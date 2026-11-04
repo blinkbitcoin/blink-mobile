@@ -1,5 +1,5 @@
-import { useCallback } from "react"
-import { gql } from "@apollo/client"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { ApolloClient, gql, useApolloClient } from "@apollo/client"
 
 import { useCardInvestmentAccountQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
@@ -19,10 +19,28 @@ gql`
       id
       defaultAccount {
         id
+        wallets {
+          id
+        }
       }
     }
   }
 `
+
+/**
+ * The sessions whose server has named the account, by client. A client is one token's
+ * session, and every custodial profile on the device restores the same persisted cache
+ * into it, so until that session's server answers, the cache can still name the account
+ * of the profile used before. Once it has answered, the cache holds this session's
+ * account, and reading it from there spares every later screen a request of its own.
+ */
+const accountAnsweredBy = new WeakSet<ApolloClient<unknown>>()
+
+/** How often a screen still waiting on the account asks again, so one whose request
+ *  failed offline is not left without it once the connection is back. */
+const ACCOUNT_RETRY_INTERVAL_MS = 15_000
+
+const NO_WALLETS: readonly string[] = []
 
 /**
  * The account the investment belongs to: its server id, or null while it is not known.
@@ -35,6 +53,7 @@ gql`
  */
 const useCardInvestmentAccount = (): {
   accountId: string | null
+  walletIds: readonly string[]
   isEligible: boolean
   refetchAccount: () => void
 } => {
@@ -42,22 +61,54 @@ const useCardInvestmentAccount = (): {
   const isAuthed = useIsAuthed()
   const isEligible = activeAccount?.type !== AccountType.SelfCustodial
 
-  /** Served from the cache the home already filled; only a fresh session fetches. */
+  /**
+   * Asked of the network until this session's server has answered, and only then read
+   * from the cache: what the cache held before would let another profile's record be
+   * read, shown and paid under this one. Until the answer arrives the id is unknown, and
+   * the investment stays out of reach. A screen whose request failed asks again on an
+   * interval until it has the answer, and picks up one another screen got on its next
+   * render, since it then reads the cache.
+   */
+  const client = useApolloClient()
+  const [answeredClient, setAnsweredClient] = useState<ApolloClient<unknown> | null>(null)
+  const hasAnsweredHere = answeredClient === client
+  const hasAnsweredElsewhere = accountAnsweredBy.has(client)
+  const isAccountAnswered = hasAnsweredHere || hasAnsweredElsewhere
+  const accountFetchPolicy = isAccountAnswered ? "cache-first" : "network-only"
+  const accountRetryIntervalMs = isAccountAnswered ? 0 : ACCOUNT_RETRY_INTERVAL_MS
   const { data, refetch } = useCardInvestmentAccountQuery({
     skip: !isEligible || !isAuthed,
-    fetchPolicy: "cache-first",
+    fetchPolicy: accountFetchPolicy,
+    pollInterval: accountRetryIntervalMs,
   })
+  const answeredAccount = data?.me?.defaultAccount
+  const answeredAccountId = answeredAccount?.id
+  const walletIds = useMemo(
+    () => answeredAccount?.wallets.map(({ id }) => id) ?? NO_WALLETS,
+    [answeredAccount],
+  )
 
-  /** For the step that has waited on the id too long: a fetch that failed, offline, is
-   *  not retried on its own, so the tap that says "try again" asks for it again. The
-   *  query is never skipped where that wait happens (an eligible account in a session),
-   *  so the refetch runs and its answer lands in the same data the wait reads. */
+  /** Shared with every later screen of the session, and kept here so this screen stops
+   *  asking the moment it has the answer. */
+  useEffect(() => {
+    if (!answeredAccountId) return
+    accountAnsweredBy.add(client)
+    setAnsweredClient(client)
+  }, [answeredAccountId, client])
+
+  /** For the step that has waited on the id too long: a fetch that failed offline is
+   *  only asked again on the interval, so the tap that says "try again" asks at once.
+   *  The query is never skipped where that wait happens (an eligible account in a
+   *  session), so the refetch runs and its answer lands in the same data the wait
+   *  reads. */
   const refetchAccount = useCallback(() => {
     refetch().catch(() => undefined)
   }, [refetch])
 
-  if (!isEligible) return { accountId: null, isEligible, refetchAccount }
-  return { accountId: data?.me?.defaultAccount?.id ?? null, isEligible, refetchAccount }
+  if (!isEligible) {
+    return { accountId: null, walletIds: NO_WALLETS, isEligible, refetchAccount }
+  }
+  return { accountId: answeredAccountId ?? null, walletIds, isEligible, refetchAccount }
 }
 
 /** What the signing step knows when the agreement is signed. */
@@ -74,6 +125,9 @@ type CardInvestmentProgressState = {
   /** The account the record is filed under, once known: what a payment is filed under
    *  too, so the receiving ledger can tell whose it is. */
   accountId: string | null
+  /** The wallets of that account, from the same answer: every one the investment's
+   *  payment may have been made from, whatever the send flow may use now. */
+  walletIds: readonly string[]
   /** Whether that account is known yet; until it is, nothing can be recorded, so a step
    *  that must record should wait on this. Never, for an account that cannot take part. */
   isAccountResolved: boolean
@@ -112,7 +166,7 @@ type CardInvestmentProgressState = {
  */
 export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
   const { persistentState, updateState } = usePersistentStateContext()
-  const { accountId, isEligible, refetchAccount } = useCardInvestmentAccount()
+  const { accountId, walletIds, isEligible, refetchAccount } = useCardInvestmentAccount()
   const progress = accountId ? getCardInvestment(persistentState, accountId) : null
 
   const start = useCallback(
@@ -209,6 +263,7 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
     progress,
     isEligible,
     accountId,
+    walletIds,
     isAccountResolved: accountId !== null,
     refetchAccount,
     start,

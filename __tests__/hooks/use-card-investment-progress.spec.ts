@@ -27,7 +27,14 @@ jest.mock("@app/graphql/is-authed-context", () => ({
   useIsAuthed: () => mockIsAuthed.current,
 }))
 
-/** The custodial account's server id, as the cache the home filled answers it. */
+/** One session's client; a fresh one per spec, so no spec inherits another's answer. */
+let mockClient: object = {}
+jest.mock("@apollo/client", () => ({
+  ...jest.requireActual("@apollo/client"),
+  useApolloClient: () => mockClient,
+}))
+
+/** The custodial account's server id, as the server answers it. */
 const mockCardInvestmentAccountQuery = jest.fn()
 const mockRefetchAccount = jest.fn(() => Promise.resolve())
 jest.mock("@app/graphql/generated", () => ({
@@ -35,6 +42,8 @@ jest.mock("@app/graphql/generated", () => ({
     mockCardInvestmentAccountQuery(options),
 }))
 
+/** Both of the account's wallets, as the server names them with the account. */
+const ACCOUNT_WALLETS = [{ id: "wallet-btc" }, { id: "wallet-usd" }]
 const SELF_CUSTODIAL_ID = "self-custodial-1"
 const CUSTODIAL_ID = "custodial-account-1"
 const OTHER_CUSTODIAL_ID = "custodial-account-2"
@@ -67,7 +76,7 @@ const custodialSession = (answer: string | null | { me: unknown } = CUSTODIAL_ID
   mockActiveAccount.current = { type: AccountType.Custodial, id: "custodial-default" }
   const data =
     typeof answer === "string"
-      ? { me: { id: "user", defaultAccount: { id: answer } } }
+      ? { me: { id: "user", defaultAccount: { id: answer, wallets: ACCOUNT_WALLETS } } }
       : answer ?? undefined
   mockCardInvestmentAccountQuery.mockReturnValue({ data, refetch: mockRefetchAccount })
 }
@@ -89,6 +98,7 @@ const applyLastUpdate = (state: PersistentState | undefined) => {
 describe("useCardInvestmentProgress", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockClient = {}
     mockPersistentState = { ...baseState }
     mockIsAuthed.current = true
     custodialSession()
@@ -137,8 +147,61 @@ describe("useCardInvestmentProgress", () => {
 
       expect(result.current.progress).toEqual(INVESTMENT)
       expect(mockCardInvestmentAccountQuery).toHaveBeenCalledWith(
-        expect.objectContaining({ skip: false, fetchPolicy: "cache-first" }),
+        expect.objectContaining({ skip: false, fetchPolicy: "network-only" }),
       )
+    })
+
+    /** A payment of the investment may have come from either wallet, whatever the send
+     *  flow allows now, so both come with the account they belong to. */
+    it("names every wallet the account holds, from the same answer as the account", () => {
+      custodialSession()
+
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      expect(result.current.walletIds).toEqual(["wallet-btc", "wallet-usd"])
+    })
+
+    it("names no wallet while the account is unknown, nor for a self-custodial one", () => {
+      custodialSession(null)
+      expect(
+        renderHook(() => useCardInvestmentProgress()).result.current.walletIds,
+      ).toEqual([])
+
+      selfCustodialSession()
+      expect(
+        renderHook(() => useCardInvestmentProgress()).result.current.walletIds,
+      ).toEqual([])
+    })
+
+    /** The server is asked, and asked again on an interval, only until it has named the
+     *  account; from then on this screen reads the answer from the cache. */
+    it("stops asking the network the moment the account is answered", () => {
+      custodialSession()
+
+      renderHook(() => useCardInvestmentProgress())
+
+      const optionsOf = (call: unknown[]) => call[0]
+      const calls = mockCardInvestmentAccountQuery.mock.calls
+      expect(optionsOf(calls[0])).toMatchObject({
+        fetchPolicy: "network-only",
+        pollInterval: 15_000,
+      })
+      expect(optionsOf(calls[calls.length - 1])).toMatchObject({
+        fetchPolicy: "cache-first",
+        pollInterval: 0,
+      })
+    })
+
+    it("keeps asking while the server has not named the account", () => {
+      custodialSession(null)
+
+      renderHook(() => useCardInvestmentProgress())
+
+      const calls = mockCardInvestmentAccountQuery.mock.calls
+      expect(calls[calls.length - 1][0]).toMatchObject({
+        fetchPolicy: "network-only",
+        pollInterval: 15_000,
+      })
     })
 
     /** Two custodial profiles on one device share the store's active-account slot; the
