@@ -1,5 +1,6 @@
 import * as React from "react"
 
+import { useIsSelfCustodialAccount } from "@app/hooks/use-is-self-custodial-account"
 import { makeStyles } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
@@ -9,6 +10,7 @@ import { ContactsCard } from "./contacts/contacts-card"
 
 export const PeopleScreen: React.FC = () => {
   const styles = useStyles()
+  const isSelfCustodial = useIsSelfCustodialAccount()
 
   return (
     <Screen
@@ -17,7 +19,7 @@ export const PeopleScreen: React.FC = () => {
       headerShown={false}
       edges={["top", "left", "right"]}
     >
-      <CirclesCardPeopleHome />
+      {!isSelfCustodial && <CirclesCardPeopleHome />}
       <ContactsCard />
       <InviteFriendsCard />
     </Screen>
