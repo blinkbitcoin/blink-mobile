@@ -4,7 +4,7 @@ import { flushEffects } from "../../helpers/flush-effects"
 
 import { SdkFeeError } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
 import { useRecommendedFeeTiers } from "@app/screens/unclaimed-deposits/hooks/use-recommended-fee-tiers"
-import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
+import { FeeTierOption } from "@app/types/fee-tiers"
 
 const mockGetRecommendedFees = jest.fn()
 

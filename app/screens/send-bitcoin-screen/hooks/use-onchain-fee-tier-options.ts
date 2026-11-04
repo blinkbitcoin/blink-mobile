@@ -8,12 +8,12 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { wrapDestination } from "@app/self-custodial/payment-details/wrap-destination"
 import { toWalletAmount } from "@app/types/amounts"
+import { type FeeTierInfo, FeeTierOption, FeeUnit } from "@app/types/fee-tiers"
 
 import { buildFeeTierOptions, feeTierLabels } from "../fee-tier-options"
 import { type ParseDestinationResult } from "../payment-destination/index.types"
 import { ConvertMoneyAmount, type PaymentDetail } from "../payment-details/index.types"
 
-import { type FeeTierInfo, FeeTierOption, FeeUnit } from "./fee-tiers.types"
 import { useCustodialFeeRail, useSelfCustodialFeeRail } from "./use-fee-rail"
 import { PAYOUT_SPEED_BY_FEE_TIER } from "./use-custodial-onchain-fee-tiers"
 

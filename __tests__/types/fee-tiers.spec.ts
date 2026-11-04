@@ -1,8 +1,4 @@
-import {
-  buildZeroTiers,
-  FeeTierOption,
-  FeeUnit,
-} from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
+import { buildZeroTiers, FeeTierOption, FeeUnit } from "@app/types/fee-tiers"
 
 describe("buildZeroTiers", () => {
   const etaMinutes = {

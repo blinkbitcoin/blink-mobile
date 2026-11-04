@@ -1,5 +1,5 @@
 import { buildFeeTierOptions } from "@app/screens/send-bitcoin-screen/fee-tier-options"
-import { FeeUnit } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
+import { FeeUnit } from "@app/types/fee-tiers"
 
 jest.mock("react-native-fs", () => ({
   DocumentDirectoryPath: "/test",
