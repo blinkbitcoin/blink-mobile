@@ -300,7 +300,9 @@ describe("SecurityScreen security score card", () => {
     const { getByTestId } = renderScreen()
     fireEvent.press(getByTestId("security-score-twoFactor"))
 
-    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate")
+    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
+      offersOnboarding: true,
+    })
   })
 
   it("routes the email signal to email registration", () => {

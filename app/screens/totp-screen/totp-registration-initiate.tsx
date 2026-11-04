@@ -3,6 +3,7 @@ import { ActivityIndicator, useWindowDimensions, View } from "react-native"
 
 import { gql } from "@apollo/client"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
 import { StepLayout } from "@app/components/step-layout"
@@ -22,7 +23,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
-import { useNavigation } from "@react-navigation/native"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -73,7 +74,9 @@ const qrCodeSize = (screenWidth: number): number =>
  * The setup key screen: the key first, to copy into an authenticator app on this phone,
  * which is where most users keep one and where they cannot scan their own screen; the
  * QR code second, for an app on another device. Next takes the key on to the code
- * screen, and from there to its backup.
+ * screen, and from there to its backup. Opened straight from the settings, it also
+ * offers the onboarding, below Next, to a user new to authenticator apps; the
+ * onboarding comes back here, to the same key.
  */
 export const TotpRegistrationInitiateScreen: React.FC = () => {
   /** The key and its QR code are on screen: no screenshot, recording or app-switcher
@@ -83,6 +86,8 @@ export const TotpRegistrationInitiateScreen: React.FC = () => {
     useNavigation<
       NativeStackNavigationProp<RootStackParamList, "totpRegistrationInitiate">
     >()
+  const { params } = useRoute<RouteProp<RootStackParamList, "totpRegistrationInitiate">>()
+  const offersOnboarding = params?.offersOnboarding === true
 
   const [totpRegistrationInitiate] = useUserTotpRegistrationInitiateMutation()
 
@@ -159,6 +164,10 @@ export const TotpRegistrationInitiateScreen: React.FC = () => {
     navigation.navigate("totpRegistrationValidate", { totpRegistrationId, secret })
   }, [navigation, totpRegistrationId, secret])
 
+  const openOnboarding = useCallback(() => {
+    navigation.navigate("totpRegistrationIntro", { isOpenedFromSetupKey: true })
+  }, [navigation])
+
   if (hasStartFailed) {
     return (
       <StepLayout
@@ -191,11 +200,20 @@ export const TotpRegistrationInitiateScreen: React.FC = () => {
     <StepLayout
       contentStyle={styles.content}
       footer={
-        <GaloyPrimaryButton
-          title={LL.common.next()}
-          onPress={handleNext}
-          {...testProps("totp-registration-next")}
-        />
+        <>
+          <GaloyPrimaryButton
+            title={LL.common.next()}
+            onPress={handleNext}
+            {...testProps("totp-registration-next")}
+          />
+          {offersOnboarding && (
+            <GaloySecondaryButton
+              title={LL.AuthenticatorOnboarding.newToAuthenticatorApps()}
+              onPress={openOnboarding}
+              {...testProps("totp-registration-onboarding")}
+            />
+          )}
+        </>
       }
     >
       <View style={styles.keyGroup}>

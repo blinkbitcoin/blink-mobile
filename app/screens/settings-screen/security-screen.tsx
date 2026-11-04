@@ -182,7 +182,8 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
        *  action exists to avoid. */
       appLock: () => enableBiometrics(goToSetPin, goToSetPin),
       hideBalance: () => setAlwaysHideBalance(true),
-      twoFactor: () => navigation.navigate("totpRegistrationInitiate"),
+      twoFactor: () =>
+        navigation.navigate("totpRegistrationInitiate", { offersOnboarding: true }),
       emailVerified: onEmailSignalPress,
     }),
     [navigation, enableBiometrics, goToSetPin, setAlwaysHideBalance, onEmailSignalPress],
