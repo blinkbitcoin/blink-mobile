@@ -1,6 +1,12 @@
 #!/bin/zsh
 
 set -eu
+
+# Concourse passes the token for the task's whole life; only the yarn install below gets it,
+# so no other command of the build, nor the exit trap, inherits it.
+GITHUB_PACKAGES_TOKEN_FOR_INSTALL="${GITHUB_PACKAGES_TOKEN:-}"
+unset GITHUB_PACKAGES_TOKEN
+
 export CI_ROOT="$(pwd)"
 export ENVFILE=.env.ci
 REACT_NATIVE_CONFIG_ENV="${CI_ROOT}/repo/${ENVFILE}"
@@ -54,7 +60,8 @@ PROXYCHECK_API_KEY=$PROXYCHECK_API_KEY
 EOF
 
 echo "    --> Installing dependencies"
-"$GITHUB_PACKAGES_AUTH" "$GITHUB_PACKAGES_NPMRC" nix develop -c yarn install
+GITHUB_PACKAGES_TOKEN="$GITHUB_PACKAGES_TOKEN_FOR_INSTALL" \
+  "$GITHUB_PACKAGES_AUTH" "$GITHUB_PACKAGES_NPMRC" nix develop -c yarn install
 echo "    --> Installing Android dependencies"
 nix develop -c sh -c 'cd android && bundle install'
 echo "    --> Installing iOS dependencies"

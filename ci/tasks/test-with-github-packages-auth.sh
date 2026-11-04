@@ -146,8 +146,9 @@ test_refuses_to_run_without_a_command() {
 }
 
 # install-deps.sh on a stand-in for its task directory, with a yarn that only records the
-# npmrc it was handed and writes a node_modules.
-test_install_deps_keeps_the_token_out_of_the_bundle() {
+# npmrc it was handed and writes a node_modules, and a git and tar, the commands that run
+# after it, that record the token they inherit before doing their own work.
+test_install_deps_gives_the_token_to_the_install_alone() {
   new_case
   local task="${WORK}/task"
   mkdir -p "${task}/deps" "${task}/deps-version" "${task}/bundled-deps" "${WORK}/bin"
@@ -166,12 +167,24 @@ echo installed > node_modules/.yarn-integrity
 EOF
   chmod +x "${WORK}/bin/yarn"
 
+  local tool
+  for tool in git tar; do
+    cat > "${WORK}/bin/${tool}" <<EOF
+#!/bin/sh
+echo "${tool}:\${GITHUB_PACKAGES_TOKEN:-}" >> "${WORK}/after-install"
+exec "$(command -v "$tool")" "\$@"
+EOF
+    chmod +x "${WORK}/bin/${tool}"
+  done
+
   local status=0
   (cd "$task" && env GITHUB_PACKAGES_TOKEN="$TOKEN" HOME="${WORK}/home" \
     PATH="${WORK}/bin:${PATH}" bash pipeline-tasks/ci/tasks/install-deps.sh > /dev/null 2>&1) ||
     status=$?
   assert_eq "install-deps succeeds" "0" "$status"
   assert_eq "yarn was handed the token" "$TOKEN_LINE" "$(grep -x -- "$TOKEN_LINE" "${WORK}/yarn-saw")"
+  assert_eq "no command after the install inherits the token" \
+    "$(printf 'git:\ntar:')" "$(cat "${WORK}/after-install")"
 
   local bundle unpacked="${WORK}/unpacked"
   bundle="$(ls "${task}"/bundled-deps/bundled-deps-v1.2.3-*.tgz)"
@@ -197,7 +210,7 @@ test_refuses_to_run_without_a_command
 
 echo "=== install-deps.sh"
 
-test_install_deps_keeps_the_token_out_of_the_bundle
+test_install_deps_gives_the_token_to_the_install_alone
 
 echo ""
 echo "Results: $PASSED passed, $FAILED failed"
