@@ -36,6 +36,9 @@ trap 'exit 143' TERM
     if [ -f "${HOME}/.npmrc" ]; then
       cat "${HOME}/.npmrc"
     fi
+    # A ~/.npmrc that does not end in a newline would take the token onto its last line,
+    # and yarn would send no auth; a blank line is harmless in an npmrc.
+    echo
     echo "//npm.pkg.github.com/:_authToken=${GITHUB_PACKAGES_TOKEN}"
   } > "$npmrc"
 )

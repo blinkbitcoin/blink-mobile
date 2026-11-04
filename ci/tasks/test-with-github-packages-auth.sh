@@ -104,6 +104,14 @@ test_carries_over_an_npmrc_ending_in_a_newline() {
   printf 'fund=false\n' > "${WORK}/home/.npmrc"
   run_wrapper "$NPMRC" "$PROBE"
   assert_eq "keeps the user's settings, then the token" \
+    "$(printf 'fund=false\n\n%s' "$TOKEN_LINE")" "$(seen content)"
+}
+
+test_keeps_an_npmrc_without_a_trailing_newline_apart_from_the_token() {
+  new_case
+  printf 'fund=false' > "${WORK}/home/.npmrc"
+  run_wrapper "$NPMRC" "$PROBE"
+  assert_eq "the user's last setting stays on its own line" \
     "$(printf 'fund=false\n%s' "$TOKEN_LINE")" "$(seen content)"
 }
 
@@ -181,6 +189,7 @@ test_without_token_warns_and_still_runs_the_command
 test_without_token_keeps_a_failing_command_status
 test_hands_the_token_to_the_command_only
 test_carries_over_an_npmrc_ending_in_a_newline
+test_keeps_an_npmrc_without_a_trailing_newline_apart_from_the_token
 test_removes_the_npmrc_once_the_command_succeeds
 test_removes_the_npmrc_once_the_command_fails
 test_removes_the_npmrc_when_terminated
