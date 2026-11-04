@@ -22,6 +22,7 @@ npmrc="$1"
 shift
 
 if [ -z "${GITHUB_PACKAGES_TOKEN:-}" ]; then
+  echo "GITHUB_PACKAGES_TOKEN not set, @blinkbitcoin installs will fail with 401" >&2
   exec "$@"
 fi
 

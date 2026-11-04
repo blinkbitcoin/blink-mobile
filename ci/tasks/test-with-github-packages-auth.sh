@@ -12,6 +12,7 @@ WRAPPER="${SCRIPT_DIR}/with-github-packages-auth.sh"
 
 TOKEN="ghp_fakeTokenForTheseTests0123456789"
 TOKEN_LINE="//npm.pkg.github.com/:_authToken=${TOKEN}"
+MISSING_TOKEN_WARNING="GITHUB_PACKAGES_TOKEN not set, @blinkbitcoin installs will fail with 401"
 
 TEST_ROOT="$(mktemp -d)"
 trap 'rm -rf "$TEST_ROOT"' EXIT
@@ -75,6 +76,7 @@ seen() {
 test_without_token_warns_and_still_runs_the_command() {
   new_case
   WITHOUT_TOKEN=true run_wrapper "$NPMRC" "$PROBE"
+  assert_eq "warns that installs will fail" "$MISSING_TOKEN_WARNING" "$STDERR"
   assert_eq "exits with the command's status" "0" "$STATUS"
   assert_eq "runs the command" "true" "$([[ -e "${WORK}/seen.path" ]] && echo true || echo false)"
   assert_eq "the command ran with no npmrc of its own" "" "$(seen path)"
