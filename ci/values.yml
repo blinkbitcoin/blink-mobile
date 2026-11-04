@@ -12,8 +12,10 @@ git_build_number_branch: build-numbers
 
 github_private_key: ((github-blinkbitcoin.private_key))
 github_api_token: ((github-blinkbitcoin.api_token))
-#! Reads @blinkbitcoin packages from GitHub Packages, so it needs the read:packages scope.
-github_packages_token: ((github-blinkbitcoin.api_token))
+#! Reads @blinkbitcoin packages from GitHub Packages: a classic PAT with read:packages and
+#! nothing else, in an entry of its own. install-deps runs every dependency's install
+#! scripts with this token in reach, so it must not be able to write anything.
+github_packages_token: ((github-packages-read.token))
 
 docker_registry: us.gcr.io/galoy-org
 docker_registry_user: ((docker-creds.username))
