@@ -3452,7 +3452,7 @@ export type LevelQuery = { readonly __typename: 'Query', readonly me?: { readonl
 export type CardInvestmentAccountQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CardInvestmentAccountQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string } } | null };
+export type CardInvestmentAccountQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string } | { readonly __typename: 'UsdWallet', readonly id: string }> } } | null };
 
 export type DisplayCurrencyQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -5368,6 +5368,9 @@ export const CardInvestmentAccountDocument = gql`
     id
     defaultAccount {
       id
+      wallets {
+        id
+      }
     }
   }
 }

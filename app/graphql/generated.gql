@@ -1312,6 +1312,10 @@ query cardInvestmentAccount {
     id
     defaultAccount {
       id
+      wallets {
+        id
+        __typename
+      }
       __typename
     }
     __typename

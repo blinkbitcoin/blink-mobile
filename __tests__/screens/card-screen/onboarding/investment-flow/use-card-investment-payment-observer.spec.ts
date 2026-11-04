@@ -23,10 +23,16 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   }),
 }))
 jest.mock("@app/graphql/is-authed-context", () => ({ useIsAuthed: () => true }))
+/** One session's client, the same object on every render as the provider's is. */
+const mockClient = {}
+jest.mock("@apollo/client", () => ({
+  ...jest.requireActual("@apollo/client"),
+  useApolloClient: () => mockClient,
+}))
 const ACCOUNT_ID = "custodial-account-1"
 jest.mock("@app/graphql/generated", () => ({
   useCardInvestmentAccountQuery: () => ({
-    data: { me: { id: "user", defaultAccount: { id: ACCOUNT_ID } } },
+    data: { me: { id: "user", defaultAccount: { id: ACCOUNT_ID, wallets: [] } } },
     refetch: () => Promise.resolve(),
   }),
 }))
