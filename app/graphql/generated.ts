@@ -8102,7 +8102,6 @@ export const MyLnUpdatesDocument = gql`
     }
     update {
       ... on LnUpdate {
-        paymentHash
         status
         transaction {
           ...Transaction

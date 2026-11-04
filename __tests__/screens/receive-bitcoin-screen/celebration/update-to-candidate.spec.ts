@@ -1,7 +1,10 @@
 import { TxNotificationType } from "@app/graphql/generated"
 import { candidateFromUpdate } from "@app/screens/receive-bitcoin-screen/celebration/update-to-candidate"
 
-const transaction = { id: "tx-1" } as never
+const transaction = {
+  id: "tx-1",
+  initiationVia: { __typename: "InitiationViaLn", paymentHash: "hash" },
+} as never
 
 describe("candidateFromUpdate", () => {
   it("celebrates a paid lightning update", () => {
@@ -9,7 +12,6 @@ describe("candidateFromUpdate", () => {
       candidateFromUpdate({
         __typename: "LnUpdate",
         status: "PAID",
-        paymentHash: "hash",
         transaction,
       }),
     ).toEqual({
@@ -24,7 +26,6 @@ describe("candidateFromUpdate", () => {
       candidateFromUpdate({
         __typename: "LnUpdate",
         status: "PENDING",
-        paymentHash: "hash",
         transaction,
       }),
     ).toBeNull()
