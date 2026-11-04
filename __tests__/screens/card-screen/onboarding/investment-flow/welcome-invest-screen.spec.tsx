@@ -23,7 +23,12 @@ const mockRefetchAccount = jest.fn()
 const mockIsAccountResolved = { current: true }
 const mockIsEligible = { current: true }
 const mockProgress: {
-  current: { selectedAmountUsd: number; settlementSats?: number; paidAt?: number } | null
+  current: {
+    selectedAmountUsd: number
+    settlementSats?: number
+    payingAt?: number
+    paidAt?: number
+  } | null
 } = { current: null }
 
 jest.mock("@app/hooks/use-card-investment-progress", () => ({
@@ -126,6 +131,28 @@ describe("WelcomeInvestScreen", () => {
       )
       await act(async () => {})
 
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "RESET",
+          payload: { index: 0, routes: [{ name: "Primary" }] },
+        }),
+      )
+    })
+
+    /** The payment step would offer the invoice again, and a second payment would land
+     *  beside the first; the home is where a payment on its way is checked against the
+     *  ledger. */
+    it("sends an investor whose payment is on its way back to the home", async () => {
+      mockProgress.current = { ...SIGNED, payingAt: 1_757_800_000_000 }
+
+      render(
+        <ContextForScreen>
+          <WelcomeInvestScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+
+      expect(mockDispatch).toHaveBeenCalledTimes(1)
       expect(mockDispatch).toHaveBeenCalledWith(
         expect.objectContaining({
           type: "RESET",
