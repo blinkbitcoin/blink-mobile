@@ -4136,6 +4136,7 @@
     "get": "Stáhnout",
     "storeNote": "„Stáhnout“ otevře App Store nebo Google Play. Po instalaci se vraťte do Blinku.",
     "haveAnApp": "Aplikaci už mám",
+    "learnHow": "Zjistit jak",
     "keyInstruction": "Zkopírujte tento klíč pro nastavení do své autentikační aplikace.",
     "qrInstruction": "Používáte jiné zařízení?\nNaskenujte místo toho tento QR kód.",
     "backupTitle": "Zálohujte svůj klíč",
