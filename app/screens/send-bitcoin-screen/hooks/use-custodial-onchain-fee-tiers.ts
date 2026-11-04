@@ -12,16 +12,16 @@ import {
   useOnChainUsdTxFeeBySpeedLazyQuery,
 } from "@app/graphql/generated"
 
-import { reportError } from "@app/utils/error-logging"
-
-import { OnchainFeeQuote } from "../payment-details/index.types"
-
 import {
   buildZeroTiers,
   FeeTierOption,
   FeeUnit,
   type FeeTierInfo,
-} from "./fee-tiers.types"
+} from "@app/types/fee-tiers"
+import { reportError } from "@app/utils/error-logging"
+
+import { OnchainFeeQuote } from "../payment-details/index.types"
+
 import { useQuoteStatus } from "./use-quote-status"
 
 export const PAYOUT_SPEED_BY_FEE_TIER: Record<FeeTierOption, PayoutSpeed> = {

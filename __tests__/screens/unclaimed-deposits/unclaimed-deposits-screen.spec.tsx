@@ -8,10 +8,7 @@ import { flushEffects } from "../../helpers/flush-effects"
 import theme from "@app/rne-theme/theme"
 import { UnclaimedDepositsScreen } from "@app/screens/unclaimed-deposits/unclaimed-deposits-screen"
 import { SdkFeeError } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
-import {
-  FeeTierOption,
-  FeeUnit,
-} from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
+import { FeeTierOption, FeeUnit } from "@app/types/fee-tiers"
 import { DepositStatus, type PendingDeposit } from "@app/types/payment"
 import { WalletCurrency } from "@app/graphql/generated"
 
