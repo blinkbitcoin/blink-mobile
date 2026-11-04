@@ -338,7 +338,7 @@ describe("DeleteAccount", () => {
       await lastConfirmProps.onModalHide?.()
     })
 
-    expect(mockSetAccountIsBeingDeleted).toHaveBeenCalledWith(true, "alice")
+    expect(mockSetAccountIsBeingDeleted).toHaveBeenCalledWith(true, "alice@breez.tips")
   })
 
   it("names the account from its persisted address while the live one has not loaded", async () => {
@@ -356,7 +356,10 @@ describe("DeleteAccount", () => {
       await lastConfirmProps.onModalHide?.()
     })
 
-    expect(mockSetAccountIsBeingDeleted).toHaveBeenCalledWith(true, "persisted")
+    expect(mockSetAccountIsBeingDeleted).toHaveBeenCalledWith(
+      true,
+      "persisted@breez.tips",
+    )
   })
 
   /** A lock the wipe could not take is still owed an answer, so this one may not land on

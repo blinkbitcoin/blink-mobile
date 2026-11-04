@@ -1,5 +1,10 @@
 import React, { useState } from "react"
-import { ActivityIndicator, TouchableOpacity, View } from "react-native"
+import {
+  AccessibilityActionEvent,
+  ActivityIndicator,
+  TouchableOpacity,
+  View,
+} from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -14,6 +19,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { DeleteAccountConfirmModal } from "./delete-account-confirm-modal"
 import { DeleteAccountHasFundsModal } from "./delete-account-has-funds-modal"
 import { isRegtestNetwork } from "@app/self-custodial/config"
+import { useLnurlServer } from "@app/self-custodial/hooks/use-lnurl-server"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import {
   probeSelfCustodialAccountWallets,
@@ -29,6 +35,9 @@ import { toastShow } from "@app/utils/toast"
 
 import { selfCustodialAccountName } from "./account-name"
 import { useAccountRemoval } from "./use-account-removal"
+
+/** The row is one accessibility element, so VoiceOver can't focus the nested delete button: expose it as an action. */
+const REMOVE_ACTION = "remove"
 
 type ProfileRowProps = {
   entry: SelfCustodialAccountEntry
@@ -50,6 +59,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
   const { requestRemoval, cancelRemoval, runPendingRemoval } = useAccountRemoval()
   const network = useSparkNetwork()
+  const { domain: lnurlDomain } = useLnurlServer()
 
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [hasFundsWarningVisible, setHasFundsWarningVisible] = useState(false)
@@ -65,6 +75,8 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
     persistedLightningAddress,
     anonymousName: LL.common.anonymousUser(),
   })
+  const accountTypeLabel = LL.AccountTypeSelectionScreen.selfCustodialLabel()
+  const removeAccountLabel = LL.ProfileScreen.removeAccount()
 
   const handleSwitch = () => {
     if (isActive) return
@@ -115,11 +127,12 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
     }
 
     setProbingBalance(true)
-    const result = await probeSelfCustodialAccountWallets(
+    const result = await probeSelfCustodialAccountWallets({
       accountId,
       network,
-      selfCustodialDepositClaimLeewayVbyte,
-    )
+      leewaySatPerVbyte: selfCustodialDepositClaimLeewayVbyte,
+      lnurlDomain,
+    })
     setProbingBalance(false)
 
     switch (result.status) {
@@ -134,6 +147,10 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
     }
   }
 
+  const handleAccessibilityAction = ({ nativeEvent }: AccessibilityActionEvent) => {
+    if (nativeEvent.actionName === REMOVE_ACTION) handleRemovePress()
+  }
+
   const handleConfirm = () => {
     requestRemoval(accountId, rowTitle)
     setConfirmVisible(false)
@@ -146,7 +163,16 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
 
   return (
     <>
-      <TouchableOpacity onPress={handleSwitch} {...testProps(`profile-row-${accountId}`)}>
+      <TouchableOpacity
+        onPress={handleSwitch}
+        testID={`profile-row-${accountId}`}
+        accessible
+        accessibilityRole="button"
+        accessibilityLabel={`${rowTitle}, ${accountTypeLabel}`}
+        accessibilityState={{ selected: isActive }}
+        accessibilityActions={[{ name: REMOVE_ACTION, label: removeAccountLabel }]}
+        onAccessibilityAction={handleAccessibilityAction}
+      >
         <ListItem
           bottomDivider
           containerStyle={[styles.listStyle, isFirstItem && styles.firstItem]}
@@ -161,7 +187,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
               {rowTitle}
             </ListItem.Title>
             <Text type="p3" style={styles.subtleText}>
-              {LL.AccountTypeSelectionScreen.selfCustodialLabel()}
+              {accountTypeLabel}
             </Text>
           </ListItem.Content>
           {probingBalance ? (
@@ -176,7 +202,9 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
               size="small"
               onPress={handleRemovePress}
               backgroundColor={colors.grey4}
-              {...testProps(`delete-button-${accountId}`)}
+              testID={`delete-button-${accountId}`}
+              accessibilityRole="button"
+              accessibilityLabel={removeAccountLabel}
             />
           )}
         </ListItem>

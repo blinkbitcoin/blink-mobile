@@ -59,7 +59,7 @@ import { useSendWallets } from "./hooks/use-send-wallets"
 
 import { testProps } from "../../utils/testProps"
 import { ConfirmFeesModal } from "./confirm-fees-modal"
-import { isValidAmount } from "./payment-details"
+import { isValidAmount, withConvertMoneyAmount } from "./payment-details"
 import { PaymentDetail } from "./payment-details/index.types"
 import { SendBitcoinDetailsExtraInfo } from "./send-bitcoin-details-extra-info"
 
@@ -148,7 +148,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   const [isLoadingLnurl, setIsLoadingLnurl] = useState(false)
   const [modalHighFeesVisible, setModalHighFeesVisible] = useState(false)
 
-  const { convertMoneyAmount: _convertMoneyAmount } = usePriceConversion()
+  const { convertMoneyAmount: _convertMoneyAmount, displayCurrency } =
+    usePriceConversion()
   const { zeroDisplayAmount } = useDisplayCurrency()
   const { paymentDestination, sendingWalletId } = route.params
 
@@ -201,9 +202,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   const [asyncErrorMessage, setAsyncErrorMessage] = useState("")
   const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
 
-  // we are caching the _convertMoneyAmount when the screen loads.
-  // this is because the _convertMoneyAmount can change while the user is on this screen
-  // and we don't want to update the payment detail with a new convertMoneyAmount
+  /** Keeps the payment detail on the current rate. A change of display currency, which is
+   *  what sats-only mode starting or ending is, also moves the amount already typed. */
   useEffect(() => {
     if (!_convertMoneyAmount) {
       return
@@ -211,9 +211,10 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
     setPaymentDetail(
       (paymentDetail) =>
-        paymentDetail && paymentDetail.setConvertMoneyAmount(_convertMoneyAmount),
+        paymentDetail &&
+        withConvertMoneyAmount(paymentDetail, _convertMoneyAmount, displayCurrency),
     )
-  }, [_convertMoneyAmount, setPaymentDetail])
+  }, [_convertMoneyAmount, displayCurrency, setPaymentDetail])
 
   // we set the default values when the screen loads
   // this only run once (doesn't re-run after paymentDetail is set)

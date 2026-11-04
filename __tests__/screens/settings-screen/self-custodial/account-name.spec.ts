@@ -11,7 +11,7 @@ describe("selfCustodialAccountName", () => {
         persistedLightningAddress: "persisted@breez.tips",
         anonymousName: ANONYMOUS,
       }),
-    ).toBe("live")
+    ).toBe("live@breez.tips")
   })
 
   /** The live address is empty until the wallet has loaded it, offline or on a slow
@@ -24,7 +24,7 @@ describe("selfCustodialAccountName", () => {
         persistedLightningAddress: "persisted@breez.tips",
         anonymousName: ANONYMOUS,
       }),
-    ).toBe("persisted")
+    ).toBe("persisted@breez.tips")
   })
 
   /** The live address belongs to whichever account is active, never to this one. */
@@ -36,7 +36,7 @@ describe("selfCustodialAccountName", () => {
         persistedLightningAddress: "persisted@breez.tips",
         anonymousName: ANONYMOUS,
       }),
-    ).toBe("persisted")
+    ).toBe("persisted@breez.tips")
   })
 
   it("calls an account with no address anonymous", () => {

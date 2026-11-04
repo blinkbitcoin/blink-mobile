@@ -15,7 +15,10 @@ const parsedPaymentDestination = (
   if (isSendDestination(result)) return result.validDestination
   if (
     !result.valid &&
-    result.invalidReason === InvalidDestinationReason.UsernameDoesNotExist
+    (result.invalidReason === InvalidDestinationReason.UsernameDoesNotExist ||
+      /** The backend could not be asked. The Lightning Address route runs against a
+       *  different host, so it is still worth trying rather than giving up here. */
+      result.invalidReason === InvalidDestinationReason.DestinationUnverifiable)
   ) {
     return result.invalidPaymentDestination
   }

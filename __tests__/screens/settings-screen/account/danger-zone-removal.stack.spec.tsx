@@ -263,7 +263,7 @@ describe("Danger zone removal under the real lock", () => {
 
       expect(screen.queryByText("Delete account and data")).toBeNull()
       expect(screen.getByTestId("account-deletion-lock")).toBeTruthy()
-      expect(screen.getByText("alice")).toBeTruthy()
+      expect(screen.getByText("alice@breez.tips")).toBeTruthy()
     })
 
     it("still refuses the Android back key once that component is gone", async () => {
@@ -288,7 +288,7 @@ describe("Danger zone removal under the real lock", () => {
       expect(mockToastShow).toHaveBeenCalledWith(
         expect.objectContaining({
           type: "success",
-          message: "You removed account alice.",
+          message: "You removed account alice@breez.tips.",
         }),
       )
     })
