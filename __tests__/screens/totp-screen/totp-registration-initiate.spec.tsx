@@ -128,7 +128,7 @@ describe("TotpRegistrationInitiateScreen", () => {
     mockRouteParams = { offersOnboarding: true }
     await renderScreen()
 
-    fireEvent.press(screen.getByText(LL.AuthenticatorOnboarding.newToAuthenticatorApps()))
+    fireEvent.press(screen.getByText(LL.AuthenticatorOnboarding.learnHow()))
 
     expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationIntro", {
       isOpenedFromSetupKey: true,
@@ -140,9 +140,7 @@ describe("TotpRegistrationInitiateScreen", () => {
   it("does not offer the onboarding when it was reached through it", async () => {
     await renderScreen()
 
-    expect(
-      screen.queryByText(LL.AuthenticatorOnboarding.newToAuthenticatorApps()),
-    ).toBeNull()
+    expect(screen.queryByText(LL.AuthenticatorOnboarding.learnHow())).toBeNull()
   })
 
   it("hands the code screen the registration it started and its setup key", async () => {

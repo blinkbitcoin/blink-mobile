@@ -208,7 +208,7 @@ export const TotpRegistrationInitiateScreen: React.FC = () => {
           />
           {offersOnboarding && (
             <GaloySecondaryButton
-              title={LL.AuthenticatorOnboarding.newToAuthenticatorApps()}
+              title={LL.AuthenticatorOnboarding.learnHow()}
               onPress={openOnboarding}
               {...testProps("totp-registration-onboarding")}
             />

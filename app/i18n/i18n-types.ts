@@ -13829,9 +13829,9 @@ type RootTranslation = {
 		 */
 		haveAnApp: string
 		/**
-		 * N​e​w​ ​t​o​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​s​?
+		 * L​e​a​r​n​ ​h​o​w
 		 */
-		newToAuthenticatorApps: string
+		learnHow: string
 		/**
 		 * C​o​p​y​ ​t​h​i​s​ ​s​e​t​u​p​ ​k​e​y​ ​i​n​t​o​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
 		 */
@@ -28013,9 +28013,9 @@ export type TranslationFunctions = {
 		 */
 		haveAnApp: () => LocalizedString
 		/**
-		 * New to authenticator apps?
+		 * Learn how
 		 */
-		newToAuthenticatorApps: () => LocalizedString
+		learnHow: () => LocalizedString
 		/**
 		 * Copy this setup key into your authenticator app.
 		 */
