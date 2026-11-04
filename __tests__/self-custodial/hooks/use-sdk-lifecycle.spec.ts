@@ -921,7 +921,7 @@ describe("useSdkLifecycle: connectivity and retries", () => {
   })
 })
 
-describe("useSdkLifecycle loadMore while the connection changes or fails", () => {
+describe("useSdkLifecycle paging when the account switches or a page fails", () => {
   beforeEach(resetMocks)
 
   it("drops a page that lands after the account has switched", async () => {
@@ -1000,5 +1000,112 @@ describe("useSdkLifecycle loadMore while the connection changes or fails", () =>
     )
     expect(result.current.loadingMore).toBe(false)
     expect(result.current.hasMoreTransactions).toBe(true)
+  })
+
+  it("starts the new account from its own first page", async () => {
+    const sdkB = buildSdk("sdk-B")
+    mockInitSdk.mockResolvedValueOnce(buildSdk("sdk-A")).mockResolvedValueOnce(sdkB)
+    captureListener()
+    mockGetSnapshot.mockResolvedValueOnce({
+      wallets: [],
+      allTransactions: [],
+      hasMore: true,
+      rawTransactionCount: 250,
+    })
+
+    const { result, rerender } = renderHook(
+      ({ accountId }: { accountId: string }) => useSdkLifecycle(accountId, 0),
+      { initialProps: { accountId: "acct-A" } },
+    )
+    await waitFor(() => expect(result.current.hasMoreTransactions).toBe(true))
+
+    rerender({ accountId: "acct-B" })
+    await waitFor(() => expect(result.current.connectedAccountId).toBe("acct-B"))
+    await waitFor(() =>
+      expect(mockGetSnapshot.mock.calls.some(([sdk]) => sdk === sdkB)).toBe(true),
+    )
+
+    const firstSnapshotOfB = mockGetSnapshot.mock.calls.find(([sdk]) => sdk === sdkB)
+    expect(firstSnapshotOfB).toEqual([sdkB, 0])
+  })
+
+  it("pages the new account on its own while the previous account's page is on its way", async () => {
+    const sdkB = buildSdk("sdk-B")
+    mockInitSdk.mockResolvedValueOnce(buildSdk("sdk-A")).mockResolvedValueOnce(sdkB)
+    captureListener()
+    mockGetSnapshot
+      .mockResolvedValueOnce({
+        wallets: [],
+        allTransactions: [],
+        hasMore: true,
+        rawTransactionCount: 250,
+      })
+      .mockResolvedValue({
+        wallets: [],
+        allTransactions: [],
+        hasMore: true,
+        rawTransactionCount: 20,
+      })
+    const { loadMoreTransactions: loadMoreMock } = jest.requireMock(
+      "@app/self-custodial/providers/wallet-snapshot",
+    )
+    let resolvePageOfA: (page: unknown) => void = () => {}
+    let resolvePageOfB: (page: unknown) => void = () => {}
+    loadMoreMock
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolvePageOfA = resolve
+          }),
+      )
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolvePageOfB = resolve
+          }),
+      )
+
+    const { result, rerender } = renderHook(
+      ({ accountId }: { accountId: string }) => useSdkLifecycle(accountId, 0),
+      { initialProps: { accountId: "acct-A" } },
+    )
+    await waitFor(() => expect(result.current.hasMoreTransactions).toBe(true))
+    let pageOfA: Promise<void> = Promise.resolve()
+    act(() => {
+      pageOfA = result.current.loadMore()
+    })
+
+    rerender({ accountId: "acct-B" })
+    await waitFor(() => expect(result.current.connectedAccountId).toBe("acct-B"))
+    await waitFor(() => expect(result.current.hasMoreTransactions).toBe(true))
+    expect(result.current.loadingMore).toBe(false)
+
+    let pageOfB: Promise<void> = Promise.resolve()
+    act(() => {
+      pageOfB = result.current.loadMore()
+    })
+    expect(loadMoreMock).toHaveBeenLastCalledWith(sdkB, 20)
+
+    await act(async () => {
+      resolvePageOfA({
+        transactions: [{ id: "older-payment-of-a" }],
+        hasMore: false,
+        rawCount: 1,
+      })
+      await pageOfA
+    })
+    expect(result.current.loadingMore).toBe(true)
+
+    await act(async () => {
+      resolvePageOfB({
+        transactions: [{ id: "older-payment-of-b" }],
+        hasMore: false,
+        rawCount: 5,
+      })
+      await pageOfB
+    })
+    expect(result.current.loadingMore).toBe(false)
+    expect(result.current.hasMoreTransactions).toBe(false)
+    expect(result.current.allTransactions).toEqual([{ id: "older-payment-of-b" }])
   })
 })
