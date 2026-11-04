@@ -89,6 +89,52 @@ const writeIndex = async (entries: SelfCustodialAccountEntry[]): Promise<void> =
 
 export const listSelfCustodialAccounts = async (): Promise<ReadIndexResult> => readIndex()
 
+export const StoredWalletPresence = {
+  Present: "present",
+  Absent: "absent",
+  /** The index could not be read, so this device may or may not hold a wallet. */
+  Unknown: "unknown",
+} as const
+
+export type StoredWalletPresence =
+  (typeof StoredWalletPresence)[keyof typeof StoredWalletPresence]
+
+/**
+ * Whether this device still holds a self-custodial wallet, with "could not tell" kept as
+ * its own answer rather than folded into either of the other two.
+ *
+ * Two callers ask this and lean opposite ways on an unreadable index, both deliberately: a
+ * logout keeps the app lock on an answer it could not get, and a sessionless cold start
+ * lands on the landing screen. Sharing a boolean would force one of those biases on the
+ * other, so what is shared is the reading, and each caller names its own bias at the point
+ * it applies it. That is also what keeps the two from drifting apart as this read changes.
+ */
+export const readStoredWalletPresence = async (): Promise<StoredWalletPresence> => {
+  const wallets = await listSelfCustodialAccounts()
+  if (wallets.status === StorageReadStatus.ReadFailed) return StoredWalletPresence.Unknown
+
+  return wallets.entries.length > 0
+    ? StoredWalletPresence.Present
+    : StoredWalletPresence.Absent
+}
+
+/**
+ * The Lightning Address last known for an account, or null when none is recorded or the
+ * index cannot be read.
+ *
+ * An address is a name a server answers for, not device state: it keeps working for
+ * payers whether or not this device can currently ask about it. Reading the recorded one
+ * is therefore what lets the wallet go on offering an address while the LNURL server is
+ * unreachable, instead of hiding it as though it had been given up.
+ */
+export const getSelfCustodialLightningAddress = async (
+  id: string,
+): Promise<string | null> => {
+  const result = await readIndex()
+  if (result.status === StorageReadStatus.ReadFailed) return null
+  return result.entries.find((entry) => entry.id === id)?.lightningAddress ?? null
+}
+
 export const addSelfCustodialAccountId = async (id: string): Promise<void> => {
   const result = await readIndex()
   if (result.status === StorageReadStatus.ReadFailed) return

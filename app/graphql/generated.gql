@@ -621,6 +621,18 @@ mutation migrationStart {
   }
 }
 
+mutation onChainAddressCreate($input: OnChainAddressCreateInput!) {
+  onChainAddressCreate(input: $input) {
+    errors {
+      message
+      code
+      __typename
+    }
+    address
+    __typename
+  }
+}
+
 mutation onChainAddressCurrent($input: OnChainAddressCurrentInput!) {
   onChainAddressCurrent(input: $input) {
     errors {
@@ -757,6 +769,7 @@ mutation userEmailRegistrationInitiate($input: UserEmailRegistrationInitiateInpu
   userEmailRegistrationInitiate(input: $input) {
     errors {
       message
+      code
       __typename
     }
     emailRegistrationId
@@ -890,10 +903,11 @@ mutation userPhoneRegistrationValidate($input: UserPhoneRegistrationValidateInpu
   }
 }
 
-mutation userTotpDelete {
-  userTotpDelete {
+mutation userTotpDelete($input: UserTotpDeleteInput) {
+  userTotpDelete(input: $input) {
     errors {
       message
+      code
       __typename
     }
     me {
@@ -2117,6 +2131,14 @@ query totpRegistrationScreen {
   me {
     id
     username
+    __typename
+  }
+}
+
+query totpRegistrationState {
+  me {
+    id
+    totpEnabled
     __typename
   }
 }

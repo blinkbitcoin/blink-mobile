@@ -28,20 +28,28 @@ export const InvisibleBackButton = (): React.ReactNode => {
 
 type HeaderBackControlParams = {
   canGoBack?: boolean
+  /** Replaces the plain go back, for a screen whose way out does more than leave. */
+  onPress?: () => void
 }
 
-const HeaderBackButtonWithTheme = (
-  props: React.ComponentProps<typeof HeaderBackButton>,
-): React.ReactNode => {
+type HeaderBackButtonWithThemeProps = React.ComponentProps<typeof HeaderBackButton> & {
+  onBack?: () => void
+}
+
+const HeaderBackButtonWithTheme = ({
+  onBack,
+  ...props
+}: HeaderBackButtonWithThemeProps): React.ReactNode => {
   const navigation = useNavigation()
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
+  const handleBack = onBack ?? (() => navigation.goBack())
   return (
     <HeaderBackButton
       {...props}
-      onPress={() => navigation.goBack()}
+      onPress={handleBack}
       pressColor={colors.grey5}
       pressOpacity={1}
       style={styles.backButton}
@@ -60,9 +68,16 @@ const HeaderBackButtonWithTheme = (
  * fewer hooks than expected" and drops the whole navigation tree into the app-wide error
  * boundary (#4176).
  */
-export const headerBackControl = ({ canGoBack = true }: HeaderBackControlParams = {}) => {
+export const headerBackControl = ({
+  canGoBack = true,
+  onPress,
+}: HeaderBackControlParams = {}) => {
   const HeaderBack = (props: NativeStackHeaderBackProps): React.ReactNode =>
-    canGoBack ? <HeaderBackButtonWithTheme {...props} /> : <InvisibleBackButton />
+    canGoBack ? (
+      <HeaderBackButtonWithTheme {...props} onBack={onPress} />
+    ) : (
+      <InvisibleBackButton />
+    )
 
   return HeaderBack
 }

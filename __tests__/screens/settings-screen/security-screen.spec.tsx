@@ -108,7 +108,11 @@ jest.mock("@app/utils/toast", () => ({
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useFocusEffect: (callback: () => void) => mockUseFocusEffect(callback),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    isFocused: () => true,
+    addListener: () => () => {},
+  }),
 }))
 
 jest.mock("@app/components/screen", () => ({
@@ -162,7 +166,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 const baseState: PersistentState = {
-  schemaVersion: 21,
+  schemaVersion: 23,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -181,7 +185,7 @@ const Harness: React.FC<{ initialState: PersistentState }> = ({ initialState }) 
           setPersistentState((prev) => update(prev) ?? prev)
         },
         resetState: mockResetState,
-        clearToken: async () => {},
+        clearToken: async () => true,
       }}
     >
       {/* eslint-disable @typescript-eslint/no-explicit-any */}
@@ -666,7 +670,7 @@ describe("SecurityScreen — turning the PIN off", () => {
     return rendered
   }
 
-  it("clears the lockout along with the PIN", async () => {
+  it("clears the attempt budget along with the PIN", async () => {
     // Otherwise a lock outlives the PIN that produced it and greets the next
     // PIN the user sets.
     const { getByTestId } = await renderWithPinOn()
@@ -679,7 +683,7 @@ describe("SecurityScreen — turning the PIN off", () => {
     expect(mockClearPinFailureState).toHaveBeenCalledTimes(1)
   })
 
-  it("leaves the lockout in place when the PIN itself could not be removed", async () => {
+  it("leaves the attempt budget in place when the PIN itself could not be removed", async () => {
     mockRemovePin.mockResolvedValue(false)
     const { getByTestId } = await renderWithPinOn()
 

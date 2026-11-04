@@ -31,6 +31,8 @@
     "createError": "Tidak dapat membuat kunci API. Silakan coba lagi.",
     "revokeError": "Tidak dapat mencabut kunci API. Silakan coba lagi.",
     "loadError": "Tidak dapat memuat kunci API Anda. Silakan coba lagi nanti.",
+    "discardSecretTitle": "Buang kunci API ini?",
+    "discardSecretBody": "Ini satu-satunya kali rahasia ditampilkan. Jika Anda pergi sekarang, kunci tidak dapat dipulihkan dan Anda harus membuat yang baru.",
     "done": "Selesai"
   },
   "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
     "skip": "Lewati",
     "unlock": "Buka Kunci",
     "usePin": "Gunakan Pin",
-    "confirmLogout": "Apakah anda yakin anda ingin keluar? Ini akan mengatur ulang cache anda dan semua pengaturan pengguna lokal"
+    "confirmLogout": "Apakah anda yakin anda ingin keluar? Ini akan mengatur ulang cache anda dan semua pengaturan pengguna lokal",
+    "forgotPin": "Lupa PIN? Hapus dompet",
+    "removeWalletsTitle": "Hapus dompet dari perangkat ini?",
+    "removeWalletsBody": "Ini menghapus semua dompet dari perangkat ini dan mengeluarkan Anda. Untuk memulihkan dompet, Anda memerlukan frasa pemulihannya. Tanpa itu, dompet akan hilang.",
+    "removeWalletsConfirm": "Hapus dompet",
+    "removeWalletsFailed": "Beberapa dompet tidak dapat dihapus. Silakan coba lagi."
   },
   "PeopleScreen": {
     "title": "Orang-orang",
@@ -2175,16 +2182,19 @@
     "walletCountNotTwo": "Jumlah dompet bukan 2. Silakan gunakan dasbor untuk melihat semua dompet dan dana akun ini"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Tidak dapat mencatat percobaan dengan aman.",
+    "attemptsLeft": "{attemptsRemaining: number} percobaan tersisa.",
     "attemptsRemaining": "PIN salah. {attemptsRemaining: number} percobaan tersisa.",
     "enterPin": "Masukkan kode PIN Anda",
-    "lockoutUnavailable": "Tidak dapat mencatat percobaan gagal dengan aman. Keluar.",
+    "oneAttemptLeft": "1 percobaan tersisa.",
     "oneAttemptRemaining": "PIN salah. 1 percobaan tersisa.",
     "pinUnreadable": "Tidak dapat memeriksa PIN Anda. Silakan coba lagi.",
     "setPin": "Atur kode PIN Anda",
     "setPinFailedMatch": "PIN tidak cocok - Atur kode PIN Anda",
     "storePinFailed": "Tidak dapat menyimpan PIN Anda.",
     "tooManyAttempts": "Terlalu banyak percobaan gagal. Keluar.",
-    "tryAgainIn": "Coba lagi dalam {seconds: number} dtk.",
+    "attemptBudgetSpent": "Terlalu banyak percobaan gagal.",
+    "tryAgainIn": "Coba lagi dalam {time: string}.",
     "verifyPin": "Verifikasi kode PIN Anda"
   },
   "PriceHistoryScreen": {
@@ -2219,6 +2229,12 @@
     "error": "Gagal membuat faktur. Silakan hubungi dukungan jika masalah ini terus berlanjut.",
     "copyInvoice": "Salin",
     "shareInvoice": "Bagikan",
+    "newAddress": "Baru",
+    "newAddressHint": "Membuat alamat Bitcoin baru. Alamat sebelumnya tetap berfungsi.",
+    "newAddressGenerated": "Alamat baru siap. Alamat sebelumnya tetap berfungsi.",
+    "newAddressFailed": "Gagal membuat alamat baru. Silakan coba lagi.",
+    "newAddressRateLimited": "Terlalu banyak alamat baru. Tunggu sebentar lalu coba lagi.",
+    "onchainAddressLoadFailed": "Gagal memuat alamat Bitcoin Anda. Ketuk Baru untuk mencoba lagi.",
     "addAmount": "Minta Jumlah Tertentu",
     "expired": "Faktur telah kedaluwarsa",
     "expiresIn": "Berakhir dalam",
@@ -2354,6 +2370,8 @@
     "invalidAmount": "Ini mengandung jumlah yang tidak valid. Silakan buat ulang dengan jumlah yang valid.",
     "usernameDoesNotExist": "{lnAddress: string} tampaknya bukan alamat {bankName: string} yang ada.",
     "usernameDoesNotExistAdvice": "Pastikan ejaan benar atau minta penerima memberikan faktur LN atau alamat BTC.",
+    "destinationUnverifiable": "Kami tidak dapat memeriksa {lnAddress} sekarang — server {bankName} tidak merespons.",
+    "destinationUnverifiableAdvice": "Alamatnya kemungkinan besar benar. Coba lagi sebentar, atau minta penerima memberikan invoice LN atau alamat BTC.",
     "selfPaymentError": "{lnAddress: string} adalah alamat {bankName: string} Anda.",
     "selfPaymentAdvice": "Jika Anda ingin mengirim uang ke akun lain milik Anda, gunakan faktur, LN, atau alamat BTC.",
     "lnAddressError": "Kami tidak dapat mencapai alamat Lightning ini. Jika Anda yakin itu ada, coba lagi nanti.",
@@ -2426,9 +2444,9 @@
     "time": "Waktu",
     "type": "Jenis",
     "feeTier": "Prioritas transaksi",
-    "fast": "Cepat",
-    "medium": "Sedang",
-    "slow": "Lambat",
+    "fast": "Prioritas",
+    "medium": "Standar",
+    "slow": "Ekonomis",
     "recommended": "Direkomendasikan",
     "walletOffline": "Dompet Anda sedang offline. Silakan periksa koneksi Anda dan coba lagi.",
     "sdkInsufficientFunds": "Dana tidak cukup untuk transaksi ini.",
@@ -2437,7 +2455,7 @@
     "sdkGenericError": "Tidak dapat memperkirakan biaya. Coba jumlah yang berbeda."
   },
   "SettingsScreen": {
-    "createAddress": "Buat alamat",
+    "createAddress": "Buat alamat Lightning",
     "addressDisabled": "(nonaktif)",
     "donationButton": "Tombol donasi",
     "btcpayServer": "BTCPay Server",
@@ -2454,6 +2472,7 @@
     "activated": "Diaktifkan",
     "addressScreen": "Cara menerima pembayaran",
     "nonCustodialAccount": "Akun non-kustodial",
+    "custodialAccount": "Akun kustodial",
     "tapUserName": "Ketuk untuk mengatur nama pengguna",
     "notifications": "Notifikasi",
     "title": "Pengaturan",
@@ -2562,8 +2581,6 @@
     "emailUnverifiedContent": "Pastikan Anda dapat masuk kembali ke akun Anda dengan memverifikasi email. Apakah Anda ingin melakukan verifikasi sekarang?",
     "totp": "Otentikasi dua faktor",
     "totpDeactivated": "Otentikasi dua faktor telah dinonaktifkan",
-    "totpDeleteAlertTitle": "Hapus otentikasi dua faktor",
-    "totpDeleteAlertContent": "Apakah Anda yakin ingin menghapus otentikasi dua faktor Anda?",
     "copiedAccountId": "ID akun Anda telah disalin ke papan klip",
     "yourAccountId": "ID Akun Anda",
     "accountId": "ID Akun",
@@ -2577,12 +2594,14 @@
     "error": "Tidak dapat mengambil profil saat ini",
     "fromThisDevice": "dari perangkat ini?",
     "switchAccount": "Anda beralih ke akun lain",
-    "removedAccount": "Anda menghapus akun {identifier: string}."
+    "removedAccount": "Anda menghapus akun {identifier: string}.",
+    "removeAccount": "Hapus akun"
   },
   "StablesatsRestriction": {
     "walletLabel": "tidak tersedia di wilayah Anda",
     "anonModeWalletLabel": "tidak tersedia dalam mode Incognito",
-    "unknownRegionWalletLabel": "ketersediaan tidak dapat diperiksa, tarik ke bawah untuk mencoba lagi"
+    "unknownRegionWalletLabel": "ketersediaan tidak dapat diperiksa, tarik ke bawah untuk mencoba lagi",
+    "networkWalletLabel": "tidak tersedia di jaringan ini"
   },
   "AnonModeConvertModal": {
     "title": "Transfer saldo Dolar Anda terlebih dahulu",
@@ -2616,14 +2635,11 @@
     "youGet": "Anda dapat"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Otentikasi dua faktor",
-    "secret": "Rahasia/cadangan",
-    "content": "Pindai kode QR ini dengan aplikasi autentikator Anda. Sebagai alternatif, Anda dapat menyalin/tempelkan kode rahasia secara manual ke aplikasi autentikator Anda."
+    "title": "Otentikasi dua faktor"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Otentikasi dua faktor",
-    "enter6digitCode": "Masukkan kode 6 digit dari aplikasi autentikator Anda untuk memvalidasi otentikasi dua faktor Anda.",
-    "success": "Otentikasi dua faktor telah diaktifkan. Anda sekarang hanya dapat masuk kembali dengan ponsel atau email DAN autentikasi dua faktor Anda.\n\nPerangkat di akun ini yang belum masuk dengan 2FA harus masuk kembali.\n\nHanya akun level 2 yang dapat dipulihkan oleh dukungan pelanggan jika akses 2FA hilang."
+    "enter6digitCode": "Masukkan kode 6 digit dari aplikasi autentikator Anda untuk memvalidasi otentikasi dua faktor Anda."
   },
   "TotpLoginValidateScreen": {
     "title": "Otentikasi dua faktor",
@@ -2667,7 +2683,7 @@
   "TransactionDetailScreen": {
     "paid": "Dibayar ke/dari",
     "received": "Anda menerima",
-    "spent": "Anda menghabiskan",
+    "sent": "Anda mengirim",
     "sending": "Mengirim",
     "receivingAccount": "Akun Penerima",
     "sendingAccount": "Akun Pengirim",
@@ -2743,6 +2759,7 @@
       "tooLong": "Alamat harus memiliki maksimal 50 karakter",
       "invalidCharacter": "Alamat hanya boleh berisi huruf, angka, dan garis bawah",
       "addressUnavailable": "Maaf, alamat ini sudah digunakan",
+      "serverUnreachable": "Tidak dapat menghubungi server alamat. Coba lagi sebentar.",
       "unknownError": "Terjadi kesalahan yang tidak diketahui, silakan coba lagi nanti",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3039,7 +3056,8 @@
     "problemPersists": "Jika masalah berlanjut, hubungi dukungan.",
     "fatalError": "Maaf, tampaknya ada masalah dalam memuat data aplikasi. Jika masalah berlanjut, silakan hubungi dukungan.",
     "showError": "Tampilkan Kesalahan",
-    "clearAppData": "Hapus Data Aplikasi dan Keluar"
+    "clearAppData": "Hapus Data Aplikasi dan Keluar",
+    "screenSecurityUnavailable": "Layar ini tetap disembunyikan karena perlindungan tangkapan layar tidak dapat diaktifkan."
   },
   "notifications": {
     "payment": {
@@ -3070,7 +3088,13 @@
     "deleteAccountFromPhone": "Halo!, tolong tutup akun saya. Nomor telepon saya adalah {phoneNumber: string}.",
     "deleteAccountError": "Terjadi kesalahan. Hubungi {email: string} untuk bantuan lebih lanjut.",
     "bye": "Selamat tinggal!",
-    "deleteAccountWarning": "Perhatian: Penutupan akun bersifat permanen!\nPastikan dompet tidak memiliki dana sebelum menutup.\nAkun yang ditutup tidak dapat dipulihkan.\nKami dapat menyimpan catatan tertentu sebagaimana diwajibkan oleh hukum."
+    "deleteAccountWarning": "Perhatian: Penutupan akun bersifat permanen!\nPastikan dompet tidak memiliki dana sebelum menutup.\nAkun yang ditutup tidak dapat dipulihkan.\nKami dapat menyimpan catatan tertentu sebagaimana diwajibkan oleh hukum.",
+    "downloadLogs": "Unduh log",
+    "exportLogsTitle": "Bagikan log dompet Anda",
+    "exportLogsBody": "Berkas ini membantu tim dukungan kami menelusuri masalah pada dompet Anda. Berkas ini berisi riwayat pembayaran (jumlah, faktur, dan alamat) serta pengenal setiap dompet non-kustodial di perangkat ini, bukan hanya yang ini, tetapi tidak pernah frasa cadangan atau kunci Anda. Bagikan hanya kepada tim dukungan kami.",
+    "exportLogsConfirm": "Bagikan log",
+    "noLogsYet": "Belum ada log untuk dibagikan. Buka dompet Anda dan coba lagi.",
+    "exportLogsError": "Tidak dapat mengekspor log. Coba lagi."
   },
   "lnurl": {
     "overLimit": "Anda tidak dapat mengirim lebih dari jumlah maksimum.",
@@ -3800,7 +3824,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Cadangkan dompet Anda",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Pilih metode cadangan Anda",
@@ -3845,6 +3869,15 @@
         "title": "Selamat datang di Blink non-kustodial",
         "testSuccess": "Frasa cadanganmu sudah benar"
       }
+    },
+    "BundleExport": {
+      "title": "Keluar darurat",
+      "body": "Jika Spark mati, paket ini memungkinkanmu memindahkan bitcoin-mu secara on-chain tanpa Blink. Saldo dolarmu tidak bisa dipulihkan.",
+      "download": "Unduh paket",
+      "sensitiveTitle": "Sensitif",
+      "learnMore": "Pelajari lebih lanjut tentang keluar sepihak",
+      "sensitiveConfirm": "Unduh",
+      "sensitiveBody": "Berkas ini menunjukkan saldo dan riwayat pembayaranmu, jadi rahasiakan. Untuk memakainya dalam keadaan darurat, kamu juga perlu frasa cadanganmu."
     },
     "CloudBackup": {
       "title": "Mari cadangkan dompet Anda",
@@ -4050,6 +4083,12 @@
     "recognizePhraseTitle": "Apakah Anda mengenali frasa cadangan ini?",
     "recognizePhraseBody": "Jangan pernah memasukkan kata-kata yang dikirim orang lain kepada Anda."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "Operator tidak dapat dijangkau",
+    "outageBody": "Spark sedang mengalami gangguan. Tunggu beberapa menit lalu coba lagi atau hubungi {support} kami",
+    "outageSupport": "Dukungan",
+    "tryAgainLater": "Coba lagi nanti"
+  },
   "BackupNudge": {
     "title": "Dana Anda dalam bahaya",
     "description": "Amankan dompet Anda sekarang. Hanya butuh satu menit.",
@@ -4058,6 +4097,81 @@
     "modalTitle": "Amankan dana Anda",
     "modalDescription": "Kami sangat menyarankan Anda untuk mencadangkan dompet Anda untuk mencegah kehilangan total dana jika Anda kehilangan perangkat ini.",
     "secureMe": "Amankan dompet"
+  },
+  "TwoFactorEnforcement": {
+    "title": "Atur otentikasi dua faktor",
+    "cardDescription": "Lindungi akun Anda dari akses yang tidak sah.",
+    "cardCta": "Atur",
+    "settingsDescription": "Lindungi akun Anda dari akses yang tidak sah dengan mengaturnya.",
+    "setupTitle": "Atur otentikasi dua faktor sekarang",
+    "setupDescription": "Untuk mencegah akses yang tidak sah ke akun Anda, tambahkan otentikasi dua faktor sekarang.",
+    "setAuthenticator": "Atur authenticator",
+    "reminderTitle": "Tambahkan authenticator untuk melindungi dana Anda",
+    "reminderDescription": "Saldo Anda telah bertambah. Aplikasi authenticator menjaga akun Anda tetap aman, bahkan jika seseorang mendapatkan akses ke email atau ponsel Anda.",
+    "modalReminder": "Jika Anda menutupnya sekarang, pastikan untuk mengaktifkannya sesegera mungkin.",
+    "dismissTwoMore": "Anda dapat menutup ini dua kali lagi.",
+    "dismissOneMore": "Anda dapat menutup ini satu kali lagi.",
+    "dismissLast": "Ini adalah terakhir kalinya Anda dapat menutup ini.",
+    "setNow": "Atur sekarang",
+    "dontWantTo": "Saya tidak mau",
+    "highBalanceTitle": "Anda memiliki lebih dari {amount}, harap tambahkan perlindungan tambahan",
+    "protectionRequiredTitle": "Harap tambahkan perlindungan tambahan untuk tetap menggunakan Blink",
+    "protectionRequiredBody": "Semakin banyak dana yang Anda miliki, semakin penting keamanan yang lebih baik. Harap tambahkan authenticator untuk terus menggunakan Blink.",
+    "nonCustodialTitle": "Jika Anda tidak ingin mengatur otentikasi dua faktor",
+    "nonCustodialBody": "Pilihan lainnya adalah beralih ke non-kustodial. Maka Anda bertanggung jawab atas dana Anda sendiri."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Lindungi dana Anda dengan authenticator",
+    "introDescription": "Aplikasi authenticator membuat kode 6 digit baru setiap 30 detik.",
+    "takeoversTitle": "Mencegah pengambilalihan akun",
+    "takeoversDescription": "Kode hanya ada di ponsel Anda",
+    "stolenNumberTitle": "Tetap aman meski nomor Anda dicuri",
+    "stolenNumberDescription": "Meskipun seseorang berhasil mengakses email atau nomor telepon Anda, mereka tidak bisa masuk",
+    "durationTitle": "Hanya sekitar 2 menit",
+    "durationDescription": "Kami akan memandu Anda langkah demi langkah",
+    "getStarted": "Mulai",
+    "appsTitle": "Dapatkan aplikasi authenticator",
+    "appsDescription": "Aplikasi authenticator apa pun bisa digunakan. Yang berikut ini gratis dan tepercaya:",
+    "googleAuthenticatorDescription": "Sederhana dan banyak digunakan. Cadangan opsional ke akun Google Anda.",
+    "protonAuthenticatorDescription": "Sumber terbuka. Cadangan dan sinkronisasi terenkripsi ujung ke ujung.",
+    "twoFasAuthDescription": "Sumber terbuka. Tidak perlu akun.",
+    "get": "Unduh",
+    "storeNote": "“Unduh” membuka App Store atau Google Play. Kembali ke Blink setelah aplikasi terpasang.",
+    "haveAnApp": "Saya sudah punya aplikasi",
+    "keyInstruction": "Salin kunci penyiapan ini ke aplikasi authenticator Anda.",
+    "qrInstruction": "Menggunakan perangkat lain?\nPindai kode QR ini sebagai gantinya.",
+    "backupTitle": "Cadangkan kunci Anda",
+    "backupDescription": "Jika ponsel Anda hilang, kunci ini memungkinkan Anda menyiapkan kembali authenticator Anda. Simpan di tempat selain ponsel ini.",
+    "saveToPasswordManager": "Simpan ke pengelola kata sandi",
+    "shareToPasswordManager": "Bagikan ke pengelola kata sandi",
+    "copyForManualBackup": "Salin untuk cadangan manual",
+    "passwordManagerUnavailable": "Tidak ada pengelola kata sandi di perangkat ini. Salin kuncinya untuk cadangan manual sebagai gantinya.",
+    "savedIt": "Saya sudah menyimpannya",
+    "keyBackupText": "Kunci penyiapan authenticator Blink\n\nAkun: {account}\nKunci penyiapan: {key}\n\nJika ponsel Anda hilang, tambahkan kunci penyiapan ini ke aplikasi authenticator untuk mendapatkan kembali kode masuk Blink Anda. Siapa pun yang memiliki kunci ini dapat membuat kode Anda, jadi rahasiakan kunci ini.",
+    "protectedTitle": "Akun Anda kini terlindungi",
+    "protectedDescription": "Mulai sekarang, untuk masuk diperlukan kode sekali pakai dari aplikasi authenticator Anda.",
+    "newPhoneTip": "Jika Anda mendapat ponsel baru, pindahkan authenticator ke ponsel tersebut <bold>sebelum</bold> Anda mengatur ulang ponsel lama.",
+    "done": "Selesai"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Aktif",
+    "statusDisabled": "2FA: Nonaktif",
+    "modalTitle": "Kami tidak menyarankan menonaktifkan 2FA",
+    "modalBody": "Ini akan menurunkan keamanan akun Anda dan memudahkan pihak ketiga mengakses akun Anda tanpa izin Anda.",
+    "keepProtected": "Tetap lindungi saya",
+    "codeInstruction": "Masukkan kode 6 digit dari aplikasi autentikator Anda untuk menonaktifkan autentikasi dua faktor.",
+    "codeInvalid": "Kode itu salah. Masukkan kode terbaru dari aplikasi autentikator Anda.",
+    "tooManyAttempts": "Terlalu banyak percobaan. Coba lagi dalam satu jam.",
+    "manualResetTitle": "Reset 2FA manual",
+    "manualResetBody": "Demi perlindungan Anda, kami tidak mengizinkan penghapusan 2FA di dalam aplikasi. Jika Anda perlu mereset 2FA, hubungi <support>Dukungan</support> kami."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "Tambah email",
+    "addPhoneTitle": "Tambah nomor telepon",
+    "addEmailCode": "Untuk menambahkan email Anda, masukkan kode 6 digit dari aplikasi autentikator Anda.",
+    "addPhoneCode": "Untuk menambahkan nomor telepon Anda, masukkan kode 6 digit dari aplikasi autentikator Anda.",
+    "codeInvalid": "Kode itu salah. Masukkan kode terbaru dari aplikasi autentikator Anda.",
+    "tooManyAttempts": "Terlalu banyak percobaan. Coba lagi dalam satu jam."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -4068,6 +4182,15 @@
     "title": "Ini adalah akun non-kustodial",
     "body": "Untuk mempelajari lebih lanjut, baca postingan blog kami",
     "cta": "Baca"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Perbarui cadangan cloud-mu",
+    "body": "Paket darurat kamu di {provider} sudah usang. Cadangkan dompetmu lagi untuk memperbaruinya.",
+    "cta": "Cadangkan lagi"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Belum ada paket darurat. Paket dibuat setelah transaksi pertamamu.",
+    "exportFailed": "Tidak dapat mengunduh paket darurat."
   },
   "StableBalance": {
     "title": "Saldo stabil",
@@ -4101,6 +4224,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink tidak dapat dijangkau",
+    "unreachableDescription": "{featureName} memerlukan server Blink, yang saat ini tidak merespons. Dompet dan dana Anda tidak terpengaruh.",
     "featureCircles": "Circles",
     "featureEarn": "Belajar",
     "featureCard": "Card"
@@ -4123,6 +4248,10 @@
     "tokenTransfer": "Transfer {token}",
     "payTo": "Bayar ke {address}",
     "payment": "Pembayaran"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Nilai tukar mungkin sudah tidak berlaku",
+    "satsOnly": "Menampilkan sats — nilai tukar tidak tersedia"
   },
   "SelfCustodialOffline": {
     "title": "Dompet offline",
@@ -4158,9 +4287,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Tidak dapat memuat biaya jaringan. Periksa koneksi Anda dan coba lagi.",
     "refundNow": "Kembalikan sekarang",

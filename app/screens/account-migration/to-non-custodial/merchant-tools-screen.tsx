@@ -9,7 +9,7 @@ import { SettingItemRow } from "@app/components/card-screen"
 import { IconHero } from "@app/components/icon-hero"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useMigrationNextStep } from "@app/screens/account-migration/hooks"
-import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
+import { StepLayout } from "@app/components/step-layout"
 import { testProps } from "@app/utils/testProps"
 
 const TOOLS_DIVIDER_WIDTH = 1
@@ -58,7 +58,7 @@ export const MigrationMerchantToolsScreen: React.FC = () => {
   ]
 
   return (
-    <MigrationStepLayout
+    <StepLayout
       footer={
         <GaloyPrimaryButton
           title={merchantToolsLL.cta()}
@@ -99,7 +99,7 @@ export const MigrationMerchantToolsScreen: React.FC = () => {
           ))}
         </View>
       </ScrollView>
-    </MigrationStepLayout>
+    </StepLayout>
   )
 }
 

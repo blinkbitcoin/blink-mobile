@@ -1,0 +1,58 @@
+diff --git a/node_modules/@react-native-firebase/crashlytics/android/src/main/java/io/invertase/firebase/crashlytics/ReactNativeFirebaseCrashlyticsModule.java b/node_modules/@react-native-firebase/crashlytics/android/src/main/java/io/invertase/firebase/crashlytics/ReactNativeFirebaseCrashlyticsModule.java
+index 940ae86..c899392 100644
+--- a/node_modules/@react-native-firebase/crashlytics/android/src/main/java/io/invertase/firebase/crashlytics/ReactNativeFirebaseCrashlyticsModule.java
++++ b/node_modules/@react-native-firebase/crashlytics/android/src/main/java/io/invertase/firebase/crashlytics/ReactNativeFirebaseCrashlyticsModule.java
+@@ -156,6 +156,13 @@ public class ReactNativeFirebaseCrashlyticsModule extends ReactNativeFirebaseMod
+   public void setCrashlyticsCollectionEnabled(Boolean enabled, Promise promise) {
+     ReactNativeFirebasePreferences.getSharedInstance()
+         .setBooleanValue(Constants.KEY_CRASHLYTICS_AUTO_COLLECTION_ENABLED, enabled);
++    // blink: apply the switch to the SDK in this process too. Upstream only stores the
++    // preference, which the init provider hands to the SDK at the next launch, so a fatal
++    // after a switch to Incognito was still sent. Read back through the init provider so
++    // the debug-build override still wins.
++    FirebaseCrashlytics.getInstance()
++        .setCrashlyticsCollectionEnabled(
++            ReactNativeFirebaseCrashlyticsInitProvider.isCrashlyticsCollectionEnabled());
+     promise.resolve(null);
+   }
+ 
+diff --git a/node_modules/@react-native-firebase/crashlytics/ios/RNFBCrashlytics/RNFBCrashlyticsModule.m b/node_modules/@react-native-firebase/crashlytics/ios/RNFBCrashlytics/RNFBCrashlyticsModule.m
+index ada982b..05e94c6 100644
+--- a/node_modules/@react-native-firebase/crashlytics/ios/RNFBCrashlytics/RNFBCrashlyticsModule.m
++++ b/node_modules/@react-native-firebase/crashlytics/ios/RNFBCrashlytics/RNFBCrashlyticsModule.m
+@@ -113,13 +113,20 @@ RCT_EXPORT_METHOD(didCrashOnPreviousExecution
+   resolve([NSNumber numberWithBool:didCrash]);
+ }
+ 
+-RCT_EXPORT_METHOD(log : (NSString *)message) { [[FIRCrashlytics crashlytics] log:message]; }
++// blink: gated like Android's log, so nothing is written while collection is off.
++RCT_EXPORT_METHOD(log : (NSString *)message) {
++  if ([RNFBCrashlyticsInitProvider isCrashlyticsCollectionEnabled]) {
++    [[FIRCrashlytics crashlytics] log:message];
++  }
++}
+ 
+ RCT_EXPORT_METHOD(logPromise
+                   : (NSString *)message resolver
+                   : (RCTPromiseResolveBlock)resolve rejecter
+                   : (RCTPromiseRejectBlock)reject) {
+-  [[FIRCrashlytics crashlytics] log:message];
++  if ([RNFBCrashlyticsInitProvider isCrashlyticsCollectionEnabled]) {
++    [[FIRCrashlytics crashlytics] log:message];
++  }
+   resolve([NSNull null]);
+ }
+ 
+@@ -182,6 +189,12 @@ RCT_EXPORT_METHOD(setCrashlyticsCollectionEnabled
+                   : (RCTPromiseRejectBlock)reject) {
+   [[RNFBPreferences shared] setBooleanValue:@"crashlytics_auto_collection_enabled"
+                                   boolValue:enabled];
++  // blink: hand the switch to the SDK now, not only at the next launch's init provider.
++  // The SDK persists it at once, and its report manager reads it at the next launch to
++  // decide whether a fatal from this one is sent or held. Read back through the init
++  // provider so the debug-build override still wins.
++  [[FIRCrashlytics crashlytics]
++      setCrashlyticsCollectionEnabled:[RNFBCrashlyticsInitProvider isCrashlyticsCollectionEnabled]];
+   resolve([NSNull null]);
+ }
+ 

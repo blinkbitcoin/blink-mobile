@@ -41,7 +41,7 @@ jest.mock("@app/store/persistent-state", () => ({
 }))
 
 jest.mock("@app/hooks/use-account-registry", () => ({
-  AccountRegistryProvider: ({ children }: { children: React.ReactNode }) => children,
+  ...jest.requireActual("@app/hooks/use-account-registry"),
   useAccountRegistry: () => ({
     accounts: [],
     activeAccount: undefined,

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { RefreshControl, View, Alert, Pressable } from "react-native"
 import { gql } from "@apollo/client"
 import Modal from "react-native-modal"
@@ -27,6 +27,8 @@ import {
 } from "@app/components/balance-header"
 import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { usePriceConversion } from "@app/hooks/use-price-conversion"
+import { RateFreshness } from "@app/types/price"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { StableTokenConvertToBtcModal } from "@app/screens/conversion-flow/stable-token-convert-to-btc-modal"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
@@ -43,6 +45,9 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
 import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
 import { SelfCustodialInfoBulletin } from "@app/components/self-custodial-info-bulletin"
+import { TwoFactorNudgeCard } from "@app/custodial/components/two-factor-nudge-card"
+import { TwoFactorReminderBulletin } from "@app/custodial/components/two-factor-reminder-bulletin"
+import { TwoFactorSessionModal } from "@app/custodial/components/two-factor-session-modal"
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { NetworkStatusBanner } from "@app/components/network-status-banner"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
@@ -72,8 +77,13 @@ import {
 } from "@app/self-custodial/hooks"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { ConvertDirection, DepositStatus } from "@app/types/payment"
+import { TwoFactorPrompt } from "@app/types/two-factor-enforcement"
 import { useBackupNudgeState } from "@app/self-custodial/hooks/use-backup-nudge-state"
 import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
+import { StaleCloudBundleBulletin } from "@app/self-custodial/components/stale-cloud-bundle-bulletin"
+import { useStaleCloudBundleBulletin } from "@app/self-custodial/hooks/use-stale-cloud-bundle-bulletin"
+import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
+import { useTwoFactorSessionPrompt } from "@app/screens/home-screen/hooks/use-two-factor-session-prompt"
 import { getErrorMessages } from "@app/graphql/utils"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useCardData } from "@app/screens/card-screen/hooks/use-card-data"
@@ -243,6 +253,17 @@ export const HomeScreen: React.FC = () => {
     shouldShow: shouldShowSelfCustodialInfoBulletin,
     dismiss: dismissSelfCustodialInfoBulletin,
   } = useSelfCustodialInfoBulletinState()
+  const {
+    shouldShow: shouldShowStaleCloudBundleBulletin,
+    dismiss: dismissStaleCloudBundleBulletin,
+  } = useStaleCloudBundleBulletin()
+  const {
+    shouldShowNudgeCard: shouldShowTwoFactorNudgeCard,
+    reminderBulletinReason: twoFactorReminderReason,
+    remainingDismissals: twoFactorRemainingDismissals,
+    isSessionStartPending: isTwoFactorStartPending,
+    registerDismissal: registerTwoFactorDismissal,
+  } = useTwoFactorEnforcement()
   const { LL } = useI18nContext()
   const {
     appConfig: {
@@ -353,11 +374,16 @@ export const HomeScreen: React.FC = () => {
     stableBalanceEnabled && isSelfCustodial && isStableBalanceActive
 
   const { formatMoneyAmount } = useDisplayCurrency()
+  const { priceFreshness, isSatsOnly } = usePriceConversion()
 
-  const formattedBalance =
-    showStableBalanceToggle && balanceMode === BalanceMode.Btc
-      ? formatMoneyAmount({ moneyAmount: toBtcMoneyAmount(satsBalance) })
-      : defaultFormattedBalance
+  const isShowingSats = showStableBalanceToggle && balanceMode === BalanceMode.Btc
+
+  const formattedBalance = isShowingSats
+    ? formatMoneyAmount({ moneyAmount: toBtcMoneyAmount(satsBalance) })
+    : defaultFormattedBalance
+
+  /** A sats figure needs no rate, so it is never stale; only a converted one can be. */
+  const isRateStale = priceFreshness === RateFreshness.Stale && !isShowingSats
 
   const accountId = dataAuthed?.me?.defaultAccount?.id
   const levelAccount = dataAuthed?.me?.defaultAccount?.level
@@ -377,11 +403,12 @@ export const HomeScreen: React.FC = () => {
     deposits,
   })
   /** The banner below only counts actionable deposits, so the pending row
-   *  carries the immature deposits' inspection path (txid / mempool link) to
-   *  the unclaimed-deposits screen. Custodial pending receives have no such
-   *  screen — their row stays inert. */
+   *  carries the immature and claiming deposits' inspection path (txid /
+   *  mempool link) to the unclaimed-deposits screen. Custodial pending
+   *  receives have no such screen — their row stays inert. */
   const hasImmatureDeposits = deposits.some(
-    ({ status }) => status === DepositStatus.Immature,
+    ({ status }) =>
+      status === DepositStatus.Immature || status === DepositStatus.Claiming,
   )
   const openUnclaimedDeposits = React.useCallback(
     () => navigation.navigate("unclaimedDepositsScreen"),
@@ -552,8 +579,28 @@ export const HomeScreen: React.FC = () => {
     isRestrictedRegion ||
     isRestrictedRegionEvaluationPending ||
     modalVisible
+  /** The wind-down nudge outranks the two-factor session start: an account whose
+   *  custodial service is ending has one remedy that matters more than a second factor.
+   *  While the wind-down has not answered, the nudge may still turn out to be due, so
+   *  the session start waits for that answer too. */
+  const isTwoFactorPromptBlocked =
+    isAnotherHomeModalVisible || migrateNowPrompt.isVisible || migrateNowPrompt.isPending
+  const { isModalOpen: isTwoFactorModalOpen, promptTier: twoFactorPromptTier } =
+    useTwoFactorSessionPrompt({ isBlocked: isTwoFactorPromptBlocked })
+  /** The dismissal takes the session start, which is what brings the modal down. */
+  const dismissTwoFactorModal = useCallback(() => {
+    registerTwoFactorDismissal(twoFactorPromptTier, {
+      prompt: TwoFactorPrompt.SessionModal,
+    })
+  }, [registerTwoFactorDismissal, twoFactorPromptTier])
+  const isTwoFactorModalVisible = isTwoFactorModalOpen && isFocused
+  /** Only while the home is in front: a screen the two-factor prompt pushed must not
+   *  end up under this modal, and the modal comes back with the home. */
   const shouldShowMigrateNowPrompt =
-    migrateNowPrompt.isVisible && !isAnotherHomeModalVisible
+    migrateNowPrompt.isVisible &&
+    !isAnotherHomeModalVisible &&
+    !isTwoFactorModalOpen &&
+    isFocused
 
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const closeRestrictionModal = () => setIsRestrictionModalVisible(false)
@@ -566,6 +613,8 @@ export const HomeScreen: React.FC = () => {
    *  "the migrate-now nudge can surface", so a region-gated account with no wind-down, or
    *  one whose self-custodial stack is off, still gets the compliance explanation. */
   const onGatedDollarTap = () => {
+    /** Nothing the user can do opens it, and the row's label already says why. */
+    if (dollarBalanceGateReason === GateReason.Network) return
     if (isAnonMode) {
       promptEnhancedMode()
       return
@@ -590,6 +639,11 @@ export const HomeScreen: React.FC = () => {
    *  the effect re-arms its timer once the evaluation settles. */
   const triggerUpgradeModal = React.useCallback(() => {
     if (isRestrictedRegion || isRestrictedRegionEvaluationPending) return
+    /** The two-factor prompt goes first: its session start stays pending until its
+     *  modal is resolved, and the two would otherwise present as two native modals.
+     *  Being a dependency of the focus effect below, this re-arms the timer once the
+     *  start is taken, so the upgrade prompt gets its turn afterwards. */
+    if (isTwoFactorStartPending) return
     if (!accountId || levelAccount !== AccountLevel.Zero) return
     if (!canShowUpgradeModal || satsBalance <= balanceLimitToTriggerUpgradeModal) return
 
@@ -598,6 +652,7 @@ export const HomeScreen: React.FC = () => {
   }, [
     isRestrictedRegion,
     isRestrictedRegionEvaluationPending,
+    isTwoFactorStartPending,
     accountId,
     levelAccount,
     canShowUpgradeModal,
@@ -907,6 +962,8 @@ export const HomeScreen: React.FC = () => {
         showStableBalanceToggle={showStableBalanceToggle}
         mode={balanceMode}
         onModeChange={toggleBalanceMode}
+        isRateStale={isRateStale}
+        isSatsOnly={isSatsOnly}
       />
       <View style={styles.badgeSlot}>
         {badgeSlotContent === "unseen" ? (
@@ -975,6 +1032,10 @@ export const HomeScreen: React.FC = () => {
         {isSelfCustodial && <UnclaimedDepositBanner deposits={deposits} />}
         <NetworkStatusBanner />
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
+        {shouldShowTwoFactorNudgeCard && <TwoFactorNudgeCard />}
+        {twoFactorReminderReason && (
+          <TwoFactorReminderBulletin reason={twoFactorReminderReason} />
+        )}
         {offboardBulletin.isVisible && <OffboardOnlyBulletin />}
         {reminderBulletin.isVisible && (
           <MigrationReminderBulletin
@@ -987,6 +1048,9 @@ export const HomeScreen: React.FC = () => {
         )}
         {shouldShowSelfCustodialInfoBulletin && (
           <SelfCustodialInfoBulletin onDismiss={dismissSelfCustodialInfoBulletin} />
+        )}
+        {shouldShowStaleCloudBundleBulletin && (
+          <StaleCloudBundleBulletin onDismiss={dismissStaleCloudBundleBulletin} />
         )}
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
         <AppUpdate />
@@ -1003,6 +1067,11 @@ export const HomeScreen: React.FC = () => {
         onAction={() => navigation.navigate("transactionHistory")}
       />
       <BackupNudgeModal isVisible={shouldShowModal && isFocused} onClose={dismissModal} />
+      <TwoFactorSessionModal
+        isVisible={isTwoFactorModalVisible}
+        remainingDismissals={twoFactorRemainingDismissals}
+        onDismiss={dismissTwoFactorModal}
+      />
     </Screen>
   )
 }

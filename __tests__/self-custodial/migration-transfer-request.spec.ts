@@ -9,6 +9,10 @@ import {
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
+/** Threaded explicitly since the config functions stopped reading a global; the real
+ *  value comes from `useLnurlServer()` at the calling hook. */
+const TEST_LNURL_DOMAIN = "staging.blink.sv"
+
 const mockInitSdk = jest.fn()
 const mockDisconnectSdk = jest.fn()
 const mockGetWalletInfo = jest.fn()
@@ -17,6 +21,7 @@ const mockReportError = jest.fn()
 const mockClassifySdkError = jest.fn()
 
 jest.mock("@app/self-custodial/bridge", () => ({
+  ...jest.requireActual("@app/self-custodial/bridge"),
   initSdk: (args: unknown) => mockInitSdk(args),
   disconnectSdk: (sdk: unknown) => mockDisconnectSdk(sdk),
   getWalletInfo: (sdk: unknown) => mockGetWalletInfo(sdk),
@@ -50,6 +55,7 @@ const buildRequest = (signChallenge = jest.fn(() => "migrate:challenge")) =>
     network: Network.Regtest,
     leewaySatPerVbyte: 1,
     signChallenge,
+    lnurlDomain: TEST_LNURL_DOMAIN,
   })
 
 /** Lets queued microtasks drain without advancing to the next run's connect, so the test
@@ -119,7 +125,8 @@ describe("buildMigrationTransferRequest", () => {
 
     await buildRequest()
 
-    expect(mockReceivePayment).toHaveBeenCalledWith({
+    expect(mockReceivePayment).toHaveBeenCalledTimes(1)
+    expect(mockReceivePayment.mock.calls[0][0]).toStrictEqual({
       paymentMethod: {
         tag: "Bolt11Invoice",
         inner: {
@@ -127,6 +134,7 @@ describe("buildMigrationTransferRequest", () => {
           amountSats: undefined,
           expirySecs: 24 * 60 * 60,
           paymentHash: undefined,
+          receiverIdentityPublicKey: undefined,
         },
       },
     })
@@ -143,6 +151,7 @@ describe("buildMigrationTransferRequest", () => {
       storageDir: "/tmp/sc-account-1",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
   })
 
@@ -306,6 +315,7 @@ describe("checkMigrationReceiveLanded", () => {
       accountId: "sc-account-1",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
 
   beforeEach(() => {
@@ -395,6 +405,7 @@ describe("checkMigrationReceiveLanded", () => {
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
       signChallenge: () => "migrate:challenge",
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
     const landed = check()
     await flushMicrotasks()
@@ -429,6 +440,7 @@ describe("buildMigrationLnAddressProof", () => {
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
       signChallenge: () => "migrate:challenge",
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
 
     expect(result).toEqual({

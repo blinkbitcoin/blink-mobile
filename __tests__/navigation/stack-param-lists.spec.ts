@@ -1,7 +1,23 @@
 import {
   canGoBackFromChooseExperience,
   ChooseExperienceContinueRoute,
+  isBackwardAction,
 } from "@app/navigation/stack-param-lists"
+
+describe("isBackwardAction", () => {
+  it("recognises the actions a user's own back press dispatches", () => {
+    expect(isBackwardAction({ type: "GO_BACK" })).toBe(true)
+    expect(isBackwardAction({ type: "POP" })).toBe(true)
+  })
+
+  /** A hold refuses only the user's back: a reset or a navigation the app dispatches
+   *  on its own has to keep working. */
+  it("leaves the removals the app dispatches on its own alone", () => {
+    expect(isBackwardAction({ type: "RESET" })).toBe(false)
+    expect(isBackwardAction({ type: "NAVIGATE" })).toBe(false)
+    expect(isBackwardAction({ type: "REPLACE" })).toBe(false)
+  })
+})
 
 describe("canGoBackFromChooseExperience", () => {
   /** Settings carries no onward step: it opened this screen over a live session, which is a

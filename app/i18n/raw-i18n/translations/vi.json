@@ -31,6 +31,8 @@
     "createError": "Không thể tạo khóa API. Vui lòng thử lại.",
     "revokeError": "Không thể thu hồi khóa API. Vui lòng thử lại.",
     "loadError": "Không thể tải các khóa API của bạn. Vui lòng thử lại sau.",
+    "discardSecretTitle": "Hủy bỏ khóa API này?",
+    "discardSecretBody": "Đây là lần duy nhất khóa bí mật được hiển thị. Nếu bạn rời đi bây giờ, khóa sẽ không thể khôi phục và bạn sẽ cần tạo khóa mới.",
     "done": "Xong"
   },
   "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
     "skip": "Bỏ qua",
     "unlock": "Mở khóa",
     "usePin": "Sử dụng PIN",
-    "confirmLogout": "Bạn có chắc muốn đăng xuất không? Điều này sẽ xóa bộ nhớ đệm và tất cả cài đặt người dùng cục bộ"
+    "confirmLogout": "Bạn có chắc muốn đăng xuất không? Điều này sẽ xóa bộ nhớ đệm và tất cả cài đặt người dùng cục bộ",
+    "forgotPin": "Quên PIN? Xóa ví",
+    "removeWalletsTitle": "Xóa ví khỏi thiết bị này?",
+    "removeWalletsBody": "Thao tác này xóa tất cả ví khỏi thiết bị này và đăng xuất bạn. Để lấy lại ví, bạn cần cụm từ khôi phục của ví đó. Nếu không có, ví sẽ bị mất.",
+    "removeWalletsConfirm": "Xóa ví",
+    "removeWalletsFailed": "Không thể xóa một số ví. Vui lòng thử lại."
   },
   "PeopleScreen": {
     "title": "People",
@@ -2175,16 +2182,19 @@
     "walletCountNotTwo": "Số ví không phải là 2. Vui lòng sử dụng bảng điều khiển để xem tất cả các ví và tiền trong tài khoản này"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Không thể ghi lại lần thử một cách an toàn.",
+    "attemptsLeft": "Còn lại {attemptsRemaining: number} lần thử.",
     "attemptsRemaining": "Mã PIN không chính xác. Còn lại {attemptsRemaining: number} lần thử.",
     "enterPin": "Nhập mã PIN của bạn",
-    "lockoutUnavailable": "Không thể ghi lại lần thử không thành công một cách an toàn. Đang đăng xuất.",
+    "oneAttemptLeft": "Còn lại 1 lần thử.",
     "oneAttemptRemaining": "Mã PIN không chính xác. Còn lại 1 lần thử .",
     "pinUnreadable": "Không thể kiểm tra mã PIN của bạn. Vui lòng thử lại.",
     "setPin": "Đặt mã PIN của bạn",
     "setPinFailedMatch": "Mã PIN không khớp - Đặt mã PIN của bạn",
     "storePinFailed": "Không thể lưu mã pin của bạn.",
     "tooManyAttempts": "Quá nhiều lần thử không thành công. Đang đăng xuất.",
-    "tryAgainIn": "Thử lại sau {seconds: number} giây.",
+    "attemptBudgetSpent": "Quá nhiều lần thử không thành công.",
+    "tryAgainIn": "Thử lại sau {time: string}.",
     "verifyPin": "Xác minh mã PIN của bạn"
   },
   "PriceHistoryScreen": {
@@ -2219,6 +2229,12 @@
     "error": "Không thể tạo hóa đơn. Vui lòng liên hệ với bộ phận hỗ trợ nếu sự cố này vẫn tiếp diễn.",
     "copyInvoice": "Copy",
     "shareInvoice": "Chia sẻ",
+    "newAddress": "Mới",
+    "newAddressHint": "Tạo một địa chỉ Bitcoin mới. Các địa chỉ trước vẫn hoạt động.",
+    "newAddressGenerated": "Địa chỉ mới đã sẵn sàng. Các địa chỉ trước vẫn hoạt động.",
+    "newAddressFailed": "Không thể tạo địa chỉ mới. Vui lòng thử lại.",
+    "newAddressRateLimited": "Quá nhiều địa chỉ mới. Vui lòng đợi một lúc rồi thử lại.",
+    "onchainAddressLoadFailed": "Không thể tải địa chỉ Bitcoin của bạn. Nhấn Mới để thử lại.",
     "addAmount": "Yêu cầu số tiền cụ thể",
     "expired": "Hóa đơn đã hết hạn",
     "expiresIn": "Hết hạn trong",
@@ -2354,6 +2370,8 @@
     "invalidAmount": "Số tiền không hợp lệ. Vui lòng tạo lại với số tiền hợp lệ.",
     "usernameDoesNotExist": "{lnAddress: string} dường như không phải là địa chỉ {bankName: string} tồn tại.",
     "usernameDoesNotExistAdvice": "Đảm bảo viết đúng chính tả hoặc yêu cầu người nhận cung cấp hóa đơn LN hoặc địa chỉ BTC. ",
+    "destinationUnverifiable": "Hiện chúng tôi không kiểm tra được {lnAddress} — máy chủ của {bankName} không phản hồi.",
+    "destinationUnverifiableAdvice": "Địa chỉ nhiều khả năng vẫn đúng. Hãy thử lại sau giây lát, hoặc xin người nhận hóa đơn LN hay địa chỉ BTC.",
     "selfPaymentError": "{lnAddress: string} là địa chỉ {bankName: string} của bạn.",
     "selfPaymentAdvice": "Nếu bạn muốn gửi tiền đến một tài khoản khác mà bạn sở hữu, bạn có thể sử dụng hóa đơn, địa chỉ LN hoặc BTC để thay thế.",
     "lnAddressError": "Chúng tôi không thể truy cập địa chỉ Lightning này. Nếu bạn chắc chắn rằng nó tồn tại, bạn có thể thử lại sau.",
@@ -2426,9 +2444,9 @@
     "time": "Thời gian",
     "type": "Loại",
     "feeTier": "Độ ưu tiên giao dịch",
-    "fast": "Nhanh",
-    "medium": "Trung bình",
-    "slow": "Chậm",
+    "fast": "Ưu tiên",
+    "medium": "Tiêu chuẩn",
+    "slow": "Tiết kiệm",
     "recommended": "Đề xuất",
     "walletOffline": "Ví của bạn đang ngoại tuyến. Vui lòng kiểm tra kết nối và thử lại.",
     "sdkInsufficientFunds": "Không đủ số dư cho giao dịch này.",
@@ -2437,7 +2455,7 @@
     "sdkGenericError": "Không thể ước tính phí. Vui lòng thử số tiền khác."
   },
   "SettingsScreen": {
-    "createAddress": "Tạo địa chỉ",
+    "createAddress": "Tạo địa chỉ Lightning",
     "addressDisabled": "(đã tắt)",
     "donationButton": "Nút quyên góp",
     "btcpayServer": "BTCPay Server",
@@ -2454,6 +2472,7 @@
     "activated": "Đã kích hoạt",
     "addressScreen": "Ways to get paid",
     "nonCustodialAccount": "Tài khoản không lưu ký",
+    "custodialAccount": "Tài khoản lưu ký",
     "tapUserName": "Nhấn để đặt tên người dùng",
     "notifications": "Notifications",
     "title": "Cài đặt",
@@ -2562,8 +2581,6 @@
     "emailUnverifiedContent": "Ensure you can log back into your account by verifying your email. Do you want to do the verification now?",
     "totp": "Two-factor authentication",
     "totpDeactivated": "Two-factor authentication has been deactivated",
-    "totpDeleteAlertTitle": "Delete two-factor authentication",
-    "totpDeleteAlertContent": "Are you sure you want to delete your two-factor authentication?",
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "Mã Tài khoản",
@@ -2577,12 +2594,14 @@
     "error": "Không thể tải hồ sơ vào lúc này",
     "fromThisDevice": "từ thiết bị này?",
     "switchAccount": "Bạn đã chuyển sang tài khoản khác",
-    "removedAccount": "Bạn đã xóa tài khoản {identifier: string}."
+    "removedAccount": "Bạn đã xóa tài khoản {identifier: string}.",
+    "removeAccount": "Xóa tài khoản"
   },
   "StablesatsRestriction": {
     "walletLabel": "không khả dụng tại khu vực của bạn",
     "anonModeWalletLabel": "không khả dụng ở chế độ Incognito",
-    "unknownRegionWalletLabel": "không thể kiểm tra tình trạng khả dụng, kéo xuống để thử lại"
+    "unknownRegionWalletLabel": "không thể kiểm tra tình trạng khả dụng, kéo xuống để thử lại",
+    "networkWalletLabel": "không khả dụng trên mạng này"
   },
   "AnonModeConvertModal": {
     "title": "Hãy chuyển số dư Đô la của bạn trước",
@@ -2616,14 +2635,11 @@
     "youGet": "Bạn nhận được"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Two-factor authentication",
-    "secret": "Khóa bí mật/sao lưu",
-    "content": "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret into your authenticator app."
+    "title": "Two-factor authentication"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Two-factor authentication",
-    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication.",
-    "success": "Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.\n\nOnly full KYC accounts may be recovered in the case a user has lost access to their two-factor authentication."
+    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication."
   },
   "TotpLoginValidateScreen": {
     "title": "Two-factor authentication",
@@ -2667,7 +2683,7 @@
   "TransactionDetailScreen": {
     "paid": "Trả tiền cho/từ",
     "received": "Bạn đã nhận",
-    "spent": "Bạn đã chi",
+    "sent": "Bạn đã gửi",
     "sending": "Đang gửi",
     "receivingAccount": "Số dư nhận",
     "sendingAccount": "Số dư gửi",
@@ -2743,6 +2759,7 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
+      "serverUnreachable": "Không kết nối được máy chủ địa chỉ. Hãy thử lại sau giây lát.",
       "unknownError": "An unknown error occurred, please try again later",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3039,7 +3056,8 @@
     "problemPersists": "Nếu vấn đề vẫn tiếp diễn liên hệ hỗ trợ.",
     "fatalError": "Xin lỗi, chúng tôi dường như đang gặp sự cố khi tải dữ liệu ứng dụng. Nếu vấn đề vẫn tiếp diễn xin vui lòng liên hệ với hỗ trợ.",
     "showError": "Hiển thị lỗi",
-    "clearAppData": "Clear App Data and Logout"
+    "clearAppData": "Clear App Data and Logout",
+    "screenSecurityUnavailable": "Màn hình này vẫn bị ẩn vì không thể bật tính năng chống chụp màn hình."
   },
   "notifications": {
     "payment": {
@@ -3070,7 +3088,13 @@
     "deleteAccountFromPhone": "Xin chào!, vui lòng đóng tài khoản của tôi. Số điện thoại của tôi là {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "Lưu ý: Việc đóng tài khoản là vĩnh viễn!\nHãy đảm bảo ví không còn tiền trước khi đóng.\nTài khoản đã đóng không thể khôi phục.\nChúng tôi có thể lưu giữ một số hồ sơ theo yêu cầu của pháp luật."
+    "deleteAccountWarning": "Lưu ý: Việc đóng tài khoản là vĩnh viễn!\nHãy đảm bảo ví không còn tiền trước khi đóng.\nTài khoản đã đóng không thể khôi phục.\nChúng tôi có thể lưu giữ một số hồ sơ theo yêu cầu của pháp luật.",
+    "downloadLogs": "Tải nhật ký xuống",
+    "exportLogsTitle": "Chia sẻ nhật ký ví của bạn",
+    "exportLogsBody": "Tệp này giúp bộ phận hỗ trợ xem xét sự cố với ví của bạn. Tệp gồm lịch sử thanh toán (số tiền, hóa đơn và địa chỉ) và mã định danh của mọi ví không lưu ký trên thiết bị này, không chỉ ví này, nhưng không bao giờ gồm cụm từ sao lưu hay khóa. Chỉ chia sẻ với bộ phận hỗ trợ của chúng tôi.",
+    "exportLogsConfirm": "Chia sẻ nhật ký",
+    "noLogsYet": "Chưa có nhật ký để chia sẻ. Mở ví và thử lại.",
+    "exportLogsError": "Không xuất được nhật ký. Vui lòng thử lại."
   },
   "lnurl": {
     "overLimit": "Bạn không thể gửi quá mức tiền tối đa",
@@ -3800,7 +3824,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Sao lưu ví của bạn",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Chọn phương thức sao lưu",
@@ -3845,6 +3869,15 @@
         "title": "Chào mừng đến với Blink tự quản lý",
         "testSuccess": "Cụm từ sao lưu của bạn là chính xác"
       }
+    },
+    "BundleExport": {
+      "title": "Rút khẩn cấp",
+      "body": "Nếu Spark ngừng hoạt động, gói này cho phép bạn chuyển bitcoin của mình on-chain mà không cần Blink. Số dư đô la của bạn không thể khôi phục.",
+      "download": "Tải gói xuống",
+      "sensitiveTitle": "Nhạy cảm",
+      "learnMore": "Tìm hiểu thêm về rút đơn phương",
+      "sensitiveConfirm": "Tải xuống",
+      "sensitiveBody": "Tệp này cho thấy số dư và lịch sử thanh toán của bạn, vì vậy hãy giữ riêng tư. Để dùng tệp này trong trường hợp khẩn cấp, bạn cũng cần cụm từ sao lưu của mình."
     },
     "CloudBackup": {
       "title": "Hãy sao lưu ví của bạn",
@@ -4050,6 +4083,12 @@
     "recognizePhraseTitle": "Bạn có nhận ra cụm từ sao lưu này không?",
     "recognizePhraseBody": "Không bao giờ nhập các từ mà người khác gửi cho bạn."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "Không kết nối được nhà vận hành",
+    "outageBody": "Spark đang gặp sự cố. Vui lòng đợi vài phút rồi thử lại hoặc liên hệ {support} của chúng tôi",
+    "outageSupport": "Bộ phận hỗ trợ",
+    "tryAgainLater": "Thử lại sau"
+  },
   "BackupNudge": {
     "title": "Tiền của bạn đang gặp rủi ro",
     "description": "Bảo mật ví của bạn ngay bây giờ. Chỉ mất một phút.",
@@ -4058,6 +4097,81 @@
     "modalTitle": "Bảo mật tiền của bạn",
     "modalDescription": "Chúng tôi khuyến nghị bạn sao lưu ví để ngăn chặn mất hoàn toàn tiền trong trường hợp bạn mất thiết bị này.",
     "secureMe": "Bảo mật ví"
+  },
+  "TwoFactorEnforcement": {
+    "title": "Thiết lập xác thực hai yếu tố",
+    "cardDescription": "Bảo vệ tài khoản của bạn khỏi truy cập trái phép.",
+    "cardCta": "Thiết lập",
+    "settingsDescription": "Bảo vệ tài khoản của bạn khỏi truy cập trái phép bằng cách thiết lập nó.",
+    "setupTitle": "Thiết lập xác thực hai yếu tố ngay",
+    "setupDescription": "Để ngăn truy cập trái phép vào tài khoản của bạn, hãy thêm xác thực hai yếu tố ngay.",
+    "setAuthenticator": "Thiết lập ứng dụng xác thực",
+    "reminderTitle": "Thêm ứng dụng xác thực để bảo vệ tiền của bạn",
+    "reminderDescription": "Số dư của bạn đã tăng. Ứng dụng xác thực giúp tài khoản của bạn an toàn, ngay cả khi ai đó chiếm được email hoặc điện thoại của bạn.",
+    "modalReminder": "Nếu bạn bỏ qua bây giờ, hãy nhớ bật nó càng sớm càng tốt.",
+    "dismissTwoMore": "Bạn có thể bỏ qua điều này thêm hai lần nữa.",
+    "dismissOneMore": "Bạn có thể bỏ qua điều này thêm một lần nữa.",
+    "dismissLast": "Đây là lần cuối cùng bạn có thể bỏ qua điều này.",
+    "setNow": "Thiết lập ngay",
+    "dontWantTo": "Tôi không muốn",
+    "highBalanceTitle": "Bạn có hơn {amount}, vui lòng thêm lớp bảo vệ bổ sung",
+    "protectionRequiredTitle": "Vui lòng thêm lớp bảo vệ bổ sung để tiếp tục sử dụng Blink",
+    "protectionRequiredBody": "Bạn càng có nhiều tiền, bảo mật tốt hơn càng quan trọng. Vui lòng thêm ứng dụng xác thực để tiếp tục sử dụng Blink.",
+    "nonCustodialTitle": "Nếu bạn không muốn thiết lập xác thực hai yếu tố",
+    "nonCustodialBody": "Lựa chọn khác là chuyển sang không lưu ký. Khi đó bạn tự chịu trách nhiệm về tiền của mình."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Bảo vệ tiền của bạn bằng ứng dụng xác thực",
+    "introDescription": "Ứng dụng xác thực tạo một mã 6 chữ số mới sau mỗi 30 giây.",
+    "takeoversTitle": "Ngăn chặn chiếm đoạt tài khoản",
+    "takeoversDescription": "Mã chỉ có trên điện thoại của bạn",
+    "stolenNumberTitle": "An toàn ngay cả khi số điện thoại bị đánh cắp",
+    "stolenNumberDescription": "Ngay cả khi ai đó truy cập được email hoặc số điện thoại của bạn, họ cũng không thể đăng nhập",
+    "durationTitle": "Chỉ mất khoảng 2 phút",
+    "durationDescription": "Chúng tôi sẽ hướng dẫn bạn từng bước",
+    "getStarted": "Bắt đầu",
+    "appsTitle": "Tải ứng dụng xác thực",
+    "appsDescription": "Ứng dụng xác thực nào cũng dùng được. Các ứng dụng sau đây miễn phí và đáng tin cậy:",
+    "googleAuthenticatorDescription": "Đơn giản và được dùng rộng rãi. Tùy chọn sao lưu vào tài khoản Google của bạn.",
+    "protonAuthenticatorDescription": "Mã nguồn mở. Sao lưu và đồng bộ được mã hóa đầu cuối.",
+    "twoFasAuthDescription": "Mã nguồn mở. Không cần tài khoản.",
+    "get": "Tải về",
+    "storeNote": "“Tải về” sẽ mở App Store hoặc Google Play. Hãy quay lại Blink khi đã cài đặt xong.",
+    "haveAnApp": "Tôi đã có ứng dụng",
+    "keyInstruction": "Sao chép khóa thiết lập này vào ứng dụng xác thực của bạn.",
+    "qrInstruction": "Bạn đang dùng thiết bị khác?\nThay vào đó, hãy quét mã QR này.",
+    "backupTitle": "Sao lưu khóa của bạn",
+    "backupDescription": "Nếu bạn mất điện thoại, khóa này giúp bạn thiết lập lại ứng dụng xác thực. Hãy lưu nó ở nơi khác ngoài điện thoại này.",
+    "saveToPasswordManager": "Lưu vào trình quản lý mật khẩu",
+    "shareToPasswordManager": "Chia sẻ với trình quản lý mật khẩu",
+    "copyForManualBackup": "Sao chép để sao lưu thủ công",
+    "passwordManagerUnavailable": "Không có trình quản lý mật khẩu nào trên thiết bị này. Thay vào đó, hãy sao chép khóa để sao lưu thủ công.",
+    "savedIt": "Tôi đã lưu",
+    "keyBackupText": "Khóa thiết lập ứng dụng xác thực Blink\n\nTài khoản: {account}\nKhóa thiết lập: {key}\n\nNếu bạn mất điện thoại, hãy thêm khóa thiết lập này vào một ứng dụng xác thực để lấy lại mã đăng nhập Blink của bạn. Bất kỳ ai có khóa này đều có thể tạo mã của bạn, vì vậy hãy giữ bí mật.",
+    "protectedTitle": "Tài khoản của bạn hiện đã được bảo vệ",
+    "protectedDescription": "Từ giờ trở đi, việc đăng nhập cần mã dùng một lần từ ứng dụng xác thực của bạn.",
+    "newPhoneTip": "Nếu bạn đổi sang điện thoại mới, hãy chuyển ứng dụng xác thực sang máy mới <bold>trước khi</bold> đặt lại máy cũ.",
+    "done": "Xong"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Đã bật",
+    "statusDisabled": "2FA: Đã tắt",
+    "modalTitle": "Chúng tôi không khuyến nghị tắt 2FA",
+    "modalBody": "Việc này sẽ làm giảm bảo mật tài khoản và khiến bên thứ ba dễ truy cập tài khoản của bạn hơn mà không cần sự cho phép của bạn.",
+    "keepProtected": "Giữ tôi được bảo vệ",
+    "codeInstruction": "Nhập mã 6 chữ số từ ứng dụng xác thực để tắt xác thực hai yếu tố.",
+    "codeInvalid": "Mã đó không đúng. Nhập mã hiện tại từ ứng dụng xác thực của bạn.",
+    "tooManyAttempts": "Quá nhiều lần thử. Hãy thử lại sau một giờ.",
+    "manualResetTitle": "Đặt lại 2FA thủ công",
+    "manualResetBody": "Để bảo vệ bạn, chúng tôi không cho phép gỡ 2FA trong ứng dụng. Nếu bạn cần đặt lại 2FA, hãy liên hệ <support>Bộ phận hỗ trợ</support> của chúng tôi."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "Thêm email",
+    "addPhoneTitle": "Thêm số điện thoại",
+    "addEmailCode": "Để thêm email, hãy nhập mã 6 chữ số từ ứng dụng xác thực của bạn.",
+    "addPhoneCode": "Để thêm số điện thoại, hãy nhập mã 6 chữ số từ ứng dụng xác thực của bạn.",
+    "codeInvalid": "Mã đó không đúng. Nhập mã hiện tại từ ứng dụng xác thực của bạn.",
+    "tooManyAttempts": "Quá nhiều lần thử. Hãy thử lại sau một giờ."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -4068,6 +4182,15 @@
     "title": "Đây là tài khoản không lưu ký",
     "body": "Để tìm hiểu thêm, hãy đọc bài viết trên blog của chúng tôi",
     "cta": "Đọc"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Cập nhật bản sao lưu trên đám mây",
+    "body": "Gói khẩn cấp của bạn trong {provider} đã cũ. Hãy sao lưu ví của bạn lại để cập nhật.",
+    "cta": "Sao lưu lại"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Chưa có gói khẩn cấp. Gói được tạo sau giao dịch đầu tiên của bạn.",
+    "exportFailed": "Không thể tải xuống gói khẩn cấp."
   },
   "StableBalance": {
     "title": "Số dư ổn định",
@@ -4101,6 +4224,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Không kết nối được Blink",
+    "unreachableDescription": "{featureName} cần máy chủ của Blink, hiện không phản hồi. Ví và số dư của bạn không bị ảnh hưởng.",
     "featureCircles": "Circles",
     "featureEarn": "Học",
     "featureCard": "Card"
@@ -4123,6 +4248,10 @@
     "tokenTransfer": "Chuyển {token}",
     "payTo": "Thanh toán cho {address}",
     "payment": "Thanh toán"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Tỷ giá có thể đã cũ",
+    "satsOnly": "Đang hiển thị sats — không có tỷ giá"
   },
   "SelfCustodialOffline": {
     "title": "Ví đang ngoại tuyến",
@@ -4158,9 +4287,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Không thể tải phí mạng. Vui lòng kiểm tra kết nối và thử lại.",
     "refundNow": "Hoàn tiền ngay",

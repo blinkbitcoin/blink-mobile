@@ -23,11 +23,13 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { VersionComponent } from "@app/components/version"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useLevel } from "@app/graphql/level-context"
+import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useUnacknowledgedNotificationCountQuery } from "@app/graphql/generated"
 import { AccountType } from "@app/types/wallet"
 
 import { AccountBanner } from "./account/banner"
+import { TwoFactorBanner } from "./two-factor-banner"
 import { EmailSetting } from "./account/settings/email"
 import { PhoneSetting } from "./account/settings/phone"
 import { SettingsGroup } from "./group"
@@ -44,6 +46,7 @@ import { TxLimits } from "./settings/account-tx-limits"
 import { FeeRatesSetting } from "./settings/fee-rates"
 import { ApiAccessSetting } from "./settings/advanced-api-access"
 import { ExportCsvSetting } from "./settings/advanced-export-csv"
+import { ExportLogsSetting } from "./settings/advanced-export-logs"
 import { JoinCommunitySetting } from "./settings/community-join"
 import { NeedHelpSetting } from "./settings/community-need-help"
 import { CurrencySetting } from "./settings/preferences-currency"
@@ -56,6 +59,7 @@ import { AccountStaticQR } from "./settings/account-static-qr"
 import { MoveToNonCustodialSetting } from "./settings/account-move-to-noncustodial"
 import { SwitchAccountSetting } from "./settings/multi-account"
 import { StableBalanceSetting } from "./settings/stable-balance"
+import { EmergencyBundleSetting } from "./settings/emergency-bundle"
 import { ViewBackupPhraseSetting } from "./settings/view-backup-phrase"
 import { BackupWalletSetting } from "./settings/backup-wallet"
 
@@ -111,6 +115,8 @@ export const SettingsScreen: React.FC = () => {
   const isSelfCustodialMode = activeAccount?.type === AccountType.SelfCustodial
   const shouldShowSettingsBanner =
     isSelfCustodialMode && backupState.status !== BackupStatus.Completed
+  const { shouldShowSettingsBanner: shouldShowTwoFactorBanner } =
+    useTwoFactorEnforcement()
   const { isAnonMode } = useSelfCustodialAccountMode()
   const { promptEnhancedMode } = useEnhancedModePrompt()
   const { isRestrictedRegion, presentRestrictedRegionModal } = useRestrictedRegion()
@@ -153,8 +159,9 @@ export const SettingsScreen: React.FC = () => {
       OnDeviceSecuritySetting,
       ViewBackupPhraseSetting,
       BackupWalletSetting,
+      EmergencyBundleSetting,
     ],
-    advanced: [ExportCsvSetting, ApiAccessSetting],
+    advanced: [ExportCsvSetting, ExportLogsSetting, ApiAccessSetting],
     community: [NeedHelpSetting, JoinCommunitySetting],
   }
 
@@ -194,6 +201,7 @@ export const SettingsScreen: React.FC = () => {
             titleColor="primary"
           />
         )}
+        {shouldShowTwoFactorBanner && <TwoFactorBanner />}
         <SettingsGroup name={LL.common.account()} items={items.account} />
         <SettingsGroup
           name={LL.SettingsScreen.addressScreen()}
@@ -212,8 +220,9 @@ export const SettingsScreen: React.FC = () => {
           name={LL.common.securityAndPrivacy()}
           items={items.securityAndPrivacy}
         />
-        {/* Rows gate themselves by account mode (CSV export branches, API access is
-            custodial-only) and SettingsGroup collapses when every row returns null. */}
+        {/* Rows gate themselves by account type (CSV export branches, logs are
+            self-custodial-only, API access is custodial-only) and SettingsGroup
+            collapses when every row returns null. */}
         <SettingsGroup name={LL.common.advanced()} items={items.advanced} />
         <SettingsGroup name={LL.common.support()} items={items.community} />
         <VersionComponent />

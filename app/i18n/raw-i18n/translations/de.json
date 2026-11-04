@@ -31,6 +31,8 @@
         "createError": "Der API-Schlüssel konnte nicht erstellt werden. Bitte versuche es erneut.",
         "revokeError": "Der API-Schlüssel konnte nicht widerrufen werden. Bitte versuche es erneut.",
         "loadError": "Deine API-Schlüssel konnten nicht geladen werden. Bitte versuche es später erneut.",
+        "discardSecretTitle": "Diesen API-Schlüssel verwerfen?",
+        "discardSecretBody": "Das Geheimnis wird nur dieses eine Mal angezeigt. Wenn du jetzt gehst, kann der Schlüssel nicht wiederhergestellt werden und du musst einen neuen erstellen.",
         "done": "Fertig"
     },
     "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
         "skip": "Überspringen",
         "unlock": "Entsperren",
         "usePin": "PIN nutzen",
-        "confirmLogout": "Bist du sicher, dass du dich abmelden möchtest? Dadurch werden dein Cache und alle lokalen Benutzereinstellungen zurückgesetzt."
+        "confirmLogout": "Bist du sicher, dass du dich abmelden möchtest? Dadurch werden dein Cache und alle lokalen Benutzereinstellungen zurückgesetzt.",
+        "forgotPin": "PIN vergessen? Brieftaschen entfernen",
+        "removeWalletsTitle": "Brieftaschen von diesem Gerät entfernen?",
+        "removeWalletsBody": "Damit werden alle Brieftaschen von diesem Gerät entfernt und Sie werden abgemeldet. Um eine Brieftasche zurückzubekommen, brauchen Sie ihre Sicherungsphrase. Ohne sie ist die Brieftasche verloren.",
+        "removeWalletsConfirm": "Brieftaschen entfernen",
+        "removeWalletsFailed": "Einige Brieftaschen konnten nicht entfernt werden. Bitte versuchen Sie es erneut."
     },
     "PeopleScreen": {
         "title": "Leute",
@@ -2175,16 +2182,19 @@
         "walletCountNotTwo": "Die Anzahl der Wallets ist nicht zwei. Bitte verwenden Sie das Dashboard, um alle Wallets und Guthaben dieses Kontos zu sehen"
     },
     "PinScreen": {
+        "attemptUnrecorded": "Der Versuch konnte nicht sicher gespeichert werden.",
+        "attemptsLeft": "{attemptsRemaining: string} verbleibende Versuche.",
         "attemptsRemaining": "Falsche PIN. {attemptsRemaining: string} verbleibende Versuche.",
         "enterPin": "Gib deinen PIN Code ein",
-        "lockoutUnavailable": "Der Fehlversuch konnte nicht sicher gespeichert werden. Du wirst nun ausgeloggt.",
+        "oneAttemptLeft": "Letzter Versuch.",
         "oneAttemptRemaining": "Falsche PIN. Letzter Versuch.",
         "pinUnreadable": "Deine PIN konnte nicht geprüft werden. Bitte versuche es erneut.",
         "setPin": "Erstelle deinen PIN Code",
         "setPinFailedMatch": "Die PINs stimmen nicht überein - Setze deinen PIN Code",
         "storePinFailed": "Dein PIN Code konnte nicht gespeichert werden.",
         "tooManyAttempts": "Zu viele Fehlversuche. Du wirst nun ausgeloggt.",
-        "tryAgainIn": "Versuche es in {seconds: number} s erneut.",
+        "attemptBudgetSpent": "Zu viele Fehlversuche.",
+        "tryAgainIn": "Versuche es in {time: string} erneut.",
         "verifyPin": "Bestätige deinen PIN Code"
     },
     "PriceHistoryScreen": {
@@ -2219,6 +2229,12 @@
         "error": "Invoice konnte nicht erstellt werden. Bitte kontaktiere den Support, wenn dieses Problem weiterhin besteht.",
         "copyInvoice": "Kopieren",
         "shareInvoice": "Teilen",
+        "newAddress": "Neu",
+        "newAddressHint": "Erzeugt eine neue Bitcoin-Adresse. Frühere Adressen funktionieren weiterhin.",
+        "newAddressGenerated": "Neue Adresse bereit. Frühere Adressen funktionieren weiterhin.",
+        "newAddressFailed": "Neue Adresse konnte nicht erzeugt werden. Bitte versuche es erneut.",
+        "newAddressRateLimited": "Zu viele neue Adressen. Bitte warte eine Weile und versuche es erneut.",
+        "onchainAddressLoadFailed": "Deine Bitcoin-Adresse konnte nicht geladen werden. Tippe auf Neu, um es erneut zu versuchen.",
         "addAmount": "Betrag spezifizieren",
         "expired": "Die Invoice ist abgelaufen",
         "expiresIn": "Läuft ab in",
@@ -2354,6 +2370,8 @@
         "invalidAmount": "Diese Invoice enthält einen ungültigen Betrag. Bitte generiere eine neue Invoice.",
         "usernameDoesNotExist": "{lnAddress: string} scheint keine existierende {bankName: string} Adresse zu sein.",
         "usernameDoesNotExistAdvice": "Gehe sicher, dass Du alles richtig geschrieben hast oder frage den Empfänger nach einer Lightning Invoice oder BTC Adresse.",
+        "destinationUnverifiable": "Wir konnten {lnAddress} gerade nicht prüfen – die Server von {bankName} antworten nicht.",
+        "destinationUnverifiableAdvice": "Die Adresse ist wahrscheinlich in Ordnung. Versuch es gleich noch einmal oder bitte den Empfänger stattdessen um eine LN-Rechnung oder BTC-Adresse.",
         "selfPaymentError": "{lnAddress: string} ist deine {bankName: string} Adresse.",
         "selfPaymentAdvice": "Wenn Du Geld an ein anderes Konto von dir senden möchtest, nutze dafür eine Lightning Invoice, Lightning Adresse oder BTC Adresse.",
         "lnAddressError": "Wir konnten diese Lightning Adresse nicht erreichen. Wenn Du dir sicher bist dass sie existiert, probiere es später erneut.",
@@ -2426,9 +2444,9 @@
         "time": "Uhrzeit",
         "type": "Typ",
         "feeTier": "Transaktionspriorität",
-        "fast": "Schnell",
-        "medium": "Mittel",
-        "slow": "Langsam",
+        "fast": "Priorität",
+        "medium": "Standard",
+        "slow": "Sparsam",
         "recommended": "Empfohlen",
         "walletOffline": "Deine Wallet ist offline. Bitte überprüfe deine Verbindung und versuche es erneut.",
         "sdkInsufficientFunds": "Nicht genügend Guthaben für diese Transaktion.",
@@ -2437,7 +2455,7 @@
         "sdkGenericError": "Gebühren können nicht geschätzt werden. Bitte versuchen Sie einen anderen Betrag."
     },
     "SettingsScreen": {
-        "createAddress": "Adresse erstellen",
+        "createAddress": "Lightning-Adresse erstellen",
         "addressDisabled": "(deaktiviert)",
         "donationButton": "Spenden-Button",
         "btcpayServer": "BTCPay Server",
@@ -2454,6 +2472,7 @@
         "activated": "Aktiviert",
         "addressScreen": "Zahlungsmöglichkeiten",
         "nonCustodialAccount": "Nicht-verwahrtes Konto",
+        "custodialAccount": "Verwahrtes Konto",
         "tapUserName": "Antippen um einen Benutzernamen festzulegen",
         "notifications": "Benachrichtigungen",
         "title": "Einstellungen",
@@ -2562,8 +2581,6 @@
         "emailUnverifiedContent": "Stellen Sie sicher, dass Sie sich wieder bei Ihrem Konto anmelden können, indem Sie Ihre E-Mail verifizieren. Möchten Sie die Verifizierung jetzt durchführen?",
         "totp": "Zwei-Faktor Authentifizierung",
         "totpDeactivated": "Zwei-Faktor Authentifizierung wurde deaktiviert",
-        "totpDeleteAlertTitle": "Zwei-Faktor Authentifizierung löschen",
-        "totpDeleteAlertContent": "Bist Du sicher, dass du Deine Zwei-Faktor Authentifizierung löschen möchtest?",
         "copiedAccountId": "Kopieren Sie Ihre Konto-ID in die Zwischenablage",
         "yourAccountId": "Deine Konto ID",
         "accountId": "Konto ID",
@@ -2577,12 +2594,14 @@
         "error": "Profile können derzeit nicht abgerufen werden",
         "fromThisDevice": "von diesem Gerät?",
         "switchAccount": "Du hast zu einem anderen Konto gewechselt",
-        "removedAccount": "Du hast das Konto {identifier: string} entfernt."
+        "removedAccount": "Du hast das Konto {identifier: string} entfernt.",
+        "removeAccount": "Konto entfernen"
     },
     "StablesatsRestriction": {
         "walletLabel": "in deiner Region nicht verfügbar",
         "anonModeWalletLabel": "im Incognito-Modus nicht verfügbar",
-        "unknownRegionWalletLabel": "Verfügbarkeit konnte nicht geprüft werden, zum Wiederholen nach unten ziehen"
+        "unknownRegionWalletLabel": "Verfügbarkeit konnte nicht geprüft werden, zum Wiederholen nach unten ziehen",
+        "networkWalletLabel": "in diesem Netzwerk nicht verfügbar"
     },
     "AnonModeConvertModal": {
         "title": "Übertrage zuerst dein Dollar-Guthaben",
@@ -2616,14 +2635,11 @@
         "youGet": "Du erhältst"
     },
     "TotpRegistrationInitiateScreen": {
-        "title": "Zwei-Faktor Authentifizierung",
-        "secret": "Geheimnis/Backup",
-        "content": "Scannen Sie diesen QR-Code mit Ihrer Authenticator-App. Alternativ können Sie das Geheimnis auch manuell in Ihre Authenticator-App kopieren/einfügen."
+        "title": "Zwei-Faktor Authentifizierung"
     },
     "TotpRegistrationValidateScreen": {
         "title": "Zwei-Faktor Authentifizierung",
-        "enter6digitCode": "Geben Sie den 6-stelligen Code aus Ihrer Authenticator-App ein, um Ihre Zwei-Faktor-Authentifizierung zu bestätigen.",
-        "success": "Die Zwei-Faktor-Authentifizierung wurde aktiviert. Sie können sich jetzt nur noch mit Ihrem Telefon oder Ihrer E-Mail UND Ihrer Zwei-Faktor-Authentifizierung anmelden.\n\nGeräte auf diesem Konto, die nicht mit 2FA angemeldet sind, müssen sich erneut anmelden.\n\nNur Konten der Stufe 2 können im Falle eines verlorenen 2FA-Zugangs vom Kundendienst wiederhergestellt werden."
+        "enter6digitCode": "Geben Sie den 6-stelligen Code aus Ihrer Authenticator-App ein, um Ihre Zwei-Faktor-Authentifizierung zu bestätigen."
     },
     "TotpLoginValidateScreen": {
         "title": "Zwei-Faktor Authentifizierung",
@@ -2667,7 +2683,7 @@
     "TransactionDetailScreen": {
         "paid": "Gezahlt an/von",
         "received": "Du erhieltst",
-        "spent": "Du zahltest",
+        "sent": "Du sendetest",
         "sending": "Sendend",
         "receivingAccount": "Empfangendes Guthaben",
         "sendingAccount": "Sendendes Guthaben",
@@ -2688,7 +2704,7 @@
         "intraledger": "Intraledger",
         "onchainPriority": "Onchain Priorität (~10 Min.)",
         "onchainStandard": "Onchain Standard (~4 Std.)",
-        "onchainEconomy": "Onchain Economy (~24 Std.)",
+        "onchainEconomy": "Onchain Sparsam (~24 Std.)",
         "lightningTransactions": "Lightning-Transaktionen",
         "onchainBelowThreshold": "Onchain unter {threshold: string} SAT",
         "onchainAboveThreshold": "Onchain über {threshold: string} SAT",
@@ -2743,6 +2759,7 @@
             "tooLong": "Die Adresse darf nicht länger als 50 Zeichen sein",
             "invalidCharacter": "Die Adresse darf nur Buchstaben, Zahlen und Unterstriche beinhalten",
             "addressUnavailable": "Entschuldigung, diese Adresse ist schon vergeben",
+            "serverUnreachable": "Der Adressserver war nicht erreichbar. Versuch es gleich noch einmal.",
             "unknownError": "Ein unbekannter Fehler ist aufgetreten, bitte versuche es später erneut",
             "backupRequired": "Back up your wallet before creating a Lightning address"
         },
@@ -3039,7 +3056,8 @@
         "problemPersists": "Bitte kontaktiere uns, wenn dieses Problem weiterhin besteht.",
         "fatalError": "Entschuldige, die Applikationsdaten konnten nicht geladen werden. Bitte kontaktiere uns, wenn dieses Problem weiterhin besteht.",
         "showError": "Fehler anzeigen",
-        "clearAppData": "App-Daten löschen und ausloggen"
+        "clearAppData": "App-Daten löschen und ausloggen",
+        "screenSecurityUnavailable": "Dieser Bildschirm bleibt ausgeblendet, weil der Screenshot-Schutz nicht aktiviert werden konnte."
     },
     "notifications": {
         "payment": {
@@ -3070,7 +3088,13 @@
         "deleteAccountFromPhone": "Hey, bitte schließt meinen Account. Meine Telefonnummer ist {phoneNumber: string}.",
         "deleteAccountError": "Etwas ist schief gelaufen. Bitte kontaktiere {email: string}, um weitere Hilfe zu erhalten.",
         "bye": "Auf Wiedersehen!",
-        "deleteAccountWarning": "Achtung: Die Schließung des Accounts ist endgültig!\nStelle sicher, dass die Wallets kein Guthaben mehr haben, bevor du schließt.\nEin geschlossener Account kann nicht wiederhergestellt werden.\nWir können bestimmte Daten gesetzlich bedingt aufbewahren."
+        "deleteAccountWarning": "Achtung: Die Schließung des Accounts ist endgültig!\nStelle sicher, dass die Wallets kein Guthaben mehr haben, bevor du schließt.\nEin geschlossener Account kann nicht wiederhergestellt werden.\nWir können bestimmte Daten gesetzlich bedingt aufbewahren.",
+        "downloadLogs": "Logs herunterladen",
+        "exportLogsTitle": "Brieftaschen-Logs teilen",
+        "exportLogsBody": "Diese Datei hilft unserem Support, Probleme mit deinen Brieftaschen zu untersuchen. Sie enthält den Zahlungsverlauf (Beträge, Rechnungen und Adressen) und die Brieftaschen-Kennungen jeder nicht verwahrten Brieftasche auf diesem Gerät, nicht nur dieser, aber niemals deine Wiederherstellungsphrasen oder Schlüssel. Teile sie nur mit unserem Support.",
+        "exportLogsConfirm": "Logs teilen",
+        "noLogsYet": "Es gibt noch keine Logs zum Teilen. Öffne deine Brieftasche und versuche es erneut.",
+        "exportLogsError": "Logs konnten nicht exportiert werden. Bitte versuche es erneut."
     },
     "lnurl": {
         "overLimit": "Du kannst nicht mehr als den Maximalbetrag senden",
@@ -3800,7 +3824,7 @@
         }
     },
     "BackupScreen": {
-        "title": "Back up your wallet",
+        "title": "Brieftasche sichern",
         "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "Wähle deine Sicherungsmethode",
@@ -3845,6 +3869,15 @@
                 "title": "Willkommen bei nicht-verwaltetem Blink",
                 "testSuccess": "Deine Wiederherstellungsphrase ist korrekt"
             }
+        },
+        "BundleExport": {
+            "title": "Notfall-Ausstieg",
+            "body": "Falls Spark ausfällt, kannst du mit diesem Bundle deine Bitcoin ohne Blink On-Chain bewegen. Dein Dollar-Guthaben lässt sich nicht wiederherstellen.",
+            "download": "Bundle herunterladen",
+            "sensitiveTitle": "Sensibel",
+            "learnMore": "Mehr über den einseitigen Ausstieg",
+            "sensitiveConfirm": "Herunterladen",
+            "sensitiveBody": "Diese Datei zeigt dein Guthaben und deinen Zahlungsverlauf, also halte sie privat. Um sie im Notfall zu nutzen, brauchst du außerdem deine Wiederherstellungsphrase."
         },
         "CloudBackup": {
             "title": "Sichern wir Ihre Brieftasche",
@@ -4050,6 +4083,12 @@
         "recognizePhraseTitle": "Erkennst du diese Backup-Phrase?",
         "recognizePhraseBody": "Gib niemals Wörter ein, die dir jemand anderes geschickt hat."
     },
+    "EmergencyRecovery": {
+        "outageTitle": "Betreiber nicht erreichbar",
+        "outageBody": "Bei Spark gibt es eine Störung. Bitte warte ein paar Minuten und versuche es erneut oder kontaktiere unseren {support}",
+        "outageSupport": "Support",
+        "tryAgainLater": "Später erneut versuchen"
+    },
     "BackupNudge": {
         "title": "Ihre Mittel sind gefährdet",
         "description": "Sichern Sie Ihre Wallet jetzt. Es dauert nur eine Minute.",
@@ -4058,6 +4097,81 @@
         "modalTitle": "Sichern Sie Ihre Mittel",
         "modalDescription": "Wir empfehlen dringend, Ihre Wallet zu sichern, um einen vollständigen Verlust Ihrer Mittel zu verhindern, falls Sie dieses Gerät verlieren.",
         "secureMe": "Wallet sichern"
+    },
+    "TwoFactorEnforcement": {
+        "title": "Zwei-Faktor-Authentifizierung einrichten",
+        "cardDescription": "Schütze dein Konto vor unbefugtem Zugriff.",
+        "cardCta": "Einrichten",
+        "settingsDescription": "Schütze dein Konto vor unbefugtem Zugriff, indem du sie einrichtest.",
+        "setupTitle": "Richte jetzt die Zwei-Faktor-Authentifizierung ein",
+        "setupDescription": "Um unbefugten Zugriff auf dein Konto zu verhindern, füge jetzt die Zwei-Faktor-Authentifizierung hinzu.",
+        "setAuthenticator": "Authenticator einrichten",
+        "reminderTitle": "Füge einen Authenticator hinzu, um dein Guthaben zu schützen",
+        "reminderDescription": "Dein Guthaben ist gewachsen. Eine Authenticator-App schützt dein Konto, selbst wenn jemand Zugriff auf deine E-Mail oder dein Telefon bekommt.",
+        "modalReminder": "Wenn du jetzt ablehnst, aktiviere es bitte so bald wie möglich.",
+        "dismissTwoMore": "Du kannst dies noch zweimal ablehnen.",
+        "dismissOneMore": "Du kannst dies noch einmal ablehnen.",
+        "dismissLast": "Dies ist das letzte Mal, dass du dies ablehnen kannst.",
+        "setNow": "Jetzt einrichten",
+        "dontWantTo": "Ich möchte nicht",
+        "highBalanceTitle": "Du hast über {amount}, bitte füge zusätzlichen Schutz hinzu",
+        "protectionRequiredTitle": "Bitte füge zusätzlichen Schutz hinzu, um Blink weiter zu nutzen",
+        "protectionRequiredBody": "Je mehr Guthaben du hast, desto wichtiger ist bessere Sicherheit. Bitte füge einen Authenticator hinzu, um Blink weiter zu nutzen.",
+        "nonCustodialTitle": "Wenn du keine Zwei-Faktor-Authentifizierung einrichten möchtest",
+        "nonCustodialBody": "Die andere Möglichkeit ist der Wechsel zu Non-Custodial. Dann bist du selbst für dein Guthaben verantwortlich."
+    },
+    "AuthenticatorOnboarding": {
+        "introTitle": "Schütze dein Guthaben mit einem Authenticator",
+        "introDescription": "Eine Authenticator-App erzeugt alle 30 Sekunden einen neuen 6-stelligen Code.",
+        "takeoversTitle": "Verhindert Kontoübernahmen",
+        "takeoversDescription": "Der Code existiert nur auf deinem Telefon",
+        "stolenNumberTitle": "Sicher, selbst wenn deine Nummer gestohlen wird",
+        "stolenNumberDescription": "Selbst wenn jemand Zugriff auf deine E-Mail oder Telefonnummer bekommt, kann er sich nicht anmelden",
+        "durationTitle": "Dauert etwa 2 Minuten",
+        "durationDescription": "Wir führen dich Schritt für Schritt",
+        "getStarted": "Los geht's",
+        "appsTitle": "Hol dir eine Authenticator-App",
+        "appsDescription": "Jede Authenticator-App funktioniert. Diese sind kostenlos und vertrauenswürdig:",
+        "googleAuthenticatorDescription": "Einfach und weit verbreitet. Optionale Sicherung in deinem Google-Konto.",
+        "protonAuthenticatorDescription": "Quelloffen. Ende-zu-Ende-verschlüsselte Sicherung und Synchronisierung.",
+        "twoFasAuthDescription": "Quelloffen. Kein Konto erforderlich.",
+        "get": "Laden",
+        "storeNote": "„Laden“ öffnet den App Store oder Google Play. Kehre zu Blink zurück, sobald die App installiert ist.",
+        "haveAnApp": "Ich habe eine App",
+        "keyInstruction": "Kopiere diesen Einrichtungsschlüssel in deine Authenticator-App.",
+        "qrInstruction": "Nutzt du ein anderes Gerät?\nScanne stattdessen diesen QR-Code.",
+        "backupTitle": "Sichere deinen Schlüssel",
+        "backupDescription": "Wenn du dein Telefon verlierst, kannst du mit diesem Schlüssel deinen Authenticator neu einrichten. Bewahre ihn an einem anderen Ort als auf diesem Telefon auf.",
+        "saveToPasswordManager": "In einem Passwort-Manager speichern",
+        "shareToPasswordManager": "Mit einem Passwort-Manager teilen",
+        "copyForManualBackup": "Für manuelle Sicherung kopieren",
+        "passwordManagerUnavailable": "Auf diesem Gerät ist kein Passwort-Manager verfügbar. Kopiere den Schlüssel stattdessen für eine manuelle Sicherung.",
+        "savedIt": "Ich habe ihn gespeichert",
+        "keyBackupText": "Blink-Authenticator-Einrichtungsschlüssel\n\nKonto: {account}\nEinrichtungsschlüssel: {key}\n\nWenn du dein Telefon verlierst, füge diesen Einrichtungsschlüssel zu einer Authenticator-App hinzu, um deine Blink-Anmeldecodes zurückzubekommen. Jeder mit diesem Schlüssel kann deine Codes erzeugen, also halte ihn geheim.",
+        "protectedTitle": "Dein Konto ist jetzt geschützt",
+        "protectedDescription": "Ab jetzt brauchst du zum Anmelden einen Einmalcode aus deiner Authenticator-App.",
+        "newPhoneTip": "Wenn du ein neues Telefon bekommst, übertrage deinen Authenticator darauf, <bold>bevor</bold> du das alte zurücksetzt.",
+        "done": "Fertig"
+    },
+    "TwoFactorTurnOff": {
+        "statusEnabled": "2FA: Aktiviert",
+        "statusDisabled": "2FA: Deaktiviert",
+        "modalTitle": "Wir raten davon ab, 2FA zu deaktivieren",
+        "modalBody": "Dadurch würde die Sicherheit deines Kontos sinken und Dritte könnten leichter ohne deine Erlaubnis auf dein Konto zugreifen.",
+        "keepProtected": "Geschützt bleiben",
+        "codeInstruction": "Gib den 6-stelligen Code aus deiner Authenticator-App ein, um die Zwei-Faktor-Authentifizierung zu deaktivieren.",
+        "codeInvalid": "Dieser Code ist falsch. Gib den aktuellen Code aus deiner Authenticator-App ein.",
+        "tooManyAttempts": "Zu viele Versuche. Versuche es in einer Stunde erneut.",
+        "manualResetTitle": "Manuelles Zurücksetzen der 2FA",
+        "manualResetBody": "Zu deinem Schutz kann 2FA nicht in der App entfernt werden. Wenn du 2FA zurücksetzen musst, kontaktiere unseren <support>Support</support>."
+    },
+    "LoginMethodCode": {
+        "addEmailTitle": "E-Mail hinzufügen",
+        "addPhoneTitle": "Telefonnummer hinzufügen",
+        "addEmailCode": "Gib den 6-stelligen Code aus deiner Authenticator-App ein, um deine E-Mail hinzuzufügen.",
+        "addPhoneCode": "Gib den 6-stelligen Code aus deiner Authenticator-App ein, um deine Telefonnummer hinzuzufügen.",
+        "codeInvalid": "Dieser Code ist falsch. Gib den aktuellen Code aus deiner Authenticator-App ein.",
+        "tooManyAttempts": "Zu viele Versuche. Versuche es in einer Stunde erneut."
     },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",
@@ -4068,6 +4182,15 @@
         "title": "Dies ist ein nicht-verwahrtes Konto",
         "body": "Lies unseren Blogbeitrag, um mehr zu erfahren",
         "cta": "Lesen"
+    },
+    "StaleCloudBundleBulletin": {
+        "title": "Aktualisiere dein Cloud-Backup",
+        "body": "Dein Notfall-Bundle in {provider} ist veraltet. Sichere deine Brieftasche erneut, um es zu aktualisieren.",
+        "cta": "Erneut sichern"
+    },
+    "RecoveryBundleScreen": {
+        "noBundleToExport": "Noch kein Notfall-Bundle. Es wird nach deiner ersten Transaktion erstellt.",
+        "exportFailed": "Das Notfall-Bundle konnte nicht heruntergeladen werden."
     },
     "StableBalance": {
         "title": "Stabiles Guthaben",
@@ -4101,6 +4224,8 @@
         "signInDescription": "Melde dich bei deinem custodial-Konto an, um {featureName} zu nutzen.",
         "noAccountTitle": "Custodial-Konto erforderlich",
         "noAccountDescription": "{featureName} benötigt ein Blink custodial-Konto.",
+        "unreachableTitle": "Blink ist nicht erreichbar",
+        "unreachableDescription": "{featureName} benötigt die Server von Blink, die gerade nicht antworten. Deine Wallet und dein Guthaben sind nicht betroffen.",
         "featureCircles": "Circles",
         "featureEarn": "Lernen",
         "featureCard": "Karte"
@@ -4123,6 +4248,10 @@
         "tokenTransfer": "{token}-Überweisung",
         "payTo": "Zahlen an {address}",
         "payment": "Zahlung"
+    },
+    "SelfCustodialStaleRate": {
+        "notice": "Der Wechselkurs ist möglicherweise veraltet",
+        "satsOnly": "Anzeige in Sats – kein Wechselkurs verfügbar"
     },
     "SelfCustodialOffline": {
         "title": "Wallet ist offline",
@@ -4158,9 +4287,6 @@
         "refundFailed": "Rückerstattung fehlgeschlagen: {error}",
         "refundAddress": "Bitcoin-Adresse für Rückerstattung",
         "feeRate": "Netzwerkgebühr",
-        "feeRateFastest": "Schnellste (~{sats} sats) ~10 Min",
-        "feeRateHalfHour": "Normal (~{sats} sats) ~30 Min",
-        "feeRateHour": "Sparsam (~{sats} sats) ~60 Min",
         "feeRateUnit": "{rate} sat/vB",
         "feeRateUnavailable": "Netzwerkgebühren konnten nicht geladen werden. Bitte überprüfe deine Verbindung und versuche es erneut.",
         "refundNow": "Jetzt erstatten",

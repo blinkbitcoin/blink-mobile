@@ -15,6 +15,8 @@ export const useLoginMethods = () => {
   const phoneVerified = Boolean(phone)
 
   const bothEmailAndPhoneVerified = phoneVerified && emailVerified
+  /** The server asks for the authenticator's code to add or remove either method. */
+  const hasAuthenticator = Boolean(data?.me?.totpEnabled)
 
   return {
     loading: !data, // Data would auto refresh after network call
@@ -23,5 +25,6 @@ export const useLoginMethods = () => {
     phone,
     phoneVerified,
     bothEmailAndPhoneVerified,
+    hasAuthenticator,
   }
 }

@@ -139,7 +139,7 @@ const Harness: React.FC = () => {
             } as any,
             updateState: () => {},
             resetState: () => {},
-            clearToken: async () => {},
+            clearToken: async () => true,
           }}
         >
           <TypesafeI18n locale={detectDefaultLocale()}>

@@ -31,6 +31,8 @@
     "createError": "تعذّر إنشاء مفتاح API. يرجى المحاولة مرة أخرى.",
     "revokeError": "تعذّر إلغاء مفتاح API. يرجى المحاولة مرة أخرى.",
     "loadError": "تعذّر تحميل مفاتيح API الخاصة بك. يرجى المحاولة لاحقًا.",
+    "discardSecretTitle": "تجاهل مفتاح API هذا؟",
+    "discardSecretBody": "هذه هي المرة الوحيدة التي يُعرض فيها السر. إذا غادرت الآن، فلن تتمكن من استرداد المفتاح وستحتاج إلى إنشاء مفتاح جديد.",
     "done": "تم"
   },
   "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
     "skip": "تخطى",
     "unlock": "إلغاء القفل",
     "usePin": "استخدم الرمز الشخصي (PIN)",
-    "confirmLogout": "هل أنت متأكد أنك تريد تسجيل الخروج؟ سيؤدي ذلك إلى مسح ذاكرة التخزين المؤقت وجميع إعدادات المستخدم المحلية"
+    "confirmLogout": "هل أنت متأكد أنك تريد تسجيل الخروج؟ سيؤدي ذلك إلى مسح ذاكرة التخزين المؤقت وجميع إعدادات المستخدم المحلية",
+    "forgotPin": "نسيت الرمز الشخصي؟ أزل المحافظ",
+    "removeWalletsTitle": "إزالة المحافظ من هذا الجهاز؟",
+    "removeWalletsBody": "سيزيل هذا جميع المحافظ من هذا الجهاز ويسجل خروجك. لاستعادة محفظة، تحتاج إلى عبارة النسخ الاحتياطي الخاصة بها. بدونها تضيع المحفظة.",
+    "removeWalletsConfirm": "إزالة المحافظ",
+    "removeWalletsFailed": "تعذرت إزالة بعض المحافظ. يرجى المحاولة مرة أخرى."
   },
   "PeopleScreen": {
     "title": "People",
@@ -2175,16 +2182,19 @@
     "walletCountNotTwo": "عدد المحافظ ليس 2. يرجى استخدام لوحة التحكم لعرض جميع المحافظ وأموال هذا الحساب"
   },
   "PinScreen": {
+    "attemptUnrecorded": "تعذّر تسجيل المحاولة بشكل آمن.",
+    "attemptsLeft": "بقي {attemptsRemaining: string} محاولات.",
     "attemptsRemaining": "رمز شخصي خاطئ. بقي {attemptsRemaining: string} محاولات.",
     "enterPin": "أدخل رمز PIN الخاص بك",
-    "lockoutUnavailable": "تعذّر تسجيل المحاولة الفاشلة بشكل آمن. يتم تسجيل الخروج.",
+    "oneAttemptLeft": "بقيت محاولة واحدة.",
     "oneAttemptRemaining": "رمز شخصي خاطئ. بقيت محاولة واحدة.",
     "pinUnreadable": "تعذّر التحقق من رمزك الشخصي. يرجى المحاولة مرة أخرى.",
     "setPin": "عيّن رمزك الشخصي (PIN)",
     "setPinFailedMatch": "رموز ال PIN غير متوافقة - قم بتعيين رمز PIN الخاص بك",
     "storePinFailed": "غير قادر على تخزين ال PIN الخاص بك.",
     "tooManyAttempts": "الكثير من المحاولات الفاشلة. \nيتم تسجيل الخروج.",
-    "tryAgainIn": "حاول مرة أخرى بعد {seconds: number} ث.",
+    "attemptBudgetSpent": "الكثير من المحاولات الفاشلة.",
+    "tryAgainIn": "حاول مرة أخرى بعد {time: string}.",
     "verifyPin": "تحقق من رمز PIN الخاص بك"
   },
   "PriceHistoryScreen": {
@@ -2219,6 +2229,12 @@
     "error": "أخفق توليد الفاتورة. أخبر فريق الدعم رجاءً إن استمرت المشكلة.",
     "copyInvoice": "Copy",
     "shareInvoice": "مشاركة",
+    "newAddress": "جديد",
+    "newAddressHint": "ينشئ عنوان بيتكوين جديدًا. تظل العناوين السابقة صالحة.",
+    "newAddressGenerated": "العنوان الجديد جاهز. العناوين السابقة لا تزال تعمل.",
+    "newAddressFailed": "تعذّر إنشاء عنوان جديد. يرجى المحاولة مرة أخرى.",
+    "newAddressRateLimited": "عدد كبير جدًا من العناوين الجديدة. يُرجى الانتظار قليلًا ثم المحاولة مرة أخرى.",
+    "onchainAddressLoadFailed": "تعذّر تحميل عنوان البيتكوين الخاص بك. اضغط على جديد للمحاولة مرة أخرى.",
     "addAmount": "اطلب مقدارًا محدّدًا",
     "expired": "انتهت مدّة صلاحية الفاتورة",
     "expiresIn": "ينتهي في",
@@ -2354,6 +2370,8 @@
     "invalidAmount": "في هذه الفاتورة مقدار غير صالح. ولّدها مرة أخرى بعنوان صالح من فضلك.",
     "usernameDoesNotExist": "لا يبدو أن عنوان البرق هذا ({lnAddress: string}) عنوان صالح وموجود في {bankName: string}.",
     "usernameDoesNotExistAdvice": "تحقق من الكتابة الصحيحة أو اطلب من المتلقّي فاتورة برق أو عنوان بيتكوين بدلًا من ذلك.",
+    "destinationUnverifiable": "تعذّر التحقق من {lnAddress} الآن — خوادم {bankName} لا تستجيب.",
+    "destinationUnverifiableAdvice": "قد يكون العنوان صحيحًا تمامًا. أعد المحاولة بعد قليل، أو اطلب من المستلم فاتورة LN أو عنوان BTC بدلاً من ذلك.",
     "selfPaymentError": "عنوان البرق هذا ({lnAddress: string}) هو عنوانك في {bankName: string}.",
     "selfPaymentAdvice": "إذا أردت إرسال النقد إلى حساب آخر لك، يمكنك أن تستعمل فاتورة في شبكة البرق أو عنوان بيتكوين.",
     "lnAddressError": "لم نستطع بلوغ عنوان البرق هذا. إن كنت متأكدًا من وجوده، جرّب مرة أخرى لاحقًا.",
@@ -2426,9 +2444,9 @@
     "time": "الوقت",
     "type": "النوع",
     "feeTier": "أولوية المعاملة",
-    "fast": "سريع",
-    "medium": "متوسط",
-    "slow": "بطيء",
+    "fast": "أولوية",
+    "medium": "عادي",
+    "slow": "اقتصادي",
     "recommended": "موصى به",
     "walletOffline": "محفظتك غير متصلة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
     "sdkInsufficientFunds": "لا توجد أموال كافية لهذه المعاملة.",
@@ -2437,7 +2455,7 @@
     "sdkGenericError": "تعذّر تقدير الرسوم. يرجى تجربة مبلغ مختلف."
   },
   "SettingsScreen": {
-    "createAddress": "إنشاء عنوان",
+    "createAddress": "إنشاء عنوان Lightning",
     "addressDisabled": "(معطّل)",
     "donationButton": "زر التبرع",
     "btcpayServer": "BTCPay Server",
@@ -2454,6 +2472,7 @@
     "activated": "تم التفعيل",
     "addressScreen": "Ways to get paid",
     "nonCustodialAccount": "حساب غير حافظ",
+    "custodialAccount": "حساب حاضن",
     "tapUserName": "إضغط لتعيين اسم المستخدم",
     "notifications": "Notifications",
     "title": "تطبيق الإعدادات",
@@ -2562,8 +2581,6 @@
     "emailUnverifiedContent": "Ensure you can log back into your account by verifying your email. Do you want to do the verification now?",
     "totp": "Two-factor authentication",
     "totpDeactivated": "Two-factor authentication has been deactivated",
-    "totpDeleteAlertTitle": "Delete two-factor authentication",
-    "totpDeleteAlertContent": "Are you sure you want to delete your two-factor authentication?",
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "معرّف الحساب",
@@ -2577,12 +2594,14 @@
     "error": "تعذّر جلب الملفات الشخصية في الوقت الحالي",
     "fromThisDevice": "من هذا الجهاز؟",
     "switchAccount": "لقد انتقلت إلى حساب آخر",
-    "removedAccount": "لقد أزلت الحساب {identifier: string}."
+    "removedAccount": "لقد أزلت الحساب {identifier: string}.",
+    "removeAccount": "إزالة الحساب"
   },
   "StablesatsRestriction": {
     "walletLabel": "غير متاح في منطقتك",
     "anonModeWalletLabel": "غير متاح في وضع Incognito",
-    "unknownRegionWalletLabel": "تعذّر التحقق من التوفر، اسحب للأسفل لإعادة المحاولة"
+    "unknownRegionWalletLabel": "تعذّر التحقق من التوفر، اسحب للأسفل لإعادة المحاولة",
+    "networkWalletLabel": "غير متاح على هذه الشبكة"
   },
   "AnonModeConvertModal": {
     "title": "حوّل رصيدك بالدولار أولًا",
@@ -2616,14 +2635,11 @@
     "youGet": "تحصل على"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Two-factor authentication",
-    "secret": "الرمز السري/النسخ الاحتياطي",
-    "content": "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret into your authenticator app."
+    "title": "Two-factor authentication"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Two-factor authentication",
-    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication.",
-    "success": "Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.\n\nOnly full KYC accounts may be recovered in the case a user has lost access to their two-factor authentication."
+    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication."
   },
   "TotpLoginValidateScreen": {
     "title": "Two-factor authentication",
@@ -2667,7 +2683,7 @@
   "TransactionDetailScreen": {
     "paid": "دفعت إلى/من",
     "received": "استقبلت",
-    "spent": "أنفقت",
+    "sent": "أرسلت",
     "sending": "جارٍ الإرسال",
     "receivingAccount": "Receiving Account",
     "sendingAccount": "Sending Account",
@@ -2743,6 +2759,7 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
+      "serverUnreachable": "تعذّر الوصول إلى خادم العناوين. أعد المحاولة بعد قليل.",
       "unknownError": "An unknown error occurred, please try again later",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3039,7 +3056,8 @@
     "problemPersists": "تواصل مع مركز الدعم اذا استمرت المشكلة.",
     "fatalError": "نأسف على ما يبدو أننا نواجه مشكلات في تحميل بيانات التطبيق. إذا استمرت المشاكل يرجى الاتصال بالدعم.",
     "showError": "إظهار الخطأ",
-    "clearAppData": "Clear App Data and Logout"
+    "clearAppData": "Clear App Data and Logout",
+    "screenSecurityUnavailable": "تبقى هذه الشاشة مخفية لأنه تعذّر تفعيل الحماية من لقطات الشاشة."
   },
   "notifications": {
     "payment": {
@@ -3070,7 +3088,13 @@
     "deleteAccountFromPhone": "مرحبًا! يرجى إغلاق حسابي. رقم هاتفي هو {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "تنبيه: إغلاق الحساب نهائي!\nتأكد من أن المحافظ لا تحتوي على أموال قبل الإغلاق.\nلا يمكن استعادة الحساب المغلق.\nقد نحتفظ ببعض السجلات وفقًا لما يقتضيه القانون."
+    "deleteAccountWarning": "تنبيه: إغلاق الحساب نهائي!\nتأكد من أن المحافظ لا تحتوي على أموال قبل الإغلاق.\nلا يمكن استعادة الحساب المغلق.\nقد نحتفظ ببعض السجلات وفقًا لما يقتضيه القانون.",
+    "downloadLogs": "تنزيل السجلات",
+    "exportLogsTitle": "شارك سجلات محفظتك",
+    "exportLogsBody": "يساعد هذا الملف فريق الدعم لدينا على النظر في مشاكل محافظك. يتضمن سجل المدفوعات (المبالغ والفواتير والعناوين) ومعرّفات المحفظة لكل محفظة غير حافظة على هذا الجهاز، وليس هذه المحفظة فقط، لكنه لا يتضمن أبدًا عبارات النسخ الاحتياطي أو المفاتيح. شاركه فقط مع فريق الدعم لدينا.",
+    "exportLogsConfirm": "مشاركة السجلات",
+    "noLogsYet": "لا توجد سجلات لمشاركتها بعد. افتح محفظتك وحاول مرة أخرى.",
+    "exportLogsError": "تعذر تصدير سجلاتك. يرجى المحاولة مرة أخرى."
   },
   "lnurl": {
     "overLimit": "لا يمكنك إرسال مبلغ أكثر من الحد الأعلى",
@@ -3800,7 +3824,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "انسخ محفظتك احتياطيًا",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "اختر طريقة النسخ الاحتياطي",
@@ -3845,6 +3869,15 @@
         "title": "مرحبًا بك في Blink غير الحافظة",
         "testSuccess": "عبارة النسخ الاحتياطي صحيحة"
       }
+    },
+    "BundleExport": {
+      "title": "الخروج الطارئ",
+      "body": "إذا توقف Spark، تتيح لك هذه الحزمة نقل البيتكوين الخاص بك على السلسلة بدون Blink. لا يمكن استرداد رصيدك بالدولار.",
+      "download": "تنزيل الحزمة",
+      "sensitiveTitle": "حسّاس",
+      "learnMore": "اعرف المزيد عن الخروج الأحادي",
+      "sensitiveConfirm": "تنزيل",
+      "sensitiveBody": "يعرض هذا الملف رصيدك وسجل مدفوعاتك، لذا احتفظ به بشكل خاص. لاستخدامه في حالة الطوارئ، تحتاج أيضًا إلى عبارة النسخ الاحتياطي."
     },
     "CloudBackup": {
       "title": "لنقم بنسخ محفظتك احتياطيًا",
@@ -4050,6 +4083,12 @@
     "recognizePhraseTitle": "هل تتعرّف على عبارة النسخ الاحتياطي هذه؟",
     "recognizePhraseBody": "لا تُدخل أبدًا كلمات أرسلها لك شخص آخر."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "تعذّر الوصول إلى المشغّل",
+    "outageBody": "يواجه Spark انقطاعًا في الخدمة. يُرجى الانتظار بضع دقائق والمحاولة مجددًا أو التواصل مع {support}",
+    "outageSupport": "الدعم",
+    "tryAgainLater": "حاول لاحقًا"
+  },
   "BackupNudge": {
     "title": "أموالك في خطر",
     "description": "قم بتأمين محفظتك الآن. لن يستغرق الأمر سوى دقيقة واحدة.",
@@ -4058,6 +4097,81 @@
     "modalTitle": "قم بتأمين أموالك",
     "modalDescription": "نوصي بشدة بعمل نسخة احتياطية لمحفظتك لمنع فقدان كامل للأموال في حال فقدت هذا الجهاز.",
     "secureMe": "تأمين المحفظة"
+  },
+  "TwoFactorEnforcement": {
+    "title": "فعّل المصادقة الثنائية",
+    "cardDescription": "احمِ حسابك من الوصول غير المصرح به.",
+    "cardCta": "تفعيل",
+    "settingsDescription": "احمِ حسابك من الوصول غير المصرح به عبر تفعيلها.",
+    "setupTitle": "فعّل المصادقة الثنائية الآن",
+    "setupDescription": "لمنع الوصول غير المصرح به إلى حسابك، أضف المصادقة الثنائية الآن.",
+    "setAuthenticator": "إعداد تطبيق المصادقة",
+    "reminderTitle": "أضف تطبيق المصادقة لحماية أموالك",
+    "reminderDescription": "لقد زاد رصيدك. يحافظ تطبيق المصادقة على أمان حسابك، حتى إذا تمكّن شخص ما من الوصول إلى بريدك الإلكتروني أو هاتفك.",
+    "modalReminder": "إذا تجاهلت هذا الآن، فاحرص على تفعيله في أقرب وقت ممكن.",
+    "dismissTwoMore": "يمكنك تجاهل هذا مرتين أخريين.",
+    "dismissOneMore": "يمكنك تجاهل هذا مرة واحدة أخرى.",
+    "dismissLast": "هذه آخر مرة يمكنك فيها تجاهل هذا.",
+    "setNow": "فعّل الآن",
+    "dontWantTo": "لا أريد ذلك",
+    "highBalanceTitle": "لديك أكثر من {amount}، يرجى إضافة حماية إضافية",
+    "protectionRequiredTitle": "يرجى إضافة حماية إضافية لمواصلة استخدام Blink",
+    "protectionRequiredBody": "كلما زادت أموالك، زادت أهمية الأمان الأفضل. يرجى إضافة تطبيق المصادقة لمواصلة استخدام Blink.",
+    "nonCustodialTitle": "إذا كنت لا تريد تفعيل المصادقة الثنائية",
+    "nonCustodialBody": "الخيار الآخر هو الانتقال إلى الحفظ الذاتي. عندها تكون مسؤولًا عن أموالك."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "احمِ أموالك باستخدام تطبيق المصادقة",
+    "introDescription": "يُنشئ تطبيق المصادقة رمزًا جديدًا مكوّنًا من 6 أرقام كل 30 ثانية.",
+    "takeoversTitle": "يمنع الاستيلاء على الحساب",
+    "takeoversDescription": "الرمز موجود على هاتفك فقط",
+    "stolenNumberTitle": "ابقَ آمنًا حتى لو سُرق رقمك",
+    "stolenNumberDescription": "حتى لو تمكّن شخص ما من الوصول إلى بريدك الإلكتروني أو رقم هاتفك، فلن يتمكّن من تسجيل الدخول",
+    "durationTitle": "يستغرق نحو دقيقتين",
+    "durationDescription": "سنرشدك خطوة بخطوة",
+    "getStarted": "ابدأ",
+    "appsTitle": "احصل على تطبيق مصادقة",
+    "appsDescription": "أي تطبيق مصادقة يفي بالغرض. هذه التطبيقات مجانية وموثوقة:",
+    "googleAuthenticatorDescription": "بسيط وواسع الاستخدام. نسخ احتياطي اختياري إلى حسابك على Google.",
+    "protonAuthenticatorDescription": "مفتوح المصدر. نسخ احتياطي ومزامنة بتشفير تام بين الطرفين.",
+    "twoFasAuthDescription": "مفتوح المصدر. لا يحتاج إلى حساب.",
+    "get": "تنزيل",
+    "storeNote": "يفتح زر «تنزيل» متجر App Store أو Google Play. عُد إلى Blink بعد تثبيت التطبيق.",
+    "haveAnApp": "لديّ تطبيق",
+    "keyInstruction": "انسخ مفتاح الإعداد هذا إلى تطبيق المصادقة.",
+    "qrInstruction": "هل تستخدم جهازًا آخر؟\nامسح رمز QR هذا بدلًا من ذلك.",
+    "backupTitle": "احفظ نسخة احتياطية من مفتاحك",
+    "backupDescription": "إذا فقدت هاتفك، يتيح لك هذا المفتاح إعداد تطبيق المصادقة من جديد. احفظه في مكان آخر غير هذا الهاتف.",
+    "saveToPasswordManager": "الحفظ في مدير كلمات المرور",
+    "shareToPasswordManager": "المشاركة مع مدير كلمات المرور",
+    "copyForManualBackup": "النسخ للحفظ الاحتياطي اليدوي",
+    "passwordManagerUnavailable": "لا يوجد مدير كلمات مرور متاح على هذا الجهاز. انسخ المفتاح لعمل نسخة احتياطية يدوية بدلاً من ذلك.",
+    "savedIt": "لقد حفظته",
+    "keyBackupText": "مفتاح إعداد تطبيق المصادقة لـ Blink\n\nالحساب: {account}\nمفتاح الإعداد: {key}\n\nإذا فقدت هاتفك، أضف مفتاح الإعداد هذا إلى تطبيق مصادقة لاستعادة رموز تسجيل الدخول إلى Blink. يمكن لأي شخص يملك هذا المفتاح إنشاء رموزك، لذا احتفظ به سرًّا.",
+    "protectedTitle": "حسابك محمي الآن",
+    "protectedDescription": "من الآن فصاعدًا، يتطلب تسجيل الدخول رمزًا لمرة واحدة من تطبيق المصادقة.",
+    "newPhoneTip": "إذا حصلت على هاتف جديد، انقل تطبيق المصادقة إليه <bold>قبل</bold> إعادة ضبط الهاتف القديم.",
+    "done": "تم"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "المصادقة الثنائية: مفعّلة",
+    "statusDisabled": "المصادقة الثنائية: معطّلة",
+    "modalTitle": "لا ننصح بتعطيل المصادقة الثنائية",
+    "modalBody": "سيؤدي ذلك إلى تقليل أمان حسابك وتسهيل وصول طرف ثالث إلى حسابك دون إذنك.",
+    "keepProtected": "أبقني محميًا",
+    "codeInstruction": "أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة لإيقاف المصادقة الثنائية.",
+    "codeInvalid": "هذا الرمز غير صحيح. أدخل الرمز الحالي من تطبيق المصادقة.",
+    "tooManyAttempts": "محاولات كثيرة جدًا. حاول مرة أخرى بعد ساعة.",
+    "manualResetTitle": "إعادة تعيين المصادقة الثنائية يدويًا",
+    "manualResetBody": "لحمايتك، لا نسمح بإزالة المصادقة الثنائية داخل التطبيق. إذا كنت بحاجة إلى إعادة تعيينها، تواصل مع <support>الدعم</support>."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "إضافة بريد إلكتروني",
+    "addPhoneTitle": "إضافة رقم هاتف",
+    "addEmailCode": "لإضافة بريدك الإلكتروني، أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة.",
+    "addPhoneCode": "لإضافة رقم هاتفك، أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة.",
+    "codeInvalid": "هذا الرمز غير صحيح. أدخل الرمز الحالي من تطبيق المصادقة.",
+    "tooManyAttempts": "محاولات كثيرة جدًا. حاول مرة أخرى بعد ساعة."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -4068,6 +4182,15 @@
     "title": "هذا حساب غير حافظ",
     "body": "لمعرفة المزيد، اقرأ منشور مدونتنا",
     "cta": "اقرأ"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "حدّث نسختك الاحتياطية السحابية",
+    "body": "حزمة الطوارئ في {provider} قديمة. انسخ محفظتك احتياطيًا مرة أخرى لتحديثها.",
+    "cta": "نسخ احتياطي مرة أخرى"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "لا توجد حزمة طوارئ بعد. يتم إنشاؤها بعد معاملتك الأولى.",
+    "exportFailed": "تعذّر تنزيل حزمة الطوارئ."
   },
   "StableBalance": {
     "title": "الرصيد المستقر",
@@ -4101,6 +4224,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "تعذّر الوصول إلى Blink",
+    "unreachableDescription": "تحتاج {featureName} إلى خوادم Blink، وهي لا تستجيب حاليًا. محفظتك وأموالك غير متأثرة.",
     "featureCircles": "Circles",
     "featureEarn": "تعلّم",
     "featureCard": "Card"
@@ -4123,6 +4248,10 @@
     "tokenTransfer": "تحويل {token}",
     "payTo": "دفع إلى {address}",
     "payment": "دفعة"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "قد يكون سعر الصرف قديمًا",
+    "satsOnly": "العرض بالساتوشي — لا يتوفر سعر صرف"
   },
   "SelfCustodialOffline": {
     "title": "المحفظة غير متصلة",
@@ -4158,9 +4287,6 @@
     "refundFailed": "فشل الاسترداد: {error}",
     "refundAddress": "عنوان بيتكوين للاسترداد",
     "feeRate": "رسوم الشبكة",
-    "feeRateFastest": "الأسرع (~{sats} sats) ~10 دقائق",
-    "feeRateHalfHour": "عادي (~{sats} sats) ~30 دقيقة",
-    "feeRateHour": "اقتصادي (~{sats} sats) ~60 دقيقة",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "تعذّر تحميل رسوم الشبكة. يرجى التحقق من الاتصال والمحاولة مرة أخرى.",
     "refundNow": "استرداد الآن",

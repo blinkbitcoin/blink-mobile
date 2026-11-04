@@ -12,8 +12,12 @@ import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { DepositStatus } from "@app/types/payment"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
-import { buildFeeTierOptions } from "../send-bitcoin-screen/fee-tier-options"
+import {
+  buildFeeTierOptions,
+  feeTierLabels,
+} from "../send-bitcoin-screen/fee-tier-options"
 import { FeeTierOption } from "../send-bitcoin-screen/hooks/fee-tiers.types"
 
 import { DepositErrorMessage } from "./deposit-error-message"
@@ -48,11 +52,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
   const feeTierOptions = buildFeeTierOptions({
     hasQuote: hasFeeRateQuote,
     tiers: feeTiers,
-    labels: {
-      [FeeTierOption.Fast]: LL.SendBitcoinScreen.fast(),
-      [FeeTierOption.Medium]: LL.SendBitcoinScreen.medium(),
-      [FeeTierOption.Slow]: LL.SendBitcoinScreen.slow(),
-    },
+    labels: feeTierLabels(LL),
     formatFee: ({ feeAmount }) => LL.UnclaimedDeposit.feeRateUnit({ rate: feeAmount }),
     locale,
   })
@@ -118,27 +118,34 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                 <Text style={styles.mutedText}>{LL.UnclaimedDeposit.immature()}</Text>
               )}
 
-              {deposit.status !== DepositStatus.Immature && !isRefunding && (
-                <View style={styles.actions}>
-                  {isProcessing(deposit.id, DepositActionType.Claim) ? (
-                    <ActivityIndicator size="small" color={colors.primary} />
-                  ) : (
-                    <GaloyTertiaryButton
-                      title={LL.UnclaimedDeposit.claim()}
-                      onPress={() => handleClaim(deposit)}
-                      disabled={isClaimDisabled}
-                      {...testProps(`claim-${deposit.id}`)}
-                    />
-                  )}
-                  <GaloyTertiaryButton
-                    title={LL.UnclaimedDeposit.refund()}
-                    outline
-                    onPress={() => setRefundDepositId(deposit.id)}
-                    disabled={isBusy}
-                    {...testProps(`refund-toggle-${deposit.id}`)}
-                  />
-                </View>
+              {/** Claimed early: the provider has it, so neither claim nor refund applies. */}
+              {deposit.status === DepositStatus.Claiming && (
+                <Text style={styles.mutedText}>{LL.UnclaimedDeposit.claiming()}</Text>
               )}
+
+              {deposit.status !== DepositStatus.Immature &&
+                deposit.status !== DepositStatus.Claiming &&
+                !isRefunding && (
+                  <View style={styles.actions}>
+                    {isProcessing(deposit.id, DepositActionType.Claim) ? (
+                      <ActivityIndicator size="small" color={colors.primary} />
+                    ) : (
+                      <GaloyTertiaryButton
+                        title={LL.UnclaimedDeposit.claim()}
+                        onPress={() => handleClaim(deposit)}
+                        disabled={isClaimDisabled}
+                        {...testProps(`claim-${deposit.id}`)}
+                      />
+                    )}
+                    <GaloyTertiaryButton
+                      title={LL.UnclaimedDeposit.refund()}
+                      outline
+                      onPress={() => setRefundDepositId(deposit.id)}
+                      disabled={isBusy}
+                      {...testProps(`refund-toggle-${deposit.id}`)}
+                    />
+                  </View>
+                )}
 
               {isRefunding && (
                 <View style={styles.refundPanel}>
@@ -265,7 +272,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   fieldLabel: {
     fontSize: 13,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.grey2,
     marginBottom: 8,
   },

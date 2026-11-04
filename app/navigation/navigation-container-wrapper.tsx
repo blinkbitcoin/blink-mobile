@@ -18,13 +18,16 @@ import { useTheme } from "@rn-vui/themed"
 
 import { Action, useActionsContext } from "@app/components/actions"
 import { PREFIX_LINKING, TELEGRAM_CALLBACK_PATH } from "@app/config"
+import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
+import { TwoFactorSessionPrompt } from "@app/types/two-factor-enforcement"
 
 import { DEEP_LINK_SCREENS } from "./deep-link-screens"
 import { isMigrationRoute } from "./migration-routes"
 import { RootStackParamList } from "./stack-param-lists"
+import { isSetupKeyAtStake } from "./two-factor-remedy-routes"
 import { isUnlockInProgress } from "./unlock-routes"
 
 const navigationRef = createNavigationContainerRef<RootStackParamList>()
@@ -45,7 +48,8 @@ export const isMigrationDeeplink = (url: string): boolean => {
   }
 }
 
-/** Where the blocker lives: PrimaryNavigator swaps its tabs for the gate. */
+/** Where the blocker lives, and the two-factor gate with it: the home gate stands either
+ *  in for the tabs. */
 const BLOCKER_ROUTE = "Primary" satisfies keyof RootStackParamList
 
 /** Where a still-locked session has to pass through first. */
@@ -87,13 +91,19 @@ const isResetWarranted = (
 /** Why the stack is being judged. The triggers differ on WHETHER a reset is owed, not on
  *  where one lands: arming owns both of the jobs above, while a retry exists only to finish
  *  the pop an unlock stood in front of, so it must not reset a session it finds already at
- *  the blocker on the strength of a lock its own flow never lowered (the three-strikes
- *  logout resets the stack without unlocking). Where a reset that IS owed lands is the
- *  lock's call and no trigger's: see mustRouteThroughUnlock below. */
+ *  the blocker on the strength of a lock its own flow never lowered. Where a reset that IS
+ *  owed lands is the lock's call and no trigger's: see mustRouteThroughUnlock below. */
 type ResetTrigger = "gate-armed" | "unlock-cleared"
 
 export type AuthenticationContextType = {
   isAppLocked: boolean
+  /**
+   * The same answer without waiting for a commit, for the callers that read it outside a
+   * render: a lock raised during an awaited piece of work is already true here while the
+   * state, and any mirror of it, is still a commit behind. Written by the two setters, so
+   * it is never the stale one.
+   */
+  readIsAppLocked: () => boolean
   setAppUnlocked: () => void
   setAppLocked: () => void
 }
@@ -145,6 +155,26 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     isBlockerVisibleRef.current = isBlockerVisible
   }, [isBlockerVisible])
 
+  /** Links are held for as long as the two-factor session start is owed to a prompt:
+   *  while its record is read, while the countdown modal is up or the user is away in
+   *  a flow it opened, and while the gate stands in for the home. A link that opened
+   *  in the meantime would land a working screen over the prompt, or hide the modal
+   *  under a push. A start that owes no prompt holds nothing, whether or not the home
+   *  has taken it yet, and neither does the fresh read a start waits on with the home
+   *  already showing: that read has no bound, and the home is usable meanwhile. The
+   *  gate itself never pops anything: it arms on the home once the user is back there.
+   *  The linking listener closes over stale values, so the flag lives in a ref. */
+  const twoFactor = useTwoFactorEnforcement()
+  const isTwoFactorPromptOwed = twoFactor.sessionPrompt !== TwoFactorSessionPrompt.None
+  const isTwoFactorStartHeldByPrompt =
+    twoFactor.isSessionStartPending && isTwoFactorPromptOwed
+  const isTwoFactorHoldingLinks =
+    twoFactor.isPreparingSessionStart || isTwoFactorStartHeldByPrompt
+  const isTwoFactorHoldingLinksRef = useRef(isTwoFactorHoldingLinks)
+  useEffect(() => {
+    isTwoFactorHoldingLinksRef.current = isTwoFactorHoldingLinks
+  }, [isTwoFactorHoldingLinks])
+
   /** Mirrors the lock for the readers that run outside a render: the state is a commit
    *  behind, and the retry below runs during a navigation dispatch, before that commit
    *  lands. Written by the two setters so it is never the stale one. */
@@ -177,9 +207,11 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     const isArming = trigger === "gate-armed"
 
     /** Resetting a stack with nothing above the blocker, purely to route a locked session
-     *  through the unlock, is arming's job alone. A retry doing it would bounce the
-     *  three-strikes logout, which resets to the blocker itself without ever unlocking,
-     *  back onto a PIN its own flow never owed.
+     *  through the unlock, is arming's job alone. A retry doing it would bounce a session
+     *  that reached the blocker with the lock still up onto a PIN its own flow never owed.
+     *  Nothing reaches it that way while every way out of a lock screen either lowers the
+     *  lock or goes back to the gate (see useReturnToGate), and this is what keeps a retry
+     *  harmless for one that does not.
      *
      *  Judged before the unlock is: a reset that would achieve nothing has nothing to come
      *  back for either, so it must not leave a retry armed behind it. */
@@ -230,12 +262,33 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     resetToBlocker("gate-armed")
   }, [isBlockerVisible, resetToBlocker])
 
+  /** While the authenticator's setup key is at stake, any link, fresh or queued, the
+   *  migration's too, waits: one that lands on a screen below, the home among them,
+   *  would close the code check or the backup before the key is kept. Read from the
+   *  whole stack, not the focused route, so the unlock that covers the registration on a
+   *  return does not let one through. The state reopens a queued link once the key is
+   *  kept or the registration left; the linking listener closes over stale values, so it
+   *  reads the ref. */
+  const [isKeyAtStake, setIsKeyAtStake] = React.useState(false)
+  const isKeyAtStakeRef = useRef(false)
+
+  /** A link that waited for the unlock, the sign-in or the two-factor prompts opens
+   *  once all of them are out of the way; the migration link, which the prompts let
+   *  through live, goes through here as well. */
+  const isQueuedLinkHeldByPrompts =
+    isTwoFactorHoldingLinks &&
+    urlAfterUnlockAndAuth !== null &&
+    !isMigrationDeeplink(urlAfterUnlockAndAuth)
+  const isQueuedLinkHeld = isQueuedLinkHeldByPrompts || isKeyAtStake
+  const canOpenQueuedUrl = canHandlePayments && !isAppLocked && !isQueuedLinkHeld
   useEffect(() => {
-    if (canHandlePayments && !isAppLocked && urlAfterUnlockAndAuth) {
+    if (canOpenQueuedUrl && urlAfterUnlockAndAuth) {
       Linking.openURL(urlAfterUnlockAndAuth)
       setUrlAfterUnlockAndAuth(null)
     }
-  }, [canHandlePayments, isAppLocked, urlAfterUnlockAndAuth])
+  }, [canOpenQueuedUrl, urlAfterUnlockAndAuth])
+
+  const readIsAppLocked = React.useCallback(() => isAppLockedRef.current, [])
 
   const setAppUnlocked = React.useMemo(
     () => async () => {
@@ -298,10 +351,17 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         if (url.includes(TELEGRAM_CALLBACK_PATH)) return
 
         /** With the account-closed gate armed, only the migration deeplink is honoured; any
-         *  other would open a working screen on top of the blocker, so it is dropped. */
-        if (isBlockerVisibleRef.current && !isMigrationDeeplink(url)) return
+         *  other would open a working screen on top of the blocker, so it is dropped: that
+         *  gate never lets the home back. The two-factor prompts do, by a dismissal or a
+         *  factor added, so a link that arrives while they hold the session start waits
+         *  for that instead. The migration is a way out they offer, so its link passes. */
+        const isGateRemedyLink = isMigrationDeeplink(url)
+        if (isBlockerVisibleRef.current && !isGateRemedyLink) return
+        const isHeldByTwoFactor = isTwoFactorHoldingLinksRef.current && !isGateRemedyLink
+        const isHeld = isHeldByTwoFactor || isKeyAtStakeRef.current
 
-        if (!isAppLocked && canHandlePayments) {
+        const canOpenNow = !isAppLocked && canHandlePayments && !isHeld
+        if (canOpenNow) {
           const maybeAction = processLinkForAction(url)
           if (maybeAction) {
             setActiveAction(maybeAction)
@@ -322,7 +382,9 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
   }
 
   return (
-    <AuthenticationContextProvider value={{ isAppLocked, setAppUnlocked, setAppLocked }}>
+    <AuthenticationContextProvider
+      value={{ isAppLocked, readIsAppLocked, setAppUnlocked, setAppLocked }}
+    >
       <NavigationContainer
         ref={navigationRef}
         {...(mode === "dark" ? { theme: DarkTheme } : {})}
@@ -338,6 +400,9 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         }}
         onStateChange={(state) => {
           const currentRouteName = getActiveRouteName(state)
+          const isKeyAtStakeNow = isSetupKeyAtStake(state?.routes ?? [])
+          isKeyAtStakeRef.current = isKeyAtStakeNow
+          setIsKeyAtStake(isKeyAtStakeNow)
 
           if (routeName.current !== currentRouteName && currentRouteName) {
             /* eslint-disable camelcase */
