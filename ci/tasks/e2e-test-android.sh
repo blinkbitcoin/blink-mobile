@@ -25,7 +25,6 @@ export BROWSERSTACK_APP_ID=$(
 . pipeline-tasks/ci/tasks/helpers.sh
 
 unpack_deps
-use_github_packages_auth
 
 pushd repo
 
