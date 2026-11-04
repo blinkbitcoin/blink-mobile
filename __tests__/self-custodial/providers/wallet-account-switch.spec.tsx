@@ -1,10 +1,17 @@
 import React from "react"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 
+import { WalletCurrency } from "@app/graphql/generated"
 import {
   SelfCustodialWalletProvider,
   useSelfCustodialWallet,
 } from "@app/self-custodial/providers/wallet"
+import {
+  PaymentType,
+  TransactionDirection,
+  TransactionStatus,
+  type NormalizedTransaction,
+} from "@app/types/transaction"
 
 const ACCOUNT_A = "account-a"
 const ACCOUNT_B = "account-b"
@@ -12,10 +19,11 @@ const sdkA = { id: "sdk-a" }
 const sdkB = { id: "sdk-b" }
 
 let mockActiveAccountId = ACCOUNT_A
+let mockActiveAccountType = "self-custodial"
 const mockReloadSelfCustodialAccounts = jest.fn().mockResolvedValue(undefined)
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({
-    activeAccount: { id: mockActiveAccountId, type: "self-custodial" },
+    activeAccount: { id: mockActiveAccountId, type: mockActiveAccountType },
     reloadSelfCustodialAccounts: mockReloadSelfCustodialAccounts,
   }),
 }))
@@ -26,9 +34,9 @@ let mockConnection: { sdk: typeof sdkA | null; connectedAccountId: string | null
   sdk: sdkA,
   connectedAccountId: ACCOUNT_A,
 }
+let mockTransactions: NormalizedTransaction[] = []
 const mockLifecycle = {
   wallets: [],
-  allTransactions: [],
   status: "ready",
   sdkStableBalanceActive: false,
   lastPaymentEventKey: null,
@@ -40,7 +48,11 @@ const mockLifecycle = {
   refreshStableBalanceActive: jest.fn(),
 }
 jest.mock("@app/self-custodial/hooks/use-sdk-lifecycle", () => ({
-  useSdkLifecycle: () => ({ ...mockLifecycle, ...mockConnection }),
+  useSdkLifecycle: () => ({
+    ...mockLifecycle,
+    allTransactions: mockTransactions,
+    ...mockConnection,
+  }),
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
@@ -76,6 +88,7 @@ describe("SelfCustodialWalletProvider — the Lightning Address across an accoun
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveAccountId = ACCOUNT_A
+    mockActiveAccountType = "self-custodial"
     mockConnection = { sdk: sdkA, connectedAccountId: ACCOUNT_A }
     mockGetSelfCustodialLightningAddress.mockImplementation(
       async (id: string) => STORED_ADDRESSES[id] ?? null,
@@ -167,5 +180,72 @@ describe("SelfCustodialWalletProvider — the Lightning Address across an accoun
     )
     expect(mockGetLightningAddress).toHaveBeenCalledWith(sdkB)
     expect(result.current.lightningAddress).toBe("bob@blink.sv")
+  })
+})
+
+const receiveOf = (id: string): NormalizedTransaction => ({
+  id,
+  amount: { amount: 10, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+  direction: TransactionDirection.Receive,
+  status: TransactionStatus.Completed,
+  timestamp: 1700000000,
+  paymentType: PaymentType.Lightning,
+})
+
+describe("SelfCustodialWalletProvider — the transactions across an account switch", () => {
+  const paymentOfA = receiveOf("payment-of-a")
+  const paymentOfB = receiveOf("payment-of-b")
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockActiveAccountId = ACCOUNT_A
+    mockActiveAccountType = "self-custodial"
+    mockConnection = { sdk: sdkA, connectedAccountId: ACCOUNT_A }
+    mockTransactions = [paymentOfA]
+  })
+
+  it("publishes the connection's transactions while it is the active account's", async () => {
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => expect(result.current.allTransactions).toEqual([paymentOfA]))
+  })
+
+  it("publishes none of the previous account's transactions once the account has switched", async () => {
+    mockActiveAccountId = ACCOUNT_B
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => expect(result.current.allTransactions).toEqual([]))
+  })
+
+  it("publishes the new account's transactions once its connection catches up", async () => {
+    mockActiveAccountId = ACCOUNT_B
+
+    const { result, rerender } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+    expect(result.current.allTransactions).toEqual([])
+
+    mockConnection = { sdk: sdkB, connectedAccountId: ACCOUNT_B }
+    mockTransactions = [paymentOfB]
+    rerender(undefined)
+
+    await waitFor(() => expect(result.current.allTransactions).toEqual([paymentOfB]))
+  })
+
+  it("publishes nothing while the new account's connection is on its way", async () => {
+    mockActiveAccountId = ACCOUNT_B
+    mockConnection = { sdk: null, connectedAccountId: null }
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => expect(result.current.allTransactions).toEqual([]))
+  })
+
+  it("publishes nothing while a custodial account is active", async () => {
+    mockActiveAccountType = "custodial"
+    mockConnection = { sdk: null, connectedAccountId: null }
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => expect(result.current.allTransactions).toEqual([]))
   })
 })
