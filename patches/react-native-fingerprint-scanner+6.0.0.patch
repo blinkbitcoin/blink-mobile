@@ -1,3 +1,79 @@
+diff --git a/node_modules/react-native-fingerprint-scanner/android/src/main/java/com/hieuvp/fingerprint/ReactNativeFingerprintScannerModule.java b/node_modules/react-native-fingerprint-scanner/android/src/main/java/com/hieuvp/fingerprint/ReactNativeFingerprintScannerModule.java
+index 57364dc..d38ed93 100644
+--- a/node_modules/react-native-fingerprint-scanner/android/src/main/java/com/hieuvp/fingerprint/ReactNativeFingerprintScannerModule.java
++++ b/node_modules/react-native-fingerprint-scanner/android/src/main/java/com/hieuvp/fingerprint/ReactNativeFingerprintScannerModule.java
+@@ -2,6 +2,7 @@ package com.hieuvp.fingerprint;
+ 
+ import android.os.Build;
+ import androidx.annotation.NonNull;
++import androidx.annotation.VisibleForTesting;
+ import androidx.biometric.BiometricPrompt;
+ import androidx.biometric.BiometricManager;
+ import androidx.biometric.BiometricPrompt.AuthenticationCallback;
+@@ -105,15 +106,20 @@ public class ReactNativeFingerprintScannerModule
+ 
+         AuthCallback authCallback = new AuthCallback(promise);
+         Executor executor = Executors.newSingleThreadExecutor();
+-        biometricPrompt = new BiometricPrompt(
+-            fragmentActivity,
+-            executor,
+-            authCallback
+-        );
++        biometricPrompt = createBiometricPrompt(fragmentActivity, executor, authCallback);
+ 
+         return biometricPrompt;
+     }
+ 
++    @VisibleForTesting
++    protected BiometricPrompt createBiometricPrompt(
++        final FragmentActivity fragmentActivity,
++        final Executor executor,
++        final AuthenticationCallback callback
++    ) {
++        return new BiometricPrompt(fragmentActivity, executor, callback);
++    }
++
+     private void biometricAuthenticate(final String title, final String subtitle, final String description, final String cancelButton, final Promise promise) {
+         UiThreadUtil.runOnUiThread(
+             new Runnable() {
+@@ -210,12 +216,36 @@ public class ReactNativeFingerprintScannerModule
+     }
+ 
+     @ReactMethod
+-    public synchronized void release() {
++    public void release() {
+         if (requiresLegacyAuthentication()) {
+             getFingerprintIdentify().cancelIdentify();
+             mFingerprintIdentify = null;
+         }
+ 
++        // cancelAuthentication walks the FragmentManager's store, which only the main
++        // thread may touch: JS calls land on the native modules queue, and from there
++        // the walk throws ConcurrentModificationException if a fragment commits under
++        // it, which is what happens every time a prompt closes.
++        //
++        // Not runOnUiThread alone, because that always posts: onHostDestroy has to
++        // cancel before the activity finishes going away, not after.
++        if (UiThreadUtil.isOnUiThread()) {
++            releaseBiometricPrompt();
++            return;
++        }
++        UiThreadUtil.runOnUiThread(
++            new Runnable() {
++                @Override
++                public void run() {
++                    releaseBiometricPrompt();
++                }
++            });
++    }
++
++    // biometricPrompt is confined to the main thread, like the authenticate that sets
++    // it. Posting from the one native modules queue keeps JS's release/authenticate
++    // order, and a second release finds null.
++    private void releaseBiometricPrompt() {
+         // consistent across legacy and current API
+         if (biometricPrompt != null) {
+             biometricPrompt.cancelAuthentication();  // if release called from eg React
 diff --git a/node_modules/react-native-fingerprint-scanner/react-native.config.js b/node_modules/react-native-fingerprint-scanner/react-native.config.js
 index 5f794ab..c36ba55 100644
 --- a/node_modules/react-native-fingerprint-scanner/react-native.config.js
