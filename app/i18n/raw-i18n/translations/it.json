@@ -2391,6 +2391,8 @@
         "invalidAmount": "Contiene un importo non valido. Si prega di rigenerare con un importo valido.",
         "usernameDoesNotExist": "{lnAddress: string} non sembra essere un indirizzo {bankName: string} esistente.",
         "usernameDoesNotExistAdvice": "Assicuratevi che sia scritto correttamente o chiedete al destinatario un'invoice LN o un indirizzo BTC.",
+        "destinationUnverifiable": "Non abbiamo potuto verificare {lnAddress} in questo momento: i server di {bankName} non rispondono.",
+        "destinationUnverifiableAdvice": "L'indirizzo è probabilmente corretto. Riprova tra un momento, oppure chiedi al destinatario una fattura LN o un indirizzo BTC.",
         "selfPaymentError": "{lnAddress: string} è il tuo indirizzo {bankName: string}.",
         "selfPaymentAdvice": "Se vuoi inviare denaro a un altro conto di tua proprietà, puoi utilizzare un'invoice, un indirizzo LN o un indirizzo BTC.",
         "lnAddressError": "Non riusciamo a raggiungere questo indirizzo Lightning. Se sei sicuro che esista, puoi riprovare più tardi.",
@@ -2618,7 +2620,8 @@
         "error": "Impossibile recuperare i profili al momento",
         "fromThisDevice": "da questo dispositivo?",
         "switchAccount": "Hai cambiato account",
-        "removedAccount": "Hai rimosso l'account {identifier: string}."
+        "removedAccount": "Hai rimosso l'account {identifier: string}.",
+        "removeAccount": "Rimuovi account"
     },
     "StablesatsRestriction": {
         "walletLabel": "non è disponibile nella tua regione",
@@ -2782,6 +2785,7 @@
             "tooLong": "L'indirizzo deve essere lungo al massimo 50 caratteri",
             "invalidCharacter": "L'indirizzo può contenere solo lettere, numeri e caratteri di sottolineatura",
             "addressUnavailable": "Spiacenti, questo indirizzo è già stato preso",
+            "serverUnreachable": "Impossibile raggiungere il server degli indirizzi. Riprova tra un momento.",
             "unknownError": "Si è verificato un errore sconosciuto, riprova più tardi",
             "backupRequired": "Back up your wallet before creating a Lightning address"
         },
@@ -3109,12 +3113,12 @@
         "deleteAccountError": "Qualcosa è andato storto. Contatta {email: string} per ulteriore assistenza.",
         "bye": "Ciao!",
         "deleteAccountWarning": "Attenzione: la chiusura dell'account è permanente!\nAssicurati che i wallet non abbiano fondi prima della chiusura.\nUn account chiuso non può essere ripristinato.\nPotremmo conservare alcuni dati come richiesto dalla legge.",
-        "downloadLogs": "Download logs",
-        "exportLogsTitle": "Share your wallet logs",
-        "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-        "exportLogsConfirm": "Share logs",
-        "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-        "exportLogsError": "Couldn't export your logs. Please try again."
+        "downloadLogs": "Scarica i log",
+        "exportLogsTitle": "Condividi i log del portafoglio",
+        "exportLogsBody": "Questo file aiuta la nostra assistenza a esaminare i problemi dei tuoi portafogli. Include la cronologia dei pagamenti (importi, fatture e indirizzi) e gli identificatori di ogni portafoglio non custodiale su questo dispositivo, non solo di questo, ma mai le frasi di recupero o le chiavi. Condividilo solo con la nostra assistenza.",
+        "exportLogsConfirm": "Condividi i log",
+        "noLogsYet": "Non ci sono ancora log da condividere. Apri il portafoglio e riprova.",
+        "exportLogsError": "Impossibile esportare i log. Riprova."
     },
     "lnurl": {
         "overLimit": "Non è possibile inviare più dell'importo massimo",
@@ -3851,7 +3855,7 @@
         }
     },
     "BackupScreen": {
-        "title": "Back up your wallet",
+        "title": "Esegui il backup del portafoglio",
         "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "Scegli il metodo di backup",
@@ -3909,6 +3913,7 @@
         "CloudBackup": {
             "title": "Eseguiamo il backup del portafoglio",
             "description": "Salveremo una copia della tua frase di backup nel tuo {provider}.",
+            "encryptCheckbox": "Crittografa con password aggiuntiva",
             "password": "Password",
             "passwordPlaceholder": "(minimo 12 caratteri)",
             "confirmPassword": "Conferma password",
@@ -4250,6 +4255,8 @@
         "signInDescription": "Accedi al tuo account custodial per usare {featureName}.",
         "noAccountTitle": "Account custodial richiesto",
         "noAccountDescription": "{featureName} richiede un account custodial Blink.",
+        "unreachableTitle": "Blink non è raggiungibile",
+        "unreachableDescription": "{featureName} richiede i server di Blink, che al momento non rispondono. Il tuo portafoglio e i tuoi fondi non sono interessati.",
         "featureCircles": "Circoli",
         "featureEarn": "Impara",
         "featureCard": "Carta"
@@ -4272,6 +4279,10 @@
         "tokenTransfer": "Trasferimento {token}",
         "payTo": "Pagare a {address}",
         "payment": "Pagamento"
+    },
+    "SelfCustodialStaleRate": {
+        "notice": "Il tasso di cambio potrebbe non essere aggiornato",
+        "satsOnly": "Visualizzazione in sats — nessun tasso di cambio disponibile"
     },
     "SelfCustodialOffline": {
         "title": "Il portafoglio è offline",
