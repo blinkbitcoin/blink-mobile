@@ -7959,6 +7959,10 @@ type RootTranslation = {
 		 * U​n​a​b​l​e​ ​t​o​ ​e​s​t​i​m​a​t​e​ ​f​e​e​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​a​m​o​u​n​t​.
 		 */
 		sdkGenericError: string
+		/**
+		 * T​h​i​s​ ​i​s​ ​y​o​u​r​ ​o​w​n​ ​w​a​l​l​e​t​'​s​ ​a​d​d​r​e​s​s​.​ ​Y​o​u​ ​c​a​n​'​t​ ​s​e​n​d​ ​a​n​ ​o​n​-​c​h​a​i​n​ ​p​a​y​m​e​n​t​ ​t​o​ ​y​o​u​r​s​e​l​f​.
+		 */
+		onchainSelfPayment: string
 	}
 	ApiScreen: {
 		/**
@@ -22313,6 +22317,10 @@ export type TranslationFunctions = {
 		 * Unable to estimate fees. Please try a different amount.
 		 */
 		sdkGenericError: () => LocalizedString
+		/**
+		 * This is your own wallet's address. You can't send an on-chain payment to yourself.
+		 */
+		onchainSelfPayment: () => LocalizedString
 	}
 	ApiScreen: {
 		/**

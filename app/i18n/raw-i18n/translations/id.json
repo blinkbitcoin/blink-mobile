@@ -2471,7 +2471,8 @@
     "sdkInsufficientFunds": "Dana tidak cukup untuk transaksi ini.",
     "sdkAmountTooLow": "Jumlah terlalu rendah untuk transaksi on-chain.",
     "sdkNetworkError": "Kesalahan jaringan. Periksa koneksi Anda dan coba lagi.",
-    "sdkGenericError": "Tidak dapat memperkirakan biaya. Coba jumlah yang berbeda."
+    "sdkGenericError": "Tidak dapat memperkirakan biaya. Coba jumlah yang berbeda.",
+    "onchainSelfPayment": "Ini adalah alamat dompet Anda sendiri. Anda tidak dapat mengirim pembayaran on-chain ke diri sendiri."
   },
   "SettingsScreen": {
     "createAddress": "Buat alamat Lightning",

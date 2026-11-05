@@ -2471,7 +2471,8 @@
     "sdkInsufficientFunds": "No hi ha prou fons per a aquesta transacció.",
     "sdkAmountTooLow": "L'import és massa baix per a una transacció on-chain.",
     "sdkNetworkError": "Error de xarxa. Comproveu la connexió i torneu-ho a provar.",
-    "sdkGenericError": "No s'han pogut estimar les comissions. Proveu un import diferent."
+    "sdkGenericError": "No s'han pogut estimar les comissions. Proveu un import diferent.",
+    "onchainSelfPayment": "Aquesta és l'adreça del vostre propi moneder. No us podeu enviar un pagament on-chain a vós mateix."
   },
   "SettingsScreen": {
     "createAddress": "Crea una adreça Lightning",

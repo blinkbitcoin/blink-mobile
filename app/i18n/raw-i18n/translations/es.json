@@ -2471,7 +2471,8 @@
         "sdkInsufficientFunds": "Fondos insuficientes para esta transacción.",
         "sdkAmountTooLow": "El monto es muy bajo para una transacción on-chain.",
         "sdkNetworkError": "Error de red. Verifica tu conexión e intenta de nuevo.",
-        "sdkGenericError": "No se pueden estimar las comisiones. Intenta con un monto diferente."
+        "sdkGenericError": "No se pueden estimar las comisiones. Intenta con un monto diferente.",
+        "onchainSelfPayment": "Esta es la dirección de tu propia billetera. No puedes enviarte un pago on-chain a ti mismo."
     },
     "SettingsScreen": {
         "createAddress": "Crear dirección Lightning",

@@ -2471,7 +2471,8 @@
     "sdkInsufficientFunds": "Bu işlem için yeterli bakiye yok.",
     "sdkAmountTooLow": "Tutar, bir on-chain işlemi için çok düşük.",
     "sdkNetworkError": "Ağ hatası. Bağlantınızı kontrol edin ve tekrar deneyin.",
-    "sdkGenericError": "Ücretler tahmin edilemiyor. Lütfen farklı bir tutar deneyin."
+    "sdkGenericError": "Ücretler tahmin edilemiyor. Lütfen farklı bir tutar deneyin.",
+    "onchainSelfPayment": "Bu, kendi cüzdanınızın adresi. Kendinize on-chain ödeme gönderemezsiniz."
   },
   "SettingsScreen": {
     "createAddress": "Lightning adresi oluştur",
