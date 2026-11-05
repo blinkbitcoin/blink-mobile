@@ -145,6 +145,8 @@ const WalletOverview: React.FC<Props> = ({
   const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed || hasWallets })
   const wallets = hasWallets ? suppliedWallets : data?.me?.defaultAccount?.wallets
   const cardAccount = getCardAccount(accounts)
+  const cardBalance = cardAccount?.balance
+  const isCardBalanceKnown = cardBalance !== undefined
 
   const hasUsdBalance = (getUsdWallet(wallets)?.balance ?? 0) > 0
   /** A gated balance still shows its amount (the row stays disabled); the label only
@@ -176,14 +178,15 @@ const WalletOverview: React.FC<Props> = ({
     }
   }
 
-  if (cardAccount) {
-    const cardMoneyAmount = toBtcMoneyAmount(cardAccount.balance)
+  if (isCardBalanceKnown) {
+    const cardMoneyAmount = toBtcMoneyAmount(cardBalance)
     cardBalanceFormatted = formatMoneyAmount({ moneyAmount: cardMoneyAmount })
     cardInDisplayCurrency = moneyAmountToDisplayCurrencyString({
       moneyAmount: cardMoneyAmount,
       isApproximate: true,
     })
   }
+  const isCardBalanceLoading = loading || !isCardBalanceKnown
 
   const openTransactionHistory = (currencyFilter: WalletCurrency) => {
     if (!wallets || wallets.length === 0) return
@@ -350,7 +353,7 @@ const WalletOverview: React.FC<Props> = ({
                   </View>
                 </View>
               </View>
-              {loading ? (
+              {isCardBalanceLoading ? (
                 <Loader />
               ) : hideAmount ? (
                 <HiddenBalancePlaceholder size="small" />

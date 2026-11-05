@@ -46,9 +46,11 @@ export const useTotalBalance = (
     toUsdMoneyAmount(usdWallet?.balance),
     DisplayCurrency,
   )
+  const cardSats = cardAccount?.balance
   const cardAmount =
-    cardAccount &&
-    convertMoneyAmount?.(toBtcMoneyAmount(cardAccount.balance), DisplayCurrency)
+    cardSats === undefined
+      ? undefined
+      : convertMoneyAmount?.(toBtcMoneyAmount(cardSats), DisplayCurrency)
 
   /** The price conversion is the only thing this loader waits on. Callers hand this one flag
    *  to the whole header, so folding the region in blanked the username, the total and the
@@ -104,7 +106,7 @@ export const useTotalBalance = (
   /** The card is held in sats too, so a total with no dollar leg still needs no rate. */
   const satsBalance =
     !usdWallet?.balance && btcWallet?.balance
-      ? btcWallet.balance + (cardAccount?.balance ?? 0)
+      ? btcWallet.balance + (cardSats ?? 0)
       : totalBtc?.amount || 0
 
   return {

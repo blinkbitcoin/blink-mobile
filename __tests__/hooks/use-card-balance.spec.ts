@@ -136,6 +136,40 @@ describe("useCardBalance", () => {
     )
   })
 
+  it("leaves availableSats undefined until the balance arrives", () => {
+    mockUseCardBalanceQuery.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    })
+
+    const { result } = renderHook(() => useCardBalance("card-1"))
+
+    expect(result.current.availableSats).toBeUndefined()
+  })
+
+  it("keeps availableSats undefined when the request fails", () => {
+    const error = new Error("card balance unavailable")
+    mockUseCardBalanceQuery.mockReturnValue({ data: undefined, loading: false, error })
+
+    const { result } = renderHook(() => useCardBalance("card-1"))
+
+    expect(result.current.availableSats).toBeUndefined()
+    expect(result.current.error).toBe(error)
+  })
+
+  it("reports a confirmed zero balance as zero", () => {
+    mockUseCardBalanceQuery.mockReturnValue({
+      data: { cardBalance: { available: 0, pending: 0, posted: 0 } },
+      loading: false,
+      error: undefined,
+    })
+
+    const { result } = renderHook(() => useCardBalance("card-1"))
+
+    expect(result.current.availableSats).toBe(0)
+  })
+
   it("defaults available to 0 when data is null", () => {
     mockUseCardBalanceQuery.mockReturnValue({
       data: { cardBalance: null },

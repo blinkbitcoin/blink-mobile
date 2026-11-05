@@ -193,7 +193,7 @@ describe("useTotalBalance", () => {
   })
 
   describe("card balance", () => {
-    const withCard = (balance: number) => [
+    const withCard = (balance: number | undefined) => [
       ...wallets,
       { id: "card", balance, walletCurrency: CARD },
     ]
@@ -235,6 +235,18 @@ describe("useTotalBalance", () => {
       const { result } = renderHook(() => useTotalBalance(btcAndCard))
 
       expect(result.current.satsBalance).toBe(1_050_000)
+    })
+
+    it("leaves a card whose balance is not known yet out of the total", () => {
+      mockConvertMoneyAmount.mockReturnValue(identityConversion)
+
+      renderHook(() => useTotalBalance(withCard(undefined)))
+
+      expect(mockFormatMoneyAmount).toHaveBeenCalledWith(
+        expect.objectContaining({
+          moneyAmount: expect.objectContaining({ amount: 1_050_000 }),
+        }),
+      )
     })
 
     it("leaves the total untouched when the accounts have no card", () => {
