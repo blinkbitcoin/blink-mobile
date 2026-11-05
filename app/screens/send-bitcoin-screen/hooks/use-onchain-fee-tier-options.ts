@@ -210,6 +210,7 @@ export const useOnchainFeeTierOptions = ({
     selectedTierFee,
     hasFeeQuote,
     feeTierErrorMessage: feeRail.errorMessage,
+    isSelfPayment: feeRail.isSelfPayment,
     isQuotingFees,
     isQuotingFeesForNext,
     quoteFeesForNext,
