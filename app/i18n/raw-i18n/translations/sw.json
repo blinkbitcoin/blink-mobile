@@ -2474,7 +2474,8 @@
     "sdkInsufficientFunds": "Fedha hazitoshi kwa muamala huu.",
     "sdkAmountTooLow": "Kiasi ni kidogo sana kwa muamala wa on-chain.",
     "sdkNetworkError": "Hitilafu ya mtandao. Angalia muunganisho wako na ujaribu tena.",
-    "sdkGenericError": "Haiwezekani kukadiri ada. Tafadhali jaribu kiasi tofauti."
+    "sdkGenericError": "Haiwezekani kukadiri ada. Tafadhali jaribu kiasi tofauti.",
+    "onchainSelfPayment": "Hii ni anwani ya pochi yako mwenyewe. Huwezi kujitumia malipo ya on-chain."
   },
   "SettingsScreen": {
     "createAddress": "Unda anwani ya Lightning",

@@ -177,6 +177,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     setFeeTier,
     feeTierOptions,
     feeTierErrorMessage,
+    isSelfPayment,
     isQuotingFees,
     isQuotingFeesForNext,
     isOnchain,
@@ -558,6 +559,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     !amountStatus.validAmount ||
     Boolean(retryLimits) ||
     Boolean(lnurlBoundsErrorMessage) ||
+    isSelfPayment ||
     isQuotingFees
 
   /**

@@ -2541,6 +2541,8 @@ const en: BaseTranslation = {
     sdkAmountTooLow: "Amount is too low for an on-chain transaction.",
     sdkNetworkError: "Network error. Please check your connection and try again.",
     sdkGenericError: "Unable to estimate fees. Please try a different amount.",
+    onchainSelfPayment:
+      "This is your own wallet's address. You can't send an on-chain payment to yourself.",
   },
   ApiScreen: {
     keysGroupTitle: "API keys",

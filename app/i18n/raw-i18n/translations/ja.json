@@ -2474,7 +2474,8 @@
         "sdkInsufficientFunds": "この取引に十分な残高がありません。",
         "sdkAmountTooLow": "オンチェーン取引には金額が低すぎます。",
         "sdkNetworkError": "ネットワークエラー。接続を確認して再試行してください。",
-        "sdkGenericError": "手数料を見積もれません。別の金額をお試しください。"
+        "sdkGenericError": "手数料を見積もれません。別の金額をお試しください。",
+        "onchainSelfPayment": "これはあなた自身のウォレットのアドレスです。自分自身にオンチェーンで送金することはできません。"
     },
     "SettingsScreen": {
         "createAddress": "Lightningアドレスを作成",
