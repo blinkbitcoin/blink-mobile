@@ -77,7 +77,7 @@ const readSeenPendingDepositIds = (value: unknown): string[] | undefined => {
  * `allTransactions` arrives newest-first from the wallet provider.
  */
 export const latestOnchainReceiptId = (
-  transactions: NormalizedTransaction[],
+  transactions: readonly NormalizedTransaction[],
 ): string | null =>
   transactions.find(
     (tx) =>

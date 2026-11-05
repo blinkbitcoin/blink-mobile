@@ -14,7 +14,7 @@ import { recordAppError } from "@app/utils/error-reporting"
 
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { type NormalizedTransaction } from "@app/types/transaction"
+import { NO_TRANSACTIONS, type NormalizedTransaction } from "@app/types/transaction"
 import {
   AccountType,
   ActiveWalletStatus,
@@ -49,7 +49,9 @@ const reportLightningAddressError = (
 }
 
 type SelfCustodialWalletContextValue = ActiveWalletState & {
-  allTransactions: NormalizedTransaction[]
+  /** The active account's transactions only: empty on the commit where the connection
+   *  still belongs to the account the user switched away from. */
+  allTransactions: readonly NormalizedTransaction[]
   retry: () => void
   sdk: BreezSdkInterface | null
   /** The account the connected `sdk` belongs to, which is not always the active one: the
@@ -183,7 +185,8 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
    * that account's address, and its paycode, under the one now selected. The switch
    * re-runs this effect, so the cleanup drops a lookup already in flight.
    */
-  const isSdkOnActiveAccount = connectedAccountId === activeSelfCustodialAccountId
+  const isSdkOnActiveAccount =
+    Boolean(connectedAccountId) && connectedAccountId === activeSelfCustodialAccountId
 
   useEffect(() => {
     if (!sdk || !connectedAccountId || !isSdkOnActiveAccount) return undefined
@@ -241,10 +244,21 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     }
   }, [sdk, connectedAccountId, reloadSelfCustodialAccounts])
 
+  /**
+   * Published only while the connection is the active account's, like the address above.
+   * On the commit where the user switches, the list still belongs to the account being
+   * left, and a consumer that pairs it with the active account, such as the home badge
+   * and its seen state, would announce that account's payment under the new one and
+   * record it there as seen.
+   */
+  const activeAccountTransactions = isSdkOnActiveAccount
+    ? allTransactions
+    : NO_TRANSACTIONS
+
   const value = useMemo(
     (): SelfCustodialWalletContextValue => ({
       wallets,
-      allTransactions,
+      allTransactions: activeAccountTransactions,
       status,
       accountType: AccountType.SelfCustodial,
       retry,
@@ -263,7 +277,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     }),
     [
       wallets,
-      allTransactions,
+      activeAccountTransactions,
       status,
       retry,
       sdk,

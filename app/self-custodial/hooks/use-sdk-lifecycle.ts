@@ -216,16 +216,21 @@ export const useSdkLifecycle = (
   }, [resetBackoff, scheduleBackoffRetry])
 
   useEffect(() => {
+    /** All of this belongs to the account it was read for, paging included: the next
+     *  account starts from its own first page, and a page still loading for the previous
+     *  one must not hold its pagination back. */
+    setWallets([])
+    setAllTransactions([])
+    setHasMoreTransactions(false)
+    setLoadingMore(false)
+    rawTxOffsetRef.current = 0
+
     if (!activeSelfCustodialAccountId) {
       setStatus(ActiveWalletStatus.Unavailable)
-      setWallets([])
-      setAllTransactions([])
       return
     }
 
     setStatus(ActiveWalletStatus.Loading)
-    setWallets([])
-    setAllTransactions([])
 
     let mounted = true
     abortRef.current = false
@@ -361,10 +366,16 @@ export const useSdkLifecycle = (
   }, [refreshWallets])
 
   const loadMore = useCallback(async () => {
-    if (!sdkRef.current || loadingMore || !hasMoreTransactions) return
+    const sdk = sdkRef.current
+    if (!sdk || loadingMore || !hasMoreTransactions) return
+    /** A page asked of a connection that an account switch has since replaced belongs to
+     *  the account the user left: merging it would list that account's payments under the
+     *  new one, and settling it would end a page the new account may be loading itself. */
+    const isStale = () => sdkRef.current !== sdk
     setLoadingMore(true)
     try {
-      const result = await loadMoreTransactions(sdkRef.current, rawTxOffsetRef.current)
+      const result = await loadMoreTransactions(sdk, rawTxOffsetRef.current)
+      if (isStale()) return
       rawTxOffsetRef.current += result.rawCount
       setHasMoreTransactions(result.hasMore)
       setWallets((prev) => appendTransactions(prev, result.transactions))
@@ -372,7 +383,7 @@ export const useSdkLifecycle = (
     } catch (err) {
       logSdkEvent(SdkLogLevel.Error, `Failed to load more transactions: ${err}`)
     } finally {
-      setLoadingMore(false)
+      if (!isStale()) setLoadingMore(false)
     }
   }, [loadingMore, hasMoreTransactions])
 
