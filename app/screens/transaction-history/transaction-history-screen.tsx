@@ -170,7 +170,6 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   const {
     allTransactions: selfCustodialAllTransactions,
     hasMoreTransactions: selfCustodialHasMore,
-    loadingMore: selfCustodialLoadingMore,
     loadMore: selfCustodialLoadMore,
     refreshWallets: refreshSelfCustodialWallets,
   } = useSelfCustodialWallet()
@@ -466,38 +465,46 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   const loadedCount = activeWallet.isSelfCustodial
     ? allSelfCustodialFragments.length
     : transactions?.edges?.length ?? 0
-  const loadedCountRef = React.useRef(loadedCount)
-  loadedCountRef.current = loadedCount
 
-  // The SDK pages by offset and guards loadMore with state, so a second call while one is
-  // in flight would read the same offset and then skip a page.
-  const canExpandSearch = activeWallet.isSelfCustodial
-    ? selfCustodialHasMore && !selfCustodialLoadingMore
+  const hasMoreToSearch = activeWallet.isSelfCustodial
+    ? selfCustodialHasMore
     : Boolean(transactions?.pageInfo?.hasNextPage) && loadedCount < CUSTODIAL_SEARCH_CAP
 
+  // While the filters match nothing, the expanding search owns paging: the list's own
+  // onEndReached is off, so the two can't ask for the same page at once.
+  const filteredToNothing =
+    filtersActive && visibleSettledTxs.length === 0 && visiblePendingTxs.length === 0
+
+  // A round that fails or reads nothing stalls the search it was for. Changing the filters
+  // or the wallet starts a new search; pulling to refresh retries the stalled one.
+  const searchKey = `${walletFilter}|${directions.sent}|${directions.received}|${searchQuery}`
+  const [stalledSearchKey, setStalledSearchKey] = React.useState<string | null>(null)
+
   const isExpandingSearch =
-    filtersActive &&
-    visibleSettledTxs.length === 0 &&
-    visiblePendingTxs.length === 0 &&
-    canExpandSearch
+    filteredToNothing && hasMoreToSearch && stalledSearchKey !== searchKey
 
   const expandingRef = React.useRef(false)
+  // The cursor last asked for: a round can end before the list re-renders with the next
+  // cursor, and asking for the same one twice would fetch the same page again.
+  const requestedCursorRef = React.useRef<string | null>(null)
   const [expandRound, setExpandRound] = React.useState(0)
 
   /**
    * While the filters match nothing, keeps loading older pages until something matches, the
-   * history ends or the custodial cap is reached. A round that loads nothing new stops it,
-   * so a failing request can't loop.
+   * history ends, the custodial cap is reached or a round makes no progress.
    */
   React.useEffect(() => {
     if (!isExpandingSearch || expandingRef.current) return
 
     const endCursor = transactions?.pageInfo?.endCursor
-    if (!activeWallet.isSelfCustodial && !endCursor) return
+    if (!activeWallet.isSelfCustodial) {
+      if (!endCursor || endCursor === requestedCursorRef.current) return
+      requestedCursorRef.current = endCursor
+    }
 
     expandingRef.current = true
-    const countBefore = loadedCountRef.current
-    const request = activeWallet.isSelfCustodial
+    const roundSearchKey = searchKey
+    const request: Promise<boolean> = activeWallet.isSelfCustodial
       ? selfCustodialLoadMore()
       : fetchMore({
           variables: {
@@ -505,18 +512,28 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
             walletIds: walletIdsByCurrency,
             after: endCursor,
           },
-        })
+        }).then(
+          (result) =>
+            (result.data?.me?.defaultAccount?.transactions?.edges?.length ?? 0) > 0,
+        )
 
-    Promise.resolve(request)
-      .catch((err) => reportError("transaction-history-search", err))
-      .finally(() => {
+    request
+      .catch((err) => {
+        reportError("transaction-history-search", err)
+        return false
+      })
+      .then((progressed) => {
         expandingRef.current = false
-        if (loadedCountRef.current !== countBefore) setExpandRound((round) => round + 1)
+        if (!progressed) {
+          requestedCursorRef.current = null
+          setStalledSearchKey(roundSearchKey)
+        }
+        setExpandRound((round) => round + 1)
       })
   }, [
     isExpandingSearch,
     expandRound,
-    loadedCount,
+    searchKey,
     activeWallet.isSelfCustodial,
     selfCustodialLoadMore,
     fetchMore,
@@ -624,6 +641,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
           balancePrimary={walletSummary.balancePrimary}
           balanceSecondary={walletSummary.balanceSecondary}
           balanceHidden={hideAmount}
+          balanceLoading={walletSummary.balanceLoading}
           onSwitch={nextWallet ? () => setSelectedWallet(nextWallet) : undefined}
           switchTo={nextWallet}
         />
@@ -661,6 +679,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   }
 
   const handleRefresh = async () => {
+    setStalledSearchKey(null)
     if (!activeWallet.isSelfCustodial) {
       refetch()
       return
@@ -705,7 +724,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
           }
           sections={sections}
           keyExtractor={keyExtractor}
-          onEndReached={fetchNextTransactionsPage}
+          onEndReached={filteredToNothing ? undefined : fetchNextTransactionsPage}
           onEndReachedThreshold={0.5}
           onRefresh={handleRefresh}
           refreshing={refreshing}
