@@ -14,6 +14,7 @@ import { StepLayout } from "@app/components/step-layout"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { fonts } from "@app/rne-theme/fonts"
 import { AuthenticatorApp } from "@app/types/two-factor-enforcement"
 import {
   logAuthenticatorAppSelected,
@@ -203,7 +204,7 @@ const useStyles = makeStyles(({ colors }) => ({
   getLabel: {
     fontSize: 10,
     lineHeight: 13,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   storeNote: {

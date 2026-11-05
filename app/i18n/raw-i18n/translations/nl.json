@@ -2389,6 +2389,8 @@
     "invalidAmount": "Hierin staat een ongeldig bedrag. Gelieve opnieuw te genereren met een geldig bedrag.",
     "usernameDoesNotExist": "{lnAddress: string} lijkt geen bestaand {bankName: string}-adres te zijn.",
     "usernameDoesNotExistAdvice": "Zorg ervoor dat de spelling juist is of vraag de ontvanger in plaats daarvan om een LN-factuur of BTC-adres.",
+    "destinationUnverifiable": "We konden {lnAddress} nu niet controleren — de servers van {bankName} reageren niet.",
+    "destinationUnverifiableAdvice": "Het adres klopt waarschijnlijk gewoon. Probeer het zo opnieuw, of vraag de ontvanger om een LN-factuur of BTC-adres.",
     "selfPaymentError": "{lnAddress: string} is uw {bankName: string} adres.",
     "selfPaymentAdvice": "Als u geld wilt overmaken naar een andere rekening waarvan u de eigenaar bent, kunt u in plaats daarvan een factuur-, LN- of BTC-adres gebruiken.",
     "lnAddressError": "We kunnen dit Lightning-adres niet bereiken. Als u zeker weet dat het bestaat, kunt u het later opnieuw proberen.",
@@ -2614,7 +2616,8 @@
     "error": "Profielen kunnen op dit moment niet worden opgehaald",
     "fromThisDevice": "van dit apparaat?",
     "switchAccount": "Je bent gewisseld naar een ander account",
-    "removedAccount": "Je hebt account {identifier: string} verwijderd."
+    "removedAccount": "Je hebt account {identifier: string} verwijderd.",
+    "removeAccount": "Account verwijderen"
   },
   "StablesatsRestriction": {
     "walletLabel": "niet beschikbaar in jouw regio",
@@ -2778,6 +2781,7 @@
       "tooLong": "Het adres mag maximaal 50 tekens lang zijn",
       "invalidCharacter": "Adres mag alleen letters, cijfers en onderstrepingstekens bevatten",
       "addressUnavailable": "Sorry, dit adres is al in gebruik",
+      "serverUnreachable": "Kon de adresserver niet bereiken. Probeer het zo opnieuw.",
       "unknownError": "Er is een onbekende fout opgetreden. Probeer het later opnieuw",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3105,12 +3109,12 @@
     "deleteAccountError": "Er is iets fout gegaan. Neem contact op met {email: string} voor verdere hulp.",
     "bye": "Doei!",
     "deleteAccountWarning": "Let op: het sluiten van het account is permanent!\nZorg ervoor dat wallets geen fondsen bevatten voordat u sluit.\nEen gesloten account kan niet worden hersteld.\nWij kunnen bepaalde gegevens bewaren als de wet dit vereist.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Logbestanden downloaden",
+    "exportLogsTitle": "Deel de logbestanden van je portemonnee",
+    "exportLogsBody": "Dit bestand helpt ons supportteam problemen met je portemonnees te onderzoeken. Het bevat de betalingsgeschiedenis (bedragen, facturen en adressen) en de portemonnee-id's van elke niet-bewaarde portemonnee op dit apparaat, niet alleen deze, maar nooit je herstelzinnen of sleutels. Deel het alleen met ons supportteam.",
+    "exportLogsConfirm": "Logbestanden delen",
+    "noLogsYet": "Er zijn nog geen logbestanden om te delen. Open je portemonnee en probeer het opnieuw.",
+    "exportLogsError": "Logbestanden exporteren is mislukt. Probeer het opnieuw."
   },
   "lnurl": {
     "overLimit": "U kunt niet meer dan het maximale bedrag verzenden",
@@ -3847,7 +3851,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Maak een back-up van je portemonnee",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Kies je back-upmethode",
@@ -3905,6 +3909,7 @@
     "CloudBackup": {
       "title": "Laten we een back-up maken van je portemonnee",
       "description": "We slaan een back-up van je herstelzin op in je {provider}.",
+      "encryptCheckbox": "Versleutelen met extra wachtwoord",
       "password": "Wachtwoord",
       "passwordPlaceholder": "(minimaal 12 tekens)",
       "confirmPassword": "Bevestig wachtwoord",
@@ -4246,6 +4251,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink is onbereikbaar",
+    "unreachableDescription": "{featureName} heeft de servers van Blink nodig, die nu niet reageren. Je wallet en tegoed zijn niet geraakt.",
     "featureCircles": "Circles",
     "featureEarn": "Leren",
     "featureCard": "Card"
@@ -4268,6 +4275,10 @@
     "tokenTransfer": "{token}-overdracht",
     "payTo": "Betalen aan {address}",
     "payment": "Betaling"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "De wisselkoers is mogelijk verouderd",
+    "satsOnly": "Weergave in sats — geen wisselkoers beschikbaar"
   },
   "SelfCustodialOffline": {
     "title": "Wallet is offline",

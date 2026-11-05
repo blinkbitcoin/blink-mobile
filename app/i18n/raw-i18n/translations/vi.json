@@ -2389,6 +2389,8 @@
     "invalidAmount": "Số tiền không hợp lệ. Vui lòng tạo lại với số tiền hợp lệ.",
     "usernameDoesNotExist": "{lnAddress: string} dường như không phải là địa chỉ {bankName: string} tồn tại.",
     "usernameDoesNotExistAdvice": "Đảm bảo viết đúng chính tả hoặc yêu cầu người nhận cung cấp hóa đơn LN hoặc địa chỉ BTC. ",
+    "destinationUnverifiable": "Hiện chúng tôi không kiểm tra được {lnAddress} — máy chủ của {bankName} không phản hồi.",
+    "destinationUnverifiableAdvice": "Địa chỉ nhiều khả năng vẫn đúng. Hãy thử lại sau giây lát, hoặc xin người nhận hóa đơn LN hay địa chỉ BTC.",
     "selfPaymentError": "{lnAddress: string} là địa chỉ {bankName: string} của bạn.",
     "selfPaymentAdvice": "Nếu bạn muốn gửi tiền đến một tài khoản khác mà bạn sở hữu, bạn có thể sử dụng hóa đơn, địa chỉ LN hoặc BTC để thay thế.",
     "lnAddressError": "Chúng tôi không thể truy cập địa chỉ Lightning này. Nếu bạn chắc chắn rằng nó tồn tại, bạn có thể thử lại sau.",
@@ -2614,7 +2616,8 @@
     "error": "Không thể tải hồ sơ vào lúc này",
     "fromThisDevice": "từ thiết bị này?",
     "switchAccount": "Bạn đã chuyển sang tài khoản khác",
-    "removedAccount": "Bạn đã xóa tài khoản {identifier: string}."
+    "removedAccount": "Bạn đã xóa tài khoản {identifier: string}.",
+    "removeAccount": "Xóa tài khoản"
   },
   "StablesatsRestriction": {
     "walletLabel": "không khả dụng tại khu vực của bạn",
@@ -2778,6 +2781,7 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
+      "serverUnreachable": "Không kết nối được máy chủ địa chỉ. Hãy thử lại sau giây lát.",
       "unknownError": "An unknown error occurred, please try again later",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3105,12 +3109,12 @@
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
     "deleteAccountWarning": "Lưu ý: Việc đóng tài khoản là vĩnh viễn!\nHãy đảm bảo ví không còn tiền trước khi đóng.\nTài khoản đã đóng không thể khôi phục.\nChúng tôi có thể lưu giữ một số hồ sơ theo yêu cầu của pháp luật.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Tải nhật ký xuống",
+    "exportLogsTitle": "Chia sẻ nhật ký ví của bạn",
+    "exportLogsBody": "Tệp này giúp bộ phận hỗ trợ xem xét sự cố với ví của bạn. Tệp gồm lịch sử thanh toán (số tiền, hóa đơn và địa chỉ) và mã định danh của mọi ví không lưu ký trên thiết bị này, không chỉ ví này, nhưng không bao giờ gồm cụm từ sao lưu hay khóa. Chỉ chia sẻ với bộ phận hỗ trợ của chúng tôi.",
+    "exportLogsConfirm": "Chia sẻ nhật ký",
+    "noLogsYet": "Chưa có nhật ký để chia sẻ. Mở ví và thử lại.",
+    "exportLogsError": "Không xuất được nhật ký. Vui lòng thử lại."
   },
   "lnurl": {
     "overLimit": "Bạn không thể gửi quá mức tiền tối đa",
@@ -3847,7 +3851,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Sao lưu ví của bạn",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Chọn phương thức sao lưu",
@@ -3905,6 +3909,7 @@
     "CloudBackup": {
       "title": "Hãy sao lưu ví của bạn",
       "description": "Chúng tôi sẽ lưu bản sao cụm từ khôi phục của bạn vào {provider} của bạn.",
+      "encryptCheckbox": "Mã hóa bằng mật khẩu bổ sung",
       "password": "Mật khẩu",
       "passwordPlaceholder": "(tối thiểu 12 ký tự)",
       "confirmPassword": "Xác nhận mật khẩu",
@@ -4246,6 +4251,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Không kết nối được Blink",
+    "unreachableDescription": "{featureName} cần máy chủ của Blink, hiện không phản hồi. Ví và số dư của bạn không bị ảnh hưởng.",
     "featureCircles": "Circles",
     "featureEarn": "Học",
     "featureCard": "Card"
@@ -4268,6 +4275,10 @@
     "tokenTransfer": "Chuyển {token}",
     "payTo": "Thanh toán cho {address}",
     "payment": "Thanh toán"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Tỷ giá có thể đã cũ",
+    "satsOnly": "Đang hiển thị sats — không có tỷ giá"
   },
   "SelfCustodialOffline": {
     "title": "Ví đang ngoại tuyến",

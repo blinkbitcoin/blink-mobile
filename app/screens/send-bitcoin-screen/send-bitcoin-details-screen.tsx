@@ -57,7 +57,11 @@ import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
 import { ConfirmFeesModal } from "./confirm-fees-modal"
 import { formatDestination } from "./format-destination"
 import { SendHero } from "./send-hero"
-import { AmountInvalidReason, isValidAmount } from "./payment-details"
+import {
+  AmountInvalidReason,
+  isValidAmount,
+  withConvertMoneyAmount,
+} from "./payment-details"
 import { PaymentDetail } from "./payment-details/index.types"
 import { SendBitcoinDetailsExtraInfo } from "./send-bitcoin-details-extra-info"
 
@@ -157,7 +161,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   const [modalHighFeesVisible, setModalHighFeesVisible] = useState(false)
   const [selectedPercent, setSelectedPercent] = useState<number | null>(null)
 
-  const { convertMoneyAmount: _convertMoneyAmount } = usePriceConversion()
+  const { convertMoneyAmount: _convertMoneyAmount, displayCurrency } =
+    usePriceConversion()
   const { zeroDisplayAmount } = useDisplayCurrency()
   const { paymentDestination, sendingWalletId } = route.params
 
@@ -234,9 +239,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     onAmountChange: setAmount,
   })
 
-  // we are caching the _convertMoneyAmount when the screen loads.
-  // this is because the _convertMoneyAmount can change while the user is on this screen
-  // and we don't want to update the payment detail with a new convertMoneyAmount
+  /** Keeps the payment detail on the current rate. A change of display currency, which is
+   *  what sats-only mode starting or ending is, also moves the amount already typed. */
   useEffect(() => {
     if (!_convertMoneyAmount) {
       return
@@ -244,9 +248,10 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
     setPaymentDetail(
       (paymentDetail) =>
-        paymentDetail && paymentDetail.setConvertMoneyAmount(_convertMoneyAmount),
+        paymentDetail &&
+        withConvertMoneyAmount(paymentDetail, _convertMoneyAmount, displayCurrency),
     )
-  }, [_convertMoneyAmount, setPaymentDetail])
+  }, [_convertMoneyAmount, displayCurrency, setPaymentDetail])
 
   // we set the default values when the screen loads
   // this only run once (doesn't re-run after paymentDetail is set)
