@@ -22,6 +22,8 @@ type HistoryWalletSummary = {
   wallet: WalletValues
   balancePrimary: string
   balanceSecondary?: string
+  /** A balance the card needs hasn't loaded yet, so there is no amount to show. */
+  balanceLoading: boolean
   /** Absent with a single wallet: there is nothing to cycle through. */
   nextWallet?: WalletValues
 }
@@ -40,6 +42,15 @@ export const useHistoryWalletSummary = (selected: WalletValues): HistoryWalletSu
   // While the wallets load, keep what was asked for rather than flashing Bitcoin first.
   const hasDollarWallet = loading || Boolean(usdWallet)
   const wallet = hasDollarWallet ? selected : WalletCurrency.Btc
+
+  const btcMissing = btcWallet?.balance === undefined
+  const usdMissing = usdWallet?.balance === undefined
+  const balanceLoading =
+    wallet === WalletCurrency.Btc
+      ? btcMissing
+      : wallet === WalletCurrency.Usd
+        ? usdMissing
+        : btcMissing || usdMissing
 
   const btcBalance = toBtcMoneyAmount(btcWallet?.balance)
   const usdBalance = toUsdMoneyAmount(usdWallet?.balance)
@@ -65,11 +76,21 @@ export const useHistoryWalletSummary = (selected: WalletValues): HistoryWalletSu
       })
     : undefined
 
+  if (balanceLoading) {
+    return {
+      wallet,
+      balancePrimary: "",
+      balanceLoading,
+      nextWallet: hasDollarWallet ? NEXT_WALLET[wallet] : undefined,
+    }
+  }
+
   return {
     wallet,
     balancePrimary: formatMoneyAmount({ moneyAmount: walletBalance }),
     balanceSecondary:
       secondary && formatMoneyAmount({ moneyAmount: secondary, isApproximate: true }),
+    balanceLoading,
     nextWallet: hasDollarWallet ? NEXT_WALLET[wallet] : undefined,
   }
 }
