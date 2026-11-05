@@ -55,11 +55,12 @@ export const TransactionHistoryFilters: React.FC<Props> = ({
       entering={FadeInUp.duration(PANEL_IN_MS)}
       exiting={FadeOutUp.duration(PANEL_OUT_MS)}
       style={styles.panel}
-      {...testProps("transaction-history-filters")}
+      testID="transaction-history-filters"
     >
       <View style={styles.tabs}>
         <GaloyTertiaryButton
           {...testProps("filter-sent")}
+          accessibilityLabel={LL.TransactionScreen.sent()}
           title={LL.TransactionScreen.sent()}
           unfilled={!directions.sent}
           onPress={() => onToggleDirection("sent")}
@@ -67,6 +68,7 @@ export const TransactionHistoryFilters: React.FC<Props> = ({
         />
         <GaloyTertiaryButton
           {...testProps("filter-received")}
+          accessibilityLabel={LL.TransactionScreen.received()}
           title={LL.TransactionScreen.received()}
           unfilled={!directions.received}
           onPress={() => onToggleDirection("received")}
@@ -77,6 +79,7 @@ export const TransactionHistoryFilters: React.FC<Props> = ({
         <GaloyIcon name="magnifying-glass" size={16} color={colors.grey2} />
         <TextInput
           {...testProps("transaction-history-search")}
+          accessibilityLabel={LL.common.search()}
           style={styles.searchInput}
           value={searchText}
           onChangeText={onSearchTextChange}
@@ -101,7 +104,7 @@ export const NoResultsCard: React.FC<{ expanding: boolean }> = ({ expanding }) =
   const { LL } = useI18nContext()
 
   return (
-    <View style={styles.noResults} {...testProps("transaction-history-no-results")}>
+    <View style={styles.noResults} testID="transaction-history-no-results">
       {expanding ? <ActivityIndicator size="small" /> : null}
       <Text style={styles.noResultsText}>
         {expanding

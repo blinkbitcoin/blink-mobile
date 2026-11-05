@@ -104,6 +104,26 @@ describe("TransactionHistoryFilters", () => {
     expect(screen.getByTestId("transaction-history-search").props.value).toBe("coffee")
   })
 
+  it("reads each control by its translated name, not its test id", () => {
+    renderPanel()
+
+    expect(screen.getByTestId("filter-sent").props.accessibilityLabel).toBe("Sent")
+    expect(screen.getByTestId("filter-received").props.accessibilityLabel).toBe(
+      "Received",
+    )
+    expect(
+      screen.getByTestId("transaction-history-search").props.accessibilityLabel,
+    ).toBe("Search")
+  })
+
+  it("leaves the panel's controls reachable on their own", () => {
+    renderPanel()
+
+    expect(screen.getByTestId("transaction-history-filters").props.accessible).not.toBe(
+      true,
+    )
+  })
+
   it("shows the search placeholder", () => {
     renderPanel()
 
@@ -123,6 +143,18 @@ describe("NoResultsCard", () => {
 
     expect(screen.getByText("Nothing came back")).toBeTruthy()
     expect(screen.UNSAFE_queryByType(ActivityIndicator)).toBeNull()
+  })
+
+  it("lets a screen reader read its message instead of a test id", () => {
+    render(
+      <ContextForScreen>
+        <NoResultsCard expanding={false} />
+      </ContextForScreen>,
+    )
+
+    expect(
+      screen.getByTestId("transaction-history-no-results").props.accessibilityLabel,
+    ).toBeUndefined()
   })
 
   it("shows a spinner while older payments load to search through", () => {
