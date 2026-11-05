@@ -138,19 +138,20 @@ const WalletOverview: React.FC<Props> = ({
   let cardBalanceFormatted: string | undefined = undefined
   let cardInDisplayCurrency: string | undefined = undefined
 
-  const hasAccounts = accounts && accounts.length > 0
-  const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed || hasAccounts })
-  const resolvedAccounts = hasAccounts ? accounts : data?.me?.defaultAccount?.wallets
-
-  const wallets = getWallets(resolvedAccounts)
-  const cardAccount = getCardAccount(resolvedAccounts)
+  /** Only supplied wallets make the fallback query unnecessary: a card on its own does
+   *  not carry the wallet balances, so it still needs them from the query. */
+  const suppliedWallets = getWallets(accounts)
+  const hasWallets = Boolean(suppliedWallets?.length)
+  const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed || hasWallets })
+  const wallets = hasWallets ? suppliedWallets : data?.me?.defaultAccount?.wallets
+  const cardAccount = getCardAccount(accounts)
 
   const hasUsdBalance = (getUsdWallet(wallets)?.balance ?? 0) > 0
   /** A gated balance still shows its amount (the row stays disabled); the label only
    *  stands in when there is nothing to show. */
   const showsUnavailableLabel = isDollarRowUnavailable && !hasUsdBalance
 
-  if (isAuthed || hasAccounts) {
+  if (isAuthed || hasWallets) {
     const btcWallet = getBtcWallet(wallets)
     const usdWallet = getUsdWallet(wallets)
 
@@ -173,15 +174,15 @@ const WalletOverview: React.FC<Props> = ({
     if (displayCurrency !== WalletCurrency.Usd) {
       usdInUnderlyingCurrency = formatMoneyAmount({ moneyAmount: usdWalletBalance })
     }
+  }
 
-    if (cardAccount) {
-      const cardBalance = toBtcMoneyAmount(cardAccount.balance)
-      cardBalanceFormatted = formatMoneyAmount({ moneyAmount: cardBalance })
-      cardInDisplayCurrency = moneyAmountToDisplayCurrencyString({
-        moneyAmount: cardBalance,
-        isApproximate: true,
-      })
-    }
+  if (cardAccount) {
+    const cardMoneyAmount = toBtcMoneyAmount(cardAccount.balance)
+    cardBalanceFormatted = formatMoneyAmount({ moneyAmount: cardMoneyAmount })
+    cardInDisplayCurrency = moneyAmountToDisplayCurrencyString({
+      moneyAmount: cardMoneyAmount,
+      isApproximate: true,
+    })
   }
 
   const openTransactionHistory = (currencyFilter: WalletCurrency) => {

@@ -61,6 +61,24 @@ let mockIsAnonMode = false
 const mockCardBalanceSats = 150_000
 
 const mockDisplayCurrency = jest.fn()
+const mockWalletOverviewQuery = jest.fn()
+let mockFallbackWallets: readonly WalletBalance[] | undefined
+jest.mock("@app/graphql/generated", () => {
+  const actual = jest.requireActual("@app/graphql/generated")
+  return {
+    ...actual,
+    useWalletOverviewScreenQuery: (options: { skip?: boolean }) => {
+      mockWalletOverviewQuery(options)
+      const result = actual.useWalletOverviewScreenQuery(options)
+      if (options.skip || !mockFallbackWallets) return result
+      return {
+        ...result,
+        data: { me: { defaultAccount: { wallets: mockFallbackWallets } } },
+      }
+    },
+  }
+})
+
 jest.mock("@app/hooks/use-display-currency", () => ({
   useDisplayCurrency: () => ({
     formatMoneyAmount: ({
@@ -142,6 +160,7 @@ describe("WalletOverview", () => {
     mockIsRestrictedRegion = false
     mockIsRestricted.mockReturnValue(false)
     mockDisplayCurrency.mockReturnValue("USD")
+    mockFallbackWallets = undefined
   })
 
   describe("Card row", () => {
@@ -151,6 +170,31 @@ describe("WalletOverview", () => {
 
       expect(getByText("Card")).toBeTruthy()
       expect(getByText("card-underlying")).toBeTruthy()
+    })
+
+    it("still asks for the wallets when only the card is supplied", async () => {
+      mockFallbackWallets = walletsFixture
+
+      const { getByText, getByTestId } = renderOverview({ accounts: [cardAccount] })
+      await flushEffects()
+
+      expect(mockWalletOverviewQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ skip: false }),
+      )
+      expect(getByText("btc-underlying")).toBeTruthy()
+      expect(getByTestId("card-balance").props.children).toBe("card-underlying")
+    })
+
+    it("skips the wallet query when the wallets are supplied", async () => {
+      renderOverview({ accounts: withCardFixture })
+      await flushEffects()
+
+      expect(mockWalletOverviewQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ skip: true }),
+      )
+      expect(mockWalletOverviewQuery).not.toHaveBeenCalledWith(
+        expect.objectContaining({ skip: false }),
+      )
     })
 
     it("hides the Card row when the accounts have no card", async () => {
