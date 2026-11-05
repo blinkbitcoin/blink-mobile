@@ -2424,6 +2424,7 @@
     "lowFunds": "Fonduri insuficiente",
     "amountExceed": "Suma depășește soldul de {balance: string}",
     "amountExceedsLimit": "Suma depășește limita zilnică rămasă de {limit: string}",
+    "changeDestination": "Schimbă destinația",
     "upgradeAccountToIncreaseLimit": "Faceți upgrade la cont pentru a vă crește limita",
     "amountIsRequired": "Suma este necesară",
     "cost": "Cost",
@@ -2474,7 +2475,8 @@
     "sdkInsufficientFunds": "Fonduri insuficiente pentru această tranzacție.",
     "sdkAmountTooLow": "Suma este prea mică pentru o tranzacție on-chain.",
     "sdkNetworkError": "Eroare de rețea. Verificați conexiunea și încercați din nou.",
-    "sdkGenericError": "Nu se pot estima comisioanele. Încercați o sumă diferită."
+    "sdkGenericError": "Nu se pot estima comisioanele. Încercați o sumă diferită.",
+    "onchainSelfPayment": "Aceasta este adresa propriului portofel. Nu vă puteți trimite o plată on-chain dumneavoastră înșivă."
   },
   "SettingsScreen": {
     "createAddress": "Creează adresă Lightning",

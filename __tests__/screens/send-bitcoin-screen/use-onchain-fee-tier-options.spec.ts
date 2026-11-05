@@ -30,6 +30,7 @@ let mockCustodialTiers = {
   [FeeTierOption.Slow]: { feeAmount: 100, feeUnit: FeeUnit.Sats, etaMinutes: 1440 },
 }
 let mockCustodialHasError = false
+let mockCustodialIsSelfPayment = false
 let mockCustodialIsQuoting = false
 let mockHasCustodialQuote = true
 const mockUseCustodialOnchainFeeTiers = jest.fn()
@@ -87,6 +88,7 @@ jest.mock(
         return {
           tiers: mockCustodialTiers,
           hasError: mockCustodialHasError,
+          isSelfPayment: mockCustodialIsSelfPayment,
           hasQuote: mockHasCustodialQuote,
           isQuoting: mockCustodialIsQuoting,
         }
@@ -136,6 +138,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
         sdkAmountTooLow: () => "Amount too low",
         sdkNetworkError: () => "Network error",
         sdkGenericError: () => "Generic error",
+        onchainSelfPayment: () => "Your own address",
       },
       common: {
         feeError: () => "Unable to calculate fee",
@@ -182,6 +185,7 @@ describe("useOnchainFeeTierOptions", () => {
     mockSelfCustodialIsQuoting = false
     mockHasCustodialQuote = true
     mockCustodialHasError = false
+    mockCustodialIsSelfPayment = false
     mockCustodialIsQuoting = false
     mockFeeTiers = {
       [FeeTierOption.Fast]: { feeAmount: 30, feeUnit: FeeUnit.Sats, etaMinutes: 10 },
@@ -861,6 +865,7 @@ describe("useOnchainFeeTierOptions on Next", () => {
     mockSelfCustodialIsQuoting = false
     mockHasCustodialQuote = true
     mockCustodialHasError = false
+    mockCustodialIsSelfPayment = false
     mockCustodialIsQuoting = false
   })
 
@@ -973,5 +978,39 @@ describe("useOnchainFeeTierOptions on Next", () => {
       quoted = await result.current.quoteFeesForNext()
     })
     expect(quoted).toEqual(expect.objectContaining({ hasFeeQuote: false }))
+  })
+
+  /** blink-mobile#4261: the address is the sending wallet's own, which no amount can fix. */
+  it("names a custodial self-payment and flags it, instead of the generic fee error", () => {
+    mockCustodialHasError = true
+    mockCustodialIsSelfPayment = true
+    mockHasCustodialQuote = false
+    const { result } = renderHook(() =>
+      useOnchainFeeTierOptions({
+        paymentDetail: buildCustodialOnchainDetail(),
+        isSelfCustodial: false,
+        paymentDestination: undefined,
+        convertMoneyAmount: undefined,
+      }),
+    )
+
+    expect(result.current.feeTierErrorMessage).toBe("Your own address")
+    expect(result.current.isSelfPayment).toBe(true)
+  })
+
+  it("never flags a self-payment for any other custodial fee failure", () => {
+    mockCustodialHasError = true
+    mockHasCustodialQuote = false
+    const { result } = renderHook(() =>
+      useOnchainFeeTierOptions({
+        paymentDetail: buildCustodialOnchainDetail(),
+        isSelfCustodial: false,
+        paymentDestination: undefined,
+        convertMoneyAmount: undefined,
+      }),
+    )
+
+    expect(result.current.feeTierErrorMessage).toBe("Unable to calculate fee")
+    expect(result.current.isSelfPayment).toBe(false)
   })
 })

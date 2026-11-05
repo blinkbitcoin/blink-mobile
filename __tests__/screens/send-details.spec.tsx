@@ -1,4 +1,6 @@
 import React from "react"
+import { ApolloError } from "@apollo/client"
+import { GraphQLError } from "graphql"
 import { Satoshis, type LnUrlPayServiceResponse } from "lnurl-pay"
 
 import {
@@ -846,6 +848,46 @@ describe("onchain fee tier gating", () => {
     expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
       false,
     )
+  })
+
+  /** blink-mobile#4261: the backend refuses the quote with CANT_PAY_SELF. */
+  it("names a payment to the sender's own address, holds Next and offers Change destination", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockDispatch.mockClear()
+    mockQuoteFees.mockResolvedValue({
+      data: undefined,
+      error: new ApolloError({
+        graphQLErrors: [
+          new GraphQLError("User tried to pay themselves", {
+            extensions: { code: "CANT_PAY_SELF" },
+          }),
+        ],
+      }),
+    })
+
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    await flushAsync()
+
+    const sheet = within(await screen.findByTestId(ERROR_SHEET_TEST_ID))
+    expect(sheet.getByText(LL.SendBitcoinScreen.onchainSelfPayment())).toBeTruthy()
+    expect(screen.queryByText(LL.common.feeError())).toBeNull()
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      true,
+    )
+
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinScreen.changeDestination()))
+    })
+    expect(mockDispatch).toHaveBeenCalledTimes(1)
   })
 
   /**

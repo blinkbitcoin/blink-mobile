@@ -2475,6 +2475,7 @@ const en: BaseTranslation = {
     amountExceedsLimit: "Amount exceeds your remaining daily limit of {limit: string}",
     limitsUnavailable: "We couldn't check your daily limit. Try again in a moment.",
     problemSheetTitle: "A small problem",
+    changeDestination: "Change destination",
     recipientUnreachableTitle: "Couldn't reach the recipient",
     recipientWrongAmountTitle: "Recipient sent the wrong amount",
     upgradeAccountToIncreaseLimit: "Upgrade your account to increase your limit",
@@ -2541,6 +2542,8 @@ const en: BaseTranslation = {
     sdkAmountTooLow: "Amount is too low for an on-chain transaction.",
     sdkNetworkError: "Network error. Please check your connection and try again.",
     sdkGenericError: "Unable to estimate fees. Please try a different amount.",
+    onchainSelfPayment:
+      "This is your own wallet's address. You can't send an on-chain payment to yourself.",
   },
   ApiScreen: {
     keysGroupTitle: "API keys",

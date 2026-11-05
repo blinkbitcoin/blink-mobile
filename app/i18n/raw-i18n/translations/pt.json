@@ -2424,6 +2424,7 @@
         "lowFunds": "Saldo insuficiente",
         "amountExceed": "O valor excede seu saldo de {balance: string}",
         "amountExceedsLimit": "O valor excede seu limite diário restante de {limit: string}",
+        "changeDestination": "Alterar destino",
         "upgradeAccountToIncreaseLimit": "Atualize a sua conta para aumentar o seu limite",
         "amountIsRequired": "O valor é obrigatório",
         "cost": "Custo",
@@ -2474,7 +2475,8 @@
         "sdkInsufficientFunds": "Saldo insuficiente para esta transação.",
         "sdkAmountTooLow": "O valor é muito baixo para uma transação on-chain.",
         "sdkNetworkError": "Erro de rede. Verifique sua conexão e tente novamente.",
-        "sdkGenericError": "Não foi possível estimar as taxas. Tente um valor diferente."
+        "sdkGenericError": "Não foi possível estimar as taxas. Tente um valor diferente.",
+        "onchainSelfPayment": "Este é o endereço da sua própria carteira. Você não pode enviar um pagamento on-chain para si mesmo."
     },
     "SettingsScreen": {
         "createAddress": "Criar endereço Lightning",

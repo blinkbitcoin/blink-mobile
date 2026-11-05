@@ -2424,6 +2424,7 @@
         "lowFunds": "Nicht genügend Guthaben",
         "amountExceed": "Der Betrag übersteigt dein Guthaben von {balance: string}",
         "amountExceedsLimit": "Der Betrag übersteigt dein verbleibendes tägliches Limit von {limit: string}",
+        "changeDestination": "Empfänger ändern",
         "upgradeAccountToIncreaseLimit": "Upgrade deinen Account, um dein Limit zu erhöhen",
         "amountIsRequired": "Betrag ist erforderlich",
         "cost": "Kosten",
@@ -2474,7 +2475,8 @@
         "sdkInsufficientFunds": "Nicht genügend Guthaben für diese Transaktion.",
         "sdkAmountTooLow": "Der Betrag ist zu niedrig für eine On-Chain-Transaktion.",
         "sdkNetworkError": "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
-        "sdkGenericError": "Gebühren können nicht geschätzt werden. Bitte versuchen Sie einen anderen Betrag."
+        "sdkGenericError": "Gebühren können nicht geschätzt werden. Bitte versuchen Sie einen anderen Betrag.",
+        "onchainSelfPayment": "Das ist die Adresse Ihrer eigenen Wallet. Sie können keine On-Chain-Zahlung an sich selbst senden."
     },
     "SettingsScreen": {
         "createAddress": "Lightning-Adresse erstellen",

@@ -2424,6 +2424,7 @@
     "lowFunds": "Բավարար միջոցներ չկան",
     "amountExceed": "Գումարի չափը գերազանցում է Ձեր {balance: string} հաշվեկշիռը",
     "amountExceedsLimit": "Գումարի չափը գերազանցում է {limit: string}ի Ձեր օրական սահմանաչափը",
+    "changeDestination": "Փոխել հասցեն",
     "upgradeAccountToIncreaseLimit": "Թարմացրեք Ձեր հաշիվը Ձեր սահմանաչափը բարձրացնելու համար",
     "amountIsRequired": "Հարկավոր է գումարի չափ",
     "cost": "Գին",
@@ -2474,7 +2475,8 @@
     "sdkInsufficientFunds": "Այս գործարքի համար բավարար միջոցներ չկան։",
     "sdkAmountTooLow": "Գումարը չափազանց փոքր է on-chain գործարքի համար։",
     "sdkNetworkError": "Ցանցի սխալ։ Խնդրում ենք ստուգել ձեր կապը և փորձել կրկին։",
-    "sdkGenericError": "Հնարավոր չէ հաշվարկել վճարները։ Խնդրում ենք փորձել այլ գումար։"
+    "sdkGenericError": "Հնարավոր չէ հաշվարկել վճարները։ Խնդրում ենք փորձել այլ գումար։",
+    "onchainSelfPayment": "Սա Ձեր սեփական դրամապանակի հասցեն է։ Դուք չեք կարող on-chain վճարում ուղարկել Ձեզ։"
   },
   "SettingsScreen": {
     "createAddress": "Ստեղծել Lightning հասցե",

@@ -209,6 +209,7 @@ export const useOnchainFeeTierOptions = ({
     hasFeeQuote,
     feeTierErrorMessage: feeRail.errorMessage,
     isFeeTierAmountTooLow: feeRail.isAmountTooLow,
+    isSelfPayment: feeRail.isSelfPayment,
     isQuotingFees,
     isQuotingFeesForNext,
     quoteFeesForNext,

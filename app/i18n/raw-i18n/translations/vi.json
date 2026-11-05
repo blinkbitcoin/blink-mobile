@@ -2424,6 +2424,7 @@
     "lowFunds": "Không đủ số dư",
     "amountExceed": "Số tiền vượt quá số dư {balance: string} của bạn",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
+    "changeDestination": "Đổi điểm đến",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
     "amountIsRequired": "Số tiền là bắt buộc",
     "cost": "Chi phí",
@@ -2474,7 +2475,8 @@
     "sdkInsufficientFunds": "Không đủ số dư cho giao dịch này.",
     "sdkAmountTooLow": "Số tiền quá thấp cho giao dịch on-chain.",
     "sdkNetworkError": "Lỗi mạng. Vui lòng kiểm tra kết nối và thử lại.",
-    "sdkGenericError": "Không thể ước tính phí. Vui lòng thử số tiền khác."
+    "sdkGenericError": "Không thể ước tính phí. Vui lòng thử số tiền khác.",
+    "onchainSelfPayment": "Đây là địa chỉ ví của chính bạn. Bạn không thể gửi thanh toán on-chain cho chính mình."
   },
   "SettingsScreen": {
     "createAddress": "Tạo địa chỉ Lightning",

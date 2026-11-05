@@ -2424,6 +2424,7 @@
     "lowFunds": "Nincs elegendő egyenleg",
     "amountExceed": "Az összeg meghaladja az egyenlegedet: {balance: string}",
     "amountExceedsLimit": "Az összeg meghaladja a napi limitet: {limit: string}",
+    "changeDestination": "Cél módosítása",
     "upgradeAccountToIncreaseLimit": "Magasabb tranzakciós limithez magasabb szintű felhasználói fiókra váltás szükséges",
     "amountIsRequired": "Az összeg kötelező",
     "cost": "Költség",
@@ -2474,7 +2475,8 @@
     "sdkInsufficientFunds": "Nincs elegendő egyenleg ehhez a tranzakcióhoz.",
     "sdkAmountTooLow": "Az összeg túl alacsony egy on-chain tranzakcióhoz.",
     "sdkNetworkError": "Hálózati hiba. Ellenőrizze a kapcsolatot és próbálja újra.",
-    "sdkGenericError": "Nem sikerült megbecsülni a díjakat. Próbáljon másik összeget."
+    "sdkGenericError": "Nem sikerült megbecsülni a díjakat. Próbáljon másik összeget.",
+    "onchainSelfPayment": "Ez az Ön saját tárcájának címe. Nem küldhet on-chain fizetést saját magának."
   },
   "SettingsScreen": {
     "createAddress": "Lightning cím létrehozása",

@@ -2424,6 +2424,7 @@
     "lowFunds": "Nedovoljno sredstava",
     "amountExceed": "Iznos premašuje vaš saldo od {balance: string}",
     "amountExceedsLimit": "Iznos premašuje vaše preostalo dnevno ograničenje od {limit: string}",
+    "changeDestination": "Promijeni odredište",
     "upgradeAccountToIncreaseLimit": "Nadogradite svoj račun kako biste povećali svoje ograničenje",
     "amountIsRequired": "Potreban je iznos",
     "cost": "Trošak",
@@ -2474,7 +2475,8 @@
     "sdkInsufficientFunds": "Nedovoljno sredstava za ovu transakciju.",
     "sdkAmountTooLow": "Iznos je prenizak za on-chain transakciju.",
     "sdkNetworkError": "Mrežna greška. Provjerite vezu i pokušajte ponovo.",
-    "sdkGenericError": "Nije moguće procijeniti naknade. Pokušajte s drugim iznosom."
+    "sdkGenericError": "Nije moguće procijeniti naknade. Pokušajte s drugim iznosom.",
+    "onchainSelfPayment": "Ovo je adresa vašeg vlastitog novčanika. Ne možete poslati on-chain uplatu sami sebi."
   },
   "SettingsScreen": {
     "createAddress": "Stvori Lightning adresu",

@@ -2424,6 +2424,7 @@
     "lowFunds": "أموال غير كافية",
     "amountExceed": "المقدار أعلى من ميزانيتك التي تبلغ {balance: string}",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
+    "changeDestination": "تغيير الوجهة",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
     "amountIsRequired": "المبلغ مطلوب",
     "cost": "التكلفة",
@@ -2474,7 +2475,8 @@
     "sdkInsufficientFunds": "لا توجد أموال كافية لهذه المعاملة.",
     "sdkAmountTooLow": "المبلغ منخفض جدًا لمعاملة على السلسلة.",
     "sdkNetworkError": "خطأ في الشبكة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
-    "sdkGenericError": "تعذّر تقدير الرسوم. يرجى تجربة مبلغ مختلف."
+    "sdkGenericError": "تعذّر تقدير الرسوم. يرجى تجربة مبلغ مختلف.",
+    "onchainSelfPayment": "هذا عنوان محفظتك الخاصة. لا يمكنك إرسال دفعة على السلسلة إلى نفسك."
   },
   "SettingsScreen": {
     "createAddress": "إنشاء عنوان Lightning",

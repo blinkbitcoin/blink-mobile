@@ -2424,6 +2424,7 @@
     "lowFunds": "Ikke nok midler",
     "amountExceed": "Beløbet overstiger din saldo på {balance: string}",
     "amountExceedsLimit": "Beløbet overstiger din resterende daglige grænse på {limit: string}",
+    "changeDestination": "Skift modtager",
     "upgradeAccountToIncreaseLimit": "Opgrader din konto for at øge din grænse",
     "amountIsRequired": "Beløb er påkrævet",
     "cost": "Omkostning",
@@ -2474,7 +2475,8 @@
     "sdkInsufficientFunds": "Ikke nok midler til denne transaktion.",
     "sdkAmountTooLow": "Beløbet er for lavt til en on-chain transaktion.",
     "sdkNetworkError": "Netværksfejl. Tjek din forbindelse og prøv igen.",
-    "sdkGenericError": "Kan ikke estimere gebyrer. Prøv venligst et andet beløb."
+    "sdkGenericError": "Kan ikke estimere gebyrer. Prøv venligst et andet beløb.",
+    "onchainSelfPayment": "Dette er din egen wallets adresse. Du kan ikke sende en on-chain betaling til dig selv."
   },
   "SettingsScreen": {
     "createAddress": "Opret Lightning-adresse",

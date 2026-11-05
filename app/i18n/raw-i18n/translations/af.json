@@ -2424,6 +2424,7 @@
     "lowFunds": "Nie genoeg fondse",
     "amountExceed": "Bedrag oorskry jou saldo van {balance: string}",
     "amountExceedsLimit": "Bedrag oorskry jou oorblywende daaglikse limiet van {limit: string}",
+    "changeDestination": "Verander bestemming",
     "upgradeAccountToIncreaseLimit": "Opgradeer jou rekening om jou limiet te verhoog",
     "amountIsRequired": "Bedrag word benodig",
     "cost": "Koste",
@@ -2474,7 +2475,8 @@
     "sdkInsufficientFunds": "Nie genoeg fondse vir hierdie transaksie nie.",
     "sdkAmountTooLow": "Bedrag is te laag vir 'n on-chain transaksie.",
     "sdkNetworkError": "Netwerkfout. Kontroleer asseblief jou verbinding en probeer weer.",
-    "sdkGenericError": "Kan nie fooie skat nie. Probeer asseblief 'n ander bedrag."
+    "sdkGenericError": "Kan nie fooie skat nie. Probeer asseblief 'n ander bedrag.",
+    "onchainSelfPayment": "Dit is jou eie beursie se adres. Jy kan nie 'n on-chain betaling aan jouself stuur nie."
   },
   "SettingsScreen": {
     "createAddress": "Skep Lightning-adres",

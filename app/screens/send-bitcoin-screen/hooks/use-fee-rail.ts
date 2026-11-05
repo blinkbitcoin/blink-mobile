@@ -17,6 +17,11 @@ type LL = ReturnType<typeof useI18nContext>["LL"]
 export type FeeRail = {
   tiers: Record<FeeTierOption, FeeTierInfo>
   errorMessage: string | undefined
+  /**
+   * The address belongs to the sending wallet, so the payment can never go through and Next
+   * stays off. Only the custodial backend tells this apart; the SDK has no such check.
+   */
+  isSelfPayment: boolean
   hasQuote: boolean
   isQuoting: boolean
   /** The SDK refused the amount as below the on-chain minimum: a refusal the sender fixes
@@ -70,6 +75,7 @@ export const useSelfCustodialFeeRail = ({
   return {
     tiers,
     errorMessage,
+    isSelfPayment: false,
     hasQuote,
     isQuoting,
     isAmountTooLow: error === FeeError.InvalidInput,
@@ -87,18 +93,25 @@ export const useCustodialFeeRail = ({
     ? paymentDetail.destinationSpecifiedAmount.amount
     : paymentDetail?.settlementAmount?.amount
 
-  const { tiers, hasError, hasQuote, isQuoting } = useCustodialOnchainFeeTiers({
-    walletId: isActive ? paymentDetail?.sendingWalletDescriptor.id : undefined,
-    address: isActive ? paymentDetail?.destination : undefined,
-    amount: isActive ? quotedAmount : undefined,
-    /** Read from the payment detail so the tiers always quote the endpoint the send uses. */
-    quote: isActive ? paymentDetail?.feeQuote : undefined,
-  })
+  const { tiers, hasError, isSelfPayment, hasQuote, isQuoting } =
+    useCustodialOnchainFeeTiers({
+      walletId: isActive ? paymentDetail?.sendingWalletDescriptor.id : undefined,
+      address: isActive ? paymentDetail?.destination : undefined,
+      amount: isActive ? quotedAmount : undefined,
+      /** Read from the payment detail so the tiers always quote the endpoint the send uses. */
+      quote: isActive ? paymentDetail?.feeQuote : undefined,
+    })
+
+  /** The generic one is shared with the confirmation screen, so neither promises an
+   *  impossible retry. */
+  const feeErrorMessage = isSelfPayment
+    ? LL.SendBitcoinScreen.onchainSelfPayment()
+    : LL.common.feeError()
 
   return {
     tiers,
-    /** Shared with the confirmation screen, so neither promises an impossible retry. */
-    errorMessage: hasError ? LL.common.feeError() : undefined,
+    errorMessage: hasError ? feeErrorMessage : undefined,
+    isSelfPayment,
     hasQuote,
     isQuoting,
     isAmountTooLow: false,

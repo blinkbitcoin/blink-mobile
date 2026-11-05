@@ -2424,6 +2424,7 @@
     "lowFunds": "Mana kaniyuqchu",
     "amountExceed": "Mana kaniyta rikuchiy {balance: string}",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
+    "changeDestination": "Maymanta tikray",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
     "amountIsRequired": "Kawsayniy kiti kaniyta rikuchiy",
     "cost": "Kawsayniyta qillqata sutichinaqinmi",
@@ -2474,7 +2475,8 @@
     "sdkInsufficientFunds": "Mana kaniyuqchu kay ruwaykunapaq.",
     "sdkAmountTooLow": "Yupayqa pisillam on-chain ruwaykunapaq.",
     "sdkNetworkError": "Llika pantay. Tinkisqaykita qhaway hinaspa watiqmanta ruway.",
-    "sdkGenericError": "Mana chaninchayta atinichu. Huk yupaywan watiqmanta ruway."
+    "sdkGenericError": "Mana chaninchayta atinichu. Huk yupaywan watiqmanta ruway.",
+    "onchainSelfPayment": "Kayqa kikiykipa billeteraykiq direccionninmi. Manam on-chain qullqita kikiykiman apachiyta atinkichu."
   },
   "SettingsScreen": {
     "createAddress": "Lightning tinkunata ruray",

@@ -2424,6 +2424,7 @@
     "lowFunds": "Imali ayonelanga",
     "amountExceed": "Imali idlula ibhalansi yakho {balance: string}",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
+    "changeDestination": "Tshintsha indawo ekuyiwa kuyo",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
     "amountIsRequired": "Imali iyafuneka",
     "cost": "Iindleko",
@@ -2474,7 +2475,8 @@
     "sdkInsufficientFunds": "Imali ayonelanga kulo msebenzi.",
     "sdkAmountTooLow": "Imali iphantsi kakhulu kumsebenzi we-on-chain.",
     "sdkNetworkError": "Impazamo yenethiwekhi. Khawujonge unxibelelwano lwakho uze uzame kwakhona.",
-    "sdkGenericError": "Ayikwazi ukuqikelela iintlawulo. Nceda uzame imali eyahlukileyo."
+    "sdkGenericError": "Ayikwazi ukuqikelela iintlawulo. Nceda uzame imali eyahlukileyo.",
+    "onchainSelfPayment": "Le yidilesi yesipaji sakho. Awungekhe uzithumelele intlawulo ye-on-chain."
   },
   "SettingsScreen": {
     "createAddress": "Yenza idilesi ye-Lightning",

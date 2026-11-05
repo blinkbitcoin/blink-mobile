@@ -2424,6 +2424,7 @@
     "lowFunds": "Onvoldoende saldo",
     "amountExceed": "Bedrag overschrijdt uw saldo van {balance: string}",
     "amountExceedsLimit": "Bedrag overschrijdt uw resterende dagelijkse limiet van {limit: string}",
+    "changeDestination": "Bestemming wijzigen",
     "upgradeAccountToIncreaseLimit": "Upgrade uw account om uw limiet te verhogen",
     "amountIsRequired": "Bedrag is vereist",
     "cost": "Kosten",
@@ -2474,7 +2475,8 @@
     "sdkInsufficientFunds": "Onvoldoende saldo voor deze transactie.",
     "sdkAmountTooLow": "Het bedrag is te laag voor een on-chain transactie.",
     "sdkNetworkError": "Netwerkfout. Controleer uw verbinding en probeer het opnieuw.",
-    "sdkGenericError": "Kan kosten niet schatten. Probeer een ander bedrag."
+    "sdkGenericError": "Kan kosten niet schatten. Probeer een ander bedrag.",
+    "onchainSelfPayment": "Dit is het adres van uw eigen wallet. U kunt geen on-chain betaling naar uzelf sturen."
   },
   "SettingsScreen": {
     "createAddress": "Lightning-adres aanmaken",
