@@ -2534,15 +2534,17 @@
       }
     },
     "inApp": "Mu app",
-    "celebrateIncoming": "Jaguza ssente ezijja",
-    "celebrationMinimum": "Omuwendo omutono (sats)"
+    "incomingTransactionSplash": "Olupapula lw'ensimbi ezijja",
+    "splashMinimum": "Omuwendo omutono (sats)"
   },
-  "ReceiveCelebration": {
+  "IncomingTransactionSplash": {
     "youReceived": "Wafunye",
     "note": "Ekiwandiiko",
     "dontShowAgain": "Tolaga olutimbe luno nate.",
     "details": "Ebikwata ku nsonga",
-    "announcement": "Wafunye {amount}"
+    "announcement": "Wafunye {amount}",
+    "tapToShow": "Nyiga okulaba",
+    "announcementHidden": "Wafunye ensimbi"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Akawunti yo erina omuwendo ogusoba mu $5",

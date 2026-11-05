@@ -2534,15 +2534,17 @@
       }
     },
     "inApp": "V aplikácii",
-    "celebrateIncoming": "Oslavovať prichádzajúce platby",
-    "celebrationMinimum": "Minimálna suma (sats)"
+    "incomingTransactionSplash": "Obrazovka prichádzajúcej transakcie",
+    "splashMinimum": "Minimálna suma (sats)"
   },
-  "ReceiveCelebration": {
+  "IncomingTransactionSplash": {
     "youReceived": "Dostali ste",
     "note": "Poznámka",
     "dontShowAgain": "Túto obrazovku už nezobrazovať.",
     "details": "Podrobnosti",
-    "announcement": "Prijaté {amount}"
+    "announcement": "Prijaté {amount}",
+    "tapToShow": "Klepnite na zobrazenie",
+    "announcementHidden": "Platba prijatá"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Váš účet má viac ako 5 USD",

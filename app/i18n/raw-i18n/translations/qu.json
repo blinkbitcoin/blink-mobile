@@ -2534,15 +2534,17 @@
       }
     },
     "inApp": "Apppi",
-    "celebrateIncoming": "Haywarisqa qullqita kusikuy",
-    "celebrationMinimum": "Asllaqa chanin (sats)"
+    "incomingTransactionSplash": "Haywarisqa qullqi pantalla",
+    "splashMinimum": "Asllaqa chanin (sats)"
   },
-  "ReceiveCelebration": {
+  "IncomingTransactionSplash": {
     "youReceived": "Chaskirqanki",
     "note": "Willay",
     "dontShowAgain": "Ama kay pantallata yapamanta rikuchiychu.",
     "details": "Willakuykuna",
-    "announcement": "Chaskisqa {amount}"
+    "announcement": "Chaskisqa {amount}",
+    "tapToShow": "Ñit'iy rikunaykipaq",
+    "announcementHidden": "Qullqi chaskisqa"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Cuentaykipi $5 aswan qullqi kachkan",

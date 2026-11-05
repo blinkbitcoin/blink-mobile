@@ -1,5 +1,5 @@
 import { TxNotificationType } from "@app/graphql/generated"
-import { candidateFromUpdate } from "@app/screens/receive-bitcoin-screen/celebration/update-to-candidate"
+import { candidateFromUpdate } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/update-to-candidate"
 
 const transaction = {
   id: "tx-1",
@@ -7,7 +7,7 @@ const transaction = {
 } as never
 
 describe("candidateFromUpdate", () => {
-  it("celebrates a paid lightning update", () => {
+  it("offers a paid lightning update", () => {
     expect(
       candidateFromUpdate({
         __typename: "LnUpdate",
@@ -31,7 +31,7 @@ describe("candidateFromUpdate", () => {
     ).toBeNull()
   })
 
-  it("celebrates an intraledger receipt and ignores a payment", () => {
+  it("offers an intraledger receipt and ignores a payment", () => {
     expect(
       candidateFromUpdate({
         __typename: "IntraLedgerUpdate",
@@ -48,7 +48,7 @@ describe("candidateFromUpdate", () => {
     ).toBeNull()
   })
 
-  it("celebrates a confirmed on-chain receipt and ignores a pending one", () => {
+  it("offers a confirmed on-chain receipt and ignores a pending one", () => {
     expect(
       candidateFromUpdate({
         __typename: "OnChainUpdate",

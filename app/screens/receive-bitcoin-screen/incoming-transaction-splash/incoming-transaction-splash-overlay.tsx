@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react"
 import {
   AccessibilityInfo,
   BackHandler,
+  Pressable,
   StatusBar,
   StyleSheet,
   useWindowDimensions,
@@ -28,6 +29,7 @@ import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { CheckboxRow } from "@app/components/checkbox-row"
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { SuccessBadge } from "@app/components/success-badge"
 import { SuccessGlow } from "@app/components/success-glow"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
@@ -35,8 +37,8 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { toBtcMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 
-import type { ShownCelebration } from "./receive-celebration-provider"
-import { CelebrationCloseAction } from "./types"
+import type { ShownSplash } from "./incoming-transaction-splash-provider"
+import { SplashCloseAction } from "./types"
 
 const IRIS_MS = 480
 const IRIS_OVERSHOOT = 40
@@ -65,12 +67,14 @@ const REPLACE_RING_MS = 380
 const GLOW = "rgba(255, 255, 255, 0.35)"
 const RING = "rgba(255, 255, 255, 0.25)"
 
-type CloseAction = { optedOut: boolean; action: CelebrationCloseAction }
+type CloseAction = { optedOut: boolean; action: SplashCloseAction }
 
 type Props = {
-  celebration: ShownCelebration
+  splash: ShownSplash
   onClose: (action: CloseAction) => void
   onDetails: (action: { optedOut: boolean }) => void
+  /** A tap showed a hidden amount, for analytics. */
+  onReveal: () => void
 }
 
 const triggerSuccessHaptic = () => {
@@ -86,10 +90,11 @@ const useFadeUpStyle = (progress: SharedValue<number>) =>
     transform: [{ translateY: (1 - progress.value) * FADE_UP_OFFSET }],
   }))
 
-export const ReceiveCelebrationOverlay: React.FC<Props> = ({
-  celebration,
+export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
+  splash,
   onClose,
   onDetails,
+  onReveal,
 }) => {
   const styles = useStyles()
   const {
@@ -102,8 +107,11 @@ export const ReceiveCelebrationOverlay: React.FC<Props> = ({
 
   /** What is on screen. Lags the prop during a replacement, until the old content has
    *  faded out. */
-  const [displayed, setDisplayed] = useState(celebration)
+  const [displayed, setDisplayed] = useState(splash)
   const [optedOut, setOptedOut] = useState(false)
+  /** A hidden amount shown with a tap. This screen only: the hide-balance setting and
+   *  Home's own toggle are left as they are. Each new payment starts hidden again. */
+  const [revealed, setRevealed] = useState(false)
   const [interactive, setInteractive] = useState(false)
   /** Bumped on every impact: remounts the badge so it draws itself in again. */
   const [impactKey, setImpactKey] = useState(0)
@@ -142,10 +150,17 @@ export const ReceiveCelebrationOverlay: React.FC<Props> = ({
   )
 
   const announce = useCallback(
-    (shown: ShownCelebration) => {
+    (shown: ShownSplash) => {
+      if (shown.amountHidden) {
+        // A hidden amount is not read out either.
+        AccessibilityInfo.announceForAccessibility(
+          LL.IncomingTransactionSplash.announcementHidden(),
+        )
+        return
+      }
       const { settlementDisplayAmount, settlementDisplayCurrency } = shown.transaction
       AccessibilityInfo.announceForAccessibility(
-        LL.ReceiveCelebration.announcement({
+        LL.IncomingTransactionSplash.announcement({
           amount: formatCurrency({
             amountInMajorUnits: settlementDisplayAmount,
             currency: settlementDisplayCurrency,
@@ -157,7 +172,7 @@ export const ReceiveCelebrationOverlay: React.FC<Props> = ({
   )
 
   const onImpact = useCallback(
-    (shown: ShownCelebration) => {
+    (shown: ShownSplash) => {
       if (!isMounted.current) return
       triggerSuccessHaptic()
       setImpactKey((key) => key + 1)
@@ -193,10 +208,10 @@ export const ReceiveCelebrationOverlay: React.FC<Props> = ({
         if (!finished) return
         landed.value = 1
         playEntrance()
-        runOnJS(onImpact)(celebration)
+        runOnJS(onImpact)(splash)
       },
     )
-  }, [radius, landed, playEntrance, onImpact, celebration])
+  }, [radius, landed, playEntrance, onImpact, splash])
 
   /** The iris closes on the amount wherever it really sits: large fonts and long
    *  amounts move it. */
@@ -222,17 +237,18 @@ export const ReceiveCelebrationOverlay: React.FC<Props> = ({
   /** A new payment while open: fade out, a faint ring closes in, then the same impact
    *  and entrance with the new data. The checkbox carries over. */
   useEffect(() => {
-    if (celebration.transaction.id === displayed.transaction.id) {
+    if (splash.transaction.id === displayed.transaction.id) {
       // The same payment with newer data (a note that arrived late): no replay.
-      if (celebration !== displayed) setDisplayed(celebration)
+      if (splash !== displayed) setDisplayed(splash)
       return
     }
     setInteractive(false)
 
     const showNext = () => {
-      setDisplayed(celebration)
+      setRevealed(false)
+      setDisplayed(splash)
     }
-    const land = () => onImpact(celebration)
+    const land = () => onImpact(splash)
 
     content.value = withTiming(0, { duration: REPLACE_FADE_MS }, (finished) => {
       if (!finished) return
@@ -256,10 +272,16 @@ export const ReceiveCelebrationOverlay: React.FC<Props> = ({
       )
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [celebration])
+  }, [splash])
+
+  const reveal = useCallback(() => {
+    if (!interactive) return
+    setRevealed(true)
+    onReveal()
+  }, [interactive, onReveal])
 
   const close = useCallback(
-    (action: CelebrationCloseAction) => {
+    (action: SplashCloseAction) => {
       if (interactive) onClose({ optedOut, action })
     },
     [interactive, onClose, optedOut],
@@ -267,7 +289,7 @@ export const ReceiveCelebrationOverlay: React.FC<Props> = ({
 
   useEffect(() => {
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
-      close(CelebrationCloseAction.Back)
+      close(SplashCloseAction.Back)
       return true
     })
     return () => subscription.remove()
@@ -312,9 +334,10 @@ export const ReceiveCelebrationOverlay: React.FC<Props> = ({
   const satsAmount = formatMoneyAmount({
     moneyAmount: toBtcMoneyAmount(displayed.amountSats),
   })
+  const masked = displayed.amountHidden && !revealed
 
   return (
-    <View style={StyleSheet.absoluteFill} {...testProps("receive-celebration")}>
+    <View style={StyleSheet.absoluteFill} {...testProps("incoming-transaction-splash")}>
       {/* White icons on the green in both themes; unmounting restores the app's own. */}
       <StatusBar barStyle="light-content" />
       <Animated.View
@@ -357,40 +380,54 @@ export const ReceiveCelebrationOverlay: React.FC<Props> = ({
       >
         <View style={styles.placeholder} />
         <View style={styles.body}>
-          <View style={styles.hero}>
+          <Pressable
+            style={styles.hero}
+            onPress={reveal}
+            disabled={!masked}
+            accessible={masked}
+            accessibilityRole={masked ? "button" : undefined}
+            accessibilityLabel={
+              masked ? LL.IncomingTransactionSplash.tapToShow() : undefined
+            }
+            testID="incoming-transaction-splash-reveal"
+          >
             <Animated.View style={[styles.badge, badgeStyle]}>
               {impactKey > 0 && (
                 <SuccessBadge key={impactKey} size={BADGE_SIZE} color={colors._white} />
               )}
             </Animated.View>
             <Animated.View style={[styles.text, amountGroupStyle]}>
-              <Text type="p2" style={styles.white}>
-                {LL.ReceiveCelebration.youReceived()}
+              <Text type="p3" style={styles.white}>
+                {LL.IncomingTransactionSplash.youReceived()}
               </Text>
               <View ref={amountRef} onLayout={onAmountLayout}>
-                <Text
-                  bold
-                  style={[styles.white, styles.amount]}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                >
-                  {displayAmount}
-                </Text>
+                {masked ? (
+                  <HiddenBalancePlaceholder size="large" color={colors._white} />
+                ) : (
+                  <Text
+                    bold
+                    style={[styles.white, styles.amount]}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                  >
+                    {displayAmount}
+                  </Text>
+                )}
               </View>
             </Animated.View>
             <Animated.View style={detailGroupStyle}>
-              <Text type="p1" style={styles.white}>
-                {satsAmount}
+              <Text type="p2" style={[styles.white, masked && styles.tapToShow]}>
+                {masked ? LL.IncomingTransactionSplash.tapToShow() : satsAmount}
               </Text>
             </Animated.View>
-          </View>
+          </Pressable>
           {memo ? (
             <Animated.View style={[styles.noteCard, detailGroupStyle]}>
-              <Text type="p2" style={[styles.white, styles.noteLabel]}>
-                {LL.ReceiveCelebration.note()}
+              <Text type="p3" style={[styles.white, styles.noteLabel]}>
+                {LL.IncomingTransactionSplash.note()}
               </Text>
               <Text
-                type="p2"
+                type="p3"
                 bold
                 style={[styles.white, styles.noteValue]}
                 numberOfLines={3}
@@ -406,25 +443,25 @@ export const ReceiveCelebrationOverlay: React.FC<Props> = ({
         <Animated.View style={controlsStyle}>
           <View style={styles.checkboxRow}>
             <CheckboxRow
-              label={LL.ReceiveCelebration.dontShowAgain()}
+              label={LL.IncomingTransactionSplash.dontShowAgain()}
               isChecked={optedOut}
               onPress={() => setOptedOut((value) => !value)}
               color={colors._white}
               checkColor={colors._green}
               centered
-              testID="receive-celebration-opt-out"
+              testID="incoming-transaction-splash-opt-out"
             />
           </View>
           <View style={styles.buttonGroup}>
             <GaloyPrimaryButton
               title={LL.common.close()}
-              onPress={() => close(CelebrationCloseAction.Close)}
+              onPress={() => close(SplashCloseAction.Close)}
               buttonStyle={styles.closeButton}
               titleStyle={styles.closeButtonTitle}
               containerStyle={styles.fullWidth}
             />
             <GaloySecondaryButton
-              title={LL.ReceiveCelebration.details()}
+              title={LL.IncomingTransactionSplash.details()}
               onPress={() => interactive && onDetails({ optedOut })}
               titleStyle={styles.white}
             />
@@ -440,8 +477,8 @@ export const ReceiveCelebrationOverlay: React.FC<Props> = ({
             iconOnly
             backgroundColor={colors._green}
             color={colors._white}
-            onPress={() => close(CelebrationCloseAction.X)}
-            {...testProps("receive-celebration-close")}
+            onPress={() => close(SplashCloseAction.X)}
+            {...testProps("incoming-transaction-splash-close")}
           />
         </Animated.View>
       </Animated.View>
@@ -487,6 +524,9 @@ const useStyles = makeStyles(({ colors }) => ({
   amount: {
     fontSize: 32,
     lineHeight: 34,
+  },
+  tapToShow: {
+    textTransform: "uppercase",
   },
   noteCard: {
     flexDirection: "row",

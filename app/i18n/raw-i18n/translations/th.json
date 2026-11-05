@@ -2534,15 +2534,17 @@
       }
     },
     "inApp": "ในแอป",
-    "celebrateIncoming": "ฉลองเมื่อได้รับเงิน",
-    "celebrationMinimum": "จำนวนขั้นต่ำ (sats)"
+    "incomingTransactionSplash": "หน้าจอแจ้งรายการเงินเข้า",
+    "splashMinimum": "จำนวนขั้นต่ำ (sats)"
   },
-  "ReceiveCelebration": {
+  "IncomingTransactionSplash": {
     "youReceived": "คุณได้รับ",
     "note": "บันทึก",
     "dontShowAgain": "ไม่ต้องแสดงหน้านี้ อีก",
     "details": "รายละเอียด",
-    "announcement": "ได้รับ {amount}"
+    "announcement": "ได้รับ {amount}",
+    "tapToShow": "แตะเพื่อแสดง",
+    "announcementHidden": "ได้รับเงินแล้ว"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "บัญชีของคุณมีมากกว่า $5",

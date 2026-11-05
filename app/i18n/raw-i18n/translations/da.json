@@ -2534,15 +2534,17 @@
       }
     },
     "inApp": "I appen",
-    "celebrateIncoming": "Fejr indgående betalinger",
-    "celebrationMinimum": "Minimumsbeløb (sats)"
+    "incomingTransactionSplash": "Skærm for indgående transaktion",
+    "splashMinimum": "Minimumsbeløb (sats)"
   },
-  "ReceiveCelebration": {
+  "IncomingTransactionSplash": {
     "youReceived": "Du har modtaget",
     "note": "Note",
     "dontShowAgain": "Vis ikke denne skærm igen.",
     "details": "Detaljer",
-    "announcement": "Modtaget {amount}"
+    "announcement": "Modtaget {amount}",
+    "tapToShow": "Tryk for at vise",
+    "announcementHidden": "Betaling modtaget"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Din konto har mere end $5",

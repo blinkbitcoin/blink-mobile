@@ -8312,15 +8312,15 @@ type RootTranslation = {
 		 */
 		inApp: string
 		/**
-		 * C​e​l​e​b​r​a​t​e​ ​i​n​c​o​m​i​n​g​ ​p​a​y​m​e​n​t​s
+		 * I​n​c​o​m​i​n​g​ ​t​r​a​n​s​a​c​t​i​o​n​ ​s​p​l​a​s​h​ ​s​c​r​e​e​n
 		 */
-		celebrateIncoming: string
+		incomingTransactionSplash: string
 		/**
 		 * M​i​n​i​m​u​m​ ​a​m​o​u​n​t​ ​(​s​a​t​s​)
 		 */
-		celebrationMinimum: string
+		splashMinimum: string
 	}
-	ReceiveCelebration: {
+	IncomingTransactionSplash: {
 		/**
 		 * Y​o​u​ ​r​e​c​e​i​v​e​d
 		 */
@@ -8342,6 +8342,14 @@ type RootTranslation = {
 		 * @param {string} amount
 		 */
 		announcement: RequiredParams<'amount'>
+		/**
+		 * T​a​p​ ​t​o​ ​s​h​o​w
+		 */
+		tapToShow: string
+		/**
+		 * P​a​y​m​e​n​t​ ​r​e​c​e​i​v​e​d
+		 */
+		announcementHidden: string
 	}
 	AccountScreen: {
 		/**
@@ -22634,15 +22642,15 @@ export type TranslationFunctions = {
 		 */
 		inApp: () => LocalizedString
 		/**
-		 * Celebrate incoming payments
+		 * Incoming transaction splash screen
 		 */
-		celebrateIncoming: () => LocalizedString
+		incomingTransactionSplash: () => LocalizedString
 		/**
 		 * Minimum amount (sats)
 		 */
-		celebrationMinimum: () => LocalizedString
+		splashMinimum: () => LocalizedString
 	}
-	ReceiveCelebration: {
+	IncomingTransactionSplash: {
 		/**
 		 * You received
 		 */
@@ -22663,6 +22671,14 @@ export type TranslationFunctions = {
 		 * Received {amount}
 		 */
 		announcement: (arg: { amount: string }) => LocalizedString
+		/**
+		 * Tap to show
+		 */
+		tapToShow: () => LocalizedString
+		/**
+		 * Payment received
+		 */
+		announcementHidden: () => LocalizedString
 	}
 	AccountScreen: {
 		/**

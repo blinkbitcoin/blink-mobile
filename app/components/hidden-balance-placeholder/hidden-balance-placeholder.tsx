@@ -11,6 +11,9 @@ import { testProps } from "@app/utils/testProps"
 
 type Props = {
   size: "large" | "small"
+  /** Defaults to grey4. Set it on a coloured ground, such as the incoming transaction
+   *  splash. */
+  color?: string
 }
 
 const CIRCLE_SIZES = {
@@ -20,8 +23,8 @@ const CIRCLE_SIZES = {
 
 const CIRCLES = [0, 1, 2, 3] as const
 
-export const HiddenBalancePlaceholder: React.FC<Props> = ({ size }) => {
-  const styles = useStyles(CIRCLE_SIZES[size])
+export const HiddenBalancePlaceholder: React.FC<Props> = ({ size, color }) => {
+  const styles = useStyles({ ...CIRCLE_SIZES[size], color })
 
   return (
     <View {...testProps("hidden-balance-placeholder")} style={styles.container}>
@@ -33,7 +36,10 @@ export const HiddenBalancePlaceholder: React.FC<Props> = ({ size }) => {
 }
 
 const useStyles = makeStyles(
-  ({ colors }, { diameter, gap }: { diameter: number; gap: number }) => ({
+  (
+    { colors },
+    { diameter, gap, color }: { diameter: number; gap: number; color?: string },
+  ) => ({
     container: {
       flexDirection: "row",
       alignItems: "center",
@@ -43,7 +49,7 @@ const useStyles = makeStyles(
       width: diameter,
       height: diameter,
       borderRadius: diameter / 2,
-      backgroundColor: colors.grey4,
+      backgroundColor: color ?? colors.grey4,
     },
   }),
 )

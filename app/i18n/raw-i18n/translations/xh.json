@@ -2534,15 +2534,17 @@
       }
     },
     "inApp": "Kwiprogram",
-    "celebrateIncoming": "Bhiyoza iintlawulo ezingenayo",
-    "celebrationMinimum": "Eyona mali incinci (sats)"
+    "incomingTransactionSplash": "Isikrini sentengiselwano engenayo",
+    "splashMinimum": "Eyona mali incinci (sats)"
   },
-  "ReceiveCelebration": {
+  "IncomingTransactionSplash": {
     "youReceived": "Ufumene",
     "note": "Inqaku",
     "dontShowAgain": "Ungaphindi ubonise le skrini.",
     "details": "Iinkcukacha",
-    "announcement": "Ufumene {amount}"
+    "announcement": "Ufumene {amount}",
+    "tapToShow": "Cofa ukuze ubonise",
+    "announcementHidden": "Intlawulo ifunyenwe"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "I-akhawunti yakho inangaphezulu kwe-$5",

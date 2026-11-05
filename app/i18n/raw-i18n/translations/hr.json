@@ -2534,15 +2534,17 @@
       }
     },
     "inApp": "U aplikaciji",
-    "celebrateIncoming": "Proslavi dolazne uplate",
-    "celebrationMinimum": "Najmanji iznos (sats)"
+    "incomingTransactionSplash": "Zaslon dolazne transakcije",
+    "splashMinimum": "Najmanji iznos (sats)"
   },
-  "ReceiveCelebration": {
+  "IncomingTransactionSplash": {
     "youReceived": "Primili ste",
     "note": "Bilješka",
     "dontShowAgain": "Ne prikazuj više ovaj zaslon.",
     "details": "Detalji",
-    "announcement": "Primljeno {amount}"
+    "announcement": "Primljeno {amount}",
+    "tapToShow": "Dodirni za prikaz",
+    "announcementHidden": "Uplata primljena"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Vaš račun ima više od $5",

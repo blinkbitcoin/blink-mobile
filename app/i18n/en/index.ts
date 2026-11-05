@@ -2637,15 +2637,17 @@ const en: BaseTranslation = {
       },
     },
     inApp: "In the app",
-    celebrateIncoming: "Celebrate incoming payments",
-    celebrationMinimum: "Minimum amount (sats)",
+    incomingTransactionSplash: "Incoming transaction splash screen",
+    splashMinimum: "Minimum amount (sats)",
   },
-  ReceiveCelebration: {
+  IncomingTransactionSplash: {
     youReceived: "You received",
     note: "Note",
     dontShowAgain: "Don’t show me this screen again.",
     details: "Details",
     announcement: "Received {amount: string}",
+    tapToShow: "Tap to show",
+    announcementHidden: "Payment received",
   },
   AccountScreen: {
     fundsMoreThan5Dollars: "Your account has more than $5",

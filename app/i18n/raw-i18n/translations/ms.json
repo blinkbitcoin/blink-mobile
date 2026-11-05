@@ -2534,15 +2534,17 @@
       }
     },
     "inApp": "Dalam apl",
-    "celebrateIncoming": "Raikan bayaran masuk",
-    "celebrationMinimum": "Amaun minimum (sats)"
+    "incomingTransactionSplash": "Skrin transaksi masuk",
+    "splashMinimum": "Amaun minimum (sats)"
   },
-  "ReceiveCelebration": {
+  "IncomingTransactionSplash": {
     "youReceived": "Anda menerima",
     "note": "Nota",
     "dontShowAgain": "Jangan tunjukkan skrin ini lagi.",
     "details": "Butiran",
-    "announcement": "Diterima {amount}"
+    "announcement": "Diterima {amount}",
+    "tapToShow": "Tekan untuk tunjuk",
+    "announcementHidden": "Bayaran diterima"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Akaun anda mempunyai lebih daripada $5",

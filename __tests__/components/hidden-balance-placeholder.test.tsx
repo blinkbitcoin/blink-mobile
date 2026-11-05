@@ -9,10 +9,10 @@ jest.mock("@rn-vui/themed", () => ({
     (
       factory: (
         theme: { colors: Record<string, string> },
-        props: { diameter: number; gap: number },
+        props: { diameter: number; gap: number; color?: string },
       ) => object,
     ) =>
-    (props: { diameter: number; gap: number }) =>
+    (props: { diameter: number; gap: number; color?: string }) =>
       factory({ colors: { grey4: "#CCCCCC" } }, props),
 }))
 
@@ -48,6 +48,22 @@ describe("HiddenBalancePlaceholder", () => {
       getCircles(render(<HiddenBalancePlaceholder size="large" />)).forEach((circle) => {
         expect(circle.props.style.width).toBe(17)
         expect(circle.props.style.height).toBe(17)
+      })
+    })
+  })
+
+  describe("color", () => {
+    it("defaults to grey4", () => {
+      getCircles(render(<HiddenBalancePlaceholder size="large" />)).forEach((circle) => {
+        expect(circle.props.style.backgroundColor).toBe("#CCCCCC")
+      })
+    })
+
+    it("uses the color it is given", () => {
+      getCircles(
+        render(<HiddenBalancePlaceholder size="large" color="#FFFFFF" />),
+      ).forEach((circle) => {
+        expect(circle.props.style.backgroundColor).toBe("#FFFFFF")
       })
     })
   })

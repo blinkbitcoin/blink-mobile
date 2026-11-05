@@ -5,8 +5,8 @@ import { HomeAuthedDocument, useMyLnUpdatesSubscription } from "@app/graphql/gen
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { LnUpdateHashPaidProvider } from "@app/graphql/ln-update-context"
 
-import { useReceiveCelebration } from "./celebration/receive-celebration-provider"
-import { candidateFromUpdate } from "./celebration/update-to-candidate"
+import { useIncomingTransactionSplash } from "./incoming-transaction-splash/incoming-transaction-splash-provider"
+import { candidateFromUpdate } from "./incoming-transaction-splash/update-to-candidate"
 
 gql`
   subscription myLnUpdates {
@@ -43,7 +43,7 @@ gql`
 export const MyLnUpdateSub = ({ children }: PropsWithChildren) => {
   const client = useApolloClient()
   const isAuthed = useIsAuthed()
-  const { celebrate } = useReceiveCelebration()
+  const { showSplash } = useIncomingTransactionSplash()
 
   const { data: dataSub } = useMyLnUpdatesSubscription({ skip: !isAuthed })
   const [lastHash, setLastHash] = useState<string>("")
@@ -57,8 +57,8 @@ export const MyLnUpdateSub = ({ children }: PropsWithChildren) => {
       client.refetchQueries({ include: [HomeAuthedDocument] })
       if (candidate?.paymentHash) setLastHash(candidate.paymentHash)
     }
-    if (candidate) celebrate(candidate)
-  }, [dataSub, client, celebrate])
+    if (candidate) showSplash(candidate)
+  }, [dataSub, client, showSplash])
 
   return <LnUpdateHashPaidProvider value={lastHash}>{children}</LnUpdateHashPaidProvider>
 }
