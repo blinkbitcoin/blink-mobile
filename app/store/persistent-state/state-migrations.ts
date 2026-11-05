@@ -291,7 +291,10 @@ type PersistentState_21 = {
   selfCustodialServerAccountModeByAccountId?: Record<string, AccountMode>
   // Last transaction seen per currency, for accounts whose Apollo cache is never
   // restored from disk (self-custodial). Custodial keeps this in the cache itself.
-  txLastSeenByAccountId?: Record<string, { btcId: string; usdId: string }>
+  txLastSeenByAccountId?: Record<
+    string,
+    { btcId: string; usdId: string; announceSinceMs?: number }
+  >
 }
 
 type PersistentState_22 = Omit<PersistentState_21, "schemaVersion"> & {
