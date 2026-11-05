@@ -182,6 +182,60 @@ describe("useAddToWallet", () => {
       expect(result.current.isAdding).toBe(false)
     })
 
+    it("keeps offering a card shown after the add started", async () => {
+      const pendingAdd = deferred<WalletAddResult>()
+      mockAddCardToWallet.mockReturnValue(pendingAdd.promise)
+      const { result, rerender } = await renderWithCard("card-1")
+
+      act(() => {
+        result.current.addToWallet()
+      })
+      rerender({ id: "card-2", digits: "4242" })
+      await act(async () => {})
+      await act(async () => {
+        pendingAdd.resolve(WalletAddResult.Added)
+      })
+
+      expect(result.current.canAddToWallet).toBe(true)
+      expect(result.current.isAdding).toBe(false)
+    })
+
+    it("drops the error of an add whose card is no longer shown", async () => {
+      const pendingAdd = deferred<WalletAddResult>()
+      mockAddCardToWallet.mockReturnValue(
+        pendingAdd.promise.then(() => Promise.reject(new Error("provisioning failed"))),
+      )
+      const { result, rerender } = await renderWithCard("card-1")
+
+      act(() => {
+        result.current.addToWallet()
+      })
+      rerender({ id: "card-2", digits: "4242" })
+      await act(async () => {
+        pendingAdd.resolve(WalletAddResult.Added)
+      })
+
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
+    it("stays quiet when the screen is left before the add fails", async () => {
+      const pendingAdd = deferred<WalletAddResult>()
+      mockAddCardToWallet.mockReturnValue(
+        pendingAdd.promise.then(() => Promise.reject(new Error("provisioning failed"))),
+      )
+      const { result, unmount } = await renderWithCard()
+
+      act(() => {
+        result.current.addToWallet()
+      })
+      unmount()
+      await act(async () => {
+        pendingAdd.resolve(WalletAddResult.Added)
+      })
+
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
     it("does nothing without a card", async () => {
       const { result } = renderHook(() => useAddToWallet(undefined, undefined))
       await act(async () => {})
