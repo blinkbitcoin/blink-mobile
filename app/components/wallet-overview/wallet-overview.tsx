@@ -355,7 +355,12 @@ const WalletOverview: React.FC<Props> = ({
                 <HiddenBalancePlaceholder size="small" />
               ) : (
                 <View style={[styles.hideableArea, pressedCard && styles.pressedOpacity]}>
-                  <Text type="p1" bold style={styles.boldBalance}>
+                  <Text
+                    type="p1"
+                    bold
+                    style={styles.boldBalance}
+                    {...testProps("card-balance")}
+                  >
                     {cardBalanceFormatted}
                   </Text>
                   <Text type="p3">{cardInDisplayCurrency}</Text>
