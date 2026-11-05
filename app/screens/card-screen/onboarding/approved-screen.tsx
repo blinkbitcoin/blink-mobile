@@ -7,12 +7,17 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { useCardData } from "@app/hooks"
+import { useAddToWallet } from "../hooks/use-add-to-wallet"
 import { isCardFrozen } from "../utils/card-display"
 
 export const CardApprovedScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { LL } = useI18nContext()
   const { card, hasPhysicalCard } = useCardData()
+  const { canAddToWallet, isAdding, addToWallet } = useAddToWallet(
+    card?.id,
+    card?.lastFour,
+  )
 
   const handlePrimaryButtonPress = () => {
     if (hasPhysicalCard) {
@@ -33,8 +38,12 @@ export const CardApprovedScreen: React.FC = () => {
       }
       onPrimaryButtonPress={handlePrimaryButtonPress}
       iconName="check-badge"
+      cardId={card?.id}
       cardNumber={card?.lastFour}
       isFrozen={card ? isCardFrozen(card.status) : false}
+      showAddToWallet={canAddToWallet}
+      onAddToWallet={addToWallet}
+      isAddingToWallet={isAdding}
     />
   )
 }
