@@ -597,6 +597,42 @@ describe("a self-custodial on-chain fee", () => {
   })
 })
 
+/** blink-mobile#4261: the backend refused the custodial fee quote because the address is
+ *  the sending wallet's own. Stood in through the fee options; the hook specs cover how the
+ *  refusal is told apart. */
+describe("a custodial on-chain payment to the sender's own address", () => {
+  const selfPayment = LL.SendBitcoinScreen.onchainSelfPayment()
+
+  it("says so in place of the fee error, and holds Next", async () => {
+    mockFeeTierOverride.current = {
+      feeTierErrorMessage: selfPayment,
+      isSelfPayment: true,
+    }
+    renderScreen(intraledgerDestination())
+    await settle()
+    typeKeys("1")
+    await settle()
+
+    expect(screen.getByText(selfPayment)).toBeTruthy()
+    expect(screen.queryByText(LL.common.feeError())).toBeNull()
+    expect(isNextDisabled()).toBe(true)
+  })
+
+  it("leaves Next on for any other fee error, as before", async () => {
+    mockFeeTierOverride.current = {
+      feeTierErrorMessage: LL.common.feeError(),
+      isSelfPayment: false,
+    }
+    renderScreen(intraledgerDestination())
+    await settle()
+    typeKeys("1")
+    await settle()
+
+    expect(screen.getByText(LL.common.feeError())).toBeTruthy()
+    expect(isNextDisabled()).toBe(false)
+  })
+})
+
 describe("fixed amount", () => {
   it("hides the keypad and chips and offers Next straight away", async () => {
     renderScreen(invoiceDestination)
