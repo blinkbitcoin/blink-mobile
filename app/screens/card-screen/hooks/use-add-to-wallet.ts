@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
+import { useIsMounted } from "@app/hooks/use-is-mounted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toastShow } from "@app/utils/toast"
 
@@ -19,13 +20,16 @@ export const useAddToWallet = (
   const [canAddToWallet, setCanAddToWallet] = useState(false)
   const [isAdding, setIsAdding] = useState(false)
   const { run } = useInFlightGuard()
+  const isMounted = useIsMounted()
 
   const walletCard = useMemo<WalletCard | undefined>(
     () => (cardId && lastFour ? { cardId, lastFour } : undefined),
     [cardId, lastFour],
   )
+  const shownCardRef = useRef(walletCard)
 
   useEffect(() => {
+    shownCardRef.current = walletCard
     setCanAddToWallet(false)
     if (!walletCard) return
 
@@ -46,20 +50,22 @@ export const useAddToWallet = (
   const addToWallet = useCallback(async () => {
     if (!walletCard) return
 
-    /** One wallet sheet at a time: a second tap before the first answer must not open
-     *  another one. */
+    /** One wallet sheet at a time, and an answer only lands on the screen and the card
+     *  that asked for it: a card switched or a screen left mid-add drops the late result. */
     await run(async () => {
+      const isStillShown = () => isMounted() && shownCardRef.current === walletCard
       setIsAdding(true)
       try {
         const result = await addCardToWallet(walletCard)
-        if (result === WalletAddResult.Added) setCanAddToWallet(false)
+        const shouldStopOffering = result === WalletAddResult.Added && isStillShown()
+        if (shouldStopOffering) setCanAddToWallet(false)
       } catch {
-        toastShow({ message: LL.errors.unexpectedError(), LL })
+        if (isStillShown()) toastShow({ message: LL.errors.unexpectedError(), LL })
       } finally {
-        setIsAdding(false)
+        if (isMounted()) setIsAdding(false)
       }
     })
-  }, [walletCard, run, LL])
+  }, [walletCard, run, isMounted, LL])
 
   return { canAddToWallet, isAdding, addToWallet }
 }
