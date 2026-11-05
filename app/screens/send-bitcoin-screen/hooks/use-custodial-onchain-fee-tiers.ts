@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
-import { gql } from "@apollo/client"
+import { type ApolloError, gql } from "@apollo/client"
 
 import {
   type OnChainTxFeeBySpeedQuery,
@@ -163,6 +163,20 @@ const FEE_UNIT_BY_QUOTE: Record<OnchainFeeQuote, FeeUnit> = {
   [OnchainFeeQuote.UsdAsBtcDenominated]: FeeUnit.Cents,
 }
 
+/**
+ * The backend's code for a payout to the sending wallet's own address (blink-mobile#4261).
+ * It is the only rejection the sender can't fix by changing the amount, so it is told apart
+ * by its code; the message text is never read.
+ */
+const SELF_PAYMENT_ERROR_CODE = "CANT_PAY_SELF"
+
+const isSelfPaymentRejection = (error: ApolloError | undefined): boolean =>
+  Boolean(
+    error?.graphQLErrors.some(
+      ({ extensions }) => extensions?.code === SELF_PAYMENT_ERROR_CODE,
+    ),
+  )
+
 const EMPTY_TIERS = Object.freeze(
   buildZeroTiers(CUSTODIAL_PAYOUT_ETA_MINUTES, FeeUnit.Sats),
 )
@@ -207,6 +221,8 @@ type CustodialOnchainFeeTiersParams = {
 type CustodialOnchainFeeTiersResult = {
   tiers: Record<FeeTierOption, FeeTierInfo>
   hasError: boolean
+  /** The failure is the address belonging to the sending wallet, which no amount can fix. */
+  isSelfPayment: boolean
   hasQuote: boolean
   isQuoting: boolean
 }
@@ -218,6 +234,8 @@ export const useCustodialOnchainFeeTiers = ({
   quote,
 }: CustodialOnchainFeeTiersParams): CustodialOnchainFeeTiersResult => {
   const [tiers, setTiers] = useState(EMPTY_TIERS)
+  // Read only while the current inputs have failed, so a stale value is never shown.
+  const [isSelfPaymentFailure, setIsSelfPaymentFailure] = useState(false)
   /** Null until every input a quote needs is in hand, which is what gates the fetch below. */
   const inputsKey =
     walletId && address && amount && quote
@@ -256,9 +274,10 @@ export const useCustodialOnchainFeeTiers = ({
     setTiers(EMPTY_TIERS)
 
     /** Every failure lands the same way on screen; only what is reported differs. */
-    const failQuote = (err: unknown, isExpected: boolean) => {
+    const failQuote = (err: unknown, isExpected: boolean, isSelfPayment = false) => {
       reportError("use-custodial-onchain-fee-tiers", err, { expected: isExpected })
       setTiers(EMPTY_TIERS)
+      setIsSelfPaymentFailure(isSelfPayment)
       markFailed()
     }
 
@@ -275,7 +294,11 @@ export const useCustodialOnchainFeeTiers = ({
          * an empty response with nothing to explain it is a defect of its own.
          */
         const isInputRejection = Boolean(error?.graphQLErrors.length)
-        failQuote(error ?? new Error("Missing on-chain fee data"), isInputRejection)
+        failQuote(
+          error ?? new Error("Missing on-chain fee data"),
+          isInputRejection,
+          isSelfPaymentRejection(error),
+        )
         return
       }
 
@@ -303,5 +326,11 @@ export const useCustodialOnchainFeeTiers = ({
     fetchFees()
   }, [fetchFees])
 
-  return { tiers, hasError: hasFailed, hasQuote, isQuoting }
+  return {
+    tiers,
+    hasError: hasFailed,
+    isSelfPayment: hasFailed && isSelfPaymentFailure,
+    hasQuote,
+    isQuoting,
+  }
 }
