@@ -1,5 +1,6 @@
 import React, { useEffect } from "react"
 import { Pressable, View } from "react-native"
+import ContentLoader, { Rect } from "react-content-loader/native"
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -18,9 +19,12 @@ export const SEND_WALLET_SUMMARY_TEST_ID = "choose-wallet-to-send-from"
 export const SEND_WALLET_SECONDARY_TEST_ID = "send-wallet-balance-secondary"
 export const SEND_WALLET_SIZER_TEST_ID = "send-wallet-balance-sizer"
 export const SEND_WALLET_LINES_TEST_ID = "send-wallet-balance-lines"
+export const WALLET_SUMMARY_LOADER_TEST_ID = "wallet-summary-balance-loader"
 
 const SWITCH_ANIMATION_MS = 180
 const SWITCH_OFFSET = 8
+const LOADER_WIDTH = 100
+const LOADER_HEIGHT = 18
 
 export type WalletSummaryProps = {
   /** "ALL" only where a screen lists both wallets at once (transaction history). */
@@ -40,6 +44,8 @@ export type WalletSummaryProps = {
   inactive?: boolean
   /** Swaps the balances for the hidden-balance dots, keeping the card's height. */
   balanceHidden?: boolean
+  /** Swaps the balances for a loading bar while an amount the card needs is still missing. */
+  balanceLoading?: boolean
 }
 
 /**
@@ -55,6 +61,7 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
   switchTo,
   inactive = false,
   balanceHidden = false,
+  balanceLoading = false,
 }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
@@ -116,13 +123,33 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
         >
-          <Text style={styles.balancePrimary}>{balancePrimary}</Text>
+          <Text style={styles.balancePrimary}>{balancePrimary || " "}</Text>
           <Text style={styles.balanceSecondary}> </Text>
         </View>
         {/* The visible lines sit over it, centred: a dollar wallet shown in USD is one line. */}
         {balanceHidden ? (
           <View style={styles.balancesVisible}>
             <HiddenBalancePlaceholder size="small" />
+          </View>
+        ) : balanceLoading ? (
+          <View style={styles.balancesVisible} testID={WALLET_SUMMARY_LOADER_TEST_ID}>
+            <ContentLoader
+              height={LOADER_HEIGHT}
+              width={LOADER_WIDTH}
+              speed={1.2}
+              backgroundColor={styles.loaderBackground.color}
+              foregroundColor={styles.loaderForeground.color}
+              viewBox={`0 0 ${LOADER_WIDTH} ${LOADER_HEIGHT}`}
+            >
+              <Rect
+                x="0"
+                y="0"
+                rx="4"
+                ry="4"
+                width={LOADER_WIDTH}
+                height={LOADER_HEIGHT}
+              />
+            </ContentLoader>
           </View>
         ) : (
           <Animated.View
@@ -169,6 +196,12 @@ const useStyles = makeStyles(({ colors }) => ({
     borderColor: colors.transparent,
     paddingHorizontal: 14,
     paddingVertical: 14,
+  },
+  loaderBackground: {
+    color: colors.loaderBackground,
+  },
+  loaderForeground: {
+    color: colors.loaderForeground,
   },
   cardInactive: {
     backgroundColor: colors.grey7,

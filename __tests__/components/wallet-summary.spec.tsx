@@ -8,6 +8,7 @@ import {
   SEND_WALLET_SECONDARY_TEST_ID,
   SEND_WALLET_SIZER_TEST_ID,
   SEND_WALLET_SUMMARY_TEST_ID,
+  WALLET_SUMMARY_LOADER_TEST_ID,
   WalletSummary,
 } from "@app/components/wallet-summary"
 import { WalletCurrency } from "@app/graphql/generated"
@@ -110,6 +111,22 @@ describe("WalletSummary", () => {
       renderCard({ balanceHidden: true })
 
       expect(card().props.accessibilityLabel).toBe("All accounts")
+    })
+  })
+
+  describe("loading balances", () => {
+    it("shows a loading bar in place of the amounts", () => {
+      renderCard({ balancePrimary: "", balanceLoading: true })
+
+      expect(screen.getByTestId(WALLET_SUMMARY_LOADER_TEST_ID)).toBeTruthy()
+      expect(screen.queryByTestId(SEND_WALLET_LINES_TEST_ID)).toBeNull()
+    })
+
+    it("keeps the dots when balances are hidden", () => {
+      renderCard({ balancePrimary: "", balanceLoading: true, balanceHidden: true })
+
+      expect(screen.getByTestId("hidden-balance-placeholder")).toBeTruthy()
+      expect(screen.queryByTestId(WALLET_SUMMARY_LOADER_TEST_ID)).toBeNull()
     })
   })
 

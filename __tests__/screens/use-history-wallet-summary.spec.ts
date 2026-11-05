@@ -109,6 +109,49 @@ describe("useHistoryWalletSummary", () => {
     expect(summaryFor("ALL").nextWallet).toBe(WalletCurrency.Btc)
   })
 
+  describe("while a balance it needs is missing", () => {
+    it("flags All as loading instead of rendering an empty amount", () => {
+      mockUseSendWallets.mockReturnValue({
+        btcWallet,
+        usdWallet: undefined,
+        loading: true,
+      })
+
+      const summary = summaryFor("ALL")
+
+      expect(summary.balanceLoading).toBe(true)
+      expect(summary.balancePrimary).toBe("")
+      expect(summary.balanceSecondary).toBeUndefined()
+    })
+
+    it("flags All as loading when the bitcoin wallet is missing", () => {
+      mockUseSendWallets.mockReturnValue({
+        btcWallet: undefined,
+        usdWallet,
+        loading: true,
+      })
+
+      expect(summaryFor("ALL").balanceLoading).toBe(true)
+    })
+
+    it("still shows Bitcoin, which doesn't need the dollar balance", () => {
+      mockUseSendWallets.mockReturnValue({
+        btcWallet,
+        usdWallet: undefined,
+        loading: true,
+      })
+
+      const summary = summaryFor(WalletCurrency.Btc)
+
+      expect(summary.balanceLoading).toBe(false)
+      expect(summary.balancePrimary).toBe("1000 BTC")
+    })
+
+    it("is not loading once both balances are in", () => {
+      expect(summaryFor("ALL").balanceLoading).toBe(false)
+    })
+  })
+
   it("falls back to the bitcoin balance alone when prices are not loaded", () => {
     mockHasConversion = false
 
