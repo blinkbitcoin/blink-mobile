@@ -121,27 +121,29 @@ const captureListener = (): { current: SdkEventListener | null } => {
 
 const buildSdk = (id: string) => ({ id }) as unknown as object
 
-describe("useSdkLifecycle", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockDepositClaimLeewayVbyte = 7
-    mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
-    mockValidateStoredNetwork.mockResolvedValue(true)
-    mockGetSnapshot.mockResolvedValue({
-      wallets: [],
-      allTransactions: [],
-      hasMore: false,
-      rawTransactionCount: 0,
-    })
-    mockAddSdkEventListener.mockResolvedValue("listener-id")
-    mockRemoveSdkEventListener.mockResolvedValue(undefined)
-    mockGetUserSettings.mockResolvedValue({ stableBalanceActiveLabel: undefined })
-    mockDisconnectSdk.mockResolvedValue(undefined)
-    const isOnline = jest.requireMock("@app/self-custodial/providers/is-online")
-    isOnline.getOnlineState.mockResolvedValue("online")
-    isOnline.getServiceStatus.mockResolvedValue(0)
-    isOnline.isDegradedStatus.mockReturnValue(false)
+const resetMocks = () => {
+  jest.clearAllMocks()
+  mockDepositClaimLeewayVbyte = 7
+  mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
+  mockValidateStoredNetwork.mockResolvedValue(true)
+  mockGetSnapshot.mockResolvedValue({
+    wallets: [],
+    allTransactions: [],
+    hasMore: false,
+    rawTransactionCount: 0,
   })
+  mockAddSdkEventListener.mockResolvedValue("listener-id")
+  mockRemoveSdkEventListener.mockResolvedValue(undefined)
+  mockGetUserSettings.mockResolvedValue({ stableBalanceActiveLabel: undefined })
+  mockDisconnectSdk.mockResolvedValue(undefined)
+  const isOnline = jest.requireMock("@app/self-custodial/providers/is-online")
+  isOnline.getOnlineState.mockResolvedValue("online")
+  isOnline.getServiceStatus.mockResolvedValue(0)
+  isOnline.isDegradedStatus.mockReturnValue(false)
+}
+
+describe("useSdkLifecycle", () => {
+  beforeEach(resetMocks)
 
   describe("inactive paths", () => {
     it("stays Unavailable and never calls initSdk when accountId is null", async () => {
@@ -848,5 +850,87 @@ describe("useSdkLifecycle", () => {
         expect(mockInitSdk).toHaveBeenCalledTimes(2)
       })
     })
+  })
+})
+
+describe("useSdkLifecycle loadMore while a page is loading", () => {
+  beforeEach(resetMocks)
+
+  it("reads one page when a second call arrives while the first is loading", async () => {
+    const sdk = buildSdk("sdk-1")
+    mockInitSdk.mockResolvedValue(sdk)
+    captureListener()
+
+    const { loadMoreTransactions: loadMoreMock } = jest.requireMock(
+      "@app/self-custodial/providers/wallet-snapshot",
+    )
+    let resolvePage: (page: unknown) => void = () => {}
+    loadMoreMock.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolvePage = resolve
+        }),
+    )
+    loadMoreMock.mockResolvedValue({ transactions: [], hasMore: true, rawCount: 20 })
+    mockGetSnapshot.mockResolvedValue({
+      wallets: [],
+      allTransactions: [],
+      hasMore: true,
+      rawTransactionCount: 0,
+    })
+
+    const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+    await waitFor(() => {
+      expect(result.current.hasMoreTransactions).toBe(true)
+    })
+
+    let first: Promise<boolean> = Promise.resolve(false)
+    let second: Promise<boolean> = Promise.resolve(false)
+    act(() => {
+      first = result.current.loadMore()
+      second = result.current.loadMore()
+    })
+    await act(async () => {
+      resolvePage({ transactions: [], hasMore: true, rawCount: 20 })
+      await Promise.all([first, second])
+    })
+
+    expect(loadMoreMock).toHaveBeenCalledTimes(1)
+    await expect(first).resolves.toBe(true)
+    await expect(second).resolves.toBe(true)
+
+    // The offset moved by one page, not two.
+    await act(async () => {
+      await result.current.loadMore()
+    })
+    expect(loadMoreMock).toHaveBeenLastCalledWith(sdk, 20)
+  })
+
+  it("resolves false when the page fails to load", async () => {
+    mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+    captureListener()
+    const { loadMoreTransactions: loadMoreMock } = jest.requireMock(
+      "@app/self-custodial/providers/wallet-snapshot",
+    )
+    loadMoreMock.mockRejectedValueOnce(new Error("sdk offline"))
+    mockGetSnapshot.mockResolvedValue({
+      wallets: [],
+      allTransactions: [],
+      hasMore: true,
+      rawTransactionCount: 0,
+    })
+
+    const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+    await waitFor(() => {
+      expect(result.current.hasMoreTransactions).toBe(true)
+    })
+
+    let loaded: boolean | undefined
+    await act(async () => {
+      loaded = await result.current.loadMore()
+    })
+
+    expect(loaded).toBe(false)
+    expect(result.current.loadingMore).toBe(false)
   })
 })

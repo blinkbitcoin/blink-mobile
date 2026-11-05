@@ -62,7 +62,8 @@ type SelfCustodialWalletContextValue = ActiveWalletState & {
   lastReceivedPaymentId: string | null
   hasMoreTransactions: boolean
   loadingMore: boolean
-  loadMore: () => Promise<void>
+  /** Resolves true once a page was read, false when none was (no more pages, or it failed). */
+  loadMore: () => Promise<boolean>
   refreshWallets: () => Promise<void>
   refreshStableBalanceActive: () => Promise<void>
   updateCurrentSelfCustodialAccount: () => Promise<void>
@@ -83,7 +84,7 @@ const defaultState: SelfCustodialWalletContextValue = {
   lastReceivedPaymentId: null,
   hasMoreTransactions: false,
   loadingMore: false,
-  loadMore: noop,
+  loadMore: async () => false,
   refreshWallets: noop,
   refreshStableBalanceActive: noop,
   updateCurrentSelfCustodialAccount: noop,
