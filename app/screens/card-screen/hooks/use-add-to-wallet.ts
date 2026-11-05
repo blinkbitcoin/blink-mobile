@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 
+import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toastShow } from "@app/utils/toast"
 
@@ -17,6 +18,7 @@ export const useAddToWallet = (
   const { LL } = useI18nContext()
   const [canAddToWallet, setCanAddToWallet] = useState(false)
   const [isAdding, setIsAdding] = useState(false)
+  const { run } = useInFlightGuard()
 
   const walletCard = useMemo<WalletCard | undefined>(
     () => (cardId && lastFour ? { cardId, lastFour } : undefined),
@@ -44,16 +46,20 @@ export const useAddToWallet = (
   const addToWallet = useCallback(async () => {
     if (!walletCard) return
 
-    setIsAdding(true)
-    try {
-      const result = await addCardToWallet(walletCard)
-      if (result === WalletAddResult.Added) setCanAddToWallet(false)
-    } catch {
-      toastShow({ message: LL.errors.unexpectedError(), LL })
-    } finally {
-      setIsAdding(false)
-    }
-  }, [walletCard, LL])
+    /** One wallet sheet at a time: a second tap before the first answer must not open
+     *  another one. */
+    await run(async () => {
+      setIsAdding(true)
+      try {
+        const result = await addCardToWallet(walletCard)
+        if (result === WalletAddResult.Added) setCanAddToWallet(false)
+      } catch {
+        toastShow({ message: LL.errors.unexpectedError(), LL })
+      } finally {
+        setIsAdding(false)
+      }
+    })
+  }, [walletCard, run, LL])
 
   return { canAddToWallet, isAdding, addToWallet }
 }
