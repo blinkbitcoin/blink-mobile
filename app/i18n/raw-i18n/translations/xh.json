@@ -2473,7 +2473,8 @@
     "sdkInsufficientFunds": "Imali ayonelanga kulo msebenzi.",
     "sdkAmountTooLow": "Imali iphantsi kakhulu kumsebenzi we-on-chain.",
     "sdkNetworkError": "Impazamo yenethiwekhi. Khawujonge unxibelelwano lwakho uze uzame kwakhona.",
-    "sdkGenericError": "Ayikwazi ukuqikelela iintlawulo. Nceda uzame imali eyahlukileyo."
+    "sdkGenericError": "Ayikwazi ukuqikelela iintlawulo. Nceda uzame imali eyahlukileyo.",
+    "onchainSelfPayment": "Le yidilesi yesipaji sakho. Awungekhe uzithumelele intlawulo ye-on-chain."
   },
   "SettingsScreen": {
     "createAddress": "Yenza idilesi ye-Lightning",

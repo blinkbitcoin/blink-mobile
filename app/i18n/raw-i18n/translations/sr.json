@@ -2473,7 +2473,8 @@
     "sdkInsufficientFunds": "Nedovoljno sredstava za ovu transakciju.",
     "sdkAmountTooLow": "Iznos je prenizak za on-chain transakciju.",
     "sdkNetworkError": "Greška mreže. Proverite vezu i pokušajte ponovo.",
-    "sdkGenericError": "Nije moguće proceniti naknade. Pokušajte sa drugim iznosom."
+    "sdkGenericError": "Nije moguće proceniti naknade. Pokušajte sa drugim iznosom.",
+    "onchainSelfPayment": "Ovo je adresa vašeg sopstvenog novčanika. Ne možete poslati on-chain uplatu sami sebi."
   },
   "SettingsScreen": {
     "createAddress": "Направи Lightning адресу",

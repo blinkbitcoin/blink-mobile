@@ -2473,7 +2473,8 @@
     "sdkInsufficientFunds": "Ikke nok midler til denne transaktion.",
     "sdkAmountTooLow": "Beløbet er for lavt til en on-chain transaktion.",
     "sdkNetworkError": "Netværksfejl. Tjek din forbindelse og prøv igen.",
-    "sdkGenericError": "Kan ikke estimere gebyrer. Prøv venligst et andet beløb."
+    "sdkGenericError": "Kan ikke estimere gebyrer. Prøv venligst et andet beløb.",
+    "onchainSelfPayment": "Dette er din egen wallets adresse. Du kan ikke sende en on-chain betaling til dig selv."
   },
   "SettingsScreen": {
     "createAddress": "Opret Lightning-adresse",

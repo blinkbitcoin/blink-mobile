@@ -2473,7 +2473,8 @@
     "sdkInsufficientFunds": "Nedostatok prostriedkov pre túto transakciu.",
     "sdkAmountTooLow": "Suma je príliš nízka pre on-chain transakciu.",
     "sdkNetworkError": "Chyba siete. Skontrolujte pripojenie a skúste to znova.",
-    "sdkGenericError": "Nie je možné odhadnúť poplatky. Skúste inú sumu."
+    "sdkGenericError": "Nie je možné odhadnúť poplatky. Skúste inú sumu.",
+    "onchainSelfPayment": "Toto je adresa vašej vlastnej peňaženky. Nemôžete poslať on-chain platbu sami sebe."
   },
   "SettingsScreen": {
     "createAddress": "Vytvoriť Lightning adresu",
