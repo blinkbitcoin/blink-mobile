@@ -112,7 +112,7 @@ export const ReplaceCardScreen: React.FC = () => {
       iconName: "delivery",
       iconColor: colors._green,
       lastFour: result.lastFour,
-      cardId,
+      cardId: result.id,
     })
   }, [
     replaceCard,
