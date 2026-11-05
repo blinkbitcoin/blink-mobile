@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires, camelcase */
 import React from "react"
 
-import { act, render, waitFor } from "@testing-library/react-native"
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 import { InteractionManager, SectionList } from "react-native"
 
 import { markTxLastSeenId } from "@app/graphql/client-only-query"
@@ -84,6 +84,12 @@ jest.mock("@app/graphql/generated", () => ({
 
 jest.mock("@app/graphql/client-only-query", () => ({ markTxLastSeenId: jest.fn() }))
 
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
 /** Re-renders its readers on every update, as the real provider does, so a test sees what
  *  the screen does with its own writes and not only the state it started from. */
 let mockPersistentState: PersistentState
@@ -128,6 +134,22 @@ const custodialQueryWithData = {
   loading: false,
 }
 
+/** No transactions loaded yet, but older pages to search through. */
+const custodialQueryWithMorePages = {
+  ...custodialQueryWithData,
+  data: {
+    me: {
+      defaultAccount: {
+        ...custodialQueryWithData.data.me.defaultAccount,
+        transactions: {
+          edges: [],
+          pageInfo: { hasNextPage: true, endCursor: "cursor-1" },
+        },
+      },
+    },
+  },
+}
+
 const selfCustodialQueryEmpty = {
   data: undefined,
   previousData: undefined,
@@ -154,11 +176,16 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
 }))
 
 const mockRefreshSelfCustodialWallets = jest.fn().mockResolvedValue(undefined)
-const mockSelfCustodialLoadMore = jest.fn().mockResolvedValue(undefined)
-const mockSelfCustodialState: { allTransactions: unknown[] } = { allTransactions: [] }
+const mockSelfCustodialLoadMore = jest.fn().mockResolvedValue(true)
+const mockSelfCustodialState: { allTransactions: unknown[]; hasMore: boolean } = {
+  allTransactions: [],
+  hasMore: false,
+}
 jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({
     allTransactions: mockSelfCustodialState.allTransactions,
+    hasMoreTransactions: mockSelfCustodialState.hasMore,
+    loadingMore: false,
     loadMore: mockSelfCustodialLoadMore,
     refreshWallets: mockRefreshSelfCustodialWallets,
   }),
@@ -213,8 +240,16 @@ jest.mock("@app/screens/transaction-history/use-history-wallet-summary", () => {
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
-      common: { transactionsError: () => "tx error" },
-      TransactionScreen: { noTransaction: () => "No transactions" },
+      common: { transactionsError: () => "tx error", search: () => "Search" },
+      TransactionScreen: {
+        noTransaction: () => "No transactions",
+        filters: () => "Filters",
+        sent: () => "Sent",
+        received: () => "Received",
+        searchPlaceholder: () => "Search...",
+        expandingSearch: () => "Expanding search",
+        nothingCameBack: () => "Nothing came back",
+      },
     },
     locale: "en",
   }),
@@ -274,6 +309,7 @@ describe("TransactionHistoryScreen — self-custodial behavior", () => {
     jest.clearAllMocks()
     mockTransitionState.hasTransitioned = true
     mockSelfCustodialState.allTransactions = []
+    mockSelfCustodialState.hasMore = false
     mockToTransactionFragments.mockReturnValue([])
     /** An account that already has its seen record, so these tests read the seen state
      *  itself rather than the start of a new or restored account. */
@@ -570,5 +606,110 @@ describe("TransactionHistoryScreen — self-custodial behavior", () => {
 
     expect(queryByTestId("transaction-history-skeleton")).toBeNull()
     expect(UNSAFE_getByType(SectionList)).toBeTruthy()
+  })
+
+  describe("expanding search", () => {
+    // Switching Received off on a list with no sent payments filters it down to nothing.
+    const filterToNothing = async (screen: ReturnType<typeof render>) => {
+      const options = mockSetOptions.mock.calls[mockSetOptions.mock.calls.length - 1][0]
+      await act(async () => {
+        options.headerRight().props.onPress()
+      })
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("filter-received"))
+      })
+    }
+
+    const deferred = <T,>() => {
+      let resolve: (value: T) => void = () => {}
+      const promise = new Promise<T>((r) => {
+        resolve = r
+      })
+      return { promise, resolve }
+    }
+
+    it("custodial: a failed page settles on Nothing came back and isn't asked for again", async () => {
+      setActiveWallet(false)
+      mockUseTransactionListQuery.mockReturnValue(custodialQueryWithMorePages)
+      mockFetchMore.mockRejectedValue(new Error("network"))
+
+      const screen = render(<TransactionHistoryScreen route={route} />)
+      await filterToNothing(screen)
+
+      expect(await screen.findByText("Nothing came back")).toBeTruthy()
+      await flushEffects()
+      expect(mockFetchMore).toHaveBeenCalledTimes(1)
+      expect(screen.queryByText("Expanding search")).toBeNull()
+      expect(mockReportError).toHaveBeenCalledWith(
+        "transaction-history-search",
+        expect.any(Error),
+      )
+    })
+
+    it("custodial: a page with no new transactions stops the search", async () => {
+      setActiveWallet(false)
+      mockUseTransactionListQuery.mockReturnValue(custodialQueryWithMorePages)
+      mockFetchMore.mockResolvedValue({
+        data: { me: { defaultAccount: { transactions: { edges: [] } } } },
+      })
+
+      const screen = render(<TransactionHistoryScreen route={route} />)
+      await filterToNothing(screen)
+
+      expect(await screen.findByText("Nothing came back")).toBeTruthy()
+      await flushEffects()
+      expect(mockFetchMore).toHaveBeenCalledTimes(1)
+    })
+
+    it("custodial: pulling to refresh retries a stalled search", async () => {
+      setActiveWallet(false)
+      mockUseTransactionListQuery.mockReturnValue(custodialQueryWithMorePages)
+      mockFetchMore.mockRejectedValue(new Error("network"))
+
+      const screen = render(<TransactionHistoryScreen route={route} />)
+      await filterToNothing(screen)
+      await screen.findByText("Nothing came back")
+
+      await act(async () => {
+        await screen.UNSAFE_getByType(SectionList).props.onRefresh?.()
+      })
+
+      await waitFor(() => expect(mockFetchMore).toHaveBeenCalledTimes(2))
+    })
+
+    it("self-custodial: a page that fails to load settles on Nothing came back", async () => {
+      mockSelfCustodialState.hasMore = true
+      mockSelfCustodialLoadMore.mockResolvedValue(false)
+      setActiveWallet(true)
+
+      const screen = render(<TransactionHistoryScreen route={route} />)
+      await filterToNothing(screen)
+
+      expect(await screen.findByText("Nothing came back")).toBeTruthy()
+      await flushEffects()
+      expect(mockSelfCustodialLoadMore).toHaveBeenCalledTimes(1)
+    })
+
+    it("turns the list's own paging off while the search loads pages", async () => {
+      mockSelfCustodialState.hasMore = true
+      const page = deferred<boolean>()
+      mockSelfCustodialLoadMore.mockReturnValue(page.promise)
+      setActiveWallet(true)
+
+      const screen = render(<TransactionHistoryScreen route={route} />)
+      expect(screen.UNSAFE_getByType(SectionList).props.onEndReached).toEqual(
+        expect.any(Function),
+      )
+
+      await filterToNothing(screen)
+
+      expect(screen.getByText("Expanding search")).toBeTruthy()
+      expect(screen.UNSAFE_getByType(SectionList).props.onEndReached).toBeUndefined()
+      expect(mockSelfCustodialLoadMore).toHaveBeenCalledTimes(1)
+
+      await act(async () => {
+        page.resolve(false)
+      })
+    })
   })
 })
