@@ -1,12 +1,12 @@
 import React from "react"
-import { View } from "react-native"
+import { Pressable, View } from "react-native"
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   type SharedValue,
 } from "react-native-reanimated"
 import { useIsFocused } from "@react-navigation/native"
-import { Text, makeStyles, ListItem } from "@rn-vui/themed"
+import { Text, makeStyles, ListItem, useTheme } from "@rn-vui/themed"
 import { useFragment } from "@apollo/client"
 
 import {
@@ -14,6 +14,7 @@ import {
   TransactionFragmentDoc,
   WalletCurrency,
 } from "@app/graphql/generated"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useAppConfig } from "@app/hooks"
@@ -100,25 +101,41 @@ const BounceOnFocus: React.FC<{
   return null
 }
 
+/**
+ * `list` is the full-width row Home uses. `card` is the 2026 row: it sits in a rounded
+ * date-group card (transaction history, contact screen), so the group's outer rows carry
+ * the corners and every other row a divider on top.
+ */
+export type TransactionItemVariant = "list" | "card"
+
 type Props = {
   txid: string
+  variant?: TransactionItemVariant
   subtitle?: boolean
   isFirst?: boolean
   isLast?: boolean
   isOnHomeScreen?: boolean
   testId?: string
   highlight?: boolean
+  /**
+   * Whether a highlighted row may bounce. Read once, when the row mounts: a list that
+   * remounts its rows (filtering rebuilds the sections) passes false for a row that has
+   * already bounced, and a bounce in progress is never cut short by the value changing.
+   */
+  bounce?: boolean
   onPress?: (txid: string) => void
 }
 
 const TransactionItem: React.FC<Props> = ({
   txid,
+  variant = "list",
   subtitle = false,
   isFirst = false,
   isLast = false,
   isOnHomeScreen = false,
   testId = "transaction-item",
   highlight = false,
+  bounce = true,
   onPress,
 }) => {
   // makeStyles memoizes on the props object identity, so an object literal here
@@ -128,6 +145,10 @@ const TransactionItem: React.FC<Props> = ({
     [isFirst, isLast, isOnHomeScreen, highlight],
   )
   const styles = useStyles(styleProps)
+  const cardStyles = useCardStyles(styleProps)
+  const {
+    theme: { colors },
+  } = useTheme()
 
   const scale = useSharedValue(1)
   const animatedStyle = useAnimatedStyle(
@@ -143,6 +164,7 @@ const TransactionItem: React.FC<Props> = ({
   // never mount it, so they never subscribe to navigation focus.
   const everHighlighted = React.useRef(highlight)
   if (highlight) everHighlighted.current = true
+  const canBounce = React.useRef(bounce).current
 
   const { data: tx } = useFragment<TransactionFragment>({
     fragment: TransactionFragmentDoc,
@@ -210,6 +232,77 @@ const TransactionItem: React.FC<Props> = ({
       ? undefined
       : formattedSettlementAmount
 
+  if (variant === "card") {
+    // Only the wallet-currency amount carries the sign; the display amount above it reads
+    // as a plain price, unless it is the only line.
+    const cardDisplayAmount = formattedSecondaryAmount
+      ? formatCurrency({
+          amountInMajorUnits: Math.abs(Number(tx.settlementDisplayAmount)),
+          currency: tx.settlementDisplayCurrency,
+        })
+      : formattedDisplayAmount
+    const cardAmountStyle = isReceive ? cardStyles.receive : cardStyles.send
+    const iconName =
+      walletCurrency === WalletCurrency.Usd
+        ? "dollar"
+        : tx.settlementVia?.__typename === "SettlementViaOnChain"
+          ? "bitcoin"
+          : "lightning"
+
+    return (
+      <Animated.View style={animatedStyle}>
+        {everHighlighted.current && canBounce ? (
+          <BounceOnFocus visible={highlight} scale={scale} />
+        ) : null}
+        <Pressable
+          {...testProps(testId)}
+          style={cardStyles.container}
+          onPress={onPress ? handlePress : undefined}
+          disabled={!onPress}
+          accessibilityRole={onPress ? "button" : undefined}
+        >
+          {isFirst ? null : <View style={cardStyles.divider} />}
+          <GaloyIcon name={iconName} size={20} color={colors.primary} />
+          <View style={cardStyles.content} {...testProps("list-item-content")}>
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={cardStyles.title}
+              {...testProps("tx-description")}
+            >
+              {description}
+            </Text>
+            {subtitle ? (
+              <Text style={cardStyles.subtitle}>
+                <TransactionDate
+                  createdAt={tx.createdAt}
+                  status={tx.status}
+                  includeTime={false}
+                />
+              </Text>
+            ) : null}
+          </View>
+          <View style={cardStyles.amounts}>
+            {hideAmount ? (
+              <HiddenBalancePlaceholder size="small" />
+            ) : (
+              <>
+                <Text style={[cardStyles.amountPrimary, cardAmountStyle]}>
+                  {cardDisplayAmount}
+                </Text>
+                {formattedSecondaryAmount && (
+                  <Text style={[cardStyles.amountSecondary, cardAmountStyle]}>
+                    {formattedSecondaryAmount}
+                  </Text>
+                )}
+              </>
+            )}
+          </View>
+        </Pressable>
+      </Animated.View>
+    )
+  }
+
   return (
     // Always wrapped, so the element type at this position never depends on
     // `highlight`: React does not diff across a type change, and swapping the
@@ -218,7 +311,7 @@ const TransactionItem: React.FC<Props> = ({
     // below is conditional, and it sits in its own child slot so toggling it
     // leaves the row beside it untouched.
     <Animated.View style={animatedStyle}>
-      {everHighlighted.current ? (
+      {everHighlighted.current && canBounce ? (
         <BounceOnFocus visible={highlight} scale={scale} />
       ) : null}
       <ListItem
@@ -325,5 +418,64 @@ const useStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
     alignItems: "flex-end",
     justifyContent: "center",
     minHeight: 40,
+  },
+}))
+
+/** Figma `transaction-2026`: Paragraph 3 title over a Paragraph 4 date, amounts on the right. */
+const useCardStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 10,
+    padding: 10,
+    overflow: "hidden",
+    backgroundColor: props.highlight ? colors.grey4 : colors.grey5,
+    borderTopLeftRadius: props.isFirst ? 8 : 0,
+    borderTopRightRadius: props.isFirst ? 8 : 0,
+    borderBottomLeftRadius: props.isLast ? 8 : 0,
+    borderBottomRightRadius: props.isLast ? 8 : 0,
+  },
+  /** Figma `Line` between rows, inset 10 from each side like the row's padding. */
+  divider: {
+    position: "absolute",
+    top: 0,
+    left: 10,
+    right: 10,
+    height: 1,
+    backgroundColor: colors.grey4,
+  },
+  content: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 14,
+    lineHeight: 18,
+    color: colors.black,
+  },
+  subtitle: {
+    fontSize: 12,
+    lineHeight: 18,
+    color: colors.grey2,
+  },
+  amounts: {
+    alignItems: "flex-end",
+    justifyContent: "center",
+    minHeight: 36,
+  },
+  amountPrimary: {
+    fontSize: 14,
+    lineHeight: 18,
+    textAlign: "right",
+  },
+  amountSecondary: {
+    fontSize: 12,
+    lineHeight: 18,
+    textAlign: "right",
+  },
+  receive: {
+    color: colors._green,
+  },
+  send: {
+    color: colors.black,
   },
 }))

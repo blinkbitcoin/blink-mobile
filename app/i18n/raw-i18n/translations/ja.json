@@ -2731,7 +2731,13 @@
         "noTransaction": "トランザクションがありません",
         "title": "トランザクション",
         "recentTransactions": "最近のトランザクション",
-        "transactionHistoryTitle": "トランザクション履歴"
+        "transactionHistoryTitle": "トランザクション履歴",
+        "filters": "フィルター",
+        "sent": "送金",
+        "received": "受金",
+        "searchPlaceholder": "検索...",
+        "expandingSearch": "検索範囲を広げています",
+        "nothingCameBack": "結果がありません"
     },
     "TransferScreen": {
         "title": "送金",
@@ -3103,6 +3109,9 @@
     },
     "AmountInputButton": {
         "tapToSetAmount": "金額を設定する"
+    },
+    "Accessibility": {
+        "switchToWallet": "{wallet: string} に切り替える"
     },
     "AppUpdate": {
         "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",

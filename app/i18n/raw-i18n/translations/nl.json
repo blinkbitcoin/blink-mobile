@@ -2731,7 +2731,13 @@
     "noTransaction": "Geen transactie om weer te geven",
     "title": "Transacties",
     "recentTransactions": "Recente transacties",
-    "transactionHistoryTitle": "Transactie Geschiedenis"
+    "transactionHistoryTitle": "Transactiegeschiedenis",
+    "filters": "Filters",
+    "sent": "Verzonden",
+    "received": "Ontvangen",
+    "searchPlaceholder": "Zoek...",
+    "expandingSearch": "Zoekopdracht wordt uitgebreid",
+    "nothingCameBack": "Niets gevonden"
   },
   "TransferScreen": {
     "title": "Overmaking",
@@ -3020,7 +3026,7 @@
       "other": "Dagen"
     },
     "dollar": "dollar",
-    "all": "ALLES",
+    "all": "Alles",
     "allAccounts": "Alle accounts",
     "some": "Sommige",
     "support": "Ondersteuning",
@@ -3103,6 +3109,9 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Stel bedrag in"
+  },
+  "Accessibility": {
+    "switchToWallet": "Overschakelen naar {wallet: string}"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ik moet mijn app bijwerken naar de nieuwste versie. Ik gebruik de app {os: string} met versie {version: string}.",

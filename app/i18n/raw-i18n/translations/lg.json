@@ -2731,7 +2731,13 @@
     "noTransaction": "Tewali mpanyisa z'okulaga",
     "title": "Empanyisa zonna",
     "recentTransactions": "Ewaanyisiganya Egyakakolebwa",
-    "transactionHistoryTitle": "Ebyafaayo by'okuwanyisa"
+    "transactionHistoryTitle": "Ebyafaayo by'okuwanyisa",
+    "filters": "Ebisengejja",
+    "sent": "Ebisindiddwa",
+    "received": "Ebifuniddwa",
+    "searchPlaceholder": "Noonya...",
+    "expandingSearch": "Okunoonya kugaziwa",
+    "nothingCameBack": "Tewali kizuuliddwa"
   },
   "TransferScreen": {
     "title": "Sindika",
@@ -3020,7 +3026,7 @@
       "other": "Ennaku"
     },
     "dollar": "Doola",
-    "all": "BYONNA",
+    "all": "Byonna",
     "allAccounts": "Akawunti zonna",
     "some": "Ebimu",
     "support": "Obuyambi",
@@ -3103,6 +3109,9 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Teekawo omuwendo"
+  },
+  "Accessibility": {
+    "switchToWallet": "Kyusa ku {wallet: string}"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Nneetaaga okukyuusa app yange okutuuka ku nkyusa eyasembyeyo. Ndi mukozesa {os: string} eya app n'e nkyusa eya {version: string}.",

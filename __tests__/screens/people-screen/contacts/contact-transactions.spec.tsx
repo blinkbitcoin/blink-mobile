@@ -72,15 +72,23 @@ type RowProps = {
   subtitle?: boolean
   isFirst?: boolean
   isLast?: boolean
+  variant?: string
 }
 
 const mockRowProps: RowProps[] = []
 
 jest.mock("@app/components/transaction-item", () => ({
   ...jest.requireActual("@app/components/transaction-item"),
-  MemoizedTransactionItem: ({ txid, onPress, subtitle, isFirst, isLast }: RowProps) => {
+  MemoizedTransactionItem: ({
+    txid,
+    onPress,
+    subtitle,
+    isFirst,
+    isLast,
+    variant,
+  }: RowProps) => {
     const { View } = jest.requireActual("react-native")
-    mockRowProps.push({ txid, onPress, subtitle, isFirst, isLast })
+    mockRowProps.push({ txid, onPress, subtitle, isFirst, isLast, variant })
     return <View testID={`transaction-${txid}`} />
   },
 }))
@@ -118,9 +126,6 @@ const contact: UserContact = {
   alias: "Alice",
   transactionsCount: 2,
 }
-
-/** The radius the date group's card carries, mirrored from the screen's own token. */
-const GROUP_RADIUS = 8
 
 const makeFragment = (id: string) => ({
   __typename: "Transaction" as const,
@@ -445,7 +450,7 @@ describe("ContactTransactions", () => {
       ])
     })
 
-    it("rounds the group's outer corners and nothing in between", () => {
+    it("draws every row as the card row, which rounds the group's outer corners", () => {
       mockUseQuery.mockReturnValue(
         custodialQuery({
           edges: [
@@ -456,26 +461,11 @@ describe("ContactTransactions", () => {
         }),
       )
 
-      const { getByTestId } = renderContactTransactions()
+      renderContactTransactions()
 
-      /** The row wraps in the view that carries the corners, past the row component. */
-      const cornersOf = (txid: string) => {
-        let node = getByTestId(`transaction-${txid}`).parent
-        while (node && typeof node.type !== "string") node = node.parent
-        return StyleSheet.flatten(node?.props.style)
-      }
-
-      expect(cornersOf("first-tx")).toEqual({
-        borderTopLeftRadius: GROUP_RADIUS,
-        borderTopRightRadius: GROUP_RADIUS,
-        overflow: "hidden",
-      })
-      expect(cornersOf("middle-tx")).toEqual({})
-      expect(cornersOf("last-tx")).toEqual({
-        borderBottomLeftRadius: GROUP_RADIUS,
-        borderBottomRightRadius: GROUP_RADIUS,
-        overflow: "hidden",
-      })
+      // The corners belong to the card row now (see transaction-item.test.tsx); the list
+      // only has to ask for it and say which rows open and close the group.
+      expect(mockRowProps.map(({ variant }) => variant)).toEqual(["card", "card", "card"])
     })
   })
 })

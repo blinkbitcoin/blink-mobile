@@ -2731,7 +2731,13 @@
     "noTransaction": "Nema transakcija za prikaz",
     "title": "Transakcije",
     "recentTransactions": "Nedavne transakcije",
-    "transactionHistoryTitle": "Povijest transakcija"
+    "transactionHistoryTitle": "Povijest transakcija",
+    "filters": "Filtri",
+    "sent": "Poslane",
+    "received": "Primljene",
+    "searchPlaceholder": "Traži...",
+    "expandingSearch": "Proširujem pretragu",
+    "nothingCameBack": "Ništa nije pronađeno"
   },
   "TransferScreen": {
     "title": "Prijenos",
@@ -3020,7 +3026,7 @@
       "other": "Dana"
     },
     "dollar": "Dolar",
-    "all": "SVE",
+    "all": "Sve",
     "allAccounts": "Svi računi",
     "some": "Neki",
     "support": "Podrška",
@@ -3103,6 +3109,9 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Postavite iznos"
+  },
+  "Accessibility": {
+    "switchToWallet": "Prebaci na {wallet: string}"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Moram ažurirati svoju aplikaciju na najnoviju verziju. Koristim aplikaciju {os: string} s verzijom {version: string}.",

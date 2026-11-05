@@ -2731,7 +2731,13 @@
     "noTransaction": "Gösterilecek işlem bulunamadı",
     "title": "Tüm işlemler",
     "recentTransactions": "Güncel işlemler",
-    "transactionHistoryTitle": "İşlem Geçmişi"
+    "transactionHistoryTitle": "İşlem geçmişi",
+    "filters": "Filtreler",
+    "sent": "Gönderilen",
+    "received": "Alınan",
+    "searchPlaceholder": "Ara...",
+    "expandingSearch": "Arama genişletiliyor",
+    "nothingCameBack": "Sonuç bulunamadı"
   },
   "TransferScreen": {
     "title": "Transfer",
@@ -3020,7 +3026,7 @@
       "other": "Gün"
     },
     "dollar": "Dolar",
-    "all": "TÜMÜ",
+    "all": "Tümü",
     "allAccounts": "Tüm hesaplar",
     "some": "Bazı",
     "support": "Destek",
@@ -3103,6 +3109,9 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Miktarı belirle"
+  },
+  "Accessibility": {
+    "switchToWallet": "{wallet: string} seçeneğine geç"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Uygulamamı en son sürüme güncellemem gerekiyor. {os: string} uygulamasının {version: string} sürümünü kullanıyorum.",

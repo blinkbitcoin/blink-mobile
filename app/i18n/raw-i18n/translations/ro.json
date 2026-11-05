@@ -2731,7 +2731,13 @@
     "noTransaction": "Nicio tranzacție de afișat",
     "title": "Toate tranzacțiile",
     "recentTransactions": "Tranzacții recente",
-    "transactionHistoryTitle": "Istoricul tranzacțiilor"
+    "transactionHistoryTitle": "Istoricul tranzacțiilor",
+    "filters": "Filtre",
+    "sent": "Trimise",
+    "received": "Primite",
+    "searchPlaceholder": "Caută...",
+    "expandingSearch": "Se extinde căutarea",
+    "nothingCameBack": "Niciun rezultat"
   },
   "TransferScreen": {
     "title": "Transfer",
@@ -3020,7 +3026,7 @@
       "other": "Zile"
     },
     "dollar": "Dolar",
-    "all": "TOATE",
+    "all": "Toate",
     "allAccounts": "Toate conturile",
     "some": "Unele",
     "support": "Suport",
@@ -3103,6 +3109,9 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Setați suma"
+  },
+  "Accessibility": {
+    "switchToWallet": "Treci la {wallet: string}"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Trebuie să-mi actualizez aplicația la cea mai recentă versiune. Folosesc aplicația {os: string} cu versiunea {version: string}.",

@@ -2731,7 +2731,13 @@
     "noTransaction": "Ingen transaktion at vise",
     "title": "Alle transaktioner",
     "recentTransactions": "Seneste transaktioner",
-    "transactionHistoryTitle": "Transaktionshistorik"
+    "transactionHistoryTitle": "Transaktionshistorik",
+    "filters": "Filtre",
+    "sent": "Sendte",
+    "received": "Modtagne",
+    "searchPlaceholder": "Søg...",
+    "expandingSearch": "Udvider søgningen",
+    "nothingCameBack": "Ingen resultater"
   },
   "TransferScreen": {
     "title": "Overfør",
@@ -3020,7 +3026,7 @@
       "other": "Dage"
     },
     "dollar": "dollar",
-    "all": "ALLE",
+    "all": "Alle",
     "allAccounts": "Alle konti",
     "some": "Nogle",
     "support": "Support",
@@ -3103,6 +3109,9 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Vælg beløb"
+  },
+  "Accessibility": {
+    "switchToWallet": "Skift til {wallet: string}"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Jeg skal opdatere min app til den nyeste version. Jeg bruger {os: string} app med version {version: string}.",

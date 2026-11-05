@@ -2731,7 +2731,13 @@
         "noTransaction": "No se han realizado transacciones",
         "title": "Todas las Transacciones",
         "recentTransactions": "Transacciones recientes",
-        "transactionHistoryTitle": "Historial"
+        "transactionHistoryTitle": "Historial",
+        "filters": "Filtros",
+        "sent": "Enviadas",
+        "received": "Recibidas",
+        "searchPlaceholder": "Buscar...",
+        "expandingSearch": "Ampliando la búsqueda",
+        "nothingCameBack": "No se encontró nada"
     },
     "TransferScreen": {
         "title": "Transferir",
@@ -3020,7 +3026,7 @@
             "other": "Días"
         },
         "dollar": "Dólar",
-        "all": "TODAS",
+        "all": "Todas",
         "allAccounts": "Todas las cuentas",
         "profiles": "Perfiles",
         "paste": "Pegar",
@@ -3103,6 +3109,9 @@
     },
     "AmountInputButton": {
         "tapToSetAmount": "Fijar cantidad"
+    },
+    "Accessibility": {
+        "switchToWallet": "Cambiar a {wallet: string}"
     },
     "AppUpdate": {
         "needToUpdateSupportMessage": "Necesito actualizar la aplicación a la última versión. Utilizo la aplicación para {os: string} con la versión {version: string}.",
