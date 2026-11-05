@@ -115,7 +115,11 @@ describe("ReplaceCardScreen", () => {
     loadLocale("en")
     jest.clearAllMocks()
     mockAddListener.mockReturnValue(jest.fn())
-    mockCardReplace.mockResolvedValue({ lastFour: "4321", cardType: "VIRTUAL" })
+    mockCardReplace.mockResolvedValue({
+      id: "replacement-card",
+      lastFour: "4321",
+      cardType: "VIRTUAL",
+    })
     mockLockCard.mockResolvedValue(true)
   })
 
@@ -349,7 +353,11 @@ describe("ReplaceCardScreen", () => {
     })
 
     it("submits and navigates to status screen", async () => {
-      mockCardReplace.mockResolvedValueOnce({ lastFour: "4321", cardType: "VIRTUAL" })
+      mockCardReplace.mockResolvedValueOnce({
+        id: "replacement-card",
+        lastFour: "4321",
+        cardType: "VIRTUAL",
+      })
 
       const { getByText } = render(
         <ContextForScreen>
@@ -374,7 +382,7 @@ describe("ReplaceCardScreen", () => {
         iconName: "delivery",
         iconColor: expect.any(String),
         lastFour: "4321",
-        cardId: "card-123",
+        cardId: "replacement-card",
       })
     })
 
