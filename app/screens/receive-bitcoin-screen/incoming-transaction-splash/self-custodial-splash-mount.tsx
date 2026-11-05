@@ -5,7 +5,6 @@ import { SdkEvent_Tags as SdkEventTags } from "@breeztech/breez-sdk-spark-react-
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
-import { toTransactionFragment } from "@app/self-custodial/mappers/to-transaction-fragment"
 import {
   isKnownPayment,
   mapSelfCustodialTransaction,
@@ -15,13 +14,12 @@ import { onSucceededPayment } from "@app/self-custodial/providers/succeeded-paym
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import {
   NormalizedTransaction,
-  PaymentType,
   TransactionDirection,
   TransactionStatus,
 } from "@app/types/transaction"
 
 import { useIncomingTransactionSplash } from "./incoming-transaction-splash-provider"
-import { SplashCandidate, SplashPaymentType } from "./types"
+import { selfCustodialCandidate } from "./self-custodial-candidate"
 
 const SUCCEEDED_PREFIX = `${SdkEventTags.PaymentSucceeded}:`
 
@@ -64,14 +62,7 @@ export const SelfCustodialSplashMount = () => {
   )
 
   const toCandidate = useMemo(
-    () =>
-      (tx: NormalizedTransaction): SplashCandidate => ({
-        transaction: toTransactionFragment(tx, displayInfo),
-        paymentType:
-          tx.paymentType === PaymentType.Onchain
-            ? SplashPaymentType.Onchain
-            : SplashPaymentType.Lightning,
-      }),
+    () => (tx: NormalizedTransaction) => selfCustodialCandidate(tx, displayInfo),
     [displayInfo],
   )
 
