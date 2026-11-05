@@ -162,6 +162,26 @@ describe("useAddToWallet", () => {
       expect(result.current.isAdding).toBe(false)
     })
 
+    it("starts one wallet add at a time and stays busy until it answers", async () => {
+      const pendingAdd = deferred<WalletAddResult>()
+      mockAddCardToWallet.mockReturnValue(pendingAdd.promise)
+      const { result } = await renderWithCard()
+
+      await act(async () => {
+        result.current.addToWallet()
+        await result.current.addToWallet()
+      })
+
+      expect(mockAddCardToWallet).toHaveBeenCalledTimes(1)
+      expect(result.current.isAdding).toBe(true)
+
+      await act(async () => {
+        pendingAdd.resolve(WalletAddResult.Added)
+      })
+
+      expect(result.current.isAdding).toBe(false)
+    })
+
     it("does nothing without a card", async () => {
       const { result } = renderHook(() => useAddToWallet(undefined, undefined))
       await act(async () => {})
