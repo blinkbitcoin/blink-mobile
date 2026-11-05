@@ -373,7 +373,7 @@ export const HomeScreen: React.FC = () => {
     accountBalances.push({
       id: homeCard.id,
       walletCurrency: CARD,
-      balance: cardBalanceSats ?? 0,
+      balance: cardBalanceSats,
     })
   }
 
@@ -381,7 +381,7 @@ export const HomeScreen: React.FC = () => {
     formattedBalance: defaultFormattedBalance,
     satsBalance,
     isLoading: balanceConversionLoading,
-  } = useTotalBalance(wallets, showCardRow ? cardBalanceSats : undefined)
+  } = useTotalBalance(accountBalances)
 
   const loading = queryLoading || balanceConversionLoading
 
