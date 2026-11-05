@@ -300,7 +300,8 @@ export default class KeyStoreWrapper {
    * outlive every reinstall if the app died before the list caught up. The
    * same order `setMnemonicForAccount` keeps, on the same terms: a record that
    * fails does not hold the value back, it is reported, and the boot sweep
-   * records it again.
+   * records it again. It does hold back the purge, which keeps the legacy copy
+   * the wipe can still reach until the record lands.
    */
   private static mnemonicSlotFor(accountId: string, key: string): ReadThroughArgs {
     return {
@@ -883,16 +884,18 @@ export default class KeyStoreWrapper {
 
   /**
    * Records the account whose mnemonic a read is about to migrate, and reports
-   * a record that did not land. The copy is written either way, so without the
-   * report nothing would say a seed the wipe cannot name is on its way in.
+   * a record that did not land. A read writes the copy either way, so without
+   * the report nothing would say a seed the wipe cannot name is on its way in.
+   * The purge does not erase the legacy copy on a record that did not land.
    */
-  private static async recordMigratingAccount(accountId: string): Promise<void> {
+  private static async recordMigratingAccount(accountId: string): Promise<boolean> {
     const tracked = await KeyStoreWrapper.trackMnemonicAccount(accountId)
-    if (tracked) return
+    if (tracked) return true
 
     recordAppError(new Error("Mnemonic migrating but not tracked"), {
       dedupKey: "storage-mnemonic-migrating-untracked",
     })
+    return false
   }
 
   /**
@@ -1184,7 +1187,7 @@ export default class KeyStoreWrapper {
    * gone on. Both platforms report a lookup that failed as `failed` rather than
    * absent (see purgeThrough), so that read is a missing key and the slot is
    * remembered like any other. A mnemonic's `gone` rests on a read that returned
-   * the value.
+   * the value and, where a legacy copy was erased, on its account being tracked.
    */
   public static async purgeLegacyKeyStore(
     accountIds: string[],

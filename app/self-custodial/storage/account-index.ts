@@ -684,10 +684,11 @@ const readPurgedSlots = async (): Promise<readonly string[]> => {
  *
  * The pass runs whatever the sweep reported. The six session slots have fixed
  * keys and need nothing from it, and purgeThrough proves each mnemonic reached
- * the new store before its legacy copy is erased, so an account the sweep could
- * not read cannot cost a seed here. Gating the whole pass on the sweep would
- * leave the legacy PIN, token and profiles in place for good on a device with
- * one Keystore entry a lock-screen change invalidated, and say nothing about it.
+ * the new store, and records its account, before its legacy copy is erased, so
+ * an account the sweep could not read or record cannot cost a seed here. Gating
+ * the whole pass on the sweep would leave the legacy PIN, token and profiles in
+ * place for good on a device with one Keystore entry a lock-screen change
+ * invalidated, and say nothing about it.
  *
  * What the sweep gates is the done-flag. The flag says the migration is finished
  * for this install, and the sweep is what confirms every account was read, moved
