@@ -170,6 +170,20 @@ describe("useCardBalance", () => {
     expect(result.current.availableSats).toBe(0)
   })
 
+  it("exposes the query refetch", () => {
+    const refetch = jest.fn()
+    mockUseCardBalanceQuery.mockReturnValue({
+      data: undefined,
+      loading: false,
+      error: undefined,
+      refetch,
+    })
+
+    const { result } = renderHook(() => useCardBalance("card-1"))
+
+    expect(result.current.refetch).toBe(refetch)
+  })
+
   it("defaults available to 0 when data is null", () => {
     mockUseCardBalanceQuery.mockReturnValue({
       data: { cardBalance: null },
