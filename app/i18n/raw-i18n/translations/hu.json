@@ -2424,6 +2424,7 @@
     "lowFunds": "Nincs elegendő egyenleg",
     "amountExceed": "Az összeg meghaladja az egyenlegedet: {balance: string}",
     "amountExceedsLimit": "Az összeg meghaladja a napi limitet: {limit: string}",
+    "changeDestination": "Cél módosítása",
     "upgradeAccountToIncreaseLimit": "Magasabb tranzakciós limithez magasabb szintű felhasználói fiókra váltás szükséges",
     "amountIsRequired": "Az összeg kötelező",
     "cost": "Költség",

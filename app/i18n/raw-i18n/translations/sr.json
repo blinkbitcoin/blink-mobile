@@ -2424,6 +2424,7 @@
     "lowFunds": "Nedovoljno sredstava",
     "amountExceed": "Износ прелази ваше стање од {balance: string}",
     "amountExceedsLimit": "Износ прелази ваш дневни лимит од {limit: string}",
+    "changeDestination": "Промени дестинацију",
     "upgradeAccountToIncreaseLimit": "Надоградите свој налог да бисте повећали лимит",
     "amountIsRequired": "Износ је обавезан",
     "cost": "Цена",

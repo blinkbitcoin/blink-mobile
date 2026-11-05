@@ -2424,6 +2424,7 @@
     "lowFunds": "Ανεπαρκές υπόλοιπο",
     "amountExceed": "Το ποσό υπερβαίνει το υπόλοιπό σας {balance: string}",
     "amountExceedsLimit": "Το ποσό υπερβαίνει το εναπομένον όριο των {limit: string}",
+    "changeDestination": "Αλλαγή προορισμού",
     "upgradeAccountToIncreaseLimit": "Αναβαθμίστε τον λογαριασμό σας για να αυξήσετε το όριο σας ",
     "amountIsRequired": "Απαιτείται ποσό",
     "cost": "Kόστος",

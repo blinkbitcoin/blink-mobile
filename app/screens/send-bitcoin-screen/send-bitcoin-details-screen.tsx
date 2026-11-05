@@ -654,6 +654,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               })
             : undefined
         }
+        selfPaymentMessage={isSelfPayment ? feeTierErrorMessage : undefined}
         onRetryLimits={retryLimits}
         onRetry={goToNextScreen || undefined}
         onChangeAmount={clearAmount}

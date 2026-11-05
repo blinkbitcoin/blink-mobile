@@ -2424,6 +2424,7 @@
     "lowFunds": "Fons insuficients",
     "amountExceed": "L'import excedeix el teu saldo {balance: string}",
     "amountExceedsLimit": "La quantitat supera el teu límit diari restant de {limit: string}",
+    "changeDestination": "Canvia la destinació",
     "upgradeAccountToIncreaseLimit": "Actualitza el teu compte per incrementar els teus límits",
     "amountIsRequired": "L'import és necessari",
     "cost": "Cost",

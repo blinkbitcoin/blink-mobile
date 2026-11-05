@@ -2424,6 +2424,7 @@
     "lowFunds": "Fonduri insuficiente",
     "amountExceed": "Suma depășește soldul de {balance: string}",
     "amountExceedsLimit": "Suma depășește limita zilnică rămasă de {limit: string}",
+    "changeDestination": "Schimbă destinația",
     "upgradeAccountToIncreaseLimit": "Faceți upgrade la cont pentru a vă crește limita",
     "amountIsRequired": "Suma este necesară",
     "cost": "Cost",

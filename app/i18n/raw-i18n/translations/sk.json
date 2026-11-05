@@ -2424,6 +2424,7 @@
     "lowFunds": "Nedostatok prostriedkov",
     "amountExceed": "Suma prekračuje váš zostatok vo výške {balance: string}",
     "amountExceedsLimit": "Suma prekračuje váš zostávajúci denný limit {limit: string}",
+    "changeDestination": "Zmeniť príjemcu",
     "upgradeAccountToIncreaseLimit": "Upgradujte si účet a zvýšte svoj limit",
     "amountIsRequired": "Suma je povinná",
     "cost": "Náklady",

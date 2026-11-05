@@ -7790,6 +7790,10 @@ type RootTranslation = {
 		 */
 		problemSheetTitle: string
 		/**
+		 * C​h​a​n​g​e​ ​d​e​s​t​i​n​a​t​i​o​n
+		 */
+		changeDestination: string
+		/**
 		 * C​o​u​l​d​n​'​t​ ​r​e​a​c​h​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t
 		 */
 		recipientUnreachableTitle: string
@@ -22189,6 +22193,10 @@ export type TranslationFunctions = {
 		 * A small problem
 		 */
 		problemSheetTitle: () => LocalizedString
+		/**
+		 * Change destination
+		 */
+		changeDestination: () => LocalizedString
 		/**
 		 * Couldn't reach the recipient
 		 */

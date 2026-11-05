@@ -2424,6 +2424,7 @@
     "lowFunds": "Dana tidak cukup",
     "amountExceed": "Jumlah melebihi saldo Anda sebesar {balance: string}",
     "amountExceedsLimit": "Jumlah melebihi batas harian Anda yang tersisa sebesar {limit: string}",
+    "changeDestination": "Ubah tujuan",
     "upgradeAccountToIncreaseLimit": "Tingkatkan akun Anda untuk meningkatkan batas",
     "amountIsRequired": "Jumlah diperlukan",
     "cost": "Biaya",

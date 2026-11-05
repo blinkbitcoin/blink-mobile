@@ -2424,6 +2424,7 @@
     "lowFunds": "Dana tidak mencukupi",
     "amountExceed": "Amaun ini telah melebihi baki {balance: string}",
     "amountExceedsLimit": "Amaun ini telah melebihi baki transaksi harian {limit: string}",
+    "changeDestination": "Tukar destinasi",
     "upgradeAccountToIncreaseLimit": "Naik taraf akaun anda untuk tambahkan had",
     "amountIsRequired": "Jumlah diperlukan",
     "cost": "Kos",

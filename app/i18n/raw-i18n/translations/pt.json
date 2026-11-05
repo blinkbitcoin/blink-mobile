@@ -2424,6 +2424,7 @@
         "lowFunds": "Saldo insuficiente",
         "amountExceed": "O valor excede seu saldo de {balance: string}",
         "amountExceedsLimit": "O valor excede seu limite diário restante de {limit: string}",
+        "changeDestination": "Alterar destino",
         "upgradeAccountToIncreaseLimit": "Atualize a sua conta para aumentar o seu limite",
         "amountIsRequired": "O valor é obrigatório",
         "cost": "Custo",

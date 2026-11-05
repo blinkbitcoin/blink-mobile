@@ -2424,6 +2424,7 @@
     "lowFunds": "Ssente tezimala",
     "amountExceed": "Omuwendo gusukka bbalansi yo eya {balance: string}",
     "amountExceedsLimit": "Omuwendo gusukka ekkomo lyo erisigaddewo buli lunaku erya {limit: string}",
+    "changeDestination": "Kyusa ekigobero",
     "upgradeAccountToIncreaseLimit": "Yongesa omutindo gwa akawunti yo okwongera ku kkomo lyo",
     "amountIsRequired": "Omuwendo gwetagisa",
     "cost": "Omuwendo",

@@ -2424,6 +2424,7 @@
     "lowFunds": "Imali ayonelanga",
     "amountExceed": "Imali idlula ibhalansi yakho {balance: string}",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
+    "changeDestination": "Tshintsha indawo ekuyiwa kuyo",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
     "amountIsRequired": "Imali iyafuneka",
     "cost": "Iindleko",

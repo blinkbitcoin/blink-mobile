@@ -2424,6 +2424,7 @@
     "lowFunds": "ยอดเงินไม่เพียงพอ",
     "amountExceed": "จำนวนมากกว่ายอดคงเหลือ {balance: string} ของคุณ",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
+    "changeDestination": "เปลี่ยนปลายทาง",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
     "amountIsRequired": "ต้องใส่จำนวนเงิน",
     "cost": "ค่าใช้จ่าย",

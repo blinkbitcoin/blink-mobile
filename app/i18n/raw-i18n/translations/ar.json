@@ -2424,6 +2424,7 @@
     "lowFunds": "أموال غير كافية",
     "amountExceed": "المقدار أعلى من ميزانيتك التي تبلغ {balance: string}",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
+    "changeDestination": "تغيير الوجهة",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
     "amountIsRequired": "المبلغ مطلوب",
     "cost": "التكلفة",

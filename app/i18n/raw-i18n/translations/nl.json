@@ -2424,6 +2424,7 @@
     "lowFunds": "Onvoldoende saldo",
     "amountExceed": "Bedrag overschrijdt uw saldo van {balance: string}",
     "amountExceedsLimit": "Bedrag overschrijdt uw resterende dagelijkse limiet van {limit: string}",
+    "changeDestination": "Bestemming wijzigen",
     "upgradeAccountToIncreaseLimit": "Upgrade uw account om uw limiet te verhogen",
     "amountIsRequired": "Bedrag is vereist",
     "cost": "Kosten",

@@ -2424,6 +2424,7 @@
     "lowFunds": "Ikke nok midler",
     "amountExceed": "Beløbet overstiger din saldo på {balance: string}",
     "amountExceedsLimit": "Beløbet overstiger din resterende daglige grænse på {limit: string}",
+    "changeDestination": "Skift modtager",
     "upgradeAccountToIncreaseLimit": "Opgrader din konto for at øge din grænse",
     "amountIsRequired": "Beløb er påkrævet",
     "cost": "Omkostning",

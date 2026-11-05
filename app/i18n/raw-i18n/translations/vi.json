@@ -2424,6 +2424,7 @@
     "lowFunds": "Không đủ số dư",
     "amountExceed": "Số tiền vượt quá số dư {balance: string} của bạn",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
+    "changeDestination": "Đổi điểm đến",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
     "amountIsRequired": "Số tiền là bắt buộc",
     "cost": "Chi phí",

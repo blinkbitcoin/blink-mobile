@@ -2424,6 +2424,7 @@
         "lowFunds": "Nicht genügend Guthaben",
         "amountExceed": "Der Betrag übersteigt dein Guthaben von {balance: string}",
         "amountExceedsLimit": "Der Betrag übersteigt dein verbleibendes tägliches Limit von {limit: string}",
+        "changeDestination": "Empfänger ändern",
         "upgradeAccountToIncreaseLimit": "Upgrade deinen Account, um dein Limit zu erhöhen",
         "amountIsRequired": "Betrag ist erforderlich",
         "cost": "Kosten",
