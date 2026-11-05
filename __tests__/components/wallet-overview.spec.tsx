@@ -1,6 +1,8 @@
 import React from "react"
 import { StyleSheet } from "react-native"
-import { render, fireEvent } from "@testing-library/react-native"
+import ContentLoader from "react-content-loader/native"
+import { render, fireEvent, within } from "@testing-library/react-native"
+import type { ReactTestInstance } from "react-test-renderer"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import WalletOverview from "@app/components/wallet-overview/wallet-overview"
@@ -110,6 +112,16 @@ const overviewTree = ({
 
 const renderOverview = (options: RenderOptions = {}) => render(overviewTree(options))
 
+/** The balance row is the nearest ancestor that sets a minimum height. */
+const balanceRowOf = (node: ReactTestInstance): ReactTestInstance => {
+  let row = node.parent
+  while (row && StyleSheet.flatten(row.props.style)?.minHeight === undefined) {
+    row = row.parent
+  }
+  if (!row) throw new Error("no balance row above this node")
+  return row
+}
+
 describe("WalletOverview", () => {
   beforeEach(() => {
     loadLocale("en")
@@ -171,15 +183,43 @@ describe("WalletOverview", () => {
       expect(getByText("Dollar")).toBeTruthy()
     })
 
-    it("keeps the loading skeleton within the row height, so the rows do not jump on load", async () => {
+    it("lets each balance row grow with the font size", async () => {
+      const loading = renderOverview({ loading: true })
+      await flushEffects()
+      const rowStyleOf = (node: ReactTestInstance) =>
+        StyleSheet.flatten(balanceRowOf(node).props.style)
+      const loadingRows = loading.getAllByTestId("balance-skeleton").map(rowStyleOf)
+      loading.unmount()
+
+      const loaded = renderOverview()
+      await flushEffects()
+      const loadedRows = [
+        rowStyleOf(loaded.getByTestId("bitcoin-balance")),
+        rowStyleOf(loaded.getByTestId("stablesats-balance")),
+      ]
+
+      expect(loadingRows).toHaveLength(2)
+      ;[...loadingRows, ...loadedRows].forEach(({ minHeight, height, maxHeight }) => {
+        expect({ minHeight, height, maxHeight }).toEqual({
+          minHeight: expect.any(Number),
+          height: undefined,
+          maxHeight: undefined,
+        })
+      })
+    })
+
+    it("sizes the skeleton to the row's minimum height, so the rows do not jump on load", async () => {
       const { getAllByTestId } = renderOverview({ loading: true })
       await flushEffects()
 
-      const skeletons = getAllByTestId("balance-skeleton")
-      expect(skeletons).toHaveLength(2)
-      skeletons.forEach((skeleton) => {
+      getAllByTestId("balance-skeleton").forEach((skeleton) => {
+        const { minHeight } = StyleSheet.flatten(balanceRowOf(skeleton).props.style)
         const { height, marginTop, marginBottom, marginVertical, margin } =
           StyleSheet.flatten(skeleton.props.style)
+
+        expect(within(skeleton).UNSAFE_getByType(ContentLoader).props.height).toBe(
+          minHeight,
+        )
         expect({ height, marginTop, marginBottom, marginVertical, margin }).toEqual({
           height: undefined,
           marginTop: undefined,
@@ -187,6 +227,18 @@ describe("WalletOverview", () => {
           marginVertical: undefined,
           margin: undefined,
         })
+      })
+    })
+
+    it("keeps the skeleton centred vertically when the row grows", async () => {
+      const { getAllByTestId } = renderOverview({ loading: true })
+      await flushEffects()
+
+      getAllByTestId("balance-skeleton").forEach((skeleton) => {
+        expect(StyleSheet.flatten(balanceRowOf(skeleton).props.style).alignItems).toBe(
+          "center",
+        )
+        expect(StyleSheet.flatten(skeleton.props.style).alignSelf).toBeUndefined()
       })
     })
 
