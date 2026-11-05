@@ -27,6 +27,22 @@ jest.mock("@app/hooks/use-card-holder", () => ({
   }),
 }))
 
+const mockAddToWallet = jest.fn()
+const mockUseAddToWallet = jest.fn()
+jest.mock("@app/screens/card-screen/hooks/use-add-to-wallet", () => ({
+  useAddToWallet: (cardId: string, lastFour: string) =>
+    mockUseAddToWallet(cardId, lastFour),
+}))
+
+const walletState = (
+  overrides: { canAddToWallet?: boolean; isAdding?: boolean } = {},
+) => ({
+  canAddToWallet: true,
+  isAdding: false,
+  addToWallet: mockAddToWallet,
+  ...overrides,
+})
+
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
   return {
@@ -44,6 +60,7 @@ describe("CardAddToMobileWalletScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
+    mockUseAddToWallet.mockReturnValue(walletState())
   })
 
   describe("rendering", () => {
@@ -116,36 +133,54 @@ describe("CardAddToMobileWalletScreen", () => {
   })
 
   describe("add to wallet button", () => {
-    it("displays add to wallet button", async () => {
-      const { getByText } = render(
+    const renderScreen = async () => {
+      const screen = render(
         <ContextForScreen>
           <CardAddToMobileWalletScreen />
         </ContextForScreen>,
       )
-
       await act(async () => {})
+      return screen
+    }
+
+    it("checks the wallet with the card from the route", async () => {
+      await renderScreen()
+
+      expect(mockUseAddToWallet).toHaveBeenCalledWith("card-123", "1111")
+    })
+
+    it("shows the button when the wallet can take the card", async () => {
+      const { getByText } = await renderScreen()
 
       expect(getByText("Add to")).toBeTruthy()
     })
 
-    it("allows pressing add to wallet button", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
+    it("hides the button when the wallet cannot take the card", async () => {
+      mockUseAddToWallet.mockReturnValue(walletState({ canAddToWallet: false }))
 
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardAddToMobileWalletScreen />
-        </ContextForScreen>,
-      )
+      const { queryByText } = await renderScreen()
 
-      await act(async () => {})
+      expect(queryByText("Add to")).toBeNull()
+    })
 
-      const button = getByText("Add to")
+    it("adds the card to the wallet when the button is pressed", async () => {
+      const { getByText } = await renderScreen()
+
       await act(async () => {
-        fireEvent.press(button)
+        fireEvent.press(getByText("Add to"))
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Add to wallet pressed")
-      consoleSpy.mockRestore()
+      expect(mockAddToWallet).toHaveBeenCalledTimes(1)
+    })
+
+    it("disables the button while the card is being added", async () => {
+      mockUseAddToWallet.mockReturnValue(walletState({ isAdding: true }))
+
+      const { getByLabelText } = await renderScreen()
+
+      expect(getByLabelText("Add to Google Pay").props.accessibilityState).toEqual(
+        expect.objectContaining({ disabled: true }),
+      )
     })
   })
 
@@ -259,47 +294,6 @@ describe("CardAddToMobileWalletScreen", () => {
       ).toBeTruthy()
       expect(getByText("Add to")).toBeTruthy()
       expect(getByText("Benefits of mobile wallet")).toBeTruthy()
-    })
-
-    it("user can interact with add to wallet button", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardAddToMobileWalletScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      await act(async () => {
-        fireEvent.press(getByText("Add to"))
-      })
-
-      expect(consoleSpy).toHaveBeenCalledWith("Add to wallet pressed")
-      consoleSpy.mockRestore()
-    })
-  })
-
-  describe("loading state", () => {
-    it("button becomes disabled during loading", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardAddToMobileWalletScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      const button = getByText("Add to")
-      await act(async () => {
-        fireEvent.press(button)
-      })
-
-      expect(consoleSpy).toHaveBeenCalled()
-      consoleSpy.mockRestore()
     })
   })
 })
