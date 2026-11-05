@@ -67,11 +67,11 @@ export const useTotalBalance = (
    * known to have finished empty.
    *
    * A held USD balance cannot be added to it without the very rate that is missing, so
-   * the sats figure is the Bitcoin balance alone. Understating a total is safer than
-   * inventing a rate to complete it.
+   * the sats figure is the Bitcoin balance plus the card, which is held in sats too.
+   * Understating a total is safer than inventing a rate to complete it.
    */
   if (priceStatus === PriceStatus.Unavailable) {
-    const satsOnly = btcWallet?.balance ?? 0
+    const satsOnly = (btcWallet?.balance ?? 0) + (cardSats ?? 0)
     return {
       formattedBalance: formatMoneyAmount({ moneyAmount: toBtcMoneyAmount(satsOnly) }),
       numericBalance: satsOnly,

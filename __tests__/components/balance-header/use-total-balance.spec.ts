@@ -249,6 +249,25 @@ describe("useTotalBalance", () => {
       )
     })
 
+    it("counts the card in the sats total when no rate is coming", () => {
+      mockConvertMoneyAmount.mockReturnValue(undefined)
+      mockPriceStatus.mockReturnValue("unavailable")
+
+      const { result } = renderHook(() => useTotalBalance(withCard(50_000)))
+
+      expect(result.current.satsBalance).toBe(1_050_000)
+      expect(result.current.numericBalance).toBe(1_050_000)
+    })
+
+    it("leaves an unknown card out of the sats total when no rate is coming", () => {
+      mockConvertMoneyAmount.mockReturnValue(undefined)
+      mockPriceStatus.mockReturnValue("unavailable")
+
+      const { result } = renderHook(() => useTotalBalance(withCard(undefined)))
+
+      expect(result.current.satsBalance).toBe(1_000_000)
+    })
+
     it("leaves the total untouched when the accounts have no card", () => {
       mockConvertMoneyAmount.mockReturnValue(identityConversion)
 
