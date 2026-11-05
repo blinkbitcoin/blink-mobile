@@ -259,12 +259,13 @@ export type ReadThroughArgs = {
   readonly deleteLegacyOnMigrate: boolean
   /**
    * Runs before a migrating write, for a slot whose new-store copy has to be
-   * named somewhere else. Named first, a process killed between the two leaves
-   * a name with no copy, which is harmless; written first, it leaves a copy
-   * that nothing names. Best effort and inside the slot's turn: a record that
-   * fails does not hold the write back.
+   * named somewhere else, and resolves whether the name landed. Named first, a
+   * process killed between the two leaves a name with no copy, which is harmless;
+   * written first, it leaves a copy that nothing names. Best effort and inside
+   * the slot's turn: a record that fails does not hold the write back. It does
+   * hold back the purge's erase of a seed's legacy copy (see purgeThrough).
    */
-  readonly recordBeforeMigrate?: () => Promise<void>
+  readonly recordBeforeMigrate?: () => Promise<boolean>
 }
 
 export type RemoveThroughArgs = {
@@ -293,13 +294,15 @@ const abandoned = (slot: string): { status: "failed"; err: unknown } => ({
 /**
  * Best effort, like the legacy-hit counter. Letting a rejection out would fail
  * a read whose value is already in hand, and bookkeeping must never cost
- * availability.
+ * availability. A slot with nothing to record has nothing that can fail to land.
  */
-const recordBeforeMigrate = async (args: ReadThroughArgs): Promise<void> => {
+const recordBeforeMigrate = async (args: ReadThroughArgs): Promise<boolean> => {
+  if (!args.recordBeforeMigrate) return true
   try {
-    await args.recordBeforeMigrate?.()
+    return await args.recordBeforeMigrate()
   } catch {
     // The owner of the record repairs it later; the migration goes ahead.
+    return false
   }
 }
 
@@ -539,8 +542,9 @@ export const worsePurge = (a: SlotPurge, b: SlotPurge): SlotPurge =>
 export type PurgeThroughOptions = {
   /**
    * Whether the new store has to hold the value before an empty legacy read
-   * counts as nothing left to erase. True for the seed, where being wrong costs
-   * someone their money; false where it costs a re-login.
+   * counts as nothing left to erase, and the slot's name has to land before a
+   * legacy copy is erased. True for the seed, where being wrong costs someone
+   * their money; false where it costs a re-login.
    */
   requireMigrated: boolean
 }
@@ -555,10 +559,11 @@ export type PurgeThroughOptions = {
  * only copy — a re-login for a session slot, and someone's seed for a
  * mnemonic.
  *
- * So the new store has to say `found` itself before anything is deleted, and
- * every step runs inside the slot queue: a read-through migrating this same
- * slot concurrently sits between its own miss and its legacy read, and an
- * unqueued erase in that window takes the value out from under it.
+ * So the new store has to say `found` itself before anything is deleted, a seed
+ * has to be named where the reinstall wipe looks for it, and every step runs
+ * inside the slot queue: a read-through migrating this same slot concurrently
+ * sits between its own miss and its legacy read, and an unqueued erase in that
+ * window takes the value out from under it.
  *
  * Anything but `gone` leaves the copy for the next boot, split by whether a
  * later boot could answer differently. Only the caller can act on that
@@ -667,6 +672,19 @@ export const purgeThrough = async (
           const isReadable =
             rewritten.status === "found" && rewritten.value === legacy.value
           if (!isReadable) return "transient"
+        }
+
+        // The reinstall wipe reaches a migrated seed only through the list that
+        // names its account, and clears the legacy store whole. Erased while that
+        // record is missing, the seed is left in the new store with nothing to
+        // reach it, so the copy waits for a record that landed. Asked on both
+        // paths: a seed that was already in the new store was never recorded
+        // here, and the rewrite above went ahead on a record that failed, as a
+        // read does. A record that keeps failing keeps the copy, and the slot is
+        // named again on the next launch.
+        if (requireMigrated) {
+          const isRecorded = await recordBeforeMigrate(args)
+          if (!isRecorded) return "transient"
         }
 
         // The queue handed this slot to someone else while it was held, so the

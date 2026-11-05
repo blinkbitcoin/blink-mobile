@@ -678,10 +678,11 @@ describe("the legacy purge over a damaged index", () => {
 
   /**
    * A seed already in the new store that nothing tracks, because the write that tracks it
-   * failed once, which the store reports and goes past. The purge erases its legacy copy,
-   * so the sweep before it has to record it for the reinstall wipe, or hold the flag.
+   * failed once, which the store reports and goes past. Its legacy copy is the one the
+   * reinstall wipe can still reach, so the purge keeps it, and the flag with it, until the
+   * account is recorded.
    */
-  it("holds the flag until a damaged entry's seed is recorded for the reinstall wipe", async () => {
+  it("keeps a damaged entry's legacy seed until it is recorded for the reinstall wipe", async () => {
     mockAsyncStorage.set(
       INDEX_KEY,
       JSON.stringify([{ id: DAMAGED_ACCOUNT, lightningAddress: 5 }]),
@@ -690,12 +691,14 @@ describe("the legacy purge over a damaged index", () => {
     mockLegacyStore.set(`mnemonic:${DAMAGED_ACCOUNT}`, DAMAGED_WORDS)
     mockFaults.trackedListWrites = true
 
-    expect(await launchPurge()).toEqual({ status: "sweep-incomplete" })
+    expect(await launchPurge()).toEqual({ status: "incomplete" })
+    expect(mockLegacyStore.get(`mnemonic:${DAMAGED_ACCOUNT}`)).toBe(DAMAGED_WORDS)
     expect(mockAsyncStorage.has("legacyKeyStorePurged")).toBe(false)
 
     mockFaults.trackedListWrites = false
     expect(await launchPurge()).toEqual({ status: "done" })
     expect(mockKeychain.get(serverFor("mnemonicAccounts"))).toBe(DAMAGED_ACCOUNT)
+    expect(mockLegacyStore.has(`mnemonic:${DAMAGED_ACCOUNT}`)).toBe(false)
   })
 
   /** An entry with no id names nothing, and no write to the index drops it. */

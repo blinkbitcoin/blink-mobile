@@ -3480,3 +3480,94 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
     jest.useRealTimers()
   })
 })
+
+/**
+ * The reinstall wipe reaches a migrated seed only through the tracked list, and
+ * clears the legacy store whole. Erasing the legacy copy while the list does not
+ * name the account would leave the seed where no wipe reaches it, so the copy
+ * waits for the record, and a slot kept for that is named again next launch.
+ */
+describe("KeyStoreWrapper.purgeLegacyKeyStore for a seed whose account is not tracked", () => {
+  beforeEach(resetPurgeStores)
+
+  const refuseTrackedListWrites = () => {
+    mockSetInternet.mockImplementation(
+      async (server: string, slot: string, value: string) => {
+        if (slot === "mnemonicAccounts") return false
+        stores.migrated.set(slot, value)
+        return { service: server }
+      },
+    )
+  }
+
+  it("tracks the account of a seed already in the new store before erasing its legacy copy", async () => {
+    stores.migrated.set("mnemonic:alice", "alpha beta")
+    stores.legacy.set("mnemonic:alice", "alpha beta")
+
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
+
+    expect(purged.outcome).toBe("gone")
+    expect(stores.migrated.get("mnemonicAccounts")).toBe("alice")
+    expect(stores.legacy.has("mnemonic:alice")).toBe(false)
+    const listWrite = mockSetInternet.mock.calls.findIndex(
+      ([, slot]) => slot === "mnemonicAccounts",
+    )
+    const seedErase = mockRemove.mock.calls.findIndex(([key]) => key === "mnemonic:alice")
+    expect(mockSetInternet.mock.invocationCallOrder[listWrite]).toBeLessThan(
+      mockRemove.mock.invocationCallOrder[seedErase],
+    )
+  })
+
+  it("keeps the legacy copy of a seed already in the new store, and names it again next launch", async () => {
+    stores.migrated.set("mnemonic:alice", "alpha beta")
+    stores.legacy.set("mnemonic:alice", "alpha beta")
+    refuseTrackedListWrites()
+
+    const first = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
+
+    expect(first.outcome).toBe("transient")
+    expect(stores.legacy.get("mnemonic:alice")).toBe("alpha beta")
+    expect(first.purgedSlots).not.toContain("mnemonic:alice")
+
+    mockSetInternet.mockImplementation(
+      async (server: string, slot: string, value: string) => {
+        stores.migrated.set(slot, value)
+        return { service: server }
+      },
+    )
+    const second = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], first.purgedSlots)
+
+    expect(second.outcome).toBe("gone")
+    expect(stores.migrated.get("mnemonicAccounts")).toBe("alice")
+    expect(stores.legacy.has("mnemonic:alice")).toBe(false)
+  })
+
+  it("keeps the legacy copy of a seed it moved while the account could not be tracked", async () => {
+    stores.legacy.set("mnemonic:alice", "alpha beta")
+    refuseTrackedListWrites()
+
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
+
+    expect(purged.outcome).toBe("transient")
+    expect(stores.migrated.get("mnemonic:alice")).toBe("alpha beta")
+    expect(stores.legacy.get("mnemonic:alice")).toBe("alpha beta")
+    expect(purged.purgedSlots).not.toContain("mnemonic:alice")
+  })
+
+  it("keeps the legacy copy while the tracked list cannot be read", async () => {
+    stores.migrated.set("mnemonic:alice", "alpha beta")
+    stores.legacy.set("mnemonic:alice", "alpha beta")
+    mockGetInternet.mockImplementation(async (server: string) => {
+      const slot = server.replace("secure-store.blink.local/", "")
+      if (slot === "mnemonicAccounts") throw new Error("keychain unavailable")
+      const value = stores.migrated.get(slot)
+      return value === undefined ? false : { username: slot, password: value }
+    })
+
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
+
+    expect(purged.outcome).toBe("transient")
+    expect(stores.legacy.get("mnemonic:alice")).toBe("alpha beta")
+    expect(purged.purgedSlots).not.toContain("mnemonic:alice")
+  })
+})
