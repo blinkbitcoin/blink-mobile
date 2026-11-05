@@ -2452,7 +2452,8 @@
         "sdkInsufficientFunds": "Fonds insuffisants pour cette transaction.",
         "sdkAmountTooLow": "Le montant est trop faible pour une transaction on-chain.",
         "sdkNetworkError": "Erreur réseau. Vérifiez votre connexion et réessayez.",
-        "sdkGenericError": "Impossible d'estimer les frais. Essayez un montant différent."
+        "sdkGenericError": "Impossible d'estimer les frais. Essayez un montant différent.",
+        "onchainSelfPayment": "C'est l'adresse de votre propre portefeuille. Vous ne pouvez pas vous envoyer un paiement on-chain."
     },
     "SettingsScreen": {
         "createAddress": "Créer une adresse Lightning",
