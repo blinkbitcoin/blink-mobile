@@ -26,6 +26,17 @@ jest.mock("@app/graphql/generated", () => ({
   }),
 }))
 
+jest.mock("@app/hooks/use-account-registry", () => ({
+  ...jest.requireActual("@app/hooks/use-account-registry"),
+  useAccountRegistry: () => ({
+    accounts: [],
+    activeAccount: undefined,
+    selfCustodialEntries: [],
+    setActiveAccountId: jest.fn(),
+    reloadSelfCustodialAccounts: jest.fn(),
+  }),
+}))
+
 jest.mock("@app/graphql/is-authed-context", () => ({
   ...jest.requireActual("@app/graphql/is-authed-context"),
   useIsAuthed: () => true,

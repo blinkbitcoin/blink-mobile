@@ -2370,6 +2370,8 @@
     "invalidAmount": "Αυτό περιέχει ένα άκυρο ποσό. Παρακαλούμε αναδημιουργήστε το με ένα έγκυρο ποσό.",
     "usernameDoesNotExist": "{lnAddress: string} δεν φαίνεται να υπάρχει αυτή η διεύθυνση {bankName: string}.",
     "usernameDoesNotExistAdvice": "Είτε βεβαιωθείτε ότι η ορθογραφία είναι σωστή είτε ζητήστε από τον παραλήπτη μια διεύθυνση τιμολογίου LN ή μια διεύθυνση BTC.",
+    "destinationUnverifiable": "Δεν μπορέσαμε να ελέγξουμε το {lnAddress} τώρα — οι διακομιστές του {bankName} δεν απαντούν.",
+    "destinationUnverifiableAdvice": "Η διεύθυνση μάλλον είναι σωστή. Δοκιμάστε ξανά σε λίγο ή ζητήστε από τον παραλήπτη τιμολόγιο LN ή διεύθυνση BTC.",
     "selfPaymentError": "{lnAddress: string} είναι η {bankName: string} διεύθυνσή σας.",
     "selfPaymentAdvice": "Αν θέλετε να στείλετε χρήματα σε άλλο λογαριασμό που σας ανήκει, μπορείτε να χρησιμοποιήσετε μια διεύθυνση τιμολογίου, LN ή BTC.",
     "lnAddressError": "Δεν μπορούμε να βρούμε αυτή τη διεύθυνση Lightning. Αν είστε σίγουροι ότι υπάρχει, μπορείτε να προσπαθήσετε ξανά αργότερα.",
@@ -2595,7 +2597,8 @@
     "error": "Δεν είναι δυνατή η ανάκτηση προφίλ αυτή τη στιγμή",
     "fromThisDevice": "από αυτή τη συσκευή;",
     "switchAccount": "Κάνατε εναλλαγή σε άλλο λογαριασμό",
-    "removedAccount": "Αφαιρέσατε τον λογαριασμό {identifier: string}."
+    "removedAccount": "Αφαιρέσατε τον λογαριασμό {identifier: string}.",
+    "removeAccount": "Αφαίρεση λογαριασμού"
   },
   "StablesatsRestriction": {
     "walletLabel": "δεν είναι διαθέσιμο στην περιοχή σου",
@@ -2759,6 +2762,7 @@
       "tooLong": "Η διεύθυνση πρέπει να είναι μέχρι 50 χαρακτήσρες",
       "invalidCharacter": "Η διεύθυνση μπορεί να περιέχει μόνο γράμματα, αριθμούς και κάτω παύλες",
       "addressUnavailable": "Λυπούμαστε, αυτή η διεύθυνση είναι κατειλημμένη ",
+      "serverUnreachable": "Δεν ήταν δυνατή η σύνδεση με τον διακομιστή διευθύνσεων. Δοκιμάστε ξανά σε λίγο.",
       "unknownError": "Προέκυψε άγνωστο σφάλμα, παρακαλούμε δοκιμάστε ξανά αργότερα ",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3086,12 +3090,12 @@
     "deleteAccountError": "Κάτι πήγε στραβά. Επικοινωνήστε με το {email: string} για περαιτέρω βοήθεια.",
     "bye": "Αντίο!",
     "deleteAccountWarning": "Προσοχή: Το κλείσιμο του λογαριασμού είναι μόνιμο!\nΒεβαιωθείτε ότι τα πορτοφόλια δεν έχουν χρήματα πριν το κλείσιμο.\nΈνας κλειστός λογαριασμός δεν μπορεί να επαναφερθεί.\nΕνδέχεται να διατηρήσουμε ορισμένα αρχεία όπως απαιτείται από τον νόμο.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Λήψη αρχείων καταγραφής",
+    "exportLogsTitle": "Μοιραστείτε τα αρχεία καταγραφής του πορτοφολιού",
+    "exportLogsBody": "Αυτό το αρχείο βοηθά την ομάδα υποστήριξης να εξετάσει προβλήματα με τα πορτοφόλια σας. Περιλαμβάνει το ιστορικό πληρωμών (ποσά, τιμολόγια και διευθύνσεις) και τα αναγνωριστικά κάθε πορτοφολιού μη φύλαξης σε αυτή τη συσκευή, όχι μόνο αυτού, αλλά ποτέ τις φράσεις αντιγράφου ασφαλείας ή τα κλειδιά σας. Μοιραστείτε το μόνο με την ομάδα υποστήριξης.",
+    "exportLogsConfirm": "Μοιραστείτε τα αρχεία καταγραφής",
+    "noLogsYet": "Δεν υπάρχουν ακόμα αρχεία καταγραφής για κοινοποίηση. Ανοίξτε το πορτοφόλι σας και δοκιμάστε ξανά.",
+    "exportLogsError": "Δεν ήταν δυνατή η εξαγωγή των αρχείων καταγραφής. Δοκιμάστε ξανά."
   },
   "lnurl": {
     "overLimit": "Δεν μπορείτε να στείλετε περισσότερα από το μέγιστο ποσό",
@@ -3827,7 +3831,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Αντίγραφο ασφαλείας πορτοφολιού",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Επιλέξτε τη μέθοδο αντιγράφου ασφαλείας",
@@ -3885,6 +3889,7 @@
     "CloudBackup": {
       "title": "Ας δημιουργήσουμε αντίγραφο ασφαλείας του πορτοφολιού σας",
       "description": "Θα αποθηκεύσουμε ένα αντίγραφο της φράσης ανάκτησης στο {provider} σας.",
+      "encryptCheckbox": "Κρυπτογράφηση με πρόσθετο κωδικό",
       "password": "Κωδικός",
       "passwordPlaceholder": "(τουλάχιστον 12 χαρακτήρες)",
       "confirmPassword": "Επιβεβαίωση κωδικού",
@@ -4226,6 +4231,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Το Blink δεν είναι προσβάσιμο",
+    "unreachableDescription": "Το {featureName} χρειάζεται τους διακομιστές του Blink, που αυτή τη στιγμή δεν απαντούν. Το πορτοφόλι και τα κεφάλαιά σας δεν επηρεάζονται.",
     "featureCircles": "Circles",
     "featureEarn": "Μάθηση",
     "featureCard": "Card"
@@ -4248,6 +4255,10 @@
     "tokenTransfer": "Μεταφορά {token}",
     "payTo": "Πληρωμή σε {address}",
     "payment": "Πληρωμή"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Η ισοτιμία μπορεί να μην είναι ενημερωμένη",
+    "satsOnly": "Εμφάνιση σε sats — δεν υπάρχει διαθέσιμη ισοτιμία"
   },
   "SelfCustodialOffline": {
     "title": "Το πορτοφόλι είναι εκτός σύνδεσης",

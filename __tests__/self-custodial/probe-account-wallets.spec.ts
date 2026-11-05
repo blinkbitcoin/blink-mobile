@@ -8,6 +8,10 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { toWalletId } from "@app/types/wallet"
 
+/** Threaded explicitly since the config functions stopped reading a global; the real
+ *  value comes from `useLnurlServer()` at the calling hook. */
+const TEST_LNURL_DOMAIN = "staging.blink.sv"
+
 const mockGetMnemonic = jest.fn()
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
@@ -67,11 +71,12 @@ describe("probeSelfCustodialAccountWallets", () => {
   it("returns no-mnemonic without initializing the SDK when no mnemonic is stored", async () => {
     mockGetMnemonic.mockResolvedValue(null)
 
-    const result = await probeSelfCustodialAccountWallets(
-      TEST_ACCOUNT_ID,
-      Network.Regtest,
-      TEST_LEEWAY,
-    )
+    const result = await probeSelfCustodialAccountWallets({
+      accountId: TEST_ACCOUNT_ID,
+      network: Network.Regtest,
+      leewaySatPerVbyte: TEST_LEEWAY,
+      lnurlDomain: TEST_LNURL_DOMAIN,
+    })
 
     expect(result).toEqual({ status: ProbeAccountWalletsStatus.NoMnemonic })
     expect(mockInitSdk).not.toHaveBeenCalled()
@@ -87,17 +92,19 @@ describe("probeSelfCustodialAccountWallets", () => {
       rawTransactionCount: 0,
     })
 
-    const result = await probeSelfCustodialAccountWallets(
-      TEST_ACCOUNT_ID,
-      Network.Regtest,
-      TEST_LEEWAY,
-    )
+    const result = await probeSelfCustodialAccountWallets({
+      accountId: TEST_ACCOUNT_ID,
+      network: Network.Regtest,
+      leewaySatPerVbyte: TEST_LEEWAY,
+      lnurlDomain: TEST_LNURL_DOMAIN,
+    })
 
     expect(mockInitSdk).toHaveBeenCalledWith({
       mnemonic: TEST_MNEMONIC,
       storageDir: `/storage/spark/${TEST_ACCOUNT_ID}`,
       network: Network.Regtest,
       leewaySatPerVbyte: TEST_LEEWAY,
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
     expect(mockGetSnapshot).toHaveBeenCalledWith(FAKE_SDK)
     expect(result).toEqual({
@@ -115,7 +122,12 @@ describe("probeSelfCustodialAccountWallets", () => {
       rawTransactionCount: 0,
     })
 
-    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, Network.Regtest, TEST_LEEWAY)
+    await probeSelfCustodialAccountWallets({
+      accountId: TEST_ACCOUNT_ID,
+      network: Network.Regtest,
+      leewaySatPerVbyte: TEST_LEEWAY,
+      lnurlDomain: TEST_LNURL_DOMAIN,
+    })
 
     expect(mockDisconnectSdk).toHaveBeenCalledWith(FAKE_SDK)
   })
@@ -125,11 +137,12 @@ describe("probeSelfCustodialAccountWallets", () => {
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockRejectedValue(new Error("getInfo failed"))
 
-    const result = await probeSelfCustodialAccountWallets(
-      TEST_ACCOUNT_ID,
-      Network.Regtest,
-      TEST_LEEWAY,
-    )
+    const result = await probeSelfCustodialAccountWallets({
+      accountId: TEST_ACCOUNT_ID,
+      network: Network.Regtest,
+      leewaySatPerVbyte: TEST_LEEWAY,
+      lnurlDomain: TEST_LNURL_DOMAIN,
+    })
 
     expect(result.status).toBe(ProbeAccountWalletsStatus.ProbeFailed)
     if (result.status === ProbeAccountWalletsStatus.ProbeFailed) {
@@ -142,11 +155,12 @@ describe("probeSelfCustodialAccountWallets", () => {
     mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
     mockInitSdk.mockRejectedValue(new Error("connect failed"))
 
-    const result = await probeSelfCustodialAccountWallets(
-      TEST_ACCOUNT_ID,
-      Network.Regtest,
-      TEST_LEEWAY,
-    )
+    const result = await probeSelfCustodialAccountWallets({
+      accountId: TEST_ACCOUNT_ID,
+      network: Network.Regtest,
+      leewaySatPerVbyte: TEST_LEEWAY,
+      lnurlDomain: TEST_LNURL_DOMAIN,
+    })
 
     expect(result.status).toBe(ProbeAccountWalletsStatus.ProbeFailed)
     if (result.status === ProbeAccountWalletsStatus.ProbeFailed) {
@@ -160,11 +174,12 @@ describe("probeSelfCustodialAccountWallets", () => {
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockRejectedValue("opaque string failure")
 
-    const result = await probeSelfCustodialAccountWallets(
-      TEST_ACCOUNT_ID,
-      Network.Regtest,
-      TEST_LEEWAY,
-    )
+    const result = await probeSelfCustodialAccountWallets({
+      accountId: TEST_ACCOUNT_ID,
+      network: Network.Regtest,
+      leewaySatPerVbyte: TEST_LEEWAY,
+      lnurlDomain: TEST_LNURL_DOMAIN,
+    })
 
     expect(result.status).toBe(ProbeAccountWalletsStatus.ProbeFailed)
     if (result.status === ProbeAccountWalletsStatus.ProbeFailed) {
@@ -183,11 +198,12 @@ describe("probeSelfCustodialAccountWallets", () => {
     })
     mockDisconnectSdk.mockRejectedValueOnce(new Error("disconnect failed"))
 
-    const result = await probeSelfCustodialAccountWallets(
-      TEST_ACCOUNT_ID,
-      Network.Regtest,
-      TEST_LEEWAY,
-    )
+    const result = await probeSelfCustodialAccountWallets({
+      accountId: TEST_ACCOUNT_ID,
+      network: Network.Regtest,
+      leewaySatPerVbyte: TEST_LEEWAY,
+      lnurlDomain: TEST_LNURL_DOMAIN,
+    })
 
     expect(result).toEqual({
       status: ProbeAccountWalletsStatus.Ok,
@@ -206,7 +222,12 @@ describe("probeSelfCustodialAccountWallets", () => {
     const disconnectError = new Error("SQLite handle locked")
     mockDisconnectSdk.mockRejectedValueOnce(disconnectError)
 
-    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, Network.Regtest, TEST_LEEWAY)
+    await probeSelfCustodialAccountWallets({
+      accountId: TEST_ACCOUNT_ID,
+      network: Network.Regtest,
+      leewaySatPerVbyte: TEST_LEEWAY,
+      lnurlDomain: TEST_LNURL_DOMAIN,
+    })
 
     expect(mockRecordError).toHaveBeenCalledWith(disconnectError)
   })
@@ -221,7 +242,12 @@ describe("probeSelfCustodialAccountWallets", () => {
     })
     mockDisconnectSdk.mockRejectedValueOnce("native handle invalid")
 
-    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, Network.Regtest, TEST_LEEWAY)
+    await probeSelfCustodialAccountWallets({
+      accountId: TEST_ACCOUNT_ID,
+      network: Network.Regtest,
+      leewaySatPerVbyte: TEST_LEEWAY,
+      lnurlDomain: TEST_LNURL_DOMAIN,
+    })
 
     expect(mockRecordError).toHaveBeenCalledWith(
       expect.objectContaining({
