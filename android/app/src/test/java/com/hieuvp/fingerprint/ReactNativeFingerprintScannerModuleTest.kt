@@ -24,6 +24,7 @@ import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
+import org.robolectric.android.controller.ActivityController
 import org.robolectric.annotation.Config
 import org.robolectric.shadow.api.Shadow
 import org.robolectric.shadows.ShadowBiometricManager
@@ -133,6 +134,7 @@ class ReactNativeFingerprintScannerModuleTest {
   }
 
   private val mainThread: Thread = Looper.getMainLooper().thread
+  private lateinit var activityController: ActivityController<FragmentActivity>
   private lateinit var activity: FragmentActivity
   private lateinit var context: TestReactContext
   private lateinit var module: TestModule
@@ -146,7 +148,8 @@ class ReactNativeFingerprintScannerModuleTest {
       setCanAuthenticate(true)
       setAuthenticatorType(BiometricManager.Authenticators.BIOMETRIC_WEAK)
     }
-    activity = Robolectric.buildActivity(FragmentActivity::class.java).setup().get()
+    activityController = Robolectric.buildActivity(FragmentActivity::class.java).setup()
+    activity = activityController.get()
     context = TestReactContext(application).also { it.activity = activity }
     module = TestModule(context)
   }
@@ -259,6 +262,46 @@ class ReactNativeFingerprintScannerModuleTest {
     // The new prompt answers the new promise, not the one it replaced.
     second.callback.onAuthenticationError(BiometricPrompt.ERROR_CANCELED, "cancelled")
     assertEquals(listOf<String?>("SystemCancel"), promise.rejections.toList())
+  }
+
+  @Test
+  fun `authenticate with no activity answers JS instead of leaving it waiting`() {
+    context.activity = null
+    val promise = RecordingPromise()
+
+    authenticate(promise)
+    runMainLooper()
+
+    assertEquals(listOf<String?>("SystemCancel"), promise.rejections.toList())
+    assertTrue(module.prompts.isEmpty())
+  }
+
+  @Test
+  fun `authenticate once the activity's state is saved answers JS instead of leaving it waiting`() {
+    activityController.pause().stop()
+    assertTrue(activity.supportFragmentManager.isStateSaved)
+    val promise = RecordingPromise()
+
+    authenticate(promise)
+    runMainLooper()
+
+    assertEquals(listOf<String?>("SystemCancel"), promise.rejections.toList())
+    assertTrue(module.prompts.isEmpty())
+  }
+
+  @Test
+  fun `a rejected authenticate does not get in the way of the next one`() {
+    context.activity = null
+    authenticate()
+    runMainLooper()
+
+    context.activity = activity
+    val promise = RecordingPromise()
+    authenticate(promise)
+    runMainLooper()
+
+    assertEquals(1, module.prompts.single().authenticateCalls)
+    assertTrue(promise.rejections.isEmpty())
   }
 
   /**

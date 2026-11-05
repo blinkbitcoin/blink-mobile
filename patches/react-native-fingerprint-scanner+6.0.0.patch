@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-fingerprint-scanner/android/src/main/java/com/hieuvp/fingerprint/ReactNativeFingerprintScannerModule.java b/node_modules/react-native-fingerprint-scanner/android/src/main/java/com/hieuvp/fingerprint/ReactNativeFingerprintScannerModule.java
-index 57364dc..d38ed93 100644
+index 57364dc..9692705 100644
 --- a/node_modules/react-native-fingerprint-scanner/android/src/main/java/com/hieuvp/fingerprint/ReactNativeFingerprintScannerModule.java
 +++ b/node_modules/react-native-fingerprint-scanner/android/src/main/java/com/hieuvp/fingerprint/ReactNativeFingerprintScannerModule.java
 @@ -2,6 +2,7 @@ package com.hieuvp.fingerprint;
@@ -36,7 +36,23 @@ index 57364dc..d38ed93 100644
      private void biometricAuthenticate(final String title, final String subtitle, final String description, final String cancelButton, final Promise promise) {
          UiThreadUtil.runOnUiThread(
              new Runnable() {
-@@ -210,12 +216,36 @@ public class ReactNativeFingerprintScannerModule
+@@ -121,7 +127,14 @@ public class ReactNativeFingerprintScannerModule
+                 public void run() {
+                     FragmentActivity fragmentActivity = (FragmentActivity) mReactContext.getCurrentActivity();
+ 
+-                    if(fragmentActivity == null) return;
++                    // BiometricPrompt drops a call it cannot show without ever answering
++                    // it, once the activity's state is saved, so JS would wait forever.
++                    // SystemCancel is what the caller hears if the system takes the prompt
++                    // away after it opens, and every caller already handles it.
++                    if (fragmentActivity == null || fragmentActivity.getSupportFragmentManager().isStateSaved()) {
++                        promise.reject("SystemCancel", TYPE_BIOMETRICS);
++                        return;
++                    }
+ 
+                     BiometricPrompt bioPrompt = getBiometricPrompt(fragmentActivity, promise);
+ 
+@@ -210,12 +223,36 @@ public class ReactNativeFingerprintScannerModule
      }
  
      @ReactMethod
