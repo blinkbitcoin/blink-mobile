@@ -100,6 +100,18 @@ jest.mock("@app/screens/card-screen/hooks/use-card-secrets", () => ({
   }),
 }))
 
+let mockScreenGuard: "on" | "pending" | "failed" = "on"
+jest.mock("@app/utils/screen-security", () => ({
+  acquireScreenSecurity: () => {
+    const ready = {
+      on: () => Promise.resolve(),
+      pending: () => new Promise<void>(() => {}),
+      failed: () => Promise.reject(new Error("screen guard unavailable")),
+    }[mockScreenGuard]()
+    return { ready, release: () => Promise.resolve() }
+  },
+}))
+
 const mockUseCardData = jest.fn()
 jest.mock("@app/hooks/use-card-data", () => ({
   useCardData: () => mockUseCardData(),
@@ -137,6 +149,7 @@ const setupMocks = (overrides?: { cardData?: Partial<typeof defaultCardData> }) 
   mockUseCardData.mockReturnValue({ ...defaultCardData, ...overrides?.cardData })
   mockSecrets = undefined
   mockHolderName = ""
+  mockScreenGuard = "on"
   /** Default arrangement: a biometrics user passing the prompt. The gate fails
    *  closed in every unauthenticated arrangement, so most cases need a pass. */
   mockReadIsPinEnabled.mockResolvedValue({ status: "no" })
@@ -579,6 +592,51 @@ describe("CardDetailsScreen", () => {
 
       const copied = mockCopyToClipboard.mock.calls.map(([params]) => params.content)
       expect(copied).toEqual(["4549880051539745", "342", "Satoshi Nakamoto"])
+    })
+  })
+
+  describe("screen protection", () => {
+    const renderDetails = async () => {
+      const screen = render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+      return screen
+    }
+
+    it("keeps the card secrets unfetched and hidden while the screen guard is pending", async () => {
+      mockScreenGuard = "pending"
+      mockSecrets = { pan: "4549880051539745", cvc: "342" }
+
+      const { getByTestId, queryByTestId } = await renderDetails()
+
+      expect(getByTestId("screen-security-activating")).toBeTruthy()
+      expect(mockFetchSecrets).not.toHaveBeenCalled()
+      expect(queryByTestId("card-number-field")).toBeNull()
+      expect(queryByTestId("card-cvv-field")).toBeNull()
+    })
+
+    it("never mounts the card secrets when the screen guard fails", async () => {
+      mockScreenGuard = "failed"
+      mockSecrets = { pan: "4549880051539745", cvc: "342" }
+
+      const { getByTestId, queryByTestId } = await renderDetails()
+      await act(async () => {
+        jest.runAllTimers()
+      })
+
+      expect(getByTestId("screen-security-error")).toBeTruthy()
+      expect(mockFetchSecrets).not.toHaveBeenCalled()
+      expect(queryByTestId("card-number-field")).toBeNull()
+      expect(queryByTestId("card-cvv-field")).toBeNull()
+    })
+
+    it("asks for the secrets once the user and the screen guard are both cleared", async () => {
+      await renderDetails()
+
+      expect(mockFetchSecrets).toHaveBeenCalledWith("card-1")
     })
   })
 

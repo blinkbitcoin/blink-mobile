@@ -10,6 +10,7 @@ import { BlinkCard } from "@app/components/blink-card"
 import { headerRightNoGlass } from "@app/components/header-no-glass"
 import { InfoSection, InfoCard } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
+import { ScreenSecurityGate } from "@app/components/screen-security-gate"
 import { CardStatus } from "@app/graphql/generated"
 import { useCardData, useCardHolder, useClipboard } from "@app/hooks"
 import {
@@ -25,13 +26,14 @@ import { isCardFrozen, formatCardType, formatIssuedDate } from "./utils/card-dis
 
 const CLIPBOARD_CLEAR_MS = 60_000
 
+type DetailsCard = NonNullable<ReturnType<typeof useCardData>["card"]>
+
 export const CardDetailsScreen: React.FC = () => {
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
-  const { LL, locale } = useI18nContext()
-  const { copyToClipboard } = useClipboard(CLIPBOARD_CLEAR_MS)
+  const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const handleDismiss = useCallback(() => navigation.goBack(), [navigation])
@@ -44,26 +46,12 @@ export const CardDetailsScreen: React.FC = () => {
   })
 
   const { card, loading: cardLoading } = useCardData()
-  const { fullName } = useCardHolder(card?.id)
-  const { secrets, fetchSecrets } = useCardSecrets()
 
   useEffect(() => {
     if (authenticated && !cardLoading && !card) {
       handleDismiss()
     }
   }, [authenticated, cardLoading, card, handleDismiss])
-
-  useEffect(() => {
-    if (authenticated && card?.id && !secrets) {
-      fetchSecrets(card.id)
-    }
-  }, [authenticated, card?.id, secrets, fetchSecrets])
-
-  const handleCopy = (content: string, label: string) =>
-    copyToClipboard({
-      content,
-      message: LL.common.hasBeenCopiedToClipboard({ type: label }),
-    })
 
   const handleSettingsPress = useCallback(() => {
     navigation.navigate("cardSettingsScreen")
@@ -78,6 +66,46 @@ export const CardDetailsScreen: React.FC = () => {
       )),
     )
   }, [navigation, styles.headerRight, colors.black, handleSettingsPress])
+
+  if (!authenticated || cardLoading) {
+    return (
+      <Screen preset="scroll">
+        <ActivityIndicator style={styles.loader} color={colors.primary} />
+      </Screen>
+    )
+  }
+
+  if (!card) return null
+
+  return (
+    <ScreenSecurityGate>
+      <CardDetailsContent card={card} />
+    </ScreenSecurityGate>
+  )
+}
+
+/** Mounted only once the screen guard is on, so the decrypted card number and CVV are
+ *  never fetched or painted where a screenshot, a recording or the app switcher could
+ *  catch them. */
+const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
+  const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
+  const { LL, locale } = useI18nContext()
+  const { copyToClipboard } = useClipboard(CLIPBOARD_CLEAR_MS)
+  const { fullName } = useCardHolder(card.id)
+  const { secrets, fetchSecrets } = useCardSecrets()
+
+  useEffect(() => {
+    if (!secrets) fetchSecrets(card.id)
+  }, [card.id, secrets, fetchSecrets])
+
+  const handleCopy = (content: string, label: string) =>
+    copyToClipboard({
+      content,
+      message: LL.common.hasBeenCopiedToClipboard({ type: label }),
+    })
 
   const cardStatusConfig = useMemo(
     () => ({
@@ -108,16 +136,6 @@ export const CardDetailsScreen: React.FC = () => {
     }),
     [colors, LL],
   )
-
-  if (!authenticated || cardLoading) {
-    return (
-      <Screen preset="scroll">
-        <ActivityIndicator style={styles.loader} color={colors.primary} />
-      </Screen>
-    )
-  }
-
-  if (!card) return null
 
   const isFrozen = isCardFrozen(card.status)
   const statusConfig = cardStatusConfig[card.status]
