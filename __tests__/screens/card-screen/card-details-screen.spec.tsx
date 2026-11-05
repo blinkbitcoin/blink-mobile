@@ -1,5 +1,5 @@
 import React from "react"
-import { render, fireEvent, act } from "@testing-library/react-native"
+import { render, fireEvent, act, within } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardDetailsScreen } from "@app/screens/card-screen/card-details-screen"
@@ -79,14 +79,21 @@ jest.mock("@app/utils/toast", () => ({
 
 import { toastShow } from "@app/utils/toast"
 
+let mockHolderName = ""
 jest.mock("@app/hooks/use-card-holder", () => ({
-  useCardHolder: () => ({ firstName: "", lastName: "", fullName: "", loading: false }),
+  useCardHolder: () => ({
+    firstName: "",
+    lastName: "",
+    fullName: mockHolderName,
+    loading: false,
+  }),
 }))
 
+let mockSecrets: { pan: string; cvc: string } | undefined
 const mockFetchSecrets = jest.fn()
 jest.mock("@app/screens/card-screen/hooks/use-card-secrets", () => ({
   useCardSecrets: () => ({
-    secrets: undefined,
+    secrets: mockSecrets,
     loading: false,
     error: undefined,
     fetchSecrets: mockFetchSecrets,
@@ -128,6 +135,8 @@ const defaultCardData = {
 
 const setupMocks = (overrides?: { cardData?: Partial<typeof defaultCardData> }) => {
   mockUseCardData.mockReturnValue({ ...defaultCardData, ...overrides?.cardData })
+  mockSecrets = undefined
+  mockHolderName = ""
   /** Default arrangement: a biometrics user passing the prompt. The gate fails
    *  closed in every unauthenticated arrangement, so most cases need a pass. */
   mockReadIsPinEnabled.mockResolvedValue({ status: "no" })
@@ -509,6 +518,67 @@ describe("CardDetailsScreen", () => {
       await act(async () => {})
 
       expect(mockUseClipboard).toHaveBeenCalledWith(60_000)
+    })
+  })
+
+  describe("card secrets", () => {
+    const renderDetails = async () => {
+      const screen = render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+      return screen
+    }
+
+    it("asks for the secrets of the card once the user is authenticated", async () => {
+      await renderDetails()
+
+      expect(mockFetchSecrets).toHaveBeenCalledWith("card-1")
+    })
+
+    it("never asks for the secrets when authentication fails", async () => {
+      mockAuthenticate.mockImplementation(
+        (_desc: string, _onSuccess: () => void, onFail: () => void) => {
+          onFail()
+        },
+      )
+
+      await renderDetails()
+
+      expect(mockFetchSecrets).not.toHaveBeenCalled()
+    })
+
+    it("shows the full card number, the CVV and the holder once loaded", async () => {
+      mockSecrets = { pan: "4549880051539745", cvc: "342" }
+      mockHolderName = "Satoshi Nakamoto"
+
+      const { getByTestId } = await renderDetails()
+
+      expect(
+        within(getByTestId("card-number-field")).getByText("4549 8800 5153 9745"),
+      ).toBeTruthy()
+      expect(within(getByTestId("card-cvv-field")).getByText("342")).toBeTruthy()
+      expect(
+        within(getByTestId("card-holder-field")).getByText("Satoshi Nakamoto"),
+      ).toBeTruthy()
+    })
+
+    it("copies the full card number, the CVV and the holder name", async () => {
+      mockSecrets = { pan: "4549880051539745", cvc: "342" }
+      mockHolderName = "Satoshi Nakamoto"
+
+      const { getByTestId } = await renderDetails()
+
+      await act(async () => {
+        fireEvent.press(getByTestId("card-number-field"))
+        fireEvent.press(getByTestId("card-cvv-field"))
+        fireEvent.press(getByTestId("card-holder-field"))
+      })
+
+      const copied = mockCopyToClipboard.mock.calls.map(([params]) => params.content)
+      expect(copied).toEqual(["4549880051539745", "342", "Satoshi Nakamoto"])
     })
   })
 

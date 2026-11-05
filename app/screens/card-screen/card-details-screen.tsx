@@ -157,6 +157,7 @@ export const CardDetailsScreen: React.FC = () => {
                 label={LL.CardFlow.CardDetails.cvv()}
                 value={secrets?.cvc ?? null}
                 icon="copy-paste"
+                testID="card-cvv-field"
                 onAction={() =>
                   handleCopy(secrets?.cvc ?? "", LL.CardFlow.CardDetails.cvv())
                 }
@@ -168,6 +169,7 @@ export const CardDetailsScreen: React.FC = () => {
             label={LL.CardFlow.CardDetails.cardholderName()}
             value={fullName || null}
             icon="copy-paste"
+            testID="card-holder-field"
             onAction={() =>
               handleCopy(fullName, LL.CardFlow.CardDetails.cardholderName())
             }
