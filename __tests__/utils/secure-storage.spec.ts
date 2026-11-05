@@ -2751,6 +2751,61 @@ describe("KeyStoreWrapper clearAppLock", () => {
   })
 })
 
+/**
+ * Both stores, so that a purge which migrates before erasing is exercised the
+ * way it runs: the legacy value moves across and the new store then answers
+ * for it.
+ */
+const stores = {
+  legacy: new Map<string, string>(),
+  migrated: new Map<string, string>(),
+}
+
+const legacyNotFound = () =>
+  Object.assign(new Error("key does not present"), { code: "404" })
+
+const resetPurgeStores = () => {
+  jest.clearAllMocks()
+  stores.legacy.clear()
+  stores.migrated.clear()
+  // Reset per test: two cases below pin the platform, and one verdict in
+  // purgeThrough turns on it, so a leaked value would make the rest of this block
+  // order-dependent.
+  setPlatform(ORIGINAL_PLATFORM)
+
+  mockGet.mockImplementation(async (key: string) => {
+    const value = stores.legacy.get(key)
+    if (value === undefined) throw legacyNotFound()
+    return value
+  })
+  mockRemove.mockImplementation(async (key: string) => {
+    stores.legacy.delete(key)
+  })
+  // The blank an erase falls back to when the delete is refused lands like any write.
+  mockSet.mockImplementation(async (key: string, value: string) => {
+    stores.legacy.set(key, value)
+  })
+  mockGetInternet.mockImplementation(async (server: string) => {
+    const slot = server.replace("secure-store.blink.local/", "")
+    const value = stores.migrated.get(slot)
+    if (value === undefined) return false
+    return { username: slot, password: value }
+  })
+  // The purge probes a seed the legacy store does not hold before it reads it,
+  // so this is the call that answers for the new store there — see purgeThrough.
+  mockHasInternet.mockImplementation(async ({ server }: { server: string }) => {
+    const slot = server.replace("secure-store.blink.local/", "")
+    return stores.migrated.has(slot)
+  })
+  mockSetInternet.mockImplementation(
+    async (server: string, slot: string, value: string) => {
+      stores.migrated.set(slot, value)
+      return { service: server }
+    },
+  )
+  mockResetInternet.mockResolvedValue(undefined)
+}
+
 describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
   /** Every key the purge is expected to name, in the order it names them. */
   const FIXED_KEYS = [
@@ -2762,60 +2817,7 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
     "galoyAuthToken",
   ]
 
-  /**
-   * Both stores, so that a purge which migrates before erasing is exercised the
-   * way it runs: the legacy value moves across and the new store then answers
-   * for it.
-   */
-  const stores = {
-    legacy: new Map<string, string>(),
-    migrated: new Map<string, string>(),
-  }
-
-  const legacyNotFound = () =>
-    Object.assign(new Error("key does not present"), { code: "404" })
-
-  beforeEach(() => {
-    jest.clearAllMocks()
-    stores.legacy.clear()
-    stores.migrated.clear()
-    // Reset per test: two cases below pin the platform, and one verdict in
-    // purgeThrough turns on it, so a leaked value would make the rest of this block
-    // order-dependent.
-    setPlatform(ORIGINAL_PLATFORM)
-
-    mockGet.mockImplementation(async (key: string) => {
-      const value = stores.legacy.get(key)
-      if (value === undefined) throw legacyNotFound()
-      return value
-    })
-    mockRemove.mockImplementation(async (key: string) => {
-      stores.legacy.delete(key)
-    })
-    // The blank an erase falls back to when the delete is refused lands like any write.
-    mockSet.mockImplementation(async (key: string, value: string) => {
-      stores.legacy.set(key, value)
-    })
-    mockGetInternet.mockImplementation(async (server: string) => {
-      const slot = server.replace("secure-store.blink.local/", "")
-      const value = stores.migrated.get(slot)
-      if (value === undefined) return false
-      return { username: slot, password: value }
-    })
-    // The purge probes a seed the legacy store does not hold before it reads it,
-    // so this is the call that answers for the new store there — see purgeThrough.
-    mockHasInternet.mockImplementation(async ({ server }: { server: string }) => {
-      const slot = server.replace("secure-store.blink.local/", "")
-      return stores.migrated.has(slot)
-    })
-    mockSetInternet.mockImplementation(
-      async (server: string, slot: string, value: string) => {
-        stores.migrated.set(slot, value)
-        return { service: server }
-      },
-    )
-    mockResetInternet.mockResolvedValue(undefined)
-  })
+  beforeEach(resetPurgeStores)
 
   it("erases the six fixed keys", async () => {
     FIXED_KEYS.forEach((key) => stores.legacy.set(key, `${key}-value`))
