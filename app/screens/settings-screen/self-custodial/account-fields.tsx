@@ -29,7 +29,7 @@ const ReadOnlyField: React.FC<FieldProps> = ({
   return (
     <View style={styles.fieldGroup}>
       <Text style={styles.label}>{label}</Text>
-      <View style={styles.box}>
+      <View style={[styles.box, !copyTestID && styles.boxStatic]}>
         <Text
           style={styles.value}
           numberOfLines={1}
@@ -140,13 +140,14 @@ const useStyles = makeStyles(({ colors }) => ({
   box: {
     flexDirection: "row",
     alignItems: "center",
-    ...staticSurface(colors),
+    backgroundColor: colors.grey5,
     borderRadius: 8,
     paddingLeft: 14,
     paddingRight: 10,
     paddingVertical: 14,
     gap: 14,
   },
+  boxStatic: staticSurface(colors),
   value: {
     flex: 1,
     color: colors.black,

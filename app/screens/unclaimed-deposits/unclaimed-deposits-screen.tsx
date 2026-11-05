@@ -13,7 +13,6 @@ import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { DepositStatus } from "@app/types/payment"
 import { testProps } from "@app/utils/testProps"
 import { fonts } from "@app/rne-theme/fonts"
-import { staticSurface } from "@app/rne-theme/surfaces"
 
 import {
   buildFeeTierOptions,
@@ -231,7 +230,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginTop: 40,
   },
   card: {
-    ...staticSurface(colors),
+    backgroundColor: colors.grey5,
     borderRadius: 12,
     padding: 20,
     gap: 14,

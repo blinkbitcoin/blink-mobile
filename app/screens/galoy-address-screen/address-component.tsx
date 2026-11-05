@@ -4,7 +4,6 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { fonts } from "@app/rne-theme/fonts"
-import { staticSurface } from "@app/rne-theme/surfaces"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 const addressTypes = {
@@ -124,7 +123,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    ...staticSurface(colors),
+    backgroundColor: colors.grey5,
     paddingVertical: 16,
     paddingHorizontal: 8,
     borderRadius: 8,

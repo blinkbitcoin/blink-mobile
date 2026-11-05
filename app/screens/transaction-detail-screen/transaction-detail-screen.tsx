@@ -76,7 +76,12 @@ const Row = ({
       {content ? (
         content
       ) : (
-        <View style={styles.valueContainer}>
+        <View
+          style={[
+            styles.valueContainer,
+            icons.length === 0 && styles.valueContainerStatic,
+          ]}
+        >
           <Text selectable={false} style={styles.value}>
             {value}
           </Text>
@@ -667,10 +672,11 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     minHeight: 60,
     padding: 14,
-    ...staticSurface(colors),
+    backgroundColor: colors.grey5,
     alignItems: "center",
     borderRadius: 8,
   },
+  valueContainerStatic: staticSurface(colors),
   value: {
     flex: 1,
     fontSize: 14,

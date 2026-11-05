@@ -28,6 +28,7 @@ export const TEST_GALOY_INSTANCE = {
 
 const colors: Record<string, string> = {
   grey5: "#f5f5f5",
+  grey7: "#f9f9f9",
   primary: "#fc5805",
   black: "#000",
   white: "#fff",
