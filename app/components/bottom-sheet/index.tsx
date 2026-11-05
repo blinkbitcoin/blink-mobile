@@ -79,6 +79,11 @@ type SharedProps = {
   contentContainerStyle?: StyleProp<ViewStyle>
   scrollTestID?: string
   testID?: string
+  /**
+   * Which edges carry the 1px `grey4` outline. The app's sheets draw it on the
+   * top and both sides; Send 3.0's sheets draw the top edge only.
+   */
+  outline?: "topAndSides" | "top"
 }
 
 /**
@@ -142,6 +147,7 @@ type Props = ModalProps | InlineProps
  *
  * The silhouette in `useStyles` is the app's, not this component's invention —
  * a caller wanting a different one is a question for design rather than a prop.
+ * The one design has asked for so far is `outline="top"`.
  *
  * Built here rather than taken from `@gorhom/bottom-sheet`, which is broken on
  * this stack — see the note in `amount-input-modal.tsx` for the issue links.
@@ -171,6 +177,7 @@ export const BottomSheet: React.FC<Props> = ({
   contentContainerStyle,
   scrollTestID,
   testID,
+  outline = "topAndSides",
 }) => {
   const styles = useStyles()
   const { height: windowHeight } = useWindowDimensions()
@@ -453,6 +460,7 @@ export const BottomSheet: React.FC<Props> = ({
       <Animated.View
         style={[
           styles.sheet,
+          outline === "top" && styles.sheetTopOutline,
           isInline
             ? styles.sheetInline
             : { height: sheetHeight + BOTTOM_OVERHANG, marginBottom: -BOTTOM_OVERHANG },
@@ -570,6 +578,10 @@ const useStyles = makeStyles(({ colors }) => ({
     borderBottomWidth: 0,
     borderColor: colors.grey4,
     paddingTop: 8,
+  },
+  sheetTopOutline: {
+    borderLeftWidth: 0,
+    borderRightWidth: 0,
   },
   // Fills the slot the layout gives it, so the surface above shrinks by exactly
   // this sheet's height rather than being covered by it.
