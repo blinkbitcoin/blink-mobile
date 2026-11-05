@@ -238,9 +238,12 @@ describe("TransactionHistoryScreen — self-custodial behavior", () => {
     mockTransitionState.hasTransitioned = true
     mockSelfCustodialState.allTransactions = []
     mockToTransactionFragments.mockReturnValue([])
+    /** An account that already has its seen record, so these tests read the seen state
+     *  itself rather than the start of a new or restored account. */
     mockPersistentState = {
       ...defaultPersistentState,
       activeAccountId: SELF_CUSTODIAL_ACCOUNT_ID,
+      txLastSeenByAccountId: { [SELF_CUSTODIAL_ACCOUNT_ID]: { btcId: "", usdId: "" } },
     }
     mockUseApolloClient.mockReturnValue({
       cache: {
