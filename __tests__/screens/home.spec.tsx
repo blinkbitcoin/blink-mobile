@@ -1,5 +1,6 @@
 import React from "react"
 import { it } from "@jest/globals"
+import { ApolloError } from "@apollo/client"
 import { MockedResponse } from "@apollo/client/testing"
 import { GraphQLError } from "graphql"
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
@@ -275,9 +276,12 @@ let mockIsRestrictedRegion = false
 let mockIsRestrictedRegionEvaluationPending = false
 let mockCanShowUpgradeModal = false
 let mockHomeCard: { id: string; status: CardStatus } | undefined
-let mockHomeCardBalanceSats = 0
+let mockHomeCardLoading = false
+let mockHomeCardBalanceSats: number | undefined = 0
+let mockHomeCardBalanceError: ApolloError | undefined
 const mockUseCardData = jest.fn((_options: { skip?: boolean }) => ({
   card: mockHomeCard,
+  loading: mockHomeCardLoading,
 }))
 const mockPresentRestrictedRegionModal = jest.fn()
 jest.mock("@app/components/restricted-region", () => ({
@@ -536,7 +540,10 @@ jest.mock("@app/hooks", () => {
       resetUpgradeModal: jest.fn(),
     }),
     useCardData: (options: { skip?: boolean }) => mockUseCardData(options),
-    useCardBalance: () => ({ availableSats: mockHomeCardBalanceSats }),
+    useCardBalance: () => ({
+      availableSats: mockHomeCardBalanceSats,
+      error: mockHomeCardBalanceError,
+    }),
   }
 })
 
@@ -1024,7 +1031,9 @@ const resetHomeScreenMocks = () => {
   mockIsRestrictedRegionEvaluationPending = false
   mockCanShowUpgradeModal = false
   mockHomeCard = undefined
+  mockHomeCardLoading = false
   mockHomeCardBalanceSats = 0
+  mockHomeCardBalanceError = undefined
   mockTwoFactorSessionPrompt.isModalOpen = false
   mockTwoFactorEnforcement.isSessionStartPending = false
   jest.clearAllMocks()
@@ -2221,23 +2230,67 @@ describe("HomeScreen card account", () => {
 
     const cardBalance = getByTestId("card-balance", { includeHiddenElements: true })
     expect(cardBalance.props.children).toBe("50,000 SAT")
+    expect(getByTestId("balance-value", { includeHiddenElements: true })).toBeTruthy()
   })
 
-  it("leaves a card that is not usable out of the accounts", async () => {
-    mockHomeCard = { id: "card-1", status: CardStatus.Canceled }
+  it("holds the total back while the card itself loads", async () => {
+    mockHomeCardLoading = true
+
+    const { queryByTestId } = renderHome()
+    await flushEffects()
+
+    expect(queryByTestId("balance-value", { includeHiddenElements: true })).toBeNull()
+  })
+
+  it("shows the total once it is known there is no card", async () => {
+    const { getByTestId } = renderHome()
+    await flushEffects()
+
+    expect(getByTestId("balance-value", { includeHiddenElements: true })).toBeTruthy()
+  })
+
+  it("holds the card row and the total back while the card balance loads", async () => {
+    mockHomeCard = { id: "card-1", status: CardStatus.Active }
+    mockHomeCardBalanceSats = undefined
 
     const { queryByTestId } = renderHome()
     await flushEffects()
 
     expect(queryByTestId("card-balance", { includeHiddenElements: true })).toBeNull()
+    expect(queryByTestId("balance-value", { includeHiddenElements: true })).toBeNull()
   })
 
-  it("only asks for the card on the staging instance", async () => {
-    renderHome()
+  it("shows the card balance error instead of a zero balance", async () => {
+    mockHomeCard = { id: "card-1", status: CardStatus.Active }
+    mockHomeCardBalanceSats = undefined
+    mockHomeCardBalanceError = new ApolloError({
+      errorMessage: "card balance unavailable",
+    })
+
+    const { getByText, queryByTestId } = renderHome()
     await flushEffects()
 
-    expect(mockUseCardData).toHaveBeenCalledWith({ skip: true })
-    expect(mockUseCardData).not.toHaveBeenCalledWith({ skip: false })
+    expect(
+      getByText("card balance unavailable", { includeHiddenElements: true }),
+    ).toBeTruthy()
+    expect(queryByTestId("card-balance", { includeHiddenElements: true })).toBeNull()
+    expect(queryByTestId("balance-value", { includeHiddenElements: true })).toBeNull()
+  })
+
+  it("keeps a known card balance even when a later poll fails", async () => {
+    mockHomeCard = { id: "card-1", status: CardStatus.Active }
+    mockHomeCardBalanceSats = 50_000
+    mockHomeCardBalanceError = new ApolloError({
+      errorMessage: "card balance unavailable",
+    })
+
+    const { getByTestId, queryByText } = renderHome()
+    await flushEffects()
+
+    expect(getByTestId("card-balance", { includeHiddenElements: true })).toBeTruthy()
+    expect(
+      queryByText("card balance unavailable", { includeHiddenElements: true }),
+    ).toBeNull()
   })
 })
 

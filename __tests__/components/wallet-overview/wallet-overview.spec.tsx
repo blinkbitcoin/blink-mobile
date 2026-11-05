@@ -172,6 +172,19 @@ describe("WalletOverview", () => {
       expect(getByText("card-underlying")).toBeTruthy()
     })
 
+    it("holds the card balance back while it is not known", async () => {
+      const unknownCard: AccountBalance = { ...cardAccount, balance: undefined }
+
+      const { getByText, queryByTestId } = renderOverview({
+        accounts: [...walletsFixture, unknownCard],
+      })
+      await flushEffects()
+
+      expect(getByText("Card")).toBeTruthy()
+      expect(queryByTestId("card-balance")).toBeNull()
+      expect(getByText("btc-underlying")).toBeTruthy()
+    })
+
     it("still asks for the wallets when only the card is supplied", async () => {
       mockFallbackWallets = walletsFixture
 

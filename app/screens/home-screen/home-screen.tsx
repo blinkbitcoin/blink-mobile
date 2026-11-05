@@ -362,11 +362,19 @@ export const HomeScreen: React.FC = () => {
    * Ref PR #3899.
    */
   const isCardBackendAvailable = galoyInstanceId === "Staging"
-  const { card: homeCard } = useCardData({ skip: !isCardBackendAvailable })
+  const { card: homeCard, loading: cardDataLoading } = useCardData({
+    skip: !isCardBackendAvailable,
+  })
   const showCardRow = homeCard !== undefined && isCardUsable(homeCard.status)
-  const { availableSats: cardBalanceSats } = useCardBalance(
+  const { availableSats: cardBalanceSats, error: cardBalanceError } = useCardBalance(
     showCardRow ? homeCard?.id : undefined,
   )
+  /** A card that is still loading, or whose balance has not arrived or failed to, holds
+   *  the total back: summing the wallets alone would show an understated total as if it
+   *  were the real one. */
+  const isCardDataLoading = cardDataLoading && homeCard === undefined
+  const isCardBalanceUnknown = showCardRow && cardBalanceSats === undefined
+  const cardBalanceFailure = isCardBalanceUnknown ? cardBalanceError : undefined
 
   const accountBalances: AccountBalance[] = [...(wallets ?? [])]
   if (showCardRow && homeCard) {
@@ -384,6 +392,7 @@ export const HomeScreen: React.FC = () => {
   } = useTotalBalance(accountBalances)
 
   const loading = queryLoading || balanceConversionLoading
+  const isTotalBalanceLoading = loading || isCardDataLoading || isCardBalanceUnknown
 
   const showStableBalanceToggle =
     stableBalanceEnabled && isSelfCustodial && isStableBalanceActive
@@ -972,7 +981,7 @@ export const HomeScreen: React.FC = () => {
         </View>
       </View>
       <BalanceHeader
-        loading={loading}
+        loading={isTotalBalanceLoading}
         formattedBalance={formattedBalance}
         showStableBalanceToggle={showStableBalanceToggle}
         mode={balanceMode}
@@ -1020,6 +1029,9 @@ export const HomeScreen: React.FC = () => {
           showUsdNotification={isOutgoing ? false : hasUnseenUsdTx}
         />
         {error && <GaloyErrorBox errorMessage={getErrorMessages(error)} />}
+        {cardBalanceFailure && (
+          <GaloyErrorBox errorMessage={getErrorMessages(cardBalanceFailure)} />
+        )}
         <View style={styles.listItemsContainer}>
           {buttons.map((item) => (
             <React.Fragment key={item.icon}>

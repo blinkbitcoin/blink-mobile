@@ -6,7 +6,8 @@ export type WalletBalance = Pick<Wallet, "id" | "walletCurrency" | "balance">
 type CardBalance = {
   id: string
   walletCurrency: CardCurrency
-  balance: number
+  /** Undefined while the card balance is not known yet. */
+  balance: number | undefined
 }
 
 export type AccountBalance = WalletBalance | CardBalance
