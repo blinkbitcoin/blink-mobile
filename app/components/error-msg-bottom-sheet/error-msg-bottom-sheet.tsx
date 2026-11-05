@@ -31,6 +31,8 @@ type ErrorMsgBottomSheetProps = {
  * action that resolves it. A warning the user may accept adds that as a secondary action. It sits on top of the screen's inline error rather
  * than replacing it, so the error is still there once the sheet is dismissed.
  *
+ * Its outline is the top edge only, with no sides.
+ *
  * It rests on its content and doesn't expand: messages are short. Swiping it
  * down, pressing the scrim or Android back closes it without taking the action.
  *
@@ -62,6 +64,7 @@ export const ErrorMsgBottomSheet: React.FC<ErrorMsgBottomSheetProps> = ({
       onClose={onClose}
       restsOnHeader
       expandable={false}
+      outline="top"
       testID={testID}
       header={
         <View style={styles.content}>

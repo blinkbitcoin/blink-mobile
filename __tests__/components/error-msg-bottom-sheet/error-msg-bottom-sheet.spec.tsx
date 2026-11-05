@@ -130,6 +130,16 @@ describe("ErrorMsgBottomSheet", () => {
     })
   })
 
+  it("outlines the top edge only, with no border down the sides", () => {
+    renderSheet()
+
+    const sheet = StyleSheet.flatten(screen.getByTestId(SHEET_TEST_ID).props.style)
+    expect(sheet.borderWidth).toBe(1)
+    expect(sheet.borderBottomWidth).toBe(0)
+    expect(sheet.borderLeftWidth).toBe(0)
+    expect(sheet.borderRightWidth).toBe(0)
+  })
+
   describe("screen reader", () => {
     /** Read first, a full-screen "Close" stood between a screen reader and the message. */
     it("keeps the scrim out of reach, so the title is read first", () => {
