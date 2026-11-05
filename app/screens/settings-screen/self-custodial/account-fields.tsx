@@ -9,6 +9,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
 import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { testProps } from "@app/utils/testProps"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 type FieldProps = {
   label: string
@@ -139,7 +140,7 @@ const useStyles = makeStyles(({ colors }) => ({
   box: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderRadius: 8,
     paddingLeft: 14,
     paddingRight: 10,

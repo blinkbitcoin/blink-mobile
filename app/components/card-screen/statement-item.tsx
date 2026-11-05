@@ -3,6 +3,7 @@ import { TouchableOpacity, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 const DOWNLOADED_OPACITY = 0.4
 
@@ -66,7 +67,7 @@ const useStyles = makeStyles(({ colors }) => ({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 10,

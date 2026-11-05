@@ -15,6 +15,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { formatDateFromNow } from "@app/utils/date"
 import { openExternalUrl } from "@app/utils/external"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 const SUBSCRIBE_ROUTE: keyof RootStackParamList = "cardOnboardingSubscribeScreen"
 const SUBSCRIPTION_RENEWAL_MONTHS = 12
@@ -194,7 +195,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingTop: 30,
   },
   cardContainer: {
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderRadius: 16,
     padding: 18,
     paddingBottom: 5,

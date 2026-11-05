@@ -28,6 +28,7 @@ import { Screen } from "@app/components/screen"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 type Props = {
   route: RouteProp<RootStackParamList, "conversionConfirmation">
@@ -288,7 +289,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   conversionInfoCard: {
     margin: 20,
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderRadius: 13,
     padding: 20,
   },
@@ -360,7 +361,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   infoContainer: {
     marginHorizontal: 20,
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderRadius: 6,
     padding: 20,
     paddingVertical: 12,

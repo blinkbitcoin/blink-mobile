@@ -51,6 +51,7 @@ import {
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
 import { reportError } from "@app/utils/error-logging"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 import { FeeTierSelector } from "./fee-tier-selector"
 import { shouldWarnAboutHighFee } from "./hooks/onchain-fee-alert"
@@ -722,7 +723,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     borderStyle: "solid",
     overflow: "hidden",
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderRadius: 10,
     alignItems: "center",
     padding: 14,

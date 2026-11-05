@@ -3,6 +3,7 @@ import { View } from "react-native"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { InfoRow } from "./info-row"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 type InfoItem = {
   label: string
@@ -47,7 +48,7 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 20,
   },
   card: {
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 14,

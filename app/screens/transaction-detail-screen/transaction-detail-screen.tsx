@@ -36,6 +36,7 @@ import { makeStyles, Text } from "@rn-vui/themed"
 
 import { IconTransaction } from "@app/components/icon-transactions"
 import { Screen } from "@app/components/screen"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { formatTimeToMempool, timeToMempool } from "./format-time"
 
@@ -666,7 +667,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     minHeight: 60,
     padding: 14,
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     alignItems: "center",
     borderRadius: 8,
   },
