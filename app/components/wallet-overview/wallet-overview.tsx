@@ -11,8 +11,9 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import {
   AccountBalance,
   getBtcWallet,
+  getCardAccount,
   getUsdWallet,
-  WalletBalance,
+  getWallets,
 } from "@app/graphql/wallets-utils"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useDollarBalanceGate } from "@app/hooks/use-dollar-balance-restricted"
@@ -141,10 +142,8 @@ const WalletOverview: React.FC<Props> = ({
   const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed || hasAccounts })
   const resolvedAccounts = hasAccounts ? accounts : data?.me?.defaultAccount?.wallets
 
-  const wallets = resolvedAccounts?.filter(
-    (a): a is WalletBalance => a.walletCurrency !== CARD,
-  )
-  const cardAccount = resolvedAccounts?.find((a) => a.walletCurrency === CARD)
+  const wallets = getWallets(resolvedAccounts)
+  const cardAccount = getCardAccount(resolvedAccounts)
 
   const hasUsdBalance = (getUsdWallet(wallets)?.balance ?? 0) > 0
   /** A gated balance still shows its amount (the row stays disabled); the label only
