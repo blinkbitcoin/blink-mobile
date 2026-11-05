@@ -1,4 +1,10 @@
-import { WalletBalance, getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
+import {
+  AccountBalance,
+  getBtcWallet,
+  getCardAccount,
+  getUsdWallet,
+  getWallets,
+} from "@app/graphql/wallets-utils"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { usePriceConversion } from "@app/hooks"
@@ -11,8 +17,7 @@ import {
 } from "@app/types/amounts"
 
 export const useTotalBalance = (
-  wallets?: readonly WalletBalance[],
-  cardBalanceSats?: number,
+  accounts?: readonly AccountBalance[],
 ): {
   formattedBalance: string
   numericBalance: number
@@ -25,8 +30,10 @@ export const useTotalBalance = (
   // TODO: check that there are 2 wallets.
   // otherwise fail (account with more/less 2 wallets will not be working with the current mobile app)
   // some tests accounts have only 1 wallet
+  const wallets = getWallets(accounts)
   const btcWallet = getBtcWallet(wallets)
   const usdWallet = getUsdWallet(wallets)
+  const cardAccount = getCardAccount(accounts)
 
   const btcAmount = convertMoneyAmount?.(
     toBtcMoneyAmount(btcWallet?.balance),
@@ -40,9 +47,8 @@ export const useTotalBalance = (
     DisplayCurrency,
   )
   const cardAmount =
-    cardBalanceSats === undefined
-      ? undefined
-      : convertMoneyAmount?.(toBtcMoneyAmount(cardBalanceSats), DisplayCurrency)
+    cardAccount &&
+    convertMoneyAmount?.(toBtcMoneyAmount(cardAccount.balance), DisplayCurrency)
 
   /** The price conversion is the only thing this loader waits on. Callers hand this one flag
    *  to the whole header, so folding the region in blanked the username, the total and the

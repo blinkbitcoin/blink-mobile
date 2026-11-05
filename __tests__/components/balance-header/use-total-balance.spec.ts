@@ -2,6 +2,7 @@ import { renderHook } from "@testing-library/react-native"
 
 import { useTotalBalance } from "@app/components/balance-header/use-total-balance"
 import { WalletCurrency } from "@app/graphql/generated"
+import { CARD } from "@app/types/amounts"
 
 const mockConvertMoneyAmount = jest.fn()
 const mockPriceStatus = jest.fn(() => "ready")
@@ -192,10 +193,15 @@ describe("useTotalBalance", () => {
   })
 
   describe("card balance", () => {
-    it("adds the card balance to the total when cardBalanceSats is provided", () => {
+    const withCard = (balance: number) => [
+      ...wallets,
+      { id: "card", balance, walletCurrency: CARD },
+    ]
+
+    it("adds the card balance to the total when the accounts include a card", () => {
       mockConvertMoneyAmount.mockReturnValue(identityConversion)
 
-      const { result } = renderHook(() => useTotalBalance(wallets, 50_000))
+      const { result } = renderHook(() => useTotalBalance(withCard(50_000)))
 
       expect(mockFormatMoneyAmount).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -209,7 +215,7 @@ describe("useTotalBalance", () => {
     it("still counts a card whose balance is 0", () => {
       mockConvertMoneyAmount.mockReturnValue(identityConversion)
 
-      renderHook(() => useTotalBalance(wallets, 0))
+      renderHook(() => useTotalBalance(withCard(0)))
 
       expect(mockFormatMoneyAmount).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -218,10 +224,10 @@ describe("useTotalBalance", () => {
       )
     })
 
-    it("leaves the total untouched when cardBalanceSats is undefined", () => {
+    it("leaves the total untouched when the accounts have no card", () => {
       mockConvertMoneyAmount.mockReturnValue(identityConversion)
 
-      renderHook(() => useTotalBalance(wallets, undefined))
+      renderHook(() => useTotalBalance(wallets))
 
       expect(mockFormatMoneyAmount).toHaveBeenCalledWith(
         expect.objectContaining({
