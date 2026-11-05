@@ -1,4 +1,6 @@
 import React from "react"
+import { StyleSheet } from "react-native"
+import { ReactTestInstance } from "react-test-renderer"
 import { render, fireEvent } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
@@ -123,6 +125,12 @@ const overviewTree = ({
 
 const renderOverview = (options: RenderOptions = {}) => render(overviewTree(options))
 
+const nearestOpacity = (node: ReactTestInstance | null): number | undefined => {
+  if (!node) return undefined
+  const opacity = StyleSheet.flatten(node.props.style)?.opacity
+  return typeof opacity === "number" ? opacity : nearestOpacity(node.parent)
+}
+
 describe("WalletOverview", () => {
   beforeEach(() => {
     loadLocale("en")
@@ -174,6 +182,28 @@ describe("WalletOverview", () => {
       fireEvent.press(getByText("Card"))
 
       expect(mockNavigate).toHaveBeenCalledWith("cardDashboardScreen")
+    })
+
+    it("holds the card balance back while the balances load", async () => {
+      const { getByText, queryByTestId } = renderOverview({
+        accounts: withCardFixture,
+        loading: true,
+      })
+      await flushEffects()
+
+      expect(getByText("Card")).toBeTruthy()
+      expect(queryByTestId("card-balance")).toBeNull()
+    })
+
+    it("dims the card balance only while the Card row is pressed", async () => {
+      const { getByText, getByTestId } = renderOverview({ accounts: withCardFixture })
+      await flushEffects()
+
+      fireEvent(getByText("Card"), "pressIn")
+      expect(nearestOpacity(getByTestId("card-balance"))).toBe(0.7)
+
+      fireEvent(getByText("Card"), "pressOut")
+      expect(nearestOpacity(getByTestId("card-balance"))).toBeUndefined()
     })
 
     it("keeps the card account out of the transaction history wallets", async () => {

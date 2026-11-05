@@ -13,6 +13,7 @@ import { waitForStableRender } from "../helpers/wait-for-stable-render"
 import {
   AccountLevel,
   BulletinsDocument,
+  CardStatus,
   HomeAuthedDocument,
   HomeUnauthedDocument,
   Network,
@@ -273,6 +274,11 @@ const UPGRADE_MODAL_DELAY_WITH_SLACK_MS = 2000
 let mockIsRestrictedRegion = false
 let mockIsRestrictedRegionEvaluationPending = false
 let mockCanShowUpgradeModal = false
+let mockHomeCard: { id: string; status: CardStatus } | undefined
+let mockHomeCardBalanceSats = 0
+const mockUseCardData = jest.fn((_options: { skip?: boolean }) => ({
+  card: mockHomeCard,
+}))
 const mockPresentRestrictedRegionModal = jest.fn()
 jest.mock("@app/components/restricted-region", () => ({
   useRestrictedRegion: () => ({
@@ -529,6 +535,8 @@ jest.mock("@app/hooks", () => {
       markShownUpgradeModal: jest.fn(),
       resetUpgradeModal: jest.fn(),
     }),
+    useCardData: (options: { skip?: boolean }) => mockUseCardData(options),
+    useCardBalance: () => ({ availableSats: mockHomeCardBalanceSats }),
   }
 })
 
@@ -1015,6 +1023,8 @@ const resetHomeScreenMocks = () => {
   mockIsRestrictedRegion = false
   mockIsRestrictedRegionEvaluationPending = false
   mockCanShowUpgradeModal = false
+  mockHomeCard = undefined
+  mockHomeCardBalanceSats = 0
   mockTwoFactorSessionPrompt.isModalOpen = false
   mockTwoFactorEnforcement.isSessionStartPending = false
   jest.clearAllMocks()
@@ -2189,6 +2199,45 @@ describe("SelfCustodialInfoBulletin gating", () => {
     await flushEffects()
 
     expect(mockSelfCustodialInfoBulletin).not.toHaveBeenCalled()
+  })
+})
+
+describe("HomeScreen card account", () => {
+  beforeEach(resetHomeScreenMocks)
+
+  const renderHome = () =>
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+  it("lists a usable card as another account with its balance", async () => {
+    mockHomeCard = { id: "card-1", status: CardStatus.Active }
+    mockHomeCardBalanceSats = 50_000
+
+    const { getByTestId } = renderHome()
+    await flushEffects()
+
+    const cardBalance = getByTestId("card-balance", { includeHiddenElements: true })
+    expect(cardBalance.props.children).toBe("50,000 SAT")
+  })
+
+  it("leaves a card that is not usable out of the accounts", async () => {
+    mockHomeCard = { id: "card-1", status: CardStatus.Canceled }
+
+    const { queryByTestId } = renderHome()
+    await flushEffects()
+
+    expect(queryByTestId("card-balance", { includeHiddenElements: true })).toBeNull()
+  })
+
+  it("only asks for the card on the staging instance", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(mockUseCardData).toHaveBeenCalledWith({ skip: true })
+    expect(mockUseCardData).not.toHaveBeenCalledWith({ skip: false })
   })
 })
 
