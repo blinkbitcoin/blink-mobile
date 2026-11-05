@@ -2538,15 +2538,17 @@
       }
     },
     "inApp": "Trong ứng dụng",
-    "celebrateIncoming": "Ăn mừng khoản nhận",
-    "celebrationMinimum": "Số tiền tối thiểu (sats)"
+    "incomingTransactionSplash": "Màn hình giao dịch đến",
+    "splashMinimum": "Số tiền tối thiểu (sats)"
   },
-  "ReceiveCelebration": {
+  "IncomingTransactionSplash": {
     "youReceived": "Bạn đã nhận",
     "note": "Ghi chú",
     "dontShowAgain": "Đừng hiện màn hình này nữa.",
     "details": "Chi tiết",
-    "announcement": "Đã nhận {amount}"
+    "announcement": "Đã nhận {amount}",
+    "tapToShow": "Chạm để hiện",
+    "announcementHidden": "Đã nhận thanh toán"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Tài khoản của bạn có hơn $5",

@@ -2538,15 +2538,17 @@
       }
     },
     "inApp": "داخل التطبيق",
-    "celebrateIncoming": "احتفل بالمدفوعات الواردة",
-    "celebrationMinimum": "الحد الأدنى (ساتس)"
+    "incomingTransactionSplash": "شاشة المعاملة الواردة",
+    "splashMinimum": "الحد الأدنى (ساتس)"
   },
-  "ReceiveCelebration": {
+  "IncomingTransactionSplash": {
     "youReceived": "استلمت",
     "note": "ملاحظة",
     "dontShowAgain": "لا تُظهر هذه الشاشة مرة أخرى.",
     "details": "التفاصيل",
-    "announcement": "تم استلام {amount}"
+    "announcement": "تم استلام {amount}",
+    "tapToShow": "انقر للعرض",
+    "announcementHidden": "تم استلام دفعة"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "حسابك يحتوي على أكثر من 5$",

@@ -2538,15 +2538,17 @@
       }
     },
     "inApp": "Հավելվածում",
-    "celebrateIncoming": "Տոնել մուտքային վճարումները",
-    "celebrationMinimum": "Նվազագույն գումար (sats)"
+    "incomingTransactionSplash": "Մուտքային գործարքի էկրան",
+    "splashMinimum": "Նվազագույն գումար (sats)"
   },
-  "ReceiveCelebration": {
+  "IncomingTransactionSplash": {
     "youReceived": "Դուք ստացել եք",
     "note": "Նշում",
     "dontShowAgain": "Այլևս չցուցադրել այս էկրանը։",
     "details": "Մանրամասներ",
-    "announcement": "Ստացվել է {amount}"
+    "announcement": "Ստացվել է {amount}",
+    "tapToShow": "Սեղմեք՝ ցուցադրելու համար",
+    "announcementHidden": "Վճարումը ստացվել է"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Ձեր հաշվին $5-ից ավելի միջոցներ կան",

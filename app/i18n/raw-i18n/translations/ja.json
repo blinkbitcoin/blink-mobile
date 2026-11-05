@@ -2538,15 +2538,17 @@
             }
         },
         "inApp": "アプリ内",
-        "celebrateIncoming": "入金を祝う",
-        "celebrationMinimum": "最低金額（sats）"
+        "incomingTransactionSplash": "入金時の全画面表示",
+        "splashMinimum": "最低金額（sats）"
     },
-    "ReceiveCelebration": {
+    "IncomingTransactionSplash": {
         "youReceived": "受け取りました",
         "note": "メモ",
         "dontShowAgain": "この画面を今後表示しない。",
         "details": "詳細",
-        "announcement": "受取 {amount}"
+        "announcement": "受取 {amount}",
+        "tapToShow": "タップして表示",
+        "announcementHidden": "入金がありました"
     },
     "AccountScreen": {
         "fundsMoreThan5Dollars": "アカウントの残高が$5を超えています",

@@ -9,7 +9,7 @@ import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { ScrollView, TouchableWithoutFeedback } from "react-native-gesture-handler"
 
 import { AppUpdate } from "@app/components/app-update/app-update"
-import { useOverlayCover } from "@app/screens/receive-bitcoin-screen/celebration/overlay-cover"
+import { useOverlayCover } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/overlay-cover"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyIcon, icons } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"

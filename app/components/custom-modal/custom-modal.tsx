@@ -5,7 +5,7 @@ import Modal from "react-native-modal"
 
 import { makeStyles, Text, TextProps, useTheme } from "@rn-vui/themed"
 
-import { useOverlayCover } from "@app/screens/receive-bitcoin-screen/celebration/overlay-cover"
+import { useOverlayCover } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/overlay-cover"
 import { testProps } from "@app/utils/testProps"
 
 import { GaloyIcon } from "../atomic/galoy-icon"

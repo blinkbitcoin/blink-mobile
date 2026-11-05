@@ -20,23 +20,23 @@ import {
   TransactionStatus,
 } from "@app/types/transaction"
 
-import { useReceiveCelebration } from "./receive-celebration-provider"
-import { CelebrationCandidate, CelebrationPaymentType } from "./types"
+import { useIncomingTransactionSplash } from "./incoming-transaction-splash-provider"
+import { SplashCandidate, SplashPaymentType } from "./types"
 
 const SUCCEEDED_PREFIX = `${SdkEventTags.PaymentSucceeded}:`
 
 /**
  * Self-custodial receives never come through GraphQL: they are the SDK's own
  * PaymentSucceeded events. Pending events are ignored. The payment the event carries is
- * celebrated at once, without waiting for the wallet refresh the event triggers (seconds
+ * shown at once, without waiting for the wallet refresh the event triggers (seconds
  * on a busy wallet). The event key is the fallback: its id waits in a queue until the
  * payment shows up in the transactions, and the provider drops whichever comes second. A
  * claimed on-chain deposit arrives the same way, as a succeeded payment.
  */
-export const SelfCustodialCelebrationMount = () => {
+export const SelfCustodialSplashMount = () => {
   const { isSelfCustodial } = useActiveWallet()
   const { lastPaymentEventKey, allTransactions } = useSelfCustodialWallet()
-  const { celebrate, refresh } = useReceiveCelebration()
+  const { showSplash, refresh } = useIncomingTransactionSplash()
   const { convertMoneyAmount, displayCurrency } = usePriceConversion()
   const { fractionDigits } = useDisplayCurrency()
 
@@ -65,17 +65,17 @@ export const SelfCustodialCelebrationMount = () => {
 
   const toCandidate = useMemo(
     () =>
-      (tx: NormalizedTransaction): CelebrationCandidate => ({
+      (tx: NormalizedTransaction): SplashCandidate => ({
         transaction: toTransactionFragment(tx, displayInfo),
         paymentType:
           tx.paymentType === PaymentType.Onchain
-            ? CelebrationPaymentType.Onchain
-            : CelebrationPaymentType.Lightning,
+            ? SplashPaymentType.Onchain
+            : SplashPaymentType.Lightning,
       }),
     [displayInfo],
   )
 
-  const isCelebratable = (tx: NormalizedTransaction) =>
+  const isSplashCandidate = (tx: NormalizedTransaction) =>
     tx.direction === TransactionDirection.Receive &&
     tx.status === TransactionStatus.Completed &&
     !tx.isConversion
@@ -85,11 +85,11 @@ export const SelfCustodialCelebrationMount = () => {
     return onSucceededPayment((payment) => {
       if (!isKnownPayment(payment)) return
       const tx = mapSelfCustodialTransaction(payment)
-      if (!isCelebratable(tx)) return
+      if (!isSplashCandidate(tx)) return
       offered.current = { id: tx.id, memo: tx.memo }
-      celebrate(toCandidate(tx))
+      showSplash(toCandidate(tx))
     })
-  }, [isSelfCustodial, toCandidate, celebrate])
+  }, [isSelfCustodial, toCandidate, showSplash])
 
   useEffect(() => {
     const last = offered.current
@@ -113,11 +113,11 @@ export const SelfCustodialCelebrationMount = () => {
     if (settled.length === 0) return
     setPendingIds((ids) => ids.filter((id) => !settled.some((tx) => tx.id === id)))
 
-    settled.filter(isCelebratable).forEach((tx) => {
+    settled.filter(isSplashCandidate).forEach((tx) => {
       offered.current = { id: tx.id, memo: tx.memo }
-      celebrate(toCandidate(tx))
+      showSplash(toCandidate(tx))
     })
-  }, [pendingIds, allTransactions, toCandidate, celebrate, refresh])
+  }, [pendingIds, allTransactions, toCandidate, showSplash, refresh])
 
   return null
 }
