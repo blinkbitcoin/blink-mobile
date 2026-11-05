@@ -33,6 +33,7 @@ import {
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
 type StatusProcessed = "SUCCESS" | "PENDING" | "QUEUED"
@@ -448,7 +449,7 @@ const useStyles = makeStyles(({ colors }) => ({
   successActionFieldContainer: {
     overflow: "hidden",
     gap: 20,
-    backgroundColor: colors.grey7,
+    ...staticSurface(colors),
     borderRadius: 10,
     alignItems: "center",
     paddingHorizontal: 10,
