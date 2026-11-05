@@ -2370,6 +2370,8 @@
     "invalidAmount": "Això conté un import invàlid. Si us plau torna-ho a generar amb un import vàlid.",
     "usernameDoesNotExist": "{lnAddress: string} no sembla ser una {bankName: string} adreça existent.",
     "usernameDoesNotExistAdvice": "Assegurat que l'ortografia sigui correcta o demana al destinatari una factura LN o una adreça BTC.",
+    "destinationUnverifiable": "No hem pogut comprovar {lnAddress} ara mateix: els servidors de {bankName} no responen.",
+    "destinationUnverifiableAdvice": "És probable que l'adreça sigui correcta. Torna-ho a provar d'aquí a un moment o demana al destinatari una factura LN o una adreça BTC.",
     "selfPaymentError": "{lnAddress: string} és la teva adreça {bankName: string} .",
     "selfPaymentAdvice": "Si vols enviar diners a un altre compte teu, pots utilitzar una adreça de factura, LN o BTC.",
     "lnAddressError": "No podem contactar a aquesta adreça de Lightning. Si estas segur que existeix, tornar-ho a provar més tard.",
@@ -2595,7 +2597,8 @@
     "error": "No es poden obtenir els perfils en aquest moment",
     "fromThisDevice": "des d'aquest dispositiu?",
     "switchAccount": "Has canviat a un altre compte",
-    "removedAccount": "Has eliminat el compte {identifier: string}."
+    "removedAccount": "Has eliminat el compte {identifier: string}.",
+    "removeAccount": "Elimina el compte"
   },
   "StablesatsRestriction": {
     "walletLabel": "no està disponible a la teva regió",
@@ -2759,6 +2762,7 @@
       "tooLong": "L'adreça pot ser com a màxim de 50 caràcters",
       "invalidCharacter": "L'adreça només pot contenir lletres, números i guions baixos",
       "addressUnavailable": "Ho sentim, aquesta adreça ja està presa",
+      "serverUnreachable": "No s'ha pogut contactar amb el servidor d'adreces. Torna-ho a provar d'aquí a un moment.",
       "unknownError": "S'ha produït un error desconegut. Torna-ho a provar més tard",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3086,12 +3090,12 @@
     "deleteAccountError": "Alguna cosa ha anat malament. Contacta amb {email: string} per obtenir més ajuda.",
     "bye": "Adéu!",
     "deleteAccountWarning": "Atenció: el tancament del compte és permanent!\nAssegura't que les carteres no tinguin fons abans de tancar-lo.\nUn compte tancat no es pot restaurar.\nÉs possible que conservem certs registres segons ho exigeixi la llei.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Baixa els logs",
+    "exportLogsTitle": "Comparteix els logs de la cartera",
+    "exportLogsBody": "Aquest fitxer ajuda l'assistència a investigar problemes amb les teves carteres. Inclou l'historial de pagaments (imports, factures i adreces) i els identificadors de cada cartera no custodiada d'aquest dispositiu, no només d'aquesta, però mai les frases de còpia de seguretat ni les claus. Comparteix-lo només amb la nostra assistència.",
+    "exportLogsConfirm": "Comparteix els logs",
+    "noLogsYet": "Encara no hi ha logs per compartir. Obre la cartera i torna-ho a provar.",
+    "exportLogsError": "No s'han pogut exportar els logs. Torna-ho a provar."
   },
   "lnurl": {
     "overLimit": "No pots enviar més que l'import màxim",
@@ -3827,7 +3831,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Fes una còpia de seguretat de la cartera",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Tria el teu mètode de còpia de seguretat",
@@ -3885,6 +3889,7 @@
     "CloudBackup": {
       "title": "Fem una còpia de seguretat de la teva cartera",
       "description": "Desarem una còpia de la teva frase de seguretat al teu {provider}.",
+      "encryptCheckbox": "Xifrar amb contrasenya addicional",
       "password": "Contrasenya",
       "passwordPlaceholder": "(mínim 12 caràcters)",
       "confirmPassword": "Confirmar contrasenya",
@@ -4226,6 +4231,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink no està disponible",
+    "unreachableDescription": "{featureName} necessita els servidors de Blink, que ara mateix no responen. La teva cartera i els teus fons no es veuen afectats.",
     "featureCircles": "Circles",
     "featureEarn": "Aprendre",
     "featureCard": "Card"
@@ -4248,6 +4255,10 @@
     "tokenTransfer": "Transferència {token}",
     "payTo": "Pagar a {address}",
     "payment": "Pagament"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "El tipus de canvi pot estar desactualitzat",
+    "satsOnly": "Es mostren sats: no hi ha tipus de canvi disponible"
   },
   "SelfCustodialOffline": {
     "title": "La cartera està fora de línia",

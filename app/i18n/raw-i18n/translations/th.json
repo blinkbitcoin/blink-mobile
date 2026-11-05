@@ -2370,6 +2370,8 @@
     "invalidAmount": "จำนวนเงินไม่ถูกต้อง กรุณาสร้างใหม่โดยใช้จำนวนเงินที่ถูกต้อง",
     "usernameDoesNotExist": "{lnAddress: string} ดูเหมือนจะไม่ใช่แอดเดรส {bankName: string} ที่มีอยู่จริง",
     "usernameDoesNotExistAdvice": "ลองเช็คอีกครั้งว่าสะกดถูกต้องไหม ไม่อย่างนั้นก็ลองขอไลท์นิ่งอินวอยซ์หรือบิตคอยน์แอดเดรสมาใช้แทน",
+    "destinationUnverifiable": "ขณะนี้เราไม่สามารถตรวจสอบ {lnAddress} ได้ — เซิร์ฟเวอร์ของ {bankName} ไม่ตอบสนอง",
+    "destinationUnverifiableAdvice": "ที่อยู่นี้อาจถูกต้องอยู่แล้ว ลองอีกครั้งในอีกสักครู่ หรือขอใบแจ้งหนี้ LN หรือที่อยู่ BTC จากผู้รับแทน",
     "selfPaymentError": "{lnAddress: string} คือแอดเดรส {bankName: string} ของคุณ",
     "selfPaymentAdvice": "ถ้าต้องการส่งเงินไปยังบัญชีอื่นที่คุณเป็นเจ้าของ คุณสามารถใช้อินวอยซ์, ไลท์นิ่งแอดเดรส หรือบิตคอยน์แอดเดรสแทนได้",
     "lnAddressError": "เราไม่สามารถเชื่อมต่อไปยังไลท์นิ่งแอดเดรสนี้ได้ ถ้าคุณมั่นใจว่ามันมีตัวตนอยู่จริง คุณสามารถลองใหม่ได้ภายหลัง",
@@ -2595,7 +2597,8 @@
     "error": "ไม่สามารถดึงข้อมูลโปรไฟล์ได้ในขณะนี้",
     "fromThisDevice": "จากอุปกรณ์นี้?",
     "switchAccount": "คุณได้สลับไปยังบัญชีอื่นแล้ว",
-    "removedAccount": "คุณได้ลบบัญชี {identifier: string} แล้ว"
+    "removedAccount": "คุณได้ลบบัญชี {identifier: string} แล้ว",
+    "removeAccount": "ลบบัญชี"
   },
   "StablesatsRestriction": {
     "walletLabel": "ไม่พร้อมใช้งานในภูมิภาคของคุณ",
@@ -2759,6 +2762,7 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
+      "serverUnreachable": "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ที่อยู่ได้ ลองอีกครั้งในอีกสักครู่",
       "unknownError": "An unknown error occurred, please try again later",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3086,12 +3090,12 @@
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
     "deleteAccountWarning": "ข้อควรระวัง: การปิดบัญชีเป็นการกระทำถาวร!\nตรวจสอบให้แน่ใจว่ากระเป๋าเงินไม่มีเงินคงเหลือก่อนปิดบัญชี\nบัญชีที่ปิดแล้วไม่สามารถกู้คืนได้\nเราอาจเก็บรักษาบันทึกบางอย่างตามที่กฎหมายกำหนด",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "ดาวน์โหลดบันทึก",
+    "exportLogsTitle": "แชร์บันทึกกระเป๋าเงินของคุณ",
+    "exportLogsBody": "ไฟล์นี้ช่วยให้ฝ่ายสนับสนุนตรวจสอบปัญหาของกระเป๋าเงินของคุณ ไฟล์มีประวัติการชำระเงิน (จำนวนเงิน ใบแจ้งหนี้ และที่อยู่) และตัวระบุของกระเป๋าเงินแบบไม่ฝากดูแลทุกใบในอุปกรณ์นี้ ไม่ใช่แค่ใบนี้ แต่ไม่มีวลีสำรองหรือกุญแจของคุณ แชร์กับฝ่ายสนับสนุนของเราเท่านั้น",
+    "exportLogsConfirm": "แชร์บันทึก",
+    "noLogsYet": "ยังไม่มีบันทึกให้แชร์ เปิดกระเป๋าเงินแล้วลองอีกครั้ง",
+    "exportLogsError": "ไม่สามารถส่งออกบันทึกได้ โปรดลองใหม่อีกครั้ง"
   },
   "lnurl": {
     "overLimit": "คุณไม่สามารถส่งเงินได้เกินกว่านี้",
@@ -3827,7 +3831,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "สำรองข้อมูลกระเป๋าเงินของคุณ",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "เลือกวิธีการสำรองข้อมูล",
@@ -3885,6 +3889,7 @@
     "CloudBackup": {
       "title": "มาสำรองข้อมูลกระเป๋าเงินของคุณกัน",
       "description": "เราจะบันทึกสำเนาวลีสำรองของคุณไปยัง {provider} ของคุณ",
+      "encryptCheckbox": "เข้ารหัสด้วยรหัสผ่านเพิ่มเติม",
       "password": "รหัสผ่าน",
       "passwordPlaceholder": "(อย่างน้อย 12 ตัวอักษร)",
       "confirmPassword": "ยืนยันรหัสผ่าน",
@@ -4226,6 +4231,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "ไม่สามารถเชื่อมต่อ Blink ได้",
+    "unreachableDescription": "{featureName} ต้องใช้เซิร์ฟเวอร์ของ Blink ซึ่งขณะนี้ไม่ตอบสนอง กระเป๋าเงินและยอดเงินของคุณไม่ได้รับผลกระทบ",
     "featureCircles": "Circles",
     "featureEarn": "เรียนรู้",
     "featureCard": "Card"
@@ -4248,6 +4255,10 @@
     "tokenTransfer": "โอน {token}",
     "payTo": "จ่ายไปที่ {address}",
     "payment": "การชำระเงิน"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "อัตราแลกเปลี่ยนอาจไม่เป็นปัจจุบัน",
+    "satsOnly": "แสดงเป็น sats — ไม่มีอัตราแลกเปลี่ยน"
   },
   "SelfCustodialOffline": {
     "title": "กระเป๋าเงินออฟไลน์",
