@@ -1,4 +1,5 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
@@ -168,6 +169,25 @@ describe("WalletOverview", () => {
 
       expect(getByText("Bitcoin")).toBeTruthy()
       expect(getByText("Dollar")).toBeTruthy()
+    })
+
+    it("keeps the loading skeleton within the row height, so the rows do not jump on load", async () => {
+      const { getAllByTestId } = renderOverview({ loading: true })
+      await flushEffects()
+
+      const skeletons = getAllByTestId("balance-skeleton")
+      expect(skeletons).toHaveLength(2)
+      skeletons.forEach((skeleton) => {
+        const { height, marginTop, marginBottom, marginVertical, margin } =
+          StyleSheet.flatten(skeleton.props.style)
+        expect({ height, marginTop, marginBottom, marginVertical, margin }).toEqual({
+          height: undefined,
+          marginTop: undefined,
+          marginBottom: undefined,
+          marginVertical: undefined,
+          margin: undefined,
+        })
+      })
     })
 
     it("masks the balances when hide amount is enabled", async () => {

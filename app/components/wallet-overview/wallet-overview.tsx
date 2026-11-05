@@ -27,13 +27,15 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { CurrencyPill, useEqualPillWidth } from "../atomic/currency-pill"
 
 const CARD_NUMBER_MASK = "••••"
+/** The skeleton fills the row exactly, so the balances replace it without moving the list. */
+const BALANCE_ROW_HEIGHT = 45
 
 const Loader = () => {
   const styles = useStyles()
   return (
-    <View style={styles.loaderContainer}>
+    <View style={styles.loaderContainer} testID="balance-skeleton">
       <ContentLoader
-        height={45}
+        height={BALANCE_ROW_HEIGHT}
         width={"60%"}
         speed={1.2}
         backgroundColor={styles.loaderBackground.color}
@@ -371,7 +373,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    minHeight: 45,
+    minHeight: BALANCE_ROW_HEIGHT,
     marginVertical: 4,
     marginTop: 5,
   },
@@ -409,8 +411,6 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "flex-end",
-    height: 45,
-    marginTop: 5,
   },
   pressedOpacity: { opacity: 0.7 },
   cardPillBackground: {
