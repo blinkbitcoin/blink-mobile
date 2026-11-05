@@ -279,9 +279,13 @@ let mockHomeCard: { id: string; status: CardStatus } | undefined
 let mockHomeCardLoading = false
 let mockHomeCardBalanceSats: number | undefined = 0
 let mockHomeCardBalanceError: ApolloError | undefined
+let mockGaloyInstanceId: string | undefined
+const mockRefetchCardData = jest.fn()
+const mockRefetchCardBalance = jest.fn()
 const mockUseCardData = jest.fn((_options: { skip?: boolean }) => ({
   card: mockHomeCard,
   loading: mockHomeCardLoading,
+  refetch: mockRefetchCardData,
 }))
 const mockPresentRestrictedRegionModal = jest.fn()
 jest.mock("@app/components/restricted-region", () => ({
@@ -543,7 +547,20 @@ jest.mock("@app/hooks", () => {
     useCardBalance: () => ({
       availableSats: mockHomeCardBalanceSats,
       error: mockHomeCardBalanceError,
+      refetch: mockRefetchCardBalance,
     }),
+    /** Lets a case run on another instance, since the card only exists on Staging. */
+    useAppConfig: () => {
+      const config = actual.useAppConfig()
+      if (!mockGaloyInstanceId) return config
+      return {
+        ...config,
+        appConfig: {
+          ...config.appConfig,
+          galoyInstance: { ...config.appConfig.galoyInstance, id: mockGaloyInstanceId },
+        },
+      }
+    },
   }
 })
 
@@ -1034,6 +1051,9 @@ const resetHomeScreenMocks = () => {
   mockHomeCardLoading = false
   mockHomeCardBalanceSats = 0
   mockHomeCardBalanceError = undefined
+  mockGaloyInstanceId = undefined
+  mockRefetchCardData.mockResolvedValue(undefined)
+  mockRefetchCardBalance.mockResolvedValue(undefined)
   mockTwoFactorSessionPrompt.isModalOpen = false
   mockTwoFactorEnforcement.isSessionStartPending = false
   jest.clearAllMocks()
@@ -2291,6 +2311,99 @@ describe("HomeScreen card account", () => {
     expect(
       queryByText("card balance unavailable", { includeHiddenElements: true }),
     ).toBeNull()
+  })
+
+  describe("pull to refresh", () => {
+    beforeEach(() => {
+      mockRefetchCustodialRestrictions.mockResolvedValue(undefined)
+    })
+
+    const pull = async () => {
+      // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+      const { UNSAFE_getByType } = renderHome()
+      await flushEffects()
+      await act(async () => {
+        await UNSAFE_getByType(RefreshControl).props.onRefresh()
+      })
+    }
+
+    it("asks for the card and its balance again on Staging", async () => {
+      mockGaloyInstanceId = "Staging"
+      mockHomeCard = { id: "card-1", status: CardStatus.Active }
+      mockHomeCardBalanceSats = 50_000
+
+      await pull()
+
+      expect(mockRefetchCardData).toHaveBeenCalledTimes(1)
+      expect(mockRefetchCardBalance).toHaveBeenCalledTimes(1)
+    })
+
+    it("keeps the spinner until the card balance comes back", async () => {
+      mockGaloyInstanceId = "Staging"
+      mockHomeCard = { id: "card-1", status: CardStatus.Active }
+      mockHomeCardBalanceSats = 50_000
+      let resolveCardBalance: (value: undefined) => void = () => {}
+      mockRefetchCardBalance.mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveCardBalance = resolve
+        }),
+      )
+      // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+      const { UNSAFE_getByType } = renderHome()
+      await flushEffects()
+
+      act(() => {
+        UNSAFE_getByType(RefreshControl).props.onRefresh()
+      })
+      await flushEffects()
+
+      expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(true)
+
+      await act(async () => {
+        resolveCardBalance(undefined)
+      })
+
+      await waitFor(() =>
+        expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false),
+      )
+    })
+
+    it("does not ask for the balance of a card that is not usable", async () => {
+      mockGaloyInstanceId = "Staging"
+      mockHomeCard = { id: "card-1", status: CardStatus.Canceled }
+
+      await pull()
+
+      expect(mockRefetchCardData).toHaveBeenCalledTimes(1)
+      expect(mockRefetchCardBalance).not.toHaveBeenCalled()
+    })
+
+    it("leaves the card alone off Staging", async () => {
+      mockHomeCard = { id: "card-1", status: CardStatus.Active }
+      mockHomeCardBalanceSats = 50_000
+
+      await pull()
+
+      expect(mockRefetchCardData).not.toHaveBeenCalled()
+      expect(mockRefetchCardBalance).not.toHaveBeenCalled()
+    })
+  })
+
+  it("leaves a card that is not usable out of the accounts", async () => {
+    mockHomeCard = { id: "card-1", status: CardStatus.Canceled }
+
+    const { queryByTestId } = renderHome()
+    await flushEffects()
+
+    expect(queryByTestId("card-balance", { includeHiddenElements: true })).toBeNull()
+  })
+
+  it("only asks for the card on the staging instance", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(mockUseCardData).toHaveBeenCalledWith({ skip: true })
+    expect(mockUseCardData).not.toHaveBeenCalledWith({ skip: false })
   })
 })
 

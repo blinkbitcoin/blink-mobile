@@ -21,7 +21,7 @@ export const useCardBalance = (cardId: string | undefined) => {
   const isAuthed = useIsAuthed()
   const { moneyAmountToDisplayCurrencyString, formatMoneyAmount } = useDisplayCurrency()
 
-  const { data, loading, error } = useCardBalanceQuery({
+  const { data, loading, error, refetch } = useCardBalanceQuery({
     variables: { cardId: cardId ?? "" },
     skip: !isAuthed || !cardId,
     fetchPolicy: "network-only",
@@ -40,5 +40,5 @@ export const useCardBalance = (cardId: string | undefined) => {
   const balanceSecondary =
     formatMoneyAmount({ moneyAmount: btcAmount, isApproximate: false }) ?? ""
 
-  return { balancePrimary, balanceSecondary, availableSats, loading, error }
+  return { balancePrimary, balanceSecondary, availableSats, loading, error, refetch }
 }

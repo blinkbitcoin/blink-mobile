@@ -362,13 +362,17 @@ export const HomeScreen: React.FC = () => {
    * Ref PR #3899.
    */
   const isCardBackendAvailable = galoyInstanceId === "Staging"
-  const { card: homeCard, loading: cardDataLoading } = useCardData({
-    skip: !isCardBackendAvailable,
-  })
+  const {
+    card: homeCard,
+    loading: cardDataLoading,
+    refetch: refetchCardData,
+  } = useCardData({ skip: !isCardBackendAvailable })
   const showCardRow = homeCard !== undefined && isCardUsable(homeCard.status)
-  const { availableSats: cardBalanceSats, error: cardBalanceError } = useCardBalance(
-    showCardRow ? homeCard?.id : undefined,
-  )
+  const {
+    availableSats: cardBalanceSats,
+    error: cardBalanceError,
+    refetch: refetchCardBalance,
+  } = useCardBalance(showCardRow ? homeCard?.id : undefined)
   /** A card that is still loading, or whose balance has not arrived or failed to, holds
    *  the total back: summing the wallets alone would show an understated total as if it
    *  were the real one. */
@@ -686,6 +690,15 @@ export const HomeScreen: React.FC = () => {
     openUpgradeModal,
   ])
 
+  /** Gated like the card queries themselves: off Staging there is no card backend, and
+   *  without a usable card there is no balance to ask for. */
+  const refetchCard = React.useCallback(async () => {
+    if (!isCardBackendAvailable) return
+    const cardRefetches: Promise<unknown>[] = [refetchCardData()]
+    if (showCardRow) cardRefetches.push(refetchCardBalance())
+    await Promise.all(cardRefetches)
+  }, [isCardBackendAvailable, showCardRow, refetchCardData, refetchCardBalance])
+
   const refetch = React.useCallback(async () => {
     if (isSelfCustodial) {
       // Both must land before the pull-to-refresh spinner retracts: the wallet
@@ -707,6 +720,7 @@ export const HomeScreen: React.FC = () => {
       refetchAuthed(),
       refetchUnauthed(),
       refetchBulletins(),
+      refetchCard(),
     ])
     // Triggers the upgrade trial account modal after refetch
     triggerUpgradeModal()
@@ -717,6 +731,7 @@ export const HomeScreen: React.FC = () => {
     refetchPendingDeposits,
     refetchAuthed,
     refetchBulletins,
+    refetchCard,
     refetchCustodialRestrictions,
     refetchRealtimePrice,
     refetchUnauthed,
