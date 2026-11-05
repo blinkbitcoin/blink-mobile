@@ -101,8 +101,11 @@ export const useTotalBalance = (
   const numericBalance = Number(integerBalanceString)
 
   const totalBtc = convertMoneyAmount?.(totalDisplay, WalletCurrency.Btc)
+  /** The card is held in sats too, so a total with no dollar leg still needs no rate. */
   const satsBalance =
-    !usdWallet?.balance && btcWallet?.balance ? btcWallet?.balance : totalBtc?.amount || 0
+    !usdWallet?.balance && btcWallet?.balance
+      ? btcWallet.balance + (cardAccount?.balance ?? 0)
+      : totalBtc?.amount || 0
 
   return {
     formattedBalance: formatMoneyAmount({ moneyAmount: totalDisplay }),
