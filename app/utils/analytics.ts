@@ -345,63 +345,70 @@ export const logLoginMethodCodeFailed = (params: LogLoginMethodCodeFailedParams)
   analytics().logEvent("login_method_code_failed", { login_method: params.loginMethod })
 }
 
-type CelebrationWallet = "btc" | "usd" | "self_custodial"
-type CelebrationPaymentTypeName = "lightning" | "intraledger" | "onchain"
-type CelebrationCloseAction = "close" | "details" | "back" | "x" | "background"
-type CelebrationSettingSource = "celebration" | "settings"
+type SplashWallet = "btc" | "usd" | "self_custodial"
+type SplashPaymentTypeName = "lightning" | "intraledger" | "onchain"
+type SplashCloseAction = "close" | "details" | "back" | "x" | "background"
+type SplashSettingSource = "splash" | "settings"
 
-type LogReceiveCelebrationShownParams = {
+type LogIncomingTransactionSplashShownParams = {
   route: string
-  wallet: CelebrationWallet
-  paymentType: CelebrationPaymentTypeName
+  wallet: SplashWallet
+  paymentType: SplashPaymentTypeName
   amountBucket: string
   hasNote: boolean
+  amountHidden: boolean
 }
 
-export const logReceiveCelebrationShown = (params: LogReceiveCelebrationShownParams) => {
-  analytics().logEvent("receive_celebration_shown", {
+export const logIncomingTransactionSplashShown = (
+  params: LogIncomingTransactionSplashShownParams,
+) => {
+  analytics().logEvent("incoming_tx_splash_shown", {
     route: params.route,
     wallet: params.wallet,
     payment_type: params.paymentType,
     amount_bucket: params.amountBucket,
     has_note: params.hasNote,
+    amount_hidden: params.amountHidden,
   })
 }
 
-export const logReceiveCelebrationReplaced = (params: {
+export const logIncomingTransactionSplashReplaced = (params: {
   secondsSincePrevious: number
   route: string
 }) => {
-  analytics().logEvent("receive_celebration_replaced", {
+  analytics().logEvent("incoming_tx_splash_replaced", {
     seconds_since_previous: params.secondsSincePrevious,
     route: params.route,
   })
 }
 
-export const logReceiveCelebrationSuppressed = (params: {
-  reason: "below_minimum" | "blocked_route" | "opted_out" | "balance_hidden"
+export const logIncomingTransactionSplashSuppressed = (params: {
+  reason: "below_minimum" | "blocked_route" | "opted_out"
 }) => {
-  analytics().logEvent("receive_celebration_suppressed", { reason: params.reason })
+  analytics().logEvent("incoming_tx_splash_suppressed", { reason: params.reason })
 }
 
-export const logReceiveCelebrationClosed = (params: {
-  action: CelebrationCloseAction
+export const logIncomingTransactionSplashClosed = (params: {
+  action: SplashCloseAction
   timeOnScreenMs: number
   optedOut: boolean
+  /** Whether a hidden amount was tapped to show it. */
+  amountRevealed: boolean
 }) => {
-  analytics().logEvent("receive_celebration_closed", {
+  analytics().logEvent("incoming_tx_splash_closed", {
     action: params.action,
     time_on_screen_ms: params.timeOnScreenMs,
     opted_out: params.optedOut,
+    amount_revealed: params.amountRevealed,
   })
 }
 
-export const logReceiveCelebrationSettingChanged = (params: {
+export const logIncomingTransactionSplashSettingChanged = (params: {
   enabled: boolean
   minimumSats: number
-  source: CelebrationSettingSource
+  source: SplashSettingSource
 }) => {
-  analytics().logEvent("receive_celebration_setting_changed", {
+  analytics().logEvent("incoming_tx_splash_setting_changed", {
     enabled: params.enabled,
     minimum_sats: params.minimumSats,
     source: params.source,

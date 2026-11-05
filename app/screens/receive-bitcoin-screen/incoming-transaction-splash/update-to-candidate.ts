@@ -1,8 +1,8 @@
 import { TxNotificationType } from "@app/graphql/generated"
 
-import { CelebrationCandidate, CelebrationPaymentType } from "./types"
+import { SplashCandidate, SplashPaymentType } from "./types"
 
-type UpdateTransaction = CelebrationCandidate["transaction"]
+type UpdateTransaction = SplashCandidate["transaction"]
 
 const paymentHashOf = (transaction: UpdateTransaction): string | undefined => {
   const via = transaction.initiationVia
@@ -11,18 +11,18 @@ const paymentHashOf = (transaction: UpdateTransaction): string | undefined => {
 }
 
 /** LnUpdate PAID, IntraLedgerReceipt, and OnchainReceipt only. Pending on-chain and
- *  outgoing intraledger updates are not a celebration. */
+ *  outgoing intraledger updates are not a splash. */
 export const candidateFromUpdate = (update: {
   __typename?: string
   status?: string
   txNotificationType?: TxNotificationType
   transaction?: UpdateTransaction
-}): CelebrationCandidate | null => {
+}): SplashCandidate | null => {
   if (update.__typename === "LnUpdate" && update.transaction) {
     if (update.status !== "PAID") return null
     return {
       transaction: update.transaction,
-      paymentType: CelebrationPaymentType.Lightning,
+      paymentType: SplashPaymentType.Lightning,
       paymentHash: paymentHashOf(update.transaction),
     }
   }
@@ -33,7 +33,7 @@ export const candidateFromUpdate = (update: {
   ) {
     return {
       transaction: update.transaction,
-      paymentType: CelebrationPaymentType.IntraLedger,
+      paymentType: SplashPaymentType.IntraLedger,
     }
   }
   if (
@@ -43,7 +43,7 @@ export const candidateFromUpdate = (update: {
   ) {
     return {
       transaction: update.transaction,
-      paymentType: CelebrationPaymentType.Onchain,
+      paymentType: SplashPaymentType.Onchain,
     }
   }
   return null

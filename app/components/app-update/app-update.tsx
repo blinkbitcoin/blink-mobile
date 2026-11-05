@@ -13,7 +13,7 @@ import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { isIos } from "../../utils/helper"
 import { GaloyPrimaryButton } from "../atomic/galoy-primary-button"
-import { useOverlayCover } from "@app/screens/receive-bitcoin-screen/celebration/overlay-cover"
+import { useOverlayCover } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/overlay-cover"
 import { isUpdateAvailableOrRequired } from "./app-update.logic"
 
 gql`

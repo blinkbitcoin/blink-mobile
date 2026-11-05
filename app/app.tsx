@@ -51,9 +51,9 @@ import { RootStack } from "./navigation/root-navigator"
 import { MigrationBlockerProvider } from "./screens/account-migration/hooks/use-migration-blocker"
 import { ErrorScreen } from "./screens/error-screen"
 import {
-  ReceiveCelebrationProvider,
-  SelfCustodialCelebrationMount,
-} from "./screens/receive-bitcoin-screen/celebration"
+  IncomingTransactionSplashProvider,
+  SelfCustodialSplashMount,
+} from "./screens/receive-bitcoin-screen/incoming-transaction-splash"
 import { MyLnUpdateSub } from "./screens/receive-bitcoin-screen/my-ln-updates-sub"
 import { PersistentStateProvider } from "./store/persistent-state"
 import { detectDefaultLocale } from "./utils/locale-detector"
@@ -109,7 +109,7 @@ export const App = () => (
                                           <EnhancedModePromptProvider>
                                             <RestrictedRegionProvider>
                                               <NotificationsProvider>
-                                                <ReceiveCelebrationProvider>
+                                                <IncomingTransactionSplashProvider>
                                                   <MyLnUpdateSub>
                                                     <AppStateWrapper />
                                                     <PushNotificationComponent />
@@ -122,9 +122,9 @@ export const App = () => (
                                                     <RootStack />
                                                     <NetworkErrorComponent />
                                                     <ActionModals />
-                                                    <SelfCustodialCelebrationMount />
+                                                    <SelfCustodialSplashMount />
                                                   </MyLnUpdateSub>
-                                                </ReceiveCelebrationProvider>
+                                                </IncomingTransactionSplashProvider>
                                               </NotificationsProvider>
                                             </RestrictedRegionProvider>
                                           </EnhancedModePromptProvider>

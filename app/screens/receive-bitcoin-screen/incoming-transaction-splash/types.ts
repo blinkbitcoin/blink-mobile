@@ -1,21 +1,20 @@
 import { TransactionFragment } from "@app/graphql/generated"
 
-export const CelebrationPaymentType = {
+export const SplashPaymentType = {
   Lightning: "lightning",
   IntraLedger: "intraledger",
   Onchain: "onchain",
 } as const
 
-export type CelebrationPaymentType =
-  (typeof CelebrationPaymentType)[keyof typeof CelebrationPaymentType]
+export type SplashPaymentType = (typeof SplashPaymentType)[keyof typeof SplashPaymentType]
 
-/** A settled incoming payment offered to the celebration. Custodial updates and
+/** A settled incoming payment offered to the splash. Custodial updates and
  *  self-custodial payments both arrive as a TransactionFragment, the shape the
  *  transaction details screen reads from the cache. */
-export type CelebrationCandidate = {
+export type SplashCandidate = {
   transaction: TransactionFragment
-  paymentType: CelebrationPaymentType
-  /** Lightning only: lets Receive skip its own haptic for the invoice celebrated here. */
+  paymentType: SplashPaymentType
+  /** Lightning only: lets Receive skip its own haptic for the invoice shown in the splash. */
   paymentHash?: string
   /** Checks it against the moment the app came to the foreground even for on-chain. Set
    *  for self-custodial payments, whose time is when they settled (for a deposit, when it
@@ -23,17 +22,16 @@ export type CelebrationCandidate = {
   createdAtIsSettlement?: boolean
 }
 
-export const CelebrationSuppressReason = {
+export const SplashSuppressReason = {
   BelowMinimum: "below_minimum",
   BlockedRoute: "blocked_route",
   OptedOut: "opted_out",
-  BalanceHidden: "balance_hidden",
 } as const
 
-export type CelebrationSuppressReason =
-  (typeof CelebrationSuppressReason)[keyof typeof CelebrationSuppressReason]
+export type SplashSuppressReason =
+  (typeof SplashSuppressReason)[keyof typeof SplashSuppressReason]
 
-export const CelebrationCloseAction = {
+export const SplashCloseAction = {
   Close: "close",
   Details: "details",
   Back: "back",
@@ -41,5 +39,4 @@ export const CelebrationCloseAction = {
   Background: "background",
 } as const
 
-export type CelebrationCloseAction =
-  (typeof CelebrationCloseAction)[keyof typeof CelebrationCloseAction]
+export type SplashCloseAction = (typeof SplashCloseAction)[keyof typeof SplashCloseAction]

@@ -2538,15 +2538,17 @@
       }
     },
     "inApp": "Στην εφαρμογή",
-    "celebrateIncoming": "Γιόρτασε τις εισερχόμενες πληρωμές",
-    "celebrationMinimum": "Ελάχιστο ποσό (sats)"
+    "incomingTransactionSplash": "Οθόνη εισερχόμενης συναλλαγής",
+    "splashMinimum": "Ελάχιστο ποσό (sats)"
   },
-  "ReceiveCelebration": {
+  "IncomingTransactionSplash": {
     "youReceived": "Έλαβες",
     "note": "Σημείωση",
     "dontShowAgain": "Να μην εμφανιστεί ξανά αυτή η οθόνη.",
     "details": "Λεπτομέρειες",
-    "announcement": "Ελήφθη {amount}"
+    "announcement": "Ελήφθη {amount}",
+    "tapToShow": "Πατήστε για εμφάνιση",
+    "announcementHidden": "Η πληρωμή ελήφθη"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Ο λογαριασμός σας έχει περισσότερα από $5",

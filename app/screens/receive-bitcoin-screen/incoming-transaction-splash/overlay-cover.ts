@@ -7,7 +7,7 @@ const notify = () => {
   listeners.forEach((listener) => listener())
 }
 
-/** A modal or sheet is on top. The celebration drops rather than covering it. */
+/** A modal or sheet is on top. The splash drops rather than covering it. */
 export const pushOverlayCover = (): (() => void) => {
   depth += 1
   notify()

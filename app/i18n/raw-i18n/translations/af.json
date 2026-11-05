@@ -2538,15 +2538,17 @@
       }
     },
     "inApp": "In die app",
-    "celebrateIncoming": "Vier inkomende betalings",
-    "celebrationMinimum": "Minimumbedrag (sats)"
+    "incomingTransactionSplash": "Skerm vir inkomende transaksies",
+    "splashMinimum": "Minimumbedrag (sats)"
   },
-  "ReceiveCelebration": {
+  "IncomingTransactionSplash": {
     "youReceived": "Jy het ontvang",
     "note": "Nota",
     "dontShowAgain": "Moenie hierdie skerm weer wys nie.",
     "details": "Besonderhede",
-    "announcement": "Ontvang {amount}"
+    "announcement": "Ontvang {amount}",
+    "tapToShow": "Tik om te wys",
+    "announcementHidden": "Betaling ontvang"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Jou rekening het meer as $5",

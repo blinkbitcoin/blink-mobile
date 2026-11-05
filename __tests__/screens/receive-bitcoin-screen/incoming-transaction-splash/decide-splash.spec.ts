@@ -4,20 +4,20 @@ import { TxDirection, WalletCurrency } from "@app/graphql/generated"
 import {
   ALLOWED_ROUTES,
   amountBucket,
-  decideCelebration,
+  decideSplash,
   FOREGROUND_GRACE_MS,
-} from "@app/screens/receive-bitcoin-screen/celebration/decide-celebration"
-import { CelebrationCandidate } from "@app/screens/receive-bitcoin-screen/celebration/types"
+} from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/decide-splash"
+import { SplashCandidate } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/types"
 
 const NOW = 1_700_000_000_000
 
 const candidate = (
-  overrides: Partial<CelebrationCandidate> & {
+  overrides: Partial<SplashCandidate> & {
     amount?: number
     createdAt?: number
     direction?: TxDirection
   } = {},
-): CelebrationCandidate =>
+): SplashCandidate =>
   ({
     paymentType: overrides.paymentType ?? "lightning",
     paymentHash: overrides.paymentHash,
@@ -30,16 +30,15 @@ const candidate = (
       settlementCurrency: WalletCurrency.Btc,
       memo: null,
     },
-  }) as CelebrationCandidate
+  }) as SplashCandidate
 
-const decide = (overrides: Partial<Parameters<typeof decideCelebration>[0]> = {}) =>
-  decideCelebration({
+const decide = (overrides: Partial<Parameters<typeof decideSplash>[0]> = {}) =>
+  decideSplash({
     candidate: candidate(),
     foregroundSinceMs: NOW - 60_000,
     appActive: true,
     alreadySeen: false,
     enabled: true,
-    balanceHidden: false,
     minSats: 100,
     amountSats: 5_000,
     routeName: "Home",
@@ -49,7 +48,7 @@ const decide = (overrides: Partial<Parameters<typeof decideCelebration>[0]> = {}
     ...overrides,
   })
 
-describe("decideCelebration", () => {
+describe("decideSplash", () => {
   it("shows a settled receive on an allowed screen", () => {
     expect(decide().outcome).toBe("show")
   })
@@ -102,9 +101,8 @@ describe("decideCelebration", () => {
   })
 
   it("suppresses for each product reason", () => {
-    const cases: Array<[Partial<Parameters<typeof decideCelebration>[0]>, string]> = [
+    const cases: Array<[Partial<Parameters<typeof decideSplash>[0]>, string]> = [
       [{ enabled: false }, "opted_out"],
-      [{ balanceHidden: true }, "balance_hidden"],
       [{ amountSats: 99 }, "below_minimum"],
       [{ amountSats: null }, "below_minimum"],
       [{ routeName: "sendBitcoinDetails" }, "blocked_route"],

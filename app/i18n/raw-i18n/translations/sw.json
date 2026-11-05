@@ -2538,15 +2538,17 @@
       }
     },
     "inApp": "Ndani ya programu",
-    "celebrateIncoming": "Sherehekea malipo yanayoingia",
-    "celebrationMinimum": "Kiasi cha chini (sats)"
+    "incomingTransactionSplash": "Skrini ya muamala unaoingia",
+    "splashMinimum": "Kiasi cha chini (sats)"
   },
-  "ReceiveCelebration": {
+  "IncomingTransactionSplash": {
     "youReceived": "Umepokea",
     "note": "Dokezo",
     "dontShowAgain": "Usionyeshe skrini hii tena.",
     "details": "Maelezo",
-    "announcement": "Imepokelewa {amount}"
+    "announcement": "Imepokelewa {amount}",
+    "tapToShow": "Bonyeza kuonyesha",
+    "announcementHidden": "Malipo yamepokelewa"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Akaunti yako ina zaidi ya $5",

@@ -2538,15 +2538,17 @@
       }
     },
     "inApp": "A l'app",
-    "celebrateIncoming": "Celebra els pagaments entrants",
-    "celebrationMinimum": "Import mínim (sats)"
+    "incomingTransactionSplash": "Pantalla de transacció entrant",
+    "splashMinimum": "Import mínim (sats)"
   },
-  "ReceiveCelebration": {
+  "IncomingTransactionSplash": {
     "youReceived": "Has rebut",
     "note": "Nota",
     "dontShowAgain": "No tornis a mostrar aquesta pantalla.",
     "details": "Detalls",
-    "announcement": "Rebut {amount}"
+    "announcement": "Rebut {amount}",
+    "tapToShow": "Prem per mostrar",
+    "announcementHidden": "Pagament rebut"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "El teu compte té més de 5$",

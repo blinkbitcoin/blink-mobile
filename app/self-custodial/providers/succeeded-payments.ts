@@ -7,7 +7,7 @@ const listeners = new Set<SucceededPaymentListener>()
 /**
  * Every payment the SDK reports as succeeded, handed over the moment its event lands,
  * ahead of the wallet refresh that event triggers (seconds on a busy wallet). For
- * observers that react to the payment itself, such as the receive celebration.
+ * observers that react to the payment itself, such as the incoming transaction splash.
  */
 export const onSucceededPayment = (listener: SucceededPaymentListener): (() => void) => {
   listeners.add(listener)

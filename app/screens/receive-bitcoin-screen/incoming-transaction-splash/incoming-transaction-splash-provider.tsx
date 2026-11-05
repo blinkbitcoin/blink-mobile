@@ -21,36 +21,43 @@ import {
 } from "@app/navigation/navigation-container-wrapper"
 import { toUsdMoneyAmount } from "@app/types/amounts"
 import {
-  logReceiveCelebrationClosed,
-  logReceiveCelebrationReplaced,
-  logReceiveCelebrationSettingChanged,
-  logReceiveCelebrationShown,
-  logReceiveCelebrationSuppressed,
+  logIncomingTransactionSplashClosed,
+  logIncomingTransactionSplashReplaced,
+  logIncomingTransactionSplashSettingChanged,
+  logIncomingTransactionSplashShown,
+  logIncomingTransactionSplashSuppressed,
 } from "@app/utils/analytics"
 
-import { amountBucket, decideCelebration } from "./decide-celebration"
+import { amountBucket, decideSplash } from "./decide-splash"
 import { isOverlayCovered } from "./overlay-cover"
-import { ReceiveCelebrationOverlay } from "./receive-celebration-overlay"
-import { CelebrationCandidate, CelebrationCloseAction } from "./types"
-import { useCelebrationSettings } from "./use-celebration-settings"
+import { IncomingTransactionSplashOverlay } from "./incoming-transaction-splash-overlay"
+import { SplashCandidate, SplashCloseAction } from "./types"
+import { useSplashSettings } from "./use-splash-settings"
 
-export type ShownCelebration = CelebrationCandidate & { amountSats: number }
-
-type ReceiveCelebrationContextValue = {
-  celebrate: (candidate: CelebrationCandidate) => void
-  /** Newer data for the payment on screen, such as a sender's note that landed after it. */
-  refresh: (candidate: CelebrationCandidate) => void
-  /** Whether this Lightning payment hash was celebrated, so Receive skips its own haptic. */
-  isCelebratedHash: (paymentHash: string) => boolean
+export type ShownSplash = SplashCandidate & {
+  amountSats: number
+  /** The balance was hidden when it landed: the amounts stay masked until a tap on the
+   *  splash shows them. The tap never changes the hide-balance setting. */
+  amountHidden: boolean
 }
 
-const ReceiveCelebrationContext = createContext<ReceiveCelebrationContextValue>({
-  celebrate: () => {},
-  refresh: () => {},
-  isCelebratedHash: () => false,
-})
+type IncomingTransactionSplashContextValue = {
+  showSplash: (candidate: SplashCandidate) => void
+  /** Newer data for the payment on screen, such as a sender's note that landed after it. */
+  refresh: (candidate: SplashCandidate) => void
+  /** Whether this Lightning payment hash got the splash, so Receive skips its own haptic. */
+  isSplashShownForHash: (paymentHash: string) => boolean
+}
 
-export const useReceiveCelebration = () => useContext(ReceiveCelebrationContext)
+const IncomingTransactionSplashContext =
+  createContext<IncomingTransactionSplashContextValue>({
+    showSplash: () => {},
+    refresh: () => {},
+    isSplashShownForHash: () => false,
+  })
+
+export const useIncomingTransactionSplash = () =>
+  useContext(IncomingTransactionSplashContext)
 
 const walletLabel = (
   isSelfCustodial: boolean,
@@ -60,10 +67,12 @@ const walletLabel = (
   return currency === WalletCurrency.Usd ? "usd" : "btc"
 }
 
-export const ReceiveCelebrationProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  const [shown, setShown] = useState<ShownCelebration | null>(null)
+export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
+  children,
+}) => {
+  const [shown, setShown] = useState<ShownSplash | null>(null)
 
-  const settings = useCelebrationSettings()
+  const settings = useSplashSettings()
   const { hideAmount } = useHideAmount()
   const { alwaysHideBalance } = useHideBalanceSetting()
   const { isAppLocked } = useAuthenticationContext()
@@ -71,12 +80,13 @@ export const ReceiveCelebrationProvider: React.FC<PropsWithChildren> = ({ childr
   const { convertMoneyAmount } = usePriceConversion()
 
   const seenIds = useRef(new Set<string>())
-  const celebratedHashes = useRef(new Set<string>())
+  const splashHashes = useRef(new Set<string>())
   const foregroundSince = useRef(Date.now())
   const shownAt = useRef(0)
   const shownId = useRef<string | null>(null)
+  const amountRevealed = useRef(false)
 
-  /** Read through a ref so `celebrate` keeps one identity for the subscription effects. */
+  /** Read through a ref so `showSplash` keeps one identity for the subscription effects. */
   const gate = useRef({
     settings,
     balanceHidden: hideAmount || alwaysHideBalance,
@@ -92,13 +102,14 @@ export const ReceiveCelebrationProvider: React.FC<PropsWithChildren> = ({ childr
     convertMoneyAmount,
   }
 
-  const dismiss = useCallback((action: CelebrationCloseAction) => {
+  const dismiss = useCallback((action: SplashCloseAction) => {
     if (!shownId.current) return
     shownId.current = null
-    logReceiveCelebrationClosed({
+    logIncomingTransactionSplashClosed({
       action,
       timeOnScreenMs: Date.now() - shownAt.current,
       optedOut: false,
+      amountRevealed: amountRevealed.current,
     })
     setShown(null)
   }, [])
@@ -111,16 +122,16 @@ export const ReceiveCelebrationProvider: React.FC<PropsWithChildren> = ({ childr
       }
       /** Background only: iOS goes "inactive" for a pulled-down notification centre or
        *  a biometric prompt, which should not dismiss it. */
-      if (state === "background") dismiss(CelebrationCloseAction.Background)
+      if (state === "background") dismiss(SplashCloseAction.Background)
     })
     return () => subscription.remove()
   }, [dismiss])
 
   useEffect(() => {
-    if (isAppLocked) dismiss(CelebrationCloseAction.Background)
+    if (isAppLocked) dismiss(SplashCloseAction.Background)
   }, [isAppLocked, dismiss])
 
-  const toSats = useCallback((candidate: CelebrationCandidate): number | null => {
+  const toSats = useCallback((candidate: SplashCandidate): number | null => {
     const { settlementAmount, settlementCurrency } = candidate.transaction
     const amount = Math.abs(settlementAmount)
     if (settlementCurrency === WalletCurrency.Btc) return amount
@@ -132,8 +143,8 @@ export const ReceiveCelebrationProvider: React.FC<PropsWithChildren> = ({ childr
     return convert(toUsdMoneyAmount(amount), WalletCurrency.Btc).amount
   }, [])
 
-  const celebrate = useCallback(
-    (candidate: CelebrationCandidate) => {
+  const showSplash = useCallback(
+    (candidate: SplashCandidate) => {
       const alreadySeen = seenIds.current.has(candidate.transaction.id)
       if (!alreadySeen) seenIds.current.add(candidate.transaction.id)
 
@@ -141,13 +152,12 @@ export const ReceiveCelebrationProvider: React.FC<PropsWithChildren> = ({ childr
         ? navigationRef.getCurrentRoute()?.name
         : undefined
       const current = gate.current
-      const decision = decideCelebration({
+      const decision = decideSplash({
         candidate,
         foregroundSinceMs: foregroundSince.current,
         appActive: AppState.currentState === "active",
         alreadySeen,
         enabled: current.settings.enabled,
-        balanceHidden: current.balanceHidden,
         minSats: current.settings.minSats,
         amountSats: toSats(candidate),
         routeName,
@@ -158,33 +168,39 @@ export const ReceiveCelebrationProvider: React.FC<PropsWithChildren> = ({ childr
 
       if (decision.outcome === "skip") return
       if (decision.outcome === "suppress") {
-        logReceiveCelebrationSuppressed({ reason: decision.reason })
+        logIncomingTransactionSplashSuppressed({ reason: decision.reason })
         return
       }
 
-      if (candidate.paymentHash) celebratedHashes.current.add(candidate.paymentHash)
-      const next: ShownCelebration = { ...candidate, amountSats: decision.amountSats }
+      if (candidate.paymentHash) splashHashes.current.add(candidate.paymentHash)
+      const next: ShownSplash = {
+        ...candidate,
+        amountSats: decision.amountSats,
+        amountHidden: current.balanceHidden,
+      }
       if (shownId.current && shownId.current !== next.transaction.id) {
-        logReceiveCelebrationReplaced({
+        logIncomingTransactionSplashReplaced({
           secondsSincePrevious: Math.round((Date.now() - shownAt.current) / 1000),
           route: routeName ?? "unknown",
         })
       }
       shownId.current = next.transaction.id
       shownAt.current = Date.now()
-      logReceiveCelebrationShown({
+      amountRevealed.current = false
+      logIncomingTransactionSplashShown({
         route: routeName ?? "unknown",
         wallet: walletLabel(current.isSelfCustodial, next.transaction.settlementCurrency),
         paymentType: next.paymentType,
         amountBucket: amountBucket(next.amountSats),
         hasNote: Boolean(next.transaction.memo),
+        amountHidden: next.amountHidden,
       })
       setShown(next)
     },
     [toSats],
   )
 
-  const refresh = useCallback((candidate: CelebrationCandidate) => {
+  const refresh = useCallback((candidate: SplashCandidate) => {
     setShown((current) =>
       current && current.transaction.id === candidate.transaction.id
         ? { ...current, transaction: candidate.transaction }
@@ -192,26 +208,27 @@ export const ReceiveCelebrationProvider: React.FC<PropsWithChildren> = ({ childr
     )
   }, [])
 
-  const isCelebratedHash = useCallback(
-    (paymentHash: string) => celebratedHashes.current.has(paymentHash),
+  const isSplashShownForHash = useCallback(
+    (paymentHash: string) => splashHashes.current.has(paymentHash),
     [],
   )
 
   const close = useCallback(
-    ({ optedOut, action }: { optedOut: boolean; action: CelebrationCloseAction }) => {
+    ({ optedOut, action }: { optedOut: boolean; action: SplashCloseAction }) => {
       if (optedOut) {
         settings.setEnabled(false)
-        logReceiveCelebrationSettingChanged({
+        logIncomingTransactionSplashSettingChanged({
           enabled: false,
           minimumSats: settings.minSats,
-          source: "celebration",
+          source: "splash",
         })
       }
       if (shownId.current) {
-        logReceiveCelebrationClosed({
+        logIncomingTransactionSplashClosed({
           action,
           timeOnScreenMs: Date.now() - shownAt.current,
           optedOut,
+          amountRevealed: amountRevealed.current,
         })
       }
       shownId.current = null
@@ -223,7 +240,7 @@ export const ReceiveCelebrationProvider: React.FC<PropsWithChildren> = ({ childr
   const openDetails = useCallback(
     ({ optedOut }: { optedOut: boolean }) => {
       const txid = shown?.transaction.id
-      close({ optedOut, action: CelebrationCloseAction.Details })
+      close({ optedOut, action: SplashCloseAction.Details })
       if (txid && navigationRef.isReady()) {
         navigationRef.navigate("transactionDetail", { txid })
       }
@@ -231,21 +248,26 @@ export const ReceiveCelebrationProvider: React.FC<PropsWithChildren> = ({ childr
     [close, shown],
   )
 
+  const onReveal = useCallback(() => {
+    amountRevealed.current = true
+  }, [])
+
   const value = useMemo(
-    () => ({ celebrate, refresh, isCelebratedHash }),
-    [celebrate, refresh, isCelebratedHash],
+    () => ({ showSplash, refresh, isSplashShownForHash }),
+    [showSplash, refresh, isSplashShownForHash],
   )
 
   return (
-    <ReceiveCelebrationContext.Provider value={value}>
+    <IncomingTransactionSplashContext.Provider value={value}>
       {children}
       {shown && (
-        <ReceiveCelebrationOverlay
-          celebration={shown}
+        <IncomingTransactionSplashOverlay
+          splash={shown}
           onClose={close}
           onDetails={openDetails}
+          onReveal={onReveal}
         />
       )}
-    </ReceiveCelebrationContext.Provider>
+    </IncomingTransactionSplashContext.Provider>
   )
 }

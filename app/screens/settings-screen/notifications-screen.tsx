@@ -18,8 +18,8 @@ import { ListItem, makeStyles, Text } from "@rn-vui/themed"
 import { Screen } from "@app/components/screen"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { Switch } from "@app/components/atomic/switch"
-import { useCelebrationSettings } from "@app/screens/receive-bitcoin-screen/celebration"
-import { logReceiveCelebrationSettingChanged } from "@app/utils/analytics"
+import { useSplashSettings } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash"
+import { logIncomingTransactionSplashSettingChanged } from "@app/utils/analytics"
 import { SettingsGroup } from "./group"
 
 gql`
@@ -236,30 +236,32 @@ export const NotificationSettingsScreen: React.FC = () => {
       <SettingsGroup items={pushNotificationSettings} />
       <SettingsGroup
         name={LL.NotificationSettingsScreen.inApp()}
-        items={[CelebrationToggleRow, CelebrationMinimumRow]}
+        items={[SplashToggleRow, SplashMinimumRow]}
       />
     </Screen>
   )
 }
 
-const CelebrationToggleRow: React.FC = () => {
+const SplashToggleRow: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
-  const { enabled, minSats, setEnabled } = useCelebrationSettings()
+  const { enabled, minSats, setEnabled } = useSplashSettings()
 
   return (
     <ListItem containerStyle={styles.listItemContainer}>
       <GaloyIcon name="receive" size={24} />
       <ListItem.Content>
         <ListItem.Title>
-          <Text type="p2">{LL.NotificationSettingsScreen.celebrateIncoming()}</Text>
+          <Text type="p2">
+            {LL.NotificationSettingsScreen.incomingTransactionSplash()}
+          </Text>
         </ListItem.Title>
       </ListItem.Content>
       <Switch
         value={enabled}
         onValueChange={(value) => {
           setEnabled(value)
-          logReceiveCelebrationSettingChanged({
+          logIncomingTransactionSplashSettingChanged({
             enabled: value,
             minimumSats: minSats,
             source: "settings",
@@ -270,17 +272,17 @@ const CelebrationToggleRow: React.FC = () => {
   )
 }
 
-const CelebrationMinimumRow: React.FC = () => {
+const SplashMinimumRow: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
-  const { enabled, minSats, setMinSats } = useCelebrationSettings()
+  const { enabled, minSats, setMinSats } = useSplashSettings()
   const [draft, setDraft] = React.useState(String(minSats))
 
   const commit = () => {
     const value = Number.parseInt(draft, 10)
     if (Number.isFinite(value) && value >= 0) {
       setMinSats(value)
-      logReceiveCelebrationSettingChanged({
+      logIncomingTransactionSplashSettingChanged({
         enabled,
         minimumSats: value,
         source: "settings",
@@ -294,7 +296,7 @@ const CelebrationMinimumRow: React.FC = () => {
     <ListItem containerStyle={styles.listItemContainer}>
       <ListItem.Content>
         <ListItem.Title>
-          <Text type="p2">{LL.NotificationSettingsScreen.celebrationMinimum()}</Text>
+          <Text type="p2">{LL.NotificationSettingsScreen.splashMinimum()}</Text>
         </ListItem.Title>
       </ListItem.Content>
       <TextInput

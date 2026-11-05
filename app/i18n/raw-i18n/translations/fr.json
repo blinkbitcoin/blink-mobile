@@ -2538,15 +2538,17 @@
             }
         },
         "inApp": "Dans l'app",
-        "celebrateIncoming": "Célébrer les paiements reçus",
-        "celebrationMinimum": "Montant minimum (sats)"
+        "incomingTransactionSplash": "Écran de transaction entrante",
+        "splashMinimum": "Montant minimum (sats)"
     },
-    "ReceiveCelebration": {
+    "IncomingTransactionSplash": {
         "youReceived": "Vous avez reçu",
         "note": "Note",
         "dontShowAgain": "Ne plus afficher cet écran.",
         "details": "Détails",
-        "announcement": "Reçu {amount}"
+        "announcement": "Reçu {amount}",
+        "tapToShow": "Touchez pour afficher",
+        "announcementHidden": "Paiement reçu"
     },
     "AccountScreen": {
         "fundsMoreThan5Dollars": "Votre compte contient plus de 5 $",
