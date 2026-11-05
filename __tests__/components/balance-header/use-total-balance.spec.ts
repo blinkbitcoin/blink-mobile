@@ -224,6 +224,19 @@ describe("useTotalBalance", () => {
       )
     })
 
+    it("counts the card in satsBalance when there is no dollar balance", () => {
+      mockConvertMoneyAmount.mockReturnValue(identityConversion)
+      const btcAndCard = [
+        { id: "btc", balance: 1_000_000, walletCurrency: WalletCurrency.Btc },
+        { id: "usd", balance: 0, walletCurrency: WalletCurrency.Usd },
+        { id: "card", balance: 50_000, walletCurrency: CARD },
+      ]
+
+      const { result } = renderHook(() => useTotalBalance(btcAndCard))
+
+      expect(result.current.satsBalance).toBe(1_050_000)
+    })
+
     it("leaves the total untouched when the accounts have no card", () => {
       mockConvertMoneyAmount.mockReturnValue(identityConversion)
 
