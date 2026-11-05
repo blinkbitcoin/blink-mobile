@@ -1,5 +1,5 @@
 import { Wallet, WalletCurrency } from "@app/graphql/generated"
-import type { CardCurrency } from "@app/types/amounts"
+import { CARD, CardCurrency } from "@app/types/amounts"
 
 export type WalletBalance = Pick<Wallet, "id" | "walletCurrency" | "balance">
 
@@ -10,6 +10,12 @@ type CardBalance = {
 }
 
 export type AccountBalance = WalletBalance | CardBalance
+
+export const getWallets = (accounts: readonly AccountBalance[] | undefined) =>
+  accounts?.filter((account): account is WalletBalance => account.walletCurrency !== CARD)
+
+export const getCardAccount = (accounts: readonly AccountBalance[] | undefined) =>
+  accounts?.find((account): account is CardBalance => account.walletCurrency === CARD)
 
 export const getBtcWallet = (wallets: readonly WalletBalance[] | undefined) => {
   if (wallets === undefined || wallets.length === 0) {
