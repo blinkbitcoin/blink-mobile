@@ -2391,6 +2391,8 @@
     "invalidAmount": "Ово садржи неважећи износ. Молимо вас поново генеришите са важећим износом.",
     "usernameDoesNotExist": "{lnAddress: string} не изгледа као {bankName: string} адреса која постоји.",
     "usernameDoesNotExistAdvice": "Или проверите да ли је правилно написано или замените адресом „LN“ рачуна или „BTC“ адресом.",
+    "destinationUnverifiable": "Тренутно нисмо могли да проверимо {lnAddress} — {bankName} сервери не одговарају.",
+    "destinationUnverifiableAdvice": "Адреса је вероватно исправна. Покушајте поново за тренутак или затражите од примаоца LN рачун или BTC адресу.",
     "selfPaymentError": "{lnAddress: string} је ваша {bankName: string} адреса.",
     "selfPaymentAdvice": "Ако желите послати новац на други налог који поседујете, можете користити „LN“ или „BTC“ адресу или рачун уместо тога.",
     "lnAddressError": "Не можемо да приступимо овој Lightning адреси. Ако сте сигурни да постоји, покушајте поново касније.",
@@ -2618,7 +2620,8 @@
     "error": "Тренутно није могуће преузети профиле",
     "fromThisDevice": "са овог уређаја?",
     "switchAccount": "Пребацили сте се на други налог",
-    "removedAccount": "Уклонили сте налог {identifier: string}."
+    "removedAccount": "Уклонили сте налог {identifier: string}.",
+    "removeAccount": "Уклони налог"
   },
   "StablesatsRestriction": {
     "walletLabel": "није доступан у вашем региону",
@@ -2782,6 +2785,7 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
+      "serverUnreachable": "Није било могуће контактирати сервер адреса. Покушајте поново за тренутак.",
       "unknownError": "An unknown error occurred, please try again later",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3109,12 +3113,12 @@
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
     "deleteAccountWarning": "Пажња: Затварање налога је трајно!\nПре затварања проверите да новчаници немају средстава.\nЗатворени налог се не може вратити.\nМожемо задржати одређене записе у складу са законом.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Преузми записе",
+    "exportLogsTitle": "Подели записе новчаника",
+    "exportLogsBody": "Ова датотека помаже нашем тиму за подршку да испита проблеме са твојим новчаницима. Садржи историју плаћања (износе, фактуре и адресе) и идентификаторе сваког не-кастодијалног новчаника на овом уређају, не само овог, али никада твоје резервне фразе ни кључеве. Подели је само са нашим тимом за подршку.",
+    "exportLogsConfirm": "Подели записе",
+    "noLogsYet": "Још нема записа за дељење. Отвори новчаник и покушај поново.",
+    "exportLogsError": "Није могуће извести записе. Покушај поново."
   },
   "lnurl": {
     "overLimit": "Не можете послати више од максималног износа",
@@ -3851,7 +3855,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Направите резервну копију новчаника",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Изаберите метод резервне копије",
@@ -3909,6 +3913,7 @@
     "CloudBackup": {
       "title": "Направимо резервну копију вашег новчаника",
       "description": "Сачуваћемо копију ваше фразе за опоравак у вашем {provider}.",
+      "encryptCheckbox": "Шифрујте додатном лозинком",
       "password": "Лозинка",
       "passwordPlaceholder": "(најмање 12 знакова)",
       "confirmPassword": "Потврдите лозинку",
@@ -4250,6 +4255,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink је недоступан",
+    "unreachableDescription": "{featureName} захтева Blink сервере, који тренутно не одговарају. Ваш новчаник и средства нису погођени.",
     "featureCircles": "Circles",
     "featureEarn": "Учи",
     "featureCard": "Card"
@@ -4272,6 +4279,10 @@
     "tokenTransfer": "{token} пренос",
     "payTo": "Плати на {address}",
     "payment": "Плаћање"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Курс можда није ажуран",
+    "satsOnly": "Приказ у сатима — курс није доступан"
   },
   "SelfCustodialOffline": {
     "title": "Новчаник је ван мреже",

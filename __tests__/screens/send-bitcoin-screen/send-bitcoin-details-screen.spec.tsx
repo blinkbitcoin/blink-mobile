@@ -1,11 +1,25 @@
 import React from "react"
 
-import { render } from "@testing-library/react-native"
+import { act, render, screen } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import theme from "@app/rne-theme/theme"
+import { createNoAmountLightningPaymentDetails } from "@app/screens/send-bitcoin-screen/payment-details"
 import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
+import {
+  toBtcMoneyAmount,
+  toDisplayAmount,
+  type MoneyAmount,
+  type WalletOrDisplayCurrency,
+} from "@app/types/amounts"
+import { SATS_DISPLAY_CURRENCY } from "@app/types/price"
+import {
+  createPriceConverters,
+  priceOfCurrencyInCurrencyFromRates,
+  satsOnlyPriceOfCurrencyInCurrency,
+} from "@app/utils/price-conversion"
 
 const mockSendWallets = jest.fn()
 const mockCreatePaymentDetail = jest.fn()
@@ -43,7 +57,10 @@ jest.mock("@app/screens/send-bitcoin-screen/hooks/use-send-wallets", () => ({
  *  array each time changes the identities the screen's effects depend on, which re-renders
  *  it forever and exhausts the worker rather than failing an assertion. */
 const CONVERT_MONEY_AMOUNT = jest.fn((amount: unknown) => amount)
-const PRICE_CONVERSION = { convertMoneyAmount: CONVERT_MONEY_AMOUNT }
+const PRICE_CONVERSION: { convertMoneyAmount: unknown; displayCurrency: string } = {
+  convertMoneyAmount: CONVERT_MONEY_AMOUNT,
+  displayCurrency: "USD",
+}
 
 jest.mock("@app/hooks/use-price-conversion", () => ({
   usePriceConversion: () => PRICE_CONVERSION,
@@ -52,7 +69,7 @@ jest.mock("@app/hooks/use-price-conversion", () => ({
 const DISPLAY_CURRENCY = {
   formatMoneyAmount: () => "$0.00",
   getSecondaryAmountIfCurrencyIsDifferent: () => undefined,
-  zeroDisplayAmount: { amount: 0, currency: "DisplayCurrency", currencyCode: "USD" },
+  zeroDisplayAmount: toDisplayAmount({ amount: 0, currencyCode: "USD" }),
 }
 
 jest.mock("@app/hooks/use-display-currency", () => ({
@@ -132,8 +149,15 @@ const AMOUNT_PAD = {
   toggleCurrency: jest.fn(),
 }
 
+const mockNumberPad = jest.fn(
+  (_args: { onAmountChange: (amount: MoneyAmount<WalletOrDisplayCurrency>) => void }) =>
+    AMOUNT_PAD,
+)
+
 jest.mock("@app/components/amount-input-screen/use-number-pad", () => ({
-  useNumberPad: () => AMOUNT_PAD,
+  useNumberPad: (args: {
+    onAmountChange: (amount: MoneyAmount<WalletOrDisplayCurrency>) => void
+  }) => mockNumberPad(args),
 }))
 jest.mock("@app/screens/send-bitcoin-screen/send-hero", () => ({
   SendHero: () => null,
@@ -314,5 +338,71 @@ describe("SendBitcoinDetailsScreen region gate", () => {
     const { queryByTestId } = renderScreen()
 
     expect(queryByTestId(PENDING_TEST_ID)).toBeNull()
+  })
+})
+
+describe("SendBitcoinDetailsScreen when a rate arrives after an amount was typed in sats", () => {
+  /** One BTC is 100,000 USD here, so a sat is a tenth of a US cent. */
+  const satsOnly = createPriceConverters(
+    satsOnlyPriceOfCurrencyInCurrency,
+    SATS_DISPLAY_CURRENCY,
+  ).convertMoneyAmount
+  const inUsd = createPriceConverters(
+    priceOfCurrencyInCurrencyFromRates(0.1, 1) ?? satsOnlyPriceOfCurrencyInCurrency,
+    "USD",
+  ).convertMoneyAmount
+
+  const setTypedAmount = (amount: MoneyAmount<WalletOrDisplayCurrency>) => {
+    const { calls } = mockNumberPad.mock
+    calls[calls.length - 1][0].onAmountChange(amount)
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockSendWallets.mockReturnValue(RESTRICTED_WALLETS)
+    mockCreatePaymentDetail.mockImplementation(
+      ({ convertMoneyAmount, sendingWalletDescriptor }) =>
+        createNoAmountLightningPaymentDetails({
+          paymentRequest: "lnbc1noamount",
+          unitOfAccountAmount: toBtcMoneyAmount(0),
+          convertMoneyAmount,
+          sendingWalletDescriptor,
+        }),
+    )
+    PRICE_CONVERSION.convertMoneyAmount = satsOnly
+    PRICE_CONVERSION.displayCurrency = SATS_DISPLAY_CURRENCY
+    DISPLAY_CURRENCY.zeroDisplayAmount = toDisplayAmount({
+      amount: 0,
+      currencyCode: SATS_DISPLAY_CURRENCY,
+    })
+  })
+
+  afterEach(() => {
+    PRICE_CONVERSION.convertMoneyAmount = CONVERT_MONEY_AMOUNT
+    PRICE_CONVERSION.displayCurrency = "USD"
+    DISPLAY_CURRENCY.zeroDisplayAmount = toDisplayAmount({
+      amount: 0,
+      currencyCode: "USD",
+    })
+  })
+
+  it("keeps the amount, what it settles to, and the way forward", () => {
+    const { rerender } = renderScreen()
+    act(() => {
+      setTypedAmount(
+        toDisplayAmount({ amount: 1000, currencyCode: SATS_DISPLAY_CURRENCY }),
+      )
+    })
+    expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled).toBe(false)
+
+    PRICE_CONVERSION.convertMoneyAmount = inUsd
+    PRICE_CONVERSION.displayCurrency = "USD"
+    rerender(
+      <Wrapper>
+        <SendBitcoinDetailsScreen route={route} />
+      </Wrapper>,
+    )
+
+    expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled).toBe(false)
   })
 })

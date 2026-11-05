@@ -10,6 +10,7 @@ import CustomModal from "@app/components/custom-modal/custom-modal"
 import { IconHero } from "@app/components/icon-hero"
 import { UNILATERAL_EXIT_CASE_STUDY_URL } from "@app/config"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 import { useRecoveryBundleActions } from "@app/screens/self-custodial/recovery-backup/use-recovery-bundle-actions"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
@@ -147,7 +148,7 @@ const useStyles = makeStyles(({ colors }) => ({
   inactiveTitle: {
     fontSize: 20,
     lineHeight: 24,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.grey5,
   },
   learnMore: {
