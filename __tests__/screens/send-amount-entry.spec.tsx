@@ -641,7 +641,8 @@ describe("a custodial on-chain payment to the sender's own address", () => {
     typeKeys("1")
     await settle()
 
-    expect(screen.getByText(selfPayment)).toBeTruthy()
+    // Inline, and in the error message sheet opened over it.
+    expect(screen.getAllByText(selfPayment)).toHaveLength(2)
     expect(screen.queryByText(LL.common.feeError())).toBeNull()
     expect(isNextDisabled()).toBe(true)
   })

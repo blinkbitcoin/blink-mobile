@@ -54,6 +54,7 @@ import { useOnchainFeeTierOptions } from "./hooks/use-onchain-fee-tier-options"
 import { useSendWallets } from "./hooks/use-send-wallets"
 
 import { testProps } from "../../utils/testProps"
+import { AmountEntryErrorSheet } from "./amount-entry/amount-entry-error-sheet"
 import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
 import { ConfirmFeesModal } from "./confirm-fees-modal"
 import { formatDestination } from "./format-destination"
@@ -239,6 +240,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     convertMoneyAmount: paymentDetail?.convertMoneyAmount ?? _convertMoneyAmount,
     onAmountChange: setAmount,
   })
+
+  /** "Change amount" from the error sheet: back to zero, destination, wallet and note kept. */
+  const clearAmount = () => {
+    setAmount(zeroDisplayAmount)
+    amountPad.showAmount(zeroDisplayAmount)
+  }
 
   /** Keeps the payment detail on the current rate. A change of display currency, which is
    *  what sats-only mode starting or ending is, also moves the amount already typed. */
@@ -612,6 +619,21 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       avoidKeyboardEnabled={isIos || isKeyboardVisible}
       edges={isKeyboardVisible ? ["left", "right"] : ["left", "right", "bottom"]}
     >
+      <AmountEntryErrorSheet
+        lnurlError={undefined}
+        limitMessage={
+          !amountStatus.validAmount &&
+          amountStatus.invalidReason === AmountInvalidReason.InsufficientLimit
+            ? LL.SendBitcoinScreen.amountExceedsLimit({
+                limit: formatMoneyAmount({ moneyAmount: amountStatus.remainingLimit }),
+              })
+            : undefined
+        }
+        selfPaymentMessage={isSelfPayment ? feeTierErrorMessage : undefined}
+        onRetryLimits={undefined}
+        onRetry={goToNextScreen || undefined}
+        onChangeAmount={clearAmount}
+      />
       <ConfirmFeesModal
         action={() => {
           setModalHighFeesVisible(false)

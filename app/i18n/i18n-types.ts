@@ -7784,6 +7784,26 @@ type RootTranslation = {
 		 */
 		amountExceedsLimit: RequiredParams<'limit'>
 		/**
+		 * W​e​ ​c​o​u​l​d​n​'​t​ ​c​h​e​c​k​ ​y​o​u​r​ ​d​a​i​l​y​ ​l​i​m​i​t​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​.
+		 */
+		limitsUnavailable: string
+		/**
+		 * A​ ​s​m​a​l​l​ ​p​r​o​b​l​e​m
+		 */
+		problemSheetTitle: string
+		/**
+		 * C​h​a​n​g​e​ ​d​e​s​t​i​n​a​t​i​o​n
+		 */
+		changeDestination: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​r​e​a​c​h​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t
+		 */
+		recipientUnreachableTitle: string
+		/**
+		 * R​e​c​i​p​i​e​n​t​ ​s​e​n​t​ ​t​h​e​ ​w​r​o​n​g​ ​a​m​o​u​n​t
+		 */
+		recipientWrongAmountTitle: string
+		/**
 		 * U​p​g​r​a​d​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​t​o​ ​i​n​c​r​e​a​s​e​ ​y​o​u​r​ ​l​i​m​i​t
 		 */
 		upgradeAccountToIncreaseLimit: string
@@ -22256,6 +22276,26 @@ export type TranslationFunctions = {
 		 * Amount exceeds your remaining daily limit of {limit}
 		 */
 		amountExceedsLimit: (arg: { limit: string }) => LocalizedString
+		/**
+		 * We couldn't check your daily limit. Try again in a moment.
+		 */
+		limitsUnavailable: () => LocalizedString
+		/**
+		 * A small problem
+		 */
+		problemSheetTitle: () => LocalizedString
+		/**
+		 * Change destination
+		 */
+		changeDestination: () => LocalizedString
+		/**
+		 * Couldn't reach the recipient
+		 */
+		recipientUnreachableTitle: () => LocalizedString
+		/**
+		 * Recipient sent the wrong amount
+		 */
+		recipientWrongAmountTitle: () => LocalizedString
 		/**
 		 * Upgrade your account to increase your limit
 		 */

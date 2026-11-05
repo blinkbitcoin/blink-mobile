@@ -1,7 +1,9 @@
 import React from "react"
+import { ApolloError } from "@apollo/client"
+import { GraphQLError } from "graphql"
 import { Satoshis, type LnUrlPayServiceResponse } from "lnurl-pay"
 
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native"
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
@@ -48,11 +50,15 @@ jest.mock("lnurl-pay", () => ({
     mockRequestInvoiceWithServiceParams(...args),
 }))
 
+const ERROR_SHEET_TEST_ID = "amount-entry-error-msg-bottom-sheet"
+
 const mockNavigate = jest.fn()
+const mockDispatch = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
     navigate: mockNavigate,
+    dispatch: mockDispatch,
     setOptions: jest.fn(),
   }),
 }))
@@ -667,6 +673,46 @@ describe("onchain fee tier gating", () => {
     expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
       false,
     )
+  })
+
+  /** blink-mobile#4261: the backend refuses the quote with CANT_PAY_SELF. */
+  it("names a payment to the sender's own address, holds Next and offers Change destination", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockDispatch.mockClear()
+    mockQuoteFees.mockResolvedValue({
+      data: undefined,
+      error: new ApolloError({
+        graphQLErrors: [
+          new GraphQLError("User tried to pay themselves", {
+            extensions: { code: "CANT_PAY_SELF" },
+          }),
+        ],
+      }),
+    })
+
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    await flushAsync()
+
+    const sheet = within(await screen.findByTestId(ERROR_SHEET_TEST_ID))
+    expect(sheet.getByText(LL.SendBitcoinScreen.onchainSelfPayment())).toBeTruthy()
+    expect(screen.queryByText(LL.common.feeError())).toBeNull()
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      true,
+    )
+
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinScreen.changeDestination()))
+    })
+    expect(mockDispatch).toHaveBeenCalledTimes(1)
   })
 
   /**
