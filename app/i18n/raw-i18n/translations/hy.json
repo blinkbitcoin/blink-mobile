@@ -2391,6 +2391,8 @@
     "invalidAmount": "Սա պարունակում է անվավեր չափ։ Խնդրում ենք վերաստեղծել վավեր չափով։ ",
     "usernameDoesNotExist": "{lnAddress: string}, կարծես, գոյություն ունեցող {bankName: string} հասցե չէ։ ",
     "usernameDoesNotExistAdvice": "Կամ համոզվեք, որ ուղղագրությունը ճիշտ է, կամ դրա փոխարեն ստացողից խնդրեք Lightning ցանցի վճարման հարցում կամ BTC հասցե:",
+    "destinationUnverifiable": "Այս պահին չհաջողվեց ստուգել {lnAddress}-ը — {bankName}-ի սերվերները չեն պատասխանում։",
+    "destinationUnverifiableAdvice": "Հասցեն ամենայն հավանականությամբ ճիշտ է։ Փորձեք մի պահից նորից կամ ստացողից խնդրեք LN հաշիվ կամ BTC հասցե։",
     "selfPaymentError": "{lnAddress: string}ը Ձեր {bankName: string} հասցեն է։ ",
     "selfPaymentAdvice": "Եթե Դուք ցանկանում եք գումար ուղարկել Ձեր մեկ այլ հաշվի, ապա փոխարենը Դուք կարող եք օգտագործել վճարման հարցում, Lightning ցանց կամ BTC հարսցե։ ",
     "lnAddressError": "Մենք չենք կարողանում կապ հաստատել այս Lightning հասցեի հետ։ Եթե Դուք վստահ եք, որ այն գոյություն ունի, մի փոքր ուշ կարող եք կրկին փորձել։",
@@ -2616,7 +2618,8 @@
     "error": "Հնարավոր չէ այս պահին բեռնել պրոֆիլները",
     "fromThisDevice": "այս սարքից։",
     "switchAccount": "Delays delays delays delays",
-    "removedAccount": "Դուք հեռացրել եք {identifier: string} հաշիվը։"
+    "removedAccount": "Դուք հեռացրել եք {identifier: string} հաշիվը։",
+    "removeAccount": "Հեռացնել հաշիվը"
   },
   "StablesatsRestriction": {
     "walletLabel": "հասանելի չէ ձեր տարածաշրջանում",
@@ -2780,6 +2783,7 @@
       "tooLong": "Հասցեն պետք է ունենա առնվազն 50 նիշ",
       "invalidCharacter": "րՀասցեն կարող է ունենալ միայն նամակներ, թվեր, և ստորագծեր",
       "addressUnavailable": "Ներողություն, այս հասցեն արդեն կիրառվում է",
+      "serverUnreachable": "Հասցեների սերվերը հասանելի չէ։ Փորձեք մի պահից նորից։",
       "unknownError": "Անհայտ սխալ։ Խնդրում ենք կրկին փորձել ավելի ուշ",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3107,12 +3111,12 @@
     "deleteAccountError": "Սխալ։ Կապ հաստատեք {email: string} հետագա աջակցության համար։ ",
     "bye": "Հաջողությու՛ն։ ",
     "deleteAccountWarning": "Ուշադրություն. Հաշվի փակումն անշրջելի է:\nՓակելուց առաջ համոզվեք, որ դրամապանակներում միջոցներ չկան:\nՓակված հաշիվը հնարավոր չէ վերականգնել:\nՄենք կարող ենք պահպանել որոշ գրառումներ, ինչպես պահանջվում է օրենքով:",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Ներբեռնել մատյանները",
+    "exportLogsTitle": "Կիսվել դրամապանակի մատյաններով",
+    "exportLogsBody": "Այս ֆայլը օգնում է աջակցման ծառայությանը ուսումնասիրել ձեր դրամապանակների խնդիրները։ Այն ներառում է վճարումների պատմությունը (գումարներ, հաշիվ-ապրանքագրեր և հասցեներ) և այս սարքի յուրաքանչյուր ոչ պահպանող դրամապանակի նույնացուցիչները, ոչ միայն այս մեկինը, բայց երբեք ձեր պահեստային արտահայտությունները կամ բանալիները։ Կիսվեք դրանով միայն մեր աջակցման ծառայության հետ։",
+    "exportLogsConfirm": "Կիսվել մատյաններով",
+    "noLogsYet": "Դեռ չկան մատյաններ կիսվելու համար։ Բացեք դրամապանակը և փորձեք կրկին։",
+    "exportLogsError": "Չհաջողվեց արտահանել մատյանները։ Խնդրում ենք կրկին փորձել։"
   },
   "lnurl": {
     "overLimit": "Դուք չեք կարող առավելագույն չափը գերազանցող գումար ուղարկել",
@@ -3907,6 +3911,7 @@
     "CloudBackup": {
       "title": "Եկեք պահուստարորենք ձեր դրամապանակը",
       "description": "Մենք կպահեստենք ձեր պահուստային արտահայտության պատճենը ձեր {provider}-ում.",
+      "encryptCheckbox": "Գաղտնագրել լրացուցիչ գաղտնաբառով",
       "password": "Գաղտնաբառ",
       "passwordPlaceholder": "(նվազագույնը 12 նիշ)",
       "confirmPassword": "Հաստատել գաղտնաբառը",
@@ -4248,6 +4253,8 @@
     "signInDescription": "Մուտք գործեք ձեր պահառու հաշվին՝ {featureName: string} օգտագործելու համար։",
     "noAccountTitle": "Պահառու հաշիվ է պահանջվում",
     "noAccountDescription": "{featureName: string}-ի համար անհրաժեշտ է Blink պահառու հաշիվ։",
+    "unreachableTitle": "Blink-ը հասանելի չէ",
+    "unreachableDescription": "{featureName}-ին անհրաժեշտ են Blink-ի սերվերները, որոնք այս պահին չեն պատասխանում։ Ձեր դրամապանակը և միջոցները չեն տուժում։",
     "featureCircles": "Circles",
     "featureEarn": "Սովորել",
     "featureCard": "Քարտ"
@@ -4270,6 +4277,10 @@
     "tokenTransfer": "{token} փոխանցում",
     "payTo": "Վճարել՝ {address}",
     "payment": "Վճարում"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Փոխարժեքը կարող է հնացած լինել",
+    "satsOnly": "Ցուցադրվում է sats-ով — փոխարժեք հասանելի չէ"
   },
   "SelfCustodialOffline": {
     "title": "Դրամապանակը անցանց է",

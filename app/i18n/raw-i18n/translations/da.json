@@ -2391,6 +2391,8 @@
     "invalidAmount": "Denne indeholder et ugyldigt beløb. Generer venligst med et gyldigt beløb.",
     "usernameDoesNotExist": "{lnAddress: string} synes ikke at være en {bankName: string} adresse, der eksisterer.",
     "usernameDoesNotExistAdvice": "Sørg enten for, at stavningen er korrekt, eller bed modtageren om en LN faktura eller BTC adresse i stedet.",
+    "destinationUnverifiable": "Vi kunne ikke tjekke {lnAddress} lige nu – {bankName}s servere svarer ikke.",
+    "destinationUnverifiableAdvice": "Adressen er sandsynligvis fin. Prøv igen om lidt, eller bed modtageren om en LN-faktura eller BTC-adresse i stedet.",
     "selfPaymentError": "{lnAddress: string} er din {bankName: string} adresse.",
     "selfPaymentAdvice": "Hvis du vil sende penge til en anden konto, som du ejer, kan du bruge en faktura, LN eller BTC adresse i stedet.",
     "lnAddressError": "Vi kan ikke nå denne Lightning-adresse. Hvis du er sikker på, at den eksisterer, kan du prøve igen senere.",
@@ -2616,7 +2618,8 @@
     "error": "Kan ikke hente profiler på nuværende tidspunkt",
     "fromThisDevice": "fra denne enhed?",
     "switchAccount": "Du skiftede til en anden konto",
-    "removedAccount": "Du fjernede kontoen {identifier: string}."
+    "removedAccount": "Du fjernede kontoen {identifier: string}.",
+    "removeAccount": "Fjern konto"
   },
   "StablesatsRestriction": {
     "walletLabel": "ikke tilgængelig i din region",
@@ -2780,6 +2783,7 @@
       "tooLong": "Adressen må maksimalt være 50 tegn lang",
       "invalidCharacter": "Adressen kan kun indeholde bogstaver, tal og understregninger",
       "addressUnavailable": "Beklager, denne adresse er allerede taget",
+      "serverUnreachable": "Kunne ikke nå adresseserveren. Prøv igen om lidt.",
       "unknownError": "Der opstod en ukendt fejl, prøv igen senere",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3107,12 +3111,12 @@
     "deleteAccountError": "Noget gik galt. Kontakt {email: string} for yderligere assistance.",
     "bye": "Farvel!",
     "deleteAccountWarning": "Bemærk: Lukning af kontoen er permanent!\nSørg for, at tegnebøgerne ikke har penge, før du lukker.\nEn lukket konto kan ikke genoprettes.\nVi kan opbevare visse oplysninger, som påkrævet af loven.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Download logfiler",
+    "exportLogsTitle": "Del logfilerne fra din tegnebog",
+    "exportLogsBody": "Denne fil hjælper vores supportteam med at undersøge problemer med dine tegnebøger. Den indeholder betalingshistorikken (beløb, fakturaer og adresser) og tegnebogs-id'er for alle ikke-depottegnebøger på denne enhed, ikke kun denne, men aldrig dine gendannelsesfraser eller nøgler. Del den kun med vores supportteam.",
+    "exportLogsConfirm": "Del logfiler",
+    "noLogsYet": "Der er endnu ingen logfiler at dele. Åbn din tegnebog, og prøv igen.",
+    "exportLogsError": "Kunne ikke eksportere dine logfiler. Prøv igen."
   },
   "lnurl": {
     "overLimit": "Du kan ikke sende mere end maks beløbet",
@@ -3849,7 +3853,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Sikkerhedskopiér din tegnebog",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Vælg din backup-metode",
@@ -3907,6 +3911,7 @@
     "CloudBackup": {
       "title": "Lad os sikkerhedskopiere din tegnebog",
       "description": "Vi gemmer en sikkerhedskopi af din gendannelsesfrase i din {provider}.",
+      "encryptCheckbox": "Kryptér med ekstra adgangskode",
       "password": "Adgangskode",
       "passwordPlaceholder": "(minimum 12 tegn)",
       "confirmPassword": "Bekræft adgangskode",
@@ -4248,6 +4253,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink kan ikke nås",
+    "unreachableDescription": "{featureName} kræver Blinks servere, som ikke svarer lige nu. Din wallet og dine midler er upåvirkede.",
     "featureCircles": "Circles",
     "featureEarn": "Lær",
     "featureCard": "Card"
@@ -4270,6 +4277,10 @@
     "tokenTransfer": "{token}-overførsel",
     "payTo": "Betal til {address}",
     "payment": "Betaling"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Vekselkursen er muligvis forældet",
+    "satsOnly": "Viser sats – ingen vekselkurs tilgængelig"
   },
   "SelfCustodialOffline": {
     "title": "Pungen er offline",

@@ -2391,6 +2391,8 @@
     "invalidAmount": "Bu geçersiz bir tutar içeriyor. Lütfen geçerli bir tutarla yeniden oluşturun.",
     "usernameDoesNotExist": "{lnAddress: string} adresi var olan bir {bankName: string} adresi gibi görünmüyor.",
     "usernameDoesNotExistAdvice": "Ya yazımın doğru olduğundan emin olun ya da alıcıdan bunun yerine bir LN faturası veya BTC adresi isteyin.",
+    "destinationUnverifiable": "{lnAddress} adresini şu anda kontrol edemedik — {bankName} sunucuları yanıt vermiyor.",
+    "destinationUnverifiableAdvice": "Adres büyük olasılıkla doğrudur. Birazdan tekrar deneyin ya da alıcıdan bir LN faturası veya BTC adresi isteyin.",
     "selfPaymentError": "{lnAddress: string} sizin {bankName: string} adresinizdir.",
     "selfPaymentAdvice": "Sahip olduğunuz başka bir hesaba para göndermek istiyorsanız, bunun yerine bir fatura, LN veya BTC adresi kullanabilirsiniz.",
     "lnAddressError": "Bu Lightning adresine ulaşamıyoruz. Var olduğundan eminseniz, daha sonra tekrar deneyebilirsiniz.",
@@ -2616,7 +2618,8 @@
     "error": "Şu anda profiller getirilemedi",
     "fromThisDevice": "bu cihazdan mı?",
     "switchAccount": "Başka bir hesaba geçiş yaptınız",
-    "removedAccount": "{identifier: string} hesabını kaldırdınız."
+    "removedAccount": "{identifier: string} hesabını kaldırdınız.",
+    "removeAccount": "Hesabı kaldır"
   },
   "StablesatsRestriction": {
     "walletLabel": "bölgenizde kullanılamıyor",
@@ -2780,6 +2783,7 @@
       "tooLong": "Adres en fazla 50 karakter uzunluğunda olabilir",
       "invalidCharacter": "Adres yalnızca harf, sayı ve alttan çizgi içerebilir",
       "addressUnavailable": "Üzgünüm, bu adres çoktan alındı",
+      "serverUnreachable": "Adres sunucusuna ulaşılamadı. Birazdan tekrar deneyin.",
       "unknownError": "Bilinmeyen bir hata yaşandı, lütfen daha sonra tekrar deneyin",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3107,12 +3111,12 @@
     "deleteAccountError": "Bir şeyler yanlış gitti. Daha fazla yardım için {email: string} ile iletişime geçin.",
     "bye": "Güle güle!",
     "deleteAccountWarning": "Dikkat: Hesap kapatma işlemi kalıcıdır!\nKapatmadan önce cüzdanlarınızda bakiye olmadığından emin olun.\nKapatılan hesap geri getirilemez.\nYasal gereklilikler nedeniyle belirli kayıtları saklayabiliriz.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Günlükleri indir",
+    "exportLogsTitle": "Cüzdan günlüklerinizi paylaşın",
+    "exportLogsBody": "Bu dosya, destek ekibimizin cüzdanlarınızdaki sorunları incelemesine yardımcı olur. Bu cihazdaki her saklamasız cüzdanın (yalnızca bu değil) ödeme geçmişini (tutarlar, faturalar ve adresler) ve cüzdan tanımlayıcılarını içerir; yedekleme ifadelerinizi veya anahtarlarınızı asla içermez. Yalnızca destek ekibimizle paylaşın.",
+    "exportLogsConfirm": "Günlükleri paylaş",
+    "noLogsYet": "Henüz paylaşılacak günlük yok. Cüzdanınızı açıp yeniden deneyin.",
+    "exportLogsError": "Günlükler dışa aktarılamadı. Lütfen yeniden deneyin."
   },
   "lnurl": {
     "overLimit": "Maksimum miktarın üzerinde gönderemezsiniz",
@@ -3849,7 +3853,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Cüzdanınızı yedekleyin",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Yedekleme yönteminizi seçin",
@@ -3907,6 +3911,7 @@
     "CloudBackup": {
       "title": "Cüzdanınızı yedekleyelim",
       "description": "Yedek ifadenizin bir kopyasını {provider} hesabınıza kaydedeceğiz.",
+      "encryptCheckbox": "Ek şifre ile şifrele",
       "password": "Şifre",
       "passwordPlaceholder": "(en az 12 karakter)",
       "confirmPassword": "Şifreyi onayla",
@@ -4248,6 +4253,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink'e ulaşılamıyor",
+    "unreachableDescription": "{featureName} Blink sunucularını gerektiriyor; şu anda yanıt vermiyorlar. Cüzdanınız ve bakiyeniz etkilenmedi.",
     "featureCircles": "Circles",
     "featureEarn": "Öğren",
     "featureCard": "Card"
@@ -4270,6 +4277,10 @@
     "tokenTransfer": "{token} Transferi",
     "payTo": "{address} adresine öde",
     "payment": "Ödeme"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Döviz kuru güncel olmayabilir",
+    "satsOnly": "Sats olarak gösteriliyor — döviz kuru yok"
   },
   "SelfCustodialOffline": {
     "title": "Cüzdan çevrimdışı",
