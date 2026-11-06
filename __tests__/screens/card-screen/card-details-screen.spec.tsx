@@ -80,7 +80,7 @@ jest.mock("@app/utils/toast", () => ({
 import { toastShow } from "@app/utils/toast"
 
 const mockUseCardData = jest.fn()
-jest.mock("@app/screens/card-screen/hooks/use-card-data", () => ({
+jest.mock("@app/hooks/use-card-data", () => ({
   useCardData: () => mockUseCardData(),
 }))
 
