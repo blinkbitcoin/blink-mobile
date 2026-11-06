@@ -1,10 +1,39 @@
+import React, { PropsWithChildren } from "react"
 import { renderHook, act } from "@testing-library/react-native"
 
+import {
+  InMemoryCache,
+  LazyQueryHookOptions,
+  LazyQueryResultTuple,
+  useLazyQuery,
+} from "@apollo/client"
+import { MockedProvider } from "@apollo/client/testing"
+import {
+  CardSecretsEncryptedDocument,
+  CardSecretsEncryptedQuery,
+  CardSecretsEncryptedQueryVariables,
+} from "@app/graphql/generated"
 import { useCardSecrets } from "@app/screens/card-screen/hooks/use-card-secrets"
 
+type SecretsQueryOptions = LazyQueryHookOptions<
+  CardSecretsEncryptedQuery,
+  CardSecretsEncryptedQueryVariables
+>
+type SecretsLazyQueryTuple = LazyQueryResultTuple<
+  CardSecretsEncryptedQuery,
+  CardSecretsEncryptedQueryVariables
+>
+
 const mockFetchEncryptedSecrets = jest.fn()
+const mockUseSecretsLazyQuery = jest.fn(
+  (_options: SecretsQueryOptions): SecretsLazyQueryTuple | [jest.Mock] => [
+    mockFetchEncryptedSecrets,
+  ],
+)
 jest.mock("@app/graphql/generated", () => ({
-  useCardSecretsEncryptedLazyQuery: () => [mockFetchEncryptedSecrets],
+  ...jest.requireActual("@app/graphql/generated"),
+  useCardSecretsEncryptedLazyQuery: (options: SecretsQueryOptions) =>
+    mockUseSecretsLazyQuery(options),
 }))
 
 const mockFetchPublicKey = jest.fn()
@@ -34,6 +63,7 @@ jest.mock("@app/utils/crypto", () => ({
 describe("useCardSecrets", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockUseSecretsLazyQuery.mockImplementation(() => [mockFetchEncryptedSecrets])
   })
 
   it("returns initial state with no secrets", () => {
@@ -170,5 +200,57 @@ describe("useCardSecrets", () => {
     expect(mockFetchEncryptedSecrets).toHaveBeenCalledWith({
       variables: { cardId: "card-456", sessionId: "encrypted-session-id" },
     })
+  })
+
+  it("keeps the encrypted card number and CVV out of the Apollo cache", async () => {
+    const cache = new InMemoryCache()
+    const mocks = [
+      {
+        request: {
+          query: CardSecretsEncryptedDocument,
+          variables: { cardId: "card-123", sessionId: "encrypted-session-id" },
+        },
+        result: {
+          data: {
+            cardSecretsEncrypted: {
+              __typename: "CardSecretsEncrypted",
+              encryptedPan: {
+                __typename: "EncryptedData",
+                iv: "pan-iv",
+                data: "encrypted-pan-data",
+              },
+              encryptedCvc: {
+                __typename: "EncryptedData",
+                iv: "cvc-iv",
+                data: "encrypted-cvc-data",
+              },
+            },
+          },
+        },
+      },
+    ]
+    const wrapper = ({ children }: PropsWithChildren) =>
+      React.createElement(MockedProvider, { mocks, cache }, children)
+    mockUseSecretsLazyQuery.mockImplementation((options: SecretsQueryOptions) =>
+      useLazyQuery<CardSecretsEncryptedQuery, CardSecretsEncryptedQueryVariables>(
+        CardSecretsEncryptedDocument,
+        options,
+      ),
+    )
+    mockFetchPublicKey.mockResolvedValue({
+      data: {
+        cardEncryptionPublicKey:
+          "-----BEGIN PUBLIC KEY-----\nTEST\n-----END PUBLIC KEY-----",
+      },
+    })
+
+    const { result } = renderHook(() => useCardSecrets(), { wrapper })
+    await act(async () => {
+      await result.current.fetchSecrets("card-123")
+    })
+
+    expect(result.current.secrets).toEqual({ pan: "4242424242424242", cvc: "123" })
+    expect(JSON.stringify(cache.extract())).not.toContain("encrypted-pan-data")
+    expect(JSON.stringify(cache.extract())).not.toContain("encrypted-cvc-data")
   })
 })

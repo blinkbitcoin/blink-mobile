@@ -31,7 +31,11 @@ type CardSecrets = {
 export const useCardSecrets = () => {
   const { LL } = useI18nContext()
   const { fetchPublicKey } = useCardEncryption()
-  const [fetchEncryptedSecrets] = useCardSecretsEncryptedLazyQuery()
+  /** Kept out of the Apollo cache, which is persisted to disk: the encrypted card
+   *  number and CVV have no reason to outlive the screen that asked for them. */
+  const [fetchEncryptedSecrets] = useCardSecretsEncryptedLazyQuery({
+    fetchPolicy: "no-cache",
+  })
   const [secrets, setSecrets] = useState<CardSecrets | undefined>()
   const [error, setError] = useState<string | undefined>()
   const [loading, setLoading] = useState(false)
