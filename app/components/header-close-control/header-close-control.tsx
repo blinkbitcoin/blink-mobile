@@ -6,7 +6,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { GaloyIconButton } from "../atomic/galoy-icon-button"
-import { headerRightNoGlass } from "../header-no-glass"
+import { HEADER_ICON_TOUCH_SIZE, headerRightNoGlass } from "../header-no-glass"
 
 type HeaderCloseControlParams = {
   navigateTo?: keyof RootStackParamList
@@ -28,6 +28,7 @@ const HeaderCloseButton: React.FC<HeaderCloseControlParams> = ({
       name="close"
       backgroundColor={colors.grey5}
       style={styles.headerCloseButton}
+      touchSize={HEADER_ICON_TOUCH_SIZE}
     />
   )
 }

@@ -334,11 +334,17 @@ export const GaloyIcon = ({
     containerSize,
   })
 
+  /*
+   * The background container sets collapsable={false} so it always has a native
+   * view. A transparent container (an iconOnly button at rest) is otherwise
+   * flattened away, and when pressing gives it a background the new-architecture
+   * Android view is created without its border radius: a square, not a circle.
+   */
   if (name in phosphorIconMap) {
     const PhosphorIcon = phosphorIconMap[name as keyof typeof phosphorIconMap]
     if (backgroundColor) {
       return (
-        <View style={[style, styles.iconContainerStyle]}>
+        <View collapsable={false} style={[style, styles.iconContainerStyle]}>
           <PhosphorIcon
             size={resolvedSize}
             color={resolvedColor}
@@ -372,7 +378,7 @@ export const GaloyIcon = ({
   const SvgIcon = customSvgMap[name as keyof typeof customSvgMap]
   if (backgroundColor) {
     return (
-      <View style={[style, styles.iconContainerStyle]}>
+      <View collapsable={false} style={[style, styles.iconContainerStyle]}>
         <SvgIcon
           width={resolvedSize}
           height={resolvedSize}
@@ -414,7 +420,7 @@ const useStyles = makeStyles(
       iconContainerStyle: {
         opacity: opacity || 1,
         backgroundColor,
-        borderRadius: resolvedContainerSize,
+        borderRadius: resolvedContainerSize / 2,
         width: resolvedContainerSize,
         height: resolvedContainerSize,
         alignItems: "center",

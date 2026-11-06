@@ -14,6 +14,7 @@ import { GaloyIcon, icons } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { DisabledFeature } from "@app/components/disabled-feature"
+import { HEADER_ICON_TOUCH_SIZE } from "@app/components/header-no-glass"
 import { BulletinsCard } from "@app/components/notifications/bulletins"
 import { SetDefaultAccountModal } from "@app/components/set-default-account-modal"
 import { StableSatsModal } from "@app/components/stablesats-modal"
@@ -929,6 +930,7 @@ export const HomeScreen: React.FC = () => {
             name="graph"
             iconOnly={true}
             weight="bold"
+            touchSize={HEADER_ICON_TOUCH_SIZE}
           />
           <View>
             {!loading && usernameTitle && (
@@ -953,6 +955,7 @@ export const HomeScreen: React.FC = () => {
             name="menu"
             iconOnly={true}
             weight="bold"
+            touchSize={HEADER_ICON_TOUCH_SIZE}
           />
         </View>
       </View>

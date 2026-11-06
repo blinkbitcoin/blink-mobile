@@ -6,6 +6,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
+import { HEADER_ICON_TOUCH_SIZE } from "@app/components/header-no-glass"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { testProps } from "@app/utils/testProps"
 
@@ -48,6 +49,7 @@ export const CloseHeader: React.FC<CloseHeaderProps> = ({
           size="medium"
           backgroundColor={colors.grey5}
           onPress={onClose ?? leaveFlow}
+          touchSize={HEADER_ICON_TOUCH_SIZE}
           {...testProps(testID)}
         />
       )}
