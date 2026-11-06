@@ -7,12 +7,12 @@ import {
 } from "@app/components/header-no-glass"
 
 /**
- * Header controls get a touch box of at least 42dp. `hitSlop` can't provide it: on
- * Android a touch outside the parent's bounds never reaches the child, and the native
- * header wraps each item in a view sized to its content. So every header item has to
- * size its own box from the shared standard. The artifact under test is the header
- * source, so source-coupling here is intentional: a new header item that skips the
- * standard fails here instead of shipping a small target.
+ * Header controls get a touch box of at least 48dp, Material's minimum. `hitSlop` can't
+ * provide it: on Android a touch outside the parent's bounds never reaches the child, and
+ * the native header wraps each item in a view sized to its content. So every header item
+ * has to size its own box from the shared standard. The artifact under test is the
+ * header source, so source-coupling here is intentional: a new header item that skips
+ * the standard fails here instead of shipping a small target.
  */
 
 const REPO_ROOT = join(__dirname, "..", "..", "..")
@@ -34,8 +34,8 @@ const sourceFiles = (dir: string): string[] =>
   })
 
 describe("header touch area", () => {
-  it("is at least 42dp square", () => {
-    expect(HEADER_ICON_TOUCH_SIZE).toBeGreaterThanOrEqual(42)
+  it("is at least 48dp square", () => {
+    expect(HEADER_ICON_TOUCH_SIZE).toBeGreaterThanOrEqual(48)
     expect(headerIconTouchArea).toMatchObject({
       width: HEADER_ICON_TOUCH_SIZE,
       height: HEADER_ICON_TOUCH_SIZE,

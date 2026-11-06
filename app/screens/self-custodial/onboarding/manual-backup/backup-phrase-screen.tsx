@@ -31,7 +31,6 @@ import { useBackupCountdownDeadline, useBackupPhrase } from "../hooks"
 const WORDS_PER_CARD = 3
 
 // The clear tertiary button has no padding, so its hit area is the text bounds.
-const HEADER_BUTTON_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 }
 
 type PhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhrase">
 
@@ -70,7 +69,6 @@ const BackupPhraseContent: React.FC<BackupPhraseContentProps> = ({
           title={copyLabel}
           onPress={handleCopy}
           containerStyle={styles.headerButton}
-          hitSlop={HEADER_BUTTON_HIT_SLOP}
           {...testProps("backup-phrase-copy")}
           accessibilityLabel={copyLabel}
         />

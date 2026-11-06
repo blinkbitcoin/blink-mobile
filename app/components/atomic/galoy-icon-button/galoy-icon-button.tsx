@@ -32,7 +32,8 @@ export type GaloyIconButtonProps = {
   /** Minimum touch box, in dp, for a button without text. The box grows around the
    *  icon and negative margins take the growth back, so the button keeps its place
    *  and footprint. Unlike `hitSlop`, it is part of the layout, so a touch outside
-   *  the parent's bounds still reaches it. */
+   *  the parent's bounds still reaches it. It replaces `hitSlop`, which past the parent
+   *  is drawn by the touchables inspector but never receives a touch. */
   touchSize?: number
 }
 
@@ -159,7 +160,7 @@ export const GaloyIconButton = ({
 
   return (
     <Pressable
-      hitSlop={text ? 0 : iconContainerSize / 2}
+      hitSlop={text || touchArea ? 0 : iconContainerSize / 2}
       style={text ? styles.pressableWithText : styles.pressableWithIcon}
       disabled={isDisabled}
       {...testProps(testPropId)}

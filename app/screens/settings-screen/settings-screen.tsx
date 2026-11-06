@@ -243,16 +243,16 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "column",
     rowGap: 18,
   },
-  // The 42dp box centres the 24dp bell, 9dp in from each edge: the margin and the
-  // badge offsets are the old ones less those 9dp, so neither moves.
+  // The 48dp box centres the 24dp bell, 12dp in from each edge: the margin and the
+  // badge offsets are the old ones less those 12dp, so neither moves.
   headerRight: {
     ...headerIconTouchArea,
-    marginRight: 3,
+    marginRight: 0,
   },
   notificationCount: {
     position: "absolute",
-    right: 6,
-    top: 6,
+    right: 9,
+    top: 9,
     color: colors._darkGrey,
     backgroundColor: colors.black,
     textAlign: "center",

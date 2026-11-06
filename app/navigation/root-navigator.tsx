@@ -1402,9 +1402,9 @@ const useStyles = makeStyles(({ colors }) => ({
   title: {
     color: colors.black,
   },
-  // 42dp box around the 18dp icon: the margin gives back the 12dp it grew by.
+  // 48dp box around the 18dp icon: the margin gives back the 15dp it grew by.
   SendBitcoinScreenScanIcon: {
     ...headerIconTouchArea,
-    marginRight: 8,
+    marginRight: 5,
   },
 }))

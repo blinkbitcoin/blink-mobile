@@ -28,7 +28,6 @@ import { testProps } from "@app/utils/testProps"
 import { useViewBackupPhrase } from "../hooks"
 
 // The clear tertiary button has no padding, so its hit area is the text bounds.
-const HEADER_BUTTON_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 }
 
 type ViewBackupPhraseContentProps = {
   isAuthenticated: boolean
@@ -75,7 +74,6 @@ const BackupPhraseContent: React.FC = () => {
           title={copyLabel}
           onPress={handleCopy}
           containerStyle={styles.headerButton}
-          hitSlop={HEADER_BUTTON_HIT_SLOP}
           {...testProps("backup-phrase-copy")}
           accessibilityLabel={copyLabel}
         />

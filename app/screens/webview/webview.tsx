@@ -276,8 +276,8 @@ const useStyles = makeStyles(({ colors }) => ({
     // which already applies the standard leading inset (both iOS bar-button items and
     // Android). An extra marginLeft stacks on top and pushes the glyph ~10px right.
     // (The old JS stack had no such inset, hence the previous marginLeft:10.)
-    // The 42dp touch box centres the 20dp caret 11dp in, so -11 keeps it at the inset.
+    // The 48dp touch box centres the 20dp caret 14dp in, so -14 keeps it at the inset.
     ...headerIconTouchArea,
-    marginLeft: -11,
+    marginLeft: -14,
   },
 }))

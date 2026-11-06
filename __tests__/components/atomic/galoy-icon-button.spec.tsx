@@ -66,6 +66,16 @@ describe("GaloyIconButton touchSize", () => {
     expect(style).toMatchObject({ width: 51, height: 51, marginLeft: 0, marginTop: 0 })
   })
 
+  /** Past the parent, `hitSlop` is drawn by the touchables inspector but never gets a
+   *  touch, so with a real box it would only overstate the target. */
+  it("drops hitSlop once the touch box is real", () => {
+    const { getByTestId } = renderWithTheme(
+      <GaloyIconButton name="menu" size="medium" iconOnly touchSize={42} />,
+    )
+
+    expect(getByTestId("menu").props.hitSlop).toBe(0)
+  })
+
   it("keeps the 34dp box when no touch size is asked for", () => {
     const style = buttonStyle(<GaloyIconButton name="menu" size="medium" iconOnly />)
 

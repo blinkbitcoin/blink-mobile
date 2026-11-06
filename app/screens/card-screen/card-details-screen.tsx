@@ -200,10 +200,10 @@ export const CardDetailsScreen: React.FC = () => {
 }
 
 const useStyles = makeStyles(() => ({
-  // 42dp box around the 24dp icon: the margin gives back the 9dp it grew by.
+  // 48dp box around the 24dp icon: the margin gives back the 12dp it grew by.
   headerRight: {
     ...headerIconTouchArea,
-    marginRight: 15,
+    marginRight: 12,
   },
   content: {
     paddingTop: 20,

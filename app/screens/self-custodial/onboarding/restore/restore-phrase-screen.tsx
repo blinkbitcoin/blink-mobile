@@ -37,7 +37,6 @@ import { RestoreStatus, useRestorePhrase } from "./hooks/use-restore-phrase"
 type RestorePhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialRestorePhrase">
 
 // The clear tertiary button has no padding, so its hit area is the text bounds.
-const HEADER_BUTTON_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 }
 
 type RestorePhraseContentProps = {
   step: PhraseStep
@@ -105,7 +104,6 @@ const RestorePhraseContent: React.FC<RestorePhraseContentProps> = ({ step, resto
           title={pasteLabel}
           onPress={handlePasteFromClipboard}
           containerStyle={styles.headerButton}
-          hitSlop={HEADER_BUTTON_HIT_SLOP}
           {...testProps("restore-paste-button")}
           accessibilityLabel={pasteLabel}
         />

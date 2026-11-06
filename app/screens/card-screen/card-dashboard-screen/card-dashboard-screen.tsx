@@ -200,10 +200,10 @@ const useStyles = makeStyles(({ colors }) => ({
   loadMore: {
     marginTop: 16,
   },
-  // 42dp box around the 24dp icon (was 40dp from padding): the margin gives back 1dp.
+  // 48dp box around the 24dp icon (was 40dp from padding): the margin gives back 4dp.
   headerRight: {
     ...headerIconTouchArea,
-    marginRight: 15,
+    marginRight: 12,
   },
 }))
 
