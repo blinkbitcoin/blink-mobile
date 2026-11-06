@@ -2442,6 +2442,37 @@ describe("HomeScreen card account", () => {
       )
     })
 
+    it("keeps the spinner for the card balance even when the card refetch fails", async () => {
+      mockGaloyInstanceId = "Staging"
+      mockHomeCard = { id: "card-1", status: CardStatus.Active }
+      mockHomeCardBalanceSats = 50_000
+      mockRefetchCardData.mockRejectedValueOnce(new Error("card unavailable"))
+      let resolveCardBalance: (value: undefined) => void = () => {}
+      mockRefetchCardBalance.mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveCardBalance = resolve
+        }),
+      )
+      // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+      const { UNSAFE_getByType } = renderHome()
+      await flushEffects()
+
+      act(() => {
+        UNSAFE_getByType(RefreshControl).props.onRefresh()
+      })
+      await flushEffects()
+
+      expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(true)
+
+      await act(async () => {
+        resolveCardBalance(undefined)
+      })
+
+      await waitFor(() =>
+        expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false),
+      )
+    })
+
     it("does not ask for the balance of a card that is not usable", async () => {
       mockGaloyInstanceId = "Staging"
       mockHomeCard = { id: "card-1", status: CardStatus.Canceled }
