@@ -3072,7 +3072,6 @@
     "faq": "Česta pitanja",
     "statusPage": "Stranica statusa",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Podrška",
     "defaultSupportMessage": "Bok! Trebam pomoć s {bankName: string}, koristim verziju {version: string} na {os: string}.",
     "emailCopied": "e-pošta {email: string} kopirana u međuspremnik",

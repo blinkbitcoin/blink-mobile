@@ -3072,7 +3072,6 @@
     "faq": "Maswali yanayoulizwa mara kwa mara",
     "statusPage": "Ukurasa wa Hali",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Usaidizi",
     "defaultSupportMessage": "Hujambo! Nahitaji usaidizi wa {bankName: string}, ninatumia toleo la {version: string} kwenye {os: string}.",
     "emailCopied": "Barua pepe {email: string} imenakiliwa kwenye ubao wa kunakili",

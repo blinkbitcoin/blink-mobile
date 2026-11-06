@@ -3072,7 +3072,6 @@
     "faq": "Soalan Yang Sering Diajukan",
     "statusPage": "Status Halaman",
     "telegram": "Telegram",
-    "mattermost": "Paling penting",
     "defaultEmailSubject": "Sokongan - {bankName: string}",
     "defaultSupportMessage": "Hai! Saya perlukan bantuan daripada {bankName: string}, Saya menggunakan versi {version: string} pada {os: string}.",
     "emailCopied": "emel {email: string} telah disalin ke clipboard",

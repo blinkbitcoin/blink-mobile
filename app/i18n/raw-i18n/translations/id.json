@@ -3072,7 +3072,6 @@
     "faq": "FAQ",
     "statusPage": "Status Page",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Dukungan",
     "defaultSupportMessage": "Halo! Saya membutuhkan bantuan dengan {bankName: string}, saya menggunakan versi {version: string} pada {os: string}.",
     "emailCopied": "email {email: string} disalin ke clipboard",

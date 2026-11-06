@@ -3072,7 +3072,6 @@
         "faq": "Preguntas Frecuentes - FAQ",
         "statusPage": "Página de estado",
         "telegram": "Telegram",
-        "mattermost": "Mattermost",
         "defaultEmailSubject": "{bankName: string} - Soporte",
         "defaultSupportMessage": "Hola! Necesito ayuda con {bankName: string}, estoy usando la versión {version: string} de {os: string}.",
         "emailCopied": "dirección electrónica {email: string} copiada al portapapeles",

@@ -107,7 +107,6 @@ export const ErrorScreen = ({
           SupportChannels.StatusPage,
           SupportChannels.Email,
           SupportChannels.Telegram,
-          SupportChannels.Mattermost,
         ]}
       />
     </Screen>

@@ -3072,7 +3072,6 @@
     "faq": "FAQ",
     "statusPage": "Страница стања",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Подршка",
     "defaultSupportMessage": "Хеј, треба ми помоћ у вези са {bankName: string}, користим верзију {version: string} на оперативном систему {os: string}.",
     "emailCopied": "адреса е-поште {email: string} је копирана у клипборд",

@@ -3222,7 +3222,6 @@ const en: BaseTranslation = {
     faq: "FAQ",
     statusPage: "Status page",
     telegram: "Telegram",
-    mattermost: "Mattermost",
     defaultEmailSubject: "{bankName: string} - Support",
     defaultSupportMessage:
       "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
