@@ -3,6 +3,7 @@ import { type StoredFiatCurrencies } from "./self-custodial-fiat-currencies"
 import { type StoredFiatRates } from "./self-custodial-fiat-rates"
 import { AccountMode } from "@app/types/account"
 import { DefaultAccountId } from "@app/types/wallet"
+import type { ReinstallSessionSlot } from "@app/utils/storage/secureStorage"
 
 type PersistentState_3 = {
   schemaVersion: 3
@@ -311,8 +312,55 @@ type PersistentState_23 = Omit<PersistentState_22, "schemaVersion"> & {
   selfCustodialFiatCurrencies?: StoredFiatCurrencies
 }
 
-const migrate23ToCurrent = (state: PersistentState_23): Promise<PersistentState> =>
+type PersistentState_24 = Omit<PersistentState_23, "schemaVersion"> & {
+  schemaVersion: 24
+  /**
+   * A reinstall wipe of the key material that is still owed.
+   *
+   * The fresh-install branch only fires while the blob is absent, so the erase
+   * used to be retried by leaving the blob unwritten — which also re-triggered
+   * the session wipe, signing the user out on every launch with nothing to end
+   * the loop. Carrying it here instead lets the blob be written, which ends
+   * that loop, while the next boot still knows the erase has not happened.
+   *
+   * It lives in the blob rather than the keychain on purpose: an uninstall
+   * clears this, and a genuine reinstall should start the whole verdict again.
+   *
+   * It is not a setting, so a state reset carries it over. Only the retry that
+   * finishes the erase removes it.
+   */
+  pendingReinstallKeyMaterialWipe?: boolean
+  /**
+   * The session slots a reinstall wipe could not erase, by name.
+   *
+   * Recorded for the same reason as the key-material marker above, and beside it rather
+   * than inside it: the blob is written as soon as either is owed, and a written blob is
+   * what keeps the fresh-install branch from running again, so this is the only thing
+   * left that brings a later boot back for these slots. Retried whatever the account
+   * index says, since the previous owner's sign-in and lock are no less theirs once the
+   * new owner opens an account. Absent once nothing is owed.
+   */
+  pendingReinstallSessionWipe?: ReinstallSessionSlot[]
+  /**
+   * A whole-store clear of the legacy key store that a confirmed reinstall still owes.
+   *
+   * Apart from the key-material marker because the two follow different rules. This one is
+   * only recorded on proof of a reinstall, the boot that found the account index absent, so
+   * it is retried whatever the index says later: an account the new owner opens does not
+   * make the previous owner's legacy-only seeds, which no tracked id names, any less theirs,
+   * and this build writes nothing new to the legacy store. An index that could not be read
+   * never records it, since there the legacy store may hold this user's only copy of a seed
+   * the sweep has not moved yet.
+   */
+  pendingReinstallLegacyStoreClear?: boolean
+}
+
+const migrate24ToCurrent = (state: PersistentState_24): Promise<PersistentState> =>
   Promise.resolve(state)
+
+/** Adds the optional owed-reinstall-wipe marker; nothing to backfill. */
+const migrate23ToCurrent = (state: PersistentState_23): Promise<PersistentState> =>
+  migrate24ToCurrent({ ...state, schemaVersion: 24 })
 
 /** Adds the optional device-wide currency metadata; nothing to backfill. */
 const migrate22ToCurrent = (state: PersistentState_22): Promise<PersistentState> =>
@@ -494,6 +542,7 @@ type StateMigrations = {
   21: (state: PersistentState_21) => Promise<PersistentState>
   22: (state: PersistentState_22) => Promise<PersistentState>
   23: (state: PersistentState_23) => Promise<PersistentState>
+  24: (state: PersistentState_24) => Promise<PersistentState>
 }
 
 const stateMigrations: StateMigrations = {
@@ -518,12 +567,13 @@ const stateMigrations: StateMigrations = {
   21: migrate21ToCurrent,
   22: migrate22ToCurrent,
   23: migrate23ToCurrent,
+  24: migrate24ToCurrent,
 }
 
-export type PersistentState = PersistentState_23
+export type PersistentState = PersistentState_24
 
 export const defaultPersistentState: PersistentState = {
-  schemaVersion: 23,
+  schemaVersion: 24,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -583,7 +633,8 @@ export const migratePersistentState = async (
     | 20
     | 21
     | 22
-    | 23 = data.schemaVersion
+    | 23
+    | 24 = data.schemaVersion
   try {
     const migration = stateMigrations[schemaVersion]
     const state = await migration(data)
