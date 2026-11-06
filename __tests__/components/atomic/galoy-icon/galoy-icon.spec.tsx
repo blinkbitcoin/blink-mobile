@@ -1,6 +1,8 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
+import type { ReactTestRendererJSON } from "react-test-renderer"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import theme from "@app/rne-theme/theme"
@@ -170,6 +172,59 @@ describe("GaloyIcon", () => {
           />,
         ).toJSON(),
       ).not.toBeNull()
+    })
+  })
+
+  describe("background container", () => {
+    const container = (ui: React.ReactElement) =>
+      renderWithTheme(ui).toJSON() as ReactTestRendererJSON
+    const containerStyle = (ui: React.ReactElement) =>
+      StyleSheet.flatten(container(ui).props.style)
+
+    /** An iconOnly button's container is transparent at rest. Fabric flattens
+     *  that view away, and the Android view it creates on press, once the
+     *  background turns grey, has no border radius: the highlight is a square. */
+    it("keeps a transparent phosphor container as a native view", () => {
+      expect(
+        container(<GaloyIcon name="menu" size={24} backgroundColor="transparent" />).props
+          .collapsable,
+      ).toBe(false)
+    })
+
+    it("keeps a transparent custom svg container as a native view", () => {
+      expect(
+        container(
+          <GaloyIcon
+            name="warning-with-background"
+            size={24}
+            backgroundColor="transparent"
+          />,
+        ).props.collapsable,
+      ).toBe(false)
+    })
+
+    it("rounds a phosphor icon's container to a circle", () => {
+      const style = containerStyle(
+        <GaloyIcon name="menu" size={24} backgroundColor="red" opacity={0.7} />,
+      )
+
+      expect(style.borderRadius).toBe(style.width / 2)
+    })
+
+    it("rounds a custom svg's container to a circle", () => {
+      const style = containerStyle(
+        <GaloyIcon name="warning-with-background" size={24} backgroundColor="red" />,
+      )
+
+      expect(style.borderRadius).toBe(style.width / 2)
+    })
+
+    it("rounds a fixed-size container to a circle", () => {
+      const style = containerStyle(
+        <GaloyIcon name="info" size={24} backgroundColor="red" containerSize={60} />,
+      )
+
+      expect(style).toMatchObject({ width: 60, height: 60, borderRadius: 30 })
     })
   })
 })
