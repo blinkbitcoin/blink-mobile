@@ -170,6 +170,19 @@ describe("useAddToWallet", () => {
       expect(result.current.isAdding).toBe(false)
     })
 
+    it("keeps offering the card quietly while the wallet is busy with another one", async () => {
+      mockAddCardToWallet.mockResolvedValue(WalletAddResult.Busy)
+      const { result } = await renderWithCard()
+
+      await act(async () => {
+        await result.current.addToWallet()
+      })
+
+      expect(result.current.canAddToWallet).toBe(true)
+      expect(result.current.isAdding).toBe(false)
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
     it("starts one wallet add at a time and stays busy until it answers", async () => {
       const pendingAdd = deferred<WalletAddResult>()
       mockAddCardToWallet.mockReturnValue(pendingAdd.promise)
