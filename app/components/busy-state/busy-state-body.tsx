@@ -39,7 +39,7 @@ export const BusyStateBody: React.FC<BusyStateBodyProps> = ({
   const styles = useStyles()
 
   return (
-    <View style={styles.body}>
+    <View style={styles.column}>
       <View
         style={styles.pictogram}
         accessible={false}
@@ -54,7 +54,7 @@ export const BusyStateBody: React.FC<BusyStateBodyProps> = ({
           {title}
         </Text>
         {body ? (
-          <Text type="p3" style={styles.body3} {...testProps(`${testIdPrefix}-body`)}>
+          <Text type="p3" style={styles.body} {...testProps(`${testIdPrefix}-body`)}>
             {body}
           </Text>
         ) : null}
@@ -64,7 +64,7 @@ export const BusyStateBody: React.FC<BusyStateBodyProps> = ({
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  body: {
+  column: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
@@ -84,7 +84,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.black,
     textAlign: "center",
   },
-  body3: {
+  body: {
     color: colors.grey1,
     textAlign: "center",
   },

@@ -345,12 +345,6 @@ export const DeveloperScreen: React.FC = () => {
               headerStyle={styles.textHeader}
             />
           )}
-          <Button
-            title="Busy state sandbox"
-            containerStyle={styles.button}
-            {...testProps("Busy state sandbox")}
-            onPress={() => navigate("busyStateSandbox")}
-          />
           <Text style={styles.textHeader}>Trigger Bulletins</Text>
           <Button
             title="Onboarding Phase 1: KYC"

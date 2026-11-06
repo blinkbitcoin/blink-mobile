@@ -18,16 +18,30 @@ import {
   SCREEN_PADDING,
 } from "./config"
 
+/**
+ * At least one way out is required. Hardware back is swallowed on this screen
+ * unless it has `onBack` or `onClose` to call, so an error offering only
+ * "Try Again" would trap a user whose retry keeps failing.
+ */
+type BusyStateErrorExit =
+  | {
+      /** Shows "Back". Also what Android's hardware back calls. */
+      onBack: () => void
+      /** Shows "Close". */
+      onClose?: () => void
+    }
+  | {
+      onBack?: () => void
+      /** Shows "Close". Hardware back calls it when there is no `onBack`. */
+      onClose: () => void
+    }
+
 export type BusyStateError = {
   title: string
   body?: string
   /** Shows "Try Again". */
   onRetry?: () => void
-  /** Shows "Back". */
-  onBack?: () => void
-  /** Shows "Close". */
-  onClose?: () => void
-}
+} & BusyStateErrorExit
 
 type ErrorAction = {
   key: "retry" | "back" | "close"

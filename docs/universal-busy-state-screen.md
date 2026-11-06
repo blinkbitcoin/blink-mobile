@@ -90,14 +90,17 @@ Only themed Blink variables are used. No raw hexes in the component.
 
 `colors.black` is this theme's _inverting foreground_ token — it is `#FFFFFF` in
 dark mode, and `colors.white` is the inverting background. Glyph colours for
-`icon1`/`icon2` are the caller's (the demo uses `colors._green` for the key and
+`icon1`/`icon2` are the caller's (Figma uses `colors._green` for the key and
 `colors.black` for the second glyph).
 
 ---
 
 ## 3. Public API
 
-Two layers, so the pictogram can be reused without the screen chrome.
+Two layers, so the pictogram can be reused without the screen chrome. The
+index exports only these two components, their types, and `CHIP_GLYPH_SIZE`,
+`MIN_VISIBLE_MS` and `SIGNAL_MS`. The chip, connector and text column are
+internal: a flow that wants this look uses the component, it does not rebuild it.
 
 ### `<BusyStateAnimation />` — the chip pair + connector
 
@@ -123,9 +126,10 @@ type BusyStateError = {
   title: string
   body?: string
   onRetry?: () => void // "Try Again"
-  onBack?: () => void // "Back"
-  onClose?: () => void // "Close"
-}
+} & (
+  | { onBack: () => void; onClose?: () => void } // "Back" (+ "Close")
+  | { onBack?: () => void; onClose: () => void } // "Close" (+ "Back")
+)
 
 type BusyStateScreenProps = {
   icon1: React.ReactNode
@@ -178,6 +182,9 @@ Figma [29835:120215](https://www.figma.com/design/9MQuQi8ZhXVvDibWSI3C4c/Blink?n
   `GaloyIcon name="alert"`) in `colors.error`. No connector, nothing moves.
 - **Copy:** `error.title` (h2 bold) and optional `error.body` (p3 grey1), in the
   same column as the busy copy, so the title does not jump when the state flips.
+- **A way out is required.** The type demands `onBack` or `onClose`. Hardware
+  back is swallowed unless one of them exists, so an error offering only Try
+  Again would trap a user whose retry keeps failing.
 - **Buttons:** one per handler passed. Fixed order **Try Again → Back → Close**.
   The first one present is `GaloyPrimaryButton`; the rest are
   `GaloySecondaryButton`. Labels come from `LL.common.tryAgain/back/close`, so
@@ -308,7 +315,6 @@ app/components/busy-state/
   busy-state-error.tsx       error state: alert chip + buttons
   busy-state-screen.tsx      screen chrome, completion lifecycle, hardware back
 app/assets/icons-redesign/alert.svg   error glyph, registered as GaloyIcon "alert"
-app/screens/developer-screen/busy-state-sandbox-screen.tsx   dev-only demo
 __tests__/components/busy-state-screen.spec.tsx
 ```
 
@@ -316,17 +322,18 @@ __tests__/components/busy-state-screen.spec.tsx
 
 ## 10. Rulings
 
-| #   | Date       | Question                   | Ruling                                                                                                    |
-| --- | ---------- | -------------------------- | --------------------------------------------------------------------------------------------------------- |
-| 1   | 2026-09-10 | Connector motion           | **Marching ants, looping.** Ease-in-out on the chip spread; linear on the dash travel.                    |
-| 2   | 2026-09-10 | `strokeDashoffset` draw-in | Dropped; `translateX` march instead.                                                                      |
-| 3   | 2026-09-10 | Minimum duration           | `MIN_VISIBLE_MS = 600`, `SIGNAL_MS = 3000`.                                                               |
-| 4   | 2026-09-10 | Colours                    | Themed tokens only.                                                                                       |
-| 5   | 2026-11-06 | Caller API                 | Only `icon1`, `icon2`, `title` (required) and `body` (optional). Chip/connector colour overrides removed. |
-| 6   | 2026-11-06 | Dash pattern               | `4 4` (was `5 5`).                                                                                        |
-| 7   | 2026-11-06 | Header                     | `headerShown: false` on the route is correct.                                                             |
-| 8   | 2026-11-06 | Platform parity            | Explicit `zIndex`, `gestureEnabled: false` + `BackHandler` (§6).                                          |
-| 9   | 2026-11-06 | Failure                    | Built in as the error state (§4), alert glyph, Try Again / Back / Close as optional handlers.             |
+| #   | Date       | Question                   | Ruling                                                                                                       |
+| --- | ---------- | -------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| 1   | 2026-09-10 | Connector motion           | **Marching ants, looping.** Ease-in-out on the chip spread; linear on the dash travel.                       |
+| 2   | 2026-09-10 | `strokeDashoffset` draw-in | Dropped; `translateX` march instead.                                                                         |
+| 3   | 2026-09-10 | Minimum duration           | `MIN_VISIBLE_MS = 600`, `SIGNAL_MS = 3000`.                                                                  |
+| 4   | 2026-09-10 | Colours                    | Themed tokens only.                                                                                          |
+| 5   | 2026-11-06 | Caller API                 | Only `icon1`, `icon2`, `title` (required) and `body` (optional). Chip/connector colour overrides removed.    |
+| 6   | 2026-11-06 | Dash pattern               | `4 4` (was `5 5`).                                                                                           |
+| 7   | 2026-11-06 | Header                     | `headerShown: false` on the route is correct.                                                                |
+| 8   | 2026-11-06 | Platform parity            | Explicit `zIndex`, `gestureEnabled: false` + `BackHandler` (§6).                                             |
+| 9   | 2026-11-06 | Failure                    | Built in as the error state (§4), alert glyph, Try Again / Back / Close as handlers; Back or Close required. |
+| 10  | 2026-11-06 | Demo screen                | Dev sandbox removed before merge; not needed going forward.                                                  |
 
 ### Still open
 
@@ -335,7 +342,7 @@ __tests__/components/busy-state-screen.spec.tsx
 **Copy length.** No `numberOfLines` cap; German wraps the title to four lines and
 the group stays centred.
 
-**`_green` on light.** The demo's key glyph at `#00A700` on light `grey5` is ~3.0:1
+**`_green` on light.** Figma's key glyph at `#00A700` on light `grey5` is ~3.0:1
 — fine for a 32pt glyph, below AA for text.
 
 **Ostrich glyph.** `galoy-icon` has no Nostr glyph; the first production adopter
@@ -344,9 +351,7 @@ adds it.
 **i18n.** The component adds no keys (button labels reuse `common`). Any
 production adopter adds its title/body in all 28 locales in the same commit.
 
-## 11. Demo
-
-Developer menu → **Busy state sandbox** (dev builds only). Runs: timed, timed
-with long German copy, timed title-only, pending 6s, pending 80ms (floor test),
-and three failing runs — Try Again + Back, Back only (as Figma), and all three
-buttons. A failing run fails once and succeeds on Try Again.
+**No in-app surface yet.** The dev-only sandbox used to tune this was removed
+before merge. Until the first production adopter (e.g. `WalletCreationScreen`)
+lands, the unit spec is the only coverage; that adopter's PR does the on-device
+check in both themes and on both platforms (§6).
