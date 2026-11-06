@@ -55,6 +55,14 @@ describe("useAddToWallet", () => {
       expect(mockCanAddCardToWallet).not.toHaveBeenCalled()
     })
 
+    it("cannot add without the last four digits and never asks the wallet", async () => {
+      const { result } = renderHook(() => useAddToWallet("card-1", undefined))
+      await act(async () => {})
+
+      expect(result.current.canAddToWallet).toBe(false)
+      expect(mockCanAddCardToWallet).not.toHaveBeenCalled()
+    })
+
     it("can add once the wallet accepts the card", async () => {
       const { result } = await renderWithCard()
 

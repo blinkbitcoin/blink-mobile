@@ -22,10 +22,11 @@ export const useAddToWallet = (
   const { run } = useInFlightGuard()
   const isMounted = useIsMounted()
 
-  const walletCard = useMemo<WalletCard | undefined>(
-    () => (cardId && lastFour ? { cardId, lastFour } : undefined),
-    [cardId, lastFour],
-  )
+  const walletCard = useMemo<WalletCard | undefined>(() => {
+    if (!cardId) return undefined
+    if (!lastFour) return undefined
+    return { cardId, lastFour }
+  }, [cardId, lastFour])
   const shownCardRef = useRef(walletCard)
 
   useEffect(() => {
