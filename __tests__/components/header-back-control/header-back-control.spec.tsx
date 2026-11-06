@@ -177,8 +177,31 @@ describe("headerBackControl", () => {
 
     const { getByLabelText } = renderHeaderLeft(headerBackControl()(headerProps))
 
+    // -10 for the native inset, -5 more for the wider circle box below.
     expect(backButtonStyle(getByLabelText(BACK_BUTTON_LABEL))).toMatchObject({
-      marginLeft: -10,
+      marginLeft: -15,
+      marginRight: 6,
     })
+  })
+
+  /** The Android press is a borderless 40dp ripple clipped to the button's box. In the
+   *  default ~30dp box it showed as a rounded square; a 40dp box shows the whole circle. */
+  it("gives the Android button a box the whole press ripple fits in", () => {
+    Object.defineProperty(Platform, "OS", { configurable: true, value: "android" })
+
+    const { getByLabelText } = renderHeaderLeft(headerBackControl()(headerProps))
+
+    expect(backButtonStyle(getByLabelText(BACK_BUTTON_LABEL))).toMatchObject({
+      width: 40,
+      height: 40,
+    })
+  })
+
+  it("leaves the iOS button its own size, where the press is a fade, not a ripple", () => {
+    const { getByLabelText } = renderHeaderLeft(headerBackControl()(headerProps))
+
+    const style = backButtonStyle(getByLabelText(BACK_BUTTON_LABEL))
+    expect(style.width).toBeUndefined()
+    expect(style.height).toBeUndefined()
   })
 })
