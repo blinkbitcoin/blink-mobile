@@ -2461,6 +2461,18 @@ describe("HomeScreen card account", () => {
       expect(mockRefetchCardData).not.toHaveBeenCalled()
       expect(mockRefetchCardBalance).not.toHaveBeenCalled()
     })
+
+    it("leaves the card alone in a self-custodial session", async () => {
+      mockGaloyInstanceId = "Staging"
+      mockActiveWalletOverride = selfCustodialReadyWalletOverride(0)
+      mockHomeCard = { id: "card-1", status: CardStatus.Active }
+      mockHomeCardBalanceSats = 50_000
+
+      await pull()
+
+      expect(mockRefetchCardData).not.toHaveBeenCalled()
+      expect(mockRefetchCardBalance).not.toHaveBeenCalled()
+    })
   })
 
   it("leaves a card that is not usable out of the accounts", async () => {
@@ -2473,6 +2485,26 @@ describe("HomeScreen card account", () => {
   })
 
   it("only asks for the card on the staging instance", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(mockUseCardData).toHaveBeenCalledWith({ skip: true })
+    expect(mockUseCardData).not.toHaveBeenCalledWith({ skip: false })
+  })
+
+  it("asks for the card in a custodial session on Staging", async () => {
+    mockGaloyInstanceId = "Staging"
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockUseCardData).toHaveBeenCalledWith({ skip: false })
+  })
+
+  it("does not ask for the card in a self-custodial session", async () => {
+    mockGaloyInstanceId = "Staging"
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(0)
+
     renderHome()
     await flushEffects()
 

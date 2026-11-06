@@ -358,17 +358,21 @@ export const HomeScreen: React.FC = () => {
   /**
    * TODO(card): `cards` on ConsumerAccount only exists on the staging backend
    * today, so gate the home card row to staging until the card service ships to
-   * every instance; then drop `isCardBackendAvailable` and query unconditionally.
+   * every instance; then drop `isCardBackendAvailable` from the gate below.
    * Ref PR #3899.
    */
   const isCardBackendAvailable = galoyInstanceId === "Staging"
+  /** The card belongs to the custodial account, so a self-custodial session leaves it
+   *  out like the other custodial queries above, rather than adding another account's
+   *  card to its own total. */
+  const isCardQueryEnabled = isCardBackendAvailable && !isSelfCustodial
   const {
     card: homeCard,
     hasLoaded: hasCardDataLoaded,
     loading: cardDataLoading,
     error: cardDataError,
     refetch: refetchCardData,
-  } = useCardData({ skip: !isCardBackendAvailable })
+  } = useCardData({ skip: !isCardQueryEnabled })
   const showCardRow = homeCard !== undefined && isCardUsable(homeCard.status)
   const {
     availableSats: cardBalanceSats,
@@ -700,14 +704,14 @@ export const HomeScreen: React.FC = () => {
     openUpgradeModal,
   ])
 
-  /** Gated like the card queries themselves: off Staging there is no card backend, and
-   *  without a usable card there is no balance to ask for. */
+  /** Gated like the card queries themselves: off Staging or in a self-custodial session
+   *  there is no card to ask for, and without a usable card there is no balance. */
   const refetchCard = React.useCallback(async () => {
-    if (!isCardBackendAvailable) return
+    if (!isCardQueryEnabled) return
     const cardRefetches: Promise<unknown>[] = [refetchCardData()]
     if (showCardRow) cardRefetches.push(refetchCardBalance())
     await Promise.all(cardRefetches)
-  }, [isCardBackendAvailable, showCardRow, refetchCardData, refetchCardBalance])
+  }, [isCardQueryEnabled, showCardRow, refetchCardData, refetchCardBalance])
 
   const refetch = React.useCallback(async () => {
     if (isSelfCustodial) {
