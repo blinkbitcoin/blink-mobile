@@ -364,7 +364,9 @@ export const HomeScreen: React.FC = () => {
   const isCardBackendAvailable = galoyInstanceId === "Staging"
   const {
     card: homeCard,
+    hasLoaded: hasCardDataLoaded,
     loading: cardDataLoading,
+    error: cardDataError,
     refetch: refetchCardData,
   } = useCardData({ skip: !isCardBackendAvailable })
   const showCardRow = homeCard !== undefined && isCardUsable(homeCard.status)
@@ -373,12 +375,20 @@ export const HomeScreen: React.FC = () => {
     error: cardBalanceError,
     refetch: refetchCardBalance,
   } = useCardBalance(showCardRow ? homeCard?.id : undefined)
-  /** A card that is still loading, or whose balance has not arrived or failed to, holds
-   *  the total back: summing the wallets alone would show an understated total as if it
-   *  were the real one. */
-  const isCardDataLoading = cardDataLoading && homeCard === undefined
+  /** A card lookup that has not answered yet or failed before answering, or a card whose
+   *  balance has not arrived or failed to, holds the total back: summing the wallets
+   *  alone would show an understated total as if it were the real one. */
+  const hasCardDataError = cardDataError !== undefined
+  const isCardUnknown = !hasCardDataLoaded && (cardDataLoading || hasCardDataError)
   const isCardBalanceUnknown = showCardRow && cardBalanceSats === undefined
+  const cardDataFailure = isCardUnknown ? cardDataError : undefined
   const cardBalanceFailure = isCardBalanceUnknown ? cardBalanceError : undefined
+  const homeErrorMessage = error && getErrorMessages(error)
+  const cardFailure = cardDataFailure ?? cardBalanceFailure
+  const cardFailureMessage = cardFailure && getErrorMessages(cardFailure)
+  /** Offline the home and card queries fail with the same message: show it once. */
+  const isCardFailureRepeated = cardFailureMessage === homeErrorMessage
+  const shownCardFailureMessage = isCardFailureRepeated ? undefined : cardFailureMessage
 
   const accountBalances: AccountBalance[] = [...(wallets ?? [])]
   if (showCardRow && homeCard) {
@@ -396,7 +406,7 @@ export const HomeScreen: React.FC = () => {
   } = useTotalBalance(accountBalances)
 
   const loading = queryLoading || balanceConversionLoading
-  const isTotalBalanceLoading = loading || isCardDataLoading || isCardBalanceUnknown
+  const isTotalBalanceLoading = loading || isCardUnknown || isCardBalanceUnknown
 
   const showStableBalanceToggle =
     stableBalanceEnabled && isSelfCustodial && isStableBalanceActive
@@ -1043,9 +1053,9 @@ export const HomeScreen: React.FC = () => {
           showBtcNotification={isOutgoing ? false : hasUnseenBtcTx}
           showUsdNotification={isOutgoing ? false : hasUnseenUsdTx}
         />
-        {error && <GaloyErrorBox errorMessage={getErrorMessages(error)} />}
-        {cardBalanceFailure && (
-          <GaloyErrorBox errorMessage={getErrorMessages(cardBalanceFailure)} />
+        {homeErrorMessage && <GaloyErrorBox errorMessage={homeErrorMessage} />}
+        {shownCardFailureMessage && (
+          <GaloyErrorBox errorMessage={shownCardFailureMessage} />
         )}
         <View style={styles.listItemsContainer}>
           {buttons.map((item) => (

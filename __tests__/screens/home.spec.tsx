@@ -276,7 +276,9 @@ let mockIsRestrictedRegion = false
 let mockIsRestrictedRegionEvaluationPending = false
 let mockCanShowUpgradeModal = false
 let mockHomeCard: { id: string; status: CardStatus } | undefined
+let mockHomeCardLoaded = false
 let mockHomeCardLoading = false
+let mockHomeCardError: ApolloError | undefined
 let mockHomeCardBalanceSats: number | undefined = 0
 let mockHomeCardBalanceError: ApolloError | undefined
 let mockGaloyInstanceId: string | undefined
@@ -284,7 +286,9 @@ const mockRefetchCardData = jest.fn()
 const mockRefetchCardBalance = jest.fn()
 const mockUseCardData = jest.fn((_options: { skip?: boolean }) => ({
   card: mockHomeCard,
+  hasLoaded: mockHomeCardLoaded,
   loading: mockHomeCardLoading,
+  error: mockHomeCardError,
   refetch: mockRefetchCardData,
 }))
 const mockPresentRestrictedRegionModal = jest.fn()
@@ -1048,7 +1052,9 @@ const resetHomeScreenMocks = () => {
   mockIsRestrictedRegionEvaluationPending = false
   mockCanShowUpgradeModal = false
   mockHomeCard = undefined
+  mockHomeCardLoaded = false
   mockHomeCardLoading = false
+  mockHomeCardError = undefined
   mockHomeCardBalanceSats = 0
   mockHomeCardBalanceError = undefined
   mockGaloyInstanceId = undefined
@@ -2311,6 +2317,74 @@ describe("HomeScreen card account", () => {
     expect(
       queryByText("card balance unavailable", { includeHiddenElements: true }),
     ).toBeNull()
+  })
+
+  it("shows the card error and holds the total back when the card fails to load", async () => {
+    mockHomeCardError = new ApolloError({ errorMessage: "card unavailable" })
+
+    const { getByText, queryByTestId } = renderHome()
+    await flushEffects()
+
+    expect(getByText("card unavailable", { includeHiddenElements: true })).toBeTruthy()
+    expect(queryByTestId("balance-value", { includeHiddenElements: true })).toBeNull()
+  })
+
+  it("keeps a card already on hand when a later card lookup fails", async () => {
+    mockHomeCardLoaded = true
+    mockHomeCard = { id: "card-1", status: CardStatus.Active }
+    mockHomeCardBalanceSats = 50_000
+    mockHomeCardError = new ApolloError({ errorMessage: "card unavailable" })
+
+    const { getByTestId, queryByText } = renderHome()
+    await flushEffects()
+
+    expect(getByTestId("card-balance", { includeHiddenElements: true })).toBeTruthy()
+    expect(getByTestId("balance-value", { includeHiddenElements: true })).toBeTruthy()
+    expect(queryByText("card unavailable", { includeHiddenElements: true })).toBeNull()
+  })
+
+  describe("error boxes", () => {
+    const homeAuthedFailure = (message: string): MockedResponse => ({
+      request: { query: HomeAuthedDocument },
+      maxUsageCount: Number.POSITIVE_INFINITY,
+      error: new Error(message),
+    })
+
+    it("shows an error the home and the card share only once", async () => {
+      currentMocks = [homeAuthedFailure("Network request failed")]
+      mockHomeCardError = new ApolloError({
+        networkError: new Error("Network request failed"),
+      })
+
+      const { findAllByText } = renderHome()
+
+      expect(
+        await findAllByText("Network request failed", { includeHiddenElements: true }),
+      ).toHaveLength(1)
+    })
+
+    it("shows a card failure next to a different home error", async () => {
+      currentMocks = [homeAuthedFailure("home unavailable")]
+      mockHomeCardError = new ApolloError({ errorMessage: "card unavailable" })
+
+      const { findByText, getByText } = renderHome()
+
+      expect(
+        await findByText("home unavailable", { includeHiddenElements: true }),
+      ).toBeTruthy()
+      expect(getByText("card unavailable", { includeHiddenElements: true })).toBeTruthy()
+    })
+  })
+
+  it("keeps the total of an account known to have no card when a later lookup fails", async () => {
+    mockHomeCardLoaded = true
+    mockHomeCardError = new ApolloError({ errorMessage: "card unavailable" })
+
+    const { getByTestId, queryByText } = renderHome()
+    await flushEffects()
+
+    expect(getByTestId("balance-value", { includeHiddenElements: true })).toBeTruthy()
+    expect(queryByText("card unavailable", { includeHiddenElements: true })).toBeNull()
   })
 
   describe("pull to refresh", () => {
