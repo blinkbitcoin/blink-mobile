@@ -41,13 +41,16 @@ jest.mock("@app/screens/card-screen/hooks/use-card-encryption", () => ({
   useCardEncryption: () => ({ fetchPublicKey: mockFetchPublicKey, loading: false }),
 }))
 
-jest.mock("@app/i18n/i18n-react", () => ({
-  useI18nContext: () => ({ LL: {} }),
+const mockRecordAppError = jest.fn()
+jest.mock("@app/utils/error-reporting", () => ({
+  ...jest.requireActual("@app/utils/error-reporting"),
+  recordAppError: (error: Error) => mockRecordAppError(error),
 }))
 
-const mockToastShow = jest.fn()
-jest.mock("@app/utils/toast", () => ({
-  toastShow: (...args: readonly unknown[]) => mockToastShow(...args),
+jest.mock("@app/i18n/i18n-react", () => ({
+  useI18nContext: () => ({
+    LL: { errors: { unexpectedError: () => "unexpected error" } },
+  }),
 }))
 
 jest.mock("@app/utils/crypto", () => ({
@@ -70,7 +73,6 @@ describe("useCardSecrets", () => {
     const { result } = renderHook(() => useCardSecrets())
 
     expect(result.current.secrets).toBeUndefined()
-    expect(result.current.loading).toBe(false)
     expect(result.current.error).toBeUndefined()
     expect(result.current.fetchSecrets).toBeDefined()
   })
@@ -100,11 +102,10 @@ describe("useCardSecrets", () => {
 
     expect(fetchResult).toEqual({ pan: "4242424242424242", cvc: "123" })
     expect(result.current.secrets).toEqual({ pan: "4242424242424242", cvc: "123" })
-    expect(result.current.loading).toBe(false)
     expect(result.current.error).toBeUndefined()
   })
 
-  it("returns undefined when public key is not available", async () => {
+  it("fails with the unexpected error when the public key is not available", async () => {
     mockFetchPublicKey.mockResolvedValue({
       data: { cardEncryptionPublicKey: null },
     })
@@ -118,9 +119,13 @@ describe("useCardSecrets", () => {
 
     expect(fetchResult).toBeUndefined()
     expect(result.current.secrets).toBeUndefined()
+    expect(result.current.error).toBe("unexpected error")
+    expect(mockRecordAppError).toHaveBeenCalledWith(
+      new Error("Card encryption public key is missing"),
+    )
   })
 
-  it("returns undefined when encrypted secrets are not available", async () => {
+  it("fails with the unexpected error when the encrypted secrets are not available", async () => {
     mockFetchPublicKey.mockResolvedValue({
       data: {
         cardEncryptionPublicKey:
@@ -140,9 +145,13 @@ describe("useCardSecrets", () => {
 
     expect(fetchResult).toBeUndefined()
     expect(result.current.secrets).toBeUndefined()
+    expect(result.current.error).toBe("unexpected error")
+    expect(mockRecordAppError).toHaveBeenCalledWith(
+      new Error("Encrypted card secrets are missing"),
+    )
   })
 
-  it("sets error and shows toast on fetch failure", async () => {
+  it("reports a failed fetch and sets the unexpected error", async () => {
     mockFetchPublicKey.mockRejectedValue(new Error("Network error"))
 
     const { result } = renderHook(() => useCardSecrets())
@@ -153,17 +162,11 @@ describe("useCardSecrets", () => {
     })
 
     expect(fetchResult).toBeUndefined()
-    expect(result.current.error).toBe("Network error")
-    expect(result.current.loading).toBe(false)
-    expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({
-        message: "Network error",
-        type: "warning",
-      }),
-    )
+    expect(result.current.error).toBe("unexpected error")
+    expect(mockRecordAppError).toHaveBeenCalledWith(new Error("Network error"))
   })
 
-  it("sets empty error message for non-Error throws", async () => {
+  it("sets the unexpected error for a throw that is not an Error", async () => {
     mockFetchPublicKey.mockRejectedValue("string error")
 
     const { result } = renderHook(() => useCardSecrets())
@@ -172,7 +175,47 @@ describe("useCardSecrets", () => {
       await result.current.fetchSecrets("card-123")
     })
 
-    expect(result.current.error).toBe("")
+    expect(result.current.error).toBe("unexpected error")
+  })
+
+  it("clears the previous error when asked again", async () => {
+    mockFetchPublicKey.mockRejectedValueOnce(new Error("Network error"))
+    const { result } = renderHook(() => useCardSecrets())
+    await act(async () => {
+      await result.current.fetchSecrets("card-123")
+    })
+
+    mockFetchPublicKey.mockResolvedValue({
+      data: {
+        cardEncryptionPublicKey:
+          "-----BEGIN PUBLIC KEY-----\nTEST\n-----END PUBLIC KEY-----",
+      },
+    })
+    mockFetchEncryptedSecrets.mockResolvedValue({
+      data: {
+        cardSecretsEncrypted: {
+          encryptedPan: { iv: "pan-iv", data: "encrypted-pan-data" },
+          encryptedCvc: { iv: "cvc-iv", data: "encrypted-cvc-data" },
+        },
+      },
+    })
+    await act(async () => {
+      await result.current.fetchSecrets("card-123")
+    })
+
+    expect(result.current.error).toBeUndefined()
+    expect(result.current.secrets).toEqual({ pan: "4242424242424242", cvc: "123" })
+  })
+
+  it("asks the server for the public key every time", async () => {
+    mockFetchPublicKey.mockResolvedValue({ data: { cardEncryptionPublicKey: null } })
+    const { result } = renderHook(() => useCardSecrets())
+
+    await act(async () => {
+      await result.current.fetchSecrets("card-123")
+    })
+
+    expect(mockFetchPublicKey).toHaveBeenCalledWith({ fetchPolicy: "network-only" })
   })
 
   it("passes cardId and sessionId to encrypted secrets query", async () => {

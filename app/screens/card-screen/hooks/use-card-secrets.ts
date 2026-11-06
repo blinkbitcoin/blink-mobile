@@ -4,7 +4,7 @@ import { gql } from "@apollo/client"
 import { useCardSecretsEncryptedLazyQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { decryptAesGcm, encryptRsaOaep, generateRandomHexKey } from "@app/utils/crypto"
-import { toastShow } from "@app/utils/toast"
+import { recordAppError, toError } from "@app/utils/error-reporting"
 
 import { useCardEncryption } from "./use-card-encryption"
 
@@ -38,16 +38,18 @@ export const useCardSecrets = () => {
   })
   const [secrets, setSecrets] = useState<CardSecrets | undefined>()
   const [error, setError] = useState<string | undefined>()
-  const [loading, setLoading] = useState(false)
 
   const fetchSecrets = useCallback(
     async (cardId: string): Promise<CardSecrets | undefined> => {
-      setLoading(true)
       setError(undefined)
       try {
-        const { data: publicKeyData } = await fetchPublicKey()
+        /** From the server every time, so a retry after the key rotates does not keep
+         *  sealing the session with the stale key the persisted cache still holds. */
+        const { data: publicKeyData } = await fetchPublicKey({
+          fetchPolicy: "network-only",
+        })
         const publicKeyPem = publicKeyData?.cardEncryptionPublicKey
-        if (!publicKeyPem) return undefined
+        if (!publicKeyPem) throw new Error("Card encryption public key is missing")
 
         const secretKey = generateRandomHexKey()
         const sessionId = encryptRsaOaep(publicKeyPem, secretKey)
@@ -57,7 +59,7 @@ export const useCardSecrets = () => {
         })
 
         const encrypted = data?.cardSecretsEncrypted
-        if (!encrypted) return undefined
+        if (!encrypted) throw new Error("Encrypted card secrets are missing")
 
         const pan = decryptAesGcm({
           data: encrypted.encryptedPan.data,
@@ -74,16 +76,15 @@ export const useCardSecrets = () => {
         setSecrets(result)
         return result
       } catch (err) {
-        const message = err instanceof Error ? err.message : ""
-        setError(message)
-        toastShow({ message, type: "warning", LL })
+        recordAppError(toError(err))
+        /** One localized message for every failure: a network, crypto or library
+         *  message would reach the screen untranslated. */
+        setError(LL.errors.unexpectedError())
         return undefined
-      } finally {
-        setLoading(false)
       }
     },
     [fetchPublicKey, fetchEncryptedSecrets, LL],
   )
 
-  return { secrets, loading, error, fetchSecrets }
+  return { secrets, error, fetchSecrets }
 }
