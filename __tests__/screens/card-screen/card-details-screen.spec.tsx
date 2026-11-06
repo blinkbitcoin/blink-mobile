@@ -501,7 +501,7 @@ describe("CardDetailsScreen", () => {
   })
 
   describe("copy interactions", () => {
-    it("copies lastFour when card number field is pressed", async () => {
+    it("does not copy the last four before the full card number arrives", async () => {
       const { getByTestId } = render(
         <ContextForScreen>
           <CardDetailsScreen />
@@ -510,15 +510,13 @@ describe("CardDetailsScreen", () => {
 
       await act(async () => {})
 
+      expect(within(getByTestId("card-number-field")).getByText("—")).toBeTruthy()
+
       await act(async () => {
         fireEvent.press(getByTestId("card-number-field"))
       })
 
-      expect(mockCopyToClipboard).toHaveBeenCalledWith(
-        expect.objectContaining({
-          content: "4242",
-        }),
-      )
+      expect(mockCopyToClipboard).not.toHaveBeenCalled()
     })
 
     it("initializes clipboard with 60s auto-clear", async () => {

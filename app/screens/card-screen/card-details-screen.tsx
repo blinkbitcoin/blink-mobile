@@ -139,15 +139,23 @@ const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
 
   const isFrozen = isCardFrozen(card.status)
   const statusConfig = cardStatusConfig[card.status]
-  const cardNumber = secrets?.pan ?? card.lastFour
-  const cardNumberFormatted = formatCardDisplayNumber(cardNumber, true)
+  /** The card visual shows the last four while the secrets load, but the field waits for
+   *  the full number, so copying it can never put four digits on the clipboard. */
+  const visibleCardNumber = secrets?.pan ?? card.lastFour
+  const cardNumberFormatted = secrets ? formatCardDisplayNumber(secrets.pan, true) : null
+  const copyCardNumber = secrets
+    ? () => handleCopy(secrets.pan, LL.CardFlow.CardDetails.cardNumber())
+    : undefined
+  const copyCvv = secrets
+    ? () => handleCopy(secrets.cvc, LL.CardFlow.CardDetails.cvv())
+    : undefined
 
   return (
     <Screen preset="scroll">
       <View style={styles.content}>
         <BlinkCard
           cardId={card.id}
-          cardNumber={cardNumber}
+          cardNumber={visibleCardNumber}
           validThruDate=""
           isFrozen={isFrozen}
           showCardDetails
@@ -159,7 +167,7 @@ const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
             value={cardNumberFormatted}
             icon="copy-paste"
             testID="card-number-field"
-            onAction={() => handleCopy(cardNumber, LL.CardFlow.CardDetails.cardNumber())}
+            onAction={copyCardNumber}
           />
 
           <View style={styles.rowFields}>
@@ -176,9 +184,7 @@ const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
                 value={secrets?.cvc ?? null}
                 icon="copy-paste"
                 testID="card-cvv-field"
-                onAction={() =>
-                  handleCopy(secrets?.cvc ?? "", LL.CardFlow.CardDetails.cvv())
-                }
+                onAction={copyCvv}
               />
             </View>
           </View>
