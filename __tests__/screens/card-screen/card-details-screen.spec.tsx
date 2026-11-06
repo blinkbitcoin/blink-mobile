@@ -90,12 +90,12 @@ jest.mock("@app/hooks/use-card-holder", () => ({
 }))
 
 let mockSecrets: { pan: string; cvc: string } | undefined
+let mockSecretsError: string | undefined
 const mockFetchSecrets = jest.fn()
 jest.mock("@app/screens/card-screen/hooks/use-card-secrets", () => ({
   useCardSecrets: () => ({
     secrets: mockSecrets,
-    loading: false,
-    error: undefined,
+    error: mockSecretsError,
     fetchSecrets: mockFetchSecrets,
   }),
 }))
@@ -148,6 +148,7 @@ const defaultCardData = {
 const setupMocks = (overrides?: { cardData?: Partial<typeof defaultCardData> }) => {
   mockUseCardData.mockReturnValue({ ...defaultCardData, ...overrides?.cardData })
   mockSecrets = undefined
+  mockSecretsError = undefined
   mockHolderName = ""
   mockScreenGuard = "on"
   /** Default arrangement: a biometrics user passing the prompt. The gate fails
@@ -565,8 +566,9 @@ describe("CardDetailsScreen", () => {
       mockSecrets = { pan: "4549880051539745", cvc: "342" }
       mockHolderName = "Satoshi Nakamoto"
 
-      const { getByTestId } = await renderDetails()
+      const { getByTestId, queryByTestId } = await renderDetails()
 
+      expect(queryByTestId("card-secrets-loading")).toBeNull()
       expect(
         within(getByTestId("card-number-field")).getByText("4549 8800 5153 9745"),
       ).toBeTruthy()
@@ -590,6 +592,32 @@ describe("CardDetailsScreen", () => {
 
       const copied = mockCopyToClipboard.mock.calls.map(([params]) => params.content)
       expect(copied).toEqual(["4549880051539745", "342", "Satoshi Nakamoto"])
+    })
+
+    it("shows a loader and no retry until the secrets arrive", async () => {
+      const { getByTestId, queryByText } = await renderDetails()
+
+      expect(getByTestId("card-secrets-loading")).toBeTruthy()
+      expect(queryByText("Try Again")).toBeNull()
+    })
+
+    it("shows the failure and asks for the secrets again from its retry", async () => {
+      mockSecretsError = "card details unavailable"
+
+      const { getByText, getByTestId } = await renderDetails()
+
+      expect(getByText("card details unavailable")).toBeTruthy()
+      await act(async () => {
+        fireEvent.press(getByTestId("card-number-field"))
+      })
+      expect(mockCopyToClipboard).not.toHaveBeenCalled()
+
+      mockFetchSecrets.mockClear()
+      await act(async () => {
+        fireEvent.press(getByText("Try Again"))
+      })
+
+      expect(mockFetchSecrets).toHaveBeenCalledWith("card-1")
     })
   })
 

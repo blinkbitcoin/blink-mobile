@@ -5,7 +5,9 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { ActionField } from "@app/components/action-field"
+import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { BlinkCard } from "@app/components/blink-card"
 import { headerRightNoGlass } from "@app/components/header-no-glass"
 import { InfoSection, InfoCard } from "@app/components/card-screen"
@@ -95,11 +97,16 @@ const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
   const { LL, locale } = useI18nContext()
   const { copyToClipboard } = useClipboard(CLIPBOARD_CLEAR_MS)
   const { fullName } = useCardHolder(card.id)
-  const { secrets, fetchSecrets } = useCardSecrets()
+  const { secrets, error: secretsError, fetchSecrets } = useCardSecrets()
 
   useEffect(() => {
     if (!secrets) fetchSecrets(card.id)
   }, [card.id, secrets, fetchSecrets])
+
+  const retrySecrets = useCallback(() => fetchSecrets(card.id), [card.id, fetchSecrets])
+  const hasSecretsFailed = secretsError !== undefined
+  /** Also before the first fetch starts, so the fields never flash empty without it. */
+  const isSecretsLoading = !secrets && !hasSecretsFailed
 
   const handleCopy = (content: string, label: string) =>
     copyToClipboard({
@@ -162,6 +169,15 @@ const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
         />
 
         <View style={styles.fieldsContainer}>
+          {isSecretsLoading && (
+            <ActivityIndicator testID="card-secrets-loading" color={colors.primary} />
+          )}
+          {hasSecretsFailed && (
+            <View style={styles.secretsFailure}>
+              <GaloyErrorBox errorMessage={secretsError} />
+              <GaloyPrimaryButton title={LL.common.tryAgain()} onPress={retrySecrets} />
+            </View>
+          )}
           <ActionField
             label={LL.CardFlow.CardDetails.cardNumber()}
             value={cardNumberFormatted}
@@ -244,6 +260,9 @@ const useStyles = makeStyles(() => ({
   fieldsContainer: {
     paddingHorizontal: 24,
     gap: 20,
+  },
+  secretsFailure: {
+    gap: 10,
   },
   rowFields: {
     flexDirection: "row",
