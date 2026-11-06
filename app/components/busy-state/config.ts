@@ -2,7 +2,7 @@
  * Design constants for the universal busy state.
  *
  * Every measurement here comes from Figma `9MQuQi8ZhXVvDibWSI3C4c`, frames
- * 23646:128620 (start) and 23646:128717 (end). See
+ * 23646:128620 (start), 23646:128717 (end) and 29835:120215 (error). See
  * `docs/universal-busy-state-screen.md`.
  */
 
@@ -17,9 +17,9 @@ export const CONNECTOR_LENGTH = 60
 
 export const CONNECTOR_STROKE_WIDTH = 1
 
-/** Figma's dash pattern: 5 on, 5 off. */
-export const DASH_ON = 5
-export const DASH_OFF = 5
+/** Figma's dash pattern: 4 on, 4 off. */
+export const DASH_ON = 4
+export const DASH_OFF = 4
 
 /**
  * One full dash period. The marching strip travels exactly this far and then
@@ -55,11 +55,11 @@ export const ENTRANCE_DURATION_MS = 300
 /**
  * How long the dashes take to travel one `DASH_PERIOD`, i.e. the marching speed.
  *
- * 10pt per 500ms is 20pt/s, so a dash crosses the 60pt gap in three seconds.
+ * 8pt per 400ms is 20pt/s, so a dash crosses the 60pt gap in three seconds.
  * This is the number most likely to want tuning on a device — it is the whole
- * speed control.
+ * speed control. Change it with `DASH_PERIOD` to keep the speed.
  */
-export const DASH_TRAVEL_MS = 500
+export const DASH_TRAVEL_MS = 400
 
 /**
  * The hard floor: the busy state may not end before its entrance has finished,
@@ -80,3 +80,17 @@ export const ROW_TOP_PADDING = 10
 
 /** The text block's width in the 360pt Figma frame. */
 export const TEXT_BLOCK_WIDTH = 264
+
+/** Screen gutters, from the Figma `body` and `button-group` frames. */
+export const SCREEN_PADDING = 20
+export const BUTTONS_TOP_PADDING = 10
+export const BUTTONS_GAP = 10
+
+/**
+ * Explicit stacking for the pictogram. Sibling order alone is not trusted: on
+ * Android `elevation` outranks it, so the order is pinned with `zIndex`, which
+ * both platforms honour the same way.
+ */
+export const Z_CONNECTOR = 0
+export const Z_ICON_2 = 1
+export const Z_ICON_1 = 2

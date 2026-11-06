@@ -1,20 +1,12 @@
-import React, { useEffect, useRef, useState } from "react"
-import { View } from "react-native"
-
-import { makeStyles, Text } from "@rn-vui/themed"
+import React, { useCallback, useEffect, useRef, useState } from "react"
+import { BackHandler } from "react-native"
 
 import { Screen } from "@app/components/screen"
-import { testProps } from "@app/utils/testProps"
 
-import { BusyStateAnimation, type BusyStateAnimationProps } from "./busy-state-animation"
-import {
-  HEADING_TO_STATUS_GAP,
-  MIN_VISIBLE_MS,
-  ROW_TO_TEXT_GAP,
-  ROW_TOP_PADDING,
-  SIGNAL_MS,
-  TEXT_BLOCK_WIDTH,
-} from "./config"
+import { BusyStateAnimation } from "./busy-state-animation"
+import { BusyStateBody } from "./busy-state-body"
+import { BusyStateErrorView, type BusyStateError } from "./busy-state-error"
+import { MIN_VISIBLE_MS, SIGNAL_MS } from "./config"
 
 export type BusyCompletion =
   /**
@@ -28,18 +20,83 @@ export type BusyCompletion =
    */
   | { kind: "timed"; durationMs?: number }
 
-export type BusyStateScreenProps = BusyStateAnimationProps & {
-  heading: string
-  /** The status line. Its trailing ellipsis is part of the copy. */
-  status: string
+export type BusyStateScreenProps = {
+  /** Left chip glyph. Size it `CHIP_GLYPH_SIZE`. */
+  icon1: React.ReactNode
+  /** Right chip glyph. Size it `CHIP_GLYPH_SIZE`. */
+  icon2: React.ReactNode
+  /** Always rendered bold; the caller supplies the words, never the weight. */
+  title: string
+  /** Optional line under the title. A trailing "…" is part of the copy. */
+  body?: string
   completion: BusyCompletion
   /** Called exactly once, when the floor has elapsed and the work has finished. */
   onDone: () => void
+  /**
+   * Set when the work failed. Replaces the busy state with the error state and
+   * holds `onDone` back. Clear it to retry: the entrance and the floor start over.
+   */
+  error?: BusyStateError
+}
+
+type BusyStateProgressProps = Pick<
+  BusyStateScreenProps,
+  "icon1" | "icon2" | "title" | "body" | "completion"
+> & { onFinished: () => void }
+
+/** One attempt: the pictogram plus its floor timer. Remounted on every retry. */
+const BusyStateProgress: React.FC<BusyStateProgressProps> = ({
+  icon1,
+  icon2,
+  title,
+  body,
+  completion,
+  onFinished,
+}) => {
+  const [floorElapsed, setFloorElapsed] = useState(false)
+
+  const holdMs =
+    completion.kind === "timed"
+      ? Math.max(completion.durationMs ?? SIGNAL_MS, MIN_VISIBLE_MS)
+      : MIN_VISIBLE_MS
+
+  useEffect(() => {
+    const timer = setTimeout(() => setFloorElapsed(true), holdMs)
+
+    return () => clearTimeout(timer)
+  }, [holdMs])
+
+  const workFinished = completion.kind === "timed" || completion.done
+
+  useEffect(() => {
+    if (floorElapsed && workFinished) onFinished()
+  }, [floorElapsed, workFinished, onFinished])
+
+  return (
+    <BusyStateBody
+      pictogram={<BusyStateAnimation icon1={icon1} icon2={icon2} />}
+      title={title}
+      body={body}
+      testIdPrefix="busy-state"
+      textAccessibility={{
+        accessible: true,
+        accessibilityRole: "progressbar",
+        accessibilityLabel: title,
+        accessibilityValue: body ? { text: body } : undefined,
+      }}
+    />
+  )
 }
 
 /**
- * The universal busy state: a pictogram, a heading and a status line, held on
- * screen while something happens elsewhere.
+ * The universal busy state: two icon chips joined by a marching dashed line, a
+ * title and an optional body, held on screen while something happens elsewhere.
+ * If the work fails, pass `error` and it becomes the error state.
+ *
+ * **The route must set `headerShown: false` and `gestureEnabled: false`.**
+ * `Screen`'s own `headerShown` only drives the safe-area insets. Android's
+ * hardware back is handled here: swallowed while busy, and routed to
+ * `onBack` (else `onClose`) on error, so both platforms behave the same.
  *
  * **The caller must keep this mounted until `onDone` fires.** Rendering it as
  * `{loading && <BusyStateScreen … />}` defeats the whole point: the component
@@ -56,94 +113,42 @@ export type BusyStateScreenProps = BusyStateAnimationProps & {
  * )}
  * ```
  *
- * This screen never navigates and never renders an error. It reports that it is
- * finished; the caller decides where to go and what to show if the work failed.
+ * This screen never navigates. It reports that it is finished, or shows the
+ * error the caller passes; the caller decides where to go.
  */
 export const BusyStateScreen: React.FC<BusyStateScreenProps> = ({
-  heading,
-  status,
-  completion,
+  error,
   onDone,
-  ...animation
+  ...progress
 }) => {
-  const styles = useStyles()
-
-  const [floorElapsed, setFloorElapsed] = useState(false)
   const doneRef = useRef(false)
 
-  const holdMs =
-    completion.kind === "timed"
-      ? Math.max(completion.durationMs ?? SIGNAL_MS, MIN_VISIBLE_MS)
-      : MIN_VISIBLE_MS
-
-  useEffect(() => {
-    const timer = setTimeout(() => setFloorElapsed(true), holdMs)
-
-    return () => clearTimeout(timer)
-  }, [holdMs])
-
-  const workFinished = completion.kind === "timed" || completion.done
-
-  useEffect(() => {
-    if (!floorElapsed || !workFinished || doneRef.current) return
-
+  const onFinished = useCallback(() => {
+    if (doneRef.current) return
     doneRef.current = true
     onDone()
-  }, [floorElapsed, workFinished, onDone])
+  }, [onDone])
+
+  const onHardwareBack = error?.onBack ?? error?.onClose
+
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+      onHardwareBack?.()
+      return true
+    })
+
+    return () => subscription.remove()
+  }, [onHardwareBack])
 
   return (
     <Screen preset="fixed" headerShown={false}>
-      <View
-        style={styles.body}
-        accessibilityRole="progressbar"
-        accessibilityLabel={heading}
-        accessibilityValue={{ text: status }}
-      >
-        <View style={styles.pictogram}>
-          <BusyStateAnimation {...animation} />
-        </View>
-
-        <View style={styles.text}>
-          <Text
-            type="h2"
-            bold
-            style={styles.heading}
-            {...testProps("busy-state-heading")}
-          >
-            {heading}
-          </Text>
-          <Text type="p3" style={styles.status} {...testProps("busy-state-status")}>
-            {status}
-          </Text>
-        </View>
-      </View>
+      {/* The progress view unmounts while the error shows, so clearing the
+          error mounts a fresh attempt: the entrance and the floor start over. */}
+      {error ? (
+        <BusyStateErrorView error={error} />
+      ) : (
+        <BusyStateProgress {...progress} onFinished={onFinished} />
+      )}
     </Screen>
   )
 }
-
-const useStyles = makeStyles(({ colors }) => ({
-  body: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    gap: ROW_TO_TEXT_GAP,
-  },
-  pictogram: {
-    paddingTop: ROW_TOP_PADDING,
-  },
-  text: {
-    width: TEXT_BLOCK_WIDTH,
-    maxWidth: "100%",
-    gap: HEADING_TO_STATUS_GAP,
-  },
-  heading: {
-    color: colors.black,
-    textAlign: "center",
-  },
-  status: {
-    color: colors.grey1,
-    textAlign: "center",
-  },
-}))

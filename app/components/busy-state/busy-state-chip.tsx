@@ -5,25 +5,22 @@ import { makeStyles } from "@rn-vui/themed"
 
 import { CHIP_GLYPH_SIZE, CHIP_SIZE } from "./config"
 
-export type BusyChip = {
+export type BusyStateChipProps = {
   /** Rendered centred in a `CHIP_GLYPH_SIZE` box. Give it that size. */
   icon: React.ReactNode
-  /** Chip background. Defaults to `colors.grey5`. */
-  backgroundColor?: string
 }
 
 /**
- * The round 52×52 surface a busy-state glyph sits on.
+ * The round 52×52 `colors.grey5` surface a busy-state glyph sits on.
  *
- * Deliberately has no shadow and no `elevation`: the entrance depends on the two
- * chips' sibling order to read as one emerging from behind the other, and on
- * Android any `elevation` would override that order.
+ * Deliberately has no shadow and no `elevation`. Stacking is set by the parent
+ * with `zIndex`, and on Android an `elevation` here would override it.
  */
-export const BusyStateChip: React.FC<BusyChip> = ({ icon, backgroundColor }) => {
+export const BusyStateChip: React.FC<BusyStateChipProps> = ({ icon }) => {
   const styles = useStyles()
 
   return (
-    <View style={[styles.chip, backgroundColor ? { backgroundColor } : undefined]}>
+    <View style={styles.chip}>
       <View style={styles.glyph}>{icon}</View>
     </View>
   )

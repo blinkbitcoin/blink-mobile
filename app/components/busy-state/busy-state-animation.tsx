@@ -13,7 +13,7 @@ import Animated, {
 
 import { makeStyles } from "@rn-vui/themed"
 
-import { BusyStateChip, type BusyChip } from "./busy-state-chip"
+import { BusyStateChip } from "./busy-state-chip"
 import { BusyStateConnector } from "./busy-state-connector"
 import {
   CHIP_SIZE,
@@ -23,14 +23,15 @@ import {
   ENTRANCE_DELAY_MS,
   ENTRANCE_DURATION_MS,
   ROW_WIDTH,
+  Z_ICON_1,
+  Z_ICON_2,
 } from "./config"
 
 export type BusyStateAnimationProps = {
-  /** The chip the connection starts from. Sits above the other one at rest. */
-  from: BusyChip
-  /** The chip that emerges from behind `from`. */
-  to: BusyChip
-  connectorColor?: string
+  /** Left chip, where the connection starts. Sits above `icon2` at rest. */
+  icon1: React.ReactNode
+  /** Right chip. Emerges from behind `icon1`. */
+  icon2: React.ReactNode
   /** Fires once the entrance has settled. Not called again. */
   onEntranceComplete?: () => void
 }
@@ -45,20 +46,20 @@ export type BusyStateAnimationProps = {
  * by a toggled transition — a prop change or a re-render cannot play it
  * backwards. There is no exit.
  *
- * `from` is rendered second so it wins the sibling z-order: at rest both chips
- * are stacked at the row's centre with `to` underneath, so only `from` is
- * visible, and `to` slides out from beneath it as they part. That is a z-order
- * reveal, not a fade or a scale, which is what makes it read as "emerging from
- * behind" rather than "popping in".
+ * `icon1` is stacked above `icon2` with an explicit `zIndex`: at rest both chips
+ * sit at the row's centre with `icon2` underneath, so only `icon1` is visible,
+ * and `icon2` slides out from beneath it as they part. That is a z-order reveal,
+ * not a fade or a scale, which is what makes it read as "emerging from behind"
+ * rather than "popping in". The order is pinned with `zIndex` rather than left
+ * to sibling order so iOS and Android stack it the same way.
  *
  * Under `useReducedMotion` the resting state is rendered immediately and nothing
  * moves at all — including the dashes. The busy signal is then carried by the
  * `progressbar` role on the text, which `BusyStateScreen` sets.
  */
 export const BusyStateAnimation: React.FC<BusyStateAnimationProps> = ({
-  from,
-  to,
-  connectorColor,
+  icon1,
+  icon2,
   onEntranceComplete,
 }) => {
   const styles = useStyles()
@@ -105,11 +106,11 @@ export const BusyStateAnimation: React.FC<BusyStateAnimationProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const fromStyle = useAnimatedStyle(() => ({
+  const icon1Style = useAnimatedStyle(() => ({
     transform: [{ translateX: CHIP_TRAVEL * (1 - progress.value) }],
   }))
 
-  const toStyle = useAnimatedStyle(() => ({
+  const icon2Style = useAnimatedStyle(() => ({
     transform: [{ translateX: -CHIP_TRAVEL * (1 - progress.value) }],
   }))
 
@@ -121,19 +122,19 @@ export const BusyStateAnimation: React.FC<BusyStateAnimationProps> = ({
       accessibilityElementsHidden
     >
       {/*
-        Order is z-order. The connector is at the bottom so that while the chips
-        are still parting, each of them covers the stretch of line it is sitting
-        on — the window is wider than the gap at that moment, and a connector
-        drawn over a chip would show dashes crossing the glyph.
+        The connector is at the bottom of the stack so that while the chips are
+        still parting, each of them covers the stretch of line it is sitting on:
+        the window is wider than the gap at that moment, and a connector drawn
+        over a chip would show dashes crossing the glyph.
       */}
-      <BusyStateConnector progress={progress} march={march} color={connectorColor} />
+      <BusyStateConnector progress={progress} march={march} />
 
-      <Animated.View style={[styles.chipRight, toStyle]}>
-        <BusyStateChip {...to} />
+      <Animated.View style={[styles.chipRight, icon2Style]}>
+        <BusyStateChip icon={icon2} />
       </Animated.View>
 
-      <Animated.View style={[styles.chipLeft, fromStyle]}>
-        <BusyStateChip {...from} />
+      <Animated.View style={[styles.chipLeft, icon1Style]}>
+        <BusyStateChip icon={icon1} />
       </Animated.View>
     </Animated.View>
   )
@@ -149,10 +150,12 @@ const useStyles = makeStyles(() => ({
     position: "absolute",
     left: 0,
     top: 0,
+    zIndex: Z_ICON_1,
   },
   chipRight: {
     position: "absolute",
     left: ROW_WIDTH - CHIP_SIZE,
     top: 0,
+    zIndex: Z_ICON_2,
   },
 }))

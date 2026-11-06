@@ -11,6 +11,7 @@ import {
   DASH_OFF,
   DASH_ON,
   DASH_PERIOD,
+  Z_CONNECTOR,
 } from "./config"
 
 /**
@@ -28,7 +29,6 @@ type BusyStateConnectorProps = {
   progress: SharedValue<number>
   /** Distance the dashes have travelled, in points, wrapping at `DASH_PERIOD`. */
   march: SharedValue<number>
-  color?: string
 }
 
 /**
@@ -50,7 +50,6 @@ type BusyStateConnectorProps = {
 export const BusyStateConnector: React.FC<BusyStateConnectorProps> = ({
   progress,
   march,
-  color,
 }) => {
   const styles = useStyles()
   const {
@@ -81,7 +80,7 @@ export const BusyStateConnector: React.FC<BusyStateConnectorProps> = ({
             y1={STRIP_HEIGHT / 2}
             x2={STRIP_WIDTH}
             y2={STRIP_HEIGHT / 2}
-            stroke={color ?? colors.grey2}
+            stroke={colors.grey2}
             strokeWidth={CONNECTOR_STROKE_WIDTH}
             strokeDasharray={[DASH_ON, DASH_OFF]}
             strokeLinecap="butt"
@@ -98,6 +97,7 @@ const useStyles = makeStyles(() => ({
     top: (CHIP_SIZE - STRIP_HEIGHT) / 2,
     height: STRIP_HEIGHT,
     overflow: "hidden",
+    zIndex: Z_CONNECTOR,
   },
   strip: {
     position: "absolute",
