@@ -1,5 +1,5 @@
 import React from "react"
-import { BackHandler, Text as RNText } from "react-native"
+import { AccessibilityInfo, BackHandler, Text as RNText } from "react-native"
 import { act, fireEvent, render } from "@testing-library/react-native"
 
 import { ThemeProvider } from "@rn-vui/themed"
@@ -178,7 +178,11 @@ describe("BusyStateScreen", () => {
 
     it("replaces the busy copy with the error title and body", () => {
       const { getByText, queryByText } = render(
-        failing({ title: "Something went wrong", body: "No connection" }),
+        failing({
+          title: "Something went wrong",
+          body: "No connection",
+          onBack: jest.fn(),
+        }),
       )
 
       expect(getByText("Something went wrong")).toBeTruthy()
@@ -197,6 +201,26 @@ describe("BusyStateScreen", () => {
         "busy-state-close",
       ])
       expect(queryByTestId("busy-state-back")).toBeNull()
+    })
+
+    it("requires a way out besides Try Again", () => {
+      // @ts-expect-error -- retry alone would trap the user: back is swallowed.
+      const trapped: BusyStateError = { title: "Failed", onRetry: jest.fn() }
+      const withBack: BusyStateError = { title: "Failed", onBack: jest.fn() }
+      const withClose: BusyStateError = { title: "Failed", onClose: jest.fn() }
+
+      expect([trapped, withBack, withClose]).toHaveLength(3)
+    })
+
+    it("announces the error title and body to screen readers", () => {
+      const announce = jest
+        .spyOn(AccessibilityInfo, "announceForAccessibility")
+        .mockImplementation(() => undefined)
+
+      render(failing({ title: "Failed", body: "No connection", onBack: jest.fn() }))
+
+      expect(announce).toHaveBeenCalledWith("Failed. No connection")
+      announce.mockRestore()
     })
 
     it("labels the buttons from the shared copy and calls their handlers", () => {
@@ -234,7 +258,7 @@ describe("BusyStateScreen", () => {
         screenFor({
           completion: { kind: "pending", done: false },
           onDone,
-          error: { title: "Failed", onRetry: jest.fn() },
+          error: { title: "Failed", onRetry: jest.fn(), onBack: jest.fn() },
         }),
       )
       advance(SIGNAL_MS)
