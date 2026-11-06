@@ -11117,6 +11117,10 @@ type RootTranslation = {
 			 */
 			limitMustBePositive: string
 			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​u​p​d​a​t​e​ ​A​T​M​ ​w​i​t​h​d​r​a​w​a​l​s
+			 */
+			atmToggleError: string
+			/**
 			 * T​r​a​n​s​a​c​t​i​o​n​ ​t​y​p​e​s
 			 */
 			transactionTypesTitle: string
@@ -25338,6 +25342,10 @@ export type TranslationFunctions = {
 			 * Limit must be greater than zero
 			 */
 			limitMustBePositive: () => LocalizedString
+			/**
+			 * Failed to update ATM withdrawals
+			 */
+			atmToggleError: () => LocalizedString
 			/**
 			 * Transaction types
 			 */

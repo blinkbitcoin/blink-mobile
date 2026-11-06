@@ -3247,7 +3247,8 @@
       "noLimit": "ไม่มีขีดจำกัด",
       "limitUpdateSuccess": "อัปเดตขีดจำกัดสำเร็จ",
       "limitUpdateError": "ไม่สามารถอัปเดตขีดจำกัดได้",
-      "limitMustBePositive": "ขีดจำกัดต้องมากกว่าศูนย์"
+      "limitMustBePositive": "ขีดจำกัดต้องมากกว่าศูนย์",
+      "atmToggleError": "ไม่สามารถอัปเดตการถอน ATM ได้"
     },
     "CardFeeSchedule": {
       "title": "ตารางค่าธรรมเนียมบัตร Blink",

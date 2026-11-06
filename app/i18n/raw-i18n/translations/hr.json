@@ -3247,7 +3247,8 @@
       "noLimit": "Bez ograničenja",
       "limitUpdateSuccess": "Ograničenje uspješno ažurirano",
       "limitUpdateError": "Nije moguće ažurirati ograničenje",
-      "limitMustBePositive": "Ograničenje mora biti veće od nule"
+      "limitMustBePositive": "Ograničenje mora biti veće od nule",
+      "atmToggleError": "Nije moguće ažurirati podizanja na bankomatu"
     },
     "CardFeeSchedule": {
       "title": "Raspored naknada Blink kartice",

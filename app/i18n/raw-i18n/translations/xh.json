@@ -3247,7 +3247,8 @@
       "noLimit": "Akukho mda",
       "limitUpdateSuccess": "Umda uhlaziywe ngempumelelo",
       "limitUpdateError": "Ayiphumelelanga ukuhlaziya umda",
-      "limitMustBePositive": "Umda kufuneka ube ngaphezu kwezero"
+      "limitMustBePositive": "Umda kufuneka ube ngaphezu kwezero",
+      "atmToggleError": "Ayiphumelelanga ukuhlaziya ukukhupha kwi-ATM"
     },
     "CardFeeSchedule": {
       "title": "Uludwe lweentlawulo zeKhadi leBlink",

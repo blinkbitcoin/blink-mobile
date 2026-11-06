@@ -3247,7 +3247,8 @@
       "noLimit": "Tanpa batas",
       "limitUpdateSuccess": "Batas berhasil diperbarui",
       "limitUpdateError": "Gagal memperbarui batas",
-      "limitMustBePositive": "Batas harus lebih besar dari nol"
+      "limitMustBePositive": "Batas harus lebih besar dari nol",
+      "atmToggleError": "Gagal memperbarui penarikan ATM"
     },
     "CardFeeSchedule": {
       "title": "Jadwal biaya Kartu Blink",

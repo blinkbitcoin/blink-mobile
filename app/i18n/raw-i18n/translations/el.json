@@ -3247,7 +3247,8 @@
       "noLimit": "Χωρίς όριο",
       "limitUpdateSuccess": "Το όριο ενημερώθηκε επιτυχώς",
       "limitUpdateError": "Αποτυχία ενημέρωσης ορίου",
-      "limitMustBePositive": "Το όριο πρέπει να είναι μεγαλύτερο από μηδέν"
+      "limitMustBePositive": "Το όριο πρέπει να είναι μεγαλύτερο από μηδέν",
+      "atmToggleError": "Αποτυχία ενημέρωσης αναλήψεων ATM"
     },
     "CardFeeSchedule": {
       "title": "Πρόγραμμα χρεώσεων κάρτας Blink",

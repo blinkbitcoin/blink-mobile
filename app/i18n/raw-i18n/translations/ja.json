@@ -3331,7 +3331,8 @@
             "noLimit": "制限なし",
             "limitUpdateSuccess": "制限が正常に更新されました",
             "limitUpdateError": "制限の更新に失敗しました",
-            "limitMustBePositive": "制限はゼロより大きい必要があります"
+            "limitMustBePositive": "制限はゼロより大きい必要があります",
+            "atmToggleError": "ATM引き出しの更新に失敗しました"
         },
         "CardStatements": {
             "title": "明細",

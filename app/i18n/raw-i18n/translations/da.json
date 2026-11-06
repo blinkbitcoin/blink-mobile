@@ -3247,7 +3247,8 @@
       "noLimit": "Ingen grænse",
       "limitUpdateSuccess": "Grænse opdateret",
       "limitUpdateError": "Kunne ikke opdatere grænsen",
-      "limitMustBePositive": "Grænsen skal være større end nul"
+      "limitMustBePositive": "Grænsen skal være større end nul",
+      "atmToggleError": "Kunne ikke opdatere hævninger i hæveautomater"
     },
     "CardFeeSchedule": {
       "title": "Blink-kortets gebyrplan",

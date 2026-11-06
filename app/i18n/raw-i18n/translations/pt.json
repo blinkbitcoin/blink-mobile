@@ -3331,7 +3331,8 @@
             "noLimit": "Sem limite",
             "limitUpdateSuccess": "Limite atualizado com sucesso",
             "limitUpdateError": "Falha ao atualizar o limite",
-            "limitMustBePositive": "O limite deve ser maior que zero"
+            "limitMustBePositive": "O limite deve ser maior que zero",
+            "atmToggleError": "Falha ao atualizar os saques no caixa"
         },
         "CardStatements": {
             "title": "Movimentos",

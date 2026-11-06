@@ -3247,7 +3247,8 @@
       "noLimit": "Sense límit",
       "limitUpdateSuccess": "Límit actualitzat correctament",
       "limitUpdateError": "No s'ha pogut actualitzar el límit",
-      "limitMustBePositive": "El límit ha de ser superior a zero"
+      "limitMustBePositive": "El límit ha de ser superior a zero",
+      "atmToggleError": "No s'han pogut actualitzar les retirades al caixer"
     },
     "CardFeeSchedule": {
       "title": "Programa de tarifes de la targeta Blink",

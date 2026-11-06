@@ -3247,7 +3247,8 @@
       "noLimit": "Limit yok",
       "limitUpdateSuccess": "Limit başarıyla güncellendi",
       "limitUpdateError": "Limit güncellenemedi",
-      "limitMustBePositive": "Limit sıfırdan büyük olmalıdır"
+      "limitMustBePositive": "Limit sıfırdan büyük olmalıdır",
+      "atmToggleError": "ATM çekimleri güncellenemedi"
     },
     "CardFeeSchedule": {
       "title": "Blink Kart ücret çizelgesi",

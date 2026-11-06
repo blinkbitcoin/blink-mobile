@@ -3247,7 +3247,8 @@
       "noLimit": "Không giới hạn",
       "limitUpdateSuccess": "Cập nhật giới hạn thành công",
       "limitUpdateError": "Không thể cập nhật giới hạn",
-      "limitMustBePositive": "Giới hạn phải lớn hơn không"
+      "limitMustBePositive": "Giới hạn phải lớn hơn không",
+      "atmToggleError": "Không thể cập nhật rút ATM"
     },
     "CardFeeSchedule": {
       "title": "Biểu phí Thẻ Blink",
