@@ -91,7 +91,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
       common: {
-        cancel: () => "Cancel",
+        cancel: () => "cancel-from-ll",
+        confirm: () => "confirm-from-ll",
         error: () => "Error",
         ok: () => "OK",
         warning: () => "Warning",
@@ -160,7 +161,7 @@ const openDeletionModal = async () => {
 const confirmDeletion = async () => {
   fireEvent.changeText(screen.getByPlaceholderText("delete"), "delete")
   await act(async () => {
-    fireEvent.press(screen.getByText("Confirm"))
+    fireEvent.press(screen.getByText("confirm-from-ll"))
   })
   await pressAlertButton(alertCalls.length - 1, "OK")
 }
@@ -219,7 +220,7 @@ describe("Delete", () => {
   it("stays put when the balance warning is dismissed", async () => {
     mockSettingsData = walletsWith(1500, 0)
     await openDeletionModal()
-    await pressAlertButton(0, "Cancel")
+    await pressAlertButton(0, "cancel-from-ll")
 
     expect(screen.queryByTestId("delete-modal")).toBeNull()
   })
@@ -227,12 +228,12 @@ describe("Delete", () => {
   it("keeps the confirm button disabled until the keyword is typed", async () => {
     await openDeletionModal()
 
-    fireEvent.press(screen.getByText("Confirm"))
+    fireEvent.press(screen.getByText("confirm-from-ll"))
     expect(alertCalls).toHaveLength(0)
 
     fireEvent.changeText(screen.getByPlaceholderText("delete"), "delete")
     await act(async () => {
-      fireEvent.press(screen.getByText("Confirm"))
+      fireEvent.press(screen.getByText("confirm-from-ll"))
     })
 
     expect(alertCalls[0]?.title).toBe("Are you sure?")
@@ -242,7 +243,7 @@ describe("Delete", () => {
     await openDeletionModal()
     fireEvent.changeText(screen.getByPlaceholderText("delete"), "delete")
     await act(async () => {
-      fireEvent.press(screen.getByText("Cancel"))
+      fireEvent.press(screen.getByText("cancel-from-ll"))
     })
 
     expect(screen.queryByTestId("delete-modal")).toBeNull()
@@ -253,9 +254,9 @@ describe("Delete", () => {
     await openDeletionModal()
     fireEvent.changeText(screen.getByPlaceholderText("delete"), "delete")
     await act(async () => {
-      fireEvent.press(screen.getByText("Confirm"))
+      fireEvent.press(screen.getByText("confirm-from-ll"))
     })
-    await pressAlertButton(0, "Cancel")
+    await pressAlertButton(0, "cancel-from-ll")
 
     expect(mockDeleteAccount).not.toHaveBeenCalled()
   })
