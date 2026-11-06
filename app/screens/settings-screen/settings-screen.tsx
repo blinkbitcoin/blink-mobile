@@ -8,7 +8,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { headerRightNoGlass } from "@app/components/header-no-glass"
+import { headerIconTouchArea, headerRightNoGlass } from "@app/components/header-no-glass"
 import { useEnhancedModePrompt } from "@app/components/enhanced-mode-prompt"
 import {
   RestrictedRegionBanner,
@@ -173,8 +173,11 @@ export const SettingsScreen: React.FC = () => {
         ?.unacknowledgedStatefulNotificationsWithoutBulletinEnabledCount || 0
     navigation.setOptions(
       headerRightNoGlass(() => (
-        <TouchableOpacity onPress={() => navigation.navigate("notificationHistory")}>
-          <GaloyIcon name="bell" size={24} style={styles.headerRight} />
+        <TouchableOpacity
+          style={styles.headerRight}
+          onPress={() => navigation.navigate("notificationHistory")}
+        >
+          <GaloyIcon name="bell" size={24} />
           {count !== 0 && (
             <Text
               type="p4"
@@ -240,13 +243,16 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "column",
     rowGap: 18,
   },
+  // The 42dp box centres the 24dp bell, 9dp in from each edge: the margin and the
+  // badge offsets are the old ones less those 9dp, so neither moves.
   headerRight: {
-    marginRight: 12,
+    ...headerIconTouchArea,
+    marginRight: 3,
   },
   notificationCount: {
     position: "absolute",
-    right: 9,
-    top: -3,
+    right: 6,
+    top: 6,
     color: colors._darkGrey,
     backgroundColor: colors.black,
     textAlign: "center",

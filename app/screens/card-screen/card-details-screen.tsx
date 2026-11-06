@@ -7,7 +7,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { ActionField } from "@app/components/action-field"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { BlinkCard } from "@app/components/blink-card"
-import { headerRightNoGlass } from "@app/components/header-no-glass"
+import { headerIconTouchArea, headerRightNoGlass } from "@app/components/header-no-glass"
 import { InfoSection, InfoCard } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { CardStatus } from "@app/graphql/generated"
@@ -200,8 +200,10 @@ export const CardDetailsScreen: React.FC = () => {
 }
 
 const useStyles = makeStyles(() => ({
+  // 42dp box around the 24dp icon: the margin gives back the 9dp it grew by.
   headerRight: {
-    marginRight: 24,
+    ...headerIconTouchArea,
+    marginRight: 15,
   },
   content: {
     paddingTop: 20,

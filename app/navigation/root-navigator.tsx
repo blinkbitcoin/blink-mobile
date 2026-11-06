@@ -109,7 +109,7 @@ import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-scr
 import { CardFeeScheduleScreen } from "@app/screens/card-screen/card-fee-schedule-screen"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
 import { headerCloseControlOptions } from "@app/components/header-close-control"
-import { headerRightNoGlass } from "@app/components/header-no-glass"
+import { headerIconTouchArea, headerRightNoGlass } from "@app/components/header-no-glass"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
 import {
   CardAddToMobileWalletScreen,
@@ -1402,7 +1402,9 @@ const useStyles = makeStyles(({ colors }) => ({
   title: {
     color: colors.black,
   },
+  // 42dp box around the 18dp icon: the margin gives back the 12dp it grew by.
   SendBitcoinScreenScanIcon: {
-    marginRight: 20,
+    ...headerIconTouchArea,
+    marginRight: 8,
   },
 }))

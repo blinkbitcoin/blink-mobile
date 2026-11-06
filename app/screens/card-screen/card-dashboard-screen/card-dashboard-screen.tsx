@@ -15,7 +15,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { BackendFeatureGate } from "@app/components/backend-feature-gate"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { BlinkCard } from "@app/components/blink-card"
-import { headerRightNoGlass } from "@app/components/header-no-glass"
+import { headerIconTouchArea, headerRightNoGlass } from "@app/components/header-no-glass"
 import {
   CardActionButtons,
   CardBalanceSection,
@@ -200,9 +200,10 @@ const useStyles = makeStyles(({ colors }) => ({
   loadMore: {
     marginTop: 16,
   },
+  // 42dp box around the 24dp icon (was 40dp from padding): the margin gives back 1dp.
   headerRight: {
-    padding: 8,
-    marginRight: 16,
+    ...headerIconTouchArea,
+    marginRight: 15,
   },
 }))
 
