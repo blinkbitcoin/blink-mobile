@@ -1,4 +1,9 @@
-import { renderHook } from "@testing-library/react-hooks"
+import React, { PropsWithChildren } from "react"
+import { act, renderHook } from "@testing-library/react-hooks"
+
+import { QueryHookOptions, useQuery } from "@apollo/client"
+import { MockedProvider, MockedResponse } from "@apollo/client/testing"
+import { CardDocument, CardQuery, CardQueryVariables } from "@app/graphql/generated"
 import { useCardData } from "@app/hooks/use-card-data"
 
 const mockUseIsAuthed = jest.fn()
@@ -50,6 +55,7 @@ describe("useCardData", () => {
     const { result } = renderHook(() => useCardData())
 
     expect(result.current.card).toEqual(mockCard)
+    expect(result.current.hasLoaded).toBe(true)
     expect(result.current.loading).toBe(false)
     expect(result.current.error).toBeUndefined()
   })
@@ -65,6 +71,7 @@ describe("useCardData", () => {
     const { result } = renderHook(() => useCardData())
 
     expect(result.current.card).toBeUndefined()
+    expect(result.current.hasLoaded).toBe(false)
     expect(result.current.loading).toBe(true)
   })
 
@@ -80,6 +87,7 @@ describe("useCardData", () => {
     const { result } = renderHook(() => useCardData())
 
     expect(result.current.error).toBe(mockError)
+    expect(result.current.hasLoaded).toBe(false)
   })
 
   it("returns undefined card when data is null", () => {
@@ -93,6 +101,7 @@ describe("useCardData", () => {
     const { result } = renderHook(() => useCardData())
 
     expect(result.current.card).toBeUndefined()
+    expect(result.current.hasLoaded).toBe(true)
   })
 
   it("skips query when not authenticated", () => {
@@ -171,6 +180,50 @@ describe("useCardData", () => {
 
     const { result } = renderHook(() => useCardData())
 
+    expect(result.current.card?.id).toBe("card-1")
+  })
+})
+
+describe("useCardData against the Apollo client", () => {
+  const cardQueryData = {
+    me: {
+      __typename: "User",
+      id: "user-1",
+      defaultAccount: {
+        __typename: "ConsumerAccount",
+        id: "acct-1",
+        cards: [{ ...mockCard, dailyLimitCents: null, monthlyLimitCents: null }],
+        cardConsumerApplications: [],
+      },
+    },
+  }
+
+  const mocks: MockedResponse[] = [
+    { request: { query: CardDocument }, result: { data: cardQueryData } },
+    { request: { query: CardDocument }, error: new Error("card unavailable") },
+  ]
+
+  const wrapper = ({ children }: PropsWithChildren) =>
+    React.createElement(MockedProvider, { mocks }, children)
+
+  beforeEach(() => {
+    mockUseIsAuthed.mockReturnValue(true)
+    mockUseCardQuery.mockImplementation(
+      (options: QueryHookOptions<CardQuery, CardQueryVariables>) =>
+        useQuery<CardQuery, CardQueryVariables>(CardDocument, options),
+    )
+  })
+
+  it("keeps the last answer and stays loaded when a later lookup fails", async () => {
+    const { result, waitFor } = renderHook(() => useCardData(), { wrapper })
+    await waitFor(() => result.current.hasLoaded)
+
+    await act(async () => {
+      await result.current.refetch().catch(() => undefined)
+    })
+
+    expect(result.current.error?.message).toBe("card unavailable")
+    expect(result.current.hasLoaded).toBe(true)
     expect(result.current.card?.id).toBe("card-1")
   })
 })
