@@ -81,14 +81,15 @@ export const CardDetailsScreen: React.FC = () => {
 
   return (
     <ScreenSecurityGate>
-      <CardDetailsContent card={card} />
+      <CardDetailsContent key={card.id} card={card} />
     </ScreenSecurityGate>
   )
 }
 
 /** Mounted only once the screen guard is on, so the decrypted card number and CVV are
  *  never fetched or painted where a screenshot, a recording or the app switcher could
- *  catch them. */
+ *  catch them. Keyed by the card, so a replaced card starts over instead of showing the
+ *  secrets of the one before. */
 const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
   const styles = useStyles()
   const {
