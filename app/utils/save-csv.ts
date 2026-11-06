@@ -27,15 +27,31 @@ const requestLegacyWritePermission = async (): Promise<boolean> => {
   return result === PermissionsAndroid.RESULTS.GRANTED
 }
 
+/** A write that fails on a name `exists` called free is usually a file this install
+ *  doesn't own: on Android 11+ an export left by an earlier install is invisible to
+ *  `exists` yet still blocks the name. One more numbered name gets past it; a second
+ *  failure means the folder itself refuses the write (API 29), so stop and let the
+ *  caller fall back to the share sheet. */
+const MAX_WRITE_FAILURES = 2
+
 /** Mirrors what a browser does with a repeated download: keep the readable name and
  *  number the copies rather than overwriting the export the user already has. */
-const findFreeDownloadPath = async (): Promise<string> => {
+const writeToFreeDownloadPath = async (csvEncoded: string): Promise<string> => {
   const base = `${RNFS.DownloadDirectoryPath}/${CSV_BASENAME}`
+  let writeFailures = 0
 
   for (let attempt = 0; attempt < MAX_FILENAME_ATTEMPTS; attempt += 1) {
     const path = attempt === 0 ? base : `${base}-${attempt}`
     const candidate = `${path}.${CSV_EXTENSION}`
-    if (!(await RNFS.exists(candidate))) return candidate
+    if (!(await RNFS.exists(candidate))) {
+      try {
+        await RNFS.writeFile(candidate, csvEncoded, "base64")
+        return candidate
+      } catch (err) {
+        writeFailures += 1
+        if (writeFailures >= MAX_WRITE_FAILURES) throw err
+      }
+    }
   }
 
   throw new Error("No free filename in the Downloads folder")
@@ -52,8 +68,7 @@ const findFreeDownloadPath = async (): Promise<string> => {
 export const saveCsvToDownloads = async (csvEncoded: string): Promise<string | null> => {
   if (!(await requestLegacyWritePermission())) return null
 
-  const path = await findFreeDownloadPath()
-  await RNFS.writeFile(path, csvEncoded, "base64")
+  const path = await writeToFreeDownloadPath(csvEncoded)
   /** Without the MediaStore scan the file exists on disk but is invisible to the Files
    *  and Downloads apps, which is indistinguishable from a failed download. */
   await RNFS.scanFile(path)

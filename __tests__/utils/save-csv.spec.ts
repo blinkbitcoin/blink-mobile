@@ -68,6 +68,23 @@ describe("saveCsvToDownloads", () => {
     expect(RNFS.writeFile).not.toHaveBeenCalled()
   })
 
+  it("moves to the next numbered name when a write fails on a name exists missed", async () => {
+    ;(RNFS.writeFile as jest.Mock).mockRejectedValueOnce(new Error("EACCES"))
+
+    await expect(saveCsvToDownloads(CSV_BASE64)).resolves.toBe(
+      "/mock/downloads/blink-transactions-1.csv",
+    )
+    expect(RNFS.scanFile).toHaveBeenCalledWith("/mock/downloads/blink-transactions-1.csv")
+  })
+
+  it("rejects after a second failed write so the caller can fall back to sharing", async () => {
+    ;(RNFS.writeFile as jest.Mock).mockRejectedValue(new Error("EACCES"))
+
+    await expect(saveCsvToDownloads(CSV_BASE64)).rejects.toThrow("EACCES")
+    expect(RNFS.writeFile).toHaveBeenCalledTimes(2)
+    expect(RNFS.scanFile).not.toHaveBeenCalled()
+  })
+
   it("does not ask for the legacy storage grant from API 29 up", async () => {
     setAndroidVersion(29)
 
