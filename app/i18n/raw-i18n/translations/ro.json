@@ -3072,7 +3072,6 @@
     "faq": "FAQ",
     "statusPage": "Pagina de stare",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Asistență",
     "defaultSupportMessage": "Bună! Am nevoie de ajutor cu {bankName: string}, folosesc versiunea {version: string} pe {os: string}.",
     "emailCopied": "e-mail {email: string} copiat în clipboard",
