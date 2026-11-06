@@ -11,6 +11,11 @@ jest.mock("@app/screens/card-screen/utils/wallet-provisioning", () => ({
   addCardToWallet: (...args: readonly unknown[]) => mockAddCardToWallet(...args),
 }))
 
+let mockIsFocused = true
+jest.mock("@react-navigation/native", () => ({
+  useNavigation: () => ({ isFocused: () => mockIsFocused }),
+}))
+
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: { errors: { unexpectedError: () => "Unexpected error occurred" } },
@@ -43,6 +48,7 @@ const renderWithCard = async (cardId = "card-1", lastFour = "4242") => {
 describe("useAddToWallet", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsFocused = true
     mockCanAddCardToWallet.mockResolvedValue(true)
   })
 
@@ -255,6 +261,41 @@ describe("useAddToWallet", () => {
       })
 
       expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
+    it("keeps the error off a screen the user moved on from", async () => {
+      const pendingAdd = deferred<WalletAddResult>()
+      mockAddCardToWallet.mockReturnValue(
+        pendingAdd.promise.then(() => Promise.reject(new Error("provisioning failed"))),
+      )
+      const { result } = await renderWithCard()
+
+      act(() => {
+        result.current.addToWallet()
+      })
+      mockIsFocused = false
+      await act(async () => {
+        pendingAdd.resolve(WalletAddResult.Added)
+      })
+
+      expect(mockToastShow).not.toHaveBeenCalled()
+      expect(result.current.isAdding).toBe(false)
+    })
+
+    it("stops offering a card added while the screen was out of focus", async () => {
+      const pendingAdd = deferred<WalletAddResult>()
+      mockAddCardToWallet.mockReturnValue(pendingAdd.promise)
+      const { result } = await renderWithCard()
+
+      act(() => {
+        result.current.addToWallet()
+      })
+      mockIsFocused = false
+      await act(async () => {
+        pendingAdd.resolve(WalletAddResult.Added)
+      })
+
+      expect(result.current.canAddToWallet).toBe(false)
     })
 
     it("does nothing without a card", async () => {

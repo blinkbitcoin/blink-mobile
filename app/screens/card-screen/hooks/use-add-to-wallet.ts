@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useNavigation } from "@react-navigation/native"
 
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useIsMounted } from "@app/hooks/use-is-mounted"
@@ -17,6 +18,7 @@ export const useAddToWallet = (
   lastFour: string | undefined,
 ) => {
   const { LL } = useI18nContext()
+  const navigation = useNavigation()
   const [canAddToWallet, setCanAddToWallet] = useState(false)
   const [isAdding, setIsAdding] = useState(false)
   const { run } = useInFlightGuard()
@@ -61,12 +63,15 @@ export const useAddToWallet = (
         const shouldStopOffering = result === WalletAddResult.Added && isStillShown()
         if (shouldStopOffering) setCanAddToWallet(false)
       } catch {
-        if (isStillShown()) toastShow({ message: LL.errors.unexpectedError(), LL })
+        /** A screen left mounted under the one the user moved on to keeps its state, but
+         *  does not raise its toast over that screen. */
+        const shouldShowError = isStillShown() && navigation.isFocused()
+        if (shouldShowError) toastShow({ message: LL.errors.unexpectedError(), LL })
       } finally {
         if (isMounted()) setIsAdding(false)
       }
     })
-  }, [walletCard, run, isMounted, LL])
+  }, [walletCard, run, isMounted, navigation, LL])
 
   return { canAddToWallet, isAdding, addToWallet }
 }
