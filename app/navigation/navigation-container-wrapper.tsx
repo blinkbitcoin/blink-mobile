@@ -393,7 +393,6 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
           /** Cold-start gates (restricted-region verdict) may still be resolving; the
            *  gate self-releases at its cap, so this can never defer the hide unbounded. */
           bootSplashGate.whenReleased().then(() => RNBootSplash.hide({ fade: true }))
-          console.log("NavigationContainer onReady")
           /** Cold-started already gated: reset now that the container is ready, since the
            *  effect above may have run before isReady() turned true. */
           if (isBlockerVisibleRef.current) resetToBlocker("gate-armed")

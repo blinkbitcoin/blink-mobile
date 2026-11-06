@@ -1,5 +1,5 @@
-/** Shared manual mock: the real module warns at load time when no API key is
- *  configured, so specs replace it wholesale with `jest.mock("@app/utils/ip-country-lookup")`. */
+/** Shared manual mock: the real module calls out to the IP lookup services, so specs
+ *  replace it wholesale with `jest.mock("@app/utils/ip-country-lookup")`. */
 export const DEFAULT_ADAPTERS = []
 
 export const resolveIpCountryCode = jest.fn(async () => undefined)

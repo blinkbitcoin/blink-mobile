@@ -117,10 +117,18 @@ describe("parseDestination with unified BIP-21 URIs", () => {
 
   it("prefers the LNURL even when the onchain address is on the wrong network", async () => {
     const testnetAddress = "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx"
+    // blink-client logs the onchain parse failure before falling back to the LNURL.
+    const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {})
 
     const destination = await parseDestination(
       parseParams(`bitcoin:${testnetAddress}?lightning=${lnurl}`),
     )
+
+    expect(debugSpy).toHaveBeenCalledWith(
+      expect.stringContaining("[Parse error: onchain]"),
+      expect.anything(),
+    )
+    debugSpy.mockRestore()
 
     expect(destination).toEqual(
       expect.objectContaining({

@@ -30,6 +30,9 @@ jest.mock("@app/config/feature-flags-context", () => ({
   }),
 }))
 
+// The device-location hook resolves the IP country; unmocked, that is a real request.
+jest.mock("@app/utils/ip-country-lookup")
+
 jest.mock("@app/hooks/use-display-currency", () => ({
   useDisplayCurrency: () => ({
     formatCurrency: ({

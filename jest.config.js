@@ -5,8 +5,22 @@
 // passing in CI. Pin it here, before any transform or module load happens.
 process.env.NODE_ENV = "test"
 
+// On GitHub Actions each failing test becomes an annotation on its spec line, and
+// each failed attempt of a retried test a RETRY annotation. The run prints no
+// PASS line per file: just the failures, grouped per file at the end by the
+// github-actions reporter, and the totals from the summary reporter, whose own
+// list of failures would repeat them and is switched off by the threshold.
+// Local runs and Concourse keep the default reporter.
+const reporters = process.env.GITHUB_ACTIONS
+  ? [
+      ["github-actions", { silent: true }],
+      ["summary", { summaryThreshold: Number.MAX_SAFE_INTEGER }],
+    ]
+  : ["default"]
+
 module.exports = {
   preset: "@react-native/jest-preset",
+  reporters,
   setupFiles: [
     "./node_modules/@react-native/jest-preset/jest/setup.js",
     "./node_modules/react-native-gesture-handler/jestSetup.js",

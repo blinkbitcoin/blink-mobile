@@ -85,13 +85,19 @@ describe("resolveIpCountryCode", () => {
 })
 
 describe("resolveIpCountryCodeCached", () => {
+  /** The first shared lookup warns that no API key is set; "no-key warning" below covers it. */
+  let warnSpy: jest.SpyInstance
+
   beforeEach(() => {
     jest.clearAllMocks()
+    warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
     mutableConfig.GEO_IPIFY_API_KEY = ""
     mutableConfig.IPINFO_API_KEY = ""
     mutableConfig.PROXYCHECK_API_KEY = ""
     mutableConfig.IPAPI_API_KEY = ""
   })
+
+  afterEach(() => warnSpy.mockRestore())
 
   /** One sequential test: the cache is module state, so the phases (rejection
    *  absorption, failure retries, concurrent dedupe, cached reuse) must run in a
@@ -339,7 +345,25 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
 })
 
 describe("no-key warning", () => {
+  const NO_KEYS = {
+    GEO_IPIFY_API_KEY: "",
+    IPINFO_API_KEY: "",
+    PROXYCHECK_API_KEY: "",
+    IPAPI_API_KEY: "",
+  }
+
   let warnSpy: jest.SpyInstance
+
+  /** A fresh copy of the module under `config`, so its warn-once flag starts unset. */
+  const loadLookup = (config: Record<string, string>) => {
+    let lookup: { resolveIpCountryCodeCached: () => Promise<unknown> } | undefined
+    jest.isolateModules(() => {
+      jest.doMock("react-native-config", () => config)
+      lookup = require("@app/utils/ip-country-lookup") // eslint-disable-line @typescript-eslint/no-var-requires
+    })
+    if (!lookup) throw new Error("ip-country-lookup did not load")
+    return lookup
+  }
 
   beforeEach(() => {
     warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
@@ -347,31 +371,32 @@ describe("no-key warning", () => {
 
   afterEach(() => {
     warnSpy.mockRestore()
+    jest.dontMock("react-native-config")
     jest.resetModules()
   })
 
-  it("warns on module load when no API keys are configured", () => {
-    jest.isolateModules(() => {
-      jest.mock("react-native-config", () => ({
-        GEO_IPIFY_API_KEY: "",
-        IPINFO_API_KEY: "",
-        PROXYCHECK_API_KEY: "",
-        IPAPI_API_KEY: "",
-      }))
-      require("@app/utils/ip-country-lookup") // eslint-disable-line @typescript-eslint/no-var-requires
-    })
-    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("No API key configured"))
+  it("does not warn on import, even with no API keys configured", () => {
+    loadLookup(NO_KEYS)
+
+    expect(warnSpy).not.toHaveBeenCalled()
   })
 
-  it("does not warn when at least one API key is configured", () => {
-    jest.isolateModules(() => {
-      jest.mock("react-native-config", () => ({
-        GEO_IPIFY_API_KEY: "test-key",
-        IPINFO_API_KEY: "",
-        IPAPI_API_KEY: "",
-      }))
-      require("@app/utils/ip-country-lookup") // eslint-disable-line @typescript-eslint/no-var-requires
-    })
+  it("warns once, at the first lookup, when no API keys are configured", async () => {
+    const lookup = loadLookup(NO_KEYS)
+
+    await lookup.resolveIpCountryCodeCached()
+    expect(warnSpy).toHaveBeenCalledTimes(1)
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("No API key configured"))
+
+    // A failed lookup is not cached, so this starts a new one; the warning must not repeat.
+    await lookup.resolveIpCountryCodeCached()
+    expect(warnSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it("does not warn when at least one API key is configured", async () => {
+    const lookup = loadLookup({ ...NO_KEYS, GEO_IPIFY_API_KEY: "test-key" })
+
+    await lookup.resolveIpCountryCodeCached()
     expect(warnSpy).not.toHaveBeenCalled()
   })
 })

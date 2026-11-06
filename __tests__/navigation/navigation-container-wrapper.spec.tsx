@@ -221,12 +221,6 @@ describe("isMigrationDeeplink", () => {
 })
 
 describe("the lock's synchronous read", () => {
-  /** onReady logs on the way past, and these tests mount the container to get the real
-   *  context. */
-  const consoleLogSpy = jest.spyOn(console, "log")
-  beforeAll(() => consoleLogSpy.mockImplementation(() => {}))
-  afterAll(() => consoleLogSpy.mockRestore())
-
   beforeEach(() => {
     jest.clearAllMocks()
     mockBlockerVisible = false
@@ -416,12 +410,6 @@ const renderWrapper = (children: React.ReactNode) =>
   render(<NavigationContainerWrapper>{children}</NavigationContainerWrapper>)
 
 describe("NavigationContainerWrapper boot splash", () => {
-  /** onReady logs on the way past, which would print a console block from every spec that
-   *  fires it. */
-  const consoleLogSpy = jest.spyOn(console, "log")
-  beforeAll(() => consoleLogSpy.mockImplementation(() => {}))
-  afterAll(() => consoleLogSpy.mockRestore())
-
   beforeEach(() => {
     jest.clearAllMocks()
     mockBlockerVisible = false
@@ -452,15 +440,6 @@ describe("NavigationContainerWrapper boot splash", () => {
 })
 
 describe("NavigationContainerWrapper armed-gate reset", () => {
-  /** onReady logs on the way past, which would print a console block from every spec that
-   *  fires it. The spy is made when the block runs, not when the file is collected: a
-   *  spy made at collection is the one the block before restores. */
-  let consoleLogSpy: jest.SpyInstance
-  beforeAll(() => {
-    consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {})
-  })
-  afterAll(() => consoleLogSpy.mockRestore())
-
   beforeEach(() => {
     jest.clearAllMocks()
     mockBlockerVisible = false
@@ -1010,12 +989,6 @@ const rerenderWrapper = (
   rendered.rerender(<NavigationContainerWrapper>{children}</NavigationContainerWrapper>)
 
 describe("NavigationContainerWrapper two-factor gate", () => {
-  let consoleLogSpy: jest.SpyInstance
-  beforeAll(() => {
-    consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {})
-  })
-  afterAll(() => consoleLogSpy.mockRestore())
-
   beforeEach(() => {
     jest.clearAllMocks()
     mockBlockerVisible = false

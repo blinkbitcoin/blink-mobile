@@ -74,6 +74,8 @@ describe("TrialAccountLimitsModal", () => {
           closeModal={closeModal}
           beforeSubmit={beforeSubmit}
         />,
+        // The modal queries its limits on mount; an unmocked query is an Apollo warning.
+        [accountLimitsMock(99900)],
       ),
     )
 
