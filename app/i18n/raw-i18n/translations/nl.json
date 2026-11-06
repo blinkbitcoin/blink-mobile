@@ -3047,7 +3047,9 @@
     "network": {
       "server": "Server Fout. Probeer het later opnieuw.",
       "request": "Vraag probleem aan.\nNeem contact op met de technische ondersteuning als het probleem zich blijft voordoen",
-      "connection": "Verbindingsprobleem.\nControleer uw internetverbinding"
+      "connection": "Verbindingsprobleem.\nControleer uw internetverbinding",
+      "statusCode": "Status code: {statusCode: number}",
+      "errorCode": "Error code: {errorCode: string}"
     },
     "unexpectedError": "Er is een onverwachte fout opgetreden",
     "restartApp": "Start de toepassing opnieuw.",

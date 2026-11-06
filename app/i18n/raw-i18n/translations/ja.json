@@ -3047,7 +3047,9 @@
         "network": {
             "server": "サーバー上でエラーが発生しました。時間をあけてもう一度トライしてみてください",
             "request": "リクエストに失敗しました。\n問題が解決しない場合は、サポートにお問い合わせください",
-            "connection": "接続に失敗しました。\nインターネット接続を確認してください"
+            "connection": "接続に失敗しました。\nインターネット接続を確認してください",
+            "statusCode": "Status code: {statusCode: number}",
+            "errorCode": "Error code: {errorCode: string}"
         },
         "unexpectedError": "予期しないエラーが発生しました",
         "restartApp": "アプリを再起動してください。",

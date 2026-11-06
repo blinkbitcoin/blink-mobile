@@ -3047,7 +3047,9 @@
     "network": {
       "server": "Server bermasalah. Sila cuba lagi",
       "request": "Laporkan isu ini\nHubungi pasukan sokongan jika masalah kekal terjadi ",
-      "connection": "Masalah perhubungan.\nPastikan sambungan internet anda ada"
+      "connection": "Masalah perhubungan.\nPastikan sambungan internet anda ada",
+      "statusCode": "Status code: {statusCode: number}",
+      "errorCode": "Error code: {errorCode: string}"
     },
     "unexpectedError": "Masalah yang tidak dijangka telah terjadi ",
     "restartApp": "Sila mula semula aplikasi ini",

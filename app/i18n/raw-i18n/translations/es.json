@@ -3047,7 +3047,9 @@
         "network": {
             "server": "Hubo un error en el servidor.\nPor favor intente más tarde",
             "request": "Hay un error en el requerimiento. Póngase en contacto con el soporte técnico si este problema persiste.",
-            "connection": "Error al conectar.\nVerifique su conexión a internet."
+            "connection": "Error al conectar.\nVerifique su conexión a internet.",
+            "statusCode": "Status code: {statusCode: number}",
+            "errorCode": "Error code: {errorCode: string}"
         },
         "unexpectedError": "Ocurrió un error inesperado",
         "restartApp": "Reinicie la aplicación.",

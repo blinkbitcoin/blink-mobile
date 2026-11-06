@@ -3047,7 +3047,9 @@
     "network": {
       "server": "Sunucu hatası. Lütfen sonra tekrar deneyin.",
       "request": "Sorun talep edin.\nSorun devam ederse desteğe başvurun",
-      "connection": "Bağlantı sorunu\nLütfen internet bağlantınızı kontrol edin."
+      "connection": "Bağlantı sorunu\nLütfen internet bağlantınızı kontrol edin.",
+      "statusCode": "Status code: {statusCode: number}",
+      "errorCode": "Error code: {errorCode: string}"
     },
     "unexpectedError": "Beklenmedik bir hata oluştu",
     "restartApp": "Lütfen aplikasyonu tekrar başlatın. ",

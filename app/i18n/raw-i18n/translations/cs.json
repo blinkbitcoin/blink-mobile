@@ -3047,7 +3047,9 @@
     "network": {
       "server": "Chyba serveru. Zkuste to prosím později",
       "request": "Problém s žádostí.\nPokud problém přetrvává, kontaktujte podporu",
-      "connection": "Problém s připojením.\nOvěřte si připojení k internetu"
+      "connection": "Problém s připojením.\nOvěřte si připojení k internetu",
+      "statusCode": "Status code: {statusCode: number}",
+      "errorCode": "Error code: {errorCode: string}"
     },
     "unexpectedError": "Vyskytla se neočekávaná chyba",
     "restartApp": "Restartujte aplikaci.",

@@ -3047,7 +3047,9 @@
     "network": {
       "server": "Szerverhiba. Kérjük, próbáld újra később",
       "request": "Kérési probléma.\nHa a probléma továbbra is fennáll, lépj kapcsolatba az ügyfélszolgálattal.",
-      "connection": "Kapcsolódási probléma.\nEllenőrizzd az internetkapcsolatodat"
+      "connection": "Kapcsolódási probléma.\nEllenőrizzd az internetkapcsolatodat",
+      "statusCode": "Status code: {statusCode: number}",
+      "errorCode": "Error code: {errorCode: string}"
     },
     "unexpectedError": "Váratlan hiba történt",
     "restartApp": "Kérjük, indítsd újra az alkalmazást.",

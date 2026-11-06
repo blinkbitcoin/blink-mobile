@@ -3047,7 +3047,9 @@
         "network": {
             "server": "Serverfehler. Bitte versuche es später erneut",
             "request": "Anfragefehler.\nBitte kontaktiere uns, wenn dieses Problem weiterhin besteht",
-            "connection": "Verbindungsfehler.\nStelle sicher, dass Du eine Internetverbindung hast"
+            "connection": "Verbindungsfehler.\nStelle sicher, dass Du eine Internetverbindung hast",
+            "statusCode": "Status code: {statusCode: number}",
+            "errorCode": "Error code: {errorCode: string}"
         },
         "unexpectedError": "Es trat ein unerwarteter Fehler auf",
         "restartApp": "Bitte starte die App neu.",
