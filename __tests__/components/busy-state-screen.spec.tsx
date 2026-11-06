@@ -1,9 +1,12 @@
 import React from "react"
-import { Text as RNText } from "react-native"
-import { act, render } from "@testing-library/react-native"
+import { BackHandler, Text as RNText } from "react-native"
+import { act, fireEvent, render } from "@testing-library/react-native"
 
 import { ThemeProvider } from "@rn-vui/themed"
 
+import TypesafeI18n from "@app/i18n/i18n-react"
+import { i18nObject } from "@app/i18n/i18n-util"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
 import theme from "@app/rne-theme/theme"
 
 // Not a wholesale stub: react-native-gesture-handler reaches into reanimated's
@@ -34,21 +37,38 @@ import {
   MIN_VISIBLE_MS,
   SIGNAL_MS,
   type BusyCompletion,
+  type BusyStateError,
 } from "@app/components/busy-state"
 
-const renderScreen = (completion: BusyCompletion, onDone: () => void) =>
-  render(
-    <ThemeProvider theme={theme}>
+loadLocale("en")
+const LL = i18nObject("en")
+
+const TITLE = "Your backup phrase is used to create your Nostr keys"
+const BODY = "Generating keys…"
+
+type Overrides = {
+  completion: BusyCompletion
+  onDone: () => void
+  body?: string
+  error?: BusyStateError
+}
+
+const screenFor = (overrides: Overrides) => (
+  <ThemeProvider theme={theme}>
+    <TypesafeI18n locale="en">
       <BusyStateScreen
-        from={{ icon: <RNText>from</RNText> }}
-        to={{ icon: <RNText>to</RNText> }}
-        heading="Your backup phrase is used to create your Nostr keys"
-        status="Generating keys…"
-        completion={completion}
-        onDone={onDone}
+        icon1={<RNText>icon1</RNText>}
+        icon2={<RNText>icon2</RNText>}
+        title={TITLE}
+        // An explicit `body: undefined` means "no body", not "the default".
+        body={"body" in overrides ? overrides.body : BODY}
+        completion={overrides.completion}
+        onDone={overrides.onDone}
+        error={overrides.error}
       />
-    </ThemeProvider>,
-  )
+    </TypesafeI18n>
+  </ThemeProvider>
+)
 
 const advance = (ms: number) =>
   act(() => {
@@ -64,16 +84,27 @@ describe("BusyStateScreen", () => {
     jest.useRealTimers()
   })
 
-  it("renders the heading and the status line", () => {
-    const { getByText } = renderScreen({ kind: "timed" }, jest.fn())
+  it("renders the title and the body", () => {
+    const { getByText } = render(
+      screenFor({ completion: { kind: "timed" }, onDone: jest.fn() }),
+    )
 
-    expect(getByText("Your backup phrase is used to create your Nostr keys")).toBeTruthy()
-    expect(getByText("Generating keys…")).toBeTruthy()
+    expect(getByText(TITLE)).toBeTruthy()
+    expect(getByText(BODY)).toBeTruthy()
+  })
+
+  it("renders the title alone when no body is given", () => {
+    const { getByText, queryByTestId } = render(
+      screenFor({ completion: { kind: "timed" }, onDone: jest.fn(), body: undefined }),
+    )
+
+    expect(getByText(TITLE)).toBeTruthy()
+    expect(queryByTestId("busy-state-body")).toBeNull()
   })
 
   it("holds a timed completion for the full signal duration", () => {
     const onDone = jest.fn()
-    renderScreen({ kind: "timed" }, onDone)
+    render(screenFor({ completion: { kind: "timed" }, onDone }))
 
     advance(SIGNAL_MS - 1)
     expect(onDone).not.toHaveBeenCalled()
@@ -84,7 +115,7 @@ describe("BusyStateScreen", () => {
 
   it("honours a shorter explicit hold but never goes below the floor", () => {
     const onDone = jest.fn()
-    renderScreen({ kind: "timed", durationMs: 10 }, onDone)
+    render(screenFor({ completion: { kind: "timed", durationMs: 10 }, onDone }))
 
     advance(MIN_VISIBLE_MS - 1)
     expect(onDone).not.toHaveBeenCalled()
@@ -95,7 +126,7 @@ describe("BusyStateScreen", () => {
 
   it("does not flash when the work is already finished at mount", () => {
     const onDone = jest.fn()
-    renderScreen({ kind: "pending", done: true }, onDone)
+    render(screenFor({ completion: { kind: "pending", done: true }, onDone }))
 
     advance(MIN_VISIBLE_MS - 1)
     expect(onDone).not.toHaveBeenCalled()
@@ -106,24 +137,15 @@ describe("BusyStateScreen", () => {
 
   it("waits for pending work that outlasts the floor", () => {
     const onDone = jest.fn()
-    const { rerender } = renderScreen({ kind: "pending", done: false }, onDone)
+    const { rerender } = render(
+      screenFor({ completion: { kind: "pending", done: false }, onDone }),
+    )
 
     advance(MIN_VISIBLE_MS + 5000)
     expect(onDone).not.toHaveBeenCalled()
 
     act(() => {
-      rerender(
-        <ThemeProvider theme={theme}>
-          <BusyStateScreen
-            from={{ icon: <RNText>from</RNText> }}
-            to={{ icon: <RNText>to</RNText> }}
-            heading="Your backup phrase is used to create your Nostr keys"
-            status="Generating keys…"
-            completion={{ kind: "pending", done: true }}
-            onDone={onDone}
-          />
-        </ThemeProvider>,
-      )
+      rerender(screenFor({ completion: { kind: "pending", done: true }, onDone }))
     })
 
     expect(onDone).toHaveBeenCalledTimes(1)
@@ -131,27 +153,134 @@ describe("BusyStateScreen", () => {
 
   it("calls onDone at most once", () => {
     const onDone = jest.fn()
-    const { rerender } = renderScreen({ kind: "pending", done: true }, onDone)
+    const { rerender } = render(
+      screenFor({ completion: { kind: "pending", done: true }, onDone }),
+    )
 
     advance(MIN_VISIBLE_MS)
     expect(onDone).toHaveBeenCalledTimes(1)
 
     act(() => {
-      rerender(
-        <ThemeProvider theme={theme}>
-          <BusyStateScreen
-            from={{ icon: <RNText>from</RNText> }}
-            to={{ icon: <RNText>to</RNText> }}
-            heading="Your backup phrase is used to create your Nostr keys"
-            status="Generating keys…"
-            completion={{ kind: "pending", done: true }}
-            onDone={onDone}
-          />
-        </ThemeProvider>,
-      )
+      rerender(screenFor({ completion: { kind: "pending", done: true }, onDone }))
     })
     advance(SIGNAL_MS)
 
     expect(onDone).toHaveBeenCalledTimes(1)
+  })
+
+  describe("error state", () => {
+    const failing = (error: BusyStateError) =>
+      screenFor({
+        completion: { kind: "pending", done: false },
+        onDone: jest.fn(),
+        error,
+      })
+
+    it("replaces the busy copy with the error title and body", () => {
+      const { getByText, queryByText } = render(
+        failing({ title: "Something went wrong", body: "No connection" }),
+      )
+
+      expect(getByText("Something went wrong")).toBeTruthy()
+      expect(getByText("No connection")).toBeTruthy()
+      expect(queryByText(TITLE)).toBeNull()
+    })
+
+    it("shows one button per handler, in the order Try Again, Back, Close", () => {
+      const { getAllByTestId, queryByTestId } = render(
+        failing({ title: "Failed", onRetry: jest.fn(), onClose: jest.fn() }),
+      )
+
+      const buttons = getAllByTestId(/^busy-state-(retry|back|close)$/)
+      expect(buttons.map((b) => b.props.testID)).toEqual([
+        "busy-state-retry",
+        "busy-state-close",
+      ])
+      expect(queryByTestId("busy-state-back")).toBeNull()
+    })
+
+    it("labels the buttons from the shared copy and calls their handlers", () => {
+      const onRetry = jest.fn()
+      const onBack = jest.fn()
+      const onClose = jest.fn()
+      const { getByText } = render(failing({ title: "Failed", onRetry, onBack, onClose }))
+
+      fireEvent.press(getByText(LL.common.tryAgain()))
+      fireEvent.press(getByText(LL.common.back()))
+      fireEvent.press(getByText(LL.common.close()))
+
+      expect(onRetry).toHaveBeenCalledTimes(1)
+      expect(onBack).toHaveBeenCalledTimes(1)
+      expect(onClose).toHaveBeenCalledTimes(1)
+    })
+
+    it("holds onDone back while the error shows", () => {
+      const onDone = jest.fn()
+      render(
+        screenFor({
+          completion: { kind: "pending", done: true },
+          onDone,
+          error: { title: "Failed", onBack: jest.fn() },
+        }),
+      )
+
+      advance(SIGNAL_MS)
+      expect(onDone).not.toHaveBeenCalled()
+    })
+
+    it("starts a fresh attempt, floor included, when the error clears", () => {
+      const onDone = jest.fn()
+      const { rerender } = render(
+        screenFor({
+          completion: { kind: "pending", done: false },
+          onDone,
+          error: { title: "Failed", onRetry: jest.fn() },
+        }),
+      )
+      advance(SIGNAL_MS)
+
+      act(() => {
+        rerender(screenFor({ completion: { kind: "pending", done: true }, onDone }))
+      })
+
+      advance(MIN_VISIBLE_MS - 1)
+      expect(onDone).not.toHaveBeenCalled()
+
+      advance(1)
+      expect(onDone).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe("Android hardware back", () => {
+    it("is swallowed while busy and routed to onBack on error", () => {
+      const listeners: Array<() => boolean | null | undefined> = []
+      jest
+        .spyOn(BackHandler, "addEventListener")
+        .mockImplementation((_event, handler) => {
+          listeners.push(handler)
+          return { remove: () => listeners.splice(listeners.indexOf(handler), 1) }
+        })
+
+      const onBack = jest.fn()
+      const { rerender } = render(
+        screenFor({ completion: { kind: "pending", done: false }, onDone: jest.fn() }),
+      )
+
+      expect(listeners[listeners.length - 1]()).toBe(true)
+      expect(onBack).not.toHaveBeenCalled()
+
+      act(() => {
+        rerender(
+          screenFor({
+            completion: { kind: "pending", done: false },
+            onDone: jest.fn(),
+            error: { title: "Failed", onBack },
+          }),
+        )
+      })
+
+      expect(listeners[listeners.length - 1]()).toBe(true)
+      expect(onBack).toHaveBeenCalledTimes(1)
+    })
   })
 })
