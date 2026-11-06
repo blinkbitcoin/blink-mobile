@@ -710,7 +710,9 @@ export const HomeScreen: React.FC = () => {
     if (!isCardQueryEnabled) return
     const cardRefetches: Promise<unknown>[] = [refetchCardData()]
     if (showCardRow) cardRefetches.push(refetchCardBalance())
-    await Promise.all(cardRefetches)
+    /** Settled rather than all: a failure already shows through the card hooks' error,
+     *  and must neither retract the spinner early nor cut the rest of the pull short. */
+    await Promise.allSettled(cardRefetches)
   }, [isCardQueryEnabled, showCardRow, refetchCardData, refetchCardBalance])
 
   const refetch = React.useCallback(async () => {
