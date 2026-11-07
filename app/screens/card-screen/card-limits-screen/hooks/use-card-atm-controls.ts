@@ -188,32 +188,29 @@ export const useCardAtmControls = (cardId: string) => {
     refetch().catch(() => undefined)
   }, [refetch])
 
+  /** A save that failed may still have landed, its answer lost on the way back, so the
+   *  controls are read again and the screen shows what the server holds. */
   const applyUpdate = useCallback(
     async <T>(
       mutate: () => Promise<FetchResult<T>>,
       failureMessage: string,
     ): Promise<boolean> => {
-      try {
-        const { data: result, errors } = await mutate()
-
-        if (errors) {
-          toastShow({ message: getErrorMessages(errors), LL })
-          return false
-        }
-
-        if (!result) {
-          toastShow({ message: failureMessage, LL })
-          return false
-        }
-
-        return true
-      } catch (err) {
-        const message = err instanceof Error ? err.message : failureMessage
+      const fail = (message: string) => {
         toastShow({ message, LL })
+        readControlsAgain()
         return false
       }
+
+      try {
+        const { data: result, errors } = await mutate()
+        if (errors) return fail(getErrorMessages(errors))
+        if (!result) return fail(failureMessage)
+        return true
+      } catch (err) {
+        return fail(err instanceof Error ? err.message : failureMessage)
+      }
     },
-    [LL],
+    [LL, readControlsAgain],
   )
 
   const saveAtmLimit = useCallback(

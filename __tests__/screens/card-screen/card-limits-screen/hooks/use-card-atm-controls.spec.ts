@@ -551,6 +551,29 @@ describe("useCardAtmControls", () => {
       expect(result.current.updatingAtmLimit).toBeNull()
     })
 
+    /** A lost answer is not proof the removal never landed: the controls are read again
+     *  so the screen shows what the server holds instead of the limit it had. */
+    it("reads the controls again after a save that failed", async () => {
+      mockLimitRemove.mockRejectedValue(new Error("Network request failed"))
+      const { result } = renderHook(() => useCardAtmControls("card-1"))
+
+      await act(async () => {
+        await result.current.handleUpdateAtmMonthlyLimit("")
+      })
+
+      expect(mockRefetch).toHaveBeenCalledTimes(1)
+    })
+
+    it("reads nothing again after a save that worked", async () => {
+      const { result } = renderHook(() => useCardAtmControls("card-1"))
+
+      await act(async () => {
+        await result.current.handleUpdateAtmDailyLimit("300")
+      })
+
+      expect(mockRefetch).not.toHaveBeenCalled()
+    })
+
     it("falls back to a generic message for a failure without one", async () => {
       mockLimitSet.mockRejectedValue("offline")
       const { result } = renderHook(() => useCardAtmControls("card-1"))
@@ -616,6 +639,7 @@ describe("useCardAtmControls", () => {
       expect(mockToastShow).toHaveBeenCalledWith(
         expect.objectContaining({ message: "Network failure" }),
       )
+      expect(mockRefetch).toHaveBeenCalledTimes(1)
     })
 
     it("reports a failed switch when the server sends nothing back", async () => {
