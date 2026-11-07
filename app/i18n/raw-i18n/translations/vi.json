@@ -2482,7 +2482,6 @@
     "darkDefault": "Mode: dark, (Default).",
     "lightDefault": "Mode: light, (Default).",
     "csvTransactionsError": "Không thể xuất các giao dịch sang CSV. Có lỗi xảy ra. Nếu vấn đề vẫn tiếp diễn xin vui lòng liên hệ với bộ phận hỗ trợ.",
-    "csvTransactionsSaved": "Đã lưu giao dịch vào thư mục Tải xuống.",
     "lnurlNoUsername": "Để tạo địa chỉ LNURL, trước tiên bạn phải đặt tên người dùng. Bạn có muốn đặt tên người dùng ngay bây giờ không?",
     "copyClipboardLnurl": "Địa chỉ LNURL đã được sao chép trong bộ nhớ tạm",
     "defaultWallet": "Nhận mặc định",

@@ -2482,7 +2482,6 @@
         "darkDefault": "Bildschirm: abgedunkelt, (Standard).",
         "lightDefault": "Bildschirm: hell, (Standard).",
         "csvTransactionsError": "Die Transaktionen konnten nicht als CSV exportiert werden. Etwas ging schief. Wenn es weiterhin nicht funktioniert, kontaktiere uns.",
-        "csvTransactionsSaved": "Transaktionen wurden in deinem Downloads-Ordner gespeichert.",
         "lnurlNoUsername": "Um eine LNURL Adresse zu generieren, gib zuerst einen Benutzernamen an. Möchtest Du jetzt einen Benutzernamen festlegen?",
         "copyClipboardLnurl": "LNURL Adresse wurde in die Zwischenablage kopiert",
         "defaultWallet": "Standard-Empfang",

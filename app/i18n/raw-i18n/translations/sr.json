@@ -2482,7 +2482,6 @@
     "darkDefault": "Режим: таман, (Подразумевано).",
     "lightDefault": "Режим: светао, (Подразумевано).",
     "csvTransactionsError": "Није могуће извести трансакције у „csv“ формату. Дошло је до грешке. Ако проблем потраје, контактирајте подршку.",
-    "csvTransactionsSaved": "Transakcije su sačuvane u fascikli Preuzimanja.",
     "lnurlNoUsername": "Да бисте генерисали „lnurl“ адресу, прво морате поставити корисничко име. Желите ли сада да поставите корисничко име?",
     "copyClipboardLnurl": "„Lnurl“ адреса је копирана у клипборд",
     "defaultWallet": "Подразумевани пријем",

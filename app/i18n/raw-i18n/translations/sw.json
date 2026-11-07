@@ -2482,7 +2482,6 @@
     "darkDefault": "Njia: giza, (Chaguo msingi).",
     "lightDefault": "Njia: mwanga, (Chaguo msingi).",
     "csvTransactionsError": "Haikuweza kupeleka malipo kwenye csv. Kitu kilienda mrama. Ikiwa tatizo hili litaendelea tafadhali wasiliana na usaidizi. ",
-    "csvTransactionsSaved": "Miamala imehifadhiwa kwenye folda yako ya Vipakuliwa.",
     "lnurlNoUsername": "Ukitaka kuunda anwani ya lnurl, lazima kwanza uandikishe jina la mtumiaji. Unataka kuandikisha jina la mtumiaji saa hii?",
     "copyClipboardLnurl": "Anwani ya lnurl imenakiliwa kwenye ubao wa kunakili",
     "defaultWallet": "Pokea chaguo-msingi",

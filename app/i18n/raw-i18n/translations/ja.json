@@ -2482,7 +2482,6 @@
         "darkDefault": "モード：ダーク（デフォルト）",
         "lightDefault": "モード：ライト（デフォルト）",
         "csvTransactionsError": "エラーが発生しました。トランザクションをCSVにエクスポートできません。問題が解決しない場合は、サポートにお問い合わせください。",
-        "csvTransactionsSaved": "取引履歴をダウンロードフォルダに保存しました。",
         "lnurlNoUsername": "lnurlアドレスを発行するには、まずはユーザー名を設定する必要があります。 今すぐユーザー名を設定しますか？",
         "copyClipboardLnurl": "Lnurlアドレスがクリップボードにコピーされました",
         "defaultWallet": "デフォルトの受取",

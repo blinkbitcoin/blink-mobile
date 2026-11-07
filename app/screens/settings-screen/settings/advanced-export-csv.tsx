@@ -6,22 +6,13 @@ import { getWalletIds } from "@app/graphql/wallets-utils"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useExportTransactionsCsv } from "@app/custodial/hooks/use-export-transactions-csv"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { useExportSelfCustodialTransactionsCsv } from "@app/self-custodial/hooks/use-export-transactions-csv"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountType } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
-import { CsvExportOutcome } from "@app/utils/export-csv-file"
 import { toastShow } from "@app/utils/toast"
 
 import { SettingsRow } from "../row"
-
-/** A download lands silently in the Downloads folder, so it needs a word to say so; the
- *  share sheet is its own confirmation. */
-const toastSavedExport = (outcome: CsvExportOutcome, LL: TranslationFunctions) => {
-  if (outcome !== "saved") return
-  toastShow({ message: LL.SettingsScreen.csvTransactionsSaved(), type: "success", LL })
-}
 
 export const ExportCsvSetting: React.FC = () => {
   const { activeAccount } = useAccountRegistry()
@@ -43,7 +34,7 @@ const CustodialExportCsvRow: React.FC = () => {
 
   const handleExportCsv = async () => {
     try {
-      toastSavedExport(await exportCsv(walletIds), LL)
+      await exportCsv(walletIds)
     } catch (err: unknown) {
       reportError("export-csv", err)
       toastShow({ message: LL.SettingsScreen.csvTransactionsError(), LL })
@@ -73,7 +64,7 @@ const SelfCustodialExportCsvRow: React.FC = () => {
 
   const handleExportCsv = async () => {
     try {
-      toastSavedExport(await exportCsv(), LL)
+      await exportCsv()
     } catch (err: unknown) {
       reportError("self-custodial-export-csv", err)
       toastShow({ message: LL.SettingsScreen.csvTransactionsError(), LL })

@@ -2482,7 +2482,6 @@
     "darkDefault": "Mode: gelap, (Default).",
     "lightDefault": "Mode: terang, (Default).",
     "csvTransactionsError": "Tidak dapat mengekspor transaksi ke CSV. Terjadi kesalahan. Jika masalah berlanjut, silakan hubungi dukungan.",
-    "csvTransactionsSaved": "Transaksi disimpan ke folder Unduhan.",
     "lnurlNoUsername": "Untuk membuat alamat lnurl, Anda harus mengatur nama pengguna terlebih dahulu. Apakah Anda ingin mengatur nama pengguna sekarang?",
     "copyClipboardLnurl": "Alamat Lnurl telah disalin ke papan klip",
     "defaultWallet": "Penerimaan default",

@@ -2482,7 +2482,6 @@
     "darkDefault": "Način rada: tamno, (zadano).",
     "lightDefault": "Način rada: svjetlo, (zadano).",
     "csvTransactionsError": "Nije moguće izvesti transakcije u csv. Nešto je pošlo po zlu. Ako se problem nastavi, kontaktirajte podršku.",
-    "csvTransactionsSaved": "Transakcije su spremljene u mapu Preuzimanja.",
     "lnurlNoUsername": "Za generiranje lnurl adrese prvo morate postaviti korisničko ime. Želite li sada postaviti korisničko ime?",
     "copyClipboardLnurl": "Lnurl adresa je kopirana u međuspremnik",
     "defaultWallet": "Zadano primanje",

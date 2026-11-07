@@ -2482,7 +2482,6 @@
         "darkDefault": "Mode : sombre, (par défaut).",
         "lightDefault": "Mode : clair, (par défaut).",
         "csvTransactionsError": "Impossible d’exporter les transactions vers un fichier CSV. Une erreur s’est produite. Si le problème persiste, veuillez contacter le support technique.",
-        "csvTransactionsSaved": "Transactions enregistrées dans votre dossier Téléchargements.",
         "lnurlNoUsername": "Pour générer une adresse lnurl, vous devez d’abord définir un identifiant. Voulez-vous en définir un maintenant ?",
         "copyClipboardLnurl": "L'adresse lnurl a été copiée dans le presse-papiers",
         "defaultWallet": "Réception par défaut",

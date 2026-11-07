@@ -2482,7 +2482,6 @@
     "darkDefault": "Isimo: kumnyama, (Okuhlala kukho).",
     "lightDefault": "Isimo: ukukhanya, (Okuhlala kukho).",
     "csvTransactionsError": "Ayikwazanga ukuthumela ngaphandle intengiselwano kwi-csv. Into ayihamba kakuhle. Ukuba umcimbi uyaqhubeka ufuna uncedo olupheleleyo.",
-    "csvTransactionsSaved": "Iintengiselwano zigcinwe kwifolda yakho yeDownloads.",
     "lnurlNoUsername": "Ukwenza idilesi ye-lnurl kufuneka uqale usete igama lomsebenzisi. Ngaba ufuna ukuseta igama lokusebenzisa ngoku?",
     "copyClipboardLnurl": "Idilesi ye-Lnurl ikotshwe kwiKlipbhodi.",
     "defaultWallet": "Receive to",
