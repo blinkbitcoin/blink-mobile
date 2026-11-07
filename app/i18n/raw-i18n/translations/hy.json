@@ -2537,18 +2537,20 @@
         "description": "Զգուշացումներ Bitcoin-ի գնի մասին։"
       }
     },
-    "inApp": "Հավելվածում",
+    "splashGroup": "Մուտքային գործարքի էկրան",
     "incomingTransactionSplash": "Մուտքային գործարքի էկրան",
-    "splashMinimum": "Նվազագույն գումար (sats)"
+    "splashMinimum": "Նվազագույն գումար (SAT)"
   },
   "IncomingTransactionSplash": {
     "youReceived": "Դուք ստացել եք",
     "note": "Նշում",
-    "dontShowAgain": "Այլևս չցուցադրել այս էկրանը։",
+    "dontShowAgain": "Այլևս չցուցադրել",
     "details": "Մանրամասներ",
     "announcement": "Ստացվել է {amount}",
     "tapToShow": "Սեղմեք՝ ցուցադրելու համար",
-    "announcementHidden": "Վճարումը ստացվել է"
+    "announcementHidden": "Վճարումը ստացվել է",
+    "toastOn": "Ծանուցման էկրանը միացված է",
+    "toastOff": "Ծանուցման էկրանն անջատված է"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Ձեր հաշվին $5-ից ավելի միջոցներ կան",

@@ -2537,18 +2537,20 @@
         "description": "Notifikationer om Bitcoin-prisen."
       }
     },
-    "inApp": "I appen",
+    "splashGroup": "Skærm for indgående transaktion",
     "incomingTransactionSplash": "Skærm for indgående transaktion",
-    "splashMinimum": "Minimumsbeløb (sats)"
+    "splashMinimum": "Minimumsbeløb (SAT)"
   },
   "IncomingTransactionSplash": {
     "youReceived": "Du har modtaget",
     "note": "Note",
-    "dontShowAgain": "Vis ikke denne skærm igen.",
+    "dontShowAgain": "Vis ikke dette igen",
     "details": "Detaljer",
     "announcement": "Modtaget {amount}",
     "tapToShow": "Tryk for at vise",
-    "announcementHidden": "Betaling modtaget"
+    "announcementHidden": "Betaling modtaget",
+    "toastOn": "Splash-skærm er slået til",
+    "toastOff": "Splash-skærm er slået fra"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Din konto har mere end $5",

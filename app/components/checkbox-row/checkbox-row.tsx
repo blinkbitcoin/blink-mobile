@@ -16,6 +16,8 @@ type CheckboxRowProps = {
   color?: string
   /** The tick's colour on a `color` fill. Defaults to white. */
   checkColor?: string
+  /** Keeps the label on one line. Translations are written to fit; this is the guard. */
+  singleLine?: boolean
 }
 
 export const CheckboxRow: React.FC<CheckboxRowProps> = ({
@@ -27,6 +29,7 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
   testID,
   color,
   checkColor,
+  singleLine,
 }) => {
   const styles = useStyles()
   const {
@@ -58,8 +61,11 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
         style={[
           styles.label,
           centered && styles.labelCentered,
+          singleLine && styles.labelSingleLine,
           color ? { color } : undefined,
         ]}
+        numberOfLines={singleLine ? 1 : undefined}
+        adjustsFontSizeToFit={singleLine}
       >
         {label}
       </Text>
@@ -99,6 +105,9 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   labelCentered: {
     flex: 0,
+  },
+  labelSingleLine: {
+    flexShrink: 1,
   },
   disabled: {
     opacity: 0.5,

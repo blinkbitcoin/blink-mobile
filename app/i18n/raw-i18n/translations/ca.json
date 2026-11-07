@@ -2537,18 +2537,20 @@
         "description": "Notificacions sobre el preu de Bitcoin."
       }
     },
-    "inApp": "A l'app",
+    "splashGroup": "Pantalla de transacció entrant",
     "incomingTransactionSplash": "Pantalla de transacció entrant",
-    "splashMinimum": "Import mínim (sats)"
+    "splashMinimum": "Import mínim (SAT)"
   },
   "IncomingTransactionSplash": {
     "youReceived": "Has rebut",
     "note": "Nota",
-    "dontShowAgain": "No tornis a mostrar aquesta pantalla.",
+    "dontShowAgain": "No ho tornis a mostrar",
     "details": "Detalls",
     "announcement": "Rebut {amount}",
     "tapToShow": "Prem per mostrar",
-    "announcementHidden": "Pagament rebut"
+    "announcementHidden": "Pagament rebut",
+    "toastOn": "Pantalla d'avís activada",
+    "toastOff": "Pantalla d'avís desactivada"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "El teu compte té més de 5$",

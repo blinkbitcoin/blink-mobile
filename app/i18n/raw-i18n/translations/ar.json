@@ -2537,18 +2537,20 @@
         "description": "إشعارات حول سعر Bitcoin."
       }
     },
-    "inApp": "داخل التطبيق",
+    "splashGroup": "شاشة المعاملة الواردة",
     "incomingTransactionSplash": "شاشة المعاملة الواردة",
-    "splashMinimum": "الحد الأدنى (ساتس)"
+    "splashMinimum": "الحد الأدنى (SAT)"
   },
   "IncomingTransactionSplash": {
     "youReceived": "استلمت",
     "note": "ملاحظة",
-    "dontShowAgain": "لا تُظهر هذه الشاشة مرة أخرى.",
+    "dontShowAgain": "لا تُظهر هذا مرة أخرى",
     "details": "التفاصيل",
     "announcement": "تم استلام {amount}",
     "tapToShow": "انقر للعرض",
-    "announcementHidden": "تم استلام دفعة"
+    "announcementHidden": "تم استلام دفعة",
+    "toastOn": "شاشة الإشعار مفعّلة",
+    "toastOff": "شاشة الإشعار معطّلة"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "حسابك يحتوي على أكثر من 5$",

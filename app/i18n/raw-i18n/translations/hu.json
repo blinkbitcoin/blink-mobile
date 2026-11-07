@@ -2537,18 +2537,20 @@
         "description": "Értesítések a Bitcoin áráról."
       }
     },
-    "inApp": "Az alkalmazásban",
+    "splashGroup": "Bejövő tranzakció képernyője",
     "incomingTransactionSplash": "Bejövő tranzakció képernyője",
-    "splashMinimum": "Minimum összeg (sats)"
+    "splashMinimum": "Minimum összeg (SAT)"
   },
   "IncomingTransactionSplash": {
     "youReceived": "Kaptál",
     "note": "Megjegyzés",
-    "dontShowAgain": "Ne mutasd többé ezt a képernyőt.",
+    "dontShowAgain": "Ne mutasd többé",
     "details": "Részletek",
     "announcement": "Beérkezett {amount}",
     "tapToShow": "Koppints a megjelenítéshez",
-    "announcementHidden": "Fizetés beérkezett"
+    "announcementHidden": "Fizetés beérkezett",
+    "toastOn": "Értesítő képernyő bekapcsolva",
+    "toastOff": "Értesítő képernyő kikapcsolva"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "A számládon több mint 5 dollár van",

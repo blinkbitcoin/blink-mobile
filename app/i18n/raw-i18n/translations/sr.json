@@ -2537,18 +2537,20 @@
         "description": "Обавештења о цени Bitcoin-а."
       }
     },
-    "inApp": "U aplikaciji",
+    "splashGroup": "Ekran dolazne transakcije",
     "incomingTransactionSplash": "Ekran dolazne transakcije",
-    "splashMinimum": "Najmanji iznos (sats)"
+    "splashMinimum": "Najmanji iznos (SAT)"
   },
   "IncomingTransactionSplash": {
     "youReceived": "Primili ste",
     "note": "Beleška",
-    "dontShowAgain": "Ne prikazuj više ovaj ekran.",
+    "dontShowAgain": "Ne prikazuj više",
     "details": "Detalji",
     "announcement": "Primljeno {amount}",
     "tapToShow": "Dodirni za prikaz",
-    "announcementHidden": "Uplata primljena"
+    "announcementHidden": "Uplata primljena",
+    "toastOn": "Ekran obaveštenja je uključen",
+    "toastOff": "Ekran obaveštenja je isključen"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Ваш налог има више од $5",

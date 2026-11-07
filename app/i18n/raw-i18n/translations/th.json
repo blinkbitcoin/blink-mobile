@@ -2537,18 +2537,20 @@
         "description": "การแจ้งเตือนเกี่ยวกับราคา Bitcoin"
       }
     },
-    "inApp": "ในแอป",
+    "splashGroup": "หน้าจอแจ้งรายการเงินเข้า",
     "incomingTransactionSplash": "หน้าจอแจ้งรายการเงินเข้า",
-    "splashMinimum": "จำนวนขั้นต่ำ (sats)"
+    "splashMinimum": "จำนวนขั้นต่ำ (SAT)"
   },
   "IncomingTransactionSplash": {
     "youReceived": "คุณได้รับ",
     "note": "บันทึก",
-    "dontShowAgain": "ไม่ต้องแสดงหน้านี้ อีก",
+    "dontShowAgain": "ไม่ต้องแสดงอีก",
     "details": "รายละเอียด",
     "announcement": "ได้รับ {amount}",
     "tapToShow": "แตะเพื่อแสดง",
-    "announcementHidden": "ได้รับเงินแล้ว"
+    "announcementHidden": "ได้รับเงินแล้ว",
+    "toastOn": "เปิดหน้าจอแจ้งเงินเข้าแล้ว",
+    "toastOff": "ปิดหน้าจอแจ้งเงินเข้าแล้ว"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "บัญชีของคุณมีมากกว่า $5",

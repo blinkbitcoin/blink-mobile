@@ -2537,18 +2537,20 @@
                 "description": "Bitcoinの価格に関する通知"
             }
         },
-        "inApp": "アプリ内",
+        "splashGroup": "入金時の全画面表示",
         "incomingTransactionSplash": "入金時の全画面表示",
-        "splashMinimum": "最低金額（sats）"
+        "splashMinimum": "最低金額（SAT）"
     },
     "IncomingTransactionSplash": {
         "youReceived": "受け取りました",
         "note": "メモ",
-        "dontShowAgain": "この画面を今後表示しない。",
+        "dontShowAgain": "今後表示しない",
         "details": "詳細",
         "announcement": "受取 {amount}",
         "tapToShow": "タップして表示",
-        "announcementHidden": "入金がありました"
+        "announcementHidden": "入金がありました",
+        "toastOn": "全画面表示をオンにしました",
+        "toastOff": "全画面表示をオフにしました"
     },
     "AccountScreen": {
         "fundsMoreThan5Dollars": "アカウントの残高が$5を超えています",

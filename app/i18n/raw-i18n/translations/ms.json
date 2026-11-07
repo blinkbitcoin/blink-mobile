@@ -2537,18 +2537,20 @@
         "description": "Notifikasi tentang harga Bitcoin."
       }
     },
-    "inApp": "Dalam apl",
+    "splashGroup": "Skrin transaksi masuk",
     "incomingTransactionSplash": "Skrin transaksi masuk",
-    "splashMinimum": "Amaun minimum (sats)"
+    "splashMinimum": "Amaun minimum (SAT)"
   },
   "IncomingTransactionSplash": {
     "youReceived": "Anda menerima",
     "note": "Nota",
-    "dontShowAgain": "Jangan tunjukkan skrin ini lagi.",
+    "dontShowAgain": "Jangan tunjukkan lagi",
     "details": "Butiran",
     "announcement": "Diterima {amount}",
     "tapToShow": "Tekan untuk tunjuk",
-    "announcementHidden": "Bayaran diterima"
+    "announcementHidden": "Bayaran diterima",
+    "toastOn": "Skrin pemberitahuan dihidupkan",
+    "toastOff": "Skrin pemberitahuan dimatikan"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Akaun anda mempunyai lebih daripada $5",
