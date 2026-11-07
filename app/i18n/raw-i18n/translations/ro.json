@@ -3248,7 +3248,8 @@
       "limitUpdateSuccess": "Limita a fost actualizată cu succes",
       "limitUpdateError": "Nu s-a putut actualiza limita",
       "limitMustBePositive": "Limita trebuie să fie mai mare decât zero",
-      "atmToggleError": "Nu s-au putut actualiza retragerile ATM"
+      "atmToggleError": "Nu s-au putut actualiza retragerile ATM",
+      "invalidLimitAmount": "Introdu o sumă validă cu cel mult 2 zecimale"
     },
     "CardFeeSchedule": {
       "title": "Grila de taxe a cardului Blink",

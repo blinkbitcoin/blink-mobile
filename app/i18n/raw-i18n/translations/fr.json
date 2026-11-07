@@ -3332,7 +3332,8 @@
             "limitUpdateSuccess": "Limite mise à jour avec succès",
             "limitUpdateError": "Échec de la mise à jour de la limite",
             "limitMustBePositive": "La limite doit être supérieure à zéro",
-            "atmToggleError": "Échec de la mise à jour des retraits DAB"
+            "atmToggleError": "Échec de la mise à jour des retraits DAB",
+            "invalidLimitAmount": "Saisissez un montant valide avec 2 décimales au maximum"
         },
         "CardStatements": {
             "title": "Mouvements",

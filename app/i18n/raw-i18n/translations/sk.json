@@ -3248,7 +3248,8 @@
       "limitUpdateSuccess": "Limit bol úspešne aktualizovaný",
       "limitUpdateError": "Nepodarilo sa aktualizovať limit",
       "limitMustBePositive": "Limit musí byť väčší ako nula",
-      "atmToggleError": "Nepodarilo sa aktualizovať výbery z bankomatu"
+      "atmToggleError": "Nepodarilo sa aktualizovať výbery z bankomatu",
+      "invalidLimitAmount": "Zadajte platnú sumu s najviac 2 desatinnými miestami"
     },
     "CardFeeSchedule": {
       "title": "Sadzobník poplatkov karty Blink",

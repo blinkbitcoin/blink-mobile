@@ -3248,7 +3248,8 @@
       "limitUpdateSuccess": "Cập nhật giới hạn thành công",
       "limitUpdateError": "Không thể cập nhật giới hạn",
       "limitMustBePositive": "Giới hạn phải lớn hơn không",
-      "atmToggleError": "Không thể cập nhật rút ATM"
+      "atmToggleError": "Không thể cập nhật rút ATM",
+      "invalidLimitAmount": "Nhập số tiền hợp lệ, tối đa 2 chữ số thập phân"
     },
     "CardFeeSchedule": {
       "title": "Biểu phí Thẻ Blink",

@@ -3248,7 +3248,8 @@
       "limitUpdateSuccess": "Το όριο ενημερώθηκε επιτυχώς",
       "limitUpdateError": "Αποτυχία ενημέρωσης ορίου",
       "limitMustBePositive": "Το όριο πρέπει να είναι μεγαλύτερο από μηδέν",
-      "atmToggleError": "Αποτυχία ενημέρωσης αναλήψεων ATM"
+      "atmToggleError": "Αποτυχία ενημέρωσης αναλήψεων ATM",
+      "invalidLimitAmount": "Εισάγετε ένα έγκυρο ποσό με έως 2 δεκαδικά"
     },
     "CardFeeSchedule": {
       "title": "Πρόγραμμα χρεώσεων κάρτας Blink",

@@ -3248,7 +3248,8 @@
       "limitUpdateSuccess": "Limiet succesvol bijgewerkt",
       "limitUpdateError": "Limiet bijwerken mislukt",
       "limitMustBePositive": "Limiet moet groter zijn dan nul",
-      "atmToggleError": "Geldautomaatopnames bijwerken mislukt"
+      "atmToggleError": "Geldautomaatopnames bijwerken mislukt",
+      "invalidLimitAmount": "Voer een geldig bedrag in met maximaal 2 decimalen"
     },
     "CardFeeSchedule": {
       "title": "Blink Card-tariefoverzicht",

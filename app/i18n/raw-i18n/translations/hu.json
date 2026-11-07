@@ -3248,7 +3248,8 @@
       "limitUpdateSuccess": "Korlát sikeresen frissítve",
       "limitUpdateError": "Nem sikerült frissíteni a korlátot",
       "limitMustBePositive": "A korlátnak nullánál nagyobbnak kell lennie",
-      "atmToggleError": "Nem sikerült frissíteni az ATM felvételeket"
+      "atmToggleError": "Nem sikerült frissíteni az ATM felvételeket",
+      "invalidLimitAmount": "Adj meg egy érvényes összeget legfeljebb 2 tizedesjeggyel"
     },
     "CardFeeSchedule": {
       "title": "Blink kártya díjszabása",

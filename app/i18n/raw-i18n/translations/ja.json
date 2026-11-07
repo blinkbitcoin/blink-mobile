@@ -3332,7 +3332,8 @@
             "limitUpdateSuccess": "制限が正常に更新されました",
             "limitUpdateError": "制限の更新に失敗しました",
             "limitMustBePositive": "制限はゼロより大きい必要があります",
-            "atmToggleError": "ATM引き出しの更新に失敗しました"
+            "atmToggleError": "ATM引き出しの更新に失敗しました",
+            "invalidLimitAmount": "小数点以下2桁までの有効な金額を入力してください"
         },
         "CardStatements": {
             "title": "明細",

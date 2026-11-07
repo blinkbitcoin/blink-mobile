@@ -3332,7 +3332,8 @@
             "limitUpdateSuccess": "Límite actualizado correctamente",
             "limitUpdateError": "No se pudo actualizar el límite",
             "limitMustBePositive": "El límite debe ser mayor que cero",
-            "atmToggleError": "No se pudieron actualizar los retiros en cajero"
+            "atmToggleError": "No se pudieron actualizar los retiros en cajero",
+            "invalidLimitAmount": "Ingresa un monto válido con hasta 2 decimales"
         },
         "CardStatements": {
             "title": "Movimientos",

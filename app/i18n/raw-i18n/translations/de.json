@@ -3332,7 +3332,8 @@
             "limitUpdateSuccess": "Limit erfolgreich aktualisiert",
             "limitUpdateError": "Limit konnte nicht aktualisiert werden",
             "limitMustBePositive": "Das Limit muss größer als null sein",
-            "atmToggleError": "Geldautomaten-Abhebungen konnten nicht aktualisiert werden"
+            "atmToggleError": "Geldautomaten-Abhebungen konnten nicht aktualisiert werden",
+            "invalidLimitAmount": "Gib einen gültigen Betrag mit höchstens 2 Nachkommastellen ein"
         },
         "CardStatements": {
             "title": "Umsätze",

@@ -50,6 +50,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
           limitUpdateSuccess: () => "Limit updated successfully",
           limitUpdateError: () => "Failed to update limit",
           atmToggleError: () => "Failed to update ATM withdrawals",
+          invalidLimitAmount: () => "Enter a valid amount with up to 2 decimals",
         },
       },
     },
@@ -358,7 +359,7 @@ describe("useCardAtmControls", () => {
       expect(mockToastShow).not.toHaveBeenCalled()
     })
 
-    it.each(["0", "-20", "abc"])("refuses %s as a limit", async (dollars) => {
+    it.each(["0", "0.00"])("refuses %s as a limit", async (dollars) => {
       const { result } = renderHook(() => useCardAtmControls("card-1"))
 
       await act(async () => {
@@ -369,6 +370,42 @@ describe("useCardAtmControls", () => {
       expect(mockToastShow).toHaveBeenCalledWith(
         expect.objectContaining({ message: "Limit must be greater than zero" }),
       )
+    })
+
+    it.each([
+      ["a numeric prefix", "100abc"],
+      ["letters", "abc"],
+      ["a sign", "-20"],
+      ["a repeated separator", "100..50"],
+      ["more than two decimals", "100.505"],
+      ["an amount beyond what the API takes", "21474836.48"],
+    ])("saves nothing for %s and says why", async (_case, dollars) => {
+      const { result } = renderHook(() => useCardAtmControls("card-1"))
+
+      await act(async () => {
+        await result.current.handleUpdateAtmDailyLimit(dollars)
+      })
+
+      expect(mockLimitSet).not.toHaveBeenCalled()
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: "Enter a valid amount with up to 2 decimals",
+        }),
+      )
+    })
+
+    it("takes a comma as the decimal separator", async () => {
+      const { result } = renderHook(() => useCardAtmControls("card-1"))
+
+      await act(async () => {
+        await result.current.handleUpdateAtmDailyLimit("350,50")
+      })
+
+      expect(mockLimitSet).toHaveBeenCalledWith({
+        variables: {
+          input: expect.objectContaining({ limitCents: 35050 }),
+        },
+      })
     })
 
     it("marks the period as saving until the server answers", async () => {

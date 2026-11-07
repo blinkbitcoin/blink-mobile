@@ -14,7 +14,7 @@ import {
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { toMinorUnit } from "@app/utils/helper"
+import { parseDollarsToCents } from "@app/utils/helper"
 import { toastShow } from "@app/utils/toast"
 
 gql`
@@ -232,7 +232,11 @@ export const useCardAtmControls = (cardId: string) => {
         return
       }
 
-      const limitCents = toMinorUnit(dollars)
+      const limitCents = parseDollarsToCents(dollars)
+      if (limitCents === null) {
+        toastShow({ message: LL.CardFlow.CardLimits.invalidLimitAmount(), LL })
+        return
+      }
       if (limitCents === currentLimitCents) return
 
       const isPositive = limitCents > 0

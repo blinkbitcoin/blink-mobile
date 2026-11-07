@@ -3494,6 +3494,7 @@ const en: BaseTranslation = {
       limitUpdateError: "Failed to update limit",
       limitMustBePositive: "Limit must be greater than zero",
       atmToggleError: "Failed to update ATM withdrawals",
+      invalidLimitAmount: "Enter a valid amount with up to 2 decimals",
       transactionTypesTitle: "Transaction types",
       TransactionTypes: {
         ecommerce: "Online purchases",

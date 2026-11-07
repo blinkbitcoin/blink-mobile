@@ -3248,7 +3248,8 @@
       "limitUpdateSuccess": "Límit actualitzat correctament",
       "limitUpdateError": "No s'ha pogut actualitzar el límit",
       "limitMustBePositive": "El límit ha de ser superior a zero",
-      "atmToggleError": "No s'han pogut actualitzar les retirades al caixer"
+      "atmToggleError": "No s'han pogut actualitzar les retirades al caixer",
+      "invalidLimitAmount": "Introdueix un import vàlid amb 2 decimals com a màxim"
     },
     "CardFeeSchedule": {
       "title": "Programa de tarifes de la targeta Blink",

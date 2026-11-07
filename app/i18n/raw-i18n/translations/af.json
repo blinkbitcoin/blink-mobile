@@ -3248,7 +3248,8 @@
       "limitUpdateSuccess": "Limiet suksesvol opgedateer",
       "limitUpdateError": "Kon limiet nie opdateer nie",
       "limitMustBePositive": "Limiet moet groter as nul wees",
-      "atmToggleError": "Kon OTM-onttrekkings nie opdateer nie"
+      "atmToggleError": "Kon OTM-onttrekkings nie opdateer nie",
+      "invalidLimitAmount": "Voer 'n geldige bedrag in met hoogstens 2 desimale"
     },
     "CardFeeSchedule": {
       "title": "Blink-kaart fooiskedule",
