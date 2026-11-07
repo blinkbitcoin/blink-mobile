@@ -19,6 +19,9 @@ export const MigrationRejectionCode = {
   OperationRestricted: "OPERATION_RESTRICTED",
   /** A stale proof and a bad destination share this code; the clock skew tells them apart. */
   InvalidDestination: "MIGRATION_INVALID_DESTINATION",
+  /** Refused while an incoming on-chain deposit has not confirmed. Transient: it clears
+   *  once the deposit lands, so it earns a retry rather than support. */
+  PendingDeposit: "MIGRATION_PENDING_DEPOSIT",
 } as const
 
 export type MigrationRejectionCode =

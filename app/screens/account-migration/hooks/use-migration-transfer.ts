@@ -87,6 +87,9 @@ type UseMigrationTransfer = {
   failureReason: MigrationSupportReason | null
   isClockOutOfSync: boolean
   hasConnectionIssue: boolean
+  /** The commit was refused while an incoming deposit has not confirmed: recoverable, it
+   *  clears on a retry once the deposit has landed. */
+  isDepositPending: boolean
   retry: () => Promise<void>
 }
 
@@ -114,6 +117,7 @@ export const useMigrationTransfer = ({
   )
   const [isClockOutOfSync, setIsClockOutOfSync] = useState(false)
   const [hasConnectionIssue, setHasConnectionIssue] = useState(false)
+  const [isDepositPending, setIsDepositPending] = useState(false)
 
   /**
    * Polling stops for good once there is nothing left to watch: a terminal phase, a
@@ -125,9 +129,10 @@ export const useMigrationTransfer = ({
    */
   const [hasStopped, setHasStopped] = useState(false)
 
-  /** Also paused while out of sync: nothing advances until the retry fires a fresh commit,
-   *  so polling would only re-run the server's resume routine for nothing. */
-  const shouldStopPolling = hasStopped || isClockOutOfSync
+  /** Also paused while out of sync or refused for a pending deposit: nothing advances until
+   *  the retry fires a fresh commit, so polling would only re-run the server's resume
+   *  routine for nothing. */
+  const shouldStopPolling = hasStopped || isClockOutOfSync || isDepositPending
   const { status, refetch: refetchStatus } = useMigrationStatus({
     skip,
     pollInterval: shouldStopPolling ? 0 : STATUS_POLL_INTERVAL_MS,
@@ -235,6 +240,18 @@ export const useMigrationTransfer = ({
       const [rejection] = data?.migrationCommit?.errors ?? []
       if (!rejection) return
 
+      /** A deposit still confirming refuses the commit until it lands. Nothing moved, so
+       *  it pauses on the retry like a skewed clock instead of handing the user to support,
+       *  and the guard is released at once: a screen mounted again (its pause gone with the
+       *  old one) has to be able to commit again, or it would wait on a commit never sent. */
+      const isPendingDepositRejection =
+        rejection.code === MigrationRejectionCode.PendingDeposit
+      if (isPendingDepositRejection) {
+        accountsWithCommitStarted.delete(custodialId)
+        setIsDepositPending(true)
+        return
+      }
+
       /** A skewed clock makes the proof stale, which the backend rejects under the
        *  bad-destination code; that code plus a real skew is what earns a retry rather
        *  than a handover to support. Any other code falls through to support (fail-safe). */
@@ -253,9 +270,10 @@ export const useMigrationTransfer = ({
   /** The server is waiting for a destination only while IN_PROGRESS: TRANSFERRING already
    *  has one, and committing a second invoice is refused as a state conflict. */
   const isAwaitingDestination = status === MigrationStatus.InProgress
-  /** A recoverable issue (skewed clock or lost connection) pauses the commit; clearing the
-   *  flag on retry flips canCommit back to true and re-fires the effect. */
-  const hasRecoverableIssue = isClockOutOfSync || hasConnectionIssue
+  /** A recoverable issue (skewed clock, lost connection or pending deposit) pauses the
+   *  commit; clearing the flag on retry flips canCommit back to true and re-fires the
+   *  effect. */
+  const hasRecoverableIssue = isClockOutOfSync || hasConnectionIssue || isDepositPending
   const canCommit = isAwaitingDestination && !skip && !hasFailed && !hasRecoverableIssue
 
   useEffect(() => {
@@ -288,6 +306,7 @@ export const useMigrationTransfer = ({
    *  conflict. */
   const runRetry = useCallback(async () => {
     setIsClockOutOfSync(false)
+    setIsDepositPending(false)
 
     if (hasConnectionIssue) {
       let freshStatus: MigrationStatus | null
@@ -330,6 +349,7 @@ export const useMigrationTransfer = ({
     failureReason: activeFailureReason,
     isClockOutOfSync,
     hasConnectionIssue,
+    isDepositPending,
     retry,
   }
 }
