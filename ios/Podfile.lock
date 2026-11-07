@@ -1712,6 +1712,27 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
+  - react-native-netinfo (12.0.1):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - react-native-nfc-manager (3.14.14):
     - React-Core
   - react-native-quick-base64 (2.2.2):
@@ -1893,7 +1914,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-webview (13.16.0):
+  - react-native-webview (16.0.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2873,6 +2894,7 @@ DEPENDENCIES:
   - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-maps (from `../node_modules/react-native-maps`)
+  - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-nfc-manager (from `../node_modules/react-native-nfc-manager`)
   - react-native-quick-base64 (from `../node_modules/react-native-quick-base64`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
@@ -3085,6 +3107,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-image-picker"
   react-native-maps:
     :path: "../node_modules/react-native-maps"
+  react-native-netinfo:
+    :path: "../node_modules/@react-native-community/netinfo"
   react-native-nfc-manager:
     :path: "../node_modules/react-native-nfc-manager"
   react-native-quick-base64:
@@ -3310,6 +3334,7 @@ SPEC CHECKSUMS:
   react-native-geolocation: 98d3d27936fabcf57779578b5e7056939763e0b6
   react-native-image-picker: 91e8eac0c800912ef8f86ff7d489df29ab81f168
   react-native-maps: 1b51692f53553d3f61765a6a3f0ac1c0c983e16e
+  react-native-netinfo: adec161a2fc40d327f2c1bab7d8c57a91943ab74
   react-native-nfc-manager: f74a1e52807a916d27c2f428633e474cf661d611
   react-native-quick-base64: 6568199bb2ac8e72ecdfdc73a230fbc5c1d3aac4
   react-native-safe-area-context: f660c52c843d3a1801ee62f0f336b17ea5fd9b7a
@@ -3318,7 +3343,7 @@ SPEC CHECKSUMS:
   react-native-skia: 4e5bcb017067a228e80926673d70bed934190760
   react-native-slider: d3c62864af399014469359120d9a9a6cbbd9c6f7
   react-native-view-shot: 3f63bf155f961829ce65aa472bcba640b33e7108
-  react-native-webview: 4f00ce23bf30a7102479cd1f3ca90b692d364be9
+  react-native-webview: dd0f736ba2add18c9a0cfbfb77863d9d77e59c28
   React-NativeModulesApple: 0fa5a20ef85fadf1fae5da3ee5c434e2eea6c0c1
   React-networking: 008ca1fb7936195f6ae4f3fedae3596e44b9e62b
   React-oscompat: 563c536fc2d9cece1f54442fa2a3d9f68a9621e3

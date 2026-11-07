@@ -34,8 +34,3 @@ export const MOCK_EXPECTED_MONTHLY_VOLUME_OPTIONS = [
   { value: "2,000 - 2,999", label: "$2,000 - $2,999" },
   { value: "3,000 or more", label: "$3,000 or more" },
 ]
-
-/** The amounts on offer, in dollars. The share of the company each buys is not written
- *  here: it follows from the valuation in `investment-terms`, the same way the term
- *  sheet states it, so the two screens cannot describe different deals. */
-export const MOCK_CREDIT_LIMIT_VALUES = [1000, 2500, 5000, 10000, 25000, 50000, 100000]
