@@ -1400,6 +1400,20 @@ describe("SendBitcoinDestinationScreen paste buttons", () => {
     await flushEffects()
   })
 
+  it("keeps the search placeholder to one line, cut off at the end", async () => {
+    render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+
+    const placeholder = screen.getByText(LL.SendBitcoinScreen.placeholder())
+    expect(placeholder.props.numberOfLines).toBe(1)
+    expect(placeholder.props.ellipsizeMode).toBe("tail")
+
+    await flushEffects()
+  })
+
   it("renders both paste labels in the bold face", async () => {
     render(
       <ContextForScreen>

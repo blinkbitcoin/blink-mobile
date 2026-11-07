@@ -44,6 +44,7 @@ import { toWalletBalances } from "./hooks/use-send-wallets"
 import { testProps } from "../../utils/testProps"
 import { ConfirmDestinationModal } from "./confirm-destination-modal"
 import { DestinationInformation } from "./destination-information"
+import { SingleLinePlaceholderInput } from "./single-line-placeholder-input"
 import { resolveDestination } from "./payment-destination/resolve-destination"
 import {
   DestinationDirection,
@@ -769,6 +770,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           <SearchBar
             {...testProps(LL.SendBitcoinScreen.placeholder())}
             placeholder={LL.SendBitcoinScreen.placeholder()}
+            InputComponent={SingleLinePlaceholderInput}
             value={
               activeInputRef.current === InputType.Search
                 ? destinationState.unparsedDestination
