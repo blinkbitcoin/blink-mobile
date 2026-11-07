@@ -2353,11 +2353,32 @@
     "maxFeeSelected": "Eno ye ssente ezisinga obunene z’ogenda okusasula ku mpanyisa eno. Kiyinza okumaliriza nga kitono nga okusasula kukoleddwa.",
     "invoiceAlreadyPaid": "Yinivoyisi eno yasasuddwa dda",
     "somethingWentWrong": "Waliwo ekikyamu ekigenze mumaso",
+    "priceUpdated": "Bbeeyi ekyuse, n'olwekyo omuwendo gukyusiddwa. Gukebere nga tonnasindika.",
     "paymentAlreadyAttempted": "Okusasula kwagezaako dda.\n\nBw’oba ​​oyagala okuddamu okusindika ssente zino, tandika okuva ku ntobo.",
     "slideToConfirm": "Seereza Okukakasa",
     "slideConfirming": "Okukakasa",
+    "slideToSend": "Seereza Okusindika",
+    "calculatingFee": "Kubala ssente…",
+    "sendProgress": {
+      "reviewing": "Okwekebejja",
+      "signing": "Okussaako omukono",
+      "findingRoute": "Okunoonya ekkubo",
+      "broadcasting": "Okusaasaanya",
+      "checkingDelivery": "Okukebera okutuuka",
+      "retrying": "Okuddamu",
+      "almostThere": "Kumpi tutuuse",
+      "anyTimeNow": "Essaawa yonna kati",
+      "ohOh": "Woowe",
+      "tryingAgain": "Tuddamu ogezaako"
+    },
     "copiedDestination": "Gy'eziraga wawanduukuluddwa ku lutimbe",
-    "lightningRecommended": "Ebisale ebingi! Tukukubiriza okukozesa Lightning.",
+    "lightningRecommended": "Ebisale ebingi. Tukukubiriza okukozesa Lightning.",
+    "sending": "Okusindika",
+    "sent": "Kisindikiddwa",
+    "receipt": "Lisiiti",
+    "fromBalance": "Okuva ku Balance",
+    "details": "Ebisingawo",
+    "changeAmount": "Kyusa omuwendo",
     "usdRemainderSweep": "Ekisigaddewo {remaining: string} ({remainingSats: string}) kijja kufuulibwa Bitcoin. Ekitundu ekisembayo eky'USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2401,8 +2422,11 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Okuwaanyisa kulina okuweebwayo mu mempool",
     "amount": "Omuwendo",
+    "addAmount": "Yongerako omuwendo",
+    "lowFunds": "Ssente tezimala",
     "amountExceed": "Omuwendo gusukka bbalansi yo eya {balance: string}",
     "amountExceedsLimit": "Omuwendo gusukka ekkomo lyo erisigaddewo buli lunaku erya {limit: string}",
+    "changeDestination": "Kyusa ekigobero",
     "upgradeAccountToIncreaseLimit": "Yongesa omutindo gwa akawunti yo okwongera ku kkomo lyo",
     "amountIsRequired": "Omuwendo gwetagisa",
     "cost": "Omuwendo",
@@ -2421,10 +2445,11 @@
     "title": "Sindika Bitcoin",
     "failedToFetchLnurlInvoice": "Tulemereddwa okufuna yinivoyisi ya lnurl",
     "lnurlInvoiceIncorrectAmount": "Server ya lnurl yazzeemu ne yinivoyisi n'omuwendo ogutali mutuufu.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Okulabula ku bisale ebingi!",
-      "content": "Ssente zo zisukka ebitundu 50% okusinga ssente eziweerezeddwa. Okakasa nti oyagala kugenda mu maaso?\n\nOkukendeeza ku bisale, saba oyo afuna ssente akkirize okutunda ng’oyita mu Lightning",
-      "confirmButton": "Nkakasa ebitundu 100%"
+      "body": "Ssente z'osasula ziri 50% oba okusingawo ku ssente z'oweereza. Okakasa nti oyagala okugenda mu maaso?",
+      "cancelPayment": "Sazaamu okusasula",
+      "acceptFee": "Kkiriza sente"
     },
     "copiedDestination": "Gy'eziraga wawanduukuluddwa ku lutimbe",
     "pendingPayment": "Ensasula eno eweerezeddwa, naye tennaba kukakasa.\n\nKisoboka okusasula tekujja kukakasa, mu mbeera eyo ssente zijja kuddizibwa ku akawunti yo.",
@@ -2452,7 +2477,8 @@
     "sdkInsufficientFunds": "Ssente tezimala ku mulimu guno.",
     "sdkAmountTooLow": "Omuwendo guli wansi ennyo olw'okukola on-chain.",
     "sdkNetworkError": "Ensobi y'ennyonnyola. Kebera ennyonnyola yo oddemu okugezaako.",
-    "sdkGenericError": "Tesobola kusoma ssente z'obukozi. Gezaako omuwendo omulala."
+    "sdkGenericError": "Tesobola kusoma ssente z'obukozi. Gezaako omuwendo omulala.",
+    "onchainSelfPayment": "Eno ye ndagiriro ya wallet yo. Tosobola kwesindikira ssente ku on-chain."
   },
   "SettingsScreen": {
     "createAddress": "Kola endagiriro ya Lightning",
@@ -3112,6 +3138,13 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Teekawo omuwendo"
+  },
+  "Accessibility": {
+    "deleteKey": "Sazaamu",
+    "swapCurrencyHint": "Kyusa ensimbi z'owandiikamu omuwendo",
+    "switchToWallet": "Kyusa ku {wallet: string}",
+    "copy": "Koppa",
+    "revealBalanceHint": "Kiraga ssente zo ezisigaddewo ku lupapula luno"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Nneetaaga okukyuusa app yange okutuuka ku nkyusa eyasembyeyo. Ndi mukozesa {os: string} eya app n'e nkyusa eya {version: string}.",

@@ -101,38 +101,17 @@ describe("Username Payment Flow", () => {
   })
 
   it("Add amount", async () => {
-    await addSmallAmount(LL)
+    await addSmallAmount()
   })
 
   it("Click Next again", async () => {
     await clickButton(LL.common.next())
   })
 
-  it("Slides to confirm payment and get Green Checkmark success", async () => {
-    await swipeButton(LL.SendBitcoinConfirmationScreen.slideToConfirm())
-  })
-
-  it("Clicks on not enjoying app", async () => {
-    await browser.pause(3000)
-    const contexts = await browser.getContexts()
-    const nativeContext = contexts.find((context) =>
-      context.toString().toLowerCase().includes("native"),
-    )
-    await browser.pause(3000)
-    if (nativeContext) {
-      await browser.switchContext(nativeContext.toString())
-    }
-
-    if (process.env.E2E_DEVICE === "android") {
-      await driver.back()
-    }
-
-    const appContext = contexts.find((context) =>
-      context.toString().toLowerCase().includes("webview"),
-    )
-    if (appContext) {
-      await browser.switchContext(appContext.toString())
-    }
+  it("Slides to confirm payment and leaves Sent with Close", async () => {
+    await swipeButton(LL.SendBitcoinConfirmationScreen.slideToSend())
+    await clickButton(LL.common.close())
+    await waitTillOnHomeScreen()
   })
 })
 
@@ -146,7 +125,7 @@ describe("Conversion Flow", () => {
   })
 
   it("Add amount", async () => {
-    await addSmallAmount(LL)
+    await addSmallAmount()
   })
 
   it("Click Next", async () => {
