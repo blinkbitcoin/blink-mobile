@@ -47,20 +47,15 @@ jest.mock("@app/utils/error-reporting", () => ({
   recordAppError: (error: Error) => mockRecordAppError(error),
 }))
 
-jest.mock("@app/i18n/i18n-react", () => ({
-  useI18nContext: () => ({
-    LL: { errors: { unexpectedError: () => "unexpected error" } },
-  }),
-}))
-
+const mockDecryptAesGcm = jest.fn(({ data }: { data: string }) => {
+  if (data === "encrypted-pan-data") return "4242424242424242"
+  if (data === "encrypted-cvc-data") return "123"
+  return ""
+})
 jest.mock("@app/utils/crypto", () => ({
   generateRandomHexKey: () => "abcd1234abcd1234abcd1234abcd1234",
   encryptRsaOaep: () => "encrypted-session-id",
-  decryptAesGcm: ({ data }: { data: string }) => {
-    if (data === "encrypted-pan-data") return "4242424242424242"
-    if (data === "encrypted-cvc-data") return "123"
-    return ""
-  },
+  decryptAesGcm: (params: { data: string }) => mockDecryptAesGcm(params),
 }))
 
 describe("useCardSecrets", () => {
@@ -73,7 +68,7 @@ describe("useCardSecrets", () => {
     const { result } = renderHook(() => useCardSecrets())
 
     expect(result.current.secrets).toBeUndefined()
-    expect(result.current.error).toBeUndefined()
+    expect(result.current.hasFailed).toBe(false)
     expect(result.current.fetchSecrets).toBeDefined()
   })
 
@@ -102,10 +97,10 @@ describe("useCardSecrets", () => {
 
     expect(fetchResult).toEqual({ pan: "4242424242424242", cvc: "123" })
     expect(result.current.secrets).toEqual({ pan: "4242424242424242", cvc: "123" })
-    expect(result.current.error).toBeUndefined()
+    expect(result.current.hasFailed).toBe(false)
   })
 
-  it("fails with the unexpected error when the public key is not available", async () => {
+  it("fails when the public key is not available", async () => {
     mockFetchPublicKey.mockResolvedValue({
       data: { cardEncryptionPublicKey: null },
     })
@@ -119,13 +114,13 @@ describe("useCardSecrets", () => {
 
     expect(fetchResult).toBeUndefined()
     expect(result.current.secrets).toBeUndefined()
-    expect(result.current.error).toBe("unexpected error")
+    expect(result.current.hasFailed).toBe(true)
     expect(mockRecordAppError).toHaveBeenCalledWith(
       new Error("Card encryption public key is missing"),
     )
   })
 
-  it("fails with the unexpected error when the encrypted secrets are not available", async () => {
+  it("fails when the encrypted secrets are not available", async () => {
     mockFetchPublicKey.mockResolvedValue({
       data: {
         cardEncryptionPublicKey:
@@ -145,13 +140,13 @@ describe("useCardSecrets", () => {
 
     expect(fetchResult).toBeUndefined()
     expect(result.current.secrets).toBeUndefined()
-    expect(result.current.error).toBe("unexpected error")
+    expect(result.current.hasFailed).toBe(true)
     expect(mockRecordAppError).toHaveBeenCalledWith(
       new Error("Encrypted card secrets are missing"),
     )
   })
 
-  it("reports a failed fetch and sets the unexpected error", async () => {
+  it("reports a failed fetch and fails", async () => {
     mockFetchPublicKey.mockRejectedValue(new Error("Network error"))
 
     const { result } = renderHook(() => useCardSecrets())
@@ -162,11 +157,11 @@ describe("useCardSecrets", () => {
     })
 
     expect(fetchResult).toBeUndefined()
-    expect(result.current.error).toBe("unexpected error")
+    expect(result.current.hasFailed).toBe(true)
     expect(mockRecordAppError).toHaveBeenCalledWith(new Error("Network error"))
   })
 
-  it("sets the unexpected error for a throw that is not an Error", async () => {
+  it("fails for a throw that is not an Error", async () => {
     mockFetchPublicKey.mockRejectedValue("string error")
 
     const { result } = renderHook(() => useCardSecrets())
@@ -175,10 +170,10 @@ describe("useCardSecrets", () => {
       await result.current.fetchSecrets("card-123")
     })
 
-    expect(result.current.error).toBe("unexpected error")
+    expect(result.current.hasFailed).toBe(true)
   })
 
-  it("clears the previous error when asked again", async () => {
+  it("clears the previous failure when asked again", async () => {
     mockFetchPublicKey.mockRejectedValueOnce(new Error("Network error"))
     const { result } = renderHook(() => useCardSecrets())
     await act(async () => {
@@ -203,7 +198,7 @@ describe("useCardSecrets", () => {
       await result.current.fetchSecrets("card-123")
     })
 
-    expect(result.current.error).toBeUndefined()
+    expect(result.current.hasFailed).toBe(false)
     expect(result.current.secrets).toEqual({ pan: "4242424242424242", cvc: "123" })
   })
 
@@ -295,5 +290,153 @@ describe("useCardSecrets", () => {
     expect(result.current.secrets).toEqual({ pan: "4242424242424242", cvc: "123" })
     expect(JSON.stringify(cache.extract())).not.toContain("encrypted-pan-data")
     expect(JSON.stringify(cache.extract())).not.toContain("encrypted-cvc-data")
+  })
+})
+
+describe("useCardSecrets attempts", () => {
+  type Answer<T> = { data: T }
+  type PublicKeyAnswer = Answer<{ cardEncryptionPublicKey: string | null }>
+
+  const publicKeyAnswer: PublicKeyAnswer = {
+    data: {
+      cardEncryptionPublicKey:
+        "-----BEGIN PUBLIC KEY-----\nTEST\n-----END PUBLIC KEY-----",
+    },
+  }
+  const secretsAnswer = {
+    data: {
+      cardSecretsEncrypted: {
+        encryptedPan: { iv: "pan-iv", data: "encrypted-pan-data" },
+        encryptedCvc: { iv: "cvc-iv", data: "encrypted-cvc-data" },
+      },
+    },
+  }
+
+  /** A public key request the test answers by hand, to hold an attempt open. */
+  const deferredPublicKey = () => {
+    let resolve: (answer: PublicKeyAnswer) => void = () => undefined
+    let reject: (error: Error) => void = () => undefined
+    const promise = new Promise<PublicKeyAnswer>((res, rej) => {
+      resolve = res
+      reject = rej
+    })
+    return { promise, resolve, reject }
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockUseSecretsLazyQuery.mockImplementation(() => [mockFetchEncryptedSecrets])
+    mockFetchEncryptedSecrets.mockResolvedValue(secretsAnswer)
+  })
+
+  it("takes the failure, and with it the retry, away as soon as it asks again", async () => {
+    mockFetchPublicKey.mockRejectedValueOnce(new Error("Network error"))
+    const { result } = renderHook(() => useCardSecrets())
+    await act(async () => {
+      await result.current.fetchSecrets("card-123")
+    })
+    expect(result.current.hasFailed).toBe(true)
+
+    mockFetchPublicKey.mockReturnValue(deferredPublicKey().promise)
+    act(() => {
+      result.current.fetchSecrets("card-123")
+    })
+
+    expect(result.current.hasFailed).toBe(false)
+  })
+
+  it("keeps the newer answer when an older attempt fails after it", async () => {
+    const older = deferredPublicKey()
+    mockFetchPublicKey.mockReturnValueOnce(older.promise)
+    mockFetchPublicKey.mockResolvedValueOnce(publicKeyAnswer)
+    const { result } = renderHook(() => useCardSecrets())
+
+    await act(async () => {
+      result.current.fetchSecrets("card-123")
+      await result.current.fetchSecrets("card-123")
+    })
+    await act(async () => {
+      older.reject(new Error("Network error"))
+    })
+
+    expect(result.current.secrets).toEqual({ pan: "4242424242424242", cvc: "123" })
+    expect(result.current.hasFailed).toBe(false)
+    expect(mockRecordAppError).not.toHaveBeenCalled()
+  })
+
+  it("asks for no secrets with the key of an attempt a newer one replaced", async () => {
+    const older = deferredPublicKey()
+    mockFetchPublicKey.mockReturnValueOnce(older.promise)
+    mockFetchPublicKey.mockResolvedValueOnce(publicKeyAnswer)
+    const { result } = renderHook(() => useCardSecrets())
+    await act(async () => {
+      result.current.fetchSecrets("card-123")
+      await result.current.fetchSecrets("card-123")
+    })
+
+    await act(async () => {
+      older.resolve(publicKeyAnswer)
+    })
+
+    expect(mockFetchEncryptedSecrets).toHaveBeenCalledTimes(1)
+  })
+
+  /** The last check runs before decrypting, so a newer attempt can still start while the
+   *  older one decrypts; the older answer is dropped on arrival all the same. */
+  it("drops the answer of an attempt replaced while it decrypts", async () => {
+    mockFetchPublicKey.mockResolvedValueOnce(publicKeyAnswer)
+    mockFetchPublicKey.mockReturnValueOnce(deferredPublicKey().promise)
+    const { result } = renderHook(() => useCardSecrets())
+    mockDecryptAesGcm.mockImplementationOnce(() => {
+      result.current.fetchSecrets("card-123")
+      return "4242424242424242"
+    })
+
+    let olderResult: { pan: string; cvc: string } | undefined
+    await act(async () => {
+      olderResult = await result.current.fetchSecrets("card-123")
+    })
+
+    expect(olderResult).toBeUndefined()
+    expect(result.current.secrets).toBeUndefined()
+  })
+
+  it("keeps the newer failure when an older attempt answers after it", async () => {
+    const older = deferredPublicKey()
+    mockFetchPublicKey.mockReturnValueOnce(older.promise)
+    mockFetchPublicKey.mockRejectedValueOnce(new Error("Network error"))
+    const { result } = renderHook(() => useCardSecrets())
+
+    await act(async () => {
+      result.current.fetchSecrets("card-123")
+      await result.current.fetchSecrets("card-123")
+    })
+    await act(async () => {
+      older.resolve(publicKeyAnswer)
+    })
+
+    expect(result.current.secrets).toBeUndefined()
+    expect(result.current.hasFailed).toBe(true)
+    expect(mockRecordAppError).toHaveBeenCalledTimes(1)
+  })
+
+  /** What lets the screen's fetch effect run once: nothing it depends on changes with
+   *  a re-render, the locale included, since the hook no longer reads it. Run on the real
+   *  lazy query, whose execute function Apollo keeps for the life of the component. */
+  it("keeps the same fetchSecrets across renders", () => {
+    mockUseSecretsLazyQuery.mockImplementation((options: SecretsQueryOptions) =>
+      useLazyQuery<CardSecretsEncryptedQuery, CardSecretsEncryptedQueryVariables>(
+        CardSecretsEncryptedDocument,
+        options,
+      ),
+    )
+    const wrapper = ({ children }: PropsWithChildren) =>
+      React.createElement(MockedProvider, { mocks: [] }, children)
+    const { result, rerender } = renderHook(() => useCardSecrets(), { wrapper })
+    const { fetchSecrets } = result.current
+
+    rerender({})
+
+    expect(result.current.fetchSecrets).toBe(fetchSecrets)
   })
 })
