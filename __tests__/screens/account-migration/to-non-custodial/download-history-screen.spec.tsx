@@ -1,4 +1,5 @@
 import React from "react"
+import { Platform } from "react-native"
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -54,12 +55,15 @@ jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
 
-const renderScreen = () =>
-  render(
-    <ContextForScreen>
-      <MigrationDownloadHistoryScreen />
-    </ContextForScreen>,
-  )
+const screenTree = () => (
+  <ContextForScreen>
+    <MigrationDownloadHistoryScreen />
+  </ContextForScreen>
+)
+
+const renderScreen = () => render(screenTree())
+
+const DEFAULT_PLATFORM_OS = Platform.OS
 
 const pressDownload = () =>
   fireEvent.press(screen.getByText(LL.AccountMigration.downloadHistoryDownloadCta()))
@@ -78,6 +82,10 @@ const isSkipDisabled = () =>
     ?.disabled
 
 describe("MigrationDownloadHistoryScreen", () => {
+  afterEach(() => {
+    Platform.OS = DEFAULT_PLATFORM_OS
+  })
+
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
@@ -134,6 +142,72 @@ describe("MigrationDownloadHistoryScreen", () => {
 
     expect(mockContinuePastHistory).toHaveBeenCalledTimes(1)
     expect(mockExportCsv).toHaveBeenCalledTimes(1)
+  })
+
+  it("offers no second download on iOS, whose share sheet reports the activity's own completion", async () => {
+    Platform.OS = "ios"
+    renderScreen()
+    await flushEffects()
+
+    pressDownload()
+    await waitFor(() => expect(screen.getByText(LL.common.continue())).toBeTruthy())
+
+    expect(screen.queryByTestId("migration-download-history-redownload")).toBeNull()
+  })
+
+  /** Android's chooser resolves success once a target app is picked, so a Drive or Gmail
+   *  save the user then cancels still lands here; Download has to stay reachable. */
+  it("keeps Download available on Android after the chooser reports success", async () => {
+    Platform.OS = "android"
+    renderScreen()
+    await flushEffects()
+
+    pressDownload()
+    await waitFor(() => expect(screen.getByText(LL.common.continue())).toBeTruthy())
+    expect(screen.queryByText(LL.common.skip())).toBeNull()
+
+    fireEvent.press(screen.getByTestId("migration-download-history-redownload"))
+    await waitFor(() => expect(mockExportCsv).toHaveBeenCalledTimes(2))
+    expect(mockContinuePastHistory).not.toHaveBeenCalled()
+
+    pressPrimary()
+    expect(mockContinuePastHistory).toHaveBeenCalledTimes(1)
+  })
+
+  it("keeps Continue enabled when the wallet balances refetch after a download", async () => {
+    renderScreen()
+    await flushEffects()
+
+    pressDownload()
+    await waitFor(() => expect(screen.getByText(LL.common.continue())).toBeTruthy())
+
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+      refetch: jest.fn(),
+    })
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    expect(isPrimaryDisabled()).toBe(false)
+  })
+
+  it("disables Continue while the next step is still being resolved after a download", async () => {
+    renderScreen()
+    await flushEffects()
+
+    pressDownload()
+    await waitFor(() => expect(screen.getByText(LL.common.continue())).toBeTruthy())
+
+    mockUseMigrationNextStep.mockReturnValue({
+      continuePastHistory: mockContinuePastHistory,
+      loading: true,
+    })
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    expect(isPrimaryDisabled()).toBe(true)
   })
 
   it("downloads the CSV without leaving the screen", async () => {

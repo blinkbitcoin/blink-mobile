@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react"
+import { Platform } from "react-native"
 
 import { useTheme } from "@rn-vui/themed"
 
@@ -15,6 +16,12 @@ import { StepLayout } from "@app/components/step-layout"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
+
+/** Android's share chooser reports success as soon as the user picks a target app, before
+ *  that app saves or sends the file, so a cancelled Drive or Gmail upload still reads as
+ *  a download. iOS reports from the activity's own completion, so only Android keeps a way
+ *  to download again once the primary CTA has moved on to Continue. */
+const canRedownloadAfterExport = (): boolean => Platform.OS === "android"
 
 export const MigrationDownloadHistoryScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -62,19 +69,28 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
                 ? LL.common.continue()
                 : LL.AccountMigration.downloadHistoryDownloadCta()
             }
-            loading={isDownloading}
+            loading={!hasDownloaded && isDownloading}
             disabled={hasDownloaded ? isBusy : isDownloadDisabled}
             onPress={hasDownloaded ? continuePastHistory : handleDownload}
             {...testProps("migration-download-history-cta")}
           />
           {/** Once the history is downloaded the primary CTA is the way forward, so the
-           *  screen drops the secondary action rather than offering it twice. */}
+           *  screen drops Skip rather than offering it twice. */}
           {!hasDownloaded && (
             <GaloySecondaryButton
               title={LL.common.skip()}
               disabled={isBusy}
               onPress={continuePastHistory}
               {...testProps("migration-download-history-continue")}
+            />
+          )}
+          {hasDownloaded && canRedownloadAfterExport() && (
+            <GaloySecondaryButton
+              title={LL.AccountMigration.downloadHistoryDownloadCta()}
+              loading={isDownloading}
+              disabled={isDownloadDisabled}
+              onPress={handleDownload}
+              {...testProps("migration-download-history-redownload")}
             />
           )}
         </>
