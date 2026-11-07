@@ -63,6 +63,27 @@ const accountsWithCommitStarted = new Set<string>()
  */
 const settledCommitFailures = new Map<string, MigrationSupportReason>()
 
+/** What a commit settled with, short of the server taking it. */
+type CommitOutcome =
+  | { kind: "connectionIssue" }
+  | { kind: "clockOutOfSync" }
+  | { kind: "depositPending" }
+  | { kind: "failed"; reason: MigrationSupportReason }
+
+type CommitOutcomeListener = (custodialId: string, outcome: CommitOutcome) => void
+
+/**
+ * The mounted screens to tell how a commit settled. The guard above keeps a screen that
+ * mounts while the commit is in flight from sending its own, and the one that sent it may
+ * be gone by the time the answer arrives, so the outcome goes to whichever screen is
+ * mounted for the account rather than to the one that asked. Nothing is kept: a screen
+ * mounted afterwards starts from the server's phase and the remembered failure alone.
+ */
+const commitOutcomeListeners = new Set<CommitOutcomeListener>()
+const announceCommitOutcome = (custodialId: string, outcome: CommitOutcome): void => {
+  commitOutcomeListeners.forEach((listener) => listener(custodialId, outcome))
+}
+
 /** Clears the module-level commit guard and remembered failures; for test isolation,
  *  never called in production. */
 export const resetMigrationCommitGuard = (): void => {
@@ -171,16 +192,42 @@ export const useMigrationTransfer = ({
     if (hasAdvancedPastCommit) setHasConnectionIssue(false)
   }, [status])
 
+  /** Takes the account the commit was sent for, which only runs with one. */
   const fail = useCallback(
-    (reason: MigrationSupportReason, err: unknown) => {
+    (custodialId: string, reason: MigrationSupportReason, err: unknown) => {
       reportError("Migration transfer", err)
       /** Remember the settled failure so a re-entered screen restores it instead of
        *  blocking the re-commit and spinning with nothing to show. */
-      if (custodialAccountId) settledCommitFailures.set(custodialAccountId, reason)
-      setFailureReason(reason)
+      settledCommitFailures.set(custodialId, reason)
+      announceCommitOutcome(custodialId, { kind: "failed", reason })
     },
-    [custodialAccountId],
+    [],
   )
+
+  /** Takes in how the account's commit settled, whichever screen sent it. */
+  useEffect(() => {
+    if (!custodialAccountId) return
+    const takeOutcome: CommitOutcomeListener = (custodialId, outcome) => {
+      if (custodialId !== custodialAccountId) return
+      switch (outcome.kind) {
+        case "connectionIssue":
+          setHasConnectionIssue(true)
+          return
+        case "clockOutOfSync":
+          setIsClockOutOfSync(true)
+          return
+        case "depositPending":
+          setIsDepositPending(true)
+          return
+        case "failed":
+          setFailureReason(outcome.reason)
+      }
+    }
+    commitOutcomeListeners.add(takeOutcome)
+    return () => {
+      commitOutcomeListeners.delete(takeOutcome)
+    }
+  }, [custodialAccountId])
 
   /** The owner id can resolve a tick after mount; once it does, restore any failure the
    *  guard already remembers so a re-entered screen routes to support rather than spinning. */
@@ -208,6 +255,7 @@ export const useMigrationTransfer = ({
 
       if (result.status === MigrationSdkStatus.NoMnemonic) {
         fail(
+          custodialId,
           MigrationSupportReason.SelfCustodialAccountMissing,
           new Error("No mnemonic for the provisioned account"),
         )
@@ -217,12 +265,12 @@ export const useMigrationTransfer = ({
       /** A dropped connection during the connect or the sign can be sent again, so it
        *  pauses on the shared retry rather than handing the user to support. */
       if (result.status === MigrationSdkStatus.ConnectionError) {
-        setHasConnectionIssue(true)
+        announceCommitOutcome(custodialId, { kind: "connectionIssue" })
         return
       }
 
       if (result.status === MigrationSdkStatus.Failed) {
-        fail(MigrationSupportReason.TransferFailed, result.error)
+        fail(custodialId, MigrationSupportReason.TransferFailed, result.error)
         return
       }
 
@@ -242,13 +290,13 @@ export const useMigrationTransfer = ({
 
       /** A deposit still confirming refuses the commit until it lands. Nothing moved, so
        *  it pauses on the retry like a skewed clock instead of handing the user to support,
-       *  and the guard is released at once: a screen mounted again (its pause gone with the
-       *  old one) has to be able to commit again, or it would wait on a commit never sent. */
+       *  and the guard is released at once: a screen mounted afterwards, with no pause of
+       *  its own, has to be able to commit again rather than wait on a commit never sent. */
       const isPendingDepositRejection =
         rejection.code === MigrationRejectionCode.PendingDeposit
       if (isPendingDepositRejection) {
         accountsWithCommitStarted.delete(custodialId)
-        setIsDepositPending(true)
+        announceCommitOutcome(custodialId, { kind: "depositPending" })
         return
       }
 
@@ -259,10 +307,14 @@ export const useMigrationTransfer = ({
         rejection.code === MigrationRejectionCode.InvalidDestination &&
         isDeviceClockSkewed()
       if (isStaleProofRejection) {
-        setIsClockOutOfSync(true)
+        announceCommitOutcome(custodialId, { kind: "clockOutOfSync" })
         return
       }
-      fail(MigrationSupportReason.TransferFailed, new Error(rejection.message))
+      fail(
+        custodialId,
+        MigrationSupportReason.TransferFailed,
+        new Error(rejection.message),
+      )
     },
     [network, selfCustodialDepositClaimLeewayVbyte, commitMigration, fail, lnurlDomain],
   )
@@ -289,10 +341,10 @@ export const useMigrationTransfer = ({
       /** A commit lost to the network can still have landed: it earns the shared retry, not
        *  a handover, and the guard stays claimed until the user's retry clears it. */
       if (isNetworkFailure(err)) {
-        setHasConnectionIssue(true)
+        announceCommitOutcome(custodialAccountId, { kind: "connectionIssue" })
         return
       }
-      fail(MigrationSupportReason.TransferFailed, err)
+      fail(custodialAccountId, MigrationSupportReason.TransferFailed, err)
     })
   }, [canCommit, custodialAccountId, selfCustodialAccountId, commit, fail])
 

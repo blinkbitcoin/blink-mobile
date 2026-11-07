@@ -99,6 +99,19 @@ const collectedRequest = {
 const networkError = () =>
   Object.assign(new Error("offline"), { networkError: new Error("net") })
 
+type CommitAnswer = { data: { migrationCommit: { errors: unknown[] } } }
+
+/** A commit the test answers by hand, to keep it in flight across a remount. */
+const deferredCommit = () => {
+  let resolve: (answer: CommitAnswer) => void = () => undefined
+  let reject: (error: Error) => void = () => undefined
+  const promise = new Promise<CommitAnswer>((settle, fail) => {
+    resolve = settle
+    reject = fail
+  })
+  return { promise, resolve, reject }
+}
+
 const renderTransfer = (
   overrides: Partial<Parameters<typeof useMigrationTransfer>[0]> = {},
 ) =>
@@ -860,6 +873,95 @@ describe("useMigrationTransfer", () => {
   })
 })
 
+describe("useMigrationTransfer, across a remount mid-commit", () => {
+  beforeEach(resetTransferMocks)
+
+  /** Mounts a screen that sends a commit left in flight, swaps it for a replacement that
+   *  holds back from a second one, and hands back the in-flight commit to settle. */
+  const replaceMidCommit = async () => {
+    const inFlight = deferredCommit()
+    mockCommitMigration.mockReturnValueOnce(inFlight.promise)
+    const first = renderTransfer()
+    await flushEffects()
+    first.unmount()
+    const replacement = renderTransfer()
+    await flushEffects()
+    return { inFlight, replacement }
+  }
+
+  it("hands a lost connection to a screen that replaced the one in flight", async () => {
+    const inFlight = deferredCommit()
+    mockCommitMigration.mockReturnValueOnce(inFlight.promise)
+    const first = renderTransfer()
+    await flushEffects()
+    first.unmount()
+    const replacement = renderTransfer()
+    await flushEffects()
+
+    await act(async () => {
+      inFlight.reject(networkError())
+    })
+    await flushEffects()
+    expect(replacement.result.current.hasConnectionIssue).toBe(true)
+
+    await act(async () => {
+      await replacement.result.current.retry()
+    })
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+    expect(replacement.result.current.hasConnectionIssue).toBe(false)
+  })
+
+  it("hands a stale proof to a screen that replaced the one in flight", async () => {
+    mockIsDeviceClockSkewed.mockReturnValue(true)
+    const { inFlight, replacement } = await replaceMidCommit()
+
+    await act(async () => {
+      inFlight.resolve({
+        data: {
+          migrationCommit: {
+            errors: [{ message: "stale proof", code: "MIGRATION_INVALID_DESTINATION" }],
+          },
+        },
+      })
+    })
+    await flushEffects()
+
+    expect(replacement.result.current.isClockOutOfSync).toBe(true)
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+  })
+
+  it("leaves a screen for another account alone", async () => {
+    mockCommitMigration.mockResolvedValueOnce({
+      data: { migrationCommit: { errors: [{ message: "refused" }] } },
+    })
+    const other = renderTransfer({ custodialAccountId: "custodial-2", skip: true })
+    renderTransfer()
+    await flushEffects()
+
+    expect(other.result.current.failureReason).toBeNull()
+  })
+
+  /** The same order as a remount mid-commit with a refusal: the failure reaches the screen
+   *  that replaced the one in flight instead of leaving it waiting on the commit. */
+  it("hands a failure to a screen that replaced the one in flight", async () => {
+    const { inFlight, replacement } = await replaceMidCommit()
+
+    await act(async () => {
+      inFlight.resolve({
+        data: { migrationCommit: { errors: [{ message: "refused" }] } },
+      })
+    })
+    await flushEffects()
+
+    expect(replacement.result.current.failureReason).toBe(
+      MigrationSupportReason.TransferFailed,
+    )
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+  })
+})
+
 describe("useMigrationTransfer, with a deposit still confirming", () => {
   beforeEach(resetTransferMocks)
 
@@ -924,6 +1026,36 @@ describe("useMigrationTransfer, with a deposit still confirming", () => {
 
     expect(mockCommitMigration).toHaveBeenCalledTimes(2)
     expect(second.result.current.isDepositPending).toBe(false)
+  })
+
+  /** The order a remount mid-commit takes: the screen that sent the commit is gone when
+   *  the refusal arrives, and the one that replaced it held back from a second commit, so
+   *  the refusal has to reach it or it waits on the commit forever. */
+  it("hands the refusal to a screen that replaced the one in flight", async () => {
+    const inFlight = deferredCommit()
+    mockCommitMigration.mockReturnValueOnce(inFlight.promise)
+    const first = renderTransfer()
+    await flushEffects()
+    first.unmount()
+
+    const replacement = renderTransfer()
+    await flushEffects()
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      inFlight.resolve(pendingDepositRejection)
+    })
+    await flushEffects()
+    expect(replacement.result.current.isDepositPending).toBe(true)
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      await replacement.result.current.retry()
+    })
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+    expect(replacement.result.current.isDepositPending).toBe(false)
   })
 
   it("commits again once the user retries, and clears the pending deposit", async () => {
