@@ -240,14 +240,16 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               satAmount,
               currencyFeeAmount,
               satFeeAmount,
+              // The receipt wraps every recipient in full; only an invoice is
+              // long enough to need shortening.
               destination:
-                paymentDetail?.paymentType === "intraledger"
-                  ? destination
-                  : ellipsizeMiddle(destination, {
+                paymentDetail?.paymentType === "lightning"
+                  ? ellipsizeMiddle(destination, {
                       maxLength: 50,
                       maxResultLeft: 13,
                       maxResultRight: 8,
-                    }),
+                    })
+                  : destination,
               paymentType: paymentDetail?.paymentType,
               createdAt: transaction?.createdAt,
             },

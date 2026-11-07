@@ -19,7 +19,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import SendBitcoinCompletedScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-completed-screen"
 
 import { ContextForScreen, ContextForScreenWithTheme } from "./helper"
-import { AppStateStatus, Linking, View, ViewStyle } from "react-native"
+import { AppStateStatus, Linking, StyleSheet, View, ViewStyle } from "react-native"
 import { light, dark } from "@app/rne-theme/colors"
 
 const screenshotState = { isTakingScreenshot: false }
@@ -203,6 +203,95 @@ const renderSuccess = () => {
   )
   screen.getByTestId("Success Text")
 }
+
+describe("SendBitcoinCompletedScreen actions", () => {
+  let LL: ReturnType<typeof i18nObject>
+  const receiptRoute = {
+    key: "sendBitcoinCompleted",
+    name: "sendBitcoinCompleted",
+    params: {
+      status: "SUCCESS",
+      currencyAmount: "$0.03",
+      satAmount: "25 SAT",
+      currencyFeeAmount: "$0.00",
+      satFeeAmount: "0 SAT",
+      destination: "alice",
+      paymentType: "intraledger",
+      createdAt: 1747691078,
+    },
+  } as const
+
+  const renderReceipt = () => {
+    render(
+      <ContextForScreen>
+        <MockedScreen route={receiptRoute} />
+      </ContextForScreen>,
+    )
+    act(() => {
+      jest.advanceTimersByTime(2300)
+    })
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    loadLocale("en")
+    LL = i18nObject("en")
+    screenshotState.isTakingScreenshot = false
+  })
+
+  it("goes home from the Close button under Share", () => {
+    renderReceipt()
+
+    expect(screen.getByText(LL.common.share())).toBeTruthy()
+    fireEvent.press(screen.getByText(LL.common.close()))
+
+    expect(mockPopToTop).toHaveBeenCalledTimes(1)
+  })
+
+  it("keeps Close out of the shared receipt image", () => {
+    screenshotState.isTakingScreenshot = true
+    renderReceipt()
+
+    expect(screen.queryByText(LL.common.close())).toBeNull()
+  })
+})
+
+describe("SendBitcoinCompletedScreen recipient", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    loadLocale("en")
+    screenshotState.isTakingScreenshot = false
+  })
+
+  it("prints an on-chain recipient in full and lets it wrap", () => {
+    const onchainRoute = {
+      key: "sendBitcoinCompleted",
+      name: "sendBitcoinCompleted",
+      params: {
+        status: "SUCCESS",
+        currencyAmount: "$100.00",
+        satAmount: "100,100 SAT",
+        destination: "bc1p5d7rjq7g6rdk2yhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg3297",
+        paymentType: "onchain",
+        createdAt: 1747691078,
+      },
+    } as const
+
+    render(
+      <ContextForScreen>
+        <SuccessAction route={onchainRoute} />
+      </ContextForScreen>,
+    )
+
+    act(() => {
+      jest.advanceTimersByTime(2300)
+    })
+
+    const recipient = screen.getByText(onchainRoute.params.destination)
+    expect(recipient.props.numberOfLines).toBeUndefined()
+    expect(recipient.props.ellipsizeMode).toBeUndefined()
+  })
+})
 
 describe("SendBitcoinCompletedScreen", () => {
   let LL: ReturnType<typeof i18nObject>
@@ -930,6 +1019,70 @@ describe("SendBitcoinCompletedScreen", () => {
       expect(viewShot.props.style).toMatchObject({
         backgroundColor: dark.white,
       })
+    })
+  })
+})
+
+type HostNode = { props: { style?: unknown }; parent: HostNode | null }
+
+/** The background of the nearest surface that paints one around a value. */
+const surfaceColor = (node: HostNode) => {
+  for (let current: HostNode | null = node; current; current = current.parent) {
+    const { backgroundColor } = StyleSheet.flatten(current.props.style as never) ?? {}
+    if (backgroundColor) return backgroundColor
+  }
+  return undefined
+}
+
+/** A success action is read, not pressed. Its URL is a text link with no icon, which
+ *  does not make the field a press target, so the field keeps the static grey7
+ *  (blink-wip#1871, blink-wip#1309). */
+describe("SendBitcoinCompletedScreen success action surface", () => {
+  const urlRoute = {
+    key: "sendBitcoinCompleted",
+    name: "sendBitcoinCompleted",
+    params: {
+      status: "SUCCESS",
+      successAction: {
+        tag: "url",
+        description: null,
+        url: "https://es.blink.sv",
+        message: null,
+        ciphertext: null,
+        iv: null,
+        decipher: () => null,
+      },
+      currencyAmount: "$0.03",
+      satAmount: "25 SAT",
+      currencyFeeAmount: "$0.00",
+      satFeeAmount: "0 SAT",
+      destination: "moises",
+      paymentType: "lightning",
+      createdAt: 1747691078,
+    },
+  } as const
+
+  const modes = [
+    { mode: "light", grey7: light.grey7 },
+    { mode: "dark", grey7: dark.grey7 },
+  ] as const
+
+  modes.forEach(({ mode, grey7 }) => {
+    it(`paints a URL success action on the static grey7 in ${mode} mode`, async () => {
+      render(
+        <ContextForScreenWithTheme mode={mode}>
+          <SuccessAction route={urlRoute} />
+        </ContextForScreenWithTheme>,
+      )
+
+      act(() => {
+        jest.advanceTimersByTime(2300)
+      })
+
+      const url = await waitFor(() =>
+        screen.findByText(urlRoute.params.successAction.url),
+      )
+      expect(surfaceColor(url as never)).toBe(grey7)
     })
   })
 })
