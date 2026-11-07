@@ -5,7 +5,6 @@ import Modal from "react-native-modal"
 
 import { makeStyles, Text, TextProps, useTheme } from "@rn-vui/themed"
 
-import { useOverlayCover } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/overlay-cover"
 import { testProps } from "@app/utils/testProps"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
@@ -78,7 +77,6 @@ const CustomModal: React.FC<CustomModalProps> = ({
     /* eslint @typescript-eslint/ban-ts-comment: "off" */
     // @ts-ignore-next-line no-implicit-any error
   }) as StyleSheet.NamedStyles
-  useOverlayCover(isVisible)
   const {
     theme: { mode, colors },
   } = useTheme()

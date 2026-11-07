@@ -3,7 +3,6 @@ import { it } from "@jest/globals"
 import { TxDirection, WalletCurrency } from "@app/graphql/generated"
 import {
   ALLOWED_ROUTES,
-  amountBucket,
   decideSplash,
   FOREGROUND_GRACE_MS,
 } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/decide-splash"
@@ -44,7 +43,6 @@ const decide = (overrides: Partial<Parameters<typeof decideSplash>[0]> = {}) =>
     routeName: "Home",
     keyboardVisible: false,
     appLocked: false,
-    overlayCovered: false,
     ...overrides,
   })
 
@@ -109,7 +107,6 @@ describe("decideSplash", () => {
       [{ routeName: undefined }, "blocked_route"],
       [{ keyboardVisible: true }, "blocked_route"],
       [{ appLocked: true }, "blocked_route"],
-      [{ overlayCovered: true }, "blocked_route"],
     ]
     cases.forEach(([overrides, reason]) => {
       expect(decide(overrides)).toEqual({ outcome: "suppress", reason })
@@ -124,14 +121,5 @@ describe("decideSplash", () => {
     for (const routeName of ALLOWED_ROUTES) {
       expect(decide({ routeName }).outcome).toBe("show")
     }
-  })
-})
-
-describe("amountBucket", () => {
-  it("bands sats without reporting the exact amount", () => {
-    expect(amountBucket(99)).toBe("lt_100")
-    expect(amountBucket(100)).toBe("100_999")
-    expect(amountBucket(77_095)).toBe("10k_100k")
-    expect(amountBucket(1_000_000)).toBe("1m_plus")
   })
 })

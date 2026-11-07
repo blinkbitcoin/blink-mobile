@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { PropsWithChildren, useCallback, useEffect, useRef, useState } from "react"
 import {
   AccessibilityInfo,
-  BackHandler,
+  Modal,
+  Platform,
   Pressable,
   StatusBar,
   StyleSheet,
@@ -21,6 +22,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { FullWindowOverlay } from "react-native-screens"
 
 import { Canvas, RadialGradient, Rect, vec } from "@shopify/react-native-skia"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -39,7 +41,7 @@ import { testProps } from "@app/utils/testProps"
 
 import type { ShownSplash } from "./incoming-transaction-splash-provider"
 import { PendingHourglass } from "./pending-hourglass"
-import { SplashCloseAction, SplashPaymentType } from "./types"
+import { SplashPaymentType } from "./types"
 
 const IRIS_MS = 480
 const IRIS_OVERSHOOT = 40
@@ -70,15 +72,40 @@ const REPLACE_RING_MS = 380
 const GLOW = "rgba(255, 255, 255, 0.35)"
 const RING = "rgba(255, 255, 255, 0.25)"
 
-type CloseAction = { optedOut: boolean; action: SplashCloseAction }
+type CloseAction = { optedOut: boolean }
 
 type Props = {
   splash: ShownSplash
   onClose: (action: CloseAction) => void
-  onDetails: (action: { optedOut: boolean }) => void
-  /** A tap showed a hidden amount, for analytics. */
-  onReveal: () => void
+  onDetails: (action: CloseAction) => void
 }
+
+/**
+ * The splash goes over everything, an open modal or sheet included, and is the only
+ * thing a screen reader can reach while it is up. Android: a native modal, a window of
+ * its own above any other. iOS: a native modal would have to be presented by the one
+ * already open, so it is a full-window overlay instead, added to the window last.
+ */
+const SplashWindow: React.FC<PropsWithChildren<{ onBack: () => void }>> = ({
+  onBack,
+  children,
+}) =>
+  Platform.OS === "ios" ? (
+    <FullWindowOverlay unstable_accessibilityContainerViewIsModal>
+      {children}
+    </FullWindowOverlay>
+  ) : (
+    <Modal
+      visible
+      transparent
+      animationType="none"
+      statusBarTranslucent
+      navigationBarTranslucent
+      onRequestClose={onBack}
+    >
+      {children}
+    </Modal>
+  )
 
 /** On-chain is shown when it is detected, before it confirms. */
 const isPendingOnchain = (splash: ShownSplash) =>
@@ -101,7 +128,6 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
   splash,
   onClose,
   onDetails,
-  onReveal,
 }) => {
   const styles = useStyles()
   const {
@@ -111,6 +137,21 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
   const insets = useSafeAreaInsets()
   const { width, height } = useWindowDimensions()
   const { formatCurrency, formatMoneyAmount } = useDisplayCurrency()
+
+  /** The display-currency amount, or the sats alone when there is no price yet. */
+  const heroAmount = useCallback(
+    (shown: ShownSplash) => {
+      if (shown.unpriced) {
+        return formatMoneyAmount({ moneyAmount: toBtcMoneyAmount(shown.amountSats) })
+      }
+      const { settlementDisplayAmount, settlementDisplayCurrency } = shown.transaction
+      return formatCurrency({
+        amountInMajorUnits: settlementDisplayAmount,
+        currency: settlementDisplayCurrency,
+      })
+    },
+    [formatCurrency, formatMoneyAmount],
+  )
 
   /** What is on screen. Lags the prop during a replacement, until the old content has
    *  faded out. */
@@ -168,18 +209,14 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
         )
         return
       }
-      const { settlementDisplayAmount, settlementDisplayCurrency } = shown.transaction
-      const amount = formatCurrency({
-        amountInMajorUnits: settlementDisplayAmount,
-        currency: settlementDisplayCurrency,
-      })
+      const amount = heroAmount(shown)
       AccessibilityInfo.announceForAccessibility(
         pending
           ? LL.IncomingTransactionSplash.announcementPending({ amount })
           : LL.IncomingTransactionSplash.announcement({ amount }),
       )
     },
-    [LL, formatCurrency],
+    [LL, heroAmount],
   )
 
   const onImpact = useCallback(
@@ -286,25 +323,12 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
   }, [splash])
 
   const reveal = useCallback(() => {
-    if (!interactive) return
-    setRevealed(true)
-    onReveal()
-  }, [interactive, onReveal])
+    if (interactive) setRevealed(true)
+  }, [interactive])
 
-  const close = useCallback(
-    (action: SplashCloseAction) => {
-      if (interactive) onClose({ optedOut, action })
-    },
-    [interactive, onClose, optedOut],
-  )
-
-  useEffect(() => {
-    const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
-      close(SplashCloseAction.Back)
-      return true
-    })
-    return () => subscription.remove()
-  }, [close])
+  const close = useCallback(() => {
+    if (interactive) onClose({ optedOut })
+  }, [interactive, onClose, optedOut])
 
   const center = useDerivedValue(() => vec(centerX.value, centerY.value))
   const irisPositions = useDerivedValue(() => {
@@ -336,175 +360,183 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
   const detailGroupStyle = useFadeUpStyle(detailGroup)
   const controlsStyle = useFadeUpStyle(controls)
 
-  const { settlementDisplayAmount, settlementDisplayCurrency, memo } =
-    displayed.transaction
-  const displayAmount = formatCurrency({
-    amountInMajorUnits: settlementDisplayAmount,
-    currency: settlementDisplayCurrency,
-  })
+  const { memo } = displayed.transaction
+  const displayAmount = heroAmount(displayed)
   const satsAmount = formatMoneyAmount({
     moneyAmount: toBtcMoneyAmount(displayed.amountSats),
   })
   const masked = displayed.amountHidden && !revealed
   const pendingOnchain = isPendingOnchain(displayed)
+  /** Unpriced, the hero already is the sats: the line under it would repeat it. */
+  const showSatsLine = masked || !displayed.unpriced
 
   return (
-    <View style={StyleSheet.absoluteFill} {...testProps("incoming-transaction-splash")}>
-      {/* White icons on the green in both themes; unmounting restores the app's own. */}
-      <StatusBar barStyle="light-content" />
-      <Animated.View
-        style={[StyleSheet.absoluteFill, styles.ground, groundStyle]}
-        pointerEvents="none"
-      />
-      <Animated.View style={[StyleSheet.absoluteFill, pulseStyle]} pointerEvents="none">
-        <SuccessGlow
-          progress={pulse}
-          centerX={anchor.x}
-          centerY={anchor.y}
-          radius={PULSE_RADIUS}
-          innerColor="transparent"
-          rimColor={colors._white}
-        />
-      </Animated.View>
-      {/* Unmounted once it lands: Android composites a Skia canvas on its own surface,
-          and one left on screen drops the overlay's grounds under some screens (Receive). */}
-      {!irisDone && (
-        <Canvas style={StyleSheet.absoluteFill} pointerEvents="none">
-          <Rect x={0} y={0} width={width} height={height}>
-            <RadialGradient
-              c={center}
-              r={irisRadius}
-              colors={["transparent", "transparent", GLOW, colors._green]}
-              positions={irisPositions}
-            />
-          </Rect>
-        </Canvas>
-      )}
-      <Animated.View style={[styles.ring, ringStyle]} pointerEvents="none" />
-
-      <Animated.View
-        style={[
-          styles.container,
-          { paddingTop: insets.top, paddingBottom: insets.bottom },
-          contentStyle,
-        ]}
-        pointerEvents={interactive ? "box-none" : "none"}
-      >
-        <View style={styles.placeholder} />
-        <View style={styles.body}>
-          <Pressable
-            style={styles.hero}
-            onPress={reveal}
-            disabled={!masked}
-            accessible={masked}
-            accessibilityRole={masked ? "button" : undefined}
-            accessibilityLabel={
-              masked ? LL.IncomingTransactionSplash.tapToShow() : undefined
-            }
-            testID="incoming-transaction-splash-reveal"
-          >
-            <Animated.View style={[styles.badge, badgeStyle]}>
-              {impactKey > 0 &&
-                (pendingOnchain ? (
-                  <PendingHourglass
-                    key={impactKey}
-                    size={HOURGLASS_SIZE}
-                    color={colors._white}
-                  />
-                ) : (
-                  <SuccessBadge key={impactKey} size={BADGE_SIZE} color={colors._white} />
-                ))}
-            </Animated.View>
-            <Animated.View style={[styles.text, amountGroupStyle]}>
-              <Text type="p3" style={styles.white}>
-                {pendingOnchain
-                  ? LL.IncomingTransactionSplash.pendingOnchain()
-                  : LL.IncomingTransactionSplash.youReceived()}
-              </Text>
-              <View ref={amountRef} onLayout={onAmountLayout}>
-                {masked ? (
-                  <HiddenBalancePlaceholder size="large" color={colors._white} />
-                ) : (
-                  <Text
-                    bold
-                    style={[styles.white, styles.amount]}
-                    numberOfLines={1}
-                    adjustsFontSizeToFit
-                  >
-                    {displayAmount}
-                  </Text>
-                )}
-              </View>
-            </Animated.View>
-            <Animated.View style={detailGroupStyle}>
-              <Text type="p2" style={[styles.white, masked && styles.tapToShow]}>
-                {masked ? LL.IncomingTransactionSplash.tapToShow() : satsAmount}
-              </Text>
-            </Animated.View>
-          </Pressable>
-          {memo ? (
-            <Animated.View style={[styles.noteCard, detailGroupStyle]}>
-              <Text type="p3" style={[styles.white, styles.noteLabel]}>
-                {LL.IncomingTransactionSplash.note()}
-              </Text>
-              <Text
-                type="p3"
-                bold
-                style={[styles.white, styles.noteValue]}
-                numberOfLines={3}
-                ellipsizeMode="tail"
-              >
-                {memo}
-              </Text>
-            </Animated.View>
-          ) : null}
-        </View>
-        <View style={styles.placeholder} />
-
-        <Animated.View style={controlsStyle}>
-          <View style={styles.checkboxRow}>
-            <CheckboxRow
-              label={LL.IncomingTransactionSplash.dontShowAgain()}
-              isChecked={optedOut}
-              onPress={() => setOptedOut((value) => !value)}
-              color={colors._white}
-              checkColor={colors._green}
-              centered
-              singleLine
-              testID="incoming-transaction-splash-opt-out"
-            />
-          </View>
-          <View style={styles.buttonGroup}>
-            <GaloyPrimaryButton
-              title={LL.common.close()}
-              onPress={() => close(SplashCloseAction.Close)}
-              buttonStyle={styles.closeButton}
-              titleStyle={styles.closeButtonTitle}
-              containerStyle={styles.fullWidth}
-            />
-            <GaloySecondaryButton
-              title={LL.IncomingTransactionSplash.details()}
-              onPress={() => interactive && onDetails({ optedOut })}
-              titleStyle={styles.white}
-            />
-          </View>
-        </Animated.View>
-
+    <SplashWindow onBack={close}>
+      <View style={StyleSheet.absoluteFill} {...testProps("incoming-transaction-splash")}>
+        {/* White icons on the green in both themes; unmounting restores the app's own. */}
+        <StatusBar barStyle="light-content" />
         <Animated.View
-          style={[styles.closeIcon, { top: insets.top + 14 }, controlsStyle]}
-        >
-          <GaloyIconButton
-            name="close"
-            size="medium"
-            iconOnly
-            backgroundColor={colors._green}
-            color={colors._white}
-            onPress={() => close(SplashCloseAction.X)}
-            {...testProps("incoming-transaction-splash-close")}
+          style={[StyleSheet.absoluteFill, styles.ground, groundStyle]}
+          pointerEvents="none"
+        />
+        <Animated.View style={[StyleSheet.absoluteFill, pulseStyle]} pointerEvents="none">
+          <SuccessGlow
+            progress={pulse}
+            centerX={anchor.x}
+            centerY={anchor.y}
+            radius={PULSE_RADIUS}
+            innerColor="transparent"
+            rimColor={colors._white}
           />
         </Animated.View>
-      </Animated.View>
-    </View>
+        {/* Unmounted once it lands: Android composites a Skia canvas on its own surface,
+          and one left on screen drops the overlay's grounds under some screens (Receive). */}
+        {!irisDone && (
+          <Canvas style={StyleSheet.absoluteFill} pointerEvents="none">
+            <Rect x={0} y={0} width={width} height={height}>
+              <RadialGradient
+                c={center}
+                r={irisRadius}
+                colors={["transparent", "transparent", GLOW, colors._green]}
+                positions={irisPositions}
+              />
+            </Rect>
+          </Canvas>
+        )}
+        <Animated.View style={[styles.ring, ringStyle]} pointerEvents="none" />
+
+        <Animated.View
+          style={[
+            styles.container,
+            { paddingTop: insets.top, paddingBottom: insets.bottom },
+            contentStyle,
+          ]}
+          pointerEvents={interactive ? "box-none" : "none"}
+        >
+          <View style={styles.placeholder} />
+          <View style={styles.body}>
+            <Pressable
+              style={styles.hero}
+              onPress={reveal}
+              disabled={!masked}
+              accessible={masked}
+              accessibilityRole={masked ? "button" : undefined}
+              accessibilityLabel={
+                masked ? LL.IncomingTransactionSplash.tapToShow() : undefined
+              }
+              testID="incoming-transaction-splash-reveal"
+            >
+              <Animated.View style={[styles.badge, badgeStyle]}>
+                {impactKey > 0 &&
+                  (pendingOnchain ? (
+                    <PendingHourglass
+                      key={impactKey}
+                      size={HOURGLASS_SIZE}
+                      color={colors._white}
+                    />
+                  ) : (
+                    <SuccessBadge
+                      key={impactKey}
+                      size={BADGE_SIZE}
+                      color={colors._white}
+                    />
+                  ))}
+              </Animated.View>
+              <Animated.View style={[styles.text, amountGroupStyle]}>
+                <Text type="p3" style={styles.white}>
+                  {pendingOnchain
+                    ? LL.IncomingTransactionSplash.pendingOnchain()
+                    : LL.IncomingTransactionSplash.youReceived()}
+                </Text>
+                <View ref={amountRef} onLayout={onAmountLayout}>
+                  {masked ? (
+                    <HiddenBalancePlaceholder size="large" color={colors._white} />
+                  ) : (
+                    <Text
+                      bold
+                      style={[styles.white, styles.amount]}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                    >
+                      {displayAmount}
+                    </Text>
+                  )}
+                </View>
+              </Animated.View>
+              {showSatsLine && (
+                <Animated.View style={detailGroupStyle}>
+                  <Text type="p2" style={[styles.white, masked && styles.tapToShow]}>
+                    {masked ? LL.IncomingTransactionSplash.tapToShow() : satsAmount}
+                  </Text>
+                </Animated.View>
+              )}
+            </Pressable>
+            {memo ? (
+              <Animated.View style={[styles.noteCard, detailGroupStyle]}>
+                <Text type="p3" style={[styles.white, styles.noteLabel]}>
+                  {LL.IncomingTransactionSplash.note()}
+                </Text>
+                <Text
+                  type="p3"
+                  bold
+                  style={[styles.white, styles.noteValue]}
+                  numberOfLines={3}
+                  ellipsizeMode="tail"
+                >
+                  {memo}
+                </Text>
+              </Animated.View>
+            ) : null}
+          </View>
+          <View style={styles.placeholder} />
+
+          <Animated.View style={controlsStyle}>
+            <View style={styles.checkboxRow}>
+              <CheckboxRow
+                label={LL.IncomingTransactionSplash.dontShowAgain()}
+                isChecked={optedOut}
+                onPress={() => setOptedOut((value) => !value)}
+                color={colors._white}
+                checkColor={colors._green}
+                centered
+                singleLine
+                testID="incoming-transaction-splash-opt-out"
+              />
+            </View>
+            <View style={styles.buttonGroup}>
+              <GaloyPrimaryButton
+                title={LL.common.close()}
+                onPress={close}
+                buttonStyle={styles.closeButton}
+                titleStyle={styles.closeButtonTitle}
+                containerStyle={styles.fullWidth}
+              />
+              <GaloySecondaryButton
+                title={LL.IncomingTransactionSplash.details()}
+                onPress={() => interactive && onDetails({ optedOut })}
+                disabled={displayed.detailsPending === true}
+                titleStyle={styles.white}
+                disabledTitleStyle={styles.white}
+              />
+            </View>
+          </Animated.View>
+
+          <Animated.View
+            style={[styles.closeIcon, { top: insets.top + 14 }, controlsStyle]}
+          >
+            <GaloyIconButton
+              name="close"
+              size="medium"
+              iconOnly
+              backgroundColor={colors._green}
+              color={colors._white}
+              onPress={close}
+              {...testProps("incoming-transaction-splash-close")}
+            />
+          </Animated.View>
+        </Animated.View>
+      </View>
+    </SplashWindow>
   )
 }
 
