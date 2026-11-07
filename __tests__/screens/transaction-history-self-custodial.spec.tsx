@@ -52,7 +52,12 @@ jest.mock("@app/components/wallet-filter-dropdown", () => ({
 }))
 
 jest.mock("@app/components/transaction-item", () => ({
-  MemoizedTransactionItem: () => null,
+  MemoizedTransactionItem: ({ txid, highlight }: { txid: string; highlight?: boolean }) =>
+    React.createElement(
+      "Text",
+      { testID: `tx-${txid}` },
+      highlight ? "highlight" : "no-highlight",
+    ),
   useDescriptionDisplay: () => "",
 }))
 
@@ -439,6 +444,45 @@ describe("TransactionHistoryScreen — self-custodial behavior", () => {
 
       expect(mockPersistentState.txLastSeenByAccountId).toEqual({
         [SELF_CUSTODIAL_ACCOUNT_ID]: { btcId: "sc-btc-new", usdId: "sc-usd-new" },
+      })
+    })
+
+    describe("after a restore", () => {
+      /** The record a restore starts: no ids yet, and a cutoff at 10s. */
+      const restoredRecord = { btcId: "", usdId: "", announceSinceMs: 10_000 }
+
+      const renderRestoredHistory = (receive: ReturnType<typeof buildFragment>) => {
+        mockPersistentState = {
+          ...mockPersistentState,
+          txLastSeenByAccountId: { [SELF_CUSTODIAL_ACCOUNT_ID]: restoredRecord },
+        }
+        mockSelfCustodialState.allTransactions = [
+          { id: receive.id, amount: { currency: "BTC" }, timestamp: receive.createdAt },
+        ]
+        mockToTransactionFragments.mockReturnValue([receive])
+        setActiveWallet(true)
+
+        return render(<TransactionHistoryScreen route={route} />)
+      }
+
+      it("does not highlight or mark seen a receive from before the record started", async () => {
+        const { getByTestId } = renderRestoredHistory(
+          buildFragment("sc-btc-replayed", "BTC", 9),
+        )
+        await flushEffects()
+
+        expect(getByTestId("tx-sc-btc-replayed").props.children).toBe("no-highlight")
+        expect(getTxLastSeenIds(mockPersistentState)).toEqual(restoredRecord)
+      })
+
+      it("highlights and marks seen a receive from after the record started", async () => {
+        const { getByTestId } = renderRestoredHistory(
+          buildFragment("sc-btc-after", "BTC", 11),
+        )
+        await flushEffects()
+
+        expect(getByTestId("tx-sc-btc-after").props.children).toBe("highlight")
+        expect(getTxLastSeenIds(mockPersistentState).btcId).toBe("sc-btc-after")
       })
     })
 

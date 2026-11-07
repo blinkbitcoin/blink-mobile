@@ -108,9 +108,10 @@ export const useTransactionSeenState = ({
   /** Custodial history is the server's and never replays. Self-custodial announces only
    *  what is newer than its record; with no record yet, nothing. Payment times are whole
    *  seconds, so the record's start is compared in seconds too: a payment in the second
-   *  the record started is new, not part of the history. */
+   *  the record started is new, not part of the history. History applies the same cutoff
+   *  to its highlight, so a restored account's past receives are not marked new there. */
   const isNewEnoughToAnnounce = useCallback(
-    (transaction: TransactionFragment | undefined): boolean => {
+    (transaction: Pick<TransactionFragment, "createdAt"> | undefined): boolean => {
       if (!transaction) return false
       if (!isSelfCustodial) return true
       if (!hasDeviceRecord) return false
@@ -175,6 +176,7 @@ export const useTransactionSeenState = ({
     latestUsdTxId,
     lastSeenBtcId,
     lastSeenUsdId,
+    isNewEnoughToAnnounce,
     markTxSeen: markTransactionAsSeen,
   }
 }
