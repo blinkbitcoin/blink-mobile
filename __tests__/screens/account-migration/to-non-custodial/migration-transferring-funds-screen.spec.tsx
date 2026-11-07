@@ -1,5 +1,5 @@
 import React from "react"
-import { fireEvent, render, screen } from "@testing-library/react-native"
+import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { MigrationTransferringFundsScreen } from "@app/screens/account-migration/to-non-custodial/migration-transferring-funds-screen"
@@ -16,9 +16,32 @@ const CLOSE_UNAVAILABLE_MESSAGE =
 
 const mockNavigate = jest.fn()
 const mockReset = jest.fn()
+let mockIsFocused = true
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate, reset: mockReset }),
+  useIsFocused: () => mockIsFocused,
+}))
+
+const mockPendingDepositModal = jest.fn()
+jest.mock("@app/screens/account-migration/pending-deposit-modal", () => ({
+  PendingDepositModal: (props: {
+    isVisible: boolean
+    onAcknowledge: () => void
+    showCloseIconButton?: boolean
+    onContactSupport?: () => void
+  }) => {
+    mockPendingDepositModal(props)
+    const ReactNs = jest.requireActual<typeof import("react")>("react")
+    const RN = jest.requireActual<typeof import("react-native")>("react-native")
+    return props.isVisible
+      ? ReactNs.createElement(
+          RN.Text,
+          { testID: "pending-deposit-modal-ok", onPress: props.onAcknowledge },
+          "ok",
+        )
+      : null
+  },
 }))
 
 const mockCompleteMigration = jest.fn()
@@ -51,7 +74,23 @@ let mockIsReceiveDelayed = false
 let mockFailureReason: MigrationSupportReason | null = null
 let mockIsClockOutOfSync = false
 let mockHasConnectionIssue = false
+let mockIsDepositPending = false
 const mockRetry = jest.fn()
+
+const mockUseCustodialPendingDeposits = jest.fn()
+const mockCheckDepositsClear = jest.fn()
+jest.mock("@app/screens/account-migration/hooks/use-custodial-pending-deposits", () => ({
+  useCustodialPendingDeposits: (options: { skip?: boolean }) => {
+    mockUseCustodialPendingDeposits(options)
+    return {
+      hasPendingDeposit: false,
+      loading: false,
+      isReady: true,
+      hasError: false,
+      checkClear: mockCheckDepositsClear,
+    }
+  },
+}))
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-transfer", () => ({
   useMigrationTransfer: (args: unknown) => {
@@ -63,6 +102,7 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-transfer", () => (
       failureReason: mockFailureReason,
       isClockOutOfSync: mockIsClockOutOfSync,
       hasConnectionIssue: mockHasConnectionIssue,
+      isDepositPending: mockIsDepositPending,
       retry: mockRetry,
     }
   },
@@ -116,8 +156,117 @@ describe("MigrationTransferringFundsScreen", () => {
     mockFailureReason = null
     mockIsClockOutOfSync = false
     mockHasConnectionIssue = false
+    mockIsDepositPending = false
+    mockIsFocused = true
+    mockCheckDepositsClear.mockResolvedValue(true)
     mockCompleteMigration.mockResolvedValue(MigrationCompletion.Completed)
     loadLocale("en")
+  })
+
+  describe("with the commit refused for a deposit still confirming", () => {
+    beforeEach(() => {
+      mockIsDepositPending = true
+    })
+
+    it("asks for the deposits only once the commit has been refused for one", async () => {
+      renderScreen()
+      await flushEffects()
+
+      expect(mockUseCustodialPendingDeposits).toHaveBeenLastCalledWith({ skip: false })
+    })
+
+    it("commits again from OK once the deposit has landed", async () => {
+      renderScreen()
+      await flushEffects()
+
+      fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+      await flushEffects()
+
+      expect(mockCheckDepositsClear).toHaveBeenCalledTimes(1)
+      expect(mockRetry).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    it("does not commit again from OK while the deposit is still confirming", async () => {
+      mockCheckDepositsClear.mockResolvedValue(false)
+      renderScreen()
+      await flushEffects()
+
+      fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+      await flushEffects()
+
+      expect(mockRetry).not.toHaveBeenCalled()
+    })
+
+    it("leaves it to the commit from OK when the check fails", async () => {
+      mockCheckDepositsClear.mockRejectedValue(new Error("network"))
+      renderScreen()
+      await flushEffects()
+
+      fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+      await flushEffects()
+
+      expect(mockRetry).toHaveBeenCalledTimes(1)
+    })
+
+    it("shows the check running on OK only while the check OK started is out", async () => {
+      let answerCheck: (value: boolean) => void = () => undefined
+      mockCheckDepositsClear.mockReturnValue(
+        new Promise<boolean>((resolve) => {
+          answerCheck = resolve
+        }),
+      )
+      renderScreen()
+      await flushEffects()
+
+      expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+        expect.objectContaining({ isChecking: false }),
+      )
+
+      fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+      await flushEffects()
+
+      expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+        expect.objectContaining({ isChecking: true }),
+      )
+
+      await act(async () => {
+        answerCheck(false)
+      })
+
+      expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+        expect.objectContaining({ isChecking: false }),
+      )
+    })
+
+    it("offers support from the modal and no way to close it", async () => {
+      renderScreen()
+      await flushEffects()
+
+      expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          showCloseIconButton: false,
+          onContactSupport: expect.any(Function),
+        }),
+      )
+    })
+
+    it("hides the modal while another screen is on top", async () => {
+      mockIsFocused = false
+
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.queryByTestId("pending-deposit-modal-ok")).toBeNull()
+    })
+  })
+
+  it("keeps the pending-deposit modal hidden, and the deposits unasked, while nothing refused the commit", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.queryByTestId("pending-deposit-modal-ok")).toBeNull()
+    expect(mockUseCustodialPendingDeposits).toHaveBeenLastCalledWith({ skip: true })
   })
 
   it("swallows the hardware back while the funds move", async () => {
@@ -401,6 +550,21 @@ describe("MigrationTransferringFundsScreen", () => {
       reason: MigrationSupportReason.ReceiveDelayed,
       origin: "receive-delayed",
       custodialAccountId: "custodial-1",
+    })
+  })
+
+  it("leaves the custodial id out of the delayed-receive ticket when there is none", async () => {
+    mockIsReceiveDelayed = true
+    mockOwnerId = null
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("migration-receive-delayed-contact-support"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: MigrationSupportReason.ReceiveDelayed,
+      origin: "receive-delayed",
+      custodialAccountId: undefined,
     })
   })
 

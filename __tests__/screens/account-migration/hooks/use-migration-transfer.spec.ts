@@ -112,21 +112,23 @@ const renderTransfer = (
     }),
   )
 
-describe("useMigrationTransfer", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    resetMigrationCommitGuard()
-    mockStatus = MigrationStatus.InProgress
-    mockRefetchStatus = () => Promise.resolve(mockStatus)
-    mockBuildTransferRequest.mockResolvedValue({
-      status: MigrationSdkStatus.Ok,
-      value: collectedRequest,
-    })
-    mockCommitMigration.mockResolvedValue({ data: { migrationCommit: { errors: [] } } })
-    mockIsDeviceClockSkewed.mockReturnValue(false)
-    mockCurrentProofTimestamp.mockReturnValue(1_700_000_000)
-    mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+const resetTransferMocks = () => {
+  jest.clearAllMocks()
+  resetMigrationCommitGuard()
+  mockStatus = MigrationStatus.InProgress
+  mockRefetchStatus = () => Promise.resolve(mockStatus)
+  mockBuildTransferRequest.mockResolvedValue({
+    status: MigrationSdkStatus.Ok,
+    value: collectedRequest,
   })
+  mockCommitMigration.mockResolvedValue({ data: { migrationCommit: { errors: [] } } })
+  mockIsDeviceClockSkewed.mockReturnValue(false)
+  mockCurrentProofTimestamp.mockReturnValue(1_700_000_000)
+  mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+}
+
+describe("useMigrationTransfer", () => {
+  beforeEach(resetTransferMocks)
 
   it("commits the collected destination while the server awaits one", async () => {
     renderTransfer()
@@ -855,5 +857,88 @@ describe("useMigrationTransfer", () => {
     })
 
     expect(mockCommitMigration).not.toHaveBeenCalled()
+  })
+})
+
+describe("useMigrationTransfer, with a deposit still confirming", () => {
+  beforeEach(resetTransferMocks)
+
+  const pendingDepositRejection = {
+    data: {
+      migrationCommit: {
+        errors: [
+          {
+            message: "Migration is not available while an incoming deposit is pending.",
+            code: "MIGRATION_PENDING_DEPOSIT",
+          },
+        ],
+      },
+    },
+  }
+
+  it("pauses on the retry instead of handing the user to support", async () => {
+    mockCommitMigration.mockResolvedValue(pendingDepositRejection)
+
+    const { result } = renderTransfer()
+    await flushEffects()
+
+    expect(result.current.isDepositPending).toBe(true)
+    expect(result.current.failureReason).toBeNull()
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  it("pauses the phase poll while the deposit is pending", async () => {
+    mockCommitMigration.mockResolvedValue(pendingDepositRejection)
+
+    renderTransfer()
+    await flushEffects()
+
+    expect(mockUseMigrationStatus).toHaveBeenLastCalledWith({
+      skip: false,
+      pollInterval: 0,
+    })
+  })
+
+  it("suppresses a server failure behind the retry while the deposit is pending", async () => {
+    mockCommitMigration.mockResolvedValue(pendingDepositRejection)
+    const { result, rerender } = renderTransfer()
+    await flushEffects()
+
+    mockStatus = MigrationStatus.Failed
+    rerender({})
+    await flushEffects()
+
+    expect(result.current.isDepositPending).toBe(true)
+    expect(result.current.failureReason).toBeNull()
+  })
+
+  it("commits again from a screen mounted again after the refusal", async () => {
+    mockCommitMigration.mockResolvedValueOnce(pendingDepositRejection)
+    const first = renderTransfer()
+    await flushEffects()
+    expect(first.result.current.isDepositPending).toBe(true)
+    first.unmount()
+
+    const second = renderTransfer()
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+    expect(second.result.current.isDepositPending).toBe(false)
+  })
+
+  it("commits again once the user retries, and clears the pending deposit", async () => {
+    mockCommitMigration.mockResolvedValueOnce(pendingDepositRejection)
+    const { result } = renderTransfer()
+    await flushEffects()
+    expect(result.current.isDepositPending).toBe(true)
+
+    await act(async () => {
+      await result.current.retry()
+    })
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+    expect(result.current.isDepositPending).toBe(false)
+    expect(result.current.failureReason).toBeNull()
   })
 })

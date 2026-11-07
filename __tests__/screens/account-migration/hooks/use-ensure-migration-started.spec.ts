@@ -27,6 +27,19 @@ const refusedWith = (message: string) => ({
 
 const DOLLAR_BALANCE_REFUSAL = "Dollar balance must be empty before migration"
 
+const pendingDepositRefusal = {
+  data: {
+    migrationStart: {
+      errors: [
+        {
+          message: "Migration is not available while an incoming deposit is pending.",
+          code: "MIGRATION_PENDING_DEPOSIT",
+        },
+      ],
+    },
+  },
+}
+
 const networkFailure = () => {
   const err = new Error("Network request failed")
   return Object.assign(err, { networkError: new Error("offline") })
@@ -152,6 +165,73 @@ describe("useEnsureMigrationStarted", () => {
     await flushEffects()
 
     expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+  })
+
+  it("waits on a deposit still confirming without treating it as final or reporting it", async () => {
+    mockMigrationStart.mockResolvedValue(pendingDepositRefusal)
+
+    const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    await flushEffects()
+
+    expect(result.current.isDepositPending).toBe(true)
+    expect(result.current.isRejected).toBe(false)
+    expect(result.current.isStarted).toBe(false)
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  it("fires again when a retry follows a pending-deposit refusal, and starts once it lands", async () => {
+    mockMigrationStart.mockResolvedValueOnce(pendingDepositRefusal)
+
+    const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    await flushEffects()
+    expect(result.current.isDepositPending).toBe(true)
+
+    act(() => result.current.retry())
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(2)
+    expect(result.current.isStarted).toBe(true)
+    expect(result.current.isDepositPending).toBe(false)
+  })
+
+  it("drops an acceptance that lands after the screen has left", async () => {
+    let settle: (value: unknown) => void = () => undefined
+    mockMigrationStart.mockReturnValue(
+      new Promise((resolve) => {
+        settle = resolve
+      }),
+    )
+
+    const { result, unmount } = renderHook(() =>
+      useEnsureMigrationStarted({ skip: false }),
+    )
+    unmount()
+
+    await act(async () => {
+      settle(accepted)
+    })
+
+    expect(result.current.isStarted).toBe(false)
+  })
+
+  it("drops a pending-deposit refusal that lands after the screen has left", async () => {
+    let settle: (value: unknown) => void = () => undefined
+    mockMigrationStart.mockReturnValue(
+      new Promise((resolve) => {
+        settle = resolve
+      }),
+    )
+
+    const { result, unmount } = renderHook(() =>
+      useEnsureMigrationStarted({ skip: false }),
+    )
+    unmount()
+
+    await act(async () => {
+      settle(pendingDepositRefusal)
+    })
+
+    expect(result.current.isDepositPending).toBe(false)
   })
 
   /** An accepted start is settled too: re-firing it would re-arm an already-armed lock. */
@@ -434,6 +514,20 @@ describe("useEnsureMigrationStarted", () => {
       expect(mockMigrationStart).toHaveBeenCalledTimes(2)
       return hook
     }
+
+    it("keeps the first start's acceptance when the repeat is refused for a deposit after it", async () => {
+      const { result } = await sendRepeat()
+
+      await act(async () => {
+        answerFirst(accepted)
+      })
+      await act(async () => {
+        answerSecond(pendingDepositRefusal)
+      })
+
+      expect(result.current.isStarted).toBe(true)
+      expect(result.current.isDepositPending).toBe(false)
+    })
 
     it("keeps the first start's acceptance when the repeat is refused after it", async () => {
       const { result } = await sendRepeat()

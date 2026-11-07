@@ -3949,6 +3949,11 @@
       "title": "Ne možemo da migriramo vaš dolarski saldo",
       "body": "Prvo ispraznite svoj dolarski saldo. Možete ga preneti na svoj Bitcoin saldo u Blinku ili na drugo mesto."
     },
+    "pendingDepositModal": {
+      "title": "Имате депозит на чекању на свом налогу",
+      "body": "Не можете мигрирати на другу врсту налога док сви ваши депозити на чекању не буду измирени и уплаћени на овај налог.",
+      "contactSupportCta": "Контактирај подршку"
+    },
     "balancesOverview": {
       "title": "Премести свој салдо",
       "body": "Безбедно премести своја средства на свој нови налог.",

@@ -3949,6 +3949,11 @@
       "title": "Nu îți putem migra soldul în dolari",
       "body": "Golește mai întâi soldul în dolari. Îl poți transfera în soldul tău Bitcoin din Blink sau în altă parte."
     },
+    "pendingDepositModal": {
+      "title": "Există un depozit în așteptare în contul tău",
+      "body": "Nu poți migra către un alt tip de cont până când toate depozitele tale în așteptare nu au fost decontate și creditate în acest cont.",
+      "contactSupportCta": "Contactează asistența"
+    },
     "balancesOverview": {
       "title": "Mută-ți soldul",
       "body": "Mută-ți fondurile în siguranță în noul tău cont.",

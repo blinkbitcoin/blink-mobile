@@ -3949,6 +3949,11 @@
             "title": "Non possiamo migrare il tuo saldo in dollari",
             "body": "Svuota prima il tuo saldo in dollari. Puoi trasferirlo sul tuo saldo Bitcoin in Blink o altrove."
         },
+        "pendingDepositModal": {
+            "title": "C'è un deposito in sospeso sul tuo account",
+            "body": "Non puoi migrare a un altro tipo di account finché tutti i tuoi depositi in sospeso non sono stati regolati e accreditati su questo account.",
+            "contactSupportCta": "Contatta il supporto"
+        },
         "balancesOverview": {
             "title": "Sposta il tuo saldo",
             "body": "Sposta i tuoi fondi in sicurezza sul tuo nuovo account.",
