@@ -9,7 +9,12 @@ import { ContextForScreen } from "../helper"
 const mockPopToTop = jest.fn()
 const mockReplace = jest.fn()
 const mockDispatch = jest.fn()
-let mockRouteParams: { returnTo?: "migration" | "modeSelection" } | undefined
+type ReturnArm = {
+  target: "migration" | "modeSelection" | "investment"
+  selectedAmountUsd?: number
+}
+
+let mockRouteParams: { returnTo?: ReturnArm } | undefined
 
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
@@ -57,7 +62,7 @@ describe("ConversionSuccessScreen", () => {
   })
 
   it("hands off to the migration entry for a migration conversion", () => {
-    mockRouteParams = { returnTo: "migration" }
+    mockRouteParams = { returnTo: { target: "migration" } }
 
     renderScreen()
 
@@ -69,8 +74,43 @@ describe("ConversionSuccessScreen", () => {
     expect(mockPopToTop).not.toHaveBeenCalled()
   })
 
+  /**
+   * The investment step is resumed on the figure the investor chose several screens
+   * earlier: landing on Home instead would lose it, and the step cannot ask for it again
+   * without making them repeat the choice and the signature.
+   */
+  it("resumes the investment step on the amount it was left on", () => {
+    mockRouteParams = { returnTo: { target: "investment", selectedAmountUsd: 500 } }
+
+    renderScreen()
+
+    act(() => {
+      jest.advanceTimersByTime(SUCCESS_DELAY)
+    })
+
+    expect(mockReplace).toHaveBeenCalledWith("cardOnboardingTransferInvestScreen", {
+      selectedAmountUsd: 500,
+    })
+    expect(mockPopToTop).not.toHaveBeenCalled()
+  })
+
+  /** The step has nothing to resume without the figure, and a screen asking for an amount
+   *  the investor already chose is worse than Home. */
+  it("returns to Home when the investment arm carries no amount", () => {
+    mockRouteParams = { returnTo: { target: "investment" } }
+
+    renderScreen()
+
+    act(() => {
+      jest.advanceTimersByTime(SUCCESS_DELAY)
+    })
+
+    expect(mockPopToTop).toHaveBeenCalledTimes(1)
+    expect(mockReplace).not.toHaveBeenCalled()
+  })
+
   it("rebuilds the settings path with Anon preselected for an Anon-switch conversion", () => {
-    mockRouteParams = { returnTo: "modeSelection" }
+    mockRouteParams = { returnTo: { target: "modeSelection" } }
 
     renderScreen()
 
