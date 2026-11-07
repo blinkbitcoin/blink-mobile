@@ -2538,7 +2538,7 @@
       }
     },
     "splashGroup": "Մուտքային գործարքի էկրան",
-    "incomingTransactionSplash": "Մուտքային գործարքի էկրան",
+    "incomingTransactionSplash": "Ցույց տալ էկրանը",
     "splashMinimum": "Նվազագույն գումար (SAT)"
   },
   "IncomingTransactionSplash": {

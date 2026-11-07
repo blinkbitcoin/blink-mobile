@@ -2538,7 +2538,7 @@
       }
     },
     "splashGroup": "Zaslon dolazne transakcije",
-    "incomingTransactionSplash": "Zaslon dolazne transakcije",
+    "incomingTransactionSplash": "Prikaži zaslon",
     "splashMinimum": "Najmanji iznos (SAT)"
   },
   "IncomingTransactionSplash": {

@@ -2538,7 +2538,7 @@
             }
         },
         "splashGroup": "Bildschirm bei Zahlungseingang",
-        "incomingTransactionSplash": "Bildschirm für eingehende Transaktionen",
+        "incomingTransactionSplash": "Bildschirm anzeigen",
         "splashMinimum": "Mindestbetrag (SAT)"
     },
     "IncomingTransactionSplash": {
@@ -2549,8 +2549,8 @@
         "announcement": "Erhalten {amount}",
         "tapToShow": "Antippen zum Anzeigen",
         "announcementHidden": "Zahlung erhalten",
-        "toastOn": "Splash-Screen ist an",
-        "toastOff": "Splash-Screen ist aus"
+        "toastOn": "Bildschirm bei Zahlungseingang ist an",
+        "toastOff": "Bildschirm bei Zahlungseingang ist aus"
     },
     "AccountScreen": {
         "fundsMoreThan5Dollars": "Ihr Konto hat mehr als $5",
