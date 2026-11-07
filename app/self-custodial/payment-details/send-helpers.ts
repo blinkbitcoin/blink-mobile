@@ -53,7 +53,45 @@ type PrepareParams = {
   amount: bigint | undefined
   tokenIdentifier?: string
   conversionOptions?: ConversionOptions
+  /** The quote review showed, for a send that converts dollars on the way out. */
+  quoteRef?: QuoteRef
 }
+
+/** What review showed for a dollar send: the fee, and the conversion behind it. */
+export type SendQuote = { feeSats: number; amountIn?: string; amountOut?: string }
+export type QuoteRef = { current?: SendQuote }
+
+export const quoteOf = (
+  feeSats: number,
+  estimate: { amountIn: unknown; amountOut: unknown } | undefined,
+): SendQuote => ({
+  feeSats,
+  amountIn: estimate ? String(estimate.amountIn) : undefined,
+  amountOut: estimate ? String(estimate.amountOut) : undefined,
+})
+
+/**
+ * Whether a dollar send's fresh quote differs from the one review showed. The price
+ * moves the conversion, so a send that kept going would pay or deliver amounts the
+ * sender never saw. A send with no quote on record has nothing to compare: review
+ * always quotes before the slider can move.
+ */
+export const hasQuoteMoved = (reviewed: SendQuote | undefined, fresh: SendQuote) =>
+  reviewed !== undefined &&
+  (reviewed.feeSats !== fresh.feeSats ||
+    reviewed.amountIn !== fresh.amountIn ||
+    reviewed.amountOut !== fresh.amountOut)
+
+/** A send stopped before anything went out, because its quote moved. */
+export const quoteMovedFailure = () => ({
+  status: PaymentSendResult.Failure,
+  errors: [
+    {
+      __typename: "GraphQLApplicationError" as const,
+      message: SelfCustodialErrorCode.QuoteMoved,
+    },
+  ],
+})
 
 /** What a send reports about itself: the rail category and the wallet spent from, never
  *  the destination, amount, or counterparty. */
@@ -127,6 +165,9 @@ export const createGetFee = <T extends WalletCurrency>(
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
       const feeSats = extractLightningFee(prepared) ?? 0
+      if (params.quoteRef) {
+        params.quoteRef.current = quoteOf(feeSats, prepared.conversionEstimate)
+      }
       const amountAdjustment = mapAmountAdjustment(
         prepared.conversionEstimate?.amountAdjustment,
       )
@@ -176,6 +217,19 @@ export const createSendMutation = (
     measure(ScEvent.PaymentSendInitiated, telemetryParams(telemetry))
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
+      if (
+        params.quoteRef &&
+        hasQuoteMoved(
+          params.quoteRef.current,
+          quoteOf(extractLightningFee(prepared) ?? 0, prepared.conversionEstimate),
+        )
+      ) {
+        measureIn(startedIn, ScEvent.PaymentSendFailed, {
+          ...telemetryParams(telemetry),
+          error_code: SelfCustodialErrorCode.QuoteMoved,
+        })
+        return quoteMovedFailure()
+      }
       const response = await executeSend(params.sdk, prepared)
       measureSettlement(
         response?.payment,

@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react"
 import { makeStyles, Text } from "@rn-vui/themed"
 import { Pressable, View } from "react-native"
 
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { Key as KeyType } from "../amount-input-screen/number-pad-reducer"
+import { fonts } from "@app/rne-theme/fonts"
 
 const KEY_ROW_PREFIX = "row-"
 const KEY_TEST_ID_PREFIX = "Key"
@@ -65,6 +67,7 @@ const Key = ({
   disabled?: boolean
 }) => {
   const styles = useStyles()
+  const { LL } = useI18nContext()
   const isBackspace = numberPadKey === KeyType.Backspace
 
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null)
@@ -105,6 +108,9 @@ const Key = ({
       onPress={() => handleKeyPress(numberPadKey)}
       onPressOut={handleBackSpacePressOut}
       {...testProps(`${KEY_TEST_ID_PREFIX} ${numberPadKey}`)}
+      accessibilityRole="button"
+      accessibilityLabel={isBackspace ? LL.Accessibility.deleteKey() : numberPadKey}
+      accessibilityState={{ disabled }}
     >
       {isBackspace ? (
         <GaloyIcon name="back-space" size={28} color={styles.backspaceIcon.color} />
@@ -143,9 +149,9 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey5,
   },
   keyText: {
-    fontSize: 26,
-    fontWeight: "700",
-    lineHeight: 30,
+    fontFamily: fonts.bold,
+    fontSize: 28,
+    lineHeight: 32,
     textAlign: "center",
   },
   backspaceIcon: {

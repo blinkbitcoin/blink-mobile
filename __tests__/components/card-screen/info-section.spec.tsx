@@ -1,8 +1,12 @@
 import React from "react"
-import { Text as RNText, View } from "react-native"
-import { render } from "@testing-library/react-native"
+import { StyleSheet, Text as RNText, View } from "react-native"
+import { ReactTestInstance } from "react-test-renderer"
+import { render, screen } from "@testing-library/react-native"
 
-import { InfoSection } from "@app/components/card-screen/info-section"
+import {
+  INFO_SECTION_OUTLINE_TEST_ID,
+  InfoSection,
+} from "@app/components/card-screen/info-section"
 
 jest.mock("@rn-vui/themed", () => ({
   Text: (props: React.ComponentProps<typeof RNText>) => <RNText {...props} />,
@@ -18,7 +22,16 @@ jest.mock("@rn-vui/themed", () => ({
   makeStyles: () => () => ({
     container: {},
     title: {},
-    card: {},
+    card: { backgroundColor: "#F5F5F5", padding: 14 },
+    cardInactive: { backgroundColor: "#F9F9F9" },
+    outline: {
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      borderWidth: 1,
+    },
   }),
 }))
 
@@ -248,6 +261,59 @@ describe("InfoSection", () => {
       )
 
       expect(getByTestId("value-Empty").props.children).toBe("")
+    })
+  })
+
+  /** The card is the one View carrying the card padding in the style mock. */
+  const cardStyle = (views: ReactTestInstance[]) =>
+    views
+      .map((view) => StyleSheet.flatten(view.props.style))
+      .find((style) => style?.padding === 14)
+
+  describe("inactive surface", () => {
+    it("paints the card on the static grey7 surface when inactive", () => {
+      render(<InfoSection {...defaultProps} inactive />)
+
+      expect(cardStyle(screen.UNSAFE_getAllByType(View))?.backgroundColor).toBe("#F9F9F9")
+    })
+
+    it("keeps the grey5 surface by default", () => {
+      render(<InfoSection {...defaultProps} />)
+
+      expect(cardStyle(screen.UNSAFE_getAllByType(View))?.backgroundColor).toBe("#F5F5F5")
+    })
+  })
+
+  describe("outline", () => {
+    it("draws no outline without an outlineColor", () => {
+      const { queryByTestId } = render(<InfoSection {...defaultProps} />)
+
+      expect(queryByTestId(INFO_SECTION_OUTLINE_TEST_ID)).toBeNull()
+    })
+
+    it("draws the outline in the given colour", () => {
+      const { getByTestId } = render(
+        <InfoSection {...defaultProps} outlineColor="#DC2626" />,
+      )
+
+      const outline = StyleSheet.flatten(
+        getByTestId(INFO_SECTION_OUTLINE_TEST_ID).props.style,
+      )
+      expect(outline.borderColor).toBe("#DC2626")
+      expect(outline.borderWidth).toBe(1)
+    })
+
+    /** Drawn over the card rather than as its border, so the rows don't move when an error
+     *  outlines the card. */
+    it("overlays the card instead of bordering it, so the rows keep their place", () => {
+      const { getByTestId } = render(
+        <InfoSection {...defaultProps} outlineColor="#DC2626" />,
+      )
+
+      const outline = getByTestId(INFO_SECTION_OUTLINE_TEST_ID)
+      expect(StyleSheet.flatten(outline.props.style).position).toBe("absolute")
+      expect(outline.props.pointerEvents).toBe("none")
+      expect(cardStyle(screen.UNSAFE_getAllByType(View))?.borderWidth).toBeUndefined()
     })
   })
 })

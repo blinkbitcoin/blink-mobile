@@ -1,5 +1,13 @@
-import React, { useRef } from "react"
-import { View, TextInput, StyleProp, ViewStyle, TouchableOpacity } from "react-native"
+import React, { useEffect, useRef, useState } from "react"
+import {
+  Keyboard,
+  Pressable,
+  View,
+  TextInput,
+  StyleProp,
+  ViewStyle,
+  TouchableOpacity,
+} from "react-native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
@@ -29,11 +37,21 @@ export const NoteInput: React.FC<NoteInputProps> = ({
   fontSize = 16,
 }) => {
   const { LL } = useI18nContext()
-  const styles = useStyles({ editable: Boolean(editable), big })
+  const [isFocused, setIsFocused] = useState(false)
+  const styles = useStyles({ editable: Boolean(editable), big, isFocused })
   const {
     theme: { colors },
   } = useTheme()
   const textInputRef = useRef<TextInput>(null)
+
+  /** Android's back gesture closes the keyboard but keeps the field focused; let go of it
+   *  too, so the field never looks focused with no keyboard to type on. */
+  useEffect(() => {
+    const sub = Keyboard.addListener("keyboardDidHide", () =>
+      textInputRef.current?.blur(),
+    )
+    return () => sub.remove()
+  }, [])
 
   const focusTextInput = () => {
     if (textInputRef.current) {
@@ -41,36 +59,57 @@ export const NoteInput: React.FC<NoteInputProps> = ({
     }
   }
   return (
-    <View style={[styles.fieldBackground, style]}>
+    // The whole field focuses the input, since the input itself is only one line tall. Not
+    // an element of its own for a screen reader, which reaches the input directly.
+    <Pressable
+      style={[styles.fieldBackground, style]}
+      onPress={focusTextInput}
+      accessible={false}
+    >
       <View style={styles.noteContainer}>
         <TextInput
           {...testProps("add-note")}
+          accessibilityLabel={LL.NoteInput.addNote()}
           style={[styles.noteInput, { fontSize }]}
           placeholder={LL.NoteInput.addNote()}
           placeholderTextColor={colors.black}
           onChangeText={onChangeText}
-          onBlur={onBlur}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => {
+            setIsFocused(false)
+            onBlur?.()
+          }}
           value={value}
           editable={editable}
           selectTextOnFocus
           maxLength={500}
           ref={textInputRef}
         />
-        <TouchableOpacity style={styles.noteIconContainer} onPress={focusTextInput}>
-          <GaloyIcon name={"note"} size={iconSize} color={colors.primary} />
+        {/* The same target as the field, so a screen reader skips it. */}
+        <TouchableOpacity
+          style={styles.noteIconContainer}
+          onPress={focusTextInput}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
+          <GaloyIcon name={"pencil"} size={iconSize} color={colors.primary} />
         </TouchableOpacity>
       </View>
-    </View>
+    </Pressable>
   )
 }
 
 const useStyles = makeStyles(
-  ({ colors }, { editable, big }: { editable: boolean; big: boolean }) => ({
+  (
+    { colors },
+    { editable, big, isFocused }: { editable: boolean; big: boolean; isFocused: boolean },
+  ) => ({
     fieldBackground: {
       flexDirection: "row",
       borderStyle: "solid",
       overflow: "hidden",
-      backgroundColor: colors.grey5,
+      /** Lifts to grey6 while typed in, as the conversion fields do. */
+      backgroundColor: isFocused ? colors.grey6 : colors.grey5,
       paddingHorizontal: 10,
       borderRadius: 10,
       alignItems: "center",
@@ -98,6 +137,8 @@ const useStyles = makeStyles(
       color: colors.black,
       fontWeight: "400",
       lineHeight: 20,
+      /** No platform padding, so the field's min height and font scale set its size. */
+      paddingVertical: 0,
     },
   }),
 )

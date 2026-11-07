@@ -2353,11 +2353,30 @@
     "maxFeeSelected": "Ovo je najveća naknada koja će vam biti naplaćena za ovu transakciju. Nakon izvršenja plaćanja može ispasti manje.",
     "invoiceAlreadyPaid": "Ovaj račun je već plaćen",
     "somethingWentWrong": "Nešto je pošlo po zlu",
+    "priceUpdated": "Cijena se promijenila pa su iznosi ažurirani. Provjerite ih prije slanja.",
     "paymentAlreadyAttempted": "Plaćanje je već pokušano.\n\nAko želite ponovo poslati ovo plaćanje, počnite ispočetka.",
     "slideToConfirm": "Povucite za potvrdu",
     "slideConfirming": "Potvrđivanje...",
+    "slideToSend": "Povucite za slanje",
+    "calculatingFee": "Izračun naknade…",
+    "sendProgress": {
+      "reviewing": "Provjera",
+      "signing": "Potpisivanje",
+      "findingRoute": "Traženje rute",
+      "broadcasting": "Emitiranje",
+      "checkingDelivery": "Provjera isporuke",
+      "retrying": "Ponovni pokušaj",
+      "almostThere": "Skoro gotovo",
+      "anyTimeNow": "Svakog trena",
+      "ohOh": "Ups",
+      "tryingAgain": "Pokušavamo ponovno"
+    },
     "copiedDestination": "Odredište kopirano u međuspremnik",
-    "lightningRecommended": "Visoka naknada! Preporučujemo Lightning.",
+    "lightningRecommended": "Visoka naknada. Preporučujemo Lightning.",
+    "sending": "Slanje",
+    "fromBalance": "Sa salda",
+    "details": "Detalji",
+    "changeAmount": "Promijeni iznos",
     "usdRemainderSweep": "Preostalo {remaining: string} ({remainingSats: string}) bit će pretvoreno u Bitcoin. Minimum u USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2401,6 +2420,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transakcija bi trebala biti poslana u mempool",
     "amount": "Iznos",
+    "addAmount": "Dodaj iznos",
+    "lowFunds": "Nedovoljno sredstava",
     "amountExceed": "Iznos premašuje vaš saldo od {balance: string}",
     "amountExceedsLimit": "Iznos premašuje vaše preostalo dnevno ograničenje od {limit: string}",
     "upgradeAccountToIncreaseLimit": "Nadogradite svoj račun kako biste povećali svoje ograničenje",
@@ -2452,7 +2473,8 @@
     "sdkInsufficientFunds": "Nedovoljno sredstava za ovu transakciju.",
     "sdkAmountTooLow": "Iznos je prenizak za on-chain transakciju.",
     "sdkNetworkError": "Mrežna greška. Provjerite vezu i pokušajte ponovo.",
-    "sdkGenericError": "Nije moguće procijeniti naknade. Pokušajte s drugim iznosom."
+    "sdkGenericError": "Nije moguće procijeniti naknade. Pokušajte s drugim iznosom.",
+    "onchainSelfPayment": "Ovo je adresa vašeg vlastitog novčanika. Ne možete poslati on-chain uplatu sami sebi."
   },
   "SettingsScreen": {
     "createAddress": "Stvori Lightning adresu",
@@ -3112,6 +3134,13 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Postavite iznos"
+  },
+  "Accessibility": {
+    "deleteKey": "Izbriši",
+    "swapCurrencyHint": "Mijenja valutu u kojoj upisujete iznos",
+    "switchToWallet": "Prebaci na {wallet: string}",
+    "copy": "Kopiraj",
+    "revealBalanceHint": "Prikazuje vaše stanje na ovom zaslonu"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Moram ažurirati svoju aplikaciju na najnoviju verziju. Koristim aplikaciju {os: string} s verzijom {version: string}.",
