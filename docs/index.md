@@ -54,6 +54,7 @@ yarn ios             # iOS (terminal 2)
 | [Self-Custodial Rollout](./self-custodial-rollout.md) | Release-gate checklist for promoting a self-custodial build |
 | [Self-Custodial Backend Independence](./self-custodial-backend-independence.md) | Phased plan for keeping self-custodial usable while Blink services are down |
 | [Self-custodial wallet logs](./self-custodial-logs.md) | Where users download the Breez SDK log, what it contains, and how support reads it |
+| [Universal busy-state screen](./universal-busy-state-screen.md) | Shared pending/error screen (`BusyStateScreen`): caller API, route options, lifecycle, design rulings |
 | [README](../README.md) | Project overview and basic instructions |
 | [Contributing](../CONTRIBUTING.MD) | Contribution guidelines |
 
