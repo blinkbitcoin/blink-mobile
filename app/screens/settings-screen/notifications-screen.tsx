@@ -21,7 +21,7 @@ import { Switch } from "@app/components/atomic/switch"
 import {
   toastSplashSetting,
   useSplashSettings,
-} from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash"
+} from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/use-splash-settings"
 import { logIncomingTransactionSplashOptedOut } from "@app/utils/analytics"
 import { SettingsGroup } from "./group"
 
