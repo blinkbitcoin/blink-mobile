@@ -3951,6 +3951,11 @@
       "title": "Asikwazi ukufudusa ibhalansi yakho yedola",
       "body": "Qala ukhuphe yonke ibhalansi yakho yedola. Ungayidlulisela kwibhalansi yakho yeBitcoin kuBlink okanye kwenye indawo."
     },
+    "pendingDepositModal": {
+      "title": "Kukho idiphozithi esalindileyo kwiakhawunti yakho",
+      "body": "Awukwazi ukufudukela kolunye uhlobo lweakhawunti de zonke iidiphozithi zakho ezisalindileyo zihlawulwe kwaye zifakwe kule akhawunti.",
+      "contactSupportCta": "Qhagamshelana nenkxaso"
+    },
     "balancesOverview": {
       "title": "Hambisa ibhalansi yakho",
       "body": "Hambisa imali yakho ngokukhuselekileyo kwiakhawunti yakho entsha.",

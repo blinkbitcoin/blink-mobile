@@ -3951,6 +3951,11 @@
       "title": "Váš dolarový zůstatek nemůžeme migrovat",
       "body": "Nejprve vyprázdněte svůj dolarový zůstatek. Můžete jej převést na svůj bitcoinový zůstatek v Blinku nebo jinam."
     },
+    "pendingDepositModal": {
+      "title": "Na váš účet čeká nevyřízený vklad",
+      "body": "Na jiný typ účtu nemůžete přejít, dokud nebudou všechny vaše čekající vklady vypořádány a připsány na tento účet.",
+      "contactSupportCta": "Kontaktovat podporu"
+    },
     "balancesOverview": {
       "title": "Přesuňte svůj zůstatek",
       "body": "Bezpečně přesuňte své prostředky na svůj nový účet.",

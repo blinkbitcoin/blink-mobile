@@ -3951,6 +3951,11 @@
       "title": "Vi kan ikke migrere din dollarsaldo",
       "body": "Tøm først din dollarsaldo. Du kan overføre den til din Bitcoin-saldo i Blink eller et andet sted."
     },
+    "pendingDepositModal": {
+      "title": "Der er en afventende indbetaling til din konto",
+      "body": "Du kan ikke migrere til en anden kontotype, før alle dine afventende indbetalinger er afregnet og krediteret denne konto.",
+      "contactSupportCta": "Kontakt support"
+    },
     "balancesOverview": {
       "title": "Flyt din saldo",
       "body": "Flyt dine midler sikkert til din nye konto.",

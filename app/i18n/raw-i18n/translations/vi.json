@@ -3951,6 +3951,11 @@
       "title": "Chúng tôi không thể di chuyển số dư đô la của bạn",
       "body": "Trước tiên hãy rút hết số dư đô la của bạn. Bạn có thể chuyển nó sang số dư Bitcoin trong Blink hoặc nơi khác."
     },
+    "pendingDepositModal": {
+      "title": "Có một khoản tiền gửi đang chờ xử lý vào tài khoản của bạn",
+      "body": "Bạn không thể chuyển sang loại tài khoản khác cho đến khi tất cả các khoản tiền gửi đang chờ xử lý của bạn được hoàn tất và ghi có vào tài khoản này.",
+      "contactSupportCta": "Liên hệ hỗ trợ"
+    },
     "balancesOverview": {
       "title": "Chuyển số dư của bạn",
       "body": "Chuyển tiền của bạn một cách an toàn sang tài khoản mới.",

@@ -3951,6 +3951,11 @@
       "title": "Manam dólar qullqiykita astayta atinikuchu",
       "body": "Ñawpaqta dólar qullqiykita ch'usaqyachiy. Blinkpi Bitcoin qullqiykiman utaq huk lawman apachiyta atinki."
     },
+    "pendingDepositModal": {
+      "title": "Kuentaykiman huk depósito suyachkan",
+      "body": "Manam huk laya kuentaman astakuyta atinkichu, llapan suyachkaq depósitoykikuna kay kuentaman chayamunankama.",
+      "contactSupportCta": "Yanapaqwan rimay"
+    },
     "balancesOverview": {
       "title": "Qullqiykita astiy",
       "body": "Qullqiykikunata mana ima llakiwan musuq cuentaykiman astiy.",

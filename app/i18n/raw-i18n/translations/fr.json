@@ -3951,6 +3951,11 @@
             "title": "Nous ne pouvons pas migrer votre solde en dollars",
             "body": "Videz d'abord votre solde en dollars. Vous pouvez le transférer vers votre solde Bitcoin dans Blink ou ailleurs."
         },
+        "pendingDepositModal": {
+            "title": "Un dépôt est en attente sur votre compte",
+            "body": "Vous ne pouvez pas migrer vers un autre type de compte tant que tous vos dépôts en attente n'ont pas été réglés et crédités sur ce compte.",
+            "contactSupportCta": "Contacter le support"
+        },
         "balancesOverview": {
             "title": "Déplacez votre solde",
             "body": "Déplacez vos fonds en toute sécurité vers votre nouveau compte.",

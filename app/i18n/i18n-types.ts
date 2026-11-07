@@ -13296,6 +13296,20 @@ type RootTranslation = {
 			 */
 			body: string
 		}
+		pendingDepositModal: {
+			/**
+			 * T​h​e​r​e​ ​i​s​ ​a​ ​p​e​n​d​i​n​g​ ​d​e​p​o​s​i​t​ ​t​o​ ​y​o​u​r​ ​a​c​c​o​u​n​t
+			 */
+			title: string
+			/**
+			 * Y​o​u​ ​c​a​n​n​o​t​ ​m​i​g​r​a​t​e​ ​t​o​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​t​y​p​e​ ​o​f​ ​a​c​c​o​u​n​t​ ​b​e​f​o​r​e​ ​a​l​l​ ​y​o​u​r​ ​p​e​n​d​i​n​g​ ​d​e​p​o​s​i​t​s​ ​h​a​v​e​ ​b​e​e​n​ ​s​e​t​t​l​e​d​ ​a​n​d​ ​c​r​e​d​i​t​e​d​ ​o​n​ ​t​h​i​s​ ​a​c​c​o​u​n​t​.
+			 */
+			body: string
+			/**
+			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
+			 */
+			contactSupportCta: string
+		}
 		migrateNowModal: {
 			/**
 			 * M​i​g​r​a​t​e​ ​n​o​w​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t
@@ -27489,6 +27503,20 @@ export type TranslationFunctions = {
 			 * Empty your Dollar Balance first. You can transfer to your Bitcoin Balance in Blink or elsewhere.
 			 */
 			body: () => LocalizedString
+		}
+		pendingDepositModal: {
+			/**
+			 * There is a pending deposit to your account
+			 */
+			title: () => LocalizedString
+			/**
+			 * You cannot migrate to a different type of account before all your pending deposits have been settled and credited on this account.
+			 */
+			body: () => LocalizedString
+			/**
+			 * Contact support
+			 */
+			contactSupportCta: () => LocalizedString
 		}
 		migrateNowModal: {
 			/**
