@@ -7,25 +7,31 @@ import { navigateAfterAccountDelete } from "@app/screens/settings-screen/self-cu
 const buildNavigation = () => {
   const dispatch = jest.fn()
   const navigate = jest.fn()
+  const popTo = jest.fn()
   const routeAfterLogout = jest.fn()
   return {
     navigation: {
       dispatch,
       navigate,
+      popTo,
     } as unknown as NativeStackNavigationProp<RootStackParamList>,
     dispatch,
     navigate,
+    popTo,
     routeAfterLogout,
   }
 }
 
 describe("navigateAfterAccountDelete", () => {
-  it("soft-navigates to Primary when the user switched to another self-custodial account", () => {
-    const { navigation, dispatch, navigate, routeAfterLogout } = buildNavigation()
+  /** `navigate` would push a second Primary and leave the locked screen underneath; the
+   *  resulting stacks are pinned in account-deletion-lock.stack.spec. */
+  it("pops back to Primary when the user switched to another self-custodial account", () => {
+    const { navigation, dispatch, navigate, popTo, routeAfterLogout } = buildNavigation()
 
     navigateAfterAccountDelete(navigation, routeAfterLogout, "switched-to-self-custodial")
 
-    expect(navigate).toHaveBeenCalledWith("Primary")
+    expect(popTo).toHaveBeenCalledWith("Primary")
+    expect(navigate).not.toHaveBeenCalled()
     expect(dispatch).not.toHaveBeenCalled()
     expect(routeAfterLogout).not.toHaveBeenCalled()
   })

@@ -262,10 +262,11 @@ const logout = () => {
 
 const deleteLastWallet = async () => {
   const { result } = renderHook(() => useDeleteAccount())
-  let outcome: Awaited<ReturnType<typeof result.current.deleteWallet>>
+  let outcome: Awaited<ReturnType<typeof result.current.deleteWallet>> | undefined
   await act(async () => {
     outcome = await result.current.deleteWallet(WALLET_ID)
   })
+  if (!outcome) throw new Error("deleteWallet did not return")
   return outcome
 }
 
@@ -390,7 +391,7 @@ describe("writes after one the disk refused", () => {
     // Any write that lands saves the whole file, as storing another wallet's seed does.
     await KeyStoreWrapper.setMnemonicForAccount("another-wallet", SEED)
 
-    expect(outcome).toBeUndefined()
+    expect(outcome).toEqual({ removed: false, outcome: "logged-out-locked" })
     expect(await listedWalletIds()).toEqual([WALLET_ID])
     expect(mockLegacyPrefs.file.get(SEED_KEY)).toBe(SEED)
     expect(await KeyStoreWrapper.getMnemonicForAccount(WALLET_ID)).toBe(SEED)
@@ -404,7 +405,7 @@ describe("writes after one the disk refused", () => {
 
     const outcome = await deleteLastWallet()
 
-    expect(outcome).toBeUndefined()
+    expect(outcome).toEqual({ removed: false, outcome: "logged-out-locked" })
     expect(await listedWalletIds()).toEqual([WALLET_ID])
     expect(mockLegacyPrefs.file.get(SESSIONS_KEY)).toBe(SAVED_SESSIONS)
     expect(await KeyStoreWrapper.getPin()).toBe(PIN)
@@ -419,7 +420,7 @@ describe("writes after one the disk refused", () => {
 
     const outcome = await deleteLastWallet()
 
-    expect(outcome).toBe("logged-out-locked")
+    expect(outcome).toEqual({ removed: true, outcome: "logged-out-locked" })
     expect(await listedWalletIds()).toEqual([])
     // The deletion's read moved them to the new store, where they still are.
     expect(await KeyStoreWrapper.readSessionProfiles()).toEqual({
@@ -451,7 +452,7 @@ describe("the PIN lock repair after a seed erase the disk refused", () => {
 
     const lock = await readPinLockState(now)
 
-    expect(outcome).toBeUndefined()
+    expect(outcome).toEqual({ removed: false, outcome: "logged-out-locked" })
     expect(lock).toEqual({
       status: "readable",
       state: { attempts: 1, lockedUntil: now + 10_000 },
