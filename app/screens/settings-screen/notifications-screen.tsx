@@ -272,7 +272,7 @@ const SplashToggleRow: React.FC = () => {
   )
 }
 
-const SplashMinimumRow: React.FC = () => {
+export const SplashMinimumRow: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const { enabled, minSats, setMinSats } = useSplashSettings()

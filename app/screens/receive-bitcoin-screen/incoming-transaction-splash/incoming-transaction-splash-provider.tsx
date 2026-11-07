@@ -97,7 +97,6 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
   const showSplash = useCallback(
     (candidate: SplashCandidate) => {
       const alreadySeen = seenIds.current.has(candidate.transaction.id)
-      if (!alreadySeen) seenIds.current.add(candidate.transaction.id)
 
       const routeName = navigationRef.isReady()
         ? navigationRef.getCurrentRoute()?.name
@@ -115,6 +114,13 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
         keyboardVisible: Keyboard.isVisible(),
         appLocked: current.isAppLocked,
       })
+      /** Only a live payment is remembered. A restore replays every past one, an outgoing
+       *  one never shows: neither can ever pass, so neither is kept for the app's life. */
+      const neverShows =
+        decision.outcome === "skip" &&
+        (decision.reason === "outgoing" ||
+          decision.reason === "settled_before_foreground")
+      if (!alreadySeen && !neverShows) seenIds.current.add(candidate.transaction.id)
       if (decision.outcome !== "show") return false
 
       if (candidate.paymentHash) splashHashes.current.add(candidate.paymentHash)
@@ -132,7 +138,8 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
   const refresh = useCallback((candidate: SplashCandidate) => {
     setShown((current) =>
       current && current.transaction.id === candidate.transaction.id
-        ? { ...current, ...candidate }
+        ? // Set outright: a candidate without the flag must clear it, not inherit it.
+          { ...current, ...candidate, detailsPending: candidate.detailsPending }
         : current,
     )
   }, [])
