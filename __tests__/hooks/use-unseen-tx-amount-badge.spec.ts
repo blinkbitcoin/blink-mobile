@@ -4,6 +4,10 @@ import { TxDirection, type TransactionFragment } from "@app/graphql/generated"
 import { useUnseenTxAmountBadge } from "@app/components/unseen-tx-amount-badge"
 
 const mockNavigate = jest.fn()
+const mockPriceConverter = jest.fn()
+const mockConvertMoneyAmount = jest.fn<typeof mockPriceConverter | undefined, []>(
+  () => mockPriceConverter,
+)
 
 jest.mock("@react-navigation/native", () => {
   return {
@@ -21,13 +25,15 @@ type FormatMoneyAmountArgs = {
 }
 
 jest.mock("@app/hooks", () => {
+  const formatters = {
+    formatCurrency: ({ amountInMajorUnits, currency }: FormatCurrencyArgs) =>
+      `${currency} ${amountInMajorUnits}`,
+    formatMoneyAmount: ({ moneyAmount }: FormatMoneyAmountArgs) =>
+      `${moneyAmount.currency} ${moneyAmount.amount}`,
+  }
   return {
-    useDisplayCurrency: () => ({
-      formatCurrency: ({ amountInMajorUnits, currency }: FormatCurrencyArgs) =>
-        `${currency} ${amountInMajorUnits}`,
-      formatMoneyAmount: ({ moneyAmount }: FormatMoneyAmountArgs) =>
-        `${moneyAmount.currency} ${moneyAmount.amount}`,
-    }),
+    useDisplayCurrency: () => formatters,
+    usePriceConversion: () => ({ convertMoneyAmount: mockConvertMoneyAmount() }),
   }
 })
 
@@ -92,6 +98,7 @@ const tx = (overrides: Partial<TransactionFragment>): TransactionFragment =>
 describe("useUnseenTxAmountBadge", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockConvertMoneyAmount.mockReturnValue(mockPriceConverter)
   })
 
   it("falls back to the cached custodial transactions when none are provided", () => {
@@ -269,6 +276,111 @@ describe("useUnseenTxAmountBadge", () => {
     )
 
     expect(sendResult.current.unseenAmountText).toBe("BTC 10")
+  })
+
+  describe("a self-custodial amount", () => {
+    const unpriced = tx({
+      id: "receive",
+      createdAt: 1,
+      settlementAmount: 10,
+      settlementDisplayAmount: "10",
+      settlementDisplayCurrency: "BTC",
+    })
+    const priced = tx({
+      id: "receive",
+      createdAt: 1,
+      settlementAmount: 10,
+      settlementDisplayAmount: "0.01",
+      settlementDisplayCurrency: "USD",
+    })
+
+    it("is not announced without a price", () => {
+      mockConvertMoneyAmount.mockReturnValue(undefined)
+
+      const { result } = renderHook(() =>
+        useUnseenTxAmountBadge({
+          transactions: [unpriced],
+          isSelfCustodial: true,
+          hasUnseenBtcTx: true,
+          hasUnseenUsdTx: false,
+        }),
+      )
+
+      expect(result.current.latestUnseenTx?.id).toBe("receive")
+      expect(result.current.unseenAmountText).toBeNull()
+    })
+
+    it("is announced in the display currency once the price arrives", () => {
+      mockConvertMoneyAmount.mockReturnValue(undefined)
+
+      const { result, rerender } = renderHook(
+        ({ transactions }: { transactions: TransactionFragment[] }) =>
+          useUnseenTxAmountBadge({
+            transactions,
+            isSelfCustodial: true,
+            hasUnseenBtcTx: true,
+            hasUnseenUsdTx: false,
+          }),
+        { initialProps: { transactions: [unpriced] } },
+      )
+
+      expect(result.current.unseenAmountText).toBeNull()
+
+      mockConvertMoneyAmount.mockReturnValue(mockPriceConverter)
+      rerender({ transactions: [priced] })
+
+      expect(result.current.unseenAmountText).toBe("+USD 0.01")
+    })
+
+    it("holds a send back until the price arrives", () => {
+      const transactions = [
+        tx({
+          id: "send",
+          createdAt: 1,
+          direction: TxDirection.Send,
+          settlementDisplayAmount: "0.01",
+          settlementDisplayCurrency: "USD",
+        }),
+      ]
+      mockConvertMoneyAmount.mockReturnValue(undefined)
+
+      const { result, rerender } = renderHook(() =>
+        useUnseenTxAmountBadge({
+          transactions,
+          isSelfCustodial: true,
+          hasUnseenBtcTx: true,
+          hasUnseenUsdTx: false,
+        }),
+      )
+
+      expect(result.current.unseenAmountText).toBeNull()
+
+      mockConvertMoneyAmount.mockReturnValue(mockPriceConverter)
+      rerender()
+
+      expect(result.current.unseenAmountText).toBe("USD 0.01")
+    })
+  })
+
+  it("never holds a custodial amount back for the price", () => {
+    mockConvertMoneyAmount.mockReturnValue(undefined)
+
+    const { result } = renderHook(() =>
+      useUnseenTxAmountBadge({
+        transactions: [
+          tx({
+            id: "receive",
+            createdAt: 1,
+            settlementDisplayAmount: "0.06",
+            settlementDisplayCurrency: "USD",
+          }),
+        ],
+        hasUnseenBtcTx: true,
+        hasUnseenUsdTx: false,
+      }),
+    )
+
+    expect(result.current.unseenAmountText).toBe("+USD 0.06")
   })
 
   it("navigates to transactionDetail for the transaction it is given", () => {

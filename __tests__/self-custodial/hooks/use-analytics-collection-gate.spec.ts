@@ -14,7 +14,7 @@ jest.mock("@app/self-custodial/analytics-identity", () => ({
 }))
 
 const custodialState: PersistentState = {
-  schemaVersion: 21,
+  schemaVersion: 23,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
   activeAccountId: "custodial-default",

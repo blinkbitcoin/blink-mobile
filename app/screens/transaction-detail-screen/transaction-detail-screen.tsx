@@ -400,7 +400,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   } else if (onChainTxNotBroadcasted) {
     spendOrReceiveText = LL.TransactionDetailScreen.sending()
   } else {
-    spendOrReceiveText = LL.TransactionDetailScreen.spent()
+    spendOrReceiveText = LL.TransactionDetailScreen.sent()
   }
 
   return (
@@ -425,11 +425,10 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
             {/* Pinned to one line: leaving it unbounded lets Android re-break
                 it after the first word on a re-layout, and since the container
                 height is already fixed by the first measure pass the wrapped
-                word lands outside it and is clipped — "You spent" silently
+                word lands outside it and is clipped — "You sent" silently
                 renders as "You". Shrink rather than ellipsize when the line
-                genuinely doesn't fit, so a long locale (the longest is ms
-                "Anda dah belanjakan") stays whole under accessibility font
-                scaling instead of losing its tail. */}
+                genuinely doesn't fit, so a long locale stays whole under
+                accessibility font scaling instead of losing its tail. */}
             <Text type="h2" numberOfLines={1} adjustsFontSizeToFit>
               {spendOrReceiveText}
             </Text>

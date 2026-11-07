@@ -7571,6 +7571,16 @@ type RootTranslation = {
 		 */
 		usernameDoesNotExistAdvice: string
 		/**
+		 * W​e​ ​c​o​u​l​d​n​'​t​ ​c​h​e​c​k​ ​{​l​n​A​d​d​r​e​s​s​}​ ​r​i​g​h​t​ ​n​o​w​ ​—​ ​{​b​a​n​k​N​a​m​e​}​'​s​ ​s​e​r​v​e​r​s​ ​a​r​e​n​'​t​ ​r​e​s​p​o​n​d​i​n​g​.
+		 * @param {string} bankName
+		 * @param {string} lnAddress
+		 */
+		destinationUnverifiable: RequiredParams<'bankName' | 'lnAddress'>
+		/**
+		 * T​h​e​ ​a​d​d​r​e​s​s​ ​m​a​y​ ​w​e​l​l​ ​b​e​ ​f​i​n​e​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​,​ ​o​r​ ​a​s​k​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t​ ​f​o​r​ ​a​n​ ​L​N​ ​i​n​v​o​i​c​e​ ​o​r​ ​B​T​C​ ​a​d​d​r​e​s​s​ ​i​n​s​t​e​a​d​.
+		 */
+		destinationUnverifiableAdvice: string
+		/**
 		 * {​l​n​A​d​d​r​e​s​s​}​ ​i​s​ ​y​o​u​r​ ​{​b​a​n​k​N​a​m​e​}​ ​a​d​d​r​e​s​s​.
 		 * @param {string} bankName
 		 * @param {string} lnAddress
@@ -8554,6 +8564,10 @@ type RootTranslation = {
 		 * @param {string} identifier
 		 */
 		removedAccount: RequiredParams<'identifier'>
+		/**
+		 * R​e​m​o​v​e​ ​a​c​c​o​u​n​t
+		 */
+		removeAccount: string
 	}
 	TotpRegistrationInitiateScreen: {
 		/**
@@ -8855,9 +8869,9 @@ type RootTranslation = {
 		 */
 		received: string
 		/**
-		 * Y​o​u​ ​s​p​e​n​t
+		 * Y​o​u​ ​s​e​n​t
 		 */
-		spent: string
+		sent: string
 		/**
 		 * S​e​n​d​i​n​g
 		 */
@@ -9134,6 +9148,10 @@ type RootTranslation = {
 			 * S​o​r​r​y​,​ ​t​h​i​s​ ​a​d​d​r​e​s​s​ ​i​s​ ​a​l​r​e​a​d​y​ ​t​a​k​e​n
 			 */
 			addressUnavailable: string
+			/**
+			 * C​o​u​l​d​n​'​t​ ​r​e​a​c​h​ ​t​h​e​ ​a​d​d​r​e​s​s​ ​s​e​r​v​e​r​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​.
+			 */
+			serverUnreachable: string
 			/**
 			 * A​n​ ​u​n​k​n​o​w​n​ ​e​r​r​o​r​ ​o​c​c​u​r​r​e​d​,​ ​p​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r
 			 */
@@ -12753,6 +12771,10 @@ type RootTranslation = {
 			 */
 			description: RequiredParams<'provider'>
 			/**
+			 * E​n​c​r​y​p​t​ ​w​i​t​h​ ​a​d​d​i​t​i​o​n​a​l​ ​p​a​s​s​w​o​r​d
+			 */
+			encryptCheckbox: string
+			/**
 			 * P​a​s​s​w​o​r​d
 			 */
 			password: string
@@ -14002,6 +14024,16 @@ type RootTranslation = {
 		 */
 		exportFailed: string
 	}
+	SelfCustodialStaleRate: {
+		/**
+		 * E​x​c​h​a​n​g​e​ ​r​a​t​e​ ​m​a​y​ ​b​e​ ​o​u​t​ ​o​f​ ​d​a​t​e
+		 */
+		notice: string
+		/**
+		 * S​h​o​w​i​n​g​ ​s​a​t​s​ ​—​ ​n​o​ ​e​x​c​h​a​n​g​e​ ​r​a​t​e​ ​a​v​a​i​l​a​b​l​e
+		 */
+		satsOnly: string
+	}
 	SelfCustodialOffline: {
 		/**
 		 * W​a​l​l​e​t​ ​i​s​ ​o​f​f​l​i​n​e
@@ -14287,6 +14319,15 @@ type RootTranslation = {
 		 * @param {string} featureName
 		 */
 		noAccountDescription: RequiredParams<'featureName'>
+		/**
+		 * B​l​i​n​k​ ​i​s​ ​u​n​r​e​a​c​h​a​b​l​e
+		 */
+		unreachableTitle: string
+		/**
+		 * {​f​e​a​t​u​r​e​N​a​m​e​}​ ​n​e​e​d​s​ ​B​l​i​n​k​'​s​ ​s​e​r​v​e​r​s​,​ ​w​h​i​c​h​ ​a​r​e​n​'​t​ ​r​e​s​p​o​n​d​i​n​g​ ​r​i​g​h​t​ ​n​o​w​.​ ​Y​o​u​r​ ​w​a​l​l​e​t​ ​a​n​d​ ​f​u​n​d​s​ ​a​r​e​ ​u​n​a​f​f​e​c​t​e​d​.
+		 * @param {string} featureName
+		 */
+		unreachableDescription: RequiredParams<'featureName'>
 		/**
 		 * C​i​r​c​l​e​s
 		 */
@@ -21843,6 +21884,14 @@ export type TranslationFunctions = {
 		 */
 		usernameDoesNotExistAdvice: () => LocalizedString
 		/**
+		 * We couldn't check {lnAddress} right now — {bankName}'s servers aren't responding.
+		 */
+		destinationUnverifiable: (arg: { bankName: string, lnAddress: string }) => LocalizedString
+		/**
+		 * The address may well be fine. Try again in a moment, or ask the recipient for an LN invoice or BTC address instead.
+		 */
+		destinationUnverifiableAdvice: () => LocalizedString
+		/**
 		 * {lnAddress} is your {bankName} address.
 		 */
 		selfPaymentError: (arg: { bankName: string, lnAddress: string }) => LocalizedString
@@ -22802,6 +22851,10 @@ export type TranslationFunctions = {
 		 * You removed account {identifier}.
 		 */
 		removedAccount: (arg: { identifier: string }) => LocalizedString
+		/**
+		 * Remove account
+		 */
+		removeAccount: () => LocalizedString
 	}
 	TotpRegistrationInitiateScreen: {
 		/**
@@ -23099,9 +23152,9 @@ export type TranslationFunctions = {
 		 */
 		received: () => LocalizedString
 		/**
-		 * You spent
+		 * You sent
 		 */
-		spent: () => LocalizedString
+		sent: () => LocalizedString
 		/**
 		 * Sending
 		 */
@@ -23363,6 +23416,10 @@ export type TranslationFunctions = {
 			 * Sorry, this address is already taken
 			 */
 			addressUnavailable: () => LocalizedString
+			/**
+			 * Couldn't reach the address server. Try again in a moment.
+			 */
+			serverUnreachable: () => LocalizedString
 			/**
 			 * An unknown error occurred, please try again later
 			 */
@@ -26920,6 +26977,10 @@ export type TranslationFunctions = {
 			 */
 			description: (arg: { provider: string }) => LocalizedString
 			/**
+			 * Encrypt with additional password
+			 */
+			encryptCheckbox: () => LocalizedString
+			/**
 			 * Password
 			 */
 			password: () => LocalizedString
@@ -28148,6 +28209,16 @@ export type TranslationFunctions = {
 		 */
 		exportFailed: () => LocalizedString
 	}
+	SelfCustodialStaleRate: {
+		/**
+		 * Exchange rate may be out of date
+		 */
+		notice: () => LocalizedString
+		/**
+		 * Showing sats — no exchange rate available
+		 */
+		satsOnly: () => LocalizedString
+	}
 	SelfCustodialOffline: {
 		/**
 		 * Wallet is offline
@@ -28419,6 +28490,14 @@ export type TranslationFunctions = {
 		 * {featureName} requires a Blink custodial account.
 		 */
 		noAccountDescription: (arg: { featureName: string }) => LocalizedString
+		/**
+		 * Blink is unreachable
+		 */
+		unreachableTitle: () => LocalizedString
+		/**
+		 * {featureName} needs Blink's servers, which aren't responding right now. Your wallet and funds are unaffected.
+		 */
+		unreachableDescription: (arg: { featureName: string }) => LocalizedString
 		/**
 		 * Circles
 		 */

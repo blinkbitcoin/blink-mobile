@@ -1985,7 +1985,8 @@ const mocks = [
           },
           denominatorCurrency: "USD",
           id: "67b6e1d2-04c8-509a-abbd-b1cab08575d5",
-          timestamp: 1677184189,
+          /** As just served: a self-custodial session ages the backend's price by it. */
+          timestamp: Math.floor(Date.now() / 1000),
           usdCentPrice: {
             base: 100000000,
             offset: 6,

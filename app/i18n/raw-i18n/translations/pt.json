@@ -2372,6 +2372,8 @@
         "invalidAmount": " Contém um valor inválido. Por favor ajuste com um valor válido.",
         "usernameDoesNotExist": "{lnAddress: string} não parece ser um {bankName: string} endereço que existe.",
         "usernameDoesNotExistAdvice": "Certifique-se de que a ortografia está correta ou peça ao destinatário uma fatura LN ou um endereço BTC.",
+        "destinationUnverifiable": "Não conseguimos verificar {lnAddress} neste momento — os servidores da {bankName} não estão a responder.",
+        "destinationUnverifiableAdvice": "O endereço provavelmente está correto. Tente novamente daqui a pouco, ou peça ao destinatário uma fatura LN ou um endereço BTC.",
         "selfPaymentError": "{lnAddress: string} é seu {bankName: string} endereço.",
         "selfPaymentAdvice": "Se você quiser enviar dinheiro para outra conta sua, pode usar uma fatura, LN ou um endereço de BTC.",
         "lnAddressError": "Não conseguimos acessar este endereço Lightning. Se tiver certeza de que existe, tente novamente mais tarde.",
@@ -2594,7 +2596,8 @@
         "error": "Não foi possível buscar perfis no momento",
         "fromThisDevice": "deste dispositivo?",
         "switchAccount": "Você trocou para outra conta",
-        "removedAccount": "Você removeu a conta {identifier: string}."
+        "removedAccount": "Você removeu a conta {identifier: string}.",
+        "removeAccount": "Remover conta"
     },
     "StablesatsRestriction": {
         "walletLabel": "não está disponível na sua região",
@@ -2682,7 +2685,7 @@
     "TransactionDetailScreen": {
         "paid": "Pago de/para",
         "received": "Você recebeu",
-        "spent": "Você gastou",
+        "sent": "Você enviou",
         "sending": "Enviando",
         "receivingAccount": "Saldo de Recebimento",
         "sendingAccount": "Saldo de Envio",
@@ -2758,6 +2761,7 @@
             "tooLong": "O endereço deve ter no máximo 50 caracteres de comprimento.",
             "invalidCharacter": "O endereço só pode conter letras, números e sublinhados.",
             "addressUnavailable": "Desculpe, este endereço já está em uso.",
+            "serverUnreachable": "Não foi possível contactar o servidor de endereços. Tente novamente daqui a pouco.",
             "unknownError": "Ocorreu um erro desconhecido, por favor tente novamente mais tarde.",
             "backupRequired": "Back up your wallet before creating a Lightning address"
         },
@@ -3085,12 +3089,12 @@
         "deleteAccountError": "Algo deu errado. Fale com {email: string}  para mais assistência.",
         "bye": "Adeus!",
         "deleteAccountWarning": "Atenção: O encerramento da conta é permanente!\nCertifique-se de que as carteiras não possuem fundos antes de encerrar.\nUma conta encerrada não pode ser recuperada.\nPodemos reter certos registros conforme exigido por lei.",
-        "downloadLogs": "Download logs",
-        "exportLogsTitle": "Share your wallet logs",
-        "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-        "exportLogsConfirm": "Share logs",
-        "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-        "exportLogsError": "Couldn't export your logs. Please try again."
+        "downloadLogs": "Baixar logs",
+        "exportLogsTitle": "Compartilhar os logs da sua carteira",
+        "exportLogsBody": "Este arquivo ajuda nossa equipe de suporte a investigar problemas nas suas carteiras. Ele inclui o histórico de pagamentos (valores, faturas e endereços) e os identificadores de cada carteira não custodial neste dispositivo, não só desta, mas nunca suas frases de recuperação ou chaves. Compartilhe apenas com nossa equipe de suporte.",
+        "exportLogsConfirm": "Compartilhar logs",
+        "noLogsYet": "Ainda não há logs para compartilhar. Abra sua carteira e tente de novo.",
+        "exportLogsError": "Não foi possível exportar seus logs. Tente de novo."
     },
     "lnurl": {
         "overLimit": "Você não pode enviar mais do que o valor máximo",
@@ -3820,7 +3824,7 @@
         }
     },
     "BackupScreen": {
-        "title": "Back up your wallet",
+        "title": "Fazer backup da sua carteira",
         "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "Escolha seu método de backup",
@@ -3878,6 +3882,7 @@
         "CloudBackup": {
             "title": "Vamos fazer backup da sua carteira",
             "description": "Salvaremos uma cópia da sua frase de backup no seu {provider}.",
+            "encryptCheckbox": "Criptografar com senha adicional",
             "password": "Senha",
             "passwordPlaceholder": "(mínimo 12 caracteres)",
             "confirmPassword": "Confirmar senha",
@@ -4219,6 +4224,8 @@
         "signInDescription": "Faça login na sua conta custodial para usar {featureName}.",
         "noAccountTitle": "Conta custodial necessária",
         "noAccountDescription": "{featureName} requer uma conta custodial da Blink.",
+        "unreachableTitle": "O Blink está inacessível",
+        "unreachableDescription": "{featureName} precisa dos servidores da Blink, que não estão a responder neste momento. A sua carteira e os seus fundos não são afetados.",
         "featureCircles": "Círculos",
         "featureEarn": "Aprender",
         "featureCard": "Cartão"
@@ -4241,6 +4248,10 @@
         "tokenTransfer": "Transferência {token}",
         "payTo": "Pagar a {address}",
         "payment": "Pagamento"
+    },
+    "SelfCustodialStaleRate": {
+        "notice": "A taxa de câmbio pode estar desatualizada",
+        "satsOnly": "A mostrar sats — nenhuma taxa de câmbio disponível"
     },
     "SelfCustodialOffline": {
         "title": "A carteira está offline",

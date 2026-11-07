@@ -2372,6 +2372,8 @@
     "invalidAmount": "Kino kirimu omuwendo ogutali mutuufu. Nsaba oddemu okukola n'omuwendo omutuufu.",
     "usernameDoesNotExist": "{lnAddress: string} erabika nga teri ndagiriro ya {bankName: string} eriwo.",
     "usernameDoesNotExistAdvice": "Kakasa nti enjawulo mu mpandiika ntuufu oba saba oyo afuna yinivoyisi oba endagiriro ya BTC",
+    "destinationUnverifiable": "Tetusobodde kukebera {lnAddress} kaakano — sevva za {bankName} teziddamu.",
+    "destinationUnverifiableAdvice": "Endagiriro eyinza okuba nga ntuufu. Ddamu ogezeeko mu kaseera katono, oba saba omufuna LN invoice oba endagiriro ya BTC.",
     "selfPaymentError": "{lnAddress: string} ye ndagiriro yo eya {bankName: string}.",
     "selfPaymentAdvice": "Bwoba oyagala okusindika ssente ku akawunti endala gy'olina, osobola okukozesa yinivoyisi, LN oba endagiriro eya BTC.",
     "lnAddressError": "Tetusobola kutuuka ku ndagiriro eno eya Lightning. Bw’oba ​​okakasa nti kiriwo, osobola okuddamu okugezaako oluvannyuma.",
@@ -2594,7 +2596,8 @@
     "error": "Tetusobola kufuna profayiro mu kiseera kino",
     "fromThisDevice": "okuva ku katambi kano?",
     "switchAccount": "Okyusizza eri akawunti endala",
-    "removedAccount": "Oggyewo akawunti {identifier: string}."
+    "removedAccount": "Oggyewo akawunti {identifier: string}.",
+    "removeAccount": "Ggyawo akawunti"
   },
   "StablesatsRestriction": {
     "walletLabel": "teriiwo mu kitundu kyo",
@@ -2682,7 +2685,7 @@
   "TransactionDetailScreen": {
     "paid": "Zisasuddwa eri/ okuva",
     "received": "Ofunye",
-    "spent": "Okozesezza",
+    "sent": "Osindise",
     "sending": "Okusindika",
     "receivingAccount": "Akawunti Efuna",
     "sendingAccount": "Akawunti Esindika",
@@ -2758,6 +2761,7 @@
       "tooLong": "Endagiriro eteekwa ennyo okuba n'ennukuta 50",
       "invalidCharacter": "Endagiriro esobola okubaamu ennukuta, ennamba, n'okuggumiza",
       "addressUnavailable": "Tusonyiwe, eno endagiriro yatwaliddwa dda",
+      "serverUnreachable": "Tetusobodde kutuuka ku sevva y'endagiriro. Ddamu ogezeeko mu kaseera katono.",
       "unknownError": "Ensobi etamanyiddwa etuseewo, tukusaba okugezaako nate oluvannyuma",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3085,12 +3089,12 @@
     "deleteAccountError": "Waliwo ekitatambudde bulungi. Tukirira {email: string} okufuna obuyambi.",
     "bye": "Tweelaba!",
     "deleteAccountWarning": "Kulabula: Okuggalawo akawunti kwa lubeerera!\nKakasa nti walooti tezirina ssente nga tonnaggalawo.\nAkawunti egaaziddwawo teyinza kuddizibwa.\nTuyinza kukuuma ebiwandiiko ebimu nga amateeka bwe galagira.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Ggya ebiwandiiko",
+    "exportLogsTitle": "Gabana ebiwandiiko by'akawunti yo",
+    "exportLogsBody": "Fayiro eno eyambako ttiimu yaffe ey'obuyambi okunoonyereza ku bizibu ku kawunti zo. Erimu ebyafaayo by'okusasula (ebitundutundu, invoices n'endagiriro) n'obubonero bwa buli kawunti etakuumibwa ku kyuma kino, si eyo yokka, naye tewali bigambo by'enkalakkalira wadde obusumuluzo. Gigabane ne ttiimu yaffe ey'obuyambi yokka.",
+    "exportLogsConfirm": "Gabana ebiwandiiko",
+    "noLogsYet": "Tewali biwandiiko kugabana. Ggulawo akawunti yo oddemu ogezeeko.",
+    "exportLogsError": "Tekisobose okufulumya ebiwandiiko. Gezaako nate."
   },
   "lnurl": {
     "overLimit": "Tosobola kusindika ssente ezisukka mu muwendo ogusinga obunene",
@@ -3820,7 +3824,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Koppa akawunti yo",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Londa enkola yo ey'okukoppa",
@@ -3878,6 +3882,7 @@
     "CloudBackup": {
       "title": "Ka tukoppe akawunti yo",
       "description": "Tujja kutereka kopi y'ekigambo kyo eky'okukuuma mu {provider} yo.",
+      "encryptCheckbox": "Kiziyiza n'ekigambo eky'okustreyitinga ekirala",
       "password": "Ekigambo eky'okuyingira",
       "passwordPlaceholder": "(obunene 12 ennukuta)",
       "confirmPassword": "Kakasa ekigambo eky'okuyingira",
@@ -4219,6 +4224,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink tetuukibwa",
+    "unreachableDescription": "{featureName} yeetaagisa sevva za Blink, ezitali kuddamu kaakano. Ewaleti yo n'ensimbi zo tezikwatiddwako.",
     "featureCircles": "Circles",
     "featureEarn": "Yiga",
     "featureCard": "Card"
@@ -4241,6 +4248,10 @@
     "tokenTransfer": "Okukyusa {token}",
     "payTo": "Sasula {address}",
     "payment": "Okusasula"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Omuwendo gw'enkyusa guyinza okuba nga gukaddiye",
+    "satsOnly": "Tulaga mu sats — tewali muwendo gwa nkyusa"
   },
   "SelfCustodialOffline": {
     "title": "Envalopu si ku yintaneeti",
