@@ -1584,11 +1584,7 @@ query migrationPendingDeposits {
     defaultAccount {
       id
       pendingIncomingTransactions {
-        id
-        direction
-        settlementVia {
-          __typename
-        }
+        ...Transaction
         __typename
       }
       __typename

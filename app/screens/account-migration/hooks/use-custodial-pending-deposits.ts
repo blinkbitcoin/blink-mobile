@@ -16,11 +16,7 @@ gql`
       defaultAccount {
         id
         pendingIncomingTransactions {
-          id
-          direction
-          settlementVia {
-            __typename
-          }
+          ...Transaction
         }
       }
     }
@@ -70,6 +66,12 @@ type UseCustodialPendingDeposits = {
  * while it runs, so it neither unmounts the screen showing it nor flips what that screen
  * holds back; `loading` is what tells a caller one is running. A check that fails is an
  * error like a first answer that fails.
+ *
+ * The list is read with the same Transaction fragment Home reads it with, because both
+ * land on the same account in the shared cache: a leaner shape would leave Home's read
+ * incomplete the moment this check found a deposit Home had not seen. Sharing the entry
+ * also works the other way, so a Home refetch (a push notification, the app coming back
+ * to the foreground) updates the answer here without another check.
  */
 export const useCustodialPendingDeposits = ({
   skip = false,
