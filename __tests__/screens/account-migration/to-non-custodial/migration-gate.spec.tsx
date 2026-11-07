@@ -1277,6 +1277,26 @@ describe("MigrationGate, with a deposit still confirming", () => {
     expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
   })
 
+  /** The check it ignores stays out of its retry too, so that check failing can neither
+   *  fail the retry nor send a report for a read that does not apply. */
+  it("leaves the deposit check out of a committed migration's retry", async () => {
+    mockIsMigrationLocked = true
+    mockIsMigrationCommitted = true
+    const refetchApiKeys = jest.fn().mockResolvedValue(undefined)
+    const checkClear = jest.fn().mockRejectedValue(new Error("network"))
+    mockUseActiveApiKeys.mockReturnValue(
+      apiKeysState({ hasError: true, isReady: false, refetch: refetchApiKeys }),
+    )
+    mockUseCustodialPendingDeposits.mockReturnValue(pendingDepositsState({ checkClear }))
+
+    const { getByTestId } = render(<MigrationGate />)
+    fireEvent.press(getByTestId("gate-retry-button"))
+    await act(async () => {})
+
+    expect(refetchApiKeys).toHaveBeenCalledTimes(1)
+    expect(checkClear).not.toHaveBeenCalled()
+  })
+
   it("keeps the OK spinner off where OK only leaves", () => {
     mockUseCustodialPendingDeposits.mockReturnValue(
       pendingDepositsState({ hasPendingDeposit: true, loading: true }),

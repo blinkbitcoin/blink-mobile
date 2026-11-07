@@ -172,12 +172,13 @@ export const MigrationGate: React.FC = () => {
   /** Settles only once every source has: the server refetches reject on a network
    *  error, and failing fast on one would end the retry while the local reads it exists to
    *  measure are still running. The first rejection is rethrown afterwards for the retry's
-   *  report. */
+   *  report. A committed migration skips the deposit check, which it ignores anyway, so
+   *  that check failing cannot fail its retry. */
   const refetchGateData = useCallback(async (): Promise<void> => {
     const results = await Promise.allSettled([
       refetchApiKeys(),
       refetchBalances(),
-      checkPendingDepositsClear(),
+      isPendingDepositCheckNeeded ? checkPendingDepositsClear() : undefined,
       refetchLock(),
       refetchCheckpoint(),
       refetchPendingWallet(),
@@ -189,6 +190,7 @@ export const MigrationGate: React.FC = () => {
   }, [
     refetchApiKeys,
     refetchBalances,
+    isPendingDepositCheckNeeded,
     checkPendingDepositsClear,
     refetchLock,
     refetchCheckpoint,
