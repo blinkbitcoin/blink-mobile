@@ -2533,18 +2533,20 @@
         "description": "Okumanyisibwa ku bbeeyi ya Bitcoin."
       }
     },
-    "inApp": "Mu app",
+    "splashGroup": "Olupapula lw'ensimbi ezijja",
     "incomingTransactionSplash": "Olupapula lw'ensimbi ezijja",
-    "splashMinimum": "Omuwendo omutono (sats)"
+    "splashMinimum": "Omuwendo omutono (SAT)"
   },
   "IncomingTransactionSplash": {
     "youReceived": "Wafunye",
     "note": "Ekiwandiiko",
-    "dontShowAgain": "Tolaga olutimbe luno nate.",
+    "dontShowAgain": "Tolaga kino nate",
     "details": "Ebikwata ku nsonga",
     "announcement": "Wafunye {amount}",
     "tapToShow": "Nyiga okulaba",
-    "announcementHidden": "Wafunye ensimbi"
+    "announcementHidden": "Wafunye ensimbi",
+    "toastOn": "Olupapula luno lukoleddwa",
+    "toastOff": "Olupapula luno luggiddwako"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Akawunti yo erina omuwendo ogusoba mu $5",

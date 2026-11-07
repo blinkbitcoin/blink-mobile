@@ -2533,18 +2533,20 @@
         "description": "Notifications about the price of Bitcoin."
       }
     },
-    "inApp": "Στην εφαρμογή",
+    "splashGroup": "Οθόνη εισερχόμενης συναλλαγής",
     "incomingTransactionSplash": "Οθόνη εισερχόμενης συναλλαγής",
-    "splashMinimum": "Ελάχιστο ποσό (sats)"
+    "splashMinimum": "Ελάχιστο ποσό (SAT)"
   },
   "IncomingTransactionSplash": {
     "youReceived": "Έλαβες",
     "note": "Σημείωση",
-    "dontShowAgain": "Να μην εμφανιστεί ξανά αυτή η οθόνη.",
+    "dontShowAgain": "Να μην εμφανιστεί ξανά",
     "details": "Λεπτομέρειες",
     "announcement": "Ελήφθη {amount}",
     "tapToShow": "Πατήστε για εμφάνιση",
-    "announcementHidden": "Η πληρωμή ελήφθη"
+    "announcementHidden": "Η πληρωμή ελήφθη",
+    "toastOn": "Η οθόνη ειδοποίησης είναι ενεργή",
+    "toastOff": "Η οθόνη ειδοποίησης είναι ανενεργή"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Ο λογαριασμός σας έχει περισσότερα από $5",

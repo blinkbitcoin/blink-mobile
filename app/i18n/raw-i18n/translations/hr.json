@@ -2533,18 +2533,20 @@
         "description": "Obavijesti o cijeni Bitcoina."
       }
     },
-    "inApp": "U aplikaciji",
+    "splashGroup": "Zaslon dolazne transakcije",
     "incomingTransactionSplash": "Zaslon dolazne transakcije",
-    "splashMinimum": "Najmanji iznos (sats)"
+    "splashMinimum": "Najmanji iznos (SAT)"
   },
   "IncomingTransactionSplash": {
     "youReceived": "Primili ste",
     "note": "Bilješka",
-    "dontShowAgain": "Ne prikazuj više ovaj zaslon.",
+    "dontShowAgain": "Ne prikazuj više",
     "details": "Detalji",
     "announcement": "Primljeno {amount}",
     "tapToShow": "Dodirni za prikaz",
-    "announcementHidden": "Uplata primljena"
+    "announcementHidden": "Uplata primljena",
+    "toastOn": "Zaslon obavijesti je uključen",
+    "toastOff": "Zaslon obavijesti je isključen"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Vaš račun ima više od $5",

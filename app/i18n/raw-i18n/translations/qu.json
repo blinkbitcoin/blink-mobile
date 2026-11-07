@@ -2533,18 +2533,20 @@
         "description": "Bitcoin chaninmanta willanakuykuna."
       }
     },
-    "inApp": "Apppi",
+    "splashGroup": "Haywarisqa qullqi pantalla",
     "incomingTransactionSplash": "Haywarisqa qullqi pantalla",
-    "splashMinimum": "Asllaqa chanin (sats)"
+    "splashMinimum": "Asllaqa chanin (SAT)"
   },
   "IncomingTransactionSplash": {
     "youReceived": "Chaskirqanki",
     "note": "Willay",
-    "dontShowAgain": "Ama kay pantallata yapamanta rikuchiychu.",
+    "dontShowAgain": "Ama kayta yapamanta rikuchiychu",
     "details": "Willakuykuna",
     "announcement": "Chaskisqa {amount}",
     "tapToShow": "Ñit'iy rikunaykipaq",
-    "announcementHidden": "Qullqi chaskisqa"
+    "announcementHidden": "Qullqi chaskisqa",
+    "toastOn": "Pantalla kichasqa",
+    "toastOff": "Pantalla wichqasqa"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Cuentaykipi $5 aswan qullqi kachkan",

@@ -2533,18 +2533,20 @@
                 "description": "Benachrichtigungen über den Preis von Bitcoin."
             }
         },
-        "inApp": "In der App",
+        "splashGroup": "Bildschirm bei Zahlungseingang",
         "incomingTransactionSplash": "Bildschirm für eingehende Transaktionen",
-        "splashMinimum": "Mindestbetrag (Sats)"
+        "splashMinimum": "Mindestbetrag (SAT)"
     },
     "IncomingTransactionSplash": {
         "youReceived": "Du hast erhalten",
         "note": "Notiz",
-        "dontShowAgain": "Diesen Bildschirm nicht mehr anzeigen.",
+        "dontShowAgain": "Nicht mehr anzeigen",
         "details": "Details",
         "announcement": "Erhalten {amount}",
         "tapToShow": "Antippen zum Anzeigen",
-        "announcementHidden": "Zahlung erhalten"
+        "announcementHidden": "Zahlung erhalten",
+        "toastOn": "Splash-Screen ist an",
+        "toastOff": "Splash-Screen ist aus"
     },
     "AccountScreen": {
         "fundsMoreThan5Dollars": "Ihr Konto hat mehr als $5",

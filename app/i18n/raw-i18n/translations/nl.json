@@ -2533,18 +2533,20 @@
         "description": "Meldingen over de prijs van Bitcoin."
       }
     },
-    "inApp": "In de app",
+    "splashGroup": "Scherm voor inkomende transactie",
     "incomingTransactionSplash": "Scherm voor inkomende transactie",
-    "splashMinimum": "Minimumbedrag (sats)"
+    "splashMinimum": "Minimumbedrag (SAT)"
   },
   "IncomingTransactionSplash": {
     "youReceived": "Je hebt ontvangen",
     "note": "Notitie",
-    "dontShowAgain": "Dit scherm niet meer tonen.",
+    "dontShowAgain": "Niet meer tonen",
     "details": "Details",
     "announcement": "Ontvangen {amount}",
     "tapToShow": "Tik om te tonen",
-    "announcementHidden": "Betaling ontvangen"
+    "announcementHidden": "Betaling ontvangen",
+    "toastOn": "Splashscherm staat aan",
+    "toastOff": "Splashscherm staat uit"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Je account heeft meer dan $5",

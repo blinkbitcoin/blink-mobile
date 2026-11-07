@@ -14,6 +14,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useHideBalanceSetting } from "@app/hooks/use-hide-balance-setting"
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import {
   navigationRef,
@@ -32,7 +33,7 @@ import { amountBucket, decideSplash } from "./decide-splash"
 import { isOverlayCovered } from "./overlay-cover"
 import { IncomingTransactionSplashOverlay } from "./incoming-transaction-splash-overlay"
 import { SplashCandidate, SplashCloseAction } from "./types"
-import { useSplashSettings } from "./use-splash-settings"
+import { toastSplashSetting, useSplashSettings } from "./use-splash-settings"
 
 export type ShownSplash = SplashCandidate & {
   amountSats: number
@@ -72,6 +73,7 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
 }) => {
   const [shown, setShown] = useState<ShownSplash | null>(null)
 
+  const { LL } = useI18nContext()
   const settings = useSplashSettings()
   const { hideAmount } = useHideAmount()
   const { alwaysHideBalance } = useHideBalanceSetting()
@@ -217,6 +219,7 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
     ({ optedOut, action }: { optedOut: boolean; action: SplashCloseAction }) => {
       if (optedOut) {
         settings.setEnabled(false)
+        toastSplashSetting({ enabled: false, LL })
         logIncomingTransactionSplashSettingChanged({
           enabled: false,
           minimumSats: settings.minSats,
@@ -234,7 +237,7 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
       shownId.current = null
       setShown(null)
     },
-    [settings],
+    [settings, LL],
   )
 
   const openDetails = useCallback(

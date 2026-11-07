@@ -2533,18 +2533,20 @@
         "description": "Bitcoin fiyatı hakkında bildirimler."
       }
     },
-    "inApp": "Uygulamada",
+    "splashGroup": "Gelen işlem ekranı",
     "incomingTransactionSplash": "Gelen işlem ekranı",
-    "splashMinimum": "En düşük tutar (sats)"
+    "splashMinimum": "En düşük tutar (SAT)"
   },
   "IncomingTransactionSplash": {
     "youReceived": "Aldınız",
     "note": "Not",
-    "dontShowAgain": "Bu ekranı bir daha gösterme.",
+    "dontShowAgain": "Bunu bir daha gösterme",
     "details": "Ayrıntılar",
     "announcement": "Alındı {amount}",
     "tapToShow": "Göstermek için dokunun",
-    "announcementHidden": "Ödeme alındı"
+    "announcementHidden": "Ödeme alındı",
+    "toastOn": "Bildirim ekranı açık",
+    "toastOff": "Bildirim ekranı kapalı"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Hesabınızda 5 dolardan fazla para var",

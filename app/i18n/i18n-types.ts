@@ -8308,15 +8308,15 @@ type RootTranslation = {
 			}
 		}
 		/**
-		 * I​n​ ​t​h​e​ ​a​p​p
+		 * I​n​c​o​m​i​n​g​ ​t​r​a​n​s​a​c​t​i​o​n​ ​s​p​l​a​s​h
 		 */
-		inApp: string
+		splashGroup: string
 		/**
 		 * I​n​c​o​m​i​n​g​ ​t​r​a​n​s​a​c​t​i​o​n​ ​s​p​l​a​s​h​ ​s​c​r​e​e​n
 		 */
 		incomingTransactionSplash: string
 		/**
-		 * M​i​n​i​m​u​m​ ​a​m​o​u​n​t​ ​(​s​a​t​s​)
+		 * M​i​n​i​m​u​m​ ​a​m​o​u​n​t​ ​(​S​A​T​)
 		 */
 		splashMinimum: string
 	}
@@ -8330,7 +8330,7 @@ type RootTranslation = {
 		 */
 		note: string
 		/**
-		 * D​o​n​’​t​ ​s​h​o​w​ ​m​e​ ​t​h​i​s​ ​s​c​r​e​e​n​ ​a​g​a​i​n​.
+		 * D​o​n​’​t​ ​s​h​o​w​ ​m​e​ ​t​h​i​s​ ​a​g​a​i​n
 		 */
 		dontShowAgain: string
 		/**
@@ -8350,6 +8350,14 @@ type RootTranslation = {
 		 * P​a​y​m​e​n​t​ ​r​e​c​e​i​v​e​d
 		 */
 		announcementHidden: string
+		/**
+		 * S​p​l​a​s​h​ ​s​c​r​e​e​n​ ​i​s​ ​o​n
+		 */
+		toastOn: string
+		/**
+		 * S​p​l​a​s​h​ ​s​c​r​e​e​n​ ​i​s​ ​o​f​f
+		 */
+		toastOff: string
 	}
 	AccountScreen: {
 		/**
@@ -22638,15 +22646,15 @@ export type TranslationFunctions = {
 			}
 		}
 		/**
-		 * In the app
+		 * Incoming transaction splash
 		 */
-		inApp: () => LocalizedString
+		splashGroup: () => LocalizedString
 		/**
 		 * Incoming transaction splash screen
 		 */
 		incomingTransactionSplash: () => LocalizedString
 		/**
-		 * Minimum amount (sats)
+		 * Minimum amount (SAT)
 		 */
 		splashMinimum: () => LocalizedString
 	}
@@ -22660,7 +22668,7 @@ export type TranslationFunctions = {
 		 */
 		note: () => LocalizedString
 		/**
-		 * Don’t show me this screen again.
+		 * Don’t show me this again
 		 */
 		dontShowAgain: () => LocalizedString
 		/**
@@ -22679,6 +22687,14 @@ export type TranslationFunctions = {
 		 * Payment received
 		 */
 		announcementHidden: () => LocalizedString
+		/**
+		 * Splash screen is on
+		 */
+		toastOn: () => LocalizedString
+		/**
+		 * Splash screen is off
+		 */
+		toastOff: () => LocalizedString
 	}
 	AccountScreen: {
 		/**

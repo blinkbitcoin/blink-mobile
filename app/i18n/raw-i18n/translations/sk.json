@@ -2533,18 +2533,20 @@
         "description": "Oznámenia o cene bitcoinu."
       }
     },
-    "inApp": "V aplikácii",
+    "splashGroup": "Obrazovka prichádzajúcej transakcie",
     "incomingTransactionSplash": "Obrazovka prichádzajúcej transakcie",
-    "splashMinimum": "Minimálna suma (sats)"
+    "splashMinimum": "Minimálna suma (SAT)"
   },
   "IncomingTransactionSplash": {
     "youReceived": "Dostali ste",
     "note": "Poznámka",
-    "dontShowAgain": "Túto obrazovku už nezobrazovať.",
+    "dontShowAgain": "Toto už nezobrazovať",
     "details": "Podrobnosti",
     "announcement": "Prijaté {amount}",
     "tapToShow": "Klepnite na zobrazenie",
-    "announcementHidden": "Platba prijatá"
+    "announcementHidden": "Platba prijatá",
+    "toastOn": "Obrazovka platby je zapnutá",
+    "toastOff": "Obrazovka platby je vypnutá"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Váš účet má viac ako 5 USD",
