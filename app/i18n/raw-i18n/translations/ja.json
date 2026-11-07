@@ -2538,7 +2538,7 @@
             }
         },
         "splashGroup": "入金時の全画面表示",
-        "incomingTransactionSplash": "入金時の全画面表示",
+        "incomingTransactionSplash": "全画面表示を使う",
         "splashMinimum": "最低金額（SAT）"
     },
     "IncomingTransactionSplash": {

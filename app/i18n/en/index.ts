@@ -2641,7 +2641,7 @@ const en: BaseTranslation = {
       },
     },
     splashGroup: "Incoming transaction splash",
-    incomingTransactionSplash: "Incoming transaction splash screen",
+    incomingTransactionSplash: "Show splash screen",
     splashMinimum: "Minimum amount (SAT)",
   },
   IncomingTransactionSplash: {

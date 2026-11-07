@@ -2538,7 +2538,7 @@
       }
     },
     "splashGroup": "Bejövő tranzakció képernyője",
-    "incomingTransactionSplash": "Bejövő tranzakció képernyője",
+    "incomingTransactionSplash": "Képernyő megjelenítése",
     "splashMinimum": "Minimum összeg (SAT)"
   },
   "IncomingTransactionSplash": {

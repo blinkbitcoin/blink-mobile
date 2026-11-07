@@ -8329,7 +8329,7 @@ type RootTranslation = {
 		 */
 		splashGroup: string
 		/**
-		 * I​n​c​o​m​i​n​g​ ​t​r​a​n​s​a​c​t​i​o​n​ ​s​p​l​a​s​h​ ​s​c​r​e​e​n
+		 * S​h​o​w​ ​s​p​l​a​s​h​ ​s​c​r​e​e​n
 		 */
 		incomingTransactionSplash: string
 		/**
@@ -22709,7 +22709,7 @@ export type TranslationFunctions = {
 		 */
 		splashGroup: () => LocalizedString
 		/**
-		 * Incoming transaction splash screen
+		 * Show splash screen
 		 */
 		incomingTransactionSplash: () => LocalizedString
 		/**
