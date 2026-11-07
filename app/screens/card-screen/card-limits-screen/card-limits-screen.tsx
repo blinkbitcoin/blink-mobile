@@ -11,7 +11,7 @@ import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { SpendingPeriod, WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { toMajorUnit } from "@app/utils/helper"
+import { parseDollarsToCents, toMajorUnit } from "@app/utils/helper"
 
 import { useCardData } from "../hooks/use-card-data"
 
@@ -78,6 +78,18 @@ export const CardLimitsScreen: React.FC = () => {
    *  instead of being formatted as a zero amount. */
   const formatAtmLimit = (value: string) => (value ? formatAmount(value) : value)
 
+  /** Compared as the parsed amount, so a value typed with a comma that matches the saved
+   *  limit is not sent again. An emptied field reads as zero, as it always has, so leaving
+   *  it empty where no limit is set changes nothing. */
+  const isSpendingLimitUnchanged = (
+    value: string,
+    savedCents: number | null | undefined,
+  ) => {
+    const isBlank = value.trim() === ""
+    const typedCents = isBlank ? 0 : parseDollarsToCents(value)
+    return typedCents === (savedCents ?? 0)
+  }
+
   const isSavingAtmLimit = updatingAtmLimit !== null
   const isSavingAtmDailyLimit = updatingAtmLimit === SpendingPeriod.Daily
   const isSavingAtmMonthlyLimit = updatingAtmLimit === SpendingPeriod.Monthly
@@ -122,7 +134,7 @@ export const CardLimitsScreen: React.FC = () => {
             keyboardType="decimal-pad"
             formatDisplay={formatAmount}
             onBlur={(value) => {
-              if (Number(value) !== toMajorUnit(card.dailyLimitCents ?? 0))
+              if (!isSpendingLimitUnchanged(value, card.dailyLimitCents))
                 handleUpdateDailyLimit(value)
             }}
             loading={updatingField === LimitField.Daily}
@@ -137,7 +149,7 @@ export const CardLimitsScreen: React.FC = () => {
             keyboardType="decimal-pad"
             formatDisplay={formatAmount}
             onBlur={(value) => {
-              if (Number(value) !== toMajorUnit(card.monthlyLimitCents ?? 0))
+              if (!isSpendingLimitUnchanged(value, card.monthlyLimitCents))
                 handleUpdateMonthlyLimit(value)
             }}
             loading={updatingField === LimitField.Monthly}

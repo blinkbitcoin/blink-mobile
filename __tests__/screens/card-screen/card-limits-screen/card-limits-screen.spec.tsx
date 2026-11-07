@@ -1,7 +1,7 @@
 import React from "react"
 import { ActivityIndicator } from "react-native"
 import type { ReactTestInstance } from "react-test-renderer"
-import { render, fireEvent, within } from "@testing-library/react-native"
+import { act, render, fireEvent, within } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardLimitsScreen } from "@app/screens/card-screen/card-limits-screen"
@@ -271,6 +271,27 @@ describe("CardLimitsScreen", () => {
       expect(mockHandleUpdateDailyLimit).not.toHaveBeenCalled()
     })
 
+    it("leaves an emptied spending field alone where no limit is set", () => {
+      setupMocks({ cardData: { card: { ...activeCard, dailyLimitCents: null } } })
+      const { getByLabelText } = renderScreen()
+      const dailyField = getByLabelText("Daily spending")
+      fireEvent.changeText(dailyField, "")
+      fireEvent(dailyField, "blur")
+      expect(mockHandleUpdateDailyLimit).not.toHaveBeenCalled()
+    })
+
+    it("does not save again a spending limit typed with a comma that matches the saved one", () => {
+      const { getByLabelText } = render(
+        <ContextForScreen>
+          <CardLimitsScreen />
+        </ContextForScreen>,
+      )
+      const monthlyField = getByLabelText("Monthly spending limits")
+      fireEvent.changeText(monthlyField, "5000,00")
+      fireEvent(monthlyField, "blur")
+      expect(mockHandleUpdateMonthlyLimit).not.toHaveBeenCalled()
+    })
+
     it("calls handleUpdateMonthlyLimit when monthly field loses focus with a new value", () => {
       const { getByLabelText } = render(
         <ContextForScreen>
@@ -363,6 +384,29 @@ describe("CardLimitsScreen", () => {
 
       expect(mockHandleUpdateAtmDailyLimit).toHaveBeenCalledWith("100abc")
       expect(getByLabelText("Daily ATM limits").props.value).toBe("")
+    })
+
+    /** While the save is out the field keeps what was typed and shows it as the amount it
+     *  saves: a comma decimal reads as $350.5, not the $0 a plain number reading gives. */
+    it("shows a comma amount as the amount it saves while the save is out", () => {
+      const { getByLabelText, rerender } = renderScreen()
+      const dailyField = getByLabelText("Daily ATM limits")
+      fireEvent(dailyField, "focus")
+      fireEvent.changeText(dailyField, "350,50")
+
+      setupMocks({ atmControls: { updatingAtmLimit: SpendingPeriod.Daily } })
+      rerender(
+        <ContextForScreen>
+          <CardLimitsScreen />
+        </ContextForScreen>,
+      )
+      /** Called on the input itself: the testing library skips events on a field that is
+       *  no longer editable, while the device still reports the focus leaving it. */
+      act(() => {
+        getByLabelText("Daily ATM limits").props.onBlur()
+      })
+
+      expect(getByLabelText("Daily ATM limits").props.value).toBe("$350.5")
     })
 
     it("saves the monthly ATM limit when its field loses focus", () => {
