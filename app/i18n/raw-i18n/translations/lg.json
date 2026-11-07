@@ -3949,6 +3949,11 @@
       "title": "Tetusobola kutambuza ssente zo eza doola",
       "body": "Sooka omalewo ssente zo eza doola. Osobola okuzisindika ku ssente zo eza Bitcoin mu Blink oba awalala."
     },
+    "pendingDepositModal": {
+      "title": "Waliwo ssente eziteekeddwa ku akawunti yo ezikyalindiriddwa",
+      "body": "Toyinza kukyusa kugenda ku kika kya akawunti ekirala okutuusa ng'ssente zo zonna ezikyalindiriddwa zimaze okutuuka era nga ziteekeddwa ku akawunti eno.",
+      "contactSupportCta": "Tuukirira obuyambi"
+    },
     "balancesOverview": {
       "title": "Tambuza ssente zo",
       "body": "Tambuza ssente zo mu bukuumi ku kawunti yo empya.",

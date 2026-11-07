@@ -3949,6 +3949,11 @@
       "title": "Nem tudjuk átköltöztetni a dollár egyenlegedet",
       "body": "Először ürítsd ki a dollár egyenlegedet. Átutalhatod a Bitcoin egyenlegedre a Blinkben vagy máshová."
     },
+    "pendingDepositModal": {
+      "title": "Függőben lévő befizetés van a számládon",
+      "body": "Nem válthatsz másik számlatípusra, amíg az összes függőben lévő befizetésed nem teljesült és nem került jóváírásra ezen a számlán.",
+      "contactSupportCta": "Kapcsolat a támogatással"
+    },
     "balancesOverview": {
       "title": "Mozgasd az egyenleged",
       "body": "Mozgasd biztonságosan a pénzed az új fiókodba.",

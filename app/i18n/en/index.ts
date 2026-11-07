@@ -4202,6 +4202,11 @@ const en: BaseTranslation = {
       title: "We cannot migrate your Dollar Balance",
       body: "Empty your Dollar Balance first. You can transfer to your Bitcoin Balance in Blink or elsewhere.",
     },
+    pendingDepositModal: {
+      title: "There is a pending deposit to your account",
+      body: "You cannot migrate to a different type of account before all your pending deposits have been settled and credited on this account.",
+      contactSupportCta: "Contact support",
+    },
     migrateNowModal: {
       title: "Migrate now to a non-custodial account",
       body: "You can no longer receive funds to your custodial account. Blink has discontinued custodial service in your region and this account will be inactivated by the end of {date: string}.\n\nMigrate now to a non-custodial account.",

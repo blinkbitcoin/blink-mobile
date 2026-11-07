@@ -3949,6 +3949,11 @@
       "title": "We kunnen je dollarsaldo niet migreren",
       "body": "Maak eerst je dollarsaldo leeg. Je kunt het overboeken naar je Bitcoin-saldo in Blink of ergens anders."
     },
+    "pendingDepositModal": {
+      "title": "Er staat een storting op je rekening in afwachting",
+      "body": "Je kunt niet naar een ander type rekening migreren voordat al je openstaande stortingen zijn verwerkt en op deze rekening zijn bijgeschreven.",
+      "contactSupportCta": "Contact met support"
+    },
     "balancesOverview": {
       "title": "Verplaats je saldo",
       "body": "Verplaats je geld veilig naar je nieuwe account.",
