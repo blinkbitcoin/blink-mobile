@@ -2532,7 +2532,23 @@
         "title": "Գնի փոփոխություններ",
         "description": "Զգուշացումներ Bitcoin-ի գնի մասին։"
       }
-    }
+    },
+    "splashGroup": "Մուտքային գործարքի էկրան",
+    "incomingTransactionSplash": "Ցույց տալ էկրանը",
+    "splashMinimum": "Նվազագույն գումար (SAT)"
+  },
+  "IncomingTransactionSplash": {
+    "youReceived": "Դուք ստացել եք",
+    "pendingOnchain": "Onchain ընթացքի մեջ",
+    "note": "Նշում",
+    "dontShowAgain": "Այլևս չցուցադրել",
+    "details": "Մանրամասներ",
+    "announcement": "Ստացվել է {amount}",
+    "tapToShow": "Սեղմեք՝ ցուցադրելու համար",
+    "announcementHidden": "Վճարումը ստացվել է",
+    "announcementPending": "Onchain ընթացքի մեջ, {amount}",
+    "toastOn": "Ծանուցման էկրանը միացված է",
+    "toastOff": "Ծանուցման էկրանն անջատված է"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Ձեր հաշվին $5-ից ավելի միջոցներ կան",

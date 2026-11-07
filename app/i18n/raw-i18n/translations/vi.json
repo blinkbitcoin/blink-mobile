@@ -2532,7 +2532,23 @@
         "title": "Biến động giá",
         "description": "Thông báo về giá Bitcoin."
       }
-    }
+    },
+    "splashGroup": "Màn hình giao dịch đến",
+    "incomingTransactionSplash": "Hiển thị màn hình",
+    "splashMinimum": "Số tiền tối thiểu (SAT)"
+  },
+  "IncomingTransactionSplash": {
+    "youReceived": "Bạn đã nhận",
+    "pendingOnchain": "Trên chuỗi đang chờ",
+    "note": "Ghi chú",
+    "dontShowAgain": "Đừng hiện lại nữa",
+    "details": "Chi tiết",
+    "announcement": "Đã nhận {amount}",
+    "tapToShow": "Chạm để hiện",
+    "announcementHidden": "Đã nhận thanh toán",
+    "announcementPending": "Trên chuỗi đang chờ, {amount}",
+    "toastOn": "Đã bật màn hình thông báo",
+    "toastOff": "Đã tắt màn hình thông báo"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Tài khoản của bạn có hơn $5",

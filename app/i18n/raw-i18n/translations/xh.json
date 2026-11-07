@@ -2532,7 +2532,23 @@
         "title": "Utshintsho lwamaxabiso",
         "description": "Izaziso malunga nexabiso le-Bitcoin."
       }
-    }
+    },
+    "splashGroup": "Isikrini sentengiselwano engenayo",
+    "incomingTransactionSplash": "Bonisa isikrini",
+    "splashMinimum": "Eyona mali incinci (SAT)"
+  },
+  "IncomingTransactionSplash": {
+    "youReceived": "Ufumene",
+    "pendingOnchain": "Onchain elindileyo",
+    "note": "Inqaku",
+    "dontShowAgain": "Ungaphindi ukubonise oku",
+    "details": "Iinkcukacha",
+    "announcement": "Ufumene {amount}",
+    "tapToShow": "Cofa ukuze ubonise",
+    "announcementHidden": "Intlawulo ifunyenwe",
+    "announcementPending": "Onchain elindileyo, {amount}",
+    "toastOn": "Isikrini sivuliwe",
+    "toastOff": "Isikrini sivaliwe"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "I-akhawunti yakho inangaphezulu kwe-$5",

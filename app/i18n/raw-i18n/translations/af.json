@@ -2532,7 +2532,23 @@
         "title": "Prysveranderings",
         "description": "Kennisgewings oor die prys van Bitcoin."
       }
-    }
+    },
+    "splashGroup": "Inkomende transaksie-skerm",
+    "incomingTransactionSplash": "Wys skerm",
+    "splashMinimum": "Minimumbedrag (SAT)"
+  },
+  "IncomingTransactionSplash": {
+    "youReceived": "Jy het ontvang",
+    "pendingOnchain": "Hangend onchain",
+    "note": "Nota",
+    "dontShowAgain": "Moenie dit weer wys nie",
+    "details": "Besonderhede",
+    "announcement": "Ontvang {amount}",
+    "tapToShow": "Tik om te wys",
+    "announcementHidden": "Betaling ontvang",
+    "announcementPending": "Hangend onchain, {amount}",
+    "toastOn": "Skerm vir inkomende betalings is aan",
+    "toastOff": "Skerm vir inkomende betalings is af"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Jou rekening het meer as $5",

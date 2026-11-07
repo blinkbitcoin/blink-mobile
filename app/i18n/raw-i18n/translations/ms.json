@@ -2532,7 +2532,23 @@
         "title": "Perubahan harga",
         "description": "Notifikasi tentang harga Bitcoin."
       }
-    }
+    },
+    "splashGroup": "Skrin transaksi masuk",
+    "incomingTransactionSplash": "Tunjukkan skrin",
+    "splashMinimum": "Amaun minimum (SAT)"
+  },
+  "IncomingTransactionSplash": {
+    "youReceived": "Anda menerima",
+    "pendingOnchain": "Onchain belum selesai",
+    "note": "Nota",
+    "dontShowAgain": "Jangan tunjukkan lagi",
+    "details": "Butiran",
+    "announcement": "Diterima {amount}",
+    "tapToShow": "Tekan untuk tunjuk",
+    "announcementHidden": "Bayaran diterima",
+    "announcementPending": "Onchain belum selesai, {amount}",
+    "toastOn": "Skrin pemberitahuan dihidupkan",
+    "toastOff": "Skrin pemberitahuan dimatikan"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Akaun anda mempunyai lebih daripada $5",

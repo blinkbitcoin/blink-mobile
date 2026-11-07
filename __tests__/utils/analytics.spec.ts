@@ -23,6 +23,7 @@ import {
   logTwoFactorNonCustodialChosen,
   logTwoFactorDisableAttempted,
   logTwoFactorDisableBlocked,
+  logIncomingTransactionSplashOptedOut,
   logLoginMethodCodeFailed,
   logTwoFactorPromptDismissed,
   logTwoFactorPromptShown,
@@ -52,7 +53,10 @@ jest.mock("@app/self-custodial/analytics-identity", () => ({
 
 const mockMeasure = jest.fn()
 jest.mock("@app/self-custodial/measurement", () => ({
-  ScEvent: { PaymentDestinationParsed: "sc_payment_destination_parsed" },
+  ScEvent: {
+    PaymentDestinationParsed: "sc_payment_destination_parsed",
+    IncomingTxSplashOptedOut: "sc_incoming_tx_splash_opted_out",
+  },
   measure: (...args: unknown[]) => mockMeasure(...args),
 }))
 
@@ -543,6 +547,33 @@ describe("analytics helpers", () => {
       expect(mockLogEvent).toHaveBeenCalledWith("login_method_code_failed", {
         login_method: "email",
       })
+    })
+  })
+
+  describe("turning the incoming transaction splash off", () => {
+    afterEach(() => {
+      mockIsCustodial = true
+    })
+
+    it("reports only the opt-out and where it came from", () => {
+      logIncomingTransactionSplashOptedOut({ source: "splash" })
+
+      expect(mockLogEvent).toHaveBeenCalledTimes(1)
+      expect(mockLogEvent).toHaveBeenCalledWith("incoming_tx_splash_opted_out", {
+        source: "splash",
+      })
+      expect(mockMeasure).not.toHaveBeenCalled()
+    })
+
+    it("goes through the self-custodial gate for a self-custodial account", () => {
+      mockIsCustodial = false
+
+      logIncomingTransactionSplashOptedOut({ source: "settings" })
+
+      expect(mockMeasure).toHaveBeenCalledWith("sc_incoming_tx_splash_opted_out", {
+        source: "settings",
+      })
+      expect(mockLogEvent).not.toHaveBeenCalled()
     })
   })
 })

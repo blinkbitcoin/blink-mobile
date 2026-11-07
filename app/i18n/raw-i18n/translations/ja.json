@@ -2532,7 +2532,23 @@
                 "title": "価格変動",
                 "description": "Bitcoinの価格に関する通知"
             }
-        }
+        },
+        "splashGroup": "入金時の全画面表示",
+        "incomingTransactionSplash": "全画面表示を使う",
+        "splashMinimum": "最低金額（SAT）"
+    },
+    "IncomingTransactionSplash": {
+        "youReceived": "受け取りました",
+        "pendingOnchain": "オンチェーン保留中",
+        "note": "メモ",
+        "dontShowAgain": "今後表示しない",
+        "details": "詳細",
+        "announcement": "受取 {amount}",
+        "tapToShow": "タップして表示",
+        "announcementHidden": "入金がありました",
+        "announcementPending": "オンチェーン保留中, {amount}",
+        "toastOn": "全画面表示をオンにしました",
+        "toastOff": "全画面表示をオフにしました"
     },
     "AccountScreen": {
         "fundsMoreThan5Dollars": "アカウントの残高が$5を超えています",

@@ -2532,7 +2532,23 @@
         "title": "Mabadiliko ya bei",
         "description": "Arifa kuhusu bei ya Bitcoin."
       }
-    }
+    },
+    "splashGroup": "Skrini ya muamala unaoingia",
+    "incomingTransactionSplash": "Onyesha skrini",
+    "splashMinimum": "Kiasi cha chini (SAT)"
+  },
+  "IncomingTransactionSplash": {
+    "youReceived": "Umepokea",
+    "pendingOnchain": "Onchain inasubiri",
+    "note": "Dokezo",
+    "dontShowAgain": "Usionyeshe hii tena",
+    "details": "Maelezo",
+    "announcement": "Imepokelewa {amount}",
+    "tapToShow": "Bonyeza kuonyesha",
+    "announcementHidden": "Malipo yamepokelewa",
+    "announcementPending": "Onchain inasubiri, {amount}",
+    "toastOn": "Skrini ya arifa imewashwa",
+    "toastOff": "Skrini ya arifa imezimwa"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Akaunti yako ina zaidi ya $5",

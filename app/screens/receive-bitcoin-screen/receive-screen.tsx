@@ -36,7 +36,6 @@ import { toastShow } from "@app/utils/toast"
 import { RECEIVE_ACTIONS_GAP, RECEIVE_INPUTS_GUTTER } from "./layout"
 import { NfcHeaderButton } from "./nfc-header-button"
 import { QRView } from "./qr-view"
-import { withMyLnUpdateSub } from "./my-ln-updates-sub"
 import { Invoice, InvoiceType, PaymentRequestState } from "./payment/index.types"
 import {
   useDisplayPaymentRequest,
@@ -489,4 +488,4 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 }))
 
-export default withMyLnUpdateSub(ReceiveScreen)
+export default ReceiveScreen

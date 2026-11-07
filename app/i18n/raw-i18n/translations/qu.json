@@ -2532,7 +2532,23 @@
         "title": "Chanin tikrakuykuna",
         "description": "Bitcoin chaninmanta willanakuykuna."
       }
-    }
+    },
+    "splashGroup": "Haywarisqa qullqi pantalla",
+    "incomingTransactionSplash": "Pantallata rikuchiy",
+    "splashMinimum": "Asllaqa chanin (SAT)"
+  },
+  "IncomingTransactionSplash": {
+    "youReceived": "Chaskirqanki",
+    "pendingOnchain": "Onchain kanqaqmi",
+    "note": "Willay",
+    "dontShowAgain": "Ama kayta yapamanta rikuchiychu",
+    "details": "Willakuykuna",
+    "announcement": "Chaskisqa {amount}",
+    "tapToShow": "Ñit'iy rikunaykipaq",
+    "announcementHidden": "Qullqi chaskisqa",
+    "announcementPending": "Onchain kanqaqmi, {amount}",
+    "toastOn": "Pantalla kichasqa",
+    "toastOff": "Pantalla wichqasqa"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Cuentaykipi $5 aswan qullqi kachkan",

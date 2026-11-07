@@ -120,8 +120,15 @@ export const extractMemo = (payment: Payment): string | undefined => {
      * the SDK stores in lnurlPayInfo.comment. The comment is the user's own note, so it wins
      * over the destination description for history display, matching custodial behaviour.
      */
-    const { lnurlPayInfo, description } = payment.details.inner
-    return lnurlPayInfo?.comment ?? description ?? undefined
+    const { lnurlPayInfo, lnurlReceiveMetadata, description } = payment.details.inner
+    /** On a receive to a Lightning address the sender's note is the LUD-12 comment the
+     *  SDK keeps in lnurlReceiveMetadata, not in the invoice. */
+    return (
+      lnurlPayInfo?.comment ??
+      lnurlReceiveMetadata?.senderComment ??
+      description ??
+      undefined
+    )
   }
 
   if (PaymentDetails.Spark.instanceOf(payment.details)) {

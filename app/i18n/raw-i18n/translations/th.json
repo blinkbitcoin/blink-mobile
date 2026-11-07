@@ -2532,7 +2532,23 @@
         "title": "การเปลี่ยนแปลงราคา",
         "description": "การแจ้งเตือนเกี่ยวกับราคา Bitcoin"
       }
-    }
+    },
+    "splashGroup": "หน้าจอแจ้งรายการเงินเข้า",
+    "incomingTransactionSplash": "แสดงหน้าจอ",
+    "splashMinimum": "จำนวนขั้นต่ำ (SAT)"
+  },
+  "IncomingTransactionSplash": {
+    "youReceived": "คุณได้รับ",
+    "pendingOnchain": "Onchain รอดำเนินการ",
+    "note": "บันทึก",
+    "dontShowAgain": "ไม่ต้องแสดงอีก",
+    "details": "รายละเอียด",
+    "announcement": "ได้รับ {amount}",
+    "tapToShow": "แตะเพื่อแสดง",
+    "announcementHidden": "ได้รับเงินแล้ว",
+    "announcementPending": "Onchain รอดำเนินการ, {amount}",
+    "toastOn": "เปิดหน้าจอแจ้งเงินเข้าแล้ว",
+    "toastOff": "ปิดหน้าจอแจ้งเงินเข้าแล้ว"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "บัญชีของคุณมีมากกว่า $5",
