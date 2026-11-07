@@ -106,7 +106,9 @@ export const useTransactionSeenState = ({
   }, [isSelfCustodial, hasDeviceRecord, updateState])
 
   /** Custodial history is the server's and never replays. Self-custodial announces only
-   *  what is newer than its record; with no record yet, nothing. */
+   *  what is newer than its record; with no record yet, nothing. Payment times are whole
+   *  seconds, so the record's start is compared in seconds too: a payment in the second
+   *  the record started is new, not part of the history. */
   const isNewEnoughToAnnounce = useCallback(
     (transaction: TransactionFragment | undefined): boolean => {
       if (!transaction) return false
@@ -114,7 +116,8 @@ export const useTransactionSeenState = ({
       if (!hasDeviceRecord) return false
       const { announceSinceMs } = deviceLastSeen
       return (
-        announceSinceMs === undefined || transaction.createdAt * 1000 >= announceSinceMs
+        announceSinceMs === undefined ||
+        transaction.createdAt >= Math.floor(announceSinceMs / 1000)
       )
     },
     [isSelfCustodial, hasDeviceRecord, deviceLastSeen],
