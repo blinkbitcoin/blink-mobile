@@ -2539,12 +2539,14 @@
   },
   "IncomingTransactionSplash": {
     "youReceived": "Du har modtaget",
+    "pendingOnchain": "Afventende onchain",
     "note": "Note",
     "dontShowAgain": "Vis ikke dette igen",
     "details": "Detaljer",
     "announcement": "Modtaget {amount}",
     "tapToShow": "Tryk for at vise",
     "announcementHidden": "Betaling modtaget",
+    "announcementPending": "Afventende onchain, {amount}",
     "toastOn": "Skærm ved indgående betaling er slået til",
     "toastOff": "Skærm ved indgående betaling er slået fra"
   },

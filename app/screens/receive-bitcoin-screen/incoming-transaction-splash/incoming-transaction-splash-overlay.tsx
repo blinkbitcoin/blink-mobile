@@ -38,7 +38,8 @@ import { toBtcMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 
 import type { ShownSplash } from "./incoming-transaction-splash-provider"
-import { SplashCloseAction } from "./types"
+import { PendingHourglass } from "./pending-hourglass"
+import { SplashCloseAction, SplashPaymentType } from "./types"
 
 const IRIS_MS = 480
 const IRIS_OVERSHOOT = 40
@@ -60,6 +61,8 @@ const PULSE_MS = 700
 const PULSE_EASING = Easing.out(Easing.cubic)
 
 const BADGE_SIZE = 52
+/** Figma `29515:54715`: the 32 dp hourglass glyph drawn at 1.75×. */
+const HOURGLASS_SIZE = 56
 
 const REPLACE_FADE_MS = 140
 const REPLACE_RING_MS = 380
@@ -76,6 +79,10 @@ type Props = {
   /** A tap showed a hidden amount, for analytics. */
   onReveal: () => void
 }
+
+/** On-chain is shown when it is detected, before it confirms. */
+const isPendingOnchain = (splash: ShownSplash) =>
+  splash.paymentType === SplashPaymentType.Onchain
 
 const triggerSuccessHaptic = () => {
   // Honors the phone's system haptics setting, unlike the shared triggerHapticFeedback.
@@ -151,21 +158,25 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
 
   const announce = useCallback(
     (shown: ShownSplash) => {
+      const pending = isPendingOnchain(shown)
       if (shown.amountHidden) {
         // A hidden amount is not read out either.
         AccessibilityInfo.announceForAccessibility(
-          LL.IncomingTransactionSplash.announcementHidden(),
+          pending
+            ? LL.IncomingTransactionSplash.pendingOnchain()
+            : LL.IncomingTransactionSplash.announcementHidden(),
         )
         return
       }
       const { settlementDisplayAmount, settlementDisplayCurrency } = shown.transaction
+      const amount = formatCurrency({
+        amountInMajorUnits: settlementDisplayAmount,
+        currency: settlementDisplayCurrency,
+      })
       AccessibilityInfo.announceForAccessibility(
-        LL.IncomingTransactionSplash.announcement({
-          amount: formatCurrency({
-            amountInMajorUnits: settlementDisplayAmount,
-            currency: settlementDisplayCurrency,
-          }),
-        }),
+        pending
+          ? LL.IncomingTransactionSplash.announcementPending({ amount })
+          : LL.IncomingTransactionSplash.announcement({ amount }),
       )
     },
     [LL, formatCurrency],
@@ -335,6 +346,7 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
     moneyAmount: toBtcMoneyAmount(displayed.amountSats),
   })
   const masked = displayed.amountHidden && !revealed
+  const pendingOnchain = isPendingOnchain(displayed)
 
   return (
     <View style={StyleSheet.absoluteFill} {...testProps("incoming-transaction-splash")}>
@@ -392,13 +404,22 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
             testID="incoming-transaction-splash-reveal"
           >
             <Animated.View style={[styles.badge, badgeStyle]}>
-              {impactKey > 0 && (
-                <SuccessBadge key={impactKey} size={BADGE_SIZE} color={colors._white} />
-              )}
+              {impactKey > 0 &&
+                (pendingOnchain ? (
+                  <PendingHourglass
+                    key={impactKey}
+                    size={HOURGLASS_SIZE}
+                    color={colors._white}
+                  />
+                ) : (
+                  <SuccessBadge key={impactKey} size={BADGE_SIZE} color={colors._white} />
+                ))}
             </Animated.View>
             <Animated.View style={[styles.text, amountGroupStyle]}>
               <Text type="p3" style={styles.white}>
-                {LL.IncomingTransactionSplash.youReceived()}
+                {pendingOnchain
+                  ? LL.IncomingTransactionSplash.pendingOnchain()
+                  : LL.IncomingTransactionSplash.youReceived()}
               </Text>
               <View ref={amountRef} onLayout={onAmountLayout}>
                 {masked ? (

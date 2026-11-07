@@ -2539,12 +2539,14 @@
     },
     "IncomingTransactionSplash": {
         "youReceived": "Vous avez reçu",
+        "pendingOnchain": "En attente onchain",
         "note": "Note",
         "dontShowAgain": "Ne plus afficher",
         "details": "Détails",
         "announcement": "Reçu {amount}",
         "tapToShow": "Touchez pour afficher",
         "announcementHidden": "Paiement reçu",
+        "announcementPending": "En attente onchain, {amount}",
         "toastOn": "Écran de paiement activé",
         "toastOff": "Écran de paiement désactivé"
     },

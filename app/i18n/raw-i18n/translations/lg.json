@@ -2539,12 +2539,14 @@
   },
   "IncomingTransactionSplash": {
     "youReceived": "Wafunye",
+    "pendingOnchain": "Tekinagwa ku lujegere",
     "note": "Ekiwandiiko",
     "dontShowAgain": "Tolaga kino nate",
     "details": "Ebikwata ku nsonga",
     "announcement": "Wafunye {amount}",
     "tapToShow": "Nyiga okulaba",
     "announcementHidden": "Wafunye ensimbi",
+    "announcementPending": "Tekinagwa ku lujegere, {amount}",
     "toastOn": "Olupapula luno lukoleddwa",
     "toastOff": "Olupapula luno luggiddwako"
   },

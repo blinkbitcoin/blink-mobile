@@ -2539,12 +2539,14 @@
   },
   "IncomingTransactionSplash": {
     "youReceived": "Je hebt ontvangen",
+    "pendingOnchain": "Onchain in behandeling",
     "note": "Notitie",
     "dontShowAgain": "Niet meer tonen",
     "details": "Details",
     "announcement": "Ontvangen {amount}",
     "tapToShow": "Tik om te tonen",
     "announcementHidden": "Betaling ontvangen",
+    "announcementPending": "Onchain in behandeling, {amount}",
     "toastOn": "Scherm bij inkomende betaling staat aan",
     "toastOff": "Scherm bij inkomende betaling staat uit"
   },

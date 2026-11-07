@@ -8,9 +8,10 @@ export const SplashPaymentType = {
 
 export type SplashPaymentType = (typeof SplashPaymentType)[keyof typeof SplashPaymentType]
 
-/** A settled incoming payment offered to the splash. Custodial updates and
- *  self-custodial payments both arrive as a TransactionFragment, the shape the
- *  transaction details screen reads from the cache. */
+/** An incoming payment offered to the splash: settled for Lightning and intraledger,
+ *  detected and still pending for on-chain. Custodial updates and self-custodial
+ *  payments both arrive as a TransactionFragment, the shape the transaction details
+ *  screen reads from the cache. */
 export type SplashCandidate = {
   transaction: TransactionFragment
   paymentType: SplashPaymentType
@@ -20,6 +21,9 @@ export type SplashCandidate = {
    *  for self-custodial payments, whose time is when they settled (for a deposit, when it
    *  was claimed), so a wallet sync replaying old deposits never fires. */
   createdAtIsSettlement?: boolean
+  /** A self-custodial deposit the SDK has seen but not claimed. It is not a transaction
+   *  yet, so Details opens the unclaimed deposits screen instead. */
+  unclaimedDeposit?: boolean
 }
 
 export const SplashSuppressReason = {

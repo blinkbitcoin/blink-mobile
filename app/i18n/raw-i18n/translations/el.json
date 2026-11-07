@@ -2539,12 +2539,14 @@
   },
   "IncomingTransactionSplash": {
     "youReceived": "Έλαβες",
+    "pendingOnchain": "Σε αναμονή on-chain",
     "note": "Σημείωση",
     "dontShowAgain": "Να μην εμφανιστεί ξανά",
     "details": "Λεπτομέρειες",
     "announcement": "Ελήφθη {amount}",
     "tapToShow": "Πατήστε για εμφάνιση",
     "announcementHidden": "Η πληρωμή ελήφθη",
+    "announcementPending": "Σε αναμονή on-chain, {amount}",
     "toastOn": "Η οθόνη ειδοποίησης είναι ενεργή",
     "toastOff": "Η οθόνη ειδοποίησης είναι ανενεργή"
   },

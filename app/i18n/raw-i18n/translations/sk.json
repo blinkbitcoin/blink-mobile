@@ -2539,12 +2539,14 @@
   },
   "IncomingTransactionSplash": {
     "youReceived": "Dostali ste",
+    "pendingOnchain": "Čakajúce onchain",
     "note": "Poznámka",
     "dontShowAgain": "Toto už nezobrazovať",
     "details": "Podrobnosti",
     "announcement": "Prijaté {amount}",
     "tapToShow": "Klepnite na zobrazenie",
     "announcementHidden": "Platba prijatá",
+    "announcementPending": "Čakajúce onchain, {amount}",
     "toastOn": "Obrazovka platby je zapnutá",
     "toastOff": "Obrazovka platby je vypnutá"
   },

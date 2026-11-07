@@ -2539,12 +2539,14 @@
   },
   "IncomingTransactionSplash": {
     "youReceived": "استلمت",
+    "pendingOnchain": "قيد الانتظار على السلسلة",
     "note": "ملاحظة",
     "dontShowAgain": "لا تُظهر هذا مرة أخرى",
     "details": "التفاصيل",
     "announcement": "تم استلام {amount}",
     "tapToShow": "انقر للعرض",
     "announcementHidden": "تم استلام دفعة",
+    "announcementPending": "قيد الانتظار على السلسلة, {amount}",
     "toastOn": "شاشة الإشعار مفعّلة",
     "toastOff": "شاشة الإشعار معطّلة"
   },

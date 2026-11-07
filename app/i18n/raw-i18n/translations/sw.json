@@ -2539,12 +2539,14 @@
   },
   "IncomingTransactionSplash": {
     "youReceived": "Umepokea",
+    "pendingOnchain": "Onchain inasubiri",
     "note": "Dokezo",
     "dontShowAgain": "Usionyeshe hii tena",
     "details": "Maelezo",
     "announcement": "Imepokelewa {amount}",
     "tapToShow": "Bonyeza kuonyesha",
     "announcementHidden": "Malipo yamepokelewa",
+    "announcementPending": "Onchain inasubiri, {amount}",
     "toastOn": "Skrini ya arifa imewashwa",
     "toastOff": "Skrini ya arifa imezimwa"
   },

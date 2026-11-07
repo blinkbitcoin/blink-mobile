@@ -2539,12 +2539,14 @@
   },
   "IncomingTransactionSplash": {
     "youReceived": "Ufumene",
+    "pendingOnchain": "Onchain elindileyo",
     "note": "Inqaku",
     "dontShowAgain": "Ungaphindi ukubonise oku",
     "details": "Iinkcukacha",
     "announcement": "Ufumene {amount}",
     "tapToShow": "Cofa ukuze ubonise",
     "announcementHidden": "Intlawulo ifunyenwe",
+    "announcementPending": "Onchain elindileyo, {amount}",
     "toastOn": "Isikrini sivuliwe",
     "toastOff": "Isikrini sivaliwe"
   },

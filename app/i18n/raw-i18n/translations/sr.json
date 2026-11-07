@@ -2539,12 +2539,14 @@
   },
   "IncomingTransactionSplash": {
     "youReceived": "Primili ste",
+    "pendingOnchain": "На блокчејну, на чекању",
     "note": "Beleška",
     "dontShowAgain": "Ne prikazuj više",
     "details": "Detalji",
     "announcement": "Primljeno {amount}",
     "tapToShow": "Dodirni za prikaz",
     "announcementHidden": "Uplata primljena",
+    "announcementPending": "На блокчејну, на чекању, {amount}",
     "toastOn": "Ekran obaveštenja je uključen",
     "toastOff": "Ekran obaveštenja je isključen"
   },

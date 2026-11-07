@@ -2539,12 +2539,14 @@
   },
   "IncomingTransactionSplash": {
     "youReceived": "Kaptál",
+    "pendingOnchain": "Onchain függőben",
     "note": "Megjegyzés",
     "dontShowAgain": "Ne mutasd többé",
     "details": "Részletek",
     "announcement": "Beérkezett {amount}",
     "tapToShow": "Koppints a megjelenítéshez",
     "announcementHidden": "Fizetés beérkezett",
+    "announcementPending": "Onchain függőben, {amount}",
     "toastOn": "Értesítő képernyő bekapcsolva",
     "toastOff": "Értesítő képernyő kikapcsolva"
   },
