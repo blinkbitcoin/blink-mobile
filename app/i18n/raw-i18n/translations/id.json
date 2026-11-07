@@ -3249,6 +3249,7 @@
       "limitUpdateError": "Gagal memperbarui batas",
       "limitMustBePositive": "Batas harus lebih besar dari nol",
       "atmToggleError": "Gagal memperbarui penarikan ATM",
+      "atmControlsLoadError": "Gagal memuat batas ATM Anda",
       "invalidLimitAmount": "Masukkan jumlah yang valid dengan maksimal 2 desimal"
     },
     "CardFeeSchedule": {

@@ -3249,6 +3249,7 @@
       "limitUpdateError": "ไม่สามารถอัปเดตขีดจำกัดได้",
       "limitMustBePositive": "ขีดจำกัดต้องมากกว่าศูนย์",
       "atmToggleError": "ไม่สามารถอัปเดตการถอน ATM ได้",
+      "atmControlsLoadError": "ไม่สามารถโหลดขีดจำกัด ATM ได้",
       "invalidLimitAmount": "ป้อนจำนวนเงินที่ถูกต้อง ทศนิยมไม่เกิน 2 ตำแหน่ง"
     },
     "CardFeeSchedule": {

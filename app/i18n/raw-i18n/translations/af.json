@@ -3249,6 +3249,7 @@
       "limitUpdateError": "Kon limiet nie opdateer nie",
       "limitMustBePositive": "Limiet moet groter as nul wees",
       "atmToggleError": "Kon OTM-onttrekkings nie opdateer nie",
+      "atmControlsLoadError": "Kon nie jou OTM-limiete laai nie",
       "invalidLimitAmount": "Voer 'n geldige bedrag in met hoogstens 2 desimale"
     },
     "CardFeeSchedule": {

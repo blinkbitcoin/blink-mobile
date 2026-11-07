@@ -129,8 +129,10 @@ const deferred = <T>() => {
   return { promise, resolve }
 }
 
+const mockRefetch = jest.fn()
+
 const givenControls = (data: CardSpendingControlsQuery | undefined) =>
-  mockUseControlsQuery.mockReturnValue({ data, loading: false })
+  mockUseControlsQuery.mockReturnValue({ data, loading: false, refetch: mockRefetch })
 
 const cacheWith = (data: CardSpendingControlsQuery) => {
   const cache = createCache()
@@ -155,6 +157,7 @@ describe("useCardAtmControls", () => {
     mockLimitSet.mockResolvedValue(savedLimit)
     mockLimitRemove.mockResolvedValue(removedLimit)
     mockToggleSet.mockResolvedValue(savedToggle)
+    mockRefetch.mockResolvedValue({ data: controlsWithLimits })
   })
 
   describe("reading the controls", () => {
@@ -168,7 +171,11 @@ describe("useCardAtmControls", () => {
       mockIsAuthed.mockReturnValue(true)
       renderHook(() => useCardAtmControls(""))
       expect(mockUseControlsQuery).toHaveBeenLastCalledWith(
-        expect.objectContaining({ skip: false, fetchPolicy: "network-only" }),
+        expect.objectContaining({
+          skip: false,
+          fetchPolicy: "network-only",
+          notifyOnNetworkStatusChange: true,
+        }),
       )
     })
 
@@ -206,16 +213,88 @@ describe("useCardAtmControls", () => {
       const { result } = renderHook(() => useCardAtmControls("card-1"))
 
       expect(result.current.hasAtmControls).toBe(false)
-      expect(result.current.isAtmEnabled).toBe(true)
+      expect(result.current.hasAtmControlsFailed).toBe(true)
     })
 
-    it("has no controls before they arrive", () => {
-      mockUseControlsQuery.mockReturnValue({ data: undefined, loading: true })
+    it("has no controls before they arrive, and has not failed either", () => {
+      mockUseControlsQuery.mockReturnValue({
+        data: undefined,
+        loading: true,
+        refetch: mockRefetch,
+      })
 
       const { result } = renderHook(() => useCardAtmControls("card-1"))
 
-      expect(result.current.loading).toBe(true)
+      expect(result.current.isAtmControlsLoading).toBe(true)
       expect(result.current.hasAtmControls).toBe(false)
+      expect(result.current.hasAtmControlsFailed).toBe(false)
+    })
+
+    /** Never read as a card with no ATM rules: that would show withdrawals allowed and no
+     *  limit as if they were saved. */
+    it("fails, rather than showing defaults, when the controls request fails", () => {
+      mockUseControlsQuery.mockReturnValue({
+        data: undefined,
+        loading: false,
+        error: new Error("Network request failed"),
+        refetch: mockRefetch,
+      })
+
+      const { result } = renderHook(() => useCardAtmControls("card-1"))
+
+      expect(result.current.hasAtmControls).toBe(false)
+      expect(result.current.isAtmControlsLoading).toBe(false)
+      expect(result.current.hasAtmControlsFailed).toBe(true)
+    })
+
+    /** A read again with the card already held keeps the controls on screen, so a field
+     *  being edited is not unmounted under the user. */
+    it("keeps the controls on screen while it reads them again", () => {
+      mockUseControlsQuery.mockReturnValue({
+        data: controlsWithLimits,
+        loading: true,
+        refetch: mockRefetch,
+      })
+
+      const { result } = renderHook(() => useCardAtmControls("card-1"))
+
+      expect(result.current.hasAtmControls).toBe(true)
+      expect(result.current.isAtmControlsLoading).toBe(false)
+      expect(result.current.hasAtmControlsFailed).toBe(false)
+    })
+
+    it("has not failed while there is no session to ask with", () => {
+      mockIsAuthed.mockReturnValue(false)
+      givenControls(undefined)
+
+      const { result } = renderHook(() => useCardAtmControls("card-1"))
+
+      expect(result.current.hasAtmControlsFailed).toBe(false)
+      expect(result.current.isAtmControlsLoading).toBe(false)
+    })
+
+    it("asks for the controls again on retry", () => {
+      mockRefetch.mockResolvedValue({ data: controlsWithLimits })
+      const { result } = renderHook(() => useCardAtmControls("card-1"))
+
+      act(() => {
+        result.current.retryAtmControls()
+      })
+
+      expect(mockRefetch).toHaveBeenCalledTimes(1)
+    })
+
+    it("handles a retry that fails again, leaving it to the failure already shown", () => {
+      const failedRead = Promise.reject(new Error("Network request failed"))
+      const handleFailure = jest.spyOn(failedRead, "catch")
+      mockRefetch.mockReturnValue(failedRead)
+      const { result } = renderHook(() => useCardAtmControls("card-1"))
+
+      act(() => {
+        result.current.retryAtmControls()
+      })
+
+      expect(handleFailure).toHaveBeenCalledTimes(1)
     })
   })
 

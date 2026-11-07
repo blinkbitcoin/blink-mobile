@@ -11121,6 +11121,10 @@ type RootTranslation = {
 			 */
 			atmToggleError: string
 			/**
+			 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​y​o​u​r​ ​A​T​M​ ​l​i​m​i​t​s
+			 */
+			atmControlsLoadError: string
+			/**
 			 * E​n​t​e​r​ ​a​ ​v​a​l​i​d​ ​a​m​o​u​n​t​ ​w​i​t​h​ ​u​p​ ​t​o​ ​2​ ​d​e​c​i​m​a​l​s
 			 */
 			invalidLimitAmount: string
@@ -25350,6 +25354,10 @@ export type TranslationFunctions = {
 			 * Failed to update ATM withdrawals
 			 */
 			atmToggleError: () => LocalizedString
+			/**
+			 * Could not load your ATM limits
+			 */
+			atmControlsLoadError: () => LocalizedString
 			/**
 			 * Enter a valid amount with up to 2 decimals
 			 */

@@ -80,12 +80,15 @@ jest.mock(
 const mockHandleUpdateAtmDailyLimit = jest.fn()
 const mockHandleUpdateAtmMonthlyLimit = jest.fn()
 const mockHandleToggleAtm = jest.fn()
+const mockRetryAtmControls = jest.fn()
 const defaultAtmControls = {
   atmDailyLimitCents: null,
   atmMonthlyLimitCents: 50000,
   isAtmEnabled: true,
   hasAtmControls: true,
-  loading: false,
+  isAtmControlsLoading: false,
+  hasAtmControlsFailed: false,
+  retryAtmControls: mockRetryAtmControls,
   updatingAtmLimit: null,
   isTogglingAtm: false,
   handleUpdateAtmDailyLimit: mockHandleUpdateAtmDailyLimit,
@@ -311,13 +314,14 @@ describe("CardLimitsScreen", () => {
   })
 
   describe("ATM controls", () => {
-    it("waits for the ATM controls before showing the limits", () => {
-      setupMocks({ atmControls: { loading: true } })
+    it("loads the ATM controls on their own, with the spending limits usable", () => {
+      setupMocks({ atmControls: { hasAtmControls: false, isAtmControlsLoading: true } })
 
-      const { getByTestId, queryByText } = renderScreen()
+      const { getByTestId, queryByLabelText, getByLabelText } = renderScreen()
 
-      expect(getByTestId("activity-indicator")).toBeTruthy()
-      expect(queryByText("ATM withdrawal limits")).toBeNull()
+      expect(getByTestId("atm-controls-loading")).toBeTruthy()
+      expect(queryByLabelText("Daily ATM limits")).toBeNull()
+      expect(getByLabelText("Daily spending").props.editable).toBe(true)
     })
 
     it("shows the ATM limit inputs with their helper texts", () => {
@@ -345,6 +349,20 @@ describe("CardLimitsScreen", () => {
       fireEvent(dailyField, "blur")
 
       expect(mockHandleUpdateAtmDailyLimit).toHaveBeenCalledWith("300")
+    })
+
+    /** The field reads the saved limit back once it loses focus, so an amount that was not
+     *  saved never stays on screen looking as if it were. */
+    it("puts the saved limit back in a field whose amount was not saved", () => {
+      const { getByLabelText } = renderScreen()
+
+      const dailyField = getByLabelText("Daily ATM limits")
+      fireEvent(dailyField, "focus")
+      fireEvent.changeText(dailyField, "100abc")
+      fireEvent(dailyField, "blur")
+
+      expect(mockHandleUpdateAtmDailyLimit).toHaveBeenCalledWith("100abc")
+      expect(getByLabelText("Daily ATM limits").props.value).toBe("")
     })
 
     it("saves the monthly ATM limit when its field loses focus", () => {
@@ -407,17 +425,22 @@ describe("CardLimitsScreen", () => {
       expect(mockHandleToggleAtm).not.toHaveBeenCalled()
     })
 
-    it("locks every ATM control when they could not be loaded", () => {
-      setupMocks({ atmControls: { hasAtmControls: false } })
+    /** Never the switch and "No limit" as if they were saved: the section says it could
+     *  not load them and offers to ask again. */
+    it("shows the failure with a retry, and no ATM controls, when they fail to load", () => {
+      setupMocks({ atmControls: { hasAtmControls: false, hasAtmControlsFailed: true } })
 
-      const { getByRole, getByLabelText } = renderScreen()
+      const { getByText, queryByRole, queryByLabelText, queryByTestId } = renderScreen()
 
-      expect(
-        getByRole("switch", { name: "ATM withdrawals" }).props.accessibilityState
-          .disabled,
-      ).toBe(true)
-      expect(getByLabelText("Daily ATM limits").props.editable).toBe(false)
-      expect(getByLabelText("Monthly ATM limit").props.editable).toBe(false)
+      expect(getByText("Could not load your ATM limits")).toBeTruthy()
+      expect(queryByRole("switch", { name: "ATM withdrawals" })).toBeNull()
+      expect(queryByLabelText("Daily ATM limits")).toBeNull()
+      expect(queryByLabelText("Monthly ATM limit")).toBeNull()
+      expect(queryByTestId("atm-controls-loading")).toBeNull()
+
+      fireEvent.press(getByText("Try Again"))
+
+      expect(mockRetryAtmControls).toHaveBeenCalledTimes(1)
     })
   })
 

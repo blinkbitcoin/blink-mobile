@@ -3249,6 +3249,7 @@
       "limitUpdateError": "Không thể cập nhật giới hạn",
       "limitMustBePositive": "Giới hạn phải lớn hơn không",
       "atmToggleError": "Không thể cập nhật rút ATM",
+      "atmControlsLoadError": "Không thể tải giới hạn ATM",
       "invalidLimitAmount": "Nhập số tiền hợp lệ, tối đa 2 chữ số thập phân"
     },
     "CardFeeSchedule": {

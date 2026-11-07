@@ -3249,6 +3249,7 @@
       "limitUpdateError": "Imeshindikana kusasisha kikomo",
       "limitMustBePositive": "Kikomo lazima kiwe kikubwa kuliko sifuri",
       "atmToggleError": "Imeshindikana kusasisha utoaji wa ATM",
+      "atmControlsLoadError": "Imeshindikana kupakia vikomo vya ATM",
       "invalidLimitAmount": "Weka kiasi sahihi chenye desimali 2 au chache"
     },
     "CardFeeSchedule": {

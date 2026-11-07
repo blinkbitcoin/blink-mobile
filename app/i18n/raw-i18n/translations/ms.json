@@ -3249,6 +3249,7 @@
       "limitUpdateError": "Gagal mengemas kini had",
       "limitMustBePositive": "Had mestilah lebih besar daripada sifar",
       "atmToggleError": "Gagal mengemas kini pengeluaran ATM",
+      "atmControlsLoadError": "Gagal memuatkan had ATM anda",
       "invalidLimitAmount": "Masukkan jumlah yang sah dengan paling banyak 2 perpuluhan"
     },
     "CardFeeSchedule": {

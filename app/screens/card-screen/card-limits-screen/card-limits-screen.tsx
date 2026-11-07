@@ -3,6 +3,8 @@ import { ActivityIndicator, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 
+import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
 import { InputField, SwitchRow } from "@app/components/card-screen"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
@@ -37,7 +39,9 @@ export const CardLimitsScreen: React.FC = () => {
     atmMonthlyLimitCents,
     isAtmEnabled,
     hasAtmControls,
-    loading: atmControlsLoading,
+    isAtmControlsLoading,
+    hasAtmControlsFailed,
+    retryAtmControls,
     updatingAtmLimit,
     isTogglingAtm,
     handleUpdateAtmDailyLimit,
@@ -53,8 +57,7 @@ export const CardLimitsScreen: React.FC = () => {
     }
   }, [loading, card, navigation])
 
-  const isScreenLoading = loading || atmControlsLoading
-  if (isScreenLoading || !card) {
+  if (loading || !card) {
     return (
       <Screen preset="scroll">
         <ActivityIndicator
@@ -78,8 +81,6 @@ export const CardLimitsScreen: React.FC = () => {
   const isSavingAtmLimit = updatingAtmLimit !== null
   const isSavingAtmDailyLimit = updatingAtmLimit === SpendingPeriod.Daily
   const isSavingAtmMonthlyLimit = updatingAtmLimit === SpendingPeriod.Monthly
-  const isAtmLimitDisabled = !hasAtmControls || isSavingAtmLimit
-  const isAtmToggleDisabled = !hasAtmControls || isTogglingAtm
 
   return (
     <Screen preset="scroll">
@@ -148,41 +149,61 @@ export const CardLimitsScreen: React.FC = () => {
           <Text style={styles.sectionTitle}>
             {LL.CardFlow.CardLimits.atmLimitsTitle()}
           </Text>
-          <View style={styles.atmSwitchCard}>
-            <SwitchRow
-              title={LL.CardFlow.CardLimits.TransactionTypes.atm()}
-              description={LL.CardFlow.CardLimits.TransactionTypes.atmDescription()}
-              value={isAtmEnabled}
-              onValueChange={handleToggleAtm}
-              disabled={isAtmToggleDisabled}
-            />
-          </View>
-          <InputField
-            testID="atm-daily-limit-input"
-            label={LL.CardFlow.CardLimits.dailyAtmLimit()}
-            value={toAtmLimitValue(atmDailyLimitCents)}
-            placeholder={LL.CardFlow.CardLimits.noLimit()}
-            helperText={LL.CardFlow.CardLimits.dailyAtmLimitHelper()}
-            size="large"
-            keyboardType="decimal-pad"
-            formatDisplay={formatAtmLimit}
-            onBlur={handleUpdateAtmDailyLimit}
-            loading={isSavingAtmDailyLimit}
-            disabled={isAtmLimitDisabled}
-          />
-          <InputField
-            testID="atm-monthly-limit-input"
-            label={LL.CardFlow.CardLimits.monthlyAtmLimit()}
-            value={toAtmLimitValue(atmMonthlyLimitCents)}
-            placeholder={LL.CardFlow.CardLimits.noLimit()}
-            helperText={LL.CardFlow.CardLimits.monthlyAtmLimitHelper()}
-            size="large"
-            keyboardType="decimal-pad"
-            formatDisplay={formatAtmLimit}
-            onBlur={handleUpdateAtmMonthlyLimit}
-            loading={isSavingAtmMonthlyLimit}
-            disabled={isAtmLimitDisabled}
-          />
+          {/* The ATM controls load on their own, so the spending limits above stay
+              usable while they load or after they fail. */}
+          {isAtmControlsLoading && (
+            <ActivityIndicator testID="atm-controls-loading" color={colors.primary} />
+          )}
+          {hasAtmControlsFailed && (
+            <View style={styles.atmControlsFailure}>
+              <GaloyErrorBox
+                errorMessage={LL.CardFlow.CardLimits.atmControlsLoadError()}
+              />
+              <GaloyPrimaryButton
+                title={LL.common.tryAgain()}
+                onPress={retryAtmControls}
+              />
+            </View>
+          )}
+          {hasAtmControls && (
+            <>
+              <View style={styles.atmSwitchCard}>
+                <SwitchRow
+                  title={LL.CardFlow.CardLimits.TransactionTypes.atm()}
+                  description={LL.CardFlow.CardLimits.TransactionTypes.atmDescription()}
+                  value={isAtmEnabled}
+                  onValueChange={handleToggleAtm}
+                  disabled={isTogglingAtm}
+                />
+              </View>
+              <InputField
+                testID="atm-daily-limit-input"
+                label={LL.CardFlow.CardLimits.dailyAtmLimit()}
+                value={toAtmLimitValue(atmDailyLimitCents)}
+                placeholder={LL.CardFlow.CardLimits.noLimit()}
+                helperText={LL.CardFlow.CardLimits.dailyAtmLimitHelper()}
+                size="large"
+                keyboardType="decimal-pad"
+                formatDisplay={formatAtmLimit}
+                onBlur={handleUpdateAtmDailyLimit}
+                loading={isSavingAtmDailyLimit}
+                disabled={isSavingAtmLimit}
+              />
+              <InputField
+                testID="atm-monthly-limit-input"
+                label={LL.CardFlow.CardLimits.monthlyAtmLimit()}
+                value={toAtmLimitValue(atmMonthlyLimitCents)}
+                placeholder={LL.CardFlow.CardLimits.noLimit()}
+                helperText={LL.CardFlow.CardLimits.monthlyAtmLimitHelper()}
+                size="large"
+                keyboardType="decimal-pad"
+                formatDisplay={formatAtmLimit}
+                onBlur={handleUpdateAtmMonthlyLimit}
+                loading={isSavingAtmMonthlyLimit}
+                disabled={isSavingAtmLimit}
+              />
+            </>
+          )}
         </View>
 
         <View pointerEvents="none" style={styles.disabledSection}>
@@ -279,6 +300,9 @@ const useStyles = makeStyles(({ colors }) => ({
   settingsGroupContainer: {
     marginTop: 0,
     borderRadius: 8,
+  },
+  atmControlsFailure: {
+    gap: 10,
   },
   atmSwitchCard: {
     backgroundColor: colors.grey5,

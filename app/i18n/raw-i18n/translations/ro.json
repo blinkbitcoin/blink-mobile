@@ -3249,6 +3249,7 @@
       "limitUpdateError": "Nu s-a putut actualiza limita",
       "limitMustBePositive": "Limita trebuie să fie mai mare decât zero",
       "atmToggleError": "Nu s-au putut actualiza retragerile ATM",
+      "atmControlsLoadError": "Nu s-au putut încărca limitele ATM",
       "invalidLimitAmount": "Introdu o sumă validă cu cel mult 2 zecimale"
     },
     "CardFeeSchedule": {

@@ -3249,6 +3249,7 @@
       "limitUpdateError": "Ayiphumelelanga ukuhlaziya umda",
       "limitMustBePositive": "Umda kufuneka ube ngaphezu kwezero",
       "atmToggleError": "Ayiphumelelanga ukuhlaziya ukukhupha kwi-ATM",
+      "atmControlsLoadError": "Ayiphumelelanga ukulayisha imida ye-ATM",
       "invalidLimitAmount": "Faka isixa esichanekileyo esinamadesimali ama-2 kuphela"
     },
     "CardFeeSchedule": {

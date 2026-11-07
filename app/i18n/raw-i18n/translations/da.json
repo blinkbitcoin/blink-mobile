@@ -3249,6 +3249,7 @@
       "limitUpdateError": "Kunne ikke opdatere grænsen",
       "limitMustBePositive": "Grænsen skal være større end nul",
       "atmToggleError": "Kunne ikke opdatere hævninger i hæveautomater",
+      "atmControlsLoadError": "Kunne ikke indlæse dine hæveautomatgrænser",
       "invalidLimitAmount": "Indtast et gyldigt beløb med højst 2 decimaler"
     },
     "CardFeeSchedule": {

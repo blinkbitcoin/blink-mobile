@@ -132,10 +132,13 @@ export const useCardAtmControls = (cardId: string) => {
   const [updatingAtmLimit, setUpdatingAtmLimit] = useState<SpendingPeriod | null>(null)
   const [pendingAtmEnabled, setPendingAtmEnabled] = useState<boolean | null>(null)
 
-  const { data, loading } = useCardSpendingControlsQuery({
+  /** notifyOnNetworkStatusChange reopens `loading` for a retry, so the section shows it
+   *  running instead of leaving the failure on screen until the answer. */
+  const { data, loading, refetch } = useCardSpendingControlsQuery({
     skip: !isAuthed,
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
+    notifyOnNetworkStatusChange: true,
   })
   const [cardSpendingLimitSet] = useCardSpendingLimitSetMutation({
     update: (cache, { data: result }) => {
@@ -157,6 +160,13 @@ export const useCardAtmControls = (cardId: string) => {
   })
 
   const card = data?.me?.defaultAccount?.cards?.find(({ id }) => id === cardId)
+  /** The values below, the unlimited and allowed defaults included, only mean something
+   *  once an answer holds the card. A failed request, or one that answered without the
+   *  card, is a failure the screen offers to retry, never a card with no ATM rules. */
+  const hasAtmControls = card !== undefined
+  const isAtmControlsLoading = loading && !hasAtmControls
+  /** Without a session nothing was asked, so there is nothing to have failed. */
+  const hasAtmControlsFailed = isAuthed && !loading && !hasAtmControls
   const atmDailyLimitCents = findAtmLimitCents(card?.spendingLimits, SpendingPeriod.Daily)
   const atmMonthlyLimitCents = findAtmLimitCents(
     card?.spendingLimits,
@@ -171,6 +181,12 @@ export const useCardAtmControls = (cardId: string) => {
       ?.enabled ?? true
   const isAtmEnabled = pendingAtmEnabled ?? savedAtmEnabled
   const isTogglingAtm = pendingAtmEnabled !== null
+
+  /** A failed read again shows through the failure the section already offers, and the
+   *  client's error link has already recorded a transport failure. */
+  const readControlsAgain = useCallback(() => {
+    refetch().catch(() => undefined)
+  }, [refetch])
 
   const applyUpdate = useCallback(
     async <T>(
@@ -283,8 +299,10 @@ export const useCardAtmControls = (cardId: string) => {
     atmDailyLimitCents,
     atmMonthlyLimitCents,
     isAtmEnabled,
-    hasAtmControls: card !== undefined,
-    loading,
+    hasAtmControls,
+    isAtmControlsLoading,
+    hasAtmControlsFailed,
+    retryAtmControls: readControlsAgain,
     updatingAtmLimit,
     isTogglingAtm,
     handleUpdateAtmDailyLimit,

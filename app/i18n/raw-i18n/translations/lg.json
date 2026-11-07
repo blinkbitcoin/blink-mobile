@@ -3249,6 +3249,7 @@
       "limitUpdateError": "Kkomo tesobodde kukyusibwa",
       "limitMustBePositive": "Kkomo erina okusinga zeero",
       "atmToggleError": "Okuggya ku ATM tekusobodde kukyusibwa",
+      "atmControlsLoadError": "Ebikomo bya ATM tebisobodde kufunibwa",
       "invalidLimitAmount": "Yingiza omuwendo omutuufu ogulina desimolo 2 zokka"
     },
     "CardFeeSchedule": {
