@@ -41,9 +41,9 @@ type DecideInput = {
   overlayCovered: boolean
 }
 
-/** Custodial on-chain is exempt: its createdAt is when the transaction hit the
- *  mempool, long before the confirmation that brings it here. Self-custodial sets
- *  createdAtIsSettlement, including a claimed deposit, so a sync replay stays quiet. */
+/** Custodial on-chain is exempt: its createdAt is the server's mempool time, not the
+ *  device's, and its one pending update is only ever sent live. Self-custodial sets
+ *  createdAtIsSettlement, a detected deposit included, so a sync replay stays quiet. */
 export const settledBeforeForeground = (
   candidate: SplashCandidate,
   foregroundSinceMs: number,

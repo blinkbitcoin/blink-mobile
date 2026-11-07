@@ -9,17 +9,22 @@ import {
   isKnownPayment,
   mapSelfCustodialTransaction,
 } from "@app/self-custodial/mappers/transaction"
+import { onNewDeposits } from "@app/self-custodial/providers/new-deposits"
 import { paymentIdFromEventKey } from "@app/self-custodial/providers/sdk-events"
 import { onSucceededPayment } from "@app/self-custodial/providers/succeeded-payments"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import {
   NormalizedTransaction,
+  PaymentType,
   TransactionDirection,
   TransactionStatus,
 } from "@app/types/transaction"
 
 import { useIncomingTransactionSplash } from "./incoming-transaction-splash-provider"
-import { selfCustodialCandidate } from "./self-custodial-candidate"
+import {
+  selfCustodialCandidate,
+  selfCustodialDepositCandidate,
+} from "./self-custodial-candidate"
 
 const SUCCEEDED_PREFIX = `${SdkEventTags.PaymentSucceeded}:`
 
@@ -28,8 +33,9 @@ const SUCCEEDED_PREFIX = `${SdkEventTags.PaymentSucceeded}:`
  * PaymentSucceeded events. Pending events are ignored. The payment the event carries is
  * shown at once, without waiting for the wallet refresh the event triggers (seconds
  * on a busy wallet). The event key is the fallback: its id waits in a queue until the
- * payment shows up in the transactions, and the provider drops whichever comes second. A
- * claimed on-chain deposit arrives the same way, as a succeeded payment.
+ * payment shows up in the transactions, and the provider drops whichever comes second.
+ * On-chain is different: a deposit gets its pending splash when the SDK first sees it,
+ * and the succeeded payment its claim turns into later is not a splash.
  */
 export const SelfCustodialSplashMount = () => {
   const { isSelfCustodial } = useActiveWallet()
@@ -69,7 +75,19 @@ export const SelfCustodialSplashMount = () => {
   const isSplashCandidate = (tx: NormalizedTransaction) =>
     tx.direction === TransactionDirection.Receive &&
     tx.status === TransactionStatus.Completed &&
+    tx.paymentType !== PaymentType.Onchain &&
     !tx.isConversion
+
+  useEffect(() => {
+    if (!isSelfCustodial) return
+    return onNewDeposits((deposits) => {
+      deposits
+        .filter((deposit) => !deposit.refundTxId)
+        .forEach((deposit) =>
+          showSplash(selfCustodialDepositCandidate(deposit, Date.now(), displayInfo)),
+        )
+    })
+  }, [isSelfCustodial, displayInfo, showSplash])
 
   useEffect(() => {
     if (!isSelfCustodial) return

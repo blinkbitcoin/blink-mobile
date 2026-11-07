@@ -48,18 +48,18 @@ describe("candidateFromUpdate", () => {
     ).toBeNull()
   })
 
-  it("offers a confirmed on-chain receipt and ignores a pending one", () => {
+  it("offers a pending on-chain receipt and ignores the confirmed one", () => {
     expect(
       candidateFromUpdate({
         __typename: "OnChainUpdate",
-        txNotificationType: TxNotificationType.OnchainReceipt,
+        txNotificationType: TxNotificationType.OnchainReceiptPending,
         transaction,
       })?.paymentType,
     ).toBe("onchain")
     expect(
       candidateFromUpdate({
         __typename: "OnChainUpdate",
-        txNotificationType: TxNotificationType.OnchainReceiptPending,
+        txNotificationType: TxNotificationType.OnchainReceipt,
         transaction,
       }),
     ).toBeNull()

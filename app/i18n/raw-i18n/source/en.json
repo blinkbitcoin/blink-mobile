@@ -2543,12 +2543,14 @@
     },
     "IncomingTransactionSplash": {
         "youReceived": "You received",
+        "pendingOnchain": "Pending OnChain",
         "note": "Note",
         "dontShowAgain": "Don’t show me this again",
         "details": "Details",
         "announcement": "Received {amount: string}",
         "tapToShow": "Tap to show",
         "announcementHidden": "Payment received",
+        "announcementPending": "Pending OnChain, {amount: string}",
         "toastOn": "Splash screen is on",
         "toastOff": "Splash screen is off"
     },

@@ -2543,12 +2543,14 @@
     },
     "IncomingTransactionSplash": {
         "youReceived": "受け取りました",
+        "pendingOnchain": "オンチェーン保留中",
         "note": "メモ",
         "dontShowAgain": "今後表示しない",
         "details": "詳細",
         "announcement": "受取 {amount}",
         "tapToShow": "タップして表示",
         "announcementHidden": "入金がありました",
+        "announcementPending": "オンチェーン保留中, {amount}",
         "toastOn": "全画面表示をオンにしました",
         "toastOff": "全画面表示をオフにしました"
     },

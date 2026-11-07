@@ -2543,12 +2543,14 @@
   },
   "IncomingTransactionSplash": {
     "youReceived": "Aldınız",
+    "pendingOnchain": "Onchain beklemede",
     "note": "Not",
     "dontShowAgain": "Bunu bir daha gösterme",
     "details": "Ayrıntılar",
     "announcement": "Alındı {amount}",
     "tapToShow": "Göstermek için dokunun",
     "announcementHidden": "Ödeme alındı",
+    "announcementPending": "Onchain beklemede, {amount}",
     "toastOn": "Bildirim ekranı açık",
     "toastOff": "Bildirim ekranı kapalı"
   },

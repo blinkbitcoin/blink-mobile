@@ -2543,12 +2543,14 @@
   },
   "IncomingTransactionSplash": {
     "youReceived": "Chaskirqanki",
+    "pendingOnchain": "Onchain kanqaqmi",
     "note": "Willay",
     "dontShowAgain": "Ama kayta yapamanta rikuchiychu",
     "details": "Willakuykuna",
     "announcement": "Chaskisqa {amount}",
     "tapToShow": "Ñit'iy rikunaykipaq",
     "announcementHidden": "Qullqi chaskisqa",
+    "announcementPending": "Onchain kanqaqmi, {amount}",
     "toastOn": "Pantalla kichasqa",
     "toastOff": "Pantalla wichqasqa"
   },
