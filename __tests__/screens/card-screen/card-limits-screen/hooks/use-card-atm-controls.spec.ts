@@ -131,6 +131,13 @@ const deferred = <T>() => {
 
 const mockRefetch = jest.fn()
 
+/** A request lost on the network, the way Apollo throws it: an error carrying a truthy
+ *  networkError, as opposed to a refusal it throws with the server's GraphQL errors. */
+const networkFailure = () =>
+  Object.assign(new Error("Network request failed"), {
+    networkError: new Error("offline"),
+  })
+
 const givenControls = (data: CardSpendingControlsQuery | undefined) =>
   mockUseControlsQuery.mockReturnValue({ data, loading: false, refetch: mockRefetch })
 
@@ -273,28 +280,63 @@ describe("useCardAtmControls", () => {
       expect(result.current.isAtmControlsLoading).toBe(false)
     })
 
-    it("asks for the controls again on retry", () => {
-      mockRefetch.mockResolvedValue({ data: controlsWithLimits })
+    it("holds the controls back on retry until the server answers", async () => {
+      const read = deferred<{ data: CardSpendingControlsQuery }>()
+      mockRefetch.mockReturnValue(read.promise)
       const { result } = renderHook(() => useCardAtmControls("card-1"))
 
       act(() => {
         result.current.retryAtmControls()
       })
-
       expect(mockRefetch).toHaveBeenCalledTimes(1)
+      expect(result.current.isAtmControlsLoading).toBe(true)
+      expect(result.current.hasAtmControls).toBe(false)
+
+      await act(async () => {
+        read.resolve({ data: controlsWithLimits })
+      })
+
+      expect(result.current.isAtmControlsLoading).toBe(false)
+      expect(result.current.hasAtmControls).toBe(true)
     })
 
-    it("handles a retry that fails again, leaving it to the failure already shown", () => {
-      const failedRead = Promise.reject(new Error("Network request failed"))
-      const handleFailure = jest.spyOn(failedRead, "catch")
-      mockRefetch.mockReturnValue(failedRead)
+    /** The card the client still holds is not shown as current once the read meant to
+     *  confirm it failed: the failure stays, with its retry. */
+    it("stays failed, with the card it held hidden, when the read fails", async () => {
+      mockRefetch.mockRejectedValue(new Error("Network request failed"))
+      const { result } = renderHook(() => useCardAtmControls("card-1"))
+
+      await act(async () => {
+        await result.current.retryAtmControls()
+      })
+
+      expect(result.current.hasAtmControlsFailed).toBe(true)
+      expect(result.current.hasAtmControls).toBe(false)
+      expect(result.current.isAtmControlsLoading).toBe(false)
+    })
+
+    it("lets only the latest read settle the controls", async () => {
+      const newer = deferred<{ data: CardSpendingControlsQuery }>()
+      let rejectOlder: (error: Error) => void = () => {}
+      const olderRead = new Promise<{ data: CardSpendingControlsQuery }>((_, reject) => {
+        rejectOlder = reject
+      })
+      mockRefetch.mockReturnValueOnce(olderRead).mockReturnValueOnce(newer.promise)
       const { result } = renderHook(() => useCardAtmControls("card-1"))
 
       act(() => {
         result.current.retryAtmControls()
+        result.current.retryAtmControls()
+      })
+      await act(async () => {
+        newer.resolve({ data: controlsWithLimits })
+      })
+      await act(async () => {
+        rejectOlder(new Error("Network request failed"))
       })
 
-      expect(handleFailure).toHaveBeenCalledTimes(1)
+      expect(result.current.hasAtmControls).toBe(true)
+      expect(result.current.hasAtmControlsFailed).toBe(false)
     })
   })
 
@@ -523,6 +565,23 @@ describe("useCardAtmControls", () => {
       expect(result.current.updatingAtmLimit).toBeNull()
     })
 
+    /** A refusal says the save did not land, so the controls on screen are still what the
+     *  server holds and there is nothing to read again. */
+    it("keeps the controls after the server refuses a save", async () => {
+      mockLimitSet.mockResolvedValue({
+        data: null,
+        errors: [{ message: "Card not found" }],
+      })
+      const { result } = renderHook(() => useCardAtmControls("card-1"))
+
+      await act(async () => {
+        await result.current.handleUpdateAtmDailyLimit("300")
+      })
+
+      expect(mockRefetch).not.toHaveBeenCalled()
+      expect(result.current.hasAtmControls).toBe(true)
+    })
+
     it("reports a failed update when the server sends nothing back", async () => {
       mockLimitRemove.mockResolvedValue({ data: null })
       const { result } = renderHook(() => useCardAtmControls("card-1"))
@@ -551,10 +610,35 @@ describe("useCardAtmControls", () => {
       expect(result.current.updatingAtmLimit).toBeNull()
     })
 
-    /** A lost answer is not proof the removal never landed: the controls are read again
-     *  so the screen shows what the server holds instead of the limit it had. */
-    it("reads the controls again after a save that failed", async () => {
-      mockLimitRemove.mockRejectedValue(new Error("Network request failed"))
+    /** A lost answer is not proof the removal never landed: the controls are held back and
+     *  read again, so the screen shows what the server holds instead of the limit it had. */
+    it("holds the controls back and reads them again after a save lost on the network", async () => {
+      const read = deferred<{ data: CardSpendingControlsQuery }>()
+      mockRefetch.mockReturnValue(read.promise)
+      mockLimitRemove.mockRejectedValue(networkFailure())
+      const { result } = renderHook(() => useCardAtmControls("card-1"))
+
+      let save: Promise<void> | undefined
+      await act(async () => {
+        save = result.current.handleUpdateAtmMonthlyLimit("")
+      })
+      expect(mockRefetch).toHaveBeenCalledTimes(1)
+      expect(result.current.hasAtmControls).toBe(false)
+      expect(result.current.isAtmControlsLoading).toBe(true)
+      expect(result.current.hasAtmControlsFailed).toBe(false)
+      expect(result.current.updatingAtmLimit).toBe(SpendingPeriod.Monthly)
+
+      await act(async () => {
+        read.resolve({ data: controlsWithLimits })
+        await save
+      })
+
+      expect(result.current.hasAtmControls).toBe(true)
+      expect(result.current.updatingAtmLimit).toBeNull()
+    })
+
+    it("reads the controls again after a save answered with nothing", async () => {
+      mockLimitRemove.mockResolvedValue({ data: null })
       const { result } = renderHook(() => useCardAtmControls("card-1"))
 
       await act(async () => {
@@ -562,6 +646,41 @@ describe("useCardAtmControls", () => {
       })
 
       expect(mockRefetch).toHaveBeenCalledTimes(1)
+      expect(result.current.hasAtmControls).toBe(true)
+    })
+
+    /** With the client's default error policy a refusal arrives thrown, its GraphQL errors
+     *  in hand and no network error: it did not land, so nothing is read again. */
+    it("keeps the controls after a refusal thrown by the client", async () => {
+      mockLimitSet.mockRejectedValue(new Error("Card not found"))
+      const { result } = renderHook(() => useCardAtmControls("card-1"))
+
+      await act(async () => {
+        await result.current.handleUpdateAtmDailyLimit("300")
+      })
+
+      expect(mockRefetch).not.toHaveBeenCalled()
+      expect(result.current.hasAtmControls).toBe(true)
+    })
+
+    /** Refused before any render, so a second tap in the frame of the failure cannot start
+     *  a save that an older read could then overwrite. */
+    it("saves nothing while the controls are held back", async () => {
+      mockRefetch.mockReturnValue(new Promise(() => {}))
+      mockLimitRemove.mockRejectedValue(networkFailure())
+      const { result } = renderHook(() => useCardAtmControls("card-1"))
+      const { handleUpdateAtmDailyLimit, handleToggleAtm } = result.current
+
+      await act(async () => {
+        result.current.handleUpdateAtmMonthlyLimit("")
+      })
+      await act(async () => {
+        await handleUpdateAtmDailyLimit("300")
+        await handleToggleAtm(false)
+      })
+
+      expect(mockLimitSet).not.toHaveBeenCalled()
+      expect(mockToggleSet).not.toHaveBeenCalled()
     })
 
     it("reads nothing again after a save that worked", async () => {
@@ -639,7 +758,18 @@ describe("useCardAtmControls", () => {
       expect(mockToastShow).toHaveBeenCalledWith(
         expect.objectContaining({ message: "Network failure" }),
       )
+    })
+
+    it("reads the controls again after a switch lost on the network", async () => {
+      mockToggleSet.mockRejectedValue(networkFailure())
+      const { result } = renderHook(() => useCardAtmControls("card-1"))
+
+      await act(async () => {
+        await result.current.handleToggleAtm(false)
+      })
+
       expect(mockRefetch).toHaveBeenCalledTimes(1)
+      expect(result.current.isTogglingAtm).toBe(false)
     })
 
     it("reports a failed switch when the server sends nothing back", async () => {

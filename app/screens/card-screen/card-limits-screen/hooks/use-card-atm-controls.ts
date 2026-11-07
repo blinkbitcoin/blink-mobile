@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import { ApolloCache, FetchResult, NormalizedCacheObject, gql } from "@apollo/client"
 
 import {
@@ -12,10 +12,12 @@ import {
   useCardSpendingToggleSetMutation,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { isNetworkFailure } from "@app/graphql/transport-error"
 import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { parseDollarsToCents } from "@app/utils/helper"
 import { toastShow } from "@app/utils/toast"
+import { withTimeout } from "@app/utils/with-timeout"
 
 gql`
   fragment CardSpendingControls on Card {
@@ -118,6 +120,15 @@ const updateCachedCard = (
     (card) => (card ? update(card) : card),
   )
 
+/** A read of the controls has no deadline of its own, so one stalled on a broken
+ *  connection would hold the section on its loader for good. The bound leaves room for the
+ *  transport's own retries of a query that fails on the network. */
+const CONTROLS_READ_TIMEOUT_MS = 20_000
+
+/** Where a read of the controls the hook asked for itself stands: after a save that got
+ *  no answer, or from the retry. "settled" means no such read is out or failed. */
+type ControlsRead = "settled" | "reading" | "failed"
+
 const findAtmLimitCents = (
   limits: ReadonlyArray<CardLimit> | undefined,
   period: SpendingPeriod,
@@ -131,6 +142,15 @@ export const useCardAtmControls = (cardId: string) => {
   const { LL } = useI18nContext()
   const [updatingAtmLimit, setUpdatingAtmLimit] = useState<SpendingPeriod | null>(null)
   const [pendingAtmEnabled, setPendingAtmEnabled] = useState<boolean | null>(null)
+  const [controlsRead, setControlsRead] = useState<ControlsRead>("settled")
+  /** Mirrors `controlsRead` the moment it changes, so a save tapped in the same frame as
+   *  the failure that held the controls back is refused too, before any render. */
+  const controlsReadRef = useRef<ControlsRead>("settled")
+  const latestReadRef = useRef(0)
+  const markControlsRead = useCallback((state: ControlsRead) => {
+    controlsReadRef.current = state
+    setControlsRead(state)
+  }, [])
 
   /** notifyOnNetworkStatusChange reopens `loading` for a retry, so the section shows it
    *  running instead of leaving the failure on screen until the answer. */
@@ -162,11 +182,21 @@ export const useCardAtmControls = (cardId: string) => {
   const card = data?.me?.defaultAccount?.cards?.find(({ id }) => id === cardId)
   /** The values below, the unlimited and allowed defaults included, only mean something
    *  once an answer holds the card. A failed request, or one that answered without the
-   *  card, is a failure the screen offers to retry, never a card with no ATM rules. */
-  const hasAtmControls = card !== undefined
-  const isAtmControlsLoading = loading && !hasAtmControls
-  /** Without a session nothing was asked, so there is nothing to have failed. */
-  const hasAtmControlsFailed = isAuthed && !loading && !hasAtmControls
+   *  card, is a failure the screen offers to retry, never a card with no ATM rules. While
+   *  a read the hook asked for is out or failed, the card it holds may no longer be what
+   *  the server has, so the controls are held back the same way. */
+  const hasCard = card !== undefined
+  const isControlsReadSettled = controlsRead === "settled"
+  const isControlsReadOut = controlsRead === "reading"
+  const hasControlsReadFailed = controlsRead === "failed"
+  const hasAtmControls = hasCard && isControlsReadSettled
+  const isInitialReadLoading = loading && !hasCard
+  const isAtmControlsLoading = isInitialReadLoading || isControlsReadOut
+  /** Without a session nothing was asked, so there is nothing to have failed. A read that
+   *  is out is loading, not failed, even before Apollo reports it loading. */
+  const hasInitialReadFailed = isAuthed && !loading && !hasCard
+  const hasReadFailed = hasInitialReadFailed || hasControlsReadFailed
+  const hasAtmControlsFailed = hasReadFailed && !isAtmControlsLoading
   const atmDailyLimitCents = findAtmLimitCents(card?.spendingLimits, SpendingPeriod.Daily)
   const atmMonthlyLimitCents = findAtmLimitCents(
     card?.spendingLimits,
@@ -182,33 +212,50 @@ export const useCardAtmControls = (cardId: string) => {
   const isAtmEnabled = pendingAtmEnabled ?? savedAtmEnabled
   const isTogglingAtm = pendingAtmEnabled !== null
 
-  /** A failed read again shows through the failure the section already offers, and the
-   *  client's error link has already recorded a transport failure. */
-  const readControlsAgain = useCallback(() => {
-    refetch().catch(() => undefined)
-  }, [refetch])
+  /** The controls come back only once the server has answered this read, and only the
+   *  latest read settles them, so one that was superseded cannot show what an older answer
+   *  held. A read that fails stays failed, with the retry, rather than falling back to
+   *  values the server may no longer hold; the client's error link has already recorded a
+   *  transport failure. */
+  const readControlsAgain = useCallback(async () => {
+    latestReadRef.current += 1
+    const read = latestReadRef.current
+    markControlsRead("reading")
+    try {
+      await withTimeout(refetch(), CONTROLS_READ_TIMEOUT_MS, "Card ATM controls read")
+      if (read === latestReadRef.current) markControlsRead("settled")
+    } catch {
+      if (read === latestReadRef.current) markControlsRead("failed")
+    }
+  }, [refetch, markControlsRead])
 
-  /** A save that failed may still have landed, its answer lost on the way back, so the
-   *  controls are read again and the screen shows what the server holds. */
+  const areControlsHeldBack = () => controlsReadRef.current !== "settled"
+
+  /** A refusal from the server leaves the controls as they were. A save lost on the
+   *  network, or answered with nothing, may still have landed, so the controls are held
+   *  back until the server says what it holds, and the save settles only after that read:
+   *  no stale value shows as current, and no later save can start before it. */
   const applyUpdate = useCallback(
     async <T>(
       mutate: () => Promise<FetchResult<T>>,
       failureMessage: string,
     ): Promise<boolean> => {
-      const fail = (message: string) => {
-        toastShow({ message, LL })
-        readControlsAgain()
-        return false
-      }
-
       try {
         const { data: result, errors } = await mutate()
-        if (errors) return fail(getErrorMessages(errors))
-        if (!result) return fail(failureMessage)
-        return true
+        if (errors) {
+          toastShow({ message: getErrorMessages(errors), LL })
+          return false
+        }
+        if (result) return true
+        toastShow({ message: failureMessage, LL })
       } catch (err) {
-        return fail(err instanceof Error ? err.message : failureMessage)
+        toastShow({ message: err instanceof Error ? err.message : failureMessage, LL })
+        /** The client's error policy throws a refusal rather than returning it: only a
+         *  request lost on the network leaves the outcome unknown. */
+        if (!isNetworkFailure(err)) return false
       }
+      await readControlsAgain()
+      return false
     },
     [LL, readControlsAgain],
   )
@@ -234,6 +281,7 @@ export const useCardAtmControls = (cardId: string) => {
    *  backend only accepts amounts above zero. */
   const updateAtmLimit = useCallback(
     async (period: SpendingPeriod, currentLimitCents: number | null, dollars: string) => {
+      if (areControlsHeldBack()) return
       const input = { cardId, category: SpendingCategory.Atm, period }
 
       const isCleared = dollars.trim() === ""
@@ -279,6 +327,7 @@ export const useCardAtmControls = (cardId: string) => {
 
   const handleToggleAtm = useCallback(
     async (enabled: boolean) => {
+      if (areControlsHeldBack()) return
       setPendingAtmEnabled(enabled)
       await applyUpdate(
         () =>
