@@ -2534,7 +2534,7 @@
       }
     },
     "splashGroup": "Layar transaksi masuk",
-    "incomingTransactionSplash": "Layar transaksi masuk",
+    "incomingTransactionSplash": "Tampilkan layar",
     "splashMinimum": "Jumlah minimum (SAT)"
   },
   "IncomingTransactionSplash": {

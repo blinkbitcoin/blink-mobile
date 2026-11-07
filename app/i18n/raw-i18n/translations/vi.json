@@ -2534,7 +2534,7 @@
       }
     },
     "splashGroup": "Màn hình giao dịch đến",
-    "incomingTransactionSplash": "Màn hình giao dịch đến",
+    "incomingTransactionSplash": "Hiển thị màn hình",
     "splashMinimum": "Số tiền tối thiểu (SAT)"
   },
   "IncomingTransactionSplash": {

@@ -2534,7 +2534,7 @@
       }
     },
     "splashGroup": "Skærm for indgående transaktion",
-    "incomingTransactionSplash": "Skærm for indgående transaktion",
+    "incomingTransactionSplash": "Vis skærm",
     "splashMinimum": "Minimumsbeløb (SAT)"
   },
   "IncomingTransactionSplash": {
@@ -2545,8 +2545,8 @@
     "announcement": "Modtaget {amount}",
     "tapToShow": "Tryk for at vise",
     "announcementHidden": "Betaling modtaget",
-    "toastOn": "Splash-skærm er slået til",
-    "toastOff": "Splash-skærm er slået fra"
+    "toastOn": "Skærm ved indgående betaling er slået til",
+    "toastOff": "Skærm ved indgående betaling er slået fra"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Din konto har mere end $5",

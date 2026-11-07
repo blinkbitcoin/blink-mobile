@@ -2534,7 +2534,7 @@
       }
     },
     "splashGroup": "Scherm voor inkomende transactie",
-    "incomingTransactionSplash": "Scherm voor inkomende transactie",
+    "incomingTransactionSplash": "Scherm tonen",
     "splashMinimum": "Minimumbedrag (SAT)"
   },
   "IncomingTransactionSplash": {
@@ -2545,8 +2545,8 @@
     "announcement": "Ontvangen {amount}",
     "tapToShow": "Tik om te tonen",
     "announcementHidden": "Betaling ontvangen",
-    "toastOn": "Splashscherm staat aan",
-    "toastOff": "Splashscherm staat uit"
+    "toastOn": "Scherm bij inkomende betaling staat aan",
+    "toastOff": "Scherm bij inkomende betaling staat uit"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Je account heeft meer dan $5",

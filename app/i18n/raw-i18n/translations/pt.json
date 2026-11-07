@@ -2534,7 +2534,7 @@
             }
         },
         "splashGroup": "Tela de transação recebida",
-        "incomingTransactionSplash": "Tela de transação recebida",
+        "incomingTransactionSplash": "Mostrar tela",
         "splashMinimum": "Valor mínimo (SAT)"
     },
     "IncomingTransactionSplash": {

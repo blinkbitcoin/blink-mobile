@@ -2534,7 +2534,7 @@
       }
     },
     "splashGroup": "Οθόνη εισερχόμενης συναλλαγής",
-    "incomingTransactionSplash": "Οθόνη εισερχόμενης συναλλαγής",
+    "incomingTransactionSplash": "Εμφάνιση οθόνης",
     "splashMinimum": "Ελάχιστο ποσό (SAT)"
   },
   "IncomingTransactionSplash": {

@@ -2534,7 +2534,7 @@
       }
     },
     "splashGroup": "Ecran pentru tranzacții primite",
-    "incomingTransactionSplash": "Ecran pentru tranzacții primite",
+    "incomingTransactionSplash": "Afișează ecranul",
     "splashMinimum": "Sumă minimă (SAT)"
   },
   "IncomingTransactionSplash": {

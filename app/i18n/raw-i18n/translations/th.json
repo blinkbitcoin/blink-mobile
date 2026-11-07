@@ -2534,7 +2534,7 @@
       }
     },
     "splashGroup": "หน้าจอแจ้งรายการเงินเข้า",
-    "incomingTransactionSplash": "หน้าจอแจ้งรายการเงินเข้า",
+    "incomingTransactionSplash": "แสดงหน้าจอ",
     "splashMinimum": "จำนวนขั้นต่ำ (SAT)"
   },
   "IncomingTransactionSplash": {

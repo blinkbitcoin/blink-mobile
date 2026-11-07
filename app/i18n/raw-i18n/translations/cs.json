@@ -2534,7 +2534,7 @@
       }
     },
     "splashGroup": "Obrazovka příchozí transakce",
-    "incomingTransactionSplash": "Obrazovka příchozí transakce",
+    "incomingTransactionSplash": "Zobrazit obrazovku",
     "splashMinimum": "Minimální částka (SAT)"
   },
   "IncomingTransactionSplash": {

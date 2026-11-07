@@ -2534,7 +2534,7 @@
       }
     },
     "splashGroup": "Gelen işlem ekranı",
-    "incomingTransactionSplash": "Gelen işlem ekranı",
+    "incomingTransactionSplash": "Ekranı göster",
     "splashMinimum": "En düşük tutar (SAT)"
   },
   "IncomingTransactionSplash": {

@@ -2534,7 +2534,7 @@
             }
         },
         "splashGroup": "Schermata transazione in arrivo",
-        "incomingTransactionSplash": "Schermata transazione in arrivo",
+        "incomingTransactionSplash": "Mostra schermata",
         "splashMinimum": "Importo minimo (SAT)"
     },
     "IncomingTransactionSplash": {

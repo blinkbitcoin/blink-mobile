@@ -2534,7 +2534,7 @@
             }
         },
         "splashGroup": "Pantalla de transacción entrante",
-        "incomingTransactionSplash": "Pantalla de transacción entrante",
+        "incomingTransactionSplash": "Mostrar pantalla",
         "splashMinimum": "Monto mínimo (SAT)"
     },
     "IncomingTransactionSplash": {
