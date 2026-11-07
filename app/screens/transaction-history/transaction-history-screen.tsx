@@ -221,6 +221,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     lastSeenUsdId,
     latestBtcTxId,
     latestUsdTxId,
+    isNewEnoughToAnnounce,
     markTxSeen,
   } = useTransactionSeenState({
     accountId: accountId || "",
@@ -301,6 +302,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
         settlementCurrency === WalletCurrency.Btc ? latestBtcTxId : latestUsdTxId
 
       if (activeWallet.isSelfCustodial) {
+        if (!isNewEnoughToAnnounce({ createdAt })) return false
         return shouldHighlightByTimestamp({
           createdAt,
           baselineCreatedAt:
@@ -331,6 +333,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
       latestUsdTxId,
       activeWallet.isSelfCustodial,
       lastSeenCreatedAt,
+      isNewEnoughToAnnounce,
     ],
   )
 

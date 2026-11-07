@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { useApolloClient } from "@apollo/client"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
@@ -11,7 +11,9 @@ import {
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import {
   getTxLastSeenIds,
+  hasTxLastSeenRecord,
   withTxLastSeenId,
+  withTxSeenBaseline,
 } from "@app/store/persistent-state/tx-last-seen"
 
 import {
@@ -19,22 +21,21 @@ import {
   useAccountTransactions,
 } from "./use-account-transactions"
 
-const getLatestTransactionId = (
+const getLatestTransaction = (
   transactions: ReadonlyArray<TransactionFragment>,
   currency: WalletCurrency,
   feeReimbursementMemo: string,
-): string => {
+): TransactionFragment | undefined => {
   const filteredTransactions = transactions.filter(
     (transaction) =>
       transaction.settlementCurrency === currency &&
       isAnnounceableTransaction(transaction, feeReimbursementMemo),
   )
-  if (filteredTransactions.length === 0) return ""
+  if (filteredTransactions.length === 0) return undefined
 
-  const latestTransaction = filteredTransactions.reduce((latest, transaction) =>
+  return filteredTransactions.reduce((latest, transaction) =>
     transaction.createdAt > latest.createdAt ? transaction : latest,
   )
-  return latestTransaction.id
 }
 
 type TransactionSeenStateParams = {
@@ -67,14 +68,14 @@ export const useTransactionSeenState = ({
 
   const baseTransactions = useAccountTransactions({ isSelfCustodial, transactions })
 
-  const latestTransactionIds = useMemo(
+  const latestTransactions = useMemo(
     () => ({
-      btcId: getLatestTransactionId(
+      btc: getLatestTransaction(
         baseTransactions,
         WalletCurrency.Btc,
         feeReimbursementMemo,
       ),
-      usdId: getLatestTransactionId(
+      usd: getLatestTransaction(
         baseTransactions,
         WalletCurrency.Usd,
         feeReimbursementMemo,
@@ -95,20 +96,53 @@ export const useTransactionSeenState = ({
   const cachedLastSeenBtcId = lastSeenData?.txLastSeen?.btcId || ""
   const cachedLastSeenUsdId = lastSeenData?.txLastSeen?.usdId || ""
   const deviceLastSeen = getTxLastSeenIds(persistentState)
+  const hasDeviceRecord = hasTxLastSeenRecord(persistentState)
+
+  /** A self-custodial account starts its record the first time it is read, so the history
+   *  already there, and what a restore replays as it syncs, is never announced. */
+  useEffect(() => {
+    if (!isSelfCustodial || hasDeviceRecord) return
+    updateState((prev) => prev && withTxSeenBaseline(prev, Date.now()))
+  }, [isSelfCustodial, hasDeviceRecord, updateState])
+
+  /** Custodial history is the server's and never replays. Self-custodial announces only
+   *  what is newer than its record; with no record yet, nothing. Payment times are whole
+   *  seconds, so the record's start is compared in seconds too: a payment in the second
+   *  the record started is new, not part of the history. History applies the same cutoff
+   *  to its highlight, so a restored account's past receives are not marked new there. */
+  const isNewEnoughToAnnounce = useCallback(
+    (transaction: Pick<TransactionFragment, "createdAt"> | undefined): boolean => {
+      if (!transaction) return false
+      if (!isSelfCustodial) return true
+      if (!hasDeviceRecord) return false
+      const { announceSinceMs } = deviceLastSeen
+      return (
+        announceSinceMs === undefined ||
+        transaction.createdAt >= Math.floor(announceSinceMs / 1000)
+      )
+    },
+    [isSelfCustodial, hasDeviceRecord, deviceLastSeen],
+  )
 
   const lastSeenBtcId = isSelfCustodial ? deviceLastSeen.btcId : cachedLastSeenBtcId
   const lastSeenUsdId = isSelfCustodial ? deviceLastSeen.usdId : cachedLastSeenUsdId
-  const latestBtcTxId = latestTransactionIds.btcId
-  const latestUsdTxId = latestTransactionIds.usdId
+  const latestBtcTxId = latestTransactions.btc?.id ?? ""
+  const latestUsdTxId = latestTransactions.usd?.id ?? ""
 
   const hasUnseenBtcTx = useMemo(
-    () => latestBtcTxId !== "" && latestBtcTxId !== lastSeenBtcId,
-    [latestBtcTxId, lastSeenBtcId],
+    () =>
+      latestBtcTxId !== "" &&
+      latestBtcTxId !== lastSeenBtcId &&
+      isNewEnoughToAnnounce(latestTransactions.btc),
+    [latestBtcTxId, lastSeenBtcId, isNewEnoughToAnnounce, latestTransactions.btc],
   )
 
   const hasUnseenUsdTx = useMemo(
-    () => latestUsdTxId !== "" && latestUsdTxId !== lastSeenUsdId,
-    [latestUsdTxId, lastSeenUsdId],
+    () =>
+      latestUsdTxId !== "" &&
+      latestUsdTxId !== lastSeenUsdId &&
+      isNewEnoughToAnnounce(latestTransactions.usd),
+    [latestUsdTxId, lastSeenUsdId, isNewEnoughToAnnounce, latestTransactions.usd],
   )
 
   const markTransactionAsSeen = useCallback(
@@ -119,7 +153,13 @@ export const useTransactionSeenState = ({
 
       if (isSelfCustodial) {
         updateState(
-          (prev) => prev && withTxLastSeenId(prev, currency, transactionIdToMark),
+          (prev) =>
+            prev &&
+            withTxLastSeenId(
+              withTxSeenBaseline(prev, Date.now()),
+              currency,
+              transactionIdToMark,
+            ),
         )
         return
       }
@@ -136,6 +176,7 @@ export const useTransactionSeenState = ({
     latestUsdTxId,
     lastSeenBtcId,
     lastSeenUsdId,
+    isNewEnoughToAnnounce,
     markTxSeen: markTransactionAsSeen,
   }
 }

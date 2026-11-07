@@ -2,7 +2,9 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { defaultPersistentState } from "@app/store/persistent-state/state-migrations"
 import {
   getTxLastSeenIds,
+  hasTxLastSeenRecord,
   withTxLastSeenId,
+  withTxSeenBaseline,
 } from "@app/store/persistent-state/tx-last-seen"
 import { DefaultAccountId } from "@app/types/wallet"
 
@@ -155,5 +157,48 @@ describe("withTxLastSeenId", () => {
     }
 
     expect(withTxLastSeenId(state, WalletCurrency.Usd, "usd-1")).toBe(state)
+  })
+})
+
+describe("withTxSeenBaseline", () => {
+  const NOW = 1_793_840_000_000
+
+  it("starts a record for an account that has none, with the start time", () => {
+    const state = stateForAccount(SELF_CUSTODIAL_ID)
+    expect(hasTxLastSeenRecord(state)).toBe(false)
+
+    const next = withTxSeenBaseline(state, NOW)
+
+    expect(hasTxLastSeenRecord(next)).toBe(true)
+    expect(getTxLastSeenIds(next)).toEqual({
+      btcId: "",
+      usdId: "",
+      announceSinceMs: NOW,
+    })
+  })
+
+  it("leaves an existing record alone, so a restart never moves the start", () => {
+    const state = {
+      ...stateForAccount(SELF_CUSTODIAL_ID),
+      txLastSeenByAccountId: {
+        [SELF_CUSTODIAL_ID]: { btcId: "btc-1", usdId: "", announceSinceMs: 1 },
+      },
+    }
+
+    expect(withTxSeenBaseline(state, NOW)).toBe(state)
+  })
+
+  it("keeps the other accounts' records", () => {
+    const state = {
+      ...stateForAccount(SELF_CUSTODIAL_ID),
+      txLastSeenByAccountId: {
+        [OTHER_SELF_CUSTODIAL_ID]: { btcId: "btc-other", usdId: "" },
+      },
+    }
+
+    expect(withTxSeenBaseline(state, NOW).txLastSeenByAccountId).toEqual({
+      [OTHER_SELF_CUSTODIAL_ID]: { btcId: "btc-other", usdId: "" },
+      [SELF_CUSTODIAL_ID]: { btcId: "", usdId: "", announceSinceMs: NOW },
+    })
   })
 })
