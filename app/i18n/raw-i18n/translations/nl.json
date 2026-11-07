@@ -2276,6 +2276,9 @@
     "depositFeeTiers": "Deposit fees: {tiers: string}",
     "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
     "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
+    "depositBelowMinimum": "Het bedrag ligt onder de minimale storting. Alles onder {min} SAT komt niet aan",
+    "depositBelowFee": "Het bedrag gaat op aan de stortingskosten",
+    "depositConsumedByFee": "{fee} SAT gaat op aan de stortingskosten",
     "autoConvertMinAmount": "Bedragen onder {minSats: number} sats / {minFiat: string} kunnen niet automatisch worden omgezet naar Dollar. Je ontvangt Bitcoin in plaats daarvan.",
     "autoConvertFailed": "Betaling ontvangen maar de conversie is mislukt.",
     "pleaseWaitForConversion": "Wacht tot de omzetting is voltooid"

@@ -68,6 +68,9 @@ type ContextualInfoProps = {
   shouldShowAutoConvertMinWarning?: boolean
   autoConvertMinSats?: number
   autoConvertMinFiat?: string
+  /** Shown under the onchain deposit fee line for an amount the fee or the
+   *  minimum deposit would swallow (blink-wip#1261). */
+  depositWarning?: string
 }
 
 export const ContextualInfo: React.FC<ContextualInfoProps> = ({
@@ -80,6 +83,7 @@ export const ContextualInfo: React.FC<ContextualInfoProps> = ({
   shouldShowAutoConvertMinWarning = false,
   autoConvertMinSats,
   autoConvertMinFiat,
+  depositWarning,
 }) => {
   const styles = useStyles()
   const {
@@ -141,13 +145,29 @@ export const ContextualInfo: React.FC<ContextualInfoProps> = ({
     )
   }
 
-  if (type === Invoice.OnChain && feesInformation) {
-    const tiers = formatDepositFeeTiers(feesInformation.deposit)
-
-    return (
+  if (type === Invoice.OnChain && (feesInformation || depositWarning)) {
+    const feeLine = feesInformation && (
       <View style={styles.depositFeeContainer}>
         <GaloyIcon name="warning" size={16} color={colors.grey1} />
-        <Text style={styles.depositFeeText}>{depositFeeText(LL, tiers)}</Text>
+        <Text style={styles.depositFeeText}>
+          {depositFeeText(LL, formatDepositFeeTiers(feesInformation.deposit))}
+        </Text>
+      </View>
+    )
+    if (!depositWarning) return feeLine
+
+    return (
+      <View style={styles.stackedContainer}>
+        {feeLine}
+        <View style={styles.depositFeeContainer}>
+          <GaloyIcon name="warning" size={16} color={colors.error} />
+          <Text
+            style={[styles.depositFeeText, styles.depositWarningText]}
+            testID="deposit-fee-warning"
+          >
+            {depositWarning}
+          </Text>
+        </View>
       </View>
     )
   }
@@ -202,5 +222,8 @@ const useStyles = makeStyles(({ colors }) => ({
     fontWeight: "400",
     lineHeight: 20,
     flex: 1,
+  },
+  depositWarningText: {
+    color: colors.error,
   },
 }))

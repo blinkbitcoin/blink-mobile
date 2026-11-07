@@ -2276,6 +2276,9 @@
     "depositFeeTiers": "Deposit fees: {tiers: string}",
     "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
     "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
+    "depositBelowMinimum": "Գումարը նվազագույն ավանդից ցածր է։ {min} SAT-ից պակաս ոչինչ չի հասնի",
+    "depositBelowFee": "Գումարը կսպառվի ավանդի վճարով",
+    "depositConsumedByFee": "Ավանդի վճարը կսպառի {fee} SAT",
     "autoConvertMinAmount": "{minSats: number} սաթ / {minFiat: string}-ից պակաս գումարները չեն կարող ավտոմատ կերպով փոխարկվել Դոլարի։ Դուք կստանաք Bitcoin։",
     "autoConvertFailed": "Վճարումը ստացվեց, սակայն փոխարկումը չհաջողվեց։",
     "pleaseWaitForConversion": "Խնդրում ենք սպասել, մինչև փոխարկումն ավարտվի"

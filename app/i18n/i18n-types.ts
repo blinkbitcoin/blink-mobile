@@ -7181,6 +7181,20 @@ type RootTranslation = {
 		 */
 		depositFeeTierAbove: RequiredParams<'fee' | 'min'>
 		/**
+		 * A​m​o​u​n​t​ ​i​s​ ​b​e​l​o​w​ ​t​h​e​ ​m​i​n​i​m​u​m​ ​d​e​p​o​s​i​t​.​ ​A​n​y​t​h​i​n​g​ ​u​n​d​e​r​ ​{​m​i​n​}​ ​S​A​T​ ​w​i​l​l​ ​n​o​t​ ​a​r​r​i​v​e
+		 * @param {string} min
+		 */
+		depositBelowMinimum: RequiredParams<'min'>
+		/**
+		 * A​m​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​c​o​n​s​u​m​e​d​ ​b​y​ ​t​h​e​ ​d​e​p​o​s​i​t​ ​f​e​e
+		 */
+		depositBelowFee: string
+		/**
+		 * {​f​e​e​}​ ​S​A​T​ ​w​i​l​l​ ​b​e​ ​c​o​n​s​u​m​e​d​ ​b​y​ ​t​h​e​ ​d​e​p​o​s​i​t​ ​f​e​e
+		 * @param {string} fee
+		 */
+		depositConsumedByFee: RequiredParams<'fee'>
+		/**
 		 * A​m​o​u​n​t​s​ ​b​e​l​o​w​ ​{​m​i​n​S​a​t​s​}​ ​S​A​T​ ​/​ ​{​m​i​n​F​i​a​t​}​ ​c​a​n​'​t​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​D​o​l​l​a​r​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​.​ ​Y​o​u​'​l​l​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​i​n​s​t​e​a​d​.
 		 * @param {string} minFiat
 		 * @param {number} minSats
@@ -21509,6 +21523,18 @@ export type TranslationFunctions = {
 		 * {fee} SAT above {min} SAT
 		 */
 		depositFeeTierAbove: (arg: { fee: string, min: string }) => LocalizedString
+		/**
+		 * Amount is below the minimum deposit. Anything under {min} SAT will not arrive
+		 */
+		depositBelowMinimum: (arg: { min: string }) => LocalizedString
+		/**
+		 * Amount will be consumed by the deposit fee
+		 */
+		depositBelowFee: () => LocalizedString
+		/**
+		 * {fee} SAT will be consumed by the deposit fee
+		 */
+		depositConsumedByFee: (arg: { fee: string }) => LocalizedString
 		/**
 		 * Amounts below {minSats} SAT / {minFiat} can't be converted to Dollar automatically. You'll receive Bitcoin instead.
 		 */
