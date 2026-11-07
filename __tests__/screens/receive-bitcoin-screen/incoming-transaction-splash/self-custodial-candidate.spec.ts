@@ -49,7 +49,6 @@ const decideCandidate = (candidate: SplashCandidate) =>
     routeName: "Home",
     keyboardVisible: false,
     appLocked: false,
-    overlayCovered: false,
   })
 
 describe("selfCustodialCandidate", () => {
@@ -67,6 +66,22 @@ describe("selfCustodialCandidate", () => {
     expect(decide(receive(PaymentType.Lightning, Math.floor(NOW / 1000))).outcome).toBe(
       "show",
     )
+  })
+
+  it("marks a receive unpriced until a display price is known", () => {
+    const tx = receive(PaymentType.Lightning, Math.floor(NOW / 1000))
+    const display = {
+      displayCurrency: "USD",
+      convertMoneyAmount: (amount: { amount: number }) => ({
+        amount: amount.amount,
+        currency: "DisplayCurrency",
+        currencyCode: "USD",
+      }),
+      fractionDigits: 2,
+    } as unknown as Parameters<typeof selfCustodialCandidate>[1]
+
+    expect(selfCustodialCandidate(tx).unpriced).toBe(true)
+    expect(selfCustodialCandidate(tx, display).unpriced).toBe(false)
   })
 })
 

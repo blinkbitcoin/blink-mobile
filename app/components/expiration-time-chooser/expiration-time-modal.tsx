@@ -9,7 +9,6 @@ import { GaloyIcon } from "../atomic/galoy-icon"
 import { GaloyIconButton } from "../atomic/galoy-icon-button"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useOverlayCover } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/overlay-cover"
 
 export type ExpirationTimeModalProps = {
   value?: string | number
@@ -26,7 +25,6 @@ export const ExpirationTimeModal: React.FC<ExpirationTimeModalProps> = ({
   isOpen,
   close,
 }) => {
-  useOverlayCover(isOpen)
   const {
     theme: { colors },
   } = useTheme()

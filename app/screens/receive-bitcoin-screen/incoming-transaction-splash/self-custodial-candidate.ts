@@ -27,6 +27,7 @@ export const selfCustodialCandidate = (
       ? SplashPaymentType.Onchain
       : SplashPaymentType.Lightning,
   createdAtIsSettlement: true,
+  unpriced: !display,
 })
 
 /** A deposit has no time of its own until it is claimed: it counts from when the SDK
@@ -51,4 +52,5 @@ export const selfCustodialDepositCandidate = (
   paymentType: SplashPaymentType.Onchain,
   createdAtIsSettlement: true,
   unclaimedDeposit: true,
+  unpriced: !display,
 })

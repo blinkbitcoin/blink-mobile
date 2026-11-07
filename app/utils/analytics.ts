@@ -345,72 +345,14 @@ export const logLoginMethodCodeFailed = (params: LogLoginMethodCodeFailedParams)
   analytics().logEvent("login_method_code_failed", { login_method: params.loginMethod })
 }
 
-type SplashWallet = "btc" | "usd" | "self_custodial"
-type SplashPaymentTypeName = "lightning" | "intraledger" | "onchain"
-type SplashCloseAction = "close" | "details" | "back" | "x" | "background"
-type SplashSettingSource = "splash" | "settings"
-
-type LogIncomingTransactionSplashShownParams = {
-  route: string
-  wallet: SplashWallet
-  paymentType: SplashPaymentTypeName
-  amountBucket: string
-  hasNote: boolean
-  amountHidden: boolean
-}
-
-export const logIncomingTransactionSplashShown = (
-  params: LogIncomingTransactionSplashShownParams,
-) => {
-  analytics().logEvent("incoming_tx_splash_shown", {
-    route: params.route,
-    wallet: params.wallet,
-    payment_type: params.paymentType,
-    amount_bucket: params.amountBucket,
-    has_note: params.hasNote,
-    amount_hidden: params.amountHidden,
-  })
-}
-
-export const logIncomingTransactionSplashReplaced = (params: {
-  secondsSincePrevious: number
-  route: string
+/** The splash reports one thing only: that someone turned it off, and from where. A
+ *  self-custodial account reports it through its own gate, so only Enhanced sends it. */
+export const logIncomingTransactionSplashOptedOut = (params: {
+  source: "splash" | "settings"
 }) => {
-  analytics().logEvent("incoming_tx_splash_replaced", {
-    seconds_since_previous: params.secondsSincePrevious,
-    route: params.route,
-  })
-}
-
-export const logIncomingTransactionSplashSuppressed = (params: {
-  reason: "below_minimum" | "blocked_route" | "opted_out"
-}) => {
-  analytics().logEvent("incoming_tx_splash_suppressed", { reason: params.reason })
-}
-
-export const logIncomingTransactionSplashClosed = (params: {
-  action: SplashCloseAction
-  timeOnScreenMs: number
-  optedOut: boolean
-  /** Whether a hidden amount was tapped to show it. */
-  amountRevealed: boolean
-}) => {
-  analytics().logEvent("incoming_tx_splash_closed", {
-    action: params.action,
-    time_on_screen_ms: params.timeOnScreenMs,
-    opted_out: params.optedOut,
-    amount_revealed: params.amountRevealed,
-  })
-}
-
-export const logIncomingTransactionSplashSettingChanged = (params: {
-  enabled: boolean
-  minimumSats: number
-  source: SplashSettingSource
-}) => {
-  analytics().logEvent("incoming_tx_splash_setting_changed", {
-    enabled: params.enabled,
-    minimum_sats: params.minimumSats,
-    source: params.source,
-  })
+  if (!isCustodialAnalyticsDomain()) {
+    measure(ScEvent.IncomingTxSplashOptedOut, { source: params.source })
+    return
+  }
+  logCustodialEvent("incoming_tx_splash_opted_out", { source: params.source })
 }

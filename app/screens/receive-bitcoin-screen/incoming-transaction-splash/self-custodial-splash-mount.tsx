@@ -32,8 +32,10 @@ const SUCCEEDED_PREFIX = `${SdkEventTags.PaymentSucceeded}:`
  * Self-custodial receives never come through GraphQL: they are the SDK's own
  * PaymentSucceeded events. Pending events are ignored. The payment the event carries is
  * shown at once, without waiting for the wallet refresh the event triggers (seconds
- * on a busy wallet). The event key is the fallback: its id waits in a queue until the
- * payment shows up in the transactions, and the provider drops whichever comes second.
+ * on a busy wallet), with Details inactive until that refresh lists it: the details
+ * screen reads the wallet's list, so it could not find it before. The event key is the
+ * fallback: its id waits in a queue until the payment shows up in the transactions, and
+ * the provider drops whichever comes second.
  * On-chain is different: a deposit gets its pending splash when the SDK first sees it,
  * and the succeeded payment its claim turns into later is not a splash.
  */
@@ -47,8 +49,16 @@ export const SelfCustodialSplashMount = () => {
   const [pendingIds, setPendingIds] = useState<readonly string[]>([])
   /** The key the provider already held at mount is history, not a new payment. */
   const initialKey = useRef(lastPaymentEventKey)
-  /** The last payment offered, so a note that lands after it can still reach the screen. */
-  const offered = useRef<{ id: string; memo: string | undefined } | null>(null)
+  /** The last payment offered, so a note that lands after it, or the refresh that lets
+   *  Details open it, can still reach the screen. */
+  const offered = useRef<{
+    id: string
+    memo: string | undefined
+    detailsPending: boolean
+  } | null>(null)
+  /** Read from the event listener without resubscribing on every refresh. */
+  const listed = useRef(allTransactions)
+  listed.current = allTransactions
 
   useEffect(() => {
     if (!isSelfCustodial || !lastPaymentEventKey) return
@@ -95,8 +105,9 @@ export const SelfCustodialSplashMount = () => {
       if (!isKnownPayment(payment)) return
       const tx = mapSelfCustodialTransaction(payment)
       if (!isSplashCandidate(tx)) return
-      offered.current = { id: tx.id, memo: tx.memo }
-      showSplash(toCandidate(tx))
+      const detailsPending = !listed.current.some((listedTx) => listedTx.id === tx.id)
+      offered.current = { id: tx.id, memo: tx.memo, detailsPending }
+      showSplash({ ...toCandidate(tx), detailsPending })
     })
   }, [isSelfCustodial, toCandidate, showSplash])
 
@@ -104,8 +115,8 @@ export const SelfCustodialSplashMount = () => {
     const last = offered.current
     if (last) {
       const tx = allTransactions.find((candidate) => candidate.id === last.id)
-      if (tx && tx.memo !== last.memo) {
-        offered.current = { id: tx.id, memo: tx.memo }
+      if (tx && (tx.memo !== last.memo || last.detailsPending)) {
+        offered.current = { id: tx.id, memo: tx.memo, detailsPending: false }
         refresh(toCandidate(tx))
       }
     }
@@ -123,7 +134,7 @@ export const SelfCustodialSplashMount = () => {
     setPendingIds((ids) => ids.filter((id) => !settled.some((tx) => tx.id === id)))
 
     settled.filter(isSplashCandidate).forEach((tx) => {
-      offered.current = { id: tx.id, memo: tx.memo }
+      offered.current = { id: tx.id, memo: tx.memo, detailsPending: false }
       showSplash(toCandidate(tx))
     })
   }, [pendingIds, allTransactions, toCandidate, showSplash, refresh])
