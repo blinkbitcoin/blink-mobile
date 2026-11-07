@@ -17,7 +17,7 @@ import {
   TransactionStatus,
 } from "@app/types/transaction"
 
-import { useIncomingTransactionSplash } from "./incoming-transaction-splash-provider"
+import { useIncomingTransactionSplash } from "./incoming-transaction-splash-context"
 import {
   selfCustodialCandidate,
   selfCustodialDepositCandidate,

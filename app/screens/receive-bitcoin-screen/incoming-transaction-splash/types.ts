@@ -1,5 +1,8 @@
 import { TransactionFragment } from "@app/graphql/generated"
 
+/** From the start of the iris to the controls taking taps: the entrance is over. */
+export const SPLASH_SETTLE_MS = 900
+
 export const SplashPaymentType = {
   Lightning: "lightning",
   IntraLedger: "intraledger",

@@ -12,7 +12,7 @@ import {
   PaymentRequestState,
   PaymentRequestCreationData,
 } from "../payment/index.types"
-import { useIncomingTransactionSplash } from "../incoming-transaction-splash/incoming-transaction-splash-provider"
+import { useIncomingTransactionSplash } from "../incoming-transaction-splash/incoming-transaction-splash-context"
 import { createPaymentRequest } from "../payment/payment-request"
 
 export const useInvoiceLifecycle = (

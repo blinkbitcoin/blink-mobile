@@ -36,12 +36,13 @@ import { SuccessBadge } from "@app/components/success-badge"
 import { SuccessGlow } from "@app/components/success-glow"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 import { toBtcMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 
 import type { ShownSplash } from "./incoming-transaction-splash-provider"
 import { PendingHourglass } from "./pending-hourglass"
-import { SplashPaymentType } from "./types"
+import { SPLASH_SETTLE_MS, SplashPaymentType } from "./types"
 
 const IRIS_MS = 480
 const IRIS_OVERSHOOT = 40
@@ -55,7 +56,6 @@ const FADE_UP_MS = 320
 const FADE_UP_OFFSET = 10
 const FADE_UP_EASING = Easing.out(Easing.cubic)
 const STAGGER_MS = 60
-const SETTLE_MS = 900
 
 /** Figma `pulse-anim`: a 1250 dp ring blooms out of the amount on impact and fades out. */
 const PULSE_RADIUS = 625
@@ -224,9 +224,14 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
       if (!isMounted.current) return
       triggerSuccessHaptic()
       setImpactKey((key) => key + 1)
-      setIrisDone(true)
       announce(shown)
-      setTimeout(() => setInteractive(true), SETTLE_MS - IRIS_MS)
+      /** The canvas goes once the entrance is over, not on the impact frame itself: closed,
+       *  it is the same green as the ground under it, and a native surface torn down on
+       *  that frame is a dropped frame on a slow phone. */
+      setTimeout(() => {
+        setIrisDone(true)
+        setInteractive(true)
+      }, SPLASH_SETTLE_MS - IRIS_MS)
     },
     [announce],
   )
@@ -615,8 +620,9 @@ const useStyles = makeStyles(({ colors }) => ({
   fullWidth: {
     alignSelf: "stretch",
   },
-  // Same size and type as GaloyPrimaryButton's own styles, which a buttonStyle /
-  // titleStyle prop replaces rather than merges: only the colours differ here.
+  // Same size as GaloyPrimaryButton's own styles, which a buttonStyle / titleStyle prop
+  // replaces rather than merges: only the colours differ here. Bold is the face, not a
+  // weight: a weight on Source Sans Pro draws Roboto Bold on Android.
   closeButton: {
     minHeight: 50,
     backgroundColor: colors._black,
@@ -624,7 +630,7 @@ const useStyles = makeStyles(({ colors }) => ({
   closeButtonTitle: {
     fontSize: 20,
     lineHeight: 24,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors._white,
   },
   closeIcon: {

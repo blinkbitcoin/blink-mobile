@@ -1,8 +1,6 @@
 import React, {
-  createContext,
   PropsWithChildren,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -23,6 +21,7 @@ import { toUsdMoneyAmount } from "@app/types/amounts"
 import { logIncomingTransactionSplashOptedOut } from "@app/utils/analytics"
 
 import { decideSplash } from "./decide-splash"
+import { IncomingTransactionSplashContext } from "./incoming-transaction-splash-context"
 import { IncomingTransactionSplashOverlay } from "./incoming-transaction-splash-overlay"
 import { SplashCandidate } from "./types"
 import { toastSplashSetting, useSplashSettings } from "./use-splash-settings"
@@ -33,25 +32,6 @@ export type ShownSplash = SplashCandidate & {
    *  splash shows them. The tap never changes the hide-balance setting. */
   amountHidden: boolean
 }
-
-type IncomingTransactionSplashContextValue = {
-  showSplash: (candidate: SplashCandidate) => void
-  /** Newer data for the payment on screen, such as a sender's note that landed after it,
-   *  or the wallet list catching up so Details can open it. */
-  refresh: (candidate: SplashCandidate) => void
-  /** Whether this Lightning payment hash got the splash, so Receive skips its own haptic. */
-  isSplashShownForHash: (paymentHash: string) => boolean
-}
-
-const IncomingTransactionSplashContext =
-  createContext<IncomingTransactionSplashContextValue>({
-    showSplash: () => {},
-    refresh: () => {},
-    isSplashShownForHash: () => false,
-  })
-
-export const useIncomingTransactionSplash = () =>
-  useContext(IncomingTransactionSplashContext)
 
 export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
   children,
@@ -135,7 +115,7 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
         keyboardVisible: Keyboard.isVisible(),
         appLocked: current.isAppLocked,
       })
-      if (decision.outcome !== "show") return
+      if (decision.outcome !== "show") return false
 
       if (candidate.paymentHash) splashHashes.current.add(candidate.paymentHash)
       const next: ShownSplash = {
@@ -144,6 +124,7 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
         amountHidden: current.balanceHidden,
       }
       setShown(next)
+      return true
     },
     [toSats],
   )
