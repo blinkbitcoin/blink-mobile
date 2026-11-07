@@ -1578,6 +1578,25 @@ query migrationOwner {
   }
 }
 
+query migrationPendingDeposits {
+  me {
+    id
+    defaultAccount {
+      id
+      pendingIncomingTransactions {
+        id
+        direction
+        settlementVia {
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
 query migrationStatus {
   migration {
     status

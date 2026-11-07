@@ -3530,6 +3530,11 @@ export type MigrationOwnerQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MigrationOwnerQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string } } | null };
 
+export type MigrationPendingDepositsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MigrationPendingDepositsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly pendingIncomingTransactions: ReadonlyArray<{ readonly __typename: 'Transaction', readonly id: string, readonly direction: TxDirection, readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger' } | { readonly __typename: 'SettlementViaLn' } | { readonly __typename: 'SettlementViaOnChain' } }> } } | null };
+
 export type MigrationStartMutationVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -5960,6 +5965,55 @@ export type MigrationOwnerQueryHookResult = ReturnType<typeof useMigrationOwnerQ
 export type MigrationOwnerLazyQueryHookResult = ReturnType<typeof useMigrationOwnerLazyQuery>;
 export type MigrationOwnerSuspenseQueryHookResult = ReturnType<typeof useMigrationOwnerSuspenseQuery>;
 export type MigrationOwnerQueryResult = Apollo.QueryResult<MigrationOwnerQuery, MigrationOwnerQueryVariables>;
+export const MigrationPendingDepositsDocument = gql`
+    query migrationPendingDeposits {
+  me {
+    id
+    defaultAccount {
+      id
+      pendingIncomingTransactions {
+        id
+        direction
+        settlementVia {
+          __typename
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useMigrationPendingDepositsQuery__
+ *
+ * To run a query within a React component, call `useMigrationPendingDepositsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMigrationPendingDepositsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMigrationPendingDepositsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMigrationPendingDepositsQuery(baseOptions?: Apollo.QueryHookOptions<MigrationPendingDepositsQuery, MigrationPendingDepositsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MigrationPendingDepositsQuery, MigrationPendingDepositsQueryVariables>(MigrationPendingDepositsDocument, options);
+      }
+export function useMigrationPendingDepositsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MigrationPendingDepositsQuery, MigrationPendingDepositsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MigrationPendingDepositsQuery, MigrationPendingDepositsQueryVariables>(MigrationPendingDepositsDocument, options);
+        }
+export function useMigrationPendingDepositsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MigrationPendingDepositsQuery, MigrationPendingDepositsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MigrationPendingDepositsQuery, MigrationPendingDepositsQueryVariables>(MigrationPendingDepositsDocument, options);
+        }
+export type MigrationPendingDepositsQueryHookResult = ReturnType<typeof useMigrationPendingDepositsQuery>;
+export type MigrationPendingDepositsLazyQueryHookResult = ReturnType<typeof useMigrationPendingDepositsLazyQuery>;
+export type MigrationPendingDepositsSuspenseQueryHookResult = ReturnType<typeof useMigrationPendingDepositsSuspenseQuery>;
+export type MigrationPendingDepositsQueryResult = Apollo.QueryResult<MigrationPendingDepositsQuery, MigrationPendingDepositsQueryVariables>;
 export const MigrationStartDocument = gql`
     mutation migrationStart {
   migrationStart {
