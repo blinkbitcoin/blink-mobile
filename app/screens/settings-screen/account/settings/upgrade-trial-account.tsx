@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from "react"
+import React, { useRef, useState, useCallback } from "react"
 import { View } from "react-native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"

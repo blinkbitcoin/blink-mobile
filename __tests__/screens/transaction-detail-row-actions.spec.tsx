@@ -1,9 +1,11 @@
 import React from "react"
 
 import { fireEvent, render } from "@testing-library/react-native"
-import { Linking, StyleSheet } from "react-native"
+import { Linking } from "react-native"
 
 import { TransactionDetailScreen } from "@app/screens/transaction-detail-screen/transaction-detail-screen"
+
+import { surfaceColor } from "../helpers/surface-color"
 
 jest.mock("@rn-vui/themed", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockThemedText(),
@@ -144,17 +146,6 @@ const renderScreenWithTx = (tx: unknown) => {
 const copiedContents = () =>
   mockCopyToClipboard.mock.calls.map(([{ content }]) => content)
 
-type HostNode = { props: { style?: unknown }; parent: HostNode | null }
-
-/** The background of the nearest surface that paints one around a value. */
-const surfaceColor = (node: HostNode) => {
-  for (let current: HostNode | null = node; current; current = current.parent) {
-    const { backgroundColor } = StyleSheet.flatten(current.props.style as never) ?? {}
-    if (backgroundColor) return backgroundColor
-  }
-  return undefined
-}
-
 // Regression guards for the #3732 / #3898 icon-row rework: every copy /
 // open-in-explorer icon on the detail rows must fire its handler with the
 // right payload when tapped.
@@ -235,9 +226,9 @@ describe("TransactionDetailScreen row icon actions", () => {
         broadcastedOnChainTx(ONCHAIN_TX_HASH),
       )
 
-      expect(surfaceColor(getByText("some description") as never)).toBe("#f5f5f5")
-      expect(surfaceColor(getAllByTestId("copy-paste")[0] as never)).toBe("#f5f5f5")
-      expect(surfaceColor(getByText("OnChain") as never)).toBe("#f9f9f9")
+      expect(surfaceColor(getByText("some description"))).toBe("#f5f5f5")
+      expect(surfaceColor(getAllByTestId("copy-paste")[0])).toBe("#f5f5f5")
+      expect(surfaceColor(getByText("OnChain"))).toBe("#f9f9f9")
     })
   })
 })

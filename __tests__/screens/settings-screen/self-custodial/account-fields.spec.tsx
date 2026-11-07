@@ -1,11 +1,12 @@
 import React from "react"
 import { fireEvent, render } from "@testing-library/react-native"
-import { StyleSheet } from "react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { AccountFields } from "@app/screens/settings-screen/self-custodial/account-fields"
 import { light } from "@app/rne-theme/colors"
 import theme from "@app/rne-theme/theme"
+
+import { surfaceColor } from "../../../helpers/surface-color"
 
 const mockAccountInfo = {
   identityPubkey: "abc-pubkey",
@@ -45,17 +46,6 @@ jest.mock("@app/i18n/i18n-react", () => ({
     },
   }),
 }))
-
-type HostNode = { props: { style?: unknown }; parent: HostNode | null }
-
-/** The background of the nearest surface that paints one around a value. */
-const surfaceColor = (node: HostNode) => {
-  for (let current: HostNode | null = node; current; current = current.parent) {
-    const { backgroundColor } = StyleSheet.flatten(current.props.style as never) ?? {}
-    if (backgroundColor) return backgroundColor
-  }
-  return undefined
-}
 
 const renderFields = () =>
   render(
@@ -126,8 +116,8 @@ describe("AccountFields", () => {
    *  backup status has nothing to press, so it takes the static grey7 (blink-wip#1871). */
   it("keeps the copyable fields grey5 and paints backup status grey7", () => {
     const { getByText } = renderFields()
-    expect(surfaceColor(getByText("abc-pubkey") as never)).toBe(light.grey5)
-    expect(surfaceColor(getByText("user@blink.sv") as never)).toBe(light.grey5)
-    expect(surfaceColor(getByText("Completed") as never)).toBe(light.grey7)
+    expect(surfaceColor(getByText("abc-pubkey"))).toBe(light.grey5)
+    expect(surfaceColor(getByText("user@blink.sv"))).toBe(light.grey5)
+    expect(surfaceColor(getByText("Completed"))).toBe(light.grey7)
   })
 })
