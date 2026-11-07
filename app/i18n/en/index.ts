@@ -2191,6 +2191,8 @@ const en: BaseTranslation = {
     myAccounts: "Balances",
     walletCountNotTwo:
       "Wallet count is not 2. Please use the dashboard to see all the wallets and funds of this account",
+    bulletinPosition: "Notification {position: number} of {total: number}",
+    bulletinReadMore: "Read more",
   },
   PinScreen: {
     attemptBudgetSpent: "Too many failed attempts.",

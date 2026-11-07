@@ -1,8 +1,14 @@
 import * as React from "react"
 import { Text as ReactNativeText, TouchableOpacity, View } from "react-native"
+import { ReactTestRendererJSON } from "react-test-renderer"
 import { render, fireEvent } from "@testing-library/react-native"
 
+import { BulletinCarouselItemContext } from "@app/components/notifications/bulletin-carousel-context"
 import { NotificationCardUI } from "@app/components/notifications/notification-card-ui"
+import TypesafeI18n from "@app/i18n/i18n-react"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
+
+loadLocale("en")
 
 jest.mock("@rn-vui/themed", () => {
   return {
@@ -173,5 +179,132 @@ describe("NotificationCardUI", () => {
     const screen = render(<NotificationCardUI {...defaultProps} />)
 
     expect(screen.UNSAFE_queryByType(TouchableOpacity)).toBeTruthy()
+  })
+})
+
+/** A long body is cut to 3 lines plus "Read more" once it measures over 4 lines. */
+describe("NotificationCardUI with a long body", () => {
+  const LONG = "A body long enough to need more than four lines on a small phone."
+
+  const card = (
+    props: Partial<React.ComponentProps<typeof NotificationCardUI>> = {},
+    isActive = true,
+  ) => (
+    <TypesafeI18n locale="en">
+      <BulletinCarouselItemContext.Provider value={{ isActive }}>
+        <NotificationCardUI {...defaultProps} text={LONG} {...props} />
+      </BulletinCarouselItemContext.Provider>
+    </TypesafeI18n>
+  )
+
+  /** The hidden copy reports how many lines the full body takes. */
+  const measureLines = (screen: ReturnType<typeof render>, count: number) =>
+    fireEvent(
+      screen.getAllByText(LONG, { includeHiddenElements: true })[0],
+      "textLayout",
+      { nativeEvent: { lines: Array.from({ length: count }, () => ({})) } },
+    )
+
+  const visibleBody = (screen: ReturnType<typeof render>) => screen.getByText(LONG)
+
+  it("shows a body of 4 lines in full, with no Read more", () => {
+    const screen = render(card())
+    measureLines(screen, 4)
+
+    expect(visibleBody(screen).props.numberOfLines).toBeUndefined()
+    expect(screen.queryByText("Read more")).toBeNull()
+  })
+
+  it("cuts a body over 4 lines to 3, ending in an ellipsis, with Read more under it", () => {
+    const screen = render(card())
+    measureLines(screen, 5)
+
+    expect(visibleBody(screen).props).toMatchObject({
+      numberOfLines: 3,
+      ellipsizeMode: "tail",
+    })
+    expect(screen.getByRole("button", { name: "Read more" })).toBeTruthy()
+  })
+
+  it("keeps the measuring copy away from screen readers, which read the full body", () => {
+    const screen = render(card())
+    measureLines(screen, 5)
+
+    expect(screen.getAllByText(LONG)).toHaveLength(1)
+    expect(visibleBody(screen).props.accessibilityLabel).toBe(LONG)
+  })
+
+  it("expands on Read more", () => {
+    const action = jest.fn(() => Promise.resolve())
+    const screen = render(card({ action }))
+    measureLines(screen, 5)
+
+    fireEvent.press(screen.getByText("Read more"))
+
+    expect(visibleBody(screen).props.numberOfLines).toBeUndefined()
+    expect(screen.queryByText("Read more")).toBeNull()
+    expect(action).not.toHaveBeenCalled()
+  })
+
+  /** While cut short, a tap anywhere reads more; only the button opens the link. */
+  it("expands on a tap on the card instead of opening the link", () => {
+    const action = jest.fn(() => Promise.resolve())
+    const screen = render(card({ action }))
+    measureLines(screen, 5)
+
+    expect(screen.UNSAFE_queryByType(TouchableOpacity)).toBeNull()
+    /** Not a button for screen readers, which reach "Read more" on its own. */
+    const root = screen.toJSON() as ReactTestRendererJSON
+    expect(root.props.accessible).toBe(false)
+    expect(root.props.onClick).toEqual(expect.any(Function))
+    fireEvent.press(screen.getByText("Test Title"))
+
+    expect(action).not.toHaveBeenCalled()
+    expect(screen.queryByText("Read more")).toBeNull()
+  })
+
+  it("still opens the link from the action button while cut short", () => {
+    const action = jest.fn(() => Promise.resolve())
+    const screen = render(card({ action, buttonLabel: "Open" }))
+    measureLines(screen, 5)
+
+    fireEvent.press(screen.getByTestId("primary-button"))
+
+    expect(action).toHaveBeenCalledTimes(1)
+    expect(screen.getByText("Read more")).toBeTruthy()
+  })
+
+  it("behaves as before once expanded: a tap opens the link", () => {
+    const action = jest.fn(() => Promise.resolve())
+    const screen = render(card({ action }))
+    measureLines(screen, 5)
+    fireEvent.press(screen.getByText("Read more"))
+
+    fireEvent.press(screen.getByText("Test Title"))
+
+    expect(action).toHaveBeenCalledTimes(1)
+  })
+
+  it("expands a card without a link, which stays a plain card afterwards", () => {
+    const screen = render(card({ action: undefined }))
+    measureLines(screen, 5)
+
+    fireEvent.press(screen.getByText("Test Title"))
+
+    expect(screen.queryByText("Read more")).toBeNull()
+    expect((screen.toJSON() as ReactTestRendererJSON).props.onClick).toBeUndefined()
+    expect(screen.UNSAFE_queryByType(TouchableOpacity)).toBeNull()
+  })
+
+  it("folds back when swiped out of view", () => {
+    const screen = render(card())
+    measureLines(screen, 5)
+    fireEvent.press(screen.getByText("Read more"))
+
+    screen.rerender(card({}, false))
+    screen.rerender(card({}, true))
+
+    expect(visibleBody(screen).props.numberOfLines).toBe(3)
+    expect(screen.getByText("Read more")).toBeTruthy()
   })
 })

@@ -2179,7 +2179,9 @@
     "updateAvailable": "Uhlaziyo luyafumaneka. Cofa ukuhlaziya ngoku",
     "useLightning": "Sisebenzisa inethiwekhi yombane.",
     "myAccounts": "Ibhalansi",
-    "walletCountNotTwo": "Inani lezipaji asizizo ezi-2. Nceda usebenzise idashbhodi ukubona zonke izipaji nemali yeli akhawunti"
+    "walletCountNotTwo": "Inani lezipaji asizizo ezi-2. Nceda usebenzise idashbhodi ukubona zonke izipaji nemali yeli akhawunti",
+    "bulletinPosition": "Isaziso {position: number} kwezi-{total: number}",
+    "bulletinReadMore": "Funda ngakumbi"
   },
   "PinScreen": {
     "attemptUnrecorded": "Akukwazekanga ukurekhoda umzamo ngokukhuselekileyo.",

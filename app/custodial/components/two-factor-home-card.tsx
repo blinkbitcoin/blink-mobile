@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect } from "react"
+import React, { useCallback, useContext, useEffect } from "react"
 
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+import { BulletinCarouselItemContext } from "@app/components/notifications/bulletin-carousel-context"
 import { NotificationCardUI } from "@app/components/notifications/notification-card-ui"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -32,7 +33,8 @@ type TwoFactorHomeCardProps = {
 
 /**
  * A two-factor prompt on the home, as a card: it reports itself as shown to the
- * enforcement, which counts the impressions, and its button opens its destination, told
+ * enforcement, which counts the impressions, once it is the card in view, since the
+ * carousel mounts the cards out of view too. Its button opens its destination, told
  * which prompt opened it and why it was up. What sets one prompt apart from another is
  * its copy, its destination and its dismissal.
  */
@@ -47,10 +49,11 @@ export const TwoFactorHomeCard: React.FC<TwoFactorHomeCardProps> = ({
 }) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { markPromptShown } = useTwoFactorEnforcement()
+  const { isActive } = useContext(BulletinCarouselItemContext)
 
   useEffect(() => {
-    markPromptShown(prompt, reason)
-  }, [markPromptShown, prompt, reason])
+    if (isActive) markPromptShown(prompt, reason)
+  }, [isActive, markPromptShown, prompt, reason])
 
   const handleSet = useCallback(() => {
     navigation.navigate(destination, { origin: { prompt, reason } })
