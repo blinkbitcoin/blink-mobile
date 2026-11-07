@@ -46,6 +46,8 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
   const { convertMoneyAmount } = usePriceConversion()
 
   const seenIds = useRef(new Set<string>())
+  /** Payments that came in one event behind the one on screen, shown in turn on Close. */
+  const queued = useRef<ShownSplash[]>([])
   const splashHashes = useRef(new Set<string>())
   const foregroundSince = useRef(Date.now())
 
@@ -63,7 +65,10 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
     convertMoneyAmount,
   }
 
-  const dismiss = useCallback(() => setShown(null), [])
+  const dismiss = useCallback(() => {
+    queued.current = []
+    setShown(null)
+  }, [])
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (state) => {
@@ -94,8 +99,9 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
     return convert(toUsdMoneyAmount(amount), WalletCurrency.Btc).amount
   }, [])
 
-  const showSplash = useCallback(
-    (candidate: SplashCandidate) => {
+  /** The splash this payment gets, or null when it gets none. */
+  const accept = useCallback(
+    (candidate: SplashCandidate): ShownSplash | null => {
       const alreadySeen = seenIds.current.has(candidate.transaction.id)
 
       const routeName = navigationRef.isReady()
@@ -121,18 +127,41 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
         (decision.reason === "outgoing" ||
           decision.reason === "settled_before_foreground")
       if (!alreadySeen && !neverShows) seenIds.current.add(candidate.transaction.id)
-      if (decision.outcome !== "show") return false
+      if (decision.outcome !== "show") return null
 
       if (candidate.paymentHash) splashHashes.current.add(candidate.paymentHash)
-      const next: ShownSplash = {
+      return {
         ...candidate,
         amountSats: decision.amountSats,
         amountHidden: current.balanceHidden,
       }
+    },
+    [toSats],
+  )
+
+  const showSplash = useCallback(
+    (candidate: SplashCandidate) => {
+      const next = accept(candidate)
+      if (!next) return false
       setShown(next)
       return true
     },
-    [toSats],
+    [accept],
+  )
+
+  /** Several payments in one event, such as a batch of deposits: the first goes on
+   *  screen and the rest follow it on Close. Payments that arrive one by one still
+   *  replace each other. */
+  const showSplashes = useCallback(
+    (candidates: readonly SplashCandidate[]) => {
+      const [first, ...rest] = candidates
+        .map(accept)
+        .filter((next): next is ShownSplash => next !== null)
+      if (!first) return
+      setShown(first)
+      queued.current.push(...rest)
+    },
+    [accept],
   )
 
   const refresh = useCallback((candidate: SplashCandidate) => {
@@ -155,8 +184,9 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
         settings.setEnabled(false)
         toastSplashSetting({ enabled: false, LL })
         logIncomingTransactionSplashOptedOut({ source: "splash" })
+        queued.current = []
       }
-      setShown(null)
+      setShown(queued.current.shift() ?? null)
     },
     [settings, LL],
   )
@@ -166,6 +196,8 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
       if (!shown || shown.detailsPending) return
       const txid = shown.transaction.id
       const unclaimedDeposit = shown.unclaimedDeposit === true
+      // Details leaves the splash: the unclaimed deposits screen lists the rest anyway.
+      queued.current = []
       close({ optedOut })
       if (!navigationRef.isReady()) return
       if (unclaimedDeposit) {
@@ -178,8 +210,8 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
   )
 
   const value = useMemo(
-    () => ({ showSplash, refresh, isSplashShownForHash }),
-    [showSplash, refresh, isSplashShownForHash],
+    () => ({ showSplash, showSplashes, refresh, isSplashShownForHash }),
+    [showSplash, showSplashes, refresh, isSplashShownForHash],
   )
 
   return (

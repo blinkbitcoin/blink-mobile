@@ -75,4 +75,17 @@ describe("SplashMinimumRow", () => {
     fireEvent(screen.getByDisplayValue("250"), "endEditing")
     expect(mockSetMinSats).toHaveBeenCalledWith(250)
   })
+
+  it("keeps a remote-config minimum that resolved while the field was focused", async () => {
+    const view = renderRow()
+    const input = await screen.findByDisplayValue("100")
+
+    fireEvent(input, "focus")
+    mockMinSats = 500
+    rerenderRow(view)
+    fireEvent(screen.getByDisplayValue("100"), "endEditing")
+
+    expect(mockSetMinSats).not.toHaveBeenCalled()
+    expect(await screen.findByDisplayValue("500")).toBeTruthy()
+  })
 })

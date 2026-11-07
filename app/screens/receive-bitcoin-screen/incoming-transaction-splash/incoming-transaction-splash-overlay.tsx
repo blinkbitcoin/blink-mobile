@@ -417,6 +417,10 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
             contentStyle,
           ]}
           pointerEvents={interactive ? "box-none" : "none"}
+          /* Transparent controls are still in a screen reader's reach: out until they
+             come alive. */
+          accessibilityElementsHidden={!interactive}
+          importantForAccessibility={interactive ? "auto" : "no-hide-descendants"}
         >
           <View style={styles.placeholder} />
           <View style={styles.body}>
@@ -500,7 +504,7 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
               <CheckboxRow
                 label={LL.IncomingTransactionSplash.dontShowAgain()}
                 isChecked={optedOut}
-                onPress={() => setOptedOut((value) => !value)}
+                onPress={() => interactive && setOptedOut((value) => !value)}
                 color={colors._white}
                 checkColor={colors._green}
                 centered

@@ -277,16 +277,23 @@ export const SplashMinimumRow: React.FC = () => {
   const styles = useStyles()
   const { enabled, minSats, setMinSats } = useSplashSettings()
   const [draft, setDraft] = React.useState(String(minSats))
-  const editing = React.useRef(false)
+  /** The text when the field took focus, or null while it has none. */
+  const focusedDraft = React.useRef<string | null>(null)
 
   /** Remote config can resolve after the screen opens: follow it, but never over a
    *  value being typed, and never by writing it back as the user's own. */
   React.useEffect(() => {
-    if (!editing.current) setDraft(String(minSats))
+    if (focusedDraft.current === null) setDraft(String(minSats))
   }, [minSats])
 
   const commit = () => {
-    editing.current = false
+    const untouched = draft === focusedDraft.current
+    focusedDraft.current = null
+    /** Focused and left as it was: whatever remote config settled on in between stands. */
+    if (untouched) {
+      setDraft(String(minSats))
+      return
+    }
     const value = Number.parseInt(draft, 10)
     if (Number.isFinite(value) && value >= 0) {
       if (value !== minSats) setMinSats(value)
@@ -309,7 +316,7 @@ export const SplashMinimumRow: React.FC = () => {
         value={draft}
         onChangeText={setDraft}
         onFocus={() => {
-          editing.current = true
+          focusedDraft.current = draft
         }}
         onEndEditing={commit}
         keyboardType="number-pad"

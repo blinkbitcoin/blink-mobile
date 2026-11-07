@@ -35,7 +35,7 @@ import {
 export const SelfCustodialSplashMount = () => {
   const { isSelfCustodial } = useActiveWallet()
   const { allTransactions } = useSelfCustodialWallet()
-  const { showSplash, refresh } = useIncomingTransactionSplash()
+  const { showSplash, showSplashes, refresh } = useIncomingTransactionSplash()
   const { convertMoneyAmount, displayCurrency } = usePriceConversion()
   const { fractionDigits } = useDisplayCurrency()
 
@@ -71,14 +71,16 @@ export const SelfCustodialSplashMount = () => {
 
   useEffect(() => {
     if (!isSelfCustodial) return
-    return onNewDeposits((deposits) => {
-      deposits
-        .filter((deposit) => !deposit.refundTxId)
-        .forEach((deposit) =>
-          showSplash(selfCustodialDepositCandidate(deposit, Date.now(), displayInfo)),
-        )
-    })
-  }, [isSelfCustodial, displayInfo, showSplash])
+    return onNewDeposits((deposits) =>
+      showSplashes(
+        deposits
+          .filter((deposit) => !deposit.refundTxId)
+          .map((deposit) =>
+            selfCustodialDepositCandidate(deposit, Date.now(), displayInfo),
+          ),
+      ),
+    )
+  }, [isSelfCustodial, displayInfo, showSplashes])
 
   useEffect(() => {
     if (!isSelfCustodial) return
