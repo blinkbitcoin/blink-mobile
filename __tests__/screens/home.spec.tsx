@@ -1,4 +1,4 @@
-import React from "react"
+import React, { PropsWithChildren } from "react"
 import { it } from "@jest/globals"
 import { ApolloError } from "@apollo/client"
 import { MockedResponse } from "@apollo/client/testing"
@@ -25,6 +25,7 @@ import {
 import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { mockCurrencyList } from "@app/graphql/mocks"
+import { PersistentStateContext } from "@app/store/persistent-state"
 import { GateReason } from "@app/types/account"
 import { ConvertDirection } from "@app/types/payment"
 import {
@@ -1823,16 +1824,41 @@ describe("HomeScreen", () => {
       mockBalanceModeValue = "usd"
     })
 
-    it("shows the unseen badge for a received self-custodial transaction", async () => {
-      const receivedTransaction: NormalizedTransaction = {
-        id: "sc-received-tx",
-        amount: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
-        direction: TransactionDirection.Receive,
-        status: TransactionStatus.Completed,
-        timestamp: 1747691078,
-        paymentType: PaymentType.Lightning,
-      }
+    const receivedTransaction: NormalizedTransaction = {
+      id: "sc-received-tx",
+      amount: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+      direction: TransactionDirection.Receive,
+      status: TransactionStatus.Completed,
+      timestamp: 1747691078,
+      paymentType: PaymentType.Lightning,
+    }
 
+    const SELF_CUSTODIAL_ACCOUNT_ID = "sc-account"
+
+    /** An account that already has its seen record, so this reads the badge itself
+     *  rather than the start of a new or restored account. */
+    const EstablishedSeenRecord: React.FC<PropsWithChildren> = ({ children }) => (
+      <PersistentStateContext.Provider
+        value={{
+          persistentState: {
+            schemaVersion: 23,
+            galoyInstance: { id: "Main" },
+            galoyAuthToken: "",
+            activeAccountId: SELF_CUSTODIAL_ACCOUNT_ID,
+            txLastSeenByAccountId: {
+              [SELF_CUSTODIAL_ACCOUNT_ID]: { btcId: "", usdId: "" },
+            },
+          },
+          updateState: () => {},
+          resetState: () => {},
+          clearToken: async () => true,
+        }}
+      >
+        {children}
+      </PersistentStateContext.Provider>
+    )
+
+    it("shows the unseen badge for a received self-custodial transaction", async () => {
       mockSelfCustodialWalletOverride = {
         ...mockSelfCustodialWalletOverride,
         allTransactions: [receivedTransaction],
@@ -1840,13 +1866,32 @@ describe("HomeScreen", () => {
 
       const { findByLabelText } = render(
         <ContextForScreen>
-          <HomeScreen />
+          <EstablishedSeenRecord>
+            <HomeScreen />
+          </EstablishedSeenRecord>
         </ContextForScreen>,
       )
 
       expect(await findByLabelText(/^\+/)).toBeTruthy()
 
       await flushEffects()
+    })
+
+    it("shows no unseen badge before the account has a seen record", async () => {
+      mockSelfCustodialWalletOverride = {
+        ...mockSelfCustodialWalletOverride,
+        allTransactions: [receivedTransaction],
+      }
+
+      const { queryByLabelText } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      expect(queryByLabelText(/^\+/)).toBeNull()
     })
 
     it("shows no unseen badge when the self-custodial wallet has no transactions", async () => {
