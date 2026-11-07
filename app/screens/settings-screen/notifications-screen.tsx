@@ -22,7 +22,7 @@ import {
   toastSplashSetting,
   useSplashSettings,
 } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash"
-import { logIncomingTransactionSplashSettingChanged } from "@app/utils/analytics"
+import { logIncomingTransactionSplashOptedOut } from "@app/utils/analytics"
 import { SettingsGroup } from "./group"
 
 gql`
@@ -248,7 +248,7 @@ export const NotificationSettingsScreen: React.FC = () => {
 const SplashToggleRow: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
-  const { enabled, minSats, setEnabled } = useSplashSettings()
+  const { enabled, setEnabled } = useSplashSettings()
 
   return (
     <ListItem containerStyle={styles.listItemContainer}>
@@ -265,11 +265,7 @@ const SplashToggleRow: React.FC = () => {
         onValueChange={(value) => {
           setEnabled(value)
           toastSplashSetting({ enabled: value, LL })
-          logIncomingTransactionSplashSettingChanged({
-            enabled: value,
-            minimumSats: minSats,
-            source: "settings",
-          })
+          if (!value) logIncomingTransactionSplashOptedOut({ source: "settings" })
         }}
       />
     </ListItem>
@@ -281,16 +277,19 @@ const SplashMinimumRow: React.FC = () => {
   const styles = useStyles()
   const { enabled, minSats, setMinSats } = useSplashSettings()
   const [draft, setDraft] = React.useState(String(minSats))
+  const editing = React.useRef(false)
+
+  /** Remote config can resolve after the screen opens: follow it, but never over a
+   *  value being typed, and never by writing it back as the user's own. */
+  React.useEffect(() => {
+    if (!editing.current) setDraft(String(minSats))
+  }, [minSats])
 
   const commit = () => {
+    editing.current = false
     const value = Number.parseInt(draft, 10)
     if (Number.isFinite(value) && value >= 0) {
-      setMinSats(value)
-      logIncomingTransactionSplashSettingChanged({
-        enabled,
-        minimumSats: value,
-        source: "settings",
-      })
+      if (value !== minSats) setMinSats(value)
       return
     }
     setDraft(String(minSats))
@@ -309,6 +308,9 @@ const SplashMinimumRow: React.FC = () => {
         style={styles.minimumInput}
         value={draft}
         onChangeText={setDraft}
+        onFocus={() => {
+          editing.current = true
+        }}
         onEndEditing={commit}
         keyboardType="number-pad"
         returnKeyType="done"

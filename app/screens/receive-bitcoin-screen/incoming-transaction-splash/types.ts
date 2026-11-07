@@ -24,6 +24,12 @@ export type SplashCandidate = {
   /** A self-custodial deposit the SDK has seen but not claimed. It is not a transaction
    *  yet, so Details opens the unclaimed deposits screen instead. */
   unclaimedDeposit?: boolean
+  /** Self-custodial: the payment is not in the wallet's transaction list yet, so the
+   *  details screen could not find it. Details stays inactive until it is. */
+  detailsPending?: boolean
+  /** Self-custodial, before a price has loaded: the display amount is the raw sats, not
+   *  a display-currency value, so the screen shows sats alone. */
+  unpriced?: boolean
 }
 
 export const SplashSuppressReason = {
@@ -34,13 +40,3 @@ export const SplashSuppressReason = {
 
 export type SplashSuppressReason =
   (typeof SplashSuppressReason)[keyof typeof SplashSuppressReason]
-
-export const SplashCloseAction = {
-  Close: "close",
-  Details: "details",
-  Back: "back",
-  X: "x",
-  Background: "background",
-} as const
-
-export type SplashCloseAction = (typeof SplashCloseAction)[keyof typeof SplashCloseAction]

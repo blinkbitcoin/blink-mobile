@@ -12,7 +12,6 @@ import { AppState, Keyboard } from "react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
-import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useHideBalanceSetting } from "@app/hooks/use-hide-balance-setting"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
@@ -21,18 +20,11 @@ import {
   useAuthenticationContext,
 } from "@app/navigation/navigation-container-wrapper"
 import { toUsdMoneyAmount } from "@app/types/amounts"
-import {
-  logIncomingTransactionSplashClosed,
-  logIncomingTransactionSplashReplaced,
-  logIncomingTransactionSplashSettingChanged,
-  logIncomingTransactionSplashShown,
-  logIncomingTransactionSplashSuppressed,
-} from "@app/utils/analytics"
+import { logIncomingTransactionSplashOptedOut } from "@app/utils/analytics"
 
-import { amountBucket, decideSplash } from "./decide-splash"
-import { isOverlayCovered } from "./overlay-cover"
+import { decideSplash } from "./decide-splash"
 import { IncomingTransactionSplashOverlay } from "./incoming-transaction-splash-overlay"
-import { SplashCandidate, SplashCloseAction } from "./types"
+import { SplashCandidate } from "./types"
 import { toastSplashSetting, useSplashSettings } from "./use-splash-settings"
 
 export type ShownSplash = SplashCandidate & {
@@ -44,7 +36,8 @@ export type ShownSplash = SplashCandidate & {
 
 type IncomingTransactionSplashContextValue = {
   showSplash: (candidate: SplashCandidate) => void
-  /** Newer data for the payment on screen, such as a sender's note that landed after it. */
+  /** Newer data for the payment on screen, such as a sender's note that landed after it,
+   *  or the wallet list catching up so Details can open it. */
   refresh: (candidate: SplashCandidate) => void
   /** Whether this Lightning payment hash got the splash, so Receive skips its own haptic. */
   isSplashShownForHash: (paymentHash: string) => boolean
@@ -60,14 +53,6 @@ const IncomingTransactionSplashContext =
 export const useIncomingTransactionSplash = () =>
   useContext(IncomingTransactionSplashContext)
 
-const walletLabel = (
-  isSelfCustodial: boolean,
-  currency: WalletCurrency,
-): "btc" | "usd" | "self_custodial" => {
-  if (isSelfCustodial) return "self_custodial"
-  return currency === WalletCurrency.Usd ? "usd" : "btc"
-}
-
 export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
@@ -78,43 +63,27 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
   const { hideAmount } = useHideAmount()
   const { alwaysHideBalance } = useHideBalanceSetting()
   const { isAppLocked } = useAuthenticationContext()
-  const { isSelfCustodial } = useActiveWallet()
   const { convertMoneyAmount } = usePriceConversion()
 
   const seenIds = useRef(new Set<string>())
   const splashHashes = useRef(new Set<string>())
   const foregroundSince = useRef(Date.now())
-  const shownAt = useRef(0)
-  const shownId = useRef<string | null>(null)
-  const amountRevealed = useRef(false)
 
   /** Read through a ref so `showSplash` keeps one identity for the subscription effects. */
   const gate = useRef({
     settings,
     balanceHidden: hideAmount || alwaysHideBalance,
     isAppLocked,
-    isSelfCustodial,
     convertMoneyAmount,
   })
   gate.current = {
     settings,
     balanceHidden: hideAmount || alwaysHideBalance,
     isAppLocked,
-    isSelfCustodial,
     convertMoneyAmount,
   }
 
-  const dismiss = useCallback((action: SplashCloseAction) => {
-    if (!shownId.current) return
-    shownId.current = null
-    logIncomingTransactionSplashClosed({
-      action,
-      timeOnScreenMs: Date.now() - shownAt.current,
-      optedOut: false,
-      amountRevealed: amountRevealed.current,
-    })
-    setShown(null)
-  }, [])
+  const dismiss = useCallback(() => setShown(null), [])
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (state) => {
@@ -124,13 +93,13 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
       }
       /** Background only: iOS goes "inactive" for a pulled-down notification centre or
        *  a biometric prompt, which should not dismiss it. */
-      if (state === "background") dismiss(SplashCloseAction.Background)
+      if (state === "background") dismiss()
     })
     return () => subscription.remove()
   }, [dismiss])
 
   useEffect(() => {
-    if (isAppLocked) dismiss(SplashCloseAction.Background)
+    if (isAppLocked) dismiss()
   }, [isAppLocked, dismiss])
 
   const toSats = useCallback((candidate: SplashCandidate): number | null => {
@@ -165,14 +134,8 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
         routeName,
         keyboardVisible: Keyboard.isVisible(),
         appLocked: current.isAppLocked,
-        overlayCovered: isOverlayCovered(),
       })
-
-      if (decision.outcome === "skip") return
-      if (decision.outcome === "suppress") {
-        logIncomingTransactionSplashSuppressed({ reason: decision.reason })
-        return
-      }
+      if (decision.outcome !== "show") return
 
       if (candidate.paymentHash) splashHashes.current.add(candidate.paymentHash)
       const next: ShownSplash = {
@@ -180,23 +143,6 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
         amountSats: decision.amountSats,
         amountHidden: current.balanceHidden,
       }
-      if (shownId.current && shownId.current !== next.transaction.id) {
-        logIncomingTransactionSplashReplaced({
-          secondsSincePrevious: Math.round((Date.now() - shownAt.current) / 1000),
-          route: routeName ?? "unknown",
-        })
-      }
-      shownId.current = next.transaction.id
-      shownAt.current = Date.now()
-      amountRevealed.current = false
-      logIncomingTransactionSplashShown({
-        route: routeName ?? "unknown",
-        wallet: walletLabel(current.isSelfCustodial, next.transaction.settlementCurrency),
-        paymentType: next.paymentType,
-        amountBucket: amountBucket(next.amountSats),
-        hasNote: Boolean(next.transaction.memo),
-        amountHidden: next.amountHidden,
-      })
       setShown(next)
     },
     [toSats],
@@ -205,7 +151,7 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
   const refresh = useCallback((candidate: SplashCandidate) => {
     setShown((current) =>
       current && current.transaction.id === candidate.transaction.id
-        ? { ...current, transaction: candidate.transaction }
+        ? { ...current, ...candidate }
         : current,
     )
   }, [])
@@ -216,25 +162,12 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
   )
 
   const close = useCallback(
-    ({ optedOut, action }: { optedOut: boolean; action: SplashCloseAction }) => {
+    ({ optedOut }: { optedOut: boolean }) => {
       if (optedOut) {
         settings.setEnabled(false)
         toastSplashSetting({ enabled: false, LL })
-        logIncomingTransactionSplashSettingChanged({
-          enabled: false,
-          minimumSats: settings.minSats,
-          source: "splash",
-        })
+        logIncomingTransactionSplashOptedOut({ source: "splash" })
       }
-      if (shownId.current) {
-        logIncomingTransactionSplashClosed({
-          action,
-          timeOnScreenMs: Date.now() - shownAt.current,
-          optedOut,
-          amountRevealed: amountRevealed.current,
-        })
-      }
-      shownId.current = null
       setShown(null)
     },
     [settings, LL],
@@ -242,10 +175,11 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
 
   const openDetails = useCallback(
     ({ optedOut }: { optedOut: boolean }) => {
-      const txid = shown?.transaction.id
-      const unclaimedDeposit = shown?.unclaimedDeposit === true
-      close({ optedOut, action: SplashCloseAction.Details })
-      if (!txid || !navigationRef.isReady()) return
+      if (!shown || shown.detailsPending) return
+      const txid = shown.transaction.id
+      const unclaimedDeposit = shown.unclaimedDeposit === true
+      close({ optedOut })
+      if (!navigationRef.isReady()) return
       if (unclaimedDeposit) {
         navigationRef.navigate("unclaimedDepositsScreen")
         return
@@ -254,10 +188,6 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
     },
     [close, shown],
   )
-
-  const onReveal = useCallback(() => {
-    amountRevealed.current = true
-  }, [])
 
   const value = useMemo(
     () => ({ showSplash, refresh, isSplashShownForHash }),
@@ -272,7 +202,6 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
           splash={shown}
           onClose={close}
           onDetails={openDetails}
-          onReveal={onReveal}
         />
       )}
     </IncomingTransactionSplashContext.Provider>

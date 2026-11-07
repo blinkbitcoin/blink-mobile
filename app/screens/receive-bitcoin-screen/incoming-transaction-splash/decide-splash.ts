@@ -38,7 +38,6 @@ type DecideInput = {
   routeName: string | undefined
   keyboardVisible: boolean
   appLocked: boolean
-  overlayCovered: boolean
 }
 
 /** Custodial on-chain is exempt: its createdAt is the server's mempool time, not the
@@ -65,7 +64,6 @@ export const decideSplash = ({
   routeName,
   keyboardVisible,
   appLocked,
-  overlayCovered,
 }: DecideInput): SplashDecision => {
   if (candidate.transaction.direction !== TxDirection.Receive) {
     return { outcome: "skip", reason: "outgoing" }
@@ -79,24 +77,8 @@ export const decideSplash = ({
   if (amountSats === null || amountSats < minSats) {
     return { outcome: "suppress", reason: SplashSuppressReason.BelowMinimum }
   }
-  if (
-    !routeName ||
-    !ALLOWED_ROUTES.has(routeName) ||
-    keyboardVisible ||
-    appLocked ||
-    overlayCovered
-  ) {
+  if (!routeName || !ALLOWED_ROUTES.has(routeName) || keyboardVisible || appLocked) {
     return { outcome: "suppress", reason: SplashSuppressReason.BlockedRoute }
   }
   return { outcome: "show", amountSats }
-}
-
-/** Coarse sats bands. The exact amount never leaves the device. */
-export const amountBucket = (amountSats: number): string => {
-  if (amountSats < 100) return "lt_100"
-  if (amountSats < 1_000) return "100_999"
-  if (amountSats < 10_000) return "1k_10k"
-  if (amountSats < 100_000) return "10k_100k"
-  if (amountSats < 1_000_000) return "100k_1m"
-  return "1m_plus"
 }
