@@ -5,6 +5,8 @@ import { Linking } from "react-native"
 
 import { TransactionDetailScreen } from "@app/screens/transaction-detail-screen/transaction-detail-screen"
 
+import { surfaceColor } from "../helpers/surface-color"
+
 jest.mock("@rn-vui/themed", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockThemedText(),
 )
@@ -213,6 +215,20 @@ describe("TransactionDetailScreen row icon actions", () => {
         LN_PAYMENT_REQUEST,
         TX_ID,
       ])
+    })
+  })
+
+  // A row with a copy or explorer icon is a press target, so it keeps the tappable
+  // grey5; a row with nothing to press takes the static grey7 (blink-wip#1871).
+  describe("row surface", () => {
+    it("keeps the copy rows grey5 and paints a row without icons grey7", () => {
+      const { getAllByTestId, getByText } = renderScreenWithTx(
+        broadcastedOnChainTx(ONCHAIN_TX_HASH),
+      )
+
+      expect(surfaceColor(getByText("some description"))).toBe("#f5f5f5")
+      expect(surfaceColor(getAllByTestId("copy-paste")[0])).toBe("#f5f5f5")
+      expect(surfaceColor(getByText("OnChain"))).toBe("#f9f9f9")
     })
   })
 })

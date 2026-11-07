@@ -2,6 +2,7 @@ import React from "react"
 import { Animated, Easing, Pressable, StyleProp, View, ViewStyle } from "react-native"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 type WarningCardProps = {
@@ -94,7 +95,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderColor: colors.warning,
   },
   static: {
-    backgroundColor: colors.grey7,
+    ...staticSurface(colors),
   },
   active: {
     backgroundColor: colors.grey5,

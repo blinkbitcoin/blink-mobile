@@ -7,6 +7,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 import { modalContentBleed, toastSideInset, toastTopOffset } from "./toast-frame"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 export type ToastType = "success" | "error" | "warning"
 
@@ -117,7 +118,7 @@ const useStyles = makeStyles(
       borderWidth: 1,
       borderRadius: 8,
       borderColor: accent,
-      backgroundColor: colors.grey7,
+      ...staticSurface(colors),
     },
     text: {
       // Always bold, via the Bold face itself and no fontWeight. Android resolves

@@ -5,6 +5,7 @@ import { makeStyles, Text } from "@rn-vui/themed"
 
 import { InfoRow } from "@app/components/card-screen/info-row"
 import { testProps } from "@app/utils/testProps"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 type BalancePairCardProps = {
   bitcoinLabel: string
@@ -62,7 +63,7 @@ export const BalancePairCard: React.FC<BalancePairCardProps> = ({
 const useStyles = makeStyles(({ colors }) => ({
   card: {
     width: "100%",
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderRadius: 8,
     paddingHorizontal: 14,
     paddingVertical: 10,

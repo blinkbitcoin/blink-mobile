@@ -7,6 +7,7 @@ import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { ActiveWalletStatus } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
 
@@ -35,7 +36,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 8,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderBottomWidth: 1,
     borderBottomColor: colors.grey4,
   },

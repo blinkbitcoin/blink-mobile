@@ -10,6 +10,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { toMajorUnit } from "@app/utils/helper"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 import { useCardData } from "../hooks/use-card-data"
 
@@ -196,7 +197,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   currentLimitsCard: {
     flexDirection: "row",
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderRadius: 8,
     minHeight: 80,
     paddingVertical: 18,

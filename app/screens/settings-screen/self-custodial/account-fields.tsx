@@ -9,6 +9,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
 import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { testProps } from "@app/utils/testProps"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 type FieldProps = {
   label: string
@@ -28,7 +29,7 @@ const ReadOnlyField: React.FC<FieldProps> = ({
   return (
     <View style={styles.fieldGroup}>
       <Text style={styles.label}>{label}</Text>
-      <View style={styles.box}>
+      <View style={[styles.box, !copyTestID && styles.boxStatic]}>
         <Text
           style={styles.value}
           numberOfLines={1}
@@ -146,6 +147,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 14,
     gap: 14,
   },
+  boxStatic: staticSurface(colors),
   value: {
     flex: 1,
     color: colors.black,
