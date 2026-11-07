@@ -4136,6 +4136,7 @@
         "get": "Baixar",
         "storeNote": "“Baixar” abre a App Store ou o Google Play. Volte ao Blink quando o aplicativo estiver instalado.",
         "haveAnApp": "Já tenho um aplicativo",
+        "learnHow": "Saiba como",
         "keyInstruction": "Copie esta chave de configuração para o seu aplicativo autenticador.",
         "qrInstruction": "Está usando outro dispositivo?\nEscaneie este código QR em vez disso.",
         "backupTitle": "Faça backup da sua chave",

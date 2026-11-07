@@ -4136,6 +4136,7 @@
     "get": "Obtén",
     "storeNote": "«Obtén» obre l'App Store o Google Play. Torna a Blink quan estigui instal·lada.",
     "haveAnApp": "Ja tinc una aplicació",
+    "learnHow": "Descobreix com",
     "keyInstruction": "Copia aquesta clau de configuració a la teva aplicació d'autenticació.",
     "qrInstruction": "Fas servir un altre dispositiu?\nEn comptes d'això, escaneja aquest codi QR.",
     "backupTitle": "Fes una còpia de seguretat de la clau",

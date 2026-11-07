@@ -4136,6 +4136,7 @@
     "get": "Unduh",
     "storeNote": "“Unduh” membuka App Store atau Google Play. Kembali ke Blink setelah aplikasi terpasang.",
     "haveAnApp": "Saya sudah punya aplikasi",
+    "learnHow": "Pelajari caranya",
     "keyInstruction": "Salin kunci penyiapan ini ke aplikasi authenticator Anda.",
     "qrInstruction": "Menggunakan perangkat lain?\nPindai kode QR ini sebagai gantinya.",
     "backupTitle": "Cadangkan kunci Anda",

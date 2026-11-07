@@ -4136,6 +4136,7 @@
         "get": "入手",
         "storeNote": "「入手」を押すとApp StoreまたはGoogle Playが開きます。インストールが終わったらBlinkに戻ってください。",
         "haveAnApp": "アプリを持っています",
+        "learnHow": "やり方を見る",
         "keyInstruction": "このセットアップキーを認証アプリにコピーしてください。",
         "qrInstruction": "別のデバイスを使っていますか？\n代わりにこのQRコードをスキャンしてください。",
         "backupTitle": "キーをバックアップ",

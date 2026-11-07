@@ -233,7 +233,10 @@ export type RootStackParamList = {
    *  every prompt's Set authenticator. */
   totpRegistrationIntro: TwoFactorFlowParams | undefined
   totpRegistrationApps: undefined
-  totpRegistrationInitiate: undefined
+  /** Opened from the settings, the setup key screen offers the onboarding as a
+   *  secondary action for a user new to authenticator apps; reached through the
+   *  onboarding, it does not offer it again. */
+  totpRegistrationInitiate: { offersOnboarding?: boolean } | undefined
   /** The setup key travels on to the backup, the only screens that ever show it, and
    *  goes with them once the flow is left. Neither route is deep-linkable, so the key
    *  cannot arrive from outside the app (asserted over DEEP_LINK_SCREENS). */
