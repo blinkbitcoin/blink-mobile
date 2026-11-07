@@ -428,6 +428,28 @@ describe("useTransactionSeenState", () => {
         expect(mockUpdateState).not.toHaveBeenCalled()
       })
 
+      /** Payment times are whole seconds; the record's start has milliseconds. */
+      it.each([
+        ["announces a payment in the second the record started", startedAt, true],
+        ["does not announce one from the second before", startedAt - 1, false],
+      ])("%s", (_label, createdAt, announced) => {
+        mockPersistentState = withRecord({
+          btcId: "",
+          usdId: "",
+          announceSinceMs: startedAtMs + 999,
+        })
+
+        const { result } = renderHook(() =>
+          useTransactionSeenState({
+            accountId,
+            isSelfCustodial: mockIsSelfCustodial,
+            transactions: [buildTx({ id: "same-second", createdAt })],
+          }),
+        )
+
+        expect(result.current.hasUnseenBtcTx).toBe(announced)
+      })
+
       it("keeps the start time when a transaction is marked seen", () => {
         mockPersistentState = withRecord({
           btcId: "",
