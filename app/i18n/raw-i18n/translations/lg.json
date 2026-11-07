@@ -2401,6 +2401,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Okuwaanyisa kulina okuweebwayo mu mempool",
     "amount": "Omuwendo",
+    "addAmount": "Yongerako omuwendo",
+    "lowFunds": "Ssente tezimala",
     "amountExceed": "Omuwendo gusukka bbalansi yo eya {balance: string}",
     "amountExceedsLimit": "Omuwendo gusukka ekkomo lyo erisigaddewo buli lunaku erya {limit: string}",
     "upgradeAccountToIncreaseLimit": "Yongesa omutindo gwa akawunti yo okwongera ku kkomo lyo",
@@ -2452,7 +2454,8 @@
     "sdkInsufficientFunds": "Ssente tezimala ku mulimu guno.",
     "sdkAmountTooLow": "Omuwendo guli wansi ennyo olw'okukola on-chain.",
     "sdkNetworkError": "Ensobi y'ennyonnyola. Kebera ennyonnyola yo oddemu okugezaako.",
-    "sdkGenericError": "Tesobola kusoma ssente z'obukozi. Gezaako omuwendo omulala."
+    "sdkGenericError": "Tesobola kusoma ssente z'obukozi. Gezaako omuwendo omulala.",
+    "onchainSelfPayment": "Eno ye ndagiriro ya wallet yo. Tosobola kwesindikira ssente ku on-chain."
   },
   "SettingsScreen": {
     "createAddress": "Kola endagiriro ya Lightning",
@@ -3112,6 +3115,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Teekawo omuwendo"
+  },
+  "Accessibility": {
+    "deleteKey": "Sazaamu",
+    "swapCurrencyHint": "Kyusa ensimbi z'owandiikamu omuwendo",
+    "switchToWallet": "Kyusa ku {wallet: string}",
+    "copy": "Koppa"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Nneetaaga okukyuusa app yange okutuuka ku nkyusa eyasembyeyo. Ndi mukozesa {os: string} eya app n'e nkyusa eya {version: string}.",

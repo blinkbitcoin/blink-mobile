@@ -2401,6 +2401,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transakciu je potrebné odoslať do mempoolu",
     "amount": "Suma",
+    "addAmount": "Pridať sumu",
+    "lowFunds": "Nedostatok prostriedkov",
     "amountExceed": "Suma prekračuje váš zostatok vo výške {balance: string}",
     "amountExceedsLimit": "Suma prekračuje váš zostávajúci denný limit {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgradujte si účet a zvýšte svoj limit",
@@ -2452,7 +2454,8 @@
     "sdkInsufficientFunds": "Nedostatok prostriedkov pre túto transakciu.",
     "sdkAmountTooLow": "Suma je príliš nízka pre on-chain transakciu.",
     "sdkNetworkError": "Chyba siete. Skontrolujte pripojenie a skúste to znova.",
-    "sdkGenericError": "Nie je možné odhadnúť poplatky. Skúste inú sumu."
+    "sdkGenericError": "Nie je možné odhadnúť poplatky. Skúste inú sumu.",
+    "onchainSelfPayment": "Toto je adresa vašej vlastnej peňaženky. Nemôžete poslať on-chain platbu sami sebe."
   },
   "SettingsScreen": {
     "createAddress": "Vytvoriť Lightning adresu",
@@ -3112,6 +3115,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Nastaviť sumu"
+  },
+  "Accessibility": {
+    "deleteKey": "Vymazať",
+    "swapCurrencyHint": "Prepne menu, v ktorej zadávate sumu",
+    "switchToWallet": "Prepnúť na {wallet: string}",
+    "copy": "Kopírovať"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Potrebujem aktualizovať aplikáciu na najnovšiu verziu. Používam aplikáciu {os: string} s verziou {version: string}.",

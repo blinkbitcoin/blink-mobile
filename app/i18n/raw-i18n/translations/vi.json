@@ -2401,6 +2401,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Giao dịch sẽ được gửi vào mempool",
     "amount": "Số tiền",
+    "addAmount": "Thêm số tiền",
+    "lowFunds": "Không đủ số dư",
     "amountExceed": "Số tiền vượt quá số dư {balance: string} của bạn",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
@@ -2452,7 +2454,8 @@
     "sdkInsufficientFunds": "Không đủ số dư cho giao dịch này.",
     "sdkAmountTooLow": "Số tiền quá thấp cho giao dịch on-chain.",
     "sdkNetworkError": "Lỗi mạng. Vui lòng kiểm tra kết nối và thử lại.",
-    "sdkGenericError": "Không thể ước tính phí. Vui lòng thử số tiền khác."
+    "sdkGenericError": "Không thể ước tính phí. Vui lòng thử số tiền khác.",
+    "onchainSelfPayment": "Đây là địa chỉ ví của chính bạn. Bạn không thể gửi thanh toán on-chain cho chính mình."
   },
   "SettingsScreen": {
     "createAddress": "Tạo địa chỉ Lightning",
@@ -3112,6 +3115,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
+  },
+  "Accessibility": {
+    "deleteKey": "Xóa",
+    "swapCurrencyHint": "Chuyển đơn vị tiền tệ bạn dùng để nhập số tiền",
+    "switchToWallet": "Chuyển sang {wallet: string}",
+    "copy": "Sao chép"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",
