@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { BackHandler } from "react-native"
+import { useFocusEffect } from "@react-navigation/native"
 
 import { Screen } from "@app/components/screen"
 
@@ -95,8 +96,9 @@ const BusyStateProgress: React.FC<BusyStateProgressProps> = ({
  *
  * **The route must set `headerShown: false` and `gestureEnabled: false`.**
  * `Screen`'s own `headerShown` only drives the safe-area insets. Android's
- * hardware back is handled here: swallowed while busy, and routed to
- * `onBack` (else `onClose`) on error, so both platforms behave the same.
+ * hardware back is handled here while the route is focused: swallowed while
+ * busy, and routed to `onBack` (else `onClose`) on error, so both platforms
+ * behave the same. It must render inside a navigator.
  *
  * **The caller must keep this mounted until `onDone` fires.** Rendering it as
  * `{loading && <BusyStateScreen … />}` defeats the whole point: the component
@@ -131,14 +133,18 @@ export const BusyStateScreen: React.FC<BusyStateScreenProps> = ({
 
   const onHardwareBack = error?.onBack ?? error?.onClose
 
-  useEffect(() => {
-    const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
-      onHardwareBack?.()
-      return true
-    })
+  // Scoped to focus, not mount: a native stack keeps a covered route mounted,
+  // and its handler would otherwise take the press from the route on top.
+  useFocusEffect(
+    useCallback(() => {
+      const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+        onHardwareBack?.()
+        return true
+      })
 
-    return () => subscription.remove()
-  }, [onHardwareBack])
+      return () => subscription.remove()
+    }, [onHardwareBack]),
+  )
 
   return (
     <Screen preset="fixed" headerShown={false}>
