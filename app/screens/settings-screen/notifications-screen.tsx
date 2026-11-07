@@ -18,7 +18,10 @@ import { ListItem, makeStyles, Text } from "@rn-vui/themed"
 import { Screen } from "@app/components/screen"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { Switch } from "@app/components/atomic/switch"
-import { useSplashSettings } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash"
+import {
+  toastSplashSetting,
+  useSplashSettings,
+} from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash"
 import { logIncomingTransactionSplashSettingChanged } from "@app/utils/analytics"
 import { SettingsGroup } from "./group"
 
@@ -235,7 +238,7 @@ export const NotificationSettingsScreen: React.FC = () => {
     <Screen style={styles.container} preset="scroll">
       <SettingsGroup items={pushNotificationSettings} />
       <SettingsGroup
-        name={LL.NotificationSettingsScreen.inApp()}
+        name={LL.NotificationSettingsScreen.splashGroup()}
         items={[SplashToggleRow, SplashMinimumRow]}
       />
     </Screen>
@@ -261,6 +264,7 @@ const SplashToggleRow: React.FC = () => {
         value={enabled}
         onValueChange={(value) => {
           setEnabled(value)
+          toastSplashSetting({ enabled: value, LL })
           logIncomingTransactionSplashSettingChanged({
             enabled: value,
             minimumSats: minSats,
@@ -292,6 +296,8 @@ const SplashMinimumRow: React.FC = () => {
     setDraft(String(minSats))
   }
 
+  if (!enabled) return null
+
   return (
     <ListItem containerStyle={styles.listItemContainer}>
       <ListItem.Content>
@@ -316,6 +322,7 @@ const useStyles = makeStyles(({ colors }) => ({
   container: {
     paddingHorizontal: 12,
     paddingVertical: 20,
+    gap: 20,
   },
   listItemContainer: {
     backgroundColor: colors.transparent,

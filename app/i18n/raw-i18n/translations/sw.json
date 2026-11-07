@@ -2537,18 +2537,20 @@
         "description": "Arifa kuhusu bei ya Bitcoin."
       }
     },
-    "inApp": "Ndani ya programu",
+    "splashGroup": "Skrini ya muamala unaoingia",
     "incomingTransactionSplash": "Skrini ya muamala unaoingia",
-    "splashMinimum": "Kiasi cha chini (sats)"
+    "splashMinimum": "Kiasi cha chini (SAT)"
   },
   "IncomingTransactionSplash": {
     "youReceived": "Umepokea",
     "note": "Dokezo",
-    "dontShowAgain": "Usionyeshe skrini hii tena.",
+    "dontShowAgain": "Usionyeshe hii tena",
     "details": "Maelezo",
     "announcement": "Imepokelewa {amount}",
     "tapToShow": "Bonyeza kuonyesha",
-    "announcementHidden": "Malipo yamepokelewa"
+    "announcementHidden": "Malipo yamepokelewa",
+    "toastOn": "Skrini ya arifa imewashwa",
+    "toastOff": "Skrini ya arifa imezimwa"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Akaunti yako ina zaidi ya $5",

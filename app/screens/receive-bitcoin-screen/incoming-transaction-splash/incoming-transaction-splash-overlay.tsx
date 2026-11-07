@@ -449,6 +449,7 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
               color={colors._white}
               checkColor={colors._green}
               centered
+              singleLine
               testID="incoming-transaction-splash-opt-out"
             />
           </View>
@@ -548,6 +549,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   checkboxRow: {
     paddingVertical: 20,
+    paddingHorizontal: 20,
     alignItems: "center",
   },
   buttonGroup: {

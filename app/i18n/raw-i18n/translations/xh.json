@@ -2537,18 +2537,20 @@
         "description": "Izaziso malunga nexabiso le-Bitcoin."
       }
     },
-    "inApp": "Kwiprogram",
+    "splashGroup": "Isikrini sentengiselwano engenayo",
     "incomingTransactionSplash": "Isikrini sentengiselwano engenayo",
-    "splashMinimum": "Eyona mali incinci (sats)"
+    "splashMinimum": "Eyona mali incinci (SAT)"
   },
   "IncomingTransactionSplash": {
     "youReceived": "Ufumene",
     "note": "Inqaku",
-    "dontShowAgain": "Ungaphindi ubonise le skrini.",
+    "dontShowAgain": "Ungaphindi ukubonise oku",
     "details": "Iinkcukacha",
     "announcement": "Ufumene {amount}",
     "tapToShow": "Cofa ukuze ubonise",
-    "announcementHidden": "Intlawulo ifunyenwe"
+    "announcementHidden": "Intlawulo ifunyenwe",
+    "toastOn": "Isikrini sivuliwe",
+    "toastOff": "Isikrini sivaliwe"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "I-akhawunti yakho inangaphezulu kwe-$5",

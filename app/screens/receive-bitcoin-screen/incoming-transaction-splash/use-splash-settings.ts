@@ -1,7 +1,9 @@
 import { useCallback } from "react"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { usePersistentStateContext } from "@app/store/persistent-state"
+import { toastShow } from "@app/utils/toast"
 
 type SplashSettings = {
   enabled: boolean
@@ -42,3 +44,20 @@ export const useSplashSettings = (): SplashSettings => {
     setMinSats,
   }
 }
+
+/** Confirms an on/off change, from Settings or the splash's opt-out. */
+export const toastSplashSetting = ({
+  enabled,
+  LL,
+}: {
+  enabled: boolean
+  LL: TranslationFunctions
+}) =>
+  toastShow({
+    type: "success",
+    message: (translations) =>
+      enabled
+        ? translations.IncomingTransactionSplash.toastOn()
+        : translations.IncomingTransactionSplash.toastOff(),
+    LL,
+  })

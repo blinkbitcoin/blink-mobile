@@ -2537,18 +2537,20 @@
                 "description": "Notificações sobre o preço do Bitcoin"
             }
         },
-        "inApp": "No app",
+        "splashGroup": "Tela de transação recebida",
         "incomingTransactionSplash": "Tela de transação recebida",
-        "splashMinimum": "Valor mínimo (sats)"
+        "splashMinimum": "Valor mínimo (SAT)"
     },
     "IncomingTransactionSplash": {
         "youReceived": "Você recebeu",
         "note": "Nota",
-        "dontShowAgain": "Não mostrar esta tela novamente.",
+        "dontShowAgain": "Não mostrar novamente",
         "details": "Detalhes",
         "announcement": "Recebido {amount}",
         "tapToShow": "Toque para mostrar",
-        "announcementHidden": "Pagamento recebido"
+        "announcementHidden": "Pagamento recebido",
+        "toastOn": "Tela de aviso ativada",
+        "toastOff": "Tela de aviso desativada"
     },
     "AccountScreen": {
         "fundsMoreThan5Dollars": "Sua conta possui mais de $5",
