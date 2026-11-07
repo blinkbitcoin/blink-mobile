@@ -254,14 +254,14 @@ Not a `strokeDashoffset` animation: in react-native-svg that goes through
 
 ## 6. Behaving the same on iOS and Android
 
-| Concern                        | How it is made identical                                                                                                                                                                      |
-| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| "Emerging from behind" z-order | Pinned with explicit `zIndex` (connector 0, `icon2` 1, `icon1` 2), not sibling order. No chip has a shadow or `elevation`, which on Android would override `zIndex`.                          |
-| Header                         | Route sets `headerShown: false` (§3).                                                                                                                                                         |
-| Leaving mid-work               | iOS: route sets `gestureEnabled: false`. Android: the component registers a `BackHandler` that swallows hardware back while busy, and on error calls `onBack`, else `onClose`, else swallows. |
-| Decorative pictogram           | Both `accessibilityElementsHidden` (iOS) and `importantForAccessibility="no-hide-descendants"` (Android).                                                                                     |
-| Error announcement             | `AccessibilityInfo.announceForAccessibility` on both; `accessibilityRole="alert"` alone is not spoken by VoiceOver.                                                                           |
-| Dash rendering                 | SVG line, not a `borderStyle: "dashed"` view — RN draws dashed borders differently on each platform.                                                                                          |
+| Concern                        | How it is made identical                                                                                                                                                                                                                                             |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| "Emerging from behind" z-order | Pinned with explicit `zIndex` (connector 0, `icon2` 1, `icon1` 2), not sibling order. No chip has a shadow or `elevation`, which on Android would override `zIndex`.                                                                                                 |
+| Header                         | Route sets `headerShown: false` (§3).                                                                                                                                                                                                                                |
+| Leaving mid-work               | iOS: route sets `gestureEnabled: false`. Android: while its route is focused, the component registers a `BackHandler` that swallows hardware back while busy, and on error calls `onBack`, else `onClose`, else swallows. A route pushed on top gets the press back. |
+| Decorative pictogram           | Both `accessibilityElementsHidden` (iOS) and `importantForAccessibility="no-hide-descendants"` (Android).                                                                                                                                                            |
+| Error announcement             | `AccessibilityInfo.announceForAccessibility` on both; `accessibilityRole="alert"` alone is not spoken by VoiceOver.                                                                                                                                                  |
+| Dash rendering                 | SVG line, not a `borderStyle: "dashed"` view — RN draws dashed borders differently on each platform.                                                                                                                                                                 |
 
 ---
 
@@ -315,7 +315,11 @@ app/components/busy-state/
   busy-state-error.tsx       error state: alert chip + buttons
   busy-state-screen.tsx      screen chrome, completion lifecycle, hardware back
 app/assets/icons-redesign/alert.svg   error glyph, registered as GaloyIcon "alert"
-__tests__/components/busy-state-screen.spec.tsx
+__tests__/components/
+  busy-state-screen.spec.tsx         lifecycle, error state, what hardware back does
+  busy-state-screen.stack.spec.tsx   on a real stack: back follows focus, not mount
+  busy-state-animation.spec.tsx      entrance, march and connector geometry, with motion and reduced
+  busy-state-alert-glyph.spec.ts     the alert glyph comes out of the SVG transform tintable
 ```
 
 ---

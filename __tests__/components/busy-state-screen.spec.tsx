@@ -25,6 +25,13 @@ jest.mock("react-native-reanimated", () => ({
   cancelAnimation: jest.fn(),
 }))
 
+// No navigator here: focus is mount. The sibling `.stack.spec` covers blur.
+jest.mock("@react-navigation/native", () => ({
+  ...jest.requireActual("@react-navigation/native"),
+  useFocusEffect: (callback: () => void | (() => void)) =>
+    jest.requireActual<typeof import("react")>("react").useEffect(callback, [callback]),
+}))
+
 jest.mock("react-native-svg", () => ({
   __esModule: true,
   default: ({ children }: { children?: React.ReactNode }) => children ?? null,
@@ -305,6 +312,28 @@ describe("BusyStateScreen", () => {
 
       expect(listeners[listeners.length - 1]()).toBe(true)
       expect(onBack).toHaveBeenCalledTimes(1)
+    })
+
+    it("falls back to onClose on an error without onBack", () => {
+      const listeners: Array<() => boolean | null | undefined> = []
+      jest
+        .spyOn(BackHandler, "addEventListener")
+        .mockImplementation((_event, handler) => {
+          listeners.push(handler)
+          return { remove: () => listeners.splice(listeners.indexOf(handler), 1) }
+        })
+
+      const onClose = jest.fn()
+      render(
+        screenFor({
+          completion: { kind: "pending", done: false },
+          onDone: jest.fn(),
+          error: { title: "Failed", onRetry: jest.fn(), onClose },
+        }),
+      )
+
+      expect(listeners[listeners.length - 1]()).toBe(true)
+      expect(onClose).toHaveBeenCalledTimes(1)
     })
   })
 })
