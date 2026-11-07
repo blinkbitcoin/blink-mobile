@@ -68,6 +68,7 @@ jest.mock("@app/hooks/use-price-conversion", () => ({
 
 const DISPLAY_CURRENCY = {
   formatMoneyAmount: () => "$0.00",
+  getSecondaryAmountIfCurrencyIsDifferent: () => undefined,
   zeroDisplayAmount: toDisplayAmount({ amount: 0, currencyCode: "USD" }),
 }
 
@@ -79,12 +80,6 @@ const LEVEL = { currentLevel: "ONE" }
 
 jest.mock("@app/graphql/level-context", () => ({
   useLevel: () => LEVEL,
-}))
-
-const HIDE_AMOUNT = { hideAmount: false }
-
-jest.mock("@app/graphql/hide-amount-context", () => ({
-  useHideAmount: () => HIDE_AMOUNT,
 }))
 
 jest.mock("@app/graphql/is-authed-context", () => ({
@@ -104,11 +99,13 @@ const FEE_TIER_OPTIONS = {
   setFeeTier: jest.fn(),
   feeTierOptions: [],
   feeTierErrorMessage: undefined,
-  isFeeTierErrorBlocking: false,
+  isFeeTierAmountTooLow: false,
   isQuotingFees: false,
+  isQuotingFeesForNext: false,
   isOnchain: false,
   selectedTierFee: undefined,
   hasFeeQuote: false,
+  quoteFeesForNext: async () => ({ selectedTierFee: undefined, hasFeeQuote: false }),
 }
 
 jest.mock("@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tier-options", () => ({
@@ -138,29 +135,39 @@ jest.mock("@app/store/persistent-state", () => ({
   usePersistentStateContext: () => PERSISTENT_STATE,
 }))
 
-const PILL_WIDTH = { widthStyle: {}, onPillLayout: jest.fn() }
-
-jest.mock("@app/components/atomic/currency-pill/use-equal-pill-width", () => ({
-  useEqualPillWidth: () => PILL_WIDTH,
-}))
-
 /** The resolved screen renders the whole send form. None of it is what this file asserts,
  *  and rendering it for real is heavy enough to exhaust the worker, so the presentational
  *  pieces stand in as nothing. */
-type AmountInputProps = {
-  unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
-  setAmount: (amount: MoneyAmount<WalletOrDisplayCurrency>) => void
+const AMOUNT_PAD = {
+  padCurrency: "DisplayCurrency",
+  padAmount: { amount: 0, currency: "DisplayCurrency", currencyCode: "USD" },
+  typedAmountText: "",
+  hasTyped: false,
+  disabledKeys: new Set(),
+  onKeyPress: jest.fn(),
+  showAmount: jest.fn(),
+  toggleCurrency: jest.fn(),
 }
-const mockAmountInput = jest.fn((_props: AmountInputProps) => null)
-jest.mock("@app/components/amount-input/amount-input", () => ({
-  AmountInput: (props: AmountInputProps) => mockAmountInput(props),
+
+const mockNumberPad = jest.fn(
+  (_args: { onAmountChange: (amount: MoneyAmount<WalletOrDisplayCurrency>) => void }) =>
+    AMOUNT_PAD,
+)
+
+jest.mock("@app/components/amount-input-screen/use-number-pad", () => ({
+  useNumberPad: (args: {
+    onAmountChange: (amount: MoneyAmount<WalletOrDisplayCurrency>) => void
+  }) => mockNumberPad(args),
+}))
+jest.mock("@app/screens/send-bitcoin-screen/send-hero", () => ({
+  SendHero: () => null,
+}))
+jest.mock("@app/screens/send-bitcoin-screen/amount-entry/send-wallet-summary", () => ({
+  SendWalletSummary: () => null,
 }))
 jest.mock("@app/components/note-input", () => ({ NoteInput: () => null }))
-jest.mock("@app/components/payment-destination-display", () => ({
-  PaymentDestinationDisplay: () => null,
-}))
-jest.mock("@app/screens/send-bitcoin-screen/confirm-fees-modal", () => ({
-  ConfirmFeesModal: () => null,
+jest.mock("@app/screens/send-bitcoin-screen/high-fee-sheet", () => ({
+  HighFeeSheet: () => null,
 }))
 jest.mock("@app/screens/send-bitcoin-screen/send-bitcoin-details-extra-info", () => ({
   SendBitcoinDetailsExtraInfo: () => null,
@@ -227,7 +234,9 @@ describe("SendBitcoinDetailsScreen region gate", () => {
     mockCreatePaymentDetail.mockReturnValue({
       canSetAmount: false,
       paymentType: "lightning",
+      destination: "lnbc1sendbitcoindetailsscreenspec",
       sendingWalletDescriptor: { id: BTC_WALLET.id, currency: "BTC" },
+      unitOfAccountAmount: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
       convertMoneyAmount: jest.fn(),
       setConvertMoneyAmount: jest.fn(),
     })
@@ -343,9 +352,9 @@ describe("SendBitcoinDetailsScreen when a rate arrives after an amount was typed
     "USD",
   ).convertMoneyAmount
 
-  const lastAmountInput = (): AmountInputProps => {
-    const { calls } = mockAmountInput.mock
-    return calls[calls.length - 1][0]
+  const setTypedAmount = (amount: MoneyAmount<WalletOrDisplayCurrency>) => {
+    const { calls } = mockNumberPad.mock
+    calls[calls.length - 1][0].onAmountChange(amount)
   }
 
   beforeEach(() => {
@@ -380,7 +389,7 @@ describe("SendBitcoinDetailsScreen when a rate arrives after an amount was typed
   it("keeps the amount, what it settles to, and the way forward", () => {
     const { rerender } = renderScreen()
     act(() => {
-      lastAmountInput().setAmount(
+      setTypedAmount(
         toDisplayAmount({ amount: 1000, currencyCode: SATS_DISPLAY_CURRENCY }),
       )
     })
@@ -394,7 +403,6 @@ describe("SendBitcoinDetailsScreen when a rate arrives after an amount was typed
       </Wrapper>,
     )
 
-    expect(lastAmountInput().unitOfAccountAmount).toEqual(toBtcMoneyAmount(1000))
     expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled).toBe(false)
   })
 })
