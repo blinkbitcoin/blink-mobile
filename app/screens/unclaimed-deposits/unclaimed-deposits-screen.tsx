@@ -10,6 +10,7 @@ import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import { FeeTierOption } from "@app/types/fee-tiers"
 import { DepositStatus } from "@app/types/payment"
 import { testProps } from "@app/utils/testProps"
 import { fonts } from "@app/rne-theme/fonts"
@@ -18,7 +19,6 @@ import {
   buildFeeTierOptions,
   feeTierLabels,
 } from "../send-bitcoin-screen/fee-tier-options"
-import { FeeTierOption } from "../send-bitcoin-screen/hooks/fee-tiers.types"
 
 import { DepositErrorMessage } from "./deposit-error-message"
 import { useDepositActions } from "./hooks/use-deposit-actions"

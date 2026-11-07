@@ -7,14 +7,14 @@ import {
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { extractOnchainFees, prepareSend } from "@app/self-custodial/bridge"
-import { FEE_TIER_ETA_MINUTES } from "@app/types/payment"
-
 import {
   buildZeroTiers,
   FeeTierOption,
   FeeUnit,
   type FeeTierInfo,
-} from "./fee-tiers.types"
+} from "@app/types/fee-tiers"
+import { FEE_TIER_ETA_MINUTES } from "@app/types/payment"
+
 import { useQuoteStatus } from "./use-quote-status"
 
 export const ETA_MINUTES: Record<FeeTierOption, number> = FEE_TIER_ETA_MINUTES
