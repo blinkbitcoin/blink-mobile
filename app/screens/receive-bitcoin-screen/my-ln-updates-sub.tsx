@@ -5,7 +5,8 @@ import { HomeAuthedDocument, useMyLnUpdatesSubscription } from "@app/graphql/gen
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { LnUpdateHashPaidProvider } from "@app/graphql/ln-update-context"
 
-import { useIncomingTransactionSplash } from "./incoming-transaction-splash/incoming-transaction-splash-provider"
+import { useIncomingTransactionSplash } from "./incoming-transaction-splash/incoming-transaction-splash-context"
+import { SPLASH_SETTLE_MS } from "./incoming-transaction-splash/types"
 import { candidateFromUpdate } from "./incoming-transaction-splash/update-to-candidate"
 
 gql`
@@ -53,11 +54,16 @@ export const MyLnUpdateSub = ({ children }: PropsWithChildren) => {
     if (!update) return
 
     const candidate = candidateFromUpdate(update)
+    const splashShown = candidate ? showSplash(candidate) : false
     if (update.__typename === "LnUpdate" && update.status === "PAID") {
-      client.refetchQueries({ include: [HomeAuthedDocument] })
+      /** Home is under the splash until it is closed. Its refetch landing mid-entrance
+       *  re-renders Home on the JS thread just as the impact's haptic and badge are due,
+       *  and a slow phone plays them late: it waits for the entrance to finish. */
+      const refetchHome = () => client.refetchQueries({ include: [HomeAuthedDocument] })
+      if (splashShown) setTimeout(refetchHome, SPLASH_SETTLE_MS)
+      else refetchHome()
       if (candidate?.paymentHash) setLastHash(candidate.paymentHash)
     }
-    if (candidate) showSplash(candidate)
   }, [dataSub, client, showSplash])
 
   return <LnUpdateHashPaidProvider value={lastHash}>{children}</LnUpdateHashPaidProvider>
