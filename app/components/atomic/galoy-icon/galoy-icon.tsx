@@ -324,8 +324,10 @@ export const GaloyIcon = ({
   } = useTheme()
 
   const resolvedSize =
-    size ?? (sizeVariant ? ICON_SIZES[sizeVariant] : undefined) ?? Math.max(width, height)
-  const resolvedColor = color || colors.black
+    size ??
+    (sizeVariant ? ICON_SIZES[sizeVariant] : undefined) ??
+    Math.max(width ?? 0, height ?? 0)
+  const resolvedColor = color || colors.textOnBackground
 
   const styles = useStyles({
     backgroundColor,

@@ -24,15 +24,15 @@ export const GaloyCurrencyBubble = ({
     <GaloyIcon
       name="bitcoin"
       size={iconSize}
-      color={highlighted ? colors.white : colors._white}
-      backgroundColor={highlighted ? colors.primary : colors.grey3}
+      color={highlighted ? colors.backgroundDefault : colors.staticWhite}
+      backgroundColor={highlighted ? colors.accent : colors.textDisabled}
     />
   ) : (
     <GaloyIcon
       name="dollar"
       size={iconSize}
-      color={colors._white}
-      backgroundColor={highlighted ? colors._green : colors.grey3}
+      color={colors.staticWhite}
+      backgroundColor={highlighted ? colors.staticSuccess : colors.textDisabled}
     />
   )
 }
