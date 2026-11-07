@@ -7898,6 +7898,11 @@ type RootTranslation = {
 		 */
 		keysGroupTitle: string
 		/**
+		 * I​n​a​c​t​i​v​e​ ​k​e​y​s​ ​(​{​c​o​u​n​t​}​)
+		 * @param {number} count
+		 */
+		inactiveKeys: RequiredParams<'count'>
+		/**
 		 * N​o​ ​A​P​I​ ​k​e​y​s​ ​y​e​t
 		 */
 		noKeys: string
@@ -8004,6 +8009,10 @@ type RootTranslation = {
 		 * R​e​v​o​k​e
 		 */
 		revoke: string
+		/**
+		 * G​o​ ​b​a​c​k
+		 */
+		revokeGoBack: string
 		/**
 		 * A​P​I​ ​k​e​y​ ​r​e​v​o​k​e​d
 		 */
@@ -22190,6 +22199,10 @@ export type TranslationFunctions = {
 		 */
 		keysGroupTitle: () => LocalizedString
 		/**
+		 * Inactive keys ({count})
+		 */
+		inactiveKeys: (arg: { count: number }) => LocalizedString
+		/**
 		 * No API keys yet
 		 */
 		noKeys: () => LocalizedString
@@ -22293,6 +22306,10 @@ export type TranslationFunctions = {
 		 * Revoke
 		 */
 		revoke: () => LocalizedString
+		/**
+		 * Go back
+		 */
+		revokeGoBack: () => LocalizedString
 		/**
 		 * API key revoked
 		 */

@@ -44,6 +44,12 @@ describe("SwitchRow", () => {
   })
 
   describe("rendering", () => {
+    it("pads 14 above and below, as the design system row does", () => {
+      const { toJSON } = renderWithTheme(<SwitchRow {...defaultProps} />)
+
+      expect(JSON.stringify(toJSON())).toContain('"paddingVertical":14')
+    })
+
     it("renders without crashing", () => {
       const { toJSON } = renderWithTheme(<SwitchRow {...defaultProps} />)
       expect(toJSON()).toBeTruthy()

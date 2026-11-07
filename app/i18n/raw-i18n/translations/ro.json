@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Chei API",
+    "inactiveKeys": "Chei inactive ({count})",
     "noKeys": "Încă nu există chei API",
     "createKey": "Creează cheie API",
     "createTitle": "Cheie API nouă",
@@ -27,6 +28,7 @@
     "revokeTitle": "Revoci cheia API?",
     "revokeBody": "\"{name: string}\" va înceta imediat să funcționeze. Această acțiune nu poate fi anulată.",
     "revoke": "Revocă",
+    "revokeGoBack": "Înapoi",
     "revokeSuccess": "Cheie API revocată",
     "createError": "Cheia API nu a putut fi creată. Încearcă din nou.",
     "revokeError": "Cheia API nu a putut fi revocată. Încearcă din nou.",

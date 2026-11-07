@@ -35,7 +35,7 @@ export const SwitchRow: React.FC<SwitchRowProps> = ({
 const useStyles = makeStyles(({ colors }) => ({
   listItemContainer: {
     backgroundColor: colors.transparent,
-    paddingVertical: 8,
+    paddingVertical: 14,
     paddingLeft: 14,
     paddingRight: 10,
     minHeight: 0,

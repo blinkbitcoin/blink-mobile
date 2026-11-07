@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Κλειδιά API",
+    "inactiveKeys": "Ανενεργά κλειδιά ({count})",
     "noKeys": "Δεν υπάρχουν ακόμη κλειδιά API",
     "createKey": "Δημιουργία κλειδιού API",
     "createTitle": "Νέο κλειδί API",
@@ -27,6 +28,7 @@
     "revokeTitle": "Ανάκληση κλειδιού API;",
     "revokeBody": "Το \"{name: string}\" θα σταματήσει να λειτουργεί αμέσως. Αυτό δεν μπορεί να αναιρεθεί.",
     "revoke": "Ανάκληση",
+    "revokeGoBack": "Πίσω",
     "revokeSuccess": "Το κλειδί API ανακλήθηκε",
     "createError": "Δεν ήταν δυνατή η δημιουργία του κλειδιού API. Προσπαθήστε ξανά.",
     "revokeError": "Δεν ήταν δυνατή η ανάκληση του κλειδιού API. Προσπαθήστε ξανά.",

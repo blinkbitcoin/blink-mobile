@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Kunci API",
+    "inactiveKeys": "Kunci tidak aktif ({count})",
     "noKeys": "Belum ada kunci API",
     "createKey": "Buat kunci API",
     "createTitle": "Kunci API baru",
@@ -27,6 +28,7 @@
     "revokeTitle": "Cabut kunci API?",
     "revokeBody": "\"{name: string}\" akan langsung berhenti berfungsi. Tindakan ini tidak dapat dibatalkan.",
     "revoke": "Cabut",
+    "revokeGoBack": "Kembali",
     "revokeSuccess": "Kunci API dicabut",
     "createError": "Tidak dapat membuat kunci API. Silakan coba lagi.",
     "revokeError": "Tidak dapat mencabut kunci API. Silakan coba lagi.",
