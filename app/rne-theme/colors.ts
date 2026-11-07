@@ -29,12 +29,12 @@ const light = {
 
   grey0: "#3A3C51", // grey1
   grey1: "#393939", // grey3
-  grey2: "#9292A0", // grey4
+  grey2: "#8C8C97", // grey4
   grey3: "#AEAEB8", // grey5
   grey4: "#E2E2E4", // grey8-ish
   grey5: "#F2F2F4", // grey9-ish
   grey6: "#E7E7E7", // grey6-ish
-  grey7: "#F9F9F9", // static card surface
+  grey7: "#F7F7F7", // static card surface
 
   loaderForeground: "#ecebeb",
   loaderBackground: "#f3f3f3",
@@ -88,7 +88,7 @@ const dark = {
   grey4: "#393939", // grey8
   grey5: "#1d1d1d", // after grey9
   grey6: "#2B2B2B", // grey6
-  grey7: "#0F0F0F", // static card surface
+  grey7: "#121212", // static card surface
 
   loaderBackground: "#131313",
   loaderForeground: "#3c3b3b",

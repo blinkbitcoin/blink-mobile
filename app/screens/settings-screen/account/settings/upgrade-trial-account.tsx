@@ -9,7 +9,6 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import { AccountLevel, useLevel } from "@app/graphql/level-context"
-import { staticSurface } from "@app/rne-theme/surfaces"
 
 import { useShowWarningSecureAccount } from "../show-warning-secure-account-hook"
 
@@ -71,7 +70,7 @@ export const UpgradeTrialAccount: React.FC = () => {
 const useStyles = makeStyles(({ colors }) => ({
   container: {
     borderRadius: 20,
-    ...staticSurface(colors),
+    backgroundColor: colors.grey5,
     padding: 16,
     display: "flex",
     flexDirection: "column",
