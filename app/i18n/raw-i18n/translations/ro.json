@@ -2543,12 +2543,14 @@
   },
   "IncomingTransactionSplash": {
     "youReceived": "Ai primit",
+    "pendingOnchain": "Onchain în așteptare",
     "note": "Notă",
     "dontShowAgain": "Nu mai arăta asta",
     "details": "Detalii",
     "announcement": "Primit {amount}",
     "tapToShow": "Atingeți pentru a afișa",
     "announcementHidden": "Plată primită",
+    "announcementPending": "Onchain în așteptare, {amount}",
     "toastOn": "Ecranul de notificare e activat",
     "toastOff": "Ecranul de notificare e dezactivat"
   },

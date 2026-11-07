@@ -10,8 +10,9 @@ const paymentHashOf = (transaction: UpdateTransaction): string | undefined => {
   return undefined
 }
 
-/** LnUpdate PAID, IntraLedgerReceipt, and OnchainReceipt only. Pending on-chain and
- *  outgoing intraledger updates are not a splash. */
+/** LnUpdate PAID, IntraLedgerReceipt, and OnchainReceiptPending only. On-chain gets its
+ *  one splash when it is detected, so the confirmed OnchainReceipt that follows is not a
+ *  splash, and neither is an outgoing intraledger update. */
 export const candidateFromUpdate = (update: {
   __typename?: string
   status?: string
@@ -39,7 +40,7 @@ export const candidateFromUpdate = (update: {
   if (
     update.__typename === "OnChainUpdate" &&
     update.transaction &&
-    update.txNotificationType === TxNotificationType.OnchainReceipt
+    update.txNotificationType === TxNotificationType.OnchainReceiptPending
   ) {
     return {
       transaction: update.transaction,

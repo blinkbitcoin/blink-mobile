@@ -8343,6 +8343,10 @@ type RootTranslation = {
 		 */
 		youReceived: string
 		/**
+		 * P​e​n​d​i​n​g​ ​O​n​C​h​a​i​n
+		 */
+		pendingOnchain: string
+		/**
 		 * N​o​t​e
 		 */
 		note: string
@@ -8367,6 +8371,11 @@ type RootTranslation = {
 		 * P​a​y​m​e​n​t​ ​r​e​c​e​i​v​e​d
 		 */
 		announcementHidden: string
+		/**
+		 * P​e​n​d​i​n​g​ ​O​n​C​h​a​i​n​,​ ​{​a​m​o​u​n​t​}
+		 * @param {string} amount
+		 */
+		announcementPending: RequiredParams<'amount'>
 		/**
 		 * S​p​l​a​s​h​ ​s​c​r​e​e​n​ ​i​s​ ​o​n
 		 */
@@ -22723,6 +22732,10 @@ export type TranslationFunctions = {
 		 */
 		youReceived: () => LocalizedString
 		/**
+		 * Pending OnChain
+		 */
+		pendingOnchain: () => LocalizedString
+		/**
 		 * Note
 		 */
 		note: () => LocalizedString
@@ -22746,6 +22759,10 @@ export type TranslationFunctions = {
 		 * Payment received
 		 */
 		announcementHidden: () => LocalizedString
+		/**
+		 * Pending OnChain, {amount}
+		 */
+		announcementPending: (arg: { amount: string }) => LocalizedString
 		/**
 		 * Splash screen is on
 		 */

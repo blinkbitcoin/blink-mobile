@@ -2543,12 +2543,14 @@
   },
   "IncomingTransactionSplash": {
     "youReceived": "Has rebut",
+    "pendingOnchain": "Pendent onchain",
     "note": "Nota",
     "dontShowAgain": "No ho tornis a mostrar",
     "details": "Detalls",
     "announcement": "Rebut {amount}",
     "tapToShow": "Prem per mostrar",
     "announcementHidden": "Pagament rebut",
+    "announcementPending": "Pendent onchain, {amount}",
     "toastOn": "Pantalla d'avís activada",
     "toastOff": "Pantalla d'avís desactivada"
   },

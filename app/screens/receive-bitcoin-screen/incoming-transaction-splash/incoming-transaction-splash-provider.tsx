@@ -243,10 +243,14 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
   const openDetails = useCallback(
     ({ optedOut }: { optedOut: boolean }) => {
       const txid = shown?.transaction.id
+      const unclaimedDeposit = shown?.unclaimedDeposit === true
       close({ optedOut, action: SplashCloseAction.Details })
-      if (txid && navigationRef.isReady()) {
-        navigationRef.navigate("transactionDetail", { txid })
+      if (!txid || !navigationRef.isReady()) return
+      if (unclaimedDeposit) {
+        navigationRef.navigate("unclaimedDepositsScreen")
+        return
       }
+      navigationRef.navigate("transactionDetail", { txid })
     },
     [close, shown],
   )

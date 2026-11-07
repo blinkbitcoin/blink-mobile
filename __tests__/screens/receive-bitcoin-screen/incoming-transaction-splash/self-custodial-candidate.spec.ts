@@ -2,7 +2,11 @@ import { it } from "@jest/globals"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { decideSplash } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/decide-splash"
-import { selfCustodialCandidate } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/self-custodial-candidate"
+import {
+  selfCustodialCandidate,
+  selfCustodialDepositCandidate,
+} from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/self-custodial-candidate"
+import { SplashCandidate } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/types"
 import { toWalletMoneyAmount } from "@app/types/amounts"
 import { AccountType } from "@app/types/wallet"
 import {
@@ -31,9 +35,11 @@ const receive = (paymentType: PaymentType, timestamp: number): NormalizedTransac
   sourceAccountType: AccountType.SelfCustodial,
 })
 
-const decide = (tx: NormalizedTransaction) =>
+const decide = (tx: NormalizedTransaction) => decideCandidate(selfCustodialCandidate(tx))
+
+const decideCandidate = (candidate: SplashCandidate) =>
   decideSplash({
-    candidate: selfCustodialCandidate(tx),
+    candidate,
     foregroundSinceMs: NOW - 60_000,
     appActive: true,
     alreadySeen: false,
@@ -57,9 +63,34 @@ describe("selfCustodialCandidate", () => {
     },
   )
 
-  it("shows an on-chain deposit claimed now", () => {
-    expect(decide(receive(PaymentType.Onchain, Math.floor(NOW / 1000))).outcome).toBe(
+  it("shows a Lightning receive settled now", () => {
+    expect(decide(receive(PaymentType.Lightning, Math.floor(NOW / 1000))).outcome).toBe(
       "show",
     )
+  })
+})
+
+describe("selfCustodialDepositCandidate", () => {
+  const deposit = {
+    txid: "abc",
+    vout: 1,
+    amountSats: BigInt(5_000),
+    isMature: false,
+  } as Parameters<typeof selfCustodialDepositCandidate>[0]
+
+  it("offers a detected deposit as a pending on-chain receive", () => {
+    const candidate = selfCustodialDepositCandidate(deposit, NOW)
+
+    expect(candidate).toMatchObject({
+      paymentType: "onchain",
+      unclaimedDeposit: true,
+      transaction: {
+        id: "abc:1",
+        direction: "RECEIVE",
+        status: "PENDING",
+        settlementAmount: 5_000,
+      },
+    })
+    expect(decideCandidate(candidate).outcome).toBe("show")
   })
 })

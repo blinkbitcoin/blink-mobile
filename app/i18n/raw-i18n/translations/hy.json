@@ -2543,12 +2543,14 @@
   },
   "IncomingTransactionSplash": {
     "youReceived": "Դուք ստացել եք",
+    "pendingOnchain": "Onchain ընթացքի մեջ",
     "note": "Նշում",
     "dontShowAgain": "Այլևս չցուցադրել",
     "details": "Մանրամասներ",
     "announcement": "Ստացվել է {amount}",
     "tapToShow": "Սեղմեք՝ ցուցադրելու համար",
     "announcementHidden": "Վճարումը ստացվել է",
+    "announcementPending": "Onchain ընթացքի մեջ, {amount}",
     "toastOn": "Ծանուցման էկրանը միացված է",
     "toastOff": "Ծանուցման էկրանն անջատված է"
   },
