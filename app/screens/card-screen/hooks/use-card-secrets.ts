@@ -1,8 +1,7 @@
-import { useCallback, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import { gql } from "@apollo/client"
 
 import { useCardSecretsEncryptedLazyQuery } from "@app/graphql/generated"
-import { useI18nContext } from "@app/i18n/i18n-react"
 import { decryptAesGcm, encryptRsaOaep, generateRandomHexKey } from "@app/utils/crypto"
 import { recordAppError, toError } from "@app/utils/error-reporting"
 
@@ -28,8 +27,14 @@ type CardSecrets = {
   cvc: string
 }
 
+/**
+ * The decrypted card number and CVV, fetched on demand. A failure is a flag rather than a
+ * message: the screen words it, which keeps the locale out of `fetchSecrets` so a language
+ * change cannot start a second fetch. Only the latest attempt lands, so a retry tapped
+ * twice, or one started while another is still out, never mixes the answer of one with
+ * the failure of the other.
+ */
 export const useCardSecrets = () => {
-  const { LL } = useI18nContext()
   const { fetchPublicKey } = useCardEncryption()
   /** Kept out of the Apollo cache, which is persisted to disk: the encrypted card
    *  number and CVV have no reason to outlive the screen that asked for them. */
@@ -37,17 +42,30 @@ export const useCardSecrets = () => {
     fetchPolicy: "no-cache",
   })
   const [secrets, setSecrets] = useState<CardSecrets | undefined>()
-  const [error, setError] = useState<string | undefined>()
+  const [hasFailed, setHasFailed] = useState(false)
+  const latestAttemptRef = useRef(0)
 
+  /** Clearing the failure first takes the retry off the screen while the attempt runs.
+   *  An attempt a newer one replaced is abandoned: it stops before asking for the secrets
+   *  and before decrypting them, and whatever it settles with is dropped. */
   const fetchSecrets = useCallback(
     async (cardId: string): Promise<CardSecrets | undefined> => {
-      setError(undefined)
-      try {
+      latestAttemptRef.current += 1
+      const attempt = latestAttemptRef.current
+      const isLatestAttempt = () => attempt === latestAttemptRef.current
+      const stopIfAbandoned = () => {
+        if (!isLatestAttempt()) {
+          throw new Error("Card secrets attempt abandoned")
+        }
+      }
+
+      const readSecrets = async (): Promise<CardSecrets> => {
         /** From the server every time, so a retry after the key rotates does not keep
          *  sealing the session with the stale key the persisted cache still holds. */
         const { data: publicKeyData } = await fetchPublicKey({
           fetchPolicy: "network-only",
         })
+        stopIfAbandoned()
         const publicKeyPem = publicKeyData?.cardEncryptionPublicKey
         if (!publicKeyPem) throw new Error("Card encryption public key is missing")
 
@@ -57,7 +75,7 @@ export const useCardSecrets = () => {
         const { data } = await fetchEncryptedSecrets({
           variables: { cardId, sessionId },
         })
-
+        stopIfAbandoned()
         const encrypted = data?.cardSecretsEncrypted
         if (!encrypted) throw new Error("Encrypted card secrets are missing")
 
@@ -72,19 +90,24 @@ export const useCardSecrets = () => {
           key: secretKey,
         })
 
-        const result = { pan, cvc }
+        return { pan, cvc }
+      }
+
+      setHasFailed(false)
+      try {
+        const result = await readSecrets()
+        if (!isLatestAttempt()) return undefined
         setSecrets(result)
         return result
       } catch (err) {
+        if (!isLatestAttempt()) return undefined
         recordAppError(toError(err))
-        /** One localized message for every failure: a network, crypto or library
-         *  message would reach the screen untranslated. */
-        setError(LL.errors.unexpectedError())
+        setHasFailed(true)
         return undefined
       }
     },
-    [fetchPublicKey, fetchEncryptedSecrets, LL],
+    [fetchPublicKey, fetchEncryptedSecrets],
   )
 
-  return { secrets, error, fetchSecrets }
+  return { secrets, hasFailed, fetchSecrets }
 }

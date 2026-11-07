@@ -98,14 +98,13 @@ const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
   const { LL, locale } = useI18nContext()
   const { copyToClipboard } = useClipboard(CLIPBOARD_CLEAR_MS)
   const { fullName } = useCardHolder(card.id)
-  const { secrets, error: secretsError, fetchSecrets } = useCardSecrets()
+  const { secrets, hasFailed: hasSecretsFailed, fetchSecrets } = useCardSecrets()
 
   useEffect(() => {
     if (!secrets) fetchSecrets(card.id)
   }, [card.id, secrets, fetchSecrets])
 
   const retrySecrets = useCallback(() => fetchSecrets(card.id), [card.id, fetchSecrets])
-  const hasSecretsFailed = secretsError !== undefined
   /** Also before the first fetch starts, so the fields never flash empty without it. */
   const isSecretsLoading = !secrets && !hasSecretsFailed
 
@@ -175,7 +174,9 @@ const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
           )}
           {hasSecretsFailed && (
             <View style={styles.secretsFailure}>
-              <GaloyErrorBox errorMessage={secretsError} />
+              {/* One message for every failure: a network, crypto or library message
+                  would reach the screen untranslated. */}
+              <GaloyErrorBox errorMessage={LL.errors.unexpectedError()} />
               <GaloyPrimaryButton title={LL.common.tryAgain()} onPress={retrySecrets} />
             </View>
           )}

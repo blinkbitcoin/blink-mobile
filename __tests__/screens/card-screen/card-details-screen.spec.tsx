@@ -90,12 +90,12 @@ jest.mock("@app/hooks/use-card-holder", () => ({
 }))
 
 let mockSecrets: { pan: string; cvc: string } | undefined
-let mockSecretsError: string | undefined
+let mockSecretsHasFailed = false
 const mockFetchSecrets = jest.fn()
 jest.mock("@app/screens/card-screen/hooks/use-card-secrets", () => ({
   useCardSecrets: () => ({
     secrets: mockSecrets,
-    error: mockSecretsError,
+    hasFailed: mockSecretsHasFailed,
     fetchSecrets: mockFetchSecrets,
   }),
 }))
@@ -148,7 +148,7 @@ const defaultCardData = {
 const setupMocks = (overrides?: { cardData?: Partial<typeof defaultCardData> }) => {
   mockUseCardData.mockReturnValue({ ...defaultCardData, ...overrides?.cardData })
   mockSecrets = undefined
-  mockSecretsError = undefined
+  mockSecretsHasFailed = false
   mockHolderName = ""
   mockScreenGuard = "on"
   /** Default arrangement: a biometrics user passing the prompt. The gate fails
@@ -602,11 +602,11 @@ describe("CardDetailsScreen", () => {
     })
 
     it("shows the failure and asks for the secrets again from its retry", async () => {
-      mockSecretsError = "card details unavailable"
+      mockSecretsHasFailed = true
 
       const { getByText, getByTestId } = await renderDetails()
 
-      expect(getByText("card details unavailable")).toBeTruthy()
+      expect(getByText("Unexpected error occurred")).toBeTruthy()
       await act(async () => {
         fireEvent.press(getByTestId("card-number-field"))
       })
