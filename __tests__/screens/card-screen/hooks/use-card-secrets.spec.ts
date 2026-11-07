@@ -329,6 +329,111 @@ describe("useCardSecrets attempts", () => {
     mockFetchEncryptedSecrets.mockResolvedValue(secretsAnswer)
   })
 
+  describe("with a request that never answers", () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it("keeps waiting until the bound", async () => {
+      mockFetchPublicKey.mockReturnValue(new Promise(() => {}))
+      const { result } = renderHook(() => useCardSecrets())
+
+      act(() => {
+        result.current.fetchSecrets("card-123")
+      })
+      await act(async () => {
+        await jest.advanceTimersByTimeAsync(29_999)
+      })
+
+      expect(result.current.hasFailed).toBe(false)
+      expect(mockRecordAppError).not.toHaveBeenCalled()
+    })
+
+    it("fails at the bound, so the screen offers its retry", async () => {
+      mockFetchPublicKey.mockReturnValue(new Promise(() => {}))
+      const { result } = renderHook(() => useCardSecrets())
+
+      act(() => {
+        result.current.fetchSecrets("card-123")
+      })
+      await act(async () => {
+        await jest.advanceTimersByTimeAsync(30_000)
+      })
+
+      expect(result.current.hasFailed).toBe(true)
+      expect(result.current.secrets).toBeUndefined()
+      expect(mockRecordAppError).toHaveBeenCalledWith(
+        new Error("Card secrets fetch timed out after 30000ms"),
+      )
+    })
+
+    it("asks for no secrets with a key that arrives after the bound", async () => {
+      const publicKey = deferredPublicKey()
+      mockFetchPublicKey.mockReturnValue(publicKey.promise)
+      const { result } = renderHook(() => useCardSecrets())
+      act(() => {
+        result.current.fetchSecrets("card-123")
+      })
+      await act(async () => {
+        await jest.advanceTimersByTimeAsync(30_000)
+      })
+
+      await act(async () => {
+        publicKey.resolve(publicKeyAnswer)
+      })
+
+      expect(mockFetchEncryptedSecrets).not.toHaveBeenCalled()
+      expect(result.current.secrets).toBeUndefined()
+      expect(result.current.hasFailed).toBe(true)
+    })
+
+    it("decrypts nothing from secrets that arrive after the bound", async () => {
+      let answerSecrets: (answer: typeof secretsAnswer) => void = () => undefined
+      mockFetchPublicKey.mockResolvedValue(publicKeyAnswer)
+      mockFetchEncryptedSecrets.mockReturnValue(
+        new Promise((resolve) => {
+          answerSecrets = resolve
+        }),
+      )
+      const { result } = renderHook(() => useCardSecrets())
+      act(() => {
+        result.current.fetchSecrets("card-123")
+      })
+      await act(async () => {
+        await jest.advanceTimersByTimeAsync(30_000)
+      })
+
+      await act(async () => {
+        answerSecrets(secretsAnswer)
+      })
+
+      expect(mockDecryptAesGcm).not.toHaveBeenCalled()
+      expect(result.current.secrets).toBeUndefined()
+    })
+
+    it("reports and asks nothing for an attempt still out when the screen goes", async () => {
+      const publicKey = deferredPublicKey()
+      mockFetchPublicKey.mockReturnValue(publicKey.promise)
+      const { result, unmount } = renderHook(() => useCardSecrets())
+      act(() => {
+        result.current.fetchSecrets("card-123")
+      })
+
+      unmount()
+      await act(async () => {
+        publicKey.resolve(publicKeyAnswer)
+        await jest.advanceTimersByTimeAsync(30_000)
+      })
+
+      expect(mockFetchEncryptedSecrets).not.toHaveBeenCalled()
+      expect(mockRecordAppError).not.toHaveBeenCalled()
+    })
+  })
+
   it("takes the failure, and with it the retry, away as soon as it asks again", async () => {
     mockFetchPublicKey.mockRejectedValueOnce(new Error("Network error"))
     const { result } = renderHook(() => useCardSecrets())

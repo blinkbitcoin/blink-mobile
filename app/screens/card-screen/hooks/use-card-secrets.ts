@@ -1,9 +1,10 @@
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { gql } from "@apollo/client"
 
 import { useCardSecretsEncryptedLazyQuery } from "@app/graphql/generated"
 import { decryptAesGcm, encryptRsaOaep, generateRandomHexKey } from "@app/utils/crypto"
 import { recordAppError, toError } from "@app/utils/error-reporting"
+import { withTimeout } from "@app/utils/with-timeout"
 
 import { useCardEncryption } from "./use-card-encryption"
 
@@ -21,6 +22,12 @@ gql`
     }
   }
 `
+
+/** Neither request has a deadline of its own, so one stalled on a broken connection would
+ *  hold the screen on its loader for good. Sized for both requests taking the transport's
+ *  single unauthorized retry, 5 s each (createUnauthorizedRetryLink in
+ *  app/graphql/retry-policy.ts), with the rest left for four slow round trips. */
+const SECRETS_ATTEMPT_TIMEOUT_MS = 30_000
 
 type CardSecrets = {
   pan: string
@@ -45,16 +52,26 @@ export const useCardSecrets = () => {
   const [hasFailed, setHasFailed] = useState(false)
   const latestAttemptRef = useRef(0)
 
+  /** Leaving the screen supersedes whatever attempt is still out, so it neither reports
+   *  a failure nobody is there to see nor decrypts an answer nobody will read. */
+  useEffect(
+    () => () => {
+      latestAttemptRef.current += 1
+    },
+    [],
+  )
+
   /** Clearing the failure first takes the retry off the screen while the attempt runs.
-   *  An attempt a newer one replaced is abandoned: it stops before asking for the secrets
-   *  and before decrypting them, and whatever it settles with is dropped. */
+   *  An attempt that timed out or was superseded is abandoned: it stops before asking for
+   *  the secrets and before decrypting them, and whatever it settles with is dropped. */
   const fetchSecrets = useCallback(
     async (cardId: string): Promise<CardSecrets | undefined> => {
       latestAttemptRef.current += 1
       const attempt = latestAttemptRef.current
       const isLatestAttempt = () => attempt === latestAttemptRef.current
+      let isSettled = false
       const stopIfAbandoned = () => {
-        if (!isLatestAttempt()) {
+        if (isSettled || !isLatestAttempt()) {
           throw new Error("Card secrets attempt abandoned")
         }
       }
@@ -95,7 +112,11 @@ export const useCardSecrets = () => {
 
       setHasFailed(false)
       try {
-        const result = await readSecrets()
+        const result = await withTimeout(
+          readSecrets(),
+          SECRETS_ATTEMPT_TIMEOUT_MS,
+          "Card secrets fetch",
+        )
         if (!isLatestAttempt()) return undefined
         setSecrets(result)
         return result
@@ -104,6 +125,8 @@ export const useCardSecrets = () => {
         recordAppError(toError(err))
         setHasFailed(true)
         return undefined
+      } finally {
+        isSettled = true
       }
     },
     [fetchPublicKey, fetchEncryptedSecrets],
