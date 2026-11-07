@@ -802,7 +802,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           ) : (
             <TouchableOpacity onPress={handlePaste}>
               <View style={styles.iconContainer}>
-                <Text color={colors.primary} type="p2">
+                <Text color={colors.primary} type="p2" bold>
                   {LL.common.paste()}
                 </Text>
               </View>
@@ -1068,7 +1068,7 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
               </TouchableOpacity>
             ) : (
               <TouchableOpacity onPress={handlePastePhone}>
-                <Text color={colors.primary} type="p2">
+                <Text color={colors.primary} type="p2" bold>
                   {LL.common.paste()}
                 </Text>
               </TouchableOpacity>
