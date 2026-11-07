@@ -18,6 +18,7 @@ gql`
 `
 
 type ReplaceResult = {
+  id: string
   lastFour: string
   cardType: CardType
 }
@@ -44,6 +45,7 @@ export const useReplaceCard = () => {
         }
 
         return {
+          id: data.cardReplace.id,
           lastFour: data.cardReplace.lastFour,
           cardType: data.cardReplace.cardType,
         }
