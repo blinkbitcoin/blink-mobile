@@ -79,6 +79,16 @@ describe("SwitchRow", () => {
 
       expect(mockOnValueChange).toHaveBeenCalled()
     })
+
+    it("ignores presses and reports itself disabled while disabled", () => {
+      const { getByRole } = renderWithTheme(<SwitchRow {...defaultProps} disabled />)
+
+      const switchElement = getByRole("switch")
+      fireEvent(switchElement, "pressIn")
+
+      expect(mockOnValueChange).not.toHaveBeenCalled()
+      expect(switchElement.props.accessibilityState.disabled).toBe(true)
+    })
   })
 
   describe("optional props", () => {

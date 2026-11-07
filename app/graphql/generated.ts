@@ -3597,6 +3597,34 @@ export type CardTransactionsPaginatedQueryVariables = Exact<{
 
 export type CardTransactionsPaginatedQuery = { readonly __typename: 'Query', readonly cardTransactionsPaginated: { readonly __typename: 'CardTransactionConnection', readonly edges: ReadonlyArray<{ readonly __typename: 'CardTransactionEdge', readonly cursor: string, readonly node: { readonly __typename: 'CardTransaction', readonly id: string, readonly amount: number, readonly currency: string, readonly merchantName: string, readonly status: TransactionStatus, readonly createdAt: string, readonly cardId: string } }>, readonly pageInfo: { readonly __typename: 'CardTransactionPageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null } } };
 
+export type CardSpendingControlsFragment = { readonly __typename: 'Card', readonly id: string, readonly spendingLimits: ReadonlyArray<{ readonly __typename: 'SpendingLimit', readonly category: SpendingCategory, readonly period: SpendingPeriod, readonly limitCents: number }>, readonly spendingToggles: ReadonlyArray<{ readonly __typename: 'SpendingToggle', readonly category: SpendingCategory, readonly enabled: boolean }> };
+
+export type CardSpendingControlsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CardSpendingControlsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly spendingLimits: ReadonlyArray<{ readonly __typename: 'SpendingLimit', readonly category: SpendingCategory, readonly period: SpendingPeriod, readonly limitCents: number }>, readonly spendingToggles: ReadonlyArray<{ readonly __typename: 'SpendingToggle', readonly category: SpendingCategory, readonly enabled: boolean }> }> } } | null };
+
+export type CardSpendingLimitSetMutationVariables = Exact<{
+  input: CardSpendingLimitSetInput;
+}>;
+
+
+export type CardSpendingLimitSetMutation = { readonly __typename: 'Mutation', readonly cardSpendingLimitSet: { readonly __typename: 'CardSpendingLimitSetPayload', readonly limit: { readonly __typename: 'SpendingLimit', readonly category: SpendingCategory, readonly period: SpendingPeriod, readonly limitCents: number } } };
+
+export type CardSpendingLimitRemoveMutationVariables = Exact<{
+  input: CardSpendingLimitRemoveInput;
+}>;
+
+
+export type CardSpendingLimitRemoveMutation = { readonly __typename: 'Mutation', readonly cardSpendingLimitRemove: { readonly __typename: 'CardSpendingLimitRemovePayload', readonly removedLimit: { readonly __typename: 'SpendingLimit', readonly category: SpendingCategory, readonly period: SpendingPeriod, readonly limitCents: number } } };
+
+export type CardSpendingToggleSetMutationVariables = Exact<{
+  input: CardSpendingToggleSetInput;
+}>;
+
+
+export type CardSpendingToggleSetMutation = { readonly __typename: 'Mutation', readonly cardSpendingToggleSet: { readonly __typename: 'CardSpendingToggleSetPayload', readonly toggle: { readonly __typename: 'SpendingToggle', readonly category: SpendingCategory, readonly enabled: boolean } } };
+
 export type CardUpdateLimitsMutationVariables = Exact<{
   input: CardUpdateInput;
 }>;
@@ -4277,6 +4305,20 @@ export const TransactionListFragmentDoc = gql`
   }
 }
     ${TransactionFragmentDoc}`;
+export const CardSpendingControlsFragmentDoc = gql`
+    fragment CardSpendingControls on Card {
+  id
+  spendingLimits {
+    category
+    period
+    limitCents
+  }
+  spendingToggles {
+    category
+    enabled
+  }
+}
+    `;
 export const CardTransactionDetailsFragmentDoc = gql`
     fragment CardTransactionDetails on CardTransaction {
   id
@@ -6430,6 +6472,163 @@ export type CardTransactionsPaginatedQueryHookResult = ReturnType<typeof useCard
 export type CardTransactionsPaginatedLazyQueryHookResult = ReturnType<typeof useCardTransactionsPaginatedLazyQuery>;
 export type CardTransactionsPaginatedSuspenseQueryHookResult = ReturnType<typeof useCardTransactionsPaginatedSuspenseQuery>;
 export type CardTransactionsPaginatedQueryResult = Apollo.QueryResult<CardTransactionsPaginatedQuery, CardTransactionsPaginatedQueryVariables>;
+export const CardSpendingControlsDocument = gql`
+    query cardSpendingControls {
+  me {
+    id
+    defaultAccount {
+      id
+      ... on ConsumerAccount {
+        cards {
+          ...CardSpendingControls
+        }
+      }
+    }
+  }
+}
+    ${CardSpendingControlsFragmentDoc}`;
+
+/**
+ * __useCardSpendingControlsQuery__
+ *
+ * To run a query within a React component, call `useCardSpendingControlsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCardSpendingControlsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCardSpendingControlsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCardSpendingControlsQuery(baseOptions?: Apollo.QueryHookOptions<CardSpendingControlsQuery, CardSpendingControlsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CardSpendingControlsQuery, CardSpendingControlsQueryVariables>(CardSpendingControlsDocument, options);
+      }
+export function useCardSpendingControlsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CardSpendingControlsQuery, CardSpendingControlsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CardSpendingControlsQuery, CardSpendingControlsQueryVariables>(CardSpendingControlsDocument, options);
+        }
+export function useCardSpendingControlsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CardSpendingControlsQuery, CardSpendingControlsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CardSpendingControlsQuery, CardSpendingControlsQueryVariables>(CardSpendingControlsDocument, options);
+        }
+export type CardSpendingControlsQueryHookResult = ReturnType<typeof useCardSpendingControlsQuery>;
+export type CardSpendingControlsLazyQueryHookResult = ReturnType<typeof useCardSpendingControlsLazyQuery>;
+export type CardSpendingControlsSuspenseQueryHookResult = ReturnType<typeof useCardSpendingControlsSuspenseQuery>;
+export type CardSpendingControlsQueryResult = Apollo.QueryResult<CardSpendingControlsQuery, CardSpendingControlsQueryVariables>;
+export const CardSpendingLimitSetDocument = gql`
+    mutation cardSpendingLimitSet($input: CardSpendingLimitSetInput!) {
+  cardSpendingLimitSet(input: $input) {
+    limit {
+      category
+      period
+      limitCents
+    }
+  }
+}
+    `;
+export type CardSpendingLimitSetMutationFn = Apollo.MutationFunction<CardSpendingLimitSetMutation, CardSpendingLimitSetMutationVariables>;
+
+/**
+ * __useCardSpendingLimitSetMutation__
+ *
+ * To run a mutation, you first call `useCardSpendingLimitSetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardSpendingLimitSetMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardSpendingLimitSetMutation, { data, loading, error }] = useCardSpendingLimitSetMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardSpendingLimitSetMutation(baseOptions?: Apollo.MutationHookOptions<CardSpendingLimitSetMutation, CardSpendingLimitSetMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardSpendingLimitSetMutation, CardSpendingLimitSetMutationVariables>(CardSpendingLimitSetDocument, options);
+      }
+export type CardSpendingLimitSetMutationHookResult = ReturnType<typeof useCardSpendingLimitSetMutation>;
+export type CardSpendingLimitSetMutationResult = Apollo.MutationResult<CardSpendingLimitSetMutation>;
+export type CardSpendingLimitSetMutationOptions = Apollo.BaseMutationOptions<CardSpendingLimitSetMutation, CardSpendingLimitSetMutationVariables>;
+export const CardSpendingLimitRemoveDocument = gql`
+    mutation cardSpendingLimitRemove($input: CardSpendingLimitRemoveInput!) {
+  cardSpendingLimitRemove(input: $input) {
+    removedLimit {
+      category
+      period
+      limitCents
+    }
+  }
+}
+    `;
+export type CardSpendingLimitRemoveMutationFn = Apollo.MutationFunction<CardSpendingLimitRemoveMutation, CardSpendingLimitRemoveMutationVariables>;
+
+/**
+ * __useCardSpendingLimitRemoveMutation__
+ *
+ * To run a mutation, you first call `useCardSpendingLimitRemoveMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardSpendingLimitRemoveMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardSpendingLimitRemoveMutation, { data, loading, error }] = useCardSpendingLimitRemoveMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardSpendingLimitRemoveMutation(baseOptions?: Apollo.MutationHookOptions<CardSpendingLimitRemoveMutation, CardSpendingLimitRemoveMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardSpendingLimitRemoveMutation, CardSpendingLimitRemoveMutationVariables>(CardSpendingLimitRemoveDocument, options);
+      }
+export type CardSpendingLimitRemoveMutationHookResult = ReturnType<typeof useCardSpendingLimitRemoveMutation>;
+export type CardSpendingLimitRemoveMutationResult = Apollo.MutationResult<CardSpendingLimitRemoveMutation>;
+export type CardSpendingLimitRemoveMutationOptions = Apollo.BaseMutationOptions<CardSpendingLimitRemoveMutation, CardSpendingLimitRemoveMutationVariables>;
+export const CardSpendingToggleSetDocument = gql`
+    mutation cardSpendingToggleSet($input: CardSpendingToggleSetInput!) {
+  cardSpendingToggleSet(input: $input) {
+    toggle {
+      category
+      enabled
+    }
+  }
+}
+    `;
+export type CardSpendingToggleSetMutationFn = Apollo.MutationFunction<CardSpendingToggleSetMutation, CardSpendingToggleSetMutationVariables>;
+
+/**
+ * __useCardSpendingToggleSetMutation__
+ *
+ * To run a mutation, you first call `useCardSpendingToggleSetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardSpendingToggleSetMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardSpendingToggleSetMutation, { data, loading, error }] = useCardSpendingToggleSetMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardSpendingToggleSetMutation(baseOptions?: Apollo.MutationHookOptions<CardSpendingToggleSetMutation, CardSpendingToggleSetMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardSpendingToggleSetMutation, CardSpendingToggleSetMutationVariables>(CardSpendingToggleSetDocument, options);
+      }
+export type CardSpendingToggleSetMutationHookResult = ReturnType<typeof useCardSpendingToggleSetMutation>;
+export type CardSpendingToggleSetMutationResult = Apollo.MutationResult<CardSpendingToggleSetMutation>;
+export type CardSpendingToggleSetMutationOptions = Apollo.BaseMutationOptions<CardSpendingToggleSetMutation, CardSpendingToggleSetMutationVariables>;
 export const CardUpdateLimitsDocument = gql`
     mutation cardUpdateLimits($input: CardUpdateInput!) {
   cardUpdate(input: $input) {
