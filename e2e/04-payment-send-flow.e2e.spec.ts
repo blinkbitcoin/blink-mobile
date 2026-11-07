@@ -178,7 +178,7 @@ describe("Lightning Payments Flow", () => {
   })
 
   it("Slides to confirm payment and navigate to move money screen", async () => {
-    await swipeButton(LL.SendBitcoinConfirmationScreen.slideToConfirm())
+    await swipeButton(LL.SendBitcoinConfirmationScreen.slideToSend())
     await waitTillOnHomeScreen()
   })
 })

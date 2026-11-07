@@ -147,6 +147,22 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     fee.status === "loading" || (fee.status === "error" && !fee.amount)
   const dustNotEvaluable =
     dustWarning.status === "pending" || dustWarning.status === "blocked"
+  // A blocked dust check stays a plain disable until #1273 N1 is ruled.
+  const isCalculating = feeUnavailable || dustWarning.status === "pending"
+
+  const progress = LL.SendBitcoinConfirmationScreen.sendProgress
+  const sendProgressLabels = [
+    progress.reviewing(),
+    progress.signing(),
+    progress.findingRoute(),
+    progress.broadcasting(),
+    progress.checkingDelivery(),
+    progress.retrying(),
+    progress.almostThere(),
+    progress.anyTimeNow(),
+    progress.ohOh(),
+    progress.tryingAgain(),
+  ]
 
   const defaultAmount = formatMoneyAmount({ moneyAmount: ZeroUsdMoneyAmount })
   let currencyFeeAmount = defaultAmount
@@ -622,8 +638,19 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             <View style={styles.sliderContainer}>
               <GaloySliderButton
                 isLoading={sendPaymentLoading || isVerifying}
-                initialText={LL.SendBitcoinConfirmationScreen.slideToConfirm()}
-                loadingText={LL.SendBitcoinConfirmationScreen.slideConfirming()}
+                initialText={LL.SendBitcoinConfirmationScreen.slideToSend()}
+                loadingText={LL.SendBitcoinConfirmationScreen.sendProgress.reviewing()}
+                busyLabels={sendProgressLabels}
+                disabledText={
+                  isCalculating
+                    ? LL.SendBitcoinConfirmationScreen.calculatingFee()
+                    : undefined
+                }
+                accentColor={
+                  sendingWalletDescriptor.currency === WalletCurrency.Usd
+                    ? colors._green
+                    : colors.primary
+                }
                 onSwipe={handleSendPayment}
                 disabled={
                   !validAmount || !sendPayment || feeUnavailable || dustNotEvaluable
