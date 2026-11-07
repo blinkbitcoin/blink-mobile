@@ -3552,7 +3552,7 @@ export type MigrationOwnerQuery = { readonly __typename: 'Query', readonly me?: 
 export type MigrationPendingDepositsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MigrationPendingDepositsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly pendingIncomingTransactions: ReadonlyArray<{ readonly __typename: 'Transaction', readonly id: string, readonly direction: TxDirection, readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger' } | { readonly __typename: 'SettlementViaLn' } | { readonly __typename: 'SettlementViaOnChain' } }> } } | null };
+export type MigrationPendingDepositsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly pendingIncomingTransactions: ReadonlyArray<{ readonly __typename: 'Transaction', readonly id: string, readonly status: TxStatus, readonly direction: TxDirection, readonly memo?: string | null, readonly createdAt: number, readonly settlementAmount: number, readonly settlementFee: number, readonly settlementDisplayFee: string, readonly settlementCurrency: WalletCurrency, readonly settlementDisplayAmount: string, readonly settlementDisplayCurrency: string, readonly settlementPrice: { readonly __typename: 'PriceOfOneSettlementMinorUnitInDisplayMinorUnit', readonly base: number, readonly offset: number, readonly currencyUnit: string, readonly formattedAmount: string }, readonly initiationVia: { readonly __typename: 'InitiationViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null } | { readonly __typename: 'InitiationViaLn', readonly paymentHash: string, readonly paymentRequest: string } | { readonly __typename: 'InitiationViaOnChain', readonly address: string }, readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null, readonly preImage?: string | null } | { readonly __typename: 'SettlementViaLn', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaOnChain', readonly transactionHash?: string | null, readonly arrivalInMempoolEstimatedAt?: number | null } }> } } | null };
 
 export type MigrationStartMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -6169,16 +6169,12 @@ export const MigrationPendingDepositsDocument = gql`
     defaultAccount {
       id
       pendingIncomingTransactions {
-        id
-        direction
-        settlementVia {
-          __typename
-        }
+        ...Transaction
       }
     }
   }
 }
-    `;
+    ${TransactionFragmentDoc}`;
 
 /**
  * __useMigrationPendingDepositsQuery__
