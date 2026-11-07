@@ -7,6 +7,8 @@ import { SplashCandidate } from "./types"
 type IncomingTransactionSplashContextValue = {
   /** Whether it went on screen. */
   showSplash: (candidate: SplashCandidate) => boolean
+  /** Several payments from one event: one at a time, the next on Close. */
+  showSplashes: (candidates: readonly SplashCandidate[]) => void
   /** Newer data for the payment on screen, such as a sender's note that landed after it,
    *  or the wallet list catching up so Details can open it. */
   refresh: (candidate: SplashCandidate) => void
@@ -17,6 +19,7 @@ type IncomingTransactionSplashContextValue = {
 export const IncomingTransactionSplashContext =
   createContext<IncomingTransactionSplashContextValue>({
     showSplash: () => false,
+    showSplashes: () => {},
     refresh: () => {},
     isSplashShownForHash: () => false,
   })

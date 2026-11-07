@@ -168,4 +168,29 @@ describe("IncomingTransactionSplashProvider", () => {
       expect(splash.showSplash(candidate())).toBe(false)
     })
   })
+
+  it("shows every deposit from one event in turn, the next on Close", () => {
+    const splash = renderProvider()
+    const deposit = (id: string) =>
+      candidate({ transaction: { ...candidate().transaction, id } })
+
+    act(() => splash.showSplashes([deposit("a:0"), deposit("b:1")]))
+    expect(mockOverlay?.splash.transaction.id).toBe("a:0")
+
+    act(() => mockOverlay?.onClose({ optedOut: false }))
+    expect(mockOverlay?.splash.transaction.id).toBe("b:1")
+  })
+
+  it("drops the rest of a batch on opt-out", () => {
+    const splash = renderProvider()
+    const deposit = (id: string) =>
+      candidate({ transaction: { ...candidate().transaction, id } })
+
+    act(() => splash.showSplashes([deposit("a:0"), deposit("b:1")]))
+    act(() => mockOverlay?.onClose({ optedOut: true }))
+    mockOverlay = null
+    act(() => splash.refresh(deposit("b:1")))
+
+    expect(mockOverlay).toBeNull()
+  })
 })
