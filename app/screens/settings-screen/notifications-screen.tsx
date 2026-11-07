@@ -320,7 +320,7 @@ const SplashMinimumRow: React.FC = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 20,
     paddingVertical: 20,
     gap: 20,
   },
