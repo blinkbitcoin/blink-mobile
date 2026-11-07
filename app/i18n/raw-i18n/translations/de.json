@@ -2401,6 +2401,8 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "Transaktion sollte an den Mempool übermittelt werden",
         "amount": "Betrag",
+        "addAmount": "Betrag hinzufügen",
+        "lowFunds": "Nicht genügend Guthaben",
         "amountExceed": "Der Betrag übersteigt dein Guthaben von {balance: string}",
         "amountExceedsLimit": "Der Betrag übersteigt dein verbleibendes tägliches Limit von {limit: string}",
         "upgradeAccountToIncreaseLimit": "Upgrade deinen Account, um dein Limit zu erhöhen",
@@ -2452,7 +2454,8 @@
         "sdkInsufficientFunds": "Nicht genügend Guthaben für diese Transaktion.",
         "sdkAmountTooLow": "Der Betrag ist zu niedrig für eine On-Chain-Transaktion.",
         "sdkNetworkError": "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
-        "sdkGenericError": "Gebühren können nicht geschätzt werden. Bitte versuchen Sie einen anderen Betrag."
+        "sdkGenericError": "Gebühren können nicht geschätzt werden. Bitte versuchen Sie einen anderen Betrag.",
+        "onchainSelfPayment": "Das ist die Adresse Ihrer eigenen Wallet. Sie können keine On-Chain-Zahlung an sich selbst senden."
     },
     "SettingsScreen": {
         "createAddress": "Lightning-Adresse erstellen",
@@ -3112,6 +3115,12 @@
     },
     "AmountInputButton": {
         "tapToSetAmount": "Setze Betrag"
+    },
+    "Accessibility": {
+        "deleteKey": "Löschen",
+        "swapCurrencyHint": "Wechselt die Währung für die Betragseingabe",
+        "switchToWallet": "Zu {wallet: string} wechseln",
+        "copy": "Kopieren"
     },
     "AppUpdate": {
         "needToUpdateSupportMessage": "Ich muss meine App auf die neuste Version updaten. Ich nutze die {os: string} App mit Version {version: string}.",

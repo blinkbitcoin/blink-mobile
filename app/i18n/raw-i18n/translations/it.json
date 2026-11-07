@@ -2401,6 +2401,8 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "La transazione deve essere inviata a mempool",
         "amount": "Importo",
+        "addAmount": "Aggiungi importo",
+        "lowFunds": "Fondi insufficienti",
         "amountExceed": "L'importo supera il saldo di {balance: string}",
         "amountExceedsLimit": "L'importo supera il limite giornaliero rimanente di {limit: string}",
         "upgradeAccountToIncreaseLimit": "Aggiorna il tuo account per aumentare il tuo limite",
@@ -2452,7 +2454,8 @@
         "sdkInsufficientFunds": "Fondi insufficienti per questa transazione.",
         "sdkAmountTooLow": "L'importo è troppo basso per una transazione on-chain.",
         "sdkNetworkError": "Errore di rete. Controlla la connessione e riprova.",
-        "sdkGenericError": "Impossibile stimare le commissioni. Prova con un importo diverso."
+        "sdkGenericError": "Impossibile stimare le commissioni. Prova con un importo diverso.",
+        "onchainSelfPayment": "Questo è l'indirizzo del tuo stesso portafoglio. Non puoi inviare un pagamento on-chain a te stesso."
     },
     "SettingsScreen": {
         "createAddress": "Crea indirizzo Lightning",
@@ -3112,6 +3115,12 @@
     },
     "AmountInputButton": {
         "tapToSetAmount": "Imposta importo"
+    },
+    "Accessibility": {
+        "deleteKey": "Cancella",
+        "swapCurrencyHint": "Cambia la valuta in cui digiti l'importo",
+        "switchToWallet": "Passa a {wallet: string}",
+        "copy": "Copia"
     },
     "AppUpdate": {
         "needToUpdateSupportMessage": "Devo aggiornare la mia app all'ultima versione. Sto usando l'app {os: string} con la versione {version: string}.",

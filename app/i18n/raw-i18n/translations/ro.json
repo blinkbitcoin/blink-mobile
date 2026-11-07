@@ -2401,6 +2401,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Tranzacția trebuie trimisă la mempool",
     "amount": "Suma",
+    "addAmount": "Adaugă suma",
+    "lowFunds": "Fonduri insuficiente",
     "amountExceed": "Suma depășește soldul de {balance: string}",
     "amountExceedsLimit": "Suma depășește limita zilnică rămasă de {limit: string}",
     "upgradeAccountToIncreaseLimit": "Faceți upgrade la cont pentru a vă crește limita",
@@ -2452,7 +2454,8 @@
     "sdkInsufficientFunds": "Fonduri insuficiente pentru această tranzacție.",
     "sdkAmountTooLow": "Suma este prea mică pentru o tranzacție on-chain.",
     "sdkNetworkError": "Eroare de rețea. Verificați conexiunea și încercați din nou.",
-    "sdkGenericError": "Nu se pot estima comisioanele. Încercați o sumă diferită."
+    "sdkGenericError": "Nu se pot estima comisioanele. Încercați o sumă diferită.",
+    "onchainSelfPayment": "Aceasta este adresa propriului portofel. Nu vă puteți trimite o plată on-chain dumneavoastră înșivă."
   },
   "SettingsScreen": {
     "createAddress": "Creează adresă Lightning",
@@ -3112,6 +3115,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Setați suma"
+  },
+  "Accessibility": {
+    "deleteKey": "Șterge",
+    "swapCurrencyHint": "Schimbă moneda în care introduceți suma",
+    "switchToWallet": "Treci la {wallet: string}",
+    "copy": "Copiați"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Trebuie să-mi actualizez aplicația la cea mai recentă versiune. Folosesc aplicația {os: string} cu versiunea {version: string}.",

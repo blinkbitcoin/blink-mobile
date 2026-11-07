@@ -22,9 +22,12 @@ export const useAlternatingSpin = (duration = 200) => {
     })
   }, [duration, rotation])
 
-  const spinStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${rotation.value}deg` }],
-  }))
+  const spinStyle = useAnimatedStyle(
+    () => ({
+      transform: [{ rotate: `${rotation.value}deg` }],
+    }),
+    [rotation],
+  )
 
   return { triggerSpin, spinStyle }
 }

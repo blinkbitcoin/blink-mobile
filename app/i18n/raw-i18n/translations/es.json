@@ -2401,6 +2401,8 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "La transacción debe enviarse a la Mempool.",
         "amount": "Cantidad",
+        "addAmount": "Añade una cantidad",
+        "lowFunds": "Fondos insuficientes",
         "amountExceed": "La cantidad excede su saldo de {balance: string}",
         "amountExceedsLimit": "El importe supera tu límite diario restante de {limit: string}",
         "upgradeAccountToIncreaseLimit": "Actualiza tu cuenta para aumentar tu límite",
@@ -2452,7 +2454,8 @@
         "sdkInsufficientFunds": "Fondos insuficientes para esta transacción.",
         "sdkAmountTooLow": "El monto es muy bajo para una transacción on-chain.",
         "sdkNetworkError": "Error de red. Verifica tu conexión e intenta de nuevo.",
-        "sdkGenericError": "No se pueden estimar las comisiones. Intenta con un monto diferente."
+        "sdkGenericError": "No se pueden estimar las comisiones. Intenta con un monto diferente.",
+        "onchainSelfPayment": "Esta es la dirección de tu propia billetera. No puedes enviarte un pago on-chain a ti mismo."
     },
     "SettingsScreen": {
         "createAddress": "Crear dirección Lightning",
@@ -3112,6 +3115,12 @@
     },
     "AmountInputButton": {
         "tapToSetAmount": "Fijar cantidad"
+    },
+    "Accessibility": {
+        "deleteKey": "Borrar",
+        "swapCurrencyHint": "Cambia la moneda en la que escribes la cantidad",
+        "switchToWallet": "Cambiar a {wallet: string}",
+        "copy": "Copiar"
     },
     "AppUpdate": {
         "needToUpdateSupportMessage": "Necesito actualizar la aplicación a la última versión. Utilizo la aplicación para {os: string} con la versión {version: string}.",

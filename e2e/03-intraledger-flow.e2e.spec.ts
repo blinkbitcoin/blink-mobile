@@ -101,7 +101,7 @@ describe("Username Payment Flow", () => {
   })
 
   it("Add amount", async () => {
-    await addSmallAmount(LL)
+    await addSmallAmount()
   })
 
   it("Click Next again", async () => {
@@ -146,7 +146,7 @@ describe("Conversion Flow", () => {
   })
 
   it("Add amount", async () => {
-    await addSmallAmount(LL)
+    await addSmallAmount()
   })
 
   it("Click Next", async () => {
