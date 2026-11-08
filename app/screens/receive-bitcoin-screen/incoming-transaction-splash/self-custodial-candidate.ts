@@ -14,9 +14,10 @@ import { SplashCandidate, SplashPaymentType } from "./types"
 
 type DisplayInfo = Parameters<typeof toTransactionFragment>[1]
 
-/** A self-custodial payment's time is when it settled, so it is always checked against
- *  the moment the app came to the foreground. A wallet restore or sync replays every past
- *  payment as PaymentSucceeded; without the flag each old one would show the splash. */
+/** A self-custodial payment is checked against the moment the app came to the
+ *  foreground. A wallet restore or sync replays every past payment as PaymentSucceeded;
+ *  without the flag each old one would show the splash. Its time is when it was created,
+ *  not when it settled, so the mount also passes `claimSeenLive` for a live one. */
 export const selfCustodialCandidate = (
   tx: NormalizedTransaction,
   display?: DisplayInfo,

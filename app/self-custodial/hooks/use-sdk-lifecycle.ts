@@ -34,7 +34,7 @@ import {
   REFRESH_EVENTS,
 } from "../providers/sdk-events"
 import { emitNewDeposits } from "../providers/new-deposits"
-import { emitSucceededPayment } from "../providers/succeeded-payments"
+import { emitSucceededPayment, notePendingPayment } from "../providers/succeeded-payments"
 import { validateStoredNetwork } from "../providers/validate-network"
 import {
   getOnlineState,
@@ -271,6 +271,9 @@ export const useSdkLifecycle = (
          *  the only word a pending send gets of its failure. Gated to Enhanced inside. */
         const observedPayment = extractObservedPayment(event)
         if (observedPayment) measureObservedPayment(observedPayment)
+        if (observedPayment && event.tag === SdkEventTags.PaymentPending) {
+          notePendingPayment(observedPayment)
+        }
         if (observedPayment && event.tag === SdkEventTags.PaymentSucceeded) {
           emitSucceededPayment(observedPayment)
         }

@@ -7,7 +7,10 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { IncomingTransactionSplashContext } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/incoming-transaction-splash-context"
 import { SelfCustodialSplashMount } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/self-custodial-splash-mount"
 import { emitNewDeposits } from "@app/self-custodial/providers/new-deposits"
-import { emitSucceededPayment } from "@app/self-custodial/providers/succeeded-payments"
+import {
+  emitSucceededPayment,
+  notePendingPayment,
+} from "@app/self-custodial/providers/succeeded-payments"
 import { toWalletMoneyAmount } from "@app/types/amounts"
 import {
   NormalizedTransaction,
@@ -135,6 +138,24 @@ describe("SelfCustodialSplashMount", () => {
     expect(showSplash).toHaveBeenCalledWith(
       expect.objectContaining({ detailsPending: false }),
     )
+  })
+
+  it("marks a payment live only when the SDK reported it pending first", () => {
+    mount()
+    const live = lightningReceive("live")
+    const replayed = lightningReceive("replayed")
+
+    act(() => {
+      notePendingPayment(live as unknown as Payment)
+      emitSucceededPayment(live as unknown as Payment)
+      emitSucceededPayment(replayed as unknown as Payment)
+      emitSucceededPayment(live as unknown as Payment)
+    })
+
+    const flags = (
+      showSplash.mock.calls as unknown as Array<[{ claimSeenLive: boolean }]>
+    ).map(([candidate]) => candidate.claimSeenLive)
+    expect(flags).toEqual([true, false, false])
   })
 
   it("offers neither a pending payment nor a claimed deposit", () => {
