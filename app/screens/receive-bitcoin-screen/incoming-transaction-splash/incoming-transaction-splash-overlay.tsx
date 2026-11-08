@@ -74,6 +74,11 @@ const RING = "rgba(255, 255, 255, 0.25)"
 
 type CloseAction = { optedOut: boolean }
 
+/** One entrance at a time. "iris" and "ring" run up to the impact, "fading" clears the
+ *  old payment before a ring, "settling" waits from the impact until the controls come
+ *  alive. */
+type EntrancePhase = "iris" | "fading" | "ring" | "settling" | "settled"
+
 type Props = {
   splash: ShownSplash
   onClose: (action: CloseAction) => void
@@ -171,6 +176,11 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
   /** Animation callbacks land on the JS thread after the fact: an overlay dismissed
    *  mid-iris (backgrounded, locked) must not buzz or announce from beyond the grave. */
   const isMounted = useRef(true)
+  /** The newest payment: a running entrance lands with it, whichever one it began with. */
+  const latest = useRef(splash)
+  latest.current = splash
+  const phase = useRef<EntrancePhase>("iris")
+  const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const centerX = useSharedValue(width / 2)
   const centerY = useSharedValue(height / 2)
@@ -188,6 +198,7 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
   useEffect(
     () => () => {
       isMounted.current = false
+      if (settleTimer.current) clearTimeout(settleTimer.current)
       ;[radius, ringRadius, content, pulse, amountGroup, detailGroup, controls].forEach(
         (value) => cancelAnimation(value),
       )
@@ -219,22 +230,22 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
     [LL, heroAmount],
   )
 
-  const onImpact = useCallback(
-    (shown: ShownSplash) => {
-      if (!isMounted.current) return
-      triggerSuccessHaptic()
-      setImpactKey((key) => key + 1)
-      announce(shown)
-      /** The canvas goes once the entrance is over, not on the impact frame itself: closed,
-       *  it is the same green as the ground under it, and a native surface torn down on
-       *  that frame is a dropped frame on a slow phone. */
-      setTimeout(() => {
-        setIrisDone(true)
-        setInteractive(true)
-      }, SPLASH_SETTLE_MS - IRIS_MS)
-    },
-    [announce],
-  )
+  const onImpact = useCallback(() => {
+    if (!isMounted.current) return
+    phase.current = "settling"
+    triggerSuccessHaptic()
+    setImpactKey((key) => key + 1)
+    announce(latest.current)
+    /** The canvas goes once the entrance is over, not on the impact frame itself: closed,
+     *  it is the same green as the ground under it, and a native surface torn down on
+     *  that frame is a dropped frame on a slow phone. */
+    settleTimer.current = setTimeout(() => {
+      settleTimer.current = null
+      phase.current = "settled"
+      setIrisDone(true)
+      setInteractive(true)
+    }, SPLASH_SETTLE_MS - IRIS_MS)
+  }, [announce])
 
   const playEntrance = useCallback(() => {
     "worklet"
@@ -261,10 +272,10 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
         if (!finished) return
         landed.value = 1
         playEntrance()
-        runOnJS(onImpact)(splash)
+        runOnJS(onImpact)()
       },
     )
-  }, [radius, landed, playEntrance, onImpact, splash])
+  }, [radius, landed, playEntrance, onImpact])
 
   /** The iris closes on the amount wherever it really sits: large fonts and long
    *  amounts move it. */
@@ -288,20 +299,42 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
   }, [centerX, centerY, radius, width, height, startIris])
 
   /** A new payment while open: fade out, a faint ring closes in, then the same impact
-   *  and entrance with the new data. The checkbox carries over. */
+   *  and entrance with the new data. The checkbox carries over. One that lands while an
+   *  entrance is still on its way in takes that entrance over instead: one haptic, one
+   *  announcement, for the newest payment. */
   useEffect(() => {
     if (splash.transaction.id === displayed.transaction.id) {
       // The same payment with newer data (a note that arrived late): no replay.
       if (splash !== displayed) setDisplayed(splash)
       return
     }
-    setInteractive(false)
+
+    switch (phase.current) {
+      case "fading":
+        // The old payment is still fading out: the ring after it picks up the newest.
+        return
+      case "iris":
+      case "ring":
+        // Nothing of the old payment is visible: swap the data under the closing iris.
+        setRevealed(false)
+        setDisplayed(splash)
+        return
+      case "settling":
+        // Landed but not yet alive: start over, the controls stay off.
+        if (settleTimer.current) clearTimeout(settleTimer.current)
+        settleTimer.current = null
+        break
+      case "settled":
+        setInteractive(false)
+        break
+    }
+    phase.current = "fading"
 
     const showNext = () => {
+      phase.current = "ring"
       setRevealed(false)
-      setDisplayed(splash)
+      setDisplayed(latest.current)
     }
-    const land = () => onImpact(splash)
 
     content.value = withTiming(0, { duration: REPLACE_FADE_MS }, (finished) => {
       if (!finished) return
@@ -320,7 +353,7 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
           if (!done) return
           ringOpacity.value = 0
           playEntrance()
-          runOnJS(land)()
+          runOnJS(onImpact)()
         },
       )
     })
@@ -457,7 +490,11 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
                     ? LL.IncomingTransactionSplash.pendingOnchain()
                     : LL.IncomingTransactionSplash.youReceived()}
                 </Text>
-                <View ref={amountRef} onLayout={onAmountLayout}>
+                <View
+                  ref={amountRef}
+                  onLayout={onAmountLayout}
+                  testID="incoming-transaction-splash-amount"
+                >
                   {masked ? (
                     <HiddenBalancePlaceholder size="large" color={colors._white} />
                   ) : (
