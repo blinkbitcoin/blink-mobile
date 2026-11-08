@@ -111,6 +111,7 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
       const decision = decideSplash({
         candidate,
         foregroundSinceMs: foregroundSince.current,
+        nowMs: Date.now(),
         appActive: AppState.currentState === "active",
         alreadySeen,
         enabled: current.settings.enabled,

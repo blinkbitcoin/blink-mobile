@@ -41,6 +41,7 @@ const decideCandidate = (candidate: SplashCandidate) =>
   decideSplash({
     candidate,
     foregroundSinceMs: NOW - 60_000,
+    nowMs: NOW,
     appActive: true,
     alreadySeen: false,
     enabled: true,

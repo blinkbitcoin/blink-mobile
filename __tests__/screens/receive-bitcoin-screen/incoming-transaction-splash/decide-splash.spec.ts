@@ -5,6 +5,7 @@ import {
   ALLOWED_ROUTES,
   decideSplash,
   FOREGROUND_GRACE_MS,
+  LIVE_CLAIM_MAX_AGE_MS,
 } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/decide-splash"
 import { SplashCandidate } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/types"
 
@@ -21,6 +22,7 @@ const candidate = (
     paymentType: overrides.paymentType ?? "lightning",
     paymentHash: overrides.paymentHash,
     createdAtIsSettlement: overrides.createdAtIsSettlement,
+    claimSeenLive: overrides.claimSeenLive,
     transaction: {
       id: "tx-1",
       direction: overrides.direction ?? TxDirection.Receive,
@@ -35,6 +37,7 @@ const decide = (overrides: Partial<Parameters<typeof decideSplash>[0]> = {}) =>
   decideSplash({
     candidate: candidate(),
     foregroundSinceMs: NOW - 60_000,
+    nowMs: NOW,
     appActive: true,
     alreadySeen: false,
     enabled: true,
@@ -93,6 +96,34 @@ describe("decideSplash", () => {
           paymentType: "onchain",
           createdAt,
           createdAtIsSettlement: true,
+        }),
+      }),
+    ).toEqual({ outcome: "skip", reason: "settled_before_foreground" })
+  })
+
+  it("shows a self-custodial receive seen pending live, though its invoice predates the foreground", () => {
+    const createdAt = Math.floor((NOW - 10 * 60 * 1000) / 1000)
+    expect(
+      decide({
+        foregroundSinceMs: NOW,
+        candidate: candidate({
+          createdAt,
+          createdAtIsSettlement: true,
+          claimSeenLive: true,
+        }),
+      }).outcome,
+    ).toBe("show")
+  })
+
+  it("drops a payment seen pending live once it is older than any invoice the app asks for", () => {
+    const createdAt = Math.floor((NOW - LIVE_CLAIM_MAX_AGE_MS - 1000) / 1000)
+    expect(
+      decide({
+        foregroundSinceMs: NOW,
+        candidate: candidate({
+          createdAt,
+          createdAtIsSettlement: true,
+          claimSeenLive: true,
         }),
       }),
     ).toEqual({ outcome: "skip", reason: "settled_before_foreground" })

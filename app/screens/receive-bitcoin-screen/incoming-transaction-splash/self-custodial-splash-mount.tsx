@@ -84,13 +84,13 @@ export const SelfCustodialSplashMount = () => {
 
   useEffect(() => {
     if (!isSelfCustodial) return
-    return onSucceededPayment((payment) => {
+    return onSucceededPayment((payment, { claimSeenLive }) => {
       if (!isKnownPayment(payment)) return
       const tx = mapSelfCustodialTransaction(payment)
       if (!isSplashCandidate(tx)) return
       const detailsPending = !listed.current.some((listedTx) => listedTx.id === tx.id)
       offered.current = { id: tx.id, memo: tx.memo, detailsPending }
-      showSplash({ ...toCandidate(tx), detailsPending })
+      showSplash({ ...toCandidate(tx), detailsPending, claimSeenLive })
     })
   }, [isSelfCustodial, toCandidate, showSplash])
 
