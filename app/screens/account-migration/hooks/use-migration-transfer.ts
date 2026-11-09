@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react"
 
 import { gql } from "@apollo/client"
 
@@ -14,6 +14,7 @@ import {
 } from "@app/self-custodial/migration-transfer-request"
 import { MigrationRejectionCode, MigrationSupportReason } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
+import { createExternalStore } from "@app/utils/external-store"
 
 import {
   buildMigrationProofChallenge,
@@ -45,50 +46,60 @@ const DISCLOSURE_VERSION = "v1"
  *  immediate without turning a slow settle into a burst of reads. */
 const STATUS_POLL_INTERVAL_MS = 2000
 
-/**
- * Custodial accounts whose commit has already fired this session. Unlike a per-mount ref
- * this survives a remount, so a screen that re-mounts while the first commit is still in
- * flight cannot fire a second one with a fresh invoice, which the backend refuses as a
- * state conflict. A genuine relaunch starts empty but reads TRANSFERRING, which already
- * blocks a re-commit.
- */
-const accountsWithCommitStarted = new Set<string>()
-
-/**
- * The terminal commit failure remembered for each custodial account, keyed by id. The
- * guard above outlives a remount but the per-mount failure state does not, so a screen
- * re-entered after a failure would block the re-commit yet show no outcome and spin.
- * Recording the settled reason here lets a remount restore it and route to support exactly
- * as the first mount did.
- */
-const settledCommitFailures = new Map<string, MigrationSupportReason>()
-
-/** What a commit settled with, short of the server taking it. */
-type CommitOutcome =
+/** Where an account's commit stands: sent and not answered (or answered by the phase
+ *  moving on), or settled short of the server taking it. */
+type CommitRecord =
+  | { kind: "sent" }
   | { kind: "connectionIssue" }
   | { kind: "clockOutOfSync" }
   | { kind: "depositPending" }
   | { kind: "failed"; reason: MigrationSupportReason }
 
-type CommitOutcomeListener = (custodialId: string, outcome: CommitOutcome) => void
-
 /**
- * The mounted screens to tell how a commit settled. The guard above keeps a screen that
- * mounts while the commit is in flight from sending its own, and the one that sent it may
- * be gone by the time the answer arrives, so the outcome goes to whichever screen is
- * mounted for the account rather than to the one that asked. Nothing is kept: a screen
- * mounted afterwards starts from the server's phase and the remembered failure alone.
+ * The commit record of each custodial account this session, keyed by id, and the only
+ * place a transfer screen learns how its account's commit went. It outlives the screen
+ * that sent the commit, so whichever screen is mounted for the account when the answer
+ * lands reads it, and so does one whose account id only resolves afterwards. A record
+ * blocks a second commit, which the backend refuses as a state conflict, until the user's
+ * retry clears a recoverable one; a failure keeps it for good. A genuine relaunch starts
+ * empty but reads TRANSFERRING, which already blocks a re-commit.
  */
-const commitOutcomeListeners = new Set<CommitOutcomeListener>()
-const announceCommitOutcome = (custodialId: string, outcome: CommitOutcome): void => {
-  commitOutcomeListeners.forEach((listener) => listener(custodialId, outcome))
+const commitRecords = createExternalStore<ReadonlyMap<string, CommitRecord>>(new Map())
+
+const recordCommit = (custodialId: string, record: CommitRecord): void => {
+  commitRecords.set(new Map(commitRecords.get()).set(custodialId, record))
 }
 
-/** Clears the module-level commit guard and remembered failures; for test isolation,
- *  never called in production. */
+const releaseCommit = (custodialId: string): void => {
+  const next = new Map(commitRecords.get())
+  next.delete(custodialId)
+  commitRecords.set(next)
+}
+
+const failCommit = (
+  custodialId: string,
+  reason: MigrationSupportReason,
+  err: unknown,
+): void => {
+  reportError("Migration transfer", err)
+  recordCommit(custodialId, { kind: "failed", reason })
+}
+
+type RecoverableCommitRecord = Extract<
+  CommitRecord,
+  { kind: "connectionIssue" | "clockOutOfSync" | "depositPending" }
+>
+
+const isRecoverableRecord = (
+  record: CommitRecord | undefined,
+): record is RecoverableCommitRecord =>
+  record?.kind === "connectionIssue" ||
+  record?.kind === "clockOutOfSync" ||
+  record?.kind === "depositPending"
+
+/** Clears every commit record; for test isolation, never called in production. */
 export const resetMigrationCommitGuard = (): void => {
-  accountsWithCommitStarted.clear()
-  settledCommitFailures.clear()
+  commitRecords.reset()
 }
 
 type UseMigrationTransferArgs = {
@@ -131,14 +142,20 @@ export const useMigrationTransfer = ({
   const { domain: lnurlDomain } = useLnurlServer()
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
   const [commitMigration] = useMigrationCommitMutation()
-  /** Seeded from the remembered outcome so a screen re-entered after a settled failure
-   *  shows it at once, rather than blocking the re-commit and spinning with nothing shown. */
-  const [failureReason, setFailureReason] = useState<MigrationSupportReason | null>(() =>
-    custodialAccountId ? settledCommitFailures.get(custodialAccountId) ?? null : null,
+
+  const readCommitRecord = useCallback(
+    () => (custodialAccountId ? commitRecords.get().get(custodialAccountId) : undefined),
+    [custodialAccountId],
   )
-  const [isClockOutOfSync, setIsClockOutOfSync] = useState(false)
-  const [hasConnectionIssue, setHasConnectionIssue] = useState(false)
-  const [isDepositPending, setIsDepositPending] = useState(false)
+  const commitRecord = useSyncExternalStore(
+    commitRecords.subscribe,
+    readCommitRecord,
+    readCommitRecord,
+  )
+  const failureReason = commitRecord?.kind === "failed" ? commitRecord.reason : null
+  const isClockOutOfSync = commitRecord?.kind === "clockOutOfSync"
+  const hasConnectionIssue = commitRecord?.kind === "connectionIssue"
+  const isDepositPending = commitRecord?.kind === "depositPending"
 
   /**
    * Polling stops for good once there is nothing left to watch: a terminal phase, a
@@ -189,53 +206,9 @@ export const useMigrationTransfer = ({
    *  request): the transfer is under way, so the notice clears and the screen watches it. */
   useEffect(() => {
     const hasAdvancedPastCommit = status !== null && status !== MigrationStatus.InProgress
-    if (hasAdvancedPastCommit) setHasConnectionIssue(false)
-  }, [status])
-
-  /** Takes the account the commit was sent for, which only runs with one. */
-  const fail = useCallback(
-    (custodialId: string, reason: MigrationSupportReason, err: unknown) => {
-      reportError("Migration transfer", err)
-      /** Remember the settled failure so a re-entered screen restores it instead of
-       *  blocking the re-commit and spinning with nothing to show. */
-      settledCommitFailures.set(custodialId, reason)
-      announceCommitOutcome(custodialId, { kind: "failed", reason })
-    },
-    [],
-  )
-
-  /** Takes in how the account's commit settled, whichever screen sent it. */
-  useEffect(() => {
-    if (!custodialAccountId) return
-    const takeOutcome: CommitOutcomeListener = (custodialId, outcome) => {
-      if (custodialId !== custodialAccountId) return
-      switch (outcome.kind) {
-        case "connectionIssue":
-          setHasConnectionIssue(true)
-          return
-        case "clockOutOfSync":
-          setIsClockOutOfSync(true)
-          return
-        case "depositPending":
-          setIsDepositPending(true)
-          return
-        case "failed":
-          setFailureReason(outcome.reason)
-      }
-    }
-    commitOutcomeListeners.add(takeOutcome)
-    return () => {
-      commitOutcomeListeners.delete(takeOutcome)
-    }
-  }, [custodialAccountId])
-
-  /** The owner id can resolve a tick after mount; once it does, restore any failure the
-   *  guard already remembers so a re-entered screen routes to support rather than spinning. */
-  useEffect(() => {
-    if (!custodialAccountId || hasFailed) return
-    const rememberedFailure = settledCommitFailures.get(custodialAccountId)
-    if (rememberedFailure) setFailureReason(rememberedFailure)
-  }, [custodialAccountId, hasFailed])
+    if (!hasAdvancedPastCommit || !hasConnectionIssue || !custodialAccountId) return
+    recordCommit(custodialAccountId, { kind: "sent" })
+  }, [status, hasConnectionIssue, custodialAccountId])
 
   const commit = useCallback(
     async (custodialId: string, selfCustodialId: string) => {
@@ -254,7 +227,7 @@ export const useMigrationTransfer = ({
       })
 
       if (result.status === MigrationSdkStatus.NoMnemonic) {
-        fail(
+        failCommit(
           custodialId,
           MigrationSupportReason.SelfCustodialAccountMissing,
           new Error("No mnemonic for the provisioned account"),
@@ -265,12 +238,12 @@ export const useMigrationTransfer = ({
       /** A dropped connection during the connect or the sign can be sent again, so it
        *  pauses on the shared retry rather than handing the user to support. */
       if (result.status === MigrationSdkStatus.ConnectionError) {
-        announceCommitOutcome(custodialId, { kind: "connectionIssue" })
+        recordCommit(custodialId, { kind: "connectionIssue" })
         return
       }
 
       if (result.status === MigrationSdkStatus.Failed) {
-        fail(custodialId, MigrationSupportReason.TransferFailed, result.error)
+        failCommit(custodialId, MigrationSupportReason.TransferFailed, result.error)
         return
       }
 
@@ -290,13 +263,12 @@ export const useMigrationTransfer = ({
 
       /** A deposit still confirming refuses the commit until it lands. Nothing moved, so
        *  it pauses on the retry like a skewed clock instead of handing the user to support,
-       *  and the guard is released at once: a screen mounted afterwards, with no pause of
-       *  its own, has to be able to commit again rather than wait on a commit never sent. */
+       *  and a screen mounted afterwards picks the pause up too: its OK checks the deposit
+       *  before committing, where committing at once would only be refused again. */
       const isPendingDepositRejection =
         rejection.code === MigrationRejectionCode.PendingDeposit
       if (isPendingDepositRejection) {
-        accountsWithCommitStarted.delete(custodialId)
-        announceCommitOutcome(custodialId, { kind: "depositPending" })
+        recordCommit(custodialId, { kind: "depositPending" })
         return
       }
 
@@ -307,60 +279,61 @@ export const useMigrationTransfer = ({
         rejection.code === MigrationRejectionCode.InvalidDestination &&
         isDeviceClockSkewed()
       if (isStaleProofRejection) {
-        announceCommitOutcome(custodialId, { kind: "clockOutOfSync" })
+        recordCommit(custodialId, { kind: "clockOutOfSync" })
         return
       }
-      fail(
+      failCommit(
         custodialId,
         MigrationSupportReason.TransferFailed,
         new Error(rejection.message),
       )
     },
-    [network, selfCustodialDepositClaimLeewayVbyte, commitMigration, fail, lnurlDomain],
+    [network, selfCustodialDepositClaimLeewayVbyte, commitMigration, lnurlDomain],
   )
 
   /** The server is waiting for a destination only while IN_PROGRESS: TRANSFERRING already
    *  has one, and committing a second invoice is refused as a state conflict. */
   const isAwaitingDestination = status === MigrationStatus.InProgress
   /** A recoverable issue (skewed clock, lost connection or pending deposit) pauses the
-   *  commit; clearing the flag on retry flips canCommit back to true and re-fires the
+   *  commit; the retry clearing the record flips canCommit back to true and re-fires the
    *  effect. */
-  const hasRecoverableIssue = isClockOutOfSync || hasConnectionIssue || isDepositPending
+  const hasRecoverableIssue = isRecoverableRecord(commitRecord)
   const canCommit = isAwaitingDestination && !skip && !hasFailed && !hasRecoverableIssue
 
   useEffect(() => {
     if (!canCommit) return
 
-    /** Both ids checked before the guard is claimed, so a transient null never latches
+    /** Both ids checked before the record is written, so a transient null never latches
      *  out a commit that could still fire once the id arrives. */
     if (!custodialAccountId || !selfCustodialAccountId) return
-    if (accountsWithCommitStarted.has(custodialAccountId)) return
+    if (commitRecords.get().has(custodialAccountId)) return
 
-    accountsWithCommitStarted.add(custodialAccountId)
+    recordCommit(custodialAccountId, { kind: "sent" })
     commit(custodialAccountId, selfCustodialAccountId).catch((err) => {
       /** A commit lost to the network can still have landed: it earns the shared retry, not
-       *  a handover, and the guard stays claimed until the user's retry clears it. */
+       *  a handover, and it blocks another commit until the retry has re-read the phase. */
       if (isNetworkFailure(err)) {
-        announceCommitOutcome(custodialAccountId, { kind: "connectionIssue" })
+        recordCommit(custodialAccountId, { kind: "connectionIssue" })
         return
       }
-      fail(custodialAccountId, MigrationSupportReason.TransferFailed, err)
+      failCommit(custodialAccountId, MigrationSupportReason.TransferFailed, err)
     })
-  }, [canCommit, custodialAccountId, selfCustodialAccountId, commit, fail])
+  }, [canCommit, custodialAccountId, selfCustodialAccountId, commit])
 
   /** FAILED has no client-side way back: the phase machine only leaves it when a late
    *  payment settles server-side, so offering a retry would loop on a refusal. */
   const serverFailure = hasServerFailed ? MigrationSupportReason.TransferFailed : null
 
-  /** Clears the recoverable flag so the commit effect fires again. A commit lost to the
-   *  network may have landed, so after a connection issue the phase is re-read first: if it
-   *  advanced past IN_PROGRESS, watch rather than send a second invoice refused as a state
-   *  conflict. */
+  /** Clears a recoverable record so the commit effect fires again; a commit still in flight
+   *  or a failure is left alone. A commit lost to the network may have landed, so after a
+   *  connection issue the phase is re-read first: if it advanced past IN_PROGRESS, watch
+   *  rather than send a second invoice refused as a state conflict. */
   const runRetry = useCallback(async () => {
-    setIsClockOutOfSync(false)
-    setIsDepositPending(false)
+    if (!custodialAccountId) return
+    const record = commitRecords.get().get(custodialAccountId)
+    if (!isRecoverableRecord(record)) return
 
-    if (hasConnectionIssue) {
+    if (record.kind === "connectionIssue") {
       let freshStatus: MigrationStatus | null
       try {
         freshStatus = await refetchStatus()
@@ -371,14 +344,13 @@ export const useMigrationTransfer = ({
       const hasAdvancedPastCommit =
         freshStatus !== null && freshStatus !== MigrationStatus.InProgress
       if (hasAdvancedPastCommit) {
-        setHasConnectionIssue(false)
+        recordCommit(custodialAccountId, { kind: "sent" })
         return
       }
     }
 
-    if (custodialAccountId) accountsWithCommitStarted.delete(custodialAccountId)
-    setHasConnectionIssue(false)
-  }, [custodialAccountId, hasConnectionIssue, refetchStatus])
+    releaseCommit(custodialAccountId)
+  }, [custodialAccountId, refetchStatus])
 
   /** One retry at a time so a double-tap cannot clear the commit guard mid-flight. */
   const isRetryingRef = useRef(false)
