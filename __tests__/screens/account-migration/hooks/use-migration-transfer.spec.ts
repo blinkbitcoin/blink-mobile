@@ -1117,6 +1117,46 @@ describe("useMigrationTransfer, across a remount mid-commit", () => {
     expect(mockCommitMigration).toHaveBeenCalledTimes(1)
   })
 
+  /** Two screens can be mounted for the account at once: a retry whose phase read answers
+   *  after the other one already sent the next commit leaves that commit's record alone. */
+  it("leaves the commit another screen's retry sent while its own read the phase", async () => {
+    mockCommitMigration.mockRejectedValueOnce(networkError())
+    const first = renderTransfer()
+    const second = renderTransfer()
+    await flushEffects()
+    expect(second.result.current.hasConnectionIssue).toBe(true)
+
+    const phaseReads: Array<() => void> = []
+    mockRefetchStatus = () =>
+      new Promise((resolve) => {
+        phaseReads.push(() => resolve(MigrationStatus.InProgress))
+      })
+    mockCommitMigration.mockReturnValueOnce(deferredCommit().promise)
+    let firstRetry = Promise.resolve()
+    let secondRetry = Promise.resolve()
+    await act(async () => {
+      firstRetry = first.result.current.retry()
+      secondRetry = second.result.current.retry()
+    })
+
+    await act(async () => {
+      phaseReads[0]()
+      await firstRetry
+    })
+    await flushEffects()
+    expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+
+    await act(async () => {
+      phaseReads[1]()
+      await secondRetry
+    })
+    await flushEffects()
+    renderTransfer()
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+  })
+
   it("keeps a failure on a retry, for a screen mounted afterwards too", async () => {
     mockCommitMigration.mockResolvedValueOnce({
       data: { migrationCommit: { errors: [{ message: "refused" }] } },

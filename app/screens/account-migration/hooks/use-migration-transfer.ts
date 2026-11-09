@@ -341,6 +341,10 @@ export const useMigrationTransfer = ({
         /** Phase read failed too (still offline): keep the retry, do not recommit blind. */
         return
       }
+      /** Another screen's retry may have sent the next commit while the phase was read,
+       *  and releasing its record would let a second invoice out behind it. */
+      const isRecordUnchanged = commitRecords.get().get(custodialAccountId) === record
+      if (!isRecordUnchanged) return
       const hasAdvancedPastCommit =
         freshStatus !== null && freshStatus !== MigrationStatus.InProgress
       if (hasAdvancedPastCommit) {
