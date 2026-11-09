@@ -1244,9 +1244,9 @@ describe("useMigrationTransfer, with a deposit still confirming", () => {
     expect(result.current.failureReason).toBeNull()
   })
 
-  /** Committing at once would only be refused again while the deposit confirms, so a
-   *  screen mounted after the refusal shows it and commits on the retry its OK sends. */
-  it("hands the refusal to a screen mounted again after it", async () => {
+  /** The only way back to the screen is Approve, which checks the deposits right before
+   *  it navigates, so a screen mounted after the refusal commits instead of showing it. */
+  it("commits again from a screen mounted again after the refusal", async () => {
     mockCommitMigration.mockResolvedValueOnce(pendingDepositRejection)
     const first = renderTransfer()
     await flushEffects()
@@ -1255,16 +1255,23 @@ describe("useMigrationTransfer, with a deposit still confirming", () => {
 
     const second = renderTransfer()
     await flushEffects()
-    expect(second.result.current.isDepositPending).toBe(true)
-    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
-
-    await act(async () => {
-      await second.result.current.retry()
-    })
-    await flushEffects()
 
     expect(mockCommitMigration).toHaveBeenCalledTimes(2)
     expect(second.result.current.isDepositPending).toBe(false)
+  })
+
+  it("takes the pause off the screen that showed it once a later one commits", async () => {
+    mockCommitMigration.mockResolvedValueOnce(pendingDepositRejection)
+    const first = renderTransfer()
+    await flushEffects()
+    expect(first.result.current.isDepositPending).toBe(true)
+
+    const later = renderTransfer()
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+    expect(later.result.current.isDepositPending).toBe(false)
+    expect(first.result.current.isDepositPending).toBe(false)
   })
 
   /** The order a remount mid-commit takes: the screen that sent the commit is gone when

@@ -61,8 +61,9 @@ type CommitRecord =
  * that sent the commit, so whichever screen is mounted for the account when the answer
  * lands reads it, and so does one whose account id only resolves afterwards. A record
  * blocks a second commit, which the backend refuses as a state conflict, until the user's
- * retry clears a recoverable one; a failure keeps it for good. A genuine relaunch starts
- * empty but reads TRANSFERRING, which already blocks a re-commit.
+ * retry clears a recoverable one; a failure keeps it for good. A deposit refusal is the
+ * one a screen mounted after it does not take, see `readCommitRecord`. A genuine relaunch
+ * starts empty but reads TRANSFERRING, which already blocks a re-commit.
  */
 const commitRecords = createExternalStore<ReadonlyMap<string, CommitRecord>>(new Map())
 
@@ -143,10 +144,23 @@ export const useMigrationTransfer = ({
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
   const [commitMigration] = useMigrationCommitMutation()
 
-  const readCommitRecord = useCallback(
-    () => (custodialAccountId ? commitRecords.get().get(custodialAccountId) : undefined),
-    [custodialAccountId],
-  )
+  const [recordsAtMount] = useState(() => commitRecords.get())
+
+  /**
+   * The account's record as this screen should act on it. A deposit refusal that was
+   * already there when the screen mounted is left out: the only way back to this screen
+   * is Approve, which checks the deposits right before it navigates, so the screen commits
+   * again rather than show a refusal that check has just cleared. One that lands after the
+   * mount, including while the account id is still loading, is this screen's to show.
+   */
+  const readCommitRecord = useCallback(() => {
+    if (!custodialAccountId) return undefined
+    const record = commitRecords.get().get(custodialAccountId)
+    const isRefusalFromBeforeMount =
+      record?.kind === "depositPending" &&
+      record === recordsAtMount.get(custodialAccountId)
+    return isRefusalFromBeforeMount ? undefined : record
+  }, [custodialAccountId, recordsAtMount])
   const commitRecord = useSyncExternalStore(
     commitRecords.subscribe,
     readCommitRecord,
@@ -263,8 +277,7 @@ export const useMigrationTransfer = ({
 
       /** A deposit still confirming refuses the commit until it lands. Nothing moved, so
        *  it pauses on the retry like a skewed clock instead of handing the user to support,
-       *  and a screen mounted afterwards picks the pause up too: its OK checks the deposit
-       *  before committing, where committing at once would only be refused again. */
+       *  and a screen mounted afterwards commits again rather than show it. */
       const isPendingDepositRejection =
         rejection.code === MigrationRejectionCode.PendingDeposit
       if (isPendingDepositRejection) {
@@ -306,7 +319,7 @@ export const useMigrationTransfer = ({
     /** Both ids checked before the record is written, so a transient null never latches
      *  out a commit that could still fire once the id arrives. */
     if (!custodialAccountId || !selfCustodialAccountId) return
-    if (commitRecords.get().has(custodialAccountId)) return
+    if (readCommitRecord()) return
 
     recordCommit(custodialAccountId, { kind: "sent" })
     commit(custodialAccountId, selfCustodialAccountId).catch((err) => {
@@ -318,7 +331,7 @@ export const useMigrationTransfer = ({
       }
       failCommit(custodialAccountId, MigrationSupportReason.TransferFailed, err)
     })
-  }, [canCommit, custodialAccountId, selfCustodialAccountId, commit])
+  }, [canCommit, custodialAccountId, selfCustodialAccountId, commit, readCommitRecord])
 
   /** FAILED has no client-side way back: the phase machine only leaves it when a late
    *  payment settles server-side, so offering a retry would loop on a refusal. */
@@ -330,7 +343,7 @@ export const useMigrationTransfer = ({
    *  rather than send a second invoice refused as a state conflict. */
   const runRetry = useCallback(async () => {
     if (!custodialAccountId) return
-    const record = commitRecords.get().get(custodialAccountId)
+    const record = readCommitRecord()
     if (!isRecoverableRecord(record)) return
 
     if (record.kind === "connectionIssue") {
@@ -343,7 +356,7 @@ export const useMigrationTransfer = ({
       }
       /** Another screen's retry may have sent the next commit while the phase was read,
        *  and releasing its record would let a second invoice out behind it. */
-      const isRecordUnchanged = commitRecords.get().get(custodialAccountId) === record
+      const isRecordUnchanged = readCommitRecord() === record
       if (!isRecordUnchanged) return
       const hasAdvancedPastCommit =
         freshStatus !== null && freshStatus !== MigrationStatus.InProgress
@@ -354,7 +367,7 @@ export const useMigrationTransfer = ({
     }
 
     releaseCommit(custodialAccountId)
-  }, [custodialAccountId, refetchStatus])
+  }, [custodialAccountId, readCommitRecord, refetchStatus])
 
   /** One retry at a time so a double-tap cannot clear the commit guard mid-flight. */
   const isRetryingRef = useRef(false)
