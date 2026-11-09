@@ -10,6 +10,8 @@ import { useTheme } from "@rn-vui/themed"
 import { CardStatusLayout } from "@app/components/card-screen"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
+import { useAddToWallet } from "./hooks/use-add-to-wallet"
+
 type CardStatusScreenRouteProp = RouteProp<RootStackParamList, "cardStatusScreen">
 
 export const CardStatusScreen: React.FC = () => {
@@ -32,6 +34,9 @@ export const CardStatusScreen: React.FC = () => {
     cardId,
   } = route.params
 
+  const { canAddToWallet, isAdding, addToWallet } = useAddToWallet(cardId, lastFour)
+  const isAddToWalletShown = showAddToWallet && canAddToWallet
+
   const handlePrimaryButtonPress = () => {
     navigation.dispatch(CommonActions.navigate(navigateTo))
   }
@@ -49,7 +54,9 @@ export const CardStatusScreen: React.FC = () => {
       cardNumber={lastFour ?? ""}
       validThruDate=""
       isFrozen={false}
-      showAddToWallet={showAddToWallet}
+      showAddToWallet={isAddToWalletShown}
+      onAddToWallet={addToWallet}
+      isAddingToWallet={isAdding}
     />
   )
 }
