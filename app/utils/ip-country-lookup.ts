@@ -65,15 +65,23 @@ export const DEFAULT_ADAPTERS: IpLookupAdapter[] = [
   ipapiAdapter,
 ]
 
-if (
-  !Config.GEO_IPIFY_API_KEY &&
-  !Config.IPINFO_API_KEY &&
-  !Config.PROXYCHECK_API_KEY &&
-  !Config.IPAPI_API_KEY
-) {
-  console.warn(
-    "[ip-country-lookup] No API key configured. Running on free tiers only (rate-limited). Set GEO_IPIFY_API_KEY, IPINFO_API_KEY, PROXYCHECK_API_KEY, or IPAPI_API_KEY in .env.local.",
-  )
+let hasWarnedNoApiKey = false
+
+/** Warned at the first shared lookup, not at import: every screen that pulls in the hooks
+ *  barrel imports this module, and a module-scope warning printed from each of them. */
+const warnOnceIfNoApiKey = (): void => {
+  if (hasWarnedNoApiKey) return
+  hasWarnedNoApiKey = true
+  if (
+    !Config.GEO_IPIFY_API_KEY &&
+    !Config.IPINFO_API_KEY &&
+    !Config.PROXYCHECK_API_KEY &&
+    !Config.IPAPI_API_KEY
+  ) {
+    console.warn(
+      "[ip-country-lookup] No API key configured. Running on free tiers only (rate-limited). Set GEO_IPIFY_API_KEY, IPINFO_API_KEY, PROXYCHECK_API_KEY, or IPAPI_API_KEY in .env.local.",
+    )
+  }
 }
 
 export const resolveIpCountryCode = async (
@@ -138,6 +146,7 @@ export const resetIpCountryLookup = (): void => {
 
 export const resolveIpCountryCodeCached = (): Promise<CountryCode | undefined> => {
   if (!sharedLookup) {
+    warnOnceIfNoApiKey()
     /** Captured so a lookup still in flight when a reset lands cannot clear the promise
      *  its successor installed, which would spend another round of rate-limited calls. */
     const generation = lookupGeneration

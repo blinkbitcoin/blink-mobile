@@ -10,6 +10,7 @@ import {
   Observable,
   Operation,
 } from "@apollo/client"
+import { HomeAuthedDocument } from "@app/graphql/generated"
 import { hasIdempotencyKey } from "@app/graphql/retry-policy"
 import { useSendPayment } from "@app/screens/send-bitcoin-screen/use-send-payment"
 
@@ -27,29 +28,34 @@ const KEY = "11111111-1111-4111-8111-111111111111"
 
 const captured: Operation[] = []
 
+/** Complete results for both operations on the link: a field missing from either is an
+ *  Apollo "Missing field" warning, not a test failure. */
 const capturingLink = new ApolloLink((operation) => {
   captured.push(operation)
+  if (operation.operationName === "homeAuthed") {
+    return Observable.of({ data: { me: null } })
+  }
   return Observable.of({
     data: {
       lnInvoicePaymentSend: {
         __typename: "PaymentSendPayload",
         status: "SUCCESS",
         errors: [],
+        transaction: null,
       },
     },
   })
 })
 
+let client: ApolloClient<unknown>
+
 const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <ApolloProvider
-    client={new ApolloClient({ link: capturingLink, cache: new InMemoryCache() })}
-  >
-    {children}
-  </ApolloProvider>
+  <ApolloProvider client={client}>{children}</ApolloProvider>
 )
 
 describe("useSendPayment — idempotency header on the wire", () => {
   beforeEach(() => {
+    client = new ApolloClient({ link: capturingLink, cache: new InMemoryCache() })
     captured.length = 0
     ;(Crypto.randomUUID as jest.Mock).mockReset()
     ;(Crypto.randomUUID as jest.Mock).mockReturnValue(KEY)
@@ -65,6 +71,15 @@ describe("useSendPayment — idempotency header on the wire", () => {
       return { status: undefined }
     }
 
+    // refetchQueries only refetches a query something is watching, as the home screen
+    // does in the app. Unwatched, Apollo warns and the refetch never reaches the link.
+    const homeAuthed = client.watchQuery({ query: HomeAuthedDocument })
+    const watching = homeAuthed.subscribe(() => undefined)
+    await act(async () => {
+      await homeAuthed.result()
+    })
+    captured.length = 0
+
     const { result } = renderHook(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       () => useSendPayment(sendPaymentMutation as any, {}),
@@ -75,7 +90,6 @@ describe("useSendPayment — idempotency header on the wire", () => {
       await result.current.sendPayment?.()
     })
 
-    // refetchQueries can put the HomeAuthed refetch on the same link.
     const payment = captured.find((op) => op.operationName === "lnInvoicePaymentSend")
     expect(payment).toBeDefined()
     expect(payment?.getContext().headers).toMatchObject({ "X-Idempotency-Key": KEY })
@@ -84,9 +98,10 @@ describe("useSendPayment — idempotency header on the wire", () => {
 
     // The refetch must NOT carry the key: it is a query, and a stray idempotency header
     // would switch off its transport retries too.
-    const refetch = captured.find((op) => op.operationName !== "lnInvoicePaymentSend")
-    if (refetch) {
-      expect(hasIdempotencyKey(refetch)).toBe(false)
-    }
+    const refetch = captured.find((op) => op.operationName === "homeAuthed")
+    expect(refetch).toBeDefined()
+    expect(hasIdempotencyKey(refetch as Operation)).toBe(false)
+
+    watching.unsubscribe()
   })
 })
