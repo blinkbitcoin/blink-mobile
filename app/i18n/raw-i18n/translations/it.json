@@ -3331,7 +3331,10 @@
             "noLimit": "Nessun limite",
             "limitUpdateSuccess": "Limite aggiornato con successo",
             "limitUpdateError": "Impossibile aggiornare il limite",
-            "limitMustBePositive": "Il limite deve essere maggiore di zero"
+            "limitMustBePositive": "Il limite deve essere maggiore di zero",
+            "atmToggleError": "Impossibile aggiornare i prelievi bancomat",
+            "atmControlsLoadError": "Impossibile caricare i limiti bancomat",
+            "invalidLimitAmount": "Inserisci un importo valido con al massimo 2 decimali"
         },
         "CardStatements": {
             "title": "Movimenti",

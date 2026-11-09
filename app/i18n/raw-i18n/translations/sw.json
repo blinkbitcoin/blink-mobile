@@ -3247,7 +3247,10 @@
       "noLimit": "Hakuna kikomo",
       "limitUpdateSuccess": "Kikomo kimesasishwa kwa mafanikio",
       "limitUpdateError": "Imeshindikana kusasisha kikomo",
-      "limitMustBePositive": "Kikomo lazima kiwe kikubwa kuliko sifuri"
+      "limitMustBePositive": "Kikomo lazima kiwe kikubwa kuliko sifuri",
+      "atmToggleError": "Imeshindikana kusasisha utoaji wa ATM",
+      "atmControlsLoadError": "Imeshindikana kupakia vikomo vya ATM",
+      "invalidLimitAmount": "Weka kiasi sahihi chenye desimali 2 au chache"
     },
     "CardFeeSchedule": {
       "title": "Ratiba ya ada za Kadi ya Blink",

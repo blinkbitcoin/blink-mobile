@@ -3247,7 +3247,10 @@
       "noLimit": "بدون حد",
       "limitUpdateSuccess": "تم تحديث الحد بنجاح",
       "limitUpdateError": "فشل تحديث الحد",
-      "limitMustBePositive": "يجب أن يكون الحد أكبر من الصفر"
+      "limitMustBePositive": "يجب أن يكون الحد أكبر من الصفر",
+      "atmToggleError": "فشل تحديث السحب من الصراف الآلي",
+      "atmControlsLoadError": "تعذّر تحميل حدود الصراف الآلي",
+      "invalidLimitAmount": "أدخل مبلغًا صالحًا بخانتين عشريتين كحد أقصى"
     },
     "CardFeeSchedule": {
       "title": "جدول رسوم بطاقة Blink",
