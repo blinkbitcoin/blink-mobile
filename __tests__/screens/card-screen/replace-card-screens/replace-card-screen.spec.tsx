@@ -62,7 +62,7 @@ jest.mock("@app/utils/helper", () => ({
 const mockCardReplace = jest.fn()
 const mockLockCard = jest.fn()
 
-jest.mock("@app/screens/card-screen/hooks", () => ({
+jest.mock("@app/hooks/use-card-data", () => ({
   useCardData: () => ({ card: { id: "card-123", cardType: "PHYSICAL" } }),
 }))
 
@@ -404,7 +404,7 @@ describe("ReplaceCardScreen", () => {
     beforeEach(() => {
       jest
         .spyOn(
-          jest.requireMock("@app/screens/card-screen/hooks") as {
+          jest.requireMock("@app/hooks/use-card-data") as {
             useCardData: () => { card: { id: string; cardType: string } }
           },
           "useCardData",
