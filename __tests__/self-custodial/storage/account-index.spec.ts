@@ -40,6 +40,7 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
 import {
   addSelfCustodialAccountId,
   findSelfCustodialAccountByMnemonic,
+  getSelfCustodialLightningAddress,
   listSelfCustodialAccounts,
   StorageReadStatus,
   readStoredWalletPresence,
@@ -1126,5 +1127,56 @@ describe("self-custodial account-index — damaged entries", () => {
       const ids = await readSelfCustodialAccountIds()
       expect(ids.status).toBe(StorageReadStatus.ReadFailed)
     })
+  })
+})
+
+describe("self-custodial account-index — the recorded lightning address", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockGetItem.mockResolvedValue(null)
+  })
+
+  it("returns the address recorded for the account", async () => {
+    setIndex([
+      { id: "a1", lightningAddress: "alice@blink.sv" },
+      { id: "a2", lightningAddress: "bob@blink.sv" },
+    ])
+
+    expect(await getSelfCustodialLightningAddress("a2")).toBe("bob@blink.sv")
+  })
+
+  it("returns null for an account the index does not name", async () => {
+    setIndex([{ id: "a1", lightningAddress: "alice@blink.sv" }])
+
+    expect(await getSelfCustodialLightningAddress("missing")).toBeNull()
+  })
+
+  it("returns null for an account with no address recorded", async () => {
+    setIndex([{ id: "a1", lightningAddress: null }])
+
+    expect(await getSelfCustodialLightningAddress("a1")).toBeNull()
+  })
+
+  /** A damaged entry still names its account, but it holds no address to offer. */
+  it("returns null for an entry that carries the id but no address", async () => {
+    mockGetItem.mockImplementation((key: string) =>
+      key === ACCOUNT_INDEX_KEY
+        ? Promise.resolve(JSON.stringify([{ id: "a1" }]))
+        : Promise.resolve(null),
+    )
+
+    expect(await getSelfCustodialLightningAddress("a1")).toBeNull()
+  })
+
+  it("returns null for an account named only by the legacy id list", async () => {
+    setLegacyOnly(["a1"])
+
+    expect(await getSelfCustodialLightningAddress("a1")).toBeNull()
+  })
+
+  it("returns null instead of throwing when the index cannot be read", async () => {
+    mockGetItem.mockRejectedValueOnce(new Error("AsyncStorage unavailable"))
+
+    expect(await getSelfCustodialLightningAddress("a1")).toBeNull()
   })
 })
