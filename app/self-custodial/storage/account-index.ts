@@ -200,7 +200,8 @@ export const readSelfCustodialAccountIds = async (): Promise<AccountIdsRead> => 
 export const StoredWalletPresence = {
   Present: "present",
   Absent: "absent",
-  /** The index could not be read, so this device may or may not hold a wallet. */
+  /** The index could not be read, or holds only items that do not read as accounts, so
+   *  this device may or may not hold a wallet. */
   Unknown: "unknown",
 } as const
 
@@ -216,13 +217,19 @@ export type StoredWalletPresence =
  * lands on the landing screen. Sharing a boolean would force one of those biases on the
  * other, so what is shared is the reading, and each caller names its own bias at the point
  * it applies it. That is also what keeps the two from drifting apart as this read changes.
+ *
+ * Read from every item the index stores, not only the accounts a screen can list. An item
+ * that does not read as an account may still stand for a wallet and its seed, as the
+ * sweep and the strict reader already assume, so an index holding only those cannot say
+ * the device has none. One readable wallet is enough to say it has one.
  */
 export const readStoredWalletPresence = async (): Promise<StoredWalletPresence> => {
-  const wallets = await listSelfCustodialAccounts()
-  if (wallets.status === StorageReadStatus.ReadFailed) return StoredWalletPresence.Unknown
+  const stored = await readStoredIndex()
+  if (stored.status === StorageReadStatus.ReadFailed) return StoredWalletPresence.Unknown
+  if (stored.entries.length > 0) return StoredWalletPresence.Present
 
-  return wallets.entries.length > 0
-    ? StoredWalletPresence.Present
+  return stored.items.length > 0
+    ? StoredWalletPresence.Unknown
     : StoredWalletPresence.Absent
 }
 

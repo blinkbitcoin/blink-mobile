@@ -1159,6 +1159,42 @@ describe("self-custodial account-index — damaged entries", () => {
       expect(ids.status).toBe(StorageReadStatus.ReadFailed)
     })
   })
+
+  /** A logout and the forgotten-PIN escape drop the app lock on absent, so an item that
+   *  may still stand for a wallet and its seed must never read as none. */
+  describe("the wallet presence", () => {
+    it("is unknown for an index whose only item is damaged", async () => {
+      storeCanonical([DAMAGED])
+
+      expect(await readStoredWalletPresence()).toBe(StoredWalletPresence.Unknown)
+    })
+
+    it("is unknown for a canonical value that is not a list", async () => {
+      storeCanonical(VALID)
+
+      expect(await readStoredWalletPresence()).toBe(StoredWalletPresence.Unknown)
+    })
+
+    it("is unknown for a legacy value that is not a list", async () => {
+      storeLegacy(DAMAGED)
+
+      expect(await readStoredWalletPresence()).toBe(StoredWalletPresence.Unknown)
+    })
+
+    it("is present when a readable wallet sits beside a damaged item", async () => {
+      storeCanonical([VALID, DAMAGED])
+
+      expect(await readStoredWalletPresence()).toBe(StoredWalletPresence.Present)
+    })
+
+    it("turns unknown, not absent, once the last readable wallet is removed beside a damaged one", async () => {
+      storeCanonical([VALID, DAMAGED])
+
+      await removeSelfCustodialAccountId("acc-1")
+
+      expect(await readStoredWalletPresence()).toBe(StoredWalletPresence.Unknown)
+    })
+  })
 })
 
 describe("self-custodial account-index — the recorded lightning address", () => {
