@@ -1,3 +1,4 @@
+import { it } from "@jest/globals"
 import { spawnSync } from "child_process"
 import {
   chmodSync,
@@ -88,6 +89,16 @@ const packTarball = () => {
 const downloads = () => readFileSync(curlLog(), "utf8").split("\n").filter(Boolean).length
 const vendoredVersion = () =>
   JSON.parse(readFileSync(join(vendorDir(), "package.json"), "utf8")).version
+const integrityMarker = () => join(vendorDir(), ".integrity")
+
+/** A same-version copy the script did not verify, such as one restored from a cache. */
+const seedVendoredCopy = (marker?: string) => {
+  writeFile(
+    join(vendorDir(), "package.json"),
+    JSON.stringify({ version: pinned("MPP_VERSION") }, null, 2),
+  )
+  if (marker) writeFile(integrityMarker(), `${marker}\n`)
+}
 
 type InstallOptions = {
   checksumMatches?: boolean
@@ -263,5 +274,46 @@ describe("install-meawallet-mpp.sh on a machine that was provisioned before", ()
 
     expect(vendoredVersion()).toBe(pinned("MPP_VERSION"))
     expect(downloads()).toBe(2)
+  })
+})
+
+describe("install-meawallet-mpp.sh trusting a vendored copy", () => {
+  beforeEach(() => {
+    giveCredentials()
+    giveConfig()
+  })
+
+  it("marks the SDK with the pinned checksum once its archive matched it", () => {
+    install()
+
+    expect(readFileSync(integrityMarker(), "utf8").trim()).toBe(pinned("MPP_INTEGRITY"))
+  })
+
+  it.each<[string, string | undefined]>([
+    ["no marker", undefined],
+    ["a marker from another checksum", "sha512-of-another-archive"],
+  ])("downloads the SDK again over a same-version copy with %s", (_, marker) => {
+    seedVendoredCopy(marker)
+
+    const { status } = install()
+
+    expect(status).toBe(0)
+    expect(downloads()).toBe(1)
+    expect(readFileSync(integrityMarker(), "utf8").trim()).toBe(pinned("MPP_INTEGRITY"))
+  })
+
+  it("leaves an unverified copy unmarked when the new archive fails its checksum", () => {
+    seedVendoredCopy()
+
+    const { status } = install({ checksumMatches: false })
+
+    expect(status).toBe(1)
+    expect(existsSync(integrityMarker())).toBe(false)
+  })
+
+  it("leaves nothing beside the vendored SDK once it is in place", () => {
+    install()
+
+    expect(readdirSync(dirname(vendorDir()))).toEqual(["react-native-mpp"])
   })
 })

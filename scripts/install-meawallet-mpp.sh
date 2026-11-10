@@ -16,7 +16,9 @@
 #
 # Each run converges on what this machine has now: without the credentials the vendored
 # SDK is removed, and without the configuration both of its copies are, so access that
-# was revoked or a configuration that was withdrawn never lingers in a build.
+# was revoked or a configuration that was withdrawn never lingers in a build. A vendored
+# SDK is reused only while it carries the marker written once its archive matched the
+# pinned checksum, so a partial, corrupt or restored copy is downloaded again.
 
 set -eu
 
@@ -26,6 +28,7 @@ MPP_TARBALL="https://nexus.ext.meawallet.com/repository/react-native-mpp/@meawal
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 VENDOR_DIR="$ROOT/vendor/meawallet/react-native-mpp"
+INTEGRITY_MARKER="$VENDOR_DIR/.integrity"
 CONFIG_DIR="${MEA_CONFIG_DIR:-$HOME/.config/blink}"
 CONFIG_FILE="${MEA_CONFIG_FILE:-$CONFIG_DIR/mea_config}"
 ANDROID_CONFIG="$ROOT/android/app/src/main/res/raw/mea_config"
@@ -35,10 +38,8 @@ log() {
   echo "[meawallet] $*"
 }
 
-vendored_version() {
-  if [ -f "$VENDOR_DIR/package.json" ]; then
-    sed -n 's/^ *"version": *"\([^"]*\)".*/\1/p' "$VENDOR_DIR/package.json" | head -n 1
-  fi
+has_verified_package() {
+  [ -f "$INTEGRITY_MARKER" ] && [ "$(cat "$INTEGRITY_MARKER")" = "$MPP_INTEGRITY" ]
 }
 
 install_config() {
@@ -64,7 +65,7 @@ install_package() {
     return 0
   fi
 
-  if [ "$(vendored_version)" = "$MPP_VERSION" ]; then
+  if has_verified_package; then
     log "@meawallet/react-native-mpp $MPP_VERSION already vendored"
     return 0
   fi
@@ -88,10 +89,15 @@ install_package() {
     return 1
   fi
 
-  tar -xzf "$work/package.tgz" -C "$work"
-  rm -rf "$VENDOR_DIR"
+  # Extracted beside its destination so the swap is a rename, and marked last, so an
+  # install cut short anywhere leaves a copy the next run does not trust.
   mkdir -p "$(dirname "$VENDOR_DIR")"
-  mv "$work/package" "$VENDOR_DIR"
+  staging=$(mktemp -d "$(dirname "$VENDOR_DIR")/.staging.XXXXXX")
+  trap 'rm -rf "$work" "$staging"' EXIT
+  tar -xzf "$work/package.tgz" -C "$staging"
+  rm -rf "$VENDOR_DIR"
+  mv "$staging/package" "$VENDOR_DIR"
+  printf '%s\n' "$MPP_INTEGRITY" > "$INTEGRITY_MARKER"
   log "@meawallet/react-native-mpp $MPP_VERSION vendored"
 }
 
