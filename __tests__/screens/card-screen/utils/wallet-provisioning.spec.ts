@@ -17,10 +17,10 @@ jest.mock("@app/utils/error-reporting", () => ({
 let mockIsProvisioningAvailable = true
 const mockFetchProvisioningData = jest.fn()
 jest.mock("@app/screens/card-screen/utils/card-provisioning-data", () => ({
-  get isCardProvisioningAvailable() {
-    return mockIsProvisioningAvailable
+  get fetchCardProvisioningData() {
+    if (!mockIsProvisioningAvailable) return null
+    return (cardId: string) => mockFetchProvisioningData(cardId)
   },
-  fetchCardProvisioningData: (cardId: string) => mockFetchProvisioningData(cardId),
 }))
 
 const mockGetMeaWalletSdk = jest.fn()
@@ -139,6 +139,17 @@ describe("addCardToWallet", () => {
     expect(mockRecordAppError).toHaveBeenCalledWith(
       new Error("This build carries no device wallet SDK"),
     )
+  })
+
+  it("fails and reports when the backend cannot provision cards yet", async () => {
+    mockIsProvisioningAvailable = false
+    mockGetMeaWalletSdk.mockResolvedValue(fakeSdk())
+
+    await expect(addCardToWallet(card)).rejects.toThrow(
+      "The backend does not provide card provisioning data yet",
+    )
+    expect(mockGetMeaWalletSdk).not.toHaveBeenCalled()
+    expect(mockRecordAppError).toHaveBeenCalledTimes(1)
   })
 
   it("fails and reports when the backend cannot provision the card", async () => {

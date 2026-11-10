@@ -1,10 +1,7 @@
 import { recordAppError, toError } from "@app/utils/error-reporting"
 
 import { WalletAddResult, type WalletCard } from "../types"
-import {
-  fetchCardProvisioningData,
-  isCardProvisioningAvailable,
-} from "./card-provisioning-data"
+import { fetchCardProvisioningData } from "./card-provisioning-data"
 import { deviceWalletFor } from "./device-wallets"
 import { getMeaWalletSdk } from "./meawallet-sdk"
 
@@ -14,7 +11,7 @@ import { getMeaWalletSdk } from "./meawallet-sdk"
  * can hand over what the wallet needs, and the wallet on this device can take this card.
  */
 export const canAddCardToWallet = async (card: WalletCard): Promise<boolean> => {
-  if (!isCardProvisioningAvailable) return false
+  if (!fetchCardProvisioningData) return false
   const sdk = await getMeaWalletSdk()
   if (!sdk) return false
   return deviceWalletFor(sdk).canAdd(card)
@@ -31,9 +28,13 @@ type PendingAdd = {
 let pendingAdd: PendingAdd | undefined
 
 const provisionCard = async (card: WalletCard): Promise<WalletAddResult> => {
+  const fetchData = fetchCardProvisioningData
+  if (!fetchData) {
+    throw new Error("The backend does not provide card provisioning data yet")
+  }
   const sdk = await getMeaWalletSdk()
   if (!sdk) throw new Error("This build carries no device wallet SDK")
-  const data = await fetchCardProvisioningData(card.cardId)
+  const data = await fetchData(card.cardId)
   return deviceWalletFor(sdk).add(card, data)
 }
 
