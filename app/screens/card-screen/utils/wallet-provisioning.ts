@@ -1,17 +1,6 @@
 import { recordAppError, toError } from "@app/utils/error-reporting"
 
-export const WalletAddResult = {
-  Added: "added",
-  Cancelled: "cancelled",
-  Busy: "busy",
-} as const
-
-export type WalletAddResult = (typeof WalletAddResult)[keyof typeof WalletAddResult]
-
-export type WalletCard = {
-  cardId: string
-  lastFour: string
-}
+import { WalletAddResult, type WalletCard } from "../types"
 
 /**
  * Boundary with the device wallet (Apple Pay, Google Pay and Samsung Pay). The

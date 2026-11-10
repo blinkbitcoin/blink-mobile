@@ -1,7 +1,7 @@
+import { WalletAddResult } from "@app/screens/card-screen/types"
 import {
   addCardToWallet,
   canAddCardToWallet,
-  WalletAddResult,
 } from "@app/screens/card-screen/utils/wallet-provisioning"
 
 const mockRecordAppError = jest.fn()

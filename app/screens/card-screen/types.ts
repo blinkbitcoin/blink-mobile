@@ -32,3 +32,16 @@ export const EMPTY_ADDRESS: ShippingAddress = {
   postalCode: "",
   countryCode: "",
 }
+
+export const WalletAddResult = {
+  Added: "added",
+  Cancelled: "cancelled",
+  Busy: "busy",
+} as const
+
+export type WalletAddResult = (typeof WalletAddResult)[keyof typeof WalletAddResult]
+
+export type WalletCard = {
+  cardId: string
+  lastFour: string
+}
