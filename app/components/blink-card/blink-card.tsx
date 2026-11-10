@@ -21,6 +21,7 @@ type BlinkCardProps = {
   validThruDate: string | Date
   isFrozen: boolean
   showCardDetails?: boolean
+  showValidThru?: boolean
 }
 
 export const BlinkCard: React.FC<BlinkCardProps> = ({
@@ -30,6 +31,7 @@ export const BlinkCard: React.FC<BlinkCardProps> = ({
   validThruDate,
   isFrozen,
   showCardDetails = false,
+  showValidThru = showCardDetails,
 }) => {
   const { width: screenWidth } = useWindowDimensions()
   const cardWidth = Math.min(screenWidth - CARD_HORIZONTAL_MARGIN, CARD_MAX_WIDTH)
@@ -45,7 +47,7 @@ export const BlinkCard: React.FC<BlinkCardProps> = ({
   const displayHolderName = holderName ?? resolvedName
 
   const maskedCardNumber = formatCardDisplayNumber(cardNumber, showCardDetails)
-  const maskedValidThru = formatCardValidThruDisplay(validThruDate, showCardDetails)
+  const maskedValidThru = formatCardValidThruDisplay(validThruDate, showValidThru)
 
   return (
     <View style={[styles.cardWrapper, { width: cardWidth, height: cardHeight }]}>
