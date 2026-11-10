@@ -14,6 +14,7 @@ import { PendingDepositModal } from "@app/screens/account-migration/pending-depo
 loadLocale("en")
 
 const TITLE = "There is a pending deposit to your account"
+const STILL_CONFIRMING = "Your deposit is not confirmed yet. Try again in a few minutes."
 
 const wrap = (ui: React.ReactElement) => (
   <ThemeProvider>
@@ -114,6 +115,29 @@ describe("PendingDepositModal", () => {
     )
 
     expect(queryByText("OK")).toBeNull()
+  })
+
+  it("says the deposit is still confirming once the user's check found it pending", () => {
+    const { getByText } = render(
+      wrap(
+        <PendingDepositModal
+          isVisible={true}
+          onAcknowledge={jest.fn()}
+          showCloseIconButton={false}
+          isStillPending={true}
+        />,
+      ),
+    )
+
+    expect(getByText(STILL_CONFIRMING)).toBeTruthy()
+  })
+
+  it("leaves the still confirming line out by default", () => {
+    const { queryByText } = render(
+      wrap(<PendingDepositModal isVisible={true} onAcknowledge={jest.fn()} />),
+    )
+
+    expect(queryByText(STILL_CONFIRMING)).toBeNull()
   })
 
   it("offers Contact support where the caller hands it over", () => {

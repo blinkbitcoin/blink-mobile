@@ -4,6 +4,7 @@ import { usePendingDepositHold } from "@app/screens/account-migration/hooks/use-
 import { PendingDepositCheckStatus } from "@app/types/migration"
 
 let mockHasPendingDeposit = false
+let mockIsStillPending = false
 const mockCheck = jest.fn()
 jest.mock("@app/screens/account-migration/hooks/use-custodial-pending-deposits", () => ({
   useCustodialPendingDeposits: () => ({
@@ -13,6 +14,7 @@ jest.mock("@app/screens/account-migration/hooks/use-custodial-pending-deposits",
     check: mockCheck,
     recheck: jest.fn().mockResolvedValue({ status: PendingDepositCheckStatus.Clear }),
     isRecheckRunning: false,
+    isStillPending: mockIsStillPending,
   }),
 }))
 
@@ -146,5 +148,48 @@ describe("usePendingDepositHold reading the figures again", () => {
     })
 
     expect(refreshFigures).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("usePendingDepositHold saying the deposit is still confirming", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockHasPendingDeposit = true
+    mockIsStillPending = true
+  })
+
+  const renderHold = (isServerFlowNotStarted: boolean) =>
+    renderHook(() =>
+      usePendingDepositHold({
+        isStartHeld: false,
+        isModalOutranked: false,
+        refreshFigures: jest.fn().mockResolvedValue(true),
+        isUndrained: true,
+        isCommitRefusedForDeposit: false,
+        isServerFlowNotStarted,
+        leaveFlow: jest.fn(),
+      }),
+    )
+
+  it("says so where OK checks again", () => {
+    const { result } = renderHold(false)
+
+    expect(result.current.isModalClosable).toBe(false)
+    expect(result.current.isStillPendingShown).toBe(true)
+  })
+
+  it("leaves it out where OK only leaves", () => {
+    const { result } = renderHold(true)
+
+    expect(result.current.isModalClosable).toBe(true)
+    expect(result.current.isStillPendingShown).toBe(false)
+  })
+
+  it("leaves it out until the user's check has found the deposit still pending", () => {
+    mockIsStillPending = false
+
+    const { result } = renderHold(false)
+
+    expect(result.current.isStillPendingShown).toBe(false)
   })
 })

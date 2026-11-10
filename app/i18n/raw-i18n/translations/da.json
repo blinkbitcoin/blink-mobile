@@ -3954,7 +3954,8 @@
     "pendingDepositModal": {
       "title": "Der er en afventende indbetaling til din konto",
       "body": "Du kan ikke migrere til en anden kontotype, før alle dine afventende indbetalinger er afregnet og krediteret denne konto.",
-      "contactSupportCta": "Kontakt support"
+      "contactSupportCta": "Kontakt support",
+      "stillConfirming": "Din indbetaling er ikke bekræftet endnu. Prøv igen om et par minutter."
     },
     "balancesOverview": {
       "title": "Flyt din saldo",

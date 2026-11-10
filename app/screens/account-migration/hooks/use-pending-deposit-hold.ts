@@ -69,6 +69,7 @@ export const usePendingDepositHold = ({
     check: checkAgain,
     recheck,
     isRecheckRunning,
+    isStillPending,
   } = useCustodialPendingDeposits()
 
   const [hasSeenDeposit, setHasSeenDeposit] = useState(false)
@@ -175,6 +176,8 @@ export const usePendingDepositHold = ({
     MigrationSupportReason.DepositPending,
   )
   const modalSupportAction = isModalClosable ? undefined : sendSupportEmail
+  /** Only where OK checks again: where it leaves, there is nothing to try again. */
+  const isStillPendingShown = !isModalClosable && isStillPending
 
   const checkBeforeApprove = useCallback(async (): Promise<boolean> => {
     const depositCheck = await recheck()
@@ -188,6 +191,7 @@ export const usePendingDepositHold = ({
     isModalClosable,
     acknowledgeModal,
     modalSupportAction,
+    isStillPendingShown,
     hasCheckError,
     isRecheckRunning,
     acknowledge,

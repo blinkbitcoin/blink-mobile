@@ -3954,7 +3954,8 @@
     "pendingDepositModal": {
       "title": "Kuentaykiman huk depósito suyachkan",
       "body": "Manam huk laya kuentaman astakuyta atinkichu, llapan suyachkaq depósitoykikuna kay kuentaman chayamunankama.",
-      "contactSupportCta": "Yanapaqwan rimay"
+      "contactSupportCta": "Yanapaqwan rimay",
+      "stillConfirming": "Depósitoykiqa manaraqmi takyachisqachu. Huk iskay minutomanta yapamanta ruray."
     },
     "balancesOverview": {
       "title": "Qullqiykita astiy",

@@ -3954,7 +3954,8 @@
     "pendingDepositModal": {
       "title": "Kukho idiphozithi esalindileyo kwiakhawunti yakho",
       "body": "Awukwazi ukufudukela kolunye uhlobo lweakhawunti de zonke iidiphozithi zakho ezisalindileyo zihlawulwe kwaye zifakwe kule akhawunti.",
-      "contactSupportCta": "Qhagamshelana nenkxaso"
+      "contactSupportCta": "Qhagamshelana nenkxaso",
+      "stillConfirming": "Idiphozithi yakho ayikaqinisekiswa. Zama kwakhona emva kwemizuzu embalwa."
     },
     "balancesOverview": {
       "title": "Hambisa ibhalansi yakho",

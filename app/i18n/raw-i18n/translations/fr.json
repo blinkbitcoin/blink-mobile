@@ -3954,7 +3954,8 @@
         "pendingDepositModal": {
             "title": "Un dépôt est en attente sur votre compte",
             "body": "Vous ne pouvez pas migrer vers un autre type de compte tant que tous vos dépôts en attente n'ont pas été réglés et crédités sur ce compte.",
-            "contactSupportCta": "Contacter le support"
+            "contactSupportCta": "Contacter le support",
+            "stillConfirming": "Votre dépôt n'est pas encore confirmé. Réessayez dans quelques minutes."
         },
         "balancesOverview": {
             "title": "Déplacez votre solde",

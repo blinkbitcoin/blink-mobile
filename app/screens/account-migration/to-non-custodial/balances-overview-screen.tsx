@@ -770,6 +770,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
           showCloseIconButton={depositHold.isModalClosable}
           isChecking={depositHold.isRecheckRunning}
           onContactSupport={depositHold.modalSupportAction}
+          isStillPending={depositHold.isStillPendingShown}
         />
       ) : null}
     </Screen>

@@ -3954,7 +3954,8 @@
     "pendingDepositModal": {
       "title": "Na váš účet čeká nevyřízený vklad",
       "body": "Na jiný typ účtu nemůžete přejít, dokud nebudou všechny vaše čekající vklady vypořádány a připsány na tento účet.",
-      "contactSupportCta": "Kontaktovat podporu"
+      "contactSupportCta": "Kontaktovat podporu",
+      "stillConfirming": "Váš vklad zatím nebyl potvrzen. Zkuste to znovu za několik minut."
     },
     "balancesOverview": {
       "title": "Přesuňte svůj zůstatek",

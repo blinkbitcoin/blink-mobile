@@ -3954,7 +3954,8 @@
     "pendingDepositModal": {
       "title": "Na vašem računu je uplata na čekanju",
       "body": "Ne možete migrirati na drugu vrstu računa dok sve vaše uplate na čekanju ne budu podmirene i pripisane ovom računu.",
-      "contactSupportCta": "Kontaktiraj podršku"
+      "contactSupportCta": "Kontaktiraj podršku",
+      "stillConfirming": "Vaša uplata još nije potvrđena. Pokušajte ponovno za nekoliko minuta."
     },
     "balancesOverview": {
       "title": "Premjesti svoj saldo",

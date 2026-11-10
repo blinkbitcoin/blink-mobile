@@ -3954,7 +3954,8 @@
     "pendingDepositModal": {
       "title": "Waliwo ssente eziteekeddwa ku akawunti yo ezikyalindiriddwa",
       "body": "Toyinza kukyusa kugenda ku kika kya akawunti ekirala okutuusa ng'ssente zo zonna ezikyalindiriddwa zimaze okutuuka era nga ziteekeddwa ku akawunti eno.",
-      "contactSupportCta": "Tuukirira obuyambi"
+      "contactSupportCta": "Tuukirira obuyambi",
+      "stillConfirming": "Ssente zo tezinnakakasibwa. Gezaako nate oluvannyuma lw'eddakiika ntono."
     },
     "balancesOverview": {
       "title": "Tambuza ssente zo",

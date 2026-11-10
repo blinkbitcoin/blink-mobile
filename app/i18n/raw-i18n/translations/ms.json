@@ -3954,7 +3954,8 @@
     "pendingDepositModal": {
       "title": "Terdapat deposit yang belum selesai ke akaun anda",
       "body": "Anda tidak boleh berpindah ke jenis akaun lain sebelum semua deposit anda yang belum selesai diselesaikan dan dikreditkan ke akaun ini.",
-      "contactSupportCta": "Hubungi sokongan"
+      "contactSupportCta": "Hubungi sokongan",
+      "stillConfirming": "Deposit anda belum disahkan. Cuba lagi dalam beberapa minit."
     },
     "balancesOverview": {
       "title": "Pindahkan baki anda",

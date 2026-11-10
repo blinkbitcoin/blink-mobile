@@ -3954,7 +3954,8 @@
     "pendingDepositModal": {
       "title": "Există un depozit în așteptare în contul tău",
       "body": "Nu poți migra către un alt tip de cont până când toate depozitele tale în așteptare nu au fost decontate și creditate în acest cont.",
-      "contactSupportCta": "Contactează asistența"
+      "contactSupportCta": "Contactează asistența",
+      "stillConfirming": "Depozitul tău nu este încă confirmat. Încearcă din nou peste câteva minute."
     },
     "balancesOverview": {
       "title": "Mută-ți soldul",

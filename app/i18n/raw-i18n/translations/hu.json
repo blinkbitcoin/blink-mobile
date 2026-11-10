@@ -3954,7 +3954,8 @@
     "pendingDepositModal": {
       "title": "Függőben lévő befizetés van a számládon",
       "body": "Nem válthatsz másik számlatípusra, amíg az összes függőben lévő befizetésed nem teljesült és nem került jóváírásra ezen a számlán.",
-      "contactSupportCta": "Kapcsolat a támogatással"
+      "contactSupportCta": "Kapcsolat a támogatással",
+      "stillConfirming": "A befizetésed még nincs megerősítve. Próbáld újra néhány perc múlva."
     },
     "balancesOverview": {
       "title": "Mozgasd az egyenleged",

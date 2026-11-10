@@ -3954,7 +3954,8 @@
         "pendingDepositModal": {
             "title": "C'è un deposito in sospeso sul tuo account",
             "body": "Non puoi migrare a un altro tipo di account finché tutti i tuoi depositi in sospeso non sono stati regolati e accreditati su questo account.",
-            "contactSupportCta": "Contatta il supporto"
+            "contactSupportCta": "Contatta il supporto",
+            "stillConfirming": "Il tuo deposito non è ancora confermato. Riprova tra qualche minuto."
         },
         "balancesOverview": {
             "title": "Sposta il tuo saldo",

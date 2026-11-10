@@ -1177,6 +1177,24 @@ describe("MigrationBalancesOverviewScreen, with a deposit still confirming", () 
     )
   })
 
+  it("says the deposit is still confirming once the check OK started finds it pending", async () => {
+    const pendingResult = pendingDepositsQueryResult([pendingOnChainReceive])
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingResult)
+    renderScreen()
+    await flushEffects()
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isStillPending: false }),
+    )
+
+    fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+    await flushEffects()
+
+    expect(pendingResult.refetch).toHaveBeenCalledTimes(1)
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isStillPending: true }),
+    )
+  })
+
   it("asks for the dollar balance to be emptied before showing the pending deposit", async () => {
     mockUseWalletOverviewScreenQuery.mockReturnValue(
       walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 5000 }),

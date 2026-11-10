@@ -13309,6 +13309,10 @@ type RootTranslation = {
 			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
 			 */
 			contactSupportCta: string
+			/**
+			 * Y​o​u​r​ ​d​e​p​o​s​i​t​ ​i​s​ ​n​o​t​ ​c​o​n​f​i​r​m​e​d​ ​y​e​t​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​f​e​w​ ​m​i​n​u​t​e​s​.
+			 */
+			stillConfirming: string
 		}
 		migrateNowModal: {
 			/**
@@ -27517,6 +27521,10 @@ export type TranslationFunctions = {
 			 * Contact support
 			 */
 			contactSupportCta: () => LocalizedString
+			/**
+			 * Your deposit is not confirmed yet. Try again in a few minutes.
+			 */
+			stillConfirming: () => LocalizedString
 		}
 		migrateNowModal: {
 			/**

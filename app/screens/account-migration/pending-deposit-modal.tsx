@@ -20,6 +20,8 @@ type PendingDepositModalProps = {
   /** Offered where the user cannot leave, so a deposit that never confirms (a low fee
    *  left in the mempool) is not a dead end. */
   onContactSupport?: () => void
+  /** The check started from OK found the deposit still confirming. */
+  isStillPending?: boolean
 }
 
 export const PendingDepositModal: React.FC<PendingDepositModalProps> = ({
@@ -28,6 +30,7 @@ export const PendingDepositModal: React.FC<PendingDepositModalProps> = ({
   showCloseIconButton = true,
   isChecking = false,
   onContactSupport,
+  isStillPending = false,
 }) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
@@ -46,7 +49,16 @@ export const PendingDepositModal: React.FC<PendingDepositModalProps> = ({
       image={<GaloyIcon name="warning" size={80} color={colors.warning} />}
       title={LL.AccountMigration.pendingDepositModal.title()}
       body={
-        <Text style={styles.body}>{LL.AccountMigration.pendingDepositModal.body()}</Text>
+        <>
+          <Text style={styles.body}>
+            {LL.AccountMigration.pendingDepositModal.body()}
+          </Text>
+          {isStillPending ? (
+            <Text style={styles.stillConfirming}>
+              {LL.AccountMigration.pendingDepositModal.stillConfirming()}
+            </Text>
+          ) : null}
+        </>
       }
       primaryButtonTitle={LL.common.ok()}
       primaryButtonOnPress={onAcknowledge}
@@ -65,5 +77,12 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 22,
     textAlign: "center",
     color: colors.black,
+  },
+  stillConfirming: {
+    marginTop: 12,
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: "center",
+    color: colors.warning,
   },
 }))

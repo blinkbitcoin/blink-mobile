@@ -3954,7 +3954,8 @@
         "pendingDepositModal": {
             "title": "Hay un depósito pendiente en tu cuenta",
             "body": "No puedes migrar a otro tipo de cuenta hasta que todos tus depósitos pendientes se hayan liquidado y acreditado en esta cuenta.",
-            "contactSupportCta": "Contactar con soporte"
+            "contactSupportCta": "Contactar con soporte",
+            "stillConfirming": "Tu depósito todavía no está confirmado. Vuelve a intentarlo en unos minutos."
         },
         "balancesOverview": {
             "title": "Mueve tu saldo",

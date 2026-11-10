@@ -140,6 +140,7 @@ const pendingDepositsState = (overrides: Record<string, unknown> = {}) => ({
   check: jest.fn().mockResolvedValue({ status: PendingDepositCheckStatus.Clear }),
   recheck: jest.fn().mockResolvedValue({ status: PendingDepositCheckStatus.Clear }),
   isRecheckRunning: false,
+  isStillPending: false,
   ...overrides,
 })
 
@@ -1376,6 +1377,44 @@ describe("MigrationGate, with a deposit still confirming", () => {
 
     expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
       expect.objectContaining({ isChecking: false }),
+    )
+  })
+
+  it("says the deposit is still confirming once the check OK started finds it pending", () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, isStillPending: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isStillPending: true }),
+    )
+  })
+
+  it("leaves the still confirming line out until the check OK started finds the deposit pending", () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isStillPending: false }),
+    )
+  })
+
+  it("leaves the still confirming line out where OK only leaves", () => {
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, isStillPending: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isStillPending: false }),
     )
   })
 

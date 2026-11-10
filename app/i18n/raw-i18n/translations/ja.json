@@ -3954,7 +3954,8 @@
         "pendingDepositModal": {
             "title": "アカウントに保留中の入金があります",
             "body": "保留中の入金がすべて確定し、このアカウントに反映されるまで、別の種類のアカウントに移行することはできません。",
-            "contactSupportCta": "サポートに連絡"
+            "contactSupportCta": "サポートに連絡",
+            "stillConfirming": "入金はまだ確定していません。数分後にもう一度お試しください。"
         },
         "balancesOverview": {
             "title": "残高を移動する",

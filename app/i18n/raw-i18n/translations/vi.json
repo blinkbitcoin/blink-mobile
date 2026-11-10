@@ -3954,7 +3954,8 @@
     "pendingDepositModal": {
       "title": "Có một khoản tiền gửi đang chờ xử lý vào tài khoản của bạn",
       "body": "Bạn không thể chuyển sang loại tài khoản khác cho đến khi tất cả các khoản tiền gửi đang chờ xử lý của bạn được hoàn tất và ghi có vào tài khoản này.",
-      "contactSupportCta": "Liên hệ hỗ trợ"
+      "contactSupportCta": "Liên hệ hỗ trợ",
+      "stillConfirming": "Khoản tiền gửi của bạn chưa được xác nhận. Hãy thử lại sau vài phút."
     },
     "balancesOverview": {
       "title": "Chuyển số dư của bạn",

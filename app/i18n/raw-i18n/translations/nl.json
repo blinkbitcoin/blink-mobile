@@ -3954,7 +3954,8 @@
     "pendingDepositModal": {
       "title": "Er staat een storting op je rekening in afwachting",
       "body": "Je kunt niet naar een ander type rekening migreren voordat al je openstaande stortingen zijn verwerkt en op deze rekening zijn bijgeschreven.",
-      "contactSupportCta": "Contact met support"
+      "contactSupportCta": "Contact met support",
+      "stillConfirming": "Je storting is nog niet bevestigd. Probeer het over een paar minuten opnieuw."
     },
     "balancesOverview": {
       "title": "Verplaats je saldo",

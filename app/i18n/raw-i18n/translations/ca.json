@@ -3954,7 +3954,8 @@
     "pendingDepositModal": {
       "title": "Hi ha un dipòsit pendent al teu compte",
       "body": "No pots migrar a un altre tipus de compte fins que tots els teus dipòsits pendents s'hagin liquidat i abonat en aquest compte.",
-      "contactSupportCta": "Contacta amb suport"
+      "contactSupportCta": "Contacta amb suport",
+      "stillConfirming": "El teu dipòsit encara no s'ha confirmat. Torna-ho a provar d'aquí a uns minuts."
     },
     "balancesOverview": {
       "title": "Mou el teu saldo",

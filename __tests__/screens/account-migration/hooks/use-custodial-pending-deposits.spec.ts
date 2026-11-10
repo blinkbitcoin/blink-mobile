@@ -272,6 +272,128 @@ describe("useCustodialPendingDeposits", () => {
       expect(result.current.isRecheckRunning).toBe(false)
     })
 
+    describe("whether the user's last check found the deposit still pending", () => {
+      const renderWithAnswers = () => {
+        const { refetch, answers } = deferredAnswers()
+        const queryResult = (transactions: Array<typeof pendingOnChainReceive>) => ({
+          ...pendingDepositsQueryResult(transactions),
+          refetch,
+        })
+        mockUseMigrationPendingDepositsQuery.mockReturnValue(
+          queryResult([pendingOnChainReceive]),
+        )
+        const rendered = renderHook(() => useCustodialPendingDeposits())
+        const showList = (transactions: Array<typeof pendingOnChainReceive>) => {
+          mockUseMigrationPendingDepositsQuery.mockReturnValue(queryResult(transactions))
+          rendered.rerender({})
+        }
+        return { ...rendered, answers, showList }
+      }
+      const pendingAnswer = () => ({
+        data: pendingDepositsQueryResult([pendingOnChainReceive]).data,
+      })
+
+      it("is off before the user has checked", () => {
+        const { result } = renderWithAnswers()
+
+        expect(result.current.isStillPending).toBe(false)
+      })
+
+      it("turns on once the user's check answers pending", async () => {
+        const { result, answers } = renderWithAnswers()
+
+        act(() => {
+          result.current.recheck()
+        })
+        await act(async () => {
+          answers[0](pendingAnswer())
+        })
+
+        expect(result.current.isStillPending).toBe(true)
+      })
+
+      it("stays off for a pending answer to a check the user did not start", async () => {
+        const { result, answers } = renderWithAnswers()
+
+        act(() => {
+          result.current.check()
+        })
+        await act(async () => {
+          answers[0](pendingAnswer())
+        })
+
+        expect(result.current.isStillPending).toBe(false)
+      })
+
+      it("turns off while the user's next check runs, and stays off when it answers clear", async () => {
+        const { result, answers, showList } = renderWithAnswers()
+        act(() => {
+          result.current.recheck()
+        })
+        await act(async () => {
+          answers[0](pendingAnswer())
+        })
+
+        act(() => {
+          result.current.recheck()
+        })
+        expect(result.current.isStillPending).toBe(false)
+
+        showList([])
+        await act(async () => {
+          answers[1]({ data: pendingDepositsQueryResult().data })
+        })
+
+        expect(result.current.isStillPending).toBe(false)
+      })
+
+      it("stays off for a check that fails", async () => {
+        const refetch = jest.fn().mockRejectedValue(new Error("Network request failed"))
+        mockUseMigrationPendingDepositsQuery.mockReturnValue({
+          ...pendingDepositsQueryResult([pendingOnChainReceive]),
+          refetch,
+        })
+        const { result } = renderHook(() => useCustodialPendingDeposits())
+
+        await act(async () => {
+          await result.current.recheck()
+        })
+
+        expect(result.current.isStillPending).toBe(false)
+      })
+
+      it("forgets the answer once the deposit has cleared, so a later deposit starts without it", async () => {
+        const { result, answers, showList } = renderWithAnswers()
+        act(() => {
+          result.current.recheck()
+        })
+        await act(async () => {
+          answers[0](pendingAnswer())
+        })
+
+        showList([])
+        expect(result.current.isStillPending).toBe(false)
+        showList([pendingOnChainReceive])
+
+        expect(result.current.isStillPending).toBe(false)
+      })
+
+      it("keeps the answer when that same check brings the deposit into the list", async () => {
+        const { result, answers, showList } = renderWithAnswers()
+        showList([])
+        act(() => {
+          result.current.recheck()
+        })
+        await act(async () => {
+          answers[0](pendingAnswer())
+        })
+
+        showList([pendingOnChainReceive])
+
+        expect(result.current.isStillPending).toBe(true)
+      })
+    })
+
     it("leaves the spinner off for a check the user did not start", async () => {
       const { refetch, answers } = deferredAnswers()
       mockUseMigrationPendingDepositsQuery.mockReturnValue({

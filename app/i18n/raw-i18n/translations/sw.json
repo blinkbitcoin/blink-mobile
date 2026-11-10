@@ -3954,7 +3954,8 @@
     "pendingDepositModal": {
       "title": "Kuna amana inayosubiri kwenye akaunti yako",
       "body": "Huwezi kuhamia aina nyingine ya akaunti kabla ya amana zako zote zinazosubiri kukamilika na kuwekwa kwenye akaunti hii.",
-      "contactSupportCta": "Wasiliana na usaidizi"
+      "contactSupportCta": "Wasiliana na usaidizi",
+      "stillConfirming": "Amana yako bado haijathibitishwa. Jaribu tena baada ya dakika chache."
     },
     "balancesOverview": {
       "title": "Hamisha salio lako",

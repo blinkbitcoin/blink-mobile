@@ -4004,7 +4004,8 @@
         "pendingDepositModal": {
             "title": "There is a pending deposit to your account",
             "body": "You cannot migrate to a different type of account before all your pending deposits have been settled and credited on this account.",
-            "contactSupportCta": "Contact support"
+            "contactSupportCta": "Contact support",
+            "stillConfirming": "Your deposit is not confirmed yet. Try again in a few minutes."
         },
         "migrateNowModal": {
             "title": "Migrate now to a non-custodial account",

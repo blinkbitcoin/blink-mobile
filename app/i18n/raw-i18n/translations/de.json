@@ -3954,7 +3954,8 @@
         "pendingDepositModal": {
             "title": "Es gibt eine ausstehende Einzahlung auf dein Konto",
             "body": "Du kannst nicht zu einem anderen Kontotyp migrieren, bevor alle deine ausstehenden Einzahlungen abgewickelt und diesem Konto gutgeschrieben wurden.",
-            "contactSupportCta": "Support kontaktieren"
+            "contactSupportCta": "Support kontaktieren",
+            "stillConfirming": "Deine Einzahlung ist noch nicht bestätigt. Versuche es in ein paar Minuten erneut."
         },
         "balancesOverview": {
             "title": "Verschiebe dein Guthaben",

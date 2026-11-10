@@ -110,6 +110,7 @@ export const MigrationGate: React.FC = () => {
     check: checkPendingDeposits,
     recheck: recheckPendingDeposits,
     isRecheckRunning: isPendingDepositRecheckRunning,
+    isStillPending: isPendingDepositStillPending,
   } = useCustodialPendingDeposits()
   const {
     navigateToCheckpoint,
@@ -460,9 +461,10 @@ export const MigrationGate: React.FC = () => {
     const pendingDepositSupportAction = isExitBlocked
       ? sendDepositSupportEmail
       : undefined
-    /** Only where OK checks again: where it leaves, a check running in the background
-     *  has nothing to do with it. */
+    /** Both only where OK checks again: where it leaves, a check running in the
+     *  background has nothing to do with it, and there is nothing to try again. */
     const isPendingDepositCheckShown = isExitBlocked && isPendingDepositRecheckRunning
+    const isStillPendingShown = isExitBlocked && isPendingDepositStillPending
     return (
       <>
         <MigrationRequiredScreen mode={mode} isExitBlocked={isExitBlocked} />
@@ -472,6 +474,7 @@ export const MigrationGate: React.FC = () => {
           showCloseIconButton={canClosePendingDepositModal}
           isChecking={isPendingDepositCheckShown}
           onContactSupport={pendingDepositSupportAction}
+          isStillPending={isStillPendingShown}
         />
       </>
     )

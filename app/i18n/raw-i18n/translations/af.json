@@ -3954,7 +3954,8 @@
     "pendingDepositModal": {
       "title": "Daar is 'n hangende deposito na jou rekening",
       "body": "Jy kan nie na 'n ander soort rekening migreer voordat al jou hangende deposito's vereffen en op hierdie rekening gekrediteer is nie.",
-      "contactSupportCta": "Kontak ondersteuning"
+      "contactSupportCta": "Kontak ondersteuning",
+      "stillConfirming": "Jou deposito is nog nie bevestig nie. Probeer weer oor 'n paar minute."
     },
     "balancesOverview": {
       "title": "Skuif jou saldo",

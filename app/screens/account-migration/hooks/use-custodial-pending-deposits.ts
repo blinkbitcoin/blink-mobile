@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { gql } from "@apollo/client"
 
 import {
@@ -70,6 +70,8 @@ type UseCustodialPendingDeposits = {
   /** The same check, started by the user: its spinner is `isRecheckRunning`. */
   recheck: () => Promise<PendingDepositCheck>
   isRecheckRunning: boolean
+  /** The user's last check found the deposit still pending. */
+  isStillPending: boolean
 }
 
 /**
@@ -130,20 +132,35 @@ export const useCustodialPendingDeposits = ({
    *  tap. Counted, so a second tap while the first check is out keeps it on until both
    *  have answered. */
   const [rechecksRunning, setRechecksRunning] = useState(0)
+  /** Without it a tap that found the deposit still confirming changes nothing on screen,
+   *  and reads as a tap that did nothing. Off while the next one runs, so each answer
+   *  shows as new. */
+  const [isRecheckAnsweredPending, setIsRecheckAnsweredPending] = useState(false)
   const recheck = useCallback(async (): Promise<PendingDepositCheck> => {
     setRechecksRunning((running) => running + 1)
+    setIsRecheckAnsweredPending(false)
     const answer = await check()
     setRechecksRunning((running) => running - 1)
+    setIsRecheckAnsweredPending(answer.status === PendingDepositCheckStatus.Pending)
     return answer
   }, [check])
 
+  const hasPendingDeposit = hasPendingOnChainReceive(pendingTransactions)
+
+  /** Cleared however the deposit cleared (a check, a Home refetch), so a deposit sent later
+   *  does not start out with an answer about this one. */
+  useEffect(() => {
+    if (!hasPendingDeposit) setIsRecheckAnsweredPending(false)
+  }, [hasPendingDeposit])
+
   return {
-    hasPendingDeposit: hasPendingOnChainReceive(pendingTransactions),
+    hasPendingDeposit,
     loading,
     isReady: !error && pendingTransactions !== undefined,
     hasError: Boolean(error),
     check,
     recheck,
     isRecheckRunning: rechecksRunning > 0,
+    isStillPending: isRecheckAnsweredPending,
   }
 }
