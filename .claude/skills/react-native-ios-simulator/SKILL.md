@@ -263,13 +263,16 @@ under a shared lock, so a clone can never race a re-bless.
 
 **Staleness is judged, not guessed — and mechanically.** Bless hashes the
 build's `ios/Podfile.lock` into the stamp (`--lockfile` overrides the default
-cwd-relative path), and every claim run from an app worktree root prints the
+cwd-relative path) — but only when the installed build is provably no older
+than that lockfile (`simctl install` keeps the build's mtimes; bless finds the
+app via `DEMO_APP_ID_IOS`). An old install blessed from a newer worktree gets
+no hash, so it can never pass for current. Every claim run from an app worktree root prints the
 verdict as a `# golden verdict:` line: `native build matches` or
 `NATIVE BUILD STALE`. Stale means a native module changed since the bless (a
 `Podfile.lock` change, such as a renamed native module) — install a fresh build
 onto the clone or re-bless; do not trust the cloned install. For a stamp
-without a hash (blessed before lockfile stamping, or blessed without a
-lockfile), fall back to diffing native paths against the stamp's SHA:
+without a hash (blessed before lockfile stamping, without a lockfile, or from
+a build older than the lockfile), fall back to diffing native paths against the stamp's SHA:
 
 ```bash
 git -C /path/to/your-app log <stamp-sha>..origin/main -- ios/ package.json yarn.lock

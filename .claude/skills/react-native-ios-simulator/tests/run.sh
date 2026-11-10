@@ -704,11 +704,34 @@ check "claim warns NATIVE BUILD STALE when the lockfile moved on" "yes" \
   "$(echo "$out" | grep -q "NATIVE BUILD STALE" && echo yes || echo no)"
 (cd "$VERDICT_APP" && "$SCRIPTS/release-session.sh" 712 --delete) >/dev/null 2>&1
 
-# --- bless records the lockfile hash in the stamp ----------------------------
+# --- bless records the lockfile hash only for a build no older than it -------
+# simctl install keeps a build's mtimes, so the installed bundle dates the
+# build; the fake app's container mtime plays that role here.
+touch -t 202601010000 "$VERDICT_APP/ios/Podfile.lock"
 out=$("$SCRIPTS/claim-session.sh" 713) && eval "$out"
-"$SCRIPTS/bless-golden.sh" 713 --sha bbb222 --lockfile "$VERDICT_APP/ios/Podfile.lock" >/dev/null 2>&1
+mkdir -p "$FAKE_APP_ROOT/$DEMO_UDID"; cp -R "$APP_SRC" "$FAKE_APP_ROOT/$DEMO_UDID/com.example.demoapp.app"
+touch -t 202602010000 "$FAKE_APP_ROOT/$DEMO_UDID/com.example.demoapp.app"     # built after the lockfile
+DEMO_APP_ID_IOS=com.example.demoapp "$SCRIPTS/bless-golden.sh" 713 --sha bbb222 --lockfile "$VERDICT_APP/ios/Podfile.lock" >/dev/null 2>&1
 check "bless with a lockfile exits zero" "0" "$?"
 check "the blessed stamp carries the lockfile hash" "yes" \
+  "$(grep -q '^podfile-lock-hash=' "$GOLDEN_STAMP" && echo yes || echo no)"
+
+# An old install blessed from a newer worktree: the lockfile moved on after
+# the build, so the stamp must not vouch for it.
+out=$("$SCRIPTS/claim-session.sh" 714) && eval "$out"
+mkdir -p "$FAKE_APP_ROOT/$DEMO_UDID"; cp -R "$APP_SRC" "$FAKE_APP_ROOT/$DEMO_UDID/com.example.demoapp.app"
+touch -t 202512010000 "$FAKE_APP_ROOT/$DEMO_UDID/com.example.demoapp.app"     # built BEFORE the lockfile
+out=$(DEMO_APP_ID_IOS=com.example.demoapp "$SCRIPTS/bless-golden.sh" 714 --sha ccc333 --lockfile "$VERDICT_APP/ios/Podfile.lock" 2>&1)
+check "bless of an older build than the lockfile still succeeds" "0" "$?"
+check "but its stamp carries no lockfile hash" "no" \
+  "$(grep -q '^podfile-lock-hash=' "$GOLDEN_STAMP" && echo yes || echo no)"
+check "and the bless says why" "yes" \
+  "$(echo "$out" | grep -q "changed after the installed build" && echo yes || echo no)"
+
+# A build bless cannot find cannot be vouched for either.
+out=$("$SCRIPTS/claim-session.sh" 715) && eval "$out"
+out=$("$SCRIPTS/bless-golden.sh" 715 --sha ddd444 --lockfile "$VERDICT_APP/ios/Podfile.lock" 2>&1)
+check "a bless that cannot date the build stamps no hash" "no" \
   "$(grep -q '^podfile-lock-hash=' "$GOLDEN_STAMP" && echo yes || echo no)"
 
 echo

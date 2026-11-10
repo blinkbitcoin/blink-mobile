@@ -26,8 +26,10 @@
 #   --lockfile   Podfile.lock of the build the golden carries (default:
 #                ios/Podfile.lock in the cwd). Its hash goes into the stamp so
 #                claim-session.sh can give an instant stale/fresh verdict
-#                instead of git archaeology; without a lockfile the stamp
-#                carries no hash and native-stamp.sh check demands a re-bless
+#                instead of git archaeology - but only when the installed build
+#                (found via DEMO_APP_ID_IOS) is no older than the lockfile;
+#                otherwise the stamp carries no hash and native-stamp.sh check
+#                demands a re-bless
 #
 # Workflow: claim a session, install the app, log in once, then bless.
 # If a later clone comes up logged out, the fix is to re-bless a fresh login.
@@ -96,6 +98,22 @@ if [ -n "$METRO_PID" ] && kill -0 "$METRO_PID" 2>/dev/null; then
   echo "stopped Metro pid $METRO_PID (port $PORT)"
 fi
 
+# --- Date the installed build -------------------------------------------------
+# The lockfile hash vouches for the INSTALLED build, so it may only be stamped
+# when that build is provably no older than the lockfile. `simctl install`
+# keeps the build's file mtimes, so the bundle's Info.plist dates the build.
+# A lockfile changed after the build (or a build that cannot be dated) gets no
+# hash - which makes claims demand a re-bless rather than print a false
+# "native build matches" for an old install blessed from a newer worktree.
+BUILD_MTIME=""
+if [ -n "${DEMO_APP_ID_IOS:-}" ]; then
+  CONTAINER=$(xcrun simctl get_app_container "$UDID" "$DEMO_APP_ID_IOS" app 2>/dev/null || true)
+  if [ -n "$CONTAINER" ] && [ -e "$CONTAINER" ]; then
+    DATED="$CONTAINER/Info.plist"; [ -e "$DATED" ] || DATED="$CONTAINER"
+    BUILD_MTIME=$(stat -f %m "$DATED" 2>/dev/null || echo "")
+  fi
+fi
+
 # Ours by the gate above, so shutting it down is as safe as release doing it.
 xcrun simctl shutdown "$UDID" 2>/dev/null || true
 
@@ -118,10 +136,14 @@ runtime=$RUNTIME
 EOF
 # The lockfile hash is what turns "is this golden's native build stale?" from
 # git archaeology into an instant claim-time comparison.
-if [ -f "$LOCKFILE" ]; then
-  "$(dirname "${BASH_SOURCE[0]}")/native-stamp.sh" write "$NEW_STAMP" --lockfile "$LOCKFILE" >/dev/null
-else
+if [ ! -f "$LOCKFILE" ]; then
   echo "note: no Podfile.lock at $LOCKFILE - the stamp carries no native hash, so staleness checks will demand a re-bless; pass --lockfile to fix" >&2
+elif [ -z "$BUILD_MTIME" ]; then
+  echo "note: cannot date the installed build (set DEMO_APP_ID_IOS so bless can find it) - the stamp carries no native hash, so staleness checks will demand a re-bless" >&2
+elif [ "$(stat -f %m "$LOCKFILE")" -gt "$BUILD_MTIME" ]; then
+  echo "note: $LOCKFILE changed after the installed build was made ($(date -r "$BUILD_MTIME" +%Y-%m-%dT%H:%M)) - the stamp carries no native hash, since it cannot vouch for that build; install a build of this worktree and re-bless" >&2
+else
+  "$(dirname "${BASH_SOURCE[0]}")/native-stamp.sh" write "$NEW_STAMP" --lockfile "$LOCKFILE" >/dev/null
 fi
 
 cat > "$SWAP/swap.sh" <<'SWAPEOF'
