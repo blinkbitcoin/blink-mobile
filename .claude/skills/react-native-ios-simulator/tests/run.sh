@@ -715,7 +715,7 @@ echo
 echo "credential precheck"
 
 # The wall this removes: an agent discovering forty minutes into a session
-# that the staging OTP was never set on this machine. Claim reports the gap
+# that a required login credential was never set on this machine. Claim reports the gap
 # up front - and never blocks, because most demos need no account at all.
 reset_world
 export FAKE_CRED_PRESENT=some-value

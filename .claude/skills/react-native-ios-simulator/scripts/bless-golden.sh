@@ -1,7 +1,7 @@
 #!/bin/bash
 # Promote this session's simulator into the golden slot - the device that
 # claim-session.sh clones for every later session instead of creating a blank
-# one and paying app install + staging login again.
+# one and paying app install + login again.
 #
 # Bless INSTEAD of release, never after it: this script terminates the session
 # it promotes. Merely renaming the device would leave the session manifest

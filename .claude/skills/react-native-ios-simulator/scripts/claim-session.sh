@@ -281,8 +281,8 @@ if [ -f "$SESSION_DIR/golden-stamp" ]; then
   fi
 fi
 
-# Fail-fast credential report: flows that need a real account (a staging login
-# for the golden, an OTP) dead-end mid-session when a credential is absent.
+# Fail-fast credential report: flows that need a real account (a test-account
+# login for the golden, an OTP) dead-end mid-session when a credential is absent.
 # Naming the gap at claim time lets the agent plan the stub-harness route up
 # front instead of discovering the wall forty minutes in. Repo-specific names
 # come from DEMO_REQUIRED_ENV (see AGENTS.md); this never blocks the claim -

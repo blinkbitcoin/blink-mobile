@@ -236,7 +236,7 @@ reaper never touches a booted device or one named for another session prefix.
 
 ## The Golden Simulator: Skip Install + Login
 
-A video session used to pay a fresh staging login (OTP, coordinate taps,
+A video session used to pay a fresh app login (OTP, coordinate taps,
 keyboard overlays) on every new simulator, and every session paid the app
 install. The golden simulator pays both **once**: a blessed, shutdown device
 with the app installed and an account logged in, which `claim-session.sh`
@@ -248,7 +248,7 @@ Create or refresh it by promoting a session you set up once:
 
 ```bash
 eval "$("$SKILL/scripts/claim-session.sh" 3712)"
-# install the app, log in to staging once (Maestro or by hand), verify the
+# install the app, log in once (Maestro or by hand), verify the
 # home screen, then promote - bless REPLACES release for this session:
 "$SKILL/scripts/bless-golden.sh" 3712 --sha "$(git rev-parse HEAD)"
 ```
@@ -266,7 +266,7 @@ build's `ios/Podfile.lock` into the stamp (`--lockfile` overrides the default
 cwd-relative path), and every claim run from an app worktree root prints the
 verdict as a `# golden verdict:` line: `native build matches` or
 `NATIVE BUILD STALE`. Stale means a native module changed since the bless (a
-`Podfile.lock` change, like the geetest module rename) — install a fresh build
+`Podfile.lock` change, such as a renamed native module) — install a fresh build
 onto the clone or re-bless; do not trust the cloned install. For a stamp
 without a hash (blessed before lockfile stamping, or blessed without a
 lockfile), fall back to diffing native paths against the stamp's SHA:
@@ -275,7 +275,7 @@ lockfile), fall back to diffing native paths against the stamp's SHA:
 git -C /path/to/your-app log <stamp-sha>..origin/main -- ios/ package.json yarn.lock
 ```
 
-A clone that comes up logged out (staging sessions do expire) means the same
+A clone that comes up logged out (test-account sessions do expire) means the same
 thing — re-bless with a fresh login. Opt out of cloning with
 `DEMO_SIM_GOLDEN=none`, or point at a differently named golden with
 `DEMO_SIM_GOLDEN=<device name>`. The reaper never touches the golden: it has

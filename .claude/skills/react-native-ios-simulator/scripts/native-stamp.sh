@@ -6,8 +6,8 @@
 # simulator's app install is safe only while no native module changed since
 # that build was made. Deciding that by reading git history is slow and
 # error-prone, and a wrong guess costs a ~14 min locked rebuild discovered
-# only when the app crashes at launch (a renamed native module - the geetest
-# rename - did exactly this). Podfile.lock is the native closure's fingerprint:
+# only when the app crashes at launch (renaming a native module does exactly
+# this). Podfile.lock is the native closure's fingerprint:
 # same hash, same native build inputs.
 #
 # Usage:
@@ -63,7 +63,7 @@ case "$MODE" in
     else
       die "native build is STALE: $LOCKFILE hashes to $HASH but the stamp recorded $RECORDED.
        A native module changed since this build was stamped (a Podfile.lock change,
-       like the geetest module rename) - rebuild, or re-bless the golden, before
+       such as a renamed native module) - rebuild, or re-bless the golden, before
        trusting this install"
     fi
     ;;
