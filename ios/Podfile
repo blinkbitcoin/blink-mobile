@@ -45,9 +45,7 @@ target 'GaloyApp' do
 
   # The MeaWallet SDK configuration, present only where scripts/install-meawallet-mpp.sh
   # could install it.
-  if File.exist?(File.join(__dir__, 'MeaConfig', 'mea_config'))
-    pod 'BlinkMeaConfig', :path => './MeaConfig'
-  end
+  pod 'BlinkMeaConfig', path: './MeaConfig' if File.exist?(File.join(__dir__, 'MeaConfig', 'mea_config'))
 
 
   post_install do |installer|
