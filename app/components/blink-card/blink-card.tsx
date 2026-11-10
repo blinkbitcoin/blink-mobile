@@ -1,12 +1,12 @@
 import React from "react"
 import { StyleSheet, View, useWindowDimensions } from "react-native"
 import { BlurView } from "@react-native-community/blur"
-import { LinearGradient } from "react-native-linear-gradient"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon/galoy-icon"
 import { useCardHolder } from "@app/hooks/use-card-holder"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 import { formatCardValidThruDisplay } from "@app/utils/date"
 import { formatCardDisplayNumber } from "@app/utils/helper"
 
@@ -49,29 +49,25 @@ export const BlinkCard: React.FC<BlinkCardProps> = ({
 
   return (
     <View style={[styles.cardWrapper, { width: cardWidth, height: cardHeight }]}>
-      <LinearGradient
-        colors={[colors.staticBrandSunset, colors.staticBrandYellow]}
-        useAngle={true}
-        angle={249}
-        style={[styles.card, { width: cardWidth, height: cardHeight }]}
-      >
+      <View style={[styles.card, { width: cardWidth, height: cardHeight }]}>
         <View style={styles.topRow}>
-          <GaloyIcon
-            name="blink-icon"
-            width={98}
-            height={30}
-            color={colors.staticWhite}
-          />
+          <GaloyIcon name="blink-icon" width={98} height={30} color={colors.staticWhite} />
           <GaloyIcon
             name="visa-platinum"
             width={69}
             height={35}
             color={colors.staticWhite}
+            style={styles.visaLogo}
           />
         </View>
 
-        <View style={styles.cardNumberSpacer} />
-        <Text style={styles.cardNumber}>{maskedCardNumber}</Text>
+        <Text
+          style={[styles.cardNumber, { top: cardHeight / 2 }]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+        >
+          {maskedCardNumber}
+        </Text>
 
         <View style={styles.bottomRow}>
           <Text style={styles.holderName}>{displayHolderName?.toUpperCase()}</Text>
@@ -82,7 +78,7 @@ export const BlinkCard: React.FC<BlinkCardProps> = ({
             ) : null}
           </View>
         </View>
-      </LinearGradient>
+      </View>
 
       {isFrozen && (
         <>
@@ -110,33 +106,36 @@ const useStyles = makeStyles(({ colors }) => ({
     overflow: "hidden",
   },
   card: {
+    backgroundColor: colors.staticCardBackground,
     borderRadius: 14,
-    paddingTop: 7,
-    paddingHorizontal: 11,
-    paddingBottom: 15,
-    justifyContent: "flex-start",
+    paddingTop: 11,
+    paddingLeft: 13,
+    paddingRight: 15,
+    paddingBottom: 18,
+    justifyContent: "space-between",
   },
   topRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 12,
+  },
+  /** The digits' side bearing keeps the date's ink 1pt in from its box, while the logo's
+   *  ink reaches its edge, so the logo steps in by the same 1pt to line up with the date. */
+  visaLogo: {
+    marginRight: 1,
   },
   cardNumber: {
+    position: "absolute",
+    left: 0,
+    right: 0,
     color: colors.staticWhite,
     fontSize: 24,
     textAlign: "center",
     textShadowColor: "rgba(0, 0, 0, 0.3)",
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
-    fontFamily: "Source Sans Pro",
-    fontStyle: "normal",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 32,
-    marginBottom: 7,
-  },
-  cardNumberSpacer: {
-    flexGrow: 1,
   },
   bottomRow: {
     flexDirection: "row",
@@ -146,14 +145,11 @@ const useStyles = makeStyles(({ colors }) => ({
   holderName: {
     color: colors.staticWhite,
     fontSize: 14,
-    fontWeight: "700",
-    fontFamily: "Source Sans Pro",
-    lineHeight: 20,
+    fontFamily: fonts.bold,
+    lineHeight: 18,
     textShadowColor: "rgba(0, 0, 0, 0.3)",
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
-    marginBottom: 1,
-    marginLeft: 5,
   },
   validThruContainer: {
     alignItems: "flex-end",
@@ -162,9 +158,7 @@ const useStyles = makeStyles(({ colors }) => ({
   validThruLabel: {
     color: colors.staticWhite,
     fontSize: 10,
-    fontFamily: "Source Sans Pro",
-    fontStyle: "normal",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 13,
     textShadowColor: "rgba(0, 0, 0, 0.3)",
     textShadowOffset: { width: 0, height: 1 },
@@ -173,10 +167,8 @@ const useStyles = makeStyles(({ colors }) => ({
   validThruValue: {
     color: colors.staticWhite,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontStyle: "normal",
-    fontWeight: "400",
-    lineHeight: 20,
+    fontFamily: fonts.regular,
+    lineHeight: 18,
     textShadowColor: "rgba(0, 0, 0, 0.3)",
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
@@ -216,17 +208,13 @@ const useStyles = makeStyles(({ colors }) => ({
   frozenTitle: {
     color: colors.staticWhite,
     fontSize: 20,
-    fontWeight: "700",
-    fontFamily: "Source Sans Pro",
-    fontStyle: "normal",
+    fontFamily: fonts.bold,
     lineHeight: 24,
   },
   frozenSubtitle: {
     color: colors.staticWhite,
     fontSize: 12,
-    fontWeight: "400",
-    fontFamily: "Source Sans Pro",
-    fontStyle: "normal",
+    fontFamily: fonts.regular,
     lineHeight: 18,
   },
 }))
