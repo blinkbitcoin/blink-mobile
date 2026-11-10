@@ -4,15 +4,16 @@ import { WalletAddResult, type CardholderAddress, type DeviceWallet } from "../t
 import type { GooglePayAddress, MeaWalletSdk } from "./meawallet-sdk"
 
 /** Apple reports the user or the system dismissing its sheet under this domain, with
- *  codes 1 (user) and 2 (system); the SDK passes the NSError through as the message. */
+ *  codes 1 (user) and 2 (system). React Native hands the NSError's domain to JS beside its
+ *  code, so the match does not depend on how the SDK words the message. */
 const APPLE_ADD_PASS_ERROR_DOMAIN = "PKAddPaymentPassErrorDomain"
 const APPLE_CANCEL_CODES: readonly string[] = ["1", "2"]
 
 const isAppleSheetDismissed = (err: unknown): boolean => {
   if (!(err instanceof Error)) return false
-  const { code } = err as Error & { code?: string }
+  const { code, domain } = err as Error & { code?: string; domain?: string }
   const isCancelCode = code !== undefined && APPLE_CANCEL_CODES.includes(code)
-  return isCancelCode && err.message.includes(APPLE_ADD_PASS_ERROR_DOMAIN)
+  return isCancelCode && domain === APPLE_ADD_PASS_ERROR_DOMAIN
 }
 
 /** The SDK names its errors in `code`, and reports the user backing out of Google's sheet,

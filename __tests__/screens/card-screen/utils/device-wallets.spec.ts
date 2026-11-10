@@ -44,10 +44,13 @@ const fakeSdk = () => {
   return sdk satisfies MeaWalletSdk
 }
 
-/** A rejection as the SDK forwards it from Apple: the NSError code as `code` and the
- *  NSError itself, domain included, as the message. */
-const appleError = (domain: string, code: string) =>
-  Object.assign(new Error(`Error Domain=${domain} Code=${code} "(null)"`), { code })
+/** A rejection as React Native hands the SDK's NSError to JS: its code as `code`, its
+ *  domain as `domain`, and the SDK's description of it as the message. */
+const appleError = (
+  domain: string,
+  code: string,
+  message = `Error Domain=${domain} Code=${code} "(null)"`,
+) => Object.assign(new Error(message), { code, domain })
 
 /** A rejection as the SDK forwards it from Google Pay: its error name as `code`, and the
  *  native error, wallet code included, as `userInfo`. */
@@ -147,6 +150,34 @@ describe("deviceWalletFor on iOS", () => {
     await expect(deviceWalletFor(sdk).add(card, provisioning)).resolves.toBe(
       WalletAddResult.Cancelled,
     )
+  })
+
+  /** The SDK words the message, and a rewording must not turn every cancel into an error. */
+  it("answers cancelled from the domain whatever the message says", async () => {
+    const sdk = fakeSdk()
+    sdk.applePay.showAddPaymentPassView.mockRejectedValue(
+      appleError(
+        "PKAddPaymentPassErrorDomain",
+        "1",
+        "The operation couldn't be completed.",
+      ),
+    )
+
+    await expect(deviceWalletFor(sdk).add(card, provisioning)).resolves.toBe(
+      WalletAddResult.Cancelled,
+    )
+  })
+
+  it("fails on another domain's error whose message names Apple's", async () => {
+    const sdk = fakeSdk()
+    const wrapped = appleError(
+      "com.meawallet.mpp",
+      "1",
+      "Error Domain=PKAddPaymentPassErrorDomain Code=1 wrapped by the SDK",
+    )
+    sdk.applePay.showAddPaymentPassView.mockRejectedValue(wrapped)
+
+    await expect(deviceWalletFor(sdk).add(card, provisioning)).rejects.toBe(wrapped)
   })
 
   it("fails on Apple's unsupported error rather than calling it a cancel", async () => {
