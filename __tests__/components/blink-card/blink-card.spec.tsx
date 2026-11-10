@@ -158,6 +158,49 @@ describe("BlinkCard", () => {
     })
   })
 
+  describe("rendering with showValidThru", () => {
+    it("shows the date while the number stays masked", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard
+          {...defaultProps}
+          validThruDate={new Date(Date.UTC(2028, 11, 1))}
+          showValidThru={true}
+        />,
+      )
+
+      expect(getByText("•••• •••• •••• 4242")).toBeTruthy()
+      expect(getByText("12/ 28")).toBeTruthy()
+    })
+
+    it("masks the date even when the card details are shown", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} showCardDetails={true} showValidThru={false} />,
+      )
+
+      expect(getByText("4242 4242 4242 4242")).toBeTruthy()
+      expect(getByText("•• / ••")).toBeTruthy()
+    })
+  })
+
+  describe("holder name and date fallbacks", () => {
+    it("shows the name the card holder lookup resolves when none is given", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} holderName={undefined} cardId="card-test-id" />,
+      )
+
+      expect(getByText("SATOSHI TEST")).toBeTruthy()
+    })
+
+    it("leaves the date out when it cannot be read", () => {
+      const { getByText, queryByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} validThruDate="not-a-date" showCardDetails={true} />,
+      )
+
+      expect(getByText("VALID THRU")).toBeTruthy()
+      expect(queryByText(/\//)).toBeNull()
+    })
+  })
+
   describe("rendering frozen state", () => {
     it("renders without crashing when frozen", () => {
       const { toJSON } = renderWithProviders(
