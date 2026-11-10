@@ -1,6 +1,7 @@
 {
     "ApiScreen": {
         "keysGroupTitle": "Chaves de API",
+        "inactiveKeys": "Chaves inativas ({count})",
         "noKeys": "Ainda não há chaves de API",
         "createKey": "Criar chave de API",
         "createTitle": "Nova chave de API",
@@ -27,6 +28,7 @@
         "revokeTitle": "Revogar a chave de API?",
         "revokeBody": "\"{name: string}\" deixará de funcionar imediatamente. Isto não pode ser desfeito.",
         "revoke": "Revogar",
+        "revokeGoBack": "Voltar",
         "revokeSuccess": "Chave de API revogada",
         "createError": "Não foi possível criar a chave de API. Tente novamente.",
         "revokeError": "Não foi possível revogar a chave de API. Tente novamente.",
@@ -2370,6 +2372,8 @@
         "invalidAmount": " Contém um valor inválido. Por favor ajuste com um valor válido.",
         "usernameDoesNotExist": "{lnAddress: string} não parece ser um {bankName: string} endereço que existe.",
         "usernameDoesNotExistAdvice": "Certifique-se de que a ortografia está correta ou peça ao destinatário uma fatura LN ou um endereço BTC.",
+        "destinationUnverifiable": "Não conseguimos verificar {lnAddress} neste momento — os servidores da {bankName} não estão a responder.",
+        "destinationUnverifiableAdvice": "O endereço provavelmente está correto. Tente novamente daqui a pouco, ou peça ao destinatário uma fatura LN ou um endereço BTC.",
         "selfPaymentError": "{lnAddress: string} é seu {bankName: string} endereço.",
         "selfPaymentAdvice": "Se você quiser enviar dinheiro para outra conta sua, pode usar uma fatura, LN ou um endereço de BTC.",
         "lnAddressError": "Não conseguimos acessar este endereço Lightning. Se tiver certeza de que existe, tente novamente mais tarde.",
@@ -2592,7 +2596,8 @@
         "error": "Não foi possível buscar perfis no momento",
         "fromThisDevice": "deste dispositivo?",
         "switchAccount": "Você trocou para outra conta",
-        "removedAccount": "Você removeu a conta {identifier: string}."
+        "removedAccount": "Você removeu a conta {identifier: string}.",
+        "removeAccount": "Remover conta"
     },
     "StablesatsRestriction": {
         "walletLabel": "não está disponível na sua região",
@@ -2756,6 +2761,7 @@
             "tooLong": "O endereço deve ter no máximo 50 caracteres de comprimento.",
             "invalidCharacter": "O endereço só pode conter letras, números e sublinhados.",
             "addressUnavailable": "Desculpe, este endereço já está em uso.",
+            "serverUnreachable": "Não foi possível contactar o servidor de endereços. Tente novamente daqui a pouco.",
             "unknownError": "Ocorreu um erro desconhecido, por favor tente novamente mais tarde.",
             "backupRequired": "Back up your wallet before creating a Lightning address"
         },
@@ -3068,7 +3074,6 @@
         "faq": "FAQ",
         "statusPage": "Página de status",
         "telegram": "Telegram",
-        "mattermost": "Mais importante",
         "defaultEmailSubject": "{bankName: string} - Suporte",
         "defaultSupportMessage": "Ei! Preciso de ajuda com {bankName: string}, estou usando a versão {version: string} em {os: string}.",
         "emailCopied": "email {email: string} copiado para a área de transferência",
@@ -3327,7 +3332,10 @@
             "noLimit": "Sem limite",
             "limitUpdateSuccess": "Limite atualizado com sucesso",
             "limitUpdateError": "Falha ao atualizar o limite",
-            "limitMustBePositive": "O limite deve ser maior que zero"
+            "limitMustBePositive": "O limite deve ser maior que zero",
+            "atmToggleError": "Falha ao atualizar os saques no caixa",
+            "atmControlsLoadError": "Não foi possível carregar seus limites de caixa",
+            "invalidLimitAmount": "Insira um valor válido com até 2 casas decimais"
         },
         "CardStatements": {
             "title": "Movimentos",
@@ -4218,6 +4226,8 @@
         "signInDescription": "Faça login na sua conta custodial para usar {featureName}.",
         "noAccountTitle": "Conta custodial necessária",
         "noAccountDescription": "{featureName} requer uma conta custodial da Blink.",
+        "unreachableTitle": "O Blink está inacessível",
+        "unreachableDescription": "{featureName} precisa dos servidores da Blink, que não estão a responder neste momento. A sua carteira e os seus fundos não são afetados.",
         "featureCircles": "Círculos",
         "featureEarn": "Aprender",
         "featureCard": "Cartão"
@@ -4240,6 +4250,10 @@
         "tokenTransfer": "Transferência {token}",
         "payTo": "Pagar a {address}",
         "payment": "Pagamento"
+    },
+    "SelfCustodialStaleRate": {
+        "notice": "A taxa de câmbio pode estar desatualizada",
+        "satsOnly": "A mostrar sats — nenhuma taxa de câmbio disponível"
     },
     "SelfCustodialOffline": {
         "title": "A carteira está offline",

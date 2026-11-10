@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API anahtarları",
+    "inactiveKeys": "Etkin olmayan anahtarlar ({count})",
     "noKeys": "Henüz API anahtarı yok",
     "createKey": "API anahtarı oluştur",
     "createTitle": "Yeni API anahtarı",
@@ -19,17 +20,18 @@
     "expiryNever": "Asla",
     "expiresOn": "{date: string} tarihinde sona erer",
     "neverExpires": "Asla sona ermez",
-    "revoked": "İptal edildi",
+    "revoked": "Geçersiz kılındı",
     "expired": "{date: string} tarihinde sona erdi",
     "expiredNoDate": "Süresi doldu",
     "secretWarning": "Anahtar yalnızca bu bir kez gösterilir. Şimdi kopyalayın veya paylaşın ve güvenli bir yerde saklayın.",
     "secretCopied": "API anahtarı kopyalandı. Pano 1 dakika içinde temizlenir",
-    "revokeTitle": "API anahtarı iptal edilsin mi?",
+    "revokeTitle": "API anahtarı geçersiz kılınsın mı?",
     "revokeBody": "\"{name: string}\" hemen çalışmayı durduracak. Bu işlem geri alınamaz.",
-    "revoke": "İptal et",
-    "revokeSuccess": "API anahtarı iptal edildi",
+    "revoke": "Geçersiz kıl",
+    "revokeGoBack": "Geri dön",
+    "revokeSuccess": "API anahtarı geçersiz kılındı",
     "createError": "API anahtarı oluşturulamadı. Lütfen tekrar deneyin.",
-    "revokeError": "API anahtarı iptal edilemedi. Lütfen tekrar deneyin.",
+    "revokeError": "API anahtarı geçersiz kılınamadı. Lütfen tekrar deneyin.",
     "loadError": "API anahtarlarınız yüklenemedi. Lütfen daha sonra tekrar deneyin.",
     "discardSecretTitle": "Bu API anahtarından vazgeçilsin mi?",
     "discardSecretBody": "Gizli anahtar yalnızca bu bir kez gösterilir. Şimdi ayrılırsanız anahtar kurtarılamaz ve yenisini oluşturmanız gerekir.",
@@ -2370,6 +2372,8 @@
     "invalidAmount": "Bu geçersiz bir tutar içeriyor. Lütfen geçerli bir tutarla yeniden oluşturun.",
     "usernameDoesNotExist": "{lnAddress: string} adresi var olan bir {bankName: string} adresi gibi görünmüyor.",
     "usernameDoesNotExistAdvice": "Ya yazımın doğru olduğundan emin olun ya da alıcıdan bunun yerine bir LN faturası veya BTC adresi isteyin.",
+    "destinationUnverifiable": "{lnAddress} adresini şu anda kontrol edemedik — {bankName} sunucuları yanıt vermiyor.",
+    "destinationUnverifiableAdvice": "Adres büyük olasılıkla doğrudur. Birazdan tekrar deneyin ya da alıcıdan bir LN faturası veya BTC adresi isteyin.",
     "selfPaymentError": "{lnAddress: string} sizin {bankName: string} adresinizdir.",
     "selfPaymentAdvice": "Sahip olduğunuz başka bir hesaba para göndermek istiyorsanız, bunun yerine bir fatura, LN veya BTC adresi kullanabilirsiniz.",
     "lnAddressError": "Bu Lightning adresine ulaşamıyoruz. Var olduğundan eminseniz, daha sonra tekrar deneyebilirsiniz.",
@@ -2592,7 +2596,8 @@
     "error": "Şu anda profiller getirilemedi",
     "fromThisDevice": "bu cihazdan mı?",
     "switchAccount": "Başka bir hesaba geçiş yaptınız",
-    "removedAccount": "{identifier: string} hesabını kaldırdınız."
+    "removedAccount": "{identifier: string} hesabını kaldırdınız.",
+    "removeAccount": "Hesabı kaldır"
   },
   "StablesatsRestriction": {
     "walletLabel": "bölgenizde kullanılamıyor",
@@ -2756,6 +2761,7 @@
       "tooLong": "Adres en fazla 50 karakter uzunluğunda olabilir",
       "invalidCharacter": "Adres yalnızca harf, sayı ve alttan çizgi içerebilir",
       "addressUnavailable": "Üzgünüm, bu adres çoktan alındı",
+      "serverUnreachable": "Adres sunucusuna ulaşılamadı. Birazdan tekrar deneyin.",
       "unknownError": "Bilinmeyen bir hata yaşandı, lütfen daha sonra tekrar deneyin",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3068,7 +3074,6 @@
     "faq": "SSS",
     "statusPage": "Durum Sayfası",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string}  - Destek",
     "defaultSupportMessage": "Selamlar! {bankName: string} ile ilgili yardıma ihtiyacım var. {os: string} cihazımda {version: string} sürümünü kullanıyorum.",
     "emailCopied": "E-posta {email: string} panoya kopyalandı",
@@ -3243,7 +3248,10 @@
       "noLimit": "Limit yok",
       "limitUpdateSuccess": "Limit başarıyla güncellendi",
       "limitUpdateError": "Limit güncellenemedi",
-      "limitMustBePositive": "Limit sıfırdan büyük olmalıdır"
+      "limitMustBePositive": "Limit sıfırdan büyük olmalıdır",
+      "atmToggleError": "ATM çekimleri güncellenemedi",
+      "atmControlsLoadError": "ATM limitleri yüklenemedi",
+      "invalidLimitAmount": "En fazla 2 ondalık basamaklı geçerli bir tutar girin"
     },
     "CardFeeSchedule": {
       "title": "Blink Kart ücret çizelgesi",
@@ -4218,6 +4226,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink'e ulaşılamıyor",
+    "unreachableDescription": "{featureName} Blink sunucularını gerektiriyor; şu anda yanıt vermiyorlar. Cüzdanınız ve bakiyeniz etkilenmedi.",
     "featureCircles": "Circles",
     "featureEarn": "Öğren",
     "featureCard": "Card"
@@ -4240,6 +4250,10 @@
     "tokenTransfer": "{token} Transferi",
     "payTo": "{address} adresine öde",
     "payment": "Ödeme"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Döviz kuru güncel olmayabilir",
+    "satsOnly": "Sats olarak gösteriliyor — döviz kuru yok"
   },
   "SelfCustodialOffline": {
     "title": "Cüzdan çevrimdışı",

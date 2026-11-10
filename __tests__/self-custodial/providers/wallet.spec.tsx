@@ -1,5 +1,5 @@
 import React from "react"
-import { Text } from "react-native"
+import { AppState, Text } from "react-native"
 import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import { act, render, renderHook, waitFor } from "@testing-library/react-native"
 
@@ -84,6 +84,12 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
     getMnemonicForAccount: (id: string) => mockGetMnemonicForAccount(id),
+    // Derived from the plain read so the fixtures below keep working; a spec
+    // that cares about failed-vs-absent overrides this directly.
+    readMnemonicWithStatus: async (id: string) => {
+      const mnemonic = await mockGetMnemonicForAccount(id)
+      return mnemonic ? { status: "found", value: mnemonic } : { status: "absent" }
+    },
     getMnemonicNetworkForAccount: (id: string) => mockGetMnemonicNetworkForAccount(id),
     getSessionProfiles: jest.fn().mockResolvedValue([]),
   },
@@ -109,8 +115,16 @@ jest.mock("@app/self-custodial/storage/account-index", () => ({
   listSelfCustodialAccounts: () => mockListSelfCustodialAccounts(),
   setSelfCustodialLightningAddress: (...args: unknown[]) =>
     mockSetSelfCustodialLightningAddress(...args),
+  getSelfCustodialLightningAddress: (id: string) =>
+    mockGetSelfCustodialLightningAddress(id),
   StorageReadStatus: { Ok: "ok", ReadFailed: "read-failed" },
 }))
+
+/** The provider seeds the address from what this device recorded, before asking the
+ *  SDK. Defaults to "nothing recorded", which is what a fresh account has. */
+const mockGetSelfCustodialLightningAddress = jest.fn(
+  async (_id: string): Promise<string | null> => null,
+)
 
 const mockUseIsAuthed = jest.fn().mockReturnValue(false)
 jest.mock("@app/graphql/is-authed-context", () => ({
@@ -175,6 +189,8 @@ jest.mock("@app/self-custodial/config", () => ({
   SparkConfig: { network: 1 },
   SparkNetworkLabel: "regtest",
   storageDirFor: (id: string) => `/tmp/${id}`,
+  /** Read by `useLnurlServer`, which the SDK lifecycle below calls. */
+  resolveLnurlServer: () => ({ serverUrl: "https://blink.sv", domain: "blink.sv" }),
 }))
 
 jest.mock("@app/self-custodial/providers/validate-network", () => ({
@@ -226,27 +242,30 @@ const fireInitialSynced = async (
   })
 }
 
-describe("SelfCustodialWalletProvider", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockStableBalanceEnabled = true
-    mockGetMnemonicForAccount.mockResolvedValue(null)
-    mockGetMnemonicNetworkForAccount.mockResolvedValue("regtest")
-    mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
-    mockDisconnectSdk.mockResolvedValue(undefined)
-    mockAddSdkEventListener.mockResolvedValue("listener-id")
-    mockRemoveSdkEventListener.mockResolvedValue(undefined)
-    mockGetUserSettings.mockResolvedValue({
-      stableBalanceActiveLabel: undefined,
-      sparkPrivateModeEnabled: false,
-    })
-    mockState.activeAccountId = "test-self-custodial-uuid"
-    mockListSelfCustodialAccounts.mockResolvedValue([
-      { id: "test-self-custodial-uuid", lightningAddress: null },
-    ])
-    mockGetLightningAddress.mockResolvedValue(null)
-    mockSetSelfCustodialLightningAddress.mockResolvedValue(undefined)
+/** One self-custodial account, nothing connected: the state both describes start from. */
+const resetToDisconnectedWallet = () => {
+  jest.clearAllMocks()
+  mockStableBalanceEnabled = true
+  mockGetMnemonicForAccount.mockResolvedValue(null)
+  mockGetMnemonicNetworkForAccount.mockResolvedValue("regtest")
+  mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
+  mockDisconnectSdk.mockResolvedValue(undefined)
+  mockAddSdkEventListener.mockResolvedValue("listener-id")
+  mockRemoveSdkEventListener.mockResolvedValue(undefined)
+  mockGetUserSettings.mockResolvedValue({
+    stableBalanceActiveLabel: undefined,
+    sparkPrivateModeEnabled: false,
   })
+  mockState.activeAccountId = "test-self-custodial-uuid"
+  mockListSelfCustodialAccounts.mockResolvedValue([
+    { id: "test-self-custodial-uuid", lightningAddress: null },
+  ])
+  mockGetLightningAddress.mockResolvedValue(null)
+  mockSetSelfCustodialLightningAddress.mockResolvedValue(undefined)
+}
+
+describe("SelfCustodialWalletProvider", () => {
+  beforeEach(resetToDisconnectedWallet)
 
   it("renders children", async () => {
     const { getByText } = render(
@@ -384,6 +403,7 @@ describe("SelfCustodialWalletProvider", () => {
       storageDir: "/tmp/test-self-custodial-uuid",
       network: mockSparkNetwork.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlDomain: "blink.sv",
     })
   })
 
@@ -1591,20 +1611,22 @@ describe("SelfCustodialWalletProvider — stale-write safety", () => {
       })
     })
 
-    it("skips both persist and reload when getLightningAddress resolves to null", async () => {
+    it("records that the account has no address when getLightningAddress resolves to null", async () => {
+      // The record is what the next launch seeds from, so an address the server no
+      // longer holds must be cleared there too, not left to be offered again.
       mockGetLightningAddress.mockResolvedValue(null)
 
       renderHook(() => useSelfCustodialWallet(), { wrapper })
 
       await waitFor(() => {
-        expect(mockGetLightningAddress).toHaveBeenCalled()
+        expect(mockSetSelfCustodialLightningAddress).toHaveBeenCalledWith(
+          "test-self-custodial-uuid",
+          null,
+        )
       })
-      await new Promise((resolve) => {
-        setTimeout(resolve, 20)
+      await waitFor(() => {
+        expect(mockListSelfCustodialAccounts).toHaveBeenCalledTimes(2)
       })
-
-      expect(mockSetSelfCustodialLightningAddress).not.toHaveBeenCalled()
-      expect(mockListSelfCustodialAccounts).toHaveBeenCalledTimes(1)
     })
 
     it("swallows getLightningAddress rejection without persisting or reloading", async () => {
@@ -1722,5 +1744,279 @@ describe("SelfCustodialWalletProvider — stale-write safety", () => {
         }),
       )
     })
+  })
+
+  describe("the Lightning Address when its server cannot be reached", () => {
+    /** Enough of an SDK for the resolve effect to run against. */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fakeSdkForAddressTests = {} as any
+
+    /** Set here rather than inherited from whichever test ran before, so each of these
+     *  holds when run alone. */
+    beforeEach(() => {
+      mockState.activeAccountId = "test-self-custodial-uuid"
+      mockListSelfCustodialAccounts.mockResolvedValue({
+        status: "ok",
+        entries: [{ id: "test-self-custodial-uuid", lightningAddress: null }],
+      })
+    })
+
+    it("offers the address this device recorded", async () => {
+      // An address is a name the LNURL server answers for, not device state: it keeps
+      // working for whoever pays it whether or not this device can ask about it.
+      mockGetSelfCustodialLightningAddress.mockResolvedValue("alice@blink.sv")
+      mockGetLightningAddress.mockRejectedValue(new Error("lnurl server down"))
+
+      const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() => expect(result.current.lightningAddress).toBe("alice@blink.sv"))
+    })
+
+    it("lets the server's answer win over the recorded one", async () => {
+      // A name changed on another device is the truth; the seed only fills a gap.
+      mockGetSelfCustodialLightningAddress.mockResolvedValue("old@blink.sv")
+      mockGetLightningAddress.mockResolvedValue({ lightningAddress: "new@blink.sv" })
+
+      mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
+      mockInitSdk.mockResolvedValue(fakeSdkForAddressTests)
+
+      const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() => expect(result.current.lightningAddress).toBe("new@blink.sv"))
+    })
+
+    it("does not put back a recorded address once the server said there is none", async () => {
+      // The seed read can land after the answer. Taking it then would offer an address
+      // the server has just said the account does not have.
+      let releaseSeed: (address: string | null) => void = () => {}
+      mockGetSelfCustodialLightningAddress.mockImplementation(
+        () =>
+          new Promise<string | null>((resolve) => {
+            releaseSeed = resolve
+          }),
+      )
+      mockGetLightningAddress.mockResolvedValue({ lightningAddress: null })
+      mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
+      mockInitSdk.mockResolvedValue(fakeSdkForAddressTests)
+
+      const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() => expect(mockGetLightningAddress).toHaveBeenCalled())
+      await act(async () => {
+        releaseSeed("old@blink.sv")
+      })
+
+      expect(result.current.lightningAddress).toBeNull()
+    })
+
+    it("does not let a late seed undo the answer a refresh brought", async () => {
+      // The first ask failed, then the address was registered and refreshed. The
+      // record read at launch is older than that answer and must not replace it.
+      let releaseSeed: (address: string | null) => void = () => {}
+      mockGetSelfCustodialLightningAddress.mockImplementation(
+        () =>
+          new Promise<string | null>((resolve) => {
+            releaseSeed = resolve
+          }),
+      )
+      mockGetLightningAddress.mockRejectedValueOnce(new Error("lnurl server down"))
+      mockGetLightningAddress.mockResolvedValue({ lightningAddress: "new@blink.sv" })
+      mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
+      mockInitSdk.mockResolvedValue(fakeSdkForAddressTests)
+
+      const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+      await waitFor(() => expect(mockGetLightningAddress).toHaveBeenCalled())
+      await act(async () => {
+        await result.current.updateCurrentSelfCustodialAccount()
+      })
+      await act(async () => {
+        releaseSeed("old@blink.sv")
+      })
+
+      expect(result.current.lightningAddress).toBe("new@blink.sv")
+    })
+
+    it("seeds again on returning to an account the SDK answered for before", async () => {
+      // An answer is about the session it came in. Back on the account with its
+      // server unreachable, the recorded address is all there is to offer.
+      mockListSelfCustodialAccounts.mockResolvedValue({
+        status: "ok",
+        entries: [
+          { id: "test-self-custodial-uuid", lightningAddress: "alice@blink.sv" },
+          { id: "other-account", lightningAddress: null },
+        ],
+      })
+      mockGetSelfCustodialLightningAddress.mockImplementation(async (id: string) =>
+        id === "test-self-custodial-uuid" ? "alice@blink.sv" : null,
+      )
+      mockGetLightningAddress.mockResolvedValueOnce({
+        lightningAddress: "alice@blink.sv",
+      })
+      mockGetLightningAddress.mockRejectedValue(new Error("lnurl server down"))
+      mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
+      mockInitSdk.mockResolvedValue(fakeSdkForAddressTests)
+
+      const { result, rerender } = renderHook(() => useSelfCustodialWallet(), {
+        wrapper,
+      })
+      await waitFor(() => expect(mockGetLightningAddress).toHaveBeenCalled())
+
+      mockState.activeAccountId = "other-account"
+      rerender(undefined)
+      await waitFor(() => expect(result.current.lightningAddress).toBeNull())
+      mockState.activeAccountId = "test-self-custodial-uuid"
+      rerender(undefined)
+
+      await waitFor(() => expect(result.current.lightningAddress).toBe("alice@blink.sv"))
+    })
+
+    it("stays empty for an account that never had one", async () => {
+      mockGetSelfCustodialLightningAddress.mockResolvedValue(null)
+      mockGetLightningAddress.mockRejectedValue(new Error("lnurl server down"))
+
+      const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      // Anchored on the lookup having happened, so a seed that never ran would fail
+      // here rather than pass by doing nothing.
+      await waitFor(() => expect(mockGetSelfCustodialLightningAddress).toHaveBeenCalled())
+      expect(result.current.lightningAddress).toBeNull()
+    })
+  })
+})
+
+describe("SelfCustodialWalletProvider — foreground recovery", () => {
+  /**
+   * Both the provider and the lifecycle listen for "active"; this drives every
+   * listener that is still subscribed, which is what the OS does. Removal is
+   * tracked rather than ignored: both re-subscribe when their dependencies
+   * change, and calling a handler they already removed would run it with a stale
+   * closure production never sees — a wallet that has since connected still
+   * looking unconnected.
+   */
+  const liveForegroundListeners = new Set<(state: string) => void>()
+
+  // Re-armed per test rather than once for the describe: other describes in
+  // this file spy on the same method from inside their tests, and a spy
+  // installed at collection time is whichever of them ran last.
+  beforeEach(() => {
+    resetToDisconnectedWallet()
+    liveForegroundListeners.clear()
+    jest.spyOn(AppState, "addEventListener").mockImplementation(((
+      event: string,
+      handler: (state: string) => void,
+    ) => {
+      if (event === "change") liveForegroundListeners.add(handler)
+      return {
+        remove: () => {
+          liveForegroundListeners.delete(handler)
+        },
+      }
+    }) as unknown as typeof AppState.addEventListener)
+  })
+
+  const foreground = () => {
+    liveForegroundListeners.forEach((handler) => handler("active"))
+  }
+
+  /**
+   * Foregrounding is the first thing anyone tries, and it used to do nothing for
+   * a wallet that never started: the lifecycle's own handler refreshes, and a
+   * refresh returns immediately without an SDK.
+   */
+  it("re-runs the lifecycle when the app returns to the foreground with no wallet", async () => {
+    // A wallet that never started: the network marker could not be confirmed,
+    // so there is no SDK for the lifecycle's own refresh to work with.
+    // Once per run, twice, rather than for the file — an implementation set
+    // here outlives clearAllMocks and would fail every later test.
+    mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
+    const mockValidate = jest.requireMock(
+      "@app/self-custodial/providers/validate-network",
+    ).validateStoredNetwork
+    mockValidate.mockResolvedValueOnce(false).mockResolvedValueOnce(false)
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Error)
+    })
+
+    const readsBefore = mockGetMnemonicForAccount.mock.calls.length
+    await act(async () => {
+      foreground()
+    })
+    await flushEffects()
+
+    expect(result.current.sdk).toBeNull()
+    // The retry bumps the count the lifecycle effect depends on, so it starts
+    // over — which is the whole point, since refreshing cannot.
+    expect(mockGetMnemonicForAccount.mock.calls.length).toBeGreaterThan(readsBefore)
+  })
+
+  /**
+   * Unavailable is where every custodial-only user rests: the provider mounts
+   * for them too, finds no self-custodial account, and stops. Retrying that
+   * would re-run the whole lifecycle on each foreground for people this feature
+   * never touches, and it could not connect anything if it did.
+   */
+  it("leaves a device with no self-custodial account alone on every foreground", async () => {
+    mockState.activeAccountId = "custodial-account"
+    mockListSelfCustodialAccounts.mockResolvedValue([])
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Unavailable)
+    })
+
+    const readsBefore = mockGetMnemonicForAccount.mock.calls.length
+    await act(async () => {
+      foreground()
+    })
+    await flushEffects()
+
+    expect(mockGetMnemonicForAccount.mock.calls).toHaveLength(readsBefore)
+  })
+
+  /**
+   * The other Unavailable: an account whose mnemonic is gone. The lifecycle
+   * treats that as terminal, so re-reading the keystore would return the same
+   * answer however many times the user foregrounds the app.
+   */
+  it("leaves an account with no mnemonic alone, since a retry reads the same answer", async () => {
+    mockGetMnemonicForAccount.mockResolvedValue(null)
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Unavailable)
+    })
+
+    const readsBefore = mockGetMnemonicForAccount.mock.calls.length
+    await act(async () => {
+      foreground()
+    })
+    await flushEffects()
+
+    expect(mockGetMnemonicForAccount.mock.calls).toHaveLength(readsBefore)
+  })
+
+  it("leaves a connected wallet to the refresh it already has", async () => {
+    mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue({
+      addEventListener: jest.fn().mockResolvedValue("listener-id"),
+      disconnect: jest.fn(),
+    })
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+    await waitFor(() => {
+      expect(result.current.sdk).not.toBeNull()
+    })
+
+    const initsBefore = mockInitSdk.mock.calls.length
+    await act(async () => {
+      foreground()
+    })
+    await flushEffects()
+
+    // No re-initialisation: with an SDK the lifecycle's refresh is the right
+    // answer and this path stays out of the way.
+    expect(mockInitSdk.mock.calls).toHaveLength(initsBefore)
   })
 })

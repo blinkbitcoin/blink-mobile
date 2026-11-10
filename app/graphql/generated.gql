@@ -1,3 +1,19 @@
+fragment CardSpendingControls on Card {
+  id
+  spendingLimits {
+    category
+    period
+    limitCents
+    __typename
+  }
+  spendingToggles {
+    category
+    enabled
+    __typename
+  }
+  __typename
+}
+
 fragment CardTransactionDetails on CardTransaction {
   id
   amount
@@ -324,6 +340,41 @@ mutation cardReplace($input: CardReplaceInput!) {
     lastFour
     cardType
     status
+    __typename
+  }
+}
+
+mutation cardSpendingLimitRemove($input: CardSpendingLimitRemoveInput!) {
+  cardSpendingLimitRemove(input: $input) {
+    removedLimit {
+      category
+      period
+      limitCents
+      __typename
+    }
+    __typename
+  }
+}
+
+mutation cardSpendingLimitSet($input: CardSpendingLimitSetInput!) {
+  cardSpendingLimitSet(input: $input) {
+    limit {
+      category
+      period
+      limitCents
+      __typename
+    }
+    __typename
+  }
+}
+
+mutation cardSpendingToggleSet($input: CardSpendingToggleSetInput!) {
+  cardSpendingToggleSet(input: $input) {
+    toggle {
+      category
+      enabled
+      __typename
+    }
     __typename
   }
 }
@@ -1305,6 +1356,48 @@ query cardBalance($cardId: ID!) {
 
 query cardEncryptionPublicKey {
   cardEncryptionPublicKey
+}
+
+query cardHolder($cardId: ID!) {
+  cardHolder(cardId: $cardId) {
+    firstName
+    lastName
+    __typename
+  }
+}
+
+query cardSecretsEncrypted($cardId: ID!, $sessionId: String!) {
+  cardSecretsEncrypted(cardId: $cardId, sessionId: $sessionId) {
+    encryptedPan {
+      iv
+      data
+      __typename
+    }
+    encryptedCvc {
+      iv
+      data
+      __typename
+    }
+    __typename
+  }
+}
+
+query cardSpendingControls {
+  me {
+    id
+    defaultAccount {
+      id
+      ... on ConsumerAccount {
+        cards {
+          ...CardSpendingControls
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
 }
 
 query cardTransactionsPaginated($cardId: ID!, $first: Int!, $after: String) {

@@ -30,6 +30,8 @@ export type CustomModalProps = {
   secondaryButtonOnPress?: () => void
   secondaryButtonLoading?: boolean
   showCloseIconButton?: boolean
+  closeIconButtonAccessibilityLabel?: string
+  /** Also disables the close icon, so nothing can close the modal while this is false. */
   dismissable?: boolean
   /** Once the modal is off the screen, for what must not run while it closes. */
   onModalHide?: () => void
@@ -61,6 +63,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
   secondaryButtonOnPress,
   secondaryButtonLoading,
   showCloseIconButton = true,
+  closeIconButtonAccessibilityLabel,
   dismissable = true,
   onModalHide,
   backgroundModalColor,
@@ -107,7 +110,15 @@ const CustomModal: React.FC<CustomModalProps> = ({
           )}
 
           {showCloseIconButton && (
-            <TouchableOpacity onPress={toggleModal} {...testProps("modal-close")}>
+            <TouchableOpacity
+              onPress={toggleModal}
+              {...testProps("modal-close")}
+              disabled={!dismissable}
+              style={!dismissable && styles.closeIconButtonDisabled}
+              accessibilityRole="button"
+              accessibilityLabel={closeIconButtonAccessibilityLabel}
+              accessibilityState={{ disabled: !dismissable }}
+            >
               <GaloyIcon name="close" size={30} color={colors.grey0} />
             </TouchableOpacity>
           )}
@@ -224,6 +235,9 @@ const useStyles = makeStyles(({ colors }, props: UseStylesProps) => ({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+  closeIconButtonDisabled: {
+    opacity: 0.35,
   },
   headerTitle: {
     flexShrink: 1,

@@ -27,7 +27,9 @@ import {
 } from "@app/components/balance-header"
 import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { usePriceConversion } from "@app/hooks/use-price-conversion"
+import { RateFreshness } from "@app/types/price"
+import { CARD, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { StableTokenConvertToBtcModal } from "@app/screens/conversion-flow/stable-token-convert-to-btc-modal"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import SlideUpHandle from "@app/components/slide-up-handle"
@@ -83,15 +85,19 @@ import { useStaleCloudBundleBulletin } from "@app/self-custodial/hooks/use-stale
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { useTwoFactorSessionPrompt } from "@app/screens/home-screen/hooks/use-two-factor-session-prompt"
 import { getErrorMessages } from "@app/graphql/utils"
-import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
-import { useCardData } from "@app/screens/card-screen/hooks/use-card-data"
+import { AccountBalance, getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { isCardUsable } from "@app/screens/card-screen/utils/card-display"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
 import { extractLightningAddressUsername } from "@app/utils/pay-links"
-import { useAppConfig, useAutoShowUpgradeModal } from "@app/hooks"
+import {
+  useAppConfig,
+  useAutoShowUpgradeModal,
+  useCardBalance,
+  useCardData,
+} from "@app/hooks"
 import {
   AccountLevel,
   useBulletinsQuery,
@@ -352,31 +358,74 @@ export const HomeScreen: React.FC = () => {
   /**
    * TODO(card): `cards` on ConsumerAccount only exists on the staging backend
    * today, so gate the home card row to staging until the card service ships to
-   * every instance; then drop `isCardBackendAvailable` and query unconditionally.
+   * every instance; then drop `isCardBackendAvailable` from the gate below.
    * Ref PR #3899.
    */
   const isCardBackendAvailable = galoyInstanceId === "Staging"
-  const { card: homeCard } = useCardData({ skip: !isCardBackendAvailable })
-  const hasCard = homeCard !== undefined && isCardUsable(homeCard.status)
-  const cardLastFour = homeCard?.lastFour
+  /** The card belongs to the custodial account, so a self-custodial session leaves it
+   *  out like the other custodial queries above, rather than adding another account's
+   *  card to its own total. */
+  const isCardQueryEnabled = isCardBackendAvailable && !isSelfCustodial
+  const {
+    card: homeCard,
+    hasLoaded: hasCardDataLoaded,
+    loading: cardDataLoading,
+    error: cardDataError,
+    refetch: refetchCardData,
+  } = useCardData({ skip: !isCardQueryEnabled })
+  const showCardRow = homeCard !== undefined && isCardUsable(homeCard.status)
+  const {
+    availableSats: cardBalanceSats,
+    error: cardBalanceError,
+    refetch: refetchCardBalance,
+  } = useCardBalance(showCardRow ? homeCard?.id : undefined)
+  /** A card lookup that has not answered yet or failed before answering, or a card whose
+   *  balance has not arrived or failed to, holds the total back: summing the wallets
+   *  alone would show an understated total as if it were the real one. */
+  const hasCardDataError = cardDataError !== undefined
+  const isCardUnknown = !hasCardDataLoaded && (cardDataLoading || hasCardDataError)
+  const isCardBalanceUnknown = showCardRow && cardBalanceSats === undefined
+  const cardDataFailure = isCardUnknown ? cardDataError : undefined
+  const cardBalanceFailure = isCardBalanceUnknown ? cardBalanceError : undefined
+  const homeErrorMessage = error && getErrorMessages(error)
+  const cardFailure = cardDataFailure ?? cardBalanceFailure
+  const cardFailureMessage = cardFailure && getErrorMessages(cardFailure)
+  /** Offline the home and card queries fail with the same message: show it once. */
+  const isCardFailureRepeated = cardFailureMessage === homeErrorMessage
+  const shownCardFailureMessage = isCardFailureRepeated ? undefined : cardFailureMessage
+
+  const accountBalances: AccountBalance[] = [...(wallets ?? [])]
+  if (showCardRow && homeCard) {
+    accountBalances.push({
+      id: homeCard.id,
+      walletCurrency: CARD,
+      balance: cardBalanceSats,
+    })
+  }
 
   const {
     formattedBalance: defaultFormattedBalance,
     satsBalance,
     isLoading: balanceConversionLoading,
-  } = useTotalBalance(wallets)
+  } = useTotalBalance(accountBalances)
 
   const loading = queryLoading || balanceConversionLoading
+  const isTotalBalanceLoading = loading || isCardUnknown || isCardBalanceUnknown
 
   const showStableBalanceToggle =
     stableBalanceEnabled && isSelfCustodial && isStableBalanceActive
 
   const { formatMoneyAmount } = useDisplayCurrency()
+  const { priceFreshness, isSatsOnly } = usePriceConversion()
 
-  const formattedBalance =
-    showStableBalanceToggle && balanceMode === BalanceMode.Btc
-      ? formatMoneyAmount({ moneyAmount: toBtcMoneyAmount(satsBalance) })
-      : defaultFormattedBalance
+  const isShowingSats = showStableBalanceToggle && balanceMode === BalanceMode.Btc
+
+  const formattedBalance = isShowingSats
+    ? formatMoneyAmount({ moneyAmount: toBtcMoneyAmount(satsBalance) })
+    : defaultFormattedBalance
+
+  /** A sats figure needs no rate, so it is never stale; only a converted one can be. */
+  const isRateStale = priceFreshness === RateFreshness.Stale && !isShowingSats
 
   const accountId = dataAuthed?.me?.defaultAccount?.id
   const levelAccount = dataAuthed?.me?.defaultAccount?.level
@@ -655,6 +704,17 @@ export const HomeScreen: React.FC = () => {
     openUpgradeModal,
   ])
 
+  /** Gated like the card queries themselves: off Staging or in a self-custodial session
+   *  there is no card to ask for, and without a usable card there is no balance. */
+  const refetchCard = React.useCallback(async () => {
+    if (!isCardQueryEnabled) return
+    const cardRefetches: Promise<unknown>[] = [refetchCardData()]
+    if (showCardRow) cardRefetches.push(refetchCardBalance())
+    /** Settled rather than all: a failure already shows through the card hooks' error,
+     *  and must neither retract the spinner early nor cut the rest of the pull short. */
+    await Promise.allSettled(cardRefetches)
+  }, [isCardQueryEnabled, showCardRow, refetchCardData, refetchCardBalance])
+
   const refetch = React.useCallback(async () => {
     if (isSelfCustodial) {
       // Both must land before the pull-to-refresh spinner retracts: the wallet
@@ -676,6 +736,7 @@ export const HomeScreen: React.FC = () => {
       refetchAuthed(),
       refetchUnauthed(),
       refetchBulletins(),
+      refetchCard(),
     ])
     // Triggers the upgrade trial account modal after refetch
     triggerUpgradeModal()
@@ -686,6 +747,7 @@ export const HomeScreen: React.FC = () => {
     refetchPendingDeposits,
     refetchAuthed,
     refetchBulletins,
+    refetchCard,
     refetchCustodialRestrictions,
     refetchRealtimePrice,
     refetchUnauthed,
@@ -950,11 +1012,13 @@ export const HomeScreen: React.FC = () => {
         </View>
       </View>
       <BalanceHeader
-        loading={loading}
+        loading={isTotalBalanceLoading}
         formattedBalance={formattedBalance}
         showStableBalanceToggle={showStableBalanceToggle}
         mode={balanceMode}
         onModeChange={toggleBalanceMode}
+        isRateStale={isRateStale}
+        isSatsOnly={isSatsOnly}
       />
       <View style={styles.badgeSlot}>
         {badgeSlotContent === "unseen" ? (
@@ -991,13 +1055,14 @@ export const HomeScreen: React.FC = () => {
           loading={loading}
           setIsStablesatModalVisible={setIsStablesatModalVisible}
           onGatedTap={onGatedDollarTap}
-          wallets={wallets}
-          hasCard={hasCard}
-          cardLastFour={cardLastFour}
+          accounts={accountBalances}
           showBtcNotification={isOutgoing ? false : hasUnseenBtcTx}
           showUsdNotification={isOutgoing ? false : hasUnseenUsdTx}
         />
-        {error && <GaloyErrorBox errorMessage={getErrorMessages(error)} />}
+        {homeErrorMessage && <GaloyErrorBox errorMessage={homeErrorMessage} />}
+        {shownCardFailureMessage && (
+          <GaloyErrorBox errorMessage={shownCardFailureMessage} />
+        )}
         <View style={styles.listItemsContainer}>
           {buttons.map((item) => (
             <React.Fragment key={item.icon}>
