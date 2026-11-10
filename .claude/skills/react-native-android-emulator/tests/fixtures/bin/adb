@@ -73,6 +73,7 @@ case "${1:-}" in
         [ -n "${FAKE_RUN_AS_DENIED:-}" ] && { echo "run-as: package not debuggable: $APP" >&2; exit 1; }
         case "${1:-}" in
           mkdir) mkdir -p "$ROOT/data/data/$APP/shared_prefs" 2>/dev/null; exit 0 ;;
+          cat) cat "$ROOT${2:?}" 2>/dev/null || { echo "cat: ${2}: No such file or directory" >&2; exit 1; } ;;
           cp)
             SRC="${2:?}"; DST="${3:?}"
             mkdir -p "$ROOT$(dirname "$DST")"

@@ -180,6 +180,40 @@ check "an iOS claim with the same PR number gets a different port" "different" \
   "$([ -n "$IOS_PORT" ] && [ "$IOS_PORT" != "$ANDROID_PORT" ] && echo different || echo "same ($IOS_PORT vs $ANDROID_PORT)")"
 
 echo
+echo "failed claims and re-claims"
+
+# A claim that dies mid-boot must hand back everything it took: with no
+# released-at stamp the reaper never would, and a lone AVD would stay
+# "reserved" for every later claim on the machine.
+reset_world
+FAKE_EMULATOR_BOOT_FAILS=1 "$SCRIPTS/claim-session.sh" 3800 >/dev/null 2>&1
+check "a claim whose emulator dies exits non-zero" "1" "$?"
+check "the failed claim leaves no AVD reserved" "none" \
+  "$(grep -rlx "rn-demo-android-pr3800" "$DEMO_SIM_REGISTRY/avds" 2>/dev/null | head -1 | grep -q . && echo held || echo none)"
+check "the failed claim leaves no console port reserved" "none" \
+  "$(grep -rlx "rn-demo-android-pr3800" "$DEMO_SIM_REGISTRY/emu-ports" 2>/dev/null | head -1 | grep -q . && echo held || echo none)"
+check "the failed claim leaves no Metro port reserved" "none" \
+  "$(grep -rlx "rn-demo-android-pr3800" "$DEMO_SIM_REGISTRY/ports" 2>/dev/null | head -1 | grep -q . && echo held || echo none)"
+"$SCRIPTS/claim-session.sh" 3801 >/dev/null 2>&1
+check "the next claim can use the AVD the failed one took" "0" "$?"
+"$SCRIPTS/release-session.sh" 3801 --delete >/dev/null 2>&1
+
+# Release frees the Metro port but keeps the session dir for retakes; if
+# another session took the port meanwhile, the re-claim must move.
+reset_world
+eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
+KEPT_PORT="$DEMO_PORT"
+"$SCRIPTS/release-session.sh" 3712 >/dev/null 2>&1
+mkdir -p "$DEMO_SIM_REGISTRY/ports/$KEPT_PORT"
+echo "rn-demo-pr9999" > "$DEMO_SIM_REGISTRY/ports/$KEPT_PORT/owner"
+eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
+check "re-claim does not reuse a port another session took" "moved" \
+  "$([ "$DEMO_PORT" != "$KEPT_PORT" ] && echo moved || echo "reused $KEPT_PORT")"
+check "the other session keeps its reservation" "rn-demo-pr9999" \
+  "$(cat "$DEMO_SIM_REGISTRY/ports/$KEPT_PORT/owner" 2>/dev/null)"
+"$SCRIPTS/release-session.sh" 3712 --delete >/dev/null 2>&1
+
+echo
 echo "pointing the app at this session's Metro"
 
 reset_world
@@ -203,6 +237,27 @@ check "the prefs travel as a pushed file, not inline text" "yes" \
   "$(grep -q "push .* /data/local/tmp/debug_http_host.xml" "$FAKE_ARGS_LOG" && echo yes || echo no)"
 check "every adb call is pinned with -s" "0" \
   "$(grep "^adb " "$FAKE_ARGS_LOG" | grep -v "^adb devices" | grep -cv -- "-s $DEMO_ANDROID_SERIAL")"
+
+# A running app can flush its in-memory prefs over our write, so the stop
+# must come before the file lands, not after.
+check "the app is stopped before the prefs are written" "yes" \
+  "$(awk '/force-stop com.example.demoapp/ {stop=NR} /push .* \/data\/local\/tmp\/debug_http_host.xml/ {push=NR} END {print (stop && push && stop < push) ? "yes" : "no"}' "$FAKE_ARGS_LOG")"
+
+# The default prefs file holds more than the redirect; re-pointing must keep
+# the rest and replace (not duplicate) an earlier redirect.
+cat > "$PREFS" <<'XML'
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <boolean name="js_dev_mode_debug" value="true" />
+    <string name="debug_http_host">10.0.2.2:8081</string>
+</map>
+XML
+DEMO_APP_ID_ANDROID=com.example.demoapp "$SCRIPTS/point-app-at-metro.sh" >/dev/null 2>&1
+check "re-pointing keeps the app's other preferences" "yes" \
+  "$(grep -q 'name="js_dev_mode_debug"' "$PREFS" && echo yes || echo no)"
+check "re-pointing leaves exactly one redirect" "1" "$(grep -c 'name="debug_http_host"' "$PREFS")"
+check "the remaining redirect is the claimed port" "yes" \
+  "$(grep -q "10.0.2.2:$DEMO_PORT" "$PREFS" && ! grep -q '10.0.2.2:8081' "$PREFS" && echo yes || echo no)"
 
 DEMO_APP_ID_ANDROID= "$SCRIPTS/point-app-at-metro.sh" >/dev/null 2>&1
 check "refuses without an app id" "1" "$?"
@@ -240,7 +295,22 @@ echo "documented behavior matches the scripts"
 
 SKILL_MD="$TESTS_DIR/../SKILL.md"
 check "SKILL.md pre-approves this skill's commands (allowed-tools)" "yes" \
-  "$(head -5 "$SKILL_MD" | grep "allowed-tools:" | grep -q -- "Bash(adb \*)" && head -5 "$SKILL_MD" | grep "allowed-tools:" | grep -q -- "Bash(emulator \*)" && echo yes || echo no)"
+  "$(head -5 "$SKILL_MD" | grep "allowed-tools:" | grep -q -- "Bash(adb -s \* exec-out screencap \*)" && echo yes || echo no)"
+# Raw `adb emu kill`, `adb kill-server`, `pm clear` or a bare `emulator` launch
+# skip every guard the scripts add (serial pinning, AVD reservation), so no
+# allowlist may pre-approve adb or emulator wholesale.
+check "no allowlist pre-approves adb or emulator wholesale" "none" \
+  "$(python3 -c '
+import glob, json, os, sys
+root = sys.argv[1]
+grants = json.load(open(os.path.join(root, "settings.json")))["permissions"]["allow"]
+for md in glob.glob(os.path.join(root, "skills", "*", "SKILL.md")):
+    for line in open(md).read().split("\n")[:5]:
+        if line.startswith("allowed-tools:"):
+            grants += [g.strip() + ")" for g in line[len("allowed-tools:"):].split(")") if g.strip()]
+bad = sorted({g for g in grants if g in ("Bash(adb *)", "Bash(emulator *)") or g.startswith("Bash(adb -s * shell *")})
+print(" ".join(bad) or "none")
+' "$TESTS_DIR/../../.." 2>&1)"
 check "SKILL.md explains the 10.0.2.2 default that breaks naive sessions" "yes" \
   "$(grep -q "10.0.2.2" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md corrects the adb reverse folklore rather than repeating it" "yes" \

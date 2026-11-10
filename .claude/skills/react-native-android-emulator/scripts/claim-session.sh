@@ -92,10 +92,47 @@ if git rev-parse --show-toplevel >/dev/null 2>&1; then
 fi
 
 # --- Metro port --------------------------------------------------------------
-if [ -f "$SESSION_DIR/port" ]; then
-  PORT=$(cat "$SESSION_DIR/port")   # idempotent re-claim
+# Everything this run reserves or starts is rolled back if the claim dies
+# before handing the session out: a failed claim has no released-at stamp, so
+# the reaper would never free its AVD, console port or Metro port, and a lone
+# AVD would stay "reserved" for every later claim on the machine. Only what
+# THIS run newly took is undone - a re-claim never releases what an earlier,
+# successful claim of the same session holds.
+NEW_PORT=""; NEW_AVD=""; NEW_CONSOLE=""; EMU_PID=""; CLAIM_DONE=""
+rollback_claim() {
+  [ -z "$CLAIM_DONE" ] || return 0
+  if [ -n "$EMU_PID" ] && kill -0 "$EMU_PID" 2>/dev/null; then
+    kill "$EMU_PID" 2>/dev/null || true
+  fi
+  [ -n "$NEW_PORT" ] && { release_metro_port "$REGISTRY" "$NEW_PORT" "$SESSION_NAME"; rm -f "$SESSION_DIR/port"; }
+  [ -n "$NEW_CONSOLE" ] && { release_slot "$REGISTRY" emu-ports "$NEW_CONSOLE" "$SESSION_NAME"; rm -f "$SESSION_DIR/console-port"; }
+  [ -n "$NEW_AVD" ] && { release_slot "$REGISTRY" avds "$NEW_AVD" "$SESSION_NAME"; rm -f "$SESSION_DIR/avd"; }
+  rm -f "$SESSION_DIR/emulator.pid"
+  return 0
+}
+trap rollback_claim EXIT
+
+# fresh_slot <ns> <name>: reserve_slot, remembering whether this run took it.
+fresh_slot() {
+  local existed=""
+  [ -d "$REGISTRY/$1/$2" ] && existed=1
+  reserve_slot "$REGISTRY" "$1" "$2" "$SESSION_NAME" || return 1
+  [ -n "$existed" ] || case "$1" in avds) NEW_AVD="$2" ;; emu-ports) NEW_CONSOLE="$2" ;; esac
+  return 0
+}
+
+# A recorded port is only reusable while the registry still says it is ours:
+# release frees the reservation but keeps the session dir for retakes, so a
+# re-claim re-takes it atomically or reserves a fresh one - never trusting the
+# file alone, or two sessions end up sharing one Metro.
+PORT=$(cat "$SESSION_DIR/port" 2>/dev/null || echo "")
+if [ -n "$PORT" ] && [ "$(cat "$REGISTRY/ports/$PORT/owner" 2>/dev/null)" = "$SESSION_NAME" ]; then
+  :   # still ours: idempotent re-claim
+elif reclaim_metro_port "$REGISTRY" "$SESSION_NAME" "$PORT"; then
+  NEW_PORT="$PORT"
 else
   PORT=$(reserve_metro_port "$REGISTRY" "$SESSION_NAME" "$PR") || exit 1
+  NEW_PORT="$PORT"
   echo "$PORT" > "$SESSION_DIR/port"
 fi
 
@@ -126,13 +163,13 @@ else
   if [ -n "$WANT_AVD" ]; then
     echo "$AVAILABLE_AVDS" | grep -qx "$WANT_AVD" || die "no such AVD '$WANT_AVD'. Available:
 $AVAILABLE_AVDS"
-    reserve_slot "$REGISTRY" avds "$WANT_AVD" "$SESSION_NAME" \
+    fresh_slot avds "$WANT_AVD" \
       || die "AVD '$WANT_AVD' is reserved by another session ($(cat "$REGISTRY/avds/$WANT_AVD/owner" 2>/dev/null))"
     AVD="$WANT_AVD"
   else
     while IFS= read -r candidate; do
       [ -n "$candidate" ] || continue
-      if reserve_slot "$REGISTRY" avds "$candidate" "$SESSION_NAME"; then
+      if fresh_slot avds "$candidate"; then
         AVD="$candidate"; break
       fi
     done <<< "$AVAILABLE_AVDS"
@@ -148,14 +185,14 @@ $AVAILABLE_AVDS"
   CONSOLE_PORT=""
   if [ -f "$SESSION_DIR/console-port" ]; then
     CONSOLE_PORT=$(cat "$SESSION_DIR/console-port")
-    reserve_slot "$REGISTRY" emu-ports "$CONSOLE_PORT" "$SESSION_NAME" || CONSOLE_PORT=""
+    fresh_slot emu-ports "$CONSOLE_PORT" || CONSOLE_PORT=""
   fi
   if [ -z "$CONSOLE_PORT" ]; then
     # Console ports are even and live in 5554..5680; the serial is
     # emulator-<console port>, which is what makes it ours by construction.
     for candidate in $(seq 5554 2 5680); do
       device_attached "$(serial_of "$candidate")" && continue
-      if reserve_slot "$REGISTRY" emu-ports "$candidate" "$SESSION_NAME"; then
+      if fresh_slot emu-ports "$candidate"; then
         CONSOLE_PORT="$candidate"; break
       fi
     done
@@ -203,6 +240,8 @@ LIVE_AVD=$(adb -s "$SERIAL" emu avd name 2>/dev/null | head -1 | tr -d '\r' || t
 if [ -n "$LIVE_AVD" ] && [ "$LIVE_AVD" != "$AVD" ]; then
   die "refusing $SERIAL - it is running AVD '$LIVE_AVD', not the '$AVD' this session reserved"
 fi
+
+CLAIM_DONE=1   # from here on the session is handed out; nothing is rolled back
 
 tel_emit android.claim.total "$T_CLAIM" origin="${CLAIM_ORIGIN:-reclaim}" \
   serial="$SERIAL" port="$PORT" avd="$AVD"

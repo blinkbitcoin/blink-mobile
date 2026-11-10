@@ -77,12 +77,29 @@ trap 'rm -f "$TMP_LOCAL"' EXIT
 
 # The dev menu writes exactly this shape; anything else and the framework
 # ignores the file rather than telling you.
-cat > "$TMP_LOCAL" <<EOF
+# Stop the app FIRST: a running app holds its SharedPreferences in memory,
+# and any apply()/commit() between our write and a later force-stop would
+# write that stale map back - without the redirect - and the next launch would
+# dial 10.0.2.2:8081, another agent's Metro.
+adb -s "$SERIAL" shell am force-stop "$APP_ID" 2>/dev/null || true
+
+# Merge into the existing default prefs rather than replacing the file: it
+# also holds React Native's other dev settings and anything else the app
+# keeps in its default SharedPreferences.
+LINE="    <string name=\"debug_http_host\">$HOST:$PORT</string>"
+EXISTING=$(adb -s "$SERIAL" shell run-as "$APP_ID" cat "$PREFS_FILE" 2>/dev/null | tr -d '\r' || true)
+if printf '%s\n' "$EXISTING" | grep -q '</map>'; then
+  printf '%s\n' "$EXISTING" | grep -v 'name="debug_http_host"' \
+    | awk -v line="$LINE" '/<\/map>/ && !done { print line; done = 1 } { print }' > "$TMP_LOCAL"
+else
+  # No prefs yet (or the empty `<map />` form Android writes): start fresh.
+  cat > "$TMP_LOCAL" <<EOF
 <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
 <map>
-    <string name="debug_http_host">$HOST:$PORT</string>
+$LINE
 </map>
 EOF
+fi
 
 adb -s "$SERIAL" push "$TMP_LOCAL" /data/local/tmp/debug_http_host.xml >/dev/null \
   || die "adb push failed"
@@ -90,10 +107,6 @@ adb -s "$SERIAL" shell run-as "$APP_ID" mkdir -p "/data/data/$APP_ID/shared_pref
 adb -s "$SERIAL" shell run-as "$APP_ID" cp /data/local/tmp/debug_http_host.xml "$PREFS_FILE" \
   || die "run-as cp failed - is $APP_ID installed, and is this a debuggable build?"
 adb -s "$SERIAL" shell rm -f /data/local/tmp/debug_http_host.xml 2>/dev/null || true
-
-# The value is only consulted at process start (see the companion-object cache
-# above), so this force-stop is what makes the write take effect.
-adb -s "$SERIAL" shell am force-stop "$APP_ID" 2>/dev/null || true
 
 tel_emit android.point_at_metro.total "$T_POINT" port="$PORT" host="$HOST"
 

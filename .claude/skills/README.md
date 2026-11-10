@@ -41,7 +41,8 @@ ownership gates, the collateral-damage assertion — and the suites that
 mutation-check them. The device-wide verbs those scripts guard (`erase`,
 `delete`, `shutdown`, `boot`, `create`, `clone`, `rename`, `uninstall`, and
 `spawn`/`privacy`/`addmedia`/`status_bar`, which change whatever device they
-are pointed at, `booted` included) are
+are pointed at, `booted` included; on Android `emulator`, `adb emu kill`,
+`adb kill-server`, `pm clear`) are
 deliberately *not* pre-approved: run raw, they skip every guard, so they
 still prompt — go through the scripts instead. Note: non-interactive runs in an *untrusted* checkout
 ignore project settings by design; trust the workspace once and the

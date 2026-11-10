@@ -106,7 +106,7 @@ curl -sSI "$RAW/after.png" | head -1
 ## After Editing the Scripts
 
 ```bash
-"$ATT/tests/run.sh"     # 27 assertions, ~5s, exits non-zero on failure
+"$ATT/tests/run.sh"     # 31 assertions, ~5s, exits non-zero on failure
 ```
 
 Pushes for real, to a local bare repo standing in for origin: no network, but

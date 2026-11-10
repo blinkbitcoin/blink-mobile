@@ -1,7 +1,7 @@
 ---
 name: react-native-android-emulator
 description: Use when running a React Native app on an Android emulator — claiming an isolated emulator and Metro port, pointing the app at that port, or any task involving adb, avd, emulator serials or an Android demo. Required before capturing Android screenshots or video, and whenever other agents may share the same machine.
-allowed-tools: Bash(adb *) Bash(emulator *) Bash(maestro *) Bash(node node_modules/react-native/cli.js *) Bash(/*/.claude/skills/*/scripts/*.sh) Bash(/*/.claude/skills/*/scripts/*.sh *) Bash(/*/.claude/skills/*/tests/run.sh)
+allowed-tools: Bash(adb devices) Bash(adb -s * exec-out screencap *) Bash(adb -s * shell screencap *) Bash(adb -s * shell input *) Bash(adb -s * shell am start *) Bash(adb -s * shell getprop *) Bash(adb -s * install *) Bash(adb -s * pull *) Bash(maestro *) Bash(node node_modules/react-native/cli.js *) Bash(/*/.claude/skills/*/scripts/*.sh) Bash(/*/.claude/skills/*/scripts/*.sh *) Bash(/*/.claude/skills/*/tests/run.sh)
 ---
 
 # React Native on an Isolated Android Emulator
@@ -153,7 +153,7 @@ tracked separately.
 ## After Editing the Scripts
 
 ```bash
-"$SKILL/tests/run.sh"     # 56 assertions, ~20s, exits non-zero on failure; fake adb + emulator, no device, no network
+"$SKILL/tests/run.sh"     # 68 assertions, ~20s, exits non-zero on failure; fake adb + emulator, no device, no network
 ```
 
 Run it after touching anything in `scripts/`. If you add a guarantee, add the
