@@ -1,6 +1,7 @@
 {
     "ApiScreen": {
         "keysGroupTitle": "APIキー",
+        "inactiveKeys": "無効なキー ({count})",
         "noKeys": "APIキーはまだありません",
         "createKey": "APIキーを作成",
         "createTitle": "新しいAPIキー",
@@ -27,6 +28,7 @@
         "revokeTitle": "APIキーを取り消しますか？",
         "revokeBody": "「{name: string}」は直ちに機能しなくなります。この操作は元に戻せません。",
         "revoke": "取り消す",
+        "revokeGoBack": "戻る",
         "revokeSuccess": "APIキーを取り消しました",
         "createError": "APIキーを作成できませんでした。もう一度お試しください。",
         "revokeError": "APIキーを取り消せませんでした。もう一度お試しください。",

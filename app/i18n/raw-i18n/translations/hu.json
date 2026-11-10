@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API-kulcsok",
+    "inactiveKeys": "Inaktív kulcsok ({count})",
     "noKeys": "Még nincsenek API-kulcsok",
     "createKey": "API-kulcs létrehozása",
     "createTitle": "Új API-kulcs",
@@ -27,6 +28,7 @@
     "revokeTitle": "Visszavonja az API-kulcsot?",
     "revokeBody": "A(z) \"{name: string}\" azonnal működésképtelenné válik. Ez nem vonható vissza.",
     "revoke": "Visszavonás",
+    "revokeGoBack": "Vissza",
     "revokeSuccess": "API-kulcs visszavonva",
     "createError": "Az API-kulcs létrehozása nem sikerült. Próbálja újra.",
     "revokeError": "Az API-kulcs visszavonása nem sikerült. Próbálja újra.",

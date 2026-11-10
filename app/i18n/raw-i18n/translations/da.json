@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API-nøgler",
+    "inactiveKeys": "Inaktive nøgler ({count})",
     "noKeys": "Ingen API-nøgler endnu",
     "createKey": "Opret API-nøgle",
     "createTitle": "Ny API-nøgle",
@@ -27,6 +28,7 @@
     "revokeTitle": "Tilbagekald API-nøgle?",
     "revokeBody": "\"{name: string}\" holder straks op med at virke. Dette kan ikke fortrydes.",
     "revoke": "Tilbagekald",
+    "revokeGoBack": "Tilbage",
     "revokeSuccess": "API-nøgle tilbagekaldt",
     "createError": "API-nøglen kunne ikke oprettes. Prøv igen.",
     "revokeError": "API-nøglen kunne ikke tilbagekaldes. Prøv igen.",

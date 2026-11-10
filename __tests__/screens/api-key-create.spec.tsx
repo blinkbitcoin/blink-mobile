@@ -1,5 +1,7 @@
+import fs from "fs"
+import path from "path"
 import React from "react"
-import { Share } from "react-native"
+import { Share, StyleSheet } from "react-native"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 import Clipboard from "@react-native-clipboard/clipboard"
 
@@ -11,6 +13,8 @@ import { acquireScreenSecurity } from "@app/utils/screen-security"
 import { ContextForScreen } from "./helper"
 import { flushEffects } from "../helpers/flush-effects"
 
+// three chips of this many characters fit a 320 dp row
+const MAX_EXPIRY_LABEL_LENGTH = 16
 const API_KEY_SECRET = "blink_S3CR3TS3CR3TS3CR3T"
 
 jest.mock("react-native-reanimated", () => {
@@ -111,8 +115,11 @@ describe("ApiKeyCreateScreen", () => {
     await flushEffects()
 
     typeName("CI bot")
-    fireEvent(screen.getByTestId("scope-read-switch"), "pressIn")
-    fireEvent(screen.getByTestId("scope-receive-switch"), "pressIn")
+    fireEvent(screen.getByRole("switch", { name: LL.ApiScreen.scopeRead() }), "pressIn")
+    fireEvent(
+      screen.getByRole("switch", { name: LL.ApiScreen.scopeReceive() }),
+      "pressIn",
+    )
 
     pressCreate()
     expect(apiKeyCreateMock).not.toHaveBeenCalled()
@@ -122,8 +129,11 @@ describe("ApiKeyCreateScreen", () => {
     renderScreen()
 
     typeName("CI bot")
-    fireEvent(screen.getByTestId("scope-receive-switch"), "pressIn")
-    fireEvent.press(screen.getByTestId(LL.ApiScreen.expiryNever()))
+    fireEvent(
+      screen.getByRole("switch", { name: LL.ApiScreen.scopeReceive() }),
+      "pressIn",
+    )
+    fireEvent.press(screen.getByText(LL.ApiScreen.expiryNever()))
 
     pressCreate()
 
@@ -136,6 +146,71 @@ describe("ApiKeyCreateScreen", () => {
     )
     // The created key opens its secret behind the guard, whose lease settles after.
     await flushEffects()
+  })
+
+  it("offers 30 days, 90 days and never, with 90 days selected", async () => {
+    renderScreen()
+    await flushEffects()
+
+    const labels = [
+      LL.ApiScreen.expiry30Days(),
+      LL.ApiScreen.expiry90Days(),
+      LL.ApiScreen.expiryNever(),
+    ]
+    labels.forEach((label) => expect(screen.getByText(label)).toBeTruthy())
+    expect(screen.getByTestId("api-key-expiry-90%").props.accessibilityState).toEqual(
+      expect.objectContaining({ selected: true }),
+    )
+  })
+
+  it("announces each expiry chip by its own label to screen readers", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("api-key-expiry-30%").props.accessibilityLabel).toBe(
+      LL.ApiScreen.expiry30Days(),
+    )
+    expect(screen.getByTestId("api-key-expiry-90%").props.accessibilityLabel).toBe(
+      LL.ApiScreen.expiry90Days(),
+    )
+    expect(screen.getByTestId("api-key-expiry-0%").props.accessibilityLabel).toBe(
+      LL.ApiScreen.expiryNever(),
+    )
+  })
+
+  it("wraps the expiry chips onto a new line instead of clipping them", async () => {
+    renderScreen()
+    await flushEffects()
+
+    // the nearest host ancestor of a chip is the selector row
+    let row = screen.getByTestId("api-key-expiry-30%").parent
+    while (row && typeof row.type !== "string") row = row.parent
+    expect(StyleSheet.flatten(row?.props.style)).toEqual(
+      expect.objectContaining({ flexWrap: "wrap" }),
+    )
+  })
+
+  it("keeps every locale's expiry labels short enough to share one narrow row", () => {
+    const keys = ["expiry30Days", "expiry90Days", "expiryNever"] as const
+    const translationsDir = path.join(__dirname, "../../app/i18n/raw-i18n/translations")
+    const tooLong = fs.readdirSync(translationsDir).flatMap((file) => {
+      const { ApiScreen } = JSON.parse(
+        fs.readFileSync(path.join(translationsDir, file), "utf8"),
+      )
+      return keys
+        .map((key) => `${file}: ${ApiScreen[key]}`)
+        .filter((entry) => entry.split(": ")[1].length > MAX_EXPIRY_LABEL_LENGTH)
+    })
+    expect(tooLong).toEqual([])
+  })
+
+  it("caps the key name at 64 characters", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(
+      screen.getByPlaceholderText(LL.ApiScreen.keyNamePlaceholder()).props.maxLength,
+    ).toBe(64)
   })
 
   it("defaults to both scopes and 90 days expiry", async () => {

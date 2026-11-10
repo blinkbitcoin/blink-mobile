@@ -13,20 +13,24 @@ import { testProps } from "@app/utils/testProps"
 export const PERCENTAGE_OPTIONS = [25, 50, 75, 100] as const
 const DEFAULT_TEST_ID_PREFIX = "convert"
 
-export type PercentageSelectorProps = {
+/** Generic over the option type so a caller with a closed set of values, such as day counts,
+ *  gets that set back in onSelect instead of any number. */
+export type PercentageSelectorProps<T extends number = number> = {
   isLocked: boolean
   loadingPercent: number | null
   /** The active percentage, drawn as a pressed chip so the current selection stays visible
    *  after its amount settles (the migration lands here already on 100%). */
-  selectedPercent?: number | null
-  onSelect: (percentage: number) => void
-  options?: Readonly<number[]>
+  selectedPercent?: T | null
+  onSelect: (percentage: T) => void
+  options?: Readonly<T[]>
   disabledOptions?: Readonly<number[]>
   testIdPrefix?: string
   containerStyle?: StyleProp<ViewStyle>
+  /** For chips that aren't percentages, such as day counts. */
+  formatLabel?: (option: T) => string
 }
 
-export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
+export const PercentageSelector = <T extends number = number>({
   isLocked,
   loadingPercent,
   selectedPercent,
@@ -35,13 +39,18 @@ export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
   disabledOptions,
   testIdPrefix = DEFAULT_TEST_ID_PREFIX,
   containerStyle,
-}) => {
+  formatLabel = (option) => `${option}%`,
+}: PercentageSelectorProps<T>) => {
   const {
     theme: { colors },
   } = useTheme()
   const styles = useStyles()
+  // the default list only applies when options is omitted, where T is plain number
   const opts = useMemo(
-    () => (options && options.length ? options : PERCENTAGE_OPTIONS),
+    () =>
+      options && options.length
+        ? options
+        : (PERCENTAGE_OPTIONS as unknown as Readonly<T[]>),
     [options],
   )
 
@@ -62,14 +71,20 @@ export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
             ]}
             disabled={isDisabled}
             onPress={() => onSelect(p)}
-            accessibilityLabel={testIdPrefix}
-            accessibilityState={{ selected: isSelected, disabled: isDisabled }}
+            accessibilityRole="button"
+            // after testProps, which would otherwise read the test ID out to screen readers
+            accessibilityLabel={formatLabel(p)}
+            accessibilityState={{
+              selected: isSelected,
+              disabled: isDisabled,
+              busy: loading,
+            }}
           >
             {loading ? (
               <ActivityIndicator color={colors.primary} />
             ) : (
               <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>
-                {p}%
+                {formatLabel(p)}
               </Text>
             )}
           </TouchableOpacity>
