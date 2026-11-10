@@ -66,3 +66,10 @@ export type CardProvisioningData = {
   displayName: string
   address: CardholderAddress
 }
+
+/** A wallet on the device that can take the card: Apple Pay on iOS, Google Pay on
+ *  Android. */
+export type DeviceWallet = {
+  canAdd: (card: WalletCard) => Promise<boolean>
+  add: (card: WalletCard, data: CardProvisioningData) => Promise<WalletAddResult>
+}
