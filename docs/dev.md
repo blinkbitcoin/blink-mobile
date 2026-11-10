@@ -52,6 +52,8 @@ Then run `yarn install` (or `yarn meawallet:install` on its own). It vendors the
 
 When the registry cannot be reached or the package fails its checksum, the install goes on without the SDK, so `yarn install` still works offline. A release job that must ship the wallet sets `MEA_REQUIRED=1`, which turns any install that leaves the SDK out into a failure.
 
+On a machine with access, `pod install` adds the `BlinkMeaConfig` and `meawallet-react-native-mpp` pods to `ios/Podfile.lock`. Never commit those lines: they belong to that machine alone, and the next contributor's `pod install` strips them again. `yarn check-code` (and `yarn check:podfile-lock` on its own) fails when the lock staged for commit carries them.
+
 ### Android Development
 
 To run the application on Android:

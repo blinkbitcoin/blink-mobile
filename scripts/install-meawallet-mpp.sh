@@ -107,6 +107,7 @@ install_config() {
   cp "$CONFIG_FILE" "$ANDROID_CONFIG"
   cp "$CONFIG_FILE" "$IOS_CONFIG"
   log "mea_config installed for Android and iOS"
+  log "pod install adds the MeaWallet pods to ios/Podfile.lock: never commit them"
 }
 
 install_package() {

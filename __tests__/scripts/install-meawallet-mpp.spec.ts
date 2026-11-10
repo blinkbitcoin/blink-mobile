@@ -264,9 +264,10 @@ describe("install-meawallet-mpp.sh installing", () => {
     giveCredentials()
     giveConfig("config v1")
 
-    const { status } = install()
+    const { status, output } = install()
 
     expect(status).toBe(0)
+    expect(output).toContain("never commit them")
     expect(vendoredVersion()).toBe(pinned("MPP_VERSION"))
     expect(readFileSync(androidConfig(), "utf8")).toBe("config v1")
     expect(readFileSync(iosConfig(), "utf8")).toBe("config v1")
