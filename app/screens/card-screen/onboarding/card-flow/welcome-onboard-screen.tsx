@@ -2,9 +2,10 @@ import * as React from "react"
 import { ScrollView, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { Icon, makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -25,31 +26,22 @@ export const WelcomeOnboardScreen: React.FC = () => {
   return (
     <Screen>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.contentContainer}>
-          <View style={styles.iconContainer}>
-            <View style={styles.iconCircle}>
-              <Icon
-                name={"heart-outline"}
-                type="ionicon"
-                color={colors.success}
-                size={40}
-              />
-            </View>
-          </View>
+        <IconHero
+          icon="heart-outline"
+          iconColor={colors.success}
+          title={LL.CardFlow.Onboarding.WelcomeOnboard.welcomeMessage.title()}
+          subtitle={
+            <Text type="p1" style={styles.subtitle}>
+              — {LL.CardFlow.Onboarding.WelcomeOnboard.welcomeMessage.subtitle()} —
+            </Text>
+          }
+        />
 
-          <Text type="h2" style={styles.welcomeTitle}>
-            {LL.CardFlow.Onboarding.WelcomeOnboard.welcomeMessage.title()}
-          </Text>
-
-          <Text type="p1" style={styles.subtitle}>
-            — {LL.CardFlow.Onboarding.WelcomeOnboard.welcomeMessage.subtitle()} —
-          </Text>
-
-          <Text type="p2" style={styles.bodyText}>
+        <View style={styles.paragraphs}>
+          <Text type="p2">
             {LL.CardFlow.Onboarding.WelcomeOnboard.welcomeMessage.paragraphs.body1()}
           </Text>
-
-          <Text type="p2" style={styles.bodyText}>
+          <Text type="p2">
             {LL.CardFlow.Onboarding.WelcomeOnboard.welcomeMessage.paragraphs.body2()}
           </Text>
         </View>
@@ -64,43 +56,21 @@ export const WelcomeOnboardScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(() => ({
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     paddingHorizontal: 20,
+    paddingTop: 20,
     paddingBottom: 20,
-    paddingTop: 40,
-  },
-  contentContainer: {
-    alignItems: "center",
-  },
-  iconContainer: {
-    marginBottom: 15,
-  },
-  iconCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: colors.surfaceInteractive,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  welcomeTitle: {
-    marginBottom: 10,
-    textAlign: "center",
-    fontWeight: "bold",
   },
   subtitle: {
-    marginBottom: 40,
     textAlign: "center",
   },
-  bodyText: {
-    marginBottom: 24,
-    lineHeight: 26,
-    textAlign: "left",
-    width: "100%",
+  paragraphs: {
+    marginTop: 30,
+    gap: 24,
   },
   buttonsContainer: {
     justifyContent: "flex-end",
