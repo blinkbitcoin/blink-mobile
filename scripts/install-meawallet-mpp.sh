@@ -32,6 +32,7 @@ VENDOR_DIR="$ROOT/vendor/meawallet/react-native-mpp"
 INTEGRITY_MARKER="$VENDOR_DIR/.integrity"
 CONFIG_DIR="${MEA_CONFIG_DIR:-$HOME/.config/blink}"
 CONFIG_FILE="${MEA_CONFIG_FILE:-$CONFIG_DIR/mea_config}"
+CREDENTIALS_FILE="$CONFIG_DIR/meawallet-rn.env"
 ANDROID_CONFIG="$ROOT/android/app/src/main/res/raw/mea_config"
 IOS_CONFIG="$ROOT/ios/MeaConfig/mea_config"
 
@@ -66,6 +67,19 @@ has_completed_install() {
   [ -f "$INTEGRITY_MARKER" ] && [ "$(cat "$INTEGRITY_MARKER")" = "$MPP_INTEGRITY" ]
 }
 
+# The environment wins per variable, as CI passes it, and the file fills whichever one it
+# left unset: a shell that exports only the user still reads the password from the file.
+load_credentials() {
+  env_user="${MEA_RN_USER:-}"
+  env_password="${MEA_RN_PASSWORD:-}"
+  if [ -f "$CREDENTIALS_FILE" ] && { [ -z "$env_user" ] || [ -z "$env_password" ]; }; then
+    # shellcheck disable=SC1090
+    . "$CREDENTIALS_FILE"
+  fi
+  MEA_RN_USER="${env_user:-${MEA_RN_USER:-}}"
+  MEA_RN_PASSWORD="${env_password:-${MEA_RN_PASSWORD:-}}"
+}
+
 install_config() {
   if [ ! -s "$CONFIG_FILE" ]; then
     rm -f "$ANDROID_CONFIG" "$IOS_CONFIG"
@@ -79,11 +93,8 @@ install_config() {
 }
 
 install_package() {
-  if [ -z "${MEA_RN_USER:-}" ] && [ -f "$CONFIG_DIR/meawallet-rn.env" ]; then
-    # shellcheck disable=SC1091
-    . "$CONFIG_DIR/meawallet-rn.env"
-  fi
-  if [ -z "${MEA_RN_USER:-}" ] || [ -z "${MEA_RN_PASSWORD:-}" ]; then
+  load_credentials
+  if [ -z "$MEA_RN_USER" ] || [ -z "$MEA_RN_PASSWORD" ]; then
     rm -rf "$VENDOR_DIR"
     log "no MeaWallet credentials, the build goes without the push provisioning SDK"
     return 0

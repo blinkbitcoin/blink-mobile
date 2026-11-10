@@ -277,6 +277,35 @@ describe("install-meawallet-mpp.sh installing", () => {
     expect(readdirSync(join(root, "tmp"))).toEqual([])
   })
 
+  /** A shell that exports only the user, left over from trying CI's setup, must not read
+   *  as no access: that would remove a good vendored SDK. */
+  it("fills the password the environment left out from the credentials file", () => {
+    giveCredentials()
+    giveConfig()
+
+    const { status } = install({
+      env: { MEA_RN_USER: "ci", FAKE_EXPECTED_CONFIG: expectedConfig("ci") },
+    })
+
+    expect(status).toBe(0)
+    expect(readFileSync(curlLog(), "utf8")).toContain("stdin config matched")
+    expect(vendoredVersion()).toBe(pinned("MPP_VERSION"))
+  })
+
+  it("lets the environment's password win over the file's", () => {
+    giveCredentials()
+    giveConfig()
+
+    install({
+      env: {
+        MEA_RN_PASSWORD: "password-from-env",
+        FAKE_EXPECTED_CONFIG: expectedConfig("blink", "password-from-env"),
+      },
+    })
+
+    expect(readFileSync(curlLog(), "utf8")).toContain("stdin config matched")
+  })
+
   /** curl reads a double-quoted config value with backslash escapes. */
   it("escapes quotes and backslashes in the password for curl's config", () => {
     const password = 'pa"ss\\word'
