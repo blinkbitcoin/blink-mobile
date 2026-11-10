@@ -102,9 +102,31 @@ xcrun simctl shutdown "$UDID" 2>/dev/null || true
 # --- The swap, under the golden lock -----------------------------------------
 SWAP="$(mktemp -d "${TMPDIR:-/tmp}/bless-golden.XXXXXX")"
 trap 'rm -rf "$SWAP"' EXIT
+# --- Stamp -------------------------------------------------------------------
+# What a later claim needs to judge a clone: which hardware this is (device
+# type/runtime gate the clone) and which build it carries (the agent diffs
+# native paths against this SHA before trusting the install). Built here and
+# installed by the swap itself, under the golden lock: a stamp written after
+# the lock is released lets a concurrent claim clone the new golden while
+# reading the old golden's stamp.
+NEW_STAMP="$SWAP/stamp"
+cat > "$NEW_STAMP" <<EOF
+sha=$SHA
+date=$(date +%Y-%m-%dT%H:%M:%S)
+device-type=$DEVICE_TYPE
+runtime=$RUNTIME
+EOF
+# The lockfile hash is what turns "is this golden's native build stale?" from
+# git archaeology into an instant claim-time comparison.
+if [ -f "$LOCKFILE" ]; then
+  "$(dirname "${BASH_SOURCE[0]}")/native-stamp.sh" write "$NEW_STAMP" --lockfile "$LOCKFILE" >/dev/null
+else
+  echo "note: no Podfile.lock at $LOCKFILE - the stamp carries no native hash, so staleness checks will demand a re-bless; pass --lockfile to fix" >&2
+fi
+
 cat > "$SWAP/swap.sh" <<'SWAPEOF'
 set -euo pipefail
-UDID="$1"; GOLDEN_NAME="$2"
+UDID="$1"; GOLDEN_NAME="$2"; NEW_STAMP="$3"; GOLDEN_DIR="$4"
 OLD=$(xcrun simctl list devices -j | python3 -c "
 import json,sys
 name=sys.argv[1]
@@ -118,31 +140,14 @@ if [ -n "$OLD" ]; then
   xcrun simctl rename "$OLD" "$GOLDEN_NAME-retired"
 fi
 xcrun simctl rename "$UDID" "$GOLDEN_NAME"
+mkdir -p "$GOLDEN_DIR"
+cp "$NEW_STAMP" "$GOLDEN_DIR/stamp.new" && mv -f "$GOLDEN_DIR/stamp.new" "$GOLDEN_DIR/stamp"
 if [ -n "$OLD" ]; then
   xcrun simctl delete "$OLD"
 fi
 SWAPEOF
 "$(dirname "${BASH_SOURCE[0]}")/with-lock.sh" golden 300 \
-  bash "$SWAP/swap.sh" "$UDID" "$GOLDEN_NAME"
-
-# --- Stamp -------------------------------------------------------------------
-# What a later claim needs to judge a clone: which hardware this is (device
-# type/runtime gate the clone) and which build it carries (the agent diffs
-# native paths against this SHA before trusting the install).
-mkdir -p "$GOLDEN_DIR"
-cat > "$GOLDEN_DIR/stamp" <<EOF
-sha=$SHA
-date=$(date +%Y-%m-%dT%H:%M:%S)
-device-type=$DEVICE_TYPE
-runtime=$RUNTIME
-EOF
-# The lockfile hash is what turns "is this golden's native build stale?" from
-# git archaeology into an instant claim-time comparison.
-if [ -f "$LOCKFILE" ]; then
-  "$(dirname "${BASH_SOURCE[0]}")/native-stamp.sh" write "$GOLDEN_DIR/stamp" --lockfile "$LOCKFILE" >/dev/null
-else
-  echo "note: no Podfile.lock at $LOCKFILE - the stamp carries no native hash, so staleness checks will demand a re-bless; pass --lockfile to fix" >&2
-fi
+  bash "$SWAP/swap.sh" "$UDID" "$GOLDEN_NAME" "$NEW_STAMP" "$GOLDEN_DIR"
 
 # --- Collateral-damage assertion ---------------------------------------------
 # Same exit guarantee as release-session.sh: every device booted before this
@@ -164,19 +169,23 @@ for u, n in before.items():
     if u not in after and u != ours:
         print('%s (%s)' % (n, u))
 " "$PRE" "$NOW" "$UDID")
-  if [ -n "$MISSING" ]; then
-    echo "COLLATERAL DAMAGE - these were booted before this session and are not now:" >&2
-    echo "$MISSING" >&2
-    exit 1
-  fi
 fi
 
 # --- Adopt the session -------------------------------------------------------
-# The device left the session's namespace, so the session must not survive it.
+# The device left the session's namespace, so the session must not survive it
+# - even when the collateral check below fails: the device is already the
+# golden, and a manifest still pointing at it would make every later release
+# of this PR exit FATAL through its ownership gate.
 if [ -n "$PORT" ] && [ "$(cat "$REGISTRY/ports/$PORT/owner" 2>/dev/null)" = "$SIM_NAME" ]; then
   rm -rf "$REGISTRY/ports/$PORT"
 fi
 rm -rf "$SESSION_DIR"
+
+if [ -n "${MISSING:-}" ]; then
+  echo "COLLATERAL DAMAGE - these were booted before this session and are not now:" >&2
+  echo "$MISSING" >&2
+  exit 1
+fi
 
 echo "blessed $GOLDEN_NAME ($UDID) - stamp: $GOLDEN_DIR/stamp"
 sed 's/^/  /' "$GOLDEN_DIR/stamp"

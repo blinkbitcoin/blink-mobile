@@ -181,16 +181,30 @@ for _, devices in json.load(sys.stdin)['devices'].items():
       else
         # Under the golden lock: a concurrent re-bless swaps the golden device
         # mid-flight. If the clone still fails, fall through to a blank create.
+        # The stamp is snapshotted inside the same lock as the clone, so the
+        # two always describe the same golden; the eligibility checks above
+        # read it unlocked and are only a fast filter, re-run on the snapshot.
         UDID=$("$(dirname "${BASH_SOURCE[0]}")/with-lock.sh" golden 300 \
-          xcrun simctl clone "$GOLDEN_UDID" "$SIM_NAME" 2>/dev/null || true)
+          bash -c 'cp "$1" "$2" && xcrun simctl clone "$3" "$4"' _ \
+          "$GOLDEN_DIR/stamp" "$SESSION_DIR/golden-stamp" "$GOLDEN_UDID" "$SIM_NAME" 2>/dev/null || true)
+        if [ -n "$UDID" ]; then
+          STAMP_TYPE=$(grep '^device-type=' "$SESSION_DIR/golden-stamp" 2>/dev/null | cut -d= -f2- || true)
+          STAMP_RUNTIME=$(grep '^runtime=' "$SESSION_DIR/golden-stamp" 2>/dev/null | cut -d= -f2- || true)
+          if [ "$DEVICE_TYPE" != "$STAMP_TYPE" ] || { [ -n "$RUNTIME" ] && [ "$RUNTIME" != "$STAMP_RUNTIME" ]; }; then
+            echo "note: golden $GOLDEN_NAME was re-blessed as a '$STAMP_TYPE' ($STAMP_RUNTIME) mid-claim; creating a blank device" >&2
+            xcrun simctl delete "$UDID" 2>/dev/null || true   # our own fresh clone
+            rm -f "$SESSION_DIR/golden-stamp"
+            UDID=""
+          fi
+        fi
         if [ -n "$UDID" ]; then
           echo "cloned-from-golden" > "$SESSION_DIR/origin"
           echo "$GOLDEN_NAME" > "$SESSION_DIR/golden-source"
-          cp "$GOLDEN_DIR/stamp" "$SESSION_DIR/golden-stamp" 2>/dev/null || true
           echo "$STAMP_TYPE" > "$SESSION_DIR/device-type"
           echo "${STAMP_RUNTIME:-default}" > "$SESSION_DIR/runtime"
         else
-          echo "note: cloning golden $GOLDEN_NAME failed; creating a blank device" >&2
+          rm -f "$SESSION_DIR/golden-stamp"
+          echo "note: cloning golden $GOLDEN_NAME failed or was refused; creating a blank device" >&2
         fi
       fi
     fi

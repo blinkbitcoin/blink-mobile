@@ -612,6 +612,23 @@ check "the retired golden is deleted, not orphaned" "" \
 check "the stamp now describes the new golden" "yes" \
   "$(grep -q '^sha=def456' "$GOLDEN_STAMP" && echo yes || echo no)"
 
+# --- a bless that trips the collateral check still adopts its session ---------
+# The device is already the golden by then; a surviving manifest would point
+# at it and make every later release of this PR fail its ownership gate.
+# Isolated world: this test shuts down the user's simulator on purpose.
+(
+  export DEMO_SIM_REGISTRY="$WORK/collateral-registry" FAKE_DEVICES="$WORK/collateral-devices.txt"
+  printf 'USER-SIM|iPhone 16 Pro|Booted\n' > "$FAKE_DEVICES"
+  eval "$("$SCRIPTS/claim-session.sh" 720 2>/dev/null)"
+  xcrun simctl shutdown USER-SIM
+  "$SCRIPTS/bless-golden.sh" 720 --sha c0ffee >/dev/null 2>&1
+  echo "rc=$? session=$([ -d "$DEMO_SESSION_DIR" ] && echo kept || echo adopted) port=$([ -d "$DEMO_SIM_REGISTRY/ports/$DEMO_PORT" ] && echo held || echo freed)"
+) > "$WORK/collateral-bless.out" 2>/dev/null
+check "bless still fails loudly on collateral damage" "yes" \
+  "$(grep -q '^rc=1 ' "$WORK/collateral-bless.out" && echo yes || echo "no ($(cat "$WORK/collateral-bless.out"))")"
+check "a failed bless still adopts its session and frees its port" "yes" \
+  "$(grep -q 'session=adopted port=freed' "$WORK/collateral-bless.out" && echo yes || echo "no ($(cat "$WORK/collateral-bless.out"))")"
+
 # --- the stamp's lockfile hash gives claim an instant staleness verdict ------
 VERDICT_APP="$WORK/verdict-app"; mkdir -p "$VERDICT_APP/ios"
 echo "PODS blessed" > "$VERDICT_APP/ios/Podfile.lock"
