@@ -14,12 +14,14 @@
 # $MEA_CONFIG_FILE or $MEA_CONFIG_DIR/mea_config. MEA_CONFIG_DIR defaults to
 # ~/.config/blink. No credential is ever printed.
 #
-# Each run converges on what this machine has now: without the credentials the vendored
-# SDK is removed, and without the configuration both of its copies are, so access that
-# was revoked or a configuration that was withdrawn never lingers in a build. A vendored
-# SDK is reused only while it carries the marker written once its archive matched the
-# pinned checksum, so a partial, corrupt or restored copy is downloaded again, and a copy
-# a run could not verify is removed, since the build links whatever is vendored.
+# Each run converges on what this machine has now. The SDK and its configuration are
+# installed together or not at all: an SDK without its configuration fails to start, and
+# a configuration without the SDK is a pod that does nothing. So without the credentials
+# or without the configuration both are removed, and access that was revoked or a
+# configuration that was withdrawn never lingers in a build. A vendored SDK is reused
+# only while it carries the marker written once its archive matched the pinned checksum,
+# so a partial, corrupt or restored copy is downloaded again, and a copy a run could not
+# verify is removed, since the build links whatever is vendored.
 
 set -eu
 
@@ -80,12 +82,18 @@ load_credentials() {
   MEA_RN_PASSWORD="${env_password:-${MEA_RN_PASSWORD:-}}"
 }
 
+remove_sdk_and_config() {
+  rm -rf "$VENDOR_DIR"
+  rm -f "$ANDROID_CONFIG" "$IOS_CONFIG"
+}
+
+go_without() {
+  remove_sdk_and_config
+  log "$1, the build goes without the push provisioning SDK"
+  exit 0
+}
+
 install_config() {
-  if [ ! -s "$CONFIG_FILE" ]; then
-    rm -f "$ANDROID_CONFIG" "$IOS_CONFIG"
-    log "no mea_config found, the build goes without it"
-    return 0
-  fi
   mkdir -p "$(dirname "$ANDROID_CONFIG")" "$(dirname "$IOS_CONFIG")"
   cp "$CONFIG_FILE" "$ANDROID_CONFIG"
   cp "$CONFIG_FILE" "$IOS_CONFIG"
@@ -93,13 +101,6 @@ install_config() {
 }
 
 install_package() {
-  load_credentials
-  if [ -z "$MEA_RN_USER" ] || [ -z "$MEA_RN_PASSWORD" ]; then
-    rm -rf "$VENDOR_DIR"
-    log "no MeaWallet credentials, the build goes without the push provisioning SDK"
-    return 0
-  fi
-
   if has_completed_install; then
     log "@meawallet/react-native-mpp $MPP_VERSION already vendored"
     return 0
@@ -109,19 +110,20 @@ install_package() {
   work=$(mktemp -d "${TMPDIR:-/tmp}/meawallet-mpp.XXXXXX")
   # The credentials reach curl on its stdin, never its arguments or a file that a killed
   # install could leave behind. The configs link whatever is vendored, so a copy this run
-  # could not verify is removed rather than left for the next build to pick up.
+  # could not verify is removed, with its configuration, rather than left for the next
+  # build to pick up.
   user=$(curl_config_quote "$MEA_RN_USER")
   password=$(curl_config_quote "$MEA_RN_PASSWORD")
   if ! printf 'user = "%s:%s"\n' "$user" "$password" |
     curl -K - -sSf -o "$work/package.tgz" "$MPP_TARBALL"; then
-    rm -rf "$VENDOR_DIR"
+    remove_sdk_and_config
     log "could not download @meawallet/react-native-mpp $MPP_VERSION"
     return 1
   fi
 
   integrity=$(openssl dgst -sha512 -binary "$work/package.tgz" | openssl base64 -A)
   if [ "$integrity" != "$MPP_INTEGRITY" ]; then
-    rm -rf "$VENDOR_DIR"
+    remove_sdk_and_config
     log "integrity mismatch for @meawallet/react-native-mpp $MPP_VERSION, not installing it"
     return 1
   fi
@@ -137,5 +139,12 @@ install_package() {
   log "@meawallet/react-native-mpp $MPP_VERSION vendored"
 }
 
+load_credentials
+if [ -z "$MEA_RN_USER" ] || [ -z "$MEA_RN_PASSWORD" ]; then
+  go_without "no MeaWallet credentials"
+fi
+if [ ! -s "$CONFIG_FILE" ]; then
+  go_without "no mea_config found"
+fi
 install_package
 install_config

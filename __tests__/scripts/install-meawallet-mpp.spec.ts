@@ -239,6 +239,26 @@ describe("install-meawallet-mpp.sh installing", () => {
     expect(downloads()).toBe(0)
   })
 
+  it("vendors nothing for credentials that come without a configuration", () => {
+    giveCredentials()
+
+    const { status } = install()
+
+    expect(status).toBe(0)
+    expect(downloads()).toBe(0)
+    expect(existsSync(vendorDir())).toBe(false)
+  })
+
+  it("copies no configuration that comes without credentials", () => {
+    giveConfig()
+
+    const { status } = install()
+
+    expect(status).toBe(0)
+    expect(existsSync(androidConfig())).toBe(false)
+    expect(existsSync(iosConfig())).toBe(false)
+  })
+
   it("vendors the SDK and copies the configuration to Android and iOS", () => {
     giveCredentials()
     giveConfig("config v1")
@@ -370,25 +390,42 @@ describe("install-meawallet-mpp.sh on a machine that was provisioned before", ()
     expect(downloads()).toBe(1)
   })
 
-  it("removes the SDK once the credentials are gone", () => {
+  /** The SDK and its configuration go together: one without the other only fails to
+   *  start, or adds a pod that does nothing. */
+  it("removes the SDK and its configuration once the credentials are gone", () => {
     revokeCredentials()
 
     const { status } = install()
 
     expect(status).toBe(0)
     expect(existsSync(vendorDir())).toBe(false)
-    expect(readFileSync(iosConfig(), "utf8")).toBe("config v1")
+    expect(existsSync(androidConfig())).toBe(false)
+    expect(existsSync(iosConfig())).toBe(false)
   })
 
-  it("removes both configuration copies once the configuration is gone", () => {
+  it("removes the SDK and its configuration once the configuration is gone", () => {
     withdrawConfig()
 
     const { status } = install()
 
     expect(status).toBe(0)
+    expect(existsSync(vendorDir())).toBe(false)
     expect(existsSync(androidConfig())).toBe(false)
     expect(existsSync(iosConfig())).toBe(false)
-    expect(vendoredVersion()).toBe(pinned("MPP_VERSION"))
+  })
+
+  it.each<[string, InstallOptions]>([
+    ["the download fails", { downloadFails: true }],
+    ["the archive fails its checksum", { checksumMatches: false }],
+  ])("removes the configuration too when %s on a new install", (_, failure) => {
+    writeFile(integrityMarker(), "sha512-of-the-previous-version\n")
+
+    const { status } = install(failure)
+
+    expect(status).toBe(1)
+    expect(existsSync(vendorDir())).toBe(false)
+    expect(existsSync(androidConfig())).toBe(false)
+    expect(existsSync(iosConfig())).toBe(false)
   })
 
   it("vendors the SDK again once the credentials come back", () => {
