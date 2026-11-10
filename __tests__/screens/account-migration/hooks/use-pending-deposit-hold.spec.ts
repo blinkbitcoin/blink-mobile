@@ -16,6 +16,10 @@ jest.mock("@app/screens/account-migration/hooks/use-custodial-pending-deposits",
   }),
 }))
 
+jest.mock("@app/screens/account-migration/hooks/use-migration-support-email", () => ({
+  useMigrationSupportEmail: () => ({ sendSupportEmail: jest.fn() }),
+}))
+
 jest.mock("@app/screens/account-migration/hooks/use-custodial-wind-down", () => ({
   useCustodialWindDown: () => null,
 }))
@@ -58,7 +62,6 @@ describe("usePendingDepositHold reading the figures again", () => {
         isCommitRefusedForDeposit,
         isServerFlowNotStarted: false,
         leaveFlow: jest.fn(),
-        contactSupport: jest.fn(),
       }),
     )
 

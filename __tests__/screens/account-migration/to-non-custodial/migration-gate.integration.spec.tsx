@@ -65,6 +65,19 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
   }),
 }))
 
+const mockSendDepositSupportEmail = jest.fn()
+const mockUseMigrationSupportEmail = jest.fn()
+jest.mock("@app/screens/account-migration/hooks/use-migration-support-email", () => ({
+  useMigrationSupportEmail: (reason: string) => {
+    mockUseMigrationSupportEmail(reason)
+    return {
+      sendSupportEmail: mockSendDepositSupportEmail,
+      cardDetails: [],
+      supportDetailsText: "",
+    }
+  },
+}))
+
 jest.mock("@app/screens/account-migration/hooks/use-migration-lock", () => ({
   useMigrationLock: () => ({
     isLocked: true,

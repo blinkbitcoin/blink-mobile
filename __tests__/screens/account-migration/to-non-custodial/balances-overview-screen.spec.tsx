@@ -13,7 +13,7 @@ import {
   type CheckpointUpdate,
   mergeCheckpoint,
 } from "@app/screens/account-migration/utils/migration-checkpoint-storage"
-import { MigrationLnAddressOutcome } from "@app/types/migration"
+import { MigrationLnAddressOutcome, MigrationSupportReason } from "@app/types/migration"
 import { WindDown, WindDownStatus } from "@app/types/wind-down"
 import {
   StorageFailure,
@@ -100,6 +100,19 @@ jest.mock("@react-navigation/native", () => ({
 let mockWindDown: WindDown | null = null
 jest.mock("@app/screens/account-migration/hooks/use-custodial-wind-down", () => ({
   useCustodialWindDown: () => mockWindDown,
+}))
+
+const mockSendDepositSupportEmail = jest.fn()
+const mockUseMigrationSupportEmail = jest.fn()
+jest.mock("@app/screens/account-migration/hooks/use-migration-support-email", () => ({
+  useMigrationSupportEmail: (reason: string) => {
+    mockUseMigrationSupportEmail(reason)
+    return {
+      sendSupportEmail: mockSendDepositSupportEmail,
+      cardDetails: [],
+      supportDetailsText: "",
+    }
+  },
 }))
 
 jest.mock("@app/graphql/generated", () => ({
@@ -3128,11 +3141,16 @@ describe("MigrationBalancesOverviewScreen figures read again after a deposit", (
       await flushEffects()
 
       expect(lastModalProps()).toEqual(
-        expect.objectContaining({
-          showCloseIconButton: false,
-          onContactSupport: expect.any(Function),
-        }),
+        expect.objectContaining({ showCloseIconButton: false }),
       )
+      expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith(
+        MigrationSupportReason.DepositPending,
+      )
+      act(() => {
+        lastModalProps().onContactSupport?.()
+      })
+      expect(mockSendDepositSupportEmail).toHaveBeenCalledTimes(1)
+
       fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
       await flushEffects()
       expect(mockReset).not.toHaveBeenCalled()

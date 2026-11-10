@@ -89,7 +89,6 @@ const mockPendingDepositModal = jest.fn(
   },
 )
 const mockUseCustodialPendingDeposits = jest.fn()
-const mockOpenSupport = jest.fn()
 const mockUnavailableScreen = jest.fn(() => null)
 /** Keeps the testID the gate hands it, so the specs find the button by the id the screen
  *  actually ships rather than one the mock invents. */
@@ -191,8 +190,17 @@ jest.mock("@app/screens/account-migration/hooks/use-reusable-pending-wallet", ()
   }),
 }))
 
-jest.mock("@app/hooks/use-contact-support", () => ({
-  useContactSupport: () => ({ openSupport: mockOpenSupport }),
+const mockSendDepositSupportEmail = jest.fn()
+const mockUseMigrationSupportEmail = jest.fn()
+jest.mock("@app/screens/account-migration/hooks/use-migration-support-email", () => ({
+  useMigrationSupportEmail: (reason: string) => {
+    mockUseMigrationSupportEmail(reason)
+    return {
+      sendSupportEmail: mockSendDepositSupportEmail,
+      cardDetails: [],
+      supportDetailsText: "",
+    }
+  },
 }))
 
 jest.mock("@app/screens/account-migration/hooks/use-custodial-pending-deposits", () => ({
@@ -1162,7 +1170,10 @@ describe("MigrationGate, with a deposit still confirming", () => {
     render(<MigrationGate />)
 
     expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
-      expect.objectContaining({ onContactSupport: mockOpenSupport }),
+      expect.objectContaining({ onContactSupport: mockSendDepositSupportEmail }),
+    )
+    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith(
+      MigrationSupportReason.DepositPending,
     )
   })
 

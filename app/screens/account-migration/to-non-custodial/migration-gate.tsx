@@ -10,7 +10,6 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { DollarBalanceMigrationModal } from "@app/components/dollar-balance-migration-modal"
 import { Screen } from "@app/components/screen"
-import { useContactSupport } from "@app/hooks/use-contact-support"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { TemporarilyUnavailableScreen } from "@app/screens/feature-unavailable/temporarily-unavailable-screen"
@@ -31,6 +30,7 @@ import {
 } from "@app/screens/account-migration/hooks"
 import { useCustodialPendingDeposits } from "@app/screens/account-migration/hooks/use-custodial-pending-deposits"
 import { useCustodialWindDown } from "@app/screens/account-migration/hooks/use-custodial-wind-down"
+import { useMigrationSupportEmail } from "@app/screens/account-migration/hooks/use-migration-support-email"
 import { useMigrationLock } from "@app/screens/account-migration/hooks/use-migration-lock"
 import { useReusablePendingWallet } from "@app/screens/account-migration/hooks/use-reusable-pending-wallet"
 import { useStorageHandover } from "@app/screens/account-migration/hooks/use-storage-handover"
@@ -132,7 +132,11 @@ export const MigrationGate: React.FC = () => {
   const exitFlow = useCallback(() => {
     navigation.goBack()
   }, [navigation])
-  const { openSupport } = useContactSupport()
+  /** The deposit modal's support mail carries the reason and the account, as every other
+   *  migration handover does, so support can act on the first message. */
+  const { sendSupportEmail: sendDepositSupportEmail } = useMigrationSupportEmail(
+    MigrationSupportReason.DepositPending,
+  )
 
   /** The retry reports the first source that failed, so a check that could not answer
    *  counts as one, carrying the error its request raised. A failed check also shows
@@ -453,7 +457,9 @@ export const MigrationGate: React.FC = () => {
      *  instead, so a deposit that has confirmed lets the user through right here. */
     const acknowledgePendingDeposit = isExitBlocked ? recheckPendingDeposits : exitFlow
     const canClosePendingDepositModal = !isExitBlocked
-    const pendingDepositSupportAction = isExitBlocked ? openSupport : undefined
+    const pendingDepositSupportAction = isExitBlocked
+      ? sendDepositSupportEmail
+      : undefined
     /** Only where OK checks again: where it leaves, a check running in the background
      *  has nothing to do with it. */
     const isPendingDepositCheckShown = isExitBlocked && isPendingDepositRecheckRunning

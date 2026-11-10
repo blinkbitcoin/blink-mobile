@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
-import { PendingDepositCheckStatus } from "@app/types/migration"
+import { MigrationSupportReason, PendingDepositCheckStatus } from "@app/types/migration"
 import { WindDownStatus } from "@app/types/wind-down"
 
 import { useCustodialPendingDeposits } from "./use-custodial-pending-deposits"
 import { useCustodialWindDown } from "./use-custodial-wind-down"
 import { useEnsureMigrationStarted } from "./use-ensure-migration-started"
+import { useMigrationSupportEmail } from "./use-migration-support-email"
 
 /** Where reading the figures again after a deposit cleared stands. */
 const FigureRefresh = {
@@ -34,8 +35,6 @@ type UsePendingDepositHoldArgs = {
   isServerFlowNotStarted: boolean
   /** Takes the user out of the migration, for a modal they are free to leave. */
   leaveFlow: () => void
-  /** Hands the user to support, offered only where they cannot leave. */
-  contactSupport: () => void
 }
 
 /**
@@ -62,7 +61,6 @@ export const usePendingDepositHold = ({
   isCommitRefusedForDeposit,
   isServerFlowNotStarted,
   leaveFlow,
-  contactSupport,
 }: UsePendingDepositHoldArgs) => {
   const {
     hasPendingDeposit,
@@ -171,7 +169,12 @@ export const usePendingDepositHold = ({
    *  figures is caught here rather than after the balance has moved: a deposit brings the
    *  modal back and a failed check brings the retry, both through the check's own state. */
   const acknowledgeModal = isModalClosable ? leaveFlow : acknowledge
-  const modalSupportAction = isModalClosable ? undefined : contactSupport
+  /** The mail carries the reason and the account, as every other migration handover does,
+   *  so support can act on the first message. */
+  const { sendSupportEmail } = useMigrationSupportEmail(
+    MigrationSupportReason.DepositPending,
+  )
+  const modalSupportAction = isModalClosable ? undefined : sendSupportEmail
 
   const checkBeforeApprove = useCallback(async (): Promise<boolean> => {
     const depositCheck = await recheck()

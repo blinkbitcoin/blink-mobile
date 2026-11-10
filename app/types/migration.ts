@@ -86,6 +86,9 @@ export const MigrationSupportReason = {
   /** The server paid the migration out, but the receive into the new self-custodial
    *  wallet stayed unconfirmed past the notice window — the funds look stuck in transit. */
   ReceiveDelayed: "receive-delayed",
+  /** An incoming on-chain deposit still confirming holds the migration, and the user asked
+   *  for help from the modal that says so: a low fee can leave it unconfirmed for days. */
+  DepositPending: "deposit-pending",
   /** The proof the lightning-address re-point signs could not be built on this device: the
    *  SDK answered with a failure, or the keychain threw. The commit signs the same proof
    *  through the same chain, so it would fail moments later — this is the one re-point

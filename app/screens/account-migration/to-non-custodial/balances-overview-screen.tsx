@@ -254,7 +254,6 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     isCommitRefusedForDeposit: routeParams?.isDepositRefused === true,
     isServerFlowNotStarted,
     leaveFlow,
-    contactSupport: openSupport,
   })
   /** Taken once: a later refusal sets it again, which has to read as a change. */
   useEffect(() => {
