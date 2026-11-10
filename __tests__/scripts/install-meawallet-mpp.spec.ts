@@ -1,5 +1,5 @@
 import { it } from "@jest/globals"
-import { spawnSync } from "child_process"
+import { spawn, spawnSync } from "child_process"
 import {
   chmodSync,
   copyFileSync,
@@ -23,9 +23,22 @@ const pinned = (name: string): string => {
   return match[1]
 }
 
-/** Answers the registry with the test tarball, or fails like curl -f on a 4xx. */
+/** Answers the registry with the test tarball, or fails like curl -f on a 4xx. A config read
+ *  from stdin is checked against the one expected and logged by its user alone, so the log
+ *  never holds the password. With FAKE_CURL_STARTED it hangs, as a slow download does. */
 const FAKE_CURL = `#!/bin/sh
 echo "$@" >> "$FAKE_CURL_LOG"
+case " $* " in
+  *" -K - "*)
+    config=$(cat)
+    [ "$config" = "$FAKE_EXPECTED_CONFIG" ] && echo "stdin config matched" >> "$FAKE_CURL_LOG"
+    echo "stdin user: $(printf '%s' "$config" | sed -n 's/^user = "\\([^:]*\\):.*/\\1/p')" >> "$FAKE_CURL_LOG"
+    ;;
+esac
+if [ -n "\${FAKE_CURL_STARTED:-}" ]; then
+  : > "$FAKE_CURL_STARTED"
+  sleep 30
+fi
 [ -z "\${FAKE_CURL_FAIL:-}" ] || exit 22
 while [ $# -gt 0 ]; do
   [ "$1" = "-o" ] && out=$2
@@ -33,6 +46,26 @@ while [ $# -gt 0 ]; do
 done
 cp "$FAKE_TARBALL" "$out"
 `
+
+/** The real tar, except with FAKE_TAR_STARTED, where it leaves half an archive behind and
+ *  hangs, as an extract cut short does. */
+const FAKE_TAR = `#!/bin/sh
+if [ -n "\${FAKE_TAR_STARTED:-}" ]; then
+  while [ $# -gt 0 ]; do
+    [ "$1" = "-C" ] && dest=$2
+    shift
+  done
+  mkdir -p "$dest/package"
+  : > "$dest/package/half-extracted.js"
+  : > "$FAKE_TAR_STARTED"
+  sleep 30
+  exit 0
+fi
+exec "$FAKE_REAL_TAR" "$@"
+`
+const REAL_TAR = spawnSync("sh", ["-c", "command -v tar"], {
+  encoding: "utf8",
+}).stdout.trim()
 
 /** Hashes any archive to the pinned checksum, standing in for the real package. */
 const FAKE_OPENSSL = `#!/bin/sh
@@ -86,7 +119,11 @@ const packTarball = () => {
   spawnSync("tar", ["-czf", join(root, "package.tgz"), "-C", source, "package"])
 }
 
-const downloads = () => readFileSync(curlLog(), "utf8").split("\n").filter(Boolean).length
+/** curl calls, as the fake logs each one's arguments; its stdin notes are left out. */
+const downloads = () =>
+  readFileSync(curlLog(), "utf8")
+    .split("\n")
+    .filter((line) => line !== "" && !line.startsWith("stdin ")).length
 const vendoredVersion = () =>
   JSON.parse(readFileSync(join(vendorDir(), "package.json"), "utf8")).version
 const integrityMarker = () => join(vendorDir(), ".integrity")
@@ -109,28 +146,68 @@ type InstallOptions = {
   env?: Record<string, string>
 }
 
-/** Runs the script in a scratch checkout with a scratch HOME, so it never reads the
- *  developer's own credentials or touches the real vendored SDK. */
-const install = ({
+/** The curl config the script should pipe for the credentials giveCredentials writes. */
+const expectedConfig = (user = "blink", password = PASSWORD) =>
+  `user = "${user}:${password}"`
+
+/** A scratch checkout with a scratch HOME, so the script never reads the developer's own
+ *  credentials or touches the real vendored SDK. */
+const installEnv = ({
   checksumMatches = true,
   downloadFails = false,
   env = {},
-}: InstallOptions = {}) => {
+}: InstallOptions = {}): Record<string, string> => {
   const fakeOpenssl = checksumMatches ? [join(root, "openssl-bin")] : []
+  return {
+    PATH: [join(root, "bin"), ...fakeOpenssl, process.env.PATH ?? ""].join(":"),
+    HOME: home,
+    TMPDIR: join(root, "tmp"),
+    FAKE_CURL_LOG: curlLog(),
+    FAKE_TARBALL: join(root, "package.tgz"),
+    FAKE_DIGEST: pinned("MPP_INTEGRITY"),
+    FAKE_REAL_TAR: REAL_TAR,
+    FAKE_EXPECTED_CONFIG: expectedConfig(),
+    ...(downloadFails ? { FAKE_CURL_FAIL: "1" } : {}),
+    ...env,
+  }
+}
+
+const install = (options: InstallOptions = {}) => {
   const result = spawnSync("sh", [join(repo, "scripts", "install-meawallet-mpp.sh")], {
     encoding: "utf8",
-    env: {
-      PATH: [join(root, "bin"), ...fakeOpenssl, process.env.PATH ?? ""].join(":"),
-      HOME: home,
-      TMPDIR: join(root, "tmp"),
-      FAKE_CURL_LOG: curlLog(),
-      FAKE_TARBALL: join(root, "package.tgz"),
-      FAKE_DIGEST: pinned("MPP_INTEGRITY"),
-      ...(downloadFails ? { FAKE_CURL_FAIL: "1" } : {}),
-      ...env,
-    },
+    env: installEnv(options),
   })
   return { status: result.status, output: result.stdout + result.stderr }
+}
+
+const until = async (condition: () => boolean) => {
+  const deadline = Date.now() + 10_000
+  while (!condition()) {
+    if (Date.now() > deadline) throw new Error("the step under test never started")
+    await new Promise((resolve) => {
+      setTimeout(resolve, 20)
+    })
+  }
+}
+
+/** Starts the script under `shell` and, once the step that `startedFlag` marks is running,
+ *  sends Ctrl-C the way a terminal does: to the whole process group. */
+const interruptInstall = async (
+  shell: string,
+  startedFlag: "FAKE_CURL_STARTED" | "FAKE_TAR_STARTED",
+) => {
+  const started = join(root, "started")
+  const child = spawn(shell, [join(repo, "scripts", "install-meawallet-mpp.sh")], {
+    detached: true,
+    stdio: "ignore",
+    env: { ...installEnv(), [startedFlag]: started },
+  })
+  const exited = new Promise<number | null>((resolve) => {
+    child.on("exit", (code) => resolve(code))
+  })
+  await until(() => existsSync(started))
+  process.kill(-(child.pid ?? 0), "SIGINT")
+  return exited
 }
 
 beforeEach(() => {
@@ -140,6 +217,7 @@ beforeEach(() => {
   mkdirSync(join(repo, "scripts"), { recursive: true })
   copyFileSync(SCRIPT, join(repo, "scripts", "install-meawallet-mpp.sh"))
   writeExecutable(join(root, "bin", "curl"), FAKE_CURL)
+  writeExecutable(join(root, "bin", "tar"), FAKE_TAR)
   writeExecutable(join(root, "openssl-bin", "openssl"), FAKE_OPENSSL)
   mkdirSync(join(root, "tmp"))
   writeFile(curlLog(), "")
@@ -186,15 +264,31 @@ describe("install-meawallet-mpp.sh installing", () => {
     expect(readFileSync(iosConfig(), "utf8")).toBe("ci config")
   })
 
-  it("keeps the password out of the output and the download command, and leaves no netrc", () => {
+  it("hands the credentials to curl on stdin, never in its arguments, the output or a file", () => {
     giveCredentials()
     giveConfig()
 
     const { output } = install()
 
+    const log = readFileSync(curlLog(), "utf8")
+    expect(log).toContain("stdin config matched")
+    expect(log).not.toContain(PASSWORD)
     expect(output).not.toContain(PASSWORD)
-    expect(readFileSync(curlLog(), "utf8")).not.toContain(PASSWORD)
     expect(readdirSync(join(root, "tmp"))).toEqual([])
+  })
+
+  /** curl reads a double-quoted config value with backslash escapes. */
+  it("escapes quotes and backslashes in the password for curl's config", () => {
+    const password = 'pa"ss\\word'
+    writeFile(
+      join(configDir(), "meawallet-rn.env"),
+      `MEA_RN_USER=blink\nMEA_RN_PASSWORD='${password}'\n`,
+    )
+    giveConfig()
+
+    install({ env: { FAKE_EXPECTED_CONFIG: expectedConfig("blink", 'pa\\"ss\\\\word') } })
+
+    expect(readFileSync(curlLog(), "utf8")).toContain("stdin config matched")
   })
 
   it("does not download the SDK again once it is vendored", () => {
@@ -330,4 +424,39 @@ describe("install-meawallet-mpp.sh trusting a vendored copy", () => {
 
     expect(readdirSync(dirname(vendorDir()))).toEqual(["react-native-mpp"])
   })
+})
+
+/** A developer stops a slow yarn install with Ctrl-C. dash, Linux's /bin/sh, runs no EXIT
+ *  trap when a signal ends it, so it is run here alongside whatever sh this machine has. */
+const SHELLS = ["sh", "dash"].filter(
+  (shell) => spawnSync("sh", ["-c", `command -v ${shell}`]).status === 0,
+)
+
+describe("install-meawallet-mpp.sh cut short", () => {
+  beforeEach(() => {
+    giveCredentials()
+    giveConfig()
+  })
+
+  it.each(SHELLS)(
+    "leaves nothing in TMPDIR when %s is stopped mid-download",
+    async (shell) => {
+      const status = await interruptInstall(shell, "FAKE_CURL_STARTED")
+
+      expect(readdirSync(join(root, "tmp"))).toEqual([])
+      expect(existsSync(vendorDir())).toBe(false)
+      expect(status).toBe(130)
+    },
+  )
+
+  it.each(SHELLS)(
+    "leaves no half-extracted SDK when %s is stopped mid-extract",
+    async (shell) => {
+      const status = await interruptInstall(shell, "FAKE_TAR_STARTED")
+
+      expect(readdirSync(join(root, "tmp"))).toEqual([])
+      expect(readdirSync(dirname(vendorDir()))).toEqual([])
+      expect(status).toBe(130)
+    },
+  )
 })

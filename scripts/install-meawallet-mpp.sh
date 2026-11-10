@@ -35,8 +35,29 @@ CONFIG_FILE="${MEA_CONFIG_FILE:-$CONFIG_DIR/mea_config}"
 ANDROID_CONFIG="$ROOT/android/app/src/main/res/raw/mea_config"
 IOS_CONFIG="$ROOT/ios/MeaConfig/mea_config"
 
+work=""
+staging=""
+
 log() {
   echo "[meawallet] $*"
+}
+
+# One cleanup for every way out: a clean exit, a failure, or a Ctrl-C on a slow yarn
+# install. dash, Linux's /bin/sh, runs no EXIT trap when a signal ends it, so the signals
+# are trapped too, and leave with the status a shell gives them.
+cleanup() {
+  if [ -n "$work" ]; then rm -rf "$work"; fi
+  if [ -n "$staging" ]; then rm -rf "$staging"; fi
+}
+trap cleanup EXIT
+trap 'cleanup; exit 129' HUP
+trap 'cleanup; exit 130' INT
+trap 'cleanup; exit 143' TERM
+
+# Escapes a value for a double-quoted string in a curl config. printf is a shell builtin,
+# so the value never reaches a process's arguments; sed reads it on stdin.
+curl_config_quote() {
+  printf '%s' "$1" | sed 's/[\\"]/\\&/g'
 }
 
 # A completion marker, written last once the archive matched the pinned checksum: it tells
@@ -73,21 +94,19 @@ install_package() {
     return 0
   fi
 
-  work=$(mktemp -d)
-  trap 'rm -rf "$work"' EXIT
-  (
-    umask 077
-    printf 'machine nexus.ext.meawallet.com login %s password %s\n' \
-      "$MEA_RN_USER" "$MEA_RN_PASSWORD" > "$work/netrc"
-  )
-  # The configs link whatever is vendored, so a copy this run could not verify is removed
-  # rather than left for the next build to pick up.
-  if ! curl -sSf --netrc-file "$work/netrc" -o "$work/package.tgz" "$MPP_TARBALL"; then
+  # A template, since macOS's mktemp ignores TMPDIR without one.
+  work=$(mktemp -d "${TMPDIR:-/tmp}/meawallet-mpp.XXXXXX")
+  # The credentials reach curl on its stdin, never its arguments or a file that a killed
+  # install could leave behind. The configs link whatever is vendored, so a copy this run
+  # could not verify is removed rather than left for the next build to pick up.
+  user=$(curl_config_quote "$MEA_RN_USER")
+  password=$(curl_config_quote "$MEA_RN_PASSWORD")
+  if ! printf 'user = "%s:%s"\n' "$user" "$password" |
+    curl -K - -sSf -o "$work/package.tgz" "$MPP_TARBALL"; then
     rm -rf "$VENDOR_DIR"
     log "could not download @meawallet/react-native-mpp $MPP_VERSION"
     return 1
   fi
-  rm -f "$work/netrc"
 
   integrity=$(openssl dgst -sha512 -binary "$work/package.tgz" | openssl base64 -A)
   if [ "$integrity" != "$MPP_INTEGRITY" ]; then
@@ -100,7 +119,6 @@ install_package() {
   # install cut short anywhere leaves a copy the next run does not trust.
   mkdir -p "$(dirname "$VENDOR_DIR")"
   staging=$(mktemp -d "$(dirname "$VENDOR_DIR")/.staging.XXXXXX")
-  trap 'rm -rf "$work" "$staging"' EXIT
   tar -xzf "$work/package.tgz" -C "$staging"
   rm -rf "$VENDOR_DIR"
   mv "$staging/package" "$VENDOR_DIR"
