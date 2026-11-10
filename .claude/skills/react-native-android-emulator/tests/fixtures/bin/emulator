@@ -39,7 +39,8 @@ if awk -F'|' -v a="$AVD" '$2==a {found=1} END {exit !found}' "$DEVICES"; then
   exit 1
 fi
 
-[ -n "${FAKE_EMULATOR_BOOT_FAILS:-}" ] && { echo "emulator: boot failed" >&2; exit 1; }
+# Shaped like the real thing: an INFO line, the FATAL cause, then blank lines.
+[ -n "${FAKE_EMULATOR_BOOT_FAILS:-}" ] && { printf 'INFO         | starting\nFATAL        | boot failed: no system image\n\n' >&2; exit 1; }
 
 # Another emulator (outside the registry) grabbed this console port between
 # the claim's attached-check and our launch: it shows up on the serial, and

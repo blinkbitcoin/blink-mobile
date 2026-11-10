@@ -1089,6 +1089,32 @@ check "the client frame is masked as RFC 6455 requires" "yes" \
   "$(echo "$FRAME" | grep -q "masked=1" && echo yes || echo no)"
 kill "$WS_PID" 2>/dev/null
 
+# --- verify-session: an already-loaded app is proven by a reload probe -------
+# The fake emits bundle events only after a reload broadcast - an app that
+# finished loading before verify ran. Passive listening alone reported such a
+# healthy session as "NO BUNDLE REQUEST" (caught live in the smoke run).
+start_ws_fake bundle-done
+out=$("$SCRIPTS/verify-session.sh" --port "$WS_PORT" --grace 1 --timeout 10 --skip-head 2>&1); rc=$?
+check "verify passes for an already-loaded app via a reload probe" "0" "$rc"
+check "and says the bundle came after a probe" "yes" \
+  "$(echo "$out" | grep -q "after a reload probe" && echo yes || echo no)"
+check "the probe is a masked reload broadcast on /message" "yes" \
+  "$(grep "^frame path=/message" "$WS_LOG" | grep -q 'masked=1.*"method": "reload"' && echo yes || echo no)"
+kill "$WS_PID" 2>/dev/null
+
+start_ws_fake bundle-done
+"$SCRIPTS/verify-session.sh" --port "$WS_PORT" --grace 1 --timeout 3 --no-reload --skip-head >/dev/null 2>&1
+check "--no-reload stays passive (no probe, so a loaded app is not proven)" "1" "$?"
+check "--no-reload sends nothing on /message" "0" "$(grep -c '^frame path=/message' "$WS_LOG")"
+kill "$WS_PID" 2>/dev/null
+
+start_ws_fake silent
+out=$("$SCRIPTS/verify-session.sh" --port "$WS_PORT" --grace 1 --timeout 3 --skip-head 2>&1); rc=$?
+check "verify still fails when no app answers even the probe" "1" "$rc"
+check "and says a probe was tried" "yes" \
+  "$(echo "$out" | grep -q "even after a reload probe" && echo yes || echo no)"
+kill "$WS_PID" 2>/dev/null
+
 # --- no app connected: the silent-no-op broadcast must not report success ----
 # This is the assertion that dies if the /events wait is ever skipped: a
 # fire-and-forget mutant exits 0 here and ships identical before/after pairs.

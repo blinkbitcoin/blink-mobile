@@ -62,6 +62,10 @@ DEMO_SIM_NAME="$SESSION_NAME"   # session label for telemetry spans
 T_REAP=$(tel_now)
 "$(dirname "${BASH_SOURCE[0]}")/reap-stale.sh" >/dev/null 2>&1 || true
 tel_emit android.claim.reap "$T_REAP"
+# Remembered so a failed first claim can remove the dir it created: it has no
+# released-at stamp, so the reaper would never sweep it.
+SESSION_DIR_NEW=""
+[ -d "$SESSION_DIR" ] || SESSION_DIR_NEW=1
 mkdir -p "$SESSION_DIR"
 rm -f "$SESSION_DIR/released-at"
 
@@ -118,6 +122,9 @@ rollback_claim() {
   [ -n "$NEW_CONSOLE" ] && { release_slot "$REGISTRY" emu-ports "$NEW_CONSOLE" "$SESSION_NAME"; rm -f "$SESSION_DIR/console-port"; }
   [ -n "$NEW_AVD" ] && { release_slot "$REGISTRY" avds "$NEW_AVD" "$SESSION_NAME"; rm -f "$SESSION_DIR/avd"; }
   rm -f "$SESSION_DIR/emulator.pid"
+  # A first claim that never handed a session out leaves nothing worth keeping
+  # (the emulator log goes with it - the FATAL line already named the cause).
+  [ -n "$SESSION_DIR_NEW" ] && rm -rf "$SESSION_DIR"
   return 0
 }
 trap rollback_claim EXIT
@@ -155,6 +162,15 @@ FOREIGN_8081=""
 lsof -nP -iTCP:8081 -sTCP:LISTEN >/dev/null 2>&1 && FOREIGN_8081=1
 
 # --- Emulator ----------------------------------------------------------------
+# The emulator's own explanation: its last FATAL/ERROR line (the log often
+# ends with blank lines), else its last non-blank line, prefix stripped.
+emu_cause() {
+  local log="$SESSION_DIR/emulator.log" line
+  line=$(grep -E '^(FATAL|ERROR)' "$log" 2>/dev/null | tail -1)
+  [ -n "$line" ] || line=$(grep -v '^[[:space:]]*$' "$log" 2>/dev/null | tail -1)
+  printf '%s' "${line:-no output - see the emulator command line}" | sed 's/^[A-Z]* *| *//'
+}
+
 serial_of() { echo "emulator-$1"; }
 device_attached() { adb devices | grep -q "^$1[[:space:]]"; }
 
@@ -230,12 +246,12 @@ $AVAILABLE_AVDS"
   BOOT_TIMEOUT="${DEMO_EMU_BOOT_TIMEOUT:-180}"
   BOOT_DEADLINE=$(( $(date +%s) + BOOT_TIMEOUT ))
   until device_attached "$SERIAL"; do
-    kill -0 "$EMU_PID" 2>/dev/null || die "the emulator process died during boot - see $SESSION_DIR/emulator.log"
+    kill -0 "$EMU_PID" 2>/dev/null || die "the emulator process died during boot: $(emu_cause)"
     [ "$(date +%s)" -lt "$BOOT_DEADLINE" ] || die "emulator $SERIAL never attached within ${BOOT_TIMEOUT}s"
     sleep 2
   done
   until [ "$(adb -s "$SERIAL" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ]; do
-    kill -0 "$EMU_PID" 2>/dev/null || die "the emulator process died during boot - see $SESSION_DIR/emulator.log"
+    kill -0 "$EMU_PID" 2>/dev/null || die "the emulator process died during boot: $(emu_cause)"
     [ "$(date +%s)" -lt "$BOOT_DEADLINE" ] || die "emulator $SERIAL attached but never finished booting within ${BOOT_TIMEOUT}s"
     sleep 2
   done

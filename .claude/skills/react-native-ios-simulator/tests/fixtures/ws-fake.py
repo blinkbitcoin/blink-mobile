@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Fake Metro dev-server websocket endpoints for reload-app.sh tests.
+"""Fake Metro dev-server endpoints for the reload-app.sh and verify-session.sh tests.
 
 Serves /message and /events like @react-native-community/cli-server-api does,
 records what the client actually sent, and emits events per FAKE_WS_MODE:
 
   bundle-done   after a reload broadcast arrives on /message, emit
                 bundle_build_started then bundle_build_done on /events
+                (an app that is already loaded: it re-requests only on reload)
   silent        never emit anything on /events (models "no app connected")
   bundle-fail   emit bundle_build_failed instead
 
@@ -91,6 +92,11 @@ def handshake(conn):
     head = buf.split(b"\r\n\r\n", 1)[0].decode(errors="replace")
     request_line = head.split("\r\n")[0]
     path = request_line.split(" ")[1]
+    if "upgrade: websocket" not in head.lower():
+        # Plain HTTP, like Metro's /status liveness probe.
+        body = b"packager-status:running"
+        conn.sendall(b"HTTP/1.1 200 OK\r\nContent-Length: %d\r\nConnection: close\r\n\r\n" % len(body) + body)
+        return None
     key = ""
     for line in head.split("\r\n")[1:]:
         if line.lower().startswith("sec-websocket-key:"):
@@ -110,6 +116,8 @@ def handshake(conn):
 def handle(conn):
     try:
         path = handshake(conn)
+        if path is None:
+            return
         log("connect %s" % path)
         if path == "/events":
             # The real events socket pushes reporter events; it never needs to

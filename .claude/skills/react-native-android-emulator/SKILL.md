@@ -106,7 +106,10 @@ If your worktree shares `node_modules` with another checkout, export
 ```
 
 Asserts Metro actually served a bundle on your port (watching the dev server's own
-`/events` stream), reports a foreign Metro on 8081, and catches **checkout drift** —
+`/events` stream). An app that already finished loading makes no new request, so
+after a short grace period it sends one reload broadcast — a connected app
+re-requests its bundle, a missing one still fails; pass `--no-reload` mid-flow,
+where a reload would reset the screen. It also reports a foreign Metro on 8081, and catches **checkout drift** —
 the shared clone moving to another branch mid-session, which once manufactured a
 phantom crash that looked like the change under test. Demos run from a **detached
 worktree** for exactly this reason.
@@ -153,7 +156,7 @@ tracked separately.
 ## After Editing the Scripts
 
 ```bash
-"$SKILL/tests/run.sh"     # 73 assertions, ~20s, exits non-zero on failure; fake adb + emulator, no device, no network
+"$SKILL/tests/run.sh"     # 76 assertions, ~20s, exits non-zero on failure; fake adb + emulator, no device, no network
 ```
 
 Run it after touching anything in `scripts/`. If you add a guarantee, add the

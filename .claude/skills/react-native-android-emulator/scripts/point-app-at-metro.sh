@@ -101,8 +101,8 @@ $LINE
 EOF
 fi
 
-adb -s "$SERIAL" push "$TMP_LOCAL" /data/local/tmp/debug_http_host.xml >/dev/null \
-  || die "adb push failed"
+PUSH_OUT=$(adb -s "$SERIAL" push "$TMP_LOCAL" /data/local/tmp/debug_http_host.xml 2>&1) \
+  || die "adb push failed: $PUSH_OUT"   # newer adb prints progress on stderr; keep it for failures only
 adb -s "$SERIAL" shell run-as "$APP_ID" mkdir -p "/data/data/$APP_ID/shared_prefs" 2>/dev/null || true
 adb -s "$SERIAL" shell run-as "$APP_ID" cp /data/local/tmp/debug_http_host.xml "$PREFS_FILE" \
   || die "run-as cp failed - is $APP_ID installed, and is this a debuggable build?"

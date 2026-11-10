@@ -93,6 +93,10 @@ case "${1:-}" in
     ;;
 
   push)
+
+    # Newer adb reports transfer progress on stderr, success or not.
+
+    echo "${3:-file}: 1 file pushed, 0 skipped. 0.2 MB/s (128 bytes in 0.001s)" >&2
     SRC="${2:?}"; DST="${3:?}"
     mkdir -p "$ROOT$(dirname "$DST")"
     cp "$SRC" "$ROOT$DST" || exit 1

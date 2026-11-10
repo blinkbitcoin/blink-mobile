@@ -18,14 +18,21 @@
 #
 # Platform-neutral: it talks to Metro and to git, never to a device.
 #
-# Usage: verify-session.sh [--port N] [--timeout S] [--skip-bundle] [--skip-head]
+# Usage: verify-session.sh [--port N] [--timeout S] [--grace S] [--no-reload]
+#                          [--skip-bundle] [--skip-head]
 #   --port         defaults to $DEMO_PORT
 #   --timeout      seconds to wait for bundle activity (default 45)
+#   --grace        seconds to wait passively before probing (default 5)
+#   --no-reload    never probe: only a bundle request the app makes on its own
+#                  counts (use mid-flow, where a reload would reset the screen)
 #   --skip-bundle  only check HEAD drift and the 8081 neighbour
 #   --skip-head    only check the bundle request
 #
-# Run it AFTER launching the app. Exit 0 means: your Metro served your app,
-# from the checkout you claimed.
+# Run it after launching the app. An app that already finished loading makes
+# no new bundle request, so after the grace period this sends one reload
+# broadcast (exactly what reload-app.sh does): a connected app re-requests its
+# bundle, and a missing one still fails. Exit 0 means: your Metro served your
+# app, from the checkout you claimed.
 
 set -euo pipefail
 
@@ -37,6 +44,8 @@ die() { echo "FATAL: $*" >&2; exit 1; }
 
 PORT="${DEMO_PORT:-}"
 TIMEOUT="${VERIFY_TIMEOUT:-45}"
+GRACE="${VERIFY_GRACE:-5}"
+NO_RELOAD=""
 SKIP_BUNDLE=""
 SKIP_HEAD=""
 
@@ -44,9 +53,11 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --port)        PORT="${2:?--port needs a value}"; shift 2 ;;
     --timeout)     TIMEOUT="${2:?--timeout needs a value}"; shift 2 ;;
+    --grace)       GRACE="${2:?--grace needs a value}"; shift 2 ;;
+    --no-reload)   NO_RELOAD=1; shift ;;
     --skip-bundle) SKIP_BUNDLE=1; shift ;;
     --skip-head)   SKIP_HEAD=1; shift ;;
-    *) die "unknown argument '$1' (usage: verify-session.sh [--port N] [--timeout S] [--skip-bundle] [--skip-head])" ;;
+    *) die "unknown argument '$1' (usage: verify-session.sh [--port N] [--timeout S] [--grace S] [--no-reload] [--skip-bundle] [--skip-head])" ;;
   esac
 done
 
@@ -86,10 +97,11 @@ if [ -z "$SKIP_BUNDLE" ]; then
   curl -sf "http://localhost:$PORT/status" >/dev/null 2>&1 \
     || die "nothing is listening on $PORT - start Metro for this session first"
 
-  BUNDLE_SEEN=$(PORT="$PORT" TIMEOUT="$TIMEOUT" python3 <<'PY'
+  BUNDLE_SEEN=$(PORT="$PORT" TIMEOUT="$TIMEOUT" GRACE="$GRACE" NO_RELOAD="$NO_RELOAD" python3 <<'PY'
 import base64, json, os, socket, struct, sys, time
 
 port, timeout = int(os.environ["PORT"]), float(os.environ["TIMEOUT"])
+grace, no_reload = float(os.environ["GRACE"]), os.environ.get("NO_RELOAD") == "1"
 
 # Minimal RFC 6455 client - same shape as reload-app.sh, kept dependency-free
 # so this works from any cwd with no node_modules.
@@ -111,6 +123,16 @@ def ws_connect(path):
     if b" 101" not in head.split(b"\r\n", 1)[0]:
         raise ConnectionError("handshake refused")
     return s, leftover
+
+def probe_reload():
+    """One masked reload broadcast on /message - what reload-app.sh sends."""
+    s, _ = ws_connect("/message")
+    payload = json.dumps({"version": 2, "method": "reload"}).encode()
+    mask = os.urandom(4)
+    s.sendall(bytes([0x81, 0x80 | len(payload)]) + mask
+              + bytes(b ^ mask[i % 4] for i, b in enumerate(payload)))
+    s.sendall(bytes([0x88, 0x82]) + mask + bytes(b ^ mask[i % 4] for i, b in enumerate(struct.pack(">H", 1000))))
+    s.close()
 
 def parse_frame(buf):
     if len(buf) < 2:
@@ -138,8 +160,16 @@ except OSError as e:
     sys.exit(0)
 
 sock.settimeout(0.5)
-deadline = time.time() + timeout
+start = time.time()
+deadline = start + timeout
+probed = False
 while time.time() < deadline:
+    if not probed and not no_reload and time.time() - start >= grace:
+        probed = True
+        try:
+            probe_reload()
+        except OSError:
+            pass
     frame = parse_frame(buf)
     while frame:
         opcode, payload, buf = frame
@@ -153,7 +183,7 @@ while time.time() < deadline:
             # bundle_build_done fires for cache-warm serves too, which is
             # exactly the common case for a second launch.
             if etype in ("bundle_build_started", "bundle_build_done", "bundle_transform_progressed"):
-                print("SEEN")
+                print("SEEN_AFTER_PROBE" if probed else "SEEN")
                 sys.exit(0)
         frame = parse_frame(buf)
     try:
@@ -171,12 +201,15 @@ PY
     SEEN)
       echo "bundle: Metro on $PORT served a bundle request - the app is talking to this session"
       ;;
+    SEEN_AFTER_PROBE)
+      echo "bundle: Metro on $PORT served a bundle request after a reload probe - the app (already loaded) is talking to this session"
+      ;;
     ERROR:*)
       echo "FATAL: could not watch Metro's /events on $PORT (${BUNDLE_SEEN#ERROR:})" >&2
       FAILED=1
       ;;
     *)
-      echo "NO BUNDLE REQUEST on port $PORT within ${TIMEOUT}s. The app is not talking to this session's Metro." >&2
+      echo "NO BUNDLE REQUEST on port $PORT within ${TIMEOUT}s$([ -z "$NO_RELOAD" ] && echo ", even after a reload probe"). The app is not talking to this session's Metro." >&2
       echo "       Likely causes, in the order they usually bite:" >&2
       echo "         1. the app is pointed elsewhere - on Android an emulator dials 10.0.2.2:8081 unless" >&2
       echo "            point-app-at-metro.sh has set debug_http_host (and force-stopped the app afterwards);" >&2

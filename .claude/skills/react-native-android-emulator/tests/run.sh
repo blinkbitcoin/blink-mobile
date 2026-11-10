@@ -188,6 +188,11 @@ echo "failed claims and re-claims"
 reset_world
 FAKE_EMULATOR_BOOT_FAILS=1 "$SCRIPTS/claim-session.sh" 3800 >/dev/null 2>&1
 check "a claim whose emulator dies exits non-zero" "1" "$?"
+check "a failed first claim leaves no session folder behind" "absent" \
+  "$([ -d "$DEMO_SIM_REGISTRY/rn-demo-android-pr3800" ] && echo present || echo absent)"
+out=$(FAKE_EMULATOR_BOOT_FAILS=1 "$SCRIPTS/claim-session.sh" 3800 2>&1)
+check "and the failure names the cause inline (its log is gone)" "yes" \
+  "$(echo "$out" | grep -q "died during boot: boot failed: no system image" && echo yes || echo no)"
 check "the failed claim leaves no AVD reserved" "none" \
   "$(grep -rlx "rn-demo-android-pr3800" "$DEMO_SIM_REGISTRY/avds" 2>/dev/null | head -1 | grep -q . && echo held || echo none)"
 check "the failed claim leaves no console port reserved" "none" \
@@ -239,8 +244,10 @@ echo "pointing the app at this session's Metro"
 reset_world
 eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
 : > "$FAKE_ARGS_LOG"
-DEMO_APP_ID_ANDROID=com.example.demoapp "$SCRIPTS/point-app-at-metro.sh" >/dev/null 2>&1
+out=$(DEMO_APP_ID_ANDROID=com.example.demoapp "$SCRIPTS/point-app-at-metro.sh" 2>&1)
 check "point-app-at-metro exits zero" "0" "$?"
+check "adb push progress noise is not passed through" "no" \
+  "$(echo "$out" | grep -q "file pushed" && echo yes || echo no)"
 PREFS="$FAKE_ANDROID_ROOT/data/data/com.example.demoapp/shared_prefs/com.example.demoapp_preferences.xml"
 check "the preference file lands in the app's shared_prefs" "yes" \
   "$([ -f "$PREFS" ] && echo yes || echo no)"
