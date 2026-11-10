@@ -43,6 +43,12 @@ target 'GaloyApp' do
   )
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec', :modular_headers => false
 
+  # The MeaWallet SDK configuration, present only where scripts/install-meawallet-mpp.sh
+  # could install it.
+  if File.exist?(File.join(__dir__, 'MeaConfig', 'mea_config'))
+    pod 'BlinkMeaConfig', :path => './MeaConfig'
+  end
+
 
   post_install do |installer|
     installer.pods_project.targets.each do |target|
