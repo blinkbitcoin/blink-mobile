@@ -629,7 +629,11 @@ check "the stamp now describes the new golden" "yes" \
   mkdir -p "$DEMO_SIM_REGISTRY/locks/golden"; echo "$HOLDER" > "$DEMO_SIM_REGISTRY/locks/golden/pid"
   "$SCRIPTS/claim-session.sh" 731 > "$WORK/rebless-claim.out" 2> "$WORK/rebless-claim.err" &
   CLAIM=$!
-  for _ in $(seq 50); do grep -q "waiting for 'golden'" "$WORK/rebless-claim.err" 2>/dev/null && break; sleep 0.2; done
+  # The claim silences with-lock's stderr, so detect the blocked clone by its
+  # waiting with-lock process rather than by a message it never shows.
+  WAITED=no
+  for _ in $(seq 50); do pgrep -f "with-lock.sh golden 300" >/dev/null 2>&1 && { WAITED=yes; break; }; sleep 0.2; done
+  echo "waited=$WAITED"
   sed -i '' 's/^device-type=.*/device-type=iPhone 15/' "$STAMP"
   kill "$HOLDER" 2>/dev/null; wait "$HOLDER" 2>/dev/null
   wait "$CLAIM"; echo "rc=$?"
@@ -637,6 +641,8 @@ check "the stamp now describes the new golden" "yes" \
   echo "snapshot=$([ -f "$DEMO_SIM_REGISTRY/rn-demo-pr731/golden-stamp" ] && echo kept || echo dropped)"
   echo "clones=$(awk -F'|' '$2=="rn-demo-pr731"' "$FAKE_DEVICES" | wc -l | tr -d ' ')"
 ) > "$WORK/rebless.out" 2>/dev/null
+check "the claim was blocked on the golden lock when the golden changed" "yes" \
+  "$(sed -n 's/^waited=//p' "$WORK/rebless.out")"
 check "a claim racing a re-bless still succeeds" "yes" \
   "$(grep -q '^rc=0' "$WORK/rebless.out" && echo yes || echo "no ($(tr '\n' ' ' < "$WORK/rebless.out"))")"
 check "it refuses the clone whose locked stamp no longer matches" "created" \
@@ -651,9 +657,11 @@ check "leaving exactly one device for the session" "1" "$(sed -n 's/^clones=//p'
   eval "$("$SCRIPTS/claim-session.sh" 740 2>/dev/null)"; FIRST="$DEMO_UDID"
   "$SCRIPTS/bless-golden.sh" 740 --sha aaaa >/dev/null 2>&1
   eval "$("$SCRIPTS/claim-session.sh" 741 2>/dev/null)"; SECOND="$DEMO_UDID"
-  chmod 555 "$DEMO_SIM_REGISTRY/golden/rn-demo-golden"      # stamp.new cannot be staged
+  # stamp.new as a dangling symlink into a missing dir: the staging copy
+  # fails even for root, where a read-only chmod would not stop the write.
+  ln -s "$WORK/no-such-dir/stamp" "$DEMO_SIM_REGISTRY/golden/rn-demo-golden/stamp.new"
   "$SCRIPTS/bless-golden.sh" 741 --sha bbbb >/dev/null 2>&1; echo "rc=$?"
-  chmod 755 "$DEMO_SIM_REGISTRY/golden/rn-demo-golden"
+  rm -f "$DEMO_SIM_REGISTRY/golden/rn-demo-golden/stamp.new"
   echo "golden=$(awk -F'|' '$2=="rn-demo-golden" {print $1}' "$FAKE_DEVICES" | tr '\n' ' ')"
   echo "first=$FIRST"
   echo "retired=$(awk -F'|' '$2 ~ /-retired$/' "$FAKE_DEVICES" | wc -l | tr -d ' ')"
