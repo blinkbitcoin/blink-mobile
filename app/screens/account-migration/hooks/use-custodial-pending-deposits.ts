@@ -25,6 +25,15 @@ gql`
 
 const ON_CHAIN_SETTLEMENT: SettlementViaOnChain["__typename"] = "SettlementViaOnChain"
 
+/**
+ * The backend stops counting a pending deposit 48 hours after it was created, so a
+ * transaction stuck in the mempool cannot block the migration forever. The same window
+ * applies here: holding a user the server would let through only traps them behind a
+ * deposit that may never confirm.
+ */
+const PENDING_DEPOSIT_MAX_AGE_MS = 48 * 60 * 60 * 1000
+const MS_PER_SECOND = 1000
+
 type PendingTransactions =
   | NonNullable<
       MigrationPendingDepositsQuery["me"]
@@ -35,12 +44,15 @@ const readPendingTransactions = (
   data: MigrationPendingDepositsQuery | undefined,
 ): PendingTransactions => data?.me?.defaultAccount?.pendingIncomingTransactions
 
-const hasPendingOnChainReceive = (transactions: PendingTransactions): boolean =>
-  (transactions ?? []).some(
-    ({ direction, settlementVia }) =>
+const hasPendingOnChainReceive = (transactions: PendingTransactions): boolean => {
+  const cutoffMs = Date.now() - PENDING_DEPOSIT_MAX_AGE_MS
+  return (transactions ?? []).some(
+    ({ direction, settlementVia, createdAt }) =>
       direction === TxDirection.Receive &&
-      settlementVia.__typename === ON_CHAIN_SETTLEMENT,
+      settlementVia.__typename === ON_CHAIN_SETTLEMENT &&
+      createdAt * MS_PER_SECOND > cutoffMs,
   )
+}
 
 type UseCustodialPendingDepositsOptions = {
   /** For a screen that only needs the answer once something has told it to look. */

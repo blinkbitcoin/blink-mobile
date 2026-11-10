@@ -67,6 +67,52 @@ describe("useCustodialPendingDeposits", () => {
     expect(result.current.hasPendingDeposit).toBe(false)
   })
 
+  describe("a deposit the backend no longer counts", () => {
+    const BACKEND_MAX_AGE_SECONDS = 48 * 60 * 60
+    const onChainReceiveAged = (ageSeconds: number) => ({
+      ...pendingOnChainReceive,
+      createdAt: Math.floor(Date.now() / 1000) - ageSeconds,
+    })
+
+    it("still counts one just inside the 48 hours", () => {
+      mockUseMigrationPendingDepositsQuery.mockReturnValue(
+        pendingDepositsQueryResult([onChainReceiveAged(BACKEND_MAX_AGE_SECONDS - 60)]),
+      )
+
+      const { result } = renderHook(() => useCustodialPendingDeposits())
+
+      expect(result.current.hasPendingDeposit).toBe(true)
+    })
+
+    it("stops counting one older than the 48 hours", () => {
+      mockUseMigrationPendingDepositsQuery.mockReturnValue(
+        pendingDepositsQueryResult([onChainReceiveAged(BACKEND_MAX_AGE_SECONDS + 60)]),
+      )
+
+      const { result } = renderHook(() => useCustodialPendingDeposits())
+
+      expect(result.current.hasPendingDeposit).toBe(false)
+    })
+
+    it("lets the check through when the only pending deposit is past the 48 hours", async () => {
+      const aged = [onChainReceiveAged(BACKEND_MAX_AGE_SECONDS + 60)]
+      mockUseMigrationPendingDepositsQuery.mockReturnValue({
+        ...pendingDepositsQueryResult(aged),
+        refetch: jest
+          .fn()
+          .mockResolvedValue({ data: pendingDepositsQueryResult(aged).data }),
+      })
+      const { result } = renderHook(() => useCustodialPendingDeposits())
+
+      let isClear: boolean | undefined
+      await act(async () => {
+        isClear = await result.current.checkClear()
+      })
+
+      expect(isClear).toBe(true)
+    })
+  })
+
   it("is not ready while the first answer is in flight", () => {
     mockUseMigrationPendingDepositsQuery.mockReturnValue({
       loading: true,

@@ -45,7 +45,7 @@ const pendingOnChainDeposit = (id: string): TransactionFragment => ({
   status: TxStatus.Pending,
   direction: TxDirection.Receive,
   memo: null,
-  createdAt: 1700000000,
+  createdAt: Math.floor(Date.now() / 1000),
   settlementAmount: 5000,
   settlementFee: 0,
   settlementDisplayFee: "0.00",

@@ -41,12 +41,16 @@ export const walletOverviewQueryResult = ({
 type PendingTransactionFixture = {
   direction: TxDirection
   settlementVia: { __typename: string }
+  /** Seconds, as the Transaction fragment carries it. */
+  createdAt?: number
 }
 
-/** A deposit to the custodial on-chain address that has not confirmed yet. */
+/** A deposit to the custodial on-chain address that has not confirmed yet, broadcast a
+ *  few seconds ago. */
 export const pendingOnChainReceive: PendingTransactionFixture = {
   direction: TxDirection.Receive,
   settlementVia: { __typename: "SettlementViaOnChain" },
+  createdAt: Math.floor(Date.now() / 1000),
 }
 
 /**
