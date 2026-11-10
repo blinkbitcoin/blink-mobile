@@ -1,8 +1,3 @@
-import {
-  getMeaWalletSdk,
-  resetMeaWalletSdk,
-} from "@app/screens/card-screen/utils/meawallet-sdk"
-
 const mockRecordAppError = jest.fn()
 jest.mock("@app/utils/error-reporting", () => ({
   ...jest.requireActual("@app/utils/error-reporting"),
@@ -49,15 +44,29 @@ const vendorThePackage = () => {
   )
 }
 
+type MeaWalletSdkModule = typeof import("@app/screens/card-screen/utils/meawallet-sdk")
+
+/** A fresh copy of the module, since the SDK it starts is module state that lasts the
+ *  session in the app. The package is required later, on the first call, so the reset in
+ *  beforeEach is what drops the copy of it an earlier case loaded. */
+const loadGetMeaWalletSdk = (): MeaWalletSdkModule["getMeaWalletSdk"] => {
+  let sdkModule: MeaWalletSdkModule | undefined
+  jest.isolateModules(() => {
+    sdkModule = require("@app/screens/card-screen/utils/meawallet-sdk")
+  })
+  return sdkModule!.getMeaWalletSdk
+}
+
 describe("getMeaWalletSdk", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    resetMeaWalletSdk()
+    jest.resetModules()
     mockInitialize.mockResolvedValue(undefined)
   })
 
   it("answers null when the build does not carry the SDK", async () => {
     leaveThePackageOut()
+    const getMeaWalletSdk = loadGetMeaWalletSdk()
 
     await expect(getMeaWalletSdk()).resolves.toBeNull()
     expect(mockRecordAppError).not.toHaveBeenCalled()
@@ -72,6 +81,7 @@ describe("getMeaWalletSdk", () => {
       },
       { virtual: true },
     )
+    const getMeaWalletSdk = loadGetMeaWalletSdk()
 
     await expect(getMeaWalletSdk()).resolves.toBeNull()
     expect(mockRecordAppError).not.toHaveBeenCalled()
@@ -79,6 +89,7 @@ describe("getMeaWalletSdk", () => {
 
   it("starts the SDK and hands back its wallets", async () => {
     vendorThePackage()
+    const getMeaWalletSdk = loadGetMeaWalletSdk()
 
     const sdk = await getMeaWalletSdk()
 
@@ -89,6 +100,7 @@ describe("getMeaWalletSdk", () => {
 
   it("starts the SDK once, however many cards ask", async () => {
     vendorThePackage()
+    const getMeaWalletSdk = loadGetMeaWalletSdk()
 
     const first = getMeaWalletSdk()
     const second = getMeaWalletSdk()
@@ -102,6 +114,7 @@ describe("getMeaWalletSdk", () => {
     vendorThePackage()
     const cardData = { type: "SECRET" }
     mockWithCardSecret.mockReturnValue(cardData)
+    const getMeaWalletSdk = loadGetMeaWalletSdk()
 
     const sdk = await getMeaWalletSdk()
 
@@ -114,6 +127,7 @@ describe("getMeaWalletSdk", () => {
   it("reports a start that fails and does not try again", async () => {
     vendorThePackage()
     mockInitialize.mockRejectedValue(new Error("mea_config not found"))
+    const getMeaWalletSdk = loadGetMeaWalletSdk()
 
     await expect(getMeaWalletSdk()).resolves.toBeNull()
     await expect(getMeaWalletSdk()).resolves.toBeNull()

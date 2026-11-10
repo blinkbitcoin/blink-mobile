@@ -101,8 +101,3 @@ export const getMeaWalletSdk = (): Promise<MeaWalletSdk | null> => {
   if (!started) started = startSdk()
   return started
 }
-
-/** Forgets the started SDK; for test isolation, never called in production. */
-export const resetMeaWalletSdk = (): void => {
-  started = undefined
-}
