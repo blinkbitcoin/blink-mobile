@@ -219,6 +219,9 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     armMigrationConversion()
     navigation.navigate("conversionDetails")
   }, [navigation])
+  const leaveFlow = useCallback(() => {
+    navigation.reset({ index: 0, routes: [{ name: "Primary" }] })
+  }, [navigation])
 
   /**
    * Landing here WITH figures declares the migration started server-side, which is what
@@ -249,6 +252,9 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     refreshFigures: preview.refresh,
     isUndrained: isServerFlowUnstarted || migrationStatus === MigrationStatus.InProgress,
     isCommitRefusedForDeposit: routeParams?.isDepositRefused === true,
+    isServerFlowNotStarted,
+    leaveFlow,
+    contactSupport: openSupport,
   })
   /** Taken once: a later refusal sets it again, which has to read as a change. */
   useEffect(() => {
@@ -761,10 +767,10 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
       {depositHold.isModalShown ? (
         <PendingDepositModal
           isVisible={isFocused}
-          onAcknowledge={depositHold.acknowledge}
-          showCloseIconButton={false}
+          onAcknowledge={depositHold.acknowledgeModal}
+          showCloseIconButton={depositHold.isModalClosable}
           isChecking={depositHold.isRecheckRunning}
-          onContactSupport={openSupport}
+          onContactSupport={depositHold.modalSupportAction}
         />
       ) : null}
     </Screen>

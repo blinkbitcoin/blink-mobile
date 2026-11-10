@@ -16,6 +16,10 @@ jest.mock("@app/screens/account-migration/hooks/use-custodial-pending-deposits",
   }),
 }))
 
+jest.mock("@app/screens/account-migration/hooks/use-custodial-wind-down", () => ({
+  useCustodialWindDown: () => null,
+}))
+
 jest.mock("@app/screens/account-migration/hooks/use-ensure-migration-started", () => ({
   useEnsureMigrationStarted: () => ({
     isStarted: false,
@@ -52,6 +56,9 @@ describe("usePendingDepositHold reading the figures again", () => {
         refreshFigures,
         isUndrained: true,
         isCommitRefusedForDeposit,
+        isServerFlowNotStarted: false,
+        leaveFlow: jest.fn(),
+        contactSupport: jest.fn(),
       }),
     )
 

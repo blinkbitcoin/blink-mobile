@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import { PendingDepositCheckStatus } from "@app/types/migration"
+import { WindDownStatus } from "@app/types/wind-down"
 
 import { useCustodialPendingDeposits } from "./use-custodial-pending-deposits"
+import { useCustodialWindDown } from "./use-custodial-wind-down"
 import { useEnsureMigrationStarted } from "./use-ensure-migration-started"
 
 /** Where reading the figures again after a deposit cleared stands. */
@@ -28,6 +30,12 @@ type UsePendingDepositHoldArgs = {
   /** The transfer screen sent the user back: the server refused the commit for a deposit
    *  still confirming. */
   isCommitRefusedForDeposit: boolean
+  /** The server's current answer: this account's migration has not started. */
+  isServerFlowNotStarted: boolean
+  /** Takes the user out of the migration, for a modal they are free to leave. */
+  leaveFlow: () => void
+  /** Hands the user to support, offered only where they cannot leave. */
+  contactSupport: () => void
 }
 
 /**
@@ -52,6 +60,9 @@ export const usePendingDepositHold = ({
   refreshFigures,
   isUndrained,
   isCommitRefusedForDeposit,
+  isServerFlowNotStarted,
+  leaveFlow,
+  contactSupport,
 }: UsePendingDepositHoldArgs) => {
   const {
     hasPendingDeposit,
@@ -81,6 +92,15 @@ export const usePendingDepositHold = ({
    *  would cover and its OK could not resolve. */
   const isDepositPending = hasPendingDeposit || migrationStart.isDepositPending
   const isModalShown = isDepositPending && !isModalOutranked && !hasCheckError
+
+  /** The gate's rule: while the server has not started the run nothing is locked, so a user
+   *  held here by a deposit that can take hours to confirm may leave and wait elsewhere.
+   *  Only the armed gate, or a run the server has taken, keeps them here, where OK checks
+   *  again and support is offered for a deposit that never confirms. */
+  const windDown = useCustodialWindDown()
+  const isArmedGate = windDown?.status === WindDownStatus.GatedClosed
+  const isModalClosable =
+    isServerFlowNotStarted && !migrationStart.isStarted && !isArmedGate
 
   /** Which refresh still speaks for the figures: a deposit seen again retires one that is
    *  still out, since it read a balance that is about to change. */
@@ -150,6 +170,9 @@ export const usePendingDepositHold = ({
   /** Asked once more right before the drain, so a deposit sent while the user read the
    *  figures is caught here rather than after the balance has moved: a deposit brings the
    *  modal back and a failed check brings the retry, both through the check's own state. */
+  const acknowledgeModal = isModalClosable ? leaveFlow : acknowledge
+  const modalSupportAction = isModalClosable ? undefined : contactSupport
+
   const checkBeforeApprove = useCallback(async (): Promise<boolean> => {
     const depositCheck = await recheck()
     return depositCheck.status === PendingDepositCheckStatus.Clear
@@ -159,6 +182,9 @@ export const usePendingDepositHold = ({
     migrationStart,
     isBlocking,
     isModalShown,
+    isModalClosable,
+    acknowledgeModal,
+    modalSupportAction,
     hasCheckError,
     isRecheckRunning,
     acknowledge,

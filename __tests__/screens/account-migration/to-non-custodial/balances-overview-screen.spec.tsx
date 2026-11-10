@@ -14,6 +14,7 @@ import {
   mergeCheckpoint,
 } from "@app/screens/account-migration/utils/migration-checkpoint-storage"
 import { MigrationLnAddressOutcome } from "@app/types/migration"
+import { WindDown, WindDownStatus } from "@app/types/wind-down"
 import {
   StorageFailure,
   type StorageWriteResult,
@@ -83,12 +84,22 @@ const migrationQueryResult = (preview: {
 })
 
 const mockSetParams = jest.fn()
+const mockReset = jest.fn()
 let mockRouteParams: { isDepositRefused?: true } | undefined
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate, setParams: mockSetParams }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    setParams: mockSetParams,
+    reset: mockReset,
+  }),
   useRoute: () => ({ params: mockRouteParams }),
   useIsFocused: () => mockIsFocused,
+}))
+
+let mockWindDown: WindDown | null = null
+jest.mock("@app/screens/account-migration/hooks/use-custodial-wind-down", () => ({
+  useCustodialWindDown: () => mockWindDown,
 }))
 
 jest.mock("@app/graphql/generated", () => ({
@@ -291,6 +302,7 @@ const resetScreenMocks = () => {
   mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
   mockSaveCheckpointHandle = mockSaveCheckpoint
   mockRouteParams = undefined
+  mockWindDown = null
   loadLocale("en")
   mockDollarRestricted = false
   mockCurrentDollarRestricted = false
@@ -2988,7 +3000,9 @@ describe("MigrationBalancesOverviewScreen figures read again after a deposit", (
     renderScreen()
     await flushEffects()
 
-    await clearDepositFromOk()
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingDepositsQueryResult())
+    screen.rerender(screenTree())
+    await flushEffects()
     await act(async () => {
       answerNext()
     })
@@ -3073,6 +3087,89 @@ describe("MigrationBalancesOverviewScreen figures read again after a deposit", (
         }),
       )
       expect(approveButton()).toBeEnabled()
+    })
+  })
+
+  describe("leaving from the modal", () => {
+    const windDownWith = (status: WindDownStatus) => ({ status }) as unknown as WindDown
+
+    const lastModalProps = () =>
+      mockPendingDepositModal.mock.calls[mockPendingDepositModal.mock.calls.length - 1][0]
+
+    it("lets a user whose run the server has not started leave", async () => {
+      mockMigrationStatus = MigrationStatus.NotStarted
+      mockUseMigrationPendingDepositsQuery.mockReturnValue(
+        pendingDepositsQueryResult([pendingOnChainReceive]),
+      )
+      renderScreen()
+      await flushEffects()
+
+      expect(lastModalProps()).toEqual(
+        expect.objectContaining({
+          showCloseIconButton: true,
+          onContactSupport: undefined,
+        }),
+      )
+
+      fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+      await flushEffects()
+
+      expect(mockReset).toHaveBeenCalledWith({ index: 0, routes: [{ name: "Primary" }] })
+      expect(mockMigrationStart).not.toHaveBeenCalled()
+    })
+
+    it("keeps the armed gate on the modal even before the run starts", async () => {
+      mockMigrationStatus = MigrationStatus.NotStarted
+      mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+      mockUseMigrationPendingDepositsQuery.mockReturnValue(
+        pendingDepositsQueryResult([pendingOnChainReceive]),
+      )
+      renderScreen()
+      await flushEffects()
+
+      expect(lastModalProps()).toEqual(
+        expect.objectContaining({
+          showCloseIconButton: false,
+          onContactSupport: expect.any(Function),
+        }),
+      )
+      fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+      await flushEffects()
+      expect(mockReset).not.toHaveBeenCalled()
+    })
+
+    /** The phase read can lag the start this screen just sent, and an accepted start is
+     *  the lock, whatever that read still says. */
+    it("keeps a user whose start was accepted on the modal, though the read says not started", async () => {
+      mockMigrationStatus = MigrationStatus.NotStarted
+      renderScreen()
+      await flushEffects()
+      expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+
+      mockUseMigrationPendingDepositsQuery.mockReturnValue(
+        pendingDepositsQueryResult([pendingOnChainReceive]),
+      )
+      screen.rerender(screenTree())
+      await flushEffects()
+
+      expect(lastModalProps()).toEqual(
+        expect.objectContaining({ showCloseIconButton: false }),
+      )
+    })
+
+    it("keeps a run the server has taken on the modal", async () => {
+      mockUseMigrationPendingDepositsQuery.mockReturnValue(
+        pendingDepositsQueryResult([pendingOnChainReceive]),
+      )
+      renderScreen()
+      await flushEffects()
+
+      expect(lastModalProps()).toEqual(
+        expect.objectContaining({ showCloseIconButton: false }),
+      )
+      fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+      await flushEffects()
+      expect(mockReset).not.toHaveBeenCalled()
     })
   })
 
