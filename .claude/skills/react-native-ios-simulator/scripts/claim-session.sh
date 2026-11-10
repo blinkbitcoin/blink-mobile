@@ -44,6 +44,16 @@ PREFLIGHT_COUNT=$(grep -c '"udid"' "$SESSION_DIR/preflight-booted.json" || true)
 # Deterministic starting point per PR (so re-runs are stable), then walk upward.
 # mkdir is atomic on every filesystem we care about: whoever creates the
 # directory owns the port. 8081 is never in range - that is the user's Metro.
+# Something outside this session's Metro is listening there: an unrelated
+# server, or a stray bundler. The session's own Metro (metro.pid) does not count.
+port_listened() {
+  local own
+  lsof -nP -iTCP:"$1" -sTCP:LISTEN >/dev/null 2>&1 || return 1
+  own=$(cat "$SESSION_DIR/metro.pid" 2>/dev/null || echo "")
+  [ -n "$own" ] && kill -0 "$own" 2>/dev/null && return 1   # our Metro is alive: the listener is ours
+  return 0
+}
+
 reserve_port() {
   local base=$((8100 + (PR % 400)))
   local candidate stale_pid
@@ -64,7 +74,13 @@ reserve_port() {
     # Metro ever started on it - otherwise a claim that died before recording
     # its port leaks the reservation forever. Another session's reservation is
     # never ours to judge.
+    # Still re-checked for a listener: an orphaned reservation's port may
+    # have been taken by an unrelated server since.
     if [ "$(cat "$REGISTRY/ports/$candidate/owner" 2>/dev/null)" = "$SIM_NAME" ]; then
+      if port_listened "$candidate"; then
+        rm -rf "$REGISTRY/ports/$candidate"   # ours, but unusable: free it, move on
+        continue
+      fi
       echo "$candidate"; return 0
     fi
   done
@@ -78,7 +94,10 @@ reserve_port() {
 reclaim_port() {
   local port="$1"
   case "$port" in ''|*[!0-9]*) return 1 ;; esac
-  [ "$(cat "$REGISTRY/ports/$port/owner" 2>/dev/null)" = "$SIM_NAME" ] && return 0
+  if [ "$(cat "$REGISTRY/ports/$port/owner" 2>/dev/null)" = "$SIM_NAME" ]; then
+    port_listened "$port" && return 1
+    return 0
+  fi
   mkdir "$REGISTRY/ports/$port" 2>/dev/null || return 1
   echo "$SIM_NAME" > "$REGISTRY/ports/$port/owner"
   if lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; then

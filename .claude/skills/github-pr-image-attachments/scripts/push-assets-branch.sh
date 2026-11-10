@@ -96,10 +96,22 @@ else
   # A retake publishes to the same branch again. Build on its current tip so
   # the push is a fast-forward, and keep every file already there that this
   # publish does not replace - earlier PR comments still embed those URLs.
+  # "Branch does not exist yet" must be told apart from "could not reach the
+  # remote": treating an auth or network failure as a first publish builds an
+  # unrelated root commit, and the push then fails as a misleading
+  # non-fast-forward. ls-remote exits 2 only for a missing ref.
   PARENT=""
-  if git fetch -q "$REMOTE" "refs/heads/$BRANCH" 2>/dev/null; then
-    PARENT=$(git rev-parse -q --verify FETCH_HEAD^{commit} 2>/dev/null || echo "")
-  fi
+  LS_ERR=$(git ls-remote --exit-code "$REMOTE" "refs/heads/$BRANCH" 2>&1 >/dev/null); LS_RC=$?
+  case "$LS_RC" in
+    0)
+      FETCH_ERR=$(git fetch -q "$REMOTE" "refs/heads/$BRANCH" 2>&1) \
+        || die "could not fetch the existing $BRANCH from '$REMOTE': $FETCH_ERR"
+      PARENT=$(git rev-parse -q --verify 'FETCH_HEAD^{commit}') \
+        || die "fetched $BRANCH but FETCH_HEAD is not a commit"
+      ;;
+    2) : ;;   # first publish for this PR and purpose
+    *) die "could not reach remote '$REMOTE' to check for $BRANCH: $LS_ERR" ;;
+  esac
   if [ -n "$PARENT" ]; then
     while IFS= read -r entry; do
       [ -n "$entry" ] || continue

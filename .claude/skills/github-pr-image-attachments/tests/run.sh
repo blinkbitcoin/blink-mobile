@@ -79,6 +79,14 @@ check "files from the first publish stay embeddable" "after.png before.png zoom.
 check "a re-published file carries the new bytes" "$(git -C "$REPO" hash-object after.png)" \
   "$(git -C "$WORK/origin.git" rev-parse refs/heads/assets/pr-3712-screenshots:after.png)"
 
+# An unreachable remote is not "no branch yet": it must fail naming the
+# remote, not build a root commit and die later as a non-fast-forward.
+git -C "$REPO" remote add unreachable "$WORK/no-such-remote.git"
+out=$(cd "$REPO" && "$PUSH" 3712 screenshots after.png --repo acme/sample-app --remote unreachable 2>&1); rc=$?
+check "an unreachable remote fails the publish" "1" "$rc"
+check "and says the remote could not be reached" "yes" \
+  "$(echo "$out" | grep -q "could not reach remote 'unreachable'" && echo yes || echo no)"
+
 echo
 echo "repo derivation from the remote"
 

@@ -35,6 +35,9 @@ while [ -z "$acquired" ]; do
 
   holder=$(cat "$LOCK_DIR/pid" 2>/dev/null || echo "")
   if [ -n "$holder" ] && ! kill -0 "$holder" 2>/dev/null; then
+    # Test seam: widen the window between seeing the dead holder and acting
+    # on it, so the suite can force the two-reclaimer interleaving for real.
+    [ -n "${WITH_LOCK_RECLAIM_DELAY:-}" ] && sleep "$WITH_LOCK_RECLAIM_DELAY"
     # Reclaiming is itself a critical section: two waiters can both see the
     # same dead pid, and an unguarded rm by the slower one would delete the
     # lock the faster one just took. Only the waiter holding the reclaim
@@ -63,7 +66,7 @@ while [ -z "$acquired" ]; do
   fi
 
   echo "waiting for '$LOCK_NAME' (held by pid ${holder:-unknown})..." >&2
-  sleep 10
+  sleep "${WITH_LOCK_POLL_SECONDS:-10}"   # overridable so tests need not wait 10s per poll
 done
 
 trap 'rm -rf "$LOCK_DIR"' EXIT INT TERM

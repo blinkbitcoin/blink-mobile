@@ -148,6 +148,28 @@ check "re-claim re-takes its freed port when still free" "$KEPT_PORT" "$DEMO_POR
 check "the re-taken port is reserved again" "rn-demo-pr3712" \
   "$(cat "$DEMO_SIM_REGISTRY/ports/$DEMO_PORT/owner" 2>/dev/null)"
 
+# --- an owned reservation is dropped if an outside process now listens -------
+reset_world
+eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
+TAKEN_PORT="$DEMO_PORT"
+python3 -c '
+import socket, sys, time
+s = socket.socket(); s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+s.bind(("127.0.0.1", int(sys.argv[1]))); s.listen(1)
+sys.stderr.write("bound\n"); sys.stderr.flush()
+time.sleep(60)
+' "$TAKEN_PORT" 2>"$WORK/bind2.log" &
+BINDER2=$!
+STRAYS+=($BINDER2)
+disown $BINDER2 2>/dev/null
+for _ in $(seq 30); do grep -q bound "$WORK/bind2.log" 2>/dev/null && break; sleep 0.2; done
+eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
+check "re-claim leaves a port an outside process took over" "moved" \
+  "$([ "$DEMO_PORT" != "$TAKEN_PORT" ] && echo moved || echo "kept $TAKEN_PORT")"
+check "and frees its own now-unusable reservation" "absent" \
+  "$([ -d "$DEMO_SIM_REGISTRY/ports/$TAKEN_PORT" ] && echo present || echo absent)"
+kill "$BINDER2" 2>/dev/null
+
 # --- an own reservation without metro.pid is reused, not leaked -------------
 reset_world
 eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
@@ -443,23 +465,21 @@ check "reclaims a lock from a dead holder" "0" "$?"
 
 # Two waiters that both see the same dead holder must not both end up
 # inside: the slower one's reclaim would otherwise delete the faster one's
-# fresh lock.
+# fresh lock. WITH_LOCK_RECLAIM_DELAY forces the interleaving: B sees the
+# dead pid and stalls, A reclaims and enters, then B acts on its stale read.
 rm -rf "$DEMO_SIM_REGISTRY/locks"; : > "$WORK/reclaim.log"
 mkdir -p "$DEMO_SIM_REGISTRY/locks/native-build"
 echo 999999 > "$DEMO_SIM_REGISTRY/locks/native-build/pid"
-for w in A B C; do
-  "$SCRIPTS/with-lock.sh" native-build 30 bash -c "echo $w-in >> '$WORK/reclaim.log'; sleep 1; echo $w-out >> '$WORK/reclaim.log'" >/dev/null 2>&1 &
-  eval "RECLAIM_$w=\$!"
-done
-wait "$RECLAIM_A" "$RECLAIM_B" "$RECLAIM_C" 2>/dev/null
-check "concurrent reclaimers never overlap inside the lock" "yes" \
-  "$(python3 -c '
-import sys
-inside = 0
-for line in open(sys.argv[1]):
-    inside += 1 if line.strip().endswith("-in") else -1
-    if inside > 1: print("no"); sys.exit()
-print("yes")' "$WORK/reclaim.log")"
+WITH_LOCK_RECLAIM_DELAY=2 WITH_LOCK_POLL_SECONDS=1 "$SCRIPTS/with-lock.sh" native-build 30 \
+  bash -c "echo B-in >> '$WORK/reclaim.log'; sleep 1; echo B-out >> '$WORK/reclaim.log'" >/dev/null 2>&1 &
+RECLAIM_B=$!
+sleep 0.5
+WITH_LOCK_POLL_SECONDS=1 "$SCRIPTS/with-lock.sh" native-build 30 \
+  bash -c "echo A-in >> '$WORK/reclaim.log'; sleep 3; echo A-out >> '$WORK/reclaim.log'" >/dev/null 2>&1 &
+RECLAIM_A=$!
+wait "$RECLAIM_A" "$RECLAIM_B" 2>/dev/null
+check "a stale reclaimer never deletes the lock another waiter took" "A-in A-out B-in B-out" \
+  "$(tr '\n' ' ' < "$WORK/reclaim.log" | sed 's/ $//')"
 
 rm -rf "$DEMO_SIM_REGISTRY/locks"
 mkdir -p "$DEMO_SIM_REGISTRY/locks/native-build" "$DEMO_SIM_REGISTRY/locks/native-build.reclaim"
