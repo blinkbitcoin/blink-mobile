@@ -45,7 +45,7 @@ export const CardIntroducingScreen: React.FC = () => {
             <View style={styles.lineStyle} />
           </View>
           <Text type="h2" style={styles.boldText}>
-            {LL.CardFlow.Onboarding.CardIntroducing.cardInfo.maximalist()}
+            {LL.CardFlow.Onboarding.CardIntroducing.cardInfo.bitcoiners()}
           </Text>
         </View>
       </View>
