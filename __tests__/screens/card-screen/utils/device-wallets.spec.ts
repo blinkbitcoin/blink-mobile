@@ -1,3 +1,4 @@
+import { it } from "@jest/globals"
 import { Platform } from "react-native"
 
 import {
@@ -251,9 +252,34 @@ describe("deviceWalletFor on Android", () => {
     expect(sdk.googlePay.checkWalletForCardSuffix).toHaveBeenCalledWith("4242")
   })
 
-  it("does not offer a card Google Wallet already holds", async () => {
+  it.each(["TOKEN_STATE_ACTIVE", "TOKEN_STATE_SUSPENDED", "TOKEN_STATE_PENDING"])(
+    "does not offer a card Google Wallet holds in %s",
+    async (tokenState) => {
+      const sdk = fakeSdk()
+      sdk.googlePay.checkWalletForCardSuffix.mockResolvedValue([{ tokenState }])
+
+      await expect(deviceWalletFor(sdk).canAdd(card)).resolves.toBe(false)
+    },
+  )
+
+  /** A user who left Google's identity check before finishing must be able to try again. */
+  it.each([
+    "TOKEN_STATE_NEEDS_IDENTITY_VERIFICATION",
+    "TOKEN_STATE_UNTOKENIZED",
+    "TOKEN_STATE_NOT_FOUND",
+  ])("offers the card again while its only token is in %s", async (tokenState) => {
     const sdk = fakeSdk()
-    sdk.googlePay.checkWalletForCardSuffix.mockResolvedValue([{ tokenId: "token-1" }])
+    sdk.googlePay.checkWalletForCardSuffix.mockResolvedValue([{ tokenState }])
+
+    await expect(deviceWalletFor(sdk).canAdd(card)).resolves.toBe(true)
+  })
+
+  it("does not offer the card when any of its tokens holds it", async () => {
+    const sdk = fakeSdk()
+    sdk.googlePay.checkWalletForCardSuffix.mockResolvedValue([
+      { tokenState: "TOKEN_STATE_NEEDS_IDENTITY_VERIFICATION" },
+      { tokenState: "TOKEN_STATE_ACTIVE" },
+    ])
 
     await expect(deviceWalletFor(sdk).canAdd(card)).resolves.toBe(false)
   })

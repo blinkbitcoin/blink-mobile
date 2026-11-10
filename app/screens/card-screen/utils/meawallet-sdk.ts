@@ -25,10 +25,13 @@ type ApplePayModule = {
   showAddPaymentPassView: (tokenization: AppleOemTokenization) => Promise<string>
 }
 
+/** A token Google Wallet holds for a card; the app reads only its state. */
+type GoogleWalletToken = { readonly tokenState: string }
+
 type GooglePayModule = {
   isWalletAvailable: () => Promise<boolean>
-  /** The tokens Google Wallet holds for the card; the app only counts them. */
-  checkWalletForCardSuffix: (suffix: string) => Promise<readonly object[]>
+  /** The tokens Google Wallet holds for cards ending in these digits. */
+  checkWalletForCardSuffix: (suffix: string) => Promise<readonly GoogleWalletToken[]>
   push: (
     card: MppCardData,
     displayName: string,

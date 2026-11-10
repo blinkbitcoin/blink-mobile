@@ -21,6 +21,21 @@ const isAppleSheetDismissed = (err: unknown): boolean => {
  *  answers is a GOOGLE_PAY_ERROR carrying the wallet's own code. */
 const GOOGLE_CANCEL_CODE = "OPERATION_CANCELLED_BY_USER"
 
+/**
+ * Google Wallet keeps a token for a card it took, and also for one it never finished: a
+ * token waiting on identity verification stays when the user leaves Google's check before
+ * finishing it. Only a token that holds the card counts as the card being there, and one
+ * still being provisioned does too, so a second add does not race it. The tokens are
+ * found by the card's last four digits, so one an older card with the same digits left
+ * behind counts the same. Adding again pushes the card anew; finishing the waiting token
+ * through the SDK's tokenize call needs a run on a device with real provisioning data.
+ */
+const GOOGLE_HELD_TOKEN_STATES: readonly string[] = [
+  "TOKEN_STATE_ACTIVE",
+  "TOKEN_STATE_SUSPENDED",
+  "TOKEN_STATE_PENDING",
+]
+
 const isGoogleSheetDismissed = (err: unknown): boolean => {
   if (!(err instanceof Error)) return false
   const { code } = err as Error & { code?: string }
@@ -64,7 +79,10 @@ const googleWallet = (sdk: MeaWalletSdk): DeviceWallet => ({
     const isAvailable = await sdk.googlePay.isWalletAvailable()
     if (!isAvailable) return false
     const tokens = await sdk.googlePay.checkWalletForCardSuffix(card.lastFour)
-    return tokens.length === 0
+    const isCardHeld = tokens.some(({ tokenState }) =>
+      GOOGLE_HELD_TOKEN_STATES.includes(tokenState),
+    )
+    return !isCardHeld
   },
   add: async (card, data) => {
     try {
