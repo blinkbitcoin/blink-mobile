@@ -13,7 +13,12 @@ jest.mock("../scripts/meawallet-mpp", () => ({
   isInstalled: () => mockIsInstalled,
 }))
 
-type MetroConfig = { resolver: { extraNodeModules: Record<string, string> } }
+type MetroConfig = {
+  resolver: { extraNodeModules: Record<string, string> }
+  transformer: {
+    getTransformOptions: () => Promise<{ transform: { inlineRequires: boolean } }>
+  }
+}
 
 /** The config is read once, as Metro starts, so each case loads its own copy. */
 const loadConfig = (): MetroConfig => {
@@ -40,6 +45,13 @@ describe("metro.config", () => {
       "@meawallet/react-native-mpp",
       "/repo/vendor/meawallet/react-native-mpp",
     )
+  })
+
+  /** Modules load when first used rather than all at startup. */
+  it("keeps requires inline", async () => {
+    const { transform } = await loadConfig().transformer.getTransformOptions()
+
+    expect(transform.inlineRequires).toBe(true)
   })
 })
 
