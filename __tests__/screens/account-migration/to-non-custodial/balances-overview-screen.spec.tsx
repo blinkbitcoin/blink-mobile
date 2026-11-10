@@ -1426,6 +1426,41 @@ describe("MigrationBalancesOverviewScreen, with a deposit still confirming", () 
     expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
   })
 
+  describe("the line above the retry when the deposit check fails", () => {
+    const failDepositCheckWith = (error: Error) =>
+      mockUseMigrationPendingDepositsQuery.mockReturnValue({
+        loading: false,
+        error,
+        data: undefined,
+        refetch: jest.fn().mockRejectedValue(error),
+      })
+
+    it("blames the connection when the check never reached the server", async () => {
+      failDepositCheckWith(
+        Object.assign(new Error("Network request failed"), {
+          networkError: new Error("offline"),
+        }),
+      )
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+      expect(screen.getByText(LL.errors.network.connection())).toBeTruthy()
+    })
+
+    /** As in the gate: a GraphQL or an auth error is the server's, and sending the user to
+     *  check a connection that works sends them looking in the wrong place. */
+    it("stays generic when the server answered the check with an error", async () => {
+      failDepositCheckWith(new Error("Not authorized"))
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+      expect(screen.getByText(LL.errors.generic())).toBeTruthy()
+      expect(screen.queryByText(LL.errors.network.connection())).toBeNull()
+    })
+  })
+
   it("holds the start while the pending-deposit check has not answered", async () => {
     mockUseMigrationPendingDepositsQuery.mockReturnValue({
       loading: true,

@@ -169,6 +169,34 @@ describe("useCustodialPendingDeposits", () => {
     expect(result.current.isReady).toBe(false)
   })
 
+  it("tells a check that never reached the server apart as a network failure", () => {
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      ...pendingDepositsQueryResult(),
+      data: undefined,
+      error: Object.assign(new Error("Network request failed"), {
+        networkError: new Error("offline"),
+      }),
+    })
+
+    const { result } = renderHook(() => useCustodialPendingDeposits())
+
+    expect(result.current.hasError).toBe(true)
+    expect(result.current.hasNetworkFailure).toBe(true)
+  })
+
+  it("keeps a check the server answered with an error apart from a network failure", () => {
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      ...pendingDepositsQueryResult(),
+      data: undefined,
+      error: new Error("Not authorized"),
+    })
+
+    const { result } = renderHook(() => useCustodialPendingDeposits())
+
+    expect(result.current.hasError).toBe(true)
+    expect(result.current.hasNetworkFailure).toBe(false)
+  })
+
   it("is not ready when the query settles without data", () => {
     mockUseMigrationPendingDepositsQuery.mockReturnValue({
       loading: false,

@@ -54,6 +54,8 @@ import { testProps } from "@app/utils/testProps"
 type RetryMessageInput = {
   LL: TranslationFunctions
   hasNetworkFailure: boolean
+  /** A server-backed read failed other than on the network (a GraphQL or an auth error). */
+  hasServerDataError: boolean
   /** The kind the checkpoint read failed with, null when that read is not what failed. */
   checkpointReadFailure: StorageFailure | null
   /** The kind the commit-point write failed with, null when it did not fail at the store. */
@@ -74,15 +76,20 @@ type RetryMessageInput = {
  *
  * A write turned away before it reached the store carries no kind: it waits on the owner
  * lookup, which is the network's.
+ *
+ * A server error gets the generic wording, as in the gate: it is neither the connection
+ * nor the device, and naming either sends the user looking in the wrong place.
  */
 const resolveRetryMessage = ({
   LL,
   hasNetworkFailure,
+  hasServerDataError,
   checkpointReadFailure,
   commitPointWriteFailure,
 }: RetryMessageInput): string => {
   const { storageUnavailable } = LL.AccountMigration
   if (hasNetworkFailure) return LL.errors.network.connection()
+  if (hasServerDataError) return LL.errors.generic()
 
   const isWriteOutOfSpace = commitPointWriteFailure === StorageFailure.OutOfSpace
   if (isWriteOutOfSpace) return storageUnavailable.notSavedOutOfSpaceBody()
@@ -597,10 +604,13 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     hasLnAddressConnectionIssue ||
     hasIdLookupFailure ||
     hasStatusReadFailure ||
-    depositHold.hasCheckError ||
+    depositHold.hasCheckNetworkFailure ||
     depositHold.hasFigureRefreshFailed
   const isRetryable =
-    hasNetworkFailure || hasCheckpointReadFailure || isCommitPointWriteRetryable
+    hasNetworkFailure ||
+    depositHold.hasCheckServerError ||
+    hasCheckpointReadFailure ||
+    isCommitPointWriteRetryable
 
   const checkpointReadFailure = hasCheckpointReadFailure ? checkpointStorageFailure : null
   const commitPointWriteFailure = isCommitPointWriteRetryable
@@ -609,6 +619,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const retryMessage = resolveRetryMessage({
     LL,
     hasNetworkFailure,
+    hasServerDataError: depositHold.hasCheckServerError,
     checkpointReadFailure,
     commitPointWriteFailure,
   })

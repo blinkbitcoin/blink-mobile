@@ -5,12 +5,15 @@ import { PendingDepositCheckStatus } from "@app/types/migration"
 
 let mockHasPendingDeposit = false
 let mockIsStillPending = false
+let mockHasError = false
+let mockHasNetworkFailure = false
 const mockCheck = jest.fn()
 jest.mock("@app/screens/account-migration/hooks/use-custodial-pending-deposits", () => ({
   useCustodialPendingDeposits: () => ({
     hasPendingDeposit: mockHasPendingDeposit,
     isReady: true,
-    hasError: false,
+    hasError: mockHasError,
+    hasNetworkFailure: mockHasNetworkFailure,
     check: mockCheck,
     recheck: jest.fn().mockResolvedValue({ status: PendingDepositCheckStatus.Clear }),
     isRecheckRunning: false,
@@ -52,6 +55,8 @@ describe("usePendingDepositHold reading the figures again", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockHasPendingDeposit = false
+    mockHasError = false
+    mockHasNetworkFailure = false
   })
 
   const renderHold = (refreshFigures: jest.Mock, isCommitRefusedForDeposit = false) =>
@@ -156,6 +161,8 @@ describe("usePendingDepositHold saying the deposit is still confirming", () => {
     jest.clearAllMocks()
     mockHasPendingDeposit = true
     mockIsStillPending = true
+    mockHasError = false
+    mockHasNetworkFailure = false
   })
 
   const renderHold = (isServerFlowNotStarted: boolean) =>
@@ -191,5 +198,45 @@ describe("usePendingDepositHold saying the deposit is still confirming", () => {
     const { result } = renderHold(false)
 
     expect(result.current.isStillPendingShown).toBe(false)
+  })
+})
+
+describe("usePendingDepositHold telling a failed check's cause", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockHasPendingDeposit = false
+    mockIsStillPending = false
+    mockHasError = true
+  })
+
+  const renderHold = () =>
+    renderHook(() =>
+      usePendingDepositHold({
+        isStartHeld: false,
+        isModalOutranked: false,
+        refreshFigures: jest.fn().mockResolvedValue(true),
+        isUndrained: true,
+        isCommitRefusedForDeposit: false,
+        isServerFlowNotStarted: false,
+        leaveFlow: jest.fn(),
+      }),
+    )
+
+  it("puts a check that never reached the server down to the network", () => {
+    mockHasNetworkFailure = true
+
+    const { result } = renderHold()
+
+    expect(result.current.hasCheckNetworkFailure).toBe(true)
+    expect(result.current.hasCheckServerError).toBe(false)
+  })
+
+  it("puts any other failure down to the server", () => {
+    mockHasNetworkFailure = false
+
+    const { result } = renderHold()
+
+    expect(result.current.hasCheckNetworkFailure).toBe(false)
+    expect(result.current.hasCheckServerError).toBe(true)
   })
 })

@@ -66,6 +66,7 @@ export const usePendingDepositHold = ({
     hasPendingDeposit,
     isReady: isCheckReady,
     hasError: hasCheckError,
+    hasNetworkFailure: hasCheckNetworkFailure,
     check: checkAgain,
     recheck,
     isRecheckRunning,
@@ -91,6 +92,9 @@ export const usePendingDepositHold = ({
    *  would cover and its OK could not resolve. */
   const isDepositPending = hasPendingDeposit || migrationStart.isDepositPending
   const isModalShown = isDepositPending && !isModalOutranked && !hasCheckError
+  /** A check that failed other than on the network (a GraphQL or an auth error): the
+   *  server's, so the screen words its retry generically rather than as the connection. */
+  const hasCheckServerError = hasCheckError && !hasCheckNetworkFailure
 
   /** The gate's rule: while the server has not started the run nothing is locked, so a user
    *  held here by a deposit that can take hours to confirm may leave and wait elsewhere.
@@ -192,7 +196,8 @@ export const usePendingDepositHold = ({
     acknowledgeModal,
     modalSupportAction,
     isStillPendingShown,
-    hasCheckError,
+    hasCheckNetworkFailure,
+    hasCheckServerError,
     isRecheckRunning,
     acknowledge,
     checkBeforeApprove,

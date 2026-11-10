@@ -8,6 +8,7 @@ import {
   useMigrationPendingDepositsQuery,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { isNetworkFailure } from "@app/graphql/transport-error"
 import { PendingDepositCheck, PendingDepositCheckStatus } from "@app/types/migration"
 import { toError } from "@app/utils/error-reporting"
 
@@ -66,6 +67,9 @@ type UseCustodialPendingDeposits = {
   loading: boolean
   isReady: boolean
   hasError: boolean
+  /** The error is the network's, so a caller can word it as the connection; any other
+   *  (a GraphQL or an auth error) is the server's. */
+  hasNetworkFailure: boolean
   check: () => Promise<PendingDepositCheck>
   /** The same check, started by the user: its spinner is `isRecheckRunning`. */
   recheck: () => Promise<PendingDepositCheck>
@@ -158,6 +162,7 @@ export const useCustodialPendingDeposits = ({
     loading,
     isReady: !error && pendingTransactions !== undefined,
     hasError: Boolean(error),
+    hasNetworkFailure: isNetworkFailure(error),
     check,
     recheck,
     isRecheckRunning: rechecksRunning > 0,
