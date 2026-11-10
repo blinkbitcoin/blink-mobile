@@ -113,6 +113,20 @@ describe("useCustodialPendingDeposits", () => {
     })
   })
 
+  /** Under errorPolicy "all" a failed check can still carry the last answer, and reading
+   *  that as ready would turn a check that failed into "nothing pending". */
+  it("is not ready when the check fails, even with an earlier answer still held", () => {
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      ...pendingDepositsQueryResult(),
+      error: new Error("network"),
+    })
+
+    const { result } = renderHook(() => useCustodialPendingDeposits())
+
+    expect(result.current.isReady).toBe(false)
+    expect(result.current.hasError).toBe(true)
+  })
+
   it("is not ready while the first answer is in flight", () => {
     mockUseMigrationPendingDepositsQuery.mockReturnValue({
       loading: true,
