@@ -3702,10 +3702,10 @@
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Hoş geldiniz",
-          "subtitle": "Blink Özel'e",
+          "subtitle": "Blink Orange'a",
           "paragraphs": {
-            "body1": "Biri sizi düşündü ve sizi Blink Özel'e davet etmemizi önerdi. Muhtemelen harika bir Bitcoiner olduğunuz için.",
-            "body2": "2026 hedefimiz programı o kadar çok avantajla doldurmak ki gelecek yıl yenilemenin mantıklı olacağı açık olsun."
+            "body1": "Biri sizi düşündü ve sizi Blink Orange'a davet etmemizi önerdi. Muhtemelen harika bir Bitcoiner olduğunuz için.",
+            "body2": "Blink Orange, Blink'in Bitcoiner'lara yönelik, yalnızca davetle katılınan üyeliğinin ilk seviyesidir. Blink kartı ve kişisel hesap yöneticiniz sunduğumuz ilk hizmetlerden ikisidir — geri kalanını 2027'ye kadar inşa ediyoruz."
           }
         },
         "buttonText": "Hadi başlayalım"

@@ -3702,10 +3702,10 @@
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Dobrodošli na brod",
-          "subtitle": "U Blink Privatni",
+          "subtitle": "U Blink Orange",
           "paragraphs": {
-            "body1": "Netko je mislio na vas i predložio da vas pozovemo u Blink Privatni. Vjerojatno zato što ste sjajan Bitcoiner.",
-            "body2": "Naš cilj za 2026. je napuniti program s toliko pogodnosti da će biti očito da se isplati obnoviti sljedeće godine."
+            "body1": "Netko je mislio na vas i predložio da vas pozovemo u Blink Orange. Vjerojatno zato što ste sjajan Bitcoiner.",
+            "body2": "Blink Orange je prva razina Blink članstva za Bitcoinere, samo uz pozivnicu. Blink kartica i vaš osobni upravitelj računa dvije su od prvih usluga koje nudimo — ostatak gradimo do 2027."
           }
         },
         "buttonText": "Idemo"

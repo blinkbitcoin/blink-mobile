@@ -3702,10 +3702,10 @@
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Karibu kwenye bodi",
-          "subtitle": "Kwa Blink Binafsi",
+          "subtitle": "Kwa Blink Orange",
           "paragraphs": {
-            "body1": "Mtu fulani alikufikiria na kupendekeza kwamba tukualike kwa Blink Binafsi. Labda kwa sababu wewe ni Bitcoiner mzuri sana.",
-            "body2": "Lengo letu kwa 2026 ni kujaza programu na vitu vingi vizuri hivi kwamba itakuwa dhahiri kuhuisha mwaka ujao."
+            "body1": "Mtu fulani alikufikiria na kupendekeza kwamba tukualike kwa Blink Orange. Labda kwa sababu wewe ni Bitcoiner mzuri sana.",
+            "body2": "Blink Orange ni ngazi ya kwanza ya uanachama wa Blink kwa Bitcoiners, kwa mwaliko tu. Blink Card na meneja wako binafsi wa akaunti ni huduma mbili kati ya za kwanza tunazotoa — zilizobaki tunazijenga hadi 2027."
           }
         },
         "buttonText": "Twende"

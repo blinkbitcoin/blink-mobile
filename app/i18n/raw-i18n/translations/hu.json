@@ -3702,10 +3702,10 @@
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Üdvözöljük a fedélzeten",
-          "subtitle": "A Blink Privátban",
+          "subtitle": "A Blink Orange-ban",
           "paragraphs": {
-            "body1": "Valaki gondolt rád és javasolta, hogy meghívjunk a Blink Privátba. Valószínűleg azért, mert fantasztikus Bitcoiner vagy.",
-            "body2": "Célunk 2026-ra az, hogy a programot annyi jósággal töltsük meg, hogy nyilvánvaló legyen jövőre megújítani."
+            "body1": "Valaki gondolt rád és javasolta, hogy meghívjunk a Blink Orange-ba. Valószínűleg azért, mert fantasztikus Bitcoiner vagy.",
+            "body2": "A Blink Orange a Blink tagságának első szintje Bitcoinereknek, csak meghívással. A Blink kártya és a személyes ügyfélmenedzsered az első szolgáltatásaink közül kettő — a többit 2027-ig építjük."
           }
         },
         "buttonText": "Rajta"

@@ -3702,10 +3702,10 @@
             "WelcomeOnboard": {
                 "welcomeMessage": {
                     "title": "Bienvenue à bord",
-                    "subtitle": "Chez Blink Privé",
+                    "subtitle": "Chez Blink Orange",
                     "paragraphs": {
-                        "body1": "Quelqu'un a pensé à vous et a suggéré que nous devrions vous inviter à Blink Privé. Probablement parce que vous êtes un Bitcoiner formidable.",
-                        "body2": "Notre objectif pour 2026 est de remplir le programme avec tellement d'avantages qu'il sera évident de renouveler l'année prochaine."
+                        "body1": "Quelqu'un a pensé à vous et a suggéré que nous devrions vous inviter à Blink Orange. Probablement parce que vous êtes un Bitcoiner formidable.",
+                        "body2": "Blink Orange est le premier niveau de l'adhésion Blink pour les Bitcoiners, sur invitation. La Blink Card et votre gestionnaire de compte personnel sont deux des premiers services que nous proposons — le reste, nous le construisons d'ici 2027."
                     }
                 },
                 "buttonText": "Allons-y"

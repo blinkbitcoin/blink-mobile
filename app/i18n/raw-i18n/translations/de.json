@@ -3702,10 +3702,10 @@
             "WelcomeOnboard": {
                 "welcomeMessage": {
                     "title": "Willkommen an Bord",
-                    "subtitle": "Bei Blink Privat",
+                    "subtitle": "Bei Blink Orange",
                     "paragraphs": {
-                        "body1": "Jemand hat an dich gedacht und vorgeschlagen, dass wir dich zu Blink Privat einladen sollten. Wahrscheinlich weil du ein großartiger Bitcoiner bist.",
-                        "body2": "Unser Ziel für 2026 ist es, das Programm mit so vielen Vorteilen zu füllen, dass es offensichtlich sein wird, nächstes Jahr zu verlängern."
+                        "body1": "Jemand hat an dich gedacht und vorgeschlagen, dass wir dich zu Blink Orange einladen sollten. Wahrscheinlich weil du ein großartiger Bitcoiner bist.",
+                        "body2": "Blink Orange ist die erste Stufe der Blink-Mitgliedschaft für Bitcoiner, nur auf Einladung. Die Blink Card und dein persönlicher Kundenbetreuer sind zwei der ersten Leistungen, die wir anbieten — den Rest bauen wir bis 2027 auf."
                     }
                 },
                 "buttonText": "Los geht's"

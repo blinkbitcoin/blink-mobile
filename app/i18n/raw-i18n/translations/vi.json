@@ -3702,10 +3702,10 @@
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Chào mừng bạn",
-          "subtitle": "Đến Blink Riêng tư",
+          "subtitle": "Đến Blink Orange",
           "paragraphs": {
-            "body1": "Ai đó đã nghĩ về bạn và đề xuất rằng chúng tôi nên mời bạn tham gia Blink Riêng tư. Có lẽ vì bạn là một Bitcoiner tuyệt vời.",
-            "body2": "Mục tiêu của chúng tôi cho năm 2026 là lấp đầy chương trình với nhiều ưu đãi đến mức việc gia hạn năm sau là điều hiển nhiên."
+            "body1": "Ai đó đã nghĩ về bạn và đề xuất rằng chúng tôi nên mời bạn tham gia Blink Orange. Có lẽ vì bạn là một Bitcoiner tuyệt vời.",
+            "body2": "Blink Orange là cấp độ đầu tiên trong chương trình thành viên của Blink dành cho Bitcoiner, chỉ dành cho người được mời. Thẻ Blink và người quản lý tài khoản cá nhân của bạn là hai trong số những dịch vụ đầu tiên chúng tôi cung cấp — phần còn lại chúng tôi sẽ xây dựng đến năm 2027."
           }
         },
         "buttonText": "Bắt đầu nào"

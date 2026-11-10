@@ -3702,10 +3702,10 @@
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Vítejte na palubě",
-          "subtitle": "V Blink Privátní",
+          "subtitle": "V Blink Orange",
           "paragraphs": {
-            "body1": "Někdo na vás myslel a navrhl, že bychom vás měli pozvat do Blink Privátní. Pravděpodobně proto, že jste skvělý Bitcoiner.",
-            "body2": "Naším cílem pro rok 2026 je naplnit program tolika výhodami, že bude zřejmé, že se vyplatí příští rok obnovit."
+            "body1": "Někdo na vás myslel a navrhl, že bychom vás měli pozvat do Blink Orange. Pravděpodobně proto, že jste skvělý Bitcoiner.",
+            "body2": "Blink Orange je první úroveň členství v Blinku pro Bitcoinery, pouze na pozvání. Blink Card a váš osobní správce účtu jsou dvě z prvních služeb, které nabízíme — zbytek budujeme do roku 2027."
           }
         },
         "buttonText": "Pojďme na to"

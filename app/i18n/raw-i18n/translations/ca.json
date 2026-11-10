@@ -3702,10 +3702,10 @@
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Benvingut a bord",
-          "subtitle": "A Blink Privat",
+          "subtitle": "A Blink Orange",
           "paragraphs": {
-            "body1": "Algú va pensar en tu i va suggerir que t'hauríem de convidar a Blink Privat. Probablement perquè ets un Bitcoiner increïble.",
-            "body2": "El nostre objectiu per al 2026 és omplir el programa amb tantes coses bones que serà obvi renovar l'any vinent."
+            "body1": "Algú va pensar en tu i va suggerir que t'hauríem de convidar a Blink Orange. Probablement perquè ets un Bitcoiner increïble.",
+            "body2": "Blink Orange és el primer nivell de la membresia de Blink per a Bitcoiners, només per invitació. La Blink Card i el teu gestor de compte personal són dos dels primers serveis que oferim — la resta l'anem construint fins al 2027."
           }
         },
         "buttonText": "Anem-hi"

@@ -3702,10 +3702,10 @@
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Wamkelekile",
-          "subtitle": "Kwi-Blink Yabucala",
+          "subtitle": "Kwi-Blink Orange",
           "paragraphs": {
-            "body1": "Umntu othile wacinga ngawe waza wacebisa ukuba sikumeme kwi-Blink Yabucala. Mhlawumbi ngenxa yokuba ungum-Bitcoiner omangalisayo.",
-            "body2": "Injongo yethu ngo-2026 kukuzalisa inkqubo ngezinto ezininzi ezintle kangangokuba kuya kucaca ukuba kufanele uhlaziye kunyaka ozayo."
+            "body1": "Umntu othile wacinga ngawe waza wacebisa ukuba sikumeme kwi-Blink Orange. Mhlawumbi ngenxa yokuba ungum-Bitcoiner omangalisayo.",
+            "body2": "I-Blink Orange linqanaba lokuqala lobulungu be-Blink kuma-Bitcoiner, ngesimemo kuphela. Ikhadi le-Blink kunye nomphathi weakhawunti yakho ziinkonzo ezimbini zokuqala esizinikezelayo — ezinye sisazakha ukuya kutsho ngo-2027."
           }
         },
         "buttonText": "Masiye"

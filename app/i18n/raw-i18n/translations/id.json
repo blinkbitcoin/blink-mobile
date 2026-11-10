@@ -3702,10 +3702,10 @@
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Selamat datang",
-          "subtitle": "Di Blink Pribadi",
+          "subtitle": "Di Blink Orange",
           "paragraphs": {
-            "body1": "Seseorang memikirkan Anda dan menyarankan agar kami mengundang Anda ke Blink Pribadi. Mungkin karena Anda adalah Bitcoiner yang luar biasa.",
-            "body2": "Tujuan kami untuk 2026 adalah mengisi program dengan begitu banyak keuntungan sehingga sudah jelas untuk memperbarui tahun depan."
+            "body1": "Seseorang memikirkan Anda dan menyarankan agar kami mengundang Anda ke Blink Orange. Mungkin karena Anda adalah Bitcoiner yang luar biasa.",
+            "body2": "Blink Orange adalah tingkat pertama keanggotaan Blink untuk para Bitcoiner, hanya dengan undangan. Blink Card dan manajer akun pribadi Anda adalah dua layanan pertama yang kami tawarkan — sisanya sedang kami bangun hingga 2027."
           }
         },
         "buttonText": "Ayo mulai"

@@ -12301,16 +12301,16 @@ type RootTranslation = {
 					 */
 					title: string
 					/**
-					 * T​o​ ​B​l​i​n​k​ ​P​r​i​v​a​t​e
+					 * T​o​ ​B​l​i​n​k​ ​O​r​a​n​g​e
 					 */
 					subtitle: string
 					paragraphs: {
 						/**
-						 * S​o​m​e​o​n​e​ ​t​h​o​u​g​h​t​ ​o​f​ ​y​o​u​ ​a​n​d​ ​s​u​g​g​e​s​t​e​d​ ​t​h​a​t​ ​w​e​ ​s​h​o​u​l​d​ ​i​n​v​i​t​e​ ​y​o​u​ ​t​o​ ​B​l​i​n​k​ ​P​r​i​v​a​t​e​.​ ​P​r​o​b​a​b​l​y​ ​b​e​c​a​u​s​e​ ​y​o​u​ ​a​r​e​ ​a​n​ ​a​w​e​s​o​m​e​ ​B​i​t​c​o​i​n​e​r​.
+						 * S​o​m​e​o​n​e​ ​t​h​o​u​g​h​t​ ​o​f​ ​y​o​u​ ​a​n​d​ ​s​u​g​g​e​s​t​e​d​ ​t​h​a​t​ ​w​e​ ​s​h​o​u​l​d​ ​i​n​v​i​t​e​ ​y​o​u​ ​t​o​ ​B​l​i​n​k​ ​O​r​a​n​g​e​.​ ​P​r​o​b​a​b​l​y​ ​b​e​c​a​u​s​e​ ​y​o​u​ ​a​r​e​ ​a​n​ ​a​w​e​s​o​m​e​ ​B​i​t​c​o​i​n​e​r​.
 						 */
 						body1: string
 						/**
-						 * O​u​r​ ​g​o​a​l​ ​f​o​r​ ​2​0​2​6​ ​i​s​ ​t​o​ ​s​t​u​f​f​ ​t​h​e​ ​p​r​o​g​r​a​m​ ​w​i​t​h​ ​s​o​ ​m​u​c​h​ ​g​o​o​d​i​e​s​ ​t​h​a​t​ ​i​t​ ​w​i​l​l​ ​b​e​ ​o​b​v​i​o​u​s​ ​t​o​ ​r​e​n​e​w​ ​n​e​x​t​ ​y​e​a​r​.
+						 * B​l​i​n​k​ ​O​r​a​n​g​e​ ​i​s​ ​t​h​e​ ​f​i​r​s​t​ ​t​i​e​r​ ​o​f​ ​B​l​i​n​k​'​s​ ​m​e​m​b​e​r​s​h​i​p​ ​f​o​r​ ​B​i​t​c​o​i​n​e​r​s​,​ ​b​y​ ​i​n​v​i​t​a​t​i​o​n​.​ ​T​h​e​ ​B​l​i​n​k​ ​C​a​r​d​ ​a​n​d​ ​y​o​u​r​ ​p​e​r​s​o​n​a​l​ ​a​c​c​o​u​n​t​ ​m​a​n​a​g​e​r​ ​a​r​e​ ​t​w​o​ ​o​f​ ​t​h​e​ ​f​i​r​s​t​ ​s​e​r​v​i​c​e​s​ ​w​e​ ​o​f​f​e​r​ ​—​ ​t​h​e​ ​r​e​s​t​ ​w​e​'​r​e​ ​b​u​i​l​d​i​n​g​ ​t​h​r​o​u​g​h​ ​2​0​2​7​.
 						 */
 						body2: string
 					}
@@ -26554,16 +26554,16 @@ export type TranslationFunctions = {
 					 */
 					title: () => LocalizedString
 					/**
-					 * To Blink Private
+					 * To Blink Orange
 					 */
 					subtitle: () => LocalizedString
 					paragraphs: {
 						/**
-						 * Someone thought of you and suggested that we should invite you to Blink Private. Probably because you are an awesome Bitcoiner.
+						 * Someone thought of you and suggested that we should invite you to Blink Orange. Probably because you are an awesome Bitcoiner.
 						 */
 						body1: () => LocalizedString
 						/**
-						 * Our goal for 2026 is to stuff the program with so much goodies that it will be obvious to renew next year.
+						 * Blink Orange is the first tier of Blink's membership for Bitcoiners, by invitation. The Blink Card and your personal account manager are two of the first services we offer — the rest we're building through 2027.
 						 */
 						body2: () => LocalizedString
 					}

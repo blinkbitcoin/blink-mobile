@@ -64,7 +64,7 @@ describe("WelcomeOnboardScreen", () => {
 
     await act(async () => {})
 
-    expect(getByText(/To Blink Private/)).toBeTruthy()
+    expect(getByText(/To Blink Orange/)).toBeTruthy()
   })
 
   it("displays body1 paragraph", async () => {
@@ -78,7 +78,7 @@ describe("WelcomeOnboardScreen", () => {
 
     expect(
       getByText(
-        "Someone thought of you and suggested that we should invite you to Blink Private. Probably because you are an awesome Bitcoiner.",
+        "Someone thought of you and suggested that we should invite you to Blink Orange. Probably because you are an awesome Bitcoiner.",
       ),
     ).toBeTruthy()
   })
@@ -94,7 +94,7 @@ describe("WelcomeOnboardScreen", () => {
 
     expect(
       getByText(
-        "Our goal for 2026 is to stuff the program with so much goodies that it will be obvious to renew next year.",
+        "Blink Orange is the first tier of Blink's membership for Bitcoiners, by invitation. The Blink Card and your personal account manager are two of the first services we offer — the rest we're building through 2027.",
       ),
     ).toBeTruthy()
   })

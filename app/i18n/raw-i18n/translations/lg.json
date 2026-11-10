@@ -3702,10 +3702,10 @@
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Tukusanyukidde",
-          "subtitle": "Mu Blink Ekyama",
+          "subtitle": "Mu Blink Orange",
           "paragraphs": {
-            "body1": "Omuntu eyalowooza ku ggwe era n'ateesa nti tusaanye okukuyita mu Blink Ekyama. Oboolyawo kubanga oli Bitcoiner omulungi nnyo.",
-            "body2": "Ekigendererwa kyaffe mu 2026 kwe kutekamu pulogulamu ebirungi ebingi nti kiriba kirabika okuddamu okuwandiisa omwaka ogujja."
+            "body1": "Omuntu eyalowooza ku ggwe era n'ateesa nti tusaanye okukuyita mu Blink Orange. Oboolyawo kubanga oli Bitcoiner omulungi nnyo.",
+            "body2": "Blink Orange gwe mutendera ogusooka ogw'obwammemba bwa Blink eri ba Bitcoiner, ku kuyitibwa kwokka. Kaadi ya Blink n'omuddukanya w'akawunti yo ey'enjawulo ze mpeereza bbiri ku ezisooka ze tuwaayo — ebisigadde tubizimba okutuusa mu 2027."
           }
         },
         "buttonText": "Ka tugende"

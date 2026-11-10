@@ -3857,10 +3857,10 @@ const en: BaseTranslation = {
       WelcomeOnboard: {
         welcomeMessage: {
           title: "Welcome onboard",
-          subtitle: "To Blink Private",
+          subtitle: "To Blink Orange",
           paragraphs: {
-            body1: "Someone thought of you and suggested that we should invite you to Blink Private. Probably because you are an awesome Bitcoiner.",
-            body2: "Our goal for 2026 is to stuff the program with so much goodies that it will be obvious to renew next year.",
+            body1: "Someone thought of you and suggested that we should invite you to Blink Orange. Probably because you are an awesome Bitcoiner.",
+            body2: "Blink Orange is the first tier of Blink's membership for Bitcoiners, by invitation. The Blink Card and your personal account manager are two of the first services we offer — the rest we're building through 2027.",
           },
         },
         buttonText: "Let's go",
