@@ -2,7 +2,7 @@ import { act, renderHook } from "@testing-library/react-native"
 
 import { MigrationStatus } from "@app/graphql/generated"
 import {
-  resetMigrationCommitGuard,
+  resetMigrationCommitRecords,
   useMigrationTransfer,
 } from "@app/screens/account-migration/hooks/use-migration-transfer"
 import { MigrationSdkStatus } from "@app/self-custodial/migration-transfer-request"
@@ -148,9 +148,11 @@ const renderTransfer = (
     }),
   )
 
+/** Run before each case, so after RNTL's auto-cleanup has unmounted the previous case's
+ *  hooks, which the records reset needs. */
 const resetTransferMocks = () => {
   jest.clearAllMocks()
-  resetMigrationCommitGuard()
+  resetMigrationCommitRecords()
   mockStatus = MigrationStatus.InProgress
   mockRefetchStatus = () => Promise.resolve(mockStatus)
   mockBuildTransferRequest.mockResolvedValue({

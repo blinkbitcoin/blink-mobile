@@ -98,8 +98,10 @@ const isRecoverableRecord = (
   record?.kind === "clockOutOfSync" ||
   record?.kind === "depositPending"
 
-/** Clears every commit record; for test isolation, never called in production. */
-export const resetMigrationCommitGuard = (): void => {
+/** Clears every commit record; for test isolation, never called in production. It also
+ *  drops the store's listeners, so it is only called with no hook mounted: a mounted one
+ *  would stop hearing about its account's commit. */
+export const resetMigrationCommitRecords = (): void => {
   commitRecords.reset()
 }
 
