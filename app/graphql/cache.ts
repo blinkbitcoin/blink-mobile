@@ -80,6 +80,14 @@ export const createCache = () =>
       TxLastSeen: {
         keyFields: ["accountId"],
       },
+      Card: {
+        /** A card's limits and toggles come as whole lists without ids, so the latest
+         *  list replaces the cached one, a lifted limit included. */
+        fields: {
+          spendingLimits: { merge: false },
+          spendingToggles: { merge: false },
+        },
+      },
       Query: {
         fields: {
           // local only fields

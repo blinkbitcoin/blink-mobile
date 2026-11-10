@@ -8,6 +8,7 @@ import {
   OptionRow,
   ShippingAddressForm,
 } from "@app/components/card-screen"
+import { radius } from "@app/rne-theme/radius"
 import { CheckboxRow } from "@app/components/checkbox-row"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
@@ -110,11 +111,11 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
         <View style={localStyles.deliveryCard}>
           <OptionRow
             icon="delivery"
-            iconColor={colors.grey2}
+            iconColor={colors.textMuted}
             title={shippingLL.standardDelivery()}
             subtitle={standardDays}
             value={standardPrice}
-            valueColor={colors._green}
+            valueColor={colors.success}
           />
         </View>
       </View>
@@ -151,7 +152,7 @@ const useLocalStyles = makeStyles(() => ({
     gap: 17,
   },
   deliveryCard: {
-    borderRadius: 8,
+    borderRadius: radius.default,
     overflow: "hidden",
   },
 }))

@@ -11,13 +11,14 @@ import { Icon, ListItem, makeStyles, useTheme, Text } from "@rn-vui/themed"
 
 import TelegramOutline from "./telegram.svg"
 
+export const TELEGRAM_COMMUNITY_URL = "https://t.me/blinkbtc"
+
 export const SupportChannels = {
   Email: "email",
   EmailCopy: "emailCopy",
   Telegram: "telegram",
   WhatsApp: "whatsapp",
   StatusPage: "statusPage",
-  Mattermost: "mattermost",
   Faq: "faq",
 } as const
 
@@ -68,7 +69,14 @@ const ContactModal: React.FC<Props> = ({
     {
       id: SupportChannels.Faq,
       name: LL.support.faq(),
-      icon: <Icon name={"book-outline"} type="ionicon" color={colors.black} size={20} />,
+      icon: (
+        <Icon
+          name={"book-outline"}
+          type="ionicon"
+          color={colors.textOnBackground}
+          size={20}
+        />
+      ),
       action: () => {
         Linking.openURL(`https://faq.blink.sv`)
         toggleModal()
@@ -77,32 +85,23 @@ const ContactModal: React.FC<Props> = ({
     {
       id: SupportChannels.Telegram,
       name: LL.support.telegram(),
-      icon: <TelegramOutline width={20} height={20} fill={colors.black} />,
+      icon: <TelegramOutline width={20} height={20} fill={colors.textOnBackground} />,
       action: () => {
-        Linking.openURL(`https://t.me/blinkbtc`)
-        toggleModal()
-      },
-    },
-    {
-      id: SupportChannels.Mattermost,
-      name: LL.support.mattermost(),
-      icon: (
-        <Icon
-          name={"chatbubbles-outline"}
-          type="ionicon"
-          color={colors.black}
-          size={20}
-        />
-      ),
-      action: () => {
-        Linking.openURL(`https://chat.blink.sv`)
+        Linking.openURL(TELEGRAM_COMMUNITY_URL)
         toggleModal()
       },
     },
     {
       id: SupportChannels.WhatsApp,
       name: LL.support.whatsapp(),
-      icon: <Icon name={"logo-whatsapp"} type="ionicon" color={colors.black} size={20} />,
+      icon: (
+        <Icon
+          name={"logo-whatsapp"}
+          type="ionicon"
+          color={colors.textOnBackground}
+          size={20}
+        />
+      ),
       action: () => {
         openWhatsAppAction(messageBody)
         toggleModal()
@@ -111,7 +110,14 @@ const ContactModal: React.FC<Props> = ({
     {
       id: SupportChannels.Email,
       name: LL.support.email(),
-      icon: <Icon name={"mail-outline"} type="ionicon" color={colors.black} size={20} />,
+      icon: (
+        <Icon
+          name={"mail-outline"}
+          type="ionicon"
+          color={colors.textOnBackground}
+          size={20}
+        />
+      ),
       action: () => {
         Linking.openURL(
           `mailto:${CONTACT_EMAIL_ADDRESS}?subject=${encodeURIComponent(
@@ -124,9 +130,16 @@ const ContactModal: React.FC<Props> = ({
     {
       id: SupportChannels.EmailCopy,
       name: supportEmailAddress,
-      icon: <Icon name={"mail-outline"} type="ionicon" color={colors.black} size={20} />,
+      icon: (
+        <Icon
+          name={"mail-outline"}
+          type="ionicon"
+          color={colors.textOnBackground}
+          size={20}
+        />
+      ),
       rightIcon: (
-        <Icon name={"copy-outline"} type="ionicon" color={colors.primary} size={20} />
+        <Icon name={"copy-outline"} type="ionicon" color={colors.accent} size={20} />
       ),
       action: () => {
         copyToClipboard({
@@ -142,7 +155,7 @@ const ContactModal: React.FC<Props> = ({
     <ReactNativeModal
       isVisible={isVisible}
       backdropOpacity={0.8}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       onBackdropPress={toggleModal}
       style={styles.modal}
     >
@@ -166,7 +179,7 @@ const ContactModal: React.FC<Props> = ({
                 <ListItem.Chevron
                   name={"chevron-forward"}
                   type="ionicon"
-                  color={colors.primary}
+                  color={colors.accent}
                   size={20}
                 />
               )}
@@ -190,12 +203,12 @@ const useStyles = makeStyles(({ colors }) => ({
     marginHorizontal: 0,
   },
   listItemContainer: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
   listItemTitle: {
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   icons: {
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

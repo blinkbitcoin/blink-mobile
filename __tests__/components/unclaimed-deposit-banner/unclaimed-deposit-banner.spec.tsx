@@ -104,6 +104,20 @@ describe("UnclaimedDepositBanner", () => {
     expect(getByText("1000 sats")).toBeTruthy()
   })
 
+  it("excludes deposits claimed early — the balance pill owns them until they land", () => {
+    const { getByText } = renderBanner([
+      buildDeposit({ id: "1", status: DepositStatus.Claimable }),
+      buildDeposit({
+        id: "2",
+        status: DepositStatus.Claiming,
+        amount: { amount: 7777, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+      }),
+    ])
+
+    expect(getByText("1 pending")).toBeTruthy()
+    expect(getByText("1000 sats")).toBeTruthy()
+  })
+
   it("renders nothing when every deposit is immature", () => {
     const { queryByTestId } = renderBanner([
       buildDeposit({ id: "1", status: DepositStatus.Immature }),

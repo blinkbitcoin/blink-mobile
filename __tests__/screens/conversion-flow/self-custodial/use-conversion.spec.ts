@@ -30,9 +30,19 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   }),
 }))
 
+const mockMeasure = jest.fn()
+jest.mock("@app/self-custodial/measurement", () => ({
+  ...jest.requireActual("@app/self-custodial/measurement"),
+  measure: (...args: unknown[]) => mockMeasure(...args),
+}))
+
+/** Spied on rather than run: these helpers are gated on the custodial domain too, and the
+ *  hook must not call them at all. */
+const mockLogConversionAttempt = jest.fn()
+const mockLogConversionResult = jest.fn()
 jest.mock("@app/utils/analytics", () => ({
-  logConversionAttempt: jest.fn(),
-  logConversionResult: jest.fn(),
+  logConversionAttempt: (...args: unknown[]) => mockLogConversionAttempt(...args),
+  logConversionResult: (...args: unknown[]) => mockLogConversionResult(...args),
 }))
 
 jest.mock("@react-native-firebase/crashlytics", () => ({
@@ -154,6 +164,9 @@ describe("useSelfCustodialConversion", () => {
     expect(execute).toHaveBeenCalledTimes(1)
     expect(mockOnSuccess).toHaveBeenCalledTimes(1)
     expect(result.current.errorMessage).toBeUndefined()
+    /** The custodial account's swap events; this one reports through sc_swap_*. */
+    expect(mockLogConversionAttempt).not.toHaveBeenCalled()
+    expect(mockLogConversionResult).not.toHaveBeenCalled()
     expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledWith(
       "notificationSuccess",
       {
@@ -178,6 +191,8 @@ describe("useSelfCustodialConversion", () => {
 
     expect(result.current.errorMessage).toBe("SDK boom")
     expect(mockOnSuccess).not.toHaveBeenCalled()
+    expect(mockLogConversionAttempt).not.toHaveBeenCalled()
+    expect(mockLogConversionResult).not.toHaveBeenCalled()
     expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledWith("notificationError", {
       ignoreAndroidSystemSettings: true,
     })
@@ -439,5 +454,78 @@ describe("useSelfCustodialConversion", () => {
 
     expect(secondQuote.execute).toHaveBeenCalledTimes(1)
     expect(firstQuote.execute).not.toHaveBeenCalled()
+  })
+
+  describe("quote shown telemetry", () => {
+    const quotesShown = () =>
+      mockMeasure.mock.calls.filter(([event]) => event === "sc_swap_quote_shown")
+
+    it("counts the quote the user confirms against once, not each price tick", async () => {
+      mockGetQuote.mockResolvedValue(makeQuote())
+
+      const { result, rerender } = renderHook(() =>
+        useSelfCustodialConversion(defaultParams),
+      )
+      await waitFor(() => expect(result.current.canExecute).toBe(true))
+      mockConvertMoneyAmount.mockImplementation(
+        (amount: { amount: number }, currency: WalletCurrency) =>
+          currency === WalletCurrency.Btc
+            ? toBtcMoneyAmount(amount.amount * 101)
+            : toUsdMoneyAmount(amount.amount),
+      )
+      rerender({})
+
+      expect(quotesShown()).toEqual([
+        [
+          "sc_swap_quote_shown",
+          { direction: ConvertDirection.BtcToUsd, source: "manual" },
+        ],
+      ])
+    })
+
+    it("counts a new amount as a new quote shown", async () => {
+      mockGetQuote.mockResolvedValue(makeQuote())
+
+      const { result, rerender } = renderHook(
+        (params: typeof defaultParams) => useSelfCustodialConversion(params),
+        { initialProps: defaultParams },
+      )
+      await waitFor(() => expect(result.current.canExecute).toBe(true))
+      rerender({ ...defaultParams, moneyAmount: toUsdMoneyAmount(700) })
+      await waitFor(() => expect(mockGetQuote).toHaveBeenCalledTimes(2))
+      await waitFor(() => expect(quotesShown()).toHaveLength(2))
+    })
+
+    it("does not count a re-quote of the same amount after a failed execute", async () => {
+      mockGetQuote
+        .mockResolvedValueOnce(
+          makeQuote({
+            execute: jest.fn().mockResolvedValue({
+              status: PaymentResultStatus.Failed,
+              errors: [{ message: "SDK boom" }],
+            }),
+          }),
+        )
+        .mockResolvedValueOnce(makeQuote())
+
+      const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+      await waitFor(() => expect(result.current.canExecute).toBe(true))
+      await act(async () => {
+        await result.current.execute()
+      })
+      await waitFor(() => expect(mockGetQuote).toHaveBeenCalledTimes(2))
+      await waitFor(() => expect(result.current.canExecute).toBe(true))
+
+      expect(quotesShown()).toHaveLength(1)
+    })
+
+    it("counts nothing when no quote could be fetched", async () => {
+      mockGetQuote.mockResolvedValue(null)
+
+      const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+      await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
+
+      expect(quotesShown()).toHaveLength(0)
+    })
   })
 })

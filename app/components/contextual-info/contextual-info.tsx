@@ -98,7 +98,7 @@ export const ContextualInfo: React.FC<ContextualInfoProps> = ({
   if (shouldShowAutoConvertMinWarning && autoConvertMinSats !== undefined) {
     stackedMessages.push(
       <View key="auto-convert-min" style={styles.depositFeeContainer}>
-        <GaloyIcon name="warning" size={16} color={colors.grey1} />
+        <GaloyIcon name="warning" size={16} color={colors.textSecondary} />
         <Text style={styles.depositFeeText}>
           {LL.ReceiveScreen.autoConvertMinAmount({
             minSats: autoConvertMinSats,
@@ -128,7 +128,7 @@ export const ContextualInfo: React.FC<ContextualInfoProps> = ({
             {LL.common.expirationTime()}
             {formattedTime ? `: ${formattedTime}` : ""}
           </Text>
-          <GaloyIcon name="caret-down" size={12} color={colors.grey1} />
+          <GaloyIcon name="caret-down" size={12} color={colors.textSecondary} />
         </Pressable>
         <ExpirationTimeModal
           value={expirationTime}
@@ -146,7 +146,7 @@ export const ContextualInfo: React.FC<ContextualInfoProps> = ({
 
     return (
       <View style={styles.depositFeeContainer}>
-        <GaloyIcon name="warning" size={16} color={colors.grey1} />
+        <GaloyIcon name="warning" size={16} color={colors.textSecondary} />
         <Text style={styles.depositFeeText}>{depositFeeText(LL, tiers)}</Text>
       </View>
     )
@@ -184,7 +184,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 4,
   },
   linkText: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     fontSize: 14,
     fontWeight: "400",
     lineHeight: 20,
@@ -197,7 +197,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 4,
   },
   depositFeeText: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     fontSize: 14,
     fontWeight: "400",
     lineHeight: 20,

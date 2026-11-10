@@ -13,25 +13,46 @@ jest.mock("react-native-linear-gradient", () => ({
   LinearGradient: "LinearGradient",
 }))
 
+type LayoutProps = {
+  title: string
+  subtitle: string
+  buttonLabel: string
+  onPrimaryButtonPress: () => void
+  cardId?: string
+  cardNumber?: string
+  showAddToWallet?: boolean
+  onAddToWallet: () => void
+  isAddingToWallet?: boolean
+}
+
+const mockLayoutProps = jest.fn()
 jest.mock("@app/components/card-screen", () => {
   const { View, Text, TouchableOpacity } = jest.requireActual("react-native")
   return {
-    CardStatusLayout: (props: {
-      title: string
-      subtitle: string
-      buttonLabel: string
-      onPrimaryButtonPress: () => void
-    }) => (
-      <View>
-        <Text>{props.title}</Text>
-        <Text>{props.subtitle}</Text>
-        <TouchableOpacity onPress={props.onPrimaryButtonPress}>
-          <Text>{props.buttonLabel}</Text>
-        </TouchableOpacity>
-      </View>
-    ),
+    CardStatusLayout: (props: LayoutProps) => {
+      mockLayoutProps(props)
+      return (
+        <View>
+          <Text>{props.title}</Text>
+          <Text>{props.subtitle}</Text>
+          <TouchableOpacity onPress={props.onPrimaryButtonPress}>
+            <Text>{props.buttonLabel}</Text>
+          </TouchableOpacity>
+        </View>
+      )
+    },
   }
 })
+
+const mockAddToWallet = jest.fn()
+const mockUseAddToWallet = jest.fn()
+jest.mock("@app/screens/card-screen/hooks/use-add-to-wallet", () => ({
+  useAddToWallet: (cardId?: string, lastFour?: string) =>
+    mockUseAddToWallet(cardId, lastFour),
+}))
+
+const lastLayoutProps = (): LayoutProps =>
+  mockLayoutProps.mock.calls[mockLayoutProps.mock.calls.length - 1][0]
 
 const mockDispatch = jest.fn()
 
@@ -54,7 +75,7 @@ jest.mock("@react-navigation/native", () => {
 let mockHasPhysicalCard = false
 let mockCardLastFour: string | undefined = "1234"
 
-jest.mock("@app/screens/card-screen/hooks/use-card-data", () => ({
+jest.mock("@app/hooks/use-card-data", () => ({
   useCardData: () => ({
     card: mockCardLastFour ? { id: "card-123", lastFour: mockCardLastFour } : null,
     hasPhysicalCard: mockHasPhysicalCard,
@@ -68,6 +89,11 @@ describe("CardApprovedScreen", () => {
     jest.clearAllMocks()
     mockHasPhysicalCard = false
     mockCardLastFour = "1234"
+    mockUseAddToWallet.mockReturnValue({
+      canAddToWallet: true,
+      isAdding: false,
+      addToWallet: mockAddToWallet,
+    })
   })
 
   it("renders without crashing", async () => {
@@ -173,6 +199,49 @@ describe("CardApprovedScreen", () => {
         type: "NAVIGATE",
         payload: { name: "cardDashboardScreen", params: undefined },
       })
+    })
+  })
+
+  describe("add to wallet", () => {
+    const renderScreen = async () => {
+      render(
+        <ContextForScreen>
+          <CardApprovedScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+    }
+
+    it("checks the wallet with the approved card", async () => {
+      await renderScreen()
+
+      expect(mockUseAddToWallet).toHaveBeenCalledWith("card-123", "1234")
+    })
+
+    it("hands the card and the wallet state to the layout", async () => {
+      await renderScreen()
+
+      expect(lastLayoutProps()).toEqual(
+        expect.objectContaining({
+          cardId: "card-123",
+          cardNumber: "1234",
+          showAddToWallet: true,
+          onAddToWallet: mockAddToWallet,
+          isAddingToWallet: false,
+        }),
+      )
+    })
+
+    it("hides the add to wallet button when the wallet cannot take the card", async () => {
+      mockUseAddToWallet.mockReturnValue({
+        canAddToWallet: false,
+        isAdding: false,
+        addToWallet: mockAddToWallet,
+      })
+
+      await renderScreen()
+
+      expect(lastLayoutProps().showAddToWallet).toBe(false)
     })
   })
 })

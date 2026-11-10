@@ -131,7 +131,8 @@ const HANDLES_ITS_OWN_INSETS = new Set([
   "TransactionDetailScreen",
   // Redirect-only, renders no UI of its own.
   "MigrationEntryScreen",
-  // Full-bleed map; MapComponent offsets its own controls by insets.top.
+  // Full-bleed map; MapComponent offsets its own controls by insets.top. The
+  // tab bar takes insets.bottom and Screen takes left/right.
   "MapScreen",
   // Decorative full-bleed maps and quiz backdrops, unchanged by this rule.
   "EarnMapScreen",

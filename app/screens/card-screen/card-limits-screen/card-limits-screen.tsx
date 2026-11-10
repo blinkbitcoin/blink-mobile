@@ -3,18 +3,26 @@ import { ActivityIndicator, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 
+import { radius } from "@app/rne-theme/radius"
+import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
 import { InputField, SwitchRow } from "@app/components/card-screen"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { WalletCurrency } from "@app/graphql/generated"
+import { SpendingPeriod, WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { toMajorUnit } from "@app/utils/helper"
+import { parseDollarsToCents, toMajorUnit } from "@app/utils/helper"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
-import { useCardData } from "../hooks/use-card-data"
+import { useCardData } from "@app/hooks"
 
-import { LimitField, useCardLimits } from "./hooks"
+import { LimitField, useCardAtmControls, useCardLimits } from "./hooks"
 import { createCurrencyFormatters } from "../utils"
+import { groupTitleGap } from "@app/rne-theme/tokens"
+
+const toAtmLimitValue = (cents: number | null) =>
+  cents === null ? "" : toMajorUnit(cents).toString()
 
 export const CardLimitsScreen: React.FC = () => {
   const styles = useStyles()
@@ -29,6 +37,20 @@ export const CardLimitsScreen: React.FC = () => {
   const { card, loading } = useCardData()
   const { handleUpdateDailyLimit, handleUpdateMonthlyLimit, updatingField } =
     useCardLimits(card?.id ?? "")
+  const {
+    atmDailyLimitCents,
+    atmMonthlyLimitCents,
+    isAtmEnabled,
+    hasAtmControls,
+    isAtmControlsLoading,
+    hasAtmControlsFailed,
+    retryAtmControls,
+    updatingAtmLimit,
+    isTogglingAtm,
+    handleUpdateAtmDailyLimit,
+    handleUpdateAtmMonthlyLimit,
+    handleToggleAtm,
+  } = useCardAtmControls(card?.id ?? "")
 
   const { formatAmount } = createCurrencyFormatters(currencySymbol)
 
@@ -44,7 +66,7 @@ export const CardLimitsScreen: React.FC = () => {
         <ActivityIndicator
           testID="activity-indicator"
           style={styles.loader}
-          color={colors.primary}
+          color={colors.accent}
         />
       </Screen>
     )
@@ -54,6 +76,26 @@ export const CardLimitsScreen: React.FC = () => {
     cents === null
       ? LL.CardFlow.CardLimits.noLimit()
       : formatAmount(toMajorUnit(cents).toString())
+
+  /** An ATM limit is optional, so an empty field keeps its "No limit" placeholder
+   *  instead of being formatted as a zero amount. */
+  const formatAtmLimit = (value: string) => (value ? formatAmount(value) : value)
+
+  /** Compared as the parsed amount, so a value typed with a comma that matches the saved
+   *  limit is not sent again. An emptied field reads as zero, as it always has, so leaving
+   *  it empty where no limit is set changes nothing. */
+  const isSpendingLimitUnchanged = (
+    value: string,
+    savedCents: number | null | undefined,
+  ) => {
+    const isBlank = value.trim() === ""
+    const typedCents = isBlank ? 0 : parseDollarsToCents(value)
+    return typedCents === (savedCents ?? 0)
+  }
+
+  const isSavingAtmLimit = updatingAtmLimit !== null
+  const isSavingAtmDailyLimit = updatingAtmLimit === SpendingPeriod.Daily
+  const isSavingAtmMonthlyLimit = updatingAtmLimit === SpendingPeriod.Monthly
 
   return (
     <Screen preset="scroll">
@@ -95,7 +137,7 @@ export const CardLimitsScreen: React.FC = () => {
             keyboardType="decimal-pad"
             formatDisplay={formatAmount}
             onBlur={(value) => {
-              if (Number(value) !== toMajorUnit(card.dailyLimitCents ?? 0))
+              if (!isSpendingLimitUnchanged(value, card.dailyLimitCents))
                 handleUpdateDailyLimit(value)
             }}
             loading={updatingField === LimitField.Daily}
@@ -110,7 +152,7 @@ export const CardLimitsScreen: React.FC = () => {
             keyboardType="decimal-pad"
             formatDisplay={formatAmount}
             onBlur={(value) => {
-              if (Number(value) !== toMajorUnit(card.monthlyLimitCents ?? 0))
+              if (!isSpendingLimitUnchanged(value, card.monthlyLimitCents))
                 handleUpdateMonthlyLimit(value)
             }}
             loading={updatingField === LimitField.Monthly}
@@ -118,24 +160,69 @@ export const CardLimitsScreen: React.FC = () => {
           />
         </View>
 
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            {LL.CardFlow.CardLimits.atmLimitsTitle()}
+          </Text>
+          {/* The ATM controls load on their own, so the spending limits above stay
+              usable while they load or after they fail. */}
+          {isAtmControlsLoading && (
+            <ActivityIndicator testID="atm-controls-loading" color={colors.accent} />
+          )}
+          {hasAtmControlsFailed && (
+            <View style={styles.atmControlsFailure}>
+              <GaloyErrorBox
+                errorMessage={LL.CardFlow.CardLimits.atmControlsLoadError()}
+              />
+              <GaloyPrimaryButton
+                title={LL.common.tryAgain()}
+                onPress={retryAtmControls}
+              />
+            </View>
+          )}
+          {hasAtmControls && (
+            <>
+              <View style={styles.atmSwitchCard}>
+                <SwitchRow
+                  title={LL.CardFlow.CardLimits.TransactionTypes.atm()}
+                  description={LL.CardFlow.CardLimits.TransactionTypes.atmDescription()}
+                  value={isAtmEnabled}
+                  onValueChange={handleToggleAtm}
+                  disabled={isTogglingAtm}
+                />
+              </View>
+              <InputField
+                testID="atm-daily-limit-input"
+                label={LL.CardFlow.CardLimits.dailyAtmLimit()}
+                value={toAtmLimitValue(atmDailyLimitCents)}
+                placeholder={LL.CardFlow.CardLimits.noLimit()}
+                helperText={LL.CardFlow.CardLimits.dailyAtmLimitHelper()}
+                size="large"
+                keyboardType="decimal-pad"
+                formatDisplay={formatAtmLimit}
+                onBlur={handleUpdateAtmDailyLimit}
+                loading={isSavingAtmDailyLimit}
+                disabled={isSavingAtmLimit}
+              />
+              <InputField
+                testID="atm-monthly-limit-input"
+                label={LL.CardFlow.CardLimits.monthlyAtmLimit()}
+                value={toAtmLimitValue(atmMonthlyLimitCents)}
+                placeholder={LL.CardFlow.CardLimits.noLimit()}
+                helperText={LL.CardFlow.CardLimits.monthlyAtmLimitHelper()}
+                size="large"
+                keyboardType="decimal-pad"
+                formatDisplay={formatAtmLimit}
+                onBlur={handleUpdateAtmMonthlyLimit}
+                loading={isSavingAtmMonthlyLimit}
+                disabled={isSavingAtmLimit}
+              />
+            </>
+          )}
+        </View>
+
         <View pointerEvents="none" style={styles.disabledSection}>
           <Text style={styles.comingSoonBadge}>{LL.common.soon()}</Text>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              {LL.CardFlow.CardLimits.atmLimitsTitle()}
-            </Text>
-            <InputField
-              label={LL.CardFlow.CardLimits.dailyAtmLimit()}
-              value=""
-              helperText={LL.CardFlow.CardLimits.dailyAtmLimitHelper()}
-            />
-            <InputField
-              label={LL.CardFlow.CardLimits.monthlyAtmLimit()}
-              value=""
-              helperText={LL.CardFlow.CardLimits.monthlyAtmLimitHelper()}
-            />
-          </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>
@@ -149,12 +236,6 @@ export const CardLimitsScreen: React.FC = () => {
                   <SwitchRow
                     title={LL.CardFlow.CardLimits.TransactionTypes.ecommerce()}
                     description={LL.CardFlow.CardLimits.TransactionTypes.ecommerceDescription()}
-                  />
-                ),
-                () => (
-                  <SwitchRow
-                    title={LL.CardFlow.CardLimits.TransactionTypes.atm()}
-                    description={LL.CardFlow.CardLimits.TransactionTypes.atmDescription()}
                   />
                 ),
                 () => (
@@ -183,25 +264,25 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 20,
   },
   sectionTitle: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 16,
     fontWeight: "700",
     lineHeight: 24,
   },
   currentLimitsTitle: {
-    color: colors.black,
+    color: colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
     fontWeight: "400",
   },
   currentLimitsCard: {
     flexDirection: "row",
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
+    ...staticSurface(colors),
+    borderRadius: radius.default,
     minHeight: 80,
     paddingVertical: 18,
     paddingHorizontal: 10,
-    marginTop: 3,
+    marginTop: groupTitleGap,
   },
   currentLimitColumn: {
     flex: 1,
@@ -209,13 +290,13 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
   },
   currentLimitValue: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 20,
     fontWeight: "700",
     lineHeight: 24,
   },
   currentLimitLabel: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
     lineHeight: 16,
     marginTop: 5,
@@ -225,7 +306,7 @@ const useStyles = makeStyles(({ colors }) => ({
     opacity: 0.4,
   },
   comingSoonBadge: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 18,
     fontWeight: "700",
     lineHeight: 24,
@@ -233,7 +314,15 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   settingsGroupContainer: {
     marginTop: 0,
-    borderRadius: 8,
+    borderRadius: radius.default,
+  },
+  atmControlsFailure: {
+    gap: 10,
+  },
+  atmSwitchCard: {
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
+    overflow: "hidden",
   },
   dividerStyle: {
     marginHorizontal: 22,

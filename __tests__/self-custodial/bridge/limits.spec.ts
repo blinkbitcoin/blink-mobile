@@ -6,6 +6,7 @@ const mockRequireTokenId = jest.fn(() => "usdb-token-id")
 jest.mock("@app/self-custodial/config", () => ({
   SparkConfig: {},
   requireSparkTokenIdentifier: () => mockRequireTokenId(),
+  sparkTokenIdentifier: () => mockRequireTokenId(),
 }))
 
 const mockGetInfo = jest.fn().mockResolvedValue({

@@ -3,6 +3,7 @@ import { Animated, View, type ViewStyle } from "react-native"
 
 import { makeStyles } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { CheckboxRow } from "@app/components/checkbox-row"
 
 const REVEAL_DURATION_MS = 300
@@ -87,8 +88,8 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingTop: 20,
   },
   card: {
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     paddingVertical: 10,
     paddingHorizontal: 14,
   },

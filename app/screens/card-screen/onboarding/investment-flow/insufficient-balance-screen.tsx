@@ -121,7 +121,7 @@ export const InsufficientBalanceScreen: React.FC = () => {
     <Screen headerShown={false}>
       <CloseHeader testID="insufficient-balance-close" />
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <IconHero icon="info" iconColor={colors.primary} title={shortfall.title} />
+        <IconHero icon="info" iconColor={colors.accent} title={shortfall.title} />
 
         {/* Until the price feed answers the balance reads as zero, and the figures
             would say the investor holds nothing and owes it all; the spinner stands in
@@ -130,7 +130,7 @@ export const InsufficientBalanceScreen: React.FC = () => {
           {isLoading ? (
             <ActivityIndicator
               size="large"
-              color={colors.primary}
+              color={colors.accent}
               testID="insufficient-balance-loading"
             />
           ) : (

@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Pressable, StyleSheet, TextInput, View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -107,7 +108,7 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
                   pressed && styles.toggleButtonPressed,
                 ]}
               >
-                <GaloyIcon name="transfer" size={34} color={theme.colors.primary} />
+                <GaloyIcon name="transfer" size={34} color={theme.colors.accent} />
               </Pressable>
             </View>
           </>
@@ -148,8 +149,8 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 14,
   },
   currencyInputGroup: {
-    backgroundColor: colors.grey5,
-    borderRadius: 12,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     borderWidth: 1,
     borderColor: "transparent",
   },
@@ -164,21 +165,21 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 12,
   },
   primaryRowBg: {
-    backgroundColor: colors.grey6,
+    backgroundColor: colors.surfacePressed,
   },
   singleRow: {
-    borderRadius: 12,
+    borderRadius: radius.default,
     paddingVertical: 15,
   },
   topRow: {
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    borderTopLeftRadius: radius.default,
+    borderTopRightRadius: radius.default,
     paddingTop: 15,
     paddingBottom: 27,
   },
   bottomRow: {
-    borderBottomLeftRadius: 12,
-    borderBottomRightRadius: 12,
+    borderBottomLeftRadius: radius.default,
+    borderBottomRightRadius: radius.default,
     paddingTop: 27,
     paddingBottom: 15,
   },
@@ -195,7 +196,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -211,7 +212,7 @@ const useStyles = makeStyles(({ colors }) => ({
     fontWeight: "700",
     lineHeight: 24,
     textAlign: "right",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   hiddenInput: {
     ...StyleSheet.absoluteFill,

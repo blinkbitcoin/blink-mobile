@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { Pressable, StyleProp, TextStyle, View, ViewStyle } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
 const ICON_SIZE = 16
@@ -46,7 +47,7 @@ export const SettingItemRow: React.FC<SettingItemRowProps> = ({
     theme: { colors },
   } = useTheme()
 
-  const iconColor = leftIconColor ?? colors.black
+  const iconColor = leftIconColor ?? colors.textOnBackground
 
   const renderLeftIcon = () => {
     if (leftIcon) {
@@ -66,7 +67,7 @@ export const SettingItemRow: React.FC<SettingItemRowProps> = ({
         <GaloyIcon
           name={rightIcon}
           size={ICON_SIZE}
-          color={rightIconColor ?? colors.primary}
+          color={rightIconColor ?? colors.accent}
         />
       )}
     </>
@@ -91,14 +92,14 @@ export const SettingItemRow: React.FC<SettingItemRowProps> = ({
 }
 
 const useStyles = makeStyles(({ colors }, { hovering, hasSubtitle }: StyleProps) => {
-  const baseBackground = hasSubtitle ? colors.grey5 : colors.transparent
+  const baseBackground = hasSubtitle ? colors.surfaceInteractive : colors.transparent
 
   return {
     container: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: hovering ? colors.grey4 : baseBackground,
-      borderRadius: hasSubtitle ? 8 : 0,
+      backgroundColor: hovering ? colors.neutral : baseBackground,
+      borderRadius: hasSubtitle ? radius.default : 0,
       paddingVertical: 14,
       paddingLeft: 14,
       paddingRight: 10,
@@ -108,14 +109,14 @@ const useStyles = makeStyles(({ colors }, { hovering, hasSubtitle }: StyleProps)
       flex: 1,
     },
     title: {
-      color: colors.black,
+      color: colors.textOnBackground,
       fontFamily: "Source Sans Pro",
       fontSize: 14,
       fontWeight: "400",
       lineHeight: 20,
     },
     subtitle: {
-      color: colors.grey2,
+      color: colors.textMuted,
       fontFamily: "Source Sans Pro",
       fontSize: 14,
       fontWeight: "400",

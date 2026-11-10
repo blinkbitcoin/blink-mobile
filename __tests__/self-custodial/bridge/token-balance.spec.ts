@@ -11,9 +11,10 @@ jest.mock("@react-native-firebase/crashlytics", () => ({
   default: () => ({ recordError: mockRecordError, log: mockLog }),
 }))
 
+let mockTokenIdentifier: string | null = "test-token-id"
 jest.mock("@app/self-custodial/config", () => ({
   SparkConfig: {},
-  requireSparkTokenIdentifier: () => "test-token-id",
+  sparkTokenIdentifier: () => mockTokenIdentifier,
   SparkToken: { DefaultDecimals: 6, Label: "USDB", Ticker: "USDB" },
 }))
 
@@ -133,6 +134,27 @@ describe("token-balance crashlytics reporting", () => {
   beforeEach(() => {
     mockRecordError.mockClear()
     mockLog.mockClear()
+    mockTokenIdentifier = "test-token-id"
+  })
+
+  /** The breadcrumb above is for a wallet that never held the token; a network with no
+   *  token has nothing to hold, so finding none there is not worth a line. */
+  it("finds no token and leaves no breadcrumb on a network with none configured", async () => {
+    mockTokenIdentifier = null
+    const fresh = loadFreshModule()
+    const sdk = {
+      getInfo: jest.fn().mockResolvedValue({
+        tokenBalances: { "test-token-id": usdbToken, "other-token": otherToken },
+      }),
+    } as never
+
+    await expect(fresh.fetchUsdbDecimals(sdk)).resolves.toBe(6)
+    expect(
+      fresh.findUsdbToken({ tokenBalances: { "other-token": otherToken } } as never),
+    ).toBeUndefined()
+
+    expect(mockLog).not.toHaveBeenCalled()
+    expect(mockRecordError).not.toHaveBeenCalled()
   })
 
   it("leaves an expected breadcrumb when the token is missing (fresh wallet), never a non-fatal", () => {

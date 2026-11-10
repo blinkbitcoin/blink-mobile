@@ -245,7 +245,9 @@ describe("createSelfCustodialLightningPaymentDetails", () => {
 
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ amount: BigInt(3065) }),
-      expect.any(Object),
+      expect.objectContaining({
+        telemetry: { rail: "bolt11", sendingWallet: WalletCurrency.Usd },
+      }),
     )
   })
 
@@ -262,7 +264,9 @@ describe("createSelfCustodialLightningPaymentDetails", () => {
 
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ amount: BigInt(12345) }),
-      expect.any(Object),
+      expect.objectContaining({
+        telemetry: { rail: "bolt11", sendingWallet: WalletCurrency.Btc },
+      }),
     )
   })
 
@@ -293,5 +297,47 @@ describe("createSelfCustodialLightningPaymentDetails", () => {
 
     const prepareParams = mockCreateSendMutation.mock.calls[0][0]
     expect(prepareParams.conversionOptions).toBeUndefined()
+  })
+
+  describe("with a fixed invoice", () => {
+    const btcAmount = (amount: number) => ({
+      amount,
+      currency: WalletCurrency.Btc,
+      currencyCode: WalletCurrency.Btc,
+    })
+
+    it("leaves the amount to the invoice for both the fee quote and the send", () => {
+      createSelfCustodialLightningPaymentDetails(
+        createParams({
+          unitOfAccountAmount: btcAmount(1268),
+          hasAmount: true,
+          convertMoneyAmount: jest.fn((amount) => amount),
+        }),
+      )
+
+      expect(mockCreateGetFee.mock.calls[0][0].amount).toBeUndefined()
+      expect(mockCreateSendMutation.mock.calls[0][0].amount).toBeUndefined()
+    })
+
+    it("leaves the amount to the invoice when a USD wallet pays it", () => {
+      const convertMoneyAmount = jest.fn((amount, target) =>
+        target === WalletCurrency.Usd
+          ? { amount: 127, currency: target, currencyCode: target }
+          : amount,
+      )
+
+      createSelfCustodialLightningPaymentDetails(
+        createParams({
+          unitOfAccountAmount: btcAmount(1268),
+          hasAmount: true,
+          sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
+          convertMoneyAmount,
+        }),
+      )
+
+      const prepareParams = mockCreateSendMutation.mock.calls[0][0]
+      expect(prepareParams.amount).toBeUndefined()
+      expect(prepareParams.conversionOptions).toBeDefined()
+    })
   })
 })

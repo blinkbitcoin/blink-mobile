@@ -3,6 +3,10 @@ export const SetUsernameError = {
   TOO_LONG: "TOO_LONG",
   INVALID_CHARACTER: "INVALID_CHARACTER",
   ADDRESS_UNAVAILABLE: "ADDRESS_UNAVAILABLE",
+  /** The address server could not be reached. Distinct from ADDRESS_UNAVAILABLE, which
+   *  says the name is taken: telling a user their chosen name is gone when the server
+   *  merely did not answer sends them off to pick a different one for nothing. */
+  SERVER_UNREACHABLE: "SERVER_UNREACHABLE",
   UNKNOWN_ERROR: "UNKNOWN_ERROR",
   BACKUP_REQUIRED: "BACKUP_REQUIRED",
 } as const

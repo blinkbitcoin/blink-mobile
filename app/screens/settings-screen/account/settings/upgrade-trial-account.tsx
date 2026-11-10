@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from "react"
+import React, { useRef, useState, useCallback } from "react"
 import { View } from "react-native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -70,7 +70,7 @@ export const UpgradeTrialAccount: React.FC = () => {
 const useStyles = makeStyles(({ colors }) => ({
   container: {
     borderRadius: 20,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     padding: 16,
     display: "flex",
     flexDirection: "column",

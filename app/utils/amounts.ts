@@ -17,17 +17,23 @@ type FormatUsdInDisplayDeps = {
   ) => MoneyAmount<WalletOrDisplayCurrency>
 }
 
-// Formats a USD-cents amount in the user's display currency. When the
-// price-conversion is not yet available, falls back to formatting the raw
-// USD amount so the UI never blocks on price loading.
+/**
+ * Formats a USD-cents amount in the user's display currency, or as the raw USD amount
+ * when it cannot be converted, so the UI never blocks on price loading. That covers a
+ * converter that has not loaded and one that has no dollar rate, which is what the
+ * sats-only converter answers with: a `NaN` formats as an empty string, and these are
+ * confirmation surfaces where a blank amount reads as nothing being at stake.
+ */
 export const formatUsdInDisplay = (
   usdCents: number,
   { formatMoneyAmount, convertMoneyAmount }: FormatUsdInDisplayDeps,
 ): string => {
   const usdAmount = toUsdMoneyAmount(usdCents)
-  if (!convertMoneyAmount) return formatMoneyAmount({ moneyAmount: usdAmount })
+  const displayAmount = convertMoneyAmount?.(usdAmount, DisplayCurrency)
+  const isDisplayAmountKnown =
+    displayAmount !== undefined && Number.isFinite(displayAmount.amount)
   return formatMoneyAmount({
-    moneyAmount: convertMoneyAmount(usdAmount, DisplayCurrency),
+    moneyAmount: isDisplayAmountKnown ? displayAmount : usdAmount,
   })
 }
 

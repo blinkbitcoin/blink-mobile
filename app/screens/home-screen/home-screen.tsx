@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { RefreshControl, View, Alert, Pressable } from "react-native"
 import { gql } from "@apollo/client"
 import Modal from "react-native-modal"
@@ -8,12 +8,17 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { ScrollView, TouchableWithoutFeedback } from "react-native-gesture-handler"
 
+import { radius } from "@app/rne-theme/radius"
 import { AppUpdate } from "@app/components/app-update/app-update"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyIcon, icons } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { DisabledFeature } from "@app/components/disabled-feature"
+import {
+  HEADER_ICON_BUTTON_TOUCH_PADDING,
+  headerIconButtonTouchPaddingAbove,
+} from "@app/components/header-no-glass"
 import { BulletinsCard } from "@app/components/notifications/bulletins"
 import { SetDefaultAccountModal } from "@app/components/set-default-account-modal"
 import { StableSatsModal } from "@app/components/stablesats-modal"
@@ -27,7 +32,8 @@ import {
 } from "@app/components/balance-header"
 import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { usePriceConversion } from "@app/hooks/use-price-conversion"
+import { CARD, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { StableTokenConvertToBtcModal } from "@app/screens/conversion-flow/stable-token-convert-to-btc-modal"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import SlideUpHandle from "@app/components/slide-up-handle"
@@ -43,12 +49,16 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
 import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
 import { SelfCustodialInfoBulletin } from "@app/components/self-custodial-info-bulletin"
+import { TwoFactorNudgeCard } from "@app/custodial/components/two-factor-nudge-card"
+import { TwoFactorReminderBulletin } from "@app/custodial/components/two-factor-reminder-bulletin"
+import { TwoFactorSessionModal } from "@app/custodial/components/two-factor-session-modal"
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { NetworkStatusBanner } from "@app/components/network-status-banner"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
 import {
   useDollarBalanceGate,
@@ -72,18 +82,27 @@ import {
 } from "@app/self-custodial/hooks"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { ConvertDirection, DepositStatus } from "@app/types/payment"
+import { TwoFactorPrompt } from "@app/types/two-factor-enforcement"
 import { useBackupNudgeState } from "@app/self-custodial/hooks/use-backup-nudge-state"
 import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
+import { StaleCloudBundleBulletin } from "@app/self-custodial/components/stale-cloud-bundle-bulletin"
+import { useStaleCloudBundleBulletin } from "@app/self-custodial/hooks/use-stale-cloud-bundle-bulletin"
+import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
+import { useTwoFactorSessionPrompt } from "@app/screens/home-screen/hooks/use-two-factor-session-prompt"
 import { getErrorMessages } from "@app/graphql/utils"
-import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
-import { useCardData } from "@app/screens/card-screen/hooks/use-card-data"
+import { AccountBalance, getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { isCardUsable } from "@app/screens/card-screen/utils/card-display"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
 import { extractLightningAddressUsername } from "@app/utils/pay-links"
-import { useAppConfig, useAutoShowUpgradeModal } from "@app/hooks"
+import {
+  useAppConfig,
+  useAutoShowUpgradeModal,
+  useCardBalance,
+  useCardData,
+} from "@app/hooks"
 import {
   AccountLevel,
   useBulletinsQuery,
@@ -243,6 +262,17 @@ export const HomeScreen: React.FC = () => {
     shouldShow: shouldShowSelfCustodialInfoBulletin,
     dismiss: dismissSelfCustodialInfoBulletin,
   } = useSelfCustodialInfoBulletinState()
+  const {
+    shouldShow: shouldShowStaleCloudBundleBulletin,
+    dismiss: dismissStaleCloudBundleBulletin,
+  } = useStaleCloudBundleBulletin()
+  const {
+    shouldShowNudgeCard: shouldShowTwoFactorNudgeCard,
+    reminderBulletinReason: twoFactorReminderReason,
+    remainingDismissals: twoFactorRemainingDismissals,
+    isSessionStartPending: isTwoFactorStartPending,
+    registerDismissal: registerTwoFactorDismissal,
+  } = useTwoFactorEnforcement()
   const { LL } = useI18nContext()
   const {
     appConfig: {
@@ -333,31 +363,71 @@ export const HomeScreen: React.FC = () => {
   /**
    * TODO(card): `cards` on ConsumerAccount only exists on the staging backend
    * today, so gate the home card row to staging until the card service ships to
-   * every instance; then drop `isCardBackendAvailable` and query unconditionally.
+   * every instance; then drop `isCardBackendAvailable` from the gate below.
    * Ref PR #3899.
    */
   const isCardBackendAvailable = galoyInstanceId === "Staging"
-  const { card: homeCard } = useCardData({ skip: !isCardBackendAvailable })
-  const hasCard = homeCard !== undefined && isCardUsable(homeCard.status)
-  const cardLastFour = homeCard?.lastFour
+  /** The card belongs to the custodial account, so a self-custodial session leaves it
+   *  out like the other custodial queries above, rather than adding another account's
+   *  card to its own total. */
+  const isCardQueryEnabled = isCardBackendAvailable && !isSelfCustodial
+  const {
+    card: homeCard,
+    hasLoaded: hasCardDataLoaded,
+    loading: cardDataLoading,
+    error: cardDataError,
+    refetch: refetchCardData,
+  } = useCardData({ skip: !isCardQueryEnabled })
+  const showCardRow = homeCard !== undefined && isCardUsable(homeCard.status)
+  const {
+    availableSats: cardBalanceSats,
+    error: cardBalanceError,
+    refetch: refetchCardBalance,
+  } = useCardBalance(showCardRow ? homeCard?.id : undefined)
+  /** A card lookup that has not answered yet or failed before answering, or a card whose
+   *  balance has not arrived or failed to, holds the total back: summing the wallets
+   *  alone would show an understated total as if it were the real one. */
+  const hasCardDataError = cardDataError !== undefined
+  const isCardUnknown = !hasCardDataLoaded && (cardDataLoading || hasCardDataError)
+  const isCardBalanceUnknown = showCardRow && cardBalanceSats === undefined
+  const cardDataFailure = isCardUnknown ? cardDataError : undefined
+  const cardBalanceFailure = isCardBalanceUnknown ? cardBalanceError : undefined
+  const homeErrorMessage = error && getErrorMessages(error)
+  const cardFailure = cardDataFailure ?? cardBalanceFailure
+  const cardFailureMessage = cardFailure && getErrorMessages(cardFailure)
+  /** Offline the home and card queries fail with the same message: show it once. */
+  const isCardFailureRepeated = cardFailureMessage === homeErrorMessage
+  const shownCardFailureMessage = isCardFailureRepeated ? undefined : cardFailureMessage
+
+  const accountBalances: AccountBalance[] = [...(wallets ?? [])]
+  if (showCardRow && homeCard) {
+    accountBalances.push({
+      id: homeCard.id,
+      walletCurrency: CARD,
+      balance: cardBalanceSats,
+    })
+  }
 
   const {
     formattedBalance: defaultFormattedBalance,
     satsBalance,
     isLoading: balanceConversionLoading,
-  } = useTotalBalance(wallets)
+  } = useTotalBalance(accountBalances)
 
   const loading = queryLoading || balanceConversionLoading
+  const isTotalBalanceLoading = loading || isCardUnknown || isCardBalanceUnknown
 
   const showStableBalanceToggle =
     stableBalanceEnabled && isSelfCustodial && isStableBalanceActive
 
   const { formatMoneyAmount } = useDisplayCurrency()
+  const { isSatsOnly } = usePriceConversion()
 
-  const formattedBalance =
-    showStableBalanceToggle && balanceMode === BalanceMode.Btc
-      ? formatMoneyAmount({ moneyAmount: toBtcMoneyAmount(satsBalance) })
-      : defaultFormattedBalance
+  const isShowingSats = showStableBalanceToggle && balanceMode === BalanceMode.Btc
+
+  const formattedBalance = isShowingSats
+    ? formatMoneyAmount({ moneyAmount: toBtcMoneyAmount(satsBalance) })
+    : defaultFormattedBalance
 
   const accountId = dataAuthed?.me?.defaultAccount?.id
   const levelAccount = dataAuthed?.me?.defaultAccount?.level
@@ -377,11 +447,12 @@ export const HomeScreen: React.FC = () => {
     deposits,
   })
   /** The banner below only counts actionable deposits, so the pending row
-   *  carries the immature deposits' inspection path (txid / mempool link) to
-   *  the unclaimed-deposits screen. Custodial pending receives have no such
-   *  screen — their row stays inert. */
+   *  carries the immature and claiming deposits' inspection path (txid /
+   *  mempool link) to the unclaimed-deposits screen. Custodial pending
+   *  receives have no such screen — their row stays inert. */
   const hasImmatureDeposits = deposits.some(
-    ({ status }) => status === DepositStatus.Immature,
+    ({ status }) =>
+      status === DepositStatus.Immature || status === DepositStatus.Claiming,
   )
   const openUnclaimedDeposits = React.useCallback(
     () => navigation.navigate("unclaimedDepositsScreen"),
@@ -552,8 +623,28 @@ export const HomeScreen: React.FC = () => {
     isRestrictedRegion ||
     isRestrictedRegionEvaluationPending ||
     modalVisible
+  /** The wind-down nudge outranks the two-factor session start: an account whose
+   *  custodial service is ending has one remedy that matters more than a second factor.
+   *  While the wind-down has not answered, the nudge may still turn out to be due, so
+   *  the session start waits for that answer too. */
+  const isTwoFactorPromptBlocked =
+    isAnotherHomeModalVisible || migrateNowPrompt.isVisible || migrateNowPrompt.isPending
+  const { isModalOpen: isTwoFactorModalOpen, promptTier: twoFactorPromptTier } =
+    useTwoFactorSessionPrompt({ isBlocked: isTwoFactorPromptBlocked })
+  /** The dismissal takes the session start, which is what brings the modal down. */
+  const dismissTwoFactorModal = useCallback(() => {
+    registerTwoFactorDismissal(twoFactorPromptTier, {
+      prompt: TwoFactorPrompt.SessionModal,
+    })
+  }, [registerTwoFactorDismissal, twoFactorPromptTier])
+  const isTwoFactorModalVisible = isTwoFactorModalOpen && isFocused
+  /** Only while the home is in front: a screen the two-factor prompt pushed must not
+   *  end up under this modal, and the modal comes back with the home. */
   const shouldShowMigrateNowPrompt =
-    migrateNowPrompt.isVisible && !isAnotherHomeModalVisible
+    migrateNowPrompt.isVisible &&
+    !isAnotherHomeModalVisible &&
+    !isTwoFactorModalOpen &&
+    isFocused
 
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const closeRestrictionModal = () => setIsRestrictionModalVisible(false)
@@ -566,6 +657,8 @@ export const HomeScreen: React.FC = () => {
    *  "the migrate-now nudge can surface", so a region-gated account with no wind-down, or
    *  one whose self-custodial stack is off, still gets the compliance explanation. */
   const onGatedDollarTap = () => {
+    /** Nothing the user can do opens it, and the row's label already says why. */
+    if (dollarBalanceGateReason === GateReason.Network) return
     if (isAnonMode) {
       promptEnhancedMode()
       return
@@ -590,6 +683,11 @@ export const HomeScreen: React.FC = () => {
    *  the effect re-arms its timer once the evaluation settles. */
   const triggerUpgradeModal = React.useCallback(() => {
     if (isRestrictedRegion || isRestrictedRegionEvaluationPending) return
+    /** The two-factor prompt goes first: its session start stays pending until its
+     *  modal is resolved, and the two would otherwise present as two native modals.
+     *  Being a dependency of the focus effect below, this re-arms the timer once the
+     *  start is taken, so the upgrade prompt gets its turn afterwards. */
+    if (isTwoFactorStartPending) return
     if (!accountId || levelAccount !== AccountLevel.Zero) return
     if (!canShowUpgradeModal || satsBalance <= balanceLimitToTriggerUpgradeModal) return
 
@@ -598,6 +696,7 @@ export const HomeScreen: React.FC = () => {
   }, [
     isRestrictedRegion,
     isRestrictedRegionEvaluationPending,
+    isTwoFactorStartPending,
     accountId,
     levelAccount,
     canShowUpgradeModal,
@@ -606,6 +705,17 @@ export const HomeScreen: React.FC = () => {
     markShownUpgradeModal,
     openUpgradeModal,
   ])
+
+  /** Gated like the card queries themselves: off Staging or in a self-custodial session
+   *  there is no card to ask for, and without a usable card there is no balance. */
+  const refetchCard = React.useCallback(async () => {
+    if (!isCardQueryEnabled) return
+    const cardRefetches: Promise<unknown>[] = [refetchCardData()]
+    if (showCardRow) cardRefetches.push(refetchCardBalance())
+    /** Settled rather than all: a failure already shows through the card hooks' error,
+     *  and must neither retract the spinner early nor cut the rest of the pull short. */
+    await Promise.allSettled(cardRefetches)
+  }, [isCardQueryEnabled, showCardRow, refetchCardData, refetchCardBalance])
 
   const refetch = React.useCallback(async () => {
     if (isSelfCustodial) {
@@ -628,6 +738,7 @@ export const HomeScreen: React.FC = () => {
       refetchAuthed(),
       refetchUnauthed(),
       refetchBulletins(),
+      refetchCard(),
     ])
     // Triggers the upgrade trial account modal after refetch
     triggerUpgradeModal()
@@ -638,6 +749,7 @@ export const HomeScreen: React.FC = () => {
     refetchPendingDeposits,
     refetchAuthed,
     refetchBulletins,
+    refetchCard,
     refetchCustodialRestrictions,
     refetchRealtimePrice,
     refetchUnauthed,
@@ -804,7 +916,12 @@ export const HomeScreen: React.FC = () => {
         </TouchableWithoutFeedback>
       </View>
       <View style={styles.viewModal}>
-        <GaloyIcon name="minus" size={64} color={colors.grey3} style={styles.icon} />
+        <GaloyIcon
+          name="minus"
+          size={64}
+          color={colors.textDisabled}
+          style={styles.icon}
+        />
         <Text type="h1">{LL.common.needWallet()}</Text>
         <View style={styles.openWalletContainer}>
           <GaloyPrimaryButton
@@ -874,8 +991,9 @@ export const HomeScreen: React.FC = () => {
             name="graph"
             iconOnly={true}
             weight="bold"
+            touchPadding={headerIconButtonTouchPaddingAbove}
           />
-          <View>
+          <View style={styles.headerTitle}>
             {!loading && usernameTitle && (
               <Pressable onPress={canSwitchAccount ? handleSwitchPress : null}>
                 <View style={styles.profileContainer}>
@@ -898,15 +1016,17 @@ export const HomeScreen: React.FC = () => {
             name="menu"
             iconOnly={true}
             weight="bold"
+            touchPadding={headerIconButtonTouchPaddingAbove}
           />
         </View>
       </View>
       <BalanceHeader
-        loading={loading}
+        loading={isTotalBalanceLoading}
         formattedBalance={formattedBalance}
         showStableBalanceToggle={showStableBalanceToggle}
         mode={balanceMode}
         onModeChange={toggleBalanceMode}
+        isSatsOnly={isSatsOnly}
       />
       <View style={styles.badgeSlot}>
         {badgeSlotContent === "unseen" ? (
@@ -934,8 +1054,8 @@ export const HomeScreen: React.FC = () => {
           <RefreshControl
             refreshing={isPullRefreshing}
             onRefresh={handlePullToRefresh}
-            colors={[colors.primary]}
-            tintColor={colors.primary}
+            colors={[colors.accent]}
+            tintColor={colors.accent}
           />
         }
       >
@@ -943,13 +1063,14 @@ export const HomeScreen: React.FC = () => {
           loading={loading}
           setIsStablesatModalVisible={setIsStablesatModalVisible}
           onGatedTap={onGatedDollarTap}
-          wallets={wallets}
-          hasCard={hasCard}
-          cardLastFour={cardLastFour}
+          accounts={accountBalances}
           showBtcNotification={isOutgoing ? false : hasUnseenBtcTx}
           showUsdNotification={isOutgoing ? false : hasUnseenUsdTx}
         />
-        {error && <GaloyErrorBox errorMessage={getErrorMessages(error)} />}
+        {homeErrorMessage && <GaloyErrorBox errorMessage={homeErrorMessage} />}
+        {shownCardFailureMessage && (
+          <GaloyErrorBox errorMessage={shownCardFailureMessage} />
+        )}
         <View style={styles.listItemsContainer}>
           {buttons.map((item) => (
             <React.Fragment key={item.icon}>
@@ -975,6 +1096,10 @@ export const HomeScreen: React.FC = () => {
         {isSelfCustodial && <UnclaimedDepositBanner deposits={deposits} />}
         <NetworkStatusBanner />
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
+        {shouldShowTwoFactorNudgeCard && <TwoFactorNudgeCard />}
+        {twoFactorReminderReason && (
+          <TwoFactorReminderBulletin reason={twoFactorReminderReason} />
+        )}
         {offboardBulletin.isVisible && <OffboardOnlyBulletin />}
         {reminderBulletin.isVisible && (
           <MigrationReminderBulletin
@@ -987,6 +1112,9 @@ export const HomeScreen: React.FC = () => {
         )}
         {shouldShowSelfCustodialInfoBulletin && (
           <SelfCustodialInfoBulletin onDismiss={dismissSelfCustodialInfoBulletin} />
+        )}
+        {shouldShowStaleCloudBundleBulletin && (
+          <StaleCloudBundleBulletin onDismiss={dismissStaleCloudBundleBulletin} />
         )}
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
         <AppUpdate />
@@ -1003,6 +1131,11 @@ export const HomeScreen: React.FC = () => {
         onAction={() => navigation.navigate("transactionHistory")}
       />
       <BackupNudgeModal isVisible={shouldShowModal && isFocused} onClose={dismissModal} />
+      <TwoFactorSessionModal
+        isVisible={isTwoFactorModalVisible}
+        remainingDismissals={twoFactorRemainingDismissals}
+        onDismiss={dismissTwoFactorModal}
+      />
     </Screen>
   )
 }
@@ -1016,8 +1149,9 @@ const useStyles = makeStyles(({ colors }) => ({
   listItemsContainer: {
     paddingHorizontal: 15,
     paddingVertical: 15,
-    borderRadius: 12,
-    backgroundColor: colors.grey5,
+    borderRadius: radius.default,
+    // The band itself isn't a press target; only the icon buttons on it are.
+    ...staticSurface(colors),
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -1044,7 +1178,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   viewModal: {
     alignItems: "center",
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     height: "30%",
     justifyContent: "flex-end",
     paddingHorizontal: 20,
@@ -1059,10 +1193,10 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
     alignItems: "center",
     columnGap: 10,
-    backgroundColor: colors.grey5,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
-    borderColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
+    borderTopLeftRadius: radius.default,
+    borderTopRightRadius: radius.default,
+    borderColor: colors.surfaceInteractive,
     borderBottomWidth: 2,
     paddingVertical: 14,
   },
@@ -1071,8 +1205,10 @@ const useStyles = makeStyles(({ colors }) => ({
     flexGrow: 1,
     alignItems: "center",
   },
+  // The price and menu touch boxes grow 7dp up and sideways into the row's margins (no
+  // room is free below them). The icons stay 13dp down (6 + 0 + 7) and the balance at 47dp.
   balanceContainer: {
-    marginTop: 7,
+    marginTop: 6,
     flexDirection: "column",
     minHeight: 40,
   },
@@ -1080,8 +1216,12 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginHorizontal: 20,
-    marginTop: 6,
+    marginHorizontal: 20 - HEADER_ICON_BUTTON_TOUCH_PADDING,
+    marginTop: 0,
+  },
+  // Matches the padding above the icons, so the username stays centred on them.
+  headerTitle: {
+    paddingTop: HEADER_ICON_BUTTON_TOUCH_PADDING,
   },
   error: {
     alignSelf: "center",
@@ -1095,7 +1235,7 @@ const useStyles = makeStyles(({ colors }) => ({
   actionsSeparator: {
     width: 1,
     alignSelf: "stretch",
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
   },
   badgeSlot: {
     // minHeight, not height: at 20pt x the 1.4 font cap the badge's line box

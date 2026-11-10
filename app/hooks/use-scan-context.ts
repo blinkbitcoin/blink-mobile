@@ -21,8 +21,13 @@ export const useScanContext = (): ScanContextAdapter => {
       galoyInstance: { lnAddressHostname },
     },
   } = useAppConfig()
-  const { data } = useScanningQrCodeScreenQuery({ skip: !isAuthed })
-  const { data: unauthedData } = useHomeUnauthedQuery({ fetchPolicy: "cache-first" })
+  const { data } = useScanningQrCodeScreenQuery({ skip: !isAuthed || isSelfCustodial })
+  /** The self-custodial branch below builds its context from the SDK's own network and
+   *  domains, so both queries would be fetched and discarded. */
+  const { data: unauthedData } = useHomeUnauthedQuery({
+    skip: isSelfCustodial,
+    fetchPolicy: "cache-first",
+  })
   const network = useSparkNetwork()
 
   return useMemo((): ScanContextAdapter => {

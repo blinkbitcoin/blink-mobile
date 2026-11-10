@@ -38,7 +38,7 @@ export const CloudBackupPicker: React.FC<Props> = ({ entries, onSelect }) => {
               bottomDivider
               containerStyle={[styles.listStyle, index === 0 && styles.firstItem]}
             >
-              <GaloyIcon name="key-outline" size={20} color={colors.grey1} />
+              <GaloyIcon name="key-outline" size={20} color={colors.textSecondary} />
               <ListItem.Content>
                 <ListItem.Title numberOfLines={1} ellipsizeMode="middle">
                   {hasLightningAddress ? lightningAddress : walletIdentifier}
@@ -70,14 +70,14 @@ export const CloudBackupPicker: React.FC<Props> = ({ entries, onSelect }) => {
 const useStyles = makeStyles(({ colors }) => ({
   listStyle: {
     borderBottomWidth: 2,
-    borderColor: colors.grey5,
-    backgroundColor: colors.white,
+    borderColor: colors.surfaceInteractive,
+    backgroundColor: colors.backgroundDefault,
   },
   firstItem: {
     borderTopWidth: 2,
-    borderColor: colors.grey5,
+    borderColor: colors.surfaceInteractive,
   },
   subtitle: {
-    color: colors.grey2,
+    color: colors.textMuted,
   },
 }))

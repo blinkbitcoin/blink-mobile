@@ -1,19 +1,17 @@
 import React, { ReactNode } from "react"
-import {
-  Platform,
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  DimensionValue,
-} from "react-native"
+import { View, TouchableOpacity, StyleSheet, DimensionValue } from "react-native"
 import { ScrollView } from "react-native-gesture-handler"
 import Modal from "react-native-modal"
 
 import { makeStyles, Text, TextProps, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
+import { testProps } from "@app/utils/testProps"
+
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { GaloyPrimaryButton } from "../atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "../atomic/galoy-secondary-button"
+import { fonts } from "@app/rne-theme/fonts"
 
 export type CustomModalProps = {
   isVisible: boolean
@@ -33,7 +31,11 @@ export type CustomModalProps = {
   secondaryButtonOnPress?: () => void
   secondaryButtonLoading?: boolean
   showCloseIconButton?: boolean
+  closeIconButtonAccessibilityLabel?: string
+  /** Also disables the close icon, so nothing can close the modal while this is false. */
   dismissable?: boolean
+  /** Once the modal is off the screen, for what must not run while it closes. */
+  onModalHide?: () => void
   minHeight?: DimensionValue
   titleMaxWidth?: DimensionValue
   titleTextAlignment?: "auto" | "center" | "left" | "right" | "justify"
@@ -62,7 +64,9 @@ const CustomModal: React.FC<CustomModalProps> = ({
   secondaryButtonOnPress,
   secondaryButtonLoading,
   showCloseIconButton = true,
+  closeIconButtonAccessibilityLabel,
   dismissable = true,
+  onModalHide,
   backgroundModalColor,
   titleFontSize,
 }) => {
@@ -84,11 +88,12 @@ const CustomModal: React.FC<CustomModalProps> = ({
     <Modal
       isVisible={isVisible}
       backdropOpacity={0.8}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       backdropTransitionOutTiming={0}
       avoidKeyboard={true}
       onBackdropPress={dismissable ? toggleModal : undefined}
       onBackButtonPress={dismissable ? toggleModal : undefined}
+      onModalHide={onModalHide}
     >
       <View style={styles.container}>
         <View style={styles.headerContainer}>
@@ -106,8 +111,16 @@ const CustomModal: React.FC<CustomModalProps> = ({
           )}
 
           {showCloseIconButton && (
-            <TouchableOpacity onPress={toggleModal}>
-              <GaloyIcon name="close" size={30} color={colors.grey0} />
+            <TouchableOpacity
+              onPress={toggleModal}
+              {...testProps("modal-close")}
+              disabled={!dismissable}
+              style={!dismissable && styles.closeIconButtonDisabled}
+              accessibilityRole="button"
+              accessibilityLabel={closeIconButtonAccessibilityLabel}
+              accessibilityState={{ disabled: !dismissable }}
+            >
+              <GaloyIcon name="close" size={30} color={colors.textPrimary} />
             </TouchableOpacity>
           )}
         </View>
@@ -168,10 +181,10 @@ type UseStylesProps = {
 
 const useStyles = makeStyles(({ colors }, props: UseStylesProps) => ({
   container: {
-    backgroundColor: props.backgroundModalColor ?? colors.grey5,
+    backgroundColor: props.backgroundModalColor ?? colors.surfaceInteractive,
     maxHeight: "95%",
     minHeight: props.minHeight || "auto",
-    borderRadius: 16,
+    borderRadius: radius.popup,
     padding: 20,
   },
   modalCard: {
@@ -190,11 +203,11 @@ const useStyles = makeStyles(({ colors }, props: UseStylesProps) => ({
   },
   modalTitleText: {
     fontSize: props.titleFontSize ?? 24,
-    fontWeight: Platform.OS === "ios" ? "600" : "700",
+    fontFamily: fonts.bold,
     lineHeight: 32,
     maxWidth: props.titleMaxWidth || "80%",
     textAlign: props.titleTextAlignment || "center",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   modalBodyContainer: {
     flex: 1,
@@ -223,6 +236,9 @@ const useStyles = makeStyles(({ colors }, props: UseStylesProps) => ({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+  closeIconButtonDisabled: {
+    opacity: 0.35,
   },
   headerTitle: {
     flexShrink: 1,

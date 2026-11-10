@@ -4,7 +4,7 @@ import { gql } from "@apollo/client"
 import { useCardUpdateLimitsMutation } from "@app/graphql/generated"
 import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { toMinorUnit } from "@app/utils/helper"
+import { parseDollarsToCents } from "@app/utils/helper"
 import { toastShow } from "@app/utils/toast"
 
 import type { LimitField } from "./types"
@@ -33,7 +33,11 @@ export const useCardLimits = (cardId: string) => {
         monthly: "monthlyLimitCents",
       }
 
-      const minorUnits = toMinorUnit(dollars)
+      const minorUnits = parseDollarsToCents(dollars)
+      if (minorUnits === null) {
+        toastShow({ message: LL.CardFlow.CardLimits.invalidLimitAmount(), LL })
+        return
+      }
       if (minorUnits <= 0) {
         toastShow({ message: LL.CardFlow.CardLimits.limitMustBePositive(), LL })
         return

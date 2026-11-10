@@ -44,6 +44,7 @@ jest.mock("@app/graphql/generated", () => ({
   useLnNoAmountInvoiceCreateMutation: () => [mockLnNoAmountInvoiceCreate],
   useLnUsdInvoiceCreateMutation: () => [mockLnUsdInvoiceCreate],
   useOnChainAddressCurrentMutation: () => [mockOnChainAddressCurrent],
+  useOnChainAddressCreateMutation: () => [jest.fn()],
 }))
 
 const mockUseLnUpdateHashPaid = jest.fn()

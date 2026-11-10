@@ -60,8 +60,8 @@ export const RestrictedRegionScreen: React.FC = () => {
             <GaloyIcon
               name="warning"
               size={32}
-              color={colors.primary}
-              backgroundColor={colors.grey5}
+              color={colors.accent}
+              backgroundColor={colors.surfaceInteractive}
               containerSize={44}
             />
             <View style={styles.heroText}>
@@ -130,7 +130,7 @@ const blockBackPress = () => {}
 const useStyles = makeStyles(({ colors }) => ({
   overlay: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
   },
   safeArea: {
     flex: 1,
@@ -152,12 +152,11 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   title: {
     textAlign: "center",
-    fontWeight: "700",
   },
   body: {
     lineHeight: 22,
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   balances: {
     alignSelf: "stretch",
@@ -171,14 +170,13 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   balanceLabel: {
     lineHeight: 20,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   balanceValue: {
     lineHeight: 20,
   },
   balanceValueBold: {
     lineHeight: 20,
-    fontWeight: "700",
   },
   spacer: {
     flex: 1,

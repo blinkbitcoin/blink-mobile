@@ -22,6 +22,7 @@ gql`
 `
 
 type CreateResult = {
+  id: string
   lastFour: string
   cardType: CardType
 }
@@ -65,6 +66,7 @@ export const useCreateCard = () => {
         }
 
         return {
+          id: data.cardCreate.id,
           lastFour: data.cardCreate.lastFour,
           cardType: data.cardCreate.cardType,
         }

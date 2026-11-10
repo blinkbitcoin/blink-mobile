@@ -43,7 +43,7 @@ export const Notification: React.FC<NotificationProps> = ({
   }, [acknowledgedAt, isAcknowledged])
 
   const iconName = toGaloyIconName(icon)
-  const iconColor = isAcknowledged ? colors.grey2 : colors.black
+  const iconColor = isAcknowledged ? colors.textMuted : colors.textOnBackground
 
   return (
     <TouchableWithoutFeedback
@@ -87,7 +87,7 @@ const useStyles = makeStyles(
     container: {
       padding: 10,
       borderBottomWidth: 1,
-      borderBottomColor: colors.grey5,
+      borderBottomColor: colors.surfaceInteractive,
       display: "flex",
       flexDirection: "row",
       columnGap: 12,
@@ -101,7 +101,7 @@ const useStyles = makeStyles(
       flex: 1,
     },
     text: {
-      color: isAcknowledged ? colors.grey2 : colors.black,
+      color: isAcknowledged ? colors.textMuted : colors.textOnBackground,
     },
   }),
 )

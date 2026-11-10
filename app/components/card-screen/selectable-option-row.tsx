@@ -46,7 +46,7 @@ export const SelectableOptionRow: React.FC<SelectableOptionRowProps> = ({
         valueColor={valueColor}
         highlighted={isSelected}
       >
-        <GaloyIcon name="caret-right" size={16} color={colors.primary} />
+        <GaloyIcon name="caret-right" size={16} color={colors.accent} />
       </OptionRow>
     </Pressable>
   )

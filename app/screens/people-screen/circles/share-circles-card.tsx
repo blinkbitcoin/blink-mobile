@@ -1,5 +1,6 @@
 import { View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { PressableCard } from "@app/components/pressable-card"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -30,10 +31,10 @@ export const ShareCircles = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     display: "flex",
     flexDirection: "row",
-    borderRadius: 12,
+    borderRadius: radius.default,
     padding: 12,
     columnGap: 4,
     alignItems: "center",

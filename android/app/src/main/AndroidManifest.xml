@@ -7,11 +7,22 @@
         <action android:name="android.intent.action.VIEW" />
         <data android:scheme="tg" />
       </intent>
+      <!-- Lets Navigate see whether Google Maps is installed; geo: otherwise. -->
+      <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="google.navigation" />
+      </intent>
     </queries>
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove" />
+    <!-- Firebase Analytics declares these for ad attribution and the advertising ID,
+         which Blink does not use. Without ACCESS_ADSERVICES_ATTRIBUTION, Analytics also
+         never reaches the ad services classes build.gradle excludes. -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION" tools:node="remove" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />

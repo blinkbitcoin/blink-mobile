@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {
   AesSuccessActionDataResult_Tags as AesResultTag,
   FeePolicy,
@@ -40,10 +41,12 @@ import {
   resolveSendTokenIdentifier,
   toSdkSendAmount,
 } from "../bridge"
+import { isOwnLnurlAddress } from "../config"
+import { ScEvent, ScRail } from "../measurement"
 import { classifySdkError } from "../sdk-error"
 
 import { htlcDetailsOf } from "./lost-send"
-import { feeFailure, runSelfCustodialSend } from "./send-helpers"
+import { feeFailure, runSelfCustodialSend, sendSettlement } from "./send-helpers"
 
 const SAT_TO_MILLISAT = BigInt(1000)
 
@@ -199,12 +202,15 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
   const isUsdSend = sendingWalletDescriptor.currency === WalletCurrency.Usd
   const payRequest = lnurlParamsToPayRequest(lnurlParams, lnurl)
 
+  // Only the note the user typed travels as the comment. The destination's description
+  // just prefills the note field, and the receiver shows the comment as the payer's note,
+  // so sending it back would greet them with their own "Pay to" text.
   // `commentAllowed` is a maximum length, not a flag. The note field accepts more
-  // characters than a destination typically allows, and since the note is now what fills
-  // the comment an over-long one would have the pay request rejected outright.
+  // characters than a destination typically allows, and an over-long comment would have
+  // the pay request rejected outright.
   const comment =
-    lnurlParams.commentAllowed && memo
-      ? memo.slice(0, lnurlParams.commentAllowed)
+    lnurlParams.commentAllowed && senderSpecifiedMemo
+      ? senderSpecifiedMemo.slice(0, lnurlParams.commentAllowed)
       : undefined
 
   const prepareOptions = {
@@ -221,6 +227,27 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
       : undefined,
     feePolicy: isUsdSend ? FeePolicy.FeesIncluded : undefined,
   }
+
+  /** LNURL sends report their own fine rail, split from plain BOLT11. */
+  const sendTelemetry = {
+    rail: ScRail.LnurlPay,
+    sending_wallet: sendingWalletDescriptor.currency,
+  }
+
+  /** A payment to one of our own addresses is the inviter side of an Enhanced referral,
+   *  reported with the settle and only if the payment settles; the join to the
+   *  recipient's account creation is the server's, keyed on the address it serves. */
+  const sendSettlementTelemetry = sendSettlement(
+    sendTelemetry,
+    isOwnLnurlAddress(destination)
+      ? [
+          {
+            event: ScEvent.BlinkPaymentSent,
+            params: { ...sendTelemetry, recipient_type: "blink_lightning_address" },
+          },
+        ]
+      : [],
+  )
 
   const sendFailure = (err: unknown) => ({
     status: PaymentSendResult.Failure,
@@ -277,6 +304,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
             sdk,
             idempotencyKeyRef,
             destination: lostAttemptsKey,
+            telemetry: { params: sendTelemetry, settlement: sendSettlementTelemetry },
             prepare: () => prepareLnurl(sdk, prepareOptions),
             identify: (prepared) => ({
               paymentHash: prepared.invoiceDetails.paymentHash,
@@ -297,7 +325,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
 
   // Both memos are overwritten because the LNURL description supplied by the destination
   // otherwise keeps winning the `memo` resolution above, leaving the note field frozen on
-  // the destination's own text and sending it as the comment. Mirrors the custodial LNURL
+  // the destination's own text. Mirrors the custodial LNURL
   // details in app/screens/send-bitcoin-screen/payment-details/lightning.ts.
   // Consequence, also intentional and shared with custodial: once the user edits the note
   // the destination description is gone, so clearing the field sends no comment at all
@@ -348,6 +376,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
   return {
     destination,
     memo,
+    comment,
     convertMoneyAmount,
     setConvertMoneyAmount,
     paymentType: PaymentType.Lnurl,

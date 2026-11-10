@@ -2,12 +2,15 @@ import React, { useCallback, useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { Screen } from "@app/components/screen"
 import { YearSelector } from "@app/components/year-selector"
 import { ContactSupportRow, InfoCard, StatementItem } from "@app/components/card-screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 import { useStatementsData } from "./hooks"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 export const CardStatementsScreen: React.FC = () => {
   const styles = useStyles()
@@ -51,7 +54,7 @@ export const CardStatementsScreen: React.FC = () => {
           <ActivityIndicator
             testID="activity-indicator"
             size="large"
-            color={colors.primary}
+            color={colors.accent}
           />
         </View>
       </Screen>
@@ -194,10 +197,10 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 20,
   },
   section: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   sectionLabel: {
-    color: colors.black,
+    color: colors.textSecondary,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
@@ -206,8 +209,8 @@ const useStyles = makeStyles(({ colors }) => ({
   currentStatementCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
+    ...staticSurface(colors),
+    borderRadius: radius.default,
     paddingHorizontal: 14,
     paddingVertical: 18,
     gap: 14,
@@ -217,17 +220,17 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
   },
   currentStatementLabel: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 12,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
     lineHeight: 18,
   },
   currentStatementValue: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 18,
     fontFamily: "Source Sans Pro",
-    fontWeight: "600",
+    fontWeight: "700",
     lineHeight: 24,
   },
   statementsContainer: {
@@ -235,6 +238,6 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   settingsGroupContainer: {
     marginTop: 0,
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
 }))

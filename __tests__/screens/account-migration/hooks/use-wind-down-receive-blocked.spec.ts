@@ -13,7 +13,10 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 let mockStatus: WindDownStatus | null = WindDownStatus.PreCutoff
 
 jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
-  useWindDownStatus: () => (mockStatus === null ? null : { status: mockStatus }),
+  useWindDownStatus: () => ({
+    windDown: mockStatus === null ? null : { status: mockStatus },
+    isPending: false,
+  }),
 }))
 
 describe("useWindDownReceiveBlocked", () => {

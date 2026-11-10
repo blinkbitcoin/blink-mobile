@@ -1,8 +1,10 @@
 import * as React from "react"
 import { View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { RestrictedRegionBody } from "./restricted-region-body"
@@ -22,22 +24,22 @@ export const RestrictedRegionBanner: React.FC = () => {
 const useStyles = makeStyles(({ colors }) => ({
   container: {
     borderWidth: 1,
-    borderColor: colors.primary,
-    borderRadius: 12,
-    backgroundColor: colors.grey5,
+    borderColor: colors.accent,
+    borderRadius: radius.default,
+    ...staticSurface(colors),
     padding: 14,
   },
   title: {
     fontSize: 14,
     fontWeight: "700",
     lineHeight: 20,
-    color: colors.primary,
+    color: colors.accent,
     marginBottom: 2,
   },
   body: {
     fontSize: 14,
     fontWeight: "400",
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

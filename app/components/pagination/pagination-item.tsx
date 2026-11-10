@@ -11,7 +11,7 @@ import { makeStyles } from "@rn-vui/themed"
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    backgroundColor: colors._white,
+    backgroundColor: colors.staticWhite,
     borderRadius: 50,
     overflow: "hidden",
   },

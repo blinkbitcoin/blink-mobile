@@ -5,6 +5,7 @@ import Modal from "react-native-modal"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
@@ -63,7 +64,7 @@ const CustodialStablesatsModal: React.FC<InternalProps> = ({
     <Modal
       isVisible={isVisible}
       backdropOpacity={0.8}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       onBackdropPress={toggleModal}
     >
       <View style={styles.modalCard}>
@@ -150,8 +151,8 @@ const useCustodialStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 12,
   },
   modalCard: {
-    backgroundColor: colors.grey5,
-    borderRadius: 16,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.popup,
     paddingVertical: 18,
   },
   cardTitleContainer: {
@@ -177,7 +178,7 @@ const useSelfCustodialStyles = makeStyles(({ colors }) => ({
   body: {
     fontSize: 16,
     lineHeight: 22,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
   },
   termsLink: {

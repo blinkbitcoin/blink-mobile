@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native"
 
 import type { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
-import { useDisplayCurrency } from "@app/hooks"
+import { useDisplayCurrency, usePriceConversion } from "@app/hooks"
 import {
   isAnnounceableTransaction,
   useAccountTransactions,
@@ -27,9 +27,20 @@ export const useUnseenTxAmountBadge = ({
 }: UnseenTxAmountBadgeParams) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { formatCurrency, formatMoneyAmount } = useDisplayCurrency()
+  const { convertMoneyAmount } = usePriceConversion()
   const { feeReimbursementMemo } = useRemoteConfig()
 
   const baseTransactions = useAccountTransactions({ isSelfCustodial, transactions })
+
+  /**
+   * A self-custodial amount is priced on this device with this same converter, so
+   * without one its transaction carries the raw wallet amount where the display
+   * amount belongs. An announcement keeps the text it was made with, so making it
+   * then would show that amount for the whole announcement. Waiting lets it go out
+   * in the display currency once the price is in. A custodial amount was priced by
+   * the server when it settled.
+   */
+  const isAwaitingPrice = isSelfCustodial && !convertMoneyAmount
 
   const latestUnseenTx = useMemo(() => {
     if (baseTransactions.length === 0) return
@@ -54,6 +65,7 @@ export const useUnseenTxAmountBadge = ({
 
   const unseenAmountText = useMemo(() => {
     if (!latestUnseenTx) return null
+    if (isAwaitingPrice) return null
 
     const {
       settlementDisplayAmount: displayAmount,
@@ -86,7 +98,7 @@ export const useUnseenTxAmountBadge = ({
     if (!formatted) return null
 
     return direction === TxDirection.Receive ? `+${formatted}` : formatted
-  }, [latestUnseenTx, formatCurrency, formatMoneyAmount])
+  }, [latestUnseenTx, isAwaitingPrice, formatCurrency, formatMoneyAmount])
 
   /** Takes the transaction to open rather than reading the newest unseen one: once a badge
    *  is announced its transaction is already marked seen, so by the time it can be pressed

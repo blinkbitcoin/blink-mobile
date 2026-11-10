@@ -2,7 +2,9 @@ import React from "react"
 import { View, TouchableOpacity } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 const PLACEHOLDER = "—"
 
@@ -11,6 +13,8 @@ type ActionFieldProps = {
   onAction?: () => void
   icon: IconNamesType
   label?: string
+  /** What pressing does, for screen readers; without it they read the shown value. */
+  accessibilityLabel?: string
   testID?: string
 }
 
@@ -19,6 +23,7 @@ export const ActionField: React.FC<ActionFieldProps> = ({
   onAction,
   icon,
   label,
+  accessibilityLabel,
   testID,
 }) => {
   const styles = useStyles()
@@ -27,7 +32,7 @@ export const ActionField: React.FC<ActionFieldProps> = ({
   } = useTheme()
 
   const hasValue = value !== null && value !== undefined && value !== PLACEHOLDER
-  const iconColor = hasValue ? colors.primary : colors.grey3
+  const iconColor = hasValue ? colors.accent : colors.textDisabled
 
   return (
     <View style={styles.container}>
@@ -37,6 +42,9 @@ export const ActionField: React.FC<ActionFieldProps> = ({
         disabled={!hasValue}
         style={styles.valueContainer}
         testID={testID}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
+        accessibilityState={{ disabled: !hasValue }}
       >
         <Text style={styles.value}>{value ?? PLACEHOLDER}</Text>
         <View style={styles.actionButton}>
@@ -49,10 +57,10 @@ export const ActionField: React.FC<ActionFieldProps> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   label: {
-    color: colors.black,
+    color: colors.textSecondary,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
@@ -62,13 +70,13 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     height: 50,
     paddingHorizontal: 10,
   },
   value: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 16,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",

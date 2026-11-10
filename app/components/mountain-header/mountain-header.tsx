@@ -13,7 +13,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   headerSection: {
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 16,
     paddingTop: 18,
   },
@@ -23,7 +23,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   titleSection: {
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 24,
     fontWeight: "bold",
     paddingTop: 6,

@@ -77,6 +77,8 @@ export type RestrictionVerdict =
  * that reads it as a restriction accuses a user nobody restricted.
  */
 export const GateReason = {
+  /** The network has no dollar token (Staging, unless the build names one). */
+  Network: "network",
   Anon: "anon",
   Region: "region",
   UnknownRegion: "unknownRegion",

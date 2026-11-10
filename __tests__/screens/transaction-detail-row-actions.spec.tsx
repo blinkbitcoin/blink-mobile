@@ -5,6 +5,8 @@ import { Linking } from "react-native"
 
 import { TransactionDetailScreen } from "@app/screens/transaction-detail-screen/transaction-detail-screen"
 
+import { surfaceColor } from "../helpers/surface-color"
+
 jest.mock("@rn-vui/themed", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockThemedText(),
 )
@@ -81,32 +83,9 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({ allTransactions: mockNoTransactions }),
 }))
 
-const LLText = () => ""
-jest.mock("@app/i18n/i18n-react", () => ({
-  useI18nContext: () => ({
-    LL: {
-      common: {
-        date: LLText,
-        fees: LLText,
-        description: LLText,
-        type: LLText,
-        preimageProofOfPayment: LLText,
-        paymentRequest: LLText,
-        hasBeenCopiedToClipboard: LLText,
-      },
-      TransactionDetailScreen: {
-        received: LLText,
-        sending: LLText,
-        spent: LLText,
-        paid: LLText,
-        receivingAccount: LLText,
-        sendingAccount: LLText,
-        txNotBroadcast: LLText,
-      },
-    },
-    locale: "en",
-  }),
-}))
+jest.mock("@app/i18n/i18n-react", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockI18n(),
+)
 
 const ONCHAIN_TX_HASH = "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"
 const SPARK_TX_ID = "0196fe12-7fca-7d55-8d9d-1af6f9f0e7b9"
@@ -236,6 +215,20 @@ describe("TransactionDetailScreen row icon actions", () => {
         LN_PAYMENT_REQUEST,
         TX_ID,
       ])
+    })
+  })
+
+  // A row with a copy or explorer icon is a press target, so it keeps the tappable
+  // surfaceInteractive; a row with nothing to press takes the surfaceStatic (blink-wip#1871).
+  describe("row surface", () => {
+    it("keeps the copy rows surfaceInteractive and paints a row without icons surfaceStatic", () => {
+      const { getAllByTestId, getByText } = renderScreenWithTx(
+        broadcastedOnChainTx(ONCHAIN_TX_HASH),
+      )
+
+      expect(surfaceColor(getByText("some description"))).toBe("#f5f5f5")
+      expect(surfaceColor(getAllByTestId("copy-paste")[0])).toBe("#f5f5f5")
+      expect(surfaceColor(getByText("OnChain"))).toBe("#f9f9f9")
     })
   })
 })

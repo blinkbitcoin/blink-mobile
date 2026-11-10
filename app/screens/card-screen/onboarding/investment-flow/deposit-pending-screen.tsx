@@ -27,10 +27,10 @@ export const DepositPendingScreen: React.FC = () => {
       <CloseHeader testID="deposit-pending-close" />
       <StatusScreenLayout
         icon="clock"
-        iconColor={colors.primary}
+        iconColor={colors.accent}
         iconSize={57}
         iconPadding={16}
-        iconBackgroundColor={colors.grey5}
+        iconBackgroundColor={colors.surfaceInteractive}
         footer={
           <GaloyPrimaryButton
             title={LL.CardFlow.Onboarding.DepositPending.buttonText()}
@@ -48,7 +48,7 @@ export const DepositPendingScreen: React.FC = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   message: {
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
   },
 }))

@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "@app/*": ["app/*"],
+      "@mocks/*": ["__mocks__/*"],
+      "@meawallet/react-native-mpp": [
+        "vendor/meawallet/react-native-mpp/lib/typescript/index.d.ts"
+      ]
+    }
+  },
+  "include": ["meawallet-mpp-contract.ts"]
+}

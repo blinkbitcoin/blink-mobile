@@ -2,16 +2,17 @@ import React from "react"
 import { View, TouchableOpacity } from "react-native"
 import Modal from "react-native-modal"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 const useStyles = makeStyles(({ colors }) => ({
   modalView: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     maxFlex: 1,
     maxHeight: "75%",
-    borderRadius: 16,
+    borderRadius: radius.popup,
     padding: 20,
   },
   titleContainer: {
@@ -50,7 +51,7 @@ export const PayCodeExplainerModal = ({
     <Modal
       isVisible={modalVisible}
       backdropOpacity={0.3}
-      backdropColor={colors.grey3}
+      backdropColor={colors.textDisabled}
       onBackdropPress={toggleModal}
       swipeDirection={modalVisible ? ["down"] : ["up"]}
     >
@@ -60,7 +61,7 @@ export const PayCodeExplainerModal = ({
             {LL.GaloyAddressScreen.howToUseYourPaycode()}
           </Text>
           <TouchableOpacity onPress={toggleModal}>
-            <GaloyIcon name="close" size={32} color={colors.black} />
+            <GaloyIcon name="close" size={32} color={colors.textOnBackground} />
           </TouchableOpacity>
         </View>
         <Text style={styles.bodyText}>

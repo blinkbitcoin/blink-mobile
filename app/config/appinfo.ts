@@ -24,6 +24,9 @@ export const BLINK_DOMAIN = "blink.sv"
 export const BLOCKED_COUNTRIES_FAQ_LINK =
   "https://faq.blink.sv/creating-a-blink-account/which-countries-are-unable-to-download-and-activate-blink"
 
+export const UNILATERAL_EXIT_CASE_STUDY_URL =
+  "https://www.blink.sv/blog/case-study-spark-unilateral-exit-on-bitcoin-mainnet"
+
 export const getCloudBackupFilenamePrefix = (network: string) =>
   `blink-spark-backup-${network.toLowerCase()}-`
 

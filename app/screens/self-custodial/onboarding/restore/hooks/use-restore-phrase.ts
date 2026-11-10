@@ -23,7 +23,7 @@ type RestorePhraseParams = {
 export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { restore, status: restoreStatus } = useRestoreWallet()
+  const { requestRestore, status: restoreStatus } = useRestoreWallet()
   const [validationError, setValidationError] = useState<string | null>(null)
 
   const isStep1 = step === PhraseStep.First
@@ -82,8 +82,8 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
       setValidationError(LL.RestoreScreen.invalidMnemonic())
       return
     }
-    await restore(mnemonic).catch(() => {})
-  }, [bip39.words, restore, LL])
+    await requestRestore(mnemonic).catch(() => {})
+  }, [bip39.words, requestRestore, LL])
 
   const updateWord = useCallback(
     (index: number, value: string) => {

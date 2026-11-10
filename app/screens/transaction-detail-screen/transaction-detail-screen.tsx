@@ -3,6 +3,7 @@ import { ActivityIndicator, Linking, Pressable, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { ScrollView } from "react-native-gesture-handler"
 import { useFragment } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -36,8 +37,10 @@ import { makeStyles, Text } from "@rn-vui/themed"
 
 import { IconTransaction } from "@app/components/icon-transactions"
 import { Screen } from "@app/components/screen"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { formatTimeToMempool, timeToMempool } from "./format-time"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 // Tappable icon action used in the detail rows (copy / open-in-explorer).
 // Built on GaloyIconButton (a Pressable) so taps register inside the
@@ -75,7 +78,12 @@ const Row = ({
       {content ? (
         content
       ) : (
-        <View style={styles.valueContainer}>
+        <View
+          style={[
+            styles.valueContainer,
+            icons.length === 0 && styles.valueContainerStatic,
+          ]}
+        >
           <Text selectable={false} style={styles.value}>
             {value}
           </Text>
@@ -400,7 +408,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   } else if (onChainTxNotBroadcasted) {
     spendOrReceiveText = LL.TransactionDetailScreen.sending()
   } else {
-    spendOrReceiveText = LL.TransactionDetailScreen.spent()
+    spendOrReceiveText = LL.TransactionDetailScreen.sent()
   }
 
   return (
@@ -425,11 +433,10 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
             {/* Pinned to one line: leaving it unbounded lets Android re-break
                 it after the first word on a re-layout, and since the container
                 height is already fixed by the first measure pass the wrapped
-                word lands outside it and is clipped — "You spent" silently
+                word lands outside it and is clipped — "You sent" silently
                 renders as "You". Shrink rather than ellipsize when the line
-                genuinely doesn't fit, so a long locale (the longest is ms
-                "Anda dah belanjakan") stays whole under accessibility font
-                scaling instead of losing its tail. */}
+                genuinely doesn't fit, so a long locale stays whole under
+                accessibility font scaling instead of losing its tail. */}
             <Text type="h2" numberOfLines={1} adjustsFontSizeToFit>
               {spendOrReceiveText}
             </Text>
@@ -635,9 +642,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginVertical: 6,
   },
 
-  amountDetailsContainer: {
-    backgroundColor: colors.grey5,
-  },
+  amountDetailsContainer: staticSurface(colors),
 
   amountView: {
     alignItems: "center",
@@ -656,7 +661,9 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   entry: {
-    marginVertical: 4,
+    color: colors.textSecondary,
+    marginBottom: groupTitleGap,
+    marginTop: 4,
   },
 
   transactionDetailView: {
@@ -667,10 +674,11 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     minHeight: 60,
     padding: 14,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     alignItems: "center",
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
+  valueContainerStatic: staticSurface(colors),
   value: {
     flex: 1,
     fontSize: 14,

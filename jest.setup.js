@@ -19,3 +19,13 @@ if (isCI) {
     originalWarn(...args)
   }
 }
+
+// `requestIdleCallback` is installed by React Native's InitializeCore at runtime,
+// which the jest preset does not run, so the global is missing here. Scheduling
+// straight away is the honest stand-in: a test has no frames to yield to, and
+// the alternative is production code carrying a guard for a global that always
+// exists on device.
+if (typeof global.requestIdleCallback !== "function") {
+  global.requestIdleCallback = (callback) => setTimeout(() => callback(), 0)
+  global.cancelIdleCallback = (handle) => clearTimeout(handle)
+}

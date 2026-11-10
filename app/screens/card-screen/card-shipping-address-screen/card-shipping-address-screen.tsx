@@ -68,7 +68,7 @@ export const CardShippingAddressScreen: React.FC = () => {
           <ActivityIndicator
             testID="activity-indicator"
             size="large"
-            color={colors.primary}
+            color={colors.accent}
           />
         </View>
       </Screen>

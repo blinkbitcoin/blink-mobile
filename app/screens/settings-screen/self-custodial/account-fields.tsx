@@ -3,12 +3,15 @@ import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
 import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { testProps } from "@app/utils/testProps"
+import { staticSurface } from "@app/rne-theme/surfaces"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 type FieldProps = {
   label: string
@@ -28,7 +31,7 @@ const ReadOnlyField: React.FC<FieldProps> = ({
   return (
     <View style={styles.fieldGroup}>
       <Text style={styles.label}>{label}</Text>
-      <View style={styles.box}>
+      <View style={[styles.box, !copyTestID && styles.boxStatic]}>
         <Text
           style={styles.value}
           numberOfLines={1}
@@ -54,7 +57,7 @@ const CopyButton: React.FC<{ value: string; testID: string }> = ({ value, testID
       onPress={() => copyToClipboard({ content: value })}
       {...testProps(testID)}
     >
-      <GaloyIcon name="copy-paste" size={16} color={colors.primary} />
+      <GaloyIcon name="copy-paste" size={16} color={colors.accent} />
     </TouchableOpacity>
   )
 }
@@ -129,26 +132,27 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 20,
   },
   fieldGroup: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   label: {
-    color: colors.black,
+    color: colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
   },
   box: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     paddingLeft: 14,
     paddingRight: 10,
     paddingVertical: 14,
     gap: 14,
   },
+  boxStatic: staticSurface(colors),
   value: {
     flex: 1,
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     lineHeight: 20,
   },

@@ -2,9 +2,17 @@
 const { getDefaultConfig, mergeConfig } = require("@react-native/metro-config")
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require("path")
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const meawalletMpp = require("./scripts/meawallet-mpp")
 
 const defaultConfig = getDefaultConfig(__dirname)
 const { assetExts, sourceExts } = defaultConfig.resolver
+
+/** The MeaWallet SDK is vendored outside node_modules, see scripts/meawallet-mpp.js.
+ *  Without it the app's optional require of the package fails and no wallet is offered. */
+const meawalletMppModule = meawalletMpp.isInstalled()
+  ? { "@meawallet/react-native-mpp": meawalletMpp.root }
+  : {}
 
 /**
  * Metro configuration
@@ -35,6 +43,7 @@ const config = {
     extraNodeModules: {
       stream: path.resolve(__dirname, "node_modules/readable-stream"),
       zlib: path.resolve(__dirname, "node_modules/browserify-zlib"),
+      ...meawalletMppModule,
     },
 
     resolverMainFields: ["sbmodern", "react-native", "browser", "main"],

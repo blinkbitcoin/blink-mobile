@@ -1,6 +1,7 @@
 import React from "react"
 import { Pressable, PressableProps, StyleProp, View, ViewStyle } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
 import { useTheme, Text, makeStyles } from "@rn-vui/themed"
@@ -39,31 +40,31 @@ export const AmountInputButton: React.FC<AmountInputButtonProps> = ({
     switch (true) {
       case error:
         colorStyles = {
-          backgroundColor: colors.error9,
+          backgroundColor: colors.errorBackground,
         }
         break
       case pressed:
         colorStyles = {
           opacity: 0.5,
-          backgroundColor: colors.grey5,
+          backgroundColor: colors.surfaceInteractive,
         }
         break
       case disabled:
         colorStyles = {
-          backgroundColor: colors.grey5,
+          backgroundColor: colors.surfaceInteractive,
           opacity: 0.5,
         }
         break
       default:
         colorStyles = {
-          backgroundColor: colors.grey5,
+          backgroundColor: colors.surfaceInteractive,
         }
     }
 
     const sizeStyles = {
       paddingVertical: 8,
       paddingHorizontal: 12,
-      borderRadius: 8,
+      borderRadius: radius.default,
       minHeight: big ? 60 : 50,
       justifyContent: "center",
     }
@@ -96,7 +97,7 @@ export const AmountInputButton: React.FC<AmountInputButtonProps> = ({
           <GaloyIcon
             name={iconName}
             size={20}
-            color={error ? colors.error : colors.primary}
+            color={error ? colors.error : colors.accent}
           />
         )}
       </View>

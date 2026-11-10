@@ -106,6 +106,7 @@ const mockSdk = {
 } as never
 
 const KEY = "11111111-1111-4111-8111-111111111111"
+const TELEMETRY = { rail: "bolt11", sendingWallet: WalletCurrency.Btc } as const
 const NEXT_KEY = "22222222-2222-4222-8222-222222222222"
 
 const sdkError = (tag: string) => ({ tag, inner: undefined })
@@ -178,7 +179,10 @@ describe("a bitcoin send carries the attempt's idempotency key", () => {
     mockSendPayment.mockResolvedValue(sent())
     const ref = {}
 
-    const result = await attempt(createSendMutation(btcLightning, ref), ref)
+    const result = await attempt(
+      createSendMutation(btcLightning, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
 
     expect(result.status).toBe(PaymentSendResult.Success)
     expect(sentKeys()).toEqual([KEY])
@@ -187,9 +191,12 @@ describe("a bitcoin send carries the attempt's idempotency key", () => {
   it("retries a send that threw under the same key, so the SDK refuses a duplicate", async () => {
     mockPrepareSendPayment.mockResolvedValue(bolt11("hash-1"))
     mockSendPayment.mockRejectedValueOnce(lostResponse()).mockResolvedValueOnce(sent())
-    mockFindLostSend.mockResolvedValue({ status: "not-found" })
+    mockFindLostSend.mockResolvedValue({ status: "not-found", failed: [] })
     const ref = {}
-    const send = createSendMutation(btcLightning, ref)
+    const send = createSendMutation(btcLightning, {
+      telemetry: TELEMETRY,
+      idempotencyKeyRef: ref,
+    })
 
     const first = await attempt(send, ref)
     const second = await attempt(send, ref, NEXT_KEY)
@@ -204,7 +211,10 @@ describe("a bitcoin send carries the attempt's idempotency key", () => {
     mockSendPayment.mockResolvedValue(sent())
     const ref = {}
 
-    await attempt(createSendMutation(btcSpark, ref), ref)
+    await attempt(
+      createSendMutation(btcSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
 
     expect(sentKeys()).toEqual([KEY])
   })
@@ -216,7 +226,13 @@ describe("a bitcoin send carries the attempt's idempotency key", () => {
     mockSendPayment.mockResolvedValue(sent())
     const ref = {}
 
-    await attempt(createSendMutationOnchain(btcSpark, "fast", ref), ref)
+    await attempt(
+      createSendMutationOnchain(btcSpark, "fast", {
+        telemetry: TELEMETRY,
+        idempotencyKeyRef: ref,
+      }),
+      ref,
+    )
 
     expect(mockSendPayment).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -231,7 +247,10 @@ describe("a bitcoin send carries the attempt's idempotency key", () => {
     mockSendPayment.mockResolvedValue(sent())
     const ref = {}
 
-    await attempt(createSendMutation(usdSpark, ref), ref)
+    await attempt(
+      createSendMutation(usdSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
 
     expect(sentKeys()).toEqual([undefined])
   })
@@ -248,17 +267,27 @@ describe("a dollar Lightning send is looked for instead", () => {
     mockSendPayment.mockResolvedValue(sent())
     const ref = {}
 
-    await attempt(createSendMutation(usdLightning, ref), ref)
+    await attempt(
+      createSendMutation(usdLightning, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
 
     expect(sentKeys()).toEqual([undefined])
   })
 
   it("reports a send that threw as sent when the wallet holds its payment", async () => {
     mockSendPayment.mockRejectedValue(lostResponse())
-    mockFindLostSend.mockResolvedValue({ status: "found", payment: { id: "p1" } })
+    mockFindLostSend.mockResolvedValue({
+      status: "found",
+      payment: { id: "p1" },
+      failed: [],
+    })
     const ref = {}
 
-    const result = await attempt(createSendMutation(usdLightning, ref), ref)
+    const result = await attempt(
+      createSendMutation(usdLightning, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
 
     expect(result.status).toBe(PaymentSendResult.Success)
     expect(
@@ -276,10 +305,13 @@ describe("a dollar Lightning send is looked for instead", () => {
   it("looks for the lost attempt before the retry sends, and does not pay twice", async () => {
     mockSendPayment.mockRejectedValueOnce(lostResponse())
     mockFindLostSend
-      .mockResolvedValueOnce({ status: "not-found" })
-      .mockResolvedValueOnce({ status: "found", payment: { id: "p1" } })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "found", payment: { id: "p1" }, failed: [] })
     const ref = {}
-    const send = createSendMutation(usdLightning, ref)
+    const send = createSendMutation(usdLightning, {
+      telemetry: TELEMETRY,
+      idempotencyKeyRef: ref,
+    })
 
     const first = await attempt(send, ref)
     const second = await attempt(send, ref)
@@ -292,10 +324,13 @@ describe("a dollar Lightning send is looked for instead", () => {
   it("sends nothing while the lost attempt's history cannot be read", async () => {
     mockSendPayment.mockRejectedValueOnce(lostResponse())
     mockFindLostSend
-      .mockResolvedValueOnce({ status: "not-found" })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
       .mockResolvedValueOnce({ status: "unreadable", error: new Error("offline") })
     const ref = {}
-    const send = createSendMutation(usdLightning, ref)
+    const send = createSendMutation(usdLightning, {
+      telemetry: TELEMETRY,
+      idempotencyKeyRef: ref,
+    })
 
     await attempt(send, ref)
     const second = await attempt(send, ref)
@@ -308,14 +343,23 @@ describe("a dollar Lightning send is looked for instead", () => {
   it("still looks for the lost attempt after a new amount starts the key over", async () => {
     mockSendPayment.mockRejectedValueOnce(lostResponse())
     mockFindLostSend
-      .mockResolvedValueOnce({ status: "not-found" })
-      .mockResolvedValueOnce({ status: "found", payment: { id: "p1" } })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "found", payment: { id: "p1" }, failed: [] })
     const ref = {}
-    await attempt(createSendMutation(usdLightning, ref), ref)
+    await attempt(
+      createSendMutation(usdLightning, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
 
     /** A new amount or wallet: the same destination under a new key ref. */
     const rebuilt = {}
-    const result = await attempt(createSendMutation(usdLightning, rebuilt), rebuilt)
+    const result = await attempt(
+      createSendMutation(usdLightning, {
+        telemetry: TELEMETRY,
+        idempotencyKeyRef: rebuilt,
+      }),
+      rebuilt,
+    )
 
     expect(result.status).toBe(PaymentSendResult.Success)
     expect(mockSendPayment).toHaveBeenCalledTimes(1)
@@ -325,7 +369,10 @@ describe("a dollar Lightning send is looked for instead", () => {
     mockSendPayment.mockRejectedValue(sdkError("InsufficientFunds"))
     const ref = {}
 
-    const result = await attempt(createSendMutation(usdLightning, ref), ref)
+    const result = await attempt(
+      createSendMutation(usdLightning, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
 
     expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.InsufficientFunds)
     expect(mockFindLostSend).not.toHaveBeenCalled()
@@ -336,10 +383,13 @@ describe("a dollar send to a Spark invoice is looked for by the invoice", () => 
   it("matches the token payment of the same invoice", async () => {
     mockPrepareSendPayment.mockResolvedValue(sparkInvoice("spark1inv", "usdb-token-id"))
     mockSendPayment.mockRejectedValue(lostResponse())
-    mockFindLostSend.mockResolvedValue({ status: "not-found" })
+    mockFindLostSend.mockResolvedValue({ status: "not-found", failed: [] })
     const ref = {}
 
-    await attempt(createSendMutation(usdSpark, ref), ref)
+    await attempt(
+      createSendMutation(usdSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
 
     expect(
       lookupMatches(0, {
@@ -360,7 +410,10 @@ describe("a send that cannot be looked for is never sent twice", () => {
     mockPrepareSendPayment.mockResolvedValue(sparkAddress("usdb-token-id"))
     mockSendPayment.mockRejectedValue(lostResponse())
     const ref = {}
-    const send = createSendMutation(usdSpark, ref)
+    const send = createSendMutation(usdSpark, {
+      telemetry: TELEMETRY,
+      idempotencyKeyRef: ref,
+    })
 
     const first = await attempt(send, ref)
     const second = await attempt(send, ref)
@@ -375,11 +428,18 @@ describe("a send that cannot be looked for is never sent twice", () => {
     mockPrepareSendPayment.mockResolvedValue(sparkAddress("usdb-token-id"))
     mockSendPayment.mockRejectedValue(lostResponse())
     const ref = {}
-    await attempt(createSendMutation(usdSpark, ref), ref)
+    await attempt(
+      createSendMutation(usdSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
 
     /** A new amount or wallet: the same destination under a new key ref. */
     const rebuilt = {}
-    const result = await attempt(createSendMutation(btcSpark, rebuilt), rebuilt, NEXT_KEY)
+    const result = await attempt(
+      createSendMutation(btcSpark, { telemetry: TELEMETRY, idempotencyKeyRef: rebuilt }),
+      rebuilt,
+      NEXT_KEY,
+    )
 
     expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.OutcomeUnknown)
     expect(mockSendPayment).toHaveBeenCalledTimes(1)
@@ -391,7 +451,10 @@ describe("a send that cannot be looked for is never sent twice", () => {
       .mockRejectedValueOnce(sdkError("InsufficientFunds"))
       .mockResolvedValueOnce(sent())
     const ref = {}
-    const send = createSendMutation(usdSpark, ref)
+    const send = createSendMutation(usdSpark, {
+      telemetry: TELEMETRY,
+      idempotencyKeyRef: ref,
+    })
 
     await attempt(send, ref)
     const second = await attempt(send, ref)
@@ -404,7 +467,10 @@ describe("a send that cannot be looked for is never sent twice", () => {
     mockPrepareSendPayment.mockResolvedValue(sparkAddress())
     mockSendPayment.mockRejectedValueOnce(lostResponse()).mockResolvedValueOnce(sent())
     const ref = {}
-    const send = createSendMutation(btcSpark, ref)
+    const send = createSendMutation(btcSpark, {
+      telemetry: TELEMETRY,
+      idempotencyKeyRef: ref,
+    })
 
     const first = await attempt(send, ref)
     const second = await attempt(send, ref)
@@ -422,15 +488,25 @@ describe("a send that cannot be looked for is never sent twice", () => {
       mockPrepareSendPayment.mockResolvedValue(sparkAddress())
       mockSendPayment.mockRejectedValueOnce(lostResponse()).mockResolvedValue(sent())
       const ref = {}
-      await attempt(createSendMutation(btcSpark, ref), ref)
+      await attempt(
+        createSendMutation(btcSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+        ref,
+      )
 
       const rebuilt = {}
-      return attempt(createSendMutation(btcSpark, rebuilt), rebuilt, NEXT_KEY)
+      return attempt(
+        createSendMutation(btcSpark, {
+          telemetry: TELEMETRY,
+          idempotencyKeyRef: rebuilt,
+        }),
+        rebuilt,
+        NEXT_KEY,
+      )
     }
 
     /** Exact, whatever the phone's clock says: no window can leave the payment out. */
     it("asks the wallet for the lost attempt by its key, the id the SDK records it under", async () => {
-      mockFindPaymentUnderKey.mockResolvedValue({ status: "not-found" })
+      mockFindPaymentUnderKey.mockResolvedValue({ status: "not-found", failed: [] })
 
       await sendUnderNewKey()
 
@@ -441,7 +517,11 @@ describe("a send that cannot be looked for is never sent twice", () => {
     })
 
     it("reports the lost attempt's payment as the send when the wallet holds it", async () => {
-      mockFindPaymentUnderKey.mockResolvedValue({ status: "found", payment: { id: KEY } })
+      mockFindPaymentUnderKey.mockResolvedValue({
+        status: "found",
+        payment: { id: KEY },
+        failed: [],
+      })
 
       const result = await sendUnderNewKey()
 
@@ -451,7 +531,7 @@ describe("a send that cannot be looked for is never sent twice", () => {
     })
 
     it("sends once the wallet shows the lost attempt never went out", async () => {
-      mockFindPaymentUnderKey.mockResolvedValue({ status: "not-found" })
+      mockFindPaymentUnderKey.mockResolvedValue({ status: "not-found", failed: [] })
 
       const result = await sendUnderNewKey()
 
@@ -521,7 +601,10 @@ describe("a retry under the key every lost attempt went out with", () => {
     mockPrepareSendPayment.mockResolvedValue(bolt11("hash-1"))
     mockSendPayment.mockRejectedValueOnce(lostResponse()).mockResolvedValueOnce(sent())
     const ref = {}
-    const send = createSendMutation(btcLightning, ref)
+    const send = createSendMutation(btcLightning, {
+      telemetry: TELEMETRY,
+      idempotencyKeyRef: ref,
+    })
 
     await attempt(send, ref)
     const retry = await attempt(send, ref)
@@ -534,13 +617,23 @@ describe("a retry under the key every lost attempt went out with", () => {
   it("is still looked for under a new key, a new amount's", async () => {
     mockPrepareSendPayment.mockResolvedValue(bolt11("hash-1"))
     mockSendPayment.mockRejectedValueOnce(lostResponse())
-    mockFindLostSend.mockResolvedValue({ status: "found", payment: { id: "p1" } })
+    mockFindLostSend.mockResolvedValue({
+      status: "found",
+      payment: { id: "p1" },
+      failed: [],
+    })
     const ref = {}
-    await attempt(createSendMutation(btcLightning, ref), ref)
+    await attempt(
+      createSendMutation(btcLightning, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
 
     const rebuilt = {}
     const result = await attempt(
-      createSendMutation(btcLightning, rebuilt),
+      createSendMutation(btcLightning, {
+        telemetry: TELEMETRY,
+        idempotencyKeyRef: rebuilt,
+      }),
       rebuilt,
       NEXT_KEY,
     )
@@ -553,15 +646,34 @@ describe("a retry under the key every lost attempt went out with", () => {
   it("is looked for once the attempts went out under different keys", async () => {
     mockPrepareSendPayment.mockResolvedValue(bolt11("hash-1"))
     mockSendPayment.mockRejectedValue(lostResponse())
-    mockFindLostSend.mockResolvedValue({ status: "not-found" })
+    mockFindLostSend.mockResolvedValue({ status: "not-found", failed: [] })
     const first = {}
-    await attempt(createSendMutation(btcLightning, first), first)
+    await attempt(
+      createSendMutation(btcLightning, {
+        telemetry: TELEMETRY,
+        idempotencyKeyRef: first,
+      }),
+      first,
+    )
     const second = {}
-    await attempt(createSendMutation(btcLightning, second), second, NEXT_KEY)
+    await attempt(
+      createSendMutation(btcLightning, {
+        telemetry: TELEMETRY,
+        idempotencyKeyRef: second,
+      }),
+      second,
+      NEXT_KEY,
+    )
     expect(lostAttemptsTo("lnbc1...").lostSend?.idempotencyKey).toBeUndefined()
 
     mockFindLostSend.mockClear()
-    await attempt(createSendMutation(btcLightning, second), second)
+    await attempt(
+      createSendMutation(btcLightning, {
+        telemetry: TELEMETRY,
+        idempotencyKeyRef: second,
+      }),
+      second,
+    )
 
     expect(mockFindLostSend).toHaveBeenCalledTimes(1)
   })
@@ -600,11 +712,17 @@ describe("lost attempts outlive the payment detail", () => {
     mockPrepareSendPayment.mockResolvedValue(sparkAddress("usdb-token-id"))
     mockSendPayment.mockRejectedValueOnce(lostResponse()).mockResolvedValue(sent())
     const ref = {}
-    await attempt(createSendMutation(usdSpark, ref), ref)
+    await attempt(
+      createSendMutation(usdSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
 
     const elsewhere = { ...usdSpark, paymentRequest: "sp1other" }
     const other = {}
-    const result = await attempt(createSendMutation(elsewhere, other), other)
+    const result = await attempt(
+      createSendMutation(elsewhere, { telemetry: TELEMETRY, idempotencyKeyRef: other }),
+      other,
+    )
 
     expect(result.status).toBe(PaymentSendResult.Success)
   })
@@ -622,7 +740,10 @@ describe("a send the SDK adds a conversion to on its own", () => {
     mockPrepareSendPayment.mockResolvedValue(withConversion(sparkAddress()))
     mockSendPayment.mockRejectedValueOnce(lostResponse()).mockResolvedValue(sent())
     const ref = {}
-    const send = createSendMutation(btcSpark, ref)
+    const send = createSendMutation(btcSpark, {
+      telemetry: TELEMETRY,
+      idempotencyKeyRef: ref,
+    })
 
     const first = await attempt(send, ref)
     const retry = await attempt(send, ref)
@@ -635,10 +756,17 @@ describe("a send the SDK adds a conversion to on its own", () => {
   it("is looked for at once when it throws, as a dollar send is", async () => {
     mockPrepareSendPayment.mockResolvedValue(withConversion(bolt11("hash-1")))
     mockSendPayment.mockRejectedValue(lostResponse())
-    mockFindLostSend.mockResolvedValue({ status: "found", payment: { id: "p1" } })
+    mockFindLostSend.mockResolvedValue({
+      status: "found",
+      payment: { id: "p1" },
+      failed: [],
+    })
     const ref = {}
 
-    const result = await attempt(createSendMutation(btcLightning, ref), ref)
+    const result = await attempt(
+      createSendMutation(btcLightning, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
 
     expect(result.status).toBe(PaymentSendResult.Success)
     expect(sentKeys()).toEqual([undefined])
@@ -648,11 +776,18 @@ describe("a send the SDK adds a conversion to on its own", () => {
     mockPrepareSendPayment.mockResolvedValueOnce(bolt11("hash-1"))
     mockSendPayment.mockRejectedValueOnce(lostResponse())
     const ref = {}
-    const send = createSendMutation(btcLightning, ref)
+    const send = createSendMutation(btcLightning, {
+      telemetry: TELEMETRY,
+      idempotencyKeyRef: ref,
+    })
     await attempt(send, ref)
 
     mockPrepareSendPayment.mockResolvedValue(withConversion(bolt11("hash-1")))
-    mockFindLostSend.mockResolvedValue({ status: "found", payment: { id: "p1" } })
+    mockFindLostSend.mockResolvedValue({
+      status: "found",
+      payment: { id: "p1" },
+      failed: [],
+    })
     const retry = await attempt(send, ref)
 
     expect(retry.status).toBe(PaymentSendResult.Success)
@@ -667,7 +802,10 @@ describe("a payment the SDK hands back as failed", () => {
     mockSendPayment.mockResolvedValue(sent(FAILED))
     const ref = {}
 
-    const result = await attempt(createSendMutation(btcLightning, ref), ref)
+    const result = await attempt(
+      createSendMutation(btcLightning, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
 
     expect(result.status).toBe(PaymentSendResult.Failure)
   })
@@ -681,7 +819,10 @@ describe("a payment the SDK hands back as failed", () => {
       .mockResolvedValueOnce(sent(FAILED))
       .mockResolvedValueOnce(sent())
     const ref = {}
-    const send = createSendMutation(btcLightning, ref)
+    const send = createSendMutation(btcLightning, {
+      telemetry: TELEMETRY,
+      idempotencyKeyRef: ref,
+    })
 
     await attempt(send, ref)
     const failedRetry = await attempt(send, ref)
@@ -700,9 +841,12 @@ describe("the lost attempts of one invoice", () => {
       bolt11("hash-1", { conversionEstimate: { amountIn: 1n } }),
     )
     mockSendPayment.mockRejectedValue(lostResponse())
-    mockFindLostSend.mockResolvedValue({ status: "not-found" })
+    mockFindLostSend.mockResolvedValue({ status: "not-found", failed: [] })
     const ref = {}
-    const send = createSendMutation(usdLightning, ref)
+    const send = createSendMutation(usdLightning, {
+      telemetry: TELEMETRY,
+      idempotencyKeyRef: ref,
+    })
 
     for (let i = 0; i < 3; i += 1) await attempt(send, ref)
 
@@ -736,8 +880,21 @@ describe("sends to one destination", () => {
     const second = {}
 
     const sends = [
-      attempt(createSendMutation(usdLightning, first), first),
-      attempt(createSendMutation(usdLightning, second), second, NEXT_KEY),
+      attempt(
+        createSendMutation(usdLightning, {
+          telemetry: TELEMETRY,
+          idempotencyKeyRef: first,
+        }),
+        first,
+      ),
+      attempt(
+        createSendMutation(usdLightning, {
+          telemetry: TELEMETRY,
+          idempotencyKeyRef: second,
+        }),
+        second,
+        NEXT_KEY,
+      ),
     ]
     await settleTicks()
     expect(mockPrepareSendPayment).toHaveBeenCalledTimes(1)
@@ -755,14 +912,27 @@ describe("sends to one destination", () => {
     mockPrepareSendPayment.mockResolvedValueOnce(withConversion(bolt11("hash-a")))
     mockSendPayment.mockImplementationOnce(() => inFlight.promise)
     mockFindLostSend
-      .mockResolvedValueOnce({ status: "not-found" })
-      .mockResolvedValueOnce({ status: "found", payment: { id: "paid-a" } })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "found", payment: { id: "paid-a" }, failed: [] })
     const first = {}
     const second = {}
 
     const sends = [
-      attempt(createSendMutation(usdLightning, first), first),
-      attempt(createSendMutation(usdLightning, second), second, NEXT_KEY),
+      attempt(
+        createSendMutation(usdLightning, {
+          telemetry: TELEMETRY,
+          idempotencyKeyRef: first,
+        }),
+        first,
+      ),
+      attempt(
+        createSendMutation(usdLightning, {
+          telemetry: TELEMETRY,
+          idempotencyKeyRef: second,
+        }),
+        second,
+        NEXT_KEY,
+      ),
     ]
     await settleTicks()
     inFlight.reject(lostResponse())
@@ -793,8 +963,21 @@ describe("sends to one destination", () => {
     const bitcoin = {}
 
     const sends = [
-      attempt(createSendMutation(usdSpark, dollars), dollars),
-      attempt(createSendMutation(btcSpark, bitcoin), bitcoin, NEXT_KEY),
+      attempt(
+        createSendMutation(usdSpark, {
+          telemetry: TELEMETRY,
+          idempotencyKeyRef: dollars,
+        }),
+        dollars,
+      ),
+      attempt(
+        createSendMutation(btcSpark, {
+          telemetry: TELEMETRY,
+          idempotencyKeyRef: bitcoin,
+        }),
+        bitcoin,
+        NEXT_KEY,
+      ),
     ]
     await settleTicks()
     inFlight.reject(lostResponse())
@@ -816,8 +999,18 @@ describe("sends to one destination", () => {
     const elsewhere = { ...usdLightning, paymentRequest: "lnbc2..." }
     const other = {}
 
-    const waiting = attempt(createSendMutation(usdLightning, first), first)
-    const result = await attempt(createSendMutation(elsewhere, other), other, NEXT_KEY)
+    const waiting = attempt(
+      createSendMutation(usdLightning, {
+        telemetry: TELEMETRY,
+        idempotencyKeyRef: first,
+      }),
+      first,
+    )
+    const result = await attempt(
+      createSendMutation(elsewhere, { telemetry: TELEMETRY, idempotencyKeyRef: other }),
+      other,
+      NEXT_KEY,
+    )
 
     expect(result.status).toBe(PaymentSendResult.Success)
     inFlight.resolve(sent())
@@ -839,14 +1032,21 @@ describe("a send that finishes after a switch of wallet", () => {
       .mockResolvedValue(sent())
     scopeLostAttemptsTo("wallet-a")
     const first = {}
-    const late = attempt(createSendMutation(usdSpark, first), first)
+    const late = attempt(
+      createSendMutation(usdSpark, { telemetry: TELEMETRY, idempotencyKeyRef: first }),
+      first,
+    )
     await new Promise(setImmediate)
 
     scopeLostAttemptsTo("wallet-b")
     throwLate(lostResponse())
     await late
     const second = {}
-    const result = await attempt(createSendMutation(usdSpark, second), second, NEXT_KEY)
+    const result = await attempt(
+      createSendMutation(usdSpark, { telemetry: TELEMETRY, idempotencyKeyRef: second }),
+      second,
+      NEXT_KEY,
+    )
 
     expect(result.status).toBe(PaymentSendResult.Success)
     expect(mockSendPayment).toHaveBeenCalledTimes(2)
@@ -862,13 +1062,20 @@ describe("a same-key retry whose quote fails", () => {
       .mockRejectedValueOnce(sdkError("InsufficientFunds"))
     mockSendPayment.mockRejectedValueOnce(lostResponse())
     const ref = {}
-    const send = createSendMutation(btcLightning, ref)
+    const send = createSendMutation(btcLightning, {
+      telemetry: TELEMETRY,
+      idempotencyKeyRef: ref,
+    })
     await attempt(send, ref)
     return attempt(send, ref)
   }
 
   it("reports the lost attempt's payment when the wallet holds it", async () => {
-    mockFindLostSend.mockResolvedValue({ status: "found", payment: { id: "p1" } })
+    mockFindLostSend.mockResolvedValue({
+      status: "found",
+      payment: { id: "p1" },
+      failed: [],
+    })
 
     const retry = await retryAfterSpentFunds()
 
@@ -878,7 +1085,7 @@ describe("a same-key retry whose quote fails", () => {
   })
 
   it("reports the quote's failure when the wallet shows nothing", async () => {
-    mockFindLostSend.mockResolvedValue({ status: "not-found" })
+    mockFindLostSend.mockResolvedValue({ status: "not-found", failed: [] })
 
     const retry = await retryAfterSpentFunds()
 
@@ -893,7 +1100,10 @@ describe("a bitcoin Spark-address send that throws again under the same key", ()
     mockPrepareSendPayment.mockResolvedValue(sparkAddress())
     mockSendPayment.mockRejectedValue(lostResponse())
     const ref = {}
-    const send = createSendMutation(btcSpark, ref)
+    const send = createSendMutation(btcSpark, {
+      telemetry: TELEMETRY,
+      idempotencyKeyRef: ref,
+    })
 
     await attempt(send, ref)
     await attempt(send, ref)
@@ -920,7 +1130,10 @@ describe("the same send asked for twice before the first is done", () => {
       )
       .mockResolvedValueOnce(sent(FAILED))
     const ref = { current: KEY }
-    const send = createSendMutation(btcLightning, ref)
+    const send = createSendMutation(btcLightning, {
+      telemetry: TELEMETRY,
+      idempotencyKeyRef: ref,
+    })
 
     const first = send()
     const repeat = send()
@@ -940,9 +1153,12 @@ describe("the lost attempts of a send, against a phone clock that is off", () =>
       bolt11("hash-1", { conversionEstimate: { amountIn: 1n } }),
     )
     mockSendPayment.mockRejectedValue(lostResponse())
-    mockFindLostSend.mockResolvedValue({ status: "not-found" })
+    mockFindLostSend.mockResolvedValue({ status: "not-found", failed: [] })
     const ref = {}
-    await attempt(createSendMutation(usdLightning, ref), ref)
+    await attempt(
+      createSendMutation(usdLightning, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
   }
 
   /** The wallet's newest send, stamped by the server's clock, goes with the attempt: the

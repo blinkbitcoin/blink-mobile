@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 import { useCountUp } from "use-count-up"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { getcBackValue } from "@app/components/circle"
 import { PressableCard } from "@app/components/pressable-card"
@@ -100,11 +101,11 @@ export const CirclesCardPeopleHome = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     display: "flex",
     flexDirection: "column",
     marginBottom: 20,
-    borderRadius: 12,
+    borderRadius: radius.default,
     padding: 12,
     paddingBottom: 0,
     rowGap: 14,
@@ -129,7 +130,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   separator: {
     height: 1,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     marginTop: 8,
   },
   textCenter: {
@@ -144,7 +145,7 @@ const useStyles = makeStyles(({ colors }) => ({
     minHeight: 62,
   },
   pointsNumber: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontWeight: "700",
     fontSize: 50,
   },
@@ -156,7 +157,7 @@ const useStyles = makeStyles(({ colors }) => ({
     position: "absolute",
     right: -150,
     bottom: -150,
-    backgroundColor: colors.backdropWhite,
+    backgroundColor: colors.backdrop,
     zIndex: -10,
   },
   viewCirclescta: {

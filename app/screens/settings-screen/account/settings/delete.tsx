@@ -3,6 +3,7 @@ import { Alert, TextInput, View } from "react-native"
 import Modal from "react-native-modal"
 
 import { gql } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
@@ -12,11 +13,9 @@ import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useAppConfig } from "@app/hooks"
 import useLogout from "@app/hooks/use-logout"
+import { useLogoutAndRoute } from "@app/hooks/use-logout-and-route"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
-import { useNavigation } from "@react-navigation/native"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useTheme, Text, makeStyles } from "@rn-vui/themed"
 
 import {
@@ -45,8 +44,8 @@ gql`
 export const Delete = () => {
   const styles = useStyles()
 
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { logout } = useLogout()
+  const { routeAfterLogout } = useLogoutAndRoute()
   const { appConfig } = useAppConfig()
   const { switchToNextProfile } = useSwitchToNextProfile()
 
@@ -63,7 +62,7 @@ export const Delete = () => {
     theme: { colors },
   } = useTheme()
 
-  const { setAccountIsBeingDeleted } = useAccountDeleteContext()
+  const { setAccountIsBeingDeleted, leaveWhileDeleting } = useAccountDeleteContext()
 
   const [deleteAccount] = useAccountDeleteMutation({ fetchPolicy: "no-cache" })
 
@@ -115,30 +114,30 @@ export const Delete = () => {
     }
   }
 
-  /** The deletion hides every way off this screen while it runs; a deletion that did not
+  /** The lock takes every way off this screen away while it runs; a deletion that did not
    *  happen has to give them back, or the user is left on a dead screen with no exit. */
-  const releaseDeletionLock = () => {
-    navigation.setOptions({ headerLeft: undefined, gestureEnabled: true })
-    setAccountIsBeingDeleted(false)
-  }
+  const releaseDeletionLock = () => setAccountIsBeingDeleted(false)
 
   const deleteUserAccount = async () => {
     try {
       const accountToDeleteToken = appConfig.token
 
-      navigation.setOptions({
-        headerLeft: () => null, // Hides the default back button
-        gestureEnabled: false, // Disables swipe to go back gesture
-      })
       setAccountIsBeingDeleted(true)
 
       const res = await deleteAccount()
 
       if (res.data?.accountDelete?.success) {
-        setAccountIsBeingDeleted(false)
-
-        const outcome = await switchToNextProfile(accountToDeleteToken)
+        /** The lock stays up from here on: the account is gone, and the screen under the
+         *  cover is about to render for whichever session comes next. It is left only
+         *  through the lock, by the switch or by the farewell's OK, and never given back. */
+        const outcome = await switchToNextProfile(
+          accountToDeleteToken,
+          leaveWhileDeleting,
+        )
         const hasSwitched = outcome === SwitchProfileOutcome.Switched
+        /** Kept until a logout says otherwise: no logout ran means no lock was dropped,
+         *  and the switched path leaves the session it moved to in front of it. */
+        let isAppLockKeptByLogout = true
         if (!hasSwitched) {
           // The logout erases every saved session, which is only correct once
           // we know there is none left. An unreadable store is ignorance, not
@@ -147,10 +146,14 @@ export const Delete = () => {
           // list, so it can still be offered and will 401 once. Cheaper than
           // erasing sessions that were only invisible.
           const isStoreUnreadable = outcome === SwitchProfileOutcome.ProfilesUnreadable
-          await logout({
+          const { isAppLockKept } = await logout({
             stateToDefault: true,
             preserveStoredCredentials: isStoreUnreadable,
           })
+          /** Carried to the dialog rather than acted on here: the way out is taken when
+           *  the farewell is acknowledged, and a lock kept over a wallet the device still
+           *  stores is owed an answer before the landing screen offers it again. */
+          isAppLockKeptByLogout = isAppLockKept
         }
 
         Alert.alert(LL.support.bye(), LL.support.deleteAccountConfirmation(), [
@@ -158,10 +161,7 @@ export const Delete = () => {
             text: LL.common.ok(),
             onPress: () => {
               if (!hasSwitched) {
-                navigation.reset({
-                  index: 0,
-                  routes: [{ name: "getStarted" }],
-                })
+                leaveWhileDeleting(() => routeAfterLogout(isAppLockKeptByLogout))
               }
             },
           },
@@ -201,7 +201,7 @@ export const Delete = () => {
       isVisible={modalVisible}
       onBackdropPress={closeModal}
       backdropOpacity={0.8}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       avoidKeyboard={true}
     >
       <View style={styles.view}>
@@ -218,11 +218,11 @@ export const Delete = () => {
           onChangeText={setText}
           value={text}
           placeholder={LL.support.delete()}
-          placeholderTextColor={colors.grey3}
+          placeholderTextColor={colors.textDisabled}
         />
-        <View style={styles.actionButtons}>
+        <View style={styles.modalButtons} testID="delete-modal-buttons">
           <GaloyPrimaryButton
-            title="Confirm"
+            title={LL.common.confirm()}
             disabled={!userWroteDelete}
             onPress={() => {
               closeModal()
@@ -236,7 +236,7 @@ export const Delete = () => {
               )
             }}
           />
-          <GaloySecondaryButton title="Cancel" onPress={closeModal} />
+          <GaloySecondaryButton title={LL.common.cancel()} onPress={closeModal} />
         </View>
       </View>
     </Modal>
@@ -261,19 +261,19 @@ export const Delete = () => {
 const useStyles = makeStyles(({ colors }) => ({
   view: {
     marginHorizontal: 20,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     padding: 20,
-    borderRadius: 20,
+    borderRadius: radius.popup,
     display: "flex",
     flexDirection: "column",
     rowGap: 20,
   },
   textInput: {
     fontSize: 16,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     padding: 12,
-    color: colors.black,
-    borderRadius: 8,
+    color: colors.textOnBackground,
+    borderRadius: radius.default,
   },
   actionButtons: {
     display: "flex",
@@ -281,7 +281,11 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     justifyContent: "space-between",
   },
+  modalButtons: {
+    flexDirection: "column",
+    rowGap: 12,
+  },
   warningText: {
-    color: colors.primary,
+    color: colors.accent,
   },
 }))

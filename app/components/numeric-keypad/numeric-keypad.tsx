@@ -2,6 +2,7 @@ import React, { useCallback } from "react"
 import { Pressable, View, StyleProp, ViewStyle } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
 
@@ -87,7 +88,7 @@ const KeypadKey: React.FC<KeypadKeyProps> = ({ keyValue, onPress, disabled }) =>
   )
 
   const isBackspace = keyValue === NumericKey.Backspace
-  const iconColor = disabled ? colors.grey3 : colors.primary
+  const iconColor = disabled ? colors.textDisabled : colors.accent
   const textStyle = disabled ? [styles.keyText, styles.keyTextDisabled] : styles.keyText
 
   return (
@@ -120,15 +121,15 @@ const useStyles = makeStyles(({ colors }) => ({
   key: {
     flex: 1,
     minHeight: 54,
-    borderRadius: 12,
+    borderRadius: radius.default,
     borderWidth: 1,
-    borderColor: colors.grey4,
+    borderColor: colors.neutral,
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 10,
   },
   keyPressed: {
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
   },
   keyDisabled: {
     opacity: 0.5,
@@ -138,10 +139,10 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 28,
     fontWeight: "700",
     lineHeight: 32,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
   },
   keyTextDisabled: {
-    color: colors.grey3,
+    color: colors.textDisabled,
   },
 }))

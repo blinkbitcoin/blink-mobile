@@ -59,7 +59,7 @@ let mockCloseCardAccountReturn = {
   hasPositiveBalance: false,
   balanceDisplay: "",
 }
-jest.mock("@app/screens/card-screen/hooks/use-card-data", () => ({
+jest.mock("@app/hooks/use-card-data", () => ({
   useCardData: () => ({
     card: { id: "card-123", lastFour: "1234", cardType: "PHYSICAL" },
     hasPhysicalCard: false,
@@ -418,7 +418,7 @@ describe("CardSettingsScreen", () => {
 
       expect(mockNavigate).toHaveBeenCalledWith("cardAddToMobileWalletScreen", {
         lastFour: "1234",
-        holderName: "",
+        cardId: "card-123",
       })
     })
 

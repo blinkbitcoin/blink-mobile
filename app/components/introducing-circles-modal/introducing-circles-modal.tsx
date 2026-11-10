@@ -3,6 +3,7 @@ import { View } from "react-native"
 import Modal from "react-native-modal"
 
 import { useApolloClient } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { setIntroducingCirclesModalShown } from "@app/graphql/client-only-query"
 import { useIntroducingCirclesModalShownQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -42,7 +43,7 @@ export const IntroducingCirclesModal: React.FC<Props> = ({ isVisible, setIsVisib
     <Modal
       isVisible={isVisible}
       backdropOpacity={0.8}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       backdropTransitionOutTiming={0}
       onBackdropPress={acknowledgeModal}
     >
@@ -51,7 +52,7 @@ export const IntroducingCirclesModal: React.FC<Props> = ({ isVisible, setIsVisib
           <View style={styles.cross}>
             <GaloyIconButton name="close" size="medium" onPress={acknowledgeModal} />
           </View>
-          <GaloyIcon name="people" color={colors.primary} size={50} />
+          <GaloyIcon name="people" color={colors.accent} size={50} />
           <View style={styles.cardTitleContainer}>
             <Text type="h1" bold>
               {LL.Circles.introducingCircles()}
@@ -84,7 +85,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
   },
   peopleIcon: {
-    color: colors.primary,
+    color: colors.accent,
   },
   cross: {
     position: "absolute",
@@ -92,8 +93,8 @@ const useStyles = makeStyles(({ colors }) => ({
     right: 20,
   },
   modalCard: {
-    backgroundColor: colors.grey5,
-    borderRadius: 16,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.popup,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",

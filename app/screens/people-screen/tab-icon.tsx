@@ -74,10 +74,10 @@ const useStyles = makeStyles(({ colors }) => ({
     height: 4,
     width: 4,
     borderRadius: 2,
-    backgroundColor: colors.grey2,
+    backgroundColor: colors.textMuted,
   },
   notificationDotHighlight: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
   },
   notificationRing: {
     position: "absolute",
@@ -87,10 +87,10 @@ const useStyles = makeStyles(({ colors }) => ({
     height: 8,
     width: 8,
     borderRadius: 5,
-    borderColor: colors.grey2,
+    borderColor: colors.textMuted,
     borderWidth: 1,
   },
   notificationRingHighlight: {
-    borderColor: colors.primary,
+    borderColor: colors.accent,
   },
 }))

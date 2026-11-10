@@ -1,38 +1,60 @@
-// Escalating lockout after N consecutive failures: none, 10s, 30s. The failure
-// after the last entry has no lockout — it logs the user out (pin-verification.ts)
-// — so the number of attempts the schedule grants IS the schedule's length.
-const LOCKOUT_MS_BY_FAILURES = [0, 10_000, 30_000] as const
+import type { PinFailureState } from "@app/utils/storage/secureStorage"
 
-/** Derived, so adding a tier can't silently widen the attempt budget. */
-export const MAX_PIN_ATTEMPTS = LOCKOUT_MS_BY_FAILURES.length
-
-export const MAX_LOCKOUT_MS = LOCKOUT_MS_BY_FAILURES[MAX_PIN_ATTEMPTS - 1]
-
-export const lockoutMsForFailures = (failures: number): number =>
-  LOCKOUT_MS_BY_FAILURES[Math.min(Math.max(failures, 0), MAX_PIN_ATTEMPTS - 1)]
+const SECOND_MS = 1000
+const MINUTE_MS = 60 * SECOND_MS
 
 /**
- * Bounds a persisted lock when it is loaded: a stored timestamp further out
- * than the longest scheduled lockout (wall clock rolled backward after the
- * write, or a corrupt value) is cut to now + MAX_LOCKOUT_MS, so it still
- * expires on schedule instead of locking the user out indefinitely.
+ * How long the keypad stays shut after each consecutive failure, the first
+ * failure first. The last entry repeats for every failure past the table.
+ *
+ * The first two are a nudge: the attempt budget is what stops a guesser there,
+ * and one typo should cost seconds. From the third on, the budget is spent and
+ * the session is gone, but on a device whose lock outlives that logout the PIN
+ * is still there to guess against. The wait is then the only thing pacing the
+ * guesses, so it grows fast and stays long.
  */
-export const clampLockedUntil = (lockedUntil: number, now: number): number =>
-  Math.min(Math.max(lockedUntil, 0), now + MAX_LOCKOUT_MS)
+const LOCKOUT_MS_BY_FAILURE = [
+  10 * SECOND_MS,
+  30 * SECOND_MS,
+  MINUTE_MS,
+  5 * MINUTE_MS,
+  15 * MINUTE_MS,
+  60 * MINUTE_MS,
+] as const
+
+/** Whole failures only: a count that is fractional or not a number would index
+ *  past the table and come back as no wait at all, so it is truncated here, and
+ *  anything short of one failure asks for none. */
+export const lockoutMsForFailures = (failures: number): number => {
+  const hasFailed = failures >= 1
+  if (!hasFailed) return 0
+  const lastTier = LOCKOUT_MS_BY_FAILURE.length - 1
+  return LOCKOUT_MS_BY_FAILURE[Math.min(Math.trunc(failures) - 1, lastTier)]
+}
 
 /**
- * Milliseconds of lockout left at `now`, floored at zero and capped at the
- * longest scheduled lockout. The cap matters while the screen stays mounted:
- * a clock that moves backward mid-lockout must not inflate a live countdown
- * past what the schedule can hand out.
+ * Bounds a lock by the wait its own failure count warrants.
+ *
+ * A lock is written as now + that wait, so one read back further out than
+ * that proves the clock moved backward after the write, or that the value is
+ * not one this schedule wrote. It is cut to a full wait from now, so it still
+ * expires on schedule instead of standing for as long as the clock was off.
+ */
+export const clampLockedUntil = (
+  { attempts, lockedUntil }: PinFailureState,
+  now: number,
+): number => Math.min(Math.max(lockedUntil, 0), now + lockoutMsForFailures(attempts))
+
+/**
+ * Milliseconds of lockout left at `now`, floored at zero and bounded as above.
  *
  * The other direction is deliberately not defended: a clock moved *forward*
  * past `lockedUntil` lifts the lock at once. Nothing in JS gives a monotonic
- * reading that survives a relaunch, so the only real fix is native elapsed-time
- * counting (Android `SystemClock.elapsedRealtime`, iOS boot-time arithmetic) —
- * out of proportion for this. What it costs is pacing, not budget: the attempt
- * count is not a clock value, so MAX_PIN_ATTEMPTS still caps total guesses at
- * three before the session ends, tampered clock or not.
+ * reading that survives a relaunch, so closing that takes elapsed time counted
+ * natively (Android `SystemClock.elapsedRealtime`, iOS boot-time arithmetic).
+ * Under the cap it costs pacing and not budget, since the attempt count is not
+ * a clock value. Past the cap pacing is all there is, so there it is the limit
+ * of what a wall clock can enforce.
  */
-export const remainingLockoutMs = (lockedUntil: number, now: number): number =>
-  Math.min(Math.max(0, lockedUntil - now), MAX_LOCKOUT_MS)
+export const remainingLockoutMs = (state: PinFailureState, now: number): number =>
+  Math.max(0, clampLockedUntil(state, now) - now)

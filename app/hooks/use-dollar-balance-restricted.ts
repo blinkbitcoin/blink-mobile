@@ -2,7 +2,9 @@ import { GateReason } from "@app/types/account"
 import { AccountType } from "@app/types/wallet"
 
 import { toGateReason, useAccountRestrictions } from "./use-account-restrictions"
+import { useActiveWallet } from "./use-active-wallet"
 import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
+import { useHasSparkToken } from "@app/self-custodial/hooks/use-spark-network"
 
 /** `isRestricted` needs a resolved country, so it never accuses an unrestricted user.
  *  Surfaces hold on `isRegionPending` instead of reading the unresolved region as
@@ -32,17 +34,27 @@ type DollarBalanceGate = {
   reason: GateReason | null
 }
 
-/** The availability gate: Anon gates the dollar balance by itself, region otherwise. Anon
- *  resolves no region, so nothing pends there: the mode gates on its own. */
+/** The availability gate: a self-custodial wallet on a network with no dollar token, or
+ *  Anon, gates the dollar balance by itself, region otherwise. Anon resolves no region, so
+ *  nothing pends there: the mode gates on its own. */
 export const useDollarBalanceGate = (): DollarBalanceGate => {
+  const { accountType } = useActiveWallet()
+  const hasSparkToken = useHasSparkToken()
   const { isAnonMode } = useSelfCustodialAccountMode()
   const { isRestricted, isRegionPending, isRegionDetermined } =
     useDollarBalanceRestriction()
 
+  const isTokenMissing = accountType === AccountType.SelfCustodial && !hasSparkToken
+
   return {
-    isGated: isAnonMode || isRestricted,
+    isGated: isTokenMissing || isAnonMode || isRestricted,
     isRegionPending,
-    reason: toGateReason({ isAnonMode, isRestricted, isRegionDetermined }),
+    reason: toGateReason({
+      isTokenMissing,
+      isAnonMode,
+      isRestricted,
+      isRegionDetermined,
+    }),
   }
 }
 

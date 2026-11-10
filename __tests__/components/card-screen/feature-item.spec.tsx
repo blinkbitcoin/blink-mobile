@@ -12,8 +12,10 @@ jest.mock("@app/components/atomic/galoy-icon", () => {
   const { Text } = jest.requireActual("react-native")
   return {
     ...actual,
-    GaloyIcon: ({ name }: { name: string }) => (
-      <Text testID={`icon-${name}`}>{name}</Text>
+    GaloyIcon: ({ name, style }: { name: string; style?: object }) => (
+      <Text testID={`icon-${name}`} style={style}>
+        {name}
+      </Text>
     ),
   }
 })
@@ -48,5 +50,17 @@ describe("FeatureItem", () => {
         getByText("You receive 10,000 units ~0.1% of Blink").props.style,
       ),
     ).toMatchObject({ flex: 1 })
+  })
+
+  it("rounds the icon background to a circle", async () => {
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <FeatureItem feature={{ icon: "coins", title: "At $10M pre-money valuation" }} />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    const style = StyleSheet.flatten(getByTestId("icon-coins").props.style)
+    expect(style.borderRadius).toBe(style.width / 2)
   })
 })

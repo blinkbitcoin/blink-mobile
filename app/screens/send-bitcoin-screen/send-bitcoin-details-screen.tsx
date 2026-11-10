@@ -13,6 +13,7 @@ import {
 } from "react-native"
 import ReactNativeModal from "react-native-modal"
 import { gql } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { AmountInput } from "@app/components/amount-input/amount-input"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
@@ -59,9 +60,10 @@ import { useSendWallets } from "./hooks/use-send-wallets"
 
 import { testProps } from "../../utils/testProps"
 import { ConfirmFeesModal } from "./confirm-fees-modal"
-import { isValidAmount } from "./payment-details"
+import { isValidAmount, withConvertMoneyAmount } from "./payment-details"
 import { PaymentDetail } from "./payment-details/index.types"
 import { SendBitcoinDetailsExtraInfo } from "./send-bitcoin-details-extra-info"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 gql`
   query sendBitcoinDetailsScreen {
@@ -148,7 +150,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   const [isLoadingLnurl, setIsLoadingLnurl] = useState(false)
   const [modalHighFeesVisible, setModalHighFeesVisible] = useState(false)
 
-  const { convertMoneyAmount: _convertMoneyAmount } = usePriceConversion()
+  const { convertMoneyAmount: _convertMoneyAmount, displayCurrency } =
+    usePriceConversion()
   const { zeroDisplayAmount } = useDisplayCurrency()
   const { paymentDestination, sendingWalletId } = route.params
 
@@ -201,9 +204,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   const [asyncErrorMessage, setAsyncErrorMessage] = useState("")
   const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
 
-  // we are caching the _convertMoneyAmount when the screen loads.
-  // this is because the _convertMoneyAmount can change while the user is on this screen
-  // and we don't want to update the payment detail with a new convertMoneyAmount
+  /** Keeps the payment detail on the current rate. A change of display currency, which is
+   *  what sats-only mode starting or ending is, also moves the amount already typed. */
   useEffect(() => {
     if (!_convertMoneyAmount) {
       return
@@ -211,9 +213,10 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
     setPaymentDetail(
       (paymentDetail) =>
-        paymentDetail && paymentDetail.setConvertMoneyAmount(_convertMoneyAmount),
+        paymentDetail &&
+        withConvertMoneyAmount(paymentDetail, _convertMoneyAmount, displayCurrency),
     )
-  }, [_convertMoneyAmount, setPaymentDetail])
+  }, [_convertMoneyAmount, displayCurrency, setPaymentDetail])
 
   // we set the default values when the screen loads
   // this only run once (doesn't re-run after paymentDetail is set)
@@ -268,7 +271,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         <View style={styles.walletListPendingContainer}>
           <ActivityIndicator
             size="large"
-            color={colors.primary}
+            color={colors.accent}
             {...testProps("send-wallet-list-pending")}
           />
         </View>
@@ -440,7 +443,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           }
 
           if (lnurlParams?.commentAllowed) {
-            requestInvoiceParams.comment = paymentDetail.memo
+            requestInvoiceParams.comment = paymentDetail.comment
           }
 
           const result = await requestInvoiceWithServiceParams(requestInvoiceParams)
@@ -566,7 +569,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               onPress={handleCopyToClipboard}
               hitSlop={30}
             >
-              <GaloyIcon name={"copy-paste"} size={18} color={colors.primary} />
+              <GaloyIcon name={"copy-paste"} size={18} color={colors.accent} />
             </TouchableOpacity>
           </View>
         </View>
@@ -620,7 +623,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               </View>
 
               <View style={styles.pickWalletIcon}>
-                <GaloyIcon name={"caret-down"} size={24} color={colors.primary} />
+                <GaloyIcon name={"caret-down"} size={24} color={colors.accent} />
               </View>
             </View>
           </TouchableWithoutFeedback>
@@ -711,8 +714,8 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     borderStyle: "solid",
     overflow: "hidden",
-    backgroundColor: colors.grey5,
-    borderRadius: 10,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     alignItems: "center",
     padding: 14,
     minHeight: 60,
@@ -721,8 +724,8 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     borderStyle: "solid",
     overflow: "hidden",
-    backgroundColor: colors.grey5,
-    borderRadius: 10,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     alignItems: "center",
     padding: 14,
     minHeight: 60,
@@ -737,9 +740,9 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     borderStyle: "solid",
     overflow: "hidden",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     paddingHorizontal: 14,
-    borderRadius: 10,
+    borderRadius: radius.default,
     alignItems: "center",
     marginBottom: 10,
     minHeight: 60,
@@ -770,8 +773,9 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
   },
   fieldTitleText: {
+    color: colors.textSecondary,
     fontWeight: "bold",
-    marginBottom: 4,
+    marginBottom: groupTitleGap,
   },
   fieldContainer: {
     marginBottom: 12,

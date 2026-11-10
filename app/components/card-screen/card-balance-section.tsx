@@ -1,5 +1,6 @@
 import React from "react"
 import { TouchableOpacity, View } from "react-native"
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Text, makeStyles } from "@rn-vui/themed"
 
@@ -58,16 +59,16 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "column",
   },
   balanceUsd: {
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   balanceSecondary: {
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
   addFundsButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     paddingHorizontal: 14,
     height: 40,
     gap: 6,
@@ -76,9 +77,9 @@ const useStyles = makeStyles(({ colors }) => ({
     opacity: 0.5,
   },
   addFundsText: {
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   primaryColor: {
-    color: colors.primary,
+    color: colors.accent,
   },
 }))

@@ -36,6 +36,10 @@ const noRetryOperations = [
   "onChainUsdTxFeeBySpeed",
   "onChainUsdTxFeeAsBtcDenominatedBySpeed",
 
+  // Each landing mints an address and spends one of the hourly creates; the user taps
+  // New again instead.
+  "onChainAddressCreate",
+
   // no need to retry to upload the token
   // specially as it's running on app start
   // and can create some unwanted loop when token is not valid
@@ -51,6 +55,24 @@ const noRetryOperations = [
   // Irreversible, and it kills the token that authenticated it: a resend can neither undo
   // the first attempt nor authenticate itself.
   "accountDelete",
+
+  // Spends its registration: a resend after a lost answer is refused even when the first
+  // attempt turned the authenticator on. The code screen reads the account back instead.
+  "userTotpRegistrationValidate",
+
+  // Each code check spends one of the hourly attempts the server allows, and a removal
+  // that landed leaves nothing for a resend to remove.
+  "userTotpDelete",
+
+  // The login method additions the authenticator guards: each spends one of those
+  // attempts, the phone's also its SMS code, and one that landed refuses a resend.
+  "userEmailRegistrationInitiate",
+  "userPhoneRegistrationValidate",
+
+  // A card limit removal that landed leaves nothing for a resend to remove. The limits
+  // screen reports a failed one and reads the card's controls again, so it shows what
+  // the server holds.
+  "cardSpendingLimitRemove",
 ]
 
 const IDEMPOTENCY_KEY_HEADER = "x-idempotency-key"

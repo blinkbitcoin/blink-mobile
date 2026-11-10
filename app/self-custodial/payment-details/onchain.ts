@@ -15,6 +15,8 @@ import {
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 
+import { ScRail } from "../measurement"
+
 import { createGetFeeOnchain, createSendMutationOnchain } from "./send-helpers"
 
 type CreateOnchainParams<T extends WalletCurrency> = {
@@ -68,11 +70,13 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
         canSendPayment: true,
         canGetFee: true,
         getFee: createGetFeeOnchain(prepareParams, feeTier),
-        sendPaymentMutation: createSendMutationOnchain(
-          prepareParams,
-          feeTier,
+        sendPaymentMutation: createSendMutationOnchain(prepareParams, feeTier, {
+          telemetry: {
+            rail: ScRail.Onchain,
+            sendingWallet: sendingWalletDescriptor.currency,
+          },
           idempotencyKeyRef,
-        ),
+        }),
       }
     : { canSendPayment: false, canGetFee: false }
 

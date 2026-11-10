@@ -11,7 +11,7 @@ import {
 import { Screen } from "@app/components/screen"
 import { SuccessScreenLayout } from "@app/components/success-screen-layout"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { isBackwardAction, RootStackParamList } from "@app/navigation/stack-param-lists"
 
 type SuccessRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupSuccess">
 
@@ -37,6 +37,20 @@ export const BackupSuccessScreen: React.FC = () => {
   }, [navigateToHome])
 
   useEffect(() => () => clearTimeout(holdTimerRef.current), [])
+
+  /** Every way here lands with the work done and only this screen's reset to Primary
+   *  ahead, which leaving clears. So the user's back goes home at once rather than back
+   *  into a flow that is over: a restore's terms, with the account already active. The
+   *  swipe, which the native stack cannot refuse, is switched off in the route options. */
+  useEffect(
+    () =>
+      navigation.addListener("beforeRemove", (event) => {
+        if (!isBackwardAction(event.data.action)) return
+        event.preventDefault()
+        navigateToHome()
+      }),
+    [navigation, navigateToHome],
+  )
 
   const fallbackMessage = reBackup
     ? LL.common.success()

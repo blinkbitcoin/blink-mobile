@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { IconHero } from "@app/components/icon-hero"
 import { CloseHeader } from "@app/components/close-header"
@@ -58,7 +59,7 @@ export const SelectInvestScreen: React.FC = () => {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <IconHero
           icon="btc-outline"
-          iconColor={colors.primary}
+          iconColor={colors.accent}
           title={LL.CardFlow.Onboarding.SelectInvest.desiredCreditLimit()}
         />
 
@@ -120,20 +121,20 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
   },
   limitOptionSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.grey6,
-    borderRadius: 8,
+    borderColor: colors.accent,
+    backgroundColor: colors.surfacePressed,
+    borderRadius: radius.default,
   },
   limitSeparator: {
     width: "97%",
     height: 1,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     position: "absolute",
     bottom: 0,
     alignSelf: "center",
   },
   limitText: {
-    color: colors.grey0,
+    color: colors.textPrimary,
     paddingLeft: 10,
   },
   buttonsContainer: {

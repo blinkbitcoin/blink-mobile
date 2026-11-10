@@ -24,6 +24,11 @@ jest.mock("@react-navigation/native", () => {
 jest.mock("@app/screens/earns-map-screen/use-quiz-server", () => ({
   useQuizServer: jest.fn(),
 }))
+// The real modal unmounts its body only once the closing animation ends, which a
+// loaded CI runner can push past the waitFor timeout.
+jest.mock("react-native-modal", () =>
+  jest.requireActual("@mocks/react-native-modal-mock"),
+)
 const findPressableParent = (node: ReactTestInstance | null): ReactTestInstance => {
   let current: ReactTestInstance | null = node
   while (current && !current.props?.onPress) {
@@ -159,11 +164,12 @@ describe("EarnMapScreen", () => {
       expect(screen.getByText(oneSectionTitle)).toBeTruthy()
     })
     fireEvent.press(screen.getByText(LL.EarnScreen.continueNoRewards()))
-    await waitFor(
-      () => {
-        expect(screen.queryByText(oneSectionTitle)).toBeNull()
-      },
-      { timeout: 3000 },
-    )
+    await waitFor(() => {
+      expect(screen.queryByText(oneSectionTitle)).toBeNull()
+    })
+    expect(mockNavigate).toHaveBeenCalledWith("earnsSection", {
+      section: "WhatIsMoney",
+      isAvailable: false,
+    })
   })
 })

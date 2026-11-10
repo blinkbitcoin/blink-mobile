@@ -64,7 +64,7 @@ export const UnsupportedRegionScreen: React.FC = () => {
             name="close"
             size={45}
             color={colors.error}
-            backgroundColor={colors.grey5}
+            backgroundColor={colors.surfaceInteractive}
             containerSize={44}
           />
           <View style={styles.textGroup}>
@@ -99,14 +99,14 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 20,
     fontWeight: "700",
     lineHeight: 24,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
     maxWidth: 264,
   },
   description: {
     fontSize: 16,
     lineHeight: 22,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
     maxWidth: 264,
   },

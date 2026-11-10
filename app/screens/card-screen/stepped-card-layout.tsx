@@ -39,7 +39,7 @@ export const SteppedCardLayout: React.FC<SteppedCardLayoutProps> = ({
     theme: { colors },
   } = useTheme()
 
-  const resolvedIconColor = iconColor ?? colors.primary
+  const resolvedIconColor = iconColor ?? colors.accent
 
   return (
     <Screen preset="fixed" style={styles.screen}>
@@ -53,7 +53,7 @@ export const SteppedCardLayout: React.FC<SteppedCardLayoutProps> = ({
             name={icon}
             size={34}
             color={resolvedIconColor}
-            backgroundColor={colors.grey5}
+            backgroundColor={colors.surfaceInteractive}
             containerSize={44}
           />
 
@@ -106,7 +106,7 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 20,
     fontWeight: "700",
     lineHeight: 24,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
   },
   subtitle: {
@@ -114,7 +114,7 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 12,
     fontWeight: "400",
     lineHeight: 18,
-    color: colors.grey2,
+    color: colors.textMuted,
     textAlign: "center",
   },
   content: {

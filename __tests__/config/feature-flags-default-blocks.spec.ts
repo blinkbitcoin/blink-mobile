@@ -12,6 +12,7 @@ jest.mock("@react-native-firebase/remote-config", () => ({
     setDefaults: jest.fn(),
     setConfigSettings: jest.fn(),
     getValue: jest.fn(() => ({
+      getSource: () => "remote",
       asString: () => "",
       asBoolean: () => false,
       asNumber: () => 0,

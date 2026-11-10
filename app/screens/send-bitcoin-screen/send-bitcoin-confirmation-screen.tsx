@@ -4,6 +4,7 @@ import { PanGestureHandler } from "react-native-gesture-handler"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 
 import { gql } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
@@ -49,6 +50,8 @@ import {
 } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
 import { ellipsizeMiddle } from "@app/utils/helper"
+import { staticSurface } from "@app/rne-theme/surfaces"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 gql`
   query sendBitcoinConfirmationScreen {
@@ -495,13 +498,13 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               onPress={handleCopyToClipboard}
               hitSlop={30}
             >
-              <GaloyIcon name={"copy-paste"} size={18} color={colors.primary} />
+              <GaloyIcon name={"copy-paste"} size={18} color={colors.accent} />
             </TouchableOpacity>
           </View>
         </View>
         <View style={styles.fieldContainer}>
           <Text style={styles.fieldTitleText}>{LL.common.from()}</Text>
-          <View style={styles.fieldBackground}>
+          <View style={[styles.fieldBackground, styles.fieldBackgroundStatic]}>
             <View style={styles.walletSelectorTypeContainer}>
               <CurrencyPill
                 currency={sendingWalletDescriptor.currency}
@@ -543,7 +546,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         </View>
         <View style={styles.fieldContainer}>
           <Text style={styles.fieldTitleText}>{LL.SendBitcoinScreen.amount()}</Text>
-          <View style={styles.fieldBackground}>
+          <View style={[styles.fieldBackground, styles.fieldBackgroundStatic]}>
             <Text type="p2">
               {formatDisplayAndWalletAmount({
                 primaryAmount: unitOfAccountAmount,
@@ -556,7 +559,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         {note ? (
           <View style={styles.fieldContainer}>
             <Text style={styles.fieldTitleText}>{LL.SendBitcoinScreen.note()}</Text>
-            <View style={styles.fieldBackground}>
+            <View style={[styles.fieldBackground, styles.fieldBackgroundStatic]}>
               <Text type="p2" style={styles.noteText}>
                 {note}
               </Text>
@@ -573,6 +576,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           <View
             style={[
               styles.fieldBackground,
+              styles.fieldBackgroundStatic,
               isLightningRecommended() ? styles.warningOutline : undefined,
             ]}
           >
@@ -654,19 +658,21 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     borderStyle: "solid",
     overflow: "hidden",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     padding: 14,
     minHeight: 60,
-    borderRadius: 10,
+    borderRadius: radius.default,
     alignItems: "center",
   },
+  fieldBackgroundStatic: staticSurface(colors),
   warningOutline: {
     borderColor: colors.warning,
     borderWidth: 2,
   },
   fieldTitleText: {
+    color: colors.textSecondary,
     fontWeight: "bold",
-    marginBottom: 4,
+    marginBottom: groupTitleGap,
   },
   walletSelectorTypeContainer: {
     justifyContent: "center",

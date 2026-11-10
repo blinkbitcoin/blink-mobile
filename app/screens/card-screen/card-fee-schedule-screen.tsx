@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
@@ -13,6 +14,8 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { openExternalUrl } from "@app/utils/external"
+import { staticSurface } from "@app/rne-theme/surfaces"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 type Fee = {
   title: string
@@ -132,7 +135,7 @@ export const CardFeeScheduleScreen: React.FC = () => {
 
         <View style={styles.noticeCard}>
           <View style={styles.noticeTitleRow}>
-            <GaloyIcon name="info" size={16} color={colors.black} />
+            <GaloyIcon name="info" size={16} color={colors.textOnBackground} />
             <Text style={styles.noticeTitle}>{btcConversion.title()}</Text>
           </View>
           <Text style={styles.noticeBody}>{btcConversion.body()}</Text>
@@ -162,7 +165,7 @@ export const CardFeeScheduleScreen: React.FC = () => {
           <GaloyIcon
             name={isDetailsExpanded ? "caret-up" : "caret-down"}
             size={16}
-            color={colors.black}
+            color={colors.textOnBackground}
           />
           <Text style={styles.expandTitle}>{additionalDetails.title()}</Text>
         </Pressable>
@@ -215,19 +218,19 @@ const useStyles = makeStyles(({ colors }) => ({
   effective: {
     fontSize: 12,
     lineHeight: 18,
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
   section: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   sectionLabel: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textSecondary,
   },
   card: {
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
+    ...staticSurface(colors),
+    borderRadius: radius.default,
   },
   row: {
     flexDirection: "row",
@@ -244,27 +247,27 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 12,
     lineHeight: 18,
     fontWeight: "700",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   rowSubtitle: {
     fontSize: 10,
     lineHeight: 13,
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
   rowValue: {
     fontSize: 14,
     lineHeight: 20,
     fontWeight: "700",
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "right",
   },
   separator: {
     height: 1,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
   },
   noticeCard: {
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
+    ...staticSurface(colors),
+    borderRadius: radius.default,
     padding: 14,
     gap: 14,
   },
@@ -277,17 +280,17 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 16,
     lineHeight: 22,
     fontWeight: "700",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   noticeBody: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
   infoBox: {
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderLeftWidth: 2,
-    borderLeftColor: colors.black,
+    borderLeftColor: colors.textOnBackground,
     borderRadius: 6,
     paddingLeft: 14,
     paddingRight: 10,
@@ -296,13 +299,13 @@ const useStyles = makeStyles(({ colors }) => ({
   infoText: {
     fontSize: 12,
     lineHeight: 18,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   infoLink: {
     fontSize: 12,
     lineHeight: 18,
     fontWeight: "700",
-    color: colors.primary,
+    color: colors.accent,
   },
   expandTitleRow: {
     flexDirection: "row",
@@ -312,18 +315,18 @@ const useStyles = makeStyles(({ colors }) => ({
   expandTitle: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   detailsCard: {
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
+    ...staticSurface(colors),
+    borderRadius: radius.default,
     padding: 14,
     gap: 12,
   },
   detailsParagraph: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
   detailsBold: {
     fontWeight: "700",

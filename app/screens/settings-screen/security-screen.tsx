@@ -2,6 +2,7 @@ import * as React from "react"
 import { useCallback, useMemo, useState } from "react"
 import { View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { useHideBalanceSetting } from "@app/hooks/use-hide-balance-setting"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import type { TranslationFunctions } from "@app/i18n/i18n-types"
@@ -182,7 +183,8 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
        *  action exists to avoid. */
       appLock: () => enableBiometrics(goToSetPin, goToSetPin),
       hideBalance: () => setAlwaysHideBalance(true),
-      twoFactor: () => navigation.navigate("totpRegistrationInitiate"),
+      twoFactor: () =>
+        navigation.navigate("totpRegistrationInitiate", { offersOnboarding: true }),
       emailVerified: onEmailSignalPress,
     }),
     [navigation, enableBiometrics, goToSetPin, setAlwaysHideBalance, onEmailSignalPress],
@@ -258,11 +260,11 @@ const useStyles = makeStyles(({ colors }) => ({
     rowGap: 20,
   },
   settingContainer: {
-    backgroundColor: colors.grey5,
-    borderRadius: 12,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
   },
   textContainer: {
-    color: colors.grey3,
+    color: colors.textDisabled,
   },
   listItemContainer: {
     backgroundColor: colors.transparent,

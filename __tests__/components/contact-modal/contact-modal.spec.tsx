@@ -40,7 +40,12 @@ jest.mock("@rn-vui/themed", () => {
     makeStyles: () => () => ({}),
     useTheme: () => ({
       theme: {
-        colors: { black: "#000", white: "#fff", primary: "#fc5805", grey5: "#eee" },
+        colors: {
+          textOnBackground: "#000",
+          backgroundDefault: "#fff",
+          accent: "#fc5805",
+          surfaceInteractive: "#eee",
+        },
       },
     }),
     Icon: () => null,
@@ -76,7 +81,6 @@ jest.mock("@app/i18n/i18n-react", () => ({
         statusPage: () => "Status page",
         faq: () => "FAQ",
         telegram: () => "Telegram",
-        mattermost: () => "Mattermost",
         whatsapp: () => "WhatsApp",
         email: () => "Email",
         emailCopied: ({ email }: { email: string }) =>
@@ -151,11 +155,6 @@ describe("ContactModal", () => {
       label: "Telegram",
       url: "https://t.me/blinkbtc",
     },
-    {
-      channel: SupportChannels.Mattermost,
-      label: "Mattermost",
-      url: "https://chat.blink.sv",
-    },
   ]
 
   linkChannels.forEach(({ channel, label, url }) => {
@@ -197,7 +196,6 @@ describe("ContactModal", () => {
     expect(getByText("support@blink.sv")).toBeTruthy()
     expect(queryByText("Email")).toBeNull()
     expect(queryByText("Telegram")).toBeNull()
-    expect(queryByText("Mattermost")).toBeNull()
     expect(queryByText("WhatsApp")).toBeNull()
   })
 

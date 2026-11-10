@@ -9,6 +9,11 @@ if [[ -z $(git config --global user.name) ]]; then
   git config --global user.name "CI Bot" > /dev/null
 fi
 
+# Node's default heap cap is ~2 GB on the 8 GiB workers; matches .github/workflows/test.yml.
+function use_ci_node_heap() {
+  export NODE_OPTIONS=--max-old-space-size=4096
+}
+
 function unpack_deps() {
 
   echo "Unpacking deps... "
@@ -22,6 +27,20 @@ function unpack_deps() {
     git --no-pager diff
     exit 1;
   fi
+
+  # node_modules carries the patches the bundle was built with. Compare the whole
+  # tree, not an overlay: an overlay misses a patch added or deleted since then.
+  local bundled_patches
+  bundled_patches=$(mktemp -d)
+  tar -zxf ../bundled-deps/bundled-deps-*.tgz -C "${bundled_patches}" ./patches/
+
+  if ! diff -r "${bundled_patches}/patches" patches; then
+    echo "Bundled deps were built with different patches - deps are not in sync"
+    rm -rf "${bundled_patches}"
+    exit 1;
+  fi
+
+  rm -rf "${bundled_patches}"
 
   echo "Done!"
 

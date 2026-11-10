@@ -9,6 +9,8 @@ import { makeStyles, useTheme, Text } from "@rn-vui/themed"
 import Icon from "react-native-vector-icons/Ionicons"
 import ReactNativeModal from "react-native-modal"
 
+import { radius } from "@app/rne-theme/radius"
+
 export interface DropdownOption {
   value: string
   label: string
@@ -87,7 +89,7 @@ export const DropdownComponent: React.FC<DropdownProps> = ({
             </View>
 
             <View style={styles.iconContainer}>
-              <Icon name="chevron-down" size={24} color={colors.primary} />
+              <Icon name="chevron-down" size={24} color={colors.accent} />
             </View>
           </View>
         </View>
@@ -125,7 +127,7 @@ export const DropdownComponent: React.FC<DropdownProps> = ({
                   )}
                 </View>
                 {option.value === selectedValue && (
-                  <Icon name="checkmark" size={24} color={colors.primary} />
+                  <Icon name="checkmark" size={24} color={colors.accent} />
                 )}
               </View>
             </TouchableOpacity>
@@ -139,23 +141,23 @@ export const DropdownComponent: React.FC<DropdownProps> = ({
 const useStyles = makeStyles(({ colors }) => ({
   fieldBackground: {
     flexDirection: "row",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     alignItems: "center",
     paddingHorizontal: 14,
     paddingVertical: 14,
     minHeight: 60,
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
   contentContainer: {
     flex: 1,
     justifyContent: "center",
   },
   descriptionText: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     marginTop: 2,
   },
   placeholderText: {
-    color: colors.grey3,
+    color: colors.textDisabled,
   },
   iconContainer: {
     marginLeft: 12,
@@ -171,22 +173,22 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   optionContainer: {
     flexDirection: "row",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     paddingHorizontal: 14,
     paddingVertical: 16,
-    borderRadius: 10,
+    borderRadius: radius.default,
     alignItems: "center",
     marginBottom: 10,
     minHeight: 60,
   },
   selectedOption: {
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
   },
   optionContent: {
     flex: 1,
   },
   optionDescription: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     marginTop: 2,
   },
 }))

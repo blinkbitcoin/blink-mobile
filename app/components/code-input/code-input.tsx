@@ -2,6 +2,7 @@ import * as React from "react"
 import { useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { testProps } from "@app/utils/testProps"
 import { useTheme } from "@react-navigation/native"
@@ -31,12 +32,15 @@ const useStyles = makeStyles(({ colors }) => ({
   inputContainerStyle: {
     minWidth: 160,
     minHeight: 60,
-    borderWidth: 2,
-    borderBottomWidth: 2,
+    borderWidth: 0,
+    borderBottomWidth: 0,
     paddingHorizontal: 10,
-    borderColor: colors.primary5,
-    borderRadius: 8,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     marginRight: 0,
+  },
+  fieldFocused: {
+    backgroundColor: colors.surfaceFocused,
   },
   inputStyle: {
     fontSize: 24,
@@ -68,8 +72,13 @@ export const CodeInput: React.FC<Props> = ({
   const { colors } = useTheme()
 
   const [code, _setCode] = useState("")
+  // The field autofocuses on mount, so start focused: no resting fill flashes first.
+  const [isFieldFocused, setIsFieldFocused] = useState(true)
 
+  /** Nothing typed while a code is checked: the field keeps the one sent, rather than
+   *  show another that would not be. */
   const setCode = (codeInput: string) => {
+    if (loading) return
     const code = codeInput.trim()
 
     if (code.length > 6) {
@@ -99,7 +108,12 @@ export const CodeInput: React.FC<Props> = ({
           {...testProps("code-input")}
           placeholder={placeholder}
           containerStyle={styles.inputComponentContainerStyle}
-          inputContainerStyle={styles.inputContainerStyle}
+          inputContainerStyle={[
+            styles.inputContainerStyle,
+            isFieldFocused && styles.fieldFocused,
+          ]}
+          onFocus={() => setIsFieldFocused(true)}
+          onBlur={() => setIsFieldFocused(false)}
           inputStyle={styles.inputStyle}
           value={code}
           onChangeText={setCode}
@@ -117,6 +131,8 @@ export const CodeInput: React.FC<Props> = ({
           <ActivityIndicator
             style={styles.activityIndicator}
             size="large"
+            // React Navigation's theme, not the app palette: `primary` is its own key
+            // eslint-disable-next-line no-restricted-syntax
             color={colors.primary}
           />
         )}

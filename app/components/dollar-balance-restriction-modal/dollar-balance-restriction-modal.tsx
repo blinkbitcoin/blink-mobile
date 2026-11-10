@@ -35,7 +35,7 @@ export const DollarBalanceRestrictionModal: React.FC<Props> = ({
     <CustomModal
       isVisible={isVisible}
       toggleModal={toggleModal}
-      image={<GaloyIcon name="info" size={80} color={colors.primary} />}
+      image={<GaloyIcon name="info" size={80} color={colors.accent} />}
       title={title}
       titleMaxWidth="100%"
       body={body}

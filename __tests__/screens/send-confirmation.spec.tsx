@@ -25,8 +25,10 @@ import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import type { useNonCustodialConversionLimits } from "@app/self-custodial/hooks/use-non-custodial-conversion-limits"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
+import { light } from "@app/rne-theme/colors"
 
-import { flushEffects } from "../helpers/flush-effects"
+import { surfaceColor } from "../helpers/surface-color"
+import { waitForStableRender } from "../helpers/wait-for-stable-render"
 import { ContextForScreen } from "./helper"
 
 const Intraledger = ({
@@ -55,7 +57,7 @@ jest.mock("@app/store/persistent-state", () => ({
 }))
 
 jest.mock("@app/hooks/use-account-registry", () => ({
-  AccountRegistryProvider: ({ children }: { children: React.ReactNode }) => children,
+  ...jest.requireActual("@app/hooks/use-account-registry"),
   useAccountRegistry: () => ({
     accounts: [],
     activeAccount: undefined,
@@ -394,6 +396,39 @@ describe("SendBitcoinConfirmationScreen", () => {
     )
 
     expect(feeRow().getByText("₦0 ($0.00)")).toBeTruthy()
+  })
+
+  it("paints the review fields static and keeps the copyable destination interactive", async () => {
+    const note = "Dinner split"
+    const routeWithNote = {
+      ...route,
+      params: {
+        paymentDetail: createIntraledgerPaymentDetails({
+          ...defaultParams,
+          senderSpecifiedMemo: note,
+        }),
+      },
+    } as const
+
+    await renderSettled(
+      <ContextForScreen>
+        <Intraledger route={routeWithNote} />
+      </ContextForScreen>,
+    )
+
+    const [copyDestination] = screen
+      .UNSAFE_getAllByType(TouchableOpacity)
+      .filter((node) => node.props.hitSlop === 30)
+    expect(surfaceColor(copyDestination)).toBe(light.surfaceInteractive)
+
+    // One value per field, so dropping the static style from any one of them fails here:
+    // the file-level guard only counts the style, not the fields that use it.
+    const from = screen.getByText("$100.00")
+    const amount = screen.getByText("$1.00 (₦1)")
+    const fee = screen.getByLabelText("Successful Fee")
+    for (const value of [from, amount, screen.getByText(note), fee]) {
+      expect(surfaceColor(value)).toBe(light.surfaceStatic)
+    }
   })
 
   it("Send Screen Confirmation - Lightning lnurl Payment", async () => {
@@ -1051,13 +1086,13 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
   it("disables the slider when the fee quote errors so the user cannot sweep unwarned (C1)", async () => {
     mockUseFee.mockReturnValue({ status: "error" })
 
-    render(
+    const view = render(
       <ContextForScreen>
         <Intraledger route={buildUsdSettlementRoute(200)} />
       </ContextForScreen>,
     )
 
-    await flushEffects()
+    await waitForStableRender(view)
 
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
   })
@@ -1065,13 +1100,13 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
   it("disables the slider while the fee quote is loading", async () => {
     mockUseFee.mockReturnValue({ status: "loading" })
 
-    render(
+    const view = render(
       <ContextForScreen>
         <Intraledger route={buildUsdSettlementRoute(200)} />
       </ContextForScreen>,
     )
 
-    await flushEffects()
+    await waitForStableRender(view)
 
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
   })
@@ -1087,13 +1122,13 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
       amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
     })
 
-    render(
+    const view = render(
       <ContextForScreen>
         <Intraledger route={buildUsdSettlementRoute(200)} />
       </ContextForScreen>,
     )
 
-    await flushEffects()
+    await waitForStableRender(view)
 
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
   })
@@ -1107,12 +1142,12 @@ describe("SendBitcoinConfirmationScreen — fee error messages", () => {
 
   const renderWithFee = async (fee: Record<string, unknown>) => {
     mockUseFee.mockReturnValue(fee)
-    render(
+    const view = render(
       <ContextForScreen>
         <Intraledger route={buildUsdSettlementRoute(200)} />
       </ContextForScreen>,
     )
-    await flushEffects()
+    await waitForStableRender(view)
   }
 
   it("names the cause when the quote carries a classified self-custodial code", async () => {

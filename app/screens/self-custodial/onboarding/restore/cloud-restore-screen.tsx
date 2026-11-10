@@ -159,12 +159,12 @@ const useStyles = makeStyles(({ colors }) => ({
   description: {
     fontSize: 16,
     lineHeight: 22,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   pickerDescription: {
     fontSize: 16,
     lineHeight: 22,
-    color: colors.grey2,
+    color: colors.textMuted,
     marginTop: 10,
     marginBottom: 12,
   },

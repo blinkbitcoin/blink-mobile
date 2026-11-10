@@ -228,6 +228,7 @@ export const executeAutoConvert = async (
       currencyCode: WalletCurrency.Usd,
     },
     direction: ConvertDirection.BtcToUsd,
+    source: "auto_convert",
   }
 
   let quote

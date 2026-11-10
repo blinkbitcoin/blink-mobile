@@ -4,6 +4,9 @@ import { Pressable, TextInput, View } from "react-native"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
+import { groupTitleGap } from "@app/rne-theme/tokens"
+
+import { radius } from "@app/rne-theme/radius"
 
 type PasswordInputProps = {
   label: string
@@ -12,6 +15,7 @@ type PasswordInputProps = {
   onBlur?: () => void
   placeholder?: string
   error?: string
+  disabled?: boolean
 }
 
 export const PasswordInput: React.FC<PasswordInputProps> = ({
@@ -21,6 +25,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
   onBlur,
   placeholder,
   error,
+  disabled = false,
 }) => {
   const [secure, setSecure] = useState(true)
   const styles = useStyles()
@@ -38,17 +43,18 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
           onChangeText={onChangeText}
           onBlur={onBlur}
           placeholder={placeholder}
-          placeholderTextColor={colors.grey2}
+          placeholderTextColor={colors.textMuted}
           accessibilityLabel={label}
           secureTextEntry={secure}
           autoCapitalize="none"
           autoCorrect={false}
+          editable={!disabled}
         />
         <Pressable onPress={() => setSecure((prev) => !prev)} style={styles.eyeButton}>
           <GaloyIcon
             name={secure ? "eye" : "eye-slash"}
             size={16}
-            color={colors.primary}
+            color={colors.accent}
           />
         </Pressable>
       </View>
@@ -69,14 +75,14 @@ const useStyles = makeStyles(({ colors }) => ({
   label: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
-    marginBottom: 3,
+    color: colors.textSecondary,
+    marginBottom: groupTitleGap,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     minHeight: 50,
     paddingLeft: 14,
     paddingRight: 10,
@@ -85,7 +91,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
     paddingVertical: 5,
   },
   eyeButton: {

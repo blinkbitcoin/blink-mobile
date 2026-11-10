@@ -70,4 +70,16 @@ describe("PasswordInput", () => {
     fireEvent(getByPlaceholderText("Enter password"), "blur")
     expect(onBlur).toHaveBeenCalledTimes(1)
   })
+
+  it("does not take typing while disabled", () => {
+    const onChangeText = jest.fn()
+    const { getByPlaceholderText } = render(
+      <ContextForScreen>
+        <PasswordInput {...defaultProps} onChangeText={onChangeText} disabled />
+      </ContextForScreen>,
+    )
+
+    fireEvent.changeText(getByPlaceholderText("Enter password"), "mypassword")
+    expect(onChangeText).not.toHaveBeenCalled()
+  })
 })

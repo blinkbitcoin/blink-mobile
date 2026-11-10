@@ -16,6 +16,7 @@ import { OnboardingStatus } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { getKycBannerConfig } from "./get-kyc-banner-config"
 import { usePersonalDetailsData } from "./hooks"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 export const CardPersonalDetailsScreen: React.FC = () => {
   const styles = useStyles()
@@ -41,10 +42,10 @@ export const CardPersonalDetailsScreen: React.FC = () => {
     status: onboardingStatus,
     translations: LLPersonalDetails,
     colors: {
-      success: colors._green,
+      success: colors.success,
       warning: colors.warning,
       error: colors.error,
-      info: colors.primary,
+      info: colors.accent,
     },
   })
 
@@ -64,7 +65,7 @@ export const CardPersonalDetailsScreen: React.FC = () => {
     return (
       <Screen preset="scroll">
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={colors.accent} />
         </View>
       </Screen>
     )
@@ -149,7 +150,7 @@ export const CardPersonalDetailsScreen: React.FC = () => {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{LL.common.support()}</Text>
-          <ContactSupportRow rightIconColor={colors.primary} />
+          <ContactSupportRow rightIconColor={colors.accent} />
         </View>
       </View>
     </Screen>
@@ -176,24 +177,24 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
   },
   fullName: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",
     lineHeight: 20,
   },
   cardholderLabel: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 12,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
     lineHeight: 18,
   },
   section: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   sectionTitle: {
-    color: colors.black,
+    color: colors.textSecondary,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",

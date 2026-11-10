@@ -3,6 +3,7 @@ import {
   latestOnchainReceiptId,
   loadIssuedOnchainAddress,
   mergeSeenPendingDepositIds,
+  readIssuedOnchainAddress,
   saveIssuedOnchainAddress,
 } from "@app/self-custodial/storage/onchain-address"
 import {
@@ -270,9 +271,61 @@ describe("issued onchain address record", () => {
 
     await expect(
       saveIssuedOnchainAddress(ACCOUNT_ID, { address: "bc1q", depositMarker: null }),
-    ).resolves.toBeUndefined()
+    ).resolves.toBe(false)
     expect(mockRecordAppError).toHaveBeenCalledWith(
       expect.objectContaining({ message: "storage write exploded" }),
     )
+  })
+
+  it("says the record was written when the write lands", async () => {
+    await expect(
+      saveIssuedOnchainAddress(ACCOUNT_ID, { address: "bc1q", depositMarker: null }),
+    ).resolves.toBe(true)
+  })
+
+  /** A failed read must not pass for "no record": the address it hides may be the one
+   *  the SDK hands back, and telling them apart is what keeps a visit from counting. */
+  describe("telling a missing record from an unreadable one", () => {
+    it("reads a missing record as none issued", async () => {
+      await expect(readIssuedOnchainAddress(ACCOUNT_ID)).resolves.toEqual({
+        ok: true,
+        issued: null,
+      })
+    })
+
+    it("reads a stored record", async () => {
+      await saveIssuedOnchainAddress(ACCOUNT_ID, { address: "bc1q", depositMarker: "m" })
+
+      await expect(readIssuedOnchainAddress(ACCOUNT_ID)).resolves.toEqual({
+        ok: true,
+        issued: { address: "bc1q", depositMarker: "m", seenPendingDepositIds: undefined },
+      })
+    })
+
+    it("reads a record of the wrong shape as none issued, for the next save to replace", async () => {
+      store.set(STORAGE_KEY, JSON.stringify({ address: 42 }))
+
+      await expect(readIssuedOnchainAddress(ACCOUNT_ID)).resolves.toEqual({
+        ok: true,
+        issued: null,
+      })
+    })
+
+    /** Bytes that do not parse may be a record cut short mid-write: nothing can be said
+     *  about the address it held. */
+    it("says so when the stored bytes do not parse", async () => {
+      store.set(STORAGE_KEY, "{not json")
+
+      await expect(readIssuedOnchainAddress(ACCOUNT_ID)).resolves.toEqual({ ok: false })
+    })
+
+    it("says so when the store cannot be read", async () => {
+      storageFailure.read = new Error("storage read exploded")
+
+      await expect(readIssuedOnchainAddress(ACCOUNT_ID)).resolves.toEqual({ ok: false })
+      expect(mockRecordAppError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "storage read exploded" }),
+      )
+    })
   })
 })

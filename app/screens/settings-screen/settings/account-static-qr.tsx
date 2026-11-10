@@ -26,8 +26,8 @@ export const AccountStaticQR: React.FC = () => {
       loading={loading}
       title={LL.SettingsScreen.staticQr()}
       subtitleShorter={true}
-      leftGaloyIcon={<QrCodeIcon size={20} color={colors.black} />}
-      rightIcon={<GaloyIcon name="arrow-square-out" size={20} color={colors.primary} />}
+      leftGaloyIcon={<QrCodeIcon size={20} color={colors.textOnBackground} />}
+      rightIcon={<GaloyIcon name="arrow-square-out" size={20} color={colors.accent} />}
       action={() => {
         Linking.openURL(qrUrl)
       }}

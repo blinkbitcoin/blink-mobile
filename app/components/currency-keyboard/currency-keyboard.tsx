@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import { makeStyles, Text } from "@rn-vui/themed"
 import { Pressable, View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { Key as KeyType } from "../amount-input-screen/number-pad-reducer"
@@ -132,15 +133,15 @@ const useStyles = makeStyles(({ colors }) => ({
     minHeight: 45,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 12,
+    borderRadius: radius.default,
     borderWidth: 1,
-    borderColor: colors.grey4,
+    borderColor: colors.neutral,
   },
   keyDisabled: {
     opacity: 0.4,
   },
   keyPressedBg: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
   keyText: {
     fontSize: 26,
@@ -149,6 +150,6 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlign: "center",
   },
   backspaceIcon: {
-    color: colors.primary,
+    color: colors.accent,
   },
 }))

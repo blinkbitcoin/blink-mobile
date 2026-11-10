@@ -3,8 +3,10 @@ import { ActivityIndicator, View } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { InfoRow } from "@app/components/card-screen/info-row"
 import { testProps } from "@app/utils/testProps"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 type BalancePairCardProps = {
   bitcoinLabel: string
@@ -62,15 +64,15 @@ export const BalancePairCard: React.FC<BalancePairCardProps> = ({
 const useStyles = makeStyles(({ colors }) => ({
   card: {
     width: "100%",
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
+    ...staticSurface(colors),
+    borderRadius: radius.default,
     paddingHorizontal: 14,
     paddingVertical: 10,
     gap: 10,
   },
   separator: {
     height: 1,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
   },
   dollarPendingRow: {
     flexDirection: "row",
@@ -78,6 +80,6 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "space-between",
   },
   dollarPendingLabel: {
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
 }))

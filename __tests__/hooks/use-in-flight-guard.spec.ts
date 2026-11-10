@@ -1,6 +1,10 @@
 import { renderHook, act } from "@testing-library/react-native"
 
-import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
+import {
+  createInFlightGuard,
+  InFlightStatus,
+  useInFlightGuard,
+} from "@app/hooks/use-in-flight-guard"
 
 describe("useInFlightGuard", () => {
   it("resolves to the operation's result on first call", async () => {
@@ -127,5 +131,140 @@ describe("useInFlightGuard", () => {
     })
 
     expect(first.result.current.isRunning()).toBe(false)
+  })
+
+  /** `run` answers `undefined` both for a call turned away and for an operation that
+   *  answered nothing, so a caller that has to tell them apart asks `attempt`. */
+  describe("attempt", () => {
+    it("tells an operation that answered nothing from a call turned away", async () => {
+      const guard = createInFlightGuard()
+      let release: () => void = () => {}
+      const first = guard.attempt(
+        () =>
+          new Promise<void>((resolve) => {
+            release = resolve
+          }),
+      )
+
+      const turnedAway = await guard.attempt(async () => undefined)
+      release()
+
+      expect(turnedAway).toEqual({ status: InFlightStatus.AlreadyRunning })
+      expect(await first).toEqual({ status: InFlightStatus.Ran, value: undefined })
+    })
+
+    it("never runs the operation it turns away", async () => {
+      const guard = createInFlightGuard()
+      let release: () => void = () => {}
+      const first = guard.attempt(
+        () =>
+          new Promise<void>((resolve) => {
+            release = resolve
+          }),
+      )
+      const second = jest.fn(async () => "second")
+
+      await guard.attempt(second)
+      release()
+      await first
+
+      expect(second).not.toHaveBeenCalled()
+    })
+
+    it("passes a rejection through and lets the next attempt run", async () => {
+      const guard = createInFlightGuard()
+
+      await expect(
+        guard.attempt(async () => {
+          throw new Error("boom")
+        }),
+      ).rejects.toThrow("boom")
+
+      expect(await guard.attempt(async () => "after")).toEqual({
+        status: InFlightStatus.Ran,
+        value: "after",
+      })
+    })
+  })
+
+  /** A screen mounted while an operation started elsewhere still runs has to see it,
+   *  which polling `isRunning()` on render does not give it. */
+  describe("subscribe", () => {
+    it("tells a listener when an operation starts and when it settles", async () => {
+      const guard = createInFlightGuard()
+      const seen: boolean[] = []
+      guard.subscribe(() => seen.push(guard.isRunning()))
+      let release: () => void = () => {}
+
+      const running = guard.run(
+        () =>
+          new Promise<void>((resolve) => {
+            release = resolve
+          }),
+      )
+      expect(seen).toEqual([true])
+
+      release()
+      await running
+      expect(seen).toEqual([true, false])
+    })
+
+    it("tells it when an operation rejects too", async () => {
+      const guard = createInFlightGuard()
+      const listener = jest.fn()
+      guard.subscribe(listener)
+
+      await guard
+        .run(async () => {
+          throw new Error("boom")
+        })
+        .catch(() => undefined)
+
+      expect(listener).toHaveBeenCalledTimes(2)
+      expect(guard.isRunning()).toBe(false)
+    })
+
+    it("says nothing for a call turned away", async () => {
+      const guard = createInFlightGuard()
+      let release: () => void = () => {}
+      const first = guard.run(
+        () =>
+          new Promise<void>((resolve) => {
+            release = resolve
+          }),
+      )
+      const listener = jest.fn()
+      guard.subscribe(listener)
+
+      await guard.run(async () => "second")
+      expect(listener).not.toHaveBeenCalled()
+
+      release()
+      await first
+    })
+
+    it("lets go of the guard even when a listener throws", async () => {
+      const guard = createInFlightGuard()
+      const unsubscribe = guard.subscribe(() => {
+        throw new Error("listener broke")
+      })
+
+      await expect(guard.run(async () => "done")).rejects.toThrow("listener broke")
+      unsubscribe()
+
+      expect(guard.isRunning()).toBe(false)
+      expect(await guard.run(async () => "after")).toBe("after")
+    })
+
+    it("stops telling a listener that unsubscribed", async () => {
+      const guard = createInFlightGuard()
+      const listener = jest.fn()
+      const unsubscribe = guard.subscribe(listener)
+      unsubscribe()
+
+      await guard.run(async () => "done")
+
+      expect(listener).not.toHaveBeenCalled()
+    })
   })
 })

@@ -1,6 +1,6 @@
 import { Network } from "@breeztech/breez-sdk-spark-react-native"
 import Config from "react-native-config"
-import { DocumentDirectoryPath } from "react-native-fs"
+import { CachesDirectoryPath, DocumentDirectoryPath } from "react-native-fs"
 
 import { LNURL_DOMAINS } from "@app/config/appinfo"
 import { type GaloyInstanceName } from "@app/config/galoy-instances"
@@ -54,12 +54,51 @@ export const lnurlDomainsFor = (network: Network): string[] =>
     : [lnurlDomainFor(network), REGTEST_PAY_DOMAIN]
 
 /**
- * Base URL of the LNURL server for a self-custodial account: the same host its address is
- * spelled with, which is what serves the authenticated `/lnurlpay/{pubkey}` routes. Not
- * the custodial `lnAddressHostname` — `pay.*` fronts the payment app and 404s them.
+ * Whether an address-form identifier (user@domain) names one of our own accounts on any
+ * network we know. Telemetry only: a cross-network false positive costs a miscounted
+ * referral, not a misrouted payment, so the check spans every known domain instead of
+ * resolving the active network.
  */
-export const lnurlServerUrlFor = (network: Network): string =>
-  `https://${lnurlDomainFor(network)}`
+export const isOwnLnurlAddress = (identifier: string): boolean => {
+  const at = identifier.lastIndexOf("@")
+  if (at < 0) return false
+  const domain = identifier.slice(at + 1).toLowerCase()
+  return [
+    ...LNURL_DOMAINS,
+    MAINNET_LNURL_DOMAIN,
+    REGTEST_LNURL_DOMAIN,
+    REGTEST_PAY_DOMAIN,
+  ].includes(domain)
+}
+
+/**
+ * Where an account's Lightning Address lives: the base URL the app makes its own signed
+ * requests against, and the domain the SDK registers and resolves against at connect.
+ * Both spell the same host — not the custodial `lnAddressHostname`, since `pay.*` fronts
+ * the payment app and 404s the `/lnurlpay/{pubkey}` routes.
+ */
+export type LnurlServer = {
+  serverUrl: string
+  domain: string
+}
+
+/**
+ * Pure in both arguments. `outageHost` is the developer-only override from
+ * `app/config/simulated-outage.ts`, passed in rather than read here so this function
+ * says what it depends on and a caller cannot be surprised by a switch it cannot see.
+ *
+ * The override reaches the SDK's own requests without touching {@link lnurlDomainsFor},
+ * which decides whether a scanned code names an account we issued: black-holing that
+ * would change parsing rather than connectivity.
+ */
+export const resolveLnurlServer = (
+  network: Network,
+  outageHost: string | null,
+): LnurlServer => {
+  if (outageHost) return { serverUrl: `http://${outageHost}`, domain: outageHost }
+  const domain = lnurlDomainFor(network)
+  return { serverUrl: `https://${domain}`, domain }
+}
 
 /**
  * Returns the wallet's stored network label when it conflicts with the current
@@ -74,8 +113,32 @@ export const mismatchedNetworkLabel = (
   return storedLabel === networkLabelFor(network) ? null : storedLabel
 }
 
+/** The directory every wallet's SDK storage on `network` lives under. */
+export const storageRootFor = (network: Network): string =>
+  `${DocumentDirectoryPath}/breez-sdk-spark-${networkLabelFor(network)}`
+
 export const storageDirFor = (accountId: string, network: Network): string =>
-  `${DocumentDirectoryPath}/breez-sdk-spark-${networkLabelFor(network)}/${accountId}`
+  `${storageRootFor(network)}/${accountId}`
+
+/**
+ * Where the SDK writes `sdk.log`. One directory for the whole process, because the SDK
+ * logger is process-global rather than per account; under caches so the iOS backup
+ * skips it and Android's react-native-share provider (`cache-path "/"`) can share it.
+ */
+export const sdkLogDir = (): string => `${CachesDirectoryPath}/breez-sdk-logs`
+
+/** `sdk.log` is moved aside at launch once it passes this, so at most two files exist. */
+export const SDK_LOG_ROTATE_BYTES = 2 * 1024 * 1024
+
+/** Export cap: both files whole (2 x the rotate cap) plus room for one long session. */
+export const SDK_LOG_EXPORT_BYTES = 5 * 1024 * 1024
+
+/** Where a built export waits for the share target; emptied at the start of each export. */
+export const sdkLogExportDir = (): string =>
+  `${CachesDirectoryPath}/breez-sdk-log-exports`
+
+/** Printed in the export header. Pinned by a test against the installed package. */
+export const BREEZ_SDK_VERSION = "0.27.1"
 
 // Validates BREEZ_API_KEY at SDK init (from `lifecycle.createSdkConfig`). A
 // missing key means the build is misconfigured (e.g. release minification
@@ -97,12 +160,58 @@ let cachedTokenIdentifier: string | null = null
 // throws on a misconfigured build; downstream callers in hot paths (mappers,
 // snapshot loops, conversion entry points) read the cached value without
 // re-validating.
-export const requireSparkTokenIdentifier = (): string => {
+const requireMainnetTokenIdentifier = (): string => {
   if (cachedTokenIdentifier !== null) return cachedTokenIdentifier
   const id = Config.SPARK_TOKEN_IDENTIFIER
   if (!id) {
     throw new Error("SPARK_TOKEN_IDENTIFIER is not configured for this build")
   }
   cachedTokenIdentifier = id
+  return id
+}
+
+/**
+ * The Stable Balance token on a network, or null when it has none. From 0.27 the SDK
+ * refuses to connect with a token minted on another network, and USDB exists on mainnet
+ * only, so regtest carries a token only when the build names a regtest one.
+ */
+export const sparkTokenIdentifierFor = (network: Network): string | null => {
+  if (network === Network.Mainnet) return requireMainnetTokenIdentifier()
+  return Config.SPARK_REGTEST_TOKEN_IDENTIFIER || null
+}
+
+/** Never throws: a mainnet build without its token is the SDK connect's error to raise. */
+export const hasSparkTokenFor = (network: Network): boolean => {
+  if (network === Network.Mainnet) return true
+  return sparkTokenIdentifierFor(network) !== null
+}
+
+/**
+ * The network the SDK was last configured for. Every SDK in a session runs on it, since a
+ * wallet stored for another network is refused before connect, so the token lookups deep
+ * in the bridge and mappers read it here rather than having it threaded through to them.
+ * Null before the first connect, which reads as mainnet: the lookups' behaviour before
+ * the token became per network.
+ */
+let sdkNetwork: Network | null = null
+
+export const setSparkTokenNetwork = (network: Network): void => {
+  sdkNetwork = network
+}
+
+/** The connected network's token, or null when it has none (regtest by default). */
+export const sparkTokenIdentifier = (): string | null =>
+  sdkNetwork === null
+    ? requireMainnetTokenIdentifier()
+    : sparkTokenIdentifierFor(sdkNetwork)
+
+/** For the calls that cannot run without a token: conversions, dollar sends and limits.
+ *  The dollar-balance gate keeps them out of reach on a network without one. */
+export const requireSparkTokenIdentifier = (): string => {
+  const id = sparkTokenIdentifier()
+  if (id === null) {
+    const label = sdkNetwork === null ? "this network" : networkLabelFor(sdkNetwork)
+    throw new Error(`No Spark token is configured for ${label}`)
+  }
   return id
 }

@@ -4,9 +4,10 @@ import { RootStackParamList } from "./stack-param-lists"
 
 /**
  * The routes the unlock flow runs on, and the single source of truth for them: the unlock
- * screens type their own options against this list, and the armed migration gate reads it
- * to know which screen it must never tear down, so a fourth unlock step cannot be added to
- * one and forgotten in the other.
+ * screens type their own options against this list, the armed migration gate reads it to
+ * know which screen it must never tear down, and the two-factor gate to know which screen
+ * is not the user's own, so a fourth unlock step cannot be added to one and forgotten in
+ * the others.
  */
 const UNLOCK_ROUTE_NAMES = [
   "authenticationCheck",
@@ -15,6 +16,14 @@ const UNLOCK_ROUTE_NAMES = [
 ] as const satisfies readonly (keyof RootStackParamList)[]
 
 export type UnlockRouteName = (typeof UNLOCK_ROUTE_NAMES)[number]
+
+/**
+ * Where every launch starts: the gate, with an account or without. The landing screen can
+ * open a new account with no credentials and lists every wallet the device stores, so no
+ * launch may open on it ahead of a lock that could still be set. The gate hands a device
+ * with nothing to unlock on to it.
+ */
+export const LAUNCH_ROUTE = "authenticationCheck" satisfies UnlockRouteName
 
 /**
  * Which `screenPurpose` means the route is unlocking, rather than one of the Settings jobs

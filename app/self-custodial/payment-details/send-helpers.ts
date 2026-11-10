@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {
   OnchainConfirmationSpeed,
   PaymentStatus,
@@ -35,6 +36,16 @@ import {
   prepareSend,
   type PreparedTokenLegs,
 } from "../bridge"
+import {
+  measure,
+  measureIn,
+  measurementGeneration,
+  measureSettlement,
+  ScEvent,
+  type ScEventParams,
+  type ScRail,
+  type SettlementTelemetry,
+} from "../measurement"
 import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 
 import {
@@ -49,8 +60,11 @@ import {
   CODES_RAISED_BEFORE_DISPATCH,
   findLostSend,
   findPaymentUnderKey,
+  htlcDetailsOf,
   isPaymentOfLostSend,
   readWalletClockSec,
+  sparkInvoiceOf,
+  type LostSendLookup,
 } from "./lost-send"
 
 type PrepareParams = {
@@ -59,6 +73,34 @@ type PrepareParams = {
   amount: bigint | undefined
   tokenIdentifier?: string
   conversionOptions?: ConversionOptions
+}
+
+/** What a send reports about itself: the rail category and the wallet spent from, never
+ *  the destination, amount, or counterparty. */
+export type SendTelemetry = {
+  rail: ScRail
+  sendingWallet: WalletCurrency
+}
+
+const telemetryParams = ({ rail, sendingWallet }: SendTelemetry): ScEventParams => ({
+  rail,
+  sending_wallet: sendingWallet,
+})
+
+/** A send settles or fails once, by the SDK's word; `alsoSettled` rides on the settle. */
+export const sendSettlement = (
+  params: ScEventParams,
+  alsoSettled: SettlementTelemetry["settled"] = [],
+): SettlementTelemetry => ({
+  settled: [{ event: ScEvent.PaymentSendSettled, params }, ...alsoSettled],
+  failed: { event: ScEvent.PaymentSendFailed, params },
+})
+
+/** What a self-custodial send reports: the params every event carries, and how it
+ *  settles. */
+export type SelfCustodialSendTelemetry = {
+  params: ScEventParams
+  settlement: SettlementTelemetry
 }
 
 const TIER_TO_SPEED: Record<FeeTierOption, OnchainConfirmationSpeed> = {
@@ -173,15 +215,30 @@ export const identifyPreparedSend = (
 
 type SendRail = { scope: string; confirmationSpeed?: OnchainConfirmationSpeed }
 
+/**
+ * How a send mutation reports itself, and the payment detail's key ref: the send hook
+ * mints the idempotency key into it before every attempt and a retry reads the same one
+ * back, so a bitcoin send retried after a throw is refused by the SDK as a duplicate
+ * rather than paid twice.
+ */
+export type SendMutationOptions = {
+  telemetry: SendTelemetry
+  idempotencyKeyRef?: IdempotencyKeyRef
+}
+
 const runSendMutation = (
   params: PrepareParams,
-  idempotencyKeyRef: IdempotencyKeyRef,
+  { telemetry, idempotencyKeyRef = {} }: SendMutationOptions,
   { scope, confirmationSpeed }: SendRail,
 ): ReturnType<SendPaymentMutation> =>
   runSelfCustodialSend({
     sdk: params.sdk,
     idempotencyKeyRef,
     destination: params.paymentRequest,
+    telemetry: {
+      params: telemetryParams(telemetry),
+      settlement: sendSettlement(telemetryParams(telemetry)),
+    },
     prepare: () => prepareSend(params.sdk, toPrepareOptions(params)),
     identify: identifyPreparedSend,
     execute: (prepared, idempotencyKey) =>
@@ -194,26 +251,21 @@ const runSendMutation = (
     }),
   })
 
-/**
- * The key ref is the payment detail's: the send hook mints the idempotency key into it
- * before every attempt and a retry reads the same one back, so a bitcoin send retried
- * after a throw is refused by the SDK as a duplicate rather than paid twice.
- */
 export const createSendMutation = (
   params: PrepareParams,
-  idempotencyKeyRef: IdempotencyKeyRef = {},
+  options: SendMutationOptions,
 ): SendPaymentMutation => {
   return () =>
-    runSendMutation(params, idempotencyKeyRef, { scope: "Self-custodial Lightning send" })
+    runSendMutation(params, options, { scope: "Self-custodial Lightning send" })
 }
 
 export const createSendMutationOnchain = (
   params: PrepareParams,
   feeTier: FeeTierOption,
-  idempotencyKeyRef: IdempotencyKeyRef = {},
+  options: SendMutationOptions,
 ): SendPaymentMutation => {
   return () =>
-    runSendMutation(params, idempotencyKeyRef, {
+    runSendMutation(params, options, {
       scope: "Self-custodial onchain send",
       confirmationSpeed: TIER_TO_SPEED[feeTier],
     })
@@ -278,6 +330,85 @@ const outcomeUnknown = (): SendOutcome => ({
   ],
 })
 
+/** What one attempt reports once its outcome is known: the measurement context it began
+ *  in, and how it settles. */
+type AttemptTelemetry = { startedIn: number; settlement: SettlementTelemetry }
+
+const beginAttempt = (telemetry: SelfCustodialSendTelemetry): AttemptTelemetry => {
+  const startedIn = measurementGeneration()
+  measure(ScEvent.PaymentSendInitiated, telemetry.params)
+  return { startedIn, settlement: telemetry.settlement }
+}
+
+const reportFailed = (
+  attempt: AttemptTelemetry,
+  telemetry: SelfCustodialSendTelemetry,
+  err: unknown,
+) =>
+  measureIn(attempt.startedIn, ScEvent.PaymentSendFailed, {
+    ...telemetry.params,
+    error_code: classifySdkError(err),
+  })
+
+/**
+ * The telemetry of each attempt still owed an outcome, by what its payment can be found by
+ * (the invoice's payment hash, the Spark invoice, or the key it went out under, which the
+ * SDK records as the payment's id). Kept apart from the lost attempts, which are payment
+ * safety: a payment found on a later look reports what its own attempt would have, not
+ * the send that found it. Telemetry only, and bounded: an attempt that falls out, or one
+ * with nothing to find it by, is simply not reported.
+ */
+const ATTEMPT_TELEMETRY_CAP = 100
+const attemptTelemetry = new Map<string, AttemptTelemetry>()
+
+const telemetryKeysOf = (
+  identity: SendIdentity | undefined,
+  idempotencyKey: string | undefined,
+): string[] => [
+  ...(identity?.paymentHash ? [`hash:${identity.paymentHash}`] : []),
+  ...(identity?.sparkInvoice ? [`invoice:${identity.sparkInvoice}`] : []),
+  ...(idempotencyKey ? [`id:${idempotencyKey.toLowerCase()}`] : []),
+]
+
+const rememberAttemptTelemetry = (
+  keys: ReadonlyArray<string>,
+  attempt: AttemptTelemetry,
+) =>
+  keys.forEach((key) => {
+    if (attemptTelemetry.size >= ATTEMPT_TELEMETRY_CAP) {
+      const oldest = attemptTelemetry.keys().next().value
+      if (oldest !== undefined) attemptTelemetry.delete(oldest)
+    }
+    attemptTelemetry.set(key, attempt)
+  })
+
+const forgetAttemptTelemetry = (attempt: AttemptTelemetry) =>
+  attemptTelemetry.forEach((held, key) => {
+    if (held === attempt) attemptTelemetry.delete(key)
+  })
+
+/** The attempt that made this payment reports how it ended, once. */
+const reportOutcomeOf = (payment: Payment) => {
+  const attempt = [
+    htlcDetailsOf(payment)?.paymentHash && `hash:${htlcDetailsOf(payment)?.paymentHash}`,
+    sparkInvoiceOf(payment) && `invoice:${sparkInvoiceOf(payment)}`,
+    `id:${payment.id.toLowerCase()}`,
+  ]
+    .map((key) => (key ? attemptTelemetry.get(key) : undefined))
+    .find((held) => held !== undefined)
+  if (!attempt) return
+  forgetAttemptTelemetry(attempt)
+  measureSettlement(payment, attempt.settlement, attempt.startedIn)
+}
+
+/** Each attempt whose payment a look saw failed has ended, and reports so: the look
+ *  passes it over as not the send landing, which would otherwise leave that attempt
+ *  waiting forever for an outcome. */
+const withFailedReported = (lookup: LostSendLookup): LostSendLookup => {
+  if (lookup.status !== "unreadable") lookup.failed.forEach(reportOutcomeOf)
+  return lookup
+}
+
 type RunSelfCustodialSendParams<
   P extends PreparedTokenLegs,
   R extends { payment: Payment },
@@ -287,6 +418,7 @@ type RunSelfCustodialSendParams<
   idempotencyKeyRef: IdempotencyKeyRef
   /** Where the send goes: what its lost attempts are remembered under. */
   destination: string
+  telemetry: SelfCustodialSendTelemetry
   prepare: () => Promise<P>
   identify: (prepared: P) => SendIdentity | undefined
   execute: (prepared: P, idempotencyKey: string | undefined) => Promise<R>
@@ -345,11 +477,12 @@ const sendAfterEarlierAttempts = async <
   {
     sdk,
     idempotencyKeyRef,
+    telemetry,
     prepare,
     identify,
     execute,
     sentOutcome,
-    foundOutcome,
+    foundOutcome: reportedAsSent,
     failure,
   }: RunSelfCustodialSendParams<P, R>,
   invocationKey: string | undefined,
@@ -368,13 +501,20 @@ const sendAfterEarlierAttempts = async <
   const settle = (...settled: SettledAttempts[]) =>
     attempts.update((current) => settled.reduce(withoutSettled, current))
 
+  /** The wallet's record of a send an earlier attempt or this one made, reported as the
+   *  send, with the telemetry of the attempt that paid it. */
+  const foundOutcome = (payment: Payment) => {
+    reportOutcomeOf(payment)
+    return reportedAsSent(payment)
+  }
+
   const findThisSend = (lost: LostSend) =>
     findLostSend({
       sdk,
       startedAtMs: lost.startedAtMs,
       walletClockSec: lost.walletClockSec,
       matches: (payment) => isPaymentOfLostSend(lost, payment),
-    })
+    }).then(withFailedReported)
 
   /**
    * Whether an attempt with nothing to look it up by went out. One made under a key is
@@ -389,7 +529,7 @@ const sendAfterEarlierAttempts = async <
     const sentKey = sent.idempotencyKey
     if (sentKey === undefined) return outcomeUnknown()
 
-    const look = await findPaymentUnderKey({ sdk, key: sentKey })
+    const look = withFailedReported(await findPaymentUnderKey({ sdk, key: sentKey }))
     if (look.status === "unreadable") return outcomeUnknown()
 
     unresolved = undefined
@@ -454,7 +594,9 @@ const sendAfterEarlierAttempts = async <
   } catch (err) {
     retriedUnder = {}
     const recovered = await clearEarlierAttempts(undefined)
-    return recovered ?? failure(err)
+    if (recovered) return recovered
+    reportFailed(beginAttempt(telemetry), telemetry, err)
+    return failure(err)
   }
 
   /** A send that goes out without the key is no retry under it: what was let through as
@@ -466,18 +608,35 @@ const sendAfterEarlierAttempts = async <
 
   const identity = identify(prepared)
   const startedAtMs = Date.now()
+  /** A new payment is about to be made: telemetry counts it as a send of its own, in
+   *  the context in effect now, and keeps how it reports by what it can be found by, so
+   *  a payment that turns up on a later look reports as this attempt would have. */
+  const attempt = beginAttempt(telemetry)
+  rememberAttemptTelemetry(telemetryKeysOf(identity, idempotencyKey), attempt)
   try {
     const result = await execute(prepared, idempotencyKey)
     settle(lookedFor, retriedUnder)
+    forgetAttemptTelemetry(attempt)
+    /** The SDK's types promise a payment, but a response without one has been seen:
+     *  reported as sent, as the send itself would have been, with nothing to measure. */
+    const payment: Payment | undefined = result?.payment
+    measureSettlement(payment, attempt.settlement, attempt.startedIn)
     /** A failed payment is final, also when the SDK hands back the one an earlier
      *  attempt made under this key: the next attempt is a new payment, under a new key. */
-    if (result.payment.status === PaymentStatus.Failed) {
+    if (payment?.status === PaymentStatus.Failed) {
       startKeyOver(idempotencyKeyRef, idempotencyKey)
-      return failure(new Error(`Payment ${result.payment.id} failed`))
+      return failure(new Error(`Payment ${payment.id} failed`))
     }
     return sentOutcome(result)
   } catch (err) {
     const isRaisedBeforeDispatch = CODES_RAISED_BEFORE_DISPATCH.has(classifySdkError(err))
+    /** The SDK refused it on the way in: this attempt ends here as a failure, whatever is
+     *  kept for payment safety. Any other throw leaves the outcome unknown, and telemetry
+     *  waits for the payment to turn up, or to be seen failed. */
+    if (isRaisedBeforeDispatch) {
+      forgetAttemptTelemetry(attempt)
+      reportFailed(attempt, telemetry, err)
+    }
 
     if (!identity) {
       if (isRaisedBeforeDispatch) return failure(err)

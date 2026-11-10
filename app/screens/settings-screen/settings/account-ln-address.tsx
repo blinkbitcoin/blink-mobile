@@ -85,7 +85,7 @@ const LightningAddressRow: React.FC<LightningAddressRowProps> = ({
         leftGaloyIcon="lightning-address"
         rightIcon={
           isAddressCopyable ? (
-            <GaloyIcon name="copy-paste" size={20} color={colors.primary} />
+            <GaloyIcon name="copy-paste" size={20} color={colors.accent} />
           ) : undefined
         }
         action={handleAction}

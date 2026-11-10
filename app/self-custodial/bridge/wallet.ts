@@ -8,6 +8,7 @@ import {
   type BreezSdkInterface,
   type Network,
   type Payment,
+  type SyncWalletResponse,
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { reportError } from "@app/utils/error-logging"
@@ -57,8 +58,54 @@ export const deriveWalletIdentityPubkey = async (
   }
 }
 
-export const syncSelfCustodialWallet = (sdk: BreezSdkInterface) =>
-  sdk.syncWallet(SyncWalletRequest.create({}))
+/** The sync each wallet has in flight, so callers share it rather than each starting one.
+ *  Keyed by the SDK itself, so a wallet that is replaced — another account, a reconnect —
+ *  starts clean and the entry for the old one goes with it. */
+const inFlightSync = new WeakMap<BreezSdkInterface, Promise<SyncWalletResponse>>()
+
+/**
+ * Never cancelled, deliberately. The SDK's async option would carry an `AbortSignal`
+ * through to UniFFI's future cancellation, but a user sync is run by the caller's own
+ * future: `trigger_sync_and_wait` marks the coordinator `sync_running` and then awaits
+ * `run_sync_loop` inline, and that flag is cleared only where the loop drains its waiters
+ * (`sdk/sync_coordinator.rs` @0.23.1, unchanged at 0.27.1). Cancelling drops the loop
+ * with the flag still set, so every later sync queues behind a runner that no longer
+ * exists and waits forever, for as long as the wallet is connected.
+ *
+ * Which means a caller that gives up still leaves the call running, so a second caller
+ * arriving meanwhile is handed the first one instead of starting another. Nothing is lost
+ * by waiting on it: a sync that is already running is the catch-up a new one would ask
+ * for, and the SDK would serialize them anyway — the coordinator queues a later caller
+ * behind the same pass, and `collect_exit_chains` has it join the collection already in
+ * progress. What a second call would add is another uncancellable native future and,
+ * where the stall is in the collection rather than the pass, another full sync on a
+ * connection already struggling.
+ *
+ * Sharing lasts only as long as the call does: once it settles the entry is dropped, so
+ * the next caller gets a sync of its own.
+ */
+export const syncSelfCustodialWallet = (
+  sdk: BreezSdkInterface,
+): Promise<SyncWalletResponse> => {
+  const running = inFlightSync.get(sdk)
+  if (running) return running
+
+  const started = sdk.syncWallet(SyncWalletRequest.create({}))
+  inFlightSync.set(sdk, started)
+  /**
+   * Dropped on either ending, since a sync that failed is as finished as one that did
+   * not, and the next caller is owed a new one rather than this one's error.
+   *
+   * No guard that the entry is still this call's: it cannot be another's. The entry is
+   * set in the same breath as the call, and the only thing that removes it is this
+   * handler, so a later call finds this one and shares it until then. The handlers sit on
+   * a branch of their own, which leaves what callers await untouched — both its timing
+   * and its rejection, which stays theirs to handle.
+   */
+  const clear = () => inFlightSync.delete(sdk)
+  started.then(clear, clear)
+  return started
+}
 
 export const listPayments = (sdk: BreezSdkInterface, offset: number, limit: number) =>
   sdk.listPayments({
@@ -73,15 +120,23 @@ export const listPayments = (sdk: BreezSdkInterface, offset: number, limit: numb
     sortAscending: false,
   })
 
-/** How the SDK (0.22) answers an id it holds no payment for: InvalidInput("Not found"). */
-const isPaymentNotFound = (err: unknown): boolean =>
-  typeof err === "object" &&
-  err !== null &&
-  "tag" in err &&
-  err.tag === SdkErrorTags.InvalidInput &&
-  "inner" in err &&
-  Array.isArray(err.inner) &&
-  err.inner[0] === "Not found"
+/**
+ * How the SDK answers an id it holds no payment for. The SQLite storage the app runs on
+ * passes the missing row up as a storage error, "Underlying implementation error: Query
+ * returned no rows" (`persist/sqlite.rs` get_payment_by_id and map_sqlite_error, 0.22
+ * through 0.27.1); the SDK's other storage backends answer InvalidInput("Not found").
+ * Anything else is a wallet that could not be read, never a payment that is absent.
+ */
+const isPaymentNotFound = (err: unknown): boolean => {
+  if (typeof err !== "object" || err === null || !("tag" in err) || !("inner" in err)) {
+    return false
+  }
+  const message = Array.isArray(err.inner) ? err.inner[0] : undefined
+  if (typeof message !== "string") return false
+  if (err.tag === SdkErrorTags.StorageError)
+    return /query returned no rows/i.test(message)
+  return err.tag === SdkErrorTags.InvalidInput && message === "Not found"
+}
 
 /**
  * The payment the wallet records under `paymentId`, or undefined when it holds none.

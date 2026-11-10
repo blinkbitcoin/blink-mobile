@@ -55,6 +55,12 @@ ios/vendor/bundle
 # Bundle artifact
 *.jsbundle
 
+# MeaWallet push provisioning SDK and its configuration, installed per machine by
+# scripts/install-meawallet-mpp.sh
+vendor/meawallet/
+android/app/src/main/res/raw/mea_config
+ios/MeaConfig/mea_config
+
 
 ios/GaloyApp.app.dSYM.zip
 ios/AppStore_io.galoy.app.mobileprovision

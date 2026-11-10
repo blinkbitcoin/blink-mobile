@@ -4,11 +4,13 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Feature, FeatureItem } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 export const CardDetailsScreen: React.FC = () => {
   const styles = useStyles()
@@ -83,8 +85,8 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingBottom: 20,
   },
   cardContainer: {
-    backgroundColor: colors.grey5,
-    borderRadius: 12,
+    ...staticSurface(colors),
+    borderRadius: radius.default,
     padding: 15,
     gap: 30,
   },

@@ -18,6 +18,15 @@ jest.mock("@app/utils/helper", () => ({
   isIos: false,
 }))
 
+jest.mock("@app/hooks/use-card-holder", () => ({
+  useCardHolder: () => ({
+    firstName: "TEST",
+    lastName: "USER",
+    fullName: "TEST USER",
+    loading: false,
+  }),
+}))
+
 const mockDispatch = jest.fn()
 const mockUseRoute = jest.fn()
 
@@ -42,7 +51,7 @@ const cardApprovedParams = {
   navigateTo: "cardDashboardScreen" as const,
   iconName: "approved" as const,
   lastFour: "1111",
-  holderName: "TEST USER",
+  cardId: "card-123",
 }
 
 const physicalCardOrderedParams = {
@@ -52,7 +61,7 @@ const physicalCardOrderedParams = {
   navigateTo: "cardDashboardScreen" as const,
   iconName: "delivery" as const,
   lastFour: "4242",
-  holderName: "TEST USER",
+  cardId: "card-456",
 }
 
 const cardApprovedWithCustomColorParams = {
@@ -60,16 +69,24 @@ const cardApprovedWithCustomColorParams = {
   iconColor: "#FF5500",
 }
 
-// Some app handlers log placeholder/diagnostic messages via console.log when
-// pressed (e.g. "Add to wallet pressed" in card-status-layout); capture them so expected logs don't pollute CI logs.
-let consoleLogSpy: jest.SpyInstance
+const mockAddToWallet = jest.fn()
+const mockUseAddToWallet = jest.fn()
+jest.mock("@app/screens/card-screen/hooks/use-add-to-wallet", () => ({
+  useAddToWallet: (cardId: string, lastFour: string) =>
+    mockUseAddToWallet(cardId, lastFour),
+}))
 
-beforeEach(() => {
-  consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {})
+const walletState = (
+  overrides: { canAddToWallet?: boolean; isAdding?: boolean } = {},
+) => ({
+  canAddToWallet: true,
+  isAdding: false,
+  addToWallet: mockAddToWallet,
+  ...overrides,
 })
 
-afterEach(() => {
-  consoleLogSpy.mockRestore()
+beforeEach(() => {
+  mockUseAddToWallet.mockReturnValue(walletState())
 })
 
 describe("CardStatusScreen - Card Approved variant", () => {
@@ -166,7 +183,7 @@ describe("CardStatusScreen - Card Approved variant", () => {
     expect(getByText("Add to")).toBeTruthy()
   })
 
-  it("add to wallet button can be pressed", async () => {
+  it("adds the card to the wallet when the button is pressed", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <CardStatusScreen />
@@ -180,7 +197,66 @@ describe("CardStatusScreen - Card Approved variant", () => {
       fireEvent.press(button)
     })
 
+    expect(mockAddToWallet).toHaveBeenCalledTimes(1)
     expect(mockDispatch).not.toHaveBeenCalled()
+  })
+
+  it("checks the wallet with the card from the route", async () => {
+    render(
+      <ContextForScreen>
+        <CardStatusScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(mockUseAddToWallet).toHaveBeenCalledWith("card-123", "1111")
+  })
+
+  it("hides the add to wallet button when the wallet cannot take the card", async () => {
+    mockUseAddToWallet.mockReturnValue(walletState({ canAddToWallet: false }))
+
+    const { queryByText } = render(
+      <ContextForScreen>
+        <CardStatusScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(queryByText("Add to")).toBeNull()
+  })
+
+  it("hides the add to wallet button when the route opts out of it", async () => {
+    mockUseRoute.mockReturnValue({
+      params: { ...cardApprovedParams, showAddToWallet: false },
+    })
+
+    const { queryByText } = render(
+      <ContextForScreen>
+        <CardStatusScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(queryByText("Add to")).toBeNull()
+  })
+
+  it("disables the add to wallet button while the card is being added", async () => {
+    mockUseAddToWallet.mockReturnValue(walletState({ isAdding: true }))
+
+    const { getByLabelText } = render(
+      <ContextForScreen>
+        <CardStatusScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(getByLabelText("Add to Google Pay").props.accessibilityState).toEqual(
+      expect.objectContaining({ disabled: true }),
+    )
   })
 
   it("navigates to correct screen when primary button is pressed", async () => {
@@ -414,6 +490,7 @@ describe("CardStatusScreen - complete user flow", () => {
       fireEvent.press(getByText("Add to"))
     })
 
+    expect(mockAddToWallet).toHaveBeenCalledTimes(1)
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 

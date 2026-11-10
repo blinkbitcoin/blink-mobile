@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react"
 import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { Screen } from "@app/components/screen"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -100,8 +101,8 @@ export const CardPinLayout: React.FC<CardPinLayoutProps> = ({
             <GaloyIcon
               name="key-outline"
               size={28}
-              color={colors.primary}
-              backgroundColor={colors.grey5}
+              color={colors.accent}
+              backgroundColor={colors.surfaceInteractive}
               containerSize={52}
             />
           </View>
@@ -162,7 +163,7 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 14,
     fontWeight: "700",
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
   },
   subtitle: {
@@ -170,7 +171,7 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 12,
     fontWeight: "400",
     lineHeight: 18,
-    color: colors.grey2,
+    color: colors.textMuted,
     textAlign: "center",
   },
   pinDisplayWrapper: {
@@ -181,10 +182,10 @@ const useStyles = makeStyles(({ colors }) => ({
     minWidth: 124,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    borderRadius: 8,
+    borderRadius: radius.default,
     borderWidth: 1,
-    borderColor: colors.primary,
-    backgroundColor: colors.grey5,
+    borderColor: colors.accent,
+    backgroundColor: colors.surfaceInteractive,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -196,7 +197,7 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 24,
     fontWeight: "700",
     lineHeight: 32,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
   },
   errorText: {

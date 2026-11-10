@@ -1,11 +1,14 @@
 import { makeStyles } from "@rn-vui/themed"
+import { groupTitleGap } from "@app/rne-theme/tokens"
+
+import { radius } from "@app/rne-theme/radius"
 
 export const useSharedStepStyles = makeStyles(({ colors }) => ({
   section: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   sectionTitle: {
-    color: colors.black,
+    color: colors.textSecondary,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
@@ -13,7 +16,7 @@ export const useSharedStepStyles = makeStyles(({ colors }) => ({
   },
   settingsGroupContainer: {
     marginTop: 0,
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
   dividerStyle: {
     marginHorizontal: 22,

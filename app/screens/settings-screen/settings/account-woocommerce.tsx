@@ -26,7 +26,7 @@ export const AccountWoocommerce: React.FC = () => {
       loading={loading}
       title={LL.SettingsScreen.woocommerce()}
       leftGaloyIcon="woocommerce"
-      rightIcon={<GaloyIcon name="arrow-square-out" size={20} color={colors.primary} />}
+      rightIcon={<GaloyIcon name="arrow-square-out" size={20} color={colors.accent} />}
       action={() => {
         Linking.openURL(WOOCOMMERCE_URL)
       }}

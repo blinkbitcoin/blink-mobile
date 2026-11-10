@@ -2,7 +2,13 @@ import React from "react"
 import { render, act, fireEvent } from "@testing-library/react-native"
 
 import { MigrationGate } from "@app/screens/account-migration/to-non-custodial/migration-gate"
+import {
+  MigrationSupportOrigin,
+  MigrationSupportReason,
+  PendingDepositCheckStatus,
+} from "@app/types/migration"
 import { WindDown, WindDownStatus } from "@app/types/wind-down"
+import { StorageFailure } from "@app/utils/storage/storage-failure"
 
 import { walletOverviewQueryResult } from "../helpers"
 
@@ -12,21 +18,28 @@ let mockIsFocused = true
 const mockUseActiveApiKeys = jest.fn()
 let mockWindDown: WindDown | null = null
 let mockIsMigrationLocked = false
+let mockIsMigrationCommitted = false
 let mockLockLoading = false
 let mockLockError = false
 const mockRefetchLock = jest.fn()
 let mockCheckpointLoading = false
 let mockCheckpointError = false
+let mockCheckpointStorageFailure: StorageFailure | null = null
 const mockRefetchCheckpoint = jest.fn()
 let mockHasResumableCheckpoint = true
 const mockNavigateToCheckpoint = jest.fn()
 let mockReusablePendingAccountId: string | null = null
 let mockPendingWalletLoading = false
 let mockPendingWalletError = false
+let mockPendingWalletStorageFailure: StorageFailure | null = null
 const mockRefetchPendingWallet = jest.fn()
 const mockUseTransferBlocked = jest.fn()
 const mockUseDollarBalanceRestricted = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
+/** Every query result carries a refetch that settles, unless a case overrides it: without
+ *  one the gate's retry throws before its first await, never disables itself, and lets a
+ *  burst of presses count as attempts no user could make. */
+const mockRefetchWalletOverview = jest.fn()
 const mockReportError = jest.fn()
 /** The child mocks render a Pressable per action instead of returning null, so tests drive
  *  them with real fireEvent (which honours `disabled`) rather than calling captured props;
@@ -65,7 +78,31 @@ const mockDollarBalanceModal = jest.fn(
     )
   },
 )
+const mockPendingDepositModal = jest.fn(
+  (props: {
+    isVisible: boolean
+    onAcknowledge: () => void
+    showCloseIconButton?: boolean
+  }) => {
+    const { Pressable } = jest.requireActual("react-native")
+    return <Pressable testID="gate-pending-deposit-ok" onPress={props.onAcknowledge} />
+  },
+)
+const mockUseCustodialPendingDeposits = jest.fn()
 const mockUnavailableScreen = jest.fn(() => null)
+/** Keeps the testID the gate hands it, so the specs find the button by the id the screen
+ *  actually ships rather than one the mock invents. */
+const mockSecondaryButton = jest.fn(
+  (props: { title: string; onPress: () => void; testID?: string }) => {
+    const { Pressable, Text } = jest.requireActual("react-native")
+    return (
+      <Pressable testID={props.testID} onPress={props.onPress}>
+        <Text>{props.title}</Text>
+      </Pressable>
+    )
+  },
+)
+
 const mockPrimaryButton = jest.fn(
   (props: { title: string; onPress: () => void; disabled?: boolean }) => {
     const { Pressable, Text } = jest.requireActual("react-native")
@@ -90,7 +127,20 @@ const apiKeysState = (overrides: Record<string, unknown> = {}) => ({
   loading: false,
   isReady: true,
   hasError: false,
-  refetch: jest.fn(),
+  refetch: jest.fn().mockResolvedValue(undefined),
+  ...overrides,
+})
+
+/** A settled check with nothing pending, which cases override field by field. */
+const pendingDepositsState = (overrides: Record<string, unknown> = {}) => ({
+  hasPendingDeposit: false,
+  loading: false,
+  isReady: true,
+  hasError: false,
+  check: jest.fn().mockResolvedValue({ status: PendingDepositCheckStatus.Clear }),
+  recheck: jest.fn().mockResolvedValue({ status: PendingDepositCheckStatus.Clear }),
+  isRecheckRunning: false,
+  isStillPending: false,
   ...overrides,
 })
 
@@ -111,7 +161,7 @@ jest.mock("@react-navigation/native", () => ({
 
 jest.mock("@rn-vui/themed", () => ({
   ...jest.requireActual("@rn-vui/themed"),
-  useTheme: () => ({ theme: { colors: { primary: "#fb5607", warning: "#f0a202" } } }),
+  useTheme: () => ({ theme: { colors: { accent: "#fb5607", warning: "#f0a202" } } }),
 }))
 
 jest.mock("@app/components/screen", () => ({
@@ -125,6 +175,7 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
     navigateToCheckpoint: mockNavigateToCheckpoint,
     loading: mockCheckpointLoading,
     hasError: mockCheckpointError,
+    storageFailure: mockCheckpointStorageFailure,
     refetch: mockRefetchCheckpoint,
     hasResumableCheckpoint: mockHasResumableCheckpoint,
   }),
@@ -135,8 +186,35 @@ jest.mock("@app/screens/account-migration/hooks/use-reusable-pending-wallet", ()
     reusablePendingAccountId: mockReusablePendingAccountId,
     loading: mockPendingWalletLoading,
     hasError: mockPendingWalletError,
+    storageFailure: mockPendingWalletStorageFailure,
     refetch: mockRefetchPendingWallet,
   }),
+}))
+
+const mockSendDepositSupportEmail = jest.fn()
+const mockUseMigrationSupportEmail = jest.fn()
+jest.mock("@app/screens/account-migration/hooks/use-migration-support-email", () => ({
+  useMigrationSupportEmail: (reason: string) => {
+    mockUseMigrationSupportEmail(reason)
+    return {
+      sendSupportEmail: mockSendDepositSupportEmail,
+      cardDetails: [],
+      supportDetailsText: "",
+    }
+  },
+}))
+
+jest.mock("@app/screens/account-migration/hooks/use-custodial-pending-deposits", () => ({
+  useCustodialPendingDeposits: (options: { skip?: boolean }) =>
+    mockUseCustodialPendingDeposits(options),
+}))
+
+jest.mock("@app/screens/account-migration/pending-deposit-modal", () => ({
+  PendingDepositModal: (props: {
+    isVisible: boolean
+    onAcknowledge: () => void
+    showCloseIconButton?: boolean
+  }) => mockPendingDepositModal(props),
 }))
 
 jest.mock("@app/screens/account-migration/hooks/use-custodial-wind-down", () => ({
@@ -146,6 +224,7 @@ jest.mock("@app/screens/account-migration/hooks/use-custodial-wind-down", () => 
 jest.mock("@app/screens/account-migration/hooks/use-migration-lock", () => ({
   useMigrationLock: () => ({
     isLocked: mockIsMigrationLocked,
+    isCommitted: mockIsMigrationCommitted,
     loading: mockLockLoading,
     hasError: mockLockError,
     refetch: mockRefetchLock,
@@ -167,7 +246,10 @@ jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
-  useWalletOverviewScreenQuery: () => mockUseWalletOverviewScreenQuery(),
+  useWalletOverviewScreenQuery: () => ({
+    refetch: mockRefetchWalletOverview,
+    ...mockUseWalletOverviewScreenQuery(),
+  }),
 }))
 
 jest.mock("@app/graphql/is-authed-context", () => ({
@@ -217,6 +299,13 @@ jest.mock("@app/i18n/i18n-react", () => ({
     LL: {
       errors: { generic: () => "generic error" },
       common: { tryAgain: () => "Try Again" },
+      AccountMigration: {
+        storageUnavailable: {
+          unreadableBody: () => "could not read your progress",
+          outOfSpaceBody: () => "no space left",
+          contactSupportCta: () => "Contact support",
+        },
+      },
     },
   }),
 }))
@@ -224,6 +313,11 @@ jest.mock("@app/i18n/i18n-react", () => ({
 jest.mock("@app/components/atomic/galoy-primary-button", () => ({
   GaloyPrimaryButton: (props: { title: string; onPress: () => void }) =>
     mockPrimaryButton(props),
+}))
+
+jest.mock("@app/components/atomic/galoy-secondary-button", () => ({
+  GaloySecondaryButton: (props: { title: string; onPress: () => void }) =>
+    mockSecondaryButton(props),
 }))
 
 jest.mock("@app/components/atomic/galoy-icon", () => ({
@@ -238,28 +332,38 @@ jest.mock("@app/utils/error-logging", () => ({
       : mockReportError(operation, err, options),
 }))
 
+const resetGateMocks = (): void => {
+  jest.clearAllMocks()
+  mockIsFocused = true
+  mockWindDown = null
+  mockSelfCustodialDisabled = false
+  mockIsMigrationLocked = false
+  mockIsMigrationCommitted = false
+  mockLockLoading = false
+  mockLockError = false
+  mockCheckpointLoading = false
+  mockCheckpointError = false
+  mockCheckpointStorageFailure = null
+  mockPendingWalletStorageFailure = null
+  mockHasResumableCheckpoint = true
+  mockReusablePendingAccountId = null
+  mockPendingWalletLoading = false
+  mockPendingWalletError = false
+  mockUseActiveApiKeys.mockReturnValue(apiKeysState())
+  mockUseCustodialPendingDeposits.mockReturnValue(pendingDepositsState())
+  mockRefetchWalletOverview.mockResolvedValue(undefined)
+  mockRefetchLock.mockResolvedValue(undefined)
+  mockRefetchCheckpoint.mockResolvedValue(undefined)
+  mockRefetchPendingWallet.mockResolvedValue(undefined)
+  mockUseTransferBlocked.mockReturnValue(false)
+  mockUseDollarBalanceRestricted.mockReturnValue(false)
+  mockUseWalletOverviewScreenQuery.mockReturnValue(
+    walletOverviewQueryResult({ usdBalance: 0 }),
+  )
+}
+
 describe("MigrationGate", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockIsFocused = true
-    mockWindDown = null
-    mockSelfCustodialDisabled = false
-    mockIsMigrationLocked = false
-    mockLockLoading = false
-    mockLockError = false
-    mockCheckpointLoading = false
-    mockCheckpointError = false
-    mockHasResumableCheckpoint = true
-    mockReusablePendingAccountId = null
-    mockPendingWalletLoading = false
-    mockPendingWalletError = false
-    mockUseActiveApiKeys.mockReturnValue(apiKeysState())
-    mockUseTransferBlocked.mockReturnValue(false)
-    mockUseDollarBalanceRestricted.mockReturnValue(false)
-    mockUseWalletOverviewScreenQuery.mockReturnValue(
-      walletOverviewQueryResult({ usdBalance: 0 }),
-    )
-  })
+  beforeEach(resetGateMocks)
 
   it("shows the temporarily-unavailable screen while the kill-switch is on, whatever the entry", () => {
     mockSelfCustodialDisabled = true
@@ -746,6 +850,55 @@ describe("MigrationGate", () => {
     expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
   })
 
+  /** A checkpoint that answered with somewhere to resume decides the route alone: the
+   *  pending wallet is only the fallback for a checkpoint that is gone, so a failed read of
+   *  it must not hold this user on a retry, or hand them to support after three. */
+  it("resumes from a good checkpoint when only the pending-wallet read fails", () => {
+    mockIsMigrationLocked = true
+    mockHasResumableCheckpoint = true
+    mockPendingWalletError = true
+
+    const { queryByTestId } = render(<MigrationGate />)
+
+    expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
+    expect(queryByTestId("gate-retry-button")).toBeNull()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** Until the checkpoint has answered, nobody knows yet whether the pending read matters,
+   *  so the gate waits on its spinner rather than flashing the error screen first. */
+  it("waits for the checkpoint before letting a failed pending-wallet read block", () => {
+    mockIsMigrationLocked = true
+    mockCheckpointLoading = true
+    mockHasResumableCheckpoint = false
+    mockPendingWalletError = true
+
+    const { getByTestId, queryByTestId, rerender } = render(<MigrationGate />)
+
+    expect(getByTestId("migration-gate-loading")).toBeTruthy()
+    expect(queryByTestId("gate-retry-button")).toBeNull()
+
+    mockCheckpointLoading = false
+    mockHasResumableCheckpoint = true
+    rerender(<MigrationGate />)
+
+    expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
+    expect(queryByTestId("gate-retry-button")).toBeNull()
+  })
+
+  /** The checkpoint's own failure still blocks whatever it last held: a refetch that fails
+   *  after an earlier good read leaves the old record in state, and that is no answer. */
+  it("still blocks on a failed checkpoint read even with a resumable record in state", () => {
+    mockIsMigrationLocked = true
+    mockHasResumableCheckpoint = true
+    mockCheckpointError = true
+
+    const { getByTestId } = render(<MigrationGate />)
+
+    expect(getByTestId("gate-retry-button")).toBeTruthy()
+    expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
+  })
+
   /** The once-per-mount claim must not be spent while the reads are in error: a retry that
    *  then succeeds still owes the user its resume-or-handover decision. */
   it("still decides after a retry recovers from a failed checkpoint read", () => {
@@ -769,13 +922,6 @@ describe("MigrationGate", () => {
   it("refetches the local reads too when the retry button is pressed", async () => {
     mockIsMigrationLocked = true
     mockCheckpointError = true
-    mockUseActiveApiKeys.mockReturnValue(
-      apiKeysState({ refetch: jest.fn().mockResolvedValue(undefined) }),
-    )
-    mockUseWalletOverviewScreenQuery.mockReturnValue({
-      ...walletOverviewQueryResult({ usdBalance: 0 }),
-      refetch: jest.fn().mockResolvedValue(undefined),
-    })
 
     const { getByTestId } = render(<MigrationGate />)
     fireEvent.press(getByTestId("gate-retry-button"))
@@ -783,6 +929,9 @@ describe("MigrationGate", () => {
 
     expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(1)
     expect(mockRefetchPendingWallet).toHaveBeenCalledTimes(1)
+    /** The anchor that keeps this fixture honest: a retry that threw instead of fetching
+     *  would report here and still leave the counts above looking plausible. */
+    expect(mockReportError).not.toHaveBeenCalled()
   })
 
   /** The local reads only feed the locked resume-or-handover decision, so their failure
@@ -910,5 +1059,656 @@ describe("MigrationGate", () => {
     render(<MigrationGate />)
 
     expect(mockRequiredScreen.mock.calls[0][0].mode).toBe("forcedPreDeadline")
+  })
+})
+
+describe("MigrationGate, with a deposit still confirming", () => {
+  beforeEach(resetGateMocks)
+
+  it("holds a loading screen while the pending-deposit check loads", () => {
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ loading: true, isReady: false }),
+    )
+
+    const { getByTestId } = render(<MigrationGate />)
+
+    expect(getByTestId("migration-gate-loading")).toBeTruthy()
+    expect(mockRequiredScreen).not.toHaveBeenCalled()
+    expect(mockPendingDepositModal).not.toHaveBeenCalled()
+  })
+
+  it("shows a retry instead of the intro when the pending-deposit check fails", () => {
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasError: true, isReady: false }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPrimaryButton).toHaveBeenCalled()
+    expect(mockRequiredScreen).not.toHaveBeenCalled()
+    expect(mockPendingDepositModal).not.toHaveBeenCalled()
+  })
+
+  it("asks for the pending deposits again from that retry", async () => {
+    const check = jest.fn().mockResolvedValue({ status: PendingDepositCheckStatus.Clear })
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({
+        hasError: true,
+        isReady: false,
+        check,
+      }),
+    )
+
+    const { getByTestId } = render(<MigrationGate />)
+    fireEvent.press(getByTestId("gate-retry-button"))
+    await act(async () => {})
+
+    expect(check).toHaveBeenCalledTimes(1)
+  })
+
+  it("blocks entry with the pending-deposit modal over the intro", () => {
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockRequiredScreen).toHaveBeenCalledWith(
+      expect.objectContaining({ mode: "voluntary", isExitBlocked: false }),
+    )
+    expect(mockPendingDepositModal).toHaveBeenCalledWith(
+      expect.objectContaining({ isVisible: true, showCloseIconButton: true }),
+    )
+  })
+
+  it("warns about the API keys before the pending deposit", () => {
+    mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasActiveApiKeys: true }))
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockApiServiceScreen).toHaveBeenCalled()
+    expect(mockPendingDepositModal).not.toHaveBeenCalled()
+  })
+
+  it("asks for the dollar balance to be emptied before the pending deposit", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 20 }),
+    )
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockDollarBalanceModal).toHaveBeenCalled()
+    expect(mockPendingDepositModal).not.toHaveBeenCalled()
+  })
+
+  it("leaves the flow from OK where the user can still leave", () => {
+    const check = jest.fn().mockResolvedValue({ status: PendingDepositCheckStatus.Clear })
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, check }),
+    )
+
+    const { getByTestId } = render(<MigrationGate />)
+    fireEvent.press(getByTestId("gate-pending-deposit-ok"))
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(check).not.toHaveBeenCalled()
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ onContactSupport: undefined }),
+    )
+  })
+
+  it("offers support from the modal where the user cannot leave", () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ onContactSupport: mockSendDepositSupportEmail }),
+    )
+    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith(
+      MigrationSupportReason.DepositPending,
+    )
+  })
+
+  it("checks again from OK once the gate is armed, and lets the user through once it lands", async () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    const recheck = jest
+      .fn()
+      .mockResolvedValue({ status: PendingDepositCheckStatus.Clear })
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, recheck }),
+    )
+
+    const { getByTestId, rerender } = render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ showCloseIconButton: false }),
+    )
+
+    fireEvent.press(getByTestId("gate-pending-deposit-ok"))
+    await act(async () => {})
+
+    expect(recheck).toHaveBeenCalledTimes(1)
+    expect(mockGoBack).not.toHaveBeenCalled()
+
+    mockPendingDepositModal.mockClear()
+    mockUseCustodialPendingDeposits.mockReturnValue(pendingDepositsState())
+    rerender(<MigrationGate />)
+
+    expect(mockPendingDepositModal).not.toHaveBeenCalled()
+    expect(mockRequiredScreen).toHaveBeenLastCalledWith(
+      expect.objectContaining({ mode: "gate", isExitBlocked: true }),
+    )
+  })
+
+  it("stays on the modal when checking again from OK fails", async () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    const recheck = jest.fn().mockResolvedValue({
+      status: PendingDepositCheckStatus.Unknown,
+      error: new Error("network"),
+    })
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, recheck }),
+    )
+
+    const { getByTestId } = render(<MigrationGate />)
+    fireEvent.press(getByTestId("gate-pending-deposit-ok"))
+    await act(async () => {})
+
+    expect(recheck).toHaveBeenCalledTimes(1)
+    expect(getByTestId("gate-pending-deposit-ok")).toBeTruthy()
+  })
+
+  it("holds a locked migration on the modal instead of resuming it", () => {
+    mockIsMigrationLocked = true
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
+    expect(mockPendingDepositModal).toHaveBeenCalledWith(
+      expect.objectContaining({ showCloseIconButton: false }),
+    )
+    expect(mockRequiredScreen).toHaveBeenCalledWith(
+      expect.objectContaining({ isExitBlocked: true }),
+    )
+  })
+
+  it("shows the check running on the modal instead of the loading screen", () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, isRecheckRunning: true }),
+    )
+
+    const { queryByTestId } = render(<MigrationGate />)
+
+    expect(queryByTestId("migration-gate-loading")).toBeNull()
+    expect(mockPendingDepositModal).toHaveBeenCalledWith(
+      expect.objectContaining({ isChecking: true }),
+    )
+  })
+
+  it("checks the deposits again when the gate regains focus after the dollar transfer", () => {
+    const check = jest.fn().mockResolvedValue({ status: PendingDepositCheckStatus.Clear })
+    mockUseCustodialPendingDeposits.mockReturnValue(pendingDepositsState({ check }))
+
+    const { rerender } = render(<MigrationGate />)
+    mockIsFocused = false
+    rerender(<MigrationGate />)
+
+    expect(check).not.toHaveBeenCalled()
+
+    mockIsFocused = true
+    rerender(<MigrationGate />)
+
+    expect(check).toHaveBeenCalledTimes(1)
+  })
+
+  describe("asking for the deposits only where the answer is used", () => {
+    /** The lock is read fresh on every mount, so asking alongside it would spend a request
+     *  on every resume of a committed migration, which ignores the answer. */
+    it("waits for the lock before asking", () => {
+      mockLockLoading = true
+
+      render(<MigrationGate />)
+
+      expect(mockUseCustodialPendingDeposits).toHaveBeenLastCalledWith({ skip: true })
+    })
+
+    it("never asks for a committed migration", () => {
+      mockIsMigrationLocked = true
+      mockIsMigrationCommitted = true
+
+      render(<MigrationGate />)
+
+      expect(mockUseCustodialPendingDeposits).toHaveBeenLastCalledWith({ skip: true })
+    })
+
+    it("asks once the lock says nothing has been committed", () => {
+      render(<MigrationGate />)
+
+      expect(mockUseCustodialPendingDeposits).toHaveBeenLastCalledWith({ skip: false })
+    })
+
+    /** A refetch runs even on a skipped query, so the focus check has to hold back too. */
+    it("does not ask again on focus for a committed migration", () => {
+      mockIsMigrationLocked = true
+      mockIsMigrationCommitted = true
+      const check = jest
+        .fn()
+        .mockResolvedValue({ status: PendingDepositCheckStatus.Clear })
+      mockUseCustodialPendingDeposits.mockReturnValue(pendingDepositsState({ check }))
+
+      const { rerender } = render(<MigrationGate />)
+      mockIsFocused = false
+      rerender(<MigrationGate />)
+      mockIsFocused = true
+      rerender(<MigrationGate />)
+
+      expect(check).not.toHaveBeenCalled()
+    })
+  })
+
+  it("resumes a committed migration past a pending deposit, since the balance has left", () => {
+    mockIsMigrationLocked = true
+    mockIsMigrationCommitted = true
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).not.toHaveBeenCalled()
+    expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
+  })
+
+  it("resumes a committed migration without waiting on, or failing with, the deposit check", () => {
+    mockIsMigrationLocked = true
+    mockIsMigrationCommitted = true
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasError: true, isReady: false }),
+    )
+
+    const { queryByTestId } = render(<MigrationGate />)
+
+    expect(queryByTestId("gate-retry-button")).toBeNull()
+    expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
+  })
+
+  /** The check it ignores stays out of its retry too, so that check failing can neither
+   *  fail the retry nor send a report for a read that does not apply. */
+  it("leaves the deposit check out of a committed migration's retry", async () => {
+    mockIsMigrationLocked = true
+    mockIsMigrationCommitted = true
+    const refetchApiKeys = jest.fn().mockResolvedValue(undefined)
+    const check = jest.fn().mockResolvedValue({
+      status: PendingDepositCheckStatus.Unknown,
+      error: new Error("network"),
+    })
+    mockUseActiveApiKeys.mockReturnValue(
+      apiKeysState({ hasError: true, isReady: false, refetch: refetchApiKeys }),
+    )
+    mockUseCustodialPendingDeposits.mockReturnValue(pendingDepositsState({ check }))
+
+    const { getByTestId } = render(<MigrationGate />)
+    fireEvent.press(getByTestId("gate-retry-button"))
+    await act(async () => {})
+
+    expect(refetchApiKeys).toHaveBeenCalledTimes(1)
+    expect(check).not.toHaveBeenCalled()
+  })
+
+  describe("a deposit check run by the retry", () => {
+    const retryWithCheck = async (check: jest.Mock) => {
+      mockUseActiveApiKeys.mockReturnValue(
+        apiKeysState({
+          hasError: true,
+          isReady: false,
+          refetch: jest.fn().mockResolvedValue(undefined),
+        }),
+      )
+      mockUseCustodialPendingDeposits.mockReturnValue(pendingDepositsState({ check }))
+
+      const { getByTestId } = render(<MigrationGate />)
+      fireEvent.press(getByTestId("gate-retry-button"))
+      await act(async () => {})
+    }
+
+    it("reports a request that failed with the error it raised", async () => {
+      await retryWithCheck(
+        jest.fn().mockResolvedValue({
+          status: PendingDepositCheckStatus.Unknown,
+          error: new Error("network"),
+        }),
+      )
+
+      expect(mockReportError).toHaveBeenCalledWith(
+        "Migration gate retry",
+        expect.objectContaining({ message: "network" }),
+      )
+    })
+
+    it("reports nothing for one that answered without the list", async () => {
+      await retryWithCheck(
+        jest
+          .fn()
+          .mockResolvedValue({ status: PendingDepositCheckStatus.Unknown, error: null }),
+      )
+
+      const retryReports = mockReportError.mock.calls.filter(
+        ([operation]) => operation === "Migration gate retry",
+      )
+      expect(retryReports).toHaveLength(0)
+    })
+  })
+
+  it("keeps the spinner off on the armed gate until the user checks again", () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, loading: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isChecking: false }),
+    )
+  })
+
+  it("says the deposit is still confirming once the check OK started finds it pending", () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, isStillPending: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isStillPending: true }),
+    )
+  })
+
+  it("leaves the still confirming line out until the check OK started finds the deposit pending", () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isStillPending: false }),
+    )
+  })
+
+  it("leaves the still confirming line out where OK only leaves", () => {
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, isStillPending: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isStillPending: false }),
+    )
+  })
+
+  it("keeps the OK spinner off where OK only leaves", () => {
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, isRecheckRunning: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenCalledWith(
+      expect.objectContaining({ isChecking: false }),
+    )
+  })
+
+  it("hides the pending-deposit modal while a pushed screen has focus", () => {
+    mockIsFocused = false
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenCalledWith(
+      expect.objectContaining({ isVisible: false }),
+    )
+  })
+})
+
+describe("MigrationGate, with an unreadable device store", () => {
+  beforeEach(resetGateMocks)
+
+  /** The gate reaches its error screen for a locked account whose local reads failed. */
+  const arriveAtStorageError = (): void => {
+    mockIsMigrationLocked = true
+    mockCheckpointError = true
+  }
+
+  /** Each press settles before the next, the way a user spends the budget: the button
+   *  disables itself while a retry is in flight, so a burst of taps is one attempt. */
+  const pressRetry = async (
+    getByTestId: (id: string) => unknown,
+    times: number,
+  ): Promise<void> => {
+    for (let attempt = 0; attempt < times; attempt += 1) {
+      // eslint-disable-next-line no-await-in-loop -- each retry must settle before the next
+      await act(async () => {
+        fireEvent.press(getByTestId("gate-retry-button") as never)
+      })
+    }
+  }
+
+  it("says the device is full when the failure was about space", () => {
+    arriveAtStorageError()
+    mockCheckpointStorageFailure = StorageFailure.OutOfSpace
+
+    const { getByText } = render(<MigrationGate />)
+
+    expect(getByText("no space left")).toBeTruthy()
+  })
+
+  it("reads the failure off the pending-wallet source too", () => {
+    arriveAtStorageError()
+    mockPendingWalletError = true
+    mockPendingWalletStorageFailure = StorageFailure.OutOfSpace
+
+    const { getByText } = render(<MigrationGate />)
+
+    expect(getByText("no space left")).toBeTruthy()
+  })
+
+  it("says the device could not be read when the message could not say why", () => {
+    arriveAtStorageError()
+    mockCheckpointStorageFailure = StorageFailure.Unknown
+
+    const { getByText, queryByText } = render(<MigrationGate />)
+
+    expect(getByText("could not read your progress")).toBeTruthy()
+    expect(queryByText("no space left")).toBeNull()
+  })
+
+  it("keeps the generic wording for a failure that was not the device's", () => {
+    mockIsMigrationLocked = true
+    mockLockError = true
+
+    const { getByText, queryByText } = render(<MigrationGate />)
+
+    expect(getByText("generic error")).toBeTruthy()
+    expect(queryByText("could not read your progress")).toBeNull()
+  })
+
+  it("offers only the retry while retrying is still worth a try", async () => {
+    arriveAtStorageError()
+
+    const { getByTestId, queryByTestId } = render(<MigrationGate />)
+    await pressRetry(getByTestId, 2)
+
+    expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(2)
+    expect(queryByTestId("migration-gate-storage-support")).toBeNull()
+  })
+
+  it("offers support once retrying has failed enough times to stop being a fix", async () => {
+    arriveAtStorageError()
+
+    const { getByTestId } = render(<MigrationGate />)
+    await pressRetry(getByTestId, 3)
+
+    /** Three real round-trips, not three taps on a retry that threw before fetching. */
+    expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(3)
+    expect(mockReportError).not.toHaveBeenCalled()
+    expect(getByTestId("migration-gate-storage-support")).toBeTruthy()
+  })
+
+  it("holds the retry and the handover while a retry is still in flight", async () => {
+    arriveAtStorageError()
+    let settleRefetch: () => void = () => undefined
+    const { getByTestId, queryByTestId } = render(<MigrationGate />)
+    await pressRetry(getByTestId, 2)
+
+    mockRefetchCheckpoint.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          settleRefetch = resolve
+        }),
+    )
+    await act(async () => {
+      fireEvent.press(getByTestId("gate-retry-button"))
+    })
+    /** A tap while the third attempt is out must not start a fourth. */
+    fireEvent.press(getByTestId("gate-retry-button"))
+
+    expect(getByTestId("gate-retry-button")).toBeDisabled()
+    expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(3)
+    expect(queryByTestId("migration-gate-storage-support")).toBeNull()
+
+    await act(async () => {
+      settleRefetch()
+    })
+
+    expect(getByTestId("gate-retry-button")).toBeEnabled()
+    expect(getByTestId("migration-gate-storage-support")).toBeTruthy()
+  })
+
+  /** Production ordering: Apollo's refetch rejects on a network error, often well before the
+   *  local reads answer. The retry must stay in flight until every source has settled, or
+   *  the budget advances on an attempt whose storage answer is still outstanding. */
+  it("stays in flight until the local reads settle, even when a server refetch fails first", async () => {
+    arriveAtStorageError()
+    const offline = new Error("Network request failed")
+    mockUseActiveApiKeys.mockReturnValue(
+      apiKeysState({ refetch: jest.fn().mockRejectedValue(offline) }),
+    )
+    const { getByTestId, queryByTestId } = render(<MigrationGate />)
+    await pressRetry(getByTestId, 2)
+
+    let settleCheckpointRead: () => void = () => undefined
+    mockRefetchCheckpoint.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          settleCheckpointRead = resolve
+        }),
+    )
+
+    await act(async () => {
+      fireEvent.press(getByTestId("gate-retry-button"))
+    })
+    fireEvent.press(getByTestId("gate-retry-button"))
+
+    expect(getByTestId("gate-retry-button")).toBeDisabled()
+    expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(3)
+    expect(queryByTestId("migration-gate-storage-support")).toBeNull()
+
+    await act(async () => {
+      settleCheckpointRead()
+    })
+
+    expect(getByTestId("gate-retry-button")).toBeEnabled()
+    expect(getByTestId("migration-gate-storage-support")).toBeTruthy()
+    expect(mockReportError).toHaveBeenLastCalledWith("Migration gate retry", offline)
+  })
+
+  it("hands over saying the store was unreadable, never that the records are gone", async () => {
+    arriveAtStorageError()
+
+    const { getByTestId } = render(<MigrationGate />)
+    await pressRetry(getByTestId, 3)
+    fireEvent.press(getByTestId("migration-gate-storage-support"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: MigrationSupportReason.StorageUnreadable,
+      /** Not the terminal gate origin: a user who frees up space has to get back here. */
+      origin: MigrationSupportOrigin.GateStorage,
+    })
+  })
+
+  /** The user was just told to free up space; a ticket claiming the store could not be read
+   *  would contradict that and drop the one remedy they can apply. */
+  it("hands over naming a full device when that is what the screen said", async () => {
+    arriveAtStorageError()
+    mockCheckpointStorageFailure = StorageFailure.OutOfSpace
+
+    const { getByTestId, getByText } = render(<MigrationGate />)
+    expect(getByText("no space left")).toBeTruthy()
+    await pressRetry(getByTestId, 3)
+    fireEvent.press(getByTestId("migration-gate-storage-support"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: MigrationSupportReason.StorageOutOfSpace,
+      origin: MigrationSupportOrigin.GateStorage,
+    })
+  })
+
+  it("names a full device for the ticket when only the pending-wallet read hit one", async () => {
+    arriveAtStorageError()
+    mockCheckpointStorageFailure = StorageFailure.Unknown
+    mockPendingWalletError = true
+    mockPendingWalletStorageFailure = StorageFailure.OutOfSpace
+
+    const { getByTestId } = render(<MigrationGate />)
+    await pressRetry(getByTestId, 3)
+    fireEvent.press(getByTestId("migration-gate-storage-support"))
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "accountMigrationContactSupport",
+      expect.objectContaining({ reason: MigrationSupportReason.StorageOutOfSpace }),
+    )
+  })
+
+  /** The rule this screen cannot honestly test lives in the hook's own spec: an unlocked
+   *  account never renders this screen at all. */
+  it("says the store is unreadable only when the network sources answered", () => {
+    arriveAtStorageError()
+    mockLockError = true
+
+    const { getByText, queryByText } = render(<MigrationGate />)
+
+    expect(getByText("generic error")).toBeTruthy()
+    expect(queryByText("could not read your progress")).toBeNull()
+  })
+
+  it("prefers the failure the user can act on when the two sources disagree", () => {
+    arriveAtStorageError()
+    mockCheckpointStorageFailure = StorageFailure.Unknown
+    mockPendingWalletError = true
+    mockPendingWalletStorageFailure = StorageFailure.OutOfSpace
+
+    const { getByText } = render(<MigrationGate />)
+
+    expect(getByText("no space left")).toBeTruthy()
   })
 })

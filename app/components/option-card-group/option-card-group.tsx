@@ -3,6 +3,7 @@ import { Pressable, View } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
 
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
@@ -67,8 +68,8 @@ const useStyles = makeStyles(({ colors }) => ({
   card: {
     flex: 1,
     maxWidth: "50%",
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     borderWidth: 1,
     borderColor: "transparent",
     paddingHorizontal: 14,
@@ -77,8 +78,8 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 10,
   },
   cardSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.grey6,
+    borderColor: colors.accent,
+    backgroundColor: colors.surfacePressed,
   },
   iconContainer: {
     width: 32,
@@ -90,13 +91,13 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 14,
     fontWeight: "700",
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
   },
   cardDescription: {
     fontSize: 12,
     lineHeight: 18,
-    color: colors.grey2,
+    color: colors.textMuted,
     textAlign: "center",
   },
 }))
