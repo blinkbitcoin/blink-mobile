@@ -76,6 +76,8 @@ type StoredIndex =
       status: typeof StorageReadStatus.Ok
       entries: SelfCustodialAccountEntry[]
       items: readonly unknown[]
+      /** False for a stored value that is not a list, which `items` holds as one item. */
+      isList: boolean
     }
   | StorageReadFailed
 
@@ -96,16 +98,24 @@ const readStoredIndex = async (): Promise<StoredIndex> => {
         status: StorageReadStatus.Ok,
         entries: entriesOf(parsed),
         items: itemsOf(parsed),
+        isList: Array.isArray(parsed),
       }
     }
 
     // One-shot migration from the legacy id-only list.
     const legacyRaw = await AsyncStorage.getItem(LEGACY_ID_LIST_KEY)
-    if (!legacyRaw) return { status: StorageReadStatus.Ok, entries: [], items: [] }
+    if (!legacyRaw) {
+      return { status: StorageReadStatus.Ok, entries: [], items: [], isList: true }
+    }
 
     const legacyParsed: unknown = JSON.parse(legacyRaw)
     if (!Array.isArray(legacyParsed)) {
-      return { status: StorageReadStatus.Ok, entries: [], items: itemsOf(legacyParsed) }
+      return {
+        status: StorageReadStatus.Ok,
+        entries: [],
+        items: itemsOf(legacyParsed),
+        isList: false,
+      }
     }
 
     // An item that is not an id is carried over as it is, for the reason above.
@@ -114,7 +124,12 @@ const readStoredIndex = async (): Promise<StoredIndex> => {
     )
     await AsyncStorage.setItem(ACCOUNT_INDEX_KEY, JSON.stringify(migrated))
 
-    return { status: StorageReadStatus.Ok, entries: entriesOf(migrated), items: migrated }
+    return {
+      status: StorageReadStatus.Ok,
+      entries: entriesOf(migrated),
+      items: migrated,
+      isList: true,
+    }
   } catch (err) {
     return toReadFailed(err)
   }
@@ -288,10 +303,16 @@ export const addSelfCustodialAccountId = async (id: string): Promise<void> => {
  * Drops every item naming the account, a damaged one included: the account's mnemonic is
  * erased with it, so an item left behind would only have the sweep name a seed that is
  * gone.
+ *
+ * A stored value that is not a list is left as it is. Its one item gone, what remained
+ * would be an empty list, which the strict reader the owed reinstall erase trusts, and
+ * nothing in that value ever vouched for an empty index. Kept, it stays the read that
+ * failed it already is, and only names a seed that is gone.
  */
 export const removeSelfCustodialAccountId = async (id: string): Promise<void> => {
   const result = await readStoredIndex()
   if (result.status === StorageReadStatus.ReadFailed) return
+  if (!result.isList) return
 
   const next = result.items.filter((item) => idOfEntry(item) !== id)
   if (next.length === result.items.length) return

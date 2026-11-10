@@ -1061,6 +1061,14 @@ describe("self-custodial account-index — damaged entries", () => {
       expect(storedIndex()).toEqual([VALID, 42])
     })
 
+    it("removes an account from the legacy list it migrates on the way", async () => {
+      storeLegacy(["acc-1", "acc-3"])
+
+      await removeSelfCustodialAccountId("acc-1")
+
+      expect(storedIndex()).toEqual([{ id: "acc-3", lightningAddress: null }])
+    })
+
     it("keeps a legacy value that is not a list when an account registers", async () => {
       storeLegacy(DAMAGED)
 
@@ -1109,6 +1117,26 @@ describe("self-custodial account-index — damaged entries", () => {
       await removeSelfCustodialAccountId("acc-2")
 
       expect(storedIndex()).toEqual([VALID])
+    })
+
+    it("keeps a canonical value that is not a list untrusted when the account it names is removed", async () => {
+      storeCanonical(VALID)
+
+      await removeSelfCustodialAccountId("acc-1")
+
+      expect(storedIndex()).toEqual(VALID)
+      const ids = await readSelfCustodialAccountIds()
+      expect(ids.status).toBe(StorageReadStatus.ReadFailed)
+    })
+
+    it("keeps a legacy value that is not a list untrusted when the account it names is removed", async () => {
+      storeLegacy(VALID)
+
+      await removeSelfCustodialAccountId("acc-1")
+
+      expect(stored.has(ACCOUNT_INDEX_KEY)).toBe(false)
+      const ids = await readSelfCustodialAccountIds()
+      expect(ids.status).toBe(StorageReadStatus.ReadFailed)
     })
 
     it("keeps a damaged entry when a lightning address is stored", async () => {
