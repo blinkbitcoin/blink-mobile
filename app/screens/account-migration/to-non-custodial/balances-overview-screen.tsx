@@ -26,18 +26,16 @@ import {
   useHardwareBackGuard,
 } from "@app/screens/account-migration/hooks"
 import { useCustodialOwnerId } from "@app/screens/account-migration/hooks/use-custodial-owner-id"
-import { useCustodialPendingDeposits } from "@app/screens/account-migration/hooks/use-custodial-pending-deposits"
-import { useEnsureMigrationStarted } from "@app/screens/account-migration/hooks/use-ensure-migration-started"
 import { armMigrationConversion } from "@app/screens/conversion-flow/drain-conversion"
 import { useMigrationLnAddressTransfer } from "@app/screens/account-migration/hooks/use-migration-ln-address-transfer"
 import { useMigrationStatus } from "@app/screens/account-migration/hooks/use-migration-status"
+import { usePendingDepositHold } from "@app/screens/account-migration/hooks/use-pending-deposit-hold"
 import { PendingDepositModal } from "@app/screens/account-migration/pending-deposit-modal"
 import { resolveServerFlow } from "@app/screens/account-migration/utils/server-migration-flow"
 import {
   MigrationLnAddressOutcome,
   MigrationSupportOrigin,
   MigrationSupportReason,
-  PendingDepositCheckStatus,
   ServerMigrationFlow,
 } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
@@ -207,22 +205,6 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   }, [navigation])
 
   /**
-   * The gate checked for an on-chain deposit still confirming on the way in, and this
-   * catches one that arrived since: it would land after the drain on an account with
-   * nothing left to credit it to. A check that has not answered, or failed, holds the start
-   * and Approve the same as a deposit does, since neither says there is none.
-   */
-  const {
-    hasPendingDeposit,
-    isReady: isPendingDepositCheckReady,
-    hasError: hasPendingDepositCheckError,
-    check: checkPendingDeposits,
-    recheck: recheckPendingDeposits,
-    isRecheckRunning: isPendingDepositRecheckRunning,
-  } = useCustodialPendingDeposits()
-  const isPendingDepositBlocking = hasPendingDeposit || !isPendingDepositCheckReady
-
-  /**
    * Landing here WITH figures declares the migration started server-side, which is what
    * makes this the point of no return: the lock then lives on the backend and survives a
    * reinstall, where the checkpoint below only remembers which screen to resume on. It
@@ -241,21 +223,15 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     !preview.isReady ||
     isMigrationFailed ||
     hasDollarBalance ||
-    isPendingDepositBlocking ||
     isPhaseAwaited ||
     isServerFlowUnrecognised ||
     isUnstartedFigureAwaited
-  const migrationStart = useEnsureMigrationStarted({ skip: isMigrationStartHeld })
-
-  /** The server can still find a deposit this screen's own check missed (one sent since),
-   *  and refuses the start until it lands; both show the same modal. After the dollar
-   *  balance, as in the gate: that one has an action the user can take right away, and two
-   *  modals cannot share the screen. */
-  const isDepositPending = hasPendingDeposit || migrationStart.isDepositPending
-  /** A check that is failing yields to the retry below, which the modal would cover and
-   *  its OK could not resolve. */
-  const showPendingDepositModal =
-    isDepositPending && !hasDollarBalance && !hasPendingDepositCheckError
+  /** A deposit still confirming holds the start too, see usePendingDepositHold. */
+  const depositHold = usePendingDepositHold({
+    isStartHeld: isMigrationStartHeld,
+    isModalOutranked: hasDollarBalance,
+  })
+  const { migrationStart } = depositHold
 
   const {
     ownerId,
@@ -537,16 +513,13 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  guard may have turned Approve off, while the check was out. */
   const canStillApproveRef = useRef(false)
 
-  /** Asked once more right before the drain, so a deposit sent while the user read the
-   *  figures is caught here rather than after the balance has moved: a deposit brings the
-   *  modal back and a failed check brings the retry, both through the hook's own state. */
+  const { checkBeforeApprove } = depositHold
   const handleApprove = useCallback(async () => {
-    const depositCheck = await recheckPendingDeposits()
-    const isClear = depositCheck.status === PendingDepositCheckStatus.Clear
+    const isClear = await checkBeforeApprove()
     const canStillApprove = isClear && canStillApproveRef.current
     if (!canStillApprove) return
     navigation.navigate("accountMigrationTransferringFunds")
-  }, [recheckPendingDeposits, navigation])
+  }, [checkBeforeApprove, navigation])
 
   /** Either source losing the network earns the same retry, and it refreshes both:
    *  figures without a started migration are as useless as the reverse. */
@@ -580,7 +553,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     hasLnAddressConnectionIssue ||
     hasIdLookupFailure ||
     hasStatusReadFailure ||
-    hasPendingDepositCheckError
+    depositHold.hasCheckError
   const isRetryable =
     hasNetworkFailure || hasCheckpointReadFailure || isCommitPointWriteRetryable
 
@@ -597,17 +570,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
 
   const { retry: retryPreview } = preview
   const { retry: retryMigrationStart } = migrationStart
-
-  /** OK checks again first, and asks the server to start again only once the deposit has
-   *  landed and only when it was the server that refused: asking while it still confirms
-   *  is only refused again, and a start this screen's own check held goes out by itself
-   *  once that check is clear. */
-  const acknowledgePendingDeposit = useCallback(async () => {
-    const depositCheck = await recheckPendingDeposits()
-    const isClear = depositCheck.status === PendingDepositCheckStatus.Clear
-    const shouldAskServerAgain = isClear && migrationStart.isDepositPending
-    if (shouldAskServerAgain) retryMigrationStart()
-  }, [recheckPendingDeposits, migrationStart.isDepositPending, retryMigrationStart])
+  const { checkAgain: checkPendingDepositsAgain } = depositHold
 
   /** The owner and the checkpoint join the shared retry because the re-point cannot fire
    *  without the ids they carry: refreshing everything else around a lookup that failed
@@ -621,7 +584,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     refetchOwnerId().catch(() => undefined)
     refetchCheckpoint().catch(() => undefined)
     refetchMigrationStatus().catch(() => undefined)
-    checkPendingDeposits()
+    checkPendingDepositsAgain()
   }, [
     recordCommitPoint,
     refetchMigrationStatus,
@@ -630,7 +593,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     retryLnAddressTransfer,
     refetchOwnerId,
     refetchCheckpoint,
-    checkPendingDeposits,
+    checkPendingDepositsAgain,
   ])
 
   /** Approve commits against a server-side flow, so it stays off until the server has
@@ -644,7 +607,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     !migrationStart.isStarted ||
     !isLnAddressSettled ||
     !isCommitPointHeld ||
-    isPendingDepositBlocking
+    depositHold.isBlocking
 
   const canApprove = isFocused && !isApproveDisabled
   useEffect(() => {
@@ -727,7 +690,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
             <GaloyPrimaryButton
               title={LLOverview.approveCta()}
               onPress={handleApprove}
-              loading={isPendingDepositRecheckRunning}
+              loading={depositHold.isRecheckRunning}
               disabled={isApproveDisabled}
               {...testProps("migration-balances-overview-approve")}
             />
@@ -747,12 +710,12 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
           showCloseIconButton={false}
         />
       ) : null}
-      {showPendingDepositModal ? (
+      {depositHold.isModalShown ? (
         <PendingDepositModal
           isVisible={isFocused}
-          onAcknowledge={acknowledgePendingDeposit}
+          onAcknowledge={depositHold.acknowledge}
           showCloseIconButton={false}
-          isChecking={isPendingDepositRecheckRunning}
+          isChecking={depositHold.isRecheckRunning}
           onContactSupport={openSupport}
         />
       ) : null}
