@@ -3682,9 +3682,9 @@
       "CardIntroducing": {
         "title": "Memperkenalkan",
         "cardInfo": {
-          "bitcoinCard": "Kartu Visa Blink",
+          "bitcoinCard": "Blink Card",
           "for": "untuk",
-          "maximalist": "Maksimalis Bitcoin"
+          "bitcoiners": "Bitcoiner"
         },
         "buttonText": "Lanjutkan"
       },

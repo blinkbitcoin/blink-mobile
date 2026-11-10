@@ -3682,9 +3682,9 @@
       "CardIntroducing": {
         "title": "Ներկայացնում ենք",
         "cardInfo": {
-          "bitcoinCard": "Blink Visa քարտը",
+          "bitcoinCard": "Blink քարտը",
           "for": "համար",
-          "maximalist": "Bitcoin մաքսիմալիստների"
+          "bitcoiners": "բիթքոյներների"
         },
         "buttonText": "Շարունակել"
       },

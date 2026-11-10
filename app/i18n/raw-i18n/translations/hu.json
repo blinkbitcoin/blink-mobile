@@ -3682,9 +3682,9 @@
       "CardIntroducing": {
         "title": "Bemutatjuk",
         "cardInfo": {
-          "bitcoinCard": "A Blink Visa kártya",
+          "bitcoinCard": "A Blink kártya",
           "for": "a",
-          "maximalist": "Bitcoin Maximalistáknak"
+          "bitcoiners": "Bitcoinereknek"
         },
         "buttonText": "Tovább"
       },

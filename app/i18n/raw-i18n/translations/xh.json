@@ -3682,9 +3682,9 @@
       "CardIntroducing": {
         "title": "Ukwazisa",
         "cardInfo": {
-          "bitcoinCard": "Ikhadi le-Blink Visa",
+          "bitcoinCard": "Ikhadi le-Blink",
           "for": "le",
-          "maximalist": "Abathandi be-Bitcoin"
+          "bitcoiners": "ama-Bitcoiner"
         },
         "buttonText": "Qhubeka"
       },

@@ -3682,9 +3682,9 @@
       "CardIntroducing": {
         "title": "Kuanzisha",
         "cardInfo": {
-          "bitcoinCard": "Kadi ya Blink Visa",
+          "bitcoinCard": "Blink Card",
           "for": "kwa",
-          "maximalist": "Wapenzi wa Bitcoin"
+          "bitcoiners": "Bitcoiners"
         },
         "buttonText": "Endelea"
       },

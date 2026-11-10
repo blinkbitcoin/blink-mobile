@@ -3682,9 +3682,9 @@
       "CardIntroducing": {
         "title": "Okwanjula",
         "cardInfo": {
-          "bitcoinCard": "Kaadi ya Blink Visa",
+          "bitcoinCard": "Kaadi ya Blink",
           "for": "ya",
-          "maximalist": "Abantu ba Bitcoin"
+          "bitcoiners": "Ba Bitcoiner"
         },
         "buttonText": "Weyongere"
       },

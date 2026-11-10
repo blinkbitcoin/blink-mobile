@@ -3682,9 +3682,9 @@
       "CardIntroducing": {
         "title": "تقديم",
         "cardInfo": {
-          "bitcoinCard": "بطاقة Blink Visa",
+          "bitcoinCard": "بطاقة Blink",
           "for": "لـ",
-          "maximalist": "أنصار البيتكوين"
+          "bitcoiners": "مستخدمي البيتكوين"
         },
         "buttonText": "متابعة"
       },

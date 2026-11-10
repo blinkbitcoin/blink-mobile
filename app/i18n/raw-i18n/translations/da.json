@@ -3682,9 +3682,9 @@
       "CardIntroducing": {
         "title": "Introduktion",
         "cardInfo": {
-          "bitcoinCard": "Blink Visa-kortet",
+          "bitcoinCard": "Blink-kortet",
           "for": "til",
-          "maximalist": "Bitcoin Maksimalister"
+          "bitcoiners": "Bitcoinere"
         },
         "buttonText": "Fortsæt"
       },

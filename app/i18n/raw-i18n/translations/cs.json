@@ -3682,9 +3682,9 @@
       "CardIntroducing": {
         "title": "Představujeme",
         "cardInfo": {
-          "bitcoinCard": "Karta Blink Visa",
+          "bitcoinCard": "Blink Card",
           "for": "pro",
-          "maximalist": "Bitcoin maximalisty"
+          "bitcoiners": "Bitcoinery"
         },
         "buttonText": "Pokračovat"
       },

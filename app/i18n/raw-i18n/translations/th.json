@@ -3682,9 +3682,9 @@
       "CardIntroducing": {
         "title": "แนะนำ",
         "cardInfo": {
-          "bitcoinCard": "บัตร Blink Visa",
+          "bitcoinCard": "บัตร Blink",
           "for": "สำหรับ",
-          "maximalist": "ผู้นิยมบิตคอยน์"
+          "bitcoiners": "บิตคอยเนอร์"
         },
         "buttonText": "ดำเนินการต่อ"
       },

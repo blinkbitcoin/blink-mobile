@@ -3682,9 +3682,9 @@
       "CardIntroducing": {
         "title": "Σας παρουσιάζουμε",
         "cardInfo": {
-          "bitcoinCard": "Την κάρτα Visa της Blink",
+          "bitcoinCard": "Η Blink Card",
           "for": "για",
-          "maximalist": "Bitcoin maximalists"
+          "bitcoiners": "Bitcoiners"
         },
         "buttonText": "Συνέχεια"
       },

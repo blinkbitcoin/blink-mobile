@@ -3682,9 +3682,9 @@
       "CardIntroducing": {
         "title": "Presentant",
         "cardInfo": {
-          "bitcoinCard": "La targeta Visa de Blink",
+          "bitcoinCard": "La Blink Card",
           "for": "per a",
-          "maximalist": "Bitcoin Maximalistes"
+          "bitcoiners": "Bitcoiners"
         },
         "buttonText": "Continuar"
       },

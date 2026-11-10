@@ -3682,9 +3682,9 @@
       "CardIntroducing": {
         "title": "Prezentare",
         "cardInfo": {
-          "bitcoinCard": "Cardul Visa Blink",
+          "bitcoinCard": "Blink Card",
           "for": "pentru",
-          "maximalist": "Maximaliștii Bitcoin"
+          "bitcoiners": "Bitcoineri"
         },
         "buttonText": "Continuă"
       },

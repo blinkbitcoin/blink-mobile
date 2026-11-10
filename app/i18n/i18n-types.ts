@@ -12245,7 +12245,7 @@ type RootTranslation = {
 				title: string
 				cardInfo: {
 					/**
-					 * T​h​e​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d
+					 * T​h​e​ ​B​l​i​n​k​ ​C​a​r​d
 					 */
 					bitcoinCard: string
 					/**
@@ -12253,9 +12253,9 @@ type RootTranslation = {
 					 */
 					'for': string
 					/**
-					 * B​i​t​c​o​i​n​ ​M​a​x​i​m​a​l​i​s​t​s
+					 * B​i​t​c​o​i​n​e​r​s
 					 */
-					maximalist: string
+					bitcoiners: string
 				}
 				/**
 				 * C​o​n​t​i​n​u​e
@@ -26498,7 +26498,7 @@ export type TranslationFunctions = {
 				title: () => LocalizedString
 				cardInfo: {
 					/**
-					 * The Blink Visa card
+					 * The Blink Card
 					 */
 					bitcoinCard: () => LocalizedString
 					/**
@@ -26506,9 +26506,9 @@ export type TranslationFunctions = {
 					 */
 					'for': () => LocalizedString
 					/**
-					 * Bitcoin Maximalists
+					 * Bitcoiners
 					 */
-					maximalist: () => LocalizedString
+					bitcoiners: () => LocalizedString
 				}
 				/**
 				 * Continue

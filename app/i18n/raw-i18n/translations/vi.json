@@ -3682,9 +3682,9 @@
       "CardIntroducing": {
         "title": "Giới thiệu",
         "cardInfo": {
-          "bitcoinCard": "Thẻ Visa Blink",
+          "bitcoinCard": "Thẻ Blink",
           "for": "dành cho",
-          "maximalist": "Người theo chủ nghĩa Bitcoin tối đa"
+          "bitcoiners": "Bitcoiner"
         },
         "buttonText": "Tiếp tục"
       },
