@@ -41,6 +41,15 @@ fi
 
 [ -n "${FAKE_EMULATOR_BOOT_FAILS:-}" ] && { echo "emulator: boot failed" >&2; exit 1; }
 
+# Another emulator (outside the registry) grabbed this console port between
+# the claim's attached-check and our launch: it shows up on the serial, and
+# ours dies on the bind.
+if [ -n "${FAKE_EMULATOR_PORT_STOLEN_BY:-}" ]; then
+  printf '%s|%s|device\n' "emulator-$PORT" "$FAKE_EMULATOR_PORT_STOLEN_BY" >> "$DEVICES"
+  echo "emulator: ERROR: console port $PORT is already in use" >&2
+  exit 1
+fi
+
 printf '%s|%s|device\n' "emulator-$PORT" "$AVD" >> "$DEVICES"
 
 # A real emulator stays in the foreground until killed; the claim backgrounds it

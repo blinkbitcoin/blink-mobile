@@ -104,9 +104,14 @@ rollback_claim() {
   if [ -n "$EMU_PID" ]; then
     # The launcher PID is only a wrapper: the qemu child that actually runs
     # the AVD can outlive it and keep the AVD locked (or attach later as a
-    # mystery device). Ask the console to stop the instance first - the
-    # serial is one this run launched on a console port it just reserved.
-    [ -n "${SERIAL:-}" ] && adb -s "$SERIAL" emu kill >/dev/null 2>&1 || true
+    # mystery device). Ask the console to stop the instance first - but only
+    # if the instance answering on that serial runs the AVD this run
+    # launched: another emulator can grab the console port between our
+    # attached-check and our launch, and it is not ours to stop.
+    if [ -n "${SERIAL:-}" ] && [ -n "${AVD:-}" ] \
+       && [ "$(adb -s "$SERIAL" emu avd name 2>/dev/null | head -1 | tr -d '\r')" = "$AVD" ]; then
+      adb -s "$SERIAL" emu kill >/dev/null 2>&1 || true
+    fi
     kill "$EMU_PID" 2>/dev/null || true
   fi
   [ -n "$NEW_PORT" ] && { release_metro_port "$REGISTRY" "$NEW_PORT" "$SESSION_NAME"; rm -f "$SESSION_DIR/port"; }

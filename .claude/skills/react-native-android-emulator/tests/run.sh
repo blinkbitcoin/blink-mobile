@@ -209,6 +209,15 @@ check "its half-booted emulator is stopped, not left attached" "0" \
 check "the rollback stops it through the console" "yes" \
   "$(grep -q 'emu kill' "$FAKE_ARGS_LOG" && echo yes || echo no)"
 
+# Another emulator grabs the console port between the claim's check and its
+# launch: the claim's own emulator dies, and the rollback must leave the
+# foreign instance on that serial running.
+reset_world
+FAKE_EMULATOR_PORT_STOLEN_BY=Someone_Elses_Studio_AVD "$SCRIPTS/claim-session.sh" 3803 >/dev/null 2>&1
+check "a claim whose console port was taken exits non-zero" "1" "$?"
+check "the foreign emulator on that console port survives the rollback" "1" \
+  "$(grep -c '|Someone_Elses_Studio_AVD|' "$FAKE_ADB_DEVICES")"
+
 # Release frees the Metro port but keeps the session dir for retakes; if
 # another session took the port meanwhile, the re-claim must move.
 reset_world

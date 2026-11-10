@@ -153,7 +153,7 @@ tracked separately.
 ## After Editing the Scripts
 
 ```bash
-"$SKILL/tests/run.sh"     # 71 assertions, ~20s, exits non-zero on failure; fake adb + emulator, no device, no network
+"$SKILL/tests/run.sh"     # 73 assertions, ~20s, exits non-zero on failure; fake adb + emulator, no device, no network
 ```
 
 Run it after touching anything in `scripts/`. If you add a guarantee, add the
