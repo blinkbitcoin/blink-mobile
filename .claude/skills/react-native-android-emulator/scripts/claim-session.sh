@@ -101,7 +101,12 @@ fi
 NEW_PORT=""; NEW_AVD=""; NEW_CONSOLE=""; EMU_PID=""; CLAIM_DONE=""
 rollback_claim() {
   [ -z "$CLAIM_DONE" ] || return 0
-  if [ -n "$EMU_PID" ] && kill -0 "$EMU_PID" 2>/dev/null; then
+  if [ -n "$EMU_PID" ]; then
+    # The launcher PID is only a wrapper: the qemu child that actually runs
+    # the AVD can outlive it and keep the AVD locked (or attach later as a
+    # mystery device). Ask the console to stop the instance first - the
+    # serial is one this run launched on a console port it just reserved.
+    [ -n "${SERIAL:-}" ] && adb -s "$SERIAL" emu kill >/dev/null 2>&1 || true
     kill "$EMU_PID" 2>/dev/null || true
   fi
   [ -n "$NEW_PORT" ] && { release_metro_port "$REGISTRY" "$NEW_PORT" "$SESSION_NAME"; rm -f "$SESSION_DIR/port"; }
@@ -126,15 +131,17 @@ fresh_slot() {
 # re-claim re-takes it atomically or reserves a fresh one - never trusting the
 # file alone, or two sessions end up sharing one Metro.
 PORT=$(cat "$SESSION_DIR/port" 2>/dev/null || echo "")
-if [ -n "$PORT" ] && [ "$(cat "$REGISTRY/ports/$PORT/owner" 2>/dev/null)" = "$SESSION_NAME" ]; then
-  :   # still ours: idempotent re-claim
-elif reclaim_metro_port "$REGISTRY" "$SESSION_NAME" "$PORT"; then
-  NEW_PORT="$PORT"
-else
-  PORT=$(reserve_metro_port "$REGISTRY" "$SESSION_NAME" "$PR") || exit 1
-  NEW_PORT="$PORT"
-  echo "$PORT" > "$SESSION_DIR/port"
-fi
+RECLAIM_RC=0
+reclaim_metro_port "$REGISTRY" "$SESSION_NAME" "$PORT" || RECLAIM_RC=$?
+case "$RECLAIM_RC" in
+  0) : ;;                    # still ours: idempotent re-claim
+  2) NEW_PORT="$PORT" ;;     # re-taken by this run: roll it back on failure
+  *)
+    PORT=$(reserve_metro_port "$REGISTRY" "$SESSION_NAME" "$PR") || exit 1
+    NEW_PORT="$PORT"
+    echo "$PORT" > "$SESSION_DIR/port"
+    ;;
+esac
 
 # A foreign Metro on 8081 is the normal state on a shared Mac, and the reason
 # "just run on 8081" is not available. Name it here rather than leaving the

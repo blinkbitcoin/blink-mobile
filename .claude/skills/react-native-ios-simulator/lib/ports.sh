@@ -12,7 +12,8 @@
 # session that silently steals another agent's bundler.
 #
 #   reserve_metro_port <registry> <owner> <seed>   -> echoes the port, or fails
-#   reclaim_metro_port <registry> <owner> <port>   -> 0 re-taken, 1 held by another
+#   reclaim_metro_port <registry> <owner> <port>   -> 0 already ours, 2 re-taken now,
+#                                                     1 unavailable (another holds it)
 #   release_metro_port <registry> <port> <owner>   -> frees it if still ours
 #   reserve_slot <registry> <namespace> <name> <owner>  -> 0 won, 1 taken
 #   release_slot <registry> <namespace> <name> <owner>
@@ -81,8 +82,10 @@ reserve_metro_port() {
   return 1
 }
 
-# Re-take a specific port a session recorded earlier: 0 if it is (again) ours,
-# 1 if another session or an outside process holds it now. Release frees the
+# Re-take a specific port a session recorded earlier: 0 if the reservation is
+# still ours, 2 if it was free and this call re-took it (the caller owns the
+# new reservation, e.g. for rollback), 1 if another session or an outside
+# process holds it now. Release frees the
 # reservation while the session dir keeps its port file for retakes, so the
 # file alone never proves ownership.
 reclaim_metro_port() {
@@ -102,7 +105,7 @@ reclaim_metro_port() {
     rm -rf "$registry/ports/$port"
     return 1
   fi
-  return 0
+  return 2
 }
 
 release_metro_port() {

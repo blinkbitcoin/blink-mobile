@@ -87,7 +87,9 @@ PORTS_LIB="$(dirname "${BASH_SOURCE[0]}")/../lib/ports.sh"
 # re-claim re-takes it atomically or reserves a fresh one - never trusting the
 # file alone, or two sessions end up sharing one Metro.
 PORT=$(cat "$SESSION_DIR/port" 2>/dev/null || echo "")
-if ! reclaim_metro_port "$REGISTRY" "$SIM_NAME" "$PORT"; then
+RECLAIM_RC=0
+reclaim_metro_port "$REGISTRY" "$SIM_NAME" "$PORT" || RECLAIM_RC=$?
+if [ "$RECLAIM_RC" -eq 1 ]; then   # 0 still ours, 2 re-taken: either way PORT is held
   PORT=$(reserve_metro_port "$REGISTRY" "$SIM_NAME" "$PR") || exit 1
   echo "$PORT" > "$SESSION_DIR/port"
 fi

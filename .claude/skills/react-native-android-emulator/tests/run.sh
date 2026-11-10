@@ -198,6 +198,17 @@ check "the failed claim leaves no Metro port reserved" "none" \
 check "the next claim can use the AVD the failed one took" "0" "$?"
 "$SCRIPTS/release-session.sh" 3801 --delete >/dev/null 2>&1
 
+# A boot that attaches but never completes: the launcher is killed, but the
+# instance itself must be stopped through its console too, or it keeps the
+# AVD locked after the reservation is handed back.
+reset_world
+FAKE_BOOT_COMPLETED=0 DEMO_EMU_BOOT_TIMEOUT=3 "$SCRIPTS/claim-session.sh" 3802 >/dev/null 2>&1
+check "a claim whose emulator never finishes booting exits non-zero" "1" "$?"
+check "its half-booted emulator is stopped, not left attached" "0" \
+  "$(grep -c '|Pixel_Test_A|' "$FAKE_ADB_DEVICES")"
+check "the rollback stops it through the console" "yes" \
+  "$(grep -q 'emu kill' "$FAKE_ARGS_LOG" && echo yes || echo no)"
+
 # Release frees the Metro port but keeps the session dir for retakes; if
 # another session took the port meanwhile, the re-claim must move.
 reset_world
