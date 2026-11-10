@@ -214,6 +214,15 @@ const DeveloperScreen: React.ComponentType | null = __DEV__
     require("../screens/developer-screen").DeveloperScreen
   : null
 
+/** `headerBackVisible: false` hides only the native button, while the navigators here
+ *  also draw their own back through `headerLeft`, so a screen that offers only the close
+ *  button clears both. A null element leaves no left item for iOS 26 to wrap in a glass
+ *  capsule. The swipe and the hardware back are left as they are. */
+const noHeaderBack = {
+  headerBackVisible: false,
+  headerLeft: () => null,
+}
+
 /**
  * The swipe stays blocked for every entry: leaving by gesture is undirected, so the arrow is
  * the one deliberate way out, and only creation has anywhere to take it.
@@ -946,9 +955,7 @@ export const RootStack = () => {
         component={CardPersonalInformationScreen}
         options={{
           title: LL.CardFlow.Onboarding.PersonalInformation.title(),
-          // Suppresses the back button natively — an empty custom headerLeft item
-          // would still get the iOS 26 Liquid Glass capsule drawn around it.
-          headerBackVisible: false,
+          ...noHeaderBack,
           ...headerCloseControlOptions(),
         }}
       />
@@ -974,7 +981,7 @@ export const RootStack = () => {
         component={CardPreapprovedScreen}
         options={{
           title: "",
-          headerBackVisible: false,
+          ...noHeaderBack,
           ...headerCloseControlOptions(),
         }}
       />
