@@ -138,6 +138,18 @@ const legacyAliases = (semantic: typeof lightSemantic | typeof darkSemantic) => 
   _warningLight: semantic.staticWarningBackground,
 })
 
+// Role tokens that share a value with another token today but do a different job.
+// They reference that token instead of repeating its value, and get their own value
+// once design separates them (e.g. textOnAccent turning black for AA contrast).
+const roleTokens = (semantic: typeof lightSemantic | typeof darkSemantic) => ({
+  textOnAccent: semantic.backgroundDefault, // labels and icons on an accent fill
+  textOnAccentDisabled: semantic.surfaceInteractive, // label on a disabled accent fill
+  textPlaceholder: semantic.border,
+  borderStrong: semantic.textDisabled, // focused input underline
+  surfaceMuted: semantic.border, // neutral control fill: icon button, switch track off
+  surfaceInactive: semantic.textDisabled, // unselected currency pill and bubble
+})
+
 // Flagged for design review (see proposal §2.1/§5): none of the app blues is the
 // brand blue. Scheduled for removal, so they get no semantic alias.
 const legacyBlues = {
@@ -157,12 +169,14 @@ const legacyBlues = {
 
 const light = {
   ...lightSemantic,
+  ...roleTokens(lightSemantic),
   ...legacyAliases(lightSemantic),
   ...legacyBlues.light,
 }
 
 const dark = {
   ...darkSemantic,
+  ...roleTokens(darkSemantic),
   ...legacyAliases(darkSemantic),
   ...legacyBlues.dark,
 }

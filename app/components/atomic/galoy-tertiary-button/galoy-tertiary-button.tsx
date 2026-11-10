@@ -61,7 +61,7 @@ export const GaloyTertiaryButton = (props: GaloyTertiaryButtonProps) => {
     return [dynamicStyle, containerStyle, styles.pressableStyle]
   }
 
-  let textColor = colors.backgroundDefault
+  let textColor = colors.textOnAccent
   if (outline) textColor = colors.textOnBackground
   if (clear) textColor = colors.accent
 

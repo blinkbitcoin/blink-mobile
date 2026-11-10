@@ -39,23 +39,38 @@ const aliasToSemantic: Record<string, string> = {
   _warningLight: "staticWarningBackground",
 }
 
+// Role tokens share their source token's value until design gives them their own.
+// Drop an entry here in the same change that gives that role a value of its own.
+const roleToSource: Record<string, string> = {
+  textOnAccent: "backgroundDefault",
+  textOnAccentDisabled: "surfaceInteractive",
+  textPlaceholder: "border",
+  borderStrong: "textDisabled",
+  surfaceMuted: "border",
+  surfaceInactive: "textDisabled",
+}
+
 describe("color token aliases", () => {
   const checkAliases = (palette: Record<string, string>) => {
-    for (const [legacy, semantic] of Object.entries(aliasToSemantic)) {
+    for (const [legacy, semantic] of Object.entries({
+      ...aliasToSemantic,
+      ...roleToSource,
+    })) {
       expect(palette[legacy]).toBeDefined()
       expect(palette[semantic]).toBeDefined()
       expect(palette[legacy]).toEqual(palette[semantic])
     }
   }
 
-  it("every legacy alias matches its semantic token in light mode", () => {
+  it("every legacy alias and role token matches its source in light mode", () => {
     checkAliases(light as unknown as Record<string, string>)
   })
 
-  it("every legacy alias matches its semantic token in dark mode", () => {
+  it("every legacy alias and role token matches its source in dark mode", () => {
     checkAliases(dark as unknown as Record<string, string>)
   })
 
+  // darkStatic is lightStatic today, so this only bites if someone splits the two.
   it("static tokens are identical across modes", () => {
     for (const [key, value] of Object.entries(light)) {
       if (key.startsWith("static")) {

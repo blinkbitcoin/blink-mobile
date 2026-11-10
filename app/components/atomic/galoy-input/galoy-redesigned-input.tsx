@@ -24,11 +24,11 @@ const useStyles = makeStyles(
     labelComponentStyles: {
       marginBottom: 9,
       fontWeight: "400",
-      color: colors.surfaceInteractive,
+      color: colors.grey5,
       marginLeft: isFocused ? 2 : 10,
     },
     errorMessageStyles: {
-      color: props.caption ? colors.surfaceInteractive : colors.error,
+      color: props.caption ? colors.grey5 : colors.error,
       textTransform: "capitalize",
       marginTop: 9,
       marginLeft: isFocused ? 2 : 10,
@@ -75,7 +75,7 @@ const GaloyInputFunctions = (
           remainingProps.errorMessage ? styles.errorStateStyle : null,
           isFocused ? styles.inputContainerFocused : null,
         ]}
-        placeholderTextColor={colors.border}
+        placeholderTextColor={colors.textPlaceholder}
         onFocus={(e) => {
           setIsFocused(true)
           remainingProps.onFocus?.(e)

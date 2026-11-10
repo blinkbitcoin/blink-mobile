@@ -50,20 +50,20 @@ export const CurrencyPill = ({
       case WalletCurrency.Btc:
         return {
           defaultText: LL.common.bitcoin(),
-          color: highlighted ? colors.backgroundDefault : colors.staticWhite,
-          backgroundColor: highlighted ? colors.accent : colors.textDisabled,
+          color: highlighted ? colors.textOnAccent : colors.staticWhite,
+          backgroundColor: highlighted ? colors.accent : colors.surfaceInactive,
         }
       case WalletCurrency.Usd:
         return {
           defaultText: LL.common.dollar(),
           color: highlighted ? colors.staticWhite : colors.staticWhite,
-          backgroundColor: highlighted ? colors.staticSuccess : colors.textDisabled,
+          backgroundColor: highlighted ? colors.staticSuccess : colors.surfaceInactive,
         }
       case CARD:
         return {
           defaultText: LL.common.card(),
-          color: colors._white,
-          backgroundColor: colors._cardPill,
+          color: colors.staticWhite,
+          backgroundColor: colors.staticCardPill,
         }
       default:
         return {

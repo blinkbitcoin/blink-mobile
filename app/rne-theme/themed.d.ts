@@ -22,6 +22,14 @@ declare module "@rn-vui/themed" {
     backdrop: string
     backdropStrong: string
 
+    // Role tokens — share a value with another token today, do a different job.
+    textOnAccent: string
+    textOnAccentDisabled: string
+    textPlaceholder: string
+    borderStrong: string
+    surfaceMuted: string
+    surfaceInactive: string
+
     // static* tokens never invert between light and dark mode.
     // Allowed only on screens that require no inversion (QR code, camera)
     // or in sections that are not dark/light aware (earns) — eslint-enforced.

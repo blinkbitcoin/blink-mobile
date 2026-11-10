@@ -18,7 +18,7 @@ export const GaloyPrimaryButton: FC<PropsWithChildren<ButtonProps>> = (props) =>
       // The library hardcodes a white spinner for solid buttons. In dark theme
       // the title on the orange fill is black, so the spinner drifted from the
       // text it stands in for. Track the title's colour instead.
-      loadingProps={{ color: colors.backgroundDefault }}
+      loadingProps={{ color: colors.textOnAccent }}
       buttonStyle={styles.buttonStyle}
       titleStyle={styles.titleStyle}
       disabledStyle={styles.disabledStyle}
@@ -33,10 +33,10 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 20,
     lineHeight: 24,
     fontWeight: "700",
-    color: colors.backgroundDefault,
+    color: colors.textOnAccent,
   },
   disabledTitleStyle: {
-    color: colors.surfaceInteractive,
+    color: colors.textOnAccentDisabled,
   },
   buttonStyle: {
     minHeight: 50,
