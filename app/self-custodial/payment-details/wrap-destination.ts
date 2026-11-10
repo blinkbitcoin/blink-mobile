@@ -4,7 +4,6 @@ import { LnUrlPayServiceResponse } from "lnurl-pay"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
-import { type SendAttemptRef } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import {
   type CreatePaymentDetailParams,
   isSendDestination,
@@ -20,8 +19,6 @@ import { createSelfCustodialSparkPaymentDetails } from "./spark"
 
 type WrapOptions = {
   feeTier?: FeeTierOption
-  /** What an earlier build of the same on-chain send left behind, for a fee-tier rebuild. */
-  attemptRef?: SendAttemptRef
 }
 
 type ValidDestination = Extract<
@@ -110,7 +107,6 @@ const buildOnchainDetail = <T extends WalletCurrency>({
     address: destination.address,
     unitOfAccountAmount: toBtcMoneyAmount(0),
     feeTier: options.feeTier,
-    idempotencyKeyRef: options.attemptRef,
     ...params,
   })
 

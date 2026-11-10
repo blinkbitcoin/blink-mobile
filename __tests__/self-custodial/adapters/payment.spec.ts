@@ -24,6 +24,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
     NetworkError: "NetworkError",
     Generic: "Generic",
   },
+  PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
   PrepareSendPaymentRequest: {
     create: (args: unknown) => args,
   },
@@ -101,7 +102,7 @@ describe("self-custodial payment adapters", () => {
       const sdk = createMockSdk()
       const prepared = { amount: BigInt(1000) }
       sdk.prepareSendPayment.mockResolvedValue(prepared)
-      sdk.sendPayment.mockResolvedValue({})
+      sdk.sendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
 
       const send = createSendPayment(sdk as never)
       const result = await send({ destination: "lnbc1..." })
@@ -109,6 +110,20 @@ describe("self-custodial payment adapters", () => {
       expect(sdk.prepareSendPayment).toHaveBeenCalledTimes(1)
       expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
       expect(result.status).toBe("success")
+    })
+
+    /** The SDK hands back the payment an invoice's key already made, failed or not:
+     *  a failed one is reported as failed, never as sent. */
+    it("returns failed when the SDK hands back a failed payment", async () => {
+      const sdk = createMockSdk()
+      sdk.prepareSendPayment.mockResolvedValue({ amount: BigInt(1000) })
+      sdk.sendPayment.mockResolvedValue({ payment: { id: "p1", status: 2 } })
+
+      const send = createSendPayment(sdk as never)
+      const result = await send({ destination: "lnbc1..." })
+
+      expect(result.status).toBe("failed")
+      expect(result.errors?.[0].message).toBe("Payment p1 failed")
     })
 
     it("returns failed on error", async () => {
@@ -125,7 +140,7 @@ describe("self-custodial payment adapters", () => {
     it("sends with tokenIdentifier + USDB-scaled amount when currency is USD", async () => {
       const sdk = createMockSdk()
       sdk.prepareSendPayment.mockResolvedValue({ amount: BigInt(100) })
-      sdk.sendPayment.mockResolvedValue({})
+      sdk.sendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
 
       const send = createSendPayment(sdk as never)
       await send({
@@ -145,7 +160,7 @@ describe("self-custodial payment adapters", () => {
     it("sends without tokenIdentifier and amount in sats when currency is BTC", async () => {
       const sdk = createMockSdk()
       sdk.prepareSendPayment.mockResolvedValue({ amount: BigInt(1000) })
-      sdk.sendPayment.mockResolvedValue({})
+      sdk.sendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
 
       const send = createSendPayment(sdk as never)
       await send({
@@ -164,7 +179,7 @@ describe("self-custodial payment adapters", () => {
     it("sends without tokenIdentifier when amount is omitted", async () => {
       const sdk = createMockSdk()
       sdk.prepareSendPayment.mockResolvedValue({ amount: BigInt(0) })
-      sdk.sendPayment.mockResolvedValue({})
+      sdk.sendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
 
       const send = createSendPayment(sdk as never)
       await send({ destination: "lnbc1..." })
@@ -186,7 +201,7 @@ describe("self-custodial payment adapters", () => {
     it("keys every send of the same invoice alike, so the SDK pays it once", async () => {
       const sdk = createMockSdk()
       sdk.prepareSendPayment.mockResolvedValue(invoice("hash-1"))
-      sdk.sendPayment.mockResolvedValue({})
+      sdk.sendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
       const send = createSendPayment(sdk as never)
 
       await send({ destination: "lnbc1..." })
@@ -201,7 +216,7 @@ describe("self-custodial payment adapters", () => {
       sdk.prepareSendPayment
         .mockResolvedValueOnce(invoice("hash-1"))
         .mockResolvedValueOnce(invoice("hash-2"))
-      sdk.sendPayment.mockResolvedValue({})
+      sdk.sendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
       const send = createSendPayment(sdk as never)
 
       await send({ destination: "lnbc1..." })
@@ -216,7 +231,7 @@ describe("self-custodial payment adapters", () => {
         ...invoice("hash-1"),
         tokenIdentifier: "test-token-id",
       })
-      sdk.sendPayment.mockResolvedValue({})
+      sdk.sendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
 
       await createSendPayment(sdk as never)({
         destination: "lnbc1...",

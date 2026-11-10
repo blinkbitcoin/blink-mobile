@@ -37,6 +37,7 @@ export {
 export type {
   ExecuteSendOptions,
   OnchainFeeTiers,
+  PreparedTokenLegs,
   PrepareSendOptions,
   PrepareLnurlOptions,
 } from "./send"

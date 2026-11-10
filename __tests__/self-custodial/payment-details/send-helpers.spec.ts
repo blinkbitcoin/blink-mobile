@@ -9,7 +9,10 @@ import {
   createSendMutation,
   createSendMutationOnchain,
 } from "@app/self-custodial/payment-details/send-helpers"
-import { findLostSend } from "@app/self-custodial/payment-details/lost-send"
+import {
+  findLostSend,
+  findPaymentUnderKey,
+} from "@app/self-custodial/payment-details/lost-send"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 
@@ -46,6 +49,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
     OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
     PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
     SyncWalletRequest: { create: (request: unknown) => request },
+    GetPaymentRequest: { create: (request: unknown) => request },
     PaymentType: { Send: 0, Receive: 1 },
     Seed: { Mnemonic: jest.fn().mockImplementation((args: unknown) => args) },
     StableBalanceActiveLabel: {
@@ -90,12 +94,14 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
 
 const mockListPayments = jest.fn()
 const mockSyncWallet = jest.fn()
+const mockGetPayment = jest.fn()
 
 const mockSdk = {
   prepareSendPayment: (...args: unknown[]) => mockPrepareSendPayment(...args),
   sendPayment: (...args: unknown[]) => mockSendPayment(...args),
   listPayments: (...args: unknown[]) => mockListPayments(...args),
   syncWallet: (...args: unknown[]) => mockSyncWallet(...args),
+  getPayment: (...args: unknown[]) => mockGetPayment(...args),
 } as never
 
 const sdkError = (tag: string, inner?: readonly [string]) => ({ tag, inner })
@@ -563,7 +569,7 @@ describe("createSendMutation", () => {
         inner: { invoiceDetails: { paymentHash: "hash-1" } },
       },
     })
-    mockSendPayment.mockResolvedValue(undefined)
+    mockSendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
 
     const send = createSendMutation({
       sdk: mockSdk,
@@ -663,7 +669,7 @@ describe("createSendMutation", () => {
         inner: { invoiceDetails: { paymentHash: "hash-1" } },
       },
     })
-    mockSendPayment.mockResolvedValue(undefined)
+    mockSendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
 
     const send = createSendMutation({
       sdk: mockSdk,
@@ -685,7 +691,7 @@ describe("createSendMutation", () => {
         inner: { invoiceDetails: { paymentHash: "hash-1" } },
       },
     })
-    mockSendPayment.mockResolvedValue(undefined)
+    mockSendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
     const conversionOptions = {
       conversionType: { tag: "ToBitcoin", inner: { fromTokenIdentifier: "usdb" } },
       maxSlippageBps: undefined,
@@ -715,7 +721,7 @@ describe("createSendMutationOnchain", () => {
     mockPrepareSendPayment.mockResolvedValue({
       paymentMethod: { tag: "BitcoinAddress", inner: {} },
     })
-    mockSendPayment.mockResolvedValue(undefined)
+    mockSendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
 
     const send = createSendMutationOnchain(
       { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
@@ -772,7 +778,12 @@ describe("findLostSend", () => {
   }
 
   const lookup = () =>
-    findLostSend({ sdk: mockSdk, startedAtMs: STARTED_AT_MS, matches: toFriend })
+    findLostSend({
+      sdk: mockSdk,
+      startedAtMs: STARTED_AT_MS,
+      walletClockSec: STARTED_AT_MS / 1000,
+      matches: toFriend,
+    })
 
   /** Runs the lookup to its end, releasing each wait between looks. */
   const settle = async <T>(pending: Promise<T>): Promise<T> => {
@@ -797,6 +808,62 @@ describe("findLostSend", () => {
    *  a day before the attempt's own clock, because the wallet stamps a payment with the
    *  server's clock and a phone's can be set well ahead of it. Only what was sent from
    *  this wallet is asked for. */
+  /** A phone clock days ahead puts the attempt's own time after the payment's, which
+   *  the wallet stamps by the server's clock: the wallet's newest send then, stamped the
+   *  same way, still reaches it. */
+  it("reaches back from the wallet's own clock when it is earlier than the phone's", async () => {
+    walletAnswers([sent("p1", COMPLETED)])
+    const twoDaysEarlier = STARTED_AT_MS / 1000 - 2 * 24 * 60 * 60
+
+    await settle(
+      findLostSend({
+        sdk: mockSdk,
+        startedAtMs: STARTED_AT_MS,
+        walletClockSec: twoDaysEarlier,
+        matches: toFriend,
+      }),
+    )
+
+    expect(mockListPayments).toHaveBeenCalledWith(
+      expect.objectContaining({ fromTimestamp: BigInt(twoDaysEarlier - 24 * 60 * 60) }),
+    )
+  })
+
+  /** A phone clock behind the server's: its own time is the earlier, and is used. */
+  it("reaches back from the phone's clock when it is the earlier", async () => {
+    walletAnswers([sent("p1", COMPLETED)])
+
+    await settle(
+      findLostSend({
+        sdk: mockSdk,
+        startedAtMs: STARTED_AT_MS,
+        walletClockSec: STARTED_AT_MS / 1000 + 2 * 24 * 60 * 60,
+        matches: toFriend,
+      }),
+    )
+
+    expect(mockListPayments).toHaveBeenCalledWith(
+      expect.objectContaining({ fromTimestamp: BigInt(1_747_691_078 - 24 * 60 * 60) }),
+    )
+  })
+
+  it("reads the whole history when the wallet held no send to go by", async () => {
+    walletAnswers([sent("p1", COMPLETED)])
+
+    await settle(
+      findLostSend({
+        sdk: mockSdk,
+        startedAtMs: STARTED_AT_MS,
+        walletClockSec: 0,
+        matches: toFriend,
+      }),
+    )
+
+    expect(mockListPayments).toHaveBeenCalledWith(
+      expect.objectContaining({ fromTimestamp: BigInt(0) }),
+    )
+  })
+
   it("asks for outgoing payments from a day before the attempt", async () => {
     walletAnswers([sent("p1", COMPLETED)])
 
@@ -1018,5 +1085,99 @@ describe("findLostSend", () => {
     const found = await settle(lookup())
 
     expect(found).toEqual({ status: "not-found" })
+  })
+})
+
+describe("findPaymentUnderKey", () => {
+  const COMPLETED = 0
+  const PENDING = 1
+  const FAILED = 2
+  const KEY = "11111111-1111-4111-8111-111111111111"
+  /** What the SDK answers an id it holds no payment for. */
+  const notFound = () => sdkError("InvalidInput", ["Not found"])
+  const lookup = () => findPaymentUnderKey({ sdk: mockSdk, key: KEY.toUpperCase() })
+
+  /** Runs the lookup to its end, releasing each wait between looks. */
+  const settle = async <T>(pending: Promise<T>): Promise<T> => {
+    for (let i = 0; i < 3; i += 1) {
+      await Promise.resolve()
+      await jest.advanceTimersByTimeAsync(2000)
+    }
+    return pending
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    jest.useFakeTimers()
+    mockSyncWallet.mockResolvedValue(undefined)
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  /** Exact, with no window: a phone clock days ahead cannot leave the payment out. */
+  it("asks the caught-up wallet for the payment by its id, the key", async () => {
+    mockGetPayment.mockResolvedValue({ payment: { id: KEY, status: COMPLETED } })
+
+    const result = await settle(lookup())
+
+    expect(result).toEqual({ status: "found", payment: { id: KEY, status: COMPLETED } })
+    expect(mockSyncWallet).toHaveBeenCalledTimes(1)
+    expect(mockGetPayment).toHaveBeenCalledWith({ paymentId: KEY })
+    expect(mockListPayments).not.toHaveBeenCalled()
+  })
+
+  it("finds a payment still in flight", async () => {
+    mockGetPayment.mockResolvedValue({ payment: { id: KEY, status: PENDING } })
+
+    const result = await settle(lookup())
+
+    expect(result.status).toBe("found")
+  })
+
+  it("finds one that lands on a later look", async () => {
+    mockGetPayment
+      .mockRejectedValueOnce(notFound())
+      .mockResolvedValueOnce({ payment: { id: KEY, status: COMPLETED } })
+
+    const result = await settle(lookup())
+
+    expect(result.status).toBe("found")
+    expect(mockGetPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("answers not-found once every look shows no payment under the key", async () => {
+    mockGetPayment.mockRejectedValue(notFound())
+
+    const result = await settle(lookup())
+
+    expect(result).toEqual({ status: "not-found" })
+    expect(mockGetPayment).toHaveBeenCalledTimes(3)
+  })
+
+  it("does not take a failed payment under the key for the attempt landing", async () => {
+    mockGetPayment.mockResolvedValue({ payment: { id: KEY, status: FAILED } })
+
+    const result = await settle(lookup())
+
+    expect(result).toEqual({ status: "not-found" })
+  })
+
+  it("is unreadable when the wallet cannot be read", async () => {
+    mockGetPayment.mockRejectedValue(sdkError("StorageError", ["disk"]))
+
+    const result = await settle(lookup())
+
+    expect(result.status).toBe("unreadable")
+  })
+
+  it("is unreadable when the wallet cannot catch up with the server", async () => {
+    mockSyncWallet.mockRejectedValue(sdkError("NetworkError"))
+    mockGetPayment.mockRejectedValue(notFound())
+
+    const result = await settle(lookup())
+
+    expect(result.status).toBe("unreadable")
   })
 })

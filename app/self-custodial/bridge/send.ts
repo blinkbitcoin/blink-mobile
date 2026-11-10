@@ -9,6 +9,7 @@ import {
   SendPaymentOptions,
   SendPaymentRequest,
   type BreezSdkInterface,
+  type ConversionEstimate,
   type ConversionOptions,
   type LnurlPayRequestDetails,
   type LnurlPayResponse,
@@ -97,12 +98,21 @@ export const resolveSendTokenIdentifier = (
 ): string | undefined =>
   currency === WalletCurrency.Usd ? requireSparkTokenIdentifier() : undefined
 
+/** What a prepared send or LNURL pay says about the token legs it will move. */
+export type PreparedTokenLegs = {
+  tokenIdentifier?: string
+  conversionEstimate?: ConversionEstimate
+}
+
 /**
  * Whether a prepared send moves a token on any leg: a USDB transfer, or a conversion in
  * or out of USDB on the way. The SDK has no idempotency hook for token transfers and
  * rejects a key on such a payment as invalid input before anything is sent.
+ *
+ * Read from the prepared payment, never from what was asked for: with stable balance
+ * active and too few sats, the SDK adds a conversion to a plain bitcoin send on its own.
  */
-export const hasTokenLeg = (prepared: PrepareSendPaymentResponse): boolean =>
+export const hasTokenLeg = (prepared: PreparedTokenLegs): boolean =>
   prepared.tokenIdentifier !== undefined || prepared.conversionEstimate !== undefined
 
 export type ExecuteSendOptions = {
@@ -167,6 +177,7 @@ export const prepareLnurl = (sdk: BreezSdkInterface, options: PrepareLnurlOption
 export const extractLnurlFee = (prepared: PrepareLnurlPayResponse): number =>
   toNumber(prepared.feeSats)
 
+/** The key is dropped on a token leg, as `executeSend` drops it, for the same reason. */
 export const executeLnurl = (
   sdk: BreezSdkInterface,
   prepareResponse: PrepareLnurlPayResponse,
@@ -175,6 +186,6 @@ export const executeLnurl = (
   sdk.lnurlPay(
     LnurlPayRequest.create({
       prepareResponse,
-      idempotencyKey,
+      idempotencyKey: hasTokenLeg(prepareResponse) ? undefined : idempotencyKey,
     }),
   )

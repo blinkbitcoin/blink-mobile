@@ -6,13 +6,18 @@ import {
   type SparkHtlcDetails,
 } from "@breeztech/breez-sdk-spark-react-native"
 
-import { type LostSend } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
-
 import { reportError } from "@app/utils/error-logging"
 import { sleep } from "@app/utils/sleep"
 
-import { listSentPaymentsSince, syncSelfCustodialWallet } from "../bridge/wallet"
+import {
+  getPaymentById,
+  listSentPaymentsSince,
+  newestSentPaymentTimestamp,
+  syncSelfCustodialWallet,
+} from "../bridge/wallet"
 import { SelfCustodialErrorCode } from "../sdk-error"
+
+import { type LostSend } from "./lost-attempts"
 
 /**
  * How a send whose outcome the SDK lost is looked for before it is treated as never made.
@@ -41,6 +46,8 @@ type FindLostSendParams = {
   sdk: BreezSdkInterface
   /** When the attempt was dispatched, in milliseconds. */
   startedAtMs: number
+  /** The wallet's own clock as the attempt was lost: see `LostSend.walletClockSec`. */
+  walletClockSec: number
   /** Whether a payment in the history is one this attempt may have made. */
   matches: (payment: Payment) => boolean
 }
@@ -117,6 +124,32 @@ const scanHistorySince = async (
 }
 
 /**
+ * Looks a few times, spaced out for a payment that threw to land in between, until one
+ * look finds it. The last look decides otherwise, since each reads the wallet afresh: a
+ * look that could not read earlier says nothing about one that did later.
+ */
+const lookRepeatedly = async (
+  look: () => Promise<LostSendLookup>,
+): Promise<LostSendLookup> => {
+  let lastLook: LostSendLookup = { status: "not-found" }
+
+  for (let attempt = 1; attempt <= LOST_SEND_ATTEMPTS; attempt += 1) {
+    try {
+      lastLook = await look()
+    } catch (err) {
+      reportError("Self-custodial lost send lookup", err)
+      lastLook = { status: "unreadable", error: err }
+    }
+    if (lastLook.status === "found") return lastLook
+
+    const isLastAttempt = attempt === LOST_SEND_ATTEMPTS
+    if (!isLastAttempt) await sleep(LOST_SEND_DELAY_MS)
+  }
+
+  return lastLook
+}
+
+/**
  * The payment an attempt made in spite of throwing, "not-found" when the last look read
  * the history and showed none, or "unreadable" when it could not. A completed payment
  * outranks a pending one for the same attempt; a failed one is not the attempt landing,
@@ -125,36 +158,61 @@ const scanHistorySince = async (
  * The last look decides, since each one reads the history afresh after the wallet caught
  * up: a look that could not read earlier says nothing about one that did later.
  */
-export const findLostSend = async ({
+export const findLostSend = ({
   sdk,
   startedAtMs,
+  walletClockSec,
   matches,
 }: FindLostSendParams): Promise<LostSendLookup> => {
-  const since = BigInt(Math.floor(startedAtMs / 1000) - LOST_SEND_LOOKBACK_SECONDS)
-  let lastLook: LostSendLookup = { status: "not-found" }
+  const earliestSec = Math.min(Math.floor(startedAtMs / 1000), walletClockSec)
+  const since = BigInt(Math.max(0, earliestSec - LOST_SEND_LOOKBACK_SECONDS))
+  return lookRepeatedly(async () => {
+    const scan = await scanHistorySince(sdk, since, matches)
+    const payment = scan.matches.find(isCompleted) ?? scan.matches.find(isPendingPayment)
+    if (payment) return { status: "found", payment }
+    return scan.hasUndescribedSend
+      ? {
+          status: "unreadable",
+          error: new Error("Lost send lookup met an undescribed send"),
+        }
+      : { status: "not-found" }
+  })
+}
 
-  for (let attempt = 1; attempt <= LOST_SEND_ATTEMPTS; attempt += 1) {
-    try {
-      const scan = await scanHistorySince(sdk, since, matches)
-      const payment =
-        scan.matches.find(isCompleted) ?? scan.matches.find(isPendingPayment)
-      if (payment) return { status: "found", payment }
-      lastLook = scan.hasUndescribedSend
-        ? {
-            status: "unreadable",
-            error: new Error("Lost send lookup met an undescribed send"),
-          }
-        : { status: "not-found" }
-    } catch (err) {
-      reportError("Self-custodial lost send lookup", err)
-      lastLook = { status: "unreadable", error: err }
-    }
+/**
+ * The payment an attempt made under `key`: the SDK records a keyed send with the key as
+ * its payment id, so it is asked for by that id once the wallet has caught up with the
+ * server. Exact, with no window: nothing a clock says, the phone's or the server's, can
+ * leave it out. A failed payment under the key is not the attempt landing.
+ */
+export const findPaymentUnderKey = ({
+  sdk,
+  key,
+}: {
+  sdk: BreezSdkInterface
+  key: string
+}): Promise<LostSendLookup> =>
+  lookRepeatedly(async () => {
+    await syncSelfCustodialWallet(sdk)
+    const payment = await getPaymentById(sdk, key.toLowerCase())
+    return payment && isLanded(payment)
+      ? { status: "found", payment }
+      : { status: "not-found" }
+  })
 
-    const isLastAttempt = attempt === LOST_SEND_ATTEMPTS
-    if (!isLastAttempt) await sleep(LOST_SEND_DELAY_MS)
+/**
+ * The wallet's own clock for an attempt just lost: when the newest send it holds was
+ * made, by the server's clock. 0, so the look reaches back to the start of the history,
+ * when it holds none or cannot be read: a narrower window could leave the payment out.
+ */
+export const readWalletClockSec = async (sdk: BreezSdkInterface): Promise<number> => {
+  try {
+    const newest = await newestSentPaymentTimestamp(sdk)
+    return newest === undefined ? 0 : Number(newest)
+  } catch (err) {
+    reportError("Self-custodial wallet clock", err)
+    return 0
   }
-
-  return lastLook
 }
 
 /**
@@ -193,7 +251,7 @@ export const isPaymentOfLostSend = (
   const paymentHash = htlcDetailsOf(payment)?.paymentHash
   if (paymentHash !== undefined && lost.paymentHashes.includes(paymentHash)) return true
   const sparkInvoice = sparkInvoiceOf(payment)
-  return sparkInvoice !== undefined && (lost.sparkInvoices ?? []).includes(sparkInvoice)
+  return sparkInvoice !== undefined && lost.sparkInvoices.includes(sparkInvoice)
 }
 
 /**

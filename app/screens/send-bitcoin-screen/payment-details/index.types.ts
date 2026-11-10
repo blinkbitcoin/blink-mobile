@@ -54,37 +54,6 @@ export type ConvertMoneyAmount = <W extends WalletOrDisplayCurrency>(
  */
 export type IdempotencyKeyRef = { current?: string }
 
-/**
- * The attempts of a send that threw after dispatch without their payment turning up: the
- * payment hash of each invoice they paid (or, for a Spark invoice, the invoice itself),
- * and when the first of them was made.
- */
-export type LostSend = {
-  startedAtMs: number
-  paymentHashes: string[]
-  sparkInvoices?: string[]
-}
-
-/**
- * An attempt that threw after dispatch and left nothing its payment could be found by in
- * the wallet's history (a send to a Spark or bitcoin address). Only a retry under the key
- * it was sent with is safe, since the SDK refuses that as a duplicate; anything else could
- * be the second payment, so it is refused until the sender has checked their history.
- */
-export type UnresolvedSend = { idempotencyKey?: string }
-
-/**
- * Everything an attempt leaves behind for the next one, on one holder: the idempotency
- * key above, the lost attempts to look for before anything is sent, and an attempt that
- * cannot be looked for at all. Shared by every rebuild the same way. The key alone starts
- * over with a new amount, wallet or fee; the rest survives, since the payment that may
- * have gone out is as real after it.
- */
-export type SendAttemptRef = IdempotencyKeyRef & {
-  lostSend?: LostSend
-  unresolvedSend?: UnresolvedSend
-}
-
 export type BaseCreatePaymentDetailsParams<T extends WalletCurrency> = {
   convertMoneyAmount: ConvertMoneyAmount
   sendingWalletDescriptor: WalletDescriptor<T>
@@ -186,7 +155,7 @@ type BasePaymentDetail<T extends WalletCurrency> = {
   canGetFee: boolean
   sendPaymentMutation?: SendPaymentMutation
   canSendPayment: boolean
-  idempotencyKeyRef?: SendAttemptRef
+  idempotencyKeyRef?: IdempotencyKeyRef
   destinationSpecifiedAmount?: BtcMoneyAmount
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency> // destinationSpecifiedAmount if the invoice has an amount, otherwise the amount that the user is denominating the payment in
   settlementAmount: WalletAmount<T> // the amount that will be subtracted from the sending wallet

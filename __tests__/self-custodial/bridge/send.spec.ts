@@ -438,6 +438,24 @@ describe("executeLnurl", () => {
     )
   })
 
+  /** The SDK rejects a key on a pay with a conversion as invalid input, and it adds one
+   *  to a bitcoin pay on its own when stable balance is active and sats run short. */
+  it("drops the key when the quote carries a conversion", async () => {
+    const lnurlPay = jest.fn().mockResolvedValue({})
+    const sdk = { lnurlPay } as never
+    const prepareResponse = {
+      amountSats: BigInt(100),
+      feeSats: BigInt(1),
+      conversionEstimate: { amountIn: BigInt(1) },
+    } as never
+
+    await executeLnurl(sdk, prepareResponse, "idemp-key-1")
+
+    expect(lnurlPay).toHaveBeenCalledWith(
+      expect.objectContaining({ idempotencyKey: undefined }),
+    )
+  })
+
   it("passes idempotencyKey as undefined when not provided", async () => {
     const lnurlPay = jest.fn().mockResolvedValue({})
     const sdk = { lnurlPay } as never

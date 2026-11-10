@@ -10,23 +10,19 @@ import {
   SetAmount,
   SetSendingWalletDescriptor,
   BaseCreatePaymentDetailsParams,
-  SendAttemptRef,
+  IdempotencyKeyRef,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 
-import {
-  carryLostAttempts,
-  createGetFeeOnchain,
-  createSendMutationOnchain,
-} from "./send-helpers"
+import { createGetFeeOnchain, createSendMutationOnchain } from "./send-helpers"
 
 type CreateOnchainParams<T extends WalletCurrency> = {
   sdk: BreezSdkInterface
   address: string
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
   feeTier?: FeeTierOption
-  idempotencyKeyRef?: SendAttemptRef
+  idempotencyKeyRef?: IdempotencyKeyRef
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrency>(
@@ -47,12 +43,12 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
    * Same holder for every rebuild, as the LNURL detail keeps it: the send hook mints the
    * key into it on the first attempt and reads it back on a retry, so a bitcoin send
    * retried after a throw is refused by the SDK as a duplicate rather than paid twice.
-   * What a lost attempt leaves behind rides on it too.
+   * What a lost attempt leaves behind is kept by destination, apart from the detail.
    */
-  const attemptRef: SendAttemptRef = params.idempotencyKeyRef ?? {}
+  const idempotencyKeyRef: IdempotencyKeyRef = params.idempotencyKeyRef ?? {}
   const paramsWithKey: CreateOnchainParams<T> = {
     ...params,
-    idempotencyKeyRef: attemptRef,
+    idempotencyKeyRef,
   }
 
   const memo = destinationSpecifiedMemo || senderSpecifiedMemo
@@ -75,7 +71,7 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
         sendPaymentMutation: createSendMutationOnchain(
           prepareParams,
           feeTier,
-          attemptRef,
+          idempotencyKeyRef,
         ),
       }
     : { canSendPayment: false, canGetFee: false }
@@ -83,7 +79,7 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
   const setAmount: SetAmount<T> = (newAmount) =>
     createSelfCustodialOnchainPaymentDetails({
       ...paramsWithKey,
-      idempotencyKeyRef: carryLostAttempts(attemptRef),
+      idempotencyKeyRef: undefined,
       unitOfAccountAmount: newAmount,
     })
 
@@ -101,7 +97,7 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
   const setSendingWalletDescriptor: SetSendingWalletDescriptor<T> = (desc) =>
     createSelfCustodialOnchainPaymentDetails({
       ...paramsWithKey,
-      idempotencyKeyRef: carryLostAttempts(attemptRef),
+      idempotencyKeyRef: undefined,
       sendingWalletDescriptor: desc,
     })
 
@@ -119,7 +115,7 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
     unitOfAccountAmount,
     sendingWalletDescriptor,
     setSendingWalletDescriptor,
-    idempotencyKeyRef: attemptRef,
+    idempotencyKeyRef,
     canSetAmount: true,
     setAmount,
     ...setMemo,

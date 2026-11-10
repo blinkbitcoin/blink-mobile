@@ -4,9 +4,6 @@ import { PaymentType } from "@blinkbitcoin/blink-client"
 import { createSelfCustodialOnchainPaymentDetails } from "@app/self-custodial/payment-details/onchain"
 
 jest.mock("@app/self-custodial/payment-details/send-helpers", () => ({
-  carryLostAttempts: jest.requireActual(
-    "@app/self-custodial/payment-details/send-helpers",
-  ).carryLostAttempts,
   createGetFee: jest.fn().mockReturnValue(jest.fn()),
   createGetFeeOnchain: jest.fn().mockReturnValue(jest.fn()),
   createSendMutation: jest.fn().mockReturnValue(jest.fn()),

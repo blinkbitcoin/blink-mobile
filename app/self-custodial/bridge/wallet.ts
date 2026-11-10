@@ -1,6 +1,8 @@
 import {
+  GetPaymentRequest,
   PaymentType,
   RegisterLightningAddressRequest,
+  SdkError_Tags as SdkErrorTags,
   SyncWalletRequest,
   defaultExternalSigners,
   type BreezSdkInterface,
@@ -70,6 +72,52 @@ export const listPayments = (sdk: BreezSdkInterface, offset: number, limit: numb
     limit,
     sortAscending: false,
   })
+
+/** How the SDK (0.22) answers an id it holds no payment for: InvalidInput("Not found"). */
+const isPaymentNotFound = (err: unknown): boolean =>
+  typeof err === "object" &&
+  err !== null &&
+  "tag" in err &&
+  err.tag === SdkErrorTags.InvalidInput &&
+  "inner" in err &&
+  Array.isArray(err.inner) &&
+  err.inner[0] === "Not found"
+
+/**
+ * The payment the wallet records under `paymentId`, or undefined when it holds none.
+ * Any other failure means the wallet could not be read, and is thrown.
+ */
+export const getPaymentById = async (
+  sdk: BreezSdkInterface,
+  paymentId: string,
+): Promise<Payment | undefined> => {
+  try {
+    const { payment } = await sdk.getPayment(GetPaymentRequest.create({ paymentId }))
+    return payment
+  } catch (err) {
+    if (isPaymentNotFound(err)) return undefined
+    throw err
+  }
+}
+
+/** When the newest outgoing payment the wallet holds was made (unix seconds), by the
+ *  server's clock, or undefined when it holds none. */
+export const newestSentPaymentTimestamp = async (
+  sdk: BreezSdkInterface,
+): Promise<bigint | undefined> => {
+  const { payments } = await sdk.listPayments({
+    typeFilter: [PaymentType.Send],
+    statusFilter: undefined,
+    assetFilter: undefined,
+    paymentDetailsFilter: undefined,
+    fromTimestamp: undefined,
+    toTimestamp: undefined,
+    offset: 0,
+    limit: 1,
+    sortAscending: false,
+  })
+  return payments[0]?.timestamp
+}
 
 /** One page of the outgoing payments created at or after `fromTimestamp` (unix seconds),
  *  newest first, in any status: what a send whose outcome the SDK lost is looked up

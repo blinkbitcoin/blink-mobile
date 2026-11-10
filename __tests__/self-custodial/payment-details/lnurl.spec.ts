@@ -5,6 +5,7 @@ import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
 import { createSelfCustodialLnurlPaymentDetails } from "@app/self-custodial/payment-details/lnurl"
+import { scopeLostAttemptsTo } from "@app/self-custodial/payment-details/lost-attempts"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 
 const mockPrepareLnurl = jest.fn()
@@ -19,8 +20,19 @@ jest.mock("@app/self-custodial/bridge/wallet", () => ({
   syncSelfCustodialWallet: (...args: unknown[]) => mockSyncSelfCustodialWallet(...args),
 }))
 
+/** A dollar send converts on the way out, and the SDK's quote says so with an estimate:
+ *  what the send flow reads to leave the idempotency key off. */
+const QUOTED_CONVERSION = { amountIn: BigInt(1), amountOut: BigInt(1) }
+
 jest.mock("@app/self-custodial/bridge", () => ({
-  prepareLnurl: (...args: unknown[]) => mockPrepareLnurl(...args),
+  prepareLnurl: async (...args: unknown[]) => {
+    const quoted = await mockPrepareLnurl(...args)
+    const options = args[1] as { conversionOptions?: unknown } | undefined
+    return options?.conversionOptions
+      ? { conversionEstimate: QUOTED_CONVERSION, ...quoted }
+      : quoted
+  },
+  hasTokenLeg: jest.requireActual("@app/self-custodial/bridge/send").hasTokenLeg,
   executeLnurl: (...args: unknown[]) => mockExecuteLnurl(...args),
   extractLnurlFee: (...args: unknown[]) => mockExtractLnurlFee(...args),
   buildConversionType: jest.fn().mockReturnValue({ tag: "ToBitcoin" }),
@@ -44,6 +56,13 @@ jest.mock("@app/self-custodial/payment-details/lost-send", () => ({
 const { findLostSend: actualFindLostSend } = jest.requireActual<
   typeof import("@app/self-custodial/payment-details/lost-send")
 >("@app/self-custodial/payment-details/lost-send")
+
+/** Lost attempts are kept for the connected wallet for as long as the app runs, which
+ *  here is the whole file: every test connects a wallet of its own, holding none. */
+let connectedWallets = 0
+beforeEach(() => {
+  scopeLostAttemptsTo(`wallet-${(connectedWallets += 1)}`)
+})
 
 jest.mock("@app/utils/sleep", () => ({ sleep: () => Promise.resolve() }))
 jest.mock("@app/utils/error-logging", () => ({ reportError: jest.fn() }))
@@ -1560,5 +1579,51 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
       expect(retry.errors?.[0]?.message).toBe(SelfCustodialErrorCode.NetworkError)
       expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
     })
+  })
+})
+
+describe("createSelfCustodialLnurlPaymentDetails lost attempts", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  /** The identifier is the server's word, and another endpoint may give the same one:
+   *  a lost send to one must not be taken for a send to the other. */
+  it("keeps them by the lnurl the sender gave, not by the identifier it names", async () => {
+    const usd = {
+      sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
+      unitOfAccountAmount: {
+        amount: 100,
+        currency: WalletCurrency.Usd,
+        currencyCode: "USD",
+      },
+    }
+    const sendTo = (lnurl: string) => {
+      const detail = createSelfCustodialLnurlPaymentDetails(
+        createParams({
+          ...usd,
+          lnurl,
+          lnurlParams: baseLnurlParams({ identifier: "same@example.com" }),
+        }),
+      )
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      return detail.sendPaymentMutation({} as never)
+    }
+    mockPrepareLnurl.mockResolvedValue(quote())
+    mockExecuteLnurl
+      .mockRejectedValueOnce({ tag: "NetworkError" })
+      .mockResolvedValueOnce({
+        payment: { id: "p2", status: 0, timestamp: BigInt(1), details: undefined },
+        successAction: undefined,
+      })
+    mockFindLostSend.mockResolvedValue({ status: "not-found" })
+
+    await sendTo("lnurl1first")
+    mockFindLostSend.mockClear()
+    const other = await sendTo("lnurl1second")
+
+    expect(other.status).toBe(PaymentSendResult.Success)
+    expect(mockFindLostSend).not.toHaveBeenCalled()
+    expect(mockExecuteLnurl).toHaveBeenCalledTimes(2)
   })
 })

@@ -1,4 +1,7 @@
-import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  PaymentStatus,
+  type BreezSdkInterface,
+} from "@breeztech/breez-sdk-spark-react-native"
 import { v5 as uuidv5 } from "uuid"
 
 import { WalletCurrency } from "@app/graphql/generated"
@@ -39,8 +42,13 @@ const INVOICE_KEY_NAMESPACE = "8f0c2a51-6b0e-4f63-9a1d-3c5e7b9d1f20"
 /**
  * The key a bitcoin send through this adapter carries. Its callers hold no payment intent
  * to keep a key on across retries, so an invoice keys itself: every send of the same
- * invoice carries the same key and the SDK refuses all but the first. A send with no
- * invoice gets a key of its own, which at least makes the SDK's internal retries safe.
+ * invoice carries the same key and the SDK answers all but the first with the payment
+ * the first one made. A send with no invoice gets a key of its own, which at least makes
+ * the SDK's internal retries safe.
+ *
+ * So the first payment of an invoice is its only one through this adapter: once it has
+ * failed, every later send of the invoice comes back as that failure, and the caller
+ * needs a new invoice to try again.
  */
 const adapterIdempotencyKey = (paymentHash: string | undefined): Promise<string> =>
   paymentHash
@@ -59,7 +67,10 @@ export const createSendPayment = (sdk: BreezSdkInterface): SendPaymentAdapter =>
       const idempotencyKey = hasTokenLeg(prepared)
         ? undefined
         : await adapterIdempotencyKey(identifyPreparedSend(prepared)?.paymentHash)
-      await executeSend(sdk, prepared, { idempotencyKey })
+      const { payment } = await executeSend(sdk, prepared, { idempotencyKey })
+      if (payment.status === PaymentStatus.Failed) {
+        return failed(`Payment ${payment.id} failed`)
+      }
 
       return { status: PaymentResultStatus.Success }
     } catch (err) {

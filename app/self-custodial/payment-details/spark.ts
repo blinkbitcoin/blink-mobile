@@ -10,19 +10,19 @@ import {
   SetAmount,
   SetSendingWalletDescriptor,
   BaseCreatePaymentDetailsParams,
-  SendAttemptRef,
+  IdempotencyKeyRef,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 
 import { resolveSendTokenIdentifier, toSdkSendAmount } from "../bridge"
 
-import { carryLostAttempts, createGetFee, createSendMutation } from "./send-helpers"
+import { createGetFee, createSendMutation } from "./send-helpers"
 
 type CreateSparkParams<T extends WalletCurrency> = {
   sdk: BreezSdkInterface
   address: string
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
-  idempotencyKeyRef?: SendAttemptRef
+  idempotencyKeyRef?: IdempotencyKeyRef
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createSelfCustodialSparkPaymentDetails = <T extends WalletCurrency>(
@@ -42,10 +42,10 @@ export const createSelfCustodialSparkPaymentDetails = <T extends WalletCurrency>
    * Same holder for every rebuild, as the LNURL detail keeps it: the send hook mints the
    * key into it on the first attempt and reads it back on a retry, so a bitcoin send
    * retried after a throw is refused by the SDK as a duplicate rather than paid twice.
-   * What a lost attempt leaves behind rides on it too.
+   * What a lost attempt leaves behind is kept by destination, apart from the detail.
    */
-  const attemptRef: SendAttemptRef = params.idempotencyKeyRef ?? {}
-  const paramsWithKey: CreateSparkParams<T> = { ...params, idempotencyKeyRef: attemptRef }
+  const idempotencyKeyRef: IdempotencyKeyRef = params.idempotencyKeyRef ?? {}
+  const paramsWithKey: CreateSparkParams<T> = { ...params, idempotencyKeyRef }
 
   const memo = destinationSpecifiedMemo || senderSpecifiedMemo
   const settlementAmount = convertMoneyAmount(
@@ -67,14 +67,14 @@ export const createSelfCustodialSparkPaymentDetails = <T extends WalletCurrency>
         canSendPayment: true,
         canGetFee: true,
         getFee: createGetFee(prepareParams),
-        sendPaymentMutation: createSendMutation(prepareParams, attemptRef),
+        sendPaymentMutation: createSendMutation(prepareParams, idempotencyKeyRef),
       }
     : { canSendPayment: false, canGetFee: false }
 
   const setAmount: SetAmount<T> = (newAmount) =>
     createSelfCustodialSparkPaymentDetails({
       ...paramsWithKey,
-      idempotencyKeyRef: carryLostAttempts(attemptRef),
+      idempotencyKeyRef: undefined,
       unitOfAccountAmount: newAmount,
     })
 
@@ -92,7 +92,7 @@ export const createSelfCustodialSparkPaymentDetails = <T extends WalletCurrency>
   const setSendingWalletDescriptor: SetSendingWalletDescriptor<T> = (desc) =>
     createSelfCustodialSparkPaymentDetails({
       ...paramsWithKey,
-      idempotencyKeyRef: carryLostAttempts(attemptRef),
+      idempotencyKeyRef: undefined,
       sendingWalletDescriptor: desc,
     })
 
@@ -110,7 +110,7 @@ export const createSelfCustodialSparkPaymentDetails = <T extends WalletCurrency>
     unitOfAccountAmount,
     sendingWalletDescriptor,
     setSendingWalletDescriptor,
-    idempotencyKeyRef: attemptRef,
+    idempotencyKeyRef,
     canSetAmount: true,
     setAmount,
     ...setMemo,

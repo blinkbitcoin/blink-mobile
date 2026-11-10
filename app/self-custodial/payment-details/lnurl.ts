@@ -18,7 +18,7 @@ import {
   PaymentDetail,
   PaymentDetailSendPaymentGetFee,
   PaymentDetailSetMemo,
-  SendAttemptRef,
+  IdempotencyKeyRef,
   SetAmount,
   SetInvoice,
   SetSendingWalletDescriptor,
@@ -43,7 +43,7 @@ import {
 import { classifySdkError } from "../sdk-error"
 
 import { htlcDetailsOf } from "./lost-send"
-import { carryLostAttempts, feeFailure, runSelfCustodialSend } from "./send-helpers"
+import { feeFailure, runSelfCustodialSend } from "./send-helpers"
 
 const SAT_TO_MILLISAT = BigInt(1000)
 
@@ -146,7 +146,7 @@ type CreateSCLnurlParams<T extends WalletCurrency> = {
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
   successAction?: LNURLPaySuccessAction
   isMerchant: boolean
-  idempotencyKeyRef?: SendAttemptRef
+  idempotencyKeyRef?: IdempotencyKeyRef
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>(
@@ -169,13 +169,24 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
    * Same holder for every rebuild, as the custodial details keep it: the send hook mints
    * the key into it on the first attempt, inside its own try, and reads it back on a
    * retry, so a bitcoin send retried after a throw is refused by the SDK as a duplicate
-   * rather than paid twice. The lost attempts ride on it too.
+   * rather than paid twice. What a lost attempt leaves behind is kept by destination,
+   * apart from the detail.
    */
-  const attemptRef: SendAttemptRef = params.idempotencyKeyRef ?? {}
+  const idempotencyKeyRef: IdempotencyKeyRef = params.idempotencyKeyRef ?? {}
   const paramsWithKey: CreateSCLnurlParams<T> = {
     ...params,
-    idempotencyKeyRef: attemptRef,
+    idempotencyKeyRef,
   }
+
+  /**
+   * The destination is shown by the identifier the pay-request names itself by, but that
+   * is the server's word and two unrelated endpoints may give the same one. Lost attempts
+   * are kept under what the sender scanned or typed, which is what was resolved to this
+   * endpoint: never under a name another endpoint could share, which would report its
+   * payment as this send's.
+   */
+  const destination = lnurlParams.identifier || lnurl
+  const lostAttemptsKey = lnurl
 
   const destinationSpecifiedAmount =
     lnurlParams.max === lnurlParams.min ? toBtcMoneyAmount(lnurlParams.max) : undefined
@@ -264,20 +275,20 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
         sendPaymentMutation: () =>
           runSelfCustodialSend({
             sdk,
-            attemptRef,
-            isKeyedSend: !isUsdSend,
+            idempotencyKeyRef,
+            destination: lostAttemptsKey,
             prepare: () => prepareLnurl(sdk, prepareOptions),
             identify: (prepared) => ({
               paymentHash: prepared.invoiceDetails.paymentHash,
             }),
-            execute: async (prepared, idempotencyKey) => {
-              const result = await executeLnurl(sdk, prepared, idempotencyKey)
-              return sendOutcome(
+            execute: (prepared, idempotencyKey) =>
+              executeLnurl(sdk, prepared, idempotencyKey),
+            sentOutcome: (result) =>
+              sendOutcome(
                 result.payment,
                 result.successAction,
                 PaymentSendResult.Success,
-              )
-            },
+              ),
             foundOutcome,
             failure: sendFailure,
           }),
@@ -304,21 +315,21 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
   /**
    * A new amount or wallet is a new payment, so the key starts over, as the custodial
    * details do: the SDK answers a reused key with the payment it already made, which
-   * would report the old amount as sent. The lost attempts stay, as on every rebuild: a
+   * would report the old amount as sent. The lost attempts stay, kept by destination: a
    * payment that may have gone out does not stop being one because the amount changed,
    * and a send made without looking for it first could be the second one.
    */
   const setAmount: SetAmount<T> = (newAmount) =>
     createSelfCustodialLnurlPaymentDetails({
       ...paramsWithKey,
-      idempotencyKeyRef: carryLostAttempts(attemptRef),
+      idempotencyKeyRef: undefined,
       unitOfAccountAmount: newAmount,
     })
 
   const setSendingWalletDescriptor: SetSendingWalletDescriptor<T> = (desc) =>
     createSelfCustodialLnurlPaymentDetails({
       ...paramsWithKey,
-      idempotencyKeyRef: carryLostAttempts(attemptRef),
+      idempotencyKeyRef: undefined,
       sendingWalletDescriptor: desc,
     })
 
@@ -335,7 +346,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     })
 
   return {
-    destination: lnurlParams.identifier || lnurl,
+    destination,
     memo,
     convertMoneyAmount,
     setConvertMoneyAmount,
@@ -347,7 +358,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     setSendingWalletDescriptor,
     lnurlParams,
     setInvoice,
-    idempotencyKeyRef: attemptRef,
+    idempotencyKeyRef,
     successAction,
     setSuccessAction,
     isMerchant,
