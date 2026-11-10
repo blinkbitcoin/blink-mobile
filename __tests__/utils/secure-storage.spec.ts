@@ -1015,6 +1015,58 @@ describe("KeyStoreWrapper mnemonic that arrives by migration", () => {
     expect(mockGet).not.toHaveBeenCalled()
   })
 
+  it("counts a network marker as migrated from the new store alone", async () => {
+    mockHasInternet.mockImplementation(
+      async ({ server }: { server: string }) => server === NETWORK_SERVER,
+    )
+
+    expect(await KeyStoreWrapper.mnemonicNetworkIsMigrated("alice")).toEqual({
+      status: "yes",
+    })
+    expect(await KeyStoreWrapper.mnemonicNetworkIsMigrated("bob")).toEqual({
+      status: "no",
+    })
+    expect(mockGet).not.toHaveBeenCalled()
+  })
+
+  describe("a network marker whose migrating write", () => {
+    const landed = new Set<string>()
+
+    const keychainRefusing = (refused: string | null) => {
+      landed.clear()
+      mockSetInternet.mockImplementation(async (server: string) => {
+        if (server === refused) return false
+        landed.add(server)
+        return { service: "mock" }
+      })
+      mockHasInternet.mockImplementation(async ({ server }: { server: string }) =>
+        landed.has(server),
+      )
+    }
+
+    it("is refused is found and still not counted as migrated", async () => {
+      keychainRefusing(NETWORK_SERVER)
+
+      expect(await KeyStoreWrapper.mnemonicNetworkExists("alice")).toEqual({
+        status: "yes",
+      })
+      expect(await KeyStoreWrapper.mnemonicNetworkIsMigrated("alice")).toEqual({
+        status: "no",
+      })
+    })
+
+    it("lands is counted as migrated", async () => {
+      keychainRefusing(null)
+
+      expect(await KeyStoreWrapper.mnemonicNetworkExists("alice")).toEqual({
+        status: "yes",
+      })
+      expect(await KeyStoreWrapper.mnemonicNetworkIsMigrated("alice")).toEqual({
+        status: "yes",
+      })
+    })
+  })
+
   it("does not rewrite the list for an account it already names", async () => {
     mockGetInternet.mockImplementation(async (server: string) =>
       server === LIST_SERVER

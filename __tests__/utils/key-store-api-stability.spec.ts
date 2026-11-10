@@ -47,6 +47,7 @@ const PINNED_SURFACE = [
   "mnemonicIsMigrated",
   "mnemonicKeyFor",
   "mnemonicNetworkExists",
+  "mnemonicNetworkIsMigrated",
   "mnemonicNetworkKeyFor",
   "mnemonicSlotFor",
   "name",

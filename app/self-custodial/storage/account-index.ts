@@ -394,6 +394,31 @@ const describeProbeFailure = (err: unknown): string => {
 }
 
 /**
+ * Whether an account's network marker is still waiting on the legacy store.
+ *
+ * Its probe migrates it as the seed's does, and answers yes for a marker it read out of
+ * the legacy store even when the write meant to move it failed, so a marker found is asked
+ * again without the fallback. A probe that could not answer vouches for no move either. An
+ * account with no marker has nothing to move.
+ */
+const isNetworkMarkerLeftBehind = async (id: string): Promise<boolean> => {
+  const marker = await KeyStoreWrapper.mnemonicNetworkExists(id)
+  if (marker.status === "no") return false
+  if (marker.status === "failed") {
+    recordAppError(
+      new Error(
+        `Mnemonic network marker sweep probe failed: ${describeProbeFailure(marker.err)}`,
+      ),
+      { expected: true },
+    )
+    return true
+  }
+
+  const landed = await KeyStoreWrapper.mnemonicNetworkIsMigrated(id)
+  return landed.status !== "yes"
+}
+
+/**
  * Every account id the index names, and how many of its items name none.
  *
  * Not readIndex's list, which leaves out an entry it cannot read as an account. One that
@@ -479,6 +504,7 @@ export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
         { expected: true },
       )
     } else {
+      let isLeftBehind = false
       if (mnemonic.status === "yes") {
         // "Found" is not "moved". The probe answers yes for a value it read out
         // of the legacy store even when the write meant to migrate it failed —
@@ -499,15 +525,18 @@ export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
           if (remembered) {
             migrated += 1
           } else {
-            failures += 1
+            isLeftBehind = true
           }
         } else {
-          failures += 1
+          isLeftBehind = true
         }
       }
-      // The network marker rides along: probed for its side effect only, and an
-      // account with no marker is not a failure.
-      await KeyStoreWrapper.mnemonicNetworkExists(id)
+      // The network marker rides along, and the release that drops the legacy store
+      // would take one that never moved with it, so it is held to the seed's count.
+      // Asked even when the seed was left behind, since the probe is also what moves
+      // it, and the account counts once either way.
+      const isMarkerLeftBehind = await isNetworkMarkerLeftBehind(id)
+      if (isLeftBehind || isMarkerLeftBehind) failures += 1
     }
   }
 

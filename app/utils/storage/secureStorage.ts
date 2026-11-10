@@ -1073,6 +1073,13 @@ export default class KeyStoreWrapper {
     )
   }
 
+  /** The network marker's counterpart to mnemonicIsMigrated, for the same count. */
+  public static async mnemonicNetworkIsMigrated(
+    accountId: string,
+  ): Promise<SecureExists> {
+    return secureExists(KeyStoreWrapper.mnemonicNetworkKeyFor(accountId))
+  }
+
   /**
    * Keeps a failed read distinct from an account that was never tagged with a
    * network, for callers that must not connect a wallet they could not verify.

@@ -7,6 +7,7 @@ const mockRememberMnemonicAccount = jest.fn()
 const mockMnemonicExists = jest.fn()
 const mockMnemonicNetworkExists = jest.fn()
 const mockMnemonicIsMigrated = jest.fn()
+const mockMnemonicNetworkIsMigrated = jest.fn()
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
   __esModule: true,
@@ -27,6 +28,8 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
     mnemonicExists: (...args: unknown[]) => mockMnemonicExists(...args),
     mnemonicNetworkExists: (...args: unknown[]) => mockMnemonicNetworkExists(...args),
     mnemonicIsMigrated: (...args: unknown[]) => mockMnemonicIsMigrated(...args),
+    mnemonicNetworkIsMigrated: (...args: unknown[]) =>
+      mockMnemonicNetworkIsMigrated(...args),
   },
 }))
 
@@ -1178,5 +1181,81 @@ describe("self-custodial account-index — the recorded lightning address", () =
     mockGetItem.mockRejectedValueOnce(new Error("AsyncStorage unavailable"))
 
     expect(await getSelfCustodialLightningAddress("a1")).toBeNull()
+  })
+})
+
+/**
+ * The marker's probe migrates it the way the seed's does, and answers yes for a marker it
+ * read out of the legacy store even when the write meant to move it failed. Kept out of
+ * the first describe, which is at the line cap.
+ */
+describe("self-custodial account-index — the network marker in the sweep", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    setIndex([{ id: "a1", lightningAddress: null }])
+    mockRememberMnemonicAccount.mockResolvedValue(true)
+    mockMnemonicExists.mockResolvedValue({ status: "yes" })
+    mockMnemonicIsMigrated.mockResolvedValue({ status: "yes" })
+    mockMnemonicNetworkExists.mockResolvedValue({ status: "yes" })
+    mockMnemonicNetworkIsMigrated.mockResolvedValue({ status: "yes" })
+  })
+
+  it("counts a marker the probe found but the migrating write never moved as a failure", async () => {
+    mockMnemonicNetworkIsMigrated.mockResolvedValue({ status: "no" })
+
+    const result = await sweepMnemonicMigration()
+
+    expect(mockMnemonicNetworkIsMigrated).toHaveBeenCalledWith("a1")
+    expect(result).toEqual({ status: "incomplete", failures: 1 })
+  })
+
+  it("counts a marker it could not ask about as a failure, keeping the cause as a breadcrumb", async () => {
+    mockMnemonicNetworkExists.mockResolvedValue({
+      status: "failed",
+      err: Object.assign(new Error("keychain locked"), { code: "E_KEYCHAIN" }),
+    })
+
+    const result = await sweepMnemonicMigration()
+
+    expect(result).toEqual({ status: "incomplete", failures: 1 })
+    expect(mockMnemonicNetworkIsMigrated).not.toHaveBeenCalled()
+    expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+      "[expected] Mnemonic network marker sweep probe failed: Error E_KEYCHAIN",
+    )
+  })
+
+  it("counts an account once when both its seed and its marker were left behind", async () => {
+    mockMnemonicIsMigrated.mockResolvedValue({ status: "no" })
+    mockMnemonicNetworkIsMigrated.mockResolvedValue({ status: "no" })
+
+    const result = await sweepMnemonicMigration()
+
+    expect(result).toEqual({ status: "incomplete", failures: 1 })
+    // Still asked, since the probe is also what moves the marker.
+    expect(mockMnemonicNetworkExists).toHaveBeenCalledWith("a1")
+  })
+
+  it("counts a marker left behind by an account that has no seed", async () => {
+    mockMnemonicExists.mockResolvedValue({ status: "no" })
+    mockMnemonicNetworkIsMigrated.mockResolvedValue({ status: "no" })
+
+    const result = await sweepMnemonicMigration()
+
+    expect(result).toEqual({ status: "incomplete", failures: 1 })
+  })
+
+  it("finishes over a marker that reached the new store", async () => {
+    const result = await sweepMnemonicMigration()
+
+    expect(result).toEqual({ status: "ok", migrated: 1 })
+  })
+
+  it("never asks about a marker the account does not have", async () => {
+    mockMnemonicNetworkExists.mockResolvedValue({ status: "no" })
+
+    const result = await sweepMnemonicMigration()
+
+    expect(mockMnemonicNetworkIsMigrated).not.toHaveBeenCalled()
+    expect(result).toEqual({ status: "ok", migrated: 1 })
   })
 })
