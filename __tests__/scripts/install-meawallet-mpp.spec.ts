@@ -1,5 +1,6 @@
 import { it } from "@jest/globals"
 import { spawn, spawnSync } from "child_process"
+import { createHash } from "crypto"
 import {
   chmodSync,
   copyFileSync,
@@ -446,6 +447,28 @@ describe("install-meawallet-mpp.sh trusting a vendored copy", () => {
   beforeEach(() => {
     giveCredentials()
     giveConfig()
+  })
+
+  /** Every other case fakes openssl, so this one pins the scratch script to the test
+   *  archive's real digest and runs the real pipeline: a broken digest command would
+   *  answer something else, and the install would go without the SDK. */
+  it("verifies the archive with the real openssl when it matches the pinned digest", () => {
+    const digest = createHash("sha512")
+      .update(readFileSync(join(root, "package.tgz")))
+      .digest("base64")
+    const script = join(repo, "scripts", "install-meawallet-mpp.sh")
+    writeFileSync(
+      script,
+      readFileSync(script, "utf8").replace(
+        /MPP_INTEGRITY="[^"]+"/,
+        `MPP_INTEGRITY="${digest}"`,
+      ),
+    )
+
+    const { status } = install({ checksumMatches: false })
+
+    expect(status).toBe(0)
+    expect(readFileSync(integrityMarker(), "utf8").trim()).toBe(digest)
   })
 
   it("marks the SDK with the pinned checksum once its archive matched it", () => {
