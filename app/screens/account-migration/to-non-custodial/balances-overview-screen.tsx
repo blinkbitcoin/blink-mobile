@@ -561,7 +561,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     const isClear = await checkBeforeApprove()
     const canStillApprove = isClear && canStillApproveRef.current
     if (!canStillApprove) return
-    navigation.navigate("accountMigrationTransferringFunds")
+    navigation.navigate("accountMigrationTransferringFunds", { isDepositChecked: true })
   }, [checkBeforeApprove, navigation])
 
   /** Either source losing the network earns the same retry, and it refreshes both:

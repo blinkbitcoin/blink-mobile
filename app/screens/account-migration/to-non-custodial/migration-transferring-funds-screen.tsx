@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react"
 import { Text } from "react-native"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
-import { useNavigation } from "@react-navigation/native"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -32,6 +32,9 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { params: routeParams } =
+    useRoute<RouteProp<RootStackParamList, "accountMigrationTransferringFunds">>()
+  const isDepositChecked = routeParams?.isDepositChecked === true
 
   /** The custodial id comes from the completion hook rather than a second owner query of
    *  this screen's own: two no-cache reads of the same id can disagree for a render after
@@ -103,6 +106,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     selfCustodialAccountId: migrationAccountId,
     expectedReceiveSats: migrationExpectedReceiveSats,
     skip: isTransferSkipped,
+    isDepositChecked,
   })
 
   useEffect(() => {

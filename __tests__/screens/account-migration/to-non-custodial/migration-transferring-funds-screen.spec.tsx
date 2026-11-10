@@ -17,9 +17,11 @@ const CLOSE_UNAVAILABLE_MESSAGE =
 const mockNavigate = jest.fn()
 const mockReset = jest.fn()
 const mockPopTo = jest.fn()
+let mockRouteParams: { isDepositChecked?: true } | undefined
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate, reset: mockReset, popTo: mockPopTo }),
+  useRoute: () => ({ params: mockRouteParams }),
 }))
 
 const mockCompleteMigration = jest.fn()
@@ -120,6 +122,7 @@ describe("MigrationTransferringFundsScreen", () => {
     mockIsClockOutOfSync = false
     mockHasConnectionIssue = false
     mockIsDepositPending = false
+    mockRouteParams = undefined
     mockCompleteMigration.mockResolvedValue(MigrationCompletion.Completed)
     loadLocale("en")
   })
@@ -174,7 +177,18 @@ describe("MigrationTransferringFundsScreen", () => {
       selfCustodialAccountId: "sc-account-1",
       expectedReceiveSats: 21000,
       skip: false,
+      isDepositChecked: false,
     })
+  })
+
+  it("tells the transfer the deposits were checked when Approve opened the screen", async () => {
+    mockRouteParams = { isDepositChecked: true }
+    renderScreen()
+    await flushEffects()
+
+    expect(mockUseMigrationTransfer).toHaveBeenCalledWith(
+      expect.objectContaining({ isDepositChecked: true }),
+    )
   })
 
   /** The session can end under the screen; the transfer then has no account to bill and

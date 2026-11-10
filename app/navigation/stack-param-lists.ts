@@ -374,7 +374,12 @@ export type RootStackParamList = {
         isDepositRefused?: true
       }
     | undefined
-  accountMigrationTransferringFunds: undefined
+  accountMigrationTransferringFunds:
+    | {
+        /** Approve opened the screen, right after its own check found no deposit. */
+        isDepositChecked?: true
+      }
+    | undefined
   accountMigrationContactSupport: {
     reason: MigrationSupportReason
     origin?: MigrationSupportOrigin

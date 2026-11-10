@@ -143,6 +143,7 @@ const renderTransfer = (
       selfCustodialAccountId: "sc-account-1",
       expectedReceiveSats: 21000,
       skip: false,
+      isDepositChecked: false,
       ...overrides,
     }),
   )
@@ -269,6 +270,7 @@ describe("useMigrationTransfer", () => {
           selfCustodialAccountId: "sc-account-1",
           expectedReceiveSats: 21000,
           skip: false,
+          isDepositChecked: false,
         }),
       { initialProps: { custodialAccountId: null as string | null } },
     )
@@ -307,6 +309,7 @@ describe("useMigrationTransfer", () => {
           selfCustodialAccountId: "sc-account-1",
           expectedReceiveSats: 21000,
           skip: false,
+          isDepositChecked: false,
         }),
       { initialProps: { custodialAccountId: null as string | null } },
     )
@@ -973,6 +976,7 @@ describe("useMigrationTransfer, across a remount mid-commit", () => {
             selfCustodialAccountId: "sc-account-1",
             expectedReceiveSats: 21000,
             skip: false,
+            isDepositChecked: false,
           }),
         { initialProps: { custodialAccountId: null as string | null } },
       )
@@ -1244,20 +1248,47 @@ describe("useMigrationTransfer, with a deposit still confirming", () => {
     expect(result.current.failureReason).toBeNull()
   })
 
-  /** The only way back to the screen is Approve, which checks the deposits right before
-   *  it navigates, so a screen mounted after the refusal commits instead of showing it. */
-  it("commits again from a screen mounted again after the refusal", async () => {
+  /** Approve checks the deposits right before it opens the screen and says so, so a
+   *  screen it opened after the refusal commits instead of showing it. */
+  it("commits again from a screen Approve opened after the refusal", async () => {
     mockCommitMigration.mockResolvedValueOnce(pendingDepositRejection)
     const first = renderTransfer()
     await flushEffects()
     expect(first.result.current.isDepositPending).toBe(true)
     first.unmount()
 
-    const second = renderTransfer()
+    const second = renderTransfer({ isDepositChecked: true })
     await flushEffects()
 
     expect(mockCommitMigration).toHaveBeenCalledTimes(2)
     expect(second.result.current.isDepositPending).toBe(false)
+  })
+
+  /** Approve's check only speaks for refusals from before it: a deposit sent since is
+   *  refused on this screen's own commit, and that refusal is the screen's to show. */
+  it("shows the refusal of its own commit on a screen Approve opened", async () => {
+    mockCommitMigration.mockResolvedValueOnce(pendingDepositRejection)
+
+    const { result } = renderTransfer({ isDepositChecked: true })
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+    expect(result.current.isDepositPending).toBe(true)
+  })
+
+  /** Any other way in has not checked the deposits since the refusal, so the refusal
+   *  stands and the screen sends the user back to approve rather than commit over it. */
+  it("keeps the refusal for a screen opened after it without Approve's check", async () => {
+    mockCommitMigration.mockResolvedValueOnce(pendingDepositRejection)
+    const first = renderTransfer()
+    await flushEffects()
+    first.unmount()
+
+    const second = renderTransfer()
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+    expect(second.result.current.isDepositPending).toBe(true)
   })
 
   it("takes the pause off the screen that showed it once a later one commits", async () => {
@@ -1266,7 +1297,7 @@ describe("useMigrationTransfer, with a deposit still confirming", () => {
     await flushEffects()
     expect(first.result.current.isDepositPending).toBe(true)
 
-    const later = renderTransfer()
+    const later = renderTransfer({ isDepositChecked: true })
     await flushEffects()
 
     expect(mockCommitMigration).toHaveBeenCalledTimes(2)

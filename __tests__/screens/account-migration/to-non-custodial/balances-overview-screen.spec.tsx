@@ -773,7 +773,9 @@ describe("MigrationBalancesOverviewScreen", () => {
     fireEvent.press(screen.getByText(LLOverview.approveCta()))
     await flushEffects()
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationTransferringFunds")
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationTransferringFunds", {
+      isDepositChecked: true,
+    })
   })
 
   /** The migration only ever moves bitcoin: a remaining dollar balance is emptied through the
@@ -1223,7 +1225,10 @@ describe("MigrationBalancesOverviewScreen, with a deposit still confirming", () 
     fireEvent.press(screen.getByText(LLOverview.approveCta()))
     await flushEffects()
 
-    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationTransferringFunds")
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "accountMigrationTransferringFunds",
+      expect.anything(),
+    )
   })
 
   it("stays on Approve when the check before it fails", async () => {
@@ -1237,7 +1242,10 @@ describe("MigrationBalancesOverviewScreen, with a deposit still confirming", () 
     fireEvent.press(screen.getByText(LLOverview.approveCta()))
     await flushEffects()
 
-    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationTransferringFunds")
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "accountMigrationTransferringFunds",
+      expect.anything(),
+    )
   })
 
   it("drops a clear answer that lands after the screen lost focus", async () => {
@@ -1263,7 +1271,10 @@ describe("MigrationBalancesOverviewScreen, with a deposit still confirming", () 
       answerCheck({ data: clearResult.data })
     })
 
-    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationTransferringFunds")
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "accountMigrationTransferringFunds",
+      expect.anything(),
+    )
   })
 
   it("ignores a second Approve while its check is running", async () => {

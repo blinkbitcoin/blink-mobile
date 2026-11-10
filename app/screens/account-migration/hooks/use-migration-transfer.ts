@@ -109,6 +109,8 @@ type UseMigrationTransferArgs = {
   /** From the checkpoint; null on records saved before the field existed. */
   expectedReceiveSats: number | null
   skip: boolean
+  /** The screen was opened right after a check found no deposit pending. */
+  isDepositChecked: boolean
 }
 
 type UseMigrationTransfer = {
@@ -138,6 +140,7 @@ export const useMigrationTransfer = ({
   selfCustodialAccountId,
   expectedReceiveSats,
   skip,
+  isDepositChecked,
 }: UseMigrationTransferArgs): UseMigrationTransfer => {
   const network = useSparkNetwork()
   const { domain: lnurlDomain } = useLnurlServer()
@@ -148,10 +151,12 @@ export const useMigrationTransfer = ({
 
   /**
    * The account's record as this screen should act on it. A deposit refusal that was
-   * already there when the screen mounted is left out: the only way back to this screen
-   * is Approve, which checks the deposits right before it navigates, so the screen commits
-   * again rather than show a refusal that check has just cleared. One that lands after the
-   * mount, including while the account id is still loading, is this screen's to show.
+   * already there when the screen mounted is left out only when the caller says the
+   * deposits were checked since (Approve checks them right before it opens the screen):
+   * the screen then commits again rather than show a refusal that check has just cleared.
+   * Opened any other way, the refusal stands and sends the user back to approve. One that
+   * lands after the mount, including while the account id is still loading, is this
+   * screen's to show.
    */
   const readCommitRecord = useCallback(() => {
     if (!custodialAccountId) return undefined
@@ -159,8 +164,9 @@ export const useMigrationTransfer = ({
     const isRefusalFromBeforeMount =
       record?.kind === "depositPending" &&
       record === recordsAtMount.get(custodialAccountId)
-    return isRefusalFromBeforeMount ? undefined : record
-  }, [custodialAccountId, recordsAtMount])
+    const isRefusalCheckedSince = isDepositChecked && isRefusalFromBeforeMount
+    return isRefusalCheckedSince ? undefined : record
+  }, [custodialAccountId, recordsAtMount, isDepositChecked])
   const commitRecord = useSyncExternalStore(
     commitRecords.subscribe,
     readCommitRecord,
