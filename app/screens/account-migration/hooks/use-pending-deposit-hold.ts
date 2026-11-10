@@ -1,15 +1,30 @@
-import { useCallback } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import { PendingDepositCheckStatus } from "@app/types/migration"
 
 import { useCustodialPendingDeposits } from "./use-custodial-pending-deposits"
 import { useEnsureMigrationStarted } from "./use-ensure-migration-started"
 
+/** Where reading the figures again after a deposit cleared stands. */
+const FigureRefresh = {
+  Idle: "idle",
+  Running: "running",
+  Done: "done",
+  Failed: "failed",
+} as const
+
+type FigureRefresh = (typeof FigureRefresh)[keyof typeof FigureRefresh]
+
 type UsePendingDepositHoldArgs = {
   /** Every other reason the commit screen holds the start back. */
   isStartHeld: boolean
   /** Another modal owns the screen (the dollar balance), and two cannot share it. */
   isModalOutranked: boolean
+  /** Reads the figures again, answering true once they have arrived. */
+  refreshFigures: () => Promise<boolean>
+  /** The server still waits for a destination, so nothing has drained and a figure read
+   *  again may replace the one the start bound (mergeCheckpoint). */
+  isUndrained: boolean
 }
 
 /**
@@ -21,10 +36,18 @@ type UsePendingDepositHoldArgs = {
  * It owns the start because the two hold each other: a deposit holds the start back, and a
  * start the server refuses for a deposit this screen's own check missed (one sent since)
  * brings the modal back.
+ *
+ * A deposit that confirms changes the balance the migration sends, and the figures on
+ * screen were read before it did. So once one has been pending, the start and Approve also
+ * wait until the figures have been read again after it cleared: approving the old ones
+ * would bind a receive figure short of what moves, and a zero lets the receive gate open
+ * before the deposit's sats arrive.
  */
 export const usePendingDepositHold = ({
   isStartHeld,
   isModalOutranked,
+  refreshFigures,
+  isUndrained,
 }: UsePendingDepositHoldArgs) => {
   const {
     hasPendingDeposit,
@@ -34,7 +57,15 @@ export const usePendingDepositHold = ({
     recheck,
     isRecheckRunning,
   } = useCustodialPendingDeposits()
-  const isBlocking = hasPendingDeposit || !isCheckReady
+
+  const [hasSeenDeposit, setHasSeenDeposit] = useState(false)
+  const [figureRefresh, setFigureRefresh] = useState<FigureRefresh>(FigureRefresh.Idle)
+  /** How many times the figures have been read again after a deposit cleared, so a caller
+   *  can tell a figure it already recorded from one read since. */
+  const [figureRefreshes, setFigureRefreshes] = useState(0)
+  const isFigureRefreshAwaited = hasSeenDeposit && figureRefresh !== FigureRefresh.Done
+
+  const isBlocking = hasPendingDeposit || !isCheckReady || isFigureRefreshAwaited
 
   const migrationStart = useEnsureMigrationStarted({ skip: isStartHeld || isBlocking })
 
@@ -43,6 +74,47 @@ export const usePendingDepositHold = ({
    *  would cover and its OK could not resolve. */
   const isDepositPending = hasPendingDeposit || migrationStart.isDepositPending
   const isModalShown = isDepositPending && !isModalOutranked && !hasCheckError
+
+  /** Which refresh still speaks for the figures: a deposit seen again retires one that is
+   *  still out, since it read a balance that is about to change. */
+  const latestRefreshRef = useRef(0)
+  useEffect(() => {
+    if (!isDepositPending) return
+    latestRefreshRef.current += 1
+    setHasSeenDeposit(true)
+    setFigureRefresh(FigureRefresh.Idle)
+  }, [isDepositPending])
+
+  const isDepositClear = isCheckReady && !isDepositPending
+  const shouldRefreshFigures =
+    hasSeenDeposit && isDepositClear && figureRefresh === FigureRefresh.Idle
+  useEffect(() => {
+    if (!shouldRefreshFigures) return
+    latestRefreshRef.current += 1
+    const refreshId = latestRefreshRef.current
+    setFigureRefresh(FigureRefresh.Running)
+    refreshFigures().then((isRefreshed) => {
+      if (refreshId !== latestRefreshRef.current) return
+      setFigureRefresh(isRefreshed ? FigureRefresh.Done : FigureRefresh.Failed)
+      if (isRefreshed) setFigureRefreshes((count) => count + 1)
+    })
+  }, [shouldRefreshFigures, refreshFigures])
+
+  /** For the screen's retry: a refresh that failed is asked again, anything else is left
+   *  as it is. */
+  const retryFigureRefresh = useCallback(() => {
+    setFigureRefresh((current) =>
+      current === FigureRefresh.Failed ? FigureRefresh.Idle : current,
+    )
+  }, [])
+
+  /** Whether the latest reading may replace the bound figure, and whether the save that
+   *  carries it is still to land: Approve waits on it, since the receive gate reads the
+   *  figure on disk. Counted against the readings, so a later one is waited on again. */
+  const isFigureRebindable = figureRefreshes > 0 && isUndrained
+  const [recordedFigureRefreshes, setRecordedFigureRefreshes] = useState(0)
+  const isRefreshedFigureAwaited =
+    isFigureRebindable && recordedFigureRefreshes < figureRefreshes
 
   const { isDepositPending: isStartRefusedForDeposit, retry: retryStart } = migrationStart
 
@@ -74,5 +146,13 @@ export const usePendingDepositHold = ({
     acknowledge,
     checkBeforeApprove,
     checkAgain,
+    figureRefreshes,
+    hasFigureRefreshFailed: figureRefresh === FigureRefresh.Failed,
+    retryFigureRefresh,
+    /** For the save: marks the figure as read again after a deposit cleared. */
+    receiveFigureRefreshed: isFigureRebindable ? (true as const) : undefined,
+    isRefreshedFigureAwaited,
+    /** Called with the readings a landed save carried. */
+    recordRefreshedFigure: setRecordedFigureRefreshes,
   }
 }
