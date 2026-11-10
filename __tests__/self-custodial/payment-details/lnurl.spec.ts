@@ -1600,6 +1600,34 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
       expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
     })
 
+    /** SDK 0.27 finishes a Lightning send that committed funds before the SSP was asked
+     *  to pay, on a later sync. Until then the wallet records the committed swap as a send
+     *  it cannot describe: Pending, with no invoice and no hash to match. */
+    it("pays nothing again while the wallet holds a committed send it has not described", async () => {
+      const detail = createSelfCustodialLnurlPaymentDetails(usdParams())
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      const first = await detail.sendPaymentMutation({} as never)
+      expect(first.status).toBe(PaymentSendResult.Failure)
+
+      historyShows({
+        id: "transfer-1",
+        status: PENDING,
+        timestamp: BigInt(Math.floor(Date.now() / 1000)),
+        details: undefined,
+      })
+      const retry = await detail.sendPaymentMutation({} as never)
+
+      expect(retry.status).toBe(PaymentSendResult.Failure)
+      expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+
+      /** A later sync resumes the send, and its payment carries the invoice it paid. */
+      historyShows(lostSendRecord(QUOTED_HASH))
+      const later = await detail.sendPaymentMutation({} as never)
+
+      expect(later.status).toBe(PaymentSendResult.Success)
+      expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+    })
+
     it("sends nothing on the retry while the wallet cannot catch up with the server", async () => {
       const detail = createSelfCustodialLnurlPaymentDetails(usdParams())
       if (!detail.canSendPayment) throw new Error("expected canSendPayment")

@@ -99,6 +99,15 @@ type HistoryScan = {
   syncFailure?: { readonly error: unknown }
 }
 
+/**
+ * A send the wallet records without details. Besides a Lightning send it has not fetched
+ * yet, this is how the SDK (0.27) records a Lightning send that committed funds to the SSP
+ * but threw before the SSP was asked to pay: the swap transfer, Pending, with no invoice
+ * and no hash. The SDK finishes that send on a later sync (`resume_pending_sends` in
+ * `sdk/lightning_sender.rs`), so its payment can land after a look that found nothing by
+ * hash. Treating such a send as one that may be the attempt, so the look cannot answer
+ * "not-found", is what keeps a retry from paying again meanwhile: narrowing it reopens that.
+ */
 const isUndescribedSend = (payment: Payment): boolean =>
   payment.details === undefined && payment.status !== PaymentStatus.Failed
 
