@@ -2,28 +2,24 @@ import React, { useCallback, useEffect, useRef, useState } from "react"
 import { Text } from "react-native"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
-import { useIsFocused, useNavigation } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { Screen } from "@app/components/screen"
 import { StatusScreenLayout } from "@app/components/status-screen-layout"
-import { useContactSupport } from "@app/hooks/use-contact-support"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
   useCompleteMigration,
   useHardwareBackGuard,
 } from "@app/screens/account-migration/hooks"
-import { useCustodialPendingDeposits } from "@app/screens/account-migration/hooks/use-custodial-pending-deposits"
 import { useMigrationTransfer } from "@app/screens/account-migration/hooks/use-migration-transfer"
-import { PendingDepositModal } from "@app/screens/account-migration/pending-deposit-modal"
 import {
   MigrationCompletion,
   MigrationSupportOrigin,
   MigrationSupportReason,
-  PendingDepositCheckStatus,
 } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
@@ -78,8 +74,6 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     })
   }, [navigation, custodialAccountId])
 
-  const isFocused = useIsFocused()
-  const { openSupport } = useContactSupport()
   const [isCloseUnavailable, setIsCloseUnavailable] = useState(false)
   const [completionAttempt, setCompletionAttempt] = useState(0)
 
@@ -279,43 +273,20 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
   const waitingFooter = isDelayedNoticeShown ? delayedFooter : undefined
   const screenFooter = isRecoverable ? recoverableFooter : waitingFooter
 
-  /** Asked only once the commit has been refused for a deposit, never on the way in. */
-  const { recheck: recheckDeposits, isRecheckRunning: isDepositRecheckRunning } =
-    useCustodialPendingDeposits({
-      skip: !isDepositPending,
-    })
-
   /**
-   * A commit refused for a deposit still confirming moved nothing. OK checks again first
-   * and commits only once the deposit has landed: committing while it still confirms is
-   * only refused again, and each commit asks the new wallet for a fresh invoice. A check
-   * that fails hands the decision to the commit, which the server refuses again while the
-   * deposit confirms and which offers the connection retry when offline, so OK always
-   * answers.
+   * A commit refused for a deposit still confirming moved nothing, and the figures the user
+   * approved were read before that deposit, so they no longer say what the migration will
+   * send. The commit screen is where they are read again: it waits for the deposit to land
+   * and has the user approve the new figures, rather than this screen committing the old
+   * ones once it clears.
    */
-  const acknowledgePendingDeposit = useCallback(async () => {
-    const depositCheck = await recheckDeposits()
-    const isClear = depositCheck.status === PendingDepositCheckStatus.Clear
-    const hasCheckFailed =
-      depositCheck.status === PendingDepositCheckStatus.Unknown &&
-      depositCheck.error !== null
-    const shouldCommitAgain = isClear || hasCheckFailed
-    if (shouldCommitAgain) retry()
-  }, [recheckDeposits, retry])
-
-  /** Support is offered since this screen has no way back. Hidden while support is on top,
-   *  as this screen stays mounted under it. */
-  const isPendingDepositModalShown = isDepositPending && isFocused
+  useEffect(() => {
+    if (!isDepositPending) return
+    navigation.popTo("accountMigrationBalancesOverview", { isDepositRefused: true })
+  }, [isDepositPending, navigation])
 
   return (
     <Screen preset="fixed" headerShown={false}>
-      <PendingDepositModal
-        isVisible={isPendingDepositModalShown}
-        onAcknowledge={acknowledgePendingDeposit}
-        showCloseIconButton={false}
-        isChecking={isDepositRecheckRunning}
-        onContactSupport={openSupport}
-      />
       <StatusScreenLayout
         icon="clock"
         iconColor={colors.warning}

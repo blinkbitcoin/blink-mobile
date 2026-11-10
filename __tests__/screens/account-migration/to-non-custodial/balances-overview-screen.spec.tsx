@@ -82,9 +82,12 @@ const migrationQueryResult = (preview: {
   },
 })
 
+const mockSetParams = jest.fn()
+let mockRouteParams: { isDepositRefused?: true } | undefined
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({ navigate: mockNavigate, setParams: mockSetParams }),
+  useRoute: () => ({ params: mockRouteParams }),
   useIsFocused: () => mockIsFocused,
 }))
 
@@ -287,6 +290,7 @@ const resetScreenMocks = () => {
   jest.clearAllMocks()
   mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
   mockSaveCheckpointHandle = mockSaveCheckpoint
+  mockRouteParams = undefined
   loadLocale("en")
   mockDollarRestricted = false
   mockCurrentDollarRestricted = false
@@ -3019,6 +3023,57 @@ describe("MigrationBalancesOverviewScreen figures read again after a deposit", (
         true,
     )
     expect(refreshedSaves).toHaveLength(0)
+  })
+
+  describe("sent back for a commit the server refused for a deposit", () => {
+    beforeEach(() => {
+      mockRouteParams = { isDepositRefused: true }
+    })
+
+    it("checks the deposits again and holds Approve on the deposit it finds", async () => {
+      const checkAfterRefusal = jest.fn().mockResolvedValue({
+        data: pendingDepositsQueryResult([pendingOnChainReceive]).data,
+      })
+      mockUseMigrationPendingDepositsQuery.mockReturnValue({
+        ...pendingDepositsQueryResult(),
+        refetch: checkAfterRefusal,
+      })
+      renderScreen()
+      mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingThenClearCheck())
+      await flushEffects()
+      screen.rerender(screenTree())
+      await flushEffects()
+
+      expect(checkAfterRefusal).toHaveBeenCalledTimes(1)
+      expect(mockSetParams).toHaveBeenCalledWith({ isDepositRefused: undefined })
+      expect(screen.getByTestId("pending-deposit-modal-ok")).toBeTruthy()
+      expect(approveButton()).toBeDisabled()
+    })
+
+    it("reads the figures again before Approve even when the deposit has landed", async () => {
+      const { refetch, answerNext } = deferredPreviewRefetch(4990)
+      mockUseMigrationQuery.mockReturnValue(previewWith(990, refetch))
+      renderScreen()
+      await flushEffects()
+
+      expect(refetch).toHaveBeenCalledTimes(1)
+      expect(approveButton()).toBeDisabled()
+
+      await act(async () => {
+        answerNext()
+      })
+      screen.rerender(screenTree())
+      await flushEffects()
+
+      expect(mockSaveCheckpoint).toHaveBeenCalledWith(
+        MigrationCheckpoint.BalancesOverview,
+        expect.objectContaining({
+          expectedReceiveSats: 4990,
+          isReceiveFigureRefreshed: true,
+        }),
+      )
+      expect(approveButton()).toBeEnabled()
+    })
   })
 
   it("reads them again for a second deposit that clears later", async () => {

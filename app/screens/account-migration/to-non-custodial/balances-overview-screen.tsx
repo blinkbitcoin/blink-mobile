@@ -1,6 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { ActivityIndicator, ScrollView, View } from "react-native"
-import { useFocusEffect, useIsFocused, useNavigation } from "@react-navigation/native"
+import {
+  RouteProp,
+  useFocusEffect,
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -103,6 +109,8 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { params: routeParams } =
+    useRoute<RouteProp<RootStackParamList, "accountMigrationBalancesOverview">>()
 
   const {
     checkpoint: storedCheckpoint,
@@ -240,7 +248,13 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     isModalOutranked: hasDollarBalance,
     refreshFigures: preview.refresh,
     isUndrained: isServerFlowUnstarted || migrationStatus === MigrationStatus.InProgress,
+    isCommitRefusedForDeposit: routeParams?.isDepositRefused === true,
   })
+  /** Taken once: a later refusal sets it again, which has to read as a change. */
+  useEffect(() => {
+    if (routeParams?.isDepositRefused)
+      navigation.setParams({ isDepositRefused: undefined })
+  }, [routeParams?.isDepositRefused, navigation])
   const {
     migrationStart,
     figureRefreshes,
@@ -602,11 +616,12 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  without the ids they carry: refreshing everything else around a lookup that failed
    *  would replay the same dead screen. Their rejections carry nothing the hooks' own state
    *  does not already report, so they are swallowed like the preview's. */
-  const { hasFigureRefreshFailed } = depositHold
   const handleRetry = useCallback(() => {
     /** A reading after a deposit that failed is asked again through the hold, which reads
      *  both sources itself, so the figures are not fetched twice for one tap. */
-    const retryFigures = hasFigureRefreshFailed ? retryFigureRefresh : retryPreview
+    const retryFigures = depositHold.hasFigureRefreshFailed
+      ? retryFigureRefresh
+      : retryPreview
     retryFigures()
     retryMigrationStart()
     retryLnAddressTransfer()
@@ -618,7 +633,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   }, [
     recordCommitPoint,
     refetchMigrationStatus,
-    hasFigureRefreshFailed,
+    depositHold.hasFigureRefreshFailed,
     retryFigureRefresh,
     retryPreview,
     retryMigrationStart,

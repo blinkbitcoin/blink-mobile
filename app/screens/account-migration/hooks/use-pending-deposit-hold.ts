@@ -25,6 +25,9 @@ type UsePendingDepositHoldArgs = {
   /** The server still waits for a destination, so nothing has drained and a figure read
    *  again may replace the one the start bound (mergeCheckpoint). */
   isUndrained: boolean
+  /** The transfer screen sent the user back: the server refused the commit for a deposit
+   *  still confirming. */
+  isCommitRefusedForDeposit: boolean
 }
 
 /**
@@ -48,6 +51,7 @@ export const usePendingDepositHold = ({
   isModalOutranked,
   refreshFigures,
   isUndrained,
+  isCommitRefusedForDeposit,
 }: UsePendingDepositHoldArgs) => {
   const {
     hasPendingDeposit,
@@ -64,6 +68,9 @@ export const usePendingDepositHold = ({
    *  can tell a figure it already recorded from one read since. */
   const [figureRefreshes, setFigureRefreshes] = useState(0)
   const isFigureRefreshAwaited = hasSeenDeposit && figureRefresh !== FigureRefresh.Done
+  /** The check run after a refused commit: the answer the screen holds may predate the
+   *  deposit the server saw, so the figures are not read again before this one answers. */
+  const [isRefusalCheckOut, setIsRefusalCheckOut] = useState(false)
 
   const isBlocking = hasPendingDeposit || !isCheckReady || isFigureRefreshAwaited
 
@@ -85,7 +92,18 @@ export const usePendingDepositHold = ({
     setFigureRefresh(FigureRefresh.Idle)
   }, [isDepositPending])
 
-  const isDepositClear = isCheckReady && !isDepositPending
+  /** A refused commit counts as a deposit seen: the deposits are asked again, and the
+   *  figures are read again once it clears, as after any other. */
+  useEffect(() => {
+    if (!isCommitRefusedForDeposit) return
+    latestRefreshRef.current += 1
+    setHasSeenDeposit(true)
+    setFigureRefresh(FigureRefresh.Idle)
+    setIsRefusalCheckOut(true)
+    checkAgain().then(() => setIsRefusalCheckOut(false))
+  }, [isCommitRefusedForDeposit, checkAgain])
+
+  const isDepositClear = isCheckReady && !isDepositPending && !isRefusalCheckOut
   const shouldRefreshFigures =
     hasSeenDeposit && isDepositClear && figureRefresh === FigureRefresh.Idle
   useEffect(() => {

@@ -4,12 +4,13 @@ import { usePendingDepositHold } from "@app/screens/account-migration/hooks/use-
 import { PendingDepositCheckStatus } from "@app/types/migration"
 
 let mockHasPendingDeposit = false
+const mockCheck = jest.fn()
 jest.mock("@app/screens/account-migration/hooks/use-custodial-pending-deposits", () => ({
   useCustodialPendingDeposits: () => ({
     hasPendingDeposit: mockHasPendingDeposit,
     isReady: true,
     hasError: false,
-    check: jest.fn(),
+    check: mockCheck,
     recheck: jest.fn().mockResolvedValue({ status: PendingDepositCheckStatus.Clear }),
     isRecheckRunning: false,
   }),
@@ -43,13 +44,14 @@ describe("usePendingDepositHold reading the figures again", () => {
     mockHasPendingDeposit = false
   })
 
-  const renderHold = (refreshFigures: jest.Mock) =>
+  const renderHold = (refreshFigures: jest.Mock, isCommitRefusedForDeposit = false) =>
     renderHook(() =>
       usePendingDepositHold({
         isStartHeld: false,
         isModalOutranked: false,
         refreshFigures,
         isUndrained: true,
+        isCommitRefusedForDeposit,
       }),
     )
 
@@ -113,5 +115,26 @@ describe("usePendingDepositHold reading the figures again", () => {
 
     expect(refreshFigures).not.toHaveBeenCalled()
     expect(result.current.isBlocking).toBe(false)
+  })
+
+  it("waits for the check after a refused commit before reading the figures again", async () => {
+    let answerCheck: () => void = () => undefined
+    mockCheck.mockReturnValue(
+      new Promise<void>((resolve) => {
+        answerCheck = resolve
+      }),
+    )
+    const { refreshFigures } = deferredRefreshes()
+
+    renderHold(refreshFigures, true)
+
+    expect(mockCheck).toHaveBeenCalledTimes(1)
+    expect(refreshFigures).not.toHaveBeenCalled()
+
+    await act(async () => {
+      answerCheck()
+    })
+
+    expect(refreshFigures).toHaveBeenCalledTimes(1)
   })
 })
