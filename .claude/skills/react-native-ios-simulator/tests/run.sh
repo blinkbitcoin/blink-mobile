@@ -1161,7 +1161,7 @@ grants = json.load(open(os.path.join(root, "settings.json")))["permissions"]["al
 for md in glob.glob(os.path.join(root, "skills", "*", "SKILL.md")):
     head = open(md).read().split("\n")[:5]
     grants += [g + ")" for line in head if line.startswith("allowed-tools:") for g in line.split(")") if g.strip()]
-bad = [g.strip() for g in grants if re.match(r"Bash\(xcrun simctl (\*|erase|delete|shutdown|boot |create|clone|rename|uninstall)", g.strip())]
+bad = [g.strip() for g in grants if re.match(r"Bash\(xcrun simctl (\*|erase|delete|shutdown|boot |create|clone|rename|uninstall|spawn|privacy|addmedia|status_bar)", g.strip())]
 print(" ".join(sorted(set(bad))) or "none")
 ' "$TESTS_DIR/../../.." 2>&1)"
 check "SKILL.md documents telemetry and the spans report" "yes" \

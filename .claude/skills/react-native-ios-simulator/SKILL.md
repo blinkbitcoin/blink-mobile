@@ -1,7 +1,7 @@
 ---
 name: react-native-ios-simulator
 description: Use when running a React Native app on an iOS simulator on macOS — claiming an isolated simulator and Metro port, installing or building the app, reaching a particular screen or state, or any task involving xcrun simctl, Metro bundler ports, or a demo simulator. Required before capturing screenshots or video, and whenever other agents may share the same Mac.
-allowed-tools: Bash(xcrun simctl list) Bash(xcrun simctl list *) Bash(xcrun simctl io *) Bash(xcrun simctl launch *) Bash(xcrun simctl terminate *) Bash(xcrun simctl install *) Bash(xcrun simctl openurl *) Bash(xcrun simctl spawn *) Bash(xcrun simctl ui *) Bash(xcrun simctl status_bar *) Bash(xcrun simctl get_app_container *) Bash(xcrun simctl bootstatus *) Bash(xcrun simctl privacy *) Bash(xcrun simctl addmedia *) Bash(maestro *) Bash(node node_modules/react-native/cli.js *) Bash(/*/.claude/skills/*/scripts/*.sh) Bash(/*/.claude/skills/*/scripts/*.sh *) Bash(/*/.claude/skills/*/tests/run.sh) Bash(/*/.claude/skills/*/bench/live.sh *)
+allowed-tools: Bash(xcrun simctl list) Bash(xcrun simctl list *) Bash(xcrun simctl io *) Bash(xcrun simctl launch *) Bash(xcrun simctl terminate *) Bash(xcrun simctl install *) Bash(xcrun simctl openurl *) Bash(xcrun simctl ui *) Bash(xcrun simctl get_app_container *) Bash(xcrun simctl bootstatus *) Bash(maestro *) Bash(node node_modules/react-native/cli.js *) Bash(/*/.claude/skills/*/scripts/*.sh) Bash(/*/.claude/skills/*/scripts/*.sh *) Bash(/*/.claude/skills/*/tests/run.sh) Bash(/*/.claude/skills/*/bench/live.sh *)
 ---
 
 # React Native on an Isolated iOS Simulator (macOS)

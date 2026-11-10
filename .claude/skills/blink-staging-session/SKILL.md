@@ -1,7 +1,7 @@
 ---
 name: blink-staging-session
 description: Use when a Blink demo session needs a real logged-in staging account on a claimed iOS simulator — logging in with the staging global OTP, switching a fresh install off the Main (production) instance, or provisioning/refreshing the golden simulator with a live login. Blink-repo-specific; the app-agnostic simulator mechanics live in react-native-ios-simulator.
-allowed-tools: Bash(xcrun simctl list) Bash(xcrun simctl list *) Bash(xcrun simctl io *) Bash(xcrun simctl launch *) Bash(xcrun simctl terminate *) Bash(xcrun simctl install *) Bash(xcrun simctl openurl *) Bash(xcrun simctl spawn *) Bash(xcrun simctl ui *) Bash(xcrun simctl status_bar *) Bash(xcrun simctl get_app_container *) Bash(xcrun simctl bootstatus *) Bash(xcrun simctl privacy *) Bash(xcrun simctl addmedia *) Bash(maestro *) Bash(/*/.claude/skills/*/scripts/*.sh) Bash(/*/.claude/skills/*/scripts/*.sh *) Bash(/*/.claude/skills/*/tests/run.sh)
+allowed-tools: Bash(xcrun simctl list) Bash(xcrun simctl list *) Bash(xcrun simctl io *) Bash(xcrun simctl launch *) Bash(xcrun simctl terminate *) Bash(xcrun simctl install *) Bash(xcrun simctl openurl *) Bash(xcrun simctl ui *) Bash(xcrun simctl get_app_container *) Bash(xcrun simctl bootstatus *) Bash(maestro *) Bash(/*/.claude/skills/*/scripts/*.sh) Bash(/*/.claude/skills/*/scripts/*.sh *) Bash(/*/.claude/skills/*/tests/run.sh)
 ---
 
 # A Logged-In Staging Session on a Claimed Simulator (Blink-specific)

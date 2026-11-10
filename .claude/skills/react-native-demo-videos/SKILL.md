@@ -1,7 +1,7 @@
 ---
 name: react-native-demo-videos
 description: Use when a PR needs a moving demo rather than screenshots — recording a user session flow on an iOS simulator or Android emulator to show a bugfix or feature behaving, before/after interaction videos, animated GIF, MP4 or WebM of app navigation, "demo expected behavior". Covers simctl recordVideo and adb screenrecord. Takes gif, mp4 or webm, and optionally ios or android, as arguments.
-allowed-tools: Bash(xcrun simctl list) Bash(xcrun simctl list *) Bash(xcrun simctl io *) Bash(xcrun simctl launch *) Bash(xcrun simctl terminate *) Bash(xcrun simctl install *) Bash(xcrun simctl openurl *) Bash(xcrun simctl spawn *) Bash(xcrun simctl ui *) Bash(xcrun simctl status_bar *) Bash(xcrun simctl get_app_container *) Bash(xcrun simctl bootstatus *) Bash(xcrun simctl privacy *) Bash(xcrun simctl addmedia *) Bash(maestro *) Bash(ffmpeg *) Bash(ffprobe *) Bash(/*/.claude/skills/*/scripts/*.sh) Bash(/*/.claude/skills/*/scripts/*.sh *) Bash(/*/.claude/skills/*/tests/run.sh)
+allowed-tools: Bash(xcrun simctl list) Bash(xcrun simctl list *) Bash(xcrun simctl io *) Bash(xcrun simctl launch *) Bash(xcrun simctl terminate *) Bash(xcrun simctl install *) Bash(xcrun simctl openurl *) Bash(xcrun simctl ui *) Bash(xcrun simctl get_app_container *) Bash(xcrun simctl bootstatus *) Bash(maestro *) Bash(ffmpeg *) Bash(ffprobe *) Bash(/*/.claude/skills/*/scripts/*.sh) Bash(/*/.claude/skills/*/scripts/*.sh *) Bash(/*/.claude/skills/*/tests/run.sh)
 ---
 
 # Demo Videos for React Native PRs
