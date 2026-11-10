@@ -6,12 +6,8 @@ import { useIsMounted } from "@app/hooks/use-is-mounted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toastShow } from "@app/utils/toast"
 
-import {
-  addCardToWallet,
-  canAddCardToWallet,
-  WalletAddResult,
-  WalletCard,
-} from "../utils/wallet-provisioning"
+import { WalletAddResult, type WalletCard } from "../types"
+import { addCardToWallet, canAddCardToWallet } from "../utils/wallet-provisioning"
 
 export const useAddToWallet = (
   cardId: string | undefined,
