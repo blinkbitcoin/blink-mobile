@@ -130,7 +130,9 @@ export const useEnsureMigrationStarted = ({
           if (!isMountedRef.current) return
           isAcceptedRef.current = true
           /** An answer settles the connection question too: an earlier attempt's dropped
-           *  request may have raised it after the caller asked for this one. */
+           *  request may have raised it after the caller asked for this one. The deposit
+           *  flag likewise: a newer attempt's refusal may have raised it after the retry
+           *  that sent that attempt cleared it. */
           setHasConnectionIssue(false)
           setIsRejected(false)
           setIsDepositPending(false)

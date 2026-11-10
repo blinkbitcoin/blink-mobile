@@ -194,6 +194,25 @@ describe("useEnsureMigrationStarted", () => {
     expect(result.current.isDepositPending).toBe(false)
   })
 
+  /** The deposit has landed and OK asked again, but the request never arrived: the retry
+   *  is what the screen needs now, and a deposit flag left on would cover it. */
+  it("drops the deposit refusal when the retry after it loses the connection", async () => {
+    mockMigrationStart
+      .mockResolvedValueOnce(pendingDepositRefusal)
+      .mockRejectedValueOnce(networkFailure())
+
+    const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    await flushEffects()
+    expect(result.current.isDepositPending).toBe(true)
+
+    act(() => result.current.retry())
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(2)
+    expect(result.current.hasConnectionIssue).toBe(true)
+    expect(result.current.isDepositPending).toBe(false)
+  })
+
   it("drops an acceptance that lands after the screen has left", async () => {
     let settle: (value: unknown) => void = () => undefined
     mockMigrationStart.mockReturnValue(
@@ -557,6 +576,25 @@ describe("useEnsureMigrationStarted", () => {
 
       expect(result.current.isStarted).toBe(true)
       expect(result.current.isRejected).toBe(false)
+    })
+
+    /** The repeat's refusal raised the flag after the retry that sent it had cleared it,
+     *  so only the acceptance itself can clear it again: left on, the deposit modal would
+     *  cover a run the server already holds. */
+    it("takes the first start's acceptance over a deposit refusal of the repeat that came first", async () => {
+      const { result } = await sendRepeat()
+
+      await act(async () => {
+        answerSecond(pendingDepositRefusal)
+      })
+      expect(result.current.isDepositPending).toBe(true)
+
+      await act(async () => {
+        answerFirst(accepted)
+      })
+
+      expect(result.current.isStarted).toBe(true)
+      expect(result.current.isDepositPending).toBe(false)
     })
 
     it("keeps the acceptance when the repeat answers with no payload after it", async () => {
