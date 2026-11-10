@@ -15,6 +15,17 @@ const isAppleSheetDismissed = (err: unknown): boolean => {
   return isCancelCode && err.message.includes(APPLE_ADD_PASS_ERROR_DOMAIN)
 }
 
+/** The SDK names its errors in `code`, and reports the user backing out of Google's sheet,
+ *  or out of creating a Google Wallet on the way, under this one. Anything else the wallet
+ *  answers is a GOOGLE_PAY_ERROR carrying the wallet's own code. */
+const GOOGLE_CANCEL_CODE = "OPERATION_CANCELLED_BY_USER"
+
+const isGoogleSheetDismissed = (err: unknown): boolean => {
+  if (!(err instanceof Error)) return false
+  const { code } = err as Error & { code?: string }
+  return code === GOOGLE_CANCEL_CODE
+}
+
 const toGooglePayAddress = (address: CardholderAddress): GooglePayAddress => ({
   name: address.name,
   address1: address.line1,
@@ -55,12 +66,17 @@ const googleWallet = (sdk: MeaWalletSdk): DeviceWallet => ({
     return tokens.length === 0
   },
   add: async (card, data) => {
-    await sdk.googlePay.push(
-      sdk.cardWithSecret(card.cardId, data.cardSecret),
-      data.displayName,
-      toGooglePayAddress(data.address),
-    )
-    return WalletAddResult.Added
+    try {
+      await sdk.googlePay.push(
+        sdk.cardWithSecret(card.cardId, data.cardSecret),
+        data.displayName,
+        toGooglePayAddress(data.address),
+      )
+      return WalletAddResult.Added
+    } catch (err) {
+      if (isGoogleSheetDismissed(err)) return WalletAddResult.Cancelled
+      throw err
+    }
   },
 })
 

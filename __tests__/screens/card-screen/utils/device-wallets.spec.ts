@@ -49,6 +49,14 @@ const fakeSdk = () => {
 const appleError = (domain: string, code: string) =>
   Object.assign(new Error(`Error Domain=${domain} Code=${code} "(null)"`), { code })
 
+/** A rejection as the SDK forwards it from Google Pay: its error name as `code`, and the
+ *  native error, wallet code included, as `userInfo`. */
+const googleError = (code: string, message: string) =>
+  Object.assign(new Error(message), {
+    code,
+    userInfo: { name: code, walletApiErrorCode: 0 },
+  })
+
 const originalOs = Platform.OS
 const runOn = (os: typeof Platform.OS) => {
   Object.defineProperty(Platform, "OS", { get: () => os, configurable: true })
@@ -238,11 +246,49 @@ describe("deviceWalletFor on Android", () => {
     })
   })
 
+  it("answers cancelled when the user backs out of Google's sheet", async () => {
+    const sdk = fakeSdk()
+    sdk.googlePay.push.mockRejectedValue(
+      googleError("OPERATION_CANCELLED_BY_USER", "Operation cancelled by user."),
+    )
+
+    await expect(deviceWalletFor(sdk).add(card, provisioning)).resolves.toBe(
+      WalletAddResult.Cancelled,
+    )
+  })
+
   it("fails when Google Pay refuses the card", async () => {
     const sdk = fakeSdk()
-    const refused = new Error("PUSH_PROVISIONING_FAILED")
+    const refused = googleError("GOOGLE_PAY_ERROR", "Failed to push token")
     sdk.googlePay.push.mockRejectedValue(refused)
 
     await expect(deviceWalletFor(sdk).add(card, provisioning)).rejects.toBe(refused)
+  })
+
+  /** The wrapper's own cancel code, from an intent the system dropped, is not the user
+   *  backing out. */
+  it("fails on another cancel code the SDK can send", async () => {
+    const sdk = fakeSdk()
+    const dropped = googleError("PENDING_INTENT_CANCELLED", "PendingIntent was cancelled")
+    sdk.googlePay.push.mockRejectedValue(dropped)
+
+    await expect(deviceWalletFor(sdk).add(card, provisioning)).rejects.toBe(dropped)
+  })
+
+  it("fails on an error that carries no code", async () => {
+    const sdk = fakeSdk()
+    const noCode = new Error("Operation cancelled by user.")
+    sdk.googlePay.push.mockRejectedValue(noCode)
+
+    await expect(deviceWalletFor(sdk).add(card, provisioning)).rejects.toBe(noCode)
+  })
+
+  it("fails on a rejection that is not an error", async () => {
+    const sdk = fakeSdk()
+    sdk.googlePay.push.mockRejectedValue("OPERATION_CANCELLED_BY_USER")
+
+    await expect(deviceWalletFor(sdk).add(card, provisioning)).rejects.toBe(
+      "OPERATION_CANCELLED_BY_USER",
+    )
   })
 })
