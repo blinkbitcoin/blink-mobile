@@ -91,14 +91,17 @@ const vendoredVersion = () =>
   JSON.parse(readFileSync(join(vendorDir(), "package.json"), "utf8")).version
 const integrityMarker = () => join(vendorDir(), ".integrity")
 
-/** A same-version copy the script did not verify, such as one restored from a cache. */
+/** A same-version copy the script did not verify, such as one restored from a cache. It
+ *  carries a file of its own, so a case can tell it was replaced rather than written over. */
 const seedVendoredCopy = (marker?: string) => {
   writeFile(
     join(vendorDir(), "package.json"),
     JSON.stringify({ version: pinned("MPP_VERSION") }, null, 2),
   )
+  writeFile(staleFile(), "from the copy the script did not vendor")
   if (marker) writeFile(integrityMarker(), `${marker}\n`)
 }
+const staleFile = () => join(vendorDir(), "stale.js")
 
 type InstallOptions = {
   checksumMatches?: boolean
@@ -300,15 +303,26 @@ describe("install-meawallet-mpp.sh trusting a vendored copy", () => {
     expect(status).toBe(0)
     expect(downloads()).toBe(1)
     expect(readFileSync(integrityMarker(), "utf8").trim()).toBe(pinned("MPP_INTEGRITY"))
+    expect(existsSync(staleFile())).toBe(false)
   })
 
-  it("leaves an unverified copy unmarked when the new archive fails its checksum", () => {
+  /** The configs link whatever is vendored, so only a verified copy may stay there. */
+  it("removes an unverified copy when the new archive fails its checksum", () => {
     seedVendoredCopy()
 
     const { status } = install({ checksumMatches: false })
 
     expect(status).toBe(1)
-    expect(existsSync(integrityMarker())).toBe(false)
+    expect(existsSync(vendorDir())).toBe(false)
+  })
+
+  it("removes a copy from another checksum when the download fails", () => {
+    seedVendoredCopy("sha512-of-the-previous-version")
+
+    const { status } = install({ downloadFails: true })
+
+    expect(status).toBe(1)
+    expect(existsSync(vendorDir())).toBe(false)
   })
 
   it("leaves nothing beside the vendored SDK once it is in place", () => {

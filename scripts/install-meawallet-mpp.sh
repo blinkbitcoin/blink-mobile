@@ -18,7 +18,8 @@
 # SDK is removed, and without the configuration both of its copies are, so access that
 # was revoked or a configuration that was withdrawn never lingers in a build. A vendored
 # SDK is reused only while it carries the marker written once its archive matched the
-# pinned checksum, so a partial, corrupt or restored copy is downloaded again.
+# pinned checksum, so a partial, corrupt or restored copy is downloaded again, and a copy
+# a run could not verify is removed, since the build links whatever is vendored.
 
 set -eu
 
@@ -38,7 +39,9 @@ log() {
   echo "[meawallet] $*"
 }
 
-has_verified_package() {
+# A completion marker, written last once the archive matched the pinned checksum: it tells
+# an install that finished from one cut short. It is not tamper evidence for the files.
+has_completed_install() {
   [ -f "$INTEGRITY_MARKER" ] && [ "$(cat "$INTEGRITY_MARKER")" = "$MPP_INTEGRITY" ]
 }
 
@@ -65,7 +68,7 @@ install_package() {
     return 0
   fi
 
-  if has_verified_package; then
+  if has_completed_install; then
     log "@meawallet/react-native-mpp $MPP_VERSION already vendored"
     return 0
   fi
@@ -77,7 +80,10 @@ install_package() {
     printf 'machine nexus.ext.meawallet.com login %s password %s\n' \
       "$MEA_RN_USER" "$MEA_RN_PASSWORD" > "$work/netrc"
   )
+  # The configs link whatever is vendored, so a copy this run could not verify is removed
+  # rather than left for the next build to pick up.
   if ! curl -sSf --netrc-file "$work/netrc" -o "$work/package.tgz" "$MPP_TARBALL"; then
+    rm -rf "$VENDOR_DIR"
     log "could not download @meawallet/react-native-mpp $MPP_VERSION"
     return 1
   fi
@@ -85,6 +91,7 @@ install_package() {
 
   integrity=$(openssl dgst -sha512 -binary "$work/package.tgz" | openssl base64 -A)
   if [ "$integrity" != "$MPP_INTEGRITY" ]; then
+    rm -rf "$VENDOR_DIR"
     log "integrity mismatch for @meawallet/react-native-mpp $MPP_VERSION, not installing it"
     return 1
   fi
