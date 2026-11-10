@@ -3072,7 +3072,6 @@
     "faq": "Συχνές ερωτήσεις",
     "statusPage": "Σελίδα Κατάστασης",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Υποστήριξη",
     "defaultSupportMessage": "Γεια σας! Χρειάζομαι λίγη βοήθεια με το {bankName: string}, χρησιμοποιώ την έκδοση {version: string} στο {os: string}.",
     "emailCopied": "email {email: string} αντιγράφηκε στο πρόχειρο ",

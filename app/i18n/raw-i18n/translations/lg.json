@@ -3072,7 +3072,6 @@
     "faq": "FAQ",
     "statusPage": "Omuko gw'embeera",
     "telegram": "Telegram",
-    "mattermost": "Ekisinga obukulu",
     "defaultEmailSubject": "{bankName: string} - Okuwagira",
     "defaultSupportMessage": "Ab'eyo! Nze nneetaaga obuyambi ku {bankName: string}, nkozesa enkyusa {type: string} ku {os: string}.",
     "emailCopied": "email {email: string} ekoppedwa ku clipboard",

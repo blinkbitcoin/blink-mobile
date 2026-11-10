@@ -3072,7 +3072,6 @@
     "faq": "FAQ",
     "statusPage": "P'anqakuna Yupaychay",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Yachanakuy",
     "defaultSupportMessage": "¡Juyayay! Qanqa atipuni {bankName: string}piyta kani, {os: string}ta allinmi version {version: string}ninchikmi. Kaypi yachanichu.",
     "emailCopied": "Imayna {email: string} qillqanman yuraqchanku chimpusqan.",

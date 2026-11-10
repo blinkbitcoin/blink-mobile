@@ -3072,7 +3072,6 @@
     "faq": "SSS",
     "statusPage": "Durum Sayfası",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string}  - Destek",
     "defaultSupportMessage": "Selamlar! {bankName: string} ile ilgili yardıma ihtiyacım var. {os: string} cihazımda {version: string} sürümünü kullanıyorum.",
     "emailCopied": "E-posta {email: string} panoya kopyalandı",

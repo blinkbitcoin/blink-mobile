@@ -3072,7 +3072,6 @@
     "faq": "FAQ",
     "statusPage": "Statusbladsy",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Ondersteuning",
     "defaultSupportMessage": "Hi daar! Ek benodig hulp met {bankName: string}, ek gebruik weergawe {version: string} op {os: string}. ",
     "emailCopied": "e-pos {email: string} oorgedra na knipbord",

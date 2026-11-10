@@ -3072,7 +3072,6 @@
     "faq": "FAQ",
     "statusPage": "Status Page",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - مركز الدعم",
     "defaultSupportMessage": "مرحبا! أحتاج إلى بعض المساعدة في {bankName: string}، أنا أستخدم الإصدار {version: string} على {os: string}.",
     "emailCopied": "نُسخ عنوان البريد {email: string}  إلى الحافظة",

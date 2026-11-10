@@ -10265,10 +10265,6 @@ type RootTranslation = {
 		 */
 		telegram: string
 		/**
-		 * M​a​t​t​e​r​m​o​s​t
-		 */
-		mattermost: string
-		/**
 		 * {​b​a​n​k​N​a​m​e​}​ ​-​ ​S​u​p​p​o​r​t
 		 * @param {string} bankName
 		 */
@@ -24520,10 +24516,6 @@ export type TranslationFunctions = {
 		 * Telegram
 		 */
 		telegram: () => LocalizedString
-		/**
-		 * Mattermost
-		 */
-		mattermost: () => LocalizedString
 		/**
 		 * {bankName} - Support
 		 */

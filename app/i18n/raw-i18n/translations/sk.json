@@ -3072,7 +3072,6 @@
     "faq": "FAQ",
     "statusPage": "Stav",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Podpora",
     "defaultSupportMessage": "Dobrý deň! Potrebujem pomoc s {bankName: string}, používam verziu {version: string} na {os: string}.",
     "emailCopied": "e-mail {email: string} skopírovaný do schránky",

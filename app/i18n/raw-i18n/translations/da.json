@@ -3072,7 +3072,6 @@
     "faq": "Ofte stillede spørgsmål",
     "statusPage": "Statusside",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Support",
     "defaultSupportMessage": "Hej! Jeg har brug for hjælp med {bankName: string}. Jeg bruger version {version: string} på {os: string}.",
     "emailCopied": "email {email: string} kopieret til udklipsholder",

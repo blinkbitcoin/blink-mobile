@@ -3072,7 +3072,6 @@
     "faq": "FAQ",
     "statusPage": "Status Page",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Աջակցություն",
     "defaultSupportMessage": "Ողջու՛յն։ Օգնություն է հարկավոր {bankName: string}ի առիթով, ես պգտագործում եմ {version: string} տարբերակը {os: string}ով։ ",
     "emailCopied": "էլ․ հասցե {email: string} պատճենվեց ժամանակավոր շտեմարանում ",
