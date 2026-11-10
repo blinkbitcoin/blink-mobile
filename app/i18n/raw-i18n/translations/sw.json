@@ -3953,6 +3953,12 @@
       "title": "Hatuwezi kuhamisha Salio lako la Dola",
       "body": "Kwanza ondoa Salio lako la Dola. Unaweza kulihamishia kwenye Salio lako la Bitcoin kwenye Blink au mahali pengine."
     },
+    "pendingDepositModal": {
+      "title": "Kuna amana inayosubiri kwenye akaunti yako",
+      "body": "Huwezi kuhamia aina nyingine ya akaunti kabla ya amana zako zote zinazosubiri kukamilika na kuwekwa kwenye akaunti hii.",
+      "contactSupportCta": "Wasiliana na usaidizi",
+      "stillConfirming": "Amana yako bado haijathibitishwa. Jaribu tena baada ya dakika chache."
+    },
     "balancesOverview": {
       "title": "Hamisha salio lako",
       "body": "Hamisha fedha zako kwa usalama kwenye akaunti yako mpya.",

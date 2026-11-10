@@ -3953,6 +3953,12 @@
       "title": "No podem migrar el teu saldo en dòlars",
       "body": "Primer buida el teu saldo en dòlars. Pots transferir-lo al teu saldo en bitcoins a Blink o en un altre lloc."
     },
+    "pendingDepositModal": {
+      "title": "Hi ha un dipòsit pendent al teu compte",
+      "body": "No pots migrar a un altre tipus de compte fins que tots els teus dipòsits pendents s'hagin liquidat i abonat en aquest compte.",
+      "contactSupportCta": "Contacta amb suport",
+      "stillConfirming": "El teu dipòsit encara no s'ha confirmat. Torna-ho a provar d'aquí a uns minuts."
+    },
     "balancesOverview": {
       "title": "Mou el teu saldo",
       "body": "Mou els teus fons de manera segura al teu nou compte.",

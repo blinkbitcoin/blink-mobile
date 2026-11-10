@@ -3953,6 +3953,12 @@
       "title": "Dolar bakiyenizi taşıyamıyoruz",
       "body": "Önce dolar bakiyenizi boşaltın. Blink içindeki Bitcoin bakiyenize veya başka bir yere aktarabilirsiniz."
     },
+    "pendingDepositModal": {
+      "title": "Hesabınıza bekleyen bir para yatırma işlemi var",
+      "body": "Bekleyen tüm para yatırma işlemleriniz tamamlanıp bu hesaba aktarılmadan farklı bir hesap türüne taşınamazsınız.",
+      "contactSupportCta": "Desteğe ulaş",
+      "stillConfirming": "Para yatırma işleminiz henüz onaylanmadı. Birkaç dakika sonra tekrar deneyin."
+    },
     "balancesOverview": {
       "title": "Bakiyeni taşı",
       "body": "Fonlarını güvenle yeni hesabına taşı.",

@@ -3953,6 +3953,12 @@
       "title": "Kami tidak dapat memigrasikan Saldo Dolar Anda",
       "body": "Kosongkan Saldo Dolar Anda terlebih dahulu. Anda dapat mentransfernya ke Saldo Bitcoin di Blink atau ke tempat lain."
     },
+    "pendingDepositModal": {
+      "title": "Ada setoran tertunda ke akun Anda",
+      "body": "Anda tidak dapat bermigrasi ke jenis akun lain sebelum semua setoran tertunda Anda diselesaikan dan dikreditkan ke akun ini.",
+      "contactSupportCta": "Hubungi dukungan",
+      "stillConfirming": "Setoran Anda belum dikonfirmasi. Coba lagi dalam beberapa menit."
+    },
     "balancesOverview": {
       "title": "Pindahkan saldo Anda",
       "body": "Pindahkan dana Anda dengan aman ke akun baru Anda.",

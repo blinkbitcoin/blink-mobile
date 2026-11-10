@@ -367,8 +367,19 @@ export type RootStackParamList = {
   accountMigrationKeepReceiving: undefined
   accountMigrationMerchantTools: undefined
   accountMigrationDownloadHistory: undefined
-  accountMigrationBalancesOverview: undefined
-  accountMigrationTransferringFunds: undefined
+  accountMigrationBalancesOverview:
+    | {
+        /** The transfer screen sent the user back: the server refused the commit for a
+         *  deposit still confirming. */
+        isDepositRefused?: true
+      }
+    | undefined
+  accountMigrationTransferringFunds:
+    | {
+        /** Approve opened the screen, right after its own check found no deposit. */
+        isDepositChecked?: true
+      }
+    | undefined
   accountMigrationContactSupport: {
     reason: MigrationSupportReason
     origin?: MigrationSupportOrigin

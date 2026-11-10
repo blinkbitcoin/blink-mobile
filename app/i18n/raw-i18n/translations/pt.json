@@ -3953,6 +3953,12 @@
             "title": "Não podemos migrar o seu saldo em dólares",
             "body": "Esvazie primeiro o seu saldo em dólares. Você pode transferi-lo para o seu saldo Bitcoin no Blink ou para outro lugar."
         },
+        "pendingDepositModal": {
+            "title": "Há um depósito pendente na sua conta",
+            "body": "Você não pode migrar para outro tipo de conta antes que todos os seus depósitos pendentes tenham sido liquidados e creditados nesta conta.",
+            "contactSupportCta": "Falar com o suporte",
+            "stillConfirming": "Seu depósito ainda não foi confirmado. Tente novamente em alguns minutos."
+        },
         "balancesOverview": {
             "title": "Mova seu saldo",
             "body": "Mova seus fundos com segurança para sua nova conta.",
