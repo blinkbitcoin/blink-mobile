@@ -985,6 +985,8 @@ export const RootStack = () => {
         component={WelcomeOnboardScreen}
         options={{
           title: "",
+          ...noHeaderBack,
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
