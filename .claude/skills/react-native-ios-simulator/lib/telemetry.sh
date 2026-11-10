@@ -28,7 +28,7 @@
 #
 # Record schema (v1):
 #   {"v":1,"ts":<epoch>,"dur_ms":<int>,"span":"sim.claim.total",
-#    "skill":"sim","session":"blink-demo-pr4092","run_id":"<pid.ts>",
+#    "skill":"sim","session":"rn-demo-pr4092","run_id":"<pid.ts>",
 #    "rev":"<git short sha>","ok":true,"meta":{...}}
 # `skill` is the span's first dot-segment. `rev` is the skills checkout's
 # HEAD, cached once per process - it is what makes before/after comparison
