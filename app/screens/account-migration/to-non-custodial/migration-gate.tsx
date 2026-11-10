@@ -97,6 +97,11 @@ export const MigrationGate: React.FC = () => {
    *  floating over it; regaining focus shows it again with a fresh balance check. */
   const isFocused = useIsFocused()
 
+  /** A committed migration ignores the deposit check (see shouldBlockOnPendingDeposit), and
+   *  the lock is read fresh on every mount, so the check waits for the lock's answer rather
+   *  than spend a request on every resume. */
+  const isPendingDepositCheckSkipped = lockLoading || isMigrationCommitted
+
   const {
     usdBalanceCents,
     isReady: balancesReady,
@@ -111,7 +116,7 @@ export const MigrationGate: React.FC = () => {
     recheck: recheckPendingDeposits,
     isRecheckRunning: isPendingDepositRecheckRunning,
     isStillPending: isPendingDepositStillPending,
-  } = useCustodialPendingDeposits()
+  } = useCustodialPendingDeposits({ skip: isPendingDepositCheckSkipped })
   const {
     navigateToCheckpoint,
     loading: checkpointLoading,
@@ -235,8 +240,9 @@ export const MigrationGate: React.FC = () => {
     if (!hasBlurredRef.current) return
     hasBlurredRef.current = false
     refetchBalances()
-    checkPendingDeposits()
-  }, [isFocused, refetchBalances, checkPendingDeposits])
+    /** Held back with the query: a refetch runs even on a skipped one. */
+    if (!isPendingDepositCheckSkipped) checkPendingDeposits()
+  }, [isFocused, refetchBalances, checkPendingDeposits, isPendingDepositCheckSkipped])
 
   /** Ready only once every source has settled WITH data, so a failed query never reads as
    *  an empty answer; the lock is part of it, or the gate decides before it knows, renders

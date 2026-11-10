@@ -205,7 +205,8 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-support-email", ()
 }))
 
 jest.mock("@app/screens/account-migration/hooks/use-custodial-pending-deposits", () => ({
-  useCustodialPendingDeposits: () => mockUseCustodialPendingDeposits(),
+  useCustodialPendingDeposits: (options: { skip?: boolean }) =>
+    mockUseCustodialPendingDeposits(options),
 }))
 
 jest.mock("@app/screens/account-migration/pending-deposit-modal", () => ({
@@ -1272,6 +1273,51 @@ describe("MigrationGate, with a deposit still confirming", () => {
     rerender(<MigrationGate />)
 
     expect(check).toHaveBeenCalledTimes(1)
+  })
+
+  describe("asking for the deposits only where the answer is used", () => {
+    /** The lock is read fresh on every mount, so asking alongside it would spend a request
+     *  on every resume of a committed migration, which ignores the answer. */
+    it("waits for the lock before asking", () => {
+      mockLockLoading = true
+
+      render(<MigrationGate />)
+
+      expect(mockUseCustodialPendingDeposits).toHaveBeenLastCalledWith({ skip: true })
+    })
+
+    it("never asks for a committed migration", () => {
+      mockIsMigrationLocked = true
+      mockIsMigrationCommitted = true
+
+      render(<MigrationGate />)
+
+      expect(mockUseCustodialPendingDeposits).toHaveBeenLastCalledWith({ skip: true })
+    })
+
+    it("asks once the lock says nothing has been committed", () => {
+      render(<MigrationGate />)
+
+      expect(mockUseCustodialPendingDeposits).toHaveBeenLastCalledWith({ skip: false })
+    })
+
+    /** A refetch runs even on a skipped query, so the focus check has to hold back too. */
+    it("does not ask again on focus for a committed migration", () => {
+      mockIsMigrationLocked = true
+      mockIsMigrationCommitted = true
+      const check = jest
+        .fn()
+        .mockResolvedValue({ status: PendingDepositCheckStatus.Clear })
+      mockUseCustodialPendingDeposits.mockReturnValue(pendingDepositsState({ check }))
+
+      const { rerender } = render(<MigrationGate />)
+      mockIsFocused = false
+      rerender(<MigrationGate />)
+      mockIsFocused = true
+      rerender(<MigrationGate />)
+
+      expect(check).not.toHaveBeenCalled()
+    })
   })
 
   it("resumes a committed migration past a pending deposit, since the balance has left", () => {
