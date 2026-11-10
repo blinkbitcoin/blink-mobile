@@ -37,6 +37,7 @@ import {
   MigrationLnAddressOutcome,
   MigrationSupportOrigin,
   MigrationSupportReason,
+  PendingDepositCheckStatus,
   ServerMigrationFlow,
 } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
@@ -216,13 +217,9 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     loading: isPendingDepositCheckRunning,
     isReady: isPendingDepositCheckReady,
     hasError: hasPendingDepositCheckError,
-    checkClear: checkPendingDepositsClear,
+    check: checkPendingDeposits,
   } = useCustodialPendingDeposits()
   const isPendingDepositBlocking = hasPendingDeposit || !isPendingDepositCheckReady
-  /** A failed check shows through the hook's own error, which offers the retry below. */
-  const checkPendingDepositsAgain = useCallback(() => {
-    checkPendingDepositsClear().catch(() => undefined)
-  }, [checkPendingDepositsClear])
 
   /**
    * Landing here WITH figures declares the migration started server-side, which is what
@@ -547,12 +544,13 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  modal back and a failed check brings the retry, both through the hook's own state. */
   const handleApprove = useCallback(async () => {
     setIsApproveChecking(true)
-    const isClear = await checkPendingDepositsClear().catch(() => false)
+    const depositCheck = await checkPendingDeposits()
     setIsApproveChecking(false)
+    const isClear = depositCheck.status === PendingDepositCheckStatus.Clear
     const canStillApprove = isClear && canStillApproveRef.current
     if (!canStillApprove) return
     navigation.navigate("accountMigrationTransferringFunds")
-  }, [checkPendingDepositsClear, navigation])
+  }, [checkPendingDeposits, navigation])
 
   /** Either source losing the network earns the same retry, and it refreshes both:
    *  figures without a started migration are as useless as the reverse. */
@@ -609,10 +607,11 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  is only refused again, and a start this screen's own check held goes out by itself
    *  once that check is clear. */
   const acknowledgePendingDeposit = useCallback(async () => {
-    const isClear = await checkPendingDepositsClear().catch(() => false)
+    const depositCheck = await checkPendingDeposits()
+    const isClear = depositCheck.status === PendingDepositCheckStatus.Clear
     const shouldAskServerAgain = isClear && migrationStart.isDepositPending
     if (shouldAskServerAgain) retryMigrationStart()
-  }, [checkPendingDepositsClear, migrationStart.isDepositPending, retryMigrationStart])
+  }, [checkPendingDeposits, migrationStart.isDepositPending, retryMigrationStart])
 
   /** The owner and the checkpoint join the shared retry because the re-point cannot fire
    *  without the ids they carry: refreshing everything else around a lookup that failed
@@ -626,7 +625,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     refetchOwnerId().catch(() => undefined)
     refetchCheckpoint().catch(() => undefined)
     refetchMigrationStatus().catch(() => undefined)
-    checkPendingDepositsAgain()
+    checkPendingDeposits()
   }, [
     recordCommitPoint,
     refetchMigrationStatus,
@@ -635,7 +634,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     retryLnAddressTransfer,
     refetchOwnerId,
     refetchCheckpoint,
-    checkPendingDepositsAgain,
+    checkPendingDeposits,
   ])
 
   /** Approve commits against a server-side flow, so it stays off until the server has

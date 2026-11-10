@@ -8,6 +8,8 @@ import {
   useMigrationPendingDepositsQuery,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { PendingDepositCheck, PendingDepositCheckStatus } from "@app/types/migration"
+import { toError } from "@app/utils/error-reporting"
 
 gql`
   query migrationPendingDeposits {
@@ -64,7 +66,7 @@ type UseCustodialPendingDeposits = {
   loading: boolean
   isReady: boolean
   hasError: boolean
-  checkClear: () => Promise<boolean>
+  check: () => Promise<PendingDepositCheck>
 }
 
 /**
@@ -102,13 +104,22 @@ export const useCustodialPendingDeposits = ({
   const pendingTransactions = readPendingTransactions(data)
 
   /** Resolves with the fresh answer, so a caller about to act on it does not wait for a
-   *  render: true only when that answer arrived and holds no pending deposit. Rejects like
-   *  the refetch does when the request fails, which the error state shows as well. */
-  const checkClear = useCallback(async (): Promise<boolean> => {
-    const { data: freshData } = await refetch()
-    const freshTransactions = readPendingTransactions(freshData)
-    if (freshTransactions === undefined) return false
-    return !hasPendingOnChainReceive(freshTransactions)
+   *  render. Never rejects: a request that failed, which the error state shows as well, or
+   *  an answer without the list is Unknown, and each caller says what that means for it. */
+  const check = useCallback(async (): Promise<PendingDepositCheck> => {
+    try {
+      const { data: freshData } = await refetch()
+      const freshTransactions = readPendingTransactions(freshData)
+      if (freshTransactions === undefined) {
+        return { status: PendingDepositCheckStatus.Unknown, error: null }
+      }
+      const isPending = hasPendingOnChainReceive(freshTransactions)
+      return isPending
+        ? { status: PendingDepositCheckStatus.Pending }
+        : { status: PendingDepositCheckStatus.Clear }
+    } catch (err) {
+      return { status: PendingDepositCheckStatus.Unknown, error: toError(err) }
+    }
   }, [refetch])
 
   return {
@@ -116,6 +127,6 @@ export const useCustodialPendingDeposits = ({
     loading,
     isReady: !error && pendingTransactions !== undefined,
     hasError: Boolean(error),
-    checkClear,
+    check,
   }
 }

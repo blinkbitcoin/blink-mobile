@@ -28,6 +28,7 @@ import {
 } from "@app/graphql/generated"
 import mocks from "@app/graphql/mocks"
 import { useCustodialPendingDeposits } from "@app/screens/account-migration/hooks/use-custodial-pending-deposits"
+import { PendingDepositCheck, PendingDepositCheckStatus } from "@app/types/migration"
 
 jest.mock("@app/graphql/is-authed-context", () => ({
   ...jest.requireActual("@app/graphql/is-authed-context"),
@@ -142,13 +143,13 @@ describe("useCustodialPendingDeposits under a real client", () => {
     await network.answer(pendingDepositsAnswer([]))
     await waitFor(() => expect(result.current.isReady).toBe(true))
 
-    let isClear: Promise<boolean> | undefined
+    let depositCheck: Promise<PendingDepositCheck> | undefined
     act(() => {
-      isClear = result.current.checkClear()
+      depositCheck = result.current.check()
     })
     await network.answer(pendingDepositsAnswer(["pending-deposit-2"]))
 
-    expect(await isClear).toBe(false)
+    expect(await depositCheck).toEqual({ status: PendingDepositCheckStatus.Pending })
     expect(readHomePendingIds(client)).toEqual(["pending-deposit-2"])
   })
 
@@ -182,7 +183,7 @@ describe("useCustodialPendingDeposits under a real client", () => {
     await waitFor(() => expect(result.current.hasPendingDeposit).toBe(true))
 
     act(() => {
-      result.current.checkClear().catch(() => undefined)
+      result.current.check()
     })
     await waitFor(() => expect(result.current.loading).toBe(true))
 
@@ -200,15 +201,15 @@ describe("useCustodialPendingDeposits under a real client", () => {
     const { result } = renderCheck(client)
     await waitFor(() => expect(network.requests()).toBe(1))
 
-    let isClear: Promise<boolean> | undefined
+    let depositCheck: Promise<PendingDepositCheck> | undefined
     act(() => {
-      isClear = result.current.checkClear()
+      depositCheck = result.current.check()
     })
     await act(async () => {})
 
     expect(network.requests()).toBe(1)
     await network.answer(pendingDepositsAnswer([]))
-    expect(await isClear).toBe(true)
+    expect(await depositCheck).toEqual({ status: PendingDepositCheckStatus.Clear })
     expect(result.current.hasPendingDeposit).toBe(false)
   })
 })

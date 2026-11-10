@@ -2,6 +2,7 @@ import { act, renderHook } from "@testing-library/react-native"
 
 import { TxDirection } from "@app/graphql/generated"
 import { useCustodialPendingDeposits } from "@app/screens/account-migration/hooks/use-custodial-pending-deposits"
+import { PendingDepositCheck, PendingDepositCheckStatus } from "@app/types/migration"
 
 import { pendingDepositsQueryResult, pendingOnChainReceive } from "../helpers"
 
@@ -104,12 +105,12 @@ describe("useCustodialPendingDeposits", () => {
       })
       const { result } = renderHook(() => useCustodialPendingDeposits())
 
-      let isClear: boolean | undefined
+      let depositCheck: PendingDepositCheck | undefined
       await act(async () => {
-        isClear = await result.current.checkClear()
+        depositCheck = await result.current.check()
       })
 
-      expect(isClear).toBe(true)
+      expect(depositCheck).toEqual({ status: PendingDepositCheckStatus.Clear })
     })
   })
 
@@ -210,18 +211,18 @@ describe("useCustodialPendingDeposits", () => {
     )
   })
 
-  describe("checkClear", () => {
-    const checkClearWith = async (refetch: jest.Mock) => {
+  describe("check", () => {
+    const checkWith = async (refetch: jest.Mock) => {
       mockUseMigrationPendingDepositsQuery.mockReturnValue({
         ...pendingDepositsQueryResult(),
         refetch,
       })
       const { result } = renderHook(() => useCustodialPendingDeposits())
-      let isClear: boolean | undefined
+      let depositCheck: PendingDepositCheck | undefined
       await act(async () => {
-        isClear = await result.current.checkClear()
+        depositCheck = await result.current.check()
       })
-      return isClear
+      return depositCheck
     }
 
     it("is clear when the fresh answer holds no pending deposit", async () => {
@@ -229,32 +230,39 @@ describe("useCustodialPendingDeposits", () => {
         .fn()
         .mockResolvedValue({ data: pendingDepositsQueryResult().data })
 
-      expect(await checkClearWith(refetch)).toBe(true)
+      expect(await checkWith(refetch)).toEqual({
+        status: PendingDepositCheckStatus.Clear,
+      })
       expect(refetch).toHaveBeenCalledTimes(1)
     })
 
-    it("is not clear when the fresh answer holds a pending deposit", async () => {
+    it("is pending when the fresh answer holds a pending deposit", async () => {
       const refetch = jest.fn().mockResolvedValue({
         data: pendingDepositsQueryResult([pendingOnChainReceive]).data,
       })
 
-      expect(await checkClearWith(refetch)).toBe(false)
+      expect(await checkWith(refetch)).toEqual({
+        status: PendingDepositCheckStatus.Pending,
+      })
     })
 
-    it("is not clear when the fresh answer carries no transactions", async () => {
+    it("is unknown, with no error, when the fresh answer carries no transactions", async () => {
       const refetch = jest.fn().mockResolvedValue({ data: { me: null } })
 
-      expect(await checkClearWith(refetch)).toBe(false)
+      expect(await checkWith(refetch)).toEqual({
+        status: PendingDepositCheckStatus.Unknown,
+        error: null,
+      })
     })
 
-    it("rejects when the request fails", async () => {
-      mockUseMigrationPendingDepositsQuery.mockReturnValue({
-        ...pendingDepositsQueryResult(),
-        refetch: jest.fn().mockRejectedValue(new Error("network")),
-      })
-      const { result } = renderHook(() => useCustodialPendingDeposits())
+    it("is unknown, carrying the request's error, when the request fails", async () => {
+      const failure = new Error("network")
+      const refetch = jest.fn().mockRejectedValue(failure)
 
-      await expect(result.current.checkClear()).rejects.toThrow("network")
+      expect(await checkWith(refetch)).toEqual({
+        status: PendingDepositCheckStatus.Unknown,
+        error: failure,
+      })
     })
   })
 })

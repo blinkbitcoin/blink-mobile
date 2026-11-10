@@ -14,7 +14,11 @@ import { useContactSupport } from "@app/hooks/use-contact-support"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { TemporarilyUnavailableScreen } from "@app/screens/feature-unavailable/temporarily-unavailable-screen"
-import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
+import {
+  MigrationSupportOrigin,
+  MigrationSupportReason,
+  PendingDepositCheckStatus,
+} from "@app/types/migration"
 import { WindDownStatus } from "@app/types/wind-down"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
@@ -104,7 +108,7 @@ export const MigrationGate: React.FC = () => {
     loading: pendingDepositsLoading,
     isReady: pendingDepositsReady,
     hasError: pendingDepositsError,
-    checkClear: checkPendingDepositsClear,
+    check: checkPendingDeposits,
   } = useCustodialPendingDeposits()
   const {
     navigateToCheckpoint,
@@ -129,11 +133,15 @@ export const MigrationGate: React.FC = () => {
   }, [navigation])
   const { openSupport } = useContactSupport()
 
-  /** A failed check shows through the hook's own error, which sends the gate to its
-   *  retry screen, so the rejection carries nothing left to handle here. */
-  const checkPendingDepositsAgain = useCallback(() => {
-    checkPendingDepositsClear().catch(() => undefined)
-  }, [checkPendingDepositsClear])
+  /** The retry reports the first source that failed, so a check that could not answer
+   *  counts as one, carrying the error its request raised. A failed check also shows
+   *  through the hook's own error, which is what sends the gate to its retry screen. */
+  const checkPendingDepositsForRetry = useCallback(async (): Promise<void> => {
+    const result = await checkPendingDeposits()
+    const isFailedRequest =
+      result.status === PendingDepositCheckStatus.Unknown && result.error !== null
+    if (isFailedRequest) throw result.error
+  }, [checkPendingDeposits])
 
   const goToDollarTransfer = useCallback(() => {
     /** Arm the flag before navigating so the convert screen waives its region restriction
@@ -178,7 +186,7 @@ export const MigrationGate: React.FC = () => {
     const results = await Promise.allSettled([
       refetchApiKeys(),
       refetchBalances(),
-      isPendingDepositCheckNeeded ? checkPendingDepositsClear() : undefined,
+      isPendingDepositCheckNeeded ? checkPendingDepositsForRetry() : undefined,
       refetchLock(),
       refetchCheckpoint(),
       refetchPendingWallet(),
@@ -191,7 +199,7 @@ export const MigrationGate: React.FC = () => {
     refetchApiKeys,
     refetchBalances,
     isPendingDepositCheckNeeded,
-    checkPendingDepositsClear,
+    checkPendingDepositsForRetry,
     refetchLock,
     refetchCheckpoint,
     refetchPendingWallet,
@@ -221,8 +229,8 @@ export const MigrationGate: React.FC = () => {
     if (!hasBlurredRef.current) return
     hasBlurredRef.current = false
     refetchBalances()
-    checkPendingDepositsAgain()
-  }, [isFocused, refetchBalances, checkPendingDepositsAgain])
+    checkPendingDeposits()
+  }, [isFocused, refetchBalances, checkPendingDeposits])
 
   /** Ready only once every source has settled WITH data, so a failed query never reads as
    *  an empty answer; the lock is part of it, or the gate decides before it knows, renders
@@ -442,7 +450,7 @@ export const MigrationGate: React.FC = () => {
     /** Leaving is the way to wait, and coming back from Settings asks the network again.
      *  Where the exit is blocked (the armed gate or a locked migration) OK checks again
      *  instead, so a deposit that has confirmed lets the user through right here. */
-    const acknowledgePendingDeposit = isExitBlocked ? checkPendingDepositsAgain : exitFlow
+    const acknowledgePendingDeposit = isExitBlocked ? checkPendingDeposits : exitFlow
     const canClosePendingDepositModal = !isExitBlocked
     const pendingDepositSupportAction = isExitBlocked ? openSupport : undefined
     /** Only where OK checks again: where it leaves, a check running in the background

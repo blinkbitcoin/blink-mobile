@@ -27,6 +27,24 @@ export const MigrationRejectionCode = {
 export type MigrationRejectionCode =
   (typeof MigrationRejectionCode)[keyof typeof MigrationRejectionCode]
 
+/** What a check for an on-chain deposit still confirming answered. */
+export const PendingDepositCheckStatus = {
+  Clear: "clear",
+  Pending: "pending",
+  /** The check said neither: its request failed, or it answered without the list. */
+  Unknown: "unknown",
+} as const
+
+export type PendingDepositCheckStatus =
+  (typeof PendingDepositCheckStatus)[keyof typeof PendingDepositCheckStatus]
+
+/** Unknown carries the request's error, null when it answered without the list, so a
+ *  caller that reports failures reports the same one the request raised. */
+export type PendingDepositCheck =
+  | { status: typeof PendingDepositCheckStatus.Clear }
+  | { status: typeof PendingDepositCheckStatus.Pending }
+  | { status: typeof PendingDepositCheckStatus.Unknown; error: Error | null }
+
 /**
  * Why the migration handed the user to support. Deliberately NOT translated: the value is
  * copied out of an email by a human, so it has to stay greppable whatever locale produced

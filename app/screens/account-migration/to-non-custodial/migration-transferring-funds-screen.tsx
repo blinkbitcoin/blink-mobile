@@ -23,6 +23,7 @@ import {
   MigrationCompletion,
   MigrationSupportOrigin,
   MigrationSupportReason,
+  PendingDepositCheckStatus,
 } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
@@ -279,7 +280,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
   const screenFooter = isRecoverable ? recoverableFooter : waitingFooter
 
   /** Asked only once the commit has been refused for a deposit, never on the way in. */
-  const { checkClear: checkDepositsClear } = useCustodialPendingDeposits({
+  const { check: checkDeposits } = useCustodialPendingDeposits({
     skip: !isDepositPending,
   })
   /** The check OK starts, apart from the fetch the modal opening sets off, so its spinner
@@ -296,10 +297,15 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
    */
   const acknowledgePendingDeposit = useCallback(async () => {
     setIsDepositRecheckRunning(true)
-    const isClear = await checkDepositsClear().catch(() => true)
+    const depositCheck = await checkDeposits()
     setIsDepositRecheckRunning(false)
-    if (isClear) retry()
-  }, [checkDepositsClear, retry])
+    const isClear = depositCheck.status === PendingDepositCheckStatus.Clear
+    const hasCheckFailed =
+      depositCheck.status === PendingDepositCheckStatus.Unknown &&
+      depositCheck.error !== null
+    const shouldCommitAgain = isClear || hasCheckFailed
+    if (shouldCommitAgain) retry()
+  }, [checkDeposits, retry])
 
   /** Support is offered since this screen has no way back. Hidden while support is on top,
    *  as this screen stays mounted under it. */
