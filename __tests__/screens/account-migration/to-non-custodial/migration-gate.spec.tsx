@@ -139,6 +139,8 @@ const pendingDepositsState = (overrides: Record<string, unknown> = {}) => ({
   isReady: true,
   hasError: false,
   check: jest.fn().mockResolvedValue({ status: PendingDepositCheckStatus.Clear }),
+  recheck: jest.fn().mockResolvedValue({ status: PendingDepositCheckStatus.Clear }),
+  isRecheckRunning: false,
   ...overrides,
 })
 
@@ -1166,9 +1168,11 @@ describe("MigrationGate, with a deposit still confirming", () => {
 
   it("checks again from OK once the gate is armed, and lets the user through once it lands", async () => {
     mockWindDown = windDownWith(WindDownStatus.GatedClosed)
-    const check = jest.fn().mockResolvedValue({ status: PendingDepositCheckStatus.Clear })
+    const recheck = jest
+      .fn()
+      .mockResolvedValue({ status: PendingDepositCheckStatus.Clear })
     mockUseCustodialPendingDeposits.mockReturnValue(
-      pendingDepositsState({ hasPendingDeposit: true, check }),
+      pendingDepositsState({ hasPendingDeposit: true, recheck }),
     )
 
     const { getByTestId, rerender } = render(<MigrationGate />)
@@ -1180,7 +1184,7 @@ describe("MigrationGate, with a deposit still confirming", () => {
     fireEvent.press(getByTestId("gate-pending-deposit-ok"))
     await act(async () => {})
 
-    expect(check).toHaveBeenCalledTimes(1)
+    expect(recheck).toHaveBeenCalledTimes(1)
     expect(mockGoBack).not.toHaveBeenCalled()
 
     mockPendingDepositModal.mockClear()
@@ -1195,19 +1199,19 @@ describe("MigrationGate, with a deposit still confirming", () => {
 
   it("stays on the modal when checking again from OK fails", async () => {
     mockWindDown = windDownWith(WindDownStatus.GatedClosed)
-    const check = jest.fn().mockResolvedValue({
+    const recheck = jest.fn().mockResolvedValue({
       status: PendingDepositCheckStatus.Unknown,
       error: new Error("network"),
     })
     mockUseCustodialPendingDeposits.mockReturnValue(
-      pendingDepositsState({ hasPendingDeposit: true, check }),
+      pendingDepositsState({ hasPendingDeposit: true, recheck }),
     )
 
     const { getByTestId } = render(<MigrationGate />)
     fireEvent.press(getByTestId("gate-pending-deposit-ok"))
     await act(async () => {})
 
-    expect(check).toHaveBeenCalledTimes(1)
+    expect(recheck).toHaveBeenCalledTimes(1)
     expect(getByTestId("gate-pending-deposit-ok")).toBeTruthy()
   })
 
@@ -1231,7 +1235,7 @@ describe("MigrationGate, with a deposit still confirming", () => {
   it("shows the check running on the modal instead of the loading screen", () => {
     mockWindDown = windDownWith(WindDownStatus.GatedClosed)
     mockUseCustodialPendingDeposits.mockReturnValue(
-      pendingDepositsState({ hasPendingDeposit: true, loading: true }),
+      pendingDepositsState({ hasPendingDeposit: true, isRecheckRunning: true }),
     )
 
     const { queryByTestId } = render(<MigrationGate />)
@@ -1351,9 +1355,22 @@ describe("MigrationGate, with a deposit still confirming", () => {
     })
   })
 
-  it("keeps the OK spinner off where OK only leaves", () => {
+  it("keeps the spinner off on the armed gate until the user checks again", () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
     mockUseCustodialPendingDeposits.mockReturnValue(
       pendingDepositsState({ hasPendingDeposit: true, loading: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isChecking: false }),
+    )
+  })
+
+  it("keeps the OK spinner off where OK only leaves", () => {
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, isRecheckRunning: true }),
     )
 
     render(<MigrationGate />)

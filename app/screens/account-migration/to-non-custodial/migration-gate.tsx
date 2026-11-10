@@ -105,10 +105,11 @@ export const MigrationGate: React.FC = () => {
   } = useCustodialWalletBalances()
   const {
     hasPendingDeposit,
-    loading: pendingDepositsLoading,
     isReady: pendingDepositsReady,
     hasError: pendingDepositsError,
     check: checkPendingDeposits,
+    recheck: recheckPendingDeposits,
+    isRecheckRunning: isPendingDepositRecheckRunning,
   } = useCustodialPendingDeposits()
   const {
     navigateToCheckpoint,
@@ -450,12 +451,12 @@ export const MigrationGate: React.FC = () => {
     /** Leaving is the way to wait, and coming back from Settings asks the network again.
      *  Where the exit is blocked (the armed gate or a locked migration) OK checks again
      *  instead, so a deposit that has confirmed lets the user through right here. */
-    const acknowledgePendingDeposit = isExitBlocked ? checkPendingDeposits : exitFlow
+    const acknowledgePendingDeposit = isExitBlocked ? recheckPendingDeposits : exitFlow
     const canClosePendingDepositModal = !isExitBlocked
     const pendingDepositSupportAction = isExitBlocked ? openSupport : undefined
     /** Only where OK checks again: where it leaves, a check running in the background
      *  has nothing to do with it. */
-    const isPendingDepositCheckShown = isExitBlocked && pendingDepositsLoading
+    const isPendingDepositCheckShown = isExitBlocked && isPendingDepositRecheckRunning
     return (
       <>
         <MigrationRequiredScreen mode={mode} isExitBlocked={isExitBlocked} />

@@ -280,12 +280,10 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
   const screenFooter = isRecoverable ? recoverableFooter : waitingFooter
 
   /** Asked only once the commit has been refused for a deposit, never on the way in. */
-  const { check: checkDeposits } = useCustodialPendingDeposits({
-    skip: !isDepositPending,
-  })
-  /** The check OK starts, apart from the fetch the modal opening sets off, so its spinner
-   *  only ever answers the user's tap. */
-  const [isDepositRecheckRunning, setIsDepositRecheckRunning] = useState(false)
+  const { recheck: recheckDeposits, isRecheckRunning: isDepositRecheckRunning } =
+    useCustodialPendingDeposits({
+      skip: !isDepositPending,
+    })
 
   /**
    * A commit refused for a deposit still confirming moved nothing. OK checks again first
@@ -296,16 +294,14 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
    * answers.
    */
   const acknowledgePendingDeposit = useCallback(async () => {
-    setIsDepositRecheckRunning(true)
-    const depositCheck = await checkDeposits()
-    setIsDepositRecheckRunning(false)
+    const depositCheck = await recheckDeposits()
     const isClear = depositCheck.status === PendingDepositCheckStatus.Clear
     const hasCheckFailed =
       depositCheck.status === PendingDepositCheckStatus.Unknown &&
       depositCheck.error !== null
     const shouldCommitAgain = isClear || hasCheckFailed
     if (shouldCommitAgain) retry()
-  }, [checkDeposits, retry])
+  }, [recheckDeposits, retry])
 
   /** Support is offered since this screen has no way back. Hidden while support is on top,
    *  as this screen stays mounted under it. */

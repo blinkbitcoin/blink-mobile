@@ -1110,18 +1110,39 @@ describe("MigrationBalancesOverviewScreen, with a deposit still confirming", () 
     expect(screen.getByTestId("pending-deposit-modal-ok")).toBeTruthy()
   })
 
-  it("shows the check running on the modal while it asks again", async () => {
+  it("shows the check OK started running on the modal until it answers", async () => {
+    type CheckAnswer = { data: ReturnType<typeof pendingDepositsQueryResult>["data"] }
+    let answerCheck: (answer: CheckAnswer) => void = () => undefined
     mockUseMigrationPendingDepositsQuery.mockReturnValue({
       ...pendingDepositsQueryResult([pendingOnChainReceive]),
-      loading: true,
+      refetch: jest.fn().mockReturnValue(
+        new Promise<CheckAnswer>((resolve) => {
+          answerCheck = resolve
+        }),
+      ),
     })
     renderScreen()
+    await flushEffects()
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isChecking: false }),
+    )
+
+    fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
     await flushEffects()
 
     expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
       expect.objectContaining({ isChecking: true }),
     )
     expect(mockMigrationStart).not.toHaveBeenCalled()
+
+    await act(async () => {
+      answerCheck({ data: pendingDepositsQueryResult([pendingOnChainReceive]).data })
+    })
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isChecking: false }),
+    )
   })
 
   it("asks for the dollar balance to be emptied before showing the pending deposit", async () => {

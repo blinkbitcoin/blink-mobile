@@ -1,12 +1,11 @@
 import React from "react"
-import { act, fireEvent, render, screen } from "@testing-library/react-native"
+import { fireEvent, render, screen } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { MigrationTransferringFundsScreen } from "@app/screens/account-migration/to-non-custodial/migration-transferring-funds-screen"
 import {
   MigrationCompletion,
   MigrationSupportReason,
-  PendingDepositCheck,
   PendingDepositCheckStatus,
 } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
@@ -84,6 +83,7 @@ const mockRetry = jest.fn()
 
 const mockUseCustodialPendingDeposits = jest.fn()
 const mockCheckDeposits = jest.fn()
+let mockIsDepositRecheckRunning = false
 jest.mock("@app/screens/account-migration/hooks/use-custodial-pending-deposits", () => ({
   useCustodialPendingDeposits: (options: { skip?: boolean }) => {
     mockUseCustodialPendingDeposits(options)
@@ -92,7 +92,9 @@ jest.mock("@app/screens/account-migration/hooks/use-custodial-pending-deposits",
       loading: false,
       isReady: true,
       hasError: false,
-      check: mockCheckDeposits,
+      check: jest.fn(),
+      recheck: mockCheckDeposits,
+      isRecheckRunning: mockIsDepositRecheckRunning,
     }
   },
 }))
@@ -162,6 +164,7 @@ describe("MigrationTransferringFundsScreen", () => {
     mockIsClockOutOfSync = false
     mockHasConnectionIssue = false
     mockIsDepositPending = false
+    mockIsDepositRecheckRunning = false
     mockIsFocused = true
     mockCheckDeposits.mockResolvedValue({ status: PendingDepositCheckStatus.Clear })
     mockCompleteMigration.mockResolvedValue(MigrationCompletion.Completed)
@@ -217,13 +220,7 @@ describe("MigrationTransferringFundsScreen", () => {
       expect(mockRetry).toHaveBeenCalledTimes(1)
     })
 
-    it("shows the check running on OK only while the check OK started is out", async () => {
-      let answerCheck: (value: PendingDepositCheck) => void = () => undefined
-      mockCheckDeposits.mockReturnValue(
-        new Promise<PendingDepositCheck>((resolve) => {
-          answerCheck = resolve
-        }),
-      )
+    it("shows the recheck OK started running on the modal", async () => {
       renderScreen()
       await flushEffects()
 
@@ -231,19 +228,12 @@ describe("MigrationTransferringFundsScreen", () => {
         expect.objectContaining({ isChecking: false }),
       )
 
-      fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+      mockIsDepositRecheckRunning = true
+      renderScreen()
       await flushEffects()
 
       expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
         expect.objectContaining({ isChecking: true }),
-      )
-
-      await act(async () => {
-        answerCheck({ status: PendingDepositCheckStatus.Pending })
-      })
-
-      expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
-        expect.objectContaining({ isChecking: false }),
       )
     })
 

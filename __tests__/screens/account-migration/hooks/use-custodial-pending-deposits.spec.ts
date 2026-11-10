@@ -211,6 +211,86 @@ describe("useCustodialPendingDeposits", () => {
     )
   })
 
+  describe("recheck", () => {
+    type CheckAnswer = { data: ReturnType<typeof pendingDepositsQueryResult>["data"] }
+    const deferredAnswers = () => {
+      const answers: Array<(answer: CheckAnswer) => void> = []
+      const refetch = jest.fn().mockImplementation(
+        () =>
+          new Promise<CheckAnswer>((resolve) => {
+            answers.push(resolve)
+          }),
+      )
+      return { refetch, answers }
+    }
+
+    it("runs the check and shows it running until it answers", async () => {
+      const { refetch, answers } = deferredAnswers()
+      mockUseMigrationPendingDepositsQuery.mockReturnValue({
+        ...pendingDepositsQueryResult(),
+        refetch,
+      })
+      const { result } = renderHook(() => useCustodialPendingDeposits())
+      expect(result.current.isRecheckRunning).toBe(false)
+
+      let depositCheck: Promise<PendingDepositCheck> | undefined
+      act(() => {
+        depositCheck = result.current.recheck()
+      })
+      expect(result.current.isRecheckRunning).toBe(true)
+
+      await act(async () => {
+        answers[0]({ data: pendingDepositsQueryResult([pendingOnChainReceive]).data })
+      })
+
+      expect(result.current.isRecheckRunning).toBe(false)
+      expect(await depositCheck).toEqual({ status: PendingDepositCheckStatus.Pending })
+    })
+
+    it("keeps showing it running until a second tap's check has answered too", async () => {
+      const { refetch, answers } = deferredAnswers()
+      mockUseMigrationPendingDepositsQuery.mockReturnValue({
+        ...pendingDepositsQueryResult(),
+        refetch,
+      })
+      const { result } = renderHook(() => useCustodialPendingDeposits())
+
+      act(() => {
+        result.current.recheck()
+        result.current.recheck()
+      })
+      await act(async () => {
+        answers[0]({ data: pendingDepositsQueryResult().data })
+      })
+
+      expect(result.current.isRecheckRunning).toBe(true)
+
+      await act(async () => {
+        answers[1]({ data: pendingDepositsQueryResult().data })
+      })
+
+      expect(result.current.isRecheckRunning).toBe(false)
+    })
+
+    it("leaves the spinner off for a check the user did not start", async () => {
+      const { refetch, answers } = deferredAnswers()
+      mockUseMigrationPendingDepositsQuery.mockReturnValue({
+        ...pendingDepositsQueryResult(),
+        refetch,
+      })
+      const { result } = renderHook(() => useCustodialPendingDeposits())
+
+      act(() => {
+        result.current.check()
+      })
+
+      expect(result.current.isRecheckRunning).toBe(false)
+      await act(async () => {
+        answers[0]({ data: pendingDepositsQueryResult().data })
+      })
+    })
+  })
+
   describe("check", () => {
     const checkWith = async (refetch: jest.Mock) => {
       mockUseMigrationPendingDepositsQuery.mockReturnValue({

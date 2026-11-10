@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import { gql } from "@apollo/client"
 
 import {
@@ -67,6 +67,9 @@ type UseCustodialPendingDeposits = {
   isReady: boolean
   hasError: boolean
   check: () => Promise<PendingDepositCheck>
+  /** The same check, started by the user: its spinner is `isRecheckRunning`. */
+  recheck: () => Promise<PendingDepositCheck>
+  isRecheckRunning: boolean
 }
 
 /**
@@ -122,11 +125,25 @@ export const useCustodialPendingDeposits = ({
     }
   }, [refetch])
 
+  /** A check the user started (an OK, an Approve), apart from the ones the same query runs
+   *  on its own (a mount, a focus, a retry), so a spinner shown for it only ever answers a
+   *  tap. Counted, so a second tap while the first check is out keeps it on until both
+   *  have answered. */
+  const [rechecksRunning, setRechecksRunning] = useState(0)
+  const recheck = useCallback(async (): Promise<PendingDepositCheck> => {
+    setRechecksRunning((running) => running + 1)
+    const answer = await check()
+    setRechecksRunning((running) => running - 1)
+    return answer
+  }, [check])
+
   return {
     hasPendingDeposit: hasPendingOnChainReceive(pendingTransactions),
     loading,
     isReady: !error && pendingTransactions !== undefined,
     hasError: Boolean(error),
     check,
+    recheck,
+    isRecheckRunning: rechecksRunning > 0,
   }
 }

@@ -214,10 +214,11 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    */
   const {
     hasPendingDeposit,
-    loading: isPendingDepositCheckRunning,
     isReady: isPendingDepositCheckReady,
     hasError: hasPendingDepositCheckError,
     check: checkPendingDeposits,
+    recheck: recheckPendingDeposits,
+    isRecheckRunning: isPendingDepositRecheckRunning,
   } = useCustodialPendingDeposits()
   const isPendingDepositBlocking = hasPendingDeposit || !isPendingDepositCheckReady
 
@@ -535,22 +536,17 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   /** Read when the check before Approve answers: the screen may have lost focus, or a
    *  guard may have turned Approve off, while the check was out. */
   const canStillApproveRef = useRef(false)
-  /** Approve's own check, apart from the other fetches of the same query (the mount, the
-   *  modal's OK, the retry), so its spinner only ever answers the user's tap. */
-  const [isApproveChecking, setIsApproveChecking] = useState(false)
 
   /** Asked once more right before the drain, so a deposit sent while the user read the
    *  figures is caught here rather than after the balance has moved: a deposit brings the
    *  modal back and a failed check brings the retry, both through the hook's own state. */
   const handleApprove = useCallback(async () => {
-    setIsApproveChecking(true)
-    const depositCheck = await checkPendingDeposits()
-    setIsApproveChecking(false)
+    const depositCheck = await recheckPendingDeposits()
     const isClear = depositCheck.status === PendingDepositCheckStatus.Clear
     const canStillApprove = isClear && canStillApproveRef.current
     if (!canStillApprove) return
     navigation.navigate("accountMigrationTransferringFunds")
-  }, [checkPendingDeposits, navigation])
+  }, [recheckPendingDeposits, navigation])
 
   /** Either source losing the network earns the same retry, and it refreshes both:
    *  figures without a started migration are as useless as the reverse. */
@@ -607,11 +603,11 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  is only refused again, and a start this screen's own check held goes out by itself
    *  once that check is clear. */
   const acknowledgePendingDeposit = useCallback(async () => {
-    const depositCheck = await checkPendingDeposits()
+    const depositCheck = await recheckPendingDeposits()
     const isClear = depositCheck.status === PendingDepositCheckStatus.Clear
     const shouldAskServerAgain = isClear && migrationStart.isDepositPending
     if (shouldAskServerAgain) retryMigrationStart()
-  }, [checkPendingDeposits, migrationStart.isDepositPending, retryMigrationStart])
+  }, [recheckPendingDeposits, migrationStart.isDepositPending, retryMigrationStart])
 
   /** The owner and the checkpoint join the shared retry because the re-point cannot fire
    *  without the ids they carry: refreshing everything else around a lookup that failed
@@ -731,7 +727,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
             <GaloyPrimaryButton
               title={LLOverview.approveCta()}
               onPress={handleApprove}
-              loading={isApproveChecking}
+              loading={isPendingDepositRecheckRunning}
               disabled={isApproveDisabled}
               {...testProps("migration-balances-overview-approve")}
             />
@@ -756,7 +752,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
           isVisible={isFocused}
           onAcknowledge={acknowledgePendingDeposit}
           showCloseIconButton={false}
-          isChecking={isPendingDepositCheckRunning}
+          isChecking={isPendingDepositRecheckRunning}
           onContactSupport={openSupport}
         />
       ) : null}
