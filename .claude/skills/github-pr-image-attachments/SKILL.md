@@ -25,9 +25,9 @@ them out.
 ## Ask First
 
 Pushing a branch to an org repo is outward-facing. Ask before the first push
-to any org, and record the approval here as a dated fact — approval for one
-org never extends to another. Recorded approvals: blinkbitcoin repos,
-2026-07-24.
+to any org, and keep the approval as a dated fact in your own notes, not in
+this shared file — approval for one org never extends to another, and one
+person's approval is not a teammate's.
 
 ## Procedure
 

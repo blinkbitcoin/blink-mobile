@@ -78,6 +78,22 @@ else
   TOTAL_PASS=$((TOTAL_PASS + 1)); printf '  \033[32mPASS\033[0m no pipeline targets: SKILL.md is the one doing-interface\n'
 fi
 
+# --- App-agnostic ------------------------------------------------------------
+# The shared skills must read the same in any React Native repo. App names,
+# org names and app-history anecdotes belong in the repo's own AGENTS.md or
+# in an explicitly app-specific skill (blink-staging-session), never in the
+# generic ones. One assertion; the offending lines are printed on failure.
+printf '\n\033[1m=== App-agnostic ===\033[0m\n'
+RESIDUE=$(grep -rniE 'blink|galoy|geetest|bitcoinbeach|breez' "$HERE" \
+  --exclude-dir=blink-staging-session --exclude=run-all-tests.sh 2>/dev/null \
+  | grep -v 'blink-staging-session' | grep -v 'BLINK_' || true)
+if [ -z "$RESIDUE" ]; then
+  TOTAL_PASS=$((TOTAL_PASS + 1)); printf '  \033[32mPASS\033[0m generic skills carry no app- or org-specific names\n'
+else
+  TOTAL_FAIL=$((TOTAL_FAIL + 1)); printf '  \033[31mFAIL\033[0m generic skills carry app- or org-specific names:\n'
+  printf '%s\n' "$RESIDUE" | sed "s|^$HERE/|       |"
+fi
+
 echo
 echo "====================================="
 printf '%d suites, %d assertions passed, %d failed\n' "$SUITES" "$TOTAL_PASS" "$TOTAL_FAIL"
