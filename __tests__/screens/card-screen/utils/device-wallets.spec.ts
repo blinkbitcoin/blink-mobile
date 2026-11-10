@@ -37,7 +37,7 @@ const fakeSdk = () => {
     googlePay: {
       isWalletAvailable: jest.fn().mockResolvedValue(true),
       checkWalletForCardSuffix: jest.fn().mockResolvedValue([]),
-      pushCard: jest.fn().mockResolvedValue({ tokenId: "token-1" }),
+      push: jest.fn().mockResolvedValue({ tokenId: "token-1" }),
     },
     cardWithSecret: jest.fn().mockReturnValue(cardData),
   }
@@ -226,7 +226,7 @@ describe("deviceWalletFor on Android", () => {
       WalletAddResult.Added,
     )
     expect(sdk.cardWithSecret).toHaveBeenCalledWith("card-1", "secret-1")
-    expect(sdk.googlePay.pushCard).toHaveBeenCalledWith(cardData, "Blink Visa •• 4242", {
+    expect(sdk.googlePay.push).toHaveBeenCalledWith(cardData, "Blink Visa •• 4242", {
       name: "Satoshi Nakamoto",
       address1: "1 Main St",
       address2: "Apt 2",
@@ -241,7 +241,7 @@ describe("deviceWalletFor on Android", () => {
   it("fails when Google Pay refuses the card", async () => {
     const sdk = fakeSdk()
     const refused = new Error("PUSH_PROVISIONING_FAILED")
-    sdk.googlePay.pushCard.mockRejectedValue(refused)
+    sdk.googlePay.push.mockRejectedValue(refused)
 
     await expect(deviceWalletFor(sdk).add(card, provisioning)).rejects.toBe(refused)
   })

@@ -55,7 +55,7 @@ const googleWallet = (sdk: MeaWalletSdk): DeviceWallet => ({
     return tokens.length === 0
   },
   add: async (card, data) => {
-    await sdk.googlePay.pushCard(
+    await sdk.googlePay.push(
       sdk.cardWithSecret(card.cardId, data.cardSecret),
       data.displayName,
       toGooglePayAddress(data.address),

@@ -60,7 +60,7 @@ const fakeSdk = () => {
     googlePay: {
       isWalletAvailable: jest.fn(),
       checkWalletForCardSuffix: jest.fn(),
-      pushCard: jest.fn(),
+      push: jest.fn(),
     },
     cardWithSecret: jest.fn().mockReturnValue({ type: "SECRET" }),
   }

@@ -29,7 +29,7 @@ type GooglePayModule = {
   isWalletAvailable: () => Promise<boolean>
   /** The tokens Google Wallet holds for the card; the app only counts them. */
   checkWalletForCardSuffix: (suffix: string) => Promise<readonly object[]>
-  pushCard: (
+  push: (
     card: MppCardData,
     displayName: string,
     address: GooglePayAddress,
