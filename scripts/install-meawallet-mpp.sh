@@ -12,7 +12,8 @@
 # Credentials: MEA_RN_USER and MEA_RN_PASSWORD, or the same two keys in
 # $MEA_CONFIG_DIR/meawallet-rn.env. Configuration: the mea_config file Rain shared, from
 # $MEA_CONFIG_FILE or $MEA_CONFIG_DIR/mea_config. MEA_CONFIG_DIR defaults to
-# ~/.config/blink. No credential is ever printed.
+# ~/.config/blink. MEA_REQUIRED=1 turns an install that leaves the SDK out into a failure.
+# No credential is ever printed.
 #
 # Each run converges on what this machine has now. The SDK and its configuration are
 # installed together or not at all: an SDK without its configuration fails to start, and
@@ -87,8 +88,16 @@ remove_sdk_and_config() {
   rm -f "$ANDROID_CONFIG" "$IOS_CONFIG"
 }
 
+# Without MEA_REQUIRED a machine that cannot install the SDK goes without it, so a
+# contributor offline, or CI during a MeaWallet outage, still gets a working yarn install
+# and the pod install chained after it. A release job sets MEA_REQUIRED=1 to fail instead
+# of shipping a build without the wallet.
 go_without() {
   remove_sdk_and_config
+  if [ "${MEA_REQUIRED:-}" = "1" ]; then
+    log "$1, and MEA_REQUIRED is set"
+    exit 1
+  fi
   log "$1, the build goes without the push provisioning SDK"
   exit 0
 }
@@ -116,16 +125,12 @@ install_package() {
   password=$(curl_config_quote "$MEA_RN_PASSWORD")
   if ! printf 'user = "%s:%s"\n' "$user" "$password" |
     curl -K - -sSf -o "$work/package.tgz" "$MPP_TARBALL"; then
-    remove_sdk_and_config
-    log "could not download @meawallet/react-native-mpp $MPP_VERSION"
-    return 1
+    go_without "could not download @meawallet/react-native-mpp $MPP_VERSION"
   fi
 
   integrity=$(openssl dgst -sha512 -binary "$work/package.tgz" | openssl base64 -A)
   if [ "$integrity" != "$MPP_INTEGRITY" ]; then
-    remove_sdk_and_config
-    log "integrity mismatch for @meawallet/react-native-mpp $MPP_VERSION, not installing it"
-    return 1
+    go_without "integrity mismatch for @meawallet/react-native-mpp $MPP_VERSION"
   fi
 
   # Extracted beside its destination so the swap is a rename, and marked last, so an

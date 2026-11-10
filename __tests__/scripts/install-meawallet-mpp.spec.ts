@@ -350,13 +350,15 @@ describe("install-meawallet-mpp.sh installing", () => {
     expect(downloads()).toBe(1)
   })
 
-  it("fails without vendoring anything when the download fails", () => {
+  /** A contributor offline, or CI during a MeaWallet outage, still gets a working yarn
+   *  install, and the pod install chained after it. */
+  it("goes without the SDK, and lets yarn install go on, when the download fails", () => {
     giveCredentials()
     giveConfig()
 
     const { status, output } = install({ downloadFails: true })
 
-    expect(status).toBe(1)
+    expect(status).toBe(0)
     expect(output).toContain("could not download")
     expect(existsSync(vendorDir())).toBe(false)
   })
@@ -367,7 +369,7 @@ describe("install-meawallet-mpp.sh installing", () => {
 
     const { status, output } = install({ checksumMatches: false })
 
-    expect(status).toBe(1)
+    expect(status).toBe(0)
     expect(output).toContain("integrity mismatch")
     expect(existsSync(vendorDir())).toBe(false)
   })
@@ -422,7 +424,7 @@ describe("install-meawallet-mpp.sh on a machine that was provisioned before", ()
 
     const { status } = install(failure)
 
-    expect(status).toBe(1)
+    expect(status).toBe(0)
     expect(existsSync(vendorDir())).toBe(false)
     expect(existsSync(androidConfig())).toBe(false)
     expect(existsSync(iosConfig())).toBe(false)
@@ -472,7 +474,7 @@ describe("install-meawallet-mpp.sh trusting a vendored copy", () => {
 
     const { status } = install({ checksumMatches: false })
 
-    expect(status).toBe(1)
+    expect(status).toBe(0)
     expect(existsSync(vendorDir())).toBe(false)
   })
 
@@ -481,7 +483,7 @@ describe("install-meawallet-mpp.sh trusting a vendored copy", () => {
 
     const { status } = install({ downloadFails: true })
 
-    expect(status).toBe(1)
+    expect(status).toBe(0)
     expect(existsSync(vendorDir())).toBe(false)
   })
 
@@ -489,6 +491,39 @@ describe("install-meawallet-mpp.sh trusting a vendored copy", () => {
     install()
 
     expect(readdirSync(dirname(vendorDir()))).toEqual(["react-native-mpp"])
+  })
+})
+
+/** A release job sets MEA_REQUIRED=1, so an install that leaves the SDK out fails it
+ *  rather than shipping a build without the wallet. */
+describe("install-meawallet-mpp.sh with MEA_REQUIRED", () => {
+  const required = { MEA_REQUIRED: "1" }
+
+  it.each<[string, () => void, InstallOptions]>([
+    ["the download fails", () => undefined, { downloadFails: true }],
+    ["the archive fails its checksum", () => undefined, { checksumMatches: false }],
+    ["the credentials are missing", revokeCredentials, {}],
+    ["the configuration is missing", withdrawConfig, {}],
+  ])("fails the install when %s", (_, takeAway, failure) => {
+    giveCredentials()
+    giveConfig()
+    takeAway()
+
+    const { status, output } = install({ ...failure, env: required })
+
+    expect(status).toBe(1)
+    expect(output).toContain("MEA_REQUIRED")
+    expect(existsSync(vendorDir())).toBe(false)
+  })
+
+  it("installs as usual when nothing is missing", () => {
+    giveCredentials()
+    giveConfig()
+
+    const { status } = install({ env: required })
+
+    expect(status).toBe(0)
+    expect(vendoredVersion()).toBe(pinned("MPP_VERSION"))
   })
 })
 
