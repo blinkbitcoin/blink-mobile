@@ -48,7 +48,7 @@ With access, put the credentials and the configuration file Rain shared in `~/.c
 - `meawallet-rn.env`, with `MEA_RN_USER` and `MEA_RN_PASSWORD` for the React Native package
 - `mea_config`, the SDK configuration
 
-Then run `yarn install` (or `yarn meawallet:install` on its own). It vendors the SDK to `vendor/meawallet/` and copies `mea_config` into the Android and iOS projects. None of those files are tracked by git. CI can pass `MEA_RN_USER`, `MEA_RN_PASSWORD` and `MEA_CONFIG_FILE` as environment variables instead.
+Then run `yarn install` (or `yarn meawallet:install` on its own). It vendors the SDK to `vendor/meawallet/` and copies `mea_config` into the Android and iOS projects. None of those files are tracked by git. Once the credentials are gone the next install removes the vendored SDK, and once `mea_config` is gone it removes both copies. CI can pass `MEA_RN_USER`, `MEA_RN_PASSWORD` and `MEA_CONFIG_FILE` as environment variables instead.
 
 ### Android Development
 

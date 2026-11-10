@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Installs the MeaWallet push provisioning SDK (@meawallet/react-native-mpp) and its
-# configuration where this machine has access to them, and skips them everywhere else.
+# configuration where this machine has access to them, and removes them everywhere else.
 #
 # The package lives in MeaWallet's private registry, so it is kept out of package.json:
 # an install without access would fail for every contributor and CI job. Here it is
@@ -13,6 +13,10 @@
 # $MEA_CONFIG_DIR/meawallet-rn.env. Configuration: the mea_config file Rain shared, from
 # $MEA_CONFIG_FILE or $MEA_CONFIG_DIR/mea_config. MEA_CONFIG_DIR defaults to
 # ~/.config/blink. No credential is ever printed.
+#
+# Each run converges on what this machine has now: without the credentials the vendored
+# SDK is removed, and without the configuration both of its copies are, so access that
+# was revoked or a configuration that was withdrawn never lingers in a build.
 
 set -eu
 
@@ -39,7 +43,8 @@ vendored_version() {
 
 install_config() {
   if [ ! -s "$CONFIG_FILE" ]; then
-    log "no mea_config found, the SDK stays without configuration"
+    rm -f "$ANDROID_CONFIG" "$IOS_CONFIG"
+    log "no mea_config found, the build goes without it"
     return 0
   fi
   mkdir -p "$(dirname "$ANDROID_CONFIG")" "$(dirname "$IOS_CONFIG")"
@@ -49,17 +54,18 @@ install_config() {
 }
 
 install_package() {
-  if [ "$(vendored_version)" = "$MPP_VERSION" ]; then
-    log "@meawallet/react-native-mpp $MPP_VERSION already vendored"
-    return 0
-  fi
-
   if [ -z "${MEA_RN_USER:-}" ] && [ -f "$CONFIG_DIR/meawallet-rn.env" ]; then
     # shellcheck disable=SC1091
     . "$CONFIG_DIR/meawallet-rn.env"
   fi
   if [ -z "${MEA_RN_USER:-}" ] || [ -z "${MEA_RN_PASSWORD:-}" ]; then
-    log "no MeaWallet credentials, skipping the push provisioning SDK"
+    rm -rf "$VENDOR_DIR"
+    log "no MeaWallet credentials, the build goes without the push provisioning SDK"
+    return 0
+  fi
+
+  if [ "$(vendored_version)" = "$MPP_VERSION" ]; then
+    log "@meawallet/react-native-mpp $MPP_VERSION already vendored"
     return 0
   fi
 
