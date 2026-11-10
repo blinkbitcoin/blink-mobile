@@ -18,25 +18,24 @@ export type GooglePayAddress = {
 /** What Apple Pay answers to start adding a card, handed back to show its sheet. */
 type AppleOemTokenization = { readonly tokenizationReceipt: string }
 
+/** Written as methods, as the SDK declares them: what the app passes back is data the SDK
+ *  itself made, so its parameters are matched either way rather than only one. */
 type ApplePayModule = {
-  canAddPaymentPass: () => Promise<boolean>
-  canAddPaymentPassWithPrimaryAccountNumberSuffix: (suffix: string) => Promise<boolean>
-  initializeOemTokenization: (card: MppCardData) => Promise<AppleOemTokenization>
-  showAddPaymentPassView: (tokenization: AppleOemTokenization) => Promise<string>
+  canAddPaymentPass(): Promise<boolean>
+  canAddPaymentPassWithPrimaryAccountNumberSuffix(suffix: string): Promise<boolean>
+  initializeOemTokenization(card: MppCardData): Promise<AppleOemTokenization>
+  showAddPaymentPassView(tokenization: AppleOemTokenization): Promise<string>
 }
 
 /** A token Google Wallet holds for a card; the app reads only its state. */
 type GoogleWalletToken = { readonly tokenState: string }
 
 type GooglePayModule = {
-  isWalletAvailable: () => Promise<boolean>
+  isWalletAvailable(): Promise<boolean>
   /** The tokens Google Wallet holds for cards ending in these digits. */
-  checkWalletForCardSuffix: (suffix: string) => Promise<readonly GoogleWalletToken[]>
-  push: (
-    card: MppCardData,
-    displayName: string,
-    address: GooglePayAddress,
-  ) => Promise<object>
+  checkWalletForCardSuffix(suffix: string): Promise<readonly GoogleWalletToken[]>
+  /** Answers what it pushed, which the app does not read. */
+  push(card: MppCardData, displayName: string, address: GooglePayAddress): Promise<object>
 }
 
 export type MeaWalletSdk = {
@@ -48,16 +47,17 @@ export type MeaWalletSdk = {
 /**
  * The slice of `@meawallet/react-native-mpp` the app uses. The package comes from
  * MeaWallet's private registry, so scripts/install-meawallet-mpp.sh vendors it only on
- * machines with access and TypeScript never sees its own types.
+ * machines with access and the app build never sees its own types; where it is vendored,
+ * scripts/meawallet-mpp-contract.ts checks this slice against them.
  */
-type MppPackage = {
+export type MppPackage = {
   default: {
-    initialize: () => Promise<void>
+    initialize(): Promise<void>
     ApplePay: ApplePayModule
     GooglePay: GooglePayModule
   }
   MppCardDataParameters: {
-    withCardSecret: (cardId: string, cardSecret: string) => MppCardData
+    withCardSecret(cardId: string, cardSecret: string): MppCardData
   }
 }
 
