@@ -1128,7 +1128,7 @@ echo "documented behavior matches the scripts"
 
 SKILL_MD="$TESTS_DIR/../SKILL.md"
 check "SKILL.md pre-approves this skill's commands (allowed-tools)" "yes" \
-  "$(head -5 "$SKILL_MD" | grep "allowed-tools:" | grep -q -- "Bash(xcrun simctl \*)" && head -5 "$SKILL_MD" | grep "allowed-tools:" | grep -q -- "Bash(maestro \*)" && echo yes || echo no)"
+  "$(head -5 "$SKILL_MD" | grep "allowed-tools:" | grep -q -- "Bash(xcrun simctl io \*)" && head -5 "$SKILL_MD" | grep "allowed-tools:" | grep -q -- "Bash(maestro \*)" && echo yes || echo no)"
 check "SKILL.md documents the reload flip" "yes" \
   "$(grep -q "reload-app.sh" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md documents the golden bless workflow" "yes" \
@@ -1148,9 +1148,22 @@ try:
     allow = json.load(open(sys.argv[1]))["permissions"]["allow"]
 except Exception:
     print("no"); sys.exit()
-need = ["Bash(xcrun simctl *)", "Bash(maestro *)", "Bash(ffmpeg *)"]
+need = ["Bash(xcrun simctl io *)", "Bash(xcrun simctl launch *)", "Bash(maestro *)", "Bash(ffmpeg *)"]
 print("yes" if all(n in allow for n in need) and any(".claude/skills" in a for a in allow) else "no")
 ' "$SETTINGS" 2>/dev/null)"
+# The guarded, device-wide verbs must still prompt when run raw: a blanket
+# grant would let `simctl erase all` wipe the user's simulators unasked.
+check "no allowlist pre-approves destructive simctl verbs" "none" \
+  "$(python3 -c '
+import glob, json, os, re, sys
+root = sys.argv[1]
+grants = json.load(open(os.path.join(root, "settings.json")))["permissions"]["allow"]
+for md in glob.glob(os.path.join(root, "skills", "*", "SKILL.md")):
+    head = open(md).read().split("\n")[:5]
+    grants += [g + ")" for line in head if line.startswith("allowed-tools:") for g in line.split(")") if g.strip()]
+bad = [g.strip() for g in grants if re.match(r"Bash\(xcrun simctl (\*|erase|delete|shutdown|boot |create|clone|rename|uninstall)", g.strip())]
+print(" ".join(sorted(set(bad))) or "none")
+' "$TESTS_DIR/../../.." 2>&1)"
 check "SKILL.md documents telemetry and the spans report" "yes" \
   "$(grep -q "spans-report.sh" "$SKILL_MD" && grep -q "DEMO_TELEMETRY=0" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md documents the credential precheck" "yes" \

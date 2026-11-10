@@ -29,14 +29,18 @@ instructions (e.g. `AGENTS.md`).
 ## Permissions: allowed by default, guarded by the scripts
 
 Autonomous sessions die on permission prompts, so the repo pre-approves the
-skills' commands in two layers: `.claude/settings.json` allowlists
-`xcrun simctl`, `maestro`, `ffmpeg`/`ffprobe`/`magick`, the RN CLI, and the
-skill scripts for every session in a trusted checkout, and each `SKILL.md`
+skills' commands in two layers: `.claude/settings.json` allowlists the
+non-destructive `xcrun simctl` verbs (`list`, `io`, `launch`, `install`, …),
+`maestro`, `ffmpeg`/`ffprobe`/`magick`, the RN CLI, and the skill scripts for
+every session in a trusted checkout, and each `SKILL.md`
 carries the same grants as `allowed-tools` frontmatter (turn-scoped, works
 even where project settings don't apply). This is safe because the safety
 here was never the prompt: it is the tested scripts — udid scoping,
 ownership gates, the collateral-damage assertion — and the suites that
-mutation-check them. Note: non-interactive runs in an *untrusted* checkout
+mutation-check them. The device-wide verbs those scripts guard (`erase`,
+`delete`, `shutdown`, `boot`, `create`, `clone`, `rename`, `uninstall`) are
+deliberately *not* pre-approved: run raw, they skip every guard, so they
+still prompt — go through the scripts instead. Note: non-interactive runs in an *untrusted* checkout
 ignore project settings by design; trust the workspace once and the
 allowlist applies.
 

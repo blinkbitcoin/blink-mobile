@@ -1,7 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xcrun simctl *)",
+      "Bash(xcrun simctl list)",
+      "Bash(xcrun simctl list *)",
+      "Bash(xcrun simctl io *)",
+      "Bash(xcrun simctl launch *)",
+      "Bash(xcrun simctl terminate *)",
+      "Bash(xcrun simctl install *)",
+      "Bash(xcrun simctl openurl *)",
+      "Bash(xcrun simctl spawn *)",
+      "Bash(xcrun simctl ui *)",
+      "Bash(xcrun simctl status_bar *)",
+      "Bash(xcrun simctl get_app_container *)",
+      "Bash(xcrun simctl bootstatus *)",
+      "Bash(xcrun simctl privacy *)",
+      "Bash(xcrun simctl addmedia *)",
       "Bash(maestro *)",
       "Bash(ffmpeg *)",
       "Bash(ffprobe *)",
