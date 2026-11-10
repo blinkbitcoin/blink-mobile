@@ -3247,7 +3247,10 @@
       "noLimit": "Mana limitayuq",
       "limitUpdateSuccess": "Limite allinlla musuqyachisqa",
       "limitUpdateError": "Mana atikurqanchu limite musuqyachiyta",
-      "limitMustBePositive": "Limite nisqaqa cero nisqamanta hatunraq kanan"
+      "limitMustBePositive": "Limite nisqaqa cero nisqamanta hatunraq kanan",
+      "atmToggleError": "Mana atikurqanchu ATM hurquykunata musuqyachiyta",
+      "atmControlsLoadError": "Mana atikurqanchu ATM limitekunata apamuyta",
+      "invalidLimitAmount": "Allin qullqita qillqay, 2 decimalkama"
     },
     "CardFeeSchedule": {
       "title": "Blink tarjeta pagana lista",

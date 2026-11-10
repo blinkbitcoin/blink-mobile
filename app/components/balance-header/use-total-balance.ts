@@ -1,4 +1,10 @@
-import { WalletBalance, getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
+import {
+  AccountBalance,
+  getBtcWallet,
+  getCardAccount,
+  getUsdWallet,
+  getWallets,
+} from "@app/graphql/wallets-utils"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { usePriceConversion } from "@app/hooks"
@@ -11,7 +17,7 @@ import {
 } from "@app/types/amounts"
 
 export const useTotalBalance = (
-  wallets?: readonly WalletBalance[],
+  accounts?: readonly AccountBalance[],
 ): {
   formattedBalance: string
   numericBalance: number
@@ -24,8 +30,10 @@ export const useTotalBalance = (
   // TODO: check that there are 2 wallets.
   // otherwise fail (account with more/less 2 wallets will not be working with the current mobile app)
   // some tests accounts have only 1 wallet
+  const wallets = getWallets(accounts)
   const btcWallet = getBtcWallet(wallets)
   const usdWallet = getUsdWallet(wallets)
+  const cardAccount = getCardAccount(accounts)
 
   const btcAmount = convertMoneyAmount?.(
     toBtcMoneyAmount(btcWallet?.balance),
@@ -38,6 +46,11 @@ export const useTotalBalance = (
     toUsdMoneyAmount(usdWallet?.balance),
     DisplayCurrency,
   )
+  const cardSats = cardAccount?.balance
+  const cardAmount =
+    cardSats === undefined
+      ? undefined
+      : convertMoneyAmount?.(toBtcMoneyAmount(cardSats), DisplayCurrency)
 
   /** The price conversion is the only thing this loader waits on. Callers hand this one flag
    *  to the whole header, so folding the region in blanked the username, the total and the
@@ -54,11 +67,11 @@ export const useTotalBalance = (
    * known to have finished empty.
    *
    * A held USD balance cannot be added to it without the very rate that is missing, so
-   * the sats figure is the Bitcoin balance alone. Understating a total is safer than
-   * inventing a rate to complete it.
+   * the sats figure is the Bitcoin balance plus the card, which is held in sats too.
+   * Understating a total is safer than inventing a rate to complete it.
    */
   if (priceStatus === PriceStatus.Unavailable) {
-    const satsOnly = btcWallet?.balance ?? 0
+    const satsOnly = (btcWallet?.balance ?? 0) + (cardSats ?? 0)
     return {
       formattedBalance: formatMoneyAmount({ moneyAmount: toBtcMoneyAmount(satsOnly) }),
       numericBalance: satsOnly,
@@ -76,7 +89,10 @@ export const useTotalBalance = (
     }
   }
 
-  const totalDisplay = addMoneyAmounts({ a: usdAmount, b: btcAmount })
+  const walletTotal = addMoneyAmounts({ a: usdAmount, b: btcAmount })
+  const totalDisplay = cardAmount
+    ? addMoneyAmounts({ a: walletTotal, b: cardAmount })
+    : walletTotal
 
   const integerBalanceString = formatMoneyAmount({
     moneyAmount: totalDisplay,
@@ -87,8 +103,11 @@ export const useTotalBalance = (
   const numericBalance = Number(integerBalanceString)
 
   const totalBtc = convertMoneyAmount?.(totalDisplay, WalletCurrency.Btc)
+  /** The card is held in sats too, so a total with no dollar leg still needs no rate. */
   const satsBalance =
-    !usdWallet?.balance && btcWallet?.balance ? btcWallet?.balance : totalBtc?.amount || 0
+    !usdWallet?.balance && btcWallet?.balance
+      ? btcWallet.balance + (cardSats ?? 0)
+      : totalBtc?.amount || 0
 
   return {
     formattedBalance: formatMoneyAmount({ moneyAmount: totalDisplay }),

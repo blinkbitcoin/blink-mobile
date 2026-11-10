@@ -29,7 +29,8 @@ const MIGRATION_OPERATIONS = [
  *  it spent the only token that could. An authenticator's code check spends its
  *  registration: a resend after a lost answer is refused though the first turned it on.
  *  Removing the authenticator spends one of the hour's code checks on every try, as do
- *  the login method additions it guards. */
+ *  the login method additions it guards. A card limit removal that landed leaves nothing
+ *  for a resend to remove. */
 const IRREVERSIBLE_OPERATIONS = [
   ...MIGRATION_OPERATIONS,
   "accountDelete",
@@ -37,6 +38,7 @@ const IRREVERSIBLE_OPERATIONS = [
   "userTotpDelete",
   "userEmailRegistrationInitiate",
   "userPhoneRegistrationValidate",
+  "cardSpendingLimitRemove",
 ]
 
 /**

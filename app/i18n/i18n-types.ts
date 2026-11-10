@@ -11117,6 +11117,18 @@ type RootTranslation = {
 			 */
 			limitMustBePositive: string
 			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​u​p​d​a​t​e​ ​A​T​M​ ​w​i​t​h​d​r​a​w​a​l​s
+			 */
+			atmToggleError: string
+			/**
+			 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​y​o​u​r​ ​A​T​M​ ​l​i​m​i​t​s
+			 */
+			atmControlsLoadError: string
+			/**
+			 * E​n​t​e​r​ ​a​ ​v​a​l​i​d​ ​a​m​o​u​n​t​ ​w​i​t​h​ ​u​p​ ​t​o​ ​2​ ​d​e​c​i​m​a​l​s
+			 */
+			invalidLimitAmount: string
+			/**
 			 * T​r​a​n​s​a​c​t​i​o​n​ ​t​y​p​e​s
 			 */
 			transactionTypesTitle: string
@@ -25338,6 +25350,18 @@ export type TranslationFunctions = {
 			 * Limit must be greater than zero
 			 */
 			limitMustBePositive: () => LocalizedString
+			/**
+			 * Failed to update ATM withdrawals
+			 */
+			atmToggleError: () => LocalizedString
+			/**
+			 * Could not load your ATM limits
+			 */
+			atmControlsLoadError: () => LocalizedString
+			/**
+			 * Enter a valid amount with up to 2 decimals
+			 */
+			invalidLimitAmount: () => LocalizedString
 			/**
 			 * Transaction types
 			 */

@@ -3247,7 +3247,10 @@
       "noLimit": "Tewali kkomo",
       "limitUpdateSuccess": "Kkomo ekyusiddwa obulungi",
       "limitUpdateError": "Kkomo tesobodde kukyusibwa",
-      "limitMustBePositive": "Kkomo erina okusinga zeero"
+      "limitMustBePositive": "Kkomo erina okusinga zeero",
+      "atmToggleError": "Okuggya ku ATM tekusobodde kukyusibwa",
+      "atmControlsLoadError": "Ebikomo bya ATM tebisobodde kufunibwa",
+      "invalidLimitAmount": "Yingiza omuwendo omutuufu ogulina desimolo 2 zokka"
     },
     "CardFeeSchedule": {
       "title": "Enteekera y'ebisale bya kaadi ya Blink",

@@ -9,10 +9,11 @@ import WalletOverview from "@app/components/wallet-overview/wallet-overview"
 import { WalletCurrency } from "@app/graphql/generated"
 import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
-import { WalletBalance } from "@app/graphql/wallets-utils"
+import { AccountBalance, WalletBalance } from "@app/graphql/wallets-utils"
 import { GateReason } from "@app/types/account"
-import { ContextForScreen } from "../screens/helper"
-import { flushEffects } from "../helpers/flush-effects"
+import { CARD } from "@app/types/amounts"
+import { ContextForScreen } from "../../screens/helper"
+import { flushEffects } from "../../helpers/flush-effects"
 
 const mockNavigate = jest.fn()
 jest.mock("@react-navigation/native", () => {
@@ -56,11 +57,40 @@ jest.mock("@app/components/restricted-region", () => ({
 
 let mockIsAnonMode = false
 
+/** The card balance is a BTC amount like the bitcoin wallet's, so the formatter tells
+ *  them apart by amount for the card-row assertions. */
+const mockCardBalanceSats = 150_000
+
 const mockDisplayCurrency = jest.fn()
+const mockWalletOverviewQuery = jest.fn()
+let mockFallbackWallets: readonly WalletBalance[] | undefined
+jest.mock("@app/graphql/generated", () => {
+  const actual = jest.requireActual("@app/graphql/generated")
+  return {
+    ...actual,
+    useWalletOverviewScreenQuery: (options: { skip?: boolean }) => {
+      mockWalletOverviewQuery(options)
+      const result = actual.useWalletOverviewScreenQuery(options)
+      if (options.skip || !mockFallbackWallets) return result
+      return {
+        ...result,
+        data: { me: { defaultAccount: { wallets: mockFallbackWallets } } },
+      }
+    },
+  }
+})
+
 jest.mock("@app/hooks/use-display-currency", () => ({
   useDisplayCurrency: () => ({
-    formatMoneyAmount: ({ moneyAmount }: { moneyAmount: { currency: string } }) =>
-      moneyAmount.currency === "USD" ? "usd-underlying" : "btc-underlying",
+    formatMoneyAmount: ({
+      moneyAmount,
+    }: {
+      moneyAmount: { currency: string; amount: number }
+    }) => {
+      if (moneyAmount.currency === "USD") return "usd-underlying"
+      if (moneyAmount.amount === mockCardBalanceSats) return "card-underlying"
+      return "btc-underlying"
+    },
     displayCurrency: mockDisplayCurrency(),
     moneyAmountToDisplayCurrencyString: () => "display-amount",
   }),
@@ -71,39 +101,41 @@ const walletsFixture: readonly WalletBalance[] = [
   { id: "usd-id", walletCurrency: WalletCurrency.Usd, balance: 6942 },
 ]
 
+const cardAccount: AccountBalance = {
+  id: "card-id",
+  walletCurrency: CARD,
+  balance: mockCardBalanceSats,
+}
+
+const withCardFixture: readonly AccountBalance[] = [...walletsFixture, cardAccount]
+
 const mockSetStablesatModalVisible = jest.fn()
 
 type RenderOptions = {
   loading?: boolean
-  wallets?: readonly WalletBalance[]
+  accounts?: readonly AccountBalance[]
   hideAmount?: boolean
   toggleHideAmount?: () => void
   isAuthed?: boolean
   onGatedTap?: () => void
-  hasCard?: boolean
-  cardLastFour?: string | null
 }
 
 const overviewTree = ({
   loading = false,
-  wallets = walletsFixture,
+  accounts = walletsFixture,
   hideAmount = false,
   toggleHideAmount = jest.fn(),
   isAuthed = true,
   onGatedTap,
-  hasCard = false,
-  cardLastFour,
 }: RenderOptions = {}) => (
   <ContextForScreen>
     <IsAuthedContextProvider value={isAuthed}>
       <HideAmountContextProvider value={{ hideAmount, toggleHideAmount }}>
         <WalletOverview
           loading={loading}
-          wallets={wallets}
+          accounts={accounts}
           setIsStablesatModalVisible={mockSetStablesatModalVisible}
           onGatedTap={onGatedTap}
-          hasCard={hasCard}
-          cardLastFour={cardLastFour}
         />
       </HideAmountContextProvider>
     </IsAuthedContextProvider>
@@ -122,6 +154,12 @@ const balanceRowOf = (node: ReactTestInstance): ReactTestInstance => {
   return row
 }
 
+const nearestOpacity = (node: ReactTestInstance | null): number | undefined => {
+  if (!node) return undefined
+  const opacity = StyleSheet.flatten(node.props.style)?.opacity
+  return typeof opacity === "number" ? opacity : nearestOpacity(node.parent)
+}
+
 describe("WalletOverview", () => {
   beforeEach(() => {
     loadLocale("en")
@@ -133,44 +171,122 @@ describe("WalletOverview", () => {
     mockIsRestrictedRegion = false
     mockIsRestricted.mockReturnValue(false)
     mockDisplayCurrency.mockReturnValue("USD")
+    mockFallbackWallets = undefined
   })
 
   describe("Card row", () => {
-    it("shows the Card row with the masked last four when hasCard is true", async () => {
-      const { getByText } = renderOverview({ hasCard: true, cardLastFour: "4242" })
+    it("shows the Card row with its balance when the accounts include a card", async () => {
+      const { getByText } = renderOverview({ accounts: withCardFixture })
       await flushEffects()
 
       expect(getByText("Card")).toBeTruthy()
-      expect(getByText("•••• 4242")).toBeTruthy()
+      expect(getByText("card-underlying")).toBeTruthy()
     })
 
-    it("hides the Card row when hasCard is false", async () => {
-      const { queryByText } = renderOverview({ hasCard: false })
+    it("holds the card balance back while it is not known", async () => {
+      const unknownCard: AccountBalance = { ...cardAccount, balance: undefined }
+
+      const { getByText, queryByTestId } = renderOverview({
+        accounts: [...walletsFixture, unknownCard],
+      })
+      await flushEffects()
+
+      expect(getByText("Card")).toBeTruthy()
+      expect(queryByTestId("card-balance")).toBeNull()
+      expect(getByText("btc-underlying")).toBeTruthy()
+    })
+
+    it("still asks for the wallets when only the card is supplied", async () => {
+      mockFallbackWallets = walletsFixture
+
+      const { getByText, getByTestId } = renderOverview({ accounts: [cardAccount] })
+      await flushEffects()
+
+      expect(mockWalletOverviewQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ skip: false }),
+      )
+      expect(getByText("btc-underlying")).toBeTruthy()
+      expect(getByTestId("card-balance").props.children).toBe("card-underlying")
+    })
+
+    it("skips the wallet query when the wallets are supplied", async () => {
+      renderOverview({ accounts: withCardFixture })
+      await flushEffects()
+
+      expect(mockWalletOverviewQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ skip: true }),
+      )
+      expect(mockWalletOverviewQuery).not.toHaveBeenCalledWith(
+        expect.objectContaining({ skip: false }),
+      )
+    })
+
+    it("hides the Card row when the accounts have no card", async () => {
+      const { queryByText } = renderOverview()
       await flushEffects()
 
       expect(queryByText("Card")).toBeNull()
+      expect(queryByText("card-underlying")).toBeNull()
     })
 
-    it("hides the card last four when hide amount is enabled", async () => {
-      const { getByText, queryByText } = renderOverview({
-        hasCard: true,
-        cardLastFour: "4242",
+    it("masks the card balance when hide amount is enabled", async () => {
+      const { getByText, getAllByTestId, queryByText } = renderOverview({
+        accounts: withCardFixture,
         hideAmount: true,
       })
       await flushEffects()
 
       expect(getByText("Card")).toBeTruthy()
-      expect(queryByText("•••• 4242")).toBeNull()
-      expect(getByText("••••")).toBeTruthy()
+      expect(queryByText("card-underlying")).toBeNull()
+      expect(getAllByTestId("hidden-balance-placeholder").length).toBeGreaterThanOrEqual(
+        3,
+      )
     })
 
     it("navigates to the card dashboard when the Card row is pressed", async () => {
-      const { getByText } = renderOverview({ hasCard: true, cardLastFour: "4242" })
+      const { getByText } = renderOverview({ accounts: withCardFixture })
       await flushEffects()
 
       fireEvent.press(getByText("Card"))
 
       expect(mockNavigate).toHaveBeenCalledWith("cardDashboardScreen")
+    })
+
+    it("holds the card balance back while the balances load", async () => {
+      const { getByText, queryByTestId } = renderOverview({
+        accounts: withCardFixture,
+        loading: true,
+      })
+      await flushEffects()
+
+      expect(getByText("Card")).toBeTruthy()
+      expect(queryByTestId("card-balance")).toBeNull()
+    })
+
+    it("dims the card balance only while the Card row is pressed", async () => {
+      const { getByText, getByTestId } = renderOverview({ accounts: withCardFixture })
+      await flushEffects()
+
+      fireEvent(getByText("Card"), "pressIn")
+      expect(nearestOpacity(getByTestId("card-balance"))).toBe(0.7)
+
+      fireEvent(getByText("Card"), "pressOut")
+      expect(nearestOpacity(getByTestId("card-balance"))).toBeUndefined()
+    })
+
+    it("keeps the card account out of the transaction history wallets", async () => {
+      const { getByText } = renderOverview({ accounts: withCardFixture })
+      await flushEffects()
+
+      fireEvent.press(getByText("Bitcoin"))
+
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "transactionHistory",
+        expect.objectContaining({
+          wallets: walletsFixture,
+          currencyFilter: WalletCurrency.Btc,
+        }),
+      )
     })
   })
 
@@ -294,7 +410,7 @@ describe("WalletOverview", () => {
       ]
 
       const { getByText } = renderOverview({
-        wallets: emptyUsdWallets,
+        accounts: emptyUsdWallets,
         onGatedTap: jest.fn(),
       })
       await flushEffects()
@@ -315,7 +431,7 @@ describe("WalletOverview", () => {
       ]
 
       const { getByText, queryByText } = renderOverview({
-        wallets: emptyUsdWallets,
+        accounts: emptyUsdWallets,
         onGatedTap: jest.fn(),
       })
       await flushEffects()
@@ -340,7 +456,7 @@ describe("WalletOverview", () => {
       ]
 
       const { getByText, queryByText } = renderOverview({
-        wallets: emptyUsdWallets,
+        accounts: emptyUsdWallets,
         onGatedTap: jest.fn(),
       })
       await flushEffects()
@@ -359,7 +475,7 @@ describe("WalletOverview", () => {
       ]
 
       const { getByText, queryByText } = renderOverview({
-        wallets: emptyUsdWallets,
+        accounts: emptyUsdWallets,
         onGatedTap: jest.fn(),
       })
       await flushEffects()
@@ -379,7 +495,7 @@ describe("WalletOverview", () => {
       ]
 
       const { getByText, queryByText } = renderOverview({
-        wallets: emptyUsdWallets,
+        accounts: emptyUsdWallets,
         onGatedTap: jest.fn(),
       })
       await flushEffects()
@@ -417,7 +533,7 @@ describe("WalletOverview", () => {
       ]
 
       const { getByText, queryByText } = renderOverview({
-        wallets: emptyUsdWallets,
+        accounts: emptyUsdWallets,
         onGatedTap: jest.fn(),
       })
       await flushEffects()
@@ -469,7 +585,7 @@ describe("WalletOverview", () => {
         { id: "usd-id", walletCurrency: WalletCurrency.Usd, balance: 0 },
       ]
 
-      const { getByText } = renderOverview({ wallets: emptyUsdWallets, onGatedTap })
+      const { getByText } = renderOverview({ accounts: emptyUsdWallets, onGatedTap })
       await flushEffects()
 
       fireEvent.press(
@@ -520,7 +636,7 @@ describe("WalletOverview", () => {
     })
 
     it("does not open the transaction history when there are no wallets", async () => {
-      const { getByText } = renderOverview({ wallets: [] })
+      const { getByText } = renderOverview({ accounts: [] })
 
       fireEvent.press(getByText("Bitcoin"))
 
@@ -565,22 +681,22 @@ describe("WalletOverview", () => {
     })
   })
 
-  describe("authentication and wallet sources", () => {
-    it("renders with default balances when no wallets prop is passed", async () => {
-      const { getByText } = renderOverview({ wallets: undefined })
+  describe("authentication and account sources", () => {
+    it("renders with default balances when no accounts prop is passed", async () => {
+      const { getByText } = renderOverview({ accounts: undefined })
       await flushEffects()
 
       expect(getByText("Bitcoin")).toBeTruthy()
     })
 
-    it("skips balance computation when not authed and no wallets are provided", async () => {
-      const { getByText } = renderOverview({ isAuthed: false, wallets: [] })
+    it("skips balance computation when not authed and no accounts are provided", async () => {
+      const { getByText } = renderOverview({ isAuthed: false, accounts: [] })
       await flushEffects()
 
       expect(getByText("Bitcoin")).toBeTruthy()
     })
 
-    it("computes balances from the wallets prop even when not authed", async () => {
+    it("computes balances from the accounts prop even when not authed", async () => {
       const { getByText } = renderOverview({ isAuthed: false })
       await flushEffects()
 
