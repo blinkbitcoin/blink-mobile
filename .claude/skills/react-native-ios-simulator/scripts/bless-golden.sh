@@ -127,6 +127,11 @@ fi
 cat > "$SWAP/swap.sh" <<'SWAPEOF'
 set -euo pipefail
 UDID="$1"; GOLDEN_NAME="$2"; NEW_STAMP="$3"; GOLDEN_DIR="$4"
+# Stage the stamp beside its final path BEFORE any rename: if this copy fails
+# the swap aborts with the old golden and its stamp untouched, and the
+# post-rename install below is a same-directory rename that cannot half-fail.
+mkdir -p "$GOLDEN_DIR"
+cp "$NEW_STAMP" "$GOLDEN_DIR/stamp.new"
 OLD=$(xcrun simctl list devices -j | python3 -c "
 import json,sys
 name=sys.argv[1]
@@ -140,8 +145,7 @@ if [ -n "$OLD" ]; then
   xcrun simctl rename "$OLD" "$GOLDEN_NAME-retired"
 fi
 xcrun simctl rename "$UDID" "$GOLDEN_NAME"
-mkdir -p "$GOLDEN_DIR"
-cp "$NEW_STAMP" "$GOLDEN_DIR/stamp.new" && mv -f "$GOLDEN_DIR/stamp.new" "$GOLDEN_DIR/stamp"
+mv -f "$GOLDEN_DIR/stamp.new" "$GOLDEN_DIR/stamp"
 if [ -n "$OLD" ]; then
   xcrun simctl delete "$OLD"
 fi

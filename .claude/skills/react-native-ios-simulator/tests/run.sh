@@ -612,6 +612,58 @@ check "the retired golden is deleted, not orphaned" "" \
 check "the stamp now describes the new golden" "yes" \
   "$(grep -q '^sha=def456' "$GOLDEN_STAMP" && echo yes || echo no)"
 
+# --- a golden re-blessed while a claim waits on the lock is re-checked -------
+# The claim's eligibility check reads the stamp unlocked; if the golden is
+# swapped for different hardware before the claim gets the lock, the clone
+# must be judged by the stamp snapshotted WITH it - and refused. Isolated
+# world; the golden lock is held by a live sleeper, the stamp rewritten
+# underneath the waiting claim, then the sleeper dies.
+(
+  export DEMO_SIM_REGISTRY="$WORK/rebless-registry" FAKE_DEVICES="$WORK/rebless-devices.txt"
+  export WITH_LOCK_POLL_SECONDS=1
+  : > "$FAKE_DEVICES"
+  eval "$("$SCRIPTS/claim-session.sh" 730 2>/dev/null)"
+  "$SCRIPTS/bless-golden.sh" 730 --sha 1111 >/dev/null 2>&1
+  STAMP="$DEMO_SIM_REGISTRY/golden/rn-demo-golden/stamp"
+  sleep 60 & HOLDER=$!
+  mkdir -p "$DEMO_SIM_REGISTRY/locks/golden"; echo "$HOLDER" > "$DEMO_SIM_REGISTRY/locks/golden/pid"
+  "$SCRIPTS/claim-session.sh" 731 > "$WORK/rebless-claim.out" 2> "$WORK/rebless-claim.err" &
+  CLAIM=$!
+  for _ in $(seq 50); do grep -q "waiting for 'golden'" "$WORK/rebless-claim.err" 2>/dev/null && break; sleep 0.2; done
+  sed -i '' 's/^device-type=.*/device-type=iPhone 15/' "$STAMP"
+  kill "$HOLDER" 2>/dev/null; wait "$HOLDER" 2>/dev/null
+  wait "$CLAIM"; echo "rc=$?"
+  echo "origin=$(cat "$DEMO_SIM_REGISTRY/rn-demo-pr731/origin" 2>/dev/null)"
+  echo "snapshot=$([ -f "$DEMO_SIM_REGISTRY/rn-demo-pr731/golden-stamp" ] && echo kept || echo dropped)"
+  echo "clones=$(awk -F'|' '$2=="rn-demo-pr731"' "$FAKE_DEVICES" | wc -l | tr -d ' ')"
+) > "$WORK/rebless.out" 2>/dev/null
+check "a claim racing a re-bless still succeeds" "yes" \
+  "$(grep -q '^rc=0' "$WORK/rebless.out" && echo yes || echo "no ($(tr '\n' ' ' < "$WORK/rebless.out"))")"
+check "it refuses the clone whose locked stamp no longer matches" "created" \
+  "$(sed -n 's/^origin=//p' "$WORK/rebless.out")"
+check "and keeps no stale golden snapshot" "dropped" "$(sed -n 's/^snapshot=//p' "$WORK/rebless.out")"
+check "leaving exactly one device for the session" "1" "$(sed -n 's/^clones=//p' "$WORK/rebless.out")"
+
+# --- a stamp that cannot be written aborts the swap before any rename --------
+(
+  export DEMO_SIM_REGISTRY="$WORK/stampfail-registry" FAKE_DEVICES="$WORK/stampfail-devices.txt"
+  : > "$FAKE_DEVICES"
+  eval "$("$SCRIPTS/claim-session.sh" 740 2>/dev/null)"; FIRST="$DEMO_UDID"
+  "$SCRIPTS/bless-golden.sh" 740 --sha aaaa >/dev/null 2>&1
+  eval "$("$SCRIPTS/claim-session.sh" 741 2>/dev/null)"; SECOND="$DEMO_UDID"
+  chmod 555 "$DEMO_SIM_REGISTRY/golden/rn-demo-golden"      # stamp.new cannot be staged
+  "$SCRIPTS/bless-golden.sh" 741 --sha bbbb >/dev/null 2>&1; echo "rc=$?"
+  chmod 755 "$DEMO_SIM_REGISTRY/golden/rn-demo-golden"
+  echo "golden=$(awk -F'|' '$2=="rn-demo-golden" {print $1}' "$FAKE_DEVICES" | tr '\n' ' ')"
+  echo "first=$FIRST"
+  echo "retired=$(awk -F'|' '$2 ~ /-retired$/' "$FAKE_DEVICES" | wc -l | tr -d ' ')"
+  echo "stamp=$(sed -n 's/^sha=//p' "$DEMO_SIM_REGISTRY/golden/rn-demo-golden/stamp")"
+) > "$WORK/stampfail.out" 2>/dev/null
+check "a re-bless whose stamp cannot be written fails" "yes" \
+  "$(grep -q '^rc=[1-9]' "$WORK/stampfail.out" && echo yes || echo "no ($(tr '\n' ' ' < "$WORK/stampfail.out"))")"
+check "and leaves the old golden and its stamp in place" "yes" \
+  "$(f=$(sed -n 's/^first=//p' "$WORK/stampfail.out"); grep -q "^golden=$f $" "$WORK/stampfail.out" && grep -q '^stamp=aaaa$' "$WORK/stampfail.out" && grep -q '^retired=0$' "$WORK/stampfail.out" && echo yes || echo "no ($(tr '\n' ' ' < "$WORK/stampfail.out"))")"
+
 # --- a bless that trips the collateral check still adopts its session ---------
 # The device is already the golden by then; a surviving manifest would point
 # at it and make every later release of this PR fail its ownership gate.
