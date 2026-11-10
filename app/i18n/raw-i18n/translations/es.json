@@ -1,6 +1,7 @@
 {
     "ApiScreen": {
         "keysGroupTitle": "Claves API",
+        "inactiveKeys": "Claves inactivas ({count})",
         "noKeys": "Aún no hay claves API",
         "createKey": "Crear clave API",
         "createTitle": "Nueva clave API",
@@ -27,6 +28,7 @@
         "revokeTitle": "¿Revocar la clave API?",
         "revokeBody": "\"{name: string}\" dejará de funcionar de inmediato. Esto no se puede deshacer.",
         "revoke": "Revocar",
+        "revokeGoBack": "Volver",
         "revokeSuccess": "Clave API revocada",
         "createError": "No se pudo crear la clave API. Inténtalo de nuevo.",
         "revokeError": "No se pudo revocar la clave API. Inténtalo de nuevo.",
@@ -3072,7 +3074,6 @@
         "faq": "Preguntas Frecuentes - FAQ",
         "statusPage": "Página de estado",
         "telegram": "Telegram",
-        "mattermost": "Mattermost",
         "defaultEmailSubject": "{bankName: string} - Soporte",
         "defaultSupportMessage": "Hola! Necesito ayuda con {bankName: string}, estoy usando la versión {version: string} de {os: string}.",
         "emailCopied": "dirección electrónica {email: string} copiada al portapapeles",
@@ -3331,7 +3332,10 @@
             "noLimit": "Sin límite",
             "limitUpdateSuccess": "Límite actualizado correctamente",
             "limitUpdateError": "No se pudo actualizar el límite",
-            "limitMustBePositive": "El límite debe ser mayor que cero"
+            "limitMustBePositive": "El límite debe ser mayor que cero",
+            "atmToggleError": "No se pudieron actualizar los retiros en cajero",
+            "atmControlsLoadError": "No se pudieron cargar tus límites de cajero",
+            "invalidLimitAmount": "Ingresa un monto válido con hasta 2 decimales"
         },
         "CardStatements": {
             "title": "Movimientos",

@@ -7898,6 +7898,11 @@ type RootTranslation = {
 		 */
 		keysGroupTitle: string
 		/**
+		 * I​n​a​c​t​i​v​e​ ​k​e​y​s​ ​(​{​c​o​u​n​t​}​)
+		 * @param {number} count
+		 */
+		inactiveKeys: RequiredParams<'count'>
+		/**
 		 * N​o​ ​A​P​I​ ​k​e​y​s​ ​y​e​t
 		 */
 		noKeys: string
@@ -8004,6 +8009,10 @@ type RootTranslation = {
 		 * R​e​v​o​k​e
 		 */
 		revoke: string
+		/**
+		 * G​o​ ​b​a​c​k
+		 */
+		revokeGoBack: string
 		/**
 		 * A​P​I​ ​k​e​y​ ​r​e​v​o​k​e​d
 		 */
@@ -10265,10 +10274,6 @@ type RootTranslation = {
 		 */
 		telegram: string
 		/**
-		 * M​a​t​t​e​r​m​o​s​t
-		 */
-		mattermost: string
-		/**
 		 * {​b​a​n​k​N​a​m​e​}​ ​-​ ​S​u​p​p​o​r​t
 		 * @param {string} bankName
 		 */
@@ -11116,6 +11121,18 @@ type RootTranslation = {
 			 * L​i​m​i​t​ ​m​u​s​t​ ​b​e​ ​g​r​e​a​t​e​r​ ​t​h​a​n​ ​z​e​r​o
 			 */
 			limitMustBePositive: string
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​u​p​d​a​t​e​ ​A​T​M​ ​w​i​t​h​d​r​a​w​a​l​s
+			 */
+			atmToggleError: string
+			/**
+			 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​y​o​u​r​ ​A​T​M​ ​l​i​m​i​t​s
+			 */
+			atmControlsLoadError: string
+			/**
+			 * E​n​t​e​r​ ​a​ ​v​a​l​i​d​ ​a​m​o​u​n​t​ ​w​i​t​h​ ​u​p​ ​t​o​ ​2​ ​d​e​c​i​m​a​l​s
+			 */
+			invalidLimitAmount: string
 			/**
 			 * T​r​a​n​s​a​c​t​i​o​n​ ​t​y​p​e​s
 			 */
@@ -22190,6 +22207,10 @@ export type TranslationFunctions = {
 		 */
 		keysGroupTitle: () => LocalizedString
 		/**
+		 * Inactive keys ({count})
+		 */
+		inactiveKeys: (arg: { count: number }) => LocalizedString
+		/**
 		 * No API keys yet
 		 */
 		noKeys: () => LocalizedString
@@ -22293,6 +22314,10 @@ export type TranslationFunctions = {
 		 * Revoke
 		 */
 		revoke: () => LocalizedString
+		/**
+		 * Go back
+		 */
+		revokeGoBack: () => LocalizedString
 		/**
 		 * API key revoked
 		 */
@@ -24509,10 +24534,6 @@ export type TranslationFunctions = {
 		 */
 		telegram: () => LocalizedString
 		/**
-		 * Mattermost
-		 */
-		mattermost: () => LocalizedString
-		/**
 		 * {bankName} - Support
 		 */
 		defaultEmailSubject: (arg: { bankName: string }) => LocalizedString
@@ -25338,6 +25359,18 @@ export type TranslationFunctions = {
 			 * Limit must be greater than zero
 			 */
 			limitMustBePositive: () => LocalizedString
+			/**
+			 * Failed to update ATM withdrawals
+			 */
+			atmToggleError: () => LocalizedString
+			/**
+			 * Could not load your ATM limits
+			 */
+			atmControlsLoadError: () => LocalizedString
+			/**
+			 * Enter a valid amount with up to 2 decimals
+			 */
+			invalidLimitAmount: () => LocalizedString
 			/**
 			 * Transaction types
 			 */

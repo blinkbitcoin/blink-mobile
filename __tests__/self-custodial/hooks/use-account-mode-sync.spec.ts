@@ -15,7 +15,7 @@ jest.mock("@app/self-custodial/lnurl-server-mode", () => ({
 }))
 
 let mockPersistentState: PersistentState = {
-  schemaVersion: 23,
+  schemaVersion: 24,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
   activeAccountId: "sc-1",
@@ -70,7 +70,7 @@ describe("useAccountModeSync", () => {
     mockSdk = sdk
     mockConnectedAccountId = "sc-1"
     mockPersistentState = {
-      schemaVersion: 23,
+      schemaVersion: 24,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "",
       activeAccountId: "sc-1",

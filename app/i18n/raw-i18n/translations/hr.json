@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API ključevi",
+    "inactiveKeys": "Neaktivni ključevi ({count})",
     "noKeys": "Još nema API ključeva",
     "createKey": "Stvori API ključ",
     "createTitle": "Novi API ključ",
@@ -27,6 +28,7 @@
     "revokeTitle": "Opozvati API ključ?",
     "revokeBody": "\"{name: string}\" odmah će prestati raditi. Ovo se ne može poništiti.",
     "revoke": "Opozovi",
+    "revokeGoBack": "Natrag",
     "revokeSuccess": "API ključ opozvan",
     "createError": "API ključ nije moguće stvoriti. Pokušajte ponovno.",
     "revokeError": "API ključ nije moguće opozvati. Pokušajte ponovno.",
@@ -3072,7 +3074,6 @@
     "faq": "Česta pitanja",
     "statusPage": "Stranica statusa",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Podrška",
     "defaultSupportMessage": "Bok! Trebam pomoć s {bankName: string}, koristim verziju {version: string} na {os: string}.",
     "emailCopied": "e-pošta {email: string} kopirana u međuspremnik",
@@ -3247,7 +3248,10 @@
       "noLimit": "Bez ograničenja",
       "limitUpdateSuccess": "Ograničenje uspješno ažurirano",
       "limitUpdateError": "Nije moguće ažurirati ograničenje",
-      "limitMustBePositive": "Ograničenje mora biti veće od nule"
+      "limitMustBePositive": "Ograničenje mora biti veće od nule",
+      "atmToggleError": "Nije moguće ažurirati podizanja na bankomatu",
+      "atmControlsLoadError": "Nije moguće učitati ograničenja za bankomat",
+      "invalidLimitAmount": "Unesite ispravan iznos s najviše 2 decimale"
     },
     "CardFeeSchedule": {
       "title": "Raspored naknada Blink kartice",

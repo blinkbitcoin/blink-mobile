@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API-sleutels",
+    "inactiveKeys": "Onaktiewe sleutels ({count})",
     "noKeys": "Nog geen API-sleutels nie",
     "createKey": "Skep API-sleutel",
     "createTitle": "Nuwe API-sleutel",
@@ -27,6 +28,7 @@
     "revokeTitle": "Herroep API-sleutel?",
     "revokeBody": "\"{name: string}\" sal onmiddellik ophou werk. Dit kan nie ongedaan gemaak word nie.",
     "revoke": "Herroep",
+    "revokeGoBack": "Gaan terug",
     "revokeSuccess": "API-sleutel herroep",
     "createError": "Kon nie die API-sleutel skep nie. Probeer weer.",
     "revokeError": "Kon nie die API-sleutel herroep nie. Probeer weer.",
@@ -3072,7 +3074,6 @@
     "faq": "FAQ",
     "statusPage": "Statusbladsy",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Ondersteuning",
     "defaultSupportMessage": "Hi daar! Ek benodig hulp met {bankName: string}, ek gebruik weergawe {version: string} op {os: string}. ",
     "emailCopied": "e-pos {email: string} oorgedra na knipbord",
@@ -3247,7 +3248,10 @@
       "noLimit": "Geen limiet",
       "limitUpdateSuccess": "Limiet suksesvol opgedateer",
       "limitUpdateError": "Kon limiet nie opdateer nie",
-      "limitMustBePositive": "Limiet moet groter as nul wees"
+      "limitMustBePositive": "Limiet moet groter as nul wees",
+      "atmToggleError": "Kon OTM-onttrekkings nie opdateer nie",
+      "atmControlsLoadError": "Kon nie jou OTM-limiete laai nie",
+      "invalidLimitAmount": "Voer 'n geldige bedrag in met hoogstens 2 desimale"
     },
     "CardFeeSchedule": {
       "title": "Blink-kaart fooiskedule",

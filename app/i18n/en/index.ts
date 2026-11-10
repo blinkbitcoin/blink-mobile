@@ -2516,6 +2516,7 @@ const en: BaseTranslation = {
   },
   ApiScreen: {
     keysGroupTitle: "API keys",
+    inactiveKeys: "Inactive keys ({count: number})",
     noKeys: "No API keys yet",
     createKey: "Create API key",
     createTitle: "New API key",
@@ -2545,6 +2546,7 @@ const en: BaseTranslation = {
     revokeBody:
       "\"{name: string}\" will stop working immediately. This cannot be undone.",
     revoke: "Revoke",
+    revokeGoBack: "Go back",
     revokeSuccess: "API key revoked",
     createError: "Could not create the API key. Please try again.",
     revokeError: "Could not revoke the API key. Please try again.",
@@ -3222,7 +3224,6 @@ const en: BaseTranslation = {
     faq: "FAQ",
     statusPage: "Status page",
     telegram: "Telegram",
-    mattermost: "Mattermost",
     defaultEmailSubject: "{bankName: string} - Support",
     defaultSupportMessage:
       "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
@@ -3493,6 +3494,9 @@ const en: BaseTranslation = {
       limitUpdateSuccess: "Limit updated successfully",
       limitUpdateError: "Failed to update limit",
       limitMustBePositive: "Limit must be greater than zero",
+      atmToggleError: "Failed to update ATM withdrawals",
+      atmControlsLoadError: "Could not load your ATM limits",
+      invalidLimitAmount: "Enter a valid amount with up to 2 decimals",
       transactionTypesTitle: "Transaction types",
       TransactionTypes: {
         ecommerce: "Online purchases",

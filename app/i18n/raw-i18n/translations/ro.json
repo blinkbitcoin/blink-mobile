@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Chei API",
+    "inactiveKeys": "Chei inactive ({count})",
     "noKeys": "Încă nu există chei API",
     "createKey": "Creează cheie API",
     "createTitle": "Cheie API nouă",
@@ -27,6 +28,7 @@
     "revokeTitle": "Revoci cheia API?",
     "revokeBody": "\"{name: string}\" va înceta imediat să funcționeze. Această acțiune nu poate fi anulată.",
     "revoke": "Revocă",
+    "revokeGoBack": "Înapoi",
     "revokeSuccess": "Cheie API revocată",
     "createError": "Cheia API nu a putut fi creată. Încearcă din nou.",
     "revokeError": "Cheia API nu a putut fi revocată. Încearcă din nou.",
@@ -3072,7 +3074,6 @@
     "faq": "FAQ",
     "statusPage": "Pagina de stare",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Asistență",
     "defaultSupportMessage": "Bună! Am nevoie de ajutor cu {bankName: string}, folosesc versiunea {version: string} pe {os: string}.",
     "emailCopied": "e-mail {email: string} copiat în clipboard",
@@ -3247,7 +3248,10 @@
       "noLimit": "Fără limită",
       "limitUpdateSuccess": "Limita a fost actualizată cu succes",
       "limitUpdateError": "Nu s-a putut actualiza limita",
-      "limitMustBePositive": "Limita trebuie să fie mai mare decât zero"
+      "limitMustBePositive": "Limita trebuie să fie mai mare decât zero",
+      "atmToggleError": "Nu s-au putut actualiza retragerile ATM",
+      "atmControlsLoadError": "Nu s-au putut încărca limitele ATM",
+      "invalidLimitAmount": "Introdu o sumă validă cu cel mult 2 zecimale"
     },
     "CardFeeSchedule": {
       "title": "Grila de taxe a cardului Blink",

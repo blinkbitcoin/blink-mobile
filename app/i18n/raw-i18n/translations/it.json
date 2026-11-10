@@ -1,6 +1,7 @@
 {
     "ApiScreen": {
         "keysGroupTitle": "Chiavi API",
+        "inactiveKeys": "Chiavi inattive ({count})",
         "noKeys": "Ancora nessuna chiave API",
         "createKey": "Crea chiave API",
         "createTitle": "Nuova chiave API",
@@ -27,6 +28,7 @@
         "revokeTitle": "Revocare la chiave API?",
         "revokeBody": "\"{name: string}\" smetterà di funzionare immediatamente. Questa operazione non può essere annullata.",
         "revoke": "Revoca",
+        "revokeGoBack": "Indietro",
         "revokeSuccess": "Chiave API revocata",
         "createError": "Impossibile creare la chiave API. Riprova.",
         "revokeError": "Impossibile revocare la chiave API. Riprova.",
@@ -3072,7 +3074,6 @@
         "faq": "FAQ",
         "statusPage": "Pagina di stato",
         "telegram": "Telegram",
-        "mattermost": "Mattermost",
         "defaultEmailSubject": "{bankName: string} - Supporto",
         "defaultSupportMessage": "Ciao! Ho bisogno di aiuto con {bankName: string}. Sto usando la versione {version: string} su {os: string}.",
         "emailCopied": "email {email: string} copiata negli appunti",
@@ -3331,7 +3332,10 @@
             "noLimit": "Nessun limite",
             "limitUpdateSuccess": "Limite aggiornato con successo",
             "limitUpdateError": "Impossibile aggiornare il limite",
-            "limitMustBePositive": "Il limite deve essere maggiore di zero"
+            "limitMustBePositive": "Il limite deve essere maggiore di zero",
+            "atmToggleError": "Impossibile aggiornare i prelievi bancomat",
+            "atmControlsLoadError": "Impossibile caricare i limiti bancomat",
+            "invalidLimitAmount": "Inserisci un importo valido con al massimo 2 decimali"
         },
         "CardStatements": {
             "title": "Movimenti",

@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Kunci API",
+    "inactiveKeys": "Kunci tidak aktif ({count})",
     "noKeys": "Belum ada kunci API",
     "createKey": "Buat kunci API",
     "createTitle": "Kunci API baru",
@@ -27,6 +28,7 @@
     "revokeTitle": "Cabut kunci API?",
     "revokeBody": "\"{name: string}\" akan langsung berhenti berfungsi. Tindakan ini tidak dapat dibatalkan.",
     "revoke": "Cabut",
+    "revokeGoBack": "Kembali",
     "revokeSuccess": "Kunci API dicabut",
     "createError": "Tidak dapat membuat kunci API. Silakan coba lagi.",
     "revokeError": "Tidak dapat mencabut kunci API. Silakan coba lagi.",
@@ -3072,7 +3074,6 @@
     "faq": "FAQ",
     "statusPage": "Status Page",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Dukungan",
     "defaultSupportMessage": "Halo! Saya membutuhkan bantuan dengan {bankName: string}, saya menggunakan versi {version: string} pada {os: string}.",
     "emailCopied": "email {email: string} disalin ke clipboard",
@@ -3247,7 +3248,10 @@
       "noLimit": "Tanpa batas",
       "limitUpdateSuccess": "Batas berhasil diperbarui",
       "limitUpdateError": "Gagal memperbarui batas",
-      "limitMustBePositive": "Batas harus lebih besar dari nol"
+      "limitMustBePositive": "Batas harus lebih besar dari nol",
+      "atmToggleError": "Gagal memperbarui penarikan ATM",
+      "atmControlsLoadError": "Gagal memuat batas ATM Anda",
+      "invalidLimitAmount": "Masukkan jumlah yang valid dengan maksimal 2 desimal"
     },
     "CardFeeSchedule": {
       "title": "Jadwal biaya Kartu Blink",

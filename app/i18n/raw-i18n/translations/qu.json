@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API llavekuna",
+    "inactiveKeys": "Mana llamk'aq llavekuna ({count})",
     "noKeys": "Manaraq API llavekuna kanchu",
     "createKey": "API llaveta ruray",
     "createTitle": "Musuq API llave",
@@ -27,6 +28,7 @@
     "revokeTitle": "API llaveta chinkachiyta munankichu?",
     "revokeBody": "\"{name: string}\" utqaylla mana llamk'anqañachu. Kayqa mana kutichiy atinchu.",
     "revoke": "Chinkachiy",
+    "revokeGoBack": "Kutiy",
     "revokeSuccess": "API llave chinkachisqa",
     "createError": "API llave mana rurayta atikurqanchu. Yapamanta ruray.",
     "revokeError": "API llave mana chinkachiyta atikurqanchu. Yapamanta ruray.",
@@ -3072,7 +3074,6 @@
     "faq": "FAQ",
     "statusPage": "P'anqakuna Yupaychay",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Yachanakuy",
     "defaultSupportMessage": "¡Juyayay! Qanqa atipuni {bankName: string}piyta kani, {os: string}ta allinmi version {version: string}ninchikmi. Kaypi yachanichu.",
     "emailCopied": "Imayna {email: string} qillqanman yuraqchanku chimpusqan.",
@@ -3247,7 +3248,10 @@
       "noLimit": "Mana limitayuq",
       "limitUpdateSuccess": "Limite allinlla musuqyachisqa",
       "limitUpdateError": "Mana atikurqanchu limite musuqyachiyta",
-      "limitMustBePositive": "Limite nisqaqa cero nisqamanta hatunraq kanan"
+      "limitMustBePositive": "Limite nisqaqa cero nisqamanta hatunraq kanan",
+      "atmToggleError": "Mana atikurqanchu ATM hurquykunata musuqyachiyta",
+      "atmControlsLoadError": "Mana atikurqanchu ATM limitekunata apamuyta",
+      "invalidLimitAmount": "Allin qullqita qillqay, 2 decimalkama"
     },
     "CardFeeSchedule": {
       "title": "Blink tarjeta pagana lista",

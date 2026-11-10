@@ -1,6 +1,7 @@
 {
     "ApiScreen": {
         "keysGroupTitle": "API-Schlüssel",
+        "inactiveKeys": "Inaktive Schlüssel ({count})",
         "noKeys": "Noch keine API-Schlüssel",
         "createKey": "API-Schlüssel erstellen",
         "createTitle": "Neuer API-Schlüssel",
@@ -27,6 +28,7 @@
         "revokeTitle": "API-Schlüssel widerrufen?",
         "revokeBody": "\"{name: string}\" funktioniert sofort nicht mehr. Dies kann nicht rückgängig gemacht werden.",
         "revoke": "Widerrufen",
+        "revokeGoBack": "Zurück",
         "revokeSuccess": "API-Schlüssel widerrufen",
         "createError": "Der API-Schlüssel konnte nicht erstellt werden. Bitte versuche es erneut.",
         "revokeError": "Der API-Schlüssel konnte nicht widerrufen werden. Bitte versuche es erneut.",
@@ -3072,7 +3074,6 @@
         "faq": "FAQ",
         "statusPage": "Status-Seite",
         "telegram": "Telegram",
-        "mattermost": "Mattermost",
         "defaultEmailSubject": "{bankName: string} - Support",
         "defaultSupportMessage": "Hey! Ich brauche Hilfe mit {bankName: string}, ich benutze Version {version: string} auf {os: string}.",
         "emailCopied": "E-Mail {email: string} in Zwischenablage kopiert",
@@ -3331,7 +3332,10 @@
             "noLimit": "Kein Limit",
             "limitUpdateSuccess": "Limit erfolgreich aktualisiert",
             "limitUpdateError": "Limit konnte nicht aktualisiert werden",
-            "limitMustBePositive": "Das Limit muss größer als null sein"
+            "limitMustBePositive": "Das Limit muss größer als null sein",
+            "atmToggleError": "Geldautomaten-Abhebungen konnten nicht aktualisiert werden",
+            "atmControlsLoadError": "Geldautomaten-Limits konnten nicht geladen werden",
+            "invalidLimitAmount": "Gib einen gültigen Betrag mit höchstens 2 Nachkommastellen ein"
         },
         "CardStatements": {
             "title": "Umsätze",

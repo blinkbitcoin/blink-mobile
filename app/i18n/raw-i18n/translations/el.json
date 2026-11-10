@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Κλειδιά API",
+    "inactiveKeys": "Ανενεργά κλειδιά ({count})",
     "noKeys": "Δεν υπάρχουν ακόμη κλειδιά API",
     "createKey": "Δημιουργία κλειδιού API",
     "createTitle": "Νέο κλειδί API",
@@ -27,6 +28,7 @@
     "revokeTitle": "Ανάκληση κλειδιού API;",
     "revokeBody": "Το \"{name: string}\" θα σταματήσει να λειτουργεί αμέσως. Αυτό δεν μπορεί να αναιρεθεί.",
     "revoke": "Ανάκληση",
+    "revokeGoBack": "Πίσω",
     "revokeSuccess": "Το κλειδί API ανακλήθηκε",
     "createError": "Δεν ήταν δυνατή η δημιουργία του κλειδιού API. Προσπαθήστε ξανά.",
     "revokeError": "Δεν ήταν δυνατή η ανάκληση του κλειδιού API. Προσπαθήστε ξανά.",
@@ -3072,7 +3074,6 @@
     "faq": "Συχνές ερωτήσεις",
     "statusPage": "Σελίδα Κατάστασης",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Υποστήριξη",
     "defaultSupportMessage": "Γεια σας! Χρειάζομαι λίγη βοήθεια με το {bankName: string}, χρησιμοποιώ την έκδοση {version: string} στο {os: string}.",
     "emailCopied": "email {email: string} αντιγράφηκε στο πρόχειρο ",
@@ -3247,7 +3248,10 @@
       "noLimit": "Χωρίς όριο",
       "limitUpdateSuccess": "Το όριο ενημερώθηκε επιτυχώς",
       "limitUpdateError": "Αποτυχία ενημέρωσης ορίου",
-      "limitMustBePositive": "Το όριο πρέπει να είναι μεγαλύτερο από μηδέν"
+      "limitMustBePositive": "Το όριο πρέπει να είναι μεγαλύτερο από μηδέν",
+      "atmToggleError": "Αποτυχία ενημέρωσης αναλήψεων ATM",
+      "atmControlsLoadError": "Δεν ήταν δυνατή η φόρτωση των ορίων ATM",
+      "invalidLimitAmount": "Εισάγετε ένα έγκυρο ποσό με έως 2 δεκαδικά"
     },
     "CardFeeSchedule": {
       "title": "Πρόγραμμα χρεώσεων κάρτας Blink",

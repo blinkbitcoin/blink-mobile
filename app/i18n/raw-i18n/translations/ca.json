@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Claus API",
+    "inactiveKeys": "Claus inactives ({count})",
     "noKeys": "Encara no hi ha cap clau API",
     "createKey": "Crea una clau API",
     "createTitle": "Nova clau API",
@@ -27,6 +28,7 @@
     "revokeTitle": "Voleu revocar la clau API?",
     "revokeBody": "\"{name: string}\" deixarà de funcionar immediatament. Això no es pot desfer.",
     "revoke": "Revoca",
+    "revokeGoBack": "Tornar",
     "revokeSuccess": "Clau API revocada",
     "createError": "No s'ha pogut crear la clau API. Torna-ho a provar.",
     "revokeError": "No s'ha pogut revocar la clau API. Torna-ho a provar.",
@@ -3072,7 +3074,6 @@
     "faq": "FAQ",
     "statusPage": "Pàgina d'estat",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Suport",
     "defaultSupportMessage": "Hola! Necessito ajuda amb {bankName: string}, utilitzo la versió {version: string} de {os: string}.",
     "emailCopied": "l'adreça electrònica {email: string} s'ha copiat al porta-retalls",
@@ -3247,7 +3248,10 @@
       "noLimit": "Sense límit",
       "limitUpdateSuccess": "Límit actualitzat correctament",
       "limitUpdateError": "No s'ha pogut actualitzar el límit",
-      "limitMustBePositive": "El límit ha de ser superior a zero"
+      "limitMustBePositive": "El límit ha de ser superior a zero",
+      "atmToggleError": "No s'han pogut actualitzar les retirades al caixer",
+      "atmControlsLoadError": "No s'han pogut carregar els límits del caixer",
+      "invalidLimitAmount": "Introdueix un import vàlid amb 2 decimals com a màxim"
     },
     "CardFeeSchedule": {
       "title": "Programa de tarifes de la targeta Blink",

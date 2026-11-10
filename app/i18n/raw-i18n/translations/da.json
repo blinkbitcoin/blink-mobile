@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API-nøgler",
+    "inactiveKeys": "Inaktive nøgler ({count})",
     "noKeys": "Ingen API-nøgler endnu",
     "createKey": "Opret API-nøgle",
     "createTitle": "Ny API-nøgle",
@@ -27,6 +28,7 @@
     "revokeTitle": "Tilbagekald API-nøgle?",
     "revokeBody": "\"{name: string}\" holder straks op med at virke. Dette kan ikke fortrydes.",
     "revoke": "Tilbagekald",
+    "revokeGoBack": "Tilbage",
     "revokeSuccess": "API-nøgle tilbagekaldt",
     "createError": "API-nøglen kunne ikke oprettes. Prøv igen.",
     "revokeError": "API-nøglen kunne ikke tilbagekaldes. Prøv igen.",
@@ -3072,7 +3074,6 @@
     "faq": "Ofte stillede spørgsmål",
     "statusPage": "Statusside",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Support",
     "defaultSupportMessage": "Hej! Jeg har brug for hjælp med {bankName: string}. Jeg bruger version {version: string} på {os: string}.",
     "emailCopied": "email {email: string} kopieret til udklipsholder",
@@ -3247,7 +3248,10 @@
       "noLimit": "Ingen grænse",
       "limitUpdateSuccess": "Grænse opdateret",
       "limitUpdateError": "Kunne ikke opdatere grænsen",
-      "limitMustBePositive": "Grænsen skal være større end nul"
+      "limitMustBePositive": "Grænsen skal være større end nul",
+      "atmToggleError": "Kunne ikke opdatere hævninger i hæveautomater",
+      "atmControlsLoadError": "Kunne ikke indlæse dine hæveautomatgrænser",
+      "invalidLimitAmount": "Indtast et gyldigt beløb med højst 2 decimaler"
     },
     "CardFeeSchedule": {
       "title": "Blink-kortets gebyrplan",
