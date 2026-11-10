@@ -215,6 +215,7 @@
       { "property": "staticLighterGrey", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
       { "property": "staticDarkGrey", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
       { "property": "staticCardPill", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
+      { "property": "staticCardBackground", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
       { "property": "staticBrandOrange", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
       { "property": "staticSuccess", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
       { "property": "staticBrandYellow", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
