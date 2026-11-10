@@ -288,6 +288,9 @@ git -C /path/to/your-app log <stamp-sha>..origin/main -- ios/ package.json yarn.
 stale. The fix is a plain `simctl install` of the same build over it (an
 upgrade install: re-registers the app, **keeps the data container and the
 login**), then launch again. A shutdown/boot cycle alone does not clear it.
+Install from the build on disk (the DerivedData `.app`, or a copy you kept) —
+not from the clone itself: its `get_app_container` path still points into the
+golden's old device directory, which no longer exists.
 
 A clone that comes up logged out (test-account sessions do expire) means the same
 thing — re-bless with a fresh login. Opt out of cloning with
