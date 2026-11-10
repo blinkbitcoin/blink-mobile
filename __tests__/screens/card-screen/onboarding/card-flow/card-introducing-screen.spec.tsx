@@ -52,7 +52,7 @@ describe("CardIntroducingScreen", () => {
 
     await act(async () => {})
 
-    expect(getByText("The Blink Visa card")).toBeTruthy()
+    expect(getByText("The Blink Card")).toBeTruthy()
   })
 
   it("displays 'for' text", async () => {
@@ -67,7 +67,7 @@ describe("CardIntroducingScreen", () => {
     expect(getByText("for")).toBeTruthy()
   })
 
-  it("displays maximalist text", async () => {
+  it("displays bitcoiners text", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <CardIntroducingScreen />
@@ -76,7 +76,7 @@ describe("CardIntroducingScreen", () => {
 
     await act(async () => {})
 
-    expect(getByText("Bitcoin Maximalists")).toBeTruthy()
+    expect(getByText("Bitcoiners")).toBeTruthy()
   })
 
   it("displays continue button", async () => {

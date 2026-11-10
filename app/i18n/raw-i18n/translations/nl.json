@@ -3685,9 +3685,9 @@
       "CardIntroducing": {
         "title": "Introductie",
         "cardInfo": {
-          "bitcoinCard": "De Blink Visa-kaart",
+          "bitcoinCard": "De Blink Card",
           "for": "voor",
-          "maximalist": "Bitcoin Maximalisten"
+          "bitcoiners": "Bitcoiners"
         },
         "buttonText": "Doorgaan"
       },

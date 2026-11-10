@@ -3840,9 +3840,9 @@ const en: BaseTranslation = {
       CardIntroducing: {
         title: "Introducing",
         cardInfo: {
-          bitcoinCard: "The Blink Visa card",
+          bitcoinCard: "The Blink Card",
           for: "for",
-          maximalist: "Bitcoin Maximalists",
+          bitcoiners: "Bitcoiners",
         },
         buttonText: "Continue",
       },

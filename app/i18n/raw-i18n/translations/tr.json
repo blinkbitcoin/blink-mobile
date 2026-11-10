@@ -3685,9 +3685,9 @@
       "CardIntroducing": {
         "title": "Tanıtım",
         "cardInfo": {
-          "bitcoinCard": "Blink Visa kartı",
+          "bitcoinCard": "Blink kartı",
           "for": "için",
-          "maximalist": "Bitcoin Maksimalistleri"
+          "bitcoiners": "Bitcoiner'lar"
         },
         "buttonText": "Devam Et"
       },
