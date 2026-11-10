@@ -21,6 +21,14 @@ shift 2
 REGISTRY="${DEMO_SIM_REGISTRY:-$HOME/.claude/rn-sim-sessions}"
 LOCK_DIR="$REGISTRY/locks/$LOCK_NAME"
 RECLAIM_DIR="$LOCK_DIR.reclaim"
+
+# Test seams, validated: a 0 poll would spin a waiter at full CPU for the
+# whole wait, and a non-numeric value would make `sleep` abort the wait.
+POLL_SECONDS="${WITH_LOCK_POLL_SECONDS:-10}"
+case "$POLL_SECONDS" in ''|*[!0-9.]*|.*|*.*.*) POLL_SECONDS=10 ;; esac
+awk -v p="$POLL_SECONDS" 'BEGIN { exit !(p >= 1) }' || POLL_SECONDS=1   # floor: never a hot spin
+RECLAIM_DELAY="${WITH_LOCK_RECLAIM_DELAY:-}"
+case "$RECLAIM_DELAY" in ''|*[!0-9.]*|.*|*.*.*) RECLAIM_DELAY="" ;; esac
 mkdir -p "$REGISTRY/locks"
 
 acquired=""
@@ -37,7 +45,7 @@ while [ -z "$acquired" ]; do
   if [ -n "$holder" ] && ! kill -0 "$holder" 2>/dev/null; then
     # Test seam: widen the window between seeing the dead holder and acting
     # on it, so the suite can force the two-reclaimer interleaving for real.
-    [ -n "${WITH_LOCK_RECLAIM_DELAY:-}" ] && sleep "$WITH_LOCK_RECLAIM_DELAY"
+    [ -n "$RECLAIM_DELAY" ] && sleep "$RECLAIM_DELAY"
     # Reclaiming is itself a critical section: two waiters can both see the
     # same dead pid, and an unguarded rm by the slower one would delete the
     # lock the faster one just took. Only the waiter holding the reclaim
@@ -66,7 +74,7 @@ while [ -z "$acquired" ]; do
   fi
 
   echo "waiting for '$LOCK_NAME' (held by pid ${holder:-unknown})..." >&2
-  sleep "${WITH_LOCK_POLL_SECONDS:-10}"   # overridable so tests need not wait 10s per poll
+  sleep "$POLL_SECONDS"   # overridable (>= 1s) so tests need not wait 10s per poll
 done
 
 trap 'rm -rf "$LOCK_DIR"' EXIT INT TERM

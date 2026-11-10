@@ -170,6 +170,34 @@ check "and frees its own now-unusable reservation" "absent" \
   "$([ -d "$DEMO_SIM_REGISTRY/ports/$TAKEN_PORT" ] && echo present || echo absent)"
 kill "$BINDER2" 2>/dev/null
 
+# --- an unusable owned reservation is freed even when a lower port wins -----
+# The recorded port sits above the base; once the base frees up, the fallback
+# reserve returns before ever walking to the old port, so reclaim itself must
+# free it. Its metro.pid names a live process that is NOT the listener (a
+# recycled PID): that must not pass for "our Metro is listening".
+reset_world
+mkdir -p "$DEMO_SIM_REGISTRY/ports/8212"; echo "rn-demo-pr9999" > "$DEMO_SIM_REGISTRY/ports/8212/owner"
+eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
+HIGH_PORT="$DEMO_PORT"
+rm -rf "$DEMO_SIM_REGISTRY/ports/8212"
+sleep 60 & RECYCLED=$!; STRAYS+=($RECYCLED); disown $RECYCLED 2>/dev/null
+echo "$RECYCLED" > "$DEMO_SESSION_DIR/metro.pid"
+python3 -c '
+import socket, sys, time
+s = socket.socket(); s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+s.bind(("127.0.0.1", int(sys.argv[1]))); s.listen(1)
+sys.stderr.write("bound\n"); sys.stderr.flush()
+time.sleep(60)
+' "$HIGH_PORT" 2>"$WORK/bind3.log" &
+BINDER3=$!; STRAYS+=($BINDER3); disown $BINDER3 2>/dev/null
+for _ in $(seq 30); do grep -q bound "$WORK/bind3.log" 2>/dev/null && break; sleep 0.2; done
+eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
+check "a live but non-listening metro.pid does not vouch for the port" "moved" \
+  "$([ "$DEMO_PORT" != "$HIGH_PORT" ] && echo moved || echo "kept $HIGH_PORT")"
+check "the abandoned higher reservation is freed, not leaked" "absent" \
+  "$([ -d "$DEMO_SIM_REGISTRY/ports/$HIGH_PORT" ] && echo present || echo absent)"
+kill "$BINDER3" "$RECYCLED" 2>/dev/null
+
 # --- an own reservation without metro.pid is reused, not leaked -------------
 reset_world
 eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
@@ -480,6 +508,13 @@ RECLAIM_A=$!
 wait "$RECLAIM_A" "$RECLAIM_B" 2>/dev/null
 check "a stale reclaimer never deletes the lock another waiter took" "A-in A-out B-in B-out" \
   "$(tr '\n' ' ' < "$WORK/reclaim.log" | sed 's/ $//')"
+
+# A zero poll must not turn waiting into a hot spin.
+rm -rf "$DEMO_SIM_REGISTRY/locks"
+mkdir -p "$DEMO_SIM_REGISTRY/locks/held"; echo $$ > "$DEMO_SIM_REGISTRY/locks/held/pid"
+WITH_LOCK_POLL_SECONDS=0 "$SCRIPTS/with-lock.sh" held 2 true 2> "$WORK/spin.log" >/dev/null
+check "a zero poll interval is floored, not spun" "yes" \
+  "$([ "$(grep -c "waiting for 'held'" "$WORK/spin.log")" -le 4 ] && echo yes || echo "no ($(grep -c "waiting for" "$WORK/spin.log") polls in 2s)")"
 
 rm -rf "$DEMO_SIM_REGISTRY/locks"
 mkdir -p "$DEMO_SIM_REGISTRY/locks/native-build" "$DEMO_SIM_REGISTRY/locks/native-build.reclaim"

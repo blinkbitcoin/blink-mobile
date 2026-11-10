@@ -47,10 +47,13 @@ PREFLIGHT_COUNT=$(grep -c '"udid"' "$SESSION_DIR/preflight-booted.json" || true)
 # Something outside this session's Metro is listening there: an unrelated
 # server, or a stray bundler. The session's own Metro (metro.pid) does not count.
 port_listened() {
-  local own
-  lsof -nP -iTCP:"$1" -sTCP:LISTEN >/dev/null 2>&1 || return 1
+  local pids own
+  pids=$(lsof -nP -t -iTCP:"$1" -sTCP:LISTEN 2>/dev/null || true)
+  [ -n "$pids" ] || return 1
+  # Ours only if the recorded Metro PID is itself one of the listeners - a
+  # merely alive metro.pid proves nothing (the PID may have been recycled).
   own=$(cat "$SESSION_DIR/metro.pid" 2>/dev/null || echo "")
-  [ -n "$own" ] && kill -0 "$own" 2>/dev/null && return 1   # our Metro is alive: the listener is ours
+  [ -n "$own" ] && printf '%s\n' "$pids" | grep -qx "$own" && return 1
   return 0
 }
 
@@ -95,7 +98,10 @@ reclaim_port() {
   local port="$1"
   case "$port" in ''|*[!0-9]*) return 1 ;; esac
   if [ "$(cat "$REGISTRY/ports/$port/owner" 2>/dev/null)" = "$SIM_NAME" ]; then
-    port_listened "$port" && return 1
+    if port_listened "$port"; then
+      rm -rf "$REGISTRY/ports/$port"   # ours, but unusable: free it before moving on
+      return 1
+    fi
     return 0
   fi
   mkdir "$REGISTRY/ports/$port" 2>/dev/null || return 1
