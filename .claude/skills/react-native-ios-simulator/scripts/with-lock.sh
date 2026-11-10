@@ -20,6 +20,7 @@ shift 2
 
 REGISTRY="${DEMO_SIM_REGISTRY:-$HOME/.claude/rn-sim-sessions}"
 LOCK_DIR="$REGISTRY/locks/$LOCK_NAME"
+RECLAIM_DIR="$LOCK_DIR.reclaim"
 mkdir -p "$REGISTRY/locks"
 
 acquired=""
@@ -34,9 +35,26 @@ while [ -z "$acquired" ]; do
 
   holder=$(cat "$LOCK_DIR/pid" 2>/dev/null || echo "")
   if [ -n "$holder" ] && ! kill -0 "$holder" 2>/dev/null; then
-    echo "reclaiming '$LOCK_NAME' from dead pid $holder" >&2
-    rm -rf "$LOCK_DIR"
-    continue
+    # Reclaiming is itself a critical section: two waiters can both see the
+    # same dead pid, and an unguarded rm by the slower one would delete the
+    # lock the faster one just took. Only the waiter holding the reclaim
+    # mutex may remove the lock, and only after re-reading that it still
+    # belongs to the dead pid.
+    if mkdir "$RECLAIM_DIR" 2>/dev/null; then
+      if [ "$(cat "$LOCK_DIR/pid" 2>/dev/null || echo "")" = "$holder" ] \
+         && ! kill -0 "$holder" 2>/dev/null; then
+        echo "reclaiming '$LOCK_NAME' from dead pid $holder" >&2
+        rm -rf "$LOCK_DIR"
+      fi
+      rmdir "$RECLAIM_DIR" 2>/dev/null || true
+      continue
+    fi
+    # A reclaim mutex is held for milliseconds; one older than a minute was
+    # orphaned by a waiter killed mid-reclaim.
+    if [ $(( $(date +%s) - $(stat -f %m "$RECLAIM_DIR" 2>/dev/null || date +%s) )) -gt 60 ]; then
+      rmdir "$RECLAIM_DIR" 2>/dev/null || true
+      continue
+    fi
   fi
 
   if [ "$(date +%s)" -ge "$deadline" ]; then

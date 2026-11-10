@@ -121,6 +121,41 @@ check "every other device survives" "$before_others" "$(wc -l < "$FAKE_DEVICES" 
 check "port reservation is freed" "absent" \
   "$([ -d "$DEMO_SIM_REGISTRY/ports/$DEMO_PORT" ] && echo present || echo absent)"
 
+# --- re-claim after a keep-release re-validates the recorded port -------------
+# Release frees the reservation but keeps the session dir for retakes; if
+# another session took the port meanwhile, the re-claim must not reuse it.
+reset_world
+eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
+KEPT_PORT="$DEMO_PORT"
+"$SCRIPTS/release-session.sh" 3712 >/dev/null 2>&1
+mkdir -p "$DEMO_SIM_REGISTRY/ports/$KEPT_PORT"
+echo "rn-demo-pr9999" > "$DEMO_SIM_REGISTRY/ports/$KEPT_PORT/owner"
+eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
+check "re-claim does not reuse a port another session took" "moved" \
+  "$([ "$DEMO_PORT" != "$KEPT_PORT" ] && echo moved || echo "reused $KEPT_PORT")"
+check "the other session keeps its reservation" "rn-demo-pr9999" \
+  "$(cat "$DEMO_SIM_REGISTRY/ports/$KEPT_PORT/owner" 2>/dev/null)"
+check "the re-claim holds its new port in the registry" "rn-demo-pr3712" \
+  "$(cat "$DEMO_SIM_REGISTRY/ports/$DEMO_PORT/owner" 2>/dev/null)"
+
+# --- a free recorded port is re-taken, not swapped --------------------------
+reset_world
+eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
+KEPT_PORT="$DEMO_PORT"
+"$SCRIPTS/release-session.sh" 3712 >/dev/null 2>&1
+eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
+check "re-claim re-takes its freed port when still free" "$KEPT_PORT" "$DEMO_PORT"
+check "the re-taken port is reserved again" "rn-demo-pr3712" \
+  "$(cat "$DEMO_SIM_REGISTRY/ports/$DEMO_PORT/owner" 2>/dev/null)"
+
+# --- an own reservation without metro.pid is reused, not leaked -------------
+reset_world
+eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
+KEPT_PORT="$DEMO_PORT"
+rm -f "$DEMO_SESSION_DIR/port"     # a claim that died before recording its port
+eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
+check "reuses its own reservation even with no Metro pid" "$KEPT_PORT" "$DEMO_PORT"
+
 # --- collateral damage detection --------------------------------------------
 reset_world
 eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
@@ -346,6 +381,13 @@ DEMO_UDID= DEMO_SESSION_DIR="$DEMO_SESSION_DIR" DEMO_PORT="$DEMO_PORT" \
   "$SCRIPTS/reset-app.sh" --udid "$RESET_UDID" --app-id com.example.demoapp >/dev/null 2>&1
 check "reset accepts --udid in place of the env var" "0" "$?"
 
+# --- only this session's own device ------------------------------------------
+OTHER_SESSION_UDID=$(eval "$("$SCRIPTS/claim-session.sh" 4112 2>/dev/null)"; echo "$DEMO_UDID")
+out=$("$SCRIPTS/reset-app.sh" --udid "$OTHER_SESSION_UDID" --app-id com.example.demoapp 2>&1); rc=$?
+check "refuses another session's device" "1" "$rc"
+check "names the mismatch" "yes" \
+  "$(echo "$out" | grep -q "not this session's" && echo yes || echo no)"
+
 # --- reinstalls from cache when the device lost the app -----------------------
 rm -rf "$FAKE_APP_ROOT/$DEMO_UDID/com.example.demoapp.app"
 "$SCRIPTS/reset-app.sh" --app-id com.example.demoapp >/dev/null 2>&1
@@ -398,6 +440,33 @@ mkdir -p "$DEMO_SIM_REGISTRY/locks/native-build"
 echo 999999 > "$DEMO_SIM_REGISTRY/locks/native-build/pid"   # PID that cannot exist
 "$SCRIPTS/with-lock.sh" native-build 15 true >/dev/null 2>&1
 check "reclaims a lock from a dead holder" "0" "$?"
+
+# Two waiters that both see the same dead holder must not both end up
+# inside: the slower one's reclaim would otherwise delete the faster one's
+# fresh lock.
+rm -rf "$DEMO_SIM_REGISTRY/locks"; : > "$WORK/reclaim.log"
+mkdir -p "$DEMO_SIM_REGISTRY/locks/native-build"
+echo 999999 > "$DEMO_SIM_REGISTRY/locks/native-build/pid"
+for w in A B C; do
+  "$SCRIPTS/with-lock.sh" native-build 30 bash -c "echo $w-in >> '$WORK/reclaim.log'; sleep 1; echo $w-out >> '$WORK/reclaim.log'" >/dev/null 2>&1 &
+  eval "RECLAIM_$w=\$!"
+done
+wait "$RECLAIM_A" "$RECLAIM_B" "$RECLAIM_C" 2>/dev/null
+check "concurrent reclaimers never overlap inside the lock" "yes" \
+  "$(python3 -c '
+import sys
+inside = 0
+for line in open(sys.argv[1]):
+    inside += 1 if line.strip().endswith("-in") else -1
+    if inside > 1: print("no"); sys.exit()
+print("yes")' "$WORK/reclaim.log")"
+
+rm -rf "$DEMO_SIM_REGISTRY/locks"
+mkdir -p "$DEMO_SIM_REGISTRY/locks/native-build" "$DEMO_SIM_REGISTRY/locks/native-build.reclaim"
+echo 999999 > "$DEMO_SIM_REGISTRY/locks/native-build/pid"
+touch -t 202001010000 "$DEMO_SIM_REGISTRY/locks/native-build.reclaim"   # orphaned long ago
+"$SCRIPTS/with-lock.sh" native-build 25 true >/dev/null 2>&1
+check "clears an orphaned reclaim mutex" "0" "$?"
 
 rm -rf "$DEMO_SIM_REGISTRY/locks"
 mkdir -p "$DEMO_SIM_REGISTRY/locks/held"

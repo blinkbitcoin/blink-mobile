@@ -65,6 +65,21 @@ check "did not switch branches" "yes" \
   "$(cd "$REPO" && git symbolic-ref -q HEAD >/dev/null && echo yes || echo no)"
 
 echo
+echo "republishing (retakes)"
+
+FIRST=$(git -C "$WORK/origin.git" rev-parse refs/heads/assets/pr-3712-screenshots)
+printf 'retaken' > "$REPO/after.png"
+printf 'extra' > "$REPO/zoom.png"
+out=$(cd "$REPO" && "$PUSH" 3712 screenshots after.png zoom.png --repo acme/sample-app 2>&1)
+check "a second publish to the same branch succeeds" "0" "$?"
+check "the republish fast-forwards the branch" "$FIRST" \
+  "$(git -C "$WORK/origin.git" rev-parse refs/heads/assets/pr-3712-screenshots^ 2>/dev/null)"
+check "files from the first publish stay embeddable" "after.png before.png zoom.png " \
+  "$(git -C "$WORK/origin.git" ls-tree -r --name-only refs/heads/assets/pr-3712-screenshots | sort | tr '\n' ' ')"
+check "a re-published file carries the new bytes" "$(git -C "$REPO" hash-object after.png)" \
+  "$(git -C "$WORK/origin.git" rev-parse refs/heads/assets/pr-3712-screenshots:after.png)"
+
+echo
 echo "repo derivation from the remote"
 
 # Without --repo, owner/name comes from the origin remote URL — both shapes.

@@ -60,20 +60,36 @@ reserve_port() {
       fi
       echo "$candidate"; return 0
     fi
-    # Reclaim a reservation whose owning session no longer exists.
-    stale_pid=$(cat "$REGISTRY/ports/$candidate/metro.pid" 2>/dev/null || echo "")
-    if [ -n "$stale_pid" ] && ! kill -0 "$stale_pid" 2>/dev/null; then
-      if [ "$(cat "$REGISTRY/ports/$candidate/owner" 2>/dev/null)" = "$SIM_NAME" ]; then
-        echo "$candidate"; return 0
-      fi
+    # A reservation this session already owns is ours to reuse, whether or not
+    # Metro ever started on it - otherwise a claim that died before recording
+    # its port leaks the reservation forever. Another session's reservation is
+    # never ours to judge.
+    if [ "$(cat "$REGISTRY/ports/$candidate/owner" 2>/dev/null)" = "$SIM_NAME" ]; then
+      echo "$candidate"; return 0
     fi
   done
   echo "FATAL: no free port in $base..$((base + 60))" >&2; exit 1
 }
 
-if [ -f "$SESSION_DIR/port" ]; then
-  PORT=$(cat "$SESSION_DIR/port")   # idempotent re-claim
-else
+# A recorded port is only reusable while the registry still says it is ours:
+# release frees the reservation but keeps the session dir for retakes, so a
+# re-claim must re-take the port (atomically) or reserve a fresh one - never
+# trust the file alone, or two sessions end up sharing one Metro.
+reclaim_port() {
+  local port="$1"
+  case "$port" in ''|*[!0-9]*) return 1 ;; esac
+  [ "$(cat "$REGISTRY/ports/$port/owner" 2>/dev/null)" = "$SIM_NAME" ] && return 0
+  mkdir "$REGISTRY/ports/$port" 2>/dev/null || return 1
+  echo "$SIM_NAME" > "$REGISTRY/ports/$port/owner"
+  if lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
+    rm -rf "$REGISTRY/ports/$port"
+    return 1
+  fi
+  return 0
+}
+
+PORT=$(cat "$SESSION_DIR/port" 2>/dev/null || echo "")
+if ! reclaim_port "$PORT"; then
   PORT=$(reserve_port)
   echo "$PORT" > "$SESSION_DIR/port"
 fi

@@ -93,11 +93,30 @@ if [ -n "$DRY" ]; then
   echo "repo:    $REPO"
   echo "refspec: <commit>:refs/heads/$BRANCH"
 else
+  # A retake publishes to the same branch again. Build on its current tip so
+  # the push is a fast-forward, and keep every file already there that this
+  # publish does not replace - earlier PR comments still embed those URLs.
+  PARENT=""
+  if git fetch -q "$REMOTE" "refs/heads/$BRANCH" 2>/dev/null; then
+    PARENT=$(git rev-parse -q --verify FETCH_HEAD^{commit} 2>/dev/null || echo "")
+  fi
+  if [ -n "$PARENT" ]; then
+    while IFS= read -r entry; do
+      [ -n "$entry" ] || continue
+      case " $SEEN " in
+        *" ${entry#*	} "*) continue ;;   # replaced by this publish
+      esac
+      TREE_INPUT="${TREE_INPUT}${entry}
+"
+    done <<EOF
+$(git ls-tree "$PARENT")
+EOF
+  fi
   TREE=$(printf '%s' "$TREE_INPUT" | git mktree) || die "git mktree failed"
-  COMMIT=$(git commit-tree "$TREE" -m "$PURPOSE for #$PR") || die "git commit-tree failed"
+  COMMIT=$(git commit-tree "$TREE" ${PARENT:+-p "$PARENT"} -m "$PURPOSE for #$PR") || die "git commit-tree failed"
   # The refspec is written literally. Assembling it in a shell variable has
   # been mangled before.
-  git push "$REMOTE" "$COMMIT:refs/heads/$BRANCH" >/dev/null 2>&1 || die "push failed"
+  PUSH_ERR=$(git push -q "$REMOTE" "$COMMIT:refs/heads/$BRANCH" 2>&1) || die "push failed: $PUSH_ERR"
   echo "pushed $BRANCH"
 fi
 

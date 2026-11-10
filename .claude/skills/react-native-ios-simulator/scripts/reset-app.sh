@@ -49,10 +49,16 @@ for _, devices in json.load(sys.stdin)['devices'].items():
         if d['udid'] == udid:
             print(d['name']); sys.exit(0)
 " "$UDID" || true)
-case "$ACTUAL_NAME" in
+# Exactly this session's device, not merely any session's: the session dir is
+# keyed by the device name claim-session.sh gave it, so a stale DEMO_UDID or a
+# mistyped --udid can never reset another agent's live simulator.
+EXPECTED_NAME=$(basename "$SESSION_DIR")
+case "$EXPECTED_NAME" in
   "$PREFIX"-pr*) : ;;
-  *) die "refusing to reset $UDID - named '${ACTUAL_NAME:-<gone>}', not a '${PREFIX}-pr<N>' session device" ;;
+  *) die "DEMO_SESSION_DIR '$SESSION_DIR' is not a '${PREFIX}-pr<N>' session" ;;
 esac
+[ "$ACTUAL_NAME" = "$EXPECTED_NAME" ] \
+  || die "refusing to reset $UDID - named '${ACTUAL_NAME:-<gone>}', not this session's '$EXPECTED_NAME'"
 
 # --- Cache the installed bundle, or fall back to a previous cache ------------
 CACHE_DIR="$SESSION_DIR/app-cache"
