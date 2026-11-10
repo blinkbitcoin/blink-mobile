@@ -39,6 +39,17 @@ Once Nix and direnv are set up, follow these steps to set up the blink-mobile pr
    yarn install
    ```
 
+### Card push provisioning SDK (optional)
+
+Adding the Blink card to Apple Pay or Google Pay runs through the MeaWallet SDK (`@meawallet/react-native-mpp`), which lives in MeaWallet's private registry. Without access the app builds and runs the same, and the add to wallet button stays hidden.
+
+With access, put the credentials and the configuration file Rain shared in `~/.config/blink/`:
+
+- `meawallet-rn.env`, with `MEA_RN_USER` and `MEA_RN_PASSWORD` for the React Native package
+- `mea_config`, the SDK configuration
+
+Then run `yarn install` (or `yarn meawallet:install` on its own). It vendors the SDK to `vendor/meawallet/` and copies `mea_config` into the Android and iOS projects. None of those files are tracked by git. CI can pass `MEA_RN_USER`, `MEA_RN_PASSWORD` and `MEA_CONFIG_FILE` as environment variables instead.
+
 ### Android Development
 
 To run the application on Android:
