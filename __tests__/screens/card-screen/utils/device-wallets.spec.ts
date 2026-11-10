@@ -303,6 +303,22 @@ describe("deviceWalletFor on Android", () => {
     })
   })
 
+  it.each(["", "   "])(
+    "leaves the second address line out when the cardholder has none (%j)",
+    async (line2) => {
+      const sdk = fakeSdk()
+
+      await deviceWalletFor(sdk).add(card, {
+        ...provisioning,
+        address: { ...provisioning.address, line2 },
+      })
+
+      const [, , address] = sdk.googlePay.push.mock.calls[0]
+      expect(address.address2).toBeUndefined()
+      expect(address.address1).toBe("1 Main St")
+    },
+  )
+
   it("answers cancelled when the user backs out of Google's sheet", async () => {
     const sdk = fakeSdk()
     sdk.googlePay.push.mockRejectedValue(

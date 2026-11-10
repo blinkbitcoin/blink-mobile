@@ -42,10 +42,17 @@ const isGoogleSheetDismissed = (err: unknown): boolean => {
   return code === GOOGLE_CANCEL_CODE
 }
 
+/** Left out when the cardholder has none, so Google Pay never shows a blank second line;
+ *  the SDK reads a missing one as null. */
+const secondAddressLine = (line2: string): string | undefined => {
+  if (line2.trim() === "") return undefined
+  return line2
+}
+
 const toGooglePayAddress = (address: CardholderAddress): GooglePayAddress => ({
   name: address.name,
   address1: address.line1,
-  address2: address.line2,
+  address2: secondAddressLine(address.line2),
   locality: address.city,
   administrativeArea: address.region,
   postalCode: address.postalCode,
