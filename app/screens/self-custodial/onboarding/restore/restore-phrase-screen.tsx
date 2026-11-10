@@ -36,8 +36,6 @@ import { RestoreStatus, useRestorePhrase } from "./hooks/use-restore-phrase"
 
 type RestorePhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialRestorePhrase">
 
-// The clear tertiary button has no padding, so its hit area is the text bounds.
-
 type RestorePhraseContentProps = {
   step: PhraseStep
   restore: ReturnType<typeof useRestorePhrase>

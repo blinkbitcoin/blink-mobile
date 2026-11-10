@@ -27,8 +27,6 @@ import { testProps } from "@app/utils/testProps"
 
 import { useViewBackupPhrase } from "../hooks"
 
-// The clear tertiary button has no padding, so its hit area is the text bounds.
-
 type ViewBackupPhraseContentProps = {
   isAuthenticated: boolean
 }

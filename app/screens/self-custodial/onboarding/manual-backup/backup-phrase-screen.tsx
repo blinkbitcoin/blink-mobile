@@ -30,8 +30,6 @@ import { useBackupCountdownDeadline, useBackupPhrase } from "../hooks"
 
 const WORDS_PER_CARD = 3
 
-// The clear tertiary button has no padding, so its hit area is the text bounds.
-
 type PhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhrase">
 
 type BackupPhraseContentProps = {
