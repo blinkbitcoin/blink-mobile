@@ -3953,6 +3953,12 @@
             "title": "Wir können dein Dollar-Guthaben nicht migrieren",
             "body": "Leere zuerst dein Dollar-Guthaben. Du kannst es auf dein Bitcoin-Guthaben in Blink oder anderswohin übertragen."
         },
+        "pendingDepositModal": {
+            "title": "Es gibt eine ausstehende Einzahlung auf dein Konto",
+            "body": "Du kannst nicht zu einem anderen Kontotyp migrieren, bevor alle deine ausstehenden Einzahlungen abgewickelt und diesem Konto gutgeschrieben wurden.",
+            "contactSupportCta": "Support kontaktieren",
+            "stillConfirming": "Deine Einzahlung ist noch nicht bestätigt. Versuche es in ein paar Minuten erneut."
+        },
         "balancesOverview": {
             "title": "Verschiebe dein Guthaben",
             "body": "Verschiebe deine Gelder sicher auf dein neues Konto.",
@@ -4140,6 +4146,7 @@
         "get": "Laden",
         "storeNote": "„Laden“ öffnet den App Store oder Google Play. Kehre zu Blink zurück, sobald die App installiert ist.",
         "haveAnApp": "Ich habe eine App",
+        "learnHow": "So geht’s",
         "keyInstruction": "Kopiere diesen Einrichtungsschlüssel in deine Authenticator-App.",
         "qrInstruction": "Nutzt du ein anderes Gerät?\nScanne stattdessen diesen QR-Code.",
         "backupTitle": "Sichere deinen Schlüssel",
@@ -4252,7 +4259,6 @@
         "payment": "Zahlung"
     },
     "SelfCustodialStaleRate": {
-        "notice": "Der Wechselkurs ist möglicherweise veraltet",
         "satsOnly": "Anzeige in Sats – kein Wechselkurs verfügbar"
     },
     "SelfCustodialOffline": {

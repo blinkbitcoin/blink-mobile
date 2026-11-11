@@ -3953,6 +3953,12 @@
       "title": "Nem tudjuk átköltöztetni a dollár egyenlegedet",
       "body": "Először ürítsd ki a dollár egyenlegedet. Átutalhatod a Bitcoin egyenlegedre a Blinkben vagy máshová."
     },
+    "pendingDepositModal": {
+      "title": "Függőben lévő befizetés van a számládon",
+      "body": "Nem válthatsz másik számlatípusra, amíg az összes függőben lévő befizetésed nem teljesült és nem került jóváírásra ezen a számlán.",
+      "contactSupportCta": "Kapcsolat a támogatással",
+      "stillConfirming": "A befizetésed még nincs megerősítve. Próbáld újra néhány perc múlva."
+    },
     "balancesOverview": {
       "title": "Mozgasd az egyenleged",
       "body": "Mozgasd biztonságosan a pénzed az új fiókodba.",
@@ -4140,6 +4146,7 @@
     "get": "Letöltés",
     "storeNote": "A „Letöltés” megnyitja az App Store-t vagy a Google Playt. Ha telepítetted, gyere vissza a Blinkbe.",
     "haveAnApp": "Már van alkalmazásom",
+    "learnHow": "Nézd meg, hogyan",
     "keyInstruction": "Másold be ezt a beállítási kulcsot a hitelesítő alkalmazásodba.",
     "qrInstruction": "Másik eszközt használsz?\nOlvasd be inkább ezt a QR-kódot.",
     "backupTitle": "Mentsd el a kulcsodat",
@@ -4252,7 +4259,6 @@
     "payment": "Fizetés"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Az árfolyam elavult lehet",
     "satsOnly": "Satoshiban megjelenítve – nincs elérhető árfolyam"
   },
   "SelfCustodialOffline": {

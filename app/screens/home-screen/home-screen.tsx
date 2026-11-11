@@ -14,6 +14,10 @@ import { GaloyIcon, icons } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { DisabledFeature } from "@app/components/disabled-feature"
+import {
+  HEADER_ICON_BUTTON_TOUCH_PADDING,
+  headerIconButtonTouchPaddingAbove,
+} from "@app/components/header-no-glass"
 import { BulletinsCard } from "@app/components/notifications/bulletins"
 import { SetDefaultAccountModal } from "@app/components/set-default-account-modal"
 import { StableSatsModal } from "@app/components/stablesats-modal"
@@ -28,7 +32,6 @@ import {
 import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
-import { RateFreshness } from "@app/types/price"
 import { CARD, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { StableTokenConvertToBtcModal } from "@app/screens/conversion-flow/stable-token-convert-to-btc-modal"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
@@ -416,16 +419,13 @@ export const HomeScreen: React.FC = () => {
     stableBalanceEnabled && isSelfCustodial && isStableBalanceActive
 
   const { formatMoneyAmount } = useDisplayCurrency()
-  const { priceFreshness, isSatsOnly } = usePriceConversion()
+  const { isSatsOnly } = usePriceConversion()
 
   const isShowingSats = showStableBalanceToggle && balanceMode === BalanceMode.Btc
 
   const formattedBalance = isShowingSats
     ? formatMoneyAmount({ moneyAmount: toBtcMoneyAmount(satsBalance) })
     : defaultFormattedBalance
-
-  /** A sats figure needs no rate, so it is never stale; only a converted one can be. */
-  const isRateStale = priceFreshness === RateFreshness.Stale && !isShowingSats
 
   const accountId = dataAuthed?.me?.defaultAccount?.id
   const levelAccount = dataAuthed?.me?.defaultAccount?.level
@@ -989,8 +989,9 @@ export const HomeScreen: React.FC = () => {
             name="graph"
             iconOnly={true}
             weight="bold"
+            touchPadding={headerIconButtonTouchPaddingAbove}
           />
-          <View>
+          <View style={styles.headerTitle}>
             {!loading && usernameTitle && (
               <Pressable onPress={canSwitchAccount ? handleSwitchPress : null}>
                 <View style={styles.profileContainer}>
@@ -1013,6 +1014,7 @@ export const HomeScreen: React.FC = () => {
             name="menu"
             iconOnly={true}
             weight="bold"
+            touchPadding={headerIconButtonTouchPaddingAbove}
           />
         </View>
       </View>
@@ -1022,7 +1024,6 @@ export const HomeScreen: React.FC = () => {
         showStableBalanceToggle={showStableBalanceToggle}
         mode={balanceMode}
         onModeChange={toggleBalanceMode}
-        isRateStale={isRateStale}
         isSatsOnly={isSatsOnly}
       />
       <View style={styles.badgeSlot}>
@@ -1201,8 +1202,10 @@ const useStyles = makeStyles(({ colors }) => ({
     flexGrow: 1,
     alignItems: "center",
   },
+  // The price and menu touch boxes grow 7dp up and sideways into the row's margins (no
+  // room is free below them). The icons stay 13dp down (6 + 0 + 7) and the balance at 47dp.
   balanceContainer: {
-    marginTop: 7,
+    marginTop: 6,
     flexDirection: "column",
     minHeight: 40,
   },
@@ -1210,8 +1213,12 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginHorizontal: 20,
-    marginTop: 6,
+    marginHorizontal: 20 - HEADER_ICON_BUTTON_TOUCH_PADDING,
+    marginTop: 0,
+  },
+  // Matches the padding above the icons, so the username stays centred on them.
+  headerTitle: {
+    paddingTop: HEADER_ICON_BUTTON_TOUCH_PADDING,
   },
   error: {
     alignSelf: "center",

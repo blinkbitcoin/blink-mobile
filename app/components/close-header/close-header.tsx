@@ -6,6 +6,10 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
+import {
+  HEADER_ICON_BUTTON_TOUCH_PADDING,
+  headerIconButtonTouchPaddingAbove,
+} from "@app/components/header-no-glass"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { testProps } from "@app/utils/testProps"
 
@@ -48,6 +52,7 @@ export const CloseHeader: React.FC<CloseHeaderProps> = ({
           size="medium"
           backgroundColor={colors.surfaceInteractive}
           onPress={onClose ?? leaveFlow}
+          touchPadding={headerIconButtonTouchPaddingAbove}
           {...testProps(testID)}
         />
       )}
@@ -61,7 +66,10 @@ const useStyles = makeStyles(() => ({
     flexDirection: "row",
     justifyContent: "flex-end",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 10,
+    // The touch box grows into the padding above and beside the close button, so the
+    // button and the 44dp row stay where they were.
+    paddingLeft: 20,
+    paddingRight: 20 - HEADER_ICON_BUTTON_TOUCH_PADDING,
+    paddingTop: 10 - HEADER_ICON_BUTTON_TOUCH_PADDING,
   },
 }))
