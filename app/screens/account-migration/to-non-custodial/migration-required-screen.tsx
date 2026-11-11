@@ -108,7 +108,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   const presentationByMode: Record<MigrationMode, ModePresentation> = {
     voluntary: {
       heroIcon: "upgrade",
-      heroIconColor: colors._green,
+      heroIconColor: colors.staticSuccess,
       title: LL.AccountMigration.migrationRequiredTitle(),
       subtitle: LL.AccountMigration.migrationRequiredBody(),
       shouldShowClose: true,
@@ -116,7 +116,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
     },
     forcedPreDeadline: {
       heroIcon: "upgrade",
-      heroIconColor: colors._green,
+      heroIconColor: colors.staticSuccess,
       title: LL.AccountMigration.migrationRequiredTitle(),
       subtitle: LL.AccountMigration.migrationRequiredForcedBody(),
       shouldShowClose: true,
@@ -175,10 +175,10 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 16,
     lineHeight: 22,
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   gateLink: {
     textDecorationLine: "underline",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

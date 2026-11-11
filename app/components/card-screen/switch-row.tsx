@@ -48,13 +48,13 @@ const useStyles = makeStyles(({ colors }) => ({
     minHeight: 0,
   },
   listItemTitle: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     lineHeight: 20,
     fontWeight: "400",
   },
   listItemSubtitle: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontWeight: "400",
     fontSize: 14,
     lineHeight: 16,

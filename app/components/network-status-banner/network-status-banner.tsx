@@ -35,9 +35,9 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 8,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderBottomWidth: 1,
-    borderBottomColor: colors.grey4,
+    borderBottomColor: colors.border,
   },
   text: {
     color: colors.warning,

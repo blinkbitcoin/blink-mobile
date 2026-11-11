@@ -28,13 +28,13 @@ export const WalletToggleButton: React.FC<WalletToggleButtonProps> = ({
       style={[styles.button, containerStyle, disabled && styles.buttonDisabled]}
       disabled={disabled}
       onPress={onPress}
-      underlayColor={colors.grey6}
+      underlayColor={colors.surfacePressed}
       testID={testID}
     >
       {loading ? (
-        <ActivityIndicator color={colors.primary} />
+        <ActivityIndicator color={colors.accent} />
       ) : (
-        <GaloyIcon name="transfer" color={colors.primary} size={25} />
+        <GaloyIcon name="transfer" color={colors.accent} size={25} />
       )}
     </TouchableHighlight>
   )
@@ -45,13 +45,13 @@ const useStyles = makeStyles(({ colors }) => ({
     height: 50,
     width: 50,
     borderRadius: 50,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
     zIndex: 3,
     elevation: 3,
   },
   buttonDisabled: {
-    backgroundColor: colors.grey6,
+    backgroundColor: colors.surfacePressed,
   },
 }))

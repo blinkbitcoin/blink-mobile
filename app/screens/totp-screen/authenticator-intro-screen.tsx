@@ -92,7 +92,7 @@ export const AuthenticatorIntroScreen: React.FC = () => {
     >
       <IconHero
         icon="lock-closed"
-        iconColor={colors._green}
+        iconColor={colors.staticSuccess}
         title={LL.AuthenticatorOnboarding.introTitle()}
         subtitle={
           <Text type="p3" style={styles.description}>
@@ -105,7 +105,7 @@ export const AuthenticatorIntroScreen: React.FC = () => {
           <React.Fragment key={benefit.icon}>
             {index > 0 && (
               <Divider
-                color={colors.grey4}
+                color={colors.border}
                 width={DIVIDER_WIDTH}
                 style={styles.divider}
               />
@@ -127,14 +127,14 @@ export const AuthenticatorIntroScreen: React.FC = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   description: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     textAlign: "center",
   },
   /** On the static card surface: the benefits are read, never pressed. */
   benefitsCard: {
     marginTop: 30,
     marginHorizontal: 20,
-    backgroundColor: colors.grey7,
+    backgroundColor: colors.surfaceStatic,
     borderRadius: 8,
     overflow: "hidden",
   },

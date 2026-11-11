@@ -24,11 +24,11 @@ const useStyles = makeStyles(
     labelComponentStyles: {
       marginBottom: 9,
       fontWeight: "400",
-      color: colors.grey5,
+      color: colors.surfaceInteractive,
       marginLeft: isFocused ? 2 : 10,
     },
     errorMessageStyles: {
-      color: props.caption ? colors.grey5 : colors.error,
+      color: props.caption ? colors.surfaceInteractive : colors.error,
       textTransform: "capitalize",
       marginTop: 9,
       marginLeft: isFocused ? 2 : 10,

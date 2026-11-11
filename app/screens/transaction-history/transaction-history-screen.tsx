@@ -519,14 +519,14 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   sectionHeaderContainer: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     flexDirection: "row",
     justifyContent: "space-between",
     padding: 18,
   },
 
   sectionHeaderText: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 18,
   },
 }))

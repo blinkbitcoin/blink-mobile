@@ -163,7 +163,7 @@ const useStyles = makeStyles(({ colors }) => ({
     fontFamily: fonts.bold,
   },
   description: {
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   row: {
     flexDirection: "row",
@@ -172,7 +172,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 12,
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    borderColor: colors.grey4,
+    borderColor: colors.border,
   },
   rowLabel: {
     flex: 1,
@@ -182,7 +182,7 @@ const useStyles = makeStyles(({ colors }) => ({
     fontFamily: fonts.bold,
   },
   rowHint: {
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   spinner: {
     marginRight: 4,

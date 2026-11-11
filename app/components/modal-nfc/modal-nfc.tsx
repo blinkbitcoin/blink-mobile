@@ -196,7 +196,7 @@ export const ModalNfc: React.FC<{
       onSwipeComplete={dismiss}
       onBackdropPress={dismiss}
       backdropOpacity={0.3}
-      backdropColor={colors.grey3}
+      backdropColor={colors.textDisabled}
       swipeThreshold={50}
       propagateSwipe
       style={styles.modal}
@@ -204,13 +204,18 @@ export const ModalNfc: React.FC<{
       <Pressable style={styles.flex} onPress={dismiss}></Pressable>
       <SafeAreaView style={styles.modalForeground}>
         <View style={styles.iconContainer}>
-          <GaloyIcon name="minus" size={72} color={colors.grey3} style={styles.icon} />
+          <GaloyIcon
+            name="minus"
+            size={72}
+            color={colors.textDisabled}
+            style={styles.icon}
+          />
         </View>
         <Text type="h1" bold style={styles.message}>
           {LL.SettingsScreen.nfcScanNow()}
         </Text>
         <View style={styles.scanIconContainer}>
-          <GaloyIcon name="scan" size={140} color={colors.grey1} />
+          <GaloyIcon name="scan" size={140} color={colors.textSecondary} />
         </View>
         <View style={styles.buttonContainer}>
           <GaloySecondaryButton title={LL.common.cancel()} onPress={dismiss} />
@@ -258,7 +263,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 20,
     paddingTop: 10,
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
   },
 
   modalContent: {

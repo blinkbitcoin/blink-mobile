@@ -269,7 +269,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         <View style={styles.walletListPendingContainer}>
           <ActivityIndicator
             size="large"
-            color={colors.primary}
+            color={colors.accent}
             {...testProps("send-wallet-list-pending")}
           />
         </View>
@@ -567,7 +567,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               onPress={handleCopyToClipboard}
               hitSlop={30}
             >
-              <GaloyIcon name={"copy-paste"} size={18} color={colors.primary} />
+              <GaloyIcon name={"copy-paste"} size={18} color={colors.accent} />
             </TouchableOpacity>
           </View>
         </View>
@@ -621,7 +621,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               </View>
 
               <View style={styles.pickWalletIcon}>
-                <GaloyIcon name={"caret-down"} size={24} color={colors.primary} />
+                <GaloyIcon name={"caret-down"} size={24} color={colors.accent} />
               </View>
             </View>
           </TouchableWithoutFeedback>
@@ -712,7 +712,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     borderStyle: "solid",
     overflow: "hidden",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 10,
     alignItems: "center",
     padding: 14,
@@ -722,7 +722,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     borderStyle: "solid",
     overflow: "hidden",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 10,
     alignItems: "center",
     padding: 14,
@@ -738,7 +738,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     borderStyle: "solid",
     overflow: "hidden",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     paddingHorizontal: 14,
     borderRadius: 10,
     alignItems: "center",

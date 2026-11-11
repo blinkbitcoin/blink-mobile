@@ -284,29 +284,29 @@ type UseStyleProps = {
 const useStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
   container: {
     paddingVertical: 9,
-    borderColor: colors.grey4,
+    borderColor: colors.border,
     overflow: "hidden",
-    backgroundColor: props.highlight ? colors.grey4 : colors.grey5,
+    backgroundColor: props.highlight ? colors.border : colors.surfaceInteractive,
     borderTopWidth: (props.isFirst && props.isOnHomeScreen) || !props.isFirst ? 1 : 0,
     borderBottomLeftRadius: props.isLast && props.isOnHomeScreen ? 12 : 0,
     borderBottomRightRadius: props.isLast && props.isOnHomeScreen ? 12 : 0,
   },
   hiddenBalanceContainer: {
     fontSize: 16,
-    color: colors.grey0,
+    color: colors.textPrimary,
   },
   pending: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     textAlign: "right",
     flexWrap: "wrap",
   },
   receive: {
-    color: colors._green,
+    color: colors.staticSuccess,
     textAlign: "right",
     flexWrap: "wrap",
   },
   send: {
-    color: colors.grey0,
+    color: colors.textPrimary,
     textAlign: "right",
     flexWrap: "wrap",
   },
@@ -316,7 +316,7 @@ const useStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
     fontWeight: "400",
   },
   subtitle: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
     lineHeight: 20,
     fontWeight: "400",

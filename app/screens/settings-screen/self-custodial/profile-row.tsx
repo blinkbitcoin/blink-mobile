@@ -181,7 +181,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
           containerStyle={[styles.listStyle, isFirstItem && styles.firstItem]}
         >
           {isActive ? (
-            <GaloyIcon name="check-circle" size={20} color={colors._green} />
+            <GaloyIcon name="check-circle" size={20} color={colors.staticSuccess} />
           ) : (
             <View style={styles.spacer} />
           )}
@@ -196,7 +196,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
           {probingBalance ? (
             <ActivityIndicator
               size="small"
-              color={colors.primary}
+              color={colors.accent}
               {...testProps(`probe-spinner-${accountId}`)}
             />
           ) : (
@@ -204,7 +204,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
               name="close"
               size="small"
               onPress={handleRemovePress}
-              backgroundColor={colors.grey4}
+              backgroundColor={colors.border}
               testID={`delete-button-${accountId}`}
               accessibilityRole="button"
               accessibilityLabel={removeAccountLabel}
@@ -213,7 +213,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
         </ListItem>
       </TouchableOpacity>
       <Overlay isVisible={deleteState === "deleting"} overlayStyle={styles.overlayStyle}>
-        <ActivityIndicator size={50} color={colors.primary} />
+        <ActivityIndicator size={50} color={colors.accent} />
         <Text>{LL.AccountScreen.pleaseWait()}</Text>
       </Overlay>
       <DeleteAccountHasFundsModal
@@ -233,8 +233,8 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
 const useStyles = makeStyles(({ colors }) => ({
   listStyle: {
     borderBottomWidth: 2,
-    borderColor: colors.grey5,
-    backgroundColor: colors.white,
+    borderColor: colors.surfaceInteractive,
+    backgroundColor: colors.backgroundDefault,
   },
   firstItem: {
     marginTop: 0,
@@ -244,7 +244,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 20,
   },
   subtleText: {
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   overlayStyle: {
     backgroundColor: "transparent",

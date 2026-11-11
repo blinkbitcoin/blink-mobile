@@ -26,10 +26,10 @@ jest.mock("@rn-vui/themed", () => ({
   useTheme: () => ({
     theme: {
       colors: {
-        primary: "#F7931A",
+        accent: "#F7931A",
         error: "#FF0000",
-        error9: "#FFE0E0",
-        grey4: "#E0E0E0",
+        errorBackground: "#FFE0E0",
+        border: "#E0E0E0",
       },
     },
   }),

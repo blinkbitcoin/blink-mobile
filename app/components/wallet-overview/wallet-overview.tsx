@@ -298,7 +298,7 @@ const WalletOverview: React.FC<Props> = ({
                 <NotificationBadge visible={showUsdNotification} />
               </View>
               <Pressable onPress={() => setIsStablesatModalVisible(true)}>
-                <GaloyIcon color={colors.grey1} name="question" size={18} />
+                <GaloyIcon color={colors.textSecondary} name="question" size={18} />
               </Pressable>
             </View>
             {isDollarBalanceLoading ? (
@@ -385,7 +385,7 @@ export default WalletOverview
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     display: "flex",
     flexDirection: "column",
     borderRadius: 12,
@@ -415,7 +415,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   separator: {
     height: 1,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.border,
     marginVertical: 2,
   },
   titleSeparator: {

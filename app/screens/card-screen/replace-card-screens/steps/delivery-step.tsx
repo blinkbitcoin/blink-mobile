@@ -76,11 +76,11 @@ export const DeliveryStep: React.FC<DeliveryStepProps> = ({
           () => (
             <SelectableOptionRow
               icon="delivery"
-              iconColor={colors.grey2}
+              iconColor={colors.textMuted}
               title={deliveryLL.standardDelivery()}
               subtitle={getDays(Delivery.Standard)}
               value={getPrice(Delivery.Standard)}
-              valueColor={colors._green}
+              valueColor={colors.staticSuccess}
               isSelected={selectedDelivery === Delivery.Standard}
               onPress={() => onSelectDelivery(Delivery.Standard)}
             />
@@ -88,11 +88,11 @@ export const DeliveryStep: React.FC<DeliveryStepProps> = ({
           () => (
             <SelectableOptionRow
               icon="lightning"
-              iconColor={colors.grey2}
+              iconColor={colors.textMuted}
               title={deliveryLL.expressDelivery()}
               subtitle={getDays(Delivery.Express)}
               value={getPrice(Delivery.Express)}
-              valueColor={colors.black}
+              valueColor={colors.textOnBackground}
               isSelected={selectedDelivery === Delivery.Express}
               onPress={() => onSelectDelivery(Delivery.Express)}
             />

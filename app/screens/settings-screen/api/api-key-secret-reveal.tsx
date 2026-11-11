@@ -70,7 +70,7 @@ const ApiKeySecretRevealContent: React.FC<
       <View style={styles.body}>
         <IconHero
           icon="check-badge"
-          iconColor={colors._green}
+          iconColor={colors.staticSuccess}
           title={name}
           subtitle={LL.ApiScreen.secretWarning()}
         />
@@ -93,7 +93,7 @@ const ApiKeySecretRevealContent: React.FC<
           title={LL.common.share()}
           icon={
             <View style={styles.shareIcon}>
-              <GaloyIcon name="share" size={SHARE_ICON_SIZE} color={colors.primary} />
+              <GaloyIcon name="share" size={SHARE_ICON_SIZE} color={colors.accent} />
             </View>
           }
           hitSlop={SHARE_HIT_SLOP}

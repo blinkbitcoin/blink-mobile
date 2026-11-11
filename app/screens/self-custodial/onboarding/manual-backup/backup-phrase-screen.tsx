@@ -181,7 +181,7 @@ const useStyles = makeStyles(({ colors }) => ({
   wordNumber: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   wordText: {
     fontSize: 14,

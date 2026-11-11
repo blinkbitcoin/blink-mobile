@@ -62,7 +62,7 @@ export const SettingsRow: React.FC<Props> = ({
       <GaloyIcon
         name={(rightIcon as IconNamesType) || defaultIcon}
         size={20}
-        color={colors.primary}
+        color={colors.accent}
       />
     ) : (
       rightIcon
@@ -114,7 +114,7 @@ const useStyles = makeStyles(({ colors }, { hovering }: { hovering: boolean }) =
     alignItems: "center",
     justifyContent: "space-between",
     columnGap: 16,
-    backgroundColor: hovering ? colors.grey4 : undefined,
+    backgroundColor: hovering ? colors.border : undefined,
     minHeight: 58,
   },
   spacing: {

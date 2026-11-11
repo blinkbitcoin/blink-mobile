@@ -111,7 +111,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                 <Text style={styles.txLink} numberOfLines={1} ellipsizeMode="middle">
                   {deposit.txid}
                 </Text>
-                <GaloyIcon name="link" size={12} color={colors.primary} />
+                <GaloyIcon name="link" size={12} color={colors.accent} />
               </Pressable>
 
               {deposit.status === DepositStatus.Immature && (
@@ -128,7 +128,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                 !isRefunding && (
                   <View style={styles.actions}>
                     {isProcessing(deposit.id, DepositActionType.Claim) ? (
-                      <ActivityIndicator size="small" color={colors.primary} />
+                      <ActivityIndicator size="small" color={colors.accent} />
                     ) : (
                       <GaloyTertiaryButton
                         title={LL.UnclaimedDeposit.claim()}
@@ -157,7 +157,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                       <TextInput
                         style={styles.fieldInputText}
                         placeholder={addressPlaceholderFor(network)}
-                        placeholderTextColor={colors.grey2}
+                        placeholderTextColor={colors.textMuted}
                         value={refundAddress}
                         onChangeText={setRefundAddress}
                         autoCapitalize="none"
@@ -195,7 +195,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                       {...testProps("cancel-refund")}
                     />
                     {isProcessing(deposit.id, DepositActionType.Refund) ? (
-                      <ActivityIndicator size="small" color={colors.primary} />
+                      <ActivityIndicator size="small" color={colors.accent} />
                     ) : (
                       <GaloyTertiaryButton
                         title={LL.UnclaimedDeposit.refundNow()}
@@ -226,11 +226,11 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   emptyText: {
     textAlign: "center",
-    color: colors.grey2,
+    color: colors.textMuted,
     marginTop: 40,
   },
   card: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 12,
     padding: 20,
     gap: 14,
@@ -238,7 +238,7 @@ const useStyles = makeStyles(({ colors }) => ({
   cardTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   txRow: {
     flexDirection: "row",
@@ -247,13 +247,13 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   txLink: {
     fontSize: 12,
-    color: colors.primary,
+    color: colors.accent,
     fontFamily: "Source Sans Pro",
     flex: 1,
   },
   mutedText: {
     fontSize: 12,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   errorText: {
     fontSize: 12,
@@ -268,16 +268,16 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 14,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: colors.grey4,
+    borderTopColor: colors.border,
   },
   fieldLabel: {
     fontSize: 13,
     fontFamily: fonts.bold,
-    color: colors.grey2,
+    color: colors.textMuted,
     marginBottom: 8,
   },
   fieldInput: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     borderRadius: 10,
     paddingHorizontal: 14,
     minHeight: 48,
@@ -285,11 +285,11 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   fieldInputText: {
     fontSize: 14,
-    color: colors.black,
+    color: colors.textOnBackground,
     fontFamily: "Source Sans Pro",
   },
   fieldGroup: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 10,

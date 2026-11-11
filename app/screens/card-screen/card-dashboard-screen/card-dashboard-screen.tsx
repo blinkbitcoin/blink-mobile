@@ -76,11 +76,11 @@ const CardDashboardScreenContent: React.FC = () => {
     navigation.setOptions(
       headerRightNoGlass(() => (
         <TouchableOpacity style={styles.headerRight} onPress={handleSettingsPress}>
-          <GaloyIcon name="settings" size={24} color={colors.black} />
+          <GaloyIcon name="settings" size={24} color={colors.textOnBackground} />
         </TouchableOpacity>
       )),
     )
-  }, [navigation, styles.headerRight, colors.black, handleSettingsPress])
+  }, [navigation, styles.headerRight, colors.textOnBackground, handleSettingsPress])
 
   useEffect(() => {
     if (isFocused) refetch()
@@ -109,7 +109,7 @@ const CardDashboardScreenContent: React.FC = () => {
   if (cardLoading) {
     return (
       <Screen preset="scroll" style={styles.screen}>
-        <ActivityIndicator style={styles.loader} color={colors.primary} />
+        <ActivityIndicator style={styles.loader} color={colors.accent} />
       </Screen>
     )
   }
@@ -131,8 +131,8 @@ const CardDashboardScreenContent: React.FC = () => {
           <RefreshControl
             refreshing={txLoading && isFocused}
             onRefresh={refetch}
-            colors={[colors.primary]}
-            tintColor={colors.primary}
+            colors={[colors.accent]}
+            tintColor={colors.accent}
           />
         }
       >
@@ -167,7 +167,7 @@ const CardDashboardScreenContent: React.FC = () => {
         />
 
         {fetchingMore && (
-          <ActivityIndicator style={styles.loadMore} color={colors.primary} />
+          <ActivityIndicator style={styles.loadMore} color={colors.accent} />
         )}
       </ScrollView>
     </Screen>
@@ -176,7 +176,7 @@ const CardDashboardScreenContent: React.FC = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   screen: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
   },
   content: {
     paddingTop: 16,
@@ -195,7 +195,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   emptyStateText: {
     fontSize: 16,
-    color: colors.grey3,
+    color: colors.textDisabled,
   },
   loadMore: {
     marginTop: 16,

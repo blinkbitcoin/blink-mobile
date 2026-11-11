@@ -57,7 +57,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     alignItems: "center",
     justifyContent: "center",
   },

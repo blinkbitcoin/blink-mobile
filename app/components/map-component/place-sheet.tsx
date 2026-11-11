@@ -332,7 +332,11 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
       disabled={!onPress}
       accessibilityRole={onPress ? "link" : "text"}
     >
-      <GaloyIcon name={icon} size={16} color={onPress ? colors.primary : colors.grey1} />
+      <GaloyIcon
+        name={icon}
+        size={16}
+        color={onPress ? colors.accent : colors.textSecondary}
+      />
       <Text style={onPress ? styles.rowLink : styles.rowText}>{text}</Text>
     </Pressable>
   )
@@ -420,7 +424,7 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
                   accessibilityLabel={LL.common.share()}
                   hitSlop={12}
                 >
-                  <GaloyIcon name="share" size={22} color={colors.primary} />
+                  <GaloyIcon name="share" size={22} color={colors.accent} />
                 </Pressable>
               </View>
 
@@ -480,8 +484,8 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
                       size={14}
                       color={
                         verification === VerificationState.Verified
-                          ? colors._green
-                          : colors.grey2
+                          ? colors.staticSuccess
+                          : colors.textMuted
                       }
                     />
                     <Text style={styles.verificationText}>{verificationLabel}</Text>
@@ -623,12 +627,12 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
     flex: 1,
   },
   sheet: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     borderWidth: 1,
     borderBottomWidth: 0,
-    borderColor: colors.grey4,
+    borderColor: colors.border,
     paddingTop: 8,
     // Cancels the extra height above, so only the seam moves off-screen.
     marginBottom: -BOTTOM_OVERHANG,
@@ -638,7 +642,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.grey3,
+    backgroundColor: colors.textDisabled,
     marginBottom: 8,
   },
   peek: {
@@ -658,7 +662,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
     flex: 1,
     fontSize: 20,
     fontFamily: fonts.bold,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   nameSkeleton: {
     flex: 1,
@@ -680,7 +684,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
     rowGap: 6,
   },
   badge: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 10,
     paddingHorizontal: 8,
     paddingVertical: 3,
@@ -688,7 +692,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   badgeOpen: {
     fontSize: 12,
     fontFamily: fonts.bold,
-    color: colors._green,
+    color: colors.staticSuccess,
   },
   badgeClosed: {
     fontSize: 12,
@@ -698,7 +702,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   badgeBoosted: {
     fontSize: 12,
     fontFamily: fonts.bold,
-    color: colors.primary,
+    color: colors.accent,
   },
   verification: {
     flexDirection: "row",
@@ -708,12 +712,12 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   },
   verificationText: {
     fontSize: 12,
-    color: colors.grey1,
+    color: colors.textSecondary,
     flexShrink: 1,
   },
   peekFact: {
     fontSize: 14,
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
   scroll: {
     flex: 1,
@@ -740,18 +744,18 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   rowText: {
     flex: 1,
     fontSize: 14,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   rowLink: {
     flex: 1,
     fontSize: 14,
     fontWeight: "700",
-    color: colors.primary,
+    color: colors.accent,
     textDecorationLine: "underline",
   },
   description: {
     fontSize: 14,
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
   errorRow: {
     flexDirection: "row",
@@ -767,7 +771,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   retryText: {
     fontSize: 13,
     fontFamily: fonts.bold,
-    color: colors.primary,
+    color: colors.accent,
   },
   skeletonBlock: {
     rowGap: 10,
@@ -782,13 +786,13 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   },
   attribution: {
     fontSize: 12,
-    color: colors.grey2,
+    color: colors.textMuted,
     textAlign: "center",
   },
   attributionLink: {
     // Same grey as the sentence around it: this is a credit, not an action, so
     // the underline is the only thing marking the two names as reachable.
-    color: colors.grey2,
+    color: colors.textMuted,
     textDecorationLine: "underline",
   },
 }))

@@ -3,15 +3,15 @@ import { render } from "@testing-library/react-native"
 
 jest.mock("@rn-vui/themed", () => {
   const colors = {
-    grey0: "#ccc",
-    grey2: "#999",
-    grey3: "#aaa",
-    grey4: "#eee",
-    grey5: "#f5f5f5",
-    primary: "#fc5805",
+    textPrimary: "#ccc",
+    textMuted: "#999",
+    textDisabled: "#aaa",
+    border: "#eee",
+    surfaceInteractive: "#f5f5f5",
+    accent: "#fc5805",
     warning: "#ffaa00",
-    black: "#000",
-    white: "#fff",
+    textOnBackground: "#000",
+    backgroundDefault: "#fff",
   }
   return {
     makeStyles:

@@ -8,15 +8,15 @@ import { AccountType } from "@app/types/wallet"
 
 jest.mock("@rn-vui/themed", () => {
   const colors: Record<string, string> = {
-    grey0: "#ccc",
-    grey1: "#aaa",
-    grey2: "#999",
-    grey4: "#eee",
-    grey5: "#f5f5f5",
-    grey6: "#fafafa",
-    primary: "#fc5805",
-    black: "#000",
-    white: "#fff",
+    textPrimary: "#ccc",
+    textSecondary: "#aaa",
+    textMuted: "#999",
+    border: "#eee",
+    surfaceInteractive: "#f5f5f5",
+    surfacePressed: "#fafafa",
+    accent: "#fc5805",
+    textOnBackground: "#000",
+    backgroundDefault: "#fff",
     error: "#f00",
     transparent: "transparent",
   }

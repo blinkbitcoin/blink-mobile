@@ -109,11 +109,11 @@ const useStyles = makeStyles(({ colors }, { bottom }: { bottom: number }) => ({
   sheetContent: {
     paddingBottom: bottom,
     paddingTop: 8,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     borderWidth: 1,
-    borderColor: colors.grey4,
+    borderColor: colors.border,
     borderBottomWidth: 0,
   },
   handleIndicator: {
@@ -121,7 +121,7 @@ const useStyles = makeStyles(({ colors }, { bottom }: { bottom: number }) => ({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.grey3,
+    backgroundColor: colors.textDisabled,
     marginBottom: 8,
   },
 }))

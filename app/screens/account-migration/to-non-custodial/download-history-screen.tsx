@@ -98,7 +98,7 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
     >
       <IconHero
         icon="clock"
-        iconColor={colors.primary}
+        iconColor={colors.accent}
         title={LL.AccountMigration.downloadHistoryTitle()}
         subtitle={LL.AccountMigration.downloadHistoryBody()}
       />
