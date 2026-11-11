@@ -12,15 +12,7 @@
     },
     "ecmaVersion": 12
   },
-  "plugins": [
-    "react",
-    "react-hooks",
-    "react-native",
-    "@typescript-eslint",
-    "import",
-    "prettier",
-    "jest"
-  ],
+  "plugins": ["react", "react-hooks", "react-native", "@typescript-eslint", "import", "prettier", "jest"],
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
@@ -216,51 +208,19 @@
     //     sync with the static* keys in colors.ts (enforced by colors.spec.ts).
     "no-restricted-properties": [
       "error",
-      {
-        "property": "staticWhite",
-        "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)."
-      },
-      {
-        "property": "staticBlack",
-        "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)."
-      },
-      {
-        "property": "staticLightGrey",
-        "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)."
-      },
-      {
-        "property": "staticLighterGrey",
-        "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)."
-      },
-      {
-        "property": "staticDarkGrey",
-        "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)."
-      },
-      {
-        "property": "staticCardPill",
-        "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)."
-      },
-      {
-        "property": "staticBrandOrange",
-        "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)."
-      },
-      {
-        "property": "staticSuccess",
-        "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)."
-      },
-      {
-        "property": "staticBrandYellow",
-        "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)."
-      },
-      {
-        "property": "staticBrandSunset",
-        "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)."
-      },
-      {
-        "property": "staticWarningBackground",
-        "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)."
-      }
+      { "property": "staticWhite", "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)." },
+      { "property": "staticBlack", "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)." },
+      { "property": "staticLightGrey", "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)." },
+      { "property": "staticLighterGrey", "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)." },
+      { "property": "staticDarkGrey", "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)." },
+      { "property": "staticCardPill", "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)." },
+      { "property": "staticBrandOrange", "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)." },
+      { "property": "staticSuccess", "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)." },
+      { "property": "staticBrandYellow", "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)." },
+      { "property": "staticBrandSunset", "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)." },
+      { "property": "staticWarningBackground", "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)." }
     ]
+
   },
   "overrides": [
     {
