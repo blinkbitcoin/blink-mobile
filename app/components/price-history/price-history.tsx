@@ -99,7 +99,7 @@ export const PriceHistory = () => {
     currentPriceData && startPriceData
       ? (currentPriceData - startPriceData) / startPriceData
       : 0
-  const color = delta > 0 ? { color: colors.staticSuccess } : { color: colors.error }
+  const color = delta > 0 ? { color: colors.success } : { color: colors.error }
 
   const activePrice = useDerivedValue(() => {
     const price = isActive

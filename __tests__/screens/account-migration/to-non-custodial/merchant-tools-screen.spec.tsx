@@ -158,8 +158,8 @@ describe("MigrationMerchantToolsScreen", () => {
     renderScreenInTheme("dark")
     await flushEffects()
 
-    expect(screen.getByTestId("icon-receive").props.color).toBe(dark.staticSuccess)
-    expect(screen.getByTestId("icon-calculator").props.color).not.toBe(dark.staticSuccess)
+    expect(screen.getByTestId("icon-receive").props.color).toBe(dark.success)
+    expect(screen.getByTestId("icon-calculator").props.color).not.toBe(dark.success)
   })
 
   it("offers a single action, with no way to tap into a tool", async () => {

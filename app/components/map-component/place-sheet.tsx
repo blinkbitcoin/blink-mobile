@@ -484,7 +484,7 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
                       size={14}
                       color={
                         verification === VerificationState.Verified
-                          ? colors.staticSuccess
+                          ? colors.success
                           : colors.textMuted
                       }
                     />
@@ -672,7 +672,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   requiresAppLink: {
     // Restated rather than inherited: the themed Text falls back to black, not
     // to the surrounding GaloyInfo tint.
-    color: colors.blue5,
+    color: colors.info,
     fontWeight: "700",
     textDecorationLine: "underline",
   },
@@ -692,7 +692,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   badgeOpen: {
     fontSize: 12,
     fontFamily: fonts.bold,
-    color: colors.staticSuccess,
+    color: colors.success,
   },
   badgeClosed: {
     fontSize: 12,

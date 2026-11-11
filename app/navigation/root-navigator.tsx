@@ -83,7 +83,7 @@ import {
 import { PinScreen } from "../screens/authentication-screen/pin-screen"
 import { unlockScreenOptions } from "../screens/authentication-screen/unlock-screen"
 import { EarnMapScreen } from "../screens/earns-map-screen"
-import { EarnQuiz, EarnSection } from "../screens/earns-screen"
+import { EarnQuiz, EarnSection, earnSectionHeaderOptions } from "../screens/earns-screen"
 import { SectionCompleted } from "../screens/earns-screen/section-completed"
 import { AccountTypeSelectionScreen } from "../screens/account-type-selection"
 import { GetStartedScreen } from "../screens/get-started-screen"
@@ -566,14 +566,7 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="earnsSection"
         component={EarnSection}
-        options={{
-          headerStyle: { backgroundColor: colors._blue },
-          headerTintColor: colors.staticWhite,
-          headerTitleStyle: {
-            fontWeight: "bold",
-            fontSize: 18,
-          },
-        }}
+        options={earnSectionHeaderOptions(colors)}
       />
       <RootNavigator.Screen
         name="earnsQuiz"

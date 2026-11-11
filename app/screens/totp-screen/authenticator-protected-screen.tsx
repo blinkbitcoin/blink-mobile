@@ -37,7 +37,7 @@ export const AuthenticatorProtectedScreen: React.FC = () => {
     >
       <IconHero
         icon="check-badge"
-        iconColor={colors.staticSuccess}
+        iconColor={colors.success}
         title={LL.AuthenticatorOnboarding.protectedTitle()}
         subtitle={
           <Text type="p3" style={styles.description}>

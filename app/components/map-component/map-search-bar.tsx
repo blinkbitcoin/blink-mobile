@@ -100,6 +100,7 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
     paddingHorizontal: 16,
     borderRadius: CONTROL_HEIGHT / 2,
     backgroundColor: colors.backgroundDefault,
+    // eslint-disable-next-line no-restricted-properties -- a shadow is black in both modes
     shadowColor: colors.staticBlack,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -120,6 +121,7 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.backgroundDefault,
+    // eslint-disable-next-line no-restricted-properties -- a shadow is black in both modes
     shadowColor: colors.staticBlack,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,

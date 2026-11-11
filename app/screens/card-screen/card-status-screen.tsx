@@ -27,7 +27,7 @@ export const CardStatusScreen: React.FC = () => {
     buttonLabel,
     navigateTo,
     iconName,
-    iconColor = colors.staticSuccess,
+    iconColor = colors.success,
     showCard = true,
     showAddToWallet = true,
     lastFour,

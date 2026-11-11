@@ -235,7 +235,7 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 20,
   },
   statusSubscribe: {
-    color: colors.staticSuccess,
+    color: colors.success,
     fontWeight: "700",
     lineHeight: 20,
   },

@@ -108,7 +108,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   const presentationByMode: Record<MigrationMode, ModePresentation> = {
     voluntary: {
       heroIcon: "upgrade",
-      heroIconColor: colors.staticSuccess,
+      heroIconColor: colors.success,
       title: LL.AccountMigration.migrationRequiredTitle(),
       subtitle: LL.AccountMigration.migrationRequiredBody(),
       shouldShowClose: true,
@@ -116,7 +116,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
     },
     forcedPreDeadline: {
       heroIcon: "upgrade",
-      heroIconColor: colors.staticSuccess,
+      heroIconColor: colors.success,
       title: LL.AccountMigration.migrationRequiredTitle(),
       subtitle: LL.AccountMigration.migrationRequiredForcedBody(),
       shouldShowClose: true,

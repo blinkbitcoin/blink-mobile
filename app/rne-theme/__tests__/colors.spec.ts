@@ -34,6 +34,10 @@ const aliasToSemantic: Record<string, string> = {
   _primary1: "staticBrandYellow",
   _primary2: "staticBrandSunset",
   _warningLight: "staticWarningBackground",
+  blue5: "info",
+  _blue: "staticBlue",
+  _lightBlue: "staticBrightBlue",
+  _sky: "staticPaleBlue",
 }
 
 // Role tokens share their source token's value until design gives them their own.
@@ -83,9 +87,6 @@ describe("color token aliases", () => {
   })
 })
 
-// No semantic alias yet: flagged for design review in colors.ts.
-const blues = ["blue5", "_blue", "_lightBlue", "_sky"]
-
 describe("legacy name inventory", () => {
   // colors.ts, themed.d.ts, the alias map above and the eslint rule each list the
   // legacy names. colors-lint.spec.ts ties the eslint rule to themed.d.ts; this
@@ -96,8 +97,8 @@ describe("legacy name inventory", () => {
       .matchAll(/\/\*\* @deprecated[^*]*\*\/\s*(?:readonly )?(\w+):/g),
   ].map(([, name]) => name)
 
-  it("marks exactly the aliased and flagged names deprecated in themed.d.ts", () => {
-    expect(deprecated.sort()).toEqual([...Object.keys(aliasToSemantic), ...blues].sort())
+  it("marks exactly the aliased names deprecated in themed.d.ts", () => {
+    expect(deprecated.sort()).toEqual(Object.keys(aliasToSemantic).sort())
   })
 })
 

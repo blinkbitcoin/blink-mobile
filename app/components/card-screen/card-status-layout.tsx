@@ -47,7 +47,7 @@ export const CardStatusLayout: React.FC<CardStatusLayoutProps> = ({
     theme: { colors },
   } = useTheme()
 
-  const resolvedIconColor = iconColor ?? colors.staticSuccess
+  const resolvedIconColor = iconColor ?? colors.success
 
   return (
     <Screen style={styles.screen}>

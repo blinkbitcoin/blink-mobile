@@ -181,7 +181,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
           containerStyle={[styles.listStyle, isFirstItem && styles.firstItem]}
         >
           {isActive ? (
-            <GaloyIcon name="check-circle" size={20} color={colors.staticSuccess} />
+            <GaloyIcon name="check-circle" size={20} color={colors.success} />
           ) : (
             <View style={styles.spacer} />
           )}

@@ -168,12 +168,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
           </View>
           {isSelected ? (
             <View {...testProps(`merchant-${item.id}-selected`)}>
-              <GaloyIcon
-                name="check"
-                size={22}
-                color={colors.staticSuccess}
-                weight="bold"
-              />
+              <GaloyIcon name="check" size={22} color={colors.success} weight="bold" />
             </View>
           ) : (
             <View style={styles.checkPlaceholder} />
@@ -182,7 +177,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
       )
     },
     [
-      colors.staticSuccess,
+      colors.success,
       colors.accent,
       LL.MerchantSelectionScreen,
       handleMerchantPress,

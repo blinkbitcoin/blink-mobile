@@ -20,6 +20,9 @@ const lightStatic = {
   staticBrandYellow: "#FFBE0B",
   staticBrandSunset: "#FB5607",
   staticWarningBackground: "#FFF9E5",
+  staticBlue: "#3050C4",
+  staticBrightBlue: "#3553FF",
+  staticPaleBlue: "#C3CCFF",
 }
 
 // static tokens are identical in both modes by definition
@@ -50,6 +53,8 @@ const lightSemantic = {
   errorBackground: "#FEE2E2",
 
   warning: "#E18E02",
+
+  info: "#4453E2", // info box tint
 
   loaderForeground: "#ecebeb",
   loaderBackground: "#f3f3f3",
@@ -83,6 +88,8 @@ const darkSemantic = {
   errorBackground: "#7F1D1D",
 
   warning: "#FFC563",
+
+  info: "#F0F0F7",
 
   loaderForeground: "#3c3b3b",
   loaderBackground: "#131313",
@@ -127,6 +134,12 @@ const legacyAliases = (semantic: typeof lightSemantic | typeof darkSemantic) => 
   _primary1: semantic.staticBrandYellow,
   _primary2: semantic.staticBrandSunset,
   _warningLight: semantic.staticWarningBackground,
+
+  // the app blues; none of them is the brand blue
+  blue5: semantic.info,
+  _blue: semantic.staticBlue,
+  _lightBlue: semantic.staticBrightBlue,
+  _sky: semantic.staticPaleBlue,
 })
 
 // Role tokens that share a value with another token today but do a different job.
@@ -145,35 +158,16 @@ const roleTokens = (semantic: typeof lightSemantic | typeof darkSemantic) => ({
   success: semantic.staticSuccess,
 })
 
-// Flagged for design review (see proposal §2.1/§5): none of the app blues is the
-// brand blue. Scheduled for removal, so they get no semantic alias.
-const legacyBlues = {
-  light: {
-    blue5: "#4453E2",
-    _blue: "#3050C4",
-    _lightBlue: "#3553FF",
-    _sky: "#C3CCFF",
-  },
-  dark: {
-    blue5: "#F0F0F7",
-    _blue: "#3050C4",
-    _lightBlue: "#3553FF",
-    _sky: "#C3CCFF",
-  },
-}
-
 const light = {
   ...lightSemantic,
   ...roleTokens(lightSemantic),
   ...legacyAliases(lightSemantic),
-  ...legacyBlues.light,
 }
 
 const dark = {
   ...darkSemantic,
   ...roleTokens(darkSemantic),
   ...legacyAliases(darkSemantic),
-  ...legacyBlues.dark,
 }
 
 export { light, dark }

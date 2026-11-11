@@ -39,7 +39,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   valueRemaining: {
     fontWeight: "bold",
-    color: colors.staticSuccess,
+    color: colors.success,
     maxWidth: "50%",
   },
   valueTotal: {

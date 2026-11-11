@@ -30,7 +30,7 @@ export const WelcomeInvestScreen: React.FC = () => {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <IconHero
           icon="heart-outline"
-          iconColor={colors.staticSuccess}
+          iconColor={colors.success}
           title={LL.CardFlow.Onboarding.WelcomeInvest.welcomeMessage.title()}
         />
 

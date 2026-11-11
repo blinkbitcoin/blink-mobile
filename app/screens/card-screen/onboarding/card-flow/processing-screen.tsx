@@ -30,7 +30,7 @@ export const CardProcessingScreen: React.FC = () => {
             <View style={styles.iconCircle}>
               <Icon
                 name={"time-outline"}
-                color={colors.staticSuccess}
+                color={colors.success}
                 size={40}
                 type="ionicon"
               />

@@ -32,7 +32,7 @@ export const CardAddToMobileWalletScreen: React.FC = () => {
       <View style={styles.content}>
         <View style={styles.heroSection}>
           <View style={styles.iconContainer}>
-            <GaloyIcon name="physical-card" size={34} color={colors.staticSuccess} />
+            <GaloyIcon name="physical-card" size={34} color={colors.success} />
           </View>
           <Text style={styles.title}>{LL.CardFlow.AddToMobileWallet.addYourCard()}</Text>
           <Text style={styles.subtitle}>

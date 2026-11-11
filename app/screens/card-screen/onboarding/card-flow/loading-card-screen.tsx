@@ -33,7 +33,7 @@ export const LoadingCardScreen: React.FC = () => {
               <Icon
                 name={"time-outline"}
                 type="ionicon"
-                color={colors.staticSuccess}
+                color={colors.success}
                 size={40}
               />
             </View>

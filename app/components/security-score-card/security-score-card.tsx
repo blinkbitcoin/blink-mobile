@@ -38,7 +38,7 @@ export const SecurityScoreCard: React.FC<SecurityScoreCardProps> = ({
   const levels: Record<SecurityScoreLevel, LevelPresentation> = {
     low: { label: copy.levelLow, color: colors.error, icon: "warning" },
     medium: { label: copy.levelMedium, color: colors.warning, icon: "warning" },
-    high: { label: copy.levelHigh, color: colors.staticSuccess, icon: "check-circle" },
+    high: { label: copy.levelHigh, color: colors.success, icon: "check-circle" },
   }
   const level = levels[score.level]
   const headline = copy.title({ done: score.done, total: score.total })
@@ -70,7 +70,7 @@ export const SecurityScoreCard: React.FC<SecurityScoreCardProps> = ({
           const handlePress = isPressable ? () => onSignalPress(signal.key) : undefined
           const rowAccessibilityRole = isPressable ? "button" : "text"
           const statusLabel = signal.done ? copy.enabled() : copy.set()
-          const statusColor = signal.done ? colors.staticSuccess : colors.accent
+          const statusColor = signal.done ? colors.success : colors.accent
 
           return (
             <Pressable
