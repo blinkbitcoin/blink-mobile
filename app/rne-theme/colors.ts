@@ -35,14 +35,14 @@ const lightSemantic = {
 
   textPrimary: "#3A3C51",
   textSecondary: "#393939",
-  textMuted: "#9292A0", // 3.07:1 on backgroundDefault — secondary labels only
+  textMuted: "#8C8C97", // 3.33:1 on backgroundDefault — secondary labels only
   textDisabled: "#AEAEB8",
 
   border: "#E2E2E4",
 
   surfaceInteractive: "#F2F2F4", // tappable surface, at rest
   surfacePressed: "#E7E7E7", // surfaceInteractive while held — transient only
-  surfaceStatic: "#F9F9F9", // cannot be tapped, ever — cards, banners, read-only
+  surfaceStatic: "#F7F7F7", // cannot be tapped, ever — cards, banners, read-only
 
   accent: "#fc5805",
   accent2: "#fd800b", // accent2–4 are the mirrored ramp kept for existing gradients
@@ -78,7 +78,7 @@ const darkSemantic = {
 
   surfaceInteractive: "#1d1d1d",
   surfacePressed: "#2B2B2B",
-  surfaceStatic: "#0F0F0F",
+  surfaceStatic: "#121212",
 
   accent: "#ffad0d",
   accent2: "#fe990d",
