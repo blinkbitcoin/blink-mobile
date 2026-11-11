@@ -149,7 +149,9 @@ describe("AuthenticatorAppsScreen", () => {
 
     fireEvent.press(screen.getByText(LL.AuthenticatorOnboarding.haveAnApp()))
 
-    expect(mockPopTo).toHaveBeenCalledWith("totpRegistrationInitiate")
+    expect(mockPopTo).toHaveBeenCalledWith("totpRegistrationInitiate", {
+      offersOnboarding: false,
+    })
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 

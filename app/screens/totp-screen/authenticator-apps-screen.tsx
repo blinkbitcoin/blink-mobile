@@ -103,7 +103,9 @@ export const AuthenticatorAppsScreen: React.FC = () => {
       .getState()
       .routes.some((route) => route.name === SETUP_KEY_ROUTE)
     if (isSetupKeyBelow) {
-      navigation.popTo(SETUP_KEY_ROUTE)
+      /** Back to the key it opened from, which no longer offers the onboarding just
+       *  done. */
+      navigation.popTo(SETUP_KEY_ROUTE, { offersOnboarding: false })
       return
     }
     navigation.navigate(SETUP_KEY_ROUTE)
