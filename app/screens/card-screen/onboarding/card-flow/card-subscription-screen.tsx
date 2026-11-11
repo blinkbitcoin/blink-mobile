@@ -2,69 +2,69 @@ import * as React from "react"
 import { View } from "react-native"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { makeStyles, Text } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { SubscriptionOfferCard } from "@app/components/card-screen"
 import { CheckboxRow } from "@app/components/card-screen/checkbox-row"
 import { Screen } from "@app/components/screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useKycFlow } from "@app/hooks"
-import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { KycFlowType, WalletCurrency } from "@app/graphql/generated"
+import { KycFlowType } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { formatDateFromNow } from "@app/utils/date"
 import { openExternalUrl } from "@app/utils/external"
-import { staticSurface } from "@app/rne-theme/surfaces"
+
+import {
+  SUBSCRIPTION_RENEWAL_MONTHS,
+  useSubscriptionOffer,
+} from "./use-subscription-offer"
 
 const SUBSCRIBE_ROUTE: keyof RootStackParamList = "cardOnboardingSubscribeScreen"
-const SUBSCRIPTION_RENEWAL_MONTHS = 12
 
 export const CardSubscriptionScreen: React.FC = () => {
   const styles = useStyles()
-  const { LL, locale } = useI18nContext()
+  const {
+    theme: { colors },
+  } = useTheme()
+  const { LL } = useI18nContext()
   const route = useRoute<RouteProp<RootStackParamList>>()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const isSubscribeVariant = route.name === SUBSCRIBE_ROUTE
 
-  const {
-    cardTermsAndConditionsUrl,
-    cardPrivacyPolicyUrl,
-    cardCardholderAgreementUrl,
-    cardSubscriptionPriceUsd,
-  } = useRemoteConfig()
-  const { formatCurrency } = useDisplayCurrency()
+  const { cardTermsAndConditionsUrl, cardPrivacyPolicyUrl, cardCardholderAgreementUrl } =
+    useRemoteConfig()
+  const { isFree, ...offerCard } = useSubscriptionOffer({ isSubscribeVariant })
 
   const { startKyc } = useKycFlow({
     type: KycFlowType.Card,
     headerTitle: LL.CardFlow.Onboarding.kycHeaderTitle(),
   })
 
-  const price = React.useMemo(
-    () =>
-      formatCurrency({
-        amountInMajorUnits: cardSubscriptionPriceUsd,
-        currency: WalletCurrency.Usd,
-      }),
-    [formatCurrency, cardSubscriptionPriceUsd],
-  )
-
-  const renewalDate = React.useMemo(
-    () => formatDateFromNow({ months: SUBSCRIPTION_RENEWAL_MONTHS, locale }),
-    [locale],
-  )
-
-  const [isAgreed, setIsAgreed] = React.useState(false)
-  const [isRenew, setIsRenew] = React.useState(false)
+  const [isNoticeAccepted, setIsNoticeAccepted] = React.useState(false)
   const [isFeeScheduleAgreed, setIsFeeScheduleAgreed] = React.useState(false)
+  const [isAgreed, setIsAgreed] = React.useState(false)
 
-  const isSubscribeReady = isRenew && isFeeScheduleAgreed && isAgreed
+  const isSubscribeReady = isNoticeAccepted && isFeeScheduleAgreed
   const isAcceptDisabled = isSubscribeVariant ? !isSubscribeReady : !isAgreed
 
-  const statusLabel = isSubscribeVariant
-    ? LL.CardFlow.Onboarding.CardSubscription.status.specialOfferLabel()
-    : LL.CardFlow.Onboarding.CardSubscription.status.label()
+  /** The free offer has nothing to subscribe to yet, so its header carries no title. Set
+   *  both ways, since the price comes from Remote Config and can change while mounted. */
+  const subscribeHeaderTitle = isFree
+    ? ""
+    : LL.CardFlow.Onboarding.CardSubscription.subscribeTitle()
+  React.useLayoutEffect(() => {
+    if (isSubscribeVariant) {
+      navigation.setOptions({ title: subscribeHeaderTitle })
+    }
+  }, [isSubscribeVariant, navigation, subscribeHeaderTitle])
+
+  const noticeText = isFree
+    ? LL.CardFlow.Onboarding.CardSubscription.freeNotice()
+    : LL.CardFlow.Onboarding.CardSubscription.renew({
+        months: SUBSCRIPTION_RENEWAL_MONTHS,
+      })
 
   const handleAccept = () => {
     if (isSubscribeVariant) {
@@ -78,99 +78,69 @@ export const CardSubscriptionScreen: React.FC = () => {
   return (
     <Screen>
       <View style={styles.contentContainer}>
-        <View style={styles.cardContainer}>
-          <Text type="p2" style={styles.cardTitle}>
-            {LL.CardFlow.Onboarding.CardSubscription.cardTitle()}
-          </Text>
+        <SubscriptionOfferCard {...offerCard} />
 
-          <Text type="h1" style={styles.price}>
-            {price}
-          </Text>
-
-          <Text type="p3" style={styles.perYear}>
-            {LL.CardFlow.Onboarding.CardSubscription.perYear()}
-          </Text>
-
-          <View style={styles.infoRow}>
-            <Text type="p3" style={styles.label}>
-              {statusLabel}
-            </Text>
-            {isSubscribeVariant ? (
-              <Text type="p3" style={styles.statusSubscribe}>
-                {LL.CardFlow.Onboarding.CardSubscription.status.firstYearFree()}
+        {isSubscribeVariant && (
+          <>
+            <CheckboxRow
+              checked={isNoticeAccepted}
+              onPress={() => setIsNoticeAccepted(!isNoticeAccepted)}
+            >
+              <Text type="p3" style={styles.agreementText}>
+                {noticeText}
               </Text>
-            ) : (
-              <Text type="p3" style={styles.statusPending}>
-                {LL.CardFlow.Onboarding.CardSubscription.status.paymentPending()}
+            </CheckboxRow>
+
+            <CheckboxRow
+              checked={isFeeScheduleAgreed}
+              onPress={() => setIsFeeScheduleAgreed(!isFeeScheduleAgreed)}
+            >
+              <Text type="p3" style={styles.agreementText}>
+                {LL.CardFlow.Onboarding.CardSubscription.feeSchedule.text()}{" "}
+                <Text
+                  type="p3"
+                  bold
+                  color={colors.accent}
+                  style={styles.agreementText}
+                  onPress={() => navigation.navigate("cardFeeScheduleScreen")}
+                >
+                  {LL.CardFlow.Onboarding.CardSubscription.feeSchedule.linkText()}
+                </Text>
               </Text>
-            )}
-          </View>
+            </CheckboxRow>
+          </>
+        )}
 
-          <View style={styles.infoRow}>
-            <Text type="p3" style={styles.label}>
-              {LL.CardFlow.Onboarding.CardSubscription.renewalDate.label()}
-            </Text>
-            <Text type="p3" style={styles.value}>
-              {renewalDate}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.checkboxesContainer}>
-          {isSubscribeVariant && (
-            <>
-              <CheckboxRow checked={isRenew} onPress={() => setIsRenew(!isRenew)}>
-                <Text type="p3" style={styles.agreementText}>
-                  {LL.CardFlow.Onboarding.CardSubscription.renew({
-                    months: SUBSCRIPTION_RENEWAL_MONTHS,
-                  })}
-                </Text>
-              </CheckboxRow>
-
-              <CheckboxRow
-                checked={isFeeScheduleAgreed}
-                onPress={() => setIsFeeScheduleAgreed(!isFeeScheduleAgreed)}
-              >
-                <Text type="p3" style={styles.agreementText}>
-                  {LL.CardFlow.Onboarding.CardSubscription.feeSchedule.text()}{" "}
-                  <Text
-                    type="p3"
-                    style={styles.feeScheduleLink}
-                    onPress={() => navigation.navigate("cardFeeScheduleScreen")}
-                  >
-                    {LL.CardFlow.Onboarding.CardSubscription.feeSchedule.linkText()}
-                  </Text>
-                </Text>
-              </CheckboxRow>
-            </>
-          )}
-
+        {!isSubscribeVariant && (
           <CheckboxRow checked={isAgreed} onPress={() => setIsAgreed(!isAgreed)}>
             <Text type="p3" style={styles.agreementText}>
               {LL.CardFlow.Onboarding.CardSubscription.agreement.text()}{" "}
               <Text
-                style={styles.link}
+                bold
+                color={colors.accent}
                 onPress={() => openExternalUrl(cardTermsAndConditionsUrl)}
               >
                 {LL.CardFlow.Onboarding.CardSubscription.agreement.termsOfService()}
               </Text>
               ,{" "}
               <Text
-                style={styles.link}
+                bold
+                color={colors.accent}
                 onPress={() => openExternalUrl(cardPrivacyPolicyUrl)}
               >
                 {LL.CardFlow.Onboarding.CardSubscription.agreement.privacyPolicy()}
               </Text>
               , {LL.CardFlow.Onboarding.CardSubscription.agreement.and()}{" "}
               <Text
-                style={styles.link}
+                bold
+                color={colors.accent}
                 onPress={() => openExternalUrl(cardCardholderAgreementUrl)}
               >
                 {LL.CardFlow.Onboarding.CardSubscription.agreement.cardholderAgreement()}
               </Text>
             </Text>
           </CheckboxRow>
-        </View>
+        )}
       </View>
 
       <View style={styles.buttonsContainer}>
@@ -188,78 +158,14 @@ export const CardSubscriptionScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(() => ({
   contentContainer: {
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 30,
-  },
-  cardContainer: {
-    ...staticSurface(colors),
-    borderRadius: 16,
-    padding: 18,
-    paddingBottom: 5,
-  },
-  cardTitle: {
-    color: colors.textOnBackground,
-    textAlign: "center",
-    marginBottom: 5,
-    fontWeight: "700",
-    lineHeight: 22,
-  },
-  price: {
-    color: colors.accent,
-    textAlign: "center",
-    marginBottom: 5,
-    fontWeight: "700",
-    lineHeight: 32,
-  },
-  perYear: {
-    color: colors.textMuted,
-    textAlign: "center",
-    marginBottom: 15,
-    lineHeight: 16,
-  },
-  infoRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  label: {
-    color: colors.textMuted,
-    lineHeight: 20,
-  },
-  statusPending: {
-    color: colors.accent,
-    fontWeight: "700",
-    lineHeight: 20,
-  },
-  statusSubscribe: {
-    color: colors.success,
-    fontWeight: "700",
-    lineHeight: 20,
-  },
-  value: {
-    color: colors.textOnBackground,
-    fontWeight: "700",
-    lineHeight: 20,
-  },
-  checkboxesContainer: {
-    marginTop: 17,
-    gap: 17,
+    gap: 20,
   },
   agreementText: {
-    color: colors.textOnBackground,
-    lineHeight: 16,
-  },
-  link: {
-    color: colors.accent,
-    fontWeight: "500",
-  },
-  feeScheduleLink: {
-    color: colors.accent,
-    fontWeight: "700",
     lineHeight: 16,
   },
   buttonsContainer: {
