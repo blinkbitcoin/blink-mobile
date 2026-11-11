@@ -135,6 +135,10 @@
           {
             "name": "@react-native-firebase/crashlytics",
             "message": "Write to Crashlytics only through app/utils/error-reporting.ts (logBreadcrumb, recordAppError), which drops everything while an Incognito or unset-mode wallet is active."
+          },
+          {
+            "name": "react-native-haptic-feedback",
+            "message": "Fire haptics only through app/utils/haptics.ts (haptics.select, haptics.success, …), so each intent keeps one feel and one silent-mode rule. See blinkbitcoin/blink-wip#2041."
           }
         ]
       }
@@ -199,6 +203,30 @@
               {
                 "name": "react-native-secure-key-store",
                 "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              },
+              {
+                "name": "react-native-haptic-feedback",
+                "message": "Fire haptics only through app/utils/haptics.ts (haptics.select, haptics.success, …), so each intent keeps one feel and one silent-mode rule. See blinkbitcoin/blink-wip#2041."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/utils/haptics.ts", "__tests__/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react-native-secure-key-store",
+                "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              },
+              {
+                "name": "@react-native-firebase/crashlytics",
+                "message": "Write to Crashlytics only through app/utils/error-reporting.ts (logBreadcrumb, recordAppError), which drops everything while an Incognito or unset-mode wallet is active."
               }
             ]
           }
