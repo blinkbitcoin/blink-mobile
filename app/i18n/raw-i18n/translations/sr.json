@@ -3655,8 +3655,14 @@
         "paymentTitle": "Плаћање",
         "acceptButton": "Прихвати",
         "payButton": "Настави и Плати",
-        "cardTitle": "Blink Приватни",
+        "cardTitle": "Blink Orange",
+        "free": "Бесплатно",
+        "forNow": "за сада",
         "perYear": "годишње",
+        "freeBreakdown": {
+          "card": "Blink Card",
+          "memberBenefits": "Остале чланске погодности"
+        },
         "status": {
           "label": "Статус",
           "specialOfferLabel": "Посебна понуда",
@@ -3677,7 +3683,8 @@
           "text": "Прегледао сам и слажем се са",
           "linkText": "Ценовником накнада за Blink Card"
         },
-        "renew": "Разумем да ће се моја претплата аутоматски обновити за {months: number} месеци"
+        "renew": "Разумем да ће се моја претплата аутоматски обновити за {months: number} месеци",
+        "freeNotice": "Разумем да је Blink Orange за сада бесплатан и да се чланарина може увести касније, уз претходно обавештење"
       },
       "CardIntroducing": {
         "title": "Представљамо",

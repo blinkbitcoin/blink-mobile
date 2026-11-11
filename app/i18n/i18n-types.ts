@@ -12356,13 +12356,31 @@ type RootTranslation = {
 				 */
 				payButton: string
 				/**
-				 * B​l​i​n​k​ ​P​r​i​v​a​t​e
+				 * B​l​i​n​k​ ​O​r​a​n​g​e
 				 */
 				cardTitle: string
+				/**
+				 * F​r​e​e
+				 */
+				free: string
+				/**
+				 * f​o​r​ ​n​o​w
+				 */
+				forNow: string
 				/**
 				 * p​e​r​ ​y​e​a​r
 				 */
 				perYear: string
+				freeBreakdown: {
+					/**
+					 * B​l​i​n​k​ ​C​a​r​d
+					 */
+					card: string
+					/**
+					 * O​t​h​e​r​ ​m​e​m​b​e​r​ ​b​e​n​e​f​i​t​s
+					 */
+					memberBenefits: string
+				}
 				status: {
 					/**
 					 * S​t​a​t​u​s
@@ -12424,6 +12442,10 @@ type RootTranslation = {
 				 * @param {number} months
 				 */
 				renew: RequiredParams<'months'>
+				/**
+				 * I​ ​u​n​d​e​r​s​t​a​n​d​ ​B​l​i​n​k​ ​O​r​a​n​g​e​ ​i​s​ ​f​r​e​e​ ​f​o​r​ ​n​o​w​,​ ​a​n​d​ ​t​h​a​t​ ​a​ ​m​e​m​b​e​r​s​h​i​p​ ​f​e​e​ ​m​a​y​ ​b​e​ ​i​n​t​r​o​d​u​c​e​d​ ​l​a​t​e​r​,​ ​w​i​t​h​ ​n​o​t​i​c​e
+				 */
+				freeNotice: string
 			}
 			LoadingCard: {
 				/**
@@ -26625,13 +26647,31 @@ export type TranslationFunctions = {
 				 */
 				payButton: () => LocalizedString
 				/**
-				 * Blink Private
+				 * Blink Orange
 				 */
 				cardTitle: () => LocalizedString
+				/**
+				 * Free
+				 */
+				free: () => LocalizedString
+				/**
+				 * for now
+				 */
+				forNow: () => LocalizedString
 				/**
 				 * per year
 				 */
 				perYear: () => LocalizedString
+				freeBreakdown: {
+					/**
+					 * Blink Card
+					 */
+					card: () => LocalizedString
+					/**
+					 * Other member benefits
+					 */
+					memberBenefits: () => LocalizedString
+				}
 				status: {
 					/**
 					 * Status
@@ -26692,6 +26732,10 @@ export type TranslationFunctions = {
 				 * I understand my subscription will automatically renew in {months} months
 				 */
 				renew: (arg: { months: number }) => LocalizedString
+				/**
+				 * I understand Blink Orange is free for now, and that a membership fee may be introduced later, with notice
+				 */
+				freeNotice: () => LocalizedString
 			}
 			LoadingCard: {
 				/**

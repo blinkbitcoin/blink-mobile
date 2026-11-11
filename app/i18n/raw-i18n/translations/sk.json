@@ -3655,8 +3655,14 @@
         "paymentTitle": "Platba",
         "acceptButton": "Prijať",
         "payButton": "Pokračovať a Zaplatiť",
-        "cardTitle": "Blink Súkromný",
+        "cardTitle": "Blink Orange",
+        "free": "Zadarmo",
+        "forNow": "zatiaľ",
         "perYear": "za rok",
+        "freeBreakdown": {
+          "card": "Blink Card",
+          "memberBenefits": "Ďalšie členské výhody"
+        },
         "status": {
           "label": "Stav",
           "specialOfferLabel": "Špeciálna ponuka",
@@ -3677,7 +3683,8 @@
           "text": "Skontroloval som a súhlasím s dokumentom",
           "linkText": "Sadzobník poplatkov Blink Card"
         },
-        "renew": "Rozumiem, že moje predplatné sa automaticky obnoví o {months: number} mesiacov"
+        "renew": "Rozumiem, že moje predplatné sa automaticky obnoví o {months: number} mesiacov",
+        "freeNotice": "Rozumiem, že Blink Orange je zatiaľ zadarmo a že členský poplatok môže byť neskôr zavedený, s predchádzajúcim upozornením"
       },
       "CardIntroducing": {
         "title": "Predstavujeme",

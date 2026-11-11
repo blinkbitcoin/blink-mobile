@@ -3655,8 +3655,14 @@
         "paymentTitle": "การชำระเงิน",
         "acceptButton": "ยอมรับ",
         "payButton": "ดำเนินการและชำระเงิน",
-        "cardTitle": "Blink ส่วนตัว",
+        "cardTitle": "Blink Orange",
+        "free": "ฟรี",
+        "forNow": "ในตอนนี้",
         "perYear": "ต่อปี",
+        "freeBreakdown": {
+          "card": "บัตร Blink",
+          "memberBenefits": "สิทธิประโยชน์สมาชิกอื่นๆ"
+        },
         "status": {
           "label": "สถานะ",
           "specialOfferLabel": "ข้อเสนอพิเศษ",
@@ -3677,7 +3683,8 @@
           "text": "ฉันได้ตรวจสอบและยอมรับ",
           "linkText": "ตารางค่าธรรมเนียม Blink Card"
         },
-        "renew": "ฉันเข้าใจว่าการสมัครสมาชิกของฉันจะต่ออายุโดยอัตโนมัติใน {months: number} เดือน"
+        "renew": "ฉันเข้าใจว่าการสมัครสมาชิกของฉันจะต่ออายุโดยอัตโนมัติใน {months: number} เดือน",
+        "freeNotice": "ฉันเข้าใจว่า Blink Orange ใช้งานได้ฟรีในตอนนี้ และอาจมีการเรียกเก็บค่าสมาชิกในภายหลังโดยจะแจ้งให้ทราบล่วงหน้า"
       },
       "CardIntroducing": {
         "title": "แนะนำ",

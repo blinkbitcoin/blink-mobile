@@ -3877,8 +3877,14 @@ const en: BaseTranslation = {
         paymentTitle: "Payment",
         acceptButton: "Accept",
         payButton: "Continue & Pay",
-        cardTitle: "Blink Private",
+        cardTitle: "Blink Orange",
+        free: "Free",
+        forNow: "for now",
         perYear: "per year",
+        freeBreakdown: {
+          card: "Blink Card",
+          memberBenefits: "Other member benefits",
+        },
         status: {
           label: "Status",
           specialOfferLabel: "Special offer",
@@ -3900,6 +3906,7 @@ const en: BaseTranslation = {
           linkText: "Blink Card Fee Schedule",
         },
         renew: "I understand my subscription will automatically renew in {months: number} months",
+        freeNotice: "I understand Blink Orange is free for now, and that a membership fee may be introduced later, with notice",
       },
       LoadingCard: {
         title: "We're working on your card",

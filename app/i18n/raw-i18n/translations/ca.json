@@ -3655,8 +3655,14 @@
         "paymentTitle": "Pagament",
         "acceptButton": "Acceptar",
         "payButton": "Continuar i Pagar",
-        "cardTitle": "Blink Privat",
+        "cardTitle": "Blink Orange",
+        "free": "Gratis",
+        "forNow": "de moment",
         "perYear": "per any",
+        "freeBreakdown": {
+          "card": "Blink Card",
+          "memberBenefits": "Altres avantatges de membre"
+        },
         "status": {
           "label": "Estat",
           "specialOfferLabel": "Oferta especial",
@@ -3677,7 +3683,8 @@
           "text": "He revisat i accepto la",
           "linkText": "Taula de Tarifes de Blink Card"
         },
-        "renew": "Entenc que la meva subscripció es renovarà automàticament en {months: number} mesos"
+        "renew": "Entenc que la meva subscripció es renovarà automàticament en {months: number} mesos",
+        "freeNotice": "Entenc que Blink Orange és gratuït de moment i que més endavant es podria introduir una quota de membre, amb avís previ"
       },
       "CardIntroducing": {
         "title": "Presentant",

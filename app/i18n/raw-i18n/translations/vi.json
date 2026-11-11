@@ -3655,8 +3655,14 @@
         "paymentTitle": "Thanh toán",
         "acceptButton": "Chấp nhận",
         "payButton": "Tiếp tục và Thanh toán",
-        "cardTitle": "Blink Riêng tư",
+        "cardTitle": "Blink Orange",
+        "free": "Miễn phí",
+        "forNow": "hiện tại",
         "perYear": "mỗi năm",
+        "freeBreakdown": {
+          "card": "Thẻ Blink",
+          "memberBenefits": "Các quyền lợi thành viên khác"
+        },
         "status": {
           "label": "Trạng thái",
           "specialOfferLabel": "Ưu đãi đặc biệt",
@@ -3677,7 +3683,8 @@
           "text": "Tôi đã xem xét và đồng ý với",
           "linkText": "Biểu Phí Blink Card"
         },
-        "renew": "Tôi hiểu rằng gói đăng ký của tôi sẽ tự động gia hạn sau {months: number} tháng"
+        "renew": "Tôi hiểu rằng gói đăng ký của tôi sẽ tự động gia hạn sau {months: number} tháng",
+        "freeNotice": "Tôi hiểu rằng Blink Orange hiện miễn phí và có thể áp dụng phí thành viên sau này, kèm thông báo trước"
       },
       "CardIntroducing": {
         "title": "Giới thiệu",

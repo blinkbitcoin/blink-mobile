@@ -3655,8 +3655,14 @@
         "paymentTitle": "Betaling",
         "acceptButton": "Aanvaar",
         "payButton": "Gaan voort en Betaal",
-        "cardTitle": "Blink Privaat",
+        "cardTitle": "Blink Orange",
+        "free": "Gratis",
+        "forNow": "vir nou",
         "perYear": "per jaar",
+        "freeBreakdown": {
+          "card": "Blink-kaart",
+          "memberBenefits": "Ander lidvoordele"
+        },
         "status": {
           "label": "Status",
           "specialOfferLabel": "Spesiale aanbod",
@@ -3677,7 +3683,8 @@
           "text": "Ek het nagegaan en stem in tot die",
           "linkText": "Blink Card-fooiskedule"
         },
-        "renew": "Ek verstaan dat my intekening outomaties oor {months: number} maande sal hernu"
+        "renew": "Ek verstaan dat my intekening outomaties oor {months: number} maande sal hernu",
+        "freeNotice": "Ek verstaan dat Blink Orange vir nou gratis is, en dat 'n lidmaatskapfooi later ingestel kan word, met kennisgewing"
       },
       "CardIntroducing": {
         "title": "Bekendstelling",

@@ -3655,8 +3655,14 @@
         "paymentTitle": "Plată",
         "acceptButton": "Acceptă",
         "payButton": "Continuă și Plătește",
-        "cardTitle": "Blink Privat",
+        "cardTitle": "Blink Orange",
+        "free": "Gratuit",
+        "forNow": "deocamdată",
         "perYear": "pe an",
+        "freeBreakdown": {
+          "card": "Blink Card",
+          "memberBenefits": "Alte beneficii pentru membri"
+        },
         "status": {
           "label": "Status",
           "specialOfferLabel": "Ofertă specială",
@@ -3677,7 +3683,8 @@
           "text": "Am examinat și sunt de acord cu",
           "linkText": "Grila de Tarife Blink Card"
         },
-        "renew": "Înțeleg că abonamentul meu se va reînnoi automat în {months: number} luni"
+        "renew": "Înțeleg că abonamentul meu se va reînnoi automat în {months: number} luni",
+        "freeNotice": "Înțeleg că Blink Orange este gratuit deocamdată și că ulterior ar putea fi introdusă o taxă de membru, cu notificare prealabilă"
       },
       "CardIntroducing": {
         "title": "Prezentare",

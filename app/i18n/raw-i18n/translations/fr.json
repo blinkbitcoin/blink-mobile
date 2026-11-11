@@ -3655,8 +3655,14 @@
                 "paymentTitle": "Paiement",
                 "acceptButton": "Accepter",
                 "payButton": "Continuer et Payer",
-                "cardTitle": "Blink Privé",
+                "cardTitle": "Blink Orange",
+                "free": "Gratuit",
+                "forNow": "pour l'instant",
                 "perYear": "par an",
+                "freeBreakdown": {
+                    "card": "Blink Card",
+                    "memberBenefits": "Autres avantages membres"
+                },
                 "status": {
                     "label": "Statut",
                     "specialOfferLabel": "Offre spéciale",
@@ -3677,7 +3683,8 @@
                     "text": "J'ai examiné et j'accepte le",
                     "linkText": "Barème des Frais de Blink Card"
                 },
-                "renew": "Je comprends que mon abonnement se renouvellera automatiquement dans {months: number} mois"
+                "renew": "Je comprends que mon abonnement se renouvellera automatiquement dans {months: number} mois",
+                "freeNotice": "Je comprends que Blink Orange est gratuit pour l'instant et que des frais d'adhésion pourront être introduits plus tard, avec préavis"
             },
             "CardIntroducing": {
                 "title": "Présentation",

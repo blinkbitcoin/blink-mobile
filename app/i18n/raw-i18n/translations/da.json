@@ -3655,8 +3655,14 @@
         "paymentTitle": "Betaling",
         "acceptButton": "Acceptér",
         "payButton": "Fortsæt og Betal",
-        "cardTitle": "Blink Privat",
+        "cardTitle": "Blink Orange",
+        "free": "Gratis",
+        "forNow": "indtil videre",
         "perYear": "per år",
+        "freeBreakdown": {
+          "card": "Blink-kort",
+          "memberBenefits": "Andre medlemsfordele"
+        },
         "status": {
           "label": "Status",
           "specialOfferLabel": "Særtilbud",
@@ -3677,7 +3683,8 @@
           "text": "Jeg har gennemgået og accepterer",
           "linkText": "Blink Card-gebyroversigt"
         },
-        "renew": "Jeg forstår, at mit abonnement automatisk fornyes om {months: number} måneder"
+        "renew": "Jeg forstår, at mit abonnement automatisk fornyes om {months: number} måneder",
+        "freeNotice": "Jeg forstår, at Blink Orange er gratis indtil videre, og at der senere kan blive indført et medlemsgebyr med varsel"
       },
       "CardIntroducing": {
         "title": "Introduktion",

@@ -3655,8 +3655,14 @@
         "paymentTitle": "Malipo",
         "acceptButton": "Kubali",
         "payButton": "Endelea na Kulipa",
-        "cardTitle": "Blink Binafsi",
+        "cardTitle": "Blink Orange",
+        "free": "Bure",
+        "forNow": "kwa sasa",
         "perYear": "kwa mwaka",
+        "freeBreakdown": {
+          "card": "Blink Card",
+          "memberBenefits": "Manufaa mengine ya uanachama"
+        },
         "status": {
           "label": "Hali",
           "specialOfferLabel": "Ofa maalum",
@@ -3677,7 +3683,8 @@
           "text": "Nimekagua na ninakubali",
           "linkText": "Ratiba ya Ada ya Blink Card"
         },
-        "renew": "Ninaelewa kuwa usajili wangu utahuishwa kiotomatiki baada ya miezi {months: number}"
+        "renew": "Ninaelewa kuwa usajili wangu utahuishwa kiotomatiki baada ya miezi {months: number}",
+        "freeNotice": "Ninaelewa kuwa Blink Orange ni bure kwa sasa, na kwamba ada ya uanachama inaweza kuanzishwa baadaye, kwa taarifa"
       },
       "CardIntroducing": {
         "title": "Kuanzisha",

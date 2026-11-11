@@ -3655,8 +3655,14 @@
         "paymentTitle": "الدفع",
         "acceptButton": "قبول",
         "payButton": "متابعة والدفع",
-        "cardTitle": "بلينك الخاصة",
+        "cardTitle": "Blink Orange",
+        "free": "مجاني",
+        "forNow": "حاليًا",
         "perYear": "سنوياً",
+        "freeBreakdown": {
+          "card": "بطاقة Blink",
+          "memberBenefits": "مزايا العضوية الأخرى"
+        },
         "status": {
           "label": "الحالة",
           "specialOfferLabel": "عرض خاص",
@@ -3677,7 +3683,8 @@
           "text": "لقد راجعتُ وأوافق على",
           "linkText": "جدول رسوم Blink Card"
         },
-        "renew": "أفهم أن اشتراكي سيتجدد تلقائيًا خلال {months: number} شهرًا"
+        "renew": "أفهم أن اشتراكي سيتجدد تلقائيًا خلال {months: number} شهرًا",
+        "freeNotice": "أفهم أن Blink Orange مجاني حاليًا، وأنه قد تُفرض رسوم عضوية لاحقًا مع إشعار مسبق"
       },
       "CardIntroducing": {
         "title": "تقديم",

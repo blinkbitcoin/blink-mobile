@@ -3655,8 +3655,14 @@
         "paymentTitle": "Okusasula",
         "acceptButton": "Kkiriza",
         "payButton": "Weyongere era Osasula",
-        "cardTitle": "Blink Ekyama",
+        "cardTitle": "Blink Orange",
+        "free": "Bwereere",
+        "forNow": "kati",
         "perYear": "buli mwaka",
+        "freeBreakdown": {
+          "card": "Kaadi ya Blink",
+          "memberBenefits": "Ebirungi ebirala eby'obwammemba"
+        },
         "status": {
           "label": "Embeera",
           "specialOfferLabel": "Ekirabo eky'enjawulo",
@@ -3677,7 +3683,8 @@
           "text": "Nkakasizza era nkkiriza",
           "linkText": "Oluwendo lw'ebisale bya Blink Card"
         },
-        "renew": "Ntegeera nti okwewandiisa kwange kujja kuddaabirizibwa okwokwokka nga wayiseewo emyezi {months: number}"
+        "renew": "Ntegeera nti okwewandiisa kwange kujja kuddaabirizibwa okwokwokka nga wayiseewo emyezi {months: number}",
+        "freeNotice": "Ntegeera nti Blink Orange ya bwereere kati, era nti ssente z'obwammemba ziyinza okutandikibwawo oluvannyuma, nga tutegeezeddwa"
       },
       "CardIntroducing": {
         "title": "Okwanjula",

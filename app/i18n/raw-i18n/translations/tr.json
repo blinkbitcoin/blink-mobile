@@ -3655,8 +3655,14 @@
         "paymentTitle": "Ödeme",
         "acceptButton": "Kabul Et",
         "payButton": "Devam Et ve Öde",
-        "cardTitle": "Blink Özel",
+        "cardTitle": "Blink Orange",
+        "free": "Ücretsiz",
+        "forNow": "şimdilik",
         "perYear": "yıllık",
+        "freeBreakdown": {
+          "card": "Blink kartı",
+          "memberBenefits": "Diğer üyelik avantajları"
+        },
         "status": {
           "label": "Durum",
           "specialOfferLabel": "Özel teklif",
@@ -3677,7 +3683,8 @@
           "text": "İnceledim ve şunu kabul ediyorum:",
           "linkText": "Blink Card Ücret Çizelgesi"
         },
-        "renew": "Aboneliğimin {months: number} ay içinde otomatik olarak yenileneceğini anlıyorum"
+        "renew": "Aboneliğimin {months: number} ay içinde otomatik olarak yenileneceğini anlıyorum",
+        "freeNotice": "Blink Orange'ın şimdilik ücretsiz olduğunu ve ileride önceden bildirilerek bir üyelik ücreti getirilebileceğini anlıyorum"
       },
       "CardIntroducing": {
         "title": "Tanıtım",

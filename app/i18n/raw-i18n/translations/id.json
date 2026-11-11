@@ -3655,8 +3655,14 @@
         "paymentTitle": "Pembayaran",
         "acceptButton": "Terima",
         "payButton": "Lanjutkan dan Bayar",
-        "cardTitle": "Blink Pribadi",
+        "cardTitle": "Blink Orange",
+        "free": "Gratis",
+        "forNow": "untuk saat ini",
         "perYear": "per tahun",
+        "freeBreakdown": {
+          "card": "Blink Card",
+          "memberBenefits": "Manfaat anggota lainnya"
+        },
         "status": {
           "label": "Status",
           "specialOfferLabel": "Penawaran khusus",
@@ -3677,7 +3683,8 @@
           "text": "Saya telah meninjau dan menyetujui",
           "linkText": "Jadwal Biaya Blink Card"
         },
-        "renew": "Saya memahami bahwa langganan saya akan diperpanjang secara otomatis dalam {months: number} bulan"
+        "renew": "Saya memahami bahwa langganan saya akan diperpanjang secara otomatis dalam {months: number} bulan",
+        "freeNotice": "Saya memahami bahwa Blink Orange gratis untuk saat ini, dan biaya keanggotaan dapat diberlakukan nanti, dengan pemberitahuan"
       },
       "CardIntroducing": {
         "title": "Memperkenalkan",

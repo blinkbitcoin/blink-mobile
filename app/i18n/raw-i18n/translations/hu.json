@@ -3655,8 +3655,14 @@
         "paymentTitle": "Fizetés",
         "acceptButton": "Elfogadás",
         "payButton": "Folytatás és Fizetés",
-        "cardTitle": "Blink Privát",
+        "cardTitle": "Blink Orange",
+        "free": "Ingyenes",
+        "forNow": "egyelőre",
         "perYear": "évente",
+        "freeBreakdown": {
+          "card": "Blink kártya",
+          "memberBenefits": "Egyéb tagsági előnyök"
+        },
         "status": {
           "label": "Állapot",
           "specialOfferLabel": "Különleges ajánlat",
@@ -3677,7 +3683,8 @@
           "text": "Átnéztem és elfogadom a következőt:",
           "linkText": "Blink Card díjszabása"
         },
-        "renew": "Megértem, hogy az előfizetésem {months: number} hónap múlva automatikusan megújul"
+        "renew": "Megértem, hogy az előfizetésem {months: number} hónap múlva automatikusan megújul",
+        "freeNotice": "Tudomásul veszem, hogy a Blink Orange egyelőre ingyenes, és hogy később, előzetes értesítéssel tagsági díjat vezethetnek be"
       },
       "CardIntroducing": {
         "title": "Bemutatjuk",

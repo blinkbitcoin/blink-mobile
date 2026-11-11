@@ -3655,8 +3655,14 @@
         "paymentTitle": "Intlawulo",
         "acceptButton": "Yamkela",
         "payButton": "Qhubeka kwaye Uhlawule",
-        "cardTitle": "Blink Yabucala",
+        "cardTitle": "Blink Orange",
+        "free": "Simahla",
+        "forNow": "okwangoku",
         "perYear": "ngonyaka",
+        "freeBreakdown": {
+          "card": "Ikhadi le-Blink",
+          "memberBenefits": "Ezinye izibonelelo zobulungu"
+        },
         "status": {
           "label": "Isimo",
           "specialOfferLabel": "Inikelo elikhethekileyo",
@@ -3677,7 +3683,8 @@
           "text": "Ndiyiphengululile kwaye ndiyavuma",
           "linkText": "Ishedyuli Yeentlawulo ye-Blink Card"
         },
-        "renew": "Ndiyaqonda ukuba ubhaliso lwam luya kuhlaziywa ngokuzenzekelayo kwiinyanga ezili-{months: number}"
+        "renew": "Ndiyaqonda ukuba ubhaliso lwam luya kuhlaziywa ngokuzenzekelayo kwiinyanga ezili-{months: number}",
+        "freeNotice": "Ndiyaqonda ukuba i-Blink Orange isimahla okwangoku, kwaye kunokwenzeka ukuba kuziswe umrhumo wobulungu kamva, ngesaziso"
       },
       "CardIntroducing": {
         "title": "Ukwazisa",

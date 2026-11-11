@@ -3655,8 +3655,14 @@
         "paymentTitle": "Πληρωμή",
         "acceptButton": "Αποδοχή",
         "payButton": "Συνέχεια και πληρωμή",
-        "cardTitle": "Blink Private",
+        "cardTitle": "Blink Orange",
+        "free": "Δωρεάν",
+        "forNow": "προς το παρόν",
         "perYear": "ανά έτος",
+        "freeBreakdown": {
+          "card": "Blink Card",
+          "memberBenefits": "Άλλα προνόμια μέλους"
+        },
         "status": {
           "label": "Κατάσταση",
           "specialOfferLabel": "Ειδική προσφορά",
@@ -3677,7 +3683,8 @@
           "text": "Έχω ελέγξει και συμφωνώ με τον",
           "linkText": "Πίνακα Χρεώσεων της Blink Card"
         },
-        "renew": "Καταλαβαίνω ότι η συνδρομή μου θα ανανεωθεί αυτόματα σε {months: number} μήνες"
+        "renew": "Καταλαβαίνω ότι η συνδρομή μου θα ανανεωθεί αυτόματα σε {months: number} μήνες",
+        "freeNotice": "Κατανοώ ότι το Blink Orange είναι δωρεάν προς το παρόν και ότι ενδέχεται αργότερα να εισαχθεί συνδρομή μέλους, με προειδοποίηση"
       },
       "CardIntroducing": {
         "title": "Σας παρουσιάζουμε",
