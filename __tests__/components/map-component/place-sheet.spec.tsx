@@ -17,7 +17,11 @@ import { PlaceSheet } from "@app/components/map-component/place-sheet"
 import { openExternalUrl } from "@app/utils/external"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
-import { animatedHeightOf, translateYOf } from "../../helpers/bottom-sheet"
+import {
+  animatedHeightOf,
+  settledTranslateYOf,
+  translateYOf,
+} from "../../helpers/bottom-sheet"
 import { ContextForScreen } from "../../screens/helper"
 
 jest.mock("@app/btcmap/use-place-details", () => ({
@@ -357,7 +361,7 @@ describe("PlaceSheet", () => {
         { state: 5, translationY: -900, velocityY: 0 },
       ])
     })
-    await waitFor(() => expect(Math.abs(translateYOf(sheet))).toBeLessThan(1))
+    expect(Math.abs(await settledTranslateYOf(sheet))).toBeLessThan(1)
 
     await act(async () => {
       fireEvent(getByTestId("place-sheet-peek"), "layout", {
@@ -365,8 +369,9 @@ describe("PlaceSheet", () => {
       })
     })
 
-    // Still open, rather than sprung back to the taller peek.
-    expect(Math.abs(translateYOf(sheet))).toBeLessThan(1)
+    // Still open once everything has stopped moving, rather than sprung back to
+    // the taller peek.
+    expect(Math.abs(await settledTranslateYOf(sheet))).toBeLessThan(1)
   })
 
   it("shows where and when in the block the lower position rests on", async () => {
