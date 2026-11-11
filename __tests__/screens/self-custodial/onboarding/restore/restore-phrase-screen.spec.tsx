@@ -1,9 +1,11 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { fireEvent, render } from "@testing-library/react-native"
 
 import { RestorePhraseScreen } from "@app/screens/self-custodial/onboarding/restore/restore-phrase-screen"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
+import { HEADER_ICON_TOUCH_SIZE } from "@app/components/header-no-glass"
 
 import { ContextForScreen, ContextForScreenWithTheme } from "../../../helper"
 import { flushEffects } from "../../../../helpers/flush-effects"
@@ -505,7 +507,14 @@ describe("RestorePhraseScreen", () => {
     const { getByTestId } = renderHeaderRight()
     const button = getByTestId("restore-paste-button")
     expect(button.props.accessibilityLabel).toBe(LL.RestoreScreen.paste())
-    expect(button.props.hitSlop).toEqual({ top: 12, bottom: 12, left: 12, right: 12 })
+    // `hitSlop` never reaches past the native header item, so the box itself is 48dp.
+    expect(button.props.hitSlop).toBeUndefined()
+    expect(StyleSheet.flatten(button.props.style)).toMatchObject({
+      minWidth: HEADER_ICON_TOUCH_SIZE,
+      minHeight: HEADER_ICON_TOUCH_SIZE,
+      alignItems: "flex-end",
+      justifyContent: "center",
+    })
   })
 
   it("clears the header Paste button when step 1 advances to step 2", async () => {

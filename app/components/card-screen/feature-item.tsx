@@ -50,7 +50,7 @@ const useStyles = makeStyles(() => {
       gap: 15,
     },
     iconStyle: {
-      borderRadius: containerSize,
+      borderRadius: containerSize / 2,
       width: containerSize,
       height: containerSize,
       alignItems: "center",

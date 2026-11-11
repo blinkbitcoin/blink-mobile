@@ -1,24 +1,21 @@
 import { recordAppError, toError } from "@app/utils/error-reporting"
 
-export const WalletAddResult = {
-  Added: "added",
-  Cancelled: "cancelled",
-  Busy: "busy",
-} as const
-
-export type WalletAddResult = (typeof WalletAddResult)[keyof typeof WalletAddResult]
-
-export type WalletCard = {
-  cardId: string
-  lastFour: string
-}
+import { WalletAddResult, type WalletCard } from "../types"
+import { fetchCardProvisioningData } from "./card-provisioning-data"
+import { deviceWalletFor } from "./device-wallets"
+import { getMeaWalletSdk } from "./meawallet-sdk"
 
 /**
- * Boundary with the device wallet (Apple Pay, Google Pay and Samsung Pay). The
- * MeaWallet SDK that backs it is not installed yet (blink-wip#427), so until it
- * lands no wallet can take the card and the add to wallet button stays hidden.
+ * Boundary with the device wallet (Apple Pay on iOS, Google Pay on Android), backed by
+ * the MeaWallet SDK. The card is offered only when the build carries the SDK, the backend
+ * can hand over what the wallet needs, and the wallet on this device can take this card.
  */
-export const canAddCardToWallet = async (_card: WalletCard): Promise<boolean> => false
+export const canAddCardToWallet = async (card: WalletCard): Promise<boolean> => {
+  if (!fetchCardProvisioningData) return false
+  const sdk = await getMeaWalletSdk()
+  if (!sdk) return false
+  return deviceWalletFor(sdk).canAdd(card)
+}
 
 type PendingAdd = {
   cardId: string
@@ -30,8 +27,15 @@ type PendingAdd = {
  *  away as busy. */
 let pendingAdd: PendingAdd | undefined
 
-const provisionCard = async (_card: WalletCard): Promise<WalletAddResult> => {
-  throw new Error("No device wallet can take the card yet")
+const provisionCard = async (card: WalletCard): Promise<WalletAddResult> => {
+  const fetchData = fetchCardProvisioningData
+  if (!fetchData) {
+    throw new Error("The backend does not provide card provisioning data yet")
+  }
+  const sdk = await getMeaWalletSdk()
+  if (!sdk) throw new Error("This build carries no device wallet SDK")
+  const data = await fetchData(card.cardId)
+  return deviceWalletFor(sdk).add(card, data)
 }
 
 export const addCardToWallet = (card: WalletCard): Promise<WalletAddResult> => {

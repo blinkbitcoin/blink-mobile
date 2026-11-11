@@ -3953,6 +3953,12 @@
             "title": "No podemos migrar tu Saldo Dólar",
             "body": "Primero vacía tu Saldo Dólar. Puedes transferirlo a tu Saldo Bitcoin en Blink o a otro lugar."
         },
+        "pendingDepositModal": {
+            "title": "Hay un depósito pendiente en tu cuenta",
+            "body": "No puedes migrar a otro tipo de cuenta hasta que todos tus depósitos pendientes se hayan liquidado y acreditado en esta cuenta.",
+            "contactSupportCta": "Contactar con soporte",
+            "stillConfirming": "Tu depósito todavía no está confirmado. Vuelve a intentarlo en unos minutos."
+        },
         "balancesOverview": {
             "title": "Mueve tu saldo",
             "body": "Mueve tus fondos de forma segura a tu nueva cuenta.",
@@ -4140,6 +4146,7 @@
         "get": "Obtener",
         "storeNote": "“Obtener” abre la App Store o Google Play. Vuelve a Blink cuando esté instalada.",
         "haveAnApp": "Ya tengo una aplicación",
+        "learnHow": "Descubre cómo",
         "keyInstruction": "Copia esta clave de configuración en tu aplicación de autenticación.",
         "qrInstruction": "¿Usas otro dispositivo?\nEscanea este código QR en su lugar.",
         "backupTitle": "Respalda tu clave",
@@ -4252,7 +4259,6 @@
         "payment": "Pago"
     },
     "SelfCustodialStaleRate": {
-        "notice": "El tipo de cambio puede estar desactualizado",
         "satsOnly": "Mostrando sats: no hay tipo de cambio disponible"
     },
     "SelfCustodialOffline": {

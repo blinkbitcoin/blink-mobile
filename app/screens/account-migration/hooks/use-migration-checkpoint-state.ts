@@ -34,6 +34,9 @@ type SaveCheckpointOptions = {
   /** The server reports this account's migration not started, read by the caller just
    *  before the save. Never re-sent either: an answer goes stale. */
   isServerFlowUnstarted?: true
+  /** The caller read this figure again after a deposit cleared, while the server still
+   *  waited for a destination. Never re-sent either, for the same reason. */
+  isReceiveFigureRefreshed?: true
 }
 
 /**
@@ -136,6 +139,7 @@ export const useMigrationCheckpointState = () => {
         expectedReceiveSats: expectedReceiveSatsUpdate,
         isStartConfirmed: isStartConfirmedUpdate,
         isServerFlowUnstarted,
+        isReceiveFigureRefreshed,
       }: SaveCheckpointOptions = {},
     ): Promise<StorageWriteResult> => {
       /** Without a resolved owner the checkpoint cannot be keyed, and saving would erase the
@@ -150,6 +154,7 @@ export const useMigrationCheckpointState = () => {
           expectedReceiveSatsUpdate ?? expectedReceiveSats ?? undefined,
         isStartConfirmed: isStartConfirmedUpdate,
         isServerFlowUnstarted,
+        isReceiveFigureRefreshed,
       }
       try {
         const written = await saveCheckpointToStorage(storageKey, update)
