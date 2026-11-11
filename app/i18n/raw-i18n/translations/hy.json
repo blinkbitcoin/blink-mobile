@@ -3843,7 +3843,7 @@
         "acknowledgeSolicitation": "Ես գիտակցում եմ, որ Blink Visa քարտի համար դիմելը չի համարվում չարտոնված դիմում"
       },
       "CardPreapproved": {
-        "title": "You have been pre-approved for the Blink Visa card!",
+        "title": "Դուք հաստատվել եք Blink քարտի համար!",
         "buttonText": "Close"
       },
       "CardProcessing": {

@@ -3843,7 +3843,7 @@
         "acknowledgeSolicitation": "Tôi thừa nhận rằng việc đăng ký Thẻ Blink Visa không cấu thành hành vi chào mời trái phép"
       },
       "CardPreapproved": {
-        "title": "Bạn đã được phê duyệt trước cho thẻ Blink Visa!",
+        "title": "Bạn đã được phê duyệt cho Thẻ Blink!",
         "buttonText": "Đóng"
       },
       "CardProcessing": {

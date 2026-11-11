@@ -3843,7 +3843,7 @@
         "acknowledgeSolicitation": "Potvrđujem da podnošenje zahtjeva za karticu Blink Visa ne predstavlja neovlašteno oglašavanje"
       },
       "CardPreapproved": {
-        "title": "Unaprijed ste odobreni za Blink Visa karticu!",
+        "title": "Odobreni ste za Blink karticu!",
         "buttonText": "Zatvori"
       },
       "CardProcessing": {

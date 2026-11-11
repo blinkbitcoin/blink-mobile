@@ -3782,7 +3782,7 @@
                 "acknowledgeSolicitation": "Ich erkenne an, dass die Beantragung der Blink Visa Card keine unbefugte Aufforderung darstellt"
             },
             "CardPreapproved": {
-                "title": "Sie wurden für die Blink Visa-Karte vorab genehmigt!",
+                "title": "Sie wurden für die Blink Card genehmigt!",
                 "buttonText": "Schließen"
             },
             "CardProcessing": {

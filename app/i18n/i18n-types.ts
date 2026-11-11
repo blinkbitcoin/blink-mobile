@@ -12769,7 +12769,7 @@ type RootTranslation = {
 			}
 			CardPreapproved: {
 				/**
-				 * Y​o​u​ ​h​a​v​e​ ​b​e​e​n​ ​p​r​e​-​a​p​p​r​o​v​e​d​ ​f​o​r​ ​t​h​e​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d​!
+				 * Y​o​u​ ​h​a​v​e​ ​b​e​e​n​ ​a​p​p​r​o​v​e​d​ ​f​o​r​ ​t​h​e​ ​B​l​i​n​k​ ​C​a​r​d​!
 				 */
 				title: string
 				/**
@@ -27085,7 +27085,7 @@ export type TranslationFunctions = {
 			}
 			CardPreapproved: {
 				/**
-				 * You have been pre-approved for the Blink Visa card!
+				 * You have been approved for the Blink Card!
 				 */
 				title: () => LocalizedString
 				/**

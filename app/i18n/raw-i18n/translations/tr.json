@@ -3843,7 +3843,7 @@
         "acknowledgeSolicitation": "Blink Visa Kartı için başvurmanın yetkisiz bir talep oluşturmadığını kabul ediyorum"
       },
       "CardPreapproved": {
-        "title": "Blink Visa kartı için ön onay aldınız!",
+        "title": "Blink kartı için onay aldınız!",
         "buttonText": "Kapat"
       },
       "CardProcessing": {

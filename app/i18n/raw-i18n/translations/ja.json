@@ -3782,7 +3782,7 @@
                 "acknowledgeSolicitation": "Blink Visa カードの申し込みが不正な勧誘に該当しないことを認めます"
             },
             "CardPreapproved": {
-                "title": "Blink Visaカードの事前承認が完了しました！",
+                "title": "Blink カードが承認されました！",
                 "buttonText": "閉じる"
             },
             "CardProcessing": {

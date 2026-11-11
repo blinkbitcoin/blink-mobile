@@ -4029,7 +4029,7 @@ const en: BaseTranslation = {
           "I acknowledge that applying for the Blink Visa Card does not constitute unauthorized solicitation",
       },
       CardPreapproved: {
-        title: "You have been pre-approved for the Blink Visa card!",
+        title: "You have been approved for the Blink Card!",
         buttonText: "Close",
       },
       CardProcessing: {

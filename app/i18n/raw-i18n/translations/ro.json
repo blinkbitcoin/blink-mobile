@@ -3843,7 +3843,7 @@
         "acknowledgeSolicitation": "Recunosc că solicitarea cardului Blink Visa nu constituie o solicitare neautorizată"
       },
       "CardPreapproved": {
-        "title": "Ați fost pre-aprobat pentru cardul Blink Visa!",
+        "title": "Ați fost aprobat pentru Blink Card!",
         "buttonText": "Închide"
       },
       "CardProcessing": {

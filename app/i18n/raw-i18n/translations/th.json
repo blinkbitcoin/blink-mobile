@@ -3843,7 +3843,7 @@
         "acknowledgeSolicitation": "ฉันรับทราบว่าการสมัครบัตร Blink Visa ไม่ถือเป็นการชักชวนที่ไม่ได้รับอนุญาต"
       },
       "CardPreapproved": {
-        "title": "คุณได้รับการอนุมัติล่วงหน้าสำหรับบัตร Blink Visa แล้ว!",
+        "title": "คุณได้รับการอนุมัติบัตร Blink แล้ว!",
         "buttonText": "ปิด"
       },
       "CardProcessing": {

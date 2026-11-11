@@ -3782,7 +3782,7 @@
                 "acknowledgeSolicitation": "Reconheço que solicitar o cartão Blink Visa não constitui uma solicitação não autorizada"
             },
             "CardPreapproved": {
-                "title": "Você foi pré-aprovado para o cartão Blink Visa!",
+                "title": "Você foi aprovado para o Cartão Blink!",
                 "buttonText": "Fechar"
             },
             "CardProcessing": {

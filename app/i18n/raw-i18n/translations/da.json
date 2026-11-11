@@ -3843,7 +3843,7 @@
         "acknowledgeSolicitation": "Jeg anerkender, at ansøgning om Blink Visa-kortet ikke udgør uautoriseret henvendelse"
       },
       "CardPreapproved": {
-        "title": "Du er blevet forhåndsgodkendt til Blink Visa-kortet!",
+        "title": "Du er blevet godkendt til Blink-kortet!",
         "buttonText": "Luk"
       },
       "CardProcessing": {
