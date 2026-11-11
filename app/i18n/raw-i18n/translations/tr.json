@@ -4258,7 +4258,6 @@
     "payment": "Ödeme"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Döviz kuru güncel olmayabilir",
     "satsOnly": "Sats olarak gösteriliyor — döviz kuru yok"
   },
   "SelfCustodialOffline": {

@@ -4258,7 +4258,6 @@
     "payment": "Betaling"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Vekselkursen er muligvis forældet",
     "satsOnly": "Viser sats – ingen vekselkurs tilgængelig"
   },
   "SelfCustodialOffline": {

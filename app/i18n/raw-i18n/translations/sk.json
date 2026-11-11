@@ -4258,7 +4258,6 @@
     "payment": "Platba"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Výmenný kurz môže byť zastaraný",
     "satsOnly": "Zobrazené v satoch – výmenný kurz nie je dostupný"
   },
   "SelfCustodialOffline": {

@@ -36,10 +36,6 @@ type Props = {
   showStableBalanceToggle?: boolean
   mode?: BalanceMode
   onModeChange?: () => void
-  /** The amount above is priced off an exchange rate old enough that the user should be
-   *  told, rather than read it as today's. Never blocks the figure: an old rate is a
-   *  caveat on a number, not a reason to withhold it. */
-  isRateStale?: boolean
   /** The amount above is in sats because nothing could price it. Said out loud so a
    *  balance that changes denomination does not read as money changing. */
   isSatsOnly?: boolean
@@ -51,7 +47,6 @@ export const BalanceHeader: React.FC<Props> = ({
   showStableBalanceToggle,
   mode,
   onModeChange,
-  isRateStale = false,
   isSatsOnly = false,
 }) => {
   const styles = useStyles()
@@ -59,14 +54,6 @@ export const BalanceHeader: React.FC<Props> = ({
 
   const { hideAmount, toggleHideAmount } = useHideAmount()
   const currentMode = mode ?? BalanceMode.Btc
-
-  /** One slot, and sats-only wins: "no rate at all" subsumes "the rate is old", and two
-   *  lines under a balance is one too many. */
-  const noticeText = isSatsOnly
-    ? LL.SelfCustodialStaleRate.satsOnly()
-    : isRateStale
-      ? LL.SelfCustodialStaleRate.notice()
-      : null
 
   const modeLabel =
     currentMode === BalanceMode.Btc
@@ -98,9 +85,9 @@ export const BalanceHeader: React.FC<Props> = ({
           </View>
         </TouchableOpacity>
       )}
-      {noticeText && !hideAmount && !loading ? (
-        <Text style={styles.staleRateText} {...testProps("balance-rate-notice")}>
-          {noticeText}
+      {isSatsOnly && !hideAmount && !loading ? (
+        <Text style={styles.satsOnlyText} {...testProps("balance-rate-notice")}>
+          {LL.SelfCustodialStaleRate.satsOnly()}
         </Text>
       ) : null}
       {showStableBalanceToggle && onModeChange ? (
@@ -144,7 +131,7 @@ const useStyles = makeStyles(({ colors }) => ({
   loaderForefound: {
     color: colors.loaderForeground,
   },
-  staleRateText: {
+  satsOnlyText: {
     marginTop: 4,
     fontSize: 12,
     textAlign: "center",

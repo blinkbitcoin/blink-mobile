@@ -4258,7 +4258,6 @@
     "payment": "دفعة"
   },
   "SelfCustodialStaleRate": {
-    "notice": "قد يكون سعر الصرف قديمًا",
     "satsOnly": "العرض بالساتوشي — لا يتوفر سعر صرف"
   },
   "SelfCustodialOffline": {

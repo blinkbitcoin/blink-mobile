@@ -4258,7 +4258,6 @@
     "payment": "Pembayaran"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Kadar pertukaran mungkin sudah lapuk",
     "satsOnly": "Memaparkan sats — tiada kadar pertukaran tersedia"
   },
   "SelfCustodialOffline": {

@@ -263,11 +263,13 @@ price means the screen is still loading.
   balance in sats instead of a skeleton. The balance is read from the SDK's own
   storage and is not in doubt; only its price is. A held USD balance is left out
   of that figure rather than completed with a rate we do not have.
-- **Balance header, old rate.** A `Stale` rate adds one line under the figure:
-  "Exchange rate may be out of date". It never withholds the number — an old
-  rate is a caveat on it, not a reason to hide it — and it is suppressed while
-  the balance is hidden or still loading, and when the figure is in sats, which
-  needs no rate.
+- **Balance header, old rate.** A `Stale` rate prices the figure with no line
+  under it. The line it once added ("Exchange rate may be out of date") appeared
+  on every launch more than an hour after the last one and went when that
+  launch's refresh landed, moving everything under the balance
+  (blink-wip#2035). It was removed rather than held behind a skeleton: an
+  outage would have kept that skeleton up, and a slightly old figure beats
+  none. `priceFreshness` is still returned for any caller that needs it.
 
 **Superseded: the sats-only receive and send flow.** This phase originally
 argued that one was not worth building, on the reading that `OfflineGate` covers
