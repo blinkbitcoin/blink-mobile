@@ -1,5 +1,3 @@
-import ReactNativeHapticFeedback from "react-native-haptic-feedback"
-
 import {
   toMajorUnit,
   toMinorUnit,
@@ -9,7 +7,6 @@ import {
   maskString,
   normalizeString,
   pickRandomIndices,
-  triggerHapticFeedback,
 } from "@app/utils/helper"
 
 describe("ellipsizeMiddle", () => {
@@ -251,22 +248,5 @@ describe("pickRandomIndices", () => {
   it("returns all indices when count exceeds total", () => {
     const result = pickRandomIndices(3, 5)
     expect(result).toEqual([0, 1, 2])
-  })
-})
-
-describe("triggerHapticFeedback", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it("triggers the given type while ignoring Android system settings", () => {
-    triggerHapticFeedback("notificationSuccess")
-
-    expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledWith(
-      "notificationSuccess",
-      {
-        ignoreAndroidSystemSettings: true,
-      },
-    )
   })
 })

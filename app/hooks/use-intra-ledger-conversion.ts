@@ -13,7 +13,7 @@ import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { WalletDescriptor } from "@app/types/wallets"
 import { logConversionAttempt, logConversionResult } from "@app/utils/analytics"
-import { triggerHapticFeedback } from "@app/utils/helper"
+import { haptics } from "@app/utils/haptics"
 
 type ConversionRequest = {
   fromWallet: WalletDescriptor<WalletCurrency>
@@ -92,7 +92,7 @@ export const useIntraLedgerConversion = ({
         if (!status) {
           recordAppError(new Error("Conversion failed"))
           setErrorMessage(LL.common.error())
-          triggerHapticFeedback("notificationError")
+          haptics.error()
           return
         }
 
@@ -103,18 +103,18 @@ export const useIntraLedgerConversion = ({
         })
 
         if (status === PaymentSendResult.Success) {
-          triggerHapticFeedback("notificationSuccess")
+          haptics.success()
           onSuccess()
           return
         }
 
         setErrorMessage(failure ?? LL.common.error())
-        triggerHapticFeedback("notificationError")
+        haptics.error()
       } catch (err) {
         if (err instanceof Error) {
           recordAppError(err)
           setErrorMessage(err.message)
-          triggerHapticFeedback("notificationError")
+          haptics.error()
         }
       }
     })

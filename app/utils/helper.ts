@@ -1,7 +1,4 @@
 import { Platform } from "react-native"
-import ReactNativeHapticFeedback, {
-  HapticFeedbackTypes,
-} from "react-native-haptic-feedback"
 
 import { MASK_CHAR } from "@app/config/appinfo"
 
@@ -110,6 +107,3 @@ export const toNumber = (value: bigint | string | number): number => {
   if (Number.isNaN(parsed)) return 0
   return parsed
 }
-
-export const triggerHapticFeedback = (type: keyof typeof HapticFeedbackTypes) =>
-  ReactNativeHapticFeedback.trigger(type, { ignoreAndroidSystemSettings: true })
