@@ -3689,14 +3689,21 @@
         "buttonText": "Tiếp tục"
       },
       "CardDetails": {
-        "title": "Đặc quyền bổ sung",
+        "title": "Bao gồm những gì",
         "features": {
-          "accountManager": "Quản lý tài khoản chuyên trách",
-          "support": "Hỗ trợ ưu tiên",
-          "onchainDeposits": "Hoàn 50% phí giao dịch",
-          "circularEconomies": "100 $ cho kinh tế tuần hoàn"
+          "card": {
+            "title": "Thẻ Blink",
+            "subtitle": "thẻ Visa của bạn, sẵn sàng ngay hôm nay"
+          },
+          "accountManager": {
+            "title": "Quản lý tài khoản cá nhân",
+            "subtitle": "và hỗ trợ ưu tiên"
+          },
+          "businessAccounts": "Tài khoản doanh nghiệp",
+          "virtualAccounts": "Tài khoản ảo"
         },
-        "andMore": "... và nhiều hơn nữa vào năm 2026",
+        "availableIn": "trong {months} tháng",
+        "footnote": "Một số tính năng sẽ có trong vòng {months} tháng. Thẻ đã sẵn sàng ngay hôm nay.",
         "buttonText": "Tiếp tục"
       },
       "WelcomeOnboard": {

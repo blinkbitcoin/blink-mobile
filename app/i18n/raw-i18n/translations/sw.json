@@ -3689,14 +3689,21 @@
         "buttonText": "Endelea"
       },
       "CardDetails": {
-        "title": "Faida za ziada",
+        "title": "Kilichojumuishwa",
         "features": {
-          "accountManager": "Meneja akaunti maalum",
-          "support": "Msaada wa kipaumbele",
-          "onchainDeposits": "Urejeshaji wa 50% kwa ada za muamala",
-          "circularEconomies": "$100 kwa uchumi wa mzunguko"
+          "card": {
+            "title": "Blink Card",
+            "subtitle": "kadi yako ya Visa, iko tayari leo"
+          },
+          "accountManager": {
+            "title": "Meneja binafsi wa akaunti",
+            "subtitle": "na usaidizi wa kipaumbele"
+          },
+          "businessAccounts": "Akaunti za biashara",
+          "virtualAccounts": "Akaunti pepe"
         },
-        "andMore": "... na zaidi zinakuja 2026",
+        "availableIn": "baada ya miezi {months}",
+        "footnote": "Baadhi ya vipengele vitapatikana ndani ya miezi {months}. Kadi iko tayari leo.",
         "buttonText": "Endelea"
       },
       "WelcomeOnboard": {

@@ -3689,14 +3689,21 @@
         "buttonText": "Devam Et"
       },
       "CardDetails": {
-        "title": "Ek avantajlar",
+        "title": "Neler dahil",
         "features": {
-          "accountManager": "Özel hesap yöneticisi",
-          "support": "Öncelikli destek",
-          "onchainDeposits": "İşlem ücretlerinden %50 geri ödeme",
-          "circularEconomies": "Döngüsel ekonomilere 100 $"
+          "card": {
+            "title": "Blink kartı",
+            "subtitle": "Visa kartınız, bugün hazır"
+          },
+          "accountManager": {
+            "title": "Kişisel hesap yöneticisi",
+            "subtitle": "ve öncelikli destek"
+          },
+          "businessAccounts": "İşletme hesapları",
+          "virtualAccounts": "Sanal hesaplar"
         },
-        "andMore": "... ve 2026'da daha fazlası geliyor",
+        "availableIn": "{months} ay içinde",
+        "footnote": "Bazı özellikler {months} ay içinde kullanıma sunulacak. Kart bugün hazır.",
         "buttonText": "Devam Et"
       },
       "WelcomeOnboard": {

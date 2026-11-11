@@ -32,6 +32,12 @@ describe("GaloyIcon", () => {
       ).not.toBeNull()
     })
 
+    it("renders the card icon", () => {
+      const { getByTestId } = renderWithTheme(<GaloyIcon name="card" size={17} />)
+
+      expect(getByTestId("icon-card")).toBeTruthy()
+    })
+
     it("renders with a custom color and opacity", () => {
       expect(
         renderWithTheme(

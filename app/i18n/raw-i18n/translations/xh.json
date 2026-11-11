@@ -3689,14 +3689,21 @@
         "buttonText": "Qhubeka"
       },
       "CardDetails": {
-        "title": "Inzuzo ezongezelelweyo",
+        "title": "Okubandakanyiweyo",
         "features": {
-          "accountManager": "Umphathi weakhawunti ozinikeleyo",
-          "support": "Inkxaso ephambili",
-          "onchainDeposits": "50% ubuyiselo kwiimali zotshintsho",
-          "circularEconomies": "$100 kwiikhonomi ezijikeleziyo"
+          "card": {
+            "title": "Ikhadi le-Blink",
+            "subtitle": "ikhadi lakho le-Visa, lilungile namhlanje"
+          },
+          "accountManager": {
+            "title": "Umphathi weakhawunti yakho",
+            "subtitle": "kunye nenkxaso ephambili"
+          },
+          "businessAccounts": "Iiakhawunti zeshishini",
+          "virtualAccounts": "Iiakhawunti zedijithali"
         },
-        "andMore": "... nokunye okuninzi kuzayo ngo-2026",
+        "availableIn": "kwiinyanga ezi-{months}",
+        "footnote": "Ezinye iimpawu ziya kufumaneka kwiinyanga ezi-{months}. Ikhadi lilungile namhlanje.",
         "buttonText": "Qhubeka"
       },
       "WelcomeOnboard": {

@@ -3689,14 +3689,21 @@
         "buttonText": "Continuă"
       },
       "CardDetails": {
-        "title": "Avantaje suplimentare",
+        "title": "Ce este inclus",
         "features": {
-          "accountManager": "Manager de cont dedicat",
-          "support": "Suport prioritar",
-          "onchainDeposits": "50% înapoi din comisioanele de tranzacție",
-          "circularEconomies": "100 $ pentru economii circulare"
+          "card": {
+            "title": "Blink Card",
+            "subtitle": "cardul tău Visa, gata astăzi"
+          },
+          "accountManager": {
+            "title": "Manager de cont personal",
+            "subtitle": "și asistență prioritară"
+          },
+          "businessAccounts": "Conturi de afaceri",
+          "virtualAccounts": "Conturi virtuale"
         },
-        "andMore": "... și mai multe vin în 2026",
+        "availableIn": "în {months} luni",
+        "footnote": "Unele funcții vor fi disponibile în cel mult {months} luni. Cardul este gata astăzi.",
         "buttonText": "Continuă"
       },
       "WelcomeOnboard": {

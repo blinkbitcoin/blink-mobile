@@ -3689,14 +3689,21 @@
         "buttonText": "Weyongere"
       },
       "CardDetails": {
-        "title": "Ebirala ebirungi",
+        "title": "Ebigirimu",
         "features": {
-          "accountManager": "Omukozi w'akawunti ow'enjawulo",
-          "support": "Obuyambi obw'okusooka",
-          "onchainDeposits": "50% okuddizibwa ku ssente z'okutambula",
-          "circularEconomies": "$100 eri ekonomiya ezeetooloola"
+          "card": {
+            "title": "Kaadi ya Blink",
+            "subtitle": "kaadi yo eya Visa, etegese leero"
+          },
+          "accountManager": {
+            "title": "Omuddukanya w'akawunti yo ey'enjawulo",
+            "subtitle": "n'obuyambi obukulembezebwa"
+          },
+          "businessAccounts": "Akawunti za bizinensi",
+          "virtualAccounts": "Akawunti ez'oku yintaneti"
         },
-        "andMore": "... n'ebirala bijja mu 2026",
+        "availableIn": "mu myezi {months}",
+        "footnote": "Ebimu ku bintu bijja kubaawo mu myezi {months}. Kaadi etegese leero.",
         "buttonText": "Weyongere"
       },
       "WelcomeOnboard": {

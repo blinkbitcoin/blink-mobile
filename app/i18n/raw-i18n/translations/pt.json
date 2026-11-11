@@ -3689,14 +3689,21 @@
                 "buttonText": "Continuar"
             },
             "CardDetails": {
-                "title": "Vantagens adicionais",
+                "title": "O que está incluído",
                 "features": {
-                    "accountManager": "Gerente de conta dedicado",
-                    "support": "Suporte prioritário",
-                    "onchainDeposits": "50% de reembolso nas taxas de transação",
-                    "circularEconomies": "$100 para economias circulares"
+                    "card": {
+                        "title": "Cartão Blink",
+                        "subtitle": "seu cartão Visa, pronto hoje"
+                    },
+                    "accountManager": {
+                        "title": "Gerente de conta pessoal",
+                        "subtitle": "e suporte prioritário"
+                    },
+                    "businessAccounts": "Contas empresariais",
+                    "virtualAccounts": "Contas virtuais"
                 },
-                "andMore": "... e mais novidades em 2026",
+                "availableIn": "em {months} meses",
+                "footnote": "Alguns recursos estarão disponíveis em até {months} meses. O cartão está pronto hoje.",
                 "buttonText": "Continuar"
             },
             "WelcomeOnboard": {

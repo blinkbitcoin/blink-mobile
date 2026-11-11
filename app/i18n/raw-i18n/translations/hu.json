@@ -3689,14 +3689,21 @@
         "buttonText": "Tovább"
       },
       "CardDetails": {
-        "title": "További előnyök",
+        "title": "Mit tartalmaz",
         "features": {
-          "accountManager": "Dedikált fiókkezelő",
-          "support": "Elsőbbségi támogatás",
-          "onchainDeposits": "50% visszatérítés a tranzakciós díjakból",
-          "circularEconomies": "100 $ körkörös gazdaságoknak"
+          "card": {
+            "title": "Blink kártya",
+            "subtitle": "a Visa kártyád, már ma kész"
+          },
+          "accountManager": {
+            "title": "Személyes ügyfélmenedzser",
+            "subtitle": "és elsőbbségi támogatás"
+          },
+          "businessAccounts": "Üzleti számlák",
+          "virtualAccounts": "Virtuális számlák"
         },
-        "andMore": "... és még több jön 2026-ban",
+        "availableIn": "{months} hónap múlva",
+        "footnote": "Egyes funkciók {months} hónapon belül lesznek elérhetők. A kártya már ma kész.",
         "buttonText": "Tovább"
       },
       "WelcomeOnboard": {

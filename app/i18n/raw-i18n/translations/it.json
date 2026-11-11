@@ -3689,14 +3689,21 @@
                 "buttonText": "Continua"
             },
             "CardDetails": {
-                "title": "Vantaggi aggiuntivi",
+                "title": "Cosa è incluso",
                 "features": {
-                    "accountManager": "Account manager dedicato",
-                    "support": "Supporto prioritario",
-                    "onchainDeposits": "50% di rimborso sulle commissioni di transazione",
-                    "circularEconomies": "100 $ per le economie circolari"
+                    "card": {
+                        "title": "Blink Card",
+                        "subtitle": "la tua carta Visa, pronta oggi"
+                    },
+                    "accountManager": {
+                        "title": "Account manager personale",
+                        "subtitle": "e supporto prioritario"
+                    },
+                    "businessAccounts": "Conti aziendali",
+                    "virtualAccounts": "Conti virtuali"
                 },
-                "andMore": "... e altro in arrivo nel 2026",
+                "availableIn": "tra {months} mesi",
+                "footnote": "Alcune funzionalità saranno disponibili entro {months} mesi. La carta è pronta oggi.",
                 "buttonText": "Continua"
             },
             "WelcomeOnboard": {

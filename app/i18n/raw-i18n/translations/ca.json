@@ -3689,14 +3689,21 @@
         "buttonText": "Continuar"
       },
       "CardDetails": {
-        "title": "Avantatges addicionals",
+        "title": "Què inclou",
         "features": {
-          "accountManager": "Gestor de comptes dedicat",
-          "support": "Suport prioritari",
-          "onchainDeposits": "50% de reemborsament en comissions de transacció",
-          "circularEconomies": "100$ per a economies circulars"
+          "card": {
+            "title": "Blink Card",
+            "subtitle": "la teva targeta Visa, llesta avui"
+          },
+          "accountManager": {
+            "title": "Gestor de compte personal",
+            "subtitle": "i suport prioritari"
+          },
+          "businessAccounts": "Comptes d'empresa",
+          "virtualAccounts": "Comptes virtuals"
         },
-        "andMore": "... i més per venir el 2026",
+        "availableIn": "d'aquí a {months} mesos",
+        "footnote": "Algunes funcions estaran disponibles d'aquí a {months} mesos. La targeta està llesta avui.",
         "buttonText": "Continuar"
       },
       "WelcomeOnboard": {

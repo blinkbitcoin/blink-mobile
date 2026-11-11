@@ -3689,14 +3689,21 @@
         "buttonText": "Pokračovať"
       },
       "CardDetails": {
-        "title": "Ďalšie výhody",
+        "title": "Čo je zahrnuté",
         "features": {
-          "accountManager": "Vyhradený správca účtu",
-          "support": "Prioritná podpora",
-          "onchainDeposits": "50% späť z transakčných poplatkov",
-          "circularEconomies": "100 $ pre cirkulárne ekonomiky"
+          "card": {
+            "title": "Blink Card",
+            "subtitle": "vaša karta Visa, pripravená už dnes"
+          },
+          "accountManager": {
+            "title": "Osobný manažér účtu",
+            "subtitle": "a prioritná podpora"
+          },
+          "businessAccounts": "Firemné účty",
+          "virtualAccounts": "Virtuálne účty"
         },
-        "andMore": "... a ďalšie prídu v roku 2026",
+        "availableIn": "o {months} mesiacov",
+        "footnote": "Niektoré funkcie budú dostupné do {months} mesiacov. Karta je pripravená už dnes.",
         "buttonText": "Pokračovať"
       },
       "WelcomeOnboard": {

@@ -3689,14 +3689,21 @@
         "buttonText": "Teruskan"
       },
       "CardDetails": {
-        "title": "Faedah tambahan",
+        "title": "Apa yang disertakan",
         "features": {
-          "accountManager": "Pengurus akaun khusus",
-          "support": "Sokongan keutamaan",
-          "onchainDeposits": "50% pulangan yuran transaksi",
-          "circularEconomies": "$100 untuk ekonomi pekeliling"
+          "card": {
+            "title": "Kad Blink",
+            "subtitle": "kad Visa anda, sedia hari ini"
+          },
+          "accountManager": {
+            "title": "Pengurus akaun peribadi",
+            "subtitle": "dan sokongan keutamaan"
+          },
+          "businessAccounts": "Akaun perniagaan",
+          "virtualAccounts": "Akaun maya"
         },
-        "andMore": "... dan lagi akan datang pada 2026",
+        "availableIn": "dalam {months} bulan",
+        "footnote": "Sesetengah ciri akan tersedia dalam tempoh {months} bulan. Kad sedia hari ini.",
         "buttonText": "Teruskan"
       },
       "WelcomeOnboard": {

@@ -3689,14 +3689,21 @@
         "buttonText": "Ñawpaqman"
       },
       "CardDetails": {
-        "title": "Yapay allinkunakuna",
+        "title": "Ima kachkan",
         "features": {
-          "accountManager": "Sapaq kawaq akawuntapaq",
-          "support": "Ñawpaq yanapay",
-          "onchainDeposits": "50% kutichiy comisión transacciónmanta",
-          "circularEconomies": "$100 muyuq ekonomiyakunapaq"
+          "card": {
+            "title": "Blink tarjeta",
+            "subtitle": "Visa tarjetayki, kunan p'unchaw wakichisqa"
+          },
+          "accountManager": {
+            "title": "Sapan cuenta kamachiq",
+            "subtitle": "ñawpaq yanapaywan"
+          },
+          "businessAccounts": "Llamkay cuentakuna",
+          "virtualAccounts": "Virtual cuentakuna"
         },
-        "andMore": "... astawanraq 2026-pi hamushan",
+        "availableIn": "{months} killapi",
+        "footnote": "Wakin ruraykunaqa {months} killa ukhupi kanqa. Tarjetaqa kunan p'unchaw wakichisqa.",
         "buttonText": "Ñawpaqman"
       },
       "WelcomeOnboard": {

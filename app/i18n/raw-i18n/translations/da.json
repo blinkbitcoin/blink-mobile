@@ -3689,14 +3689,21 @@
         "buttonText": "Fortsæt"
       },
       "CardDetails": {
-        "title": "Yderligere fordele",
+        "title": "Hvad er inkluderet",
         "features": {
-          "accountManager": "Dedikeret kontoadministrator",
-          "support": "Prioriteret support",
-          "onchainDeposits": "50% tilbage på transaktionsgebyrer",
-          "circularEconomies": "$100 til cirkulære økonomier"
+          "card": {
+            "title": "Blink-kort",
+            "subtitle": "dit Visa-kort, klar i dag"
+          },
+          "accountManager": {
+            "title": "Personlig kontoansvarlig",
+            "subtitle": "og prioriteret support"
+          },
+          "businessAccounts": "Erhvervskonti",
+          "virtualAccounts": "Virtuelle konti"
         },
-        "andMore": "... og mere kommer i 2026",
+        "availableIn": "om {months} måneder",
+        "footnote": "Nogle funktioner bliver tilgængelige inden for {months} måneder. Kortet er klar i dag.",
         "buttonText": "Fortsæt"
       },
       "WelcomeOnboard": {

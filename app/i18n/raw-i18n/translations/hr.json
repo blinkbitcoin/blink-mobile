@@ -3689,14 +3689,21 @@
         "buttonText": "Nastavi"
       },
       "CardDetails": {
-        "title": "Dodatne pogodnosti",
+        "title": "Što je uključeno",
         "features": {
-          "accountManager": "Posvećeni upravitelj računa",
-          "support": "Prioritetna podrška",
-          "onchainDeposits": "50% povrata na naknade za transakcije",
-          "circularEconomies": "100 $ za kružne ekonomije"
+          "card": {
+            "title": "Blink kartica",
+            "subtitle": "vaša Visa kartica, spremna već danas"
+          },
+          "accountManager": {
+            "title": "Osobni upravitelj računa",
+            "subtitle": "i prioritetna podrška"
+          },
+          "businessAccounts": "Poslovni računi",
+          "virtualAccounts": "Virtualni računi"
         },
-        "andMore": "... i još toga dolazi 2026.",
+        "availableIn": "za {months} mjeseci",
+        "footnote": "Neke značajke bit će dostupne u roku od {months} mjeseci. Kartica je spremna već danas.",
         "buttonText": "Nastavi"
       },
       "WelcomeOnboard": {

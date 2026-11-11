@@ -12264,31 +12264,49 @@ type RootTranslation = {
 			}
 			CardDetails: {
 				/**
-				 * A​d​d​i​t​i​o​n​a​l​ ​p​e​r​k​s
+				 * W​h​a​t​'​s​ ​i​n​c​l​u​d​e​d
 				 */
 				title: string
 				features: {
+					card: {
+						/**
+						 * B​l​i​n​k​ ​C​a​r​d
+						 */
+						title: string
+						/**
+						 * y​o​u​r​ ​V​i​s​a​ ​c​a​r​d​,​ ​r​e​a​d​y​ ​t​o​d​a​y
+						 */
+						subtitle: string
+					}
+					accountManager: {
+						/**
+						 * P​e​r​s​o​n​a​l​ ​a​c​c​o​u​n​t​ ​m​a​n​a​g​e​r
+						 */
+						title: string
+						/**
+						 * a​n​d​ ​p​r​i​o​r​i​t​y​ ​s​u​p​p​o​r​t
+						 */
+						subtitle: string
+					}
 					/**
-					 * D​e​d​i​c​a​t​e​d​ ​a​c​c​o​u​n​t​ ​m​a​n​a​g​e​r
+					 * B​u​s​i​n​e​s​s​ ​a​c​c​o​u​n​t​s
 					 */
-					accountManager: string
+					businessAccounts: string
 					/**
-					 * P​r​i​o​r​i​t​y​ ​s​u​p​p​o​r​t
+					 * V​i​r​t​u​a​l​ ​a​c​c​o​u​n​t​s
 					 */
-					support: string
-					/**
-					 * 5​0​%​ ​b​a​c​k​ ​o​n​ ​t​r​a​n​s​a​c​t​i​o​n​ ​f​e​e​s
-					 */
-					onchainDeposits: string
-					/**
-					 * $​1​0​0​ ​t​o​ ​c​i​r​c​u​l​a​r​ ​e​c​o​n​o​m​i​e​s
-					 */
-					circularEconomies: string
+					virtualAccounts: string
 				}
 				/**
-				 * .​.​.​ ​a​n​d​ ​m​o​r​e​ ​c​o​m​i​n​g​ ​i​n​ ​2​0​2​6
+				 * i​n​ ​{​m​o​n​t​h​s​}​ ​m​o​n​t​h​s
+				 * @param {number} months
 				 */
-				andMore: string
+				availableIn: RequiredParams<'months'>
+				/**
+				 * S​o​m​e​ ​f​e​a​t​u​r​e​s​ ​w​i​l​l​ ​b​e​ ​a​v​a​i​l​a​b​l​e​ ​w​i​t​h​i​n​ ​{​m​o​n​t​h​s​}​ ​m​o​n​t​h​s​.​ ​T​h​e​ ​c​a​r​d​ ​i​s​ ​r​e​a​d​y​ ​t​o​d​a​y​.
+				 * @param {number} months
+				 */
+				footnote: RequiredParams<'months'>
 				/**
 				 * C​o​n​t​i​n​u​e
 				 */
@@ -26517,31 +26535,47 @@ export type TranslationFunctions = {
 			}
 			CardDetails: {
 				/**
-				 * Additional perks
+				 * What's included
 				 */
 				title: () => LocalizedString
 				features: {
+					card: {
+						/**
+						 * Blink Card
+						 */
+						title: () => LocalizedString
+						/**
+						 * your Visa card, ready today
+						 */
+						subtitle: () => LocalizedString
+					}
+					accountManager: {
+						/**
+						 * Personal account manager
+						 */
+						title: () => LocalizedString
+						/**
+						 * and priority support
+						 */
+						subtitle: () => LocalizedString
+					}
 					/**
-					 * Dedicated account manager
+					 * Business accounts
 					 */
-					accountManager: () => LocalizedString
+					businessAccounts: () => LocalizedString
 					/**
-					 * Priority support
+					 * Virtual accounts
 					 */
-					support: () => LocalizedString
-					/**
-					 * 50% back on transaction fees
-					 */
-					onchainDeposits: () => LocalizedString
-					/**
-					 * $100 to circular economies
-					 */
-					circularEconomies: () => LocalizedString
+					virtualAccounts: () => LocalizedString
 				}
 				/**
-				 * ... and more coming in 2026
+				 * in {months} months
 				 */
-				andMore: () => LocalizedString
+				availableIn: (arg: { months: number }) => LocalizedString
+				/**
+				 * Some features will be available within {months} months. The card is ready today.
+				 */
+				footnote: (arg: { months: number }) => LocalizedString
 				/**
 				 * Continue
 				 */

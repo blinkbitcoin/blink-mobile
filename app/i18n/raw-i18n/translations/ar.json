@@ -3689,14 +3689,21 @@
         "buttonText": "متابعة"
       },
       "CardDetails": {
-        "title": "مزايا إضافية",
+        "title": "ما الذي يتضمنه",
         "features": {
-          "accountManager": "مدير حساب مخصص",
-          "support": "دعم ذو أولوية",
-          "onchainDeposits": "استرداد 50% على رسوم المعاملات",
-          "circularEconomies": "100$ للاقتصادات الدائرية"
+          "card": {
+            "title": "بطاقة Blink",
+            "subtitle": "بطاقة Visa الخاصة بك، جاهزة اليوم"
+          },
+          "accountManager": {
+            "title": "مدير حساب شخصي",
+            "subtitle": "ودعم ذو أولوية"
+          },
+          "businessAccounts": "حسابات الأعمال",
+          "virtualAccounts": "حسابات افتراضية"
         },
-        "andMore": "... والمزيد قادم في 2026",
+        "availableIn": "خلال {months} شهرًا",
+        "footnote": "ستتوفر بعض الميزات خلال {months} شهرًا. البطاقة جاهزة اليوم.",
         "buttonText": "متابعة"
       },
       "WelcomeOnboard": {

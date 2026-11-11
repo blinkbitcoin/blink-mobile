@@ -3689,14 +3689,21 @@
         "buttonText": "Շարունակել"
       },
       "CardDetails": {
-        "title": "Լրացուցիչ առավելություններ",
+        "title": "Ինչ է ներառված",
         "features": {
-          "accountManager": "Անձնական հաշվի կառավարիչ",
-          "support": "Առաջնահերթ աջակցություն",
-          "onchainDeposits": "Գործարքի վճարների 50% վերադարձ",
-          "circularEconomies": "$100 շրջանաձև տնտեսություններին"
+          "card": {
+            "title": "Blink քարտ",
+            "subtitle": "Ձեր Visa քարտը՝ պատրաստ այսօր"
+          },
+          "accountManager": {
+            "title": "Անձնական հաշվի մենեջեր",
+            "subtitle": "և առաջնահերթ աջակցություն"
+          },
+          "businessAccounts": "Բիզնես հաշիվներ",
+          "virtualAccounts": "Վիրտուալ հաշիվներ"
         },
-        "andMore": "... և ավելին` 2026-ին",
+        "availableIn": "{months} ամսից",
+        "footnote": "Որոշ գործառույթներ հասանելի կլինեն {months} ամսվա ընթացքում։ Քարտը պատրաստ է այսօր։",
         "buttonText": "Շարունակել"
       },
       "WelcomeOnboard": {

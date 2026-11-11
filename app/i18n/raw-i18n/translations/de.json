@@ -3689,14 +3689,21 @@
                 "buttonText": "Weiter"
             },
             "CardDetails": {
-                "title": "Zusätzliche Vorteile",
+                "title": "Was enthalten ist",
                 "features": {
-                    "accountManager": "Persönlicher Kontobetreuer",
-                    "support": "Prioritärer Support",
-                    "onchainDeposits": "50% Rückerstattung auf Transaktionsgebühren",
-                    "circularEconomies": "100 $ für zirkuläre Wirtschaften"
+                    "card": {
+                        "title": "Blink Card",
+                        "subtitle": "deine Visa-Karte, heute bereit"
+                    },
+                    "accountManager": {
+                        "title": "Persönlicher Kundenbetreuer",
+                        "subtitle": "und bevorzugter Support"
+                    },
+                    "businessAccounts": "Geschäftskonten",
+                    "virtualAccounts": "Virtuelle Konten"
                 },
-                "andMore": "... und mehr kommt 2026",
+                "availableIn": "in {months} Monaten",
+                "footnote": "Einige Funktionen sind innerhalb von {months} Monaten verfügbar. Die Karte ist schon heute bereit.",
                 "buttonText": "Weiter"
             },
             "WelcomeOnboard": {

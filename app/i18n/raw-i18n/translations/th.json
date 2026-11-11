@@ -3689,14 +3689,21 @@
         "buttonText": "ดำเนินการต่อ"
       },
       "CardDetails": {
-        "title": "สิทธิประโยชน์เพิ่มเติม",
+        "title": "สิ่งที่รวมอยู่",
         "features": {
-          "accountManager": "ผู้จัดการบัญชีเฉพาะ",
-          "support": "การสนับสนุนแบบพิเศษ",
-          "onchainDeposits": "คืนเงิน 50% ค่าธรรมเนียมธุรกรรม",
-          "circularEconomies": "$100 สำหรับเศรษฐกิจหมุนเวียน"
+          "card": {
+            "title": "บัตร Blink",
+            "subtitle": "บัตร Visa ของคุณ พร้อมใช้วันนี้"
+          },
+          "accountManager": {
+            "title": "ผู้จัดการบัญชีส่วนตัว",
+            "subtitle": "และการสนับสนุนแบบให้ความสำคัญเป็นพิเศษ"
+          },
+          "businessAccounts": "บัญชีธุรกิจ",
+          "virtualAccounts": "บัญชีเสมือน"
         },
-        "andMore": "... และอีกมากมายในปี 2026",
+        "availableIn": "ในอีก {months} เดือน",
+        "footnote": "ฟีเจอร์บางอย่างจะพร้อมใช้งานภายใน {months} เดือน บัตรพร้อมใช้วันนี้",
         "buttonText": "ดำเนินการต่อ"
       },
       "WelcomeOnboard": {

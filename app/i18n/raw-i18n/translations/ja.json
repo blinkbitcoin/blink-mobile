@@ -3689,14 +3689,21 @@
                 "buttonText": "続ける"
             },
             "CardDetails": {
-                "title": "追加特典",
+                "title": "含まれるもの",
                 "features": {
-                    "accountManager": "専任アカウントマネージャー",
-                    "support": "優先サポート",
-                    "onchainDeposits": "取引手数料の50%キャッシュバック",
-                    "circularEconomies": "循環型経済に100ドル"
+                    "card": {
+                        "title": "Blink カード",
+                        "subtitle": "あなたの Visa カード、今日から使えます"
+                    },
+                    "accountManager": {
+                        "title": "専任のアカウントマネージャー",
+                        "subtitle": "優先サポート付き"
+                    },
+                    "businessAccounts": "ビジネス口座",
+                    "virtualAccounts": "バーチャル口座"
                 },
-                "andMore": "... さらに2026年に追加予定",
+                "availableIn": "{months}か月後",
+                "footnote": "一部の機能は{months}か月以内に利用可能になります。カードは今日から使えます。",
                 "buttonText": "続ける"
             },
             "WelcomeOnboard": {

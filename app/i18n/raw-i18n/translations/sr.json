@@ -3689,14 +3689,21 @@
         "buttonText": "Настави"
       },
       "CardDetails": {
-        "title": "Додатне погодности",
+        "title": "Шта је укључено",
         "features": {
-          "accountManager": "Посвећени менаџер налога",
-          "support": "Приоритетна подршка",
-          "onchainDeposits": "50% повраћаја на провизије за трансакције",
-          "circularEconomies": "100 $ за циркуларне економије"
+          "card": {
+            "title": "Blink Card",
+            "subtitle": "ваша Visa картица, спремна већ данас"
+          },
+          "accountManager": {
+            "title": "Лични менаџер налога",
+            "subtitle": "и приоритетна подршка"
+          },
+          "businessAccounts": "Пословни налози",
+          "virtualAccounts": "Виртуелни налози"
         },
-        "andMore": "... и још тога долази 2026.",
+        "availableIn": "за {months} месеци",
+        "footnote": "Неке функције биће доступне у року од {months} месеци. Картица је спремна већ данас.",
         "buttonText": "Настави"
       },
       "WelcomeOnboard": {

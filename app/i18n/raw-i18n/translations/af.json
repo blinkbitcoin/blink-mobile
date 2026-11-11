@@ -3689,14 +3689,21 @@
         "buttonText": "Gaan voort"
       },
       "CardDetails": {
-        "title": "Bykomende voordele",
+        "title": "Wat is ingesluit",
         "features": {
-          "accountManager": "Toegewyde rekeningbestuurder",
-          "support": "Prioriteit-ondersteuning",
-          "onchainDeposits": "50% terug op transaksiegelde",
-          "circularEconomies": "$100 vir sirkulêre ekonomieë"
+          "card": {
+            "title": "Blink-kaart",
+            "subtitle": "jou Visa-kaart, vandag gereed"
+          },
+          "accountManager": {
+            "title": "Persoonlike rekeningbestuurder",
+            "subtitle": "en prioriteitsondersteuning"
+          },
+          "businessAccounts": "Besigheidsrekeninge",
+          "virtualAccounts": "Virtuele rekeninge"
         },
-        "andMore": "... en meer kom in 2026",
+        "availableIn": "oor {months} maande",
+        "footnote": "Sommige funksies sal binne {months} maande beskikbaar wees. Die kaart is vandag gereed.",
         "buttonText": "Gaan voort"
       },
       "WelcomeOnboard": {

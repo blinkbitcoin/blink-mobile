@@ -3844,14 +3844,21 @@ const en: BaseTranslation = {
         buttonText: "Continue",
       },
       CardDetails: {
-        title: "Additional perks",
+        title: "What's included",
         features: {
-          accountManager: "Dedicated account manager",
-          support: "Priority support",
-          onchainDeposits: "50% back on transaction fees",
-          circularEconomies: "$100 to circular economies",
+          card: {
+            title: "Blink Card",
+            subtitle: "your Visa card, ready today",
+          },
+          accountManager: {
+            title: "Personal account manager",
+            subtitle: "and priority support",
+          },
+          businessAccounts: "Business accounts",
+          virtualAccounts: "Virtual accounts",
         },
-        andMore: "... and more coming in 2026",
+        availableIn: "in {months:number} months",
+        footnote: "Some features will be available within {months:number} months. The card is ready today.",
         buttonText: "Continue",
       },
       WelcomeOnboard: {

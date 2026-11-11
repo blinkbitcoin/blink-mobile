@@ -3689,14 +3689,21 @@
         "buttonText": "Lanjutkan"
       },
       "CardDetails": {
-        "title": "Keuntungan tambahan",
+        "title": "Yang termasuk",
         "features": {
-          "accountManager": "Manajer akun khusus",
-          "support": "Dukungan prioritas",
-          "onchainDeposits": "Pengembalian 50% biaya transaksi",
-          "circularEconomies": "$100 untuk ekonomi sirkular"
+          "card": {
+            "title": "Blink Card",
+            "subtitle": "kartu Visa Anda, siap hari ini"
+          },
+          "accountManager": {
+            "title": "Manajer akun pribadi",
+            "subtitle": "dan dukungan prioritas"
+          },
+          "businessAccounts": "Akun bisnis",
+          "virtualAccounts": "Akun virtual"
         },
-        "andMore": "... dan lainnya segera hadir di 2026",
+        "availableIn": "dalam {months} bulan",
+        "footnote": "Beberapa fitur akan tersedia dalam {months} bulan. Kartu siap hari ini.",
         "buttonText": "Lanjutkan"
       },
       "WelcomeOnboard": {
