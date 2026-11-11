@@ -16379,6 +16379,11 @@ react-native-error-boundary@^1.2.4:
   resolved "https://registry.npmjs.org/react-native-error-boundary/-/react-native-error-boundary-1.2.4.tgz#d700d1c23cdc18a17f6f14bd7d9f751a1f698c65"
   integrity sha512-PF5xn+3mGKk8uzf9GpOQa1kvxsG3Bs3XMwJZNqqUG//jC1FDp+WRGxg4r2sPG70MveSOQmQNuHnAycCPYQNg6g==
 
+react-native-fast-confetti@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/react-native-fast-confetti/-/react-native-fast-confetti-2.0.2.tgz#2ec4c03c5d8cdfccb49d970660c0dab8967d1558"
+  integrity sha512-g/so5kYCQFMFNuD3ui10hMCXZTA8pPzOhwUJgzfslxI2WHuYb4SjdOxV0I9xPv7ts8Sqch6bS7oCJZMX2DM0Yw==
+
 "react-native-fingerprint-scanner@git+https://github.com/hieuvp/react-native-fingerprint-scanner.git#9cecc0db326471c571553ea85f7c016fee2f803d":
   version "6.0.0"
   resolved "git+https://github.com/hieuvp/react-native-fingerprint-scanner.git#9cecc0db326471c571553ea85f7c016fee2f803d"
