@@ -3,6 +3,7 @@
  * destination. No dependencies, so the wallet lifecycle can scope it without pulling in
  * the send path.
  */
+import type { ConvertAttemptRef } from "@app/types/payment"
 
 /**
  * The attempts of a send that threw after dispatch without their payment turning up: the
@@ -139,6 +140,20 @@ export const lostAttemptsFor = (destination: string): LostAttemptsHandle => {
       return result
     },
   }
+}
+
+/**
+ * The manual conversions' attempt ref, by wallet, for as long as the app runs. Not kept
+ * on the conversion screen, for the reason lost sends are not kept on the payment detail:
+ * the screen is built anew each time it is opened, so a user who backs out after a lost
+ * conversion and opens it again would start from nothing and could convert twice.
+ */
+const conversionAttemptRefs = new WeakMap<Map<string, LostAttempts>, ConvertAttemptRef>()
+
+export const conversionAttemptRef = (): ConvertAttemptRef => {
+  const held = conversionAttemptRefs.get(connectedWalletAttempts) ?? {}
+  conversionAttemptRefs.set(connectedWalletAttempts, held)
+  return held
 }
 
 /** What the connected wallet holds for a destination. */

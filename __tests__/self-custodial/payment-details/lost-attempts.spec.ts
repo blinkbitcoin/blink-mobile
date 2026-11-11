@@ -1,4 +1,5 @@
 import {
+  conversionAttemptRef,
   lostAttemptsFor,
   lostAttemptsTo,
   scopeLostAttemptsTo,
@@ -174,5 +175,19 @@ describe("sends to a destination, one at a time", () => {
 
     release()
     await held
+  })
+})
+
+describe("conversionAttemptRef", () => {
+  it("is one holder per wallet, kept while another wallet is connected", () => {
+    scopeLostAttemptsTo("wallet-a")
+    const walletA = conversionAttemptRef()
+    expect(conversionAttemptRef()).toBe(walletA)
+
+    scopeLostAttemptsTo("wallet-b")
+    expect(conversionAttemptRef()).not.toBe(walletA)
+
+    scopeLostAttemptsTo("wallet-a")
+    expect(conversionAttemptRef()).toBe(walletA)
   })
 })

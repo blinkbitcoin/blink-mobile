@@ -20,6 +20,7 @@ import {
   PaymentResultStatus,
   type ConvertAttemptRef,
   type ConvertParams,
+  type UnresolvedConversion,
   type ConvertQuote,
   type GetConversionQuoteAdapter,
   type PaymentAdapterResult,
@@ -300,8 +301,8 @@ const OUTCOME_UNKNOWN_MESSAGE = "Conversion outcome unknown"
  * A conversion is a token leg, which the SDK takes no idempotency key on, and every quote
  * pays a fresh invoice, so a retry after a lost response would be a second conversion.
  * A conversion that throws after dispatch is looked for by its invoice; when it does not
- * turn up, the attempt ref is marked and every later conversion on it is refused, telling
- * the user to check their history instead.
+ * turn up, the attempt ref keeps it, and every later conversion on that ref looks for it
+ * again and is refused until it is found, telling the user to check their history.
  */
 type ConversionExecution = QuotedConversion & {
   /** The measurement context the quote was made in: the quote closes over that
@@ -315,11 +316,32 @@ const executePrepared = async (
   sdk: BreezSdkInterface,
   { prepared, invoice, startedIn, params, attemptRef }: ConversionExecution,
 ): Promise<PaymentAdapterResult> => {
-  if (attemptRef.hasUnresolvedConversion) {
-    return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
+  /** Written through these rather than after each await: one conversion runs on a ref at
+   *  a time (the screen's in-flight guard; auto-convert passes a ref of its own). */
+  const keepUnresolved = (unresolved: UnresolvedConversion | undefined) => {
+    attemptRef.unresolvedConversion = unresolved
   }
-  const markUnresolved = () => {
-    attemptRef.hasUnresolvedConversion = true
+
+  const earlier = attemptRef.unresolvedConversion
+  if (earlier) {
+    /** The earlier conversion is looked for again first. Found, it is what this one
+     *  reports, and nothing more is converted: the funds it moved are the ones this
+     *  retry would move a second time. Still missing, it keeps every retry refused. */
+    const lookup = await findLostSend({
+      sdk,
+      startedAtMs: earlier.startedAtMs,
+      walletClockSec: earlier.walletClockSec,
+      matches: (payment) =>
+        isPaymentOfLostSend(
+          { paymentHashes: [], sparkInvoices: [earlier.invoice] },
+          payment,
+        ),
+    })
+    if (lookup.status !== "found") {
+      return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
+    }
+    keepUnresolved(undefined)
+    return { status: PaymentResultStatus.Success }
   }
   const swapTelemetry = {
     direction: params.direction,
@@ -343,13 +365,18 @@ const executePrepared = async (
     )
     return { status: PaymentResultStatus.Success }
   } catch (err) {
-    measureIn(startedIn, ScEvent.SwapFailed, {
-      ...swapTelemetry,
-      error_code: classifySdkError(err),
-    })
     recordConvertError(err, params, "executePrepared")
-    const message = err instanceof Error ? err.message : `Conversion failed: ${err}`
-    if (CODES_RAISED_BEFORE_DISPATCH.has(classifySdkError(err))) return failed(message)
+    const errorCode = classifySdkError(err)
+    const reportSwapFailed = () =>
+      measureIn(startedIn, ScEvent.SwapFailed, {
+        ...swapTelemetry,
+        error_code: errorCode,
+      })
+
+    if (CODES_RAISED_BEFORE_DISPATCH.has(errorCode)) {
+      reportSwapFailed()
+      return failed(err instanceof Error ? err.message : `Conversion failed: ${err}`)
+    }
 
     const walletClockSec = await readWalletClockSec(sdk)
     const lost = await findLostSend({
@@ -359,9 +386,13 @@ const executePrepared = async (
       matches: (payment) =>
         isPaymentOfLostSend({ paymentHashes: [], sparkInvoices: [invoice] }, payment),
     })
-    if (lost.status === "found") return { status: PaymentResultStatus.Success }
+    if (lost.status === "found") {
+      measureIn(startedIn, ScEvent.SwapCompleted, swapTelemetry)
+      return { status: PaymentResultStatus.Success }
+    }
 
-    markUnresolved()
+    reportSwapFailed()
+    keepUnresolved({ invoice, startedAtMs, walletClockSec })
     return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
   }
 }

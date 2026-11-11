@@ -5,11 +5,11 @@ import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { measure, ScEvent } from "@app/self-custodial/measurement"
+import { conversionAttemptRef } from "@app/self-custodial/payment-details/lost-attempts"
 import { type MoneyAmount, type WalletOrDisplayCurrency } from "@app/types/amounts"
 import {
   ConvertErrorCode,
   PaymentResultStatus,
-  type ConvertAttemptRef,
   type ConvertParams,
 } from "@app/types/payment"
 import { reportError } from "@app/utils/error-logging"
@@ -48,10 +48,6 @@ export const useSelfCustodialConversion = ({
   const guard = useInFlightGuard()
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | undefined>()
-  /** Outlives every re-quote on this screen: a conversion that may have gone out must
-   *  stop the next quote from converting the same funds again. */
-  const attemptRef = useRef<ConvertAttemptRef>({})
-
   const liveQuoteParams = useMemo(() => {
     if (!enabled || !convertMoneyAmount) return null
     const fromAmount = convertMoneyAmount(moneyAmount, fromCurrency)
@@ -108,8 +104,11 @@ export const useSelfCustodialConversion = ({
         }
 
         /** No conversion_attempt/result here: those are the custodial account's events,
-         *  and the swap reports itself through the bridge's sc_swap_* events. */
-        const result = await quote.execute(attemptRef.current)
+         *  and the swap reports itself through the bridge's sc_swap_* events. The attempt
+         *  ref is the wallet's, which outlives every re-quote and this screen: a
+         *  conversion that may have gone out must stop the next one from converting the
+         *  same funds again. */
+        const result = await quote.execute(conversionAttemptRef())
         const isSuccess = result.status === PaymentResultStatus.Success
 
         if (isSuccess) {

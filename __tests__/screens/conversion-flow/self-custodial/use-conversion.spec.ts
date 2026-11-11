@@ -576,5 +576,31 @@ describe("useSelfCustodialConversion", () => {
       expect(firstExecute.mock.calls[0][0]).toBeDefined()
       expect(secondExecute.mock.calls[0][0]).toBe(firstExecute.mock.calls[0][0])
     })
+
+    it("keeps the wallet's attempt ref when the screen is opened again", async () => {
+      const firstExecute = unknownOutcome()
+      const secondExecute = unknownOutcome()
+      /** The failed execute re-quotes on the first screen too, so every quote after the
+       *  first is the second screen's. */
+      mockGetQuote
+        .mockResolvedValueOnce(makeQuote({ execute: firstExecute }))
+        .mockResolvedValue(makeQuote({ execute: secondExecute }))
+
+      const firstScreen = renderHook(() => useSelfCustodialConversion(defaultParams))
+      await waitFor(() => expect(firstScreen.result.current.canExecute).toBe(true))
+      await act(async () => {
+        await firstScreen.result.current.execute()
+      })
+      firstScreen.unmount()
+
+      const secondScreen = renderHook(() => useSelfCustodialConversion(defaultParams))
+      await waitFor(() => expect(secondScreen.result.current.canExecute).toBe(true))
+      await act(async () => {
+        await secondScreen.result.current.execute()
+      })
+
+      expect(firstExecute.mock.calls[0][0]).toBeDefined()
+      expect(secondExecute.mock.calls[0][0]).toBe(firstExecute.mock.calls[0][0])
+    })
   })
 })

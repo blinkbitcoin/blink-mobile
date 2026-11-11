@@ -267,12 +267,22 @@ export const resolveDustAdjustment = (
   return amountInSourceCurrency >= fromWalletBalance ? null : amountAdjustment
 }
 
+/** A conversion that threw after dispatch without turning up in the wallet's history:
+ *  the wallet's own invoice it paid, when it went out, and the wallet's clock then
+ *  (unix seconds), which is what the next conversion looks for it by. */
+export type UnresolvedConversion = {
+  invoice: string
+  startedAtMs: number
+  walletClockSec: number
+}
+
 /**
- * What a conversion that may have gone out leaves for the next one on the same screen.
+ * What a conversion that may have gone out leaves for the next one in the same wallet.
  * Every quote pays a fresh invoice, so a retry is a new payment that a lost one would be
- * doubled by; the holder outlives the quotes so the retry can be refused.
+ * doubled by; the holder outlives the quotes so the retry can be refused until the lost
+ * one is found.
  */
-export type ConvertAttemptRef = { hasUnresolvedConversion?: boolean }
+export type ConvertAttemptRef = { unresolvedConversion?: UnresolvedConversion }
 
 export type ConvertQuote = {
   feeAmount: UsdMoneyAmount
