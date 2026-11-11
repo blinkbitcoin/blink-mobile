@@ -26,6 +26,7 @@ import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { mockCurrencyList } from "@app/graphql/mocks"
 import { PersistentStateContext } from "@app/store/persistent-state"
+import { defaultPersistentState } from "@app/store/persistent-state/state-migrations"
 import { GateReason } from "@app/types/account"
 import { ConvertDirection } from "@app/types/payment"
 import {
@@ -1841,9 +1842,7 @@ describe("HomeScreen", () => {
       <PersistentStateContext.Provider
         value={{
           persistentState: {
-            schemaVersion: 23,
-            galoyInstance: { id: "Main" },
-            galoyAuthToken: "",
+            ...defaultPersistentState,
             activeAccountId: SELF_CUSTODIAL_ACCOUNT_ID,
             txLastSeenByAccountId: {
               [SELF_CUSTODIAL_ACCOUNT_ID]: { btcId: "", usdId: "" },
