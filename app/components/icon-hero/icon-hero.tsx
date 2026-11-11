@@ -36,7 +36,7 @@ export const IconHero: React.FC<IconHeroProps> = ({
         <GaloyIcon name={icon} size={34} color={iconColor} />
       </View>
       <View style={styles.textContainer}>
-        <Text style={styles.title} numberOfLines={titleLines} ellipsizeMode="middle">
+        <Text bold style={styles.title} numberOfLines={titleLines} ellipsizeMode="middle">
           {title}
         </Text>
         {hasVisibleTextSubtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
@@ -69,7 +69,6 @@ const useStyles = makeStyles(({ colors }) => ({
   title: {
     fontSize: 20,
     lineHeight: 24,
-    fontWeight: "700",
     textAlign: "center",
     width: "100%",
   },
