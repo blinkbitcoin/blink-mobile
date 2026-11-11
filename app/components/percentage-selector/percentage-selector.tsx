@@ -3,6 +3,7 @@ import { StyleProp, View, ViewStyle } from "react-native"
 import { makeStyles } from "@rn-vui/themed"
 
 import { Chip } from "@app/components/atomic/chip"
+import { haptics } from "@app/utils/haptics"
 
 export const PERCENTAGE_OPTIONS = [25, 50, 75, 100] as const
 const DEFAULT_TEST_ID_PREFIX = "convert"
@@ -46,7 +47,10 @@ export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
           loading={loadingPercent === p}
           selected={selectedPercent === p}
           disabled={isLocked || (disabledOptions?.includes(p) ?? false)}
-          onPress={() => onSelect(p)}
+          onPress={() => {
+            haptics.select()
+            onSelect(p)
+          }}
         />
       ))}
     </View>
