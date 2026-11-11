@@ -129,21 +129,10 @@ export const useTransactionSeenState = ({
   const latestBtcTxId = latestTransactions.btc?.id ?? ""
   const latestUsdTxId = latestTransactions.usd?.id ?? ""
 
-  const hasUnseenBtcTx = useMemo(
-    () =>
-      latestBtcTxId !== "" &&
-      latestBtcTxId !== lastSeenBtcId &&
-      isNewEnoughToAnnounce(latestTransactions.btc),
-    [latestBtcTxId, lastSeenBtcId, isNewEnoughToAnnounce, latestTransactions.btc],
-  )
-
-  const hasUnseenUsdTx = useMemo(
-    () =>
-      latestUsdTxId !== "" &&
-      latestUsdTxId !== lastSeenUsdId &&
-      isNewEnoughToAnnounce(latestTransactions.usd),
-    [latestUsdTxId, lastSeenUsdId, isNewEnoughToAnnounce, latestTransactions.usd],
-  )
+  const hasUnseenBtcTx =
+    isNewEnoughToAnnounce(latestTransactions.btc) && latestBtcTxId !== lastSeenBtcId
+  const hasUnseenUsdTx =
+    isNewEnoughToAnnounce(latestTransactions.usd) && latestUsdTxId !== lastSeenUsdId
 
   const markTransactionAsSeen = useCallback(
     (currency: WalletCurrency) => {
