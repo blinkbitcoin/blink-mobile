@@ -15,14 +15,18 @@ import { flushEffects } from "../../../helpers/flush-effects"
 const mockHandleBackup = jest.fn()
 let mockLoading = false
 let mockIsValid = true
+let mockIsEncrypted = false
 const mockUseCloudBackup = jest.fn()
+const mockToggleEncryption = jest.fn()
 const mockSetPassword = jest.fn()
 const mockSetConfirmPassword = jest.fn()
 
 jest.mock("@app/screens/self-custodial/onboarding/hooks", () => ({
   useCloudBackupForm: () => ({
+    isEncrypted: mockIsEncrypted,
     password: "ValidPass1234!",
     confirmPassword: "ValidPass1234!",
+    toggleEncryption: mockToggleEncryption,
     setPassword: mockSetPassword,
     setConfirmPassword: mockSetConfirmPassword,
     passwordError: undefined,
@@ -38,13 +42,10 @@ jest.mock("@app/screens/self-custodial/onboarding/hooks", () => ({
   },
 }))
 
-const mockEnableScreenSecurity = jest.fn()
-const mockDisableScreenSecurity = jest.fn()
+const mockReleaseScreenSecurity = jest.fn(() => Promise.resolve())
+const mockAcquireScreenSecurity = jest.fn()
 jest.mock("@app/utils/screen-security", () => ({
-  enableScreenSecurity: (...args: readonly unknown[]) =>
-    mockEnableScreenSecurity(...args),
-  disableScreenSecurity: (...args: readonly unknown[]) =>
-    mockDisableScreenSecurity(...args),
+  acquireScreenSecurity: () => mockAcquireScreenSecurity(),
 }))
 
 const mockUseMigrationBackupCheckpoint = jest.fn()
@@ -83,20 +84,27 @@ jest.mock("@app/components/info-banner", () => {
 loadLocale("en")
 const LL = i18nObject("en")
 
-const renderScreen = () =>
-  render(
+/** Settles the screen guard's lease, whose resolution updates the hook's state. */
+const renderScreen = async () => {
+  const rendered = render(
     <ContextForScreen>
       <CloudBackupScreen />
     </ContextForScreen>,
   )
+  await flushEffects()
+  return rendered
+}
 
 describe("CloudBackupScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockEnableScreenSecurity.mockResolvedValue(undefined)
-    mockDisableScreenSecurity.mockResolvedValue(undefined)
+    mockAcquireScreenSecurity.mockReturnValue({
+      ready: Promise.resolve(),
+      release: mockReleaseScreenSecurity,
+    })
     mockLoading = false
     mockIsValid = true
+    mockIsEncrypted = false
   })
 
   it("renders title and subtitle", async () => {
@@ -121,19 +129,19 @@ describe("CloudBackupScreen", () => {
     expect(getByText(LL.BackupScreen.CloudBackup.continueButton())).toBeTruthy()
   })
 
-  /** The passphrase is mandatory, so the fields are ready on open with no
-   *  checkbox to opt in first. */
-  it("shows the passphrase fields and warning on open", async () => {
-    const { getByText } = render(
+  /** Additional encryption is opt-in, so a backup can finish with no passphrase. */
+  it("hides the passphrase fields until the user opts in", async () => {
+    const { getByText, queryByText } = render(
       <ContextForScreen>
         <CloudBackupScreen />
       </ContextForScreen>,
     )
     await flushEffects()
 
-    expect(getByText(LL.BackupScreen.CloudBackup.password())).toBeTruthy()
-    expect(getByText(LL.BackupScreen.CloudBackup.confirmPassword())).toBeTruthy()
-    expect(getByText(LL.BackupScreen.CloudBackup.importantTitle())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.CloudBackup.encryptCheckbox())).toBeTruthy()
+    expect(queryByText(LL.BackupScreen.CloudBackup.password())).toBeNull()
+    expect(queryByText(LL.BackupScreen.CloudBackup.confirmPassword())).toBeNull()
+    expect(queryByText(LL.BackupScreen.CloudBackup.importantTitle())).toBeNull()
   })
 
   it("calls handleBackup on continue press", async () => {
@@ -165,6 +173,7 @@ describe("CloudBackupScreen", () => {
   })
 
   it("renders the Important InfoBanner with warning icon color", async () => {
+    mockIsEncrypted = true
     render(
       <ContextForScreen>
         <CloudBackupScreen />
@@ -222,7 +231,7 @@ describe("CloudBackupScreen", () => {
       )
       await flushEffects()
 
-      expect(mockEnableScreenSecurity).toHaveBeenCalledTimes(1)
+      expect(mockAcquireScreenSecurity).toHaveBeenCalledTimes(1)
     })
 
     it("drops the guard on unmount", async () => {
@@ -235,30 +244,37 @@ describe("CloudBackupScreen", () => {
 
       unmount()
 
-      expect(mockDisableScreenSecurity).toHaveBeenCalledTimes(1)
+      expect(mockReleaseScreenSecurity).toHaveBeenCalledTimes(1)
     })
   })
 
-  /** The emergency bundle follows every cloud backup and is encrypted with the
-   *  same seed, so a new cloud backup always carries a passphrase, and there is
-   *  no choice about the bundle to make. */
-  describe("mandatory passphrase and automatic bundle backups", () => {
-    it("offers no checkbox to skip the passphrase or the automatic backups", () => {
-      const { queryByTestId } = renderScreen()
+  describe("optional additional encryption", () => {
+    it("backs up without a passphrase unless the user opts in", async () => {
+      await renderScreen()
 
-      expect(queryByTestId("encrypt-checkbox")).toBeNull()
-      expect(queryByTestId("auto-bundle-checkbox")).toBeNull()
+      expect(mockUseCloudBackup).toHaveBeenLastCalledWith({
+        isEncrypted: false,
+        password: "ValidPass1234!",
+      })
     })
 
-    it("always backs up with the passphrase", () => {
-      renderScreen()
+    it("shows the passphrase fields and warning once encryption is on", async () => {
+      mockIsEncrypted = true
+      const { getByText } = await renderScreen()
 
-      expect(mockUseCloudBackup).toHaveBeenLastCalledWith({ password: "ValidPass1234!" })
+      expect(getByText(LL.BackupScreen.CloudBackup.password())).toBeTruthy()
+      expect(getByText(LL.BackupScreen.CloudBackup.confirmPassword())).toBeTruthy()
+      expect(getByText(LL.BackupScreen.CloudBackup.importantTitle())).toBeTruthy()
+      expect(mockUseCloudBackup).toHaveBeenLastCalledWith({
+        isEncrypted: true,
+        password: "ValidPass1234!",
+      })
     })
 
-    it("keeps continue disabled until the passphrase is valid", () => {
+    it("keeps continue disabled until an opted-in passphrase is valid", async () => {
+      mockIsEncrypted = true
       mockIsValid = false
-      const { getByText } = renderScreen()
+      const { getByText } = await renderScreen()
 
       fireEvent.press(getByText(LL.BackupScreen.CloudBackup.continueButton()))
 
@@ -267,9 +283,9 @@ describe("CloudBackupScreen", () => {
   })
 
   describe("while a backup runs", () => {
-    it("does not start a second backup", () => {
+    it("does not start a second backup", async () => {
       mockLoading = true
-      const { getByTestId } = renderScreen()
+      const { getByTestId } = await renderScreen()
 
       fireEvent.press(getByTestId("cloud-backup-continue"))
 
@@ -278,9 +294,10 @@ describe("CloudBackupScreen", () => {
 
     /** handleBackup holds the passphrase it started with, so an edit landing
      *  mid-upload would leave the screen showing one the backup never used. */
-    it("keeps the passphrase fields fixed", () => {
+    it("keeps the passphrase fields fixed", async () => {
+      mockIsEncrypted = true
       mockLoading = true
-      const { getByPlaceholderText } = renderScreen()
+      const { getByPlaceholderText } = await renderScreen()
 
       fireEvent.changeText(
         getByPlaceholderText(LL.BackupScreen.CloudBackup.passwordPlaceholder()),
@@ -295,8 +312,9 @@ describe("CloudBackupScreen", () => {
       expect(mockSetConfirmPassword).not.toHaveBeenCalled()
     })
 
-    it("lets the passphrase be edited once no backup is running", () => {
-      const { getByPlaceholderText } = renderScreen()
+    it("lets the passphrase be edited once no backup is running", async () => {
+      mockIsEncrypted = true
+      const { getByPlaceholderText } = await renderScreen()
 
       fireEvent.changeText(
         getByPlaceholderText(LL.BackupScreen.CloudBackup.passwordPlaceholder()),

@@ -1,6 +1,7 @@
 import React from "react"
 import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import { act, fireEvent, render } from "@testing-library/react-native"
+import { it } from "@jest/globals"
 
 import { AccountStatus, AccountType } from "@app/types/wallet"
 
@@ -11,6 +12,14 @@ import { flushEffects } from "../../../helpers/flush-effects"
 const TEST_ENTRY_ID = "test-account-id"
 
 let mockNetwork = mockSparkNetwork.Regtest
+
+const mockRouteAfterLogout = jest.fn()
+
+/** The shared logout route reaches the lock context, which pulls in native boot code this
+ *  screen never touches; only the way out it hands back is stood in for. */
+jest.mock("@app/hooks/use-logout-and-route", () => ({
+  useLogoutAndRoute: () => ({ routeAfterLogout: mockRouteAfterLogout }),
+}))
 
 jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
   useSparkNetwork: () => mockNetwork,
@@ -193,6 +202,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
       },
       ProfileScreen: {
         switchAccount: () => "Switched accounts",
+        removeAccount: () => "Remove account",
       },
       AccountScreen: {
         pleaseWait: () => "Please wait",
@@ -231,15 +241,16 @@ describe("ProfileRow", () => {
     })
   })
 
-  it("renders the lightning username without the domain as the row title when one is set", () => {
+  /** Custodial rows spell the whole address, so a bare username here reads as a missing account. */
+  it("renders the full lightning address, domain included, as the row title when one is set", () => {
     const { getByText, queryByText } = render(
       <ProfileRow
         entry={{ id: TEST_ENTRY_ID, lightningAddress: "alice@staging.blink.sv" }}
       />,
     )
 
-    expect(getByText("alice")).toBeTruthy()
-    expect(queryByText("alice@staging.blink.sv")).toBeNull()
+    expect(getByText("alice@staging.blink.sv")).toBeTruthy()
+    expect(queryByText("alice")).toBeNull()
   })
 
   it("falls back to anonymous user label when no lightning address is set", () => {
@@ -248,6 +259,133 @@ describe("ProfileRow", () => {
     )
 
     expect(getByText("Anon user")).toBeTruthy()
+  })
+
+  it.each(["", "   "])(
+    "falls back to anonymous user label when the stored address is blank (%j)",
+    (blank) => {
+      const { getByText } = render(
+        <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: blank }} />,
+      )
+
+      expect(getByText("Anon user")).toBeTruthy()
+    },
+  )
+
+  it("announces the address and account type instead of the test id", () => {
+    const { getByTestId } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: "alice@blink.sv" }} />,
+    )
+
+    expect(getByTestId(`profile-row-${TEST_ENTRY_ID}`).props.accessibilityLabel).toBe(
+      "alice@blink.sv, Non-custodial",
+    )
+  })
+
+  it("announces the anonymous label when no address is set", () => {
+    const { getByTestId } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+
+    expect(getByTestId(`profile-row-${TEST_ENTRY_ID}`).props.accessibilityLabel).toBe(
+      "Anon user, Non-custodial",
+    )
+  })
+
+  it("trims whitespace around a stored address in the title and the announcement", () => {
+    const { getByTestId, getByText } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: "  alice@blink.sv " }} />,
+    )
+
+    expect(getByText("alice@blink.sv")).toBeTruthy()
+    expect(getByTestId(`profile-row-${TEST_ENTRY_ID}`).props.accessibilityLabel).toBe(
+      "alice@blink.sv, Non-custodial",
+    )
+  })
+
+  it.each([
+    { active: true, selected: true },
+    { active: false, selected: false },
+  ])(
+    "marks the row selected only when it is the active account (%j)",
+    ({ active, selected }) => {
+      if (active) {
+        mockUseAccountRegistry.mockReturnValue({
+          activeAccount: {
+            id: TEST_ENTRY_ID,
+            type: AccountType.SelfCustodial,
+            label: "Spark",
+            selected: true,
+            status: AccountStatus.Available,
+          },
+          setActiveAccountId,
+        })
+      }
+
+      const { getByTestId } = render(
+        <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      )
+      const row = getByTestId(`profile-row-${TEST_ENTRY_ID}`)
+
+      expect(row.props.accessibilityRole).toBe("button")
+      expect(row.props.accessibilityState).toEqual({ selected })
+    },
+  )
+
+  it("labels the delete button for screen readers instead of with its test id", () => {
+    const { getByTestId } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+    const deleteButton = getByTestId(`delete-button-${TEST_ENTRY_ID}`)
+
+    expect(deleteButton.props.accessibilityLabel).toBe("Remove account")
+    expect(deleteButton.props.accessibilityRole).toBe("button")
+  })
+
+  /** The row is a single accessibility element, so VoiceOver never focuses the nested
+   *  delete button; the removal has to be reachable from the row itself. */
+  it("offers account removal as a labelled accessibility action on the row", () => {
+    const { getByTestId } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+
+    expect(
+      getByTestId(`profile-row-${TEST_ENTRY_ID}`).props.accessibilityActions,
+    ).toEqual([{ name: "remove", label: "Remove account" }])
+  })
+
+  it("runs the same removal flow as the delete button when the row's remove action fires", async () => {
+    const { getByTestId, findByTestId } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+
+    fireEvent(getByTestId(`profile-row-${TEST_ENTRY_ID}`), "accessibilityAction", {
+      nativeEvent: { actionName: "remove" },
+    })
+
+    expect(await findByTestId("delete-modal")).toBeTruthy()
+    expect(mockProbeWallets).toHaveBeenCalledWith({
+      accountId: TEST_ENTRY_ID,
+      network: mockSparkNetwork.Mainnet,
+      leewaySatPerVbyte: 5,
+      lnurlDomain: "blink.sv",
+    })
+    expect(setActiveAccountId).not.toHaveBeenCalled()
+  })
+
+  it("ignores accessibility actions other than remove", async () => {
+    const { getByTestId, queryByTestId } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+
+    fireEvent(getByTestId(`profile-row-${TEST_ENTRY_ID}`), "accessibilityAction", {
+      nativeEvent: { actionName: "magicTap" },
+    })
+    await flushEffects()
+
+    expect(mockProbeWallets).not.toHaveBeenCalled()
+    expect(queryByTestId("delete-modal")).toBeNull()
+    expect(setActiveAccountId).not.toHaveBeenCalled()
   })
 
   it("switches to the entry's account id when the row is pressed", () => {
@@ -298,11 +436,12 @@ describe("ProfileRow", () => {
     fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
     expect(await findByTestId("delete-modal")).toBeTruthy()
-    expect(mockProbeWallets).toHaveBeenCalledWith(
-      TEST_ENTRY_ID,
-      mockSparkNetwork.Mainnet,
-      5,
-    )
+    expect(mockProbeWallets).toHaveBeenCalledWith({
+      accountId: TEST_ENTRY_ID,
+      network: mockSparkNetwork.Mainnet,
+      leewaySatPerVbyte: 5,
+      lnurlDomain: "blink.sv",
+    })
     expect(mockDeleteWallet).not.toHaveBeenCalled()
   })
 
@@ -571,7 +710,46 @@ describe("ProfileRow", () => {
       <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: "stale@example.com" }} />,
     )
 
-    expect(getByText("magentamouse1845")).toBeTruthy()
+    expect(getByText("magentamouse1845@breez.tips")).toBeTruthy()
+  })
+
+  it("falls back to the persisted address on the active row when the SDK has none", () => {
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: {
+        id: TEST_ENTRY_ID,
+        type: AccountType.SelfCustodial,
+        label: "Spark",
+        selected: true,
+        status: AccountStatus.RequiresRestore,
+      },
+      setActiveAccountId,
+    })
+
+    const { getByText } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: "stored@blink.sv" }} />,
+    )
+
+    expect(getByText("stored@blink.sv")).toBeTruthy()
+  })
+
+  it("does not let a blank live address mask the persisted one on the active row", () => {
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: {
+        id: TEST_ENTRY_ID,
+        type: AccountType.SelfCustodial,
+        label: "Spark",
+        selected: true,
+        status: AccountStatus.RequiresRestore,
+      },
+      setActiveAccountId,
+    })
+    mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: "", wallets: [] })
+
+    const { getByText } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: "stored@blink.sv" }} />,
+    )
+
+    expect(getByText("stored@blink.sv")).toBeTruthy()
   })
 
   it("ignores the live lightning address for inactive rows and uses the persisted entry value", () => {
@@ -586,6 +764,47 @@ describe("ProfileRow", () => {
       />,
     )
 
-    expect(getByText("stored")).toBeTruthy()
+    expect(getByText("stored@example.com")).toBeTruthy()
+  })
+
+  /** A lock the wipe could not take is still owed an answer, so this one may not land on
+   *  the screen that opens a new account. */
+  it("returns through the gate when the deletion left the lock standing", async () => {
+    mockNetwork = mockSparkNetwork.Mainnet
+    mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
+    mockDeleteWallet.mockResolvedValue("logged-out-locked")
+
+    const { getByTestId, findByTestId } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
+    await findByTestId("delete-modal")
+
+    await act(async () => {
+      await lastConfirmModalProps.onConfirm?.()
+    })
+
+    expect(mockRouteAfterLogout).toHaveBeenCalledWith(true)
+  })
+
+  /** The lock went with the wallet, so the flag has to come down with it. A relock raised
+   *  while the delete was in flight would otherwise stay up with no lock left to answer,
+   *  parking every later deep link behind it. */
+  it("lowers the lock flag when the deletion took the lock with it", async () => {
+    mockNetwork = mockSparkNetwork.Mainnet
+    mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
+    mockDeleteWallet.mockResolvedValue("logged-out")
+
+    const { getByTestId, findByTestId } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
+    await findByTestId("delete-modal")
+
+    await act(async () => {
+      await lastConfirmModalProps.onConfirm?.()
+    })
+
+    expect(mockRouteAfterLogout).toHaveBeenCalledWith(false)
   })
 })

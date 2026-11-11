@@ -1,0 +1,159 @@
+import React from "react"
+import { ActivityIndicator, View } from "react-native"
+import { useNavigation } from "@react-navigation/native"
+
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
+import { Screen } from "@app/components/screen"
+import { useScreenSecurity } from "@app/hooks/use-screen-security"
+import { useI18nContext } from "@app/i18n/i18n-react"
+import { testProps } from "@app/utils/testProps"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+
+type Props = {
+  children: React.ReactNode
+  /** Back action for the failure view. Screens whose gated content cannot be
+   *  recovered once popped (a server-once API secret) pass a confirming handler
+   *  here so Back can never silently discard it. Defaults to goBack. Such a screen
+   *  also blocks its header Back, so the handler is offered while registration is
+   *  pending too. */
+  onBack?: () => void
+  /** Input-only screens (the user types a phrase they already hold) must not be
+   *  locked out when registration keeps failing — Try Again re-runs the same
+   *  failing cycle and would leave no path back to the funds. Fail open: mount
+   *  the content unprotected instead. Display-only screens must never use this.
+   *  Only while the guard has never been on for this screen: content shown under
+   *  the guard stays hidden once it is gone. */
+  failOpen?: boolean
+}
+
+/** Fail-closed wrapper for screens showing seed words or other one-time secrets.
+ *  The sensitive subtree — including the effects that install header actions like
+ *  Copy/Share — is mounted only once the screen guard is actually on: while
+ *  registration is pending a spinner shows instead (it carries nothing
+ *  sensitive), and after the bounded retries are exhausted a non-sensitive error
+ *  state offers Retry/Back. Retrying remounts the hook subtree, which releases
+ *  the old lease and acquires a fresh one. */
+export const ScreenSecurityGate: React.FC<Props> = ({ children, onBack, failOpen }) => {
+  const [attempt, setAttempt] = React.useState(0)
+  /** Outlives the retries: what the user typed while the guard was on must not come
+   *  back unprotected on a retry that fails either. */
+  const [hasBeenProtected, setHasBeenProtected] = React.useState(false)
+  const markProtected = React.useCallback(() => setHasBeenProtected(true), [])
+  const canFailOpen = Boolean(failOpen) && !hasBeenProtected
+
+  return (
+    <GatedContent
+      key={attempt}
+      onRetry={() => setAttempt((current) => current + 1)}
+      onProtected={markProtected}
+      onBack={onBack}
+      failOpen={canFailOpen}
+    >
+      {children}
+    </GatedContent>
+  )
+}
+
+type GatedContentProps = Props & {
+  onRetry: () => void
+  onProtected: () => void
+}
+
+const GatedContent: React.FC<GatedContentProps> = ({
+  children,
+  onRetry,
+  onProtected,
+  onBack,
+  failOpen,
+}) => {
+  const state = useScreenSecurity()
+  const isActive = state === "active"
+
+  React.useEffect(() => {
+    if (isActive) onProtected()
+  }, [isActive, onProtected])
+
+  const { LL } = useI18nContext()
+  const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
+  const navigation = useNavigation()
+  const handleBack = onBack ?? (() => navigation.goBack())
+  const hasScreenOwnedBack = onBack !== undefined
+
+  if (isActive) return <>{children}</>
+
+  if (state === "activating") {
+    // A spinner carries nothing sensitive, so it is safe to paint before the
+    // guard is on — a blank screen read as a freeze for the whole retry window.
+    return (
+      <Screen preset="fixed">
+        <View style={styles.centerContainer}>
+          <ActivityIndicator
+            size="large"
+            color={colors.primary}
+            {...testProps("screen-security-activating")}
+          />
+        </View>
+        {hasScreenOwnedBack ? (
+          <View style={styles.activatingBackContainer}>
+            <GaloySecondaryButton
+              title={LL.common.back()}
+              onPress={onBack}
+              {...testProps("screen-security-back")}
+            />
+          </View>
+        ) : null}
+      </Screen>
+    )
+  }
+
+  if (failOpen) return <>{children}</>
+
+  return (
+    <Screen preset="fixed">
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText} {...testProps("screen-security-error")}>
+          {LL.errors.screenSecurityUnavailable()}
+        </Text>
+        <GaloyPrimaryButton
+          title={LL.common.tryAgain()}
+          onPress={onRetry}
+          {...testProps("screen-security-retry")}
+        />
+        <GaloySecondaryButton
+          title={LL.common.back()}
+          onPress={handleBack}
+          {...testProps("screen-security-back")}
+        />
+      </View>
+    </Screen>
+  )
+}
+
+const useStyles = makeStyles(({ colors }) => ({
+  centerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  activatingBackContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    paddingHorizontal: 20,
+    gap: 12,
+  },
+  errorText: {
+    fontSize: 16,
+    lineHeight: 22,
+    textAlign: "center",
+    color: colors.black,
+    marginBottom: 12,
+  },
+}))

@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { RouteProp, useRoute } from "@react-navigation/native"
@@ -9,6 +9,8 @@ import { BlinkCard } from "@app/components/blink-card/blink-card"
 import { AddToWalletButton, InfoCard } from "@app/components/card-screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+
+import { useAddToWallet } from "./hooks/use-add-to-wallet"
 
 type AddToMobileWalletRouteProp = RouteProp<
   RootStackParamList,
@@ -22,18 +24,8 @@ export const CardAddToMobileWalletScreen: React.FC = () => {
   } = useTheme()
   const { LL } = useI18nContext()
   const route = useRoute<AddToMobileWalletRouteProp>()
-  const { lastFour, holderName } = route.params
-  const [isLoading, setIsLoading] = useState(false)
-
-  const handleAddToWallet = async () => {
-    setIsLoading(true)
-    try {
-      // TODO: Implement actual wallet integration
-      console.log("Add to wallet pressed")
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const { lastFour, cardId } = route.params
+  const { canAddToWallet, isAdding, addToWallet } = useAddToWallet(cardId, lastFour)
 
   return (
     <Screen preset="scroll">
@@ -49,13 +41,15 @@ export const CardAddToMobileWalletScreen: React.FC = () => {
         </View>
 
         <BlinkCard
+          cardId={cardId}
           cardNumber={lastFour}
-          holderName={holderName}
           validThruDate=""
           isFrozen={false}
         />
 
-        <AddToWalletButton onPress={handleAddToWallet} disabled={isLoading} />
+        {canAddToWallet ? (
+          <AddToWalletButton onPress={addToWallet} disabled={isAdding} />
+        ) : null}
 
         <InfoCard
           title={LL.CardFlow.AddToMobileWallet.Benefits.title()}

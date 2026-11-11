@@ -17,11 +17,13 @@ type CardStatusLayoutProps = {
   iconName: IconNamesType
   iconColor?: string
   showCard?: boolean
+  cardId?: string
   cardNumber?: string
-  holderName?: string
   validThruDate?: string | Date
   isFrozen?: boolean
   showAddToWallet?: boolean
+  onAddToWallet: () => void
+  isAddingToWallet?: boolean
 }
 
 export const CardStatusLayout: React.FC<CardStatusLayoutProps> = ({
@@ -32,11 +34,13 @@ export const CardStatusLayout: React.FC<CardStatusLayoutProps> = ({
   iconName,
   iconColor,
   showCard = true,
+  cardId,
   cardNumber = "",
-  holderName = "",
   validThruDate = "",
   isFrozen = false,
   showAddToWallet = true,
+  onAddToWallet,
+  isAddingToWallet = false,
 }) => {
   const styles = useStyles()
   const {
@@ -44,11 +48,6 @@ export const CardStatusLayout: React.FC<CardStatusLayoutProps> = ({
   } = useTheme()
 
   const resolvedIconColor = iconColor ?? colors._green
-
-  const handleAddToWallet = () => {
-    // TODO: Phase 3 - Implement MeaWallet SDK integration
-    console.log("Add to wallet pressed")
-  }
 
   return (
     <Screen style={styles.screen}>
@@ -66,14 +65,16 @@ export const CardStatusLayout: React.FC<CardStatusLayoutProps> = ({
         <View style={styles.cardSection}>
           {showCard && (
             <BlinkCard
+              cardId={cardId}
               cardNumber={cardNumber}
-              holderName={holderName}
               validThruDate={validThruDate}
               isFrozen={isFrozen}
             />
           )}
 
-          {showAddToWallet ? <AddToWalletButton onPress={handleAddToWallet} /> : null}
+          {showAddToWallet ? (
+            <AddToWalletButton onPress={onAddToWallet} disabled={isAddingToWallet} />
+          ) : null}
         </View>
       </View>
 

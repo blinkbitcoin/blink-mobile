@@ -203,6 +203,26 @@ type RootTranslation = {
 		 * A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​'​d​ ​l​i​k​e​ ​t​o​ ​l​o​g​ ​o​u​t​?​ ​T​h​i​s​ ​w​i​l​l​ ​r​e​s​e​t​ ​y​o​u​r​ ​c​a​c​h​e​ ​a​n​d​ ​a​l​l​ ​l​o​c​a​l​ ​u​s​e​r​ ​s​e​t​t​i​n​g​s
 		 */
 		confirmLogout: string
+		/**
+		 * F​o​r​g​o​t​ ​P​I​N​?​ ​R​e​m​o​v​e​ ​w​a​l​l​e​t​s
+		 */
+		forgotPin: string
+		/**
+		 * R​e​m​o​v​e​ ​w​a​l​l​e​t​s​ ​f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e​?
+		 */
+		removeWalletsTitle: string
+		/**
+		 * T​h​i​s​ ​r​e​m​o​v​e​s​ ​a​l​l​ ​w​a​l​l​e​t​s​ ​f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e​ ​a​n​d​ ​l​o​g​s​ ​y​o​u​ ​o​u​t​.​ ​T​o​ ​g​e​t​ ​a​ ​w​a​l​l​e​t​ ​b​a​c​k​,​ ​y​o​u​ ​n​e​e​d​ ​i​t​s​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.​ ​W​i​t​h​o​u​t​ ​i​t​,​ ​t​h​e​ ​w​a​l​l​e​t​ ​i​s​ ​l​o​s​t​.
+		 */
+		removeWalletsBody: string
+		/**
+		 * R​e​m​o​v​e​ ​w​a​l​l​e​t​s
+		 */
+		removeWalletsConfirm: string
+		/**
+		 * S​o​m​e​ ​w​a​l​l​e​t​s​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​r​e​m​o​v​e​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		removeWalletsFailed: string
 	}
 	PeopleScreen: {
 		/**
@@ -6649,6 +6669,10 @@ type RootTranslation = {
 		 */
 		submitPlaceRequest: string
 		/**
+		 * S​h​o​w​ ​m​y​ ​l​o​c​a​t​i​o​n
+		 */
+		showMyLocation: string
+		/**
 		 * M​o​v​e​ ​t​h​e​ ​m​a​p​ ​t​o​ ​p​u​t​ ​t​h​e​ ​p​i​n​ ​o​n​ ​t​h​e​ ​p​l​a​c​e
 		 */
 		placePinHint: string
@@ -6797,6 +6821,19 @@ type RootTranslation = {
 	}
 	PinScreen: {
 		/**
+		 * T​o​o​ ​m​a​n​y​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​s​.
+		 */
+		attemptBudgetSpent: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​r​e​c​o​r​d​ ​t​h​e​ ​a​t​t​e​m​p​t​ ​s​e​c​u​r​e​l​y​.
+		 */
+		attemptUnrecorded: string
+		/**
+		 * {​a​t​t​e​m​p​t​s​R​e​m​a​i​n​i​n​g​}​ ​a​t​t​e​m​p​t​s​ ​r​e​m​a​i​n​i​n​g​.
+		 * @param {number} attemptsRemaining
+		 */
+		attemptsLeft: RequiredParams<'attemptsRemaining'>
+		/**
 		 * I​n​c​o​r​r​e​c​t​ ​P​I​N​.​ ​{​a​t​t​e​m​p​t​s​R​e​m​a​i​n​i​n​g​}​ ​a​t​t​e​m​p​t​s​ ​r​e​m​a​i​n​i​n​g​.
 		 * @param {number} attemptsRemaining
 		 */
@@ -6806,9 +6843,9 @@ type RootTranslation = {
 		 */
 		enterPin: string
 		/**
-		 * C​o​u​l​d​n​'​t​ ​r​e​c​o​r​d​ ​t​h​e​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​ ​s​e​c​u​r​e​l​y​.​ ​L​o​g​g​i​n​g​ ​o​u​t​.
+		 * 1​ ​a​t​t​e​m​p​t​ ​r​e​m​a​i​n​i​n​g​.
 		 */
-		lockoutUnavailable: string
+		oneAttemptLeft: string
 		/**
 		 * I​n​c​o​r​r​e​c​t​ ​P​I​N​.​ ​1​ ​a​t​t​e​m​p​t​ ​r​e​m​a​i​n​i​n​g​.
 		 */
@@ -6834,10 +6871,10 @@ type RootTranslation = {
 		 */
 		tooManyAttempts: string
 		/**
-		 * T​r​y​ ​a​g​a​i​n​ ​i​n​ ​{​s​e​c​o​n​d​s​}​s​.
-		 * @param {number} seconds
+		 * T​r​y​ ​a​g​a​i​n​ ​i​n​ ​{​t​i​m​e​}​.
+		 * @param {string} time
 		 */
-		tryAgainIn: RequiredParams<'seconds'>
+		tryAgainIn: RequiredParams<'time'>
 		/**
 		 * V​e​r​i​f​y​ ​y​o​u​r​ ​P​I​N​ ​c​o​d​e
 		 */
@@ -6956,6 +6993,30 @@ type RootTranslation = {
 		 * S​h​a​r​e
 		 */
 		shareInvoice: string
+		/**
+		 * N​e​w
+		 */
+		newAddress: string
+		/**
+		 * G​e​n​e​r​a​t​e​s​ ​a​ ​n​e​w​ ​B​i​t​c​o​i​n​ ​a​d​d​r​e​s​s​.​ ​P​r​e​v​i​o​u​s​ ​a​d​d​r​e​s​s​e​s​ ​k​e​e​p​ ​w​o​r​k​i​n​g​.
+		 */
+		newAddressHint: string
+		/**
+		 * N​e​w​ ​a​d​d​r​e​s​s​ ​r​e​a​d​y​.​ ​P​r​e​v​i​o​u​s​ ​a​d​d​r​e​s​s​e​s​ ​s​t​i​l​l​ ​w​o​r​k​.
+		 */
+		newAddressGenerated: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​g​e​n​e​r​a​t​e​ ​a​ ​n​e​w​ ​a​d​d​r​e​s​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		newAddressFailed: string
+		/**
+		 * T​o​o​ ​m​a​n​y​ ​n​e​w​ ​a​d​d​r​e​s​s​e​s​.​ ​P​l​e​a​s​e​ ​w​a​i​t​ ​a​ ​w​h​i​l​e​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		newAddressRateLimited: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​l​o​a​d​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​d​d​r​e​s​s​.​ ​T​a​p​ ​N​e​w​ ​t​o​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		onchainAddressLoadFailed: string
 		/**
 		 * R​e​q​u​e​s​t​ ​S​p​e​c​i​f​i​c​ ​A​m​o​u​n​t
 		 */
@@ -7508,6 +7569,16 @@ type RootTranslation = {
 		 */
 		usernameDoesNotExistAdvice: string
 		/**
+		 * W​e​ ​c​o​u​l​d​n​'​t​ ​c​h​e​c​k​ ​{​l​n​A​d​d​r​e​s​s​}​ ​r​i​g​h​t​ ​n​o​w​ ​—​ ​{​b​a​n​k​N​a​m​e​}​'​s​ ​s​e​r​v​e​r​s​ ​a​r​e​n​'​t​ ​r​e​s​p​o​n​d​i​n​g​.
+		 * @param {string} bankName
+		 * @param {string} lnAddress
+		 */
+		destinationUnverifiable: RequiredParams<'bankName' | 'lnAddress'>
+		/**
+		 * T​h​e​ ​a​d​d​r​e​s​s​ ​m​a​y​ ​w​e​l​l​ ​b​e​ ​f​i​n​e​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​,​ ​o​r​ ​a​s​k​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t​ ​f​o​r​ ​a​n​ ​L​N​ ​i​n​v​o​i​c​e​ ​o​r​ ​B​T​C​ ​a​d​d​r​e​s​s​ ​i​n​s​t​e​a​d​.
+		 */
+		destinationUnverifiableAdvice: string
+		/**
 		 * {​l​n​A​d​d​r​e​s​s​}​ ​i​s​ ​y​o​u​r​ ​{​b​a​n​k​N​a​m​e​}​ ​a​d​d​r​e​s​s​.
 		 * @param {string} bankName
 		 * @param {string} lnAddress
@@ -7835,6 +7906,11 @@ type RootTranslation = {
 		 */
 		keysGroupTitle: string
 		/**
+		 * I​n​a​c​t​i​v​e​ ​k​e​y​s​ ​(​{​c​o​u​n​t​}​)
+		 * @param {number} count
+		 */
+		inactiveKeys: RequiredParams<'count'>
+		/**
 		 * N​o​ ​A​P​I​ ​k​e​y​s​ ​y​e​t
 		 */
 		noKeys: string
@@ -7942,6 +8018,10 @@ type RootTranslation = {
 		 */
 		revoke: string
 		/**
+		 * G​o​ ​b​a​c​k
+		 */
+		revokeGoBack: string
+		/**
 		 * A​P​I​ ​k​e​y​ ​r​e​v​o​k​e​d
 		 */
 		revokeSuccess: string
@@ -7957,6 +8037,14 @@ type RootTranslation = {
 		 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​y​o​u​r​ ​A​P​I​ ​k​e​y​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​.
 		 */
 		loadError: string
+		/**
+		 * D​i​s​c​a​r​d​ ​t​h​i​s​ ​A​P​I​ ​k​e​y​?
+		 */
+		discardSecretTitle: string
+		/**
+		 * T​h​i​s​ ​i​s​ ​t​h​e​ ​o​n​l​y​ ​t​i​m​e​ ​t​h​e​ ​s​e​c​r​e​t​ ​i​s​ ​s​h​o​w​n​.​ ​I​f​ ​y​o​u​ ​l​e​a​v​e​ ​n​o​w​,​ ​t​h​e​ ​k​e​y​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​c​o​v​e​r​e​d​ ​a​n​d​ ​y​o​u​ ​w​i​l​l​ ​n​e​e​d​ ​t​o​ ​c​r​e​a​t​e​ ​a​ ​n​e​w​ ​o​n​e​.
+		 */
+		discardSecretBody: string
 		/**
 		 * D​o​n​e
 		 */
@@ -8483,6 +8571,10 @@ type RootTranslation = {
 		 * @param {string} identifier
 		 */
 		removedAccount: RequiredParams<'identifier'>
+		/**
+		 * R​e​m​o​v​e​ ​a​c​c​o​u​n​t
+		 */
+		removeAccount: string
 	}
 	TotpRegistrationInitiateScreen: {
 		/**
@@ -8621,6 +8713,10 @@ type RootTranslation = {
 		 * c​o​u​l​d​n​'​t​ ​c​h​e​c​k​ ​a​v​a​i​l​a​b​i​l​i​t​y​,​ ​p​u​l​l​ ​d​o​w​n​ ​t​o​ ​r​e​t​r​y
 		 */
 		unknownRegionWalletLabel: string
+		/**
+		 * n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​o​n​ ​t​h​i​s​ ​n​e​t​w​o​r​k
+		 */
+		networkWalletLabel: string
 	}
 	AnonModeConvertModal: {
 		/**
@@ -8780,9 +8876,9 @@ type RootTranslation = {
 		 */
 		received: string
 		/**
-		 * Y​o​u​ ​s​p​e​n​t
+		 * Y​o​u​ ​s​e​n​t
 		 */
-		spent: string
+		sent: string
 		/**
 		 * S​e​n​d​i​n​g
 		 */
@@ -9059,6 +9155,10 @@ type RootTranslation = {
 			 * S​o​r​r​y​,​ ​t​h​i​s​ ​a​d​d​r​e​s​s​ ​i​s​ ​a​l​r​e​a​d​y​ ​t​a​k​e​n
 			 */
 			addressUnavailable: string
+			/**
+			 * C​o​u​l​d​n​'​t​ ​r​e​a​c​h​ ​t​h​e​ ​a​d​d​r​e​s​s​ ​s​e​r​v​e​r​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​.
+			 */
+			serverUnreachable: string
 			/**
 			 * A​n​ ​u​n​k​n​o​w​n​ ​e​r​r​o​r​ ​o​c​c​u​r​r​e​d​,​ ​p​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r
 			 */
@@ -10130,6 +10230,10 @@ type RootTranslation = {
 		 * C​l​e​a​r​ ​A​p​p​ ​D​a​t​a​ ​a​n​d​ ​L​o​g​o​u​t
 		 */
 		clearAppData: string
+		/**
+		 * T​h​i​s​ ​s​c​r​e​e​n​ ​s​t​a​y​s​ ​h​i​d​d​e​n​ ​b​e​c​a​u​s​e​ ​s​c​r​e​e​n​s​h​o​t​ ​p​r​o​t​e​c​t​i​o​n​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​t​u​r​n​e​d​ ​o​n​.
+		 */
+		screenSecurityUnavailable: string
 	}
 	notifications: {
 		payment: {
@@ -10177,10 +10281,6 @@ type RootTranslation = {
 		 * T​e​l​e​g​r​a​m
 		 */
 		telegram: string
-		/**
-		 * M​a​t​t​e​r​m​o​s​t
-		 */
-		mattermost: string
 		/**
 		 * {​b​a​n​k​N​a​m​e​}​ ​-​ ​S​u​p​p​o​r​t
 		 * @param {string} bankName
@@ -10250,6 +10350,30 @@ type RootTranslation = {
 	​W​e​ ​m​a​y​ ​r​e​t​a​i​n​ ​c​e​r​t​a​i​n​ ​r​e​c​o​r​d​s​ ​a​s​ ​r​e​q​u​i​r​e​d​ ​b​y​ ​l​a​w​.
 		 */
 		deleteAccountWarning: string
+		/**
+		 * D​o​w​n​l​o​a​d​ ​l​o​g​s
+		 */
+		downloadLogs: string
+		/**
+		 * S​h​a​r​e​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​l​o​g​s
+		 */
+		exportLogsTitle: string
+		/**
+		 * T​h​i​s​ ​f​i​l​e​ ​h​e​l​p​s​ ​o​u​r​ ​s​u​p​p​o​r​t​ ​t​e​a​m​ ​l​o​o​k​ ​i​n​t​o​ ​p​r​o​b​l​e​m​s​ ​w​i​t​h​ ​y​o​u​r​ ​w​a​l​l​e​t​s​.​ ​I​t​ ​i​n​c​l​u​d​e​s​ ​t​h​e​ ​p​a​y​m​e​n​t​ ​h​i​s​t​o​r​y​ ​(​a​m​o​u​n​t​s​,​ ​i​n​v​o​i​c​e​s​ ​a​n​d​ ​a​d​d​r​e​s​s​e​s​)​ ​a​n​d​ ​w​a​l​l​e​t​ ​i​d​e​n​t​i​f​i​e​r​s​ ​o​f​ ​e​v​e​r​y​ ​s​e​l​f​-​c​u​s​t​o​d​i​a​l​ ​w​a​l​l​e​t​ ​o​n​ ​t​h​i​s​ ​d​e​v​i​c​e​,​ ​n​o​t​ ​o​n​l​y​ ​t​h​i​s​ ​o​n​e​,​ ​b​u​t​ ​n​e​v​e​r​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​s​ ​o​r​ ​k​e​y​s​.​ ​O​n​l​y​ ​s​h​a​r​e​ ​i​t​ ​w​i​t​h​ ​o​u​r​ ​s​u​p​p​o​r​t​ ​t​e​a​m​.
+		 */
+		exportLogsBody: string
+		/**
+		 * S​h​a​r​e​ ​l​o​g​s
+		 */
+		exportLogsConfirm: string
+		/**
+		 * T​h​e​r​e​ ​a​r​e​ ​n​o​ ​l​o​g​s​ ​t​o​ ​s​h​a​r​e​ ​y​e​t​.​ ​O​p​e​n​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		noLogsYet: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​e​x​p​o​r​t​ ​y​o​u​r​ ​l​o​g​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		exportLogsError: string
 	}
 	lnurl: {
 		/**
@@ -11005,6 +11129,18 @@ type RootTranslation = {
 			 * L​i​m​i​t​ ​m​u​s​t​ ​b​e​ ​g​r​e​a​t​e​r​ ​t​h​a​n​ ​z​e​r​o
 			 */
 			limitMustBePositive: string
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​u​p​d​a​t​e​ ​A​T​M​ ​w​i​t​h​d​r​a​w​a​l​s
+			 */
+			atmToggleError: string
+			/**
+			 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​y​o​u​r​ ​A​T​M​ ​l​i​m​i​t​s
+			 */
+			atmControlsLoadError: string
+			/**
+			 * E​n​t​e​r​ ​a​ ​v​a​l​i​d​ ​a​m​o​u​n​t​ ​w​i​t​h​ ​u​p​ ​t​o​ ​2​ ​d​e​c​i​m​a​l​s
+			 */
+			invalidLimitAmount: string
 			/**
 			 * T​r​a​n​s​a​c​t​i​o​n​ ​t​y​p​e​s
 			 */
@@ -12650,6 +12786,10 @@ type RootTranslation = {
 			 */
 			description: RequiredParams<'provider'>
 			/**
+			 * E​n​c​r​y​p​t​ ​w​i​t​h​ ​a​d​d​i​t​i​o​n​a​l​ ​p​a​s​s​w​o​r​d
+			 */
+			encryptCheckbox: string
+			/**
 			 * P​a​s​s​w​o​r​d
 			 */
 			password: string
@@ -13172,6 +13312,24 @@ type RootTranslation = {
 			 * E​m​p​t​y​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​f​i​r​s​t​.​ ​Y​o​u​ ​c​a​n​ ​t​r​a​n​s​f​e​r​ ​t​o​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e​ ​i​n​ ​B​l​i​n​k​ ​o​r​ ​e​l​s​e​w​h​e​r​e​.
 			 */
 			body: string
+		}
+		pendingDepositModal: {
+			/**
+			 * T​h​e​r​e​ ​i​s​ ​a​ ​p​e​n​d​i​n​g​ ​d​e​p​o​s​i​t​ ​t​o​ ​y​o​u​r​ ​a​c​c​o​u​n​t
+			 */
+			title: string
+			/**
+			 * Y​o​u​ ​c​a​n​n​o​t​ ​m​i​g​r​a​t​e​ ​t​o​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​t​y​p​e​ ​o​f​ ​a​c​c​o​u​n​t​ ​b​e​f​o​r​e​ ​a​l​l​ ​y​o​u​r​ ​p​e​n​d​i​n​g​ ​d​e​p​o​s​i​t​s​ ​h​a​v​e​ ​b​e​e​n​ ​s​e​t​t​l​e​d​ ​a​n​d​ ​c​r​e​d​i​t​e​d​ ​o​n​ ​t​h​i​s​ ​a​c​c​o​u​n​t​.
+			 */
+			body: string
+			/**
+			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
+			 */
+			contactSupportCta: string
+			/**
+			 * Y​o​u​r​ ​d​e​p​o​s​i​t​ ​i​s​ ​n​o​t​ ​c​o​n​f​i​r​m​e​d​ ​y​e​t​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​f​e​w​ ​m​i​n​u​t​e​s​.
+			 */
+			stillConfirming: string
 		}
 		migrateNowModal: {
 			/**
@@ -13714,6 +13872,10 @@ type RootTranslation = {
 		 */
 		haveAnApp: string
 		/**
+		 * L​e​a​r​n​ ​h​o​w
+		 */
+		learnHow: string
+		/**
 		 * C​o​p​y​ ​t​h​i​s​ ​s​e​t​u​p​ ​k​e​y​ ​i​n​t​o​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
 		 */
 		keyInstruction: string
@@ -13898,6 +14060,12 @@ type RootTranslation = {
 		 * C​o​u​l​d​ ​n​o​t​ ​d​o​w​n​l​o​a​d​ ​t​h​e​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​.
 		 */
 		exportFailed: string
+	}
+	SelfCustodialStaleRate: {
+		/**
+		 * S​h​o​w​i​n​g​ ​s​a​t​s​ ​—​ ​n​o​ ​e​x​c​h​a​n​g​e​ ​r​a​t​e​ ​a​v​a​i​l​a​b​l​e
+		 */
+		satsOnly: string
 	}
 	SelfCustodialOffline: {
 		/**
@@ -14185,6 +14353,15 @@ type RootTranslation = {
 		 */
 		noAccountDescription: RequiredParams<'featureName'>
 		/**
+		 * B​l​i​n​k​ ​i​s​ ​u​n​r​e​a​c​h​a​b​l​e
+		 */
+		unreachableTitle: string
+		/**
+		 * {​f​e​a​t​u​r​e​N​a​m​e​}​ ​n​e​e​d​s​ ​B​l​i​n​k​'​s​ ​s​e​r​v​e​r​s​,​ ​w​h​i​c​h​ ​a​r​e​n​'​t​ ​r​e​s​p​o​n​d​i​n​g​ ​r​i​g​h​t​ ​n​o​w​.​ ​Y​o​u​r​ ​w​a​l​l​e​t​ ​a​n​d​ ​f​u​n​d​s​ ​a​r​e​ ​u​n​a​f​f​e​c​t​e​d​.
+		 * @param {string} featureName
+		 */
+		unreachableDescription: RequiredParams<'featureName'>
+		/**
 		 * C​i​r​c​l​e​s
 		 */
 		featureCircles: string
@@ -14427,6 +14604,26 @@ export type TranslationFunctions = {
 		 * Are you sure you'd like to log out? This will reset your cache and all local user settings
 		 */
 		confirmLogout: () => LocalizedString
+		/**
+		 * Forgot PIN? Remove wallets
+		 */
+		forgotPin: () => LocalizedString
+		/**
+		 * Remove wallets from this device?
+		 */
+		removeWalletsTitle: () => LocalizedString
+		/**
+		 * This removes all wallets from this device and logs you out. To get a wallet back, you need its backup phrase. Without it, the wallet is lost.
+		 */
+		removeWalletsBody: () => LocalizedString
+		/**
+		 * Remove wallets
+		 */
+		removeWalletsConfirm: () => LocalizedString
+		/**
+		 * Some wallets could not be removed. Please try again.
+		 */
+		removeWalletsFailed: () => LocalizedString
 	}
 	PeopleScreen: {
 		/**
@@ -20861,6 +21058,10 @@ export type TranslationFunctions = {
 		 */
 		submitPlaceRequest: () => LocalizedString
 		/**
+		 * Show my location
+		 */
+		showMyLocation: () => LocalizedString
+		/**
 		 * Move the map to put the pin on the place
 		 */
 		placePinHint: () => LocalizedString
@@ -21008,6 +21209,18 @@ export type TranslationFunctions = {
 	}
 	PinScreen: {
 		/**
+		 * Too many failed attempts.
+		 */
+		attemptBudgetSpent: () => LocalizedString
+		/**
+		 * Couldn't record the attempt securely.
+		 */
+		attemptUnrecorded: () => LocalizedString
+		/**
+		 * {attemptsRemaining} attempts remaining.
+		 */
+		attemptsLeft: (arg: { attemptsRemaining: number }) => LocalizedString
+		/**
 		 * Incorrect PIN. {attemptsRemaining} attempts remaining.
 		 */
 		attemptsRemaining: (arg: { attemptsRemaining: number }) => LocalizedString
@@ -21016,9 +21229,9 @@ export type TranslationFunctions = {
 		 */
 		enterPin: () => LocalizedString
 		/**
-		 * Couldn't record the failed attempt securely. Logging out.
+		 * 1 attempt remaining.
 		 */
-		lockoutUnavailable: () => LocalizedString
+		oneAttemptLeft: () => LocalizedString
 		/**
 		 * Incorrect PIN. 1 attempt remaining.
 		 */
@@ -21044,9 +21257,9 @@ export type TranslationFunctions = {
 		 */
 		tooManyAttempts: () => LocalizedString
 		/**
-		 * Try again in {seconds}s.
+		 * Try again in {time}.
 		 */
-		tryAgainIn: (arg: { seconds: number }) => LocalizedString
+		tryAgainIn: (arg: { time: string }) => LocalizedString
 		/**
 		 * Verify your PIN code
 		 */
@@ -21165,6 +21378,30 @@ export type TranslationFunctions = {
 		 * Share
 		 */
 		shareInvoice: () => LocalizedString
+		/**
+		 * New
+		 */
+		newAddress: () => LocalizedString
+		/**
+		 * Generates a new Bitcoin address. Previous addresses keep working.
+		 */
+		newAddressHint: () => LocalizedString
+		/**
+		 * New address ready. Previous addresses still work.
+		 */
+		newAddressGenerated: () => LocalizedString
+		/**
+		 * Couldn't generate a new address. Please try again.
+		 */
+		newAddressFailed: () => LocalizedString
+		/**
+		 * Too many new addresses. Please wait a while and try again.
+		 */
+		newAddressRateLimited: () => LocalizedString
+		/**
+		 * Couldn't load your Bitcoin address. Tap New to try again.
+		 */
+		onchainAddressLoadFailed: () => LocalizedString
 		/**
 		 * Request Specific Amount
 		 */
@@ -21680,6 +21917,14 @@ export type TranslationFunctions = {
 		 */
 		usernameDoesNotExistAdvice: () => LocalizedString
 		/**
+		 * We couldn't check {lnAddress} right now — {bankName}'s servers aren't responding.
+		 */
+		destinationUnverifiable: (arg: { bankName: string, lnAddress: string }) => LocalizedString
+		/**
+		 * The address may well be fine. Try again in a moment, or ask the recipient for an LN invoice or BTC address instead.
+		 */
+		destinationUnverifiableAdvice: () => LocalizedString
+		/**
 		 * {lnAddress} is your {bankName} address.
 		 */
 		selfPaymentError: (arg: { bankName: string, lnAddress: string }) => LocalizedString
@@ -21996,6 +22241,10 @@ export type TranslationFunctions = {
 		 */
 		keysGroupTitle: () => LocalizedString
 		/**
+		 * Inactive keys ({count})
+		 */
+		inactiveKeys: (arg: { count: number }) => LocalizedString
+		/**
 		 * No API keys yet
 		 */
 		noKeys: () => LocalizedString
@@ -22100,6 +22349,10 @@ export type TranslationFunctions = {
 		 */
 		revoke: () => LocalizedString
 		/**
+		 * Go back
+		 */
+		revokeGoBack: () => LocalizedString
+		/**
 		 * API key revoked
 		 */
 		revokeSuccess: () => LocalizedString
@@ -22115,6 +22368,14 @@ export type TranslationFunctions = {
 		 * Could not load your API keys. Please try again later.
 		 */
 		loadError: () => LocalizedString
+		/**
+		 * Discard this API key?
+		 */
+		discardSecretTitle: () => LocalizedString
+		/**
+		 * This is the only time the secret is shown. If you leave now, the key cannot be recovered and you will need to create a new one.
+		 */
+		discardSecretBody: () => LocalizedString
 		/**
 		 * Done
 		 */
@@ -22631,6 +22892,10 @@ export type TranslationFunctions = {
 		 * You removed account {identifier}.
 		 */
 		removedAccount: (arg: { identifier: string }) => LocalizedString
+		/**
+		 * Remove account
+		 */
+		removeAccount: () => LocalizedString
 	}
 	TotpRegistrationInitiateScreen: {
 		/**
@@ -22769,6 +23034,10 @@ export type TranslationFunctions = {
 		 * couldn't check availability, pull down to retry
 		 */
 		unknownRegionWalletLabel: () => LocalizedString
+		/**
+		 * not available on this network
+		 */
+		networkWalletLabel: () => LocalizedString
 	}
 	AnonModeConvertModal: {
 		/**
@@ -22924,9 +23193,9 @@ export type TranslationFunctions = {
 		 */
 		received: () => LocalizedString
 		/**
-		 * You spent
+		 * You sent
 		 */
-		spent: () => LocalizedString
+		sent: () => LocalizedString
 		/**
 		 * Sending
 		 */
@@ -23188,6 +23457,10 @@ export type TranslationFunctions = {
 			 * Sorry, this address is already taken
 			 */
 			addressUnavailable: () => LocalizedString
+			/**
+			 * Couldn't reach the address server. Try again in a moment.
+			 */
+			serverUnreachable: () => LocalizedString
 			/**
 			 * An unknown error occurred, please try again later
 			 */
@@ -24244,6 +24517,10 @@ export type TranslationFunctions = {
 		 * Clear App Data and Logout
 		 */
 		clearAppData: () => LocalizedString
+		/**
+		 * This screen stays hidden because screenshot protection could not be turned on.
+		 */
+		screenSecurityUnavailable: () => LocalizedString
 	}
 	notifications: {
 		payment: {
@@ -24290,10 +24567,6 @@ export type TranslationFunctions = {
 		 * Telegram
 		 */
 		telegram: () => LocalizedString
-		/**
-		 * Mattermost
-		 */
-		mattermost: () => LocalizedString
 		/**
 		 * {bankName} - Support
 		 */
@@ -24355,6 +24628,30 @@ export type TranslationFunctions = {
 	We may retain certain records as required by law.
 		 */
 		deleteAccountWarning: () => LocalizedString
+		/**
+		 * Download logs
+		 */
+		downloadLogs: () => LocalizedString
+		/**
+		 * Share your wallet logs
+		 */
+		exportLogsTitle: () => LocalizedString
+		/**
+		 * This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.
+		 */
+		exportLogsBody: () => LocalizedString
+		/**
+		 * Share logs
+		 */
+		exportLogsConfirm: () => LocalizedString
+		/**
+		 * There are no logs to share yet. Open your wallet and try again.
+		 */
+		noLogsYet: () => LocalizedString
+		/**
+		 * Couldn't export your logs. Please try again.
+		 */
+		exportLogsError: () => LocalizedString
 	}
 	lnurl: {
 		/**
@@ -25096,6 +25393,18 @@ export type TranslationFunctions = {
 			 * Limit must be greater than zero
 			 */
 			limitMustBePositive: () => LocalizedString
+			/**
+			 * Failed to update ATM withdrawals
+			 */
+			atmToggleError: () => LocalizedString
+			/**
+			 * Could not load your ATM limits
+			 */
+			atmControlsLoadError: () => LocalizedString
+			/**
+			 * Enter a valid amount with up to 2 decimals
+			 */
+			invalidLimitAmount: () => LocalizedString
 			/**
 			 * Transaction types
 			 */
@@ -26717,6 +27026,10 @@ export type TranslationFunctions = {
 			 */
 			description: (arg: { provider: string }) => LocalizedString
 			/**
+			 * Encrypt with additional password
+			 */
+			encryptCheckbox: () => LocalizedString
+			/**
 			 * Password
 			 */
 			password: () => LocalizedString
@@ -27227,6 +27540,24 @@ export type TranslationFunctions = {
 			 * Empty your Dollar Balance first. You can transfer to your Bitcoin Balance in Blink or elsewhere.
 			 */
 			body: () => LocalizedString
+		}
+		pendingDepositModal: {
+			/**
+			 * There is a pending deposit to your account
+			 */
+			title: () => LocalizedString
+			/**
+			 * You cannot migrate to a different type of account before all your pending deposits have been settled and credited on this account.
+			 */
+			body: () => LocalizedString
+			/**
+			 * Contact support
+			 */
+			contactSupportCta: () => LocalizedString
+			/**
+			 * Your deposit is not confirmed yet. Try again in a few minutes.
+			 */
+			stillConfirming: () => LocalizedString
 		}
 		migrateNowModal: {
 			/**
@@ -27763,6 +28094,10 @@ export type TranslationFunctions = {
 		 */
 		haveAnApp: () => LocalizedString
 		/**
+		 * Learn how
+		 */
+		learnHow: () => LocalizedString
+		/**
 		 * Copy this setup key into your authenticator app.
 		 */
 		keyInstruction: () => LocalizedString
@@ -27944,6 +28279,12 @@ export type TranslationFunctions = {
 		 * Could not download the emergency bundle.
 		 */
 		exportFailed: () => LocalizedString
+	}
+	SelfCustodialStaleRate: {
+		/**
+		 * Showing sats — no exchange rate available
+		 */
+		satsOnly: () => LocalizedString
 	}
 	SelfCustodialOffline: {
 		/**
@@ -28216,6 +28557,14 @@ export type TranslationFunctions = {
 		 * {featureName} requires a Blink custodial account.
 		 */
 		noAccountDescription: (arg: { featureName: string }) => LocalizedString
+		/**
+		 * Blink is unreachable
+		 */
+		unreachableTitle: () => LocalizedString
+		/**
+		 * {featureName} needs Blink's servers, which aren't responding right now. Your wallet and funds are unaffected.
+		 */
+		unreachableDescription: (arg: { featureName: string }) => LocalizedString
 		/**
 		 * Circles
 		 */

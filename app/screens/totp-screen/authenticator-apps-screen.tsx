@@ -14,6 +14,7 @@ import { StepLayout } from "@app/components/step-layout"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { fonts } from "@app/rne-theme/fonts"
 import { AuthenticatorApp } from "@app/types/two-factor-enforcement"
 import {
   logAuthenticatorAppSelected,
@@ -62,6 +63,8 @@ const AUTHENTICATOR_APPS: ReadonlyArray<AuthenticatorAppListing> = [
   },
 ]
 
+const SETUP_KEY_ROUTE = "totpRegistrationInitiate" satisfies keyof RootStackParamList
+
 /** Read at the tap rather than once, so the store follows the platform it runs on. */
 const storeUrlOf = (listing: AuthenticatorAppListing): string =>
   Platform.OS === "ios" ? listing.appStoreUrl : listing.playStoreUrl
@@ -69,7 +72,8 @@ const storeUrlOf = (listing: AuthenticatorAppListing): string =>
 /**
  * The onboarding's second screen: three apps to get, each opening its store listing,
  * for a user without one. Coming back from the store lands here again, and I have an
- * app moves on to the setup key with an app at hand.
+ * app moves on to the setup key with an app at hand: back to the one already open
+ * beneath, when the setup key screen opened the onboarding, so its key stays the same.
  */
 export const AuthenticatorAppsScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -95,7 +99,16 @@ export const AuthenticatorAppsScreen: React.FC = () => {
       isEducationReportedRef.current = true
       logAuthenticatorEducationCompleted()
     }
-    navigation.navigate("totpRegistrationInitiate")
+    const isSetupKeyBelow = navigation
+      .getState()
+      .routes.some((route) => route.name === SETUP_KEY_ROUTE)
+    if (isSetupKeyBelow) {
+      /** Back to the key it opened from, which no longer offers the onboarding just
+       *  done. */
+      navigation.popTo(SETUP_KEY_ROUTE, { offersOnboarding: false })
+      return
+    }
+    navigation.navigate(SETUP_KEY_ROUTE)
   }, [navigation])
 
   return (
@@ -203,7 +216,7 @@ const useStyles = makeStyles(({ colors }) => ({
   getLabel: {
     fontSize: 10,
     lineHeight: 13,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   storeNote: {

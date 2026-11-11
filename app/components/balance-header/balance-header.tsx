@@ -36,6 +36,9 @@ type Props = {
   showStableBalanceToggle?: boolean
   mode?: BalanceMode
   onModeChange?: () => void
+  /** The amount above is in sats because nothing could price it. Said out loud so a
+   *  balance that changes denomination does not read as money changing. */
+  isSatsOnly?: boolean
 }
 
 export const BalanceHeader: React.FC<Props> = ({
@@ -44,6 +47,7 @@ export const BalanceHeader: React.FC<Props> = ({
   showStableBalanceToggle,
   mode,
   onModeChange,
+  isSatsOnly = false,
 }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
@@ -81,6 +85,11 @@ export const BalanceHeader: React.FC<Props> = ({
           </View>
         </TouchableOpacity>
       )}
+      {isSatsOnly && !hideAmount && !loading ? (
+        <Text style={styles.satsOnlyText} {...testProps("balance-rate-notice")}>
+          {LL.SelfCustodialStaleRate.satsOnly()}
+        </Text>
+      ) : null}
       {showStableBalanceToggle && onModeChange ? (
         <Pressable
           onPress={onModeChange}
@@ -122,6 +131,12 @@ const useStyles = makeStyles(({ colors }) => ({
   loaderForefound: {
     color: colors.loaderForeground,
   },
+  satsOnlyText: {
+    marginTop: 4,
+    fontSize: 12,
+    textAlign: "center",
+    color: colors.grey2,
+  },
   modeToggle: {
     marginTop: 4,
     paddingVertical: 2,
@@ -129,7 +144,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   modeToggleText: {
     fontSize: 11,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.grey2,
     letterSpacing: 0.6,
   },

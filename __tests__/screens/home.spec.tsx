@@ -1,5 +1,6 @@
 import React from "react"
 import { it } from "@jest/globals"
+import { ApolloError } from "@apollo/client"
 import { MockedResponse } from "@apollo/client/testing"
 import { GraphQLError } from "graphql"
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
@@ -7,12 +8,15 @@ import { RefreshControl, StyleSheet } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { HomeScreen } from "../../app/screens/home-screen"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
+
 import { ContextForScreen } from "./helper"
 import { flushEffects } from "../helpers/flush-effects"
 import { waitForStableRender } from "../helpers/wait-for-stable-render"
 import {
   AccountLevel,
   BulletinsDocument,
+  CardStatus,
   HomeAuthedDocument,
   HomeUnauthedDocument,
   Network,
@@ -208,6 +212,7 @@ jest.mock("@app/config/feature-flags-context", () => {
 })
 
 let mockIsAnonMode = false
+let mockIsTokenMissing = false
 
 jest.mock("@app/hooks/use-transfer-blocked", () => ({
   useTransferBlocked: () => mockTransferBlockedOverride,
@@ -224,9 +229,10 @@ jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
     isRegionPending: mockRegionPendingOverride,
     isRegionDetermined: mockDollarRegionDeterminedOverride,
   }),
-  useDollarBalanceGated: () => mockIsAnonMode || mockDollarBalanceRestrictedOverride,
+  useDollarBalanceGated: () =>
+    mockIsTokenMissing || mockIsAnonMode || mockDollarBalanceRestrictedOverride,
   useDollarBalanceGate: () => ({
-    isGated: mockIsAnonMode || mockDollarBalanceRestrictedOverride,
+    isGated: mockIsTokenMissing || mockIsAnonMode || mockDollarBalanceRestrictedOverride,
     isRegionPending: mockRegionPendingOverride,
     reason: mockDollarGateReason(),
   }),
@@ -234,6 +240,7 @@ jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
 
 /** The gate's own reading of a closed gate, mirrored so the modal's copy can be asserted. */
 const mockDollarGateReason = (): GateReason | null => {
+  if (mockIsTokenMissing) return GateReason.Network
   if (mockIsAnonMode) return GateReason.Anon
   if (!mockDollarBalanceRestrictedOverride) return null
   return mockDollarRegionDeterminedOverride ? GateReason.Region : GateReason.UnknownRegion
@@ -270,6 +277,24 @@ const UPGRADE_MODAL_DELAY_WITH_SLACK_MS = 2000
 let mockIsRestrictedRegion = false
 let mockIsRestrictedRegionEvaluationPending = false
 let mockCanShowUpgradeModal = false
+/** Unset keeps the real hook's answer; a spec sets it to price Home off an old rate. */
+let mockPriceFreshness: string | undefined
+let mockHomeCard: { id: string; status: CardStatus } | undefined
+let mockHomeCardLoaded = false
+let mockHomeCardLoading = false
+let mockHomeCardError: ApolloError | undefined
+let mockHomeCardBalanceSats: number | undefined = 0
+let mockHomeCardBalanceError: ApolloError | undefined
+let mockGaloyInstanceId: string | undefined
+const mockRefetchCardData = jest.fn()
+const mockRefetchCardBalance = jest.fn()
+const mockUseCardData = jest.fn((_options: { skip?: boolean }) => ({
+  card: mockHomeCard,
+  hasLoaded: mockHomeCardLoaded,
+  loading: mockHomeCardLoading,
+  error: mockHomeCardError,
+  refetch: mockRefetchCardData,
+}))
 const mockPresentRestrictedRegionModal = jest.fn()
 jest.mock("@app/components/restricted-region", () => ({
   useRestrictedRegion: () => ({
@@ -506,6 +531,19 @@ jest.mock("@app/utils/helper", () => ({
   isIos: true,
 }))
 
+jest.mock("@app/hooks/use-price-conversion", () => {
+  const actual = jest.requireActual("@app/hooks/use-price-conversion")
+  return {
+    ...actual,
+    usePriceConversion: () => {
+      const result = actual.usePriceConversion()
+      return mockPriceFreshness
+        ? { ...result, priceFreshness: mockPriceFreshness }
+        : result
+    },
+  }
+})
+
 jest.mock("@app/hooks", () => {
   const actual = jest.requireActual("@app/hooks")
 
@@ -526,6 +564,24 @@ jest.mock("@app/hooks", () => {
       markShownUpgradeModal: jest.fn(),
       resetUpgradeModal: jest.fn(),
     }),
+    useCardData: (options: { skip?: boolean }) => mockUseCardData(options),
+    useCardBalance: () => ({
+      availableSats: mockHomeCardBalanceSats,
+      error: mockHomeCardBalanceError,
+      refetch: mockRefetchCardBalance,
+    }),
+    /** Lets a case run on another instance, since the card only exists on Staging. */
+    useAppConfig: () => {
+      const config = actual.useAppConfig()
+      if (!mockGaloyInstanceId) return config
+      return {
+        ...config,
+        appConfig: {
+          ...config.appConfig,
+          galoyInstance: { ...config.appConfig.galoyInstance, id: mockGaloyInstanceId },
+        },
+      }
+    },
   }
 })
 
@@ -993,6 +1049,7 @@ const resetHomeScreenMocks = () => {
   mockIsFocused = true
   mockActiveWalletOverride = null
   mockActiveAccountOverride = null
+  mockPriceFreshness = undefined
   mockDollarBalanceRestrictedOverride = false
   mockDollarRegionDeterminedOverride = true
   mockRegionPendingOverride = false
@@ -1008,9 +1065,19 @@ const resetHomeScreenMocks = () => {
   mockDollarBalanceModalRegionUnknown = false
   mockForcedConversionParams = null
   mockIsAnonMode = false
+  mockIsTokenMissing = false
   mockIsRestrictedRegion = false
   mockIsRestrictedRegionEvaluationPending = false
   mockCanShowUpgradeModal = false
+  mockHomeCard = undefined
+  mockHomeCardLoaded = false
+  mockHomeCardLoading = false
+  mockHomeCardError = undefined
+  mockHomeCardBalanceSats = 0
+  mockHomeCardBalanceError = undefined
+  mockGaloyInstanceId = undefined
+  mockRefetchCardData.mockResolvedValue(undefined)
+  mockRefetchCardBalance.mockResolvedValue(undefined)
   mockTwoFactorSessionPrompt.isModalOpen = false
   mockTwoFactorEnforcement.isSessionStartPending = false
   jest.clearAllMocks()
@@ -1491,6 +1558,42 @@ describe("HomeScreen", () => {
 
     mockActiveWalletOverride = null
   })
+
+  /** Staging's network has no dollar token: neither Enhanced Mode nor the region would
+   *  open the gate, and the row's label already says why. */
+  it.each([
+    ["outside Anon mode", false],
+    ["in Anon mode", true],
+  ])(
+    "keeps the disabled transfer button quiet on a network with no dollar token, %s",
+    async (_label, isAnonMode) => {
+      mockIsTokenMissing = true
+      mockIsAnonMode = isAnonMode
+      mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
+      currentMocks = generateHomeMock({
+        level: AccountLevel.One,
+        network: Network.Mainnet,
+        btcBalance: 1000,
+        usdBalance: 5000,
+      })
+
+      const { getByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+      expect(mockNavigate).not.toHaveBeenCalledWith("conversionDetails")
+      expect(mockDollarBalanceModalVisible).toBe(false)
+      expect(mockPromptEnhancedMode).not.toHaveBeenCalled()
+
+      mockActiveWalletOverride = null
+    },
+  )
 
   it("keeps the transfer button inert and unexplained while the region is still resolving", async () => {
     mockRegionPendingOverride = true
@@ -2149,6 +2252,313 @@ describe("SelfCustodialInfoBulletin gating", () => {
     await flushEffects()
 
     expect(mockSelfCustodialInfoBulletin).not.toHaveBeenCalled()
+  })
+})
+
+describe("HomeScreen card account", () => {
+  beforeEach(resetHomeScreenMocks)
+
+  const renderHome = () =>
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+  it("lists a usable card as another account with its balance", async () => {
+    mockHomeCard = { id: "card-1", status: CardStatus.Active }
+    mockHomeCardBalanceSats = 50_000
+
+    const { getByTestId } = renderHome()
+    await flushEffects()
+
+    const cardBalance = getByTestId("card-balance", { includeHiddenElements: true })
+    expect(cardBalance.props.children).toBe("50,000 SAT")
+    expect(getByTestId("balance-value", { includeHiddenElements: true })).toBeTruthy()
+  })
+
+  it("holds the total back while the card itself loads", async () => {
+    mockHomeCardLoading = true
+
+    const { queryByTestId } = renderHome()
+    await flushEffects()
+
+    expect(queryByTestId("balance-value", { includeHiddenElements: true })).toBeNull()
+  })
+
+  it("shows the total once it is known there is no card", async () => {
+    const { getByTestId } = renderHome()
+    await flushEffects()
+
+    expect(getByTestId("balance-value", { includeHiddenElements: true })).toBeTruthy()
+  })
+
+  it("holds the card row and the total back while the card balance loads", async () => {
+    mockHomeCard = { id: "card-1", status: CardStatus.Active }
+    mockHomeCardBalanceSats = undefined
+
+    const { queryByTestId } = renderHome()
+    await flushEffects()
+
+    expect(queryByTestId("card-balance", { includeHiddenElements: true })).toBeNull()
+    expect(queryByTestId("balance-value", { includeHiddenElements: true })).toBeNull()
+  })
+
+  it("shows the card balance error instead of a zero balance", async () => {
+    mockHomeCard = { id: "card-1", status: CardStatus.Active }
+    mockHomeCardBalanceSats = undefined
+    mockHomeCardBalanceError = new ApolloError({
+      errorMessage: "card balance unavailable",
+    })
+
+    const { getByText, queryByTestId } = renderHome()
+    await flushEffects()
+
+    expect(
+      getByText("card balance unavailable", { includeHiddenElements: true }),
+    ).toBeTruthy()
+    expect(queryByTestId("card-balance", { includeHiddenElements: true })).toBeNull()
+    expect(queryByTestId("balance-value", { includeHiddenElements: true })).toBeNull()
+  })
+
+  it("keeps a known card balance even when a later poll fails", async () => {
+    mockHomeCard = { id: "card-1", status: CardStatus.Active }
+    mockHomeCardBalanceSats = 50_000
+    mockHomeCardBalanceError = new ApolloError({
+      errorMessage: "card balance unavailable",
+    })
+
+    const { getByTestId, queryByText } = renderHome()
+    await flushEffects()
+
+    expect(getByTestId("card-balance", { includeHiddenElements: true })).toBeTruthy()
+    expect(
+      queryByText("card balance unavailable", { includeHiddenElements: true }),
+    ).toBeNull()
+  })
+
+  it("shows the card error and holds the total back when the card fails to load", async () => {
+    mockHomeCardError = new ApolloError({ errorMessage: "card unavailable" })
+
+    const { getByText, queryByTestId } = renderHome()
+    await flushEffects()
+
+    expect(getByText("card unavailable", { includeHiddenElements: true })).toBeTruthy()
+    expect(queryByTestId("balance-value", { includeHiddenElements: true })).toBeNull()
+  })
+
+  it("keeps a card already on hand when a later card lookup fails", async () => {
+    mockHomeCardLoaded = true
+    mockHomeCard = { id: "card-1", status: CardStatus.Active }
+    mockHomeCardBalanceSats = 50_000
+    mockHomeCardError = new ApolloError({ errorMessage: "card unavailable" })
+
+    const { getByTestId, queryByText } = renderHome()
+    await flushEffects()
+
+    expect(getByTestId("card-balance", { includeHiddenElements: true })).toBeTruthy()
+    expect(getByTestId("balance-value", { includeHiddenElements: true })).toBeTruthy()
+    expect(queryByText("card unavailable", { includeHiddenElements: true })).toBeNull()
+  })
+
+  describe("error boxes", () => {
+    const homeAuthedFailure = (message: string): MockedResponse => ({
+      request: { query: HomeAuthedDocument },
+      maxUsageCount: Number.POSITIVE_INFINITY,
+      error: new Error(message),
+    })
+
+    it("shows an error the home and the card share only once", async () => {
+      currentMocks = [homeAuthedFailure("Network request failed")]
+      mockHomeCardError = new ApolloError({
+        networkError: new Error("Network request failed"),
+      })
+
+      const { findAllByText } = renderHome()
+
+      expect(
+        await findAllByText("Network request failed", { includeHiddenElements: true }),
+      ).toHaveLength(1)
+    })
+
+    it("shows a card failure next to a different home error", async () => {
+      currentMocks = [homeAuthedFailure("home unavailable")]
+      mockHomeCardError = new ApolloError({ errorMessage: "card unavailable" })
+
+      const { findByText, getByText } = renderHome()
+
+      expect(
+        await findByText("home unavailable", { includeHiddenElements: true }),
+      ).toBeTruthy()
+      expect(getByText("card unavailable", { includeHiddenElements: true })).toBeTruthy()
+    })
+  })
+
+  it("keeps the total of an account known to have no card when a later lookup fails", async () => {
+    mockHomeCardLoaded = true
+    mockHomeCardError = new ApolloError({ errorMessage: "card unavailable" })
+
+    const { getByTestId, queryByText } = renderHome()
+    await flushEffects()
+
+    expect(getByTestId("balance-value", { includeHiddenElements: true })).toBeTruthy()
+    expect(queryByText("card unavailable", { includeHiddenElements: true })).toBeNull()
+  })
+
+  describe("pull to refresh", () => {
+    beforeEach(() => {
+      mockRefetchCustodialRestrictions.mockResolvedValue(undefined)
+    })
+
+    const pull = async () => {
+      // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+      const { UNSAFE_getByType } = renderHome()
+      await flushEffects()
+      await act(async () => {
+        await UNSAFE_getByType(RefreshControl).props.onRefresh()
+      })
+    }
+
+    it("asks for the card and its balance again on Staging", async () => {
+      mockGaloyInstanceId = "Staging"
+      mockHomeCard = { id: "card-1", status: CardStatus.Active }
+      mockHomeCardBalanceSats = 50_000
+
+      await pull()
+
+      expect(mockRefetchCardData).toHaveBeenCalledTimes(1)
+      expect(mockRefetchCardBalance).toHaveBeenCalledTimes(1)
+    })
+
+    it("keeps the spinner until the card balance comes back", async () => {
+      mockGaloyInstanceId = "Staging"
+      mockHomeCard = { id: "card-1", status: CardStatus.Active }
+      mockHomeCardBalanceSats = 50_000
+      let resolveCardBalance: (value: undefined) => void = () => {}
+      mockRefetchCardBalance.mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveCardBalance = resolve
+        }),
+      )
+      // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+      const { UNSAFE_getByType } = renderHome()
+      await flushEffects()
+
+      act(() => {
+        UNSAFE_getByType(RefreshControl).props.onRefresh()
+      })
+      await flushEffects()
+
+      expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(true)
+
+      await act(async () => {
+        resolveCardBalance(undefined)
+      })
+
+      await waitFor(() =>
+        expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false),
+      )
+    })
+
+    it("keeps the spinner for the card balance even when the card refetch fails", async () => {
+      mockGaloyInstanceId = "Staging"
+      mockHomeCard = { id: "card-1", status: CardStatus.Active }
+      mockHomeCardBalanceSats = 50_000
+      mockRefetchCardData.mockRejectedValueOnce(new Error("card unavailable"))
+      let resolveCardBalance: (value: undefined) => void = () => {}
+      mockRefetchCardBalance.mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveCardBalance = resolve
+        }),
+      )
+      // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+      const { UNSAFE_getByType } = renderHome()
+      await flushEffects()
+
+      act(() => {
+        UNSAFE_getByType(RefreshControl).props.onRefresh()
+      })
+      await flushEffects()
+
+      expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(true)
+
+      await act(async () => {
+        resolveCardBalance(undefined)
+      })
+
+      await waitFor(() =>
+        expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false),
+      )
+    })
+
+    it("does not ask for the balance of a card that is not usable", async () => {
+      mockGaloyInstanceId = "Staging"
+      mockHomeCard = { id: "card-1", status: CardStatus.Canceled }
+
+      await pull()
+
+      expect(mockRefetchCardData).toHaveBeenCalledTimes(1)
+      expect(mockRefetchCardBalance).not.toHaveBeenCalled()
+    })
+
+    it("leaves the card alone off Staging", async () => {
+      mockHomeCard = { id: "card-1", status: CardStatus.Active }
+      mockHomeCardBalanceSats = 50_000
+
+      await pull()
+
+      expect(mockRefetchCardData).not.toHaveBeenCalled()
+      expect(mockRefetchCardBalance).not.toHaveBeenCalled()
+    })
+
+    it("leaves the card alone in a self-custodial session", async () => {
+      mockGaloyInstanceId = "Staging"
+      mockActiveWalletOverride = selfCustodialReadyWalletOverride(0)
+      mockHomeCard = { id: "card-1", status: CardStatus.Active }
+      mockHomeCardBalanceSats = 50_000
+
+      await pull()
+
+      expect(mockRefetchCardData).not.toHaveBeenCalled()
+      expect(mockRefetchCardBalance).not.toHaveBeenCalled()
+    })
+  })
+
+  it("leaves a card that is not usable out of the accounts", async () => {
+    mockHomeCard = { id: "card-1", status: CardStatus.Canceled }
+
+    const { queryByTestId } = renderHome()
+    await flushEffects()
+
+    expect(queryByTestId("card-balance", { includeHiddenElements: true })).toBeNull()
+  })
+
+  it("only asks for the card on the staging instance", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(mockUseCardData).toHaveBeenCalledWith({ skip: true })
+    expect(mockUseCardData).not.toHaveBeenCalledWith({ skip: false })
+  })
+
+  it("asks for the card in a custodial session on Staging", async () => {
+    mockGaloyInstanceId = "Staging"
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockUseCardData).toHaveBeenCalledWith({ skip: false })
+  })
+
+  it("does not ask for the card in a self-custodial session", async () => {
+    mockGaloyInstanceId = "Staging"
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(0)
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockUseCardData).toHaveBeenCalledWith({ skip: true })
+    expect(mockUseCardData).not.toHaveBeenCalledWith({ skip: false })
   })
 })
 
@@ -2913,6 +3323,23 @@ describe("HomeScreen pending receive badge", () => {
       await flushEffects()
     })
 
+    it("opens the unclaimed-deposits screen when the pill holds a deposit claimed early", async () => {
+      mockActiveWalletOverride = selfCustodialWallet
+      mockPendingDepositsOverride = { deposits: [sparkDeposit("claiming")] }
+
+      const { findByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      fireEvent.press(await findByTestId("pending-receive-badge"))
+
+      expect(mockNavigate).toHaveBeenCalledWith("unclaimedDepositsScreen")
+
+      await flushEffects()
+    })
+
     it("leaves the badge to the unclaimed-deposit banner for claimable deposits", async () => {
       mockActiveWalletOverride = selfCustodialWallet
       mockPendingDepositsOverride = { deposits: [sparkDeposit("claimable")] }
@@ -3293,6 +3720,39 @@ describe("HomeScreen layout under font scaling (blink-wip#931)", () => {
     expect(rowStyle.flex).toBeUndefined()
   })
 
+  /** The header row has no room under its buttons, so their touch boxes grow up and
+   *  sideways only (48×41dp), into the row's margins, never by a negative margin. */
+  it("gives the price and menu buttons a 48×41dp box with no negative margin", async () => {
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    const row = StyleSheet.flatten(getByTestId("home-header-row").props.style)
+    expect(row).toMatchObject({ marginHorizontal: 13, marginTop: 0 })
+    for (const testID of ["graph", "home-settings-button"]) {
+      const style = StyleSheet.flatten(getByTestId(testID).props.style)
+      expect(style).toMatchObject({
+        width: 48,
+        height: 41,
+        paddingTop: 7,
+        paddingBottom: 0,
+      })
+      const margins = [
+        style.marginTop,
+        style.marginRight,
+        style.marginBottom,
+        style.marginLeft,
+      ]
+      expect(
+        margins.filter((margin) => typeof margin === "number" && margin < 0),
+      ).toEqual([])
+    }
+  })
+
   it("keeps the settings menu button wired in the header", async () => {
     const { getByTestId } = render(
       <ContextForScreen>
@@ -3563,5 +4023,49 @@ describe("HomeScreen sanctioned session", () => {
     const { queryByTestId } = await renderAndSettleUpgradeDelay()
 
     expect(queryByTestId("migrate-now-modal")).toBeNull()
+  })
+})
+
+describe("HomeScreen stale exchange rate (blink-wip#2035)", () => {
+  /** Real copy rather than the empty strings an unloaded locale renders: the line only
+   *  showed for a non-empty notice. Last in the file, as the locale stays loaded. */
+  beforeAll(() => loadLocale("en"))
+  beforeEach(resetHomeScreenMocks)
+
+  it("shows the balance with no line under it when the rate is stale", async () => {
+    mockPriceFreshness = "stale"
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+        {
+          id: "usd-1",
+          walletCurrency: "USD",
+          balance: { amount: 0, currency: "USD", currencyCode: "USD" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+
+    const { getByTestId, queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    // The line came and went as the launch's refresh landed, moving everything under
+    // the balance. An old rate still prices the figure; it is just not announced.
+    expect(getByTestId("balance-value")).toBeTruthy()
+    expect(queryByTestId("balance-rate-notice")).toBeNull()
   })
 })

@@ -1,63 +1,55 @@
 import * as React from "react"
-import { Alert, Share, TouchableOpacity, View } from "react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
+import { Alert, Share, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+import { ActionField } from "@app/components/action-field"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
+import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
+import { headerBackControl } from "@app/components/header-back-control/header-back-control"
+import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
+import { ScreenSecurityGate } from "@app/components/screen-security-gate"
 import { QrCodeComponent } from "@app/components/totp-export"
 import { useClipboard } from "@app/hooks"
-import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { recordAppError } from "@app/utils/error-reporting"
+import { ellipsizeMiddle } from "@app/utils/helper"
 import { testProps } from "@app/utils/testProps"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 const CLIPBOARD_CLEAR_MS = 60_000
+const SHARE_ICON_SIZE = 16
+const SHARE_HIT_SLOP = { top: 8, bottom: 8, left: 20, right: 20 }
+/** Both ends of the key stay readable, as on the design: blink_dHWO28fQO...3JU4Nc49C */
+const SECRET_PREVIEW = { maxLength: 30, maxResultLeft: 15, maxResultRight: 9 }
 
 type Props = {
   secret: string
   name: string
 }
 
-export const ApiKeySecretReveal: React.FC<Props> = ({ secret, name }) => {
-  useScreenSecurity()
-
+/** The gate mounts this only once the screenshot guard is actually on — the secret,
+ *  its QR and the Copy/Share actions must not exist while registration is pending.
+ *  The dismissal guard lives in the wrapper below so it also covers the pending
+ *  and failed states. */
+const ApiKeySecretRevealContent: React.FC<
+  Props & { onDone: () => void; onShownChange: (shown: boolean) => void }
+> = ({ secret, name, onDone, onShownChange }) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
+
+  React.useEffect(() => {
+    onShownChange(true)
+    return () => onShownChange(false)
+  }, [onShownChange])
+
   const {
     theme: { colors },
   } = useTheme()
   const { copyToClipboard } = useClipboard(CLIPBOARD_CLEAR_MS)
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const allowLeaveRef = React.useRef(false)
-
-  React.useEffect(() => {
-    navigation.setOptions({
-      title: LL.ApiScreen.keyCreatedTitle(),
-      headerBackVisible: false,
-      gestureEnabled: false,
-    })
-  }, [navigation, LL])
-
-  // headerBackVisible/gestureEnabled don't cover the Android system back
-  // button — block every removal not initiated by the Done button so the
-  // one-time secret can't be dismissed accidentally
-  React.useEffect(
-    () =>
-      navigation.addListener("beforeRemove", (e) => {
-        if (!allowLeaveRef.current) e.preventDefault()
-      }),
-    [navigation],
-  )
-
-  const finish = () => {
-    allowLeaveRef.current = true
-    navigation.goBack()
-  }
 
   const copySecret = () =>
     copyToClipboard({ content: secret, message: LL.ApiScreen.secretCopied() })
@@ -67,7 +59,7 @@ export const ApiKeySecretReveal: React.FC<Props> = ({ secret, name }) => {
       await Share.share({ message: secret })
     } catch (err) {
       if (err instanceof Error) {
-        crashlytics().recordError(err)
+        recordAppError(err)
         Alert.alert(err.message)
       }
     }
@@ -75,96 +67,134 @@ export const ApiKeySecretReveal: React.FC<Props> = ({ secret, name }) => {
 
   return (
     <Screen style={styles.container} preset="scroll">
-      <View style={styles.header}>
-        <GaloyIcon name="check-circle" size={40} color={colors.primary} />
-        <Text type="p1" style={styles.name}>
-          {name}
-        </Text>
-        <Text type="p3" color={colors.grey2} style={styles.warning}>
-          {LL.ApiScreen.secretWarning()}
-        </Text>
-      </View>
+      <View style={styles.body}>
+        <IconHero
+          icon="check-badge"
+          iconColor={colors._green}
+          title={name}
+          subtitle={LL.ApiScreen.secretWarning()}
+        />
 
-      <View style={styles.qrContainer}>
         <QrCodeComponent value={secret} />
+
+        <View style={styles.secret}>
+          <ActionField
+            testID="api-key-secret"
+            value={ellipsizeMiddle(secret, SECRET_PREVIEW)}
+            icon="copy-paste"
+            accessibilityLabel={LL.CopySecretComponent.button()}
+            onAction={copySecret}
+          />
+        </View>
+
+        <GaloyTertiaryButton
+          {...testProps(LL.common.share())}
+          clear
+          title={LL.common.share()}
+          icon={
+            <View style={styles.shareIcon}>
+              <GaloyIcon name="share" size={SHARE_ICON_SIZE} color={colors.primary} />
+            </View>
+          }
+          hitSlop={SHARE_HIT_SLOP}
+          onPress={shareSecret}
+        />
       </View>
-
-      <TouchableOpacity
-        {...testProps("api-key-secret")}
-        style={styles.secretContainer}
-        onPress={copySecret}
-        activeOpacity={0.7}
-      >
-        <Text
-          type="p2"
-          style={styles.secretText}
-          numberOfLines={1}
-          ellipsizeMode="middle"
-        >
-          {secret}
-        </Text>
-        <GaloyIcon name="copy-paste" size={20} color={colors.primary} />
-      </TouchableOpacity>
-
-      <GaloySecondaryButton
-        {...testProps(LL.common.share())}
-        title={LL.common.share()}
-        iconName="share"
-        onPress={shareSecret}
-      />
 
       <View style={styles.buttonsContainer}>
         <GaloyPrimaryButton
           {...testProps(LL.ApiScreen.done())}
           title={LL.ApiScreen.done()}
-          onPress={finish}
+          onPress={onDone}
         />
       </View>
     </Screen>
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+export const ApiKeySecretReveal: React.FC<Props> = (props) => {
+  const { LL } = useI18nContext()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const allowLeaveRef = React.useRef(false)
+  // True only while the gated content is mounted, which is only after the
+  // screenshot guard is on. The header callback reads it at press time.
+  const secretShownRef = React.useRef(false)
+  const onShownChange = React.useCallback((shown: boolean) => {
+    secretShownRef.current = shown
+  }, [])
+
+  const finish = React.useCallback(() => {
+    allowLeaveRef.current = true
+    navigation.goBack()
+  }, [navigation])
+
+  // The failure view's Back cannot be a plain goBack: it would pop the screen
+  // and destroy the unrecoverable secret without a chance to copy it.
+  const confirmDiscard = React.useCallback(() => {
+    Alert.alert(LL.ApiScreen.discardSecretTitle(), LL.ApiScreen.discardSecretBody(), [
+      { text: LL.common.cancel(), style: "cancel" },
+      { text: LL.common.discard(), style: "destructive", onPress: finish },
+    ])
+  }, [LL, finish])
+
+  // finish() sets allowLeave and pops immediately, so the header must not use it
+  // until the secret is on screen. Until then it asks, the same as the gate's Back.
+  const onHeaderBack = React.useCallback(() => {
+    if (secretShownRef.current) finish()
+    else confirmDiscard()
+  }, [finish, confirmDiscard])
+
+  // The dismissal guard is installed here, outside the gate: the one-time secret
+  // already sits in the parent's state while registration is pending or failed,
+  // so a back swipe must not pop the screen and silently destroy it.
+  React.useEffect(() => {
+    navigation.setOptions({
+      title: LL.ApiScreen.keyCreatedTitle(),
+      headerLeft: headerBackControl({ onPress: onHeaderBack }),
+      gestureEnabled: false,
+    })
+  }, [navigation, LL, onHeaderBack])
+
+  // gestureEnabled doesn't cover the Android system back
+  // button — block every removal not initiated by Done, the header arrow or a confirmed discard
+  React.useEffect(
+    () =>
+      navigation.addListener("beforeRemove", (e) => {
+        if (!allowLeaveRef.current) e.preventDefault()
+      }),
+    [navigation],
+  )
+
+  return (
+    <ScreenSecurityGate onBack={confirmDiscard}>
+      <ApiKeySecretRevealContent
+        {...props}
+        onDone={finish}
+        onShownChange={onShownChange}
+      />
+    </ScreenSecurityGate>
+  )
+}
+
+const useStyles = makeStyles(() => ({
   container: {
     paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingBottom: 20,
     flexGrow: 1,
   },
-  header: {
+  body: {
     alignItems: "center",
-    rowGap: 8,
+    rowGap: 14,
   },
-  name: {
-    fontWeight: "bold",
+  secret: {
+    alignSelf: "stretch",
   },
-  warning: {
-    textAlign: "center",
-  },
-  qrContainer: {
-    alignItems: "center",
-    marginVertical: 20,
-  },
-  secretContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 8,
-    gap: 12,
-    backgroundColor: colors.grey5,
-    marginBottom: 16,
-  },
-  secretText: {
-    flex: 1,
-    fontFamily: "monospace",
-    letterSpacing: 0.5,
-    color: colors.grey0,
+  shareIcon: {
+    marginLeft: 8,
   },
   buttonsContainer: {
     flex: 1,
     justifyContent: "flex-end",
     marginTop: 20,
-    paddingBottom: 20,
   },
 }))

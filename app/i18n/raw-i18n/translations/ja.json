@@ -1,6 +1,7 @@
 {
     "ApiScreen": {
         "keysGroupTitle": "APIキー",
+        "inactiveKeys": "無効なキー ({count})",
         "noKeys": "APIキーはまだありません",
         "createKey": "APIキーを作成",
         "createTitle": "新しいAPIキー",
@@ -27,10 +28,13 @@
         "revokeTitle": "APIキーを取り消しますか？",
         "revokeBody": "「{name: string}」は直ちに機能しなくなります。この操作は元に戻せません。",
         "revoke": "取り消す",
+        "revokeGoBack": "戻る",
         "revokeSuccess": "APIキーを取り消しました",
         "createError": "APIキーを作成できませんでした。もう一度お試しください。",
         "revokeError": "APIキーを取り消せませんでした。もう一度お試しください。",
         "loadError": "APIキーを読み込めませんでした。後でもう一度お試しください。",
+        "discardSecretTitle": "この API キーを破棄しますか？",
+        "discardSecretBody": "シークレットが表示されるのはこの一度だけです。今離れると、キーは復元できず、新しく作成する必要があります。",
         "done": "完了"
     },
     "GaloyAddressScreen": {
@@ -78,7 +82,12 @@
         "skip": "スキップ",
         "unlock": "ロックを解除",
         "usePin": "PINを有効にする",
-        "confirmLogout": "ログアウトしてもよろしいですか？キャッシュとすべてのローカル設定がリセットされます"
+        "confirmLogout": "ログアウトしてもよろしいですか？キャッシュとすべてのローカル設定がリセットされます",
+        "forgotPin": "PINをお忘れですか？ウォレットを削除",
+        "removeWalletsTitle": "このデバイスからウォレットを削除しますか？",
+        "removeWalletsBody": "このデバイスからすべてのウォレットを削除し、ログアウトします。ウォレットを元に戻すには、そのバックアップフレーズが必要です。フレーズがないと、ウォレットは失われます。",
+        "removeWalletsConfirm": "ウォレットを削除",
+        "removeWalletsFailed": "一部のウォレットを削除できませんでした。もう一度お試しください。"
     },
     "PeopleScreen": {
         "title": "つながり",
@@ -2135,6 +2144,7 @@
         "addPlace": "マップに追加",
         "addPlaceTitle": "店舗を提案",
         "submitPlaceRequest": "リクエストを送信",
+        "showMyLocation": "現在地を表示",
         "placePinHint": "マップを動かしてピンを場所に合わせてください",
         "placeName": "名称",
         "placeNameHint": "その場所の名前",
@@ -2176,16 +2186,19 @@
         "walletCountNotTwo": "ウォレット数が2つではありません。ダッシュボードからこのアカウントのすべてのウォレットと資金を確認してください"
     },
     "PinScreen": {
+        "attemptUnrecorded": "試行を安全に記録できませんでした。",
+        "attemptsLeft": "残り{attemptsRemaining: number}回トライできます。",
         "attemptsRemaining": "PINコードが間違っています。残り{attemptsRemaining: number}回トライできます。",
         "enterPin": "PINコードを入力してください",
-        "lockoutUnavailable": "失敗した試行を安全に記録できませんでした。ログアウトします。",
+        "oneAttemptLeft": "残り1回トライできます。",
         "oneAttemptRemaining": "PINコードが間違っています。残り1回トライできます。",
         "pinUnreadable": "PINコードを確認できませんでした。もう一度お試しください。",
         "setPin": "PINコードを設定してください",
         "setPinFailedMatch": "PINコードが一致しませんでした。PINコードを設定してください",
         "storePinFailed": "PINコードを保存できません。",
         "tooManyAttempts": "間違えられる上限を超えましたので、自動ログアウトしました。",
-        "tryAgainIn": "{seconds: number}秒後にもう一度お試しください。",
+        "attemptBudgetSpent": "間違えられる上限を超えました。",
+        "tryAgainIn": "{time: string}後にもう一度お試しください。",
         "verifyPin": "PINコードを認証する"
     },
     "PriceHistoryScreen": {
@@ -2220,6 +2233,12 @@
         "error": "インボイスの作成に失敗しました。この問題が解決しない場合は、サポートにお問い合わせください。",
         "copyInvoice": "コピー",
         "shareInvoice": "共有",
+        "newAddress": "新規",
+        "newAddressHint": "新しいビットコインアドレスを生成します。以前のアドレスも引き続き使えます。",
+        "newAddressGenerated": "新しいアドレスの準備ができました。以前のアドレスも引き続き使えます。",
+        "newAddressFailed": "新しいアドレスを生成できませんでした。もう一度お試しください。",
+        "newAddressRateLimited": "新しいアドレスの作成回数が多すぎます。しばらく待ってから再度お試しください。",
+        "onchainAddressLoadFailed": "ビットコインアドレスを読み込めませんでした。「新規」をタップしてもう一度お試しください。",
         "addAmount": "金額を設定する",
         "expired": "有効期限切れのインボイスです",
         "expiresIn": "有効期限",
@@ -2355,6 +2374,8 @@
         "invalidAmount": "無効な金額が含まれています。有効な金額で再発行してください。",
         "usernameDoesNotExist": "{lnAddress: string}は、{bankName: string}アドレスとして存在しないようです。",
         "usernameDoesNotExistAdvice": "スペルが正しいことを確認するか、代わりにライトニング・インボイスまたはビットコイン・アドレスを受金者にお尋ねください。",
+        "destinationUnverifiable": "現在 {lnAddress} を確認できませんでした。{bankName} のサーバーが応答していません。",
+        "destinationUnverifiableAdvice": "アドレスは問題ない可能性が高いです。少し待って再試行するか、受取人に LN 請求書か BTC アドレスを尋ねてください。",
         "selfPaymentError": "{lnAddress: string}は、あなたの{bankName: string}アドレスです。",
         "selfPaymentAdvice": "あなたが所有している別ウォレットに送金したい場合は、代わりにライトニング・インボイス、またはビットコイン・アドレスを使用することができます。",
         "lnAddressError": "このライトニング・アドレスにアクセスできません。アドレスに誤りがない場合は、のちほど再トライしてください。",
@@ -2577,12 +2598,14 @@
         "error": "現在プロフィールを取得できません",
         "fromThisDevice": "このデバイスから？",
         "switchAccount": "別のアカウントに切り替えました",
-        "removedAccount": "アカウント {identifier: string} を削除しました。"
+        "removedAccount": "アカウント {identifier: string} を削除しました。",
+        "removeAccount": "アカウントを削除"
     },
     "StablesatsRestriction": {
         "walletLabel": "あなたの地域ではご利用いただけません",
         "anonModeWalletLabel": "Incognito モードでは利用できません",
-        "unknownRegionWalletLabel": "利用可否を確認できませんでした。下に引いて再試行してください"
+        "unknownRegionWalletLabel": "利用可否を確認できませんでした。下に引いて再試行してください",
+        "networkWalletLabel": "このネットワークでは利用できません"
     },
     "AnonModeConvertModal": {
         "title": "まずドル残高を移してください",
@@ -2664,7 +2687,7 @@
     "TransactionDetailScreen": {
         "paid": "送金先/送金元",
         "received": "受金完了",
-        "spent": "送金完了",
+        "sent": "送金完了",
         "sending": "送信中",
         "receivingAccount": "受金ウォレット",
         "sendingAccount": "送金ウォレット",
@@ -2740,6 +2763,7 @@
             "tooLong": "アドレスは50文字以上でなければなりません",
             "invalidCharacter": "アドレスにはアルファベット、数字、アンダースコアのみ使用できます",
             "addressUnavailable": "申し訳ありませんが、このアドレスは既に使われています",
+            "serverUnreachable": "アドレスサーバーに接続できませんでした。少し待って再試行してください。",
             "unknownError": "不明なエラーが発生しました。時間をあけてもう一度トライしてみてください",
             "backupRequired": "Back up your wallet before creating a Lightning address"
         },
@@ -3034,7 +3058,8 @@
         "problemPersists": "問題が解決しない場合は、サポートにお問い合わせください。",
         "fatalError": "アプリケーションデータの読み込みに問題があるようです。 問題が解決しない場合は、サポートにお問い合わせください。",
         "showError": "エラーを表示する",
-        "clearAppData": "アプリのデータを消去してログアウトする"
+        "clearAppData": "アプリのデータを消去してログアウトする",
+        "screenSecurityUnavailable": "スクリーンショット保護をオンにできなかったため、この画面は非表示のままです。"
     },
     "notifications": {
         "payment": {
@@ -3051,7 +3076,6 @@
         "faq": "よくある質問",
         "statusPage": "ステータス",
         "telegram": "Telegram",
-        "mattermost": "Mattermost",
         "defaultEmailSubject": "{bankName: string} - サポート",
         "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
         "emailCopied": "メールアドレス{email: string}がクリップボードにコピーされました",
@@ -3065,7 +3089,13 @@
         "deleteAccountFromPhone": "こんにちは！アカウントを閉じてください。私の電話番号は {phoneNumber: string} です。",
         "deleteAccountError": "エラーが発生しました。お問い合わせは{email: string}までお願いします。",
         "bye": "バイバイ！",
-        "deleteAccountWarning": "注意：アカウントの閉鎖は永久です！\n閉じる前にウォレットに資金がないことを確認してください。\n閉じられたアカウントは復元できません。\n法令により特定の記録を保持する場合があります。"
+        "deleteAccountWarning": "注意：アカウントの閉鎖は永久です！\n閉じる前にウォレットに資金がないことを確認してください。\n閉じられたアカウントは復元できません。\n法令により特定の記録を保持する場合があります。",
+        "downloadLogs": "ログをダウンロード",
+        "exportLogsTitle": "ウォレットのログを共有",
+        "exportLogsBody": "このファイルは、サポートチームがウォレットの問題を調べるために使います。この端末上のすべての非カストディアルウォレット（このウォレットだけでなく）の支払い履歴（金額、請求書、アドレス）とウォレット識別子が含まれますが、リカバリーフレーズや鍵は含まれません。サポートチームにだけ共有してください。",
+        "exportLogsConfirm": "ログを共有",
+        "noLogsYet": "共有できるログはまだありません。ウォレットを開いて、もう一度お試しください。",
+        "exportLogsError": "ログをエクスポートできませんでした。もう一度お試しください。"
     },
     "lnurl": {
         "overLimit": "最大限度額以上の送金はできません",
@@ -3304,7 +3334,10 @@
             "noLimit": "制限なし",
             "limitUpdateSuccess": "制限が正常に更新されました",
             "limitUpdateError": "制限の更新に失敗しました",
-            "limitMustBePositive": "制限はゼロより大きい必要があります"
+            "limitMustBePositive": "制限はゼロより大きい必要があります",
+            "atmToggleError": "ATM引き出しの更新に失敗しました",
+            "atmControlsLoadError": "ATMの制限を読み込めませんでした",
+            "invalidLimitAmount": "小数点以下2桁までの有効な金額を入力してください"
         },
         "CardStatements": {
             "title": "明細",
@@ -3795,7 +3828,7 @@
         }
     },
     "BackupScreen": {
-        "title": "Back up your wallet",
+        "title": "ウォレットをバックアップ",
         "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "バックアップ方法を選択",
@@ -3853,6 +3886,7 @@
         "CloudBackup": {
             "title": "ウォレットをバックアップしましょう",
             "description": "{provider}にバックアップフレーズのコピーを保存します。",
+            "encryptCheckbox": "追加パスワードで暗号化",
             "password": "パスワード",
             "passwordPlaceholder": "（12文字以上）",
             "confirmPassword": "パスワード確認",
@@ -3920,6 +3954,12 @@
         "dollarBalanceModal": {
             "title": "ドル残高は移行できません",
             "body": "まずドル残高を空にしてください。Blinkのビットコイン残高、または他の場所へ移すことができます。"
+        },
+        "pendingDepositModal": {
+            "title": "アカウントに保留中の入金があります",
+            "body": "保留中の入金がすべて確定し、このアカウントに反映されるまで、別の種類のアカウントに移行することはできません。",
+            "contactSupportCta": "サポートに連絡",
+            "stillConfirming": "入金はまだ確定していません。数分後にもう一度お試しください。"
         },
         "balancesOverview": {
             "title": "残高を移動する",
@@ -4108,6 +4148,7 @@
         "get": "入手",
         "storeNote": "「入手」を押すとApp StoreまたはGoogle Playが開きます。インストールが終わったらBlinkに戻ってください。",
         "haveAnApp": "アプリを持っています",
+        "learnHow": "やり方を見る",
         "keyInstruction": "このセットアップキーを認証アプリにコピーしてください。",
         "qrInstruction": "別のデバイスを使っていますか？\n代わりにこのQRコードをスキャンしてください。",
         "backupTitle": "キーをバックアップ",
@@ -4194,6 +4235,8 @@
         "signInDescription": "Sign in to your custodial account to use {featureName}.",
         "noAccountTitle": "Custodial account required",
         "noAccountDescription": "{featureName} requires a Blink custodial account.",
+        "unreachableTitle": "Blink に接続できません",
+        "unreachableDescription": "{featureName} には Blink のサーバーが必要ですが、現在応答していません。ウォレットと資金に影響はありません。",
         "featureCircles": "Circles",
         "featureEarn": "学ぶ",
         "featureCard": "Card"
@@ -4216,6 +4259,9 @@
         "tokenTransfer": "{token}送金",
         "payTo": "{address}に支払い",
         "payment": "支払い"
+    },
+    "SelfCustodialStaleRate": {
+        "satsOnly": "sats で表示中 — 為替レートを取得できません"
     },
     "SelfCustodialOffline": {
         "title": "ウォレットはオフラインです",

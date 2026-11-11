@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API-sleutels",
+    "inactiveKeys": "Onaktiewe sleutels ({count})",
     "noKeys": "Nog geen API-sleutels nie",
     "createKey": "Skep API-sleutel",
     "createTitle": "Nuwe API-sleutel",
@@ -27,10 +28,13 @@
     "revokeTitle": "Herroep API-sleutel?",
     "revokeBody": "\"{name: string}\" sal onmiddellik ophou werk. Dit kan nie ongedaan gemaak word nie.",
     "revoke": "Herroep",
+    "revokeGoBack": "Gaan terug",
     "revokeSuccess": "API-sleutel herroep",
     "createError": "Kon nie die API-sleutel skep nie. Probeer weer.",
     "revokeError": "Kon nie die API-sleutel herroep nie. Probeer weer.",
     "loadError": "Kon nie jou API-sleutels laai nie. Probeer later weer.",
+    "discardSecretTitle": "Gooi hierdie API-sleutel weg?",
+    "discardSecretBody": "Dit is die enigste keer wat die geheim gewys word. As jy nou weggaan, kan die sleutel nie herwin word nie en sal jy 'n nuwe een moet skep.",
     "done": "Klaar"
   },
   "GaloyAddressScreen": {
@@ -78,7 +82,12 @@
     "skip": "Gaan verby",
     "unlock": "Ontsluit",
     "usePin": "Gebruik PIN",
-    "confirmLogout": "Is jy seker jy wil afmeld? Dit sal jou kas en alle plaaslike gebruikersinstellings herstel"
+    "confirmLogout": "Is jy seker jy wil afmeld? Dit sal jou kas en alle plaaslike gebruikersinstellings herstel",
+    "forgotPin": "PIN vergeet? Verwyder beursies",
+    "removeWalletsTitle": "Verwyder beursies van hierdie toestel?",
+    "removeWalletsBody": "Dit verwyder alle beursies van hierdie toestel en teken jou uit. Om 'n beursie terug te kry, het jy sy rugsteunfrase nodig. Daarsonder is die beursie weg.",
+    "removeWalletsConfirm": "Verwyder beursies",
+    "removeWalletsFailed": "Sommige beursies kon nie verwyder word nie. Probeer asseblief weer."
   },
   "PeopleScreen": {
     "title": "Mense",
@@ -2135,6 +2144,7 @@
     "addPlace": "Voeg by kaart",
     "addPlaceTitle": "Stel besigheid voor",
     "submitPlaceRequest": "Stuur versoek",
+    "showMyLocation": "Wys my ligging",
     "placePinHint": "Skuif die kaart om die speld op die plek te sit",
     "placeName": "Naam",
     "placeNameHint": "Wat die plek genoem word",
@@ -2176,16 +2186,19 @@
     "walletCountNotTwo": "Beursietelling is nie 2 nie. Gebruik asseblief die kontroleskerm om al die beursies en fondse van hierdie rekening te sien"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Kon nie die poging veilig aanteken nie.",
+    "attemptsLeft": "{attemptsRemaining: number} probeerslae oor.",
     "attemptsRemaining": "Verkeerde PIN. {attemptsRemaining: number} probeerslae oor. ",
     "enterPin": "Voer jou PIN-kode in",
-    "lockoutUnavailable": "Kon nie die mislukte poging veilig aanteken nie. Teken uit.",
+    "oneAttemptLeft": "1 probeerslag oor.",
     "oneAttemptRemaining": "Verkeerde PIN, 1 probeerslag oor.",
     "pinUnreadable": "Kon nie jou PIN nagaan nie. Probeer asseblief weer.",
     "setPin": "Stel jou PIN-kode in",
     "setPinFailedMatch": "PINs stem nie ooreen nie - Stel jou PIN-kode in",
     "storePinFailed": "Kan nie nou jou PIN stoor nie.",
     "tooManyAttempts": "Te veel verkeerde probeerslae. Teken uit. ",
-    "tryAgainIn": "Probeer weer oor {seconds: number} s.",
+    "attemptBudgetSpent": "Te veel verkeerde probeerslae.",
+    "tryAgainIn": "Probeer weer oor {time: string}.",
     "verifyPin": "Bevestig jou PIN-kode"
   },
   "PriceHistoryScreen": {
@@ -2220,6 +2233,12 @@
     "error": "Kon nie faktuur genereer nie. Kontak asseblief ondersteuning as hierdie probleem voortduur.",
     "copyInvoice": "Dra oor",
     "shareInvoice": "Deel",
+    "newAddress": "Nuut",
+    "newAddressHint": "Skep 'n nuwe Bitcoin-adres. Vorige adresse werk steeds.",
+    "newAddressGenerated": "Nuwe adres gereed. Vorige adresse werk steeds.",
+    "newAddressFailed": "Kon nie 'n nuwe adres skep nie. Probeer asseblief weer.",
+    "newAddressRateLimited": "Te veel nuwe adresse. Wag 'n rukkie en probeer weer.",
+    "onchainAddressLoadFailed": "Kon nie jou Bitcoin-adres laai nie. Tik op Nuut om weer te probeer.",
     "addAmount": "Vra spesifieke bedrag",
     "expired": "Hierdie faktuur het verval",
     "expiresIn": "Verval in",
@@ -2355,6 +2374,8 @@
     "invalidAmount": "Hierdie bevat 'n ongeldige bedrag. Hersien asseblief met 'n geldige bedrag. ",
     "usernameDoesNotExist": "{lnAddress: string} blyk nie 'n {bankName: string}  adres te wees wat bestaan nie.",
     "usernameDoesNotExistAdvice": "Maak seker die spelling is reg of vra die ontvanger vir 'n LN-faktuur of BTC-adres. ",
+    "destinationUnverifiable": "Ons kon {lnAddress} nie nou nagaan nie — {bankName} se bedieners reageer nie.",
+    "destinationUnverifiableAdvice": "Die adres is waarskynlik reg. Probeer netnou weer, of vra die ontvanger eerder vir 'n LN-faktuur of BTC-adres.",
     "selfPaymentError": "{lnAddress: string} is jou {bankName: string} adres. ",
     "selfPaymentAdvice": "As jy geld wil stuur na 'n ander rekening wat jy besit kan jy gebruik maak van 'n LN-faktuur of BTC-adres. ",
     "lnAddressError": "Ons sukkel om hierdie adres te bereik. As jy seker is dat dit korrek is en bestaan kan jy weer later probeer. ",
@@ -2577,12 +2598,14 @@
     "error": "Kan nie tans profiele ophaal nie",
     "fromThisDevice": "van hierdie toestel?",
     "switchAccount": "Jy het na 'n ander rekening oorgeskakel",
-    "removedAccount": "Jy het rekening {identifier: string} verwyder."
+    "removedAccount": "Jy het rekening {identifier: string} verwyder.",
+    "removeAccount": "Verwyder rekening"
   },
   "StablesatsRestriction": {
     "walletLabel": "nie beskikbaar in jou streek nie",
     "anonModeWalletLabel": "nie beskikbaar in Incognito-modus nie",
-    "unknownRegionWalletLabel": "beskikbaarheid kon nie nagegaan word nie, trek af om weer te probeer"
+    "unknownRegionWalletLabel": "beskikbaarheid kon nie nagegaan word nie, trek af om weer te probeer",
+    "networkWalletLabel": "nie beskikbaar op hierdie netwerk nie"
   },
   "AnonModeConvertModal": {
     "title": "Dra eers jou Dollar-saldo oor",
@@ -2664,7 +2687,7 @@
   "TransactionDetailScreen": {
     "paid": "Betaal aan/van",
     "received": "Jy het ontvang",
-    "spent": "Jy het spandeer",
+    "sent": "Jy het gestuur",
     "sending": "Besig om te stuur",
     "receivingAccount": "Rekening waarin onvang word",
     "sendingAccount": "Rekening waaruit gestuur word",
@@ -2740,6 +2763,7 @@
       "tooLong": "Adres kan nie meer as 50 karakters lank wees nie",
       "invalidCharacter": "Adres kan net letters, nommers en 'n onderstreep bevat",
       "addressUnavailable": "Jammer, die adres is reeds geneem",
+      "serverUnreachable": "Kon nie die adresbediener bereik nie. Probeer oor 'n oomblik weer.",
       "unknownError": "'n Onbekende fout het voorgekom, probeer asseblief later weer",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3034,7 +3058,8 @@
     "problemPersists": "As die fout aanhou opduik, kontak asseblief ondersteuning. ",
     "fatalError": "Jammer, dit lyk of ons probleme het met die toepassing se data. As die probleem voortduur, kontak asseblief ondersteuning.",
     "showError": "Wys Fout",
-    "clearAppData": "Vee Toepassingdata skoon en Teken Uit"
+    "clearAppData": "Vee Toepassingdata skoon en Teken Uit",
+    "screenSecurityUnavailable": "Hierdie skerm bly versteek omdat skermskootbeskerming nie aangeskakel kon word nie."
   },
   "notifications": {
     "payment": {
@@ -3051,7 +3076,6 @@
     "faq": "FAQ",
     "statusPage": "Statusbladsy",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Ondersteuning",
     "defaultSupportMessage": "Hi daar! Ek benodig hulp met {bankName: string}, ek gebruik weergawe {version: string} op {os: string}. ",
     "emailCopied": "e-pos {email: string} oorgedra na knipbord",
@@ -3065,7 +3089,13 @@
     "deleteAccountFromPhone": "Hallo daar!, sluit asseblief my rekening. My telefoonnommer is {phoneNumber: string}.",
     "deleteAccountError": "Iets het foutgegaan. Kontak asseblief {email: string} vir verdere hulp. ",
     "bye": "Totsiens!",
-    "deleteAccountWarning": "Let wel: Die sluiting van die rekening is permanent!\nMaak seker dat beursies geen fondse het voor sluiting nie.\n'n Geslote rekening kan nie herstel word nie.\nOns kan sekere rekords hou soos deur die wet vereis."
+    "deleteAccountWarning": "Let wel: Die sluiting van die rekening is permanent!\nMaak seker dat beursies geen fondse het voor sluiting nie.\n'n Geslote rekening kan nie herstel word nie.\nOns kan sekere rekords hou soos deur die wet vereis.",
+    "downloadLogs": "Laai loglêers af",
+    "exportLogsTitle": "Deel jou beursie se loglêers",
+    "exportLogsBody": "Hierdie lêer help ons ondersteuningspan om probleme met jou beursies te ondersoek. Dit sluit die betalingsgeskiedenis (bedrae, fakture en adresse) en beursie-identifiseerders van elke nie-bewarende beursie op hierdie toestel in, nie net hierdie een nie, maar nooit jou rugsteunfrases of sleutels nie. Deel dit net met ons ondersteuningspan.",
+    "exportLogsConfirm": "Deel loglêers",
+    "noLogsYet": "Daar is nog geen loglêers om te deel nie. Maak jou beursie oop en probeer weer.",
+    "exportLogsError": "Kon nie jou loglêers uitvoer nie. Probeer asseblief weer."
   },
   "lnurl": {
     "overLimit": "Jy kan nie meer as die maksimum bedrag stuur nie",
@@ -3220,7 +3250,10 @@
       "noLimit": "Geen limiet",
       "limitUpdateSuccess": "Limiet suksesvol opgedateer",
       "limitUpdateError": "Kon limiet nie opdateer nie",
-      "limitMustBePositive": "Limiet moet groter as nul wees"
+      "limitMustBePositive": "Limiet moet groter as nul wees",
+      "atmToggleError": "Kon OTM-onttrekkings nie opdateer nie",
+      "atmControlsLoadError": "Kon nie jou OTM-limiete laai nie",
+      "invalidLimitAmount": "Voer 'n geldige bedrag in met hoogstens 2 desimale"
     },
     "CardFeeSchedule": {
       "title": "Blink-kaart fooiskedule",
@@ -3795,7 +3828,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Rugsteun jou beursie",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Kies jou rugsteunmetode",
@@ -3853,6 +3886,7 @@
     "CloudBackup": {
       "title": "Kom ons rugsteun jou beursie",
       "description": "Ons sal 'n rugsteun van jou rugsteunfrase in jou {provider} stoor.",
+      "encryptCheckbox": "Enkripteer met bykomende wagwoord",
       "password": "Wagwoord",
       "passwordPlaceholder": "(minimum 12 karakters)",
       "confirmPassword": "Bevestig wagwoord",
@@ -3920,6 +3954,12 @@
     "dollarBalanceModal": {
       "title": "Ons kan nie jou dollarsaldo migreer nie",
       "body": "Maak eers jou dollarsaldo leeg. Jy kan dit na jou Bitcoin-saldo in Blink of elders oordra."
+    },
+    "pendingDepositModal": {
+      "title": "Daar is 'n hangende deposito na jou rekening",
+      "body": "Jy kan nie na 'n ander soort rekening migreer voordat al jou hangende deposito's vereffen en op hierdie rekening gekrediteer is nie.",
+      "contactSupportCta": "Kontak ondersteuning",
+      "stillConfirming": "Jou deposito is nog nie bevestig nie. Probeer weer oor 'n paar minute."
     },
     "balancesOverview": {
       "title": "Skuif jou saldo",
@@ -4108,6 +4148,7 @@
     "get": "Kry",
     "storeNote": "“Kry” maak die App Store of Google Play oop. Kom terug na Blink wanneer dit geïnstalleer is.",
     "haveAnApp": "Ek het 'n toep",
+    "learnHow": "Leer hoe",
     "keyInstruction": "Kopieer hierdie opstelsleutel na jou authenticator-toep.",
     "qrInstruction": "Gebruik jy 'n ander toestel?\nSkandeer eerder hierdie QR-kode.",
     "backupTitle": "Rugsteun jou sleutel",
@@ -4194,6 +4235,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink is onbereikbaar",
+    "unreachableDescription": "{featureName} het Blink se bedieners nodig, wat tans nie reageer nie. Jou beursie en fondse word nie geraak nie.",
     "featureCircles": "Circles",
     "featureEarn": "Leer",
     "featureCard": "Card"
@@ -4216,6 +4259,9 @@
     "tokenTransfer": "{token}-oordrag",
     "payTo": "Betaal aan {address}",
     "payment": "Betaling"
+  },
+  "SelfCustodialStaleRate": {
+    "satsOnly": "Wys sats — geen wisselkoers beskikbaar nie"
   },
   "SelfCustodialOffline": {
     "title": "Beursie is vanlyn",

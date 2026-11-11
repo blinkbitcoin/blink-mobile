@@ -117,6 +117,14 @@ describe("InputField", () => {
       expect(onChangeText).toHaveBeenCalledWith("Nakamoto")
     })
 
+    it("caps the input at maxLength", () => {
+      const { getByLabelText } = render(
+        <InputField label="Key name" value="" onChangeText={jest.fn()} maxLength={64} />,
+      )
+
+      expect(getByLabelText("Key name").props.maxLength).toBe(64)
+    })
+
     it("displays the label in editable mode", () => {
       const { getByText } = render(
         <InputField label="Address" value="123 Main St" editable />,
@@ -178,6 +186,14 @@ describe("InputField", () => {
 
       expect(tree).toContain('"minHeight":13')
       expect(tree).not.toContain("Max $10,000 per day")
+    })
+
+    it("drops the reserved helper line when reserveHelperLine is false", () => {
+      const { toJSON } = render(
+        <InputField label="Key name" value="" editable reserveHelperLine={false} />,
+      )
+
+      expect(JSON.stringify(toJSON())).not.toContain('"minHeight":13')
     })
   })
 

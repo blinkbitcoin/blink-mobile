@@ -39,6 +39,21 @@ Once Nix and direnv are set up, follow these steps to set up the blink-mobile pr
    yarn install
    ```
 
+### Card push provisioning SDK (optional)
+
+Adding the Blink card to Apple Pay or Google Pay runs through the MeaWallet SDK (`@meawallet/react-native-mpp`), which lives in MeaWallet's private registry. Without access the app builds and runs the same, and the add to wallet button stays hidden.
+
+With access, put the credentials and the configuration file Rain shared in `~/.config/blink/`:
+
+- `meawallet-rn.env`, with `MEA_RN_USER` and `MEA_RN_PASSWORD` for the React Native package
+- `mea_config`, the SDK configuration
+
+Then run `yarn install` (or `yarn meawallet:install` on its own). It vendors the SDK to `vendor/meawallet/` and copies `mea_config` into the Android and iOS projects. None of those files are tracked by git. The SDK and its configuration go together: once either the credentials or `mea_config` is gone, the next install removes both. CI can pass `MEA_RN_USER`, `MEA_RN_PASSWORD` and `MEA_CONFIG_FILE` as environment variables instead, and the environment wins over the file for each of them.
+
+When the registry cannot be reached or the package fails its checksum, the install goes on without the SDK, so `yarn install` still works offline. A release job that must ship the wallet sets `MEA_REQUIRED=1`, which turns any install that leaves the SDK out into a failure.
+
+On a machine with access, `pod install` adds the `BlinkMeaConfig` and `meawallet-react-native-mpp` pods to `ios/Podfile.lock`. Never commit those lines: they belong to that machine alone, and the next contributor's `pod install` strips them again. `yarn check-code` (and `yarn check:podfile-lock` on its own) fails when the lock staged for commit carries them.
+
 ### Android Development
 
 To run the application on Android:

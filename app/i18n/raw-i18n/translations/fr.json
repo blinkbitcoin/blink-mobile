@@ -1,6 +1,7 @@
 {
     "ApiScreen": {
         "keysGroupTitle": "Clés API",
+        "inactiveKeys": "Clés inactives ({count})",
         "noKeys": "Aucune clé API pour l'instant",
         "createKey": "Créer une clé API",
         "createTitle": "Nouvelle clé API",
@@ -27,10 +28,13 @@
         "revokeTitle": "Révoquer la clé API ?",
         "revokeBody": "\"{name: string}\" cessera immédiatement de fonctionner. Cette action est irréversible.",
         "revoke": "Révoquer",
+        "revokeGoBack": "Retour",
         "revokeSuccess": "Clé API révoquée",
         "createError": "Impossible de créer la clé API. Veuillez réessayer.",
         "revokeError": "Impossible de révoquer la clé API. Veuillez réessayer.",
         "loadError": "Impossible de charger vos clés API. Veuillez réessayer plus tard.",
+        "discardSecretTitle": "Abandonner cette clé API ?",
+        "discardSecretBody": "C'est la seule fois où le secret est affiché. Si vous quittez maintenant, la clé ne pourra pas être récupérée et vous devrez en créer une nouvelle.",
         "done": "Terminé"
     },
     "GaloyAddressScreen": {
@@ -78,7 +82,12 @@
         "skip": "Passez cette étape",
         "unlock": "Déverrouillez",
         "usePin": "Utilisez un NIP",
-        "confirmLogout": "Êtes-vous sûr de vouloir vous déconnecter ? Cela réinitialisera votre cache et tous les paramètres utilisateur locaux"
+        "confirmLogout": "Êtes-vous sûr de vouloir vous déconnecter ? Cela réinitialisera votre cache et tous les paramètres utilisateur locaux",
+        "forgotPin": "NIP oublié ? Supprimer les portefeuilles",
+        "removeWalletsTitle": "Supprimer les portefeuilles de cet appareil ?",
+        "removeWalletsBody": "Cela supprime tous les portefeuilles de cet appareil et vous déconnecte. Pour récupérer un portefeuille, vous avez besoin de sa phrase de sauvegarde. Sans elle, le portefeuille est perdu.",
+        "removeWalletsConfirm": "Supprimer les portefeuilles",
+        "removeWalletsFailed": "Certains portefeuilles n'ont pas pu être supprimés. Veuillez réessayer."
     },
     "PeopleScreen": {
         "title": "Cercles",
@@ -2135,6 +2144,7 @@
         "addPlace": "Ajouter à la carte",
         "addPlaceTitle": "Suggérer un commerce",
         "submitPlaceRequest": "Envoyer la demande",
+        "showMyLocation": "Afficher ma position",
         "placePinHint": "Déplacez la carte pour placer le repère sur le lieu",
         "placeName": "Nom",
         "placeNameHint": "Le nom du lieu",
@@ -2176,16 +2186,19 @@
         "walletCountNotTwo": "Le nombre de portefeuilles n'est pas 2. Veuillez utiliser le tableau de bord pour voir tous les portefeuilles et les fonds de ce compte"
     },
     "PinScreen": {
+        "attemptUnrecorded": "Impossible d'enregistrer la tentative en toute sécurité.",
+        "attemptsLeft": "{attemptsRemaining: number} tentatives restantes.",
         "attemptsRemaining": "NIP incorrect. {attemptsRemaining: number} tentatives restantes.",
         "enterPin": "Saisissez votre code NIP",
-        "lockoutUnavailable": "Impossible d'enregistrer la tentative échouée en toute sécurité. Déconnexion.",
+        "oneAttemptLeft": "1 tentative restante.",
         "oneAttemptRemaining": "NIP incorrect. 1 tentative restante.",
         "pinUnreadable": "Impossible de vérifier votre NIP. Veuillez réessayer.",
         "setPin": "Définissez votre code NIP",
         "setPinFailedMatch": "Les NIP ne correspondent pas - Corrigez votre code NIP",
         "storePinFailed": "Impossible d’enregistrer votre NIP.",
         "tooManyAttempts": "Trop de tentatives infructeuses. Déconnexion.",
-        "tryAgainIn": "Réessayez dans {seconds: number} s.",
+        "attemptBudgetSpent": "Trop de tentatives infructeuses.",
+        "tryAgainIn": "Réessayez dans {time: string}.",
         "verifyPin": "Validez votre code NIP"
     },
     "PriceHistoryScreen": {
@@ -2220,6 +2233,12 @@
         "error": "Impossible de générer la facture. Merci de contacter le support si le problème persiste.",
         "copyInvoice": "Copier",
         "shareInvoice": "Partager",
+        "newAddress": "Nouvelle",
+        "newAddressHint": "Génère une nouvelle adresse Bitcoin. Les adresses précédentes restent valables.",
+        "newAddressGenerated": "Nouvelle adresse prête. Les adresses précédentes restent valables.",
+        "newAddressFailed": "Impossible de générer une nouvelle adresse. Veuillez réessayer.",
+        "newAddressRateLimited": "Trop de nouvelles adresses. Patientez un moment, puis réessayez.",
+        "onchainAddressLoadFailed": "Impossible de charger votre adresse Bitcoin. Appuyez sur Nouvelle pour réessayer.",
         "addAmount": "Demander un montant spécifique",
         "expired": "La facture a expiré",
         "expiresIn": "Expire dans",
@@ -2355,6 +2374,8 @@
         "invalidAmount": "Cette facture contient un montant non valide. Merci d’en générer une nouvelle avec un montant valide.",
         "usernameDoesNotExist": "{lnAddress: string} ne semble pas être une adresse {bankName: string} existante.",
         "usernameDoesNotExistAdvice": "Assurez-vous que l’orthographe est correcte ou bien demandez au bénéficiaire une facture Lightning Network LN ou une adresse BTC à la place.",
+        "destinationUnverifiable": "Nous n'avons pas pu vérifier {lnAddress} pour le moment — les serveurs de {bankName} ne répondent pas.",
+        "destinationUnverifiableAdvice": "L'adresse est probablement correcte. Réessayez dans un instant, ou demandez plutôt une facture LN ou une adresse BTC au destinataire.",
         "selfPaymentError": "{lnAddress: string} est votre adresse {bankName: string}.",
         "selfPaymentAdvice": "Si vous souhaitez envoyer de l’argent à un autre compte que le vôtre, vous pouvez utiliser une facture avec une adresse Lightning Network LN ou BTC à la place.",
         "lnAddressError": "Nous ne pouvons pas accéder à cette adresse Lightning. Si vous êtes sûr qu’elle existe, vous pouvez essayer à nouveau ultérieurement.",
@@ -2577,12 +2598,14 @@
         "error": "Impossible de récupérer les profils pour le moment",
         "fromThisDevice": "depuis cet appareil ?",
         "switchAccount": "Vous avez changé de compte",
-        "removedAccount": "Vous avez supprimé le compte {identifier: string}."
+        "removedAccount": "Vous avez supprimé le compte {identifier: string}.",
+        "removeAccount": "Supprimer le compte"
     },
     "StablesatsRestriction": {
         "walletLabel": "n'est pas disponible dans votre région",
         "anonModeWalletLabel": "non disponible en mode Incognito",
-        "unknownRegionWalletLabel": "impossible de vérifier la disponibilité, tirez vers le bas pour réessayer"
+        "unknownRegionWalletLabel": "impossible de vérifier la disponibilité, tirez vers le bas pour réessayer",
+        "networkWalletLabel": "non disponible sur ce réseau"
     },
     "AnonModeConvertModal": {
         "title": "Transférez d'abord votre solde en dollars",
@@ -2664,7 +2687,7 @@
     "TransactionDetailScreen": {
         "paid": "Payé à/de",
         "received": "Vous avez reçu",
-        "spent": "Vous avez dépensé",
+        "sent": "Vous avez envoyé",
         "sending": "Envoi en cours",
         "receivingAccount": "Solde destinataire",
         "sendingAccount": "Solde expéditeur",
@@ -2740,6 +2763,7 @@
             "tooLong": "L’adresse ne peut excéder plus de 50 caractères",
             "invalidCharacter": "L’adresse ne peut contenir que des lettres, chiffres et des tirets.",
             "addressUnavailable": "Désolé, cette adresse est déjà utilisée",
+            "serverUnreachable": "Impossible de joindre le serveur d'adresses. Réessayez dans un instant.",
             "unknownError": "Une erreur inconnue est survenue, merci d’essayer ultérieurement",
             "backupRequired": "Back up your wallet before creating a Lightning address"
         },
@@ -3034,7 +3058,8 @@
         "problemPersists": "Si le problème persiste, contactez le support technique.",
         "fatalError": "Désolé, nous semblons avoir des problèmes pour charger les données de l’application. Si le problème persiste, merci de contacter le support technique.",
         "showError": "Afficher l’erreur",
-        "clearAppData": "Effacer les données de l’application et se déconnecter"
+        "clearAppData": "Effacer les données de l’application et se déconnecter",
+        "screenSecurityUnavailable": "Cet écran reste masqué, car la protection contre les captures d'écran n'a pas pu être activée."
     },
     "notifications": {
         "payment": {
@@ -3051,7 +3076,6 @@
         "faq": "FAQ",
         "statusPage": "Page de configuration",
         "telegram": "Telegram",
-        "mattermost": "Mattermost",
         "defaultEmailSubject": "Aide {bankName: string} ",
         "defaultSupportMessage": "Bonjour ! J’ai besoin d’aide avec {bankName: string}, j’utilise la version {version: string} sur {os: string}.",
         "emailCopied": "e-mail {email: string} copié dans le presse-papier",
@@ -3065,7 +3089,13 @@
         "deleteAccountFromPhone": "Bonjour ! Merci de clôturer mon compte. Mon numéro de téléphone est le {phoneNumber: string}.",
         "deleteAccountError": "Une erreur est survenue. Contacter {email: string} pour recevoir une aide supplémentaire.",
         "bye": "Salut !",
-        "deleteAccountWarning": "Attention : la clôture du compte est permanente !\nAssurez-vous que les portefeuilles ne contiennent plus de fonds avant la clôture.\nUn compte clôturé ne peut pas être réactivé.\nNous pouvons conserver certains dossiers si la loi l'exige."
+        "deleteAccountWarning": "Attention : la clôture du compte est permanente !\nAssurez-vous que les portefeuilles ne contiennent plus de fonds avant la clôture.\nUn compte clôturé ne peut pas être réactivé.\nNous pouvons conserver certains dossiers si la loi l'exige.",
+        "downloadLogs": "Télécharger les journaux",
+        "exportLogsTitle": "Partager les journaux de votre portefeuille",
+        "exportLogsBody": "Ce fichier aide notre équipe de support à examiner les problèmes de vos portefeuilles. Il contient l'historique des paiements (montants, factures et adresses) et les identifiants de chaque portefeuille non-custodial sur cet appareil, pas seulement celui-ci, mais jamais vos phrases de sauvegarde ni vos clés. Ne le partagez qu'avec notre équipe de support.",
+        "exportLogsConfirm": "Partager les journaux",
+        "noLogsYet": "Il n'y a pas encore de journaux à partager. Ouvrez votre portefeuille et réessayez.",
+        "exportLogsError": "Impossible d'exporter vos journaux. Veuillez réessayer."
     },
     "lnurl": {
         "overLimit": "Vous ne pouvez pas envoyer plus que le montant maximum",
@@ -3304,7 +3334,10 @@
             "noLimit": "Sans limite",
             "limitUpdateSuccess": "Limite mise à jour avec succès",
             "limitUpdateError": "Échec de la mise à jour de la limite",
-            "limitMustBePositive": "La limite doit être supérieure à zéro"
+            "limitMustBePositive": "La limite doit être supérieure à zéro",
+            "atmToggleError": "Échec de la mise à jour des retraits DAB",
+            "atmControlsLoadError": "Impossible de charger vos limites DAB",
+            "invalidLimitAmount": "Saisissez un montant valide avec 2 décimales au maximum"
         },
         "CardStatements": {
             "title": "Mouvements",
@@ -3795,7 +3828,7 @@
         }
     },
     "BackupScreen": {
-        "title": "Back up your wallet",
+        "title": "Sauvegarder votre portefeuille",
         "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "Choisissez votre méthode de sauvegarde",
@@ -3853,6 +3886,7 @@
         "CloudBackup": {
             "title": "Sauvegardons votre portefeuille",
             "description": "Nous enregistrerons une copie de votre phrase de sauvegarde dans votre {provider}.",
+            "encryptCheckbox": "Chiffrer avec un mot de passe supplémentaire",
             "password": "Mot de passe",
             "passwordPlaceholder": "(12 caractères minimum)",
             "confirmPassword": "Confirmer le mot de passe",
@@ -3920,6 +3954,12 @@
         "dollarBalanceModal": {
             "title": "Nous ne pouvons pas migrer votre solde en dollars",
             "body": "Videz d'abord votre solde en dollars. Vous pouvez le transférer vers votre solde Bitcoin dans Blink ou ailleurs."
+        },
+        "pendingDepositModal": {
+            "title": "Un dépôt est en attente sur votre compte",
+            "body": "Vous ne pouvez pas migrer vers un autre type de compte tant que tous vos dépôts en attente n'ont pas été réglés et crédités sur ce compte.",
+            "contactSupportCta": "Contacter le support",
+            "stillConfirming": "Votre dépôt n'est pas encore confirmé. Réessayez dans quelques minutes."
         },
         "balancesOverview": {
             "title": "Déplacez votre solde",
@@ -4108,6 +4148,7 @@
         "get": "Obtenir",
         "storeNote": "« Obtenir » ouvre l'App Store ou Google Play. Revenez sur Blink une fois l'application installée.",
         "haveAnApp": "J'ai déjà une application",
+        "learnHow": "Découvrir comment",
         "keyInstruction": "Copiez cette clé de configuration dans votre application d'authentification.",
         "qrInstruction": "Vous utilisez un autre appareil ?\nScannez plutôt ce code QR.",
         "backupTitle": "Sauvegardez votre clé",
@@ -4194,6 +4235,8 @@
         "signInDescription": "Connectez-vous à votre compte custodial pour utiliser {featureName}.",
         "noAccountTitle": "Compte custodial requis",
         "noAccountDescription": "{featureName} nécessite un compte custodial Blink.",
+        "unreachableTitle": "Blink est injoignable",
+        "unreachableDescription": "{featureName} a besoin des serveurs de Blink, qui ne répondent pas pour le moment. Votre portefeuille et vos fonds ne sont pas affectés.",
         "featureCircles": "Cercles",
         "featureEarn": "Apprendre",
         "featureCard": "Carte"
@@ -4216,6 +4259,9 @@
         "tokenTransfer": "Transfert {token}",
         "payTo": "Payer à {address}",
         "payment": "Paiement"
+    },
+    "SelfCustodialStaleRate": {
+        "satsOnly": "Affichage en sats — aucun taux de change disponible"
     },
     "SelfCustodialOffline": {
         "title": "Le portefeuille est hors ligne",

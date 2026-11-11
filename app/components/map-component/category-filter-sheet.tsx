@@ -6,6 +6,7 @@ import { PLACE_CATEGORIES, PlaceCategory } from "@app/btcmap"
 import { Switch } from "@app/components/atomic/switch"
 import { BottomSheet } from "@app/components/bottom-sheet"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 import { Text, makeStyles } from "@rn-vui/themed"
 
 // Tall enough that the list reads as a list, short enough that the map it is
@@ -99,7 +100,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
   },
   title: {
     fontSize: 20,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.black,
   },
   action: {

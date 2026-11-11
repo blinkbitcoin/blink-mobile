@@ -56,8 +56,18 @@ jest.mock("@app/components/screen", () => ({
 }))
 
 jest.mock("@app/components/card-screen/add-to-wallet-button", () => ({
-  AddToWalletButton: ({ onPress }: { onPress: () => void }) => (
-    <View testID="add-to-wallet-button" onTouchEnd={onPress}>
+  AddToWalletButton: ({
+    onPress,
+    disabled,
+  }: {
+    onPress: () => void
+    disabled: boolean
+  }) => (
+    <View
+      testID="add-to-wallet-button"
+      accessibilityState={{ disabled }}
+      onTouchEnd={onPress}
+    >
       <RNText>Add to Wallet</RNText>
     </View>
   ),
@@ -65,12 +75,14 @@ jest.mock("@app/components/card-screen/add-to-wallet-button", () => ({
 
 describe("CardStatusLayout", () => {
   const mockOnPrimaryButtonPress = jest.fn()
+  const mockOnAddToWallet = jest.fn()
 
   const defaultProps = {
     title: "Card is on the way",
     subtitle: "Your card has been shipped and should arrive soon.",
     buttonLabel: "Continue",
     onPrimaryButtonPress: mockOnPrimaryButtonPress,
+    onAddToWallet: mockOnAddToWallet,
     iconName: "check-badge" as const,
   }
 
@@ -148,16 +160,24 @@ describe("CardStatusLayout", () => {
       expect(queryByTestId("add-to-wallet-button")).toBeNull()
     })
 
-    it("calls internal handler when AddToWalletButton is pressed", () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {})
+    it("calls onAddToWallet when AddToWalletButton is pressed", () => {
       const { getByTestId } = render(
         <CardStatusLayout {...defaultProps} showAddToWallet={true} />,
       )
 
       fireEvent(getByTestId("add-to-wallet-button"), "touchEnd")
 
-      expect(consoleSpy).toHaveBeenCalledWith("Add to wallet pressed")
-      consoleSpy.mockRestore()
+      expect(mockOnAddToWallet).toHaveBeenCalledTimes(1)
+    })
+
+    it("disables AddToWalletButton while the card is being added", () => {
+      const { getByTestId } = render(
+        <CardStatusLayout {...defaultProps} isAddingToWallet={true} />,
+      )
+
+      expect(getByTestId("add-to-wallet-button").props.accessibilityState).toEqual({
+        disabled: true,
+      })
     })
   })
 })

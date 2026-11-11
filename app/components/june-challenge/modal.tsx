@@ -89,7 +89,7 @@ export const JuneChallengeModal: React.FC<Props> = ({ isVisible, setIsVisible })
           </Text> */}
         </View>
       </View>
-      <GaloyToast />
+      <GaloyToast inModal />
     </Modal>
   )
 }

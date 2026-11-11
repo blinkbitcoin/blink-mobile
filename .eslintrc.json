@@ -4,7 +4,7 @@
     "react-native/react-native": true,
     "jest/globals": true
   },
-  "ignorePatterns": ["./patches", "**/GT3Captcha.bundle/resource.js"],
+  "ignorePatterns": ["./patches", "vendor/meawallet/", "**/GT3Captcha.bundle/resource.js"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {
@@ -131,6 +131,10 @@
           {
             "name": "react-native-secure-key-store",
             "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+          },
+          {
+            "name": "@react-native-firebase/crashlytics",
+            "message": "Write to Crashlytics only through app/utils/error-reporting.ts (logBreadcrumb, recordAppError), which drops everything while an Incognito or unset-mode wallet is active."
           }
         ]
       }
@@ -177,12 +181,25 @@
   },
   "overrides": [
     {
-      "files": [
-        "app/utils/storage/legacy-key-store.ts",
-        "app/utils/storage/secureStorage.ts"
-      ],
+      "files": ["app/utils/storage/legacy-key-store.ts"],
       "rules": {
         "no-restricted-imports": "off"
+      }
+    },
+    {
+      "files": ["app/utils/error-reporting.ts", "app/app.tsx"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react-native-secure-key-store",
+                "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              }
+            ]
+          }
+        ]
       }
     }
   ],

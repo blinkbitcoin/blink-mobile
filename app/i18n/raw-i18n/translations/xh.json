@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Izitshixo ze-API",
+    "inactiveKeys": "Izitshixo ezingasebenziyo ({count})",
     "noKeys": "Akukho zitshixo ze-API okwangoku",
     "createKey": "Yenza isitshixo se-API",
     "createTitle": "Isitshixo se-API esitsha",
@@ -14,23 +15,26 @@
     "scopeWrite": "Bhala",
     "writeScopeDashboardOnly": "Izitshixo ezinokuthumela iintlawulo zingenziwa kuphela ku-dashboard.blink.sv",
     "expiry": "Iphelelwa",
-    "expiry30Days": "Iintsuku ezingama-30",
-    "expiry90Days": "Iintsuku ezingama-90",
+    "expiry30Days": "Iintsuku 30",
+    "expiry90Days": "Iintsuku 90",
     "expiryNever": "Ayihlali",
     "expiresOn": "Iphelelwa nge-{date: string}",
     "neverExpires": "Ayipheleli",
-    "revoked": "Irhoxisiwe",
+    "revoked": "Itshitshisiwe",
     "expired": "Iphelelwe nge-{date: string}",
     "expiredNoDate": "Iphelelwe",
     "secretWarning": "Eli lelona xesha kuphela isitshixo esiboniswa ngalo. Sikhuphele okanye usabelane ngoku kwaye usigcine ngokukhuselekileyo.",
     "secretCopied": "Isitshixo se-API sikhutshelwe. Ibhodi yokukhuphela iza kucocwa emva komzuzu omnye",
-    "revokeTitle": "Rhoxisa isitshixo se-API?",
+    "revokeTitle": "Tshitshisa isitshixo se-API?",
     "revokeBody": "\"{name: string}\" iza kuyeka ukusebenza ngokukhawuleza. Oku akunakuguqulwa.",
-    "revoke": "Rhoxisa",
-    "revokeSuccess": "Isitshixo se-API sirhoxisiwe",
+    "revoke": "Tshitshisa",
+    "revokeGoBack": "Buyela",
+    "revokeSuccess": "Isitshixo se-API sitshitshisiwe",
     "createError": "Ayikwazanga ukwenza isitshixo se-API. Nceda uzame kwakhona.",
-    "revokeError": "Ayikwazanga ukurhoxisa isitshixo se-API. Nceda uzame kwakhona.",
+    "revokeError": "Ayikwazanga ukutshitshisa isitshixo se-API. Nceda uzame kwakhona.",
     "loadError": "Ayikwazanga ukulayisha izitshixo zakho ze-API. Nceda uzame kamva.",
+    "discardSecretTitle": "Ukulahla le sitshixo se-API?",
+    "discardSecretBody": "Eli lelona xesha kuphela imfihlo eboniswa ngalo. Ukuba ushiya ngoku, isitshixo asisoze sabuyiswa kwaye kuya kufuneka udale esitsha.",
     "done": "Kwenziwe"
   },
   "GaloyAddressScreen": {
@@ -78,7 +82,12 @@
     "skip": "Tsiba",
     "unlock": "Vula",
     "usePin": "Sebenzisa iphini",
-    "confirmLogout": "Uqinisekile ukuba ufuna ukuphuma? Oku kuya kucima ikheshe yakho kunye nezicwangciso zomsebenzisi wangaphakathi"
+    "confirmLogout": "Uqinisekile ukuba ufuna ukuphuma? Oku kuya kucima ikheshe yakho kunye nezicwangciso zomsebenzisi wangaphakathi",
+    "forgotPin": "Ulibele iphini? Susa izipaji",
+    "removeWalletsTitle": "Susa izipaji kwesi sixhobo?",
+    "removeWalletsBody": "Oku kususa zonke izipaji kwesi sixhobo kwaye kukukhuphe. Ukubuyisa isipaji, ufuna isivakalisi saso sokugcina. Ngaphandle kwaso, isipaji silahlekile.",
+    "removeWalletsConfirm": "Susa izipaji",
+    "removeWalletsFailed": "Ezinye izipaji azikwazanga ukususwa. Nceda uzame kwakhona."
   },
   "PeopleScreen": {
     "title": "Abantu",
@@ -2135,6 +2144,7 @@
     "addPlace": "Yongeza kwimephu",
     "addPlaceTitle": "Cebisa ishishini",
     "submitPlaceRequest": "Thumela isicelo",
+    "showMyLocation": "Bonisa indawo yam",
     "placePinHint": "Shukumisa imephu ubeke isalathiso kwindawo",
     "placeName": "Igama",
     "placeNameHint": "Le ndawo ibizwa ngokuba yintoni",
@@ -2176,16 +2186,19 @@
     "walletCountNotTwo": "Inani lezipaji asizizo ezi-2. Nceda usebenzise idashbhodi ukubona zonke izipaji nemali yeli akhawunti"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Akukwazekanga ukurekhoda umzamo ngokukhuselekileyo.",
+    "attemptsLeft": "{attemptsRemaining: number} imizamo eseleyo.",
     "attemptsRemaining": "I-PIN engalunganga. {attemptsRemaining: number} imizamo eseleyo.",
     "enterPin": "Faka ikhowudi yakho ye-PIN",
-    "lockoutUnavailable": "Akukwazekanga ukurekhoda umzamo ongaphumelelanga ngokukhuselekileyo. Ukuloga ngaphandle.",
+    "oneAttemptLeft": "Kushiyeke umzamo “1”.",
     "oneAttemptRemaining": "PIN engalunganga. Kushiyeke umzamo “1”.",
     "pinUnreadable": "Ayikwazanga ukujonga i-PIN yakho. Nceda uzame kwakhona.",
     "setPin": "Seta ikhowudi yakho ye-PIN",
     "setPinFailedMatch": "Pin azihambelani  - Seta ikhowudi yakho ye-PIN",
     "storePinFailed": "Ayikwazanga ukugcina iphini yakho.",
     "tooManyAttempts": "Mininzi kakhulu imizamo engaphumeleliyo. Ukuloga ngaphandle.",
-    "tryAgainIn": "Zama kwakhona emva kwe-{seconds: number} s.",
+    "attemptBudgetSpent": "Mininzi kakhulu imizamo engaphumeleliyo.",
+    "tryAgainIn": "Zama kwakhona emva kwe-{time: string}.",
     "verifyPin": "Qinisekisa ikhowudi yakho ye-PIN"
   },
   "PriceHistoryScreen": {
@@ -2218,8 +2231,14 @@
     "title": "Fumana i-Bitcoin",
     "usdTitle": "Yamkela kwi-Akhawunti ye-Idola",
     "error": "Ayiphumelelanga ukwenza i-invoyisi. Nceda uqhakamishele abezoncedo ukuba le ngxaki iyaqhubeka.",
-    "copyInvoice": "Khuphela i-invoyisi",
-    "shareInvoice": "Yabelana nge-invoyisi",
+    "copyInvoice": "Khuphela",
+    "shareInvoice": "Yabelana",
+    "newAddress": "Entsha",
+    "newAddressHint": "Yenza idilesi entsha yeBitcoin. Iidilesi zangaphambili zisasebenza.",
+    "newAddressGenerated": "Idilesi entsha ilungile. Iidilesi zangaphambili zisasebenza.",
+    "newAddressFailed": "Ayikwazanga ukwenza idilesi entsha. Nceda uzame kwakhona.",
+    "newAddressRateLimited": "Zininzi kakhulu iidilesi ezintsha. Nceda ulinde kancinci uze uzame kwakhona.",
+    "onchainAddressLoadFailed": "Ayikwazanga ukulayisha idilesi yakho yeBitcoin. Cofa u-Entsha ukuze uzame kwakhona.",
     "addAmount": "Cela Isixa esithile",
     "expired": "I-invoyisi iphelelwe lixesha",
     "expiresIn": "Iphelelwa",
@@ -2355,6 +2374,8 @@
     "invalidAmount": "Oku kuqulethe isixa esingasebenziyo. Nceda wenze ngokutsha ngexabiso elisebenzayo.",
     "usernameDoesNotExist": " {lnAddress: string} ayibonakali ngathi yi {bankName: string} idilesi ekhoyo.",
     "usernameDoesNotExistAdvice": "Qiniseka ukuba upelo luchanekile okanye ucele umamkeli nge-invoyisi ye-LN okanye idilesi ye-BTC endaweni yoko.",
+    "destinationUnverifiable": "Asikwazanga ukujonga i-{lnAddress} okwangoku — iiseva ze-{bankName} azipheduli.",
+    "destinationUnverifiableAdvice": "Idilesi mhlawumbi ilungile. Zama kwakhona kungekudala, okanye ucele umamkeli akunike i-invoice ye-LN okanye idilesi ye-BTC.",
     "selfPaymentError": "{lnAddress: string} yeyakho {bankName: string} idilesi.",
     "selfPaymentAdvice": "Ukuba ufuna ukuthumela imali kwenye iakhawunti yakho, ungasebenzisa i-invoyisi, i-LN okanye idilesi ye-BTC endaweni yoko.",
     "lnAddressError": "Asikwazi ukufikelela kule dilesi yoMbane. Ukuba uqinisekile ukuba ikhona, ungazama kwakhona kamva.",
@@ -2577,12 +2598,14 @@
     "error": "Ayikwazi ukufumana iiprofayili ngeli xesha",
     "fromThisDevice": "kule divayisi?",
     "switchAccount": "Utshintshele kwenye i-akhawunti",
-    "removedAccount": "Ususile i-akhawunti {identifier: string}."
+    "removedAccount": "Ususile i-akhawunti {identifier: string}.",
+    "removeAccount": "Susa i-akhawunti"
   },
   "StablesatsRestriction": {
     "walletLabel": "ayifumaneki kummandla wakho",
     "anonModeWalletLabel": "ayifumaneki kwimo ye-Incognito",
-    "unknownRegionWalletLabel": "ukufumaneka akukwazanga kujongwa, tsala ezantsi ukuze uzame kwakhona"
+    "unknownRegionWalletLabel": "ukufumaneka akukwazanga kujongwa, tsala ezantsi ukuze uzame kwakhona",
+    "networkWalletLabel": "akufumaneki kolu thungelwano"
   },
   "AnonModeConvertModal": {
     "title": "Qala udlulisele ibhalansi yakho yeDola",
@@ -2664,7 +2687,7 @@
   "TransactionDetailScreen": {
     "paid": "Ihlawulwe ukuya/ukusuka",
     "received": "Ufumene",
-    "spent": "Uchithe",
+    "sent": "Uthumele",
     "sending": "Iyathumela",
     "receivingAccount": "Ukufumana iAkhawunti",
     "sendingAccount": "Ukuthumela iAkhawunti",
@@ -2740,6 +2763,7 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
+      "serverUnreachable": "Ayikwazanga ukufikelela kwiseva yedilesi. Zama kwakhona kungekudala.",
       "unknownError": "An unknown error occurred, please try again later",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3034,7 +3058,8 @@
     "problemPersists": "If problem persists contact support.",
     "fatalError": "Sorry we appear to be having issues loading the application data.  If problems persist please contact support.",
     "showError": "Show Error",
-    "clearAppData": "Clear App Data and Logout"
+    "clearAppData": "Clear App Data and Logout",
+    "screenSecurityUnavailable": "Esi sikrini sihlala sifihliwe kuba ukhuseleko ekuthatheni imifanekiso yesikrini aluzange lukwazi ukuvulwa."
   },
   "notifications": {
     "payment": {
@@ -3051,7 +3076,6 @@
     "faq": "Imibuzo Ebuzwa Rhoqo",
     "statusPage": "Status Page",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Support",
     "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
     "emailCopied": "email {email: string} copied to clipboard",
@@ -3065,7 +3089,13 @@
     "deleteAccountFromPhone": "Molo!, nceda uvale i-akhawunti yam. Inombolo yam yefowuni ngu {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "Qaphela: Ukuvalwa kwe-akhawunti kusisigxina!\nQinisekisa ukuba iiwoleti azinayo imali ngaphambi kokuvala.\nI-akhawunti evaliweyo ayinakubuyiselwa.\nSinokugcina iirekhodi ezithile njengoko kufunwa luluthetho."
+    "deleteAccountWarning": "Qaphela: Ukuvalwa kwe-akhawunti kusisigxina!\nQinisekisa ukuba iiwoleti azinayo imali ngaphambi kokuvala.\nI-akhawunti evaliweyo ayinakubuyiselwa.\nSinokugcina iirekhodi ezithile njengoko kufunwa luluthetho.",
+    "downloadLogs": "Khuphela iirekhodi",
+    "exportLogsTitle": "Yabelana ngerekhodi zesipaji sakho",
+    "exportLogsBody": "Le fayile inceda inkxaso iphande iingxaki zesipaji sakho. Iqulethe imbali yentlawulo (izixa, ii-invoyisi needilesi) nezichongi zesipaji ngasinye esingagcinwanga kwesi sixhobo, hayi esi kuphela, kodwa ayinazo iibinzana zakho zokugcina okanye izitshixo. Yabelana ngayo kuphela nenkxaso.",
+    "exportLogsConfirm": "Yabelana ngerekhodi",
+    "noLogsYet": "Akukabikho rekhodi zokwabelana. Vula isipaji sakho uzame kwakhona.",
+    "exportLogsError": "Ayiphumelelanga ukukhuphela iirekhodi. Zama kwakhona."
   },
   "lnurl": {
     "overLimit": "You can't send more than max amount",
@@ -3220,7 +3250,10 @@
       "noLimit": "Akukho mda",
       "limitUpdateSuccess": "Umda uhlaziywe ngempumelelo",
       "limitUpdateError": "Ayiphumelelanga ukuhlaziya umda",
-      "limitMustBePositive": "Umda kufuneka ube ngaphezu kwezero"
+      "limitMustBePositive": "Umda kufuneka ube ngaphezu kwezero",
+      "atmToggleError": "Ayiphumelelanga ukuhlaziya ukukhupha kwi-ATM",
+      "atmControlsLoadError": "Ayiphumelelanga ukulayisha imida ye-ATM",
+      "invalidLimitAmount": "Faka isixa esichanekileyo esinamadesimali ama-2 kuphela"
     },
     "CardFeeSchedule": {
       "title": "Uludwe lweentlawulo zeKhadi leBlink",
@@ -3795,7 +3828,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Gcina isipaji sakho",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Khetha indlela yakho yokugcina",
@@ -3853,6 +3886,7 @@
     "CloudBackup": {
       "title": "Masigcine isipaji sakho",
       "description": "Siza kugcina ikopi yesivakalisi sakho sokugcina kwi-{provider} yakho.",
+      "encryptCheckbox": "Bethelela ngegama lokugqitha elongezelelweyo",
       "password": "Igama lokugqitha",
       "passwordPlaceholder": "(ubuncinane oonobumba abayi-12)",
       "confirmPassword": "Qinisekisa igama lokugqitha",
@@ -3920,6 +3954,12 @@
     "dollarBalanceModal": {
       "title": "Asikwazi ukufudusa ibhalansi yakho yedola",
       "body": "Qala ukhuphe yonke ibhalansi yakho yedola. Ungayidlulisela kwibhalansi yakho yeBitcoin kuBlink okanye kwenye indawo."
+    },
+    "pendingDepositModal": {
+      "title": "Kukho idiphozithi esalindileyo kwiakhawunti yakho",
+      "body": "Awukwazi ukufudukela kolunye uhlobo lweakhawunti de zonke iidiphozithi zakho ezisalindileyo zihlawulwe kwaye zifakwe kule akhawunti.",
+      "contactSupportCta": "Qhagamshelana nenkxaso",
+      "stillConfirming": "Idiphozithi yakho ayikaqinisekiswa. Zama kwakhona emva kwemizuzu embalwa."
     },
     "balancesOverview": {
       "title": "Hambisa ibhalansi yakho",
@@ -4108,6 +4148,7 @@
     "get": "Khuphela",
     "storeNote": "“Khuphela” ivula i-App Store okanye i-Google Play. Buyela kwi-Blink xa sele ifakiwe.",
     "haveAnApp": "Ndine-app",
+    "learnHow": "Funda indlela",
     "keyInstruction": "Kopisha esi sitshixo sokumisela kwi-app yakho ye-authenticator.",
     "qrInstruction": "Usebenzisa esinye isixhobo?\nEndaweni yoko skena le QR khowudi.",
     "backupTitle": "Gcina ikopi yesitshixo sakho",
@@ -4194,6 +4235,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "U-Blink akafikeleleki",
+    "unreachableDescription": "I-{featureName} ifuna iiseva ze-Blink, ezingaphenduliyo okwangoku. Isipaji sakho neemali zakho azichaphazelekanga.",
     "featureCircles": "Circles",
     "featureEarn": "Funda",
     "featureCard": "Card"
@@ -4216,6 +4259,9 @@
     "tokenTransfer": "Ukudluliswa kwe-{token}",
     "payTo": "Hlawula ku-{address}",
     "payment": "Intlawulo"
+  },
+  "SelfCustodialStaleRate": {
+    "satsOnly": "Ibonisa ii-sats — alikho izinga lotshintshiselwano"
   },
   "SelfCustodialOffline": {
     "title": "Ingxowa-mali ayikho kwi-intanethi",

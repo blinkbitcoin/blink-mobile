@@ -9,7 +9,7 @@ import {
   OSM_COPYRIGHT_URL,
   OpeningState,
   VerificationState,
-  directionsUrl,
+  directionsUrls,
   formatSurveyDate,
   hostOf,
   isBoosted,
@@ -33,6 +33,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { recordAppError, toError } from "@app/utils/error-reporting"
 import { openExternalUrl } from "@app/utils/external"
 import { toastShow } from "@app/utils/toast"
+import { fonts } from "@app/rne-theme/fonts"
 import { Skeleton, Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 const REFRESH_INTERVAL_MS = 60_000
@@ -126,6 +127,10 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
     return () => clearInterval(timer)
   }, [place, isTimeSensitive])
 
+  // Navigate awaits the OS before it opens anything, so a second tap in that
+  // gap would open the maps app twice.
+  const isNavigating = React.useRef(false)
+
   const boosted = isBoosted(details?.boostedUntil ?? shown?.boostedUntil, now)
   const styles = useStyles({ bottomInset: insets.bottom })
 
@@ -140,15 +145,32 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
   const verification = verificationStateAt(details?.verifiedAt, now)
 
   // Web destinations get the in-app browser the rest of the app uses, so a tap
-  // on a merchant's site does not strand the user in Safari. tel:, geo:/maps:
-  // and lightning: have to reach the OS instead — InAppBrowser cannot open them.
+  // on a merchant's site does not strand the user in Safari. tel:, mailto: and
+  // lightning: have to reach the OS instead — InAppBrowser cannot open them.
   const openUrl = (url: string) => {
     const open = isWebUrl(url) ? openExternalUrl(url) : Linking.openURL(url)
     open.catch(() => toastShow({ message: LL.MapScreen.cannotOpenLink(), LL }))
   }
 
-  const navigate = () =>
-    openUrl(directionsUrl(shown, name, Platform.OS === "ios" ? "ios" : "android"))
+  // Straight to the OS rather than through openUrl: in the in-app browser the
+  // Android Google Maps link would stay a web page, where the OS hands it to
+  // the app.
+  const navigate = () => {
+    if (isNavigating.current) return
+    isNavigating.current = true
+    const { probe, google, fallback } = directionsUrls(
+      shown,
+      name,
+      Platform.OS === "ios" ? "ios" : "android",
+    )
+    Linking.canOpenURL(probe)
+      .catch(() => false)
+      .then((hasGoogleMaps) => Linking.openURL(hasGoogleMaps ? google : fallback))
+      .catch(() => toastShow({ message: LL.MapScreen.cannotOpenLink(), LL }))
+      .finally(() => {
+        isNavigating.current = false
+      })
+  }
 
   const share = () => {
     // A dismissed share sheet resolves; a rejection is the OS refusing, which
@@ -425,7 +447,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   name: {
     flex: 1,
     fontSize: 20,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.black,
   },
   nameSkeleton: {
@@ -455,17 +477,17 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   },
   badgeOpen: {
     fontSize: 12,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors._green,
   },
   badgeClosed: {
     fontSize: 12,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.error,
   },
   badgeBoosted: {
     fontSize: 12,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   verification: {
@@ -531,7 +553,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   },
   retryText: {
     fontSize: 13,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   skeletonBlock: {

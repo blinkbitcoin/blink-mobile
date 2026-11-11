@@ -35,8 +35,12 @@ import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 import { generateSecureRandomUUID } from "@app/utils/uuid"
 import { useBottomTabBarStyle } from "@app/navigation/bottom-tab-bar-style"
+import { fonts } from "@app/rne-theme/fonts"
 import { PrimaryStackParamList } from "@app/navigation/stack-param-lists"
-import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs"
+import {
+  BottomTabBarHeightContext,
+  BottomTabNavigationProp,
+} from "@react-navigation/bottom-tabs"
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { isIOS } from "@rn-vui/base"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
@@ -46,7 +50,8 @@ import { CategoryFilterSheet } from "./category-filter-sheet"
 import { ClusterMarker, ClusterMarkerData } from "./cluster-marker"
 import { Viewport, placeLabels } from "./label-collision"
 import LocationButtonCopy from "./location-button-copy"
-import { MapSearchBar, searchBarBottom } from "./map-search-bar"
+import { MAP_CONTROL_INSET, searchBarBottom } from "./map-layout"
+import { MapSearchBar } from "./map-search-bar"
 import MapStyles from "./map-styles.json"
 import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
 import { truncateLabel } from "./marker-layout"
@@ -145,6 +150,13 @@ export default function MapComponent({
   // Where the place being added was fixed by the panel's Continue, or null
   // while the pin is still being aimed. See `PinnedPlaceMarker`.
   const [pinnedLocation, setPinnedLocation] = React.useState<LatLng | null>(null)
+  // The map's bottom edge is the screen's only when nothing is drawn below it.
+  // The tab bar and the add-place form each already pay for the system bar, so
+  // adding it again would lift the controls past 20. Read from the context
+  // rather than useBottomTabBarHeight, which throws outside a tab navigator.
+  const tabBarHeight = React.useContext(BottomTabBarHeightContext) ?? 0
+  const bottomControlOffset =
+    MAP_CONTROL_INSET + (tabBarHeight > 0 || isAddingPlace ? 0 : insets.bottom)
   // Read by the submit handler after its awaits, when the attempt may have been
   // closed, and by the cluster handler, which has to stay a stable callback.
   // Synced in an effect rather than during render: writing a ref in the render
@@ -595,7 +607,7 @@ export default function MapComponent({
             {canAddPlace && (
               <Pressable
                 testID="open-add-place"
-                style={styles.addPlace}
+                style={[styles.addPlace, { bottom: bottomControlOffset }]}
                 onPress={startAddingPlace}
                 accessibilityRole="button"
               >
@@ -630,10 +642,8 @@ export default function MapComponent({
           permissionsStatus !== RESULTS.LIMITED && (
             // Centring on yourself and then nudging the pin onto your own shop is
             // the common way to place one, so this stays on the map throughout.
-            // It needs no lifting to clear the form: the form is the map's
-            // sibling rather than something over it, so the bottom this is
-            // measured from is already the top of the form.
             <LocationButtonCopy
+              bottom={bottomControlOffset}
               requestPermissions={requestLocationPermission}
               permissionStatus={permissionsStatus}
               centerOnUser={centerOnUser}
@@ -689,7 +699,7 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
 
   // Everything drawn on the map is positioned inside this rather than over the
   // whole screen, so that "the bottom of the map" means the top of the form
-  // while one is open and the bottom of the screen when none is. The pin's
+  // while one is open and the top of the tab bar when none is. The pin's
   // centre — which is the coordinate being submitted — comes out right for the
   // same reason: it is the centre of the map view, whatever height that view
   // currently has.
@@ -716,13 +726,12 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
   },
   retryText: {
     fontSize: 13,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   addPlace: {
     position: "absolute",
-    left: 8,
-    bottom: 12,
+    left: MAP_CONTROL_INSET,
     zIndex: 99,
     flexDirection: "row",
     alignItems: "center",

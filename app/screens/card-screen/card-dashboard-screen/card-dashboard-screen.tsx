@@ -15,7 +15,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { BackendFeatureGate } from "@app/components/backend-feature-gate"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { BlinkCard } from "@app/components/blink-card"
-import { headerRightNoGlass } from "@app/components/header-no-glass"
+import { headerIconTouchArea, headerRightNoGlass } from "@app/components/header-no-glass"
 import {
   CardActionButtons,
   CardBalanceSection,
@@ -27,10 +27,10 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { toastShow } from "@app/utils/toast"
 
-import { useCardData } from "../hooks/use-card-data"
+import { useCardData, useCardBalance } from "@app/hooks"
 import { isCardFrozen, isCardUsable } from "../utils/card-display"
 
-import { useCardBalance, useCardFreeze, useCardTransactions } from "./hooks"
+import { useCardFreeze, useCardTransactions } from "./hooks"
 
 const EmptyScreen = ({ message }: { message: string }) => {
   const styles = useStyles()
@@ -137,8 +137,8 @@ const CardDashboardScreenContent: React.FC = () => {
         }
       >
         <BlinkCard
+          cardId={card?.id}
           cardNumber={cardNumber}
-          holderName=""
           validThruDate=""
           isFrozen={isFrozen}
         />
@@ -200,9 +200,10 @@ const useStyles = makeStyles(({ colors }) => ({
   loadMore: {
     marginTop: 16,
   },
+  // 48dp box around the 24dp icon (was 40dp from padding): the margin gives back 4dp.
   headerRight: {
-    padding: 8,
-    marginRight: 16,
+    ...headerIconTouchArea,
+    marginRight: 12,
   },
 }))
 

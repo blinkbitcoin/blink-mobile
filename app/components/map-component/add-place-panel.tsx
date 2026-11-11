@@ -22,6 +22,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { BottomSheet } from "@app/components/bottom-sheet"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 // Phosphor draws its X at about 70% of the box, so 24 is what puts the glyph at
@@ -392,9 +393,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
   title: {
     flex: 1,
     fontSize: 20,
-    // The bold face by name with no weight: Android swaps a weight on the
-    // regular face for Roboto, and there is no 600 face to ask for.
-    fontFamily: "SourceSansPro-Bold",
+    fontFamily: fonts.bold,
     color: colors.black,
   },
   content: {

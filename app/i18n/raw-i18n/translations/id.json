@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Kunci API",
+    "inactiveKeys": "Kunci tidak aktif ({count})",
     "noKeys": "Belum ada kunci API",
     "createKey": "Buat kunci API",
     "createTitle": "Kunci API baru",
@@ -27,10 +28,13 @@
     "revokeTitle": "Cabut kunci API?",
     "revokeBody": "\"{name: string}\" akan langsung berhenti berfungsi. Tindakan ini tidak dapat dibatalkan.",
     "revoke": "Cabut",
+    "revokeGoBack": "Kembali",
     "revokeSuccess": "Kunci API dicabut",
     "createError": "Tidak dapat membuat kunci API. Silakan coba lagi.",
     "revokeError": "Tidak dapat mencabut kunci API. Silakan coba lagi.",
     "loadError": "Tidak dapat memuat kunci API Anda. Silakan coba lagi nanti.",
+    "discardSecretTitle": "Buang kunci API ini?",
+    "discardSecretBody": "Ini satu-satunya kali rahasia ditampilkan. Jika Anda pergi sekarang, kunci tidak dapat dipulihkan dan Anda harus membuat yang baru.",
     "done": "Selesai"
   },
   "GaloyAddressScreen": {
@@ -78,7 +82,12 @@
     "skip": "Lewati",
     "unlock": "Buka Kunci",
     "usePin": "Gunakan Pin",
-    "confirmLogout": "Apakah anda yakin anda ingin keluar? Ini akan mengatur ulang cache anda dan semua pengaturan pengguna lokal"
+    "confirmLogout": "Apakah anda yakin anda ingin keluar? Ini akan mengatur ulang cache anda dan semua pengaturan pengguna lokal",
+    "forgotPin": "Lupa PIN? Hapus dompet",
+    "removeWalletsTitle": "Hapus dompet dari perangkat ini?",
+    "removeWalletsBody": "Ini menghapus semua dompet dari perangkat ini dan mengeluarkan Anda. Untuk memulihkan dompet, Anda memerlukan frasa pemulihannya. Tanpa itu, dompet akan hilang.",
+    "removeWalletsConfirm": "Hapus dompet",
+    "removeWalletsFailed": "Beberapa dompet tidak dapat dihapus. Silakan coba lagi."
   },
   "PeopleScreen": {
     "title": "Orang-orang",
@@ -2135,6 +2144,7 @@
     "addPlace": "Tambahkan ke peta",
     "addPlaceTitle": "Sarankan bisnis",
     "submitPlaceRequest": "Kirim permintaan",
+    "showMyLocation": "Tampilkan lokasi saya",
     "placePinHint": "Geser peta agar penanda tepat di tempatnya",
     "placeName": "Nama",
     "placeNameHint": "Nama tempat ini",
@@ -2176,16 +2186,19 @@
     "walletCountNotTwo": "Jumlah dompet bukan 2. Silakan gunakan dasbor untuk melihat semua dompet dan dana akun ini"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Tidak dapat mencatat percobaan dengan aman.",
+    "attemptsLeft": "{attemptsRemaining: number} percobaan tersisa.",
     "attemptsRemaining": "PIN salah. {attemptsRemaining: number} percobaan tersisa.",
     "enterPin": "Masukkan kode PIN Anda",
-    "lockoutUnavailable": "Tidak dapat mencatat percobaan gagal dengan aman. Keluar.",
+    "oneAttemptLeft": "1 percobaan tersisa.",
     "oneAttemptRemaining": "PIN salah. 1 percobaan tersisa.",
     "pinUnreadable": "Tidak dapat memeriksa PIN Anda. Silakan coba lagi.",
     "setPin": "Atur kode PIN Anda",
     "setPinFailedMatch": "PIN tidak cocok - Atur kode PIN Anda",
     "storePinFailed": "Tidak dapat menyimpan PIN Anda.",
     "tooManyAttempts": "Terlalu banyak percobaan gagal. Keluar.",
-    "tryAgainIn": "Coba lagi dalam {seconds: number} dtk.",
+    "attemptBudgetSpent": "Terlalu banyak percobaan gagal.",
+    "tryAgainIn": "Coba lagi dalam {time: string}.",
     "verifyPin": "Verifikasi kode PIN Anda"
   },
   "PriceHistoryScreen": {
@@ -2220,6 +2233,12 @@
     "error": "Gagal membuat faktur. Silakan hubungi dukungan jika masalah ini terus berlanjut.",
     "copyInvoice": "Salin",
     "shareInvoice": "Bagikan",
+    "newAddress": "Baru",
+    "newAddressHint": "Membuat alamat Bitcoin baru. Alamat sebelumnya tetap berfungsi.",
+    "newAddressGenerated": "Alamat baru siap. Alamat sebelumnya tetap berfungsi.",
+    "newAddressFailed": "Gagal membuat alamat baru. Silakan coba lagi.",
+    "newAddressRateLimited": "Terlalu banyak alamat baru. Tunggu sebentar lalu coba lagi.",
+    "onchainAddressLoadFailed": "Gagal memuat alamat Bitcoin Anda. Ketuk Baru untuk mencoba lagi.",
     "addAmount": "Minta Jumlah Tertentu",
     "expired": "Faktur telah kedaluwarsa",
     "expiresIn": "Berakhir dalam",
@@ -2355,6 +2374,8 @@
     "invalidAmount": "Ini mengandung jumlah yang tidak valid. Silakan buat ulang dengan jumlah yang valid.",
     "usernameDoesNotExist": "{lnAddress: string} tampaknya bukan alamat {bankName: string} yang ada.",
     "usernameDoesNotExistAdvice": "Pastikan ejaan benar atau minta penerima memberikan faktur LN atau alamat BTC.",
+    "destinationUnverifiable": "Kami tidak dapat memeriksa {lnAddress} sekarang — server {bankName} tidak merespons.",
+    "destinationUnverifiableAdvice": "Alamatnya kemungkinan besar benar. Coba lagi sebentar, atau minta penerima memberikan invoice LN atau alamat BTC.",
     "selfPaymentError": "{lnAddress: string} adalah alamat {bankName: string} Anda.",
     "selfPaymentAdvice": "Jika Anda ingin mengirim uang ke akun lain milik Anda, gunakan faktur, LN, atau alamat BTC.",
     "lnAddressError": "Kami tidak dapat mencapai alamat Lightning ini. Jika Anda yakin itu ada, coba lagi nanti.",
@@ -2577,12 +2598,14 @@
     "error": "Tidak dapat mengambil profil saat ini",
     "fromThisDevice": "dari perangkat ini?",
     "switchAccount": "Anda beralih ke akun lain",
-    "removedAccount": "Anda menghapus akun {identifier: string}."
+    "removedAccount": "Anda menghapus akun {identifier: string}.",
+    "removeAccount": "Hapus akun"
   },
   "StablesatsRestriction": {
     "walletLabel": "tidak tersedia di wilayah Anda",
     "anonModeWalletLabel": "tidak tersedia dalam mode Incognito",
-    "unknownRegionWalletLabel": "ketersediaan tidak dapat diperiksa, tarik ke bawah untuk mencoba lagi"
+    "unknownRegionWalletLabel": "ketersediaan tidak dapat diperiksa, tarik ke bawah untuk mencoba lagi",
+    "networkWalletLabel": "tidak tersedia di jaringan ini"
   },
   "AnonModeConvertModal": {
     "title": "Transfer saldo Dolar Anda terlebih dahulu",
@@ -2664,7 +2687,7 @@
   "TransactionDetailScreen": {
     "paid": "Dibayar ke/dari",
     "received": "Anda menerima",
-    "spent": "Anda menghabiskan",
+    "sent": "Anda mengirim",
     "sending": "Mengirim",
     "receivingAccount": "Akun Penerima",
     "sendingAccount": "Akun Pengirim",
@@ -2740,6 +2763,7 @@
       "tooLong": "Alamat harus memiliki maksimal 50 karakter",
       "invalidCharacter": "Alamat hanya boleh berisi huruf, angka, dan garis bawah",
       "addressUnavailable": "Maaf, alamat ini sudah digunakan",
+      "serverUnreachable": "Tidak dapat menghubungi server alamat. Coba lagi sebentar.",
       "unknownError": "Terjadi kesalahan yang tidak diketahui, silakan coba lagi nanti",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3034,7 +3058,8 @@
     "problemPersists": "Jika masalah berlanjut, hubungi dukungan.",
     "fatalError": "Maaf, tampaknya ada masalah dalam memuat data aplikasi. Jika masalah berlanjut, silakan hubungi dukungan.",
     "showError": "Tampilkan Kesalahan",
-    "clearAppData": "Hapus Data Aplikasi dan Keluar"
+    "clearAppData": "Hapus Data Aplikasi dan Keluar",
+    "screenSecurityUnavailable": "Layar ini tetap disembunyikan karena perlindungan tangkapan layar tidak dapat diaktifkan."
   },
   "notifications": {
     "payment": {
@@ -3051,7 +3076,6 @@
     "faq": "FAQ",
     "statusPage": "Status Page",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Dukungan",
     "defaultSupportMessage": "Halo! Saya membutuhkan bantuan dengan {bankName: string}, saya menggunakan versi {version: string} pada {os: string}.",
     "emailCopied": "email {email: string} disalin ke clipboard",
@@ -3065,7 +3089,13 @@
     "deleteAccountFromPhone": "Halo!, tolong tutup akun saya. Nomor telepon saya adalah {phoneNumber: string}.",
     "deleteAccountError": "Terjadi kesalahan. Hubungi {email: string} untuk bantuan lebih lanjut.",
     "bye": "Selamat tinggal!",
-    "deleteAccountWarning": "Perhatian: Penutupan akun bersifat permanen!\nPastikan dompet tidak memiliki dana sebelum menutup.\nAkun yang ditutup tidak dapat dipulihkan.\nKami dapat menyimpan catatan tertentu sebagaimana diwajibkan oleh hukum."
+    "deleteAccountWarning": "Perhatian: Penutupan akun bersifat permanen!\nPastikan dompet tidak memiliki dana sebelum menutup.\nAkun yang ditutup tidak dapat dipulihkan.\nKami dapat menyimpan catatan tertentu sebagaimana diwajibkan oleh hukum.",
+    "downloadLogs": "Unduh log",
+    "exportLogsTitle": "Bagikan log dompet Anda",
+    "exportLogsBody": "Berkas ini membantu tim dukungan kami menelusuri masalah pada dompet Anda. Berkas ini berisi riwayat pembayaran (jumlah, faktur, dan alamat) serta pengenal setiap dompet non-kustodial di perangkat ini, bukan hanya yang ini, tetapi tidak pernah frasa cadangan atau kunci Anda. Bagikan hanya kepada tim dukungan kami.",
+    "exportLogsConfirm": "Bagikan log",
+    "noLogsYet": "Belum ada log untuk dibagikan. Buka dompet Anda dan coba lagi.",
+    "exportLogsError": "Tidak dapat mengekspor log. Coba lagi."
   },
   "lnurl": {
     "overLimit": "Anda tidak dapat mengirim lebih dari jumlah maksimum.",
@@ -3220,7 +3250,10 @@
       "noLimit": "Tanpa batas",
       "limitUpdateSuccess": "Batas berhasil diperbarui",
       "limitUpdateError": "Gagal memperbarui batas",
-      "limitMustBePositive": "Batas harus lebih besar dari nol"
+      "limitMustBePositive": "Batas harus lebih besar dari nol",
+      "atmToggleError": "Gagal memperbarui penarikan ATM",
+      "atmControlsLoadError": "Gagal memuat batas ATM Anda",
+      "invalidLimitAmount": "Masukkan jumlah yang valid dengan maksimal 2 desimal"
     },
     "CardFeeSchedule": {
       "title": "Jadwal biaya Kartu Blink",
@@ -3795,7 +3828,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Cadangkan dompet Anda",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Pilih metode cadangan Anda",
@@ -3853,6 +3886,7 @@
     "CloudBackup": {
       "title": "Mari cadangkan dompet Anda",
       "description": "Kami akan menyimpan cadangan frasa pemulihan Anda ke {provider} Anda.",
+      "encryptCheckbox": "Enkripsi dengan kata sandi tambahan",
       "password": "Kata sandi",
       "passwordPlaceholder": "(minimal 12 karakter)",
       "confirmPassword": "Konfirmasi kata sandi",
@@ -3920,6 +3954,12 @@
     "dollarBalanceModal": {
       "title": "Kami tidak dapat memigrasikan Saldo Dolar Anda",
       "body": "Kosongkan Saldo Dolar Anda terlebih dahulu. Anda dapat mentransfernya ke Saldo Bitcoin di Blink atau ke tempat lain."
+    },
+    "pendingDepositModal": {
+      "title": "Ada setoran tertunda ke akun Anda",
+      "body": "Anda tidak dapat bermigrasi ke jenis akun lain sebelum semua setoran tertunda Anda diselesaikan dan dikreditkan ke akun ini.",
+      "contactSupportCta": "Hubungi dukungan",
+      "stillConfirming": "Setoran Anda belum dikonfirmasi. Coba lagi dalam beberapa menit."
     },
     "balancesOverview": {
       "title": "Pindahkan saldo Anda",
@@ -4108,6 +4148,7 @@
     "get": "Unduh",
     "storeNote": "“Unduh” membuka App Store atau Google Play. Kembali ke Blink setelah aplikasi terpasang.",
     "haveAnApp": "Saya sudah punya aplikasi",
+    "learnHow": "Pelajari caranya",
     "keyInstruction": "Salin kunci penyiapan ini ke aplikasi authenticator Anda.",
     "qrInstruction": "Menggunakan perangkat lain?\nPindai kode QR ini sebagai gantinya.",
     "backupTitle": "Cadangkan kunci Anda",
@@ -4194,6 +4235,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink tidak dapat dijangkau",
+    "unreachableDescription": "{featureName} memerlukan server Blink, yang saat ini tidak merespons. Dompet dan dana Anda tidak terpengaruh.",
     "featureCircles": "Circles",
     "featureEarn": "Belajar",
     "featureCard": "Card"
@@ -4216,6 +4259,9 @@
     "tokenTransfer": "Transfer {token}",
     "payTo": "Bayar ke {address}",
     "payment": "Pembayaran"
+  },
+  "SelfCustodialStaleRate": {
+    "satsOnly": "Menampilkan sats — nilai tukar tidak tersedia"
   },
   "SelfCustodialOffline": {
     "title": "Dompet offline",

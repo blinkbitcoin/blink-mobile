@@ -24,6 +24,9 @@ jest.mock("@app/i18n/i18n-react", () => ({
         balanceLabelBtc: () => "Balance · SATS",
         balanceLabelUsd: () => "Balance · USD",
       },
+      SelfCustodialStaleRate: {
+        satsOnly: () => "Showing sats — no exchange rate available",
+      },
     },
   }),
 }))
@@ -121,5 +124,41 @@ describe("BalanceHeader", () => {
 
     const placeholder = getByTestId("hidden-balance-placeholder")
     expect(within(placeholder).queryByText(/./)).toBeNull()
+  })
+
+  describe("the sats-only notice", () => {
+    it("is absent for a converted balance", () => {
+      const { queryByTestId } = renderHeader()
+
+      // Anchor: the header really rendered.
+      expect(queryByTestId("balance-value")).not.toBeNull()
+      expect(queryByTestId("balance-rate-notice")).toBeNull()
+    })
+
+    it("says why the amount is in sats", () => {
+      const { getByText, getByTestId } = renderHeader({
+        isSatsOnly: true,
+        formattedBalance: "1,000 SAT",
+      })
+
+      expect(getByTestId("balance-value")).toBeTruthy()
+      expect(getByText("Showing sats — no exchange rate available")).toBeTruthy()
+    })
+
+    it("is not shown while the balance is still loading", () => {
+      const { queryByTestId } = renderHeader({ isSatsOnly: true, loading: true })
+
+      expect(queryByTestId("balance-value")).toBeNull()
+      expect(queryByTestId("balance-rate-notice")).toBeNull()
+    })
+
+    it("stays hidden while the balance itself is hidden", () => {
+      mockHideAmount = true
+
+      const { queryByTestId } = renderHeader({ isSatsOnly: true })
+
+      expect(queryByTestId("balance-value")).toBeNull()
+      expect(queryByTestId("balance-rate-notice")).toBeNull()
+    })
   })
 })
