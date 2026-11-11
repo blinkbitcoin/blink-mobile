@@ -2,6 +2,7 @@ import React from "react"
 import { render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
+import { light } from "@app/rne-theme/colors"
 import theme from "@app/rne-theme/theme"
 import {
   DepositErrorReason,
@@ -75,6 +76,17 @@ describe("DepositErrorMessage", () => {
     })
 
     expect(getByText("Deposit too small after fees")).toBeTruthy()
+  })
+
+  it("tints the warning in the warning token", () => {
+    const { getByText } = renderWith({
+      ...baseDeposit,
+      errorReason: DepositErrorReason.BelowDust,
+    })
+
+    expect(getByText("Deposit too small after fees")).toHaveStyle({
+      color: light.warning,
+    })
   })
 
   it("shows the missing-utxo error", () => {

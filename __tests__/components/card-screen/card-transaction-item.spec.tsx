@@ -28,7 +28,6 @@ jest.mock("@rn-vui/themed", () => ({
         textMuted: "#999999",
         success: "#00AA00",
         error: "#FF0000",
-        staticBrandOrange: "#FF8C00",
         textOnBackground: "#000000",
       },
     },
@@ -235,6 +234,31 @@ describe("CardTransactionItem", () => {
       expect(getByText("3 hours ago")).toBeTruthy()
       expect(getByText("-$18.50")).toBeTruthy()
       expect(getByText("Completed")).toBeTruthy()
+    })
+  })
+
+  // Each status pins its token, so moving one to another live token fails here.
+  describe("status colours", () => {
+    const base = { merchantName: "Starbucks", timeAgo: "now", amount: "-$5.75" }
+
+    it("shows pending in textMuted", () => {
+      const { getByText } = render(<CardTransactionItem {...base} status="pending" />)
+      expect(getByText("Pending")).toHaveStyle({ color: "#999999" })
+    })
+
+    it("shows completed in success", () => {
+      const { getByText } = render(<CardTransactionItem {...base} status="completed" />)
+      expect(getByText("Completed")).toHaveStyle({ color: "#00AA00" })
+    })
+
+    it("shows declined in error", () => {
+      const { getByText } = render(<CardTransactionItem {...base} status="declined" />)
+      expect(getByText("Declined")).toHaveStyle({ color: "#FF0000" })
+    })
+
+    it("shows reversed in accent", () => {
+      const { getByText } = render(<CardTransactionItem {...base} status="reversed" />)
+      expect(getByText("Reversed")).toHaveStyle({ color: "#F7931A" })
     })
   })
 })

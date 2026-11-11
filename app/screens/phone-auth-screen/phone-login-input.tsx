@@ -115,7 +115,8 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
   const styles = useStyles()
 
   const phoneInputRef = useRef<InputRef>(null)
-  const [isFieldFocused, setIsFieldFocused] = useState(false)
+  // The field autofocuses on mount, so start focused: no resting fill flashes first.
+  const [isFieldFocused, setIsFieldFocused] = useState(true)
 
   const navigation =
     useNavigation<

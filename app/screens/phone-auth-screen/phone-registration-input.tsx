@@ -26,7 +26,8 @@ const PLACEHOLDER_PHONE_NUMBER = "123-456-7890"
 
 export const PhoneRegistrationInitiateScreen: React.FC = () => {
   const styles = useStyles()
-  const [isFieldFocused, setIsFieldFocused] = React.useState(false)
+  // The field autofocuses on mount, so start focused: no resting fill flashes first.
+  const [isFieldFocused, setIsFieldFocused] = React.useState(true)
 
   const {
     theme: { colors },

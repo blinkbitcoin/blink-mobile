@@ -95,7 +95,8 @@ export const PhoneRegistrationValidateScreen: React.FC<
   const { hasAuthenticator } = useLoginMethods()
 
   const [code, _setCode] = useState("")
-  const [isFieldFocused, setIsFieldFocused] = useState(false)
+  // The field autofocuses on mount, so start focused: no resting fill flashes first.
+  const [isFieldFocused, setIsFieldFocused] = useState(true)
   // Wait 2.5 minutes before allowing another code request
   const [secondsRemaining, setSecondsRemaining] = useState<number>(150)
   const { phone, channel } = route.params

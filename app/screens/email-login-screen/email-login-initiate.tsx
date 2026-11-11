@@ -64,7 +64,8 @@ export const EmailLoginInitiateScreen: React.FC = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList, "emailLoginInitiate">>()
 
   const [emailInput, setEmailInput] = React.useState<string>("")
-  const [isFieldFocused, setIsFieldFocused] = React.useState(false)
+  // The field autofocuses on mount, so start focused: no resting fill flashes first.
+  const [isFieldFocused, setIsFieldFocused] = React.useState(true)
   const [errorMessage, setErrorMessage] = React.useState<string>("")
   const [loading, setLoading] = React.useState<boolean>(false)
 

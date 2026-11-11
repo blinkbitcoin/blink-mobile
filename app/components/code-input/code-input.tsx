@@ -71,7 +71,8 @@ export const CodeInput: React.FC<Props> = ({
   const { colors } = useTheme()
 
   const [code, _setCode] = useState("")
-  const [isFieldFocused, setIsFieldFocused] = useState(false)
+  // The field autofocuses on mount, so start focused: no resting fill flashes first.
+  const [isFieldFocused, setIsFieldFocused] = useState(true)
 
   /** Nothing typed while a code is checked: the field keeps the one sent, rather than
    *  show another that would not be. */
