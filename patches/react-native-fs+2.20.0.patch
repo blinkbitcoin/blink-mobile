@@ -1,0 +1,30 @@
+diff --git a/node_modules/react-native-fs/RNFSManager.m b/node_modules/react-native-fs/RNFSManager.m
+index 5ddd941..9d9a9af 100755
+--- a/node_modules/react-native-fs/RNFSManager.m
++++ b/node_modules/react-native-fs/RNFSManager.m
+@@ -294,8 +294,8 @@ RCT_EXPORT_METHOD(readFile:(NSString *)filepath
+ }
+ 
+ RCT_EXPORT_METHOD(read:(NSString *)filepath
+-                  length: (NSInteger *)length
+-                  position: (NSInteger *)position
++                  length: (NSInteger)length
++                  position: (NSInteger)position
+                   resolver:(RCTPromiseResolveBlock)resolve
+                   rejecter:(RCTPromiseRejectBlock)reject)
+ {
+@@ -324,11 +324,11 @@ RCT_EXPORT_METHOD(read:(NSString *)filepath
+     }
+ 
+     // Seek to the position if there is one.
+-    [file seekToFileOffset: (int)position];
++    [file seekToFileOffset: (unsigned long long)position];
+ 
+     NSData *content;
+-    if ((int)length > 0) {
+-        content = [file readDataOfLength: (int)length];
++    if (length > 0) {
++        content = [file readDataOfLength: (NSUInteger)length];
+     } else {
+         content = [file readDataToEndOfFile];
+     }
