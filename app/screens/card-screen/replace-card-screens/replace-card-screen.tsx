@@ -110,7 +110,7 @@ export const ReplaceCardScreen: React.FC = () => {
       buttonLabel: LL.CardFlow.ReplaceCard.Status.buttonLabel(),
       navigateTo: "cardDashboardScreen",
       iconName: "delivery",
-      iconColor: colors._green,
+      iconColor: colors.staticSuccess,
       lastFour: result.lastFour,
       cardId: result.id,
     })
@@ -121,7 +121,7 @@ export const ReplaceCardScreen: React.FC = () => {
     completeFlow,
     navigation,
     LL,
-    colors._green,
+    colors.staticSuccess,
   ])
 
   const loading = replaceLoading || lockLoading
@@ -131,7 +131,7 @@ export const ReplaceCardScreen: React.FC = () => {
       case Step.ReportIssue:
         return {
           icon: "report-flag",
-          iconColor: colors.primary,
+          iconColor: colors.accent,
           title: LL.CardFlow.ReplaceCard.ReportIssue.title(),
           subtitle: LL.CardFlow.ReplaceCard.ReportIssue.subtitle(),
           buttonLabel: LL.common.continue(),
@@ -141,7 +141,7 @@ export const ReplaceCardScreen: React.FC = () => {
       case Step.Delivery:
         return {
           icon: "delivery",
-          iconColor: colors._green,
+          iconColor: colors.staticSuccess,
           title: LL.CardFlow.ReplaceCard.Delivery.title(),
           subtitle: LL.CardFlow.ReplaceCard.Delivery.subtitle(),
           buttonLabel: state.selectedDelivery
@@ -153,7 +153,7 @@ export const ReplaceCardScreen: React.FC = () => {
       case Step.Confirm:
         return {
           icon: "approved",
-          iconColor: colors._green,
+          iconColor: colors.staticSuccess,
           title: LL.CardFlow.ReplaceCard.Confirm.title(),
           subtitle: LL.CardFlow.ReplaceCard.Confirm.subtitle(),
           buttonLabel: LL.CardFlow.ReplaceCard.Confirm.submitRequest(),
@@ -221,7 +221,7 @@ export const ReplaceCardScreen: React.FC = () => {
     return (
       <Screen>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={colors.accent} />
         </View>
       </Screen>
     )

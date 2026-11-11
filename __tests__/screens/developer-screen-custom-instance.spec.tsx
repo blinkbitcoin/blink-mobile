@@ -9,9 +9,9 @@ jest.mock("@rn-vui/themed", () => {
   const ReactActual = jest.requireActual<typeof React>("react")
   const { Pressable } = jest.requireActual("react-native")
   const colors: Record<string, string> = {
-    grey3: "#999",
-    grey5: "#f5f5f5",
-    white: "#fff",
+    textDisabled: "#999",
+    surfaceInteractive: "#f5f5f5",
+    backgroundDefault: "#fff",
   }
   return {
     makeStyles:

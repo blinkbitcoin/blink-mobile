@@ -26,7 +26,7 @@ const HeaderCloseButton: React.FC<HeaderCloseControlParams> = ({
       onPress={() => navigation.navigate(navigateTo as never)}
       size="medium"
       name="close"
-      backgroundColor={colors.grey5}
+      backgroundColor={colors.surfaceInteractive}
       style={styles.headerCloseButton}
     />
   )

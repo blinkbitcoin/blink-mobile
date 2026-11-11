@@ -43,7 +43,7 @@ const ViewBackupPhraseContent: React.FC<ViewBackupPhraseContentProps> = ({
   if (!isAuthenticated) {
     return (
       <Screen preset="fixed">
-        <ActivityIndicator style={styles.loader} color={colors.primary} />
+        <ActivityIndicator style={styles.loader} color={colors.accent} />
       </Screen>
     )
   }

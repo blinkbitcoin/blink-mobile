@@ -128,7 +128,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   imageContainer: {
     alignSelf: "center",
-    backgroundColor: colors.grey3,
+    backgroundColor: colors.textDisabled,
     padding: 20,
     borderRadius: 20,
     marginBottom: 20,

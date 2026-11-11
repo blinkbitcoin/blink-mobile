@@ -129,6 +129,8 @@ export const CodeInput: React.FC<Props> = ({
           <ActivityIndicator
             style={styles.activityIndicator}
             size="large"
+            // React Navigation's theme, not the app palette: `primary` is its own key
+            // eslint-disable-next-line no-restricted-syntax
             color={colors.primary}
           />
         )}

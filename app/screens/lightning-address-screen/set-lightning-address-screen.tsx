@@ -212,7 +212,7 @@ export const SetLightningAddressScreen: React.FC<{
             onBlur={() => setIsFieldFocused(false)}
             value={username}
             placeholder={"SatoshiNakamoto"}
-            placeholderTextColor={colors.grey3}
+            placeholderTextColor={colors.textDisabled}
           />
           <Text type={"p1"}>{`@${lnAddressHostname}`}</Text>
         </View>
@@ -247,7 +247,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   successAnimationContainer: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -283,6 +283,6 @@ const useStyles = makeStyles(({ colors }) => ({
   textInputStyle: {
     flex: 1,
     fontSize: 18,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

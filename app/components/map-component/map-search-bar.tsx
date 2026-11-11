@@ -52,7 +52,7 @@ export const MapSearchBar: React.FC<Props> = ({
         accessibilityLabel={LL.common.search()}
       >
         <Text style={styles.placeholder}>{LL.common.search()}</Text>
-        <GaloyIcon name="magnifying-glass" size={20} color={colors.primary} />
+        <GaloyIcon name="magnifying-glass" size={20} color={colors.accent} />
       </Pressable>
 
       <Pressable
@@ -72,7 +72,7 @@ export const MapSearchBar: React.FC<Props> = ({
           name="ellipsis"
           size={22}
           weight="bold"
-          color={isFiltered ? colors.white : colors.primary}
+          color={isFiltered ? colors.backgroundDefault : colors.accent}
         />
       </Pressable>
     </View>
@@ -99,8 +99,8 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
     minHeight: CONTROL_HEIGHT,
     paddingHorizontal: 16,
     borderRadius: CONTROL_HEIGHT / 2,
-    backgroundColor: colors.white,
-    shadowColor: colors._black,
+    backgroundColor: colors.backgroundDefault,
+    shadowColor: colors.staticBlack,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
@@ -109,7 +109,7 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
   placeholder: {
     flex: 1,
     fontSize: 16,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   filter: {
     width: CONTROL_HEIGHT,
@@ -119,14 +119,14 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
     borderRadius: CONTROL_HEIGHT / 2,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.white,
-    shadowColor: colors._black,
+    backgroundColor: colors.backgroundDefault,
+    shadowColor: colors.staticBlack,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 4,
   },
   filterActive: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
   },
 }))

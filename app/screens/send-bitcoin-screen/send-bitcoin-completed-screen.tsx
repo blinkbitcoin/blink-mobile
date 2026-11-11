@@ -421,7 +421,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   viewShot: {
     flexGrow: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
   },
   completedText: {
     textAlign: "center",
@@ -441,7 +441,7 @@ const useStyles = makeStyles(({ colors }) => ({
   successActionFieldContainer: {
     overflow: "hidden",
     gap: 20,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 10,
     alignItems: "center",
     paddingHorizontal: 10,

@@ -80,7 +80,7 @@ const DefaultWalletPicker: React.FC<DefaultWalletPickerProps> = ({ options, info
           const isLast = index === options.length - 1
           return (
             <React.Fragment key={option.key}>
-              <Divider color={colors.grey4} />
+              <Divider color={colors.border} />
               <TouchableOpacity
                 onPress={option.onSelect}
                 activeOpacity={0.7}
@@ -97,7 +97,7 @@ const DefaultWalletPicker: React.FC<DefaultWalletPickerProps> = ({ options, info
                       <Icon
                         name="checkmark-circle"
                         size={20}
-                        color={colors._green}
+                        color={colors.staticSuccess}
                         type="ionicon"
                       />
                     ) : (
@@ -111,7 +111,7 @@ const DefaultWalletPicker: React.FC<DefaultWalletPickerProps> = ({ options, info
                   </ListItem.Content>
                 </ListItem>
               </TouchableOpacity>
-              {isLast && <Divider color={colors.grey4} />}
+              {isLast && <Divider color={colors.border} />}
             </React.Fragment>
           )
         })}
@@ -244,7 +244,7 @@ const DefaultWalletRegionPending: React.FC = () => {
       <View style={styles.regionPendingContainer}>
         <ActivityIndicator
           size="large"
-          color={colors.primary}
+          color={colors.accent}
           {...testProps("default-wallet-region-pending")}
         />
       </View>

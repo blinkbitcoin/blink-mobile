@@ -87,7 +87,7 @@ const KeypadKey: React.FC<KeypadKeyProps> = ({ keyValue, onPress, disabled }) =>
   )
 
   const isBackspace = keyValue === NumericKey.Backspace
-  const iconColor = disabled ? colors.grey3 : colors.primary
+  const iconColor = disabled ? colors.textDisabled : colors.accent
   const textStyle = disabled ? [styles.keyText, styles.keyTextDisabled] : styles.keyText
 
   return (
@@ -122,13 +122,13 @@ const useStyles = makeStyles(({ colors }) => ({
     minHeight: 54,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: colors.grey4,
+    borderColor: colors.border,
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 10,
   },
   keyPressed: {
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.border,
   },
   keyDisabled: {
     opacity: 0.5,
@@ -138,10 +138,10 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 28,
     fontWeight: "700",
     lineHeight: 32,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
   },
   keyTextDisabled: {
-    color: colors.grey3,
+    color: colors.textDisabled,
   },
 }))

@@ -63,7 +63,7 @@ const CustodialStablesatsModal: React.FC<InternalProps> = ({
     <Modal
       isVisible={isVisible}
       backdropOpacity={0.8}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       onBackdropPress={toggleModal}
     >
       <View style={styles.modalCard}>
@@ -150,7 +150,7 @@ const useCustodialStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 12,
   },
   modalCard: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 16,
     paddingVertical: 18,
   },
@@ -177,7 +177,7 @@ const useSelfCustodialStyles = makeStyles(({ colors }) => ({
   body: {
     fontSize: 16,
     lineHeight: 22,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
   },
   termsLink: {

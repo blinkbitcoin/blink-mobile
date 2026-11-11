@@ -471,7 +471,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
         <Pressable onPress={navigation.goBack}>
           <View style={[styles.close, closeInsetStyle]}>
             <Svg viewBox="0 0 100 100">
-              <Circle cx={50} cy={50} r={50} fill={colors._white} opacity={0.5} />
+              <Circle cx={50} cy={50} r={50} fill={colors.staticWhite} opacity={0.5} />
             </Svg>
             <GaloyIcon name="close" size={64} style={styles.iconClose} />
           </View>
@@ -521,7 +521,7 @@ const useStyles = makeStyles(
     },
 
     rectangle: {
-      borderColor: colors.primary,
+      borderColor: colors.accent,
       borderWidth: 2,
       height: shortestEdge * 0.75,
       width: shortestEdge * 0.75,
@@ -537,7 +537,7 @@ const useStyles = makeStyles(
       top: 0,
     },
 
-    iconClose: { position: "absolute", top: -2, color: colors._black },
+    iconClose: { position: "absolute", top: -2, color: colors.staticBlack },
 
     iconGalery: { opacity: 0.8 },
 

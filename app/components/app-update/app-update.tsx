@@ -111,7 +111,7 @@ export const AppUpdateModal = ({
   return (
     <ReactNativeModal
       isVisible={isVisible}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       backdropOpacity={0.92}
     >
       <View style={styles.main}>

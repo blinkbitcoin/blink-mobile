@@ -197,8 +197,8 @@ export const SettingsScreen: React.FC = () => {
             title={LL.BackupNudge.title()}
             description={LL.BackupNudge.settingsWarning()}
             onPress={() => navigation.navigate("selfCustodialBackupMethod")}
-            borderColor="primary"
-            titleColor="primary"
+            borderColor="accent"
+            titleColor="accent"
           />
         )}
         {shouldShowTwoFactorBanner && <TwoFactorBanner />}
@@ -247,8 +247,8 @@ const useStyles = makeStyles(({ colors }) => ({
     position: "absolute",
     right: 9,
     top: -3,
-    color: colors._darkGrey,
-    backgroundColor: colors.black,
+    color: colors.staticDarkGrey,
+    backgroundColor: colors.textOnBackground,
     textAlign: "center",
     verticalAlign: "middle",
     height: 14,

@@ -90,7 +90,7 @@ export const WalletFilterDropdown: React.FC<{
           </View>
 
           <View style={styles.pickWalletIcon}>
-            <GaloyIcon name="caret-down" size={24} color={colors.black} />
+            <GaloyIcon name="caret-down" size={24} color={colors.textOnBackground} />
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -140,7 +140,7 @@ export const WalletFilterDropdown: React.FC<{
 const useStyles = makeStyles(({ colors }) => ({
   fieldBackground: {
     flexDirection: "row",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     justifyContent: "space-between",
     alignItems: "center",
     padding: 14,
@@ -148,7 +148,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   walletContainer: {
     flexDirection: "row",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     paddingHorizontal: 14,
     borderRadius: 10,
     alignItems: "center",
@@ -170,7 +170,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   walletSelectorTypeLabelBtcText: {
     fontWeight: "bold",
-    color: colors.white,
+    color: colors.backgroundDefault,
   },
   walletSelectorTypeLabelAllText: {
     fontWeight: "bold",

@@ -111,7 +111,7 @@ export const AuthenticatorAppsScreen: React.FC = () => {
     >
       <IconHero
         icon="apps"
-        iconColor={colors._green}
+        iconColor={colors.staticSuccess}
         title={LL.AuthenticatorOnboarding.appsTitle()}
         subtitle={
           <Text type="p3" style={styles.description}>
@@ -153,7 +153,7 @@ const APP_ICON_SIZE = 28
 
 const useStyles = makeStyles(({ colors }) => ({
   description: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     textAlign: "center",
   },
   list: {
@@ -169,7 +169,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingLeft: 14,
     paddingRight: 10,
     borderRadius: 8,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
   appIcon: {
     width: APP_ICON_SIZE,
@@ -179,8 +179,8 @@ const useStyles = makeStyles(({ colors }) => ({
     overflow: "hidden",
     borderRadius: 10,
     borderWidth: 0.21,
-    borderColor: colors.grey3,
-    backgroundColor: colors._white,
+    borderColor: colors.textDisabled,
+    backgroundColor: colors.staticWhite,
   },
   appText: {
     flex: 1,
@@ -188,26 +188,26 @@ const useStyles = makeStyles(({ colors }) => ({
   appName: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   appDescription: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   getBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.border,
   },
   getLabel: {
     fontSize: 10,
     lineHeight: 13,
     fontFamily: fonts.bold,
-    color: colors.primary,
+    color: colors.accent,
   },
   storeNote: {
-    color: colors.grey2,
+    color: colors.textMuted,
   },
 }))

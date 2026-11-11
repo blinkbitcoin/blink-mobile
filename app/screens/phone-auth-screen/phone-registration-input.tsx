@@ -51,7 +51,7 @@ export const PhoneRegistrationInitiateScreen: React.FC = () => {
     return (
       <Screen>
         <View style={styles.loadingView}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={colors.accent} />
         </View>
       </Screen>
     )

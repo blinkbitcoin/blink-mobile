@@ -207,7 +207,7 @@ export const Delete = () => {
       isVisible={modalVisible}
       onBackdropPress={closeModal}
       backdropOpacity={0.8}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       avoidKeyboard={true}
     >
       <View style={styles.view}>
@@ -224,7 +224,7 @@ export const Delete = () => {
           onChangeText={setText}
           value={text}
           placeholder={LL.support.delete()}
-          placeholderTextColor={colors.grey3}
+          placeholderTextColor={colors.textDisabled}
         />
         <View style={styles.actionButtons}>
           <GaloyPrimaryButton
@@ -267,7 +267,7 @@ export const Delete = () => {
 const useStyles = makeStyles(({ colors }) => ({
   view: {
     marginHorizontal: 20,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     padding: 20,
     borderRadius: 20,
     display: "flex",
@@ -276,9 +276,9 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   textInput: {
     fontSize: 16,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.border,
     padding: 12,
-    color: colors.black,
+    color: colors.textOnBackground,
     borderRadius: 8,
   },
   actionButtons: {
@@ -288,6 +288,6 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "space-between",
   },
   warningText: {
-    color: colors.primary,
+    color: colors.accent,
   },
 }))

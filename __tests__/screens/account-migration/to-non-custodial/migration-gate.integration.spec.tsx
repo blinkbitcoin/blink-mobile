@@ -37,7 +37,7 @@ jest.mock("@react-navigation/native", () => ({
 
 jest.mock("@rn-vui/themed", () => ({
   ...jest.requireActual("@rn-vui/themed"),
-  useTheme: () => ({ theme: { colors: { primary: "#fb5607", warning: "#f0a202" } } }),
+  useTheme: () => ({ theme: { colors: { accent: "#fb5607", warning: "#f0a202" } } }),
 }))
 
 jest.mock("@app/components/screen", () => ({

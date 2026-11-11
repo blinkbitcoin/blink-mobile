@@ -46,7 +46,7 @@ export const ConfirmFeesModal: React.FC<ConfirmFeesModalProps> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   modalCard: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     borderRadius: 16,
     padding: 18,
   },

@@ -98,14 +98,14 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     borderStyle: "solid",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     paddingHorizontal: 16,
     borderRadius: 12,
     minHeight: 56,
     borderWidth: 1.5,
   },
   fieldBackgroundSelected: {
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.border,
   },
   contentContainer: {
     flex: 1,
@@ -118,7 +118,7 @@ const useStyles = makeStyles(({ colors }) => ({
     fontWeight: "500",
   },
   labelSelected: {
-    color: colors.primary,
+    color: colors.accent,
   },
   iconContainer: {
     marginLeft: 16,
@@ -136,10 +136,10 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 15,
     fontWeight: "400",
     marginLeft: 8,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
 
   recommendedSelected: {
-    color: colors.primary,
+    color: colors.accent,
   },
 }))

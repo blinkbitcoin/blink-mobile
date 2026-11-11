@@ -58,6 +58,6 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 16,
     lineHeight: 22,
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

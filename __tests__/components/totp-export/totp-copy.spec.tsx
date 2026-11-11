@@ -126,7 +126,7 @@ describe("CopySecretComponent", () => {
 
   it("outlines the field in the primary colour only where copying is the step to take", () => {
     const { unmount } = renderField({ isHighlighted: true })
-    expect(fieldBorderColor()).toBe(theme.lightColors?.primary)
+    expect(fieldBorderColor()).toBe(theme.lightColors?.accent)
     unmount()
 
     renderField({})

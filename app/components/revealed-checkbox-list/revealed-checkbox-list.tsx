@@ -87,7 +87,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingTop: 20,
   },
   card: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 14,
