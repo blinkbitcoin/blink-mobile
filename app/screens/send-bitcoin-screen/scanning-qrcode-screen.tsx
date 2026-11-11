@@ -485,7 +485,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
             <GaloyIcon
               name="image"
               size={64}
-              color={colors._lightGrey}
+              color={colors.staticWhite}
               style={galleryIconStyle}
             />
           </Pressable>
@@ -494,7 +494,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
             <GaloyIcon
               name="clipboard"
               size={64}
-              color={colors._lightGrey}
+              color={colors.staticWhite}
               style={styles.iconClipboard}
             />
           </Pressable>

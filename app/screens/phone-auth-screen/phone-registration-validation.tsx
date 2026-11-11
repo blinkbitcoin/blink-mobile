@@ -95,6 +95,7 @@ export const PhoneRegistrationValidateScreen: React.FC<
   const { hasAuthenticator } = useLoginMethods()
 
   const [code, _setCode] = useState("")
+  const [isFieldFocused, setIsFieldFocused] = useState(false)
   // Wait 2.5 minutes before allowing another code request
   const [secondsRemaining, setSecondsRemaining] = useState<number>(150)
   const { phone, channel } = route.params
@@ -282,7 +283,12 @@ export const PhoneRegistrationValidateScreen: React.FC<
         <Input
           placeholder="000000"
           containerStyle={styles.inputComponentContainerStyle}
-          inputContainerStyle={styles.inputContainerStyle}
+          inputContainerStyle={[
+            styles.inputContainerStyle,
+            isFieldFocused && styles.fieldFocused,
+          ]}
+          onFocus={() => setIsFieldFocused(true)}
+          onBlur={() => setIsFieldFocused(false)}
           inputStyle={styles.inputStyle}
           value={code}
           onChangeText={setCode}
@@ -339,12 +345,15 @@ const useStyles = makeStyles(({ colors }) => ({
   inputContainerStyle: {
     minWidth: 160,
     minHeight: 60,
-    borderWidth: 2,
-    borderBottomWidth: 2,
+    borderWidth: 0,
+    borderBottomWidth: 0,
     paddingHorizontal: 10,
-    borderColor: colors.primary5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     marginRight: 0,
+  },
+  fieldFocused: {
+    backgroundColor: colors.surfaceFocused,
   },
   inputStyle: {
     fontSize: 24,

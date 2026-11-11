@@ -31,12 +31,15 @@ const useStyles = makeStyles(({ colors }) => ({
   inputContainerStyle: {
     minWidth: 160,
     minHeight: 60,
-    borderWidth: 2,
-    borderBottomWidth: 2,
+    borderWidth: 0,
+    borderBottomWidth: 0,
     paddingHorizontal: 10,
-    borderColor: colors.primary5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     marginRight: 0,
+  },
+  fieldFocused: {
+    backgroundColor: colors.surfaceFocused,
   },
   inputStyle: {
     fontSize: 24,
@@ -68,6 +71,7 @@ export const CodeInput: React.FC<Props> = ({
   const { colors } = useTheme()
 
   const [code, _setCode] = useState("")
+  const [isFieldFocused, setIsFieldFocused] = useState(false)
 
   /** Nothing typed while a code is checked: the field keeps the one sent, rather than
    *  show another that would not be. */
@@ -102,7 +106,12 @@ export const CodeInput: React.FC<Props> = ({
           {...testProps("code-input")}
           placeholder={placeholder}
           containerStyle={styles.inputComponentContainerStyle}
-          inputContainerStyle={styles.inputContainerStyle}
+          inputContainerStyle={[
+            styles.inputContainerStyle,
+            isFieldFocused && styles.fieldFocused,
+          ]}
+          onFocus={() => setIsFieldFocused(true)}
+          onBlur={() => setIsFieldFocused(false)}
           inputStyle={styles.inputStyle}
           value={code}
           onChangeText={setCode}

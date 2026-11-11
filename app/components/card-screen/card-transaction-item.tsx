@@ -41,7 +41,7 @@ export const CardTransactionItem: React.FC<CardTransactionItemProps> = ({
       text: LL.CardFlow.TransactionStatus.declined(),
     },
     [CardTransactionUiStatus.Reversed]: {
-      color: colors._orange,
+      color: colors.accent,
       text: LL.CardFlow.TransactionStatus.reversed(),
     },
   }

@@ -62,6 +62,7 @@ export const SetLightningAddressScreen: React.FC<{
   const [error, setError] = useState<SetUsernameError | undefined>()
   const [username, setUsername] = useState("")
   const [showSuccess, setShowSuccess] = useState(false)
+  const [isFieldFocused, setIsFieldFocused] = useState(false)
   const { onboarding } = route.params
 
   const {
@@ -199,12 +200,16 @@ export const SetLightningAddressScreen: React.FC<{
           {LL.SetAddressModal.itCannotBeChanged()}
         </Text>
 
-        <View style={styles.textInputContainerStyle}>
+        <View
+          style={[styles.textInputContainerStyle, isFieldFocused && styles.fieldFocused]}
+        >
           <TextInput
             autoCorrect={false}
             autoComplete="off"
             style={styles.textInputStyle}
             onChangeText={onChangeUsername}
+            onFocus={() => setIsFieldFocused(true)}
+            onBlur={() => setIsFieldFocused(false)}
             value={username}
             placeholder={"SatoshiNakamoto"}
             placeholderTextColor={colors.grey3}
@@ -268,11 +273,12 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 12,
     borderRadius: 8,
     minHeight: 60,
-    backgroundColor: colors.grey5,
-    borderWidth: 2,
-    borderColor: colors.primary5,
+    backgroundColor: colors.surfaceInteractive,
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  fieldFocused: {
+    backgroundColor: colors.surfaceFocused,
   },
   textInputStyle: {
     flex: 1,

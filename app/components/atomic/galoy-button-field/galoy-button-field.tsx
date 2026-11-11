@@ -42,18 +42,18 @@ export const GaloyButtonField = ({
         break
       case pressed:
         colorStyles = {
-          backgroundColor: colors.accent3,
+          backgroundColor: colors.accent,
         }
         break
       case disabled:
         colorStyles = {
           opacity: 0.3,
-          backgroundColor: colors.accent4,
+          backgroundColor: colors.accent,
         }
         break
       default:
         colorStyles = {
-          backgroundColor: colors.accent4,
+          backgroundColor: colors.accent,
         }
     }
 

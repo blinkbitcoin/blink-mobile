@@ -164,7 +164,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: "transparent",
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: colors.primary3,
+    borderColor: colors.accent,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -174,7 +174,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   walletSelectorTypeLabelAllText: {
     fontWeight: "bold",
-    color: colors.primary3,
+    color: colors.accent,
   },
   walletSelectorTypeTextContainer: {
     flex: 1,

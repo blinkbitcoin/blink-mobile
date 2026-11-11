@@ -135,7 +135,7 @@ export const GetStartedScreen: React.FC = () => {
   const NonProdInstanceHint =
     id === "Main" ? null : (
       <View style={styles.textInstance}>
-        <Text type={"h2"} color={theme.darkColors?._orange}>
+        <Text type={"h2"} color={theme.darkColors?.accent}>
           {id}
         </Text>
       </View>

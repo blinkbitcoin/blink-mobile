@@ -26,6 +26,7 @@ const PLACEHOLDER_PHONE_NUMBER = "123-456-7890"
 
 export const PhoneRegistrationInitiateScreen: React.FC = () => {
   const styles = useStyles()
+  const [isFieldFocused, setIsFieldFocused] = React.useState(false)
 
   const {
     theme: { colors },
@@ -155,18 +156,26 @@ export const PhoneRegistrationInitiateScreen: React.FC = () => {
             onSelect={(country: { cca2: string }) =>
               setCountryCode(country.cca2 as PhoneNumberCountryCode)
             }
-            buttonStyle={styles.countryPickerButtonStyle}
+            buttonStyle={[
+              styles.countryPickerButtonStyle,
+              isFieldFocused && styles.fieldFocused,
+            ]}
           />
           <Input
             {...testProps("telephoneNumber")}
             placeholder={PLACEHOLDER_PHONE_NUMBER}
             containerStyle={styles.inputComponentContainerStyle}
-            inputContainerStyle={styles.inputContainerStyle}
+            inputContainerStyle={[
+              styles.inputContainerStyle,
+              isFieldFocused && styles.fieldFocused,
+            ]}
             renderErrorMessage={false}
             textContentType="telephoneNumber"
             keyboardType="phone-pad"
             value={phoneInputInfo?.rawPhoneNumber}
             onChangeText={setPhoneNumber}
+            onFocus={() => setIsFieldFocused(true)}
+            onBlur={() => setIsFieldFocused(false)}
             autoFocus={true}
           />
         </View>
@@ -226,8 +235,7 @@ const useStyles = makeStyles(({ colors }) => ({
    *  button that does not twitch between a "+1" and a "+503". */
   countryPickerButtonStyle: {
     minWidth: 110,
-    borderColor: colors.primary5,
-    borderWidth: 2,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     paddingHorizontal: 10,
     flexDirection: "row",
@@ -242,11 +250,15 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   inputContainerStyle: {
     flex: 1,
-    borderWidth: 2,
-    borderBottomWidth: 2,
+    borderWidth: 0,
+    borderBottomWidth: 0,
     paddingHorizontal: 10,
-    borderColor: colors.primary5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
+  },
+  /** Applied to the country picker too: it always looks like the number field. */
+  fieldFocused: {
+    backgroundColor: colors.surfaceFocused,
   },
   errorContainer: {
     marginBottom: 20,

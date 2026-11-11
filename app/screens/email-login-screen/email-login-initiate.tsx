@@ -38,11 +38,14 @@ const useStyles = makeStyles(({ colors }) => ({
 
   inputContainerStyle: {
     flex: 1,
-    borderWidth: 2,
-    borderBottomWidth: 2,
+    borderWidth: 0,
+    borderBottomWidth: 0,
     paddingHorizontal: 10,
-    borderColor: colors.primary5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
+  },
+  fieldFocused: {
+    backgroundColor: colors.surfaceFocused,
   },
   errorContainer: {
     marginBottom: 20,
@@ -61,6 +64,7 @@ export const EmailLoginInitiateScreen: React.FC = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList, "emailLoginInitiate">>()
 
   const [emailInput, setEmailInput] = React.useState<string>("")
+  const [isFieldFocused, setIsFieldFocused] = React.useState(false)
   const [errorMessage, setErrorMessage] = React.useState<string>("")
   const [loading, setLoading] = React.useState<boolean>(false)
 
@@ -135,7 +139,12 @@ export const EmailLoginInitiateScreen: React.FC = () => {
             {...testProps(LL.EmailRegistrationInitiateScreen.placeholder())}
             placeholder={LL.EmailRegistrationInitiateScreen.placeholder()}
             autoCapitalize="none"
-            inputContainerStyle={styles.inputContainerStyle}
+            inputContainerStyle={[
+              styles.inputContainerStyle,
+              isFieldFocused && styles.fieldFocused,
+            ]}
+            onFocus={() => setIsFieldFocused(true)}
+            onBlur={() => setIsFieldFocused(false)}
             renderErrorMessage={false}
             textContentType="emailAddress"
             keyboardType="email-address"

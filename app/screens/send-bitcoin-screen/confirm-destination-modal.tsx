@@ -59,7 +59,7 @@ export const ConfirmDestinationModal: React.FC<ConfirmDestinationModalProps> = (
       }
       toggleModal={goBack}
       title={LL.SendBitcoinDestinationScreen.confirmUsernameModal.title()}
-      image={<GaloyIcon name="info" size={100} color={colors.primary3} />}
+      image={<GaloyIcon name="info" size={100} color={colors.accent} />}
       body={
         <View style={styles.body}>
           <Text type={"p2"} color={colors.warning} style={styles.warningText}>

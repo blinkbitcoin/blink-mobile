@@ -110,7 +110,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
-    borderBottomColor: colors.primary4,
+    borderBottomColor: colors.accent,
     borderBottomWidth: 1,
   },
   emptySpacer: {

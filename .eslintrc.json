@@ -184,7 +184,7 @@
     "no-restricted-syntax": [
       "warn",
       {
-        "selector": ":matches(MemberExpression[object.name='colors'], MemberExpression[object.property.name='colors']) > Identifier.property[name=/^(white|black|primary[345]?|grey[0-7]|red|error9|blue5|backdropWhite|backdropWhiter|_(white|black|lightGrey|lighterGrey|lightBlue|darkGrey|cardPill|blue|orange|sky|green|primary1|primary2|warningLight))$/]",
+        "selector": ":matches(MemberExpression[object.name='colors'], MemberExpression[object.property.name='colors']) > Identifier.property[name=/^(white|black|primary|grey[0-7]|red|error9|blue5|backdropWhite|backdropWhiter|_(white|black|lightGrey|lighterGrey|lightBlue|darkGrey|cardPill|blue|orange|sky|green|primary1|primary2|warningLight))$/]",
         "message": "Deprecated color token — use the semantic token instead (see app/rne-theme/colors.ts)."
       }
     ],

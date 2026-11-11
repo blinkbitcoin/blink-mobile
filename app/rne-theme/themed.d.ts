@@ -15,9 +15,6 @@ declare module "@rn-vui/themed" {
     surfacePressed: string
     surfaceStatic: string
     accent: string
-    accent2: string
-    accent3: string
-    accent4: string
     errorBackground: string
     backdrop: string
     backdropStrong: string
@@ -57,12 +54,6 @@ declare module "@rn-vui/themed" {
     readonly black: string
     /** @deprecated use accent */
     readonly primary: string
-    /** @deprecated use accent2 */
-    primary3: string
-    /** @deprecated use accent3 */
-    primary4: string
-    /** @deprecated use accent4 */
-    primary5: string
     /** @deprecated use textPrimary */
     readonly grey0: string
     /** @deprecated use textSecondary */

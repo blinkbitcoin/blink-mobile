@@ -43,7 +43,7 @@ export const OpenSettingsModal = React.forwardRef<
       isVisible={isVisible}
       toggleModal={() => toggleVisible(!isVisible)}
       title={LL.MapScreen.navToSettingsTitle()}
-      image={<GaloyIcon name="info" size={100} color={colors.primary3} />}
+      image={<GaloyIcon name="info" size={100} color={colors.accent} />}
       body={
         <View style={styles.body}>
           <Text type={"p2"} style={styles.warningText}>

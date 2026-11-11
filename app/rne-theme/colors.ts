@@ -45,9 +45,6 @@ const lightSemantic = {
   surfaceStatic: "#F7F7F7", // cannot be tapped, ever — cards, banners, read-only
 
   accent: "#fc5805",
-  accent2: "#fd800b", // accent2–4 are the mirrored ramp kept for existing gradients
-  accent3: "#fe990d",
-  accent4: "#ffad0d",
 
   error: "#DC2626",
   errorBackground: "#FEE2E2",
@@ -81,9 +78,6 @@ const darkSemantic = {
   surfaceStatic: "#121212",
 
   accent: "#ffad0d",
-  accent2: "#fe990d",
-  accent3: "#fd800b",
-  accent4: "#fc5805",
 
   error: "#DC2626",
   errorBackground: "#7F1D1D",
@@ -105,9 +99,6 @@ const legacyAliases = (semantic: typeof lightSemantic | typeof darkSemantic) => 
   black: semantic.textOnBackground,
 
   primary: semantic.accent,
-  primary3: semantic.accent2,
-  primary4: semantic.accent3,
-  primary5: semantic.accent4,
 
   grey0: semantic.textPrimary,
   grey1: semantic.textSecondary,
