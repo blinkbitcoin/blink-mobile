@@ -148,6 +148,7 @@ const roleTokens = (semantic: typeof lightSemantic | typeof darkSemantic) => ({
   borderStrong: semantic.textDisabled, // focused input underline
   surfaceMuted: semantic.border, // neutral control fill: icon button, switch track off
   surfaceInactive: semantic.textDisabled, // unselected currency pill and bubble
+  surfaceFocused: semantic.surfacePressed, // input field fill while focused
   // Brand success green. Overrides the UI library default (#52C41A) that
   // `colors.success` fell back to, since the palette never defined it.
   success: semantic.staticSuccess,

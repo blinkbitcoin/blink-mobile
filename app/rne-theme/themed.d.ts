@@ -29,6 +29,7 @@ declare module "@rn-vui/themed" {
     borderStrong: string
     surfaceMuted: string
     surfaceInactive: string
+    surfaceFocused: string
 
     // static* tokens never invert between light and dark mode.
     // Allowed only on screens that require no inversion (QR code, camera)

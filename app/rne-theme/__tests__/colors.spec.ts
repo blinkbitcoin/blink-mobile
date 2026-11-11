@@ -48,6 +48,7 @@ const roleToSource: Record<string, string> = {
   borderStrong: "textDisabled",
   surfaceMuted: "border",
   surfaceInactive: "textDisabled",
+  surfaceFocused: "surfacePressed",
   success: "staticSuccess",
 }
 
