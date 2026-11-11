@@ -4146,6 +4146,7 @@
     "get": "Letöltés",
     "storeNote": "A „Letöltés” megnyitja az App Store-t vagy a Google Playt. Ha telepítetted, gyere vissza a Blinkbe.",
     "haveAnApp": "Már van alkalmazásom",
+    "learnHow": "Nézd meg, hogyan",
     "keyInstruction": "Másold be ezt a beállítási kulcsot a hitelesítő alkalmazásodba.",
     "qrInstruction": "Másik eszközt használsz?\nOlvasd be inkább ezt a QR-kódot.",
     "backupTitle": "Mentsd el a kulcsodat",

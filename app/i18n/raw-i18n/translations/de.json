@@ -4146,6 +4146,7 @@
         "get": "Laden",
         "storeNote": "„Laden“ öffnet den App Store oder Google Play. Kehre zu Blink zurück, sobald die App installiert ist.",
         "haveAnApp": "Ich habe eine App",
+        "learnHow": "So geht’s",
         "keyInstruction": "Kopiere diesen Einrichtungsschlüssel in deine Authenticator-App.",
         "qrInstruction": "Nutzt du ein anderes Gerät?\nScanne stattdessen diesen QR-Code.",
         "backupTitle": "Sichere deinen Schlüssel",

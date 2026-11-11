@@ -74,6 +74,17 @@ describe("useTwoFactorFlowExit", () => {
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
+  /** The user opened the onboarding themselves, from the setup key screen the settings
+   *  opened: no prompt is behind it to dismiss, and the setup key waits beneath. */
+  it("only goes back, charging nothing, when the setup key screen opened it", () => {
+    const { result } = renderExit({ isOpenedFromSetupKey: true })
+
+    act(() => result.current.leave())
+
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
+
   /** The user was not waving the prompt away: the registration never started. */
   it("only goes back, charging nothing, once the registration could not start", () => {
     const { result, rerender } = renderExit({ origin: MODAL_ORIGIN })

@@ -4146,6 +4146,7 @@
     "get": "Dapatkan",
     "storeNote": "“Dapatkan” membuka App Store atau Google Play. Kembali ke Blink apabila aplikasi telah dipasang.",
     "haveAnApp": "Saya sudah ada aplikasi",
+    "learnHow": "Ketahui caranya",
     "keyInstruction": "Salin kunci persediaan ini ke dalam aplikasi authenticator anda.",
     "qrInstruction": "Menggunakan peranti lain?\nImbas kod QR ini sebagai gantinya.",
     "backupTitle": "Sandarkan kunci anda",

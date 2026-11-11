@@ -4146,6 +4146,7 @@
     "get": "İndir",
     "storeNote": "“İndir” App Store'u veya Google Play'i açar. Yüklendikten sonra Blink'e geri dönün.",
     "haveAnApp": "Bir uygulamam var",
+    "learnHow": "Nasıl yapılır",
     "keyInstruction": "Bu kurulum anahtarını doğrulayıcı uygulamanıza kopyalayın.",
     "qrInstruction": "Başka bir cihaz mı kullanıyorsunuz?\nBunun yerine bu QR kodunu tarayın.",
     "backupTitle": "Anahtarınızı yedekleyin",

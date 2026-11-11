@@ -4146,6 +4146,7 @@
     "get": "Hent",
     "storeNote": "»Hent« åbner App Store eller Google Play. Vend tilbage til Blink, når appen er installeret.",
     "haveAnApp": "Jeg har en app",
+    "learnHow": "Se hvordan",
     "keyInstruction": "Kopiér denne opsætningsnøgle ind i din authenticator-app.",
     "qrInstruction": "Bruger du en anden enhed?\nScan denne QR-kode i stedet.",
     "backupTitle": "Sikkerhedskopiér din nøgle",

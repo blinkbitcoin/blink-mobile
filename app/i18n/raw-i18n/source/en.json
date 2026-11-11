@@ -4159,6 +4159,7 @@
         "get": "Get",
         "storeNote": "\"Get\" opens the App Store or Google Play. Come back to Blink when it's installed.",
         "haveAnApp": "I have an app",
+        "learnHow": "Learn how",
         "keyInstruction": "Copy this setup key into your authenticator app.",
         "qrInstruction": "Using another device?\nScan this QR code instead.",
         "backupTitle": "Back up your key",
