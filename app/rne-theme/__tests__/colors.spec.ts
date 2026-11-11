@@ -48,6 +48,7 @@ const roleToSource: Record<string, string> = {
   borderStrong: "textDisabled",
   surfaceMuted: "border",
   surfaceInactive: "textDisabled",
+  success: "staticSuccess",
 }
 
 describe("color token aliases", () => {
