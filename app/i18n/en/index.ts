@@ -4448,7 +4448,6 @@ const en: BaseTranslation = {
     exportFailed: "Could not download the emergency bundle.",
   },
   SelfCustodialStaleRate: {
-    notice: "Exchange rate may be out of date",
     satsOnly: "Showing sats — no exchange rate available",
   },
   SelfCustodialOffline: {

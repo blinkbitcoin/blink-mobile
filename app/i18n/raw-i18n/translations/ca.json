@@ -4259,7 +4259,6 @@
     "payment": "Pagament"
   },
   "SelfCustodialStaleRate": {
-    "notice": "El tipus de canvi pot estar desactualitzat",
     "satsOnly": "Es mostren sats: no hi ha tipus de canvi disponible"
   },
   "SelfCustodialOffline": {

@@ -4259,7 +4259,6 @@
     "payment": "Thanh toán"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Tỷ giá có thể đã cũ",
     "satsOnly": "Đang hiển thị sats — không có tỷ giá"
   },
   "SelfCustodialOffline": {

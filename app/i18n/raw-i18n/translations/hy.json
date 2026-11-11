@@ -4259,7 +4259,6 @@
     "payment": "Վճարում"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Փոխարժեքը կարող է հնացած լինել",
     "satsOnly": "Ցուցադրվում է sats-ով — փոխարժեք հասանելի չէ"
   },
   "SelfCustodialOffline": {

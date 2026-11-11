@@ -4259,7 +4259,6 @@
     "payment": "Pembayaran"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Nilai tukar mungkin sudah tidak berlaku",
     "satsOnly": "Menampilkan sats — nilai tukar tidak tersedia"
   },
   "SelfCustodialOffline": {

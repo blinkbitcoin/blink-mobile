@@ -4259,7 +4259,6 @@
     "payment": "Plată"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Cursul de schimb ar putea fi învechit",
     "satsOnly": "Se afișează sats — niciun curs de schimb disponibil"
   },
   "SelfCustodialOffline": {

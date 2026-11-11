@@ -4259,7 +4259,6 @@
     "payment": "การชำระเงิน"
   },
   "SelfCustodialStaleRate": {
-    "notice": "อัตราแลกเปลี่ยนอาจไม่เป็นปัจจุบัน",
     "satsOnly": "แสดงเป็น sats — ไม่มีอัตราแลกเปลี่ยน"
   },
   "SelfCustodialOffline": {

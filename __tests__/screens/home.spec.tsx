@@ -8,6 +8,8 @@ import { RefreshControl, StyleSheet } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { HomeScreen } from "../../app/screens/home-screen"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
+
 import { ContextForScreen } from "./helper"
 import { flushEffects } from "../helpers/flush-effects"
 import { waitForStableRender } from "../helpers/wait-for-stable-render"
@@ -275,6 +277,8 @@ const UPGRADE_MODAL_DELAY_WITH_SLACK_MS = 2000
 let mockIsRestrictedRegion = false
 let mockIsRestrictedRegionEvaluationPending = false
 let mockCanShowUpgradeModal = false
+/** Unset keeps the real hook's answer; a spec sets it to price Home off an old rate. */
+let mockPriceFreshness: string | undefined
 let mockHomeCard: { id: string; status: CardStatus } | undefined
 let mockHomeCardLoaded = false
 let mockHomeCardLoading = false
@@ -526,6 +530,19 @@ jest.mock("@app/utils/helper", () => ({
   ...jest.requireActual("@app/utils/helper"),
   isIos: true,
 }))
+
+jest.mock("@app/hooks/use-price-conversion", () => {
+  const actual = jest.requireActual("@app/hooks/use-price-conversion")
+  return {
+    ...actual,
+    usePriceConversion: () => {
+      const result = actual.usePriceConversion()
+      return mockPriceFreshness
+        ? { ...result, priceFreshness: mockPriceFreshness }
+        : result
+    },
+  }
+})
 
 jest.mock("@app/hooks", () => {
   const actual = jest.requireActual("@app/hooks")
@@ -1032,6 +1049,7 @@ const resetHomeScreenMocks = () => {
   mockIsFocused = true
   mockActiveWalletOverride = null
   mockActiveAccountOverride = null
+  mockPriceFreshness = undefined
   mockDollarBalanceRestrictedOverride = false
   mockDollarRegionDeterminedOverride = true
   mockRegionPendingOverride = false
@@ -4005,5 +4023,49 @@ describe("HomeScreen sanctioned session", () => {
     const { queryByTestId } = await renderAndSettleUpgradeDelay()
 
     expect(queryByTestId("migrate-now-modal")).toBeNull()
+  })
+})
+
+describe("HomeScreen stale exchange rate (blink-wip#2035)", () => {
+  /** Real copy rather than the empty strings an unloaded locale renders: the line only
+   *  showed for a non-empty notice. Last in the file, as the locale stays loaded. */
+  beforeAll(() => loadLocale("en"))
+  beforeEach(resetHomeScreenMocks)
+
+  it("shows the balance with no line under it when the rate is stale", async () => {
+    mockPriceFreshness = "stale"
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+        {
+          id: "usd-1",
+          walletCurrency: "USD",
+          balance: { amount: 0, currency: "USD", currencyCode: "USD" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+
+    const { getByTestId, queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    // The line came and went as the launch's refresh landed, moving everything under
+    // the balance. An old rate still prices the figure; it is just not announced.
+    expect(getByTestId("balance-value")).toBeTruthy()
+    expect(queryByTestId("balance-rate-notice")).toBeNull()
   })
 })

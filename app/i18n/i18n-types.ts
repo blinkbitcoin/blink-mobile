@@ -14055,10 +14055,6 @@ type RootTranslation = {
 	}
 	SelfCustodialStaleRate: {
 		/**
-		 * E​x​c​h​a​n​g​e​ ​r​a​t​e​ ​m​a​y​ ​b​e​ ​o​u​t​ ​o​f​ ​d​a​t​e
-		 */
-		notice: string
-		/**
 		 * S​h​o​w​i​n​g​ ​s​a​t​s​ ​—​ ​n​o​ ​e​x​c​h​a​n​g​e​ ​r​a​t​e​ ​a​v​a​i​l​a​b​l​e
 		 */
 		satsOnly: string
@@ -28269,10 +28265,6 @@ export type TranslationFunctions = {
 		exportFailed: () => LocalizedString
 	}
 	SelfCustodialStaleRate: {
-		/**
-		 * Exchange rate may be out of date
-		 */
-		notice: () => LocalizedString
 		/**
 		 * Showing sats — no exchange rate available
 		 */

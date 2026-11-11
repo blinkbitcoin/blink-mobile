@@ -4259,7 +4259,6 @@
     "payment": "Πληρωμή"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Η ισοτιμία μπορεί να μην είναι ενημερωμένη",
     "satsOnly": "Εμφάνιση σε sats — δεν υπάρχει διαθέσιμη ισοτιμία"
   },
   "SelfCustodialOffline": {
