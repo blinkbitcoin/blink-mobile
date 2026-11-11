@@ -64,6 +64,14 @@ describe("AddPlacePanel", () => {
     await waitFor(() => expect(getByText("13.496743, -89.439462")).toBeTruthy())
   })
 
+  it("ends both rows of the first step in a pencil, so they read as editable", async () => {
+    const { getAllByTestId, getByTestId } = renderSheet()
+
+    await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
+
+    expect(getAllByTestId("icon-pencil")).toHaveLength(2)
+  })
+
   it("follows the map, since the map is on screen and being panned", async () => {
     // The pin is aimed while this is open, so a row still naming where the map
     // was when the form opened would be describing a different place than the
