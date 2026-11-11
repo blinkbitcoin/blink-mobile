@@ -1,12 +1,11 @@
 import { renderHook, act } from "@testing-library/react-native"
 
 import { useAddToWallet } from "@app/screens/card-screen/hooks/use-add-to-wallet"
-import { WalletAddResult } from "@app/screens/card-screen/utils/wallet-provisioning"
+import { WalletAddResult } from "@app/screens/card-screen/types"
 
 const mockCanAddCardToWallet = jest.fn()
 const mockAddCardToWallet = jest.fn()
 jest.mock("@app/screens/card-screen/utils/wallet-provisioning", () => ({
-  ...jest.requireActual("@app/screens/card-screen/utils/wallet-provisioning"),
   canAddCardToWallet: (...args: readonly unknown[]) => mockCanAddCardToWallet(...args),
   addCardToWallet: (...args: readonly unknown[]) => mockAddCardToWallet(...args),
 }))

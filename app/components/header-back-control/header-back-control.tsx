@@ -5,12 +5,25 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackHeaderBackProps } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
+import { headerIconTouchArea } from "../header-no-glass"
+
 // native-stack wraps headerLeft in react-native-screens' ScreenStackHeaderLeftView,
 // which applies its own standard leading inset (~16dp on Android). The elements
 // HeaderBackButton was tuned for the old JS stack (no such inset), so it now sits
 // ~10px too far right. Pull it back on Android to restore the previous position.
 // (Migration to native-stack: PR #3840 / commit 4b6bff263.)
 const ANDROID_BACK_BUTTON_INSET_CORRECTION = -10
+
+// The elements HeaderButton presses with a borderless 20dp-radius ripple, drawn in the
+// foreground and so clipped to the button's own box. That box is ~30dp wide, so the
+// press showed as a rounded square. The header touch box (48dp) holds the whole 40dp
+// ripple, which reads as a circle. The box can't grow left past the inset correction
+// without a negative margin, so it grows right: the arrow sits ~10dp further in, and
+// with no margin on the right the title moves ~10dp with it.
+const ANDROID_BACK_BUTTON_CIRCLE = {
+  ...headerIconTouchArea,
+  marginRight: 0,
+} as const
 
 export const InvisibleBackButton = (): React.ReactNode => {
   const styles = useStyles()
@@ -95,6 +108,7 @@ const useStyles = makeStyles(() => {
     },
     backButton: {
       marginLeft: backButtonInsetCorrection,
+      ...(isAndroid && ANDROID_BACK_BUTTON_CIRCLE),
     },
   }
 })

@@ -3953,6 +3953,12 @@
             "title": "Non possiamo migrare il tuo saldo in dollari",
             "body": "Svuota prima il tuo saldo in dollari. Puoi trasferirlo sul tuo saldo Bitcoin in Blink o altrove."
         },
+        "pendingDepositModal": {
+            "title": "C'è un deposito in sospeso sul tuo account",
+            "body": "Non puoi migrare a un altro tipo di account finché tutti i tuoi depositi in sospeso non sono stati regolati e accreditati su questo account.",
+            "contactSupportCta": "Contatta il supporto",
+            "stillConfirming": "Il tuo deposito non è ancora confermato. Riprova tra qualche minuto."
+        },
         "balancesOverview": {
             "title": "Sposta il tuo saldo",
             "body": "Sposta i tuoi fondi in sicurezza sul tuo nuovo account.",
@@ -4140,6 +4146,7 @@
         "get": "Scarica",
         "storeNote": "«Scarica» apre l'App Store o Google Play. Torna su Blink quando l'app è installata.",
         "haveAnApp": "Ho già un'app",
+        "learnHow": "Scopri come",
         "keyInstruction": "Copia questa chiave di configurazione nella tua app di autenticazione.",
         "qrInstruction": "Usi un altro dispositivo?\nScansiona invece questo codice QR.",
         "backupTitle": "Fai il backup della chiave",
@@ -4252,7 +4259,6 @@
         "payment": "Pagamento"
     },
     "SelfCustodialStaleRate": {
-        "notice": "Il tasso di cambio potrebbe non essere aggiornato",
         "satsOnly": "Visualizzazione in sats — nessun tasso di cambio disponibile"
     },
     "SelfCustodialOffline": {

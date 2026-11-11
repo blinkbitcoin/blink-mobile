@@ -13305,6 +13305,24 @@ type RootTranslation = {
 			 */
 			body: string
 		}
+		pendingDepositModal: {
+			/**
+			 * T​h​e​r​e​ ​i​s​ ​a​ ​p​e​n​d​i​n​g​ ​d​e​p​o​s​i​t​ ​t​o​ ​y​o​u​r​ ​a​c​c​o​u​n​t
+			 */
+			title: string
+			/**
+			 * Y​o​u​ ​c​a​n​n​o​t​ ​m​i​g​r​a​t​e​ ​t​o​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​t​y​p​e​ ​o​f​ ​a​c​c​o​u​n​t​ ​b​e​f​o​r​e​ ​a​l​l​ ​y​o​u​r​ ​p​e​n​d​i​n​g​ ​d​e​p​o​s​i​t​s​ ​h​a​v​e​ ​b​e​e​n​ ​s​e​t​t​l​e​d​ ​a​n​d​ ​c​r​e​d​i​t​e​d​ ​o​n​ ​t​h​i​s​ ​a​c​c​o​u​n​t​.
+			 */
+			body: string
+			/**
+			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
+			 */
+			contactSupportCta: string
+			/**
+			 * Y​o​u​r​ ​d​e​p​o​s​i​t​ ​i​s​ ​n​o​t​ ​c​o​n​f​i​r​m​e​d​ ​y​e​t​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​f​e​w​ ​m​i​n​u​t​e​s​.
+			 */
+			stillConfirming: string
+		}
 		migrateNowModal: {
 			/**
 			 * M​i​g​r​a​t​e​ ​n​o​w​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t
@@ -13846,6 +13864,10 @@ type RootTranslation = {
 		 */
 		haveAnApp: string
 		/**
+		 * L​e​a​r​n​ ​h​o​w
+		 */
+		learnHow: string
+		/**
 		 * C​o​p​y​ ​t​h​i​s​ ​s​e​t​u​p​ ​k​e​y​ ​i​n​t​o​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
 		 */
 		keyInstruction: string
@@ -14032,10 +14054,6 @@ type RootTranslation = {
 		exportFailed: string
 	}
 	SelfCustodialStaleRate: {
-		/**
-		 * E​x​c​h​a​n​g​e​ ​r​a​t​e​ ​m​a​y​ ​b​e​ ​o​u​t​ ​o​f​ ​d​a​t​e
-		 */
-		notice: string
 		/**
 		 * S​h​o​w​i​n​g​ ​s​a​t​s​ ​—​ ​n​o​ ​e​x​c​h​a​n​g​e​ ​r​a​t​e​ ​a​v​a​i​l​a​b​l​e
 		 */
@@ -27507,6 +27525,24 @@ export type TranslationFunctions = {
 			 */
 			body: () => LocalizedString
 		}
+		pendingDepositModal: {
+			/**
+			 * There is a pending deposit to your account
+			 */
+			title: () => LocalizedString
+			/**
+			 * You cannot migrate to a different type of account before all your pending deposits have been settled and credited on this account.
+			 */
+			body: () => LocalizedString
+			/**
+			 * Contact support
+			 */
+			contactSupportCta: () => LocalizedString
+			/**
+			 * Your deposit is not confirmed yet. Try again in a few minutes.
+			 */
+			stillConfirming: () => LocalizedString
+		}
 		migrateNowModal: {
 			/**
 			 * Migrate now to a non-custodial account
@@ -28042,6 +28078,10 @@ export type TranslationFunctions = {
 		 */
 		haveAnApp: () => LocalizedString
 		/**
+		 * Learn how
+		 */
+		learnHow: () => LocalizedString
+		/**
 		 * Copy this setup key into your authenticator app.
 		 */
 		keyInstruction: () => LocalizedString
@@ -28225,10 +28265,6 @@ export type TranslationFunctions = {
 		exportFailed: () => LocalizedString
 	}
 	SelfCustodialStaleRate: {
-		/**
-		 * Exchange rate may be out of date
-		 */
-		notice: () => LocalizedString
 		/**
 		 * Showing sats — no exchange rate available
 		 */

@@ -3953,6 +3953,12 @@
             "title": "ドル残高は移行できません",
             "body": "まずドル残高を空にしてください。Blinkのビットコイン残高、または他の場所へ移すことができます。"
         },
+        "pendingDepositModal": {
+            "title": "アカウントに保留中の入金があります",
+            "body": "保留中の入金がすべて確定し、このアカウントに反映されるまで、別の種類のアカウントに移行することはできません。",
+            "contactSupportCta": "サポートに連絡",
+            "stillConfirming": "入金はまだ確定していません。数分後にもう一度お試しください。"
+        },
         "balancesOverview": {
             "title": "残高を移動する",
             "body": "資金を安全に新しいアカウントに移動します。",
@@ -4140,6 +4146,7 @@
         "get": "入手",
         "storeNote": "「入手」を押すとApp StoreまたはGoogle Playが開きます。インストールが終わったらBlinkに戻ってください。",
         "haveAnApp": "アプリを持っています",
+        "learnHow": "やり方を見る",
         "keyInstruction": "このセットアップキーを認証アプリにコピーしてください。",
         "qrInstruction": "別のデバイスを使っていますか？\n代わりにこのQRコードをスキャンしてください。",
         "backupTitle": "キーをバックアップ",
@@ -4252,7 +4259,6 @@
         "payment": "支払い"
     },
     "SelfCustodialStaleRate": {
-        "notice": "為替レートが最新でない可能性があります",
         "satsOnly": "sats で表示中 — 為替レートを取得できません"
     },
     "SelfCustodialOffline": {

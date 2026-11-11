@@ -3953,6 +3953,12 @@
       "title": "Ne možemo da migriramo vaš dolarski saldo",
       "body": "Prvo ispraznite svoj dolarski saldo. Možete ga preneti na svoj Bitcoin saldo u Blinku ili na drugo mesto."
     },
+    "pendingDepositModal": {
+      "title": "Имате депозит на чекању на свом налогу",
+      "body": "Не можете мигрирати на другу врсту налога док сви ваши депозити на чекању не буду измирени и уплаћени на овај налог.",
+      "contactSupportCta": "Контактирај подршку",
+      "stillConfirming": "Ваш депозит још није потврђен. Покушајте поново за неколико минута."
+    },
     "balancesOverview": {
       "title": "Премести свој салдо",
       "body": "Безбедно премести своја средства на свој нови налог.",
@@ -4140,6 +4146,7 @@
     "get": "Преузми",
     "storeNote": "„Преузми“ отвара App Store или Google Play. Вратите се у Blink када се апликација инсталира.",
     "haveAnApp": "Имам апликацију",
+    "learnHow": "Сазнај како",
     "keyInstruction": "Копирајте овај кључ за подешавање у своју апликацију за аутентификацију.",
     "qrInstruction": "Користите други уређај?\nУместо тога скенирајте овај QR код.",
     "backupTitle": "Направите резервну копију кључа",
@@ -4252,7 +4259,6 @@
     "payment": "Плаћање"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Курс можда није ажуран",
     "satsOnly": "Приказ у сатима — курс није доступан"
   },
   "SelfCustodialOffline": {

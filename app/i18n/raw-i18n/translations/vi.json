@@ -3953,6 +3953,12 @@
       "title": "Chúng tôi không thể di chuyển số dư đô la của bạn",
       "body": "Trước tiên hãy rút hết số dư đô la của bạn. Bạn có thể chuyển nó sang số dư Bitcoin trong Blink hoặc nơi khác."
     },
+    "pendingDepositModal": {
+      "title": "Có một khoản tiền gửi đang chờ xử lý vào tài khoản của bạn",
+      "body": "Bạn không thể chuyển sang loại tài khoản khác cho đến khi tất cả các khoản tiền gửi đang chờ xử lý của bạn được hoàn tất và ghi có vào tài khoản này.",
+      "contactSupportCta": "Liên hệ hỗ trợ",
+      "stillConfirming": "Khoản tiền gửi của bạn chưa được xác nhận. Hãy thử lại sau vài phút."
+    },
     "balancesOverview": {
       "title": "Chuyển số dư của bạn",
       "body": "Chuyển tiền của bạn một cách an toàn sang tài khoản mới.",
@@ -4140,6 +4146,7 @@
     "get": "Tải về",
     "storeNote": "“Tải về” sẽ mở App Store hoặc Google Play. Hãy quay lại Blink khi đã cài đặt xong.",
     "haveAnApp": "Tôi đã có ứng dụng",
+    "learnHow": "Tìm hiểu cách",
     "keyInstruction": "Sao chép khóa thiết lập này vào ứng dụng xác thực của bạn.",
     "qrInstruction": "Bạn đang dùng thiết bị khác?\nThay vào đó, hãy quét mã QR này.",
     "backupTitle": "Sao lưu khóa của bạn",
@@ -4252,7 +4259,6 @@
     "payment": "Thanh toán"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Tỷ giá có thể đã cũ",
     "satsOnly": "Đang hiển thị sats — không có tỷ giá"
   },
   "SelfCustodialOffline": {

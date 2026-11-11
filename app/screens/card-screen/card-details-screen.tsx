@@ -9,7 +9,7 @@ import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { BlinkCard } from "@app/components/blink-card"
-import { headerRightNoGlass } from "@app/components/header-no-glass"
+import { headerIconTouchArea, headerRightNoGlass } from "@app/components/header-no-glass"
 import { InfoSection, InfoCard } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { ScreenSecurityGate } from "@app/components/screen-security-gate"
@@ -251,8 +251,10 @@ const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
 }
 
 const useStyles = makeStyles(() => ({
+  // 48dp box around the 24dp icon: the margin gives back the 12dp it grew by.
   headerRight: {
-    marginRight: 24,
+    ...headerIconTouchArea,
+    marginRight: 12,
   },
   content: {
     paddingTop: 20,
