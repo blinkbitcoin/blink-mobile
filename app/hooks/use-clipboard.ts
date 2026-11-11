@@ -1,6 +1,7 @@
 import { useCallback } from "react"
 import Clipboard from "@react-native-clipboard/clipboard"
 
+import { haptics } from "@app/utils/haptics"
 import { toastShow } from "@app/utils/toast"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
@@ -46,6 +47,7 @@ export const useClipboard = (clearAfterMs?: number) => {
     ({ content, message }: CopyToClipboardParams): void => {
       cancelPendingClipboardClear()
       Clipboard.setString(content)
+      haptics.select()
       toastShow({
         type: "success",
         message: message ?? LL.common.copied(),

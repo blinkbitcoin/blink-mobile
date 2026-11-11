@@ -40,6 +40,7 @@ import {
 
 import { Screen } from "@app/components/screen"
 import { testProps } from "@app/utils/testProps"
+import { haptics } from "@app/utils/haptics"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useDollarBalanceRestrictionGuard } from "@app/hooks/use-dollar-balance-restriction-guard"
 import { useTransferBlockedGuard } from "@app/hooks/use-transfer-blocked-guard"
@@ -488,6 +489,7 @@ const ConversionDetailsScreenContent = ({
   const toggleInputs = () => {
     if (uiLocked) return
 
+    haptics.select()
     setLockFormattingInputId(null)
     setIsTyping(false)
     setSelectedPercent(null)

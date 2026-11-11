@@ -13,6 +13,7 @@ import { WalletSwitch } from "@app/components/wallet-switch"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { fonts } from "@app/rne-theme/fonts"
+import { haptics } from "@app/utils/haptics"
 import { testProps } from "@app/utils/testProps"
 
 export const SEND_WALLET_SUMMARY_TEST_ID = "choose-wallet-to-send-from"
@@ -75,7 +76,12 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
     [progress],
   )
 
-  const onPress = onSwitch ?? onReveal
+  const onPress = onSwitch
+    ? () => {
+        haptics.select()
+        onSwitch()
+      }
+    : onReveal
 
   const walletNameOf = (value: WalletCurrency) =>
     value === WalletCurrency.Btc ? LL.common.bitcoin() : LL.common.dollar()

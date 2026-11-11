@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, TextInput, View } from "react-native"
 
 import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { haptics } from "@app/utils/haptics"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "../atomic/galoy-icon/galoy-icon"
@@ -99,7 +100,11 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
             </View>
             <View style={styles.toggleOverlay} pointerEvents="box-none">
               <Pressable
-                onPress={onToggleCurrency}
+                onPress={() => {
+                  if (!onToggleCurrency) return
+                  haptics.select()
+                  onToggleCurrency()
+                }}
                 hitSlop={8}
                 accessibilityLabel="Switch currencies"
                 accessibilityRole="button"
