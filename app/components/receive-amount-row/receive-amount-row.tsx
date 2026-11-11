@@ -19,6 +19,7 @@ import {
   MoneyAmount,
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
+import { haptics } from "@app/utils/haptics"
 
 type FormattedAmounts = { formattedPrimary: string; formattedSecondary: string }
 
@@ -132,6 +133,7 @@ export const ReceiveAmountRow: React.FC<ReceiveAmountRowProps> = ({
         <Pressable
           style={styles.walletSection}
           onPress={() => {
+            haptics.select()
             triggerSpin()
             onToggleWallet()
           }}

@@ -8,6 +8,7 @@ import {
 } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { haptics } from "@app/utils/haptics"
 import { testProps } from "@app/utils/testProps"
 
 export const PERCENTAGE_OPTIONS = [25, 50, 75, 100] as const
@@ -70,7 +71,10 @@ export const PercentageSelector = <T extends number = number>({
               isDisabled && styles.chipDisabled,
             ]}
             disabled={isDisabled}
-            onPress={() => onSelect(p)}
+            onPress={() => {
+              haptics.select()
+              onSelect(p)
+            }}
             accessibilityRole="button"
             // after testProps, which would otherwise read the test ID out to screen readers
             accessibilityLabel={formatLabel(p)}
