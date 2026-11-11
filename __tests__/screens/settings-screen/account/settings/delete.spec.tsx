@@ -224,6 +224,15 @@ describe("Delete", () => {
     expect(screen.queryByTestId("delete-modal")).toBeNull()
   })
 
+  it("stacks the confirm and cancel buttons in their own column", async () => {
+    await openDeletionModal()
+
+    expect(screen.getByTestId("delete-modal-buttons")).toHaveStyle({
+      flexDirection: "column",
+      rowGap: 12,
+    })
+  })
+
   it("keeps the confirm button disabled until the keyword is typed", async () => {
     await openDeletionModal()
 
