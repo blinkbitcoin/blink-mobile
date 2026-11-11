@@ -104,8 +104,10 @@ nobody "fixes" them later.
 2. **Prefer a cached one over nothing.** Where only Blink can answer, persist the
    last good answer with a timestamp and label it.
 3. **One place decides reachability.** Consumers ask a provider, not each query.
-4. **Never silently substitute.** A stale rate is marked stale wherever money is
-   shown against it.
+4. **Never silently substitute a currency.** A usable rate, stale or not, prices
+   amounts without a label: the one that said so came and went on every launch
+   and moved the screen (blink-wip#2035). When no rate can price them, amounts
+   fall back to sats and the sats-only notice says why.
 5. **Never widen an existing privacy boundary.** The Apollo-cache restore skip at
    [client.tsx:268](../app/graphql/client.tsx) exists so a persisted custodial
    cache cannot leak into a self-custodial session. Keep it; put what
@@ -245,8 +247,8 @@ that touch those call sites, rather than churning them twice.
   custodial session still reads it as current, since it has no sats fallback.
   The hook now also returns `priceFreshness`.
 
-Staleness thresholds: fresh under 1 h, usable-but-marked under 24 h, withheld
-beyond that. A feed timestamped in the future (clock correction, a user setting
+Staleness thresholds: fresh under 1 h, stale but still used under 24 h,
+withheld beyond that. A feed timestamped in the future (clock correction, a user setting
 the date back) reads fresh rather than expired — blanking a figure the app just
 fetched is the worse failure.
 

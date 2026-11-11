@@ -184,7 +184,7 @@ export const usePriceConversion = () => {
     toDisplayMoneyAmount: createToDisplayAmount(shownCurrency),
     /** Fresh, Stale or Expired. Expired means no conversion is available at all, which
      *  `convertMoneyAmount` being undefined already says; Stale means the amounts are
-     *  real but priced off a rate old enough that the user should be told. */
+     *  real but priced off a rate over an hour old. No surface labels that today. */
     priceFreshness,
     /** Null rather than the string "NaN" when the dollar leg is unknown, which is the
      *  case in sats-only mode: a caller checking for a price must not be handed one. */
