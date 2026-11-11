@@ -1,10 +1,20 @@
 diff --git a/node_modules/react-native-fs/RNFSManager.m b/node_modules/react-native-fs/RNFSManager.m
-index 5ddd941..9d9a9af 100755
+index 5ddd941..2b4a33f 100755
 --- a/node_modules/react-native-fs/RNFSManager.m
 +++ b/node_modules/react-native-fs/RNFSManager.m
-@@ -294,8 +294,8 @@ RCT_EXPORT_METHOD(readFile:(NSString *)filepath
+@@ -293,9 +293,18 @@ RCT_EXPORT_METHOD(readFile:(NSString *)filepath
+   resolve(base64Content);
  }
  
++/*
++ * Patched (blink-mobile): upstream declares length and position as `NSInteger *`.
++ * React Native's TurboModule interop can't pass a JS number to a pointer argument and
++ * throws "Objective C type NSInteger is unsupported" before this method runs, so on iOS
++ * every RNFS.read rejected and the wallet log export always failed.
++ * Upstream: https://github.com/itinance/react-native-fs/issues/1246, fixed by
++ * https://github.com/itinance/react-native-fs/pull/1247
++ * (remove this patch once a release includes the fix).
++ */
  RCT_EXPORT_METHOD(read:(NSString *)filepath
 -                  length: (NSInteger *)length
 -                  position: (NSInteger *)position
@@ -13,7 +23,7 @@ index 5ddd941..9d9a9af 100755
                    resolver:(RCTPromiseResolveBlock)resolve
                    rejecter:(RCTPromiseRejectBlock)reject)
  {
-@@ -324,11 +324,11 @@ RCT_EXPORT_METHOD(read:(NSString *)filepath
+@@ -324,11 +333,11 @@ RCT_EXPORT_METHOD(read:(NSString *)filepath
      }
  
      // Seek to the position if there is one.
