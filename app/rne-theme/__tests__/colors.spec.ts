@@ -84,6 +84,24 @@ describe("color token aliases", () => {
   })
 })
 
+// No semantic alias yet: flagged for design review in colors.ts.
+const blues = ["blue5", "_blue", "_lightBlue", "_sky"]
+
+describe("legacy name inventory", () => {
+  // colors.ts, themed.d.ts, the alias map above and the eslint rule each list the
+  // legacy names. colors-lint.spec.ts ties the eslint rule to themed.d.ts; this
+  // ties themed.d.ts to the alias map.
+  const deprecated = [
+    ...fs
+      .readFileSync(path.resolve(__dirname, "../themed.d.ts"), "utf8")
+      .matchAll(/\/\*\* @deprecated[^*]*\*\/\s*(?:readonly )?(\w+):/g),
+  ].map(([, name]) => name)
+
+  it("marks exactly the aliased and flagged names deprecated in themed.d.ts", () => {
+    expect(deprecated.sort()).toEqual([...Object.keys(aliasToSemantic), ...blues].sort())
+  })
+})
+
 describe("static token lint guard", () => {
   // .eslintrc.json is JSON with comments, so read the restricted names as text
   // instead of parsing the file.
