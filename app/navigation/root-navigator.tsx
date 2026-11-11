@@ -134,6 +134,7 @@ import {
   CardDetailsScreen as OnboardingCardDetailsScreen,
   WelcomeOnboardScreen,
   CardSubscriptionScreen,
+  CardVerifyIdentityScreen,
   LoadingCardScreen,
   WelcomeInvestScreen,
   SelectInvestScreen,
@@ -935,6 +936,13 @@ export const RootStack = () => {
           /** The screen sets its own title: the free offer has none. */
           title: "",
           ...headerCloseControlOptions(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingVerifyIdentityScreen"
+        component={CardVerifyIdentityScreen}
+        options={{
+          title: LL.CardFlow.Onboarding.CardVerifyIdentity.headerTitle(),
         }}
       />
       <RootNavigator.Screen

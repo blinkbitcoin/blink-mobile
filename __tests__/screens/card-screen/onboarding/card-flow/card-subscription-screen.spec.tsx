@@ -26,15 +26,8 @@ jest.mock("@react-navigation/native", () => {
   }
 })
 
-const mockStartKyc = jest.fn()
-
-jest.mock("@app/hooks", () => ({
-  useKycFlow: () => ({ startKyc: mockStartKyc }),
-}))
-
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
-  KycFlowType: { Card: "Card" },
   WalletCurrency: { Usd: "USD" },
 }))
 
@@ -130,7 +123,7 @@ describe("CardSubscriptionScreen - free offer", () => {
     expect(mockSetOptions).toHaveBeenCalledWith({ title: "" })
   })
 
-  it("starts verification once both checkboxes are accepted", async () => {
+  it("opens the identity check once both checkboxes are accepted", async () => {
     const { getByText, getAllByTestId } = await renderScreen()
 
     await checkBoxes(getAllByTestId, [NOTICE_CHECKBOX_INDEX, FEE_SCHEDULE_CHECKBOX_INDEX])
@@ -138,7 +131,7 @@ describe("CardSubscriptionScreen - free offer", () => {
       fireEvent.press(getByText("Accept"))
     })
 
-    expect(mockStartKyc).toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
   })
 })
 
@@ -198,7 +191,7 @@ describe("CardSubscriptionScreen - paid offer", () => {
       fireEvent.press(getByText("Accept"))
     })
 
-    expect(mockStartKyc).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
   })
 
   it("keeps the button disabled when only the renew checkbox is checked", async () => {
@@ -209,7 +202,7 @@ describe("CardSubscriptionScreen - paid offer", () => {
       fireEvent.press(getByText("Accept"))
     })
 
-    expect(mockStartKyc).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
   })
 
   it("keeps the button disabled when only the fee schedule checkbox is checked", async () => {
@@ -220,10 +213,10 @@ describe("CardSubscriptionScreen - paid offer", () => {
       fireEvent.press(getByText("Accept"))
     })
 
-    expect(mockStartKyc).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
   })
 
-  it("starts verification once renewal and fee schedule are accepted", async () => {
+  it("opens the identity check once renewal and fee schedule are accepted", async () => {
     const { getByText, getAllByTestId } = await renderScreen()
 
     await checkBoxes(getAllByTestId, [NOTICE_CHECKBOX_INDEX, FEE_SCHEDULE_CHECKBOX_INDEX])
@@ -231,7 +224,7 @@ describe("CardSubscriptionScreen - paid offer", () => {
       fireEvent.press(getByText("Accept"))
     })
 
-    expect(mockStartKyc).toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
   })
 
   it("unchecks a checkbox when pressed again", async () => {
@@ -246,7 +239,7 @@ describe("CardSubscriptionScreen - paid offer", () => {
     })
 
     expect(getByTestId("checkbox-unchecked")).toBeTruthy()
-    expect(mockStartKyc).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
   })
 })
 
@@ -278,7 +271,7 @@ describe("CardSubscriptionScreen - payment variant", () => {
     ).toBeNull()
   })
 
-  it("logs the pending payment flow instead of starting verification", async () => {
+  it("logs the pending payment flow instead of opening the identity check", async () => {
     const { getByText, getByTestId } = await renderScreen()
 
     await act(async () => {
@@ -288,7 +281,7 @@ describe("CardSubscriptionScreen - payment variant", () => {
       fireEvent.press(getByText("Continue & Pay"))
     })
 
-    expect(mockStartKyc).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
     expect(consoleLogSpy).toHaveBeenCalledWith("TODO: payment flow")
   })
 

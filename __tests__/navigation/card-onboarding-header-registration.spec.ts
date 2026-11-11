@@ -53,4 +53,13 @@ describe("card onboarding header controls in root-navigator", () => {
       expect(options).toContain("...headerCloseControlOptions()")
     })
   })
+
+  /** The design gives this step a back arrow and the membership name, and no close. */
+  it("titles the verify identity step and leaves the close button out", () => {
+    const options = registration("cardOnboardingVerifyIdentityScreen")
+
+    expect(options).toContain("CardVerifyIdentity.headerTitle()")
+    expect(options).not.toContain("headerCloseControlOptions")
+    expect(options).not.toContain("noHeaderBack")
+  })
 })
