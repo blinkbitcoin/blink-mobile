@@ -993,7 +993,8 @@ export const RootStack = () => {
         name="cardOnboardingSubscribeScreen"
         component={CardSubscriptionScreen}
         options={{
-          title: LL.CardFlow.Onboarding.CardSubscription.subscribeTitle(),
+          /** The screen sets its own title: the free offer has none. */
+          title: "",
           ...headerCloseControlOptions(),
         }}
       />

@@ -3658,8 +3658,14 @@
         "paymentTitle": "Վճարում",
         "acceptButton": "Ընդունել",
         "payButton": "Շարունակել և վճարել",
-        "cardTitle": "Blink Private",
+        "cardTitle": "Blink Orange",
+        "free": "Անվճար",
+        "forNow": "առայժմ",
         "perYear": "տարեկան",
+        "freeBreakdown": {
+          "card": "Blink քարտ",
+          "memberBenefits": "Անդամակցության այլ առավելություններ"
+        },
         "status": {
           "label": "Կարգավիճակ",
           "specialOfferLabel": "Հատուկ առաջարկ",
@@ -3680,7 +3686,8 @@
           "text": "Ես ծանոթացել եմ և համաձայն եմ",
           "linkText": "Blink Card-ի վճարների սանդղակին"
         },
-        "renew": "Հասկանում եմ, որ իմ բաժանորդագրությունն ավտոմատ կերպով կթարմացվի {months: number} ամսից"
+        "renew": "Հասկանում եմ, որ իմ բաժանորդագրությունն ավտոմատ կերպով կթարմացվի {months: number} ամսից",
+        "freeNotice": "Ես հասկանում եմ, որ Blink Orange-ը առայժմ անվճար է, և որ ավելի ուշ՝ նախնական ծանուցմամբ, կարող է սահմանվել անդամավճար"
       },
       "CardIntroducing": {
         "title": "Ներկայացնում ենք",
