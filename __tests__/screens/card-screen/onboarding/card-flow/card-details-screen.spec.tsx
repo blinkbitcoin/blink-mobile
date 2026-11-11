@@ -5,14 +5,6 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { CardDetailsScreen } from "@app/screens/card-screen/onboarding/card-flow/card-details-screen"
 import { ContextForScreen } from "../../../helper"
 
-jest.mock("@react-native-community/blur", () => ({
-  BlurView: "BlurView",
-}))
-
-jest.mock("react-native-linear-gradient", () => ({
-  LinearGradient: "LinearGradient",
-}))
-
 const mockNavigate = jest.fn()
 
 jest.mock("@react-navigation/native", () => {
@@ -25,108 +17,60 @@ jest.mock("@react-navigation/native", () => {
   }
 })
 
+const renderScreen = async () => {
+  const screen = render(
+    <ContextForScreen>
+      <CardDetailsScreen />
+    </ContextForScreen>,
+  )
+  await act(async () => {})
+  return screen
+}
+
 describe("CardDetailsScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
   })
 
-  it("renders without crashing", async () => {
-    const { toJSON } = render(
-      <ContextForScreen>
-        <CardDetailsScreen />
-      </ContextForScreen>,
-    )
+  it("lists what the card comes with today, each with its detail", async () => {
+    const { getByText } = await renderScreen()
 
-    await act(async () => {})
-
-    expect(toJSON()).toBeTruthy()
+    expect(getByText("Blink Card")).toBeTruthy()
+    expect(getByText("your Visa card, ready today")).toBeTruthy()
+    expect(getByText("Personal account manager")).toBeTruthy()
+    expect(getByText("and priority support")).toBeTruthy()
   })
 
-  it("displays account manager feature title", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <CardDetailsScreen />
-      </ContextForScreen>,
-    )
+  it("marks the accounts that come later with when they arrive", async () => {
+    const { getByText, getAllByText } = await renderScreen()
 
-    await act(async () => {})
-
-    expect(getByText("Dedicated account manager")).toBeTruthy()
+    expect(getByText("Business accounts")).toBeTruthy()
+    expect(getByText("Virtual accounts")).toBeTruthy()
+    expect(getAllByText("in 12 months")).toHaveLength(2)
   })
 
-  it("displays support feature title", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <CardDetailsScreen />
-      </ContextForScreen>,
-    )
+  it("explains the wait with the same number of months as the badges", async () => {
+    const { getByText } = await renderScreen()
 
-    await act(async () => {})
-
-    expect(getByText("Priority support")).toBeTruthy()
-  })
-
-  it("displays onchain deposits feature title", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <CardDetailsScreen />
-      </ContextForScreen>,
-    )
-
-    await act(async () => {})
-
-    expect(getByText("50% back on transaction fees")).toBeTruthy()
-  })
-
-  it("displays circular economies feature title", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <CardDetailsScreen />
-      </ContextForScreen>,
-    )
-
-    await act(async () => {})
-
-    expect(getByText("$100 to circular economies")).toBeTruthy()
-  })
-
-  it("displays and more text", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <CardDetailsScreen />
-      </ContextForScreen>,
-    )
-
-    await act(async () => {})
-
-    expect(getByText("... and more coming in 2026")).toBeTruthy()
+    expect(
+      getByText(
+        "Some features will be available within 12 months. The card is ready today.",
+      ),
+    ).toBeTruthy()
   })
 
   it("displays continue button", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <CardDetailsScreen />
-      </ContextForScreen>,
-    )
-
-    await act(async () => {})
+    const { getByText } = await renderScreen()
 
     expect(getByText("Continue")).toBeTruthy()
   })
 
   it("navigates to cardOnboardingSubscribeScreen on button press", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <CardDetailsScreen />
-      </ContextForScreen>,
-    )
+    const { getByText } = await renderScreen()
 
-    await act(async () => {})
-
-    const button = getByText("Continue")
     await act(async () => {
-      fireEvent.press(button)
+      fireEvent.press(getByText("Continue"))
     })
 
     expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingSubscribeScreen")
