@@ -102,7 +102,8 @@ nobody "fixes" them later.
 1. **Prefer a local source over a cached one.** The Breez SDK already ships fiat
    rates and a currency list; use them rather than caching Blink's.
 2. **Prefer a cached one over nothing.** Where only Blink can answer, persist the
-   last good answer with a timestamp and label it.
+   last good answer with its timestamp, so its age can decide whether it is
+   still used (see 4).
 3. **One place decides reachability.** Consumers ask a provider, not each query.
 4. **Never silently substitute a currency.** A usable rate, stale or not, prices
    amounts without a label: the one that said so came and went on every launch
@@ -499,8 +500,8 @@ conversion it asks for — Bitcoin to display — becomes the identity.
    and [use-payment-request.ts:566](../app/self-custodial/hooks/use-payment-request.ts).
    They stop being reachable once the converter is total, and leaving them would
    hide a regression rather than catch one.
-4. Say so on screen. One line, in the pattern the stale-rate notice already
-   uses: amounts are in sats because no exchange rate is available. Without it
+4. Say so on screen. One line under the balance: amounts are in sats because
+   no exchange rate is available. Without it
    a user whose balance silently changes denomination will read it as their
    money changing. One new string across 28 locales.
 
@@ -841,7 +842,7 @@ dependency.
 |-------|---------|-----------|--------|
 | 1 | Outage reproducible on demand | — | Done |
 | 2 | **Wallet is usable offline** | 1 | Done |
-| 2b | Staleness marker and home sats fallback | 2 | Done |
+| 2b | Home sats fallback (staleness marker later removed, blink-wip#2035) | 2 | Done |
 | 3 | Currency selection works offline | 2 | Done |
 | 4 | Honest, quiet UI | 1 | Done |
 | 5 | Lightning address degrades gracefully | 1, Q1 | Done |
