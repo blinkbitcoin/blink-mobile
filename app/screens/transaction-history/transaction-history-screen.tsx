@@ -249,6 +249,11 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
       return
     }
 
+    /** Only the custodial cache read can land after the first render, so only it fills
+     *  in an id the baseline is missing. The device store is there from the start: an
+     *  empty id is that baseline, and a later one could only be this screen's own mark. */
+    if (activeWallet.isSelfCustodial) return
+
     const missingBtc = !highlightBaselineLastSeen.btcId && lastSeenBtcId
     const missingUsd = !highlightBaselineLastSeen.usdId && lastSeenUsdId
 
@@ -258,7 +263,13 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
         usdId: missingUsd ? lastSeenUsdId : highlightBaselineLastSeen.usdId,
       })
     }
-  }, [loading, highlightBaselineLastSeen, lastSeenBtcId, lastSeenUsdId])
+  }, [
+    loading,
+    highlightBaselineLastSeen,
+    lastSeenBtcId,
+    lastSeenUsdId,
+    activeWallet.isSelfCustodial,
+  ])
 
   const lastSeenIdForAll = React.useMemo(() => {
     if (!highlightBaselineLastSeen?.btcId || !highlightBaselineLastSeen?.usdId) return ""

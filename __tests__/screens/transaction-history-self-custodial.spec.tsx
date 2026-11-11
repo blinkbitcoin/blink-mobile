@@ -88,16 +88,29 @@ jest.mock("@app/graphql/generated", () => ({
 
 jest.mock("@app/graphql/client-only-query", () => ({ markTxLastSeenId: jest.fn() }))
 
+/** Re-renders its readers on every update, as the real provider does, so a test sees what
+ *  the screen does with its own writes and not only the state it started from. */
 let mockPersistentState: PersistentState
+const mockPersistentStateListeners = new Set<() => void>()
 const mockUpdateState = jest.fn((updater: (prev: PersistentState) => PersistentState) => {
   mockPersistentState = updater(mockPersistentState)
+  mockPersistentStateListeners.forEach((rerender) => rerender())
 })
-jest.mock("@app/store/persistent-state", () => ({
-  usePersistentStateContext: () => ({
-    persistentState: mockPersistentState,
-    updateState: mockUpdateState,
-  }),
-}))
+jest.mock("@app/store/persistent-state", () => {
+  const { useEffect, useReducer } = jest.requireActual<typeof import("react")>("react")
+  return {
+    usePersistentStateContext: () => {
+      const [, rerender] = useReducer((count: number) => count + 1, 0)
+      useEffect(() => {
+        mockPersistentStateListeners.add(rerender)
+        return () => {
+          mockPersistentStateListeners.delete(rerender)
+        }
+      }, [])
+      return { persistentState: mockPersistentState, updateState: mockUpdateState }
+    },
+  }
+})
 
 const custodialQueryWithData = {
   data: {
