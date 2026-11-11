@@ -3686,6 +3686,18 @@
         "renew": "Rozumiem, že moje predplatné sa automaticky obnoví o {months: number} mesiacov",
         "freeNotice": "Rozumiem, že Blink Orange je zatiaľ zadarmo a že členský poplatok môže byť neskôr zavedený, s predchádzajúcim upozornením"
       },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Overte svoju totožnosť",
+        "description": "Na aktiváciu vašej Blink Card musí vydavateľ karty overiť, kto ste (KYC). Budete potrebovať:",
+        "requirements": {
+          "governmentId": "Úradný doklad totožnosti",
+          "selfie": "Selfie / overenie živosti",
+          "proofOfAddress": "Doklad o adrese",
+          "questions": "Niekoľko otázok o vás"
+        },
+        "buttonText": "Pokračovať"
+      },
       "CardIntroducing": {
         "title": "Predstavujeme",
         "cardInfo": {

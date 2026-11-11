@@ -3686,6 +3686,18 @@
         "renew": "Megértem, hogy az előfizetésem {months: number} hónap múlva automatikusan megújul",
         "freeNotice": "Tudomásul veszem, hogy a Blink Orange egyelőre ingyenes, és hogy később, előzetes értesítéssel tagsági díjat vezethetnek be"
       },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Igazolja személyazonosságát",
+        "description": "Blink kártyája aktiválásához a kártyakibocsátónak ellenőriznie kell, ki Ön (KYC). Szüksége lesz:",
+        "requirements": {
+          "governmentId": "Hatósági személyazonosító igazolványra",
+          "selfie": "Szelfire / élőségvizsgálatra",
+          "proofOfAddress": "Lakcímigazolásra",
+          "questions": "Néhány Önre vonatkozó kérdésre"
+        },
+        "buttonText": "Tovább"
+      },
       "CardIntroducing": {
         "title": "Bemutatjuk",
         "cardInfo": {

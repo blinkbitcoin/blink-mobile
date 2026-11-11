@@ -3686,6 +3686,18 @@
         "renew": "أفهم أن اشتراكي سيتجدد تلقائيًا خلال {months: number} شهرًا",
         "freeNotice": "أفهم أن Blink Orange مجاني حاليًا، وأنه قد تُفرض رسوم عضوية لاحقًا مع إشعار مسبق"
       },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "تحقق من هويتك",
+        "description": "لتفعيل بطاقة Blink، يجب على جهة إصدار البطاقة التحقق من هويتك (KYC). ستحتاج إلى:",
+        "requirements": {
+          "governmentId": "هوية صادرة عن جهة حكومية",
+          "selfie": "صورة سيلفي / فحص الحيوية",
+          "proofOfAddress": "إثبات العنوان",
+          "questions": "بعض الأسئلة عنك"
+        },
+        "buttonText": "متابعة"
+      },
       "CardIntroducing": {
         "title": "تقديم",
         "cardInfo": {

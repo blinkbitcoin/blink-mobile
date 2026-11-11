@@ -3686,6 +3686,18 @@
                 "renew": "Je comprends que mon abonnement se renouvellera automatiquement dans {months: number} mois",
                 "freeNotice": "Je comprends que Blink Orange est gratuit pour l'instant et que des frais d'adhésion pourront être introduits plus tard, avec préavis"
             },
+            "CardVerifyIdentity": {
+                "headerTitle": "Blink Orange",
+                "title": "Vérifiez votre identité",
+                "description": "Pour activer votre Blink Card, l'émetteur de la carte doit vérifier votre identité (KYC). Vous aurez besoin de :",
+                "requirements": {
+                    "governmentId": "Une pièce d'identité officielle",
+                    "selfie": "Un selfie / test de vivacité",
+                    "proofOfAddress": "Un justificatif de domicile",
+                    "questions": "Quelques questions vous concernant"
+                },
+                "buttonText": "Continuer"
+            },
             "CardIntroducing": {
                 "title": "Présentation",
                 "cardInfo": {

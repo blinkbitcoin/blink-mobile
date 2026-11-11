@@ -3686,6 +3686,18 @@
         "renew": "Saya faham bahawa langganan saya akan diperbaharui secara automatik dalam {months: number} bulan",
         "freeNotice": "Saya faham bahawa Blink Orange percuma buat masa ini, dan yuran keahlian mungkin diperkenalkan kemudian, dengan notis"
       },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Sahkan identiti anda",
+        "description": "Untuk mengaktifkan Kad Blink anda, pengeluar kad perlu mengesahkan siapa anda (KYC). Anda akan memerlukan:",
+        "requirements": {
+          "governmentId": "ID yang dikeluarkan kerajaan",
+          "selfie": "Swafoto / semakan keaktifan",
+          "proofOfAddress": "Bukti alamat",
+          "questions": "Beberapa soalan tentang anda"
+        },
+        "buttonText": "Teruskan"
+      },
       "CardIntroducing": {
         "title": "Memperkenalkan",
         "cardInfo": {

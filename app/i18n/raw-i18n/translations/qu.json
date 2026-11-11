@@ -3686,6 +3686,18 @@
         "renew": "Yachani suscripciónníy {months: number} killapi automáticamente musuqchakunanta",
         "freeNotice": "Hamut'ani Blink Orange kunanpaq mana qullqiyuq kasqanta, qhipamanmi ayllu qullqi churakunman, ñawpaqta willaspa"
       },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Pi kasqaykita chiqaqchay",
+        "description": "Blink tarjetaykita kawsachinapaq, tarjeta qukuqmi pi kasqaykita chiqaqchanan (KYC). Kaykunatam munanki:",
+        "requirements": {
+          "governmentId": "Gobiernopa qusqan DNI",
+          "selfie": "Selfie / kawsasqa kasqayki qhawarichiy",
+          "proofOfAddress": "Maypi tiyasqaykipa pruebaqnin",
+          "questions": "Wakin tapukuykuna qammanta"
+        },
+        "buttonText": "Ñawpaqman"
+      },
       "CardIntroducing": {
         "title": "Riqsichispa",
         "cardInfo": {

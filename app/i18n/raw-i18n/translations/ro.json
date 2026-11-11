@@ -3686,6 +3686,18 @@
         "renew": "Înțeleg că abonamentul meu se va reînnoi automat în {months: number} luni",
         "freeNotice": "Înțeleg că Blink Orange este gratuit deocamdată și că ulterior ar putea fi introdusă o taxă de membru, cu notificare prealabilă"
       },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Verificați-vă identitatea",
+        "description": "Pentru a vă activa Blink Card, emitentul cardului trebuie să verifice cine sunteți (KYC). Veți avea nevoie de:",
+        "requirements": {
+          "governmentId": "Un act de identitate emis de stat",
+          "selfie": "Un selfie / verificare de prezență",
+          "proofOfAddress": "Dovada adresei",
+          "questions": "Câteva întrebări despre dumneavoastră"
+        },
+        "buttonText": "Continuă"
+      },
       "CardIntroducing": {
         "title": "Prezentare",
         "cardInfo": {

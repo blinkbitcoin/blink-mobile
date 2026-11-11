@@ -3733,6 +3733,18 @@
                 "renew": "I understand my subscription will automatically renew in {months: number} months",
                 "freeNotice": "I understand Blink Orange is free for now, and that a membership fee may be introduced later, with notice"
             },
+            "CardVerifyIdentity": {
+                "headerTitle": "Blink Orange",
+                "title": "Verify your identity",
+                "description": "To activate your Blink Card, the card issuer must verify who you are (KYC). You will need:",
+                "requirements": {
+                    "governmentId": "A government-issued ID",
+                    "selfie": "A selfie / liveness check",
+                    "proofOfAddress": "Proof of address",
+                    "questions": "A few questions about you"
+                },
+                "buttonText": "Continue"
+            },
             "LoadingCard": {
                 "title": "We're working on your card",
                 "subtitle": "We'll notify you once it's here",

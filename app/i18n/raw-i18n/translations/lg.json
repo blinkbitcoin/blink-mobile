@@ -3686,6 +3686,18 @@
         "renew": "Ntegeera nti okwewandiisa kwange kujja kuddaabirizibwa okwokwokka nga wayiseewo emyezi {months: number}",
         "freeNotice": "Ntegeera nti Blink Orange ya bwereere kati, era nti ssente z'obwammemba ziyinza okutandikibwawo oluvannyuma, nga tutegeezeddwa"
       },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Kakasa ebikukwatako",
+        "description": "Okusobola okukozesa Kaadi yo eya Blink, akola kaadi alina okukakasa ggwe ani (KYC). Ojja kwetaaga:",
+        "requirements": {
+          "governmentId": "Endagamuntu eyagabibwa gavumenti",
+          "selfie": "Ekifaananyi kya selfie / okukebera nti oli mulamu",
+          "proofOfAddress": "Obukakafu bw'ekifo w'obeera",
+          "questions": "Ebibuuzo bitono ebikukwatako"
+        },
+        "buttonText": "Weyongere"
+      },
       "CardIntroducing": {
         "title": "Okwanjula",
         "cardInfo": {

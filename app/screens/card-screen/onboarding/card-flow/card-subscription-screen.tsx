@@ -9,8 +9,6 @@ import { SubscriptionOfferCard } from "@app/components/card-screen"
 import { CheckboxRow } from "@app/components/card-screen/checkbox-row"
 import { Screen } from "@app/components/screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
-import { useKycFlow } from "@app/hooks"
-import { KycFlowType } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { openExternalUrl } from "@app/utils/external"
@@ -36,11 +34,6 @@ export const CardSubscriptionScreen: React.FC = () => {
   const { cardTermsAndConditionsUrl, cardPrivacyPolicyUrl, cardCardholderAgreementUrl } =
     useRemoteConfig()
   const { isFree, ...offerCard } = useSubscriptionOffer({ isSubscribeVariant })
-
-  const { startKyc } = useKycFlow({
-    type: KycFlowType.Card,
-    headerTitle: LL.CardFlow.Onboarding.kycHeaderTitle(),
-  })
 
   const [isNoticeAccepted, setIsNoticeAccepted] = React.useState(false)
   const [isFeeScheduleAgreed, setIsFeeScheduleAgreed] = React.useState(false)
@@ -68,7 +61,7 @@ export const CardSubscriptionScreen: React.FC = () => {
 
   const handleAccept = () => {
     if (isSubscribeVariant) {
-      startKyc()
+      navigation.navigate("cardOnboardingVerifyIdentityScreen")
       return
     }
 

@@ -3686,6 +3686,18 @@
         "renew": "Tôi hiểu rằng gói đăng ký của tôi sẽ tự động gia hạn sau {months: number} tháng",
         "freeNotice": "Tôi hiểu rằng Blink Orange hiện miễn phí và có thể áp dụng phí thành viên sau này, kèm thông báo trước"
       },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Xác minh danh tính của bạn",
+        "description": "Để kích hoạt Thẻ Blink, đơn vị phát hành thẻ cần xác minh bạn là ai (KYC). Bạn sẽ cần:",
+        "requirements": {
+          "governmentId": "Giấy tờ tùy thân do chính phủ cấp",
+          "selfie": "Ảnh selfie / kiểm tra người thật",
+          "proofOfAddress": "Bằng chứng địa chỉ",
+          "questions": "Một vài câu hỏi về bạn"
+        },
+        "buttonText": "Tiếp tục"
+      },
       "CardIntroducing": {
         "title": "Giới thiệu",
         "cardInfo": {

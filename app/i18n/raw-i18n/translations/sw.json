@@ -3686,6 +3686,18 @@
         "renew": "Ninaelewa kuwa usajili wangu utahuishwa kiotomatiki baada ya miezi {months: number}",
         "freeNotice": "Ninaelewa kuwa Blink Orange ni bure kwa sasa, na kwamba ada ya uanachama inaweza kuanzishwa baadaye, kwa taarifa"
       },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Thibitisha utambulisho wako",
+        "description": "Ili kuwezesha Blink Card yako, mtoaji wa kadi lazima athibitishe wewe ni nani (KYC). Utahitaji:",
+        "requirements": {
+          "governmentId": "Kitambulisho kilichotolewa na serikali",
+          "selfie": "Picha ya selfie / ukaguzi wa uhai",
+          "proofOfAddress": "Uthibitisho wa anwani",
+          "questions": "Maswali machache kukuhusu"
+        },
+        "buttonText": "Endelea"
+      },
       "CardIntroducing": {
         "title": "Kuanzisha",
         "cardInfo": {

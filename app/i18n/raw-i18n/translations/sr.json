@@ -3686,6 +3686,18 @@
         "renew": "Разумем да ће се моја претплата аутоматски обновити за {months: number} месеци",
         "freeNotice": "Разумем да је Blink Orange за сада бесплатан и да се чланарина може увести касније, уз претходно обавештење"
       },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Потврдите свој идентитет",
+        "description": "Да бисте активирали своју Blink Card, издавалац картице мора да потврди ко сте (KYC). Биће вам потребно:",
+        "requirements": {
+          "governmentId": "Службени лични документ",
+          "selfie": "Селфи / провера живости",
+          "proofOfAddress": "Доказ о адреси",
+          "questions": "Неколико питања о вама"
+        },
+        "buttonText": "Настави"
+      },
       "CardIntroducing": {
         "title": "Представљамо",
         "cardInfo": {

@@ -3686,6 +3686,18 @@
         "renew": "Ik begrijp dat mijn abonnement automatisch over {months: number} maanden wordt verlengd",
         "freeNotice": "Ik begrijp dat Blink Orange voorlopig gratis is en dat er later, met aankondiging, een lidmaatschapsbijdrage kan worden ingevoerd"
       },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Verifieer uw identiteit",
+        "description": "Om uw Blink Card te activeren, moet de kaartuitgever verifiëren wie u bent (KYC). U hebt nodig:",
+        "requirements": {
+          "governmentId": "Een officieel identiteitsbewijs",
+          "selfie": "Een selfie / levendheidscontrole",
+          "proofOfAddress": "Bewijs van adres",
+          "questions": "Een paar vragen over u"
+        },
+        "buttonText": "Doorgaan"
+      },
       "CardIntroducing": {
         "title": "Introductie",
         "cardInfo": {

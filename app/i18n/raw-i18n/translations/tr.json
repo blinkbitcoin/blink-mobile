@@ -3686,6 +3686,18 @@
         "renew": "Aboneliğimin {months: number} ay içinde otomatik olarak yenileneceğini anlıyorum",
         "freeNotice": "Blink Orange'ın şimdilik ücretsiz olduğunu ve ileride önceden bildirilerek bir üyelik ücreti getirilebileceğini anlıyorum"
       },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Kimliğinizi doğrulayın",
+        "description": "Blink kartınızı etkinleştirmek için kart sağlayıcısının kim olduğunuzu doğrulaması gerekir (KYC). İhtiyacınız olanlar:",
+        "requirements": {
+          "governmentId": "Resmi bir kimlik belgesi",
+          "selfie": "Bir selfie / canlılık kontrolü",
+          "proofOfAddress": "Adres kanıtı",
+          "questions": "Hakkınızda birkaç soru"
+        },
+        "buttonText": "Devam Et"
+      },
       "CardIntroducing": {
         "title": "Tanıtım",
         "cardInfo": {

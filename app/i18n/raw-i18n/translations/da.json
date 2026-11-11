@@ -3686,6 +3686,18 @@
         "renew": "Jeg forstår, at mit abonnement automatisk fornyes om {months: number} måneder",
         "freeNotice": "Jeg forstår, at Blink Orange er gratis indtil videre, og at der senere kan blive indført et medlemsgebyr med varsel"
       },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Bekræft din identitet",
+        "description": "For at aktivere dit Blink-kort skal kortudstederen bekræfte, hvem du er (KYC). Du skal bruge:",
+        "requirements": {
+          "governmentId": "Et offentligt udstedt ID",
+          "selfie": "En selfie / livstjek",
+          "proofOfAddress": "Bevis for adresse",
+          "questions": "Et par spørgsmål om dig"
+        },
+        "buttonText": "Fortsæt"
+      },
       "CardIntroducing": {
         "title": "Introduktion",
         "cardInfo": {

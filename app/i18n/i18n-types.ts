@@ -12447,6 +12447,42 @@ type RootTranslation = {
 				 */
 				freeNotice: string
 			}
+			CardVerifyIdentity: {
+				/**
+				 * B​l​i​n​k​ ​O​r​a​n​g​e
+				 */
+				headerTitle: string
+				/**
+				 * V​e​r​i​f​y​ ​y​o​u​r​ ​i​d​e​n​t​i​t​y
+				 */
+				title: string
+				/**
+				 * T​o​ ​a​c​t​i​v​a​t​e​ ​y​o​u​r​ ​B​l​i​n​k​ ​C​a​r​d​,​ ​t​h​e​ ​c​a​r​d​ ​i​s​s​u​e​r​ ​m​u​s​t​ ​v​e​r​i​f​y​ ​w​h​o​ ​y​o​u​ ​a​r​e​ ​(​K​Y​C​)​.​ ​Y​o​u​ ​w​i​l​l​ ​n​e​e​d​:
+				 */
+				description: string
+				requirements: {
+					/**
+					 * A​ ​g​o​v​e​r​n​m​e​n​t​-​i​s​s​u​e​d​ ​I​D
+					 */
+					governmentId: string
+					/**
+					 * A​ ​s​e​l​f​i​e​ ​/​ ​l​i​v​e​n​e​s​s​ ​c​h​e​c​k
+					 */
+					selfie: string
+					/**
+					 * P​r​o​o​f​ ​o​f​ ​a​d​d​r​e​s​s
+					 */
+					proofOfAddress: string
+					/**
+					 * A​ ​f​e​w​ ​q​u​e​s​t​i​o​n​s​ ​a​b​o​u​t​ ​y​o​u
+					 */
+					questions: string
+				}
+				/**
+				 * C​o​n​t​i​n​u​e
+				 */
+				buttonText: string
+			}
 			LoadingCard: {
 				/**
 				 * W​e​'​r​e​ ​w​o​r​k​i​n​g​ ​o​n​ ​y​o​u​r​ ​c​a​r​d
@@ -26736,6 +26772,42 @@ export type TranslationFunctions = {
 				 * I understand Blink Orange is free for now, and that a membership fee may be introduced later, with notice
 				 */
 				freeNotice: () => LocalizedString
+			}
+			CardVerifyIdentity: {
+				/**
+				 * Blink Orange
+				 */
+				headerTitle: () => LocalizedString
+				/**
+				 * Verify your identity
+				 */
+				title: () => LocalizedString
+				/**
+				 * To activate your Blink Card, the card issuer must verify who you are (KYC). You will need:
+				 */
+				description: () => LocalizedString
+				requirements: {
+					/**
+					 * A government-issued ID
+					 */
+					governmentId: () => LocalizedString
+					/**
+					 * A selfie / liveness check
+					 */
+					selfie: () => LocalizedString
+					/**
+					 * Proof of address
+					 */
+					proofOfAddress: () => LocalizedString
+					/**
+					 * A few questions about you
+					 */
+					questions: () => LocalizedString
+				}
+				/**
+				 * Continue
+				 */
+				buttonText: () => LocalizedString
 			}
 			LoadingCard: {
 				/**

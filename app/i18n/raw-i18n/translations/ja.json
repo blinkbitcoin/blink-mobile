@@ -3686,6 +3686,18 @@
                 "renew": "サブスクリプションが{months: number}か月後に自動的に更新されることを理解しています",
                 "freeNotice": "Blink Orange は現時点では無料であり、今後事前の通知のうえで会費が導入される可能性があることを理解しています"
             },
+            "CardVerifyIdentity": {
+                "headerTitle": "Blink Orange",
+                "title": "本人確認",
+                "description": "Blink カードを有効にするには、カード発行会社による本人確認（KYC）が必要です。必要なもの：",
+                "requirements": {
+                    "governmentId": "政府発行の身分証明書",
+                    "selfie": "セルフィー / 生体確認",
+                    "proofOfAddress": "住所証明書類",
+                    "questions": "あなたに関するいくつかの質問"
+                },
+                "buttonText": "続ける"
+            },
             "CardIntroducing": {
                 "title": "ご紹介",
                 "cardInfo": {

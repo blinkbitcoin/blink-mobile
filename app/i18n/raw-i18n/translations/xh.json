@@ -3686,6 +3686,18 @@
         "renew": "Ndiyaqonda ukuba ubhaliso lwam luya kuhlaziywa ngokuzenzekelayo kwiinyanga ezili-{months: number}",
         "freeNotice": "Ndiyaqonda ukuba i-Blink Orange isimahla okwangoku, kwaye kunokwenzeka ukuba kuziswe umrhumo wobulungu kamva, ngesaziso"
       },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Qinisekisa ubuwena bakho",
+        "description": "Ukuze uvule iKhadi lakho le-Blink, umkhuphi wekhadi kufuneka aqinisekise ukuba ungubani (KYC). Uya kudinga:",
+        "requirements": {
+          "governmentId": "Isazisi esikhutshwe ngurhulumente",
+          "selfie": "Iselfie / uvavanyo lokuphila",
+          "proofOfAddress": "Ubungqina bedilesi",
+          "questions": "Imibuzo embalwa ngawe"
+        },
+        "buttonText": "Qhubeka"
+      },
       "CardIntroducing": {
         "title": "Ukwazisa",
         "cardInfo": {
