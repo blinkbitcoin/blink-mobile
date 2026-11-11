@@ -1,6 +1,7 @@
 import React from "react"
 import {
   ActivityIndicator,
+  Insets,
   Pressable,
   PressableProps,
   View,
@@ -28,12 +29,38 @@ export type GaloyIconButtonProps = {
   backgroundColor?: string
   loading?: boolean
   weight?: IconWeight
+  /** Padding round the icon, in dp, for a button without text: the box, and so the touch
+   *  target, is the icon plus this padding. It is the button's real footprint, so a touch
+   *  anywhere in it lands, inside a native header item too. Callers keep the icon in place
+   *  with their own (positive) margins. It replaces `hitSlop`, which past the parent is
+   *  drawn by the touchables inspector but never receives a touch. */
+  touchPadding?: number | Insets
 }
 
 const sizeMapping = {
   small: 16,
   medium: 24,
   large: 36,
+}
+
+const touchBoxStyle = (contentSize: number, padding: number | Insets): ViewStyle => {
+  const {
+    top = 0,
+    right = 0,
+    bottom = 0,
+    left = 0,
+  } = typeof padding === "number"
+    ? { top: padding, right: padding, bottom: padding, left: padding }
+    : padding
+
+  return {
+    width: contentSize + left + right,
+    height: contentSize + top + bottom,
+    paddingTop: top,
+    paddingRight: right,
+    paddingBottom: bottom,
+    paddingLeft: left,
+  }
 }
 
 export const GaloyIconButton = ({
@@ -47,6 +74,7 @@ export const GaloyIconButton = ({
   backgroundColor,
   loading,
   weight,
+  touchPadding,
   ...remainingProps
 }: GaloyIconButtonProps & PressableProps) => {
   const {
@@ -111,13 +139,20 @@ export const GaloyIconButton = ({
 
   const testPropId = text || name
 
+  const callerStyle = remainingProps.style
+  const touchArea =
+    !text && touchPadding !== undefined && typeof callerStyle !== "function"
+      ? [callerStyle, touchBoxStyle(iconContainerSize, touchPadding)]
+      : undefined
+
   return (
     <Pressable
-      hitSlop={text ? 0 : iconContainerSize / 2}
+      hitSlop={text || touchArea ? 0 : iconContainerSize / 2}
       style={text ? styles.pressableWithText : styles.pressableWithIcon}
       disabled={isDisabled}
       {...testProps(testPropId)}
       {...remainingProps}
+      {...(touchArea && { style: touchArea })}
     >
       {({ pressed }) => {
         const resolvedProps = iconProps(pressed, Boolean(iconOnly), Boolean(isDisabled))

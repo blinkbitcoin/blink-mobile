@@ -14,6 +14,10 @@ import { GaloyIcon, icons } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { DisabledFeature } from "@app/components/disabled-feature"
+import {
+  HEADER_ICON_BUTTON_TOUCH_PADDING,
+  headerIconButtonTouchPaddingAbove,
+} from "@app/components/header-no-glass"
 import { BulletinsCard } from "@app/components/notifications/bulletins"
 import { SetDefaultAccountModal } from "@app/components/set-default-account-modal"
 import { StableSatsModal } from "@app/components/stablesats-modal"
@@ -984,8 +988,9 @@ export const HomeScreen: React.FC = () => {
             name="graph"
             iconOnly={true}
             weight="bold"
+            touchPadding={headerIconButtonTouchPaddingAbove}
           />
-          <View>
+          <View style={styles.headerTitle}>
             {!loading && usernameTitle && (
               <Pressable onPress={canSwitchAccount ? handleSwitchPress : null}>
                 <View style={styles.profileContainer}>
@@ -1008,6 +1013,7 @@ export const HomeScreen: React.FC = () => {
             name="menu"
             iconOnly={true}
             weight="bold"
+            touchPadding={headerIconButtonTouchPaddingAbove}
           />
         </View>
       </View>
@@ -1196,8 +1202,10 @@ const useStyles = makeStyles(({ colors }) => ({
     flexGrow: 1,
     alignItems: "center",
   },
+  // The price and menu touch boxes grow 7dp up and sideways into the row's margins (no
+  // room is free below them). The icons stay 13dp down (6 + 0 + 7) and the balance at 47dp.
   balanceContainer: {
-    marginTop: 7,
+    marginTop: 6,
     flexDirection: "column",
     minHeight: 40,
   },
@@ -1205,8 +1213,12 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginHorizontal: 20,
-    marginTop: 6,
+    marginHorizontal: 20 - HEADER_ICON_BUTTON_TOUCH_PADDING,
+    marginTop: 0,
+  },
+  // Matches the padding above the icons, so the username stays centred on them.
+  headerTitle: {
+    paddingTop: HEADER_ICON_BUTTON_TOUCH_PADDING,
   },
   error: {
     alignSelf: "center",

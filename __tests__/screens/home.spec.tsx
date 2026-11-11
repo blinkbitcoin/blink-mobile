@@ -3702,6 +3702,39 @@ describe("HomeScreen layout under font scaling (blink-wip#931)", () => {
     expect(rowStyle.flex).toBeUndefined()
   })
 
+  /** The header row has no room under its buttons, so their touch boxes grow up and
+   *  sideways only (48×41dp), into the row's margins, never by a negative margin. */
+  it("gives the price and menu buttons a 48×41dp box with no negative margin", async () => {
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    const row = StyleSheet.flatten(getByTestId("home-header-row").props.style)
+    expect(row).toMatchObject({ marginHorizontal: 13, marginTop: 0 })
+    for (const testID of ["graph", "home-settings-button"]) {
+      const style = StyleSheet.flatten(getByTestId(testID).props.style)
+      expect(style).toMatchObject({
+        width: 48,
+        height: 41,
+        paddingTop: 7,
+        paddingBottom: 0,
+      })
+      const margins = [
+        style.marginTop,
+        style.marginRight,
+        style.marginBottom,
+        style.marginLeft,
+      ]
+      expect(
+        margins.filter((margin) => typeof margin === "number" && margin < 0),
+      ).toEqual([])
+    }
+  })
+
   it("keeps the settings menu button wired in the header", async () => {
     const { getByTestId } = render(
       <ContextForScreen>
