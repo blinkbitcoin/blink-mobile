@@ -7456,10 +7456,10 @@ bip39@^3.1.0:
   dependencies:
     "@noble/hashes" "^1.2.0"
 
-bitcoinjs-lib@^6.0.0, bitcoinjs-lib@^6.1.5:
-  version "6.1.5"
-  resolved "https://registry.npmjs.org/bitcoinjs-lib/-/bitcoinjs-lib-6.1.5.tgz#3b03509ae7ddd80a440f10fc38c4a97f0a028d8c"
-  integrity sha512-yuf6xs9QX/E8LWE2aMJPNd0IxGofwfuVOiYdNUESkc+2bHHVKjhJd8qewqapeoolh9fihzHGoDCB5Vkr57RZCQ==
+bitcoinjs-lib@^6.0.0, bitcoinjs-lib@^6.1.8:
+  version "6.1.8"
+  resolved "https://registry.npmjs.org/bitcoinjs-lib/-/bitcoinjs-lib-6.1.8.tgz#42664ada7470ef8253823418f0dc3ccd90699cc7"
+  integrity sha512-A6o+yq7BvwlmLj4F0NC5f3XX109rRe5evxi368S9zil5voOtUfiqfiMCzZYKHk4k7iIJ3+NmcQW05Ar4CBlKyg==
   dependencies:
     "@noble/hashes" "^1.2.0"
     bech32 "^2.0.0"
