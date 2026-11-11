@@ -1,7 +1,6 @@
 import React, { useState } from "react"
 import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 import { PanGestureHandler } from "react-native-gesture-handler"
-import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 
 import { gql } from "@apollo/client"
 import { radius } from "@app/rne-theme/radius"
@@ -34,6 +33,7 @@ import { useSendDustWarning, useTranslateSdkError } from "@app/self-custodial/ho
 import { isSelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { logPaymentAttempt, logPaymentResult } from "@app/utils/analytics"
 import { reportError } from "@app/utils/error-logging"
+import { haptics } from "@app/utils/haptics"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -262,9 +262,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           index: routes.length - 1,
         })
       })
-      ReactNativeHapticFeedback.trigger("notificationSuccess", {
-        ignoreAndroidSystemSettings: true,
-      })
+      haptics.success()
     },
     [
       saveLnAddressContact,
@@ -305,9 +303,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
       if (status === "ALREADY_PAID") {
         setPaymentError(LL.SendBitcoinConfirmationScreen.invoiceAlreadyPaid())
-        ReactNativeHapticFeedback.trigger("notificationError", {
-          ignoreAndroidSystemSettings: true,
-        })
+        haptics.error()
         return
       }
 
@@ -315,9 +311,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         translateSdkError(errorsMessage) ||
           LL.SendBitcoinConfirmationScreen.somethingWentWrong(),
       )
-      ReactNativeHapticFeedback.trigger("notificationError", {
-        ignoreAndroidSystemSettings: true,
-      })
+      haptics.error()
     } catch (err) {
       if (err instanceof Error) {
         reportError("send-bitcoin-confirmation", err)
@@ -358,9 +352,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           }
 
           setPaymentError(LL.SendBitcoinConfirmationScreen.paymentAlreadyAttempted())
-          ReactNativeHapticFeedback.trigger("notificationError", {
-            ignoreAndroidSystemSettings: true,
-          })
+          haptics.error()
           return
         }
 
