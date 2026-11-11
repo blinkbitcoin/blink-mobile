@@ -41,7 +41,7 @@ export const RevokeApiKeyModal: React.FC<Props> = ({
       dismissable={!revoking}
       showCloseIconButton={true}
       closeIconButtonAccessibilityLabel={LL.common.close()}
-      image={<GaloyIcon name="info" size={52} color={colors.primary} />}
+      image={<GaloyIcon name="info" size={52} color={colors.accent} />}
       title={LL.ApiScreen.revokeTitle()}
       body={
         <Text style={styles.body}>
@@ -64,6 +64,6 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 16,
     lineHeight: 22,
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

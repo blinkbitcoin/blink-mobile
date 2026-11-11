@@ -10,10 +10,10 @@ let mockThemeMode = "light"
 
 jest.mock("@rn-vui/themed", () => {
   const colors = {
-    grey0: "#ccc",
-    grey5: "#f5f5f5",
-    white: "#fff",
-    black: "#000",
+    textPrimary: "#ccc",
+    surfaceInteractive: "#f5f5f5",
+    backgroundDefault: "#fff",
+    textOnBackground: "#000",
   }
   const Text = ({ children, ...props }: { children: React.ReactNode }) =>
     React.createElement("Text", props, children)

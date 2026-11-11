@@ -142,7 +142,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     backgroundColor: SCRIM_COLOR,
   },
   sheet: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingTop: 8,
@@ -152,7 +152,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.grey3,
+    backgroundColor: colors.textDisabled,
     marginBottom: 8,
   },
   header: {
@@ -165,12 +165,12 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
   title: {
     fontSize: 20,
     fontFamily: fonts.bold,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   action: {
     fontSize: 15,
     fontWeight: "700",
-    color: colors.primary,
+    color: colors.accent,
   },
   list: {
     flex: 1,
@@ -186,11 +186,11 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     columnGap: 16,
     minHeight: 56,
     borderBottomWidth: 1,
-    borderBottomColor: colors.grey5,
+    borderBottomColor: colors.surfaceInteractive,
   },
   rowLabel: {
     flex: 1,
     fontSize: 16,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

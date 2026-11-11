@@ -81,7 +81,7 @@ export const PercentageSelector = <T extends number = number>({
             }}
           >
             {loading ? (
-              <ActivityIndicator color={colors.primary} />
+              <ActivityIndicator color={colors.accent} />
             ) : (
               <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>
                 {formatLabel(p)}
@@ -102,7 +102,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: "100%",
   },
   chip: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 100,
     alignItems: "center",
     paddingVertical: 8,
@@ -110,16 +110,16 @@ const useStyles = makeStyles(({ colors }) => ({
     minWidth: 64,
   },
   chipSelected: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
   },
   chipDisabled: {
     opacity: 0.5,
   },
   chipText: {
-    color: colors.primary,
+    color: colors.accent,
     fontWeight: "bold",
   },
   chipTextSelected: {
-    color: colors.white,
+    color: colors.backgroundDefault,
   },
 }))

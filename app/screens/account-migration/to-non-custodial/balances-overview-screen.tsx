@@ -595,7 +595,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
       <View style={styles.container}>
         <IconHero
           icon="send"
-          iconColor={colors.primary}
+          iconColor={colors.accent}
           title={LLOverview.title()}
           subtitle={LLOverview.body()}
         />
@@ -615,7 +615,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
             <RichText text={preview.networkFeeLine} style={styles.networkFee} />
 
             <View style={styles.arrowCircle}>
-              <GaloyIcon name="arrow-down" size={24} color={colors.grey3} />
+              <GaloyIcon name="arrow-down" size={24} color={colors.textDisabled} />
             </View>
 
             <BalancePairCard
@@ -644,7 +644,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
             {isRetryable ? null : (
               <ActivityIndicator
                 size="large"
-                color={colors.primary}
+                color={colors.accent}
                 {...testProps("migration-balances-overview-loading")}
               />
             )}
@@ -718,14 +718,14 @@ const useStyles = makeStyles(({ colors }) => ({
   networkFee: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
   },
   arrowCircle: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.border,
     alignItems: "center",
     justifyContent: "center",
   },

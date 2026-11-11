@@ -34,7 +34,7 @@ export const OptionRow: React.FC<OptionRowProps> = ({
     theme: { colors },
   } = useTheme()
 
-  const resolvedValueColor = valueColor ?? colors.black
+  const resolvedValueColor = valueColor ?? colors.textOnBackground
 
   return (
     <View style={styles.container}>
@@ -59,20 +59,20 @@ const useStyles = makeStyles(({ colors }, { highlighted }: StyleProps) => ({
     paddingLeft: 18,
     paddingRight: 14,
     gap: 14,
-    backgroundColor: highlighted ? colors.grey4 : colors.grey5,
+    backgroundColor: highlighted ? colors.border : colors.surfaceInteractive,
   },
   textContainer: {
     flex: 1,
   },
   title: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
     lineHeight: 20,
   },
   subtitle: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",

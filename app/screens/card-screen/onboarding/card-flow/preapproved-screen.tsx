@@ -29,7 +29,7 @@ export const CardPreapprovedScreen: React.FC = () => {
         <View style={styles.contentContainer}>
           <View style={styles.iconContainer}>
             <View style={styles.iconCircle}>
-              <GaloyIcon name={"check-badge"} color={colors._green} size={45} />
+              <GaloyIcon name={"check-badge"} color={colors.staticSuccess} size={45} />
             </View>
           </View>
 
@@ -67,7 +67,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     justifyContent: "center",
     alignItems: "center",
   },

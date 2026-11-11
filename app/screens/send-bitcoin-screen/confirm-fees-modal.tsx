@@ -28,7 +28,7 @@ export const ConfirmFeesModal: React.FC<ConfirmFeesModalProps> = ({
       isVisible={isVisible}
       toggleModal={cancel}
       title={LL.SendBitcoinScreen.confirmFeesModal.title()}
-      image={<GaloyIcon name="info" size={80} color={colors.primary3} />}
+      image={<GaloyIcon name="info" size={80} color={colors.accent2} />}
       body={
         <View style={styles.body}>
           <Text type={"p2"} style={styles.warningText}>
@@ -46,7 +46,7 @@ export const ConfirmFeesModal: React.FC<ConfirmFeesModalProps> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   modalCard: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     borderRadius: 16,
     padding: 18,
   },

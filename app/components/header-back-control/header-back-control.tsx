@@ -50,7 +50,7 @@ const HeaderBackButtonWithTheme = ({
     <HeaderBackButton
       {...props}
       onPress={handleBack}
-      pressColor={colors.grey5}
+      pressColor={colors.surfaceInteractive}
       pressOpacity={1}
       style={styles.backButton}
     />

@@ -133,7 +133,7 @@ export const AddPlaceSheet: React.FC<Props> = ({ location, onSubmit, onClose }) 
           accessibilityLabel={LL.common.close()}
           hitSlop={12}
         >
-          <GaloyIcon name="close" size={20} color={colors.primary} />
+          <GaloyIcon name="close" size={20} color={colors.accent} />
         </Pressable>
       </View>
 
@@ -147,7 +147,7 @@ export const AddPlaceSheet: React.FC<Props> = ({ location, onSubmit, onClose }) 
           {/* Read-only, and with nothing to tap: the map above is the control
               for this row, and it is on screen. */}
           <View style={styles.locationRow}>
-            <GaloyIcon name="map-pin" size={16} color={colors.grey1} />
+            <GaloyIcon name="map-pin" size={16} color={colors.textSecondary} />
             <Text testID="place-coordinates" style={styles.coordinates} numberOfLines={1}>
               {formatCoordinates(shownLocation)}
             </Text>
@@ -162,7 +162,7 @@ export const AddPlaceSheet: React.FC<Props> = ({ location, onSubmit, onClose }) 
             value={name}
             onChangeText={editName}
             placeholder={LL.MapScreen.placeNameHint()}
-            placeholderTextColor={colors.grey2}
+            placeholderTextColor={colors.textMuted}
             maxLength={PLACE_NAME_MAX_LENGTH}
             autoCorrect={false}
             returnKeyType="done"
@@ -191,7 +191,7 @@ export const AddPlaceSheet: React.FC<Props> = ({ location, onSubmit, onClose }) 
             what keeps "I added my shop and it isn't there" from being a
             surprise. */}
         <View style={styles.note}>
-          <GaloyIcon name="info" size={16} color={colors.grey2} />
+          <GaloyIcon name="info" size={16} color={colors.textMuted} />
           <Text style={styles.noteText}>{LL.MapScreen.placeReviewNote()}</Text>
         </View>
       </ScrollView>
@@ -223,12 +223,12 @@ const useStyles = makeStyles(({ colors }) => ({
   // height so that the split survives the window shrinking under a keyboard.
   sheet: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     borderWidth: 1,
     borderBottomWidth: 0,
-    borderColor: colors.grey4,
+    borderColor: colors.border,
   },
   header: {
     flexDirection: "row",
@@ -243,7 +243,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     fontSize: 20,
     fontFamily: fonts.bold,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   content: {
     paddingHorizontal: 20,
@@ -255,15 +255,15 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   label: {
     fontSize: 14,
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
   // These two are hand-rolled where the category row is the shared dropdown,
   // so they take their measurements from it rather than the other way around —
   // three stacked rows in one short form have to be one row three times.
   input: {
     fontSize: 16,
-    color: colors.black,
-    backgroundColor: colors.grey5,
+    color: colors.textOnBackground,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     minHeight: 60,
     paddingHorizontal: 14,
@@ -274,7 +274,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     columnGap: 10,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     minHeight: 60,
     paddingHorizontal: 14,
@@ -282,7 +282,7 @@ const useStyles = makeStyles(({ colors }) => ({
   coordinates: {
     flex: 1,
     fontSize: 16,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   note: {
     flexDirection: "row",
@@ -293,7 +293,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     fontSize: 13,
     lineHeight: 18,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   // Outside the scroll view: the button is the point of the sheet, so it stays
   // on the sheet rather than under whatever the fields have pushed off it.

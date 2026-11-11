@@ -155,7 +155,7 @@ const SelfCustodialAccountBanner: React.FC = () => {
           style={isRestrictedRegion && styles.gatedCopyIcon}
           {...testProps("account-banner-copy")}
         >
-          <GaloyIcon name="copy-paste" size={20} color={colors.primary} />
+          <GaloyIcon name="copy-paste" size={20} color={colors.accent} />
         </View>
       )}
     </TouchableOpacity>
@@ -166,7 +166,7 @@ export const AccountIcon: React.FC<{ size: number }> = ({ size }) => {
   const {
     theme: { colors },
   } = useTheme()
-  return <GaloyIcon name="user" size={size} backgroundColor={colors.grey4} />
+  return <GaloyIcon name="user" size={size} backgroundColor={colors.border} />
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -185,7 +185,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "space-between",
   },
   iconContainer: {
-    backgroundColor: theme.colors.grey4,
+    backgroundColor: theme.colors.border,
     borderRadius: 100,
     padding: 3,
   },
@@ -194,7 +194,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
   },
   subtitle: {
-    color: theme.colors.grey2,
+    color: theme.colors.textMuted,
   },
   gatedCopyIcon: {
     opacity: 0.5,

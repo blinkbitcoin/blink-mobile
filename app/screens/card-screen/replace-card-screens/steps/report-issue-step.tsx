@@ -37,7 +37,7 @@ export const ReportIssueStep: React.FC<ReportIssueStepProps> = ({
             () => (
               <SelectableOptionRow
                 icon="question"
-                iconColor={colors.primary}
+                iconColor={colors.accent}
                 title={LL.CardFlow.ReplaceCard.ReportIssue.lostCard()}
                 subtitle={LL.CardFlow.ReplaceCard.ReportIssue.lostCardDescription()}
                 isSelected={selectedIssue === Issue.Lost}

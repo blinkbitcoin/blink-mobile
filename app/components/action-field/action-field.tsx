@@ -30,7 +30,7 @@ export const ActionField: React.FC<ActionFieldProps> = ({
   } = useTheme()
 
   const hasValue = value !== null && value !== undefined && value !== PLACEHOLDER
-  const iconColor = hasValue ? colors.primary : colors.grey3
+  const iconColor = hasValue ? colors.accent : colors.textDisabled
 
   return (
     <View style={styles.container}>
@@ -58,7 +58,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 3,
   },
   label: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
@@ -68,13 +68,13 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     height: 50,
     paddingHorizontal: 10,
   },
   value: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 16,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",

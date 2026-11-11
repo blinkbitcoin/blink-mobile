@@ -46,7 +46,7 @@ export const CloseHeader: React.FC<CloseHeaderProps> = ({
         <GaloyIconButton
           name="close"
           size="medium"
-          backgroundColor={colors.grey5}
+          backgroundColor={colors.surfaceInteractive}
           onPress={onClose ?? leaveFlow}
           {...testProps(testID)}
         />

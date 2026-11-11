@@ -14,7 +14,10 @@ import { getTxLastSeenIds } from "@app/store/persistent-state/tx-last-seen"
 import { NormalizedTransaction, PaymentType } from "@app/types/transaction"
 
 jest.mock("@rn-vui/themed", () => {
-  const colors: Record<string, string> = { grey5: "#f5f5f5", black: "#000" }
+  const colors: Record<string, string> = {
+    surfaceInteractive: "#f5f5f5",
+    textOnBackground: "#000",
+  }
   return {
     makeStyles:
       (

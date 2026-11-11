@@ -27,14 +27,14 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
 
 jest.mock("@rn-vui/themed", () => {
   const colors: Record<string, string> = {
-    grey2: "#999",
-    grey3: "#bbb",
-    grey4: "#ddd",
-    grey5: "#f5f5f5",
-    white: "#fff",
-    black: "#000",
-    primary: "#007",
-    _green: "#0f0",
+    textMuted: "#999",
+    textDisabled: "#bbb",
+    border: "#ddd",
+    surfaceInteractive: "#f5f5f5",
+    backgroundDefault: "#fff",
+    textOnBackground: "#000",
+    accent: "#007",
+    staticSuccess: "#0f0",
   }
   return {
     makeStyles:

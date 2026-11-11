@@ -256,7 +256,7 @@ describe("GaloyToast", () => {
           borderWidth: 1,
           borderRadius: 8,
           borderColor: dark[accent],
-          backgroundColor: dark.grey7,
+          backgroundColor: dark.surfaceStatic,
         })
       })
 
@@ -275,18 +275,18 @@ describe("GaloyToast", () => {
       it("keeps the message in the foreground colour, not the accent", () => {
         const { getByText } = renderToast(type)
 
-        expect(flatStyle(getByText(MESSAGE)).color).toBe(dark.black)
+        expect(flatStyle(getByText(MESSAGE)).color).toBe(dark.textOnBackground)
       })
 
       it("follows the light theme", () => {
         const { getByTestId, getByText } = renderToast(type, "light")
 
         expect(flatStyle(getByTestId(`toast-${type}`))).toMatchObject({
-          backgroundColor: light.grey7,
+          backgroundColor: light.surfaceStatic,
           borderColor: light[accent],
         })
         expect(getByTestId("toast-icon").props.color).toBe(light[accent])
-        expect(flatStyle(getByText(MESSAGE)).color).toBe(light.black)
+        expect(flatStyle(getByText(MESSAGE)).color).toBe(light.textOnBackground)
       })
     })
   })

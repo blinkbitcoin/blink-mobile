@@ -133,7 +133,7 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
       animationIn="fadeIn"
       isVisible={modalVisible}
       onBackdropPress={closeModal}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       avoidKeyboard={true}
       backdropTransitionOutTiming={0}
     >
@@ -174,7 +174,7 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
           containerStyle={[styles.listStyle, isFirstItem && styles.firstItem]}
         >
           {isCurrentlyActive ? (
-            <GaloyIcon name="check-circle" size={20} color={colors._green} />
+            <GaloyIcon name="check-circle" size={20} color={colors.staticSuccess} />
           ) : (
             <View style={styles.spacerStyle} />
           )}
@@ -187,19 +187,19 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
             </Text>
           </ListItem.Content>
           {logoutLoading ? (
-            <ActivityIndicator size="small" color={colors.primary} />
+            <ActivityIndicator size="small" color={colors.accent} />
           ) : (
             <GaloyIconButton
               name="close"
               size="small"
               onPress={openModal}
-              backgroundColor={colors.grey4}
+              backgroundColor={colors.border}
             />
           )}
         </ListItem>
       </TouchableOpacity>
       <Overlay isVisible={switchLoading} overlayStyle={styles.overlayStyle}>
-        <ActivityIndicator size={50} color={colors.primary} />
+        <ActivityIndicator size={50} color={colors.accent} />
         <Text>{LL.AccountScreen.pleaseWait()}</Text>
       </Overlay>
       {logoutModal}
@@ -210,8 +210,8 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
 const useStyles = makeStyles(({ colors }) => ({
   listStyle: {
     borderBottomWidth: 2,
-    borderColor: colors.grey5,
-    backgroundColor: colors.white,
+    borderColor: colors.surfaceInteractive,
+    backgroundColor: colors.backgroundDefault,
   },
   firstItem: {
     marginTop: 0,
@@ -225,11 +225,11 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 20,
   },
   subtitle: {
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   modalView: {
     marginHorizontal: 20,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     padding: 20,
     borderRadius: 20,
     display: "flex",
