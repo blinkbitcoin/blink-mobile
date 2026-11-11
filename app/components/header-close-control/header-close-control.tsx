@@ -6,7 +6,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { GaloyIconButton } from "../atomic/galoy-icon-button"
-import { HEADER_ICON_TOUCH_SIZE, headerRightNoGlass } from "../header-no-glass"
+import { HEADER_ICON_BUTTON_TOUCH_PADDING, headerRightNoGlass } from "../header-no-glass"
 
 type HeaderCloseControlParams = {
   navigateTo?: keyof RootStackParamList
@@ -28,7 +28,7 @@ const HeaderCloseButton: React.FC<HeaderCloseControlParams> = ({
       name="close"
       backgroundColor={colors.grey5}
       style={styles.headerCloseButton}
-      touchSize={HEADER_ICON_TOUCH_SIZE}
+      touchPadding={HEADER_ICON_BUTTON_TOUCH_PADDING}
     />
   )
 }
@@ -42,7 +42,9 @@ export const headerCloseControlOptions = ({
   headerRightNoGlass(() => <HeaderCloseButton navigateTo={navigateTo} />)
 
 const useStyles = makeStyles(() => ({
+  // The 48dp box puts the 34dp circle 7dp in from its right edge: the margin gives
+  // those 7dp back, so the circle stays 20dp from the screen edge.
   headerCloseButton: {
-    marginRight: 20,
+    marginRight: 20 - HEADER_ICON_BUTTON_TOUCH_PADDING,
   },
 }))

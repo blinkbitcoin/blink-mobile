@@ -17,12 +17,12 @@ const ANDROID_BACK_BUTTON_INSET_CORRECTION = -10
 // The elements HeaderButton presses with a borderless 20dp-radius ripple, drawn in the
 // foreground and so clipped to the button's own box. That box is ~30dp wide, so the
 // press showed as a rounded square. The header touch box (48dp) holds the whole 40dp
-// ripple, which reads as a circle; the margins keep the arrow and the title where they
-// were.
+// ripple, which reads as a circle. The box can't grow left past the inset correction
+// without a negative margin, so it grows right: the arrow sits ~10dp further in, and
+// with no margin on the right the title moves ~10dp with it.
 const ANDROID_BACK_BUTTON_CIRCLE = {
   ...headerIconTouchArea,
-  marginLeft: ANDROID_BACK_BUTTON_INSET_CORRECTION - 9,
-  marginRight: 2,
+  marginRight: 0,
 } as const
 
 export const InvisibleBackButton = (): React.ReactNode => {

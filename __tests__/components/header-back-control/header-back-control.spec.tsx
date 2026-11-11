@@ -177,10 +177,11 @@ describe("headerBackControl", () => {
 
     const { getByLabelText } = renderHeaderLeft(headerBackControl()(headerProps))
 
-    // -10 for the native inset, -9 more for the wider touch box below.
+    // -10 for the native inset only: the touch box below grows right, never by a
+    // negative margin, and the title follows it with no margin of its own.
     expect(backButtonStyle(getByLabelText(BACK_BUTTON_LABEL))).toMatchObject({
-      marginLeft: -19,
-      marginRight: 2,
+      marginLeft: -10,
+      marginRight: 0,
     })
   })
 

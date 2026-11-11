@@ -1,9 +1,9 @@
 import React from "react"
 import {
   ActivityIndicator,
+  Insets,
   Pressable,
   PressableProps,
-  StyleSheet,
   View,
   ViewStyle,
   StyleProp,
@@ -29,12 +29,12 @@ export type GaloyIconButtonProps = {
   backgroundColor?: string
   loading?: boolean
   weight?: IconWeight
-  /** Minimum touch box, in dp, for a button without text. The box grows around the
-   *  icon and negative margins take the growth back, so the button keeps its place
-   *  and footprint. Unlike `hitSlop`, it is part of the layout, so a touch outside
-   *  the parent's bounds still reaches it. It replaces `hitSlop`, which past the parent
-   *  is drawn by the touchables inspector but never receives a touch. */
-  touchSize?: number
+  /** Padding round the icon, in dp, for a button without text: the box, and so the touch
+   *  target, is the icon plus this padding. It is the button's real footprint, so a touch
+   *  anywhere in it lands, inside a native header item too. Callers keep the icon in place
+   *  with their own (positive) margins. It replaces `hitSlop`, which past the parent is
+   *  drawn by the touchables inspector but never receives a touch. */
+  touchPadding?: number | Insets
 }
 
 const sizeMapping = {
@@ -43,37 +43,24 @@ const sizeMapping = {
   large: 36,
 }
 
-type MarginSide = "Top" | "Right" | "Bottom" | "Left"
+const touchBoxStyle = (contentSize: number, padding: number | Insets): ViewStyle => {
+  const {
+    top = 0,
+    right = 0,
+    bottom = 0,
+    left = 0,
+  } = typeof padding === "number"
+    ? { top: padding, right: padding, bottom: padding, left: padding }
+    : padding
 
-/** The caller's own margins stay: the growth comes off each side on top of them. */
-const touchAreaStyle = (
-  contentSize: number,
-  touchSize: number,
-  style: StyleProp<ViewStyle>,
-): StyleProp<ViewStyle> => {
-  const box = Math.max(contentSize, touchSize)
-  const growth = (box - contentSize) / 2
-  const flat = StyleSheet.flatten(style) ?? {}
-  const margin = (side: MarginSide) => {
-    const axis =
-      side === "Left" || side === "Right" ? flat.marginHorizontal : flat.marginVertical
-    const value = flat[`margin${side}`] ?? axis ?? flat.margin ?? 0
-    return (typeof value === "number" ? value : 0) - growth
+  return {
+    width: contentSize + left + right,
+    height: contentSize + top + bottom,
+    paddingTop: top,
+    paddingRight: right,
+    paddingBottom: bottom,
+    paddingLeft: left,
   }
-
-  return [
-    style,
-    {
-      width: box,
-      height: box,
-      alignItems: "center",
-      justifyContent: "center",
-      marginTop: margin("Top"),
-      marginRight: margin("Right"),
-      marginBottom: margin("Bottom"),
-      marginLeft: margin("Left"),
-    },
-  ]
 }
 
 export const GaloyIconButton = ({
@@ -87,7 +74,7 @@ export const GaloyIconButton = ({
   backgroundColor,
   loading,
   weight,
-  touchSize,
+  touchPadding,
   ...remainingProps
 }: GaloyIconButtonProps & PressableProps) => {
   const {
@@ -154,8 +141,8 @@ export const GaloyIconButton = ({
 
   const callerStyle = remainingProps.style
   const touchArea =
-    !text && touchSize !== undefined && typeof callerStyle !== "function"
-      ? touchAreaStyle(iconContainerSize, touchSize, callerStyle)
+    !text && touchPadding !== undefined && typeof callerStyle !== "function"
+      ? [callerStyle, touchBoxStyle(iconContainerSize, touchPadding)]
       : undefined
 
   return (

@@ -9,83 +9,98 @@ import theme from "@app/rne-theme/theme"
 const renderWithTheme = (ui: React.ReactElement) =>
   render(<ThemeProvider theme={theme}>{ui}</ThemeProvider>)
 
-const callerMargins = StyleSheet.create({ close: { marginRight: 20, marginVertical: 2 } })
+const callerMargins = StyleSheet.create({ close: { marginRight: 13, marginVertical: 2 } })
 
 const buttonStyle = (ui: React.ReactElement, testID = "menu") =>
   StyleSheet.flatten(renderWithTheme(ui).getByTestId(testID).props.style)
 
+const MARGINS = [
+  "margin",
+  "marginTop",
+  "marginRight",
+  "marginBottom",
+  "marginLeft",
+] as const
+
 /* A medium icon (24dp) sits in a 34dp circle. In the header that box is the whole touch
- * target: Android drops a touch outside the parent's bounds before `hitSlop` sees it. */
-describe("GaloyIconButton touchSize", () => {
-  it("grows the touch box to the size asked for", () => {
+ * target: Android drops a touch outside the parent's bounds before `hitSlop` sees it, and
+ * the native header item sizes itself to the margin box, so the growth must stay in it. */
+describe("GaloyIconButton touchPadding", () => {
+  it("grows the box by the padding on every side", () => {
     const style = buttonStyle(
-      <GaloyIconButton name="menu" size="medium" iconOnly touchSize={42} />,
-    )
-
-    expect(style).toMatchObject({ width: 42, height: 42 })
-  })
-
-  it("takes the growth back with margins, so the button keeps its footprint", () => {
-    const style = buttonStyle(
-      <GaloyIconButton name="menu" size="medium" iconOnly touchSize={42} />,
+      <GaloyIconButton name="menu" size="medium" iconOnly touchPadding={7} />,
     )
 
     expect(style).toMatchObject({
-      marginTop: -4,
-      marginRight: -4,
-      marginBottom: -4,
-      marginLeft: -4,
+      width: 48,
+      height: 48,
+      paddingTop: 7,
+      paddingRight: 7,
+      paddingBottom: 7,
+      paddingLeft: 7,
     })
   })
 
-  it("keeps the caller's own margins on top of the growth", () => {
+  it("grows only the sides it is given", () => {
+    const style = buttonStyle(
+      <GaloyIconButton
+        name="menu"
+        size="medium"
+        iconOnly
+        touchPadding={{ top: 7, right: 7, left: 7 }}
+      />,
+    )
+
+    expect(style).toMatchObject({
+      width: 48,
+      height: 41,
+      paddingTop: 7,
+      paddingBottom: 0,
+    })
+  })
+
+  it("never takes the growth back with negative margins", () => {
+    const style = buttonStyle(
+      <GaloyIconButton name="menu" size="medium" iconOnly touchPadding={7} />,
+    )
+
+    MARGINS.forEach((side) => expect(style[side] ?? 0).toBeGreaterThanOrEqual(0))
+  })
+
+  it("keeps the caller's own margins as they are", () => {
     const style = buttonStyle(
       <GaloyIconButton
         name="close"
         size="medium"
-        touchSize={42}
+        touchPadding={7}
         style={callerMargins.close}
       />,
       "close",
     )
 
-    expect(style).toMatchObject({
-      marginRight: 16,
-      marginLeft: -4,
-      marginTop: -2,
-      marginBottom: -2,
-    })
-  })
-
-  it("leaves a button already bigger than the touch size alone", () => {
-    const style = buttonStyle(
-      <GaloyIconButton name="close" size="large" iconOnly touchSize={42} />,
-      "close",
-    )
-
-    expect(style).toMatchObject({ width: 51, height: 51, marginLeft: 0, marginTop: 0 })
+    expect(style).toMatchObject({ width: 48, marginRight: 13, marginVertical: 2 })
   })
 
   /** Past the parent, `hitSlop` is drawn by the touchables inspector but never gets a
    *  touch, so with a real box it would only overstate the target. */
   it("drops hitSlop once the touch box is real", () => {
     const { getByTestId } = renderWithTheme(
-      <GaloyIconButton name="menu" size="medium" iconOnly touchSize={42} />,
+      <GaloyIconButton name="menu" size="medium" iconOnly touchPadding={7} />,
     )
 
     expect(getByTestId("menu").props.hitSlop).toBe(0)
   })
 
-  it("keeps the 34dp box when no touch size is asked for", () => {
+  it("keeps the 34dp box when no touch padding is asked for", () => {
     const style = buttonStyle(<GaloyIconButton name="menu" size="medium" iconOnly />)
 
     expect(style).toMatchObject({ width: 34, height: 34 })
-    expect(style.marginLeft).toBeUndefined()
+    expect(style.paddingTop).toBeUndefined()
   })
 
-  it("ignores the touch size on a button with text, which lays out by its label", () => {
+  it("ignores the touch padding on a button with text, which lays out by its label", () => {
     const style = buttonStyle(
-      <GaloyIconButton name="menu" size="medium" text="Menu" touchSize={42} />,
+      <GaloyIconButton name="menu" size="medium" text="Menu" touchPadding={7} />,
       "Menu",
     )
 

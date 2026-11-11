@@ -1,8 +1,11 @@
 import { readdirSync, readFileSync, statSync } from "fs"
 import { join, relative } from "path"
 
+import { circleDiameterThatContainsSquare } from "@app/components/atomic/galoy-icon/galoy-icon"
 import {
+  HEADER_ICON_BUTTON_TOUCH_PADDING,
   HEADER_ICON_TOUCH_SIZE,
+  headerIconButtonTouchPaddingAbove,
   headerIconTouchArea,
 } from "@app/components/header-no-glass"
 
@@ -18,7 +21,10 @@ import {
 const REPO_ROOT = join(__dirname, "..", "..", "..")
 const APP_DIR = join(REPO_ROOT, "app")
 const HEADER_ITEM = /header(Right|Left)NoGlass\(/
-const USES_STANDARD = /HEADER_ICON_TOUCH_SIZE|headerIconTouchArea/
+const USES_STANDARD =
+  /HEADER_ICON_TOUCH_SIZE|HEADER_ICON_BUTTON_TOUCH_PADDING|headerIconTouchArea|headerIconButtonTouchPaddingAbove/
+/** A margin written as a negative number, such as `marginLeft: -14`. */
+const NEGATIVE_MARGIN = /margin\w*:\s*-/i
 
 /** Header items whose box meets the standard without it, and why. */
 const MEETS_IT_ALREADY: Record<string, string> = {
@@ -40,6 +46,29 @@ describe("header touch area", () => {
       width: HEADER_ICON_TOUCH_SIZE,
       height: HEADER_ICON_TOUCH_SIZE,
     })
+  })
+
+  it("pads a medium icon button out to the 48dp box", () => {
+    expect(
+      circleDiameterThatContainsSquare(24) + 2 * HEADER_ICON_BUTTON_TOUCH_PADDING,
+    ).toBe(HEADER_ICON_TOUCH_SIZE)
+    expect(headerIconButtonTouchPaddingAbove).not.toHaveProperty("bottom")
+  })
+
+  /** The native header item is sized to its child's margin box, and a touch outside it
+   *  never reaches the child. A negative margin that hands back a box's growth therefore
+   *  hands back its touch area too, so header controls place their box with positive
+   *  margins only. */
+  it("is never cancelled by a negative margin", () => {
+    const offenders = sourceFiles(APP_DIR)
+      .filter((path) => {
+        const source = readFileSync(path, "utf8")
+        return HEADER_ITEM.test(source) || USES_STANDARD.test(source)
+      })
+      .filter((path) => NEGATIVE_MARGIN.test(readFileSync(path, "utf8")))
+      .map((path) => relative(REPO_ROOT, path))
+
+    expect(offenders).toEqual([])
   })
 
   it("is used by every file that renders a header item", () => {
