@@ -1,15 +1,24 @@
 import React from "react"
-import { Text as RNText } from "react-native"
+import { Text as RNText, View } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 
 import { CheckboxRow } from "@app/components/checkbox-row"
 
+jest.mock("@app/components/atomic/galoy-icon", () => ({
+  GaloyIcon: ({ name, ...props }: { name: string }) => (
+    <View {...props} testID={`galoy-icon-${name}`} />
+  ),
+}))
+
+/** backgroundDefault and textOnAccent share a value in the real palette, so they get
+ *  distinct sentinels here to show which one the checkmark picks. */
 jest.mock("@rn-vui/themed", () => ({
   Text: (props: React.ComponentProps<typeof RNText>) => <RNText {...props} />,
   useTheme: () => ({
     theme: {
       colors: {
-        backgroundDefault: "#FFFFFF",
+        backgroundDefault: "backgroundDefault",
+        textOnAccent: "textOnAccent",
         accent: "#0066FF",
         textDisabled: "#CCCCCC",
         textOnBackground: "#000000",
@@ -67,6 +76,12 @@ describe("CheckboxRow", () => {
       const checkbox = getByRole("checkbox")
       expect(checkbox.props.accessibilityState).toEqual({ checked: true })
     })
+  })
+
+  it("draws the checkmark in textOnAccent, the role for content on an accent fill", () => {
+    const { getByTestId } = render(<CheckboxRow {...defaultProps} isChecked={true} />)
+
+    expect(getByTestId("galoy-icon-check").props.color).toBe("textOnAccent")
   })
 
   describe("interactions", () => {

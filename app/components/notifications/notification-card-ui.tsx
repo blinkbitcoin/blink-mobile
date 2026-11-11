@@ -155,6 +155,6 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 14,
     lineHeight: 20,
     fontWeight: "700",
-    color: colors.backgroundDefault,
+    color: colors.textOnAccent,
   },
 }))

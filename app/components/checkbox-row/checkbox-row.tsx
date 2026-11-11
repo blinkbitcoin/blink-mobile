@@ -37,9 +37,7 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
       testID={testID}
     >
       <View style={[styles.checkbox, isChecked && styles.checkboxChecked]}>
-        {isChecked && (
-          <GaloyIcon name="check" size={14} color={colors.backgroundDefault} />
-        )}
+        {isChecked && <GaloyIcon name="check" size={14} color={colors.textOnAccent} />}
       </View>
       <Text style={[styles.label, centered && styles.labelCentered]}>{label}</Text>
     </Pressable>
