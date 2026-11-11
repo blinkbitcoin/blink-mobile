@@ -2,10 +2,11 @@ import * as React from "react"
 import { ScrollView, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { Confetti } from "@app/components/confetti"
+import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -26,17 +27,11 @@ export const CardPreapprovedScreen: React.FC = () => {
   return (
     <Screen>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.contentContainer}>
-          <View style={styles.iconContainer}>
-            <View style={styles.iconCircle}>
-              <GaloyIcon name={"check-badge"} color={colors.success} size={45} />
-            </View>
-          </View>
-
-          <Text type="h1" style={styles.welcomeTitle}>
-            {LL.CardFlow.Onboarding.CardPreapproved.title()}
-          </Text>
-        </View>
+        <IconHero
+          icon="check-badge"
+          iconColor={colors.success}
+          title={LL.CardFlow.Onboarding.CardPreapproved.title()}
+        />
       </ScrollView>
       <View style={styles.buttonsContainer}>
         <GaloyPrimaryButton
@@ -44,37 +39,19 @@ export const CardPreapprovedScreen: React.FC = () => {
           onPress={handleNext}
         />
       </View>
+      <Confetti />
     </Screen>
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(() => ({
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     paddingHorizontal: 20,
+    paddingTop: 40,
     paddingBottom: 20,
-    paddingTop: 60,
-  },
-  contentContainer: {
-    alignItems: "center",
-  },
-  iconContainer: {
-    marginBottom: 15,
-  },
-  iconCircle: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: colors.surfaceInteractive,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  welcomeTitle: {
-    marginBottom: 16,
-    textAlign: "center",
-    fontWeight: "bold",
   },
   buttonsContainer: {
     justifyContent: "flex-end",
