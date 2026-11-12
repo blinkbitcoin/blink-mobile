@@ -309,6 +309,10 @@ type PersistentState_23 = Omit<PersistentState_22, "schemaVersion"> & {
   // The currency metadata the SDK last served, beside the rates above and for the same
   // reason. Unlike a rate it does not go stale: a symbol and a fraction size do not move.
   selfCustodialFiatCurrencies?: StoredFiatCurrencies
+  // The sender has used the amount slider on a send that went out (sent or pending), so
+  // its "Slide to select amount" hint is no longer shown. Device-wide: it is about the
+  // person, not the wallet. Optional and unset reads as "not yet", so it needs no schema bump.
+  hasLearnedAmountSlider?: boolean
 }
 
 const migrate23ToCurrent = (state: PersistentState_23): Promise<PersistentState> =>

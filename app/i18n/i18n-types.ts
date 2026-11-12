@@ -7778,6 +7778,10 @@ type RootTranslation = {
 		 */
 		addAmount: string
 		/**
+		 * S​l​i​d​e​ ​t​o​ ​s​e​l​e​c​t​ ​a​m​o​u​n​t
+		 */
+		slideToSelectAmount: string
+		/**
 		 * L​o​w​ ​f​u​n​d​s
 		 */
 		lowFunds: string
@@ -22222,6 +22226,10 @@ export type TranslationFunctions = {
 		 * Add amount
 		 */
 		addAmount: () => LocalizedString
+		/**
+		 * Slide to select amount
+		 */
+		slideToSelectAmount: () => LocalizedString
 		/**
 		 * Low funds
 		 */
