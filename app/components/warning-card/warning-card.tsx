@@ -98,7 +98,7 @@ const useStyles = makeStyles(({ colors }) => ({
     ...staticSurface(colors),
   },
   active: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
   content: {
     rowGap: 8,

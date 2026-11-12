@@ -2142,7 +2142,9 @@
     "selectAll": "Khetha konke",
     "clearAll": "Cima konke",
     "addPlace": "Yongeza kwimephu",
-    "addPlaceTitle": "Yongeza indawo",
+    "addPlaceTitle": "Cebisa ishishini",
+    "submitPlaceRequest": "Thumela isicelo",
+    "showMyLocation": "Bonisa indawo yam",
     "placePinHint": "Shukumisa imephu ubeke isalathiso kwindawo",
     "placeName": "Igama",
     "placeNameHint": "Le ndawo ibizwa ngokuba yintoni",
@@ -3953,6 +3955,12 @@
       "title": "Asikwazi ukufudusa ibhalansi yakho yedola",
       "body": "Qala ukhuphe yonke ibhalansi yakho yedola. Ungayidlulisela kwibhalansi yakho yeBitcoin kuBlink okanye kwenye indawo."
     },
+    "pendingDepositModal": {
+      "title": "Kukho idiphozithi esalindileyo kwiakhawunti yakho",
+      "body": "Awukwazi ukufudukela kolunye uhlobo lweakhawunti de zonke iidiphozithi zakho ezisalindileyo zihlawulwe kwaye zifakwe kule akhawunti.",
+      "contactSupportCta": "Qhagamshelana nenkxaso",
+      "stillConfirming": "Idiphozithi yakho ayikaqinisekiswa. Zama kwakhona emva kwemizuzu embalwa."
+    },
     "balancesOverview": {
       "title": "Hambisa ibhalansi yakho",
       "body": "Hambisa imali yakho ngokukhuselekileyo kwiakhawunti yakho entsha.",
@@ -4140,6 +4148,7 @@
     "get": "Khuphela",
     "storeNote": "“Khuphela” ivula i-App Store okanye i-Google Play. Buyela kwi-Blink xa sele ifakiwe.",
     "haveAnApp": "Ndine-app",
+    "learnHow": "Funda indlela",
     "keyInstruction": "Kopisha esi sitshixo sokumisela kwi-app yakho ye-authenticator.",
     "qrInstruction": "Usebenzisa esinye isixhobo?\nEndaweni yoko skena le QR khowudi.",
     "backupTitle": "Gcina ikopi yesitshixo sakho",
@@ -4252,7 +4261,6 @@
     "payment": "Intlawulo"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Izinga lotshintshiselwano lisenokuba lidlule ixesha",
     "satsOnly": "Ibonisa ii-sats — alikho izinga lotshintshiselwano"
   },
   "SelfCustodialOffline": {

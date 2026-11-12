@@ -41,7 +41,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 3,
   },
   title: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",

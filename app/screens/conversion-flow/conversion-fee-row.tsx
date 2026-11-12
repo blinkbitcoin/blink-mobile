@@ -47,12 +47,12 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
   },
   label: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
     fontFamily: fonts.bold,
   },
   value: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     fontSize: 14,
     fontWeight: "700",
   },

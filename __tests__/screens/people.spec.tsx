@@ -4,7 +4,7 @@ import { render } from "@testing-library/react-native"
 import { PeopleScreen } from "@app/screens/people-screen/people"
 
 jest.mock("@rn-vui/themed", () => {
-  const colors: Record<string, string> = { white: "#FFFFFF" }
+  const colors: Record<string, string> = { backgroundDefault: "#FFFFFF" }
   return {
     makeStyles:
       (fn: (theme: { colors: Record<string, string> }) => Record<string, object>) => () =>

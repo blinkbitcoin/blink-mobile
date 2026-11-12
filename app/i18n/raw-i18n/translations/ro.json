@@ -2142,7 +2142,9 @@
     "selectAll": "Selectează tot",
     "clearAll": "Șterge tot",
     "addPlace": "Adaugă pe hartă",
-    "addPlaceTitle": "Adaugă un loc",
+    "addPlaceTitle": "Sugerează un local",
+    "submitPlaceRequest": "Trimite cererea",
+    "showMyLocation": "Arată locația mea",
     "placePinHint": "Mută harta pentru a pune indicatorul pe loc",
     "placeName": "Nume",
     "placeNameHint": "Cum se numește locul",
@@ -3953,6 +3955,12 @@
       "title": "Nu îți putem migra soldul în dolari",
       "body": "Golește mai întâi soldul în dolari. Îl poți transfera în soldul tău Bitcoin din Blink sau în altă parte."
     },
+    "pendingDepositModal": {
+      "title": "Există un depozit în așteptare în contul tău",
+      "body": "Nu poți migra către un alt tip de cont până când toate depozitele tale în așteptare nu au fost decontate și creditate în acest cont.",
+      "contactSupportCta": "Contactează asistența",
+      "stillConfirming": "Depozitul tău nu este încă confirmat. Încearcă din nou peste câteva minute."
+    },
     "balancesOverview": {
       "title": "Mută-ți soldul",
       "body": "Mută-ți fondurile în siguranță în noul tău cont.",
@@ -4140,6 +4148,7 @@
     "get": "Descarcă",
     "storeNote": "„Descarcă” deschide App Store sau Google Play. Revino în Blink după ce aplicația s-a instalat.",
     "haveAnApp": "Am deja o aplicație",
+    "learnHow": "Află cum",
     "keyInstruction": "Copiază această cheie de configurare în aplicația ta de autentificare.",
     "qrInstruction": "Folosești alt dispozitiv?\nScanează în schimb acest cod QR.",
     "backupTitle": "Fă o copie de rezervă a cheii",
@@ -4252,7 +4261,6 @@
     "payment": "Plată"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Cursul de schimb ar putea fi învechit",
     "satsOnly": "Se afișează sats — niciun curs de schimb disponibil"
   },
   "SelfCustodialOffline": {

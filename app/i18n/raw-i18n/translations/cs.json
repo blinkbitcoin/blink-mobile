@@ -2142,7 +2142,9 @@
     "selectAll": "Vybrat vše",
     "clearAll": "Zrušit vše",
     "addPlace": "Přidat na mapu",
-    "addPlaceTitle": "Přidat místo",
+    "addPlaceTitle": "Navrhnout podnik",
+    "submitPlaceRequest": "Odeslat žádost",
+    "showMyLocation": "Zobrazit moji polohu",
     "placePinHint": "Posuňte mapu tak, aby špendlík byl na daném místě",
     "placeName": "Název",
     "placeNameHint": "Jak se místo jmenuje",
@@ -3953,6 +3955,12 @@
       "title": "Váš dolarový zůstatek nemůžeme migrovat",
       "body": "Nejprve vyprázdněte svůj dolarový zůstatek. Můžete jej převést na svůj bitcoinový zůstatek v Blinku nebo jinam."
     },
+    "pendingDepositModal": {
+      "title": "Na váš účet čeká nevyřízený vklad",
+      "body": "Na jiný typ účtu nemůžete přejít, dokud nebudou všechny vaše čekající vklady vypořádány a připsány na tento účet.",
+      "contactSupportCta": "Kontaktovat podporu",
+      "stillConfirming": "Váš vklad zatím nebyl potvrzen. Zkuste to znovu za několik minut."
+    },
     "balancesOverview": {
       "title": "Přesuňte svůj zůstatek",
       "body": "Bezpečně přesuňte své prostředky na svůj nový účet.",
@@ -4140,6 +4148,7 @@
     "get": "Stáhnout",
     "storeNote": "„Stáhnout“ otevře App Store nebo Google Play. Po instalaci se vraťte do Blinku.",
     "haveAnApp": "Aplikaci už mám",
+    "learnHow": "Zjistit jak",
     "keyInstruction": "Zkopírujte tento klíč pro nastavení do své autentikační aplikace.",
     "qrInstruction": "Používáte jiné zařízení?\nNaskenujte místo toho tento QR kód.",
     "backupTitle": "Zálohujte svůj klíč",
@@ -4252,7 +4261,6 @@
     "payment": "Platba"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Směnný kurz může být zastaralý",
     "satsOnly": "Zobrazeno v satech – není dostupný směnný kurz"
   },
   "SelfCustodialOffline": {

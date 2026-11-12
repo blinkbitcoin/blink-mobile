@@ -1,4 +1,4 @@
-import React from "react"
+import React, { PropsWithChildren } from "react"
 import { it } from "@jest/globals"
 import { ApolloError } from "@apollo/client"
 import { MockedResponse } from "@apollo/client/testing"
@@ -8,6 +8,8 @@ import { RefreshControl, StyleSheet } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { HomeScreen } from "../../app/screens/home-screen"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
+
 import { ContextForScreen } from "./helper"
 import { flushEffects } from "../helpers/flush-effects"
 import { waitForStableRender } from "../helpers/wait-for-stable-render"
@@ -23,6 +25,8 @@ import {
 import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { mockCurrencyList } from "@app/graphql/mocks"
+import { PersistentStateContext } from "@app/store/persistent-state"
+import { defaultPersistentState } from "@app/store/persistent-state/state-migrations"
 import { GateReason } from "@app/types/account"
 import { ConvertDirection } from "@app/types/payment"
 import {
@@ -275,6 +279,8 @@ const UPGRADE_MODAL_DELAY_WITH_SLACK_MS = 2000
 let mockIsRestrictedRegion = false
 let mockIsRestrictedRegionEvaluationPending = false
 let mockCanShowUpgradeModal = false
+/** Unset keeps the real hook's answer; a spec sets it to price Home off an old rate. */
+let mockPriceFreshness: string | undefined
 let mockHomeCard: { id: string; status: CardStatus } | undefined
 let mockHomeCardLoaded = false
 let mockHomeCardLoading = false
@@ -526,6 +532,19 @@ jest.mock("@app/utils/helper", () => ({
   ...jest.requireActual("@app/utils/helper"),
   isIos: true,
 }))
+
+jest.mock("@app/hooks/use-price-conversion", () => {
+  const actual = jest.requireActual("@app/hooks/use-price-conversion")
+  return {
+    ...actual,
+    usePriceConversion: () => {
+      const result = actual.usePriceConversion()
+      return mockPriceFreshness
+        ? { ...result, priceFreshness: mockPriceFreshness }
+        : result
+    },
+  }
+})
 
 jest.mock("@app/hooks", () => {
   const actual = jest.requireActual("@app/hooks")
@@ -1032,6 +1051,7 @@ const resetHomeScreenMocks = () => {
   mockIsFocused = true
   mockActiveWalletOverride = null
   mockActiveAccountOverride = null
+  mockPriceFreshness = undefined
   mockDollarBalanceRestrictedOverride = false
   mockDollarRegionDeterminedOverride = true
   mockRegionPendingOverride = false
@@ -1805,16 +1825,39 @@ describe("HomeScreen", () => {
       mockBalanceModeValue = "usd"
     })
 
-    it("shows the unseen badge for a received self-custodial transaction", async () => {
-      const receivedTransaction: NormalizedTransaction = {
-        id: "sc-received-tx",
-        amount: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
-        direction: TransactionDirection.Receive,
-        status: TransactionStatus.Completed,
-        timestamp: 1747691078,
-        paymentType: PaymentType.Lightning,
-      }
+    const receivedTransaction: NormalizedTransaction = {
+      id: "sc-received-tx",
+      amount: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+      direction: TransactionDirection.Receive,
+      status: TransactionStatus.Completed,
+      timestamp: 1747691078,
+      paymentType: PaymentType.Lightning,
+    }
 
+    const SELF_CUSTODIAL_ACCOUNT_ID = "sc-account"
+
+    /** An account that already has its seen record, so this reads the badge itself
+     *  rather than the start of a new or restored account. */
+    const EstablishedSeenRecord: React.FC<PropsWithChildren> = ({ children }) => (
+      <PersistentStateContext.Provider
+        value={{
+          persistentState: {
+            ...defaultPersistentState,
+            activeAccountId: SELF_CUSTODIAL_ACCOUNT_ID,
+            txLastSeenByAccountId: {
+              [SELF_CUSTODIAL_ACCOUNT_ID]: { btcId: "", usdId: "" },
+            },
+          },
+          updateState: () => {},
+          resetState: () => {},
+          clearToken: async () => true,
+        }}
+      >
+        {children}
+      </PersistentStateContext.Provider>
+    )
+
+    it("shows the unseen badge for a received self-custodial transaction", async () => {
       mockSelfCustodialWalletOverride = {
         ...mockSelfCustodialWalletOverride,
         allTransactions: [receivedTransaction],
@@ -1822,13 +1865,32 @@ describe("HomeScreen", () => {
 
       const { findByLabelText } = render(
         <ContextForScreen>
-          <HomeScreen />
+          <EstablishedSeenRecord>
+            <HomeScreen />
+          </EstablishedSeenRecord>
         </ContextForScreen>,
       )
 
       expect(await findByLabelText(/^\+/)).toBeTruthy()
 
       await flushEffects()
+    })
+
+    it("shows no unseen badge before the account has a seen record", async () => {
+      mockSelfCustodialWalletOverride = {
+        ...mockSelfCustodialWalletOverride,
+        allTransactions: [receivedTransaction],
+      }
+
+      const { queryByLabelText } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      expect(queryByLabelText(/^\+/)).toBeNull()
     })
 
     it("shows no unseen badge when the self-custodial wallet has no transactions", async () => {
@@ -3702,6 +3764,39 @@ describe("HomeScreen layout under font scaling (blink-wip#931)", () => {
     expect(rowStyle.flex).toBeUndefined()
   })
 
+  /** The header row has no room under its buttons, so their touch boxes grow up and
+   *  sideways only (48×41dp), into the row's margins, never by a negative margin. */
+  it("gives the price and menu buttons a 48×41dp box with no negative margin", async () => {
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    const row = StyleSheet.flatten(getByTestId("home-header-row").props.style)
+    expect(row).toMatchObject({ marginHorizontal: 13, marginTop: 0 })
+    for (const testID of ["graph", "home-settings-button"]) {
+      const style = StyleSheet.flatten(getByTestId(testID).props.style)
+      expect(style).toMatchObject({
+        width: 48,
+        height: 41,
+        paddingTop: 7,
+        paddingBottom: 0,
+      })
+      const margins = [
+        style.marginTop,
+        style.marginRight,
+        style.marginBottom,
+        style.marginLeft,
+      ]
+      expect(
+        margins.filter((margin) => typeof margin === "number" && margin < 0),
+      ).toEqual([])
+    }
+  })
+
   it("keeps the settings menu button wired in the header", async () => {
     const { getByTestId } = render(
       <ContextForScreen>
@@ -3972,5 +4067,49 @@ describe("HomeScreen sanctioned session", () => {
     const { queryByTestId } = await renderAndSettleUpgradeDelay()
 
     expect(queryByTestId("migrate-now-modal")).toBeNull()
+  })
+})
+
+describe("HomeScreen stale exchange rate (blink-wip#2035)", () => {
+  /** Real copy rather than the empty strings an unloaded locale renders: the line only
+   *  showed for a non-empty notice. Last in the file, as the locale stays loaded. */
+  beforeAll(() => loadLocale("en"))
+  beforeEach(resetHomeScreenMocks)
+
+  it("shows the balance with no line under it when the rate is stale", async () => {
+    mockPriceFreshness = "stale"
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+        {
+          id: "usd-1",
+          walletCurrency: "USD",
+          balance: { amount: 0, currency: "USD", currencyCode: "USD" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+
+    const { getByTestId, queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    // The line came and went as the launch's refresh landed, moving everything under
+    // the balance. An old rate still prices the figure; it is just not announced.
+    expect(getByTestId("balance-value")).toBeTruthy()
+    expect(queryByTestId("balance-rate-notice")).toBeNull()
   })
 })

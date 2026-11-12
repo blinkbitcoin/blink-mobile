@@ -16,7 +16,7 @@ jest.mock("@rn-vui/themed", () => ({
     nfcIcon: {},
   }),
   useTheme: () => ({
-    theme: { colors: { black: "#000" } },
+    theme: { colors: { textOnBackground: "#000" } },
   }),
 }))
 

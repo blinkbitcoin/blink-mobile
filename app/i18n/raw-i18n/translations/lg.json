@@ -2142,7 +2142,9 @@
     "selectAll": "Londa byonna",
     "clearAll": "Sazaamu byonna",
     "addPlace": "Yongera ku mmaapu",
-    "addPlaceTitle": "Yongera ekifo",
+    "addPlaceTitle": "Teesa bizinensi",
+    "submitPlaceRequest": "Weereza okusaba",
+    "showMyLocation": "Laga ekifo kyange",
     "placePinHint": "Tambuza mmaapu ossewo akabonero ku kifo",
     "placeName": "Erinnya",
     "placeNameHint": "Ekifo bwe kiyitibwa",
@@ -3953,6 +3955,12 @@
       "title": "Tetusobola kutambuza ssente zo eza doola",
       "body": "Sooka omalewo ssente zo eza doola. Osobola okuzisindika ku ssente zo eza Bitcoin mu Blink oba awalala."
     },
+    "pendingDepositModal": {
+      "title": "Waliwo ssente eziteekeddwa ku akawunti yo ezikyalindiriddwa",
+      "body": "Toyinza kukyusa kugenda ku kika kya akawunti ekirala okutuusa ng'ssente zo zonna ezikyalindiriddwa zimaze okutuuka era nga ziteekeddwa ku akawunti eno.",
+      "contactSupportCta": "Tuukirira obuyambi",
+      "stillConfirming": "Ssente zo tezinnakakasibwa. Gezaako nate oluvannyuma lw'eddakiika ntono."
+    },
     "balancesOverview": {
       "title": "Tambuza ssente zo",
       "body": "Tambuza ssente zo mu bukuumi ku kawunti yo empya.",
@@ -4140,6 +4148,7 @@
     "get": "Funa",
     "storeNote": "“Funa” eggulawo App Store oba Google Play. Komawo ku Blink ng'emaze okuteekebwamu.",
     "haveAnApp": "Nnina app",
+    "learnHow": "Manya engeri",
     "keyInstruction": "Koppa ekisumuluzo kino eky'okuteekawo mu app yo eya authenticator.",
     "qrInstruction": "Okozesa kyuma kirala?\nMu kifo ky'ekyo sika koodi eno eya QR.",
     "backupTitle": "Tereka kopi y'ekisumuluzo kyo",
@@ -4252,7 +4261,6 @@
     "payment": "Okusasula"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Omuwendo gw'enkyusa guyinza okuba nga gukaddiye",
     "satsOnly": "Tulaga mu sats — tewali muwendo gwa nkyusa"
   },
   "SelfCustodialOffline": {

@@ -19,8 +19,8 @@ export const InfoBanner: React.FC<InfoBannerProps> = ({
   children,
   title,
   icon,
-  iconColor = "black",
-  titleColor = "primary",
+  iconColor = "textOnBackground",
+  titleColor = "accent",
 }) => {
   const styles = useStyles()
   const {
@@ -66,6 +66,6 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 16,
     fontWeight: "400",
     lineHeight: 22,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
 }))

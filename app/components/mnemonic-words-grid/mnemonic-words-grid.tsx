@@ -64,11 +64,11 @@ const useStyles = makeStyles(({ colors }) => ({
   number: {
     fontSize: 16,
     lineHeight: 22,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   word: {
     fontSize: 16,
     lineHeight: 22,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

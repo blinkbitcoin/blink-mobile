@@ -81,7 +81,8 @@ export const ConfirmStep: React.FC<ConfirmStepProps> = ({
         {
           label: confirmLL.shippingCost(),
           value: deliveryPrice,
-          valueColor: deliveryType === Delivery.Standard ? colors._green : undefined,
+          valueColor:
+            deliveryType === Delivery.Standard ? colors.staticSuccess : undefined,
         },
       )
     }
@@ -96,7 +97,7 @@ export const ConfirmStep: React.FC<ConfirmStepProps> = ({
     deliveryType,
     deliveryLL,
     formatCurrency,
-    colors._green,
+    colors.staticSuccess,
   ])
 
   return (

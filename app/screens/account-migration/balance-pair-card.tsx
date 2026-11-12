@@ -71,7 +71,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   separator: {
     height: 1,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
   },
   dollarPendingRow: {
     flexDirection: "row",
@@ -79,6 +79,6 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "space-between",
   },
   dollarPendingLabel: {
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
 }))

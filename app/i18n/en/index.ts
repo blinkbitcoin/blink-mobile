@@ -2143,7 +2143,9 @@ const en: BaseTranslation = {
     selectAll: "Select all",
     clearAll: "Clear all",
     addPlace: "Add to map",
-    addPlaceTitle: "Add a place",
+    addPlaceTitle: "Suggest business",
+    submitPlaceRequest: "Submit request",
+    showMyLocation: "Show my location",
     placePinHint: "Move the map to put the pin on the place",
     placeName: "Name",
     placeNameHint: "What the place is called",
@@ -4206,6 +4208,12 @@ const en: BaseTranslation = {
       title: "We cannot migrate your Dollar Balance",
       body: "Empty your Dollar Balance first. You can transfer to your Bitcoin Balance in Blink or elsewhere.",
     },
+    pendingDepositModal: {
+      title: "There is a pending deposit to your account",
+      body: "You cannot migrate to a different type of account before all your pending deposits have been settled and credited on this account.",
+      contactSupportCta: "Contact support",
+      stillConfirming: "Your deposit is not confirmed yet. Try again in a few minutes.",
+    },
     migrateNowModal: {
       title: "Migrate now to a non-custodial account",
       body: "You can no longer receive funds to your custodial account. Blink has discontinued custodial service in your region and this account will be inactivated by the end of {date: string}.\n\nMigrate now to a non-custodial account.",
@@ -4374,6 +4382,7 @@ const en: BaseTranslation = {
     storeNote:
       "\"Get\" opens the App Store or Google Play. Come back to Blink when it's installed.",
     haveAnApp: "I have an app",
+    learnHow: "Learn how",
     keyInstruction: "Copy this setup key into your authenticator app.",
     qrInstruction: "Using another device?\nScan this QR code instead.",
     backupTitle: "Back up your key",
@@ -4441,7 +4450,6 @@ const en: BaseTranslation = {
     exportFailed: "Could not download the emergency bundle.",
   },
   SelfCustodialStaleRate: {
-    notice: "Exchange rate may be out of date",
     satsOnly: "Showing sats — no exchange rate available",
   },
   SelfCustodialOffline: {

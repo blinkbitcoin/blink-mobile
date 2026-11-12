@@ -55,7 +55,7 @@ const CopyButton: React.FC<{ value: string; testID: string }> = ({ value, testID
       onPress={() => copyToClipboard({ content: value })}
       {...testProps(testID)}
     >
-      <GaloyIcon name="copy-paste" size={16} color={colors.primary} />
+      <GaloyIcon name="copy-paste" size={16} color={colors.accent} />
     </TouchableOpacity>
   )
 }
@@ -133,14 +133,14 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 3,
   },
   label: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     lineHeight: 20,
   },
   box: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     paddingLeft: 14,
     paddingRight: 10,
@@ -150,7 +150,7 @@ const useStyles = makeStyles(({ colors }) => ({
   boxStatic: staticSurface(colors),
   value: {
     flex: 1,
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     lineHeight: 20,
   },

@@ -2142,7 +2142,9 @@
     "selectAll": "Llapanta akllay",
     "clearAll": "Llapanta pichay",
     "addPlace": "Pacha mapaman yapay",
-    "addPlaceTitle": "Huk cheqasta yapay",
+    "addPlaceTitle": "Qhatuta willay",
+    "submitPlaceRequest": "Mañakuyta apachiy",
+    "showMyLocation": "Maypi kasqayta rikuchiy",
     "placePinHint": "Pacha mapata kuyuchiy chay cheqaman t'ipana churanaykipaq",
     "placeName": "Suti",
     "placeNameHint": "Imaynatas chay cheqa sutichasqa",
@@ -3953,6 +3955,12 @@
       "title": "Manam dólar qullqiykita astayta atinikuchu",
       "body": "Ñawpaqta dólar qullqiykita ch'usaqyachiy. Blinkpi Bitcoin qullqiykiman utaq huk lawman apachiyta atinki."
     },
+    "pendingDepositModal": {
+      "title": "Kuentaykiman huk depósito suyachkan",
+      "body": "Manam huk laya kuentaman astakuyta atinkichu, llapan suyachkaq depósitoykikuna kay kuentaman chayamunankama.",
+      "contactSupportCta": "Yanapaqwan rimay",
+      "stillConfirming": "Depósitoykiqa manaraqmi takyachisqachu. Huk iskay minutomanta yapamanta ruray."
+    },
     "balancesOverview": {
       "title": "Qullqiykita astiy",
       "body": "Qullqiykikunata mana ima llakiwan musuq cuentaykiman astiy.",
@@ -4140,6 +4148,7 @@
     "get": "Uraqichiy",
     "storeNote": "“Uraqichiy” App Store utaq Google Play nisqata kichan. Churasqaña kaptin Blinkman kutimuy.",
     "haveAnApp": "Appniyuqmi kani",
+    "learnHow": "Imaynatam yachay",
     "keyInstruction": "Kay churana llaveta autenticador appykiman kopiyay.",
     "qrInstruction": "Huk aparatota llamk'achichkankichu?\nAswanpas kay QR códigota escaneay.",
     "backupTitle": "Llaveykita waqaychay",
@@ -4252,7 +4261,6 @@
     "payment": "Pagay"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Chaninchay yupay manaraqchá musuqchu",
     "satsOnly": "Sats-pi rikuchisqa — mana chaninchay yupay kanchu"
   },
   "SelfCustodialOffline": {

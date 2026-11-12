@@ -641,7 +641,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   amountDetailsContainer: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
 
   amountView: {
@@ -672,7 +672,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     minHeight: 60,
     padding: 14,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     alignItems: "center",
     borderRadius: 8,
   },

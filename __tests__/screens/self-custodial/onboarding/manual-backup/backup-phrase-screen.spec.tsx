@@ -1,7 +1,9 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { render, fireEvent, waitFor } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
+import { HEADER_ICON_TOUCH_SIZE } from "@app/components/header-no-glass"
 
 import { BackupPhraseScreen } from "@app/screens/self-custodial/onboarding/manual-backup/backup-phrase-screen"
 import { ContextForScreen, ContextForScreenWithTheme } from "../../../helper"
@@ -438,7 +440,14 @@ describe("BackupPhraseScreen", () => {
       expect(button.props.accessibilityLabel).toBe(
         LL.BackupScreen.ManualBackup.Phrase.copy(),
       )
-      expect(button.props.hitSlop).toEqual({ top: 12, bottom: 12, left: 12, right: 12 })
+      // `hitSlop` never reaches past the native header item, so the box itself is 48dp.
+      expect(button.props.hitSlop).toBeUndefined()
+      expect(StyleSheet.flatten(button.props.style)).toMatchObject({
+        minWidth: HEADER_ICON_TOUCH_SIZE,
+        minHeight: HEADER_ICON_TOUCH_SIZE,
+        alignItems: "flex-end",
+        justifyContent: "center",
+      })
     })
 
     it("renders spark compatible link", async () => {

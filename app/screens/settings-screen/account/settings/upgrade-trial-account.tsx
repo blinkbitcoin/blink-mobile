@@ -70,7 +70,7 @@ export const UpgradeTrialAccount: React.FC = () => {
 const useStyles = makeStyles(({ colors }) => ({
   container: {
     borderRadius: 20,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     padding: 16,
     display: "flex",
     flexDirection: "column",

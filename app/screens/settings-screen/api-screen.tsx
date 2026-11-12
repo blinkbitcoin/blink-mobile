@@ -85,7 +85,7 @@ export const ApiScreen: React.FC = () => {
     ),
   ]
 
-  const LinkIcon = <GaloyIcon name="arrow-square-out" size={20} color={colors.primary} />
+  const LinkIcon = <GaloyIcon name="arrow-square-out" size={20} color={colors.accent} />
 
   const apiSettings = [
     () => (

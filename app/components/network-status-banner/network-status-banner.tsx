@@ -38,7 +38,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 8,
     ...staticSurface(colors),
     borderBottomWidth: 1,
-    borderBottomColor: colors.grey4,
+    borderBottomColor: colors.neutral,
   },
   text: {
     color: colors.warning,

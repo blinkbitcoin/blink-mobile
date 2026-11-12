@@ -47,7 +47,7 @@ export const CardStatusLayout: React.FC<CardStatusLayoutProps> = ({
     theme: { colors },
   } = useTheme()
 
-  const resolvedIconColor = iconColor ?? colors._green
+  const resolvedIconColor = iconColor ?? colors.staticSuccess
 
   return (
     <Screen style={styles.screen}>
@@ -110,7 +110,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -119,7 +119,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 8,
   },
   title: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 20,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",
@@ -128,7 +128,7 @@ const useStyles = makeStyles(({ colors }) => ({
     maxWidth: 264,
   },
   subtitle: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",

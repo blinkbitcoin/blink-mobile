@@ -2142,7 +2142,9 @@
         "selectAll": "Selecionar tudo",
         "clearAll": "Limpar tudo",
         "addPlace": "Adicionar ao mapa",
-        "addPlaceTitle": "Adicionar um local",
+        "addPlaceTitle": "Sugerir estabelecimento",
+        "submitPlaceRequest": "Enviar pedido",
+        "showMyLocation": "Mostrar minha localização",
         "placePinHint": "Mova o mapa para colocar o marcador sobre o local",
         "placeName": "Nome",
         "placeNameHint": "Como o local se chama",
@@ -3953,6 +3955,12 @@
             "title": "Não podemos migrar o seu saldo em dólares",
             "body": "Esvazie primeiro o seu saldo em dólares. Você pode transferi-lo para o seu saldo Bitcoin no Blink ou para outro lugar."
         },
+        "pendingDepositModal": {
+            "title": "Há um depósito pendente na sua conta",
+            "body": "Você não pode migrar para outro tipo de conta antes que todos os seus depósitos pendentes tenham sido liquidados e creditados nesta conta.",
+            "contactSupportCta": "Falar com o suporte",
+            "stillConfirming": "Seu depósito ainda não foi confirmado. Tente novamente em alguns minutos."
+        },
         "balancesOverview": {
             "title": "Mova seu saldo",
             "body": "Mova seus fundos com segurança para sua nova conta.",
@@ -4140,6 +4148,7 @@
         "get": "Baixar",
         "storeNote": "“Baixar” abre a App Store ou o Google Play. Volte ao Blink quando o aplicativo estiver instalado.",
         "haveAnApp": "Já tenho um aplicativo",
+        "learnHow": "Saiba como",
         "keyInstruction": "Copie esta chave de configuração para o seu aplicativo autenticador.",
         "qrInstruction": "Está usando outro dispositivo?\nEscaneie este código QR em vez disso.",
         "backupTitle": "Faça backup da sua chave",
@@ -4252,7 +4261,6 @@
         "payment": "Pagamento"
     },
     "SelfCustodialStaleRate": {
-        "notice": "A taxa de câmbio pode estar desatualizada",
         "satsOnly": "A mostrar sats — nenhuma taxa de câmbio disponível"
     },
     "SelfCustodialOffline": {

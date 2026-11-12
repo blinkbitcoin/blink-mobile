@@ -66,7 +66,7 @@ jest.mock("@app/graphql/generated", () => ({
 }))
 
 jest.mock("@rn-vui/themed", () => ({
-  useTheme: () => ({ theme: { colors: { primary: "#fc5805" } } }),
+  useTheme: () => ({ theme: { colors: { accent: "#fc5805" } } }),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({

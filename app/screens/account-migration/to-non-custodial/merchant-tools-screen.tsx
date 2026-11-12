@@ -71,7 +71,7 @@ export const MigrationMerchantToolsScreen: React.FC = () => {
     >
       <IconHero
         icon="receive"
-        iconColor={colors._green}
+        iconColor={colors.staticSuccess}
         title={merchantToolsLL.title()}
         subtitle={merchantToolsLL.body()}
       />
@@ -83,7 +83,7 @@ export const MigrationMerchantToolsScreen: React.FC = () => {
             <React.Fragment key={tool.icon}>
               {index > 0 && (
                 <Divider
-                  color={colors.grey4}
+                  color={colors.neutral}
                   width={TOOLS_DIVIDER_WIDTH}
                   style={styles.toolsDivider}
                 />

@@ -249,7 +249,7 @@ export const MigrationContactSupportScreen: React.FC = () => {
       <View style={styles.container}>
         <IconHero
           icon={variant.icon}
-          iconColor={colors.primary}
+          iconColor={colors.accent}
           title={variant.title}
           subtitle={variant.body}
         />
@@ -315,7 +315,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "flex-start",
   },
   label: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 16,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
@@ -324,7 +324,7 @@ const useStyles = makeStyles(({ colors }) => ({
   /** No numberOfLines: every value renders complete, wrapping as needed, because support
    *  needs the whole string (account id, pubkey), never a truncated one. */
   value: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",

@@ -225,7 +225,7 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
           <View style={styles.walletSeparator}>
             <View style={styles.line}></View>
             <TouchableOpacity style={styles.switchButton} disabled>
-              <GaloyIcon name="arrow-down" color={colors.grey3} size={25} />
+              <GaloyIcon name="arrow-down" color={colors.textDisabled} size={25} />
             </TouchableOpacity>
           </View>
           <View style={styles.toFieldContainer}>
@@ -300,16 +300,20 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: 0,
   },
   conversionRateText: {
-    color: colors.grey0,
+    color: colors.textPrimary,
   },
-  conversionInfoFieldTitle: { color: colors.grey1, lineHeight: 25, fontWeight: "400" },
+  conversionInfoFieldTitle: {
+    color: colors.textSecondary,
+    lineHeight: 25,
+    fontWeight: "400",
+  },
   conversionInfoFieldValue: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     fontWeight: "bold",
     fontSize: 20,
   },
   conversionInfoFieldConvertValue: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
     fontWeight: "normal",
   },
@@ -340,7 +344,7 @@ const useStyles = makeStyles(({ colors }) => ({
     position: "relative",
   },
   line: {
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     height: 1,
     flex: 1,
   },
@@ -350,7 +354,7 @@ const useStyles = makeStyles(({ colors }) => ({
     height: 43,
     width: 43,
     borderRadius: 50,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -366,7 +370,7 @@ const useStyles = makeStyles(({ colors }) => ({
     padding: 20,
     paddingVertical: 12,
     borderLeftWidth: 2,
-    borderLeftColor: colors.black,
+    borderLeftColor: colors.textOnBackground,
   },
   sliderContainer: {
     padding: 20,
