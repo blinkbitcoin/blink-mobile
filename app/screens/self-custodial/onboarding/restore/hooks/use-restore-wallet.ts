@@ -7,6 +7,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { markSelfCustodialInfoBulletinDismissedFor } from "@app/hooks/use-self-custodial-info-bulletin-state"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
@@ -104,6 +105,7 @@ export const useRestoreWallet = () => {
             const isCloudRestore = method === BackupMethod.Cloud
             if (isCloudRestore)
               await markBackupCompletedFor(lookup.id, BackupMethod.Cloud)
+            await markSelfCustodialInfoBulletinDismissedFor(lookup.id)
             activateAccount(lookup.id)
             reinitSdk()
             /** Re-entering a phrase for an account already on the device is not a new
@@ -126,6 +128,9 @@ export const useRestoreWallet = () => {
             lnurlServer,
           })
           await markBackupCompletedFor(accountId, method)
+          /** Written before the account is active so the home screen never flashes the
+           *  "this is a non-custodial account" bulletin to someone who just restored it. */
+          await markSelfCustodialInfoBulletinDismissedFor(accountId)
           await reloadSelfCustodialAccounts()
 
           activateAccount(accountId)
