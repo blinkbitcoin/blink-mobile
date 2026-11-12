@@ -75,6 +75,8 @@ const LightningLnURL = ({
   route: RouteProp<RootStackParamList, "sendBitcoinConfirmation">
 }) => <SendBitcoinConfirmationScreen route={route} />
 
+const mockUpdatePersistentState = jest.fn()
+
 jest.mock("@app/store/persistent-state", () => ({
   ...jest.requireActual("@app/store/persistent-state"),
   usePersistentStateContext: () => ({
@@ -83,7 +85,7 @@ jest.mock("@app/store/persistent-state", () => ({
       galoyInstance: { id: "Main" },
       galoyAuthToken: "",
     },
-    updateState: jest.fn(),
+    updateState: mockUpdatePersistentState,
     resetState: jest.fn(),
   }),
 }))
@@ -4211,5 +4213,70 @@ describe("SendBitcoinConfirmationScreen, a self-custodial send that did not go o
         i18nObject("en").SendBitcoinConfirmationScreen.paymentMayStillLand(),
       ),
     ).toBeTruthy()
+  })
+})
+
+describe("SendBitcoinConfirmationScreen — amount slider hint", () => {
+  const sendWith = async (
+    outcome: Record<string, unknown>,
+    { usedAmountSlider }: { usedAmountSlider?: boolean } = {},
+  ) => {
+    const { createLnurlPaymentDetails } = PaymentDetailsLightning
+    sendPaymentMock.mockResolvedValueOnce(outcome)
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL
+          route={{
+            key: "sendBitcoinConfirmationScreen",
+            name: "sendBitcoinConfirmation",
+            params: {
+              paymentDetail: createLnurlPaymentDetails(defaultLightningParams),
+              usedAmountSlider,
+            },
+          }}
+        />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+  }
+
+  /** Whether any write to persistent state set the slider as learned. */
+  const markedLearned = () =>
+    mockUpdatePersistentState.mock.calls.some(
+      ([update]) =>
+        typeof update === "function" &&
+        update({ schemaVersion: 23, galoyInstance: { id: "Main" }, galoyAuthToken: "" })
+          ?.hasLearnedAmountSlider === true,
+    )
+
+  it("retires the hint when a slid send succeeds", async () => {
+    await sendWith({ status: "SUCCESS", extraInfo: {} }, { usedAmountSlider: true })
+
+    expect(markedLearned()).toBe(true)
+  })
+
+  it("retires the hint when a slid send is pending, as most on-chain sends answer", async () => {
+    await sendWith({ status: "PENDING", extraInfo: {} }, { usedAmountSlider: true })
+
+    expect(markedLearned()).toBe(true)
+  })
+
+  it("keeps the hint when the amount was typed", async () => {
+    await sendWith({ status: "SUCCESS", extraInfo: {} })
+
+    expect(markedLearned()).toBe(false)
+  })
+
+  it("keeps the hint when a slid send fails", async () => {
+    await sendWith(
+      { status: "FAILURE", errorsMessage: "boom" },
+      { usedAmountSlider: true },
+    )
+
+    expect(markedLearned()).toBe(false)
   })
 })
