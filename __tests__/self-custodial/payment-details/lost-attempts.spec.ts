@@ -139,6 +139,94 @@ describe("settling lost attempts", () => {
   })
 })
 
+const nextTurn = () => new Promise(setImmediate)
+
+describe("a repeat of a send still queued or in flight", () => {
+  const heldSend = () => {
+    let release: (value: string) => void = () => undefined
+    let fail: (reason: Error) => void = () => undefined
+    const run = jest.fn(
+      () =>
+        new Promise<string>((resolve, reject) => {
+          release = resolve
+          fail = reject
+        }),
+    )
+    return {
+      run,
+      release: (value: string) => release(value),
+      fail: (e: Error) => fail(e),
+    }
+  }
+
+  it("joins it under the same key and answers with its outcome", async () => {
+    const handle = lostAttemptsFor("sp1abc")
+    const first = heldSend()
+    const repeat = jest.fn(async () => "again")
+
+    const firstResult = handle.oneAtATime(first.run, "key-1")
+    const repeatResult = handle.oneAtATime(repeat, "key-1")
+    await nextTurn()
+    first.release("sent")
+
+    await expect(firstResult).resolves.toBe("sent")
+    await expect(repeatResult).resolves.toBe("sent")
+    expect(first.run).toHaveBeenCalledTimes(1)
+    expect(repeat).not.toHaveBeenCalled()
+  })
+
+  it("shares the failure of the send it joined", async () => {
+    const handle = lostAttemptsFor("sp1abc")
+    const first = heldSend()
+
+    const firstResult = handle.oneAtATime(first.run, "key-1")
+    const repeatResult = handle.oneAtATime(async () => "again", "key-1")
+    await nextTurn()
+    first.fail(new Error("lost"))
+
+    await expect(firstResult).rejects.toThrow("lost")
+    await expect(repeatResult).rejects.toThrow("lost")
+  })
+
+  it("queues a send under another key behind it instead", async () => {
+    const handle = lostAttemptsFor("sp1abc")
+    const first = heldSend()
+    const other = jest.fn(async () => "other")
+
+    const firstResult = handle.oneAtATime(first.run, "key-1")
+    const otherResult = handle.oneAtATime(other, "key-2")
+    await nextTurn()
+    expect(other).not.toHaveBeenCalled()
+    first.release("sent")
+
+    await expect(firstResult).resolves.toBe("sent")
+    await expect(otherResult).resolves.toBe("other")
+    expect(other).toHaveBeenCalledTimes(1)
+  })
+
+  it("runs the same send again once the first is done", async () => {
+    const handle = lostAttemptsFor("sp1abc")
+    const run = jest.fn(async () => "sent")
+
+    await handle.oneAtATime(run, "key-1")
+    await handle.oneAtATime(run, "key-1")
+
+    expect(run).toHaveBeenCalledTimes(2)
+  })
+
+  it("joins only within the same destination", async () => {
+    const first = heldSend()
+    const elsewhere = jest.fn(async () => "elsewhere")
+
+    const firstResult = lostAttemptsFor("sp1abc").oneAtATime(first.run, "key-1")
+    const elsewhereResult = lostAttemptsFor("sp1def").oneAtATime(elsewhere, "key-1")
+
+    await expect(elsewhereResult).resolves.toBe("elsewhere")
+    first.release("sent")
+    await firstResult
+  })
+})
+
 describe("sends to a destination, one at a time", () => {
   it("runs the next once the one before it finished, however it finished", async () => {
     const order: string[] = []

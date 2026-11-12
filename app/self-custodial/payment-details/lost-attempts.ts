@@ -101,6 +101,18 @@ const sendsInFlightIn = (byDestination: Map<string, LostAttempts>) => {
   return held
 }
 
+/**
+ * Each send still queued or in flight, by destination and the send it is (its payment's
+ * idempotency key), by wallet: what a repeat of the same send joins.
+ */
+const sameSends = new WeakMap<Map<string, LostAttempts>, Map<string, Promise<unknown>>>()
+
+const sameSendsIn = (byDestination: Map<string, LostAttempts>) => {
+  const held = sameSends.get(byDestination) ?? new Map<string, Promise<unknown>>()
+  sameSends.set(byDestination, held)
+  return held
+}
+
 /** One destination's lost attempts, in the wallet that was connected when it was taken. */
 export type LostAttemptsHandle = {
   read: () => LostAttempts
@@ -111,14 +123,34 @@ export type LostAttemptsHandle = {
    * finished. One at a time, each send reads what the one before it left behind and
    * settles only what it made itself: two in flight at once could each act on the
    * other's attempts, and pay one of them twice.
+   *
+   * A repeat of a send still queued or in flight (`sameSendKey`, a double tap the screen
+   * did not stop in time) joins it and answers with its outcome, instead of queueing
+   * behind it: a send with a token leg carries no key the SDK could refuse a duplicate
+   * by, so the repeat would go out as a second payment once the first succeeded.
    */
-  oneAtATime: <T>(send: () => Promise<T>) => Promise<T>
+  oneAtATime: <T>(send: () => Promise<T>, sameSendKey?: string) => Promise<T>
 }
 
 export const lostAttemptsFor = (destination: string): LostAttemptsHandle => {
   const byDestination = connectedWalletAttempts
   const key = storeKeyOf(destination)
   const read = () => byDestination.get(key) ?? {}
+
+  const queueBehindEarlierSends = <T>(send: () => Promise<T>): Promise<T> => {
+    const inFlight = sendsInFlightIn(byDestination)
+    const result = (inFlight.get(key) ?? Promise.resolve()).then(send)
+    const done = result.then(
+      () => undefined,
+      () => undefined,
+    )
+    inFlight.set(key, done)
+    done.then(() => {
+      if (inFlight.get(key) === done) inFlight.delete(key)
+    })
+    return result
+  }
+
   return {
     read,
     update: (change) => {
@@ -126,17 +158,20 @@ export const lostAttemptsFor = (destination: string): LostAttemptsHandle => {
       if (next.lostSend || next.unresolvedSend) byDestination.set(key, next)
       else byDestination.delete(key)
     },
-    oneAtATime: (send) => {
-      const inFlight = sendsInFlightIn(byDestination)
-      const result = (inFlight.get(key) ?? Promise.resolve()).then(send)
-      const done = result.then(
-        () => undefined,
-        () => undefined,
-      )
-      inFlight.set(key, done)
-      done.then(() => {
-        if (inFlight.get(key) === done) inFlight.delete(key)
-      })
+    oneAtATime: (send, sameSendKey) => {
+      if (sameSendKey === undefined) return queueBehindEarlierSends(send)
+
+      const pending = sameSendsIn(byDestination)
+      const sendKey = `${key}\n${sameSendKey}`
+      const joined = pending.get(sendKey)
+      if (joined) return joined as ReturnType<typeof send>
+
+      const result = queueBehindEarlierSends(send)
+      pending.set(sendKey, result)
+      const forget = () => {
+        if (pending.get(sendKey) === result) pending.delete(sendKey)
+      }
+      result.then(forget, forget)
       return result
     },
   }

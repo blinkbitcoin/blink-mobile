@@ -459,12 +459,14 @@ export const runSelfCustodialSend = <
    *  attempts, not the next one's. */
   const attempts = lostAttemptsFor(params.destination)
   /** Read when the send is asked for, not when its turn comes: a send ahead of it that
-   *  failed for good starts the shared key over, and a repeat of the same send (a double
-   *  tap the screen did not stop in time) must still go out under the key it was asked
-   *  for, to be refused as the duplicate it is, never under none. */
+   *  failed for good starts the shared key over. A repeat of the same send (a double tap
+   *  the screen did not stop in time) carries the same key, and joins the send still
+   *  queued or in flight under it rather than going out again: one with a token leg has
+   *  no key the SDK could refuse it by. */
   const invocationKey = params.idempotencyKeyRef.current
-  return attempts.oneAtATime(() =>
-    sendAfterEarlierAttempts(attempts, params, invocationKey),
+  return attempts.oneAtATime(
+    () => sendAfterEarlierAttempts(attempts, params, invocationKey),
+    invocationKey,
   )
 }
 

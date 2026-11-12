@@ -1119,20 +1119,18 @@ describe("a bitcoin Spark-address send that throws again under the same key", ()
 })
 
 describe("the same send asked for twice before the first is done", () => {
-  /** A double tap the screen did not stop in time: the repeat waits its turn, and the
-   *  first coming back failed starts the shared key over. The repeat still goes out
-   *  under the key it was asked for, and gets the same failed payment back. */
-  it("sends the repeat under the key it was asked for, not under none", async () => {
+  /** A double tap the screen did not stop in time: the repeat carries the same key, and
+   *  joins the send still in flight instead of going out again. The first coming back
+   *  failed starts the shared key over, and the repeat answers with that same failure. */
+  it("joins the send in flight and answers with its outcome", async () => {
     let failFirst: (value: unknown) => void = () => undefined
     mockPrepareSendPayment.mockResolvedValue(bolt11("hash-1"))
-    mockSendPayment
-      .mockImplementationOnce(
-        () =>
-          new Promise((resolve) => {
-            failFirst = resolve
-          }),
-      )
-      .mockResolvedValueOnce(sent(FAILED))
+    mockSendPayment.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          failFirst = resolve
+        }),
+    )
     const ref = { current: KEY }
     const send = createSendMutation(btcLightning, {
       telemetry: TELEMETRY,
@@ -1143,11 +1141,63 @@ describe("the same send asked for twice before the first is done", () => {
     const repeat = send()
     await new Promise(setImmediate)
     failFirst(sent(FAILED))
-    const results = await Promise.all([first, repeat])
+    const [firstResult, repeatResult] = await Promise.all([first, repeat])
 
-    expect(sentKeys()).toEqual([KEY, KEY])
-    results.forEach((result) => expect(result.status).toBe(PaymentSendResult.Failure))
+    expect(sentKeys()).toEqual([KEY])
+    expect(firstResult.status).toBe(PaymentSendResult.Failure)
+    expect(repeatResult).toBe(firstResult)
     expect(ref.current).toBeUndefined()
+  })
+
+  it("pays a dollar send once when it is asked for twice, though it carries no key", async () => {
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress("usdb-token-id"))
+    mockSendPayment.mockResolvedValue(sent())
+    const ref = { current: KEY }
+    const send = createSendMutation(usdSpark, {
+      telemetry: TELEMETRY,
+      idempotencyKeyRef: ref,
+    })
+
+    const [first, repeat] = await Promise.all([send(), send()])
+
+    expect(mockSendPayment).toHaveBeenCalledTimes(1)
+    expect(first.status).toBe(PaymentSendResult.Success)
+    expect(repeat).toBe(first)
+  })
+
+  it("queues a send under another key behind the one in flight, and sends it too", async () => {
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress())
+    mockSendPayment.mockResolvedValue(sent())
+    const firstRef = { current: KEY }
+    const secondRef = { current: NEXT_KEY }
+
+    await Promise.all([
+      createSendMutation(btcSpark, {
+        telemetry: TELEMETRY,
+        idempotencyKeyRef: firstRef,
+      })(),
+      createSendMutation(btcSpark, {
+        telemetry: TELEMETRY,
+        idempotencyKeyRef: secondRef,
+      })(),
+    ])
+
+    expect(sentKeys()).toEqual([KEY, NEXT_KEY])
+  })
+
+  it("sends again once the first is done: only a send still in flight is joined", async () => {
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress("usdb-token-id"))
+    mockSendPayment.mockResolvedValue(sent())
+    const ref = { current: KEY }
+    const send = createSendMutation(usdSpark, {
+      telemetry: TELEMETRY,
+      idempotencyKeyRef: ref,
+    })
+
+    await send()
+    await send()
+
+    expect(mockSendPayment).toHaveBeenCalledTimes(2)
   })
 })
 
