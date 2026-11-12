@@ -15,10 +15,13 @@ jest.mock("react-native/Libraries/Utilities/useWindowDimensions", () => ({
 }))
 
 const mockNavigate = jest.fn()
+/** The screen's route params: what opened it says whether it offers the onboarding. */
+let mockRouteParams: { offersOnboarding?: boolean } | undefined
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate }),
+  useRoute: () => ({ params: mockRouteParams }),
 }))
 
 /** The instance's name, which the QR code issues the key under. */
@@ -116,6 +119,28 @@ describe("TotpRegistrationInitiateScreen", () => {
     mockInstanceName = "Blink"
     mockWindow.width = 360
     mockTotpInitiate.mockResolvedValue(initiatedResponse)
+    mockRouteParams = undefined
+  })
+
+  /** From the settings the screen comes first, for users who know authenticator apps;
+   *  the rest get the onboarding from here, which comes back to this key. */
+  it("offers the onboarding below Next when the settings opened it", async () => {
+    mockRouteParams = { offersOnboarding: true }
+    await renderScreen()
+
+    fireEvent.press(screen.getByText(LL.AuthenticatorOnboarding.learnHow()))
+
+    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationIntro", {
+      isOpenedFromSetupKey: true,
+    })
+    expect(screen.getByText(LL.common.next())).toBeTruthy()
+  })
+
+  /** Reached through the onboarding, the user has just seen it. */
+  it("does not offer the onboarding when it was reached through it", async () => {
+    await renderScreen()
+
+    expect(screen.queryByText(LL.AuthenticatorOnboarding.learnHow())).toBeNull()
   })
 
   it("hands the code screen the registration it started and its setup key", async () => {

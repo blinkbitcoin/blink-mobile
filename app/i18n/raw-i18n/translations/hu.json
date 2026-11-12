@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API-kulcsok",
+    "inactiveKeys": "Inaktív kulcsok ({count})",
     "noKeys": "Még nincsenek API-kulcsok",
     "createKey": "API-kulcs létrehozása",
     "createTitle": "Új API-kulcs",
@@ -27,6 +28,7 @@
     "revokeTitle": "Visszavonja az API-kulcsot?",
     "revokeBody": "A(z) \"{name: string}\" azonnal működésképtelenné válik. Ez nem vonható vissza.",
     "revoke": "Visszavonás",
+    "revokeGoBack": "Vissza",
     "revokeSuccess": "API-kulcs visszavonva",
     "createError": "Az API-kulcs létrehozása nem sikerült. Próbálja újra.",
     "revokeError": "Az API-kulcs visszavonása nem sikerült. Próbálja újra.",
@@ -2140,7 +2142,9 @@
     "selectAll": "Összes kijelölése",
     "clearAll": "Összes törlése",
     "addPlace": "Hozzáadás a térképhez",
-    "addPlaceTitle": "Hely hozzáadása",
+    "addPlaceTitle": "Üzlet ajánlása",
+    "submitPlaceRequest": "Kérés beküldése",
+    "showMyLocation": "Saját helyzetem mutatása",
     "placePinHint": "Mozgasd a térképet, hogy a jelölő a helyre kerüljön",
     "placeName": "Név",
     "placeNameHint": "Hogy hívják a helyet",
@@ -2373,6 +2377,8 @@
     "invalidAmount": "Ez egy érvénytelen összeget tartalmaz. Kérjük, generáld újra egy érvényes összeggel.",
     "usernameDoesNotExist": "{lnAddress: string} úgy tűnik, hogy nem létező {bankName: string} cím.",
     "usernameDoesNotExistAdvice": "Ellenőrizd, hogy helyesen írtad-e be, vagy kérd meg a címzettet, hogy inkább küldjön LN fizetési kérelmet vagy BTC címet.",
+    "destinationUnverifiable": "Most nem tudtuk ellenőrizni a(z) {lnAddress} címet – a(z) {bankName} szerverei nem válaszolnak.",
+    "destinationUnverifiableAdvice": "A cím valószínűleg rendben van. Próbáld újra egy pillanat múlva, vagy kérj a címzettől LN-számlát vagy BTC-címet.",
     "selfPaymentError": "{lnAddress: string} a te {bankName: string} címed.",
     "selfPaymentAdvice": "Ha pénzt szeretnél küldeni egy másik saját számládra, használj inkább egy LN fizetési kérelmet, vagy BTC címet.",
     "lnAddressError": "Nem érjük el ezt a Lightning címet. Ha biztos vagy benne, hogy létezik, próbáld újra később.",
@@ -2595,7 +2601,8 @@
     "error": "A profilok jelenleg nem tölthetők be",
     "fromThisDevice": "erről az eszközről?",
     "switchAccount": "Másik fiókra váltottál",
-    "removedAccount": "Eltávolítottad a(z) {identifier: string} fiókot."
+    "removedAccount": "Eltávolítottad a(z) {identifier: string} fiókot.",
+    "removeAccount": "Fiók eltávolítása"
   },
   "StablesatsRestriction": {
     "walletLabel": "nem érhető el a régiódban",
@@ -2759,6 +2766,7 @@
       "tooLong": "A cím legfeljebb 50 karakter hosszú lehet",
       "invalidCharacter": "A cím csak betűket, számokat és aláhúzásjeleket tartalmazhat",
       "addressUnavailable": "Sajnáljuk, ez a cím már foglalt",
+      "serverUnreachable": "Nem sikerült elérni a címszervert. Próbáld újra egy pillanat múlva.",
       "unknownError": "Ismeretlen hiba történt, kérjük, próbálja újra később",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3071,7 +3079,6 @@
     "faq": "GYIK",
     "statusPage": "Állapotoldal",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Támogatás",
     "defaultSupportMessage": "Szia! Segítségre van szükségem a {bankName: string}kel kapcsolatban, a(z) {version: string} verziót használom a(z) {os: string} operációs rendszeren.",
     "emailCopied": "{email: string} email cím a vágólapra másolva",
@@ -3246,7 +3253,10 @@
       "noLimit": "Nincs korlát",
       "limitUpdateSuccess": "Korlát sikeresen frissítve",
       "limitUpdateError": "Nem sikerült frissíteni a korlátot",
-      "limitMustBePositive": "A korlátnak nullánál nagyobbnak kell lennie"
+      "limitMustBePositive": "A korlátnak nullánál nagyobbnak kell lennie",
+      "atmToggleError": "Nem sikerült frissíteni az ATM felvételeket",
+      "atmControlsLoadError": "Nem sikerült betölteni az ATM-korlátokat",
+      "invalidLimitAmount": "Adj meg egy érvényes összeget legfeljebb 2 tizedesjeggyel"
     },
     "CardFeeSchedule": {
       "title": "Blink kártya díjszabása",
@@ -3948,6 +3958,12 @@
       "title": "Nem tudjuk átköltöztetni a dollár egyenlegedet",
       "body": "Először ürítsd ki a dollár egyenlegedet. Átutalhatod a Bitcoin egyenlegedre a Blinkben vagy máshová."
     },
+    "pendingDepositModal": {
+      "title": "Függőben lévő befizetés van a számládon",
+      "body": "Nem válthatsz másik számlatípusra, amíg az összes függőben lévő befizetésed nem teljesült és nem került jóváírásra ezen a számlán.",
+      "contactSupportCta": "Kapcsolat a támogatással",
+      "stillConfirming": "A befizetésed még nincs megerősítve. Próbáld újra néhány perc múlva."
+    },
     "balancesOverview": {
       "title": "Mozgasd az egyenleged",
       "body": "Mozgasd biztonságosan a pénzed az új fiókodba.",
@@ -4135,6 +4151,7 @@
     "get": "Letöltés",
     "storeNote": "A „Letöltés” megnyitja az App Store-t vagy a Google Playt. Ha telepítetted, gyere vissza a Blinkbe.",
     "haveAnApp": "Már van alkalmazásom",
+    "learnHow": "Nézd meg, hogyan",
     "keyInstruction": "Másold be ezt a beállítási kulcsot a hitelesítő alkalmazásodba.",
     "qrInstruction": "Másik eszközt használsz?\nOlvasd be inkább ezt a QR-kódot.",
     "backupTitle": "Mentsd el a kulcsodat",
@@ -4221,6 +4238,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "A Blink nem érhető el",
+    "unreachableDescription": "A(z) {featureName} a Blink szervereit igényli, amelyek most nem válaszolnak. A tárcádat és az egyenlegedet ez nem érinti.",
     "featureCircles": "Circles",
     "featureEarn": "Tanulás",
     "featureCard": "Card"
@@ -4243,6 +4262,9 @@
     "tokenTransfer": "{token} átutalás",
     "payTo": "Fizetés: {address}",
     "payment": "Fizetés"
+  },
+  "SelfCustodialStaleRate": {
+    "satsOnly": "Satoshiban megjelenítve – nincs elérhető árfolyam"
   },
   "SelfCustodialOffline": {
     "title": "A pénztárca offline",

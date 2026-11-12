@@ -18,7 +18,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 
 jest.mock("@rn-vui/themed", () => ({
   Text: (props: React.ComponentProps<typeof RNText>) => <RNText {...props} />,
-  useTheme: () => ({ theme: { colors: { black: "#000000" } } }),
+  useTheme: () => ({ theme: { colors: { textOnBackground: "#000000" } } }),
   makeStyles: () => () => ({
     container: {},
     balanceColumn: {},

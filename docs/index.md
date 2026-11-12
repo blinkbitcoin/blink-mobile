@@ -51,6 +51,8 @@ yarn ios             # iOS (terminal 2)
 | [PR Review Guide](./pr-review.md) | Review conventions, checklists, and enforced standards for pull requests |
 | [E2E Testing](./e2e-testing.md) | End-to-end testing with Detox/Appium |
 | [Android env config & R8](./android-env-config-r8.md) | Verifying `react-native-config` values survive R8 in release builds |
+| [Self-Custodial Rollout](./self-custodial-rollout.md) | Release-gate checklist for promoting a self-custodial build |
+| [Self-Custodial Backend Independence](./self-custodial-backend-independence.md) | Phased plan for keeping self-custodial usable while Blink services are down |
 | [Self-custodial wallet logs](./self-custodial-logs.md) | Where users download the Breez SDK log, what it contains, and how support reads it |
 | [README](../README.md) | Project overview and basic instructions |
 | [Contributing](../CONTRIBUTING.MD) | Contribution guidelines |
@@ -135,6 +137,7 @@ yarn update-translations
 ```
 
 ### Running E2E Tests
+E2E runs locally only; no CI workflow runs it while the CI overhaul is pending.
 ```bash
 make tilt-up         # Start local backend
 yarn e2e:build ios.sim.debug
@@ -147,9 +150,10 @@ yarn e2e:test ios.sim.debug
 |----------|---------|---------|
 | `check-code.yml` | PR | Lint, type check |
 | `test.yml` | PR | Unit tests |
-| `e2e.yml` | PR | E2E tests (iOS + Android) |
 | `audit.yml` | Schedule | Security audit |
 | `codeql.yml` | PR | Code analysis |
+
+E2E tests (Detox/Appium) are not run in CI; run them locally per [E2E Testing](./e2e-testing.md).
 
 ## Backend Environments
 
@@ -175,4 +179,4 @@ yarn e2e:test ios.sim.debug
 - [Blink Website](https://blink.sv)
 - [Blink API Docs](https://dev.blink.sv)
 - [Galoy GitHub](https://github.com/GaloyMoney)
-- [Community Chat](https://chat.blink.sv)
+- [Community (Telegram)](https://t.me/blinkbtc)

@@ -1,7 +1,5 @@
 import { useMemo } from "react"
 
-import { recordAppError } from "@app/utils/error-reporting"
-
 import {
   useRealtimePriceQuery,
   useRealtimePriceUnauthedQuery,
@@ -9,26 +7,88 @@ import {
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import {
-  createToDisplayAmount,
-  DisplayCurrency,
-  MoneyAmount,
-  moneyAmountIsCurrencyType,
-  WalletOrDisplayCurrency,
-} from "@app/types/amounts"
+  createCustodialPriceSource,
+  createFallbackPriceSource,
+} from "@app/custodial/adapters/price"
+import { createSelfCustodialPriceSource } from "@app/self-custodial/adapters/price"
+import { useFiatRates } from "@app/self-custodial/providers/fiat-rates"
+import { noPriceSource, RateFreshness, type PriceSource } from "@app/types/price"
+import { createToDisplayAmount } from "@app/types/amounts"
 import { AccountType } from "@app/types/wallet"
+import {
+  createPriceConverters,
+  priceOfCurrencyInCurrencyFromRates,
+  satsOnlyPriceOfCurrencyInCurrency,
+  selectPrice,
+} from "@app/utils/price-conversion"
 
 import { useAccountRegistry } from "./use-account-registry"
+import { useCurrencyList } from "./use-currency-list"
 import { useEffectiveDisplayCurrency } from "./use-effective-display-currency"
 
 export const SATS_PER_BTC = 100000000
 
+export const PriceStatus = {
+  /** A conversion is available. */
+  Ready: "ready",
+  /** None yet, but a source may still answer — the first frames of a launch or an
+   *  account switch. Callers should wait rather than show a figure. */
+  Pending: "pending",
+  /** None, and none is coming. Callers must show something other than a spinner. */
+  Unavailable: "unavailable",
+} as const
+
+export type PriceStatus = (typeof PriceStatus)[keyof typeof PriceStatus]
+
 const PRICE_POLL_INTERVAL_MS = 5 * 60 * 1000
+
+/**
+ * Whether a caller waiting on a conversion should keep waiting. Only self-custodial can
+ * reach Unavailable: it is the only session where every source can be known to have
+ * finished and come back empty, which is exactly when it falls back to sats. A custodial
+ * session keeps today's behaviour, where no price means the screen is still loading.
+ */
+const priceStatusOf = (source: PriceSource, isSatsOnly: boolean): PriceStatus => {
+  /** A converter exists, but there is no fiat price. Callers keyed on this, like the
+   *  balance header's own sats fallback, must not behave as though a rate had arrived. */
+  if (isSatsOnly) return PriceStatus.Unavailable
+  if (source.rates) return PriceStatus.Ready
+  return PriceStatus.Pending
+}
+
+const finiteOrNull = (btcInUsdCents: number | undefined): string | null =>
+  btcInUsdCents === undefined || !Number.isFinite(btcInUsdCents)
+    ? null
+    : (btcInUsdCents / 100).toFixed(8)
 
 export const usePriceConversion = () => {
   const isAuthed = useIsAuthed()
   const { activeAccount } = useAccountRegistry()
   const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
   const { displayCurrency } = useEffectiveDisplayCurrency()
+
+  /**
+   * The SDK's feed, which a self-custodial account can read without the Blink backend.
+   * Only built for such an account: a second wallet on the device may have fetched a
+   * feed, but it is not this session's price.
+   */
+  const feed = useFiatRates()
+
+  /**
+   * Breez quotes whole units and the app works in minor ones, so the display currency's
+   * fraction size is what makes its rates comparable with the backend's. Taken from the
+   * resolved list rather than the SDK's own: that is the size every amount is formatted
+   * with, and it is the backend's wherever the backend lists the currency, which is the
+   * only size its own rate is right under. A whole-unit rate scales to either.
+   */
+  const { currencyList } = useCurrencyList()
+  const fractionDigits = currencyList.find(
+    (currency) => currency.id.toUpperCase() === displayCurrency.toUpperCase(),
+  )?.fractionDigits
+
+  const selfCustodialSource: PriceSource = isSelfCustodial
+    ? createSelfCustodialPriceSource(feed, displayCurrency, fractionDigits)
+    : noPriceSource
 
   const skipAuthed = !isAuthed || isSelfCustodial
   const { data: authedData } = useRealtimePriceQuery({
@@ -37,125 +97,101 @@ export const usePriceConversion = () => {
   })
   const authedPrice = authedData?.me?.defaultAccount?.realtimePrice
 
-  const skipUnauthed = !isSelfCustodial && (isAuthed || Boolean(authedPrice))
-  const { data: unauthedData } = useRealtimePriceUnauthedQuery({
+  /**
+   * Self-custodial keeps asking only while the SDK has not priced the display currency,
+   * which is the feed's own gap rather than an outage — an exotic code the SDK does not
+   * carry but the backend does. Once the SDK answers, the backend is not asked at all,
+   * so a self-custodial session makes no price request of its own.
+   */
+  const skipUnauthed = isSelfCustodial
+    ? Boolean(selfCustodialSource.rates)
+    : isAuthed || Boolean(authedPrice)
+  const { data: unauthedData, loading: unauthedLoading } = useRealtimePriceUnauthedQuery({
     skip: skipUnauthed,
     variables: { currency: displayCurrency },
     pollInterval: skipUnauthed ? undefined : PRICE_POLL_INTERVAL_MS,
     fetchPolicy: "cache-and-network",
   })
 
-  const candidatePrice = isSelfCustodial
-    ? unauthedData?.realtimePrice
-    : authedPrice ?? unauthedData?.realtimePrice
-
-  // Discard cached price when its denominator disagrees with the active preference.
-  const realtimePrice =
-    candidatePrice?.denominatorCurrency === displayCurrency ? candidatePrice : undefined
-
-  let displayCurrencyPerSat = NaN
-  let displayCurrencyPerCent = NaN
-
-  if (realtimePrice) {
-    displayCurrencyPerSat =
-      realtimePrice.btcSatPrice.base / 10 ** realtimePrice.btcSatPrice.offset
-    displayCurrencyPerCent =
-      realtimePrice.usdCentPrice.base / 10 ** realtimePrice.usdCentPrice.offset
-  }
-
-  const priceOfCurrencyInCurrency = useMemo(() => {
-    if (!displayCurrencyPerSat || !displayCurrencyPerCent) {
-      return undefined
-    }
-
-    // has units of denomiatedInCurrency/currency
-    return (
-      currency: WalletOrDisplayCurrency,
-      inCurrency: WalletOrDisplayCurrency,
-    ): number => {
-      const priceOfCurrencyInCurrency = {
-        [WalletCurrency.Btc]: {
-          [DisplayCurrency]: displayCurrencyPerSat,
-          [WalletCurrency.Usd]: displayCurrencyPerSat * (1 / displayCurrencyPerCent),
-          [WalletCurrency.Btc]: 1,
-        },
-        [WalletCurrency.Usd]: {
-          [DisplayCurrency]: displayCurrencyPerCent,
-          [WalletCurrency.Btc]: displayCurrencyPerCent * (1 / displayCurrencyPerSat),
-          [WalletCurrency.Usd]: 1,
-        },
-        [DisplayCurrency]: {
-          [WalletCurrency.Btc]: 1 / displayCurrencyPerSat,
-          [WalletCurrency.Usd]: 1 / displayCurrencyPerCent,
-          [DisplayCurrency]: 1,
-        },
-      }
-      return priceOfCurrencyInCurrency[currency][inCurrency]
-    }
-  }, [displayCurrencyPerSat, displayCurrencyPerCent])
-
-  const converters = useMemo(() => {
-    if (!priceOfCurrencyInCurrency) {
-      return undefined
-    }
-
-    const convertWithRounding = <T extends WalletOrDisplayCurrency>(
-      moneyAmount: MoneyAmount<WalletOrDisplayCurrency>,
-      toCurrency: T,
-      roundingFn: (value: number) => number,
-    ): MoneyAmount<T> => {
-      // If the money amount is already the correct currency, return it
-      if (moneyAmountIsCurrencyType(moneyAmount, toCurrency)) {
-        return moneyAmount
-      }
-
-      let amount = roundingFn(
-        moneyAmount.amount * priceOfCurrencyInCurrency(moneyAmount.currency, toCurrency),
+  /** The clock is read at render, which a self-custodial session gets every five minutes
+   *  from the feed's own tick: the cadence the feed's freshness is measured at too. */
+  const backendSource = isSelfCustodial
+    ? createFallbackPriceSource({
+        price: unauthedData?.realtimePrice,
+        displayCurrency,
+        hasSettled: !unauthedLoading,
+        now: Date.now(),
+      })
+    : createCustodialPriceSource(
+        authedPrice ?? unauthedData?.realtimePrice,
+        displayCurrency,
+        !unauthedLoading,
       )
 
-      if (
-        moneyAmountIsCurrencyType(moneyAmount, DisplayCurrency) &&
-        moneyAmount.currencyCode !== displayCurrency
-      ) {
-        amount = NaN
+  const { source, isSatsOnly, shownCurrency } = selectPrice({
+    isSelfCustodial,
+    displayCurrency,
+    selfCustodialSource,
+    backendSource,
+  })
 
-        recordAppError(
-          new Error(
-            `Price conversion is out of sync with display currency. Money amount: ${moneyAmount.currencyCode}, display currency: ${displayCurrency}`,
+  /** Memoized on the numbers rather than on `source`: the sources build a new rates
+   *  object on every render, and a new converter makes every screen holding one rebuild
+   *  what it priced. */
+  const displayCurrencyPerSat = source.rates?.displayCurrencyPerSat ?? NaN
+  const displayCurrencyPerCent = source.rates?.displayCurrencyPerCent ?? NaN
+
+  const priceOfCurrencyInCurrency = useMemo(
+    () =>
+      isSatsOnly
+        ? satsOnlyPriceOfCurrencyInCurrency
+        : priceOfCurrencyInCurrencyFromRates(
+            displayCurrencyPerSat,
+            displayCurrencyPerCent,
           ),
-        )
-      }
+    [displayCurrencyPerSat, displayCurrencyPerCent, isSatsOnly],
+  )
 
-      return {
-        amount,
-        currency: toCurrency,
-        currencyCode: toCurrency === DisplayCurrency ? displayCurrency : toCurrency,
-      }
-    }
+  const converters = useMemo(
+    () =>
+      priceOfCurrencyInCurrency
+        ? createPriceConverters(priceOfCurrencyInCurrency, shownCurrency)
+        : undefined,
+    [priceOfCurrencyInCurrency, shownCurrency],
+  )
 
-    const convertMoneyAmount = <T extends WalletOrDisplayCurrency>(
-      moneyAmount: MoneyAmount<WalletOrDisplayCurrency>,
-      toCurrency: T,
-    ): MoneyAmount<T> => convertWithRounding(moneyAmount, toCurrency, Math.round)
+  /**
+   * How current the rate behind these amounts is, as the source that answered reports
+   * it: the SDK feed by when this device read it, the backend by its own timestamp in a
+   * self-custodial session, and always Fresh in a custodial one.
+   */
+  const priceFreshness: RateFreshness = source.freshness
 
-    const convertMoneyAmountWithRounding = <T extends WalletOrDisplayCurrency>(
-      moneyAmount: MoneyAmount<WalletOrDisplayCurrency>,
-      toCurrency: T,
-      roundingFn: (value: number) => number,
-    ): MoneyAmount<T> => convertWithRounding(moneyAmount, toCurrency, roundingFn)
-
-    return { convertMoneyAmount, convertMoneyAmountWithRounding }
-  }, [priceOfCurrencyInCurrency, displayCurrency])
+  const priceStatus = priceStatusOf(source, isSatsOnly)
 
   return {
     convertMoneyAmount: converters?.convertMoneyAmount,
+    /** Ready, Pending or Unavailable — see {@link PriceStatus}. A caller that today
+     *  renders a spinner on a missing `convertMoneyAmount` should render something
+     *  else on Unavailable, or it spins forever. */
+    priceStatus,
     convertMoneyAmountWithRounding: converters?.convertMoneyAmountWithRounding,
-    displayCurrency,
-    toDisplayMoneyAmount: createToDisplayAmount(displayCurrency),
-    usdPerSat: priceOfCurrencyInCurrency
-      ? (priceOfCurrencyInCurrency(WalletCurrency.Btc, WalletCurrency.Usd) / 100).toFixed(
-          8,
-        )
-      : null,
+    displayCurrency: shownCurrency,
+    /** True while amounts are stated in sats because no rate could be found. Surfaces
+     *  that show money read this to tell the user why, rather than letting a balance
+     *  silently change denomination. */
+    isSatsOnly,
+    toDisplayMoneyAmount: createToDisplayAmount(shownCurrency),
+    /** Fresh, Stale or Expired. Expired means no usable fiat rate remains — it says
+     *  nothing about the converter: a self-custodial session still gets a sats-only
+     *  `convertMoneyAmount`, so never gate on Expired as if it were a missing one.
+     *  Stale means the amounts are real but priced off a rate over an hour old. No
+     *  surface labels that today. */
+    priceFreshness,
+    /** Null rather than the string "NaN" when the dollar leg is unknown, which is the
+     *  case in sats-only mode: a caller checking for a price must not be handed one. */
+    usdPerSat: finiteOrNull(
+      priceOfCurrencyInCurrency?.(WalletCurrency.Btc, WalletCurrency.Usd),
+    ),
   }
 }

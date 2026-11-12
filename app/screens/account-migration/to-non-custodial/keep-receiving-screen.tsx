@@ -104,7 +104,7 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
         <View style={styles.loadingContainer}>
           <ActivityIndicator
             size="large"
-            color={colors.primary}
+            color={colors.accent}
             {...testProps("migration-keep-receiving-loading")}
           />
         </View>
@@ -154,7 +154,7 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
     >
       <IconHero
         icon="lightning-address"
-        iconColor={colors._green}
+        iconColor={colors.staticSuccess}
         title={LL.AccountMigration.keepReceivingTitle()}
         subtitle={LL.AccountMigration.keepReceivingBody()}
       />
@@ -198,7 +198,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
   },
   addressLabel: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
     lineHeight: 20,
     marginBottom: 12,

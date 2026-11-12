@@ -9,6 +9,10 @@ import {
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
+/** Threaded explicitly since the config functions stopped reading a global; the real
+ *  value comes from `useLnurlServer()` at the calling hook. */
+const TEST_LNURL_DOMAIN = "staging.blink.sv"
+
 const mockInitSdk = jest.fn()
 const mockDisconnectSdk = jest.fn()
 const mockGetWalletInfo = jest.fn()
@@ -39,11 +43,11 @@ jest.mock("@app/self-custodial/sdk-error", () => ({
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
-  default: { getMnemonicForAccount: jest.fn() },
+  default: { readMnemonicWithStatus: jest.fn() },
 }))
 
 const SPARK_PUBKEY = "03".padEnd(66, "a")
-const mockGetMnemonic = KeyStoreWrapper.getMnemonicForAccount as jest.Mock
+const mockReadMnemonic = KeyStoreWrapper.readMnemonicWithStatus as jest.Mock
 
 const buildRequest = (signChallenge = jest.fn(() => "migrate:challenge")) =>
   buildMigrationTransferRequest({
@@ -51,6 +55,7 @@ const buildRequest = (signChallenge = jest.fn(() => "migrate:challenge")) =>
     network: Network.Regtest,
     leewaySatPerVbyte: 1,
     signChallenge,
+    lnurlDomain: TEST_LNURL_DOMAIN,
   })
 
 /** Lets queued microtasks drain without advancing to the next run's connect, so the test
@@ -70,7 +75,10 @@ const sdkWith = (signMessage: jest.Mock = jest.fn()) => ({
 describe("buildMigrationTransferRequest", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockGetMnemonic.mockResolvedValue("abandon abandon ability")
+    mockReadMnemonic.mockResolvedValue({
+      status: "found",
+      value: "abandon abandon ability",
+    })
     mockInitSdk.mockResolvedValue(sdkWith())
     mockGetWalletInfo.mockResolvedValue({ identityPubkey: SPARK_PUBKEY })
     mockDisconnectSdk.mockResolvedValue(undefined)
@@ -146,16 +154,54 @@ describe("buildMigrationTransferRequest", () => {
       storageDir: "/tmp/sc-account-1",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
   })
 
   it("reports a device with no mnemonic for the provisioned account", async () => {
-    mockGetMnemonic.mockResolvedValue(null)
+    mockReadMnemonic.mockResolvedValue({ status: "absent" })
 
     const result = await buildRequest()
 
     expect(result).toEqual({ status: MigrationSdkStatus.NoMnemonic })
     expect(mockInitSdk).not.toHaveBeenCalled()
+  })
+
+  /**
+   * NoMnemonic routes the user to support as a device that never held the key, so
+   * a read that merely failed must not land there: nothing is missing, the
+   * keychain just would not answer.
+   */
+  it("reports a failed read as a failure, not as a device without the key", async () => {
+    mockReadMnemonic.mockResolvedValue({
+      status: "failed",
+      err: new Error("keychain locked"),
+    })
+
+    const result = await buildRequest()
+
+    expect(result.status).toBe(MigrationSdkStatus.Failed)
+    expect(mockInitSdk).not.toHaveBeenCalled()
+  })
+
+  /**
+   * This error reaches Crashlytics with its cause intact, and a keychain error can
+   * carry the server string, which ends in the account id. The sibling call sites
+   * drop the cause for the same reason.
+   */
+  it("keeps the account id out of the error it hands the caller", async () => {
+    mockReadMnemonic.mockResolvedValue({
+      status: "failed",
+      err: new Error(`secure-store.blink.local/mnemonic:sc-account-1 locked`),
+    })
+
+    const result = await buildRequest()
+
+    expect(result.status).toBe(MigrationSdkStatus.Failed)
+    if (result.status === MigrationSdkStatus.Failed) {
+      expect(result.error.message).not.toContain("sc-account-1")
+      expect(result.error.message).toBe("Mnemonic read failed")
+    }
   })
 
   it("reports a failure when the wallet will not sign", async () => {
@@ -309,11 +355,15 @@ describe("checkMigrationReceiveLanded", () => {
       accountId: "sc-account-1",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockGetMnemonic.mockResolvedValue("abandon abandon ability")
+    mockReadMnemonic.mockResolvedValue({
+      status: "found",
+      value: "abandon abandon ability",
+    })
     mockInitSdk.mockResolvedValue({ getInfo: mockGetInfo })
     mockDisconnectSdk.mockResolvedValue(undefined)
     mockGetInfo.mockResolvedValue({ balanceSats: 0 })
@@ -346,7 +396,7 @@ describe("checkMigrationReceiveLanded", () => {
   })
 
   it("reports a device with no mnemonic for the provisioned account", async () => {
-    mockGetMnemonic.mockResolvedValue(null)
+    mockReadMnemonic.mockResolvedValue({ status: "absent" })
 
     const result = await check()
 
@@ -398,6 +448,7 @@ describe("checkMigrationReceiveLanded", () => {
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
       signChallenge: () => "migrate:challenge",
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
     const landed = check()
     await flushMicrotasks()
@@ -415,7 +466,10 @@ describe("checkMigrationReceiveLanded", () => {
 describe("buildMigrationLnAddressProof", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockGetMnemonic.mockResolvedValue("abandon abandon ability")
+    mockReadMnemonic.mockResolvedValue({
+      status: "found",
+      value: "abandon abandon ability",
+    })
     mockInitSdk.mockResolvedValue({
       signMessage: jest.fn().mockResolvedValue({ signature: "deadbeef" }),
     })
@@ -432,6 +486,7 @@ describe("buildMigrationLnAddressProof", () => {
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
       signChallenge: () => "migrate:challenge",
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
 
     expect(result).toEqual({

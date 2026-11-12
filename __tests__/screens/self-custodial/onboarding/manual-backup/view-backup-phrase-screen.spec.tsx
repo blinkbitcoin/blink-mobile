@@ -1,8 +1,10 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
+import { HEADER_ICON_TOUCH_SIZE } from "@app/components/header-no-glass"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { ViewBackupPhraseScreen } from "@app/screens/self-custodial/onboarding/manual-backup/view-backup-phrase-screen"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
@@ -300,7 +302,14 @@ describe("ViewBackupPhraseScreen", () => {
     expect(button.props.accessibilityLabel).toBe(
       LL.BackupScreen.ManualBackup.Phrase.copy(),
     )
-    expect(button.props.hitSlop).toEqual({ top: 12, bottom: 12, left: 12, right: 12 })
+    // `hitSlop` never reaches past the native header item, so the box itself is 48dp.
+    expect(button.props.hitSlop).toBeUndefined()
+    expect(StyleSheet.flatten(button.props.style)).toMatchObject({
+      minWidth: HEADER_ICON_TOUCH_SIZE,
+      minHeight: HEADER_ICON_TOUCH_SIZE,
+      alignItems: "flex-end",
+      justifyContent: "center",
+    })
   })
 
   it("renders the do-not-share warning card", async () => {

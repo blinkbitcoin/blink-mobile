@@ -112,7 +112,7 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
                   pressed && styles.toggleButtonPressed,
                 ]}
               >
-                <GaloyIcon name="transfer" size={34} color={theme.colors.primary} />
+                <GaloyIcon name="transfer" size={34} color={theme.colors.accent} />
               </Pressable>
             </View>
           </>
@@ -157,7 +157,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 14,
   },
   currencyInputGroup: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "transparent",
@@ -173,7 +173,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 12,
   },
   primaryRowBg: {
-    backgroundColor: colors.grey6,
+    backgroundColor: colors.surfacePressed,
   },
   singleRow: {
     borderRadius: 12,
@@ -204,7 +204,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -220,7 +220,7 @@ const useStyles = makeStyles(({ colors }) => ({
     fontWeight: "700",
     lineHeight: 24,
     textAlign: "right",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   hiddenInput: {
     ...StyleSheet.absoluteFill,

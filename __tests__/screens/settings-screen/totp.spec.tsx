@@ -93,7 +93,9 @@ describe("TotpSetting", () => {
 
     fireEvent.press(screen.getByText(LL.TwoFactorTurnOff.statusDisabled()))
 
-    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate")
+    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
+      offersOnboarding: true,
+    })
     expect(closeIcons()).toHaveLength(0)
   })
 

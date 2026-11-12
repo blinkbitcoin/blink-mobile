@@ -70,10 +70,10 @@ export const SupportOnboardingScreen: React.FC<SupportOnboardingScreenProps> = (
 
 const useStyles = makeStyles(({ colors }) => ({
   descriptionText: {
-    color: colors.grey2,
+    color: colors.textMuted,
     marginBottom: 15,
   },
   linkText: {
-    color: colors.primary,
+    color: colors.accent,
   },
 }))

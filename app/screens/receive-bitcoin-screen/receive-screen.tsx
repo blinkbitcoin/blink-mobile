@@ -63,7 +63,7 @@ const LoadingView: React.FC = () => {
   return (
     <Screen>
       <View style={styles.loadingContainer} testID="receive-loading">
-        <ActivityIndicator size="large" color={colors.primary} />
+        <ActivityIndicator size="large" color={colors.accent} />
       </View>
     </Screen>
   )
@@ -79,7 +79,12 @@ const ReceiveScreen = () => {
     return null
   }
 
-  /** Loader while price conversion bootstraps after an account switch. */
+  /**
+   * Loader while price conversion bootstraps after an account switch. It is never a
+   * permanent state: once every price source has settled empty, the converter falls
+   * back to sats rather than staying undefined, which is what used to leave this
+   * screen spinning on a healthy wallet whose currency nothing could price.
+   */
   if (!convertMoneyAmount) {
     return <LoadingView />
   }
@@ -478,7 +483,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 20,
   },
   paymentIdentifierText: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 16,
     fontWeight: "400",
     lineHeight: 22,

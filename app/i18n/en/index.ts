@@ -2143,7 +2143,9 @@ const en: BaseTranslation = {
     selectAll: "Select all",
     clearAll: "Clear all",
     addPlace: "Add to map",
-    addPlaceTitle: "Add a place",
+    addPlaceTitle: "Suggest business",
+    submitPlaceRequest: "Submit request",
+    showMyLocation: "Show my location",
     placePinHint: "Move the map to put the pin on the place",
     placeName: "Name",
     placeNameHint: "What the place is called",
@@ -2411,6 +2413,10 @@ const en: BaseTranslation = {
       "{lnAddress: string} doesn't seem to be a {bankName: string} address that exists.",
     usernameDoesNotExistAdvice:
       "Either make sure the spelling is right or ask the recipient for an LN invoice or BTC address instead.",
+    destinationUnverifiable:
+      "We couldn't check {lnAddress: string} right now — {bankName: string}'s servers aren't responding.",
+    destinationUnverifiableAdvice:
+      "The address may well be fine. Try again in a moment, or ask the recipient for an LN invoice or BTC address instead.",
     selfPaymentError: "{lnAddress: string} is your {bankName: string} address.",
     selfPaymentAdvice:
       "If you want to send money to another account that you own, you can use an invoice, LN or BTC address instead.",
@@ -2516,6 +2522,7 @@ const en: BaseTranslation = {
   },
   ApiScreen: {
     keysGroupTitle: "API keys",
+    inactiveKeys: "Inactive keys ({count: number})",
     noKeys: "No API keys yet",
     createKey: "Create API key",
     createTitle: "New API key",
@@ -2545,6 +2552,7 @@ const en: BaseTranslation = {
     revokeBody:
       "\"{name: string}\" will stop working immediately. This cannot be undone.",
     revoke: "Revoke",
+    revokeGoBack: "Go back",
     revokeSuccess: "API key revoked",
     createError: "Could not create the API key. Please try again.",
     revokeError: "Could not revoke the API key. Please try again.",
@@ -2706,6 +2714,7 @@ const en: BaseTranslation = {
     fromThisDevice: "from this device?",
     switchAccount: "You switched to another account",
     removedAccount: "You removed account {identifier: string}.",
+    removeAccount: "Remove account",
   },
   TotpRegistrationInitiateScreen: {
     title: "Two-factor authentication",
@@ -2890,6 +2899,7 @@ const en: BaseTranslation = {
       tooLong: "Address must be at most 50 characters long",
       invalidCharacter: "Address can only contain letters, numbers, and underscores",
       addressUnavailable: "Sorry, this address is already taken",
+      serverUnreachable: "Couldn't reach the address server. Try again in a moment.",
       unknownError: "An unknown error occurred, please try again later",
       backupRequired: "Back up your wallet before creating a Lightning address",
     },
@@ -3220,7 +3230,6 @@ const en: BaseTranslation = {
     faq: "FAQ",
     statusPage: "Status page",
     telegram: "Telegram",
-    mattermost: "Mattermost",
     defaultEmailSubject: "{bankName: string} - Support",
     defaultSupportMessage:
       "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
@@ -3491,6 +3500,9 @@ const en: BaseTranslation = {
       limitUpdateSuccess: "Limit updated successfully",
       limitUpdateError: "Failed to update limit",
       limitMustBePositive: "Limit must be greater than zero",
+      atmToggleError: "Failed to update ATM withdrawals",
+      atmControlsLoadError: "Could not load your ATM limits",
+      invalidLimitAmount: "Enter a valid amount with up to 2 decimals",
       transactionTypesTitle: "Transaction types",
       TransactionTypes: {
         ecommerce: "Online purchases",
@@ -4200,6 +4212,12 @@ const en: BaseTranslation = {
       title: "We cannot migrate your Dollar Balance",
       body: "Empty your Dollar Balance first. You can transfer to your Bitcoin Balance in Blink or elsewhere.",
     },
+    pendingDepositModal: {
+      title: "There is a pending deposit to your account",
+      body: "You cannot migrate to a different type of account before all your pending deposits have been settled and credited on this account.",
+      contactSupportCta: "Contact support",
+      stillConfirming: "Your deposit is not confirmed yet. Try again in a few minutes.",
+    },
     migrateNowModal: {
       title: "Migrate now to a non-custodial account",
       body: "You can no longer receive funds to your custodial account. Blink has discontinued custodial service in your region and this account will be inactivated by the end of {date: string}.\n\nMigrate now to a non-custodial account.",
@@ -4368,6 +4386,7 @@ const en: BaseTranslation = {
     storeNote:
       "\"Get\" opens the App Store or Google Play. Come back to Blink when it's installed.",
     haveAnApp: "I have an app",
+    learnHow: "Learn how",
     keyInstruction: "Copy this setup key into your authenticator app.",
     qrInstruction: "Using another device?\nScan this QR code instead.",
     backupTitle: "Back up your key",
@@ -4433,6 +4452,9 @@ const en: BaseTranslation = {
   RecoveryBundleScreen: {
     noBundleToExport: "No emergency bundle yet. It's created after your first transaction.",
     exportFailed: "Could not download the emergency bundle.",
+  },
+  SelfCustodialStaleRate: {
+    satsOnly: "Showing sats — no exchange rate available",
   },
   SelfCustodialOffline: {
     title: "Wallet is offline",
@@ -4526,6 +4548,9 @@ const en: BaseTranslation = {
     noAccountTitle: "Custodial account required",
     noAccountDescription:
       "{featureName: string} requires a Blink custodial account.",
+    unreachableTitle: "Blink is unreachable",
+    unreachableDescription:
+      "{featureName: string} needs Blink's servers, which aren't responding right now. Your wallet and funds are unaffected.",
     featureCircles: "Circles",
     featureEarn: "Learn",
     featureCard: "Card",

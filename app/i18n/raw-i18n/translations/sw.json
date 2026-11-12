@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Funguo za API",
+    "inactiveKeys": "Funguo zisizotumika ({count})",
     "noKeys": "Bado hakuna funguo za API",
     "createKey": "Unda ufunguo wa API",
     "createTitle": "Ufunguo mpya wa API",
@@ -27,6 +28,7 @@
     "revokeTitle": "Batilisha ufunguo wa API?",
     "revokeBody": "\"{name: string}\" utaacha kufanya kazi mara moja. Kitendo hiki hakiwezi kutenduliwa.",
     "revoke": "Batilisha",
+    "revokeGoBack": "Rudi nyuma",
     "revokeSuccess": "Ufunguo wa API umebatilishwa",
     "createError": "Imeshindwa kuunda ufunguo wa API. Tafadhali jaribu tena.",
     "revokeError": "Imeshindwa kubatilisha ufunguo wa API. Tafadhali jaribu tena.",
@@ -2140,7 +2142,9 @@
     "selectAll": "Chagua zote",
     "clearAll": "Futa zote",
     "addPlace": "Ongeza kwenye ramani",
-    "addPlaceTitle": "Ongeza mahali",
+    "addPlaceTitle": "Pendekeza biashara",
+    "submitPlaceRequest": "Wasilisha ombi",
+    "showMyLocation": "Onyesha mahali nilipo",
     "placePinHint": "Sogeza ramani ili alama iwe juu ya mahali hapo",
     "placeName": "Jina",
     "placeNameHint": "Mahali hapa panaitwaje",
@@ -2373,6 +2377,8 @@
     "invalidAmount": "Hii ina kiasi batili. Tafadhali toa yenye kiasi halali.",
     "usernameDoesNotExist": "{lnAddress: string} haionekani kuwa anwani ya {bankName: string} ambayo ipo.",
     "usernameDoesNotExistAdvice": "Hakikisha kwamba tahajia ni sahihi ama uliza anayepokea akupee ankara ya LN au anwani ya BTC badala yake.",
+    "destinationUnverifiable": "Hatukuweza kuthibitisha {lnAddress} kwa sasa — seva za {bankName} hazijibu.",
+    "destinationUnverifiableAdvice": "Anwani huenda iko sawa kabisa. Jaribu tena baada ya muda mfupi, au mwombe mpokeaji ankara ya LN au anwani ya BTC.",
     "selfPaymentError": "{lnAddress: string} ni anwani yako ya {bankName: string}",
     "selfPaymentAdvice": "Ikiwa unataka kutuma pesa kwa akaunti yako nyingine, unaweza kutumia ankara ya malipo, LN au anwani ya BTC badala yake.",
     "lnAddressError": "Hatuwezi kupata anwani hii ya Lightning. Ikiwa una uhakika iko, unaweza jaribu tena baadaye.",
@@ -2595,7 +2601,8 @@
     "error": "Haiwezi kupata wasifu kwa wakati huu",
     "fromThisDevice": "kutoka kifaa hiki?",
     "switchAccount": "Umebadilisha kwenda akaunti nyingine",
-    "removedAccount": "Umeondoa akaunti {identifier: string}."
+    "removedAccount": "Umeondoa akaunti {identifier: string}.",
+    "removeAccount": "Ondoa akaunti"
   },
   "StablesatsRestriction": {
     "walletLabel": "haipatikani katika eneo lako",
@@ -2759,6 +2766,7 @@
       "tooLong": "Anwani lazima iwe na herufi si zaidi ya 50",
       "invalidCharacter": "Anwani inaweza kuwa na herufi, nambari, na alama ya chini pekee",
       "addressUnavailable": "Samahani, anwani hii tayari imetumika",
+      "serverUnreachable": "Haikuweza kufikia seva ya anwani. Jaribu tena baada ya muda mfupi.",
       "unknownError": "Kuna hitilafu isiyofahamika, tafadhali jaribu tena baadaye",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3071,7 +3079,6 @@
     "faq": "Maswali yanayoulizwa mara kwa mara",
     "statusPage": "Ukurasa wa Hali",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Usaidizi",
     "defaultSupportMessage": "Hujambo! Nahitaji usaidizi wa {bankName: string}, ninatumia toleo la {version: string} kwenye {os: string}.",
     "emailCopied": "Barua pepe {email: string} imenakiliwa kwenye ubao wa kunakili",
@@ -3246,7 +3253,10 @@
       "noLimit": "Hakuna kikomo",
       "limitUpdateSuccess": "Kikomo kimesasishwa kwa mafanikio",
       "limitUpdateError": "Imeshindikana kusasisha kikomo",
-      "limitMustBePositive": "Kikomo lazima kiwe kikubwa kuliko sifuri"
+      "limitMustBePositive": "Kikomo lazima kiwe kikubwa kuliko sifuri",
+      "atmToggleError": "Imeshindikana kusasisha utoaji wa ATM",
+      "atmControlsLoadError": "Imeshindikana kupakia vikomo vya ATM",
+      "invalidLimitAmount": "Weka kiasi sahihi chenye desimali 2 au chache"
     },
     "CardFeeSchedule": {
       "title": "Ratiba ya ada za Kadi ya Blink",
@@ -3948,6 +3958,12 @@
       "title": "Hatuwezi kuhamisha Salio lako la Dola",
       "body": "Kwanza ondoa Salio lako la Dola. Unaweza kulihamishia kwenye Salio lako la Bitcoin kwenye Blink au mahali pengine."
     },
+    "pendingDepositModal": {
+      "title": "Kuna amana inayosubiri kwenye akaunti yako",
+      "body": "Huwezi kuhamia aina nyingine ya akaunti kabla ya amana zako zote zinazosubiri kukamilika na kuwekwa kwenye akaunti hii.",
+      "contactSupportCta": "Wasiliana na usaidizi",
+      "stillConfirming": "Amana yako bado haijathibitishwa. Jaribu tena baada ya dakika chache."
+    },
     "balancesOverview": {
       "title": "Hamisha salio lako",
       "body": "Hamisha fedha zako kwa usalama kwenye akaunti yako mpya.",
@@ -4135,6 +4151,7 @@
     "get": "Pakua",
     "storeNote": "“Pakua” hufungua App Store au Google Play. Rudi kwenye Blink baada ya kusakinisha.",
     "haveAnApp": "Nina programu",
+    "learnHow": "Jifunze jinsi",
     "keyInstruction": "Nakili ufunguo huu wa kusanidi kwenye programu yako ya kithibitishaji.",
     "qrInstruction": "Unatumia kifaa kingine?\nBadala yake changanua msimbo huu wa QR.",
     "backupTitle": "Hifadhi nakala ya ufunguo wako",
@@ -4221,6 +4238,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink haifikiki",
+    "unreachableDescription": "{featureName} inahitaji seva za Blink, ambazo hazijibu kwa sasa. Pochi yako na fedha zako haziathiriwi.",
     "featureCircles": "Circles",
     "featureEarn": "Jifunze",
     "featureCard": "Card"
@@ -4243,6 +4262,9 @@
     "tokenTransfer": "Uhamisho wa {token}",
     "payTo": "Lipa kwa {address}",
     "payment": "Malipo"
+  },
+  "SelfCustodialStaleRate": {
+    "satsOnly": "Inaonyesha sats — hakuna kiwango cha ubadilishaji"
   },
   "SelfCustodialOffline": {
     "title": "Pochi iko nje ya mtandao",

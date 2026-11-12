@@ -27,8 +27,8 @@ export const FeatureItem: React.FC<FeatureItemProps> = ({ feature }) => {
     <View style={styles.featureContainer}>
       <GaloyIcon
         name={feature.icon}
-        color={colors._black}
-        backgroundColor={colors.primary}
+        color={colors.staticBlack}
+        backgroundColor={colors.accent}
         style={styles.iconStyle}
         size={19}
       />
@@ -49,7 +49,7 @@ const useStyles = makeStyles(() => {
       gap: 15,
     },
     iconStyle: {
-      borderRadius: containerSize,
+      borderRadius: containerSize / 2,
       width: containerSize,
       height: containerSize,
       alignItems: "center",

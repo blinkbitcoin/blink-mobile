@@ -50,7 +50,13 @@ const connectTo = (
   lifecycle: ReturnType<typeof loadLifecycle>,
   storageDir: string,
 ): Promise<BreezSdkInterface> =>
-  lifecycle.initSdk({ mnemonic: "m", storageDir, network: 0, leewaySatPerVbyte: 1 })
+  lifecycle.initSdk({
+    mnemonic: "m",
+    storageDir,
+    network: 0,
+    leewaySatPerVbyte: 1,
+    lnurlDomain: "staging.blink.sv",
+  })
 
 /** A connect that stays in flight until the returned release is called, whenever the
  *  connect itself starts. */

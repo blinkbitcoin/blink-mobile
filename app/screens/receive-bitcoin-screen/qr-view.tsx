@@ -140,7 +140,7 @@ const QRViewBase: React.FC<Props> = ({
       return (
         <View {...testProps("Converting")} style={[styles.container, style]}>
           <View style={styles.convertingContent}>
-            <ActivityIndicator size="large" color={colors.primary} />
+            <ActivityIndicator size="large" color={colors.accent} />
             <Text type="p2" style={styles.convertingText}>
               {LL.ReceiveScreen.pleaseWaitForConversion()}
             </Text>
@@ -181,7 +181,7 @@ const QRViewBase: React.FC<Props> = ({
                 {err}
               </Text>
             ) : (
-              <ActivityIndicator size="large" color={colors.primary} />
+              <ActivityIndicator size="large" color={colors.accent} />
             )}
           </View>
         </View>
@@ -234,12 +234,12 @@ const useStyles = makeStyles(({ colors }) => ({
   container: {
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: colors._white,
+    backgroundColor: colors.staticWhite,
     width: "100%",
     height: undefined,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: colors.grey5,
+    borderColor: colors.surfaceInteractive,
     aspectRatio: 1,
     alignSelf: "center",
     padding: 28,
@@ -266,7 +266,7 @@ const useStyles = makeStyles(({ colors }) => ({
     rowGap: 12,
   },
   convertingText: {
-    color: colors._black,
+    color: colors.staticBlack,
     textAlign: "center",
   },
   logoOverlay: {
