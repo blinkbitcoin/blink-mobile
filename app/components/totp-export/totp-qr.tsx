@@ -29,7 +29,7 @@ export const QrCodeComponent = ({
 const useStyles = makeStyles(({ colors }) => ({
   spacingAround: {
     padding: 20,
-    backgroundColor: colors._white,
+    backgroundColor: colors.staticWhite,
     borderRadius: 10,
   },
 }))

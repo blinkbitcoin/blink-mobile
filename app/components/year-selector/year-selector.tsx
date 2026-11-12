@@ -53,7 +53,7 @@ const YearOptionItem: React.FC<YearOptionItemProps> = ({
       <GaloyIcon
         name="calendar"
         size={20}
-        color={isDisabled ? colors.grey3 : colors.black}
+        color={isDisabled ? colors.textDisabled : colors.textOnBackground}
       />
       <View style={styles.yearOptionContent}>
         <Text
@@ -77,7 +77,7 @@ const YearOptionItem: React.FC<YearOptionItemProps> = ({
         )}
       </View>
       {isSelected && !isDisabled && (
-        <GaloyIcon name="check" size={20} color={colors.primary} />
+        <GaloyIcon name="check" size={20} color={colors.accent} />
       )}
     </TouchableOpacity>
   )
@@ -129,9 +129,9 @@ export const YearSelector: React.FC<YearSelectorProps> = ({
         accessibilityRole="button"
         accessibilityLabel={`${selectedYear}`}
       >
-        <GaloyIcon name="calendar" size={20} color={colors.black} />
+        <GaloyIcon name="calendar" size={20} color={colors.textOnBackground} />
         <Text style={styles.yearText}>{selectedYear}</Text>
-        <GaloyIcon name="caret-down" size={20} color={colors.primary} />
+        <GaloyIcon name="caret-down" size={20} color={colors.accent} />
       </TouchableOpacity>
 
       <ReactNativeModal
@@ -171,7 +171,7 @@ const useStyles = makeStyles(({ colors }) => ({
   yearSelector: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 14,
@@ -179,7 +179,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   yearText: {
     flex: 1,
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 18,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",
@@ -190,7 +190,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginTop: 150,
   },
   modalContent: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     padding: 10,
     maxHeight: MODAL_MAX_HEIGHT,
@@ -212,20 +212,20 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 2,
   },
   yearOptionText: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 18,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",
     lineHeight: 24,
   },
   yearOptionSelected: {
-    color: colors.primary,
+    color: colors.accent,
   },
   yearOptionTextDisabled: {
-    color: colors.grey3,
+    color: colors.textDisabled,
   },
   yearOptionSubtext: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 12,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",

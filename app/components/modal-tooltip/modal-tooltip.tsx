@@ -56,7 +56,7 @@ export const ModalTooltip: React.FC<ModalTooltipProps> = ({
         <GaloyIcon
           name={iconName}
           size={size ?? 24}
-          color={type === "info" ? colors.black : colors.error}
+          color={type === "info" ? colors.textOnBackground : colors.error}
         />
       </TouchableOpacity>
       <Modal
@@ -65,7 +65,7 @@ export const ModalTooltip: React.FC<ModalTooltipProps> = ({
         coverScreen
         style={styles.modalStyle}
         backdropOpacity={0.3}
-        backdropColor={colors.grey3}
+        backdropColor={colors.textDisabled}
       >
         <TouchableOpacity style={styles.fillerOpacity} onPress={toggleModal} />
         <View style={styles.modalCard}>
@@ -92,7 +92,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
   },
   modalCard: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     maxFlex: 2,
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
@@ -104,7 +104,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: 10,
   },
   iconContainer: {
-    color: colors.black,
+    color: colors.textOnBackground,
     marginRight: 12,
   },
 }))

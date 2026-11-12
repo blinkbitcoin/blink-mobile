@@ -1,11 +1,17 @@
 import { Platform } from "react-native"
 
-import { legacyBlank, legacyErase, legacyRead } from "@app/utils/storage/legacy-key-store"
+import {
+  eraseEntireLegacyStore,
+  legacyBlank,
+  legacyErase,
+  legacyRead,
+} from "@app/utils/storage/legacy-key-store"
 
 const mockGet = jest.fn()
 const mockSet = jest.fn()
 const mockRemove = jest.fn()
 const mockSetResetOnAppUninstallTo = jest.fn()
+const mockResetGenericPassword = jest.fn()
 
 jest.mock("react-native-secure-key-store", () => ({
   __esModule: true,
@@ -19,6 +25,11 @@ jest.mock("react-native-secure-key-store", () => ({
   ACCESSIBLE: {
     AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: "AccessibleAfterFirstUnlockThisDeviceOnly",
   },
+}))
+
+jest.mock("react-native-keychain", () => ({
+  __esModule: true,
+  resetGenericPassword: (...args: unknown[]) => mockResetGenericPassword(...args),
 }))
 
 const setPlatform = (os: typeof Platform.OS) => {
@@ -205,6 +216,60 @@ describe("legacy-key-store", () => {
       )
 
       expect(await legacyBlank("PIN")).toBe(false)
+    })
+  })
+
+  /**
+   * What replaces the module's own reinstall sweep for the credentials no list
+   * names — see the note above the function.
+   */
+  describe("eraseEntireLegacyStore", () => {
+    beforeEach(() => {
+      mockResetGenericPassword.mockResolvedValue(true)
+    })
+
+    it("deletes by the legacy module's own service, and only that", async () => {
+      // Scoped where `clearSecureKeyStore` is not: that one takes every generic
+      // password and key the app owns, dependencies included.
+      expect(await eraseEntireLegacyStore()).toBe(true)
+
+      expect(mockResetGenericPassword).toHaveBeenCalledTimes(1)
+      expect(mockResetGenericPassword).toHaveBeenCalledWith({
+        service: "RNSecureKeyStoreKeyChain",
+      })
+    })
+
+    it("never reaches the legacy module, so the uninstall guard stays untouched", async () => {
+      await eraseEntireLegacyStore()
+
+      expect(mockSetResetOnAppUninstallTo).not.toHaveBeenCalled()
+      expect(mockRemove).not.toHaveBeenCalled()
+      expect(mockGet).not.toHaveBeenCalled()
+    })
+
+    it("reports false when the delete rejects, rather than throwing at the caller", async () => {
+      mockResetGenericPassword.mockRejectedValue(new Error("keychain unavailable"))
+
+      expect(await eraseEntireLegacyStore()).toBe(false)
+    })
+
+    /**
+     * Defence against a library change, not coverage of a reachable path:
+     * `resetGenericPasswordForOptions` resolves `@(YES)` or rejects, and never
+     * resolves false, so no iOS build reaches this today. It stays because the
+     * signature permits it and the cost of honouring it is one branch.
+     */
+    it("passes a false resolution through as a failed erase", async () => {
+      mockResetGenericPassword.mockResolvedValue(false)
+
+      expect(await eraseEntireLegacyStore()).toBe(false)
+    })
+
+    it("does nothing on Android, whose uninstall clears app storage anyway", async () => {
+      setPlatform("android")
+
+      expect(await eraseEntireLegacyStore()).toBe(true)
+      expect(mockResetGenericPassword).not.toHaveBeenCalled()
     })
   })
 })

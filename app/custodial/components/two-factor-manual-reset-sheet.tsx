@@ -41,7 +41,7 @@ export const TwoFactorManualResetSheet: React.FC<TwoFactorManualResetSheetProps>
       isVisible={isVisible}
       style={styles.modal}
       backdropOpacity={0.8}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       backdropTransitionOutTiming={0}
       swipeDirection={["down"]}
       onSwipeComplete={onClose}
@@ -51,7 +51,7 @@ export const TwoFactorManualResetSheet: React.FC<TwoFactorManualResetSheetProps>
     >
       <View style={styles.sheet}>
         <View style={styles.handle} />
-        <GaloyIcon name="info" size={32} color={colors.primary} />
+        <GaloyIcon name="info" size={32} color={colors.accent} />
         <Text type="h2" bold style={styles.title}>
           {LL.TwoFactorTurnOff.manualResetTitle()}
         </Text>
@@ -78,7 +78,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   },
   sheet: {
     alignItems: "center",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     paddingHorizontal: 20,
@@ -90,22 +90,22 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.grey3,
+    backgroundColor: colors.textDisabled,
     marginBottom: 10,
   },
   title: {
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   body: {
     textAlign: "center",
     fontSize: 16,
     lineHeight: 22,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   supportLink: {
     textDecorationLine: "underline",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   closeButton: {
     alignSelf: "stretch",

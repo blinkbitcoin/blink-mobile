@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "คีย์ API",
+    "inactiveKeys": "คีย์ที่ไม่ได้ใช้งาน ({count})",
     "noKeys": "ยังไม่มีคีย์ API",
     "createKey": "สร้างคีย์ API",
     "createTitle": "คีย์ API ใหม่",
@@ -27,6 +28,7 @@
     "revokeTitle": "เพิกถอนคีย์ API หรือไม่?",
     "revokeBody": "\"{name: string}\" จะหยุดทำงานทันที การกระทำนี้ไม่สามารถเลิกทำได้",
     "revoke": "เพิกถอน",
+    "revokeGoBack": "ย้อนกลับ",
     "revokeSuccess": "เพิกถอนคีย์ API แล้ว",
     "createError": "ไม่สามารถสร้างคีย์ API ได้ โปรดลองอีกครั้ง",
     "revokeError": "ไม่สามารถเพิกถอนคีย์ API ได้ โปรดลองอีกครั้ง",
@@ -2140,7 +2142,9 @@
     "selectAll": "เลือกทั้งหมด",
     "clearAll": "ล้างทั้งหมด",
     "addPlace": "เพิ่มลงแผนที่",
-    "addPlaceTitle": "เพิ่มสถานที่",
+    "addPlaceTitle": "แนะนำร้านค้า",
+    "submitPlaceRequest": "ส่งคำขอ",
+    "showMyLocation": "แสดงตำแหน่งของฉัน",
     "placePinHint": "เลื่อนแผนที่เพื่อวางหมุดบนสถานที่",
     "placeName": "ชื่อ",
     "placeNameHint": "สถานที่นี้ชื่ออะไร",
@@ -2229,6 +2233,12 @@
     "error": "การสร้าง invoice ผิดพลาด หากปัญหายังคงอยู่ กรุณาติดต่อฝ่ายซัพพอร์ท",
     "copyInvoice": "Copy",
     "shareInvoice": "แชร์",
+    "newAddress": "ใหม่",
+    "newAddressHint": "สร้างที่อยู่ Bitcoin ใหม่ ที่อยู่เดิมยังใช้งานได้",
+    "newAddressGenerated": "ที่อยู่ใหม่พร้อมแล้ว ที่อยู่เดิมยังใช้งานได้",
+    "newAddressFailed": "ไม่สามารถสร้างที่อยู่ใหม่ได้ โปรดลองอีกครั้ง",
+    "newAddressRateLimited": "สร้างที่อยู่ใหม่มากเกินไป โปรดรอสักครู่แล้วลองอีกครั้ง",
+    "onchainAddressLoadFailed": "ไม่สามารถโหลดที่อยู่ Bitcoin ของคุณได้ แตะ ใหม่ เพื่อลองอีกครั้ง",
     "addAmount": "ขอจำนวนเงินที่แน่นอน",
     "expired": "Invoiceนี้ หมดอายุแล้ว",
     "expiresIn": "หมดอายุใน",
@@ -2364,6 +2374,8 @@
     "invalidAmount": "จำนวนเงินไม่ถูกต้อง กรุณาสร้างใหม่โดยใช้จำนวนเงินที่ถูกต้อง",
     "usernameDoesNotExist": "{lnAddress: string} ดูเหมือนจะไม่ใช่แอดเดรส {bankName: string} ที่มีอยู่จริง",
     "usernameDoesNotExistAdvice": "ลองเช็คอีกครั้งว่าสะกดถูกต้องไหม ไม่อย่างนั้นก็ลองขอไลท์นิ่งอินวอยซ์หรือบิตคอยน์แอดเดรสมาใช้แทน",
+    "destinationUnverifiable": "ขณะนี้เราไม่สามารถตรวจสอบ {lnAddress} ได้ — เซิร์ฟเวอร์ของ {bankName} ไม่ตอบสนอง",
+    "destinationUnverifiableAdvice": "ที่อยู่นี้อาจถูกต้องอยู่แล้ว ลองอีกครั้งในอีกสักครู่ หรือขอใบแจ้งหนี้ LN หรือที่อยู่ BTC จากผู้รับแทน",
     "selfPaymentError": "{lnAddress: string} คือแอดเดรส {bankName: string} ของคุณ",
     "selfPaymentAdvice": "ถ้าต้องการส่งเงินไปยังบัญชีอื่นที่คุณเป็นเจ้าของ คุณสามารถใช้อินวอยซ์, ไลท์นิ่งแอดเดรส หรือบิตคอยน์แอดเดรสแทนได้",
     "lnAddressError": "เราไม่สามารถเชื่อมต่อไปยังไลท์นิ่งแอดเดรสนี้ได้ ถ้าคุณมั่นใจว่ามันมีตัวตนอยู่จริง คุณสามารถลองใหม่ได้ภายหลัง",
@@ -2586,12 +2598,14 @@
     "error": "ไม่สามารถดึงข้อมูลโปรไฟล์ได้ในขณะนี้",
     "fromThisDevice": "จากอุปกรณ์นี้?",
     "switchAccount": "คุณได้สลับไปยังบัญชีอื่นแล้ว",
-    "removedAccount": "คุณได้ลบบัญชี {identifier: string} แล้ว"
+    "removedAccount": "คุณได้ลบบัญชี {identifier: string} แล้ว",
+    "removeAccount": "ลบบัญชี"
   },
   "StablesatsRestriction": {
     "walletLabel": "ไม่พร้อมใช้งานในภูมิภาคของคุณ",
     "anonModeWalletLabel": "ไม่พร้อมใช้งานในโหมด Incognito",
-    "unknownRegionWalletLabel": "ไม่สามารถตรวจสอบความพร้อมใช้งานได้ ดึงลงเพื่อลองอีกครั้ง"
+    "unknownRegionWalletLabel": "ไม่สามารถตรวจสอบความพร้อมใช้งานได้ ดึงลงเพื่อลองอีกครั้ง",
+    "networkWalletLabel": "ไม่พร้อมใช้งานบนเครือข่ายนี้"
   },
   "AnonModeConvertModal": {
     "title": "โอนยอดคงเหลือดอลลาร์ของคุณก่อน",
@@ -2757,6 +2771,7 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
+      "serverUnreachable": "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ที่อยู่ได้ ลองอีกครั้งในอีกสักครู่",
       "unknownError": "An unknown error occurred, please try again later",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3069,7 +3084,6 @@
     "faq": "FAQ",
     "statusPage": "Status Page",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Support",
     "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
     "emailCopied": "email {email: string} ปยังคลิปบอร์ดแล้ว",
@@ -3083,7 +3097,13 @@
     "deleteAccountFromPhone": "สวัสดี! โปรดปิดบัญชีของฉัน หมายเลขโทรศัพท์ของฉันคือ {phoneNumber: string}",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "ข้อควรระวัง: การปิดบัญชีเป็นการกระทำถาวร!\nตรวจสอบให้แน่ใจว่ากระเป๋าเงินไม่มีเงินคงเหลือก่อนปิดบัญชี\nบัญชีที่ปิดแล้วไม่สามารถกู้คืนได้\nเราอาจเก็บรักษาบันทึกบางอย่างตามที่กฎหมายกำหนด"
+    "deleteAccountWarning": "ข้อควรระวัง: การปิดบัญชีเป็นการกระทำถาวร!\nตรวจสอบให้แน่ใจว่ากระเป๋าเงินไม่มีเงินคงเหลือก่อนปิดบัญชี\nบัญชีที่ปิดแล้วไม่สามารถกู้คืนได้\nเราอาจเก็บรักษาบันทึกบางอย่างตามที่กฎหมายกำหนด",
+    "downloadLogs": "ดาวน์โหลดบันทึก",
+    "exportLogsTitle": "แชร์บันทึกกระเป๋าเงินของคุณ",
+    "exportLogsBody": "ไฟล์นี้ช่วยให้ฝ่ายสนับสนุนตรวจสอบปัญหาของกระเป๋าเงินของคุณ ไฟล์มีประวัติการชำระเงิน (จำนวนเงิน ใบแจ้งหนี้ และที่อยู่) และตัวระบุของกระเป๋าเงินแบบไม่ฝากดูแลทุกใบในอุปกรณ์นี้ ไม่ใช่แค่ใบนี้ แต่ไม่มีวลีสำรองหรือกุญแจของคุณ แชร์กับฝ่ายสนับสนุนของเราเท่านั้น",
+    "exportLogsConfirm": "แชร์บันทึก",
+    "noLogsYet": "ยังไม่มีบันทึกให้แชร์ เปิดกระเป๋าเงินแล้วลองอีกครั้ง",
+    "exportLogsError": "ไม่สามารถส่งออกบันทึกได้ โปรดลองใหม่อีกครั้ง"
   },
   "lnurl": {
     "overLimit": "คุณไม่สามารถส่งเงินได้เกินกว่านี้",
@@ -3238,7 +3258,10 @@
       "noLimit": "ไม่มีขีดจำกัด",
       "limitUpdateSuccess": "อัปเดตขีดจำกัดสำเร็จ",
       "limitUpdateError": "ไม่สามารถอัปเดตขีดจำกัดได้",
-      "limitMustBePositive": "ขีดจำกัดต้องมากกว่าศูนย์"
+      "limitMustBePositive": "ขีดจำกัดต้องมากกว่าศูนย์",
+      "atmToggleError": "ไม่สามารถอัปเดตการถอน ATM ได้",
+      "atmControlsLoadError": "ไม่สามารถโหลดขีดจำกัด ATM ได้",
+      "invalidLimitAmount": "ป้อนจำนวนเงินที่ถูกต้อง ทศนิยมไม่เกิน 2 ตำแหน่ง"
     },
     "CardFeeSchedule": {
       "title": "ตารางค่าธรรมเนียมบัตร Blink",
@@ -3813,7 +3836,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "สำรองข้อมูลกระเป๋าเงินของคุณ",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "เลือกวิธีการสำรองข้อมูล",
@@ -3871,6 +3894,7 @@
     "CloudBackup": {
       "title": "มาสำรองข้อมูลกระเป๋าเงินของคุณกัน",
       "description": "เราจะบันทึกสำเนาวลีสำรองของคุณไปยัง {provider} ของคุณ",
+      "encryptCheckbox": "เข้ารหัสด้วยรหัสผ่านเพิ่มเติม",
       "password": "รหัสผ่าน",
       "passwordPlaceholder": "(อย่างน้อย 12 ตัวอักษร)",
       "confirmPassword": "ยืนยันรหัสผ่าน",
@@ -3938,6 +3962,12 @@
     "dollarBalanceModal": {
       "title": "เราไม่สามารถย้ายยอดดอลลาร์ของคุณได้",
       "body": "โปรดล้างยอดดอลลาร์ของคุณก่อน คุณสามารถโอนไปยังยอดบิตคอยน์ใน Blink หรือที่อื่นได้"
+    },
+    "pendingDepositModal": {
+      "title": "มีเงินฝากที่รอดำเนินการเข้าบัญชีของคุณ",
+      "body": "คุณไม่สามารถย้ายไปยังบัญชีประเภทอื่นได้จนกว่าเงินฝากที่รอดำเนินการทั้งหมดจะได้รับการชำระและเข้าบัญชีนี้แล้ว",
+      "contactSupportCta": "ติดต่อฝ่ายสนับสนุน",
+      "stillConfirming": "เงินฝากของคุณยังไม่ได้รับการยืนยัน โปรดลองอีกครั้งในอีกไม่กี่นาที"
     },
     "balancesOverview": {
       "title": "ย้ายยอดเงินของคุณ",
@@ -4126,6 +4156,7 @@
     "get": "ดาวน์โหลด",
     "storeNote": "“ดาวน์โหลด” จะเปิด App Store หรือ Google Play กลับมาที่ Blink เมื่อติดตั้งเสร็จแล้ว",
     "haveAnApp": "ฉันมีแอปแล้ว",
+    "learnHow": "ดูวิธีการ",
     "keyInstruction": "คัดลอกคีย์ตั้งค่านี้ไปยังแอปยืนยันตัวตนของคุณ",
     "qrInstruction": "ใช้อุปกรณ์เครื่องอื่นอยู่ใช่ไหม\nสแกนรหัส QR นี้แทน",
     "backupTitle": "สำรองคีย์ของคุณ",
@@ -4212,6 +4243,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "ไม่สามารถเชื่อมต่อ Blink ได้",
+    "unreachableDescription": "{featureName} ต้องใช้เซิร์ฟเวอร์ของ Blink ซึ่งขณะนี้ไม่ตอบสนอง กระเป๋าเงินและยอดเงินของคุณไม่ได้รับผลกระทบ",
     "featureCircles": "Circles",
     "featureEarn": "เรียนรู้",
     "featureCard": "Card"
@@ -4234,6 +4267,9 @@
     "tokenTransfer": "โอน {token}",
     "payTo": "จ่ายไปที่ {address}",
     "payment": "การชำระเงิน"
+  },
+  "SelfCustodialStaleRate": {
+    "satsOnly": "แสดงเป็น sats — ไม่มีอัตราแลกเปลี่ยน"
   },
   "SelfCustodialOffline": {
     "title": "กระเป๋าเงินออฟไลน์",

@@ -1842,12 +1842,12 @@
   resolved "https://registry.yarnpkg.com/@blinkbitcoin/react-native-geetest-module/-/react-native-geetest-module-0.1.2.tgz#6efc28450ae4e5ee80104c0754b183c589882351"
   integrity sha512-donA4DoTcJvV0RpVjXAyko0UPyPk5nAGElwEE2Nvyc6PQcp0gH/2OSj5OwR2tbnRW+0rPjzOYcrR+93vCXZoGw==
 
-"@breeztech/breez-sdk-spark-react-native@0.22.0":
-  version "0.22.0"
-  resolved "https://registry.yarnpkg.com/@breeztech/breez-sdk-spark-react-native/-/breez-sdk-spark-react-native-0.22.0.tgz#0db8325cec75947ec2a9e309b1a59c509d149522"
-  integrity sha512-t81chUcuJIQpdygst56JttHD/FQ9c0zAKeFeNFryxcNgQww8azBZGJiCquXkgLcu15qj7YO0cqXM9Qo6ZY43mQ==
+"@breeztech/breez-sdk-spark-react-native@0.27.1":
+  version "0.27.1"
+  resolved "https://registry.yarnpkg.com/@breeztech/breez-sdk-spark-react-native/-/breez-sdk-spark-react-native-0.27.1.tgz#6223656347040e6902b506ee98d6c06241816197"
+  integrity sha512-ExO/CsAmCEXsaSvJ/IO2znW8C4KRbKgyA64q0ijPBJcFbfJ4BrJQjfBnPOyJu4rrvdzWEsnGv6oDSxTSdQFWaw==
   dependencies:
-    uniffi-bindgen-react-native "^0.29.3-1"
+    uniffi-bindgen-react-native "git+https://github.com/breez/uniffi-bindgen-react-native.git#309bc8fa7fc56d4358dc75a78135a54d8225786b"
 
 "@callstack/react-theme-provider@3.0.3":
   version "3.0.3"
@@ -7456,10 +7456,10 @@ bip39@^3.1.0:
   dependencies:
     "@noble/hashes" "^1.2.0"
 
-bitcoinjs-lib@^6.0.0, bitcoinjs-lib@^6.1.5:
-  version "6.1.5"
-  resolved "https://registry.npmjs.org/bitcoinjs-lib/-/bitcoinjs-lib-6.1.5.tgz#3b03509ae7ddd80a440f10fc38c4a97f0a028d8c"
-  integrity sha512-yuf6xs9QX/E8LWE2aMJPNd0IxGofwfuVOiYdNUESkc+2bHHVKjhJd8qewqapeoolh9fihzHGoDCB5Vkr57RZCQ==
+bitcoinjs-lib@^6.0.0, bitcoinjs-lib@^6.1.8:
+  version "6.1.10"
+  resolved "https://registry.yarnpkg.com/bitcoinjs-lib/-/bitcoinjs-lib-6.1.10.tgz#d6650fc70f5849d374a2c39c156faf00349ad56e"
+  integrity sha512-9KpnS5JKVP0j0yfTsBNFIsNA6+JdBDb7VtL35F20I/pJYobosi3TmZFGtu6qxhJCfb0vubJixr5Zv61/lUYETw==
   dependencies:
     "@noble/hashes" "^1.2.0"
     bech32 "^2.0.0"
@@ -19008,10 +19008,9 @@ unicode-property-aliases-ecmascript@^2.0.0:
   resolved "https://registry.npmjs.org/unicode-property-aliases-ecmascript/-/unicode-property-aliases-ecmascript-2.1.0.tgz#43d41e3be698bd493ef911077c9b131f827e8ccd"
   integrity sha512-6t3foTQI9qne+OZoVQB/8x8rk2k1eVy1gRXhV3oFQ5T6R1dqQ1xtin3XqSlx3+ATBkliTaR/hHyJBm+LVPNM8w==
 
-uniffi-bindgen-react-native@^0.29.3-1:
+"uniffi-bindgen-react-native@git+https://github.com/breez/uniffi-bindgen-react-native.git#309bc8fa7fc56d4358dc75a78135a54d8225786b":
   version "0.29.3-1"
-  resolved "https://registry.yarnpkg.com/uniffi-bindgen-react-native/-/uniffi-bindgen-react-native-0.29.3-1.tgz#bcf3a9759ac036a08a983783d3319e0044c98680"
-  integrity sha512-o6gXZsAh55yuvhwF2WSFdIHV4phyfWcCmg4DuyfJWJ7CvUz1UcIz2S4u9SmXAz1jsuqvu6Xc9hexrRBB0a5osg==
+  resolved "git+https://github.com/breez/uniffi-bindgen-react-native.git#309bc8fa7fc56d4358dc75a78135a54d8225786b"
 
 unique-string@^2.0.0:
   version "2.0.0"

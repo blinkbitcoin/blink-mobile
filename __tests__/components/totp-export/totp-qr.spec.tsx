@@ -42,7 +42,7 @@ describe("QrCodeComponent", () => {
     expect(frameStyle()).toMatchObject({
       padding: 14,
       borderRadius: 20,
-      backgroundColor: theme.lightColors?._white,
+      backgroundColor: theme.lightColors?.staticWhite,
     })
   })
 })

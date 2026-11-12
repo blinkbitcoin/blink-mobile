@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API-nøgler",
+    "inactiveKeys": "Inaktive nøgler ({count})",
     "noKeys": "Ingen API-nøgler endnu",
     "createKey": "Opret API-nøgle",
     "createTitle": "Ny API-nøgle",
@@ -27,6 +28,7 @@
     "revokeTitle": "Tilbagekald API-nøgle?",
     "revokeBody": "\"{name: string}\" holder straks op med at virke. Dette kan ikke fortrydes.",
     "revoke": "Tilbagekald",
+    "revokeGoBack": "Tilbage",
     "revokeSuccess": "API-nøgle tilbagekaldt",
     "createError": "API-nøglen kunne ikke oprettes. Prøv igen.",
     "revokeError": "API-nøglen kunne ikke tilbagekaldes. Prøv igen.",
@@ -2140,7 +2142,9 @@
     "selectAll": "Vælg alle",
     "clearAll": "Ryd alle",
     "addPlace": "Tilføj til kort",
-    "addPlaceTitle": "Tilføj et sted",
+    "addPlaceTitle": "Foreslå forretning",
+    "submitPlaceRequest": "Indsend anmodning",
+    "showMyLocation": "Vis min placering",
     "placePinHint": "Flyt kortet, så nålen står på stedet",
     "placeName": "Navn",
     "placeNameHint": "Hvad stedet hedder",
@@ -2229,6 +2233,12 @@
     "error": "Fejl ved generering af faktura. Kontakt venligst support, hvis dette problem fortsætter.",
     "copyInvoice": "Kopier",
     "shareInvoice": "Del",
+    "newAddress": "Ny",
+    "newAddressHint": "Opretter en ny Bitcoin-adresse. Tidligere adresser virker stadig.",
+    "newAddressGenerated": "Ny adresse klar. Tidligere adresser virker stadig.",
+    "newAddressFailed": "Kunne ikke oprette en ny adresse. Prøv venligst igen.",
+    "newAddressRateLimited": "For mange nye adresser. Vent lidt, og prøv igen.",
+    "onchainAddressLoadFailed": "Kunne ikke indlæse din Bitcoin-adresse. Tryk på Ny for at prøve igen.",
     "addAmount": "Anmod om et bestemt beløb",
     "expired": "Fakturaen er udløbet",
     "expiresIn": "Udløber om",
@@ -2364,6 +2374,8 @@
     "invalidAmount": "Denne indeholder et ugyldigt beløb. Generer venligst med et gyldigt beløb.",
     "usernameDoesNotExist": "{lnAddress: string} synes ikke at være en {bankName: string} adresse, der eksisterer.",
     "usernameDoesNotExistAdvice": "Sørg enten for, at stavningen er korrekt, eller bed modtageren om en LN faktura eller BTC adresse i stedet.",
+    "destinationUnverifiable": "Vi kunne ikke tjekke {lnAddress} lige nu – {bankName}s servere svarer ikke.",
+    "destinationUnverifiableAdvice": "Adressen er sandsynligvis fin. Prøv igen om lidt, eller bed modtageren om en LN-faktura eller BTC-adresse i stedet.",
     "selfPaymentError": "{lnAddress: string} er din {bankName: string} adresse.",
     "selfPaymentAdvice": "Hvis du vil sende penge til en anden konto, som du ejer, kan du bruge en faktura, LN eller BTC adresse i stedet.",
     "lnAddressError": "Vi kan ikke nå denne Lightning-adresse. Hvis du er sikker på, at den eksisterer, kan du prøve igen senere.",
@@ -2586,12 +2598,14 @@
     "error": "Kan ikke hente profiler på nuværende tidspunkt",
     "fromThisDevice": "fra denne enhed?",
     "switchAccount": "Du skiftede til en anden konto",
-    "removedAccount": "Du fjernede kontoen {identifier: string}."
+    "removedAccount": "Du fjernede kontoen {identifier: string}.",
+    "removeAccount": "Fjern konto"
   },
   "StablesatsRestriction": {
     "walletLabel": "ikke tilgængelig i din region",
     "anonModeWalletLabel": "ikke tilgængelig i Incognito-tilstand",
-    "unknownRegionWalletLabel": "tilgængelighed kunne ikke tjekkes, træk ned for at prøve igen"
+    "unknownRegionWalletLabel": "tilgængelighed kunne ikke tjekkes, træk ned for at prøve igen",
+    "networkWalletLabel": "ikke tilgængelig på dette netværk"
   },
   "AnonModeConvertModal": {
     "title": "Overfør først din dollarsaldo",
@@ -2757,6 +2771,7 @@
       "tooLong": "Adressen må maksimalt være 50 tegn lang",
       "invalidCharacter": "Adressen kan kun indeholde bogstaver, tal og understregninger",
       "addressUnavailable": "Beklager, denne adresse er allerede taget",
+      "serverUnreachable": "Kunne ikke nå adresseserveren. Prøv igen om lidt.",
       "unknownError": "Der opstod en ukendt fejl, prøv igen senere",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3069,7 +3084,6 @@
     "faq": "Ofte stillede spørgsmål",
     "statusPage": "Statusside",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Support",
     "defaultSupportMessage": "Hej! Jeg har brug for hjælp med {bankName: string}. Jeg bruger version {version: string} på {os: string}.",
     "emailCopied": "email {email: string} kopieret til udklipsholder",
@@ -3083,7 +3097,13 @@
     "deleteAccountFromPhone": "Hej! Luk venligst min konto. Mit telefonnummer er {phoneNumber: string}.",
     "deleteAccountError": "Noget gik galt. Kontakt {email: string} for yderligere assistance.",
     "bye": "Farvel!",
-    "deleteAccountWarning": "Bemærk: Lukning af kontoen er permanent!\nSørg for, at tegnebøgerne ikke har penge, før du lukker.\nEn lukket konto kan ikke genoprettes.\nVi kan opbevare visse oplysninger, som påkrævet af loven."
+    "deleteAccountWarning": "Bemærk: Lukning af kontoen er permanent!\nSørg for, at tegnebøgerne ikke har penge, før du lukker.\nEn lukket konto kan ikke genoprettes.\nVi kan opbevare visse oplysninger, som påkrævet af loven.",
+    "downloadLogs": "Download logfiler",
+    "exportLogsTitle": "Del logfilerne fra din tegnebog",
+    "exportLogsBody": "Denne fil hjælper vores supportteam med at undersøge problemer med dine tegnebøger. Den indeholder betalingshistorikken (beløb, fakturaer og adresser) og tegnebogs-id'er for alle ikke-depottegnebøger på denne enhed, ikke kun denne, men aldrig dine gendannelsesfraser eller nøgler. Del den kun med vores supportteam.",
+    "exportLogsConfirm": "Del logfiler",
+    "noLogsYet": "Der er endnu ingen logfiler at dele. Åbn din tegnebog, og prøv igen.",
+    "exportLogsError": "Kunne ikke eksportere dine logfiler. Prøv igen."
   },
   "lnurl": {
     "overLimit": "Du kan ikke sende mere end maks beløbet",
@@ -3238,7 +3258,10 @@
       "noLimit": "Ingen grænse",
       "limitUpdateSuccess": "Grænse opdateret",
       "limitUpdateError": "Kunne ikke opdatere grænsen",
-      "limitMustBePositive": "Grænsen skal være større end nul"
+      "limitMustBePositive": "Grænsen skal være større end nul",
+      "atmToggleError": "Kunne ikke opdatere hævninger i hæveautomater",
+      "atmControlsLoadError": "Kunne ikke indlæse dine hæveautomatgrænser",
+      "invalidLimitAmount": "Indtast et gyldigt beløb med højst 2 decimaler"
     },
     "CardFeeSchedule": {
       "title": "Blink-kortets gebyrplan",
@@ -3813,7 +3836,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Sikkerhedskopiér din tegnebog",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Vælg din backup-metode",
@@ -3871,6 +3894,7 @@
     "CloudBackup": {
       "title": "Lad os sikkerhedskopiere din tegnebog",
       "description": "Vi gemmer en sikkerhedskopi af din gendannelsesfrase i din {provider}.",
+      "encryptCheckbox": "Kryptér med ekstra adgangskode",
       "password": "Adgangskode",
       "passwordPlaceholder": "(minimum 12 tegn)",
       "confirmPassword": "Bekræft adgangskode",
@@ -3938,6 +3962,12 @@
     "dollarBalanceModal": {
       "title": "Vi kan ikke migrere din dollarsaldo",
       "body": "Tøm først din dollarsaldo. Du kan overføre den til din Bitcoin-saldo i Blink eller et andet sted."
+    },
+    "pendingDepositModal": {
+      "title": "Der er en afventende indbetaling til din konto",
+      "body": "Du kan ikke migrere til en anden kontotype, før alle dine afventende indbetalinger er afregnet og krediteret denne konto.",
+      "contactSupportCta": "Kontakt support",
+      "stillConfirming": "Din indbetaling er ikke bekræftet endnu. Prøv igen om et par minutter."
     },
     "balancesOverview": {
       "title": "Flyt din saldo",
@@ -4126,6 +4156,7 @@
     "get": "Hent",
     "storeNote": "»Hent« åbner App Store eller Google Play. Vend tilbage til Blink, når appen er installeret.",
     "haveAnApp": "Jeg har en app",
+    "learnHow": "Se hvordan",
     "keyInstruction": "Kopiér denne opsætningsnøgle ind i din authenticator-app.",
     "qrInstruction": "Bruger du en anden enhed?\nScan denne QR-kode i stedet.",
     "backupTitle": "Sikkerhedskopiér din nøgle",
@@ -4212,6 +4243,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink kan ikke nås",
+    "unreachableDescription": "{featureName} kræver Blinks servere, som ikke svarer lige nu. Din wallet og dine midler er upåvirkede.",
     "featureCircles": "Circles",
     "featureEarn": "Lær",
     "featureCard": "Card"
@@ -4234,6 +4267,9 @@
     "tokenTransfer": "{token}-overførsel",
     "payTo": "Betal til {address}",
     "payment": "Betaling"
+  },
+  "SelfCustodialStaleRate": {
+    "satsOnly": "Viser sats – ingen vekselkurs tilgængelig"
   },
   "SelfCustodialOffline": {
     "title": "Pungen er offline",

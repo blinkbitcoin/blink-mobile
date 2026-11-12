@@ -70,7 +70,7 @@ const EnhancedModePromptModal: React.FC<PromptModalProps> = ({ onDismiss }) => {
         <GaloyIcon
           name="warning"
           size={52}
-          color={colors.primary}
+          color={colors.accent}
           {...testProps("enhanced-mode-prompt-icon")}
         />
       }
@@ -114,6 +114,6 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlign: "center",
     fontSize: 16,
     lineHeight: 22,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

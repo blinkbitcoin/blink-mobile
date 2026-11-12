@@ -91,7 +91,7 @@ export const Circle = forwardRef<CircleRef, CircleProps>(
             <View style={styles.helpBtn}>
               {helpBtnModal}
               <TouchableOpacity onPress={helpBtnModalEnable}>
-                <GaloyIcon name="question" size={23} color={colors.primary} />
+                <GaloyIcon name="question" size={23} color={colors.accent} />
               </TouchableOpacity>
             </View>
           )}
@@ -156,15 +156,15 @@ const useStyles = makeStyles(
       },
       circleSubtitle: {
         textAlign: "left",
-        backgroundColor: subtitleGreen ? colors._green : colors.black,
+        backgroundColor: subtitleGreen ? colors.staticSuccess : colors.textOnBackground,
         borderRadius: 10,
         paddingHorizontal: 10,
         alignSelf: "flex-start",
       },
-      circleSubtitleExtra: { color: colors.black, marginTop: 4 },
+      circleSubtitleExtra: { color: colors.textOnBackground, marginTop: 4 },
       circleBubble: {
         position: "absolute",
-        backgroundColor: colors.backdropWhiter,
+        backgroundColor: colors.backdropStrong,
         top: "50%",
         left: "50%",
       },

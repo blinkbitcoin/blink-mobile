@@ -2,6 +2,7 @@ import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 import { useDepositActions } from "@app/screens/unclaimed-deposits/hooks/use-deposit-actions"
 import {
+  DepositClaimDeferral,
   DepositErrorReason,
   DepositStatus,
   PaymentResultStatus,
@@ -39,6 +40,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
         missingUtxo: () => "Missing UTXO",
         claimFailed: ({ error }: { error: string }) => `Claim failed: ${error}`,
         claimSuccess: () => "Deposit claimed",
+        claiming: () => "Claiming...",
+        immature: () => "Waiting for confirmations...",
         error: () => "Error",
       },
     },
@@ -226,6 +229,100 @@ describe("useDepositActions", () => {
       expect(mockToastShow).toHaveBeenCalledWith(
         expect.objectContaining({ message: "Fee exceeded 198" }),
       )
+    })
+  })
+
+  describe("handleClaim — deferred and in-progress claims (0.26)", () => {
+    it("quotes the fee the deferred claim needs now, not the one listed earlier", async () => {
+      mockClaimDeposit.mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "Claim needs 420 sats in fees" }],
+        deferral: DepositClaimDeferral.FeeExceeded,
+        requiredFeeSats: 420,
+      })
+      const { result } = renderHook(() => useDepositActions())
+      const deposit = buildDeposit({
+        errorReason: DepositErrorReason.FeeExceeded,
+        requiredFeeSats: 198,
+      })
+
+      await act(async () => {
+        await result.current.handleClaim(deposit)
+      })
+
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Fee exceeded 420" }),
+      )
+    })
+
+    it("says the deposit is waiting for confirmations, not that it was claimed", async () => {
+      mockClaimDeposit.mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "Deposit cannot be claimed before it confirms" }],
+        deferral: DepositClaimDeferral.AwaitingConfirmations,
+      })
+      const { result } = renderHook(() => useDepositActions())
+
+      await act(async () => {
+        await result.current.handleClaim(buildDeposit())
+      })
+
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Waiting for confirmations..." }),
+      )
+    })
+
+    it("says the deposit is too small when the claim finds it so", async () => {
+      mockClaimDeposit.mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "Deposit is too small to claim after fees" }],
+        errorReason: DepositErrorReason.BelowDust,
+      })
+      const { result } = renderHook(() => useDepositActions())
+
+      await act(async () => {
+        await result.current.handleClaim(buildDeposit())
+      })
+
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Below dust" }),
+      )
+    })
+
+    it("shows the provider's reason when it declined the claim", async () => {
+      mockClaimDeposit.mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "quote expired" }],
+        deferral: DepositClaimDeferral.ProviderDeclined,
+      })
+      const { result } = renderHook(() => useDepositActions())
+
+      await act(async () => {
+        await result.current.handleClaim(buildDeposit())
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Claim failed: quote expired" }),
+      )
+    })
+
+    it("says a claim already running is in progress, and refreshes the list", async () => {
+      mockClaimDeposit.mockResolvedValue({ status: PaymentResultStatus.Pending })
+      const { result } = renderHook(() => useDepositActions())
+      await waitFor(() => expect(mockListPendingDeposits).toHaveBeenCalledTimes(1))
+
+      await act(async () => {
+        await result.current.handleClaim(buildDeposit())
+      })
+
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Claiming...", type: "warning" }),
+      )
+      expect(mockListPendingDeposits).toHaveBeenCalledTimes(2)
     })
   })
 

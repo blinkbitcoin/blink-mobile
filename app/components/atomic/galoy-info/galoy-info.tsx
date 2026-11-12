@@ -54,7 +54,7 @@ const useStyles = makeStyles(({ colors }, props: StyleProps) => ({
     paddingVertical: 6,
     borderTopRightRadius: 8,
     borderBottomRightRadius: 8,
-    backgroundColor: props.backgroundColor ?? colors.grey5,
+    backgroundColor: props.backgroundColor ?? colors.surfaceInteractive,
   },
   verticalLine: {
     width: 3,

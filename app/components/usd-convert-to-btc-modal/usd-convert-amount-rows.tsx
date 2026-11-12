@@ -50,7 +50,7 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 16,
     lineHeight: 22,
     marginTop: 8,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
   },
   rows: {
@@ -64,11 +64,11 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   label: {
     fontSize: 16,
-    color: colors.grey3,
+    color: colors.textDisabled,
   },
   value: {
     fontSize: 16,
     fontWeight: "bold",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

@@ -57,7 +57,10 @@ jest.mock("@app/self-custodial/hooks/use-pending-deposits", () => ({
 }))
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({
-  useSelfCustodialWallet: () => mockSelfCustodialWallet(),
+  useSelfCustodialWallet: () => ({
+    connectedAccountId: "sc-account-1",
+    ...mockSelfCustodialWallet(),
+  }),
 }))
 
 jest.mock("@app/hooks/use-active-wallet", () => ({

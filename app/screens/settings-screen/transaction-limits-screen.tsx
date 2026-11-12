@@ -21,7 +21,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 const useStyles = makeStyles(({ colors }) => ({
   limitWrapper: {
     padding: 20,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
   },
   increaseLimitsButtonContainer: {
     marginVertical: 20,
@@ -39,18 +39,18 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   valueRemaining: {
     fontWeight: "bold",
-    color: colors._green,
+    color: colors.staticSuccess,
     maxWidth: "50%",
   },
   valueTotal: {
     fontWeight: "bold",
-    color: colors.grey3,
+    color: colors.textDisabled,
     maxWidth: "50%",
   },
   divider: {
     marginVertical: 0,
     borderWidth: 1,
-    borderColor: colors.grey4,
+    borderColor: colors.neutral,
   },
   errorWrapper: {
     justifyContent: "center",
@@ -69,18 +69,6 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     marginTop: "50%",
     marginBottom: "50%",
-  },
-  increaseLimitsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    columnGap: 5,
-    padding: 20,
-  },
-  increaseLimitsText: {
-    color: colors.primary,
-    fontWeight: "600",
-    fontSize: 15,
-    textDecorationLine: "underline",
   },
 }))
 
@@ -172,7 +160,7 @@ export const TransactionLimitsScreen = () => {
     return (
       <Screen>
         <View style={styles.loadingWrapper}>
-          <ActivityIndicator animating size="large" color={colors.primary} />
+          <ActivityIndicator animating size="large" color={colors.accent} />
         </View>
       </Screen>
     )

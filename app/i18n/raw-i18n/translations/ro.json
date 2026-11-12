@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Chei API",
+    "inactiveKeys": "Chei inactive ({count})",
     "noKeys": "Încă nu există chei API",
     "createKey": "Creează cheie API",
     "createTitle": "Cheie API nouă",
@@ -27,6 +28,7 @@
     "revokeTitle": "Revoci cheia API?",
     "revokeBody": "\"{name: string}\" va înceta imediat să funcționeze. Această acțiune nu poate fi anulată.",
     "revoke": "Revocă",
+    "revokeGoBack": "Înapoi",
     "revokeSuccess": "Cheie API revocată",
     "createError": "Cheia API nu a putut fi creată. Încearcă din nou.",
     "revokeError": "Cheia API nu a putut fi revocată. Încearcă din nou.",
@@ -2140,7 +2142,9 @@
     "selectAll": "Selectează tot",
     "clearAll": "Șterge tot",
     "addPlace": "Adaugă pe hartă",
-    "addPlaceTitle": "Adaugă un loc",
+    "addPlaceTitle": "Sugerează un local",
+    "submitPlaceRequest": "Trimite cererea",
+    "showMyLocation": "Arată locația mea",
     "placePinHint": "Mută harta pentru a pune indicatorul pe loc",
     "placeName": "Nume",
     "placeNameHint": "Cum se numește locul",
@@ -2229,6 +2233,12 @@
     "error": "Nu s-a reușit generarea facturii. Vă rugăm să contactați asistența dacă această problemă persistă.",
     "copyInvoice": "Copiați",
     "shareInvoice": "Partajare",
+    "newAddress": "Nouă",
+    "newAddressHint": "Generează o adresă Bitcoin nouă. Adresele anterioare funcționează în continuare.",
+    "newAddressGenerated": "Adresa nouă este gata. Adresele anterioare funcționează în continuare.",
+    "newAddressFailed": "Nu s-a putut genera o adresă nouă. Încercați din nou.",
+    "newAddressRateLimited": "Prea multe adrese noi. Așteptați puțin și încercați din nou.",
+    "onchainAddressLoadFailed": "Adresa dvs. Bitcoin nu a putut fi încărcată. Atingeți Nouă pentru a încerca din nou.",
     "addAmount": "Specificați suma solicitată",
     "expired": "Factura a expirat",
     "expiresIn": "Expiră în",
@@ -2364,6 +2374,8 @@
     "invalidAmount": "Aceasta conține o sumă nevalidă. Vă rugăm să vă regenerați cu o sumă validă.",
     "usernameDoesNotExist": "{lnAddress: string} nu pare a fi o adresă {bankName: string} care există.",
     "usernameDoesNotExistAdvice": "Asigurați-vă că ortografia este corectă sau cereți destinatarului o factură LN sau o adresă BTC.",
+    "destinationUnverifiable": "Nu am putut verifica {lnAddress} acum — serverele {bankName} nu răspund.",
+    "destinationUnverifiableAdvice": "Adresa este probabil corectă. Încearcă din nou într-o clipă sau cere destinatarului o factură LN ori o adresă BTC.",
     "selfPaymentError": "{lnAddress: string} este adresa {bankName: string}.",
     "selfPaymentAdvice": "Dacă doriți să trimiteți bani către un alt cont pe care îl dețineți, puteți utiliza în schimb o factură, o adresă LN sau BTC.",
     "lnAddressError": "Nu putem avea acces la această adresă Lightning. Dacă sunteți sigur că există, puteți încerca din nou mai târziu.",
@@ -2586,12 +2598,14 @@
     "error": "Nu se pot obține profilurile în acest moment",
     "fromThisDevice": "de pe acest dispozitiv?",
     "switchAccount": "Ați comutat pe alt cont",
-    "removedAccount": "Ați eliminat contul {identifier: string}."
+    "removedAccount": "Ați eliminat contul {identifier: string}.",
+    "removeAccount": "Elimină contul"
   },
   "StablesatsRestriction": {
     "walletLabel": "nu este disponibil în regiunea ta",
     "anonModeWalletLabel": "indisponibil în modul Incognito",
-    "unknownRegionWalletLabel": "disponibilitatea nu a putut fi verificată, trage în jos pentru a reîncerca"
+    "unknownRegionWalletLabel": "disponibilitatea nu a putut fi verificată, trage în jos pentru a reîncerca",
+    "networkWalletLabel": "indisponibil în această rețea"
   },
   "AnonModeConvertModal": {
     "title": "Transferă mai întâi soldul tău în dolari",
@@ -2757,6 +2771,7 @@
       "tooLong": "Adresa poate să aibă cel mult 50 de caractere",
       "invalidCharacter": "Adresa poate conține doar litere, cifre și caractere de subliniere",
       "addressUnavailable": "Ne pare rău, această adresă este deja luată",
+      "serverUnreachable": "Serverul de adrese nu a putut fi contactat. Încearcă din nou într-o clipă.",
       "unknownError": "A apărut o eroare necunoscută, încercați din nou mai târziu",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3069,7 +3084,6 @@
     "faq": "FAQ",
     "statusPage": "Pagina de stare",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Asistență",
     "defaultSupportMessage": "Bună! Am nevoie de ajutor cu {bankName: string}, folosesc versiunea {version: string} pe {os: string}.",
     "emailCopied": "e-mail {email: string} copiat în clipboard",
@@ -3083,7 +3097,13 @@
     "deleteAccountFromPhone": "Bună!, vă rugăm să închideți contul meu. Numărul meu de telefon este {phoneNumber: string}.",
     "deleteAccountError": "Ceva nu a mers bine. Contactați {email: string} pentru asistență suplimentară.",
     "bye": "La revedere!",
-    "deleteAccountWarning": "Atenție: Închiderea contului este permanentă!\nAsigurați-vă că portofelele nu au fonduri înainte de închidere.\nUn cont închis nu poate fi restabilit.\nEste posibil să păstrăm anumite înregistrări conform cerințelor legale."
+    "deleteAccountWarning": "Atenție: Închiderea contului este permanentă!\nAsigurați-vă că portofelele nu au fonduri înainte de închidere.\nUn cont închis nu poate fi restabilit.\nEste posibil să păstrăm anumite înregistrări conform cerințelor legale.",
+    "downloadLogs": "Descarcă jurnalele",
+    "exportLogsTitle": "Partajează jurnalele portofelului",
+    "exportLogsBody": "Acest fișier ajută echipa noastră de asistență să investigheze problemele portofelelor tale. Include istoricul plăților (sume, facturi și adrese) și identificatorii fiecărui portofel non-custodial de pe acest dispozitiv, nu doar al acestuia, dar niciodată frazele de recuperare sau cheile. Partajează-l doar cu echipa noastră de asistență.",
+    "exportLogsConfirm": "Partajează jurnalele",
+    "noLogsYet": "Nu există încă jurnale de partajat. Deschide portofelul și încearcă din nou.",
+    "exportLogsError": "Nu s-au putut exporta jurnalele. Încearcă din nou."
   },
   "lnurl": {
     "overLimit": "Nu puteți trimite mai mult decât suma maximă",
@@ -3238,7 +3258,10 @@
       "noLimit": "Fără limită",
       "limitUpdateSuccess": "Limita a fost actualizată cu succes",
       "limitUpdateError": "Nu s-a putut actualiza limita",
-      "limitMustBePositive": "Limita trebuie să fie mai mare decât zero"
+      "limitMustBePositive": "Limita trebuie să fie mai mare decât zero",
+      "atmToggleError": "Nu s-au putut actualiza retragerile ATM",
+      "atmControlsLoadError": "Nu s-au putut încărca limitele ATM",
+      "invalidLimitAmount": "Introdu o sumă validă cu cel mult 2 zecimale"
     },
     "CardFeeSchedule": {
       "title": "Grila de taxe a cardului Blink",
@@ -3813,7 +3836,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Fă o copie de siguranță a portofelului",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Alege metoda de backup",
@@ -3871,6 +3894,7 @@
     "CloudBackup": {
       "title": "Să facem o copie de siguranță a portofelului tău",
       "description": "Vom salva o copie a frazei de recuperare în {provider} tău.",
+      "encryptCheckbox": "Criptează cu o parolă suplimentară",
       "password": "Parolă",
       "passwordPlaceholder": "(minim 12 caractere)",
       "confirmPassword": "Confirmă parola",
@@ -3938,6 +3962,12 @@
     "dollarBalanceModal": {
       "title": "Nu îți putem migra soldul în dolari",
       "body": "Golește mai întâi soldul în dolari. Îl poți transfera în soldul tău Bitcoin din Blink sau în altă parte."
+    },
+    "pendingDepositModal": {
+      "title": "Există un depozit în așteptare în contul tău",
+      "body": "Nu poți migra către un alt tip de cont până când toate depozitele tale în așteptare nu au fost decontate și creditate în acest cont.",
+      "contactSupportCta": "Contactează asistența",
+      "stillConfirming": "Depozitul tău nu este încă confirmat. Încearcă din nou peste câteva minute."
     },
     "balancesOverview": {
       "title": "Mută-ți soldul",
@@ -4126,6 +4156,7 @@
     "get": "Descarcă",
     "storeNote": "„Descarcă” deschide App Store sau Google Play. Revino în Blink după ce aplicația s-a instalat.",
     "haveAnApp": "Am deja o aplicație",
+    "learnHow": "Află cum",
     "keyInstruction": "Copiază această cheie de configurare în aplicația ta de autentificare.",
     "qrInstruction": "Folosești alt dispozitiv?\nScanează în schimb acest cod QR.",
     "backupTitle": "Fă o copie de rezervă a cheii",
@@ -4212,6 +4243,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink nu poate fi contactat",
+    "unreachableDescription": "{featureName} are nevoie de serverele Blink, care nu răspund în acest moment. Portofelul și fondurile tale nu sunt afectate.",
     "featureCircles": "Circles",
     "featureEarn": "Învață",
     "featureCard": "Card"
@@ -4234,6 +4267,9 @@
     "tokenTransfer": "Transfer {token}",
     "payTo": "Plătește la {address}",
     "payment": "Plată"
+  },
+  "SelfCustodialStaleRate": {
+    "satsOnly": "Se afișează sats — niciun curs de schimb disponibil"
   },
   "SelfCustodialOffline": {
     "title": "Portofelul este offline",

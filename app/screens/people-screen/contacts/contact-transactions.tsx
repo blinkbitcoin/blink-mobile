@@ -203,7 +203,7 @@ export const ContactTransactions = ({ contact }: Props) => {
 
   const ListEmptyContent = isLoadingTransactions ? (
     <View style={styles.activityIndicatorView} testID="contact-transactions-loading">
-      <ActivityIndicator size="large" color={colors.primary} />
+      <ActivityIndicator size="large" color={colors.accent} />
     </View>
   ) : (
     <View style={styles.noTransactionView} testID="contact-no-transactions">
@@ -261,7 +261,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   sectionHeaderText: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     lineHeight: 20,
   },
