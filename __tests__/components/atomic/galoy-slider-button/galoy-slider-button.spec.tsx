@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleSheet, type ViewStyle } from "react-native"
+import { StyleSheet, View, type ViewStyle } from "react-native"
 import { type PanGesture, State } from "react-native-gesture-handler"
 import {
   fireGestureHandler,
@@ -258,6 +258,16 @@ describe("GaloySliderButton", () => {
       expect(handle().props.accessibilityRole).toBe("button")
       expect(handle().props.accessibilityLabel).toBe("Slide to send")
       expect(handle().props.accessibilityActions).toEqual([{ name: "activate" }])
+    })
+
+    it("hands the native handle to handleRef, so a screen can move focus to it", async () => {
+      const handleRef = React.createRef<View>()
+      await renderSlider({ handleRef })
+
+      expect(typeof handleRef.current?.measure).toBe("function")
+      expect(
+        (handleRef.current as unknown as { props: { testID?: string } }).props.testID,
+      ).toBe("slider")
     })
 
     it("turns busy on activate, as a full slide does", async () => {
