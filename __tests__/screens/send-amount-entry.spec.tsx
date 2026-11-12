@@ -758,18 +758,17 @@ describe("amount currency", () => {
  * one line, centred in a card that keeps its two-line height.
  */
 describe("screen reader focus on open", () => {
-  const sendAccessibilityEvent = jest.spyOn(AccessibilityInfo, "sendAccessibilityEvent")
-  const isScreenReaderEnabled = jest.spyOn(AccessibilityInfo, "isScreenReaderEnabled")
+  // react-native's jest mocks: no screen reader by default, and no focus sent.
+  const isScreenReaderEnabled = jest.mocked(AccessibilityInfo.isScreenReaderEnabled)
+  const sendAccessibilityEvent = jest.mocked(AccessibilityInfo.sendAccessibilityEvent)
 
   beforeEach(() => {
     isScreenReaderEnabled.mockResolvedValue(true)
-    sendAccessibilityEvent.mockImplementation(() => undefined).mockClear()
+    sendAccessibilityEvent.mockClear()
   })
 
-  // Only this block's spies: the rest of the file keeps its own.
   afterAll(() => {
-    isScreenReaderEnabled.mockRestore()
-    sendAccessibilityEvent.mockRestore()
+    isScreenReaderEnabled.mockResolvedValue(false)
   })
 
   /** The test ID of each native node screen reader focus was sent to. */
