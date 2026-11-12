@@ -52,7 +52,7 @@ export const InfoRow: React.FC<InfoRowProps> = ({
           <Text style={[styles.value, styles.hidden]}> </Text>
           <ActivityIndicator
             size="small"
-            color={colors.grey2}
+            color={colors.textMuted}
             style={styles.spinner}
             testID={`${label} loading`}
           />

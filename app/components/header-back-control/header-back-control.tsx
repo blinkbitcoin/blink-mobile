@@ -67,7 +67,7 @@ export const HeaderBackButtonWithTheme = ({
       // overrides the icon's theme default and leaves the raw black glyph: invisible on a
       // dark background. The native header passes headerTintColor; a bare render must not
       // depend on that.
-      tintColor={props.tintColor ?? colors.black}
+      tintColor={props.tintColor ?? colors.textOnBackground}
       onPress={handleBack}
       pressColor={colors.surfaceInteractive}
       pressOpacity={1}

@@ -154,7 +154,7 @@ describe("headerBackControl", () => {
     const rendered = renderHeaderLeft(<HeaderBackButtonWithTheme />)
 
     expect(rendered.UNSAFE_getByType(Image).props.tintColor).toBe(
-      theme.lightColors?.black,
+      theme.lightColors?.textOnBackground,
     )
   })
 

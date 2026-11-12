@@ -57,14 +57,14 @@ export const Chip: React.FC<ChipProps> = ({
       >
         {label}
       </Text>
-      {loading && <ActivityIndicator style={styles.spinner} color={colors.primary} />}
+      {loading && <ActivityIndicator style={styles.spinner} color={colors.accent} />}
     </TouchableOpacity>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
   chip: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
@@ -72,13 +72,13 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 14,
   },
   chipSelected: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
   },
   chipDisabled: {
     opacity: 0.5,
   },
   chipText: {
-    color: colors.primary,
+    color: colors.accent,
     fontFamily: fonts.bold,
     fontSize: 14,
     lineHeight: 20,

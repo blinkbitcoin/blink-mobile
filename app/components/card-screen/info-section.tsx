@@ -77,7 +77,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 14,
   },
   cardInactive: {
-    backgroundColor: colors.grey7,
+    backgroundColor: colors.surfaceStatic,
   },
   outline: {
     position: "absolute",
