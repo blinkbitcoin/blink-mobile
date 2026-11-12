@@ -441,7 +441,7 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
             centerY={anchor.y}
             radius={PULSE_RADIUS}
             innerColor="transparent"
-            rimColor={colors._white}
+            rimColor={colors.staticWhite}
           />
         </Animated.View>
         {/* Unmounted once it lands: Android composites a Skia canvas on its own surface,
@@ -452,7 +452,7 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
               <RadialGradient
                 c={center}
                 r={irisRadius}
-                colors={["transparent", "transparent", GLOW, colors._green]}
+                colors={["transparent", "transparent", GLOW, colors.staticSuccess]}
                 positions={irisPositions}
               />
             </Rect>
@@ -491,13 +491,13 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
                     <PendingHourglass
                       key={impactKey}
                       size={HOURGLASS_SIZE}
-                      color={colors._white}
+                      color={colors.staticWhite}
                     />
                   ) : (
                     <SuccessBadge
                       key={impactKey}
                       size={BADGE_SIZE}
-                      color={colors._white}
+                      color={colors.staticWhite}
                     />
                   ))}
               </Animated.View>
@@ -513,7 +513,7 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
                   testID="incoming-transaction-splash-amount"
                 >
                   {masked ? (
-                    <HiddenBalancePlaceholder size="large" color={colors._white} />
+                    <HiddenBalancePlaceholder size="large" color={colors.staticWhite} />
                   ) : (
                     <Text
                       bold
@@ -559,8 +559,8 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
                 label={LL.IncomingTransactionSplash.dontShowAgain()}
                 isChecked={optedOut}
                 onPress={() => interactive && setOptedOut((value) => !value)}
-                color={colors._white}
-                checkColor={colors._green}
+                color={colors.staticWhite}
+                checkColor={colors.staticSuccess}
                 centered
                 singleLine
                 testID="incoming-transaction-splash-opt-out"
@@ -591,8 +591,8 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
               name="close"
               size="medium"
               iconOnly
-              backgroundColor={colors._green}
-              color={colors._white}
+              backgroundColor={colors.staticSuccess}
+              color={colors.staticWhite}
               onPress={close}
               {...testProps("incoming-transaction-splash-close")}
             />
@@ -605,7 +605,7 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   ground: {
-    backgroundColor: colors._green,
+    backgroundColor: colors.staticSuccess,
   },
   container: {
     flex: 1,
@@ -635,7 +635,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 14,
   },
   white: {
-    color: colors._white,
+    color: colors.staticWhite,
     textAlign: "center",
   },
   amount: {
@@ -683,13 +683,13 @@ const useStyles = makeStyles(({ colors }) => ({
   // weight: a weight on Source Sans Pro draws Roboto Bold on Android.
   closeButton: {
     minHeight: 50,
-    backgroundColor: colors._black,
+    backgroundColor: colors.staticBlack,
   },
   closeButtonTitle: {
     fontSize: 20,
     lineHeight: 24,
     fontFamily: fonts.bold,
-    color: colors._white,
+    color: colors.staticWhite,
   },
   closeIcon: {
     position: "absolute",
