@@ -138,18 +138,27 @@ const persistenceOf = new WeakMap<Map<string, LostAttempts>, WalletPersistence>(
  */
 const BECH32 = /^[a-z0-9]+1[qpzry9x8gf2tvdw0s3jn54khce6mua7l]+$/
 
+/** A Lightning address: a user, then @, then the domain that serves it, a host name and
+ *  nothing more, so a URL's path is never taken for one. */
+const LIGHTNING_ADDRESS = /^([^@\s/]+)@([a-zA-Z0-9.-]+)$/
+
 /**
  * The destination as the store knows it. A bech32 destination pasted lower case and
- * scanned upper case is one, so it is lowercased. Nothing else is: a base58 address, a
- * URL path or a Lightning address user can name another recipient in another case, and
- * two recipients merged into one would let a payment to the first be reported as a send
- * to the second.
+ * scanned upper case is one, so it is lowercased, and so is a Lightning address's domain,
+ * which names its server in any case. Nothing else is: a base58 address, a URL path or a
+ * Lightning address user can name another recipient in another case, and two recipients
+ * merged into one would let a payment to the first be reported as a send to the second.
  */
 const storeKeyOf = (destination: string): string => {
   const trimmed = destination.trim()
   const lower = trimmed.toLowerCase()
   const isOneCase = trimmed === lower || trimmed === trimmed.toUpperCase()
-  return isOneCase && BECH32.test(lower) ? lower : trimmed
+  const isBech32 = isOneCase && BECH32.test(lower)
+  if (isBech32) return lower
+  const lightningAddress = LIGHTNING_ADDRESS.exec(trimmed)
+  if (!lightningAddress) return trimmed
+  const [, user, domain] = lightningAddress
+  return `${user}@${domain.toLowerCase()}`
 }
 
 /**

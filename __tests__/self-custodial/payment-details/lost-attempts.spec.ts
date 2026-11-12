@@ -36,10 +36,23 @@ describe("the lost-attempt store", () => {
     expect(lostAttemptsTo(" lnbc2500u1pvjluez ")).toEqual({ unresolvedSend })
   })
 
+  /** A domain names its server in any case: the same recipient typed another way. */
+  it("knows a Lightning address whatever the case of its domain", () => {
+    remember("alice@Example.COM", { unresolvedSend })
+
+    expect(lostAttemptsTo("alice@example.com")).toEqual({ unresolvedSend })
+    expect(lostAttemptsTo(" alice@EXAMPLE.com ")).toEqual({ unresolvedSend })
+  })
+
   /** Another case can name another recipient: never one destination's payment taken for
    *  a send to the other. */
   const otherRecipientInAnotherCase: ReadonlyArray<[string, string, string]> = [
     ["a URL path", "lnurlp://example.com/Alice", "lnurlp://example.com/alice"],
+    [
+      "a URL path after a user",
+      "https://pay@example.com/Alice",
+      "https://pay@example.com/alice",
+    ],
     ["a Lightning address user", "Alice@example.com", "alice@example.com"],
     [
       "a base58 address",
