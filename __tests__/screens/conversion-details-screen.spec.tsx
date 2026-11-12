@@ -30,6 +30,7 @@ import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import theme from "@app/rne-theme/theme"
+import { haptics } from "@app/utils/haptics"
 import { createCache } from "@app/graphql/cache"
 import { DisplayCurrency as DisplayCurrencyType } from "@app/types/amounts"
 import { withDeviceLocale } from "../helpers/device-locale"
@@ -45,6 +46,11 @@ withDeviceLocale("en-US")
 
 /** The dollar-balance guard now holds the screen until remote config lands, and the
  *  context default outside a provider is never-ready, which would hide it for good. */
+jest.mock("@app/utils/haptics", () => {
+  const actual = jest.requireActual("@app/utils/haptics")
+  return { haptics: { ...actual.haptics, select: jest.fn() } }
+})
+
 jest.mock("@app/config/feature-flags-context", () => ({
   ...jest.requireActual("@app/config/feature-flags-context"),
   useFeatureFlags: () => ({ remoteConfigReady: true }),
@@ -2598,5 +2604,42 @@ describe("ConversionDetailsScreen region gate", () => {
       expect(getByTestId("wallet-toggle-button")).toBeTruthy()
     })
     expect(queryByTestId("conversion-details-region-pending")).toBeNull()
+  })
+})
+
+describe("Wallet toggle select haptic", () => {
+  beforeEach(() => {
+    jest.useFakeTimers()
+    jest.mocked(haptics.select).mockClear()
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  it("fires once per press of the from/to toggle", async () => {
+    const Wrapper = createTestWrapper(
+      createGraphQLMocks({ btcBalance: 100000, usdBalance: 50000 }),
+    )
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+    await waitFor(() => {
+      expect(getByTestId("wallet-toggle-button")).toBeTruthy()
+    })
+
+    await act(async () => {
+      fireEvent.press(getByTestId("wallet-toggle-button"))
+    })
+    act(() => {
+      jest.advanceTimersByTime(200)
+    })
+    await act(async () => {
+      fireEvent.press(getByTestId("wallet-toggle-button"))
+    })
+
+    expect(haptics.select).toHaveBeenCalledTimes(2)
   })
 })

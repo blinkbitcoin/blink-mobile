@@ -3,6 +3,9 @@ import { ActivityIndicator, StyleSheet, Text as ReactNativeText } from "react-na
 import { render, fireEvent, screen } from "@testing-library/react-native"
 
 import { PercentageSelector } from "@app/components/percentage-selector/percentage-selector"
+import { haptics } from "@app/utils/haptics"
+
+jest.mock("@app/utils/haptics", () => ({ haptics: { select: jest.fn() } }))
 
 jest.mock("@rn-vui/themed", () => ({
   Text: (props: React.ComponentProps<typeof ReactNativeText>) => (
@@ -152,6 +155,56 @@ describe("PercentageSelector", () => {
     fireEvent.press(getByText("50%"))
 
     expect(mockOnSelect).not.toHaveBeenCalled()
+  })
+
+  describe("select haptic", () => {
+    it("fires once per chip press, before the selection", () => {
+      const order: string[] = []
+      jest.mocked(haptics.select).mockImplementation(() => order.push("haptic"))
+      mockOnSelect.mockImplementation(() => order.push("select"))
+      render(
+        <PercentageSelector
+          isLocked={false}
+          loadingPercent={null}
+          onSelect={mockOnSelect}
+        />,
+      )
+
+      fireEvent.press(screen.getByText("25%"))
+      fireEvent.press(screen.getByText("100%"))
+
+      expect(haptics.select).toHaveBeenCalledTimes(2)
+      expect(order).toEqual(["haptic", "select", "haptic", "select"])
+    })
+
+    it("stays silent on a locked chip", () => {
+      render(
+        <PercentageSelector
+          isLocked={true}
+          loadingPercent={null}
+          onSelect={mockOnSelect}
+        />,
+      )
+
+      fireEvent.press(screen.getByText("50%"))
+
+      expect(haptics.select).not.toHaveBeenCalled()
+    })
+
+    it("stays silent on a disabled option", () => {
+      render(
+        <PercentageSelector
+          isLocked={false}
+          loadingPercent={null}
+          onSelect={mockOnSelect}
+          disabledOptions={[100]}
+        />,
+      )
+
+      fireEvent.press(screen.getByText("100%"))
+
+      expect(haptics.select).not.toHaveBeenCalled()
+    })
   })
 
   it("shows ActivityIndicator when loadingPercent matches option", () => {
