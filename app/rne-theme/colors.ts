@@ -40,9 +40,11 @@ const lightSemantic = {
 
   neutral: "#E2E2E4",
 
-  surfaceInteractive: "#F2F2F4", // tappable surface, at rest
+  // Field fills darkened by design ruling (Nov 2026) to improve contrast
+  // against backgroundDefault; surfaceStatic stays lighter than surfaceInteractive.
+  surfaceInteractive: "#ECECEE", // tappable surface, at rest
   surfacePressed: "#E7E7E7", // surfaceInteractive while held — transient only
-  surfaceStatic: "#F9F9F9", // cannot be tapped, ever — cards, banners, read-only
+  surfaceStatic: "#F2F2F2", // cannot be tapped, ever — cards, banners, read-only
 
   accent: "#fc5805",
   accent2: "#fd800b", // accent2–4 are the mirrored ramp kept for existing gradients
@@ -78,7 +80,7 @@ const darkSemantic = {
 
   surfaceInteractive: "#1d1d1d",
   surfacePressed: "#2B2B2B",
-  surfaceStatic: "#0F0F0F",
+  surfaceStatic: "#171717", // lightened by design ruling to improve contrast
 
   accent: "#ffad0d",
   accent2: "#fe990d",
