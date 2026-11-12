@@ -164,8 +164,8 @@ export const NotificationHistoryScreen = () => {
           <RefreshControl
             refreshing={loading && isFocused}
             onRefresh={refetch}
-            colors={[colors.primary]} // Android refresh indicator colors
-            tintColor={colors.primary} // iOS refresh indicator color
+            colors={[colors.accent]} // Android refresh indicator colors
+            tintColor={colors.accent} // iOS refresh indicator color
           />
         }
         data={notifications?.nodes.filter((n) => !n.bulletinEnabled)}

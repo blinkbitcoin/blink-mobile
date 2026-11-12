@@ -2,7 +2,11 @@ import React from "react"
 import { render, act, fireEvent } from "@testing-library/react-native"
 
 import { MigrationGate } from "@app/screens/account-migration/to-non-custodial/migration-gate"
-import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
+import {
+  MigrationSupportOrigin,
+  MigrationSupportReason,
+  PendingDepositCheckStatus,
+} from "@app/types/migration"
 import { WindDown, WindDownStatus } from "@app/types/wind-down"
 import { StorageFailure } from "@app/utils/storage/storage-failure"
 
@@ -14,6 +18,7 @@ let mockIsFocused = true
 const mockUseActiveApiKeys = jest.fn()
 let mockWindDown: WindDown | null = null
 let mockIsMigrationLocked = false
+let mockIsMigrationCommitted = false
 let mockLockLoading = false
 let mockLockError = false
 const mockRefetchLock = jest.fn()
@@ -73,6 +78,17 @@ const mockDollarBalanceModal = jest.fn(
     )
   },
 )
+const mockPendingDepositModal = jest.fn(
+  (props: {
+    isVisible: boolean
+    onAcknowledge: () => void
+    showCloseIconButton?: boolean
+  }) => {
+    const { Pressable } = jest.requireActual("react-native")
+    return <Pressable testID="gate-pending-deposit-ok" onPress={props.onAcknowledge} />
+  },
+)
+const mockUseCustodialPendingDeposits = jest.fn()
 const mockUnavailableScreen = jest.fn(() => null)
 /** Keeps the testID the gate hands it, so the specs find the button by the id the screen
  *  actually ships rather than one the mock invents. */
@@ -115,6 +131,19 @@ const apiKeysState = (overrides: Record<string, unknown> = {}) => ({
   ...overrides,
 })
 
+/** A settled check with nothing pending, which cases override field by field. */
+const pendingDepositsState = (overrides: Record<string, unknown> = {}) => ({
+  hasPendingDeposit: false,
+  loading: false,
+  isReady: true,
+  hasError: false,
+  check: jest.fn().mockResolvedValue({ status: PendingDepositCheckStatus.Clear }),
+  recheck: jest.fn().mockResolvedValue({ status: PendingDepositCheckStatus.Clear }),
+  isRecheckRunning: false,
+  isStillPending: false,
+  ...overrides,
+})
+
 /** Only the status drives the intro mode, so the display fields stay fixed across cases. */
 const windDownWith = (status: WindDownStatus): WindDown => ({
   status,
@@ -132,7 +161,7 @@ jest.mock("@react-navigation/native", () => ({
 
 jest.mock("@rn-vui/themed", () => ({
   ...jest.requireActual("@rn-vui/themed"),
-  useTheme: () => ({ theme: { colors: { primary: "#fb5607", warning: "#f0a202" } } }),
+  useTheme: () => ({ theme: { colors: { accent: "#fb5607", warning: "#f0a202" } } }),
 }))
 
 jest.mock("@app/components/screen", () => ({
@@ -162,6 +191,32 @@ jest.mock("@app/screens/account-migration/hooks/use-reusable-pending-wallet", ()
   }),
 }))
 
+const mockSendDepositSupportEmail = jest.fn()
+const mockUseMigrationSupportEmail = jest.fn()
+jest.mock("@app/screens/account-migration/hooks/use-migration-support-email", () => ({
+  useMigrationSupportEmail: (reason: string) => {
+    mockUseMigrationSupportEmail(reason)
+    return {
+      sendSupportEmail: mockSendDepositSupportEmail,
+      cardDetails: [],
+      supportDetailsText: "",
+    }
+  },
+}))
+
+jest.mock("@app/screens/account-migration/hooks/use-custodial-pending-deposits", () => ({
+  useCustodialPendingDeposits: (options: { skip?: boolean }) =>
+    mockUseCustodialPendingDeposits(options),
+}))
+
+jest.mock("@app/screens/account-migration/pending-deposit-modal", () => ({
+  PendingDepositModal: (props: {
+    isVisible: boolean
+    onAcknowledge: () => void
+    showCloseIconButton?: boolean
+  }) => mockPendingDepositModal(props),
+}))
+
 jest.mock("@app/screens/account-migration/hooks/use-custodial-wind-down", () => ({
   useCustodialWindDown: () => mockWindDown,
 }))
@@ -169,6 +224,7 @@ jest.mock("@app/screens/account-migration/hooks/use-custodial-wind-down", () => 
 jest.mock("@app/screens/account-migration/hooks/use-migration-lock", () => ({
   useMigrationLock: () => ({
     isLocked: mockIsMigrationLocked,
+    isCommitted: mockIsMigrationCommitted,
     loading: mockLockLoading,
     hasError: mockLockError,
     refetch: mockRefetchLock,
@@ -282,6 +338,7 @@ const resetGateMocks = (): void => {
   mockWindDown = null
   mockSelfCustodialDisabled = false
   mockIsMigrationLocked = false
+  mockIsMigrationCommitted = false
   mockLockLoading = false
   mockLockError = false
   mockCheckpointLoading = false
@@ -293,6 +350,7 @@ const resetGateMocks = (): void => {
   mockPendingWalletLoading = false
   mockPendingWalletError = false
   mockUseActiveApiKeys.mockReturnValue(apiKeysState())
+  mockUseCustodialPendingDeposits.mockReturnValue(pendingDepositsState())
   mockRefetchWalletOverview.mockResolvedValue(undefined)
   mockRefetchLock.mockResolvedValue(undefined)
   mockRefetchCheckpoint.mockResolvedValue(undefined)
@@ -1001,6 +1059,434 @@ describe("MigrationGate", () => {
     render(<MigrationGate />)
 
     expect(mockRequiredScreen.mock.calls[0][0].mode).toBe("forcedPreDeadline")
+  })
+})
+
+describe("MigrationGate, with a deposit still confirming", () => {
+  beforeEach(resetGateMocks)
+
+  it("holds a loading screen while the pending-deposit check loads", () => {
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ loading: true, isReady: false }),
+    )
+
+    const { getByTestId } = render(<MigrationGate />)
+
+    expect(getByTestId("migration-gate-loading")).toBeTruthy()
+    expect(mockRequiredScreen).not.toHaveBeenCalled()
+    expect(mockPendingDepositModal).not.toHaveBeenCalled()
+  })
+
+  it("shows a retry instead of the intro when the pending-deposit check fails", () => {
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasError: true, isReady: false }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPrimaryButton).toHaveBeenCalled()
+    expect(mockRequiredScreen).not.toHaveBeenCalled()
+    expect(mockPendingDepositModal).not.toHaveBeenCalled()
+  })
+
+  it("asks for the pending deposits again from that retry", async () => {
+    const check = jest.fn().mockResolvedValue({ status: PendingDepositCheckStatus.Clear })
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({
+        hasError: true,
+        isReady: false,
+        check,
+      }),
+    )
+
+    const { getByTestId } = render(<MigrationGate />)
+    fireEvent.press(getByTestId("gate-retry-button"))
+    await act(async () => {})
+
+    expect(check).toHaveBeenCalledTimes(1)
+  })
+
+  it("blocks entry with the pending-deposit modal over the intro", () => {
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockRequiredScreen).toHaveBeenCalledWith(
+      expect.objectContaining({ mode: "voluntary", isExitBlocked: false }),
+    )
+    expect(mockPendingDepositModal).toHaveBeenCalledWith(
+      expect.objectContaining({ isVisible: true, showCloseIconButton: true }),
+    )
+  })
+
+  it("warns about the API keys before the pending deposit", () => {
+    mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasActiveApiKeys: true }))
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockApiServiceScreen).toHaveBeenCalled()
+    expect(mockPendingDepositModal).not.toHaveBeenCalled()
+  })
+
+  it("asks for the dollar balance to be emptied before the pending deposit", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 20 }),
+    )
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockDollarBalanceModal).toHaveBeenCalled()
+    expect(mockPendingDepositModal).not.toHaveBeenCalled()
+  })
+
+  it("leaves the flow from OK where the user can still leave", () => {
+    const check = jest.fn().mockResolvedValue({ status: PendingDepositCheckStatus.Clear })
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, check }),
+    )
+
+    const { getByTestId } = render(<MigrationGate />)
+    fireEvent.press(getByTestId("gate-pending-deposit-ok"))
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(check).not.toHaveBeenCalled()
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ onContactSupport: undefined }),
+    )
+  })
+
+  it("offers support from the modal where the user cannot leave", () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ onContactSupport: mockSendDepositSupportEmail }),
+    )
+    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith(
+      MigrationSupportReason.DepositPending,
+    )
+  })
+
+  it("checks again from OK once the gate is armed, and lets the user through once it lands", async () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    const recheck = jest
+      .fn()
+      .mockResolvedValue({ status: PendingDepositCheckStatus.Clear })
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, recheck }),
+    )
+
+    const { getByTestId, rerender } = render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ showCloseIconButton: false }),
+    )
+
+    fireEvent.press(getByTestId("gate-pending-deposit-ok"))
+    await act(async () => {})
+
+    expect(recheck).toHaveBeenCalledTimes(1)
+    expect(mockGoBack).not.toHaveBeenCalled()
+
+    mockPendingDepositModal.mockClear()
+    mockUseCustodialPendingDeposits.mockReturnValue(pendingDepositsState())
+    rerender(<MigrationGate />)
+
+    expect(mockPendingDepositModal).not.toHaveBeenCalled()
+    expect(mockRequiredScreen).toHaveBeenLastCalledWith(
+      expect.objectContaining({ mode: "gate", isExitBlocked: true }),
+    )
+  })
+
+  it("stays on the modal when checking again from OK fails", async () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    const recheck = jest.fn().mockResolvedValue({
+      status: PendingDepositCheckStatus.Unknown,
+      error: new Error("network"),
+    })
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, recheck }),
+    )
+
+    const { getByTestId } = render(<MigrationGate />)
+    fireEvent.press(getByTestId("gate-pending-deposit-ok"))
+    await act(async () => {})
+
+    expect(recheck).toHaveBeenCalledTimes(1)
+    expect(getByTestId("gate-pending-deposit-ok")).toBeTruthy()
+  })
+
+  it("holds a locked migration on the modal instead of resuming it", () => {
+    mockIsMigrationLocked = true
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
+    expect(mockPendingDepositModal).toHaveBeenCalledWith(
+      expect.objectContaining({ showCloseIconButton: false }),
+    )
+    expect(mockRequiredScreen).toHaveBeenCalledWith(
+      expect.objectContaining({ isExitBlocked: true }),
+    )
+  })
+
+  it("shows the check running on the modal instead of the loading screen", () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, isRecheckRunning: true }),
+    )
+
+    const { queryByTestId } = render(<MigrationGate />)
+
+    expect(queryByTestId("migration-gate-loading")).toBeNull()
+    expect(mockPendingDepositModal).toHaveBeenCalledWith(
+      expect.objectContaining({ isChecking: true }),
+    )
+  })
+
+  it("checks the deposits again when the gate regains focus after the dollar transfer", () => {
+    const check = jest.fn().mockResolvedValue({ status: PendingDepositCheckStatus.Clear })
+    mockUseCustodialPendingDeposits.mockReturnValue(pendingDepositsState({ check }))
+
+    const { rerender } = render(<MigrationGate />)
+    mockIsFocused = false
+    rerender(<MigrationGate />)
+
+    expect(check).not.toHaveBeenCalled()
+
+    mockIsFocused = true
+    rerender(<MigrationGate />)
+
+    expect(check).toHaveBeenCalledTimes(1)
+  })
+
+  describe("asking for the deposits only where the answer is used", () => {
+    /** The lock is read fresh on every mount, so asking alongside it would spend a request
+     *  on every resume of a committed migration, which ignores the answer. */
+    it("waits for the lock before asking", () => {
+      mockLockLoading = true
+
+      render(<MigrationGate />)
+
+      expect(mockUseCustodialPendingDeposits).toHaveBeenLastCalledWith({ skip: true })
+    })
+
+    it("never asks for a committed migration", () => {
+      mockIsMigrationLocked = true
+      mockIsMigrationCommitted = true
+
+      render(<MigrationGate />)
+
+      expect(mockUseCustodialPendingDeposits).toHaveBeenLastCalledWith({ skip: true })
+    })
+
+    it("asks once the lock says nothing has been committed", () => {
+      render(<MigrationGate />)
+
+      expect(mockUseCustodialPendingDeposits).toHaveBeenLastCalledWith({ skip: false })
+    })
+
+    /** A refetch runs even on a skipped query, so the focus check has to hold back too. */
+    it("does not ask again on focus for a committed migration", () => {
+      mockIsMigrationLocked = true
+      mockIsMigrationCommitted = true
+      const check = jest
+        .fn()
+        .mockResolvedValue({ status: PendingDepositCheckStatus.Clear })
+      mockUseCustodialPendingDeposits.mockReturnValue(pendingDepositsState({ check }))
+
+      const { rerender } = render(<MigrationGate />)
+      mockIsFocused = false
+      rerender(<MigrationGate />)
+      mockIsFocused = true
+      rerender(<MigrationGate />)
+
+      expect(check).not.toHaveBeenCalled()
+    })
+  })
+
+  it("resumes a committed migration past a pending deposit, since the balance has left", () => {
+    mockIsMigrationLocked = true
+    mockIsMigrationCommitted = true
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).not.toHaveBeenCalled()
+    expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
+  })
+
+  it("resumes a committed migration without waiting on, or failing with, the deposit check", () => {
+    mockIsMigrationLocked = true
+    mockIsMigrationCommitted = true
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasError: true, isReady: false }),
+    )
+
+    const { queryByTestId } = render(<MigrationGate />)
+
+    expect(queryByTestId("gate-retry-button")).toBeNull()
+    expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
+  })
+
+  /** The check it ignores stays out of its retry too, so that check failing can neither
+   *  fail the retry nor send a report for a read that does not apply. */
+  it("leaves the deposit check out of a committed migration's retry", async () => {
+    mockIsMigrationLocked = true
+    mockIsMigrationCommitted = true
+    const refetchApiKeys = jest.fn().mockResolvedValue(undefined)
+    const check = jest.fn().mockResolvedValue({
+      status: PendingDepositCheckStatus.Unknown,
+      error: new Error("network"),
+    })
+    mockUseActiveApiKeys.mockReturnValue(
+      apiKeysState({ hasError: true, isReady: false, refetch: refetchApiKeys }),
+    )
+    mockUseCustodialPendingDeposits.mockReturnValue(pendingDepositsState({ check }))
+
+    const { getByTestId } = render(<MigrationGate />)
+    fireEvent.press(getByTestId("gate-retry-button"))
+    await act(async () => {})
+
+    expect(refetchApiKeys).toHaveBeenCalledTimes(1)
+    expect(check).not.toHaveBeenCalled()
+  })
+
+  describe("a deposit check run by the retry", () => {
+    const retryWithCheck = async (check: jest.Mock) => {
+      mockUseActiveApiKeys.mockReturnValue(
+        apiKeysState({
+          hasError: true,
+          isReady: false,
+          refetch: jest.fn().mockResolvedValue(undefined),
+        }),
+      )
+      mockUseCustodialPendingDeposits.mockReturnValue(pendingDepositsState({ check }))
+
+      const { getByTestId } = render(<MigrationGate />)
+      fireEvent.press(getByTestId("gate-retry-button"))
+      await act(async () => {})
+    }
+
+    it("reports a request that failed with the error it raised", async () => {
+      await retryWithCheck(
+        jest.fn().mockResolvedValue({
+          status: PendingDepositCheckStatus.Unknown,
+          error: new Error("network"),
+        }),
+      )
+
+      expect(mockReportError).toHaveBeenCalledWith(
+        "Migration gate retry",
+        expect.objectContaining({ message: "network" }),
+      )
+    })
+
+    it("reports nothing for one that answered without the list", async () => {
+      await retryWithCheck(
+        jest
+          .fn()
+          .mockResolvedValue({ status: PendingDepositCheckStatus.Unknown, error: null }),
+      )
+
+      const retryReports = mockReportError.mock.calls.filter(
+        ([operation]) => operation === "Migration gate retry",
+      )
+      expect(retryReports).toHaveLength(0)
+    })
+  })
+
+  it("keeps the spinner off on the armed gate until the user checks again", () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, loading: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isChecking: false }),
+    )
+  })
+
+  it("says the deposit is still confirming once the check OK started finds it pending", () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, isStillPending: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isStillPending: true }),
+    )
+  })
+
+  it("leaves the still confirming line out until the check OK started finds the deposit pending", () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isStillPending: false }),
+    )
+  })
+
+  it("leaves the still confirming line out where OK only leaves", () => {
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, isStillPending: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isStillPending: false }),
+    )
+  })
+
+  it("keeps the OK spinner off where OK only leaves", () => {
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true, isRecheckRunning: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenCalledWith(
+      expect.objectContaining({ isChecking: false }),
+    )
+  })
+
+  it("hides the pending-deposit modal while a pushed screen has focus", () => {
+    mockIsFocused = false
+    mockUseCustodialPendingDeposits.mockReturnValue(
+      pendingDepositsState({ hasPendingDeposit: true }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockPendingDepositModal).toHaveBeenCalledWith(
+      expect.objectContaining({ isVisible: false }),
+    )
   })
 })
 

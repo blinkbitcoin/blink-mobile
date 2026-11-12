@@ -1,0 +1,26 @@
+name: "CI Tasks"
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "ci/**"
+      - ".github/workflows/ci-tasks.yml"
+# The steps run scripts the PR itself can change, so the token reads the checkout and
+# nothing more, and is not left in it.
+permissions:
+  contents: read
+jobs:
+  ci-tasks:
+    name: CI Tasks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Lint the GitHub Packages auth scripts
+        run: shellcheck ci/tasks/with-github-packages-auth.sh ci/tasks/test-with-github-packages-auth.sh ci/tasks/install-deps.sh
+      - name: Test the GitHub Packages auth scripts
+        run: ci/tasks/test-with-github-packages-auth.sh
+      # The macOS build worker's /bin/sh is bash in POSIX mode; the Linux runner's is dash.
+      - name: Test them under the macOS build worker's sh
+        run: TEST_SHELL="bash --posix" ci/tasks/test-with-github-packages-auth.sh

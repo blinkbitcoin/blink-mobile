@@ -165,13 +165,13 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: colors.grey4,
+    borderColor: colors.neutral,
   },
   keyDisabled: {
     opacity: 0.4,
   },
   keyPressedBg: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
   keyText: {
     fontFamily: fonts.bold,
@@ -180,6 +180,6 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlign: "center",
   },
   backspaceIcon: {
-    color: colors.primary,
+    color: colors.accent,
   },
 }))

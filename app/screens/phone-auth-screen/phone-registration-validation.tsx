@@ -247,14 +247,14 @@ export const PhoneRegistrationValidateScreen: React.FC<
         <ActivityIndicator
           style={styles.activityIndicator}
           size="large"
-          color={colors.primary}
+          color={colors.accent}
         />
       )
       break
     case ValidatePhoneCodeStatus.WaitingForCode:
       extraInfoContent = (
         <View style={styles.timerRow}>
-          <Text type="p3" color={colors.grey3}>
+          <Text type="p3" color={colors.textDisabled}>
             {LL.PhoneLoginValidationScreen.sendAgain()} {parseTimer(secondsRemaining)}
           </Text>
         </View>
@@ -342,7 +342,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderWidth: 2,
     borderBottomWidth: 2,
     paddingHorizontal: 10,
-    borderColor: colors.primary5,
+    borderColor: colors.accent4,
     borderRadius: 8,
     marginRight: 0,
   },

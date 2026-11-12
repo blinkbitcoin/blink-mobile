@@ -13,7 +13,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { isIos } from "@app/utils/helper"
 
-import { useCardData } from "../hooks/use-card-data"
+import { useCardData } from "@app/hooks"
 import { CloseCardModal } from "./close-card-modal"
 import { NotificationCategory, useCloseCardAccount, useNotificationToggle } from "./hooks"
 
@@ -79,7 +79,7 @@ export const CardSettingsScreen: React.FC = () => {
   const handleAddToMobileWallet = () => {
     navigation.navigate("cardAddToMobileWalletScreen", {
       lastFour: card?.lastFour ?? "",
-      holderName: "",
+      cardId: card?.id ?? "",
     })
   }
 
@@ -259,7 +259,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 3,
   },
   sectionTitle: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontFamily: "Source Sans Pro",
     fontSize: 14,
     fontWeight: "400",

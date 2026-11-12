@@ -64,7 +64,7 @@ export const FullOnboardingFlowScreen: React.FC = () => {
         style={styles.screenStyle}
       >
         <View style={styles.verticalAlignment}>
-          <ActivityIndicator animating size="large" color={colors.primary} />
+          <ActivityIndicator animating size="large" color={colors.accent} />
         </View>
       </Screen>
     )

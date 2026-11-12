@@ -31,7 +31,7 @@ export const WelcomeOnboardScreen: React.FC = () => {
               <Icon
                 name={"heart-outline"}
                 type="ionicon"
-                color={colors._green}
+                color={colors.staticSuccess}
                 size={40}
               />
             </View>
@@ -83,7 +83,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     justifyContent: "center",
     alignItems: "center",
   },

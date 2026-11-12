@@ -1,3 +1,4 @@
+import { it } from "@jest/globals"
 import { renderHook, act } from "@testing-library/react-hooks"
 
 import { useCardLimits } from "@app/screens/card-screen/card-limits-screen/hooks/use-card-limits"
@@ -23,6 +24,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
           limitMustBePositive: () => "Limit must be greater than zero",
           limitUpdateSuccess: () => "Limit updated successfully",
           limitUpdateError: () => "Failed to update limit",
+          invalidLimitAmount: () => "Enter a valid amount with up to 2 decimals",
         },
       },
     },
@@ -153,17 +155,35 @@ describe("useCardLimits", () => {
       )
     })
 
-    it("rejects negative value with toast", async () => {
+    it.each<[string, string]>([
+      ["a negative amount", "-100"],
+      ["a numeric prefix", "100abc"],
+      ["more than two decimals", "100.505"],
+    ])("saves nothing for %s and says why", async (_case, dollars) => {
       const { result } = renderHook(() => useCardLimits("card-1"))
 
       await act(async () => {
-        await result.current.handleUpdateMonthlyLimit("-100")
+        await result.current.handleUpdateMonthlyLimit(dollars)
       })
 
       expect(mockMutate).not.toHaveBeenCalled()
       expect(mockToastShow).toHaveBeenCalledWith(
-        expect.objectContaining({ message: "Limit must be greater than zero" }),
+        expect.objectContaining({
+          message: "Enter a valid amount with up to 2 decimals",
+        }),
       )
+    })
+
+    it("takes a comma as the decimal separator", async () => {
+      const { result } = renderHook(() => useCardLimits("card-1"))
+
+      await act(async () => {
+        await result.current.handleUpdateDailyLimit("100,50")
+      })
+
+      expect(mockMutate).toHaveBeenCalledWith({
+        variables: { input: { cardId: "card-1", dailyLimitCents: 10050 } },
+      })
     })
   })
 

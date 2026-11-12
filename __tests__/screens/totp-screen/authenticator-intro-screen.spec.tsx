@@ -114,7 +114,7 @@ describe("AuthenticatorIntroScreen", () => {
     await renderScreen()
 
     const card = screen.getByTestId("authenticator-intro-benefits")
-    expect(StyleSheet.flatten(card.props.style).backgroundColor).toBe(light.grey7)
+    expect(StyleSheet.flatten(card.props.style).backgroundColor).toBe(light.surfaceStatic)
   })
 
   /** Every Set authenticator lands here, so this is where the setup starts. */

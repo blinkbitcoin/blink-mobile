@@ -1,6 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { ActivityIndicator, ScrollView, View } from "react-native"
-import { useFocusEffect, useIsFocused, useNavigation } from "@react-navigation/native"
+import {
+  RouteProp,
+  useFocusEffect,
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -26,10 +32,11 @@ import {
   useHardwareBackGuard,
 } from "@app/screens/account-migration/hooks"
 import { useCustodialOwnerId } from "@app/screens/account-migration/hooks/use-custodial-owner-id"
-import { useEnsureMigrationStarted } from "@app/screens/account-migration/hooks/use-ensure-migration-started"
 import { armMigrationConversion } from "@app/screens/conversion-flow/drain-conversion"
 import { useMigrationLnAddressTransfer } from "@app/screens/account-migration/hooks/use-migration-ln-address-transfer"
 import { useMigrationStatus } from "@app/screens/account-migration/hooks/use-migration-status"
+import { usePendingDepositHold } from "@app/screens/account-migration/hooks/use-pending-deposit-hold"
+import { PendingDepositModal } from "@app/screens/account-migration/pending-deposit-modal"
 import { resolveServerFlow } from "@app/screens/account-migration/utils/server-migration-flow"
 import {
   MigrationLnAddressOutcome,
@@ -47,6 +54,8 @@ import { testProps } from "@app/utils/testProps"
 type RetryMessageInput = {
   LL: TranslationFunctions
   hasNetworkFailure: boolean
+  /** A server-backed read failed other than on the network (a GraphQL or an auth error). */
+  hasServerDataError: boolean
   /** The kind the checkpoint read failed with, null when that read is not what failed. */
   checkpointReadFailure: StorageFailure | null
   /** The kind the commit-point write failed with, null when it did not fail at the store. */
@@ -67,15 +76,20 @@ type RetryMessageInput = {
  *
  * A write turned away before it reached the store carries no kind: it waits on the owner
  * lookup, which is the network's.
+ *
+ * A server error gets the generic wording, as in the gate: it is neither the connection
+ * nor the device, and naming either sends the user looking in the wrong place.
  */
 const resolveRetryMessage = ({
   LL,
   hasNetworkFailure,
+  hasServerDataError,
   checkpointReadFailure,
   commitPointWriteFailure,
 }: RetryMessageInput): string => {
   const { storageUnavailable } = LL.AccountMigration
   if (hasNetworkFailure) return LL.errors.network.connection()
+  if (hasServerDataError) return LL.errors.generic()
 
   const isWriteOutOfSpace = commitPointWriteFailure === StorageFailure.OutOfSpace
   if (isWriteOutOfSpace) return storageUnavailable.notSavedOutOfSpaceBody()
@@ -102,6 +116,8 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { params: routeParams } =
+    useRoute<RouteProp<RootStackParamList, "accountMigrationBalancesOverview">>()
 
   const {
     checkpoint: storedCheckpoint,
@@ -175,13 +191,21 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   }, [isServerFlowNotStarted])
   const isServerFlowUnstarted = isServerFlowNotStarted || hasSeenUnstartedFlow
   const serverFlowUnstarted = isServerFlowUnstarted ? true : undefined
-  /** A save carrying the flag has landed in this visit, so the disk holds the preview's
-   *  figure rather than one stored before a dollar conversion. */
-  const [isUnstartedFigureRecorded, setIsUnstartedFigureRecorded] = useState(false)
+  /** The figure the latest save carrying the flag recorded in this visit, so the disk holds
+   *  the preview's figure rather than one stored before a dollar conversion. Null until one
+   *  has landed. */
+  const [unstartedFigureRecorded, setUnstartedFigureRecorded] = useState<number | null>(
+    null,
+  )
   /** While the server reports the run not started, the start waits for that save as well
    *  as for the answer: an accepted start makes the stored figure the run's, and a save
    *  that never landed (no owner yet, or a full disk) would leave the old one to be bound,
-   *  on this visit or on a relaunch that reads the run as already in progress. */
+   *  on this visit or on a relaunch that reads the run as already in progress. It waits for
+   *  the save of the figure on screen now, not any earlier one: the figures are read again
+   *  once a deposit clears, and the start must not bind the reading from before it. */
+  const isUnstartedFigureRecorded =
+    unstartedFigureRecorded !== null &&
+    unstartedFigureRecorded === preview.expectedReceiveSats
   const isUnstartedFigureAwaited = isServerFlowUnstarted && !isUnstartedFigureRecorded
 
   /** Read once at mount, and again each time the user comes back to this instance (from
@@ -201,6 +225,9 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const goToDollarTransfer = useCallback(() => {
     armMigrationConversion()
     navigation.navigate("conversionDetails")
+  }, [navigation])
+  const leaveFlow = useCallback(() => {
+    navigation.reset({ index: 0, routes: [{ name: "Primary" }] })
   }, [navigation])
 
   /**
@@ -225,7 +252,28 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     isPhaseAwaited ||
     isServerFlowUnrecognised ||
     isUnstartedFigureAwaited
-  const migrationStart = useEnsureMigrationStarted({ skip: isMigrationStartHeld })
+  /** A deposit still confirming holds the start too, see usePendingDepositHold. */
+  const depositHold = usePendingDepositHold({
+    isStartHeld: isMigrationStartHeld,
+    isModalOutranked: hasDollarBalance,
+    refreshFigures: preview.refresh,
+    isUndrained: isServerFlowUnstarted || migrationStatus === MigrationStatus.InProgress,
+    isCommitRefusedForDeposit: routeParams?.isDepositRefused === true,
+    isServerFlowNotStarted,
+    leaveFlow,
+  })
+  /** Taken once: a later refusal sets it again, which has to read as a change. */
+  useEffect(() => {
+    if (routeParams?.isDepositRefused)
+      navigation.setParams({ isDepositRefused: undefined })
+  }, [routeParams?.isDepositRefused, navigation])
+  const {
+    migrationStart,
+    figureRefreshes,
+    receiveFigureRefreshed,
+    isRefreshedFigureAwaited,
+    recordRefreshedFigure,
+  } = depositHold
 
   const {
     ownerId,
@@ -295,6 +343,8 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     expectedReceiveSats,
     startConfirmation === true,
     serverFlowUnstarted === true,
+    receiveFigureRefreshed === true,
+    figureRefreshes,
   ].join(":")
   const recordedWriteKeyRef = useRef<string | null>(null)
   const recordCommitPoint = useCallback(async (): Promise<void> => {
@@ -305,6 +355,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
       expectedReceiveSats,
       isStartConfirmed: startConfirmation,
       isServerFlowUnstarted: serverFlowUnstarted,
+      isReceiveFigureRefreshed: receiveFigureRefreshed,
     })
     /** Latched, never unlatched: this runs again on every focus, figure change and retry,
      *  and a later failure cannot un-record a write that already landed. The confirmation
@@ -315,7 +366,9 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     }
     if (writeResult.isSaved) recordedWriteKeyRef.current = commitPointWriteKey
     const isUnstartedFigureLanded = writeResult.isSaved && serverFlowUnstarted === true
-    if (isUnstartedFigureLanded) setIsUnstartedFigureRecorded(true)
+    if (isUnstartedFigureLanded) setUnstartedFigureRecorded(expectedReceiveSats)
+    const isRefreshedFigureLanded = writeResult.isSaved && receiveFigureRefreshed === true
+    if (isRefreshedFigureLanded) recordRefreshedFigure(figureRefreshes)
     /** saveCheckpoint already reported a store that refused. One turned away for want of
      *  an owner never reached the store and reported nothing; it repeats on every focus
      *  and retry while the owner lookup is down, so it is reported once for as long as the
@@ -338,6 +391,9 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     expectedReceiveSats,
     startConfirmation,
     serverFlowUnstarted,
+    receiveFigureRefreshed,
+    figureRefreshes,
+    recordRefreshedFigure,
     commitPointWriteKey,
     saveCheckpoint,
   ])
@@ -503,9 +559,17 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     }, [handoverReason, navigation]),
   )
 
-  const handleApprove = useCallback(() => {
-    navigation.navigate("accountMigrationTransferringFunds")
-  }, [navigation])
+  /** Read when the check before Approve answers: the screen may have lost focus, or a
+   *  guard may have turned Approve off, while the check was out. */
+  const canStillApproveRef = useRef(false)
+
+  const { checkBeforeApprove } = depositHold
+  const handleApprove = useCallback(async () => {
+    const isClear = await checkBeforeApprove()
+    const canStillApprove = isClear && canStillApproveRef.current
+    if (!canStillApprove) return
+    navigation.navigate("accountMigrationTransferringFunds", { isDepositChecked: true })
+  }, [checkBeforeApprove, navigation])
 
   /** Either source losing the network earns the same retry, and it refreshes both:
    *  figures without a started migration are as useless as the reverse. */
@@ -530,7 +594,8 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   /** A record already on disk does not hold the retry back while the start still waits for
    *  the save carrying the new figure: that save is what has failed, and nothing else on
    *  screen would send it again. */
-  const isCommitPointStillNeeded = !isCommitPointHeld || isUnstartedFigureAwaited
+  const isCommitPointStillNeeded =
+    !isCommitPointHeld || isUnstartedFigureAwaited || isRefreshedFigureAwaited
   const isCommitPointWriteRetryable =
     hasCommitPointWriteFailed && isCommitPointStillNeeded
   const hasNetworkFailure =
@@ -538,9 +603,14 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     migrationStart.hasConnectionIssue ||
     hasLnAddressConnectionIssue ||
     hasIdLookupFailure ||
-    hasStatusReadFailure
+    hasStatusReadFailure ||
+    depositHold.hasCheckNetworkFailure ||
+    depositHold.hasFigureRefreshFailed
   const isRetryable =
-    hasNetworkFailure || hasCheckpointReadFailure || isCommitPointWriteRetryable
+    hasNetworkFailure ||
+    depositHold.hasCheckServerError ||
+    hasCheckpointReadFailure ||
+    isCommitPointWriteRetryable
 
   const checkpointReadFailure = hasCheckpointReadFailure ? checkpointStorageFailure : null
   const commitPointWriteFailure = isCommitPointWriteRetryable
@@ -549,33 +619,44 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const retryMessage = resolveRetryMessage({
     LL,
     hasNetworkFailure,
+    hasServerDataError: depositHold.hasCheckServerError,
     checkpointReadFailure,
     commitPointWriteFailure,
   })
 
   const { retry: retryPreview } = preview
   const { retry: retryMigrationStart } = migrationStart
+  const { checkAgain: checkPendingDepositsAgain, retryFigureRefresh } = depositHold
 
   /** The owner and the checkpoint join the shared retry because the re-point cannot fire
    *  without the ids they carry: refreshing everything else around a lookup that failed
    *  would replay the same dead screen. Their rejections carry nothing the hooks' own state
    *  does not already report, so they are swallowed like the preview's. */
   const handleRetry = useCallback(() => {
-    retryPreview()
+    /** A reading after a deposit that failed is asked again through the hold, which reads
+     *  both sources itself, so the figures are not fetched twice for one tap. */
+    const retryFigures = depositHold.hasFigureRefreshFailed
+      ? retryFigureRefresh
+      : retryPreview
+    retryFigures()
     retryMigrationStart()
     retryLnAddressTransfer()
     recordCommitPoint()
     refetchOwnerId().catch(() => undefined)
     refetchCheckpoint().catch(() => undefined)
     refetchMigrationStatus().catch(() => undefined)
+    checkPendingDepositsAgain()
   }, [
     recordCommitPoint,
     refetchMigrationStatus,
+    depositHold.hasFigureRefreshFailed,
+    retryFigureRefresh,
     retryPreview,
     retryMigrationStart,
     retryLnAddressTransfer,
     refetchOwnerId,
     refetchCheckpoint,
+    checkPendingDepositsAgain,
   ])
 
   /** Approve commits against a server-side flow, so it stays off until the server has
@@ -588,14 +669,21 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     preview.isDollarRegionPending ||
     !migrationStart.isStarted ||
     !isLnAddressSettled ||
-    !isCommitPointHeld
+    !isCommitPointHeld ||
+    depositHold.isBlocking ||
+    isRefreshedFigureAwaited
+
+  const canApprove = isFocused && !isApproveDisabled
+  useEffect(() => {
+    canStillApproveRef.current = canApprove
+  }, [canApprove])
 
   return (
     <Screen preset="fixed" headerShown={false}>
       <View style={styles.container}>
         <IconHero
           icon="send"
-          iconColor={colors.primary}
+          iconColor={colors.accent}
           title={LLOverview.title()}
           subtitle={LLOverview.body()}
         />
@@ -615,7 +703,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
             <RichText text={preview.networkFeeLine} style={styles.networkFee} />
 
             <View style={styles.arrowCircle}>
-              <GaloyIcon name="arrow-down" size={24} color={colors.grey3} />
+              <GaloyIcon name="arrow-down" size={24} color={colors.textDisabled} />
             </View>
 
             <BalancePairCard
@@ -644,7 +732,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
             {isRetryable ? null : (
               <ActivityIndicator
                 size="large"
-                color={colors.primary}
+                color={colors.accent}
                 {...testProps("migration-balances-overview-loading")}
               />
             )}
@@ -666,6 +754,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
             <GaloyPrimaryButton
               title={LLOverview.approveCta()}
               onPress={handleApprove}
+              loading={depositHold.isRecheckRunning}
               disabled={isApproveDisabled}
               {...testProps("migration-balances-overview-approve")}
             />
@@ -683,6 +772,16 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
           toggleModal={goToDollarTransfer}
           onTransfer={goToDollarTransfer}
           showCloseIconButton={false}
+        />
+      ) : null}
+      {depositHold.isModalShown ? (
+        <PendingDepositModal
+          isVisible={isFocused}
+          onAcknowledge={depositHold.acknowledgeModal}
+          showCloseIconButton={depositHold.isModalClosable}
+          isChecking={depositHold.isRecheckRunning}
+          onContactSupport={depositHold.modalSupportAction}
+          isStillPending={depositHold.isStillPendingShown}
         />
       ) : null}
     </Screen>
@@ -718,14 +817,14 @@ const useStyles = makeStyles(({ colors }) => ({
   networkFee: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
   },
   arrowCircle: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     alignItems: "center",
     justifyContent: "center",
   },

@@ -7,6 +7,11 @@
         <action android:name="android.intent.action.VIEW" />
         <data android:scheme="tg" />
       </intent>
+      <!-- Lets Navigate see whether Google Maps is installed; geo: otherwise. -->
+      <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="google.navigation" />
+      </intent>
     </queries>
 
     <uses-permission android:name="android.permission.INTERNET" />

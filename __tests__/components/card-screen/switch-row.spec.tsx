@@ -44,6 +44,12 @@ describe("SwitchRow", () => {
   })
 
   describe("rendering", () => {
+    it("pads 14 above and below, as the design system row does", () => {
+      const { toJSON } = renderWithTheme(<SwitchRow {...defaultProps} />)
+
+      expect(JSON.stringify(toJSON())).toContain('"paddingVertical":14')
+    })
+
     it("renders without crashing", () => {
       const { toJSON } = renderWithTheme(<SwitchRow {...defaultProps} />)
       expect(toJSON()).toBeTruthy()
@@ -78,6 +84,16 @@ describe("SwitchRow", () => {
       fireEvent(switchElement, "pressIn")
 
       expect(mockOnValueChange).toHaveBeenCalled()
+    })
+
+    it("ignores presses and reports itself disabled while disabled", () => {
+      const { getByRole } = renderWithTheme(<SwitchRow {...defaultProps} disabled />)
+
+      const switchElement = getByRole("switch")
+      fireEvent(switchElement, "pressIn")
+
+      expect(mockOnValueChange).not.toHaveBeenCalled()
+      expect(switchElement.props.accessibilityState.disabled).toBe(true)
     })
   })
 

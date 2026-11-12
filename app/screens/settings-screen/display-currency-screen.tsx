@@ -164,7 +164,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
   },
   searchBarContainer: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     borderBottomWidth: 0,
     borderTopWidth: 0,
     marginHorizontal: 26,
@@ -173,7 +173,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   searchBarInputContainerStyle: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
 
   searchBarRightIconStyle: {
@@ -181,7 +181,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   searchBarText: {
-    color: colors.black,
+    color: colors.textOnBackground,
     textDecorationLine: "none",
   },
 }))

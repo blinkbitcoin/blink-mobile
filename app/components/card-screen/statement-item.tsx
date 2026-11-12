@@ -36,7 +36,7 @@ export const StatementItem: React.FC<StatementItemProps> = ({
 
   return (
     <View style={styles.container}>
-      <GaloyIcon name="document-outline" size={18} color={colors.black} />
+      <GaloyIcon name="document-outline" size={18} color={colors.textOnBackground} />
       <View style={styles.content}>
         <Text style={styles.title}>{title}</Text>
         {subtitle1 && <Text style={styles.subtitle1}>{subtitle1}</Text>}
@@ -53,7 +53,7 @@ export const StatementItem: React.FC<StatementItemProps> = ({
           <GaloyIcon
             name="download"
             size={20}
-            color={colors.primary}
+            color={colors.accent}
             opacity={isDownloaded ? DOWNLOADED_OPACITY : 1}
           />
         </TouchableOpacity>
@@ -66,7 +66,7 @@ const useStyles = makeStyles(({ colors }) => ({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 10,
@@ -77,21 +77,21 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
   },
   title: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 16,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",
     lineHeight: 22,
   },
   subtitle1: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 12,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
     lineHeight: 18,
   },
   subtitle2: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 10,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
