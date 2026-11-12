@@ -142,7 +142,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     columnGap: 20,
     minHeight: 67,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: colors.transparent,
@@ -150,13 +150,13 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 14,
   },
   cardInactive: {
-    backgroundColor: colors.grey7,
+    backgroundColor: colors.surfaceStatic,
   },
   cardError: {
     borderColor: colors.error,
   },
   cardPressed: {
-    backgroundColor: colors.grey6,
+    backgroundColor: colors.surfacePressed,
   },
   balances: {
     flex: 1,
@@ -176,11 +176,11 @@ const useStyles = makeStyles(({ colors }) => ({
     fontFamily: fonts.bold,
     fontSize: 16,
     lineHeight: 22,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   balanceSecondary: {
     fontSize: 12,
     lineHeight: 18,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

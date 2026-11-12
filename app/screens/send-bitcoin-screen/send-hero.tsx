@@ -197,7 +197,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
           styles.amount,
           {
             ...primarySize,
-            color: isEmpty ? colors.grey2 : colors.black,
+            color: isEmpty ? colors.textMuted : colors.textOnBackground,
           },
           active && primaryStyle,
         ]}
@@ -214,7 +214,11 @@ export const SendHero: React.FC<SendHeroProps> = ({
             {
               fontSize: AMOUNT_SIZE[size].secondary,
               lineHeight: LINE_HEIGHT[size].secondary,
-              color: isEmpty ? colors.grey3 : active ? colors.grey2 : colors.black,
+              color: isEmpty
+                ? colors.textDisabled
+                : active
+                  ? colors.textMuted
+                  : colors.textOnBackground,
             },
             !active && styles.settledSecondary,
             active && secondaryStyle,
@@ -231,7 +235,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
   return (
     <IconHero
       icon="send"
-      iconColor={colors.primary}
+      iconColor={colors.accent}
       iconSize={ICON_SIZE}
       hasIconBackground={false}
       compact
@@ -244,7 +248,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
 const useStyles = makeStyles(({ colors }) => ({
   caption: {
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   amount: {
     fontFamily: fonts.bold,
