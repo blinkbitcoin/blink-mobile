@@ -19,6 +19,7 @@ import {
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { isIdempotencyConflict } from "@app/graphql/is-idempotency-conflict"
 import { useAppConfig, useClipboard, useDisplayCurrency } from "@app/hooks"
+import { useInitialAccessibilityFocus } from "@app/hooks/use-initial-accessibility-focus"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
@@ -103,6 +104,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   /** A tap on the wallet card shows the balance on this screen only: the global setting
    *  and the home screen's state stay as they are. */
   const [isBalanceRevealed, setIsBalanceRevealed] = useState(false)
+
+  /** Screen reader focus starts on slide to send, the step review leads to; while the fee
+   *  is still being worked out, the handle reads as calculating. */
+  const sliderHandleRef = React.useRef<View>(null)
+  useInitialAccessibilityFocus(sliderHandleRef)
   const isBalanceHidden = hideAmount && !isBalanceRevealed
 
   const {
@@ -683,6 +689,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 : colors.primary
             }
             onSwipe={handleSendPayment}
+            handleRef={sliderHandleRef}
             disabled={
               !validAmount ||
               !sendPayment ||
