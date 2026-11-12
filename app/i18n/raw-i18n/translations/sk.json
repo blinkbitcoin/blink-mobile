@@ -3092,7 +3092,7 @@
     "deleteAccountWarning": "Pozor: Zatvorenie účtu je trvalé!\nPred zatvorením sa uistite, že peňaženky nemajú žiadne prostriedky.\nZatvorený účet nie je možné obnoviť.\nNiektoré záznamy môžeme uchovávať, ak to vyžaduje zákon.",
     "downloadLogs": "Stiahnuť logy",
     "exportLogsTitle": "Zdieľať logy peňaženky",
-    "exportLogsBody": "Tento súbor pomáha nášmu tímu podpory preskúmať problémy s tvojimi peňaženkami. Obsahuje históriu platieb (sumy, faktúry a adresy) a identifikátory každej nekustodiálnej peňaženky v tomto zariadení, nielen tejto, ale nikdy tvoje zálohovacie frázy ani kľúče. Zdieľaj ho len s naším tímom podpory.",
+    "exportLogsBody": "Tento súbor pomáha nášmu tímu podpory preskúmať problémy s tvojimi peňaženkami. Obsahuje históriu platieb (sumy, faktúry a adresy) a identifikátory každej non-custodial peňaženky v tomto zariadení, nielen tejto, ale nikdy tvoje zálohovacie frázy ani kľúče. Zdieľaj ho len s naším tímom podpory.",
     "exportLogsConfirm": "Zdieľať logy",
     "noLogsYet": "Zatiaľ nie sú žiadne logy na zdieľanie. Otvor peňaženku a skús to znova.",
     "exportLogsError": "Logy sa nepodarilo exportovať. Skús to znova."

@@ -3092,7 +3092,7 @@
     "deleteAccountWarning": "Pozor: Zavření účtu je nevratné!\nPřed zavřením se ujistěte, že peněženky nemají žádné prostředky.\nZavřený účet nelze obnovit.\nNěkteré záznamy můžeme uchovávat, pokud to vyžaduje zákon.",
     "downloadLogs": "Stáhnout logy",
     "exportLogsTitle": "Sdílet logy peněženky",
-    "exportLogsBody": "Tento soubor pomáhá našemu týmu podpory prozkoumat problémy s vašimi peněženkami. Obsahuje historii plateb (částky, faktury a adresy) a identifikátory každé nesvěřenské peněženky v tomto zařízení, nejen této, ale nikdy vaše záložní fráze ani klíče. Sdílejte ho jen s naším týmem podpory.",
+    "exportLogsBody": "Tento soubor pomáhá našemu týmu podpory prozkoumat problémy s vašimi peněženkami. Obsahuje historii plateb (částky, faktury a adresy) a identifikátory každé non-custodial peněženky v tomto zařízení, nejen této, ale nikdy vaše záložní fráze ani klíče. Sdílejte ho jen s naším týmem podpory.",
     "exportLogsConfirm": "Sdílet logy",
     "noLogsYet": "Zatím nejsou žádné logy ke sdílení. Otevřete peněženku a zkuste to znovu.",
     "exportLogsError": "Logy se nepodařilo exportovat. Zkuste to prosím znovu."
