@@ -1,5 +1,5 @@
 import React from "react"
-import { Keyboard, ScrollView, StyleSheet } from "react-native"
+import { AccessibilityInfo, Keyboard, ScrollView, StyleSheet } from "react-native"
 
 import { act, fireEvent, render, screen, within } from "@testing-library/react-native"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -10,6 +10,7 @@ import { PreferredAmountCurrency } from "@app/graphql/client-only-query"
 import { WalletCurrency } from "@app/graphql/generated"
 import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
+import { INITIAL_FOCUS_DELAY_MS } from "@app/hooks/use-initial-accessibility-focus"
 import {
   CreatePaymentDetailParams,
   DestinationDirection,
@@ -39,6 +40,10 @@ jest.mock("@react-navigation/native", () => ({
     navigate: mockNavigate,
     setOptions: jest.fn(),
   }),
+  useFocusEffect: (callback: () => undefined | (() => void)) => {
+    const { useEffect } = jest.requireActual("react")
+    useEffect(callback, [callback])
+  },
 }))
 
 /** Laid over the real fee options, so a spec can stand in a fee error the quote returned. */
@@ -769,6 +774,53 @@ describe("amount currency", () => {
  * shows only when that differs. A dollar wallet with USD as the display currency is therefore
  * one line, centred in a card that keeps its two-line height.
  */
+describe("screen reader focus on open", () => {
+  // react-native's jest mocks: no screen reader by default, and no focus sent.
+  const isScreenReaderEnabled = jest.mocked(AccessibilityInfo.isScreenReaderEnabled)
+  const sendAccessibilityEvent = jest.mocked(AccessibilityInfo.sendAccessibilityEvent)
+
+  beforeEach(() => {
+    isScreenReaderEnabled.mockResolvedValue(true)
+    sendAccessibilityEvent.mockClear()
+  })
+
+  afterAll(() => {
+    isScreenReaderEnabled.mockResolvedValue(false)
+  })
+
+  /** The test ID of each native node screen reader focus was sent to. */
+  const focusedTestIds = () =>
+    sendAccessibilityEvent.mock.calls.map(
+      ([node, event]) =>
+        event === "focus" &&
+        (node as unknown as { props: { testID?: string } }).props.testID,
+    )
+
+  const passFocusDelay = () =>
+    act(
+      () =>
+        new Promise<void>((resolve) => {
+          setTimeout(resolve, INITIAL_FOCUS_DELAY_MS + 50)
+        }),
+    )
+
+  it("lands on the keypad while there is no amount yet", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+    await passFocusDelay()
+
+    expect(focusedTestIds()).toEqual(["Key 1"])
+  })
+
+  it("lands on Next when the invoice fixes the amount", async () => {
+    renderScreen(invoiceDestination)
+    await settle()
+    await passFocusDelay()
+
+    expect(focusedTestIds()).toEqual([LL.common.next()])
+  })
+})
+
 describe("wallet summary balance lines", () => {
   const secondLine = () => screen.queryByTestId("send-wallet-balance-secondary")
 
