@@ -95,7 +95,7 @@ const useStyles = makeStyles(({ colors }) => ({
   receipt: {
     position: "absolute",
     top: 0,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
   },
   screenContainer: {
     flexGrow: 1,
