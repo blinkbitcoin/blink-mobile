@@ -166,7 +166,7 @@ export const AccountIcon: React.FC<{ size: number }> = ({ size }) => {
   const {
     theme: { colors },
   } = useTheme()
-  return <GaloyIcon name="user" size={size} backgroundColor={colors.border} />
+  return <GaloyIcon name="user" size={size} backgroundColor={colors.neutral} />
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -185,7 +185,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "space-between",
   },
   iconContainer: {
-    backgroundColor: theme.colors.border,
+    backgroundColor: theme.colors.neutral,
     borderRadius: 100,
     padding: 3,
   },

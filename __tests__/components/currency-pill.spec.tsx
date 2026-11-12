@@ -32,7 +32,7 @@ jest.mock("@rn-vui/themed", () => {
           staticSuccess: "staticSuccess",
           textSecondary: "textSecondary",
           textDisabled: "textDisabled",
-          border: "border",
+          neutral: "neutral",
           transparent: "transparent",
         },
       },

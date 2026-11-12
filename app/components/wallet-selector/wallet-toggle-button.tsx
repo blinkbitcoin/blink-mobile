@@ -45,7 +45,7 @@ const useStyles = makeStyles(({ colors }) => ({
     height: 50,
     width: 50,
     borderRadius: 50,
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
     justifyContent: "center",
     alignItems: "center",
     zIndex: 3,

@@ -35,7 +35,7 @@ jest.mock("@rn-vui/themed", () => ({
         staticBrandOrange: "#FF8C00",
         textOnBackground: "#000000",
         textSecondary: "#666666",
-        border: "#E0E0E0",
+        neutral: "#E0E0E0",
         surfaceInteractive: "#F5F5F5",
       },
     },

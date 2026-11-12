@@ -97,7 +97,7 @@ const useStyles = makeStyles(({ colors }, { hovering, hasSubtitle }: StyleProps)
     container: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: hovering ? colors.border : baseBackground,
+      backgroundColor: hovering ? colors.neutral : baseBackground,
       borderRadius: hasSubtitle ? 8 : 0,
       paddingVertical: 14,
       paddingLeft: 14,

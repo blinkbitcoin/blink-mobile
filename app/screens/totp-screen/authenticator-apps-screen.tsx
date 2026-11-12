@@ -212,7 +212,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
   },
   getLabel: {
     fontSize: 10,

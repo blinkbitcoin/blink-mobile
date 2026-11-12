@@ -824,7 +824,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
     alignItems: "center",
     justifyContent: "center",
   },

@@ -343,7 +343,7 @@ const useStyles = makeStyles(({ colors }) => ({
     position: "relative",
   },
   line: {
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
     height: 1,
     flex: 1,
   },
@@ -353,7 +353,7 @@ const useStyles = makeStyles(({ colors }) => ({
     height: 43,
     width: 43,
     borderRadius: 50,
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
     justifyContent: "center",
     alignItems: "center",
   },

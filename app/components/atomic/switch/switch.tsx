@@ -63,7 +63,7 @@ export const Switch: React.FC<SwitchProps> = ({
     const backgroundColor = interpolateColor(
       progress.value,
       [0, 1],
-      [colors.surfaceMuted, colors.accent],
+      [colors.neutral, colors.accent],
     )
     return {
       backgroundColor,

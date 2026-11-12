@@ -59,7 +59,7 @@ const useStyles = makeStyles(({ colors }, { highlighted }: StyleProps) => ({
     paddingLeft: 18,
     paddingRight: 14,
     gap: 14,
-    backgroundColor: highlighted ? colors.border : colors.surfaceInteractive,
+    backgroundColor: highlighted ? colors.neutral : colors.surfaceInteractive,
   },
   textContainer: {
     flex: 1,

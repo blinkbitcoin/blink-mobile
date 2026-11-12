@@ -250,7 +250,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 22,
   },
   separator: {
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
     height: 1,
     marginLeft: 62,
   },

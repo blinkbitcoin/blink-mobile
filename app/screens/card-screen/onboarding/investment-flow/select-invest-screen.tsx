@@ -127,7 +127,7 @@ const useStyles = makeStyles(({ colors }) => ({
   limitSeparator: {
     width: "97%",
     height: 1,
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
     position: "absolute",
     bottom: 0,
     alignSelf: "center",

@@ -204,7 +204,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
               name="close"
               size="small"
               onPress={handleRemovePress}
-              backgroundColor={colors.border}
+              backgroundColor={colors.neutral}
               testID={`delete-button-${accountId}`}
               accessibilityRole="button"
               accessibilityLabel={removeAccountLabel}

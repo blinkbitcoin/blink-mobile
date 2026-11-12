@@ -1222,7 +1222,7 @@ const usestyles = makeStyles(({ colors }) => ({
     marginBottom: 30,
   },
   line: {
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
     height: 1,
     borderRadius: 10,
     flex: 1,
@@ -1268,7 +1268,7 @@ const usestyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.surfacePressed,
   },
   listItemContainer: {
-    borderColor: colors.border,
+    borderColor: colors.neutral,
     borderBottomWidth: 1,
   },
   listItemContainerBase: {

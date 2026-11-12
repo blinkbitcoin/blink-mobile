@@ -242,7 +242,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 12,
     borderRadius: 8,
     minHeight: 60,
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
     alignItems: "center",
     justifyContent: "space-between",
   },

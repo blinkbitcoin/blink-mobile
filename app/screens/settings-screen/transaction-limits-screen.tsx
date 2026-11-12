@@ -50,7 +50,7 @@ const useStyles = makeStyles(({ colors }) => ({
   divider: {
     marginVertical: 0,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.neutral,
   },
   errorWrapper: {
     justifyContent: "center",

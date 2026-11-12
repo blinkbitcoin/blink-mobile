@@ -119,7 +119,7 @@ describe("MigrationMerchantToolsScreen", () => {
     expect(dividers).toHaveLength(3)
     dividers.forEach((divider) => {
       expect(StyleSheet.flatten(divider.props.style)).toMatchObject({
-        borderBottomColor: dark.border,
+        borderBottomColor: dark.neutral,
         borderBottomWidth: 1,
         marginHorizontal: 10,
       })

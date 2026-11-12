@@ -41,7 +41,7 @@ const lightSemantic = {
   textMuted: "#8C8C97", // 3.33:1 on backgroundDefault — secondary labels only
   textDisabled: "#AEAEB8",
 
-  border: "#E2E2E4",
+  neutral: "#E2E2E4",
 
   surfaceInteractive: "#F2F2F4", // tappable surface, at rest
   surfacePressed: "#E7E7E7", // surfaceInteractive while held — transient only
@@ -76,7 +76,7 @@ const darkSemantic = {
   textMuted: "#CCCCCC",
   textDisabled: "#949494",
 
-  border: "#393939",
+  neutral: "#393939",
 
   surfaceInteractive: "#1d1d1d",
   surfacePressed: "#2B2B2B",
@@ -111,7 +111,7 @@ const legacyAliases = (semantic: typeof lightSemantic | typeof darkSemantic) => 
   grey1: semantic.textSecondary,
   grey2: semantic.textMuted,
   grey3: semantic.textDisabled,
-  grey4: semantic.border,
+  grey4: semantic.neutral,
   grey5: semantic.surfaceInteractive,
   grey6: semantic.surfacePressed,
   grey7: semantic.surfaceStatic,
@@ -148,9 +148,8 @@ const legacyAliases = (semantic: typeof lightSemantic | typeof darkSemantic) => 
 const roleTokens = (semantic: typeof lightSemantic | typeof darkSemantic) => ({
   textOnAccent: semantic.backgroundDefault, // labels and icons on an accent fill
   textOnAccentDisabled: semantic.surfaceInteractive, // label on a disabled accent fill
-  textPlaceholder: semantic.border,
+  textPlaceholder: semantic.neutral,
   borderStrong: semantic.textDisabled, // focused input underline
-  surfaceMuted: semantic.border, // neutral control fill: icon button, switch track off
   surfaceInactive: semantic.textDisabled, // unselected currency pill and bubble
   surfaceFocused: semantic.surfacePressed, // input field fill while focused
   // Brand success green. Overrides the UI library default (#52C41A) that

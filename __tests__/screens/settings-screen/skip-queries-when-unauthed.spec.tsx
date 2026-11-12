@@ -104,7 +104,7 @@ jest.mock("@rn-vui/themed", () => ({
       colors: {
         accent: "#000",
         error: "#f00",
-        border: "#ddd",
+        neutral: "#ddd",
         surfaceInteractive: "#eee",
         textOnBackground: "#000",
       },

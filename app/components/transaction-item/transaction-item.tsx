@@ -284,9 +284,9 @@ type UseStyleProps = {
 const useStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
   container: {
     paddingVertical: 9,
-    borderColor: colors.border,
+    borderColor: colors.neutral,
     overflow: "hidden",
-    backgroundColor: props.highlight ? colors.border : colors.surfaceInteractive,
+    backgroundColor: props.highlight ? colors.neutral : colors.surfaceInteractive,
     borderTopWidth: (props.isFirst && props.isOnHomeScreen) || !props.isFirst ? 1 : 0,
     borderBottomLeftRadius: props.isLast && props.isOnHomeScreen ? 12 : 0,
     borderBottomRightRadius: props.isLast && props.isOnHomeScreen ? 12 : 0,

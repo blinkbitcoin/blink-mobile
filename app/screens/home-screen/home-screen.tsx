@@ -1232,7 +1232,7 @@ const useStyles = makeStyles(({ colors }) => ({
   actionsSeparator: {
     width: 1,
     alignSelf: "stretch",
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
   },
   badgeSlot: {
     // minHeight, not height: at 20pt x the 1.4 font cap the badge's line box
