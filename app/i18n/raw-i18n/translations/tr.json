@@ -4276,7 +4276,8 @@
     "networkError": "Ağ bağlantısı sorunu. Bağlantınızı kontrol edip tekrar deneyin.",
     "invalidInput": "Ödeme bilgileri geçersiz görünüyor. Lütfen gözden geçirip tekrar deneyin.",
     "generic": "Ödeme tamamlanamadı. Bir an sonra tekrar deneyin veya daha küçük bir tutar kullanın.",
-    "outcomeUnknown": "Bu ödeme zaten gerçekleşmiş olabilir. Tekrar göndermeden önce işlem geçmişini kontrol et."
+    "outcomeUnknown": "Bu ödeme zaten gerçekleşmiş olabilir. Tekrar göndermeden önce işlem geçmişini kontrol et.",
+    "earlierPaymentFound": "Bu hedefe yaptığın önceki ödeme farklı bir tutarla zaten gerçekleşti. Tekrar göndermeden önce kontrol et."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Bu hesap {network} ağında oluşturuldu. Kullanmak için {network} ağına geçin."

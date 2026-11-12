@@ -17,7 +17,11 @@ import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 
 import { ScRail } from "../measurement"
 
-import { createGetFeeOnchain, createSendMutationOnchain } from "./send-helpers"
+import {
+  createGetFeeOnchain,
+  createSendMutationOnchain,
+  requestedAsOf,
+} from "./send-helpers"
 
 type CreateOnchainParams<T extends WalletCurrency> = {
   sdk: BreezSdkInterface
@@ -76,6 +80,7 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
             sendingWallet: sendingWalletDescriptor.currency,
           },
           idempotencyKeyRef,
+          requestedAs: requestedAsOf(unitOfAccountAmount, settlementAmount),
         }),
       }
     : { canSendPayment: false, canGetFee: false }

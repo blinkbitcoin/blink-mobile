@@ -16,7 +16,12 @@ import {
   SendPaymentMutation,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
-import { toBtcMoneyAmount, type WalletAmount } from "@app/types/amounts"
+import {
+  toBtcMoneyAmount,
+  type MoneyAmount,
+  type WalletAmount,
+  type WalletOrDisplayCurrency,
+} from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 import { reportError } from "@app/utils/error-logging"
 
@@ -51,11 +56,14 @@ import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 import {
   lostAttemptsFor,
   withoutSettled,
+  type LostAttempts,
   type LostAttemptsHandle,
   type LostSend,
+  type RequestedAs,
   type SettledAttempts,
   type UnresolvedSend,
 } from "./lost-attempts"
+
 import {
   CODES_RAISED_BEFORE_DISPATCH,
   findLostSend,
@@ -224,17 +232,35 @@ type SendRail = { scope: string; confirmationSpeed?: OnchainConfirmationSpeed }
 export type SendMutationOptions = {
   telemetry: SendTelemetry
   idempotencyKeyRef?: IdempotencyKeyRef
+  /** What the sender asked the send for; left out when the destination fixes the
+   *  amount. */
+  requestedAs?: RequestedAs
 }
+
+/**
+ * What a sender asked a send for: as they entered it, by the code of the currency they
+ * entered it in (a fiat one is told by its code alone), and as it leaves the wallet, by
+ * the wallet's currency, never its code: sats entered on the keypad are coded `SAT`, the
+ * same sats converted from fiat `BTC`.
+ */
+export const requestedAsOf = (
+  entered: MoneyAmount<WalletOrDisplayCurrency>,
+  settlement: MoneyAmount<WalletCurrency>,
+): RequestedAs => ({
+  entered: `${entered.currencyCode}:${entered.amount}`,
+  settlement: `${settlement.currency}:${settlement.amount}`,
+})
 
 const runSendMutation = (
   params: PrepareParams,
-  { telemetry, idempotencyKeyRef = {} }: SendMutationOptions,
+  { telemetry, idempotencyKeyRef = {}, requestedAs }: SendMutationOptions,
   { scope, confirmationSpeed }: SendRail,
 ): ReturnType<SendPaymentMutation> =>
   runSelfCustodialSend({
     sdk: params.sdk,
     idempotencyKeyRef,
     destination: params.paymentRequest,
+    requestedAs,
     telemetry: {
       params: telemetryParams(telemetry),
       settlement: sendSettlement(telemetryParams(telemetry)),
@@ -274,6 +300,35 @@ export const createSendMutationOnchain = (
 /** What a dispatched send can be found by in the wallet's history. */
 export type SendIdentity = { paymentHash?: string; sparkInvoice?: string }
 
+/** The key what an attempt was asked for is kept under: what its payment is found by. */
+const identityKeyOf = ({
+  paymentHash,
+  sparkInvoice,
+}: SendIdentity): string | undefined => {
+  if (paymentHash !== undefined) return `hash:${paymentHash}`
+  if (sparkInvoice !== undefined) return `invoice:${sparkInvoice}`
+  return undefined
+}
+
+/** The same key, read off a payment found in the wallet's history. */
+const identityKeyOfPayment = (payment: Payment): string | undefined =>
+  identityKeyOf({
+    paymentHash: htlcDetailsOf(payment)?.paymentHash,
+    sparkInvoice: sparkInvoiceOf(payment),
+  })
+
+/** What the attempts were asked for, once this attempt's request is added. */
+const withRequest = (
+  requestedAs: Record<string, RequestedAs> | undefined,
+  identity: SendIdentity,
+  request: RequestedAs | undefined,
+): Record<string, RequestedAs> | undefined => {
+  const identityKey = identityKeyOf(identity)
+  const isRecorded = identityKey !== undefined && request !== undefined
+  if (!isRecorded) return requestedAs
+  return { ...requestedAs, [identityKey]: request }
+}
+
 const withItem = (items: ReadonlyArray<string>, item: string | undefined): string[] =>
   item === undefined || items.includes(item) ? [...items] : [...items, item]
 
@@ -289,11 +344,13 @@ const withAttempt = (
     walletClockSec,
     identity,
     idempotencyKey,
+    requestedAs,
   }: {
     startedAtMs: number
     walletClockSec: number
     identity: SendIdentity
     idempotencyKey: string | undefined
+    requestedAs?: RequestedAs
   },
 ): LostSend => ({
   startedAtMs: earlier?.startedAtMs ?? startedAtMs,
@@ -302,6 +359,7 @@ const withAttempt = (
   sparkInvoices: withItem(earlier?.sparkInvoices ?? [], identity.sparkInvoice),
   idempotencyKey:
     earlier && earlier.idempotencyKey !== idempotencyKey ? undefined : idempotencyKey,
+  requestedAs: withRequest(earlier?.requestedAs, identity, requestedAs),
 })
 
 type SendOutcome = Awaited<ReturnType<SendPaymentMutation>>
@@ -328,6 +386,79 @@ const outcomeUnknown = (): SendOutcome => ({
       message: SelfCustodialErrorCode.OutcomeUnknown,
     },
   ],
+})
+
+/**
+ * Whether a payment found in the wallet is another send to the destination than this one:
+ * the attempt that made it was asked for another amount than this send, both as entered
+ * and as it leaves the wallet. Unknown on either side (a destination that fixes the
+ * amount, or an attempt recorded before requests were), it is taken for this send, as
+ * before.
+ */
+const isAnotherSendThan = (
+  foundRequest: RequestedAs | undefined,
+  thisRequest: RequestedAs | undefined,
+): boolean => {
+  const isComparable = foundRequest !== undefined && thisRequest !== undefined
+  if (!isComparable) return false
+  const isSameAmount =
+    foundRequest.entered === thisRequest.entered ||
+    foundRequest.settlement === thisRequest.settlement
+  return !isSameAmount
+}
+
+/** What the lost attempt that made a payment found in the wallet was asked for. */
+const requestOf = (lost: LostSend, payment: Payment): RequestedAs | undefined => {
+  const identityKey = identityKeyOfPayment(payment)
+  if (identityKey === undefined) return undefined
+  return lost.requestedAs?.[identityKey]
+}
+
+/** What a payment found in the wallet accounts for among lost attempts: the attempt that
+ *  paid its own invoice, by its payment hash or Spark invoice, and no other. */
+const onlyAttemptOf = (payment: Payment): SettledAttempts => ({
+  lostSend: {
+    startedAtMs: 0,
+    walletClockSec: 0,
+    paymentHashes: withItem([], htlcDetailsOf(payment)?.paymentHash),
+    sparkInvoices: withItem([], sparkInvoiceOf(payment)),
+  },
+})
+
+/** What a payment found for this send accounts for among lost attempts: every attempt
+ *  made for it, but none asked for another amount, which may have paid as well. */
+const attemptsOfThisSend = (
+  lost: LostSend,
+  request: RequestedAs | undefined,
+): SettledAttempts => {
+  const isOfThisSend = (identityKey: string) =>
+    !isAnotherSendThan(lost.requestedAs?.[identityKey], request)
+  return {
+    lostSend: {
+      ...lost,
+      paymentHashes: lost.paymentHashes.filter((hash) => isOfThisSend(`hash:${hash}`)),
+      sparkInvoices: lost.sparkInvoices.filter((invoice) =>
+        isOfThisSend(`invoice:${invoice}`),
+      ),
+    },
+  }
+}
+
+/**
+ * An earlier attempt's payment to the destination, made for another amount: reported as
+ * that payment, for the sender to look at, and not as this send. This send was not paid
+ * by it: either it never went out, or it went out, was lost, and is remembered to be
+ * looked for before the next send to the destination goes out.
+ */
+const earlierPaymentOutcome = (payment: Payment): SendOutcome => ({
+  status: PaymentSendResult.Failure,
+  errors: [
+    {
+      __typename: "GraphQLApplicationError",
+      message: SelfCustodialErrorCode.EarlierPaymentFound,
+    },
+  ],
+  extraInfo: { earlierPaymentId: payment.id },
 })
 
 /** What one attempt reports once its outcome is known: the measurement context it began
@@ -422,6 +553,9 @@ type RunSelfCustodialSendParams<
   prepare: () => Promise<P>
   identify: (prepared: P) => SendIdentity | undefined
   execute: (prepared: P, idempotencyKey: string | undefined) => Promise<R>
+  /** What the sender asked the send for, as they entered it; left out when the
+   *  destination fixes the amount, which leaves nothing to tell apart. */
+  requestedAs?: RequestedAs
   /** What a send the SDK made reports, once it is known not to have failed. */
   sentOutcome: (result: R) => SendOutcome
   /** The wallet's own record of a send an earlier or this attempt made, reported as the
@@ -483,6 +617,7 @@ const sendAfterEarlierAttempts = async <
     prepare,
     identify,
     execute,
+    requestedAs,
     sentOutcome,
     foundOutcome: reportedAsSent,
     failure,
@@ -503,10 +638,36 @@ const sendAfterEarlierAttempts = async <
   const settle = (...settled: SettledAttempts[]) =>
     attempts.update((current) => settled.reduce(withoutSettled, current))
 
-  /** The wallet's record of a send an earlier attempt or this one made, reported as the
-   *  send, with the telemetry of the attempt that paid it. */
-  const foundOutcome = (payment: Payment) => {
+  /**
+   * The wallet's record of a send an earlier attempt or this one made, with the telemetry
+   * of the attempt that paid it (asked for `foundRequest`). For this send, it is reported
+   * as the send, and every attempt it was looked for over is settled with it
+   * (`settleAsThisSend`). Made for another amount, it is reported as the earlier payment
+   * it is (`asEarlierSend`, by default), and settles only its own attempt
+   * (`settleAsEarlierSend`): every other one may have paid too, and stays to be looked
+   * for before anything more goes out.
+   */
+  const reportFound = (
+    payment: Payment,
+    {
+      foundRequest,
+      settleAsThisSend,
+      settleAsEarlierSend,
+      asEarlierSend = earlierPaymentOutcome,
+    }: {
+      foundRequest: RequestedAs | undefined
+      settleAsThisSend: () => void
+      settleAsEarlierSend: () => void
+      asEarlierSend?: (payment: Payment) => SendOutcome
+    },
+  ): SendOutcome => {
     reportOutcomeOf(payment)
+    const isAnotherSend = isAnotherSendThan(foundRequest, requestedAs)
+    if (isAnotherSend) {
+      settleAsEarlierSend()
+      return asEarlierSend(payment)
+    }
+    settleAsThisSend()
     return reportedAsSent(payment)
   }
 
@@ -536,8 +697,12 @@ const sendAfterEarlierAttempts = async <
 
     unresolved = undefined
     if (look.status === "found") {
-      settle(lookedFor, { unresolvedSend: sent })
-      return foundOutcome(look.payment)
+      /** Found under its own key, the payment is that attempt's, whichever send it is. */
+      return reportFound(look.payment, {
+        foundRequest: sent.requestedAs,
+        settleAsThisSend: () => settle(lookedFor, { unresolvedSend: sent }),
+        settleAsEarlierSend: () => settle({ unresolvedSend: sent }),
+      })
     }
     settle({ unresolvedSend: sent })
     return undefined
@@ -575,8 +740,11 @@ const sendAfterEarlierAttempts = async <
     if (look.status === "unreadable") return failure(look.error)
     lookedFor = { ...lookedFor, lostSend: earlier }
     if (look.status === "found") {
-      settle(lookedFor)
-      return foundOutcome(look.payment)
+      return reportFound(look.payment, {
+        foundRequest: requestOf(earlier, look.payment),
+        settleAsThisSend: () => settle(attemptsOfThisSend(earlier, requestedAs)),
+        settleAsEarlierSend: () => settle(onlyAttemptOf(look.payment)),
+      })
     }
     return undefined
   }
@@ -676,7 +844,8 @@ const sendAfterEarlierAttempts = async <
 
   if (!identity) {
     if (isRaisedBeforeDispatch) return failure(err)
-    attempts.update((current) => ({ ...current, unresolvedSend: { idempotencyKey } }))
+    const unresolvedNow: UnresolvedSend = { idempotencyKey, requestedAs }
+    attempts.update((current) => ({ ...current, unresolvedSend: unresolvedNow }))
     return idempotencyKey ? failure(err) : outcomeUnknown()
   }
 
@@ -686,18 +855,41 @@ const sendAfterEarlierAttempts = async <
    *  anything was dispatched is the SDK's word and not this code's, and the send made
    *  next has only the lookup between it and paying twice. */
   const walletClockSec = await readWalletClockSec(sdk)
-  const thisAttempt = { startedAtMs, walletClockSec, identity, idempotencyKey }
+  const thisAttempt = {
+    startedAtMs,
+    walletClockSec,
+    identity,
+    idempotencyKey,
+    requestedAs,
+  }
+  const withThisAttempt = (current: LostAttempts): LostAttempts => ({
+    ...current,
+    lostSend: withAttempt(current.lostSend, thisAttempt),
+  })
   if (!idempotencyKey && !isRaisedBeforeDispatch) {
     const thisAndEarlier = withAttempt(attempts.read().lostSend, thisAttempt)
     const lost = await findThisSend(thisAndEarlier)
     if (lost.status === "found") {
-      settle(lookedFor, { lostSend: thisAndEarlier })
-      return foundOutcome(lost.payment)
+      /** A payment an earlier attempt made leaves this one unaccounted for: it may have
+       *  paid as well, so it is remembered and looked for before the next send. For
+       *  another amount, the sender is told it may have gone through. */
+      const rememberThisSettlingFound = () =>
+        attempts.update((current) =>
+          withoutSettled(withThisAttempt(current), onlyAttemptOf(lost.payment)),
+        )
+      const isThisAttemptsPayment =
+        identityKeyOfPayment(lost.payment) === identityKeyOf(identity)
+      const settleAsThisSend = isThisAttemptsPayment
+        ? () => settle(lookedFor, { lostSend: thisAndEarlier })
+        : rememberThisSettlingFound
+      return reportFound(lost.payment, {
+        foundRequest: requestOf(thisAndEarlier, lost.payment),
+        asEarlierSend: () => outcomeUnknown(),
+        settleAsThisSend,
+        settleAsEarlierSend: rememberThisSettlingFound,
+      })
     }
   }
-  attempts.update((current) => ({
-    ...current,
-    lostSend: withAttempt(current.lostSend, thisAttempt),
-  }))
+  attempts.update(withThisAttempt)
   return failure(err)
 }

@@ -105,6 +105,8 @@ jest.mock("@app/self-custodial/sdk-error", () => {
       NetworkError: "sc_network_error",
       InvalidInput: "sc_invalid_input",
       Generic: "sc_generic",
+      OutcomeUnknown: "sc_outcome_unknown",
+      EarlierPaymentFound: "sc_earlier_payment_found",
     },
     classifySdkError: (err: { tag?: string } | unknown) => {
       const t = (err as { tag?: string })?.tag
@@ -1508,6 +1510,8 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
   /** A new amount or wallet starts the key over, and with it goes the SDK's refusal of a
    *  duplicate. The attempt that threw is remembered all the same, so the send made after
    *  that looks for its payment first. */
+  /** The earlier attempt was asked for another amount: its payment is shown as the earlier
+   *  payment it is, never as this send, and nothing more goes out. */
   it("remembers a bitcoin attempt that threw, for the send made after a new amount", async () => {
     const detail = createSelfCustodialLnurlPaymentDetails(createParams())
     if (!detail.idempotencyKeyRef) throw new Error("expected idempotencyKeyRef")
@@ -1528,7 +1532,9 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
 
     expect(mockFindLostSend).toHaveBeenCalledTimes(1)
     expect(lastLookup().matches(paymentOf(QUOTED_HASH, PENDING))).toBe(true)
-    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.status).toBe(PaymentSendResult.Failure)
+    expect(result.errors?.[0]?.message).toBe("sc_earlier_payment_found")
+    expect(result.extraInfo?.earlierPaymentId).toBe("found-1")
     expect(mockExecuteLnurl).not.toHaveBeenCalled()
   })
 
@@ -2046,6 +2052,7 @@ describe("createSelfCustodialLnurlPaymentDetails send telemetry", () => {
 })
 
 describe("createSelfCustodialLnurlPaymentDetails reporting a bitcoin send", () => {
+  const lostResponse = { tag: "NetworkError" }
   const detailFor = (sats: number, key: string) => {
     const detail = createSelfCustodialLnurlPaymentDetails(
       createParams({
@@ -2060,6 +2067,17 @@ describe("createSelfCustodialLnurlPaymentDetails reporting a bitcoin send", () =
     if (!detail.canSendPayment) throw new Error("expected canSendPayment")
     return detail
   }
+  const earlierPayment = (sats: number) => ({
+    id: "p-earlier",
+    status: 0,
+    amount: BigInt(sats),
+    timestamp: BigInt(1_700_000_000),
+    details: {
+      tag: "Lightning",
+      inner: { htlcDetails: { paymentHash: QUOTED_HASH, preimage: "pre" } },
+    },
+  })
+
   beforeEach(() => {
     ;[mockPrepareLnurl, mockExecuteLnurl, mockFindLostSend].forEach((mock) =>
       mock.mockReset(),
@@ -2077,5 +2095,38 @@ describe("createSelfCustodialLnurlPaymentDetails reporting a bitcoin send", () =
       transaction: undefined,
       extraInfo: { preimage: undefined, successAction: undefined },
     })
+  })
+
+  it("reports an earlier attempt's payment for another amount as that payment", async () => {
+    mockExecuteLnurl.mockRejectedValueOnce(lostResponse)
+    await detailFor(1500, "key-a").sendPaymentMutation({} as never)
+
+    mockFindLostSend.mockResolvedValue({
+      status: "found",
+      payment: earlierPayment(1500),
+      failed: [],
+    })
+    const result = await detailFor(2500, "key-b").sendPaymentMutation({} as never)
+
+    expect(result.status).toBe(PaymentSendResult.Failure)
+    expect(result.errors?.[0]?.message).toBe("sc_earlier_payment_found")
+    expect(result.extraInfo?.earlierPaymentId).toBe("p-earlier")
+    expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+  })
+
+  it("reports an earlier attempt's payment for the same amount as the send", async () => {
+    mockExecuteLnurl.mockRejectedValueOnce(lostResponse)
+    await detailFor(1500, "key-a").sendPaymentMutation({} as never)
+
+    mockFindLostSend.mockResolvedValue({
+      status: "found",
+      payment: earlierPayment(1500),
+      failed: [],
+    })
+    const result = await detailFor(1500, "key-b").sendPaymentMutation({} as never)
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.extraInfo?.preimage).toBe("pre")
+    expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
   })
 })

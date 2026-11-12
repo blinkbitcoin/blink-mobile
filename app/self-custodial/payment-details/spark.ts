@@ -17,7 +17,7 @@ import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { resolveSendTokenIdentifier, toSdkSendAmount } from "../bridge"
 import { ScRail } from "../measurement"
 
-import { createGetFee, createSendMutation } from "./send-helpers"
+import { createGetFee, createSendMutation, requestedAsOf } from "./send-helpers"
 
 type CreateSparkParams<T extends WalletCurrency> = {
   sdk: BreezSdkInterface
@@ -74,6 +74,7 @@ export const createSelfCustodialSparkPaymentDetails = <T extends WalletCurrency>
             sendingWallet: sendingWalletDescriptor.currency,
           },
           idempotencyKeyRef,
+          requestedAs: requestedAsOf(unitOfAccountAmount, settlementAmount),
         }),
       }
     : { canSendPayment: false, canGetFee: false }

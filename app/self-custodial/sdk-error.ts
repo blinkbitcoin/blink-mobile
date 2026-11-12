@@ -12,6 +12,9 @@ export const SelfCustodialErrorCode = {
   /** Not from the SDK: a send threw after dispatch and nothing can tell whether it paid,
    *  so the app refuses to send it again until the sender has checked their history. */
   OutcomeUnknown: "sc_outcome_unknown",
+  /** Not from the SDK: an earlier attempt to the destination turned out to have paid,
+   *  for another amount, so nothing was sent this time and the sender is shown it. */
+  EarlierPaymentFound: "sc_earlier_payment_found",
 } as const
 
 export type SelfCustodialErrorCode =

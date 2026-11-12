@@ -44,6 +44,44 @@ describe("createSelfCustodialSparkPaymentDetails", () => {
     mockCreateSendMutation.mockClear()
   })
 
+  it("hands the send what the sender asked for, as entered and as it leaves the wallet", () => {
+    createSelfCustodialSparkPaymentDetails(
+      createParams({
+        unitOfAccountAmount: {
+          amount: 70,
+          currency: "DisplayCurrency",
+          currencyCode: "USD",
+        },
+      }),
+    )
+
+    expect(mockCreateSendMutation).toHaveBeenLastCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        requestedAs: { entered: "USD:70", settlement: "BTC:1000" },
+      }),
+    )
+  })
+
+  /** The keypad codes sats `SAT`, a conversion from fiat `BTC`: the same sats leave the
+   *  wallet as the same amount either way. */
+  it("tells the amount that leaves the wallet by its currency, not the code it was entered in", () => {
+    const keypadSats = { amount: 1000, currency: WalletCurrency.Btc, currencyCode: "SAT" }
+    createSelfCustodialSparkPaymentDetails(
+      createParams({
+        unitOfAccountAmount: keypadSats,
+        convertMoneyAmount: jest.fn().mockReturnValue(keypadSats),
+      }),
+    )
+
+    expect(mockCreateSendMutation).toHaveBeenLastCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        requestedAs: { entered: "SAT:1000", settlement: "BTC:1000" },
+      }),
+    )
+  })
+
   it("returns Spark payment type", () => {
     const detail = createSelfCustodialSparkPaymentDetails(createParams())
 

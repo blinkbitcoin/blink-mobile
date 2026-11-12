@@ -42,6 +42,7 @@ import { testProps } from "../../utils/testProps"
 import { useSendBalances } from "./hooks/use-send-wallets"
 import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
 import { PaymentSendExtraInfo } from "./payment-details/index.types"
+import { PaymentErrorActions } from "./payment-error-actions"
 import useFee from "./use-fee"
 import {
   IDEMPOTENCY_KEY_UNAVAILABLE,
@@ -126,6 +127,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   })
 
   const [paymentError, setPaymentError] = useState<string | undefined>(undefined)
+  /** What the last send that did not go out said about itself, for the actions it
+   *  offers under its error. */
+  const [failedSend, setFailedSend] = useState<PaymentSendExtraInfo | undefined>(
+    undefined,
+  )
   const [isVerifying, setIsVerifying] = useState(false)
   const verifyPaymentSettled = useVerifyPaymentSettled()
   const { LL } = useI18nContext()
@@ -285,6 +291,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       return sendPayment
     }
 
+    setFailedSend(undefined)
     try {
       logPaymentAttempt({
         paymentType: paymentDetail.paymentType,
@@ -311,6 +318,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         return
       }
 
+      setFailedSend(extraInfo)
       setPaymentError(
         translateSdkError(errorsMessage) ||
           LL.SendBitcoinConfirmationScreen.somethingWentWrong(),
@@ -620,6 +628,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             </Text>
           </View>
         ) : null}
+        <PaymentErrorActions failedSend={failedSend} />
         <View style={styles.buttonContainer}>
           {/* disable slide gestures in area around the slider button */}
           <PanGestureHandler>

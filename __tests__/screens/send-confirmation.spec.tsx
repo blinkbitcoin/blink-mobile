@@ -1441,3 +1441,36 @@ describe("hide balance", () => {
     expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(0)
   })
 })
+
+describe("SendBitcoinConfirmationScreen, a self-custodial send that did not go out", () => {
+  const earlierPaymentText =
+    /Your earlier payment to this destination already went through/i
+
+  const renderAndSlide = async () => {
+    await renderSettled(
+      <ContextForScreen>
+        <Intraledger route={route} />
+      </ContextForScreen>,
+    )
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+  }
+
+  beforeEach(() => {
+    loadLocale("en")
+  })
+
+  it("offers to look at the earlier payment that went through for another amount", async () => {
+    sendPaymentMock.mockResolvedValueOnce({
+      status: "FAILURE",
+      errorsMessage: SelfCustodialErrorCode.EarlierPaymentFound,
+      extraInfo: { earlierPaymentId: "p-earlier" },
+    })
+
+    await renderAndSlide()
+
+    expect(screen.getByText(earlierPaymentText)).toBeTruthy()
+    expect(screen.getByText("View transaction")).toBeTruthy()
+  })
+})

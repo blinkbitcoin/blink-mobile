@@ -127,6 +127,51 @@ describe("settling lost attempts", () => {
     expect(settled.lostSend?.paymentHashes).toEqual(["hash-2"])
   })
 
+  it("removes accounted-for Spark invoices the same way", () => {
+    const withInvoices = (...sparkInvoices: string[]) => ({
+      ...lostSend(),
+      sparkInvoices,
+    })
+
+    const settled = withoutSettled(
+      { lostSend: withInvoices("inv-1", "inv-2") },
+      { lostSend: withInvoices("inv-1") },
+    )
+
+    expect(settled.lostSend?.sparkInvoices).toEqual(["inv-2"])
+  })
+
+  it("forgets what the settled attempts were asked for, keeping the rest", () => {
+    const settled = withoutSettled(
+      {
+        lostSend: {
+          ...lostSend("hash-1", "hash-2"),
+          sparkInvoices: ["inv-1"],
+          requestedAs: {
+            "hash:hash-1": { entered: "USD:100", settlement: "BTC:100" },
+            "hash:hash-2": { entered: "USD:200", settlement: "BTC:200" },
+            "invoice:inv-1": { entered: "USD:300", settlement: "BTC:300" },
+          },
+        },
+      },
+      { lostSend: lostSend("hash-1") },
+    )
+
+    expect(settled.lostSend?.requestedAs).toEqual({
+      "hash:hash-2": { entered: "USD:200", settlement: "BTC:200" },
+      "invoice:inv-1": { entered: "USD:300", settlement: "BTC:300" },
+    })
+  })
+
+  it("keeps a lost send with no requests recorded without inventing any", () => {
+    const settled = withoutSettled(
+      { lostSend: lostSend("hash-1", "hash-2") },
+      { lostSend: lostSend("hash-1") },
+    )
+
+    expect(settled.lostSend?.requestedAs).toBeUndefined()
+  })
+
   it("leaves an unresolved attempt another send recorded meanwhile", () => {
     const recordedMeanwhile = { idempotencyKey: undefined }
 

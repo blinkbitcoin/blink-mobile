@@ -4276,7 +4276,8 @@
         "networkError": "Problema di connessione di rete. Controlla la connessione e riprova.",
         "invalidInput": "I dettagli del pagamento sembrano non validi. Verificali e riprova.",
         "generic": "Il pagamento non è stato completato. Riprova tra un momento, o usa un importo più piccolo.",
-        "outcomeUnknown": "Questo pagamento potrebbe essere già andato a buon fine. Controlla la cronologia delle transazioni prima di inviarlo di nuovo."
+        "outcomeUnknown": "Questo pagamento potrebbe essere già andato a buon fine. Controlla la cronologia delle transazioni prima di inviarlo di nuovo.",
+        "earlierPaymentFound": "Il tuo pagamento precedente verso questa destinazione è già andato a buon fine, per un importo diverso. Controllalo prima di inviare di nuovo."
     },
     "SelfCustodialNetworkMismatch": {
         "toast": "Questo account è stato creato su {network}. Passa a {network} per usarlo."

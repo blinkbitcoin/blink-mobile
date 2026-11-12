@@ -4276,7 +4276,8 @@
     "networkError": "Masalah koneksi jaringan. Periksa koneksi Anda dan coba lagi.",
     "invalidInput": "Detail pembayaran tampak tidak valid. Harap periksa dan coba lagi.",
     "generic": "Pembayaran tidak dapat diselesaikan. Coba lagi sebentar, atau gunakan jumlah yang lebih kecil.",
-    "outcomeUnknown": "Pembayaran ini mungkin sudah berhasil. Periksa riwayat transaksi Anda sebelum mengirimnya lagi."
+    "outcomeUnknown": "Pembayaran ini mungkin sudah berhasil. Periksa riwayat transaksi Anda sebelum mengirimnya lagi.",
+    "earlierPaymentFound": "Pembayaran Anda sebelumnya ke tujuan ini sudah berhasil, dengan jumlah yang berbeda. Periksa sebelum mengirim lagi."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Akun ini dibuat di {network}. Beralih ke {network} untuk menggunakannya."

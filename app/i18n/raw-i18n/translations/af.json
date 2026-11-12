@@ -4276,7 +4276,8 @@
     "networkError": "Netwerkverbindingsprobleem. Kyk jou verbinding en probeer weer.",
     "invalidInput": "Die betaalbesonderhede lyk ongeldig. Kyk asseblief en probeer weer.",
     "generic": "Die betaling kon nie voltooi word nie. Probeer oor 'n oomblik weer, of gebruik 'n kleiner bedrag.",
-    "outcomeUnknown": "Hierdie betaling is dalk reeds deur. Gaan jou transaksiegeskiedenis na voordat jy dit weer stuur."
+    "outcomeUnknown": "Hierdie betaling is dalk reeds deur. Gaan jou transaksiegeskiedenis na voordat jy dit weer stuur.",
+    "earlierPaymentFound": "Jou vorige betaling aan hierdie bestemming is reeds deur, vir 'n ander bedrag. Gaan dit na voordat jy weer stuur."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Hierdie rekening is op {network} geskep. Skakel oor na {network} om dit te gebruik."

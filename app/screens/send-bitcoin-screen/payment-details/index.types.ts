@@ -110,6 +110,9 @@ export type PaymentSendExtraInfo = {
   arrivalAtMempoolEstimate?: number
   preimage?: string | null
   successAction?: LNURLPaySuccessAction
+  /** A self-custodial send found that an earlier attempt to the destination paid, for
+   *  another amount: that payment's id, for the sender to look at. It is not this send. */
+  earlierPaymentId?: string
 }
 
 export type SetAmount<T extends WalletCurrency> = (

@@ -4276,7 +4276,8 @@
     "networkError": "Problém se síťovým připojením. Zkontrolujte připojení a zkuste to znovu.",
     "invalidInput": "Detaily platby vypadají neplatně. Zkontrolujte je a zkuste to znovu.",
     "generic": "Platbu nebylo možné dokončit. Zkuste to za chvíli znovu nebo použijte menší částku.",
-    "outcomeUnknown": "Tato platba už možná proběhla. Než ji odešlete znovu, zkontrolujte historii transakcí."
+    "outcomeUnknown": "Tato platba už možná proběhla. Než ji odešlete znovu, zkontrolujte historii transakcí.",
+    "earlierPaymentFound": "Vaše předchozí platba na tento cíl už proběhla, ale na jinou částku. Než odešlete znovu, zkontrolujte ji."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Tento účet byl vytvořen v síti {network}. Chcete-li jej použít, přepněte na {network}."

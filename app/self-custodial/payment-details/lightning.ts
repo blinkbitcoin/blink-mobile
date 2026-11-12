@@ -18,7 +18,7 @@ import { ConvertDirection } from "@app/types/payment"
 import { buildConversionType } from "../bridge"
 import { ScRail } from "../measurement"
 
-import { createGetFee, createSendMutation } from "./send-helpers"
+import { createGetFee, createSendMutation, requestedAsOf } from "./send-helpers"
 
 type CreateLightningParams<T extends WalletCurrency> = {
   sdk: BreezSdkInterface
@@ -75,6 +75,11 @@ export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurre
       : undefined,
   }
 
+  /** An invoice with an amount fixes it: there is no other amount to tell a send by. */
+  const requestedAs = hasAmount
+    ? undefined
+    : requestedAsOf(unitOfAccountAmount, settlementAmount)
+
   const sendPaymentAndGetFee: PaymentDetailSendPaymentGetFee<T> = settlementAmount.amount
     ? {
         canSendPayment: true,
@@ -86,6 +91,7 @@ export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurre
             sendingWallet: sendingWalletDescriptor.currency,
           },
           idempotencyKeyRef,
+          requestedAs,
         }),
       }
     : { canSendPayment: false, canGetFee: false }

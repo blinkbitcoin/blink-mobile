@@ -24,7 +24,21 @@ export type LostSend = {
   paymentHashes: string[]
   sparkInvoices: string[]
   idempotencyKey?: string
+  /**
+   * What the sender asked each attempt for, by what its payment is found by
+   * (`hash:<payment hash>` or `invoice:<Spark invoice>`): what tells a payment found later
+   * for this send from one an earlier attempt made for another amount.
+   */
+  requestedAs?: Record<string, RequestedAs>
 }
+
+/**
+ * What a sender asked a send for: the amount as they entered it, and as it leaves the
+ * sending wallet (each `<currency code>:<amount>`). Either one alike is the same payment:
+ * entered again in a fiat currency, it comes out other sats once the price moved; entered
+ * in another unit, it still leaves the wallet as the same amount.
+ */
+export type RequestedAs = { entered: string; settlement: string }
 
 /**
  * An attempt that threw after dispatch and left nothing its payment could be found by in
@@ -36,7 +50,11 @@ export type LostSend = {
  * any other send to the same address, so it is refused until the sender has checked
  * their history.
  */
-export type UnresolvedSend = { idempotencyKey?: string }
+export type UnresolvedSend = {
+  idempotencyKey?: string
+  /** What the sender asked it for. */
+  requestedAs?: RequestedAs
+}
 
 /** What a send's lost attempts leave behind for the next send to the same destination. */
 export type LostAttempts = { lostSend?: LostSend; unresolvedSend?: UnresolvedSend }
@@ -225,5 +243,26 @@ const withoutIdentities = (lost: LostSend, settled: LostSend): LostSend | undefi
     (i) => !settled.sparkInvoices.includes(i),
   )
   if (paymentHashes.length === 0 && sparkInvoices.length === 0) return undefined
-  return { ...lost, paymentHashes, sparkInvoices }
+  return {
+    ...lost,
+    paymentHashes,
+    sparkInvoices,
+    requestedAs: requestsStillLost(lost.requestedAs, paymentHashes, sparkInvoices),
+  }
+}
+
+/** What the attempts still lost were asked for, and nothing of the ones settled. */
+const requestsStillLost = (
+  requestedAs: Record<string, RequestedAs> | undefined,
+  paymentHashes: ReadonlyArray<string>,
+  sparkInvoices: ReadonlyArray<string>,
+): Record<string, RequestedAs> | undefined => {
+  if (!requestedAs) return undefined
+  const remaining = new Set([
+    ...paymentHashes.map((hash) => `hash:${hash}`),
+    ...sparkInvoices.map((invoice) => `invoice:${invoice}`),
+  ])
+  return Object.fromEntries(
+    Object.entries(requestedAs).filter(([identity]) => remaining.has(identity)),
+  )
 }

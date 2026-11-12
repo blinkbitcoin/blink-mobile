@@ -46,7 +46,12 @@ import { ScEvent, ScRail } from "../measurement"
 import { classifySdkError } from "../sdk-error"
 
 import { htlcDetailsOf } from "./lost-send"
-import { feeFailure, runSelfCustodialSend, sendSettlement } from "./send-helpers"
+import {
+  feeFailure,
+  requestedAsOf,
+  runSelfCustodialSend,
+  sendSettlement,
+} from "./send-helpers"
 
 const SAT_TO_MILLISAT = BigInt(1000)
 
@@ -317,6 +322,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
             }),
             execute: (prepared, idempotencyKey) =>
               executeLnurl(sdk, prepared, idempotencyKey),
+            requestedAs: requestedAsOf(unitOfAccountAmount, settlementAmount),
             sentOutcome: (result) =>
               sendOutcome(
                 result.payment,

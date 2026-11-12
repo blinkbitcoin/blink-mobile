@@ -8,6 +8,13 @@ jest.mock("@app/self-custodial/payment-details/send-helpers", () => ({
   createGetFeeOnchain: jest.fn().mockReturnValue(jest.fn()),
   createSendMutation: jest.fn().mockReturnValue(jest.fn()),
   createSendMutationOnchain: jest.fn().mockReturnValue(jest.fn()),
+  requestedAsOf: (
+    entered: { currencyCode: string; amount: number },
+    settlement: { currency: string; amount: number },
+  ) => ({
+    entered: `${entered.currencyCode}:${entered.amount}`,
+    settlement: `${settlement.currency}:${settlement.amount}`,
+  }),
 }))
 
 jest.mock("@app/screens/send-bitcoin-screen/fee-tier-selector", () => ({
@@ -32,6 +39,21 @@ const createParams = (overrides = {}) => ({
 })
 
 describe("createSelfCustodialOnchainPaymentDetails", () => {
+  it("hands the send what the sender asked for, as they entered it", () => {
+    const { createSendMutationOnchain } = jest.requireMock(
+      "@app/self-custodial/payment-details/send-helpers",
+    )
+    createSelfCustodialOnchainPaymentDetails(createParams())
+
+    expect(createSendMutationOnchain).toHaveBeenLastCalledWith(
+      expect.anything(),
+      expect.anything(),
+      expect.objectContaining({
+        requestedAs: { entered: "BTC:1000", settlement: "BTC:1000" },
+      }),
+    )
+  })
+
   it("returns Onchain payment type", () => {
     const detail = createSelfCustodialOnchainPaymentDetails(createParams())
     expect(detail.paymentType).toBe(PaymentType.Onchain)

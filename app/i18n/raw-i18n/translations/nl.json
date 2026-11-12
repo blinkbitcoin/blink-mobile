@@ -4276,7 +4276,8 @@
     "networkError": "Probleem met netwerkverbinding. Controleer je verbinding en probeer opnieuw.",
     "invalidInput": "De betalingsgegevens lijken ongeldig. Controleer ze en probeer opnieuw.",
     "generic": "De betaling kon niet worden voltooid. Probeer het zo opnieuw, of gebruik een kleiner bedrag.",
-    "outcomeUnknown": "Deze betaling is mogelijk al uitgevoerd. Controleer je transactiegeschiedenis voordat je hem opnieuw verstuurt."
+    "outcomeUnknown": "Deze betaling is mogelijk al uitgevoerd. Controleer je transactiegeschiedenis voordat je hem opnieuw verstuurt.",
+    "earlierPaymentFound": "Je eerdere betaling naar deze bestemming is al uitgevoerd, voor een ander bedrag. Controleer hem voordat je opnieuw verstuurt."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Dit account is aangemaakt op {network}. Schakel over naar {network} om het te gebruiken."
