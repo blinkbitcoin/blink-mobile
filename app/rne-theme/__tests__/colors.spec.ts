@@ -83,6 +83,42 @@ describe("color token aliases", () => {
   })
 })
 
+// Field fills ruled by design (Nov 2026) for contrast against backgroundDefault.
+// The alias tests above only check names against each other, so pin the values.
+describe("field fill values", () => {
+  it("uses the ruled field fills in light mode", () => {
+    expect(light.surfaceInteractive).toBe("#ECECEE")
+    expect(light.surfaceStatic).toBe("#F2F2F2")
+  })
+
+  it("uses the ruled field fills in dark mode", () => {
+    expect(dark.surfaceInteractive.toUpperCase()).toBe("#1D1D1D")
+    expect(dark.surfaceStatic).toBe("#171717")
+  })
+
+  it("keeps the legacy grey5 and grey7 aliases on the ruled values", () => {
+    expect(light.grey5).toBe("#ECECEE")
+    expect(light.grey7).toBe("#F2F2F2")
+    expect(dark.grey7).toBe("#171717")
+  })
+
+  // Static fills sit between the background and the tappable fill in both modes.
+  it("orders static fills between the background and the tappable fill", () => {
+    const luminance = (hex: string) => parseInt(hex.slice(1, 3), 16)
+
+    expect(luminance(light.surfaceStatic)).toBeLessThan(
+      luminance(light.backgroundDefault),
+    )
+    expect(luminance(light.surfaceStatic)).toBeGreaterThan(
+      luminance(light.surfaceInteractive),
+    )
+    expect(luminance(dark.surfaceStatic)).toBeGreaterThan(
+      luminance(dark.backgroundDefault),
+    )
+    expect(luminance(dark.surfaceStatic)).toBeLessThan(luminance(dark.surfaceInteractive))
+  })
+})
+
 // No semantic alias yet: flagged for design review in colors.ts.
 const blues = ["blue5", "_blue", "_lightBlue", "_sky"]
 
