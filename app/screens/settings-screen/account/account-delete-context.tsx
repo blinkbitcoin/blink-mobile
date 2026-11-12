@@ -117,7 +117,7 @@ export const AccountDeleteContextProvider: React.FC<PropsWithChildren> = ({
                 {lock.identifier}
               </Text>
             ) : null}
-            <Text type="p2" color={colors.grey2}>
+            <Text type="p2" color={colors.textMuted}>
               {LL.AccountScreen.accountBeingDeleted()}
             </Text>
           </View>
@@ -139,7 +139,7 @@ const useStyles = makeStyles(({ colors }) => ({
     right: 0,
     bottom: 0,
     left: 0,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     display: "flex",
     flexDirection: "column",
     rowGap: 10,

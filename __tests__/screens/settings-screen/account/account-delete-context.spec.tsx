@@ -12,7 +12,7 @@ import {
 } from "@app/screens/settings-screen/account/account-delete-context"
 
 jest.mock("@rn-vui/themed", () => {
-  const colors = { grey2: "#999", white: "#fff" }
+  const colors = { textMuted: "#999", backgroundDefault: "#fff" }
   return {
     makeStyles: (fn: (theme: { colors: Record<string, string> }) => object) => () =>
       fn({ colors }),
