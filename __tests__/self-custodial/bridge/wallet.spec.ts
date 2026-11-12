@@ -7,7 +7,9 @@ import {
   getWalletInfo,
   listAllPayments,
   listPayments,
+  listSentPaymentsSince,
   registerLightningAddress,
+  syncSelfCustodialWallet,
 } from "@app/self-custodial/bridge/wallet"
 
 const mockReportError = jest.fn()
@@ -104,6 +106,84 @@ describe("deriveWalletIdentityPubkey", () => {
   })
 })
 
+/**
+ * A sync cannot be cancelled, so a caller that gives up leaves it running. Starting a
+ * second one then buys nothing — the SDK serializes them anyway — and costs another native
+ * future, so callers share whichever is already in flight.
+ */
+describe("syncSelfCustodialWallet", () => {
+  const pendingSdk = () => {
+    let settle: (value: unknown) => void = () => undefined
+    const syncWallet = jest.fn(
+      () =>
+        new Promise((resolve) => {
+          settle = resolve
+        }),
+    )
+    return { sdk: { syncWallet } as never, syncWallet, settle: () => settle({}) }
+  }
+
+  it("hands a second caller the sync already running", () => {
+    const { sdk, syncWallet } = pendingSdk()
+
+    const first = syncSelfCustodialWallet(sdk)
+    const second = syncSelfCustodialWallet(sdk)
+
+    expect(second).toBe(first)
+    expect(syncWallet).toHaveBeenCalledTimes(1)
+  })
+
+  it("starts a sync of its own once the shared one has settled", async () => {
+    const { sdk, syncWallet, settle } = pendingSdk()
+
+    const first = syncSelfCustodialWallet(sdk)
+    settle()
+    await first
+
+    syncSelfCustodialWallet(sdk)
+
+    expect(syncWallet).toHaveBeenCalledTimes(2)
+  })
+
+  /** A failed sync is finished too: the next caller must not be handed the failure. */
+  it("starts a sync of its own once the shared one has failed", async () => {
+    const offline = new Error("no connection")
+    const syncWallet = jest.fn().mockRejectedValueOnce(offline).mockResolvedValueOnce({})
+    const sdk = { syncWallet } as never
+
+    await expect(syncSelfCustodialWallet(sdk)).rejects.toThrow(offline)
+    await syncSelfCustodialWallet(sdk)
+
+    expect(syncWallet).toHaveBeenCalledTimes(2)
+  })
+
+  /** Keyed by the wallet, so another account's sync is never handed this one's. */
+  it("keeps each wallet's sync to itself", () => {
+    const one = pendingSdk()
+    const other = pendingSdk()
+
+    syncSelfCustodialWallet(one.sdk)
+    syncSelfCustodialWallet(other.sdk)
+
+    expect(one.syncWallet).toHaveBeenCalledTimes(1)
+    expect(other.syncWallet).toHaveBeenCalledTimes(1)
+  })
+
+  /** The sync that replaces a settled one is shared in its turn. */
+  it("shares the next sync too", async () => {
+    const wallet = pendingSdk()
+    const started = syncSelfCustodialWallet(wallet.sdk)
+    wallet.settle()
+    await started
+
+    const second = syncSelfCustodialWallet(wallet.sdk)
+    const third = syncSelfCustodialWallet(wallet.sdk)
+
+    expect(third).toBe(second)
+    expect(wallet.syncWallet).toHaveBeenCalledTimes(2)
+  })
+})
+
 describe("getWalletInfo", () => {
   it("calls sdk.getInfo with ensureSynced:false so startup does not block on SDK sync", () => {
     const getInfo = jest.fn().mockResolvedValue({ balanceSats: 0 })
@@ -128,6 +208,30 @@ describe("listPayments", () => {
       fromTimestamp: undefined,
       toTimestamp: undefined,
       offset: 20,
+      limit: 50,
+      sortAscending: false,
+    })
+  })
+})
+
+describe("listSentPaymentsSince", () => {
+  it("asks for a page of outgoing payments from the timestamp on, newest first, in any status", () => {
+    const listPaymentsFn = jest.fn().mockResolvedValue({ payments: [] })
+
+    listSentPaymentsSince({ listPayments: listPaymentsFn } as never, {
+      fromTimestamp: BigInt(1747691078),
+      limit: 50,
+      offset: 100,
+    })
+
+    expect(listPaymentsFn).toHaveBeenCalledWith({
+      typeFilter: [0],
+      statusFilter: undefined,
+      assetFilter: undefined,
+      paymentDetailsFilter: undefined,
+      fromTimestamp: BigInt(1747691078),
+      toTimestamp: undefined,
+      offset: 100,
       limit: 50,
       sortAscending: false,
     })

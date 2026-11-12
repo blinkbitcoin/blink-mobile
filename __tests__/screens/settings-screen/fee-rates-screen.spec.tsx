@@ -18,10 +18,40 @@ import { detectDefaultLocale } from "@app/utils/locale-detector"
 import { ContextForScreen } from "../helper"
 
 let mockFeeRatesConfig: FeeRatesConfig
+let mockInactivityFeeEnabled: boolean
 jest.mock("@app/config/feature-flags-context", () => ({
   ...jest.requireActual("@app/config/feature-flags-context"),
-  useRemoteConfig: () => ({ feeRatesConfig: mockFeeRatesConfig }),
+  useRemoteConfig: () => ({
+    feeRatesConfig: mockFeeRatesConfig,
+    inactivityFeeEnabled: mockInactivityFeeEnabled,
+  }),
 }))
+
+const inactivityFeeMocks = (usdCentsPerMonth: number): ReadonlyArray<MockedResponse> => [
+  {
+    request: { query: FeeRatesDocument },
+    result: {
+      data: {
+        globals: {
+          __typename: "Globals",
+          feesInformation: {
+            __typename: "FeesInformation",
+            deposit: {
+              __typename: "DepositFeesInformation",
+              minBankFee: "2500",
+              minBankFeeThreshold: "1000000",
+              tiers: [
+                { __typename: "DepositFeeTier", maxAmount: "1000000", amount: "2500" },
+                { __typename: "DepositFeeTier", maxAmount: null, amount: "5000" },
+              ],
+            },
+            inactivityFee: { __typename: "InactivityFeeInformation", usdCentsPerMonth },
+          },
+        },
+      },
+    },
+  },
+]
 
 const Stack = createNativeStackNavigator()
 
@@ -48,6 +78,7 @@ describe("FeeRatesScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     mockFeeRatesConfig = { ...defaultFeeRatesConfig }
+    mockInactivityFeeEnabled = true
   })
 
   it("renders Send, Receive and Transfer sections with remote-config default rates", async () => {
@@ -215,6 +246,78 @@ describe("FeeRatesScreen", () => {
     await findByText("2,500 SAT")
   })
 
+  it("quotes the API's inactivity fee for both custodial balances", async () => {
+    const { getAllByText, findByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    await findByText("Inactivity >12 months")
+
+    // Labels and values render in tree order, so each row's value is the
+    // entry immediately after its label. The backend charges one amount per
+    // balance, so both rows carry the same usdCentsPerMonth.
+    const cells = getAllByText(
+      /^(Inactivity >12 months|Bitcoin Balance|Dollar Balance|\$1\/month)$/,
+    ).map((node) => node.children.join(""))
+
+    expect(cells).toEqual([
+      "Inactivity >12 months",
+      "Bitcoin Balance",
+      "$1/month",
+      "Dollar Balance",
+      "$1/month",
+    ])
+  })
+
+  it("quotes a fractional inactivity fee to the cent", async () => {
+    const { findAllByText, queryByText } = renderWithApolloMocks(inactivityFeeMocks(150))
+
+    expect(await findAllByText("$1.50/month")).toHaveLength(2)
+    expect(queryByText("$1/month")).toBeNull()
+  })
+
+  it("keeps the inactivity rows and reads no fee when the API charges zero", async () => {
+    const { findByText, getByText, getAllByText } = renderWithApolloMocks(
+      inactivityFeeMocks(0),
+    )
+
+    expect(await findByText("Inactivity >12 months")).toBeTruthy()
+    expect(getByText("Bitcoin Balance")).toBeTruthy()
+    expect(getByText("Dollar Balance")).toBeTruthy()
+    // 4 from Send and Receive, plus one per inactivity row.
+    expect(getAllByText("no fee")).toHaveLength(6)
+  })
+
+  it("hides the Inactivity section when remote config turns it off", async () => {
+    mockInactivityFeeEnabled = false
+
+    const { queryByText, findByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    await findByText("2,500 SAT")
+
+    expect(queryByText("Inactivity >12 months")).toBeNull()
+    expect(queryByText("Bitcoin Balance")).toBeNull()
+    expect(queryByText("$1/month")).toBeNull()
+  })
+
+  it("hides the Inactivity section until the API returns the fee", async () => {
+    const { queryByText, findByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    expect(queryByText("Inactivity >12 months")).toBeNull()
+
+    expect(await findByText("Inactivity >12 months")).toBeTruthy()
+  })
+
   it("renders onchain receive fees from the API", async () => {
     const { findByText } = render(
       <ContextForScreen>
@@ -248,13 +351,16 @@ describe("FeeRatesScreen", () => {
       },
     ]
 
-    const { getByText, findByText } = renderWithApolloMocks(errorMocks)
+    const { getByText, queryByText, findByText } = renderWithApolloMocks(errorMocks)
 
     expect(await findByText("Unable to fetch fees at this time")).toBeTruthy()
     expect(getByText("Try Again")).toBeTruthy()
 
     expect(getByText("from ~0.9%")).toBeTruthy()
     expect(getByText("0.5%")).toBeTruthy()
+    // The amount is the API's, so a failed query shows no inactivity rows
+    // rather than a fallback price.
+    expect(queryByText("Inactivity >12 months")).toBeNull()
   })
 
   it("recovers via Try Again after a failed query", async () => {
@@ -283,6 +389,10 @@ describe("FeeRatesScreen", () => {
                     },
                     { __typename: "DepositFeeTier", maxAmount: null, amount: "5000" },
                   ],
+                },
+                inactivityFee: {
+                  __typename: "InactivityFeeInformation",
+                  usdCentsPerMonth: 100,
                 },
               },
             },
@@ -327,6 +437,10 @@ describe("FeeRatesScreen", () => {
                     { __typename: "DepositFeeTier", maxAmount: null, amount: "5000" },
                   ],
                 },
+                inactivityFee: {
+                  __typename: "InactivityFeeInformation",
+                  usdCentsPerMonth: 100,
+                },
               },
             },
           },
@@ -364,6 +478,10 @@ describe("FeeRatesScreen", () => {
                     },
                     { __typename: "DepositFeeTier", maxAmount: null, amount: "0" },
                   ],
+                },
+                inactivityFee: {
+                  __typename: "InactivityFeeInformation",
+                  usdCentsPerMonth: 100,
                 },
               },
             },

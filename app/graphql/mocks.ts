@@ -1,4 +1,5 @@
 import {
+  ApiKeysDocument,
   BulletinsDocument,
   ContactsDocument,
   CurrencyListDocument,
@@ -334,6 +335,18 @@ const mocks = [
     },
   },
   {
+    request: { query: ApiKeysDocument },
+    result: {
+      data: {
+        me: {
+          id: "user-id-123",
+          apiKeys: [],
+          __typename: "User",
+        },
+      },
+    },
+  },
+  {
     request: { query: MyUserIdDocument },
     result: {
       data: {
@@ -469,6 +482,10 @@ const mocks = [
                   amount: "5000",
                 },
               ],
+            },
+            inactivityFee: {
+              __typename: "InactivityFeeInformation",
+              usdCentsPerMonth: 100,
             },
           },
         },
@@ -1864,7 +1881,7 @@ const mocks = [
   {
     request: {
       query: BulletinsDocument,
-      variables: { first: 1 },
+      variables: { first: 10 },
     },
     result: {
       data: {
@@ -1968,7 +1985,8 @@ const mocks = [
           },
           denominatorCurrency: "USD",
           id: "67b6e1d2-04c8-509a-abbd-b1cab08575d5",
-          timestamp: 1677184189,
+          /** As just served: a self-custodial session ages the backend's price by it. */
+          timestamp: Math.floor(Date.now() / 1000),
           usdCentPrice: {
             base: 100000000,
             offset: 6,

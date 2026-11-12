@@ -3,9 +3,11 @@ import { useCallback, useEffect, useState } from "react"
 import { usePayments } from "@app/hooks/use-payments"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
+  DepositClaimDeferral,
   DepositErrorReason,
   DepositStatus,
   PaymentResultStatus,
+  type ClaimDepositResult,
   type PendingDeposit,
 } from "@app/types/payment"
 import { toastShow } from "@app/utils/toast"
@@ -27,10 +29,18 @@ type LL = ReturnType<typeof useI18nContext>["LL"]
 
 const resolveClaimErrorMessage = (
   deposit: PendingDeposit,
-  errors: PaymentError[] | undefined,
+  { deferral, requiredFeeSats, errorReason, errors }: ClaimDepositResult,
   LL: LL,
 ): string => {
-  if (deposit.errorReason === DepositErrorReason.BelowDust) {
+  if (deferral === DepositClaimDeferral.FeeExceeded) {
+    return LL.UnclaimedDeposit.feeExceeded({
+      requiredFee: requiredFeeSats ?? deposit.requiredFeeSats ?? 0,
+    })
+  }
+  if (deferral === DepositClaimDeferral.AwaitingConfirmations) {
+    return LL.UnclaimedDeposit.immature()
+  }
+  if ((errorReason ?? deposit.errorReason) === DepositErrorReason.BelowDust) {
     return LL.UnclaimedDeposit.belowDustLimit()
   }
   if (deposit.errorReason === DepositErrorReason.FeeExceeded) {
@@ -104,8 +114,13 @@ export const useDepositActions = () => {
           maxFeeSats: deposit.requiredFeeSats,
         })
         if (result.status === PaymentResultStatus.Failed) {
-          const message = resolveClaimErrorMessage(deposit, result.errors, LL)
+          const message = resolveClaimErrorMessage(deposit, result, LL)
           toastShow({ message, LL })
+          return
+        }
+        if (result.status === PaymentResultStatus.Pending) {
+          toastShow({ message: LL.UnclaimedDeposit.claiming(), type: "warning", LL })
+          await refresh()
           return
         }
         toastShow({

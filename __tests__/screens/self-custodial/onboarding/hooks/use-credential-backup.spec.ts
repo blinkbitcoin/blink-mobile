@@ -85,7 +85,7 @@ describe("useCredentialBackup", () => {
         saveResult = await result.current.save(walletIdentifier, mnemonic)
       })
 
-      expect(saveResult).toEqual({
+      expect(saveResult).toMatchObject({
         success: false,
         error: CredentialError.UserCancelled,
       })
@@ -100,7 +100,7 @@ describe("useCredentialBackup", () => {
         saveResult = await result.current.save(walletIdentifier, mnemonic)
       })
 
-      expect(saveResult).toEqual({
+      expect(saveResult).toMatchObject({
         success: false,
         error: CredentialError.UserCancelled,
       })
@@ -115,7 +115,7 @@ describe("useCredentialBackup", () => {
         saveResult = await result.current.save(walletIdentifier, mnemonic)
       })
 
-      expect(saveResult).toEqual({
+      expect(saveResult).toMatchObject({
         success: false,
         error: CredentialError.NoProvider,
       })
@@ -130,7 +130,7 @@ describe("useCredentialBackup", () => {
         saveResult = await result.current.save(walletIdentifier, mnemonic)
       })
 
-      expect(saveResult).toEqual({ success: false, error: CredentialError.Unknown })
+      expect(saveResult).toMatchObject({ success: false, error: CredentialError.Unknown })
     })
 
     it("returns unknown when a non-Error value is thrown", async () => {
@@ -142,7 +142,7 @@ describe("useCredentialBackup", () => {
         saveResult = await result.current.save(walletIdentifier, mnemonic)
       })
 
-      expect(saveResult).toEqual({ success: false, error: CredentialError.Unknown })
+      expect(saveResult).toMatchObject({ success: false, error: CredentialError.Unknown })
     })
   })
 
@@ -239,6 +239,23 @@ describe("useCredentialBackup", () => {
         walletIdentifier,
         mnemonic,
       })
+    })
+
+    /** The password manager offers every password saved for Blink. */
+    it("finds no wallet backup in an authenticator's setup key picked from the list", async () => {
+      mockSignIn.mockResolvedValue({
+        type: "password",
+        username: "someone (2FA)",
+        password: "ABCDEFGHIJKL",
+      })
+
+      const { result } = renderHook(() => useCredentialBackup())
+      let readResult
+      await act(async () => {
+        readResult = await result.current.read()
+      })
+
+      expect(readResult).toEqual({ success: false, error: CredentialError.NoProvider })
     })
 
     it("classifies cancellation errors", async () => {

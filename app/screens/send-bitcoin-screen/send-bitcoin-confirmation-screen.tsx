@@ -497,7 +497,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               onPress={handleCopyToClipboard}
               hitSlop={30}
             >
-              <GaloyIcon name={"copy-paste"} size={18} color={colors.primary} />
+              <GaloyIcon name={"copy-paste"} size={18} color={colors.accent} />
             </TouchableOpacity>
           </View>
         </View>
@@ -656,7 +656,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     borderStyle: "solid",
     overflow: "hidden",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     padding: 14,
     minHeight: 60,
     borderRadius: 10,

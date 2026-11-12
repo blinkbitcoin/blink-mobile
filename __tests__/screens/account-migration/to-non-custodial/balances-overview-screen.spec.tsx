@@ -1,6 +1,7 @@
 import React from "react"
 import { Linking } from "react-native"
-import { render, screen, fireEvent, waitFor } from "@testing-library/react-native"
+import { it } from "@jest/globals"
+import { act, render, screen, fireEvent, waitFor } from "@testing-library/react-native"
 
 import { MigrationStatus } from "@app/graphql/generated"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -8,18 +9,40 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { MigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import { MigrationBalancesOverviewScreen } from "@app/screens/account-migration/to-non-custodial/balances-overview-screen"
+import {
+  type CheckpointUpdate,
+  mergeCheckpoint,
+} from "@app/screens/account-migration/utils/migration-checkpoint-storage"
+import { MigrationLnAddressOutcome, MigrationSupportReason } from "@app/types/migration"
+import { WindDown, WindDownStatus } from "@app/types/wind-down"
+import {
+  StorageFailure,
+  type StorageWriteResult,
+} from "@app/utils/storage/storage-failure"
 import { ContextForScreen } from "../../helper"
-import { walletOverviewQueryResult } from "../helpers"
+import {
+  pendingDepositsQueryResult,
+  pendingOnChainReceive,
+  walletOverviewQueryResult,
+} from "../helpers"
 import { flushEffects } from "../../../helpers/flush-effects"
 
 loadLocale("en")
 const LL = i18nObject("en")
 const LLOverview = LL.AccountMigration.balancesOverview
+const LLStorage = LL.AccountMigration.storageUnavailable
+
+/** What the screen hands saveCheckpoint for the commit point. */
+type CommitPointSaveOptions = Pick<
+  CheckpointUpdate,
+  "expectedReceiveSats" | "isStartConfirmed" | "isServerFlowUnstarted"
+>
 const CONTACT_EMAIL = "support@blink.sv"
 
 const mockNavigate = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
 const mockUseMigrationQuery = jest.fn()
+const mockUseMigrationPendingDepositsQuery = jest.fn()
 const mockMigrationStart = jest.fn()
 const mockRefetchMigration = jest.fn()
 const mockRefetchWallets = jest.fn()
@@ -60,10 +83,36 @@ const migrationQueryResult = (preview: {
   },
 })
 
+const mockSetParams = jest.fn()
+const mockReset = jest.fn()
+let mockRouteParams: { isDepositRefused?: true } | undefined
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    setParams: mockSetParams,
+    reset: mockReset,
+  }),
+  useRoute: () => ({ params: mockRouteParams }),
   useIsFocused: () => mockIsFocused,
+}))
+
+let mockWindDown: WindDown | null = null
+jest.mock("@app/screens/account-migration/hooks/use-custodial-wind-down", () => ({
+  useCustodialWindDown: () => mockWindDown,
+}))
+
+const mockSendDepositSupportEmail = jest.fn()
+const mockUseMigrationSupportEmail = jest.fn()
+jest.mock("@app/screens/account-migration/hooks/use-migration-support-email", () => ({
+  useMigrationSupportEmail: (reason: string) => {
+    mockUseMigrationSupportEmail(reason)
+    return {
+      sendSupportEmail: mockSendDepositSupportEmail,
+      cardDetails: [],
+      supportDetailsText: "",
+    }
+  },
 }))
 
 jest.mock("@app/graphql/generated", () => ({
@@ -72,15 +121,19 @@ jest.mock("@app/graphql/generated", () => ({
     mockUseWalletOverviewScreenQuery(options),
   useMigrationQuery: () => mockUseMigrationQuery(),
   useMigrationStartMutation: () => [mockMigrationStart],
+  useMigrationPendingDepositsQuery: () => mockUseMigrationPendingDepositsQuery(),
 }))
 
 let mockMigrationStatus: MigrationStatus | null = null
+let mockMigrationStatusError: Error | undefined
+const mockRefetchMigrationStatus = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-status", () => ({
   useMigrationStatus: () => ({
     status: mockMigrationStatus,
     loading: false,
-    refetch: jest.fn(),
+    error: mockMigrationStatusError,
+    refetch: mockRefetchMigrationStatus,
   }),
 }))
 
@@ -98,31 +151,44 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (operation: string, err: unknown) => mockReportError(operation, err),
 }))
 
-const mockSaveCheckpoint = jest.fn()
+/** Resolves true like the real one: the commit point is recorded before Approve opens. */
+const mockSaveCheckpoint = jest.fn().mockResolvedValue({ isSaved: true, failure: null })
+/** What the hook hands out as saveCheckpoint. The real one changes identity once a write
+ *  lands (it closes over the stored figure), which a case swaps this to reproduce. */
+let mockSaveCheckpointHandle: (...args: unknown[]) => unknown = mockSaveCheckpoint
 let mockCheckpointLoading = false
 
 let mockCheckpointAccountId: string | null = "sc-account-1"
+/** What the store already holds for this owner: a first visit arrives from the step before
+ *  the commit point with no figure yet, which is the default every case starts from. */
+let mockStoredCheckpoint: MigrationCheckpoint | null =
+  MigrationCheckpoint.ChooseExperience
+let mockStoredExpectedReceiveSats: number | null = null
+let mockStoredIsStartConfirmed = false
 let mockOwnerId: string | null = "owner-1"
 const mockLnRetry = jest.fn()
-let mockLnAddressTransfer = {
-  isTransferred: true,
-  isRejected: false,
-  isAccountMissing: false,
-  hasConnectionIssue: false,
+const lnTransferWith = (outcome: MigrationLnAddressOutcome) => ({
+  outcome,
   retry: mockLnRetry,
-}
+})
+let mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.Transferred)
 
 let mockCheckpointHasError = false
+let mockCheckpointStorageFailure: StorageFailure | null = null
 const mockRefetchCheckpoint = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   useMigrationCheckpoint: () => ({
+    checkpoint: mockStoredCheckpoint,
+    expectedReceiveSats: mockStoredExpectedReceiveSats,
+    isStartConfirmed: mockStoredIsStartConfirmed,
     accountId: mockCheckpointAccountId,
     loading: mockCheckpointLoading,
     hasError: mockCheckpointHasError,
+    storageFailure: mockCheckpointStorageFailure,
     refetch: mockRefetchCheckpoint,
-    saveCheckpoint: mockSaveCheckpoint,
+    saveCheckpoint: mockSaveCheckpointHandle,
   }),
 }))
 
@@ -150,13 +216,7 @@ jest.mock("@app/screens/account-migration/hooks/use-custodial-owner-id", () => (
 
 /** The re-point as it stands before it has answered: nothing moved, nothing failed. The
  *  state every id that never arrived leaves it in, since it cannot fire without them. */
-const unsettledLnTransfer = () => ({
-  isTransferred: false,
-  isRejected: false,
-  isAccountMissing: false,
-  hasConnectionIssue: false,
-  retry: mockLnRetry,
-})
+const unsettledLnTransfer = () => lnTransferWith(MigrationLnAddressOutcome.Pending)
 
 const mockUseLnAddressTransfer = jest.fn()
 jest.mock(
@@ -183,6 +243,27 @@ jest.mock("@app/components/dollar-balance-migration-modal", () => ({
           RN.Text,
           { testID: "dollar-balance-modal-transfer", onPress: props.onTransfer },
           "transfer",
+        )
+      : null
+  },
+}))
+
+const mockPendingDepositModal = jest.fn()
+jest.mock("@app/screens/account-migration/pending-deposit-modal", () => ({
+  PendingDepositModal: (props: {
+    isVisible: boolean
+    onAcknowledge: () => void
+    showCloseIconButton?: boolean
+    isChecking?: boolean
+  }) => {
+    mockPendingDepositModal(props)
+    const ReactNs = jest.requireActual<typeof import("react")>("react")
+    const RN = jest.requireActual<typeof import("react-native")>("react-native")
+    return props.isVisible
+      ? ReactNs.createElement(
+          RN.Text,
+          { testID: "pending-deposit-modal-ok", onPress: props.onAcknowledge },
+          "ok",
         )
       : null
   },
@@ -231,6 +312,10 @@ const renderScreen = () => render(screenTree())
 
 const resetScreenMocks = () => {
   jest.clearAllMocks()
+  mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
+  mockSaveCheckpointHandle = mockSaveCheckpoint
+  mockRouteParams = undefined
+  mockWindDown = null
   loadLocale("en")
   mockDollarRestricted = false
   mockCurrentDollarRestricted = false
@@ -238,36 +323,43 @@ const resetScreenMocks = () => {
   mockConvertReady = true
   mockCheckpointLoading = false
   mockCheckpointAccountId = "sc-account-1"
+  mockStoredCheckpoint = MigrationCheckpoint.ChooseExperience
+  mockStoredExpectedReceiveSats = null
+  mockStoredIsStartConfirmed = false
   mockStoredModes = {}
   mockOwnerId = "owner-1"
   mockOwnerIdLoading = false
   mockOwnerIdSkipped = false
   mockOwnerIdError = false
   mockCheckpointHasError = false
+  mockCheckpointStorageFailure = null
   mockRefetchOwnerId.mockResolvedValue(undefined)
   mockRefetchCheckpoint.mockResolvedValue(undefined)
-  mockLnAddressTransfer = {
-    isTransferred: true,
-    isRejected: false,
-    isAccountMissing: false,
-    hasConnectionIssue: false,
-    retry: mockLnRetry,
-  }
+  mockRefetchMigrationStatus.mockResolvedValue(null)
+  mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.Transferred)
   mockIsFocused = true
   mockIsAuthed = true
-  mockUseWalletOverviewScreenQuery.mockReturnValue(
-    walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
-  )
-  mockUseMigrationQuery.mockReturnValue(
-    migrationQueryResult({
+  /** Each source answers a refetch, as the figures read again after a deposit cleared. */
+  mockUseWalletOverviewScreenQuery.mockReturnValue({
+    ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+    refetch: jest.fn().mockResolvedValue(undefined),
+  })
+  mockUseMigrationQuery.mockReturnValue({
+    ...migrationQueryResult({
       balanceSats: 1000,
       feeSats: 10,
       feeCoveredByBlink: false,
       receiveSats: 990,
     }),
-  )
+    refetch: jest.fn().mockResolvedValue(undefined),
+  })
   mockMigrationStart.mockResolvedValue(acceptedMigrationStart)
-  mockMigrationStatus = null
+  mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingDepositsQueryResult())
+  /** An answered phase, because the start waits for one: the tests about the phase read
+   *  itself set their own. In progress rather than not started, so no write claims the
+   *  figure unless a test asks for it. */
+  mockMigrationStatus = MigrationStatus.InProgress
+  mockMigrationStatusError = undefined
   jest.spyOn(Linking, "openURL").mockImplementation(() => Promise.resolve())
 }
 
@@ -494,6 +586,21 @@ describe("MigrationBalancesOverviewScreen", () => {
     expect(mockMigrationStart).not.toHaveBeenCalled()
   })
 
+  /** A phase this build does not know is no run to start on, and asking again only gets
+   *  it back: the start is held and support takes over, as for a failed migration. */
+  it("hands over to support when the server reports a phase this build does not know", async () => {
+    mockMigrationStatus = "PAUSED_FOR_REVIEW" as unknown as MigrationStatus
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "status-unrecognised",
+      origin: "commit",
+    })
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+  })
+
   it("tells support the preview never arrived", async () => {
     mockUseMigrationQuery.mockReturnValue({ data: { migration: null }, loading: false })
     renderScreen()
@@ -664,8 +771,11 @@ describe("MigrationBalancesOverviewScreen", () => {
     await flushEffects()
 
     fireEvent.press(screen.getByText(LLOverview.approveCta()))
+    await flushEffects()
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationTransferringFunds")
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationTransferringFunds", {
+      isDepositChecked: true,
+    })
   })
 
   /** The migration only ever moves bitcoin: a remaining dollar balance is emptied through the
@@ -711,6 +821,60 @@ describe("MigrationBalancesOverviewScreen", () => {
 
     expect(handler()).toBe(true)
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** Approving without this record drains an account whose device then remembers neither
+   *  the step nor the figure the receive gate waits on. */
+  it("does not offer Approve when the commit-point write is refused", async () => {
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.queryByTestId("migration-balances-overview-approve")).toBeNull()
+  })
+
+  /** A withheld Approve with nothing beside it is the dead end this screen may never
+   *  present: the hardware back is swallowed here. */
+  it("offers a retry instead, rather than nothing at all", async () => {
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+  })
+
+  it("re-attempts the write from that retry and opens Approve once it lands", async () => {
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+    mockUseMigrationQuery.mockReturnValue({
+      ...migrationQueryResult({
+        balanceSats: 1000,
+        feeSats: 10,
+        feeCoveredByBlink: false,
+        receiveSats: 990,
+      }),
+      refetch: jest.fn(),
+    })
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+      refetch: jest.fn(),
+    })
+    renderScreen()
+    await flushEffects()
+
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
+    fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
+  it("opens Approve once that record lands", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
   })
 
   it("persists the commit-point checkpoint with the preview's receive figure", async () => {
@@ -926,38 +1090,1421 @@ describe("MigrationBalancesOverviewScreen", () => {
   })
 })
 
-describe("MigrationBalancesOverviewScreen lightning-address re-point gating", () => {
+describe("MigrationBalancesOverviewScreen, with a deposit still confirming", () => {
   beforeEach(resetScreenMocks)
 
-  /** The re-point is a precondition of the commit, so a settled failure hands over exactly
-   *  like a refused start. */
-  it("hands over to support when the lightning-address re-point fails", async () => {
-    mockLnAddressTransfer = {
-      isTransferred: false,
-      isRejected: true,
-      isAccountMissing: false,
-      hasConnectionIssue: false,
-      retry: mockLnRetry,
-    }
+  it("holds the start and Approve behind the pending-deposit modal", async () => {
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(
+      pendingDepositsQueryResult([pendingOnChainReceive]),
+    )
     renderScreen()
     await flushEffects()
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
-      reason: "ln-address-transfer-failed",
-      origin: "commit",
+    expect(screen.getByTestId("pending-deposit-modal-ok")).toBeTruthy()
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ showCloseIconButton: false, isChecking: false }),
+    )
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
+  })
+
+  it("checks again from the modal and lets the start out once the deposit lands", async () => {
+    const pendingResult = pendingDepositsQueryResult([pendingOnChainReceive])
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingResult)
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+    await flushEffects()
+
+    expect(pendingResult.refetch).toHaveBeenCalledTimes(1)
+
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingDepositsQueryResult())
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    expect(screen.queryByTestId("pending-deposit-modal-ok")).toBeNull()
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
+  it("stays on the modal when checking again fails", async () => {
+    const pendingResult = {
+      ...pendingDepositsQueryResult([pendingOnChainReceive]),
+      refetch: jest.fn().mockRejectedValue(new Error("network")),
+    }
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingResult)
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+    await flushEffects()
+
+    expect(pendingResult.refetch).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId("pending-deposit-modal-ok")).toBeTruthy()
+  })
+
+  it("shows the check OK started running on the modal until it answers", async () => {
+    type CheckAnswer = { data: ReturnType<typeof pendingDepositsQueryResult>["data"] }
+    let answerCheck: (answer: CheckAnswer) => void = () => undefined
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      ...pendingDepositsQueryResult([pendingOnChainReceive]),
+      refetch: jest.fn().mockReturnValue(
+        new Promise<CheckAnswer>((resolve) => {
+          answerCheck = resolve
+        }),
+      ),
     })
+    renderScreen()
+    await flushEffects()
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isChecking: false }),
+    )
+
+    fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+    await flushEffects()
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isChecking: true }),
+    )
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+
+    await act(async () => {
+      answerCheck({ data: pendingDepositsQueryResult([pendingOnChainReceive]).data })
+    })
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isChecking: false }),
+    )
+  })
+
+  it("says the deposit is still confirming once the check OK started finds it pending", async () => {
+    const pendingResult = pendingDepositsQueryResult([pendingOnChainReceive])
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingResult)
+    renderScreen()
+    await flushEffects()
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isStillPending: false }),
+    )
+
+    fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+    await flushEffects()
+
+    expect(pendingResult.refetch).toHaveBeenCalledTimes(1)
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isStillPending: true }),
+    )
+  })
+
+  it("asks for the dollar balance to be emptied before showing the pending deposit", async () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 5000 }),
+    )
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(
+      pendingDepositsQueryResult([pendingOnChainReceive]),
+    )
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("dollar-balance-modal-transfer")).toBeTruthy()
+    expect(screen.queryByTestId("pending-deposit-modal-ok")).toBeNull()
+  })
+
+  it("checks the deposits again on Approve and stays when one has arrived", async () => {
+    const clearResult = pendingDepositsQueryResult()
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      ...clearResult,
+      refetch: jest.fn().mockResolvedValue({
+        data: pendingDepositsQueryResult([pendingOnChainReceive]).data,
+      }),
+    })
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LLOverview.approveCta()))
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "accountMigrationTransferringFunds",
+      expect.anything(),
+    )
+  })
+
+  it("stays on Approve when the check before it fails", async () => {
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      ...pendingDepositsQueryResult(),
+      refetch: jest.fn().mockRejectedValue(new Error("network")),
+    })
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LLOverview.approveCta()))
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "accountMigrationTransferringFunds",
+      expect.anything(),
+    )
+  })
+
+  it("drops a clear answer that lands after the screen lost focus", async () => {
+    let answerCheck: (value: unknown) => void = () => undefined
+    const clearResult = pendingDepositsQueryResult()
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      ...clearResult,
+      refetch: jest.fn(
+        () =>
+          new Promise((resolve) => {
+            answerCheck = resolve
+          }),
+      ),
+    })
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LLOverview.approveCta()))
+    mockIsFocused = false
+    screen.rerender(screenTree())
+    await flushEffects()
+    await act(async () => {
+      answerCheck({ data: clearResult.data })
+    })
+
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "accountMigrationTransferringFunds",
+      expect.anything(),
+    )
+  })
+
+  it("ignores a second Approve while its check is running", async () => {
+    let answerCheck: (value: unknown) => void = () => undefined
+    const clearResult = pendingDepositsQueryResult()
+    const refetch = jest.fn(
+      () =>
+        new Promise((resolve) => {
+          answerCheck = resolve
+        }),
+    )
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({ ...clearResult, refetch })
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("migration-balances-overview-approve"))
+    await flushEffects()
+    fireEvent.press(screen.getByTestId("migration-balances-overview-approve"))
+    await act(async () => {
+      answerCheck({ data: clearResult.data })
+    })
+
+    expect(refetch).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+  })
+
+  it("keeps the Approve spinner to its own check", async () => {
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      ...pendingDepositsQueryResult(),
+      loading: true,
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByText(LLOverview.approveCta())).toBeTruthy()
+  })
+
+  it("offers support from the pending-deposit modal, which covers the screen's own button", async () => {
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(
+      pendingDepositsQueryResult([pendingOnChainReceive]),
+    )
+    renderScreen()
+    await flushEffects()
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ onContactSupport: expect.any(Function) }),
+    )
+  })
+
+  it("shows the modal instead of support when the server refuses the start for a deposit", async () => {
+    const pendingDepositStartRefusal = {
+      data: {
+        migrationStart: {
+          errors: [
+            {
+              message: "Migration is not available while an incoming deposit is pending.",
+              code: "MIGRATION_PENDING_DEPOSIT",
+            },
+          ],
+        },
+      },
+    }
+    mockMigrationStart.mockResolvedValueOnce(pendingDepositStartRefusal)
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("pending-deposit-modal-ok")).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "accountMigrationContactSupport",
+      expect.anything(),
+    )
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
+
+    fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(2)
+    expect(screen.queryByTestId("pending-deposit-modal-ok")).toBeNull()
+  })
+
+  it("keeps the start held from OK while the server still sees the deposit pending", async () => {
+    const pendingDepositStartRefusal = {
+      data: {
+        migrationStart: {
+          errors: [
+            {
+              message: "Migration is not available while an incoming deposit is pending.",
+              code: "MIGRATION_PENDING_DEPOSIT",
+            },
+          ],
+        },
+      },
+    }
+    mockMigrationStart.mockResolvedValueOnce(pendingDepositStartRefusal)
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      ...pendingDepositsQueryResult(),
+      refetch: jest.fn().mockResolvedValue({
+        data: pendingDepositsQueryResult([pendingOnChainReceive]).data,
+      }),
+    })
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId("pending-deposit-modal-ok")).toBeTruthy()
+  })
+
+  it("offers the retry instead of the modal when the check fails after the server refused the start", async () => {
+    mockMigrationStart.mockResolvedValueOnce({
+      data: {
+        migrationStart: {
+          errors: [
+            {
+              message: "Migration is not available while an incoming deposit is pending.",
+              code: "MIGRATION_PENDING_DEPOSIT",
+            },
+          ],
+        },
+      },
+    })
+    mockUseMigrationQuery.mockReturnValue({
+      ...migrationQueryResult({
+        balanceSats: 1000,
+        feeSats: 10,
+        feeCoveredByBlink: false,
+        receiveSats: 990,
+      }),
+      refetch: mockRefetchMigration,
+    })
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+      refetch: mockRefetchWallets,
+    })
+    renderScreen()
+    await flushEffects()
+    expect(screen.getByTestId("pending-deposit-modal-ok")).toBeTruthy()
+
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      ...pendingDepositsQueryResult(),
+      error: new Error("network"),
+    })
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    expect(screen.queryByTestId("pending-deposit-modal-ok")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+  })
+
+  describe("the line above the retry when the deposit check fails", () => {
+    const failDepositCheckWith = (error: Error) =>
+      mockUseMigrationPendingDepositsQuery.mockReturnValue({
+        loading: false,
+        error,
+        data: undefined,
+        refetch: jest.fn().mockRejectedValue(error),
+      })
+
+    it("blames the connection when the check never reached the server", async () => {
+      failDepositCheckWith(
+        Object.assign(new Error("Network request failed"), {
+          networkError: new Error("offline"),
+        }),
+      )
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+      expect(screen.getByText(LL.errors.network.connection())).toBeTruthy()
+    })
+
+    /** As in the gate: a GraphQL or an auth error is the server's, and sending the user to
+     *  check a connection that works sends them looking in the wrong place. */
+    it("stays generic when the server answered the check with an error", async () => {
+      failDepositCheckWith(new Error("Not authorized"))
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+      expect(screen.getByText(LL.errors.generic())).toBeTruthy()
+      expect(screen.queryByText(LL.errors.network.connection())).toBeNull()
+    })
+  })
+
+  it("holds the start while the pending-deposit check has not answered", async () => {
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      loading: true,
+      error: undefined,
+      data: undefined,
+      refetch: jest.fn().mockResolvedValue(undefined),
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+    expect(screen.queryByTestId("pending-deposit-modal-ok")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
+  })
+
+  it("offers the retry when the pending-deposit check fails, and asks again from it", async () => {
+    const refetchPendingDeposits = jest.fn().mockRejectedValue(new Error("network"))
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      loading: false,
+      error: new Error("network"),
+      data: undefined,
+      refetch: refetchPendingDeposits,
+    })
+    mockUseMigrationQuery.mockReturnValue({
+      ...migrationQueryResult({
+        balanceSats: 1000,
+        feeSats: 10,
+        feeCoveredByBlink: false,
+        receiveSats: 990,
+      }),
+      refetch: mockRefetchMigration,
+    })
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+      refetch: mockRefetchWallets,
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+    expect(screen.queryByTestId("migration-balances-overview-approve")).toBeNull()
+
+    fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
+
+    expect(refetchPendingDeposits).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+  })
+})
+
+describe("MigrationBalancesOverviewScreen commit-point write", () => {
+  beforeEach(resetScreenMocks)
+
+  /** The window the gate exists for: everything else has settled and the write is still on
+   *  its way to the store. A refused write swaps Approve for the retry, so only a write in
+   *  flight leaves Approve on screen for this term alone to hold. */
+  it("keeps Approve disabled while the commit-point write is still in flight", async () => {
+    let settleWrite: (result: StorageWriteResult) => void = () => undefined
+    mockSaveCheckpoint.mockImplementation(
+      () =>
+        new Promise<StorageWriteResult>((resolve) => {
+          settleWrite = resolve
+        }),
+    )
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
+
+    await act(async () => {
+      settleWrite({ isSaved: true, failure: null })
+    })
+
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
+  /** The real saveCheckpoint changes identity once its write lands; that alone must not
+   *  send the same record to a store already in doubt a second time. */
+  it("writes the commit point once when the landed write re-identities saveCheckpoint", async () => {
+    const { rerender } = renderScreen()
+    await flushEffects()
+    const writesBeforeReidentity = mockSaveCheckpoint.mock.calls.length
+
+    mockSaveCheckpointHandle = (...args: unknown[]) => mockSaveCheckpoint(...args)
+    rerender(screenTree())
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledTimes(writesBeforeReidentity)
+  })
+
+  /** The re-fire is what heals a write refused for want of an owner: when the owner lands,
+   *  saveCheckpoint changes identity and the record must be attempted again. */
+  it("tries again when saveCheckpoint changes after a write that did not land", async () => {
+    mockSaveCheckpoint.mockResolvedValueOnce({ isSaved: false, failure: null })
+    const { rerender } = renderScreen()
+    await flushEffects()
+
+    mockSaveCheckpointHandle = (...args: unknown[]) => mockSaveCheckpoint(...args)
+    rerender(screenTree())
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledTimes(2)
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
+  /** Every focus records the commit point again; a store that refuses a later write cannot
+   *  un-record the one that already landed, so Approve must not close behind it. */
+  it("keeps Approve open when a re-write after a landed one is refused", async () => {
+    const { rerender } = renderScreen()
+    await flushEffects()
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+    const writesBeforeRefocus = mockSaveCheckpoint.mock.calls.length
+
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.OutOfSpace,
+    })
+    mockIsFocused = false
+    rerender(screenTree())
+    await flushEffects()
+    mockIsFocused = true
+    rerender(screenTree())
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledTimes(writesBeforeRefocus + 1)
+    expect(screen.queryByTestId("migration-balances-overview-retry")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
+  /** A resume: the lock is already held server-side and the record Approve depends on is
+   *  already durable, so a write that can only refresh its timestamp must not hold it. */
+  it("opens Approve on a resumed commit point even when the refresh write is refused", async () => {
+    mockStoredCheckpoint = MigrationCheckpoint.BalancesOverview
+    mockStoredExpectedReceiveSats = 990
+    mockStoredIsStartConfirmed = true
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.OutOfSpace,
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalled()
+    expect(screen.queryByTestId("migration-balances-overview-retry")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
+  it("still holds Approve on a resumed commit point that never recorded the accepted start", async () => {
+    mockStoredCheckpoint = MigrationCheckpoint.BalancesOverview
+    mockStoredExpectedReceiveSats = 990
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.OutOfSpace,
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.queryByTestId("migration-balances-overview-approve")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+  })
+
+  /** The step alone is not the record: one saved before the figure existed still lacks the
+   *  number the receive gate waits on, so only the write can complete it. */
+  it("still holds Approve on a stored commit point that never got its figure", async () => {
+    mockStoredCheckpoint = MigrationCheckpoint.BalancesOverview
+    mockStoredExpectedReceiveSats = null
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.OutOfSpace,
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.queryByTestId("migration-balances-overview-approve")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+  })
+
+  /** The step is recorded before the server accepts the start; the accepted start is what
+   *  later tells a flow support cleared from one that never started. */
+  it("records the accepted start with the commit point once the server takes it", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledWith(
+      MigrationCheckpoint.BalancesOverview,
+      {
+        expectedReceiveSats: 990,
+        isStartConfirmed: true,
+      },
+    )
+  })
+
+  /** A dollar balance holds the start back, so the step is recorded without a confirmed
+   *  start: coming back after the conversion must resume here, not restart the flow. */
+  it("records the commit point without a confirmed start while dollars hold it back", async () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 5000 }),
+    )
+    renderScreen()
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalled()
+    for (const [, options] of mockSaveCheckpoint.mock.calls) {
+      expect(options.isStartConfirmed).toBeUndefined()
+    }
+  })
+
+  /** Until the server starts a run the figure is the preview's latest word: a dollar
+   *  balance converted from this screen changes the bitcoin it will send, and a stale zero
+   *  would let the swap skip waiting for funds still on their way. */
+  describe("before the server has started the migration", () => {
+    it("tells the store the server has not started it", async () => {
+      mockMigrationStatus = MigrationStatus.NotStarted
+      renderScreen()
+      await flushEffects()
+
+      expect(mockSaveCheckpoint).toHaveBeenCalledWith(
+        MigrationCheckpoint.BalancesOverview,
+        expect.objectContaining({ isServerFlowUnstarted: true }),
+      )
+    })
+
+    it("writes again once a status read that had not answered says it never started", async () => {
+      mockMigrationStatus = null
+      const { rerender } = renderScreen()
+      await flushEffects()
+
+      mockMigrationStatus = MigrationStatus.NotStarted
+      rerender(screenTree())
+      await flushEffects()
+
+      expect(mockSaveCheckpoint).toHaveBeenLastCalledWith(
+        MigrationCheckpoint.BalancesOverview,
+        expect.objectContaining({
+          expectedReceiveSats: 990,
+          isServerFlowUnstarted: true,
+        }),
+      )
+    })
+
+    it("saves the new figure once converted dollars change the preview", async () => {
+      mockMigrationStatus = MigrationStatus.NotStarted
+      mockUseMigrationQuery.mockReturnValue(
+        migrationQueryResult({
+          balanceSats: 0,
+          feeSats: 0,
+          feeCoveredByBlink: true,
+          receiveSats: 0,
+        }),
+      )
+      const { rerender } = renderScreen()
+      await flushEffects()
+
+      mockUseMigrationQuery.mockReturnValue(
+        migrationQueryResult({
+          balanceSats: 5010,
+          feeSats: 10,
+          feeCoveredByBlink: false,
+          receiveSats: 5000,
+        }),
+      )
+      rerender(screenTree())
+      await flushEffects()
+
+      expect(mockSaveCheckpoint).toHaveBeenLastCalledWith(
+        MigrationCheckpoint.BalancesOverview,
+        expect.objectContaining({
+          expectedReceiveSats: 5000,
+          isServerFlowUnstarted: true,
+        }),
+      )
+    })
+
+    /** Coming back from the support screen returns to this same instance; the mount read
+     *  already covers the first focus. (A conversion does not come back here: it re-enters
+     *  through the entry screen onto a fresh instance, which reads on its own mount.) */
+    it("asks the server again each time the user comes back, not on the first focus", async () => {
+      const { rerender } = renderScreen()
+      await flushEffects()
+      expect(mockRefetchMigrationStatus).not.toHaveBeenCalled()
+
+      mockIsFocused = false
+      rerender(screenTree())
+      mockIsFocused = true
+      rerender(screenTree())
+      await flushEffects()
+
+      expect(mockRefetchMigrationStatus).toHaveBeenCalledTimes(1)
+    })
+
+    /**
+     * The instance a conversion lands on: the record still holds the zero saved before it,
+     * and the preview now says what the converted dollars will send. The accepted start
+     * binds the figure for the run, so it must wait for the phase: a start that landed
+     * first would keep the zero, and the receive gate would swap past funds in transit.
+     */
+    describe("on the instance a dollar conversion lands on", () => {
+      const arriveAfterConversion = () => {
+        mockStoredCheckpoint = MigrationCheckpoint.BalancesOverview
+        mockStoredExpectedReceiveSats = 0
+        mockMigrationStatus = null
+        mockUseMigrationQuery.mockReturnValue({
+          ...migrationQueryResult({
+            balanceSats: 5010,
+            feeSats: 10,
+            feeCoveredByBlink: false,
+            receiveSats: 5000,
+          }),
+          refetch: jest.fn(),
+        })
+        mockUseWalletOverviewScreenQuery.mockReturnValue({
+          ...walletOverviewQueryResult({ btcBalance: 5010, usdBalance: 0 }),
+          refetch: jest.fn(),
+        })
+      }
+
+      it("holds the start while the phase read has not answered", async () => {
+        arriveAfterConversion()
+        renderScreen()
+        await flushEffects()
+
+        expect(mockMigrationStart).not.toHaveBeenCalled()
+        expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
+        for (const [, options] of mockSaveCheckpoint.mock.calls) {
+          expect(options.isStartConfirmed).toBeUndefined()
+        }
+      })
+
+      it("issues the write that replaces the figure before the one carrying the start", async () => {
+        arriveAfterConversion()
+        const { rerender } = renderScreen()
+        await flushEffects()
+
+        mockMigrationStatus = MigrationStatus.NotStarted
+        rerender(screenTree())
+        await flushEffects()
+
+        expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+        const writes = mockSaveCheckpoint.mock.calls.map(([, options]) => options)
+        const replacing = writes.findIndex(
+          (options) =>
+            options.isServerFlowUnstarted === true &&
+            options.expectedReceiveSats === 5000,
+        )
+        const confirming = writes.findIndex(
+          (options) => options.isStartConfirmed === true,
+        )
+        expect(replacing).toBeGreaterThanOrEqual(0)
+        expect(confirming).toBeGreaterThan(replacing)
+      })
+
+      it("offers the retry, worded as the connection, when the phase read fails", async () => {
+        arriveAfterConversion()
+        mockMigrationStatusError = new Error("Network request failed")
+        renderScreen()
+        await flushEffects()
+
+        expect(mockMigrationStart).not.toHaveBeenCalled()
+        expect(screen.getByText(LL.errors.network.connection())).toBeTruthy()
+
+        fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+        await flushEffects()
+
+        expect(mockRefetchMigrationStatus).toHaveBeenCalled()
+      })
+
+      /** A stale phase left under a failed re-read is no answer either: the lock's own
+       *  rule, which this screen now shares. */
+      it("does not take a phase left behind by a failed re-read as the answer", async () => {
+        arriveAfterConversion()
+        mockMigrationStatus = MigrationStatus.NotStarted
+        mockMigrationStatusError = new Error("Network request failed")
+        renderScreen()
+        await flushEffects()
+
+        expect(mockMigrationStart).not.toHaveBeenCalled()
+        for (const [, options] of mockSaveCheckpoint.mock.calls) {
+          expect(options.isServerFlowUnstarted).toBeUndefined()
+        }
+      })
+    })
+
+    /** Past the start the phase holds nothing back, so a re-read that fails must not swap
+     *  the Approve the user is about to press for a retry. */
+    it("keeps Approve once the start has landed, whatever a later phase read does", async () => {
+      const { rerender } = renderScreen()
+      await flushEffects()
+      expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+
+      mockMigrationStatusError = new Error("Network request failed")
+      rerender(screenTree())
+      await flushEffects()
+
+      expect(screen.queryByTestId("migration-balances-overview-retry")).toBeNull()
+      expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+    })
+
+    it("asks the server again from the shared retry", async () => {
+      mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+      mockUseMigrationQuery.mockReturnValue({
+        ...migrationQueryResult({
+          balanceSats: 1000,
+          feeSats: 10,
+          feeCoveredByBlink: false,
+          receiveSats: 990,
+        }),
+        refetch: jest.fn(),
+      })
+      mockUseWalletOverviewScreenQuery.mockReturnValue({
+        ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+        refetch: jest.fn(),
+      })
+      renderScreen()
+      await flushEffects()
+
+      fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+      await flushEffects()
+
+      expect(mockRefetchMigrationStatus).toHaveBeenCalledTimes(1)
+    })
+
+    /** A read that has not answered, or a flow the server holds open, keeps whatever the
+     *  record already has: the live preview may be the post-drain zero. */
+    const ANSWERS_THAT_KEEP_THE_FIGURE: {
+      label: string
+      status: MigrationStatus | null
+    }[] = [
+      { label: "an unanswered read", status: null },
+      { label: "an open flow", status: MigrationStatus.InProgress },
+    ]
+
+    it.each(ANSWERS_THAT_KEEP_THE_FIGURE)(
+      "never claims it for $label",
+      async ({ status }) => {
+        mockMigrationStatus = status
+        renderScreen()
+        await flushEffects()
+
+        expect(mockSaveCheckpoint).toHaveBeenCalled()
+        for (const [, options] of mockSaveCheckpoint.mock.calls) {
+          expect(options.isServerFlowUnstarted).toBeUndefined()
+        }
+      },
+    )
+  })
+
+  /** The step can land before the server accepts the start, so a write without the
+   *  confirmation is not the record Approve waits on: refusing only the one that carries it
+   *  would otherwise leave a started flow the device later mistakes for one never started. */
+  describe("when only the write carrying the accepted start is refused", () => {
+    const refuseConfirmedWrite = () =>
+      mockSaveCheckpoint.mockImplementation(
+        async (_step: MigrationCheckpoint, options: { isStartConfirmed?: true }) =>
+          options.isStartConfirmed
+            ? { isSaved: false, failure: StorageFailure.OutOfSpace }
+            : { isSaved: true, failure: null },
+      )
+
+    it("issues the step's write before the confirmed one", async () => {
+      refuseConfirmedWrite()
+      renderScreen()
+      await flushEffects()
+
+      const confirmations = mockSaveCheckpoint.mock.calls.map(
+        ([, options]) => options.isStartConfirmed,
+      )
+      expect(confirmations[0]).toBeUndefined()
+      expect(confirmations).toContain(true)
+    })
+
+    it("holds Approve and names the full disk above the retry", async () => {
+      refuseConfirmedWrite()
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.queryByTestId("migration-balances-overview-approve")).toBeNull()
+      expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+      expect(screen.getByText(LLStorage.notSavedOutOfSpaceBody())).toBeTruthy()
+    })
+
+    it("opens Approve once a retry lands the confirmation", async () => {
+      refuseConfirmedWrite()
+      mockUseMigrationQuery.mockReturnValue({
+        ...migrationQueryResult({
+          balanceSats: 1000,
+          feeSats: 10,
+          feeCoveredByBlink: false,
+          receiveSats: 990,
+        }),
+        refetch: jest.fn(),
+      })
+      mockUseWalletOverviewScreenQuery.mockReturnValue({
+        ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+        refetch: jest.fn(),
+      })
+      renderScreen()
+      await flushEffects()
+
+      mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
+      fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+      await flushEffects()
+
+      expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+    })
+  })
+
+  describe("the line above the retry", () => {
+    const offlineStart = () =>
+      Object.assign(new Error("Network request failed"), {
+        networkError: new Error("offline"),
+      })
+
+    it("asks to free up space when the commit-point write found the disk full", async () => {
+      mockSaveCheckpoint.mockResolvedValue({
+        isSaved: false,
+        failure: StorageFailure.OutOfSpace,
+      })
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LLStorage.notSavedOutOfSpaceBody())).toBeTruthy()
+      expect(screen.queryByText(LL.errors.network.connection())).toBeNull()
+    })
+
+    /** The device refused, and the connection is fine: sending the user to check it would
+     *  have them retry the same refusal with the same wrong instruction. */
+    it("says the progress was not saved when the store refused for another reason", async () => {
+      mockSaveCheckpoint.mockResolvedValue({
+        isSaved: false,
+        failure: StorageFailure.Unknown,
+      })
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LLStorage.notSavedBody())).toBeTruthy()
+      expect(screen.queryByText(LL.errors.network.connection())).toBeNull()
+    })
+
+    /** Refused before it reached the store, for want of an owner the lookup could not
+     *  fetch: a network failure, so the network wording stands. */
+    /** A store that refused is reported where it refused; a write turned away for want of
+     *  an owner never reached the store, so the screen reports it, once however often the
+     *  user retries. */
+    it("reports a write refused for want of an owner, once", async () => {
+      mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+      mockUseMigrationQuery.mockReturnValue({
+        ...migrationQueryResult({
+          balanceSats: 1000,
+          feeSats: 10,
+          feeCoveredByBlink: false,
+          receiveSats: 990,
+        }),
+        refetch: jest.fn(),
+      })
+      mockUseWalletOverviewScreenQuery.mockReturnValue({
+        ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+        refetch: jest.fn(),
+      })
+      const { rerender } = renderScreen()
+      await flushEffects()
+      fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+      await flushEffects()
+      /** And across a visit: leaving and coming back is the same failure, not a new one. */
+      mockIsFocused = false
+      rerender(screenTree())
+      mockIsFocused = true
+      rerender(screenTree())
+      await flushEffects()
+
+      expect(mockSaveCheckpoint.mock.calls.length).toBeGreaterThanOrEqual(3)
+      const ownerlessReports = mockReportError.mock.calls.filter(
+        ([operation]) => operation === "Migration commit point",
+      )
+      expect(ownerlessReports).toHaveLength(1)
+    })
+
+    it("does not report a refusal the store already reported", async () => {
+      mockSaveCheckpoint.mockResolvedValue({
+        isSaved: false,
+        failure: StorageFailure.OutOfSpace,
+      })
+      renderScreen()
+      await flushEffects()
+
+      const operations = mockReportError.mock.calls.map(([operation]) => operation)
+      expect(operations).not.toContain("Migration commit point")
+    })
+
+    it("keeps the connection wording when the write carries no storage kind", async () => {
+      mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LL.errors.network.connection())).toBeTruthy()
+      expect(screen.queryByText(LLStorage.notSavedBody())).toBeNull()
+    })
+
+    it("keeps the connection wording when the network failed alongside the store", async () => {
+      mockSaveCheckpoint.mockResolvedValue({
+        isSaved: false,
+        failure: StorageFailure.OutOfSpace,
+      })
+      mockMigrationStart.mockRejectedValue(offlineStart())
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LL.errors.network.connection())).toBeTruthy()
+      expect(screen.queryByText(LLStorage.notSavedOutOfSpaceBody())).toBeNull()
+    })
+
+    it("keeps the connection wording when only the network failed", async () => {
+      mockMigrationStart.mockRejectedValue(offlineStart())
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LL.errors.network.connection())).toBeTruthy()
+      expect(screen.queryByText(LLStorage.notSavedBody())).toBeNull()
+    })
+
+    /** The read that feeds the re-point's ids is the device's store too: the checkpoint
+     *  could not be read, the id is missing because of it, and the network is fine. */
+    const failCheckpointRead = (failure: StorageFailure) => {
+      mockCheckpointAccountId = null
+      mockCheckpointHasError = true
+      mockCheckpointStorageFailure = failure
+      mockLnAddressTransfer = unsettledLnTransfer()
+    }
+
+    it("says the progress could not be read when the checkpoint read failed", async () => {
+      failCheckpointRead(StorageFailure.Unknown)
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LLStorage.unreadableBody())).toBeTruthy()
+      expect(screen.queryByText(LL.errors.network.connection())).toBeNull()
+    })
+
+    it("asks to free up space when the checkpoint read found the disk full", async () => {
+      failCheckpointRead(StorageFailure.OutOfSpace)
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LLStorage.outOfSpaceBody())).toBeTruthy()
+    })
+
+    /** The write reads the record before replacing it, so an unreadable store fails both
+     *  and the read, as the cause, speaks for them. */
+    it("names the read when both failed at the store for no nameable reason", async () => {
+      failCheckpointRead(StorageFailure.Unknown)
+      mockSaveCheckpoint.mockResolvedValue({
+        isSaved: false,
+        failure: StorageFailure.Unknown,
+      })
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LLStorage.unreadableBody())).toBeTruthy()
+      expect(screen.queryByText(LLStorage.notSavedBody())).toBeNull()
+    })
+
+    /** A write can fail on its own after a clean read, and a full disk is the one answer
+     *  the user can act on: it wins over the read's opaque failure. */
+    it("asks to free up space when the write found the disk full after an opaque read failure", async () => {
+      failCheckpointRead(StorageFailure.Unknown)
+      mockSaveCheckpoint.mockResolvedValue({
+        isSaved: false,
+        failure: StorageFailure.OutOfSpace,
+      })
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LLStorage.notSavedOutOfSpaceBody())).toBeTruthy()
+      expect(screen.queryByText(LLStorage.unreadableBody())).toBeNull()
+    })
+
+    it("asks to free up space when the read found the disk full and the write failed opaquely", async () => {
+      failCheckpointRead(StorageFailure.OutOfSpace)
+      mockSaveCheckpoint.mockResolvedValue({
+        isSaved: false,
+        failure: StorageFailure.Unknown,
+      })
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LLStorage.outOfSpaceBody())).toBeTruthy()
+      expect(screen.queryByText(LLStorage.notSavedBody())).toBeNull()
+    })
+
+    it("keeps the connection wording when the owner lookup failed alongside the read", async () => {
+      failCheckpointRead(StorageFailure.OutOfSpace)
+      mockOwnerIdError = true
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LL.errors.network.connection())).toBeTruthy()
+      expect(screen.queryByText(LLStorage.outOfSpaceBody())).toBeNull()
+    })
+
+    /** The store answered and simply holds no id: the lookup that keys it is the one to
+     *  retry, and that lookup is the network's. */
+    it("keeps the connection wording for a missing account the store did read", async () => {
+      mockCheckpointAccountId = null
+      mockLnAddressTransfer = unsettledLnTransfer()
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+      expect(screen.getByText(LL.errors.network.connection())).toBeTruthy()
+    })
+
+    /** A figure change starts a second write while the first is still out. The first one
+     *  answering last must not put its stale reason back above the retry. */
+    it("speaks for the latest write when two answer out of order", async () => {
+      const settleWrites: Array<(result: StorageWriteResult) => void> = []
+      mockSaveCheckpoint.mockImplementation(
+        () =>
+          new Promise<StorageWriteResult>((resolve) => {
+            settleWrites.push(resolve)
+          }),
+      )
+      const { rerender } = renderScreen()
+      await flushEffects()
+
+      mockUseMigrationQuery.mockReturnValue(
+        migrationQueryResult({
+          balanceSats: 1000,
+          feeSats: 20,
+          feeCoveredByBlink: false,
+          receiveSats: 980,
+        }),
+      )
+      rerender(screenTree())
+      await flushEffects()
+
+      expect(settleWrites.length).toBeGreaterThanOrEqual(2)
+      const settleLatest = settleWrites[settleWrites.length - 1]
+      const settleOldest = settleWrites[0]
+      await act(async () => {
+        settleLatest({ isSaved: false, failure: StorageFailure.Unknown })
+      })
+      await act(async () => {
+        settleOldest({ isSaved: false, failure: StorageFailure.OutOfSpace })
+      })
+
+      expect(screen.getByText(LLStorage.notSavedBody())).toBeTruthy()
+      expect(screen.queryByText(LLStorage.notSavedOutOfSpaceBody())).toBeNull()
+    })
+  })
+})
+
+/**
+ * The figure stored before a dollar conversion is replaced only by a save that knows the
+ * run has not started, and an accepted start binds whatever the disk holds by then. A save
+ * held back (no owner yet, or a full disk) must therefore hold the start too, and a later
+ * read that fails must not cost the confirming write its flag.
+ */
+describe("MigrationBalancesOverviewScreen converted figure", () => {
+  beforeEach(resetScreenMocks)
+
+  type Disk = { record: ReturnType<typeof mergeCheckpoint> }
+
+  const storeZeroFromBeforeTheConversion = (): Disk => {
+    mockStoredCheckpoint = MigrationCheckpoint.BalancesOverview
+    mockStoredExpectedReceiveSats = 0
+    mockMigrationStatus = MigrationStatus.NotStarted
+    mockUseMigrationQuery.mockReturnValue(
+      migrationQueryResult({
+        balanceSats: 5010,
+        feeSats: 10,
+        feeCoveredByBlink: false,
+        receiveSats: 5000,
+      }),
+    )
+    return {
+      record: mergeCheckpoint(null, {
+        step: MigrationCheckpoint.BalancesOverview,
+        custodialAccountId: "owner-1",
+        expectedReceiveSats: 0,
+      }),
+    }
+  }
+
+  const landOn =
+    (disk: Disk, isRefused: (options: CommitPointSaveOptions) => boolean) =>
+    async (step: MigrationCheckpoint, options: CommitPointSaveOptions) => {
+      if (isRefused(options)) return { isSaved: false, failure: null }
+      disk.record = mergeCheckpoint(disk.record, {
+        step,
+        custodialAccountId: "owner-1",
+        ...options,
+      })
+      return { isSaved: true, failure: null }
+    }
+
+  const swapSaveIdentity = () => {
+    mockSaveCheckpointHandle = (...args: unknown[]) => mockSaveCheckpoint(...args)
+  }
+
+  it("holds the start until the save carrying the new figure has landed", async () => {
+    const disk = storeZeroFromBeforeTheConversion()
+    const owner = { isResolved: false }
+    mockSaveCheckpoint.mockImplementation(landOn(disk, () => !owner.isResolved))
+    const { rerender } = renderScreen()
+    await flushEffects()
+
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+
+    owner.isResolved = true
+    swapSaveIdentity()
+    rerender(screenTree())
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+    expect(disk.record).toMatchObject({
+      expectedReceiveSats: 5000,
+      isStartConfirmed: true,
+    })
+  })
+
+  /** The record from before the conversion is already on disk, so only the failed save
+   *  can say why the start is held, and only the retry sends that save again. */
+  it("offers the retry when the save carrying the new figure fails", async () => {
+    storeZeroFromBeforeTheConversion()
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.OutOfSpace,
+    })
+    mockUseMigrationQuery.mockReturnValue({
+      ...migrationQueryResult({
+        balanceSats: 5010,
+        feeSats: 10,
+        feeCoveredByBlink: false,
+        receiveSats: 5000,
+      }),
+      refetch: jest.fn(),
+    })
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      ...walletOverviewQueryResult({ btcBalance: 5010, usdBalance: 0 }),
+      refetch: jest.fn(),
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+    expect(screen.getByText(LLStorage.notSavedOutOfSpaceBody())).toBeTruthy()
+    const savesBeforeRetry = mockSaveCheckpoint.mock.calls.length
+
+    fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
+
+    expect(mockSaveCheckpoint.mock.calls.length).toBeGreaterThan(savesBeforeRetry)
+  })
+
+  it("keeps the flag on the confirming write after a later read fails", async () => {
+    const disk = storeZeroFromBeforeTheConversion()
+    const confirmation = { isRefused: true }
+    mockSaveCheckpoint.mockImplementation(
+      landOn(
+        disk,
+        (options) => Boolean(options.isStartConfirmed) && confirmation.isRefused,
+      ),
+    )
+    const { rerender } = renderScreen()
+    await flushEffects()
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+
+    mockMigrationStatusError = new Error("Network request failed")
+    rerender(screenTree())
+    await flushEffects()
+
+    confirmation.isRefused = false
+    swapSaveIdentity()
+    rerender(screenTree())
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenLastCalledWith(
+      MigrationCheckpoint.BalancesOverview,
+      expect.objectContaining({ isStartConfirmed: true, isServerFlowUnstarted: true }),
+    )
+    expect(disk.record).toMatchObject({
+      expectedReceiveSats: 5000,
+      isStartConfirmed: true,
+    })
+  })
+})
+
+/** The re-reads behind the retry, and the one on a return, can fail on their own: each is
+ *  swallowed, since the source's own state already says what failed. */
+describe("MigrationBalancesOverviewScreen failed re-reads", () => {
+  beforeEach(resetScreenMocks)
+
+  it("keeps the retry on screen when the re-reads behind it fail", async () => {
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+    mockRefetchOwnerId.mockRejectedValue(new Error("offline"))
+    mockRefetchCheckpoint.mockRejectedValue(new Error("offline"))
+    mockRefetchMigrationStatus.mockRejectedValue(new Error("offline"))
+    mockUseMigrationQuery.mockReturnValue({
+      ...migrationQueryResult({
+        balanceSats: 1000,
+        feeSats: 10,
+        feeCoveredByBlink: false,
+        receiveSats: 990,
+      }),
+      refetch: jest.fn(),
+    })
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+      refetch: jest.fn(),
+    })
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
+
+    expect(mockRefetchOwnerId).toHaveBeenCalledTimes(1)
+    expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(1)
+    expect(mockRefetchMigrationStatus).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+  })
+
+  /** The start already went out on an answered phase; a re-read failing while it is in
+   *  flight must not cancel it, or its acceptance is dropped and nothing sends it again. */
+  it("honours a start in flight when a later phase read fails", async () => {
+    let settleStart: (result: typeof acceptedMigrationStart) => void = () => undefined
+    mockMigrationStart.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          settleStart = resolve
+        }),
+    )
+    const { rerender } = renderScreen()
+    await flushEffects()
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+
+    mockMigrationStatusError = new Error("Network request failed")
+    rerender(screenTree())
+    await flushEffects()
+    expect(screen.queryByTestId("migration-balances-overview-retry")).toBeNull()
+
+    await act(async () => {
+      settleStart(acceptedMigrationStart)
+    })
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+    expect(screen.queryByTestId("migration-balances-overview-retry")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
+  it("stays put when the status re-read on return fails", async () => {
+    mockRefetchMigrationStatus.mockRejectedValue(new Error("offline"))
+    const { rerender } = renderScreen()
+    await flushEffects()
+
+    mockIsFocused = false
+    rerender(screenTree())
+    mockIsFocused = true
+    rerender(screenTree())
+    await flushEffects()
+
+    expect(mockRefetchMigrationStatus).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+})
+
+describe("MigrationBalancesOverviewScreen lightning-address re-point gating", () => {
+  beforeEach(resetScreenMocks)
+
+  /**
+   * A refused re-point used to end the migration here, which left a user with an account
+   * locked server-side and no way to reach their funds (blink-wip#1211). The address is a
+   * convenience; the money is not.
+   */
+  const rejectedLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.Rejected)
+  const WARNING_TEST_ID = "migration-balances-overview-ln-address-warning"
+
+  it("does not hand over to support when the lightning-address re-point fails", async () => {
+    mockLnAddressTransfer = rejectedLnAddressTransfer
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+    /** Anchored on the screen it actually renders, so a spinner or a throw could not pass
+     *  for a migration that carried on. */
+    expect(screen.getByTestId("migration-balances-overview-approve")).not.toBeDisabled()
+    /** The telemetry has to stop with the navigation: a report on every focus would keep
+     *  filing tickets for a failure support no longer hears about. */
+    expect(mockReportError).not.toHaveBeenCalledWith(
+      "Migration handed over to support",
+      expect.anything(),
+    )
+  })
+
+  it("still offers the commit when the lightning-address re-point fails", async () => {
+    mockLnAddressTransfer = rejectedLnAddressTransfer
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-approve")).not.toBeDisabled()
+  })
+
+  /** Migrating in silence would break the promise the flow opened with, that the address
+   *  moves along with the funds. */
+  it("says the address did not move when the re-point fails", async () => {
+    mockLnAddressTransfer = rejectedLnAddressTransfer
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId(WARNING_TEST_ID)).toBeTruthy()
+    expect(screen.getByText(LLOverview.lnAddressNotMoved())).toBeTruthy()
+  })
+
+  it("says nothing about the address when the re-point succeeds", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.queryByTestId(WARNING_TEST_ID)).toBeNull()
+    expect(screen.queryByText(LLOverview.lnAddressNotMoved())).toBeNull()
+  })
+
+  /**
+   * The banner and the retry answer different sources, so they have to coexist: the retry
+   * cannot move an address the server already refused (the hook declines to re-fire a
+   * settled outcome), and hiding the caveat behind another source's error would migrate
+   * the user in silence.
+   */
+  it("keeps the caveat on screen next to a retry another source earned", async () => {
+    const offline = Object.assign(new Error("Network request failed"), {
+      networkError: new Error("offline"),
+    })
+    mockMigrationStart.mockRejectedValue(offline)
+    mockLnAddressTransfer = rejectedLnAddressTransfer
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+    expect(screen.getByTestId(WARNING_TEST_ID)).toBeTruthy()
   })
 
   /** A re-point that failed for a missing device key is the same cause the commit reports,
    *  so support gets that reason, not the generic re-point failure. */
   it("names a missing device key on the re-point as account-missing", async () => {
-    mockLnAddressTransfer = {
-      isTransferred: false,
-      isRejected: false,
-      isAccountMissing: true,
-      hasConnectionIssue: false,
-      retry: mockLnRetry,
-    }
+    mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.AccountMissing)
     renderScreen()
     await flushEffects()
 
@@ -967,17 +2514,38 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
     })
   })
 
+  /**
+   * The one re-point failure that still ends the migration: the commit signs the same proof
+   * through the same SDK chain, so promising the funds would move anyway would break that
+   * promise moments later, and the ticket would say the transfer failed rather than that
+   * the device could not sign.
+   */
+  it("hands over to support when the re-point's proof could not be built", async () => {
+    mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.ProofFailed)
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "ln-address-transfer-failed",
+      origin: "commit",
+    })
+  })
+
+  /** And it is not the refusal's banner: a proof that could not be built says nothing about
+   *  the address, so the screen must not claim it stayed behind. */
+  it("does not show the address caveat when the proof could not be built", async () => {
+    mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.ProofFailed)
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.queryByTestId(WARNING_TEST_ID)).toBeNull()
+  })
+
   /** When both preconditions fail at once, the start is the cause support hears about: it
    *  leads the handover chain, so one ticket names the root rather than the follow-on. */
   it("names the refused start when both the start and the re-point fail", async () => {
     mockMigrationStart.mockResolvedValue(rejectedMigrationStart)
-    mockLnAddressTransfer = {
-      isTransferred: false,
-      isRejected: true,
-      isAccountMissing: false,
-      hasConnectionIssue: false,
-      retry: mockLnRetry,
-    }
+    mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.ProofFailed)
     renderScreen()
     await flushEffects()
 
@@ -989,13 +2557,7 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
 
   /** In-flight is not a failure: Approve stays off, but the user is NOT sent to support. */
   it("keeps Approve off until the lightning address has moved, without a handover", async () => {
-    mockLnAddressTransfer = {
-      isTransferred: false,
-      isRejected: false,
-      isAccountMissing: false,
-      hasConnectionIssue: false,
-      retry: mockLnRetry,
-    }
+    mockLnAddressTransfer = unsettledLnTransfer()
     renderScreen()
     await flushEffects()
 
@@ -1017,13 +2579,7 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
   })
 
   it("retries the re-point along with the rest when it loses the network", async () => {
-    mockLnAddressTransfer = {
-      isTransferred: false,
-      isRejected: false,
-      isAccountMissing: false,
-      hasConnectionIssue: true,
-      retry: mockLnRetry,
-    }
+    mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.ConnectionIssue)
     mockUseMigrationQuery.mockReturnValue({
       ...migrationQueryResult({
         balanceSats: 1000,
@@ -1041,6 +2597,7 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
     await flushEffects()
 
     fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
 
     expect(mockLnRetry).toHaveBeenCalledTimes(1)
   })
@@ -1157,6 +2714,7 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
     await flushEffects()
 
     fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
 
     expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(1)
   })
@@ -1183,6 +2741,7 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
     await flushEffects()
 
     fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
 
     expect(mockRefetchOwnerId).toHaveBeenCalledTimes(1)
   })
@@ -1200,6 +2759,34 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
     await flushEffects()
 
     expect(screen.queryByTestId("migration-balances-overview-retry")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-approve")).not.toBeDisabled()
+  })
+
+  /** A refusal spends the ids as surely as a transfer does: the re-point will not fire
+   *  again either way, so an id source that fails afterwards must not take Approve away
+   *  from a user the migration has already decided to carry through. */
+  it("keeps Approve rather than the retry when a spent id source fails after a refusal", async () => {
+    mockLnAddressTransfer = rejectedLnAddressTransfer
+    mockCheckpointHasError = true
+
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.queryByTestId("migration-balances-overview-retry")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-approve")).not.toBeDisabled()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** The same for the owner: past a refusal the session that carried it is about to be
+   *  discarded, so a missing owner is not a failure to hand over on. */
+  it("does not hand over for a missing owner once the re-point was refused", async () => {
+    mockLnAddressTransfer = rejectedLnAddressTransfer
+    mockOwnerId = null
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalled()
     expect(screen.getByTestId("migration-balances-overview-approve")).not.toBeDisabled()
   })
 
@@ -1317,5 +2904,371 @@ describe("MigrationBalancesOverviewScreen dollar-region gating", () => {
     expect(mockUseLnAddressTransfer).not.toHaveBeenCalledWith(
       expect.objectContaining({ skip: false }),
     )
+  })
+})
+
+/**
+ * A deposit that confirms on this screen changes the balance the migration sends, so the
+ * figures read before it are stale once it clears. Kept apart from the deposit cases
+ * above, which hold the line cap.
+ */
+describe("MigrationBalancesOverviewScreen figures read again after a deposit", () => {
+  beforeEach(resetScreenMocks)
+
+  const previewWith = (receiveSats: number, refetch: jest.Mock) => ({
+    ...migrationQueryResult({
+      balanceSats: receiveSats + 10,
+      feeSats: 10,
+      feeCoveredByBlink: false,
+      receiveSats,
+    }),
+    refetch,
+  })
+
+  /** A preview refetch the case answers by hand, landing the figure it is given. */
+  const deferredPreviewRefetch = (freshReceiveSats: number) => {
+    const answers: Array<() => void> = []
+    const refetch: jest.Mock = jest.fn().mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          answers.push(() => {
+            mockUseMigrationQuery.mockReturnValue(previewWith(freshReceiveSats, refetch))
+            resolve()
+          })
+        }),
+    )
+    return { refetch, answerNext: () => answers.shift()?.() }
+  }
+
+  const pendingThenClearCheck = () => ({
+    ...pendingDepositsQueryResult([pendingOnChainReceive]),
+    refetch: jest.fn().mockResolvedValue({ data: pendingDepositsQueryResult().data }),
+  })
+
+  /** OK checks again and finds the deposit landed, as the shared cache then reads it. */
+  const clearDepositFromOk = async () => {
+    fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingDepositsQueryResult())
+    screen.rerender(screenTree())
+    await flushEffects()
+  }
+
+  const approveButton = () => screen.getByTestId("migration-balances-overview-approve")
+
+  it("reads the figures again once the deposit clears and holds the start until they answer", async () => {
+    const { refetch, answerNext } = deferredPreviewRefetch(4990)
+    mockUseMigrationQuery.mockReturnValue(previewWith(990, refetch))
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingThenClearCheck())
+    renderScreen()
+    await flushEffects()
+
+    await clearDepositFromOk()
+
+    expect(refetch).toHaveBeenCalledTimes(1)
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+
+    await act(async () => {
+      answerNext()
+    })
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+    expect(mockSaveCheckpoint).toHaveBeenCalledWith(
+      MigrationCheckpoint.BalancesOverview,
+      expect.objectContaining({
+        expectedReceiveSats: 4990,
+        isReceiveFigureRefreshed: true,
+      }),
+    )
+    expect(approveButton()).toBeEnabled()
+  })
+
+  it("holds Approve when a deposit shows up after the start was accepted", async () => {
+    renderScreen()
+    await flushEffects()
+    expect(approveButton()).toBeEnabled()
+
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(
+      pendingDepositsQueryResult([pendingOnChainReceive]),
+    )
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+    expect(approveButton()).toBeDisabled()
+  })
+
+  it("keeps Approve held until the save carrying the figure read again has landed", async () => {
+    const { refetch, answerNext } = deferredPreviewRefetch(4990)
+    mockUseMigrationQuery.mockReturnValue(previewWith(990, refetch))
+    renderScreen()
+    await flushEffects()
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingThenClearCheck())
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    let landRefreshedSave: () => void = () => undefined
+    mockSaveCheckpointHandle = (step, options) => {
+      const isRefreshedSave =
+        (options as { isReceiveFigureRefreshed?: true }).isReceiveFigureRefreshed === true
+      if (!isRefreshedSave) return mockSaveCheckpoint(step, options)
+      return new Promise((resolve) => {
+        landRefreshedSave = () => resolve({ isSaved: true, failure: null })
+      })
+    }
+    await clearDepositFromOk()
+    await act(async () => {
+      answerNext()
+    })
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    expect(approveButton()).toBeDisabled()
+
+    await act(async () => {
+      landRefreshedSave()
+    })
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    expect(approveButton()).toBeEnabled()
+  })
+
+  it("offers the retry when the figures cannot be read again, and reads them on it", async () => {
+    const refetch = jest
+      .fn()
+      .mockRejectedValueOnce(new Error("Network request failed"))
+      .mockResolvedValue(undefined)
+    mockUseMigrationQuery.mockReturnValue(previewWith(990, refetch))
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingThenClearCheck())
+    renderScreen()
+    await flushEffects()
+
+    await clearDepositFromOk()
+
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+
+    fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
+
+    expect(refetch).toHaveBeenCalledTimes(2)
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+    expect(approveButton()).toBeEnabled()
+  })
+
+  /** Before the server starts the run, the start waits for the save of the figure on
+   *  screen now: an accepted start binds whatever the disk holds. */
+  it("holds the start for the save of the figure read again, not an earlier one", async () => {
+    mockMigrationStatus = MigrationStatus.NotStarted
+    const { refetch, answerNext } = deferredPreviewRefetch(4990)
+    mockUseMigrationQuery.mockReturnValue(previewWith(990, refetch))
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingThenClearCheck())
+    let landFreshFigure: () => void = () => undefined
+    mockSaveCheckpointHandle = (step, options) => {
+      const isFreshFigure =
+        (options as { expectedReceiveSats?: number }).expectedReceiveSats === 4990
+      if (!isFreshFigure) return mockSaveCheckpoint(step, options)
+      return new Promise((resolve) => {
+        landFreshFigure = () => resolve({ isSaved: true, failure: null })
+      })
+    }
+    renderScreen()
+    await flushEffects()
+
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingDepositsQueryResult())
+    screen.rerender(screenTree())
+    await flushEffects()
+    await act(async () => {
+      answerNext()
+    })
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+
+    await act(async () => {
+      landFreshFigure()
+    })
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+  })
+
+  it("never lets a reading replace the figure once the server holds a destination", async () => {
+    mockMigrationStatus = MigrationStatus.Transferring
+    const refetch = jest.fn().mockResolvedValue(undefined)
+    mockUseMigrationQuery.mockReturnValue(previewWith(990, refetch))
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingThenClearCheck())
+    renderScreen()
+    await flushEffects()
+
+    await clearDepositFromOk()
+
+    expect(refetch).toHaveBeenCalledTimes(1)
+    const refreshedSaves = mockSaveCheckpoint.mock.calls.filter(
+      ([, options]) =>
+        (options as { isReceiveFigureRefreshed?: true }).isReceiveFigureRefreshed ===
+        true,
+    )
+    expect(refreshedSaves).toHaveLength(0)
+  })
+
+  describe("sent back for a commit the server refused for a deposit", () => {
+    beforeEach(() => {
+      mockRouteParams = { isDepositRefused: true }
+    })
+
+    it("checks the deposits again and holds Approve on the deposit it finds", async () => {
+      const checkAfterRefusal = jest.fn().mockResolvedValue({
+        data: pendingDepositsQueryResult([pendingOnChainReceive]).data,
+      })
+      mockUseMigrationPendingDepositsQuery.mockReturnValue({
+        ...pendingDepositsQueryResult(),
+        refetch: checkAfterRefusal,
+      })
+      renderScreen()
+      mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingThenClearCheck())
+      await flushEffects()
+      screen.rerender(screenTree())
+      await flushEffects()
+
+      expect(checkAfterRefusal).toHaveBeenCalledTimes(1)
+      expect(mockSetParams).toHaveBeenCalledWith({ isDepositRefused: undefined })
+      expect(screen.getByTestId("pending-deposit-modal-ok")).toBeTruthy()
+      expect(approveButton()).toBeDisabled()
+    })
+
+    it("reads the figures again before Approve even when the deposit has landed", async () => {
+      const { refetch, answerNext } = deferredPreviewRefetch(4990)
+      mockUseMigrationQuery.mockReturnValue(previewWith(990, refetch))
+      renderScreen()
+      await flushEffects()
+
+      expect(refetch).toHaveBeenCalledTimes(1)
+      expect(approveButton()).toBeDisabled()
+
+      await act(async () => {
+        answerNext()
+      })
+      screen.rerender(screenTree())
+      await flushEffects()
+
+      expect(mockSaveCheckpoint).toHaveBeenCalledWith(
+        MigrationCheckpoint.BalancesOverview,
+        expect.objectContaining({
+          expectedReceiveSats: 4990,
+          isReceiveFigureRefreshed: true,
+        }),
+      )
+      expect(approveButton()).toBeEnabled()
+    })
+  })
+
+  describe("leaving from the modal", () => {
+    const windDownWith = (status: WindDownStatus) => ({ status }) as unknown as WindDown
+
+    const lastModalProps = () =>
+      mockPendingDepositModal.mock.calls[mockPendingDepositModal.mock.calls.length - 1][0]
+
+    it("lets a user whose run the server has not started leave", async () => {
+      mockMigrationStatus = MigrationStatus.NotStarted
+      mockUseMigrationPendingDepositsQuery.mockReturnValue(
+        pendingDepositsQueryResult([pendingOnChainReceive]),
+      )
+      renderScreen()
+      await flushEffects()
+
+      expect(lastModalProps()).toEqual(
+        expect.objectContaining({
+          showCloseIconButton: true,
+          onContactSupport: undefined,
+        }),
+      )
+
+      fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+      await flushEffects()
+
+      expect(mockReset).toHaveBeenCalledWith({ index: 0, routes: [{ name: "Primary" }] })
+      expect(mockMigrationStart).not.toHaveBeenCalled()
+    })
+
+    it("keeps the armed gate on the modal even before the run starts", async () => {
+      mockMigrationStatus = MigrationStatus.NotStarted
+      mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+      mockUseMigrationPendingDepositsQuery.mockReturnValue(
+        pendingDepositsQueryResult([pendingOnChainReceive]),
+      )
+      renderScreen()
+      await flushEffects()
+
+      expect(lastModalProps()).toEqual(
+        expect.objectContaining({ showCloseIconButton: false }),
+      )
+      expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith(
+        MigrationSupportReason.DepositPending,
+      )
+      act(() => {
+        lastModalProps().onContactSupport?.()
+      })
+      expect(mockSendDepositSupportEmail).toHaveBeenCalledTimes(1)
+
+      fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+      await flushEffects()
+      expect(mockReset).not.toHaveBeenCalled()
+    })
+
+    /** The phase read can lag the start this screen just sent, and an accepted start is
+     *  the lock, whatever that read still says. */
+    it("keeps a user whose start was accepted on the modal, though the read says not started", async () => {
+      mockMigrationStatus = MigrationStatus.NotStarted
+      renderScreen()
+      await flushEffects()
+      expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+
+      mockUseMigrationPendingDepositsQuery.mockReturnValue(
+        pendingDepositsQueryResult([pendingOnChainReceive]),
+      )
+      screen.rerender(screenTree())
+      await flushEffects()
+
+      expect(lastModalProps()).toEqual(
+        expect.objectContaining({ showCloseIconButton: false }),
+      )
+    })
+
+    it("keeps a run the server has taken on the modal", async () => {
+      mockUseMigrationPendingDepositsQuery.mockReturnValue(
+        pendingDepositsQueryResult([pendingOnChainReceive]),
+      )
+      renderScreen()
+      await flushEffects()
+
+      expect(lastModalProps()).toEqual(
+        expect.objectContaining({ showCloseIconButton: false }),
+      )
+      fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+      await flushEffects()
+      expect(mockReset).not.toHaveBeenCalled()
+    })
+  })
+
+  it("reads them again for a second deposit that clears later", async () => {
+    const refetch = jest.fn().mockResolvedValue(undefined)
+    mockUseMigrationQuery.mockReturnValue(previewWith(990, refetch))
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingThenClearCheck())
+    renderScreen()
+    await flushEffects()
+    await clearDepositFromOk()
+    expect(refetch).toHaveBeenCalledTimes(1)
+
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingThenClearCheck())
+    screen.rerender(screenTree())
+    await flushEffects()
+    await clearDepositFromOk()
+
+    expect(refetch).toHaveBeenCalledTimes(2)
   })
 })

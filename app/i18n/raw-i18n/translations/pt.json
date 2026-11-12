@@ -1,6 +1,7 @@
 {
     "ApiScreen": {
         "keysGroupTitle": "Chaves de API",
+        "inactiveKeys": "Chaves inativas ({count})",
         "noKeys": "Ainda não há chaves de API",
         "createKey": "Criar chave de API",
         "createTitle": "Nova chave de API",
@@ -27,10 +28,13 @@
         "revokeTitle": "Revogar a chave de API?",
         "revokeBody": "\"{name: string}\" deixará de funcionar imediatamente. Isto não pode ser desfeito.",
         "revoke": "Revogar",
+        "revokeGoBack": "Voltar",
         "revokeSuccess": "Chave de API revogada",
         "createError": "Não foi possível criar a chave de API. Tente novamente.",
         "revokeError": "Não foi possível revogar a chave de API. Tente novamente.",
         "loadError": "Não foi possível carregar as suas chaves de API. Tente mais tarde.",
+        "discardSecretTitle": "Descartar esta chave de API?",
+        "discardSecretBody": "Esta é a única vez que o segredo é exibido. Se sair agora, a chave não poderá ser recuperada e terá de criar uma nova.",
         "done": "Concluído"
     },
     "GaloyAddressScreen": {
@@ -78,7 +82,12 @@
         "skip": "Pular",
         "unlock": "Desbloquear",
         "usePin": "Usar PIN",
-        "confirmLogout": "Tem certeza de que deseja sair? Isso redefinirá seu cache e todas as configurações locais de usuário"
+        "confirmLogout": "Tem certeza de que deseja sair? Isso redefinirá seu cache e todas as configurações locais de usuário",
+        "forgotPin": "Esqueceu o PIN? Remover carteiras",
+        "removeWalletsTitle": "Remover as carteiras deste dispositivo?",
+        "removeWalletsBody": "Isto remove todas as carteiras deste dispositivo e encerra a sua sessão. Para recuperar uma carteira, você precisa da frase de backup dela. Sem ela, a carteira é perdida.",
+        "removeWalletsConfirm": "Remover carteiras",
+        "removeWalletsFailed": "Não foi possível remover algumas carteiras. Tente novamente."
     },
     "PeopleScreen": {
         "title": "Pessoas",
@@ -2133,7 +2142,9 @@
         "selectAll": "Selecionar tudo",
         "clearAll": "Limpar tudo",
         "addPlace": "Adicionar ao mapa",
-        "addPlaceTitle": "Adicionar um local",
+        "addPlaceTitle": "Sugerir estabelecimento",
+        "submitPlaceRequest": "Enviar pedido",
+        "showMyLocation": "Mostrar minha localização",
         "placePinHint": "Mova o mapa para colocar o marcador sobre o local",
         "placeName": "Nome",
         "placeNameHint": "Como o local se chama",
@@ -2175,16 +2186,19 @@
         "walletCountNotTwo": "O número de carteiras não é 2. Por favor, utilize o painel para ver todas as carteiras e fundos desta conta."
     },
     "PinScreen": {
+        "attemptUnrecorded": "Não foi possível registar a tentativa em segurança.",
+        "attemptsLeft": "{attemptsRemaining: string} tentativas restantes.",
         "attemptsRemaining": "PIN incorreto. {attemptsRemaining: string} tentativas restantes.",
         "enterPin": "Insira seu código PIN",
-        "lockoutUnavailable": "Não foi possível registar a tentativa falhada em segurança. Saindo.",
+        "oneAttemptLeft": "1 tentativa restante.",
         "oneAttemptRemaining": "PIN incorreto. 1 tentativa restante.",
         "pinUnreadable": "Não foi possível verificar o seu PIN. Tente novamente.",
         "setPin": "Defina seu código PIN",
         "setPinFailedMatch": "Os PINs não correspondem - Defina seu código PIN",
         "storePinFailed": "Não foi possível armazenar seu pin.",
         "tooManyAttempts": "Muitas tentativas falharam. Saindo.",
-        "tryAgainIn": "Tente novamente em {seconds: number} s.",
+        "attemptBudgetSpent": "Muitas tentativas falharam.",
+        "tryAgainIn": "Tente novamente em {time: string}.",
         "verifyPin": "Verifique seu código PIN"
     },
     "PriceHistoryScreen": {
@@ -2219,6 +2233,12 @@
         "error": "Falha ao gerar fatura. Entre em contato com o suporte se o problema persistir.",
         "copyInvoice": "Copiar",
         "shareInvoice": "Compartilhar",
+        "newAddress": "Novo",
+        "newAddressHint": "Gera um novo endereço Bitcoin. Os endereços anteriores continuam funcionando.",
+        "newAddressGenerated": "Novo endereço pronto. Os endereços anteriores continuam funcionando.",
+        "newAddressFailed": "Não foi possível gerar um novo endereço. Tente novamente.",
+        "newAddressRateLimited": "Muitos endereços novos. Aguarde um pouco e tente novamente.",
+        "onchainAddressLoadFailed": "Não foi possível carregar seu endereço Bitcoin. Toque em Novo para tentar novamente.",
         "addAmount": "Solicitar valor específico",
         "expired": "A fatura expirou",
         "expiresIn": "Expira em",
@@ -2354,6 +2374,8 @@
         "invalidAmount": " Contém um valor inválido. Por favor ajuste com um valor válido.",
         "usernameDoesNotExist": "{lnAddress: string} não parece ser um {bankName: string} endereço que existe.",
         "usernameDoesNotExistAdvice": "Certifique-se de que a ortografia está correta ou peça ao destinatário uma fatura LN ou um endereço BTC.",
+        "destinationUnverifiable": "Não conseguimos verificar {lnAddress} neste momento — os servidores da {bankName} não estão a responder.",
+        "destinationUnverifiableAdvice": "O endereço provavelmente está correto. Tente novamente daqui a pouco, ou peça ao destinatário uma fatura LN ou um endereço BTC.",
         "selfPaymentError": "{lnAddress: string} é seu {bankName: string} endereço.",
         "selfPaymentAdvice": "Se você quiser enviar dinheiro para outra conta sua, pode usar uma fatura, LN ou um endereço de BTC.",
         "lnAddressError": "Não conseguimos acessar este endereço Lightning. Se tiver certeza de que existe, tente novamente mais tarde.",
@@ -2426,9 +2448,9 @@
         "time": "Hora",
         "type": "Tipo",
         "feeTier": "Prioridade da transação",
-        "fast": "Rápido",
-        "medium": "Médio",
-        "slow": "Lento",
+        "fast": "Prioritário",
+        "medium": "Padrão",
+        "slow": "Econômico",
         "recommended": "Recomendado",
         "walletOffline": "Sua carteira está offline. Verifique sua conexão e tente novamente.",
         "sdkInsufficientFunds": "Saldo insuficiente para esta transação.",
@@ -2437,7 +2459,7 @@
         "sdkGenericError": "Não foi possível estimar as taxas. Tente um valor diferente."
     },
     "SettingsScreen": {
-        "createAddress": "Criar endereço",
+        "createAddress": "Criar endereço Lightning",
         "addressDisabled": "(desativado)",
         "donationButton": "Botão Doar",
         "btcpayServer": "BTCPay Server",
@@ -2454,6 +2476,7 @@
         "activated": "Ativado",
         "addressScreen": "Formas de receber pagamentos",
         "nonCustodialAccount": "Conta não custodial",
+        "custodialAccount": "Conta custodial",
         "tapUserName": "Toque para definir o nome de usuário",
         "notifications": "Notificações",
         "title": "Configurações",
@@ -2562,8 +2585,6 @@
         "emailUnverifiedContent": "Certifique-se de que pode fazer login novamente na sua conta verificando o seu e-mail. Deseja fazer a verificação agora?",
         "totp": "Autenticação de dois fatores",
         "totpDeactivated": "A autenticação de dois fatores foi desativada",
-        "totpDeleteAlertTitle": "Excluir autenticação de dois fatores",
-        "totpDeleteAlertContent": "Você tem certeza de que deseja excluir sua autenticação de dois fatores?",
         "copiedAccountId": "Copiou o ID da sua conta para a área de transferência",
         "yourAccountId": "Seu ID de conta",
         "accountId": "ID da conta",
@@ -2577,12 +2598,14 @@
         "error": "Não foi possível buscar perfis no momento",
         "fromThisDevice": "deste dispositivo?",
         "switchAccount": "Você trocou para outra conta",
-        "removedAccount": "Você removeu a conta {identifier: string}."
+        "removedAccount": "Você removeu a conta {identifier: string}.",
+        "removeAccount": "Remover conta"
     },
     "StablesatsRestriction": {
         "walletLabel": "não está disponível na sua região",
         "anonModeWalletLabel": "não disponível no modo Incognito",
-        "unknownRegionWalletLabel": "não foi possível verificar a disponibilidade, puxe para baixo para tentar novamente"
+        "unknownRegionWalletLabel": "não foi possível verificar a disponibilidade, puxe para baixo para tentar novamente",
+        "networkWalletLabel": "não disponível nesta rede"
     },
     "AnonModeConvertModal": {
         "title": "Transfira primeiro o seu saldo em dólares",
@@ -2616,14 +2639,11 @@
         "youGet": "Você recebe"
     },
     "TotpRegistrationInitiateScreen": {
-        "title": "Autenticação de dois fatores",
-        "secret": "Segredo/backup",
-        "content": "Digitalize este código QR com o seu aplicativo autenticador. Alternativamente, você pode copiar/colar manualmente o segredo no seu aplicativo autenticador."
+        "title": "Autenticação de dois fatores"
     },
     "TotpRegistrationValidateScreen": {
         "title": "Autenticação de dois fatores",
-        "enter6digitCode": "Digite o código de 6 dígitos do seu aplicativo autenticador para validar sua autenticação de dois fatores.",
-        "success": "A autenticação de dois fatores foi ativada. Agora você só poderá fazer login novamente com seu telefone ou e-mail E sua autenticação de dois fatores.\n\nDispositivos nesta conta que não estão conectados com 2FA precisarão fazer login novamente.\n\nApenas contas de nível 2 podem ser recuperadas pelo suporte ao cliente em caso de perda de acesso ao 2FA."
+        "enter6digitCode": "Digite o código de 6 dígitos do seu aplicativo autenticador para validar sua autenticação de dois fatores."
     },
     "TotpLoginValidateScreen": {
         "title": "Autenticação de dois fatores",
@@ -2667,7 +2687,7 @@
     "TransactionDetailScreen": {
         "paid": "Pago de/para",
         "received": "Você recebeu",
-        "spent": "Você gastou",
+        "sent": "Você enviou",
         "sending": "Enviando",
         "receivingAccount": "Saldo de Recebimento",
         "sendingAccount": "Saldo de Envio",
@@ -2697,7 +2717,9 @@
         "noFee": "sem taxa",
         "fromApprox": "a partir de ~{fee: string}",
         "satAmount": "{amount: string} SAT",
-        "error": "Incapaz de obter as taxas agora"
+        "error": "Incapaz de obter as taxas agora",
+        "inactivity": "Inatividade >{months: number} meses",
+        "usdPerMonth": "{amount: string}/mês"
     },
     "TransactionLimitsScreen": {
         "receive": "Receber",
@@ -2741,6 +2763,7 @@
             "tooLong": "O endereço deve ter no máximo 50 caracteres de comprimento.",
             "invalidCharacter": "O endereço só pode conter letras, números e sublinhados.",
             "addressUnavailable": "Desculpe, este endereço já está em uso.",
+            "serverUnreachable": "Não foi possível contactar o servidor de endereços. Tente novamente daqui a pouco.",
             "unknownError": "Ocorreu um erro desconhecido, por favor tente novamente mais tarde.",
             "backupRequired": "Back up your wallet before creating a Lightning address"
         },
@@ -3035,7 +3058,8 @@
         "problemPersists": "Se o problema persistir entre em contato com o suporte.",
         "fatalError": "Desculpe, parece que estamos tendo problemas para carregar os dados do aplicativo. Se os problemas persistirem, entre em contato com o suporte.",
         "showError": "Mostrar erro",
-        "clearAppData": "Apagar Informação do App e Sair"
+        "clearAppData": "Apagar Informação do App e Sair",
+        "screenSecurityUnavailable": "Esta tela permanece oculta porque não foi possível ativar a proteção contra capturas de tela."
     },
     "notifications": {
         "payment": {
@@ -3052,7 +3076,6 @@
         "faq": "FAQ",
         "statusPage": "Página de status",
         "telegram": "Telegram",
-        "mattermost": "Mais importante",
         "defaultEmailSubject": "{bankName: string} - Suporte",
         "defaultSupportMessage": "Ei! Preciso de ajuda com {bankName: string}, estou usando a versão {version: string} em {os: string}.",
         "emailCopied": "email {email: string} copiado para a área de transferência",
@@ -3066,7 +3089,13 @@
         "deleteAccountFromPhone": "Olá! Por favor, encerre a minha conta. Meu contato telefônico é {phoneNumber: string}.",
         "deleteAccountError": "Algo deu errado. Fale com {email: string}  para mais assistência.",
         "bye": "Adeus!",
-        "deleteAccountWarning": "Atenção: O encerramento da conta é permanente!\nCertifique-se de que as carteiras não possuem fundos antes de encerrar.\nUma conta encerrada não pode ser recuperada.\nPodemos reter certos registros conforme exigido por lei."
+        "deleteAccountWarning": "Atenção: O encerramento da conta é permanente!\nCertifique-se de que as carteiras não possuem fundos antes de encerrar.\nUma conta encerrada não pode ser recuperada.\nPodemos reter certos registros conforme exigido por lei.",
+        "downloadLogs": "Baixar logs",
+        "exportLogsTitle": "Compartilhar os logs da sua carteira",
+        "exportLogsBody": "Este arquivo ajuda nossa equipe de suporte a investigar problemas nas suas carteiras. Ele inclui o histórico de pagamentos (valores, faturas e endereços) e os identificadores de cada carteira não custodial neste dispositivo, não só desta, mas nunca suas frases de recuperação ou chaves. Compartilhe apenas com nossa equipe de suporte.",
+        "exportLogsConfirm": "Compartilhar logs",
+        "noLogsYet": "Ainda não há logs para compartilhar. Abra sua carteira e tente de novo.",
+        "exportLogsError": "Não foi possível exportar seus logs. Tente de novo."
     },
     "lnurl": {
         "overLimit": "Você não pode enviar mais do que o valor máximo",
@@ -3305,7 +3334,10 @@
             "noLimit": "Sem limite",
             "limitUpdateSuccess": "Limite atualizado com sucesso",
             "limitUpdateError": "Falha ao atualizar o limite",
-            "limitMustBePositive": "O limite deve ser maior que zero"
+            "limitMustBePositive": "O limite deve ser maior que zero",
+            "atmToggleError": "Falha ao atualizar os saques no caixa",
+            "atmControlsLoadError": "Não foi possível carregar seus limites de caixa",
+            "invalidLimitAmount": "Insira um valor válido com até 2 casas decimais"
         },
         "CardStatements": {
             "title": "Movimentos",
@@ -3731,11 +3763,72 @@
                 "title": "Processando sua solicitação",
                 "subtitle": "Avisaremos você assim que estivermos prontos",
                 "buttonText": "Fechar"
+            },
+            "WelcomeInvest": {
+                "welcomeMessage": {
+                    "title": "Bem-vindo a fazer parte do Blink",
+                    "paragraphs": {
+                        "body1": "Antes de captar mais recursos de investidores profissionais, decidimos estender um convite à família Blink, nossos superusuários e apoiadores. Por que trazer estranhos quando podemos primeiro convidar alguém como você?",
+                        "body2": "Este é um convite pessoal. Por favor, não encaminhe ou compartilhe publicamente."
+                    }
+                },
+                "buttonText": "Continuar"
+            },
+            "SelectInvest": {
+                "desiredCreditLimit": "Quanto você gostaria de investir?",
+                "percent": "por ~{percent: number}%"
+            },
+            "CompanyValuation": {
+                "welcomeMessage": {
+                    "title": "Avaliação da empresa",
+                    "paragraphs": {
+                        "body1": "Nesta rodada de investimento, a avaliação pré-money do Blink é de $10 milhões.",
+                        "body2": "Poderíamos levantar capital a um preço mais alto de VCs. No entanto, vemos benefícios mútuos de longo prazo na parceria com nossos superusuários. Por isso, estamos estendendo esta oferta em melhores condições para você."
+                    }
+                },
+                "buttonText": "Entendido"
+            },
+            "TermSheet": {
+                "title": "Folha de Termos",
+                "equitySection": {
+                    "title": "Participação no Blink",
+                    "investment": "Investimento de {amount: string}",
+                    "valuation": "Com avaliação pré-money de $10M",
+                    "units": "Você recebe {units: string} unidades ~{percent: number}% do Blink"
+                },
+                "buttonText": "Prosseguir para Assinatura"
+            },
+            "TransferInvest": {
+                "title": "Transfira seu investimento",
+                "paragraphs": {
+                    "body1": "Você assinou o acordo de subscrição por {units: string} unidades no Blink.",
+                    "body2": "É hora de transferir o valor de investimento de {amount: string}. Você pagará com Bitcoin."
+                },
+                "buttonText": "Continuar",
+                "paymentsUnavailable": "Os pagamentos do investimento ainda não estão abertos. Tente novamente mais tarde."
+            },
+            "InsufficientBalance": {
+                "title": "Saldo insuficiente",
+                "paragraphs": {
+                    "balanceBitcoin": "Você só tem {balance: string} na sua conta Bitcoin.",
+                    "balanceDollar": "Você só tem {balance: string} na sua conta Dólar.",
+                    "body2": "Deposite mais de {shortfall: string} na sua conta para atingir o valor de investimento de {investmentAmount: string}.",
+                    "body3": "Certifique-se de que o valor total esteja em uma das suas contas; Bitcoin ou Dólar."
+                },
+                "buttonText": "Depositar",
+                "splitFunds": {
+                    "title": "Os teus fundos estão divididos",
+                    "body": "Tens o suficiente para investir, mas está dividido entre as tuas contas de Bitcoin e de Dólar. Converte para que o valor total fique numa só."
+                }
+            },
+            "DepositPending": {
+                "message": "Aguardando a liquidação do seu depósito; aguarde 2 confirmações na cadeia.",
+                "buttonText": "Ok"
             }
         }
     },
     "BackupScreen": {
-        "title": "Back up your wallet",
+        "title": "Fazer backup da sua carteira",
         "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "Escolha seu método de backup",
@@ -3780,6 +3873,15 @@
                 "title": "Bem-vindo ao Blink não-custodial",
                 "testSuccess": "Sua frase de backup está correta"
             }
+        },
+        "BundleExport": {
+            "title": "Saída de emergência",
+            "body": "Se o Spark cair, este pacote permite mover seus bitcoins on-chain sem o Blink. Seu saldo em dólares não pode ser recuperado.",
+            "download": "Baixar pacote",
+            "sensitiveTitle": "Sensível",
+            "learnMore": "Saiba mais sobre a saída unilateral",
+            "sensitiveConfirm": "Baixar",
+            "sensitiveBody": "Este arquivo mostra seu saldo e seu histórico de pagamentos, então mantenha-o privado. Para usá-lo em uma emergência, você também precisa da sua frase de recuperação."
         },
         "CloudBackup": {
             "title": "Vamos fazer backup da sua carteira",
@@ -3853,6 +3955,12 @@
             "title": "Não podemos migrar o seu saldo em dólares",
             "body": "Esvazie primeiro o seu saldo em dólares. Você pode transferi-lo para o seu saldo Bitcoin no Blink ou para outro lugar."
         },
+        "pendingDepositModal": {
+            "title": "Há um depósito pendente na sua conta",
+            "body": "Você não pode migrar para outro tipo de conta antes que todos os seus depósitos pendentes tenham sido liquidados e creditados nesta conta.",
+            "contactSupportCta": "Falar com o suporte",
+            "stillConfirming": "Seu depósito ainda não foi confirmado. Tente novamente em alguns minutos."
+        },
         "balancesOverview": {
             "title": "Mova seu saldo",
             "body": "Mova seus fundos com segurança para sua nova conta.",
@@ -3861,6 +3969,7 @@
             "newBitcoinBalance": "Novo saldo de Bitcoin",
             "newDollarBalance": "Novo saldo em dólares",
             "dollarBalanceNotAvailable": "não disponível",
+            "lnAddressNotMoved": "Não foi possível mover o seu endereço Lightning. Os seus fundos serão transferidos mesmo assim.",
             "networkFee": "Taxa de rede: <bold>{fee: string}</bold>",
             "networkFeeCoveredByBlink": "Taxa de rede: <bold>{fee: string}</bold> (coberta pela Blink)",
             "retryCta": "Tentar novamente",
@@ -3909,9 +4018,19 @@
         "explainerCheck5": "Uma taxa de rede Spark será descontada da sua conta",
         "explainerCta": "Entendi",
         "transferringFunds": "Transferindo seus fundos. Deve ser concluído em poucos segundos.",
+        "transferInProgress": {
+            "body": "Seus fundos estão a caminho da sua nova conta. Mantenha o aplicativo aberto e concluiremos automaticamente."
+        },
         "transferDelayed": {
             "body": "Seus fundos estão a caminho da sua nova conta. Está demorando mais que o normal — mantenha o aplicativo aberto e concluiremos automaticamente.",
             "contactSupportCta": "Falar com o suporte"
+        },
+        "storageUnavailable": {
+            "unreadableBody": "Não conseguimos ler o progresso da sua migração neste dispositivo. Nada se perdeu: os seus fundos estão seguros e o seu progresso continua guardado.",
+            "outOfSpaceBody": "O seu dispositivo não tem espaço de armazenamento livre, por isso não conseguimos ler o progresso da sua migração. Liberte espaço e tente novamente. Nada se perdeu: os seus fundos estão seguros.",
+            "notSavedBody": "Não conseguimos guardar o progresso da sua migração neste dispositivo. Nada se perdeu: os seus fundos estão seguros. Tente novamente.",
+            "notSavedOutOfSpaceBody": "O seu dispositivo não tem espaço de armazenamento livre, por isso não conseguimos guardar o progresso da sua migração. Liberte espaço e tente novamente. Nada se perdeu: os seus fundos estão seguros.",
+            "contactSupportCta": "Contactar o suporte"
         },
         "clockOutOfSync": {
             "body": "A data e a hora do teu dispositivo estão dessincronizadas. Define-as como automáticas para continuar.",
@@ -3974,6 +4093,12 @@
         "recognizePhraseTitle": "Você reconhece esta frase de backup?",
         "recognizePhraseBody": "Nunca insira palavras que outra pessoa lhe enviou."
     },
+    "EmergencyRecovery": {
+        "outageTitle": "Operador inacessível",
+        "outageBody": "O Spark está com uma interrupção. Aguarde alguns minutos e tente novamente ou entre em contato com nosso {support}",
+        "outageSupport": "Suporte",
+        "tryAgainLater": "Tentar mais tarde"
+    },
     "BackupNudge": {
         "title": "Seus fundos estão em risco",
         "description": "Proteja sua carteira agora. Leva apenas um minuto.",
@@ -3982,6 +4107,82 @@
         "modalTitle": "Proteja seus fundos",
         "modalDescription": "Recomendamos fortemente que você faça backup da sua carteira para evitar uma perda total de fundos caso perca este dispositivo.",
         "secureMe": "Proteger carteira"
+    },
+    "TwoFactorEnforcement": {
+        "title": "Configure a autenticação de dois fatores",
+        "cardDescription": "Proteja sua conta contra acessos não autorizados.",
+        "cardCta": "Configurar",
+        "settingsDescription": "Proteja sua conta contra acessos não autorizados configurando-a.",
+        "setupTitle": "Configure agora a autenticação de dois fatores",
+        "setupDescription": "Para evitar acessos não autorizados à sua conta, adicione agora a autenticação de dois fatores.",
+        "setAuthenticator": "Configurar autenticador",
+        "reminderTitle": "Adicione um autenticador para proteger seus fundos",
+        "reminderDescription": "Seu saldo cresceu. Um aplicativo autenticador mantém sua conta segura, mesmo que alguém tenha acesso ao seu e-mail ou telefone.",
+        "modalReminder": "Se você dispensar agora, não se esqueça de ativar o quanto antes.",
+        "dismissTwoMore": "Você pode dispensar isto mais duas vezes.",
+        "dismissOneMore": "Você pode dispensar isto mais uma vez.",
+        "dismissLast": "Esta é a última vez que você pode dispensar isto.",
+        "setNow": "Configurar agora",
+        "dontWantTo": "Não quero",
+        "highBalanceTitle": "Você tem mais de {amount}, por favor adicione proteção adicional",
+        "protectionRequiredTitle": "Por favor adicione proteção adicional para continuar usando o Blink",
+        "protectionRequiredBody": "Quanto mais fundos você tem, mais importante é uma segurança melhor. Por favor, adicione um autenticador para continuar usando o Blink.",
+        "nonCustodialTitle": "Se você não quiser configurar a autenticação de dois fatores",
+        "nonCustodialBody": "A outra opção é mudar para não custodial. Nesse caso, você é responsável pelos seus próprios fundos."
+    },
+    "AuthenticatorOnboarding": {
+        "introTitle": "Proteja seus fundos com um autenticador",
+        "introDescription": "Um aplicativo autenticador gera um novo código de 6 dígitos a cada 30 segundos.",
+        "takeoversTitle": "Impede invasões de conta",
+        "takeoversDescription": "O código fica apenas no seu telefone",
+        "stolenNumberTitle": "Fique seguro mesmo se roubarem seu número",
+        "stolenNumberDescription": "Mesmo que alguém acesse seu e-mail ou número de telefone, não conseguirá fazer login",
+        "durationTitle": "Leva cerca de 2 minutos",
+        "durationDescription": "Vamos guiar você passo a passo",
+        "getStarted": "Começar",
+        "appsTitle": "Obtenha um aplicativo autenticador",
+        "appsDescription": "Qualquer aplicativo autenticador funciona. Estes são gratuitos e confiáveis:",
+        "googleAuthenticatorDescription": "Simples e amplamente usado. Backup opcional na sua conta Google.",
+        "protonAuthenticatorDescription": "Código aberto. Backup e sincronização com criptografia de ponta a ponta.",
+        "twoFasAuthDescription": "Código aberto. Não precisa de conta.",
+        "get": "Baixar",
+        "storeNote": "“Baixar” abre a App Store ou o Google Play. Volte ao Blink quando o aplicativo estiver instalado.",
+        "haveAnApp": "Já tenho um aplicativo",
+        "learnHow": "Saiba como",
+        "keyInstruction": "Copie esta chave de configuração para o seu aplicativo autenticador.",
+        "qrInstruction": "Está usando outro dispositivo?\nEscaneie este código QR em vez disso.",
+        "backupTitle": "Faça backup da sua chave",
+        "backupDescription": "Se você perder seu telefone, esta chave permite configurar seu autenticador novamente. Guarde-a em outro lugar que não seja este telefone.",
+        "saveToPasswordManager": "Salvar em um gerenciador de senhas",
+        "shareToPasswordManager": "Compartilhar com um gerenciador de senhas",
+        "copyForManualBackup": "Copiar para backup manual",
+        "passwordManagerUnavailable": "Nenhum gerenciador de senhas disponível neste dispositivo. Copie a chave para um backup manual.",
+        "savedIt": "Já salvei",
+        "keyBackupText": "Chave de configuração do autenticador do Blink\n\nConta: {account}\nChave de configuração: {key}\n\nSe você perder seu telefone, adicione esta chave de configuração a um aplicativo autenticador para recuperar seus códigos de login do Blink. Qualquer pessoa com esta chave pode gerar seus códigos, então mantenha-a em sigilo.",
+        "protectedTitle": "Sua conta agora está protegida",
+        "protectedDescription": "A partir de agora, para fazer login você precisará de um código de uso único do seu aplicativo autenticador.",
+        "newPhoneTip": "Se você trocar de telefone, transfira seu autenticador para o novo <bold>antes</bold> de redefinir o antigo.",
+        "done": "Concluído"
+    },
+    "TwoFactorTurnOff": {
+        "statusEnabled": "2FA: Ativada",
+        "statusDisabled": "2FA: Desativada",
+        "modalTitle": "Não recomendamos desativar a 2FA",
+        "modalBody": "Isso reduziria a segurança da sua conta e facilitaria que terceiros a acessassem sem a sua permissão.",
+        "keepProtected": "Manter-me protegido",
+        "codeInstruction": "Digite o código de 6 dígitos do seu app autenticador para desativar a autenticação de dois fatores.",
+        "codeInvalid": "Esse código está incorreto. Digite o código atual do seu app autenticador.",
+        "tooManyAttempts": "Muitas tentativas. Tente novamente em uma hora.",
+        "manualResetTitle": "Redefinição manual da 2FA",
+        "manualResetBody": "Para sua proteção, não permitimos remover a 2FA dentro do app. Se você precisar redefinir a 2FA, entre em contato com o nosso <support>Suporte</support>."
+    },
+    "LoginMethodCode": {
+        "addEmailTitle": "Adicionar e-mail",
+        "addPhoneTitle": "Adicionar número de telefone",
+        "addEmailCode": "Para adicionar seu e-mail, digite o código de 6 dígitos do seu app autenticador.",
+        "addPhoneCode": "Para adicionar seu número de telefone, digite o código de 6 dígitos do seu app autenticador.",
+        "codeInvalid": "Esse código está incorreto. Digite o código atual do seu app autenticador.",
+        "tooManyAttempts": "Muitas tentativas. Tente novamente em uma hora."
     },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",
@@ -3992,6 +4193,15 @@
         "title": "Esta é uma conta não custodial",
         "body": "Para saber mais, leia a nossa publicação no blog",
         "cta": "Ler"
+    },
+    "StaleCloudBundleBulletin": {
+        "title": "Atualize seu backup na nuvem",
+        "body": "Seu pacote de emergência no {provider} está desatualizado. Faça o backup da sua carteira de novo para atualizá-lo.",
+        "cta": "Fazer backup de novo"
+    },
+    "RecoveryBundleScreen": {
+        "noBundleToExport": "Ainda não há pacote de emergência. Ele é criado após sua primeira transação.",
+        "exportFailed": "Não foi possível baixar o pacote de emergência."
     },
     "StableBalance": {
         "title": "Saldo estável",
@@ -4025,6 +4235,8 @@
         "signInDescription": "Faça login na sua conta custodial para usar {featureName}.",
         "noAccountTitle": "Conta custodial necessária",
         "noAccountDescription": "{featureName} requer uma conta custodial da Blink.",
+        "unreachableTitle": "O Blink está inacessível",
+        "unreachableDescription": "{featureName} precisa dos servidores da Blink, que não estão a responder neste momento. A sua carteira e os seus fundos não são afetados.",
         "featureCircles": "Círculos",
         "featureEarn": "Aprender",
         "featureCard": "Cartão"
@@ -4047,6 +4259,9 @@
         "tokenTransfer": "Transferência {token}",
         "payTo": "Pagar a {address}",
         "payment": "Pagamento"
+    },
+    "SelfCustodialStaleRate": {
+        "satsOnly": "A mostrar sats — nenhuma taxa de câmbio disponível"
     },
     "SelfCustodialOffline": {
         "title": "A carteira está offline",
@@ -4082,9 +4297,6 @@
         "refundFailed": "Reembolso falhou: {error}",
         "refundAddress": "Endereço Bitcoin para reembolso",
         "feeRate": "Taxa de rede",
-        "feeRateFastest": "Mais rápido (~{sats} sats) ~10 min",
-        "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-        "feeRateHour": "Econômico (~{sats} sats) ~60 min",
         "feeRateUnit": "{rate} sat/vB",
         "feeRateUnavailable": "Não foi possível carregar as taxas de rede. Verifique a conexão e tente novamente.",
         "refundNow": "Reembolsar agora",

@@ -44,7 +44,7 @@ export const DepositErrorMessage: React.FC<Props> = ({ deposit }) => {
 const useStyles = makeStyles(({ colors }) => ({
   warningText: {
     fontSize: 12,
-    color: colors._orange,
+    color: colors.staticBrandOrange,
   },
   errorText: {
     fontSize: 12,

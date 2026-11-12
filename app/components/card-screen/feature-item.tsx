@@ -27,12 +27,14 @@ export const FeatureItem: React.FC<FeatureItemProps> = ({ feature }) => {
     <View style={styles.featureContainer}>
       <GaloyIcon
         name={feature.icon}
-        color={colors._black}
-        backgroundColor={colors.primary}
+        color={colors.staticBlack}
+        backgroundColor={colors.accent}
         style={styles.iconStyle}
         size={19}
       />
-      <Text type="p2">{feature.title}</Text>
+      <Text type="p2" style={styles.title}>
+        {feature.title}
+      </Text>
     </View>
   )
 }
@@ -47,11 +49,14 @@ const useStyles = makeStyles(() => {
       gap: 15,
     },
     iconStyle: {
-      borderRadius: containerSize,
+      borderRadius: containerSize / 2,
       width: containerSize,
       height: containerSize,
       alignItems: "center",
       justifyContent: "center",
+    },
+    title: {
+      flex: 1,
     },
   }
 })

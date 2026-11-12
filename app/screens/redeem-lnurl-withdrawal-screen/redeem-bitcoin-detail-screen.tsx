@@ -210,7 +210,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderRadius: 10,
   },
   infoText: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
   },
   withdrawalErrorText: {

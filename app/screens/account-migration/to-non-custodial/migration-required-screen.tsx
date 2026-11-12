@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { CloseHeader } from "@app/components/close-header"
 import { IconHero } from "@app/components/icon-hero"
 import { RichText } from "@app/components/rich-text"
 import { useAddressScreenQuery } from "@app/graphql/generated"
@@ -14,8 +15,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { GateBalances } from "@app/screens/account-migration/gate-balances"
 import { useMigrationNextStep } from "@app/screens/account-migration/hooks"
-import { MigrationCloseHeader } from "@app/screens/account-migration/migration-close-header"
-import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
+import { StepLayout } from "@app/components/step-layout"
 import { testProps } from "@app/utils/testProps"
 
 /**
@@ -108,7 +108,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   const presentationByMode: Record<MigrationMode, ModePresentation> = {
     voluntary: {
       heroIcon: "upgrade",
-      heroIconColor: colors._green,
+      heroIconColor: colors.staticSuccess,
       title: LL.AccountMigration.migrationRequiredTitle(),
       subtitle: LL.AccountMigration.migrationRequiredBody(),
       shouldShowClose: true,
@@ -116,7 +116,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
     },
     forcedPreDeadline: {
       heroIcon: "upgrade",
-      heroIconColor: colors._green,
+      heroIconColor: colors.staticSuccess,
       title: LL.AccountMigration.migrationRequiredTitle(),
       subtitle: LL.AccountMigration.migrationRequiredForcedBody(),
       shouldShowClose: true,
@@ -133,12 +133,18 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   }
   const presentation = presentationByMode[mode]
   const canClose = presentation.shouldShowClose && !isExitBlocked
-  const closeAction = canClose ? handleClose : undefined
+  const isCloseHidden = !canClose
 
   return (
-    <MigrationStepLayout
+    <StepLayout
       headerShown={false}
-      header={<MigrationCloseHeader onClose={closeAction} testID="migration-close" />}
+      header={
+        <CloseHeader
+          onClose={handleClose}
+          isHidden={isCloseHidden}
+          testID="migration-close"
+        />
+      }
       contentStyle={styles.contentGap}
       footer={
         <GaloyPrimaryButton
@@ -157,7 +163,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
       />
 
       {presentation.shouldShowBalances ? <GateBalances /> : null}
-    </MigrationStepLayout>
+    </StepLayout>
   )
 }
 
@@ -169,10 +175,10 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 16,
     lineHeight: 22,
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   gateLink: {
     textDecorationLine: "underline",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

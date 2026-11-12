@@ -77,9 +77,18 @@ const CustodialAccountBanner: React.FC = () => {
         <View style={styles.iconContainer}>
           <AccountIcon size={25} />
         </View>
-        <Text type="p2">
-          {isUserLoggedIn ? usernameTitle : LL.SettingsScreen.logInOrCreateAccount()}
-        </Text>
+        <View style={styles.textContainer}>
+          {/* The address shares the row with the subtitle, so it gets one line and a tail
+              ellipsis; the logged-out sentence has no subtitle and keeps its room to wrap. */}
+          <Text type="p2" numberOfLines={isUserLoggedIn ? 1 : undefined}>
+            {isUserLoggedIn ? usernameTitle : LL.SettingsScreen.logInOrCreateAccount()}
+          </Text>
+          {isUserLoggedIn && (
+            <Text type="p3" style={styles.subtitle}>
+              {LL.SettingsScreen.custodialAccount()}
+            </Text>
+          )}
+        </View>
       </View>
     </TouchableWithoutFeedback>
   )
@@ -146,7 +155,7 @@ const SelfCustodialAccountBanner: React.FC = () => {
           style={isRestrictedRegion && styles.gatedCopyIcon}
           {...testProps("account-banner-copy")}
         >
-          <GaloyIcon name="copy-paste" size={20} color={colors.primary} />
+          <GaloyIcon name="copy-paste" size={20} color={colors.accent} />
         </View>
       )}
     </TouchableOpacity>
@@ -157,12 +166,12 @@ export const AccountIcon: React.FC<{ size: number }> = ({ size }) => {
   const {
     theme: { colors },
   } = useTheme()
-  return <GaloyIcon name="user" size={size} backgroundColor={colors.grey4} />
+  return <GaloyIcon name="user" size={size} backgroundColor={colors.neutral} />
 }
 
 const useStyles = makeStyles((theme) => ({
   outer: {
-    height: 70,
+    minHeight: 70,
     padding: 4,
     display: "flex",
     flexDirection: "row",
@@ -176,7 +185,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "space-between",
   },
   iconContainer: {
-    backgroundColor: theme.colors.grey4,
+    backgroundColor: theme.colors.neutral,
     borderRadius: 100,
     padding: 3,
   },
@@ -185,7 +194,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
   },
   subtitle: {
-    color: theme.colors.grey2,
+    color: theme.colors.textMuted,
   },
   gatedCopyIcon: {
     opacity: 0.5,

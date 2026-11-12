@@ -1,3 +1,19 @@
+fragment CardSpendingControls on Card {
+  id
+  spendingLimits {
+    category
+    period
+    limitCents
+    __typename
+  }
+  spendingToggles {
+    category
+    enabled
+    __typename
+  }
+  __typename
+}
+
 fragment CardTransactionDetails on CardTransaction {
   id
   amount
@@ -328,6 +344,41 @@ mutation cardReplace($input: CardReplaceInput!) {
   }
 }
 
+mutation cardSpendingLimitRemove($input: CardSpendingLimitRemoveInput!) {
+  cardSpendingLimitRemove(input: $input) {
+    removedLimit {
+      category
+      period
+      limitCents
+      __typename
+    }
+    __typename
+  }
+}
+
+mutation cardSpendingLimitSet($input: CardSpendingLimitSetInput!) {
+  cardSpendingLimitSet(input: $input) {
+    limit {
+      category
+      period
+      limitCents
+      __typename
+    }
+    __typename
+  }
+}
+
+mutation cardSpendingToggleSet($input: CardSpendingToggleSetInput!) {
+  cardSpendingToggleSet(input: $input) {
+    toggle {
+      category
+      enabled
+      __typename
+    }
+    __typename
+  }
+}
+
 mutation cardUpdate($input: CardUpdateInput!) {
   cardUpdate(input: $input) {
     id
@@ -421,6 +472,20 @@ mutation lnInvoiceCreate($input: LnInvoiceCreateInput!) {
       paymentStatus
       externalId
       satoshis
+      __typename
+    }
+    __typename
+  }
+}
+
+mutation lnInvoiceCreateOnBehalfOfRecipient($input: LnInvoiceCreateOnBehalfOfRecipientInput!) {
+  lnInvoiceCreateOnBehalfOfRecipient(input: $input) {
+    errors {
+      message
+      __typename
+    }
+    invoice {
+      paymentRequest
       __typename
     }
     __typename
@@ -607,6 +672,18 @@ mutation migrationStart {
   }
 }
 
+mutation onChainAddressCreate($input: OnChainAddressCreateInput!) {
+  onChainAddressCreate(input: $input) {
+    errors {
+      message
+      code
+      __typename
+    }
+    address
+    __typename
+  }
+}
+
 mutation onChainAddressCurrent($input: OnChainAddressCurrentInput!) {
   onChainAddressCurrent(input: $input) {
     errors {
@@ -743,6 +820,7 @@ mutation userEmailRegistrationInitiate($input: UserEmailRegistrationInitiateInpu
   userEmailRegistrationInitiate(input: $input) {
     errors {
       message
+      code
       __typename
     }
     emailRegistrationId
@@ -876,10 +954,11 @@ mutation userPhoneRegistrationValidate($input: UserPhoneRegistrationValidateInpu
   }
 }
 
-mutation userTotpDelete {
-  userTotpDelete {
+mutation userTotpDelete($input: UserTotpDeleteInput) {
+  userTotpDelete(input: $input) {
     errors {
       message
+      code
       __typename
     }
     me {
@@ -982,6 +1061,7 @@ query Bulletins($first: Int!, $after: String) {
           createdAt
           acknowledgedAt
           bulletinEnabled
+          dismissible
           icon
           action {
             ... on OpenDeepLinkAction {
@@ -1278,6 +1358,48 @@ query cardEncryptionPublicKey {
   cardEncryptionPublicKey
 }
 
+query cardHolder($cardId: ID!) {
+  cardHolder(cardId: $cardId) {
+    firstName
+    lastName
+    __typename
+  }
+}
+
+query cardSecretsEncrypted($cardId: ID!, $sessionId: String!) {
+  cardSecretsEncrypted(cardId: $cardId, sessionId: $sessionId) {
+    encryptedPan {
+      iv
+      data
+      __typename
+    }
+    encryptedCvc {
+      iv
+      data
+      __typename
+    }
+    __typename
+  }
+}
+
+query cardSpendingControls {
+  me {
+    id
+    defaultAccount {
+      id
+      ... on ConsumerAccount {
+        cards {
+          ...CardSpendingControls
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
 query cardTransactionsPaginated($cardId: ID!, $first: Int!, $after: String) {
   cardTransactionsPaginated(cardId: $cardId, first: $first, after: $after) {
     edges {
@@ -1390,6 +1512,10 @@ query feeRates {
           amount
           __typename
         }
+        __typename
+      }
+      inactivityFee {
+        usdCentsPerMonth
         __typename
       }
       __typename
@@ -1539,6 +1665,21 @@ query migrationOwner {
     id
     defaultAccount {
       id
+      __typename
+    }
+    __typename
+  }
+}
+
+query migrationPendingDeposits {
+  me {
+    id
+    defaultAccount {
+      id
+      pendingIncomingTransactions {
+        ...Transaction
+        __typename
+      }
       __typename
     }
     __typename
@@ -2098,6 +2239,14 @@ query totpRegistrationScreen {
   me {
     id
     username
+    __typename
+  }
+}
+
+query totpRegistrationState {
+  me {
+    id
+    totpEnabled
     __typename
   }
 }

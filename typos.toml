@@ -17,4 +17,5 @@ extend-exclude = [
   "patches",
   "ci/tasks/*",
   "dev/*",
+  "__tests__/i18n/retired-tier-copy.json",
 ]

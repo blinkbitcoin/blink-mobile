@@ -1,15 +1,19 @@
 import React from "react"
 
+import { Platform } from "react-native"
+
 import { fireEvent, render } from "@testing-library/react-native"
 
 import CustomModal from "@app/components/custom-modal/custom-modal"
 
+let mockThemeMode = "light"
+
 jest.mock("@rn-vui/themed", () => {
   const colors = {
-    grey0: "#ccc",
-    grey5: "#f5f5f5",
-    white: "#fff",
-    black: "#000",
+    textPrimary: "#ccc",
+    surfaceInteractive: "#f5f5f5",
+    backgroundDefault: "#fff",
+    textOnBackground: "#000",
   }
   const Text = ({ children, ...props }: { children: React.ReactNode }) =>
     React.createElement("Text", props, children)
@@ -18,7 +22,7 @@ jest.mock("@rn-vui/themed", () => {
       (fn: (...args: unknown[]) => Record<string, object>) => (props?: unknown) =>
         fn({ colors }, props ?? {}),
     Text,
-    useTheme: () => ({ theme: { colors, mode: "light" } }),
+    useTheme: () => ({ theme: { colors, mode: mockThemeMode } }),
   }
 })
 
@@ -54,6 +58,10 @@ const baseProps = {
 }
 
 describe("CustomModal", () => {
+  beforeEach(() => {
+    mockThemeMode = "light"
+  })
+
   it("does not render when invisible", () => {
     const { queryByTestId } = render(
       <CustomModal {...baseProps} isVisible={false} toggleModal={jest.fn()} />,
@@ -119,5 +127,148 @@ describe("CustomModal", () => {
     )
 
     expect(queryByTestId("icon-close")).toBeNull()
+  })
+
+  it("says once it is off the screen", () => {
+    const onModalHide = jest.fn()
+    const { rerender } = render(
+      <CustomModal {...baseProps} toggleModal={jest.fn()} onModalHide={onModalHide} />,
+    )
+    expect(onModalHide).not.toHaveBeenCalled()
+
+    rerender(
+      <CustomModal
+        {...baseProps}
+        isVisible={false}
+        toggleModal={jest.fn()}
+        onModalHide={onModalHide}
+      />,
+    )
+
+    expect(onModalHide).toHaveBeenCalledTimes(1)
+  })
+
+  it("renders every optional decoration when given one", () => {
+    // One pass over the props real callers combine: header, image, title,
+    // above-button note and a secondary action.
+    const secondaryOnPress = jest.fn()
+    const { getByTestId, getByText } = render(
+      <CustomModal
+        {...baseProps}
+        toggleModal={jest.fn()}
+        headerTitle="Header"
+        headerTitleSize="h2"
+        image={<React.Fragment />}
+        title="Title"
+        titleFontSize={18}
+        titleMaxWidth="60%"
+        titleTextAlignment="left"
+        primaryButtonTextAbove="Read this first"
+        secondaryButtonTitle="Cancel"
+        secondaryButtonOnPress={secondaryOnPress}
+        nonScrollingContent={<React.Fragment />}
+      />,
+    )
+
+    expect(getByText("Header")).toBeTruthy()
+    expect(getByText("Title")).toBeTruthy()
+    expect(getByText("Read this first")).toBeTruthy()
+
+    fireEvent.press(getByTestId("secondary-Cancel"))
+    expect(secondaryOnPress).toHaveBeenCalled()
+  })
+
+  it("does not render a secondary button without a handler for it", () => {
+    // A button that does nothing when pressed is worse than no button.
+    const { queryByTestId } = render(
+      <CustomModal
+        {...baseProps}
+        toggleModal={jest.fn()}
+        secondaryButtonTitle="Cancel"
+      />,
+    )
+
+    expect(queryByTestId("secondary-Cancel")).toBeNull()
+  })
+
+  it("renders in dark mode", () => {
+    mockThemeMode = "dark"
+    const { getByTestId } = render(<CustomModal {...baseProps} toggleModal={jest.fn()} />)
+
+    expect(getByTestId("modal")).toBeTruthy()
+  })
+
+  it("falls back to its default header and title styling", () => {
+    const { getByText } = render(
+      <CustomModal
+        {...baseProps}
+        toggleModal={jest.fn()}
+        headerTitle="Header"
+        title="Title"
+      />,
+    )
+
+    expect(getByText("Header")).toBeTruthy()
+    expect(getByText("Title")).toBeTruthy()
+  })
+
+  it("renders its title on Android too", () => {
+    // The title weight is the one platform-conditional style in here; a suite
+    // that only ever runs as iOS would never touch the Android side.
+    const original = Platform.OS
+    Object.defineProperty(Platform, "OS", { get: () => "android", configurable: true })
+    try {
+      const { getByText } = render(
+        <CustomModal {...baseProps} toggleModal={jest.fn()} title="Title" />,
+      )
+      expect(getByText("Title")).toBeTruthy()
+    } finally {
+      Object.defineProperty(Platform, "OS", { get: () => original, configurable: true })
+    }
+  })
+
+  it("labels the close icon for screen readers", () => {
+    const { getByLabelText } = render(
+      <CustomModal
+        {...baseProps}
+        toggleModal={jest.fn()}
+        closeIconButtonAccessibilityLabel="Close"
+      />,
+    )
+
+    expect(getByLabelText("Close").props.accessibilityRole).toBe("button")
+  })
+
+  it("closes from the close icon by default", () => {
+    const toggleModal = jest.fn()
+    const { getByLabelText } = render(
+      <CustomModal
+        {...baseProps}
+        toggleModal={toggleModal}
+        closeIconButtonAccessibilityLabel="Close"
+      />,
+    )
+
+    fireEvent.press(getByLabelText("Close"))
+
+    expect(toggleModal).toHaveBeenCalledTimes(1)
+  })
+
+  it("disables the close icon when not dismissable", () => {
+    const toggleModal = jest.fn()
+    const { getByLabelText } = render(
+      <CustomModal
+        {...baseProps}
+        toggleModal={toggleModal}
+        dismissable={false}
+        closeIconButtonAccessibilityLabel="Close"
+      />,
+    )
+
+    const closeIcon = getByLabelText("Close")
+    fireEvent.press(closeIcon)
+
+    expect(toggleModal).not.toHaveBeenCalled()
+    expect(closeIcon.props.accessibilityState).toEqual({ disabled: true })
   })
 })

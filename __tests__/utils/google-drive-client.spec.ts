@@ -363,4 +363,26 @@ describe("google drive client", () => {
       reason: DriveErrorReason.Unknown,
     })
   })
+
+  it("aborts a request that stalls and reports it as transient", async () => {
+    jest.useFakeTimers()
+    try {
+      global.fetch = jest.fn(
+        (_url: string, init: RequestInit) =>
+          new Promise((_resolve, reject) => {
+            init.signal?.addEventListener("abort", () => reject(new Error("Aborted")))
+          }),
+      ) as unknown as typeof fetch
+
+      const download = downloadAppDataFile("file-456", "token-abc")
+      jest.advanceTimersByTime(60_000)
+
+      await expect(download).rejects.toMatchObject({
+        reason: DriveErrorReason.Transient,
+        message: "Drive network error: Aborted",
+      })
+    } finally {
+      jest.useRealTimers()
+    }
+  })
 })

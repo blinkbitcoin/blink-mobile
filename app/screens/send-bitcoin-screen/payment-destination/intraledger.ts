@@ -37,19 +37,29 @@ export const resolveIntraledgerDestination = async ({
     }
   }
 
-  const handleWalletId = await getUserWalletId({
+  const lookup = await getUserWalletId({
     username: handle,
     accountDefaultWalletQuery,
     flag,
   })
 
-  if (!handleWalletId) {
+  if (lookup.status === UserWalletLookup.Unverifiable) {
+    return {
+      valid: false,
+      invalidReason: InvalidDestinationReason.DestinationUnverifiable,
+      invalidPaymentDestination: parsedIntraledgerDestination,
+    } as const
+  }
+
+  if (lookup.status === UserWalletLookup.NotFound) {
     return {
       valid: false,
       invalidReason: InvalidDestinationReason.UsernameDoesNotExist,
       invalidPaymentDestination: parsedIntraledgerDestination,
     } as const
   }
+
+  const handleWalletId = lookup.walletId
 
   if (myWalletIds.includes(handleWalletId)) {
     return {
@@ -99,6 +109,33 @@ export const createIntraLedgerDestination = (
   }
 }
 
+export const UserWalletLookup = {
+  Found: "found",
+  /** The backend answered, and holds no account under this name. */
+  NotFound: "not-found",
+  /** The backend did not answer. Says nothing about whether the name exists. */
+  Unverifiable: "unverifiable",
+} as const
+
+export type UserWalletLookup = (typeof UserWalletLookup)[keyof typeof UserWalletLookup]
+
+type UserWalletLookupResult =
+  | { status: typeof UserWalletLookup.Found; walletId: string }
+  | { status: typeof UserWalletLookup.NotFound }
+  | { status: typeof UserWalletLookup.Unverifiable }
+
+/**
+ * A query that failed at the transport resolves with no data and an error, and so does
+ * the backend's answer for an unknown name, which is a GraphQL error ("Account does not
+ * exist for username") rather than an empty result. The two are told apart by the kind
+ * of error: only a network error means the backend did not answer, so only it is
+ * reported as unverifiable. Any other error is an answer that the payee does not exist,
+ * which is what lets a custodial sender retry the name as a self-custodial recipient's
+ * address.
+ *
+ * A thrown lookup is treated the same way: whatever went wrong, nothing was learned
+ * about the name.
+ */
 const getUserWalletId = async ({
   flag,
   username,
@@ -107,13 +144,20 @@ const getUserWalletId = async ({
   flag: string | undefined
   username: string
   accountDefaultWalletQuery: AccountDefaultWalletLazyQueryHookResult[0]
-}) => {
-  if (flag?.toUpperCase() === "USD") {
-    const { data } = await accountDefaultWalletQuery({
-      variables: { username, walletCurrency: "USD" },
+}): Promise<UserWalletLookupResult> => {
+  try {
+    const { data, error } = await accountDefaultWalletQuery({
+      variables:
+        flag?.toUpperCase() === "USD"
+          ? { username, walletCurrency: WalletCurrency.Usd }
+          : { username },
     })
-    return data?.accountDefaultWallet?.id
+
+    const walletId = data?.accountDefaultWallet?.id
+    if (walletId) return { status: UserWalletLookup.Found, walletId }
+    if (error?.networkError) return { status: UserWalletLookup.Unverifiable }
+    return { status: UserWalletLookup.NotFound }
+  } catch {
+    return { status: UserWalletLookup.Unverifiable }
   }
-  const { data } = await accountDefaultWalletQuery({ variables: { username } })
-  return data?.accountDefaultWallet?.id
 }

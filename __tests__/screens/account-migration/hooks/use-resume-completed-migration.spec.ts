@@ -51,6 +51,7 @@ let mockReceiveConfirmation: {
   isReceiveProven?: boolean
 } = { isReceiveConfirmed: true, isReceiveDelayed: false }
 const mockUseReceiveConfirmation = jest.fn()
+const mockRecheck = jest.fn()
 
 jest.mock(
   "@app/screens/account-migration/hooks/use-migration-receive-confirmation",
@@ -59,6 +60,7 @@ jest.mock(
       mockUseReceiveConfirmation(args)
       return {
         isReceiveProven: mockReceiveConfirmation.isReceiveConfirmed,
+        recheck: mockRecheck,
         ...mockReceiveConfirmation,
       }
     },
@@ -70,6 +72,29 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-status", () => ({
     mockUseMigrationStatus(options)
     return { status: mockStatus, loading: false }
   },
+}))
+
+const mockLoadReceiveDelayedSince = jest.fn()
+const mockSaveReceiveDelayedSince = jest.fn()
+
+jest.mock("@app/screens/account-migration/utils/migration-receive-delay-storage", () => ({
+  loadReceiveDelayedSince: (accountId: string) => mockLoadReceiveDelayedSince(accountId),
+  saveReceiveDelayedSince: (accountId: string, delayedSince: number) =>
+    mockSaveReceiveDelayedSince(accountId, delayedSince),
+}))
+
+const mockSetMigrationReceiveOverdue = jest.fn()
+const mockMarkAppForegrounded = jest.fn()
+const mockMarkMigrationReceiveChecked = jest.fn()
+const mockResetMigrationReceiveWait = jest.fn()
+
+jest.mock("@app/screens/account-migration/utils/migration-receive-wait", () => ({
+  setMigrationReceiveOverdue: (isOverdue: boolean) =>
+    mockSetMigrationReceiveOverdue(isOverdue),
+  markAppForegrounded: () => mockMarkAppForegrounded(),
+  markMigrationReceiveChecked: (startedAt: number) =>
+    mockMarkMigrationReceiveChecked(startedAt),
+  resetMigrationReceiveWait: () => mockResetMigrationReceiveWait(),
 }))
 
 jest.mock("@app/utils/error-logging", () => ({
@@ -130,6 +155,8 @@ describe("useResumeCompletedMigration", () => {
     mockCompleteMigrationRef = mockCompleteMigration
     mockCompleteMigration.mockResolvedValue(MigrationCompletion.Completed)
     mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+    mockLoadReceiveDelayedSince.mockResolvedValue(null)
+    mockSaveReceiveDelayedSince.mockResolvedValue(undefined)
   })
 
   afterEach(() => {
@@ -215,6 +242,8 @@ describe("useResumeCompletedMigration", () => {
       selfCustodialAccountId: "sc-account-1",
       expectedReceiveSats: 21000,
       skip: true,
+      onWalletChecked: expect.any(Function),
+      wasDelayedEarlier: false,
     })
   })
 
@@ -226,6 +255,8 @@ describe("useResumeCompletedMigration", () => {
       selfCustodialAccountId: "sc-account-1",
       expectedReceiveSats: 21000,
       skip: false,
+      onWalletChecked: expect.any(Function),
+      wasDelayedEarlier: false,
     })
   })
 
@@ -259,6 +290,90 @@ describe("useResumeCompletedMigration", () => {
     await flushEffects()
 
     expect(mockReportError).toHaveBeenCalledTimes(1)
+  })
+
+  /** The hook outlives an account switch, so a second migration's late receive in the same
+   *  session is reported as its own. */
+  it("reports another wallet's delayed receive as well", async () => {
+    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
+    const { rerender } = renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    mockMigrationAccountId = "sc-account-2"
+    rerender({})
+    await flushEffects()
+
+    const delayReports = mockReportError.mock.calls.filter(
+      ([operation]) => operation === "Migration resume receive delayed",
+    )
+    expect(delayReports).toHaveLength(2)
+  })
+
+  /** A relaunch mid-wait picks the wait up where the last session left it, rather than
+   *  spending another full window on "on its way". */
+  describe("a receive an earlier session already saw run late", () => {
+    const lastCallArgs = () =>
+      mockUseReceiveConfirmation.mock.calls[
+        mockUseReceiveConfirmation.mock.calls.length - 1
+      ][0] as { wasDelayedEarlier?: boolean }
+
+    it("tells the receive gate, for this migration's wallet", async () => {
+      mockLoadReceiveDelayedSince.mockResolvedValue(1_700_000_000_000)
+
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      expect(mockLoadReceiveDelayedSince).toHaveBeenCalledWith("sc-account-1")
+      expect(lastCallArgs().wasDelayedEarlier).toBe(true)
+    })
+
+    it("leaves the window alone when no session saw it run late", async () => {
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      expect(mockLoadReceiveDelayedSince).toHaveBeenCalledWith("sc-account-1")
+      expect(lastCallArgs().wasDelayedEarlier).toBe(false)
+    })
+
+    it("records the delay the first time the window runs out", async () => {
+      mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
+
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      expect(mockSaveReceiveDelayedSince).toHaveBeenCalledWith(
+        "sc-account-1",
+        expect.any(Number),
+      )
+    })
+
+    it("does not record it again once an earlier session did", async () => {
+      mockLoadReceiveDelayedSince.mockResolvedValue(1_700_000_000_000)
+      mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
+
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      expect(lastCallArgs().wasDelayedEarlier).toBe(true)
+      expect(mockSaveReceiveDelayedSince).not.toHaveBeenCalled()
+    })
+
+    /** Not even before the store answers: a write then would replace the earlier moment
+     *  with this launch's. */
+    it("waits for the stored delay before recording one", async () => {
+      mockLoadReceiveDelayedSince.mockReturnValue(
+        new Promise<number | null>(() => {
+          /* never answers */
+        }),
+      )
+      mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
+
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      expect(mockLoadReceiveDelayedSince).toHaveBeenCalledWith("sc-account-1")
+      expect(mockSaveReceiveDelayedSince).not.toHaveBeenCalled()
+    })
   })
 
   it("stays quiet while the wait is still inside the notice window", async () => {
@@ -552,6 +667,108 @@ describe("useResumeCompletedMigration", () => {
 
     await act(async () => {
       settle(MigrationCompletion.Completed)
+    })
+  })
+
+  /** The migration entry and steps cannot see this hook; they read the overdue receive
+   *  from the shared record it keeps up to date. */
+  describe("the overdue receive it shares", () => {
+    it("publishes a receive that has not landed within the notice window", async () => {
+      mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      expect(mockSetMigrationReceiveOverdue).toHaveBeenLastCalledWith(true)
+    })
+
+    it("publishes a receive that is not overdue", async () => {
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      expect(mockSetMigrationReceiveOverdue).toHaveBeenLastCalledWith(false)
+    })
+
+    /** A receive that lands late must not leave a tap on Migrate handed to support while
+     *  the swap, or a deferred close behind it, is still finishing on its own. */
+    it("withdraws it once the receive lands after the notice window", async () => {
+      mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
+      const { rerender } = renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+      expect(mockSetMigrationReceiveOverdue).toHaveBeenLastCalledWith(true)
+
+      mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+      rerender({})
+      await flushEffects()
+
+      expect(mockSetMigrationReceiveOverdue).toHaveBeenLastCalledWith(false)
+    })
+
+    it("withdraws it when the watch goes away", async () => {
+      mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
+      const { unmount } = renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      unmount()
+
+      expect(mockResetMigrationReceiveWait).toHaveBeenCalledTimes(1)
+    })
+
+    /** Through the gate's own report, so only a look that reached the wallet is shared;
+     *  the composed behaviour is driven end to end in the receive-wait spec beside this. */
+    it("shares each look at the wallet the gate reports", async () => {
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      const [{ onWalletChecked }] = mockUseReceiveConfirmation.mock.lastCall as [
+        { onWalletChecked: (startedAt: number) => void },
+      ]
+      onWalletChecked(1234)
+
+      expect(mockMarkMigrationReceiveChecked).toHaveBeenCalledWith(1234)
+    })
+
+    /** Marked first, so the look it asks for counts as one taken since the app came
+     *  back: the other order leaves the overdue flag waiting on the check after. */
+    it("asks for a fresh receive check on each return, after recording it", async () => {
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      await foregroundApp()
+
+      expect(mockRecheck).toHaveBeenCalledTimes(1)
+      const [markedAt] = mockMarkAppForegrounded.mock.invocationCallOrder
+      const [recheckedAt] = mockRecheck.mock.invocationCallOrder
+      expect(markedAt).toBeLessThan(recheckedAt)
+    })
+
+    /** One listener for the receive and the deferred close: two would each have to repeat
+     *  the "became active" filter, and the order between them would be nobody's to keep. */
+    it("watches the foreground through one listener", async () => {
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      expect(mockAppStateListeners).toHaveLength(1)
+    })
+
+    it("records each return to the foreground", async () => {
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      await foregroundApp()
+
+      expect(mockMarkAppForegrounded).toHaveBeenCalledTimes(1)
+    })
+
+    it("does not record the app leaving the foreground", async () => {
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      await act(async () => {
+        mockAppStateListeners.forEach((listener) => listener("background"))
+      })
+
+      expect(mockMarkAppForegrounded).not.toHaveBeenCalled()
+      expect(mockRecheck).not.toHaveBeenCalled()
     })
   })
 })

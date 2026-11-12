@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Kľúče API",
+    "inactiveKeys": "Neaktívne kľúče ({count})",
     "noKeys": "Zatiaľ žiadne kľúče API",
     "createKey": "Vytvoriť kľúč API",
     "createTitle": "Nový kľúč API",
@@ -19,18 +20,21 @@
     "expiryNever": "Nikdy",
     "expiresOn": "Vyprší {date: string}",
     "neverExpires": "Nikdy nevyprší",
-    "revoked": "Zrušené",
+    "revoked": "Odvolaný",
     "expired": "Vypršal {date: string}",
     "expiredNoDate": "Vypršal",
     "secretWarning": "Toto je jediný raz, keď sa kľúč zobrazí. Skopírujte ho alebo zdieľajte teraz a bezpečne uložte.",
     "secretCopied": "Kľúč API skopírovaný. Schránka sa vymaže o 1 minútu",
-    "revokeTitle": "Zrušiť kľúč API?",
+    "revokeTitle": "Odvolať kľúč API?",
     "revokeBody": "\"{name: string}\" okamžite prestane fungovať. Túto akciu nie je možné vrátiť späť.",
-    "revoke": "Zrušiť",
-    "revokeSuccess": "Kľúč API zrušený",
+    "revoke": "Odvolať",
+    "revokeGoBack": "Späť",
+    "revokeSuccess": "Kľúč API odvolaný",
     "createError": "Kľúč API sa nepodarilo vytvoriť. Skúste to znova.",
-    "revokeError": "Kľúč API sa nepodarilo zrušiť. Skúste to znova.",
+    "revokeError": "Kľúč API sa nepodarilo odvolať. Skúste to znova.",
     "loadError": "Vaše kľúče API sa nepodarilo načítať. Skúste to neskôr.",
+    "discardSecretTitle": "Zahodiť tento API kľúč?",
+    "discardSecretBody": "Toto je jediný raz, keď sa tajomstvo zobrazí. Ak teraz odídete, kľúč sa nedá obnoviť a budete musieť vytvoriť nový.",
     "done": "Hotovo"
   },
   "GaloyAddressScreen": {
@@ -78,7 +82,12 @@
     "skip": "Preskočiť",
     "unlock": "Odomknúť",
     "usePin": "Použiť PIN",
-    "confirmLogout": "Naozaj sa chcete odhlásiť? Týmto sa obnoví vyrovnávacia pamäť a všetky miestne nastavenia používateľa"
+    "confirmLogout": "Naozaj sa chcete odhlásiť? Týmto sa obnoví vyrovnávacia pamäť a všetky miestne nastavenia používateľa",
+    "forgotPin": "Zabudli ste PIN? Odstráňte peňaženky",
+    "removeWalletsTitle": "Odstrániť peňaženky z tohto zariadenia?",
+    "removeWalletsBody": "Tým sa odstránia všetky peňaženky z tohto zariadenia a budete odhlásení. Na obnovenie peňaženky potrebujete jej záložnú frázu. Bez nej je peňaženka stratená.",
+    "removeWalletsConfirm": "Odstrániť peňaženky",
+    "removeWalletsFailed": "Niektoré peňaženky sa nepodarilo odstrániť. Skúste to znova."
   },
   "PeopleScreen": {
     "title": "Ľudia",
@@ -2133,7 +2142,9 @@
     "selectAll": "Vybrať všetko",
     "clearAll": "Zrušiť všetko",
     "addPlace": "Pridať na mapu",
-    "addPlaceTitle": "Pridať miesto",
+    "addPlaceTitle": "Navrhnúť podnik",
+    "submitPlaceRequest": "Odoslať žiadosť",
+    "showMyLocation": "Zobraziť moju polohu",
     "placePinHint": "Posuňte mapu tak, aby špendlík bol na danom mieste",
     "placeName": "Názov",
     "placeNameHint": "Ako sa miesto volá",
@@ -2175,16 +2186,19 @@
     "walletCountNotTwo": "Počet peňaženiek nie je 2. Na zobrazenie všetkých peňaženiek a prostriedkov tohto účtu použite informačný panel"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Pokus sa nepodarilo bezpečne zaznamenať.",
+    "attemptsLeft": "Zostávajú {attemptsRemaining: number} pokusy.",
     "attemptsRemaining": "Nesprávny PIN kód. Zostávajú {attemptsRemaining: number} pokusy.",
     "enterPin": "Zadajte svoj PIN kód",
-    "lockoutUnavailable": "Neúspešný pokus sa nepodarilo bezpečne zaznamenať. Odhlásenie.",
+    "oneAttemptLeft": "Zostáva 1 pokus.",
     "oneAttemptRemaining": "Nesprávny PIN kód. Zostáva 1 pokus.",
     "pinUnreadable": "PIN kód sa nepodarilo overiť. Skúste to znova.",
     "setPin": "Nastavenie PIN kódu",
     "setPinFailedMatch": "PINy sa nezhodujú - nastavte svoj PIN kód",
     "storePinFailed": "Nepodarilo sa uložiť váš PIN.",
     "tooManyAttempts": "Príliš veľa neúspešných pokusov. Odhlásenie.",
-    "tryAgainIn": "Skúste to znova o {seconds: number} s.",
+    "attemptBudgetSpent": "Príliš veľa neúspešných pokusov.",
+    "tryAgainIn": "Skúste to znova o {time: string}.",
     "verifyPin": "Overte svoj PIN kód"
   },
   "PriceHistoryScreen": {
@@ -2219,6 +2233,12 @@
     "error": "Nepodarilo sa vygenerovať faktúru. Ak tento problém pretrváva, kontaktujte prosím podporu.",
     "copyInvoice": "Kopírovať",
     "shareInvoice": "Zdieľať",
+    "newAddress": "Nová",
+    "newAddressHint": "Vygeneruje novú bitcoinovú adresu. Predchádzajúce adresy fungujú ďalej.",
+    "newAddressGenerated": "Nová adresa je pripravená. Predchádzajúce adresy stále fungujú.",
+    "newAddressFailed": "Novú adresu sa nepodarilo vygenerovať. Skúste to znova.",
+    "newAddressRateLimited": "Príliš veľa nových adries. Chvíľu počkajte a skúste to znova.",
+    "onchainAddressLoadFailed": "Vašu bitcoinovú adresu sa nepodarilo načítať. Ťuknite na Nová a skúste to znova.",
     "addAmount": "Požiadať o konkrétnu sumu",
     "expired": "Platnosť faktúry vypršala",
     "expiresIn": "Platnosť končí za",
@@ -2354,6 +2374,8 @@
     "invalidAmount": "Obsahuje neplatnú sumu. Vytvorte znova a zadajte platnú sumu.",
     "usernameDoesNotExist": "Príjemca {lnAddress: string} s adresou {bankName: string} pravdepodobne neexistuje.",
     "usernameDoesNotExistAdvice": "Uistite sa, že máte správny text, alebo požiadajte príjemcu o LN faktúru alebo BTC adresu.",
+    "destinationUnverifiable": "Teraz sa nepodarilo overiť {lnAddress} – servery {bankName} neodpovedajú.",
+    "destinationUnverifiableAdvice": "Adresa je pravdepodobne v poriadku. Skúste to o chvíľu znova alebo požiadajte príjemcu o LN faktúru či BTC adresu.",
     "selfPaymentError": "{lnAddress: string} je vaša {bankName: string} adresa.",
     "selfPaymentAdvice": "Ak chcete poslať peniaze na iný účet, ktorý vlastníte, použite LN faktúru alebo adresu, prípadne BTC adresu.",
     "lnAddressError": "Na túto Lightning adresu sa nemôžeme pripojiť. Ak ste si istí, že existuje, skúste to prosím neskôr.",
@@ -2426,9 +2448,9 @@
     "time": "Čas",
     "type": "Typ",
     "feeTier": "Priorita transakcie",
-    "fast": "Rýchly",
-    "medium": "Stredný",
-    "slow": "Pomalý",
+    "fast": "Prioritný",
+    "medium": "Štandardný",
+    "slow": "Ekonomický",
     "recommended": "Odporúčané",
     "walletOffline": "Vaša peňaženka je offline. Skontrolujte pripojenie a skúste to znova.",
     "sdkInsufficientFunds": "Nedostatok prostriedkov pre túto transakciu.",
@@ -2437,7 +2459,7 @@
     "sdkGenericError": "Nie je možné odhadnúť poplatky. Skúste inú sumu."
   },
   "SettingsScreen": {
-    "createAddress": "Vytvoriť adresu",
+    "createAddress": "Vytvoriť Lightning adresu",
     "addressDisabled": "(zakázané)",
     "donationButton": "Darovacie tlačidlo",
     "btcpayServer": "BTCPay Server",
@@ -2453,7 +2475,8 @@
     "posCopied": "Váš Terminál PoS bol skopírovaný",
     "activated": "Aktivované",
     "addressScreen": "Spôsoby, ako dostať zaplatené",
-    "nonCustodialAccount": "Nesvereneský účet",
+    "nonCustodialAccount": "Non-custodial účet",
+    "custodialAccount": "Custodial účet",
     "tapUserName": "Klepnutím nastavte používateľské meno",
     "notifications": "Notifikácie",
     "title": "Nastavenia",
@@ -2562,8 +2585,6 @@
     "emailUnverifiedContent": "Overením e-mailu zabezpečíte, že sa budete môcť znovu prihlásiť do svojho účtu. Chcete vykonať overenie teraz?",
     "totp": "Dvojfaktorové overenie",
     "totpDeactivated": "Dvojfaktorové overenie bolo deaktivované",
-    "totpDeleteAlertTitle": "Odstrániť dvojfaktorové overenie",
-    "totpDeleteAlertContent": "Naozaj chcete odstrániť dvojfaktorové overenie?",
     "copiedAccountId": "ID účtu bolo skopírované do schránky",
     "yourAccountId": "Vaše ID účtu",
     "accountId": "ID účtu",
@@ -2577,12 +2598,14 @@
     "error": "Momentálne nie je možné načítať profily",
     "fromThisDevice": "z tohto zariadenia?",
     "switchAccount": "Prepli ste sa na iný účet",
-    "removedAccount": "Odstránili ste účet {identifier: string}."
+    "removedAccount": "Odstránili ste účet {identifier: string}.",
+    "removeAccount": "Odstrániť účet"
   },
   "StablesatsRestriction": {
     "walletLabel": "nie je vo vašom regióne k dispozícii",
     "anonModeWalletLabel": "nedostupné v režime Incognito",
-    "unknownRegionWalletLabel": "dostupnosť sa nepodarilo overiť, potiahnutím nadol to skúste znova"
+    "unknownRegionWalletLabel": "dostupnosť sa nepodarilo overiť, potiahnutím nadol to skúste znova",
+    "networkWalletLabel": "na tejto sieti nie je k dispozícii"
   },
   "AnonModeConvertModal": {
     "title": "Najprv preveďte svoj dolárový zostatok",
@@ -2616,14 +2639,11 @@
     "youGet": "Získate"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Dvojfaktorové overenie",
-    "secret": "Tajný kľúč/záloha",
-    "content": "Naskenujte tento QR kód pomocou autentifikačnej aplikácie. Prípadne môžete tajný kód skopírovať a vložiť manuálne do aplikácie."
+    "title": "Dvojfaktorové overenie"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Dvojfaktorové overenie",
-    "enter6digitCode": "Zadajte 6-miestny kód z autentifikačnej aplikácie a overte dvojfaktorové overenie.",
-    "success": "Bola povolená dvojfaktorová autentifikácia. Teraz sa budete môcť znova prihlásiť iba pomocou telefónu alebo e-mailu A svojho dvojfaktorového overenia.\n\nZariadenia na tomto účte, ktoré nie sú prihlásené pomocou 2FA, sa budú musieť znova prihlásiť.\n\nV prípade straty prístupu 2FA môže zákaznícka podpora obnoviť iba účty úrovne 2."
+    "enter6digitCode": "Zadajte 6-miestny kód z autentifikačnej aplikácie a overte dvojfaktorové overenie."
   },
   "TotpLoginValidateScreen": {
     "title": "Dvojfaktorové overenie",
@@ -2667,7 +2687,7 @@
   "TransactionDetailScreen": {
     "paid": "Zaplatili ste do/z",
     "received": "Prijali ste",
-    "spent": "Minuli ste",
+    "sent": "Odoslali ste",
     "sending": "Odosielanie",
     "receivingAccount": "Prijímajúci zostatok",
     "sendingAccount": "Odosielajúci zostatok",
@@ -2697,7 +2717,9 @@
     "noFee": "bez poplatku",
     "fromApprox": "od ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Momentálne nie je možné načítať poplatky"
+    "error": "Momentálne nie je možné načítať poplatky",
+    "inactivity": "Neaktivita >{months: number} mesiacov",
+    "usdPerMonth": "{amount: string}/mesiac"
   },
   "TransactionLimitsScreen": {
     "receive": "Prijať",
@@ -2741,6 +2763,7 @@
       "tooLong": "Adresa môže mať maximálne 50 znakov",
       "invalidCharacter": "Adresa môže obsahovať iba písmená, číslice a podčiarkovníky.",
       "addressUnavailable": "Táto adresa je už obsadená",
+      "serverUnreachable": "Nepodarilo sa spojiť so serverom adries. Skúste to o chvíľu znova.",
       "unknownError": "Došlo k neznámej chybe, skúste to prosím neskôr",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3035,7 +3058,8 @@
     "problemPersists": "Ak problém pretrváva, kontaktujte podporu.",
     "fatalError": "Ospravedlňujeme sa, zdá sa, že máme problémy s načítavaním údajov aplikácie. Ak problémy pretrvávajú, kontaktujte prosím podporu.",
     "showError": "Zobraziť chybu",
-    "clearAppData": "Vymazať dáta aplikácie a odhlásiť sa"
+    "clearAppData": "Vymazať dáta aplikácie a odhlásiť sa",
+    "screenSecurityUnavailable": "Táto obrazovka zostáva skrytá, pretože sa nepodarilo zapnúť ochranu proti snímkam obrazovky."
   },
   "notifications": {
     "payment": {
@@ -3052,7 +3076,6 @@
     "faq": "FAQ",
     "statusPage": "Stav",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Podpora",
     "defaultSupportMessage": "Dobrý deň! Potrebujem pomoc s {bankName: string}, používam verziu {version: string} na {os: string}.",
     "emailCopied": "e-mail {email: string} skopírovaný do schránky",
@@ -3066,7 +3089,13 @@
     "deleteAccountFromPhone": "Dobrý deň!, prosím, zatvorte môj účet. Moje telefónne číslo je {phoneNumber: string}.",
     "deleteAccountError": "Niečo sa pokazilo. Pre ďalšiu pomoc kontaktujte {email: string}",
     "bye": "Dovidenia!",
-    "deleteAccountWarning": "Pozor: Zatvorenie účtu je trvalé!\nPred zatvorením sa uistite, že peňaženky nemajú žiadne prostriedky.\nZatvorený účet nie je možné obnoviť.\nNiektoré záznamy môžeme uchovávať, ak to vyžaduje zákon."
+    "deleteAccountWarning": "Pozor: Zatvorenie účtu je trvalé!\nPred zatvorením sa uistite, že peňaženky nemajú žiadne prostriedky.\nZatvorený účet nie je možné obnoviť.\nNiektoré záznamy môžeme uchovávať, ak to vyžaduje zákon.",
+    "downloadLogs": "Stiahnuť logy",
+    "exportLogsTitle": "Zdieľať logy peňaženky",
+    "exportLogsBody": "Tento súbor pomáha nášmu tímu podpory preskúmať problémy s tvojimi peňaženkami. Obsahuje históriu platieb (sumy, faktúry a adresy) a identifikátory každej nekustodiálnej peňaženky v tomto zariadení, nielen tejto, ale nikdy tvoje zálohovacie frázy ani kľúče. Zdieľaj ho len s naším tímom podpory.",
+    "exportLogsConfirm": "Zdieľať logy",
+    "noLogsYet": "Zatiaľ nie sú žiadne logy na zdieľanie. Otvor peňaženku a skús to znova.",
+    "exportLogsError": "Logy sa nepodarilo exportovať. Skús to znova."
   },
   "lnurl": {
     "overLimit": "Nemôžete poslať viac ako maximálnu sumu",
@@ -3221,7 +3250,10 @@
       "noLimit": "Bez limitu",
       "limitUpdateSuccess": "Limit bol úspešne aktualizovaný",
       "limitUpdateError": "Nepodarilo sa aktualizovať limit",
-      "limitMustBePositive": "Limit musí byť väčší ako nula"
+      "limitMustBePositive": "Limit musí byť väčší ako nula",
+      "atmToggleError": "Nepodarilo sa aktualizovať výbery z bankomatu",
+      "atmControlsLoadError": "Nepodarilo sa načítať limity pre bankomat",
+      "invalidLimitAmount": "Zadajte platnú sumu s najviac 2 desatinnými miestami"
     },
     "CardFeeSchedule": {
       "title": "Sadzobník poplatkov karty Blink",
@@ -3684,6 +3716,67 @@
         "codingBackend": "...kódujeme backend",
         "buttonText": "Super"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Vitajte, staňte sa súčasťou Blink",
+          "paragraphs": {
+            "body1": "Predtým, než získame ďalšie prostriedky od profesionálnych investorov, rozhodli sme sa rozšíriť pozvánku na rodinu Blink, našich superpoužívateľov a podporovateľov. Prečo privádzať cudzincov, keď môžeme najprv pozvať niekoho ako vy?",
+            "body2": "Toto je osobná pozvánka. Prosím, nepreposielajte ju ani ju nezdieľajte verejne."
+          }
+        },
+        "buttonText": "Pokračovať"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Koľko by ste chceli investovať?",
+        "percent": "za ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Ocenenie spoločnosti",
+          "paragraphs": {
+            "body1": "V tomto investičnom kole je pre-money ocenenie Blink 10 miliónov dolárov.",
+            "body2": "Mohli by sme získať prostriedky za vyššiu cenu od rizikových kapitalistov. Vidíme však dlhodobé vzájomné výhody v partnerstve s našimi superpoužívateľmi. Preto vám ponúkame túto ponuku za lepších podmienok."
+          }
+        },
+        "buttonText": "Rozumiem"
+      },
+      "TermSheet": {
+        "title": "Podmienky",
+        "equitySection": {
+          "title": "Podiel v Blink",
+          "investment": "Investícia {amount: string}",
+          "valuation": "Pri pre-money ocenení $10M",
+          "units": "Dostanete {units: string} jednotiek ~{percent: number}% Blink"
+        },
+        "buttonText": "Pokračovať k Podpisu"
+      },
+      "TransferInvest": {
+        "title": "Preveďte svoju investíciu",
+        "paragraphs": {
+          "body1": "Podpísali ste zmluvu o úpise {units: string} jednotiek v Blink.",
+          "body2": "Je čas previesť investičnú sumu {amount: string}. Zaplatíte Bitcoinom."
+        },
+        "buttonText": "Pokračovať",
+        "paymentsUnavailable": "Platby za investíciu zatiaľ nie sú otvorené. Skús to prosím neskôr."
+      },
+      "InsufficientBalance": {
+        "title": "Nedostatočný zostatok",
+        "paragraphs": {
+          "balanceBitcoin": "Na svojom Bitcoin účte máš iba {balance: string}.",
+          "balanceDollar": "Na svojom dolárovom účte máš iba {balance: string}.",
+          "body2": "Vlož na svoj účet viac ako {shortfall: string}, aby si dosiahol investičnú sumu {investmentAmount: string}.",
+          "body3": "Uisti sa, že celá suma je na jednom z tvojich účtov; Bitcoin alebo dolár."
+        },
+        "buttonText": "Vložiť",
+        "splitFunds": {
+          "title": "Vaše prostriedky sú rozdelené",
+          "body": "Máte dosť na investovanie, ale je to rozdelené medzi bitcoinový a dolárový účet. Preveďte prostriedky tak, aby celá suma bola na jednom z nich."
+        }
+      },
+      "DepositPending": {
+        "message": "Čaká sa na vyrovnanie tvojho vkladu; počkaj prosím na 2 potvrdenia v reťazci.",
+        "buttonText": "Dobre"
+      },
       "PersonalInformation": {
         "title": "Posledný krok",
         "fields": {
@@ -3735,7 +3828,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Zálohujte peňaženku",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Vyberte metódu zálohovania",
@@ -3780,6 +3873,15 @@
         "title": "Vitajte v necustodial Blink",
         "testSuccess": "Vaša záložná fráza je správna"
       }
+    },
+    "BundleExport": {
+      "title": "Núdzový odchod",
+      "body": "Ak Spark prestane fungovať, tento balík ti umožní presunúť tvoje bitcoiny on-chain bez Blinku. Tvoj dolárový zostatok sa obnoviť nedá.",
+      "download": "Stiahnuť balík",
+      "sensitiveTitle": "Citlivé",
+      "learnMore": "Viac o jednostrannom odchode",
+      "sensitiveConfirm": "Stiahnuť",
+      "sensitiveBody": "Tento súbor ukazuje tvoj zostatok a históriu platieb, preto ho uchovaj v súkromí. Aby si ho mohol v núdzi použiť, budeš potrebovať aj svoju zálohovaciu frázu."
     },
     "CloudBackup": {
       "title": "Zálohujme vašu peňaženku",
@@ -3853,6 +3955,12 @@
       "title": "Váš dolárový zostatok nemôžeme migrovať",
       "body": "Najprv vyprázdnite svoj dolárový zostatok. Môžete ho previesť na svoj bitcoinový zostatok v Blinku alebo inam."
     },
+    "pendingDepositModal": {
+      "title": "Na váš účet čaká nevybavený vklad",
+      "body": "Na iný typ účtu nemôžete prejsť, kým nebudú všetky vaše čakajúce vklady vysporiadané a pripísané na tento účet.",
+      "contactSupportCta": "Kontaktovať podporu",
+      "stillConfirming": "Váš vklad ešte nebol potvrdený. Skúste to znova o niekoľko minút."
+    },
     "balancesOverview": {
       "title": "Presuňte svoj zostatok",
       "body": "Bezpečne presuňte svoje prostriedky na svoj nový účet.",
@@ -3861,6 +3969,7 @@
       "newBitcoinBalance": "Nový zostatok Bitcoinu",
       "newDollarBalance": "Nový dolárový zostatok",
       "dollarBalanceNotAvailable": "nie je k dispozícii",
+      "lnAddressNotMoved": "Vašu Lightning adresu sa nepodarilo presunúť. Vaše prostriedky sa aj tak prevedú.",
       "networkFee": "Sieťový poplatok: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Sieťový poplatok: <bold>{fee: string}</bold> (hradí Blink)",
       "retryCta": "Skúsiť znova",
@@ -3909,8 +4018,18 @@
     "explainerCheck5": "Z tvojho účtu bude stiahnutý sieťový poplatok Spark",
     "explainerCta": "Rozumiem",
     "transferringFunds": "Prevádzame vaše prostriedky. Malo by to byť hotové za niekoľko sekúnd.",
+    "transferInProgress": {
+      "body": "Vaše prostriedky sú na ceste do vášho nového účtu. Nechajte aplikáciu otvorenú a dokončíme to automaticky."
+    },
     "transferDelayed": {
       "body": "Vaše prostriedky sú na ceste do vášho nového účtu. Trvá to dlhšie než zvyčajne — nechajte aplikáciu otvorenú a dokončíme to automaticky.",
+      "contactSupportCta": "Kontaktovať podporu"
+    },
+    "storageUnavailable": {
+      "unreadableBody": "Nepodarilo sa nám načítať priebeh vašej migrácie z tohto zariadenia. Nič sa nestratilo — vaše prostriedky sú v bezpečí a váš postup je stále uložený.",
+      "outOfSpaceBody": "Vo vašom zariadení už nie je voľné úložisko, takže nedokážeme načítať priebeh migrácie. Uvoľnite miesto a skúste to znova. Nič sa nestratilo — vaše prostriedky sú v bezpečí.",
+      "notSavedBody": "Priebeh vašej migrácie sa nám na tomto zariadení nepodarilo uložiť. Nič sa nestratilo: vaše prostriedky sú v bezpečí. Skúste to znova.",
+      "notSavedOutOfSpaceBody": "Vo vašom zariadení už nie je voľné úložisko, takže nedokážeme uložiť priebeh migrácie. Uvoľnite miesto a skúste to znova. Nič sa nestratilo: vaše prostriedky sú v bezpečí.",
       "contactSupportCta": "Kontaktovať podporu"
     },
     "clockOutOfSync": {
@@ -3974,6 +4093,12 @@
     "recognizePhraseTitle": "Spoznávate túto zálohovaciu frázu?",
     "recognizePhraseBody": "Nikdy nezadávajte slová, ktoré vám poslal niekto iný."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "Operátor je nedostupný",
+    "outageBody": "Spark má výpadok. Počkajte pár minút a skúste to znova, alebo kontaktujte našu {support}",
+    "outageSupport": "Podporu",
+    "tryAgainLater": "Skúsiť neskôr"
+  },
   "BackupNudge": {
     "title": "Vaše prostriedky sú v ohrožení",
     "description": "Zabezpečte svoju peňaženku teraz. Trvá to len minútu.",
@@ -3983,15 +4108,100 @@
     "modalDescription": "Dôrazne odporúčame zálohovať peňaženku, aby ste predišli úplnej strate prostriedkov v prípade straty tohto zariadenia.",
     "secureMe": "Zabezpečiť peňaženku"
   },
+  "TwoFactorEnforcement": {
+    "title": "Nastavte dvojfaktorové overenie",
+    "cardDescription": "Chráňte svoj účet pred neoprávneným prístupom.",
+    "cardCta": "Nastaviť",
+    "settingsDescription": "Chráňte svoj účet pred neoprávneným prístupom jeho nastavením.",
+    "setupTitle": "Nastavte dvojfaktorové overenie teraz",
+    "setupDescription": "Aby ste zabránili neoprávnenému prístupu k svojmu účtu, pridajte teraz dvojfaktorové overenie.",
+    "setAuthenticator": "Nastaviť autentifikátor",
+    "reminderTitle": "Pridajte autentifikátor a chráňte svoje prostriedky",
+    "reminderDescription": "Váš zostatok sa zvýšil. Autentifikačná aplikácia udrží váš účet v bezpečí, aj keď niekto získa prístup k vášmu e-mailu alebo telefónu.",
+    "modalReminder": "Ak to teraz odmietnete, nezabudnite to čo najskôr zapnúť.",
+    "dismissTwoMore": "Môžete to odmietnuť ešte dvakrát.",
+    "dismissOneMore": "Môžete to odmietnuť ešte raz.",
+    "dismissLast": "Toto je naposledy, čo to môžete odmietnuť.",
+    "setNow": "Nastaviť teraz",
+    "dontWantTo": "Nechcem",
+    "highBalanceTitle": "Máte viac ako {amount}, pridajte prosím dodatočnú ochranu",
+    "protectionRequiredTitle": "Pridajte prosím dodatočnú ochranu, aby ste mohli Blink ďalej používať",
+    "protectionRequiredBody": "Čím viac prostriedkov máte, tým dôležitejšie je lepšie zabezpečenie. Na ďalšie používanie Blinku prosím pridajte autentifikátor.",
+    "nonCustodialTitle": "Ak nechcete nastaviť dvojfaktorové overenie",
+    "nonCustodialBody": "Druhou možnosťou je prejsť na nesprávcovský režim. Potom za svoje prostriedky zodpovedáte sami."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Chráňte svoje prostriedky autentifikátorom",
+    "introDescription": "Autentifikačná aplikácia vytvára každých 30 sekúnd nový 6-miestny kód.",
+    "takeoversTitle": "Zabraňuje prevzatiu účtu",
+    "takeoversDescription": "Kód existuje iba vo vašom telefóne",
+    "stolenNumberTitle": "V bezpečí, aj keď vám ukradnú číslo",
+    "stolenNumberDescription": "Aj keď sa niekto dostane k vášmu e-mailu alebo telefónnemu číslu, neprihlási sa",
+    "durationTitle": "Trvá približne 2 minúty",
+    "durationDescription": "Prevedieme vás krok za krokom",
+    "getStarted": "Začať",
+    "appsTitle": "Získajte autentifikačnú aplikáciu",
+    "appsDescription": "Funguje akákoľvek autentifikačná aplikácia. Tieto sú bezplatné a dôveryhodné:",
+    "googleAuthenticatorDescription": "Jednoduchá a široko používaná. Voliteľná záloha do vášho účtu Google.",
+    "protonAuthenticatorDescription": "Otvorený zdrojový kód. Záloha a synchronizácia s koncovým šifrovaním.",
+    "twoFasAuthDescription": "Otvorený zdrojový kód. Nepotrebuje účet.",
+    "get": "Stiahnuť",
+    "storeNote": "„Stiahnuť“ otvorí App Store alebo Google Play. Po nainštalovaní sa vráťte do Blinku.",
+    "haveAnApp": "Aplikáciu už mám",
+    "learnHow": "Zistiť ako",
+    "keyInstruction": "Skopírujte tento kľúč na nastavenie do svojej autentifikačnej aplikácie.",
+    "qrInstruction": "Používate iné zariadenie?\nNaskenujte namiesto toho tento QR kód.",
+    "backupTitle": "Zálohujte svoj kľúč",
+    "backupDescription": "Ak stratíte telefón, tento kľúč vám umožní znova nastaviť autentifikátor. Uložte ho inde ako do tohto telefónu.",
+    "saveToPasswordManager": "Uložiť do správcu hesiel",
+    "shareToPasswordManager": "Zdieľať do správcu hesiel",
+    "copyForManualBackup": "Skopírovať na ručnú zálohu",
+    "passwordManagerUnavailable": "V tomto zariadení nie je k dispozícii žiadny správca hesiel. Namiesto toho skopírujte kľúč na manuálnu zálohu.",
+    "savedIt": "Mám ho uložený",
+    "keyBackupText": "Kľúč na nastavenie autentifikátora Blink\n\nÚčet: {account}\nKľúč na nastavenie: {key}\n\nAk stratíte telefón, pridajte tento kľúč na nastavenie do autentifikačnej aplikácie a získate späť svoje prihlasovacie kódy pre Blink. Ktokoľvek s týmto kľúčom môže vytvárať vaše kódy, preto ho uchovajte v súkromí.",
+    "protectedTitle": "Váš účet je teraz chránený",
+    "protectedDescription": "Odteraz budete na prihlásenie potrebovať jednorazový kód z autentifikačnej aplikácie.",
+    "newPhoneTip": "Ak si zaobstaráte nový telefón, preneste naň autentifikátor <bold>predtým</bold>, ako resetujete ten starý.",
+    "done": "Hotovo"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Zapnuté",
+    "statusDisabled": "2FA: Vypnuté",
+    "modalTitle": "Neodporúčame vypínať 2FA",
+    "modalBody": "Znížilo by to zabezpečenie vášho účtu a uľahčilo tretej strane prístup k vášmu účtu bez vášho súhlasu.",
+    "keepProtected": "Chcem zostať chránený",
+    "codeInstruction": "Zadajte 6-miestny kód z overovacej aplikácie, aby ste vypli dvojfaktorové overenie.",
+    "codeInvalid": "Tento kód nie je správny. Zadajte aktuálny kód z overovacej aplikácie.",
+    "tooManyAttempts": "Príliš veľa pokusov. Skúste to znova o hodinu.",
+    "manualResetTitle": "Manuálny reset 2FA",
+    "manualResetBody": "Kvôli vašej ochrane nepovoľujeme odstránenie 2FA v aplikácii. Ak potrebujete reset 2FA, kontaktujte našu <support>podporu</support>."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "Pridať e-mail",
+    "addPhoneTitle": "Pridať telefónne číslo",
+    "addEmailCode": "Na pridanie e-mailu zadajte 6-miestny kód z overovacej aplikácie.",
+    "addPhoneCode": "Na pridanie telefónneho čísla zadajte 6-miestny kód z overovacej aplikácie.",
+    "codeInvalid": "Tento kód nie je správny. Zadajte aktuálny kód z overovacej aplikácie.",
+    "tooManyAttempts": "Príliš veľa pokusov. Skúste to znova o hodinu."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
     "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
-    "title": "Toto je nesvereneský účet",
+    "title": "Toto je non-custodial účet",
     "body": "Ak sa chcete dozvedieť viac, prečítajte si náš blogový príspevok",
     "cta": "Čítať"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Aktualizuj zálohu v cloude",
+    "body": "Tvoj núdzový balík v {provider} je zastaraný. Znova zálohuj peňaženku, aby si ho aktualizoval.",
+    "cta": "Znova zálohovať"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Zatiaľ nemáš núdzový balík. Vytvorí sa po tvojej prvej transakcii.",
+    "exportFailed": "Núdzový balík sa nepodarilo stiahnuť."
   },
   "StableBalance": {
     "title": "Stabilný zostatok",
@@ -4025,6 +4235,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink je nedostupný",
+    "unreachableDescription": "{featureName} potrebuje servery Blinku, ktoré práve neodpovedajú. Vaša peňaženka a prostriedky nie sú dotknuté.",
     "featureCircles": "Circles",
     "featureEarn": "Učiť sa",
     "featureCard": "Card"
@@ -4047,6 +4259,9 @@
     "tokenTransfer": "{token} prevod",
     "payTo": "Zaplatiť na {address}",
     "payment": "Platba"
+  },
+  "SelfCustodialStaleRate": {
+    "satsOnly": "Zobrazené v satoch – výmenný kurz nie je dostupný"
   },
   "SelfCustodialOffline": {
     "title": "Peňaženka je offline",
@@ -4082,9 +4297,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Nepodarilo sa načítať sieťové poplatky. Skontroluj pripojenie a skús to znova.",
     "refundNow": "Vrátiť teraz",

@@ -12,6 +12,7 @@ type PasswordInputProps = {
   onBlur?: () => void
   placeholder?: string
   error?: string
+  disabled?: boolean
 }
 
 export const PasswordInput: React.FC<PasswordInputProps> = ({
@@ -21,6 +22,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
   onBlur,
   placeholder,
   error,
+  disabled = false,
 }) => {
   const [secure, setSecure] = useState(true)
   const styles = useStyles()
@@ -38,17 +40,18 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
           onChangeText={onChangeText}
           onBlur={onBlur}
           placeholder={placeholder}
-          placeholderTextColor={colors.grey2}
+          placeholderTextColor={colors.textMuted}
           accessibilityLabel={label}
           secureTextEntry={secure}
           autoCapitalize="none"
           autoCorrect={false}
+          editable={!disabled}
         />
         <Pressable onPress={() => setSecure((prev) => !prev)} style={styles.eyeButton}>
           <GaloyIcon
             name={secure ? "eye" : "eye-slash"}
             size={16}
-            color={colors.primary}
+            color={colors.accent}
           />
         </Pressable>
       </View>
@@ -69,13 +72,13 @@ const useStyles = makeStyles(({ colors }) => ({
   label: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
     marginBottom: 3,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     minHeight: 50,
     paddingLeft: 14,
@@ -85,7 +88,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
     paddingVertical: 5,
   },
   eyeButton: {

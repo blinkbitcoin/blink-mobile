@@ -1,18 +1,22 @@
 import { renderHook } from "@testing-library/react-native"
 
-import { useCustodialWindDown } from "@app/screens/account-migration/hooks/use-custodial-wind-down"
+import {
+  useCustodialWindDown,
+  useCustodialWindDownRead,
+} from "@app/screens/account-migration/hooks/use-custodial-wind-down"
 import { WindDown, WindDownStatus } from "@app/types/wind-down"
 import { AccountType } from "@app/types/wallet"
 
 let mockActiveAccount: { type: AccountType } | undefined
 let mockWindDown: WindDown | null = null
+let mockIsPending = false
 
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: mockActiveAccount }),
 }))
 
 jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
-  useWindDownStatus: () => mockWindDown,
+  useWindDownStatus: () => ({ windDown: mockWindDown, isPending: mockIsPending }),
 }))
 
 const affectedWindDown: WindDown = {
@@ -57,5 +61,30 @@ describe("useCustodialWindDown", () => {
     const { result } = renderHook(() => useCustodialWindDown())
 
     expect(result.current).toBeNull()
+  })
+
+  describe("read", () => {
+    afterEach(() => {
+      mockIsPending = false
+    })
+
+    it("passes the pending state through for a custodial account", () => {
+      mockActiveAccount = { type: AccountType.Custodial }
+      mockWindDown = null
+      mockIsPending = true
+
+      const { result } = renderHook(() => useCustodialWindDownRead())
+
+      expect(result.current).toEqual({ windDown: null, isPending: true })
+    })
+
+    it("is never pending for an account the wind-down cannot apply to", () => {
+      mockActiveAccount = { type: AccountType.SelfCustodial }
+      mockIsPending = true
+
+      const { result } = renderHook(() => useCustodialWindDownRead())
+
+      expect(result.current).toEqual({ windDown: null, isPending: false })
+    })
   })
 })

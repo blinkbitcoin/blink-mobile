@@ -4,6 +4,7 @@ import { ActivityIndicator, View } from "react-native"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 
 type Props = {
   feeText: string
@@ -35,7 +36,7 @@ const useStyles = makeStyles(({ colors }) => ({
   card: {
     marginHorizontal: 20,
     marginBottom: 10,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 13,
     padding: 20,
   },
@@ -45,12 +46,12 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
   },
   label: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
   },
   value: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     fontSize: 14,
     fontWeight: "700",
   },

@@ -11,6 +11,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 type OptionItem<T extends string> = {
   id: T
@@ -60,11 +61,11 @@ export const FeeTierSelector = <T extends string>({
             {loading ? (
               <ActivityIndicator
                 size="small"
-                color={colors.primary}
+                color={colors.accent}
                 {...testProps("fee-tier-spinner")}
               />
             ) : (
-              <GaloyIcon name="caret-down" size={24} color={colors.primary} />
+              <GaloyIcon name="caret-down" size={24} color={colors.accent} />
             )}
           </View>
         </View>
@@ -101,7 +102,7 @@ export const FeeTierSelector = <T extends string>({
                     )}
                   </View>
                   {isSelected && (
-                    <GaloyIcon name="check" size={16} color={colors.primary} />
+                    <GaloyIcon name="check" size={16} color={colors.accent} />
                   )}
                 </View>
               </TouchableOpacity>
@@ -116,13 +117,13 @@ export const FeeTierSelector = <T extends string>({
 const useStyles = makeStyles(({ colors }) => ({
   title: {
     fontSize: 14,
-    fontWeight: "600",
-    color: colors.black,
+    fontFamily: fonts.bold,
+    color: colors.textOnBackground,
     marginBottom: 6,
   },
   fieldBackground: {
     flexDirection: "row",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 10,
     alignItems: "center",
     paddingHorizontal: 14,
@@ -133,12 +134,12 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   selectedLabel: {
     fontSize: 16,
-    fontWeight: "600",
-    color: colors.black,
+    fontFamily: fonts.bold,
+    color: colors.textOnBackground,
   },
   selectedDetail: {
     fontSize: 13,
-    color: colors.grey2,
+    color: colors.textMuted,
     marginTop: 2,
   },
   iconContainer: {
@@ -150,7 +151,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   optionRow: {
     flexDirection: "row",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 10,
     alignItems: "center",
     paddingHorizontal: 14,
@@ -158,19 +159,19 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: 8,
   },
   optionRowSelected: {
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
   },
   optionContent: {
     flex: 1,
   },
   optionLabel: {
     fontSize: 15,
-    fontWeight: "600",
-    color: colors.black,
+    fontFamily: fonts.bold,
+    color: colors.textOnBackground,
   },
   optionDetail: {
     fontSize: 13,
-    color: colors.grey2,
+    color: colors.textMuted,
     marginTop: 2,
   },
 }))

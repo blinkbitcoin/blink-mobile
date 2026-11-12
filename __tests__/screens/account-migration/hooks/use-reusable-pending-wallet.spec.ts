@@ -1,10 +1,12 @@
 import { renderHook } from "@testing-library/react-native"
 
 import { useReusablePendingWallet } from "@app/screens/account-migration/hooks/use-reusable-pending-wallet"
+import { StorageFailure } from "@app/utils/storage/storage-failure"
 
 let mockPendingForActiveAccount: string | null = null
 let mockPendingLoading = false
 let mockPendingHasError = false
+let mockPendingStorageFailure: StorageFailure | null = null
 const mockRefetchPending = jest.fn()
 let mockRegistryAccounts: { id: string }[] = []
 let mockRegistryLoading = false
@@ -15,6 +17,7 @@ jest.mock("@app/screens/account-migration/hooks/use-pending-migration-accounts",
     pendingForActiveAccount: mockPendingForActiveAccount,
     loading: mockPendingLoading,
     hasError: mockPendingHasError,
+    storageFailure: mockPendingStorageFailure,
     refetch: mockRefetchPending,
   }),
 }))
@@ -33,6 +36,7 @@ describe("useReusablePendingWallet", () => {
     mockPendingForActiveAccount = null
     mockPendingLoading = false
     mockPendingHasError = false
+    mockPendingStorageFailure = null
     mockRegistryAccounts = []
     mockRegistryLoading = false
     mockRefetchPending.mockResolvedValue(undefined)
@@ -95,6 +99,16 @@ describe("useReusablePendingWallet", () => {
     const { result } = renderHook(() => useReusablePendingWallet())
 
     expect(result.current.hasError).toBe(true)
+  })
+
+  /** The gate names a full device off this value, so it must come through untouched. */
+  it("passes on what the pending record's failed read was", () => {
+    mockPendingHasError = true
+    mockPendingStorageFailure = StorageFailure.OutOfSpace
+
+    const { result } = renderHook(() => useReusablePendingWallet())
+
+    expect(result.current.storageFailure).toBe(StorageFailure.OutOfSpace)
   })
 
   it("reloads both halves of the predicate on refetch", async () => {

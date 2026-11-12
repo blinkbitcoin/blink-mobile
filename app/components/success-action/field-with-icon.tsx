@@ -77,21 +77,21 @@ const useStyles = makeStyles(({ colors }) => ({
   titleFieldBackground: {
     fontWeight: "300",
     fontStyle: "normal",
-    color: colors.grey2,
+    color: colors.textMuted,
     minWidth: 80,
   },
   fieldBackground: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "flex-end",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   inputStyle: {
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "right",
   },
   inputUrl: {
-    color: colors.primary,
+    color: colors.accent,
   },
   subValueStyle: {
     marginTop: 2,

@@ -7,11 +7,15 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
-import { headerRightNoGlass } from "@app/components/header-no-glass"
+import {
+  HEADER_ICON_TOUCH_SIZE,
+  headerRightNoGlass,
+  noHeaderRight,
+} from "@app/components/header-no-glass"
 import { WarningCard } from "@app/components/warning-card"
 import { Screen } from "@app/components/screen"
+import { ScreenSecurityGate } from "@app/components/screen-security-gate"
 import { SparkCompatibleInfo } from "@app/components/spark-compatible-info"
-import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
@@ -22,37 +26,26 @@ import {
 } from "@app/navigation/stack-param-lists"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 
-import { useBackupPhrase } from "../hooks"
+import { useBackupCountdownDeadline, useBackupPhrase } from "../hooks"
 
 const WORDS_PER_CARD = 3
 
-// The clear tertiary button has no padding, so its hit area is the text bounds.
-const HEADER_BUTTON_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 }
-
 type PhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhrase">
 
-export const BackupPhraseScreen: React.FC = () => {
+type BackupPhraseContentProps = {
+  step: PhraseStep
+  getCountdownDeadline: () => Date
+}
+
+/** The gate mounts this only once the screenshot guard is actually on — the words
+ *  and the header Copy action must not exist while registration is pending. */
+const BackupPhraseContent: React.FC<BackupPhraseContentProps> = ({
+  step,
+  getCountdownDeadline,
+}) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
-  /** Deep links and navigation-state rehydration can deliver missing or malformed params
-   *  despite the route type; a bare destructure here threw into the app-wide ErrorBoundary,
-   *  replacing the whole navigation tree (#4070). Fall back to the first six words. */
-  const stepParam = useRoute<PhraseRouteProp>().params?.step
-  const hasValidStep = isPhraseStep(stepParam)
-  const step = hasValidStep ? stepParam : PhraseStep.First
-
-  useEffect(() => {
-    if (hasValidStep) return
-    reportError(
-      "Backup phrase route params missing",
-      new Error("Route delivered no valid step"),
-      { dedupKey: "backup-phrase-params-missing", alwaysRecord: true },
-    )
-  }, [hasValidStep])
-
-  useScreenSecurity()
 
   const {
     firstCard,
@@ -62,7 +55,7 @@ export const BackupPhraseScreen: React.FC = () => {
     handleContinue,
     buttonTitle,
     isButtonDisabled,
-  } = useBackupPhrase(step)
+  } = useBackupPhrase(step, getCountdownDeadline)
 
   const copyLabel = LL.BackupScreen.ManualBackup.Phrase.copy()
 
@@ -74,12 +67,16 @@ export const BackupPhraseScreen: React.FC = () => {
           title={copyLabel}
           onPress={handleCopy}
           containerStyle={styles.headerButton}
-          hitSlop={HEADER_BUTTON_HIT_SLOP}
           {...testProps("backup-phrase-copy")}
           accessibilityLabel={copyLabel}
         />
       )),
     )
+    /** Header options outlive the component that set them — the route keeps the
+     *  last value and unmounting the setter does not revert it. Without this the
+     *  gate would hide the phrase while leaving Copy live in the header, one tap
+     *  away from the clipboard, exactly while the guard is off. */
+    return () => navigation.setOptions(noHeaderRight)
   }, [navigation, copyLabel, handleCopy, styles])
 
   const renderWord = (word: string, index: number) => (
@@ -124,6 +121,37 @@ export const BackupPhraseScreen: React.FC = () => {
   )
 }
 
+export const BackupPhraseScreen: React.FC = () => {
+  /** Deep links and navigation-state rehydration can deliver missing or malformed params
+   *  despite the route type; a bare destructure threw into the app-wide ErrorBoundary,
+   *  replacing the whole navigation tree (#4070). Fall back to the first six words, which
+   *  is benign since step 1 is this screen's own entry. */
+  const stepParam = useRoute<PhraseRouteProp>().params?.step
+  const hasValidStep = isPhraseStep(stepParam)
+  const step = hasValidStep ? stepParam : PhraseStep.First
+
+  /** Held above the gate, which mounts the words again each time it re-activates. */
+  const getCountdownDeadline = useBackupCountdownDeadline()
+
+  // Report ahead of the gate, not inside the gated content: on a device where
+  // registration keeps failing the content never mounts, and the signal that the
+  // route delivered no valid step would be lost with it.
+  useEffect(() => {
+    if (hasValidStep) return
+    reportError(
+      "Backup phrase route params missing",
+      new Error("Route delivered no valid step"),
+      { dedupKey: "backup-phrase-params-missing", alwaysRecord: true },
+    )
+  }, [hasValidStep])
+
+  return (
+    <ScreenSecurityGate>
+      <BackupPhraseContent step={step} getCountdownDeadline={getCountdownDeadline} />
+    </ScreenSecurityGate>
+  )
+}
+
 const useStyles = makeStyles(({ colors }) => ({
   content: {
     paddingHorizontal: 20,
@@ -131,8 +159,14 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingBottom: 20,
     gap: 20,
   },
+  // The header touch box. `hitSlop` can't reach past the native header item, so the
+  // box itself grows, its text kept against the right edge where it was.
   headerButton: {
     marginRight: 16,
+    minWidth: HEADER_ICON_TOUCH_SIZE,
+    minHeight: HEADER_ICON_TOUCH_SIZE,
+    alignItems: "flex-end",
+    justifyContent: "center",
   },
   seedWords: {
     gap: 20,
@@ -153,7 +187,7 @@ const useStyles = makeStyles(({ colors }) => ({
   wordNumber: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   wordText: {
     fontSize: 14,

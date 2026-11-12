@@ -16,7 +16,7 @@ import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useMigrationNextStep } from "@app/screens/account-migration/hooks"
-import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
+import { StepLayout } from "@app/components/step-layout"
 import { getLightningAddress } from "@app/utils/pay-links"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
@@ -104,7 +104,7 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
         <View style={styles.loadingContainer}>
           <ActivityIndicator
             size="large"
-            color={colors.primary}
+            color={colors.accent}
             {...testProps("migration-keep-receiving-loading")}
           />
         </View>
@@ -143,7 +143,7 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
   if (!hasLightningAddress) return null
 
   return (
-    <MigrationStepLayout
+    <StepLayout
       footer={
         <GaloyPrimaryButton
           title={LL.AccountMigration.keepReceivingCta()}
@@ -154,7 +154,7 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
     >
       <IconHero
         icon="lightning-address"
-        iconColor={colors._green}
+        iconColor={colors.staticSuccess}
         title={LL.AccountMigration.keepReceivingTitle()}
         subtitle={LL.AccountMigration.keepReceivingBody()}
       />
@@ -172,7 +172,7 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
           {lightningAddress}
         </Text>
       </View>
-    </MigrationStepLayout>
+    </StepLayout>
   )
 }
 
@@ -198,7 +198,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
   },
   addressLabel: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
     lineHeight: 20,
     marginBottom: 12,

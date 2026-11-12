@@ -55,6 +55,12 @@ const en: BaseTranslation = {
     usePin: "Use PIN",
     confirmLogout:
       "Are you sure you'd like to log out? This will reset your cache and all local user settings",
+    forgotPin: "Forgot PIN? Remove wallets",
+    removeWalletsTitle: "Remove wallets from this device?",
+    removeWalletsBody:
+      "This removes all wallets from this device and logs you out. To get a wallet back, you need its backup phrase. Without it, the wallet is lost.",
+    removeWalletsConfirm: "Remove wallets",
+    removeWalletsFailed: "Some wallets could not be removed. Please try again.",
   },
   PeopleScreen: {
     title: "People",
@@ -2137,7 +2143,9 @@ const en: BaseTranslation = {
     selectAll: "Select all",
     clearAll: "Clear all",
     addPlace: "Add to map",
-    addPlaceTitle: "Add a place",
+    addPlaceTitle: "Suggest business",
+    submitPlaceRequest: "Submit request",
+    showMyLocation: "Show my location",
     placePinHint: "Move the map to put the pin on the place",
     placeName: "Name",
     placeNameHint: "What the place is called",
@@ -2187,16 +2195,19 @@ const en: BaseTranslation = {
       "Wallet count is not 2. Please use the dashboard to see all the wallets and funds of this account",
   },
   PinScreen: {
+    attemptBudgetSpent: "Too many failed attempts.",
+    attemptUnrecorded: "Couldn't record the attempt securely.",
+    attemptsLeft: "{attemptsRemaining: number} attempts remaining.",
     attemptsRemaining: "Incorrect PIN. {attemptsRemaining: number} attempts remaining.",
     enterPin: "Enter your PIN code",
-    lockoutUnavailable: "Couldn't record the failed attempt securely. Logging out.",
+    oneAttemptLeft: "1 attempt remaining.",
     oneAttemptRemaining: "Incorrect PIN. 1 attempt remaining.",
     pinUnreadable: "Couldn't check your PIN. Please try again.",
     setPin: "Set your PIN code",
     setPinFailedMatch: "Pins didn't match - Set your PIN code",
     storePinFailed: "Unable to store your pin.",
     tooManyAttempts: "Too many failed attempts. Logging out.",
-    tryAgainIn: "Try again in {seconds: number}s.",
+    tryAgainIn: "Try again in {time: string}.",
     verifyPin: "Verify your PIN code",
   },
   PriceHistoryScreen: {
@@ -2232,6 +2243,12 @@ const en: BaseTranslation = {
     error: "Failed to generate invoice. Please contact support if this problem persists.",
     copyInvoice: "Copy",
     shareInvoice: "Share",
+    newAddress: "New",
+    newAddressHint: "Generates a new Bitcoin address. Previous addresses keep working.",
+    newAddressGenerated: "New address ready. Previous addresses still work.",
+    newAddressFailed: "Couldn't generate a new address. Please try again.",
+    newAddressRateLimited: "Too many new addresses. Please wait a while and try again.",
+    onchainAddressLoadFailed: "Couldn't load your Bitcoin address. Tap New to try again.",
     addAmount: "Request Specific Amount",
     expired: "The invoice has expired",
     expiresIn: "Expires in",
@@ -2392,6 +2409,10 @@ const en: BaseTranslation = {
       "{lnAddress: string} doesn't seem to be a {bankName: string} address that exists.",
     usernameDoesNotExistAdvice:
       "Either make sure the spelling is right or ask the recipient for an LN invoice or BTC address instead.",
+    destinationUnverifiable:
+      "We couldn't check {lnAddress: string} right now — {bankName: string}'s servers aren't responding.",
+    destinationUnverifiableAdvice:
+      "The address may well be fine. Try again in a moment, or ask the recipient for an LN invoice or BTC address instead.",
     selfPaymentError: "{lnAddress: string} is your {bankName: string} address.",
     selfPaymentAdvice:
       "If you want to send money to another account that you own, you can use an invoice, LN or BTC address instead.",
@@ -2476,9 +2497,18 @@ const en: BaseTranslation = {
     time: "Time",
     type: "Type",
     feeTier: "Transaction priority",
-    fast: "Fast",
-    medium: "Medium",
-    slow: "Slow",
+    /**
+     * Shared by two rails with different windows: the custodial payout queues
+     * (10m / 4h / 24h, CUSTODIAL_PAYOUT_ETA_MINUTES) and the self-custodial mempool fee
+     * rates (10m / 30m / 60m, FEE_TIER_ETA_MINUTES). They name the relative speed within a
+     * rail, not an absolute time — don't tune either one for a single rail's window without
+     * splitting the keys per domain first. The feeTier heading above reads "Transaction
+     * priority" directly over the "Priority" option; that repetition is known and left for
+     * design to settle.
+     */
+    fast: "Priority",
+    medium: "Standard",
+    slow: "Economy",
     recommended: "Recommended",
     walletOffline: "Your wallet is offline. Please check your connection and try again.",
     sdkInsufficientFunds: "Not enough funds for this transaction.",
@@ -2488,6 +2518,7 @@ const en: BaseTranslation = {
   },
   ApiScreen: {
     keysGroupTitle: "API keys",
+    inactiveKeys: "Inactive keys ({count: number})",
     noKeys: "No API keys yet",
     createKey: "Create API key",
     createTitle: "New API key",
@@ -2517,10 +2548,14 @@ const en: BaseTranslation = {
     revokeBody:
       "\"{name: string}\" will stop working immediately. This cannot be undone.",
     revoke: "Revoke",
+    revokeGoBack: "Go back",
     revokeSuccess: "API key revoked",
     createError: "Could not create the API key. Please try again.",
     revokeError: "Could not revoke the API key. Please try again.",
     loadError: "Could not load your API keys. Please try again later.",
+    discardSecretTitle: "Discard this API key?",
+    discardSecretBody:
+      "This is the only time the secret is shown. If you leave now, the key cannot be recovered and you will need to create a new one.",
     done: "Done",
   },
   SettingsScreen: {
@@ -2533,7 +2568,7 @@ const en: BaseTranslation = {
     mode: "Mode",
     pos: "Point of Sale",
     posCopied: "Your point of sale link has been copied",
-    createAddress: "Create address",
+    createAddress: "Create Lightning address",
     addressDisabled: "(disabled)",
     donationButton: "Donate Button",
     btcpayServer: "BTCPay Server",
@@ -2541,6 +2576,7 @@ const en: BaseTranslation = {
     activated: "Activated",
     addressScreen: "Ways to get paid",
     nonCustodialAccount: "Non-custodial account",
+    custodialAccount: "Custodial account",
     tapUserName: "Tap to set username",
     notifications: "Notifications",
     title: "Settings",
@@ -2660,9 +2696,6 @@ const en: BaseTranslation = {
       "Ensure you can log back into your account by verifying your email. Do you want to do the verification now?",
     totp: "Two-factor authentication",
     totpDeactivated: "Two-factor authentication has been deactivated",
-    totpDeleteAlertTitle: "Delete two-factor authentication",
-    totpDeleteAlertContent:
-      "Are you sure you want to delete your two-factor authentication?",
     copiedAccountId: "Copied your account ID to clipboard",
     yourAccountId: "Your Account ID",
     accountId: "Account ID",
@@ -2677,19 +2710,15 @@ const en: BaseTranslation = {
     fromThisDevice: "from this device?",
     switchAccount: "You switched to another account",
     removedAccount: "You removed account {identifier: string}.",
+    removeAccount: "Remove account",
   },
   TotpRegistrationInitiateScreen: {
     title: "Two-factor authentication",
-    secret: "Secret/backup",
-    content:
-      "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret.",
   },
   TotpRegistrationValidateScreen: {
     title: "Two-factor authentication",
     enter6digitCode:
       "Enter the 6-digit code from your authenticator app to validate your two-factor authentication.",
-    success:
-      "Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.\n\nDevices on this account which are not logged in with 2FA will need to log back in.\n\nOnly level 2 accounts can be recovered by customer support in the event of lost 2FA access.",
   },
   TotpLoginValidateScreen: {
     title: "Two-factor authentication",
@@ -2733,6 +2762,7 @@ const en: BaseTranslation = {
     walletLabel: "not available in your region",
     anonModeWalletLabel: "not available in Incognito mode",
     unknownRegionWalletLabel: "couldn't check availability, pull down to retry",
+    networkWalletLabel: "not available on this network",
   },
   AnonModeConvertModal: {
     title: "Transfer your Dollar Balance first",
@@ -2786,7 +2816,7 @@ const en: BaseTranslation = {
   TransactionDetailScreen: {
     paid: "Paid to/from",
     received: "You received",
-    spent: "You spent",
+    sent: "You sent",
     sending: "Sending",
     receivingAccount: "Receiving Balance",
     sendingAccount: "Sending Balance",
@@ -2820,6 +2850,8 @@ const en: BaseTranslation = {
     fromApprox: "from ~{fee: string}",
     satAmount: "{amount: string} SAT",
     error: "Unable to fetch fees at this time",
+    inactivity: "Inactivity >{months: number} months",
+    usdPerMonth: "{amount: string}/month",
   },
   TransactionLimitsScreen: {
     receive: "Receive",
@@ -2863,6 +2895,7 @@ const en: BaseTranslation = {
       tooLong: "Address must be at most 50 characters long",
       invalidCharacter: "Address can only contain letters, numbers, and underscores",
       addressUnavailable: "Sorry, this address is already taken",
+      serverUnreachable: "Couldn't reach the address server. Try again in a moment.",
       unknownError: "An unknown error occurred, please try again later",
       backupRequired: "Back up your wallet before creating a Lightning address",
     },
@@ -3175,6 +3208,8 @@ const en: BaseTranslation = {
       "Sorry we appear to be having issues loading the application data.  If problems persist please contact support.",
     showError: "Show Error",
     clearAppData: "Clear App Data and Logout",
+    screenSecurityUnavailable:
+      "This screen stays hidden because screenshot protection could not be turned on.",
   },
   notifications: {
     payment: {
@@ -3191,7 +3226,6 @@ const en: BaseTranslation = {
     faq: "FAQ",
     statusPage: "Status page",
     telegram: "Telegram",
-    mattermost: "Mattermost",
     defaultEmailSubject: "{bankName: string} - Support",
     defaultSupportMessage:
       "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
@@ -3212,6 +3246,13 @@ const en: BaseTranslation = {
       "Something went wrong. Contact {email: string} for further assistance.",
     bye: "Bye!",
     deleteAccountWarning: "Attention: Closing your account is permanent!\nMake sure wallets have no funds before closing.\nA closed account cannot be reinstated.\nWe may retain certain records as required by law.",
+    downloadLogs: "Download logs",
+    exportLogsTitle: "Share your wallet logs",
+    exportLogsBody:
+      "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+    exportLogsConfirm: "Share logs",
+    noLogsYet: "There are no logs to share yet. Open your wallet and try again.",
+    exportLogsError: "Couldn't export your logs. Please try again.",
   },
   lnurl: {
     overLimit: "You can't send more than max amount",
@@ -3455,6 +3496,9 @@ const en: BaseTranslation = {
       limitUpdateSuccess: "Limit updated successfully",
       limitUpdateError: "Failed to update limit",
       limitMustBePositive: "Limit must be greater than zero",
+      atmToggleError: "Failed to update ATM withdrawals",
+      atmControlsLoadError: "Could not load your ATM limits",
+      invalidLimitAmount: "Enter a valid amount with up to 2 decimals",
       transactionTypesTitle: "Transaction types",
       TransactionTypes: {
         ecommerce: "Online purchases",
@@ -3856,6 +3900,67 @@ const en: BaseTranslation = {
         codingBackend: "...coding the backend",
         buttonText: "Nice",
       },
+      WelcomeInvest: {
+        welcomeMessage: {
+          title: "Welcome to become part of Blink",
+          paragraphs: {
+            body1: "Before we raise more funds from professional investors we decided to extend an invitation to the Blink family, our superusers and supporters. Why bring onboard strangers when we can first invite someone like you?",
+            body2: "This is a personal invitation. Please do not forward or share publicly.",
+          },
+        },
+        buttonText: "Continue",
+      },
+      SelectInvest: {
+        desiredCreditLimit: "How much would you like to invest?",
+        percent: "for ~{percent: number}%",
+      },
+      CompanyValuation: {
+        welcomeMessage: {
+          title: "Company valuation",
+          paragraphs: {
+            body1: "In this investment round the pre-money valuation of Blink is $10 million.",
+            body2: "We could raise at a higher price from VCs. However, we see long-term mutual benefits in partnering with our superusers. Therefore, we are extending this offer at better terms for you.",
+          },
+        },
+        buttonText: "Got it",
+      },
+      TermSheet: {
+        title: "Term Sheet",
+        equitySection: {
+          title: "Equity in Blink",
+          investment: "{amount: string} Investment",
+          valuation: "At $10M pre-money valuation",
+          units: "You receive {units: string} units ~{percent: number}% of Blink",
+        },
+        buttonText: "Proceed to Sign",
+      },
+      TransferInvest: {
+        title: "Transfer your investment",
+        paragraphs: {
+          body1: "You have signed the subscription agreement for {units: string} units in Blink.",
+          body2: "Time to transfer the investment amount of {amount: string}. You will pay with Bitcoin.",
+        },
+        buttonText: "Continue",
+        paymentsUnavailable: "Investment payments are not open yet. Please try again later.",
+      },
+      InsufficientBalance: {
+        title: "Insufficient balance",
+        paragraphs: {
+          balanceBitcoin: "You only have {balance: string} in your Bitcoin account.",
+          balanceDollar: "You only have {balance: string} in your Dollar account.",
+          body2: "Deposit more than {shortfall: string} to your account to reach the investment amount of {investmentAmount: string}.",
+          body3: "Make sure that the full amount is in either of your accounts; Bitcoin or Dollar.",
+        },
+        buttonText: "Deposit",
+        splitFunds: {
+          title: "Your funds are split",
+          body: "You have enough to invest, but it is spread across your Bitcoin and Dollar accounts. Convert so the full amount sits in one of them.",
+        },
+      },
+      DepositPending: {
+        message: "Waiting for your deposit to settle, please wait 2 on-chain confirmations",
+        buttonText: "Okay",
+      },
       PersonalInformation: {
         title: "Final step",
         fields: {
@@ -3958,6 +4063,16 @@ const en: BaseTranslation = {
       cloudNotAvailable: "iCloud Drive is not available. Please sign in to iCloud in Settings and enable iCloud Drive.",
       networkError: "Network error. Please check your connection and try again.",
     },
+    BundleExport: {
+      title: "Emergency exit",
+      body: "If Spark goes down, this bundle lets you move your bitcoin onchain without Blink. Your dollar balance can't be recovered.",
+      learnMore: "Learn more about unilateral exit",
+      download: "Download bundle",
+      sensitiveTitle: "Sensitive",
+      sensitiveBody:
+        "This file shows your balance and payment history, so keep it private. To use it in an emergency, you also need your backup phrase.",
+      sensitiveConfirm: "Download",
+    },
     ManualBackup: {
       Alerts: {
         title: "Keep your backup phrase secret!",
@@ -4006,8 +4121,26 @@ const en: BaseTranslation = {
     explainerCta: "I understand",
     transferringFunds:
       "Transferring your funds. It should be done in a few seconds.",
+    // The migration entry and steps' toast while a completed transfer is still finishing
+    // on this device, usually seconds in: no "longer than usual" until it is overdue.
+    transferInProgress: {
+      body: "Your funds are on their way to your new account. Keep the app open and we'll finish up automatically.",
+    },
+    // Shared with the migration entry and steps' toast for an overdue receive; keep it
+    // saying the wait is unusual, since both only show it once it is.
     transferDelayed: {
       body: "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
+      contactSupportCta: "Contact support",
+    },
+    storageUnavailable: {
+      unreadableBody:
+        "We couldn't read your migration progress from this device. Nothing is lost — your funds are safe and your progress is still saved.",
+      outOfSpaceBody:
+        "Your device has no storage space left, so we can't read your migration progress. Free up some space and try again. Nothing is lost — your funds are safe.",
+      notSavedBody:
+        "We couldn't save your migration progress on this device. Nothing is lost: your funds are safe. Try again.",
+      notSavedOutOfSpaceBody:
+        "Your device has no storage space left, so we can't save your migration progress. Free up some space and try again. Nothing is lost: your funds are safe.",
       contactSupportCta: "Contact support",
     },
     clockOutOfSync: {
@@ -4063,6 +4196,8 @@ const en: BaseTranslation = {
       newBitcoinBalance: "New Bitcoin Balance",
       newDollarBalance: "New Dollar Balance",
       dollarBalanceNotAvailable: "not available",
+      lnAddressNotMoved:
+        "Your Lightning address could not be moved. Your funds will still be transferred.",
       networkFee: "Network fee: <bold>{fee: string}</bold>",
       networkFeeCoveredByBlink: "Network fee: <bold>{fee: string}</bold> (covered by Blink)",
       retryCta: "Try again",
@@ -4072,6 +4207,12 @@ const en: BaseTranslation = {
     dollarBalanceModal: {
       title: "We cannot migrate your Dollar Balance",
       body: "Empty your Dollar Balance first. You can transfer to your Bitcoin Balance in Blink or elsewhere.",
+    },
+    pendingDepositModal: {
+      title: "There is a pending deposit to your account",
+      body: "You cannot migrate to a different type of account before all your pending deposits have been settled and credited on this account.",
+      contactSupportCta: "Contact support",
+      stillConfirming: "Your deposit is not confirmed yet. Try again in a few minutes.",
     },
     migrateNowModal: {
       title: "Migrate now to a non-custodial account",
@@ -4177,6 +4318,13 @@ const en: BaseTranslation = {
     recognizePhraseTitle: "Do you recognize this backup phrase?",
     recognizePhraseBody: "Never enter words someone else sent you.",
   },
+  EmergencyRecovery: {
+    // Restore could not reach the Spark operators.
+    outageTitle: "Operator unreachable",
+    outageBody: "Spark is experiencing an outage. Please wait couple minutes and try again or contact our {support: string}",
+    outageSupport: "Support",
+    tryAgainLater: "Try again later",
+  },
   BackupNudge: {
     title: "Your funds are at risk",
     description: "Secure your wallet now. It only takes a minute.",
@@ -4186,6 +4334,100 @@ const en: BaseTranslation = {
     modalDescription:
       "We highly recommend you backup your wallet to prevent a complete loss of funds in case you lose this device.",
     secureMe: "Secure wallet",
+  },
+  TwoFactorEnforcement: {
+    title: "Set two-factor authentication",
+    cardDescription: "Protect your account from unauthorized access.",
+    cardCta: "Set",
+    settingsDescription: "Protect your account from unauthorized access by setting it up.",
+    setupTitle: "Set two-factor authentication now",
+    setupDescription:
+      "To prevent unauthorized access to your account, add two-factor authentication now.",
+    setAuthenticator: "Set authenticator",
+    reminderTitle: "Add an authenticator to protect your funds",
+    reminderDescription:
+      "Your balance has grown. An authenticator app keeps your account safe, even if someone gets hold of your email or phone.",
+    modalReminder: "If you dismiss now, make sure to enable it as soon as possible.",
+    dismissTwoMore: "You can dismiss this two more times.",
+    dismissOneMore: "You can dismiss this one more time.",
+    dismissLast: "This is the last time you can dismiss this.",
+    setNow: "Set now",
+    dontWantTo: "I don't want to",
+    highBalanceTitle: "You have over {amount: string}, please add additional protection",
+    protectionRequiredTitle: "Please add additional protection to keep using Blink",
+    protectionRequiredBody:
+      "The more funds you have, the more important it is with better security. Please add authenticator to continue using Blink.",
+    nonCustodialTitle: "If you don't want to set two-factor authentication",
+    nonCustodialBody:
+      "The other option is to move to non-custodial. Then you are responsible for your own funds.",
+  },
+  AuthenticatorOnboarding: {
+    introTitle: "Protect your funds with an authenticator",
+    introDescription: "An authenticator app makes a new 6-digit code every 30 seconds.",
+    takeoversTitle: "Stops account takeovers",
+    takeoversDescription: "The code lives only on your phone",
+    stolenNumberTitle: "Be safe even if your number is stolen",
+    stolenNumberDescription:
+      "Even if someone gets into your email or phone number, they can't log in",
+    durationTitle: "Takes about 2 minutes",
+    durationDescription: "We'll guide you step by step",
+    getStarted: "Get started",
+    appsTitle: "Get an authenticator app",
+    appsDescription: "Any authenticator app works. These are free and trusted:",
+    googleAuthenticatorDescription:
+      "Simple and widely used. Optional backup to your Google account.",
+    protonAuthenticatorDescription: "Open source. End-to-end encrypted backup and sync.",
+    twoFasAuthDescription: "Open source. No account needed.",
+    get: "Get",
+    storeNote:
+      "\"Get\" opens the App Store or Google Play. Come back to Blink when it's installed.",
+    haveAnApp: "I have an app",
+    learnHow: "Learn how",
+    keyInstruction: "Copy this setup key into your authenticator app.",
+    qrInstruction: "Using another device?\nScan this QR code instead.",
+    backupTitle: "Back up your key",
+    backupDescription:
+      "If you lose your phone, this key lets you set up your authenticator again. Save it somewhere other than this phone.",
+    saveToPasswordManager: "Save to a password manager",
+    shareToPasswordManager: "Share to a password manager",
+    copyForManualBackup: "Copy for manual backup",
+    passwordManagerUnavailable:
+      "No password manager available on this device. Copy the key for a manual backup instead.",
+    savedIt: "I've saved it",
+    keyBackupText:
+      "Blink authenticator setup key\n\nAccount: {account: string}\nSetup key: {key: string}\n\nIf you lose your phone, add this setup key to an authenticator app to get your Blink login codes back. Anyone with this key can make your codes, so keep it private.",
+    protectedTitle: "Your account is now protected",
+    protectedDescription:
+      "From now on, logging in needs a one-time code from your authenticator app.",
+    newPhoneTip:
+      "If you get a new phone, move your authenticator to it <bold>before</bold> you reset the old one.",
+    done: "Done",
+  },
+  TwoFactorTurnOff: {
+    statusEnabled: "2FA: Enabled",
+    statusDisabled: "2FA: Disabled",
+    modalTitle: "We don't recommend disabling 2FA",
+    modalBody:
+      "This would lower your account's security and make it easier for a third party to access your account without your permission.",
+    keepProtected: "Keep me protected",
+    codeInstruction:
+      "Enter the 6-digit code from your authenticator app to turn off two-factor authentication.",
+    codeInvalid:
+      "That code is incorrect. Enter the current code from your authenticator app.",
+    tooManyAttempts: "Too many attempts. Try again in an hour.",
+    manualResetTitle: "2FA manual reset",
+    manualResetBody:
+      "For your protection, we don't allow removal of 2FA inside the app. If you need a 2FA reset, contact our <support>Support</support>.",
+  },
+  LoginMethodCode: {
+    addEmailTitle: "Add email",
+    addPhoneTitle: "Add phone number",
+    addEmailCode: "To add your email, enter the 6-digit code from your authenticator app.",
+    addPhoneCode:
+      "To add your phone number, enter the 6-digit code from your authenticator app.",
+    codeInvalid:
+      "That code is incorrect. Enter the current code from your authenticator app.",
+    tooManyAttempts: "Too many attempts. Try again in an hour.",
   },
   BackupRequired: {
     modalTitle: "Back up your wallet first",
@@ -4197,6 +4439,18 @@ const en: BaseTranslation = {
     title: "This is a non-custodial account",
     body: "To learn more read our blog post",
     cta: "Read",
+  },
+  StaleCloudBundleBulletin: {
+    title: "Update your cloud backup",
+    body: "Your emergency bundle in {provider: string} is out of date. Back up your wallet again to update it.",
+    cta: "Back up again",
+  },
+  RecoveryBundleScreen: {
+    noBundleToExport: "No emergency bundle yet. It's created after your first transaction.",
+    exportFailed: "Could not download the emergency bundle.",
+  },
+  SelfCustodialStaleRate: {
+    satsOnly: "Showing sats — no exchange rate available",
   },
   SelfCustodialOffline: {
     title: "Wallet is offline",
@@ -4239,9 +4493,6 @@ const en: BaseTranslation = {
     refundFailed: "Refund failed: {error}",
     refundAddress: "Bitcoin address for refund",
     feeRate: "Network fee",
-    feeRateFastest: "Fastest (~{sats} sats) ~10 min",
-    feeRateHalfHour: "Normal (~{sats} sats) ~30 min",
-    feeRateHour: "Economy (~{sats} sats) ~60 min",
     feeRateUnit: "{rate} sat/vB",
     feeRateUnavailable: "Couldn't load network fees. Please check your connection and try again.",
     refundNow: "Refund now",
@@ -4293,6 +4544,9 @@ const en: BaseTranslation = {
     noAccountTitle: "Custodial account required",
     noAccountDescription:
       "{featureName: string} requires a Blink custodial account.",
+    unreachableTitle: "Blink is unreachable",
+    unreachableDescription:
+      "{featureName: string} needs Blink's servers, which aren't responding right now. Your wallet and funds are unaffected.",
     featureCircles: "Circles",
     featureEarn: "Learn",
     featureCard: "Card",

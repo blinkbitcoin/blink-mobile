@@ -9,7 +9,7 @@ import { SettingItemRow } from "@app/components/card-screen"
 import { IconHero } from "@app/components/icon-hero"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useMigrationNextStep } from "@app/screens/account-migration/hooks"
-import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
+import { StepLayout } from "@app/components/step-layout"
 import { testProps } from "@app/utils/testProps"
 
 const TOOLS_DIVIDER_WIDTH = 1
@@ -58,7 +58,7 @@ export const MigrationMerchantToolsScreen: React.FC = () => {
   ]
 
   return (
-    <MigrationStepLayout
+    <StepLayout
       footer={
         <GaloyPrimaryButton
           title={merchantToolsLL.cta()}
@@ -70,7 +70,7 @@ export const MigrationMerchantToolsScreen: React.FC = () => {
     >
       <IconHero
         icon="receive"
-        iconColor={colors._green}
+        iconColor={colors.staticSuccess}
         title={merchantToolsLL.title()}
         subtitle={merchantToolsLL.body()}
       />
@@ -82,7 +82,7 @@ export const MigrationMerchantToolsScreen: React.FC = () => {
             <React.Fragment key={tool.icon}>
               {index > 0 && (
                 <Divider
-                  color={colors.grey4}
+                  color={colors.neutral}
                   width={TOOLS_DIVIDER_WIDTH}
                   style={styles.toolsDivider}
                 />
@@ -99,7 +99,7 @@ export const MigrationMerchantToolsScreen: React.FC = () => {
           ))}
         </View>
       </ScrollView>
-    </MigrationStepLayout>
+    </StepLayout>
   )
 }
 
@@ -113,7 +113,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingBottom: 20,
   },
   toolsCard: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     overflow: "hidden",
   },

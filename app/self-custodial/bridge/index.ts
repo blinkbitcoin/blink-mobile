@@ -1,6 +1,10 @@
 export {
   initSdk,
   disconnectSdk,
+  waitForSdkIdle,
+  retireSdkStorage,
+  readmitSdkStorage,
+  SdkStorageRetiredError,
   addSdkEventListener,
   removeSdkEventListener,
   selfCustodialCreateWallet,
@@ -11,6 +15,7 @@ export {
   deriveWalletIdentityPubkey,
   listAllPayments,
   listPayments,
+  listSentPaymentsSince,
   getUserSettings,
   syncSelfCustodialWallet,
   getLightningAddress,
@@ -18,8 +23,13 @@ export {
   registerLightningAddress,
 } from "./wallet"
 export { getSparkStatus } from "./status"
+export { listFiatRates, listFiatCurrencies } from "./fiat"
 export { activateStableBalance, deactivateStableBalance } from "./stable-balance"
-export { createReceiveLightning, createReceiveOnchain } from "./receive"
+export {
+  bolt11ReceiveMethod,
+  createReceiveLightning,
+  createReceiveOnchain,
+} from "./receive"
 export { createLnurlWithdraw } from "./lnurl-withdraw"
 export {
   prepareSend,
@@ -34,7 +44,7 @@ export {
 } from "./send"
 export type { OnchainFeeTiers, PrepareSendOptions, PrepareLnurlOptions } from "./send"
 export { listDeposits, claimDeposit, refundDeposit, getRecommendedFees } from "./deposits"
-export type { MappedDeposit, NetworkFeeRates } from "./deposits"
+export type { ClaimOutcome, MappedDeposit, NetworkFeeRates } from "./deposits"
 export { createGetConversionQuote, mapAmountAdjustment } from "./convert"
 export { buildConversionType, fetchConversionLimits } from "./limits"
 export { parseSparkAddress } from "./parse"

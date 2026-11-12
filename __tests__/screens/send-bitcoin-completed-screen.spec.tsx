@@ -1000,7 +1000,7 @@ describe("SendBitcoinCompletedScreen", () => {
 
       const viewShot = await waitFor(() => screen.findByTestId("view-shot"))
       expect(viewShot.props.style).toMatchObject({
-        backgroundColor: light.white,
+        backgroundColor: light.backgroundDefault,
       })
     })
 
@@ -1017,7 +1017,7 @@ describe("SendBitcoinCompletedScreen", () => {
 
       const viewShot = await waitFor(() => screen.findByTestId("view-shot"))
       expect(viewShot.props.style).toMatchObject({
-        backgroundColor: dark.white,
+        backgroundColor: dark.backgroundDefault,
       })
     })
   })

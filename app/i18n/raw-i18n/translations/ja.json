@@ -1,6 +1,7 @@
 {
     "ApiScreen": {
         "keysGroupTitle": "APIキー",
+        "inactiveKeys": "無効なキー ({count})",
         "noKeys": "APIキーはまだありません",
         "createKey": "APIキーを作成",
         "createTitle": "新しいAPIキー",
@@ -27,10 +28,13 @@
         "revokeTitle": "APIキーを取り消しますか？",
         "revokeBody": "「{name: string}」は直ちに機能しなくなります。この操作は元に戻せません。",
         "revoke": "取り消す",
+        "revokeGoBack": "戻る",
         "revokeSuccess": "APIキーを取り消しました",
         "createError": "APIキーを作成できませんでした。もう一度お試しください。",
         "revokeError": "APIキーを取り消せませんでした。もう一度お試しください。",
         "loadError": "APIキーを読み込めませんでした。後でもう一度お試しください。",
+        "discardSecretTitle": "この API キーを破棄しますか？",
+        "discardSecretBody": "シークレットが表示されるのはこの一度だけです。今離れると、キーは復元できず、新しく作成する必要があります。",
         "done": "完了"
     },
     "GaloyAddressScreen": {
@@ -78,7 +82,12 @@
         "skip": "スキップ",
         "unlock": "ロックを解除",
         "usePin": "PINを有効にする",
-        "confirmLogout": "ログアウトしてもよろしいですか？キャッシュとすべてのローカル設定がリセットされます"
+        "confirmLogout": "ログアウトしてもよろしいですか？キャッシュとすべてのローカル設定がリセットされます",
+        "forgotPin": "PINをお忘れですか？ウォレットを削除",
+        "removeWalletsTitle": "このデバイスからウォレットを削除しますか？",
+        "removeWalletsBody": "このデバイスからすべてのウォレットを削除し、ログアウトします。ウォレットを元に戻すには、そのバックアップフレーズが必要です。フレーズがないと、ウォレットは失われます。",
+        "removeWalletsConfirm": "ウォレットを削除",
+        "removeWalletsFailed": "一部のウォレットを削除できませんでした。もう一度お試しください。"
     },
     "PeopleScreen": {
         "title": "つながり",
@@ -2133,7 +2142,9 @@
         "selectAll": "すべて選択",
         "clearAll": "すべて解除",
         "addPlace": "マップに追加",
-        "addPlaceTitle": "場所を追加",
+        "addPlaceTitle": "店舗を提案",
+        "submitPlaceRequest": "リクエストを送信",
+        "showMyLocation": "現在地を表示",
         "placePinHint": "マップを動かしてピンを場所に合わせてください",
         "placeName": "名称",
         "placeNameHint": "その場所の名前",
@@ -2175,16 +2186,19 @@
         "walletCountNotTwo": "ウォレット数が2つではありません。ダッシュボードからこのアカウントのすべてのウォレットと資金を確認してください"
     },
     "PinScreen": {
+        "attemptUnrecorded": "試行を安全に記録できませんでした。",
+        "attemptsLeft": "残り{attemptsRemaining: number}回トライできます。",
         "attemptsRemaining": "PINコードが間違っています。残り{attemptsRemaining: number}回トライできます。",
         "enterPin": "PINコードを入力してください",
-        "lockoutUnavailable": "失敗した試行を安全に記録できませんでした。ログアウトします。",
+        "oneAttemptLeft": "残り1回トライできます。",
         "oneAttemptRemaining": "PINコードが間違っています。残り1回トライできます。",
         "pinUnreadable": "PINコードを確認できませんでした。もう一度お試しください。",
         "setPin": "PINコードを設定してください",
         "setPinFailedMatch": "PINコードが一致しませんでした。PINコードを設定してください",
         "storePinFailed": "PINコードを保存できません。",
         "tooManyAttempts": "間違えられる上限を超えましたので、自動ログアウトしました。",
-        "tryAgainIn": "{seconds: number}秒後にもう一度お試しください。",
+        "attemptBudgetSpent": "間違えられる上限を超えました。",
+        "tryAgainIn": "{time: string}後にもう一度お試しください。",
         "verifyPin": "PINコードを認証する"
     },
     "PriceHistoryScreen": {
@@ -2219,6 +2233,12 @@
         "error": "インボイスの作成に失敗しました。この問題が解決しない場合は、サポートにお問い合わせください。",
         "copyInvoice": "コピー",
         "shareInvoice": "共有",
+        "newAddress": "新規",
+        "newAddressHint": "新しいビットコインアドレスを生成します。以前のアドレスも引き続き使えます。",
+        "newAddressGenerated": "新しいアドレスの準備ができました。以前のアドレスも引き続き使えます。",
+        "newAddressFailed": "新しいアドレスを生成できませんでした。もう一度お試しください。",
+        "newAddressRateLimited": "新しいアドレスの作成回数が多すぎます。しばらく待ってから再度お試しください。",
+        "onchainAddressLoadFailed": "ビットコインアドレスを読み込めませんでした。「新規」をタップしてもう一度お試しください。",
         "addAmount": "金額を設定する",
         "expired": "有効期限切れのインボイスです",
         "expiresIn": "有効期限",
@@ -2354,6 +2374,8 @@
         "invalidAmount": "無効な金額が含まれています。有効な金額で再発行してください。",
         "usernameDoesNotExist": "{lnAddress: string}は、{bankName: string}アドレスとして存在しないようです。",
         "usernameDoesNotExistAdvice": "スペルが正しいことを確認するか、代わりにライトニング・インボイスまたはビットコイン・アドレスを受金者にお尋ねください。",
+        "destinationUnverifiable": "現在 {lnAddress} を確認できませんでした。{bankName} のサーバーが応答していません。",
+        "destinationUnverifiableAdvice": "アドレスは問題ない可能性が高いです。少し待って再試行するか、受取人に LN 請求書か BTC アドレスを尋ねてください。",
         "selfPaymentError": "{lnAddress: string}は、あなたの{bankName: string}アドレスです。",
         "selfPaymentAdvice": "あなたが所有している別ウォレットに送金したい場合は、代わりにライトニング・インボイス、またはビットコイン・アドレスを使用することができます。",
         "lnAddressError": "このライトニング・アドレスにアクセスできません。アドレスに誤りがない場合は、のちほど再トライしてください。",
@@ -2426,9 +2448,9 @@
         "time": "時間",
         "type": "種類",
         "feeTier": "取引の優先度",
-        "fast": "高速",
-        "medium": "中速",
-        "slow": "低速",
+        "fast": "優先",
+        "medium": "標準",
+        "slow": "節約",
         "recommended": "推奨",
         "walletOffline": "ウォレットがオフラインです。接続を確認してもう一度お試しください。",
         "sdkInsufficientFunds": "この取引に十分な残高がありません。",
@@ -2437,7 +2459,7 @@
         "sdkGenericError": "手数料を見積もれません。別の金額をお試しください。"
     },
     "SettingsScreen": {
-        "createAddress": "アドレスを作成",
+        "createAddress": "Lightningアドレスを作成",
         "addressDisabled": "(無効)",
         "donationButton": "寄付ボタン",
         "btcpayServer": "BTCPay Server",
@@ -2454,6 +2476,7 @@
         "activated": "アクティベーション",
         "addressScreen": "さまざまな受金方法を見る",
         "nonCustodialAccount": "非カストディアルアカウント",
+        "custodialAccount": "カストディアルアカウント",
         "tapUserName": "タップしてユーザー名を設定する",
         "notifications": "通知",
         "title": "設定",
@@ -2562,8 +2585,6 @@
         "emailUnverifiedContent": "メールアドレスを認証して、ウォレットに再ログインできることを確認してください。 今すぐ認証しますか？",
         "totp": "2要素認証（2FA）",
         "totpDeactivated": "2要素認証（2FA）が無効化されました",
-        "totpDeleteAlertTitle": "2要素認証（2FA）を削除する",
-        "totpDeleteAlertContent": "2要素認証（2FA）を削除してもよろしいですか？",
         "copiedAccountId": "アカウントIDをクリップボードにコピーする",
         "yourAccountId": "あなたのアカウントID",
         "accountId": "アカウントID",
@@ -2577,12 +2598,14 @@
         "error": "現在プロフィールを取得できません",
         "fromThisDevice": "このデバイスから？",
         "switchAccount": "別のアカウントに切り替えました",
-        "removedAccount": "アカウント {identifier: string} を削除しました。"
+        "removedAccount": "アカウント {identifier: string} を削除しました。",
+        "removeAccount": "アカウントを削除"
     },
     "StablesatsRestriction": {
         "walletLabel": "あなたの地域ではご利用いただけません",
         "anonModeWalletLabel": "Incognito モードでは利用できません",
-        "unknownRegionWalletLabel": "利用可否を確認できませんでした。下に引いて再試行してください"
+        "unknownRegionWalletLabel": "利用可否を確認できませんでした。下に引いて再試行してください",
+        "networkWalletLabel": "このネットワークでは利用できません"
     },
     "AnonModeConvertModal": {
         "title": "まずドル残高を移してください",
@@ -2616,14 +2639,11 @@
         "youGet": "受取額"
     },
     "TotpRegistrationInitiateScreen": {
-        "title": "2要素認証（2FA）",
-        "secret": "シークレット/バックアップ",
-        "content": "二段階認証アプリでこの QR コードをスキャンします。 または、シークレットコードを手動でコピーして認証アプリに貼り付けるコードできます。"
+        "title": "2要素認証（2FA）"
     },
     "TotpRegistrationValidateScreen": {
         "title": "2要素認証（2FA）",
-        "enter6digitCode": "2要素認証（2FA）アプリから 6 桁のコードを入力し、承認してください。",
-        "success": "2要素認証（2FA）が有効になりました。 電話番号またはメールアドレスと2要素認証を使用してのみ再ログインできるようになります。\n\nあなたが2要素認証へのアクセスを失った場合、完全なKYCウォレットのみ再ログインできます。"
+        "enter6digitCode": "2要素認証（2FA）アプリから 6 桁のコードを入力し、承認してください。"
     },
     "TotpLoginValidateScreen": {
         "title": "2要素認証（2FA）",
@@ -2667,7 +2687,7 @@
     "TransactionDetailScreen": {
         "paid": "送金先/送金元",
         "received": "受金完了",
-        "spent": "送金完了",
+        "sent": "送金完了",
         "sending": "送信中",
         "receivingAccount": "受金ウォレット",
         "sendingAccount": "送金ウォレット",
@@ -2697,7 +2717,9 @@
         "noFee": "手数料なし",
         "fromApprox": "~{fee: string} から",
         "satAmount": "{amount: string} SAT",
-        "error": "現時点では手数料を取得できません"
+        "error": "現時点では手数料を取得できません",
+        "inactivity": "休眠 >{months: number}か月",
+        "usdPerMonth": "{amount: string}/月"
     },
     "TransactionLimitsScreen": {
         "receive": "受金",
@@ -2741,6 +2763,7 @@
             "tooLong": "アドレスは50文字以上でなければなりません",
             "invalidCharacter": "アドレスにはアルファベット、数字、アンダースコアのみ使用できます",
             "addressUnavailable": "申し訳ありませんが、このアドレスは既に使われています",
+            "serverUnreachable": "アドレスサーバーに接続できませんでした。少し待って再試行してください。",
             "unknownError": "不明なエラーが発生しました。時間をあけてもう一度トライしてみてください",
             "backupRequired": "Back up your wallet before creating a Lightning address"
         },
@@ -3035,7 +3058,8 @@
         "problemPersists": "問題が解決しない場合は、サポートにお問い合わせください。",
         "fatalError": "アプリケーションデータの読み込みに問題があるようです。 問題が解決しない場合は、サポートにお問い合わせください。",
         "showError": "エラーを表示する",
-        "clearAppData": "アプリのデータを消去してログアウトする"
+        "clearAppData": "アプリのデータを消去してログアウトする",
+        "screenSecurityUnavailable": "スクリーンショット保護をオンにできなかったため、この画面は非表示のままです。"
     },
     "notifications": {
         "payment": {
@@ -3052,7 +3076,6 @@
         "faq": "よくある質問",
         "statusPage": "ステータス",
         "telegram": "Telegram",
-        "mattermost": "Mattermost",
         "defaultEmailSubject": "{bankName: string} - サポート",
         "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
         "emailCopied": "メールアドレス{email: string}がクリップボードにコピーされました",
@@ -3066,7 +3089,13 @@
         "deleteAccountFromPhone": "こんにちは！アカウントを閉じてください。私の電話番号は {phoneNumber: string} です。",
         "deleteAccountError": "エラーが発生しました。お問い合わせは{email: string}までお願いします。",
         "bye": "バイバイ！",
-        "deleteAccountWarning": "注意：アカウントの閉鎖は永久です！\n閉じる前にウォレットに資金がないことを確認してください。\n閉じられたアカウントは復元できません。\n法令により特定の記録を保持する場合があります。"
+        "deleteAccountWarning": "注意：アカウントの閉鎖は永久です！\n閉じる前にウォレットに資金がないことを確認してください。\n閉じられたアカウントは復元できません。\n法令により特定の記録を保持する場合があります。",
+        "downloadLogs": "ログをダウンロード",
+        "exportLogsTitle": "ウォレットのログを共有",
+        "exportLogsBody": "このファイルは、サポートチームがウォレットの問題を調べるために使います。この端末上のすべての非カストディアルウォレット（このウォレットだけでなく）の支払い履歴（金額、請求書、アドレス）とウォレット識別子が含まれますが、リカバリーフレーズや鍵は含まれません。サポートチームにだけ共有してください。",
+        "exportLogsConfirm": "ログを共有",
+        "noLogsYet": "共有できるログはまだありません。ウォレットを開いて、もう一度お試しください。",
+        "exportLogsError": "ログをエクスポートできませんでした。もう一度お試しください。"
     },
     "lnurl": {
         "overLimit": "最大限度額以上の送金はできません",
@@ -3305,7 +3334,10 @@
             "noLimit": "制限なし",
             "limitUpdateSuccess": "制限が正常に更新されました",
             "limitUpdateError": "制限の更新に失敗しました",
-            "limitMustBePositive": "制限はゼロより大きい必要があります"
+            "limitMustBePositive": "制限はゼロより大きい必要があります",
+            "atmToggleError": "ATM引き出しの更新に失敗しました",
+            "atmControlsLoadError": "ATMの制限を読み込めませんでした",
+            "invalidLimitAmount": "小数点以下2桁までの有効な金額を入力してください"
         },
         "CardStatements": {
             "title": "明細",
@@ -3731,11 +3763,72 @@
                 "title": "申請を処理中",
                 "subtitle": "準備ができ次第、お知らせします",
                 "buttonText": "閉じる"
+            },
+            "WelcomeInvest": {
+                "welcomeMessage": {
+                    "title": "Blinkの一員になりませんか",
+                    "paragraphs": {
+                        "body1": "プロの投資家からさらに資金を調達する前に、Blinkファミリー、つまりスーパーユーザーやサポーターの皆さんに招待状をお送りすることにしました。あなたのような方を差し置いて、なぜ見知らぬ人を招くのでしょうか？",
+                        "body2": "これは個人的な招待です。転送や公開での共有はお控えください。"
+                    }
+                },
+                "buttonText": "続ける"
+            },
+            "SelectInvest": {
+                "desiredCreditLimit": "いくら投資したいですか？",
+                "percent": "約{percent: number}%に相当"
+            },
+            "CompanyValuation": {
+                "welcomeMessage": {
+                    "title": "企業評価",
+                    "paragraphs": {
+                        "body1": "この投資ラウンドにおけるBlinkのプレマネー評価額は1,000万ドルです。",
+                        "body2": "私たちはVCからより高い価格で資金を調達することができます。しかし、スーパーユーザーの皆様とのパートナーシップに長期的な相互利益を見出しています。そのため、より良い条件でこのオファーをご提供しています。"
+                    }
+                },
+                "buttonText": "了解"
+            },
+            "TermSheet": {
+                "title": "条件概要書",
+                "equitySection": {
+                    "title": "Blinkの株式",
+                    "investment": "{amount: string}の投資",
+                    "valuation": "プレマネー評価額1,000万ドル",
+                    "units": "{units: string}ユニット（Blinkの約{percent: number}%）を受け取ります"
+                },
+                "buttonText": "署名に進む"
+            },
+            "TransferInvest": {
+                "title": "投資額を送金してください",
+                "paragraphs": {
+                    "body1": "Blinkの{units: string}ユニットに対するサブスクリプション契約に署名しました。",
+                    "body2": "{amount: string}の投資額を送金する時です。ビットコインでお支払いいただきます。"
+                },
+                "buttonText": "続ける",
+                "paymentsUnavailable": "投資の支払いはまだ受け付けていません。後でもう一度お試しください。"
+            },
+            "InsufficientBalance": {
+                "title": "残高が不足しています",
+                "paragraphs": {
+                    "balanceBitcoin": "Bitcoinアカウントには{balance: string}しかありません。",
+                    "balanceDollar": "ドルアカウントには{balance: string}しかありません。",
+                    "body2": "投資額の{investmentAmount: string}に達するには、アカウントに{shortfall: string}を超える金額を入金してください。",
+                    "body3": "全額がBitcoinまたはドルのいずれかのアカウントにあることを確認してください。"
+                },
+                "buttonText": "入金",
+                "splitFunds": {
+                    "title": "資金が分かれています",
+                    "body": "投資に十分な残高がありますが、ビットコイン口座とドル口座に分かれています。全額が一方に入るように変換してください。"
+                }
+            },
+            "DepositPending": {
+                "message": "入金の確定を待っています。チェーン上での承認が2回完了するまでお待ちください。",
+                "buttonText": "OK"
             }
         }
     },
     "BackupScreen": {
-        "title": "Back up your wallet",
+        "title": "ウォレットをバックアップ",
         "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "バックアップ方法を選択",
@@ -3780,6 +3873,15 @@
                 "title": "ノンカストディアルBlinkへようこそ",
                 "testSuccess": "バックアップフレーズは正しいです"
             }
+        },
+        "BundleExport": {
+            "title": "緊急出金",
+            "body": "Spark が停止した場合、このバンドルを使えば Blink なしでビットコインをオンチェーンに移せます。ドル残高は復元できません。",
+            "download": "バンドルをダウンロード",
+            "sensitiveTitle": "機密情報",
+            "learnMore": "一方的な出金について詳しく見る",
+            "sensitiveConfirm": "ダウンロード",
+            "sensitiveBody": "このファイルには残高と支払い履歴が含まれるため、非公開にしてください。緊急時に使うには、リカバリーフレーズも必要です。"
         },
         "CloudBackup": {
             "title": "ウォレットをバックアップしましょう",
@@ -3853,6 +3955,12 @@
             "title": "ドル残高は移行できません",
             "body": "まずドル残高を空にしてください。Blinkのビットコイン残高、または他の場所へ移すことができます。"
         },
+        "pendingDepositModal": {
+            "title": "アカウントに保留中の入金があります",
+            "body": "保留中の入金がすべて確定し、このアカウントに反映されるまで、別の種類のアカウントに移行することはできません。",
+            "contactSupportCta": "サポートに連絡",
+            "stillConfirming": "入金はまだ確定していません。数分後にもう一度お試しください。"
+        },
         "balancesOverview": {
             "title": "残高を移動する",
             "body": "資金を安全に新しいアカウントに移動します。",
@@ -3861,6 +3969,7 @@
             "newBitcoinBalance": "新しいビットコイン残高",
             "newDollarBalance": "新しいドル残高",
             "dollarBalanceNotAvailable": "利用不可",
+            "lnAddressNotMoved": "Lightningアドレスを移行できませんでした。資金は引き続き送金されます。",
             "networkFee": "ネットワーク手数料: <bold>{fee: string}</bold>",
             "networkFeeCoveredByBlink": "ネットワーク手数料: <bold>{fee: string}</bold>（Blinkが負担）",
             "retryCta": "再試行",
@@ -3909,9 +4018,19 @@
         "explainerCheck5": "アカウントからSparkネットワーク手数料が差し引かれます",
         "explainerCta": "理解しました",
         "transferringFunds": "資金を転送中です。数秒で完了するはずです。",
+        "transferInProgress": {
+            "body": "資金は新しいアカウントへ送金中です。アプリを開いたままにしていただければ、自動的に完了します。"
+        },
         "transferDelayed": {
             "body": "資金は新しいアカウントへ送金中です。通常より時間がかかっています。アプリを開いたままにしていただければ、自動的に完了します。",
             "contactSupportCta": "サポートに問い合わせる"
+        },
+        "storageUnavailable": {
+            "unreadableBody": "この端末から移行の進行状況を読み取れませんでした。失われたものはありません。資金は安全で、進行状況も保存されたままです。",
+            "outOfSpaceBody": "デバイスの空き容量がないため、移行の進行状況を読み取れません。空き容量を確保してからもう一度お試しください。失われたものはありません。資金は安全です。",
+            "notSavedBody": "この端末に移行の進行状況を保存できませんでした。失われたものはありません。資金は安全です。もう一度お試しください。",
+            "notSavedOutOfSpaceBody": "デバイスの空き容量がないため、移行の進行状況を保存できません。空き容量を確保してからもう一度お試しください。失われたものはありません。資金は安全です。",
+            "contactSupportCta": "サポートに連絡"
         },
         "clockOutOfSync": {
             "body": "デバイスの日付と時刻がずれています。続けるには自動設定にしてください。",
@@ -3974,6 +4093,12 @@
         "recognizePhraseTitle": "このバックアップフレーズに見覚えがありますか？",
         "recognizePhraseBody": "他人から送られた単語は絶対に入力しないでください。"
     },
+    "EmergencyRecovery": {
+        "outageTitle": "オペレーターに接続できません",
+        "outageBody": "Spark で障害が発生しています。数分待ってから再試行するか、{support}にお問い合わせください",
+        "outageSupport": "サポート",
+        "tryAgainLater": "後で再試行"
+    },
     "BackupNudge": {
         "title": "あなたの資金が危険にさらされています",
         "description": "今すぐウォレットを保護してください。1分しかかかりません。",
@@ -3982,6 +4107,82 @@
         "modalTitle": "資金を保護してください",
         "modalDescription": "このデバイスを紛失した場合の資金の完全な喪失を防ぐために、ウォレットのバックアップを強くお勧めします。",
         "secureMe": "ウォレットを保護"
+    },
+    "TwoFactorEnforcement": {
+        "title": "2要素認証を設定する",
+        "cardDescription": "不正アクセスからアカウントを保護しましょう。",
+        "cardCta": "設定",
+        "settingsDescription": "設定して、不正アクセスからアカウントを保護しましょう。",
+        "setupTitle": "今すぐ2要素認証を設定する",
+        "setupDescription": "アカウントへの不正アクセスを防ぐため、今すぐ2要素認証を追加してください。",
+        "setAuthenticator": "認証アプリを設定",
+        "reminderTitle": "資金を守るために認証アプリを追加してください",
+        "reminderDescription": "残高が増えました。認証アプリがあれば、誰かにメールや電話を乗っ取られても、アカウントを安全に保てます。",
+        "modalReminder": "今閉じる場合は、できるだけ早く有効にしてください。",
+        "dismissTwoMore": "あと2回閉じることができます。",
+        "dismissOneMore": "あと1回閉じることができます。",
+        "dismissLast": "これを閉じられるのはこれが最後です。",
+        "setNow": "今すぐ設定",
+        "dontWantTo": "設定しない",
+        "highBalanceTitle": "{amount}以上をお持ちです。追加の保護を設定してください",
+        "protectionRequiredTitle": "Blinkを引き続きご利用いただくには、追加の保護を設定してください",
+        "protectionRequiredBody": "資金が多いほど、より高いセキュリティが重要になります。Blinkを引き続き利用するには認証アプリを追加してください。",
+        "nonCustodialTitle": "2要素認証を設定しない場合",
+        "nonCustodialBody": "もう一つの選択肢はノンカストディアルへの移行です。その場合、資金の管理はご自身の責任となります。"
+    },
+    "AuthenticatorOnboarding": {
+        "introTitle": "認証アプリで資金を守りましょう",
+        "introDescription": "認証アプリは30秒ごとに新しい6桁のコードを生成します。",
+        "takeoversTitle": "アカウントの乗っ取りを防止",
+        "takeoversDescription": "コードはあなたのスマートフォンにしか存在しません",
+        "stolenNumberTitle": "電話番号が盗まれても安全",
+        "stolenNumberDescription": "誰かにメールや電話番号を乗っ取られても、ログインされることはありません",
+        "durationTitle": "所要時間は約2分",
+        "durationDescription": "手順に沿ってご案内します",
+        "getStarted": "始める",
+        "appsTitle": "認証アプリを入手",
+        "appsDescription": "どの認証アプリでも使えます。以下は無料で信頼できるアプリです：",
+        "googleAuthenticatorDescription": "シンプルで広く使われています。Googleアカウントへのバックアップも可能です（任意）。",
+        "protonAuthenticatorDescription": "オープンソース。エンドツーエンドで暗号化されたバックアップと同期。",
+        "twoFasAuthDescription": "オープンソース。アカウント不要。",
+        "get": "入手",
+        "storeNote": "「入手」を押すとApp StoreまたはGoogle Playが開きます。インストールが終わったらBlinkに戻ってください。",
+        "haveAnApp": "アプリを持っています",
+        "learnHow": "やり方を見る",
+        "keyInstruction": "このセットアップキーを認証アプリにコピーしてください。",
+        "qrInstruction": "別のデバイスを使っていますか？\n代わりにこのQRコードをスキャンしてください。",
+        "backupTitle": "キーをバックアップ",
+        "backupDescription": "スマートフォンを紛失しても、このキーがあれば認証アプリを再設定できます。このスマートフォン以外の場所に保存してください。",
+        "saveToPasswordManager": "パスワードマネージャーに保存",
+        "shareToPasswordManager": "パスワードマネージャーに共有",
+        "copyForManualBackup": "手動バックアップ用にコピー",
+        "passwordManagerUnavailable": "このデバイスでは利用できるパスワードマネージャーがありません。代わりにキーをコピーして手動でバックアップしてください。",
+        "savedIt": "保存しました",
+        "keyBackupText": "Blink認証アプリのセットアップキー\n\nアカウント：{account}\nセットアップキー：{key}\n\nスマートフォンを紛失した場合は、このセットアップキーを認証アプリに追加すると、Blinkのログインコードを再び取得できます。このキーがあれば誰でもあなたのコードを生成できるため、他人に知られないよう保管してください。",
+        "protectedTitle": "アカウントが保護されました",
+        "protectedDescription": "今後のログインには、認証アプリのワンタイムコードが必要です。",
+        "newPhoneTip": "新しいスマートフォンに機種変更する場合は、古い端末をリセットする<bold>前に</bold>認証アプリを移行してください。",
+        "done": "完了"
+    },
+    "TwoFactorTurnOff": {
+        "statusEnabled": "2FA：有効",
+        "statusDisabled": "2FA：無効",
+        "modalTitle": "2FAの無効化はおすすめしません",
+        "modalBody": "アカウントのセキュリティが低下し、第三者があなたの許可なくアカウントにアクセスしやすくなります。",
+        "keepProtected": "保護を続ける",
+        "codeInstruction": "2要素認証をオフにするには、認証アプリの6桁のコードを入力してください。",
+        "codeInvalid": "コードが正しくありません。認証アプリに表示されている現在のコードを入力してください。",
+        "tooManyAttempts": "試行回数が多すぎます。1時間後にもう一度お試しください。",
+        "manualResetTitle": "2FAの手動リセット",
+        "manualResetBody": "お客様を保護するため、アプリ内では2FAを削除できません。2FAのリセットが必要な場合は、<support>サポート</support>にお問い合わせください。"
+    },
+    "LoginMethodCode": {
+        "addEmailTitle": "メールアドレスを追加",
+        "addPhoneTitle": "電話番号を追加",
+        "addEmailCode": "メールアドレスを追加するには、認証アプリの6桁のコードを入力してください。",
+        "addPhoneCode": "電話番号を追加するには、認証アプリの6桁のコードを入力してください。",
+        "codeInvalid": "コードが正しくありません。認証アプリに表示されている現在のコードを入力してください。",
+        "tooManyAttempts": "試行回数が多すぎます。1時間後にもう一度お試しください。"
     },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",
@@ -3992,6 +4193,15 @@
         "title": "これは非カストディアルアカウントです",
         "body": "詳しくはブログ記事をご覧ください",
         "cta": "読む"
+    },
+    "StaleCloudBundleBulletin": {
+        "title": "クラウドのバックアップを更新",
+        "body": "{provider} の緊急バンドルが古くなっています。ウォレットをもう一度バックアップして更新してください。",
+        "cta": "もう一度バックアップ"
+    },
+    "RecoveryBundleScreen": {
+        "noBundleToExport": "緊急バンドルはまだありません。最初の取引の後に作成されます。",
+        "exportFailed": "緊急バンドルをダウンロードできませんでした。"
     },
     "StableBalance": {
         "title": "ステーブルバランス",
@@ -4025,6 +4235,8 @@
         "signInDescription": "Sign in to your custodial account to use {featureName}.",
         "noAccountTitle": "Custodial account required",
         "noAccountDescription": "{featureName} requires a Blink custodial account.",
+        "unreachableTitle": "Blink に接続できません",
+        "unreachableDescription": "{featureName} には Blink のサーバーが必要ですが、現在応答していません。ウォレットと資金に影響はありません。",
         "featureCircles": "Circles",
         "featureEarn": "学ぶ",
         "featureCard": "Card"
@@ -4047,6 +4259,9 @@
         "tokenTransfer": "{token}送金",
         "payTo": "{address}に支払い",
         "payment": "支払い"
+    },
+    "SelfCustodialStaleRate": {
+        "satsOnly": "sats で表示中 — 為替レートを取得できません"
     },
     "SelfCustodialOffline": {
         "title": "ウォレットはオフラインです",
@@ -4082,9 +4297,6 @@
         "refundFailed": "払い戻し失敗: {error}",
         "refundAddress": "払い戻し用Bitcoinアドレス",
         "feeRate": "ネットワーク手数料",
-        "feeRateFastest": "最速 (~{sats} sats) ~10分",
-        "feeRateHalfHour": "通常 (~{sats} sats) ~30分",
-        "feeRateHour": "エコノミー (~{sats} sats) ~60分",
         "feeRateUnit": "{rate} sat/vB",
         "feeRateUnavailable": "ネットワーク手数料を読み込めませんでした。接続を確認してもう一度お試しください。",
         "refundNow": "今すぐ払い戻し",

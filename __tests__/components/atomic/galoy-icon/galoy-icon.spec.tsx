@@ -1,6 +1,8 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
+import type { ReactTestRendererJSON } from "react-test-renderer"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import theme from "@app/rne-theme/theme"
@@ -90,6 +92,141 @@ describe("GaloyIcon", () => {
       expect(
         renderWithTheme(<GaloyIcon name="sunglasses" size={24} />).toJSON(),
       ).not.toBeNull()
+    })
+  })
+
+  describe("prop fallbacks", () => {
+    // The size and colour props overlap deliberately; each fallback below is a
+    // combination real call sites use.
+    it("falls back to the theme colour when none is given", () => {
+      const { getByTestId } = renderWithTheme(<GaloyIcon name="info" size={24} />)
+
+      expect(getByTestId("icon-info").props.color).toBe(
+        theme.lightColors?.textOnBackground,
+      )
+    })
+
+    it("takes its size from width and height when size is absent", () => {
+      expect(
+        renderWithTheme(<GaloyIcon name="info" width={30} height={18} />).toJSON(),
+      ).not.toBeNull()
+    })
+
+    it("accepts a non-default phosphor weight", () => {
+      expect(
+        renderWithTheme(<GaloyIcon name="info" size={24} weight="bold" />).toJSON(),
+      ).not.toBeNull()
+    })
+
+    it("gives a custom svg its width and height separately", () => {
+      const { getByTestId } = renderWithTheme(
+        <GaloyIcon name="emergency-kit" width={30} height={18} />,
+      )
+
+      expect(getByTestId("icon-emergency-kit").props.width).toBe(30)
+      expect(getByTestId("icon-emergency-kit").props.height).toBe(18)
+    })
+
+    /** width and height default to 0, so a custom svg sized only by variant
+     *  would render at zero pixels - invisible, with no error to notice. */
+    it("sizes a custom svg from its size variant", () => {
+      const { getByTestId } = renderWithTheme(
+        <GaloyIcon name="emergency-kit" sizeVariant="lg" />,
+      )
+
+      const icon = getByTestId("icon-emergency-kit")
+      expect(icon.props.width).toBeGreaterThan(0)
+      expect(icon.props.width).toBe(icon.props.height)
+    })
+
+    it("sizes a custom svg from a numeric size", () => {
+      const { getByTestId } = renderWithTheme(
+        <GaloyIcon name="emergency-kit" size={40} />,
+      )
+
+      expect(getByTestId("icon-emergency-kit").props.width).toBe(40)
+      expect(getByTestId("icon-emergency-kit").props.height).toBe(40)
+    })
+
+    it("renders a custom svg inside a background container with a fixed container size", () => {
+      expect(
+        renderWithTheme(
+          <GaloyIcon
+            name="emergency-kit"
+            size={24}
+            backgroundColor="red"
+            containerSize={60}
+            opacity={0.4}
+          />,
+        ).toJSON(),
+      ).not.toBeNull()
+    })
+
+    it("renders a phosphor icon inside a background container with a fixed container size", () => {
+      expect(
+        renderWithTheme(
+          <GaloyIcon
+            name="info"
+            size={24}
+            backgroundColor="red"
+            containerSize={60}
+            opacity={0.4}
+          />,
+        ).toJSON(),
+      ).not.toBeNull()
+    })
+  })
+
+  describe("background container", () => {
+    const container = (ui: React.ReactElement) =>
+      renderWithTheme(ui).toJSON() as ReactTestRendererJSON
+    const containerStyle = (ui: React.ReactElement) =>
+      StyleSheet.flatten(container(ui).props.style)
+
+    /** An iconOnly button's container is transparent at rest. Fabric flattens
+     *  that view away, and the Android view it creates on press, once the
+     *  background turns grey, has no border radius: the highlight is a square. */
+    it("keeps a transparent phosphor container as a native view", () => {
+      expect(
+        container(<GaloyIcon name="menu" size={24} backgroundColor="transparent" />).props
+          .collapsable,
+      ).toBe(false)
+    })
+
+    it("keeps a transparent custom svg container as a native view", () => {
+      expect(
+        container(
+          <GaloyIcon
+            name="warning-with-background"
+            size={24}
+            backgroundColor="transparent"
+          />,
+        ).props.collapsable,
+      ).toBe(false)
+    })
+
+    it("rounds a phosphor icon's container to a circle", () => {
+      const style = containerStyle(
+        <GaloyIcon name="menu" size={24} backgroundColor="red" opacity={0.7} />,
+      )
+
+      expect(style.borderRadius).toBe(style.width / 2)
+    })
+
+    it("rounds a custom svg's container to a circle", () => {
+      const style = containerStyle(
+        <GaloyIcon name="warning-with-background" size={24} backgroundColor="red" />,
+      )
+
+      expect(style.borderRadius).toBe(style.width / 2)
+    })
+
+    it("rounds a fixed-size container to a circle", () => {
+      const style = containerStyle(
+        <GaloyIcon name="info" size={24} backgroundColor="red" containerSize={60} />,
+      )
+
+      expect(style).toMatchObject({ width: 60, height: 60, borderRadius: 30 })
     })
   })
 })

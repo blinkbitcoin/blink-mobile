@@ -1,6 +1,7 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 import { usePendingMigrationAccounts } from "@app/screens/account-migration/hooks/use-pending-migration-accounts"
+import { StorageFailure, StorageWriteError } from "@app/utils/storage/storage-failure"
 
 const mockLoadPendingProvisionedAccounts = jest.fn()
 const mockSavePendingProvisionedAccount = jest.fn()
@@ -282,6 +283,60 @@ describe("usePendingMigrationAccounts", () => {
       "save failed",
     )
     expect(result.current.pendingForActiveAccount).toBeNull()
+  })
+
+  /** The kind is attached here, where the store answered, so the caller never has to guess
+   *  it from an error that may not have come from storage at all. */
+  it("names a full disk on the write it propagates", async () => {
+    mockSavePendingProvisionedAccount.mockRejectedValue(
+      new Error("database or disk is full (code 13 SQLITE_FULL)"),
+    )
+
+    const { result } = renderHook(() => usePendingMigrationAccounts())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    const rejection = result.current.savePendingAccount("sc-new-1")
+
+    await expect(rejection).rejects.toBeInstanceOf(StorageWriteError)
+    await expect(rejection).rejects.toMatchObject({ failure: StorageFailure.OutOfSpace })
+  })
+
+  it("propagates any other store refusal as an unknown kind", async () => {
+    mockSavePendingProvisionedAccount.mockRejectedValue(new Error("Database Error"))
+
+    const { result } = renderHook(() => usePendingMigrationAccounts())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await expect(result.current.savePendingAccount("sc-new-1")).rejects.toMatchObject({
+      failure: StorageFailure.Unknown,
+      message: "Database Error",
+    })
+  })
+
+  it("keeps the message of a store rejection that is not an Error", async () => {
+    mockSavePendingProvisionedAccount.mockRejectedValue("disk unavailable")
+
+    const { result } = renderHook(() => usePendingMigrationAccounts())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await expect(result.current.savePendingAccount("sc-new-1")).rejects.toMatchObject({
+      failure: StorageFailure.Unknown,
+      message: "disk unavailable",
+    })
+  })
+
+  /** A missing owner is refused before the store is touched, so it must not arrive looking
+   *  like a storage failure the caller would answer with free-up-space copy. */
+  it("refuses a missing owner with a plain error, not a storage one", async () => {
+    mockActiveAccount = undefined
+    mockOwnerId = null
+    const { result } = renderHook(() => usePendingMigrationAccounts())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    const rejection = result.current.savePendingAccount("sc-new-1")
+
+    await expect(rejection).rejects.toThrow("without an owner id")
+    await expect(rejection).rejects.not.toBeInstanceOf(StorageWriteError)
   })
 
   it("reports when clearing a pending wallet fails", async () => {

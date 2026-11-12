@@ -84,7 +84,10 @@ missing pieces as findings:
 | **Audit** | dependency advisories (`make audit`) | Yes |
 | **Conventional commits** | PR title/commit format | Yes |
 | **CodeQL / spelling / qlty** | static analysis, typos | Yes |
-| **Android / iOS (E2E)** | Detox on self-hosted runners | Flaky; routinely fails/times out even on merged PRs. Investigate, but don't treat a red E2E alone as blocking — do treat a *relevant* E2E failure as one |
+
+There is no E2E check: the Android/iOS E2E workflow was removed while the CI overhaul is
+pending. The suites still run locally ([e2e-testing.md](./e2e-testing.md)); for a PR that
+touches a flow they cover, ask the author whether they ran them.
 
 Most common Tests failure: **stale copy assertions after an i18n/copy change** (#3862,
 #3882). If a PR changes user-facing strings, check that test assertions were updated in the
@@ -348,6 +351,34 @@ Deep reviews label structural findings by principle, and authors answer per-prin
       (#3824); concurrency guarded with `useInFlightGuard` (#3868).
 - [ ] Fees/limits from the SDK: don't rely on SDK defaults silently (default fee caps bit
       us in #3903); make chosen fee policy explicit and remote-configurable.
+- [ ] **SDK upgrades re-run the manual send matrix and record it in the PR**: every spec
+      mocks the bridge, so a contract change in the SDK is invisible to the suite (0.22.0
+      started refusing the idempotency key on dollar sends and nothing went red, #4272).
+      At minimum: dollar wallet to a Lightning address, bitcoin wallet to a Lightning
+      address, and a bech32 LNURL, as first verified in #3765.
+- [ ] SDK bumps: LNURL-server wire compatibility. The SDK talks to Blink's own
+      `blink-lnurl-server`, not Breez's, so diff the routes and signed-message format in
+      the SDK's `lnurl.rs` between the two tags, and run username register, availability
+      and restore against staging before merging (#4257).
+- [ ] The two routes the app signs for itself (`/recover`, `/mode`) are not the SDK's. Their
+      messages live in `lnurl-server-mode.ts` and are a wire contract with
+      `blink-lnurl-server`'s `signed_message.rs`, pinned by the same golden vectors on both
+      sides, so a change to either locks every deployed build out of its own Lightning
+      address. A client signing a newer message must not reach production before the server
+      that verifies it does (`blink-lnurl:v1` needs server 0.9.0,
+      blinkbitcoin/blink-lnurl-server#52).
+- [ ] A bump that migrates the SDK's own database is one-way: once a wallet has been opened
+      on the new SDK an older build cannot open it (`DatabaseTooFarAhead`), and the seed is
+      the only way back. Say in the PR which SDK floor every rollback candidate has to
+      carry, and record both the upgrade in place and the reverse-open refusal (0.23 adds
+      `instant_claim_status`; 0.26 and 0.27 add more).
+- [ ] SDK bumps: logging. Diff `crates/breez-sdk/core/src/logger.rs` between the two tags
+      (file name, append mode, filters) and scan the commits for new `{:?}` log lines.
+      Then grep a real `sdk.log` for the test phrase, `xprv`, raw preimages and any new
+      line carrying the identity key (known at 0.27.1: LNURL URLs and `Balance updated
+      for identity`). Since 0.27.1 the identity key travels as
+      `LogEntry.instanceId`: it must stay out of the file (`file_log_filter`) and out of
+      Crashlytics. See [Self-custodial wallet logs](./self-custodial-logs.md).
 
 ### Feature flags / Remote Config
 

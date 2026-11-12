@@ -11,6 +11,7 @@ import { useAppConfig } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { testProps } from "@app/utils/testProps"
 import useLogout from "@app/hooks/use-logout"
+import { useLogoutAndRoute } from "@app/hooks/use-logout-and-route"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button/galoy-icon-button"
 import Modal from "react-native-modal"
@@ -42,6 +43,7 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
 
   const { saveToken } = useAppConfig()
   const { logout } = useLogout()
+  const { logoutAndRoute } = useLogoutAndRoute()
   const { accounts, activeAccount, setActiveAccountId } = useAccountRegistry()
   const isCurrentlyActive = selected && activeAccount?.type === AccountType.Custodial
 
@@ -106,8 +108,10 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
         logout({ stateToDefault: false, token }).catch(() => {})
         return
       case "resetToLaunch":
-        await logout()
-        navigation.reset({ index: 0, routes: [{ name: "getStarted" }] })
+        /** The only branch here that ends every session: the way out is the logout's to
+         *  decide, because a lock kept over a wallet the device still stores is owed an
+         *  answer before the landing screen can offer that wallet again. */
+        await logoutAndRoute()
         return
       case "removeInactive":
         await logout({ stateToDefault: false, token })
@@ -129,7 +133,7 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
       animationIn="fadeIn"
       isVisible={modalVisible}
       onBackdropPress={closeModal}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       avoidKeyboard={true}
       backdropTransitionOutTiming={0}
     >
@@ -170,7 +174,7 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
           containerStyle={[styles.listStyle, isFirstItem && styles.firstItem]}
         >
           {isCurrentlyActive ? (
-            <GaloyIcon name="check-circle" size={20} color={colors._green} />
+            <GaloyIcon name="check-circle" size={20} color={colors.staticSuccess} />
           ) : (
             <View style={styles.spacerStyle} />
           )}
@@ -183,19 +187,19 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
             </Text>
           </ListItem.Content>
           {logoutLoading ? (
-            <ActivityIndicator size="small" color={colors.primary} />
+            <ActivityIndicator size="small" color={colors.accent} />
           ) : (
             <GaloyIconButton
               name="close"
               size="small"
               onPress={openModal}
-              backgroundColor={colors.grey4}
+              backgroundColor={colors.neutral}
             />
           )}
         </ListItem>
       </TouchableOpacity>
       <Overlay isVisible={switchLoading} overlayStyle={styles.overlayStyle}>
-        <ActivityIndicator size={50} color={colors.primary} />
+        <ActivityIndicator size={50} color={colors.accent} />
         <Text>{LL.AccountScreen.pleaseWait()}</Text>
       </Overlay>
       {logoutModal}
@@ -206,8 +210,8 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
 const useStyles = makeStyles(({ colors }) => ({
   listStyle: {
     borderBottomWidth: 2,
-    borderColor: colors.grey5,
-    backgroundColor: colors.white,
+    borderColor: colors.surfaceInteractive,
+    backgroundColor: colors.backgroundDefault,
   },
   firstItem: {
     marginTop: 0,
@@ -221,11 +225,11 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 20,
   },
   subtitle: {
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   modalView: {
     marginHorizontal: 20,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     padding: 20,
     borderRadius: 20,
     display: "flex",

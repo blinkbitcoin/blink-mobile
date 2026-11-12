@@ -178,7 +178,7 @@ export const ContactsCard = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     display: "flex",
     flexDirection: "column",
     marginBottom: 20,
@@ -195,7 +195,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   separator: {
     height: 1,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
   },
   spaceTop: {
     marginTop: 8,

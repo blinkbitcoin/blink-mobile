@@ -1,6 +1,8 @@
 /* eslint-disable camelcase */
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck — GetFee<T> type expects GQL fee probe params that self-custodial doesn't use
+import { it } from "@jest/globals"
+
 import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
 
 import {
@@ -8,12 +10,30 @@ import {
   createGetFeeOnchain,
   createSendMutation,
   createSendMutationOnchain,
+  findLostSend,
 } from "@app/self-custodial/payment-details/send-helpers"
+import {
+  measureObservedPayment,
+  resetMeasuredOnceKeys,
+  resetMeasurementContext,
+  resetSettlementTracking,
+  setMeasurementContext,
+} from "@app/self-custodial/measurement"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
+import { AccountMode } from "@app/types/account"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 
 const mockPrepareSendPayment = jest.fn()
+
+const telemetry = { rail: "bolt11", sendingWallet: WalletCurrency.Btc }
+const telemetryOnchain = { rail: "onchain", sendingWallet: WalletCurrency.Btc }
 const mockSendPayment = jest.fn()
+
+jest.mock("@app/self-custodial/analytics-identity", () => ({
+  /** The identity owner's own spec covers when delivery is safe; here it is in place. */
+  isEnhancedIdentityApplied: () => true,
+  onEnhancedIdentityApplied: () => () => undefined,
+}))
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
   const tags = {
@@ -43,6 +63,9 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
       Bolt11Invoice: "Bolt11Invoice",
     },
     OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
+    PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
+    SyncWalletRequest: { create: (request: unknown) => request },
+    PaymentType: { Send: 0, Receive: 1 },
     Seed: { Mnemonic: jest.fn().mockImplementation((args: unknown) => args) },
     StableBalanceActiveLabel: {
       Set: jest.fn().mockImplementation((args: unknown) => ({ tag: "Set", inner: args })),
@@ -78,15 +101,25 @@ jest.mock("@app/screens/send-bitcoin-screen/fee-tier-selector", () => ({
   FeeTierOption: { Fast: "fast", Medium: "medium", Slow: "slow" },
 }))
 
+const mockLogEvent = jest.fn()
+jest.mock("@react-native-firebase/analytics", () => () => ({
+  logEvent: (...args: unknown[]) => mockLogEvent(...args),
+}))
+
 const mockRecordError = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: unknown[]) => mockRecordError(...args),
   log: jest.fn(),
 }))
 
+const mockListPayments = jest.fn()
+const mockSyncWallet = jest.fn()
+
 const mockSdk = {
   prepareSendPayment: (...args: unknown[]) => mockPrepareSendPayment(...args),
   sendPayment: (...args: unknown[]) => mockSendPayment(...args),
+  listPayments: (...args: unknown[]) => mockListPayments(...args),
+  syncWallet: (...args: unknown[]) => mockSyncWallet(...args),
 } as never
 
 const sdkError = (tag: string, inner?: readonly [string]) => ({ tag, inner })
@@ -541,11 +574,14 @@ describe("createSendMutation", () => {
     })
     mockSendPayment.mockResolvedValue(undefined)
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+      },
+      telemetry,
+    )
     const result = await send()
 
     expect(result.status).toBe(PaymentSendResult.Success)
@@ -554,11 +590,14 @@ describe("createSendMutation", () => {
   it("classifies a thrown SdkError(InsufficientFunds) into the InsufficientFunds code", async () => {
     mockPrepareSendPayment.mockRejectedValue(sdkError("InsufficientFunds"))
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+      },
+      telemetry,
+    )
     const result = await send()
 
     expect(result.status).toBe(PaymentSendResult.Failure)
@@ -572,11 +611,14 @@ describe("createSendMutation", () => {
       ]),
     )
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+      },
+      telemetry,
+    )
     const result = await send()
 
     expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.InsufficientFunds)
@@ -585,11 +627,14 @@ describe("createSendMutation", () => {
   it("classifies a non-SdkError thrown value as Generic", async () => {
     mockPrepareSendPayment.mockRejectedValue(new Error("boom"))
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+      },
+      telemetry,
+    )
     const result = await send()
 
     expect(result.status).toBe(PaymentSendResult.Failure)
@@ -600,11 +645,14 @@ describe("createSendMutation", () => {
     mockRecordError.mockClear()
     mockPrepareSendPayment.mockRejectedValue(new Error("payment refused"))
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+      },
+      telemetry,
+    )
     await send()
 
     expect(mockRecordError).toHaveBeenCalledWith(
@@ -616,11 +664,14 @@ describe("createSendMutation", () => {
     mockRecordError.mockClear()
     mockPrepareSendPayment.mockRejectedValue("network blip")
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+      },
+      telemetry,
+    )
     await send()
 
     expect(mockRecordError).toHaveBeenCalledWith(
@@ -638,12 +689,15 @@ describe("createSendMutation", () => {
     })
     mockSendPayment.mockResolvedValue(undefined)
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: BigInt(1500),
-      tokenIdentifier: "usdb-token-id",
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: BigInt(1500),
+        tokenIdentifier: "usdb-token-id",
+      },
+      telemetry,
+    )
     await send()
 
     expect(mockPrepareSendPayment).toHaveBeenCalledWith(
@@ -662,12 +716,15 @@ describe("createSendMutation", () => {
       completionTimeoutSecs: undefined,
     } as never
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-      conversionOptions,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+        conversionOptions,
+      },
+      telemetry,
+    )
     await send()
 
     expect(mockPrepareSendPayment).toHaveBeenCalledWith(
@@ -690,6 +747,7 @@ describe("createSendMutationOnchain", () => {
     const send = createSendMutationOnchain(
       { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
       "medium",
+      telemetryOnchain,
     )
     const result = await send()
 
@@ -707,10 +765,730 @@ describe("createSendMutationOnchain", () => {
     const send = createSendMutationOnchain(
       { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
       "fast",
+      telemetryOnchain,
     )
     const result = await send()
 
     expect(result.status).toBe(PaymentSendResult.Failure)
     expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.NetworkError)
+  })
+})
+
+describe("findLostSend", () => {
+  const COMPLETED = 0
+  const PENDING = 1
+  const FAILED = 2
+  const STARTED_AT_MS = 1_747_691_078_000
+  const PAGE_SIZE = 50
+
+  /** A sent payment the wallet has described, as any it has caught up with. */
+  const sent = (id: string, status: number, to = "friend") => ({
+    id,
+    status,
+    to,
+    details: { tag: "Lightning" },
+  })
+  /** A sent payment the wallet has not described yet: nothing to match on. */
+  const undescribed = (id: string, status: number) => ({ id, status, details: undefined })
+  const toFriend = (payment: { to?: string }) => payment.to === "friend"
+  /** A page the wallet filled to the brim, none of it the payment looked for. */
+  const fullPageOfOthers = () =>
+    Array.from({ length: PAGE_SIZE }, (_, i) => sent(`other-${i}`, COMPLETED, "someone"))
+
+  /** Answers the wallet's listing once per call, in order. */
+  const walletAnswers = (...pages: Array<Array<ReturnType<typeof sent>>>) => {
+    pages.forEach((payments) => mockListPayments.mockResolvedValueOnce({ payments }))
+  }
+
+  /** A wallet of its own per test. The bridge keeps one sync in flight per wallet, so a
+   *  sync a test leaves pending must not be handed to the next one. */
+  let lookupSdk = mockSdk
+  const lookup = () =>
+    findLostSend({ sdk: lookupSdk, startedAtMs: STARTED_AT_MS, matches: toFriend })
+
+  /** Runs the lookup to its end, releasing each wait between looks. */
+  const settle = async <T>(pending: Promise<T>): Promise<T> => {
+    for (let i = 0; i < 3; i += 1) {
+      await Promise.resolve()
+      await jest.advanceTimersByTimeAsync(2000)
+    }
+    return pending
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    jest.useFakeTimers()
+    mockSyncWallet.mockResolvedValue(undefined)
+    lookupSdk = {
+      listPayments: (...args: unknown[]) => mockListPayments(...args),
+      syncWallet: (...args: unknown[]) => mockSyncWallet(...args),
+    } as never
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  /** The caller matches by payment hash, so the window only bounds the work: it opens
+   *  a day before the attempt's own clock, because the wallet stamps a payment with the
+   *  server's clock and a phone's can be set well ahead of it. Only what was sent from
+   *  this wallet is asked for. */
+  it("asks for outgoing payments from a day before the attempt", async () => {
+    walletAnswers([sent("p1", COMPLETED)])
+
+    await settle(lookup())
+
+    expect(mockListPayments).toHaveBeenCalledWith(
+      expect.objectContaining({
+        typeFilter: [0],
+        fromTimestamp: BigInt(1_747_691_078 - 24 * 60 * 60),
+        offset: 0,
+        limit: PAGE_SIZE,
+        sortAscending: false,
+      }),
+    )
+  })
+
+  /** The history is local, and a send that threw reaches it only once the wallet has
+   *  caught up with the server, so every look asks it to first. */
+  it("has the wallet catch up with the server before every look", async () => {
+    walletAnswers([], [], [])
+
+    await settle(lookup())
+
+    expect(mockSyncWallet).toHaveBeenCalledTimes(3)
+    expect(mockSyncWallet.mock.invocationCallOrder[0]).toBeLessThan(
+      mockListPayments.mock.invocationCallOrder[0],
+    )
+  })
+
+  it("returns the completed payment to the destination on the first look", async () => {
+    walletAnswers([sent("other", COMPLETED, "someone-else"), sent("p1", COMPLETED)])
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "found", payment: sent("p1", COMPLETED), failed: [] })
+    expect(mockListPayments).toHaveBeenCalledTimes(1)
+  })
+
+  it("returns a pending payment when that is all the wallet shows", async () => {
+    walletAnswers([sent("p1", PENDING)])
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "found", payment: sent("p1", PENDING), failed: [] })
+  })
+
+  it("prefers a completed payment over a pending one for the same attempt", async () => {
+    walletAnswers([sent("in-flight", PENDING), sent("done", COMPLETED)])
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "done" } })
+  })
+
+  /** A failed payment is not the attempt landing; it is exactly what makes a retry safe. */
+  it("passes a failed payment back beside the one that landed", async () => {
+    walletAnswers([sent("p1", FAILED), sent("p2", COMPLETED)])
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p2" } })
+    expect(found).toMatchObject({ failed: [{ id: "p1" }] })
+  })
+
+  it("passes over a failed payment", async () => {
+    walletAnswers([sent("p1", FAILED)], [sent("p1", FAILED)], [sent("p1", FAILED)])
+
+    const found = await settle(lookup())
+
+    /** Not the attempt landing, so still safe to send again; passed back so telemetry
+     *  can close the attempt it ended. */
+    expect(found).toEqual({ status: "not-found", failed: [sent("p1", FAILED)] })
+  })
+
+  /** A busy wallet fills the first page with later sends; the payment is on the next. */
+  it("turns the page when the wallet fills one, and stops at a short one", async () => {
+    walletAnswers(fullPageOfOthers(), [
+      sent("other-x", COMPLETED, "someone"),
+      sent("p1", PENDING),
+    ])
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
+    expect(mockListPayments).toHaveBeenCalledTimes(2)
+    expect(mockListPayments).toHaveBeenLastCalledWith(
+      expect.objectContaining({ offset: PAGE_SIZE, limit: PAGE_SIZE }),
+    )
+  })
+
+  /** An older attempt's failed payment can sit a page below the one that landed, and
+   *  that attempt reports its end only once it is seen. */
+  it("reads past a completed match to the failed ones on later pages", async () => {
+    walletAnswers(
+      [...fullPageOfOthers().slice(1), sent("p2", COMPLETED)],
+      [sent("p1", FAILED)],
+    )
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({
+      status: "found",
+      payment: { id: "p2" },
+      failed: [{ id: "p1" }],
+    })
+    expect(mockListPayments).toHaveBeenCalledTimes(2)
+  })
+
+  /** Pages that never run short leave the later ones unread, but not the match. */
+  it("keeps a completed match when twenty full pages have no end", async () => {
+    mockListPayments.mockResolvedValueOnce({
+      payments: [...fullPageOfOthers().slice(1), sent("p1", COMPLETED)],
+    })
+    mockListPayments.mockResolvedValue({ payments: fullPageOfOthers() })
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
+    expect(mockListPayments).toHaveBeenCalledTimes(20)
+  })
+
+  /** A match is a payment of the invoice, whatever a later page would have said. */
+  it("keeps a match made before a page that could not be read", async () => {
+    walletAnswers([...fullPageOfOthers().slice(1), sent("p1", PENDING)])
+    mockListPayments.mockRejectedValueOnce(new Error("sdk offline"))
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
+  })
+
+  /** A failed payment of the invoice is not the attempt landing, so it settles nothing
+   *  about the pages after it. */
+  it("does not let a failed match stand in for the pages that could not be read", async () => {
+    mockListPayments.mockImplementation(async ({ offset }: { offset: number }) => {
+      if (offset === 0)
+        return { payments: [...fullPageOfOthers().slice(1), sent("p1", FAILED)] }
+      throw new Error("sdk offline")
+    })
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "unreadable" })
+  })
+
+  /** Pages that never run short are a history that was not read to its end. */
+  it("answers unreadable, not nothing found, when twenty full pages have no end", async () => {
+    mockListPayments.mockResolvedValue({ payments: fullPageOfOthers() })
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "unreadable" })
+    expect(mockListPayments).toHaveBeenCalledTimes(3 * 20)
+    expect(mockRecordError).toHaveBeenCalled()
+  })
+
+  /** The payment can land in the history a moment after the call that dispatched it
+   *  gave up, so the wallet is asked again, spaced out, before giving up. */
+  it("asks again after a wait when the first look shows nothing", async () => {
+    walletAnswers([], [sent("p1", COMPLETED)])
+
+    const pending = lookup()
+    await Promise.resolve()
+    expect(mockListPayments).toHaveBeenCalledTimes(1)
+
+    const found = await settle(pending)
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
+    expect(mockListPayments).toHaveBeenCalledTimes(2)
+  })
+
+  it("gives up after three looks that show nothing", async () => {
+    walletAnswers([], [], [])
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "not-found", failed: [] })
+    expect(mockListPayments).toHaveBeenCalledTimes(3)
+  })
+
+  /** A history that cannot be read is not proof the payment was never made. */
+  it("still finds the payment on a later look after a listing that threw", async () => {
+    mockListPayments.mockRejectedValueOnce(new Error("sdk offline"))
+    walletAnswers([sent("p1", COMPLETED)])
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
+    expect(mockRecordError).toHaveBeenCalled()
+  })
+
+  /** The last look decides: each one reads the history afresh after the wallet caught
+   *  up, so an earlier look that could not read says nothing about one that did. */
+  it("answers unreadable when the last look could not read the history", async () => {
+    const offline = new Error("sdk offline")
+    walletAnswers([], [])
+    mockListPayments.mockRejectedValueOnce(offline)
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "unreadable", error: offline })
+    expect(mockListPayments).toHaveBeenCalledTimes(3)
+  })
+
+  it("answers nothing found once a later look read the history after one that could not", async () => {
+    mockListPayments.mockRejectedValueOnce(new Error("sdk offline"))
+    walletAnswers([], [])
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "not-found", failed: [] })
+  })
+
+  /** A history the wallet could not refresh may be missing the payment, so it cannot
+   *  show the payment is absent: answering "not-found" would let the send go twice. */
+  it("answers unreadable when the wallet could not catch up with the server on the last look", async () => {
+    const offline = new Error("no connection")
+    walletAnswers([], [], [])
+    mockSyncWallet.mockResolvedValueOnce(undefined)
+    mockSyncWallet.mockResolvedValueOnce(undefined)
+    mockSyncWallet.mockRejectedValueOnce(offline)
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "unreadable", error: offline })
+    expect(mockListPayments).toHaveBeenCalledTimes(3)
+  })
+
+  /** The sync also waits for exit-chain collection and fails with it, so a failed sync
+   *  must not hide a payment the local history already holds. */
+  it("finds the payment in the local history when the wallet could not catch up", async () => {
+    mockSyncWallet.mockRejectedValue(new Error("exit chain collection failed"))
+    walletAnswers([sent("p1", COMPLETED)])
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "found", payment: sent("p1", COMPLETED), failed: [] })
+    expect(mockListPayments).toHaveBeenCalledTimes(1)
+  })
+
+  it("reports a sync that failed during the lookup", async () => {
+    const offline = new Error("no connection")
+    mockSyncWallet.mockRejectedValue(offline)
+    walletAnswers([sent("p1", COMPLETED)])
+
+    await settle(lookup())
+
+    expect(mockRecordError).toHaveBeenCalledTimes(1)
+  })
+
+  /** A send the wallet has not described yet carries nothing to match on, and may be the
+   *  attempt itself: it is not known to be absent. */
+  it("answers unreadable while the window holds a send the wallet has not described", async () => {
+    walletAnswers(
+      [undescribed("bare", PENDING)],
+      [undescribed("bare", PENDING)],
+      [undescribed("bare", PENDING)],
+    )
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "unreadable" })
+  })
+
+  it("finds the payment once the wallet has described it", async () => {
+    walletAnswers([undescribed("bare", PENDING)], [sent("p1", PENDING)])
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
+  })
+
+  it("passes over an undescribed send that failed", async () => {
+    walletAnswers([undescribed("bare", FAILED)], [], [])
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "not-found", failed: [] })
+  })
+
+  /**
+   * The whole lookup against a wallet that cannot reach the server at all, which is the
+   * shape degraded connectivity takes: a sync also waits for an exit-chain collection pass,
+   * so there is more that can fail before the history is caught up.
+   *
+   * What matters is the answer it does not give. "not-found" is the only one that makes the
+   * send safe to try again, and a history the wallet never refreshed has not shown the
+   * payment absent, however empty the local copy reads. It stays bounded at the three looks
+   * rather than waiting on the wallet, and the error it met travels with it.
+   */
+  it("stays bounded and never reports a send absent when the wallet never catches up", async () => {
+    const offline = new Error("exit chain collection failed")
+    mockSyncWallet.mockReset()
+    mockSyncWallet.mockRejectedValue(offline)
+    walletAnswers([], [], [])
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "unreadable", error: offline })
+    expect(mockSyncWallet).toHaveBeenCalledTimes(3)
+    expect(mockListPayments).toHaveBeenCalledTimes(3)
+  })
+
+  /**
+   * The other shape of a wallet that cannot reach the server: one that never answers at
+   * all, rather than one that fails. Three attempts bound how many looks are taken, not
+   * how long one may take, and an awaited SDK call carries nothing of its own to stop it,
+   * so without a deadline the lookup would simply stay pending — and a send that never
+   * reaches an outcome is worse than one reported unreadable.
+   *
+   * The abandoned call is deliberately left running rather than cancelled: cancelling a
+   * user sync drops the loop that owns the SDK's sync coordinator while its `sync_running`
+   * flag is set, which wedges every later sync for as long as the wallet stays connected.
+   */
+  it("abandons a look the wallet never answers, and still never reports a send absent", async () => {
+    mockSyncWallet.mockReset()
+    mockSyncWallet.mockImplementation(() => new Promise(() => {}))
+
+    const pending = lookup()
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      await jest.advanceTimersByTimeAsync(15_000)
+      await jest.advanceTimersByTimeAsync(2000)
+    }
+    const found = await pending
+
+    expect(found).toMatchObject({ status: "unreadable" })
+    expect((found as { error: Error }).error.message).toContain("timed out after 15000ms")
+    /** One sync, not three: a look that gives up leaves it running, and the looks after
+     *  it are handed that one rather than each starting another. */
+    expect(mockSyncWallet).toHaveBeenCalledTimes(1)
+    /** Nothing was cancelled: the SDK is asked to sync and nothing else. */
+    expect(mockSyncWallet).toHaveBeenLastCalledWith(expect.anything())
+    /** The history was never read, so it was never treated as readable. */
+    expect(mockListPayments).not.toHaveBeenCalled()
+  })
+
+  /**
+   * The deadline must not cost the lookup the one thing it exists to find. A payment of
+   * the invoice can sit on a page the wallet has already answered while a later page
+   * stalls, and reporting that as unreadable would tell the user a send failed that the
+   * history had already shown landing.
+   */
+  it("keeps a payment the pages already showed when a later page never answers", async () => {
+    mockListPayments.mockResolvedValueOnce({
+      payments: [...fullPageOfOthers().slice(1), sent("p1", COMPLETED)],
+    })
+    mockListPayments.mockImplementationOnce(() => new Promise(() => {}))
+
+    const pending = lookup()
+    await jest.advanceTimersByTimeAsync(15_000)
+    const found = await pending
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
+    /** It answered on the first look, so no further look was taken. */
+    expect(mockSyncWallet).toHaveBeenCalledTimes(1)
+  })
+
+  /**
+   * The SDK calls cannot be cancelled, so an abandoned look keeps running inside its sync
+   * and comes back whenever the wallet finally answers — which is exactly when the wallet
+   * is busiest. Nothing is waiting for that look any more, so it must not then go on to
+   * read the history: up to 20 pages per abandoned look, released together on recovery.
+   */
+  it("does not read the history when the wallet answers a look that already ran out of time", async () => {
+    const releases: Array<() => void> = []
+    mockSyncWallet.mockReset()
+    mockSyncWallet.mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          releases.push(resolve)
+        }),
+    )
+
+    const pending = lookup()
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      await jest.advanceTimersByTimeAsync(15_000)
+      await jest.advanceTimersByTimeAsync(2000)
+    }
+    const found = await pending
+    expect(found).toMatchObject({ status: "unreadable" })
+
+    /** Connectivity returns and every sync the lookup left running settles. */
+    releases.forEach((release) => release())
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(releases.length).toBeGreaterThan(0)
+    expect(mockListPayments).not.toHaveBeenCalled()
+  })
+
+  /**
+   * "unreadable" keeps the lost attempt on purpose, so the user's next retry looks again.
+   * That retry must not start another sync while the first is still running, or a wallet
+   * that stays unreachable collects a native future per look per retry.
+   */
+  it("hands a second lookup the sync the first one left running", async () => {
+    const releases: Array<() => void> = []
+    mockSyncWallet.mockReset()
+    mockSyncWallet.mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          releases.push(resolve)
+        }),
+    )
+
+    const runLookup = async () => {
+      const pending = lookup()
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        await jest.advanceTimersByTimeAsync(15_000)
+        await jest.advanceTimersByTimeAsync(2000)
+      }
+      return pending
+    }
+
+    expect(await runLookup()).toMatchObject({ status: "unreadable" })
+    expect(await runLookup()).toMatchObject({ status: "unreadable" })
+
+    expect(mockSyncWallet).toHaveBeenCalledTimes(1)
+
+    /** And when it finally answers, neither lookup's looks read the history. */
+    releases.forEach((release) => release())
+    await jest.advanceTimersByTimeAsync(0)
+    expect(mockListPayments).not.toHaveBeenCalled()
+  })
+
+  /** Sharing lasts only while the sync does: once it answers, a later lookup syncs afresh
+   *  rather than reading a history nobody caught up. */
+  it("syncs again for a lookup that starts after the shared sync answered", async () => {
+    walletAnswers([], [], [], [], [], [])
+
+    await settle(lookup())
+    const before = mockSyncWallet.mock.calls.length
+    await settle(lookup())
+
+    expect(mockSyncWallet.mock.calls.length).toBeGreaterThan(before)
+  })
+
+  /** The same guard between pages: a look can be part-way through the history when its
+   *  time runs out, and the pages left are as pointless as the first. */
+  it("stops paging when the look runs out of time part-way through the history", async () => {
+    let releasePage: () => void = () => undefined
+    mockListPayments.mockResolvedValueOnce({ payments: fullPageOfOthers() })
+    mockListPayments.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releasePage = () => resolve({ payments: fullPageOfOthers() })
+        }),
+    )
+
+    const pending = lookup()
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      await jest.advanceTimersByTimeAsync(15_000)
+      await jest.advanceTimersByTimeAsync(2000)
+    }
+    await pending
+
+    const pagesBefore = mockListPayments.mock.calls.length
+    releasePage()
+    await jest.advanceTimersByTimeAsync(0)
+
+    /** The page that was in flight comes back, and no further page is asked for. */
+    expect(mockListPayments).toHaveBeenCalledTimes(pagesBefore)
+  })
+
+  /** The same holds for a pending payment, which the scan does not stop on: it keeps
+   *  paging for the failed ones, so the stall lands after the match is already in hand. */
+  it("keeps a pending payment the pages already showed when a later page never answers", async () => {
+    mockListPayments.mockResolvedValueOnce({
+      payments: [...fullPageOfOthers().slice(1), sent("p1", PENDING)],
+    })
+    mockListPayments.mockImplementationOnce(() => new Promise(() => {}))
+
+    const pending = lookup()
+    await jest.advanceTimersByTimeAsync(15_000)
+    const found = await pending
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
+  })
+})
+
+describe("send telemetry", () => {
+  const COMPLETED = 0
+  const PENDING = 1
+  const FAILED = 2
+  const SEND = 0
+
+  const loggedEvents = () => mockLogEvent.mock.calls.map(([name]) => name)
+  const sentPayment = (status: number) => ({ payment: { id: "pay-1", status } })
+  const observe = (status: number) =>
+    measureObservedPayment({
+      id: "pay-1",
+      status,
+      paymentType: SEND,
+      method: 0,
+    } as never)
+
+  const sendBolt11 = () =>
+    createSendMutation(
+      { sdk: mockSdk, paymentRequest: "lnbc1...", amount: undefined },
+      telemetry,
+    )()
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    resetMeasuredOnceKeys()
+    resetSettlementTracking()
+    setMeasurementContext({
+      accountId: "sc-1",
+      mode: AccountMode.Enhanced,
+      network: "mainnet",
+    })
+    mockPrepareSendPayment.mockResolvedValue({
+      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+    })
+  })
+
+  afterAll(() => {
+    resetMeasurementContext()
+  })
+
+  it("reports a send the SDK completed as settled", async () => {
+    mockSendPayment.mockResolvedValue(sentPayment(COMPLETED))
+
+    await sendBolt11()
+
+    expect(loggedEvents()).toEqual([
+      "sc_payment_send_initiated",
+      "sc_payment_send_settled",
+    ])
+    expect(mockLogEvent).toHaveBeenLastCalledWith("sc_payment_send_settled", {
+      network: "mainnet",
+      rail: "bolt11",
+      sending_wallet: WalletCurrency.Btc,
+    })
+  })
+
+  it("holds a dispatched-but-pending send until the SDK settles it, once", async () => {
+    mockSendPayment.mockResolvedValue(sentPayment(PENDING))
+
+    const result = await sendBolt11()
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+
+    observe(COMPLETED)
+    observe(COMPLETED)
+
+    expect(loggedEvents()).toEqual([
+      "sc_payment_send_initiated",
+      "sc_payment_send_settled",
+    ])
+  })
+
+  it("reports a pending send the SDK later fails as failed, never settled", async () => {
+    mockSendPayment.mockResolvedValue(sentPayment(PENDING))
+
+    await sendBolt11()
+    observe(FAILED)
+
+    expect(loggedEvents()).toEqual([
+      "sc_payment_send_initiated",
+      "sc_payment_send_failed",
+    ])
+    expect(mockLogEvent).toHaveBeenLastCalledWith(
+      "sc_payment_send_failed",
+      expect.objectContaining({ rail: "bolt11", error_code: "sc_settlement_failed" }),
+    )
+  })
+
+  it("resolves a pending send whose outcome was announced before the call returned", async () => {
+    observe(COMPLETED)
+    mockSendPayment.mockResolvedValue(sentPayment(PENDING))
+
+    await sendBolt11()
+
+    expect(loggedEvents()).toEqual([
+      "sc_payment_send_initiated",
+      "sc_payment_send_settled",
+    ])
+  })
+
+  it("reports a send the SDK returned as failed as failed", async () => {
+    mockSendPayment.mockResolvedValue(sentPayment(FAILED))
+
+    await sendBolt11()
+
+    expect(loggedEvents()).toEqual([
+      "sc_payment_send_initiated",
+      "sc_payment_send_failed",
+    ])
+  })
+
+  it("reports a thrown send as failed with its classified code", async () => {
+    mockSendPayment.mockRejectedValue(sdkError("NetworkError"))
+
+    await sendBolt11()
+
+    expect(mockLogEvent).toHaveBeenLastCalledWith(
+      "sc_payment_send_failed",
+      expect.objectContaining({ error_code: SelfCustodialErrorCode.NetworkError }),
+    )
+  })
+
+  it("does not count a broadcast onchain send as settled", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      paymentMethod: { tag: "BitcoinAddress", inner: {} },
+    })
+    mockSendPayment.mockResolvedValue(sentPayment(PENDING))
+
+    await createSendMutationOnchain(
+      { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
+      "medium",
+      telemetryOnchain,
+    )()
+
+    expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+  })
+
+  it.each([
+    [
+      "another account",
+      { accountId: "sc-2", mode: AccountMode.Enhanced, network: "mainnet" },
+    ],
+    ["Incognito", { accountId: "sc-1", mode: AccountMode.Anon, network: "mainnet" }],
+    [
+      "another network",
+      { accountId: "sc-1", mode: AccountMode.Enhanced, network: "regtest" },
+    ],
+  ] as const)(
+    "does not report a rejection that arrives after a switch to %s",
+    async (_label, next) => {
+      let rejectSend: (err: unknown) => void = () => undefined
+      mockSendPayment.mockImplementation(
+        () =>
+          new Promise((_resolve, reject) => {
+            rejectSend = reject
+          }),
+      )
+
+      const pending = sendBolt11()
+      await Promise.resolve()
+      await Promise.resolve()
+      setMeasurementContext(next)
+      rejectSend(sdkError("NetworkError"))
+      const result = await pending
+
+      expect(result.status).toBe(PaymentSendResult.Failure)
+      expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+    },
+  )
+
+  it("still reports the send itself as sent when the SDK returns no payment", async () => {
+    mockSendPayment.mockResolvedValue(undefined)
+
+    const result = await sendBolt11()
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
   })
 })

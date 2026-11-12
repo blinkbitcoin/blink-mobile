@@ -75,7 +75,7 @@ describe("useApiKeysList", () => {
     )
   })
 
-  it("sorts active keys before inactive ones, newest first within each group", () => {
+  it("splits active keys from revoked and expired ones, newest first in each", () => {
     mockUseApiKeysQuery.mockReturnValue(
       queryResult([
         makeApiKey({ id: "revoked-new", revoked: true, createdAt: 1700000400 }),
@@ -87,9 +87,11 @@ describe("useApiKeysList", () => {
 
     const { result } = renderHook(() => useApiKeysList())
 
-    expect(result.current.apiKeys.map((k) => k.id)).toEqual([
+    expect(result.current.activeKeys.map((k) => k.id)).toEqual([
       "active-new",
       "active-old",
+    ])
+    expect(result.current.inactiveKeys.map((k) => k.id)).toEqual([
       "revoked-new",
       "expired-old",
     ])
@@ -101,7 +103,8 @@ describe("useApiKeysList", () => {
     const { result } = renderHook(() => useApiKeysList())
 
     expect(result.current.loading).toBe(true)
-    expect(result.current.apiKeys).toEqual([])
+    expect(result.current.activeKeys).toEqual([])
+    expect(result.current.inactiveKeys).toEqual([])
   })
 
   it("keeps showing cached keys instead of a loading state during a background refresh", () => {
@@ -110,7 +113,7 @@ describe("useApiKeysList", () => {
     const { result } = renderHook(() => useApiKeysList())
 
     expect(result.current.loading).toBe(false)
-    expect(result.current.apiKeys).toHaveLength(1)
+    expect(result.current.activeKeys).toHaveLength(1)
   })
 
   it("reports errors", () => {

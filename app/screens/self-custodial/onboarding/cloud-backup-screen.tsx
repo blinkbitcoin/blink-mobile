@@ -10,6 +10,7 @@ import { InfoBanner } from "@app/components/info-banner"
 import { PasswordInput } from "@app/components/password-input"
 import { RichText } from "@app/components/rich-text"
 import { Screen } from "@app/components/screen"
+import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   MigrationCheckpoint,
@@ -29,6 +30,11 @@ export const CloudBackupScreen: React.FC = () => {
 
   const cloudProvider = getCloudProviderName(LL)
 
+  // The encryption password is typed here, and PasswordInput's eye toggle shows it in
+  // plain text. Guarded from mount, not from the moment encryption is switched on, so
+  // the first keystroke never lands on an unguarded frame.
+  useScreenSecurity()
+
   const {
     isEncrypted,
     password,
@@ -47,6 +53,10 @@ export const CloudBackupScreen: React.FC = () => {
 
   useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup)
 
+  /** The backup commits the passphrase it was started with, so it stays put
+   *  while it runs. */
+  const isContinueDisabled = !isValid || loading
+
   return (
     <Screen preset="fixed">
       <View style={styles.container}>
@@ -54,7 +64,7 @@ export const CloudBackupScreen: React.FC = () => {
           <View style={styles.heroContainer}>
             <IconHero
               icon="cloud"
-              iconColor={colors._green}
+              iconColor={colors.staticSuccess}
               title={LL.BackupScreen.CloudBackup.title()}
               subtitle={LL.BackupScreen.CloudBackup.description({
                 provider: cloudProvider,
@@ -67,6 +77,7 @@ export const CloudBackupScreen: React.FC = () => {
               label={LL.BackupScreen.CloudBackup.encryptCheckbox()}
               isChecked={isEncrypted}
               onPress={toggleEncryption}
+              disabled={loading}
               centered
               {...testProps("encrypt-checkbox")}
             />
@@ -80,6 +91,7 @@ export const CloudBackupScreen: React.FC = () => {
                   onBlur={markPasswordTouched}
                   placeholder={LL.BackupScreen.CloudBackup.passwordPlaceholder()}
                   error={passwordError}
+                  disabled={loading}
                   {...testProps("cloud-password-input")}
                 />
                 <PasswordInput
@@ -89,6 +101,7 @@ export const CloudBackupScreen: React.FC = () => {
                   onBlur={markConfirmPasswordTouched}
                   placeholder={LL.BackupScreen.CloudBackup.confirmPasswordPlaceholder()}
                   error={confirmPasswordError}
+                  disabled={loading}
                   {...testProps("cloud-confirm-password-input")}
                 />
 
@@ -111,7 +124,7 @@ export const CloudBackupScreen: React.FC = () => {
         <View style={styles.buttonsContainer}>
           <GaloyPrimaryButton
             title={LL.BackupScreen.CloudBackup.continueButton()}
-            disabled={!isValid}
+            disabled={isContinueDisabled}
             loading={loading}
             onPress={handleBackup}
             {...testProps("cloud-backup-continue")}

@@ -23,7 +23,7 @@ export const AccountDonationButton: React.FC = () => {
       loading={loading}
       title={LL.SettingsScreen.donationButton()}
       leftGaloyIcon="donation-button"
-      rightIcon={<GaloyIcon name="arrow-square-out" size={20} color={colors.primary} />}
+      rightIcon={<GaloyIcon name="arrow-square-out" size={20} color={colors.accent} />}
       action={() => {
         Linking.openURL(getDonationButtonUrl(username))
       }}
