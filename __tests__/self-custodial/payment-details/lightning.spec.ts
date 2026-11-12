@@ -341,7 +341,11 @@ describe("createSelfCustodialLightningPaymentDetails", () => {
 
 describe("createSelfCustodialLightningPaymentDetails send-all", () => {
   const FEES_INCLUDED = 1
-  const balance = { amount: 100_000, currency: WalletCurrency.Btc, currencyCode: WalletCurrency.Btc }
+  const balance = {
+    amount: 100_000,
+    currency: WalletCurrency.Btc,
+    currencyCode: WalletCurrency.Btc,
+  }
   const lastFeeParams = () =>
     mockCreateGetFee.mock.calls[mockCreateGetFee.mock.calls.length - 1][0]
 

@@ -170,7 +170,11 @@ describe("sendAllFeePolicy", () => {
 })
 
 describe("createSelfCustodialOnchainPaymentDetails send-all", () => {
-  const balance = { amount: 100_000, currency: WalletCurrency.Btc, currencyCode: WalletCurrency.Btc }
+  const balance = {
+    amount: 100_000,
+    currency: WalletCurrency.Btc,
+    currencyCode: WalletCurrency.Btc,
+  }
   const lastPrepareParams = (mock: unknown) => {
     const { calls } = (mock as jest.Mock).mock
     return calls[calls.length - 1][0]
@@ -190,7 +194,9 @@ describe("createSelfCustodialOnchainPaymentDetails send-all", () => {
 
   it("offers none on the Dollar wallet", () => {
     const detail = createSelfCustodialOnchainPaymentDetails(
-      createParams({ sendingWalletDescriptor: { id: "w2", currency: WalletCurrency.Usd } }),
+      createParams({
+        sendingWalletDescriptor: { id: "w2", currency: WalletCurrency.Usd },
+      }),
     )
 
     expect(detail.canSendMax).toBe(false)
