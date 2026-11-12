@@ -141,6 +141,9 @@ export type RootStackParamList = {
   }
   sendBitcoinConfirmation: {
     paymentDetail: PaymentDetail<WalletCurrency>
+    /** The amount was picked on the slider: a send that goes out (sent or pending)
+     *  retires its hint. */
+    usedAmountSlider?: boolean
   }
   conversionDetails: undefined
   conversionConfirmation: {
