@@ -18,6 +18,7 @@ import {
   getUserSettings,
   initSdk,
   removeSdkEventListener,
+  SdkStorageRetiredError,
 } from "../bridge"
 import { storageDirFor } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
@@ -43,6 +44,7 @@ import {
   mergeOrderedTransactions,
 } from "../providers/wallet-snapshot"
 
+import { useLnurlServer } from "./use-lnurl-server"
 import { useSparkNetwork } from "./use-spark-network"
 
 type SdkLifecycleState = {
@@ -88,6 +90,7 @@ export const useSdkLifecycle = (
   retryCount: number,
 ): SdkLifecycleState => {
   const network = useSparkNetwork()
+  const { domain: lnurlDomain } = useLnurlServer()
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
   const [wallets, setWallets] = useState<WalletState[]>([])
   const [allTransactions, setAllTransactions] = useState<NormalizedTransaction[]>([])
@@ -214,16 +217,21 @@ export const useSdkLifecycle = (
   }, [resetBackoff, scheduleBackoffRetry])
 
   useEffect(() => {
+    /** All of this belongs to the account it was read for, paging included: the next
+     *  account starts from its own first page, and a page still loading for the previous
+     *  one must not hold its pagination back. */
+    setWallets([])
+    setAllTransactions([])
+    setHasMoreTransactions(false)
+    setLoadingMore(false)
+    rawTxOffsetRef.current = 0
+
     if (!activeSelfCustodialAccountId) {
       setStatus(ActiveWalletStatus.Unavailable)
-      setWallets([])
-      setAllTransactions([])
       return
     }
 
     setStatus(ActiveWalletStatus.Loading)
-    setWallets([])
-    setAllTransactions([])
 
     let mounted = true
     abortRef.current = false
@@ -235,6 +243,7 @@ export const useSdkLifecycle = (
         storageDir: storageDirFor(accountId, network),
         network,
         leewaySatPerVbyte: depositClaimLeewayRef.current,
+        lnurlDomain,
       })
       if (abortRef.current || !mounted) {
         await teardownSdk(connectedSdk, null)
@@ -281,11 +290,22 @@ export const useSdkLifecycle = (
     }
 
     const initialize = async () => {
-      const mnemonic = await KeyStoreWrapper.getMnemonicForAccount(accountId)
-      if (!mnemonic) {
+      const stored = await KeyStoreWrapper.readMnemonicWithStatus(accountId)
+      // A keystore that could not answer is not an account without a wallet.
+      // Unavailable is terminal for this account, so scoring a transient
+      // failure as such tells the user their wallet is gone, which Error does
+      // not. Recovery from here is not automatic though: the backoff retry is
+      // armed inside refreshWallets and gated on a live SDK, and this path
+      // never connected one.
+      if (stored.status === "failed") {
+        if (mounted) setStatus(ActiveWalletStatus.Error)
+        return
+      }
+      if (stored.status === "absent") {
         if (mounted) setStatus(ActiveWalletStatus.Unavailable)
         return
       }
+      const mnemonic = stored.value
 
       const networkValid = await validateStoredNetwork(accountId, network)
       if (!networkValid) {
@@ -293,11 +313,17 @@ export const useSdkLifecycle = (
         return
       }
 
-      if (mounted) setStatus(ActiveWalletStatus.Loading)
+      /** The account can change while the mnemonic and network are read: deleting a
+       *  wallet switches away from it first. A cancelled run must not connect at all,
+       *  or it writes the deleted wallet's lines past the log cut. */
+      if (!mounted) return
+      setStatus(ActiveWalletStatus.Loading)
       await connectAndListen(mnemonic)
     }
 
     initialize().catch((err) => {
+      // initSdk refused a wallet that is being deleted; nothing went wrong
+      if (err instanceof SdkStorageRetiredError) return
       logSdkEvent(SdkLogLevel.Error, `SDK init failed: ${err}`)
       reportError("SDK init", err)
       if (mounted) setStatus(ActiveWalletStatus.Error)
@@ -320,6 +346,13 @@ export const useSdkLifecycle = (
         reportError("SDK cleanup", err)
       })
     }
+    /* `lnurlDomain` is deliberately out of this array. It is a pure function of
+       `network`, which is in it, so in a release build it cannot change without also
+       changing something that already re-runs this. The one case that would move it
+       alone is the developer outage switch, and tearing down a connected wallet to
+       apply a debug toggle is a worse trade than asking for a reload — which is what
+       the developer screen's control says to do. */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [retryCount, refreshWallets, activeSelfCustodialAccountId, resetBackoff, network])
 
   useEffect(() => {
@@ -346,18 +379,27 @@ export const useSdkLifecycle = (
 
   // Pages are read by offset, so two reads in flight would both start at the same offset
   // and then both advance it, skipping a page. A caller that arrives while a page is loading
-  // gets that page's promise instead of a second read.
-  const loadMoreRef = useRef<Promise<boolean> | null>(null)
+  // gets that page's promise instead of a second read. The read is keyed by connection, so
+  // a page still loading for an account the user has left never holds up the new one.
+  const loadMoreRef = useRef<{
+    sdk: BreezSdkInterface
+    request: Promise<boolean>
+  } | null>(null)
 
   const loadMore = useCallback((): Promise<boolean> => {
-    if (loadMoreRef.current) return loadMoreRef.current
     const sdk = sdkRef.current
+    if (sdk && loadMoreRef.current?.sdk === sdk) return loadMoreRef.current.request
     if (!sdk || !hasMoreTransactions) return Promise.resolve(false)
+    /** A page asked of a connection that an account switch has since replaced belongs to
+     *  the account the user left: merging it would list that account's payments under the
+     *  new one, and settling it would end a page the new account may be loading itself. */
+    const isStale = () => sdkRef.current !== sdk
 
     const readPage = async (): Promise<boolean> => {
       setLoadingMore(true)
       try {
         const result = await loadMoreTransactions(sdk, rawTxOffsetRef.current)
+        if (isStale()) return false
         rawTxOffsetRef.current += result.rawCount
         setHasMoreTransactions(result.hasMore)
         setWallets((prev) => appendTransactions(prev, result.transactions))
@@ -367,14 +409,14 @@ export const useSdkLifecycle = (
         logSdkEvent(SdkLogLevel.Error, `Failed to load more transactions: ${err}`)
         return false
       } finally {
-        setLoadingMore(false)
+        if (!isStale()) setLoadingMore(false)
       }
     }
 
     const request = readPage().finally(() => {
-      loadMoreRef.current = null
+      if (loadMoreRef.current?.request === request) loadMoreRef.current = null
     })
-    loadMoreRef.current = request
+    loadMoreRef.current = { sdk, request }
     return request
   }, [hasMoreTransactions])
 

@@ -5,7 +5,8 @@ import {
   isOwnLnurlAddress,
   isRegtestNetwork,
   lnurlDomainFor,
-  lnurlServerUrlFor,
+  lnurlDomainsFor,
+  resolveLnurlServer,
   mismatchedNetworkLabel,
   networkForInstance,
   networkLabelFor,
@@ -138,32 +139,67 @@ describe("lnurlDomainFor", () => {
  * service (`pay.staging.blink.sv` fronts the payment app) and answers those routes with
  * its own 404, so pointing there would look like a healthy request that never lands.
  */
-describe("lnurlServerUrlFor", () => {
+describe("resolveLnurlServer", () => {
+  /** Pure in both arguments: no global to reset between these, which is the point of
+   *  taking the override rather than reading it. */
+  const real = (network: Network) => resolveLnurlServer(network, null)
+
   it("reaches the production LNURL server on mainnet", () => {
-    expect(lnurlServerUrlFor(Network.Mainnet)).toBe("https://blink.sv")
+    expect(real(Network.Mainnet).serverUrl).toBe("https://blink.sv")
   })
 
   it("reaches the staging LNURL server on regtest", () => {
-    expect(lnurlServerUrlFor(Network.Regtest)).toBe("https://staging.blink.sv")
+    expect(real(Network.Regtest).serverUrl).toBe("https://staging.blink.sv")
   })
 
   it("keeps mainnet and regtest on separate servers", () => {
-    expect(lnurlServerUrlFor(Network.Mainnet)).not.toBe(
-      lnurlServerUrlFor(Network.Regtest),
-    )
+    expect(real(Network.Mainnet).serverUrl).not.toBe(real(Network.Regtest).serverUrl)
   })
 
   /** Both deployments are public and TLS-terminated; a plain-http request would be
    *  sending a signed pubkey in the clear. */
   it("always speaks https", () => {
-    expect(lnurlServerUrlFor(Network.Mainnet)).toMatch(/^https:\/\//)
-    expect(lnurlServerUrlFor(Network.Regtest)).toMatch(/^https:\/\//)
+    expect(real(Network.Mainnet).serverUrl).toMatch(/^https:\/\//)
+    expect(real(Network.Regtest).serverUrl).toMatch(/^https:\/\//)
   })
 
   it("stays on the exact host the address is spelled with", () => {
     for (const network of [Network.Mainnet, Network.Regtest]) {
-      expect(lnurlServerUrlFor(network)).toBe(`https://${lnurlDomainFor(network)}`)
+      expect(real(network)).toEqual({
+        serverUrl: `https://${lnurlDomainFor(network)}`,
+        domain: lnurlDomainFor(network),
+      })
     }
+  })
+
+  describe("with a simulated outage host", () => {
+    it("points both halves at it", () => {
+      expect(resolveLnurlServer(Network.Mainnet, "127.0.0.1:1")).toEqual({
+        serverUrl: "http://127.0.0.1:1",
+        domain: "127.0.0.1:1",
+      })
+    })
+
+    it("drops to http, so the failure is a transport error and not a TLS one", () => {
+      expect(resolveLnurlServer(Network.Mainnet, "192.0.2.1").serverUrl).toMatch(
+        /^http:\/\//,
+      )
+    })
+
+    it("overrides the network, since a black hole has no network of its own", () => {
+      expect(resolveLnurlServer(Network.Mainnet, "192.0.2.1")).toEqual(
+        resolveLnurlServer(Network.Regtest, "192.0.2.1"),
+      )
+    })
+  })
+
+  /** The domains the app *recognises* as its own are a parsing rule, not a destination.
+   *  An outage must not reach them, or a scanned Blink pay code would stop being read as
+   *  naming one of our accounts. */
+  it("leaves the recognised-domain list alone", () => {
+    resolveLnurlServer(Network.Mainnet, "192.0.2.1")
+
+    expect(lnurlDomainsFor(Network.Mainnet)).not.toContain("192.0.2.1")
   })
 })
 
@@ -255,5 +291,89 @@ describe("isOwnLnurlAddress", () => {
     expect(isOwnLnurlAddress("alice@walletofsatoshi.com")).toBe(false)
     expect(isOwnLnurlAddress("lnurl1dp68gurn8ghj7um9wfmxj")).toBe(false)
     expect(isOwnLnurlAddress("")).toBe(false)
+  })
+})
+
+/** USDB is minted on mainnet only, and from 0.27 the SDK refuses to connect with a token
+ *  from another network, so regtest carries one only when the build names its own. */
+describe("Spark token per network", () => {
+  beforeEach(() => {
+    jest.resetModules()
+  })
+
+  const loadConfig = (env: Record<string, string> = {}) => {
+    jest.doMock("react-native-config", () => ({
+      SPARK_TOKEN_IDENTIFIER: "mainnet-token",
+      ...env,
+    }))
+    return require("@app/self-custodial/config")
+  }
+
+  it("uses the mainnet token on mainnet", () => {
+    const { sparkTokenIdentifierFor, hasSparkTokenFor } = loadConfig()
+
+    expect(sparkTokenIdentifierFor(Network.Mainnet)).toBe("mainnet-token")
+    expect(hasSparkTokenFor(Network.Mainnet)).toBe(true)
+  })
+
+  it("has no token on regtest by default, never the mainnet one", () => {
+    const { sparkTokenIdentifierFor, hasSparkTokenFor } = loadConfig()
+
+    expect(sparkTokenIdentifierFor(Network.Regtest)).toBeNull()
+    expect(hasSparkTokenFor(Network.Regtest)).toBe(false)
+  })
+
+  it("treats an empty regtest token as none", () => {
+    const { sparkTokenIdentifierFor } = loadConfig({ SPARK_REGTEST_TOKEN_IDENTIFIER: "" })
+
+    expect(sparkTokenIdentifierFor(Network.Regtest)).toBeNull()
+  })
+
+  it("uses the regtest token a build names", () => {
+    const { sparkTokenIdentifierFor, hasSparkTokenFor } = loadConfig({
+      SPARK_REGTEST_TOKEN_IDENTIFIER: "btknrt1-test",
+    })
+
+    expect(sparkTokenIdentifierFor(Network.Regtest)).toBe("btknrt1-test")
+    expect(sparkTokenIdentifierFor(Network.Mainnet)).toBe("mainnet-token")
+    expect(hasSparkTokenFor(Network.Regtest)).toBe(true)
+  })
+
+  /** Its caller only decides what to show; the SDK connect reports the misconfiguration. */
+  it("reports mainnet as having a token without validating the build", () => {
+    const { hasSparkTokenFor } = loadConfig({ SPARK_TOKEN_IDENTIFIER: "" })
+
+    expect(hasSparkTokenFor(Network.Mainnet)).toBe(true)
+  })
+
+  it("reads the mainnet token before any SDK is configured", () => {
+    const { sparkTokenIdentifier, requireSparkTokenIdentifier } = loadConfig()
+
+    expect(sparkTokenIdentifier()).toBe("mainnet-token")
+    expect(requireSparkTokenIdentifier()).toBe("mainnet-token")
+  })
+
+  it("follows the network the SDK was configured for", () => {
+    const { setSparkTokenNetwork, sparkTokenIdentifier } = loadConfig({
+      SPARK_REGTEST_TOKEN_IDENTIFIER: "btknrt1-test",
+    })
+
+    setSparkTokenNetwork(Network.Regtest)
+    expect(sparkTokenIdentifier()).toBe("btknrt1-test")
+
+    setSparkTokenNetwork(Network.Mainnet)
+    expect(sparkTokenIdentifier()).toBe("mainnet-token")
+  })
+
+  it("answers no token on a regtest SDK without one", () => {
+    const { setSparkTokenNetwork, sparkTokenIdentifier, requireSparkTokenIdentifier } =
+      loadConfig()
+
+    setSparkTokenNetwork(Network.Regtest)
+
+    expect(sparkTokenIdentifier()).toBeNull()
+    expect(() => requireSparkTokenIdentifier()).toThrow(
+      "No Spark token is configured for regtest",
+    )
   })
 })

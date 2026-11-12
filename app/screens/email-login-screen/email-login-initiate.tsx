@@ -41,7 +41,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderWidth: 2,
     borderBottomWidth: 2,
     paddingHorizontal: 10,
-    borderColor: colors.primary5,
+    borderColor: colors.accent4,
     borderRadius: 8,
   },
   errorContainer: {

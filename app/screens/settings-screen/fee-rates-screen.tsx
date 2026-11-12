@@ -102,7 +102,7 @@ const LoadingRow: React.FC = () => {
   } = useTheme()
   return (
     <View style={styles.feeRow}>
-      <ActivityIndicator testID="fee-rates-loading" animating color={colors.primary} />
+      <ActivityIndicator testID="fee-rates-loading" animating color={colors.accent} />
     </View>
   )
 }
@@ -353,7 +353,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 5,
   },
   sectionTitle: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 16,
     fontWeight: "400",
     lineHeight: 24,
@@ -375,10 +375,10 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   feeLabel: {
     flex: 1,
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
   feeValue: {
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "right",
     flexShrink: 0,
   },

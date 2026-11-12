@@ -17,9 +17,11 @@ import {
   PaymentRequestState,
   PaymentRequestStateType,
 } from "@app/screens/receive-bitcoin-screen/payment/index.types"
-import type {
-  ReceiveInvoiceInfo,
-  ReceivePaymentRequestState,
+import {
+  NewOnchainAddressResult,
+  type NewOnchainAddressResultType,
+  type ReceiveInvoiceInfo,
+  type ReceivePaymentRequestState,
 } from "@app/screens/receive-bitcoin-screen/payment/request-state.types"
 import {
   MoneyAmount,
@@ -80,6 +82,75 @@ const isSameGeneration = (a: GenerationInputs | null, b: GenerationInputs): bool
   a !== null && a.sdk === b.sdk && a.key === b.key
 
 /**
+ * How long one on-chain address request may take to get its answer from the SDK,
+ * counted from when the request ahead of it has its own answer. The SDK call has no
+ * timeout of its own, and without one a single hung call would stall every request
+ * behind it, a tap on New included, until the user leaves the screen.
+ */
+export const ONCHAIN_REQUEST_TIMEOUT_MS = 30_000
+
+/**
+ * The tail of each account's on-chain address queue. It belongs to the account, not to the
+ * receive screen or to one SDK connection: a request runs on after the screen that made it
+ * is gone, or after a reconnect has handed the account a new SDK, and whatever asks next
+ * has to start from where that request leaves the wallet. Otherwise it reads back the
+ * address a tap was replacing, shows it, and the late rotation then overwrites the record
+ * behind it. Different accounts never wait on each other.
+ */
+type OnchainQueue = {
+  /** Settles once the last request has stopped. The next SDK call waits for this. */
+  stopped: Promise<unknown>
+  /**
+   * Settles once the last request's caller has its answer, at its deadline at the latest.
+   * The next request's deadline starts here rather than at `stopped`, so a call that
+   * ignores its cancellation cannot leave the requests behind it with no deadline at all.
+   */
+  answered: Promise<unknown>
+}
+let onchainQueues = new Map<string, OnchainQueue>()
+
+/** Drops every queue. For test isolation: a request one spec leaves hanging would
+ *  otherwise hold up the next spec's requests on the same mock account. */
+export const resetOnchainRequestQueues = (): void => {
+  onchainQueues = new Map()
+}
+
+/** How one queued on-chain address request ended. */
+const OnchainRequestOutcome = {
+  Issued: "Issued",
+  // A newer request owns the screen, or this one ran out of time: nothing to report.
+  Skipped: "Skipped",
+  Failed: "Failed",
+} as const
+type OnchainRequestOutcomeType =
+  (typeof OnchainRequestOutcome)[keyof typeof OnchainRequestOutcome]
+
+/**
+ * One request's deadline. `signal` aborts once time is up, cancelling the SDK call;
+ * `settle` is called the moment the SDK has answered, after which the deadline no
+ * longer applies: the address exists, and the request goes on to record it.
+ */
+type OnchainRequestDeadline = { signal: AbortSignal; settle: () => void }
+
+/**
+ * Stops waiting on a read once `signal` aborts. Only for reads: the read itself runs
+ * on, which is harmless because it changes nothing.
+ */
+const unlessAborted = <T>(promise: Promise<T>, signal: AbortSignal): Promise<T> =>
+  new Promise<T>((resolve, reject) => {
+    const onAbort = () =>
+      reject(new Error("Self-custodial onchain address request aborted"))
+    if (signal.aborted) {
+      onAbort()
+      return
+    }
+    signal.addEventListener("abort", onAbort)
+    promise
+      .then(resolve, reject)
+      .finally(() => signal.removeEventListener("abort", onAbort))
+  })
+
+/**
  * The deposit marker the rotation decision is made against.
  *
  * The loaded history is one page deep, so it answers "has money arrived on-chain?"
@@ -110,11 +181,26 @@ const resolveDepositMarker = async (
 }
 
 export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
-  const { sdk, lastReceivedPaymentId, lightningAddress, allTransactions } =
-    useSelfCustodialWallet()
+  const {
+    sdk,
+    connectedAccountId,
+    lastReceivedPaymentId,
+    lightningAddress,
+    allTransactions,
+  } = useSelfCustodialWallet()
   const { activeAccount } = useAccountRegistry()
   const selfCustodialAccountId =
     activeAccount?.type === AccountType.SelfCustodial ? activeAccount.id : null
+  /**
+   * The account on-chain addresses are asked for and recorded under: the active one, once
+   * the SDK is connected as it. On the commit that switches accounts the provider still
+   * hands over the previous connection, and a request then would take one account's
+   * address and file it under the other.
+   */
+  const onchainAccountId =
+    selfCustodialAccountId !== null && connectedAccountId === selfCustodialAccountId
+      ? selfCustodialAccountId
+      : null
   const { wallets, isReady } = useActiveWallet()
   const { convertMoneyAmount } = usePriceConversion()
   const { formatMoneyAmount } = useDisplayCurrency()
@@ -143,7 +229,22 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
   const [memoChangeText, setMemoChangeText] = useState<string | null>(null)
   const [amount, setAmountState] = useState<MoneyAmount<WalletOrDisplayCurrency>>()
   const [paymentRequest, setPaymentRequest] = useState<string>()
-  const [onchainAddress, setOnchainAddress] = useState<string>()
+  /**
+   * The on-chain address on screen, and whether the newest request settled without one
+   * (so the screen stops waiting). Kept with the account it belongs to: the render that
+   * switches accounts already shows nothing, rather than the previous account's address.
+   */
+  const [onchainState, setOnchainState] = useState<{
+    accountId: string
+    address?: string
+    failed: boolean
+  } | null>(null)
+  const ownOnchainState =
+    onchainState !== null && onchainState.accountId === onchainAccountId
+      ? onchainState
+      : null
+  const onchainAddress = ownOnchainState?.address
+  const onchainAddressFailed = ownOnchainState?.failed ?? false
   const [requestState, setRequestState] = useState<PaymentRequestStateType>(
     PaymentRequestState.Idle,
   )
@@ -387,98 +488,229 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
   pendingDepositIdsRef.current = pendingDepositIds
   const pendingDepositKey = pendingDepositIds.join(",")
 
-  // Only the newest request may publish its address: this runs again whenever the
-  // marker or the pending-deposit list changes, so a slow request can otherwise land
-  // after the one that replaced it and show a superseded address.
+  /**
+   * Address requests run one at a time, in the order they were made. The SDK answers
+   * `newAddress: false` with whatever address is current when the call reaches it, so
+   * a request overlapping a rotation can come back with the address it replaced and
+   * put it back on screen. Run in order, each request starts from the one before it.
+   *
+   * The queue is the account's (see `onchainQueues`), so this holds across screens and
+   * reconnects too: a request left running by a screen the user backed out of still
+   * finishes first.
+   *
+   * Only the newest request may publish, unless it was the user asking for a fresh
+   * address: a background request queued behind another adds nothing the later one
+   * will not redo, but a tap must show the address it created. Neither publishes once
+   * the SDK or the account it ran for has been replaced.
+   */
   const onchainRequestIdRef = useRef(0)
+  const onchainOwnerRef = useRef({ sdk, accountId: onchainAccountId })
+  onchainOwnerRef.current = { sdk, accountId: onchainAccountId }
 
-  const issueOnchainAddress = useCallback(async () => {
-    if (!sdk) return
-    const pendingIds = pendingDepositIdsRef.current
-    onchainRequestIdRef.current += 1
-    const requestId = onchainRequestIdRef.current
+  // `forceNew` is the user asking for a fresh address: earlier addresses stay valid, so it
+  // skips the reuse checks and no more.
+  const requestOnchainAddress = useCallback(
+    async (
+      requestId: number,
+      forceNew: boolean,
+      { signal, settle }: OnchainRequestDeadline,
+    ): Promise<OnchainRequestOutcomeType> => {
+      const accountId = onchainAccountId
+      if (!sdk || !accountId) return OnchainRequestOutcome.Failed
+      const isSuperseded = () =>
+        onchainOwnerRef.current.sdk !== sdk ||
+        onchainOwnerRef.current.accountId !== accountId ||
+        (!forceNew && requestId !== onchainRequestIdRef.current)
+      if (signal.aborted || isSuperseded()) return OnchainRequestOutcome.Skipped
+      const pendingIds = pendingDepositIdsRef.current
 
-    const marker = await resolveDepositMarker(sdk, loadedDepositMarkerRef.current)
-
-    // Rotating is only worth anything if we can record that we did: without an account
-    // id there is nowhere to write, so every run would rotate again and remember
-    // nothing — a fresh address per render, and still no reuse detection. Serve the
-    // SDK's existing address instead and leave the tracking to the next run that has
-    // an account to key on. This state is transient, an account switch mid-render.
-    const canTrackReuse = selfCustodialAccountId !== null
-    const read = canTrackReuse
-      ? await readIssuedOnchainAddress(selfCustodialAccountId)
-      : null
-    const issued = read?.ok ? read.issued : null
-    const seenPendingIds = issued?.seenPendingDepositIds ?? []
-
-    /**
-     * Rotate only on positive evidence that this address has been used:
-     *
-     * - a `null` marker means neither the loaded history nor the SDK lookback behind
-     *   it could name an on-chain receipt (cold start, a reconnect, a failed refresh)
-     *   — "we do not know yet" is not "nothing has arrived", and treating it as such
-     *   rotated on every offline visit;
-     * - no stored record at all with receipts present is the first run after
-     *   upgrade, where the SDK's current address may well be the paid one, so we
-     *   rotate once rather than adopting it;
-     * - an unclaimed deposit we have not recorded means money is sitting on the
-     *   displayed address even though no payment exists for it yet.
-     */
-    const markerMoved = marker !== null && issued?.depositMarker !== marker
-    const hasUnseenPendingDeposit = pendingIds.some((id) => !seenPendingIds.includes(id))
-    const shouldRotate = canTrackReuse && (markerMoved || hasUnseenPendingDeposit)
-
-    const result = await createReceiveOnchain(sdk)({ newAddress: shouldRotate })
-    if (!result.address) {
-      // The adapter reports failures as an error-only result rather than throwing,
-      // so without this the address request would fail in complete silence.
-      recordAppError(
-        new Error(
-          `Self-custodial onchain address request returned no address: ${JSON.stringify(
-            result.errors ?? [],
-          )}`,
-        ),
+      const marker = await unlessAborted(
+        resolveDepositMarker(sdk, loadedDepositMarkerRef.current),
+        signal,
       )
-      return
-    }
-    if (requestId !== onchainRequestIdRef.current) return
 
-    setOnchainAddress(result.address)
-    if (!canTrackReuse) return
-    const saved = await saveIssuedOnchainAddress(selfCustodialAccountId, {
-      address: result.address,
-      // Never let a snapshot that has not loaded erase a marker we already had:
-      // the next refresh would otherwise read it back as a fresh deposit.
-      depositMarker: marker ?? issued?.depositMarker ?? null,
-      // Accepted cost: once this deposit is claimed it becomes a payment, the marker
-      // moves, and we rotate a second time — away from an address that was never
-      // used. One spare address, versus threading the deposit txid onto the shared
-      // transaction type to recognise the two views of the same deposit.
-      seenPendingDepositIds: mergeSeenPendingDepositIds(
-        issued?.seenPendingDepositIds,
-        pendingIds,
-      ),
-    })
-    /**
-     * A request is an address handed out, not a visit that shows the one issued before
-     * (the first address an account gets counts too, having no record to match). It
-     * counts once the record says so, while this request still owns the screen: a failed
-     * read cannot tell a new address from the last one, and a failed save would let the
-     * next visit count it again.
-     */
-    const isNewAddress = read?.ok === true && result.address !== issued?.address
-    if (saved && isNewAddress && requestId === onchainRequestIdRef.current) {
-      // eslint-disable-next-line camelcase
-      measure(ScEvent.PaymentRequestCreated, { rail: ScRail.Onchain, has_amount: false })
-    }
-  }, [sdk, selfCustodialAccountId])
+      const read = await unlessAborted(readIssuedOnchainAddress(accountId), signal)
+      const issued = read.ok ? read.issued : null
+      const seenPendingIds = issued?.seenPendingDepositIds ?? []
+
+      /**
+       * Rotate only on positive evidence that this address has been used:
+       *
+       * - a `null` marker means neither the loaded history nor the SDK lookback behind
+       *   it could name an on-chain receipt (cold start, a reconnect, a failed refresh)
+       *   — "we do not know yet" is not "nothing has arrived", and treating it as such
+       *   rotated on every offline visit;
+       * - no stored record at all with receipts present is the first run after
+       *   upgrade, where the SDK's current address may well be the paid one, so we
+       *   rotate once rather than adopting it;
+       * - an unclaimed deposit we have not recorded means money is sitting on the
+       *   displayed address even though no payment exists for it yet.
+       */
+      const markerMoved = marker !== null && issued?.depositMarker !== marker
+      const hasUnseenPendingDeposit = pendingIds.some(
+        (id) => !seenPendingIds.includes(id),
+      )
+      const shouldRotate = forceNew || markerMoved || hasUnseenPendingDeposit
+
+      // Out of time before the call went out: nothing has changed, so nothing to undo.
+      if (signal.aborted) return OnchainRequestOutcome.Skipped
+      const result = await createReceiveOnchain(sdk, { signal })({
+        newAddress: shouldRotate,
+      })
+      // An answer after the deadline is not shown: the timeout has already reported this
+      // request, and the caller told the user it failed.
+      const abandoned = signal.aborted
+      if (!abandoned) settle()
+      if (!result.address) {
+        if (abandoned) return OnchainRequestOutcome.Skipped
+        // The adapter reports failures as an error-only result rather than throwing,
+        // so without this the address request would fail in complete silence.
+        recordAppError(
+          new Error(
+            `Self-custodial onchain address request returned no address: ${JSON.stringify(
+              result.errors ?? [],
+            )}`,
+          ),
+        )
+        return OnchainRequestOutcome.Failed
+      }
+      // Too late, a newer request is queued behind this one and will publish from where it
+      // ends, or the SDK or account changed under it. If this one rotated, the wallet has
+      // moved on regardless, so it still records the address, under the account it ran
+      // for: otherwise the next request reads the old record and rotates again.
+      const superseded = abandoned || isSuperseded()
+      if (superseded && !shouldRotate) return OnchainRequestOutcome.Skipped
+      const outcome = superseded
+        ? OnchainRequestOutcome.Skipped
+        : OnchainRequestOutcome.Issued
+
+      if (!superseded) {
+        setOnchainState({ accountId, address: result.address, failed: false })
+      }
+      const saved = await saveIssuedOnchainAddress(accountId, {
+        address: result.address,
+        // Never let a snapshot that has not loaded erase a marker we already had:
+        // the next refresh would otherwise read it back as a fresh deposit.
+        depositMarker: marker ?? issued?.depositMarker ?? null,
+        // Accepted cost: once this deposit is claimed it becomes a payment, the marker
+        // moves, and we rotate a second time — away from an address that was never
+        // used. One spare address, versus threading the deposit txid onto the shared
+        // transaction type to recognise the two views of the same deposit.
+        seenPendingDepositIds: mergeSeenPendingDepositIds(
+          issued?.seenPendingDepositIds,
+          pendingIds,
+        ),
+      })
+      /**
+       * A request is an address handed out, not a visit that shows the one issued before
+       * (the first address an account gets counts too, having no record to match). It
+       * counts once the record says so, while this request still owns the screen: a failed
+       * read cannot tell a new address from the last one, and a failed save would let the
+       * next visit count it again.
+       */
+      const isNewAddress = read.ok && result.address !== issued?.address
+      const stillOnScreen =
+        !superseded && !isSuperseded() && requestId === onchainRequestIdRef.current
+      if (saved && isNewAddress && stillOnScreen) {
+        measure(ScEvent.PaymentRequestCreated, {
+          rail: ScRail.Onchain,
+          // eslint-disable-next-line camelcase
+          has_amount: false,
+        })
+      }
+      return outcome
+    },
+    [sdk, onchainAccountId],
+  )
+
+  const issueOnchainAddress = useCallback(
+    (forceNew = false): Promise<OnchainRequestOutcomeType> => {
+      onchainRequestIdRef.current += 1
+      const requestId = onchainRequestIdRef.current
+      const accountId = onchainAccountId
+      const markFailed = () => {
+        if (!accountId || requestId !== onchainRequestIdRef.current) return
+        setOnchainState((prev) => ({
+          accountId,
+          address: prev?.accountId === accountId ? prev.address : undefined,
+          failed: true,
+        }))
+      }
+      const controller = new AbortController()
+      // The caller hears back at the deadline, even while the request is still stopping.
+      const timedOut = new Promise<OnchainRequestOutcomeType>((resolve) => {
+        controller.signal.addEventListener("abort", () =>
+          resolve(OnchainRequestOutcome.Failed),
+        )
+      })
+      let timer: ReturnType<typeof setTimeout> | undefined
+      let deadlineOver = false
+      const startDeadline = () => {
+        if (timer !== undefined || deadlineOver) return
+        timer = setTimeout(() => {
+          recordAppError(
+            new Error(
+              `Self-custodial onchain address request timed out after ${ONCHAIN_REQUEST_TIMEOUT_MS}ms`,
+            ),
+          )
+          controller.abort()
+        }, ONCHAIN_REQUEST_TIMEOUT_MS)
+      }
+      const endDeadline = () => {
+        deadlineOver = true
+        clearTimeout(timer)
+      }
+      const queue = accountId ? onchainQueues.get(accountId) : undefined
+      // The clock starts once the request ahead has its answer, even if it has not stopped:
+      // a request that runs out of time waiting skips the SDK when its turn comes.
+      const answeredAhead = queue?.answered ?? Promise.resolve()
+      const stoppedAhead = queue?.stopped ?? Promise.resolve()
+      answeredAhead.then(startDeadline)
+      const request = stoppedAhead.then(async () => {
+        startDeadline()
+        try {
+          return await requestOnchainAddress(requestId, forceNew, {
+            signal: controller.signal,
+            settle: endDeadline,
+          })
+        } catch (err) {
+          // The timeout has already answered the caller and reported it.
+          if (controller.signal.aborted) return OnchainRequestOutcome.Skipped
+          throw err
+        } finally {
+          endDeadline()
+        }
+      })
+      const answer = Promise.race([request, timedOut])
+      // The queue waits for the request itself, not its deadline: one that ran out of
+      // time is cancelled, and the next starts only once it has stopped, so it can no
+      // longer move the wallet to another address behind the next one's back. A failed
+      // request must not stall the ones queued behind it either.
+      if (accountId) {
+        onchainQueues.set(accountId, {
+          stopped: request.catch(() => undefined),
+          answered: answer.catch(() => undefined),
+        })
+      }
+      return answer.then(
+        (outcome) => {
+          if (outcome === OnchainRequestOutcome.Failed) markFailed()
+          return outcome
+        },
+        (err) => {
+          markFailed()
+          throw err
+        },
+      )
+    },
+    [onchainAccountId, requestOnchainAddress],
+  )
 
   // Runs on mount and again whenever an on-chain receipt or an unclaimed deposit
   // lands — covering both "the deposit arrived while the QR was on screen" and "it
   // arrived while the app was closed". Re-saving the record keeps this idempotent.
   useEffect(() => {
-    if (!sdk) return
+    if (!sdk || !onchainAccountId) return
     issueOnchainAddress().catch((err) => {
       recordAppError(
         err instanceof Error
@@ -491,7 +723,25 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
     return () => {
       onchainRequestIdRef.current += 1
     }
-  }, [sdk, issueOnchainAddress, loadedDepositMarker, pendingDepositKey])
+  }, [sdk, onchainAccountId, issueOnchainAddress, loadedDepositMarker, pendingDepositKey])
+
+  const generateNewOnchainAddress =
+    useCallback(async (): Promise<NewOnchainAddressResultType> => {
+      try {
+        // A tap is never superseded, so anything short of Issued means no new address.
+        const outcome = await issueOnchainAddress(true)
+        return outcome === OnchainRequestOutcome.Issued
+          ? NewOnchainAddressResult.Created
+          : NewOnchainAddressResult.Failed
+      } catch (err) {
+        recordAppError(
+          err instanceof Error
+            ? err
+            : new Error(`Self-custodial new onchain address failed: ${err}`),
+        )
+        return NewOnchainAddressResult.Failed
+      }
+    }, [issueOnchainAddress])
 
   useEffect(() => {
     if (!sdk) return
@@ -580,6 +830,9 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
     [onchainAddress, amountInSats, memo],
   )
 
+  /** `convertMoneyAmount` is undefined only while a price source is still trying; once
+   *  they have all settled it falls back to sats, so this is a bootstrap gate rather
+   *  than a dead end for a wallet nothing can price. */
   if (!sdk || !btcWallet || !convertMoneyAmount) return null
 
   const buildInvoiceData = (): ReceiveInvoiceInfo | undefined => {
@@ -636,7 +889,9 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
     feesInformation: undefined,
     info: invoiceData ? { data: invoiceData } : undefined,
     onchainAddress,
+    onchainAddressFailed,
     getOnchainFullUriFn,
+    generateNewOnchainAddress,
     pr: {
       state: requestState,
       info: { data: invoiceData },

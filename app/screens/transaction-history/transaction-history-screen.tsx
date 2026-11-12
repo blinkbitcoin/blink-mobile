@@ -323,6 +323,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     lastSeenUsdId,
     latestBtcTxId,
     latestUsdTxId,
+    isNewEnoughToAnnounce,
     markTxSeen,
   } = useTransactionSeenState({
     accountId: accountId || "",
@@ -350,6 +351,11 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
       return
     }
 
+    /** Only the custodial cache read can land after the first render, so only it fills
+     *  in an id the baseline is missing. The device store is there from the start: an
+     *  empty id is that baseline, and a later one could only be this screen's own mark. */
+    if (activeWallet.isSelfCustodial) return
+
     const missingBtc = !highlightBaselineLastSeen.btcId && lastSeenBtcId
     const missingUsd = !highlightBaselineLastSeen.usdId && lastSeenUsdId
 
@@ -359,7 +365,13 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
         usdId: missingUsd ? lastSeenUsdId : highlightBaselineLastSeen.usdId,
       })
     }
-  }, [loading, highlightBaselineLastSeen, lastSeenBtcId, lastSeenUsdId])
+  }, [
+    loading,
+    highlightBaselineLastSeen,
+    lastSeenBtcId,
+    lastSeenUsdId,
+    activeWallet.isSelfCustodial,
+  ])
 
   const lastSeenIdForAll = React.useMemo(() => {
     if (!highlightBaselineLastSeen?.btcId || !highlightBaselineLastSeen?.usdId) return ""
@@ -403,6 +415,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
         settlementCurrency === WalletCurrency.Btc ? latestBtcTxId : latestUsdTxId
 
       if (activeWallet.isSelfCustodial) {
+        if (!isNewEnoughToAnnounce({ createdAt })) return false
         return shouldHighlightByTimestamp({
           createdAt,
           baselineCreatedAt:
@@ -433,6 +446,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
       latestUsdTxId,
       activeWallet.isSelfCustodial,
       lastSeenCreatedAt,
+      isNewEnoughToAnnounce,
     ],
   )
 
@@ -768,7 +782,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   sectionHeaderText: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     lineHeight: 18,
   },

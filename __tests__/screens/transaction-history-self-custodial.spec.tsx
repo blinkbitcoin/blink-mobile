@@ -17,13 +17,13 @@ import { flushEffects } from "../helpers/flush-effects"
 
 jest.mock("@rn-vui/themed", () => {
   const colors: Record<string, string> = {
-    grey0: "#ccc",
-    grey1: "#aaa",
-    grey2: "#999",
-    grey5: "#f5f5f5",
-    primary: "#fc5805",
-    black: "#000",
-    white: "#fff",
+    textPrimary: "#ccc",
+    textSecondary: "#aaa",
+    textMuted: "#999",
+    surfaceInteractive: "#f5f5f5",
+    accent: "#fc5805",
+    textOnBackground: "#000",
+    backgroundDefault: "#fff",
   }
   return {
     makeStyles:
@@ -47,7 +47,12 @@ jest.mock("@app/components/screen", () => ({
 }))
 
 jest.mock("@app/components/transaction-item", () => ({
-  MemoizedTransactionItem: () => null,
+  MemoizedTransactionItem: ({ txid, highlight }: { txid: string; highlight?: boolean }) =>
+    React.createElement(
+      "Text",
+      { testID: `tx-${txid}` },
+      highlight ? "highlight" : "no-highlight",
+    ),
   useDescriptionDisplay: () => "",
 }))
 
@@ -85,16 +90,29 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (...args: unknown[]) => mockReportError(...args),
 }))
 
+/** Re-renders its readers on every update, as the real provider does, so a test sees what
+ *  the screen does with its own writes and not only the state it started from. */
 let mockPersistentState: PersistentState
+const mockPersistentStateListeners = new Set<() => void>()
 const mockUpdateState = jest.fn((updater: (prev: PersistentState) => PersistentState) => {
   mockPersistentState = updater(mockPersistentState)
+  mockPersistentStateListeners.forEach((rerender) => rerender())
 })
-jest.mock("@app/store/persistent-state", () => ({
-  usePersistentStateContext: () => ({
-    persistentState: mockPersistentState,
-    updateState: mockUpdateState,
-  }),
-}))
+jest.mock("@app/store/persistent-state", () => {
+  const { useEffect, useReducer } = jest.requireActual<typeof import("react")>("react")
+  return {
+    usePersistentStateContext: () => {
+      const [, rerender] = useReducer((count: number) => count + 1, 0)
+      useEffect(() => {
+        mockPersistentStateListeners.add(rerender)
+        return () => {
+          mockPersistentStateListeners.delete(rerender)
+        }
+      }, [])
+      return { persistentState: mockPersistentState, updateState: mockUpdateState }
+    },
+  }
+})
 
 const custodialQueryWithData = {
   data: {
@@ -293,9 +311,12 @@ describe("TransactionHistoryScreen — self-custodial behavior", () => {
     mockSelfCustodialState.allTransactions = []
     mockSelfCustodialState.hasMore = false
     mockToTransactionFragments.mockReturnValue([])
+    /** An account that already has its seen record, so these tests read the seen state
+     *  itself rather than the start of a new or restored account. */
     mockPersistentState = {
       ...defaultPersistentState,
       activeAccountId: SELF_CUSTODIAL_ACCOUNT_ID,
+      txLastSeenByAccountId: { [SELF_CUSTODIAL_ACCOUNT_ID]: { btcId: "", usdId: "" } },
     }
     mockUseApolloClient.mockReturnValue({
       cache: {
@@ -491,6 +512,45 @@ describe("TransactionHistoryScreen — self-custodial behavior", () => {
 
       expect(mockPersistentState.txLastSeenByAccountId).toEqual({
         [SELF_CUSTODIAL_ACCOUNT_ID]: { btcId: "sc-btc-new", usdId: "sc-usd-new" },
+      })
+    })
+
+    describe("after a restore", () => {
+      /** The record a restore starts: no ids yet, and a cutoff at 10s. */
+      const restoredRecord = { btcId: "", usdId: "", announceSinceMs: 10_000 }
+
+      const renderRestoredHistory = (receive: ReturnType<typeof buildFragment>) => {
+        mockPersistentState = {
+          ...mockPersistentState,
+          txLastSeenByAccountId: { [SELF_CUSTODIAL_ACCOUNT_ID]: restoredRecord },
+        }
+        mockSelfCustodialState.allTransactions = [
+          { id: receive.id, amount: { currency: "BTC" }, timestamp: receive.createdAt },
+        ]
+        mockToTransactionFragments.mockReturnValue([receive])
+        setActiveWallet(true)
+
+        return render(<TransactionHistoryScreen route={route} />)
+      }
+
+      it("does not highlight or mark seen a receive from before the record started", async () => {
+        const { getByTestId } = renderRestoredHistory(
+          buildFragment("sc-btc-replayed", "BTC", 9),
+        )
+        await flushEffects()
+
+        expect(getByTestId("tx-sc-btc-replayed").props.children).toBe("no-highlight")
+        expect(getTxLastSeenIds(mockPersistentState)).toEqual(restoredRecord)
+      })
+
+      it("highlights and marks seen a receive from after the record started", async () => {
+        const { getByTestId } = renderRestoredHistory(
+          buildFragment("sc-btc-after", "BTC", 11),
+        )
+        await flushEffects()
+
+        expect(getByTestId("tx-sc-btc-after").props.children).toBe("highlight")
+        expect(getTxLastSeenIds(mockPersistentState).btcId).toBe("sc-btc-after")
       })
     })
 

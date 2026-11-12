@@ -7,7 +7,11 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
-import { headerRightNoGlass, noHeaderRight } from "@app/components/header-no-glass"
+import {
+  HEADER_ICON_TOUCH_SIZE,
+  headerRightNoGlass,
+  noHeaderRight,
+} from "@app/components/header-no-glass"
 import { WarningCard } from "@app/components/warning-card"
 import { MnemonicWordsGrid } from "@app/components/mnemonic-words-grid"
 import { Screen } from "@app/components/screen"
@@ -22,9 +26,6 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { testProps } from "@app/utils/testProps"
 
 import { useViewBackupPhrase } from "../hooks"
-
-// The clear tertiary button has no padding, so its hit area is the text bounds.
-const HEADER_BUTTON_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 }
 
 type ViewBackupPhraseContentProps = {
   isAuthenticated: boolean
@@ -43,7 +44,7 @@ const ViewBackupPhraseContent: React.FC<ViewBackupPhraseContentProps> = ({
   if (!isAuthenticated) {
     return (
       <Screen preset="fixed">
-        <ActivityIndicator style={styles.loader} color={colors.primary} />
+        <ActivityIndicator style={styles.loader} color={colors.accent} />
       </Screen>
     )
   }
@@ -71,7 +72,6 @@ const BackupPhraseContent: React.FC = () => {
           title={copyLabel}
           onPress={handleCopy}
           containerStyle={styles.headerButton}
-          hitSlop={HEADER_BUTTON_HIT_SLOP}
           {...testProps("backup-phrase-copy")}
           accessibilityLabel={copyLabel}
         />
@@ -143,8 +143,14 @@ const useStyles = makeStyles(() => ({
     paddingBottom: 20,
     gap: 20,
   },
+  // The header touch box. `hitSlop` can't reach past the native header item, so the
+  // box itself grows, its text kept against the right edge where it was.
   headerButton: {
     marginRight: 16,
+    minWidth: HEADER_ICON_TOUCH_SIZE,
+    minHeight: HEADER_ICON_TOUCH_SIZE,
+    alignItems: "flex-end",
+    justifyContent: "center",
   },
   buttonsContainer: {
     gap: 10,

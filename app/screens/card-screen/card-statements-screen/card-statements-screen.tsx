@@ -51,7 +51,7 @@ export const CardStatementsScreen: React.FC = () => {
           <ActivityIndicator
             testID="activity-indicator"
             size="large"
-            color={colors.primary}
+            color={colors.accent}
           />
         </View>
       </Screen>
@@ -197,7 +197,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 3,
   },
   sectionLabel: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
@@ -206,7 +206,7 @@ const useStyles = makeStyles(({ colors }) => ({
   currentStatementCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     paddingHorizontal: 14,
     paddingVertical: 18,
@@ -217,17 +217,17 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
   },
   currentStatementLabel: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 12,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
     lineHeight: 18,
   },
   currentStatementValue: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 18,
     fontFamily: "Source Sans Pro",
-    fontWeight: "600",
+    fontWeight: "700",
     lineHeight: 24,
   },
   statementsContainer: {

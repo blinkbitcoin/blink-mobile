@@ -3,6 +3,7 @@ import {
   createListPendingDeposits,
   parseDepositId,
 } from "@app/self-custodial/adapters/deposit"
+import { DepositClaimDeferral, DepositErrorReason } from "@app/types/payment"
 
 const mockListDeposits = jest.fn()
 const mockClaimDeposit = jest.fn()
@@ -37,6 +38,32 @@ describe("createListPendingDeposits", () => {
     expect(result.deposits).toHaveLength(1)
     expect(result.deposits[0].id).toBe("abc:0")
     expect(result.deposits[0].status).toBe("claimable")
+  })
+
+  it("leaves out deposits claimed early that the balance already holds", async () => {
+    const early = (txid: string, earlyClaim: string, isMature = false) => ({
+      txid,
+      vout: 0,
+      amountSats: 3000,
+      isMature,
+      claimError: null,
+      hasRefund: false,
+      earlyClaim,
+    })
+    mockListDeposits.mockResolvedValue([
+      early("credited", "credited"),
+      early("settling", "settling"),
+      early("settling-mature", "settling", true),
+      early("waiting", "none"),
+    ])
+
+    const result = await createListPendingDeposits(mockSdk)()
+
+    expect(result.deposits.map(({ id, status }) => [id, status])).toEqual([
+      ["settling:0", "claiming"],
+      ["settling-mature:0", "claiming"],
+      ["waiting:0", "immature"],
+    ])
   })
 
   it("returns immature status for unconfirmed deposits", async () => {
@@ -110,7 +137,7 @@ describe("createClaimDeposit", () => {
   beforeEach(() => jest.clearAllMocks())
 
   it("claims deposit successfully", async () => {
-    mockClaimDeposit.mockResolvedValue(undefined)
+    mockClaimDeposit.mockResolvedValue({ status: "settled" })
 
     const adapter = createClaimDeposit(mockSdk)
     const result = await adapter.claimDeposit({ depositId: "abc:0" })
@@ -119,6 +146,77 @@ describe("createClaimDeposit", () => {
     expect(mockClaimDeposit).toHaveBeenCalledWith(
       expect.objectContaining({ txid: "abc", vout: 0 }),
     )
+  })
+
+  it("reports an early claim that was submitted as pending, not claimed", async () => {
+    mockClaimDeposit.mockResolvedValue({ status: "submitted" })
+
+    const result = await createClaimDeposit(mockSdk).claimDeposit({ depositId: "abc:0" })
+
+    expect(result).toEqual({ status: "pending" })
+  })
+
+  it("fails a claim deferred over the fee cap, carrying the fee it needs", async () => {
+    mockClaimDeposit.mockResolvedValue({
+      status: "deferred",
+      reason: "fee_exceeded",
+      requiredFeeSats: 420,
+    })
+
+    const result = await createClaimDeposit(mockSdk).claimDeposit({ depositId: "abc:0" })
+
+    expect(result.status).toBe("failed")
+    expect(result.deferral).toBe(DepositClaimDeferral.FeeExceeded)
+    expect(result.requiredFeeSats).toBe(420)
+  })
+
+  it("fails a claim deferred until the deposit confirms", async () => {
+    mockClaimDeposit.mockResolvedValue({
+      status: "deferred",
+      reason: "awaiting_confirmations",
+    })
+
+    const result = await createClaimDeposit(mockSdk).claimDeposit({ depositId: "abc:0" })
+
+    expect(result.status).toBe("failed")
+    expect(result.deferral).toBe(DepositClaimDeferral.AwaitingConfirmations)
+  })
+
+  it("fails a claim the provider declined, with its message", async () => {
+    mockClaimDeposit.mockResolvedValue({
+      status: "deferred",
+      reason: "provider_declined",
+      message: "quote expired",
+    })
+
+    const result = await createClaimDeposit(mockSdk).claimDeposit({ depositId: "abc:0" })
+
+    expect(result.status).toBe("failed")
+    expect(result.deferral).toBe(DepositClaimDeferral.ProviderDeclined)
+    expect(result.errors?.[0].message).toBe("quote expired")
+  })
+
+  it("reports a claim the SDK is already running as pending, not failed", async () => {
+    mockClaimDeposit.mockRejectedValue({
+      tag: "DepositClaimInProgress",
+      inner: { tx: "abc", vout: 0 },
+    })
+
+    const result = await createClaimDeposit(mockSdk).claimDeposit({ depositId: "abc:0" })
+
+    expect(result).toEqual({ status: "pending" })
+  })
+
+  it("reports a deposit too small to claim after fees as below dust", async () => {
+    mockClaimDeposit.mockRejectedValue({
+      tag: "DepositTooSmall",
+      inner: { tx: "abc", vout: 0, docsUrl: "" },
+    })
+
+    const result = await createClaimDeposit(mockSdk).claimDeposit({ depositId: "abc:0" })
+
+    expect(result.status).toBe("failed")
+    expect(result.errorReason).toBe(DepositErrorReason.BelowDust)
   })
 
   it("returns failed on error", async () => {

@@ -58,7 +58,7 @@ export const MigrationExplainerScreen: React.FC = () => {
     >
       <IconHero
         icon="key-outline"
-        iconColor={colors.black}
+        iconColor={colors.textOnBackground}
         title={LL.AccountMigration.explainerTitle()}
       />
       <RevealedCheckboxList

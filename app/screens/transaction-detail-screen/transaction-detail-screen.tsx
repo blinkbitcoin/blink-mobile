@@ -77,7 +77,7 @@ const Row = ({ label, value, small, link, onPress, onLongPress }: RowProps) => {
       accessibilityRole={onPress ? "button" : undefined}
       testID={label}
     >
-      <Text type="p3" color={colors.grey1} style={styles.rowLabel}>
+      <Text type="p3" color={colors.textSecondary} style={styles.rowLabel}>
         {label}
       </Text>
       <Text
@@ -297,7 +297,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   name="arrow-left"
                   size={24}
                   weight="bold"
-                  color={colors.black}
+                  color={colors.textOnBackground}
                 />
               </Pressable>
               <GaloyIconButton
@@ -519,7 +519,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 <GaloyIcon
                   name={isReceive ? "receive" : "send"}
                   size={32}
-                  color={isReceive ? colors._green : colors.primary}
+                  color={isReceive ? colors._green : colors.accent}
                 />
               </View>
               <View style={styles.heroText}>
@@ -574,7 +574,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
             </View>
 
             {onChainTxNotBroadcasted && (
-              <GaloyInfo backgroundColor={colors.grey7}>
+              <GaloyInfo backgroundColor={colors.surfaceStatic}>
                 {LL.TransactionDetailScreen.txNotBroadcast({ countdown })}
               </GaloyInfo>
             )}
@@ -641,7 +641,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
               <GaloyIcon
                 name={advancedOpen ? "caret-down" : "caret-right"}
                 size={16}
-                color={colors.black}
+                color={colors.textOnBackground}
               />
               <Text type="p3">{LL.common.advanced()}</Text>
             </Pressable>
@@ -743,14 +743,19 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
           accessibilityRole="button"
           accessibilityLabel={LL.common.back()}
         >
-          <GaloyIcon name="arrow-left" size={24} weight="bold" color={colors.black} />
+          <GaloyIcon
+            name="arrow-left"
+            size={24}
+            weight="bold"
+            color={colors.textOnBackground}
+          />
         </Pressable>
 
         <View style={[styles.closeButton, { top: insets.top + 14 }]}>
           <GaloyIconButton
             name="close"
             size="medium"
-            backgroundColor={colors.grey5}
+            backgroundColor={colors.surfaceInteractive}
             onPress={navigation.goBack}
           />
         </View>
@@ -850,7 +855,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   card: {
-    backgroundColor: colors.grey7,
+    backgroundColor: colors.surfaceStatic,
     borderRadius: 8,
     padding: 14,
     gap: 14,
@@ -890,7 +895,7 @@ const useStyles = makeStyles(({ colors }) => ({
   buttonGroup: {
     paddingHorizontal: 20,
     paddingTop: 10,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
   },
 
   resolveContainer: {
@@ -906,6 +911,6 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   amountDetailsContainer: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
 }))

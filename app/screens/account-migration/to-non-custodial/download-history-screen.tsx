@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react"
+import { Platform } from "react-native"
 
 import { useTheme } from "@rn-vui/themed"
 
@@ -15,6 +16,12 @@ import { StepLayout } from "@app/components/step-layout"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
+
+/** Android's share chooser reports success as soon as the user picks a target app, before
+ *  that app saves or sends the file, so a cancelled Drive or Gmail upload still reads as
+ *  a download. iOS reports from the activity's own completion, so only Android keeps a way
+ *  to download again once the primary CTA has moved on to Continue. */
+const canRedownloadAfterExport = (): boolean => Platform.OS === "android"
 
 export const MigrationDownloadHistoryScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -36,13 +43,12 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
    *  optional step. Skip only waits on the routing's own reads, and a failed one answers
    *  the tap with a retry rather than holding the button off. */
   const isDownloadDisabled = isBusy || !areWalletsReady
-  const secondaryButtonTitle = hasDownloaded ? LL.common.continue() : LL.common.skip()
 
   const handleDownload = useCallback(async () => {
     setIsDownloading(true)
     try {
       /** A dismissed share sheet resolves false: not an error, but not a download
-       *  either, so the secondary action keeps reading Skip. */
+       *  either, so the screen stays on Download + Skip. */
       const hasShared = await exportCsv(walletIds)
       if (hasShared) setHasDownloaded(true)
     } catch (err) {
@@ -58,24 +64,41 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
       footer={
         <>
           <GaloyPrimaryButton
-            title={LL.AccountMigration.downloadHistoryDownloadCta()}
-            loading={isDownloading}
-            disabled={isDownloadDisabled}
-            onPress={handleDownload}
+            title={
+              hasDownloaded
+                ? LL.common.continue()
+                : LL.AccountMigration.downloadHistoryDownloadCta()
+            }
+            loading={!hasDownloaded && isDownloading}
+            disabled={hasDownloaded ? isBusy : isDownloadDisabled}
+            onPress={hasDownloaded ? continuePastHistory : handleDownload}
             {...testProps("migration-download-history-cta")}
           />
-          <GaloySecondaryButton
-            title={secondaryButtonTitle}
-            disabled={isBusy}
-            onPress={continuePastHistory}
-            {...testProps("migration-download-history-continue")}
-          />
+          {/** Once the history is downloaded the primary CTA is the way forward, so the
+           *  screen drops Skip rather than offering it twice. */}
+          {!hasDownloaded && (
+            <GaloySecondaryButton
+              title={LL.common.skip()}
+              disabled={isBusy}
+              onPress={continuePastHistory}
+              {...testProps("migration-download-history-continue")}
+            />
+          )}
+          {hasDownloaded && canRedownloadAfterExport() && (
+            <GaloySecondaryButton
+              title={LL.AccountMigration.downloadHistoryDownloadCta()}
+              loading={isDownloading}
+              disabled={isDownloadDisabled}
+              onPress={handleDownload}
+              {...testProps("migration-download-history-redownload")}
+            />
+          )}
         </>
       }
     >
       <IconHero
         icon="clock"
-        iconColor={colors.primary}
+        iconColor={colors.accent}
         title={LL.AccountMigration.downloadHistoryTitle()}
         subtitle={LL.AccountMigration.downloadHistoryBody()}
       />

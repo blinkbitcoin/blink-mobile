@@ -140,6 +140,19 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
 
 jest.mock("@app/self-custodial/bridge", () => ({
   disconnectSdk: jest.fn(),
+  retireSdkStorage: jest.fn(),
+  readmitSdkStorage: jest.fn(),
+  waitForSdkIdle: async () => true,
+}))
+
+jest.mock("@app/self-custodial/diagnostics/sdk-log-files", () => ({
+  resetSdkLogs: async () => undefined,
+}))
+
+jest.mock("@app/self-custodial/storage/storage-removal", () => ({
+  markStorageForRemoval: async () => undefined,
+  removeMarkedStorage: async () => undefined,
+  unmarkStorageForRemoval: async () => undefined,
 }))
 
 /** The one wallet the device stores, open in the app, so deleting it deletes the last one. */
@@ -233,8 +246,10 @@ const listedWalletIds = async (): Promise<ReadonlyArray<string>> => {
   return listed.entries.map(({ id }) => id)
 }
 
+/** A wallet an earlier release stored: its seed is still in the legacy keychain, since this
+ *  release writes seeds to the new store and only a read moves an old one across. */
 const storeWallet = async (id: string) => {
-  await KeyStoreWrapper.setMnemonicForAccount(id, SEED)
+  mockLegacyKeychain.items.set(`mnemonic:${id}`, SEED)
   await addSelfCustodialAccountId(id)
 }
 

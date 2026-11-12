@@ -63,7 +63,12 @@ export const TotpSetting: React.FC = () => {
     navigate("totpDeleteValidate")
   }, [isCodeRequested, navigate])
 
-  const openSetup = useCallback(() => navigate("totpRegistrationInitiate"), [navigate])
+  /** Straight to the setup key: who opens it here usually knows authenticator apps,
+   *  and the screen offers the onboarding to anyone who does not. */
+  const openSetup = useCallback(
+    () => navigate("totpRegistrationInitiate", { offersOnboarding: true }),
+    [navigate],
+  )
 
   if (activeAccount?.type === AccountType.SelfCustodial) return null
 

@@ -30,13 +30,15 @@ export const UnclaimedDepositBanner: React.FC<Props> = ({ deposits }) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { count, totalSats } = useMemo(() => {
-    // Only actionable deposits belong in this banner: Immature ones are the
-    // balance header pill's job until they confirm, and Refunded ones are
-    // already resolved. The remaining statuses (Claimable, FeeExceeded, Error)
-    // all carry an action on the unclaimed-deposits screen.
+    // Only actionable deposits belong in this banner: Immature and Claiming
+    // ones are the balance header pill's job until they land, and Refunded ones
+    // are already resolved. The remaining statuses (Claimable, FeeExceeded,
+    // Error) all carry an action on the unclaimed-deposits screen.
     const actionable = deposits.filter(
       ({ status }) =>
-        status !== DepositStatus.Immature && status !== DepositStatus.Refunded,
+        status !== DepositStatus.Immature &&
+        status !== DepositStatus.Claiming &&
+        status !== DepositStatus.Refunded,
     )
     return {
       count: actionable.length,
@@ -60,7 +62,7 @@ export const UnclaimedDepositBanner: React.FC<Props> = ({ deposits }) => {
             {LL.UnclaimedDeposit.description({ sats: totalSats })}
           </Text>
         </View>
-        <GaloyIcon name="caret-right" size={20} color={colors.primary} />
+        <GaloyIcon name="caret-right" size={20} color={colors.accent} />
       </View>
     </Pressable>
   )
@@ -68,7 +70,7 @@ export const UnclaimedDepositBanner: React.FC<Props> = ({ deposits }) => {
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 12,
     padding: 14,
   },
@@ -84,10 +86,10 @@ const useStyles = makeStyles(({ colors }) => ({
   title: {
     fontSize: 14,
     fontWeight: "700",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   description: {
     fontSize: 12,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
 }))

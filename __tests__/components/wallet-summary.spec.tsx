@@ -181,7 +181,7 @@ describe("WalletSummary", () => {
         expect.objectContaining({ hasSwapIcon: false }),
       )
       expect(StyleSheet.flatten(card().props.style).backgroundColor).toBe(
-        theme.lightColors?.grey7,
+        theme.lightColors?.surfaceStatic,
       )
     })
   })

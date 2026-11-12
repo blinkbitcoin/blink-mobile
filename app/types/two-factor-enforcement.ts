@@ -63,6 +63,10 @@ export type TwoFactorFlowParams = {
   /** True when the authenticator registration could not start, so the user had
    *  nothing to answer and leaving is not a skip. */
   hasRegistrationFailedToStart?: boolean
+  /** True when the setup key screen, opened from the settings, opened the onboarding
+   *  for a user new to authenticator apps: no prompt opened it, so leaving is no skip,
+   *  and it returns to the setup key that is still behind it. */
+  isOpenedFromSetupKey?: boolean
 }
 
 /** The ways to add a login method, which the server guards with the authenticator's

@@ -54,7 +54,7 @@ export const NoteInput: React.FC<NoteInputProps> = ({
           accessibilityLabel={label}
           style={[styles.noteInput, { fontSize }]}
           placeholder={label}
-          placeholderTextColor={colors.black}
+          placeholderTextColor={colors.textOnBackground}
           onChangeText={onChangeText}
           onBlur={onBlur}
           value={value}
@@ -64,7 +64,7 @@ export const NoteInput: React.FC<NoteInputProps> = ({
           ref={textInputRef}
         />
         <TouchableOpacity style={styles.noteIconContainer} onPress={focusTextInput}>
-          <GaloyIcon name={"note"} size={iconSize} color={colors.primary} />
+          <GaloyIcon name={"note"} size={iconSize} color={colors.accent} />
         </TouchableOpacity>
       </View>
     </View>
@@ -77,7 +77,7 @@ const useStyles = makeStyles(
       flexDirection: "row",
       borderStyle: "solid",
       overflow: "hidden",
-      backgroundColor: colors.grey5,
+      backgroundColor: colors.surfaceInteractive,
       paddingHorizontal: 10,
       borderRadius: 10,
       alignItems: "center",
@@ -102,7 +102,7 @@ const useStyles = makeStyles(
     },
     noteInput: {
       flex: 1,
-      color: colors.black,
+      color: colors.textOnBackground,
       fontWeight: "400",
       lineHeight: 20,
     },

@@ -57,7 +57,7 @@ const useStyles = makeStyles(({ colors }, { screenWidth }: { screenWidth: number
     flex: 1,
   },
   buttonStyleDisabled: {
-    backgroundColor: colors._white,
+    backgroundColor: colors.staticWhite,
     borderRadius: 24,
     marginHorizontal: 60,
     marginVertical: 32,
@@ -80,7 +80,7 @@ const useStyles = makeStyles(({ colors }, { screenWidth }: { screenWidth: number
   },
 
   itemTitle: {
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 20,
     fontWeight: "bold",
     height: 72,
@@ -91,7 +91,7 @@ const useStyles = makeStyles(({ colors }, { screenWidth }: { screenWidth: number
   svgContainer: { paddingVertical: 12 },
 
   textButton: {
-    backgroundColor: colors._white,
+    backgroundColor: colors.staticWhite,
     borderRadius: 24,
     marginHorizontal: 60,
     marginVertical: 32,
@@ -107,12 +107,12 @@ const useStyles = makeStyles(({ colors }, { screenWidth }: { screenWidth: number
   },
 
   titleStyleFulfilled: {
-    color: colors._white,
+    color: colors.staticWhite,
   },
 
   unlock: {
     alignSelf: "center",
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
@@ -120,7 +120,7 @@ const useStyles = makeStyles(({ colors }, { screenWidth }: { screenWidth: number
 
   unlockQuestion: {
     alignSelf: "center",
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 16,
     paddingTop: 18,
   },
@@ -272,7 +272,7 @@ export const EarnSection = ({ route }: Props) => {
                   <GaloyIcon
                     name="check-circle"
                     size={36}
-                    color={colors._white}
+                    color={colors.staticWhite}
                     style={styles.icon}
                   />
                 ) : undefined

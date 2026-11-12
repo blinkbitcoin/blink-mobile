@@ -45,11 +45,11 @@ const useStyles = makeStyles(({ colors }) => ({
   titleStyle: {
     fontSize: 20,
     lineHeight: 24,
-    fontWeight: "600",
-    color: colors.white,
+    fontWeight: "700",
+    color: colors.backgroundDefault,
   },
   disabledTitleStyle: {
-    color: colors.grey3,
+    color: colors.textDisabled,
   },
   disabledStyle: {
     opacity: 1,

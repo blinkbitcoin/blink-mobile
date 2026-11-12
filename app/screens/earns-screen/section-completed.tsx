@@ -20,7 +20,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   buttonStyle: {
-    backgroundColor: colors._white,
+    backgroundColor: colors.staticWhite,
     borderRadius: 32,
     marginTop: 24,
     width: "100%",
@@ -35,13 +35,13 @@ const useStyles = makeStyles(({ colors }) => ({
   divider: { flex: 0.5, minHeight: 30 },
 
   headerSection: {
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 16,
     paddingTop: 18,
   },
 
   titleSection: {
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 24,
     fontWeight: "bold",
     paddingTop: 6,
@@ -72,10 +72,10 @@ export const SectionCompleted: React.FC<Props> = ({ route }) => {
   const { amount, sectionTitle, isAvailable } = route.params
   const { LL } = useI18nContext()
   return (
-    <Screen backgroundColor={colors._orange} unsafe>
+    <Screen backgroundColor={colors.staticBrandOrange} unsafe>
       <MountainHeader
         amount={amount.toString()}
-        color={colors._orange}
+        color={colors.staticBrandOrange}
         isAvailable={isAvailable}
       />
       <View style={styles.container}>
@@ -92,7 +92,10 @@ export const SectionCompleted: React.FC<Props> = ({ route }) => {
         />
       </View>
       <View style={styles.bottomView} />
-      <CloseCross color={colors._white} onPress={() => navigation.popTo("Primary")} />
+      <CloseCross
+        color={colors.staticWhite}
+        onPress={() => navigation.popTo("Primary")}
+      />
     </Screen>
   )
 }

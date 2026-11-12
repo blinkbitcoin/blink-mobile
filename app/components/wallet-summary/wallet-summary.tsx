@@ -230,11 +230,11 @@ const useStyles = makeStyles(({ colors }) => ({
     fontFamily: "SourceSansPro-Bold",
     fontSize: 16,
     lineHeight: 22,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   balanceSecondary: {
     fontSize: 12,
     lineHeight: 18,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))
