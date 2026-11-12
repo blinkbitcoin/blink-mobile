@@ -1095,6 +1095,35 @@ describe("useMigrationCheckpoint a start the server accepted", () => {
     expect(result.current.expectedReceiveSats).toBe(5000)
   })
 
+  it("renews the figure a deposit changed after the start bound it, in the store and here", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-account-2",
+      custodialAccountId: "custodial-1",
+      expectedReceiveSats: 0,
+      isStartConfirmed: true,
+    })
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
+        expectedReceiveSats: 5000,
+        isReceiveFigureRefreshed: true,
+      })
+    })
+
+    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith(
+      "migrationCheckpoint_main",
+      expect.objectContaining({
+        expectedReceiveSats: 5000,
+        isReceiveFigureRefreshed: true,
+      }),
+    )
+    expect(result.current.expectedReceiveSats).toBe(5000)
+  })
+
   /** The record keeps it for the run; re-sending it from memory would carry it into a
    *  run that restarted, where it no longer holds. */
   it("never re-sends a stored confirmation on a later save", async () => {

@@ -772,7 +772,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               accentColor={
                 sendingWalletDescriptor.currency === WalletCurrency.Usd
                   ? colors._green
-                  : colors.primary
+                  : colors.accent
               }
               onSwipe={handleSendPayment}
               handleRef={sliderHandleRef}
@@ -861,7 +861,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignSelf: "center",
   },
   footnote: {
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   sliderContainer: {
     paddingHorizontal: 20,

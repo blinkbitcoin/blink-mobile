@@ -168,6 +168,10 @@ export type CheckpointUpdate = {
   /** The server's answer as the caller read it, never stored: the account's migration has
    *  not started, so this save's receive figure may replace the one the record holds. */
   isServerFlowUnstarted?: true
+  /** Never stored either: the commit screen read this figure again after a deposit
+   *  cleared, while the server still waited for a destination, so nothing has drained and
+   *  it may replace the figure the accepted start bound. */
+  isReceiveFigureRefreshed?: true
 }
 
 /** A run ends when its step falls back behind the commit point, which only a restart the
@@ -218,14 +222,21 @@ export const mergeCheckpoint = (
    * "nothing will ever arrive" and swap before the funds land. A record without the
    * confirmation on a flow the server holds open is the opposite case (one written before
    * the field existed, maybe already drained), so it keeps what it has.
+   *
+   * A deposit that confirms on the commit screen is the other case where the bound figure
+   * is out of date before anything drains: the balance the server will send grew after the
+   * start bound it. The screen reads the figures again before it lets Approve through and
+   * says so on the save, and only while the server still waits for a destination.
    */
   const hasRestarted = hasRunRestarted(existing, update)
   const inheritedExpectedReceiveSats = hasSameOwner
     ? existing?.expectedReceiveSats
     : undefined
   const inheritedStartConfirmation = hasSameOwner ? existing?.isStartConfirmed : undefined
-  const isReceiveFigureUnbound =
+  const isUnstartedFigure =
     update.isServerFlowUnstarted === true && inheritedStartConfirmation !== true
+  const isReceiveFigureUnbound =
+    isUnstartedFigure || update.isReceiveFigureRefreshed === true
   const keptExpectedReceiveSats = isReceiveFigureUnbound
     ? update.expectedReceiveSats ?? inheritedExpectedReceiveSats
     : inheritedExpectedReceiveSats ?? update.expectedReceiveSats

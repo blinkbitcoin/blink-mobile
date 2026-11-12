@@ -3,7 +3,7 @@ import { render, waitFor } from "@testing-library/react-native"
 
 import { MigrationGate } from "@app/screens/account-migration/to-non-custodial/migration-gate"
 
-import { walletOverviewQueryResult } from "../helpers"
+import { pendingDepositsQueryResult, walletOverviewQueryResult } from "../helpers"
 
 /**
  * Integration seam the unit specs cannot reach: the gate spec mocks
@@ -37,7 +37,7 @@ jest.mock("@react-navigation/native", () => ({
 
 jest.mock("@rn-vui/themed", () => ({
   ...jest.requireActual("@rn-vui/themed"),
-  useTheme: () => ({ theme: { colors: { primary: "#fb5607", warning: "#f0a202" } } }),
+  useTheme: () => ({ theme: { colors: { accent: "#fb5607", warning: "#f0a202" } } }),
 }))
 
 jest.mock("@app/components/screen", () => ({
@@ -63,6 +63,19 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
     refetch: jest.fn().mockResolvedValue(undefined),
     hasResumableCheckpoint: mockHasResumableCheckpoint,
   }),
+}))
+
+const mockSendDepositSupportEmail = jest.fn()
+const mockUseMigrationSupportEmail = jest.fn()
+jest.mock("@app/screens/account-migration/hooks/use-migration-support-email", () => ({
+  useMigrationSupportEmail: (reason: string) => {
+    mockUseMigrationSupportEmail(reason)
+    return {
+      sendSupportEmail: mockSendDepositSupportEmail,
+      cardDetails: [],
+      supportDetailsText: "",
+    }
+  },
 }))
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-lock", () => ({
@@ -118,6 +131,7 @@ jest.mock("@app/screens/conversion-flow/drain-conversion", () => ({
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
   useWalletOverviewScreenQuery: () => walletOverviewQueryResult({ usdBalance: 0 }),
+  useMigrationPendingDepositsQuery: () => pendingDepositsQueryResult(),
 }))
 
 jest.mock("@app/graphql/is-authed-context", () => ({

@@ -147,7 +147,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderRadius: 12,
     minHeight: 67,
     overflow: "hidden",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
   disabledOverlay: {
     position: "absolute",
@@ -171,19 +171,19 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 16,
     fontWeight: "400",
     lineHeight: 22,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   placeholderText: {
     fontSize: 16,
     fontWeight: "400",
     lineHeight: 22,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   secondaryText: {
     fontSize: 12,
     fontWeight: "400",
     lineHeight: 18,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   walletSection: {
     flexDirection: "row",
@@ -192,6 +192,6 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 14,
   },
   pressedBg: {
-    backgroundColor: colors.grey6,
+    backgroundColor: colors.surfacePressed,
   },
 }))

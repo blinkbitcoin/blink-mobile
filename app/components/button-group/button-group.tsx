@@ -89,12 +89,12 @@ const useStyles = makeStyles(
       paddingVertical: 14,
       borderRadius: 8,
       opacity: disabled ? 0.4 : 1,
-      backgroundColor: colors.grey5,
+      backgroundColor: colors.surfaceInteractive,
       height: "100%",
     },
     text: {
       fontSize: 16,
-      color: selected ? colors.primary : colors.grey1,
+      color: selected ? colors.accent : colors.textSecondary,
     },
     buttonGroup: {
       flexDirection: "row",

@@ -9,12 +9,12 @@ import {
 
 jest.mock("@rn-vui/themed", () => {
   const colors = {
-    grey2: "#999",
-    grey5: "#f5f5f5",
-    primary: "#000",
-    black: "#000",
+    textMuted: "#999",
+    surfaceInteractive: "#f5f5f5",
+    accent: "#000",
+    textOnBackground: "#000",
     transparent: "transparent",
-    _green: "#0f0",
+    staticSuccess: "#0f0",
     error: "#f00",
   }
   return {

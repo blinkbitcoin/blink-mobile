@@ -40,7 +40,8 @@ export const InfoCard: React.FC<InfoCardProps> = ({
     theme: { colors },
   } = useTheme()
 
-  const resolvedTitleColor = titleColor ?? (showIcon ? colors.warning : colors.black)
+  const resolvedTitleColor =
+    titleColor ?? (showIcon ? colors.warning : colors.textOnBackground)
   const resolvedIconColor = iconColor ?? colors.warning
   const isLg = size === InfoCardSize.Lg
   const styles = useStyles({ titleColor: resolvedTitleColor, isLg, bulletSpacing })
@@ -101,7 +102,7 @@ type StyleProps = {
 const useStyles = makeStyles(
   ({ colors }, { titleColor, isLg, bulletSpacing }: StyleProps) => ({
     container: {
-      backgroundColor: colors.grey5,
+      backgroundColor: colors.surfaceInteractive,
       borderRadius: 8,
       padding: 14,
       gap: 10,
@@ -131,7 +132,7 @@ const useStyles = makeStyles(
       gap: isLg ? 2 : 10,
     },
     description: {
-      color: colors.grey2,
+      color: colors.textMuted,
       fontSize: isLg ? 16 : 14,
       fontFamily: "Source Sans Pro",
       fontWeight: "400",
@@ -151,12 +152,12 @@ const useStyles = makeStyles(
       width: 4,
       height: 4,
       borderRadius: 2,
-      backgroundColor: colors.grey2,
+      backgroundColor: colors.textMuted,
       marginTop: isLg ? 9 : 6,
     },
     bulletText: {
       flex: 1,
-      color: colors.grey2,
+      color: colors.textMuted,
       fontSize: isLg ? 16 : 14,
       fontFamily: "Source Sans Pro",
       fontWeight: "400",

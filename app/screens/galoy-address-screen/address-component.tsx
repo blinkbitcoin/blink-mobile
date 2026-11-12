@@ -74,11 +74,11 @@ const AddressComponent: React.FC<AddressComponentprops> = ({
         <View style={styles.iconsContainer}>
           {useGlobeIcon && (
             <Pressable onPress={() => Linking.openURL(address)}>
-              <GaloyIcon name="globe" size={20} color={colors.black} />
+              <GaloyIcon name="globe" size={20} color={colors.textOnBackground} />
             </Pressable>
           )}
           <Pressable onPress={handleCopyToClipboard}>
-            <GaloyIcon name="copy-paste" size={20} color={colors.black} />
+            <GaloyIcon name="copy-paste" size={20} color={colors.textOnBackground} />
           </Pressable>
           <Pressable
             onPress={() => {
@@ -88,7 +88,7 @@ const AddressComponent: React.FC<AddressComponentprops> = ({
               })
             }}
           >
-            <GaloyIcon name="share" size={20} color={colors.black} />
+            <GaloyIcon name="share" size={20} color={colors.textOnBackground} />
           </Pressable>
         </View>
       </View>
@@ -123,14 +123,14 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     paddingVertical: 16,
     paddingHorizontal: 8,
     borderRadius: 8,
     columnGap: 20,
   },
   address: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     lineHeight: 24,
   },
@@ -142,7 +142,7 @@ const useStyles = makeStyles(({ colors }) => ({
     columnGap: 5,
   },
   descriptionText: {
-    color: colors.primary,
+    color: colors.accent,
     textDecorationLine: "underline",
     fontSize: 14,
     lineHeight: 18,

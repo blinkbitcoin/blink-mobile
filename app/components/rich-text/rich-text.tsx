@@ -46,14 +46,14 @@ const useStyles = makeStyles(({ colors }) => ({
   body: {
     fontSize: 13,
     lineHeight: 18,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   bold: {
     fontWeight: "700",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   link: {
     textDecorationLine: "underline",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

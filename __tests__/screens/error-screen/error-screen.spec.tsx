@@ -68,7 +68,6 @@ jest.mock("@app/components/contact-modal/contact-modal", () => ({
     StatusPage: "statusPage",
     Email: "email",
     Telegram: "telegram",
-    Mattermost: "mattermost",
   },
 }))
 

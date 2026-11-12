@@ -8,7 +8,11 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
-import { headerRightNoGlass, noHeaderRight } from "@app/components/header-no-glass"
+import {
+  HEADER_ICON_TOUCH_SIZE,
+  headerRightNoGlass,
+  noHeaderRight,
+} from "@app/components/header-no-glass"
 import { WarningCard } from "@app/components/warning-card"
 import { ScreenSecurityGate } from "@app/components/screen-security-gate"
 import { SuggestionBar } from "@app/components/suggestion-bar"
@@ -31,9 +35,6 @@ import { isValidStepTwoWords } from "../utils"
 import { RestoreStatus, useRestorePhrase } from "./hooks/use-restore-phrase"
 
 type RestorePhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialRestorePhrase">
-
-// The clear tertiary button has no padding, so its hit area is the text bounds.
-const HEADER_BUTTON_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 }
 
 type RestorePhraseContentProps = {
   step: PhraseStep
@@ -101,7 +102,6 @@ const RestorePhraseContent: React.FC<RestorePhraseContentProps> = ({ step, resto
           title={pasteLabel}
           onPress={handlePasteFromClipboard}
           containerStyle={styles.headerButton}
-          hitSlop={HEADER_BUTTON_HIT_SLOP}
           {...testProps("restore-paste-button")}
           accessibilityLabel={pasteLabel}
         />
@@ -276,7 +276,7 @@ const useStyles = makeStyles(({ colors }) => ({
   subtitle: {
     fontSize: 16,
     lineHeight: 22,
-    color: colors.grey2,
+    color: colors.textMuted,
     marginBottom: 20,
   },
   warningCard: {
@@ -285,8 +285,14 @@ const useStyles = makeStyles(({ colors }) => ({
   inputList: {
     gap: 10,
   },
+  // The header touch box. `hitSlop` can't reach past the native header item, so the
+  // box itself grows, its text kept against the right edge where it was.
   headerButton: {
     marginRight: 16,
+    minWidth: HEADER_ICON_TOUCH_SIZE,
+    minHeight: HEADER_ICON_TOUCH_SIZE,
+    alignItems: "flex-end",
+    justifyContent: "center",
   },
   errorContainer: {
     flexDirection: "row",

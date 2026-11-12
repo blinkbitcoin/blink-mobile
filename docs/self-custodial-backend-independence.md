@@ -102,10 +102,13 @@ nobody "fixes" them later.
 1. **Prefer a local source over a cached one.** The Breez SDK already ships fiat
    rates and a currency list; use them rather than caching Blink's.
 2. **Prefer a cached one over nothing.** Where only Blink can answer, persist the
-   last good answer with a timestamp and label it.
+   last good answer with its timestamp, so its age can decide whether it is
+   still used (see 4).
 3. **One place decides reachability.** Consumers ask a provider, not each query.
-4. **Never silently substitute.** A stale rate is marked stale wherever money is
-   shown against it.
+4. **Never silently substitute a currency.** A usable rate, stale or not, prices
+   amounts without a label: the one that said so came and went on every launch
+   and moved the screen (blink-wip#2035). When no rate can price them, amounts
+   fall back to sats and the sats-only notice says why.
 5. **Never widen an existing privacy boundary.** The Apollo-cache restore skip at
    [client.tsx:268](../app/graphql/client.tsx) exists so a persisted custodial
    cache cannot leak into a self-custodial session. Keep it; put what
@@ -245,8 +248,8 @@ that touch those call sites, rather than churning them twice.
   custodial session still reads it as current, since it has no sats fallback.
   The hook now also returns `priceFreshness`.
 
-Staleness thresholds: fresh under 1 h, usable-but-marked under 24 h, withheld
-beyond that. A feed timestamped in the future (clock correction, a user setting
+Staleness thresholds: fresh under 1 h, stale but still used under 24 h,
+withheld beyond that. A feed timestamped in the future (clock correction, a user setting
 the date back) reads fresh rather than expired — blanking a figure the app just
 fetched is the worse failure.
 
@@ -263,11 +266,13 @@ price means the screen is still loading.
   balance in sats instead of a skeleton. The balance is read from the SDK's own
   storage and is not in doubt; only its price is. A held USD balance is left out
   of that figure rather than completed with a rate we do not have.
-- **Balance header, old rate.** A `Stale` rate adds one line under the figure:
-  "Exchange rate may be out of date". It never withholds the number — an old
-  rate is a caveat on it, not a reason to hide it — and it is suppressed while
-  the balance is hidden or still loading, and when the figure is in sats, which
-  needs no rate.
+- **Balance header, old rate.** A `Stale` rate prices the figure with no line
+  under it. The line it once added ("Exchange rate may be out of date") appeared
+  on every launch more than an hour after the last one and went when that
+  launch's refresh landed, moving everything under the balance
+  (blink-wip#2035). It was removed rather than held behind a skeleton: an
+  outage would have kept that skeleton up, and a slightly old figure beats
+  none. `priceFreshness` is still returned for any caller that needs it.
 
 **Superseded: the sats-only receive and send flow.** This phase originally
 argued that one was not worth building, on the reading that `OfflineGate` covers
@@ -495,8 +500,8 @@ conversion it asks for — Bitcoin to display — becomes the identity.
    and [use-payment-request.ts:566](../app/self-custodial/hooks/use-payment-request.ts).
    They stop being reachable once the converter is total, and leaving them would
    hide a regression rather than catch one.
-4. Say so on screen. One line, in the pattern the stale-rate notice already
-   uses: amounts are in sats because no exchange rate is available. Without it
+4. Say so on screen. One line under the balance: amounts are in sats because
+   no exchange rate is available. Without it
    a user whose balance silently changes denomination will read it as their
    money changing. One new string across 28 locales.
 
@@ -837,7 +842,7 @@ dependency.
 |-------|---------|-----------|--------|
 | 1 | Outage reproducible on demand | — | Done |
 | 2 | **Wallet is usable offline** | 1 | Done |
-| 2b | Staleness marker and home sats fallback | 2 | Done |
+| 2b | Home sats fallback (staleness marker later removed, blink-wip#2035) | 2 | Done |
 | 3 | Currency selection works offline | 2 | Done |
 | 4 | Honest, quiet UI | 1 | Done |
 | 5 | Lightning address degrades gracefully | 1, Q1 | Done |

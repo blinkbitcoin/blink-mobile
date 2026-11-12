@@ -337,7 +337,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         <View style={styles.walletListPendingContainer}>
           <ActivityIndicator
             size="large"
-            color={colors.primary}
+            color={colors.accent}
             {...testProps("send-wallet-list-pending")}
           />
         </View>
@@ -503,7 +503,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           }
 
           if (lnurlParams?.commentAllowed) {
-            requestInvoiceParams.comment = paymentDetail.memo
+            requestInvoiceParams.comment = paymentDetail.comment
           }
 
           const result = await requestInvoiceWithServiceParams(requestInvoiceParams)
