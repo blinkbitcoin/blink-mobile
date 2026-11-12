@@ -31,6 +31,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useAppConfig, useClipboard, usePriceConversion } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { useInitialAccessibilityFocus } from "@app/hooks/use-initial-accessibility-focus"
 import { useKeyboardVisible } from "@app/hooks/use-keyboard-visible"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -290,6 +291,15 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     zeroDisplayAmount,
     isWalletListPending,
   ])
+
+  /** Screen reader focus starts where the send goes next: the keypad while there is no
+   *  amount to send yet, Next once there is one (a fixed invoice, or back from review). */
+  const firstKeyRef = useRef<View>(null)
+  const nextRef = useRef<View>(null)
+  const isAwaitingAmount =
+    Boolean(paymentDetail?.canSetAmount) &&
+    !(paymentDetail && paymentDetail.unitOfAccountAmount.amount > 0)
+  useInitialAccessibilityFocus(isAwaitingAmount ? firstKeyRef : nextRef)
 
   /** Held rather than blanked: the seeding above waits for the region, so without this the
    *  user sits on an empty screen for as long as the country takes to resolve. */
@@ -686,6 +696,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               onPress={amountPad.onKeyPress}
               disabledKeys={amountPad.disabledKeys}
               safeMode
+              firstKeyRef={firstKeyRef}
             />
           </View>
         )}
@@ -695,6 +706,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           disabled={isNextDisabled}
           title={nextButtonTitle}
           containerStyle={styles.next}
+          pressableRef={nextRef}
           {...testProps(LL.common.next())}
           accessibilityLabel={nextButtonTitle}
         />
