@@ -193,7 +193,7 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
               name="close"
               size="small"
               onPress={openModal}
-              backgroundColor={colors.border}
+              backgroundColor={colors.neutral}
             />
           )}
         </ListItem>

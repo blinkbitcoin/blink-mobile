@@ -82,7 +82,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: 8,
   },
   transactionsList: {
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
     borderRadius: 8,
     overflow: "hidden",
     rowGap: 1,

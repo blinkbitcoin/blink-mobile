@@ -574,7 +574,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderTopRightRadius: 20,
     borderWidth: 1,
     borderBottomWidth: 0,
-    borderColor: colors.border,
+    borderColor: colors.neutral,
     paddingTop: 8,
   },
   // Fills the slot the layout gives it, so the surface above shrinks by exactly

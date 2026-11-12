@@ -122,13 +122,13 @@ const useStyles = makeStyles(({ colors }) => ({
     minHeight: 54,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.neutral,
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 10,
   },
   keyPressed: {
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
   },
   keyDisabled: {
     opacity: 0.5,

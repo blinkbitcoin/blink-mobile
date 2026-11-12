@@ -113,7 +113,7 @@ const useStyles = makeStyles(({ colors }, { bottom }: { bottom: number }) => ({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.neutral,
     borderBottomWidth: 0,
   },
   handleIndicator: {

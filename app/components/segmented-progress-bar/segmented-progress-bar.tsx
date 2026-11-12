@@ -99,7 +99,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     height: 2,
     overflow: "hidden",
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
   },
   segmentFill: {
     height: "100%",

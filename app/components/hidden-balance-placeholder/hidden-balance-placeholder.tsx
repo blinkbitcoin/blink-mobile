@@ -43,7 +43,7 @@ const useStyles = makeStyles(
       width: diameter,
       height: diameter,
       borderRadius: diameter / 2,
-      backgroundColor: colors.border,
+      backgroundColor: colors.neutral,
     },
   }),
 )

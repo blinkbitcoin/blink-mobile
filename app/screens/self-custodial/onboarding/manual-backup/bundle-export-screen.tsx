@@ -149,7 +149,7 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 20,
     lineHeight: 24,
     fontFamily: fonts.bold,
-    color: colors.surfaceInteractive,
+    color: colors.textOnAccentDisabled,
   },
   learnMore: {
     paddingTop: 10,

@@ -108,7 +108,7 @@ export const GaloyIconButton = ({
         return {
           opacity: 0.7,
           color: color || colors.accent,
-          backgroundColor: backgroundColor || colors.surfaceMuted,
+          backgroundColor: backgroundColor || colors.neutral,
         }
       case iconOnly && !pressed:
         return {
@@ -119,18 +119,18 @@ export const GaloyIconButton = ({
         return {
           opacity: 0.7,
           color: color || colors.accent,
-          backgroundColor: backgroundColor || colors.surfaceMuted,
+          backgroundColor: backgroundColor || colors.neutral,
         }
       case !iconOnly && pressed:
         return {
           opacity: 0.7,
           color: color || colors.accent,
-          backgroundColor: backgroundColor || colors.surfaceMuted,
+          backgroundColor: backgroundColor || colors.neutral,
         }
       case !iconOnly && !pressed:
         return {
           color: color || colors.accent,
-          backgroundColor: backgroundColor || colors.surfaceMuted,
+          backgroundColor: backgroundColor || colors.neutral,
         }
       default:
         return {}
@@ -194,7 +194,7 @@ export const GaloyEditButton = ({ disabled, ...remainingProps }: PressableProps)
       height: 32,
       borderRadius: 8,
       opacity: disabled ? 0.7 : 1,
-      backgroundColor: pressed ? colors.surfaceMuted : colors.surfaceInteractive,
+      backgroundColor: pressed ? colors.neutral : colors.surfaceInteractive,
       alignItems: "center",
       justifyContent: "center",
     }
@@ -239,7 +239,7 @@ const useStyles = makeStyles(
       width: iconContainerSize,
       height: iconContainerSize,
       borderRadius: iconContainerSize / 2,
-      backgroundColor: isIconOnly ? colors.transparent : customBg || colors.surfaceMuted,
+      backgroundColor: isIconOnly ? colors.transparent : customBg || colors.neutral,
       opacity: 0.7,
       alignItems: "center",
       justifyContent: "center",

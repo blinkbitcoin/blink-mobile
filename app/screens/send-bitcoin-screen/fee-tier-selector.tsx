@@ -159,7 +159,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: 8,
   },
   optionRowSelected: {
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
   },
   optionContent: {
     flex: 1,

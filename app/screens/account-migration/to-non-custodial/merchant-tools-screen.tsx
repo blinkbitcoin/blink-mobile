@@ -82,7 +82,7 @@ export const MigrationMerchantToolsScreen: React.FC = () => {
             <React.Fragment key={tool.icon}>
               {index > 0 && (
                 <Divider
-                  color={colors.border}
+                  color={colors.neutral}
                   width={TOOLS_DIVIDER_WIDTH}
                   style={styles.toolsDivider}
                 />

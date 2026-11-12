@@ -53,7 +53,10 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
               <View key={index}>
                 <Element />
                 {hasDividerBelow && (
-                  <Divider color={colors.border} style={[styles.divider, dividerStyle]} />
+                  <Divider
+                    color={colors.neutral}
+                    style={[styles.divider, dividerStyle]}
+                  />
                 )}
               </View>
             )

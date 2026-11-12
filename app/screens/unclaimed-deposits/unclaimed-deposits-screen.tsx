@@ -268,7 +268,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 14,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: colors.neutral,
   },
   fieldLabel: {
     fontSize: 13,

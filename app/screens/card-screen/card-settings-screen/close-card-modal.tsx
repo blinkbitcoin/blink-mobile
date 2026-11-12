@@ -101,7 +101,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   textInput: {
     fontSize: 16,
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
     padding: 12,
     color: colors.textOnBackground,
     borderRadius: 8,

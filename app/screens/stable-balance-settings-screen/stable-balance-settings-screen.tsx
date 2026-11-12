@@ -172,7 +172,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 12,
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.neutral,
   },
   rowLabel: {
     flex: 1,
