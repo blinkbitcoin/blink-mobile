@@ -1,5 +1,5 @@
 import { RefObject, useCallback, useRef } from "react"
-import { AccessibilityInfo, View } from "react-native"
+import { AccessibilityInfo, TextInput, View } from "react-native"
 import { useFocusEffect } from "@react-navigation/native"
 
 /** Lets the screen transition settle first: TalkBack and VoiceOver land on the first
@@ -15,7 +15,7 @@ export const INITIAL_FOCUS_DELAY_MS = 500
  * A no-op when no screen reader runs.
  */
 export const useInitialAccessibilityFocus = (
-  target: RefObject<View | null> | undefined,
+  target: RefObject<View | TextInput | null> | undefined,
 ) => {
   const targetRef = useRef(target)
   targetRef.current = target

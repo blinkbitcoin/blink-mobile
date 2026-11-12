@@ -1,10 +1,11 @@
 import React from "react"
-import { StyleSheet, View } from "react-native"
+import { AccessibilityInfo, StyleSheet, View } from "react-native"
 import { it } from "@jest/globals"
 
 import { act, fireEvent, render, screen, within } from "@testing-library/react-native"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { INITIAL_FOCUS_DELAY_MS } from "@app/hooks/use-initial-accessibility-focus"
 import { i18nObject } from "@app/i18n/i18n-util"
 import SendBitcoinDestinationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-destination-screen"
 import {
@@ -126,6 +127,10 @@ jest.mock("@react-navigation/native", () => ({
     replace: mockReplace,
     setParams: jest.fn(),
   }),
+  useFocusEffect: (callback: () => undefined | (() => void)) => {
+    const { useEffect } = jest.requireActual("react")
+    useEffect(callback, [callback])
+  },
 }))
 
 const activeWalletWallets = [
@@ -690,6 +695,34 @@ describe("SendBitcoinDestinationScreen", () => {
     await flushAsync()
 
     expect(await screen.findByText(expectedText(LL))).toBeTruthy()
+  })
+
+  it("starts screen reader focus on the destination field", async () => {
+    // react-native's jest mocks: no screen reader by default, and no focus sent.
+    const isScreenReaderEnabled = jest.mocked(AccessibilityInfo.isScreenReaderEnabled)
+    const sendAccessibilityEvent = jest.mocked(AccessibilityInfo.sendAccessibilityEvent)
+    isScreenReaderEnabled.mockResolvedValue(true)
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+    await act(
+      () =>
+        new Promise<void>((resolve) => {
+          setTimeout(resolve, INITIAL_FOCUS_DELAY_MS + 50)
+        }),
+    )
+
+    const focused = sendAccessibilityEvent.mock.calls.map(
+      ([node, event]) =>
+        event === "focus" &&
+        (node as unknown as { props: { accessibilityLabel?: string } }).props
+          .accessibilityLabel,
+    )
+    expect(focused).toEqual([LL.SendBitcoinScreen.placeholder()])
+    isScreenReaderEnabled.mockResolvedValue(false)
   })
 
   it("validates clipboard content when pasting into the search input", async () => {
