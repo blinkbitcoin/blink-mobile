@@ -27,6 +27,19 @@ const refusedWith = (message: string) => ({
 
 const DOLLAR_BALANCE_REFUSAL = "Dollar balance must be empty before migration"
 
+const pendingDepositRefusal = {
+  data: {
+    migrationStart: {
+      errors: [
+        {
+          message: "Migration is not available while an incoming deposit is pending.",
+          code: "MIGRATION_PENDING_DEPOSIT",
+        },
+      ],
+    },
+  },
+}
+
 const networkFailure = () => {
   const err = new Error("Network request failed")
   return Object.assign(err, { networkError: new Error("offline") })
@@ -152,6 +165,92 @@ describe("useEnsureMigrationStarted", () => {
     await flushEffects()
 
     expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+  })
+
+  it("waits on a deposit still confirming without treating it as final or reporting it", async () => {
+    mockMigrationStart.mockResolvedValue(pendingDepositRefusal)
+
+    const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    await flushEffects()
+
+    expect(result.current.isDepositPending).toBe(true)
+    expect(result.current.isRejected).toBe(false)
+    expect(result.current.isStarted).toBe(false)
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  it("fires again when a retry follows a pending-deposit refusal, and starts once it lands", async () => {
+    mockMigrationStart.mockResolvedValueOnce(pendingDepositRefusal)
+
+    const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    await flushEffects()
+    expect(result.current.isDepositPending).toBe(true)
+
+    act(() => result.current.retry())
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(2)
+    expect(result.current.isStarted).toBe(true)
+    expect(result.current.isDepositPending).toBe(false)
+  })
+
+  /** The deposit has landed and OK asked again, but the request never arrived: the retry
+   *  is what the screen needs now, and a deposit flag left on would cover it. */
+  it("drops the deposit refusal when the retry after it loses the connection", async () => {
+    mockMigrationStart
+      .mockResolvedValueOnce(pendingDepositRefusal)
+      .mockRejectedValueOnce(networkFailure())
+
+    const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    await flushEffects()
+    expect(result.current.isDepositPending).toBe(true)
+
+    act(() => result.current.retry())
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(2)
+    expect(result.current.hasConnectionIssue).toBe(true)
+    expect(result.current.isDepositPending).toBe(false)
+  })
+
+  it("drops an acceptance that lands after the screen has left", async () => {
+    let settle: (value: unknown) => void = () => undefined
+    mockMigrationStart.mockReturnValue(
+      new Promise((resolve) => {
+        settle = resolve
+      }),
+    )
+
+    const { result, unmount } = renderHook(() =>
+      useEnsureMigrationStarted({ skip: false }),
+    )
+    unmount()
+
+    await act(async () => {
+      settle(accepted)
+    })
+
+    expect(result.current.isStarted).toBe(false)
+  })
+
+  it("drops a pending-deposit refusal that lands after the screen has left", async () => {
+    let settle: (value: unknown) => void = () => undefined
+    mockMigrationStart.mockReturnValue(
+      new Promise((resolve) => {
+        settle = resolve
+      }),
+    )
+
+    const { result, unmount } = renderHook(() =>
+      useEnsureMigrationStarted({ skip: false }),
+    )
+    unmount()
+
+    await act(async () => {
+      settle(pendingDepositRefusal)
+    })
+
+    expect(result.current.isDepositPending).toBe(false)
   })
 
   /** An accepted start is settled too: re-firing it would re-arm an already-armed lock. */
@@ -435,6 +534,20 @@ describe("useEnsureMigrationStarted", () => {
       return hook
     }
 
+    it("keeps the first start's acceptance when the repeat is refused for a deposit after it", async () => {
+      const { result } = await sendRepeat()
+
+      await act(async () => {
+        answerFirst(accepted)
+      })
+      await act(async () => {
+        answerSecond(pendingDepositRefusal)
+      })
+
+      expect(result.current.isStarted).toBe(true)
+      expect(result.current.isDepositPending).toBe(false)
+    })
+
     it("keeps the first start's acceptance when the repeat is refused after it", async () => {
       const { result } = await sendRepeat()
 
@@ -463,6 +576,25 @@ describe("useEnsureMigrationStarted", () => {
 
       expect(result.current.isStarted).toBe(true)
       expect(result.current.isRejected).toBe(false)
+    })
+
+    /** The repeat's refusal raised the flag after the retry that sent it had cleared it,
+     *  so only the acceptance itself can clear it again: left on, the deposit modal would
+     *  cover a run the server already holds. */
+    it("takes the first start's acceptance over a deposit refusal of the repeat that came first", async () => {
+      const { result } = await sendRepeat()
+
+      await act(async () => {
+        answerSecond(pendingDepositRefusal)
+      })
+      expect(result.current.isDepositPending).toBe(true)
+
+      await act(async () => {
+        answerFirst(accepted)
+      })
+
+      expect(result.current.isStarted).toBe(true)
+      expect(result.current.isDepositPending).toBe(false)
     })
 
     it("keeps the acceptance when the repeat answers with no payload after it", async () => {

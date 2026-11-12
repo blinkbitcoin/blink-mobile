@@ -71,7 +71,7 @@ const useStyles = makeStyles(({ colors }) => ({
     position: "absolute",
     // React Native names its gradient style this way; it is not ours to rename.
     // eslint-disable-next-line camelcase
-    experimental_backgroundImage: `radial-gradient(circle farthest-corner, ${colors.white} 0%, ${colors.white} ${percent(CLEAR_STOP * RIM_STOP)}, ${colors.grey6} ${percent(RIM_STOP)}, transparent ${percent(RIM_STOP)})`,
+    experimental_backgroundImage: `radial-gradient(circle farthest-corner, ${colors.backgroundDefault} 0%, ${colors.backgroundDefault} ${percent(CLEAR_STOP * RIM_STOP)}, ${colors.surfacePressed} ${percent(RIM_STOP)}, transparent ${percent(RIM_STOP)})`,
   },
 }))
 

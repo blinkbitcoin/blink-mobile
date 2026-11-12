@@ -80,7 +80,7 @@ type SharedProps = {
   scrollTestID?: string
   testID?: string
   /**
-   * Which edges carry the 1px `grey4` outline. The app's sheets draw it on the
+   * Which edges carry the 1px `neutral` outline. The app's sheets draw it on the
    * top and both sides; Send 3.0's sheets draw the top edge only.
    */
   outline?: "topAndSides" | "top"
@@ -353,6 +353,14 @@ export const BottomSheet: React.FC<Props> = ({
     return () => subscription.remove()
   }, [isDismissing, isInline, isLeaving, isVisible, leave])
 
+  const escape = React.useCallback(() => {
+    if (!isInline) {
+      onCloseRef.current()
+      return
+    }
+    if (!isDismissing.value) leave()
+  }, [isDismissing, isInline, leave])
+
   const pan = React.useMemo(
     () =>
       Gesture.Pan()
@@ -475,7 +483,7 @@ export const BottomSheet: React.FC<Props> = ({
         // A screen reader stays inside the sheet, and its escape gesture closes it the way
         // the scrim and Android back do.
         accessibilityViewIsModal
-        onAccessibilityEscape={onClose}
+        onAccessibilityEscape={escape}
       >
         <View style={styles.handle} />
 
@@ -571,12 +579,12 @@ const useStyles = makeStyles(({ colors }) => ({
   // category filter is the only surface it changes — that one had no outline —
   // and it gains one deliberately rather than staying the odd one out.
   sheet: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     borderWidth: 1,
     borderBottomWidth: 0,
-    borderColor: colors.grey4,
+    borderColor: colors.neutral,
     paddingTop: 8,
   },
   sheetTopOutline: {
@@ -601,7 +609,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.grey3,
+    backgroundColor: colors.textDisabled,
     marginBottom: 8,
   },
   scroll: {

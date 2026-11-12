@@ -6,7 +6,7 @@ import { BackendFeatureGate } from "@app/components/backend-feature-gate/backend
 import { BlinkServicesStatus } from "@app/graphql/blink-services-status"
 
 jest.mock("@rn-vui/themed", () => {
-  const colors: Record<string, string> = { primary: "#007", grey2: "#999" }
+  const colors: Record<string, string> = { accent: "#007", textMuted: "#999" }
   return {
     makeStyles:
       (

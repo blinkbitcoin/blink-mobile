@@ -110,11 +110,11 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
         <View style={localStyles.deliveryCard}>
           <OptionRow
             icon="delivery"
-            iconColor={colors.grey2}
+            iconColor={colors.textMuted}
             title={shippingLL.standardDelivery()}
             subtitle={standardDays}
             value={standardPrice}
-            valueColor={colors._green}
+            valueColor={colors.staticSuccess}
           />
         </View>
       </View>

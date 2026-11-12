@@ -32,7 +32,7 @@ export const PhoneLnAddress: React.FC = () => {
       loading={loading}
       title={lnAddress}
       leftGaloyIcon="phone"
-      rightIcon={<GaloyIcon name="copy-paste" size={20} color={colors.primary} />}
+      rightIcon={<GaloyIcon name="copy-paste" size={20} color={colors.accent} />}
       action={() =>
         copyToClipboard({
           content: lnAddress,

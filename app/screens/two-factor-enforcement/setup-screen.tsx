@@ -102,7 +102,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
     >
       <IconHero
         icon="lock-closed"
-        iconColor={colors._green}
+        iconColor={colors.staticSuccess}
         title={LL.TwoFactorEnforcement.setupTitle()}
         subtitle={
           <Text type="p3" style={styles.description}>
@@ -120,7 +120,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingTop: 10,
   },
   description: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     textAlign: "center",
   },
 }))

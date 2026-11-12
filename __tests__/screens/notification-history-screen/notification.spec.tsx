@@ -111,15 +111,15 @@ describe("Notification", () => {
     const notification = makeNotification({ icon: Icon.Bell })
     const { getByText, getByTestId } = renderNotification(notification)
 
-    expect(getByText(notification.body)).toHaveStyle({ color: light.black })
-    expect(getByTestId("icon-bell").props.color).toBe(light.black)
+    expect(getByText(notification.body)).toHaveStyle({ color: light.textOnBackground })
+    expect(getByTestId("icon-bell").props.color).toBe(light.textOnBackground)
   })
 
   it("renders acknowledged text greyed out", () => {
     const notification = makeNotification({ acknowledgedAt: ACKNOWLEDGED_AT })
     const { getByText } = renderNotification(notification)
 
-    expect(getByText(notification.body)).toHaveStyle({ color: light.grey2 })
+    expect(getByText(notification.body)).toHaveStyle({ color: light.textMuted })
   })
 
   it("greys out the icon variant once acknowledged", () => {
@@ -129,14 +129,14 @@ describe("Notification", () => {
     })
     const { getByTestId } = renderNotification(notification)
 
-    expect(getByTestId("icon-bell").props.color).toBe(light.grey2)
+    expect(getByTestId("icon-bell").props.color).toBe(light.textMuted)
   })
 
   it("greys out the text when acknowledgedAt arrives after mount", () => {
     const notification = makeNotification()
     const { getByText, rerender } = renderNotification(notification)
 
-    expect(getByText(notification.body)).toHaveStyle({ color: light.black })
+    expect(getByText(notification.body)).toHaveStyle({ color: light.textOnBackground })
 
     rerender(
       <ThemeProvider theme={theme}>
@@ -144,7 +144,7 @@ describe("Notification", () => {
       </ThemeProvider>,
     )
 
-    expect(getByText(notification.body)).toHaveStyle({ color: light.grey2 })
+    expect(getByText(notification.body)).toHaveStyle({ color: light.textMuted })
   })
 
   it("opens the blink deep link when pressed with a deep link action", () => {

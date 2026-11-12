@@ -21,7 +21,7 @@ export const OptionIcon = ({
         <GaloyIcon
           name={icon}
           size={24}
-          color={isSelected ? colors.primary : colors.grey3}
+          color={isSelected ? colors.accent : colors.textDisabled}
         />
       </View>
     )

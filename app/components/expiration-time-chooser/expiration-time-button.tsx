@@ -61,7 +61,7 @@ export const ExpirationTimeButton: React.FC<ExpirationTimeButtonProps> = ({
             <GaloyIcon
               name={iconName}
               size={20}
-              color={error ? colors.error : colors.primary}
+              color={error ? colors.error : colors.accent}
             />
           )}
         </View>
@@ -84,10 +84,10 @@ const useStyles = makeStyles(({ colors }, props: { big?: boolean }) => ({
     justifyContent: "center",
   },
   defaultBackground: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
   errorBackground: {
-    backgroundColor: colors.error9,
+    backgroundColor: colors.errorBackground,
   },
   interactiveOpacity: {
     opacity: 0.5,

@@ -1,6 +1,7 @@
 {
     "ApiScreen": {
         "keysGroupTitle": "Clés API",
+        "inactiveKeys": "Clés inactives ({count})",
         "noKeys": "Aucune clé API pour l'instant",
         "createKey": "Créer une clé API",
         "createTitle": "Nouvelle clé API",
@@ -27,6 +28,7 @@
         "revokeTitle": "Révoquer la clé API ?",
         "revokeBody": "\"{name: string}\" cessera immédiatement de fonctionner. Cette action est irréversible.",
         "revoke": "Révoquer",
+        "revokeGoBack": "Retour",
         "revokeSuccess": "Clé API révoquée",
         "createError": "Impossible de créer la clé API. Veuillez réessayer.",
         "revokeError": "Impossible de révoquer la clé API. Veuillez réessayer.",
@@ -2140,7 +2142,9 @@
         "selectAll": "Tout sélectionner",
         "clearAll": "Tout effacer",
         "addPlace": "Ajouter à la carte",
-        "addPlaceTitle": "Ajouter un lieu",
+        "addPlaceTitle": "Suggérer un commerce",
+        "submitPlaceRequest": "Envoyer la demande",
+        "showMyLocation": "Afficher ma position",
         "placePinHint": "Déplacez la carte pour placer le repère sur le lieu",
         "placeName": "Nom",
         "placeNameHint": "Le nom du lieu",
@@ -3107,7 +3111,6 @@
         "faq": "FAQ",
         "statusPage": "Page de configuration",
         "telegram": "Telegram",
-        "mattermost": "Mattermost",
         "defaultEmailSubject": "Aide {bankName: string} ",
         "defaultSupportMessage": "Bonjour ! J’ai besoin d’aide avec {bankName: string}, j’utilise la version {version: string} sur {os: string}.",
         "emailCopied": "e-mail {email: string} copié dans le presse-papier",
@@ -3373,7 +3376,10 @@
             "noLimit": "Sans limite",
             "limitUpdateSuccess": "Limite mise à jour avec succès",
             "limitUpdateError": "Échec de la mise à jour de la limite",
-            "limitMustBePositive": "La limite doit être supérieure à zéro"
+            "limitMustBePositive": "La limite doit être supérieure à zéro",
+            "atmToggleError": "Échec de la mise à jour des retraits DAB",
+            "atmControlsLoadError": "Impossible de charger vos limites DAB",
+            "invalidLimitAmount": "Saisissez un montant valide avec 2 décimales au maximum"
         },
         "CardStatements": {
             "title": "Mouvements",
@@ -3991,6 +3997,12 @@
             "title": "Nous ne pouvons pas migrer votre solde en dollars",
             "body": "Videz d'abord votre solde en dollars. Vous pouvez le transférer vers votre solde Bitcoin dans Blink ou ailleurs."
         },
+        "pendingDepositModal": {
+            "title": "Un dépôt est en attente sur votre compte",
+            "body": "Vous ne pouvez pas migrer vers un autre type de compte tant que tous vos dépôts en attente n'ont pas été réglés et crédités sur ce compte.",
+            "contactSupportCta": "Contacter le support",
+            "stillConfirming": "Votre dépôt n'est pas encore confirmé. Réessayez dans quelques minutes."
+        },
         "balancesOverview": {
             "title": "Déplacez votre solde",
             "body": "Déplacez vos fonds en toute sécurité vers votre nouveau compte.",
@@ -4178,6 +4190,7 @@
         "get": "Obtenir",
         "storeNote": "« Obtenir » ouvre l'App Store ou Google Play. Revenez sur Blink une fois l'application installée.",
         "haveAnApp": "J'ai déjà une application",
+        "learnHow": "Découvrir comment",
         "keyInstruction": "Copiez cette clé de configuration dans votre application d'authentification.",
         "qrInstruction": "Vous utilisez un autre appareil ?\nScannez plutôt ce code QR.",
         "backupTitle": "Sauvegardez votre clé",
@@ -4290,7 +4303,6 @@
         "payment": "Paiement"
     },
     "SelfCustodialStaleRate": {
-        "notice": "Le taux de change n'est peut-être plus à jour",
         "satsOnly": "Affichage en sats — aucun taux de change disponible"
     },
     "SelfCustodialOffline": {

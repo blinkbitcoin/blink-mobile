@@ -38,6 +38,9 @@ export const useCardData = ({ skip = false }: { skip?: boolean } = {}) => {
     nextFetchPolicy: "cache-first",
   })
 
+  /** False until the query answers, so a first lookup that fails is never read as an
+   *  account without a card. Apollo keeps the last answer when a later fetch fails. */
+  const hasLoaded = data !== undefined
   const account = data?.me?.defaultAccount
 
   const cards = account?.cards
@@ -49,5 +52,5 @@ export const useCardData = ({ skip = false }: { skip?: boolean } = {}) => {
       (a) => a.applicationStatus === ApplicationStatus.Approved,
     )?.id ?? null
 
-  return { card, hasPhysicalCard, applicationId, loading, error, refetch }
+  return { card, hasPhysicalCard, applicationId, hasLoaded, loading, error, refetch }
 }

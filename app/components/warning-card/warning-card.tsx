@@ -94,10 +94,10 @@ const useStyles = makeStyles(({ colors }) => ({
     borderColor: colors.warning,
   },
   static: {
-    backgroundColor: colors.grey7,
+    backgroundColor: colors.surfaceStatic,
   },
   active: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
   content: {
     rowGap: 8,

@@ -321,7 +321,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
           styles.amount,
           {
             ...primarySize,
-            color: isEmpty ? colors.grey2 : colors.black,
+            color: isEmpty ? colors.textMuted : colors.textOnBackground,
           },
           active && primaryStyle,
           isMorphing && sentPrimaryStyle,
@@ -339,7 +339,11 @@ export const SendHero: React.FC<SendHeroProps> = ({
             {
               fontSize: AMOUNT_SIZE[size].secondary,
               lineHeight: LINE_HEIGHT[size].secondary,
-              color: isEmpty ? colors.grey3 : active ? colors.grey2 : colors.black,
+              color: isEmpty
+                ? colors.textDisabled
+                : active
+                  ? colors.textMuted
+                  : colors.textOnBackground,
             },
             !active && styles.settledSecondary,
             active && secondaryStyle,
@@ -357,7 +361,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
   const icon = isMorphing ? (
     <View style={styles.iconStack}>
       <Animated.View style={sendingIconStyle}>
-        <GaloyIcon name="send" size={ICON_SIZE} color={colors.primary} />
+        <GaloyIcon name="send" size={ICON_SIZE} color={colors.accent} />
       </Animated.View>
       {isSent && sentPlay ? (
         <View style={styles.badgeOverlay}>
@@ -376,7 +380,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
   return (
     <IconHero
       icon={icon}
-      iconColor={colors.primary}
+      iconColor={colors.accent}
       iconSize={ICON_SIZE}
       hasIconBackground={false}
       compact
@@ -393,7 +397,7 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: CAPTION_SIZE.review,
     lineHeight: CAPTION_LINE_HEIGHT.review,
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   iconStack: {
     width: ICON_SIZE,

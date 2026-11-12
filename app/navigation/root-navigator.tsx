@@ -73,7 +73,6 @@ import {
 } from "@react-navigation/native-stack"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import {
   AuthenticationCheckScreen,
@@ -109,7 +108,7 @@ import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-scr
 import { CardFeeScheduleScreen } from "@app/screens/card-screen/card-fee-schedule-screen"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
 import { headerCloseControlOptions } from "@app/components/header-close-control"
-import { headerRightNoGlass } from "@app/components/header-no-glass"
+import { headerIconTouchArea, headerRightNoGlass } from "@app/components/header-no-glass"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
 import {
   CardAddToMobileWalletScreen,
@@ -190,6 +189,7 @@ import {
   PrimaryStackParamList,
   RootStackParamList,
 } from "./stack-param-lists"
+import { useBottomTabBarStyle } from "./bottom-tab-bar-style"
 import { useResumeCompletedMigration } from "@app/screens/account-migration/hooks/use-resume-completed-migration"
 
 import { HomeGate } from "./home-gate"
@@ -414,7 +414,7 @@ export const RootStack = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
-        headerTintColor: colors.black,
+        headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
       }}
@@ -488,7 +488,7 @@ export const RootStack = () => {
               onPress={() => navigation.setParams({ scanPressed: Date.now() })}
               style={styles.SendBitcoinScreenScanIcon}
             >
-              <ScanIcon fill={colors.black} />
+              <ScanIcon fill={colors.textOnBackground} />
             </TouchableOpacity>
           )),
         }}
@@ -575,7 +575,7 @@ export const RootStack = () => {
         component={EarnSection}
         options={{
           headerStyle: { backgroundColor: colors._blue },
-          headerTintColor: colors._white,
+          headerTintColor: colors.staticWhite,
           headerTitleStyle: {
             fontWeight: "bold",
             fontSize: 18,
@@ -1161,7 +1161,7 @@ export const OnboardingNavigator = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
-        headerTintColor: colors.black,
+        headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
       }}
     >
@@ -1216,7 +1216,7 @@ export const ContactNavigator = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
-        headerTintColor: colors.black,
+        headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
       }}
@@ -1274,7 +1274,7 @@ export const PhoneLoginNavigator = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
-        headerTintColor: colors.black,
+        headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
       }}
@@ -1307,11 +1307,10 @@ export const PhoneLoginNavigator = () => {
 const Tab = createBottomTabNavigator<PrimaryStackParamList>()
 
 export const PrimaryNavigator = () => {
-  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
-  const insets = useSafeAreaInsets()
+  const tabBarStyle = useBottomTabBarStyle()
 
   const { LL } = useI18nContext()
 
@@ -1324,15 +1323,9 @@ export const PrimaryNavigator = () => {
       <Tab.Navigator
         initialRouteName="Home"
         screenOptions={{
-          tabBarActiveTintColor: colors.primary,
-          tabBarInactiveTintColor: colors.grey2,
-          tabBarStyle: [
-            styles.bottomNavigatorStyle,
-            {
-              height: 60 + insets.bottom,
-              paddingBottom: insets.bottom,
-            },
-          ],
+          tabBarActiveTintColor: colors.accent,
+          tabBarInactiveTintColor: colors.textMuted,
+          tabBarStyle,
           tabBarLabelStyle: {
             paddingBottom: 6,
             fontSize: 12,
@@ -1398,18 +1391,15 @@ export const PrimaryNavigator = () => {
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  bottomNavigatorStyle: {
-    paddingTop: 4,
-    backgroundColor: colors.white,
-    borderTopColor: colors.grey4,
-  },
   headerStyle: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
   },
   title: {
-    color: colors.black,
+    color: colors.textOnBackground,
   },
+  // 48dp box around the 18dp icon: the margin gives back the 15dp it grew by.
   SendBitcoinScreenScanIcon: {
-    marginRight: 20,
+    ...headerIconTouchArea,
+    marginRight: 5,
   },
 }))

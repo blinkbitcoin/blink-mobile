@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Kľúče API",
+    "inactiveKeys": "Neaktívne kľúče ({count})",
     "noKeys": "Zatiaľ žiadne kľúče API",
     "createKey": "Vytvoriť kľúč API",
     "createTitle": "Nový kľúč API",
@@ -19,17 +20,18 @@
     "expiryNever": "Nikdy",
     "expiresOn": "Vyprší {date: string}",
     "neverExpires": "Nikdy nevyprší",
-    "revoked": "Zrušené",
+    "revoked": "Odvolaný",
     "expired": "Vypršal {date: string}",
     "expiredNoDate": "Vypršal",
     "secretWarning": "Toto je jediný raz, keď sa kľúč zobrazí. Skopírujte ho alebo zdieľajte teraz a bezpečne uložte.",
     "secretCopied": "Kľúč API skopírovaný. Schránka sa vymaže o 1 minútu",
-    "revokeTitle": "Zrušiť kľúč API?",
+    "revokeTitle": "Odvolať kľúč API?",
     "revokeBody": "\"{name: string}\" okamžite prestane fungovať. Túto akciu nie je možné vrátiť späť.",
-    "revoke": "Zrušiť",
-    "revokeSuccess": "Kľúč API zrušený",
+    "revoke": "Odvolať",
+    "revokeGoBack": "Späť",
+    "revokeSuccess": "Kľúč API odvolaný",
     "createError": "Kľúč API sa nepodarilo vytvoriť. Skúste to znova.",
-    "revokeError": "Kľúč API sa nepodarilo zrušiť. Skúste to znova.",
+    "revokeError": "Kľúč API sa nepodarilo odvolať. Skúste to znova.",
     "loadError": "Vaše kľúče API sa nepodarilo načítať. Skúste to neskôr.",
     "discardSecretTitle": "Zahodiť tento API kľúč?",
     "discardSecretBody": "Toto je jediný raz, keď sa tajomstvo zobrazí. Ak teraz odídete, kľúč sa nedá obnoviť a budete musieť vytvoriť nový.",
@@ -2140,7 +2142,9 @@
     "selectAll": "Vybrať všetko",
     "clearAll": "Zrušiť všetko",
     "addPlace": "Pridať na mapu",
-    "addPlaceTitle": "Pridať miesto",
+    "addPlaceTitle": "Navrhnúť podnik",
+    "submitPlaceRequest": "Odoslať žiadosť",
+    "showMyLocation": "Zobraziť moju polohu",
     "placePinHint": "Posuňte mapu tak, aby špendlík bol na danom mieste",
     "placeName": "Názov",
     "placeNameHint": "Ako sa miesto volá",
@@ -3107,7 +3111,6 @@
     "faq": "FAQ",
     "statusPage": "Stav",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Podpora",
     "defaultSupportMessage": "Dobrý deň! Potrebujem pomoc s {bankName: string}, používam verziu {version: string} na {os: string}.",
     "emailCopied": "e-mail {email: string} skopírovaný do schránky",
@@ -3289,7 +3292,10 @@
       "noLimit": "Bez limitu",
       "limitUpdateSuccess": "Limit bol úspešne aktualizovaný",
       "limitUpdateError": "Nepodarilo sa aktualizovať limit",
-      "limitMustBePositive": "Limit musí byť väčší ako nula"
+      "limitMustBePositive": "Limit musí byť väčší ako nula",
+      "atmToggleError": "Nepodarilo sa aktualizovať výbery z bankomatu",
+      "atmControlsLoadError": "Nepodarilo sa načítať limity pre bankomat",
+      "invalidLimitAmount": "Zadajte platnú sumu s najviac 2 desatinnými miestami"
     },
     "CardFeeSchedule": {
       "title": "Sadzobník poplatkov karty Blink",
@@ -3991,6 +3997,12 @@
       "title": "Váš dolárový zostatok nemôžeme migrovať",
       "body": "Najprv vyprázdnite svoj dolárový zostatok. Môžete ho previesť na svoj bitcoinový zostatok v Blinku alebo inam."
     },
+    "pendingDepositModal": {
+      "title": "Na váš účet čaká nevybavený vklad",
+      "body": "Na iný typ účtu nemôžete prejsť, kým nebudú všetky vaše čakajúce vklady vysporiadané a pripísané na tento účet.",
+      "contactSupportCta": "Kontaktovať podporu",
+      "stillConfirming": "Váš vklad ešte nebol potvrdený. Skúste to znova o niekoľko minút."
+    },
     "balancesOverview": {
       "title": "Presuňte svoj zostatok",
       "body": "Bezpečne presuňte svoje prostriedky na svoj nový účet.",
@@ -4178,6 +4190,7 @@
     "get": "Stiahnuť",
     "storeNote": "„Stiahnuť“ otvorí App Store alebo Google Play. Po nainštalovaní sa vráťte do Blinku.",
     "haveAnApp": "Aplikáciu už mám",
+    "learnHow": "Zistiť ako",
     "keyInstruction": "Skopírujte tento kľúč na nastavenie do svojej autentifikačnej aplikácie.",
     "qrInstruction": "Používate iné zariadenie?\nNaskenujte namiesto toho tento QR kód.",
     "backupTitle": "Zálohujte svoj kľúč",
@@ -4290,7 +4303,6 @@
     "payment": "Platba"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Výmenný kurz môže byť zastaraný",
     "satsOnly": "Zobrazené v satoch – výmenný kurz nie je dostupný"
   },
   "SelfCustodialOffline": {
