@@ -27,6 +27,7 @@ import type { useNonCustodialConversionLimits } from "@app/self-custodial/hooks/
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
 
+import { flushEffects } from "../helpers/flush-effects"
 import { waitForStableRender } from "../helpers/wait-for-stable-render"
 import { ContextForScreen } from "./helper"
 
