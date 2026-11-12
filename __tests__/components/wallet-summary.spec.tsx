@@ -171,7 +171,7 @@ describe("WalletSummary", () => {
       expect(within(hiddenCopy).UNSAFE_queryAllByType(Text)).toHaveLength(2)
     })
 
-    it("names only the wallet, drops the swap icon and sits on grey7", () => {
+    it("names only the wallet, drops the swap icon and sits on the static surface", () => {
       renderCard({
         inactive: true,
         currency: WalletCurrency.Btc,
@@ -184,7 +184,7 @@ describe("WalletSummary", () => {
         expect.objectContaining({ hasSwapIcon: false }),
       )
       expect(StyleSheet.flatten(card().props.style).backgroundColor).toBe(
-        theme.lightColors?.grey7,
+        theme.lightColors?.surfaceStatic,
       )
     })
   })

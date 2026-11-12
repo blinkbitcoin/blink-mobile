@@ -206,13 +206,13 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.loaderForeground,
   },
   cardInactive: {
-    backgroundColor: colors.grey7,
+    backgroundColor: colors.surfaceStatic,
   },
   cardError: {
     borderColor: colors.error,
   },
   cardPressed: {
-    backgroundColor: colors.grey6,
+    backgroundColor: colors.surfacePressed,
   },
   balances: {
     flex: 1,

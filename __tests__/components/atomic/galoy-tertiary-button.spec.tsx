@@ -49,21 +49,23 @@ describe("GaloyTertiaryButton", () => {
     it("is a grey5 pill with no border", () => {
       renderButton({ unfilled: true })
 
-      expect(containerStyle()).toMatchObject({ backgroundColor: colors.grey5 })
+      expect(containerStyle()).toMatchObject({
+        backgroundColor: colors.surfaceInteractive,
+      })
       expect(containerStyle().borderWidth).toBeUndefined()
     })
 
     it("turns grey6 while pressed", () => {
       renderButton({ unfilled: true })
 
-      expect(pressedStyle()).toMatchObject({ backgroundColor: colors.grey6 })
+      expect(pressedStyle()).toMatchObject({ backgroundColor: colors.surfacePressed })
       expect(pressedStyle().borderWidth).toBeUndefined()
     })
 
     it("draws its label in primary", () => {
       renderButton({ unfilled: true })
 
-      expect(labelColor()).toBe(colors.primary)
+      expect(labelColor()).toBe(colors.accent)
     })
   })
 
@@ -71,18 +73,18 @@ describe("GaloyTertiaryButton", () => {
     it("keeps the filled primary pill", () => {
       renderButton()
 
-      expect(containerStyle()).toMatchObject({ backgroundColor: colors.primary })
-      expect(labelColor()).toBe(colors.white)
+      expect(containerStyle()).toMatchObject({ backgroundColor: colors.accent })
+      expect(labelColor()).toBe(colors.backgroundDefault)
     })
 
     it("keeps the outline style's primary border", () => {
       renderButton({ outline: true })
 
       expect(containerStyle()).toMatchObject({
-        borderColor: colors.primary,
+        borderColor: colors.accent,
         borderWidth: 1.5,
       })
-      expect(labelColor()).toBe(colors.black)
+      expect(labelColor()).toBe(colors.textOnBackground)
     })
   })
 })
