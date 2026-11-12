@@ -19,7 +19,7 @@ import { reportError } from "@app/utils/error-logging"
 
 import { GetFee } from "./payment-details/index.types"
 
-type FeeType =
+export type FeeType =
   | {
       status: "loading" | "unset"
       amount?: undefined | null
