@@ -133,7 +133,7 @@ const useStyles = makeStyles(({ colors }) => ({
     fontFamily: fonts.bold,
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "right",
   },
   modal: {
