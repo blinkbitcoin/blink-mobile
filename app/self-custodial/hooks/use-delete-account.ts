@@ -16,6 +16,11 @@ import { resetSdkLogs } from "@app/self-custodial/diagnostics/sdk-log-files"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { errorKind, logBreadcrumb } from "@app/utils/error-reporting"
 import { removeBackupStateFor } from "@app/self-custodial/providers/backup-state"
+import { forgetLostAttemptsOf } from "@app/self-custodial/payment-details/lost-attempts"
+import {
+  lostAttemptsWalletId,
+  removeLostAttempts,
+} from "@app/self-custodial/storage/lost-attempts"
 import {
   markAccountDeletedForRefresh,
   unmarkAccountDeletedForRefresh,
@@ -111,6 +116,7 @@ export const eraseWalletFromDevice = async (
     isSeedGone = await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
     if (isSeedGone) {
       await removeSelfCustodialAccountId(accountId)
+      await forgetLostAttemptsFor(accountId)
       await removeWalletStorage(storageDir, isSdkIdle)
     } else {
       await keepWalletStorage(storageDir)
@@ -163,6 +169,25 @@ export const eraseWalletFromDevice = async (
     unmarkAccountDeletedForRefresh(accountId)
     if (storageDir && !isSeedGone) await keepWalletStorage(storageDir)
     throw err
+  }
+}
+
+/**
+ * Best-effort, on both networks like the bundles, right after the seed and its index entry
+ * went, ahead of the steps that can fail: the destinations a lost send left must not
+ * outlive the wallet. A wallet whose seed survived keeps them, to look for its lost sends.
+ */
+const forgetLostAttemptsFor = async (accountId: string): Promise<void> => {
+  for (const attemptsNetwork of [Network.Mainnet, Network.Regtest]) {
+    try {
+      const walletId = lostAttemptsWalletId(accountId, attemptsNetwork)
+      forgetLostAttemptsOf(walletId)
+      await removeLostAttempts(walletId)
+    } catch (err) {
+      logBreadcrumb(
+        `[self-custodial delete] lost attempts cleanup failed (${errorKind(err)})`,
+      )
+    }
   }
 }
 

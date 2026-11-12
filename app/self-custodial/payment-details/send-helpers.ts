@@ -354,6 +354,10 @@ const withAttempt = (
   },
 ): LostSend => ({
   startedAtMs: earlier?.startedAtMs ?? startedAtMs,
+  lastAttemptAtMs: Math.max(
+    earlier?.lastAttemptAtMs ?? earlier?.startedAtMs ?? startedAtMs,
+    startedAtMs,
+  ),
   walletClockSec: Math.min(earlier?.walletClockSec ?? walletClockSec, walletClockSec),
   paymentHashes: withItem(earlier?.paymentHashes ?? [], identity.paymentHash),
   sparkInvoices: withItem(earlier?.sparkInvoices ?? [], identity.sparkInvoice),
@@ -631,6 +635,13 @@ const sendAfterEarlierAttempts = async <
   }: RunSelfCustodialSendParams<P, R>,
   invocationKey: string | undefined,
 ): Promise<SendOutcome> => {
+  /** Nothing is sent while the attempts an earlier launch lost have not been read back:
+   *  one of them may be this send's, paid already. Nothing is known lost either, so the
+   *  sender is only asked to try again in a moment. */
+  if (!attempts.isStoredRead()) {
+    return failure(new Error("Lost attempts of an earlier launch not read back yet"))
+  }
+
   const { lostSend: earlier } = attempts.read()
   let unresolved = attempts.read().unresolvedSend
 
@@ -859,7 +870,11 @@ const sendAfterEarlierAttempts = async <
 
   if (!identity) {
     if (isRaisedBeforeDispatch) return failure(err)
-    const unresolvedNow: UnresolvedSend = { idempotencyKey, requestedAs }
+    const unresolvedNow: UnresolvedSend = {
+      idempotencyKey,
+      recordedAtMs: startedAtMs,
+      requestedAs,
+    }
     attempts.update((current) => ({ ...current, unresolvedSend: unresolvedNow }))
     if (idempotencyKey) return failure(err)
     /** No "send anyway" yet: the history cannot show this payment until the wallet has

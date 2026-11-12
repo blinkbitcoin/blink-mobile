@@ -1,9 +1,13 @@
 import {
   conversionAttemptRef,
+  forgetLostAttemptsOf,
   lostAttemptsFor,
   lostAttemptsTo,
   scopeLostAttemptsTo,
+  STORED_ATTEMPTS_READ_TIMEOUT_MS,
   withoutSettled,
+  type LostAttempts,
+  type LostAttemptsStorage,
 } from "@app/self-custodial/payment-details/lost-attempts"
 
 const unresolvedSend = { idempotencyKey: undefined }
@@ -184,7 +188,247 @@ describe("settling lost attempts", () => {
   })
 })
 
+/** What a wallet left in storage in an earlier app launch, and every save since. */
+const storageHolding = (stored: Record<string, Map<string, LostAttempts>> = {}) => {
+  const saves: Array<[string, Map<string, LostAttempts>]> = []
+  const loads: string[] = []
+  const storage: LostAttemptsStorage = {
+    load: async (walletId) => {
+      loads.push(walletId)
+      return new Map(stored[walletId] ?? [])
+    },
+    save: async (walletId, attempts) => {
+      saves.push([walletId, new Map(attempts)])
+    },
+  }
+  return { storage, saves, loads }
+}
+
 const nextTurn = () => new Promise(setImmediate)
+
+describe("lost attempts across app launches", () => {
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  it("restores what the wallet left before its first send runs", async () => {
+    const { storage } = storageHolding({
+      "wallet-launch-1": new Map([["sp1abc", { unresolvedSend }]]),
+    })
+    scopeLostAttemptsTo("wallet-launch-1", storage)
+
+    const seen = await lostAttemptsFor("sp1abc").oneAtATime(async () =>
+      lostAttemptsTo("sp1abc"),
+    )
+
+    expect(seen).toEqual({ unresolvedSend })
+  })
+
+  it("reads a wallet's storage once per launch, not again on a reconnect", async () => {
+    const { storage, loads } = storageHolding()
+    scopeLostAttemptsTo("wallet-launch-3", storage)
+    scopeLostAttemptsTo("wallet-launch-4", storage)
+    scopeLostAttemptsTo("wallet-launch-3", storage)
+
+    expect(loads).toEqual(["wallet-launch-3", "wallet-launch-4"])
+  })
+
+  it("stores the latest state for the next launch, once the read has answered", async () => {
+    const { storage, saves } = storageHolding()
+    scopeLostAttemptsTo("wallet-launch-5", storage)
+
+    remember("sp1abc", { unresolvedSend })
+    remember("sp1def", { unresolvedSend })
+    lostAttemptsFor("sp1abc").update(() => ({}))
+    await nextTurn()
+
+    expect(saves.at(-1)).toEqual([
+      "wallet-launch-5",
+      new Map([["sp1def", { unresolvedSend }]]),
+    ])
+  })
+
+  it("never stores this launch's attempts over an earlier launch's not read back yet", async () => {
+    let answer: (stored: Map<string, LostAttempts>) => void = () => undefined
+    const saves: Array<Map<string, LostAttempts>> = []
+    scopeLostAttemptsTo("wallet-launch-9", {
+      load: () =>
+        new Promise((resolve) => {
+          answer = resolve
+        }),
+      save: async (_walletId, attempts) => {
+        saves.push(new Map(attempts))
+      },
+    })
+
+    remember("sp1new", { unresolvedSend })
+    await nextTurn()
+    expect(saves).toEqual([])
+
+    answer(new Map([["sp1old", { lostSend: lostSend("hash-old") }]]))
+    await nextTurn()
+
+    expect(saves.at(-1)).toEqual(
+      new Map<string, LostAttempts>([
+        ["sp1new", { unresolvedSend }],
+        ["sp1old", { lostSend: lostSend("hash-old") }],
+      ]),
+    )
+  })
+
+  it("keeps storing after a write that failed", async () => {
+    const saves: Array<Map<string, LostAttempts>> = []
+    const save = jest
+      .fn()
+      .mockRejectedValueOnce(new Error("disk full"))
+      .mockImplementation(
+        async (_walletId: string, attempts: Map<string, LostAttempts>) => {
+          saves.push(new Map(attempts))
+        },
+      )
+    scopeLostAttemptsTo("wallet-launch-10", { load: async () => new Map(), save })
+
+    remember("sp1abc", { unresolvedSend })
+    await nextTurn()
+    remember("sp1def", { unresolvedSend })
+    await nextTurn()
+
+    expect(save).toHaveBeenCalledTimes(2)
+    expect(saves).toEqual([
+      new Map([
+        ["sp1abc", { unresolvedSend }],
+        ["sp1def", { unresolvedSend }],
+      ]),
+    ])
+  })
+
+  it("has nothing to read back before any wallet connected", () => {
+    let fresh: typeof import("@app/self-custodial/payment-details/lost-attempts")
+    jest.isolateModules(() => {
+      fresh = jest.requireActual("@app/self-custodial/payment-details/lost-attempts")
+    })
+
+    expect(fresh!.lostAttemptsFor("sp1abc").isStoredRead()).toBe(true)
+  })
+
+  it("runs a send asked for before any wallet connected, with nothing to wait for", async () => {
+    let fresh: typeof import("@app/self-custodial/payment-details/lost-attempts")
+    jest.isolateModules(() => {
+      fresh = jest.requireActual("@app/self-custodial/payment-details/lost-attempts")
+    })
+
+    await expect(
+      fresh!.lostAttemptsFor("sp1abc").oneAtATime(async () => "sent"),
+    ).resolves.toBe("sent")
+  })
+
+  it("goes on without the stored attempts once their read takes too long, and restores them when it answers", async () => {
+    jest.useFakeTimers()
+    let answer: (stored: Map<string, LostAttempts>) => void = () => undefined
+    scopeLostAttemptsTo("wallet-launch-8", {
+      load: () =>
+        new Promise((resolve) => {
+          answer = resolve
+        }),
+      save: async () => undefined,
+    })
+
+    const send = lostAttemptsFor("sp1abc").oneAtATime(async () => "sent")
+    await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_READ_TIMEOUT_MS)
+    await expect(send).resolves.toBe("sent")
+
+    answer(new Map([["sp1def", { unresolvedSend }]]))
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(lostAttemptsTo("sp1def")).toEqual({ unresolvedSend })
+  })
+
+  it("reads once more before writing when the read failed, and restores what it reads", async () => {
+    const saves: Array<Map<string, LostAttempts>> = []
+    const load = jest
+      .fn()
+      .mockRejectedValueOnce(new Error("io"))
+      .mockResolvedValueOnce(new Map([["sp1old", { unresolvedSend }]]))
+    scopeLostAttemptsTo("wallet-launch-12", {
+      load,
+      save: async (_walletId, attempts) => {
+        saves.push(new Map(attempts))
+      },
+    })
+
+    remember("sp1new", { unresolvedSend })
+    await nextTurn()
+
+    expect(load).toHaveBeenCalledTimes(2)
+    expect(saves.at(-1)).toEqual(
+      new Map([
+        ["sp1new", { unresolvedSend }],
+        ["sp1old", { unresolvedSend }],
+      ]),
+    )
+  })
+
+  it("writes nothing this launch when the read fails twice, keeping what storage holds", async () => {
+    const save = jest.fn(async () => undefined)
+    scopeLostAttemptsTo("wallet-launch-13", {
+      load: () => Promise.reject(new Error("io")),
+      save,
+    })
+
+    remember("sp1new", { unresolvedSend })
+    await nextTurn()
+
+    expect(save).not.toHaveBeenCalled()
+    expect(lostAttemptsTo("sp1new")).toEqual({ unresolvedSend })
+  })
+
+  it("tells whether the stored attempts have been read back yet", async () => {
+    let answer: (stored: Map<string, LostAttempts>) => void = () => undefined
+    scopeLostAttemptsTo("wallet-launch-19", {
+      load: () =>
+        new Promise((resolve) => {
+          answer = resolve
+        }),
+      save: async () => undefined,
+    })
+
+    expect(lostAttemptsFor("sp1abc").isStoredRead()).toBe(false)
+    answer(new Map())
+    await nextTurn()
+
+    expect(lostAttemptsFor("sp1abc").isStoredRead()).toBe(true)
+  })
+
+  it("writes nothing more for a forgotten wallet, and a later scope to it starts afresh", async () => {
+    const { storage, saves, loads } = storageHolding({
+      "wallet-launch-16": new Map([["sp1abc", { unresolvedSend }]]),
+    })
+    scopeLostAttemptsTo("wallet-launch-16", storage)
+    const handleBeforeForget = lostAttemptsFor("sp1abc")
+    await handleBeforeForget.oneAtATime(async () => undefined)
+
+    forgetLostAttemptsOf("wallet-launch-16")
+    handleBeforeForget.update(() => ({ lostSend: lostSend("hash-late") }))
+    await nextTurn()
+    expect(saves).toEqual([])
+
+    scopeLostAttemptsTo("wallet-launch-16", storage)
+    expect(loads).toEqual(["wallet-launch-16", "wallet-launch-16"])
+    forgetLostAttemptsOf("wallet-never-scoped")
+  })
+
+  it("still sends when the wallet's storage cannot be read", async () => {
+    scopeLostAttemptsTo("wallet-launch-6", {
+      load: () => Promise.reject(new Error("io")),
+      save: async () => undefined,
+    })
+
+    await expect(lostAttemptsFor("sp1abc").oneAtATime(async () => "sent")).resolves.toBe(
+      "sent",
+    )
+    expect(lostAttemptsTo("sp1abc")).toEqual({})
+  })
+})
 
 describe("a repeat of a send still queued or in flight", () => {
   const heldSend = () => {

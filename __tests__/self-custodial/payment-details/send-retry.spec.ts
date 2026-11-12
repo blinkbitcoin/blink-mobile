@@ -7,6 +7,7 @@ import { createSelfCustodialSparkPaymentDetails } from "@app/self-custodial/paym
 import {
   lostAttemptsTo,
   scopeLostAttemptsTo,
+  STORED_ATTEMPTS_READ_TIMEOUT_MS,
   type RequestedAs,
 } from "@app/self-custodial/payment-details/lost-attempts"
 import {
@@ -1115,7 +1116,10 @@ describe("a bitcoin Spark-address send that throws again under the same key", ()
 
     expect(sentKeys()).toEqual([KEY, KEY])
     expect(mockFindPaymentUnderKey).not.toHaveBeenCalled()
-    expect(lostAttemptsTo("sp1abc").unresolvedSend).toEqual({ idempotencyKey: KEY })
+    expect(lostAttemptsTo("sp1abc").unresolvedSend).toEqual({
+      idempotencyKey: KEY,
+      recordedAtMs: expect.any(Number),
+    })
   })
 })
 
@@ -1614,6 +1618,39 @@ describe("a lost attempt found by a send asked for another amount", () => {
 
     expect(result.status).toBe(PaymentSendResult.Success)
     expect(lostAttemptsTo("lnbc1...")).toEqual({})
+  })
+})
+
+describe("a send asked for before the wallet's stored attempts were read back", () => {
+  beforeEach(resetSendMocks)
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  /** Nothing is known lost: the sender is asked to try again in a moment, not told a
+   *  payment may have gone through. */
+  it("is refused, sending nothing, while that read has not answered", async () => {
+    jest.useFakeTimers()
+    scopeLostAttemptsTo(`wallet-slow-read-${(connectedWallets += 1)}`, {
+      load: () =>
+        new Promise(() => {
+          /** never answers */
+        }),
+      save: async () => undefined,
+    })
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress())
+    mockSendPayment.mockResolvedValue(sent())
+    const ref = {}
+
+    const pending = attempt(
+      createSendMutation(btcSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
+    await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_READ_TIMEOUT_MS)
+    const result = await pending
+
+    expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.Generic)
+    expect(mockSendPayment).not.toHaveBeenCalled()
   })
 })
 

@@ -1,9 +1,12 @@
 /**
  * What sends that threw after dispatch leave behind for the next send to the same
- * destination. No dependencies, so the wallet lifecycle can scope it without pulling in
- * the send path.
+ * destination. It depends on nothing of the send path, so the wallet lifecycle can scope
+ * it without pulling that in; only on where it keeps them across app launches.
  */
 import type { ConvertAttemptRef } from "@app/types/payment"
+import { withTimeout } from "@app/utils/with-timeout"
+
+import { loadLostAttempts, saveLostAttempts } from "../storage/lost-attempts"
 
 /**
  * The attempts of a send that threw after dispatch without their payment turning up: the
@@ -14,6 +17,9 @@ import type { ConvertAttemptRef } from "@app/types/payment"
  */
 export type LostSend = {
   startedAtMs: number
+  /** When the latest of the attempts was made: what keeps them across app launches, so a
+   *  recent attempt does not lapse with the first one. */
+  lastAttemptAtMs?: number
   /**
    * When the newest send the wallet held was made, by the server's clock, as the
    * earliest of the attempts was lost (unix seconds; 0 when it held none or could not
@@ -48,10 +54,11 @@ export type RequestedAs = { entered: string; settlement: string }
  * attempt went out: the SDK records a keyed payment with the key as its id, so it is
  * asked for by that id. An attempt that went out without a key cannot be told apart from
  * any other send to the same address, so it is refused until the sender has checked
- * their history.
+ * their history. When it was recorded is what lets it lapse across app launches.
  */
 export type UnresolvedSend = {
   idempotencyKey?: string
+  recordedAtMs?: number
   /** What the sender asked it for. */
   requestedAs?: RequestedAs
 }
@@ -60,22 +67,55 @@ export type UnresolvedSend = {
 export type LostAttempts = { lostSend?: LostSend; unresolvedSend?: UnresolvedSend }
 
 /**
- * Lost attempts, by destination, for as long as the app runs.
+ * Lost attempts, by destination, kept across app launches.
  *
  * Not kept on the payment detail: the details screen builds a new one every time it is
  * opened, so a sender who backs out after a lost send and enters the same destination
  * again would start from nothing and could pay it twice. A new amount, wallet or fee is
  * the same destination too, so all of them see what an earlier attempt left behind
- * without carrying it from detail to detail.
+ * without carrying it from detail to detail. Not kept in memory alone either: closing the
+ * app is the usual answer to a send that hung or threw, and the send made after it would
+ * otherwise start from nothing too.
  *
  * Kept apart by wallet: a payment another wallet lost is not this one's to look for, nor
- * to be refused over. Every wallet keeps its own for as long as the app runs, so one the
- * sender switches back to still has them, and a send still in flight after a switch
- * writes where its own wallet's are, never into the next wallet's.
+ * to be refused over. Every wallet keeps its own, so one the sender switches back to
+ * still has them, and a send still in flight after a switch writes where its own
+ * wallet's are, never into the next wallet's.
  */
 const lostAttemptsByWallet = new Map<string, Map<string, LostAttempts>>()
 /** Until a wallet connects: nothing is sent before one does. */
 let connectedWalletAttempts = new Map<string, LostAttempts>()
+
+/** Where a wallet's lost attempts are kept between app launches. */
+export type LostAttemptsStorage = {
+  load: (walletId: string) => Promise<Map<string, LostAttempts>>
+  save: (walletId: string, attempts: ReadonlyMap<string, LostAttempts>) => Promise<void>
+}
+
+const deviceStorage: LostAttemptsStorage = {
+  load: loadLostAttempts,
+  save: saveLostAttempts,
+}
+
+/** How long a send waits for the stored attempts; past it, it is refused until they
+ *  have been read back. A read that failed twice lets sends go on with this launch's
+ *  attempts alone: storage that cannot be read holds back much more than these. */
+export const STORED_ATTEMPTS_READ_TIMEOUT_MS = 5000
+
+/**
+ * How a wallet's attempts reach storage. `readSettled`: the read of what an earlier launch
+ * left, as long as a send waits for it. `isRead`: whether that read has answered. `keep`:
+ * stores the attempts as they are now, after every write before it. `forget`: writes
+ * nothing more, as the wallet's deletion asks.
+ */
+type WalletPersistence = {
+  readSettled: Promise<void>
+  isRead: () => boolean
+  keep: () => void
+  forget: () => void
+}
+
+const persistenceOf = new WeakMap<Map<string, LostAttempts>, WalletPersistence>()
 
 /**
  * Bech32 and bech32m, the encoding of invoices, Spark addresses, segwit bitcoin addresses
@@ -99,11 +139,101 @@ const storeKeyOf = (destination: string): string => {
   return isOneCase && BECH32.test(lower) ? lower : trimmed
 }
 
-/** Points the store at the wallet now connected, with whatever it holds for it. */
-export const scopeLostAttemptsTo = (walletId: string) => {
-  const held = lostAttemptsByWallet.get(walletId) ?? new Map<string, LostAttempts>()
+/**
+ * Points the store at the wallet now connected, with whatever it holds for it. The first
+ * time a wallet connects in this app launch, what it left in storage is read back; its
+ * sends wait for that, so none goes out before the attempts an earlier launch lost.
+ */
+export const scopeLostAttemptsTo = (
+  walletId: string,
+  storage: LostAttemptsStorage = deviceStorage,
+) => {
+  const known = lostAttemptsByWallet.get(walletId)
+  if (known) {
+    connectedWalletAttempts = known
+    return
+  }
+
+  const held = new Map<string, LostAttempts>()
   lostAttemptsByWallet.set(walletId, held)
   connectedWalletAttempts = held
+
+  persistenceOf.set(held, persistWalletAttempts(walletId, held, storage))
+}
+
+/**
+ * Forgets a wallet's lost attempts, as its deletion does: nothing of it is written again,
+ * a send still in flight for it included, and a later scope to it starts from nothing.
+ */
+export const forgetLostAttemptsOf = (walletId: string) => {
+  const held = lostAttemptsByWallet.get(walletId)
+  if (held) persistenceOf.get(held)?.forget()
+  lostAttemptsByWallet.delete(walletId)
+}
+
+const noop = () => undefined
+
+/**
+ * How a wallet's attempts are read back and kept between app launches.
+ *
+ * Read once the wallet connects. Sends wait for the read only so long, then are refused
+ * until it has answered: one that never answers must not hold a send pending for good.
+ *
+ * Writes wait for the read whatever it takes: until it answers, nothing is known of what
+ * an earlier launch kept, and a write would replace it with this launch's attempts alone.
+ * A read that failed is tried once more; if that fails too, nothing is written this
+ * launch, for the same reason, and the attempts are kept in memory only. Writes queue
+ * behind each other, and each writes the attempts as they are when its turn comes, so
+ * the last one stored is the latest state. A write that fails leaves the queue going: the
+ * storage reports it.
+ */
+const persistWalletAttempts = (
+  walletId: string,
+  held: Map<string, LostAttempts>,
+  storage: LostAttemptsStorage,
+): WalletPersistence => {
+  let isReadable = true
+  let hasReadAnswered = false
+  let isForgotten = false
+  /** Nothing is recorded before the read has answered, since no send goes out before. */
+  const restore = (stored: Map<string, LostAttempts>) =>
+    stored.forEach((attempts, destination) => {
+      if (!held.has(destination)) held.set(destination, attempts)
+    })
+
+  const readBack: Promise<void> = storage
+    .load(walletId)
+    .then(restore, () =>
+      storage.load(walletId).then(restore, () => {
+        isReadable = false
+      }),
+    )
+    .finally(() => {
+      hasReadAnswered = true
+    })
+  const readSettled = withTimeout(
+    readBack,
+    STORED_ATTEMPTS_READ_TIMEOUT_MS,
+    "Lost attempts read",
+  ).then(noop, noop)
+
+  const write = async () => {
+    const mayWrite = isReadable && !isForgotten
+    if (!mayWrite) return
+    await storage.save(walletId, new Map(held))
+  }
+
+  let lastWrite: Promise<void> = readBack.catch(noop)
+  return {
+    readSettled,
+    isRead: () => hasReadAnswered,
+    keep: () => {
+      lastWrite = lastWrite.then(write).catch(noop)
+    },
+    forget: () => {
+      isForgotten = true
+    },
+  }
 }
 
 /**
@@ -134,6 +264,9 @@ const sameSendsIn = (byDestination: Map<string, LostAttempts>) => {
 /** One destination's lost attempts, in the wallet that was connected when it was taken. */
 export type LostAttemptsHandle = {
   read: () => LostAttempts
+  /** Whether the attempts an earlier launch left have been read back: until then, what
+   *  `read` answers may be missing some. */
+  isStoredRead: () => boolean
   /** Applied to what the destination holds when it is written, not when it was read. */
   update: (change: (current: LostAttempts) => LostAttempts) => void
   /**
@@ -157,7 +290,11 @@ export const lostAttemptsFor = (destination: string): LostAttemptsHandle => {
 
   const queueBehindEarlierSends = <T>(send: () => Promise<T>): Promise<T> => {
     const inFlight = sendsInFlightIn(byDestination)
-    const result = (inFlight.get(key) ?? Promise.resolve()).then(send)
+    const turn =
+      inFlight.get(key) ??
+      persistenceOf.get(byDestination)?.readSettled ??
+      Promise.resolve()
+    const result = turn.then(send)
     const done = result.then(
       () => undefined,
       () => undefined,
@@ -171,10 +308,12 @@ export const lostAttemptsFor = (destination: string): LostAttemptsHandle => {
 
   return {
     read,
+    isStoredRead: () => persistenceOf.get(byDestination)?.isRead() ?? true,
     update: (change) => {
       const next = change(read())
       if (next.lostSend || next.unresolvedSend) byDestination.set(key, next)
       else byDestination.delete(key)
+      persistenceOf.get(byDestination)?.keep()
     },
     oneAtATime: (send, sameSendKey) => {
       if (sameSendKey === undefined) return queueBehindEarlierSends(send)
