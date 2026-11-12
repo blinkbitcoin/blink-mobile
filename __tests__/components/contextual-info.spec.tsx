@@ -15,6 +15,7 @@ jest.mock("@rn-vui/themed", () => ({
       colors: {
         textSecondary: "textSecondary",
         accent: "accent",
+        error: "error",
       },
     },
   }),
@@ -270,6 +271,56 @@ describe("ContextualInfo", () => {
       )
 
       expect(getByTestId("galoy-icon-warning")).toBeTruthy()
+    })
+  })
+
+  describe("OnChain deposit warning", () => {
+    const feesInformation = {
+      deposit: {
+        minBankFee: "2500",
+        minBankFeeThreshold: "1000000",
+        tiers: [
+          { maxAmount: "1000000", amount: "2500" },
+          { maxAmount: null, amount: "0" },
+        ],
+      },
+    }
+    const warning = "2,500 SAT will be consumed by the deposit fee"
+
+    it("renders the warning under the deposit fee line", () => {
+      const { getByTestId, getByText } = render(
+        <ContextualInfo
+          {...defaultProps}
+          type={Invoice.OnChain}
+          canSetExpirationTime={false}
+          feesInformation={feesInformation}
+          depositWarning={warning}
+        />,
+      )
+
+      expect(getByText(/^Deposit fee:/)).toBeTruthy()
+      expect(getByTestId("deposit-fee-warning").props.children).toBe(warning)
+    })
+
+    it("renders the warning before feesInformation resolves", () => {
+      const { getByTestId } = render(
+        <ContextualInfo
+          {...defaultProps}
+          type={Invoice.OnChain}
+          canSetExpirationTime={false}
+          depositWarning={warning}
+        />,
+      )
+
+      expect(getByTestId("deposit-fee-warning").props.children).toBe(warning)
+    })
+
+    it("ignores it off the onchain page", () => {
+      const { queryByTestId } = render(
+        <ContextualInfo {...defaultProps} depositWarning={warning} />,
+      )
+
+      expect(queryByTestId("deposit-fee-warning")).toBeNull()
     })
   })
 

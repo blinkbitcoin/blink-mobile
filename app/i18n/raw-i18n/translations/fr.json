@@ -2280,6 +2280,9 @@
         "depositFeeTiers": "Deposit fees: {tiers: string}",
         "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
         "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
+        "depositBelowMinimum": "Le montant est inférieur au dépôt minimum. Tout montant inférieur à {min} SAT n'arrivera pas",
+        "depositBelowFee": "Le montant sera absorbé par les frais de dépôt",
+        "depositConsumedByFee": "{fee} SAT seront absorbés par les frais de dépôt",
         "autoConvertMinAmount": "Les montants inférieurs à {minSats: number} sats / {minFiat: string} ne peuvent pas être convertis en Dollar automatiquement. Vous recevrez des Bitcoins.",
         "autoConvertFailed": "Paiement reçu mais la conversion a échoué.",
         "pleaseWaitForConversion": "Veuillez patienter jusqu'à ce que la conversion soit terminée"

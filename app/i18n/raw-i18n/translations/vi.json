@@ -2280,6 +2280,9 @@
     "depositFeeTiers": "Deposit fees: {tiers: string}",
     "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
     "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
+    "depositBelowMinimum": "Số tiền thấp hơn mức nạp tối thiểu. Mọi khoản dưới {min} SAT sẽ không đến",
+    "depositBelowFee": "Số tiền sẽ bị phí nạp tiền khấu trừ hết",
+    "depositConsumedByFee": "{fee} SAT sẽ bị khấu trừ cho phí nạp tiền",
     "autoConvertMinAmount": "Số tiền dưới {minSats: number} sats / {minFiat: string} không thể chuyển đổi tự động sang Đô la. Bạn sẽ nhận Bitcoin thay thế.",
     "autoConvertFailed": "Đã nhận thanh toán nhưng chuyển đổi thất bại.",
     "pleaseWaitForConversion": "Vui lòng đợi cho đến khi quá trình chuyển đổi hoàn tất"

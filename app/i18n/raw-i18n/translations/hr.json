@@ -2280,6 +2280,9 @@
     "depositFeeTiers": "Deposit fees: {tiers: string}",
     "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
     "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
+    "depositBelowMinimum": "Iznos je ispod minimalnog pologa. Ništa ispod {min} SAT neće stići",
+    "depositBelowFee": "Iznos će potrošiti naknada za polog",
+    "depositConsumedByFee": "Naknada za polog potrošit će {fee} SAT",
     "autoConvertMinAmount": "Iznosi manji od {minSats: number} satoshija / {minFiat: string} ne mogu se automatski pretvoriti u Dolare. Primit ćete Bitcoin.",
     "autoConvertFailed": "Uplata primljena, ali konverzija nije uspjela.",
     "pleaseWaitForConversion": "Pričekajte dok se konverzija ne dovrši"

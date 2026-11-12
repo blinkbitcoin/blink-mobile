@@ -39,6 +39,7 @@ import { QRView } from "./qr-view"
 import { withMyLnUpdateSub } from "./my-ln-updates-sub"
 import { Invoice, InvoiceType, PaymentRequestState } from "./payment/index.types"
 import {
+  useDepositFeeWarning,
   useDisplayPaymentRequest,
   useNfcReceive,
   useOnchainResolver,
@@ -196,6 +197,16 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
   )
   const hasNothingToShare = carousel.isOnChainPage && !onchain.address
 
+  const getAmountWarning = useDepositFeeWarning(
+    requestState,
+    !isSelfCustodial && carousel.isOnChainPage,
+  )
+  // The amount carries across pages, so one set on Lightning lands in the onchain URI
+  // too; the sheet alone would never warn about it.
+  const depositWarning =
+    requestState.unitOfAccountAmount &&
+    getAmountWarning?.(requestState.unitOfAccountAmount)
+
   const {
     displayReceiveNfc,
     setDisplayReceiveNfc,
@@ -352,6 +363,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
           canSetAmount={requestState.canSetAmount}
           onToggleWallet={handleToggleWallet}
           canToggleWallet={canToggleWallet}
+          getAmountWarning={getAmountWarning}
           disabled={
             !isSelfCustodial &&
             carousel.isOnChainPage &&
@@ -419,6 +431,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
           }
           autoConvertMinSats={selfCustodialRequest?.autoConvertMinSats}
           autoConvertMinFiat={selfCustodialRequest?.autoConvertMinFiat}
+          depositWarning={depositWarning || undefined}
         />
       </View>
 
