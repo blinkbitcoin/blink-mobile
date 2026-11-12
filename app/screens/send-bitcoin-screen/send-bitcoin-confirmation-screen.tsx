@@ -26,6 +26,7 @@ import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { isIdempotencyConflict } from "@app/graphql/is-idempotency-conflict"
 import { useClipboard, useDisplayCurrency } from "@app/hooks"
 import { useAccessibilityAnnouncement } from "@app/hooks/use-accessibility-announcement"
+import { useAmountSliderHint } from "@app/hooks/use-amount-slider-hint"
 import { useInitialAccessibilityFocus } from "@app/hooks/use-initial-accessibility-focus"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -109,7 +110,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       NativeStackNavigationProp<RootStackParamList, "sendBitcoinConfirmation">
     >()
 
-  const { paymentDetail } = route.params
+  const { paymentDetail, usedAmountSlider } = route.params
+  const { markAmountSliderLearned } = useAmountSliderHint()
 
   const { hideAmount } = useHideAmount()
   /** A tap on the wallet card shows the balance on this screen only: the global setting
@@ -367,6 +369,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         hasShownSuccess: isSuccess,
       }
 
+      if (usedAmountSlider) markAmountSliderLearned()
       /** A payment that landed plays Sent in place and holds there until the sender opens
        *  the receipt or closes; the receipt then skips its own success icon. Pending keeps
        *  today's screen until its design lands. */
@@ -400,6 +403,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       resetToCompleted,
       holdSettledSend,
       isRouteLive,
+      usedAmountSlider,
+      markAmountSliderLearned,
       heroPrimaryText,
       heroSecondaryText,
       saveLnAddressContact,
