@@ -75,22 +75,24 @@ describe("saveLostAttempts", () => {
     expect(store.has(STORAGE_KEY)).toBe(false)
   })
 
-  it("reports a removal that fails, without throwing at the send", async () => {
+  /** What a write did not keep, the next launch does not know: its caller has to see it
+   *  to try again. */
+  it("reports a removal that fails and throws it", async () => {
     storageFailure.write = new Error("io")
 
-    await expect(saveLostAttempts(WALLET, new Map())).resolves.toBeUndefined()
+    await expect(saveLostAttempts(WALLET, new Map())).rejects.toThrow("io")
     expect(mockReportError).toHaveBeenCalledWith(
       "Self-custodial lost attempts save",
       storageFailure.write,
     )
   })
 
-  it("reports a write that fails, without throwing at the send", async () => {
+  it("reports a write that fails and throws it", async () => {
     storageFailure.write = new Error("disk full")
 
     await expect(
       saveLostAttempts(WALLET, new Map([["sp1abc", { lostSend: lostSend() }]])),
-    ).resolves.toBeUndefined()
+    ).rejects.toThrow("disk full")
     expect(mockReportError).toHaveBeenCalledWith(
       "Self-custodial lost attempts save",
       storageFailure.write,
@@ -107,10 +109,14 @@ describe("removeLostAttempts", () => {
     expect(store.has(STORAGE_KEY)).toBe(false)
   })
 
-  it("lets its caller see a removal that failed", async () => {
+  it("reports a removal that failed and lets its caller see it", async () => {
     storageFailure.write = new Error("io")
 
     await expect(removeLostAttempts(WALLET)).rejects.toThrow("io")
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Self-custodial lost attempts remove",
+      storageFailure.write,
+    )
   })
 })
 

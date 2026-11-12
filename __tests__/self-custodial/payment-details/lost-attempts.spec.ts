@@ -5,6 +5,8 @@ import {
   lostAttemptsTo,
   scopeLostAttemptsTo,
   STORED_ATTEMPTS_READ_TIMEOUT_MS,
+  STORED_ATTEMPTS_WRITE_RETRIES,
+  STORED_ATTEMPTS_WRITE_RETRY_DELAY_MS,
   withoutSettled,
   type LostAttempts,
   type LostAttemptsStorage,
@@ -276,7 +278,10 @@ describe("lost attempts across app launches", () => {
     )
   })
 
-  it("keeps storing after a write that failed", async () => {
+  /** What a write does not keep, the next launch does not know: an app closed before the
+   *  next change would start without it. */
+  it("tries a write that failed again a little later, storing the latest state", async () => {
+    jest.useFakeTimers()
     const saves: Array<Map<string, LostAttempts>> = []
     const save = jest
       .fn()
@@ -289,17 +294,61 @@ describe("lost attempts across app launches", () => {
     scopeLostAttemptsTo("wallet-launch-10", { load: async () => new Map(), save })
 
     remember("sp1abc", { unresolvedSend })
-    await nextTurn()
+    await jest.advanceTimersByTimeAsync(0)
+    expect(save).toHaveBeenCalledTimes(1)
     remember("sp1def", { unresolvedSend })
-    await nextTurn()
+    await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_RETRY_DELAY_MS)
 
-    expect(save).toHaveBeenCalledTimes(2)
-    expect(saves).toEqual([
-      new Map([
-        ["sp1abc", { unresolvedSend }],
-        ["sp1def", { unresolvedSend }],
-      ]),
+    const both = new Map([
+      ["sp1abc", { unresolvedSend }],
+      ["sp1def", { unresolvedSend }],
     ])
+    expect(save).toHaveBeenCalledTimes(3)
+    expect(saves).toEqual([both, both])
+  })
+
+  it("gives a write up once its retries failed too, and writes again on the next change", async () => {
+    jest.useFakeTimers()
+    const save = jest
+      .fn()
+      .mockRejectedValueOnce(new Error("disk full"))
+      .mockRejectedValueOnce(new Error("disk full"))
+      .mockRejectedValueOnce(new Error("disk full"))
+      .mockRejectedValueOnce(new Error("disk full"))
+      .mockResolvedValue(undefined)
+    scopeLostAttemptsTo("wallet-launch-11", { load: async () => new Map(), save })
+
+    remember("sp1abc", { unresolvedSend })
+    await jest.advanceTimersByTimeAsync(0)
+    expect(save).toHaveBeenCalledTimes(1)
+    /** Each retry waits twice as long as the one before. */
+    for (let retry = 0; retry < STORED_ATTEMPTS_WRITE_RETRIES; retry += 1) {
+      const delay = STORED_ATTEMPTS_WRITE_RETRY_DELAY_MS * 2 ** retry
+      await jest.advanceTimersByTimeAsync(delay - 1)
+      expect(save).toHaveBeenCalledTimes(retry + 1)
+      await jest.advanceTimersByTimeAsync(1)
+      expect(save).toHaveBeenCalledTimes(retry + 2)
+    }
+    await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_RETRY_DELAY_MS * 100)
+    expect(save).toHaveBeenCalledTimes(STORED_ATTEMPTS_WRITE_RETRIES + 1)
+
+    remember("sp1def", { unresolvedSend })
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(save).toHaveBeenCalledTimes(STORED_ATTEMPTS_WRITE_RETRIES + 2)
+  })
+
+  it("stops trying a write that failed again once the wallet is forgotten", async () => {
+    jest.useFakeTimers()
+    const save = jest.fn().mockRejectedValue(new Error("disk full"))
+    scopeLostAttemptsTo("wallet-launch-14", { load: async () => new Map(), save })
+
+    remember("sp1abc", { unresolvedSend })
+    await jest.advanceTimersByTimeAsync(0)
+    forgetLostAttemptsOf("wallet-launch-14")
+    await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_RETRY_DELAY_MS * 7)
+
+    expect(save).toHaveBeenCalledTimes(1)
   })
 
   it("has nothing to read back before any wallet connected", () => {

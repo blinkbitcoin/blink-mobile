@@ -4,6 +4,7 @@
  * it without pulling that in; only on where it keeps them across app launches.
  */
 import type { ConvertAttemptRef } from "@app/types/payment"
+import { sleep } from "@app/utils/sleep"
 import { withTimeout } from "@app/utils/with-timeout"
 
 import { loadLostAttempts, saveLostAttempts } from "../storage/lost-attempts"
@@ -102,6 +103,11 @@ const deviceStorage: LostAttemptsStorage = {
  *  attempts alone: storage that cannot be read holds back much more than these. */
 export const STORED_ATTEMPTS_READ_TIMEOUT_MS = 5000
 
+/** How many times a write that failed is tried again before it is given up on, and how
+ *  long the first retry waits; each one after waits twice as long as the one before. */
+export const STORED_ATTEMPTS_WRITE_RETRIES = 3
+export const STORED_ATTEMPTS_WRITE_RETRY_DELAY_MS = 500
+
 /**
  * How a wallet's attempts reach storage. `readSettled`: the read of what an earlier launch
  * left, as long as a send waits for it. `isRead`: whether that read has answered. `keep`:
@@ -184,8 +190,9 @@ const noop = () => undefined
  * A read that failed is tried once more; if that fails too, nothing is written this
  * launch, for the same reason, and the attempts are kept in memory only. Writes queue
  * behind each other, and each writes the attempts as they are when its turn comes, so
- * the last one stored is the latest state. A write that fails leaves the queue going: the
- * storage reports it.
+ * the last one stored is the latest state. A write that fails is tried again a few
+ * times, each a little later: what it does not keep, the next launch does not know. Past
+ * that it is given up on, as the storage reported, and the next change writes again.
  */
 const persistWalletAttempts = (
   walletId: string,
@@ -217,10 +224,19 @@ const persistWalletAttempts = (
     "Lost attempts read",
   ).then(noop, noop)
 
+  const mayWrite = () => isReadable && !isForgotten
+
   const write = async () => {
-    const mayWrite = isReadable && !isForgotten
-    if (!mayWrite) return
-    await storage.save(walletId, new Map(held))
+    for (let retry = 0; mayWrite(); retry += 1) {
+      const isSaved = await storage.save(walletId, new Map(held)).then(
+        () => true,
+        () => false,
+      )
+      if (isSaved) return
+      const hasRetriesLeft = retry < STORED_ATTEMPTS_WRITE_RETRIES
+      if (!hasRetriesLeft) return
+      await sleep(STORED_ATTEMPTS_WRITE_RETRY_DELAY_MS * 2 ** retry)
+    }
   }
 
   let lastWrite: Promise<void> = readBack.catch(noop)

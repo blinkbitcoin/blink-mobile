@@ -118,7 +118,11 @@ export const loadLostAttempts = async (
   }
 }
 
-/** Keeps a wallet's lost attempts for the next time the app runs. */
+/**
+ * Keeps a wallet's lost attempts for the next time the app runs. A write that fails is
+ * reported and thrown: what it did not keep, the next launch does not know, so the caller
+ * has to see it to try again.
+ */
 export const saveLostAttempts = async (
   walletId: string,
   attempts: ReadonlyMap<string, LostAttempts>,
@@ -131,9 +135,17 @@ export const saveLostAttempts = async (
     await saveJson(keyFor(walletId), Object.fromEntries(attempts))
   } catch (err) {
     reportError("Self-custodial lost attempts save", err)
+    throw err
   }
 }
 
-/** Forgets a wallet's lost attempts, as its deletion does: nothing of it outlives it. */
-export const removeLostAttempts = (walletId: string): Promise<void> =>
-  removeOrThrow(keyFor(walletId))
+/** Forgets a wallet's lost attempts, as its deletion does: nothing of it outlives it. A
+ *  removal that fails is reported and thrown, for the caller to see. */
+export const removeLostAttempts = async (walletId: string): Promise<void> => {
+  try {
+    await removeOrThrow(keyFor(walletId))
+  } catch (err) {
+    reportError("Self-custodial lost attempts remove", err)
+    throw err
+  }
+}
