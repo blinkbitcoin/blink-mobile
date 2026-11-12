@@ -120,6 +120,6 @@ const useStyles = makeStyles(({ colors }) => ({
     fontWeight: "bold",
   },
   chipTextSelected: {
-    color: colors.backgroundDefault,
+    color: colors.textOnAccent,
   },
 }))

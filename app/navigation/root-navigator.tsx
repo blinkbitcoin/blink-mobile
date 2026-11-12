@@ -73,7 +73,6 @@ import {
 } from "@react-navigation/native-stack"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import {
   AuthenticationCheckScreen,
@@ -190,6 +189,7 @@ import {
   PrimaryStackParamList,
   RootStackParamList,
 } from "./stack-param-lists"
+import { useBottomTabBarStyle } from "./bottom-tab-bar-style"
 import { useResumeCompletedMigration } from "@app/screens/account-migration/hooks/use-resume-completed-migration"
 
 import { HomeGate } from "./home-gate"
@@ -1293,11 +1293,10 @@ export const PhoneLoginNavigator = () => {
 const Tab = createBottomTabNavigator<PrimaryStackParamList>()
 
 export const PrimaryNavigator = () => {
-  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
-  const insets = useSafeAreaInsets()
+  const tabBarStyle = useBottomTabBarStyle()
 
   const { LL } = useI18nContext()
 
@@ -1312,13 +1311,7 @@ export const PrimaryNavigator = () => {
         screenOptions={{
           tabBarActiveTintColor: colors.accent,
           tabBarInactiveTintColor: colors.textMuted,
-          tabBarStyle: [
-            styles.bottomNavigatorStyle,
-            {
-              height: 60 + insets.bottom,
-              paddingBottom: insets.bottom,
-            },
-          ],
+          tabBarStyle,
           tabBarLabelStyle: {
             paddingBottom: 6,
             fontSize: 12,
@@ -1384,11 +1377,6 @@ export const PrimaryNavigator = () => {
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  bottomNavigatorStyle: {
-    paddingTop: 4,
-    backgroundColor: colors.backgroundDefault,
-    borderTopColor: colors.border,
-  },
   headerStyle: {
     backgroundColor: colors.backgroundDefault,
   },

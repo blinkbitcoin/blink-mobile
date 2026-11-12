@@ -1,4 +1,5 @@
 import React from "react"
+import { Path } from "react-native-svg"
 import { render } from "@testing-library/react-native"
 
 import { PlaceLocator } from "@app/components/map-component/place-locator"
@@ -32,5 +33,20 @@ describe("PlaceLocator", () => {
     )
 
     expect(getByTestId("place-pin").props.pointerEvents).toBe("none")
+  })
+
+  it("is blue in a white ring, so it is not read as a place already listed", () => {
+    // Every listed place is the accent; the pin being aimed is the one thing on
+    // the map that is not a place yet. The ring is drawn under the fill.
+    const screen = render(
+      <ContextForScreen>
+        <PlaceLocator />
+      </ContextForScreen>,
+    )
+
+    const [ring, fill] = screen.UNSAFE_getAllByType(Path)
+    expect(ring.props.stroke).toBe("#FFFFFF")
+    expect(ring.props.strokeWidth).toBe(4)
+    expect(fill.props.fill).toBe("#3050C4")
   })
 })
