@@ -68,18 +68,24 @@ jest.mock("@rn-vui/themed", () => ({
     (fn: (args: { colors: Record<string, string> }) => Record<string, object>) => () =>
       fn({
         colors: {
-          primary: "#fc5805",
-          grey2: "#949494",
-          grey3: "#999",
-          grey5: "#1d1d1d",
-          grey6: "#2B2B2B",
-          black: "#000",
+          accent: "#fc5805",
+          textMuted: "#949494",
+          textDisabled: "#999",
+          surfaceInteractive: "#1d1d1d",
+          surfacePressed: "#2B2B2B",
+          textOnBackground: "#000",
         },
       }),
   Text: ({ children, ...props }: { children: React.ReactNode }) =>
     React.createElement("Text", props, children),
   useTheme: () => ({
-    theme: { colors: { primary: "#fc5805", grey5: "#1d1d1d", grey6: "#2B2B2B" } },
+    theme: {
+      colors: {
+        accent: "#fc5805",
+        surfaceInteractive: "#1d1d1d",
+        surfacePressed: "#2B2B2B",
+      },
+    },
   }),
 }))
 

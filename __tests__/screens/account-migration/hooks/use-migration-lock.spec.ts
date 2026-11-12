@@ -57,6 +57,7 @@ describe("useMigrationLock", () => {
     const { result } = renderHook(() => useMigrationLock())
 
     expect(result.current.isLocked).toBe(true)
+    expect(result.current.isCommitted).toBe(false)
   })
 
   it("locks an account whose transfer is already under way", () => {
@@ -65,6 +66,7 @@ describe("useMigrationLock", () => {
     const { result } = renderHook(() => useMigrationLock())
 
     expect(result.current.isLocked).toBe(true)
+    expect(result.current.isCommitted).toBe(true)
   })
 
   it("leaves an account that never started free", () => {
@@ -93,6 +95,7 @@ describe("useMigrationLock", () => {
     const { result } = renderHook(() => useMigrationLock())
 
     expect(result.current.isLocked).toBe(true)
+    expect(result.current.isCommitted).toBe(true)
   })
 
   /**
@@ -121,6 +124,7 @@ describe("useMigrationLock", () => {
     const { result } = renderHook(() => useMigrationLock())
 
     expect(result.current.isLocked).toBe(false)
+    expect(result.current.isCommitted).toBe(false)
   })
 
   it("never locks a device with no active account", () => {

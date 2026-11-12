@@ -15,7 +15,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toBtcMoneyAmount } from "@app/types/amounts"
 import { toastShow } from "@app/utils/toast"
 
-import { useCardData } from "../../hooks/use-card-data"
+import { useCardData } from "@app/hooks"
 
 export const useCloseCardAccount = () => {
   const { LL } = useI18nContext()

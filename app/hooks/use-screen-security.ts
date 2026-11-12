@@ -24,7 +24,7 @@ export const useScreenSecurity = (): ScreenSecurityState => {
     // lands: a re-registration that exhausts its retries brings the guard down,
     // and the content must not be mounted when it does.
     setState("activating")
-    const lease = acquireScreenSecurity(colors.black)
+    const lease = acquireScreenSecurity(colors.textOnBackground)
     let mounted = true
 
     lease.ready.then(
@@ -45,7 +45,7 @@ export const useScreenSecurity = (): ScreenSecurityState => {
         .release()
         .catch((error: unknown) => reportError("Disable screen security", error))
     }
-  }, [colors.black])
+  }, [colors.textOnBackground])
 
   return state
 }

@@ -51,14 +51,15 @@ const buildExistingBackupMessage = (
 }
 
 type UseCloudBackupParams = {
-  /** Every new cloud backup carries a passphrase: the emergency bundle follows
-   *  the seed to the cloud, encrypted with that same seed, so the passphrase is
-   *  what protects both. */
+  /** Additional encryption is opt-in. The emergency bundle still follows the
+   *  seed, and is only as protected as that seed backup. */
+  isEncrypted: boolean
   password: string
   version?: number
 }
 
 export const useCloudBackup = ({
+  isEncrypted,
   password,
   version = DEFAULT_BACKUP_VERSION,
 }: UseCloudBackupParams) => {
@@ -144,7 +145,7 @@ export const useCloudBackup = ({
     const payload = buildBackupPayload(mnemonic, {
       walletIdentifier: identityPubkey,
       lightningAddress: lightningAddress ?? undefined,
-      password,
+      password: isEncrypted ? password : undefined,
       version,
     })
 
@@ -180,6 +181,7 @@ export const useCloudBackup = ({
       )
     }
   }, [
+    isEncrypted,
     password,
     version,
     backupAccountId,

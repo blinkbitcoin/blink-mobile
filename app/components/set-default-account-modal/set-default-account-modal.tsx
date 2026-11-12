@@ -143,7 +143,7 @@ export const SetDefaultAccountModalUI: React.FC<SetDefaultAccountModalUIProps> =
     <Modal
       isVisible={isVisible}
       backdropOpacity={0.8}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       backdropTransitionOutTiming={0}
       avoidKeyboard={true}
       onBackdropPress={toggleModal}
@@ -154,7 +154,7 @@ export const SetDefaultAccountModalUI: React.FC<SetDefaultAccountModalUIProps> =
           style={styles.closeIcon}
           name="close"
           size="medium"
-          color={colors.grey0}
+          color={colors.textPrimary}
           onPress={toggleModal}
         />
         <ScrollView
@@ -177,7 +177,7 @@ export const SetDefaultAccountModalUI: React.FC<SetDefaultAccountModalUIProps> =
           <TouchableOpacity onPress={onPressBtcAccount}>
             <View style={styles.currencyButtonContainer}>
               {loadingBtcAccount ? (
-                <ActivityIndicator size="small" color={colors.primary} />
+                <ActivityIndicator size="small" color={colors.accent} />
               ) : (
                 <>
                   <CurrencyPill
@@ -198,7 +198,7 @@ export const SetDefaultAccountModalUI: React.FC<SetDefaultAccountModalUIProps> =
           <TouchableOpacity onPress={onPressUsdAccount}>
             <View style={styles.currencyButtonContainer}>
               {loadingUsdAccount ? (
-                <ActivityIndicator size="small" color={colors.primary} />
+                <ActivityIndicator size="small" color={colors.accent} />
               ) : (
                 <>
                   <CurrencyPill
@@ -227,7 +227,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     padding: 12,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     minHeight: 90,
     borderRadius: 12,
     columnGap: 12,
@@ -238,12 +238,12 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "column",
   },
   currencyButtonText: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontWeight: "400",
     lineHeight: 22,
   },
   container: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     maxHeight: "80%",
     minHeight: "auto",
     borderRadius: 16,
@@ -263,7 +263,7 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 32,
     maxWidth: "80%",
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
     marginBottom: 10,
   },
   modalBodyContainer: {
@@ -273,7 +273,7 @@ const useStyles = makeStyles(({ colors }) => ({
   scrollViewContainer: { flexGrow: 1 },
   modalBodyText: {
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   modalActionsContainer: {
     width: "100%",

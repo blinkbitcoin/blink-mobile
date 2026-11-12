@@ -3,7 +3,6 @@ import { Alert, FlatList, Pressable, View } from "react-native"
 import { RouteProp, useFocusEffect, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useDisplayCurrency } from "@app/hooks"
@@ -12,6 +11,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { logParseDestinationResult } from "@app/utils/analytics"
+import { recordAppError } from "@app/utils/error-reporting"
 import { testProps } from "@app/utils/testProps"
 import { useScanContext } from "@app/hooks/use-scan-context"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
@@ -103,7 +103,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
           setSelectedMerchantId(null)
           if (!(err instanceof Error)) return
 
-          crashlytics().recordError(err)
+          recordAppError(err)
           Alert.alert(err.toString(), "", [{ text: LL.common.ok() }])
         } finally {
           if (isCurrentRequest()) {
@@ -144,7 +144,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
             <GaloyIcon
               name={iconForMerchant(item)}
               size={24}
-              color={colors.primary}
+              color={colors.accent}
               weight="bold"
             />
           </View>
@@ -168,7 +168,12 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
           </View>
           {isSelected ? (
             <View {...testProps(`merchant-${item.id}-selected`)}>
-              <GaloyIcon name="check" size={22} color={colors._green} weight="bold" />
+              <GaloyIcon
+                name="check"
+                size={22}
+                color={colors.staticSuccess}
+                weight="bold"
+              />
             </View>
           ) : (
             <View style={styles.checkPlaceholder} />
@@ -177,8 +182,8 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
       )
     },
     [
-      colors._green,
-      colors.primary,
+      colors.staticSuccess,
+      colors.accent,
       LL.MerchantSelectionScreen,
       handleMerchantPress,
       resolvingMerchantId,
@@ -206,7 +211,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
 const useStyles = makeStyles(({ colors }) => ({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     paddingHorizontal: 20,
     paddingTop: 18,
   },
@@ -224,7 +229,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   iconContainer: {
     alignItems: "center",
-    backgroundColor: colors.grey6,
+    backgroundColor: colors.surfacePressed,
     borderRadius: 24,
     height: 48,
     justifyContent: "center",
@@ -236,13 +241,13 @@ const useStyles = makeStyles(({ colors }) => ({
     marginRight: 12,
   },
   title: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 4,
   },
   description: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     fontSize: 14,
     lineHeight: 19,
   },
@@ -250,12 +255,12 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 22,
   },
   separator: {
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     height: 1,
     marginLeft: 62,
   },
   emptyText: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     fontSize: 16,
     marginTop: 32,
     textAlign: "center",

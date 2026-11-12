@@ -1,5 +1,5 @@
 import React from "react"
-import { Text as ReactNativeText } from "react-native"
+import { StyleSheet, Text as ReactNativeText } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 
 import { PercentageSelector } from "@app/components/percentage-selector/percentage-selector"
@@ -11,19 +11,22 @@ jest.mock("@rn-vui/themed", () => ({
   useTheme: () => ({
     theme: {
       colors: {
-        primary: "primary",
-        grey5: "grey5",
+        accent: "accent",
+        surfaceInteractive: "surfaceInteractive",
       },
     },
   }),
-  makeStyles: () => () => ({
-    row: {},
-    chip: {},
-    chipSelected: {},
-    chipDisabled: {},
-    chipText: {},
-    chipTextSelected: {},
-  }),
+  /** The real styles, run on sentinel colours: backgroundDefault and textOnAccent share
+   *  a value in the palette, so only distinct names show which one a style picked. */
+  makeStyles: (factory: (theme: { colors: Record<string, string> }) => object) => () =>
+    factory({
+      colors: {
+        accent: "accent",
+        surfaceInteractive: "surfaceInteractive",
+        backgroundDefault: "backgroundDefault",
+        textOnAccent: "textOnAccent",
+      },
+    }),
 }))
 
 describe("PercentageSelector", () => {
@@ -63,6 +66,63 @@ describe("PercentageSelector", () => {
     expect(getByText("20%")).toBeTruthy()
     expect(getByText("30%")).toBeTruthy()
     expect(queryByText("25%")).toBeNull()
+  })
+
+  it("labels options with formatLabel instead of a percentage", () => {
+    const { getByText, queryByText } = render(
+      <PercentageSelector
+        isLocked={false}
+        loadingPercent={null}
+        onSelect={mockOnSelect}
+        options={[30, 90]}
+        formatLabel={(days) => `${days} days`}
+      />,
+    )
+
+    expect(getByText("30 days")).toBeTruthy()
+    expect(getByText("90 days")).toBeTruthy()
+    expect(queryByText("30%")).toBeNull()
+  })
+
+  it("labels each chip for screen readers with its visible label, not the test ID", () => {
+    const { getByTestId, getByLabelText } = render(
+      <PercentageSelector
+        isLocked={false}
+        loadingPercent={null}
+        onSelect={mockOnSelect}
+        options={[30, 0]}
+        formatLabel={(days) => (days === 0 ? "Never" : `${days} days`)}
+        testIdPrefix="expiry"
+      />,
+    )
+
+    expect(getByTestId("expiry-30%").props.accessibilityLabel).toBe("30 days")
+    expect(getByTestId("expiry-0%").props.accessibilityLabel).toBe("Never")
+    expect(getByTestId("expiry-0%").props.accessibilityRole).toBe("button")
+
+    fireEvent.press(getByLabelText("Never"))
+    expect(mockOnSelect).toHaveBeenCalledWith(0)
+  })
+
+  it("labels default chips as percentages for screen readers", () => {
+    const { getByTestId } = render(
+      <PercentageSelector
+        isLocked={false}
+        loadingPercent={null}
+        onSelect={mockOnSelect}
+      />,
+    )
+
+    expect(getByTestId("convert-25%").props.accessibilityLabel).toBe("25%")
+  })
+
+  it("marks a loading chip as busy", () => {
+    const { getByTestId } = render(
+      <PercentageSelector isLocked={false} loadingPercent={75} onSelect={mockOnSelect} />,
+    )
+
+    expect(getByTestId("convert-75%").props.accessibilityState.busy).toBe(true)
+    expect(getByTestId("convert-25%").props.accessibilityState.busy).toBe(false)
   })
 
   it("calls onSelect when a percentage button is pressed", () => {
@@ -191,5 +251,19 @@ describe("PercentageSelector", () => {
 
     fireEvent.press(getByText("100%"))
     expect(mockOnSelect).toHaveBeenCalledWith(100)
+  })
+
+  it("labels the selected chip in textOnAccent and the rest in accent", () => {
+    const { getByText } = render(
+      <PercentageSelector
+        isLocked={false}
+        loadingPercent={null}
+        selectedPercent={50}
+        onSelect={mockOnSelect}
+      />,
+    )
+
+    expect(StyleSheet.flatten(getByText("50%").props.style).color).toBe("textOnAccent")
+    expect(StyleSheet.flatten(getByText("25%").props.style).color).toBe("accent")
   })
 })

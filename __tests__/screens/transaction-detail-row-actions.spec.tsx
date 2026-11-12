@@ -81,32 +81,9 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({ allTransactions: mockNoTransactions }),
 }))
 
-const LLText = () => ""
-jest.mock("@app/i18n/i18n-react", () => ({
-  useI18nContext: () => ({
-    LL: {
-      common: {
-        date: LLText,
-        fees: LLText,
-        description: LLText,
-        type: LLText,
-        preimageProofOfPayment: LLText,
-        paymentRequest: LLText,
-        hasBeenCopiedToClipboard: LLText,
-      },
-      TransactionDetailScreen: {
-        received: LLText,
-        sending: LLText,
-        spent: LLText,
-        paid: LLText,
-        receivingAccount: LLText,
-        sendingAccount: LLText,
-        txNotBroadcast: LLText,
-      },
-    },
-    locale: "en",
-  }),
-}))
+jest.mock("@app/i18n/i18n-react", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockI18n(),
+)
 
 const ONCHAIN_TX_HASH = "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"
 const SPARK_TX_ID = "0196fe12-7fca-7d55-8d9d-1af6f9f0e7b9"

@@ -1,15 +1,20 @@
 import { useCallback, useState } from "react"
 
 import { Network } from "@breeztech/breez-sdk-spark-react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
-import RNFS from "react-native-fs"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { canDropAppLock } from "@app/hooks/use-logout"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
-import { disconnectSdk } from "@app/self-custodial/bridge"
+import {
+  disconnectSdk,
+  readmitSdkStorage,
+  retireSdkStorage,
+  waitForSdkIdle,
+} from "@app/self-custodial/bridge"
 import { storageDirFor } from "@app/self-custodial/config"
+import { resetSdkLogs } from "@app/self-custodial/diagnostics/sdk-log-files"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
+import { errorKind, logBreadcrumb } from "@app/utils/error-reporting"
 import { removeBackupStateFor } from "@app/self-custodial/providers/backup-state"
 import {
   markAccountDeletedForRefresh,
@@ -26,12 +31,21 @@ import {
   removeSelfCustodialAccountId,
   StoredWalletPresence,
 } from "@app/self-custodial/storage/account-index"
+import {
+  markStorageForRemoval,
+  removeMarkedStorage,
+  unmarkStorageForRemoval,
+} from "@app/self-custodial/storage/storage-removal"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { AccountType, DefaultAccountId } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 type DeleteState = "idle" | "deleting" | "error"
+
+/** How long a deletion waits for the wallet's SDK to finish connecting and shut down
+ *  before cutting the log anyway, and exporting nothing more this session. */
+export const SDK_TEARDOWN_TIMEOUT_MS = 15_000
 
 export type DeleteAccountOutcome =
   | "remained"
@@ -50,7 +64,8 @@ type DeleteAccountResult = {
 
 /**
  * Erases one wallet from the device: its seed, its index entry, its SDK storage on this
- * network, its recovery-bundle files on both networks and its backup record. Returns whether
+ * network, its recovery-bundle files on both networks and its backup record. It also resets
+ * the SDK log, which mixes every wallet's lines and can't say whose they are. Returns whether
  * the seed is gone.
  *
  * The index entry goes right after the seed and only with it. A wallet whose seed survived
@@ -66,18 +81,38 @@ export const eraseWalletFromDevice = async (
   accountId: string,
   network: Network,
 ): Promise<boolean> => {
+  let storageDir: string | undefined
+  let isSeedGone = false
   try {
     // Before sweeping: an in-flight bundle refresh must refuse to persist
     // its result, or the files would reappear after the sweep for an
     // account no longer in the registry.
     markAccountDeletedForRefresh(accountId)
+    storageDir = storageDirFor(accountId, network)
 
-    const isSeedGone = await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
-    if (isSeedGone) await removeSelfCustodialAccountId(accountId)
+    /** Refuse every SDK connect for this wallet before waiting: a lifecycle that read the
+     *  mnemonic before the deletion could otherwise connect after the wait below. */
+    retireSdkStorage(storageDir)
 
-    await RNFS.unlink(storageDirFor(accountId, network)).catch((err) => {
-      crashlytics().log(`[self-custodial delete] storage dir unlink failed: ${err}`)
-    })
+    /** The log is reset once every SDK instance of the wallet is gone, a connect still in
+     *  flight from before the switch included, so it writes nothing past the cut; and
+     *  before the seed goes, so a stop in between still leaves the reset to finish. It
+     *  rejects only when it could neither record nor do the reset, and then the wallet is
+     *  kept. */
+    const isSdkIdle = await waitForSdkIdle(storageDir, SDK_TEARDOWN_TIMEOUT_MS)
+    await resetSdkLogs({ readNothingThisSession: !isSdkIdle })
+
+    /** The storage holds the wallet's history too: record its removal before the seed
+     *  goes, so it finishes at the next launch whatever happens here. */
+    await markStorageForRemoval(storageDir)
+    isSeedGone = await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
+    if (isSeedGone) {
+      await removeSelfCustodialAccountId(accountId)
+      await removeWalletStorage(storageDir, isSdkIdle)
+    } else {
+      await keepWalletStorage(storageDir)
+    }
+
     // Best-effort: leftover recovery-bundle files must not block deletion.
     // Both networks are swept - the account may have been used on the
     // other network under a different galoy instance.
@@ -86,15 +121,17 @@ export const eraseWalletFromDevice = async (
         await deleteRecoveryBundleFile(accountId, bundleNetwork)
           .then(() => removeRecoveryBundleState(accountId, bundleNetwork))
           .catch((err) => {
-            crashlytics().log(
-              `[self-custodial delete] recovery bundle cleanup failed: ${err}`,
+            logBreadcrumb(
+              `[self-custodial delete] recovery bundle cleanup failed (${errorKind(err)})`,
             )
           })
       }
     }
     await sweepRecoveryBundleFiles()
     await removeBackupStateFor(accountId).catch((err) => {
-      crashlytics().log(`[self-custodial delete] backup state cleanup failed: ${err}`)
+      logBreadcrumb(
+        `[self-custodial delete] backup state cleanup failed (${errorKind(err)})`,
+      )
     })
     // A refresh already past its deleted-account check can still write
     // after the sweep above; once every in-flight run settles, sweep
@@ -104,8 +141,8 @@ export const eraseWalletFromDevice = async (
     waitForRefreshesToSettle(accountId)
       .then(sweepRecoveryBundleFiles)
       .catch((err) => {
-        crashlytics().log(
-          `[self-custodial delete] post-refresh bundle re-sweep failed: ${err}`,
+        logBreadcrumb(
+          `[self-custodial delete] post-refresh bundle re-sweep failed (${errorKind(err)})`,
         )
       })
       .finally(() => {
@@ -121,8 +158,45 @@ export const eraseWalletFromDevice = async (
      * every later refresh of an account that may still be registered until the app restarts.
      */
     unmarkAccountDeletedForRefresh(accountId)
+    if (storageDir && !isSeedGone) await keepWalletStorage(storageDir)
     throw err
   }
+}
+
+/** A wallet whose seed survived is still listed: its SDK may connect again and its storage
+ *  stays. */
+const keepWalletStorage = async (storageDir: string): Promise<void> => {
+  readmitSdkStorage(storageDir)
+  await unmarkStorageForRemoval(storageDir).catch((err) => {
+    logBreadcrumb(`[self-custodial delete] storage unmark failed (${errorKind(err)})`)
+  })
+}
+
+/** Removes the storage at once when the SDK went idle. An SDK that outlived the wait may
+ *  hold or recreate it, so that case, and a removal that failed, try again once it is
+ *  idle. The marker still covers the next launch. */
+const removeWalletStorage = async (storageDir: string, isSdkIdle: boolean) => {
+  const removeStorage = () => removeMarkedStorage(storageDir)
+  const isStorageRemoved =
+    isSdkIdle &&
+    (await removeStorage().then(
+      () => true,
+      (err) => {
+        logBreadcrumb(
+          `[self-custodial delete] storage removal failed (${errorKind(err)})`,
+        )
+        return false
+      },
+    ))
+  if (isStorageRemoved) return
+
+  waitForSdkIdle(storageDir)
+    .then(removeStorage)
+    .catch((err) => {
+      logBreadcrumb(
+        `[self-custodial delete] storage removal retry failed (${errorKind(err)})`,
+      )
+    })
 }
 
 export const useDeleteAccount = (): DeleteAccountResult => {
@@ -171,7 +245,7 @@ export const useDeleteAccount = (): DeleteAccountResult => {
 
         if (isActive && sdk) {
           await disconnectSdk(sdk).catch((err) => {
-            crashlytics().log(`[self-custodial delete] disconnect failed: ${err}`)
+            logBreadcrumb(`[self-custodial delete] disconnect failed (${errorKind(err)})`)
           })
         }
 

@@ -61,7 +61,7 @@ const useStyles = makeStyles(({ colors }) => ({
    *  button that does not twitch between a "+1" and a "+503". */
   countryPickerButtonStyle: {
     minWidth: 110,
-    borderColor: colors.primary5,
+    borderColor: colors.accent4,
     borderWidth: 2,
     borderRadius: 8,
     paddingHorizontal: 10,
@@ -85,7 +85,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderWidth: 2,
     borderBottomWidth: 2,
     paddingHorizontal: 10,
-    borderColor: colors.primary5,
+    borderColor: colors.accent4,
     borderRadius: 8,
   },
   errorContainer: {
@@ -208,7 +208,7 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
     return (
       <Screen>
         <View style={styles.loadingView}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={colors.accent} />
         </View>
       </Screen>
     )

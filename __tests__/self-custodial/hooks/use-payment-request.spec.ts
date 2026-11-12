@@ -57,7 +57,10 @@ jest.mock("@app/self-custodial/hooks/use-pending-deposits", () => ({
 }))
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({
-  useSelfCustodialWallet: () => mockSelfCustodialWallet(),
+  useSelfCustodialWallet: () => ({
+    connectedAccountId: "sc-account-1",
+    ...mockSelfCustodialWallet(),
+  }),
 }))
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
@@ -80,7 +83,15 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 
 jest.mock("@app/self-custodial/storage/onchain-address", () => ({
   ...jest.requireActual("@app/self-custodial/storage/onchain-address"),
-  loadIssuedOnchainAddress: (...args: unknown[]) => mockLoadIssuedOnchainAddress(...args),
+  /** The hook reads through `readIssuedOnchainAddress`; a spec sets the record (or a
+   *  read failure, by rejecting) on the load mock. */
+  readIssuedOnchainAddress: async (...args: unknown[]) => {
+    try {
+      return { ok: true, issued: await mockLoadIssuedOnchainAddress(...args) }
+    } catch {
+      return { ok: false }
+    }
+  },
   saveIssuedOnchainAddress: (...args: unknown[]) => mockSaveIssuedOnchainAddress(...args),
 }))
 
@@ -88,7 +99,7 @@ describe("usePaymentRequest", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockLoadIssuedOnchainAddress.mockResolvedValue(null)
-    mockSaveIssuedOnchainAddress.mockResolvedValue(undefined)
+    mockSaveIssuedOnchainAddress.mockResolvedValue(true)
     applyPaymentRequestDefaults({
       receiveLightning: mockReceiveLightning,
       receiveOnchain: mockReceiveOnchain,

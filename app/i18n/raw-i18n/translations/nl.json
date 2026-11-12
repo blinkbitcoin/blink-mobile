@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API-sleutels",
+    "inactiveKeys": "Inactieve sleutels ({count})",
     "noKeys": "Nog geen API-sleutels",
     "createKey": "API-sleutel aanmaken",
     "createTitle": "Nieuwe API-sleutel",
@@ -27,6 +28,7 @@
     "revokeTitle": "API-sleutel intrekken?",
     "revokeBody": "\"{name: string}\" stopt onmiddellijk met werken. Dit kan niet ongedaan worden gemaakt.",
     "revoke": "Intrekken",
+    "revokeGoBack": "Terug",
     "revokeSuccess": "API-sleutel ingetrokken",
     "createError": "Kan de API-sleutel niet aanmaken. Probeer het opnieuw.",
     "revokeError": "Kan de API-sleutel niet intrekken. Probeer het opnieuw.",
@@ -2140,7 +2142,9 @@
     "selectAll": "Alles selecteren",
     "clearAll": "Alles wissen",
     "addPlace": "Toevoegen aan kaart",
-    "addPlaceTitle": "Plek toevoegen",
+    "addPlaceTitle": "Zaak voorstellen",
+    "submitPlaceRequest": "Verzoek indienen",
+    "showMyLocation": "Mijn locatie tonen",
     "placePinHint": "Verschuif de kaart zodat de speld op de plek staat",
     "placeName": "Naam",
     "placeNameHint": "Hoe de plek heet",
@@ -2229,6 +2233,12 @@
     "error": "Kan factuur niet genereren. Neem contact op met klantenservice als dit probleem zich blijft voordoen.",
     "copyInvoice": "Kopiëren",
     "shareInvoice": "Deel",
+    "newAddress": "Nieuw",
+    "newAddressHint": "Maakt een nieuw Bitcoin-adres aan. Eerdere adressen blijven werken.",
+    "newAddressGenerated": "Nieuw adres klaar. Eerdere adressen blijven werken.",
+    "newAddressFailed": "Kon geen nieuw adres aanmaken. Probeer het opnieuw.",
+    "newAddressRateLimited": "Te veel nieuwe adressen. Wacht even en probeer het opnieuw.",
+    "onchainAddressLoadFailed": "Kon je Bitcoin-adres niet laden. Tik op Nieuw om het opnieuw te proberen.",
     "addAmount": "Vraag Specifiek Bedrag Aan",
     "expired": "De factuur is verlopen",
     "expiresIn": "Verloopt in",
@@ -2364,6 +2374,8 @@
     "invalidAmount": "Hierin staat een ongeldig bedrag. Gelieve opnieuw te genereren met een geldig bedrag.",
     "usernameDoesNotExist": "{lnAddress: string} lijkt geen bestaand {bankName: string}-adres te zijn.",
     "usernameDoesNotExistAdvice": "Zorg ervoor dat de spelling juist is of vraag de ontvanger in plaats daarvan om een LN-factuur of BTC-adres.",
+    "destinationUnverifiable": "We konden {lnAddress} nu niet controleren — de servers van {bankName} reageren niet.",
+    "destinationUnverifiableAdvice": "Het adres klopt waarschijnlijk gewoon. Probeer het zo opnieuw, of vraag de ontvanger om een LN-factuur of BTC-adres.",
     "selfPaymentError": "{lnAddress: string} is uw {bankName: string} adres.",
     "selfPaymentAdvice": "Als u geld wilt overmaken naar een andere rekening waarvan u de eigenaar bent, kunt u in plaats daarvan een factuur-, LN- of BTC-adres gebruiken.",
     "lnAddressError": "We kunnen dit Lightning-adres niet bereiken. Als u zeker weet dat het bestaat, kunt u het later opnieuw proberen.",
@@ -2586,12 +2598,14 @@
     "error": "Profielen kunnen op dit moment niet worden opgehaald",
     "fromThisDevice": "van dit apparaat?",
     "switchAccount": "Je bent gewisseld naar een ander account",
-    "removedAccount": "Je hebt account {identifier: string} verwijderd."
+    "removedAccount": "Je hebt account {identifier: string} verwijderd.",
+    "removeAccount": "Account verwijderen"
   },
   "StablesatsRestriction": {
     "walletLabel": "niet beschikbaar in jouw regio",
     "anonModeWalletLabel": "niet beschikbaar in Incognito-modus",
-    "unknownRegionWalletLabel": "beschikbaarheid kon niet worden gecontroleerd, trek omlaag om opnieuw te proberen"
+    "unknownRegionWalletLabel": "beschikbaarheid kon niet worden gecontroleerd, trek omlaag om opnieuw te proberen",
+    "networkWalletLabel": "niet beschikbaar op dit netwerk"
   },
   "AnonModeConvertModal": {
     "title": "Zet eerst je dollarsaldo over",
@@ -2673,7 +2687,7 @@
   "TransactionDetailScreen": {
     "paid": "Betaald van/naar",
     "received": "Jij ontving",
-    "spent": "Je hebt uitgegeven",
+    "sent": "Jij verzond",
     "sending": "Verzenden",
     "receivingAccount": "Ontvangend saldo",
     "sendingAccount": "Verzendend saldo",
@@ -2749,6 +2763,7 @@
       "tooLong": "Het adres mag maximaal 50 tekens lang zijn",
       "invalidCharacter": "Adres mag alleen letters, cijfers en onderstrepingstekens bevatten",
       "addressUnavailable": "Sorry, dit adres is al in gebruik",
+      "serverUnreachable": "Kon de adresserver niet bereiken. Probeer het zo opnieuw.",
       "unknownError": "Er is een onbekende fout opgetreden. Probeer het later opnieuw",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3061,7 +3076,6 @@
     "faq": "FAQ",
     "statusPage": "Status Pagina",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Klantenservice",
     "defaultSupportMessage": "Hallo daar! Ik heb hulp nodig met {bankName: string}, ik gebruik de versie {version: string} op {os: string}.",
     "emailCopied": "email {email: string} gekopieerd naar klembord",
@@ -3075,7 +3089,13 @@
     "deleteAccountFromPhone": "Hallo daar!, sluit alstublieft mijn account. Mijn telefoonnummer is {phoneNumber: string}.",
     "deleteAccountError": "Er is iets fout gegaan. Neem contact op met {email: string} voor verdere hulp.",
     "bye": "Doei!",
-    "deleteAccountWarning": "Let op: het sluiten van het account is permanent!\nZorg ervoor dat wallets geen fondsen bevatten voordat u sluit.\nEen gesloten account kan niet worden hersteld.\nWij kunnen bepaalde gegevens bewaren als de wet dit vereist."
+    "deleteAccountWarning": "Let op: het sluiten van het account is permanent!\nZorg ervoor dat wallets geen fondsen bevatten voordat u sluit.\nEen gesloten account kan niet worden hersteld.\nWij kunnen bepaalde gegevens bewaren als de wet dit vereist.",
+    "downloadLogs": "Logbestanden downloaden",
+    "exportLogsTitle": "Deel de logbestanden van je portemonnee",
+    "exportLogsBody": "Dit bestand helpt ons supportteam problemen met je portemonnees te onderzoeken. Het bevat de betalingsgeschiedenis (bedragen, facturen en adressen) en de portemonnee-id's van elke niet-bewaarde portemonnee op dit apparaat, niet alleen deze, maar nooit je herstelzinnen of sleutels. Deel het alleen met ons supportteam.",
+    "exportLogsConfirm": "Logbestanden delen",
+    "noLogsYet": "Er zijn nog geen logbestanden om te delen. Open je portemonnee en probeer het opnieuw.",
+    "exportLogsError": "Logbestanden exporteren is mislukt. Probeer het opnieuw."
   },
   "lnurl": {
     "overLimit": "U kunt niet meer dan het maximale bedrag verzenden",
@@ -3230,7 +3250,10 @@
       "noLimit": "Geen limiet",
       "limitUpdateSuccess": "Limiet succesvol bijgewerkt",
       "limitUpdateError": "Limiet bijwerken mislukt",
-      "limitMustBePositive": "Limiet moet groter zijn dan nul"
+      "limitMustBePositive": "Limiet moet groter zijn dan nul",
+      "atmToggleError": "Geldautomaatopnames bijwerken mislukt",
+      "atmControlsLoadError": "Geldautomaatlimieten laden mislukt",
+      "invalidLimitAmount": "Voer een geldig bedrag in met maximaal 2 decimalen"
     },
     "CardFeeSchedule": {
       "title": "Blink Card-tariefoverzicht",
@@ -3805,7 +3828,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Maak een back-up van je portemonnee",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Kies je back-upmethode",
@@ -3863,6 +3886,7 @@
     "CloudBackup": {
       "title": "Laten we een back-up maken van je portemonnee",
       "description": "We slaan een back-up van je herstelzin op in je {provider}.",
+      "encryptCheckbox": "Versleutelen met extra wachtwoord",
       "password": "Wachtwoord",
       "passwordPlaceholder": "(minimaal 12 tekens)",
       "confirmPassword": "Bevestig wachtwoord",
@@ -3930,6 +3954,12 @@
     "dollarBalanceModal": {
       "title": "We kunnen je dollarsaldo niet migreren",
       "body": "Maak eerst je dollarsaldo leeg. Je kunt het overboeken naar je Bitcoin-saldo in Blink of ergens anders."
+    },
+    "pendingDepositModal": {
+      "title": "Er staat een storting op je rekening in afwachting",
+      "body": "Je kunt niet naar een ander type rekening migreren voordat al je openstaande stortingen zijn verwerkt en op deze rekening zijn bijgeschreven.",
+      "contactSupportCta": "Contact met support",
+      "stillConfirming": "Je storting is nog niet bevestigd. Probeer het over een paar minuten opnieuw."
     },
     "balancesOverview": {
       "title": "Verplaats je saldo",
@@ -4118,6 +4148,7 @@
     "get": "Downloaden",
     "storeNote": "“Downloaden” opent de App Store of Google Play. Kom terug naar Blink zodra de app is geïnstalleerd.",
     "haveAnApp": "Ik heb al een app",
+    "learnHow": "Bekijk hoe",
     "keyInstruction": "Kopieer deze configuratiesleutel naar je authenticator-app.",
     "qrInstruction": "Gebruik je een ander apparaat?\nScan dan deze QR-code.",
     "backupTitle": "Maak een back-up van je sleutel",
@@ -4204,6 +4235,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink is onbereikbaar",
+    "unreachableDescription": "{featureName} heeft de servers van Blink nodig, die nu niet reageren. Je wallet en tegoed zijn niet geraakt.",
     "featureCircles": "Circles",
     "featureEarn": "Leren",
     "featureCard": "Card"
@@ -4226,6 +4259,9 @@
     "tokenTransfer": "{token}-overdracht",
     "payTo": "Betalen aan {address}",
     "payment": "Betaling"
+  },
+  "SelfCustodialStaleRate": {
+    "satsOnly": "Weergave in sats — geen wisselkoers beschikbaar"
   },
   "SelfCustodialOffline": {
     "title": "Wallet is offline",

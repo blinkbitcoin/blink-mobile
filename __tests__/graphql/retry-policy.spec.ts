@@ -29,7 +29,8 @@ const MIGRATION_OPERATIONS = [
  *  it spent the only token that could. An authenticator's code check spends its
  *  registration: a resend after a lost answer is refused though the first turned it on.
  *  Removing the authenticator spends one of the hour's code checks on every try, as do
- *  the login method additions it guards. */
+ *  the login method additions it guards. A card limit removal that landed leaves nothing
+ *  for a resend to remove. */
 const IRREVERSIBLE_OPERATIONS = [
   ...MIGRATION_OPERATIONS,
   "accountDelete",
@@ -37,6 +38,7 @@ const IRREVERSIBLE_OPERATIONS = [
   "userTotpDelete",
   "userEmailRegistrationInitiate",
   "userPhoneRegistrationValidate",
+  "cardSpendingLimitRemove",
 ]
 
 /**
@@ -76,6 +78,10 @@ describe("shouldRetryOperation", () => {
     // request updates the original submission instead of duplicating the place.
     // If that keying ever goes away, this operation belongs on the no-retry list.
     expect(shouldRetryOperation(networkError, "btcMapPlaceSubmit")).toBe(true)
+  })
+
+  it("does not resend a new on-chain address request, which mints one per landing", () => {
+    expect(shouldRetryOperation(networkError, "onChainAddressCreate")).toBe(false)
   })
 
   it("does not retry an on-chain send-all", () => {
@@ -122,6 +128,10 @@ describe("shouldRetryUnauthorized", () => {
     // Same reasoning as the transport retry: the resent request carries the
     // attempt's submissionId, so the backend deduplicates it.
     expect(shouldRetryUnauthorized(unauthorizedError, "btcMapPlaceSubmit")).toBe(true)
+  })
+
+  it("does not retry a 401 on a new on-chain address request", () => {
+    expect(shouldRetryUnauthorized(unauthorizedError, "onChainAddressCreate")).toBe(false)
   })
 
   IRREVERSIBLE_OPERATIONS.forEach((operationName) => {

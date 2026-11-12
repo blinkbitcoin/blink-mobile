@@ -707,9 +707,10 @@ describe("Settings Screen", () => {
     expect(screen.getByTestId("Advanced-group")).toBeTruthy()
     expect(screen.getByText("Export all transactions")).toBeTruthy()
     expect(screen.getByText("API integration")).toBeTruthy()
+    expect(screen.queryByText("Download logs")).toBeNull()
   })
 
-  it("shows CSV export without API access for a self-custodial account", async () => {
+  it("shows CSV export and Download logs without API access for a self-custodial account", async () => {
     mockAccountRegistryOverride.activeAccount = {
       id: "sc-1",
       type: AccountType.SelfCustodial,
@@ -725,6 +726,7 @@ describe("Settings Screen", () => {
 
     expect(screen.getByTestId("Advanced-group")).toBeTruthy()
     expect(screen.getByText("Export all transactions")).toBeTruthy()
+    expect(screen.getByText("Download logs")).toBeTruthy()
     expect(screen.queryByText("API integration")).toBeNull()
   })
 
@@ -810,6 +812,25 @@ describe("Settings Screen Anon gating", () => {
 
     /** The gated rows leave the accessibility tree; the gate stands in by name. */
     expect(screen.getByLabelText("Ways to get paid")).toBeTruthy()
+  })
+
+  it("keeps Download logs open in Anon mode while Contact us is gated", async () => {
+    mockIsAnonMode = true
+    mockAccountRegistryOverride.activeAccount = {
+      id: "sc-1",
+      type: AccountType.SelfCustodial,
+    }
+
+    render(
+      <ContextForScreen>
+        <SettingsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(screen.getByLabelText("Need help? Contact us.")).toBeTruthy()
+    expect(screen.getByText("Download logs")).toBeTruthy()
+    mockAccountRegistryOverride.activeAccount = undefined
   })
 
   it("routes a tap on the gated group to the Enhanced prompt", async () => {

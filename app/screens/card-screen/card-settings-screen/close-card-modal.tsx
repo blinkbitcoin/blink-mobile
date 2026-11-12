@@ -71,7 +71,7 @@ export const CloseCardModal: React.FC<CloseCardModalProps> = ({
             onChangeText={setConfirmText}
             value={confirmText}
             placeholder={LL.CardFlow.CardSettings.closeCardClose()}
-            placeholderTextColor={colors.grey3}
+            placeholderTextColor={colors.textDisabled}
           />
         </View>
       }
@@ -92,18 +92,18 @@ const useStyles = makeStyles(({ colors }) => ({
   warning: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   instruction: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.grey0,
+    color: colors.textPrimary,
   },
   textInput: {
     fontSize: 16,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     padding: 12,
-    color: colors.black,
+    color: colors.textOnBackground,
     borderRadius: 8,
   },
 }))

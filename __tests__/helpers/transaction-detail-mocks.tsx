@@ -27,10 +27,10 @@ export const TEST_GALOY_INSTANCE = {
 }
 
 const colors: Record<string, string> = {
-  grey5: "#f5f5f5",
-  primary: "#fc5805",
-  black: "#000",
-  white: "#fff",
+  surfaceInteractive: "#f5f5f5",
+  accent: "#fc5805",
+  textOnBackground: "#000",
+  backgroundDefault: "#fff",
 }
 
 /**
@@ -126,3 +126,17 @@ export const mockDisplayCurrency = () => ({
 export const mockNavigation = () => ({
   useNavigation: () => ({ goBack: jest.fn() }),
 })
+
+/**
+ * `useI18nContext` with every `LL` string resolving to "", except the ones
+ * named in `copy` by their dotted path (`"common.tryAgain": "try-again"`).
+ * Built on a Proxy rather than a hand-typed object, so renaming a key the
+ * screen reads cannot leave a stale stub behind that crashes with
+ * "... is not a function".
+ */
+export const mockI18n = (copy: Record<string, string> = {}) => {
+  const namespace = (name: string) =>
+    new Proxy({}, { get: (_, key) => () => copy[`${name}.${String(key)}`] ?? "" })
+  const LL = new Proxy({}, { get: (_, name) => namespace(String(name)) })
+  return { useI18nContext: () => ({ LL, locale: "en" }) }
+}
