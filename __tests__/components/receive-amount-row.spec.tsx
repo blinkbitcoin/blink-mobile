@@ -6,6 +6,9 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { ReceiveAmountRow } from "@app/components/receive-amount-row"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
+import { haptics } from "@app/utils/haptics"
+
+jest.mock("@app/utils/haptics", () => ({ haptics: { select: jest.fn() } }))
 
 const mockFormatMoneyAmount = jest.fn(
   ({ moneyAmount }: { moneyAmount: MoneyAmount<WalletOrDisplayCurrency> }) =>
@@ -187,6 +190,24 @@ describe("ReceiveAmountRow", () => {
       fireEvent.press(getByLabelText("Toggle wallet"))
 
       expect(mockOnToggleWallet).not.toHaveBeenCalled()
+    })
+
+    it("fires the select haptic once per wallet switch", () => {
+      const { getByLabelText } = render(<ReceiveAmountRow {...defaultProps} />)
+
+      fireEvent.press(getByLabelText("Toggle wallet"))
+
+      expect(haptics.select).toHaveBeenCalledTimes(1)
+    })
+
+    it("stays silent when the wallet can't be switched", () => {
+      const { getByLabelText } = render(
+        <ReceiveAmountRow {...defaultProps} canToggleWallet={false} />,
+      )
+
+      fireEvent.press(getByLabelText("Toggle wallet"))
+
+      expect(haptics.select).not.toHaveBeenCalled()
     })
   })
 
