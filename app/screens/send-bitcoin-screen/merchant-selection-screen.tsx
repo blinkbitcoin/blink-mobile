@@ -144,7 +144,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
             <GaloyIcon
               name={iconForMerchant(item)}
               size={24}
-              color={colors.primary}
+              color={colors.accent}
               weight="bold"
             />
           </View>
@@ -168,7 +168,12 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
           </View>
           {isSelected ? (
             <View {...testProps(`merchant-${item.id}-selected`)}>
-              <GaloyIcon name="check" size={22} color={colors._green} weight="bold" />
+              <GaloyIcon
+                name="check"
+                size={22}
+                color={colors.staticSuccess}
+                weight="bold"
+              />
             </View>
           ) : (
             <View style={styles.checkPlaceholder} />
@@ -177,8 +182,8 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
       )
     },
     [
-      colors._green,
-      colors.primary,
+      colors.staticSuccess,
+      colors.accent,
       LL.MerchantSelectionScreen,
       handleMerchantPress,
       resolvingMerchantId,
@@ -206,7 +211,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
 const useStyles = makeStyles(({ colors }) => ({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     paddingHorizontal: 20,
     paddingTop: 18,
   },
@@ -224,7 +229,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   iconContainer: {
     alignItems: "center",
-    backgroundColor: colors.grey6,
+    backgroundColor: colors.surfacePressed,
     borderRadius: 24,
     height: 48,
     justifyContent: "center",
@@ -236,13 +241,13 @@ const useStyles = makeStyles(({ colors }) => ({
     marginRight: 12,
   },
   title: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 4,
   },
   description: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     fontSize: 14,
     lineHeight: 19,
   },
@@ -250,12 +255,12 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 22,
   },
   separator: {
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     height: 1,
     marginLeft: 62,
   },
   emptyText: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     fontSize: 16,
     marginTop: 32,
     textAlign: "center",

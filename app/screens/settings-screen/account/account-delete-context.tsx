@@ -27,7 +27,7 @@ export const AccountDeleteContextProvider: React.FC<PropsWithChildren> = ({
   const Loading = (
     <View style={styles.center}>
       <ActivityIndicator />
-      <Text type="p2" color={colors.grey2}>
+      <Text type="p2" color={colors.textMuted}>
         {LL.AccountScreen.accountBeingDeleted()}
       </Text>
     </View>

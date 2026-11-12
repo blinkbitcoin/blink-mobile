@@ -166,7 +166,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 const baseState: PersistentState = {
-  schemaVersion: 23,
+  schemaVersion: 24,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -300,7 +300,9 @@ describe("SecurityScreen security score card", () => {
     const { getByTestId } = renderScreen()
     fireEvent.press(getByTestId("security-score-twoFactor"))
 
-    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate")
+    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
+      offersOnboarding: true,
+    })
   })
 
   it("routes the email signal to email registration", () => {

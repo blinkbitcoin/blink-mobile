@@ -53,7 +53,10 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
               <View key={index}>
                 <Element />
                 {hasDividerBelow && (
-                  <Divider color={colors.grey4} style={[styles.divider, dividerStyle]} />
+                  <Divider
+                    color={colors.neutral}
+                    style={[styles.divider, dividerStyle]}
+                  />
                 )}
               </View>
             )
@@ -67,7 +70,7 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
 const useStyles = makeStyles(({ colors }) => ({
   groupCard: {
     marginTop: 5,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 12,
     overflow: "hidden",
   },

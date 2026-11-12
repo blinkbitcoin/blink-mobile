@@ -39,24 +39,24 @@ export const AmountInputButton: React.FC<AmountInputButtonProps> = ({
     switch (true) {
       case error:
         colorStyles = {
-          backgroundColor: colors.error9,
+          backgroundColor: colors.errorBackground,
         }
         break
       case pressed:
         colorStyles = {
           opacity: 0.5,
-          backgroundColor: colors.grey5,
+          backgroundColor: colors.surfaceInteractive,
         }
         break
       case disabled:
         colorStyles = {
-          backgroundColor: colors.grey5,
+          backgroundColor: colors.surfaceInteractive,
           opacity: 0.5,
         }
         break
       default:
         colorStyles = {
-          backgroundColor: colors.grey5,
+          backgroundColor: colors.surfaceInteractive,
         }
     }
 
@@ -96,7 +96,7 @@ export const AmountInputButton: React.FC<AmountInputButtonProps> = ({
           <GaloyIcon
             name={iconName}
             size={20}
-            color={error ? colors.error : colors.primary}
+            color={error ? colors.error : colors.accent}
           />
         )}
       </View>

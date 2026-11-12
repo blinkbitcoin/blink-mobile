@@ -66,23 +66,23 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   header: {
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
     marginBottom: 8,
   },
   emptyText: {
     textAlign: "center",
-    color: colors.grey2,
+    color: colors.textMuted,
     marginTop: 40,
   },
   groupContainer: {
     marginBottom: 16,
   },
   dateLabel: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     marginBottom: 8,
   },
   transactionsList: {
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     borderRadius: 8,
     overflow: "hidden",
     rowGap: 1,

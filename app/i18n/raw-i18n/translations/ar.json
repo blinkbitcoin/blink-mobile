@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "مفاتيح API",
+    "inactiveKeys": "المفاتيح غير النشطة ({count})",
     "noKeys": "لا توجد مفاتيح API بعد",
     "createKey": "إنشاء مفتاح API",
     "createTitle": "مفتاح API جديد",
@@ -19,17 +20,18 @@
     "expiryNever": "أبدًا",
     "expiresOn": "ينتهي في {date: string}",
     "neverExpires": "لا ينتهي أبدًا",
-    "revoked": "مُلغى",
+    "revoked": "مُبطَل",
     "expired": "انتهى في {date: string}",
     "expiredNoDate": "منتهي",
     "secretWarning": "هذه هي المرة الوحيدة التي يُعرض فيها المفتاح. انسخه أو شاركه الآن واحفظه في مكان آمن.",
     "secretCopied": "تم نسخ مفتاح API. ستُمسح الحافظة خلال دقيقة واحدة",
-    "revokeTitle": "إلغاء مفتاح API؟",
+    "revokeTitle": "إبطال مفتاح API؟",
     "revokeBody": "\"{name: string}\" سيتوقف عن العمل فورًا. لا يمكن التراجع عن هذا.",
-    "revoke": "إلغاء",
-    "revokeSuccess": "تم إلغاء مفتاح API",
+    "revoke": "إبطال",
+    "revokeGoBack": "العودة",
+    "revokeSuccess": "تم إبطال مفتاح API",
     "createError": "تعذّر إنشاء مفتاح API. يرجى المحاولة مرة أخرى.",
-    "revokeError": "تعذّر إلغاء مفتاح API. يرجى المحاولة مرة أخرى.",
+    "revokeError": "تعذّر إبطال مفتاح API. يرجى المحاولة مرة أخرى.",
     "loadError": "تعذّر تحميل مفاتيح API الخاصة بك. يرجى المحاولة لاحقًا.",
     "discardSecretTitle": "تجاهل مفتاح API هذا؟",
     "discardSecretBody": "هذه هي المرة الوحيدة التي يُعرض فيها السر. إذا غادرت الآن، فلن تتمكن من استرداد المفتاح وستحتاج إلى إنشاء مفتاح جديد.",
@@ -2140,7 +2142,9 @@
     "selectAll": "تحديد الكل",
     "clearAll": "مسح الكل",
     "addPlace": "أضف إلى الخريطة",
-    "addPlaceTitle": "إضافة مكان",
+    "addPlaceTitle": "اقتراح نشاط تجاري",
+    "submitPlaceRequest": "إرسال الطلب",
+    "showMyLocation": "إظهار موقعي",
     "placePinHint": "حرّك الخريطة لوضع الدبوس على المكان",
     "placeName": "الاسم",
     "placeNameHint": "ما اسم هذا المكان",
@@ -3096,7 +3100,6 @@
     "faq": "FAQ",
     "statusPage": "Status Page",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - مركز الدعم",
     "defaultSupportMessage": "مرحبا! أحتاج إلى بعض المساعدة في {bankName: string}، أنا أستخدم الإصدار {version: string} على {os: string}.",
     "emailCopied": "نُسخ عنوان البريد {email: string}  إلى الحافظة",
@@ -3278,7 +3281,10 @@
       "noLimit": "بدون حد",
       "limitUpdateSuccess": "تم تحديث الحد بنجاح",
       "limitUpdateError": "فشل تحديث الحد",
-      "limitMustBePositive": "يجب أن يكون الحد أكبر من الصفر"
+      "limitMustBePositive": "يجب أن يكون الحد أكبر من الصفر",
+      "atmToggleError": "فشل تحديث السحب من الصراف الآلي",
+      "atmControlsLoadError": "تعذّر تحميل حدود الصراف الآلي",
+      "invalidLimitAmount": "أدخل مبلغًا صالحًا بخانتين عشريتين كحد أقصى"
     },
     "CardFeeSchedule": {
       "title": "جدول رسوم بطاقة Blink",
@@ -3980,6 +3986,12 @@
       "title": "لا يمكننا ترحيل رصيدك بالدولار",
       "body": "أفرغ رصيدك بالدولار أولًا. يمكنك تحويله إلى رصيد البيتكوين في Blink أو في مكان آخر."
     },
+    "pendingDepositModal": {
+      "title": "يوجد إيداع معلّق في حسابك",
+      "body": "لا يمكنك الترحيل إلى نوع آخر من الحسابات قبل تسوية جميع إيداعاتك المعلّقة وإضافتها إلى هذا الحساب.",
+      "contactSupportCta": "تواصل مع الدعم",
+      "stillConfirming": "لم يتم تأكيد إيداعك بعد. حاول مرة أخرى بعد بضع دقائق."
+    },
     "balancesOverview": {
       "title": "انقل رصيدك",
       "body": "انقل أموالك بأمان إلى حسابك الجديد.",
@@ -4167,6 +4179,7 @@
     "get": "تنزيل",
     "storeNote": "يفتح زر «تنزيل» متجر App Store أو Google Play. عُد إلى Blink بعد تثبيت التطبيق.",
     "haveAnApp": "لديّ تطبيق",
+    "learnHow": "اعرف الطريقة",
     "keyInstruction": "انسخ مفتاح الإعداد هذا إلى تطبيق المصادقة.",
     "qrInstruction": "هل تستخدم جهازًا آخر؟\nامسح رمز QR هذا بدلًا من ذلك.",
     "backupTitle": "احفظ نسخة احتياطية من مفتاحك",
@@ -4279,7 +4292,6 @@
     "payment": "دفعة"
   },
   "SelfCustodialStaleRate": {
-    "notice": "قد يكون سعر الصرف قديمًا",
     "satsOnly": "العرض بالساتوشي — لا يتوفر سعر صرف"
   },
   "SelfCustodialOffline": {

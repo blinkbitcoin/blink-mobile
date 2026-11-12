@@ -39,7 +39,7 @@ export const MayChallengeModal: React.FC<Props> = ({ isVisible, setIsVisible }) 
       isVisible={isVisible}
       backdropOpacity={0.8}
       backdropTransitionOutTiming={0}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       onBackdropPress={acknowledgeModal}
     >
       <View style={styles.modalCard}>
@@ -50,7 +50,7 @@ export const MayChallengeModal: React.FC<Props> = ({ isVisible, setIsVisible }) 
             size="medium"
             onPress={acknowledgeModal}
           />
-          <GaloyIcon style={styles.top} name="rank" size={40} color={colors.primary} />
+          <GaloyIcon style={styles.top} name="rank" size={40} color={colors.accent} />
           <Text type="h1" bold>
             {LL.Circles.mayChallenge.title()}
           </Text>
@@ -59,11 +59,11 @@ export const MayChallengeModal: React.FC<Props> = ({ isVisible, setIsVisible }) 
           </Text>
           {ShareImg}
           <GaloyPrimaryButton onPress={share} title={LL.Circles.shareCircles()} />
-          <Text style={styles.reminder} type="p3" color={colors.grey3}>
+          <Text style={styles.reminder} type="p3" color={colors.textDisabled}>
             {LL.Circles.connectOnSocial()}
             <Text
               style={styles.underline}
-              color={colors.grey3}
+              color={colors.textDisabled}
               onPress={() => Linking.openURL(SOCIAL_LINK_TREE)}
             >
               {SOCIAL_LINK_TREE}
@@ -73,7 +73,7 @@ export const MayChallengeModal: React.FC<Props> = ({ isVisible, setIsVisible }) 
             {LL.Circles.fullDetails()}
             <Text
               style={styles.underline}
-              color={colors.grey3}
+              color={colors.textDisabled}
               onPress={() => Linking.openURL(CHALLENGE_PAGE_URL)}
             >
               {CHALLENGE_PAGE}
@@ -102,7 +102,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   top: { marginTop: 40 },
   modalCard: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 16,
     display: "flex",
     justifyContent: "center",
@@ -116,7 +116,7 @@ const useStyles = makeStyles(({ colors }) => ({
   reminder: {
     textAlign: "center",
     paddingHorizontal: 20,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   underline: {
     textDecorationLine: "underline",

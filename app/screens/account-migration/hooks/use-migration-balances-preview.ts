@@ -155,9 +155,17 @@ export const useMigrationBalancesPreview = ({
    * already report, so it is swallowed here rather than left to surface as an unhandled
    * rejection from a path the screen has handled.
    */
-  const retry = useCallback(() => {
-    Promise.all([refetchPreview(), refetchBalances()]).catch(() => undefined)
+  const refresh = useCallback(async (): Promise<boolean> => {
+    try {
+      await Promise.all([refetchPreview(), refetchBalances()])
+      return true
+    } catch {
+      return false
+    }
   }, [refetchPreview, refetchBalances])
+  const retry = useCallback(() => {
+    refresh()
+  }, [refresh])
 
   const { balanceSats, receiveSats, feeSats, feeCoveredByBlink } =
     preview ?? UNKNOWN_PREVIEW
@@ -188,6 +196,9 @@ export const useMigrationBalancesPreview = ({
     unavailableReason,
     hasDollarBalance: usdBalanceCents > 0,
     retry,
+    /** The same refresh, for a caller that must know the fresh figures arrived before it
+     *  acts on them: true once both sources answered, false when either failed. */
+    refresh,
     currentBitcoinBalance: formatMoneyAmount({ moneyAmount: currentBtcAmount }),
     currentBitcoinFiat: fiatSuffix(
       moneyAmountToDisplayCurrencyString({ moneyAmount: currentBtcAmount }),

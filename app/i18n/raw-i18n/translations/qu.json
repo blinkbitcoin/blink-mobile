@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API llavekuna",
+    "inactiveKeys": "Mana llamk'aq llavekuna ({count})",
     "noKeys": "Manaraq API llavekuna kanchu",
     "createKey": "API llaveta ruray",
     "createTitle": "Musuq API llave",
@@ -27,6 +28,7 @@
     "revokeTitle": "API llaveta chinkachiyta munankichu?",
     "revokeBody": "\"{name: string}\" utqaylla mana llamk'anqañachu. Kayqa mana kutichiy atinchu.",
     "revoke": "Chinkachiy",
+    "revokeGoBack": "Kutiy",
     "revokeSuccess": "API llave chinkachisqa",
     "createError": "API llave mana rurayta atikurqanchu. Yapamanta ruray.",
     "revokeError": "API llave mana chinkachiyta atikurqanchu. Yapamanta ruray.",
@@ -2140,7 +2142,9 @@
     "selectAll": "Llapanta akllay",
     "clearAll": "Llapanta pichay",
     "addPlace": "Pacha mapaman yapay",
-    "addPlaceTitle": "Huk cheqasta yapay",
+    "addPlaceTitle": "Qhatuta willay",
+    "submitPlaceRequest": "Mañakuyta apachiy",
+    "showMyLocation": "Maypi kasqayta rikuchiy",
     "placePinHint": "Pacha mapata kuyuchiy chay cheqaman t'ipana churanaykipaq",
     "placeName": "Suti",
     "placeNameHint": "Imaynatas chay cheqa sutichasqa",
@@ -3096,7 +3100,6 @@
     "faq": "FAQ",
     "statusPage": "P'anqakuna Yupaychay",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Yachanakuy",
     "defaultSupportMessage": "¡Juyayay! Qanqa atipuni {bankName: string}piyta kani, {os: string}ta allinmi version {version: string}ninchikmi. Kaypi yachanichu.",
     "emailCopied": "Imayna {email: string} qillqanman yuraqchanku chimpusqan.",
@@ -3278,7 +3281,10 @@
       "noLimit": "Mana limitayuq",
       "limitUpdateSuccess": "Limite allinlla musuqyachisqa",
       "limitUpdateError": "Mana atikurqanchu limite musuqyachiyta",
-      "limitMustBePositive": "Limite nisqaqa cero nisqamanta hatunraq kanan"
+      "limitMustBePositive": "Limite nisqaqa cero nisqamanta hatunraq kanan",
+      "atmToggleError": "Mana atikurqanchu ATM hurquykunata musuqyachiyta",
+      "atmControlsLoadError": "Mana atikurqanchu ATM limitekunata apamuyta",
+      "invalidLimitAmount": "Allin qullqita qillqay, 2 decimalkama"
     },
     "CardFeeSchedule": {
       "title": "Blink tarjeta pagana lista",
@@ -3980,6 +3986,12 @@
       "title": "Manam dólar qullqiykita astayta atinikuchu",
       "body": "Ñawpaqta dólar qullqiykita ch'usaqyachiy. Blinkpi Bitcoin qullqiykiman utaq huk lawman apachiyta atinki."
     },
+    "pendingDepositModal": {
+      "title": "Kuentaykiman huk depósito suyachkan",
+      "body": "Manam huk laya kuentaman astakuyta atinkichu, llapan suyachkaq depósitoykikuna kay kuentaman chayamunankama.",
+      "contactSupportCta": "Yanapaqwan rimay",
+      "stillConfirming": "Depósitoykiqa manaraqmi takyachisqachu. Huk iskay minutomanta yapamanta ruray."
+    },
     "balancesOverview": {
       "title": "Qullqiykita astiy",
       "body": "Qullqiykikunata mana ima llakiwan musuq cuentaykiman astiy.",
@@ -4167,6 +4179,7 @@
     "get": "Uraqichiy",
     "storeNote": "“Uraqichiy” App Store utaq Google Play nisqata kichan. Churasqaña kaptin Blinkman kutimuy.",
     "haveAnApp": "Appniyuqmi kani",
+    "learnHow": "Imaynatam yachay",
     "keyInstruction": "Kay churana llaveta autenticador appykiman kopiyay.",
     "qrInstruction": "Huk aparatota llamk'achichkankichu?\nAswanpas kay QR códigota escaneay.",
     "backupTitle": "Llaveykita waqaychay",
@@ -4279,7 +4292,6 @@
     "payment": "Pagay"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Chaninchay yupay manaraqchá musuqchu",
     "satsOnly": "Sats-pi rikuchisqa — mana chaninchay yupay kanchu"
   },
   "SelfCustodialOffline": {

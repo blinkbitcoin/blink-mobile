@@ -68,6 +68,11 @@ const noRetryOperations = [
   // attempts, the phone's also its SMS code, and one that landed refuses a resend.
   "userEmailRegistrationInitiate",
   "userPhoneRegistrationValidate",
+
+  // A card limit removal that landed leaves nothing for a resend to remove. The limits
+  // screen reports a failed one and reads the card's controls again, so it shows what
+  // the server holds.
+  "cardSpendingLimitRemove",
 ]
 
 const IDEMPOTENCY_KEY_HEADER = "x-idempotency-key"
