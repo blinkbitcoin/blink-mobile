@@ -75,7 +75,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     columnGap: 20,
     minHeight: 67,
-    backgroundColor: colors.grey7,
+    backgroundColor: colors.surfaceStatic,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: colors.transparent,
@@ -100,11 +100,11 @@ const useStyles = makeStyles(({ colors }) => ({
     fontFamily: "SourceSansPro-Bold",
     fontSize: 16,
     lineHeight: 22,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   balanceSecondary: {
     fontSize: 12,
     lineHeight: 18,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

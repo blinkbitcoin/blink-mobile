@@ -61,7 +61,7 @@ describe("WalletSummary", () => {
     expect(card.props.accessibilityLabel).toBe("Bitcoin, 741 SAT")
     expect(card.props.accessibilityRole).toBeUndefined()
     expect(StyleSheet.flatten(card.props.style).backgroundColor).toBe(
-      theme.lightColors?.grey7,
+      theme.lightColors?.surfaceStatic,
     )
   })
 })
