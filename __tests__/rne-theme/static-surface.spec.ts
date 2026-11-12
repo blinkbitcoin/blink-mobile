@@ -68,7 +68,7 @@ describe("static surfaces", () => {
 
   it("paints the static fill alone in both modes", () => {
     for (const colors of [light, dark]) {
-      expect(staticSurface(colors)).toEqual({ backgroundColor: colors.grey7 })
+      expect(staticSurface(colors)).toEqual({ backgroundColor: colors.surfaceStatic })
     }
   })
 })
