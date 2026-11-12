@@ -27,6 +27,7 @@ jest.mock("@app/self-custodial/payment-details/send-helpers", () => {
 /* eslint-disable camelcase */
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   PrepareSendPaymentRequest: { create: jest.fn((args: unknown) => args) },
+  FeePolicy: { FeesExcluded: 0, FeesIncluded: 1 },
   SendPaymentRequest: { create: jest.fn((args: unknown) => args) },
   Network: { Mainnet: 0, Regtest: 1 },
   BitcoinNetwork: { Bitcoin: 0, Regtest: 4 },
@@ -335,5 +336,49 @@ describe("createSelfCustodialLightningPaymentDetails", () => {
       expect(prepareParams.amount).toBeUndefined()
       expect(prepareParams.conversionOptions).toBeDefined()
     })
+  })
+})
+
+describe("createSelfCustodialLightningPaymentDetails send-all", () => {
+  const FEES_INCLUDED = 1
+  const balance = { amount: 100_000, currency: WalletCurrency.Btc, currencyCode: WalletCurrency.Btc }
+  const lastFeeParams = () =>
+    mockCreateGetFee.mock.calls[mockCreateGetFee.mock.calls.length - 1][0]
+
+  beforeEach(() => {
+    mockCreateGetFee.mockClear()
+  })
+
+  it("sends all of an invoice with no amount, the fee taken out", () => {
+    const sendAll = createSelfCustodialLightningPaymentDetails(
+      createParams({ hasAmount: false }),
+    ).setAmount!(balance, true)
+
+    expect(sendAll.canSendMax).toBe(true)
+    expect(sendAll.isSendingMax).toBe(true)
+    expect(sendAll.isFeeIncluded).toBe(true)
+    expect(lastFeeParams().feePolicy).toBe(FEES_INCLUDED)
+  })
+
+  it("offers no send-all on an invoice with its own amount", () => {
+    const detail = createSelfCustodialLightningPaymentDetails(
+      createParams({ hasAmount: true, sendMax: true }),
+    )
+
+    expect(detail.canSendMax).toBeFalsy()
+    expect(lastFeeParams().feePolicy).toBeUndefined()
+  })
+
+  it("offers no send-all from the Dollar wallet", () => {
+    const detail = createSelfCustodialLightningPaymentDetails(
+      createParams({
+        hasAmount: false,
+        sendMax: true,
+        sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
+      }),
+    )
+
+    expect(detail.canSendMax).toBe(false)
+    expect(lastFeeParams().feePolicy).toBeUndefined()
   })
 })

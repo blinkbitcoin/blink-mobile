@@ -464,8 +464,9 @@ describe("free amount", () => {
     expect(isNextDisabled()).toBe(false)
   })
 
+  /** A Blink-to-Blink send has no fee, so it is a send-all rail of its own (#2048 SA7). */
   it("sends the whole balance as a send-all where the rail supports one", async () => {
-    renderScreen(intraledgerDestination({ canSendMax: true }))
+    renderScreen(intraledgerDestination())
     await settle()
 
     slideTo(100)
@@ -478,7 +479,7 @@ describe("free amount", () => {
   })
 
   it("sends 100% as a plain amount where the rail has no send-all", async () => {
-    renderScreen(intraledgerDestination())
+    renderScreen(intraledgerDestination({ canSendMax: false }))
     await settle()
 
     slideTo(100)
