@@ -29,7 +29,7 @@ jest.mock("@rn-vui/themed", () => {
   const colors: Record<string, string> = {
     textMuted: "#999",
     textDisabled: "#bbb",
-    border: "#ddd",
+    neutral: "#ddd",
     surfaceInteractive: "#f5f5f5",
     backgroundDefault: "#fff",
     textOnBackground: "#000",

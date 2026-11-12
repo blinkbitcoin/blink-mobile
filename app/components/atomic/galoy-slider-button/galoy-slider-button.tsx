@@ -150,7 +150,7 @@ const useStyles = makeStyles(({ colors }, { buttonWidth }: { buttonWidth: number
     height: 60,
     backgroundColor: colors.surfaceInteractive,
     borderRadius: 30,
-    borderColor: colors.border,
+    borderColor: colors.neutral,
     borderWidth: 1,
     justifyContent: "center",
     alignItems: "center",

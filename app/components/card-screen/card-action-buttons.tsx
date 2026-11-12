@@ -81,7 +81,7 @@ export const CardActionButtons: React.FC<CardActionButtonsProps> = ({
               text={action.label}
               onPress={action.onPress}
               color={isActiveFrozen ? colors.error : colors.accent}
-              backgroundColor={isActiveFrozen ? colors.errorBackground : colors.border}
+              backgroundColor={isActiveFrozen ? colors.errorBackground : colors.neutral}
               loading={action.loading}
             />
           </View>

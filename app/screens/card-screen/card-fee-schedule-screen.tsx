@@ -260,7 +260,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   separator: {
     height: 1,
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
   },
   noticeCard: {
     backgroundColor: colors.surfaceInteractive,

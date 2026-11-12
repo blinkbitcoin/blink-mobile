@@ -105,7 +105,7 @@ export const AuthenticatorIntroScreen: React.FC = () => {
           <React.Fragment key={benefit.icon}>
             {index > 0 && (
               <Divider
-                color={colors.border}
+                color={colors.neutral}
                 width={DIVIDER_WIDTH}
                 style={styles.divider}
               />

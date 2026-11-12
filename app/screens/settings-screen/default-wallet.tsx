@@ -80,7 +80,7 @@ const DefaultWalletPicker: React.FC<DefaultWalletPickerProps> = ({ options, info
           const isLast = index === options.length - 1
           return (
             <React.Fragment key={option.key}>
-              <Divider color={colors.border} />
+              <Divider color={colors.neutral} />
               <TouchableOpacity
                 onPress={option.onSelect}
                 activeOpacity={0.7}
@@ -111,7 +111,7 @@ const DefaultWalletPicker: React.FC<DefaultWalletPickerProps> = ({ options, info
                   </ListItem.Content>
                 </ListItem>
               </TouchableOpacity>
-              {isLast && <Divider color={colors.border} />}
+              {isLast && <Divider color={colors.neutral} />}
             </React.Fragment>
           )
         })}

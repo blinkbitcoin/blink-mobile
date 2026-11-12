@@ -10,7 +10,7 @@ declare module "@rn-vui/themed" {
     textSecondary: string
     textMuted: string
     textDisabled: string
-    border: string
+    neutral: string
     surfaceInteractive: string
     surfacePressed: string
     surfaceStatic: string
@@ -27,7 +27,6 @@ declare module "@rn-vui/themed" {
     textOnAccentDisabled: string
     textPlaceholder: string
     borderStrong: string
-    surfaceMuted: string
     surfaceInactive: string
 
     // static* tokens never invert between light and dark mode.
@@ -70,7 +69,7 @@ declare module "@rn-vui/themed" {
     readonly grey2: string
     /** @deprecated use textDisabled */
     readonly grey3: string
-    /** @deprecated use border */
+    /** @deprecated use neutral */
     readonly grey4: string
     /** @deprecated use surfaceInteractive */
     readonly grey5: string

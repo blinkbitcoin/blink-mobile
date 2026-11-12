@@ -37,6 +37,6 @@ const useStyles = makeStyles(({ colors }) => ({
   bar: {
     paddingTop: 4,
     backgroundColor: colors.backgroundDefault,
-    borderTopColor: colors.border,
+    borderTopColor: colors.neutral,
   },
 }))

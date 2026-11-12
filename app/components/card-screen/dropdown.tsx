@@ -180,7 +180,7 @@ const useStyles = makeStyles(({ colors }) => ({
     minHeight: 60,
   },
   selectedOption: {
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
   },
   optionContent: {
     flex: 1,

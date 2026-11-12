@@ -114,7 +114,7 @@ const useStyles = makeStyles(({ colors }, { hovering }: { hovering: boolean }) =
     alignItems: "center",
     justifyContent: "space-between",
     columnGap: 16,
-    backgroundColor: hovering ? colors.border : undefined,
+    backgroundColor: hovering ? colors.neutral : undefined,
     minHeight: 58,
   },
   spacing: {

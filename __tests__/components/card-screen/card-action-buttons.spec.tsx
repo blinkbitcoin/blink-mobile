@@ -29,7 +29,7 @@ jest.mock("@rn-vui/themed", () => ({
         accent: "#F7931A",
         error: "#FF0000",
         errorBackground: "#FFE0E0",
-        border: "#E0E0E0",
+        neutral: "#E0E0E0",
       },
     },
   }),

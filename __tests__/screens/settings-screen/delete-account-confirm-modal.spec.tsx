@@ -25,7 +25,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 jest.mock("@rn-vui/themed", () => {
   const colors = {
     textDisabled: "#bbb",
-    border: "#ddd",
+    neutral: "#ddd",
     surfaceInteractive: "#eee",
     textOnBackground: "#000",
   }

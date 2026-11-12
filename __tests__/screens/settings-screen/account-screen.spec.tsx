@@ -11,7 +11,7 @@ jest.mock("@rn-vui/themed", () => {
     textPrimary: "#ccc",
     textSecondary: "#aaa",
     textMuted: "#999",
-    border: "#eee",
+    neutral: "#eee",
     surfaceInteractive: "#f5f5f5",
     surfacePressed: "#fafafa",
     accent: "#fc5805",

@@ -952,7 +952,7 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
     zIndex: 2,
   },
   lineHidden: { opacity: 0 },
-  line: { backgroundColor: colors.border, height: 1, flex: 1 },
+  line: { backgroundColor: colors.neutral, height: 1, flex: 1 },
   switchButton: {
     position: "absolute",
     left: 100,

@@ -227,7 +227,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     padding: 12,
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
     minHeight: 90,
     borderRadius: 12,
     columnGap: 12,

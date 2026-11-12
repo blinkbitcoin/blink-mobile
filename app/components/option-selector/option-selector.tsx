@@ -105,7 +105,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderWidth: 1.5,
   },
   fieldBackgroundSelected: {
-    backgroundColor: colors.border,
+    backgroundColor: colors.neutral,
   },
   contentContainer: {
     flex: 1,
