@@ -16,7 +16,7 @@ jest.mock("@rn-vui/themed", () => ({
   makeStyles:
     (styles: (theme: { colors: Record<string, string> }) => Record<string, unknown>) =>
     () =>
-      styles({ colors: { primary: "primary", grey4: "grey4" } }),
+      styles({ colors: { accent: "accent", neutral: "neutral" } }),
 }))
 
 const WIDTH = 360
@@ -92,13 +92,13 @@ describe("BulletinCarousel", () => {
     expect(rendered.getByTestId("bulletin-carousel").props.scrollEnabled).toBe(false)
   })
 
-  it("draws one bar per card, the one in view in primary", () => {
+  it("draws one bar per card, the one in view in accent", () => {
     const rendered = renderCarousel(itemsOf("a", "b", "c"))
 
     expect(bars(rendered).map(({ backgroundColor }) => backgroundColor)).toEqual([
-      "primary",
-      "grey4",
-      "grey4",
+      "accent",
+      "neutral",
+      "neutral",
     ])
     expect(
       bars(rendered).every(({ width, height }) => width === 20 && height === 2),
@@ -125,9 +125,9 @@ describe("BulletinCarousel", () => {
     swipeTo(rendered, 2)
 
     expect(bars(rendered).map(({ backgroundColor }) => backgroundColor)).toEqual([
-      "grey4",
-      "grey4",
-      "primary",
+      "neutral",
+      "neutral",
+      "accent",
     ])
     expect(rendered.getByLabelText("Notification 3 of 3")).toBeTruthy()
     expect(rendered.getByText("a:inactive", { includeHiddenElements: true })).toBeTruthy()
