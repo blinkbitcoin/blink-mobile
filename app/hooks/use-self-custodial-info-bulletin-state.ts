@@ -41,9 +41,10 @@ type DismissalState = {
 const INITIAL_DISMISSAL: DismissalState = { accountId: null, isDismissed: false }
 
 /**
- * Controls the one-time "this is a non-custodial account" home bulletin shown to
- * new and migrated self-custodial accounts; a restore marks it seen up front. Persisted per account so it shows once and stays dismissed after
- * the user closes it or follows its link, the same way the backup-completed state is tracked.
+ * Controls the one-time "this is a non-custodial account" home bulletin shown to new and
+ * migrated self-custodial accounts; a restore marks it seen up front. Persisted per account
+ * so it shows once and stays dismissed after the user closes it or follows its link, the
+ * same way the backup-completed state is tracked.
  * The dismissal is keyed to the account it was read for, so switching accounts never flashes
  * the previous one's state.
  */

@@ -7,8 +7,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { markSelfCustodialInfoBulletinDismissedFor } from "@app/hooks/use-self-custodial-info-bulletin-state"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
+import { markSelfCustodialInfoBulletinDismissedFor } from "@app/hooks/use-self-custodial-info-bulletin-state"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   ChooseExperienceContinueRoute,
