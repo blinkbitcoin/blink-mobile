@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { Ref, useEffect, useState } from "react"
 import { makeStyles, Text } from "@rn-vui/themed"
 import { Pressable, View } from "react-native"
 
@@ -16,6 +16,8 @@ type CurrencyKeyboardProps = {
   safeMode?: boolean
   disabledKeys?: ReadonlySet<KeyType>
   disabled?: boolean
+  /** The first key, "1": where screen reader focus lands to start typing an amount. */
+  firstKeyRef?: Ref<View>
 }
 
 export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
@@ -23,6 +25,7 @@ export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
   safeMode = false,
   disabledKeys,
   disabled = false,
+  firstKeyRef,
 }) => {
   const styles = useStyles()
 
@@ -46,6 +49,7 @@ export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
                 handleKeyPress={onPress}
                 safeMode={safeMode}
                 disabled={isKeyDisabled}
+                pressableRef={key === KeyType[1] ? firstKeyRef : undefined}
               />
             )
           })}
@@ -60,11 +64,13 @@ const Key = ({
   numberPadKey,
   safeMode,
   disabled,
+  pressableRef,
 }: {
   numberPadKey: KeyType
   handleKeyPress: (key: KeyType) => void
   safeMode?: boolean
   disabled?: boolean
+  pressableRef?: Ref<View>
 }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
@@ -98,6 +104,7 @@ const Key = ({
 
   return (
     <Pressable
+      ref={pressableRef}
       disabled={disabled}
       style={({ pressed }) => [
         styles.key,
