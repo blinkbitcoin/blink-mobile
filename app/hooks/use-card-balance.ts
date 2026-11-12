@@ -21,15 +21,17 @@ export const useCardBalance = (cardId: string | undefined) => {
   const isAuthed = useIsAuthed()
   const { moneyAmountToDisplayCurrencyString, formatMoneyAmount } = useDisplayCurrency()
 
-  const { data, loading, error } = useCardBalanceQuery({
+  const { data, loading, error, refetch } = useCardBalanceQuery({
     variables: { cardId: cardId ?? "" },
     skip: !isAuthed || !cardId,
     fetchPolicy: "network-only",
     pollInterval: BALANCE_POLL_INTERVAL_MS,
   })
 
-  const availableSats = data?.cardBalance?.available ?? 0
-  const btcAmount = toBtcMoneyAmount(availableSats)
+  /** Undefined until the balance arrives, so a pending or failed request is never
+   *  mistaken for a card that holds nothing. */
+  const availableSats = data?.cardBalance?.available
+  const btcAmount = toBtcMoneyAmount(availableSats ?? 0)
 
   const balancePrimary =
     moneyAmountToDisplayCurrencyString({ moneyAmount: btcAmount, isApproximate: true }) ??
@@ -38,5 +40,5 @@ export const useCardBalance = (cardId: string | undefined) => {
   const balanceSecondary =
     formatMoneyAmount({ moneyAmount: btcAmount, isApproximate: false }) ?? ""
 
-  return { balancePrimary, balanceSecondary, loading, error }
+  return { balancePrimary, balanceSecondary, availableSats, loading, error, refetch }
 }

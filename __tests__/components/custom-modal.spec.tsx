@@ -10,10 +10,10 @@ let mockThemeMode = "light"
 
 jest.mock("@rn-vui/themed", () => {
   const colors = {
-    grey0: "#ccc",
-    grey5: "#f5f5f5",
-    white: "#fff",
-    black: "#000",
+    textPrimary: "#ccc",
+    surfaceInteractive: "#f5f5f5",
+    backgroundDefault: "#fff",
+    textOnBackground: "#000",
   }
   const Text = ({ children, ...props }: { children: React.ReactNode }) =>
     React.createElement("Text", props, children)
@@ -225,5 +225,50 @@ describe("CustomModal", () => {
     } finally {
       Object.defineProperty(Platform, "OS", { get: () => original, configurable: true })
     }
+  })
+
+  it("labels the close icon for screen readers", () => {
+    const { getByLabelText } = render(
+      <CustomModal
+        {...baseProps}
+        toggleModal={jest.fn()}
+        closeIconButtonAccessibilityLabel="Close"
+      />,
+    )
+
+    expect(getByLabelText("Close").props.accessibilityRole).toBe("button")
+  })
+
+  it("closes from the close icon by default", () => {
+    const toggleModal = jest.fn()
+    const { getByLabelText } = render(
+      <CustomModal
+        {...baseProps}
+        toggleModal={toggleModal}
+        closeIconButtonAccessibilityLabel="Close"
+      />,
+    )
+
+    fireEvent.press(getByLabelText("Close"))
+
+    expect(toggleModal).toHaveBeenCalledTimes(1)
+  })
+
+  it("disables the close icon when not dismissable", () => {
+    const toggleModal = jest.fn()
+    const { getByLabelText } = render(
+      <CustomModal
+        {...baseProps}
+        toggleModal={toggleModal}
+        dismissable={false}
+        closeIconButtonAccessibilityLabel="Close"
+      />,
+    )
+
+    const closeIcon = getByLabelText("Close")
+    fireEvent.press(closeIcon)
+
+    expect(toggleModal).not.toHaveBeenCalled()
+    expect(closeIcon.props.accessibilityState).toEqual({ disabled: true })
   })
 })

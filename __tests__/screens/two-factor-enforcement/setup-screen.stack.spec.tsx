@@ -161,36 +161,63 @@ const HomeStub = () => {
   )
 }
 
-/** The settings, whose Two-factor authentication opens the setup key directly. */
+/** The settings, whose Two-factor authentication opens the setup key directly, offering
+ *  the onboarding. */
 const SettingsStub = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   return (
     <Pressable
       testID="open-from-settings"
-      onPress={() => navigation.navigate("totpRegistrationInitiate")}
+      onPress={() =>
+        navigation.navigate("totpRegistrationInitiate", { offersOnboarding: true })
+      }
     >
       <Text>settings</Text>
     </Pressable>
   )
 }
 
+/** One per mount, as the real screen starts a registration on mount: a second setup
+ *  key on the stack, or the same one mounted again, would start another. */
+let mockRegistrationCount = 0
+
 /** Stands in for the setup key step, which hands the code screen the registration and
- *  its key, the way the real one does. */
+ *  its key, and offers the onboarding when asked to, the way the real one does. */
 const TotpInitiateStub = ({
   navigation,
-}: NativeStackScreenProps<RootStackParamList, "totpRegistrationInitiate">) => (
-  <Pressable
-    testID="to-code"
-    onPress={() =>
-      navigation.navigate("totpRegistrationValidate", {
-        totpRegistrationId: "registration-id",
-        secret: "SECRET",
-      })
-    }
-  >
-    <Text>to code</Text>
-  </Pressable>
-)
+  route,
+}: NativeStackScreenProps<RootStackParamList, "totpRegistrationInitiate">) => {
+  const [registrationId] = React.useState(() => {
+    mockRegistrationCount += 1
+    return `registration-${mockRegistrationCount}`
+  })
+  return (
+    <>
+      <Text>{registrationId}</Text>
+      {route.params?.offersOnboarding && (
+        <Pressable
+          testID="learn-how"
+          onPress={() =>
+            navigation.navigate("totpRegistrationIntro", { isOpenedFromSetupKey: true })
+          }
+        >
+          <Text>learn how</Text>
+        </Pressable>
+      )}
+      <Pressable
+        testID="to-code"
+        onPress={() =>
+          navigation.navigate("totpRegistrationValidate", {
+            totpRegistrationId: registrationId,
+            secret: "SECRET",
+          })
+        }
+      >
+        <Text>to code</Text>
+      </Pressable>
+    </>
+  )
+}
 
 const renderStack = async () => {
   render(
@@ -285,6 +312,7 @@ describe("TwoFactorSetupScreen in a stack", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
+    mockRegistrationCount = 0
     mockEnforcement.hasAuthenticator = false
     mockReadRegistrationState.mockResolvedValue({
       data: { me: { id: "1", totpEnabled: false } },
@@ -444,6 +472,35 @@ describe("TwoFactorSetupScreen in a stack", () => {
 
     expect(currentRoute()).toBe("accountScreen")
     expect(stackRouteNames()).toEqual(["Primary", "accountScreen"])
+  })
+
+  /** The onboarding the setup key offers returns to that same screen, mounted once, so
+   *  the registration and the key the user was shown stay the same. */
+  it("returns from the onboarding to the same setup key the settings opened", async () => {
+    await renderStack()
+    await act(async () => {
+      navigationRef.navigate("accountScreen")
+    })
+    await press(screen.getByTestId("open-from-settings"))
+    const setupKeyRouteKey = navigationRef.getCurrentRoute()?.key
+    expect(screen.getByText("registration-1")).toBeTruthy()
+
+    await press(screen.getByTestId("learn-how"))
+    expect(currentRoute()).toBe("totpRegistrationIntro")
+    await press(screen.getByText(LL.AuthenticatorOnboarding.getStarted()))
+    await press(screen.getByText(LL.AuthenticatorOnboarding.haveAnApp()))
+
+    expect(navigationRef.getCurrentRoute()?.key).toBe(setupKeyRouteKey)
+    expect(stackRouteNames()).toEqual([
+      "Primary",
+      "accountScreen",
+      "totpRegistrationInitiate",
+    ])
+    expect(screen.getByText("registration-1")).toBeTruthy()
+    expect(mockRegistrationCount).toBe(1)
+    /** Offered once: back from it, the setup key no longer offers the onboarding. */
+    expect(screen.queryByTestId("learn-how")).toBeNull()
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
   })
 
   it("lands back on the home once a registration the blocking screen opened is done", async () => {

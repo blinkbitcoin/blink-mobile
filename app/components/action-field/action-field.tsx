@@ -12,6 +12,8 @@ type ActionFieldProps = {
   onAction?: () => void
   icon: IconNamesType
   label?: string
+  /** What pressing does, for screen readers; without it they read the shown value. */
+  accessibilityLabel?: string
   testID?: string
   /** Identifies the value itself, where a test needs to read it rather than the field. */
   valueTestID?: string
@@ -28,6 +30,7 @@ export const ActionField: React.FC<ActionFieldProps> = ({
   onAction,
   icon,
   label,
+  accessibilityLabel,
   testID,
   valueTestID,
   numberOfLines,
@@ -40,7 +43,7 @@ export const ActionField: React.FC<ActionFieldProps> = ({
   } = useTheme()
 
   const hasValue = value !== null && value !== undefined && value !== PLACEHOLDER
-  const iconColor = hasValue ? colors.primary : colors.grey3
+  const iconColor = hasValue ? colors.accent : colors.textDisabled
 
   return (
     <View style={styles.container}>
@@ -52,7 +55,7 @@ export const ActionField: React.FC<ActionFieldProps> = ({
         testID={testID}
         accessibilityRole="button"
         /* The label above is read just before it, so the button is named by its value. */
-        accessibilityLabel={value ?? PLACEHOLDER}
+        accessibilityLabel={accessibilityLabel ?? value ?? PLACEHOLDER}
         accessibilityHint={hasValue ? actionHint : undefined}
         accessibilityState={{ disabled: !hasValue }}
       >
@@ -77,7 +80,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 3,
   },
   label: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     fontFamily: fonts.regular,
     lineHeight: 20,
@@ -86,14 +89,14 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     columnGap: 12,
     minHeight: 50,
     paddingHorizontal: 10,
   },
   value: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 16,
     fontFamily: fonts.regular,
     lineHeight: 22,

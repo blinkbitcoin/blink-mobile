@@ -248,7 +248,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   if (loading) {
     ListEmptyContent = (
       <View style={styles.activityIndicatorContainer}>
-        <ActivityIndicator size="large" color={colors.primary} />
+        <ActivityIndicator size="large" color={colors.accent} />
       </View>
     )
   } else if (
@@ -808,7 +808,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           ) : (
             <TouchableOpacity onPress={handlePaste}>
               <View style={styles.iconContainer}>
-                <Text color={colors.primary} type="p2" bold>
+                <Text color={colors.accent} type="p2" bold>
                   {LL.common.paste()}
                 </Text>
               </View>
@@ -1070,11 +1070,11 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
           rightIcon={
             rawPhoneNumber && activeInputRef.current === InputType.Phone ? (
               <TouchableOpacity onPress={resetInput}>
-                <GaloyIcon name="close" size={24} color={colors.primary} />
+                <GaloyIcon name="close" size={24} color={colors.accent} />
               </TouchableOpacity>
             ) : (
               <TouchableOpacity onPress={handlePastePhone}>
-                <Text color={colors.primary} type="p2" bold>
+                <Text color={colors.accent} type="p2" bold>
                   {LL.common.paste()}
                 </Text>
               </TouchableOpacity>
@@ -1097,7 +1097,7 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
           inputContainerStyle={
             activeInputRef.current === InputType.Phone && inputContainerStyle
           }
-          bgColor={colors.grey6}
+          bgColor={colors.surfacePressed}
           keepCountryCode={keepCountryCode}
         />
       </View>
@@ -1133,7 +1133,7 @@ const usestyles = makeStyles(({ colors }) => ({
   fieldBackground: {
     flexDirection: "row",
     overflow: "hidden",
-    backgroundColor: colors.grey6,
+    backgroundColor: colors.surfacePressed,
     borderRadius: 10,
     borderColor: colors.transparent,
     borderWidth: 1,
@@ -1147,7 +1147,7 @@ const usestyles = makeStyles(({ colors }) => ({
     borderWidth: 1,
   },
   validInputContainer: {
-    borderColor: colors._green,
+    borderColor: colors.staticSuccess,
     borderWidth: 1,
   },
   warningInputContainer: {
@@ -1162,7 +1162,7 @@ const usestyles = makeStyles(({ colors }) => ({
   input: {
     flex: 1,
     paddingHorizontal: 12,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   fieldTitleText: {
     fontWeight: "bold",
@@ -1185,11 +1185,11 @@ const usestyles = makeStyles(({ colors }) => ({
     marginLeft: -10,
   },
   searchBarText: {
-    color: colors.black,
+    color: colors.textOnBackground,
     textDecorationLine: "none",
   },
   icon: {
-    color: colors.primary,
+    color: colors.accent,
   },
   activityIndicatorContainer: {
     alignItems: "center",
@@ -1204,7 +1204,7 @@ const usestyles = makeStyles(({ colors }) => ({
     fontSize: 18,
     marginTop: 30,
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   emptyListTitle: {
     color: colors.warning,
@@ -1213,9 +1213,9 @@ const usestyles = makeStyles(({ colors }) => ({
     textAlign: "center",
   },
   itemContainer: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
   },
-  itemText: { color: colors.black },
+  itemText: { color: colors.textOnBackground },
   textSeparator: {
     flexDirection: "row",
     justifyContent: "center",
@@ -1227,14 +1227,14 @@ const usestyles = makeStyles(({ colors }) => ({
     marginBottom: 30,
   },
   line: {
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     height: 1,
     borderRadius: 10,
     flex: 1,
     position: "relative",
   },
   textInformationWrapper: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     paddingHorizontal: 20,
     alignItems: "center",
     justifyContent: "center",
@@ -1243,13 +1243,13 @@ const usestyles = makeStyles(({ colors }) => ({
     zIndex: 1,
   },
   textInformation: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     textAlign: "center",
     fontSize: 16,
   },
   disabledInput: { opacity: 0.6 },
   borderFocusedInput: {
-    borderColor: colors._green,
+    borderColor: colors.staticSuccess,
     borderWidth: 1,
     borderBottomWidth: 1,
   },
@@ -1269,11 +1269,11 @@ const usestyles = makeStyles(({ colors }) => ({
     overflow: "hidden",
   },
   listContainerSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.grey6,
+    borderColor: colors.accent,
+    backgroundColor: colors.surfacePressed,
   },
   listItemContainer: {
-    borderColor: colors.grey4,
+    borderColor: colors.neutral,
     borderBottomWidth: 1,
   },
   listItemContainerBase: {

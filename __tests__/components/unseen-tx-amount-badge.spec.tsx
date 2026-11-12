@@ -15,8 +15,8 @@ type RnThemedTextProps = React.ComponentProps<typeof ReactNativeText>
 type MakeStylesFn = (
   theme: {
     colors: {
-      grey2: string
-      _green: string
+      textMuted: string
+      staticSuccess: string
     }
   },
   props: unknown,
@@ -29,8 +29,8 @@ jest.mock("@rn-vui/themed", () => {
       stylesFn(
         {
           colors: {
-            grey2: "grey2",
-            _green: "green",
+            textMuted: "textMuted",
+            staticSuccess: "green",
           },
         },
         props,
@@ -71,7 +71,7 @@ describe("UnseenTxAmountBadge", () => {
       <UnseenTxAmountBadge amountText={"-BTC 1"} visible={true} isOutgoing={true} />,
     )
 
-    expect(getByTextOutgoing("-BTC 1")).toHaveStyle({ color: "grey2" })
+    expect(getByTextOutgoing("-BTC 1")).toHaveStyle({ color: "textMuted" })
 
     const { getByText: getByTextIncoming } = render(
       <UnseenTxAmountBadge amountText={"+BTC 1"} visible={true} isOutgoing={false} />,

@@ -263,6 +263,9 @@ type LnurlSpecificProperties<T extends WalletCurrency> =
       /** The bolt11 invoice fetched from the lnurl service; set once an invoice exists
        *  (i.e. when the payment is sendable). The lnurl string itself is `destination`. */
       paymentRequest?: string
+      /** The LUD-12 comment the payment sends: only the note the user typed. The
+       *  destination's description prefills `memo` but never travels back as the comment. */
+      comment?: string
       setInvoice: SetInvoice<T>
       setSuccessAction: SetSuccessAction<T>
       isMerchant: boolean

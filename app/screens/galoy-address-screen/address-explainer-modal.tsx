@@ -17,7 +17,7 @@ const wallets = [
 
 const useStyles = makeStyles(({ colors }) => ({
   modalView: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     maxFlex: 1,
     maxHeight: "75%",
     borderRadius: 16,
@@ -58,7 +58,7 @@ export const AddressExplainerModal = ({
     <Modal
       isVisible={modalVisible}
       backdropOpacity={0.3}
-      backdropColor={colors.grey3}
+      backdropColor={colors.textDisabled}
       onBackdropPress={toggleModal}
       swipeDirection={modalVisible ? ["down"] : ["up"]}
     >
@@ -68,7 +68,7 @@ export const AddressExplainerModal = ({
             {LL.GaloyAddressScreen.howToUseYourAddress()}
           </Text>
           <TouchableOpacity onPress={toggleModal}>
-            <GaloyIcon name="close" size={32} color={colors.black} />
+            <GaloyIcon name="close" size={32} color={colors.textOnBackground} />
           </TouchableOpacity>
         </View>
         <Text style={styles.bodyText}>

@@ -178,7 +178,7 @@ const useStyles = makeStyles(({ colors }, props: { bgColor?: string }) => ({
     minHeight: 60,
   },
   countryPickerButtonStyle: {
-    backgroundColor: props.bgColor || colors.grey5,
+    backgroundColor: props.bgColor || colors.surfaceInteractive,
     borderRadius: 8,
     paddingHorizontal: 15,
     flexDirection: "row",
@@ -196,7 +196,7 @@ const useStyles = makeStyles(({ colors }, props: { bgColor?: string }) => ({
     borderWidth: 1,
     borderColor: colors.transparent,
     paddingHorizontal: 10,
-    backgroundColor: props.bgColor || colors.grey5,
+    backgroundColor: props.bgColor || colors.surfaceInteractive,
     borderRadius: 8,
   },
   disabledInput: { opacity: 0.6 },

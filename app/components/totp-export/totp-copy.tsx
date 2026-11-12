@@ -80,7 +80,7 @@ export const CopySecretComponent: React.FC<Props> = ({
       <Text type="p3" style={styles.key} numberOfLines={1} ellipsizeMode="middle">
         {secret}
       </Text>
-      <GaloyIcon name="copy-paste" size={20} color={colors.primary} />
+      <GaloyIcon name="copy-paste" size={20} color={colors.accent} />
     </TouchableOpacity>
   )
 }
@@ -95,12 +95,12 @@ const useStyles = makeStyles(({ colors }, { isHighlighted }: StyleProps) => ({
     paddingRight: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: isHighlighted ? colors.primary : colors.transparent,
-    backgroundColor: colors.grey5,
+    borderColor: isHighlighted ? colors.accent : colors.transparent,
+    backgroundColor: colors.surfaceInteractive,
   },
   key: {
     flex: 1,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

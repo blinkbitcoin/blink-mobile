@@ -100,7 +100,7 @@ const SlideUpHandle: React.FC<SlideUpHandleProps> = ({
             <Animated.View
               style={[
                 styles.progressFill,
-                { backgroundColor: colors.grey3 },
+                { backgroundColor: colors.textDisabled },
                 progressBarStyle,
               ]}
             />
@@ -123,9 +123,9 @@ const SlideUpHandle: React.FC<SlideUpHandleProps> = ({
                 ]}
               >
                 {isLoading ? (
-                  <ActivityIndicator size="small" color={colors.grey2} />
+                  <ActivityIndicator size="small" color={colors.textMuted} />
                 ) : (
-                  <GaloyIcon name="caret-up" size={18} color={colors.grey2} />
+                  <GaloyIcon name="caret-up" size={18} color={colors.textMuted} />
                 )}
               </Animated.View>
             )}
@@ -158,7 +158,7 @@ const useStyles = makeStyles(
       width: 46,
       height: 64,
       borderRadius: 23,
-      backgroundColor: colors.grey5,
+      backgroundColor: colors.surfaceInteractive,
       overflow: "hidden",
       alignItems: "center",
       justifyContent: "flex-end",
@@ -177,7 +177,7 @@ const useStyles = makeStyles(
       justifyContent: "center",
     },
     iconPressed: {
-      backgroundColor: colors.grey5,
+      backgroundColor: colors.surfaceInteractive,
       borderRadius: 20,
     },
   }),

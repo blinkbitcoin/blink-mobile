@@ -13,7 +13,9 @@ jest.mock("@app/utils/helper", () => ({
 }))
 
 jest.mock("@rn-vui/themed", () => ({
-  useTheme: () => ({ theme: { mode: "light", colors: { white: "#FFFFFF" } } }),
+  useTheme: () => ({
+    theme: { mode: "light", colors: { backgroundDefault: "#FFFFFF" } },
+  }),
 }))
 
 jest.mock("react-native-safe-area-context", () => {

@@ -38,7 +38,7 @@ export const AddToWalletButton: React.FC<AddToWalletButtonProps> = ({
         name={isIos ? "apple-pay" : "google-pay"}
         width={isIos ? 55 : 62}
         height={isIos ? 22 : 24}
-        color={colors._darkGrey}
+        color={colors.staticDarkGrey}
       />
     </Pressable>
   )
@@ -52,10 +52,10 @@ const useStyles = makeStyles(({ colors }) => ({
     width: "100%",
     gap: 8,
     height: 50,
-    backgroundColor: colors._white,
+    backgroundColor: colors.staticWhite,
     borderRadius: 100,
     borderWidth: 1,
-    borderColor: colors._darkGrey,
+    borderColor: colors.staticDarkGrey,
   },
   buttonDisabled: {
     opacity: 0.5,
@@ -65,7 +65,7 @@ const useStyles = makeStyles(({ colors }) => ({
     transform: [{ scale: 0.98 }],
   },
   buttonText: {
-    color: colors._darkGrey,
+    color: colors.staticDarkGrey,
     fontSize: 20,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",

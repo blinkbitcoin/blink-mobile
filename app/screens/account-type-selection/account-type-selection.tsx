@@ -171,11 +171,11 @@ const useStyles = makeStyles(({ colors }) => ({
   description: {
     fontSize: 16,
     lineHeight: 22,
-    color: colors.black,
+    color: colors.textOnBackground,
     marginBottom: 20,
   },
   banner: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     paddingHorizontal: 14,
     paddingVertical: 12,
@@ -184,7 +184,7 @@ const useStyles = makeStyles(({ colors }) => ({
   bannerText: {
     fontSize: 13,
     lineHeight: 18,
-    color: colors.grey1,
+    color: colors.textSecondary,
     textAlign: "center",
   },
   ctaContainer: {

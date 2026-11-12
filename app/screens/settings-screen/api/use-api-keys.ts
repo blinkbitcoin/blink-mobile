@@ -90,12 +90,11 @@ export const useApiKeysList = () => {
     fetchPolicy: "cache-and-network",
   })
 
-  const apiKeys = [...(data?.me?.apiKeys ?? [])].sort((a, b) => {
-    const aActive = apiKeyStatus(a) === "active" ? 0 : 1
-    const bActive = apiKeyStatus(b) === "active" ? 0 : 1
-    if (aActive !== bActive) return aActive - bActive
-    return Number(b.createdAt) - Number(a.createdAt)
-  })
+  const apiKeys = [...(data?.me?.apiKeys ?? [])].sort(
+    (a, b) => Number(b.createdAt) - Number(a.createdAt),
+  )
+  const activeKeys = apiKeys.filter((apiKey) => apiKeyStatus(apiKey) === "active")
+  const inactiveKeys = apiKeys.filter((apiKey) => apiKeyStatus(apiKey) !== "active")
 
-  return { apiKeys, loading: loading && !data, hasError: Boolean(error) }
+  return { activeKeys, inactiveKeys, loading: loading && !data, hasError: Boolean(error) }
 }

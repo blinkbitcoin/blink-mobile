@@ -80,8 +80,8 @@ export const CardActionButtons: React.FC<CardActionButtonsProps> = ({
               iconSize={action.iconSize}
               text={action.label}
               onPress={action.onPress}
-              color={isActiveFrozen ? colors.error : colors.primary}
-              backgroundColor={isActiveFrozen ? colors.error9 : colors.grey4}
+              color={isActiveFrozen ? colors.error : colors.accent}
+              backgroundColor={isActiveFrozen ? colors.errorBackground : colors.neutral}
               loading={action.loading}
             />
           </View>
@@ -96,7 +96,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 12,
     height: 94,
     marginHorizontal: 20,

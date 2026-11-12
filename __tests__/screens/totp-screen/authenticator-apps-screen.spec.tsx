@@ -13,9 +13,17 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 const mockNavigate = jest.fn()
+const mockPopTo = jest.fn()
+/** The stack under the screen: the setup key is beneath it when the setup key screen
+ *  opened the onboarding. */
+let mockRoutes: Array<{ name: string }> = []
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    popTo: mockPopTo,
+    getState: () => ({ routes: mockRoutes }),
+  }),
 }))
 
 const mockLogAppSelected = jest.fn()
@@ -50,6 +58,11 @@ describe("AuthenticatorAppsScreen", () => {
     jest.clearAllMocks()
     loadLocale("en")
     openURL.mockResolvedValue(true)
+    mockRoutes = [
+      { name: "Primary" },
+      { name: "totpRegistrationIntro" },
+      { name: "totpRegistrationApps" },
+    ]
   })
 
   afterEach(() => {
@@ -119,6 +132,27 @@ describe("AuthenticatorAppsScreen", () => {
 
     expect(mockLogEducationCompleted).toHaveBeenCalledTimes(1)
     expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate")
+  })
+
+  /** Opened from the setup key screen the settings opened, the onboarding returns to
+   *  that screen, whose registration and key stay the same, rather than starting
+   *  another on top of it. */
+  it("goes back to the setup key beneath it when that screen opened the onboarding", async () => {
+    mockRoutes = [
+      { name: "Primary" },
+      { name: "accountScreen" },
+      { name: "totpRegistrationInitiate" },
+      { name: "totpRegistrationIntro" },
+      { name: "totpRegistrationApps" },
+    ]
+    await renderScreen()
+
+    fireEvent.press(screen.getByText(LL.AuthenticatorOnboarding.haveAnApp()))
+
+    expect(mockPopTo).toHaveBeenCalledWith("totpRegistrationInitiate", {
+      offersOnboarding: false,
+    })
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   /** The screen stays under the setup key, so a tap after a back is the same
