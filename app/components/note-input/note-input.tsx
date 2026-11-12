@@ -109,7 +109,7 @@ const useStyles = makeStyles(
       borderStyle: "solid",
       overflow: "hidden",
       /** Lifts to grey6 while typed in, as the conversion fields do. */
-      backgroundColor: isFocused ? colors.grey6 : colors.surfaceInteractive,
+      backgroundColor: isFocused ? colors.surfacePressed : colors.surfaceInteractive,
       paddingHorizontal: 10,
       borderRadius: 10,
       alignItems: "center",
