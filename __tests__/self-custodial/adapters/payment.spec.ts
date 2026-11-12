@@ -126,6 +126,17 @@ describe("self-custodial payment adapters", () => {
       expect(result.errors?.[0].message).toBe("Payment p1 failed")
     })
 
+    it("reports a send whose answer came without a payment as sent", async () => {
+      const sdk = createMockSdk()
+      sdk.prepareSendPayment.mockResolvedValue({ amount: BigInt(1000) })
+      sdk.sendPayment.mockResolvedValue({})
+
+      const send = createSendPayment(sdk as never)
+      const result = await send({ destination: "lnbc1..." })
+
+      expect(result.status).toBe("success")
+    })
+
     it("returns failed on error", async () => {
       const sdk = createMockSdk()
       sdk.prepareSendPayment.mockRejectedValue(new Error("network error"))

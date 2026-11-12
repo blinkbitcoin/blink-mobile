@@ -1,6 +1,7 @@
 import {
   PaymentStatus,
   type BreezSdkInterface,
+  type Payment,
 } from "@breeztech/breez-sdk-spark-react-native"
 import { v5 as uuidv5 } from "uuid"
 
@@ -67,8 +68,11 @@ export const createSendPayment = (sdk: BreezSdkInterface): SendPaymentAdapter =>
       const idempotencyKey = hasTokenLeg(prepared)
         ? undefined
         : await adapterIdempotencyKey(identifyPreparedSend(prepared)?.paymentHash)
-      const { payment } = await executeSend(sdk, prepared, { idempotencyKey })
-      if (payment.status === PaymentStatus.Failed) {
+      const sent = await executeSend(sdk, prepared, { idempotencyKey })
+      /** The SDK's types promise a payment, but a response without one has been seen: the
+       *  send went out all the same, so it is reported as sent, never as failed. */
+      const payment: Payment | undefined = sent?.payment
+      if (payment?.status === PaymentStatus.Failed) {
         return failed(`Payment ${payment.id} failed`)
       }
 
