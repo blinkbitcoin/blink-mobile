@@ -2423,6 +2423,7 @@
     "willBeSentToMempoolBy": "Transaksi sepatutnya dihantar ke mempool",
     "amount": "Amaun",
     "addAmount": "Tambah amaun",
+    "slideToSelectAmount": "Leret untuk memilih amaun",
     "lowFunds": "Dana tidak mencukupi",
     "amountExceed": "Amaun ini telah melebihi baki {balance: string}",
     "amountExceedsLimit": "Amaun ini telah melebihi baki transaksi harian {limit: string}",

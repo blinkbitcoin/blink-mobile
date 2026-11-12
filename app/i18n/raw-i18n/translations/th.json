@@ -2423,6 +2423,7 @@
     "willBeSentToMempoolBy": "ธุรกรรมจะถูกส่งไปยัง Mempool",
     "amount": "จำนวนเงิน",
     "addAmount": "เพิ่มจำนวนเงิน",
+    "slideToSelectAmount": "เลื่อนเพื่อเลือกจำนวนเงิน",
     "lowFunds": "ยอดเงินไม่เพียงพอ",
     "amountExceed": "จำนวนมากกว่ายอดคงเหลือ {balance: string} ของคุณ",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",

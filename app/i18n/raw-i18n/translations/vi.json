@@ -2423,6 +2423,7 @@
     "willBeSentToMempoolBy": "Giao dịch sẽ được gửi vào mempool",
     "amount": "Số tiền",
     "addAmount": "Thêm số tiền",
+    "slideToSelectAmount": "Vuốt để chọn số tiền",
     "lowFunds": "Không đủ số dư",
     "amountExceed": "Số tiền vượt quá số dư {balance: string} của bạn",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",

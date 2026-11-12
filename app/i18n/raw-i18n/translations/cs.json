@@ -2423,6 +2423,7 @@
     "willBeSentToMempoolBy": "Transakce by měla být odeslána do mempoolu",
     "amount": "Částka",
     "addAmount": "Přidat částku",
+    "slideToSelectAmount": "Přejeďte pro výběr částky",
     "lowFunds": "Nedostatek prostředků",
     "amountExceed": "Částka přesahuje váš zůstatek ve výši {balance: string}",
     "amountExceedsLimit": "Částka přesahuje váš zbývající denní limit {limit: string}",

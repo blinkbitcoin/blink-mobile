@@ -2423,6 +2423,7 @@
     "willBeSentToMempoolBy": "Трансакција треба да буде прослеђена у мемпул",
     "amount": "Износ",
     "addAmount": "Додај износ",
+    "slideToSelectAmount": "Превуците за избор износа",
     "lowFunds": "Nedovoljno sredstava",
     "amountExceed": "Износ прелази ваше стање од {balance: string}",
     "amountExceedsLimit": "Износ прелази ваш дневни лимит од {limit: string}",

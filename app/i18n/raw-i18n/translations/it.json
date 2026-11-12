@@ -2423,6 +2423,7 @@
         "willBeSentToMempoolBy": "La transazione deve essere inviata a mempool",
         "amount": "Importo",
         "addAmount": "Aggiungi importo",
+        "slideToSelectAmount": "Scorri per scegliere l'importo",
         "lowFunds": "Fondi insufficienti",
         "amountExceed": "L'importo supera il saldo di {balance: string}",
         "amountExceedsLimit": "L'importo supera il limite giornaliero rimanente di {limit: string}",
