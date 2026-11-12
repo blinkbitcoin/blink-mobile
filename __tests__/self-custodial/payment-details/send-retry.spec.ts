@@ -11,8 +11,12 @@ import {
 import {
   createSendMutation,
   createSendMutationOnchain,
+  identifyPreparedSend,
+  runSelfCustodialSend,
 } from "@app/self-custodial/payment-details/send-helpers"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
+import { reportError } from "@app/utils/error-logging"
+import * as measurement from "@app/self-custodial/measurement"
 
 const mockPrepareSendPayment = jest.fn()
 const mockSendPayment = jest.fn()
@@ -1200,5 +1204,101 @@ describe("the lost attempts of a send, against a phone clock that is off", () =>
     await usdLost()
 
     expect(lostAttemptsTo("lnbc1...").lostSend?.walletClockSec).toBe(1_000)
+  })
+})
+
+/** Each case below sets every answer it relies on: none is left over from another. */
+const resetSendMocks = () =>
+  [
+    mockPrepareSendPayment,
+    mockSendPayment,
+    mockFindLostSend,
+    mockFindPaymentUnderKey,
+    mockListPayments,
+  ].forEach((mock) => mock.mockReset())
+
+describe("what is done with the SDK's answer, once the send went out", () => {
+  beforeEach(resetSendMocks)
+
+  it("reports a send whose answer came without a payment as sent, not as lost", async () => {
+    mockPrepareSendPayment.mockResolvedValue(bolt11("hash-1"))
+    mockSendPayment.mockResolvedValue({})
+    const ref = {}
+
+    const result = await attempt(
+      createSendMutation(btcLightning, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(lostAttemptsTo("lnbc1...")).toEqual({})
+  })
+
+  it("reports a send as sent when reporting it throws, and never keeps it as lost", async () => {
+    const outcome = await runSelfCustodialSend({
+      sdk: mockSdk,
+      idempotencyKeyRef: { current: KEY },
+      destination: "lnurl-destination",
+      telemetry: {
+        params: { rail: "lnurl_pay", sending_wallet: WalletCurrency.Btc },
+        settlement: { settled: [], failed: { event: "sc_payment_send_failed" } },
+      },
+      prepare: async () => bolt11("hash-5"),
+      identify: identifyPreparedSend,
+      execute: async () => ({}),
+      sentOutcome: (result) => ({
+        status: PaymentSendResult.Success,
+        transaction: { createdAt: Number(result.payment.timestamp) },
+      }),
+      foundOutcome: () => ({ status: PaymentSendResult.Success }),
+      failure: () => ({ status: PaymentSendResult.Failure }),
+    })
+
+    expect(outcome).toEqual({ status: PaymentSendResult.Success })
+    expect(reportError).toHaveBeenCalledWith(
+      "Self-custodial sent outcome",
+      expect.any(TypeError),
+    )
+    expect(lostAttemptsTo("lnurl-destination")).toEqual({})
+  })
+
+  it("reports a send as sent when the bookkeeping after it throws", async () => {
+    const bookkeeping = jest
+      .spyOn(measurement, "measureSettlement")
+      .mockImplementationOnce(() => {
+        throw new Error("telemetry down")
+      })
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress("usdb-token-id"))
+    mockSendPayment.mockResolvedValue(sent())
+    const ref = {}
+
+    const result = await attempt(
+      createSendMutation(usdSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(reportError).toHaveBeenCalledWith(
+      "Self-custodial send bookkeeping",
+      expect.any(Error),
+    )
+    expect(lostAttemptsTo("sp1abc")).toEqual({})
+    bookkeeping.mockRestore()
+  })
+
+  it("still treats an SDK call that throws on the spot as a send that may have gone out", async () => {
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress("usdb-token-id"))
+    mockSendPayment.mockImplementation(() => {
+      throw lostResponse()
+    })
+    const ref = {}
+
+    const result = await attempt(
+      createSendMutation(usdSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
+
+    expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.OutcomeUnknown)
+    expect(lostAttemptsTo("sp1abc").unresolvedSend).toBeDefined()
   })
 })

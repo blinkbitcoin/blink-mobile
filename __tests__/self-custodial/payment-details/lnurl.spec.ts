@@ -2044,3 +2044,38 @@ describe("createSelfCustodialLnurlPaymentDetails send telemetry", () => {
     })
   })
 })
+
+describe("createSelfCustodialLnurlPaymentDetails reporting a bitcoin send", () => {
+  const detailFor = (sats: number, key: string) => {
+    const detail = createSelfCustodialLnurlPaymentDetails(
+      createParams({
+        unitOfAccountAmount: {
+          amount: sats,
+          currency: WalletCurrency.Btc,
+          currencyCode: WalletCurrency.Btc,
+        },
+        idempotencyKeyRef: { current: key },
+      }),
+    )
+    if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+    return detail
+  }
+  beforeEach(() => {
+    ;[mockPrepareLnurl, mockExecuteLnurl, mockFindLostSend].forEach((mock) =>
+      mock.mockReset(),
+    )
+    mockPrepareLnurl.mockResolvedValue(quote())
+  })
+
+  it("reports a send whose answer came without a payment as sent", async () => {
+    mockExecuteLnurl.mockResolvedValue({ successAction: undefined })
+
+    const result = await detailFor(1500, "key-a").sendPaymentMutation({} as never)
+
+    expect(result).toEqual({
+      status: PaymentSendResult.Success,
+      transaction: undefined,
+      extraInfo: { preimage: undefined, successAction: undefined },
+    })
+  })
+})

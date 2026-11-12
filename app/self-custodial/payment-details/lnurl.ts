@@ -259,18 +259,24 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     ],
   })
 
+  /** The SDK's types promise a payment, but a response without one has been seen: the
+   *  send is reported all the same, with nothing the payment would have added. */
   const sendOutcome = (
-    payment: Payment,
+    payment: Payment | undefined,
     successAction: SuccessActionProcessed | undefined,
     status: PaymentSendResult,
-  ) => ({
-    status,
-    transaction: { createdAt: Number(payment.timestamp) },
-    extraInfo: {
-      preimage: extractPreimage(payment),
-      successAction: sdkSuccessActionToLib(successAction),
-    },
-  })
+  ) => {
+    const transaction = payment && { createdAt: Number(payment.timestamp) }
+    const preimage = payment && extractPreimage(payment)
+    return {
+      status,
+      transaction,
+      extraInfo: {
+        preimage,
+        successAction: sdkSuccessActionToLib(successAction),
+      },
+    }
+  }
 
   /** The wallet's own record of a send this detail made, reported as the send itself
    *  would have reported it: the SDK hands a payment back as soon as it is dispatched,

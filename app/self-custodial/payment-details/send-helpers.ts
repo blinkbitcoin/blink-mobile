@@ -613,56 +613,89 @@ const sendAfterEarlierAttempts = async <
    *  a payment that turns up on a later look reports as this attempt would have. */
   const attempt = beginAttempt(telemetry)
   rememberAttemptTelemetry(telemetryKeysOf(identity, idempotencyKey), attempt)
-  try {
-    const result = await execute(prepared, idempotencyKey)
-    settle(lookedFor, retriedUnder)
-    forgetAttemptTelemetry(attempt)
+
+  /** What a send the SDK made reports. A throw while reporting it is no lost send: the
+   *  payment was made, so it is reported as sent all the same, never kept as an attempt
+   *  to look for, nor shown as a failure the sender would retry. */
+  const reportSent = (result: R): SendOutcome => {
+    try {
+      return sentOutcome(result)
+    } catch (err) {
+      reportError("Self-custodial sent outcome", err)
+      return { status: PaymentSendResult.Success }
+    }
+  }
+
+  /** The bookkeeping after a send went out. A throw in it must not undo the send: the
+   *  payment was made, so it is reported and the send goes on as sent. */
+  const keepBooks = (payment: Payment | undefined) => {
+    try {
+      settle(lookedFor, retriedUnder)
+      forgetAttemptTelemetry(attempt)
+      measureSettlement(payment, attempt.settlement, attempt.startedIn)
+    } catch (err) {
+      reportError("Self-custodial send bookkeeping", err)
+    }
+  }
+
+  const reportDispatched = (result: R): SendOutcome => {
     /** The SDK's types promise a payment, but a response without one has been seen:
      *  reported as sent, as the send itself would have been, with nothing to measure. */
     const payment: Payment | undefined = result?.payment
-    measureSettlement(payment, attempt.settlement, attempt.startedIn)
+    keepBooks(payment)
     /** A failed payment is final, also when the SDK hands back the one an earlier
      *  attempt made under this key: the next attempt is a new payment, under a new key. */
     if (payment?.status === PaymentStatus.Failed) {
       startKeyOver(idempotencyKeyRef, idempotencyKey)
       return failure(new Error(`Payment ${payment.id} failed`))
     }
-    return sentOutcome(result)
-  } catch (err) {
-    const isRaisedBeforeDispatch = CODES_RAISED_BEFORE_DISPATCH.has(classifySdkError(err))
-    /** The SDK refused it on the way in: this attempt ends here as a failure, whatever is
-     *  kept for payment safety. Any other throw leaves the outcome unknown, and telemetry
-     *  waits for the payment to turn up, or to be seen failed. */
-    if (isRaisedBeforeDispatch) {
-      forgetAttemptTelemetry(attempt)
-      reportFailed(attempt, telemetry, err)
-    }
-
-    if (!identity) {
-      if (isRaisedBeforeDispatch) return failure(err)
-      attempts.update((current) => ({ ...current, unresolvedSend: { idempotencyKey } }))
-      return idempotencyKey ? failure(err) : outcomeUnknown()
-    }
-
-    /** Not looked for now when a retry under the same key is refused as a duplicate by
-     *  the SDK anyway, nor when the SDK refused the send on the way in. Remembered all
-     *  the same, in both cases: a new amount or wallet starts the key over, whether
-     *  anything was dispatched is the SDK's word and not this code's, and the send made
-     *  next has only the lookup between it and paying twice. */
-    const walletClockSec = await readWalletClockSec(sdk)
-    const thisAttempt = { startedAtMs, walletClockSec, identity, idempotencyKey }
-    if (!idempotencyKey && !isRaisedBeforeDispatch) {
-      const thisAndEarlier = withAttempt(attempts.read().lostSend, thisAttempt)
-      const lost = await findThisSend(thisAndEarlier)
-      if (lost.status === "found") {
-        settle(lookedFor, { lostSend: thisAndEarlier })
-        return foundOutcome(lost.payment)
-      }
-    }
-    attempts.update((current) => ({
-      ...current,
-      lostSend: withAttempt(current.lostSend, thisAttempt),
-    }))
-    return failure(err)
+    return reportSent(result)
   }
+
+  /** Only the SDK call itself decides whether the send went out, whether it rejects or
+   *  throws on the spot: whatever is done with its answer afterwards runs outside, where
+   *  a throw cannot be taken for a lost send. */
+  const dispatch = await Promise.resolve()
+    .then(() => execute(prepared, idempotencyKey))
+    .then(
+      (result) => ({ result }),
+      (error: unknown) => ({ error }),
+    )
+  if ("result" in dispatch) return reportDispatched(dispatch.result)
+  const err = dispatch.error
+  const isRaisedBeforeDispatch = CODES_RAISED_BEFORE_DISPATCH.has(classifySdkError(err))
+  /** The SDK refused it on the way in: this attempt ends here as a failure, whatever is
+   *  kept for payment safety. Any other throw leaves the outcome unknown, and telemetry
+   *  waits for the payment to turn up, or to be seen failed. */
+  if (isRaisedBeforeDispatch) {
+    forgetAttemptTelemetry(attempt)
+    reportFailed(attempt, telemetry, err)
+  }
+
+  if (!identity) {
+    if (isRaisedBeforeDispatch) return failure(err)
+    attempts.update((current) => ({ ...current, unresolvedSend: { idempotencyKey } }))
+    return idempotencyKey ? failure(err) : outcomeUnknown()
+  }
+
+  /** Not looked for now when a retry under the same key is refused as a duplicate by
+   *  the SDK anyway, nor when the SDK refused the send on the way in. Remembered all
+   *  the same, in both cases: a new amount or wallet starts the key over, whether
+   *  anything was dispatched is the SDK's word and not this code's, and the send made
+   *  next has only the lookup between it and paying twice. */
+  const walletClockSec = await readWalletClockSec(sdk)
+  const thisAttempt = { startedAtMs, walletClockSec, identity, idempotencyKey }
+  if (!idempotencyKey && !isRaisedBeforeDispatch) {
+    const thisAndEarlier = withAttempt(attempts.read().lostSend, thisAttempt)
+    const lost = await findThisSend(thisAndEarlier)
+    if (lost.status === "found") {
+      settle(lookedFor, { lostSend: thisAndEarlier })
+      return foundOutcome(lost.payment)
+    }
+  }
+  attempts.update((current) => ({
+    ...current,
+    lostSend: withAttempt(current.lostSend, thisAttempt),
+  }))
+  return failure(err)
 }
