@@ -54,7 +54,9 @@ import {
 import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 
 import {
+  grantSendAnyway,
   lostAttemptsFor,
+  takeSendAnyway,
   withoutSettled,
   type LostAttempts,
   type LostAttemptsHandle,
@@ -644,12 +646,16 @@ const sendAfterEarlierAttempts = async <
 
   const { lostSend: earlier } = attempts.read()
   let unresolved = attempts.read().unresolvedSend
+  /** The sender chose to send anyway past the unresolved attempt: this send goes out
+   *  without asking about it, and settles it only once it does go out. */
+  const isSentAnyway = takeSendAnyway(unresolved)
 
   /**
    * The earlier attempts this send accounts for, settled once it has an outcome, and only
    * those: a send settles what it answered for, nothing more. `lookedFor`: those
    * its own looks found nothing of. `retriedUnder`: those let through as retries under
-   * the key they went out with, which it accounts for only if it does go out under it.
+   * the key they went out with, or because the sender chose to send anyway, which it
+   * accounts for only if it does go out.
    */
   let lookedFor: SettledAttempts = {}
   let retriedUnder: SettledAttempts = {}
@@ -690,9 +696,9 @@ const sendAfterEarlierAttempts = async <
   }
 
   /** Lets the sender, once they have checked their history, send to the destination again
-   *  despite an attempt whose outcome could not be checked. */
-  const sendAnywayAfter = (sent: UnresolvedSend) => () =>
-    attempts.update((current) => withoutSettled(current, { unresolvedSend: sent }))
+   *  despite an attempt whose outcome could not be checked: the next send goes out past
+   *  it, and the attempt stays until that send does go out. */
+  const sendAnywayAfter = (sent: UnresolvedSend) => () => grantSendAnyway(sent)
 
   const findThisSend = (lost: LostSend) =>
     findLostSend({
@@ -748,7 +754,9 @@ const sendAfterEarlierAttempts = async <
   ): Promise<SendOutcome | undefined> => {
     const isRetryUnder = (sentWith: string | undefined) =>
       key !== undefined && sentWith === key
-    if (unresolved && !isRetryUnder(unresolved.idempotencyKey)) {
+    const isUnresolvedLetThrough =
+      isSentAnyway || isRetryUnder(unresolved?.idempotencyKey)
+    if (unresolved && !isUnresolvedLetThrough) {
       const refusal = await settleUnresolved(unresolved)
       if (refusal) return refusal
     }

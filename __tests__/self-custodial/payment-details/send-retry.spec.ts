@@ -1697,6 +1697,50 @@ describe("sending anyway after an outcome that could not be checked", () => {
     expect(lostAttemptsTo("sp1abc")).toEqual({})
   })
 
+  it("keeps the attempt until the send in its place goes out", async () => {
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress("usdb-token-id"))
+    mockSendPayment.mockRejectedValueOnce(lostResponse())
+
+    await usdSparkSend()
+    const refused = await usdSparkSend()
+    refused.extraInfo?.sendAnyway?.()
+
+    expect(lostAttemptsTo("sp1abc").unresolvedSend?.requestedAs).toEqual(asked("USD:500"))
+  })
+
+  it("asks again when the send in its place cannot be quoted", async () => {
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress("usdb-token-id"))
+    mockSendPayment.mockRejectedValueOnce(lostResponse())
+
+    await usdSparkSend()
+    const refused = await usdSparkSend()
+    refused.extraInfo?.sendAnyway?.()
+    mockPrepareSendPayment.mockRejectedValueOnce(sdkError("NetworkError"))
+    await usdSparkSend()
+    const next = await usdSparkSend()
+
+    expect(next.errors?.[0].message).toBe(SelfCustodialErrorCode.OutcomeUnknown)
+    expect(next.extraInfo?.sendAnyway).toEqual(expect.any(Function))
+    expect(mockSendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("asks again when the SDK refuses the send in its place on the way in", async () => {
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress("usdb-token-id"))
+    mockSendPayment
+      .mockRejectedValueOnce(lostResponse())
+      .mockRejectedValueOnce(sdkError("InsufficientFunds"))
+
+    await usdSparkSend()
+    const refused = await usdSparkSend()
+    refused.extraInfo?.sendAnyway?.()
+    const replacement = await usdSparkSend()
+    const next = await usdSparkSend()
+
+    expect(replacement.errors?.[0].message).toBe(SelfCustodialErrorCode.InsufficientFunds)
+    expect(next.errors?.[0].message).toBe(SelfCustodialErrorCode.OutcomeUnknown)
+    expect(mockSendPayment).toHaveBeenCalledTimes(2)
+  })
+
   it("releases only the attempt it was offered for, not one recorded since", async () => {
     mockPrepareSendPayment.mockResolvedValue(sparkAddress("usdb-token-id"))
     mockSendPayment.mockRejectedValue(lostResponse())
@@ -1706,8 +1750,10 @@ describe("sending anyway after an outcome that could not be checked", () => {
     refused.extraInfo?.sendAnyway?.()
     await usdSparkSend()
     refused.extraInfo?.sendAnyway?.()
+    const next = await usdSparkSend()
 
-    expect(lostAttemptsTo("sp1abc").unresolvedSend).toBeDefined()
+    expect(next.errors?.[0].message).toBe(SelfCustodialErrorCode.OutcomeUnknown)
+    expect(mockSendPayment).toHaveBeenCalledTimes(2)
   })
 
   it("does not offer it while a keyed attempt's history cannot be read, and asks again next time", async () => {

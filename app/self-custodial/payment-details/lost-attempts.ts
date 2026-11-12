@@ -353,6 +353,24 @@ export const lostAttemptsTo = (destination: string): LostAttempts =>
   lostAttemptsFor(destination).read()
 
 /**
+ * The unresolved attempts the sender chose to send anyway past, each for the one send to
+ * its destination that comes next. Not the attempt itself: it stays until a send in its
+ * place goes out, so one that fails before it does, or an app closed in between, leaves
+ * it to be asked about again. In memory alone for the same reason.
+ */
+const sendAnywayGrants = new WeakSet<UnresolvedSend>()
+
+/** Lets the next send to the attempt's destination go out past it, once. */
+export const grantSendAnyway = (unresolved: UnresolvedSend) => {
+  sendAnywayGrants.add(unresolved)
+}
+
+/** Whether a send may go out past the attempt, taking the grant if so: whatever becomes
+ *  of the send, the one after it asks again. */
+export const takeSendAnyway = (unresolved: UnresolvedSend | undefined): boolean =>
+  unresolved !== undefined && sendAnywayGrants.delete(unresolved)
+
+/**
  * What is left of a destination's lost attempts once a send has accounted for some: the
  * lost attempts it looked for or retried under their own key, and an unresolved attempt
  * under the key it went out with. Anything else stays.
