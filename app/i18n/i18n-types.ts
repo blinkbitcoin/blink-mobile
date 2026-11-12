@@ -7522,6 +7522,10 @@ type RootTranslation = {
 		 * @param {string} remainingSats
 		 */
 		usdRemainderSweep: RequiredParams<'minimum' | 'remaining' | 'remainingSats'>
+		/**
+		 * I​ ​c​h​e​c​k​e​d​ ​m​y​ ​h​i​s​t​o​r​y​,​ ​s​e​n​d​ ​a​n​y​w​a​y
+		 */
+		sendAnyway: string
 	}
 	SendBitcoinDestinationScreen: {
 		/**
@@ -21905,6 +21909,10 @@ export type TranslationFunctions = {
 		 * Remaining {remaining} ({remainingSats}) will be converted to Bitcoin. USD minimum: {minimum}.
 		 */
 		usdRemainderSweep: (arg: { minimum: string, remaining: string, remainingSats: string }) => LocalizedString
+		/**
+		 * I checked my history, send anyway
+		 */
+		sendAnyway: () => LocalizedString
 	}
 	SendBitcoinDestinationScreen: {
 		/**

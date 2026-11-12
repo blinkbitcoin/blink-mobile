@@ -2362,7 +2362,8 @@
         "slideConfirming": "Confirmando...",
         "copiedDestination": "Copiado destino para a área de transferência",
         "lightningRecommended": "Alta taxa! Recomendamos Lightning.",
-        "usdRemainderSweep": "Saldo restante {remaining: string} ({remainingSats: string}) será convertido em Bitcoin. Mínimo em USD: {minimum: string}."
+        "usdRemainderSweep": "Saldo restante {remaining: string} ({remainingSats: string}) será convertido em Bitcoin. Mínimo em USD: {minimum: string}.",
+        "sendAnyway": "Verifiquei o meu histórico, enviar mesmo assim"
     },
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "Nomes de usuário {bankName: string} agora são endereços {bankName: string}.",

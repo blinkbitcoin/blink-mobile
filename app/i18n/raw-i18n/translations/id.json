@@ -2362,7 +2362,8 @@
     "slideConfirming": "Mengkonfirmasi...",
     "copiedDestination": "Tujuan disalin ke papan klip",
     "lightningRecommended": "Biaya tinggi! Kami merekomendasikan Lightning.",
-    "usdRemainderSweep": "Sisa {remaining: string} ({remainingSats: string}) akan dikonversi ke Bitcoin. Minimum USD: {minimum: string}."
+    "usdRemainderSweep": "Sisa {remaining: string} ({remainingSats: string}) akan dikonversi ke Bitcoin. Minimum USD: {minimum: string}.",
+    "sendAnyway": "Saya sudah memeriksa riwayat, tetap kirim"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} nama pengguna sekarang adalah alamat {bankName: string}.",

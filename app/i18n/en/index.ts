@@ -2391,6 +2391,7 @@ const en: BaseTranslation = {
     lightningRecommended: "High fee! We recommend Lightning.",
     usdRemainderSweep:
       "Remaining {remaining: string} ({remainingSats: string}) will be converted to Bitcoin. USD minimum: {minimum: string}.",
+    sendAnyway: "I checked my history, send anyway",
   },
   SendBitcoinDestinationScreen: {
     usernameNowAddress:

@@ -113,6 +113,12 @@ export type PaymentSendExtraInfo = {
   /** A self-custodial send found that an earlier attempt to the destination paid, for
    *  another amount: that payment's id, for the sender to look at. It is not this send. */
   earlierPaymentId?: string
+  /** A self-custodial send whose outcome could not be checked: the sender is pointed at
+   *  their history. */
+  checkHistory?: boolean
+  /** ...and, when their history is what can answer it, lets them send to the destination
+   *  again once they have checked. */
+  sendAnyway?: () => void
 }
 
 export type SetAmount<T extends WalletCurrency> = (

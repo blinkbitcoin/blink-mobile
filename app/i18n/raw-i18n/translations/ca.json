@@ -2362,7 +2362,8 @@
     "slideConfirming": "Confirmant...",
     "copiedDestination": "Destinació copiada al porta-retalls",
     "lightningRecommended": "Comissió alta! Recomanem utilitzar Lightning.",
-    "usdRemainderSweep": "Resta {remaining: string} ({remainingSats: string}) i es convertirà a Bitcoin. Mínim d'USD: {minimum: string}."
+    "usdRemainderSweep": "Resta {remaining: string} ({remainingSats: string}) i es convertirà a Bitcoin. Mínim d'USD: {minimum: string}.",
+    "sendAnyway": "He revisat el meu historial, envia igualment"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} nom d'usuari és ara la adreça {bankName: string}.",

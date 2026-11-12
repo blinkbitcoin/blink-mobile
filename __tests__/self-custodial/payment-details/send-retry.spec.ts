@@ -1570,6 +1570,7 @@ describe("a lost attempt found by a send asked for another amount", () => {
     )
 
     expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.OutcomeUnknown)
+    expect(result.extraInfo).toEqual({ checkHistory: true, sendAnyway: undefined })
     expect(lostAttemptsTo("lnbc1...").lostSend?.paymentHashes).toEqual(["hash-b"])
   })
 
@@ -1613,6 +1614,90 @@ describe("a lost attempt found by a send asked for another amount", () => {
 
     expect(result.status).toBe(PaymentSendResult.Success)
     expect(lostAttemptsTo("lnbc1...")).toEqual({})
+  })
+})
+
+describe("sending anyway after an outcome that could not be checked", () => {
+  beforeEach(resetSendMocks)
+
+  const usdSparkSend = () => {
+    const ref = {}
+    return attempt(
+      createSendMutation(usdSpark, {
+        telemetry: TELEMETRY,
+        idempotencyKeyRef: ref,
+        requestedAs: asked("USD:500"),
+      }),
+      ref,
+    )
+  }
+
+  /** Not on the attempt that just threw: the history cannot show it yet. */
+  it("is not offered on the attempt that just threw", async () => {
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress("usdb-token-id"))
+    mockSendPayment.mockRejectedValue(lostResponse())
+
+    const result = await usdSparkSend()
+
+    expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.OutcomeUnknown)
+    expect(result.extraInfo).toEqual({ checkHistory: true, sendAnyway: undefined })
+    expect(lostAttemptsTo("sp1abc").unresolvedSend?.requestedAs).toEqual(asked("USD:500"))
+  })
+
+  it("is offered on the next try, and sends once the sender chose to", async () => {
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress("usdb-token-id"))
+    mockSendPayment.mockRejectedValueOnce(lostResponse()).mockResolvedValue(sent())
+
+    await usdSparkSend()
+    const refused = await usdSparkSend()
+    refused.extraInfo?.sendAnyway?.()
+    const again = await usdSparkSend()
+
+    expect(refused.errors?.[0].message).toBe(SelfCustodialErrorCode.OutcomeUnknown)
+    expect(refused.extraInfo?.sendAnyway).toEqual(expect.any(Function))
+    expect(again.status).toBe(PaymentSendResult.Success)
+    expect(mockSendPayment).toHaveBeenCalledTimes(2)
+    expect(lostAttemptsTo("sp1abc")).toEqual({})
+  })
+
+  it("releases only the attempt it was offered for, not one recorded since", async () => {
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress("usdb-token-id"))
+    mockSendPayment.mockRejectedValue(lostResponse())
+
+    await usdSparkSend()
+    const refused = await usdSparkSend()
+    refused.extraInfo?.sendAnyway?.()
+    await usdSparkSend()
+    refused.extraInfo?.sendAnyway?.()
+
+    expect(lostAttemptsTo("sp1abc").unresolvedSend).toBeDefined()
+  })
+
+  it("does not offer it while a keyed attempt's history cannot be read, and asks again next time", async () => {
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress())
+    mockSendPayment.mockRejectedValueOnce(lostResponse()).mockResolvedValue(sent())
+    mockFindPaymentUnderKey
+      .mockResolvedValueOnce({ status: "unreadable", error: new Error("io") })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+    const ref = {}
+    await attempt(
+      createSendMutation(btcSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
+
+    const rebuilt = {}
+    const send = createSendMutation(btcSpark, {
+      telemetry: TELEMETRY,
+      idempotencyKeyRef: rebuilt,
+    })
+    const refused = await attempt(send, rebuilt, NEXT_KEY)
+    const again = await attempt(send, rebuilt)
+
+    expect(refused.errors?.[0].message).toBe(SelfCustodialErrorCode.OutcomeUnknown)
+    expect(refused.extraInfo).toEqual({ checkHistory: true, sendAnyway: undefined })
+    expect(mockFindPaymentUnderKey).toHaveBeenCalledTimes(2)
+    expect(again.status).toBe(PaymentSendResult.Success)
+    expect(sentKeys()).toEqual([KEY, NEXT_KEY])
   })
 })
 

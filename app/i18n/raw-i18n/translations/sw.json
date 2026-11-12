@@ -2362,7 +2362,8 @@
     "slideConfirming": "Inathibitisha...",
     "copiedDestination": "Imeakiliwa marudio kwenye ubao wa kunakili",
     "lightningRecommended": "Ada kubwa! Tunapendekeza Umeme.",
-    "usdRemainderSweep": "Iliyosalia {remaining: string} ({remainingSats: string}) itabadilishwa kuwa Bitcoin. Kima cha chini cha USD: {minimum: string}."
+    "usdRemainderSweep": "Iliyosalia {remaining: string} ({remainingSats: string}) itabadilishwa kuwa Bitcoin. Kima cha chini cha USD: {minimum: string}.",
+    "sendAnyway": "Nimeangalia historia yangu, tuma hata hivyo"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} majina ya watumiaji sasa ni anwani za {bankName: string} ",

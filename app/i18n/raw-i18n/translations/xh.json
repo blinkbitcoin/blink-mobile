@@ -2362,7 +2362,8 @@
     "slideConfirming": "Iyaqinisekisa...",
     "copiedDestination": "Ikopishwe indawo ekuya kuyo kwibhodi eqhotyoshwayo",
     "lightningRecommended": "Imirhumo iphezulu! Sincoma i-Lightning.",
-    "usdRemainderSweep": "Iseleyo {remaining: string} ({remainingSats: string}) iya kuguqulelwa kwiBitcoin. USD ephantsi kakhulu: {minimum: string}."
+    "usdRemainderSweep": "Iseleyo {remaining: string} ({remainingSats: string}) iya kuguqulelwa kwiBitcoin. USD ephantsi kakhulu: {minimum: string}.",
+    "sendAnyway": "Ndijongile imbali yam, thumela noko"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "bankName:} amagama abasebenzisi ngoku {bankName: string} iidilesi.",

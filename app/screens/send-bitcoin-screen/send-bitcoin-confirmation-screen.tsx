@@ -132,6 +132,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const [failedSend, setFailedSend] = useState<PaymentSendExtraInfo | undefined>(
     undefined,
   )
+  const clearPaymentError = React.useCallback(() => {
+    setPaymentError(undefined)
+    setFailedSend(undefined)
+  }, [])
   const [isVerifying, setIsVerifying] = useState(false)
   const verifyPaymentSettled = useVerifyPaymentSettled()
   const { LL } = useI18nContext()
@@ -391,6 +395,13 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     translateSdkError,
   ])
 
+  /** The sender checked their history and chose to send anyway: the destination was
+   *  released, so the send goes out now, as the button says. */
+  const sendAgainAnyway = React.useCallback(() => {
+    clearPaymentError()
+    handleSendPayment()
+  }, [clearPaymentError, handleSendPayment])
+
   let validAmount = true
   let invalidAmountErrorMessage = ""
 
@@ -452,6 +463,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   }
 
   const errorMessage = paymentError || invalidAmountErrorMessage
+  /** What stops a send from this screen: the slider's gates, which "send anyway" honours
+   *  too, since it sends in the slider's place. */
+  const isSliderDisabled =
+    !validAmount || !sendPayment || feeUnavailable || dustNotEvaluable
 
   const transactionType = () => {
     if (paymentType === "intraledger") return LL.common.intraledger()
@@ -628,7 +643,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             </Text>
           </View>
         ) : null}
-        <PaymentErrorActions failedSend={failedSend} />
+        <PaymentErrorActions
+          failedSend={failedSend}
+          canSendAnyway={!isSliderDisabled}
+          onSendAnyway={sendAgainAnyway}
+        />
         <View style={styles.buttonContainer}>
           {/* disable slide gestures in area around the slider button */}
           <PanGestureHandler>
@@ -638,9 +657,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 initialText={LL.SendBitcoinConfirmationScreen.slideToConfirm()}
                 loadingText={LL.SendBitcoinConfirmationScreen.slideConfirming()}
                 onSwipe={handleSendPayment}
-                disabled={
-                  !validAmount || !sendPayment || feeUnavailable || dustNotEvaluable
-                }
+                disabled={isSliderDisabled}
               />
             </View>
           </PanGestureHandler>

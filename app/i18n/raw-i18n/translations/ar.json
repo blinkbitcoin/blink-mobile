@@ -2362,7 +2362,8 @@
     "slideConfirming": "جارٍ التأكيد...",
     "copiedDestination": "تم نسخ الوجهة إلى الحافظة",
     "lightningRecommended": "رسوم مرتفعة! نوصي باستخدام Lightning.",
-    "usdRemainderSweep": "الرصيد المتبقي {remaining: string} ({remainingSats: string}) سيتم تحويله إلى بيتكوين. الحد الأدنى للدولار الأمريكي: {minimum: string}."
+    "usdRemainderSweep": "الرصيد المتبقي {remaining: string} ({remainingSats: string}) سيتم تحويله إلى بيتكوين. الحد الأدنى للدولار الأمريكي: {minimum: string}.",
+    "sendAnyway": "تحققت من سجلي، أرسل على أي حال"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "أسماء المستخدمين في {bankName: string} أصبحت عناوين في {bankName: string}",

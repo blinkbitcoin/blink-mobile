@@ -2362,7 +2362,8 @@
     "slideConfirming": "Potvrđivanje...",
     "copiedDestination": "Odredište kopirano u međuspremnik",
     "lightningRecommended": "Visoka naknada! Preporučujemo Lightning.",
-    "usdRemainderSweep": "Preostalo {remaining: string} ({remainingSats: string}) bit će pretvoreno u Bitcoin. Minimum u USD: {minimum: string}."
+    "usdRemainderSweep": "Preostalo {remaining: string} ({remainingSats: string}) bit će pretvoreno u Bitcoin. Minimum u USD: {minimum: string}.",
+    "sendAnyway": "Povijest je provjerena, svejedno pošalji"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} korisnička imena sada su {bankName: string} adrese.",

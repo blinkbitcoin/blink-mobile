@@ -2362,7 +2362,8 @@
     "slideConfirming": "Confirmare...",
     "copiedDestination": "Destinație copiată în clipboard",
     "lightningRecommended": "Taxă mare! Vă recomandăm Lightning.",
-    "usdRemainderSweep": "Soldul rămas {remaining: string} ({remainingSats: string}) va fi convertit în Bitcoin. Minim USD: {minimum: string}."
+    "usdRemainderSweep": "Soldul rămas {remaining: string} ({remainingSats: string}) va fi convertit în Bitcoin. Minim USD: {minimum: string}.",
+    "sendAnyway": "Mi-am verificat istoricul, trimite oricum"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "Numele de utilizator {bankName: string} sunt acum adrese {bankName: string}.",

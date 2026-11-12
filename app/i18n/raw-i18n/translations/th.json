@@ -2362,7 +2362,8 @@
     "slideConfirming": "กำลังยืนยัน...",
     "copiedDestination": "คัดลอกปลายทางไปยังคลิปบอร์ดแล้ว",
     "lightningRecommended": "ค่าธรรมเนียมสูง! แนะนำให้ใช้ Lightning",
-    "usdRemainderSweep": "ยอดคงเหลือ {remaining: string} ({remainingSats: string}) จะถูกแปลงเป็น Bitcoin ขั้นต่ำของ USD: {minimum: string}"
+    "usdRemainderSweep": "ยอดคงเหลือ {remaining: string} ({remainingSats: string}) จะถูกแปลงเป็น Bitcoin ขั้นต่ำของ USD: {minimum: string}",
+    "sendAnyway": "ตรวจสอบประวัติแล้ว ส่งต่อไป"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "ชื่อผู้ใช้{bankName: string} เป็นแอดเดรส{bankName: string}ของคุณในขณะนี้",

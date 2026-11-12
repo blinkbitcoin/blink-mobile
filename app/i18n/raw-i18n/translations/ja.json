@@ -2362,7 +2362,8 @@
         "slideConfirming": "確認中...",
         "copiedDestination": "送信先をクリップボードにコピーしました",
         "lightningRecommended": "手数料が高額です！Lightningをお勧めします。",
-        "usdRemainderSweep": "残高{remaining: string}（{remainingSats: string}）はビットコインに変換されます。USDの最低額：{minimum: string}。"
+        "usdRemainderSweep": "残高{remaining: string}（{remainingSats: string}）はビットコインに変換されます。USDの最低額：{minimum: string}。",
+        "sendAnyway": "履歴を確認しました。このまま送金する"
     },
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "ユーザー名{bankName: string}がアドレス{bankName: string}になりました。",

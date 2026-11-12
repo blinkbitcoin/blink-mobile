@@ -2362,7 +2362,8 @@
     "slideConfirming": "Okukakasa",
     "copiedDestination": "Gy'eziraga wawanduukuluddwa ku lutimbe",
     "lightningRecommended": "Ebisale ebingi! Tukukubiriza okukozesa Lightning.",
-    "usdRemainderSweep": "Ekisigaddewo {remaining: string} ({remainingSats: string}) kijja kufuulibwa Bitcoin. Ekitundu ekisembayo eky'USD: {minimum: string}."
+    "usdRemainderSweep": "Ekisigaddewo {remaining: string} ({remainingSats: string}) kijja kufuulibwa Bitcoin. Ekitundu ekisembayo eky'USD: {minimum: string}.",
+    "sendAnyway": "Nkebedde ebyafaayo byange, weereza wadde kiri kityo"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} amannya g'omukozesa endagiriro ya {bankName: string}.",

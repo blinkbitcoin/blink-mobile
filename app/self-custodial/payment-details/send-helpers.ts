@@ -378,7 +378,13 @@ const startKeyOver = (
   }
 }
 
-const outcomeUnknown = (): SendOutcome => ({
+/**
+ * An attempt's outcome could not be checked: the sender is pointed at their history.
+ * `sendAnyway` lets them send again once they have looked, offered only when their
+ * history is what can answer it: an attempt with nothing the wallet could ever find it
+ * by. One the wallet could not read this time is asked about again on the next try.
+ */
+const outcomeUnknown = (sendAnyway?: () => void): SendOutcome => ({
   status: PaymentSendResult.Failure,
   errors: [
     {
@@ -386,6 +392,7 @@ const outcomeUnknown = (): SendOutcome => ({
       message: SelfCustodialErrorCode.OutcomeUnknown,
     },
   ],
+  extraInfo: { checkHistory: true, sendAnyway },
 })
 
 /**
@@ -671,6 +678,11 @@ const sendAfterEarlierAttempts = async <
     return reportedAsSent(payment)
   }
 
+  /** Lets the sender, once they have checked their history, send to the destination again
+   *  despite an attempt whose outcome could not be checked. */
+  const sendAnywayAfter = (sent: UnresolvedSend) => () =>
+    attempts.update((current) => withoutSettled(current, { unresolvedSend: sent }))
+
   const findThisSend = (lost: LostSend) =>
     findLostSend({
       sdk,
@@ -690,9 +702,12 @@ const sendAfterEarlierAttempts = async <
     sent: UnresolvedSend,
   ): Promise<SendOutcome | undefined> => {
     const sentKey = sent.idempotencyKey
-    if (sentKey === undefined) return outcomeUnknown()
+    if (sentKey === undefined) return outcomeUnknown(sendAnywayAfter(sent))
 
     const look = withFailedReported(await findPaymentUnderKey({ sdk, key: sentKey }))
+    /** No way past it: the attempt is the SDK's payment under its key, which the next
+     *  look can still find, and a history that cannot be read cannot be checked by the
+     *  sender either. */
     if (look.status === "unreadable") return outcomeUnknown()
 
     unresolved = undefined
@@ -846,7 +861,10 @@ const sendAfterEarlierAttempts = async <
     if (isRaisedBeforeDispatch) return failure(err)
     const unresolvedNow: UnresolvedSend = { idempotencyKey, requestedAs }
     attempts.update((current) => ({ ...current, unresolvedSend: unresolvedNow }))
-    return idempotencyKey ? failure(err) : outcomeUnknown()
+    if (idempotencyKey) return failure(err)
+    /** No "send anyway" yet: the history cannot show this payment until the wallet has
+     *  caught up. It is offered on the next try, once the sender has had time to look. */
+    return outcomeUnknown()
   }
 
   /** Not looked for now when a retry under the same key is refused as a duplicate by
