@@ -174,7 +174,11 @@ describe("createSelfCustodialSparkPaymentDetails", () => {
 })
 
 describe("createSelfCustodialSparkPaymentDetails send-all", () => {
-  const balance = { amount: 100_000, currency: WalletCurrency.Btc, currencyCode: WalletCurrency.Btc }
+  const balance = {
+    amount: 100_000,
+    currency: WalletCurrency.Btc,
+    currencyCode: WalletCurrency.Btc,
+  }
   const lastFeeParams = () =>
     mockCreateGetFee.mock.calls[mockCreateGetFee.mock.calls.length - 1][0]
   const lastSendParams = () =>
@@ -189,7 +193,9 @@ describe("createSelfCustodialSparkPaymentDetails send-all", () => {
     expect(createSelfCustodialSparkPaymentDetails(createParams()).canSendMax).toBe(true)
     expect(
       createSelfCustodialSparkPaymentDetails(
-        createParams({ sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd } }),
+        createParams({
+          sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
+        }),
       ).canSendMax,
     ).toBe(false)
   })
@@ -213,9 +219,10 @@ describe("createSelfCustodialSparkPaymentDetails send-all", () => {
   })
 
   it("drops the send-all on a wallet switch", () => {
-    const switched = createSelfCustodialSparkPaymentDetails(createParams())
-      .setAmount!(balance, true)
-      .setSendingWalletDescriptor({ id: "w-other", currency: WalletCurrency.Btc })
+    const switched = createSelfCustodialSparkPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    ).setSendingWalletDescriptor({ id: "w-other", currency: WalletCurrency.Btc })
 
     expect(switched.isSendingMax).toBe(false)
     expect(lastFeeParams().feePolicy).toBeUndefined()
