@@ -1,5 +1,5 @@
 import React from "react"
-import { AccessibilityInfo } from "react-native"
+import { AccessibilityInfo, Modal, Platform } from "react-native"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { it } from "@jest/globals"
@@ -58,6 +58,9 @@ jest.mock("@app/hooks/use-display-currency", () => ({
 jest.mock("@app/components/success-glow", () => ({ SuccessGlow: () => null }))
 jest.mock("@app/components/success-badge", () => ({ SuccessBadge: () => null }))
 
+/** One frame: the iris waits a frame after the window is up. */
+const FRAME_MS = 16
+
 const NOW_S = Math.floor(Date.now() / 1000)
 
 const payment = (id: string, amountSats: number): ShownSplash =>
@@ -112,7 +115,7 @@ describe("IncomingTransactionSplashOverlay", () => {
     return { rerender }
   }
 
-  /** The iris starts once the amount has been measured. */
+  /** The iris starts the frame after the amount has been measured. */
   const layOutAmount = async () => {
     const amount = await screen.findByTestId("incoming-transaction-splash-amount", {
       includeHiddenElements: true,
@@ -124,6 +127,7 @@ describe("IncomingTransactionSplashOverlay", () => {
       (cb: (x: number, y: number, w: number, h: number) => void) => cb(100, 300, 160, 40), // eslint-disable-line max-params
     )
     act(() => fireEvent(amount, "layout", { nativeEvent: { layout: {} } }))
+    act(() => jest.advanceTimersByTime(FRAME_MS))
   }
 
   const haptic = ReactNativeHapticFeedback.trigger as jest.Mock
@@ -141,6 +145,7 @@ describe("IncomingTransactionSplashOverlay", () => {
 
   afterEach(() => {
     jest.useRealTimers()
+    jest.restoreAllMocks()
   })
 
   it("lands once, for the newest payment, when two more arrive on its way in", async () => {
@@ -232,6 +237,17 @@ describe("IncomingTransactionSplashOverlay", () => {
 
     expect(screen.getAllByText("1,000 SAT")).toHaveLength(1)
     expect(screen.queryByText("$1.00")).toBeNull()
+  })
+
+  it("holds the iris on Android until the splash window is on screen", async () => {
+    jest.replaceProperty(Platform, "OS", "android")
+    renderOverlay(payment("a", 1_000))
+    await layOutAmount()
+    expect(mockFinishers).toHaveLength(0)
+
+    act(() => screen.UNSAFE_getByType(Modal).props.onShow())
+    act(() => jest.advanceTimersByTime(FRAME_MS))
+    expect(mockFinishers).toHaveLength(1)
   })
 
   it("shows the fiat amount with the sats under it once priced", async () => {
