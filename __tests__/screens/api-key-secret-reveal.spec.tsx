@@ -1,6 +1,6 @@
 import React from "react"
 import { Alert, AlertButton } from "react-native"
-import { act, fireEvent, render, screen } from "@testing-library/react-native"
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -8,7 +8,7 @@ import { ApiKeySecretReveal } from "@app/screens/settings-screen/api/api-key-sec
 
 import { ContextForScreen } from "./helper"
 
-const API_KEY_SECRET = "blink_S3CR3TS3CR3TS3CR3T"
+const API_KEY_SECRET = "blink_S3CR3TS3CR3TS3CR3TS3CR3TS3CR3TS3CR3T"
 
 type BeforeRemoveEvent = { preventDefault: jest.Mock }
 type BeforeRemoveListener = (event: BeforeRemoveEvent) => void
@@ -83,6 +83,16 @@ const lastAlertButtons = (): AlertButton[] => {
   return call?.[2] ?? []
 }
 
+const pressInstalledHeaderBack = () => {
+  const { headerLeft } = mockSetOptions.mock.calls.at(-1)[0]
+  render(
+    <ContextForScreen>
+      {headerLeft({ canGoBack: true, tintColor: undefined, label: undefined })}
+    </ContextForScreen>,
+  )
+  fireEvent.press(screen.getByLabelText("Go back"))
+}
+
 describe("ApiKeySecretReveal", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -91,13 +101,24 @@ describe("ApiKeySecretReveal", () => {
     jest.spyOn(Alert, "alert").mockImplementation(() => {})
   })
 
-  it("hides the header back button and disables the swipe-back gesture", async () => {
+  it("disables the swipe-back gesture", async () => {
     renderReveal()
     await screen.findByTestId("api-key-secret")
 
     expect(mockSetOptions).toHaveBeenCalledWith(
-      expect.objectContaining({ headerBackVisible: false, gestureEnabled: false }),
+      expect.objectContaining({ gestureEnabled: false }),
     )
+  })
+
+  it("leaves through the header back arrow, the same way as Done", async () => {
+    renderReveal()
+    await screen.findByTestId("api-key-secret")
+
+    pressInstalledHeaderBack()
+
+    await waitFor(() => expect(mockGoBack).toHaveBeenCalled())
+    const event = emitBeforeRemove()
+    expect(event.preventDefault).not.toHaveBeenCalled()
   })
 
   it("blocks hardware and system back navigation", async () => {
@@ -118,6 +139,36 @@ describe("ApiKeySecretReveal", () => {
     expect(mockGoBack).toHaveBeenCalled()
     const event = emitBeforeRemove()
     expect(event.preventDefault).not.toHaveBeenCalled()
+  })
+
+  it("shows both ends of the key, and copies all of it", async () => {
+    const Clipboard = jest.requireMock("@react-native-clipboard/clipboard")
+    renderReveal()
+    await screen.findByTestId("api-key-secret")
+
+    expect(screen.getByText("blink_S3CR3TS3C...R3TS3CR3T")).toBeTruthy()
+    expect(screen.queryByText(API_KEY_SECRET)).toBeNull()
+
+    fireEvent.press(screen.getByTestId("api-key-secret"))
+
+    expect(Clipboard.setString).toHaveBeenCalledWith(API_KEY_SECRET)
+  })
+
+  it("announces the key field as a copy button, not the shortened key", async () => {
+    renderReveal()
+    await screen.findByTestId("api-key-secret")
+
+    const field = screen.getByTestId("api-key-secret")
+    expect(field.props.accessibilityRole).toBe("button")
+    expect(field.props.accessibilityLabel).toBe(LL.CopySecretComponent.button())
+  })
+
+  it("names the key above its one-time warning", async () => {
+    renderReveal()
+    await screen.findByTestId("api-key-secret")
+
+    expect(screen.getByText("CI bot")).toBeTruthy()
+    expect(screen.getByText(LL.ApiScreen.secretWarning())).toBeTruthy()
   })
 
   /** The reveal shows a one-time API secret: until the screen guard is actually
@@ -151,15 +202,44 @@ describe("ApiKeySecretReveal", () => {
 
       expect(screen.queryByTestId("api-key-secret")).toBeNull()
       expect(mockSetOptions).toHaveBeenCalledWith(
-        expect.objectContaining({ headerBackVisible: false, gestureEnabled: false }),
+        expect.objectContaining({ gestureEnabled: false }),
       )
       expect(beforeRemoveListeners.length).toBeGreaterThan(0)
       const event = emitBeforeRemove()
       expect(event.preventDefault).toHaveBeenCalled()
     })
 
-    /** Header Back is hidden and every removal is blocked, so a registration that
+    /** Every removal but Done and the header arrow is blocked, so a registration that
      *  does not land would otherwise leave no way out while it is pending. */
+    it("asks before the header arrow discards the secret while registration is pending", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      renderReveal()
+      await act(async () => {})
+      expect(screen.queryByTestId("api-key-secret")).toBeNull()
+
+      pressInstalledHeaderBack()
+
+      await waitFor(() =>
+        expect(Alert.alert).toHaveBeenCalledWith(
+          LL.ApiScreen.discardSecretTitle(),
+          LL.ApiScreen.discardSecretBody(),
+          expect.any(Array),
+        ),
+      )
+      expect(mockGoBack).not.toHaveBeenCalled()
+      const cancel = lastAlertButtons().find((button) => button.style === "cancel")
+      cancel?.onPress?.()
+      expect(mockGoBack).not.toHaveBeenCalled()
+
+      const discard = lastAlertButtons().find((button) => button.style === "destructive")
+      discard?.onPress?.()
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+      const event = emitBeforeRemove()
+      expect(event.preventDefault).not.toHaveBeenCalled()
+    })
+
     it("offers Back while registration is pending, and it asks before discarding", async () => {
       const registration = deferred<void>()
       mockLeaseReady = registration.promise
@@ -192,6 +272,32 @@ describe("ApiKeySecretReveal", () => {
 
       const event = emitBeforeRemove()
       expect(event.preventDefault).toHaveBeenCalled()
+    })
+
+    it("asks before the header arrow discards the secret after registration fails", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      renderReveal()
+      await act(async () => {})
+      registration.reject(new Error("native failure"))
+      await screen.findByTestId("screen-security-retry")
+
+      pressInstalledHeaderBack()
+
+      await waitFor(() =>
+        expect(Alert.alert).toHaveBeenCalledWith(
+          LL.ApiScreen.discardSecretTitle(),
+          LL.ApiScreen.discardSecretBody(),
+          expect.any(Array),
+        ),
+      )
+      expect(mockGoBack).not.toHaveBeenCalled()
+      const discard = lastAlertButtons().find((button) => button.style === "destructive")
+      discard?.onPress?.()
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+      const event = emitBeforeRemove()
+      expect(event.preventDefault).not.toHaveBeenCalled()
     })
 
     it("keeps the secret unmounted after registration fails, and Back asks before discarding it", async () => {

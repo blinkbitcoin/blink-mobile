@@ -124,7 +124,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexShrink: 1,
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   /** Shrinks and wraps alongside the heading, so a long locale never cuts the ETA off. */
   value: {
@@ -152,7 +152,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingRight: 10,
   },
   optionRowSelected: {
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
   },
   optionContent: {
     flex: 1,
@@ -160,11 +160,11 @@ const useStyles = makeStyles(({ colors }) => ({
   optionLabel: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   optionDetail: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
 }))

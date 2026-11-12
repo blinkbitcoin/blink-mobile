@@ -188,6 +188,37 @@ describe("BiometricWrapper", () => {
     })
 
     /**
+     * The native module memoizes its prompt with the promise that opened it, so a
+     * prompt not released afterwards would leave the next caller's promise unanswered.
+     * The trailing release is also the call that crashed off the main thread.
+     */
+    describe("releasing the native prompt", () => {
+      const expectReleasedAroundThePrompt = () => {
+        expect(mockRelease).toHaveBeenCalledTimes(2)
+        const [before, after] = mockRelease.mock.invocationCallOrder
+        const [prompt] = mockAuthenticate.mock.invocationCallOrder
+        expect(before).toBeLessThan(prompt)
+        expect(prompt).toBeLessThan(after)
+      }
+
+      it("releases before prompting and again once a success settles", async () => {
+        mockAuthenticate.mockResolvedValue(undefined)
+
+        await BiometricWrapper.authenticate("auth", jest.fn(), jest.fn())
+
+        expectReleasedAroundThePrompt()
+      })
+
+      it("releases before prompting and again once a failure settles", async () => {
+        mockAuthenticate.mockRejectedValue(namedError("UserCancel", "user cancelled"))
+
+        await BiometricWrapper.authenticate("auth", jest.fn(), jest.fn())
+
+        expectReleasedAroundThePrompt()
+      })
+    })
+
+    /**
      * Only one prompt can be up at a time, so a second call is dropped. It still
      * has to answer: a caller whose only completion path is these two callbacks
      * waits forever otherwise, which is how a gated screen ends up on a spinner
@@ -231,6 +262,7 @@ describe("BiometricWrapper", () => {
 
         // One prompt was opened, not two, and the dropped call did not release it.
         expect(mockAuthenticate).toHaveBeenCalledTimes(1)
+        expect(mockRelease).toHaveBeenCalledTimes(1)
 
         release()
         await inFlight

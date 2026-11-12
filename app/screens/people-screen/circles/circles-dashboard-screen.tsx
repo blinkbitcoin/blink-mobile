@@ -85,8 +85,8 @@ const CirclesDashboardScreenContent: React.FC = () => {
           <RefreshControl
             refreshing={loading}
             onRefresh={refetch}
-            colors={[colors.primary]} // Android refresh indicator colors
-            tintColor={colors.primary} // iOS refresh indicator color
+            colors={[colors.accent]} // Android refresh indicator colors
+            tintColor={colors.accent} // iOS refresh indicator color
           />
         }
       >
@@ -191,14 +191,14 @@ const useStyles = makeStyles(({ colors }) => {
     },
     groupEffort: {
       textAlign: "center",
-      color: colors.grey3,
+      color: colors.textDisabled,
     },
     circle: {
       position: "absolute",
       height: 150,
       width: 150,
       borderRadius: 75,
-      backgroundColor: colors.backdropWhite,
+      backgroundColor: colors.backdrop,
     },
     circlesContainer: {
       zIndex: -1,

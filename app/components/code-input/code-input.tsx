@@ -34,7 +34,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderWidth: 2,
     borderBottomWidth: 2,
     paddingHorizontal: 10,
-    borderColor: colors.primary5,
+    borderColor: colors.accent4,
     borderRadius: 8,
     marginRight: 0,
   },
@@ -120,6 +120,8 @@ export const CodeInput: React.FC<Props> = ({
           <ActivityIndicator
             style={styles.activityIndicator}
             size="large"
+            // React Navigation's theme, not the app palette: `primary` is its own key
+            // eslint-disable-next-line no-restricted-syntax
             color={colors.primary}
           />
         )}

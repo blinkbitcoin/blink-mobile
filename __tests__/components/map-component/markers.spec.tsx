@@ -200,7 +200,7 @@ describe("PlaceMarker", () => {
     // amber there and would collide with the boosted pin.
     expect(
       pinFill(inMode("light", <PlaceMarker place={place()} onPress={jest.fn()} />)),
-    ).toBe(light.primary)
+    ).toBe(light.accent)
     expect(
       pinFill(inMode("dark", <PlaceMarker place={place()} onPress={jest.fn()} />)),
     ).toBe(PIN_COLOR_DARK)
@@ -214,7 +214,7 @@ describe("PlaceMarker", () => {
     for (const mode of ["light", "dark"] as const) {
       expect(
         glyphColor(inMode(mode, <PlaceMarker place={place()} onPress={jest.fn()} />)),
-      ).toBe(light._white)
+      ).toBe(light.staticWhite)
     }
   })
 
@@ -335,15 +335,15 @@ describe("PlaceLabelMarker", () => {
   })
 
   it("darkens the halo in light mode, where a white one is swallowed", () => {
-    // `colors.white` is the background token and is #FFFFFF in light mode, which
+    // `colors.backgroundDefault` is the background token and is #FFFFFF in light mode, which
     // over a pale basemap leaves the glyphs nothing but their own weight to
     // stand on. Dark mode needs no equivalent: the same token is already black
     // there, behind white text.
     expect(haloOf(inMode("light", label()))).toBe(LABEL_HALO_COLOR_LIGHT)
-    expect(haloOf(inMode("light", label()))).not.toBe(light.white)
+    expect(haloOf(inMode("light", label()))).not.toBe(light.backgroundDefault)
 
-    expect(haloOf(inMode("dark", label()))).toBe(dark.white)
-    expect(textStyleOf(inMode("dark", label())).color).toBe(dark.black)
+    expect(haloOf(inMode("dark", label()))).toBe(dark.backgroundDefault)
+    expect(textStyleOf(inMode("dark", label())).color).toBe(dark.textOnBackground)
   })
 
   it("draws the name in the pixels the collision pass reserved for it", () => {
@@ -469,6 +469,6 @@ describe("ClusterMarker", () => {
     // backfills @rn-vui's defaults for every key we leave unset, so a token we
     // do not define still answers — with a library colour, and against a theme
     // lookup it compares equal to itself.
-    expect(fill).toBe(light._green)
+    expect(fill).toBe(light.staticSuccess)
   })
 })

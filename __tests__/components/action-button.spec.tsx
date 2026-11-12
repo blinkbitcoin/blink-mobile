@@ -12,10 +12,10 @@ jest.mock("@rn-vui/themed", () => {
     useTheme: () => ({
       theme: {
         colors: {
-          primary: "primary",
-          grey5: "grey5",
-          grey6: "grey6",
-          black: "black",
+          accent: "accent",
+          surfaceInteractive: "surfaceInteractive",
+          surfacePressed: "surfacePressed",
+          textOnBackground: "textOnBackground",
         },
       },
     }),

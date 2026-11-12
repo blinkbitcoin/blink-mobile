@@ -370,9 +370,31 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
 
       await updated.getFee({} as never)
 
+      expect(updated).toMatchObject({ comment: "dinner" })
       expect(mockPrepareLnurl).toHaveBeenCalledWith(
         expect.any(Object),
         expect.objectContaining({ comment: "dinner" }),
+      )
+    })
+
+    /** The receiver shows the comment as the payer's note: an untouched note field would
+     *  otherwise send them their own "Pay to" text. */
+    it("sends no comment while the note still shows the destination description", async () => {
+      mockPrepareLnurl.mockResolvedValue(quote())
+      const detail = createSelfCustodialLnurlPaymentDetails(
+        createParams({
+          lnurlParams: baseLnurlParams({ commentAllowed: 200 }),
+          destinationSpecifiedMemo: "Payment to user@example.com",
+        }),
+      )
+      if (!detail.canGetFee) throw new Error("expected canGetFee")
+
+      await detail.getFee({} as never)
+
+      expect(detail.memo).toBe("Payment to user@example.com")
+      expect(mockPrepareLnurl).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({ comment: undefined }),
       )
     })
 

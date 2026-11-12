@@ -87,10 +87,10 @@ export const EmailSetting: React.FC = () => {
   const RightIcon = email ? (
     emailVerified ? (
       bothEmailAndPhoneVerified ? (
-        <GaloyIcon name="close" size={20} color={colors.red} />
+        <GaloyIcon name="close" size={20} color={colors.error} />
       ) : null
     ) : (
-      <GaloyIcon name="refresh" size={20} color={colors.primary} />
+      <GaloyIcon name="refresh" size={20} color={colors.accent} />
     )
   ) : undefined
 

@@ -329,8 +329,10 @@ describe("SendBitcoinDetailsScreen — LNURL requestInvoice gate", () => {
 
   const buildLnurlPaymentDetail = ({
     withSendMutation,
+    overrides = {},
   }: {
     withSendMutation: boolean
+    overrides?: Record<string, unknown>
   }): PaymentDetail<WalletCurrency> => {
     const sendingWalletDescriptor = {
       id: "btc-wallet-id",
@@ -374,6 +376,7 @@ describe("SendBitcoinDetailsScreen — LNURL requestInvoice gate", () => {
             sendPaymentMutation: jest.fn().mockResolvedValue({ status: "SUCCESS" }),
           }
         : { canSendPayment: false as const, canGetFee: false as const }),
+      ...overrides,
     }
     return detail as unknown as PaymentDetail<WalletCurrency>
   }
@@ -443,6 +446,50 @@ describe("SendBitcoinDetailsScreen — LNURL requestInvoice gate", () => {
     expect(mockRequestInvoiceWithServiceParams).toHaveBeenCalledWith(
       expect.objectContaining({ params: lnurlParams }),
     )
+  })
+
+  describe("the comment sent to a destination that allows one", () => {
+    const commentLnurlParams = { ...lnurlParams, commentAllowed: 140 }
+
+    const requestInvoiceFor = async (overrides: Record<string, unknown>) => {
+      const detail = buildLnurlPaymentDetail({
+        withSendMutation: false,
+        overrides: { lnurlParams: commentLnurlParams, ...overrides },
+      })
+      mockRequestInvoiceWithServiceParams.mockResolvedValue({
+        invoice: "lnbc10n1pjxample",
+        successAction: undefined,
+      })
+
+      render(
+        <ContextForScreen>
+          <SendBitcoinDetailsScreen route={buildRoute(detail)} />
+        </ContextForScreen>,
+      )
+      await flushAsync()
+      await flushAsync()
+
+      fireEvent.press(screen.getByText(i18nObject("en").common.next()))
+      await flushAsync()
+    }
+
+    /** The receiver shows the comment as the payer's note: an untouched note field would
+     *  otherwise send them their own "Pay to" text. */
+    it("is left out while the note still shows the destination description", async () => {
+      await requestInvoiceFor({ memo: "Pay alice", comment: undefined })
+
+      expect(mockRequestInvoiceWithServiceParams).toHaveBeenCalledWith(
+        expect.objectContaining({ comment: undefined }),
+      )
+    })
+
+    it("is the note the user typed", async () => {
+      await requestInvoiceFor({ memo: "dinner", comment: "dinner" })
+
+      expect(mockRequestInvoiceWithServiceParams).toHaveBeenCalledWith(
+        expect.objectContaining({ comment: "dinner" }),
+      )
+    })
   })
 
   // requestInvoice(lnUrlOrAddress) would resolve the destination again and fetch

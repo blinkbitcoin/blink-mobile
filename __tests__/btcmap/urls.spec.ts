@@ -1,5 +1,5 @@
 import {
-  directionsUrl,
+  directionsUrls,
   hostOf,
   isWebUrl,
   mailtoUrl,
@@ -121,22 +121,27 @@ describe("merchantUrl", () => {
   })
 })
 
-describe("directionsUrl", () => {
-  const place = { latitude: 51.5072, longitude: -0.1276 }
+describe("directionsUrls", () => {
+  const LONDON = { latitude: 51.5072, longitude: -0.1276 }
 
-  it("labels the pin with the merchant's name", () => {
-    expect(directionsUrl(place, "Satoshi Coffee", "ios")).toBe(
-      "maps:0,0?q=Satoshi%20Coffee@51.5072,-0.1276",
-    )
-    expect(directionsUrl(place, "Satoshi Coffee", "android")).toBe(
-      "geo:51.5072,-0.1276?q=51.5072,-0.1276(Satoshi%20Coffee)",
-    )
+  it("tries the Google Maps app on iOS and falls back to Apple Maps, not the web", () => {
+    expect(directionsUrls(LONDON, "Satoshi Coffee", "ios")).toEqual({
+      probe: "comgooglemaps://?daddr=51.5072,-0.1276",
+      google: "comgooglemaps://?daddr=51.5072,-0.1276",
+      fallback: "maps://?daddr=51.5072,-0.1276",
+    })
   })
 
-  it("drops to a bare coordinate when there is no name", () => {
-    // An empty label makes both platforms search for the literal string.
-    expect(directionsUrl(place, undefined, "ios")).toBe("maps:0,0?ll=51.5072,-0.1276")
-    expect(directionsUrl(place, undefined, "android")).toBe(
+  it("opens Google Maps' route on Android and falls back to the geo: chooser", () => {
+    expect(directionsUrls(LONDON, "Satoshi Coffee", "android")).toEqual({
+      probe: "google.navigation:q=51.5072,-0.1276",
+      google: "https://www.google.com/maps/dir/?api=1&destination=51.5072,-0.1276",
+      fallback: "geo:51.5072,-0.1276?q=51.5072,-0.1276(Satoshi%20Coffee)",
+    })
+  })
+
+  it("leaves the geo: label off an unnamed place rather than searching for nothing", () => {
+    expect(directionsUrls(LONDON, undefined, "android").fallback).toBe(
       "geo:51.5072,-0.1276?q=51.5072,-0.1276",
     )
   })

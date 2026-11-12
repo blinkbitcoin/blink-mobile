@@ -11,6 +11,8 @@ type ActionFieldProps = {
   onAction?: () => void
   icon: IconNamesType
   label?: string
+  /** What pressing does, for screen readers; without it they read the shown value. */
+  accessibilityLabel?: string
   testID?: string
 }
 
@@ -19,6 +21,7 @@ export const ActionField: React.FC<ActionFieldProps> = ({
   onAction,
   icon,
   label,
+  accessibilityLabel,
   testID,
 }) => {
   const styles = useStyles()
@@ -27,7 +30,7 @@ export const ActionField: React.FC<ActionFieldProps> = ({
   } = useTheme()
 
   const hasValue = value !== null && value !== undefined && value !== PLACEHOLDER
-  const iconColor = hasValue ? colors.primary : colors.grey3
+  const iconColor = hasValue ? colors.accent : colors.textDisabled
 
   return (
     <View style={styles.container}>
@@ -37,6 +40,9 @@ export const ActionField: React.FC<ActionFieldProps> = ({
         disabled={!hasValue}
         style={styles.valueContainer}
         testID={testID}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
+        accessibilityState={{ disabled: !hasValue }}
       >
         <Text style={styles.value}>{value ?? PLACEHOLDER}</Text>
         <View style={styles.actionButton}>
@@ -52,7 +58,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 3,
   },
   label: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
@@ -62,13 +68,13 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     height: 50,
     paddingHorizontal: 10,
   },
   value: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 16,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",

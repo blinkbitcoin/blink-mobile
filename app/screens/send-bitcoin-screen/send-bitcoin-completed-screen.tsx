@@ -126,7 +126,9 @@ const SuccessIconComponent: React.FC<{
     const iconMap = {
       SUCCESS: () => <GaloyIcon name="payment-success" size={100} />,
       QUEUED: () => <GaloyIcon name="payment-pending" size={100} />,
-      PENDING: () => <GaloyIcon name="warning" color={colors._orange} size={100} />,
+      PENDING: () => (
+        <GaloyIcon name="warning" color={colors.staticBrandOrange} size={100} />
+      ),
     }
     return iconMap[status]()
   }
@@ -421,7 +423,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   viewShot: {
     flexGrow: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
   },
   completedText: {
     textAlign: "center",
@@ -441,7 +443,7 @@ const useStyles = makeStyles(({ colors }) => ({
   successActionFieldContainer: {
     overflow: "hidden",
     gap: 20,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 10,
     alignItems: "center",
     paddingHorizontal: 10,
