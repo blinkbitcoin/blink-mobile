@@ -132,6 +132,10 @@ const wordMatchesContact = (searchWord: string, contact: UserContact): boolean =
   return contactNameMatchesSearchWord || contactPrettyNameMatchesSearchWord
 }
 
+/** A contact's handle as an address: a bare username gets this instance's host. */
+const toContactAddress = (handle: string, lnAddressHostname: string): string =>
+  handle && !handle.includes("@") ? `${handle}@${lnAddressHostname}` : handle
+
 const matchCheck = (
   newSearchText: string,
   allContacts: UserContact[],
@@ -243,40 +247,12 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     setSelectedId((currentId) => (currentId === id ? "" : id))
   }, [])
 
-  let ListEmptyContent: React.ReactNode
-
-  if (loading) {
-    ListEmptyContent = (
-      <View style={styles.activityIndicatorContainer}>
-        <ActivityIndicator size="large" color={colors.accent} />
-      </View>
-    )
-  } else if (
-    // TODO: refactor: ideally this should come from destinationState.destination
-    // but currently this is not validated when the user is typing,
-    // only validated on paste, or when the user is pressing the send button
-    // so there is no way to dynamically know if this is a bitcoin or lightning or lnurl
-    // until a refactor is done
-    destinationState.unparsedDestination.startsWith("bc1") ||
-    destinationState.unparsedDestination.startsWith("tb1") ||
-    destinationState.unparsedDestination.startsWith("lnurl") ||
-    destinationState.unparsedDestination.startsWith("lightning:") ||
-    destinationState.unparsedDestination.startsWith("bitcoin:") ||
-    destinationState.unparsedDestination.startsWith("1") ||
-    destinationState.unparsedDestination.startsWith("3") ||
-    destinationState.unparsedDestination.startsWith("lnbc1") ||
-    // if the user is typing a lightning address
-    // ideally we should filter from the rules below contact from the same instance
-    // ie: test and test@blink.sv are the same user
-    // but anyhow, more refactor is needed for contacts to have extenral contacts
-    destinationState.unparsedDestination.includes("@")
-  ) {
-    ListEmptyContent = <></>
-  } else if (allContacts.length > 0) {
-    ListEmptyContent = <></>
-  } else {
-    ListEmptyContent = <></>
-  }
+  // The list shows nothing when no contact matches; only loading has something to show.
+  const ListEmptyContent = loading ? (
+    <View style={styles.activityIndicatorContainer}>
+      <ActivityIndicator size="large" color={colors.accent} />
+    </View>
+  ) : null
 
   const updateMatchingContacts = useCallback(
     (newSearchText: string) => {
@@ -659,8 +635,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     async (item: UserContact) => {
       if (destinationState.destinationState === DestinationState.Validating) return
       const handle = item?.handle?.trim() ?? ""
-      const displayHandle =
-        handle && !handle.includes("@") ? `${handle}@${lnAddressHostname}` : handle
+      const displayHandle = toContactAddress(handle, lnAddressHostname)
       /**
        * parse the raw handle: a phone contact should enter the phone flow, but a
        * handle that is already a lightning address never should, even when its
@@ -848,8 +823,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           ListEmptyComponent={ListEmptyContent}
           renderItem={({ item, index }) => {
             const handle = item?.handle?.trim() ?? ""
-            const displayHandle =
-              handle && !handle.includes("@") ? `${handle}@${lnAddressHostname}` : handle
+            const displayHandle = toContactAddress(handle, lnAddressHostname)
 
             return (
               <View
