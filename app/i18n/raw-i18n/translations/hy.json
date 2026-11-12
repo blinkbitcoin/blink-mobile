@@ -2431,6 +2431,7 @@
     "willBeSentToMempoolBy": "Գործարքը պետք է ուղարկվի mempool",
     "amount": "Չափ",
     "addAmount": "Ավելացնել գումար",
+    "slideToSelectAmount": "Սահեցրեք՝ գումարն ընտրելու համար",
     "lowFunds": "Բավարար միջոցներ չկան",
     "amountExceed": "Գումարի չափը գերազանցում է Ձեր {balance: string} հաշվեկշիռը",
     "amountExceedsLimit": "Գումարի չափը գերազանցում է {limit: string}ի Ձեր օրական սահմանաչափը",
