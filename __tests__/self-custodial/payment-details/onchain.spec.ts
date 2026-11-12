@@ -1,9 +1,18 @@
 import { WalletCurrency } from "@app/graphql/generated"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
+import { FeePolicy } from "@breeztech/breez-sdk-spark-react-native"
+
 import { createSelfCustodialOnchainPaymentDetails } from "@app/self-custodial/payment-details/onchain"
+import {
+  createGetFeeOnchain,
+  createSendMutationOnchain,
+  sendAllFeePolicy,
+} from "@app/self-custodial/payment-details/send-helpers"
 
 jest.mock("@app/self-custodial/payment-details/send-helpers", () => ({
+  sendAllFeePolicy: jest.requireActual("@app/self-custodial/payment-details/send-helpers")
+    .sendAllFeePolicy,
   createGetFee: jest.fn().mockReturnValue(jest.fn()),
   createGetFeeOnchain: jest.fn().mockReturnValue(jest.fn()),
   createSendMutation: jest.fn().mockReturnValue(jest.fn()),
@@ -142,5 +151,78 @@ describe("createSelfCustodialOnchainPaymentDetails", () => {
       })
       expect(updated?.feeTier).toBe("fast")
     })
+  })
+})
+
+describe("sendAllFeePolicy", () => {
+  it("takes the fee out of a Bitcoin send-all", () => {
+    expect(sendAllFeePolicy(true, WalletCurrency.Btc)).toBe(FeePolicy.FeesIncluded)
+  })
+
+  it("leaves a plain amount's fee on top", () => {
+    expect(sendAllFeePolicy(false, WalletCurrency.Btc)).toBeUndefined()
+    expect(sendAllFeePolicy(undefined, WalletCurrency.Btc)).toBeUndefined()
+  })
+
+  it("leaves the Dollar wallet alone until #2048 SA5 lands", () => {
+    expect(sendAllFeePolicy(true, WalletCurrency.Usd)).toBeUndefined()
+  })
+})
+
+describe("createSelfCustodialOnchainPaymentDetails send-all", () => {
+  const balance = { amount: 100_000, currency: WalletCurrency.Btc, currencyCode: WalletCurrency.Btc }
+  const lastPrepareParams = (mock: unknown) => {
+    const { calls } = (mock as jest.Mock).mock
+    return calls[calls.length - 1][0]
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("offers a send-all on the Bitcoin wallet", () => {
+    const detail = createSelfCustodialOnchainPaymentDetails(createParams())
+
+    expect(detail.canSendMax).toBe(true)
+    expect(detail.isSendingMax).toBe(false)
+    expect(detail.isFeeIncluded).toBe(false)
+  })
+
+  it("offers none on the Dollar wallet", () => {
+    const detail = createSelfCustodialOnchainPaymentDetails(
+      createParams({ sendingWalletDescriptor: { id: "w2", currency: WalletCurrency.Usd } }),
+    )
+
+    expect(detail.canSendMax).toBe(false)
+  })
+
+  it("quotes and sends a send-all with the fee taken out of the balance", () => {
+    const detail = createSelfCustodialOnchainPaymentDetails(createParams())
+    const sendAll = detail.setAmount!(balance, true)
+
+    expect(sendAll.isSendingMax).toBe(true)
+    expect(sendAll.isFeeIncluded).toBe(true)
+    expect(lastPrepareParams(createGetFeeOnchain).feePolicy).toBe(FeePolicy.FeesIncluded)
+    expect(lastPrepareParams(createSendMutationOnchain).feePolicy).toBe(
+      FeePolicy.FeesIncluded,
+    )
+  })
+
+  it("puts the fee back on top once an amount is typed", () => {
+    const detail = createSelfCustodialOnchainPaymentDetails(createParams())
+    const typed = detail.setAmount!(balance, true).setAmount!(balance)
+
+    expect(typed.isSendingMax).toBe(false)
+    expect(lastPrepareParams(createGetFeeOnchain).feePolicy).toBeUndefined()
+  })
+
+  it("drops the send-all on a wallet switch", () => {
+    const detail = createSelfCustodialOnchainPaymentDetails(createParams())
+    const switched = detail.setAmount!(balance, true).setSendingWalletDescriptor({
+      id: "w3",
+      currency: WalletCurrency.Btc,
+    })
+
+    expect(switched.isSendingMax).toBe(false)
   })
 })

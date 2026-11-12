@@ -1,4 +1,6 @@
 /* eslint-disable camelcase */
+import { FeePolicy } from "@breeztech/breez-sdk-spark-react-native"
+
 import { WalletCurrency } from "@app/graphql/generated"
 
 import {
@@ -254,7 +256,21 @@ describe("prepareSend", () => {
       amount: undefined,
       tokenIdentifier: undefined,
       conversionOptions: undefined,
+      feePolicy: undefined,
     })
+  })
+
+  it("forwards the fee policy, so a send-all takes the fee out of the balance", async () => {
+    const prepareSendPayment = jest.fn().mockResolvedValue({})
+    const sdk = { prepareSendPayment } as never
+
+    await prepareSend(sdk, {
+      paymentRequest: "bc1qtest",
+      amount: BigInt(100_000),
+      feePolicy: FeePolicy.FeesIncluded,
+    })
+
+    expect(prepareSendPayment.mock.calls[0][0].feePolicy).toBe(FeePolicy.FeesIncluded)
   })
 
   it("forwards conversionOptions when provided (USDB→BTC Lightning send)", async () => {
