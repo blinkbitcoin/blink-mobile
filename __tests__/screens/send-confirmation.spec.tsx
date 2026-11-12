@@ -1,3 +1,4 @@
+import { it } from "@jest/globals"
 import React from "react"
 import { TouchableOpacity, Text } from "react-native"
 import { Satoshis } from "lnurl-pay"
@@ -26,6 +27,7 @@ import type { useNonCustodialConversionLimits } from "@app/self-custodial/hooks/
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
 import { light } from "@app/rne-theme/colors"
+import { haptics } from "@app/utils/haptics"
 
 import { surfaceColor } from "../helpers/surface-color"
 import { waitForStableRender } from "../helpers/wait-for-stable-render"
@@ -189,6 +191,10 @@ const saveLnAddressContactMock = jest.fn(({ isMerchant }) => {
 })
 jest.mock("@app/screens/send-bitcoin-screen/use-save-lnaddress-contact", () => ({
   useSaveLnAddressContact: () => saveLnAddressContactMock,
+}))
+
+jest.mock("@app/utils/haptics", () => ({
+  haptics: { success: jest.fn(), error: jest.fn() },
 }))
 
 const sendPaymentMock = jest.fn()
@@ -1401,6 +1407,88 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
     })
 
     expect(sendPaymentMock).toHaveBeenCalledTimes(2)
+  })
+})
+
+describe("SendBitcoinConfirmationScreen — haptics", () => {
+  const lnurlRoute = () =>
+    ({
+      key: "sendBitcoinConfirmationScreen",
+      name: "sendBitcoinConfirmation",
+      params: {
+        paymentDetail:
+          PaymentDetailsLightning.createLnurlPaymentDetails(defaultLightningParams),
+      },
+    }) as const
+
+  const slide = async () => {
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={lnurlRoute()} />
+      </ContextForScreen>,
+    )
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    loadLocale("en")
+    mockUseSendPayment.mockReturnValue({
+      loading: false,
+      hasAttemptedSend: false,
+      sendPayment: sendPaymentMock,
+    })
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+    })
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 500000,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 10000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+  })
+
+  it("plays success once a send completes", async () => {
+    sendPaymentMock.mockResolvedValueOnce({ status: "SUCCESS" })
+
+    await slide()
+
+    expect(haptics.success).toHaveBeenCalledTimes(1)
+    expect(haptics.error).not.toHaveBeenCalled()
+  })
+
+  it.each(["ALREADY_PAID", "FAILURE"])(
+    "plays error once when the send comes back %s",
+    async (status) => {
+      sendPaymentMock.mockResolvedValueOnce({ status })
+
+      await slide()
+
+      expect(haptics.error).toHaveBeenCalledTimes(1)
+      expect(haptics.success).not.toHaveBeenCalled()
+    },
+  )
+
+  it("plays error once when a repeated attempt cannot be confirmed as settled", async () => {
+    sendPaymentMock.mockRejectedValueOnce(
+      Object.assign(new Error("409: Conflict"), { statusCode: 409 }),
+    )
+    verifyPaymentSettledMock.mockResolvedValueOnce(undefined)
+
+    await slide()
+
+    expect(haptics.error).toHaveBeenCalledTimes(1)
+    expect(haptics.success).not.toHaveBeenCalled()
   })
 })
 
