@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API-sleutels",
+    "inactiveKeys": "Onaktiewe sleutels ({count})",
     "noKeys": "Nog geen API-sleutels nie",
     "createKey": "Skep API-sleutel",
     "createTitle": "Nuwe API-sleutel",
@@ -27,6 +28,7 @@
     "revokeTitle": "Herroep API-sleutel?",
     "revokeBody": "\"{name: string}\" sal onmiddellik ophou werk. Dit kan nie ongedaan gemaak word nie.",
     "revoke": "Herroep",
+    "revokeGoBack": "Gaan terug",
     "revokeSuccess": "API-sleutel herroep",
     "createError": "Kon nie die API-sleutel skep nie. Probeer weer.",
     "revokeError": "Kon nie die API-sleutel herroep nie. Probeer weer.",
@@ -2140,7 +2142,9 @@
     "selectAll": "Kies alles",
     "clearAll": "Wis alles",
     "addPlace": "Voeg by kaart",
-    "addPlaceTitle": "Voeg 'n plek by",
+    "addPlaceTitle": "Stel besigheid voor",
+    "submitPlaceRequest": "Stuur versoek",
+    "showMyLocation": "Wys my ligging",
     "placePinHint": "Skuif die kaart om die speld op die plek te sit",
     "placeName": "Naam",
     "placeNameHint": "Wat die plek genoem word",
@@ -3094,7 +3098,6 @@
     "faq": "FAQ",
     "statusPage": "Statusbladsy",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Ondersteuning",
     "defaultSupportMessage": "Hi daar! Ek benodig hulp met {bankName: string}, ek gebruik weergawe {version: string} op {os: string}. ",
     "emailCopied": "e-pos {email: string} oorgedra na knipbord",
@@ -3276,7 +3279,10 @@
       "noLimit": "Geen limiet",
       "limitUpdateSuccess": "Limiet suksesvol opgedateer",
       "limitUpdateError": "Kon limiet nie opdateer nie",
-      "limitMustBePositive": "Limiet moet groter as nul wees"
+      "limitMustBePositive": "Limiet moet groter as nul wees",
+      "atmToggleError": "Kon OTM-onttrekkings nie opdateer nie",
+      "atmControlsLoadError": "Kon nie jou OTM-limiete laai nie",
+      "invalidLimitAmount": "Voer 'n geldige bedrag in met hoogstens 2 desimale"
     },
     "CardFeeSchedule": {
       "title": "Blink-kaart fooiskedule",
@@ -3978,6 +3984,12 @@
       "title": "Ons kan nie jou dollarsaldo migreer nie",
       "body": "Maak eers jou dollarsaldo leeg. Jy kan dit na jou Bitcoin-saldo in Blink of elders oordra."
     },
+    "pendingDepositModal": {
+      "title": "Daar is 'n hangende deposito na jou rekening",
+      "body": "Jy kan nie na 'n ander soort rekening migreer voordat al jou hangende deposito's vereffen en op hierdie rekening gekrediteer is nie.",
+      "contactSupportCta": "Kontak ondersteuning",
+      "stillConfirming": "Jou deposito is nog nie bevestig nie. Probeer weer oor 'n paar minute."
+    },
     "balancesOverview": {
       "title": "Skuif jou saldo",
       "body": "Skuif jou fondse veilig na jou nuwe rekening.",
@@ -4165,6 +4177,7 @@
     "get": "Kry",
     "storeNote": "“Kry” maak die App Store of Google Play oop. Kom terug na Blink wanneer dit geïnstalleer is.",
     "haveAnApp": "Ek het 'n toep",
+    "learnHow": "Leer hoe",
     "keyInstruction": "Kopieer hierdie opstelsleutel na jou authenticator-toep.",
     "qrInstruction": "Gebruik jy 'n ander toestel?\nSkandeer eerder hierdie QR-kode.",
     "backupTitle": "Rugsteun jou sleutel",
@@ -4277,7 +4290,6 @@
     "payment": "Betaling"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Wisselkoers is dalk verouderd",
     "satsOnly": "Wys sats — geen wisselkoers beskikbaar nie"
   },
   "SelfCustodialOffline": {

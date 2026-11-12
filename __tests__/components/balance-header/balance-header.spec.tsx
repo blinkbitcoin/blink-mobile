@@ -25,7 +25,6 @@ jest.mock("@app/i18n/i18n-react", () => ({
         balanceLabelUsd: () => "Balance · USD",
       },
       SelfCustodialStaleRate: {
-        notice: () => "Exchange rate may be out of date",
         satsOnly: () => "Showing sats — no exchange rate available",
       },
     },
@@ -127,8 +126,8 @@ describe("BalanceHeader", () => {
     expect(within(placeholder).queryByText(/./)).toBeNull()
   })
 
-  describe("the stale-rate notice", () => {
-    it("is absent by default", () => {
+  describe("the sats-only notice", () => {
+    it("is absent for a converted balance", () => {
       const { queryByTestId } = renderHeader()
 
       // Anchor: the header really rendered.
@@ -136,37 +135,6 @@ describe("BalanceHeader", () => {
       expect(queryByTestId("balance-rate-notice")).toBeNull()
     })
 
-    it("appears beside the balance when the rate behind it is old", () => {
-      const { getByText, getByTestId } = renderHeader({ isRateStale: true })
-
-      // The figure is still shown: an old rate is a caveat on a number, not a reason
-      // to withhold it.
-      expect(getByTestId("balance-value")).toBeTruthy()
-      expect(getByText("Exchange rate may be out of date")).toBeTruthy()
-    })
-
-    it("stays hidden while the balance itself is hidden", () => {
-      mockHideAmount = true
-
-      const { queryByTestId } = renderHeader({ isRateStale: true })
-
-      // Nothing is on screen to qualify, and the notice would leak that a balance
-      // exists to price.
-      expect(queryByTestId("balance-value")).toBeNull()
-      expect(queryByTestId("balance-rate-notice")).toBeNull()
-    })
-
-    it("is not shown while the balance is still loading", () => {
-      const { queryByTestId } = renderHeader({ isRateStale: true, loading: true })
-
-      // There is no figure yet to qualify, so the caveat would be noise under a
-      // skeleton.
-      expect(queryByTestId("balance-value")).toBeNull()
-      expect(queryByTestId("balance-rate-notice")).toBeNull()
-    })
-  })
-
-  describe("the sats-only notice", () => {
     it("says why the amount is in sats", () => {
       const { getByText, getByTestId } = renderHeader({
         isSatsOnly: true,
@@ -177,16 +145,11 @@ describe("BalanceHeader", () => {
       expect(getByText("Showing sats — no exchange rate available")).toBeTruthy()
     })
 
-    it("wins over the stale-rate line rather than stacking with it", () => {
-      // "No rate at all" subsumes "the rate is old", and two lines under a balance is
-      // one too many.
-      const { getByText, queryByText } = renderHeader({
-        isSatsOnly: true,
-        isRateStale: true,
-      })
+    it("is not shown while the balance is still loading", () => {
+      const { queryByTestId } = renderHeader({ isSatsOnly: true, loading: true })
 
-      expect(getByText("Showing sats — no exchange rate available")).toBeTruthy()
-      expect(queryByText("Exchange rate may be out of date")).toBeNull()
+      expect(queryByTestId("balance-value")).toBeNull()
+      expect(queryByTestId("balance-rate-notice")).toBeNull()
     })
 
     it("stays hidden while the balance itself is hidden", () => {

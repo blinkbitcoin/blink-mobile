@@ -12,6 +12,9 @@ import { useMigrationStatus } from "./use-migration-status"
 
 type MigrationLock = {
   isLocked: boolean
+  /** The transfer was committed (transferring, or failed after it): the balance has
+   *  already left, so a precondition that guards the drain no longer applies. */
+  isCommitted: boolean
   /** What a commit-point checkpoint should do given the server's answer. Unlocked is not
    *  one answer but two: a migration that never started (or support cleared) and one that
    *  completed while this device still waits to swap into its wallet. They need opposite
@@ -83,6 +86,7 @@ export const useMigrationLock = ({
   if (!isCustodial) {
     return {
       isLocked: false,
+      isCommitted: false,
       flow: ServerMigrationFlow.Unanswered,
       loading: registryLoading,
       hasError: false,
@@ -99,6 +103,7 @@ export const useMigrationLock = ({
 
   return {
     isLocked: isInProgress || isTransferring || isFailed,
+    isCommitted: isTransferring || isFailed,
     flow: resolveServerFlow(status, hasError),
     loading,
     hasError,

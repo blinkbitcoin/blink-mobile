@@ -42,7 +42,7 @@ export const IntroducingCirclesModal: React.FC<Props> = ({ isVisible, setIsVisib
     <Modal
       isVisible={isVisible}
       backdropOpacity={0.8}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       backdropTransitionOutTiming={0}
       onBackdropPress={acknowledgeModal}
     >
@@ -51,7 +51,7 @@ export const IntroducingCirclesModal: React.FC<Props> = ({ isVisible, setIsVisib
           <View style={styles.cross}>
             <GaloyIconButton name="close" size="medium" onPress={acknowledgeModal} />
           </View>
-          <GaloyIcon name="people" color={colors.primary} size={50} />
+          <GaloyIcon name="people" color={colors.accent} size={50} />
           <View style={styles.cardTitleContainer}>
             <Text type="h1" bold>
               {LL.Circles.introducingCircles()}
@@ -84,7 +84,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
   },
   peopleIcon: {
-    color: colors.primary,
+    color: colors.accent,
   },
   cross: {
     position: "absolute",
@@ -92,7 +92,7 @@ const useStyles = makeStyles(({ colors }) => ({
     right: 20,
   },
   modalCard: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 16,
     display: "flex",
     justifyContent: "center",

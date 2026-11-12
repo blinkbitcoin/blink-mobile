@@ -1,4 +1,5 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { Region } from "react-native-maps"
 import { generateSecureRandom } from "react-native-securerandom"
 import { v4 as uuidv4 } from "uuid"
@@ -9,10 +10,26 @@ import MapComponent from "@app/components/map-component"
 import MapStyles from "@app/components/map-component/map-styles.json"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { getUserRegion } from "@app/screens/map-screen/functions"
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 
 import { ContextForScreen } from "../../screens/helper"
 
 const mockRefresh = jest.fn()
+
+// The map screen is a tab screen, and the add-place panel takes the tab bar
+// away while it is open. Only the navigation object can say whether it did, so
+// its `setOptions` is the one thing swapped out here.
+const mockSetOptions = jest.fn()
+jest.mock("@react-navigation/native", () => {
+  const actual = jest.requireActual<typeof import("@react-navigation/native")>(
+    "@react-navigation/native",
+  )
+  return {
+    __esModule: true,
+    ...actual,
+    useNavigation: () => ({ ...actual.useNavigation(), setOptions: mockSetOptions }),
+  }
+})
 
 jest.mock("@app/btcmap/use-places", () => ({ useBtcMapPlaces: jest.fn() }))
 
@@ -21,6 +38,19 @@ jest.mock("@app/btcmap/use-place-names", () => ({ useBtcMapPlaceNames: jest.fn()
 jest.mock("@app/screens/map-screen/functions", () => ({
   LOCATION_PERMISSION: "LOCATION",
   getUserRegion: jest.fn(),
+}))
+
+let mockTopInset = 0
+let mockBottomInset = 0
+let mockLeftInset = 0
+jest.mock("react-native-safe-area-context", () => ({
+  ...jest.requireActual("react-native-safe-area-context"),
+  useSafeAreaInsets: () => ({
+    top: mockTopInset,
+    bottom: mockBottomInset,
+    left: mockLeftInset,
+    right: 0,
+  }),
 }))
 
 jest.mock("react-native-permissions", () => ({
@@ -101,10 +131,10 @@ jest.mock("@app/components/map-component/category-filter-sheet", () => ({
 let capturedAddPlaceProps: Record<string, unknown> | undefined
 let addPlaceMountCount = 0
 let isAddPlaceMounted = false
-jest.mock("@app/components/map-component/add-place-sheet", () => {
+jest.mock("@app/components/map-component/add-place-panel", () => {
   const ReactActual = jest.requireActual<typeof React>("react")
   return {
-    AddPlaceSheet: (props: Record<string, unknown>) => {
+    AddPlacePanel: (props: Record<string, unknown>) => {
       capturedAddPlaceProps = props
       ReactActual.useEffect(() => {
         addPlaceMountCount += 1
@@ -201,6 +231,14 @@ jest.mock("@app/btcmap/use-place-submission", () => ({
   useSubmitBtcMapPlace: () => ({ submitPlace: mockSubmitPlace }),
 }))
 
+// Stands in for the navigator's own bar style. The real hook reads theme
+// colours, which cannot be flipped from a test; this can, which is how a
+// switch to dark while the map screen stays mounted is played out here.
+let mockTabBarStyle: unknown = { backgroundColor: "light" }
+jest.mock("@app/navigation/bottom-tab-bar-style", () => ({
+  useBottomTabBarStyle: () => mockTabBarStyle,
+}))
+
 const mockedPlaces = useBtcMapPlaces as jest.MockedFunction<typeof useBtcMapPlaces>
 const mockedNames = useBtcMapPlaceNames as jest.MockedFunction<typeof useBtcMapPlaceNames>
 const mockedGetUserRegion = getUserRegion as jest.MockedFunction<typeof getUserRegion>
@@ -246,8 +284,34 @@ const renderMap = (props: Partial<React.ComponentProps<typeof MapComponent>> = {
     </ContextForScreen>,
   )
 
+const Tab = createBottomTabNavigator()
+
+/** The map as the app mounts it: a tab whose bar is sized the way root-navigator.tsx sizes it. */
+const renderMapInTabs = () =>
+  render(
+    <ContextForScreen>
+      <Tab.Navigator
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: { height: 60 + mockBottomInset, paddingBottom: mockBottomInset },
+        }}
+      >
+        <Tab.Screen name="Map">
+          {() => (
+            <MapComponent
+              userLocation={REGION}
+              setPermissionsStatus={jest.fn()}
+              alertOnLocationError={jest.fn()}
+            />
+          )}
+        </Tab.Screen>
+      </Tab.Navigator>
+    </ContextForScreen>,
+  )
+
 beforeEach(() => {
   jest.clearAllMocks()
+  mockTabBarStyle = { backgroundColor: "light" }
   loadLocale("en")
   capturedSheetProps = undefined
   capturedSearchProps = undefined
@@ -260,6 +324,9 @@ beforeEach(() => {
   mockIsSelfCustodialAccount = false
   mockIsAtLeastLevelTwo = true
   mockBtcMapPlacesEnabled = true
+  mockTopInset = 0
+  mockBottomInset = 0
+  mockLeftInset = 0
   setDevBuild(false)
   mockSubmitPlace.mockResolvedValue({ submitted: true })
   setPlaces()
@@ -330,6 +397,98 @@ describe("MapComponent", () => {
     const { queryByText } = renderMap()
 
     await waitFor(() => expect(queryByText(/OpenStreetMap/)).toBeNull())
+  })
+
+  it("keeps the search bar, the locate and add-place buttons 20 in from the map's edges", async () => {
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("location-button-anchor")).toBeTruthy())
+    expect(StyleSheet.flatten(getByTestId("map-search-bar").props.style)).toMatchObject({
+      top: 20,
+      left: 20,
+      right: 20,
+    })
+    expect(
+      StyleSheet.flatten(getByTestId("location-button-anchor").props.style),
+    ).toMatchObject({ bottom: 20, right: 20 })
+    expect(StyleSheet.flatten(getByTestId("open-add-place").props.style)).toMatchObject({
+      bottom: 20,
+      left: 20,
+    })
+  })
+
+  it("names the locate button for a screen reader, which would otherwise read only an icon", async () => {
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("location-button")).toBeTruthy())
+    expect(getByTestId("location-button").props).toMatchObject({
+      accessibilityRole: "button",
+      accessibilityLabel: "Show my location",
+    })
+  })
+
+  it("keeps the 20 past the top system bar, and adds no side inset Screen already took", async () => {
+    mockTopInset = 47
+    mockLeftInset = 44
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("location-button-anchor")).toBeTruthy())
+    expect(StyleSheet.flatten(getByTestId("map-search-bar").props.style)).toMatchObject({
+      top: 67,
+      left: 20,
+      right: 20,
+    })
+    expect(
+      StyleSheet.flatten(getByTestId("location-button-anchor").props.style),
+    ).toMatchObject({ right: 20 })
+    expect(StyleSheet.flatten(getByTestId("open-add-place").props.style)).toMatchObject({
+      left: 20,
+    })
+  })
+
+  it("keeps the bottom controls 20 above the tab bar, which already took the system bar", async () => {
+    // Rendered in a real tab navigator, so the offset comes from the bar it
+    // actually sits on rather than from what the test assumes about it.
+    mockBottomInset = 34
+    const { getByTestId } = renderMapInTabs()
+
+    await waitFor(() => expect(getByTestId("location-button-anchor")).toBeTruthy())
+    expect(
+      StyleSheet.flatten(getByTestId("location-button-anchor").props.style),
+    ).toMatchObject({ bottom: 20 })
+    expect(StyleSheet.flatten(getByTestId("open-add-place").props.style)).toMatchObject({
+      bottom: 20,
+    })
+  })
+
+  it("keeps the bottom controls 20 past the system bar where no tab bar is under the map", async () => {
+    // No route renders the map without its tab bar today (MapScreen is only
+    // mounted as a tab), so 54 is not the shipped layout. This pins the
+    // fallback for the day the map is shown full screen.
+    mockBottomInset = 34
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("location-button-anchor")).toBeTruthy())
+    expect(
+      StyleSheet.flatten(getByTestId("location-button-anchor").props.style),
+    ).toMatchObject({ bottom: 54 })
+    expect(StyleSheet.flatten(getByTestId("open-add-place").props.style)).toMatchObject({
+      bottom: 54,
+    })
+  })
+
+  it("does not lift the locate button past 20 while the add-place form owns the bottom", async () => {
+    mockBottomInset = 34
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+
+    await waitFor(() =>
+      expect(
+        StyleSheet.flatten(getByTestId("location-button-anchor").props.style),
+      ).toMatchObject({ bottom: 20 }),
+    )
   })
 
   it("draws a pin for each place the clusterer resolves", async () => {
@@ -857,6 +1016,51 @@ describe("MapComponent adding a place", () => {
     )
   })
 
+  it("fixes the pin to the place once the form has taken its location", async () => {
+    // The second step sends the coordinate Continue took. A crosshair at the
+    // map's centre, still asking to be moved, would follow a pan to a door that
+    // is not the one being sent — so the pin becomes a marker on the place.
+    const { getByTestId, queryByTestId, queryByText } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    await waitFor(() => expect(getByTestId("place-pin")).toBeTruthy())
+    expect(queryByTestId("pinned-place-pin")).toBeNull()
+
+    const onPin = capturedAddPlaceProps?.onPin as (location: unknown) => void
+    act(() => onPin({ latitude: REGION.latitude, longitude: REGION.longitude }))
+
+    await waitFor(() => expect(getByTestId("pinned-place-pin")).toBeTruthy())
+    expect(queryByTestId("place-pin")).toBeNull()
+    expect(queryByText("Move the map to put the pin on the place")).toBeNull()
+
+    // Back on the details the map is the control for the pin again.
+    act(() => onPin(null))
+    await waitFor(() => expect(getByTestId("place-pin")).toBeTruthy())
+    expect(queryByTestId("pinned-place-pin")).toBeNull()
+  })
+
+  it("aims the pin afresh on the next attempt, not where the last one fixed it", async () => {
+    const { getByTestId, queryByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
+    act(() =>
+      (capturedAddPlaceProps?.onPin as (location: unknown) => void)({
+        latitude: REGION.latitude,
+        longitude: REGION.longitude,
+      }),
+    )
+    act(() => {
+      ;(capturedAddPlaceProps?.onClose as () => void)()
+    })
+
+    fireEvent.press(getByTestId("open-add-place"))
+    await waitFor(() => expect(getByTestId("place-pin")).toBeTruthy())
+    expect(queryByTestId("pinned-place-pin")).toBeNull()
+  })
+
   it("abandons the whole thing on cancel", async () => {
     const { getByTestId, queryByTestId } = renderMap()
 
@@ -975,6 +1179,13 @@ describe("MapComponent adding a place", () => {
         expect.objectContaining({ type: "success" }),
       ),
     )
+    // Closed by the form, which slides out on the null and then asks to be
+    // taken away — not pulled out from under it here, in the frame the answer
+    // arrived.
+    expect(isAddPlaceMounted).toBe(true)
+    act(() => {
+      ;(capturedAddPlaceProps?.onClose as () => void)()
+    })
     await waitFor(() => expect(isAddPlaceMounted).toBe(false))
   })
 
@@ -1191,14 +1402,21 @@ describe("MapComponent adding a place", () => {
     // still on it.
     expect(getByTestId("place-pin")).toBeTruthy()
 
+    const sent: { reason?: string | null } = {}
     await act(async () => {
       land?.({ submitted: true })
-      await inFlight
+      sent.reason = await inFlight
     })
 
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({ type: "success" }),
     )
+    // The null is what tells the form to slide out; its close is what ends
+    // the attempt and takes the pin with it.
+    expect(sent.reason).toBeNull()
+    act(() => {
+      ;(capturedAddPlaceProps?.onClose as () => void)()
+    })
     await waitFor(() => expect(queryByTestId("place-pin")).toBeNull())
     expect(isAddPlaceMounted).toBe(false)
   })
@@ -1226,6 +1444,92 @@ describe("MapComponent adding a place", () => {
     )
     expect(mockSubmitPlace).not.toHaveBeenCalled()
     expect(isAddPlaceMounted).toBe(true)
+  })
+})
+
+describe("MapComponent add-place tab bar", () => {
+  const tabBarStyles = () =>
+    mockSetOptions.mock.calls
+      .map(([options]) => (options as { tabBarStyle?: unknown }).tabBarStyle)
+      .filter((style) => style !== undefined)
+
+  it("takes the tab bar away while a place is being added", async () => {
+    // The panel has no window of its own — the map above it has to stay
+    // pannable — so covering the bar the way the place sheet's window does
+    // means hiding it rather than drawing over it.
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    // The screen owns the option the whole time it is mounted rather than only
+    // while the panel is up — that is what keeps the bar following the theme
+    // afterwards — so what stands before the panel opens is the navigator's
+    // own style, not nothing.
+    expect(tabBarStyles().at(-1)).toEqual({ backgroundColor: "light" })
+
+    fireEvent.press(getByTestId("open-add-place"))
+
+    await waitFor(() => expect(tabBarStyles()).toContainEqual({ display: "none" }))
+  })
+
+  it("puts the bar back with the navigator's own style, not with nothing", async () => {
+    // `setOptions` merges over the navigator's `screenOptions` rather than
+    // falling back to them, so restoring by clearing the key would leave an
+    // unstyled bar behind.
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    await waitFor(() => expect(tabBarStyles()).toContainEqual({ display: "none" }))
+
+    act(() => (capturedAddPlaceProps?.onClose as () => void)())
+
+    await waitFor(() => {
+      const restored = tabBarStyles().at(-1)
+      expect(restored).not.toEqual({ display: "none" })
+      expect(restored).toBeTruthy()
+    })
+  })
+
+  it("follows the theme afterwards rather than holding the one it closed in", async () => {
+    // `setOptions` beats `screenOptions` and lasts as long as the screen, so a
+    // bar put back from a cleanup keeps whatever style was current at that
+    // instant. Switch to dark in Settings afterwards and every other tab
+    // repaints from the navigator while the map's stays light.
+    const { getByTestId, rerender } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    await waitFor(() => expect(tabBarStyles()).toContainEqual({ display: "none" }))
+    act(() => (capturedAddPlaceProps?.onClose as () => void)())
+
+    mockTabBarStyle = { backgroundColor: "dark" }
+    rerender(
+      <ContextForScreen>
+        <MapComponent
+          userLocation={REGION}
+          setPermissionsStatus={jest.fn()}
+          alertOnLocationError={jest.fn()}
+        />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() =>
+      expect(tabBarStyles().at(-1)).toEqual({ backgroundColor: "dark" }),
+    )
+  })
+
+  it("writes nothing to the screen once it has been torn down mid-add", async () => {
+    const { getByTestId, unmount } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    await waitFor(() => expect(tabBarStyles()).toContainEqual({ display: "none" }))
+
+    const written = mockSetOptions.mock.calls.length
+    unmount()
+
+    // Nothing on the way out: there is no screen left to put a bar back on.
+    expect(mockSetOptions.mock.calls).toHaveLength(written)
   })
 })
 

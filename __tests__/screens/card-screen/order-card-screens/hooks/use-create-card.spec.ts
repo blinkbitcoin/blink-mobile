@@ -66,7 +66,7 @@ describe("useCreateCard", () => {
 
     const { result } = renderHook(() => useCreateCard())
 
-    let createResult: { lastFour: string; cardType: string } | null = null
+    let createResult: { id: string; lastFour: string; cardType: string } | null = null
     await act(async () => {
       createResult = await result.current.createCard({
         applicationId: "app-123",
@@ -74,7 +74,7 @@ describe("useCreateCard", () => {
       })
     })
 
-    expect(createResult).toEqual({ lastFour: "5678", cardType: "PHYSICAL" })
+    expect(createResult).toEqual({ id: "new-id", lastFour: "5678", cardType: "PHYSICAL" })
     expect(mockMutate).toHaveBeenCalledWith({
       variables: {
         input: {
@@ -94,7 +94,8 @@ describe("useCreateCard", () => {
 
     const { result } = renderHook(() => useCreateCard())
 
-    let createResult: { lastFour: string; cardType: string } | null = {
+    let createResult: { id: string; lastFour: string; cardType: string } | null = {
+      id: "",
       lastFour: "",
       cardType: "",
     }
@@ -119,7 +120,8 @@ describe("useCreateCard", () => {
 
     const { result } = renderHook(() => useCreateCard())
 
-    let createResult: { lastFour: string; cardType: string } | null = {
+    let createResult: { id: string; lastFour: string; cardType: string } | null = {
+      id: "",
       lastFour: "",
       cardType: "",
     }
@@ -143,7 +145,8 @@ describe("useCreateCard", () => {
 
     const { result } = renderHook(() => useCreateCard())
 
-    let createResult: { lastFour: string; cardType: string } | null = {
+    let createResult: { id: string; lastFour: string; cardType: string } | null = {
+      id: "",
       lastFour: "",
       cardType: "",
     }
@@ -167,7 +170,8 @@ describe("useCreateCard", () => {
 
     const { result } = renderHook(() => useCreateCard())
 
-    let createResult: { lastFour: string; cardType: string } | null = {
+    let createResult: { id: string; lastFour: string; cardType: string } | null = {
+      id: "",
       lastFour: "",
       cardType: "",
     }

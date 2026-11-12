@@ -16,9 +16,12 @@ const CLOSE_UNAVAILABLE_MESSAGE =
 
 const mockNavigate = jest.fn()
 const mockReset = jest.fn()
+const mockPopTo = jest.fn()
+let mockRouteParams: { isDepositChecked?: true } | undefined
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate, reset: mockReset }),
+  useNavigation: () => ({ navigate: mockNavigate, reset: mockReset, popTo: mockPopTo }),
+  useRoute: () => ({ params: mockRouteParams }),
 }))
 
 const mockCompleteMigration = jest.fn()
@@ -51,6 +54,7 @@ let mockIsReceiveDelayed = false
 let mockFailureReason: MigrationSupportReason | null = null
 let mockIsClockOutOfSync = false
 let mockHasConnectionIssue = false
+let mockIsDepositPending = false
 const mockRetry = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-transfer", () => ({
@@ -63,6 +67,7 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-transfer", () => (
       failureReason: mockFailureReason,
       isClockOutOfSync: mockIsClockOutOfSync,
       hasConnectionIssue: mockHasConnectionIssue,
+      isDepositPending: mockIsDepositPending,
       retry: mockRetry,
     }
   },
@@ -116,8 +121,32 @@ describe("MigrationTransferringFundsScreen", () => {
     mockFailureReason = null
     mockIsClockOutOfSync = false
     mockHasConnectionIssue = false
+    mockIsDepositPending = false
+    mockRouteParams = undefined
     mockCompleteMigration.mockResolvedValue(MigrationCompletion.Completed)
     loadLocale("en")
+  })
+
+  /** The figures the user approved were read before the deposit, so the commit screen
+   *  reads them again and has them approved anew. */
+  it("goes back to the commit screen when the commit is refused for a deposit", async () => {
+    mockIsDepositPending = true
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockPopTo).toHaveBeenCalledTimes(1)
+    expect(mockPopTo).toHaveBeenCalledWith("accountMigrationBalancesOverview", {
+      isDepositRefused: true,
+    })
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("stays while nothing refused the commit", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(mockPopTo).not.toHaveBeenCalled()
   })
 
   it("swallows the hardware back while the funds move", async () => {
@@ -148,7 +177,18 @@ describe("MigrationTransferringFundsScreen", () => {
       selfCustodialAccountId: "sc-account-1",
       expectedReceiveSats: 21000,
       skip: false,
+      isDepositChecked: false,
     })
+  })
+
+  it("tells the transfer the deposits were checked when Approve opened the screen", async () => {
+    mockRouteParams = { isDepositChecked: true }
+    renderScreen()
+    await flushEffects()
+
+    expect(mockUseMigrationTransfer).toHaveBeenCalledWith(
+      expect.objectContaining({ isDepositChecked: true }),
+    )
   })
 
   /** The session can end under the screen; the transfer then has no account to bill and
@@ -401,6 +441,21 @@ describe("MigrationTransferringFundsScreen", () => {
       reason: MigrationSupportReason.ReceiveDelayed,
       origin: "receive-delayed",
       custodialAccountId: "custodial-1",
+    })
+  })
+
+  it("leaves the custodial id out of the delayed-receive ticket when there is none", async () => {
+    mockIsReceiveDelayed = true
+    mockOwnerId = null
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("migration-receive-delayed-contact-support"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: MigrationSupportReason.ReceiveDelayed,
+      origin: "receive-delayed",
+      custodialAccountId: undefined,
     })
   })
 

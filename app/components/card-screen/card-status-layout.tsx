@@ -17,11 +17,13 @@ type CardStatusLayoutProps = {
   iconName: IconNamesType
   iconColor?: string
   showCard?: boolean
+  cardId?: string
   cardNumber?: string
-  holderName?: string
   validThruDate?: string | Date
   isFrozen?: boolean
   showAddToWallet?: boolean
+  onAddToWallet: () => void
+  isAddingToWallet?: boolean
 }
 
 export const CardStatusLayout: React.FC<CardStatusLayoutProps> = ({
@@ -32,23 +34,20 @@ export const CardStatusLayout: React.FC<CardStatusLayoutProps> = ({
   iconName,
   iconColor,
   showCard = true,
+  cardId,
   cardNumber = "",
-  holderName = "",
   validThruDate = "",
   isFrozen = false,
   showAddToWallet = true,
+  onAddToWallet,
+  isAddingToWallet = false,
 }) => {
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
 
-  const resolvedIconColor = iconColor ?? colors._green
-
-  const handleAddToWallet = () => {
-    // TODO: Phase 3 - Implement MeaWallet SDK integration
-    console.log("Add to wallet pressed")
-  }
+  const resolvedIconColor = iconColor ?? colors.staticSuccess
 
   return (
     <Screen style={styles.screen}>
@@ -66,14 +65,16 @@ export const CardStatusLayout: React.FC<CardStatusLayoutProps> = ({
         <View style={styles.cardSection}>
           {showCard && (
             <BlinkCard
+              cardId={cardId}
               cardNumber={cardNumber}
-              holderName={holderName}
               validThruDate={validThruDate}
               isFrozen={isFrozen}
             />
           )}
 
-          {showAddToWallet ? <AddToWalletButton onPress={handleAddToWallet} /> : null}
+          {showAddToWallet ? (
+            <AddToWalletButton onPress={onAddToWallet} disabled={isAddingToWallet} />
+          ) : null}
         </View>
       </View>
 
@@ -109,7 +110,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -118,7 +119,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 8,
   },
   title: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 20,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",
@@ -127,7 +128,7 @@ const useStyles = makeStyles(({ colors }) => ({
     maxWidth: 264,
   },
   subtitle: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",

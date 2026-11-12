@@ -56,7 +56,7 @@ export const MigrationApiServiceScreen: React.FC<MigrationApiServiceScreenProps>
     >
       <IconHero
         icon="key-outline"
-        iconColor={colors.primary}
+        iconColor={colors.accent}
         title={LL.AccountMigration.apiServiceTitle()}
         subtitle={LL.AccountMigration.apiServiceBody()}
       />

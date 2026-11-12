@@ -33,7 +33,7 @@ export const InfoRow: React.FC<InfoRowProps> = ({
   const labelStyle = isLabelRegular ? [styles.label, styles.regularLabel] : styles.label
   const valueStyle = isValueMuted
     ? [styles.value, styles.mutedValue]
-    : [styles.value, { color: valueColor ?? colors.black }]
+    : [styles.value, { color: valueColor ?? colors.textOnBackground }]
 
   return (
     // One element for a screen reader, label and value together, as a row of a list reads.
@@ -81,7 +81,7 @@ const useStyles = makeStyles(({ colors }) => ({
   label: {
     flexShrink: 0,
     maxWidth: "50%",
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",
@@ -92,7 +92,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   value: {
     flex: 1,
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",
@@ -100,7 +100,7 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlign: "right",
   },
   mutedValue: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontWeight: "400",
   },
   secondaryValue: {

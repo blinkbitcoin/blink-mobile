@@ -345,9 +345,9 @@ const useStyles = makeStyles(({ colors }) => ({
   track: {
     height: TRACK_HEIGHT,
     width: "100%",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: TRACK_HEIGHT / 2,
-    borderColor: colors.grey4,
+    borderColor: colors.neutral,
     borderWidth: 1,
     justifyContent: "center",
   },

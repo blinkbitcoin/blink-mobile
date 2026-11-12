@@ -71,8 +71,8 @@ export const createCustodialPriceSource = (
  *
  * The Apollo cache keeps the last answer when a refresh fails, so with the feed expired
  * and Blink unreachable the answer still on hand can be days old. Read as current, it
- * would price sends with no stale notice; aged, it is marked stale past an hour and
- * withheld past a day, which lets sats-only mode take over. A wrong device clock costs a
+ * would keep pricing indefinitely; aged, it reads stale past an hour and is withheld
+ * past a day, which lets sats-only mode take over. A wrong device clock costs a
  * self-custodial session the fallback, not its amounts: they are then stated in sats.
  */
 export const createFallbackPriceSource = ({

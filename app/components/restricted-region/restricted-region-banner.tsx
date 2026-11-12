@@ -22,22 +22,22 @@ export const RestrictedRegionBanner: React.FC = () => {
 const useStyles = makeStyles(({ colors }) => ({
   container: {
     borderWidth: 1,
-    borderColor: colors.primary,
+    borderColor: colors.accent,
     borderRadius: 12,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     padding: 14,
   },
   title: {
     fontSize: 14,
     fontWeight: "700",
     lineHeight: 20,
-    color: colors.primary,
+    color: colors.accent,
     marginBottom: 2,
   },
   body: {
     fontSize: 14,
     fontWeight: "400",
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

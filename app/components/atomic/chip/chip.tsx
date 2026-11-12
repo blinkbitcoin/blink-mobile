@@ -45,7 +45,7 @@ export const Chip: React.FC<ChipProps> = ({
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
-      accessibilityState={{ selected: isSelected, disabled }}
+      accessibilityState={{ selected: isSelected, disabled, busy: loading }}
     >
       {/* The label keeps its space under the spinner so the chip doesn't resize. */}
       <Text
@@ -84,7 +84,7 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 20,
   },
   chipTextSelected: {
-    color: colors.white,
+    color: colors.textOnAccent,
   },
   chipTextHidden: {
     opacity: 0,

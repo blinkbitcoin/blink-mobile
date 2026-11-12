@@ -82,7 +82,7 @@ export const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
 
         {iconName && (
           <View style={styles.iconWrapper}>
-            <GaloyIcon name={iconName} color={colors.primary} size={110} />
+            <GaloyIcon name={iconName} color={colors.accent} size={110} />
           </View>
         )}
 
@@ -132,12 +132,12 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "flex-start",
   },
   descriptionBullet: {
-    color: colors.grey2,
+    color: colors.textMuted,
     marginRight: 8,
     lineHeight: 22,
   },
   descriptionText: {
-    color: colors.grey2,
+    color: colors.textMuted,
     flex: 1,
     flexWrap: "wrap",
     lineHeight: 22,

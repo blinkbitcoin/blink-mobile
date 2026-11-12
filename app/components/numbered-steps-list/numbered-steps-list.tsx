@@ -34,7 +34,7 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 16,
     fontWeight: "400",
     lineHeight: 22,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   number: {
     width: 20,

@@ -13,13 +13,18 @@ import {
   type CheckpointUpdate,
   mergeCheckpoint,
 } from "@app/screens/account-migration/utils/migration-checkpoint-storage"
-import { MigrationLnAddressOutcome } from "@app/types/migration"
+import { MigrationLnAddressOutcome, MigrationSupportReason } from "@app/types/migration"
+import { WindDown, WindDownStatus } from "@app/types/wind-down"
 import {
   StorageFailure,
   type StorageWriteResult,
 } from "@app/utils/storage/storage-failure"
 import { ContextForScreen } from "../../helper"
-import { walletOverviewQueryResult } from "../helpers"
+import {
+  pendingDepositsQueryResult,
+  pendingOnChainReceive,
+  walletOverviewQueryResult,
+} from "../helpers"
 import { flushEffects } from "../../../helpers/flush-effects"
 
 loadLocale("en")
@@ -37,6 +42,7 @@ const CONTACT_EMAIL = "support@blink.sv"
 const mockNavigate = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
 const mockUseMigrationQuery = jest.fn()
+const mockUseMigrationPendingDepositsQuery = jest.fn()
 const mockMigrationStart = jest.fn()
 const mockRefetchMigration = jest.fn()
 const mockRefetchWallets = jest.fn()
@@ -77,10 +83,36 @@ const migrationQueryResult = (preview: {
   },
 })
 
+const mockSetParams = jest.fn()
+const mockReset = jest.fn()
+let mockRouteParams: { isDepositRefused?: true } | undefined
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    setParams: mockSetParams,
+    reset: mockReset,
+  }),
+  useRoute: () => ({ params: mockRouteParams }),
   useIsFocused: () => mockIsFocused,
+}))
+
+let mockWindDown: WindDown | null = null
+jest.mock("@app/screens/account-migration/hooks/use-custodial-wind-down", () => ({
+  useCustodialWindDown: () => mockWindDown,
+}))
+
+const mockSendDepositSupportEmail = jest.fn()
+const mockUseMigrationSupportEmail = jest.fn()
+jest.mock("@app/screens/account-migration/hooks/use-migration-support-email", () => ({
+  useMigrationSupportEmail: (reason: string) => {
+    mockUseMigrationSupportEmail(reason)
+    return {
+      sendSupportEmail: mockSendDepositSupportEmail,
+      cardDetails: [],
+      supportDetailsText: "",
+    }
+  },
 }))
 
 jest.mock("@app/graphql/generated", () => ({
@@ -89,6 +121,7 @@ jest.mock("@app/graphql/generated", () => ({
     mockUseWalletOverviewScreenQuery(options),
   useMigrationQuery: () => mockUseMigrationQuery(),
   useMigrationStartMutation: () => [mockMigrationStart],
+  useMigrationPendingDepositsQuery: () => mockUseMigrationPendingDepositsQuery(),
 }))
 
 let mockMigrationStatus: MigrationStatus | null = null
@@ -215,6 +248,27 @@ jest.mock("@app/components/dollar-balance-migration-modal", () => ({
   },
 }))
 
+const mockPendingDepositModal = jest.fn()
+jest.mock("@app/screens/account-migration/pending-deposit-modal", () => ({
+  PendingDepositModal: (props: {
+    isVisible: boolean
+    onAcknowledge: () => void
+    showCloseIconButton?: boolean
+    isChecking?: boolean
+  }) => {
+    mockPendingDepositModal(props)
+    const ReactNs = jest.requireActual<typeof import("react")>("react")
+    const RN = jest.requireActual<typeof import("react-native")>("react-native")
+    return props.isVisible
+      ? ReactNs.createElement(
+          RN.Text,
+          { testID: "pending-deposit-modal-ok", onPress: props.onAcknowledge },
+          "ok",
+        )
+      : null
+  },
+}))
+
 jest.mock("@app/config/feature-flags-context", () => ({
   ...jest.requireActual("@app/config/feature-flags-context"),
   useRemoteConfig: () => ({ supportEmailAddress: "support@blink.sv" }),
@@ -260,6 +314,8 @@ const resetScreenMocks = () => {
   jest.clearAllMocks()
   mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
   mockSaveCheckpointHandle = mockSaveCheckpoint
+  mockRouteParams = undefined
+  mockWindDown = null
   loadLocale("en")
   mockDollarRestricted = false
   mockCurrentDollarRestricted = false
@@ -283,18 +339,22 @@ const resetScreenMocks = () => {
   mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.Transferred)
   mockIsFocused = true
   mockIsAuthed = true
-  mockUseWalletOverviewScreenQuery.mockReturnValue(
-    walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
-  )
-  mockUseMigrationQuery.mockReturnValue(
-    migrationQueryResult({
+  /** Each source answers a refetch, as the figures read again after a deposit cleared. */
+  mockUseWalletOverviewScreenQuery.mockReturnValue({
+    ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+    refetch: jest.fn().mockResolvedValue(undefined),
+  })
+  mockUseMigrationQuery.mockReturnValue({
+    ...migrationQueryResult({
       balanceSats: 1000,
       feeSats: 10,
       feeCoveredByBlink: false,
       receiveSats: 990,
     }),
-  )
+    refetch: jest.fn().mockResolvedValue(undefined),
+  })
   mockMigrationStart.mockResolvedValue(acceptedMigrationStart)
+  mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingDepositsQueryResult())
   /** An answered phase, because the start waits for one: the tests about the phase read
    *  itself set their own. In progress rather than not started, so no write claims the
    *  figure unless a test asks for it. */
@@ -711,8 +771,11 @@ describe("MigrationBalancesOverviewScreen", () => {
     await flushEffects()
 
     fireEvent.press(screen.getByText(LLOverview.approveCta()))
+    await flushEffects()
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationTransferringFunds")
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationTransferringFunds", {
+      isDepositChecked: true,
+    })
   })
 
   /** The migration only ever moves bitcoin: a remaining dollar balance is emptied through the
@@ -1024,6 +1087,427 @@ describe("MigrationBalancesOverviewScreen", () => {
 
     expect(screen.getByText("BTC 1000")).toBeTruthy()
     expect(screen.getByText("BTC 990")).toBeTruthy()
+  })
+})
+
+describe("MigrationBalancesOverviewScreen, with a deposit still confirming", () => {
+  beforeEach(resetScreenMocks)
+
+  it("holds the start and Approve behind the pending-deposit modal", async () => {
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(
+      pendingDepositsQueryResult([pendingOnChainReceive]),
+    )
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("pending-deposit-modal-ok")).toBeTruthy()
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ showCloseIconButton: false, isChecking: false }),
+    )
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
+  })
+
+  it("checks again from the modal and lets the start out once the deposit lands", async () => {
+    const pendingResult = pendingDepositsQueryResult([pendingOnChainReceive])
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingResult)
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+    await flushEffects()
+
+    expect(pendingResult.refetch).toHaveBeenCalledTimes(1)
+
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingDepositsQueryResult())
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    expect(screen.queryByTestId("pending-deposit-modal-ok")).toBeNull()
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
+  it("stays on the modal when checking again fails", async () => {
+    const pendingResult = {
+      ...pendingDepositsQueryResult([pendingOnChainReceive]),
+      refetch: jest.fn().mockRejectedValue(new Error("network")),
+    }
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingResult)
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+    await flushEffects()
+
+    expect(pendingResult.refetch).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId("pending-deposit-modal-ok")).toBeTruthy()
+  })
+
+  it("shows the check OK started running on the modal until it answers", async () => {
+    type CheckAnswer = { data: ReturnType<typeof pendingDepositsQueryResult>["data"] }
+    let answerCheck: (answer: CheckAnswer) => void = () => undefined
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      ...pendingDepositsQueryResult([pendingOnChainReceive]),
+      refetch: jest.fn().mockReturnValue(
+        new Promise<CheckAnswer>((resolve) => {
+          answerCheck = resolve
+        }),
+      ),
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isChecking: false }),
+    )
+
+    fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+    await flushEffects()
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isChecking: true }),
+    )
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+
+    await act(async () => {
+      answerCheck({ data: pendingDepositsQueryResult([pendingOnChainReceive]).data })
+    })
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isChecking: false }),
+    )
+  })
+
+  it("says the deposit is still confirming once the check OK started finds it pending", async () => {
+    const pendingResult = pendingDepositsQueryResult([pendingOnChainReceive])
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingResult)
+    renderScreen()
+    await flushEffects()
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isStillPending: false }),
+    )
+
+    fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+    await flushEffects()
+
+    expect(pendingResult.refetch).toHaveBeenCalledTimes(1)
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isStillPending: true }),
+    )
+  })
+
+  it("asks for the dollar balance to be emptied before showing the pending deposit", async () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 5000 }),
+    )
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(
+      pendingDepositsQueryResult([pendingOnChainReceive]),
+    )
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("dollar-balance-modal-transfer")).toBeTruthy()
+    expect(screen.queryByTestId("pending-deposit-modal-ok")).toBeNull()
+  })
+
+  it("checks the deposits again on Approve and stays when one has arrived", async () => {
+    const clearResult = pendingDepositsQueryResult()
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      ...clearResult,
+      refetch: jest.fn().mockResolvedValue({
+        data: pendingDepositsQueryResult([pendingOnChainReceive]).data,
+      }),
+    })
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LLOverview.approveCta()))
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "accountMigrationTransferringFunds",
+      expect.anything(),
+    )
+  })
+
+  it("stays on Approve when the check before it fails", async () => {
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      ...pendingDepositsQueryResult(),
+      refetch: jest.fn().mockRejectedValue(new Error("network")),
+    })
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LLOverview.approveCta()))
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "accountMigrationTransferringFunds",
+      expect.anything(),
+    )
+  })
+
+  it("drops a clear answer that lands after the screen lost focus", async () => {
+    let answerCheck: (value: unknown) => void = () => undefined
+    const clearResult = pendingDepositsQueryResult()
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      ...clearResult,
+      refetch: jest.fn(
+        () =>
+          new Promise((resolve) => {
+            answerCheck = resolve
+          }),
+      ),
+    })
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LLOverview.approveCta()))
+    mockIsFocused = false
+    screen.rerender(screenTree())
+    await flushEffects()
+    await act(async () => {
+      answerCheck({ data: clearResult.data })
+    })
+
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "accountMigrationTransferringFunds",
+      expect.anything(),
+    )
+  })
+
+  it("ignores a second Approve while its check is running", async () => {
+    let answerCheck: (value: unknown) => void = () => undefined
+    const clearResult = pendingDepositsQueryResult()
+    const refetch = jest.fn(
+      () =>
+        new Promise((resolve) => {
+          answerCheck = resolve
+        }),
+    )
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({ ...clearResult, refetch })
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("migration-balances-overview-approve"))
+    await flushEffects()
+    fireEvent.press(screen.getByTestId("migration-balances-overview-approve"))
+    await act(async () => {
+      answerCheck({ data: clearResult.data })
+    })
+
+    expect(refetch).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+  })
+
+  it("keeps the Approve spinner to its own check", async () => {
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      ...pendingDepositsQueryResult(),
+      loading: true,
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByText(LLOverview.approveCta())).toBeTruthy()
+  })
+
+  it("offers support from the pending-deposit modal, which covers the screen's own button", async () => {
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(
+      pendingDepositsQueryResult([pendingOnChainReceive]),
+    )
+    renderScreen()
+    await flushEffects()
+
+    expect(mockPendingDepositModal).toHaveBeenLastCalledWith(
+      expect.objectContaining({ onContactSupport: expect.any(Function) }),
+    )
+  })
+
+  it("shows the modal instead of support when the server refuses the start for a deposit", async () => {
+    const pendingDepositStartRefusal = {
+      data: {
+        migrationStart: {
+          errors: [
+            {
+              message: "Migration is not available while an incoming deposit is pending.",
+              code: "MIGRATION_PENDING_DEPOSIT",
+            },
+          ],
+        },
+      },
+    }
+    mockMigrationStart.mockResolvedValueOnce(pendingDepositStartRefusal)
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("pending-deposit-modal-ok")).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "accountMigrationContactSupport",
+      expect.anything(),
+    )
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
+
+    fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(2)
+    expect(screen.queryByTestId("pending-deposit-modal-ok")).toBeNull()
+  })
+
+  it("keeps the start held from OK while the server still sees the deposit pending", async () => {
+    const pendingDepositStartRefusal = {
+      data: {
+        migrationStart: {
+          errors: [
+            {
+              message: "Migration is not available while an incoming deposit is pending.",
+              code: "MIGRATION_PENDING_DEPOSIT",
+            },
+          ],
+        },
+      },
+    }
+    mockMigrationStart.mockResolvedValueOnce(pendingDepositStartRefusal)
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      ...pendingDepositsQueryResult(),
+      refetch: jest.fn().mockResolvedValue({
+        data: pendingDepositsQueryResult([pendingOnChainReceive]).data,
+      }),
+    })
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId("pending-deposit-modal-ok")).toBeTruthy()
+  })
+
+  it("offers the retry instead of the modal when the check fails after the server refused the start", async () => {
+    mockMigrationStart.mockResolvedValueOnce({
+      data: {
+        migrationStart: {
+          errors: [
+            {
+              message: "Migration is not available while an incoming deposit is pending.",
+              code: "MIGRATION_PENDING_DEPOSIT",
+            },
+          ],
+        },
+      },
+    })
+    mockUseMigrationQuery.mockReturnValue({
+      ...migrationQueryResult({
+        balanceSats: 1000,
+        feeSats: 10,
+        feeCoveredByBlink: false,
+        receiveSats: 990,
+      }),
+      refetch: mockRefetchMigration,
+    })
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+      refetch: mockRefetchWallets,
+    })
+    renderScreen()
+    await flushEffects()
+    expect(screen.getByTestId("pending-deposit-modal-ok")).toBeTruthy()
+
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      ...pendingDepositsQueryResult(),
+      error: new Error("network"),
+    })
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    expect(screen.queryByTestId("pending-deposit-modal-ok")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+  })
+
+  describe("the line above the retry when the deposit check fails", () => {
+    const failDepositCheckWith = (error: Error) =>
+      mockUseMigrationPendingDepositsQuery.mockReturnValue({
+        loading: false,
+        error,
+        data: undefined,
+        refetch: jest.fn().mockRejectedValue(error),
+      })
+
+    it("blames the connection when the check never reached the server", async () => {
+      failDepositCheckWith(
+        Object.assign(new Error("Network request failed"), {
+          networkError: new Error("offline"),
+        }),
+      )
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+      expect(screen.getByText(LL.errors.network.connection())).toBeTruthy()
+    })
+
+    /** As in the gate: a GraphQL or an auth error is the server's, and sending the user to
+     *  check a connection that works sends them looking in the wrong place. */
+    it("stays generic when the server answered the check with an error", async () => {
+      failDepositCheckWith(new Error("Not authorized"))
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+      expect(screen.getByText(LL.errors.generic())).toBeTruthy()
+      expect(screen.queryByText(LL.errors.network.connection())).toBeNull()
+    })
+  })
+
+  it("holds the start while the pending-deposit check has not answered", async () => {
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      loading: true,
+      error: undefined,
+      data: undefined,
+      refetch: jest.fn().mockResolvedValue(undefined),
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+    expect(screen.queryByTestId("pending-deposit-modal-ok")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
+  })
+
+  it("offers the retry when the pending-deposit check fails, and asks again from it", async () => {
+    const refetchPendingDeposits = jest.fn().mockRejectedValue(new Error("network"))
+    mockUseMigrationPendingDepositsQuery.mockReturnValue({
+      loading: false,
+      error: new Error("network"),
+      data: undefined,
+      refetch: refetchPendingDeposits,
+    })
+    mockUseMigrationQuery.mockReturnValue({
+      ...migrationQueryResult({
+        balanceSats: 1000,
+        feeSats: 10,
+        feeCoveredByBlink: false,
+        receiveSats: 990,
+      }),
+      refetch: mockRefetchMigration,
+    })
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+      refetch: mockRefetchWallets,
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+    expect(screen.queryByTestId("migration-balances-overview-approve")).toBeNull()
+
+    fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
+
+    expect(refetchPendingDeposits).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
   })
 })
 
@@ -2420,5 +2904,371 @@ describe("MigrationBalancesOverviewScreen dollar-region gating", () => {
     expect(mockUseLnAddressTransfer).not.toHaveBeenCalledWith(
       expect.objectContaining({ skip: false }),
     )
+  })
+})
+
+/**
+ * A deposit that confirms on this screen changes the balance the migration sends, so the
+ * figures read before it are stale once it clears. Kept apart from the deposit cases
+ * above, which hold the line cap.
+ */
+describe("MigrationBalancesOverviewScreen figures read again after a deposit", () => {
+  beforeEach(resetScreenMocks)
+
+  const previewWith = (receiveSats: number, refetch: jest.Mock) => ({
+    ...migrationQueryResult({
+      balanceSats: receiveSats + 10,
+      feeSats: 10,
+      feeCoveredByBlink: false,
+      receiveSats,
+    }),
+    refetch,
+  })
+
+  /** A preview refetch the case answers by hand, landing the figure it is given. */
+  const deferredPreviewRefetch = (freshReceiveSats: number) => {
+    const answers: Array<() => void> = []
+    const refetch: jest.Mock = jest.fn().mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          answers.push(() => {
+            mockUseMigrationQuery.mockReturnValue(previewWith(freshReceiveSats, refetch))
+            resolve()
+          })
+        }),
+    )
+    return { refetch, answerNext: () => answers.shift()?.() }
+  }
+
+  const pendingThenClearCheck = () => ({
+    ...pendingDepositsQueryResult([pendingOnChainReceive]),
+    refetch: jest.fn().mockResolvedValue({ data: pendingDepositsQueryResult().data }),
+  })
+
+  /** OK checks again and finds the deposit landed, as the shared cache then reads it. */
+  const clearDepositFromOk = async () => {
+    fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingDepositsQueryResult())
+    screen.rerender(screenTree())
+    await flushEffects()
+  }
+
+  const approveButton = () => screen.getByTestId("migration-balances-overview-approve")
+
+  it("reads the figures again once the deposit clears and holds the start until they answer", async () => {
+    const { refetch, answerNext } = deferredPreviewRefetch(4990)
+    mockUseMigrationQuery.mockReturnValue(previewWith(990, refetch))
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingThenClearCheck())
+    renderScreen()
+    await flushEffects()
+
+    await clearDepositFromOk()
+
+    expect(refetch).toHaveBeenCalledTimes(1)
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+
+    await act(async () => {
+      answerNext()
+    })
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+    expect(mockSaveCheckpoint).toHaveBeenCalledWith(
+      MigrationCheckpoint.BalancesOverview,
+      expect.objectContaining({
+        expectedReceiveSats: 4990,
+        isReceiveFigureRefreshed: true,
+      }),
+    )
+    expect(approveButton()).toBeEnabled()
+  })
+
+  it("holds Approve when a deposit shows up after the start was accepted", async () => {
+    renderScreen()
+    await flushEffects()
+    expect(approveButton()).toBeEnabled()
+
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(
+      pendingDepositsQueryResult([pendingOnChainReceive]),
+    )
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+    expect(approveButton()).toBeDisabled()
+  })
+
+  it("keeps Approve held until the save carrying the figure read again has landed", async () => {
+    const { refetch, answerNext } = deferredPreviewRefetch(4990)
+    mockUseMigrationQuery.mockReturnValue(previewWith(990, refetch))
+    renderScreen()
+    await flushEffects()
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingThenClearCheck())
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    let landRefreshedSave: () => void = () => undefined
+    mockSaveCheckpointHandle = (step, options) => {
+      const isRefreshedSave =
+        (options as { isReceiveFigureRefreshed?: true }).isReceiveFigureRefreshed === true
+      if (!isRefreshedSave) return mockSaveCheckpoint(step, options)
+      return new Promise((resolve) => {
+        landRefreshedSave = () => resolve({ isSaved: true, failure: null })
+      })
+    }
+    await clearDepositFromOk()
+    await act(async () => {
+      answerNext()
+    })
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    expect(approveButton()).toBeDisabled()
+
+    await act(async () => {
+      landRefreshedSave()
+    })
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    expect(approveButton()).toBeEnabled()
+  })
+
+  it("offers the retry when the figures cannot be read again, and reads them on it", async () => {
+    const refetch = jest
+      .fn()
+      .mockRejectedValueOnce(new Error("Network request failed"))
+      .mockResolvedValue(undefined)
+    mockUseMigrationQuery.mockReturnValue(previewWith(990, refetch))
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingThenClearCheck())
+    renderScreen()
+    await flushEffects()
+
+    await clearDepositFromOk()
+
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+
+    fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
+
+    expect(refetch).toHaveBeenCalledTimes(2)
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+    expect(approveButton()).toBeEnabled()
+  })
+
+  /** Before the server starts the run, the start waits for the save of the figure on
+   *  screen now: an accepted start binds whatever the disk holds. */
+  it("holds the start for the save of the figure read again, not an earlier one", async () => {
+    mockMigrationStatus = MigrationStatus.NotStarted
+    const { refetch, answerNext } = deferredPreviewRefetch(4990)
+    mockUseMigrationQuery.mockReturnValue(previewWith(990, refetch))
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingThenClearCheck())
+    let landFreshFigure: () => void = () => undefined
+    mockSaveCheckpointHandle = (step, options) => {
+      const isFreshFigure =
+        (options as { expectedReceiveSats?: number }).expectedReceiveSats === 4990
+      if (!isFreshFigure) return mockSaveCheckpoint(step, options)
+      return new Promise((resolve) => {
+        landFreshFigure = () => resolve({ isSaved: true, failure: null })
+      })
+    }
+    renderScreen()
+    await flushEffects()
+
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingDepositsQueryResult())
+    screen.rerender(screenTree())
+    await flushEffects()
+    await act(async () => {
+      answerNext()
+    })
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+
+    await act(async () => {
+      landFreshFigure()
+    })
+    screen.rerender(screenTree())
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+  })
+
+  it("never lets a reading replace the figure once the server holds a destination", async () => {
+    mockMigrationStatus = MigrationStatus.Transferring
+    const refetch = jest.fn().mockResolvedValue(undefined)
+    mockUseMigrationQuery.mockReturnValue(previewWith(990, refetch))
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingThenClearCheck())
+    renderScreen()
+    await flushEffects()
+
+    await clearDepositFromOk()
+
+    expect(refetch).toHaveBeenCalledTimes(1)
+    const refreshedSaves = mockSaveCheckpoint.mock.calls.filter(
+      ([, options]) =>
+        (options as { isReceiveFigureRefreshed?: true }).isReceiveFigureRefreshed ===
+        true,
+    )
+    expect(refreshedSaves).toHaveLength(0)
+  })
+
+  describe("sent back for a commit the server refused for a deposit", () => {
+    beforeEach(() => {
+      mockRouteParams = { isDepositRefused: true }
+    })
+
+    it("checks the deposits again and holds Approve on the deposit it finds", async () => {
+      const checkAfterRefusal = jest.fn().mockResolvedValue({
+        data: pendingDepositsQueryResult([pendingOnChainReceive]).data,
+      })
+      mockUseMigrationPendingDepositsQuery.mockReturnValue({
+        ...pendingDepositsQueryResult(),
+        refetch: checkAfterRefusal,
+      })
+      renderScreen()
+      mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingThenClearCheck())
+      await flushEffects()
+      screen.rerender(screenTree())
+      await flushEffects()
+
+      expect(checkAfterRefusal).toHaveBeenCalledTimes(1)
+      expect(mockSetParams).toHaveBeenCalledWith({ isDepositRefused: undefined })
+      expect(screen.getByTestId("pending-deposit-modal-ok")).toBeTruthy()
+      expect(approveButton()).toBeDisabled()
+    })
+
+    it("reads the figures again before Approve even when the deposit has landed", async () => {
+      const { refetch, answerNext } = deferredPreviewRefetch(4990)
+      mockUseMigrationQuery.mockReturnValue(previewWith(990, refetch))
+      renderScreen()
+      await flushEffects()
+
+      expect(refetch).toHaveBeenCalledTimes(1)
+      expect(approveButton()).toBeDisabled()
+
+      await act(async () => {
+        answerNext()
+      })
+      screen.rerender(screenTree())
+      await flushEffects()
+
+      expect(mockSaveCheckpoint).toHaveBeenCalledWith(
+        MigrationCheckpoint.BalancesOverview,
+        expect.objectContaining({
+          expectedReceiveSats: 4990,
+          isReceiveFigureRefreshed: true,
+        }),
+      )
+      expect(approveButton()).toBeEnabled()
+    })
+  })
+
+  describe("leaving from the modal", () => {
+    const windDownWith = (status: WindDownStatus) => ({ status }) as unknown as WindDown
+
+    const lastModalProps = () =>
+      mockPendingDepositModal.mock.calls[mockPendingDepositModal.mock.calls.length - 1][0]
+
+    it("lets a user whose run the server has not started leave", async () => {
+      mockMigrationStatus = MigrationStatus.NotStarted
+      mockUseMigrationPendingDepositsQuery.mockReturnValue(
+        pendingDepositsQueryResult([pendingOnChainReceive]),
+      )
+      renderScreen()
+      await flushEffects()
+
+      expect(lastModalProps()).toEqual(
+        expect.objectContaining({
+          showCloseIconButton: true,
+          onContactSupport: undefined,
+        }),
+      )
+
+      fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+      await flushEffects()
+
+      expect(mockReset).toHaveBeenCalledWith({ index: 0, routes: [{ name: "Primary" }] })
+      expect(mockMigrationStart).not.toHaveBeenCalled()
+    })
+
+    it("keeps the armed gate on the modal even before the run starts", async () => {
+      mockMigrationStatus = MigrationStatus.NotStarted
+      mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+      mockUseMigrationPendingDepositsQuery.mockReturnValue(
+        pendingDepositsQueryResult([pendingOnChainReceive]),
+      )
+      renderScreen()
+      await flushEffects()
+
+      expect(lastModalProps()).toEqual(
+        expect.objectContaining({ showCloseIconButton: false }),
+      )
+      expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith(
+        MigrationSupportReason.DepositPending,
+      )
+      act(() => {
+        lastModalProps().onContactSupport?.()
+      })
+      expect(mockSendDepositSupportEmail).toHaveBeenCalledTimes(1)
+
+      fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+      await flushEffects()
+      expect(mockReset).not.toHaveBeenCalled()
+    })
+
+    /** The phase read can lag the start this screen just sent, and an accepted start is
+     *  the lock, whatever that read still says. */
+    it("keeps a user whose start was accepted on the modal, though the read says not started", async () => {
+      mockMigrationStatus = MigrationStatus.NotStarted
+      renderScreen()
+      await flushEffects()
+      expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+
+      mockUseMigrationPendingDepositsQuery.mockReturnValue(
+        pendingDepositsQueryResult([pendingOnChainReceive]),
+      )
+      screen.rerender(screenTree())
+      await flushEffects()
+
+      expect(lastModalProps()).toEqual(
+        expect.objectContaining({ showCloseIconButton: false }),
+      )
+    })
+
+    it("keeps a run the server has taken on the modal", async () => {
+      mockUseMigrationPendingDepositsQuery.mockReturnValue(
+        pendingDepositsQueryResult([pendingOnChainReceive]),
+      )
+      renderScreen()
+      await flushEffects()
+
+      expect(lastModalProps()).toEqual(
+        expect.objectContaining({ showCloseIconButton: false }),
+      )
+      fireEvent.press(screen.getByTestId("pending-deposit-modal-ok"))
+      await flushEffects()
+      expect(mockReset).not.toHaveBeenCalled()
+    })
+  })
+
+  it("reads them again for a second deposit that clears later", async () => {
+    const refetch = jest.fn().mockResolvedValue(undefined)
+    mockUseMigrationQuery.mockReturnValue(previewWith(990, refetch))
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingThenClearCheck())
+    renderScreen()
+    await flushEffects()
+    await clearDepositFromOk()
+    expect(refetch).toHaveBeenCalledTimes(1)
+
+    mockUseMigrationPendingDepositsQuery.mockReturnValue(pendingThenClearCheck())
+    screen.rerender(screenTree())
+    await flushEffects()
+    await clearDepositFromOk()
+
+    expect(refetch).toHaveBeenCalledTimes(2)
   })
 })
