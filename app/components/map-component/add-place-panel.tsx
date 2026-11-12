@@ -223,7 +223,7 @@ export const AddPlacePanel: React.FC<Props> = ({
               {/* The foreground colour, not the accent: this reads as part of
                   the title row it sits in rather than as an action of its
                   own. White on the dark sheet, black on the light one. */}
-              <GaloyIcon name="arrow-left" size={20} color={colors.black} />
+              <GaloyIcon name="arrow-left" size={20} color={colors.textOnBackground} />
             </Pressable>
           )}
           <Text style={styles.title} accessibilityRole="header">
@@ -236,7 +236,7 @@ export const AddPlacePanel: React.FC<Props> = ({
             accessibilityLabel={LL.common.close()}
             hitSlop={HEADER_ICON_HIT_SLOP.close}
           >
-            <GaloyIcon name="close" size={CLOSE_ICON_SIZE} color={colors.primary} />
+            <GaloyIcon name="close" size={CLOSE_ICON_SIZE} color={colors.accent} />
           </Pressable>
         </>
       }
@@ -287,7 +287,7 @@ export const AddPlacePanel: React.FC<Props> = ({
               is on screen. The pencil says the row can still change — moving
               the map changes it. */}
             <View style={styles.locationRow}>
-              <GaloyIcon name="map-pin" size={16} color={colors.grey1} />
+              <GaloyIcon name="map-pin" size={16} color={colors.textSecondary} />
               <Text
                 testID="place-coordinates"
                 style={styles.coordinates}
@@ -295,7 +295,7 @@ export const AddPlacePanel: React.FC<Props> = ({
               >
                 {formatCoordinates(location)}
               </Text>
-              <GaloyIcon name="pencil" size={16} color={colors.primary} />
+              <GaloyIcon name="pencil" size={16} color={colors.accent} />
             </View>
           </View>
 
@@ -308,13 +308,13 @@ export const AddPlacePanel: React.FC<Props> = ({
                 value={name}
                 onChangeText={editName}
                 placeholder={LL.MapScreen.placeNameHint()}
-                placeholderTextColor={colors.grey2}
+                placeholderTextColor={colors.textMuted}
                 maxLength={PLACE_NAME_MAX_LENGTH}
                 autoCorrect={false}
                 returnKeyType="done"
                 accessibilityLabel={LL.MapScreen.placeName()}
               />
-              <GaloyIcon name="pencil" size={16} color={colors.primary} />
+              <GaloyIcon name="pencil" size={16} color={colors.accent} />
             </View>
           </View>
         </>
@@ -371,7 +371,7 @@ export const AddPlacePanel: React.FC<Props> = ({
             what keeps "I added my shop and it isn't there" from being a
             surprise. */}
           <View style={styles.note}>
-            <GaloyIcon name="info" size={16} color={colors.grey1} />
+            <GaloyIcon name="info" size={16} color={colors.textSecondary} />
             <Text style={styles.noteText}>{LL.MapScreen.placeReviewNote()}</Text>
           </View>
         </>
@@ -394,7 +394,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     flex: 1,
     fontSize: 20,
     fontFamily: fonts.bold,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   content: {
     paddingHorizontal: 20,
@@ -406,7 +406,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
   },
   label: {
     fontSize: 14,
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
   // The two rows of the first step, on one measurement so they read as a pair,
   // each ending in the design's pencil on `galoy-input`'s right-icon inset.
@@ -414,7 +414,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     flexDirection: "row",
     alignItems: "center",
     columnGap: 12,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     minHeight: 60,
     paddingLeft: 14,
@@ -424,7 +424,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     flex: 1,
     alignSelf: "stretch",
     fontSize: 16,
-    color: colors.black,
+    color: colors.textOnBackground,
     // Android gives inputs their own vertical padding on top of the row's.
     paddingVertical: 0,
   },
@@ -432,7 +432,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     flexDirection: "row",
     alignItems: "center",
     columnGap: 10,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     minHeight: 60,
     paddingLeft: 14,
@@ -441,7 +441,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
   coordinates: {
     flex: 1,
     fontSize: 16,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   // Taken from `percentage-selector`, which is where the app already draws a
   // one-of-many choice as chips: grey5 ground, the primary as the selected
@@ -455,7 +455,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     rowGap: 8,
   },
   chip: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 100,
     alignItems: "center",
     justifyContent: "center",
@@ -467,14 +467,14 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     paddingHorizontal: 16,
   },
   chipSelected: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
   },
   chipText: {
-    color: colors.primary,
+    color: colors.accent,
     fontFamily: "SourceSansPro-Bold",
   },
   chipTextSelected: {
-    color: colors.white,
+    color: colors.textOnAccent,
     fontFamily: "SourceSansPro-Bold",
   },
   note: {
@@ -486,7 +486,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     flex: 1,
     fontSize: 13,
     lineHeight: 18,
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
   // Below the scroll rather than at the end of it — see the sheet's `footer` —
   // so the fourteen chips can be as tall as they need without the button that

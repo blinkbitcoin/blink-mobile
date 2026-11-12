@@ -36,7 +36,7 @@ export const useBottomTabBarStyle = (): StyleProp<ViewStyle> => {
 const useStyles = makeStyles(({ colors }) => ({
   bar: {
     paddingTop: 4,
-    backgroundColor: colors.white,
-    borderTopColor: colors.grey4,
+    backgroundColor: colors.backgroundDefault,
+    borderTopColor: colors.neutral,
   },
 }))

@@ -110,22 +110,22 @@ jest.mock("@rn-vui/themed", () => {
       (fn: (theme: { colors: Record<string, string> }) => Record<string, object>) => () =>
         fn({
           colors: {
-            primary: "#fc5805",
-            black: "#000",
-            red: "#f00",
-            _green: "#0f0",
-            grey3: "#999",
+            accent: "#fc5805",
+            textOnBackground: "#000",
+            error: "#f00",
+            staticSuccess: "#0f0",
+            textDisabled: "#999",
             transparent: "transparent",
           },
         }),
     useTheme: () => ({
       theme: {
         colors: {
-          primary: "#fc5805",
-          black: "#000",
-          red: "#f00",
-          _green: "#0f0",
-          grey3: "#999",
+          accent: "#fc5805",
+          textOnBackground: "#000",
+          error: "#f00",
+          staticSuccess: "#0f0",
+          textDisabled: "#999",
           transparent: "transparent",
         },
       },

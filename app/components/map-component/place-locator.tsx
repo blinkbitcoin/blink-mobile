@@ -51,14 +51,14 @@ const useStyles = makeStyles(({ colors }) => ({
     alignSelf: "center",
     bottom: OUTLINED_PIN_HEIGHT + 8,
     maxWidth: "80%",
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     borderRadius: 16,
     paddingHorizontal: 14,
     paddingVertical: 8,
   },
   hintText: {
     fontSize: 13,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
   },
 }))

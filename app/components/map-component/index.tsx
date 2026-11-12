@@ -611,7 +611,7 @@ export default function MapComponent({
                 onPress={startAddingPlace}
                 accessibilityRole="button"
               >
-                <GaloyIcon name="plus" size={16} color={colors.primary} />
+                <GaloyIcon name="plus" size={16} color={colors.accent} />
                 <Text style={styles.addPlaceText}>{LL.MapScreen.addPlace()}</Text>
               </Pressable>
             )}
@@ -625,7 +625,7 @@ export default function MapComponent({
 
         {isLoading && !allPlaces.length && (
           <View style={styles.statusPill}>
-            <ActivityIndicator size="small" color={colors.primary} />
+            <ActivityIndicator size="small" color={colors.accent} />
             <Text style={styles.statusText}>{LL.MapScreen.loadingPlaces()}</Text>
           </View>
         )}
@@ -713,7 +713,7 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
     flexDirection: "row",
     alignItems: "center",
     columnGap: 8,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 8,
@@ -721,13 +721,13 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
   },
   statusText: {
     fontSize: 13,
-    color: colors.black,
+    color: colors.textOnBackground,
     flexShrink: 1,
   },
   retryText: {
     fontSize: 13,
     fontFamily: fonts.bold,
-    color: colors.primary,
+    color: colors.accent,
   },
   addPlace: {
     position: "absolute",
@@ -736,7 +736,7 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
     flexDirection: "row",
     alignItems: "center",
     columnGap: 6,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 11,
@@ -744,6 +744,6 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
   addPlaceText: {
     fontSize: 14,
     fontWeight: "700",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

@@ -87,7 +87,7 @@ export const DropdownComponent: React.FC<DropdownProps> = ({
             </View>
 
             <View style={styles.iconContainer}>
-              <Icon name="chevron-down" size={24} color={colors.primary} />
+              <Icon name="chevron-down" size={24} color={colors.accent} />
             </View>
           </View>
         </View>
@@ -125,7 +125,7 @@ export const DropdownComponent: React.FC<DropdownProps> = ({
                   )}
                 </View>
                 {option.value === selectedValue && (
-                  <Icon name="checkmark" size={24} color={colors.primary} />
+                  <Icon name="checkmark" size={24} color={colors.accent} />
                 )}
               </View>
             </TouchableOpacity>
@@ -139,7 +139,7 @@ export const DropdownComponent: React.FC<DropdownProps> = ({
 const useStyles = makeStyles(({ colors }) => ({
   fieldBackground: {
     flexDirection: "row",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     alignItems: "center",
     paddingHorizontal: 14,
     paddingVertical: 14,
@@ -151,11 +151,11 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
   },
   descriptionText: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     marginTop: 2,
   },
   placeholderText: {
-    color: colors.grey3,
+    color: colors.textDisabled,
   },
   iconContainer: {
     marginLeft: 12,
@@ -171,7 +171,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   optionContainer: {
     flexDirection: "row",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     paddingHorizontal: 14,
     paddingVertical: 16,
     borderRadius: 10,
@@ -180,13 +180,13 @@ const useStyles = makeStyles(({ colors }) => ({
     minHeight: 60,
   },
   selectedOption: {
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
   },
   optionContent: {
     flex: 1,
   },
   optionDescription: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     marginTop: 2,
   },
 }))

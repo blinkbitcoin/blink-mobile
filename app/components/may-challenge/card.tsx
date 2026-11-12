@@ -62,12 +62,12 @@ export const MayChallengeCard: React.FC = () => {
             <Text type="p1" bold>
               {LL.Circles.mayChallenge.title()}
             </Text>
-            <Text color={colors.grey3}>{countDown}</Text>
+            <Text color={colors.textDisabled}>{countDown}</Text>
           </View>
           <Text type="p2">{LL.Circles.mayChallenge.description()}</Text>
         </View>
         <View>
-          <GaloyIcon color={colors.primary} size={28} name="rank" />
+          <GaloyIcon color={colors.accent} size={28} name="rank" />
         </View>
       </View>
     </PressableCard>
@@ -81,7 +81,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "space-between",
     padding: 16,
     borderRadius: 10,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
   textContainer: {
     flex: 1,

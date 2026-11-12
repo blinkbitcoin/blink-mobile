@@ -430,12 +430,12 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     flex: 1,
     width: "100%",
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
   },
 
   emptyCircle: {
-    backgroundColor: colors.primary,
-    borderColor: colors.white,
+    backgroundColor: colors.accent,
+    borderColor: colors.textOnAccent,
     borderRadius: 16 / 2,
     borderWidth: 2,
     height: 16,
@@ -443,20 +443,20 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   filledCircle: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.textOnAccent,
     borderRadius: 16 / 2,
     height: 16,
     width: 16,
   },
 
   forgotPinText: {
-    color: colors.white,
+    color: colors.textOnAccent,
     fontSize: 16,
     textDecorationLine: "underline",
   },
 
   helperText: {
-    color: colors.white,
+    color: colors.textOnAccent,
     fontSize: 20,
   },
 
@@ -471,7 +471,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   pinPadButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     width: "100%",
     height: "100%",
   },
@@ -481,18 +481,18 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   pinPadButtonIcon: {
-    color: colors.white,
+    color: colors.textOnAccent,
     fontSize: 32,
   },
 
   pinPadButtonTitle: {
-    color: colors.white,
+    color: colors.textOnAccent,
     fontSize: 26,
     fontWeight: "500",
   },
 
   pinPadButtonTitleDisabled: {
-    color: colors.white,
+    color: colors.textOnAccent,
     fontSize: 26,
     fontWeight: "500",
     opacity: 0.4,

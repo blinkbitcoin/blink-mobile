@@ -259,11 +259,11 @@ const useStyles = makeStyles(({ colors }) => ({
     rowGap: 20,
   },
   settingContainer: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 12,
   },
   textContainer: {
-    color: colors.grey3,
+    color: colors.textDisabled,
   },
   listItemContainer: {
     backgroundColor: colors.transparent,

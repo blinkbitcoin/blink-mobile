@@ -117,7 +117,7 @@ export const ApiKeyCreateScreen: React.FC = () => {
             ),
           ]}
         />
-        <Text type="p3" color={colors.grey2}>
+        <Text type="p3" color={colors.textMuted}>
           {LL.ApiScreen.writeScopeDashboardOnly()}
         </Text>
 

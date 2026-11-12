@@ -110,7 +110,7 @@ const BackupPhraseConfirmContent: React.FC<BackupPhraseConfirmContentProps> = ({
                       }}
                       style={styles.input}
                       placeholder={`${LL.BackupScreen.ManualBackup.Confirm.enterWord()} ${challenge.index + 1}`}
-                      placeholderTextColor={colors.grey2}
+                      placeholderTextColor={colors.textMuted}
                       value={inputs[i]}
                       onChangeText={(text) => {
                         updateInput(i, text)
@@ -122,7 +122,7 @@ const BackupPhraseConfirmContent: React.FC<BackupPhraseConfirmContentProps> = ({
                       keyboardType="visible-password"
                       {...testProps(`confirm-word-${challenge.index}`)}
                     />
-                    <GaloyIcon name="pencil" size={16} color={colors.primary} />
+                    <GaloyIcon name="pencil" size={16} color={colors.accent} />
                   </View>
                 </View>
               )
@@ -259,7 +259,7 @@ const useStyles = makeStyles(({ colors }) => ({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.transparent,
@@ -272,13 +272,13 @@ const useStyles = makeStyles(({ colors }) => ({
   wordNumber: {
     width: 24,
     fontSize: 14,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   wordNumberHidden: {
     opacity: 0,
   },
   inputCorrect: {
-    borderColor: colors._green,
+    borderColor: colors.staticSuccess,
   },
   inputError: {
     borderColor: colors.error,
@@ -286,7 +286,7 @@ const useStyles = makeStyles(({ colors }) => ({
   input: {
     flex: 1,
     fontSize: 14,
-    color: colors.black,
+    color: colors.textOnBackground,
     fontFamily: "SourceSansPro-Regular",
   },
   errorContainer: {

@@ -188,7 +188,7 @@ export const TotpRegistrationInitiateScreen: React.FC = () => {
     return (
       <Screen>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator color={colors.primary} size={"large"} />
+          <ActivityIndicator color={colors.accent} size={"large"} />
         </View>
       </Screen>
     )
@@ -256,12 +256,12 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   instruction: {
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   qrFrame: {
     padding: QR_FRAME_PADDING,
     borderRadius: 20,
     borderWidth: QR_FRAME_BORDER,
-    borderColor: colors.grey5,
+    borderColor: colors.surfaceInteractive,
   },
 }))

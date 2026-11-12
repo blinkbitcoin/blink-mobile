@@ -680,11 +680,11 @@ const useStyles = makeStyles(({ colors }) => ({
     marginVertical: 12,
   },
   selectedInstanceButton: {
-    backgroundColor: colors.grey5,
-    color: colors.white,
+    backgroundColor: colors.surfaceInteractive,
+    color: colors.backgroundDefault,
   },
   notSelectedInstanceButton: {
-    backgroundColor: colors.white,
-    color: colors.grey3,
+    backgroundColor: colors.backgroundDefault,
+    color: colors.textDisabled,
   },
 }))

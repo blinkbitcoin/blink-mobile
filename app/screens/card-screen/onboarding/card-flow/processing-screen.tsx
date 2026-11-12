@@ -30,7 +30,7 @@ export const CardProcessingScreen: React.FC = () => {
             <View style={styles.iconCircle}>
               <Icon
                 name={"time-outline"}
-                color={colors._green}
+                color={colors.staticSuccess}
                 size={40}
                 type="ionicon"
               />
@@ -40,7 +40,7 @@ export const CardProcessingScreen: React.FC = () => {
           <Text type="h2" style={styles.title}>
             {LL.CardFlow.Onboarding.CardProcessing.title()}
           </Text>
-          <Text type="p3" color={colors.grey3}>
+          <Text type="p3" color={colors.textDisabled}>
             {LL.CardFlow.Onboarding.CardProcessing.subtitle()}
           </Text>
         </View>
@@ -74,7 +74,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     justifyContent: "center",
     alignItems: "center",
   },

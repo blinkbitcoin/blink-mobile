@@ -93,7 +93,7 @@ const GatedContent: React.FC<GatedContentProps> = ({
         <View style={styles.centerContainer}>
           <ActivityIndicator
             size="large"
-            color={colors.primary}
+            color={colors.accent}
             {...testProps("screen-security-activating")}
           />
         </View>
@@ -153,7 +153,7 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 16,
     lineHeight: 22,
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
     marginBottom: 12,
   },
 }))

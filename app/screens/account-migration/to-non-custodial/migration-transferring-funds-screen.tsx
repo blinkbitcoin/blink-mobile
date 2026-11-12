@@ -294,7 +294,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
       <StatusScreenLayout
         icon="clock"
         iconColor={colors.warning}
-        iconBackgroundColor={colors._warningLight}
+        iconBackgroundColor={colors.staticWarningBackground}
         footer={screenFooter}
       >
         <Text style={styles.message}>{message}</Text>
@@ -308,7 +308,7 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 18,
     lineHeight: 24,
     fontWeight: "400",
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
   },
 }))

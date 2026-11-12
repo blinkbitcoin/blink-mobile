@@ -1,5 +1,5 @@
 import React from "react"
-import { Text as ReactNativeText } from "react-native"
+import { StyleSheet, Text as ReactNativeText } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 
 import { PercentageSelector } from "@app/components/percentage-selector/percentage-selector"
@@ -11,19 +11,22 @@ jest.mock("@rn-vui/themed", () => ({
   useTheme: () => ({
     theme: {
       colors: {
-        primary: "primary",
-        grey5: "grey5",
+        accent: "accent",
+        surfaceInteractive: "surfaceInteractive",
       },
     },
   }),
-  makeStyles: () => () => ({
-    row: {},
-    chip: {},
-    chipSelected: {},
-    chipDisabled: {},
-    chipText: {},
-    chipTextSelected: {},
-  }),
+  /** The real styles, run on sentinel colours: backgroundDefault and textOnAccent share
+   *  a value in the palette, so only distinct names show which one a style picked. */
+  makeStyles: (factory: (theme: { colors: Record<string, string> }) => object) => () =>
+    factory({
+      colors: {
+        accent: "accent",
+        surfaceInteractive: "surfaceInteractive",
+        backgroundDefault: "backgroundDefault",
+        textOnAccent: "textOnAccent",
+      },
+    }),
 }))
 
 describe("PercentageSelector", () => {
@@ -248,5 +251,19 @@ describe("PercentageSelector", () => {
 
     fireEvent.press(getByText("100%"))
     expect(mockOnSelect).toHaveBeenCalledWith(100)
+  })
+
+  it("labels the selected chip in textOnAccent and the rest in accent", () => {
+    const { getByText } = render(
+      <PercentageSelector
+        isLocked={false}
+        loadingPercent={null}
+        selectedPercent={50}
+        onSelect={mockOnSelect}
+      />,
+    )
+
+    expect(StyleSheet.flatten(getByText("50%").props.style).color).toBe("textOnAccent")
+    expect(StyleSheet.flatten(getByText("25%").props.style).color).toBe("accent")
   })
 })

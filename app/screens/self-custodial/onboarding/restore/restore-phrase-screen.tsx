@@ -276,7 +276,7 @@ const useStyles = makeStyles(({ colors }) => ({
   subtitle: {
     fontSize: 16,
     lineHeight: 22,
-    color: colors.grey2,
+    color: colors.textMuted,
     marginBottom: 20,
   },
   warningCard: {
