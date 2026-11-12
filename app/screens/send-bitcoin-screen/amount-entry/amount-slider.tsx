@@ -250,7 +250,7 @@ const useStyles = makeStyles(({ colors }) => ({
   track: {
     height: TRACK_HEIGHT,
     borderRadius: TRACK_HEIGHT / 2,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
   fill: {
     position: "absolute",
@@ -258,7 +258,7 @@ const useStyles = makeStyles(({ colors }) => ({
     top: 0,
     height: TRACK_HEIGHT,
     borderRadius: TRACK_HEIGHT / 2,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
   },
   thumbSlot: {
     position: "absolute",
@@ -275,7 +275,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: HALO_SIZE,
     height: HALO_SIZE,
     borderRadius: HALO_SIZE / 2,
-    backgroundColor: colors.black,
+    backgroundColor: colors.textOnBackground,
   },
   thumb: {
     width: THUMB_SIZE,
@@ -303,18 +303,18 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
     paddingHorizontal: 10,
     borderRadius: 12,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
   },
   /** Paragraph 5/Bold: no text type has it. */
   badgeText: {
     fontFamily: fonts.bold,
     fontSize: 10,
     lineHeight: 13,
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
   caption: {
     marginTop: HINT_GAP - TOUCH_PADDING_VERTICAL,
-    color: colors.grey2,
+    color: colors.textMuted,
     textAlign: "center",
   },
 }))
