@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react"
-import { ActivityIndicator, TouchableOpacity, View } from "react-native"
+import { ActivityIndicator, TextInput, TouchableOpacity, View } from "react-native"
 import { FlatList } from "react-native-gesture-handler"
 import { gql } from "@apollo/client"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -33,6 +33,7 @@ import { SearchBar } from "@rn-vui/base"
 import { makeStyles, useTheme, Text, ListItem } from "@rn-vui/themed"
 
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useInitialAccessibilityFocus } from "@app/hooks/use-initial-accessibility-focus"
 import { useScanContext } from "@app/hooks/use-scan-context"
 import { ActiveWalletStatus } from "@app/types/wallet"
 import { useSelfCustodialContactList } from "@app/self-custodial/hooks/use-contact-list"
@@ -176,6 +177,8 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   )
 
   const activeInputRef = useRef<TInputType>(InputType.Search)
+  const destinationFieldRef = useRef<TextInput>(null)
+  useInitialAccessibilityFocus(destinationFieldRef)
 
   const [rawPhoneNumber, setRawPhoneNumber] = useState<string>("")
   const [keepCountryCode, setKeepCountryCode] = useState<boolean>(true)
@@ -771,6 +774,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
             {...testProps(LL.SendBitcoinScreen.placeholder())}
             placeholder={LL.SendBitcoinScreen.placeholder()}
             InputComponent={SingleLinePlaceholderInput}
+            {...{ fieldRef: destinationFieldRef }}
             value={
               activeInputRef.current === InputType.Search
                 ? destinationState.unparsedDestination
