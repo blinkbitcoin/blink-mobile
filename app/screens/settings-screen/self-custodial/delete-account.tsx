@@ -77,7 +77,7 @@ export const DeleteAccount: React.FC = () => {
       />
 
       <Overlay isVisible={state === "deleting"} overlayStyle={styles.overlayStyle}>
-        <ActivityIndicator size={50} color={colors.primary} />
+        <ActivityIndicator size={50} color={colors.accent} />
         <Text>{LL.AccountScreen.pleaseWait()}</Text>
       </Overlay>
 

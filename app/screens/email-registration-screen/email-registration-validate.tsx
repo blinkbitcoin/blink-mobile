@@ -159,7 +159,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   successAnimationContainer: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     justifyContent: "center",
     alignItems: "center",
   },

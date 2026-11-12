@@ -914,7 +914,12 @@ export const HomeScreen: React.FC = () => {
         </TouchableWithoutFeedback>
       </View>
       <View style={styles.viewModal}>
-        <GaloyIcon name="minus" size={64} color={colors.grey3} style={styles.icon} />
+        <GaloyIcon
+          name="minus"
+          size={64}
+          color={colors.textDisabled}
+          style={styles.icon}
+        />
         <Text type="h1">{LL.common.needWallet()}</Text>
         <View style={styles.openWalletContainer}>
           <GaloyPrimaryButton
@@ -1047,8 +1052,8 @@ export const HomeScreen: React.FC = () => {
           <RefreshControl
             refreshing={isPullRefreshing}
             onRefresh={handlePullToRefresh}
-            colors={[colors.primary]}
-            tintColor={colors.primary}
+            colors={[colors.accent]}
+            tintColor={colors.accent}
           />
         }
       >
@@ -1143,7 +1148,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 15,
     paddingVertical: 15,
     borderRadius: 12,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -1170,7 +1175,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   viewModal: {
     alignItems: "center",
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     height: "30%",
     justifyContent: "flex-end",
     paddingHorizontal: 20,
@@ -1185,10 +1190,10 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
     alignItems: "center",
     columnGap: 10,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
-    borderColor: colors.grey5,
+    borderColor: colors.surfaceInteractive,
     borderBottomWidth: 2,
     paddingVertical: 14,
   },
@@ -1227,7 +1232,7 @@ const useStyles = makeStyles(({ colors }) => ({
   actionsSeparator: {
     width: 1,
     alignSelf: "stretch",
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
   },
   badgeSlot: {
     // minHeight, not height: at 20pt x the 1.4 font cap the badge's line box

@@ -569,12 +569,12 @@ const useStyles = makeStyles(({ colors }) => ({
   // category filter is the only surface it changes — that one had no outline —
   // and it gains one deliberately rather than staying the odd one out.
   sheet: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     borderWidth: 1,
     borderBottomWidth: 0,
-    borderColor: colors.grey4,
+    borderColor: colors.neutral,
     paddingTop: 8,
   },
   // Fills the slot the layout gives it, so the surface above shrinks by exactly
@@ -595,7 +595,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.grey3,
+    backgroundColor: colors.textDisabled,
     marginBottom: 8,
   },
   scroll: {

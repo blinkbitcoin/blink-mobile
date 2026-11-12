@@ -105,11 +105,11 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
     navigation.setOptions({
       ...headerLeftNoGlass(() => (
         <TouchableOpacity style={styles.iconContainer} onPress={handleBackPress}>
-          <GaloyIcon name="caret-left" size={20} color={colors.black} />
+          <GaloyIcon name="caret-left" size={20} color={colors.textOnBackground} />
         </TouchableOpacity>
       )),
     })
-  }, [navigation, handleBackPress, LL, styles.iconContainer, colors.black])
+  }, [navigation, handleBackPress, LL, styles.iconContainer, colors.textOnBackground])
 
   React.useEffect(() => {
     if (entryAllowed) return

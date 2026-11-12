@@ -13,7 +13,7 @@ jest.mock("@rn-vui/themed", () => ({
       ) => object,
     ) =>
     (props: { diameter: number; gap: number; color?: string }) =>
-      factory({ colors: { grey4: "#CCCCCC" } }, props),
+      factory({ colors: { neutral: "#CCCCCC" } }, props),
 }))
 
 const getCircles = (result: ReturnType<typeof render>) =>

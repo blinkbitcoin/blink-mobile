@@ -123,7 +123,7 @@ const useStyles = makeStyles(({ colors }) => ({
   primaryBalanceText: {
     fontSize: 32,
     fontWeight: "bold",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   loaderBackground: {
     color: colors.loaderBackground,
@@ -135,7 +135,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginTop: 4,
     fontSize: 12,
     textAlign: "center",
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   modeToggle: {
     marginTop: 4,
@@ -145,7 +145,7 @@ const useStyles = makeStyles(({ colors }) => ({
   modeToggleText: {
     fontSize: 11,
     fontWeight: "700",
-    color: colors.grey2,
+    color: colors.textMuted,
     letterSpacing: 0.6,
   },
 }))

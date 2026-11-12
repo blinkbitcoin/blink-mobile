@@ -102,7 +102,7 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
     <Modal
       isVisible={isVisible}
       backdropOpacity={0.8}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       backdropTransitionOutTiming={0}
       onBackdropPress={acknowledgeModal}
     >
@@ -137,8 +137,8 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
           <View style={styles.actions}>
             <View style={styles.copyContainer}>
               <TouchableOpacity onPress={handleCopyToClipboard}>
-                <Text color={colors.grey2}>
-                  <GaloyIcon name="copy-paste" size={16} color={colors.grey2} />
+                <Text color={colors.textMuted}>
+                  <GaloyIcon name="copy-paste" size={16} color={colors.textMuted} />
                   <Text> </Text>
                   {LL.PeopleScreen.copy()}
                 </Text>
@@ -146,8 +146,8 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
             </View>
             <View style={styles.shareContainer}>
               <TouchableOpacity onPress={share}>
-                <Text color={colors.grey2}>
-                  <GaloyIcon name="share" size={16} color={colors.grey2} />
+                <Text color={colors.textMuted}>
+                  <GaloyIcon name="share" size={16} color={colors.textMuted} />
                   <Text> </Text>
                   {LL.Circles.share()}
                 </Text>
@@ -188,12 +188,12 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   cross: {},
   qrCard: {
-    backgroundColor: colors._white,
+    backgroundColor: colors.staticWhite,
     padding: 20,
     borderRadius: 12,
   },
   modalCard: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 16,
     display: "flex",
     justifyContent: "center",

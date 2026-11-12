@@ -104,10 +104,10 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
     if (errorMessage !== "" || paid || pending) return null
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color={colors.primary} />
+        <ActivityIndicator size="large" color={colors.accent} />
       </View>
     )
-  }, [errorMessage, paid, pending, styles, colors.primary])
+  }, [errorMessage, paid, pending, styles, colors.accent])
 
   return (
     <Screen preset="scroll" style={styles.contentContainer}>
@@ -157,7 +157,7 @@ const useStyles = makeStyles(({ colors }) => ({
   currencyInputContainer: {
     padding: 10,
     marginTop: 10,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 10,
   },
   withdrawableDescriptionText: {

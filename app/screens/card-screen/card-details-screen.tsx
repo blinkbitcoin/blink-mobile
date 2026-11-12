@@ -63,16 +63,16 @@ export const CardDetailsScreen: React.FC = () => {
     navigation.setOptions(
       headerRightNoGlass(() => (
         <TouchableOpacity style={styles.headerRight} onPress={handleSettingsPress}>
-          <GaloyIcon name="settings" size={24} color={colors.black} />
+          <GaloyIcon name="settings" size={24} color={colors.textOnBackground} />
         </TouchableOpacity>
       )),
     )
-  }, [navigation, styles.headerRight, colors.black, handleSettingsPress])
+  }, [navigation, styles.headerRight, colors.textOnBackground, handleSettingsPress])
 
   if (!authenticated || cardLoading) {
     return (
       <Screen preset="scroll">
-        <ActivityIndicator style={styles.loader} color={colors.primary} />
+        <ActivityIndicator style={styles.loader} color={colors.accent} />
       </Screen>
     )
   }
@@ -121,7 +121,7 @@ const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
         text: LL.CardFlow.CardDetails.statusActive(),
       },
       [CardStatus.Locked]: {
-        color: colors.grey3,
+        color: colors.textDisabled,
         text: LL.CardFlow.CardDetails.statusFrozen(),
       },
       [CardStatus.Canceled]: {
@@ -133,7 +133,7 @@ const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
         text: LL.CardFlow.CardDetails.statusNotActivated(),
       },
       [CardStatus.Requested]: {
-        color: colors.grey3,
+        color: colors.textDisabled,
         text: LL.CardFlow.CardDetails.statusPending(),
       },
       [CardStatus.Failed]: {
@@ -170,7 +170,7 @@ const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
 
         <View style={styles.fieldsContainer}>
           {isSecretsLoading && (
-            <ActivityIndicator testID="card-secrets-loading" color={colors.primary} />
+            <ActivityIndicator testID="card-secrets-loading" color={colors.accent} />
           )}
           {hasSecretsFailed && (
             <View style={styles.secretsFailure}>

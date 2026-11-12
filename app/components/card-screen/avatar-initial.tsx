@@ -24,7 +24,7 @@ export const AvatarInitial: React.FC<AvatarInitialProps> = ({ name, size = 52 })
           {initial}
         </Text>
       ) : (
-        <GaloyIcon name="user" size={size * 0.5} color={colors.primary} />
+        <GaloyIcon name="user" size={size * 0.5} color={colors.accent} />
       )}
     </View>
   )
@@ -39,12 +39,12 @@ const useStyles = makeStyles(({ colors }, { size }: StyleProps) => ({
     width: size,
     height: size,
     borderRadius: size / 2,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     alignItems: "center",
     justifyContent: "center",
   },
   text: {
-    color: colors.primary,
+    color: colors.accent,
     fontSize: size * 0.65,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",

@@ -5,10 +5,10 @@ import { SettingsCard } from "@app/screens/settings-screen/settings-card"
 
 jest.mock("@rn-vui/themed", () => {
   const colors: Record<string, string> = {
-    grey2: "#999",
-    grey5: "#f5f5f5",
-    black: "#000",
-    primary: "#007",
+    textMuted: "#999",
+    surfaceInteractive: "#f5f5f5",
+    textOnBackground: "#000",
+    accent: "#007",
     error: "#f00",
     transparent: "transparent",
   }

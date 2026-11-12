@@ -61,7 +61,7 @@ const LoadingView: React.FC = () => {
   return (
     <Screen>
       <View style={styles.loadingContainer} testID="receive-loading">
-        <ActivityIndicator size="large" color={colors.primary} />
+        <ActivityIndicator size="large" color={colors.accent} />
       </View>
     </Screen>
   )
@@ -469,7 +469,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 20,
   },
   paymentIdentifierText: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 16,
     fontWeight: "400",
     lineHeight: 22,

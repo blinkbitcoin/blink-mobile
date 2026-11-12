@@ -11,8 +11,8 @@ jest.mock("@rn-vui/themed", () => ({
   useTheme: () => ({
     theme: {
       colors: {
-        black: "#000000",
-        grey2: "#666666",
+        textOnBackground: "#000000",
+        textMuted: "#666666",
         success: "#00C853",
         error: "#FF1744",
       },

@@ -44,7 +44,7 @@ export default function LocationButtonCopy({
         accessibilityLabel={LL.MapScreen.showMyLocation()}
         onPress={permissionStatus === RESULTS.GRANTED ? centerOnUser : requestPermissions}
       >
-        <CenterLocationAndroid height={22} width={22} fill={colors.primary} />
+        <CenterLocationAndroid height={22} width={22} fill={colors.accent} />
       </TouchableOpacity>
     </View>
   )
@@ -62,6 +62,6 @@ const useStyles = makeStyles(({ colors }) => ({
     borderRadius: BUTTON_SIZE / 2,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
   },
 }))

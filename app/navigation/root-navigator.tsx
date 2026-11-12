@@ -414,7 +414,7 @@ export const RootStack = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
-        headerTintColor: colors.black,
+        headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
       }}
@@ -488,7 +488,7 @@ export const RootStack = () => {
               onPress={() => navigation.setParams({ scanPressed: Date.now() })}
               style={styles.SendBitcoinScreenScanIcon}
             >
-              <ScanIcon fill={colors.black} />
+              <ScanIcon fill={colors.textOnBackground} />
             </TouchableOpacity>
           )),
         }}
@@ -568,7 +568,7 @@ export const RootStack = () => {
         component={EarnSection}
         options={{
           headerStyle: { backgroundColor: colors._blue },
-          headerTintColor: colors._white,
+          headerTintColor: colors.staticWhite,
           headerTitleStyle: {
             fontWeight: "bold",
             fontSize: 18,
@@ -1154,7 +1154,7 @@ export const OnboardingNavigator = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
-        headerTintColor: colors.black,
+        headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
       }}
     >
@@ -1209,7 +1209,7 @@ export const ContactNavigator = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
-        headerTintColor: colors.black,
+        headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
       }}
@@ -1267,7 +1267,7 @@ export const PhoneLoginNavigator = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
-        headerTintColor: colors.black,
+        headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
       }}
@@ -1316,8 +1316,8 @@ export const PrimaryNavigator = () => {
       <Tab.Navigator
         initialRouteName="Home"
         screenOptions={{
-          tabBarActiveTintColor: colors.primary,
-          tabBarInactiveTintColor: colors.grey2,
+          tabBarActiveTintColor: colors.accent,
+          tabBarInactiveTintColor: colors.textMuted,
           tabBarStyle,
           tabBarLabelStyle: {
             paddingBottom: 6,
@@ -1385,10 +1385,10 @@ export const PrimaryNavigator = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   headerStyle: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
   },
   title: {
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   // 48dp box around the 18dp icon: the margin gives back the 15dp it grew by.
   SendBitcoinScreenScanIcon: {

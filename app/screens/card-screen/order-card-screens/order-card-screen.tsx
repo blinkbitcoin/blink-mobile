@@ -110,7 +110,7 @@ export const OrderCardScreen: React.FC = () => {
       buttonLabel: LL.CardFlow.CardStatus.PhysicalCardOrdered.buttonLabel(),
       navigateTo: "cardCreatePinScreen",
       iconName: "delivery",
-      iconColor: colors._green,
+      iconColor: colors.staticSuccess,
       lastFour: result.lastFour,
       cardId: result.id,
     })
@@ -124,7 +124,7 @@ export const OrderCardScreen: React.FC = () => {
     completeFlow,
     navigation,
     LL,
-    colors._green,
+    colors.staticSuccess,
   ])
 
   const getStepConfig = (): StepConfig => {
@@ -132,7 +132,7 @@ export const OrderCardScreen: React.FC = () => {
       case Step.Shipping:
         return {
           icon: "delivery",
-          iconColor: colors._green,
+          iconColor: colors.staticSuccess,
           title: LL.CardFlow.OrderPhysicalCard.Shipping.title(),
           subtitle: LL.CardFlow.OrderPhysicalCard.Shipping.subtitle(),
           buttonLabel: LL.common.continue(),
@@ -142,7 +142,7 @@ export const OrderCardScreen: React.FC = () => {
       case Step.Confirm:
         return {
           icon: "delivery",
-          iconColor: colors._green,
+          iconColor: colors.staticSuccess,
           title: LL.CardFlow.OrderPhysicalCard.Confirm.title(),
           subtitle: LL.CardFlow.OrderPhysicalCard.Confirm.subtitle(),
           buttonLabel: LL.CardFlow.OrderPhysicalCard.Confirm.placeOrder(),
@@ -193,7 +193,7 @@ export const OrderCardScreen: React.FC = () => {
           <ActivityIndicator
             testID="activity-indicator"
             size="large"
-            color={colors.primary}
+            color={colors.accent}
           />
         </View>
       </Screen>

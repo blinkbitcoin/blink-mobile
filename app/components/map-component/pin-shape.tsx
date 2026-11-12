@@ -31,7 +31,7 @@ export const usePinColor = (isBoostedPlace: boolean): string => {
   const { theme } = useTheme()
 
   if (isBoostedPlace) return PIN_COLOR_BOOSTED
-  return theme.mode === "dark" ? PIN_COLOR_DARK : theme.colors.primary
+  return theme.mode === "dark" ? PIN_COLOR_DARK : theme.colors.accent
 }
 
 /**
@@ -45,7 +45,7 @@ export const usePinColor = (isBoostedPlace: boolean): string => {
 export const usePinGlyphColor = (): string => {
   const { theme } = useTheme()
 
-  return theme.colors._white
+  return theme.colors.staticWhite
 }
 
 // The white ring a new place's pin wears outside its fill. Drawn outside rather
@@ -119,7 +119,7 @@ export const PinShape: React.FC<PinShapeProps> = ({ color, outlineColor }) => {
 export const useNewPlacePinColors = (): { color: string; outlineColor: string } => {
   const { theme } = useTheme()
 
-  return { color: theme.colors._blue, outlineColor: theme.colors._white }
+  return { color: theme.colors._blue, outlineColor: theme.colors.staticWhite }
 }
 
 export const NewPlacePinShape: React.FC = () => {

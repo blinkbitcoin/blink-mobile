@@ -62,7 +62,7 @@ export const UnclaimedDepositBanner: React.FC<Props> = ({ deposits }) => {
             {LL.UnclaimedDeposit.description({ sats: totalSats })}
           </Text>
         </View>
-        <GaloyIcon name="caret-right" size={20} color={colors.primary} />
+        <GaloyIcon name="caret-right" size={20} color={colors.accent} />
       </View>
     </Pressable>
   )
@@ -70,7 +70,7 @@ export const UnclaimedDepositBanner: React.FC<Props> = ({ deposits }) => {
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 12,
     padding: 14,
   },
@@ -86,10 +86,10 @@ const useStyles = makeStyles(({ colors }) => ({
   title: {
     fontSize: 14,
     fontWeight: "700",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   description: {
     fontSize: 12,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
 }))

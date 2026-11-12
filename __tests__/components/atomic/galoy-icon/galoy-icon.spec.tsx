@@ -101,7 +101,9 @@ describe("GaloyIcon", () => {
     it("falls back to the theme colour when none is given", () => {
       const { getByTestId } = renderWithTheme(<GaloyIcon name="info" size={24} />)
 
-      expect(getByTestId("icon-info").props.color).toBe(theme.lightColors?.black)
+      expect(getByTestId("icon-info").props.color).toBe(
+        theme.lightColors?.textOnBackground,
+      )
     })
 
     it("takes its size from width and height when size is absent", () => {

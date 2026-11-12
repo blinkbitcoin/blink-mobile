@@ -29,7 +29,14 @@ jest.mock("@rn-vui/themed", () => ({
   Text: ({ children, ...props }: { children: React.ReactNode; testID?: string }) =>
     React.createElement("Text", props, children),
   useTheme: () => ({
-    theme: { colors: { primary: "#000", _white: "#fff", grey5: "#ccc", error: "red" } },
+    theme: {
+      colors: {
+        accent: "#000",
+        staticWhite: "#fff",
+        surfaceInteractive: "#ccc",
+        error: "red",
+      },
+    },
   }),
 }))
 
