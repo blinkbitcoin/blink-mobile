@@ -85,13 +85,18 @@ export const usePendingReceiveAmount = ({
       totalAmount.amount <= 0 ? null : formatMoneyAmount({ moneyAmount: totalAmount })
 
     if (isSelfCustodialAccount) {
-      const immatureSats = deposits
-        .filter(({ status }) => status === DepositStatus.Immature)
+      /** A deposit claimed early is still pending until its transfer credits the
+       *  balance; the adapter drops it once it has. */
+      const pendingSats = deposits
+        .filter(
+          ({ status }) =>
+            status === DepositStatus.Immature || status === DepositStatus.Claiming,
+        )
         .reduce((sum, { amount }) => sum + amount.amount, 0)
-      if (immatureSats === 0) return null
+      if (pendingSats === 0) return null
       if (!convertMoneyAmount || !displayCurrencyReady) return null
       return formatConverted(
-        convertMoneyAmount(toBtcMoneyAmount(immatureSats), DisplayCurrency),
+        convertMoneyAmount(toBtcMoneyAmount(pendingSats), DisplayCurrency),
       )
     }
 

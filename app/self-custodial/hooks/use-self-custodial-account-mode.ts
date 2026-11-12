@@ -9,6 +9,8 @@ import {
 import { AccountMode } from "@app/types/account"
 
 type SelfCustodialAccountModeReturn = {
+  /** The active self-custodial account; null while custodial is active. */
+  activeAccountId: string | null
   /** Null when the active account is custodial or has not chosen a mode yet. */
   accountMode: AccountMode | null
   isAnonMode: boolean
@@ -21,6 +23,7 @@ type SelfCustodialAccountModeReturn = {
 export const useSelfCustodialAccountMode = (): SelfCustodialAccountModeReturn => {
   const { persistentState, updateState } = usePersistentStateContext()
 
+  const activeAccountId = resolveActiveSelfCustodialId(persistentState)
   const accountMode = getSelfCustodialAccountMode(persistentState)
   const isAnonMode = accountMode === AccountMode.Anon
 
@@ -49,5 +52,12 @@ export const useSelfCustodialAccountMode = (): SelfCustodialAccountModeReturn =>
     [updateState],
   )
 
-  return { accountMode, isAnonMode, getModeFor, setAccountMode, setActiveAccountMode }
+  return {
+    activeAccountId,
+    accountMode,
+    isAnonMode,
+    getModeFor,
+    setAccountMode,
+    setActiveAccountMode,
+  }
 }

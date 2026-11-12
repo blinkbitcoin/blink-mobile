@@ -20,6 +20,7 @@ import {
 } from "@app/btcmap"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 // Long enough that a common word still reaches past the shop next door, short
@@ -122,7 +123,7 @@ export const PlaceSearchModal: React.FC<Props> = ({
         onPress={() => onSelect(item.place)}
         accessibilityRole="button"
       >
-        <GaloyIcon name="map-pin" size={20} color={colors.grey1} />
+        <GaloyIcon name="map-pin" size={20} color={colors.textSecondary} />
         <View style={styles.rowText}>
           <Text style={styles.name} numberOfLines={1}>
             {item.place.name}
@@ -143,7 +144,7 @@ export const PlaceSearchModal: React.FC<Props> = ({
     if (isLoading) {
       return (
         <View style={styles.notice}>
-          <ActivityIndicator size="small" color={colors.primary} />
+          <ActivityIndicator size="small" color={colors.accent} />
         </View>
       )
     }
@@ -160,7 +161,7 @@ export const PlaceSearchModal: React.FC<Props> = ({
 
     return (
       <View style={styles.notice}>
-        <GaloyIcon name="info" size={16} color={colors.grey2} />
+        <GaloyIcon name="info" size={16} color={colors.textMuted} />
         <Text style={styles.noticeText}>{LL.MapScreen.nothingToShow()}</Text>
       </View>
     )
@@ -189,7 +190,7 @@ export const PlaceSearchModal: React.FC<Props> = ({
             value={query}
             onChangeText={setQuery}
             placeholder={LL.common.search()}
-            placeholderTextColor={colors.grey2}
+            placeholderTextColor={colors.textMuted}
             autoCorrect={false}
             returnKeyType="search"
             accessibilityLabel={LL.common.search()}
@@ -203,7 +204,7 @@ export const PlaceSearchModal: React.FC<Props> = ({
             accessibilityLabel={query ? LL.MapScreen.clearSearch() : LL.common.close()}
             hitSlop={12}
           >
-            <GaloyIcon name="close" size={20} color={colors.primary} />
+            <GaloyIcon name="close" size={20} color={colors.accent} />
           </Pressable>
         </View>
 
@@ -227,7 +228,7 @@ type StyleProps = { topInset: number; bottomInset: number }
 const useStyles = makeStyles(({ colors }, { topInset, bottomInset }: StyleProps) => ({
   screen: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     paddingTop: topInset + 8,
   },
   field: {
@@ -238,12 +239,12 @@ const useStyles = makeStyles(({ colors }, { topInset, bottomInset }: StyleProps)
     paddingHorizontal: 16,
     borderRadius: 12,
     minHeight: 48,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
   input: {
     flex: 1,
     fontSize: 16,
-    color: colors.black,
+    color: colors.textOnBackground,
     // Android gives inputs their own vertical padding on top of the row's.
     paddingVertical: 0,
   },
@@ -258,7 +259,7 @@ const useStyles = makeStyles(({ colors }, { topInset, bottomInset }: StyleProps)
     paddingVertical: 12,
     minHeight: 64,
     borderBottomWidth: 1,
-    borderBottomColor: colors.grey5,
+    borderBottomColor: colors.surfaceInteractive,
   },
   rowText: {
     flex: 1,
@@ -266,11 +267,11 @@ const useStyles = makeStyles(({ colors }, { topInset, bottomInset }: StyleProps)
   },
   name: {
     fontSize: 16,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   subtitle: {
     fontSize: 13,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   notice: {
     flexDirection: "row",
@@ -282,11 +283,11 @@ const useStyles = makeStyles(({ colors }, { topInset, bottomInset }: StyleProps)
   },
   noticeText: {
     fontSize: 14,
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
   retry: {
     fontSize: 14,
-    fontWeight: "600",
-    color: colors.primary,
+    fontFamily: fonts.bold,
+    color: colors.accent,
   },
 }))

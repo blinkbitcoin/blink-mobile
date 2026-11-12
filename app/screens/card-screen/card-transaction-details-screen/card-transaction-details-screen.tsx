@@ -149,7 +149,7 @@ export const CardTransactionDetailsScreen: React.FC = () => {
               label: LL.CardFlow.TransactionDetails.conversionFee(),
               value: UNAVAILABLE,
               // TODO: restore to colors.success when real value is available
-              valueColor: colors.black,
+              valueColor: colors.textOnBackground,
             },
           ]}
         />
@@ -201,7 +201,7 @@ const TransactionHero: React.FC<TransactionHeroProps> = ({
   return (
     <View style={styles.heroContainer}>
       <View style={styles.iconContainer}>
-        <GaloyIcon name="storefront" size={34} color={colors.primary} />
+        <GaloyIcon name="storefront" size={34} color={colors.accent} />
       </View>
       <View style={styles.textContainer}>
         <Text style={styles.amount}>{formattedAmount}</Text>
@@ -227,7 +227,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -236,7 +236,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 8,
   },
   amount: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 20,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",
@@ -244,7 +244,7 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlign: "center",
   },
   merchantName: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
@@ -256,14 +256,14 @@ const useStyles = makeStyles(({ colors }) => ({
   //   gap: 14,
   // },
   helpDescription: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
     lineHeight: 16,
   },
   helpLink: {
-    color: colors.grey2,
+    color: colors.textMuted,
     textDecorationLine: "underline",
   },
 }))

@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Khóa API",
+    "inactiveKeys": "Khóa không hoạt động ({count})",
     "noKeys": "Chưa có khóa API nào",
     "createKey": "Tạo khóa API",
     "createTitle": "Khóa API mới",
@@ -27,10 +28,13 @@
     "revokeTitle": "Thu hồi khóa API?",
     "revokeBody": "\"{name: string}\" sẽ ngừng hoạt động ngay lập tức. Không thể hoàn tác thao tác này.",
     "revoke": "Thu hồi",
+    "revokeGoBack": "Quay lại",
     "revokeSuccess": "Đã thu hồi khóa API",
     "createError": "Không thể tạo khóa API. Vui lòng thử lại.",
     "revokeError": "Không thể thu hồi khóa API. Vui lòng thử lại.",
     "loadError": "Không thể tải các khóa API của bạn. Vui lòng thử lại sau.",
+    "discardSecretTitle": "Hủy bỏ khóa API này?",
+    "discardSecretBody": "Đây là lần duy nhất khóa bí mật được hiển thị. Nếu bạn rời đi bây giờ, khóa sẽ không thể khôi phục và bạn sẽ cần tạo khóa mới.",
     "done": "Xong"
   },
   "GaloyAddressScreen": {
@@ -78,7 +82,12 @@
     "skip": "Bỏ qua",
     "unlock": "Mở khóa",
     "usePin": "Sử dụng PIN",
-    "confirmLogout": "Bạn có chắc muốn đăng xuất không? Điều này sẽ xóa bộ nhớ đệm và tất cả cài đặt người dùng cục bộ"
+    "confirmLogout": "Bạn có chắc muốn đăng xuất không? Điều này sẽ xóa bộ nhớ đệm và tất cả cài đặt người dùng cục bộ",
+    "forgotPin": "Quên PIN? Xóa ví",
+    "removeWalletsTitle": "Xóa ví khỏi thiết bị này?",
+    "removeWalletsBody": "Thao tác này xóa tất cả ví khỏi thiết bị này và đăng xuất bạn. Để lấy lại ví, bạn cần cụm từ khôi phục của ví đó. Nếu không có, ví sẽ bị mất.",
+    "removeWalletsConfirm": "Xóa ví",
+    "removeWalletsFailed": "Không thể xóa một số ví. Vui lòng thử lại."
   },
   "PeopleScreen": {
     "title": "People",
@@ -2133,7 +2142,9 @@
     "selectAll": "Chọn tất cả",
     "clearAll": "Xóa tất cả",
     "addPlace": "Thêm vào bản đồ",
-    "addPlaceTitle": "Thêm địa điểm",
+    "addPlaceTitle": "Đề xuất cửa hàng",
+    "submitPlaceRequest": "Gửi yêu cầu",
+    "showMyLocation": "Hiển thị vị trí của tôi",
     "placePinHint": "Di chuyển bản đồ để đặt ghim lên địa điểm",
     "placeName": "Tên",
     "placeNameHint": "Địa điểm này tên là gì",
@@ -2175,16 +2186,19 @@
     "walletCountNotTwo": "Số ví không phải là 2. Vui lòng sử dụng bảng điều khiển để xem tất cả các ví và tiền trong tài khoản này"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Không thể ghi lại lần thử một cách an toàn.",
+    "attemptsLeft": "Còn lại {attemptsRemaining: number} lần thử.",
     "attemptsRemaining": "Mã PIN không chính xác. Còn lại {attemptsRemaining: number} lần thử.",
     "enterPin": "Nhập mã PIN của bạn",
-    "lockoutUnavailable": "Không thể ghi lại lần thử không thành công một cách an toàn. Đang đăng xuất.",
+    "oneAttemptLeft": "Còn lại 1 lần thử.",
     "oneAttemptRemaining": "Mã PIN không chính xác. Còn lại 1 lần thử .",
     "pinUnreadable": "Không thể kiểm tra mã PIN của bạn. Vui lòng thử lại.",
     "setPin": "Đặt mã PIN của bạn",
     "setPinFailedMatch": "Mã PIN không khớp - Đặt mã PIN của bạn",
     "storePinFailed": "Không thể lưu mã pin của bạn.",
     "tooManyAttempts": "Quá nhiều lần thử không thành công. Đang đăng xuất.",
-    "tryAgainIn": "Thử lại sau {seconds: number} giây.",
+    "attemptBudgetSpent": "Quá nhiều lần thử không thành công.",
+    "tryAgainIn": "Thử lại sau {time: string}.",
     "verifyPin": "Xác minh mã PIN của bạn"
   },
   "PriceHistoryScreen": {
@@ -2219,6 +2233,12 @@
     "error": "Không thể tạo hóa đơn. Vui lòng liên hệ với bộ phận hỗ trợ nếu sự cố này vẫn tiếp diễn.",
     "copyInvoice": "Copy",
     "shareInvoice": "Chia sẻ",
+    "newAddress": "Mới",
+    "newAddressHint": "Tạo một địa chỉ Bitcoin mới. Các địa chỉ trước vẫn hoạt động.",
+    "newAddressGenerated": "Địa chỉ mới đã sẵn sàng. Các địa chỉ trước vẫn hoạt động.",
+    "newAddressFailed": "Không thể tạo địa chỉ mới. Vui lòng thử lại.",
+    "newAddressRateLimited": "Quá nhiều địa chỉ mới. Vui lòng đợi một lúc rồi thử lại.",
+    "onchainAddressLoadFailed": "Không thể tải địa chỉ Bitcoin của bạn. Nhấn Mới để thử lại.",
     "addAmount": "Yêu cầu số tiền cụ thể",
     "expired": "Hóa đơn đã hết hạn",
     "expiresIn": "Hết hạn trong",
@@ -2368,6 +2388,8 @@
     "invalidAmount": "Số tiền không hợp lệ. Vui lòng tạo lại với số tiền hợp lệ.",
     "usernameDoesNotExist": "{lnAddress: string} dường như không phải là địa chỉ {bankName: string} tồn tại.",
     "usernameDoesNotExistAdvice": "Đảm bảo viết đúng chính tả hoặc yêu cầu người nhận cung cấp hóa đơn LN hoặc địa chỉ BTC. ",
+    "destinationUnverifiable": "Hiện chúng tôi không kiểm tra được {lnAddress} — máy chủ của {bankName} không phản hồi.",
+    "destinationUnverifiableAdvice": "Địa chỉ nhiều khả năng vẫn đúng. Hãy thử lại sau giây lát, hoặc xin người nhận hóa đơn LN hay địa chỉ BTC.",
     "selfPaymentError": "{lnAddress: string} là địa chỉ {bankName: string} của bạn.",
     "selfPaymentAdvice": "Nếu bạn muốn gửi tiền đến một tài khoản khác mà bạn sở hữu, bạn có thể sử dụng hóa đơn, địa chỉ LN hoặc BTC để thay thế.",
     "lnAddressError": "Chúng tôi không thể truy cập địa chỉ Lightning này. Nếu bạn chắc chắn rằng nó tồn tại, bạn có thể thử lại sau.",
@@ -2590,12 +2612,14 @@
     "error": "Không thể tải hồ sơ vào lúc này",
     "fromThisDevice": "từ thiết bị này?",
     "switchAccount": "Bạn đã chuyển sang tài khoản khác",
-    "removedAccount": "Bạn đã xóa tài khoản {identifier: string}."
+    "removedAccount": "Bạn đã xóa tài khoản {identifier: string}.",
+    "removeAccount": "Xóa tài khoản"
   },
   "StablesatsRestriction": {
     "walletLabel": "không khả dụng tại khu vực của bạn",
     "anonModeWalletLabel": "không khả dụng ở chế độ Incognito",
-    "unknownRegionWalletLabel": "không thể kiểm tra tình trạng khả dụng, kéo xuống để thử lại"
+    "unknownRegionWalletLabel": "không thể kiểm tra tình trạng khả dụng, kéo xuống để thử lại",
+    "networkWalletLabel": "không khả dụng trên mạng này"
   },
   "AnonModeConvertModal": {
     "title": "Hãy chuyển số dư Đô la của bạn trước",
@@ -2677,7 +2701,7 @@
   "TransactionDetailScreen": {
     "paid": "Trả tiền cho/từ",
     "received": "Bạn đã nhận",
-    "spent": "Bạn đã chi",
+    "sent": "Bạn đã gửi",
     "sending": "Đang gửi",
     "receivingAccount": "Số dư nhận",
     "sendingAccount": "Số dư gửi",
@@ -2753,6 +2777,7 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
+      "serverUnreachable": "Không kết nối được máy chủ địa chỉ. Hãy thử lại sau giây lát.",
       "unknownError": "An unknown error occurred, please try again later",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3047,7 +3072,8 @@
     "problemPersists": "Nếu vấn đề vẫn tiếp diễn liên hệ hỗ trợ.",
     "fatalError": "Xin lỗi, chúng tôi dường như đang gặp sự cố khi tải dữ liệu ứng dụng. Nếu vấn đề vẫn tiếp diễn xin vui lòng liên hệ với hỗ trợ.",
     "showError": "Hiển thị lỗi",
-    "clearAppData": "Clear App Data and Logout"
+    "clearAppData": "Clear App Data and Logout",
+    "screenSecurityUnavailable": "Màn hình này vẫn bị ẩn vì không thể bật tính năng chống chụp màn hình."
   },
   "notifications": {
     "payment": {
@@ -3064,7 +3090,6 @@
     "faq": "FAQ",
     "statusPage": "Status Page",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Support",
     "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
     "emailCopied": "email {email: string} đã sao chép vào bộ nhớ tạm",
@@ -3078,7 +3103,13 @@
     "deleteAccountFromPhone": "Xin chào!, vui lòng đóng tài khoản của tôi. Số điện thoại của tôi là {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "Lưu ý: Việc đóng tài khoản là vĩnh viễn!\nHãy đảm bảo ví không còn tiền trước khi đóng.\nTài khoản đã đóng không thể khôi phục.\nChúng tôi có thể lưu giữ một số hồ sơ theo yêu cầu của pháp luật."
+    "deleteAccountWarning": "Lưu ý: Việc đóng tài khoản là vĩnh viễn!\nHãy đảm bảo ví không còn tiền trước khi đóng.\nTài khoản đã đóng không thể khôi phục.\nChúng tôi có thể lưu giữ một số hồ sơ theo yêu cầu của pháp luật.",
+    "downloadLogs": "Tải nhật ký xuống",
+    "exportLogsTitle": "Chia sẻ nhật ký ví của bạn",
+    "exportLogsBody": "Tệp này giúp bộ phận hỗ trợ xem xét sự cố với ví của bạn. Tệp gồm lịch sử thanh toán (số tiền, hóa đơn và địa chỉ) và mã định danh của mọi ví không lưu ký trên thiết bị này, không chỉ ví này, nhưng không bao giờ gồm cụm từ sao lưu hay khóa. Chỉ chia sẻ với bộ phận hỗ trợ của chúng tôi.",
+    "exportLogsConfirm": "Chia sẻ nhật ký",
+    "noLogsYet": "Chưa có nhật ký để chia sẻ. Mở ví và thử lại.",
+    "exportLogsError": "Không xuất được nhật ký. Vui lòng thử lại."
   },
   "lnurl": {
     "overLimit": "Bạn không thể gửi quá mức tiền tối đa",
@@ -3233,7 +3264,10 @@
       "noLimit": "Không giới hạn",
       "limitUpdateSuccess": "Cập nhật giới hạn thành công",
       "limitUpdateError": "Không thể cập nhật giới hạn",
-      "limitMustBePositive": "Giới hạn phải lớn hơn không"
+      "limitMustBePositive": "Giới hạn phải lớn hơn không",
+      "atmToggleError": "Không thể cập nhật rút ATM",
+      "atmControlsLoadError": "Không thể tải giới hạn ATM",
+      "invalidLimitAmount": "Nhập số tiền hợp lệ, tối đa 2 chữ số thập phân"
     },
     "CardFeeSchedule": {
       "title": "Biểu phí Thẻ Blink",
@@ -3808,7 +3842,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Sao lưu ví của bạn",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Chọn phương thức sao lưu",
@@ -3866,6 +3900,7 @@
     "CloudBackup": {
       "title": "Hãy sao lưu ví của bạn",
       "description": "Chúng tôi sẽ lưu bản sao cụm từ khôi phục của bạn vào {provider} của bạn.",
+      "encryptCheckbox": "Mã hóa bằng mật khẩu bổ sung",
       "password": "Mật khẩu",
       "passwordPlaceholder": "(tối thiểu 12 ký tự)",
       "confirmPassword": "Xác nhận mật khẩu",
@@ -3933,6 +3968,12 @@
     "dollarBalanceModal": {
       "title": "Chúng tôi không thể di chuyển số dư đô la của bạn",
       "body": "Trước tiên hãy rút hết số dư đô la của bạn. Bạn có thể chuyển nó sang số dư Bitcoin trong Blink hoặc nơi khác."
+    },
+    "pendingDepositModal": {
+      "title": "Có một khoản tiền gửi đang chờ xử lý vào tài khoản của bạn",
+      "body": "Bạn không thể chuyển sang loại tài khoản khác cho đến khi tất cả các khoản tiền gửi đang chờ xử lý của bạn được hoàn tất và ghi có vào tài khoản này.",
+      "contactSupportCta": "Liên hệ hỗ trợ",
+      "stillConfirming": "Khoản tiền gửi của bạn chưa được xác nhận. Hãy thử lại sau vài phút."
     },
     "balancesOverview": {
       "title": "Chuyển số dư của bạn",
@@ -4121,6 +4162,7 @@
     "get": "Tải về",
     "storeNote": "“Tải về” sẽ mở App Store hoặc Google Play. Hãy quay lại Blink khi đã cài đặt xong.",
     "haveAnApp": "Tôi đã có ứng dụng",
+    "learnHow": "Tìm hiểu cách",
     "keyInstruction": "Sao chép khóa thiết lập này vào ứng dụng xác thực của bạn.",
     "qrInstruction": "Bạn đang dùng thiết bị khác?\nThay vào đó, hãy quét mã QR này.",
     "backupTitle": "Sao lưu khóa của bạn",
@@ -4207,6 +4249,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Không kết nối được Blink",
+    "unreachableDescription": "{featureName} cần máy chủ của Blink, hiện không phản hồi. Ví và số dư của bạn không bị ảnh hưởng.",
     "featureCircles": "Circles",
     "featureEarn": "Học",
     "featureCard": "Card"
@@ -4229,6 +4273,9 @@
     "tokenTransfer": "Chuyển {token}",
     "payTo": "Thanh toán cho {address}",
     "payment": "Thanh toán"
+  },
+  "SelfCustodialStaleRate": {
+    "satsOnly": "Đang hiển thị sats — không có tỷ giá"
   },
   "SelfCustodialOffline": {
     "title": "Ví đang ngoại tuyến",

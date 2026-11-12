@@ -10,6 +10,7 @@ import CustomModal from "@app/components/custom-modal/custom-modal"
 import { IconHero } from "@app/components/icon-hero"
 import { UNILATERAL_EXIT_CASE_STUDY_URL } from "@app/config"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 import { useRecoveryBundleActions } from "@app/screens/self-custodial/recovery-backup/use-recovery-bundle-actions"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
@@ -104,7 +105,7 @@ export const BundleExportScreen: React.FC = () => {
     >
       <IconHero
         icon="emergency-kit"
-        iconColor={colors._green}
+        iconColor={colors.staticSuccess}
         title={LL.BackupScreen.BundleExport.title()}
         subtitle={LL.BackupScreen.BundleExport.body()}
       />
@@ -122,7 +123,7 @@ export const BundleExportScreen: React.FC = () => {
         isVisible={confirmingDownload}
         toggleModal={() => setConfirmingDownload(false)}
         showCloseIconButton={true}
-        image={<GaloyIcon name="eye-slash" size={52} color={colors.primary} />}
+        image={<GaloyIcon name="eye-slash" size={52} color={colors.accent} />}
         title={LL.BackupScreen.BundleExport.sensitiveTitle()}
         body={
           <Text type="p2" style={styles.modalBody}>
@@ -142,13 +143,13 @@ const useStyles = makeStyles(({ colors }) => ({
   inactiveButton: {
     minHeight: 50,
     opacity: 0.5,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
   },
   inactiveTitle: {
     fontSize: 20,
     lineHeight: 24,
-    fontWeight: "600",
-    color: colors.grey5,
+    fontFamily: fonts.bold,
+    color: colors.textOnAccentDisabled,
   },
   learnMore: {
     paddingTop: 10,

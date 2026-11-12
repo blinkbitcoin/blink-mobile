@@ -178,6 +178,9 @@ export const SetLightningAddressModalUI = ({
     case SetUsernameError.ADDRESS_UNAVAILABLE:
       errorMessage = LL.SetAddressModal.Errors.addressUnavailable()
       break
+    case SetUsernameError.SERVER_UNREACHABLE:
+      errorMessage = LL.SetAddressModal.Errors.serverUnreachable()
+      break
     case SetUsernameError.UNKNOWN_ERROR:
       errorMessage = LL.SetAddressModal.Errors.unknownError()
       break
@@ -206,7 +209,7 @@ export const SetLightningAddressModalUI = ({
               onChangeText={setLnAddress}
               value={lnAddress}
               placeholder={"SatoshiNakamoto"}
-              placeholderTextColor={colors.grey3}
+              placeholderTextColor={colors.textDisabled}
             />
             <Text type={"p1"}>{`@${hostname}`}</Text>
           </View>
@@ -239,7 +242,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 12,
     borderRadius: 8,
     minHeight: 60,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     alignItems: "center",
     justifyContent: "space-between",
   },
@@ -250,7 +253,7 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlignVertical: "center",
     fontSize: 18,
     lineHeight: 24,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   centerAlign: {
     textAlign: "center",

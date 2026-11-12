@@ -1,7 +1,8 @@
 import { useCallback } from "react"
 import { gql } from "@apollo/client"
 
-import { useCardData, useCardEncryption } from "@app/screens/card-screen/hooks"
+import { useCardData } from "@app/hooks"
+import { useCardEncryption } from "@app/screens/card-screen/hooks"
 import { encryptPin } from "@app/screens/card-screen/utils"
 import { useCardPinUpdateMutation } from "@app/graphql/generated"
 import { getErrorMessages } from "@app/graphql/utils"

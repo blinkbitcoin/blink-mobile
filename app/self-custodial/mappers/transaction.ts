@@ -20,7 +20,7 @@ import {
 import { AccountType } from "@app/types/wallet"
 import { toNumber } from "@app/utils/helper"
 
-import { requireSparkTokenIdentifier } from "../config"
+import { sparkTokenIdentifier } from "../config"
 import { recordErrorOnce } from "../logging"
 
 const reportUnhandledEnum = <T>(scope: string, unhandled: unknown, fallback: T): T => {
@@ -119,9 +119,16 @@ export const extractMemo = (payment: Payment): string | undefined => {
      * own advertised text, while the sender's note travels as the LUD-12 comment and is what
      * the SDK stores in lnurlPayInfo.comment. The comment is the user's own note, so it wins
      * over the destination description for history display, matching custodial behaviour.
+     * On the receiving side the LNURL server signs the invoice with a description hash, so
+     * the payer's comment only arrives as lnurlReceiveMetadata.senderComment.
      */
-    const { lnurlPayInfo, description } = payment.details.inner
-    return lnurlPayInfo?.comment ?? description ?? undefined
+    const { lnurlPayInfo, lnurlReceiveMetadata, description } = payment.details.inner
+    return (
+      lnurlPayInfo?.comment ??
+      lnurlReceiveMetadata?.senderComment ??
+      description ??
+      undefined
+    )
   }
 
   if (PaymentDetails.Spark.instanceOf(payment.details)) {
@@ -164,20 +171,21 @@ export const hasConversion = (payment: Payment): boolean =>
   Boolean(payment.conversionDetails) || Boolean(conversionInfoOf(payment))
 
 /**
- * A token payment for anything other than the configured USDB token has no wallet in
- * this app; every surface (history, balances, CSV export) drops it rather than guessing
- * at units, with a deduped breadcrumb so the gap is visible in crash reporting.
+ * A token payment for anything other than the configured USDB token (any token at all on
+ * a network with none configured) has no wallet in this app; every surface (history,
+ * balances, CSV export) drops it rather than guessing at units, with a deduped breadcrumb
+ * so the gap is visible in crash reporting.
  */
 export const isKnownPayment = (payment: Payment): boolean => {
   if (payment.method !== PaymentMethod.Token) return true
   if (!payment.details || !PaymentDetails.Token.instanceOf(payment.details)) return false
-  const expectedIdentifier = requireSparkTokenIdentifier()
+  const expectedIdentifier = sparkTokenIdentifier()
   const observedIdentifier = payment.details.inner.metadata.identifier
   if (observedIdentifier === expectedIdentifier) return true
   recordErrorOnce(
     `spark-unknown-token-payment:${observedIdentifier}`,
     new Error(
-      `Unknown token payment dropped: id=${observedIdentifier} expected=${expectedIdentifier}`,
+      `Unknown token payment dropped: id=${observedIdentifier} expected=${expectedIdentifier ?? "none"}`,
     ),
   )
   return false

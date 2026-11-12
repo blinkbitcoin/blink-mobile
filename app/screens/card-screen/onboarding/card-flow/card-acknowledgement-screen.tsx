@@ -49,7 +49,7 @@ export const CardAcknowledgementScreen: React.FC = () => {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <IconHero
           icon="document-outline"
-          iconColor={colors.primary}
+          iconColor={colors.accent}
           title={acknowledgementLL.title()}
         />
 
@@ -135,11 +135,11 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 18,
   },
   agreementText: {
-    color: colors.black,
+    color: colors.textOnBackground,
     lineHeight: 18,
   },
   link: {
-    color: colors.primary,
+    color: colors.accent,
     fontWeight: "700",
   },
   buttonsContainer: {

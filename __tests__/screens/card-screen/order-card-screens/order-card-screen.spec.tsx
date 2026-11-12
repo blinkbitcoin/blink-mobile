@@ -74,7 +74,7 @@ const mockAddress = {
 }
 
 const mockUseCardData = jest.fn()
-jest.mock("@app/screens/card-screen/hooks", () => ({
+jest.mock("@app/hooks/use-card-data", () => ({
   useCardData: () => mockUseCardData(),
 }))
 
@@ -116,7 +116,11 @@ describe("OrderCardScreen", () => {
     loadLocale("en")
     jest.clearAllMocks()
     mockAddListener.mockReturnValue(jest.fn())
-    mockCreateCard.mockResolvedValue({ lastFour: "1234", cardType: "PHYSICAL" })
+    mockCreateCard.mockResolvedValue({
+      id: "new-card",
+      lastFour: "1234",
+      cardType: "PHYSICAL",
+    })
     mockUseCardData.mockReturnValue({
       card: { id: "card-1" },
       hasPhysicalCard: false,
@@ -292,7 +296,7 @@ describe("OrderCardScreen", () => {
         iconName: "delivery",
         iconColor: expect.any(String),
         lastFour: "1234",
-        holderName: "",
+        cardId: "new-card",
       })
     })
 

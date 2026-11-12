@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Kunci API",
+    "inactiveKeys": "Kunci tidak aktif ({count})",
     "noKeys": "Belum ada kunci API",
     "createKey": "Cipta kunci API",
     "createTitle": "Kunci API baharu",
@@ -19,18 +20,21 @@
     "expiryNever": "Tidak pernah",
     "expiresOn": "Tamat tempoh pada {date: string}",
     "neverExpires": "Tidak pernah tamat tempoh",
-    "revoked": "Dibatalkan",
+    "revoked": "Ditarik balik",
     "expired": "Tamat tempoh pada {date: string}",
     "expiredNoDate": "Tamat tempoh",
     "secretWarning": "Ini satu-satunya kali kunci ditunjukkan. Salin atau kongsikannya sekarang dan simpan dengan selamat.",
     "secretCopied": "Kunci API disalin. Papan keratan dikosongkan dalam 1 minit",
-    "revokeTitle": "Batalkan kunci API?",
+    "revokeTitle": "Tarik balik kunci API?",
     "revokeBody": "\"{name: string}\" akan berhenti berfungsi serta-merta. Tindakan ini tidak boleh dibatalkan.",
-    "revoke": "Batalkan",
-    "revokeSuccess": "Kunci API dibatalkan",
+    "revoke": "Tarik balik",
+    "revokeGoBack": "Kembali",
+    "revokeSuccess": "Kunci API ditarik balik",
     "createError": "Tidak dapat mencipta kunci API. Sila cuba lagi.",
-    "revokeError": "Tidak dapat membatalkan kunci API. Sila cuba lagi.",
+    "revokeError": "Tidak dapat menarik balik kunci API. Sila cuba lagi.",
     "loadError": "Tidak dapat memuatkan kunci API anda. Sila cuba lagi kemudian.",
+    "discardSecretTitle": "Buang kunci API ini?",
+    "discardSecretBody": "Ini satu-satunya kali rahsia ditunjukkan. Jika anda pergi sekarang, kunci tidak dapat dipulihkan dan anda perlu membuat yang baharu.",
     "done": "Selesai"
   },
   "GaloyAddressScreen": {
@@ -78,7 +82,12 @@
     "skip": "Langkau",
     "unlock": "Buka",
     "usePin": "Gunakan PIN",
-    "confirmLogout": "Adakah anda pasti mahu log keluar? Ini akan menetapkan semula cache dan semua tetapan pengguna tempatan anda"
+    "confirmLogout": "Adakah anda pasti mahu log keluar? Ini akan menetapkan semula cache dan semua tetapan pengguna tempatan anda",
+    "forgotPin": "Lupa PIN? Alih keluar dompet",
+    "removeWalletsTitle": "Alih keluar dompet daripada peranti ini?",
+    "removeWalletsBody": "Ini mengalih keluar semua dompet daripada peranti ini dan log keluar anda. Untuk mendapatkan semula dompet, anda memerlukan frasa pemulihannya. Tanpanya, dompet itu hilang.",
+    "removeWalletsConfirm": "Alih keluar dompet",
+    "removeWalletsFailed": "Sesetengah dompet tidak dapat dialih keluar. Sila cuba lagi."
   },
   "PeopleScreen": {
     "title": "Kenalan",
@@ -2133,7 +2142,9 @@
     "selectAll": "Pilih semua",
     "clearAll": "Kosongkan semua",
     "addPlace": "Tambah ke peta",
-    "addPlaceTitle": "Tambah tempat",
+    "addPlaceTitle": "Cadangkan perniagaan",
+    "submitPlaceRequest": "Hantar permintaan",
+    "showMyLocation": "Tunjukkan lokasi saya",
     "placePinHint": "Gerakkan peta untuk meletakkan penanda pada tempat itu",
     "placeName": "Nama",
     "placeNameHint": "Nama tempat ini",
@@ -2175,16 +2186,19 @@
     "walletCountNotTwo": "Bilangan dompet bukan 2. Sila gunakan papan pemuka untuk melihat semua dompet dan dana akaun ini"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Tidak dapat merekod percubaan dengan selamat.",
+    "attemptsLeft": "{attemptsRemaining: number} kali lagi percubaan.",
     "attemptsRemaining": "Salah No PIN. {Percubaan yang tinggal: number} kali lagi percubaan.",
     "enterPin": "Masukkan kod PIN anda",
-    "lockoutUnavailable": "Tidak dapat merekod percubaan yang gagal dengan selamat. Daftar keluar sekarang",
+    "oneAttemptLeft": "1 lagi percubaan.",
     "oneAttemptRemaining": "Salah no PIN. 1 lagi percubaan.",
     "pinUnreadable": "Tidak dapat menyemak PIN anda. Sila cuba lagi.",
     "setPin": "Tetapkan kod PIN anda",
     "setPinFailedMatch": "Pin tak sama - Tetapkan kod PIN anda",
     "storePinFailed": "Tak boleh nak simpan kod pin anda.",
     "tooManyAttempts": "Terlalu banyak percubaan yang gagal. Daftar keluar sekarang",
-    "tryAgainIn": "Cuba lagi dalam {seconds: number} s.",
+    "attemptBudgetSpent": "Terlalu banyak percubaan yang gagal.",
+    "tryAgainIn": "Cuba lagi dalam {time: string}.",
     "verifyPin": "Sahkan kod PIN anda"
   },
   "PriceHistoryScreen": {
@@ -2219,6 +2233,12 @@
     "error": "Gagal untuk menjana invois. Sila berhubung dengan tim sokongan\njika masalah ini tetap berlaku",
     "copyInvoice": "Salin",
     "shareInvoice": "Kongsi",
+    "newAddress": "Baharu",
+    "newAddressHint": "Menjana alamat Bitcoin baharu. Alamat sebelumnya masih berfungsi.",
+    "newAddressGenerated": "Alamat baharu sedia. Alamat sebelumnya masih berfungsi.",
+    "newAddressFailed": "Tidak dapat menjana alamat baharu. Sila cuba lagi.",
+    "newAddressRateLimited": "Terlalu banyak alamat baharu. Tunggu sebentar dan cuba lagi.",
+    "onchainAddressLoadFailed": "Tidak dapat memuatkan alamat Bitcoin anda. Ketik Baharu untuk cuba lagi.",
     "addAmount": "Mohon amaun yang spesifik",
     "expired": "Invois ni telah tamat tempoh",
     "expiresIn": "Tamat tempoh dalam",
@@ -2368,6 +2388,8 @@
     "invalidAmount": "Amaun yang salah. Mohon buat semula amaun yang tepat.",
     "usernameDoesNotExist": "Alamat {lnAddress: string} tak sama macam alamat {bankName: string} yang ada",
     "usernameDoesNotExistAdvice": "Pastikan ejaan betul atau minta penerima invois LN atau alamat BTC",
+    "destinationUnverifiable": "Kami tidak dapat menyemak {lnAddress} sekarang — pelayan {bankName} tidak memberi respons.",
+    "destinationUnverifiableAdvice": "Alamat itu berkemungkinan besar betul. Cuba lagi sebentar, atau minta penerima memberikan invois LN atau alamat BTC.",
     "selfPaymentError": "{lnAddress: string} adalah alamat {bankName: string} anda",
     "selfPaymentAdvice": "Jika anda nak hantar wang kepada akaun lain kepunyaan anda, anda boleh gunakan invois, LN atau alamat BTC ",
     "lnAddressError": "Kami tak dapat nak capai alamat LN ini. Jika anda pasti alamat ini betul, sila cuba lagi.",
@@ -2590,12 +2612,14 @@
     "error": "Tidak dapat mendapatkan profil pada masa ini",
     "fromThisDevice": "dari peranti ini?",
     "switchAccount": "Anda telah bertukar ke akaun lain",
-    "removedAccount": "Anda telah mengalih keluar akaun {identifier: string}."
+    "removedAccount": "Anda telah mengalih keluar akaun {identifier: string}.",
+    "removeAccount": "Alih keluar akaun"
   },
   "StablesatsRestriction": {
     "walletLabel": "tidak tersedia di rantau anda",
     "anonModeWalletLabel": "tidak tersedia dalam mod Incognito",
-    "unknownRegionWalletLabel": "ketersediaan tidak dapat disemak, tarik ke bawah untuk cuba lagi"
+    "unknownRegionWalletLabel": "ketersediaan tidak dapat disemak, tarik ke bawah untuk cuba lagi",
+    "networkWalletLabel": "tidak tersedia di rangkaian ini"
   },
   "AnonModeConvertModal": {
     "title": "Pindahkan baki Dolar anda dahulu",
@@ -2677,7 +2701,7 @@
   "TransactionDetailScreen": {
     "paid": "Bayar kepada/daripada",
     "received": "Anda dah terima",
-    "spent": "Anda dah belanjakan",
+    "sent": "Anda dah hantar",
     "sending": "Menghantar",
     "receivingAccount": "Akaun penerimaan",
     "sendingAccount": "Akaun penghantar",
@@ -2753,6 +2777,7 @@
       "tooLong": "Panjang alamat maksimum adalah 50 aksara",
       "invalidCharacter": "Alamat hanya boleh mengandungi huruf, nombor dan underscores sahaja",
       "addressUnavailable": "Maaf, alamat ini sudah ada pemiliknya ",
+      "serverUnreachable": "Tidak dapat menghubungi pelayan alamat. Cuba lagi sebentar.",
       "unknownError": "Ada masalah yang belum dikenal pasti berlaku, sila cuba lagi sekali.",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3047,7 +3072,8 @@
     "problemPersists": "Jika masalah tidak selesai, hubungi pasukan sokongan",
     "fatalError": "Maafkan kami, kami sedang hadapi masalah ketika menyediakan data aplikasi ini. Jika masalah belum selesai, sila hubungi pasukan sokongan.",
     "showError": "Pamerkan Masalah",
-    "clearAppData": "Padan Data Aplikasi dan Log Keluar"
+    "clearAppData": "Padan Data Aplikasi dan Log Keluar",
+    "screenSecurityUnavailable": "Skrin ini kekal tersembunyi kerana perlindungan tangkapan skrin tidak dapat dihidupkan."
   },
   "notifications": {
     "payment": {
@@ -3064,7 +3090,6 @@
     "faq": "Soalan Yang Sering Diajukan",
     "statusPage": "Status Halaman",
     "telegram": "Telegram",
-    "mattermost": "Paling penting",
     "defaultEmailSubject": "Sokongan - {bankName: string}",
     "defaultSupportMessage": "Hai! Saya perlukan bantuan daripada {bankName: string}, Saya menggunakan versi {version: string} pada {os: string}.",
     "emailCopied": "emel {email: string} telah disalin ke clipboard",
@@ -3078,7 +3103,13 @@
     "deleteAccountFromPhone": "Hai!, sila tutup akaun saya. Nombor telefon saya adalah {phoneNumber: string}.",
     "deleteAccountError": "Sesuatu yang salah telah berlaku  Hubungi {email: string} untuk bantuan lanjut.",
     "bye": "Selamat tinggal!",
-    "deleteAccountWarning": "Perhatian: Penutupan akaun adalah kekal!\nPastikan dompet tiada dana sebelum menutup.\nAkaun yang ditutup tidak boleh dipulihkan.\nKami mungkin menyimpan rekod tertentu sebagaimana dikehendaki oleh undang-undang."
+    "deleteAccountWarning": "Perhatian: Penutupan akaun adalah kekal!\nPastikan dompet tiada dana sebelum menutup.\nAkaun yang ditutup tidak boleh dipulihkan.\nKami mungkin menyimpan rekod tertentu sebagaimana dikehendaki oleh undang-undang.",
+    "downloadLogs": "Muat turun log",
+    "exportLogsTitle": "Kongsi log dompet anda",
+    "exportLogsBody": "Fail ini membantu pasukan sokongan kami menyiasat masalah dompet anda. Ia mengandungi sejarah pembayaran (jumlah, invois dan alamat) serta pengecam setiap dompet bukan kustodial pada peranti ini, bukan hanya yang ini, tetapi tidak pernah frasa sandaran atau kunci anda. Kongsikan hanya dengan pasukan sokongan kami.",
+    "exportLogsConfirm": "Kongsi log",
+    "noLogsYet": "Belum ada log untuk dikongsi. Buka dompet anda dan cuba lagi.",
+    "exportLogsError": "Tidak dapat mengeksport log. Sila cuba lagi."
   },
   "lnurl": {
     "overLimit": "Tak boleh hantar lebih daripada jumlah maksimum anda",
@@ -3233,7 +3264,10 @@
       "noLimit": "Tiada had",
       "limitUpdateSuccess": "Had berjaya dikemas kini",
       "limitUpdateError": "Gagal mengemas kini had",
-      "limitMustBePositive": "Had mestilah lebih besar daripada sifar"
+      "limitMustBePositive": "Had mestilah lebih besar daripada sifar",
+      "atmToggleError": "Gagal mengemas kini pengeluaran ATM",
+      "atmControlsLoadError": "Gagal memuatkan had ATM anda",
+      "invalidLimitAmount": "Masukkan jumlah yang sah dengan paling banyak 2 perpuluhan"
     },
     "CardFeeSchedule": {
       "title": "Jadual yuran Kad Blink",
@@ -3808,7 +3842,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Sandarkan dompet anda",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Pilih kaedah sandaran anda",
@@ -3866,6 +3900,7 @@
     "CloudBackup": {
       "title": "Mari sandarkan dompet anda",
       "description": "Kami akan menyimpan sandaran frasa pemulihan anda ke {provider} anda.",
+      "encryptCheckbox": "Sulitkan dengan kata laluan tambahan",
       "password": "Kata laluan",
       "passwordPlaceholder": "(minimum 12 aksara)",
       "confirmPassword": "Sahkan kata laluan",
@@ -3933,6 +3968,12 @@
     "dollarBalanceModal": {
       "title": "Kami tidak dapat memindahkan Baki Dolar anda",
       "body": "Kosongkan Baki Dolar anda terlebih dahulu. Anda boleh memindahkannya ke Baki Bitcoin dalam Blink atau ke tempat lain."
+    },
+    "pendingDepositModal": {
+      "title": "Terdapat deposit yang belum selesai ke akaun anda",
+      "body": "Anda tidak boleh berpindah ke jenis akaun lain sebelum semua deposit anda yang belum selesai diselesaikan dan dikreditkan ke akaun ini.",
+      "contactSupportCta": "Hubungi sokongan",
+      "stillConfirming": "Deposit anda belum disahkan. Cuba lagi dalam beberapa minit."
     },
     "balancesOverview": {
       "title": "Pindahkan baki anda",
@@ -4121,6 +4162,7 @@
     "get": "Dapatkan",
     "storeNote": "“Dapatkan” membuka App Store atau Google Play. Kembali ke Blink apabila aplikasi telah dipasang.",
     "haveAnApp": "Saya sudah ada aplikasi",
+    "learnHow": "Ketahui caranya",
     "keyInstruction": "Salin kunci persediaan ini ke dalam aplikasi authenticator anda.",
     "qrInstruction": "Menggunakan peranti lain?\nImbas kod QR ini sebagai gantinya.",
     "backupTitle": "Sandarkan kunci anda",
@@ -4207,6 +4249,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink tidak dapat dihubungi",
+    "unreachableDescription": "{featureName} memerlukan pelayan Blink, yang tidak memberi respons buat masa ini. Dompet dan dana anda tidak terjejas.",
     "featureCircles": "Circles",
     "featureEarn": "Belajar",
     "featureCard": "Card"
@@ -4229,6 +4273,9 @@
     "tokenTransfer": "Pemindahan {token}",
     "payTo": "Bayar kepada {address}",
     "payment": "Pembayaran"
+  },
+  "SelfCustodialStaleRate": {
+    "satsOnly": "Memaparkan sats — tiada kadar pertukaran tersedia"
   },
   "SelfCustodialOffline": {
     "title": "Dompet luar talian",

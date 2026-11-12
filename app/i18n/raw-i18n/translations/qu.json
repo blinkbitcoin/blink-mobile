@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API llavekuna",
+    "inactiveKeys": "Mana llamk'aq llavekuna ({count})",
     "noKeys": "Manaraq API llavekuna kanchu",
     "createKey": "API llaveta ruray",
     "createTitle": "Musuq API llave",
@@ -27,10 +28,13 @@
     "revokeTitle": "API llaveta chinkachiyta munankichu?",
     "revokeBody": "\"{name: string}\" utqaylla mana llamk'anqañachu. Kayqa mana kutichiy atinchu.",
     "revoke": "Chinkachiy",
+    "revokeGoBack": "Kutiy",
     "revokeSuccess": "API llave chinkachisqa",
     "createError": "API llave mana rurayta atikurqanchu. Yapamanta ruray.",
     "revokeError": "API llave mana chinkachiyta atikurqanchu. Yapamanta ruray.",
     "loadError": "API llavekuna mana cargayta atikurqanchu. Qhipaman ruray.",
+    "discardSecretTitle": "¿Kay API llave-ta wikch'unkichu?",
+    "discardSecretBody": "Kayllam secreto rikuchisqa kanqa. Kunan ripuspaqa llave-ta manam kutichiy atinki, chaymi musuq-ta ruwanayki kanqa.",
     "done": "Tukusqa"
   },
   "GaloyAddressScreen": {
@@ -78,7 +82,12 @@
     "skip": "Atipanichu",
     "unlock": "Churay",
     "usePin": "PIN tukuyta",
-    "confirmLogout": "¿Chiqaptachu lluqsiyta munankí? Kayqa cache nisqata tukuy local ruwachikunatapas qallarimanta churanqa"
+    "confirmLogout": "¿Chiqaptachu lluqsiyta munankí? Kayqa cache nisqata tukuy local ruwachikunatapas qallarimanta churanqa",
+    "forgotPin": "PIN qunqarqankichu? Qullqikuqkunata qichuy",
+    "removeWalletsTitle": "Kay aparatomanta qullqikuqkunata qichuykuchu?",
+    "removeWalletsBody": "Kayqa tukuy qullqikuqkunata kay aparatomanta qichun, hinallataq lluqsichisunki. Huk qullqikuqta kutichinaykipaqqa, waqaychay siminta munanki. Mana chayqa, qullqikuqqa chinkanmi.",
+    "removeWalletsConfirm": "Qullqikuqkunata qichuy",
+    "removeWalletsFailed": "Wakin qullqikuqkunataqa mana qichuyta atikurqanchu. Huktawan kallpachakuy."
   },
   "PeopleScreen": {
     "title": "People",
@@ -2133,7 +2142,9 @@
     "selectAll": "Llapanta akllay",
     "clearAll": "Llapanta pichay",
     "addPlace": "Pacha mapaman yapay",
-    "addPlaceTitle": "Huk cheqasta yapay",
+    "addPlaceTitle": "Qhatuta willay",
+    "submitPlaceRequest": "Mañakuyta apachiy",
+    "showMyLocation": "Maypi kasqayta rikuchiy",
     "placePinHint": "Pacha mapata kuyuchiy chay cheqaman t'ipana churanaykipaq",
     "placeName": "Suti",
     "placeNameHint": "Imaynatas chay cheqa sutichasqa",
@@ -2175,16 +2186,19 @@
     "walletCountNotTwo": "Walleta yupayqa mana 2 kanchu. Ama hina kaspa dashboard nisqata llamk'achiy tukuy walletakunata qullqikunatapas qhawanaykipaq"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Manam allinta waqaychayta atirqanchu kutita.",
+    "attemptsLeft": "{attemptsRemaining: number} rantiq kani.",
     "attemptsRemaining": "Mana kani PIN. {attemptsRemaining: number} rantiq kani.",
     "enterPin": "PIN kodiykita yaykuchiy",
-    "lockoutUnavailable": "Manam allinta waqaychayta atirqanchu pantasqa kutita. Chiqanichu.",
+    "oneAttemptLeft": "1 rantiq kani.",
     "oneAttemptRemaining": "Mana kani PIN. 1 rantiq kani.",
     "pinUnreadable": "Manam PIN nikita qhawayta atirqanchu. Wakmanta ruwaykuy.",
     "setPin": "PIN kodiyan kani",
     "setPinFailedMatch": "PIN kodiyan mana kani - PIN kodiyan kani.",
     "storePinFailed": "Ñuqa PIN kodiyan kawsayninkuqa mana kani.",
     "tooManyAttempts": "Rantiq kawsayninkuqa hukllaqmi. Chiqanichu.",
-    "tryAgainIn": "Wakmanta ruwaykuy {seconds: number} s qhipata.",
+    "attemptBudgetSpent": "Rantiq kawsayninkuqa hukllaqmi.",
+    "tryAgainIn": "Wakmanta ruwaykuy {time: string} qhipata.",
     "verifyPin": "PIN qillqinmi qhipanichu"
   },
   "PriceHistoryScreen": {
@@ -2219,6 +2233,12 @@
     "error": "Invoice kawsayniyta qillqata sutichinaqinmi. Chaskisqa kaniyta yachanakuyta sutichaqta munanpi ch'usaq kayniyta rikuy munanpi kawsayniyta qillqata sutichinaqinmi.",
     "copyInvoice": "Copy",
     "shareInvoice": "Ch'usaq k'iru",
+    "newAddress": "Musuq",
+    "newAddressHint": "Musuq Bitcoin tiyanata ruran. Ñawpaq tiyanakunaqa llamk'allanmi.",
+    "newAddressGenerated": "Musuq tiyana listoñam. Ñawpaq tiyanakunaqa llamk'allanmi.",
+    "newAddressFailed": "Manam musuq tiyanata ruraytachu atikurqan. Huktawan kallpachakuy.",
+    "newAddressRateLimited": "Nisyu musuq tiyanakuna. Asllata suyay, huktawan kallpachakuy.",
+    "onchainAddressLoadFailed": "Manam Bitcoin tiyanaykita apamuyta atikurqanchu. Musuqta ñit'iy huktawan kallpachakunaykipaq.",
     "addAmount": "Ch'usaq kayniyta sutichaq",
     "expired": "Qillqa chhikan",
     "expiresIn": "Munanpi chhikan",
@@ -2368,6 +2388,8 @@
     "invalidAmount": "Chaynamanta kaniyta rikuyta munanpi, chaypi kawsayniyta qillqata sutichinaqinmi ch'usaq kayniyta rikuyta munanpi. Ñuqaqa ch'usaq kayniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi yachanakuyta sutichqin.",
     "usernameDoesNotExist": "{lnAddress: string} kaniyta rikuyta munanpi, {bankName: string} kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi impuyta. ",
     "usernameDoesNotExistAdvice": "Kaniyta yachanakuyta sutichinaqinmi k'anchaypi yachanakuyta sutichqinmi, chaynamanta kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi LN invoice kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi BTC kaniyta rikuyta munanpi yachanakuyta sutichqinmi.",
+    "destinationUnverifiable": "Kunanqa mana {lnAddress} qhawayta atinikuchu — {bankName} servidorkuna mana kutichinkuchu.",
+    "destinationUnverifiableAdvice": "Direccionqa allinpunichá. Pisi pachamanta yapamanta ruray, icha chaskiqmanta LN invoice utaq BTC direccion mañakuy.",
     "selfPaymentError": "{lnAddress: string} kaniyta rikuyta munanpi, kawsayniyta qillqata sutichinaqinmi {bankName: string} kaniyta rikuyta munanpi.",
     "selfPaymentAdvice": "Ñuqaqa kaniyta rikuyta munanpi, ñuqaqa kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi kaniyta yachanakuyta sutichinaqinmi, invoice, LN kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi BTC kaniyta rikuyta munanpi yachanakuyta sutichqinmi.",
     "lnAddressError": "Chaynamanta kaniyta rikuyta munanpi, Lightning kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi impuyta. Ñuqaqa kaniyta rikuyta munanpi kayniyta qillqata sutichinaqinmi, chaynamanta kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuchiy.",
@@ -2590,12 +2612,14 @@
     "error": "Kay pachapi perfilkunata mana apamuyta atiyku",
     "fromThisDevice": "¿kay aparatomanta?",
     "switchAccount": "Huk cuentaman tikrarqanki",
-    "removedAccount": "{identifier: string} cuentata qichurqanki."
+    "removedAccount": "{identifier: string} cuentata qichurqanki.",
+    "removeAccount": "Cuentata qichuy"
   },
   "StablesatsRestriction": {
     "walletLabel": "mana kapunchu suyuykipi",
     "anonModeWalletLabel": "mana Incognito modopi kanchu",
-    "unknownRegionWalletLabel": "manam kasqanta qhawayta atikurqanchu, uraman aysay yapamanta yanaykunaykipaq"
+    "unknownRegionWalletLabel": "manam kasqanta qhawayta atikurqanchu, uraman aysay yapamanta yanaykunaykipaq",
+    "networkWalletLabel": "kay llika-pi mana kanchu"
   },
   "AnonModeConvertModal": {
     "title": "Ñawpaqta Dolar qullqiykita astay",
@@ -2677,7 +2701,7 @@
   "TransactionDetailScreen": {
     "paid": "Riqsichiy",
     "received": "Yachachichiy",
-    "spent": "Qallarichiy",
+    "sent": "Apachirqanki",
     "sending": "Apachishaspa",
     "receivingAccount": "Kawsayniyta qillqata sutichinaqin yachachinaqin sutiyuq",
     "sendingAccount": "Kawsayniyta yachachinaqin qillqata sutiyuq",
@@ -2753,6 +2777,7 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
+      "serverUnreachable": "Mana direccion servidorman chayayta atinchu. Pisi pachamanta yapamanta ruray.",
       "unknownError": "An unknown error occurred, please try again later",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3047,7 +3072,8 @@
     "problemPersists": "Kawsayninmanta, kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi, llank'ayta kani.",
     "fatalError": "Ñuqaqmi, kaypiqa, kawsayninmanta, aplicacionta kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi. Ñuqaqmi, kawsayninmanta, kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi, llank'ayta kani.",
     "showError": "Llank'ayta kani",
-    "clearAppData": "Puriytaqmi hanaq p'anta kullaywanmi k'uchuchuni"
+    "clearAppData": "Puriytaqmi hanaq p'anta kullaywanmi k'uchuchuni",
+    "screenSecurityUnavailable": "Kay pantallaqa pakasqallam qhepan, pantalla capturakunamanta amachayta mana hap'ichiyta atisqanrayku."
   },
   "notifications": {
     "payment": {
@@ -3064,7 +3090,6 @@
     "faq": "FAQ",
     "statusPage": "P'anqakuna Yupaychay",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Yachanakuy",
     "defaultSupportMessage": "¡Juyayay! Qanqa atipuni {bankName: string}piyta kani, {os: string}ta allinmi version {version: string}ninchikmi. Kaypi yachanichu.",
     "emailCopied": "Imayna {email: string} qillqanman yuraqchanku chimpusqan.",
@@ -3078,7 +3103,13 @@
     "deleteAccountFromPhone": "Napaykuy!, ama hina kaspa cuentayta wichq'ay. Teléfono numeroyqa {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "Yuyay: Cuenta wichq'ayqa wiñaypaqmi!\nWichq'aypa ñawpaqta walletakunapi mana qullqi kananpaq chiqapchay.\nWichq'asqa cuentaqa mana kutichiy atikunchu.\nIcha wakin willakuykunata waqaychaykuymi ley kamasqan."
+    "deleteAccountWarning": "Yuyay: Cuenta wichq'ayqa wiñaypaqmi!\nWichq'aypa ñawpaqta walletakunapi mana qullqi kananpaq chiqapchay.\nWichq'asqa cuentaqa mana kutichiy atikunchu.\nIcha wakin willakuykunata waqaychaykuymi ley kamasqan.",
+    "downloadLogs": "Qillqakunata urquy",
+    "exportLogsTitle": "Qullqikuqniykipa qillqakunanta qunakuy",
+    "exportLogsBody": "Kay willañiqi yanapan yanapaqkunata qullqikuqniykikunapi sasachakuykunata qhaway. Paypiqa pagay wiñay (chaninkuna, facturas, direccionkuna) hinallataq kay dispositivopi llapa mana waqaychasqa qullqikuqniypa sutichaynin, manan kaylla chu, ichaqa manan waqaychana rimaykuna nitaq llavekuna. Yanapaqkunallawan qunakuy.",
+    "exportLogsConfirm": "Qillqakunata qunakuy",
+    "noLogsYet": "Manaraq qillqakuna kanchu qunanapaq. Qullqikuqniykita kichay, watiqmanta ruway.",
+    "exportLogsError": "Qillqakunataqa manam hurquyta atirqanichu. Hukmanta kallpachakuy."
   },
   "lnurl": {
     "overLimit": "Monto yachanapaq kachkanman.",
@@ -3233,7 +3264,10 @@
       "noLimit": "Mana limitayuq",
       "limitUpdateSuccess": "Limite allinlla musuqyachisqa",
       "limitUpdateError": "Mana atikurqanchu limite musuqyachiyta",
-      "limitMustBePositive": "Limite nisqaqa cero nisqamanta hatunraq kanan"
+      "limitMustBePositive": "Limite nisqaqa cero nisqamanta hatunraq kanan",
+      "atmToggleError": "Mana atikurqanchu ATM hurquykunata musuqyachiyta",
+      "atmControlsLoadError": "Mana atikurqanchu ATM limitekunata apamuyta",
+      "invalidLimitAmount": "Allin qullqita qillqay, 2 decimalkama"
     },
     "CardFeeSchedule": {
       "title": "Blink tarjeta pagana lista",
@@ -3808,7 +3842,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Qullqikuqniykita waqaychay",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Akllay imayna waqaychanaykita",
@@ -3866,6 +3900,7 @@
     "CloudBackup": {
       "title": "Qullqikuqniykita waqaychasun",
       "description": "Waqaychay simiykipa huknin kaqta {provider} nisqaykiman waqaychasaqku.",
+      "encryptCheckbox": "Yapay contraseñawan pakay",
       "password": "Contraseña",
       "passwordPlaceholder": "(pisi kaptinpas 12 sanampakuna)",
       "confirmPassword": "Contraseñata takyachiy",
@@ -3933,6 +3968,12 @@
     "dollarBalanceModal": {
       "title": "Manam dólar qullqiykita astayta atinikuchu",
       "body": "Ñawpaqta dólar qullqiykita ch'usaqyachiy. Blinkpi Bitcoin qullqiykiman utaq huk lawman apachiyta atinki."
+    },
+    "pendingDepositModal": {
+      "title": "Kuentaykiman huk depósito suyachkan",
+      "body": "Manam huk laya kuentaman astakuyta atinkichu, llapan suyachkaq depósitoykikuna kay kuentaman chayamunankama.",
+      "contactSupportCta": "Yanapaqwan rimay",
+      "stillConfirming": "Depósitoykiqa manaraqmi takyachisqachu. Huk iskay minutomanta yapamanta ruray."
     },
     "balancesOverview": {
       "title": "Qullqiykita astiy",
@@ -4121,6 +4162,7 @@
     "get": "Uraqichiy",
     "storeNote": "“Uraqichiy” App Store utaq Google Play nisqata kichan. Churasqaña kaptin Blinkman kutimuy.",
     "haveAnApp": "Appniyuqmi kani",
+    "learnHow": "Imaynatam yachay",
     "keyInstruction": "Kay churana llaveta autenticador appykiman kopiyay.",
     "qrInstruction": "Huk aparatota llamk'achichkankichu?\nAswanpas kay QR códigota escaneay.",
     "backupTitle": "Llaveykita waqaychay",
@@ -4207,6 +4249,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink mana chayanachu",
+    "unreachableDescription": "{featureName} Blink servidorkunata munan, kunanqa mana kutichinkuchu. Walletniyki qullqiykipas mana imananchu.",
     "featureCircles": "Circles",
     "featureEarn": "Yachay",
     "featureCard": "Card"
@@ -4229,6 +4273,9 @@
     "tokenTransfer": "{token} apachiynin",
     "payTo": "{address}man pagay",
     "payment": "Pagay"
+  },
+  "SelfCustodialStaleRate": {
+    "satsOnly": "Sats-pi rikuchisqa — mana chaninchay yupay kanchu"
   },
   "SelfCustodialOffline": {
     "title": "Wallet manan conexionniyuqchu",

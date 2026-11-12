@@ -3,8 +3,10 @@ import { Linking, StyleSheet } from "react-native"
 import type { ReactTestInstance } from "react-test-renderer"
 
 import { render, fireEvent, screen, waitFor } from "@testing-library/react-native"
+import { createTheme, ThemeProvider } from "@rn-vui/themed"
 
 import { UNILATERAL_EXIT_CASE_STUDY_URL } from "@app/config"
+import { light } from "@app/rne-theme/colors"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import type { TranslationFunctions } from "@app/i18n/i18n-types"
@@ -181,6 +183,33 @@ describe("BundleExportScreen", () => {
       expect(isDrawnInactive(button)).toBe(true)
       fireEvent.press(button)
       expect(mockToastShow).toHaveBeenCalledTimes(1)
+    })
+
+    /** surfaceInteractive and textOnAccentDisabled share a value today, so the
+     *  real palette cannot tell which token the label picked. Distinct
+     *  sentinels can. */
+    it("draws the inactive label in textOnAccentDisabled, like a disabled primary button", () => {
+      const SURFACE_INTERACTIVE = "#0000B2"
+      const TEXT_ON_ACCENT_DISABLED = "#0000F2"
+      const sentinelTheme = createTheme({
+        lightColors: {
+          ...light,
+          surfaceInteractive: SURFACE_INTERACTIVE,
+          textOnAccentDisabled: TEXT_ON_ACCENT_DISABLED,
+        },
+        mode: "light",
+      })
+      mockActions.bundleState = null
+      render(
+        <ContextForScreen>
+          <ThemeProvider theme={sentinelTheme}>
+            <BundleExportScreen />
+          </ThemeProvider>
+        </ContextForScreen>,
+      )
+
+      const label = screen.getByText(LL.BackupScreen.BundleExport.download())
+      expect(StyleSheet.flatten(label.props.style).color).toBe(TEXT_ON_ACCENT_DISABLED)
     })
 
     it("looks active once the wallet has a bundle", () => {

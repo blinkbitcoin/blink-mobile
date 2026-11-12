@@ -8,7 +8,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { headerRightNoGlass } from "@app/components/header-no-glass"
+import { headerIconTouchArea, headerRightNoGlass } from "@app/components/header-no-glass"
 import { useEnhancedModePrompt } from "@app/components/enhanced-mode-prompt"
 import {
   RestrictedRegionBanner,
@@ -46,6 +46,7 @@ import { TxLimits } from "./settings/account-tx-limits"
 import { FeeRatesSetting } from "./settings/fee-rates"
 import { ApiAccessSetting } from "./settings/advanced-api-access"
 import { ExportCsvSetting } from "./settings/advanced-export-csv"
+import { ExportLogsSetting } from "./settings/advanced-export-logs"
 import { JoinCommunitySetting } from "./settings/community-join"
 import { NeedHelpSetting } from "./settings/community-need-help"
 import { CurrencySetting } from "./settings/preferences-currency"
@@ -160,7 +161,7 @@ export const SettingsScreen: React.FC = () => {
       BackupWalletSetting,
       EmergencyBundleSetting,
     ],
-    advanced: [ExportCsvSetting, ApiAccessSetting],
+    advanced: [ExportCsvSetting, ExportLogsSetting, ApiAccessSetting],
     community: [NeedHelpSetting, JoinCommunitySetting],
   }
 
@@ -172,8 +173,11 @@ export const SettingsScreen: React.FC = () => {
         ?.unacknowledgedStatefulNotificationsWithoutBulletinEnabledCount || 0
     navigation.setOptions(
       headerRightNoGlass(() => (
-        <TouchableOpacity onPress={() => navigation.navigate("notificationHistory")}>
-          <GaloyIcon name="bell" size={24} style={styles.headerRight} />
+        <TouchableOpacity
+          style={styles.headerRight}
+          onPress={() => navigation.navigate("notificationHistory")}
+        >
+          <GaloyIcon name="bell" size={24} />
           {count !== 0 && (
             <Text
               type="p4"
@@ -196,8 +200,8 @@ export const SettingsScreen: React.FC = () => {
             title={LL.BackupNudge.title()}
             description={LL.BackupNudge.settingsWarning()}
             onPress={() => navigation.navigate("selfCustodialBackupMethod")}
-            borderColor="primary"
-            titleColor="primary"
+            borderColor="accent"
+            titleColor="accent"
           />
         )}
         {shouldShowTwoFactorBanner && <TwoFactorBanner />}
@@ -219,8 +223,9 @@ export const SettingsScreen: React.FC = () => {
           name={LL.common.securityAndPrivacy()}
           items={items.securityAndPrivacy}
         />
-        {/* Rows gate themselves by account mode (CSV export branches, API access is
-            custodial-only) and SettingsGroup collapses when every row returns null. */}
+        {/* Rows gate themselves by account type (CSV export branches, logs are
+            self-custodial-only, API access is custodial-only) and SettingsGroup
+            collapses when every row returns null. */}
         <SettingsGroup name={LL.common.advanced()} items={items.advanced} />
         <SettingsGroup name={LL.common.support()} items={items.community} />
         <VersionComponent />
@@ -238,15 +243,18 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "column",
     rowGap: 18,
   },
+  // The 48dp box centres the 24dp bell, 12dp in from each edge: the margin and the
+  // badge offsets are the old ones less those 12dp, so neither moves.
   headerRight: {
-    marginRight: 12,
+    ...headerIconTouchArea,
+    marginRight: 0,
   },
   notificationCount: {
     position: "absolute",
     right: 9,
-    top: -3,
-    color: colors._darkGrey,
-    backgroundColor: colors.black,
+    top: 9,
+    color: colors.staticDarkGrey,
+    backgroundColor: colors.textOnBackground,
     textAlign: "center",
     verticalAlign: "middle",
     height: 14,

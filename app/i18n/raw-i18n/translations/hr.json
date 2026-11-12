@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API ključevi",
+    "inactiveKeys": "Neaktivni ključevi ({count})",
     "noKeys": "Još nema API ključeva",
     "createKey": "Stvori API ključ",
     "createTitle": "Novi API ključ",
@@ -27,10 +28,13 @@
     "revokeTitle": "Opozvati API ključ?",
     "revokeBody": "\"{name: string}\" odmah će prestati raditi. Ovo se ne može poništiti.",
     "revoke": "Opozovi",
+    "revokeGoBack": "Natrag",
     "revokeSuccess": "API ključ opozvan",
     "createError": "API ključ nije moguće stvoriti. Pokušajte ponovno.",
     "revokeError": "API ključ nije moguće opozvati. Pokušajte ponovno.",
     "loadError": "Vaše API ključeve nije moguće učitati. Pokušajte kasnije.",
+    "discardSecretTitle": "Odbaciti ovaj API ključ?",
+    "discardSecretBody": "Ovo je jedini put da se tajna prikazuje. Ako sada odete, ključ se neće moći vratiti i morat ćete stvoriti novi.",
     "done": "Gotovo"
   },
   "GaloyAddressScreen": {
@@ -78,7 +82,12 @@
     "skip": "Preskoči",
     "unlock": "Otključaj",
     "usePin": "Koristi PIN",
-    "confirmLogout": "Jeste li sigurni da se želite odjaviti? Ovo će resetirati vašu predmemoriju i sve lokalne korisničke postavke"
+    "confirmLogout": "Jeste li sigurni da se želite odjaviti? Ovo će resetirati vašu predmemoriju i sve lokalne korisničke postavke",
+    "forgotPin": "Zaboravili ste PIN? Uklonite novčanike",
+    "removeWalletsTitle": "Ukloniti novčanike s ovog uređaja?",
+    "removeWalletsBody": "Ovo uklanja sve novčanike s ovog uređaja i odjavljuje vas. Da biste vratili novčanik, trebate njegovu sigurnosnu frazu. Bez nje novčanik je izgubljen.",
+    "removeWalletsConfirm": "Ukloni novčanike",
+    "removeWalletsFailed": "Neke novčanike nije bilo moguće ukloniti. Pokušajte ponovno."
   },
   "PeopleScreen": {
     "title": "Ljudi",
@@ -2133,7 +2142,9 @@
     "selectAll": "Odaberi sve",
     "clearAll": "Očisti sve",
     "addPlace": "Dodaj na kartu",
-    "addPlaceTitle": "Dodaj mjesto",
+    "addPlaceTitle": "Predloži lokal",
+    "submitPlaceRequest": "Pošalji zahtjev",
+    "showMyLocation": "Prikaži moju lokaciju",
     "placePinHint": "Pomaknite kartu tako da pribadača bude na mjestu",
     "placeName": "Naziv",
     "placeNameHint": "Kako se mjesto zove",
@@ -2175,16 +2186,19 @@
     "walletCountNotTwo": "Broj novčanika nije 2. Molimo koristite nadzornu ploču za pregled svih novčanika i sredstava ovog računa"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Pokušaj nije moguće sigurno zabilježiti.",
+    "attemptsLeft": "{attemptsRemaining: number} preostalih pokušaja.",
     "attemptsRemaining": "Netočan PIN. {attemptsRemaining: number} preostalih pokušaja.",
     "enterPin": "Unesite svoj PIN kod",
-    "lockoutUnavailable": "Neuspjeli pokušaj nije moguće sigurno zabilježiti. Odjava.",
+    "oneAttemptLeft": "Preostao je 1 pokušaj.",
     "oneAttemptRemaining": "Netočan PIN. Preostao je 1 pokušaj.",
     "pinUnreadable": "Nije moguće provjeriti vaš PIN. Pokušajte ponovno.",
     "setPin": "Postavite svoj PIN kod",
     "setPinFailedMatch": "Pinovi se ne podudaraju - postavite svoj PIN kod",
     "storePinFailed": "Nije moguće pohraniti vaš PIN.",
     "tooManyAttempts": "Previše neuspjelih pokušaja. Odjava.",
-    "tryAgainIn": "Pokušajte ponovno za {seconds: number} s.",
+    "attemptBudgetSpent": "Previše neuspjelih pokušaja.",
+    "tryAgainIn": "Pokušajte ponovno za {time: string}.",
     "verifyPin": "Potvrdite svoj PIN kod"
   },
   "PriceHistoryScreen": {
@@ -2219,6 +2233,12 @@
     "error": "Generiranje fakture nije uspjelo. Obratite se podršci ako se ovaj problem nastavi pojavljivati.",
     "copyInvoice": "Kopiraj",
     "shareInvoice": "Podijeli",
+    "newAddress": "Nova",
+    "newAddressHint": "Stvara novu Bitcoin adresu. Prethodne adrese i dalje rade.",
+    "newAddressGenerated": "Nova adresa je spremna. Prethodne adrese i dalje rade.",
+    "newAddressFailed": "Nije moguće stvoriti novu adresu. Pokušajte ponovno.",
+    "newAddressRateLimited": "Previše novih adresa. Pričekajte malo i pokušajte ponovno.",
+    "onchainAddressLoadFailed": "Nije moguće učitati vašu Bitcoin adresu. Dodirnite Nova za ponovni pokušaj.",
     "addAmount": "Zatraži određeni iznos",
     "expired": "Faktura je istekla",
     "expiresIn": "Istječe za",
@@ -2368,6 +2388,8 @@
     "invalidAmount": "Ovo sadrži nevažeći iznos. Molimo regenerirajte s valjanim iznosom.",
     "usernameDoesNotExist": "Čini se da {lnAddress: string} nije adresa {bankName: string} koja postoji.",
     "usernameDoesNotExistAdvice": "Provjerite je li pravopis točan ili umjesto toga tražite od primatelja LN fakturu ili BTC adresu.",
+    "destinationUnverifiable": "Trenutačno nismo mogli provjeriti {lnAddress} — poslužitelji {bankName} ne odgovaraju.",
+    "destinationUnverifiableAdvice": "Adresa je vjerojatno ispravna. Pokušajte ponovno za trenutak ili zatražite od primatelja LN račun ili BTC adresu.",
     "selfPaymentError": "{lnAddress: string} je vaša {bankName: string} adresa.",
     "selfPaymentAdvice": "Ako želite poslati novac na drugi račun koji posjedujete, umjesto toga možete koristiti fakturu, LN ili BTC adresu.",
     "lnAddressError": "Ne možemo doći do ove Lightning adrese. Ako ste sigurni da postoji, možete pokušati ponovno kasnije.",
@@ -2590,12 +2612,14 @@
     "error": "Trenutno nije moguće dohvatiti profile",
     "fromThisDevice": "s ovog uređaja?",
     "switchAccount": "Prebacili ste se na drugi račun",
-    "removedAccount": "Uklonili ste račun {identifier: string}."
+    "removedAccount": "Uklonili ste račun {identifier: string}.",
+    "removeAccount": "Ukloni račun"
   },
   "StablesatsRestriction": {
     "walletLabel": "nije dostupan u vašoj regiji",
     "anonModeWalletLabel": "nije dostupno u Incognito načinu",
-    "unknownRegionWalletLabel": "dostupnost nije bilo moguće provjeriti, povucite prema dolje za ponovni pokušaj"
+    "unknownRegionWalletLabel": "dostupnost nije bilo moguće provjeriti, povucite prema dolje za ponovni pokušaj",
+    "networkWalletLabel": "nije dostupno na ovoj mreži"
   },
   "AnonModeConvertModal": {
     "title": "Najprije prenesite svoj dolarski saldo",
@@ -2677,7 +2701,7 @@
   "TransactionDetailScreen": {
     "paid": "Plaćeno za/od",
     "received": "Primili ste",
-    "spent": "Potrošili ste",
+    "sent": "Poslali ste",
     "sending": "Slanje",
     "receivingAccount": "Račun primatelj",
     "sendingAccount": "Račun pošiljatelj",
@@ -2753,6 +2777,7 @@
       "tooLong": "Adresa mora imati najviše 50 znakova",
       "invalidCharacter": "Adresa može sadržavati samo slova, brojke i donje crte",
       "addressUnavailable": "Nažalost, ova adresa je već zauzeta",
+      "serverUnreachable": "Poslužitelj adresa nije dostupan. Pokušajte ponovno za trenutak.",
       "unknownError": "Došlo je do nepoznate pogreške, molimo pokušajte ponovno kasnije",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3047,7 +3072,8 @@
     "problemPersists": "Ako se problem nastavi, obratite se podršci.",
     "fatalError": "Nažalost, čini se da imamo problema s učitavanjem podataka aplikacije. Ako problemi potraju, kontaktirajte podršku.",
     "showError": "Prikaži pogrešku",
-    "clearAppData": "Izbrišite podatke aplikacije i odjavite se"
+    "clearAppData": "Izbrišite podatke aplikacije i odjavite se",
+    "screenSecurityUnavailable": "Ovaj zaslon ostaje skriven jer nije bilo moguće uključiti zaštitu od snimki zaslona."
   },
   "notifications": {
     "payment": {
@@ -3064,7 +3090,6 @@
     "faq": "Česta pitanja",
     "statusPage": "Stranica statusa",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Podrška",
     "defaultSupportMessage": "Bok! Trebam pomoć s {bankName: string}, koristim verziju {version: string} na {os: string}.",
     "emailCopied": "e-pošta {email: string} kopirana u međuspremnik",
@@ -3078,7 +3103,13 @@
     "deleteAccountFromPhone": "Pozdrav!, molim vas zatvorite moj račun. Moj broj telefona je {phoneNumber: string}.",
     "deleteAccountError": "Nešto je pošlo po zlu. Kontaktirajte {email: string} za dodatnu pomoć.",
     "bye": "Pozdrav!",
-    "deleteAccountWarning": "Pažnja: Zatvaranje računa je trajno!\nPrije zatvaranja provjerite da novčanici nemaju sredstava.\nZatvoreni račun nije moguće vratiti.\nMožemo zadržati određene zapise kako zahtijeva zakon."
+    "deleteAccountWarning": "Pažnja: Zatvaranje računa je trajno!\nPrije zatvaranja provjerite da novčanici nemaju sredstava.\nZatvoreni račun nije moguće vratiti.\nMožemo zadržati određene zapise kako zahtijeva zakon.",
+    "downloadLogs": "Preuzmi zapise",
+    "exportLogsTitle": "Podijelite zapise novčanika",
+    "exportLogsBody": "Ova datoteka pomaže našem timu za podršku da istraži probleme s vašim novčanicima. Sadrži povijest plaćanja (iznose, račune i adrese) i identifikatore svakog novčanika bez skrbništva na ovom uređaju, ne samo ovog, ali nikada vaše pričuvne fraze ni ključeve. Podijelite je samo s našim timom za podršku.",
+    "exportLogsConfirm": "Podijelite zapise",
+    "noLogsYet": "Još nema zapisa za dijeljenje. Otvorite novčanik i pokušajte ponovno.",
+    "exportLogsError": "Nije moguće izvesti zapise. Pokušajte ponovno."
   },
   "lnurl": {
     "overLimit": "Ne možete poslati više od maksimalnog iznosa",
@@ -3233,7 +3264,10 @@
       "noLimit": "Bez ograničenja",
       "limitUpdateSuccess": "Ograničenje uspješno ažurirano",
       "limitUpdateError": "Nije moguće ažurirati ograničenje",
-      "limitMustBePositive": "Ograničenje mora biti veće od nule"
+      "limitMustBePositive": "Ograničenje mora biti veće od nule",
+      "atmToggleError": "Nije moguće ažurirati podizanja na bankomatu",
+      "atmControlsLoadError": "Nije moguće učitati ograničenja za bankomat",
+      "invalidLimitAmount": "Unesite ispravan iznos s najviše 2 decimale"
     },
     "CardFeeSchedule": {
       "title": "Raspored naknada Blink kartice",
@@ -3808,7 +3842,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Napravite sigurnosnu kopiju novčanika",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Odaberite metodu sigurnosne kopije",
@@ -3866,6 +3900,7 @@
     "CloudBackup": {
       "title": "Napravimo sigurnosnu kopiju vašeg novčanika",
       "description": "Spremit ćemo kopiju vaše sigurnosne fraze u vaš {provider}.",
+      "encryptCheckbox": "Šifriraj dodatnom lozinkom",
       "password": "Lozinka",
       "passwordPlaceholder": "(najmanje 12 znakova)",
       "confirmPassword": "Potvrdi lozinku",
@@ -3933,6 +3968,12 @@
     "dollarBalanceModal": {
       "title": "Ne možemo migrirati vaš dolarski saldo",
       "body": "Najprije ispraznite svoj dolarski saldo. Možete ga prenijeti na svoj Bitcoin saldo u Blinku ili drugamo."
+    },
+    "pendingDepositModal": {
+      "title": "Na vašem računu je uplata na čekanju",
+      "body": "Ne možete migrirati na drugu vrstu računa dok sve vaše uplate na čekanju ne budu podmirene i pripisane ovom računu.",
+      "contactSupportCta": "Kontaktiraj podršku",
+      "stillConfirming": "Vaša uplata još nije potvrđena. Pokušajte ponovno za nekoliko minuta."
     },
     "balancesOverview": {
       "title": "Premjesti svoj saldo",
@@ -4121,6 +4162,7 @@
     "get": "Preuzmi",
     "storeNote": "„Preuzmi“ otvara App Store ili Google Play. Vratite se u Blink kada se aplikacija instalira.",
     "haveAnApp": "Imam aplikaciju",
+    "learnHow": "Saznaj kako",
     "keyInstruction": "Kopirajte ovaj ključ za postavljanje u svoju aplikaciju za autentifikaciju.",
     "qrInstruction": "Koristite drugi uređaj?\nUmjesto toga skenirajte ovaj QR kod.",
     "backupTitle": "Napravite sigurnosnu kopiju ključa",
@@ -4207,6 +4249,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink nije dostupan",
+    "unreachableDescription": "{featureName} treba Blinkove poslužitelje, koji trenutačno ne odgovaraju. Vaš novčanik i sredstva nisu pogođeni.",
     "featureCircles": "Circles",
     "featureEarn": "Učenje",
     "featureCard": "Card"
@@ -4229,6 +4273,9 @@
     "tokenTransfer": "{token} prijenos",
     "payTo": "Plati na {address}",
     "payment": "Plaćanje"
+  },
+  "SelfCustodialStaleRate": {
+    "satsOnly": "Prikaz u satima — tečaj nije dostupan"
   },
   "SelfCustodialOffline": {
     "title": "Novčanik je izvan mreže",

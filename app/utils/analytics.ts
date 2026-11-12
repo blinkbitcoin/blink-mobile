@@ -9,6 +9,11 @@ import { ValidatePhoneCodeErrorsType } from "@app/screens/phone-auth-screen"
 import { InvoiceType } from "@app/screens/receive-bitcoin-screen/payment/index.types"
 import { ParseDestinationResult } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import {
+  isCustodialAnalyticsDomain,
+  reportCustodialEvent,
+} from "@app/self-custodial/analytics-identity"
+import { measure, ScEvent } from "@app/self-custodial/measurement"
+import {
   AuthenticatorApp,
   LoginMethod,
   SetupKeyBackupOption,
@@ -81,14 +86,41 @@ export const logUpgradeLoginSuccess = () => {
   analytics().logEvent("upgrade_login_success")
 }
 
-export const logParseDestinationResult = (parsedDestination: ParseDestinationResult) => {
+/** A custodial-era event, sent only once GA4 is under the custodial identity (held through
+ *  a transition to it) and never for a self-custodial account. */
+const logCustodialEvent = (name: string, params: Record<string, unknown>) =>
+  reportCustodialEvent(() => analytics().logEvent(name, params))
+
+/** A self-custodial parse reports as sc_payment_destination_parsed, which its own gate
+ *  sends only for an Enhanced account; the payment_destination_* events stay custodial. */
+const measureParsedDestination = (parsedDestination: ParseDestinationResult) => {
   if (parsedDestination.valid) {
-    analytics().logEvent("payment_destination_accepted", {
+    measure(ScEvent.PaymentDestinationParsed, {
+      valid: true,
+      payment_type: parsedDestination.validDestination.paymentType,
+      direction: parsedDestination.destinationDirection,
+    })
+    return
+  }
+  measure(ScEvent.PaymentDestinationParsed, {
+    valid: false,
+    payment_type: parsedDestination.invalidPaymentDestination.paymentType,
+    reason: parsedDestination.invalidReason,
+  })
+}
+
+export const logParseDestinationResult = (parsedDestination: ParseDestinationResult) => {
+  if (!isCustodialAnalyticsDomain()) {
+    measureParsedDestination(parsedDestination)
+    return
+  }
+  if (parsedDestination.valid) {
+    logCustodialEvent("payment_destination_accepted", {
       paymentType: parsedDestination.validDestination.paymentType,
       direction: parsedDestination.destinationDirection,
     })
   } else {
-    analytics().logEvent("payment_destination_rejected", {
+    logCustodialEvent("payment_destination_rejected", {
       reason: parsedDestination.invalidReason,
       paymentType: parsedDestination.invalidPaymentDestination.paymentType,
     })
@@ -100,8 +132,9 @@ type LogPaymentAttemptParams = {
   sendingWallet: WalletCurrency
 }
 
+/** Custodial only: a self-custodial send reports through its sc_payment_send_* events. */
 export const logPaymentAttempt = (params: LogPaymentAttemptParams) => {
-  analytics().logEvent("payment_attempt", {
+  logCustodialEvent("payment_attempt", {
     payment_type: params.paymentType,
     sending_wallet: params.sendingWallet,
   })
@@ -113,8 +146,9 @@ type LogPaymentResultParams = {
   paymentStatus: PaymentSendResult | null | undefined
 }
 
+/** Custodial only, like `logPaymentAttempt`. */
 export const logPaymentResult = (params: LogPaymentResultParams) => {
-  analytics().logEvent("payment_result", {
+  logCustodialEvent("payment_result", {
     payment_type: params.paymentType,
     sending_wallet: params.sendingWallet,
     payment_status: params.paymentStatus,
@@ -126,8 +160,9 @@ type LogConversionAttemptParams = {
   receivingWallet: WalletCurrency
 }
 
+/** Custodial only: a self-custodial swap reports through its sc_swap_* events. */
 export const logConversionAttempt = (params: LogConversionAttemptParams) => {
-  analytics().logEvent("conversion_attempt", {
+  logCustodialEvent("conversion_attempt", {
     sending_wallet: params.sendingWallet,
     receiving_wallet: params.receivingWallet,
   })
@@ -138,8 +173,9 @@ type LogConversionResultParams = {
   receivingWallet: WalletCurrency
   paymentStatus: PaymentSendResult
 }
+/** Custodial only, like `logConversionAttempt`. */
 export const logConversionResult = (params: LogConversionResultParams) => {
-  analytics().logEvent("conversion_result", {
+  logCustodialEvent("conversion_result", {
     sending_wallet: params.sendingWallet,
     receiving_wallet: params.receivingWallet,
     payment_status: params.paymentStatus,

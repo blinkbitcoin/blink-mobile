@@ -12,6 +12,7 @@ import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useAppConfig } from "@app/hooks"
 import useLogout from "@app/hooks/use-logout"
+import { useLogoutAndRoute } from "@app/hooks/use-logout-and-route"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
@@ -47,6 +48,7 @@ export const Delete = () => {
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { logout } = useLogout()
+  const { routeAfterLogout } = useLogoutAndRoute()
   const { appConfig } = useAppConfig()
   const { switchToNextProfile } = useSwitchToNextProfile()
 
@@ -139,6 +141,9 @@ export const Delete = () => {
 
         const outcome = await switchToNextProfile(accountToDeleteToken)
         const hasSwitched = outcome === SwitchProfileOutcome.Switched
+        /** Kept until a logout says otherwise: no logout ran means no lock was dropped,
+         *  and the switched path leaves the session it moved to in front of it. */
+        let isAppLockKeptByLogout = true
         if (!hasSwitched) {
           // The logout erases every saved session, which is only correct once
           // we know there is none left. An unreadable store is ignorance, not
@@ -147,10 +152,14 @@ export const Delete = () => {
           // list, so it can still be offered and will 401 once. Cheaper than
           // erasing sessions that were only invisible.
           const isStoreUnreadable = outcome === SwitchProfileOutcome.ProfilesUnreadable
-          await logout({
+          const { isAppLockKept } = await logout({
             stateToDefault: true,
             preserveStoredCredentials: isStoreUnreadable,
           })
+          /** Carried to the dialog rather than acted on here: the way out is taken when
+           *  the farewell is acknowledged, and a lock kept over a wallet the device still
+           *  stores is owed an answer before the landing screen offers it again. */
+          isAppLockKeptByLogout = isAppLockKept
         }
 
         Alert.alert(LL.support.bye(), LL.support.deleteAccountConfirmation(), [
@@ -158,10 +167,7 @@ export const Delete = () => {
             text: LL.common.ok(),
             onPress: () => {
               if (!hasSwitched) {
-                navigation.reset({
-                  index: 0,
-                  routes: [{ name: "getStarted" }],
-                })
+                routeAfterLogout(isAppLockKeptByLogout)
               }
             },
           },
@@ -201,7 +207,7 @@ export const Delete = () => {
       isVisible={modalVisible}
       onBackdropPress={closeModal}
       backdropOpacity={0.8}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       avoidKeyboard={true}
     >
       <View style={styles.view}>
@@ -218,7 +224,7 @@ export const Delete = () => {
           onChangeText={setText}
           value={text}
           placeholder={LL.support.delete()}
-          placeholderTextColor={colors.grey3}
+          placeholderTextColor={colors.textDisabled}
         />
         <View style={styles.actionButtons}>
           <GaloyPrimaryButton
@@ -261,7 +267,7 @@ export const Delete = () => {
 const useStyles = makeStyles(({ colors }) => ({
   view: {
     marginHorizontal: 20,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     padding: 20,
     borderRadius: 20,
     display: "flex",
@@ -270,9 +276,9 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   textInput: {
     fontSize: 16,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     padding: 12,
-    color: colors.black,
+    color: colors.textOnBackground,
     borderRadius: 8,
   },
   actionButtons: {
@@ -282,6 +288,6 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "space-between",
   },
   warningText: {
-    color: colors.primary,
+    color: colors.accent,
   },
 }))

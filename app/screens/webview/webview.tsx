@@ -4,7 +4,7 @@ import { injectJs, onMessageHandler } from "react-native-webln"
 import { WebView, WebViewMessageEvent, WebViewNavigation } from "react-native-webview"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { headerLeftNoGlass } from "@app/components/header-no-glass"
+import { headerIconTouchArea, headerLeftNoGlass } from "@app/components/header-no-glass"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { openExternalUrl } from "@app/utils/external"
@@ -105,11 +105,11 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
     navigation.setOptions({
       ...headerLeftNoGlass(() => (
         <TouchableOpacity style={styles.iconContainer} onPress={handleBackPress}>
-          <GaloyIcon name="caret-left" size={20} color={colors.black} />
+          <GaloyIcon name="caret-left" size={20} color={colors.textOnBackground} />
         </TouchableOpacity>
       )),
     })
-  }, [navigation, handleBackPress, LL, styles.iconContainer, colors.black])
+  }, [navigation, handleBackPress, LL, styles.iconContainer, colors.textOnBackground])
 
   React.useEffect(() => {
     if (entryAllowed) return
@@ -274,7 +274,11 @@ const useStyles = makeStyles(({ colors }) => ({
   iconContainer: {
     // native-stack wraps headerLeft in react-native-screens' ScreenStackHeaderLeftView,
     // which already applies the standard leading inset (both iOS bar-button items and
-    // Android). An extra marginLeft stacks on top and pushes the glyph ~10px right, so
-    // no margin here. (The old JS stack had no such inset, hence the previous marginLeft:10.)
+    // Android). An extra marginLeft stacks on top and pushes the glyph ~10px right.
+    // (The old JS stack had no such inset, hence the previous marginLeft:10.)
+    // The 48dp touch box holds the caret against its left edge, so the caret stays at
+    // the inset and the box reaches right from there.
+    ...headerIconTouchArea,
+    alignItems: "flex-start",
   },
 }))

@@ -37,23 +37,23 @@ export const GaloyButtonField = ({
     switch (true) {
       case error:
         colorStyles = {
-          backgroundColor: colors.error9,
+          backgroundColor: colors.errorBackground,
         }
         break
       case pressed:
         colorStyles = {
-          backgroundColor: colors.primary4,
+          backgroundColor: colors.accent3,
         }
         break
       case disabled:
         colorStyles = {
           opacity: 0.3,
-          backgroundColor: colors.primary5,
+          backgroundColor: colors.accent4,
         }
         break
       default:
         colorStyles = {
-          backgroundColor: colors.primary5,
+          backgroundColor: colors.accent4,
         }
     }
 
@@ -91,7 +91,7 @@ export const GaloyButtonField = ({
             style={styles.iconStyle}
             name={iconName}
             size={20}
-            color={error ? colors.error : colors.primary}
+            color={error ? colors.error : colors.accent}
           />
         )}
       </View>

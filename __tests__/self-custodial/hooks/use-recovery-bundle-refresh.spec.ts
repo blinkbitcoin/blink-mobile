@@ -221,6 +221,10 @@ describe("useRecoveryBundleRefresh", () => {
       expect(mockCrashlyticsLog).toHaveBeenCalledWith(
         expect.stringContaining("stale mark failed"),
       )
+      /** Storage errors can carry a path naming the account: only their kind is kept. */
+      expect(mockCrashlyticsLog).not.toHaveBeenCalledWith(
+        expect.stringContaining("storage unavailable"),
+      )
       expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(1)
     })
 

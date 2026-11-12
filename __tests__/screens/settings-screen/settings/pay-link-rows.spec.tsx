@@ -40,7 +40,9 @@ jest.mock("@app/hooks/use-effective-display-currency", () => ({
 }))
 
 jest.mock("@rn-vui/themed", () => ({
-  useTheme: () => ({ theme: { colors: { primary: "#fc5805", black: "#000" } } }),
+  useTheme: () => ({
+    theme: { colors: { accent: "#fc5805", textOnBackground: "#000" } },
+  }),
 }))
 
 // The labels come from the real English source rather than literals so the mock

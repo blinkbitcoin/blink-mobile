@@ -2,13 +2,13 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { AppState } from "react-native"
 
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useBackoffRetry } from "@app/hooks/use-backoff-retry"
 import { type NormalizedTransaction } from "@app/types/transaction"
 import { ActiveWalletStatus, type WalletState } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
+import { logBreadcrumb } from "@app/utils/error-reporting"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { withTimeout } from "@app/utils/with-timeout"
 
@@ -18,10 +18,13 @@ import {
   getUserSettings,
   initSdk,
   removeSdkEventListener,
+  SdkStorageRetiredError,
 } from "../bridge"
 import { storageDirFor } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
+import { measureObservedPayment } from "../measurement"
 import {
+  extractObservedPayment,
   paymentEventKey,
   paymentIdFromEventKey,
   PAYMENT_RECEIVED_EVENTS,
@@ -41,6 +44,7 @@ import {
   mergeOrderedTransactions,
 } from "../providers/wallet-snapshot"
 
+import { useLnurlServer } from "./use-lnurl-server"
 import { useSparkNetwork } from "./use-spark-network"
 
 type SdkLifecycleState = {
@@ -85,6 +89,7 @@ export const useSdkLifecycle = (
   retryCount: number,
 ): SdkLifecycleState => {
   const network = useSparkNetwork()
+  const { domain: lnurlDomain } = useLnurlServer()
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
   const [wallets, setWallets] = useState<WalletState[]>([])
   const [allTransactions, setAllTransactions] = useState<NormalizedTransaction[]>([])
@@ -168,7 +173,7 @@ export const useSdkLifecycle = (
           if (OFFLINE_EXEMPT_STATUSES.includes(prev)) return prev
           if (onlineState === OnlineState.Offline) return ActiveWalletStatus.Offline
           if (onlineState === OnlineState.Unknown) {
-            crashlytics().log(
+            logBreadcrumb(
               `[SparkSDK] connectivity check failed; preserving previous status`,
             )
             if (prev === ActiveWalletStatus.Loading) return ActiveWalletStatus.Error
@@ -211,16 +216,21 @@ export const useSdkLifecycle = (
   }, [resetBackoff, scheduleBackoffRetry])
 
   useEffect(() => {
+    /** All of this belongs to the account it was read for, paging included: the next
+     *  account starts from its own first page, and a page still loading for the previous
+     *  one must not hold its pagination back. */
+    setWallets([])
+    setAllTransactions([])
+    setHasMoreTransactions(false)
+    setLoadingMore(false)
+    rawTxOffsetRef.current = 0
+
     if (!activeSelfCustodialAccountId) {
       setStatus(ActiveWalletStatus.Unavailable)
-      setWallets([])
-      setAllTransactions([])
       return
     }
 
     setStatus(ActiveWalletStatus.Loading)
-    setWallets([])
-    setAllTransactions([])
 
     let mounted = true
     abortRef.current = false
@@ -232,6 +242,7 @@ export const useSdkLifecycle = (
         storageDir: storageDirFor(accountId, network),
         network,
         leewaySatPerVbyte: depositClaimLeewayRef.current,
+        lnurlDomain,
       })
       if (abortRef.current || !mounted) {
         await teardownSdk(connectedSdk, null)
@@ -244,6 +255,12 @@ export const useSdkLifecycle = (
 
       const listenerId = await addSdkEventListener(connectedSdk, async (event) => {
         if (!mounted) return
+
+        /** Ahead of the refresh filter: a failed send is not a refresh event, but it is
+         *  the only word a pending send gets of its failure. Gated to Enhanced inside. */
+        const observedPayment = extractObservedPayment(event)
+        if (observedPayment) measureObservedPayment(observedPayment)
+
         if (!REFRESH_EVENTS.has(event.tag)) return
 
         if (PAYMENT_RECEIVED_EVENTS.has(event.tag)) {
@@ -272,11 +289,22 @@ export const useSdkLifecycle = (
     }
 
     const initialize = async () => {
-      const mnemonic = await KeyStoreWrapper.getMnemonicForAccount(accountId)
-      if (!mnemonic) {
+      const stored = await KeyStoreWrapper.readMnemonicWithStatus(accountId)
+      // A keystore that could not answer is not an account without a wallet.
+      // Unavailable is terminal for this account, so scoring a transient
+      // failure as such tells the user their wallet is gone, which Error does
+      // not. Recovery from here is not automatic though: the backoff retry is
+      // armed inside refreshWallets and gated on a live SDK, and this path
+      // never connected one.
+      if (stored.status === "failed") {
+        if (mounted) setStatus(ActiveWalletStatus.Error)
+        return
+      }
+      if (stored.status === "absent") {
         if (mounted) setStatus(ActiveWalletStatus.Unavailable)
         return
       }
+      const mnemonic = stored.value
 
       const networkValid = await validateStoredNetwork(accountId, network)
       if (!networkValid) {
@@ -284,11 +312,17 @@ export const useSdkLifecycle = (
         return
       }
 
-      if (mounted) setStatus(ActiveWalletStatus.Loading)
+      /** The account can change while the mnemonic and network are read: deleting a
+       *  wallet switches away from it first. A cancelled run must not connect at all,
+       *  or it writes the deleted wallet's lines past the log cut. */
+      if (!mounted) return
+      setStatus(ActiveWalletStatus.Loading)
       await connectAndListen(mnemonic)
     }
 
     initialize().catch((err) => {
+      // initSdk refused a wallet that is being deleted; nothing went wrong
+      if (err instanceof SdkStorageRetiredError) return
       logSdkEvent(SdkLogLevel.Error, `SDK init failed: ${err}`)
       reportError("SDK init", err)
       if (mounted) setStatus(ActiveWalletStatus.Error)
@@ -311,6 +345,13 @@ export const useSdkLifecycle = (
         reportError("SDK cleanup", err)
       })
     }
+    /* `lnurlDomain` is deliberately out of this array. It is a pure function of
+       `network`, which is in it, so in a release build it cannot change without also
+       changing something that already re-runs this. The one case that would move it
+       alone is the developer outage switch, and tearing down a connected wallet to
+       apply a debug toggle is a worse trade than asking for a reload — which is what
+       the developer screen's control says to do. */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [retryCount, refreshWallets, activeSelfCustodialAccountId, resetBackoff, network])
 
   useEffect(() => {
@@ -336,10 +377,16 @@ export const useSdkLifecycle = (
   }, [refreshWallets])
 
   const loadMore = useCallback(async () => {
-    if (!sdkRef.current || loadingMore || !hasMoreTransactions) return
+    const sdk = sdkRef.current
+    if (!sdk || loadingMore || !hasMoreTransactions) return
+    /** A page asked of a connection that an account switch has since replaced belongs to
+     *  the account the user left: merging it would list that account's payments under the
+     *  new one, and settling it would end a page the new account may be loading itself. */
+    const isStale = () => sdkRef.current !== sdk
     setLoadingMore(true)
     try {
-      const result = await loadMoreTransactions(sdkRef.current, rawTxOffsetRef.current)
+      const result = await loadMoreTransactions(sdk, rawTxOffsetRef.current)
+      if (isStale()) return
       rawTxOffsetRef.current += result.rawCount
       setHasMoreTransactions(result.hasMore)
       setWallets((prev) => appendTransactions(prev, result.transactions))
@@ -347,7 +394,7 @@ export const useSdkLifecycle = (
     } catch (err) {
       logSdkEvent(SdkLogLevel.Error, `Failed to load more transactions: ${err}`)
     } finally {
-      setLoadingMore(false)
+      if (!isStale()) setLoadingMore(false)
     }
   }, [loadingMore, hasMoreTransactions])
 
