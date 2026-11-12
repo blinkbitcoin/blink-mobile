@@ -2141,7 +2141,11 @@ describe("createSelfCustodialLnurlPaymentDetails reporting a bitcoin send", () =
 
 describe("createSelfCustodialLnurlPaymentDetails send-all", () => {
   const FEES_INCLUDED = 1
-  const balance = { amount: 100_000, currency: WalletCurrency.Btc, currencyCode: WalletCurrency.Btc }
+  const balance = {
+    amount: 100_000,
+    currency: WalletCurrency.Btc,
+    currencyCode: WalletCurrency.Btc,
+  }
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -2157,7 +2161,8 @@ describe("createSelfCustodialLnurlPaymentDetails send-all", () => {
   const feePolicyOf = async <T extends WalletCurrency>(detail: PaymentDetail<T>) => {
     if (!detail.canGetFee) throw new Error("expected canGetFee")
     await detail.getFee({} as never)
-    return mockPrepareLnurl.mock.calls[mockPrepareLnurl.mock.calls.length - 1][1].feePolicy
+    return mockPrepareLnurl.mock.calls[mockPrepareLnurl.mock.calls.length - 1][1]
+      .feePolicy
   }
 
   it("sends all from the Bitcoin wallet with the fee taken out", async () => {
@@ -2173,16 +2178,18 @@ describe("createSelfCustodialLnurlPaymentDetails send-all", () => {
   })
 
   it("leaves a plain Bitcoin amount's fee on top", async () => {
-    const plain = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(balance)
+    const plain =
+      createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(balance)
 
     expect(plain.isFeeIncluded).toBe(false)
     expect(await feePolicyOf(plain)).toBeUndefined()
   })
 
   it("drops the send-all on a wallet switch", async () => {
-    const switched = createSelfCustodialLnurlPaymentDetails(createParams())
-      .setAmount!(balance, true)
-      .setSendingWalletDescriptor({ id: "w-other", currency: WalletCurrency.Btc })
+    const switched = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    ).setSendingWalletDescriptor({ id: "w-other", currency: WalletCurrency.Btc })
 
     expect(switched.isSendingMax).toBe(false)
     expect(await feePolicyOf(switched)).toBeUndefined()
@@ -2190,7 +2197,9 @@ describe("createSelfCustodialLnurlPaymentDetails send-all", () => {
 
   it("keeps the Dollar wallet on FeesIncluded, with no send-all offered", () => {
     const detail = createSelfCustodialLnurlPaymentDetails(
-      createParams({ sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd } }),
+      createParams({
+        sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
+      }),
     )
 
     expect(detail.canSendMax).toBe(false)
