@@ -1263,3 +1263,68 @@ describe("migration-checkpoint-storage resolveCommitPointRoute", () => {
     )
   })
 })
+
+/** A deposit that confirms on the commit screen changes the balance the server will send,
+ *  after the start may already have bound a figure. Nothing has drained yet, since the
+ *  server still waits for a destination, so the figure read again is the run's. */
+describe("migration-checkpoint-storage a figure read again after a deposit cleared", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockSaveJson.mockResolvedValue(undefined)
+  })
+
+  const startedCommitPoint = {
+    step: MigrationCheckpoint.BalancesOverview,
+    savedAt: Date.now(),
+    accountId: "sc-1",
+    custodialAccountId: "cust-1",
+    expectedReceiveSats: 0,
+    isStartConfirmed: true,
+  }
+
+  it("replaces the figure the accepted start bound", async () => {
+    mockLoadJsonOrThrow.mockResolvedValue(startedCommitPoint)
+
+    await saveCheckpointToStorage("test-key", {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-1",
+      expectedReceiveSats: 5000,
+      isReceiveFigureRefreshed: true,
+    })
+
+    expect(mockSaveJson).toHaveBeenCalledWith(
+      "test-key",
+      expect.objectContaining({ expectedReceiveSats: 5000, isStartConfirmed: true }),
+    )
+  })
+
+  it("keeps the bound figure on a save that did not read it again", async () => {
+    mockLoadJsonOrThrow.mockResolvedValue(startedCommitPoint)
+
+    await saveCheckpointToStorage("test-key", {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-1",
+      expectedReceiveSats: 5000,
+    })
+
+    expect(mockSaveJson).toHaveBeenCalledWith(
+      "test-key",
+      expect.objectContaining({ expectedReceiveSats: 0 }),
+    )
+  })
+
+  it("keeps the bound figure when the save read again carries none", async () => {
+    mockLoadJsonOrThrow.mockResolvedValue(startedCommitPoint)
+
+    await saveCheckpointToStorage("test-key", {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-1",
+      isReceiveFigureRefreshed: true,
+    })
+
+    expect(mockSaveJson).toHaveBeenCalledWith(
+      "test-key",
+      expect.objectContaining({ expectedReceiveSats: 0 }),
+    )
+  })
+})

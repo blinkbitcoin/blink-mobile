@@ -74,7 +74,7 @@ export const InviteFriendsCard = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     display: "flex",
     flexDirection: "row",
     marginBottom: 20,

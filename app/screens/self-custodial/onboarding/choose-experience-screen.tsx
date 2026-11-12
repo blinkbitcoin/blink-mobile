@@ -279,7 +279,7 @@ export const ChooseExperienceScreen: React.FC = () => {
     >
       <IconHero
         icon="spinner"
-        iconColor={colors.primary}
+        iconColor={colors.accent}
         title={LLScreen.title()}
         subtitle={LLScreen.subtitle()}
       />

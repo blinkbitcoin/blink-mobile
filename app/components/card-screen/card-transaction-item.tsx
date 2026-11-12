@@ -29,11 +29,11 @@ export const CardTransactionItem: React.FC<CardTransactionItemProps> = ({
 
   const statusConfig = {
     [CardTransactionUiStatus.Pending]: {
-      color: colors.grey2,
+      color: colors.textMuted,
       text: LL.CardFlow.TransactionStatus.pending(),
     },
     [CardTransactionUiStatus.Completed]: {
-      color: colors._green,
+      color: colors.staticSuccess,
       text: LL.CardFlow.TransactionStatus.completed(),
     },
     [CardTransactionUiStatus.Declined]: {
@@ -41,7 +41,7 @@ export const CardTransactionItem: React.FC<CardTransactionItemProps> = ({
       text: LL.CardFlow.TransactionStatus.declined(),
     },
     [CardTransactionUiStatus.Reversed]: {
-      color: colors._orange,
+      color: colors.staticBrandOrange,
       text: LL.CardFlow.TransactionStatus.reversed(),
     },
   }
@@ -50,7 +50,7 @@ export const CardTransactionItem: React.FC<CardTransactionItemProps> = ({
   const content = (
     <>
       <View style={styles.iconContainer}>
-        <GaloyIcon name="storefront" size={20} color={colors.primary} />
+        <GaloyIcon name="storefront" size={20} color={colors.accent} />
       </View>
       <View style={styles.detailsColumn}>
         <Text type="p3" bold numberOfLines={1} style={styles.merchantName}>
@@ -95,7 +95,7 @@ const useStyles = makeStyles(({ colors }) => ({
     minHeight: 55,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
   iconContainer: {
     width: 36,
@@ -110,17 +110,17 @@ const useStyles = makeStyles(({ colors }) => ({
     marginRight: 12,
   },
   merchantName: {
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   timeAgo: {
-    color: colors.grey2,
+    color: colors.textMuted,
     marginTop: 0,
   },
   amountColumn: {
     alignItems: "flex-end",
   },
   amount: {
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   status: {
     marginTop: 0,

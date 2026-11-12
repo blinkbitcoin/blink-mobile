@@ -89,7 +89,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
   },
   iconBackground: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
   textContainer: {
     alignSelf: "stretch",

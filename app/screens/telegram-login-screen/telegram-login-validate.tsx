@@ -97,7 +97,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   description: {
     textAlign: "center",
-    color: colors.grey2,
+    color: colors.textMuted,
     marginBottom: 30,
   },
   errorContainer: {

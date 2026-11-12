@@ -151,6 +151,23 @@ describe("mapSelfCustodialTransaction", () => {
     expect(result.memo).toBe("Dinner with Andrej")
   })
 
+  it("shows the payer's comment on a payment received to a Lightning address", () => {
+    const result = mapSelfCustodialTransaction(
+      createPayment({
+        paymentType: 1,
+        details: {
+          tag: "Lightning",
+          inner: {
+            description: undefined,
+            lnurlReceiveMetadata: { senderComment: "Dinner with Andrej" },
+          },
+        },
+      }),
+    )
+
+    expect(result.memo).toBe("Dinner with Andrej")
+  })
+
   it("falls back to the invoice description when there is no LNURL comment", () => {
     const result = mapSelfCustodialTransaction(
       createPayment({

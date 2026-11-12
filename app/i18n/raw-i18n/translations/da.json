@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API-nøgler",
+    "inactiveKeys": "Inaktive nøgler ({count})",
     "noKeys": "Ingen API-nøgler endnu",
     "createKey": "Opret API-nøgle",
     "createTitle": "Ny API-nøgle",
@@ -27,6 +28,7 @@
     "revokeTitle": "Tilbagekald API-nøgle?",
     "revokeBody": "\"{name: string}\" holder straks op med at virke. Dette kan ikke fortrydes.",
     "revoke": "Tilbagekald",
+    "revokeGoBack": "Tilbage",
     "revokeSuccess": "API-nøgle tilbagekaldt",
     "createError": "API-nøglen kunne ikke oprettes. Prøv igen.",
     "revokeError": "API-nøglen kunne ikke tilbagekaldes. Prøv igen.",
@@ -2140,7 +2142,9 @@
     "selectAll": "Vælg alle",
     "clearAll": "Ryd alle",
     "addPlace": "Tilføj til kort",
-    "addPlaceTitle": "Tilføj et sted",
+    "addPlaceTitle": "Foreslå forretning",
+    "submitPlaceRequest": "Indsend anmodning",
+    "showMyLocation": "Vis min placering",
     "placePinHint": "Flyt kortet, så nålen står på stedet",
     "placeName": "Navn",
     "placeNameHint": "Hvad stedet hedder",
@@ -3075,7 +3079,6 @@
     "faq": "Ofte stillede spørgsmål",
     "statusPage": "Statusside",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Support",
     "defaultSupportMessage": "Hej! Jeg har brug for hjælp med {bankName: string}. Jeg bruger version {version: string} på {os: string}.",
     "emailCopied": "email {email: string} kopieret til udklipsholder",
@@ -3256,7 +3259,10 @@
       "noLimit": "Ingen grænse",
       "limitUpdateSuccess": "Grænse opdateret",
       "limitUpdateError": "Kunne ikke opdatere grænsen",
-      "limitMustBePositive": "Grænsen skal være større end nul"
+      "limitMustBePositive": "Grænsen skal være større end nul",
+      "atmToggleError": "Kunne ikke opdatere hævninger i hæveautomater",
+      "atmControlsLoadError": "Kunne ikke indlæse dine hæveautomatgrænser",
+      "invalidLimitAmount": "Indtast et gyldigt beløb med højst 2 decimaler"
     },
     "CardFeeSchedule": {
       "title": "Blink-kortets gebyrplan",
@@ -3958,6 +3964,12 @@
       "title": "Vi kan ikke migrere din dollarsaldo",
       "body": "Tøm først din dollarsaldo. Du kan overføre den til din Bitcoin-saldo i Blink eller et andet sted."
     },
+    "pendingDepositModal": {
+      "title": "Der er en afventende indbetaling til din konto",
+      "body": "Du kan ikke migrere til en anden kontotype, før alle dine afventende indbetalinger er afregnet og krediteret denne konto.",
+      "contactSupportCta": "Kontakt support",
+      "stillConfirming": "Din indbetaling er ikke bekræftet endnu. Prøv igen om et par minutter."
+    },
     "balancesOverview": {
       "title": "Flyt din saldo",
       "body": "Flyt dine midler sikkert til din nye konto.",
@@ -4145,6 +4157,7 @@
     "get": "Hent",
     "storeNote": "»Hent« åbner App Store eller Google Play. Vend tilbage til Blink, når appen er installeret.",
     "haveAnApp": "Jeg har en app",
+    "learnHow": "Se hvordan",
     "keyInstruction": "Kopiér denne opsætningsnøgle ind i din authenticator-app.",
     "qrInstruction": "Bruger du en anden enhed?\nScan denne QR-kode i stedet.",
     "backupTitle": "Sikkerhedskopiér din nøgle",
@@ -4257,7 +4270,6 @@
     "payment": "Betaling"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Vekselkursen er muligvis forældet",
     "satsOnly": "Viser sats – ingen vekselkurs tilgængelig"
   },
   "SelfCustodialOffline": {

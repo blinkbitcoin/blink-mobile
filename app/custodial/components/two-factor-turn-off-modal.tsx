@@ -36,7 +36,7 @@ export const TwoFactorTurnOffModal: React.FC<TwoFactorTurnOffModalProps> = ({
       isVisible={isVisible}
       toggleModal={onKeepProtected}
       showCloseIconButton={true}
-      image={<GaloyIcon name="info" size={52} color={colors.primary} />}
+      image={<GaloyIcon name="info" size={52} color={colors.accent} />}
       title={LL.TwoFactorTurnOff.modalTitle()}
       body={<Text style={styles.description}>{LL.TwoFactorTurnOff.modalBody()}</Text>}
       primaryButtonTitle={LL.TwoFactorTurnOff.keepProtected()}
@@ -54,7 +54,7 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlign: "center",
     fontSize: 16,
     lineHeight: 22,
-    color: colors.black,
+    color: colors.textOnBackground,
     marginBottom: 20,
   },
 }))

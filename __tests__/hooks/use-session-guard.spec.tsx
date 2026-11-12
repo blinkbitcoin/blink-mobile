@@ -12,7 +12,7 @@ const Wrapper: React.FC<PropsWithChildren> = ({ children }) => (
   <PersistentStateContext.Provider
     value={{
       persistentState: {
-        schemaVersion: 23,
+        schemaVersion: 24,
         galoyInstance: { id: "Main" },
         ...mockSession,
       },

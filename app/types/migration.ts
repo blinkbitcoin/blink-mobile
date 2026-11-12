@@ -19,10 +19,31 @@ export const MigrationRejectionCode = {
   OperationRestricted: "OPERATION_RESTRICTED",
   /** A stale proof and a bad destination share this code; the clock skew tells them apart. */
   InvalidDestination: "MIGRATION_INVALID_DESTINATION",
+  /** Refused while an incoming on-chain deposit has not confirmed. Transient: it clears
+   *  once the deposit lands, so it earns a retry rather than support. */
+  PendingDeposit: "MIGRATION_PENDING_DEPOSIT",
 } as const
 
 export type MigrationRejectionCode =
   (typeof MigrationRejectionCode)[keyof typeof MigrationRejectionCode]
+
+/** What a check for an on-chain deposit still confirming answered. */
+export const PendingDepositCheckStatus = {
+  Clear: "clear",
+  Pending: "pending",
+  /** The check said neither: its request failed, or it answered without the list. */
+  Unknown: "unknown",
+} as const
+
+export type PendingDepositCheckStatus =
+  (typeof PendingDepositCheckStatus)[keyof typeof PendingDepositCheckStatus]
+
+/** Unknown carries the request's error, null when it answered without the list, so a
+ *  caller that reports failures reports the same one the request raised. */
+export type PendingDepositCheck =
+  | { status: typeof PendingDepositCheckStatus.Clear }
+  | { status: typeof PendingDepositCheckStatus.Pending }
+  | { status: typeof PendingDepositCheckStatus.Unknown; error: Error | null }
 
 /**
  * Why the migration handed the user to support. Deliberately NOT translated: the value is
@@ -65,6 +86,9 @@ export const MigrationSupportReason = {
   /** The server paid the migration out, but the receive into the new self-custodial
    *  wallet stayed unconfirmed past the notice window — the funds look stuck in transit. */
   ReceiveDelayed: "receive-delayed",
+  /** An incoming on-chain deposit still confirming holds the migration, and the user asked
+   *  for help from the modal that says so: a low fee can leave it unconfirmed for days. */
+  DepositPending: "deposit-pending",
   /** The proof the lightning-address re-point signs could not be built on this device: the
    *  SDK answered with a failure, or the keychain threw. The commit signs the same proof
    *  through the same chain, so it would fail moments later — this is the one re-point

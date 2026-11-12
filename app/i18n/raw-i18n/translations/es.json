@@ -1,6 +1,7 @@
 {
     "ApiScreen": {
         "keysGroupTitle": "Claves API",
+        "inactiveKeys": "Claves inactivas ({count})",
         "noKeys": "Aún no hay claves API",
         "createKey": "Crear clave API",
         "createTitle": "Nueva clave API",
@@ -27,6 +28,7 @@
         "revokeTitle": "¿Revocar la clave API?",
         "revokeBody": "\"{name: string}\" dejará de funcionar de inmediato. Esto no se puede deshacer.",
         "revoke": "Revocar",
+        "revokeGoBack": "Volver",
         "revokeSuccess": "Clave API revocada",
         "createError": "No se pudo crear la clave API. Inténtalo de nuevo.",
         "revokeError": "No se pudo revocar la clave API. Inténtalo de nuevo.",
@@ -2140,7 +2142,9 @@
         "selectAll": "Seleccionar todo",
         "clearAll": "Borrar todo",
         "addPlace": "Añadir al mapa",
-        "addPlaceTitle": "Añadir un lugar",
+        "addPlaceTitle": "Sugerir comercio",
+        "submitPlaceRequest": "Enviar solicitud",
+        "showMyLocation": "Mostrar mi ubicación",
         "placePinHint": "Mueve el mapa para poner el marcador sobre el lugar",
         "placeName": "Nombre",
         "placeNameHint": "Cómo se llama el lugar",
@@ -3075,7 +3079,6 @@
         "faq": "Preguntas Frecuentes - FAQ",
         "statusPage": "Página de estado",
         "telegram": "Telegram",
-        "mattermost": "Mattermost",
         "defaultEmailSubject": "{bankName: string} - Soporte",
         "defaultSupportMessage": "Hola! Necesito ayuda con {bankName: string}, estoy usando la versión {version: string} de {os: string}.",
         "emailCopied": "dirección electrónica {email: string} copiada al portapapeles",
@@ -3340,7 +3343,10 @@
             "noLimit": "Sin límite",
             "limitUpdateSuccess": "Límite actualizado correctamente",
             "limitUpdateError": "No se pudo actualizar el límite",
-            "limitMustBePositive": "El límite debe ser mayor que cero"
+            "limitMustBePositive": "El límite debe ser mayor que cero",
+            "atmToggleError": "No se pudieron actualizar los retiros en cajero",
+            "atmControlsLoadError": "No se pudieron cargar tus límites de cajero",
+            "invalidLimitAmount": "Ingresa un monto válido con hasta 2 decimales"
         },
         "CardStatements": {
             "title": "Movimientos",
@@ -3958,6 +3964,12 @@
             "title": "No podemos migrar tu Saldo Dólar",
             "body": "Primero vacía tu Saldo Dólar. Puedes transferirlo a tu Saldo Bitcoin en Blink o a otro lugar."
         },
+        "pendingDepositModal": {
+            "title": "Hay un depósito pendiente en tu cuenta",
+            "body": "No puedes migrar a otro tipo de cuenta hasta que todos tus depósitos pendientes se hayan liquidado y acreditado en esta cuenta.",
+            "contactSupportCta": "Contactar con soporte",
+            "stillConfirming": "Tu depósito todavía no está confirmado. Vuelve a intentarlo en unos minutos."
+        },
         "balancesOverview": {
             "title": "Mueve tu saldo",
             "body": "Mueve tus fondos de forma segura a tu nueva cuenta.",
@@ -4145,6 +4157,7 @@
         "get": "Obtener",
         "storeNote": "“Obtener” abre la App Store o Google Play. Vuelve a Blink cuando esté instalada.",
         "haveAnApp": "Ya tengo una aplicación",
+        "learnHow": "Descubre cómo",
         "keyInstruction": "Copia esta clave de configuración en tu aplicación de autenticación.",
         "qrInstruction": "¿Usas otro dispositivo?\nEscanea este código QR en su lugar.",
         "backupTitle": "Respalda tu clave",
@@ -4257,7 +4270,6 @@
         "payment": "Pago"
     },
     "SelfCustodialStaleRate": {
-        "notice": "El tipo de cambio puede estar desactualizado",
         "satsOnly": "Mostrando sats: no hay tipo de cambio disponible"
     },
     "SelfCustodialOffline": {

@@ -50,7 +50,7 @@ export const WalletSwitch: React.FC<WalletSwitchProps> = ({
     <View style={styles.container}>
       {hasSwapIcon ? (
         <Animated.View style={[spinStyle, !canToggle && styles.iconHidden]}>
-          <GaloyIcon name="refresh" size={16} color={colors.grey1} />
+          <GaloyIcon name="refresh" size={16} color={colors.textSecondary} />
         </Animated.View>
       ) : null}
       <CurrencyPill

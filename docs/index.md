@@ -179,4 +179,4 @@ E2E tests (Detox/Appium) are not run in CI; run them locally per [E2E Testing](.
 - [Blink Website](https://blink.sv)
 - [Blink API Docs](https://dev.blink.sv)
 - [Galoy GitHub](https://github.com/GaloyMoney)
-- [Community Chat](https://chat.blink.sv)
+- [Community (Telegram)](https://t.me/blinkbtc)

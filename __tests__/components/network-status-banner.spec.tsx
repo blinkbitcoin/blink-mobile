@@ -8,8 +8,8 @@ import { NetworkStatusBanner } from "@app/components/network-status-banner/netwo
 jest.mock("@rn-vui/themed", () => {
   const colors: Record<string, string> = {
     warning: "#f90",
-    grey4: "#ddd",
-    grey5: "#f5f5f5",
+    neutral: "#ddd",
+    surfaceInteractive: "#f5f5f5",
   }
   return {
     makeStyles:
