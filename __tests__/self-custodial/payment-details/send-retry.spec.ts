@@ -1099,6 +1099,43 @@ describe("a same-key retry whose quote fails", () => {
     expect(mockFindLostSend).toHaveBeenCalledTimes(1)
     expect(lostAttemptsTo("lnbc1...").lostSend?.paymentHashes).toEqual(["hash-1"])
   })
+
+  it("reports the quote's failure when an unresolved attempt's history cannot be read, keeping it", async () => {
+    mockPrepareSendPayment
+      .mockResolvedValueOnce(sparkAddress())
+      .mockRejectedValueOnce(sdkError("InsufficientFunds"))
+    mockSendPayment.mockRejectedValueOnce(lostResponse())
+    mockFindPaymentUnderKey.mockResolvedValueOnce({
+      status: "unreadable",
+      error: new Error("offline"),
+    })
+    const ref = {}
+    const send = createSendMutation(btcSpark, {
+      telemetry: TELEMETRY,
+      idempotencyKeyRef: ref,
+    })
+
+    await attempt(send, ref)
+    const retry = await attempt(send, ref)
+
+    expect(retry.errors?.[0].message).toBe(SelfCustodialErrorCode.InsufficientFunds)
+    expect(mockSendPayment).toHaveBeenCalledTimes(1)
+    expect(lostAttemptsTo("sp1abc").unresolvedSend?.idempotencyKey).toBe(KEY)
+  })
+
+  /** Nothing goes out either way: the quote's failure is what the sender can act on. */
+  it("reports the quote's failure when the wallet's history cannot be read, keeping the attempt", async () => {
+    mockFindLostSend.mockResolvedValue({
+      status: "unreadable",
+      error: new Error("offline"),
+    })
+
+    const retry = await retryAfterSpentFunds()
+
+    expect(retry.errors?.[0].message).toBe(SelfCustodialErrorCode.InsufficientFunds)
+    expect(mockSendPayment).toHaveBeenCalledTimes(1)
+    expect(lostAttemptsTo("lnbc1...").lostSend?.paymentHashes).toEqual(["hash-1"])
+  })
 })
 
 describe("a bitcoin Spark-address send that throws again under the same key", () => {

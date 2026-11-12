@@ -717,6 +717,7 @@ const sendAfterEarlierAttempts = async <
    */
   const settleUnresolved = async (
     sent: UnresolvedSend,
+    isAfterFailedQuote: boolean,
   ): Promise<SendOutcome | undefined> => {
     const sentKey = sent.idempotencyKey
     if (sentKey === undefined) return outcomeUnknown(sendAnywayAfter(sent))
@@ -724,8 +725,12 @@ const sendAfterEarlierAttempts = async <
     const look = withFailedReported(await findPaymentUnderKey({ sdk, key: sentKey }))
     /** No way past it: the attempt is the SDK's payment under its key, which the next
      *  look can still find, and a history that cannot be read cannot be checked by the
-     *  sender either. */
-    if (look.status === "unreadable") return outcomeUnknown()
+     *  sender either. After a quote that failed, nothing is sent either way, and the
+     *  quote's failure is what the sender can act on; the attempt stays all the same. */
+    if (look.status === "unreadable") {
+      if (isAfterFailedQuote) return undefined
+      return outcomeUnknown()
+    }
 
     unresolved = undefined
     if (look.status === "found") {
@@ -746,18 +751,21 @@ const sendAfterEarlierAttempts = async <
    * went out with is refused by the SDK as a duplicate, so it is let through without a
    * look, where a look could only hold back a safe retry; the send then accounts for
    * them. Anything else is looked for first, whatever this send is: the lost attempt's
-   * payment is as real after a switch of wallet or a new amount.
+   * payment is as real after a switch of wallet or a new amount. `isAfterFailedQuote`:
+   * the send could not be quoted, so it goes out in no case and only a payment found
+   * stands in its way.
    */
   let hasLooked = false
   const clearEarlierAttempts = async (
     key: string | undefined,
+    { isAfterFailedQuote = false } = {},
   ): Promise<SendOutcome | undefined> => {
     const isRetryUnder = (sentWith: string | undefined) =>
       key !== undefined && sentWith === key
     const isUnresolvedLetThrough =
       isSentAnyway || isRetryUnder(unresolved?.idempotencyKey)
     if (unresolved && !isUnresolvedLetThrough) {
-      const refusal = await settleUnresolved(unresolved)
+      const refusal = await settleUnresolved(unresolved, isAfterFailedQuote)
       if (refusal) return refusal
     }
     if (unresolved) retriedUnder = { ...retriedUnder, unresolvedSend: unresolved }
@@ -770,8 +778,13 @@ const sendAfterEarlierAttempts = async <
     hasLooked = true
     const look = await findThisSend(earlier)
     /** Nothing is sent over a history that could not be read: the payment it may hold
-     *  would be paid again. The attempt stays remembered, and the next retry asks again. */
-    if (look.status === "unreadable") return failure(look.error)
+     *  would be paid again. The attempt stays remembered, and the next retry asks again.
+     *  After a quote that failed, nothing is sent either way, and the quote's failure is
+     *  what the sender can act on. */
+    if (look.status === "unreadable") {
+      if (isAfterFailedQuote) return undefined
+      return failure(look.error)
+    }
     lookedFor = { ...lookedFor, lostSend: earlier }
     if (look.status === "found") {
       return reportFound(look.payment, {
@@ -797,7 +810,7 @@ const sendAfterEarlierAttempts = async <
     prepared = await prepare()
   } catch (err) {
     retriedUnder = {}
-    const recovered = await clearEarlierAttempts(undefined)
+    const recovered = await clearEarlierAttempts(undefined, { isAfterFailedQuote: true })
     if (recovered) return recovered
     reportFailed(beginAttempt(telemetry), telemetry, err)
     return failure(err)
