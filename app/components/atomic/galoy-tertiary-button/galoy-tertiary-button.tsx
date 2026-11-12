@@ -27,13 +27,13 @@ export const GaloyTertiaryButton = (props: GaloyTertiaryButtonProps) => {
     switch (true) {
       case pressed && unfilled:
         dynamicStyle = {
-          backgroundColor: colors.grey6,
+          backgroundColor: colors.surfacePressed,
         }
         break
       case unfilled:
         dynamicStyle = {
           opacity: disabled ? 0.7 : 1,
-          backgroundColor: colors.grey5,
+          backgroundColor: colors.surfaceInteractive,
         }
         break
       case pressed && outline:

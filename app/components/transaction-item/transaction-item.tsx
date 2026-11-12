@@ -262,7 +262,7 @@ const TransactionItem: React.FC<Props> = ({
           accessibilityRole={onPress ? "button" : undefined}
         >
           {isFirst ? null : <View style={cardStyles.divider} />}
-          <GaloyIcon name={iconName} size={20} color={colors.primary} />
+          <GaloyIcon name={iconName} size={20} color={colors.accent} />
           <View style={cardStyles.content} {...testProps("list-item-content")}>
             <Text
               numberOfLines={1}
@@ -429,7 +429,7 @@ const useCardStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
     columnGap: 10,
     padding: 10,
     overflow: "hidden",
-    backgroundColor: props.highlight ? colors.grey4 : colors.grey5,
+    backgroundColor: props.highlight ? colors.neutral : colors.surfaceInteractive,
     borderTopLeftRadius: props.isFirst ? 8 : 0,
     borderTopRightRadius: props.isFirst ? 8 : 0,
     borderBottomLeftRadius: props.isLast ? 8 : 0,
@@ -442,7 +442,7 @@ const useCardStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
     left: 10,
     right: 10,
     height: 1,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
   },
   content: {
     flex: 1,
@@ -450,12 +450,12 @@ const useCardStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
   title: {
     fontSize: 14,
     lineHeight: 18,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   subtitle: {
     fontSize: 12,
     lineHeight: 18,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   amounts: {
     alignItems: "flex-end",
@@ -473,9 +473,9 @@ const useCardStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
     textAlign: "right",
   },
   receive: {
-    color: colors._green,
+    color: colors.staticSuccess,
   },
   send: {
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

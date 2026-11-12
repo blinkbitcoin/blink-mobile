@@ -119,14 +119,14 @@ jest.mock("@rn-vui/themed", () => {
   ListItem.Subtitle = ListItemSubtitle
 
   const colors = {
-    black: "#000000",
-    grey0: "#333333",
-    grey1: "#555555",
-    grey2: "#999999",
-    grey4: "#CCCCCC",
-    grey5: "#F5F5F5",
-    _green: "#00AA00",
-    primary: "#F7931A",
+    textOnBackground: "#000000",
+    textPrimary: "#333333",
+    textSecondary: "#555555",
+    textMuted: "#999999",
+    neutral: "#CCCCCC",
+    surfaceInteractive: "#F5F5F5",
+    staticSuccess: "#00AA00",
+    accent: "#F7931A",
   }
 
   // The real style factories, run with these colours, so a test can read the row's own
@@ -453,7 +453,7 @@ describe("MemoizedTransactionItem", () => {
       expect(dividers(screen)).toHaveLength(0)
     })
 
-    it("draws a 1px grey4 divider inset 10 from each side above every other row", () => {
+    it("draws a 1px neutral divider inset 10 from each side above every other row", () => {
       const screen = render(<MemoizedTransactionItem txid="tx-1" variant="card" />)
 
       expect(dividers(screen)).toHaveLength(1)

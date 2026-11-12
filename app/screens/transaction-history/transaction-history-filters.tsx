@@ -76,7 +76,7 @@ export const TransactionHistoryFilters: React.FC<Props> = ({
         />
       </View>
       <View style={styles.search}>
-        <GaloyIcon name="magnifying-glass" size={16} color={colors.grey2} />
+        <GaloyIcon name="magnifying-glass" size={16} color={colors.textMuted} />
         <TextInput
           {...testProps("transaction-history-search")}
           accessibilityLabel={LL.common.search()}
@@ -84,7 +84,7 @@ export const TransactionHistoryFilters: React.FC<Props> = ({
           value={searchText}
           onChangeText={onSearchTextChange}
           placeholder={LL.TransactionScreen.searchPlaceholder()}
-          placeholderTextColor={colors.grey2}
+          placeholderTextColor={colors.textMuted}
           autoCorrect={false}
           autoCapitalize="none"
           returnKeyType="search"
@@ -132,7 +132,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingRight: 10,
     paddingVertical: 5,
     borderRadius: 8,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
   searchInput: {
     flex: 1,
@@ -140,7 +140,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 0,
     fontSize: 14,
     lineHeight: 18,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   noResults: {
     flexDirection: "row",
@@ -149,12 +149,12 @@ const useStyles = makeStyles(({ colors }) => ({
     columnGap: 10,
     padding: 10,
     borderRadius: 8,
-    backgroundColor: colors.grey7,
+    backgroundColor: colors.surfaceStatic,
   },
   noResultsText: {
     fontSize: 18,
     lineHeight: 24,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
   },
 }))

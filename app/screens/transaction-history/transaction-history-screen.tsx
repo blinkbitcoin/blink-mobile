@@ -146,8 +146,8 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
           name="filter"
           size={32}
           iconSize={20}
-          color={filtersOpen ? colors.white : colors.primary}
-          backgroundColor={filtersOpen ? colors.primary : colors.grey5}
+          color={filtersOpen ? colors.backgroundDefault : colors.accent}
+          backgroundColor={filtersOpen ? colors.accent : colors.surfaceInteractive}
           onPress={toggleFilters}
           accessibilityRole="button"
           accessibilityLabel={LL.TransactionScreen.filters()}
@@ -159,9 +159,9 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     navigation,
     filtersOpen,
     toggleFilters,
-    colors.white,
-    colors.primary,
-    colors.grey5,
+    colors.backgroundDefault,
+    colors.accent,
+    colors.surfaceInteractive,
     LL,
   ])
 
