@@ -183,9 +183,9 @@ const useStyles = makeStyles(({ colors }) => ({
     height: INDICATOR_BAR.height,
   },
   barActive: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
   },
   barInactive: {
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
   },
 }))
