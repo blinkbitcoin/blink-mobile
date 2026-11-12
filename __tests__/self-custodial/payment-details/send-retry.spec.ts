@@ -1207,6 +1207,10 @@ describe("the same send asked for twice before the first is done", () => {
 })
 
 describe("the lost attempts of a send, against a phone clock that is off", () => {
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
   const usdLost = async () => {
     mockPrepareSendPayment.mockResolvedValue(
       bolt11("hash-1", { conversionEstimate: { amountIn: 1n } }),
@@ -1247,6 +1251,24 @@ describe("the lost attempts of a send, against a phone clock that is off", () =>
 
     await usdLost()
 
+    expect(lostAttemptsTo("lnbc1...").lostSend?.walletClockSec).toBe(0)
+  })
+
+  /** Not a send left pending for good, with nothing recorded: the attempt is kept, to be
+   *  looked for over the whole history. */
+  it("reaches back to the start of the history when the wallet's clock does not answer", async () => {
+    jest.useFakeTimers()
+    mockListPayments.mockReturnValueOnce(
+      new Promise(() => {
+        /** never answers */
+      }),
+    )
+
+    const lost = usdLost()
+    await jest.advanceTimersByTimeAsync(15_000)
+    await lost
+
+    expect(mockFindLostSend.mock.calls[0][0].walletClockSec).toBe(0)
     expect(lostAttemptsTo("lnbc1...").lostSend?.walletClockSec).toBe(0)
   })
 

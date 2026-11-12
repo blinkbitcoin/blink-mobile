@@ -329,11 +329,17 @@ const lookUnderKey = async (
 /**
  * The wallet's own clock for an attempt just lost: when the newest send it holds was
  * made, by the server's clock. 0, so the look reaches back to the start of the history,
- * when it holds none or cannot be read: a narrower window could leave the payment out.
+ * when it holds none, cannot be read, or does not answer in time: a narrower window could
+ * leave the payment out, and a read that never answers would hold the send pending with
+ * the attempt not yet recorded.
  */
 export const readWalletClockSec = async (sdk: BreezSdkInterface): Promise<number> => {
   try {
-    const newest = await newestSentPaymentTimestamp(sdk)
+    const newest = await withTimeout(
+      newestSentPaymentTimestamp(sdk),
+      LOST_SEND_ATTEMPT_TIMEOUT_MS,
+      "Wallet clock read",
+    )
     return newest === undefined ? 0 : Number(newest)
   } catch (err) {
     reportError("Self-custodial wallet clock", err)
