@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Izitshixo ze-API",
+    "inactiveKeys": "Izitshixo ezingasebenziyo ({count})",
     "noKeys": "Akukho zitshixo ze-API okwangoku",
     "createKey": "Yenza isitshixo se-API",
     "createTitle": "Isitshixo se-API esitsha",
@@ -14,22 +15,23 @@
     "scopeWrite": "Bhala",
     "writeScopeDashboardOnly": "Izitshixo ezinokuthumela iintlawulo zingenziwa kuphela ku-dashboard.blink.sv",
     "expiry": "Iphelelwa",
-    "expiry30Days": "Iintsuku ezingama-30",
-    "expiry90Days": "Iintsuku ezingama-90",
+    "expiry30Days": "Iintsuku 30",
+    "expiry90Days": "Iintsuku 90",
     "expiryNever": "Ayihlali",
     "expiresOn": "Iphelelwa nge-{date: string}",
     "neverExpires": "Ayipheleli",
-    "revoked": "Irhoxisiwe",
+    "revoked": "Itshitshisiwe",
     "expired": "Iphelelwe nge-{date: string}",
     "expiredNoDate": "Iphelelwe",
     "secretWarning": "Eli lelona xesha kuphela isitshixo esiboniswa ngalo. Sikhuphele okanye usabelane ngoku kwaye usigcine ngokukhuselekileyo.",
     "secretCopied": "Isitshixo se-API sikhutshelwe. Ibhodi yokukhuphela iza kucocwa emva komzuzu omnye",
-    "revokeTitle": "Rhoxisa isitshixo se-API?",
+    "revokeTitle": "Tshitshisa isitshixo se-API?",
     "revokeBody": "\"{name: string}\" iza kuyeka ukusebenza ngokukhawuleza. Oku akunakuguqulwa.",
-    "revoke": "Rhoxisa",
-    "revokeSuccess": "Isitshixo se-API sirhoxisiwe",
+    "revoke": "Tshitshisa",
+    "revokeGoBack": "Buyela",
+    "revokeSuccess": "Isitshixo se-API sitshitshisiwe",
     "createError": "Ayikwazanga ukwenza isitshixo se-API. Nceda uzame kwakhona.",
-    "revokeError": "Ayikwazanga ukurhoxisa isitshixo se-API. Nceda uzame kwakhona.",
+    "revokeError": "Ayikwazanga ukutshitshisa isitshixo se-API. Nceda uzame kwakhona.",
     "loadError": "Ayikwazanga ukulayisha izitshixo zakho ze-API. Nceda uzame kamva.",
     "discardSecretTitle": "Ukulahla le sitshixo se-API?",
     "discardSecretBody": "Eli lelona xesha kuphela imfihlo eboniswa ngalo. Ukuba ushiya ngoku, isitshixo asisoze sabuyiswa kwaye kuya kufuneka udale esitsha.",
@@ -2140,7 +2142,9 @@
     "selectAll": "Khetha konke",
     "clearAll": "Cima konke",
     "addPlace": "Yongeza kwimephu",
-    "addPlaceTitle": "Yongeza indawo",
+    "addPlaceTitle": "Cebisa ishishini",
+    "submitPlaceRequest": "Thumela isicelo",
+    "showMyLocation": "Bonisa indawo yam",
     "placePinHint": "Shukumisa imephu ubeke isalathiso kwindawo",
     "placeName": "Igama",
     "placeNameHint": "Le ndawo ibizwa ngokuba yintoni",
@@ -3074,7 +3078,6 @@
     "faq": "Imibuzo Ebuzwa Rhoqo",
     "statusPage": "Status Page",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Support",
     "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
     "emailCopied": "email {email: string} copied to clipboard",
@@ -3249,7 +3252,10 @@
       "noLimit": "Akukho mda",
       "limitUpdateSuccess": "Umda uhlaziywe ngempumelelo",
       "limitUpdateError": "Ayiphumelelanga ukuhlaziya umda",
-      "limitMustBePositive": "Umda kufuneka ube ngaphezu kwezero"
+      "limitMustBePositive": "Umda kufuneka ube ngaphezu kwezero",
+      "atmToggleError": "Ayiphumelelanga ukuhlaziya ukukhupha kwi-ATM",
+      "atmControlsLoadError": "Ayiphumelelanga ukulayisha imida ye-ATM",
+      "invalidLimitAmount": "Faka isixa esichanekileyo esinamadesimali ama-2 kuphela"
     },
     "CardFeeSchedule": {
       "title": "Uludwe lweentlawulo zeKhadi leBlink",
@@ -3951,6 +3957,12 @@
       "title": "Asikwazi ukufudusa ibhalansi yakho yedola",
       "body": "Qala ukhuphe yonke ibhalansi yakho yedola. Ungayidlulisela kwibhalansi yakho yeBitcoin kuBlink okanye kwenye indawo."
     },
+    "pendingDepositModal": {
+      "title": "Kukho idiphozithi esalindileyo kwiakhawunti yakho",
+      "body": "Awukwazi ukufudukela kolunye uhlobo lweakhawunti de zonke iidiphozithi zakho ezisalindileyo zihlawulwe kwaye zifakwe kule akhawunti.",
+      "contactSupportCta": "Qhagamshelana nenkxaso",
+      "stillConfirming": "Idiphozithi yakho ayikaqinisekiswa. Zama kwakhona emva kwemizuzu embalwa."
+    },
     "balancesOverview": {
       "title": "Hambisa ibhalansi yakho",
       "body": "Hambisa imali yakho ngokukhuselekileyo kwiakhawunti yakho entsha.",
@@ -4138,6 +4150,7 @@
     "get": "Khuphela",
     "storeNote": "“Khuphela” ivula i-App Store okanye i-Google Play. Buyela kwi-Blink xa sele ifakiwe.",
     "haveAnApp": "Ndine-app",
+    "learnHow": "Funda indlela",
     "keyInstruction": "Kopisha esi sitshixo sokumisela kwi-app yakho ye-authenticator.",
     "qrInstruction": "Usebenzisa esinye isixhobo?\nEndaweni yoko skena le QR khowudi.",
     "backupTitle": "Gcina ikopi yesitshixo sakho",
@@ -4250,7 +4263,6 @@
     "payment": "Intlawulo"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Izinga lotshintshiselwano lisenokuba lidlule ixesha",
     "satsOnly": "Ibonisa ii-sats — alikho izinga lotshintshiselwano"
   },
   "SelfCustodialOffline": {

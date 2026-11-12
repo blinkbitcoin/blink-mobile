@@ -142,7 +142,7 @@ jest.mock("@rn-vui/themed", () => {
   return {
     makeStyles:
       (fn: (theme: { colors: Record<string, string> }) => Record<string, object>) => () =>
-        fn({ colors: { primary: "#fc5805" } }),
+        fn({ colors: { accent: "#fc5805" } }),
     Text: ({ children }: { children: React.ReactNode }) =>
       ReactActual.createElement("Text", null, children),
     useTheme: () => ({ theme: { mode: mockThemeMode } }),
@@ -151,7 +151,7 @@ jest.mock("@rn-vui/themed", () => {
 
 jest.mock("@app/rne-theme/theme", () => ({
   __esModule: true,
-  default: { darkColors: { _orange: "#fc5805" } },
+  default: { darkColors: { staticBrandOrange: "#fc5805" } },
 }))
 
 jest.mock("@app/assets/logo/app-logo-dark.svg", () => "AppLogoDark")

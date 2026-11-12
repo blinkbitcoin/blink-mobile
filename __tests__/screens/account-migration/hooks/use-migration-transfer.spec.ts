@@ -2,7 +2,7 @@ import { act, renderHook } from "@testing-library/react-native"
 
 import { MigrationStatus } from "@app/graphql/generated"
 import {
-  resetMigrationCommitGuard,
+  resetMigrationCommitRecords,
   useMigrationTransfer,
 } from "@app/screens/account-migration/hooks/use-migration-transfer"
 import { MigrationSdkStatus } from "@app/self-custodial/migration-transfer-request"
@@ -99,6 +99,41 @@ const collectedRequest = {
 const networkError = () =>
   Object.assign(new Error("offline"), { networkError: new Error("net") })
 
+type CommitAnswer = { data: { migrationCommit: { errors: unknown[] } } }
+
+/** The code a stale proof comes back under; only a skewed clock makes it retryable. */
+const staleProofRejection: CommitAnswer = {
+  data: {
+    migrationCommit: {
+      errors: [{ message: "stale proof", code: "MIGRATION_INVALID_DESTINATION" }],
+    },
+  },
+}
+
+const pendingDepositRejection: CommitAnswer = {
+  data: {
+    migrationCommit: {
+      errors: [
+        {
+          message: "Migration is not available while an incoming deposit is pending.",
+          code: "MIGRATION_PENDING_DEPOSIT",
+        },
+      ],
+    },
+  },
+}
+
+/** A commit the test answers by hand, to keep it in flight across a remount. */
+const deferredCommit = () => {
+  let resolve: (answer: CommitAnswer) => void = () => undefined
+  let reject: (error: Error) => void = () => undefined
+  const promise = new Promise<CommitAnswer>((settle, fail) => {
+    resolve = settle
+    reject = fail
+  })
+  return { promise, resolve, reject }
+}
+
 const renderTransfer = (
   overrides: Partial<Parameters<typeof useMigrationTransfer>[0]> = {},
 ) =>
@@ -108,25 +143,30 @@ const renderTransfer = (
       selfCustodialAccountId: "sc-account-1",
       expectedReceiveSats: 21000,
       skip: false,
+      isDepositChecked: false,
       ...overrides,
     }),
   )
 
-describe("useMigrationTransfer", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    resetMigrationCommitGuard()
-    mockStatus = MigrationStatus.InProgress
-    mockRefetchStatus = () => Promise.resolve(mockStatus)
-    mockBuildTransferRequest.mockResolvedValue({
-      status: MigrationSdkStatus.Ok,
-      value: collectedRequest,
-    })
-    mockCommitMigration.mockResolvedValue({ data: { migrationCommit: { errors: [] } } })
-    mockIsDeviceClockSkewed.mockReturnValue(false)
-    mockCurrentProofTimestamp.mockReturnValue(1_700_000_000)
-    mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+/** Run before each case, so after RNTL's auto-cleanup has unmounted the previous case's
+ *  hooks, which the records reset needs. */
+const resetTransferMocks = () => {
+  jest.clearAllMocks()
+  resetMigrationCommitRecords()
+  mockStatus = MigrationStatus.InProgress
+  mockRefetchStatus = () => Promise.resolve(mockStatus)
+  mockBuildTransferRequest.mockResolvedValue({
+    status: MigrationSdkStatus.Ok,
+    value: collectedRequest,
   })
+  mockCommitMigration.mockResolvedValue({ data: { migrationCommit: { errors: [] } } })
+  mockIsDeviceClockSkewed.mockReturnValue(false)
+  mockCurrentProofTimestamp.mockReturnValue(1_700_000_000)
+  mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+}
+
+describe("useMigrationTransfer", () => {
+  beforeEach(resetTransferMocks)
 
   it("commits the collected destination while the server awaits one", async () => {
     renderTransfer()
@@ -232,6 +272,7 @@ describe("useMigrationTransfer", () => {
           selfCustodialAccountId: "sc-account-1",
           expectedReceiveSats: 21000,
           skip: false,
+          isDepositChecked: false,
         }),
       { initialProps: { custodialAccountId: null as string | null } },
     )
@@ -270,6 +311,7 @@ describe("useMigrationTransfer", () => {
           selfCustodialAccountId: "sc-account-1",
           expectedReceiveSats: 21000,
           skip: false,
+          isDepositChecked: false,
         }),
       { initialProps: { custodialAccountId: null as string | null } },
     )
@@ -855,5 +897,459 @@ describe("useMigrationTransfer", () => {
     })
 
     expect(mockCommitMigration).not.toHaveBeenCalled()
+  })
+})
+
+describe("useMigrationTransfer, across a remount mid-commit", () => {
+  beforeEach(resetTransferMocks)
+
+  /** Mounts a screen that sends a commit left in flight, swaps it for a replacement that
+   *  holds back from a second one, and hands back the in-flight commit to settle. */
+  const replaceMidCommit = async () => {
+    const inFlight = deferredCommit()
+    mockCommitMigration.mockReturnValueOnce(inFlight.promise)
+    const first = renderTransfer()
+    await flushEffects()
+    first.unmount()
+    const replacement = renderTransfer()
+    await flushEffects()
+    return { inFlight, replacement }
+  }
+
+  it("hands a lost connection to a screen that replaced the one in flight", async () => {
+    const inFlight = deferredCommit()
+    mockCommitMigration.mockReturnValueOnce(inFlight.promise)
+    const first = renderTransfer()
+    await flushEffects()
+    first.unmount()
+    const replacement = renderTransfer()
+    await flushEffects()
+
+    await act(async () => {
+      inFlight.reject(networkError())
+    })
+    await flushEffects()
+    expect(replacement.result.current.hasConnectionIssue).toBe(true)
+
+    await act(async () => {
+      await replacement.result.current.retry()
+    })
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+    expect(replacement.result.current.hasConnectionIssue).toBe(false)
+  })
+
+  it("hands a stale proof to a screen that replaced the one in flight", async () => {
+    mockIsDeviceClockSkewed.mockReturnValue(true)
+    const { inFlight, replacement } = await replaceMidCommit()
+
+    await act(async () => {
+      inFlight.resolve(staleProofRejection)
+    })
+    await flushEffects()
+    expect(replacement.result.current.isClockOutOfSync).toBe(true)
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+
+    mockIsDeviceClockSkewed.mockReturnValue(false)
+    await act(async () => {
+      await replacement.result.current.retry()
+    })
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+    expect(replacement.result.current.isClockOutOfSync).toBe(false)
+  })
+
+  /** A replacement starts without its account id, which comes from an uncached owner read
+   *  and the checkpoint. A commit that settles in that window still reaches it once the id
+   *  resolves, or it would hold back from a second commit with no retry to offer. */
+  describe("while the replacement's account id is still loading", () => {
+    const replaceWhileOwnerLoads = async () => {
+      const inFlight = deferredCommit()
+      mockCommitMigration.mockReturnValueOnce(inFlight.promise)
+      const first = renderTransfer()
+      await flushEffects()
+      first.unmount()
+      const replacement = renderHook(
+        ({ custodialAccountId }: { custodialAccountId: string | null }) =>
+          useMigrationTransfer({
+            custodialAccountId,
+            selfCustodialAccountId: "sc-account-1",
+            expectedReceiveSats: 21000,
+            skip: false,
+            isDepositChecked: false,
+          }),
+        { initialProps: { custodialAccountId: null as string | null } },
+      )
+      await flushEffects()
+      const resolveOwner = async () => {
+        replacement.rerender({ custodialAccountId: "custodial-1" })
+        await flushEffects()
+      }
+      return { inFlight, replacement, resolveOwner }
+    }
+
+    it("offers the retry for a commit lost to the network, which re-reads the phase", async () => {
+      const { inFlight, replacement, resolveOwner } = await replaceWhileOwnerLoads()
+      await act(async () => {
+        inFlight.reject(networkError())
+      })
+      await flushEffects()
+
+      await resolveOwner()
+      expect(replacement.result.current.hasConnectionIssue).toBe(true)
+      expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+
+      let refetchCount = 0
+      mockRefetchStatus = () => {
+        refetchCount += 1
+        return Promise.resolve(mockStatus)
+      }
+      await act(async () => {
+        await replacement.result.current.retry()
+      })
+      await flushEffects()
+
+      expect(refetchCount).toBe(1)
+      expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+      expect(replacement.result.current.hasConnectionIssue).toBe(false)
+    })
+
+    it("watches instead of recommitting when the lost commit had landed", async () => {
+      const { inFlight, replacement, resolveOwner } = await replaceWhileOwnerLoads()
+      await act(async () => {
+        inFlight.reject(networkError())
+      })
+      await flushEffects()
+      await resolveOwner()
+      expect(replacement.result.current.hasConnectionIssue).toBe(true)
+
+      mockStatus = MigrationStatus.Transferring
+      await act(async () => {
+        await replacement.result.current.retry()
+      })
+      await flushEffects()
+
+      expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+      expect(replacement.result.current.hasConnectionIssue).toBe(false)
+    })
+
+    it("offers the retry for a stale proof and commits again from it", async () => {
+      mockIsDeviceClockSkewed.mockReturnValue(true)
+      const { inFlight, replacement, resolveOwner } = await replaceWhileOwnerLoads()
+      await act(async () => {
+        inFlight.resolve(staleProofRejection)
+      })
+      await flushEffects()
+
+      await resolveOwner()
+      expect(replacement.result.current.isClockOutOfSync).toBe(true)
+      expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+
+      mockIsDeviceClockSkewed.mockReturnValue(false)
+      await act(async () => {
+        await replacement.result.current.retry()
+      })
+      await flushEffects()
+
+      expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+      expect(replacement.result.current.isClockOutOfSync).toBe(false)
+    })
+
+    it("shows a pending deposit refusal and commits again from its retry", async () => {
+      const { inFlight, replacement, resolveOwner } = await replaceWhileOwnerLoads()
+      await act(async () => {
+        inFlight.resolve(pendingDepositRejection)
+      })
+      await flushEffects()
+
+      await resolveOwner()
+      expect(replacement.result.current.isDepositPending).toBe(true)
+      expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+
+      await act(async () => {
+        await replacement.result.current.retry()
+      })
+      await flushEffects()
+
+      expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+      expect(replacement.result.current.isDepositPending).toBe(false)
+    })
+  })
+
+  /** The outcome stays with the account until it is retried, not with the screen it
+   *  reached first, so a later screen still has the retry when that one is gone too. */
+  it("keeps a lost connection for a screen mounted after the one that saw it", async () => {
+    const { inFlight, replacement } = await replaceMidCommit()
+    await act(async () => {
+      inFlight.reject(networkError())
+    })
+    await flushEffects()
+    expect(replacement.result.current.hasConnectionIssue).toBe(true)
+    replacement.unmount()
+
+    const later = renderTransfer()
+    await flushEffects()
+    expect(later.result.current.hasConnectionIssue).toBe(true)
+
+    await act(async () => {
+      await later.result.current.retry()
+    })
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+  })
+
+  /** Only a recoverable outcome is the retry's to clear: one pressed while the commit is
+   *  still out must not open the way for a second invoice. */
+  it("does not commit again on a retry while the commit is still in flight", async () => {
+    const { inFlight, replacement } = await replaceMidCommit()
+
+    await act(async () => {
+      await replacement.result.current.retry()
+    })
+    await flushEffects()
+    replacement.unmount()
+    renderTransfer()
+    await flushEffects()
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      inFlight.resolve({ data: { migrationCommit: { errors: [] } } })
+    })
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+  })
+
+  /** Two screens can be mounted for the account at once: a retry whose phase read answers
+   *  after the other one already sent the next commit leaves that commit's record alone. */
+  it("leaves the commit another screen's retry sent while its own read the phase", async () => {
+    mockCommitMigration.mockRejectedValueOnce(networkError())
+    const first = renderTransfer()
+    const second = renderTransfer()
+    await flushEffects()
+    expect(second.result.current.hasConnectionIssue).toBe(true)
+
+    const phaseReads: Array<() => void> = []
+    mockRefetchStatus = () =>
+      new Promise((resolve) => {
+        phaseReads.push(() => resolve(MigrationStatus.InProgress))
+      })
+    mockCommitMigration.mockReturnValueOnce(deferredCommit().promise)
+    let firstRetry = Promise.resolve()
+    let secondRetry = Promise.resolve()
+    await act(async () => {
+      firstRetry = first.result.current.retry()
+      secondRetry = second.result.current.retry()
+    })
+
+    await act(async () => {
+      phaseReads[0]()
+      await firstRetry
+    })
+    await flushEffects()
+    expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+
+    await act(async () => {
+      phaseReads[1]()
+      await secondRetry
+    })
+    await flushEffects()
+    renderTransfer()
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+  })
+
+  it("keeps a failure on a retry, for a screen mounted afterwards too", async () => {
+    mockCommitMigration.mockResolvedValueOnce({
+      data: { migrationCommit: { errors: [{ message: "refused" }] } },
+    })
+    const first = renderTransfer()
+    await flushEffects()
+
+    await act(async () => {
+      await first.result.current.retry()
+    })
+    first.unmount()
+    const later = renderTransfer()
+    await flushEffects()
+
+    expect(later.result.current.failureReason).toBe(MigrationSupportReason.TransferFailed)
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+  })
+
+  it("leaves a screen for another account alone", async () => {
+    mockCommitMigration.mockResolvedValueOnce({
+      data: { migrationCommit: { errors: [{ message: "refused" }] } },
+    })
+    const other = renderTransfer({ custodialAccountId: "custodial-2", skip: true })
+    renderTransfer()
+    await flushEffects()
+
+    expect(other.result.current.failureReason).toBeNull()
+  })
+
+  /** The same order as a remount mid-commit with a refusal: the failure reaches the screen
+   *  that replaced the one in flight instead of leaving it waiting on the commit. */
+  it("hands a failure to a screen that replaced the one in flight", async () => {
+    const { inFlight, replacement } = await replaceMidCommit()
+
+    await act(async () => {
+      inFlight.resolve({
+        data: { migrationCommit: { errors: [{ message: "refused" }] } },
+      })
+    })
+    await flushEffects()
+
+    expect(replacement.result.current.failureReason).toBe(
+      MigrationSupportReason.TransferFailed,
+    )
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("useMigrationTransfer, with a deposit still confirming", () => {
+  beforeEach(resetTransferMocks)
+
+  it("pauses on the retry instead of handing the user to support", async () => {
+    mockCommitMigration.mockResolvedValue(pendingDepositRejection)
+
+    const { result } = renderTransfer()
+    await flushEffects()
+
+    expect(result.current.isDepositPending).toBe(true)
+    expect(result.current.failureReason).toBeNull()
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  it("pauses the phase poll while the deposit is pending", async () => {
+    mockCommitMigration.mockResolvedValue(pendingDepositRejection)
+
+    renderTransfer()
+    await flushEffects()
+
+    expect(mockUseMigrationStatus).toHaveBeenLastCalledWith({
+      skip: false,
+      pollInterval: 0,
+    })
+  })
+
+  it("suppresses a server failure behind the retry while the deposit is pending", async () => {
+    mockCommitMigration.mockResolvedValue(pendingDepositRejection)
+    const { result, rerender } = renderTransfer()
+    await flushEffects()
+
+    mockStatus = MigrationStatus.Failed
+    rerender({})
+    await flushEffects()
+
+    expect(result.current.isDepositPending).toBe(true)
+    expect(result.current.failureReason).toBeNull()
+  })
+
+  /** Approve checks the deposits right before it opens the screen and says so, so a
+   *  screen it opened after the refusal commits instead of showing it. */
+  it("commits again from a screen Approve opened after the refusal", async () => {
+    mockCommitMigration.mockResolvedValueOnce(pendingDepositRejection)
+    const first = renderTransfer()
+    await flushEffects()
+    expect(first.result.current.isDepositPending).toBe(true)
+    first.unmount()
+
+    const second = renderTransfer({ isDepositChecked: true })
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+    expect(second.result.current.isDepositPending).toBe(false)
+  })
+
+  /** Approve's check only speaks for refusals from before it: a deposit sent since is
+   *  refused on this screen's own commit, and that refusal is the screen's to show. */
+  it("shows the refusal of its own commit on a screen Approve opened", async () => {
+    mockCommitMigration.mockResolvedValueOnce(pendingDepositRejection)
+
+    const { result } = renderTransfer({ isDepositChecked: true })
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+    expect(result.current.isDepositPending).toBe(true)
+  })
+
+  /** Any other way in has not checked the deposits since the refusal, so the refusal
+   *  stands and the screen sends the user back to approve rather than commit over it. */
+  it("keeps the refusal for a screen opened after it without Approve's check", async () => {
+    mockCommitMigration.mockResolvedValueOnce(pendingDepositRejection)
+    const first = renderTransfer()
+    await flushEffects()
+    first.unmount()
+
+    const second = renderTransfer()
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+    expect(second.result.current.isDepositPending).toBe(true)
+  })
+
+  it("takes the pause off the screen that showed it once a later one commits", async () => {
+    mockCommitMigration.mockResolvedValueOnce(pendingDepositRejection)
+    const first = renderTransfer()
+    await flushEffects()
+    expect(first.result.current.isDepositPending).toBe(true)
+
+    const later = renderTransfer({ isDepositChecked: true })
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+    expect(later.result.current.isDepositPending).toBe(false)
+    expect(first.result.current.isDepositPending).toBe(false)
+  })
+
+  /** The order a remount mid-commit takes: the screen that sent the commit is gone when
+   *  the refusal arrives, and the one that replaced it held back from a second commit, so
+   *  the refusal has to reach it or it waits on the commit forever. */
+  it("hands the refusal to a screen that replaced the one in flight", async () => {
+    const inFlight = deferredCommit()
+    mockCommitMigration.mockReturnValueOnce(inFlight.promise)
+    const first = renderTransfer()
+    await flushEffects()
+    first.unmount()
+
+    const replacement = renderTransfer()
+    await flushEffects()
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      inFlight.resolve(pendingDepositRejection)
+    })
+    await flushEffects()
+    expect(replacement.result.current.isDepositPending).toBe(true)
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      await replacement.result.current.retry()
+    })
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+    expect(replacement.result.current.isDepositPending).toBe(false)
+  })
+
+  it("commits again once the user retries, and clears the pending deposit", async () => {
+    mockCommitMigration.mockResolvedValueOnce(pendingDepositRejection)
+    const { result } = renderTransfer()
+    await flushEffects()
+    expect(result.current.isDepositPending).toBe(true)
+
+    await act(async () => {
+      await result.current.retry()
+    })
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+    expect(result.current.isDepositPending).toBe(false)
+    expect(result.current.failureReason).toBeNull()
   })
 })

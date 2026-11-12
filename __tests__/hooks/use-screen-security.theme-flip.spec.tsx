@@ -71,7 +71,9 @@ describe("useScreenSecurity through the real screen-guard manager", () => {
     })
     await flushEffects()
     expect(result.current).toBe("activating")
-    expect(mockRegister).toHaveBeenLastCalledWith({ backgroundColor: light.black })
+    expect(mockRegister).toHaveBeenLastCalledWith({
+      backgroundColor: light.textOnBackground,
+    })
 
     mode = "dark"
     rerender({})
@@ -83,7 +85,9 @@ describe("useScreenSecurity through the real screen-guard manager", () => {
     // the content is still on screen for the frames before the gate re-hides it.
     expect(result.current).toBe("activating")
     expect(mockUnregister).not.toHaveBeenCalled()
-    expect(mockRegister).toHaveBeenLastCalledWith({ backgroundColor: dark.black })
+    expect(mockRegister).toHaveBeenLastCalledWith({
+      backgroundColor: dark.textOnBackground,
+    })
 
     pendingDark.resolve()
     await flushEffects()

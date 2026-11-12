@@ -86,7 +86,7 @@ export const PhoneSetting: React.FC = () => {
       rightIcon={
         phoneVerified ? (
           emailVerified ? (
-            <GaloyIcon name="close" size={20} color={colors.red} />
+            <GaloyIcon name="close" size={20} color={colors.error} />
           ) : null
         ) : (
           "caret-right"

@@ -54,11 +54,11 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
         <ActivityIndicator
           testID={`${label}-loading`}
           size="small"
-          color={colors.primary}
+          color={colors.accent}
           style={styles.spinner}
         />
       ) : (
-        <GaloyIcon name={icon} size={ICON_SIZE} color={colors.primary} />
+        <GaloyIcon name={icon} size={ICON_SIZE} color={colors.accent} />
       )}
     </Pressable>
   )
@@ -69,7 +69,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     columnGap: 5,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     paddingHorizontal: 14,
     paddingVertical: 12,
     borderRadius: 8,
@@ -77,7 +77,7 @@ const useStyles = makeStyles(({ colors }) => ({
     minWidth: 0,
   },
   pressed: {
-    backgroundColor: colors.grey6,
+    backgroundColor: colors.surfacePressed,
   },
   disabled: {
     opacity: 0.5,
@@ -86,7 +86,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexShrink: 1,
     fontSize: 14,
     fontWeight: "400",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   // Same footprint as the icon, so the row does not shift while it spins.
   spinner: {

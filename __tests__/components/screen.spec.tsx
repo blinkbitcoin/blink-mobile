@@ -5,7 +5,9 @@ import { render } from "@testing-library/react-native"
 import { Screen } from "@app/components/screen"
 
 jest.mock("@rn-vui/themed", () => ({
-  useTheme: () => ({ theme: { mode: "light", colors: { white: "#FFFFFF" } } }),
+  useTheme: () => ({
+    theme: { mode: "light", colors: { backgroundDefault: "#FFFFFF" } },
+  }),
 }))
 
 jest.mock("react-native-safe-area-context", () => {

@@ -37,7 +37,7 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
       testID={testID}
     >
       <View style={[styles.checkbox, isChecked && styles.checkboxChecked]}>
-        {isChecked && <GaloyIcon name="check" size={14} color={colors.white} />}
+        {isChecked && <GaloyIcon name="check" size={14} color={colors.textOnAccent} />}
       </View>
       <Text style={[styles.label, centered && styles.labelCentered]}>{label}</Text>
     </Pressable>
@@ -55,17 +55,17 @@ const useStyles = makeStyles(({ colors }) => ({
     height: 20,
     borderRadius: 4,
     borderWidth: 2,
-    borderColor: colors.grey3,
+    borderColor: colors.textDisabled,
     alignItems: "center",
     justifyContent: "center",
   },
   checkboxChecked: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
   },
   label: {
     flex: 1,
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",

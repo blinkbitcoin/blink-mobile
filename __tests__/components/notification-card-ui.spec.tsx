@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Text as ReactNativeText, TouchableOpacity, View } from "react-native"
+import { StyleSheet, Text as ReactNativeText, TouchableOpacity, View } from "react-native"
 import { ReactTestRendererJSON } from "react-test-renderer"
 import { render, fireEvent } from "@testing-library/react-native"
 
@@ -18,15 +18,28 @@ jest.mock("@rn-vui/themed", () => {
     useTheme: () => ({
       theme: {
         colors: {
-          primary: "primary",
-          grey5: "grey5",
-          grey2: "grey2",
-          black: "black",
-          white: "white",
+          accent: "accent",
+          surfaceInteractive: "surfaceInteractive",
+          textMuted: "textMuted",
+          textOnBackground: "textOnBackground",
+          backgroundDefault: "backgroundDefault",
+          textOnAccent: "textOnAccent",
         },
       },
     }),
-    makeStyles: () => () => ({}),
+    /** The real styles, run on sentinel colours: backgroundDefault and textOnAccent share
+     *  a value in the palette, so only distinct names show which one a style picked. */
+    makeStyles: (factory: (theme: { colors: Record<string, string> }) => object) => () =>
+      factory({
+        colors: {
+          accent: "accent",
+          surfaceInteractive: "surfaceInteractive",
+          textMuted: "textMuted",
+          textOnBackground: "textOnBackground",
+          backgroundDefault: "backgroundDefault",
+          textOnAccent: "textOnAccent",
+        },
+      }),
   }
 })
 
@@ -43,9 +56,17 @@ jest.mock("@app/components/atomic/galoy-icon-button", () => ({
 }))
 
 jest.mock("@app/components/atomic/galoy-primary-button", () => ({
-  GaloyPrimaryButton: ({ title, onPress }: { title: string; onPress?: () => void }) => (
+  GaloyPrimaryButton: ({
+    title,
+    onPress,
+    titleStyle,
+  }: {
+    title: string
+    onPress?: () => void
+    titleStyle?: object
+  }) => (
     <TouchableOpacity testID="primary-button" onPress={onPress}>
-      <ReactNativeText>{title}</ReactNativeText>
+      <ReactNativeText style={titleStyle}>{title}</ReactNativeText>
     </TouchableOpacity>
   ),
 }))
@@ -112,6 +133,16 @@ describe("NotificationCardUI", () => {
 
     expect(queryByTestId("primary-button")).toBeTruthy()
     expect(getByText("Learn more")).toBeTruthy()
+  })
+
+  it("labels the accent button in textOnAccent", () => {
+    const { getByText } = render(
+      <NotificationCardUI {...defaultProps} buttonLabel="Learn more" />,
+    )
+
+    expect(StyleSheet.flatten(getByText("Learn more").props.style).color).toBe(
+      "textOnAccent",
+    )
   })
 
   it("does not render button when buttonLabel is not provided", () => {

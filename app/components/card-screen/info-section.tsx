@@ -40,14 +40,14 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 3,
   },
   title: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
     lineHeight: 20,
   },
   card: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 14,

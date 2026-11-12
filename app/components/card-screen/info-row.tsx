@@ -27,7 +27,7 @@ export const InfoRow: React.FC<InfoRowProps> = ({
   const labelStyle = isLabelRegular ? [styles.label, styles.regularLabel] : styles.label
   const valueStyle = isValueMuted
     ? [styles.value, styles.mutedValue]
-    : [styles.value, { color: valueColor ?? colors.black }]
+    : [styles.value, { color: valueColor ?? colors.textOnBackground }]
 
   return (
     <View style={styles.container}>
@@ -50,7 +50,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   label: {
     flex: 1,
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",
@@ -61,7 +61,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   value: {
     flex: 1,
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",
@@ -69,7 +69,7 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlign: "right",
   },
   mutedValue: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontWeight: "400",
   },
   secondaryValue: {

@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "คีย์ API",
+    "inactiveKeys": "คีย์ที่ไม่ได้ใช้งาน ({count})",
     "noKeys": "ยังไม่มีคีย์ API",
     "createKey": "สร้างคีย์ API",
     "createTitle": "คีย์ API ใหม่",
@@ -27,6 +28,7 @@
     "revokeTitle": "เพิกถอนคีย์ API หรือไม่?",
     "revokeBody": "\"{name: string}\" จะหยุดทำงานทันที การกระทำนี้ไม่สามารถเลิกทำได้",
     "revoke": "เพิกถอน",
+    "revokeGoBack": "ย้อนกลับ",
     "revokeSuccess": "เพิกถอนคีย์ API แล้ว",
     "createError": "ไม่สามารถสร้างคีย์ API ได้ โปรดลองอีกครั้ง",
     "revokeError": "ไม่สามารถเพิกถอนคีย์ API ได้ โปรดลองอีกครั้ง",
@@ -2140,7 +2142,9 @@
     "selectAll": "เลือกทั้งหมด",
     "clearAll": "ล้างทั้งหมด",
     "addPlace": "เพิ่มลงแผนที่",
-    "addPlaceTitle": "เพิ่มสถานที่",
+    "addPlaceTitle": "แนะนำร้านค้า",
+    "submitPlaceRequest": "ส่งคำขอ",
+    "showMyLocation": "แสดงตำแหน่งของฉัน",
     "placePinHint": "เลื่อนแผนที่เพื่อวางหมุดบนสถานที่",
     "placeName": "ชื่อ",
     "placeNameHint": "สถานที่นี้ชื่ออะไร",
@@ -3074,7 +3078,6 @@
     "faq": "FAQ",
     "statusPage": "Status Page",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Support",
     "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
     "emailCopied": "email {email: string} ปยังคลิปบอร์ดแล้ว",
@@ -3249,7 +3252,10 @@
       "noLimit": "ไม่มีขีดจำกัด",
       "limitUpdateSuccess": "อัปเดตขีดจำกัดสำเร็จ",
       "limitUpdateError": "ไม่สามารถอัปเดตขีดจำกัดได้",
-      "limitMustBePositive": "ขีดจำกัดต้องมากกว่าศูนย์"
+      "limitMustBePositive": "ขีดจำกัดต้องมากกว่าศูนย์",
+      "atmToggleError": "ไม่สามารถอัปเดตการถอน ATM ได้",
+      "atmControlsLoadError": "ไม่สามารถโหลดขีดจำกัด ATM ได้",
+      "invalidLimitAmount": "ป้อนจำนวนเงินที่ถูกต้อง ทศนิยมไม่เกิน 2 ตำแหน่ง"
     },
     "CardFeeSchedule": {
       "title": "ตารางค่าธรรมเนียมบัตร Blink",
@@ -3951,6 +3957,12 @@
       "title": "เราไม่สามารถย้ายยอดดอลลาร์ของคุณได้",
       "body": "โปรดล้างยอดดอลลาร์ของคุณก่อน คุณสามารถโอนไปยังยอดบิตคอยน์ใน Blink หรือที่อื่นได้"
     },
+    "pendingDepositModal": {
+      "title": "มีเงินฝากที่รอดำเนินการเข้าบัญชีของคุณ",
+      "body": "คุณไม่สามารถย้ายไปยังบัญชีประเภทอื่นได้จนกว่าเงินฝากที่รอดำเนินการทั้งหมดจะได้รับการชำระและเข้าบัญชีนี้แล้ว",
+      "contactSupportCta": "ติดต่อฝ่ายสนับสนุน",
+      "stillConfirming": "เงินฝากของคุณยังไม่ได้รับการยืนยัน โปรดลองอีกครั้งในอีกไม่กี่นาที"
+    },
     "balancesOverview": {
       "title": "ย้ายยอดเงินของคุณ",
       "body": "ย้ายเงินของคุณไปยังบัญชีใหม่อย่างปลอดภัย",
@@ -4138,6 +4150,7 @@
     "get": "ดาวน์โหลด",
     "storeNote": "“ดาวน์โหลด” จะเปิด App Store หรือ Google Play กลับมาที่ Blink เมื่อติดตั้งเสร็จแล้ว",
     "haveAnApp": "ฉันมีแอปแล้ว",
+    "learnHow": "ดูวิธีการ",
     "keyInstruction": "คัดลอกคีย์ตั้งค่านี้ไปยังแอปยืนยันตัวตนของคุณ",
     "qrInstruction": "ใช้อุปกรณ์เครื่องอื่นอยู่ใช่ไหม\nสแกนรหัส QR นี้แทน",
     "backupTitle": "สำรองคีย์ของคุณ",
@@ -4250,7 +4263,6 @@
     "payment": "การชำระเงิน"
   },
   "SelfCustodialStaleRate": {
-    "notice": "อัตราแลกเปลี่ยนอาจไม่เป็นปัจจุบัน",
     "satsOnly": "แสดงเป็น sats — ไม่มีอัตราแลกเปลี่ยน"
   },
   "SelfCustodialOffline": {

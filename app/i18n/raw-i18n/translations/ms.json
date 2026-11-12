@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Kunci API",
+    "inactiveKeys": "Kunci tidak aktif ({count})",
     "noKeys": "Belum ada kunci API",
     "createKey": "Cipta kunci API",
     "createTitle": "Kunci API baharu",
@@ -19,17 +20,18 @@
     "expiryNever": "Tidak pernah",
     "expiresOn": "Tamat tempoh pada {date: string}",
     "neverExpires": "Tidak pernah tamat tempoh",
-    "revoked": "Dibatalkan",
+    "revoked": "Ditarik balik",
     "expired": "Tamat tempoh pada {date: string}",
     "expiredNoDate": "Tamat tempoh",
     "secretWarning": "Ini satu-satunya kali kunci ditunjukkan. Salin atau kongsikannya sekarang dan simpan dengan selamat.",
     "secretCopied": "Kunci API disalin. Papan keratan dikosongkan dalam 1 minit",
-    "revokeTitle": "Batalkan kunci API?",
+    "revokeTitle": "Tarik balik kunci API?",
     "revokeBody": "\"{name: string}\" akan berhenti berfungsi serta-merta. Tindakan ini tidak boleh dibatalkan.",
-    "revoke": "Batalkan",
-    "revokeSuccess": "Kunci API dibatalkan",
+    "revoke": "Tarik balik",
+    "revokeGoBack": "Kembali",
+    "revokeSuccess": "Kunci API ditarik balik",
     "createError": "Tidak dapat mencipta kunci API. Sila cuba lagi.",
-    "revokeError": "Tidak dapat membatalkan kunci API. Sila cuba lagi.",
+    "revokeError": "Tidak dapat menarik balik kunci API. Sila cuba lagi.",
     "loadError": "Tidak dapat memuatkan kunci API anda. Sila cuba lagi kemudian.",
     "discardSecretTitle": "Buang kunci API ini?",
     "discardSecretBody": "Ini satu-satunya kali rahsia ditunjukkan. Jika anda pergi sekarang, kunci tidak dapat dipulihkan dan anda perlu membuat yang baharu.",
@@ -2140,7 +2142,9 @@
     "selectAll": "Pilih semua",
     "clearAll": "Kosongkan semua",
     "addPlace": "Tambah ke peta",
-    "addPlaceTitle": "Tambah tempat",
+    "addPlaceTitle": "Cadangkan perniagaan",
+    "submitPlaceRequest": "Hantar permintaan",
+    "showMyLocation": "Tunjukkan lokasi saya",
     "placePinHint": "Gerakkan peta untuk meletakkan penanda pada tempat itu",
     "placeName": "Nama",
     "placeNameHint": "Nama tempat ini",
@@ -3074,7 +3078,6 @@
     "faq": "Soalan Yang Sering Diajukan",
     "statusPage": "Status Halaman",
     "telegram": "Telegram",
-    "mattermost": "Paling penting",
     "defaultEmailSubject": "Sokongan - {bankName: string}",
     "defaultSupportMessage": "Hai! Saya perlukan bantuan daripada {bankName: string}, Saya menggunakan versi {version: string} pada {os: string}.",
     "emailCopied": "emel {email: string} telah disalin ke clipboard",
@@ -3249,7 +3252,10 @@
       "noLimit": "Tiada had",
       "limitUpdateSuccess": "Had berjaya dikemas kini",
       "limitUpdateError": "Gagal mengemas kini had",
-      "limitMustBePositive": "Had mestilah lebih besar daripada sifar"
+      "limitMustBePositive": "Had mestilah lebih besar daripada sifar",
+      "atmToggleError": "Gagal mengemas kini pengeluaran ATM",
+      "atmControlsLoadError": "Gagal memuatkan had ATM anda",
+      "invalidLimitAmount": "Masukkan jumlah yang sah dengan paling banyak 2 perpuluhan"
     },
     "CardFeeSchedule": {
       "title": "Jadual yuran Kad Blink",
@@ -3951,6 +3957,12 @@
       "title": "Kami tidak dapat memindahkan Baki Dolar anda",
       "body": "Kosongkan Baki Dolar anda terlebih dahulu. Anda boleh memindahkannya ke Baki Bitcoin dalam Blink atau ke tempat lain."
     },
+    "pendingDepositModal": {
+      "title": "Terdapat deposit yang belum selesai ke akaun anda",
+      "body": "Anda tidak boleh berpindah ke jenis akaun lain sebelum semua deposit anda yang belum selesai diselesaikan dan dikreditkan ke akaun ini.",
+      "contactSupportCta": "Hubungi sokongan",
+      "stillConfirming": "Deposit anda belum disahkan. Cuba lagi dalam beberapa minit."
+    },
     "balancesOverview": {
       "title": "Pindahkan baki anda",
       "body": "Pindahkan dana anda dengan selamat ke akaun baharu anda.",
@@ -4138,6 +4150,7 @@
     "get": "Dapatkan",
     "storeNote": "“Dapatkan” membuka App Store atau Google Play. Kembali ke Blink apabila aplikasi telah dipasang.",
     "haveAnApp": "Saya sudah ada aplikasi",
+    "learnHow": "Ketahui caranya",
     "keyInstruction": "Salin kunci persediaan ini ke dalam aplikasi authenticator anda.",
     "qrInstruction": "Menggunakan peranti lain?\nImbas kod QR ini sebagai gantinya.",
     "backupTitle": "Sandarkan kunci anda",
@@ -4250,7 +4263,6 @@
     "payment": "Pembayaran"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Kadar pertukaran mungkin sudah lapuk",
     "satsOnly": "Memaparkan sats — tiada kadar pertukaran tersedia"
   },
   "SelfCustodialOffline": {

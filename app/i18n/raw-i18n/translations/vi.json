@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Khóa API",
+    "inactiveKeys": "Khóa không hoạt động ({count})",
     "noKeys": "Chưa có khóa API nào",
     "createKey": "Tạo khóa API",
     "createTitle": "Khóa API mới",
@@ -27,6 +28,7 @@
     "revokeTitle": "Thu hồi khóa API?",
     "revokeBody": "\"{name: string}\" sẽ ngừng hoạt động ngay lập tức. Không thể hoàn tác thao tác này.",
     "revoke": "Thu hồi",
+    "revokeGoBack": "Quay lại",
     "revokeSuccess": "Đã thu hồi khóa API",
     "createError": "Không thể tạo khóa API. Vui lòng thử lại.",
     "revokeError": "Không thể thu hồi khóa API. Vui lòng thử lại.",
@@ -2140,7 +2142,9 @@
     "selectAll": "Chọn tất cả",
     "clearAll": "Xóa tất cả",
     "addPlace": "Thêm vào bản đồ",
-    "addPlaceTitle": "Thêm địa điểm",
+    "addPlaceTitle": "Đề xuất cửa hàng",
+    "submitPlaceRequest": "Gửi yêu cầu",
+    "showMyLocation": "Hiển thị vị trí của tôi",
     "placePinHint": "Di chuyển bản đồ để đặt ghim lên địa điểm",
     "placeName": "Tên",
     "placeNameHint": "Địa điểm này tên là gì",
@@ -3074,7 +3078,6 @@
     "faq": "FAQ",
     "statusPage": "Status Page",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Support",
     "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
     "emailCopied": "email {email: string} đã sao chép vào bộ nhớ tạm",
@@ -3249,7 +3252,10 @@
       "noLimit": "Không giới hạn",
       "limitUpdateSuccess": "Cập nhật giới hạn thành công",
       "limitUpdateError": "Không thể cập nhật giới hạn",
-      "limitMustBePositive": "Giới hạn phải lớn hơn không"
+      "limitMustBePositive": "Giới hạn phải lớn hơn không",
+      "atmToggleError": "Không thể cập nhật rút ATM",
+      "atmControlsLoadError": "Không thể tải giới hạn ATM",
+      "invalidLimitAmount": "Nhập số tiền hợp lệ, tối đa 2 chữ số thập phân"
     },
     "CardFeeSchedule": {
       "title": "Biểu phí Thẻ Blink",
@@ -3951,6 +3957,12 @@
       "title": "Chúng tôi không thể di chuyển số dư đô la của bạn",
       "body": "Trước tiên hãy rút hết số dư đô la của bạn. Bạn có thể chuyển nó sang số dư Bitcoin trong Blink hoặc nơi khác."
     },
+    "pendingDepositModal": {
+      "title": "Có một khoản tiền gửi đang chờ xử lý vào tài khoản của bạn",
+      "body": "Bạn không thể chuyển sang loại tài khoản khác cho đến khi tất cả các khoản tiền gửi đang chờ xử lý của bạn được hoàn tất và ghi có vào tài khoản này.",
+      "contactSupportCta": "Liên hệ hỗ trợ",
+      "stillConfirming": "Khoản tiền gửi của bạn chưa được xác nhận. Hãy thử lại sau vài phút."
+    },
     "balancesOverview": {
       "title": "Chuyển số dư của bạn",
       "body": "Chuyển tiền của bạn một cách an toàn sang tài khoản mới.",
@@ -4138,6 +4150,7 @@
     "get": "Tải về",
     "storeNote": "“Tải về” sẽ mở App Store hoặc Google Play. Hãy quay lại Blink khi đã cài đặt xong.",
     "haveAnApp": "Tôi đã có ứng dụng",
+    "learnHow": "Tìm hiểu cách",
     "keyInstruction": "Sao chép khóa thiết lập này vào ứng dụng xác thực của bạn.",
     "qrInstruction": "Bạn đang dùng thiết bị khác?\nThay vào đó, hãy quét mã QR này.",
     "backupTitle": "Sao lưu khóa của bạn",
@@ -4250,7 +4263,6 @@
     "payment": "Thanh toán"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Tỷ giá có thể đã cũ",
     "satsOnly": "Đang hiển thị sats — không có tỷ giá"
   },
   "SelfCustodialOffline": {

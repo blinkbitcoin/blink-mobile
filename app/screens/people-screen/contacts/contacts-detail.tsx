@@ -60,7 +60,7 @@ export const ContactsDetailScreenJSX: React.FC<ContactDetailScreenProps> = ({
     <Screen>
       <IconHero
         icon="user"
-        iconColor={colors.black}
+        iconColor={colors.textOnBackground}
         title={lightningAddress}
         titleLines={ADDRESS_LINES}
       />

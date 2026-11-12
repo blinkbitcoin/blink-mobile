@@ -124,9 +124,9 @@ export const selectPrice = ({
    * an amount on screen from changing meaning as services come and go. A custodial
    * session has only the backend, and `noPriceSource` drops out of the selection.
    *
-   * That holds while the feed is stale too. A stale rate is marked as old wherever it
-   * is shown, the feed is refreshed every five minutes and on every foreground, and
-   * expiry hands over to the backend. Asking the backend for a fresher figure meanwhile
+   * That holds while the feed is stale too. A stale rate is shown unlabelled, the feed
+   * is refreshed every five minutes and on every foreground, and expiry hands over to
+   * the backend. Asking the backend for a fresher figure meanwhile
    * would move amounts twice in the first seconds of a launch, since a feed stored on
    * one launch is often stale by the next.
    *

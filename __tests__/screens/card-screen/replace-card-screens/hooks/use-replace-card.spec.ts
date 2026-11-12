@@ -54,12 +54,12 @@ describe("useReplaceCard", () => {
 
     const { result } = renderHook(() => useReplaceCard())
 
-    let replaceResult: { lastFour: string; cardType: string } | null = null
+    let replaceResult: { id: string; lastFour: string; cardType: string } | null = null
     await act(async () => {
       replaceResult = await result.current.replaceCard("card-123")
     })
 
-    expect(replaceResult).toEqual({ lastFour: "4321", cardType: "VIRTUAL" })
+    expect(replaceResult).toEqual({ id: "new-id", lastFour: "4321", cardType: "VIRTUAL" })
     expect(mockMutate).toHaveBeenCalledWith({
       variables: { input: { cardId: "card-123" } },
     })
@@ -73,7 +73,8 @@ describe("useReplaceCard", () => {
 
     const { result } = renderHook(() => useReplaceCard())
 
-    let replaceResult: { lastFour: string; cardType: string } | null = {
+    let replaceResult: { id: string; lastFour: string; cardType: string } | null = {
+      id: "",
       lastFour: "",
       cardType: "",
     }
@@ -95,7 +96,8 @@ describe("useReplaceCard", () => {
 
     const { result } = renderHook(() => useReplaceCard())
 
-    let replaceResult: { lastFour: string; cardType: string } | null = {
+    let replaceResult: { id: string; lastFour: string; cardType: string } | null = {
+      id: "",
       lastFour: "",
       cardType: "",
     }
@@ -116,7 +118,8 @@ describe("useReplaceCard", () => {
 
     const { result } = renderHook(() => useReplaceCard())
 
-    let replaceResult: { lastFour: string; cardType: string } | null = {
+    let replaceResult: { id: string; lastFour: string; cardType: string } | null = {
+      id: "",
       lastFour: "",
       cardType: "",
     }
