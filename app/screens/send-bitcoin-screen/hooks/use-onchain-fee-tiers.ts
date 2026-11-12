@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from "react"
 
 import {
+  FeePolicy,
   SdkError,
   SdkError_Tags as SdkErrorTags,
   type BreezSdkInterface,
@@ -90,17 +91,27 @@ const toTiers = (fees: {
  * quoting per keystroke ran several of those at once, each holding leaves another one
  * needed, and failed with an unclassified error on balances that could pay.
  */
-export const useOnchainFeeTiers = (
-  sdk: BreezSdkInterface | null,
-  address: string | undefined,
-  amountSats: number | undefined,
-): OnchainFeeTiersResult => {
+type OnchainFeeTiersParams = {
+  sdk: BreezSdkInterface | null
+  address: string | undefined
+  amountSats: number | undefined
+  /** A send-all: the fee is quoted out of the amount rather than on top of it. */
+  isFeeIncluded?: boolean
+}
+
+export const useOnchainFeeTiers = ({
+  sdk,
+  address,
+  amountSats,
+  isFeeIncluded = false,
+}: OnchainFeeTiersParams): OnchainFeeTiersResult => {
   const [quotedTiers, setQuotedTiers] = useState(DEFAULT_TIERS)
   /** Holds only the reason; whether it still applies is decided by the keyed failure flag. */
   const [failureReason, setFailureReason] = useState<SdkFeeError | null>(null)
   const [quotingKey, setQuotingKey] = useState<string | null>(null)
   /** The SDK instance cannot be keyed by value, so its absence gates the quote instead. */
-  const inputsKey = sdk && address && amountSats ? `${address}|${amountSats}` : null
+  const inputsKey =
+    sdk && address && amountSats ? `${address}|${amountSats}|${isFeeIncluded}` : null
   const { hasQuote, hasFailed, discardQuote, markQuoted, markFailed } =
     useQuoteStatus(inputsKey)
 
@@ -139,6 +150,7 @@ export const useOnchainFeeTiers = (
         const prepared = await prepareSend(sdk, {
           paymentRequest: address,
           amount: BigInt(amountSats),
+          feePolicy: isFeeIncluded ? FeePolicy.FeesIncluded : undefined,
         })
         if (isStale()) return null
 
@@ -177,7 +189,7 @@ export const useOnchainFeeTiers = (
     const promise = run()
     inFlightRef.current = { key: inputsKey, promise }
     return promise
-  }, [sdk, address, amountSats, inputsKey, markQuoted, markFailed])
+  }, [sdk, address, amountSats, isFeeIncluded, inputsKey, markQuoted, markFailed])
 
   /** Tiers quoted for other inputs are not this payment's, so they read as unquoted. */
   const tiers = hasQuote ? quotedTiers : DEFAULT_TIERS

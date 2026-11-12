@@ -60,6 +60,8 @@ export type PrepareSendOptions = {
   amount: bigint | undefined
   tokenIdentifier?: string
   conversionOptions?: ConversionOptions
+  /** `FeesIncluded` takes the fee out of `amount`: a send-all passes the balance. */
+  feePolicy?: FeePolicy
 }
 
 export const prepareSend = (sdk: BreezSdkInterface, options: PrepareSendOptions) =>
@@ -71,6 +73,7 @@ export const prepareSend = (sdk: BreezSdkInterface, options: PrepareSendOptions)
       amount: options.amount,
       tokenIdentifier: options.tokenIdentifier,
       conversionOptions: options.conversionOptions,
+      feePolicy: options.feePolicy,
     }),
   )
 

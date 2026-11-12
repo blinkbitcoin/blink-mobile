@@ -16,13 +16,19 @@ import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 
 import { ScRail } from "../measurement"
 
-import { createGetFeeOnchain, createSendMutationOnchain } from "./send-helpers"
+import {
+  createGetFeeOnchain,
+  createSendMutationOnchain,
+  sendAllFeePolicy,
+} from "./send-helpers"
 
 type CreateOnchainParams<T extends WalletCurrency> = {
   sdk: BreezSdkInterface
   address: string
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
   feeTier?: FeeTierOption
+  /** Slid to 100%: the whole balance, with the fee taken out of it. */
+  sendMax?: boolean
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrency>(
@@ -37,6 +43,7 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
     sendingWalletDescriptor,
     destinationSpecifiedMemo,
     senderSpecifiedMemo,
+    sendMax,
   } = params
 
   const memo = destinationSpecifiedMemo || senderSpecifiedMemo
@@ -45,10 +52,14 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
     sendingWalletDescriptor.currency,
   )
 
+  const feePolicy = sendAllFeePolicy(sendMax, sendingWalletDescriptor.currency)
+  const isSendingMax = feePolicy !== undefined
+
   const prepareParams = {
     sdk,
     paymentRequest: address,
     amount: BigInt(settlementAmount.amount),
+    feePolicy,
   }
 
   const sendPaymentAndGetFee: PaymentDetailSendPaymentGetFee<T> = settlementAmount.amount
@@ -63,10 +74,11 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
       }
     : { canSendPayment: false, canGetFee: false }
 
-  const setAmount: SetAmount<T> = (newAmount) =>
+  const setAmount: SetAmount<T> = (newAmount, newSendMax) =>
     createSelfCustodialOnchainPaymentDetails({
       ...params,
       unitOfAccountAmount: newAmount,
+      sendMax: newSendMax,
     })
 
   const setMemo: PaymentDetailSetMemo<T> = destinationSpecifiedMemo
@@ -84,6 +96,7 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
     createSelfCustodialOnchainPaymentDetails({
       ...params,
       sendingWalletDescriptor: desc,
+      sendMax: false,
     })
 
   const setConvertMoneyAmount = (fn: ConvertMoneyAmount) =>
@@ -103,6 +116,9 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
     setSendingWalletDescriptor,
     canSetAmount: true,
     setAmount,
+    canSendMax: sendingWalletDescriptor.currency === WalletCurrency.Btc,
+    isSendingMax,
+    isFeeIncluded: isSendingMax,
     ...setMemo,
     ...sendPaymentAndGetFee,
   } as PaymentDetail<T>

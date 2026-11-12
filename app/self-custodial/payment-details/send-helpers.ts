@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import {
+  FeePolicy,
   OnchainConfirmationSpeed,
   PaymentStatus,
   type BreezSdkInterface,
@@ -53,7 +54,19 @@ type PrepareParams = {
   amount: bigint | undefined
   tokenIdentifier?: string
   conversionOptions?: ConversionOptions
+  feePolicy?: FeePolicy
 }
+
+/**
+ * A send-all on the Bitcoin wallet: the SDK takes the fee out of the balance, so the
+ * wallet spends exactly what it holds. The Dollar wallet's send-all converts on the way
+ * out and waits on the SDK's answer for how the fee meets that (#2048 SA5).
+ */
+export const sendAllFeePolicy = (
+  sendMax: boolean | undefined,
+  currency: WalletCurrency,
+): FeePolicy | undefined =>
+  sendMax && currency === WalletCurrency.Btc ? FeePolicy.FeesIncluded : undefined
 
 /** What a send reports about itself: the rail category and the wallet spent from, never
  *  the destination, amount, or counterparty. */
@@ -87,6 +100,7 @@ const toPrepareOptions = (params: PrepareParams) => ({
   amount: params.amount,
   tokenIdentifier: params.tokenIdentifier,
   conversionOptions: params.conversionOptions,
+  feePolicy: params.feePolicy,
 })
 
 const asGetFeeAmount = <T extends WalletCurrency>(feeSats: number) =>
