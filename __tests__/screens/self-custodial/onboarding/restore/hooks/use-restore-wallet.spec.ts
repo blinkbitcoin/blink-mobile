@@ -1,3 +1,4 @@
+import { it } from "@jest/globals"
 import {
   Network as mockSparkNetwork,
   SdkError_Tags as SdkErrorTags,
@@ -26,6 +27,7 @@ const mockMarkBackupCompletedFor = jest.fn()
 const mockReloadSelfCustodialAccounts = jest.fn()
 const mockFindSelfCustodialAccountByMnemonic = jest.fn()
 const mockValidateMnemonic = jest.fn().mockReturnValue(true)
+const mockMarkInfoBulletinDismissedFor = jest.fn()
 
 jest.mock("bip39", () => ({
   validateMnemonic: (...args: string[]) => mockValidateMnemonic(...args),
@@ -86,6 +88,11 @@ jest.mock("@app/self-custodial/providers/backup-state", () => ({
   BackupMethod: { Manual: "manual", Cloud: "cloud", Recovery: "recovery" },
 }))
 
+jest.mock("@app/hooks/use-self-custodial-info-bulletin-state", () => ({
+  markSelfCustodialInfoBulletinDismissedFor: (...args: string[]) =>
+    mockMarkInfoBulletinDismissedFor(...args),
+}))
+
 jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
@@ -112,6 +119,7 @@ describe("useRestoreWallet", () => {
       id: null,
     })
     mockValidateMnemonic.mockReturnValue(true)
+    mockMarkInfoBulletinDismissedFor.mockResolvedValue(undefined)
   })
 
   it("starts with idle status", () => {
@@ -195,6 +203,57 @@ describe("useRestoreWallet", () => {
     const activateOrder = mockUpdateState.mock.invocationCallOrder[0]
     expect(markOrder).toBeLessThan(activateOrder)
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
+  })
+
+  /** A user who restores a wallet knows what kind of account it is, so the home
+   *  "this is a non-custodial account" bulletin is marked seen before the account is
+   *  active and never flashes on the first home render. */
+  describe("the non-custodial account bulletin", () => {
+    it.each([BackupMethod.Manual, BackupMethod.Cloud])(
+      "is marked seen for a wallet restored with a %s phrase",
+      async (method) => {
+        const { result } = renderHook(() => useRestoreWallet())
+
+        await act(async () => {
+          await result.current.restore("word1 word2 word3", method)
+        })
+
+        expect(mockMarkInfoBulletinDismissedFor).toHaveBeenCalledWith(TEST_ACCOUNT_ID)
+        const markOrder = mockMarkInfoBulletinDismissedFor.mock.invocationCallOrder[0]
+        const activateOrder = mockUpdateState.mock.invocationCallOrder[0]
+        expect(markOrder).toBeLessThan(activateOrder)
+      },
+    )
+
+    it("is marked seen for an account already on this device", async () => {
+      mockFindSelfCustodialAccountByMnemonic.mockResolvedValue({
+        status: "ok",
+        id: "existing-id",
+      })
+
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.restore("word1 word2 word3")
+      })
+
+      expect(mockMarkInfoBulletinDismissedFor).toHaveBeenCalledWith("existing-id")
+      const markOrder = mockMarkInfoBulletinDismissedFor.mock.invocationCallOrder[0]
+      const activateOrder = mockUpdateState.mock.invocationCallOrder[0]
+      expect(markOrder).toBeLessThan(activateOrder)
+    })
+
+    it("is not marked for a phrase that fails validation", async () => {
+      mockValidateMnemonic.mockReturnValue(false)
+
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.restore("not a phrase")
+      })
+
+      expect(mockMarkInfoBulletinDismissedFor).not.toHaveBeenCalled()
+    })
   })
 
   /**
