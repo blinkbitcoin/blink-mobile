@@ -42,10 +42,7 @@ import {
   ZeroUsdMoneyAmount,
 } from "@app/types/amounts"
 import { useSendDustWarning, useTranslateSdkError } from "@app/self-custodial/hooks"
-import {
-  isSelfCustodialErrorCode,
-  SelfCustodialErrorCode,
-} from "@app/self-custodial/sdk-error"
+import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { logPaymentAttempt, logPaymentResult } from "@app/utils/analytics"
 import { reportError } from "@app/utils/error-logging"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
@@ -68,6 +65,7 @@ import { SendHero } from "./send-hero"
 import { useSendBalances } from "./hooks/use-send-wallets"
 import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
 import { PaymentSendExtraInfo } from "./payment-details/index.types"
+import { useReviewFeeText } from "./review/use-review-fee-text"
 import { useReviewQuote } from "./review/use-review-quote"
 import {
   IDEMPOTENCY_KEY_UNAVAILABLE,
@@ -131,11 +129,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     isSendingMax,
   } = paymentDetail
 
-  const {
-    formatDisplayAndWalletAmount,
-    getSecondaryAmountIfCurrencyIsDifferent,
-    formatMoneyAmount,
-  } = useDisplayCurrency()
+  const { getSecondaryAmountIfCurrencyIsDifferent, formatMoneyAmount } =
+    useDisplayCurrency()
   const saveLnAddressContact = useSaveLnAddressContact()
 
   /** A typed amount reads back in the currency the sender last swapped the keypad to; a
@@ -237,9 +232,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     progress.tryingAgain(),
   ]
 
-  const defaultAmount = formatMoneyAmount({ moneyAmount: ZeroUsdMoneyAmount })
-  let currencyFeeAmount = defaultAmount
-  let satFeeAmount = defaultAmount
+  const { feeDisplayText, currencyFeeAmount, satFeeAmount, feeErrorCode, feeErrorText } =
+    useReviewFeeText({ fee, paymentDetail, leadsWithWalletCurrency })
 
   const {
     loading: sendPaymentLoading,
@@ -248,42 +242,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     isSendSpent,
   } = useSendPayment(sendPaymentMutation, paymentDetail.idempotencyKeyRef)
   useHomeOnBackWhenSpent(isSendSpent)
-
-  // Self-custodial fee failures carry a classified SDK code; custodial ones carry raw
-  // GraphQL text that is not fit to show, so only the former replaces the generic string.
-  const feeErrorCode = fee.status === "error" ? fee.errors?.[0]?.message : undefined
-  const feeErrorText =
-    (isSelfCustodialErrorCode(feeErrorCode)
-      ? translateSdkError(feeErrorCode)
-      : undefined) ?? String(LL.common.feeError())
-  let feeDisplayText = feeErrorText
-  currencyFeeAmount = feeErrorText
-  satFeeAmount = feeErrorText
-  if (fee.amount) {
-    const feeDisplayAmount = paymentDetail.convertMoneyAmount(fee.amount, DisplayCurrency)
-    const feeWalletAmount = paymentDetail.convertMoneyAmount(
-      fee.amount,
-      sendingWalletDescriptor.currency,
-    )
-    feeDisplayText = formatDisplayAndWalletAmount({
-      primaryAmount: leadsWithWalletCurrency ? feeWalletAmount : feeDisplayAmount,
-      displayAmount: feeDisplayAmount,
-      walletAmount: feeWalletAmount,
-    })
-
-    currencyFeeAmount = formatMoneyAmount({
-      moneyAmount: feeDisplayAmount,
-    })
-
-    const secondaryFeeAmount = getSecondaryAmountIfCurrencyIsDifferent({
-      primaryAmount: feeDisplayAmount,
-      walletAmount: paymentDetail.convertMoneyAmount(fee.amount, WalletCurrency.Btc),
-      displayAmount: paymentDetail.convertMoneyAmount(fee.amount, DisplayCurrency),
-    })
-    satFeeAmount = formatMoneyAmount({
-      moneyAmount: secondaryFeeAmount ?? ZeroUsdMoneyAmount,
-    })
-  }
 
   // What the recipient gets: the amount less the fee, when the fee comes out of it.
   const displayAmount = paymentDetail.convertMoneyAmount(recipientAmount, DisplayCurrency)

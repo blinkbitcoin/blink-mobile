@@ -902,7 +902,9 @@ const buildBtcSettlementRoute = (unitOfAccountSats: number) => {
 
 describe("SendBitcoinConfirmationScreen — screen reader focus on open", () => {
   it("lands on the slide-to-send handle, the step review leads to", async () => {
-    jest.spyOn(AccessibilityInfo, "isScreenReaderEnabled").mockResolvedValue(true)
+    const isScreenReaderEnabled = jest
+      .spyOn(AccessibilityInfo, "isScreenReaderEnabled")
+      .mockResolvedValue(true)
     const sendAccessibilityEvent = jest
       .spyOn(AccessibilityInfo, "sendAccessibilityEvent")
       .mockImplementation(() => undefined)
@@ -925,7 +927,8 @@ describe("SendBitcoinConfirmationScreen — screen reader focus on open", () => 
         (node as unknown as { props: { testID?: string } }).props.testID,
     )
     expect(focused).toEqual(["slider"])
-    jest.restoreAllMocks()
+    isScreenReaderEnabled.mockRestore()
+    sendAccessibilityEvent.mockRestore()
   })
 })
 
