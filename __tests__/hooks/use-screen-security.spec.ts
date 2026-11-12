@@ -17,7 +17,7 @@ jest.mock("@app/utils/error-logging", () => ({
 let themeBlack = "#000000"
 jest.mock("@rn-vui/themed", () => ({
   useTheme: () => ({
-    theme: { colors: { black: themeBlack } },
+    theme: { colors: { textOnBackground: themeBlack } },
   }),
 }))
 

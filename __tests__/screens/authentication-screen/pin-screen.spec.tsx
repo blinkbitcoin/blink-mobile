@@ -1,14 +1,16 @@
 import React from "react"
-import { Alert, BackHandler } from "react-native"
+import { Alert, BackHandler, StyleSheet, View } from "react-native"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
 import { PinScreen } from "@app/screens/authentication-screen/pin-screen"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { PinScreenPurpose } from "@app/utils/enum"
 import { RouteProp } from "@react-navigation/native"
+import { createTheme, ThemeProvider } from "@rn-vui/themed"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
+import { light } from "@app/rne-theme/colors"
 
 import { ContextForScreen } from "../helper"
 import { flushEffects } from "../../helpers/flush-effects"
@@ -897,6 +899,60 @@ describe("PinScreen", () => {
 
       expect(screen.getByText("1")).not.toBeDisabled()
     })
+  })
+})
+
+/** The page background and the foreground on accent share a value today, so the real
+ *  palette cannot tell which token a style picked. Distinct sentinels can. */
+describe("PinScreen colours", () => {
+  const BACKGROUND_DEFAULT = "#0000B1"
+  const TEXT_ON_ACCENT = "#0000F1"
+
+  const sentinelTheme = createTheme({
+    lightColors: {
+      ...light,
+      backgroundDefault: BACKGROUND_DEFAULT,
+      textOnAccent: TEXT_ON_ACCENT,
+    },
+    mode: "light",
+  })
+
+  const colorOf = (text: string) =>
+    StyleSheet.flatten(screen.getByText(text).props.style).color
+
+  beforeAll(() => {
+    loadLocale("en")
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    primeStore()
+    mockAddListener.mockReturnValue(jest.fn())
+  })
+
+  it("draws the keypad, the PIN dots and the copy in textOnAccent, not the page background", async () => {
+    render(
+      <ContextForScreen>
+        <ThemeProvider theme={sentinelTheme}>
+          <PinScreen route={buildRoute(undefined, PinScreenPurpose.SetPin)} />
+        </ThemeProvider>
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(colorOf("1")).toBe(TEXT_ON_ACCENT)
+    expect(colorOf("Set your PIN code")).toBe(TEXT_ON_ACCENT)
+
+    const dots = () =>
+      screen
+        .UNSAFE_getAllByType(View)
+        .map((view) => StyleSheet.flatten(view.props.style))
+        .filter((style) => style?.width === 16 && style?.height === 16)
+    expect(dots()).toHaveLength(4)
+    dots().forEach((dot) => expect(dot.borderColor).toBe(TEXT_ON_ACCENT))
+
+    await enterPin("1")
+    expect(dots()[0].backgroundColor).toBe(TEXT_ON_ACCENT)
   })
 })
 

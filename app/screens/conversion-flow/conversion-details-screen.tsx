@@ -139,7 +139,7 @@ const ConversionDetailsRegionPending = () => {
       <View style={styles.regionPendingContainer}>
         <ActivityIndicator
           size="large"
-          color={colors.primary}
+          color={colors.accent}
           {...testProps("conversion-details-region-pending")}
         />
       </View>
@@ -324,7 +324,7 @@ const ConversionDetailsScreenContent = ({
   const getAnimatedBackground = (type: ConvertInputType) => ({
     backgroundColor: inputAnimations[type].interpolate({
       inputRange: [0, 1],
-      outputRange: [colors.grey5, colors.grey6],
+      outputRange: [colors.surfaceInteractive, colors.surfacePressed],
     }),
   })
 
@@ -914,7 +914,7 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
   },
   walletSelectorContainer: {
     flexDirection: "column",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 13,
     borderWidth: 1,
     borderColor: "transparent",
@@ -954,7 +954,7 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
     zIndex: 2,
   },
   lineHidden: { opacity: 0 },
-  line: { backgroundColor: colors.grey4, height: 1, flex: 1 },
+  line: { backgroundColor: colors.neutral, height: 1, flex: 1 },
   switchButton: {
     position: "absolute",
     left: 100,

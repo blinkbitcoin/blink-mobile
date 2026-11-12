@@ -48,6 +48,10 @@ type InputFieldProps = {
   loading?: boolean
   disabled?: boolean
   keyboardType?: KeyboardTypeOptions
+  maxLength?: number
+  /** Keeps a line under the field for helper or error text, so the layout doesn't jump
+   *  when one appears. Turn it off for a field that never shows either. */
+  reserveHelperLine?: boolean
   formatDisplay?: (value: string) => string
   testID?: string
 } & IconProps
@@ -77,6 +81,8 @@ export const InputField: React.FC<InputFieldProps> = ({
   loading = false,
   disabled = false,
   keyboardType,
+  maxLength,
+  reserveHelperLine = true,
   formatDisplay,
   testID,
 }) => {
@@ -129,7 +135,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   const isError = Boolean(validationError) || error
 
   const rightIconElement = rightIcon ? (
-    <GaloyIcon name={rightIcon} size={20} color={colors.primary} />
+    <GaloyIcon name={rightIcon} size={20} color={colors.accent} />
   ) : null
 
   if (isEditable) {
@@ -149,10 +155,11 @@ export const InputField: React.FC<InputFieldProps> = ({
               onChangeText?.(text)
             }}
             placeholder={placeholder ?? label}
-            placeholderTextColor={colors.grey3}
-            selectionColor={colors.primary}
+            placeholderTextColor={colors.textDisabled}
+            selectionColor={colors.accent}
             accessibilityLabel={label}
             keyboardType={keyboardType}
+            maxLength={maxLength}
             editable={!disabled}
             onFocus={() => setIsFocused(true)}
             onBlur={() => {
@@ -162,23 +169,25 @@ export const InputField: React.FC<InputFieldProps> = ({
             }}
           />
           {loading ? (
-            <ActivityIndicator size="small" color={colors.primary} />
+            <ActivityIndicator size="small" color={colors.accent} />
           ) : (
             rightIconElement
           )}
         </View>
-        <View style={styles.helperTextContainer}>
-          {displayHelperText ? (
-            <View style={styles.helperTextRow}>
-              {isError && (
-                <GaloyIcon name="warning-circle" size={12} color={colors.error} />
-              )}
-              <Text style={[styles.helperText, isError && styles.helperTextError]}>
-                {displayHelperText}
-              </Text>
-            </View>
-          ) : null}
-        </View>
+        {reserveHelperLine && (
+          <View style={styles.helperTextContainer}>
+            {displayHelperText ? (
+              <View style={styles.helperTextRow}>
+                {isError && (
+                  <GaloyIcon name="warning-circle" size={12} color={colors.error} />
+                )}
+                <Text style={[styles.helperText, isError && styles.helperTextError]}>
+                  {displayHelperText}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+        )}
       </View>
     )
   }
@@ -225,14 +234,14 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
       gap: 3,
     },
     label: {
-      color: colors.black,
+      color: colors.textOnBackground,
       fontSize: 14,
       fontFamily: "Source Sans Pro",
       fontWeight: "400",
       lineHeight: 20,
     },
     valueContainer: {
-      backgroundColor: colors.grey5,
+      backgroundColor: colors.surfaceInteractive,
       borderRadius: 8,
       minHeight: isLarge ? 52 : 50,
       paddingLeft: 14,
@@ -247,7 +256,7 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
     },
     value: {
       flex: 1,
-      color: isLarge || isBold ? colors.black : colors.grey2,
+      color: isLarge || isBold ? colors.textOnBackground : colors.textMuted,
       fontSize: isLarge ? 18 : isBold ? 14 : 16,
       fontFamily: "Source Sans Pro",
       fontWeight: isLarge ? "400" : isBold ? "700" : "400",
@@ -257,7 +266,7 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
       padding: 0,
     },
     helperText: {
-      color: colors.black,
+      color: colors.textOnBackground,
       fontSize: 10,
       lineHeight: 13,
       fontWeight: "400",

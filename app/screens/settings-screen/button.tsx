@@ -35,15 +35,15 @@ const useStyles = makeStyles(
     buttonStyle: {
       height: 42,
       borderRadius: 12,
-      backgroundColor: variant === "critical" ? colors.red : colors.grey5,
+      backgroundColor: variant === "critical" ? colors.error : colors.surfaceInteractive,
     },
     titleStyle: {
       color:
         variant === "critical"
           ? "white"
           : variant === "warning"
-            ? colors.primary
-            : colors.red,
+            ? colors.accent
+            : colors.error,
     },
   }),
 )

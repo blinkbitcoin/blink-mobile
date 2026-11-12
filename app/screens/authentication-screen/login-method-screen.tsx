@@ -170,7 +170,7 @@ const useStyles = makeStyles(({ colors }) => ({
   title: {
     textAlign: "center",
     marginBottom: 24,
-    color: colors.grey0,
+    color: colors.textPrimary,
   },
   buttonContainer: {
     marginVertical: 6,

@@ -59,7 +59,7 @@ export const ConfirmDestinationModal: React.FC<ConfirmDestinationModalProps> = (
       }
       toggleModal={goBack}
       title={LL.SendBitcoinDestinationScreen.confirmUsernameModal.title()}
-      image={<GaloyIcon name="info" size={100} color={colors.primary3} />}
+      image={<GaloyIcon name="info" size={100} color={colors.accent2} />}
       body={
         <View style={styles.body}>
           <Text type={"p2"} color={colors.warning} style={styles.warningText}>
@@ -107,7 +107,7 @@ export const ConfirmDestinationModal: React.FC<ConfirmDestinationModalProps> = (
 
 const useStyles = makeStyles(({ colors }) => ({
   modalCard: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     borderRadius: 16,
     padding: 18,
   },
@@ -134,7 +134,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
   },
   checkBoxText: {

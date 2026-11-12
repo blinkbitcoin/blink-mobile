@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { Ref, useCallback, useEffect, useState } from "react"
 import {
   AccessibilityActionEvent,
   AccessibilityInfo,
@@ -68,6 +68,8 @@ type SwipeButtonPropsType = {
   disabled?: boolean
   /** Handle colour; defaults to `primary`. */
   accentColor?: string
+  /** The handle, the one element a screen reader reaches, e.g. to move focus to it. */
+  handleRef?: Ref<View>
 }
 
 const GaloySliderButton = ({
@@ -79,6 +81,7 @@ const GaloySliderButton = ({
   isLoading = false,
   disabled = false,
   accentColor,
+  handleRef,
 }: SwipeButtonPropsType) => {
   const {
     theme: { colors },
@@ -191,7 +194,9 @@ const GaloySliderButton = ({
     >
       {busy ? (
         <>
-          {trackWidth > 0 && <BusyBorder width={trackWidth} color={colors.black} />}
+          {trackWidth > 0 && (
+            <BusyBorder width={trackWidth} color={colors.textOnBackground} />
+          )}
           <Animated.View
             entering={FadeIn.duration(250).delay(COMPLETE_DURATION_MS)}
             style={styles.labelContainer}
@@ -220,9 +225,10 @@ const GaloySliderButton = ({
       )}
       <GestureDetector gesture={panGesture}>
         <Animated.View
+          ref={handleRef}
           style={[
             styles.handle,
-            { backgroundColor: accentColor ?? colors.primary },
+            { backgroundColor: accentColor ?? colors.accent },
             handleStyle,
           ]}
           pointerEvents={busy ? "none" : "auto"}
@@ -344,9 +350,9 @@ const useStyles = makeStyles(({ colors }) => ({
   track: {
     height: TRACK_HEIGHT,
     width: "100%",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: TRACK_HEIGHT / 2,
-    borderColor: colors.grey4,
+    borderColor: colors.neutral,
     borderWidth: 1,
     justifyContent: "center",
   },
@@ -380,11 +386,11 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   idleText: {
     fontSize: 14,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   busyText: {
     fontSize: 14,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   hiddenDots: {
     fontSize: 14,

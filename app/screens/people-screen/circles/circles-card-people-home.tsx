@@ -100,7 +100,7 @@ export const CirclesCardPeopleHome = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     display: "flex",
     flexDirection: "column",
     marginBottom: 20,
@@ -129,7 +129,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   separator: {
     height: 1,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     marginTop: 8,
   },
   textCenter: {
@@ -144,7 +144,7 @@ const useStyles = makeStyles(({ colors }) => ({
     minHeight: 62,
   },
   pointsNumber: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontWeight: "700",
     fontSize: 50,
   },
@@ -156,7 +156,7 @@ const useStyles = makeStyles(({ colors }) => ({
     position: "absolute",
     right: -150,
     bottom: -150,
-    backgroundColor: colors.backdropWhite,
+    backgroundColor: colors.backdrop,
     zIndex: -10,
   },
   viewCirclescta: {

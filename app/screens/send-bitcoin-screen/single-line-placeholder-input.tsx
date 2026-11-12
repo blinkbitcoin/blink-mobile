@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react"
+import React, { forwardRef, Ref, useCallback } from "react"
 import { StyleSheet, Text, TextInput, TextInputProps, View } from "react-native"
 
 /**
@@ -7,14 +7,32 @@ import { StyleSheet, Text, TextInput, TextInputProps, View } from "react-native"
  * is drawn as a Text over the empty input instead. Typed text and the placeholder share
  * the input's font and left margin, with no horizontal padding, so they start at the same x.
  */
-export const SingleLinePlaceholderInput = forwardRef<TextInput, TextInputProps>(
-  ({ placeholder, placeholderTextColor, style, value, ...props }, ref) => {
+type Props = TextInputProps & {
+  /** The native field, e.g. to move screen reader focus to it. RNE's `Input` keeps `ref`
+   *  for itself, so a screen reaches the field through this prop instead. */
+  fieldRef?: Ref<TextInput>
+}
+
+const assignRef = <T,>(ref: Ref<T> | undefined, node: T | null) => {
+  if (typeof ref === "function") ref(node)
+  else if (ref) ref.current = node
+}
+
+export const SingleLinePlaceholderInput = forwardRef<TextInput, Props>(
+  ({ placeholder, placeholderTextColor, style, value, fieldRef, ...props }, ref) => {
     const { fontFamily, fontSize, fontWeight, letterSpacing, marginLeft } =
       StyleSheet.flatten(style) ?? {}
+    const setRefs = useCallback(
+      (node: TextInput | null) => {
+        assignRef(ref, node)
+        assignRef(fieldRef, node)
+      },
+      [ref, fieldRef],
+    )
 
     return (
       <View style={styles.container}>
-        <TextInput ref={ref} value={value} style={[style, styles.input]} {...props} />
+        <TextInput ref={setRefs} value={value} style={[style, styles.input]} {...props} />
         {!value && placeholder ? (
           <View
             pointerEvents="none"

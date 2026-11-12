@@ -530,6 +530,7 @@ export const createLnurlPaymentDetails = <T extends WalletCurrency>(
     destination: lnurl,
     settlementAmount,
     memo,
+    comment: senderSpecifiedMemo,
     settlementAmountIsEstimated: sendingWalletDescriptor.currency !== WalletCurrency.Btc,
     setSendingWalletDescriptor,
     setInvoice,

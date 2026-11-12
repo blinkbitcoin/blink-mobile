@@ -72,7 +72,7 @@ export const NoteInput: React.FC<NoteInputProps> = ({
           accessibilityLabel={LL.NoteInput.addNote()}
           style={[styles.noteInput, { fontSize }]}
           placeholder={LL.NoteInput.addNote()}
-          placeholderTextColor={colors.black}
+          placeholderTextColor={colors.textOnBackground}
           onChangeText={onChangeText}
           onFocus={() => setIsFocused(true)}
           onBlur={() => {
@@ -92,7 +92,7 @@ export const NoteInput: React.FC<NoteInputProps> = ({
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
         >
-          <GaloyIcon name={"pencil"} size={iconSize} color={colors.primary} />
+          <GaloyIcon name={"pencil"} size={iconSize} color={colors.accent} />
         </TouchableOpacity>
       </View>
     </Pressable>
@@ -109,7 +109,7 @@ const useStyles = makeStyles(
       borderStyle: "solid",
       overflow: "hidden",
       /** Lifts to grey6 while typed in, as the conversion fields do. */
-      backgroundColor: isFocused ? colors.grey6 : colors.grey5,
+      backgroundColor: isFocused ? colors.surfacePressed : colors.surfaceInteractive,
       paddingHorizontal: 10,
       borderRadius: 10,
       alignItems: "center",
@@ -134,7 +134,7 @@ const useStyles = makeStyles(
     },
     noteInput: {
       flex: 1,
-      color: colors.black,
+      color: colors.textOnBackground,
       fontWeight: "400",
       lineHeight: 20,
       /** No platform padding, so the field's min height and font scale set its size. */

@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API anahtarları",
+    "inactiveKeys": "Etkin olmayan anahtarlar ({count})",
     "noKeys": "Henüz API anahtarı yok",
     "createKey": "API anahtarı oluştur",
     "createTitle": "Yeni API anahtarı",
@@ -19,17 +20,18 @@
     "expiryNever": "Asla",
     "expiresOn": "{date: string} tarihinde sona erer",
     "neverExpires": "Asla sona ermez",
-    "revoked": "İptal edildi",
+    "revoked": "Geçersiz kılındı",
     "expired": "{date: string} tarihinde sona erdi",
     "expiredNoDate": "Süresi doldu",
     "secretWarning": "Anahtar yalnızca bu bir kez gösterilir. Şimdi kopyalayın veya paylaşın ve güvenli bir yerde saklayın.",
     "secretCopied": "API anahtarı kopyalandı. Pano 1 dakika içinde temizlenir",
-    "revokeTitle": "API anahtarı iptal edilsin mi?",
+    "revokeTitle": "API anahtarı geçersiz kılınsın mı?",
     "revokeBody": "\"{name: string}\" hemen çalışmayı durduracak. Bu işlem geri alınamaz.",
-    "revoke": "İptal et",
-    "revokeSuccess": "API anahtarı iptal edildi",
+    "revoke": "Geçersiz kıl",
+    "revokeGoBack": "Geri dön",
+    "revokeSuccess": "API anahtarı geçersiz kılındı",
     "createError": "API anahtarı oluşturulamadı. Lütfen tekrar deneyin.",
-    "revokeError": "API anahtarı iptal edilemedi. Lütfen tekrar deneyin.",
+    "revokeError": "API anahtarı geçersiz kılınamadı. Lütfen tekrar deneyin.",
     "loadError": "API anahtarlarınız yüklenemedi. Lütfen daha sonra tekrar deneyin.",
     "discardSecretTitle": "Bu API anahtarından vazgeçilsin mi?",
     "discardSecretBody": "Gizli anahtar yalnızca bu bir kez gösterilir. Şimdi ayrılırsanız anahtar kurtarılamaz ve yenisini oluşturmanız gerekir.",
@@ -2140,7 +2142,9 @@
     "selectAll": "Tümünü seç",
     "clearAll": "Tümünü temizle",
     "addPlace": "Haritaya ekle",
-    "addPlaceTitle": "Yer ekle",
+    "addPlaceTitle": "İşletme öner",
+    "submitPlaceRequest": "Talebi gönder",
+    "showMyLocation": "Konumumu göster",
     "placePinHint": "İşaretçiyi yerin üzerine getirmek için haritayı kaydırın",
     "placeName": "Ad",
     "placeNameHint": "Buranın adı nedir",
@@ -3107,7 +3111,6 @@
     "faq": "SSS",
     "statusPage": "Durum Sayfası",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string}  - Destek",
     "defaultSupportMessage": "Selamlar! {bankName: string} ile ilgili yardıma ihtiyacım var. {os: string} cihazımda {version: string} sürümünü kullanıyorum.",
     "emailCopied": "E-posta {email: string} panoya kopyalandı",
@@ -3289,7 +3292,10 @@
       "noLimit": "Limit yok",
       "limitUpdateSuccess": "Limit başarıyla güncellendi",
       "limitUpdateError": "Limit güncellenemedi",
-      "limitMustBePositive": "Limit sıfırdan büyük olmalıdır"
+      "limitMustBePositive": "Limit sıfırdan büyük olmalıdır",
+      "atmToggleError": "ATM çekimleri güncellenemedi",
+      "atmControlsLoadError": "ATM limitleri yüklenemedi",
+      "invalidLimitAmount": "En fazla 2 ondalık basamaklı geçerli bir tutar girin"
     },
     "CardFeeSchedule": {
       "title": "Blink Kart ücret çizelgesi",
@@ -3991,6 +3997,12 @@
       "title": "Dolar bakiyenizi taşıyamıyoruz",
       "body": "Önce dolar bakiyenizi boşaltın. Blink içindeki Bitcoin bakiyenize veya başka bir yere aktarabilirsiniz."
     },
+    "pendingDepositModal": {
+      "title": "Hesabınıza bekleyen bir para yatırma işlemi var",
+      "body": "Bekleyen tüm para yatırma işlemleriniz tamamlanıp bu hesaba aktarılmadan farklı bir hesap türüne taşınamazsınız.",
+      "contactSupportCta": "Desteğe ulaş",
+      "stillConfirming": "Para yatırma işleminiz henüz onaylanmadı. Birkaç dakika sonra tekrar deneyin."
+    },
     "balancesOverview": {
       "title": "Bakiyeni taşı",
       "body": "Fonlarını güvenle yeni hesabına taşı.",
@@ -4178,6 +4190,7 @@
     "get": "İndir",
     "storeNote": "“İndir” App Store'u veya Google Play'i açar. Yüklendikten sonra Blink'e geri dönün.",
     "haveAnApp": "Bir uygulamam var",
+    "learnHow": "Nasıl yapılır",
     "keyInstruction": "Bu kurulum anahtarını doğrulayıcı uygulamanıza kopyalayın.",
     "qrInstruction": "Başka bir cihaz mı kullanıyorsunuz?\nBunun yerine bu QR kodunu tarayın.",
     "backupTitle": "Anahtarınızı yedekleyin",
@@ -4290,7 +4303,6 @@
     "payment": "Ödeme"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Döviz kuru güncel olmayabilir",
     "satsOnly": "Sats olarak gösteriliyor — döviz kuru yok"
   },
   "SelfCustodialOffline": {

@@ -240,7 +240,10 @@ export type RootStackParamList = {
    *  every prompt's Set authenticator. */
   totpRegistrationIntro: TwoFactorFlowParams | undefined
   totpRegistrationApps: undefined
-  totpRegistrationInitiate: undefined
+  /** Opened from the settings, the setup key screen offers the onboarding as a
+   *  secondary action for a user new to authenticator apps; reached through the
+   *  onboarding, it does not offer it again. */
+  totpRegistrationInitiate: { offersOnboarding?: boolean } | undefined
   /** The setup key travels on to the backup, the only screens that ever show it, and
    *  goes with them once the flow is left. Neither route is deep-linkable, so the key
    *  cannot arrive from outside the app (asserted over DEEP_LINK_SCREENS). */
@@ -279,7 +282,7 @@ export type RootStackParamList = {
   cardFeeScheduleScreen: undefined
   cardAddToMobileWalletScreen: {
     lastFour: string
-    holderName: string
+    cardId: string
   }
   cardDetailsScreen: undefined
   cardLimitsScreen: undefined
@@ -297,7 +300,7 @@ export type RootStackParamList = {
     showCard?: boolean
     showAddToWallet?: boolean
     lastFour?: string
-    holderName?: string
+    cardId?: string
   }
   cardShippingAddressScreen: undefined
   cardCreatePinScreen: undefined
@@ -374,8 +377,19 @@ export type RootStackParamList = {
   accountMigrationKeepReceiving: undefined
   accountMigrationMerchantTools: undefined
   accountMigrationDownloadHistory: undefined
-  accountMigrationBalancesOverview: undefined
-  accountMigrationTransferringFunds: undefined
+  accountMigrationBalancesOverview:
+    | {
+        /** The transfer screen sent the user back: the server refused the commit for a
+         *  deposit still confirming. */
+        isDepositRefused?: true
+      }
+    | undefined
+  accountMigrationTransferringFunds:
+    | {
+        /** Approve opened the screen, right after its own check found no deposit. */
+        isDepositChecked?: true
+      }
+    | undefined
   accountMigrationContactSupport: {
     reason: MigrationSupportReason
     origin?: MigrationSupportOrigin

@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API-sleutels",
+    "inactiveKeys": "Inactieve sleutels ({count})",
     "noKeys": "Nog geen API-sleutels",
     "createKey": "API-sleutel aanmaken",
     "createTitle": "Nieuwe API-sleutel",
@@ -27,6 +28,7 @@
     "revokeTitle": "API-sleutel intrekken?",
     "revokeBody": "\"{name: string}\" stopt onmiddellijk met werken. Dit kan niet ongedaan worden gemaakt.",
     "revoke": "Intrekken",
+    "revokeGoBack": "Terug",
     "revokeSuccess": "API-sleutel ingetrokken",
     "createError": "Kan de API-sleutel niet aanmaken. Probeer het opnieuw.",
     "revokeError": "Kan de API-sleutel niet intrekken. Probeer het opnieuw.",
@@ -2140,7 +2142,9 @@
     "selectAll": "Alles selecteren",
     "clearAll": "Alles wissen",
     "addPlace": "Toevoegen aan kaart",
-    "addPlaceTitle": "Plek toevoegen",
+    "addPlaceTitle": "Zaak voorstellen",
+    "submitPlaceRequest": "Verzoek indienen",
+    "showMyLocation": "Mijn locatie tonen",
     "placePinHint": "Verschuif de kaart zodat de speld op de plek staat",
     "placeName": "Naam",
     "placeNameHint": "Hoe de plek heet",
@@ -3107,7 +3111,6 @@
     "faq": "FAQ",
     "statusPage": "Status Pagina",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Klantenservice",
     "defaultSupportMessage": "Hallo daar! Ik heb hulp nodig met {bankName: string}, ik gebruik de versie {version: string} op {os: string}.",
     "emailCopied": "email {email: string} gekopieerd naar klembord",
@@ -3289,7 +3292,10 @@
       "noLimit": "Geen limiet",
       "limitUpdateSuccess": "Limiet succesvol bijgewerkt",
       "limitUpdateError": "Limiet bijwerken mislukt",
-      "limitMustBePositive": "Limiet moet groter zijn dan nul"
+      "limitMustBePositive": "Limiet moet groter zijn dan nul",
+      "atmToggleError": "Geldautomaatopnames bijwerken mislukt",
+      "atmControlsLoadError": "Geldautomaatlimieten laden mislukt",
+      "invalidLimitAmount": "Voer een geldig bedrag in met maximaal 2 decimalen"
     },
     "CardFeeSchedule": {
       "title": "Blink Card-tariefoverzicht",
@@ -3991,6 +3997,12 @@
       "title": "We kunnen je dollarsaldo niet migreren",
       "body": "Maak eerst je dollarsaldo leeg. Je kunt het overboeken naar je Bitcoin-saldo in Blink of ergens anders."
     },
+    "pendingDepositModal": {
+      "title": "Er staat een storting op je rekening in afwachting",
+      "body": "Je kunt niet naar een ander type rekening migreren voordat al je openstaande stortingen zijn verwerkt en op deze rekening zijn bijgeschreven.",
+      "contactSupportCta": "Contact met support",
+      "stillConfirming": "Je storting is nog niet bevestigd. Probeer het over een paar minuten opnieuw."
+    },
     "balancesOverview": {
       "title": "Verplaats je saldo",
       "body": "Verplaats je geld veilig naar je nieuwe account.",
@@ -4178,6 +4190,7 @@
     "get": "Downloaden",
     "storeNote": "“Downloaden” opent de App Store of Google Play. Kom terug naar Blink zodra de app is geïnstalleerd.",
     "haveAnApp": "Ik heb al een app",
+    "learnHow": "Bekijk hoe",
     "keyInstruction": "Kopieer deze configuratiesleutel naar je authenticator-app.",
     "qrInstruction": "Gebruik je een ander apparaat?\nScan dan deze QR-code.",
     "backupTitle": "Maak een back-up van je sleutel",
@@ -4290,7 +4303,6 @@
     "payment": "Betaling"
   },
   "SelfCustodialStaleRate": {
-    "notice": "De wisselkoers is mogelijk verouderd",
     "satsOnly": "Weergave in sats — geen wisselkoers beschikbaar"
   },
   "SelfCustodialOffline": {

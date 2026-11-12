@@ -119,9 +119,16 @@ export const extractMemo = (payment: Payment): string | undefined => {
      * own advertised text, while the sender's note travels as the LUD-12 comment and is what
      * the SDK stores in lnurlPayInfo.comment. The comment is the user's own note, so it wins
      * over the destination description for history display, matching custodial behaviour.
+     * On the receiving side the LNURL server signs the invoice with a description hash, so
+     * the payer's comment only arrives as lnurlReceiveMetadata.senderComment.
      */
-    const { lnurlPayInfo, description } = payment.details.inner
-    return lnurlPayInfo?.comment ?? description ?? undefined
+    const { lnurlPayInfo, lnurlReceiveMetadata, description } = payment.details.inner
+    return (
+      lnurlPayInfo?.comment ??
+      lnurlReceiveMetadata?.senderComment ??
+      description ??
+      undefined
+    )
   }
 
   if (PaymentDetails.Spark.instanceOf(payment.details)) {

@@ -70,7 +70,7 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
         ]}
         inputStyle={styles.primaryNumberText}
         placeholder={placeholder}
-        placeholderTextColor={colors.grey3}
+        placeholderTextColor={colors.textDisabled}
         inputContainerStyle={styles.primaryNumberInputContainer}
         renderErrorMessage={false}
         rightIcon={rightIcon}
@@ -149,13 +149,13 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlign: "right",
     fontSize: 12,
     lineHeight: 16,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   secondaryBalanceText: {
     textAlign: "right",
     fontSize: 10,
     lineHeight: 14,
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
   primaryNumberContainer: { flex: 1 },
   primaryNumberText: {
@@ -164,7 +164,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     padding: 0,
     margin: 0,
-    color: colors.black,
+    color: colors.textOnBackground,
     fontWeight: "bold",
   },
   primaryNumberInputContainer: { borderBottomWidth: 0, paddingBottom: 0 },

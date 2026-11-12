@@ -1,6 +1,7 @@
 {
     "ApiScreen": {
         "keysGroupTitle": "APIキー",
+        "inactiveKeys": "無効なキー ({count})",
         "noKeys": "APIキーはまだありません",
         "createKey": "APIキーを作成",
         "createTitle": "新しいAPIキー",
@@ -27,6 +28,7 @@
         "revokeTitle": "APIキーを取り消しますか？",
         "revokeBody": "「{name: string}」は直ちに機能しなくなります。この操作は元に戻せません。",
         "revoke": "取り消す",
+        "revokeGoBack": "戻る",
         "revokeSuccess": "APIキーを取り消しました",
         "createError": "APIキーを作成できませんでした。もう一度お試しください。",
         "revokeError": "APIキーを取り消せませんでした。もう一度お試しください。",
@@ -2140,7 +2142,9 @@
         "selectAll": "すべて選択",
         "clearAll": "すべて解除",
         "addPlace": "マップに追加",
-        "addPlaceTitle": "場所を追加",
+        "addPlaceTitle": "店舗を提案",
+        "submitPlaceRequest": "リクエストを送信",
+        "showMyLocation": "現在地を表示",
         "placePinHint": "マップを動かしてピンを場所に合わせてください",
         "placeName": "名称",
         "placeNameHint": "その場所の名前",
@@ -3107,7 +3111,6 @@
         "faq": "よくある質問",
         "statusPage": "ステータス",
         "telegram": "Telegram",
-        "mattermost": "Mattermost",
         "defaultEmailSubject": "{bankName: string} - サポート",
         "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
         "emailCopied": "メールアドレス{email: string}がクリップボードにコピーされました",
@@ -3373,7 +3376,10 @@
             "noLimit": "制限なし",
             "limitUpdateSuccess": "制限が正常に更新されました",
             "limitUpdateError": "制限の更新に失敗しました",
-            "limitMustBePositive": "制限はゼロより大きい必要があります"
+            "limitMustBePositive": "制限はゼロより大きい必要があります",
+            "atmToggleError": "ATM引き出しの更新に失敗しました",
+            "atmControlsLoadError": "ATMの制限を読み込めませんでした",
+            "invalidLimitAmount": "小数点以下2桁までの有効な金額を入力してください"
         },
         "CardStatements": {
             "title": "明細",
@@ -3991,6 +3997,12 @@
             "title": "ドル残高は移行できません",
             "body": "まずドル残高を空にしてください。Blinkのビットコイン残高、または他の場所へ移すことができます。"
         },
+        "pendingDepositModal": {
+            "title": "アカウントに保留中の入金があります",
+            "body": "保留中の入金がすべて確定し、このアカウントに反映されるまで、別の種類のアカウントに移行することはできません。",
+            "contactSupportCta": "サポートに連絡",
+            "stillConfirming": "入金はまだ確定していません。数分後にもう一度お試しください。"
+        },
         "balancesOverview": {
             "title": "残高を移動する",
             "body": "資金を安全に新しいアカウントに移動します。",
@@ -4178,6 +4190,7 @@
         "get": "入手",
         "storeNote": "「入手」を押すとApp StoreまたはGoogle Playが開きます。インストールが終わったらBlinkに戻ってください。",
         "haveAnApp": "アプリを持っています",
+        "learnHow": "やり方を見る",
         "keyInstruction": "このセットアップキーを認証アプリにコピーしてください。",
         "qrInstruction": "別のデバイスを使っていますか？\n代わりにこのQRコードをスキャンしてください。",
         "backupTitle": "キーをバックアップ",
@@ -4290,7 +4303,6 @@
         "payment": "支払い"
     },
     "SelfCustodialStaleRate": {
-        "notice": "為替レートが最新でない可能性があります",
         "satsOnly": "sats で表示中 — 為替レートを取得できません"
     },
     "SelfCustodialOffline": {

@@ -8,6 +8,7 @@ type SwitchRowProps = {
   description?: string
   value?: boolean
   onValueChange?: (value: boolean) => void
+  disabled?: boolean
 }
 
 export const SwitchRow: React.FC<SwitchRowProps> = ({
@@ -15,6 +16,7 @@ export const SwitchRow: React.FC<SwitchRowProps> = ({
   description,
   value = false,
   onValueChange = () => {},
+  disabled = false,
 }) => {
   const styles = useStyles()
   return (
@@ -27,7 +29,12 @@ export const SwitchRow: React.FC<SwitchRowProps> = ({
           </ListItem.Subtitle>
         )}
       </ListItem.Content>
-      <Switch value={value} onValueChange={onValueChange} accessibilityLabel={title} />
+      <Switch
+        value={value}
+        onValueChange={onValueChange}
+        disabled={disabled}
+        accessibilityLabel={title}
+      />
     </ListItem>
   )
 }
@@ -35,19 +42,19 @@ export const SwitchRow: React.FC<SwitchRowProps> = ({
 const useStyles = makeStyles(({ colors }) => ({
   listItemContainer: {
     backgroundColor: colors.transparent,
-    paddingVertical: 8,
+    paddingVertical: 14,
     paddingLeft: 14,
     paddingRight: 10,
     minHeight: 0,
   },
   listItemTitle: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     lineHeight: 20,
     fontWeight: "400",
   },
   listItemSubtitle: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontWeight: "400",
     fontSize: 14,
     lineHeight: 16,

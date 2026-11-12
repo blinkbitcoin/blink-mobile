@@ -16,12 +16,12 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   const { LL } = useI18nContext()
 
   const backgroundColorMap: Record<TransactionStatus, string> = {
-    [TransactionStatus.Pending]: colors.grey3,
+    [TransactionStatus.Pending]: colors.textDisabled,
     [TransactionStatus.Completed]: colors.success,
     [TransactionStatus.Declined]: colors.error,
     [TransactionStatus.Reversed]: colors.warning,
     [TransactionStatus.Refunded]: colors.warning,
-    [TransactionStatus.Unknown]: colors.grey3,
+    [TransactionStatus.Unknown]: colors.textDisabled,
   }
 
   const statusTextMap: Record<TransactionStatus, string> = {
@@ -33,14 +33,14 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
     [TransactionStatus.Unknown]: status,
   }
 
-  const backgroundColor = backgroundColorMap[status] ?? colors.grey3
+  const backgroundColor = backgroundColorMap[status] ?? colors.textDisabled
   const statusText = statusTextMap[status] ?? status
 
   const styles = useStyles({ backgroundColor })
 
   return (
     <View style={styles.badge}>
-      <Text style={[styles.text, { color: colors.black }]}>{statusText}</Text>
+      <Text style={[styles.text, { color: colors.textOnBackground }]}>{statusText}</Text>
     </View>
   )
 }
