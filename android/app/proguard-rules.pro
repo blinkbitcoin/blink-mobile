@@ -36,3 +36,8 @@
 
 -dontwarn com.samsung.** 
 -keep class com.samsung.** { *; }
+
+# Firebase Analytics references the ad libraries build.gradle excludes. Their classes are
+# missing on purpose, and without these R8 stops the release build on the references.
+-dontwarn androidx.privacysandbox.ads.**
+-dontwarn com.google.android.gms.ads.identifier.**

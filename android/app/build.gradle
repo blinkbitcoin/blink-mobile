@@ -148,6 +148,20 @@ android {
     }
 }
 
+/**
+ * Firebase Analytics brings Google's ad libraries along: the Privacy Sandbox ad services
+ * and the advertising ID client. Blink shows no ads, so they are left out of the APK,
+ * where Zapstore reads them as ads (blink-wip#2053). Analytics still calls into them and
+ * catches no NoClassDefFoundError. It stays off those calls only while firebase.json
+ * keeps advertising ID collection and ad storage off and the manifest removes
+ * ACCESS_ADSERVICES_ATTRIBUTION, so relaxing any of them, or upgrading Firebase, needs
+ * that checked again.
+ */
+configurations.all {
+    exclude group: "androidx.privacysandbox.ads"
+    exclude group: "com.google.android.gms", module: "play-services-ads-identifier"
+}
+
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
