@@ -44,9 +44,9 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 /** The backup button is a critical action, so the trial card keeps the
- *  tappable grey5 instead of the static grey7 (blink-wip#1871). */
+ *  tappable surfaceInteractive instead of surfaceStatic (blink-wip#1871). */
 describe("UpgradeTrialAccount", () => {
-  it("keeps the trial card grey5 while it shows the backup action", () => {
+  it("keeps the trial card surfaceInteractive while it shows the backup action", () => {
     const { getByText } = render(
       <ThemeProvider theme={theme}>
         <UpgradeTrialAccount />
@@ -54,6 +54,8 @@ describe("UpgradeTrialAccount", () => {
     )
 
     expect(getByText("Backup account")).toBeTruthy()
-    expect(surfaceColor(getByText("This is a trial account"))).toBe(light.grey5)
+    expect(surfaceColor(getByText("This is a trial account"))).toBe(
+      light.surfaceInteractive,
+    )
   })
 })

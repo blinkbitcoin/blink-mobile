@@ -16,7 +16,7 @@ const LL = i18nObject("en")
 
 /** Reads the palette from inside the same provider the banner renders under, so the
  *  colour assertions follow the theme instead of hardcoding hexes. */
-let themeColors: { accent: string; grey7: string } | undefined
+let themeColors: { accent: string; surfaceStatic: string } | undefined
 const ThemeProbe: React.FC = () => {
   themeColors = useTheme().theme.colors
   return null
@@ -48,15 +48,15 @@ describe("RestrictedRegionBanner", () => {
     ).toBeTruthy()
   })
 
-  /** Shares the backup nudge's primary border, but nothing on it is tappable, so it
-   *  takes the static grey7 fill where the nudge, a SettingsCard, keeps surfaceInteractive. */
-  it("wears the accent border on the static grey7 fill", () => {
+  /** Shares the backup nudge's accent border, but nothing on it is tappable, so it
+   *  takes the surfaceStatic fill where the nudge, a SettingsCard, keeps surfaceInteractive. */
+  it("wears the accent border on the surfaceStatic fill", () => {
     const { getByTestId, getByText } = renderBanner()
-    const { accent, grey7 } = palette()
+    const { accent, surfaceStatic } = palette()
 
     expect(getByTestId("restricted-region-banner")).toHaveStyle({
       borderColor: accent,
-      backgroundColor: grey7,
+      backgroundColor: surfaceStatic,
     })
     expect(getByText(LL.RestrictedRegion.title())).toHaveStyle({ color: accent })
   })

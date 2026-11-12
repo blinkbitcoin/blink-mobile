@@ -219,9 +219,9 @@ describe("TransactionDetailScreen row icon actions", () => {
   })
 
   // A row with a copy or explorer icon is a press target, so it keeps the tappable
-  // grey5; a row with nothing to press takes the static grey7 (blink-wip#1871).
+  // surfaceInteractive; a row with nothing to press takes the surfaceStatic (blink-wip#1871).
   describe("row surface", () => {
-    it("keeps the copy rows grey5 and paints a row without icons grey7", () => {
+    it("keeps the copy rows surfaceInteractive and paints a row without icons surfaceStatic", () => {
       const { getAllByTestId, getByText } = renderScreenWithTx(
         broadcastedOnChainTx(ONCHAIN_TX_HASH),
       )

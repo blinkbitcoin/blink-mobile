@@ -112,12 +112,12 @@ describe("AccountFields", () => {
     expect(mockCopyToClipboard).toHaveBeenCalledWith({ content: "user@blink.sv" })
   })
 
-  /** A field with a copy button is a press target and keeps the tappable grey5;
-   *  backup status has nothing to press, so it takes the static grey7 (blink-wip#1871). */
-  it("keeps the copyable fields grey5 and paints backup status grey7", () => {
+  /** A field with a copy button is a press target and keeps surfaceInteractive;
+   *  backup status has nothing to press, so it takes the surfaceStatic (blink-wip#1871). */
+  it("keeps the copyable fields surfaceInteractive and paints backup status surfaceStatic", () => {
     const { getByText } = renderFields()
-    expect(surfaceColor(getByText("abc-pubkey"))).toBe(light.grey5)
-    expect(surfaceColor(getByText("user@blink.sv"))).toBe(light.grey5)
-    expect(surfaceColor(getByText("Completed"))).toBe(light.grey7)
+    expect(surfaceColor(getByText("abc-pubkey"))).toBe(light.surfaceInteractive)
+    expect(surfaceColor(getByText("user@blink.sv"))).toBe(light.surfaceInteractive)
+    expect(surfaceColor(getByText("Completed"))).toBe(light.surfaceStatic)
   })
 })

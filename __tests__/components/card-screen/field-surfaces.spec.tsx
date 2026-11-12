@@ -12,48 +12,48 @@ import { surfaceColor } from "../../helpers/surface-color"
 const renderThemed = (ui: React.ReactElement) =>
   render(<ThemeProvider theme={theme}>{ui}</ThemeProvider>)
 
-/** A field nobody can press takes the static grey7; a press target or an
- *  editable input keeps the tappable grey5 (blink-wip#1871). */
+/** A field nobody can press takes surfaceStatic; a press target or an
+ *  editable input keeps surfaceInteractive (blink-wip#1871). */
 describe("card-screen field surfaces", () => {
   describe("InputField", () => {
-    it("paints a read-only field grey7", () => {
+    it("paints a read-only field surfaceStatic", () => {
       const { getByText } = renderThemed(<InputField label="Name" value="Satoshi" />)
 
-      expect(surfaceColor(getByText("Satoshi"))).toBe(light.grey7)
+      expect(surfaceColor(getByText("Satoshi"))).toBe(light.surfaceStatic)
     })
 
-    it("keeps a pressable field grey5", () => {
+    it("keeps a pressable field surfaceInteractive", () => {
       const { getByText } = renderThemed(
         <InputField label="Name" value="Satoshi" onPress={jest.fn()} />,
       )
 
-      expect(surfaceColor(getByText("Satoshi"))).toBe(light.grey5)
+      expect(surfaceColor(getByText("Satoshi"))).toBe(light.surfaceInteractive)
     })
 
-    it("keeps an editable field grey5", () => {
+    it("keeps an editable field surfaceInteractive", () => {
       const { getByDisplayValue } = renderThemed(
         <InputField label="Name" value="Satoshi" onChangeText={jest.fn()} />,
       )
 
-      expect(surfaceColor(getByDisplayValue("Satoshi"))).toBe(light.grey5)
+      expect(surfaceColor(getByDisplayValue("Satoshi"))).toBe(light.surfaceInteractive)
     })
   })
 
   describe("MultiLineField", () => {
     const lines = ["Satoshi Nakamoto", "123 Main Street"]
 
-    it("paints a static field grey7", () => {
+    it("paints a static field surfaceStatic", () => {
       const { getByText } = renderThemed(<MultiLineField lines={lines} />)
 
-      expect(surfaceColor(getByText("Satoshi Nakamoto"))).toBe(light.grey7)
+      expect(surfaceColor(getByText("Satoshi Nakamoto"))).toBe(light.surfaceStatic)
     })
 
-    it("keeps a pressable field grey5", () => {
+    it("keeps a pressable field surfaceInteractive", () => {
       const { getByText } = renderThemed(
         <MultiLineField lines={lines} onPress={jest.fn()} />,
       )
 
-      expect(surfaceColor(getByText("Satoshi Nakamoto"))).toBe(light.grey5)
+      expect(surfaceColor(getByText("Satoshi Nakamoto"))).toBe(light.surfaceInteractive)
     })
   })
 })
