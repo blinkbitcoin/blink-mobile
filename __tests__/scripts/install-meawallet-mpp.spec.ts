@@ -69,11 +69,8 @@ const REAL_TAR = spawnSync("sh", ["-c", "command -v tar"], {
 }).stdout.trim()
 
 /** Hashes any archive to the pinned checksum, standing in for the real package. */
-const FAKE_OPENSSL = `#!/bin/sh
-if [ "$1" = "base64" ]; then
-  cat > /dev/null
-  printf '%s' "$FAKE_DIGEST"
-fi
+const FAKE_NODE = `#!/bin/sh
+printf '%s' "$FAKE_DIGEST"
 `
 
 let root: string
@@ -158,9 +155,9 @@ const installEnv = ({
   downloadFails = false,
   env = {},
 }: InstallOptions = {}): Record<string, string> => {
-  const fakeOpenssl = checksumMatches ? [join(root, "openssl-bin")] : []
+  const fakeNode = checksumMatches ? [join(root, "node-bin")] : []
   return {
-    PATH: [join(root, "bin"), ...fakeOpenssl, process.env.PATH ?? ""].join(":"),
+    PATH: [join(root, "bin"), ...fakeNode, process.env.PATH ?? ""].join(":"),
     HOME: home,
     TMPDIR: join(root, "tmp"),
     FAKE_CURL_LOG: curlLog(),
@@ -219,7 +216,7 @@ beforeEach(() => {
   copyFileSync(SCRIPT, join(repo, "scripts", "install-meawallet-mpp.sh"))
   writeExecutable(join(root, "bin", "curl"), FAKE_CURL)
   writeExecutable(join(root, "bin", "tar"), FAKE_TAR)
-  writeExecutable(join(root, "openssl-bin", "openssl"), FAKE_OPENSSL)
+  writeExecutable(join(root, "node-bin", "node"), FAKE_NODE)
   mkdirSync(join(root, "tmp"))
   writeFile(curlLog(), "")
   packTarball()
@@ -450,10 +447,10 @@ describe("install-meawallet-mpp.sh trusting a vendored copy", () => {
     giveConfig()
   })
 
-  /** Every other case fakes openssl, so this one pins the scratch script to the test
+  /** Every other case fakes the hash, so this one pins the scratch script to the test
    *  archive's real digest and runs the real pipeline: a broken digest command would
    *  answer something else, and the install would go without the SDK. */
-  it("verifies the archive with the real openssl when it matches the pinned digest", () => {
+  it("verifies the archive with the real node when it matches the pinned digest", () => {
     const digest = createHash("sha512")
       .update(readFileSync(join(root, "package.tgz")))
       .digest("base64")
