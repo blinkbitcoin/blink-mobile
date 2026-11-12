@@ -209,9 +209,12 @@ describe("TransactionDetailScreen seen state", () => {
     mockSelfCustodialWallet.allTransactions = []
     mockApolloClient.readQuery.mockReturnValue(null)
     mockSelfCustodialFragments.mockReturnValue([])
+    /** An account that already has its seen record, so these tests read the seen state
+     *  itself rather than the start of a new or restored account. */
     mockPersistentState = {
       ...defaultPersistentState,
       activeAccountId: SELF_CUSTODIAL_ACCOUNT_ID,
+      txLastSeenByAccountId: { [SELF_CUSTODIAL_ACCOUNT_ID]: { btcId: "", usdId: "" } },
     }
   })
 
