@@ -367,9 +367,7 @@ describe("useOnchainFeeTierOptions", () => {
 
     // Address and amount gated off, so the SDK never quotes a payment the backend owns.
     expect(mockUseOnchainFeeTiers).toHaveBeenLastCalledWith(
-      expect.anything(),
-      undefined,
-      undefined,
+      expect.objectContaining({ address: undefined, amountSats: undefined }),
     )
   })
 
@@ -384,9 +382,7 @@ describe("useOnchainFeeTierOptions", () => {
     )
 
     expect(mockUseOnchainFeeTiers).toHaveBeenLastCalledWith(
-      expect.anything(),
-      "bc1qaddr",
-      5000,
+      expect.objectContaining({ address: "bc1qaddr", amountSats: 5000 }),
     )
   })
 
