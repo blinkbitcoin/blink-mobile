@@ -356,7 +356,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
   const icon = isMorphing ? (
     <View style={styles.iconStack}>
       <Animated.View style={sendingIconStyle}>
-        <GaloyIcon name="send" size={ICON_SIZE} color={colors.primary} />
+        <GaloyIcon name="send" size={ICON_SIZE} color={colors.accent} />
       </Animated.View>
       {isSent && sentPlay ? (
         <View style={styles.badgeOverlay}>
