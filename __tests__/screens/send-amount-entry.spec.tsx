@@ -685,14 +685,17 @@ describe("fixed amount", () => {
  */
 describe("screen reader focus on open", () => {
   const sendAccessibilityEvent = jest.spyOn(AccessibilityInfo, "sendAccessibilityEvent")
+  const isScreenReaderEnabled = jest.spyOn(AccessibilityInfo, "isScreenReaderEnabled")
 
   beforeEach(() => {
-    jest.spyOn(AccessibilityInfo, "isScreenReaderEnabled").mockResolvedValue(true)
+    isScreenReaderEnabled.mockResolvedValue(true)
     sendAccessibilityEvent.mockImplementation(() => undefined).mockClear()
   })
 
+  // Only this block's spies: the rest of the file keeps its own.
   afterAll(() => {
-    jest.restoreAllMocks()
+    isScreenReaderEnabled.mockRestore()
+    sendAccessibilityEvent.mockRestore()
   })
 
   /** The test ID of each native node screen reader focus was sent to. */
