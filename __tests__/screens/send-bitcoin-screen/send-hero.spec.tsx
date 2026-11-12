@@ -8,6 +8,7 @@ import TypesafeI18n from "@app/i18n/i18n-react"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { light } from "@app/rne-theme/colors"
 import theme from "@app/rne-theme/theme"
+import { haptics } from "@app/utils/haptics"
 import {
   SEND_HERO_CAPTION_TEST_ID,
   SEND_HERO_PRIMARY_TEST_ID,
@@ -15,6 +16,8 @@ import {
   SendHero,
   entryAmountFontSize,
 } from "@app/screens/send-bitcoin-screen/send-hero"
+
+jest.mock("@app/utils/haptics", () => ({ haptics: { select: jest.fn() } }))
 
 const style = (node: ReactTestInstance) => StyleSheet.flatten(node.props.style)
 
@@ -135,6 +138,36 @@ describe("SendHero", () => {
     fireEvent.press(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID))
 
     expect(onSwapCurrency).toHaveBeenCalledTimes(1)
+  })
+
+  describe("select haptic", () => {
+    beforeEach(() => jest.mocked(haptics.select).mockClear())
+
+    it("fires once per currency swap", () => {
+      renderHero({ active: true, secondaryAmount: "746 SAT", onSwapCurrency: jest.fn() })
+
+      fireEvent.press(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID))
+
+      expect(haptics.select).toHaveBeenCalledTimes(1)
+    })
+
+    it("stays silent where the amount can't be swapped", () => {
+      renderHero({ active: true, secondaryAmount: "746 SAT" })
+
+      fireEvent.press(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID))
+
+      expect(haptics.select).not.toHaveBeenCalled()
+    })
+
+    it("stays silent when there is no second currency to swap to", () => {
+      const onSwapCurrency = jest.fn()
+      renderHero({ active: true, onSwapCurrency })
+
+      fireEvent.press(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID))
+
+      expect(onSwapCurrency).not.toHaveBeenCalled()
+      expect(haptics.select).not.toHaveBeenCalled()
+    })
   })
 
   it("copies the caption on a long press where one is offered", () => {
