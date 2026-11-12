@@ -901,13 +901,17 @@ const buildBtcSettlementRoute = (unitOfAccountSats: number) => {
 }
 
 describe("SendBitcoinConfirmationScreen — screen reader focus on open", () => {
+  // react-native's jest mocks: no screen reader by default, and no focus sent.
+  const isScreenReaderEnabled = jest.mocked(AccessibilityInfo.isScreenReaderEnabled)
+  const sendAccessibilityEvent = jest.mocked(AccessibilityInfo.sendAccessibilityEvent)
+
+  afterEach(() => {
+    isScreenReaderEnabled.mockResolvedValue(false)
+  })
+
   it("lands on the slide-to-send handle, the step review leads to", async () => {
-    const isScreenReaderEnabled = jest
-      .spyOn(AccessibilityInfo, "isScreenReaderEnabled")
-      .mockResolvedValue(true)
-    const sendAccessibilityEvent = jest
-      .spyOn(AccessibilityInfo, "sendAccessibilityEvent")
-      .mockImplementation(() => undefined)
+    isScreenReaderEnabled.mockResolvedValue(true)
+    sendAccessibilityEvent.mockClear()
 
     await renderSettled(
       <ContextForScreen>
@@ -927,8 +931,6 @@ describe("SendBitcoinConfirmationScreen — screen reader focus on open", () => 
         (node as unknown as { props: { testID?: string } }).props.testID,
     )
     expect(focused).toEqual(["slider"])
-    isScreenReaderEnabled.mockRestore()
-    sendAccessibilityEvent.mockRestore()
   })
 })
 
