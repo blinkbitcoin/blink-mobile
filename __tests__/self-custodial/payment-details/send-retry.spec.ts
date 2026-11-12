@@ -1637,6 +1637,7 @@ describe("a send asked for before the wallet's stored attempts were read back", 
           /** never answers */
         }),
       save: async () => undefined,
+      remove: async () => undefined,
     })
     mockPrepareSendPayment.mockResolvedValue(sparkAddress())
     mockSendPayment.mockResolvedValue(sent())

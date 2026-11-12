@@ -7,7 +7,11 @@ import type { ConvertAttemptRef } from "@app/types/payment"
 import { sleep } from "@app/utils/sleep"
 import { withTimeout } from "@app/utils/with-timeout"
 
-import { loadLostAttempts, saveLostAttempts } from "../storage/lost-attempts"
+import {
+  loadLostAttempts,
+  removeLostAttempts,
+  saveLostAttempts,
+} from "../storage/lost-attempts"
 
 /**
  * The attempts of a send that threw after dispatch without their payment turning up: the
@@ -91,11 +95,13 @@ let connectedWalletAttempts = new Map<string, LostAttempts>()
 export type LostAttemptsStorage = {
   load: (walletId: string) => Promise<Map<string, LostAttempts>>
   save: (walletId: string, attempts: ReadonlyMap<string, LostAttempts>) => Promise<void>
+  remove: (walletId: string) => Promise<void>
 }
 
 const deviceStorage: LostAttemptsStorage = {
   load: loadLostAttempts,
   save: saveLostAttempts,
+  remove: removeLostAttempts,
 }
 
 /** How long a send waits for the stored attempts; past it, it is refused until they
@@ -112,7 +118,8 @@ export const STORED_ATTEMPTS_WRITE_RETRY_DELAY_MS = 500
  * How a wallet's attempts reach storage. `readSettled`: the read of what an earlier launch
  * left, as long as a send waits for it. `isRead`: whether that read has answered. `keep`:
  * stores the attempts as they are now, after every write before it. `forget`: writes
- * nothing more, as the wallet's deletion asks.
+ * nothing more, as the wallet's deletion asks, and removes again what a write already in
+ * flight stores.
  */
 type WalletPersistence = {
   readSettled: Promise<void>
@@ -169,7 +176,8 @@ export const scopeLostAttemptsTo = (
 
 /**
  * Forgets a wallet's lost attempts, as its deletion does: nothing of it is written again,
- * a send still in flight for it included, and a later scope to it starts from nothing.
+ * a send still in flight for it included, what a write already in flight stores is
+ * removed again, and a later scope to it starts from nothing.
  */
 export const forgetLostAttemptsOf = (walletId: string) => {
   const held = lostAttemptsByWallet.get(walletId)
@@ -226,13 +234,19 @@ const persistWalletAttempts = (
 
   const mayWrite = () => isReadable && !isForgotten
 
+  /** A write already in flight as the wallet was forgotten would put back what its
+   *  deletion removed: what it stored is removed again once it has landed. */
+  const removeIfForgotten = async () => {
+    if (isForgotten) await storage.remove(walletId)
+  }
+
   const write = async () => {
     for (let retry = 0; mayWrite(); retry += 1) {
       const isSaved = await storage.save(walletId, new Map(held)).then(
         () => true,
         () => false,
       )
-      if (isSaved) return
+      if (isSaved) return removeIfForgotten()
       const hasRetriesLeft = retry < STORED_ATTEMPTS_WRITE_RETRIES
       if (!hasRetriesLeft) return
       await sleep(STORED_ATTEMPTS_WRITE_RETRY_DELAY_MS * 2 ** retry)

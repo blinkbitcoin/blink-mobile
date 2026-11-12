@@ -190,6 +190,8 @@ describe("settling lost attempts", () => {
   })
 })
 
+const removeNothing = async () => undefined
+
 /** What a wallet left in storage in an earlier app launch, and every save since. */
 const storageHolding = (stored: Record<string, Map<string, LostAttempts>> = {}) => {
   const saves: Array<[string, Map<string, LostAttempts>]> = []
@@ -202,6 +204,7 @@ const storageHolding = (stored: Record<string, Map<string, LostAttempts>> = {}) 
     save: async (walletId, attempts) => {
       saves.push([walletId, new Map(attempts)])
     },
+    remove: removeNothing,
   }
   return { storage, saves, loads }
 }
@@ -261,6 +264,7 @@ describe("lost attempts across app launches", () => {
       save: async (_walletId, attempts) => {
         saves.push(new Map(attempts))
       },
+      remove: removeNothing,
     })
 
     remember("sp1new", { unresolvedSend })
@@ -291,7 +295,11 @@ describe("lost attempts across app launches", () => {
           saves.push(new Map(attempts))
         },
       )
-    scopeLostAttemptsTo("wallet-launch-10", { load: async () => new Map(), save })
+    scopeLostAttemptsTo("wallet-launch-10", {
+      load: async () => new Map(),
+      save,
+      remove: removeNothing,
+    })
 
     remember("sp1abc", { unresolvedSend })
     await jest.advanceTimersByTimeAsync(0)
@@ -316,7 +324,11 @@ describe("lost attempts across app launches", () => {
       .mockRejectedValueOnce(new Error("disk full"))
       .mockRejectedValueOnce(new Error("disk full"))
       .mockResolvedValue(undefined)
-    scopeLostAttemptsTo("wallet-launch-11", { load: async () => new Map(), save })
+    scopeLostAttemptsTo("wallet-launch-11", {
+      load: async () => new Map(),
+      save,
+      remove: removeNothing,
+    })
 
     remember("sp1abc", { unresolvedSend })
     await jest.advanceTimersByTimeAsync(0)
@@ -341,7 +353,11 @@ describe("lost attempts across app launches", () => {
   it("stops trying a write that failed again once the wallet is forgotten", async () => {
     jest.useFakeTimers()
     const save = jest.fn().mockRejectedValue(new Error("disk full"))
-    scopeLostAttemptsTo("wallet-launch-14", { load: async () => new Map(), save })
+    scopeLostAttemptsTo("wallet-launch-14", {
+      load: async () => new Map(),
+      save,
+      remove: removeNothing,
+    })
 
     remember("sp1abc", { unresolvedSend })
     await jest.advanceTimersByTimeAsync(0)
@@ -380,6 +396,7 @@ describe("lost attempts across app launches", () => {
           answer = resolve
         }),
       save: async () => undefined,
+      remove: removeNothing,
     })
 
     const send = lostAttemptsFor("sp1abc").oneAtATime(async () => "sent")
@@ -403,6 +420,7 @@ describe("lost attempts across app launches", () => {
       save: async (_walletId, attempts) => {
         saves.push(new Map(attempts))
       },
+      remove: removeNothing,
     })
 
     remember("sp1new", { unresolvedSend })
@@ -422,6 +440,7 @@ describe("lost attempts across app launches", () => {
     scopeLostAttemptsTo("wallet-launch-13", {
       load: () => Promise.reject(new Error("io")),
       save,
+      remove: removeNothing,
     })
 
     remember("sp1new", { unresolvedSend })
@@ -439,6 +458,7 @@ describe("lost attempts across app launches", () => {
           answer = resolve
         }),
       save: async () => undefined,
+      remove: removeNothing,
     })
 
     expect(lostAttemptsFor("sp1abc").isStoredRead()).toBe(false)
@@ -466,10 +486,55 @@ describe("lost attempts across app launches", () => {
     forgetLostAttemptsOf("wallet-never-scoped")
   })
 
+  /** The deletion removes the key while the write is in flight: once the write lands, it
+   *  would put the deleted wallet's destinations back. */
+  it("removes again what a write in flight stores after the wallet was forgotten", async () => {
+    const onDisk = new Map<string, ReadonlyMap<string, LostAttempts>>()
+    let landWrite: () => void = () => undefined
+    const storage: LostAttemptsStorage = {
+      load: async () => new Map(),
+      save: (walletId, attempts) =>
+        new Promise<void>((resolve) => {
+          landWrite = () => {
+            onDisk.set(walletId, attempts)
+            resolve()
+          }
+        }),
+      remove: async (walletId) => {
+        onDisk.delete(walletId)
+      },
+    }
+    scopeLostAttemptsTo("wallet-launch-15", storage)
+    remember("sp1abc", { unresolvedSend })
+    await nextTurn()
+
+    forgetLostAttemptsOf("wallet-launch-15")
+    await storage.remove("wallet-launch-15")
+    landWrite()
+    await nextTurn()
+
+    expect(onDisk.has("wallet-launch-15")).toBe(false)
+  })
+
+  it("removes nothing after a write that lands while the wallet is still kept", async () => {
+    const remove = jest.fn(async () => undefined)
+    scopeLostAttemptsTo("wallet-launch-17", {
+      load: async () => new Map(),
+      save: async () => undefined,
+      remove,
+    })
+
+    remember("sp1abc", { unresolvedSend })
+    await nextTurn()
+
+    expect(remove).not.toHaveBeenCalled()
+  })
+
   it("still sends when the wallet's storage cannot be read", async () => {
     scopeLostAttemptsTo("wallet-launch-6", {
       load: () => Promise.reject(new Error("io")),
       save: async () => undefined,
+      remove: removeNothing,
     })
 
     await expect(lostAttemptsFor("sp1abc").oneAtATime(async () => "sent")).resolves.toBe(
