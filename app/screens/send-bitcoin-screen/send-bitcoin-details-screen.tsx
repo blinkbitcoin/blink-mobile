@@ -623,10 +623,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   const hasAmount = paymentDetail.unitOfAccountAmount.amount > 0
 
   /** Where the slider's thumb sits: the amount's share of the balance it is sent from. */
+  const amountInWallet = hasAmount
+    ? convertMoneyAmount(paymentDetail.unitOfAccountAmount, walletCurrency)?.amount
+    : undefined
   const balanceShare =
-    hasAmount && sendingWalletBalance.amount > 0
-      ? convertMoneyAmount(paymentDetail.unitOfAccountAmount, walletCurrency).amount /
-        sendingWalletBalance.amount
+    amountInWallet && sendingWalletBalance.amount > 0
+      ? amountInWallet / sendingWalletBalance.amount
       : 0
   const isLowFunds =
     !amountStatus.validAmount &&

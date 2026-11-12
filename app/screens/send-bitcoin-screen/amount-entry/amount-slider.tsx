@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { LayoutChangeEvent, View } from "react-native"
+import { LayoutChangeEvent, View, useWindowDimensions } from "react-native"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import Animated, {
   Easing,
@@ -16,6 +16,8 @@ import { haptics } from "@app/utils/haptics"
 
 export const AMOUNT_SLIDER_TEST_ID = "send-amount-slider"
 export const AMOUNT_SLIDER_BADGE_TEST_ID = "send-amount-slider-badge"
+export const AMOUNT_SLIDER_TRACK_TEST_ID = "send-amount-slider-track"
+export const AMOUNT_SLIDER_PAN_TEST_ID = "send-amount-slider-pan"
 
 const THUMB_SIZE = 18
 /** The held thumb's ring, drawn 10 out from the thumb all round. */
@@ -28,11 +30,12 @@ const TRACK_HEIGHT = 4
 const THUMB_HIT_SIZE = 42
 const TOUCH_PADDING_VERTICAL = (THUMB_HIT_SIZE - TRACK_HEIGHT) / 2
 const TOUCH_PADDING_HORIZONTAL = THUMB_HIT_SIZE / 2 - THUMB_INSET
-/** Figma: the track sits 10 under the block's top and 10 over the hint; the 270 track
- *  leaves 25 at each side of the 320 body. */
+/** Figma: the track sits 10 under the block's top and 10 over the hint. */
 const TRACK_TOP_GAP = 10
 const HINT_GAP = 10
-const TRACK_SIDE_GAP = 25
+/** Figma draws a 270 track on a 360 screen; it keeps that share of the screen's width, so
+ *  it doesn't stretch on wide phones and still fits a 320 one. */
+const TRACK_SCREEN_SHARE = 270 / 360
 /** Wide enough for "100%"; the badge is centred in it over the thumb. */
 const BADGE_SLOT_WIDTH = 60
 /** Figma's badge bottom sits 24 above the track. */
@@ -89,6 +92,9 @@ export const AmountSlider: React.FC<AmountSliderProps> = ({
 }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
+  const { width: screenWidth } = useWindowDimensions()
+  const touchAreaWidth =
+    Math.round(screenWidth * TRACK_SCREEN_SHARE) + 2 * TOUCH_PADDING_HORIZONTAL
 
   const [trackWidth, setTrackWidth] = useState(0)
   const [heldPercent, setHeldPercent] = useState<number | null>(null)
@@ -131,6 +137,7 @@ export const AmountSlider: React.FC<AmountSliderProps> = ({
   }
 
   const pan = Gesture.Pan()
+    .withTestId(AMOUNT_SLIDER_PAN_TEST_ID)
     .minDistance(0)
     .onBegin((event) => {
       const next = clamp(event.x - TOUCH_PADDING_HORIZONTAL - THUMB_INSET, travel)
@@ -180,8 +187,15 @@ export const AmountSlider: React.FC<AmountSliderProps> = ({
   return (
     <View style={styles.container}>
       <GestureDetector gesture={pan}>
-        <View style={styles.touchArea} testID={AMOUNT_SLIDER_TEST_ID}>
-          <View style={styles.track} onLayout={onTrackLayout}>
+        <View
+          style={[styles.touchArea, { width: touchAreaWidth }]}
+          testID={AMOUNT_SLIDER_TEST_ID}
+        >
+          <View
+            style={styles.track}
+            onLayout={onTrackLayout}
+            testID={AMOUNT_SLIDER_TRACK_TEST_ID}
+          >
             <Animated.View
               style={[
                 styles.fill,
@@ -219,17 +233,17 @@ export const AmountSlider: React.FC<AmountSliderProps> = ({
   )
 }
 
-/** Figma frame `slider-%bar` (30359:128569): a 270 track centred under the amount. */
+/** Figma frame `slider-%bar` (30359:128569): the track centred under the amount. */
 const useStyles = makeStyles(({ colors }) => ({
   /** Pulled up into the gap above so the touch area, not empty padding, fills it. */
   container: {
     alignItems: "center",
     marginTop: TRACK_TOP_GAP - TOUCH_PADDING_VERTICAL,
-    paddingHorizontal: TRACK_SIDE_GAP - TOUCH_PADDING_HORIZONTAL,
     zIndex: 1,
   },
+  /** Never wider than the body it sits in. */
   touchArea: {
-    alignSelf: "stretch",
+    maxWidth: "100%",
     paddingVertical: TOUCH_PADDING_VERTICAL,
     paddingHorizontal: TOUCH_PADDING_HORIZONTAL,
   },
