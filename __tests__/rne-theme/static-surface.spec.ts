@@ -21,6 +21,38 @@ const DEFINITIONS = ["colors.ts", "themed.d.ts", "surfaces.ts"].map((name) =>
   join(APP_DIR, "rne-theme", name),
 )
 
+// The surfaces blink-wip#1871 moved to the static fill, and how many in each file. A swap
+// put back to `surfaceInteractive` lowers a count, which the guard above can't see.
+const STATIC_SURFACES: Record<string, number> = {
+  "app/components/card-screen/info-card.tsx": 1,
+  "app/components/card-screen/info-section.tsx": 1,
+  "app/components/card-screen/input-field.tsx": 1,
+  "app/components/card-screen/multi-line-field.tsx": 1,
+  "app/components/galoy-toast/galoy-toast.tsx": 1,
+  "app/components/info-banner/info-banner.tsx": 1,
+  "app/components/mnemonic-words-grid/mnemonic-words-grid.tsx": 1,
+  "app/components/network-status-banner/network-status-banner.tsx": 1,
+  "app/components/restricted-region/restricted-region-banner.tsx": 1,
+  "app/components/warning-card/warning-card.tsx": 1,
+  "app/screens/account-migration/balance-pair-card.tsx": 1,
+  "app/screens/account-migration/to-non-custodial/contact-support-screen.tsx": 1,
+  "app/screens/account-migration/to-non-custodial/merchant-tools-screen.tsx": 1,
+  "app/screens/account-type-selection/account-type-selection.tsx": 1,
+  "app/screens/card-screen/card-fee-schedule-screen.tsx": 4,
+  "app/screens/card-screen/card-limits-screen/card-limits-screen.tsx": 1,
+  "app/screens/card-screen/card-statements-screen/card-statements-screen.tsx": 1,
+  "app/screens/card-screen/onboarding/card-flow/card-details-screen.tsx": 1,
+  "app/screens/card-screen/onboarding/card-flow/card-subscription-screen.tsx": 1,
+  "app/screens/card-screen/onboarding/investment-flow/term-sheet-screen.tsx": 1,
+  "app/screens/conversion-flow/conversion-confirmation-screen.tsx": 2,
+  "app/screens/conversion-flow/conversion-fee-row.tsx": 1,
+  "app/screens/redeem-lnurl-withdrawal-screen/redeem-bitcoin-result-screen.tsx": 1,
+  "app/screens/settings-screen/self-custodial/account-fields.tsx": 1,
+  "app/screens/totp-screen/authenticator-intro-screen.tsx": 1,
+  "app/screens/totp-screen/authenticator-protected-screen.tsx": 1,
+  "app/screens/transaction-detail-screen/transaction-detail-screen.tsx": 1,
+}
+
 const sourceFiles = (dir: string): string[] =>
   readdirSync(dir).flatMap((name) => {
     const path = join(dir, name)
@@ -65,6 +97,18 @@ describe("static surfaces", () => {
       )
 
     expect(offenders).toEqual([])
+  })
+
+  it("keeps every surface moved to the static fill on it", () => {
+    const counts = Object.fromEntries(
+      Object.keys(STATIC_SURFACES).map((file) => [
+        file,
+        readFileSync(join(REPO_ROOT, file), "utf8").split("staticSurface(colors)")
+          .length - 1,
+      ]),
+    )
+
+    expect(counts).toEqual(STATIC_SURFACES)
   })
 
   it("paints the static fill alone in both modes", () => {
