@@ -17,13 +17,20 @@ import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { resolveSendTokenIdentifier, toSdkSendAmount } from "../bridge"
 import { ScRail } from "../measurement"
 
-import { createGetFee, createSendMutation, requestedAsOf } from "./send-helpers"
+import {
+  createGetFee,
+  createSendMutation,
+  requestedAsOf,
+  sendAllFeePolicy,
+} from "./send-helpers"
 
 type CreateSparkParams<T extends WalletCurrency> = {
   sdk: BreezSdkInterface
   address: string
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
   idempotencyKeyRef?: IdempotencyKeyRef
+  /** Slid to 100%: the whole balance, with the fee taken out of it. */
+  sendMax?: boolean
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createSelfCustodialSparkPaymentDetails = <T extends WalletCurrency>(
@@ -37,6 +44,7 @@ export const createSelfCustodialSparkPaymentDetails = <T extends WalletCurrency>
     sendingWalletDescriptor,
     destinationSpecifiedMemo,
     senderSpecifiedMemo,
+    sendMax,
   } = params
 
   /**
@@ -54,9 +62,13 @@ export const createSelfCustodialSparkPaymentDetails = <T extends WalletCurrency>
     sendingWalletDescriptor.currency,
   )
 
+  const feePolicy = sendAllFeePolicy(sendMax, sendingWalletDescriptor.currency)
+  const isSendingMax = feePolicy !== undefined
+
   const prepareParams = {
     sdk,
     paymentRequest: address,
+    feePolicy,
     amount: settlementAmount.amount
       ? toSdkSendAmount(settlementAmount.amount, sendingWalletDescriptor.currency)
       : undefined,
@@ -79,11 +91,12 @@ export const createSelfCustodialSparkPaymentDetails = <T extends WalletCurrency>
       }
     : { canSendPayment: false, canGetFee: false }
 
-  const setAmount: SetAmount<T> = (newAmount) =>
+  const setAmount: SetAmount<T> = (newAmount, newSendMax) =>
     createSelfCustodialSparkPaymentDetails({
       ...paramsWithKey,
       idempotencyKeyRef: undefined,
       unitOfAccountAmount: newAmount,
+      sendMax: newSendMax,
     })
 
   const setMemo: PaymentDetailSetMemo<T> = destinationSpecifiedMemo
@@ -102,6 +115,7 @@ export const createSelfCustodialSparkPaymentDetails = <T extends WalletCurrency>
       ...paramsWithKey,
       idempotencyKeyRef: undefined,
       sendingWalletDescriptor: desc,
+      sendMax: false,
     })
 
   const setConvertMoneyAmount = (fn: ConvertMoneyAmount) =>
@@ -121,6 +135,9 @@ export const createSelfCustodialSparkPaymentDetails = <T extends WalletCurrency>
     idempotencyKeyRef,
     canSetAmount: true,
     setAmount,
+    canSendMax: sendingWalletDescriptor.currency === WalletCurrency.Btc,
+    isSendingMax,
+    isFeeIncluded: isSendingMax,
     ...setMemo,
     ...sendPaymentAndGetFee,
   } as PaymentDetail<T>
