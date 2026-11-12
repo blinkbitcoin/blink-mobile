@@ -350,7 +350,8 @@ export const lostAttemptsFor = (destination: string): LostAttemptsHandle => {
     isStoredRead: () => persistenceOf.get(byDestination)?.isRead() ?? true,
     update: (change) => {
       const next = change(read())
-      if (next.lostSend || next.unresolvedSend) byDestination.set(key, next)
+      const holdsAnAttempt = Boolean(next.lostSend || next.unresolvedSend)
+      if (holdsAnAttempt) byDestination.set(key, next)
       else byDestination.delete(key)
       persistenceOf.get(byDestination)?.keep()
     },
@@ -438,7 +439,8 @@ const withoutIdentities = (lost: LostSend, settled: LostSend): LostSend | undefi
   const sparkInvoices = lost.sparkInvoices.filter(
     (i) => !settled.sparkInvoices.includes(i),
   )
-  if (paymentHashes.length === 0 && sparkInvoices.length === 0) return undefined
+  const isNothingLeft = paymentHashes.length === 0 && sparkInvoices.length === 0
+  if (isNothingLeft) return undefined
   return {
     ...lost,
     paymentHashes,

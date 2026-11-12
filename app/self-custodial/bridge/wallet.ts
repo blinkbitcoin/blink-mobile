@@ -120,6 +120,9 @@ export const listPayments = (sdk: BreezSdkInterface, offset: number, limit: numb
     sortAscending: false,
   })
 
+const isTaggedError = (err: unknown): err is { tag: unknown; inner: unknown } =>
+  typeof err === "object" && err !== null && "tag" in err && "inner" in err
+
 /**
  * How the SDK answers an id it holds no payment for. The SQLite storage the app runs on
  * passes the missing row up as a storage error, "Underlying implementation error: Query
@@ -128,9 +131,7 @@ export const listPayments = (sdk: BreezSdkInterface, offset: number, limit: numb
  * Anything else is a wallet that could not be read, never a payment that is absent.
  */
 const isPaymentNotFound = (err: unknown): boolean => {
-  if (typeof err !== "object" || err === null || !("tag" in err) || !("inner" in err)) {
-    return false
-  }
+  if (!isTaggedError(err)) return false
   const message = Array.isArray(err.inner) ? err.inner[0] : undefined
   if (typeof message !== "string") return false
   if (err.tag === SdkErrorTags.StorageError)

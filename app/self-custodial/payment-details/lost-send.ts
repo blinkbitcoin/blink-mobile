@@ -174,7 +174,9 @@ const scanHistorySince = async ({
     into.matches.push(...payments.filter(matches))
     if (payments.some(isUndescribedSend)) into.hasUndescribedSend = true
 
-    if (payments.length < LOST_SEND_PAGE_SIZE || isExpired()) return
+    const isLastPage = payments.length < LOST_SEND_PAGE_SIZE
+    const isLookOver = isLastPage || isExpired()
+    if (isLookOver) return
   }
 
   throw new Error(`Lost send lookup ran past ${LOST_SEND_MAX_PAGES} pages without an end`)
@@ -316,14 +318,12 @@ const lookUnderKey = async (
   }
 
   const payment = await getPaymentById(sdk, key.toLowerCase())
-  if (payment && (isCompleted(payment) || isPendingPayment(payment))) {
-    return { status: "found", payment, failed: [] }
-  }
+  const isFound =
+    payment !== undefined && (isCompleted(payment) || isPendingPayment(payment))
+  if (isFound) return { status: "found", payment, failed: [] }
   if (syncFailure) return { status: "unreadable", error: syncFailure.error }
-  return {
-    status: "not-found",
-    failed: payment && isFailedPayment(payment) ? [payment] : [],
-  }
+  const isFailed = payment !== undefined && isFailedPayment(payment)
+  return { status: "not-found", failed: isFailed ? [payment] : [] }
 }
 
 /**
@@ -381,7 +381,8 @@ export const isPaymentOfLostSend = (
   payment: Payment,
 ): boolean => {
   const paymentHash = htlcDetailsOf(payment)?.paymentHash
-  if (paymentHash !== undefined && lost.paymentHashes.includes(paymentHash)) return true
+  const isLostHash = paymentHash !== undefined && lost.paymentHashes.includes(paymentHash)
+  if (isLostHash) return true
   const sparkInvoice = sparkInvoiceOf(payment)
   return sparkInvoice !== undefined && lost.sparkInvoices.includes(sparkInvoice)
 }

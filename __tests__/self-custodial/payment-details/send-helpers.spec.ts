@@ -1709,6 +1709,14 @@ describe("findPaymentUnderKey", () => {
     expect(result.status).toBe("unreadable")
   })
 
+  it("is unreadable when the wallet throws an error that is not the SDK's", async () => {
+    mockGetPayment.mockRejectedValue(new Error("bridge torn down"))
+
+    const result = await settle(lookup())
+
+    expect(result.status).toBe("unreadable")
+  })
+
   it("is unreadable when the wallet cannot catch up with the server", async () => {
     mockSyncWallet.mockRejectedValue(sdkError("NetworkError"))
     mockGetPayment.mockRejectedValue(notFound())

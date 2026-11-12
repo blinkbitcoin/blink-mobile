@@ -331,8 +331,10 @@ const withRequest = (
   return { ...requestedAs, [identityKey]: request }
 }
 
-const withItem = (items: ReadonlyArray<string>, item: string | undefined): string[] =>
-  item === undefined || items.includes(item) ? [...items] : [...items, item]
+const withItem = (items: ReadonlyArray<string>, item: string | undefined): string[] => {
+  const isAlreadyIn = item === undefined || items.includes(item)
+  return isAlreadyIn ? [...items] : [...items, item]
+}
 
 /**
  * The lost attempts once this one is added. The key is kept only while every attempt went
@@ -354,19 +356,21 @@ const withAttempt = (
     idempotencyKey: string | undefined
     requestedAs?: RequestedAs
   },
-): LostSend => ({
-  startedAtMs: earlier?.startedAtMs ?? startedAtMs,
-  lastAttemptAtMs: Math.max(
-    earlier?.lastAttemptAtMs ?? earlier?.startedAtMs ?? startedAtMs,
-    startedAtMs,
-  ),
-  walletClockSec: Math.min(earlier?.walletClockSec ?? walletClockSec, walletClockSec),
-  paymentHashes: withItem(earlier?.paymentHashes ?? [], identity.paymentHash),
-  sparkInvoices: withItem(earlier?.sparkInvoices ?? [], identity.sparkInvoice),
-  idempotencyKey:
-    earlier && earlier.idempotencyKey !== idempotencyKey ? undefined : idempotencyKey,
-  requestedAs: withRequest(earlier?.requestedAs, identity, requestedAs),
-})
+): LostSend => {
+  const isKeyChanged = earlier !== undefined && earlier.idempotencyKey !== idempotencyKey
+  return {
+    startedAtMs: earlier?.startedAtMs ?? startedAtMs,
+    lastAttemptAtMs: Math.max(
+      earlier?.lastAttemptAtMs ?? earlier?.startedAtMs ?? startedAtMs,
+      startedAtMs,
+    ),
+    walletClockSec: Math.min(earlier?.walletClockSec ?? walletClockSec, walletClockSec),
+    paymentHashes: withItem(earlier?.paymentHashes ?? [], identity.paymentHash),
+    sparkInvoices: withItem(earlier?.sparkInvoices ?? [], identity.sparkInvoice),
+    idempotencyKey: isKeyChanged ? undefined : idempotencyKey,
+    requestedAs: withRequest(earlier?.requestedAs, identity, requestedAs),
+  }
+}
 
 type SendOutcome = Awaited<ReturnType<SendPaymentMutation>>
 
@@ -379,9 +383,9 @@ const startKeyOver = (
   idempotencyKeyRef: IdempotencyKeyRef,
   sentKey: string | undefined,
 ) => {
-  if (sentKey !== undefined && idempotencyKeyRef.current === sentKey) {
-    idempotencyKeyRef.current = undefined
-  }
+  const isSentKeyStillCurrent =
+    sentKey !== undefined && idempotencyKeyRef.current === sentKey
+  if (isSentKeyStillCurrent) idempotencyKeyRef.current = undefined
 }
 
 /**
@@ -762,14 +766,17 @@ const sendAfterEarlierAttempts = async <
   ): Promise<SendOutcome | undefined> => {
     const isRetryUnder = (sentWith: string | undefined) =>
       key !== undefined && sentWith === key
+    const unresolvedNow = unresolved
     const isUnresolvedLetThrough =
-      isSentAnyway || isRetryUnder(unresolved?.idempotencyKey)
-    if (unresolved && !isUnresolvedLetThrough) {
-      const refusal = await settleUnresolved(unresolved, isAfterFailedQuote)
+      isSentAnyway || isRetryUnder(unresolvedNow?.idempotencyKey)
+    const mustAskAboutUnresolved = unresolvedNow !== undefined && !isUnresolvedLetThrough
+    if (mustAskAboutUnresolved) {
+      const refusal = await settleUnresolved(unresolvedNow, isAfterFailedQuote)
       if (refusal) return refusal
     }
     if (unresolved) retriedUnder = { ...retriedUnder, unresolvedSend: unresolved }
-    if (!earlier || hasLooked) return undefined
+    const hasNothingToLookFor = !earlier || hasLooked
+    if (hasNothingToLookFor) return undefined
     if (isRetryUnder(earlier.idempotencyKey)) {
       retriedUnder = { ...retriedUnder, lostSend: earlier }
       return undefined
@@ -920,7 +927,8 @@ const sendAfterEarlierAttempts = async <
     ...current,
     lostSend: withAttempt(current.lostSend, thisAttempt),
   })
-  if (!idempotencyKey && !isRaisedBeforeDispatch) {
+  const isLookedForNow = !idempotencyKey && !isRaisedBeforeDispatch
+  if (isLookedForNow) {
     const thisAndEarlier = withAttempt(attempts.read().lostSend, thisAttempt)
     const lost = await findThisSend(thisAndEarlier)
     if (lost.status === "found") {
