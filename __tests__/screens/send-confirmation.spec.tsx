@@ -18,6 +18,7 @@ import {
 } from "@testing-library/react-native"
 
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { INITIAL_FOCUS_DELAY_MS } from "@app/hooks/use-initial-accessibility-focus"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 import { PreferredAmountCurrency } from "@app/graphql/client-only-query"
 import { PayoutSpeed, WalletCurrency } from "@app/graphql/generated"
@@ -333,6 +334,10 @@ jest.mock("@react-navigation/native", () => ({
     isFocused: () => true,
     addListener: () => () => {},
   }),
+  useFocusEffect: (callback: () => undefined | (() => void)) => {
+    const { useEffect } = jest.requireActual("react")
+    useEffect(callback, [callback])
+  },
 }))
 
 // The placeholder renders bare Views without a testID; stub it so the specs
@@ -357,6 +362,7 @@ jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () =
     initialText?: string
     disabledText?: string
     disabled?: boolean
+    handleRef?: React.Ref<React.ElementRef<typeof TouchableOpacity>>
   }
 
   /**
@@ -372,9 +378,11 @@ jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () =
       initialText = "Slide",
       disabledText,
       disabled = false,
+      handleRef,
     } = props
     return (
       <TouchableOpacity
+        ref={handleRef}
         testID={testID}
         onPress={onSwipe}
         disabled={disabled}
@@ -891,6 +899,35 @@ const buildBtcSettlementRoute = (unitOfAccountSats: number) => {
     params: { paymentDetail: PaymentDetails.createIntraledgerPaymentDetails(params) },
   } as const
 }
+
+describe("SendBitcoinConfirmationScreen — screen reader focus on open", () => {
+  it("lands on the slide-to-send handle, the step review leads to", async () => {
+    jest.spyOn(AccessibilityInfo, "isScreenReaderEnabled").mockResolvedValue(true)
+    const sendAccessibilityEvent = jest
+      .spyOn(AccessibilityInfo, "sendAccessibilityEvent")
+      .mockImplementation(() => undefined)
+
+    await renderSettled(
+      <ContextForScreen>
+        <Intraledger route={route} />
+      </ContextForScreen>,
+    )
+    await act(
+      () =>
+        new Promise<void>((resolve) => {
+          setTimeout(resolve, INITIAL_FOCUS_DELAY_MS + 50)
+        }),
+    )
+
+    const focused = sendAccessibilityEvent.mock.calls.map(
+      ([node, event]) =>
+        event === "focus" &&
+        (node as unknown as { props: { testID?: string } }).props.testID,
+    )
+    expect(focused).toEqual(["slider"])
+    jest.restoreAllMocks()
+  })
+})
 
 describe("SendBitcoinConfirmationScreen — fee-currency conversion", () => {
   beforeEach(() => {
