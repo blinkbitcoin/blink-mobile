@@ -75,8 +75,8 @@ const SuccessGlowBase: React.FC<SuccessGlowProps> = ({
 type GlowColors = Pick<SuccessGlowProps, "innerColor" | "rimColor">
 
 const useStyles = makeStyles(({ colors }, { innerColor, rimColor }: GlowColors) => {
-  const inner = innerColor ?? colors.white
-  const rim = rimColor ?? colors.grey6
+  const inner = innerColor ?? colors.backgroundDefault
+  const rim = rimColor ?? colors.surfacePressed
   return {
     bloom: {
       position: "absolute",
