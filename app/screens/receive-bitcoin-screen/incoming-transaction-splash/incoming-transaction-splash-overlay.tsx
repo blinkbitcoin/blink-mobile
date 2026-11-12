@@ -90,11 +90,12 @@ type Props = {
  * thing a screen reader can reach while it is up. Android: a native modal, a window of
  * its own above any other. iOS: a native modal would have to be presented by the one
  * already open, so it is a full-window overlay instead, added to the window last.
+ * The Android window comes up a few frames after its content is laid out: `onShown`
+ * says when it is on screen.
  */
-const SplashWindow: React.FC<PropsWithChildren<{ onBack: () => void }>> = ({
-  onBack,
-  children,
-}) =>
+const SplashWindow: React.FC<
+  PropsWithChildren<{ onBack: () => void; onShown: () => void }>
+> = ({ onBack, onShown, children }) =>
   Platform.OS === "ios" ? (
     <FullWindowOverlay unstable_accessibilityContainerViewIsModal>
       {children}
@@ -106,6 +107,9 @@ const SplashWindow: React.FC<PropsWithChildren<{ onBack: () => void }>> = ({
       animationType="none"
       statusBarTranslucent
       navigationBarTranslucent
+      // The iris is a Skia TextureView, which draws nothing in a window without it.
+      hardwareAccelerated
+      onShow={onShown}
       onRequestClose={onBack}
     >
       {children}
@@ -171,6 +175,10 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
   /** Once the first iris lands the canvas is unmounted for good. */
   const [irisDone, setIrisDone] = useState(false)
   const [anchor, setAnchor] = useState({ x: width / 2, y: height / 2 })
+  const [measured, setMeasured] = useState(false)
+  /** iOS draws in the app's own window, already up. */
+  const [windowShown, setWindowShown] = useState(Platform.OS !== "android")
+  const showWindow = useCallback(() => setWindowShown(true), [])
   const amountRef = useRef<View>(null)
   const hasEntered = useRef(false)
   /** Animation callbacks land on the JS thread after the fact: an overlay dismissed
@@ -294,9 +302,18 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
         Math.hypot(width - cx, height - cy),
       )
       if (!hasEntered.current) radius.value = farthestCorner + IRIS_OVERSHOOT
-      startIris()
+      setMeasured(true)
     })
-  }, [centerX, centerY, radius, width, height, startIris])
+  }, [centerX, centerY, radius, width, height])
+
+  /** Measuring reads the shadow tree, ahead of the native window. Started from there, a
+   *  release build ran the whole iris before Android put the window up, and the splash
+   *  appeared in one jump. It waits for the window, then one frame for the canvas. */
+  useEffect(() => {
+    if (!measured || !windowShown) return
+    const frame = requestAnimationFrame(startIris)
+    return () => cancelAnimationFrame(frame)
+  }, [measured, windowShown, startIris])
 
   /** A new payment while open: fade out, a faint ring closes in, then the same impact
    *  and entrance with the new data. The checkbox carries over. One that lands while an
@@ -409,7 +426,7 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
   const showSatsLine = masked || !displayed.unpriced
 
   return (
-    <SplashWindow onBack={close}>
+    <SplashWindow onBack={close} onShown={showWindow}>
       <View style={StyleSheet.absoluteFill} {...testProps("incoming-transaction-splash")}>
         {/* White icons on the green in both themes; unmounting restores the app's own. */}
         <StatusBar barStyle="light-content" />
