@@ -20,6 +20,7 @@ describe("ads in the Android build", () => {
       expect.objectContaining({
         google_analytics_adid_collection_enabled: false,
         analytics_default_allow_ad_storage: false,
+        analytics_default_allow_ad_user_data: false,
         analytics_default_allow_ad_personalization_signals: false,
       }),
     )
