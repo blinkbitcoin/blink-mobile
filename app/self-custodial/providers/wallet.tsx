@@ -7,6 +7,7 @@ import React, {
   useRef,
   useState,
 } from "react"
+import { AppState } from "react-native"
 
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
@@ -14,7 +15,7 @@ import { recordAppError } from "@app/utils/error-reporting"
 
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { type NormalizedTransaction } from "@app/types/transaction"
+import { NO_TRANSACTIONS, type NormalizedTransaction } from "@app/types/transaction"
 import {
   AccountType,
   ActiveWalletStatus,
@@ -28,6 +29,22 @@ import {
   getSelfCustodialLightningAddress,
   setSelfCustodialLightningAddress,
 } from "../storage/account-index"
+
+/**
+ * The statuses a fresh start can actually clear, which is a narrower set than
+ * the one the offline gate blocks on.
+ *
+ * Unavailable is deliberately left out. The lifecycle uses it for "this device
+ * has no self-custodial wallet", which is where every custodial-only user
+ * rests, with no SDK and nothing to connect — retrying it would re-run the
+ * whole lifecycle on each foreground for people this feature does not touch,
+ * and it is terminal for an account without a mnemonic too, so there is no
+ * reading of it a retry could improve.
+ */
+const FOREGROUND_RETRYABLE_STATUSES: readonly ActiveWalletStatus[] = [
+  ActiveWalletStatus.Offline,
+  ActiveWalletStatus.Error,
+]
 
 const LightningAddressOperation = {
   Resolve: "resolve",
@@ -49,7 +66,9 @@ const reportLightningAddressError = (
 }
 
 type SelfCustodialWalletContextValue = ActiveWalletState & {
-  allTransactions: NormalizedTransaction[]
+  /** The active account's transactions only: empty on the commit where the connection
+   *  still belongs to the account the user switched away from. */
+  allTransactions: readonly NormalizedTransaction[]
   retry: () => void
   sdk: BreezSdkInterface | null
   /** The account the connected `sdk` belongs to, which is not always the active one: the
@@ -127,6 +146,26 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     setRetryCount((prev) => prev + 1)
   }, [])
 
+  /**
+   * Foregrounding the app is the first thing anyone tries, and until now it did
+   * nothing for a wallet that never started: the lifecycle's own AppState
+   * handler calls refreshWallets, which returns on its first line without an
+   * SDK, and the backoff retry is gated the same way. The only working recovery
+   * lived on a screen the user has to navigate into.
+   *
+   * Narrow on purpose: with a connected SDK this changes nothing, and the
+   * lifecycle's refresh keeps handling the case this status usually means.
+   */
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (next) => {
+      if (next !== "active") return
+      if (sdk) return
+      if (!FOREGROUND_RETRYABLE_STATUSES.includes(status)) return
+      retry()
+    })
+    return () => subscription.remove()
+  }, [sdk, status, retry])
+
   const [lightningAddress, setLightningAddress] = useState<string | null>(null)
 
   /** The account the SDK last answered for. An answer of "none" is null like the
@@ -183,7 +222,8 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
    * that account's address, and its paycode, under the one now selected. The switch
    * re-runs this effect, so the cleanup drops a lookup already in flight.
    */
-  const isSdkOnActiveAccount = connectedAccountId === activeSelfCustodialAccountId
+  const isSdkOnActiveAccount =
+    Boolean(connectedAccountId) && connectedAccountId === activeSelfCustodialAccountId
 
   useEffect(() => {
     if (!sdk || !connectedAccountId || !isSdkOnActiveAccount) return undefined
@@ -241,10 +281,21 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     }
   }, [sdk, connectedAccountId, reloadSelfCustodialAccounts])
 
+  /**
+   * Published only while the connection is the active account's, like the address above.
+   * On the commit where the user switches, the list still belongs to the account being
+   * left, and a consumer that pairs it with the active account, such as the home badge
+   * and its seen state, would announce that account's payment under the new one and
+   * record it there as seen.
+   */
+  const activeAccountTransactions = isSdkOnActiveAccount
+    ? allTransactions
+    : NO_TRANSACTIONS
+
   const value = useMemo(
     (): SelfCustodialWalletContextValue => ({
       wallets,
-      allTransactions,
+      allTransactions: activeAccountTransactions,
       status,
       accountType: AccountType.SelfCustodial,
       retry,
@@ -263,7 +314,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     }),
     [
       wallets,
-      allTransactions,
+      activeAccountTransactions,
       status,
       retry,
       sdk,

@@ -49,7 +49,7 @@ const useStyles = makeStyles(({ colors }) => ({
   chip: {
     flex: 1,
     alignItems: "center",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     paddingVertical: 12,
   },

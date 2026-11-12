@@ -67,7 +67,7 @@ export const SetupKeyBackupScreen: React.FC = () => {
     >
       <IconHero
         icon="key-outline"
-        iconColor={colors._green}
+        iconColor={colors.staticSuccess}
         title={LL.AuthenticatorOnboarding.backupTitle()}
         subtitle={
           <Text type="p3" style={styles.description}>
@@ -97,7 +97,7 @@ export const SetupKeyBackupScreen: React.FC = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   description: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     textAlign: "center",
   },
   body: {
@@ -107,7 +107,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   /** The card's surface sits behind the row, so the row's own pressed shade shows. */
   option: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     overflow: "hidden",
   },
@@ -115,7 +115,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 3,
   },
   manualCopyLabel: {
-    color: colors.black,
+    color: colors.textOnBackground,
     lineHeight: 20,
   },
 }))

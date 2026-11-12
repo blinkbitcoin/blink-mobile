@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Claus API",
+    "inactiveKeys": "Claus inactives ({count})",
     "noKeys": "Encara no hi ha cap clau API",
     "createKey": "Crea una clau API",
     "createTitle": "Nova clau API",
@@ -27,6 +28,7 @@
     "revokeTitle": "Voleu revocar la clau API?",
     "revokeBody": "\"{name: string}\" deixarà de funcionar immediatament. Això no es pot desfer.",
     "revoke": "Revoca",
+    "revokeGoBack": "Tornar",
     "revokeSuccess": "Clau API revocada",
     "createError": "No s'ha pogut crear la clau API. Torna-ho a provar.",
     "revokeError": "No s'ha pogut revocar la clau API. Torna-ho a provar.",
@@ -2140,7 +2142,9 @@
     "selectAll": "Selecciona-ho tot",
     "clearAll": "Esborra-ho tot",
     "addPlace": "Afegeix al mapa",
-    "addPlaceTitle": "Afegeix un lloc",
+    "addPlaceTitle": "Suggereix un comerç",
+    "submitPlaceRequest": "Envia la sol·licitud",
+    "showMyLocation": "Mostra la meva ubicació",
     "placePinHint": "Mou el mapa per posar el marcador sobre el lloc",
     "placeName": "Nom",
     "placeNameHint": "Com es diu el lloc",
@@ -3072,7 +3076,6 @@
     "faq": "FAQ",
     "statusPage": "Pàgina d'estat",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Suport",
     "defaultSupportMessage": "Hola! Necessito ajuda amb {bankName: string}, utilitzo la versió {version: string} de {os: string}.",
     "emailCopied": "l'adreça electrònica {email: string} s'ha copiat al porta-retalls",
@@ -3247,7 +3250,10 @@
       "noLimit": "Sense límit",
       "limitUpdateSuccess": "Límit actualitzat correctament",
       "limitUpdateError": "No s'ha pogut actualitzar el límit",
-      "limitMustBePositive": "El límit ha de ser superior a zero"
+      "limitMustBePositive": "El límit ha de ser superior a zero",
+      "atmToggleError": "No s'han pogut actualitzar les retirades al caixer",
+      "atmControlsLoadError": "No s'han pogut carregar els límits del caixer",
+      "invalidLimitAmount": "Introdueix un import vàlid amb 2 decimals com a màxim"
     },
     "CardFeeSchedule": {
       "title": "Programa de tarifes de la targeta Blink",
@@ -3949,6 +3955,12 @@
       "title": "No podem migrar el teu saldo en dòlars",
       "body": "Primer buida el teu saldo en dòlars. Pots transferir-lo al teu saldo en bitcoins a Blink o en un altre lloc."
     },
+    "pendingDepositModal": {
+      "title": "Hi ha un dipòsit pendent al teu compte",
+      "body": "No pots migrar a un altre tipus de compte fins que tots els teus dipòsits pendents s'hagin liquidat i abonat en aquest compte.",
+      "contactSupportCta": "Contacta amb suport",
+      "stillConfirming": "El teu dipòsit encara no s'ha confirmat. Torna-ho a provar d'aquí a uns minuts."
+    },
     "balancesOverview": {
       "title": "Mou el teu saldo",
       "body": "Mou els teus fons de manera segura al teu nou compte.",
@@ -4136,6 +4148,7 @@
     "get": "Obtén",
     "storeNote": "«Obtén» obre l'App Store o Google Play. Torna a Blink quan estigui instal·lada.",
     "haveAnApp": "Ja tinc una aplicació",
+    "learnHow": "Descobreix com",
     "keyInstruction": "Copia aquesta clau de configuració a la teva aplicació d'autenticació.",
     "qrInstruction": "Fas servir un altre dispositiu?\nEn comptes d'això, escaneja aquest codi QR.",
     "backupTitle": "Fes una còpia de seguretat de la clau",
@@ -4248,7 +4261,6 @@
     "payment": "Pagament"
   },
   "SelfCustodialStaleRate": {
-    "notice": "El tipus de canvi pot estar desactualitzat",
     "satsOnly": "Es mostren sats: no hi ha tipus de canvi disponible"
   },
   "SelfCustodialOffline": {

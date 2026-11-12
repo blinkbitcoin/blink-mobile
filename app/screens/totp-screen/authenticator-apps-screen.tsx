@@ -63,6 +63,8 @@ const AUTHENTICATOR_APPS: ReadonlyArray<AuthenticatorAppListing> = [
   },
 ]
 
+const SETUP_KEY_ROUTE = "totpRegistrationInitiate" satisfies keyof RootStackParamList
+
 /** Read at the tap rather than once, so the store follows the platform it runs on. */
 const storeUrlOf = (listing: AuthenticatorAppListing): string =>
   Platform.OS === "ios" ? listing.appStoreUrl : listing.playStoreUrl
@@ -70,7 +72,8 @@ const storeUrlOf = (listing: AuthenticatorAppListing): string =>
 /**
  * The onboarding's second screen: three apps to get, each opening its store listing,
  * for a user without one. Coming back from the store lands here again, and I have an
- * app moves on to the setup key with an app at hand.
+ * app moves on to the setup key with an app at hand: back to the one already open
+ * beneath, when the setup key screen opened the onboarding, so its key stays the same.
  */
 export const AuthenticatorAppsScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -96,7 +99,16 @@ export const AuthenticatorAppsScreen: React.FC = () => {
       isEducationReportedRef.current = true
       logAuthenticatorEducationCompleted()
     }
-    navigation.navigate("totpRegistrationInitiate")
+    const isSetupKeyBelow = navigation
+      .getState()
+      .routes.some((route) => route.name === SETUP_KEY_ROUTE)
+    if (isSetupKeyBelow) {
+      /** Back to the key it opened from, which no longer offers the onboarding just
+       *  done. */
+      navigation.popTo(SETUP_KEY_ROUTE, { offersOnboarding: false })
+      return
+    }
+    navigation.navigate(SETUP_KEY_ROUTE)
   }, [navigation])
 
   return (
@@ -111,7 +123,7 @@ export const AuthenticatorAppsScreen: React.FC = () => {
     >
       <IconHero
         icon="apps"
-        iconColor={colors._green}
+        iconColor={colors.staticSuccess}
         title={LL.AuthenticatorOnboarding.appsTitle()}
         subtitle={
           <Text type="p3" style={styles.description}>
@@ -153,7 +165,7 @@ const APP_ICON_SIZE = 28
 
 const useStyles = makeStyles(({ colors }) => ({
   description: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     textAlign: "center",
   },
   list: {
@@ -169,7 +181,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingLeft: 14,
     paddingRight: 10,
     borderRadius: 8,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
   appIcon: {
     width: APP_ICON_SIZE,
@@ -179,8 +191,8 @@ const useStyles = makeStyles(({ colors }) => ({
     overflow: "hidden",
     borderRadius: 10,
     borderWidth: 0.21,
-    borderColor: colors.grey3,
-    backgroundColor: colors._white,
+    borderColor: colors.textDisabled,
+    backgroundColor: colors.staticWhite,
   },
   appText: {
     flex: 1,
@@ -188,26 +200,26 @@ const useStyles = makeStyles(({ colors }) => ({
   appName: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   appDescription: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   getBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
   },
   getLabel: {
     fontSize: 10,
     lineHeight: 13,
     fontFamily: fonts.bold,
-    color: colors.primary,
+    color: colors.accent,
   },
   storeNote: {
-    color: colors.grey2,
+    color: colors.textMuted,
   },
 }))

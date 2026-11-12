@@ -112,6 +112,6 @@ const useStyles = makeStyles(({ colors }) => ({
     // The band paints its own surface rather than leaning on the screen showing
     // through: a disabled primary button is a translucent fill, so whatever is
     // visible behind the band would be visible through the button.
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
   },
 }))

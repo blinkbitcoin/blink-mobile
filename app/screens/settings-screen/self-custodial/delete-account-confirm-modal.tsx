@@ -59,7 +59,7 @@ export const DeleteAccountConfirmModal: React.FC<Props> = ({
             onChangeText={setConfirmText}
             value={confirmText}
             placeholder={LL.support.delete()}
-            placeholderTextColor={colors.grey3}
+            placeholderTextColor={colors.textDisabled}
             {...testProps("self-custodial-danger-zone-delete-input")}
           />
         </View>
@@ -83,13 +83,13 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 16,
     lineHeight: 22,
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   textInput: {
     fontSize: 16,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     padding: 12,
-    color: colors.black,
+    color: colors.textOnBackground,
     borderRadius: 8,
     textAlign: "center",
   },

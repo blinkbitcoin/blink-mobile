@@ -24,11 +24,11 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
   useSparkNetwork: () => mockSparkNetwork.Regtest,
 }))
 
-const mockGetMnemonicForAccount = jest.fn()
+const mockReadMnemonicWithStatus = jest.fn()
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
-    getMnemonicForAccount: (id: string) => mockGetMnemonicForAccount(id),
+    readMnemonicWithStatus: (id: string) => mockReadMnemonicWithStatus(id),
   },
 }))
 
@@ -128,7 +128,10 @@ const buildSdk = (id: string) => ({ id }) as unknown as object
 const resetMocks = () => {
   jest.clearAllMocks()
   mockDepositClaimLeewayVbyte = 7
-  mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
+  mockReadMnemonicWithStatus.mockResolvedValue({
+    status: "found",
+    value: "word1 word2 word3",
+  })
   mockValidateStoredNetwork.mockResolvedValue(true)
   mockGetSnapshot.mockResolvedValue({
     wallets: [],
@@ -160,13 +163,39 @@ describe("useSdkLifecycle", () => {
     })
 
     it("falls to Unavailable when the keystore has no mnemonic for the account", async () => {
-      mockGetMnemonicForAccount.mockResolvedValue(null)
+      mockReadMnemonicWithStatus.mockResolvedValue({ status: "absent" })
 
       const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
 
       await waitFor(() => {
         expect(result.current.status).toBe(ActiveWalletStatus.Unavailable)
       })
+      expect(mockInitSdk).not.toHaveBeenCalled()
+    })
+
+    /**
+     * Unavailable is terminal for an account: it reads as "there is no wallet
+     * here". A keystore that could not answer says nothing of the sort. Recovery
+     * from here is not automatic — the backoff retry is armed inside
+     * refreshWallets and gated on a live SDK, which this path never connected.
+     *
+     * That null SDK is also the premise PaymentOfflineNotice's retry branches
+     * on, so it is asserted here rather than assumed: the notice's own spec
+     * mocks the provider, and would keep passing if a stale SDK ever survived
+     * this transition and quietly turned the fix into a no-op.
+     */
+    it("falls to Error with no connected SDK when the keystore cannot answer", async () => {
+      mockReadMnemonicWithStatus.mockResolvedValue({
+        status: "failed",
+        err: new Error("keystore locked"),
+      })
+
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+
+      await waitFor(() => {
+        expect(result.current.status).toBe(ActiveWalletStatus.Error)
+      })
+      expect(result.current.sdk).toBeNull()
       expect(mockInitSdk).not.toHaveBeenCalled()
     })
 
@@ -246,7 +275,7 @@ describe("useSdkLifecycle", () => {
         expect(result.current.sdk).toBe(sdk)
       })
 
-      expect(mockGetMnemonicForAccount).toHaveBeenCalledWith("acct-1")
+      expect(mockReadMnemonicWithStatus).toHaveBeenCalledWith("acct-1")
       expect(mockValidateStoredNetwork).toHaveBeenCalledWith(
         "acct-1",
         mockSparkNetwork.Regtest,
@@ -918,5 +947,194 @@ describe("useSdkLifecycle: connectivity and retries", () => {
         expect(mockInitSdk).toHaveBeenCalledTimes(2)
       })
     })
+  })
+})
+
+describe("useSdkLifecycle paging when the account switches or a page fails", () => {
+  beforeEach(resetMocks)
+
+  it("drops a page that lands after the account has switched", async () => {
+    mockInitSdk
+      .mockResolvedValueOnce(buildSdk("sdk-A"))
+      .mockResolvedValueOnce(buildSdk("sdk-B"))
+    captureListener()
+    mockGetSnapshot.mockResolvedValue({
+      wallets: [],
+      allTransactions: [],
+      hasMore: true,
+      rawTransactionCount: 0,
+    })
+    const { loadMoreTransactions: loadMoreMock, mergeOrderedTransactions: mergeMock } =
+      jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
+    let resolvePageOfA: (page: unknown) => void = () => {}
+    loadMoreMock.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolvePageOfA = resolve
+        }),
+    )
+
+    const { result, rerender } = renderHook(
+      ({ accountId }: { accountId: string }) => useSdkLifecycle(accountId, 0),
+      { initialProps: { accountId: "acct-A" } },
+    )
+    await waitFor(() => expect(result.current.hasMoreTransactions).toBe(true))
+
+    let pageOfA: Promise<void> = Promise.resolve()
+    act(() => {
+      pageOfA = result.current.loadMore()
+    })
+
+    rerender({ accountId: "acct-B" })
+    await waitFor(() => expect(result.current.connectedAccountId).toBe("acct-B"))
+
+    await act(async () => {
+      resolvePageOfA({
+        transactions: [{ id: "older-payment-of-a" }],
+        hasMore: false,
+        rawCount: 1,
+      })
+      await pageOfA
+    })
+
+    expect(mergeMock).not.toHaveBeenCalled()
+    expect(result.current.allTransactions).toEqual([])
+  })
+
+  it("logs a page that fails and stops loading", async () => {
+    mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+    captureListener()
+    mockGetSnapshot.mockResolvedValue({
+      wallets: [],
+      allTransactions: [],
+      hasMore: true,
+      rawTransactionCount: 0,
+    })
+    const { loadMoreTransactions: loadMoreMock } = jest.requireMock(
+      "@app/self-custodial/providers/wallet-snapshot",
+    )
+    loadMoreMock.mockRejectedValueOnce(new Error("page failed"))
+    const { logSdkEvent } = jest.requireMock("@app/self-custodial/logging")
+
+    const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+    await waitFor(() => expect(result.current.hasMoreTransactions).toBe(true))
+
+    await act(async () => {
+      await result.current.loadMore()
+    })
+
+    expect(logSdkEvent).toHaveBeenCalledWith(
+      "error",
+      "Failed to load more transactions: Error: page failed",
+    )
+    expect(result.current.loadingMore).toBe(false)
+    expect(result.current.hasMoreTransactions).toBe(true)
+  })
+
+  it("starts the new account from its own first page", async () => {
+    const sdkB = buildSdk("sdk-B")
+    mockInitSdk.mockResolvedValueOnce(buildSdk("sdk-A")).mockResolvedValueOnce(sdkB)
+    captureListener()
+    mockGetSnapshot.mockResolvedValueOnce({
+      wallets: [],
+      allTransactions: [],
+      hasMore: true,
+      rawTransactionCount: 250,
+    })
+
+    const { result, rerender } = renderHook(
+      ({ accountId }: { accountId: string }) => useSdkLifecycle(accountId, 0),
+      { initialProps: { accountId: "acct-A" } },
+    )
+    await waitFor(() => expect(result.current.hasMoreTransactions).toBe(true))
+
+    rerender({ accountId: "acct-B" })
+    await waitFor(() => expect(result.current.connectedAccountId).toBe("acct-B"))
+    await waitFor(() =>
+      expect(mockGetSnapshot.mock.calls.some(([sdk]) => sdk === sdkB)).toBe(true),
+    )
+
+    const firstSnapshotOfB = mockGetSnapshot.mock.calls.find(([sdk]) => sdk === sdkB)
+    expect(firstSnapshotOfB).toEqual([sdkB, 0])
+  })
+
+  it("pages the new account on its own while the previous account's page is on its way", async () => {
+    const sdkB = buildSdk("sdk-B")
+    mockInitSdk.mockResolvedValueOnce(buildSdk("sdk-A")).mockResolvedValueOnce(sdkB)
+    captureListener()
+    mockGetSnapshot
+      .mockResolvedValueOnce({
+        wallets: [],
+        allTransactions: [],
+        hasMore: true,
+        rawTransactionCount: 250,
+      })
+      .mockResolvedValue({
+        wallets: [],
+        allTransactions: [],
+        hasMore: true,
+        rawTransactionCount: 20,
+      })
+    const { loadMoreTransactions: loadMoreMock } = jest.requireMock(
+      "@app/self-custodial/providers/wallet-snapshot",
+    )
+    let resolvePageOfA: (page: unknown) => void = () => {}
+    let resolvePageOfB: (page: unknown) => void = () => {}
+    loadMoreMock
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolvePageOfA = resolve
+          }),
+      )
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolvePageOfB = resolve
+          }),
+      )
+
+    const { result, rerender } = renderHook(
+      ({ accountId }: { accountId: string }) => useSdkLifecycle(accountId, 0),
+      { initialProps: { accountId: "acct-A" } },
+    )
+    await waitFor(() => expect(result.current.hasMoreTransactions).toBe(true))
+    let pageOfA: Promise<void> = Promise.resolve()
+    act(() => {
+      pageOfA = result.current.loadMore()
+    })
+
+    rerender({ accountId: "acct-B" })
+    await waitFor(() => expect(result.current.connectedAccountId).toBe("acct-B"))
+    await waitFor(() => expect(result.current.hasMoreTransactions).toBe(true))
+    expect(result.current.loadingMore).toBe(false)
+
+    let pageOfB: Promise<void> = Promise.resolve()
+    act(() => {
+      pageOfB = result.current.loadMore()
+    })
+    expect(loadMoreMock).toHaveBeenLastCalledWith(sdkB, 20)
+
+    await act(async () => {
+      resolvePageOfA({
+        transactions: [{ id: "older-payment-of-a" }],
+        hasMore: false,
+        rawCount: 1,
+      })
+      await pageOfA
+    })
+    expect(result.current.loadingMore).toBe(true)
+
+    await act(async () => {
+      resolvePageOfB({
+        transactions: [{ id: "older-payment-of-b" }],
+        hasMore: false,
+        rawCount: 5,
+      })
+      await pageOfB
+    })
+    expect(result.current.loadingMore).toBe(false)
+    expect(result.current.hasMoreTransactions).toBe(false)
+    expect(result.current.allTransactions).toEqual([{ id: "older-payment-of-b" }])
   })
 })

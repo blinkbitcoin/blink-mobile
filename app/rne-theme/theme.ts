@@ -31,7 +31,7 @@ const theme = createTheme({
        * rather than Regular.
        */
       const universalStyle = {
-        color: props.color || colors.black,
+        color: props.color || colors.textOnBackground,
         fontFamily: props.bold ? fonts.bold : fonts.regular,
         ...(props.bold && Platform.OS === "ios" ? { fontWeight: "700" as const } : {}),
       }

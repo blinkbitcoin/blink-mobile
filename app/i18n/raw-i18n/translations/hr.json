@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API ključevi",
+    "inactiveKeys": "Neaktivni ključevi ({count})",
     "noKeys": "Još nema API ključeva",
     "createKey": "Stvori API ključ",
     "createTitle": "Novi API ključ",
@@ -27,6 +28,7 @@
     "revokeTitle": "Opozvati API ključ?",
     "revokeBody": "\"{name: string}\" odmah će prestati raditi. Ovo se ne može poništiti.",
     "revoke": "Opozovi",
+    "revokeGoBack": "Natrag",
     "revokeSuccess": "API ključ opozvan",
     "createError": "API ključ nije moguće stvoriti. Pokušajte ponovno.",
     "revokeError": "API ključ nije moguće opozvati. Pokušajte ponovno.",
@@ -2140,7 +2142,9 @@
     "selectAll": "Odaberi sve",
     "clearAll": "Očisti sve",
     "addPlace": "Dodaj na kartu",
-    "addPlaceTitle": "Dodaj mjesto",
+    "addPlaceTitle": "Predloži lokal",
+    "submitPlaceRequest": "Pošalji zahtjev",
+    "showMyLocation": "Prikaži moju lokaciju",
     "placePinHint": "Pomaknite kartu tako da pribadača bude na mjestu",
     "placeName": "Naziv",
     "placeNameHint": "Kako se mjesto zove",
@@ -3072,7 +3076,6 @@
     "faq": "Česta pitanja",
     "statusPage": "Stranica statusa",
     "telegram": "Telegram",
-    "mattermost": "Mattermost",
     "defaultEmailSubject": "{bankName: string} - Podrška",
     "defaultSupportMessage": "Bok! Trebam pomoć s {bankName: string}, koristim verziju {version: string} na {os: string}.",
     "emailCopied": "e-pošta {email: string} kopirana u međuspremnik",
@@ -3247,7 +3250,10 @@
       "noLimit": "Bez ograničenja",
       "limitUpdateSuccess": "Ograničenje uspješno ažurirano",
       "limitUpdateError": "Nije moguće ažurirati ograničenje",
-      "limitMustBePositive": "Ograničenje mora biti veće od nule"
+      "limitMustBePositive": "Ograničenje mora biti veće od nule",
+      "atmToggleError": "Nije moguće ažurirati podizanja na bankomatu",
+      "atmControlsLoadError": "Nije moguće učitati ograničenja za bankomat",
+      "invalidLimitAmount": "Unesite ispravan iznos s najviše 2 decimale"
     },
     "CardFeeSchedule": {
       "title": "Raspored naknada Blink kartice",
@@ -3949,6 +3955,12 @@
       "title": "Ne možemo migrirati vaš dolarski saldo",
       "body": "Najprije ispraznite svoj dolarski saldo. Možete ga prenijeti na svoj Bitcoin saldo u Blinku ili drugamo."
     },
+    "pendingDepositModal": {
+      "title": "Na vašem računu je uplata na čekanju",
+      "body": "Ne možete migrirati na drugu vrstu računa dok sve vaše uplate na čekanju ne budu podmirene i pripisane ovom računu.",
+      "contactSupportCta": "Kontaktiraj podršku",
+      "stillConfirming": "Vaša uplata još nije potvrđena. Pokušajte ponovno za nekoliko minuta."
+    },
     "balancesOverview": {
       "title": "Premjesti svoj saldo",
       "body": "Sigurno premjesti svoja sredstva na svoj novi račun.",
@@ -4136,6 +4148,7 @@
     "get": "Preuzmi",
     "storeNote": "„Preuzmi“ otvara App Store ili Google Play. Vratite se u Blink kada se aplikacija instalira.",
     "haveAnApp": "Imam aplikaciju",
+    "learnHow": "Saznaj kako",
     "keyInstruction": "Kopirajte ovaj ključ za postavljanje u svoju aplikaciju za autentifikaciju.",
     "qrInstruction": "Koristite drugi uređaj?\nUmjesto toga skenirajte ovaj QR kod.",
     "backupTitle": "Napravite sigurnosnu kopiju ključa",
@@ -4248,7 +4261,6 @@
     "payment": "Plaćanje"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Tečaj možda nije ažuran",
     "satsOnly": "Prikaz u satima — tečaj nije dostupan"
   },
   "SelfCustodialOffline": {

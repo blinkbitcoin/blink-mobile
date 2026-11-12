@@ -122,7 +122,7 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
     >
       <IconHero
         icon={highBalanceIcon(enforcedCurrency)}
-        iconColor={colors.primary}
+        iconColor={colors.accent}
         title={title}
         subtitle={
           <Text type="p3" style={styles.description}>
@@ -139,7 +139,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingTop: 10,
   },
   description: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     textAlign: "center",
   },
 }))

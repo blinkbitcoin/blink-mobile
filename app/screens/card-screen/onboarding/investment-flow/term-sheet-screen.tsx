@@ -109,7 +109,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 20,
   },
   cardContainer: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 12,
     padding: 15,
     gap: 25,

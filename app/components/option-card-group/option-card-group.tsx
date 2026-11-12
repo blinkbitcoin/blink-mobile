@@ -67,7 +67,7 @@ const useStyles = makeStyles(({ colors }) => ({
   card: {
     flex: 1,
     maxWidth: "50%",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "transparent",
@@ -77,8 +77,8 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 10,
   },
   cardSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.grey6,
+    borderColor: colors.accent,
+    backgroundColor: colors.surfacePressed,
   },
   iconContainer: {
     width: 32,
@@ -90,13 +90,13 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 14,
     fontWeight: "700",
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
   },
   cardDescription: {
     fontSize: 12,
     lineHeight: 18,
-    color: colors.grey2,
+    color: colors.textMuted,
     textAlign: "center",
   },
 }))

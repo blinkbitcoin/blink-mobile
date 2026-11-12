@@ -58,7 +58,7 @@ export const SelectInvestScreen: React.FC = () => {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <IconHero
           icon="btc-outline"
-          iconColor={colors.primary}
+          iconColor={colors.accent}
           title={LL.CardFlow.Onboarding.SelectInvest.desiredCreditLimit()}
         />
 
@@ -120,20 +120,20 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
   },
   limitOptionSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.grey6,
+    borderColor: colors.accent,
+    backgroundColor: colors.surfacePressed,
     borderRadius: 8,
   },
   limitSeparator: {
     width: "97%",
     height: 1,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     position: "absolute",
     bottom: 0,
     alignSelf: "center",
   },
   limitText: {
-    color: colors.grey0,
+    color: colors.textPrimary,
     paddingLeft: 10,
   },
   buttonsContainer: {

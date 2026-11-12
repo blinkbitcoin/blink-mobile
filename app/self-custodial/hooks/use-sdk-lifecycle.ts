@@ -216,16 +216,21 @@ export const useSdkLifecycle = (
   }, [resetBackoff, scheduleBackoffRetry])
 
   useEffect(() => {
+    /** All of this belongs to the account it was read for, paging included: the next
+     *  account starts from its own first page, and a page still loading for the previous
+     *  one must not hold its pagination back. */
+    setWallets([])
+    setAllTransactions([])
+    setHasMoreTransactions(false)
+    setLoadingMore(false)
+    rawTxOffsetRef.current = 0
+
     if (!activeSelfCustodialAccountId) {
       setStatus(ActiveWalletStatus.Unavailable)
-      setWallets([])
-      setAllTransactions([])
       return
     }
 
     setStatus(ActiveWalletStatus.Loading)
-    setWallets([])
-    setAllTransactions([])
 
     let mounted = true
     abortRef.current = false
@@ -284,11 +289,22 @@ export const useSdkLifecycle = (
     }
 
     const initialize = async () => {
-      const mnemonic = await KeyStoreWrapper.getMnemonicForAccount(accountId)
-      if (!mnemonic) {
+      const stored = await KeyStoreWrapper.readMnemonicWithStatus(accountId)
+      // A keystore that could not answer is not an account without a wallet.
+      // Unavailable is terminal for this account, so scoring a transient
+      // failure as such tells the user their wallet is gone, which Error does
+      // not. Recovery from here is not automatic though: the backoff retry is
+      // armed inside refreshWallets and gated on a live SDK, and this path
+      // never connected one.
+      if (stored.status === "failed") {
+        if (mounted) setStatus(ActiveWalletStatus.Error)
+        return
+      }
+      if (stored.status === "absent") {
         if (mounted) setStatus(ActiveWalletStatus.Unavailable)
         return
       }
+      const mnemonic = stored.value
 
       const networkValid = await validateStoredNetwork(accountId, network)
       if (!networkValid) {
@@ -361,10 +377,16 @@ export const useSdkLifecycle = (
   }, [refreshWallets])
 
   const loadMore = useCallback(async () => {
-    if (!sdkRef.current || loadingMore || !hasMoreTransactions) return
+    const sdk = sdkRef.current
+    if (!sdk || loadingMore || !hasMoreTransactions) return
+    /** A page asked of a connection that an account switch has since replaced belongs to
+     *  the account the user left: merging it would list that account's payments under the
+     *  new one, and settling it would end a page the new account may be loading itself. */
+    const isStale = () => sdkRef.current !== sdk
     setLoadingMore(true)
     try {
-      const result = await loadMoreTransactions(sdkRef.current, rawTxOffsetRef.current)
+      const result = await loadMoreTransactions(sdk, rawTxOffsetRef.current)
+      if (isStale()) return
       rawTxOffsetRef.current += result.rawCount
       setHasMoreTransactions(result.hasMore)
       setWallets((prev) => appendTransactions(prev, result.transactions))
@@ -372,7 +394,7 @@ export const useSdkLifecycle = (
     } catch (err) {
       logSdkEvent(SdkLogLevel.Error, `Failed to load more transactions: ${err}`)
     } finally {
-      setLoadingMore(false)
+      if (!isStale()) setLoadingMore(false)
     }
   }, [loadingMore, hasMoreTransactions])
 
