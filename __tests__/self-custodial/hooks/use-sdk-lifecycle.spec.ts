@@ -1062,7 +1062,7 @@ describe("useSdkLifecycle paging when the account switches or a page fails", () 
     )
     await waitFor(() => expect(result.current.hasMoreTransactions).toBe(true))
 
-    let pageOfA: Promise<void> = Promise.resolve()
+    let pageOfA: Promise<boolean> = Promise.resolve(false)
     act(() => {
       pageOfA = result.current.loadMore()
     })
@@ -1181,7 +1181,7 @@ describe("useSdkLifecycle paging when the account switches or a page fails", () 
       { initialProps: { accountId: "acct-A" } },
     )
     await waitFor(() => expect(result.current.hasMoreTransactions).toBe(true))
-    let pageOfA: Promise<void> = Promise.resolve()
+    let pageOfA: Promise<boolean> = Promise.resolve(false)
     act(() => {
       pageOfA = result.current.loadMore()
     })
@@ -1191,7 +1191,7 @@ describe("useSdkLifecycle paging when the account switches or a page fails", () 
     await waitFor(() => expect(result.current.hasMoreTransactions).toBe(true))
     expect(result.current.loadingMore).toBe(false)
 
-    let pageOfB: Promise<void> = Promise.resolve()
+    let pageOfB: Promise<boolean> = Promise.resolve(false)
     act(() => {
       pageOfB = result.current.loadMore()
     })
