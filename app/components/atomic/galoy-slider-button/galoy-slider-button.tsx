@@ -191,7 +191,9 @@ const GaloySliderButton = ({
     >
       {busy ? (
         <>
-          {trackWidth > 0 && <BusyBorder width={trackWidth} color={colors.black} />}
+          {trackWidth > 0 && (
+            <BusyBorder width={trackWidth} color={colors.textOnBackground} />
+          )}
           <Animated.View
             entering={FadeIn.duration(250).delay(COMPLETE_DURATION_MS)}
             style={styles.labelContainer}
@@ -223,7 +225,7 @@ const GaloySliderButton = ({
           ref={handleRef}
           style={[
             styles.handle,
-            { backgroundColor: accentColor ?? colors.primary },
+            { backgroundColor: accentColor ?? colors.accent },
             handleStyle,
           ]}
           pointerEvents={busy ? "none" : "auto"}
@@ -381,11 +383,11 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   idleText: {
     fontSize: 14,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   busyText: {
     fontSize: 14,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   hiddenDots: {
     fontSize: 14,
