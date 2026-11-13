@@ -3809,11 +3809,11 @@
         "fields": {
           "occupation": {
             "label": "Pekerjaan",
-            "placeholder": "Pilih pekerjaan anda"
+            "placeholder": "Pilih"
           },
           "annualSalaryRange": {
             "label": "Gaji tahunan",
-            "placeholder": "Pilih julat gaji anda"
+            "placeholder": "Pilih gaji"
           },
           "accountPurpose": {
             "label": "Tujuan akaun",
@@ -3824,7 +3824,6 @@
             "placeholder": "Pilih julat perbelanjaan anda"
           }
         },
-        "buttonText": "Hantar permohonan",
         "select": "pilih"
       },
       "Acknowledgement": {

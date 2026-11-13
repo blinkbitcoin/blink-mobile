@@ -3809,11 +3809,11 @@
         "fields": {
           "occupation": {
             "label": "Զբաղմունք",
-            "placeholder": "Ընտրեք Ձեր զբաղմունքը"
+            "placeholder": "Ընտրեք"
           },
           "annualSalaryRange": {
             "label": "Տարեկան աշխատավարձ",
-            "placeholder": "Ընտրեք Ձեր աշխատավարձի միջակայքը"
+            "placeholder": "Ընտրեք աշխատավարձը"
           },
           "accountPurpose": {
             "label": "Հաշվի նպատակը",
@@ -3824,7 +3824,6 @@
             "placeholder": "Ընտրեք Ձեր ծախսերի միջակայքը"
           }
         },
-        "buttonText": "Ուղարկել հայտը",
         "select": "ընտրել"
       },
       "Acknowledgement": {

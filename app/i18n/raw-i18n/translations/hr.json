@@ -3809,11 +3809,11 @@
         "fields": {
           "occupation": {
             "label": "Zanimanje",
-            "placeholder": "Odaberite svoje zanimanje"
+            "placeholder": "Odaberite"
           },
           "annualSalaryRange": {
             "label": "Godišnja plaća",
-            "placeholder": "Odaberite svoj raspon plaće"
+            "placeholder": "Odaberite plaću"
           },
           "accountPurpose": {
             "label": "Svrha računa",
@@ -3824,7 +3824,6 @@
             "placeholder": "Odaberite svoj raspon potrošnje"
           }
         },
-        "buttonText": "Pošalji prijavu",
         "select": "odaberi"
       },
       "Acknowledgement": {

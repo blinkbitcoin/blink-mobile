@@ -3809,11 +3809,11 @@
         "fields": {
           "occupation": {
             "label": "อาชีพ",
-            "placeholder": "เลือกอาชีพของคุณ"
+            "placeholder": "เลือก"
           },
           "annualSalaryRange": {
             "label": "เงินเดือนต่อปี",
-            "placeholder": "เลือกช่วงเงินเดือนของคุณ"
+            "placeholder": "เลือกเงินเดือน"
           },
           "accountPurpose": {
             "label": "วัตถุประสงค์ของบัญชี",
@@ -3824,7 +3824,6 @@
             "placeholder": "เลือกช่วงการใช้จ่ายของคุณ"
           }
         },
-        "buttonText": "ส่งใบสมัคร",
         "select": "เลือก"
       },
       "Acknowledgement": {

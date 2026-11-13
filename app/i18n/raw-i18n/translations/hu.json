@@ -3809,11 +3809,11 @@
         "fields": {
           "occupation": {
             "label": "Foglalkozás",
-            "placeholder": "Válaszd ki a foglalkozásodat"
+            "placeholder": "Válassz"
           },
           "annualSalaryRange": {
             "label": "Éves fizetés",
-            "placeholder": "Válaszd ki a fizetési sávodat"
+            "placeholder": "Válassz fizetést"
           },
           "accountPurpose": {
             "label": "Fiók célja",
@@ -3824,7 +3824,6 @@
             "placeholder": "Válaszd ki a költési sávodat"
           }
         },
-        "buttonText": "Pályázat beküldése",
         "select": "kiválaszt"
       },
       "Acknowledgement": {

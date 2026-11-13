@@ -3809,11 +3809,11 @@
         "fields": {
           "occupation": {
             "label": "Beroep",
-            "placeholder": "Kies jou beroep"
+            "placeholder": "Kies"
           },
           "annualSalaryRange": {
             "label": "Jaarlikse salaris",
-            "placeholder": "Kies jou salarisreeks"
+            "placeholder": "Kies salaris"
           },
           "accountPurpose": {
             "label": "Rekeningdoel",
@@ -3824,7 +3824,6 @@
             "placeholder": "Kies jou bestedingsreeks"
           }
         },
-        "buttonText": "Dien aansoek in",
         "select": "kies"
       },
       "Acknowledgement": {

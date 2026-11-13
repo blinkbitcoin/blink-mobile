@@ -3993,11 +3993,11 @@ const en: BaseTranslation = {
         fields: {
           occupation: {
             label: "Occupation",
-            placeholder: "Select your occupation",
+            placeholder: "Select",
           },
           annualSalaryRange: {
             label: "Annual salary",
-            placeholder: "Select your salary range",
+            placeholder: "Select salary",
           },
           accountPurpose: {
             label: "Account purpose",
@@ -4008,7 +4008,6 @@ const en: BaseTranslation = {
             placeholder: "Select your spending range",
           },
         },
-        buttonText: "Submit application",
         select: "Select",
       },
       Acknowledgement: {

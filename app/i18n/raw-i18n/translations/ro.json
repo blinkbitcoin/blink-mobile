@@ -3809,11 +3809,11 @@
         "fields": {
           "occupation": {
             "label": "Ocupație",
-            "placeholder": "Selectează ocupația ta"
+            "placeholder": "Selectează"
           },
           "annualSalaryRange": {
             "label": "Salariu anual",
-            "placeholder": "Selectează intervalul salarial"
+            "placeholder": "Selectează salariul"
           },
           "accountPurpose": {
             "label": "Scopul contului",
@@ -3824,7 +3824,6 @@
             "placeholder": "Selectează intervalul de cheltuieli"
           }
         },
-        "buttonText": "Trimite cererea",
         "select": "selectează"
       },
       "Acknowledgement": {

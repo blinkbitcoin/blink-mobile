@@ -3809,11 +3809,11 @@
         "fields": {
           "occupation": {
             "label": "المهنة",
-            "placeholder": "اختر مهنتك"
+            "placeholder": "اختر"
           },
           "annualSalaryRange": {
             "label": "الراتب السنوي",
-            "placeholder": "اختر نطاق راتبك"
+            "placeholder": "اختر الراتب"
           },
           "accountPurpose": {
             "label": "غرض الحساب",
@@ -3824,7 +3824,6 @@
             "placeholder": "اختر نطاق إنفاقك"
           }
         },
-        "buttonText": "تقديم الطلب",
         "select": "اختر"
       },
       "Acknowledgement": {
