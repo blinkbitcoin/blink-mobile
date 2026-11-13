@@ -3785,6 +3785,10 @@
                 "subtitle": "Vous pouvez maintenant activer votre carte et commencer à l'utiliser",
                 "buttonText": "Fermer"
             },
+            "CardDeclined": {
+                "title": "Nous n'avons pas pu approuver votre demande de carte",
+                "subtitle": "Votre gestionnaire de compte vous contactera."
+            },
             "CardProcessing": {
                 "title": "Traitement de votre demande",
                 "subtitle": "Cela peut prendre jusqu'à une minute"

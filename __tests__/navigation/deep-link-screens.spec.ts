@@ -75,6 +75,7 @@ describe("deep-linkable routes", () => {
   it("still links to the card onboarding steps that need nothing handed to them", () => {
     expect(DEEP_LINK_SCREENS).toHaveProperty("cardOnboardingPersonalInfoScreen")
     expect(DEEP_LINK_SCREENS).toHaveProperty("cardOnboardingPreapprovedScreen")
+    expect(DEEP_LINK_SCREENS).toHaveProperty("cardOnboardingDeclinedScreen")
   })
 
   /**

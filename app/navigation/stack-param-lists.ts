@@ -329,6 +329,7 @@ export type RootStackParamList = {
   cardOnboardingPersonalInfoScreen: undefined
   cardOnboardingAcknowledgementScreen: CardApplicationAnswers
   cardOnboardingPreapprovedScreen: undefined
+  cardOnboardingDeclinedScreen: undefined
   cardOnboardingProcessingScreen: { applicationId: string }
   cardOnboardingApprovedScreen: undefined
   selfCustodialBackupMethod: undefined

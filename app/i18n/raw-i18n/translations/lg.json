@@ -3846,6 +3846,10 @@
         "subtitle": "Kati osobola okuggulawo kaadi yo n'otandika okugikozesa",
         "buttonText": "Ggalawo"
       },
+      "CardDeclined": {
+        "title": "Tetusobodde kukkiriza kusaba kwo okwa kaadi",
+        "subtitle": "Omuddukanya wa akawunti yo ajja kukutuukirira."
+      },
       "CardProcessing": {
         "title": "Tukola ku sabiibu yo",
         "subtitle": "Kino kiyinza okutwala eddakiika emu"

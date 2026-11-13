@@ -3846,6 +3846,10 @@
         "subtitle": "Sada možete aktivirati svoju karticu i početi je koristiti",
         "buttonText": "Zatvori"
       },
+      "CardDeclined": {
+        "title": "Nismo mogli odobriti tvoj zahtjev za karticu",
+        "subtitle": "Tvoj upravitelj računa javit će ti se."
+      },
       "CardProcessing": {
         "title": "Obrađujemo vašu prijavu",
         "subtitle": "Ovo može potrajati do jedne minute"

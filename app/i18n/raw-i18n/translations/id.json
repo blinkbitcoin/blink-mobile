@@ -3846,6 +3846,10 @@
         "subtitle": "Sekarang Anda dapat mengaktifkan kartu dan mulai menggunakannya",
         "buttonText": "Tutup"
       },
+      "CardDeclined": {
+        "title": "Kami tidak dapat menyetujui pengajuan kartu Anda",
+        "subtitle": "Manajer akun Anda akan menghubungi Anda."
+      },
       "CardProcessing": {
         "title": "Memproses aplikasi Anda",
         "subtitle": "Ini bisa memakan waktu hingga satu menit"

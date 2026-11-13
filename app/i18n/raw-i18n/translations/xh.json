@@ -3846,6 +3846,10 @@
         "subtitle": "Ngoku ungalenza lisebenze ikhadi lakho uze uqalise ukulisebenzisa",
         "buttonText": "Vala"
       },
+      "CardDeclined": {
+        "title": "Asikwazanga ukwamkela isicelo sakho sekhadi",
+        "subtitle": "Umphathi weakhawunti yakho uza kunxibelelana nawe."
+      },
       "CardProcessing": {
         "title": "Siqhuba isicelo sakho",
         "subtitle": "Oku kunokuthatha ukuya kumzuzu omnye"

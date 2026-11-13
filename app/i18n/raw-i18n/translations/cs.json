@@ -3846,6 +3846,10 @@
         "subtitle": "Nyní si můžete kartu aktivovat a začít ji používat",
         "buttonText": "Zavřít"
       },
+      "CardDeclined": {
+        "title": "Vaši žádost o kartu jsme nemohli schválit",
+        "subtitle": "Váš správce účtu se vám ozve."
+      },
       "CardProcessing": {
         "title": "Zpracováváme vaši žádost",
         "subtitle": "Může to trvat až minutu"

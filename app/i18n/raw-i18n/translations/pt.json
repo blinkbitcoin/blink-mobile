@@ -3785,6 +3785,10 @@
                 "subtitle": "Agora você pode ativar seu cartão e começar a usá-lo",
                 "buttonText": "Fechar"
             },
+            "CardDeclined": {
+                "title": "Não conseguimos aprovar sua solicitação de cartão",
+                "subtitle": "Seu gerente de conta entrará em contato."
+            },
             "CardProcessing": {
                 "title": "Processando sua solicitação",
                 "subtitle": "Isso pode levar até um minuto"

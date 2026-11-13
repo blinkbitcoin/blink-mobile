@@ -3846,6 +3846,10 @@
         "subtitle": "Artık kartınızı etkinleştirip kullanmaya başlayabilirsiniz",
         "buttonText": "Kapat"
       },
+      "CardDeclined": {
+        "title": "Kart başvurunuzu onaylayamadık",
+        "subtitle": "Hesap yöneticiniz sizinle iletişime geçecek."
+      },
       "CardProcessing": {
         "title": "Başvurunuz işleniyor",
         "subtitle": "Bu işlem bir dakikaya kadar sürebilir"

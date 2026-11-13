@@ -3846,6 +3846,10 @@
         "subtitle": "Jy kan nou jou kaart aktiveer en dit begin gebruik",
         "buttonText": "Sluit"
       },
+      "CardDeclined": {
+        "title": "Ons kon nie jou kaartaansoek goedkeur nie",
+        "subtitle": "Jou rekeningbestuurder sal in verbinding tree."
+      },
       "CardProcessing": {
         "title": "Verwerk jou aansoek",
         "subtitle": "Dit kan tot 'n minuut duur"

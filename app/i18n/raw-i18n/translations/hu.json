@@ -3846,6 +3846,10 @@
         "subtitle": "Most már aktiválhatja a kártyáját, és elkezdheti használni",
         "buttonText": "Bezárás"
       },
+      "CardDeclined": {
+        "title": "Nem tudtuk jóváhagyni a kártyaigénylésedet",
+        "subtitle": "A fiókkezelőd felveszi veled a kapcsolatot."
+      },
       "CardProcessing": {
         "title": "Pályázatod feldolgozása",
         "subtitle": "Ez akár egy percig is eltarthat"

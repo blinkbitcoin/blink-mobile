@@ -12777,6 +12777,16 @@ type RootTranslation = {
 				 */
 				buttonText: string
 			}
+			CardDeclined: {
+				/**
+				 * W​e​ ​c​o​u​l​d​n​'​t​ ​a​p​p​r​o​v​e​ ​y​o​u​r​ ​c​a​r​d​ ​a​p​p​l​i​c​a​t​i​o​n
+				 */
+				title: string
+				/**
+				 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​m​a​n​a​g​e​r​ ​w​i​l​l​ ​b​e​ ​i​n​ ​t​o​u​c​h​.
+				 */
+				subtitle: string
+			}
 			CardProcessing: {
 				/**
 				 * P​r​o​c​e​s​s​i​n​g​ ​y​o​u​r​ ​a​p​p​l​i​c​a​t​i​o​n
@@ -27088,6 +27098,16 @@ export type TranslationFunctions = {
 				 * Close
 				 */
 				buttonText: () => LocalizedString
+			}
+			CardDeclined: {
+				/**
+				 * We couldn't approve your card application
+				 */
+				title: () => LocalizedString
+				/**
+				 * Your account manager will be in touch.
+				 */
+				subtitle: () => LocalizedString
 			}
 			CardProcessing: {
 				/**

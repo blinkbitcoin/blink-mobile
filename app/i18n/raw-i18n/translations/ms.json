@@ -3846,6 +3846,10 @@
         "subtitle": "Anda kini boleh mengaktifkan kad anda dan mula menggunakannya",
         "buttonText": "Tutup"
       },
+      "CardDeclined": {
+        "title": "Kami tidak dapat meluluskan permohonan kad anda",
+        "subtitle": "Pengurus akaun anda akan menghubungi anda."
+      },
       "CardProcessing": {
         "title": "Memproses permohonan anda",
         "subtitle": "Ini boleh mengambil masa sehingga satu minit"

@@ -106,11 +106,11 @@ describe("CardProcessingScreen", () => {
     expect(mockPopTo).not.toHaveBeenCalled()
   })
 
-  it("goes back to the Home under it when the issuer refuses the application", async () => {
+  it("breaks a refusal on the declined screen, in its place", async () => {
     await renderScreen("declined")
 
-    expect(mockPopTo).toHaveBeenCalledWith("Primary")
-    expect(mockReplace).not.toHaveBeenCalled()
+    expect(mockReplace).toHaveBeenCalledWith("cardOnboardingDeclinedScreen")
+    expect(mockPopTo).not.toHaveBeenCalled()
   })
 
   /** Navigating there would stack a second Home over this screen, which would stay

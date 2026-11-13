@@ -3846,6 +3846,10 @@
         "subtitle": "Sasa unaweza kuwasha kadi yako na kuanza kuitumia",
         "buttonText": "Funga"
       },
+      "CardDeclined": {
+        "title": "Hatukuweza kuidhinisha ombi lako la kadi",
+        "subtitle": "Msimamizi wa akaunti yako atawasiliana nawe."
+      },
       "CardProcessing": {
         "title": "Tunashughulikia maombi yako",
         "subtitle": "Hii inaweza kuchukua hadi dakika moja"
