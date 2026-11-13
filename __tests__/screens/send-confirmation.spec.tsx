@@ -399,9 +399,20 @@ describe("SendBitcoinConfirmationScreen", () => {
   })
 
   it("paints the review fields static and keeps the copyable destination interactive", async () => {
+    const note = "Dinner split"
+    const routeWithNote = {
+      ...route,
+      params: {
+        paymentDetail: createIntraledgerPaymentDetails({
+          ...defaultParams,
+          senderSpecifiedMemo: note,
+        }),
+      },
+    } as const
+
     await renderSettled(
       <ContextForScreen>
-        <Intraledger route={route} />
+        <Intraledger route={routeWithNote} />
       </ContextForScreen>,
     )
 
@@ -409,9 +420,15 @@ describe("SendBitcoinConfirmationScreen", () => {
       .UNSAFE_getAllByType(TouchableOpacity)
       .filter((node) => node.props.hitSlop === 30)
     expect(surfaceColor(copyDestination)).toBe(light.surfaceInteractive)
-    expect(surfaceColor(screen.getByLabelText("Successful Fee"))).toBe(
-      light.surfaceStatic,
-    )
+
+    // One value per field, so dropping the static style from any one of them fails here:
+    // the file-level guard only counts the style, not the fields that use it.
+    const from = screen.getByText("$100.00")
+    const amount = screen.getByText("$1.00 (₦1)")
+    const fee = screen.getByLabelText("Successful Fee")
+    for (const value of [from, amount, screen.getByText(note), fee]) {
+      expect(surfaceColor(value)).toBe(light.surfaceStatic)
+    }
   })
 
   it("Send Screen Confirmation - Lightning lnurl Payment", async () => {
