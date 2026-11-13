@@ -1,0 +1,43 @@
+# Switch a fresh install off the Main (production) instance onto Staging.
+# Route: triple-tap the GetStarted logo -> developerScreen -> scroll to
+# Update Environment -> Staging -> Save changes -> Back.
+#
+# Coordinate taps on purpose: these screens have a collapsed accessibility
+# tree, so text/testID matching is blind (see the simulator skill).
+# Percentages assume a portrait 16-Pro-class simulator.
+#
+# `#` comments only before the header - maestro parse-fails the whole flow
+# on prose lines, silently when output is discarded.
+appId: ${APP_ID}
+---
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 10000
+- tapOn:
+    point: "38%,39%"
+- tapOn:
+    point: "38%,39%"
+- tapOn:
+    point: "38%,39%"
+- waitForAnimationToEnd:
+    timeout: 5000
+- swipe:
+    start: "50%,80%"
+    end: "50%,20%"
+- swipe:
+    start: "50%,80%"
+    end: "50%,20%"
+- waitForAnimationToEnd:
+    timeout: 3000
+- tapOn:
+    point: "50%,57%"
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn:
+    point: "50%,42%"
+- waitForAnimationToEnd:
+    timeout: 5000
+- tapOn:
+    point: "13%,10%"
+- waitForAnimationToEnd:
+    timeout: 3000
