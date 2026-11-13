@@ -1,5 +1,5 @@
 import React from "react"
-import { render, fireEvent, act } from "@testing-library/react-native"
+import { render, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardProcessingScreen } from "@app/screens/card-screen/onboarding/card-flow/processing-screen"
@@ -13,17 +13,24 @@ jest.mock("react-native-linear-gradient", () => ({
   LinearGradient: "LinearGradient",
 }))
 
-const mockNavigate = jest.fn()
+const mockUseDashedLineFlow = jest.fn()
 
-jest.mock("@react-navigation/native", () => {
-  const actualNav = jest.requireActual("@react-navigation/native")
-  return {
-    ...actualNav,
-    useNavigation: () => ({
-      navigate: mockNavigate,
-    }),
-  }
-})
+jest.mock("@app/components/animations", () => ({
+  useDashedLineFlow: (params: unknown) => {
+    mockUseDashedLineFlow(params)
+    return { animatedProps: {}, dashArray: "5 5" }
+  },
+}))
+
+const renderScreen = async () => {
+  const screen = render(
+    <ContextForScreen>
+      <CardProcessingScreen />
+    </ContextForScreen>,
+  )
+  await act(async () => {})
+  return screen
+}
 
 describe("CardProcessingScreen", () => {
   beforeEach(() => {
@@ -31,68 +38,25 @@ describe("CardProcessingScreen", () => {
     jest.clearAllMocks()
   })
 
-  it("renders without crashing", async () => {
-    const { toJSON } = render(
-      <ContextForScreen>
-        <CardProcessingScreen />
-      </ContextForScreen>,
-    )
-
-    await act(async () => {})
-
-    expect(toJSON()).toBeTruthy()
-  })
-
-  it("displays processing title", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <CardProcessingScreen />
-      </ContextForScreen>,
-    )
-
-    await act(async () => {})
+  it("says the application is being processed", async () => {
+    const { getByText } = await renderScreen()
 
     expect(getByText("Processing your application")).toBeTruthy()
-  })
-
-  it("displays subtitle", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <CardProcessingScreen />
-      </ContextForScreen>,
-    )
-
-    await act(async () => {})
-
     expect(getByText("We will notify you once we are ready")).toBeTruthy()
   })
 
-  it("displays close button", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <CardProcessingScreen />
-      </ContextForScreen>,
-    )
+  it("flows the line's dashes, as long as the gaps, toward the card", async () => {
+    await renderScreen()
 
-    await act(async () => {})
-
-    expect(getByText("Close")).toBeTruthy()
+    expect(mockUseDashedLineFlow).toHaveBeenCalledWith({
+      dashLength: 89 / 18,
+      gapLength: 89 / 18,
+    })
   })
 
-  it("navigates to Primary on button press", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <CardProcessingScreen />
-      </ContextForScreen>,
-    )
+  it("offers no button", async () => {
+    const { queryByRole } = await renderScreen()
 
-    await act(async () => {})
-
-    const button = getByText("Close")
-    await act(async () => {
-      fireEvent.press(button)
-    })
-
-    expect(mockNavigate).toHaveBeenCalledWith("Primary")
+    expect(queryByRole("button")).toBeNull()
   })
 })

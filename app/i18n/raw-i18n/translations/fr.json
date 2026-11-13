@@ -3788,8 +3788,7 @@
             },
             "CardProcessing": {
                 "title": "Traitement de votre demande",
-                "subtitle": "Nous vous préviendrons dès que nous serons prêts",
-                "buttonText": "Fermer"
+                "subtitle": "Nous vous préviendrons dès que nous serons prêts"
             },
             "WelcomeInvest": {
                 "welcomeMessage": {
