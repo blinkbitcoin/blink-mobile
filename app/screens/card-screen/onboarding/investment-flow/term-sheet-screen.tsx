@@ -10,6 +10,7 @@ import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 import {
   formatUnitCount,
@@ -109,7 +110,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 20,
   },
   cardContainer: {
-    backgroundColor: colors.surfaceInteractive,
+    ...staticSurface(colors),
     borderRadius: 12,
     padding: 15,
     gap: 25,

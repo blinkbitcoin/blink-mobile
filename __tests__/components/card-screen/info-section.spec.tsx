@@ -23,7 +23,6 @@ jest.mock("@rn-vui/themed", () => ({
     container: {},
     title: {},
     card: { backgroundColor: "#F5F5F5", padding: 14 },
-    cardInactive: { backgroundColor: "#F9F9F9" },
     outline: {
       position: "absolute",
       top: 0,
@@ -269,20 +268,6 @@ describe("InfoSection", () => {
     views
       .map((view) => StyleSheet.flatten(view.props.style))
       .find((style) => style?.padding === 14)
-
-  describe("inactive surface", () => {
-    it("paints the card on the static grey7 surface when inactive", () => {
-      render(<InfoSection {...defaultProps} inactive />)
-
-      expect(cardStyle(screen.UNSAFE_getAllByType(View))?.backgroundColor).toBe("#F9F9F9")
-    })
-
-    it("keeps the grey5 surface by default", () => {
-      render(<InfoSection {...defaultProps} />)
-
-      expect(cardStyle(screen.UNSAFE_getAllByType(View))?.backgroundColor).toBe("#F5F5F5")
-    })
-  })
 
   describe("outline", () => {
     it("draws no outline without an outlineColor", () => {

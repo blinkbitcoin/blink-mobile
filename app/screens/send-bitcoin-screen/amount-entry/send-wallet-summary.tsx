@@ -13,6 +13,7 @@ import { WalletSwitch } from "@app/components/wallet-switch"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { fonts } from "@app/rne-theme/fonts"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import { testProps } from "@app/utils/testProps"
 
 export const SEND_WALLET_SUMMARY_TEST_ID = "choose-wallet-to-send-from"
@@ -166,7 +167,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 14,
   },
   cardInactive: {
-    backgroundColor: colors.surfaceStatic,
+    ...staticSurface(colors),
   },
   cardError: {
     borderColor: colors.error,

@@ -723,7 +723,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 title={LL.SendBitcoinConfirmationScreen.details()}
                 items={detailItems}
                 outlineColor={detailsOutline}
-                inactive
               />
               {blockingError ? (
                 <View style={styles.errorWithAction}>
