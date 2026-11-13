@@ -3787,8 +3787,7 @@
             },
             "CardProcessing": {
                 "title": "申請を処理中",
-                "subtitle": "準備ができ次第、お知らせします",
-                "buttonText": "閉じる"
+                "subtitle": "準備ができ次第、お知らせします"
             },
             "WelcomeInvest": {
                 "welcomeMessage": {

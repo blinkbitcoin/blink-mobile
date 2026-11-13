@@ -3787,8 +3787,7 @@
             },
             "CardProcessing": {
                 "title": "Dein Antrag wird bearbeitet",
-                "subtitle": "Wir benachrichtigen dich, sobald wir bereit sind",
-                "buttonText": "Schließen"
+                "subtitle": "Wir benachrichtigen dich, sobald wir bereit sind"
             },
             "WelcomeInvest": {
                 "welcomeMessage": {

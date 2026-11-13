@@ -3848,8 +3848,7 @@
       },
       "CardProcessing": {
         "title": "Zpracováváme vaši žádost",
-        "subtitle": "Dáme ti vědět, jakmile budeme připraveni",
-        "buttonText": "Zavřít"
+        "subtitle": "Dáme ti vědět, jakmile budeme připraveni"
       }
     }
   },

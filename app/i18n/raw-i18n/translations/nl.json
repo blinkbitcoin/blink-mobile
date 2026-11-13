@@ -3848,8 +3848,7 @@
       },
       "CardProcessing": {
         "title": "Je aanvraag wordt verwerkt",
-        "subtitle": "We laten het je weten zodra we klaar zijn",
-        "buttonText": "Sluiten"
+        "subtitle": "We laten het je weten zodra we klaar zijn"
       }
     }
   },

@@ -3848,8 +3848,7 @@
       },
       "CardProcessing": {
         "title": "Se procesează cererea ta",
-        "subtitle": "Te vom anunța de îndată ce vom fi pregătiți",
-        "buttonText": "Închide"
+        "subtitle": "Te vom anunța de îndată ce vom fi pregătiți"
       }
     }
   },

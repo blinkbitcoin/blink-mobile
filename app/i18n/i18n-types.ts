@@ -12786,10 +12786,6 @@ type RootTranslation = {
 				 * W​e​ ​w​i​l​l​ ​n​o​t​i​f​y​ ​y​o​u​ ​o​n​c​e​ ​w​e​ ​a​r​e​ ​r​e​a​d​y
 				 */
 				subtitle: string
-				/**
-				 * C​l​o​s​e
-				 */
-				buttonText: string
 			}
 		}
 	}
@@ -27102,10 +27098,6 @@ export type TranslationFunctions = {
 				 * We will notify you once we are ready
 				 */
 				subtitle: () => LocalizedString
-				/**
-				 * Close
-				 */
-				buttonText: () => LocalizedString
 			}
 		}
 	}
