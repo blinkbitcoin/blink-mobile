@@ -9,7 +9,13 @@ import {
 } from "./utils/commandline"
 import { setLocalAndLoginWithAccessToken, waitForHomeScreen } from "./utils/common-flows"
 import { timeout, BOB_USERNAME, ALICE_TOKEN } from "./utils/config"
-import { addAmount, tap, verifyTextPresent, sleep, slideSlider } from "./utils/controls"
+import {
+  tap,
+  typeSendAmount,
+  verifyTextPresent,
+  sleep,
+  slideSlider,
+} from "./utils/controls"
 
 loadLocale("en")
 const LL = i18nObject("en")
@@ -40,7 +46,7 @@ describe("Send: Intraledger using Username - BTC Amount", () => {
          then the address is right popup modal won't appear */
     }
 
-    await addAmount("0.02", LL)
+    await typeSendAmount("0.02")
     await tap(by.id(LL.common.next()))
 
     await slideSlider()
@@ -85,10 +91,10 @@ describe("Send: Intraledger using Username - USD Amount", () => {
          then the address is right popup modal won't appear */
     }
 
+    // The summary switches straight to the other wallet: bitcoin is the default, so one tap is dollar.
     await tap(by.id("choose-wallet-to-send-from"))
-    await tap(by.id("USD"))
 
-    await addAmount("0.02", LL)
+    await typeSendAmount("0.02")
     await tap(by.id(LL.common.next()))
 
     await slideSlider()
@@ -125,7 +131,7 @@ describe("Send: Intraledger using LN Invoice", () => {
     await invoiceInput.typeText(invoice)
     await tap(by.id(LL.common.next()))
 
-    await addAmount("0.02", LL)
+    await typeSendAmount("0.02")
 
     // some bug
     await device.disableSynchronization()
@@ -166,7 +172,7 @@ describe("Send: to External LN Invoice", () => {
     await invoiceInput.typeText(invoice)
     await tap(by.id(LL.common.next()))
 
-    await addAmount("0.02", LL)
+    await typeSendAmount("0.02")
     await tap(by.id(LL.common.next()))
 
     await slideSlider()
@@ -202,7 +208,7 @@ describe("Send: to Onchain Address", () => {
     await addressInput.typeText(address)
     await tap(by.id(LL.common.next()))
 
-    await addAmount("25.0", LL)
+    await typeSendAmount("25.0")
     await tap(by.id(LL.common.next()))
 
     await slideSlider()

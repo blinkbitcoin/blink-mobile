@@ -2357,11 +2357,30 @@
         "maxFeeSelected": "Tarifa máxima que se cobrará por esta transacción. Podría ser menor una vez se realice el pago.",
         "invoiceAlreadyPaid": "Esta factura ya ha sido pagada.",
         "somethingWentWrong": "Algo salió mal",
+        "priceUpdated": "El precio cambió, así que los montos se actualizaron. Revísalos antes de enviar.",
         "paymentAlreadyAttempted": "El pago ya se intentó.\n\nSi deseas enviar este pago nuevamente, comienza desde el principio del proceso.",
         "slideToConfirm": "Desliza para confirmar",
         "slideConfirming": "Confirmando...",
+        "slideToSend": "Desliza para enviar",
+        "calculatingFee": "Calculando la comisión…",
+        "sendProgress": {
+            "reviewing": "Revisando",
+            "signing": "Firmando",
+            "findingRoute": "Buscando ruta",
+            "broadcasting": "Transmitiendo",
+            "checkingDelivery": "Verificando la entrega",
+            "retrying": "Reintentando",
+            "almostThere": "Ya casi",
+            "anyTimeNow": "En cualquier momento",
+            "ohOh": "Uy, uy",
+            "tryingAgain": "Intentando de nuevo"
+        },
         "copiedDestination": "Destino copiado al portapapeles",
         "lightningRecommended": "Tasa elevada. Recomendamos Lightning.",
+        "sending": "Enviando",
+        "fromBalance": "Desde el saldo",
+        "details": "Detalles",
+        "changeAmount": "Cambiar cantidad",
         "usdRemainderSweep": "Restante {remaining: string} ({remainingSats: string}) se convertirá a Bitcoin. Mínimo en USD: {minimum: string}."
     },
     "SendBitcoinDestinationScreen": {
@@ -2405,6 +2424,8 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "La transacción debe enviarse a la Mempool.",
         "amount": "Cantidad",
+        "addAmount": "Añade una cantidad",
+        "lowFunds": "Fondos insuficientes",
         "amountExceed": "La cantidad excede su saldo de {balance: string}",
         "amountExceedsLimit": "El importe supera tu límite diario restante de {limit: string}",
         "upgradeAccountToIncreaseLimit": "Actualiza tu cuenta para aumentar tu límite",
@@ -2456,7 +2477,8 @@
         "sdkInsufficientFunds": "Fondos insuficientes para esta transacción.",
         "sdkAmountTooLow": "El monto es muy bajo para una transacción on-chain.",
         "sdkNetworkError": "Error de red. Verifica tu conexión e intenta de nuevo.",
-        "sdkGenericError": "No se pueden estimar las comisiones. Intenta con un monto diferente."
+        "sdkGenericError": "No se pueden estimar las comisiones. Intenta con un monto diferente.",
+        "onchainSelfPayment": "Esta es la dirección de tu propia billetera. No puedes enviarte un pago on-chain a ti mismo."
     },
     "SettingsScreen": {
         "createAddress": "Crear dirección Lightning",
@@ -3115,6 +3137,13 @@
     },
     "AmountInputButton": {
         "tapToSetAmount": "Fijar cantidad"
+    },
+    "Accessibility": {
+        "deleteKey": "Borrar",
+        "swapCurrencyHint": "Cambia la moneda en la que escribes la cantidad",
+        "switchToWallet": "Cambiar a {wallet: string}",
+        "copy": "Copiar",
+        "revealBalanceHint": "Muestra tu saldo en esta pantalla"
     },
     "AppUpdate": {
         "needToUpdateSupportMessage": "Necesito actualizar la aplicación a la última versión. Utilizo la aplicación para {os: string} con la versión {version: string}.",

@@ -49,7 +49,8 @@ type HeaderBackButtonWithThemeProps = React.ComponentProps<typeof HeaderBackButt
   onBack?: () => void
 }
 
-const HeaderBackButtonWithTheme = ({
+/** Also rendered inside a headerless screen that draws its own header row (send review). */
+export const HeaderBackButtonWithTheme = ({
   onBack,
   ...props
 }: HeaderBackButtonWithThemeProps): React.ReactNode => {
@@ -62,6 +63,11 @@ const HeaderBackButtonWithTheme = ({
   return (
     <HeaderBackButton
       {...props}
+      // HeaderBackButton hands its tint to the icon even when it is undefined, which
+      // overrides the icon's theme default and leaves the raw black glyph: invisible on a
+      // dark background. The native header passes headerTintColor; a bare render must not
+      // depend on that.
+      tintColor={props.tintColor ?? colors.textOnBackground}
       onPress={handleBack}
       pressColor={colors.surfaceInteractive}
       pressOpacity={1}

@@ -1,14 +1,26 @@
-import React, { FC, PropsWithChildren } from "react"
+import React, { FC, PropsWithChildren, Ref } from "react"
+import { View } from "react-native"
 
 import { testProps } from "@app/utils/testProps"
 import { TouchableHighlight } from "@app/utils/touchable-wrapper"
 import { Button, ButtonProps, makeStyles, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
-export const GaloyPrimaryButton: FC<PropsWithChildren<ButtonProps>> = (props) => {
+type GaloyPrimaryButtonProps = PropsWithChildren<ButtonProps> & {
+  /** The button's native pressable, e.g. to move screen reader focus to it. */
+  pressableRef?: Ref<View>
+}
+
+export const GaloyPrimaryButton: FC<GaloyPrimaryButtonProps> = ({
+  pressableRef,
+  ...props
+}) => {
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
+  // RNE hands its unknown props to the touchable, which passes this one on as its ref.
+  const touchableProps = pressableRef ? { hostRef: pressableRef } : {}
 
   return (
     <Button
@@ -23,6 +35,7 @@ export const GaloyPrimaryButton: FC<PropsWithChildren<ButtonProps>> = (props) =>
       titleStyle={styles.titleStyle}
       disabledStyle={styles.disabledStyle}
       disabledTitleStyle={styles.disabledTitleStyle}
+      {...touchableProps}
       {...props}
     />
   )
@@ -30,9 +43,10 @@ export const GaloyPrimaryButton: FC<PropsWithChildren<ButtonProps>> = (props) =>
 
 const useStyles = makeStyles(({ colors }) => ({
   titleStyle: {
+    flexGrow: 1,
+    fontFamily: fonts.bold,
     fontSize: 20,
     lineHeight: 24,
-    fontWeight: "700",
     color: colors.textOnAccent,
   },
   disabledTitleStyle: {

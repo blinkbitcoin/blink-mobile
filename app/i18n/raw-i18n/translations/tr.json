@@ -2357,11 +2357,30 @@
     "maxFeeSelected": "Bu, bu işlem için sizden tahsil edilecek maksimum ücrettir. Ödeme yapıldıktan sonra daha az olabilir.",
     "invoiceAlreadyPaid": "Bu fatura zaten ödenmiştir",
     "somethingWentWrong": "Bir şeyler ters gitti",
+    "priceUpdated": "Fiyat değişti, bu yüzden tutarlar güncellendi. Göndermeden önce kontrol edin.",
     "paymentAlreadyAttempted": "Ödeme zaten denendi.\n\nBu ödemeyi tekrar göndermek istiyorsanız, sıfırdan başlayın.",
     "slideToConfirm": "Onaylamak için kaydırın",
     "slideConfirming": "Onaylanıyor...",
+    "slideToSend": "Göndermek için kaydırın",
+    "calculatingFee": "Ücret hesaplanıyor…",
+    "sendProgress": {
+      "reviewing": "İnceleniyor",
+      "signing": "İmzalanıyor",
+      "findingRoute": "Rota aranıyor",
+      "broadcasting": "Yayınlanıyor",
+      "checkingDelivery": "Teslimat kontrol ediliyor",
+      "retrying": "Yeniden deneniyor",
+      "almostThere": "Neredeyse bitti",
+      "anyTimeNow": "Her an",
+      "ohOh": "Eyvah",
+      "tryingAgain": "Tekrar deniyoruz"
+    },
     "copiedDestination": "Hedefi panoya kopyalama",
-    "lightningRecommended": "Yüksek komisyon! Lightning kullanmanızı öneriyoruz.",
+    "lightningRecommended": "Yüksek komisyon. Lightning kullanmanızı öneriyoruz.",
+    "sending": "Gönderiliyor",
+    "fromBalance": "Bakiyeden",
+    "details": "Detaylar",
+    "changeAmount": "Tutarı değiştir",
     "usdRemainderSweep": "Kalan {remaining: string} ({remainingSats: string}) Bitcoin'e dönüştürülecek. USD minimumu: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2405,6 +2424,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "İşlem mempool'a gönderilmelidir",
     "amount": "Miktar",
+    "addAmount": "Tutar ekle",
+    "lowFunds": "Yetersiz bakiye",
     "amountExceed": "Göndermek istediğin miktar, bakiyenin {balance: string} üstünde.",
     "amountExceedsLimit": "Tutar, kalan günlük {limit: string} limitinizi aşıyor",
     "upgradeAccountToIncreaseLimit": "Limitinizi artırmak için hesabınızı yükseltin",
@@ -2456,7 +2477,8 @@
     "sdkInsufficientFunds": "Bu işlem için yeterli bakiye yok.",
     "sdkAmountTooLow": "Tutar, bir on-chain işlemi için çok düşük.",
     "sdkNetworkError": "Ağ hatası. Bağlantınızı kontrol edin ve tekrar deneyin.",
-    "sdkGenericError": "Ücretler tahmin edilemiyor. Lütfen farklı bir tutar deneyin."
+    "sdkGenericError": "Ücretler tahmin edilemiyor. Lütfen farklı bir tutar deneyin.",
+    "onchainSelfPayment": "Bu, kendi cüzdanınızın adresi. Kendinize on-chain ödeme gönderemezsiniz."
   },
   "SettingsScreen": {
     "createAddress": "Lightning adresi oluştur",
@@ -3115,6 +3137,13 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Miktarı belirle"
+  },
+  "Accessibility": {
+    "deleteKey": "Sil",
+    "swapCurrencyHint": "Tutarı girdiğiniz para birimini değiştirir",
+    "switchToWallet": "{wallet: string} seçeneğine geç",
+    "copy": "Kopyala",
+    "revealBalanceHint": "Bakiyenizi bu ekranda gösterir"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Uygulamamı en son sürüme güncellemem gerekiyor. {os: string} uygulamasının {version: string} sürümünü kullanıyorum.",
