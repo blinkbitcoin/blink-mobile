@@ -21,6 +21,7 @@ instructions (e.g. `AGENTS.md`).
 | Skill | One line |
 |---|---|
 | [`react-native-ios-simulator`](./react-native-ios-simulator/SKILL.md) | Claim/release an **isolated** simulator + Metro port; reach screens and states (stubs, reinstall via `reset-app.sh`); never touches your simulator or your Metro on 8081 |
+| [`react-native-android-emulator`](./react-native-android-emulator/SKILL.md) | Claim/release an **isolated** emulator + Metro port (shares the iOS skill's registry, so the two can never collide); points the app at your port via `debug_http_host`, because an emulator otherwise dials 10.0.2.2:8081 — another agent's Metro |
 | [`react-native-demo-screenshots`](./react-native-demo-screenshots/SKILL.md) | Settle-aware capture, honest before/after crop pairs, numeric comparison against design mocks |
 | [`react-native-demo-videos`](./react-native-demo-videos/SKILL.md) | Maestro-driven recordings with safe recorder stop paths, GIF/MP4/WebM encoding, and a guard against the `clearState` Metro-redirect trap |
 | [`github-pr-image-attachments`](./github-pr-image-attachments/SKILL.md) | Embed images in PR comments via an orphan `assets/pr-<N>-*` branch (`gh` has no attachment upload); repo derived from the origin remote |
@@ -40,7 +41,8 @@ ownership gates, the collateral-damage assertion — and the suites that
 mutation-check them. The device-wide verbs those scripts guard (`erase`,
 `delete`, `shutdown`, `boot`, `create`, `clone`, `rename`, `uninstall`, and
 `spawn`/`privacy`/`addmedia`/`status_bar`, which change whatever device they
-are pointed at, `booted` included) are
+are pointed at, `booted` included; on Android `emulator`, `adb emu kill`,
+`adb kill-server`, `pm clear`) are
 deliberately *not* pre-approved: run raw, they skip every guard, so they
 still prompt — go through the scripts instead. Note: non-interactive runs in an *untrusted* checkout
 ignore project settings by design; trust the workspace once and the
