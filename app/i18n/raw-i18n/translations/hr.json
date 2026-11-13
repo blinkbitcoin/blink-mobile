@@ -2537,7 +2537,7 @@
         "description": "Obavijesti o cijeni Bitcoina."
       }
     },
-    "splashGroup": "Zaslon dolazne transakcije",
+    "splashGroup": "Zaslon primljene uplate",
     "incomingTransactionSplash": "Prikaži zaslon",
     "splashMinimum": "Najmanji iznos (SAT)"
   },
@@ -2551,8 +2551,8 @@
     "tapToShow": "Dodirnite za prikaz",
     "announcementHidden": "Uplata primljena",
     "announcementPending": "Onchain u tijeku, {amount}",
-    "toastOn": "Zaslon obavijesti je uključen",
-    "toastOff": "Zaslon obavijesti je isključen"
+    "toastOn": "Zaslon primljene uplate je uključen",
+    "toastOff": "Zaslon primljene uplate je isključen"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Vaš račun ima više od $5",

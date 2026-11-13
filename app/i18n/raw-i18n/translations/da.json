@@ -2537,7 +2537,7 @@
         "description": "Notifikationer om Bitcoin-prisen."
       }
     },
-    "splashGroup": "Skærm for indgående transaktion",
+    "splashGroup": "Skærm for modtaget betaling",
     "incomingTransactionSplash": "Vis skærm",
     "splashMinimum": "Minimumsbeløb (SAT)"
   },
@@ -2551,8 +2551,8 @@
     "tapToShow": "Tryk for at vise",
     "announcementHidden": "Betaling modtaget",
     "announcementPending": "Afventende onchain, {amount}",
-    "toastOn": "Skærm ved indgående betaling er slået til",
-    "toastOff": "Skærm ved indgående betaling er slået fra"
+    "toastOn": "Skærm for modtaget betaling er slået til",
+    "toastOff": "Skærm for modtaget betaling er slået fra"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Din konto har mere end $5",

@@ -2537,7 +2537,7 @@
         "description": "Notificări despre prețul Bitcoin."
       }
     },
-    "splashGroup": "Ecran pentru tranzacții primite",
+    "splashGroup": "Ecran pentru plată primită",
     "incomingTransactionSplash": "Afișează ecranul",
     "splashMinimum": "Sumă minimă (SAT)"
   },
@@ -2551,8 +2551,8 @@
     "tapToShow": "Atingeți pentru a afișa",
     "announcementHidden": "Plată primită",
     "announcementPending": "Onchain în așteptare, {amount}",
-    "toastOn": "Ecranul de notificare e activat",
-    "toastOff": "Ecranul de notificare e dezactivat"
+    "toastOn": "Ecranul pentru plată primită e activat",
+    "toastOff": "Ecranul pentru plată primită e dezactivat"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Contul dvs. are mai mult de 5 USD",

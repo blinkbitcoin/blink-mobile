@@ -2537,7 +2537,7 @@
         "description": "Notifikasi tentang harga Bitcoin."
       }
     },
-    "splashGroup": "Layar transaksi masuk",
+    "splashGroup": "Layar pembayaran diterima",
     "incomingTransactionSplash": "Tampilkan layar",
     "splashMinimum": "Jumlah minimum (SAT)"
   },
@@ -2551,8 +2551,8 @@
     "tapToShow": "Ketuk untuk menampilkan",
     "announcementHidden": "Pembayaran diterima",
     "announcementPending": "Onchain tertunda, {amount}",
-    "toastOn": "Layar notifikasi aktif",
-    "toastOff": "Layar notifikasi nonaktif"
+    "toastOn": "Layar pembayaran diterima aktif",
+    "toastOff": "Layar pembayaran diterima nonaktif"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Akun Anda memiliki lebih dari $5",

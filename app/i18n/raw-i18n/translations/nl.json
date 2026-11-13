@@ -2537,7 +2537,7 @@
         "description": "Meldingen over de prijs van Bitcoin."
       }
     },
-    "splashGroup": "Scherm voor inkomende transactie",
+    "splashGroup": "Scherm voor ontvangen betaling",
     "incomingTransactionSplash": "Scherm tonen",
     "splashMinimum": "Minimumbedrag (SAT)"
   },
@@ -2551,8 +2551,8 @@
     "tapToShow": "Tik om te tonen",
     "announcementHidden": "Betaling ontvangen",
     "announcementPending": "Onchain in behandeling, {amount}",
-    "toastOn": "Scherm bij inkomende betaling staat aan",
-    "toastOff": "Scherm bij inkomende betaling staat uit"
+    "toastOn": "Scherm voor ontvangen betaling staat aan",
+    "toastOff": "Scherm voor ontvangen betaling staat uit"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Je account heeft meer dan $5",

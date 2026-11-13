@@ -2537,7 +2537,7 @@
         "description": "Զգուշացումներ Bitcoin-ի գնի մասին։"
       }
     },
-    "splashGroup": "Մուտքային գործարքի էկրան",
+    "splashGroup": "Ստացված վճարման էկրան",
     "incomingTransactionSplash": "Ցույց տալ էկրանը",
     "splashMinimum": "Նվազագույն գումար (SAT)"
   },
@@ -2551,8 +2551,8 @@
     "tapToShow": "Սեղմեք՝ ցուցադրելու համար",
     "announcementHidden": "Վճարումը ստացվել է",
     "announcementPending": "Onchain ընթացքի մեջ, {amount}",
-    "toastOn": "Ծանուցման էկրանը միացված է",
-    "toastOff": "Ծանուցման էկրանն անջատված է"
+    "toastOn": "Ստացված վճարման էկրանը միացված է",
+    "toastOff": "Ստացված վճարման էկրանն անջատված է"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Ձեր հաշվին $5-ից ավելի միջոցներ կան",
