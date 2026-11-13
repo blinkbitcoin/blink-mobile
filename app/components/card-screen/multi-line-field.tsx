@@ -3,6 +3,7 @@ import { TouchableOpacity, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 type MultiLineFieldProps = {
   lines: string[]
@@ -23,7 +24,7 @@ export const MultiLineField: React.FC<MultiLineFieldProps> = ({
   } = useTheme()
 
   const content = (
-    <View style={styles.container}>
+    <View style={[styles.container, !onPress && styles.static]}>
       {leftIcon && <GaloyIcon name={leftIcon} size={16} />}
       <View style={styles.textContainer}>
         {lines.map((line, index) => (
@@ -63,6 +64,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingRight: 10,
     gap: 14,
   },
+  static: staticSurface(colors),
   textContainer: {
     flex: 1,
   },
