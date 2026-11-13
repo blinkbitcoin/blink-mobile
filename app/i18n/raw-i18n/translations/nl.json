@@ -2547,7 +2547,7 @@
     "note": "Notitie",
     "dontShowAgain": "Niet meer tonen",
     "details": "Details",
-    "announcement": "Je hebt ontvangen {amount}",
+    "announcement": "Je hebt {amount} ontvangen",
     "tapToShow": "Tik om te tonen",
     "announcementHidden": "Betaling ontvangen",
     "announcementPending": "Onchain in behandeling, {amount}",

@@ -2547,7 +2547,7 @@
         "note": "Notiz",
         "dontShowAgain": "Nicht mehr anzeigen",
         "details": "Details",
-        "announcement": "Du hast erhalten {amount}",
+        "announcement": "Du hast {amount} erhalten",
         "tapToShow": "Antippen zum Anzeigen",
         "announcementHidden": "Zahlung erhalten",
         "announcementPending": "Onchain ausstehend, {amount}",
