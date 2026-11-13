@@ -39,12 +39,13 @@ export const SelfCustodialSplashMount = () => {
   const { convertMoneyAmount, displayCurrency } = usePriceConversion()
   const { fractionDigits } = useDisplayCurrency()
 
-  /** The last payment offered, so a note that lands after it, or the refresh that lets
-   *  Details open it, can still reach the screen. */
+  /** The last payment put on screen, so a note that lands after it, the refresh that lets
+   *  Details open it, or a price that loads after it, can still reach the screen. */
   const offered = useRef<{
     id: string
     memo: string | undefined
     detailsPending: boolean
+    unpriced: boolean
   } | null>(null)
   /** Read from the event listener without resubscribing on every refresh. */
   const listed = useRef(allTransactions)
@@ -89,8 +90,16 @@ export const SelfCustodialSplashMount = () => {
       const tx = mapSelfCustodialTransaction(payment)
       if (!isSplashCandidate(tx)) return
       const detailsPending = !listed.current.some((listedTx) => listedTx.id === tx.id)
-      offered.current = { id: tx.id, memo: tx.memo, detailsPending }
-      showSplash({ ...toCandidate(tx), detailsPending, claimSeenLive })
+      const candidate = toCandidate(tx)
+      /** A rejected payment never reaches the screen: the one already there keeps its
+       *  refresh. */
+      if (!showSplash({ ...candidate, detailsPending, claimSeenLive })) return
+      offered.current = {
+        id: tx.id,
+        memo: tx.memo,
+        detailsPending,
+        unpriced: candidate.unpriced === true,
+      }
     })
   }, [isSelfCustodial, toCandidate, showSplash])
 
@@ -98,10 +107,17 @@ export const SelfCustodialSplashMount = () => {
     const last = offered.current
     if (!last) return
     const tx = allTransactions.find((candidate) => candidate.id === last.id)
-    if (!tx || (tx.memo === last.memo && !last.detailsPending)) return
-    offered.current = { id: tx.id, memo: tx.memo, detailsPending: false }
+    if (!tx) return
+    const priceLoaded = last.unpriced && displayInfo !== undefined
+    if (tx.memo === last.memo && !last.detailsPending && !priceLoaded) return
+    offered.current = {
+      id: tx.id,
+      memo: tx.memo,
+      detailsPending: false,
+      unpriced: displayInfo === undefined,
+    }
     refresh(toCandidate(tx))
-  }, [allTransactions, toCandidate, refresh])
+  }, [allTransactions, displayInfo, toCandidate, refresh])
 
   return null
 }

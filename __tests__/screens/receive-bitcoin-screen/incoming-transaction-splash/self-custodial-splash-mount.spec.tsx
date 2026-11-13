@@ -29,8 +29,10 @@ jest.mock("@react-native-firebase/crashlytics", () => ({
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => ({ isSelfCustodial: true }),
 }))
+/** No price until a test loads one. A stable function, so it changes only when set. */
+let mockConvert: ((amount: { amount: number }) => object) | undefined
 jest.mock("@app/hooks/use-price-conversion", () => ({
-  usePriceConversion: () => ({ convertMoneyAmount: undefined, displayCurrency: "USD" }),
+  usePriceConversion: () => ({ convertMoneyAmount: mockConvert, displayCurrency: "USD" }),
 }))
 jest.mock("@app/hooks/use-display-currency", () => ({
   useDisplayCurrency: () => ({ fractionDigits: 2 }),
@@ -81,7 +83,9 @@ describe("SelfCustodialSplashMount", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    showSplash.mockImplementation(() => true)
     mockListed = []
+    mockConvert = undefined
   })
 
   it("hands a batch of deposits over together, so none is lost", () => {
@@ -138,6 +142,49 @@ describe("SelfCustodialSplashMount", () => {
     expect(showSplash).toHaveBeenCalledWith(
       expect.objectContaining({ detailsPending: false }),
     )
+  })
+
+  it("keeps refreshing the payment on screen when a later one is rejected", () => {
+    const { rerender } = mount()
+    const shown = lightningReceive("shown")
+    const rejected = lightningReceive("rejected")
+
+    act(() => emitSucceededPayment(shown as unknown as Payment))
+    showSplash.mockImplementationOnce(() => false)
+    act(() => emitSucceededPayment(rejected as unknown as Payment))
+
+    mockListed = [shown]
+    rerender()
+
+    expect(refresh).toHaveBeenCalledTimes(1)
+    expect(refresh.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ transaction: expect.objectContaining({ id: "shown" }) }),
+    )
+    expect(refresh.mock.calls[0][0]).not.toHaveProperty("detailsPending", true)
+  })
+
+  it("prices a listed payment shown without a price once the price loads", () => {
+    const tx = lightningReceive("ln-3")
+    mockListed = [tx]
+    const { rerender } = mount()
+
+    act(() => emitSucceededPayment(tx as unknown as Payment))
+    expect(showSplash).toHaveBeenCalledWith(expect.objectContaining({ unpriced: true }))
+    expect(refresh).not.toHaveBeenCalled()
+
+    mockConvert = ({ amount }) => ({ amount, currency: "DisplayCurrency" })
+    rerender()
+
+    expect(refresh).toHaveBeenCalledTimes(1)
+    expect(refresh.mock.calls[0][0]).toEqual(
+      expect.objectContaining({
+        unpriced: false,
+        transaction: expect.objectContaining({ id: "ln-3" }),
+      }),
+    )
+
+    rerender()
+    expect(refresh).toHaveBeenCalledTimes(1)
   })
 
   it("marks a payment live only when the SDK reported it pending first", () => {
