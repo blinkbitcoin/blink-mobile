@@ -575,7 +575,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
             </View>
 
             {onChainTxNotBroadcasted && (
-              <GaloyInfo backgroundColor={staticSurface(colors).backgroundColor}>
+              <GaloyInfo>
                 {LL.TransactionDetailScreen.txNotBroadcast({ countdown })}
               </GaloyInfo>
             )}

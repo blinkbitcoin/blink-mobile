@@ -28,12 +28,6 @@ import Animated, {
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { makeStyles } from "@rn-vui/themed"
 
-// A scrim has to darken in both themes; the theme's backdrop tokens invert and
-// would brighten whatever is behind the sheet in dark mode. This is the one
-// definition of it — see `category-filter-sheet` and `place-sheet`, which each
-// used to declare their own copy.
-const SCRIM_COLOR = "rgba(0, 0, 0, 0.4)"
-
 // Dragged this much further down than the snap point it started from, the sheet
 // is being dismissed rather than resized.
 const DISMISS_DISTANCE = 80
@@ -557,7 +551,7 @@ const useStyles = makeStyles(({ colors }) => ({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: SCRIM_COLOR,
+    backgroundColor: colors.scrim,
   },
   backdropPress: {
     flex: 1,
