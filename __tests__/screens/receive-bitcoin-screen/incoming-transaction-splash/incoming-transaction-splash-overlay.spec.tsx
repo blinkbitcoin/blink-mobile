@@ -250,6 +250,24 @@ describe("IncomingTransactionSplashOverlay", () => {
     expect(mockFinishers).toHaveLength(1)
   })
 
+  it("reads the payment and each control by name to a screen reader", async () => {
+    renderOverlay(payment("a", 1_000))
+    await landAndSettle()
+
+    expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledWith(
+      "You received $1.00",
+    )
+    // An accessible root would fold everything under it into one element.
+    expect(screen.getByTestId("incoming-transaction-splash").props.accessible).toBe(false)
+    expect(screen.getByLabelText("You received $1.00")).toBeTruthy()
+    expect(screen.getByRole("button", { name: "Details" })).toBeTruthy()
+
+    const closes = screen.getAllByRole("button", { name: "Close" })
+    expect(closes).toHaveLength(2)
+    closes.forEach((close) => fireEvent.press(close))
+    expect(onClose).toHaveBeenCalledTimes(2)
+  })
+
   it("shows the fiat amount with the sats under it once priced", async () => {
     renderOverlay(payment("a", 1_000))
     await landAndSettle()

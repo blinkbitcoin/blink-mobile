@@ -2547,7 +2547,7 @@
     "note": "Willay",
     "dontShowAgain": "Ama kayta yapamanta rikuchiychu",
     "details": "Willakuykuna",
-    "announcement": "Chaskisqa {amount}",
+    "announcement": "{amount} chaskirqanki",
     "tapToShow": "Ñit'iy rikunaykipaq",
     "announcementHidden": "Qullqi chaskisqa",
     "announcementPending": "Onchain kanqaqmi, {amount}",

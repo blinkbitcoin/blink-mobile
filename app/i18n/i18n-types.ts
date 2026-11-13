@@ -8359,7 +8359,7 @@ type RootTranslation = {
 		 */
 		details: string
 		/**
-		 * R​e​c​e​i​v​e​d​ ​{​a​m​o​u​n​t​}
+		 * Y​o​u​ ​r​e​c​e​i​v​e​d​ ​{​a​m​o​u​n​t​}
 		 * @param {string} amount
 		 */
 		announcement: RequiredParams<'amount'>
@@ -22748,7 +22748,7 @@ export type TranslationFunctions = {
 		 */
 		details: () => LocalizedString
 		/**
-		 * Received {amount}
+		 * You received {amount}
 		 */
 		announcement: (arg: { amount: string }) => LocalizedString
 		/**

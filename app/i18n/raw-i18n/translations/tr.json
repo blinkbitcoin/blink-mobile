@@ -2547,7 +2547,7 @@
     "note": "Not",
     "dontShowAgain": "Bunu bir daha gösterme",
     "details": "Ayrıntılar",
-    "announcement": "Alındı {amount}",
+    "announcement": "{amount} aldınız",
     "tapToShow": "Göstermek için dokunun",
     "announcementHidden": "Ödeme alındı",
     "announcementPending": "Onchain beklemede, {amount}",

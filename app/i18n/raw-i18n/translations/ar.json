@@ -2547,7 +2547,7 @@
     "note": "ملاحظة",
     "dontShowAgain": "لا تُظهر هذا مرة أخرى",
     "details": "التفاصيل",
-    "announcement": "تم استلام {amount}",
+    "announcement": "استلمت {amount}",
     "tapToShow": "انقر للعرض",
     "announcementHidden": "تم استلام دفعة",
     "announcementPending": "قيد الانتظار على السلسلة, {amount}",

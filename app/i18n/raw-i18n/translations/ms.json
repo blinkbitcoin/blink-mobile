@@ -2547,7 +2547,7 @@
     "note": "Nota",
     "dontShowAgain": "Jangan tunjukkan lagi",
     "details": "Butiran",
-    "announcement": "Diterima {amount}",
+    "announcement": "Anda menerima {amount}",
     "tapToShow": "Tekan untuk tunjuk",
     "announcementHidden": "Bayaran diterima",
     "announcementPending": "Onchain belum selesai, {amount}",

@@ -2547,7 +2547,7 @@
     "note": "Ghi chú",
     "dontShowAgain": "Đừng hiện lại nữa",
     "details": "Chi tiết",
-    "announcement": "Đã nhận {amount}",
+    "announcement": "Bạn đã nhận {amount}",
     "tapToShow": "Chạm để hiện",
     "announcementHidden": "Đã nhận thanh toán",
     "announcementPending": "Trên chuỗi đang chờ, {amount}",

@@ -2547,7 +2547,7 @@
         "note": "メモ",
         "dontShowAgain": "今後表示しない",
         "details": "詳細",
-        "announcement": "受取 {amount}",
+        "announcement": "{amount}を受け取りました",
         "tapToShow": "タップして表示",
         "announcementHidden": "入金がありました",
         "announcementPending": "オンチェーン保留中, {amount}",

@@ -38,7 +38,6 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { fonts } from "@app/rne-theme/fonts"
 import { toBtcMoneyAmount } from "@app/types/amounts"
-import { testProps } from "@app/utils/testProps"
 
 import type { ShownSplash } from "./incoming-transaction-splash-provider"
 import { PendingHourglass } from "./pending-hourglass"
@@ -126,6 +125,12 @@ const triggerSuccessHaptic = () => {
     ignoreAndroidSystemSettings: false,
   })
 }
+
+/** Animation layers: nothing for a screen reader to land on. */
+const decorative = {
+  accessibilityElementsHidden: true,
+  importantForAccessibility: "no-hide-descendants",
+} as const
 
 const useFadeUpStyle = (progress: SharedValue<number>) =>
   useAnimatedStyle(() => ({
@@ -216,26 +221,27 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
     [],
   )
 
-  const announce = useCallback(
+  /** What a screen reader says for the payment, on landing and on the hero. */
+  const spokenLine = useCallback(
     (shown: ShownSplash) => {
       const pending = isPendingOnchain(shown)
       if (shown.amountHidden) {
         // A hidden amount is not read out either.
-        AccessibilityInfo.announceForAccessibility(
-          pending
-            ? LL.IncomingTransactionSplash.pendingOnchain()
-            : LL.IncomingTransactionSplash.announcementHidden(),
-        )
-        return
+        return pending
+          ? LL.IncomingTransactionSplash.pendingOnchain()
+          : LL.IncomingTransactionSplash.announcementHidden()
       }
       const amount = heroAmount(shown)
-      AccessibilityInfo.announceForAccessibility(
-        pending
-          ? LL.IncomingTransactionSplash.announcementPending({ amount })
-          : LL.IncomingTransactionSplash.announcement({ amount }),
-      )
+      return pending
+        ? LL.IncomingTransactionSplash.announcementPending({ amount })
+        : LL.IncomingTransactionSplash.announcement({ amount })
     },
     [LL, heroAmount],
+  )
+
+  const announce = useCallback(
+    (shown: ShownSplash) => AccessibilityInfo.announceForAccessibility(spokenLine(shown)),
+    [spokenLine],
   )
 
   const onImpact = useCallback(() => {
@@ -427,14 +433,25 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
 
   return (
     <SplashWindow onBack={close} onShown={showWindow}>
-      <View style={StyleSheet.absoluteFill} {...testProps("incoming-transaction-splash")}>
+      {/* Not `testProps`: an accessible root reads as one element and keeps a screen
+          reader from every control inside it. */}
+      <View
+        style={StyleSheet.absoluteFill}
+        testID="incoming-transaction-splash"
+        accessible={false}
+      >
         {/* White icons on the green in both themes; unmounting restores the app's own. */}
         <StatusBar barStyle="light-content" />
         <Animated.View
           style={[StyleSheet.absoluteFill, styles.ground, groundStyle]}
           pointerEvents="none"
+          {...decorative}
         />
-        <Animated.View style={[StyleSheet.absoluteFill, pulseStyle]} pointerEvents="none">
+        <Animated.View
+          style={[StyleSheet.absoluteFill, pulseStyle]}
+          pointerEvents="none"
+          {...decorative}
+        >
           <SuccessGlow
             progress={pulse}
             centerX={anchor.x}
@@ -447,7 +464,7 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
         {/* Unmounted once it lands: Android composites a Skia canvas on its own surface,
           and one left on screen drops the overlay's grounds under some screens (Receive). */}
         {!irisDone && (
-          <Canvas style={StyleSheet.absoluteFill} pointerEvents="none">
+          <Canvas style={StyleSheet.absoluteFill} pointerEvents="none" {...decorative}>
             <Rect x={0} y={0} width={width} height={height}>
               <RadialGradient
                 c={center}
@@ -458,7 +475,11 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
             </Rect>
           </Canvas>
         )}
-        <Animated.View style={[styles.ring, ringStyle]} pointerEvents="none" />
+        <Animated.View
+          style={[styles.ring, ringStyle]}
+          pointerEvents="none"
+          {...decorative}
+        />
 
         <Animated.View
           style={[
@@ -478,10 +499,11 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
               style={styles.hero}
               onPress={reveal}
               disabled={!masked}
-              accessible={masked}
-              accessibilityRole={masked ? "button" : undefined}
+              /* One element, read as the landing announcement was: "You received $5". */
+              accessible
+              accessibilityRole={masked ? "button" : "text"}
               accessibilityLabel={
-                masked ? LL.IncomingTransactionSplash.tapToShow() : undefined
+                masked ? LL.IncomingTransactionSplash.tapToShow() : spokenLine(displayed)
               }
               testID="incoming-transaction-splash-reveal"
             >
@@ -594,7 +616,9 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
               backgroundColor={colors.staticSuccess}
               color={colors.staticWhite}
               onPress={close}
-              {...testProps("incoming-transaction-splash-close")}
+              testID="incoming-transaction-splash-close"
+              accessibilityRole="button"
+              accessibilityLabel={LL.common.close()}
             />
           </Animated.View>
         </Animated.View>

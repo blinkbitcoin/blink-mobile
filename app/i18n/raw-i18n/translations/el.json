@@ -2547,7 +2547,7 @@
     "note": "Σημείωση",
     "dontShowAgain": "Να μην εμφανιστεί ξανά",
     "details": "Λεπτομέρειες",
-    "announcement": "Ελήφθη {amount}",
+    "announcement": "Έλαβες {amount}",
     "tapToShow": "Πατήστε για εμφάνιση",
     "announcementHidden": "Η πληρωμή ελήφθη",
     "announcementPending": "Σε αναμονή on-chain, {amount}",
