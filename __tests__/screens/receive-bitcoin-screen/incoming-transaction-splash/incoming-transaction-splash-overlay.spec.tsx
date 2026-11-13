@@ -250,7 +250,7 @@ describe("IncomingTransactionSplashOverlay", () => {
     expect(mockFinishers).toHaveLength(1)
   })
 
-  it("reads the payment and each control by name to a screen reader", async () => {
+  it("reads the payment, Details and Close by name to a screen reader", async () => {
     renderOverlay(payment("a", 1_000))
     await landAndSettle()
 
@@ -266,6 +266,38 @@ describe("IncomingTransactionSplashOverlay", () => {
     expect(closes).toHaveLength(2)
     closes.forEach((close) => fireEvent.press(close))
     expect(onClose).toHaveBeenCalledTimes(2)
+  })
+
+  it("reads the opt-out as a checkbox that follows its state", async () => {
+    renderOverlay(payment("a", 1_000))
+    await landAndSettle()
+
+    const optOut = screen.getByRole("checkbox", { name: "Don’t show me this again" })
+    expect(optOut.props.accessibilityState).toMatchObject({ checked: false })
+
+    fireEvent.press(optOut)
+    expect(
+      screen.getByRole("checkbox", { name: "Don’t show me this again" }).props
+        .accessibilityState,
+    ).toMatchObject({ checked: true })
+  })
+
+  it("reads a hidden amount out once Tap to show reveals it", async () => {
+    renderOverlay({ ...payment("a", 1_000), amountHidden: true })
+    await landAndSettle()
+
+    expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledWith(
+      "Payment received",
+    )
+    expect(screen.queryByLabelText(/\$1\.00/)).toBeNull()
+
+    fireEvent.press(screen.getByRole("button", { name: "Tap to show" }))
+
+    expect(AccessibilityInfo.announceForAccessibility).toHaveBeenLastCalledWith(
+      "You received $1.00",
+    )
+    expect(screen.getByLabelText("You received $1.00")).toBeTruthy()
+    expect(screen.queryByRole("button", { name: "Tap to show" })).toBeNull()
   })
 
   it("shows the fiat amount with the sats under it once priced", async () => {
