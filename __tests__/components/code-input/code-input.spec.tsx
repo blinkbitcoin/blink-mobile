@@ -1,8 +1,10 @@
 import React from "react"
 import { fireEvent, render, screen } from "@testing-library/react-native"
+import { Input } from "@rn-vui/themed"
 
 import { CodeInput } from "@app/components/code-input"
 
+import { expectFocusFill, flatStyle } from "../../helpers/field-fill"
 import { flushEffects } from "../../helpers/flush-effects"
 import { ContextForScreen } from "../../screens/helper"
 
@@ -25,6 +27,12 @@ const renderInput = async (loading: boolean, errorMessage = "") => {
 }
 
 const field = () => screen.getByTestId("code-input")
+
+/** rn-vui types `Input`'s ref as the bare TextInput underneath it, which does not fit a
+ *  component type. Only the container style is read here. */
+const ThemedInput = Input as unknown as React.ComponentType<{
+  inputContainerStyle: unknown
+}>
 
 describe("CodeInput", () => {
   beforeEach(() => {
@@ -69,5 +77,18 @@ describe("CodeInput", () => {
     fireEvent.changeText(field(), "1")
 
     expect(mockSetErrorMessage).toHaveBeenCalledWith("")
+  })
+
+  it("fills the field, darker while it has focus, and starts focused", async () => {
+    await renderInput(false)
+
+    expectFocusFill({
+      startsFocused: true,
+      surfaces: () => [
+        flatStyle(screen.UNSAFE_getByType(ThemedInput).props.inputContainerStyle),
+      ],
+      focus: () => fireEvent(field(), "focus"),
+      blur: () => fireEvent(field(), "blur"),
+    })
   })
 })

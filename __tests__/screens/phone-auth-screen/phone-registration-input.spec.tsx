@@ -1,7 +1,7 @@
 import React from "react"
 import { StyleProp, StyleSheet, ViewStyle } from "react-native"
 import { Input } from "@rn-vui/themed"
-import { render } from "@testing-library/react-native"
+import { fireEvent, render } from "@testing-library/react-native"
 
 import { PhoneCodeChannelType } from "@app/graphql/generated"
 import { PhoneRegistrationInitiateScreen } from "@app/screens/phone-auth-screen/phone-registration-input"
@@ -10,6 +10,7 @@ import {
   type UseRequestPhoneCodeReturn,
 } from "@app/screens/phone-auth-screen/request-phone-code-registration"
 
+import { expectFocusFill, flatStyle } from "../../helpers/field-fill"
 import { flushEffects } from "../../helpers/flush-effects"
 import { ContextForScreen } from "../helper"
 
@@ -38,9 +39,10 @@ jest.mock("@app/screens/phone-auth-screen/request-phone-code-registration", () =
 }))
 
 /** rn-vui types `Input`'s ref as the bare TextInput underneath it, which does not fit a
- *  component type. Only the container style is read here. */
+ *  component type. Only the container styles are read here. */
 const ThemedInput = Input as unknown as React.ComponentType<{
   containerStyle: StyleProp<ViewStyle>
+  inputContainerStyle: StyleProp<ViewStyle>
 }>
 
 const renderScreen = async () => {
@@ -113,5 +115,21 @@ describe("PhoneRegistrationInitiateScreen", () => {
     expect(button.minWidth).toBe(110)
     expect(button.width).toBeUndefined()
     expect(button.flexBasis).toBeUndefined()
+  })
+
+  it("fills the number field and the country button alike, darker while the field has focus", async () => {
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { getByTestId, UNSAFE_getByType } = await renderScreen()
+    const field = getByTestId("telephoneNumber")
+
+    expectFocusFill({
+      startsFocused: true,
+      surfaces: () => [
+        flatStyle(UNSAFE_getByType(ThemedInput).props.inputContainerStyle),
+        countryButtonStyle(),
+      ],
+      focus: () => fireEvent(field, "focus"),
+      blur: () => fireEvent(field, "blur"),
+    })
   })
 })

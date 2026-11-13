@@ -2,13 +2,16 @@ import React from "react"
 import { Alert } from "react-native"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
-import { ThemeProvider } from "@rn-vui/themed"
+import { Input, ThemeProvider } from "@rn-vui/themed"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import theme from "@app/rne-theme/theme"
 import { RouteProp } from "@react-navigation/native"
+
+import { expectFocusFill, flatStyle } from "../../helpers/field-fill"
 
 const mockNavigate = jest.fn()
 
@@ -35,6 +38,12 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 const EMAIL = "someone@example.com"
+
+/** rn-vui types `Input`'s ref as the bare TextInput underneath it, which does not fit a
+ *  component type. Only the container style is read here. */
+const ThemedInput = Input as unknown as React.ComponentType<{
+  inputContainerStyle: unknown
+}>
 
 const makeRoute = (
   params: RootStackParamList["emailRegistrationInitiate"],
@@ -264,6 +273,29 @@ describe("EmailRegistrationInitiateScreen", () => {
       pressNotNow()
 
       expect(mockNavigate).toHaveBeenCalledWith("onboarding", { screen: "supportScreen" })
+    })
+  })
+
+  /** The app's theme, not rn-vui's default: the fills are tokens only it defines. */
+  it("fills the email field, darker while it has focus, and starts focused", () => {
+    render(
+      <ThemeProvider theme={theme}>
+        <TypesafeI18n locale="en">
+          <EmailRegistrationInitiateScreen route={makeRoute(undefined)} />
+        </TypesafeI18n>
+      </ThemeProvider>,
+    )
+    const field = screen.getByPlaceholderText(
+      LL.EmailRegistrationInitiateScreen.placeholder(),
+    )
+
+    expectFocusFill({
+      startsFocused: true,
+      surfaces: () => [
+        flatStyle(screen.UNSAFE_getByType(ThemedInput).props.inputContainerStyle),
+      ],
+      focus: () => fireEvent(field, "focus"),
+      blur: () => fireEvent(field, "blur"),
     })
   })
 })
