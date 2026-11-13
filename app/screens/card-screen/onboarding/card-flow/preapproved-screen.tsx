@@ -20,8 +20,9 @@ export const CardPreapprovedScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
+  /** Back to the Home under it: navigating would stack a second one on top. */
   const handleNext = () => {
-    navigation.navigate("Primary")
+    navigation.popTo("Primary")
   }
 
   return (
