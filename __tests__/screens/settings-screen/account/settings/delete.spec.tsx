@@ -233,11 +233,9 @@ describe("Delete", () => {
       flexDirection: "column",
       rowGap: 12,
     })
-    expect(
-      within(buttons)
-        .getAllByText(/^(Confirm|Cancel)$/)
-        .map((node) => node.props.children),
-    ).toEqual(["Confirm", "Cancel"])
+    const [confirm, cancel] = within(buttons).getAllByRole("button")
+    expect(confirm).toBeDisabled()
+    expect(cancel).toBeEnabled()
   })
 
   it("keeps the confirm button disabled until the keyword is typed", async () => {
