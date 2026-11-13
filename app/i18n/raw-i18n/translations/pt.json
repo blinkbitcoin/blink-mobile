@@ -2547,7 +2547,7 @@
         "note": "Nota",
         "dontShowAgain": "Não mostrar novamente",
         "details": "Detalhes",
-        "announcement": "Recebido {amount}",
+        "announcement": "Você recebeu {amount}",
         "tapToShow": "Toque para mostrar",
         "announcementHidden": "Pagamento recebido",
         "announcementPending": "Onchain pendente, {amount}",

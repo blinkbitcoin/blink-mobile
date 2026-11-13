@@ -2547,7 +2547,7 @@
     "note": "Megjegyzés",
     "dontShowAgain": "Ne mutasd többé",
     "details": "Részletek",
-    "announcement": "Beérkezett {amount}",
+    "announcement": "Kaptál {amount}",
     "tapToShow": "Koppints a megjelenítéshez",
     "announcementHidden": "Fizetés beérkezett",
     "announcementPending": "Onchain függőben, {amount}",

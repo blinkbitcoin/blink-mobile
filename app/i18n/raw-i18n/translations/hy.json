@@ -2547,7 +2547,7 @@
     "note": "Նշում",
     "dontShowAgain": "Այլևս չցուցադրել",
     "details": "Մանրամասներ",
-    "announcement": "Ստացվել է {amount}",
+    "announcement": "Դուք ստացել եք {amount}",
     "tapToShow": "Սեղմեք՝ ցուցադրելու համար",
     "announcementHidden": "Վճարումը ստացվել է",
     "announcementPending": "Onchain ընթացքի մեջ, {amount}",

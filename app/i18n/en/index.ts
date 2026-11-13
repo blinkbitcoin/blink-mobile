@@ -2650,7 +2650,7 @@ const en: BaseTranslation = {
     note: "Note",
     dontShowAgain: "Don’t show me this again",
     details: "Details",
-    announcement: "Received {amount: string}",
+    announcement: "You received {amount: string}",
     tapToShow: "Tap to show",
     announcementHidden: "Payment received",
     announcementPending: "Pending OnChain, {amount: string}",

@@ -2547,7 +2547,7 @@
     "note": "Note",
     "dontShowAgain": "Vis ikke dette igen",
     "details": "Detaljer",
-    "announcement": "Modtaget {amount}",
+    "announcement": "Du har modtaget {amount}",
     "tapToShow": "Tryk for at vise",
     "announcementHidden": "Betaling modtaget",
     "announcementPending": "Afventende onchain, {amount}",

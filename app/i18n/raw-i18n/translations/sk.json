@@ -2547,7 +2547,7 @@
     "note": "Poznámka",
     "dontShowAgain": "Toto už nezobrazovať",
     "details": "Podrobnosti",
-    "announcement": "Prijaté {amount}",
+    "announcement": "Dostali ste {amount}",
     "tapToShow": "Klepnite na zobrazenie",
     "announcementHidden": "Platba prijatá",
     "announcementPending": "Čakajúce onchain, {amount}",

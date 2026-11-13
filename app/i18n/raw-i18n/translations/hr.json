@@ -2547,7 +2547,7 @@
     "note": "Bilješka",
     "dontShowAgain": "Ne prikazuj više",
     "details": "Detalji",
-    "announcement": "Primljeno {amount}",
+    "announcement": "Primili ste {amount}",
     "tapToShow": "Dodirni za prikaz",
     "announcementHidden": "Uplata primljena",
     "announcementPending": "Onchain u tijeku, {amount}",
