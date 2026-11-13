@@ -42,3 +42,6 @@ e2e-android: reset-e2e
 
 make audit:
 	./audit.sh
+
+demo:
+	make -C .claude/skills help

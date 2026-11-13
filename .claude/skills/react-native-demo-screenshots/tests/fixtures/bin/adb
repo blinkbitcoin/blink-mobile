@@ -1,0 +1,55 @@
+#!/bin/bash
+# Fake `adb -s <serial> exec-out screencap -p` for the tests.
+#
+# Emits real PNG bytes on stdout, so the caller's image validation runs against
+# something ImageMagick can actually read. Shares the frame-sequencing contract
+# with the fake xcrun: $FAKE_FRAMES scripts a run of distinct frames (an
+# animating screen) followed by a repeat (a settled one).
+
+set -uo pipefail
+
+ARGS_LOG="${FAKE_ARGS_LOG:-/dev/null}"
+
+SERIAL=""
+if [ "${1:-}" = "-s" ]; then
+  SERIAL="${2:?fake adb: -s needs a serial}"
+  shift 2
+fi
+[ -n "$SERIAL" ] || { echo "fake adb: refusing to run without -s <serial>" >&2; exit 70; }
+
+case "${1:-} ${2:-} ${3:-}" in
+  "exec-out screencap -p")
+    echo "screencap serial=$SERIAL" >> "$ARGS_LOG"
+
+    if [ -n "${FAKE_ADB_DEVICES:-}" ] && [ -f "${FAKE_ADB_DEVICES}" ]; then
+      grep -q "^${SERIAL}|" "$FAKE_ADB_DEVICES" \
+        || { echo "adb: device '$SERIAL' not found" >&2; exit 1; }
+    fi
+
+    if [ -n "${FAKE_SHOT_BROKEN:-}" ]; then
+      printf 'adb: an error, not an image'
+      exit 0
+    fi
+
+    COUNTER_FILE="${FAKE_FRAME_COUNTER:-$TMPDIR/fake-frame-counter}"
+    n=$(cat "$COUNTER_FILE" 2>/dev/null || echo 0)
+    echo $((n + 1)) > "$COUNTER_FILE"
+
+    if [ -n "${FAKE_NEVER_SETTLE:-}" ]; then
+      magick -size "${FAKE_SHOT_SIZE:-120x260}" "xc:gray$(( (n * 7) % 100 ))" png:- 2>/dev/null \
+        || { echo "fake adb: magick unavailable" >&2; exit 1; }
+      exit 0
+    fi
+
+    FRAMES="${FAKE_FRAMES:-red}"
+    set -- $FRAMES
+    idx=$((n + 1))
+    [ "$idx" -gt "$#" ] && idx=$#
+    eval "colour=\${$idx}"
+
+    magick -size "${FAKE_SHOT_SIZE:-120x260}" "xc:$colour" png:- 2>/dev/null \
+      || { echo "fake adb: magick unavailable" >&2; exit 1; }
+    ;;
+
+  *) echo "fake adb: unsupported command '$*'" >&2; exit 64 ;;
+esac

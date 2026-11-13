@@ -1,0 +1,111 @@
+#!/bin/bash
+# Fake `adb` for the tests: the screenrecord lifecycle.
+#
+# Stands in for the on-device recorder so the suite can assert what actually
+# matters on Android: that the recorder was stopped by an on-device SIGINT
+# (`adb shell kill -2 <pid>`), not by killing the adb client. A real
+# screenrecord finalises the MP4 moov atom only when the device-side process
+# gets SIGINT/SIGHUP; this fake writes a genuinely playable file on that path
+# and leaves a truncated header on any other.
+#
+# The fake "device filesystem" lives under $FAKE_ANDROID_ROOT. Cross-process
+# signalling (kill -2 arriving via a separate adb invocation) is modelled with
+# a stop-marker file the recording loop polls.
+
+set -uo pipefail
+
+LOG="${FAKE_SIGNAL_LOG:-/dev/null}"
+ARGS_LOG="${FAKE_ARGS_LOG:-/dev/null}"
+ROOT="${FAKE_ANDROID_ROOT:?fake adb: FAKE_ANDROID_ROOT must be set}"
+
+SERIAL=""
+if [ "${1:-}" = "-s" ]; then
+  SERIAL="${2:?fake adb: -s needs a serial}"
+  shift 2
+fi
+[ -n "$SERIAL" ] || { echo "fake adb: refusing to run without -s <serial>" >&2; exit 70; }
+
+if [ -n "${FAKE_ADB_DEVICES:-}" ] && [ -f "${FAKE_ADB_DEVICES}" ]; then
+  grep -q "^${SERIAL}|" "$FAKE_ADB_DEVICES" \
+    || { echo "adb: device '$SERIAL' not found" >&2; exit 1; }
+fi
+
+case "${1:-}" in
+  shell)
+    shift
+    case "${1:-}" in
+      screenrecord)
+        shift
+        DEV_PATH=""; SKIP=""
+        for a in "$@"; do
+          if [ -n "$SKIP" ]; then SKIP=""; continue; fi
+          case "$a" in
+            --time-limit|--size|--bit-rate) SKIP=1 ;;
+            --*) : ;;
+            *) DEV_PATH="$a" ;;
+          esac
+        done
+        [ -n "$DEV_PATH" ] || { echo "fake adb: screenrecord needs an output path" >&2; exit 64; }
+        echo "screenrecord serial=$SERIAL args=$*" >> "$ARGS_LOG"
+
+        mkdir -p "$ROOT$(dirname "$DEV_PATH")"
+        printf 'FAKE-MP4-HEADER-NOT-YET-FINALISED' > "$ROOT$DEV_PATH"
+        echo $$ > "$ROOT/screenrecord.pid"
+
+        finalise() {
+          rm -f "$ROOT/screenrecord.pid"
+          if [ -z "${FAKE_RECORD_CORRUPT:-}" ]; then
+            ffmpeg -y -v error -f lavfi -i "testsrc=duration=1:size=180x320:rate=15" \
+                   -c:v libx264 -pix_fmt yuv420p -f mp4 "$ROOT$DEV_PATH" 2>/dev/null
+          fi
+          exit 0
+        }
+
+        # A real screenrecord stops on its own at the --time-limit cap.
+        if [ -n "${FAKE_SCREENRECORD_SELFSTOP:-}" ]; then
+          sleep 0.3
+          echo "SELF-STOP" >> "$LOG"
+          finalise
+        fi
+
+        # Bounded so a caller that never manages to stop the recorder leaves
+        # a process that dies on its own instead of an immortal orphan.
+        STOPPED=""
+        for _ in $(seq 1200); do
+          if [ -e "$ROOT/stop" ]; then STOPPED=1; break; fi
+          sleep 0.05
+        done
+        [ -n "$STOPPED" ] || { rm -f "$ROOT/screenrecord.pid"; exit 1; }
+        rm -f "$ROOT/stop"
+        finalise
+        ;;
+      pidof)
+        [ "${2:-}" = "screenrecord" ] || { echo "fake adb: unsupported pidof '$*'" >&2; exit 64; }
+        [ -s "$ROOT/screenrecord.pid" ] || exit 1
+        cat "$ROOT/screenrecord.pid"
+        ;;
+      kill)
+        [ "${2:-}" = "-2" ] || { echo "SIG${2:-?} sent on-device" >> "$LOG"; exit 0; }
+        echo "KILL-2 ${3:-}" >> "$LOG"
+        # $FAKE_STOP_LOST models the stop signal never reaching the on-device
+        # process (wedged adbd): the recorder keeps running and never finalises.
+        [ -n "${FAKE_STOP_LOST:-}" ] || touch "$ROOT/stop"
+        ;;
+      rm)
+        shift
+        [ "${1:-}" = "-f" ] && shift
+        echo "device-rm $*" >> "$ARGS_LOG"
+        rm -f "$ROOT${1:?fake adb: rm needs a path}"
+        ;;
+      *) echo "fake adb: unsupported shell command '$*'" >&2; exit 64 ;;
+    esac
+    ;;
+  pull)
+    SRC="${2:?fake adb: pull needs a source}"
+    DST="${3:?fake adb: pull needs a destination}"
+    echo "pull serial=$SERIAL src=$SRC dst=$DST" >> "$ARGS_LOG"
+    [ -f "$ROOT$SRC" ] || { echo "adb: remote object '$SRC' does not exist" >&2; exit 1; }
+    cp "$ROOT$SRC" "$DST"
+    ;;
+  *) echo "fake adb: unsupported command '${1:-}'" >&2; exit 64 ;;
+esac
