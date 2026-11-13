@@ -5,6 +5,7 @@ import { GraphQLError } from "graphql"
 
 import {
   ApplicationStatus,
+  CardApplicationStatusDocument,
   CardConsumerApplicationCreateDocument,
   CardKycStatusDocument,
   KycFlowType,
@@ -62,6 +63,29 @@ const createResponse = (isL2Verified: boolean): MockedResponse => ({
   },
 })
 
+const applicationsResponse = (
+  applications: Array<{ id: string; status: ApplicationStatus }>,
+): MockedResponse => ({
+  request: { query: CardApplicationStatusDocument },
+  result: {
+    data: {
+      me: {
+        __typename: "User",
+        id: "user-1",
+        defaultAccount: {
+          __typename: "ConsumerAccount",
+          id: "account-1",
+          cardConsumerApplications: applications.map(({ id, status }) => ({
+            __typename: "ConsumerApplication",
+            id,
+            applicationStatus: status,
+          })),
+        },
+      },
+    },
+  },
+})
+
 const lostCreate: MockedResponse = {
   request: createRequest(true),
   error: new Error("Network request failed"),
@@ -110,13 +134,14 @@ describe("useCardApplicationSubmit", () => {
     expect(applicationId).toBe("application-1")
   })
 
-  it("answers null when the issuer refuses the application", async () => {
+  it("answers null when the issuer refuses the application and none is live", async () => {
     const { applicationId } = await submit([
       kycResponse(OnboardingStatus.Approved),
       {
         request: createRequest(true),
         result: { errors: [new GraphQLError("Account is not invited")] },
       },
+      applicationsResponse([]),
     ])
 
     expect(applicationId).toBeNull()
@@ -126,6 +151,37 @@ describe("useCardApplicationSubmit", () => {
     const { applicationId } = await submit([
       kycResponse(OnboardingStatus.Approved),
       lostCreate,
+      applicationsResponse([]),
+    ])
+
+    expect(applicationId).toBeNull()
+  })
+
+  it("follows the application that landed when the answer to its create was lost", async () => {
+    const { applicationId } = await submit([
+      kycResponse(OnboardingStatus.Approved),
+      lostCreate,
+      applicationsResponse([{ id: "application-9", status: ApplicationStatus.Pending }]),
+    ])
+
+    expect(applicationId).toBe("application-9")
+  })
+
+  it("leaves a refused application behind instead of waiting on it", async () => {
+    const { applicationId } = await submit([
+      kycResponse(OnboardingStatus.Approved),
+      lostCreate,
+      applicationsResponse([{ id: "application-0", status: ApplicationStatus.Denied }]),
+    ])
+
+    expect(applicationId).toBeNull()
+  })
+
+  it("answers null when the applications cannot be read either", async () => {
+    const { applicationId } = await submit([
+      kycResponse(OnboardingStatus.Approved),
+      lostCreate,
+      { request: { query: CardApplicationStatusDocument }, error: new Error("offline") },
     ])
 
     expect(applicationId).toBeNull()
