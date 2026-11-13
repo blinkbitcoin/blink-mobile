@@ -2547,7 +2547,7 @@
     "note": "Nota",
     "dontShowAgain": "Moenie dit weer wys nie",
     "details": "Besonderhede",
-    "announcement": "Jy het ontvang {amount}",
+    "announcement": "Jy het {amount} ontvang",
     "tapToShow": "Tik om te wys",
     "announcementHidden": "Betaling ontvang",
     "announcementPending": "Hangend onchain, {amount}",
