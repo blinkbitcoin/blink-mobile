@@ -3669,6 +3669,11 @@ export type CardSecretsEncryptedQueryVariables = Exact<{
 
 export type CardSecretsEncryptedQuery = { readonly __typename: 'Query', readonly cardSecretsEncrypted: { readonly __typename: 'CardSecretsEncrypted', readonly encryptedPan: { readonly __typename: 'EncryptedData', readonly iv: string, readonly data: string }, readonly encryptedCvc: { readonly __typename: 'EncryptedData', readonly iv: string, readonly data: string } } };
 
+export type CardKycStatusQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CardKycStatusQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly onboardingStatus?: OnboardingStatus | null, readonly flowType?: KycFlowType | null } } | null };
+
 export type LnInvoiceCreateOnBehalfOfRecipientMutationVariables = Exact<{
   input: LnInvoiceCreateOnBehalfOfRecipientInput;
 }>;
@@ -6977,6 +6982,52 @@ export type CardSecretsEncryptedQueryHookResult = ReturnType<typeof useCardSecre
 export type CardSecretsEncryptedLazyQueryHookResult = ReturnType<typeof useCardSecretsEncryptedLazyQuery>;
 export type CardSecretsEncryptedSuspenseQueryHookResult = ReturnType<typeof useCardSecretsEncryptedSuspenseQuery>;
 export type CardSecretsEncryptedQueryResult = Apollo.QueryResult<CardSecretsEncryptedQuery, CardSecretsEncryptedQueryVariables>;
+export const CardKycStatusDocument = gql`
+    query cardKycStatus {
+  me {
+    id
+    defaultAccount {
+      ... on ConsumerAccount {
+        id
+        onboardingStatus
+        flowType
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useCardKycStatusQuery__
+ *
+ * To run a query within a React component, call `useCardKycStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCardKycStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCardKycStatusQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCardKycStatusQuery(baseOptions?: Apollo.QueryHookOptions<CardKycStatusQuery, CardKycStatusQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CardKycStatusQuery, CardKycStatusQueryVariables>(CardKycStatusDocument, options);
+      }
+export function useCardKycStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CardKycStatusQuery, CardKycStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CardKycStatusQuery, CardKycStatusQueryVariables>(CardKycStatusDocument, options);
+        }
+export function useCardKycStatusSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CardKycStatusQuery, CardKycStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CardKycStatusQuery, CardKycStatusQueryVariables>(CardKycStatusDocument, options);
+        }
+export type CardKycStatusQueryHookResult = ReturnType<typeof useCardKycStatusQuery>;
+export type CardKycStatusLazyQueryHookResult = ReturnType<typeof useCardKycStatusLazyQuery>;
+export type CardKycStatusSuspenseQueryHookResult = ReturnType<typeof useCardKycStatusSuspenseQuery>;
+export type CardKycStatusQueryResult = Apollo.QueryResult<CardKycStatusQuery, CardKycStatusQueryVariables>;
 export const LnInvoiceCreateOnBehalfOfRecipientDocument = gql`
     mutation lnInvoiceCreateOnBehalfOfRecipient($input: LnInvoiceCreateOnBehalfOfRecipientInput!) {
   lnInvoiceCreateOnBehalfOfRecipient(input: $input) {

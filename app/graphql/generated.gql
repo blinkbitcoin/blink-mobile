@@ -1366,6 +1366,22 @@ query cardHolder($cardId: ID!) {
   }
 }
 
+query cardKycStatus {
+  me {
+    id
+    defaultAccount {
+      ... on ConsumerAccount {
+        id
+        onboardingStatus
+        flowType
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
 query cardSecretsEncrypted($cardId: ID!, $sessionId: String!) {
   cardSecretsEncrypted(cardId: $cardId, sessionId: $sessionId) {
     encryptedPan {
