@@ -25,6 +25,7 @@ import {
   RESTART_RESOLVABLE_REASONS,
 } from "@app/types/migration"
 import { testProps } from "@app/utils/testProps"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 /** One footer control. The house pattern is a primary with a single secondary underneath,
  *  so each variant names exactly two. */
@@ -248,7 +249,7 @@ export const MigrationContactSupportScreen: React.FC = () => {
       <View style={styles.container}>
         <IconHero
           icon={variant.icon}
-          iconColor={colors.primary}
+          iconColor={colors.accent}
           title={variant.title}
           subtitle={variant.body}
         />
@@ -302,7 +303,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   card: {
     width: "100%",
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 14,
@@ -314,7 +315,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "flex-start",
   },
   label: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 16,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
@@ -323,7 +324,7 @@ const useStyles = makeStyles(({ colors }) => ({
   /** No numberOfLines: every value renders complete, wrapping as needed, because support
    *  needs the whole string (account id, pubkey), never a truncated one. */
   value: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",

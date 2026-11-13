@@ -2142,7 +2142,9 @@
     "selectAll": "Vælg alle",
     "clearAll": "Ryd alle",
     "addPlace": "Tilføj til kort",
-    "addPlaceTitle": "Tilføj et sted",
+    "addPlaceTitle": "Foreslå forretning",
+    "submitPlaceRequest": "Indsend anmodning",
+    "showMyLocation": "Vis min placering",
     "placePinHint": "Flyt kortet, så nålen står på stedet",
     "placeName": "Navn",
     "placeNameHint": "Hvad stedet hedder",
@@ -4146,6 +4148,7 @@
     "get": "Hent",
     "storeNote": "»Hent« åbner App Store eller Google Play. Vend tilbage til Blink, når appen er installeret.",
     "haveAnApp": "Jeg har en app",
+    "learnHow": "Se hvordan",
     "keyInstruction": "Kopiér denne opsætningsnøgle ind i din authenticator-app.",
     "qrInstruction": "Bruger du en anden enhed?\nScan denne QR-kode i stedet.",
     "backupTitle": "Sikkerhedskopiér din nøgle",
@@ -4258,7 +4261,6 @@
     "payment": "Betaling"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Vekselkursen er muligvis forældet",
     "satsOnly": "Viser sats – ingen vekselkurs tilgængelig"
   },
   "SelfCustodialOffline": {

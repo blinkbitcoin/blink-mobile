@@ -26,7 +26,7 @@ export const AccountBtcpay: React.FC = () => {
       loading={loading}
       title={LL.SettingsScreen.btcpayServer()}
       leftGaloyIcon="btcpay"
-      rightIcon={<GaloyIcon name="arrow-square-out" size={20} color={colors.primary} />}
+      rightIcon={<GaloyIcon name="arrow-square-out" size={20} color={colors.accent} />}
       action={() => {
         Linking.openURL(BTCPAY_PLUGIN_URL)
       }}

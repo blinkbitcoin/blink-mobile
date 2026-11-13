@@ -40,9 +40,9 @@ export const CurrencyPill = ({
     if (variant === "outlined") {
       return {
         defaultText: "",
-        color: colors.grey1,
+        color: colors.textSecondary,
         backgroundColor: colors.transparent,
-        borderColor: colors.grey1,
+        borderColor: colors.textSecondary,
       }
     }
 
@@ -50,27 +50,27 @@ export const CurrencyPill = ({
       case WalletCurrency.Btc:
         return {
           defaultText: LL.common.bitcoin(),
-          color: highlighted ? colors.white : colors._white,
-          backgroundColor: highlighted ? colors.primary : colors.grey3,
+          color: highlighted ? colors.textOnAccent : colors.staticWhite,
+          backgroundColor: highlighted ? colors.accent : colors.surfaceInactive,
         }
       case WalletCurrency.Usd:
         return {
           defaultText: LL.common.dollar(),
-          color: highlighted ? colors._white : colors._white,
-          backgroundColor: highlighted ? colors._green : colors.grey3,
+          color: highlighted ? colors.staticWhite : colors.staticWhite,
+          backgroundColor: highlighted ? colors.staticSuccess : colors.surfaceInactive,
         }
       case CARD:
         return {
           defaultText: LL.common.card(),
-          color: colors._white,
-          backgroundColor: colors._cardPill,
+          color: colors.staticWhite,
+          backgroundColor: colors.staticCardPill,
         }
       default:
         return {
           defaultText: currency === "ALL" ? LL.common.all() : "ALL",
-          color: colors.primary,
+          color: colors.accent,
           backgroundColor: colors.transparent,
-          borderColor: colors.primary,
+          borderColor: colors.accent,
         }
     }
   }

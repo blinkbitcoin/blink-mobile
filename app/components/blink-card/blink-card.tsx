@@ -50,14 +50,24 @@ export const BlinkCard: React.FC<BlinkCardProps> = ({
   return (
     <View style={[styles.cardWrapper, { width: cardWidth, height: cardHeight }]}>
       <LinearGradient
-        colors={[colors._primary2, colors._primary1]}
+        colors={[colors.staticBrandSunset, colors.staticBrandYellow]}
         useAngle={true}
         angle={249}
         style={[styles.card, { width: cardWidth, height: cardHeight }]}
       >
         <View style={styles.topRow}>
-          <GaloyIcon name="blink-icon" width={98} height={30} color={colors._white} />
-          <GaloyIcon name="visa-platinum" width={69} height={35} color={colors._white} />
+          <GaloyIcon
+            name="blink-icon"
+            width={98}
+            height={30}
+            color={colors.staticWhite}
+          />
+          <GaloyIcon
+            name="visa-platinum"
+            width={69}
+            height={35}
+            color={colors.staticWhite}
+          />
         </View>
 
         <View style={styles.cardNumberSpacer} />
@@ -113,7 +123,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: 12,
   },
   cardNumber: {
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 24,
     textAlign: "center",
     textShadowColor: "rgba(0, 0, 0, 0.3)",
@@ -134,7 +144,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "flex-end",
   },
   holderName: {
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 14,
     fontWeight: "700",
     fontFamily: "Source Sans Pro",
@@ -150,7 +160,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignSelf: "flex-end",
   },
   validThruLabel: {
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 10,
     fontFamily: "Source Sans Pro",
     fontStyle: "normal",
@@ -161,7 +171,7 @@ const useStyles = makeStyles(({ colors }) => ({
     textShadowRadius: 2,
   },
   validThruValue: {
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontStyle: "normal",
@@ -186,7 +196,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   blurTint: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: colors._black,
+    backgroundColor: colors.staticBlack,
     opacity: 0.6,
   },
   lockCircle: {
@@ -204,7 +214,7 @@ const useStyles = makeStyles(({ colors }) => ({
     opacity: 0.2,
   },
   frozenTitle: {
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 20,
     fontWeight: "700",
     fontFamily: "Source Sans Pro",
@@ -212,7 +222,7 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 24,
   },
   frozenSubtitle: {
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 12,
     fontWeight: "400",
     fontFamily: "Source Sans Pro",

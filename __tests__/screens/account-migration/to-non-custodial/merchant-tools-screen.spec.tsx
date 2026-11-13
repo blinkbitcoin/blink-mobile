@@ -93,12 +93,12 @@ describe("MigrationMerchantToolsScreen", () => {
     expect(screen.getByTestId("icon-woocommerce")).toBeTruthy()
   })
 
-  it("groups the tools on the grouped-list surface in both themes", async () => {
+  it("groups the tools on the surfaceStatic card in both themes", async () => {
     renderScreenInTheme("light")
     await flushEffects()
 
     expect(screen.getByTestId("migration-merchant-tools-card")).toHaveStyle({
-      backgroundColor: light.grey5,
+      backgroundColor: light.surfaceStatic,
     })
 
     screen.unmount()
@@ -106,7 +106,7 @@ describe("MigrationMerchantToolsScreen", () => {
     await flushEffects()
 
     expect(screen.getByTestId("migration-merchant-tools-card")).toHaveStyle({
-      backgroundColor: dark.grey5,
+      backgroundColor: dark.surfaceStatic,
     })
   })
 
@@ -119,7 +119,7 @@ describe("MigrationMerchantToolsScreen", () => {
     expect(dividers).toHaveLength(3)
     dividers.forEach((divider) => {
       expect(StyleSheet.flatten(divider.props.style)).toMatchObject({
-        borderBottomColor: dark.grey4,
+        borderBottomColor: dark.neutral,
         borderBottomWidth: 1,
         marginHorizontal: 10,
       })
@@ -141,7 +141,7 @@ describe("MigrationMerchantToolsScreen", () => {
     await flushEffects()
 
     TOOL_ICON_TEST_IDS.forEach((testID) => {
-      expect(screen.getByTestId(testID).props.color).toBe(light.black)
+      expect(screen.getByTestId(testID).props.color).toBe(light.textOnBackground)
     })
   })
 
@@ -150,7 +150,7 @@ describe("MigrationMerchantToolsScreen", () => {
     await flushEffects()
 
     TOOL_ICON_TEST_IDS.forEach((testID) => {
-      expect(screen.getByTestId(testID).props.color).toBe(dark.black)
+      expect(screen.getByTestId(testID).props.color).toBe(dark.textOnBackground)
     })
   })
 
@@ -158,8 +158,8 @@ describe("MigrationMerchantToolsScreen", () => {
     renderScreenInTheme("dark")
     await flushEffects()
 
-    expect(screen.getByTestId("icon-receive").props.color).toBe(dark._green)
-    expect(screen.getByTestId("icon-calculator").props.color).not.toBe(dark._green)
+    expect(screen.getByTestId("icon-receive").props.color).toBe(dark.staticSuccess)
+    expect(screen.getByTestId("icon-calculator").props.color).not.toBe(dark.staticSuccess)
   })
 
   it("offers a single action, with no way to tap into a tool", async () => {

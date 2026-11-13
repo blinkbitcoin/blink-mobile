@@ -2142,7 +2142,9 @@
         "selectAll": "Alle auswählen",
         "clearAll": "Alle abwählen",
         "addPlace": "Zur Karte hinzufügen",
-        "addPlaceTitle": "Ort hinzufügen",
+        "addPlaceTitle": "Geschäft vorschlagen",
+        "submitPlaceRequest": "Anfrage senden",
+        "showMyLocation": "Meinen Standort anzeigen",
         "placePinHint": "Verschiebe die Karte, bis die Nadel auf dem Ort steht",
         "placeName": "Name",
         "placeNameHint": "Wie der Ort heißt",
@@ -4146,6 +4148,7 @@
         "get": "Laden",
         "storeNote": "„Laden“ öffnet den App Store oder Google Play. Kehre zu Blink zurück, sobald die App installiert ist.",
         "haveAnApp": "Ich habe eine App",
+        "learnHow": "So geht’s",
         "keyInstruction": "Kopiere diesen Einrichtungsschlüssel in deine Authenticator-App.",
         "qrInstruction": "Nutzt du ein anderes Gerät?\nScanne stattdessen diesen QR-Code.",
         "backupTitle": "Sichere deinen Schlüssel",
@@ -4258,7 +4261,6 @@
         "payment": "Zahlung"
     },
     "SelfCustodialStaleRate": {
-        "notice": "Der Wechselkurs ist möglicherweise veraltet",
         "satsOnly": "Anzeige in Sats – kein Wechselkurs verfügbar"
     },
     "SelfCustodialOffline": {

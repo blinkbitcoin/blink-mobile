@@ -6661,9 +6661,17 @@ type RootTranslation = {
 		 */
 		addPlace: string
 		/**
-		 * A​d​d​ ​a​ ​p​l​a​c​e
+		 * S​u​g​g​e​s​t​ ​b​u​s​i​n​e​s​s
 		 */
 		addPlaceTitle: string
+		/**
+		 * S​u​b​m​i​t​ ​r​e​q​u​e​s​t
+		 */
+		submitPlaceRequest: string
+		/**
+		 * S​h​o​w​ ​m​y​ ​l​o​c​a​t​i​o​n
+		 */
+		showMyLocation: string
 		/**
 		 * M​o​v​e​ ​t​h​e​ ​m​a​p​ ​t​o​ ​p​u​t​ ​t​h​e​ ​p​i​n​ ​o​n​ ​t​h​e​ ​p​l​a​c​e
 		 */
@@ -13864,6 +13872,10 @@ type RootTranslation = {
 		 */
 		haveAnApp: string
 		/**
+		 * L​e​a​r​n​ ​h​o​w
+		 */
+		learnHow: string
+		/**
 		 * C​o​p​y​ ​t​h​i​s​ ​s​e​t​u​p​ ​k​e​y​ ​i​n​t​o​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
 		 */
 		keyInstruction: string
@@ -14050,10 +14062,6 @@ type RootTranslation = {
 		exportFailed: string
 	}
 	SelfCustodialStaleRate: {
-		/**
-		 * E​x​c​h​a​n​g​e​ ​r​a​t​e​ ​m​a​y​ ​b​e​ ​o​u​t​ ​o​f​ ​d​a​t​e
-		 */
-		notice: string
 		/**
 		 * S​h​o​w​i​n​g​ ​s​a​t​s​ ​—​ ​n​o​ ​e​x​c​h​a​n​g​e​ ​r​a​t​e​ ​a​v​a​i​l​a​b​l​e
 		 */
@@ -21042,9 +21050,17 @@ export type TranslationFunctions = {
 		 */
 		addPlace: () => LocalizedString
 		/**
-		 * Add a place
+		 * Suggest business
 		 */
 		addPlaceTitle: () => LocalizedString
+		/**
+		 * Submit request
+		 */
+		submitPlaceRequest: () => LocalizedString
+		/**
+		 * Show my location
+		 */
+		showMyLocation: () => LocalizedString
 		/**
 		 * Move the map to put the pin on the place
 		 */
@@ -28078,6 +28094,10 @@ export type TranslationFunctions = {
 		 */
 		haveAnApp: () => LocalizedString
 		/**
+		 * Learn how
+		 */
+		learnHow: () => LocalizedString
+		/**
 		 * Copy this setup key into your authenticator app.
 		 */
 		keyInstruction: () => LocalizedString
@@ -28261,10 +28281,6 @@ export type TranslationFunctions = {
 		exportFailed: () => LocalizedString
 	}
 	SelfCustodialStaleRate: {
-		/**
-		 * Exchange rate may be out of date
-		 */
-		notice: () => LocalizedString
 		/**
 		 * Showing sats — no exchange rate available
 		 */

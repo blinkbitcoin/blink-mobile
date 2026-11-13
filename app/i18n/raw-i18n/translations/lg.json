@@ -2142,7 +2142,9 @@
     "selectAll": "Londa byonna",
     "clearAll": "Sazaamu byonna",
     "addPlace": "Yongera ku mmaapu",
-    "addPlaceTitle": "Yongera ekifo",
+    "addPlaceTitle": "Teesa bizinensi",
+    "submitPlaceRequest": "Weereza okusaba",
+    "showMyLocation": "Laga ekifo kyange",
     "placePinHint": "Tambuza mmaapu ossewo akabonero ku kifo",
     "placeName": "Erinnya",
     "placeNameHint": "Ekifo bwe kiyitibwa",
@@ -4146,6 +4148,7 @@
     "get": "Funa",
     "storeNote": "“Funa” eggulawo App Store oba Google Play. Komawo ku Blink ng'emaze okuteekebwamu.",
     "haveAnApp": "Nnina app",
+    "learnHow": "Manya engeri",
     "keyInstruction": "Koppa ekisumuluzo kino eky'okuteekawo mu app yo eya authenticator.",
     "qrInstruction": "Okozesa kyuma kirala?\nMu kifo ky'ekyo sika koodi eno eya QR.",
     "backupTitle": "Tereka kopi y'ekisumuluzo kyo",
@@ -4258,7 +4261,6 @@
     "payment": "Okusasula"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Omuwendo gw'enkyusa guyinza okuba nga gukaddiye",
     "satsOnly": "Tulaga mu sats — tewali muwendo gwa nkyusa"
   },
   "SelfCustodialOffline": {

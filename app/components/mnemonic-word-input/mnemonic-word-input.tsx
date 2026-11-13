@@ -49,7 +49,7 @@ export const MnemonicWordInput = forwardRef<
         ref={inputRef}
         style={styles.input}
         placeholder={placeholder}
-        placeholderTextColor={colors.grey2}
+        placeholderTextColor={colors.textMuted}
         value={value}
         onChangeText={onChangeText}
         onFocus={onFocus}
@@ -58,7 +58,7 @@ export const MnemonicWordInput = forwardRef<
         keyboardType="visible-password"
         {...testProps(testID ?? `word-input-${index}`)}
       />
-      <GaloyIcon name="pencil" size={16} color={colors.primary} />
+      <GaloyIcon name="pencil" size={16} color={colors.accent} />
     </View>
   )
 })
@@ -69,7 +69,7 @@ const useStyles = makeStyles(({ colors }) => ({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.transparent,
@@ -83,13 +83,13 @@ const useStyles = makeStyles(({ colors }) => ({
   wordNumber: {
     width: 24,
     fontSize: 14,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   wordNumberHidden: {
     opacity: 0,
   },
   correct: {
-    borderColor: colors._green,
+    borderColor: colors.staticSuccess,
   },
   error: {
     borderColor: colors.error,
@@ -98,6 +98,6 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     fontSize: 14,
     fontFamily: "SourceSansPro-Regular",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

@@ -12,6 +12,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { SpendingPeriod, WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { parseDollarsToCents, toMajorUnit } from "@app/utils/helper"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 import { useCardData } from "@app/hooks"
 
@@ -63,7 +64,7 @@ export const CardLimitsScreen: React.FC = () => {
         <ActivityIndicator
           testID="activity-indicator"
           style={styles.loader}
-          color={colors.primary}
+          color={colors.accent}
         />
       </Screen>
     )
@@ -164,7 +165,7 @@ export const CardLimitsScreen: React.FC = () => {
           {/* The ATM controls load on their own, so the spending limits above stay
               usable while they load or after they fail. */}
           {isAtmControlsLoading && (
-            <ActivityIndicator testID="atm-controls-loading" color={colors.primary} />
+            <ActivityIndicator testID="atm-controls-loading" color={colors.accent} />
           )}
           {hasAtmControlsFailed && (
             <View style={styles.atmControlsFailure}>
@@ -261,20 +262,20 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 20,
   },
   sectionTitle: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 16,
     fontWeight: "700",
     lineHeight: 24,
   },
   currentLimitsTitle: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     lineHeight: 20,
     fontWeight: "400",
   },
   currentLimitsCard: {
     flexDirection: "row",
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderRadius: 8,
     minHeight: 80,
     paddingVertical: 18,
@@ -287,13 +288,13 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
   },
   currentLimitValue: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 20,
     fontWeight: "700",
     lineHeight: 24,
   },
   currentLimitLabel: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
     lineHeight: 16,
     marginTop: 5,
@@ -303,7 +304,7 @@ const useStyles = makeStyles(({ colors }) => ({
     opacity: 0.4,
   },
   comingSoonBadge: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 18,
     fontWeight: "700",
     lineHeight: 24,
@@ -317,7 +318,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 10,
   },
   atmSwitchCard: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     overflow: "hidden",
   },

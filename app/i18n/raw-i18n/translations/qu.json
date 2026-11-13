@@ -2142,7 +2142,9 @@
     "selectAll": "Llapanta akllay",
     "clearAll": "Llapanta pichay",
     "addPlace": "Pacha mapaman yapay",
-    "addPlaceTitle": "Huk cheqasta yapay",
+    "addPlaceTitle": "Qhatuta willay",
+    "submitPlaceRequest": "Mañakuyta apachiy",
+    "showMyLocation": "Maypi kasqayta rikuchiy",
     "placePinHint": "Pacha mapata kuyuchiy chay cheqaman t'ipana churanaykipaq",
     "placeName": "Suti",
     "placeNameHint": "Imaynatas chay cheqa sutichasqa",
@@ -4146,6 +4148,7 @@
     "get": "Uraqichiy",
     "storeNote": "“Uraqichiy” App Store utaq Google Play nisqata kichan. Churasqaña kaptin Blinkman kutimuy.",
     "haveAnApp": "Appniyuqmi kani",
+    "learnHow": "Imaynatam yachay",
     "keyInstruction": "Kay churana llaveta autenticador appykiman kopiyay.",
     "qrInstruction": "Huk aparatota llamk'achichkankichu?\nAswanpas kay QR códigota escaneay.",
     "backupTitle": "Llaveykita waqaychay",
@@ -4258,7 +4261,6 @@
     "payment": "Pagay"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Chaninchay yupay manaraqchá musuqchu",
     "satsOnly": "Sats-pi rikuchisqa — mana chaninchay yupay kanchu"
   },
   "SelfCustodialOffline": {

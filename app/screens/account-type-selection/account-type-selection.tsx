@@ -21,6 +21,7 @@ import {
 } from "@app/navigation/stack-param-lists"
 import { AccountTypeMode } from "@app/types/account"
 import { testProps } from "@app/utils/testProps"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 import { PhoneLoginInitiateType } from "../phone-auth-screen"
 
@@ -171,11 +172,11 @@ const useStyles = makeStyles(({ colors }) => ({
   description: {
     fontSize: 16,
     lineHeight: 22,
-    color: colors.black,
+    color: colors.textOnBackground,
     marginBottom: 20,
   },
   banner: {
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderRadius: 8,
     paddingHorizontal: 14,
     paddingVertical: 12,
@@ -184,7 +185,7 @@ const useStyles = makeStyles(({ colors }) => ({
   bannerText: {
     fontSize: 13,
     lineHeight: 18,
-    color: colors.grey1,
+    color: colors.textSecondary,
     textAlign: "center",
   },
   ctaContainer: {

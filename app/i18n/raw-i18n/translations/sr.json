@@ -2142,7 +2142,9 @@
     "selectAll": "Изабери све",
     "clearAll": "Обриши све",
     "addPlace": "Додај на мапу",
-    "addPlaceTitle": "Додај место",
+    "addPlaceTitle": "Предложи локал",
+    "submitPlaceRequest": "Пошаљи захтев",
+    "showMyLocation": "Прикажи моју локацију",
     "placePinHint": "Померите мапу да чиода буде на месту",
     "placeName": "Назив",
     "placeNameHint": "Како се место зове",
@@ -4146,6 +4148,7 @@
     "get": "Преузми",
     "storeNote": "„Преузми“ отвара App Store или Google Play. Вратите се у Blink када се апликација инсталира.",
     "haveAnApp": "Имам апликацију",
+    "learnHow": "Сазнај како",
     "keyInstruction": "Копирајте овај кључ за подешавање у своју апликацију за аутентификацију.",
     "qrInstruction": "Користите други уређај?\nУместо тога скенирајте овај QR код.",
     "backupTitle": "Направите резервну копију кључа",
@@ -4258,7 +4261,6 @@
     "payment": "Плаћање"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Курс можда није ажуран",
     "satsOnly": "Приказ у сатима — курс није доступан"
   },
   "SelfCustodialOffline": {

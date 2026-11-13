@@ -40,7 +40,12 @@ jest.mock("@rn-vui/themed", () => {
     makeStyles: () => () => ({}),
     useTheme: () => ({
       theme: {
-        colors: { black: "#000", white: "#fff", primary: "#fc5805", grey5: "#eee" },
+        colors: {
+          textOnBackground: "#000",
+          backgroundDefault: "#fff",
+          accent: "#fc5805",
+          surfaceInteractive: "#eee",
+        },
       },
     }),
     Icon: () => null,

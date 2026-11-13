@@ -418,7 +418,7 @@ export const MigrationGate: React.FC = () => {
         <View style={styles.loadingContainer}>
           <ActivityIndicator
             size="large"
-            color={colors.primary}
+            color={colors.accent}
             {...testProps("migration-gate-loading")}
           />
         </View>

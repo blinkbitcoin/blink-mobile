@@ -81,7 +81,7 @@ export const TwoFactorSessionModal: React.FC<TwoFactorSessionModalProps> = ({
         <GaloyIcon
           name="lock-closed"
           size={52}
-          color={colors.primary}
+          color={colors.accent}
           {...testProps("two-factor-modal-icon")}
         />
       }
@@ -119,7 +119,7 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlign: "center",
     fontSize: 16,
     lineHeight: 22,
-    color: colors.black,
+    color: colors.textOnBackground,
     marginBottom: 20,
   },
 }))

@@ -115,7 +115,7 @@ describe("SegmentedProgressBar", () => {
   it("paints the track behind every segment, filled or not", () => {
     renderBar(2, 1)
 
-    expect(segmentTrackColors()).toEqual([light.grey4, light.grey4])
+    expect(segmentTrackColors()).toEqual([light.neutral, light.neutral])
     expect(fillWidths()).toEqual(["100%", "0%"])
   })
 

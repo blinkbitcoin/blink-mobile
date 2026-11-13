@@ -41,7 +41,7 @@ export const ClusterMarker: React.FC<Props> = React.memo(({ cluster, onPress }) 
   // Discs are react-native-svg like the pins are, so they need the same paint
   // window before tracking can be turned off — see use-marker-settle.
   const { markerRef, tracksViewChanges } = useMarkerSettle(
-    `${colors._green}|${cluster.count}`,
+    `${colors.staticSuccess}|${cluster.count}`,
   )
 
   return (
@@ -64,14 +64,14 @@ export const ClusterMarker: React.FC<Props> = React.memo(({ cluster, onPress }) 
             cx={VIEWBOX / 2}
             cy={VIEWBOX / 2}
             r={OUTER_RADIUS}
-            fill={colors._green}
+            fill={colors.staticSuccess}
             fillOpacity={OUTER_OPACITY}
           />
           <Circle
             cx={VIEWBOX / 2}
             cy={VIEWBOX / 2}
             r={INNER_RADIUS}
-            fill={colors._green}
+            fill={colors.staticSuccess}
             fillOpacity={INNER_OPACITY}
           />
         </Svg>
@@ -104,6 +104,6 @@ const useStyles = makeStyles(({ colors }) => ({
     fontWeight: "bold",
     // The inner disc carries the accent at 70% in both themes, so the count is
     // pinned white rather than following the theme's inverted `black`.
-    color: colors._white,
+    color: colors.staticWhite,
   },
 }))

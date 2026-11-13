@@ -9,7 +9,7 @@ import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { BlinkCard } from "@app/components/blink-card"
-import { headerRightNoGlass } from "@app/components/header-no-glass"
+import { headerIconTouchArea, headerRightNoGlass } from "@app/components/header-no-glass"
 import { InfoSection, InfoCard } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { ScreenSecurityGate } from "@app/components/screen-security-gate"
@@ -63,16 +63,16 @@ export const CardDetailsScreen: React.FC = () => {
     navigation.setOptions(
       headerRightNoGlass(() => (
         <TouchableOpacity style={styles.headerRight} onPress={handleSettingsPress}>
-          <GaloyIcon name="settings" size={24} color={colors.black} />
+          <GaloyIcon name="settings" size={24} color={colors.textOnBackground} />
         </TouchableOpacity>
       )),
     )
-  }, [navigation, styles.headerRight, colors.black, handleSettingsPress])
+  }, [navigation, styles.headerRight, colors.textOnBackground, handleSettingsPress])
 
   if (!authenticated || cardLoading) {
     return (
       <Screen preset="scroll">
-        <ActivityIndicator style={styles.loader} color={colors.primary} />
+        <ActivityIndicator style={styles.loader} color={colors.accent} />
       </Screen>
     )
   }
@@ -121,7 +121,7 @@ const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
         text: LL.CardFlow.CardDetails.statusActive(),
       },
       [CardStatus.Locked]: {
-        color: colors.grey3,
+        color: colors.textDisabled,
         text: LL.CardFlow.CardDetails.statusFrozen(),
       },
       [CardStatus.Canceled]: {
@@ -133,7 +133,7 @@ const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
         text: LL.CardFlow.CardDetails.statusNotActivated(),
       },
       [CardStatus.Requested]: {
-        color: colors.grey3,
+        color: colors.textDisabled,
         text: LL.CardFlow.CardDetails.statusPending(),
       },
       [CardStatus.Failed]: {
@@ -170,7 +170,7 @@ const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
 
         <View style={styles.fieldsContainer}>
           {isSecretsLoading && (
-            <ActivityIndicator testID="card-secrets-loading" color={colors.primary} />
+            <ActivityIndicator testID="card-secrets-loading" color={colors.accent} />
           )}
           {hasSecretsFailed && (
             <View style={styles.secretsFailure}>
@@ -251,8 +251,10 @@ const CardDetailsContent: React.FC<{ card: DetailsCard }> = ({ card }) => {
 }
 
 const useStyles = makeStyles(() => ({
+  // 48dp box around the 24dp icon: the margin gives back the 12dp it grew by.
   headerRight: {
-    marginRight: 24,
+    ...headerIconTouchArea,
+    marginRight: 12,
   },
   content: {
     paddingTop: 20,

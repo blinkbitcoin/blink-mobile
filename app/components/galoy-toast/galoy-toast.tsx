@@ -7,6 +7,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 import { modalContentBleed, toastSideInset, toastTopOffset } from "./toast-frame"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 export type ToastType = "success" | "error" | "warning"
 
@@ -31,8 +32,8 @@ const ToastRow = ({ type, text1, text2, onPress, hide }: ToastRowProps) => {
   const { width } = useWindowDimensions()
   const { left, right } = useSafeAreaInsets()
   const accent = {
-    success: colors._green,
-    error: colors.red,
+    success: colors.staticSuccess,
+    error: colors.error,
     warning: colors.warning,
   }[type]
   const styles = useStyles({ accent, ...toastSideInset(width, left, right) })
@@ -117,14 +118,14 @@ const useStyles = makeStyles(
       borderWidth: 1,
       borderRadius: 8,
       borderColor: accent,
-      backgroundColor: colors.grey7,
+      ...staticSurface(colors),
     },
     text: {
       // Always bold, via the Bold face itself and no fontWeight. Android resolves
       // fontFamily to assets/fonts/<name>.ttf, so "Source Sans Pro" falls back to
       // Roboto there, and the theme's Regular face plus a weight is synthesised.
       flex: 1,
-      color: colors.black,
+      color: colors.textOnBackground,
       fontFamily: "SourceSansPro-Bold",
       fontSize: 16,
       lineHeight: 22,

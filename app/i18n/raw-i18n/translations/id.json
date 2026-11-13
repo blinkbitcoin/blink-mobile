@@ -2142,7 +2142,9 @@
     "selectAll": "Pilih semua",
     "clearAll": "Hapus semua",
     "addPlace": "Tambahkan ke peta",
-    "addPlaceTitle": "Tambahkan tempat",
+    "addPlaceTitle": "Sarankan bisnis",
+    "submitPlaceRequest": "Kirim permintaan",
+    "showMyLocation": "Tampilkan lokasi saya",
     "placePinHint": "Geser peta agar penanda tepat di tempatnya",
     "placeName": "Nama",
     "placeNameHint": "Nama tempat ini",
@@ -4146,6 +4148,7 @@
     "get": "Unduh",
     "storeNote": "“Unduh” membuka App Store atau Google Play. Kembali ke Blink setelah aplikasi terpasang.",
     "haveAnApp": "Saya sudah punya aplikasi",
+    "learnHow": "Pelajari caranya",
     "keyInstruction": "Salin kunci penyiapan ini ke aplikasi authenticator Anda.",
     "qrInstruction": "Menggunakan perangkat lain?\nPindai kode QR ini sebagai gantinya.",
     "backupTitle": "Cadangkan kunci Anda",
@@ -4258,7 +4261,6 @@
     "payment": "Pembayaran"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Nilai tukar mungkin sudah tidak berlaku",
     "satsOnly": "Menampilkan sats — nilai tukar tidak tersedia"
   },
   "SelfCustodialOffline": {

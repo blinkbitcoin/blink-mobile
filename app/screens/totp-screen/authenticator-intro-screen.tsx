@@ -17,6 +17,7 @@ import { useHardwareBackGuard } from "@app/screens/account-migration/hooks/use-h
 import { TwoFactorMethod } from "@app/types/two-factor-enforcement"
 import { logTwoFactorSetupStarted } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 type Benefit = {
   icon: IconNamesType
@@ -92,7 +93,7 @@ export const AuthenticatorIntroScreen: React.FC = () => {
     >
       <IconHero
         icon="lock-closed"
-        iconColor={colors._green}
+        iconColor={colors.staticSuccess}
         title={LL.AuthenticatorOnboarding.introTitle()}
         subtitle={
           <Text type="p3" style={styles.description}>
@@ -105,7 +106,7 @@ export const AuthenticatorIntroScreen: React.FC = () => {
           <React.Fragment key={benefit.icon}>
             {index > 0 && (
               <Divider
-                color={colors.grey4}
+                color={colors.neutral}
                 width={DIVIDER_WIDTH}
                 style={styles.divider}
               />
@@ -127,14 +128,14 @@ export const AuthenticatorIntroScreen: React.FC = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   description: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     textAlign: "center",
   },
   /** On the static card surface: the benefits are read, never pressed. */
   benefitsCard: {
     marginTop: 30,
     marginHorizontal: 20,
-    backgroundColor: colors.grey7,
+    ...staticSurface(colors),
     borderRadius: 8,
     overflow: "hidden",
   },

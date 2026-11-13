@@ -2142,7 +2142,9 @@
         "selectAll": "Seleccionar todo",
         "clearAll": "Borrar todo",
         "addPlace": "Añadir al mapa",
-        "addPlaceTitle": "Añadir un lugar",
+        "addPlaceTitle": "Sugerir comercio",
+        "submitPlaceRequest": "Enviar solicitud",
+        "showMyLocation": "Mostrar mi ubicación",
         "placePinHint": "Mueve el mapa para poner el marcador sobre el lugar",
         "placeName": "Nombre",
         "placeNameHint": "Cómo se llama el lugar",
@@ -4146,6 +4148,7 @@
         "get": "Obtener",
         "storeNote": "“Obtener” abre la App Store o Google Play. Vuelve a Blink cuando esté instalada.",
         "haveAnApp": "Ya tengo una aplicación",
+        "learnHow": "Descubre cómo",
         "keyInstruction": "Copia esta clave de configuración en tu aplicación de autenticación.",
         "qrInstruction": "¿Usas otro dispositivo?\nEscanea este código QR en su lugar.",
         "backupTitle": "Respalda tu clave",
@@ -4258,7 +4261,6 @@
         "payment": "Pago"
     },
     "SelfCustodialStaleRate": {
-        "notice": "El tipo de cambio puede estar desactualizado",
         "satsOnly": "Mostrando sats: no hay tipo de cambio disponible"
     },
     "SelfCustodialOffline": {

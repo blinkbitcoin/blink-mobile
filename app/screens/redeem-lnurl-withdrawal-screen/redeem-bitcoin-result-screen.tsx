@@ -6,6 +6,7 @@ import { Screen } from "@app/components/screen"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -105,10 +106,10 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
     if (errorMessage !== "" || paid || pending) return null
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color={colors.primary} />
+        <ActivityIndicator size="large" color={colors.accent} />
       </View>
     )
-  }, [errorMessage, paid, pending, styles, colors.primary])
+  }, [errorMessage, paid, pending, styles, colors.accent])
 
   return (
     <Screen preset="scroll" style={styles.contentContainer}>
@@ -158,7 +159,7 @@ const useStyles = makeStyles(({ colors }) => ({
   currencyInputContainer: {
     padding: 10,
     marginTop: 10,
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderRadius: 10,
   },
   withdrawableDescriptionText: {

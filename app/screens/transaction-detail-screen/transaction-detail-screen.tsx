@@ -36,6 +36,7 @@ import { makeStyles, Text } from "@rn-vui/themed"
 
 import { IconTransaction } from "@app/components/icon-transactions"
 import { Screen } from "@app/components/screen"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { formatTimeToMempool, timeToMempool } from "./format-time"
 
@@ -75,7 +76,12 @@ const Row = ({
       {content ? (
         content
       ) : (
-        <View style={styles.valueContainer}>
+        <View
+          style={[
+            styles.valueContainer,
+            icons.length === 0 && styles.valueContainerStatic,
+          ]}
+        >
           <Text selectable={false} style={styles.value}>
             {value}
           </Text>
@@ -634,9 +640,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginVertical: 6,
   },
 
-  amountDetailsContainer: {
-    backgroundColor: colors.grey5,
-  },
+  amountDetailsContainer: staticSurface(colors),
 
   amountView: {
     alignItems: "center",
@@ -666,10 +670,11 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     minHeight: 60,
     padding: 14,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     alignItems: "center",
     borderRadius: 8,
   },
+  valueContainerStatic: staticSurface(colors),
   value: {
     flex: 1,
     fontSize: 14,

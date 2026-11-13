@@ -2143,7 +2143,9 @@ const en: BaseTranslation = {
     selectAll: "Select all",
     clearAll: "Clear all",
     addPlace: "Add to map",
-    addPlaceTitle: "Add a place",
+    addPlaceTitle: "Suggest business",
+    submitPlaceRequest: "Submit request",
+    showMyLocation: "Show my location",
     placePinHint: "Move the map to put the pin on the place",
     placeName: "Name",
     placeNameHint: "What the place is called",
@@ -4380,6 +4382,7 @@ const en: BaseTranslation = {
     storeNote:
       "\"Get\" opens the App Store or Google Play. Come back to Blink when it's installed.",
     haveAnApp: "I have an app",
+    learnHow: "Learn how",
     keyInstruction: "Copy this setup key into your authenticator app.",
     qrInstruction: "Using another device?\nScan this QR code instead.",
     backupTitle: "Back up your key",
@@ -4447,7 +4450,6 @@ const en: BaseTranslation = {
     exportFailed: "Could not download the emergency bundle.",
   },
   SelfCustodialStaleRate: {
-    notice: "Exchange rate may be out of date",
     satsOnly: "Showing sats — no exchange rate available",
   },
   SelfCustodialOffline: {

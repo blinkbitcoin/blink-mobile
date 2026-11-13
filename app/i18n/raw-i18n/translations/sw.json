@@ -2142,7 +2142,9 @@
     "selectAll": "Chagua zote",
     "clearAll": "Futa zote",
     "addPlace": "Ongeza kwenye ramani",
-    "addPlaceTitle": "Ongeza mahali",
+    "addPlaceTitle": "Pendekeza biashara",
+    "submitPlaceRequest": "Wasilisha ombi",
+    "showMyLocation": "Onyesha mahali nilipo",
     "placePinHint": "Sogeza ramani ili alama iwe juu ya mahali hapo",
     "placeName": "Jina",
     "placeNameHint": "Mahali hapa panaitwaje",
@@ -4146,6 +4148,7 @@
     "get": "Pakua",
     "storeNote": "“Pakua” hufungua App Store au Google Play. Rudi kwenye Blink baada ya kusakinisha.",
     "haveAnApp": "Nina programu",
+    "learnHow": "Jifunze jinsi",
     "keyInstruction": "Nakili ufunguo huu wa kusanidi kwenye programu yako ya kithibitishaji.",
     "qrInstruction": "Unatumia kifaa kingine?\nBadala yake changanua msimbo huu wa QR.",
     "backupTitle": "Hifadhi nakala ya ufunguo wako",
@@ -4258,7 +4261,6 @@
     "payment": "Malipo"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Kiwango cha ubadilishaji huenda kimepitwa na wakati",
     "satsOnly": "Inaonyesha sats — hakuna kiwango cha ubadilishaji"
   },
   "SelfCustodialOffline": {

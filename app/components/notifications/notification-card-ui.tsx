@@ -35,7 +35,7 @@ export const NotificationCardUI: React.FC<NotificationCardUIProps> = ({
   if (loading) {
     return (
       <TouchableOpacity style={styles.loadingButtonContainer}>
-        <ActivityIndicator size="small" color={colors.primary} />
+        <ActivityIndicator size="small" color={colors.accent} />
       </TouchableOpacity>
     )
   }
@@ -46,7 +46,7 @@ export const NotificationCardUI: React.FC<NotificationCardUIProps> = ({
         <View style={styles.contentRow}>
           {icon && (
             <View style={styles.leftIconContainer}>
-              <GaloyIcon name={icon} color={colors.primary} size={24} />
+              <GaloyIcon name={icon} color={colors.accent} size={24} />
             </View>
           )}
           <View style={styles.textColumn}>
@@ -96,7 +96,7 @@ export const NotificationCardUI: React.FC<NotificationCardUIProps> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   buttonContainer: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     flexDirection: "column",
   },
@@ -126,14 +126,14 @@ const useStyles = makeStyles(({ colors }) => ({
   loadingButtonContainer: {
     flexDirection: "column",
     padding: 14,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     minHeight: 80,
     justifyContent: "center",
     alignItems: "center",
   },
   bodyText: {
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   buttonActionContainer: {
     paddingHorizontal: 14,
@@ -155,6 +155,6 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 14,
     lineHeight: 20,
     fontWeight: "700",
-    color: colors.white,
+    color: colors.textOnAccent,
   },
 }))

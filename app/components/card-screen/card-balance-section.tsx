@@ -58,15 +58,15 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "column",
   },
   balanceUsd: {
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   balanceSecondary: {
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
   addFundsButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     paddingHorizontal: 14,
     height: 40,
@@ -76,9 +76,9 @@ const useStyles = makeStyles(({ colors }) => ({
     opacity: 0.5,
   },
   addFundsText: {
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   primaryColor: {
-    color: colors.primary,
+    color: colors.accent,
   },
 }))

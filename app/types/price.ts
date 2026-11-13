@@ -30,13 +30,15 @@ export type PriceRates = {
   displayCurrencyPerCent: number
 }
 
-/** Fresh enough to show without qualification. */
+/** Fresh enough that no refresh is owed. Past it a rate is Stale but still prices. */
 export const RATES_FRESH_MS = 60 * 60 * 1000
 
 /**
- * Past {@link RATES_FRESH_MS} and within this, amounts are still shown but marked as
- * priced off an old rate. Beyond it the fiat figure is withheld and amounts fall back to
- * sats, because a day-old rate presented as today's is worse than no figure at all.
+ * Past {@link RATES_FRESH_MS} and within this, amounts are still shown, priced off the
+ * old rate with no label: one that came and went on every launch moved the screen more
+ * than it informed (blink-wip#2035). Beyond it the fiat figure is withheld and amounts
+ * fall back to sats, because a day-old rate presented as today's is worse than no
+ * figure at all.
  *
  * A day rather than an hour because the people most likely to be offline for long — a
  * merchant at a stall, anyone on intermittent signal — would rather see yesterday's

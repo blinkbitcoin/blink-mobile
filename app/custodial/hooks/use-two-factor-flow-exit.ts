@@ -19,6 +19,7 @@ export const useTwoFactorFlowExit = ({
   origin,
   isOpenedFromSetupScreen = false,
   hasRegistrationFailedToStart = false,
+  isOpenedFromSetupKey = false,
 }: TwoFactorFlowParams = {}): TwoFactorFlowExit => {
   const navigation = useNavigation()
   const { unmetTier, hasAuthenticator, registerDismissal } = useTwoFactorEnforcement()
@@ -33,10 +34,14 @@ export const useTwoFactorFlowExit = ({
 
   /**
    * The setup screen records its own skip, and there is nothing to skip if
-   * the user already has an authenticator or the registration never started.
+   * the user already has an authenticator, the registration never started, or the
+   * user opened the onboarding themselves from the setup key screen.
    */
   const isSkip =
-    !isOpenedFromSetupScreen && !hasAuthenticator && !hasRegistrationFailedToStart
+    !isOpenedFromSetupScreen &&
+    !isOpenedFromSetupKey &&
+    !hasAuthenticator &&
+    !hasRegistrationFailedToStart
 
   const leave = useCallback(() => {
     if (isSkip) registerDismissal(tierWhenOpened, originWhenOpened)

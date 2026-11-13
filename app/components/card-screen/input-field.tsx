@@ -10,6 +10,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 export const ValueStyle = {
   Bold: "bold",
@@ -135,7 +136,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   const isError = Boolean(validationError) || error
 
   const rightIconElement = rightIcon ? (
-    <GaloyIcon name={rightIcon} size={20} color={colors.primary} />
+    <GaloyIcon name={rightIcon} size={20} color={colors.accent} />
   ) : null
 
   if (isEditable) {
@@ -155,8 +156,8 @@ export const InputField: React.FC<InputFieldProps> = ({
               onChangeText?.(text)
             }}
             placeholder={placeholder ?? label}
-            placeholderTextColor={colors.grey3}
-            selectionColor={colors.primary}
+            placeholderTextColor={colors.textDisabled}
+            selectionColor={colors.accent}
             accessibilityLabel={label}
             keyboardType={keyboardType}
             maxLength={maxLength}
@@ -169,7 +170,7 @@ export const InputField: React.FC<InputFieldProps> = ({
             }}
           />
           {loading ? (
-            <ActivityIndicator size="small" color={colors.primary} />
+            <ActivityIndicator size="small" color={colors.accent} />
           ) : (
             rightIconElement
           )}
@@ -193,7 +194,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   }
 
   const content = (
-    <View style={styles.valueContainer}>
+    <View style={[styles.valueContainer, !onPress && styles.valueContainerStatic]}>
       <Text style={styles.value}>{value}</Text>
       {rightIconElement}
     </View>
@@ -234,14 +235,14 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
       gap: 3,
     },
     label: {
-      color: colors.black,
+      color: colors.textOnBackground,
       fontSize: 14,
       fontFamily: "Source Sans Pro",
       fontWeight: "400",
       lineHeight: 20,
     },
     valueContainer: {
-      backgroundColor: colors.grey5,
+      backgroundColor: colors.surfaceInteractive,
       borderRadius: 8,
       minHeight: isLarge ? 52 : 50,
       paddingLeft: 14,
@@ -254,9 +255,10 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
     valueContainerDisabled: {
       opacity: 0.5,
     },
+    valueContainerStatic: staticSurface(colors),
     value: {
       flex: 1,
-      color: isLarge || isBold ? colors.black : colors.grey2,
+      color: isLarge || isBold ? colors.textOnBackground : colors.textMuted,
       fontSize: isLarge ? 18 : isBold ? 14 : 16,
       fontFamily: "Source Sans Pro",
       fontWeight: isLarge ? "400" : isBold ? "700" : "400",
@@ -266,7 +268,7 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
       padding: 0,
     },
     helperText: {
-      color: colors.black,
+      color: colors.textOnBackground,
       fontSize: 10,
       lineHeight: 13,
       fontWeight: "400",

@@ -5,7 +5,7 @@ export const useSharedStepStyles = makeStyles(({ colors }) => ({
     gap: 3,
   },
   sectionTitle: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",

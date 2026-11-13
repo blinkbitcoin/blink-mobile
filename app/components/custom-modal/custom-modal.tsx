@@ -87,7 +87,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
     <Modal
       isVisible={isVisible}
       backdropOpacity={0.8}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       backdropTransitionOutTiming={0}
       avoidKeyboard={true}
       onBackdropPress={dismissable ? toggleModal : undefined}
@@ -119,7 +119,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
               accessibilityLabel={closeIconButtonAccessibilityLabel}
               accessibilityState={{ disabled: !dismissable }}
             >
-              <GaloyIcon name="close" size={30} color={colors.grey0} />
+              <GaloyIcon name="close" size={30} color={colors.textPrimary} />
             </TouchableOpacity>
           )}
         </View>
@@ -180,7 +180,7 @@ type UseStylesProps = {
 
 const useStyles = makeStyles(({ colors }, props: UseStylesProps) => ({
   container: {
-    backgroundColor: props.backgroundModalColor ?? colors.grey5,
+    backgroundColor: props.backgroundModalColor ?? colors.surfaceInteractive,
     maxHeight: "95%",
     minHeight: props.minHeight || "auto",
     borderRadius: 16,
@@ -206,7 +206,7 @@ const useStyles = makeStyles(({ colors }, props: UseStylesProps) => ({
     lineHeight: 32,
     maxWidth: props.titleMaxWidth || "80%",
     textAlign: props.titleTextAlignment || "center",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   modalBodyContainer: {
     flex: 1,

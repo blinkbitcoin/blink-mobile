@@ -32,7 +32,7 @@ export const CardAddToMobileWalletScreen: React.FC = () => {
       <View style={styles.content}>
         <View style={styles.heroSection}>
           <View style={styles.iconContainer}>
-            <GaloyIcon name="physical-card" size={34} color={colors._green} />
+            <GaloyIcon name="physical-card" size={34} color={colors.staticSuccess} />
           </View>
           <Text style={styles.title}>{LL.CardFlow.AddToMobileWallet.addYourCard()}</Text>
           <Text style={styles.subtitle}>
@@ -82,12 +82,12 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     alignItems: "center",
     justifyContent: "center",
   },
   title: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 20,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",
@@ -96,7 +96,7 @@ const useStyles = makeStyles(({ colors }) => ({
     maxWidth: 264,
   },
   subtitle: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 12,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",

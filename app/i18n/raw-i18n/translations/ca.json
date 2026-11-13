@@ -2142,7 +2142,9 @@
     "selectAll": "Selecciona-ho tot",
     "clearAll": "Esborra-ho tot",
     "addPlace": "Afegeix al mapa",
-    "addPlaceTitle": "Afegeix un lloc",
+    "addPlaceTitle": "Suggereix un comerç",
+    "submitPlaceRequest": "Envia la sol·licitud",
+    "showMyLocation": "Mostra la meva ubicació",
     "placePinHint": "Mou el mapa per posar el marcador sobre el lloc",
     "placeName": "Nom",
     "placeNameHint": "Com es diu el lloc",
@@ -4146,6 +4148,7 @@
     "get": "Obtén",
     "storeNote": "«Obtén» obre l'App Store o Google Play. Torna a Blink quan estigui instal·lada.",
     "haveAnApp": "Ja tinc una aplicació",
+    "learnHow": "Descobreix com",
     "keyInstruction": "Copia aquesta clau de configuració a la teva aplicació d'autenticació.",
     "qrInstruction": "Fas servir un altre dispositiu?\nEn comptes d'això, escaneja aquest codi QR.",
     "backupTitle": "Fes una còpia de seguretat de la clau",
@@ -4258,7 +4261,6 @@
     "payment": "Pagament"
   },
   "SelfCustodialStaleRate": {
-    "notice": "El tipus de canvi pot estar desactualitzat",
     "satsOnly": "Es mostren sats: no hi ha tipus de canvi disponible"
   },
   "SelfCustodialOffline": {

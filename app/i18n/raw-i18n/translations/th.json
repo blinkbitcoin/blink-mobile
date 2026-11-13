@@ -2142,7 +2142,9 @@
     "selectAll": "เลือกทั้งหมด",
     "clearAll": "ล้างทั้งหมด",
     "addPlace": "เพิ่มลงแผนที่",
-    "addPlaceTitle": "เพิ่มสถานที่",
+    "addPlaceTitle": "แนะนำร้านค้า",
+    "submitPlaceRequest": "ส่งคำขอ",
+    "showMyLocation": "แสดงตำแหน่งของฉัน",
     "placePinHint": "เลื่อนแผนที่เพื่อวางหมุดบนสถานที่",
     "placeName": "ชื่อ",
     "placeNameHint": "สถานที่นี้ชื่ออะไร",
@@ -4146,6 +4148,7 @@
     "get": "ดาวน์โหลด",
     "storeNote": "“ดาวน์โหลด” จะเปิด App Store หรือ Google Play กลับมาที่ Blink เมื่อติดตั้งเสร็จแล้ว",
     "haveAnApp": "ฉันมีแอปแล้ว",
+    "learnHow": "ดูวิธีการ",
     "keyInstruction": "คัดลอกคีย์ตั้งค่านี้ไปยังแอปยืนยันตัวตนของคุณ",
     "qrInstruction": "ใช้อุปกรณ์เครื่องอื่นอยู่ใช่ไหม\nสแกนรหัส QR นี้แทน",
     "backupTitle": "สำรองคีย์ของคุณ",
@@ -4258,7 +4261,6 @@
     "payment": "การชำระเงิน"
   },
   "SelfCustodialStaleRate": {
-    "notice": "อัตราแลกเปลี่ยนอาจไม่เป็นปัจจุบัน",
     "satsOnly": "แสดงเป็น sats — ไม่มีอัตราแลกเปลี่ยน"
   },
   "SelfCustodialOffline": {

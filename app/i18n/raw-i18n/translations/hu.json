@@ -2142,7 +2142,9 @@
     "selectAll": "Összes kijelölése",
     "clearAll": "Összes törlése",
     "addPlace": "Hozzáadás a térképhez",
-    "addPlaceTitle": "Hely hozzáadása",
+    "addPlaceTitle": "Üzlet ajánlása",
+    "submitPlaceRequest": "Kérés beküldése",
+    "showMyLocation": "Saját helyzetem mutatása",
     "placePinHint": "Mozgasd a térképet, hogy a jelölő a helyre kerüljön",
     "placeName": "Név",
     "placeNameHint": "Hogy hívják a helyet",
@@ -4146,6 +4148,7 @@
     "get": "Letöltés",
     "storeNote": "A „Letöltés” megnyitja az App Store-t vagy a Google Playt. Ha telepítetted, gyere vissza a Blinkbe.",
     "haveAnApp": "Már van alkalmazásom",
+    "learnHow": "Nézd meg, hogyan",
     "keyInstruction": "Másold be ezt a beállítási kulcsot a hitelesítő alkalmazásodba.",
     "qrInstruction": "Másik eszközt használsz?\nOlvasd be inkább ezt a QR-kódot.",
     "backupTitle": "Mentsd el a kulcsodat",
@@ -4258,7 +4261,6 @@
     "payment": "Fizetés"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Az árfolyam elavult lehet",
     "satsOnly": "Satoshiban megjelenítve – nincs elérhető árfolyam"
   },
   "SelfCustodialOffline": {

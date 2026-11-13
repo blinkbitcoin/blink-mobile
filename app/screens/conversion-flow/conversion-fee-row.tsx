@@ -5,6 +5,7 @@ import { makeStyles, Text } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { fonts } from "@app/rne-theme/fonts"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 type Props = {
   feeText: string
@@ -36,7 +37,7 @@ const useStyles = makeStyles(({ colors }) => ({
   card: {
     marginHorizontal: 20,
     marginBottom: 10,
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderRadius: 13,
     padding: 20,
   },
@@ -46,12 +47,12 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
   },
   label: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
     fontFamily: fonts.bold,
   },
   value: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     fontSize: 14,
     fontWeight: "700",
   },

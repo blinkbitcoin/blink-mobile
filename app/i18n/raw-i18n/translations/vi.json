@@ -2142,7 +2142,9 @@
     "selectAll": "Chọn tất cả",
     "clearAll": "Xóa tất cả",
     "addPlace": "Thêm vào bản đồ",
-    "addPlaceTitle": "Thêm địa điểm",
+    "addPlaceTitle": "Đề xuất cửa hàng",
+    "submitPlaceRequest": "Gửi yêu cầu",
+    "showMyLocation": "Hiển thị vị trí của tôi",
     "placePinHint": "Di chuyển bản đồ để đặt ghim lên địa điểm",
     "placeName": "Tên",
     "placeNameHint": "Địa điểm này tên là gì",
@@ -4146,6 +4148,7 @@
     "get": "Tải về",
     "storeNote": "“Tải về” sẽ mở App Store hoặc Google Play. Hãy quay lại Blink khi đã cài đặt xong.",
     "haveAnApp": "Tôi đã có ứng dụng",
+    "learnHow": "Tìm hiểu cách",
     "keyInstruction": "Sao chép khóa thiết lập này vào ứng dụng xác thực của bạn.",
     "qrInstruction": "Bạn đang dùng thiết bị khác?\nThay vào đó, hãy quét mã QR này.",
     "backupTitle": "Sao lưu khóa của bạn",
@@ -4258,7 +4261,6 @@
     "payment": "Thanh toán"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Tỷ giá có thể đã cũ",
     "satsOnly": "Đang hiển thị sats — không có tỷ giá"
   },
   "SelfCustodialOffline": {

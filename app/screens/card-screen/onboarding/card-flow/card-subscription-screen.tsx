@@ -15,6 +15,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { formatDateFromNow } from "@app/utils/date"
 import { openExternalUrl } from "@app/utils/external"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 const SUBSCRIBE_ROUTE: keyof RootStackParamList = "cardOnboardingSubscribeScreen"
 const SUBSCRIPTION_RENEWAL_MONTHS = 12
@@ -194,27 +195,27 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingTop: 30,
   },
   cardContainer: {
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderRadius: 16,
     padding: 18,
     paddingBottom: 5,
   },
   cardTitle: {
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
     marginBottom: 5,
     fontWeight: "700",
     lineHeight: 22,
   },
   price: {
-    color: colors.primary,
+    color: colors.accent,
     textAlign: "center",
     marginBottom: 5,
     fontWeight: "700",
     lineHeight: 32,
   },
   perYear: {
-    color: colors.grey2,
+    color: colors.textMuted,
     textAlign: "center",
     marginBottom: 15,
     lineHeight: 16,
@@ -226,21 +227,21 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: 16,
   },
   label: {
-    color: colors.grey2,
+    color: colors.textMuted,
     lineHeight: 20,
   },
   statusPending: {
-    color: colors.primary,
+    color: colors.accent,
     fontWeight: "700",
     lineHeight: 20,
   },
   statusSubscribe: {
-    color: colors._green,
+    color: colors.staticSuccess,
     fontWeight: "700",
     lineHeight: 20,
   },
   value: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontWeight: "700",
     lineHeight: 20,
   },
@@ -249,15 +250,15 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 17,
   },
   agreementText: {
-    color: colors.black,
+    color: colors.textOnBackground,
     lineHeight: 16,
   },
   link: {
-    color: colors.primary,
+    color: colors.accent,
     fontWeight: "500",
   },
   feeScheduleLink: {
-    color: colors.primary,
+    color: colors.accent,
     fontWeight: "700",
     lineHeight: 16,
   },

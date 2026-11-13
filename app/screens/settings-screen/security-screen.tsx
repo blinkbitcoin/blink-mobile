@@ -182,7 +182,8 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
        *  action exists to avoid. */
       appLock: () => enableBiometrics(goToSetPin, goToSetPin),
       hideBalance: () => setAlwaysHideBalance(true),
-      twoFactor: () => navigation.navigate("totpRegistrationInitiate"),
+      twoFactor: () =>
+        navigation.navigate("totpRegistrationInitiate", { offersOnboarding: true }),
       emailVerified: onEmailSignalPress,
     }),
     [navigation, enableBiometrics, goToSetPin, setAlwaysHideBalance, onEmailSignalPress],
@@ -258,11 +259,11 @@ const useStyles = makeStyles(({ colors }) => ({
     rowGap: 20,
   },
   settingContainer: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 12,
   },
   textContainer: {
-    color: colors.grey3,
+    color: colors.textDisabled,
   },
   listItemContainer: {
     backgroundColor: colors.transparent,

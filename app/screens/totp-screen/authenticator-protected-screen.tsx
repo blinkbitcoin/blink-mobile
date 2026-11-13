@@ -8,6 +8,7 @@ import { RichText } from "@app/components/rich-text"
 import { StepLayout } from "@app/components/step-layout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 import { useTotpRegistrationFlow } from "./hooks/use-totp-registration-flow"
 
@@ -37,7 +38,7 @@ export const AuthenticatorProtectedScreen: React.FC = () => {
     >
       <IconHero
         icon="check-badge"
-        iconColor={colors._green}
+        iconColor={colors.staticSuccess}
         title={LL.AuthenticatorOnboarding.protectedTitle()}
         subtitle={
           <Text type="p3" style={styles.description}>
@@ -57,15 +58,15 @@ export const AuthenticatorProtectedScreen: React.FC = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   description: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     textAlign: "center",
   },
   tip: {
     marginTop: 30,
     marginHorizontal: 20,
-    backgroundColor: colors.grey7,
+    ...staticSurface(colors),
     borderLeftWidth: 2,
-    borderLeftColor: colors.black,
+    borderLeftColor: colors.textOnBackground,
     borderRadius: 6,
     paddingLeft: 14,
     paddingRight: 10,
@@ -74,6 +75,6 @@ const useStyles = makeStyles(({ colors }) => ({
   tipText: {
     fontSize: 12,
     lineHeight: 18,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

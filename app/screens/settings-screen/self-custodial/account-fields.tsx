@@ -9,6 +9,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
 import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { testProps } from "@app/utils/testProps"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 type FieldProps = {
   label: string
@@ -28,7 +29,7 @@ const ReadOnlyField: React.FC<FieldProps> = ({
   return (
     <View style={styles.fieldGroup}>
       <Text style={styles.label}>{label}</Text>
-      <View style={styles.box}>
+      <View style={[styles.box, !copyTestID && styles.boxStatic]}>
         <Text
           style={styles.value}
           numberOfLines={1}
@@ -54,7 +55,7 @@ const CopyButton: React.FC<{ value: string; testID: string }> = ({ value, testID
       onPress={() => copyToClipboard({ content: value })}
       {...testProps(testID)}
     >
-      <GaloyIcon name="copy-paste" size={16} color={colors.primary} />
+      <GaloyIcon name="copy-paste" size={16} color={colors.accent} />
     </TouchableOpacity>
   )
 }
@@ -132,23 +133,24 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 3,
   },
   label: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     lineHeight: 20,
   },
   box: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     paddingLeft: 14,
     paddingRight: 10,
     paddingVertical: 14,
     gap: 14,
   },
+  boxStatic: staticSurface(colors),
   value: {
     flex: 1,
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     lineHeight: 20,
   },
