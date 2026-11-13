@@ -4032,6 +4032,10 @@ const en: BaseTranslation = {
         subtitle: "You can now activate your card and start using it",
         buttonText: "Close",
       },
+      CardDeclined: {
+        title: "We couldn't approve your card application",
+        subtitle: "Your account manager will be in touch.",
+      },
       CardProcessing: {
         title: "Processing your application",
         subtitle: "This can take up to a minute",

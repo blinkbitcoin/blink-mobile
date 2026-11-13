@@ -3846,6 +3846,10 @@
         "subtitle": "Du kan nu aktivere dit kort og begynde at bruge det",
         "buttonText": "Luk"
       },
+      "CardDeclined": {
+        "title": "Vi kunne ikke godkende din kortansøgning",
+        "subtitle": "Din kontoansvarlige kontakter dig."
+      },
       "CardProcessing": {
         "title": "Behandler din ansøgning",
         "subtitle": "Det kan tage op til et minut"

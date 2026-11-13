@@ -3846,6 +3846,10 @@
         "subtitle": "Ara pots activar la teva targeta i començar a fer-la servir",
         "buttonText": "Tancar"
       },
+      "CardDeclined": {
+        "title": "No hem pogut aprovar la teva sol·licitud de targeta",
+        "subtitle": "El teu gestor de compte es posarà en contacte amb tu."
+      },
       "CardProcessing": {
         "title": "Processant la teva sol·licitud",
         "subtitle": "Això pot trigar fins a un minut"

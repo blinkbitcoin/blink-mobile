@@ -3846,6 +3846,10 @@
         "subtitle": "Acum vă puteți activa cardul și puteți începe să îl folosiți",
         "buttonText": "Închide"
       },
+      "CardDeclined": {
+        "title": "Nu am putut aproba cererea ta de card",
+        "subtitle": "Managerul tău de cont te va contacta."
+      },
       "CardProcessing": {
         "title": "Se procesează cererea ta",
         "subtitle": "Acest lucru poate dura până la un minut"

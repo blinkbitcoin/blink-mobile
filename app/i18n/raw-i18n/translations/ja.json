@@ -3785,6 +3785,10 @@
                 "subtitle": "カードを有効化して、すぐにご利用いただけます",
                 "buttonText": "閉じる"
             },
+            "CardDeclined": {
+                "title": "カードのお申し込みを承認できませんでした",
+                "subtitle": "担当のアカウントマネージャーからご連絡いたします。"
+            },
             "CardProcessing": {
                 "title": "申請を処理中",
                 "subtitle": "最大1分ほどかかる場合があります"

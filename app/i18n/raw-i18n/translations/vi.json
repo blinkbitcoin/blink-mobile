@@ -3846,6 +3846,10 @@
         "subtitle": "Giờ bạn có thể kích hoạt thẻ và bắt đầu sử dụng",
         "buttonText": "Đóng"
       },
+      "CardDeclined": {
+        "title": "Chúng tôi không thể phê duyệt đơn đăng ký thẻ của bạn",
+        "subtitle": "Người quản lý tài khoản sẽ liên hệ với bạn."
+      },
       "CardProcessing": {
         "title": "Đang xử lý đơn đăng ký của bạn",
         "subtitle": "Quá trình này có thể mất tới một phút"
