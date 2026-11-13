@@ -43,9 +43,9 @@ jest.mock("@app/config/feature-flags-context", () => ({
 }))
 
 const CERTIFY_TEXT =
-  "I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Visa Card"
+  "I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Card"
 const ACKNOWLEDGE_TEXT =
-  "I acknowledge that applying for the Blink Visa Card does not constitute unauthorized solicitation"
+  "I acknowledge that applying for the Blink Card does not constitute unauthorized solicitation"
 
 describe("CardAcknowledgementScreen", () => {
   beforeEach(() => {
@@ -87,7 +87,7 @@ describe("CardAcknowledgementScreen", () => {
     await act(async () => {})
 
     expect(getByText("E-Sign Consent")).toBeTruthy()
-    expect(getByText("Issuer's Privacy Policy")).toBeTruthy()
+    expect(getByText("Issuer’s Privacy Policy")).toBeTruthy()
     expect(getByText("Blink Card Terms")).toBeTruthy()
     expect(getByText(CERTIFY_TEXT)).toBeTruthy()
     expect(getByText(ACKNOWLEDGE_TEXT)).toBeTruthy()
@@ -183,7 +183,7 @@ describe("CardAcknowledgementScreen", () => {
     await act(async () => {})
 
     await act(async () => {
-      fireEvent.press(getByText("Issuer's Privacy Policy"))
+      fireEvent.press(getByText("Issuer’s Privacy Policy"))
       fireEvent.press(getByText("Blink Card Terms"))
     })
 

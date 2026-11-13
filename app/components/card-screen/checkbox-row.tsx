@@ -34,12 +34,14 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
 const useStyles = makeStyles(() => ({
   checkboxRow: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
   },
+  /** The icon's glyph sits inset in its box, so 12 leaves the design's 14 between the
+   *  drawn box and the text. */
   checkboxStyle: {
     padding: 0,
     margin: 0,
-    marginRight: 15,
+    marginRight: 12,
     marginLeft: 0,
   },
   textContainer: {
