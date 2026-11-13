@@ -640,9 +640,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginVertical: 6,
   },
 
-  amountDetailsContainer: {
-    backgroundColor: colors.surfaceInteractive,
-  },
+  amountDetailsContainer: staticSurface(colors),
 
   amountView: {
     alignItems: "center",

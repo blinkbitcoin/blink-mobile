@@ -57,6 +57,7 @@ import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
 import {
   useDollarBalanceGate,
@@ -1148,7 +1149,8 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 15,
     paddingVertical: 15,
     borderRadius: 12,
-    backgroundColor: colors.surfaceInteractive,
+    // The band itself isn't a press target; only the icon buttons on it are.
+    ...staticSurface(colors),
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",

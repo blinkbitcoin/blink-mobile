@@ -46,11 +46,12 @@ const STATIC_SURFACES: Record<string, number> = {
   "app/screens/card-screen/onboarding/investment-flow/term-sheet-screen.tsx": 1,
   "app/screens/conversion-flow/conversion-confirmation-screen.tsx": 2,
   "app/screens/conversion-flow/conversion-fee-row.tsx": 1,
+  "app/screens/home-screen/home-screen.tsx": 1,
   "app/screens/redeem-lnurl-withdrawal-screen/redeem-bitcoin-result-screen.tsx": 1,
   "app/screens/settings-screen/self-custodial/account-fields.tsx": 1,
   "app/screens/totp-screen/authenticator-intro-screen.tsx": 1,
   "app/screens/totp-screen/authenticator-protected-screen.tsx": 1,
-  "app/screens/transaction-detail-screen/transaction-detail-screen.tsx": 1,
+  "app/screens/transaction-detail-screen/transaction-detail-screen.tsx": 2,
 }
 
 const sourceFiles = (dir: string): string[] =>
