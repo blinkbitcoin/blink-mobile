@@ -43,6 +43,16 @@ jest.mock("react-native-vector-icons/Ionicons", () => {
   }
 })
 
+jest.mock("@app/components/atomic/galoy-icon", () => {
+  const { View: MockView } =
+    jest.requireActual<typeof import("react-native")>("react-native")
+  return {
+    GaloyIcon: ({ name }: { name: string; size: number; color: string }) => (
+      <MockView testID={`galoy-icon-${name}`} />
+    ),
+  }
+})
+
 function MockModal({
   children,
   isVisible,
@@ -109,6 +119,15 @@ describe("DropdownComponent", () => {
       )
 
       expect(getByText("Canada")).toBeTruthy()
+    })
+
+    it("draws the design's caret to open the list", () => {
+      const { getByTestId, queryByTestId } = render(
+        <DropdownComponent {...defaultProps} />,
+      )
+
+      expect(getByTestId("galoy-icon-caret-down")).toBeTruthy()
+      expect(queryByTestId("icon-chevron-down")).toBeNull()
     })
   })
 
