@@ -63,7 +63,10 @@ export const CardAcknowledgementScreen: React.FC = () => {
     navigation.dispatch(
       CommonActions.reset({
         index: 1,
-        routes: [{ name: "Primary" }, { name: "cardOnboardingProcessingScreen" }],
+        routes: [
+          { name: "Primary" },
+          { name: "cardOnboardingProcessingScreen", params: { applicationId } },
+        ],
       }),
     )
   }

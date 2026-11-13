@@ -4035,7 +4035,7 @@ const en: BaseTranslation = {
       },
       CardProcessing: {
         title: "Processing your application",
-        subtitle: "We will notify you once we are ready",
+        subtitle: "This can take up to a minute",
       },
     },
   },
