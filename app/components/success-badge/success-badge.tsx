@@ -9,7 +9,6 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 import Svg, { Path } from "react-native-svg"
-import { useTheme } from "@rn-vui/themed"
 
 const AnimatedPath = Animated.createAnimatedComponent(Path)
 
@@ -48,7 +47,8 @@ const dashArray = (length: number) => [length, length + 2 * CAP_CLEARANCE]
 
 type SuccessBadgeProps = {
   size?: number
-  color?: string
+  /** The badge sits on whatever ground its caller draws, so the caller picks its colour. */
+  color: string
   /** Holds the drawing back, to land it after whatever leads into it. */
   delay?: number
 }
@@ -63,10 +63,6 @@ export const SuccessBadge: React.FC<SuccessBadgeProps> = ({
   color,
   delay = 0,
 }) => {
-  const {
-    theme: { colors },
-  } = useTheme()
-
   const badge = useSharedValue(0)
   const check = useSharedValue(0)
   const scale = useSharedValue(1)
@@ -102,8 +98,6 @@ export const SuccessBadge: React.FC<SuccessBadgeProps> = ({
     [scale],
   )
 
-  const stroke = color ?? colors._green
-
   return (
     <Animated.View style={[{ width: size, height: size }, popStyle]}>
       <Svg
@@ -114,7 +108,7 @@ export const SuccessBadge: React.FC<SuccessBadgeProps> = ({
       >
         <AnimatedPath
           d={BADGE_PATH}
-          stroke={stroke}
+          stroke={color}
           strokeWidth={STROKE_WIDTH}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -123,7 +117,7 @@ export const SuccessBadge: React.FC<SuccessBadgeProps> = ({
         />
         <AnimatedPath
           d={CHECK_PATH}
-          stroke={stroke}
+          stroke={color}
           strokeWidth={STROKE_WIDTH}
           strokeLinecap="round"
           strokeLinejoin="round"
