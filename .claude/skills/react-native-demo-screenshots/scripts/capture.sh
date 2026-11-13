@@ -19,6 +19,12 @@
 
 set -uo pipefail
 
+# Telemetry is best-effort and optional: this skill still works when the
+# simulator skill's lib is absent (skills get copied around individually).
+TEL_LIB="$(dirname "${BASH_SOURCE[0]}")/../../react-native-ios-simulator/lib/telemetry.sh"
+{ [ -f "$TEL_LIB" ] && . "$TEL_LIB"; } 2>/dev/null || true
+type tel_emit >/dev/null 2>&1 || { tel_now() { echo 0; }; tel_emit() { :; }; tel_span() { while [ $# -gt 0 ] && [ "$1" != "--" ]; do shift; done; [ $# -gt 0 ] && shift; "$@"; }; }
+
 LABEL=""; OUTDIR="."
 UDID="${DEMO_UDID:-}"; SERIAL="${DEMO_ANDROID_SERIAL:-}"; FORCE=""
 SETTLE="${SHOT_SETTLE:-0.6}"     # gap between comparison frames
@@ -77,26 +83,48 @@ if [ "$PLATFORM" = android ]; then
   # exec-out is binary-safe stdout; `shell screencap` would mangle line endings.
   shoot() { adb -s "$SERIAL" exec-out screencap -p > "$1" 2>/dev/null; }
 else
-  shoot() { xcrun simctl io "$UDID" screenshot "$1" >/dev/null 2>&1; }
+  # Resolve simctl once: xcrun dispatch costs ~80ms per shot on top of the
+  # ~0.27s screenshot itself (measured: p50 0.35s via xcrun vs 0.27s direct,
+  # bench-20260808-023805), and a settle capture pays it per frame.
+  SIMCTL="$(xcrun -f simctl 2>/dev/null || echo "")"
+  if [ -n "$SIMCTL" ]; then
+    shoot() { "$SIMCTL" io "$UDID" screenshot "$1" >/dev/null 2>&1; }
+  else
+    shoot() { xcrun simctl io "$UDID" screenshot "$1" >/dev/null 2>&1; }
+  fi
 fi
+
+# One span for the whole capture - never per frame: a python3 spawn inside the
+# settle loop would distort the very latency being measured. Frame count and
+# stability land in meta; `ok` mirrors stability so the report can keep
+# timed-out captures out of the latency percentiles (they are failure samples).
+T_CAPTURE=$(tel_now)
+FRAMES=0
 
 if [ -n "$NO_WAIT" ]; then
   shoot "$OUT" || die "screenshot failed"
+  FRAMES=1
 else
   # Two identical frames in a row means nothing is animating. Comparing file
   # digests is enough and avoids depending on an image differ.
-  DEADLINE=$(python3 -c "import time; print(time.time() + $TIMEOUT)")
+  #
+  # The deadline uses `date +%s`: 1s resolution is plenty for a 30s budget,
+  # and the two python3 spawns per frame this replaced cost 40-100ms each
+  # iteration - drift injected into the very loop whose latency the telemetry
+  # is supposed to report honestly.
+  START_S=$(date +%s)
+  TIMEOUT_S=${TIMEOUT%.*}
+  [ -n "$TIMEOUT_S" ] && [ "$TIMEOUT_S" -ge 1 ] 2>/dev/null || TIMEOUT_S=1
   PREV=""
   STABLE=""
   while :; do
     shoot "$TMP/frame.png" || die "screenshot failed - is ${UDID:-$SERIAL} booted?"
+    FRAMES=$((FRAMES + 1))
     [ -s "$TMP/frame.png" ] || die "screenshot produced an empty file"
     CUR=$(shasum -a 256 "$TMP/frame.png" | cut -d' ' -f1)
     if [ -n "$PREV" ] && [ "$CUR" = "$PREV" ]; then STABLE=1; break; fi
     PREV="$CUR"
-    NOW=$(python3 -c "import time; print(time.time())")
-    OVER=$(python3 -c "print(1 if $NOW >= $DEADLINE else 0)")
-    [ "$OVER" = "1" ] && break
+    [ $(( $(date +%s) - START_S )) -ge "$TIMEOUT_S" ] && break
     sleep "$SETTLE"
   done
   cp "$TMP/frame.png" "$OUT"
@@ -104,6 +132,14 @@ else
 fi
 
 [ -s "$OUT" ] || die "no screenshot was written to $OUT"
+
+if [ -n "$NO_WAIT" ]; then
+  tel_emit shot.capture.total "$T_CAPTURE" platform="$PLATFORM" frames=1 no_wait=1
+else
+  STABLE_FLAG="$([ -n "$STABLE" ] && echo 1 || echo 0)"
+  tel_emit shot.capture.total "$T_CAPTURE" platform="$PLATFORM" frames="$FRAMES" \
+    settle="$SETTLE" stable="$STABLE_FLAG" ok="$STABLE_FLAG"
+fi
 
 # A PNG that is not a PNG means simctl wrote an error into the file.
 if command -v magick >/dev/null 2>&1; then
