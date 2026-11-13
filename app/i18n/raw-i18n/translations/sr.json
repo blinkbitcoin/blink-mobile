@@ -2537,22 +2537,22 @@
         "description": "Обавештења о цени Bitcoin-а."
       }
     },
-    "splashGroup": "Ekran dolazne transakcije",
-    "incomingTransactionSplash": "Prikaži ekran",
-    "splashMinimum": "Najmanji iznos (SAT)"
+    "splashGroup": "Екран долазне трансакције",
+    "incomingTransactionSplash": "Прикажи екран",
+    "splashMinimum": "Најмањи износ (SAT)"
   },
   "IncomingTransactionSplash": {
-    "youReceived": "Primili ste",
+    "youReceived": "Примили сте",
     "pendingOnchain": "На блокчејну, на чекању",
-    "note": "Beleška",
-    "dontShowAgain": "Ne prikazuj više",
-    "details": "Detalji",
-    "announcement": "Primili ste {amount}",
-    "tapToShow": "Dodirni za prikaz",
-    "announcementHidden": "Uplata primljena",
+    "note": "Белешка",
+    "dontShowAgain": "Не приказуј више",
+    "details": "Детаљи",
+    "announcement": "Примили сте {amount}",
+    "tapToShow": "Додирните за приказ",
+    "announcementHidden": "Уплата примљена",
     "announcementPending": "На блокчејну, на чекању, {amount}",
-    "toastOn": "Ekran obaveštenja je uključen",
-    "toastOff": "Ekran obaveštenja je isključen"
+    "toastOn": "Екран обавештења је укључен",
+    "toastOff": "Екран обавештења је искључен"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Ваш налог има више од $5",

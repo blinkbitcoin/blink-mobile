@@ -2548,7 +2548,7 @@
     "dontShowAgain": "Toto už nezobrazovať",
     "details": "Podrobnosti",
     "announcement": "Dostali ste {amount}",
-    "tapToShow": "Klepnite na zobrazenie",
+    "tapToShow": "Klepnutím zobrazíte",
     "announcementHidden": "Platba prijatá",
     "announcementPending": "Čakajúce onchain, {amount}",
     "toastOn": "Obrazovka platby je zapnutá",

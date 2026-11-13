@@ -2550,7 +2550,7 @@
     "announcement": "استلمت {amount}",
     "tapToShow": "انقر للعرض",
     "announcementHidden": "تم استلام دفعة",
-    "announcementPending": "قيد الانتظار على السلسلة, {amount}",
+    "announcementPending": "قيد الانتظار على السلسلة، {amount}",
     "toastOn": "شاشة الإشعار مفعّلة",
     "toastOff": "شاشة الإشعار معطّلة"
   },

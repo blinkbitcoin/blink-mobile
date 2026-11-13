@@ -2542,12 +2542,12 @@
     "splashMinimum": "Jumlah minimum (SAT)"
   },
   "IncomingTransactionSplash": {
-    "youReceived": "Kamu menerima",
+    "youReceived": "Anda menerima",
     "pendingOnchain": "Onchain tertunda",
     "note": "Catatan",
     "dontShowAgain": "Jangan tampilkan lagi",
     "details": "Detail",
-    "announcement": "Kamu menerima {amount}",
+    "announcement": "Anda menerima {amount}",
     "tapToShow": "Ketuk untuk menampilkan",
     "announcementHidden": "Pembayaran diterima",
     "announcementPending": "Onchain tertunda, {amount}",
