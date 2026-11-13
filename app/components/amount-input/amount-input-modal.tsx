@@ -103,7 +103,7 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
 const useStyles = makeStyles(({ colors }, { bottom }: { bottom: number }) => ({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: colors.scrim,
     justifyContent: "flex-end",
   },
   sheetContent: {

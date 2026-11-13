@@ -11,4 +11,9 @@ describe("palette contract", () => {
   it("keeps the darkened light textMuted", () => {
     expect(light.textMuted).toBe("#8C8C97")
   })
+
+  it("dims behind modals and sheets with a black scrim in both modes", () => {
+    expect(light.scrim).toBe("rgba(0, 0, 0, 0.5)")
+    expect(dark.scrim).toBe("rgba(0, 0, 0, 0.5)")
+  })
 })
