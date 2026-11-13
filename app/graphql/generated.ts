@@ -3669,6 +3669,11 @@ export type CardSecretsEncryptedQueryVariables = Exact<{
 
 export type CardSecretsEncryptedQuery = { readonly __typename: 'Query', readonly cardSecretsEncrypted: { readonly __typename: 'CardSecretsEncrypted', readonly encryptedPan: { readonly __typename: 'EncryptedData', readonly iv: string, readonly data: string }, readonly encryptedCvc: { readonly __typename: 'EncryptedData', readonly iv: string, readonly data: string } } };
 
+export type CardApplicationStatusQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CardApplicationStatusQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly cardConsumerApplications: ReadonlyArray<{ readonly __typename: 'ConsumerApplication', readonly id: string, readonly applicationStatus: ApplicationStatus }> } } | null };
+
 export type CardConsumerApplicationCreateMutationVariables = Exact<{
   input: CardConsumerApplicationCreateInput;
 }>;
@@ -6989,6 +6994,54 @@ export type CardSecretsEncryptedQueryHookResult = ReturnType<typeof useCardSecre
 export type CardSecretsEncryptedLazyQueryHookResult = ReturnType<typeof useCardSecretsEncryptedLazyQuery>;
 export type CardSecretsEncryptedSuspenseQueryHookResult = ReturnType<typeof useCardSecretsEncryptedSuspenseQuery>;
 export type CardSecretsEncryptedQueryResult = Apollo.QueryResult<CardSecretsEncryptedQuery, CardSecretsEncryptedQueryVariables>;
+export const CardApplicationStatusDocument = gql`
+    query cardApplicationStatus {
+  me {
+    id
+    defaultAccount {
+      id
+      ... on ConsumerAccount {
+        cardConsumerApplications {
+          id
+          applicationStatus
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useCardApplicationStatusQuery__
+ *
+ * To run a query within a React component, call `useCardApplicationStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCardApplicationStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCardApplicationStatusQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCardApplicationStatusQuery(baseOptions?: Apollo.QueryHookOptions<CardApplicationStatusQuery, CardApplicationStatusQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CardApplicationStatusQuery, CardApplicationStatusQueryVariables>(CardApplicationStatusDocument, options);
+      }
+export function useCardApplicationStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CardApplicationStatusQuery, CardApplicationStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CardApplicationStatusQuery, CardApplicationStatusQueryVariables>(CardApplicationStatusDocument, options);
+        }
+export function useCardApplicationStatusSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CardApplicationStatusQuery, CardApplicationStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CardApplicationStatusQuery, CardApplicationStatusQueryVariables>(CardApplicationStatusDocument, options);
+        }
+export type CardApplicationStatusQueryHookResult = ReturnType<typeof useCardApplicationStatusQuery>;
+export type CardApplicationStatusLazyQueryHookResult = ReturnType<typeof useCardApplicationStatusLazyQuery>;
+export type CardApplicationStatusSuspenseQueryHookResult = ReturnType<typeof useCardApplicationStatusSuspenseQuery>;
+export type CardApplicationStatusQueryResult = Apollo.QueryResult<CardApplicationStatusQuery, CardApplicationStatusQueryVariables>;
 export const CardConsumerApplicationCreateDocument = gql`
     mutation cardConsumerApplicationCreate($input: CardConsumerApplicationCreateInput!) {
   cardConsumerApplicationCreate(input: $input) {

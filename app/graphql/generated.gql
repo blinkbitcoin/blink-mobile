@@ -1353,6 +1353,25 @@ query card {
   }
 }
 
+query cardApplicationStatus {
+  me {
+    id
+    defaultAccount {
+      id
+      ... on ConsumerAccount {
+        cardConsumerApplications {
+          id
+          applicationStatus
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
 query cardBalance($cardId: ID!) {
   cardBalance(cardId: $cardId) {
     available

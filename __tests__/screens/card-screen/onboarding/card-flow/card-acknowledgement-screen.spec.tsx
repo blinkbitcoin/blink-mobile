@@ -194,7 +194,13 @@ describe("CardAcknowledgementScreen", () => {
         type: "RESET",
         payload: expect.objectContaining({
           index: 1,
-          routes: [{ name: "Primary" }, { name: "cardOnboardingProcessingScreen" }],
+          routes: [
+            { name: "Primary" },
+            {
+              name: "cardOnboardingProcessingScreen",
+              params: { applicationId: "application-1" },
+            },
+          ],
         }),
       }),
     )

@@ -2,12 +2,17 @@ import * as React from "react"
 import { View } from "react-native"
 import Animated from "react-native-reanimated"
 import Svg, { Line } from "react-native-svg"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { useDashedLineFlow } from "@app/components/animations"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
+
+import { useCardApplicationApproval } from "./use-card-application-approval"
 
 const PROGRESS_ICON_SIZE = 32
 const DASHED_LINE_WIDTH = 89
@@ -37,11 +42,26 @@ export const CardProcessingScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const {
+    params: { applicationId },
+  } = useRoute<RouteProp<RootStackParamList, "cardOnboardingProcessingScreen">>()
+
+  const approvalWait = useCardApplicationApproval(applicationId)
   /** The dashes flow toward the card for as long as the issuer is deciding. */
   const { animatedProps: flowingDashProps, dashArray } = useDashedLineFlow({
     dashLength: DASH_LENGTH,
     gapLength: DASH_LENGTH,
   })
+
+  React.useEffect(() => {
+    if (approvalWait === "approved") {
+      navigation.replace("cardOnboardingPreapprovedScreen")
+      return
+    }
+    /** A refusal, or a minute without an answer, leaves it to the home and a bulletin. */
+    if (approvalWait !== "waiting") navigation.popTo("Primary")
+  }, [approvalWait, navigation])
 
   return (
     <Screen preset="fixed">

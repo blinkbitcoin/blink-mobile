@@ -54,6 +54,14 @@ describe("card onboarding header controls in root-navigator", () => {
     })
   })
 
+  /** The design leaves the wait without a way back or out: it ends on its own. */
+  it("leaves the processing wait without back and close buttons", () => {
+    const options = registration("cardOnboardingProcessingScreen")
+
+    expect(options).toContain("...noHeaderBack")
+    expect(options).not.toContain("headerCloseControlOptions")
+  })
+
   /** The design gives this step a back arrow and the membership name, and no close. */
   it("titles the verify identity step and leaves the close button out", () => {
     const options = registration("cardOnboardingVerifyIdentityScreen")
