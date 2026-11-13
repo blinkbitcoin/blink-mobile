@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import {
+  cancelAnimation,
   useSharedValue,
   useAnimatedProps,
   withRepeat,
@@ -23,14 +24,16 @@ export const useDashedLineFlow = ({
 
   const dashOffset = useSharedValue(0)
 
+  /** The flow never ends on its own, so it is cancelled when its screen goes away rather
+   *  than left running on the UI thread. */
   useEffect(() => {
     dashOffset.value = withRepeat(
       withTiming(-totalOffset, { duration, easing: Easing.linear }),
       -1,
       false,
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    return () => cancelAnimation(dashOffset)
+  }, [dashOffset, totalOffset, duration])
 
   const animatedProps = useAnimatedProps(() => ({
     strokeDashoffset: dashOffset.value,
