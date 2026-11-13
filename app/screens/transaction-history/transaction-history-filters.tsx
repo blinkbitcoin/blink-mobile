@@ -6,6 +6,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import { testProps } from "@app/utils/testProps"
 
 const PANEL_IN_MS = 200
@@ -149,7 +150,7 @@ const useStyles = makeStyles(({ colors }) => ({
     columnGap: 10,
     padding: 10,
     borderRadius: 8,
-    backgroundColor: colors.surfaceStatic,
+    ...staticSurface(colors),
   },
   noResultsText: {
     fontSize: 18,

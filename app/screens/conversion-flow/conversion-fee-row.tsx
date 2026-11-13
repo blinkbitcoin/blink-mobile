@@ -5,6 +5,7 @@ import { makeStyles, Text } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { fonts } from "@app/rne-theme/fonts"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 type Props = {
   feeText: string
@@ -36,7 +37,7 @@ const useStyles = makeStyles(({ colors }) => ({
   card: {
     marginHorizontal: 20,
     marginBottom: 10,
-    backgroundColor: colors.surfaceInteractive,
+    ...staticSurface(colors),
     borderRadius: 13,
     padding: 20,
   },

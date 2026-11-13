@@ -13,6 +13,7 @@ import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeho
 import { WalletSwitch, type WalletSwitchValue } from "@app/components/wallet-switch"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import { testProps } from "@app/utils/testProps"
 
 export const SEND_WALLET_SUMMARY_TEST_ID = "choose-wallet-to-send-from"
@@ -204,7 +205,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.loaderForeground,
   },
   cardInactive: {
-    backgroundColor: colors.surfaceStatic,
+    ...staticSurface(colors),
   },
   cardError: {
     borderColor: colors.error,
