@@ -2548,7 +2548,7 @@
     "dontShowAgain": "Ne prikazuj više",
     "details": "Detalji",
     "announcement": "Primili ste {amount}",
-    "tapToShow": "Dodirni za prikaz",
+    "tapToShow": "Dodirnite za prikaz",
     "announcementHidden": "Uplata primljena",
     "announcementPending": "Onchain u tijeku, {amount}",
     "toastOn": "Zaslon obavijesti je uključen",

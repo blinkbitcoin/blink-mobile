@@ -2542,12 +2542,12 @@
     "splashMinimum": "Ελάχιστο ποσό (SAT)"
   },
   "IncomingTransactionSplash": {
-    "youReceived": "Έλαβες",
+    "youReceived": "Λάβατε",
     "pendingOnchain": "Σε αναμονή on-chain",
     "note": "Σημείωση",
     "dontShowAgain": "Να μην εμφανιστεί ξανά",
     "details": "Λεπτομέρειες",
-    "announcement": "Έλαβες {amount}",
+    "announcement": "Λάβατε {amount}",
     "tapToShow": "Πατήστε για εμφάνιση",
     "announcementHidden": "Η πληρωμή ελήφθη",
     "announcementPending": "Σε αναμονή on-chain, {amount}",

@@ -2543,14 +2543,14 @@
   },
   "IncomingTransactionSplash": {
     "youReceived": "Bạn đã nhận",
-    "pendingOnchain": "Trên chuỗi đang chờ",
+    "pendingOnchain": "Đang chờ trên chuỗi",
     "note": "Ghi chú",
     "dontShowAgain": "Đừng hiện lại nữa",
     "details": "Chi tiết",
     "announcement": "Bạn đã nhận {amount}",
     "tapToShow": "Chạm để hiện",
     "announcementHidden": "Đã nhận thanh toán",
-    "announcementPending": "Trên chuỗi đang chờ, {amount}",
+    "announcementPending": "Đang chờ trên chuỗi, {amount}",
     "toastOn": "Đã bật màn hình thông báo",
     "toastOff": "Đã tắt màn hình thông báo"
   },
