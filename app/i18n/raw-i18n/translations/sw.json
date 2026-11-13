@@ -2537,7 +2537,7 @@
         "description": "Arifa kuhusu bei ya Bitcoin."
       }
     },
-    "splashGroup": "Skrini ya malipo yaliyopokelewa",
+    "splashGroup": "Skrini ya kupokea malipo",
     "incomingTransactionSplash": "Onyesha skrini",
     "splashMinimum": "Kiasi cha chini (SAT)"
   },
@@ -2551,8 +2551,8 @@
     "tapToShow": "Bonyeza kuonyesha",
     "announcementHidden": "Malipo yamepokelewa",
     "announcementPending": "Onchain inasubiri, {amount}",
-    "toastOn": "Skrini ya malipo yaliyopokelewa imewashwa",
-    "toastOff": "Skrini ya malipo yaliyopokelewa imezimwa"
+    "toastOn": "Skrini ya kupokea malipo imewashwa",
+    "toastOff": "Skrini ya kupokea malipo imezimwa"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Akaunti yako ina zaidi ya $5",
