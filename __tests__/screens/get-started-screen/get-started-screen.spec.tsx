@@ -143,15 +143,15 @@ jest.mock("@rn-vui/themed", () => {
     makeStyles:
       (fn: (theme: { colors: Record<string, string> }) => Record<string, object>) => () =>
         fn({ colors: { accent: "#fc5805" } }),
-    Text: ({ children }: { children: React.ReactNode }) =>
-      ReactActual.createElement("Text", null, children),
+    Text: ({ children, color }: { children: React.ReactNode; color?: string }) =>
+      ReactActual.createElement("Text", { color }, children),
     useTheme: () => ({ theme: { mode: mockThemeMode } }),
   }
 })
 
 jest.mock("@app/rne-theme/theme", () => ({
   __esModule: true,
-  default: { darkColors: { staticBrandOrange: "#fc5805" } },
+  default: { darkColors: { accent: "#ffad0d", staticBrandOrange: "#ff7e1c" } },
 }))
 
 jest.mock("@app/assets/logo/app-logo-dark.svg", () => "AppLogoDark")
@@ -199,6 +199,14 @@ describe("GetStartedScreen", () => {
     const { getByText } = render(<GetStartedScreen />)
 
     expect(getByText("Staging")).toBeTruthy()
+  })
+
+  it("names the instance in the dark palette's accent, not the brand orange", () => {
+    mockInstanceId = "Staging"
+
+    const { getByText } = render(<GetStartedScreen />)
+
+    expect(getByText("Staging").props.color).toBe("#ffad0d")
   })
 
   it("swaps the logo for the light one under a light theme", () => {

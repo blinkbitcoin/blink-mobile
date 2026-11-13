@@ -174,7 +174,7 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
           containerStyle={[styles.listStyle, isFirstItem && styles.firstItem]}
         >
           {isCurrentlyActive ? (
-            <GaloyIcon name="check-circle" size={20} color={colors.staticSuccess} />
+            <GaloyIcon name="check-circle" size={20} color={colors.success} />
           ) : (
             <View style={styles.spacerStyle} />
           )}

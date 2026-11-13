@@ -15,7 +15,7 @@ import BadgerShovelBitcoin from "./badger-shovel-01.svg"
 
 const useStyles = makeStyles(({ colors }) => ({
   bottomView: {
-    backgroundColor: colors._lightBlue,
+    backgroundColor: colors.staticBrightBlue,
     flex: 1,
   },
 
@@ -28,7 +28,7 @@ const useStyles = makeStyles(({ colors }) => ({
 
   container: {
     alignItems: "center",
-    backgroundColor: colors._lightBlue,
+    backgroundColor: colors.staticBrightBlue,
     flexGrow: 1,
   },
 
@@ -48,7 +48,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   titleStyle: {
-    color: colors._lightBlue,
+    color: colors.staticBrightBlue,
     fontSize: 18,
     fontWeight: "bold",
     flex: 1,

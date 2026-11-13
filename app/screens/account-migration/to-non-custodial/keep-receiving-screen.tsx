@@ -154,7 +154,7 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
     >
       <IconHero
         icon="lightning-address"
-        iconColor={colors.staticSuccess}
+        iconColor={colors.success}
         title={LL.AccountMigration.keepReceivingTitle()}
         subtitle={LL.AccountMigration.keepReceivingBody()}
       />

@@ -12,8 +12,8 @@ import { useMarkerSettle } from "./use-marker-settle"
 // steps green to amber to orange — the colour stays put and only the number
 // changes.
 //
-// `_green` and not `success`: our palette defines no `success`, so reading it
-// resolves to @rn-vui's own green and paints every cluster a library colour.
+// `staticSuccess` and not `success`: the map is a fixed-colour surface, and
+// `success` is a role token free to change with the theme.
 const CLUSTER_SIZE = 50
 const VIEWBOX = 45
 const OUTER_RADIUS = 22.5

@@ -10,7 +10,7 @@ const useStyles = makeStyles(
       paddingTop: 3,
       marginLeft: 0,
       borderRadius: 10,
-      backgroundColor: colors.accent3,
+      backgroundColor: colors.accent,
     },
     inputContainerFocused: {
       borderColor: colors.accent,

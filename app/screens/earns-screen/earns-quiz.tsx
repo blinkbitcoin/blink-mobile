@@ -64,13 +64,13 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   buttonStyle: {
-    backgroundColor: colors._lightBlue,
+    backgroundColor: colors.staticBrightBlue,
     borderRadius: 32,
     width: 224,
   },
 
   completedTitleStyle: {
-    color: colors._lightBlue,
+    color: colors.staticBrightBlue,
     fontSize: 18,
     fontWeight: "bold",
   },
@@ -116,7 +116,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   quizButtonStyle: {
-    backgroundColor: colors._lightBlue,
+    backgroundColor: colors.staticBrightBlue,
     height: 50,
     width: 50,
     borderRadius: 50,

@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react-native"
 
 import { CodeInput } from "@app/components/code-input"
 
+import { expectFocusFill, renderedBox } from "../../helpers/field-fill"
 import { flushEffects } from "../../helpers/flush-effects"
 import { ContextForScreen } from "../../screens/helper"
 
@@ -69,5 +70,16 @@ describe("CodeInput", () => {
     fireEvent.changeText(field(), "1")
 
     expect(mockSetErrorMessage).toHaveBeenCalledWith("")
+  })
+
+  it("fills the field, darker while it has focus, and starts focused", async () => {
+    await renderInput(false)
+
+    expectFocusFill({
+      startsFocused: true,
+      surfaces: () => [renderedBox(field())],
+      focus: () => fireEvent(field(), "focus"),
+      blur: () => fireEvent(field(), "blur"),
+    })
   })
 })

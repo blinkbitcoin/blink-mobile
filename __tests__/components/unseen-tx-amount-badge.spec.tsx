@@ -16,7 +16,7 @@ type MakeStylesFn = (
   theme: {
     colors: {
       textMuted: string
-      staticSuccess: string
+      success: string
     }
   },
   props: unknown,
@@ -30,7 +30,7 @@ jest.mock("@rn-vui/themed", () => {
         {
           colors: {
             textMuted: "textMuted",
-            staticSuccess: "green",
+            success: "green",
           },
         },
         props,

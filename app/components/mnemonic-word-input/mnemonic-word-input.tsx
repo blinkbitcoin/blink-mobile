@@ -89,7 +89,7 @@ const useStyles = makeStyles(({ colors }) => ({
     opacity: 0,
   },
   correct: {
-    borderColor: colors.staticSuccess,
+    borderColor: colors.success,
   },
   error: {
     borderColor: colors.error,

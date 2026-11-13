@@ -184,10 +184,10 @@ const useStyles = makeStyles(({ colors }) => ({
 
   inputContainerStyle: {
     flex: 1,
-    borderWidth: 2,
-    borderBottomWidth: 2,
+    borderWidth: 0,
+    borderBottomWidth: 0,
     paddingHorizontal: 10,
-    borderColor: colors.accent4,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
   },
   errorContainer: {

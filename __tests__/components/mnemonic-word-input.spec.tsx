@@ -14,7 +14,7 @@ jest.mock("@rn-vui/themed", () => {
     accent: "#000",
     textOnBackground: "#000",
     transparent: "transparent",
-    staticSuccess: "#0f0",
+    success: "#0f0",
     error: "#f00",
   }
   return {

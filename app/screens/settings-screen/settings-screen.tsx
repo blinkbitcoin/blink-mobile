@@ -253,6 +253,7 @@ const useStyles = makeStyles(({ colors }) => ({
     position: "absolute",
     right: 9,
     top: 9,
+    // eslint-disable-next-line no-restricted-properties -- the badge count keeps one dark colour in both modes
     color: colors.staticDarkGrey,
     backgroundColor: colors.textOnBackground,
     textAlign: "center",

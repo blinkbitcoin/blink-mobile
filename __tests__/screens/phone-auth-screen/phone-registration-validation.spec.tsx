@@ -10,6 +10,7 @@ import { PhoneRegistrationValidateScreen } from "@app/screens/phone-auth-screen/
 import { LoginMethodAddition } from "@app/types/two-factor-enforcement"
 import { RouteProp } from "@react-navigation/native"
 
+import { expectFocusFill, renderedBox } from "../../helpers/field-fill"
 import { flushEffects } from "../../helpers/flush-effects"
 import { ContextForScreen } from "../helper"
 
@@ -248,5 +249,18 @@ describe("PhoneRegistrationValidateScreen", () => {
       undefined,
       expect.any(Array),
     )
+  })
+
+  it("fills the code field, darker while it has focus, and starts focused", async () => {
+    renderScreen()
+    await flushEffects()
+    const field = screen.getByPlaceholderText("000000")
+
+    expectFocusFill({
+      startsFocused: true,
+      surfaces: () => [renderedBox(field)],
+      focus: () => fireEvent(field, "focus"),
+      blur: () => fireEvent(field, "blur"),
+    })
   })
 })

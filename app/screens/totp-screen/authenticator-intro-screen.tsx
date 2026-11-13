@@ -92,7 +92,7 @@ export const AuthenticatorIntroScreen: React.FC = () => {
     >
       <IconHero
         icon="lock-closed"
-        iconColor={colors.staticSuccess}
+        iconColor={colors.success}
         title={LL.AuthenticatorOnboarding.introTitle()}
         subtitle={
           <Text type="p3" style={styles.description}>

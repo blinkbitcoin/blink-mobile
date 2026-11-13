@@ -7,6 +7,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
+import { expectFocusFill, renderedBox } from "../helpers/field-fill"
 import { ContextForScreen } from "./helper"
 
 const mockRoute: RouteProp<RootStackParamList, "setLightningAddress"> = {
@@ -109,6 +110,23 @@ describe("SetLightningAddressScreen", () => {
       expect(screen.queryByText(LL.SetAddressModal.Errors.invalidCharacter())).toBeNull()
       expect(screen.queryByText(LL.SetAddressModal.Errors.tooShort())).toBeNull()
       expect(screen.queryByText(LL.SetAddressModal.Errors.tooLong())).toBeNull()
+    })
+  })
+
+  /** It does not autofocus, so it starts at rest. */
+  it("fills the address field, darker while it has focus", () => {
+    render(
+      <ContextForScreen>
+        <SetLightningAddressScreen route={mockRoute} />
+      </ContextForScreen>,
+    )
+    const field = () => screen.getByPlaceholderText("SatoshiNakamoto")
+
+    expectFocusFill({
+      startsFocused: false,
+      surfaces: () => [renderedBox(field())],
+      focus: () => fireEvent(field(), "focus"),
+      blur: () => fireEvent(field(), "blur"),
     })
   })
 })

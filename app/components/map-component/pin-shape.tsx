@@ -119,7 +119,7 @@ export const PinShape: React.FC<PinShapeProps> = ({ color, outlineColor }) => {
 export const useNewPlacePinColors = (): { color: string; outlineColor: string } => {
   const { theme } = useTheme()
 
-  return { color: theme.colors._blue, outlineColor: theme.colors.staticWhite }
+  return { color: theme.colors.staticBlue, outlineColor: theme.colors.staticWhite }
 }
 
 export const NewPlacePinShape: React.FC = () => {

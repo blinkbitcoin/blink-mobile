@@ -128,7 +128,7 @@ jest.mock("@rn-vui/themed", () => {
           textSecondary: "#555555",
           neutral: "#CCCCCC",
           surfaceInteractive: "#F5F5F5",
-          staticSuccess: "#00AA00",
+          success: "#00AA00",
           accent: "#F7931A",
         },
       },

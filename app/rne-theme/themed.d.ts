@@ -15,10 +15,8 @@ declare module "@rn-vui/themed" {
     surfacePressed: string
     surfaceStatic: string
     accent: string
-    accent2: string
-    accent3: string
-    accent4: string
     errorBackground: string
+    info: string
     backdrop: string
     backdropStrong: string
 
@@ -44,6 +42,9 @@ declare module "@rn-vui/themed" {
     staticBrandYellow: string
     staticBrandSunset: string
     staticWarningBackground: string
+    staticBlue: string
+    staticBrightBlue: string
+    staticPaleBlue: string
 
     loaderForeground: string
     loaderBackground: string
@@ -56,12 +57,6 @@ declare module "@rn-vui/themed" {
     readonly black: string
     /** @deprecated use accent */
     readonly primary: string
-    /** @deprecated use accent2 */
-    primary3: string
-    /** @deprecated use accent3 */
-    primary4: string
-    /** @deprecated use accent4 */
-    primary5: string
     /** @deprecated use textPrimary */
     readonly grey0: string
     /** @deprecated use textSecondary */
@@ -87,7 +82,7 @@ declare module "@rn-vui/themed" {
     /** @deprecated use backdropStrong */
     backdropWhiter: string
 
-    /** @deprecated flagged for design review — not the brand blue, do not use */
+    /** @deprecated use info */
     blue5: string
 
     /** @deprecated use staticWhite */
@@ -113,11 +108,11 @@ declare module "@rn-vui/themed" {
     /** @deprecated use staticWarningBackground */
     _warningLight: string
 
-    /** @deprecated flagged for design review — not the brand blue, do not use */
+    /** @deprecated use staticBlue */
     _blue: string
-    /** @deprecated flagged for design review — not the brand blue, do not use */
+    /** @deprecated use staticBrightBlue */
     _lightBlue: string
-    /** @deprecated flagged for design review — not the brand blue, do not use */
+    /** @deprecated use staticPaleBlue */
     _sky: string
 
     transparent: string

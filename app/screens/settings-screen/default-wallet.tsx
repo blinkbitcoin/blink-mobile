@@ -97,7 +97,7 @@ const DefaultWalletPicker: React.FC<DefaultWalletPickerProps> = ({ options, info
                       <Icon
                         name="checkmark-circle"
                         size={20}
-                        color={colors.staticSuccess}
+                        color={colors.success}
                         type="ionicon"
                       />
                     ) : (

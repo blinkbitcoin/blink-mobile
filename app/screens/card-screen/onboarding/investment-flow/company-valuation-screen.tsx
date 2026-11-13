@@ -30,7 +30,7 @@ export const CompanyValuationScreen: React.FC = () => {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <IconHero
           icon="graph"
-          iconColor={colors.staticSuccess}
+          iconColor={colors.success}
           title={LL.CardFlow.Onboarding.CompanyValuation.welcomeMessage.title()}
         />
 

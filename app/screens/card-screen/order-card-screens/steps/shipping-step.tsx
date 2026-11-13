@@ -114,7 +114,7 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
             title={shippingLL.standardDelivery()}
             subtitle={standardDays}
             value={standardPrice}
-            valueColor={colors.staticSuccess}
+            valueColor={colors.success}
           />
         </View>
       </View>

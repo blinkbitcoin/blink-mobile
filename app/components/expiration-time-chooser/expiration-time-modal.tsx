@@ -83,7 +83,7 @@ export const ExpirationTimeModal: React.FC<ExpirationTimeModalProps> = ({
             bottomDivider
           >
             {value === minutes ? (
-              <GaloyIcon name="check-circle" size={18} color={colors.staticSuccess} />
+              <GaloyIcon name="check-circle" size={18} color={colors.success} />
             ) : (
               <View style={styles.emptySpacer} />
             )}
@@ -110,7 +110,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
-    borderBottomColor: colors.accent3,
+    borderBottomColor: colors.accent,
     borderBottomWidth: 1,
   },
   emptySpacer: {

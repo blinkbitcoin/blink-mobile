@@ -123,7 +123,7 @@ export const AuthenticatorAppsScreen: React.FC = () => {
     >
       <IconHero
         icon="apps"
-        iconColor={colors.staticSuccess}
+        iconColor={colors.success}
         title={LL.AuthenticatorOnboarding.appsTitle()}
         subtitle={
           <Text type="p3" style={styles.description}>
@@ -192,6 +192,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderRadius: 10,
     borderWidth: 0.21,
     borderColor: colors.textDisabled,
+    // eslint-disable-next-line no-restricted-properties -- third-party app logos sit on white in both modes
     backgroundColor: colors.staticWhite,
   },
   appText: {

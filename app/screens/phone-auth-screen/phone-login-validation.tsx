@@ -200,6 +200,8 @@ export const PhoneLoginValidationScreen: React.FC<PhoneLoginValidationScreenProp
   const isUpgradeFlow = currentLevel === AccountLevel.Zero
 
   const [code, _setCode] = useState("")
+  // The field autofocuses on mount, so start focused: no resting fill flashes first.
+  const [isFieldFocused, setIsFieldFocused] = useState(true)
   // Wait 2.5 minutes before allowing another code request
   const [secondsRemaining, setSecondsRemaining] = useState<number>(150)
   const { phone, channel, onboarding } = route.params
@@ -416,7 +418,12 @@ export const PhoneLoginValidationScreen: React.FC<PhoneLoginValidationScreenProp
         <Input
           placeholder="000000"
           containerStyle={styles.inputComponentContainerStyle}
-          inputContainerStyle={styles.inputContainerStyle}
+          inputContainerStyle={[
+            styles.inputContainerStyle,
+            isFieldFocused && styles.fieldFocused,
+          ]}
+          onFocus={() => setIsFieldFocused(true)}
+          onBlur={() => setIsFieldFocused(false)}
           inputStyle={styles.inputStyle}
           value={code}
           onChangeText={setCode}
@@ -474,12 +481,15 @@ const useStyles = makeStyles(({ colors }) => ({
   inputContainerStyle: {
     minWidth: 160,
     minHeight: 60,
-    borderWidth: 2,
-    borderBottomWidth: 2,
+    borderWidth: 0,
+    borderBottomWidth: 0,
     paddingHorizontal: 10,
-    borderColor: colors.accent4,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     marginRight: 0,
+  },
+  fieldFocused: {
+    backgroundColor: colors.surfaceFocused,
   },
   inputStyle: {
     fontSize: 24,

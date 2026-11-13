@@ -41,7 +41,7 @@ export const CardPersonalDetailsScreen: React.FC = () => {
     status: onboardingStatus,
     translations: LLPersonalDetails,
     colors: {
-      success: colors.staticSuccess,
+      success: colors.success,
       warning: colors.warning,
       error: colors.error,
       info: colors.accent,

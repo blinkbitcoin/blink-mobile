@@ -94,7 +94,7 @@ export const TwoFactorNonCustodialScreen: React.FC = () => {
     >
       <IconHero
         icon="key-outline"
-        iconColor={colors.staticSuccess}
+        iconColor={colors.success}
         title={LL.TwoFactorEnforcement.nonCustodialTitle()}
         subtitle={
           <Text type="p3" style={styles.description}>

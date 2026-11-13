@@ -294,6 +294,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
       <StatusScreenLayout
         icon="clock"
         iconColor={colors.warning}
+        // eslint-disable-next-line no-restricted-properties -- pale warning tile behind the icon in both modes
         iconBackgroundColor={colors.staticWarningBackground}
         footer={screenFooter}
       >
