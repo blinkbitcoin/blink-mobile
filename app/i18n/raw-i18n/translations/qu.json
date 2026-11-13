@@ -3847,6 +3847,10 @@
         "subtitle": "Kunanqa tarjetaykita activayta atinkiñam, hinaspa llamk'achiyta qallariy",
         "buttonText": "Wisq'ay"
       },
+      "CardDeclined": {
+        "title": "Manam tarjeta mañakuyniykita chaskiyta atirqaykuchu",
+        "subtitle": "Cuentaykita kamachiqmi rimapayasunki."
+      },
       "CardProcessing": {
         "title": "Mañakuyniykita rurachkanku",
         "subtitle": "Kayqa huk minutokama unanmanmi"

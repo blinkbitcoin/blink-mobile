@@ -30,6 +30,7 @@ describe("card onboarding header controls in root-navigator", () => {
       "cardOnboardingWelcomeScreen",
       "cardOnboardingPersonalInfoScreen",
       "cardOnboardingPreapprovedScreen",
+      "cardOnboardingDeclinedScreen",
     ]
 
     CLOSE_ONLY_ROUTES.forEach((route) => {

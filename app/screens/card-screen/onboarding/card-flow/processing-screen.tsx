@@ -59,8 +59,12 @@ export const CardProcessingScreen: React.FC = () => {
       navigation.replace("cardOnboardingPreapprovedScreen")
       return
     }
-    /** A refusal, or a minute without an answer, leaves it to the home and a bulletin. */
-    if (approvalWait !== "waiting") navigation.popTo("Primary")
+    if (approvalWait === "declined") {
+      navigation.replace("cardOnboardingDeclinedScreen")
+      return
+    }
+    /** A minute without an answer leaves it to the home and a bulletin. */
+    if (approvalWait === "timedOut") navigation.popTo("Primary")
   }, [approvalWait, navigation])
 
   return (
