@@ -643,8 +643,8 @@ const sendAfterEarlierAttempts = async <
 ): Promise<SendOutcome> => {
   /** Nothing is sent while the attempts an earlier launch lost have not been read back:
    *  one of them may be this send's, paid already. A read that failed is read again
-   *  first. Nothing is known lost either, so the sender is only asked to try again in a
-   *  moment. */
+   *  first, and a write that failed is tried again too. Nothing is known lost either, so
+   *  the sender is only asked to try again in a moment. */
   await attempts.retryStorage()
   if (!attempts.isStoredRead()) {
     return failure(new Error("Lost attempts of an earlier launch not read back yet"))

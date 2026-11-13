@@ -4,7 +4,6 @@
  * it without pulling that in; only on where it keeps them across app launches.
  */
 import type { ConvertAttemptRef } from "@app/types/payment"
-import { sleep } from "@app/utils/sleep"
 import { withTimeout } from "@app/utils/with-timeout"
 
 import {
@@ -109,18 +108,18 @@ const deviceStorage: LostAttemptsStorage = {
  *  as long. */
 export const STORED_ATTEMPTS_READ_TIMEOUT_MS = 5000
 
-/** How many times a write that failed is tried again before it is given up on, and how
- *  long the first retry waits; each one after waits twice as long as the one before. */
-export const STORED_ATTEMPTS_WRITE_RETRIES = 3
+/** How long the first retry of a write that failed waits, and the longest any retry
+ *  waits; each one waits twice as long as the one before, up to that. */
 export const STORED_ATTEMPTS_WRITE_RETRY_DELAY_MS = 500
+export const STORED_ATTEMPTS_WRITE_RETRY_MAX_DELAY_MS = 30_000
 
 /**
  * How a wallet's attempts reach storage. `readSettled`: the read of what an earlier launch
  * left, as long as a send waits for it. `isRead`: whether that read has read them back.
- * `retry`: reads them again if that read failed, as long as a send waits for it. `keep`:
- * stores the attempts as they are now, after every write before it. `forget`: writes
- * nothing more, as the wallet's deletion asks, and removes again what a write already in
- * flight stores.
+ * `retry`: reads them again if that read failed, as long as a send waits for it, and
+ * tries a write waiting to be tried again at once. `keep`: stores the attempts as they are
+ * now, after every write before it. `forget`: writes nothing more, as the wallet's
+ * deletion asks, and removes again what a write already in flight stores.
  */
 type WalletPersistence = {
   readSettled: Promise<void>
@@ -216,9 +215,10 @@ const noop = () => undefined
  * launch's attempts alone. Nothing is written while the read has failed, for the same
  * reason; no send goes out meanwhile, so there is nothing to write either. Writes queue
  * behind each other, and each writes the attempts as they are when its turn comes, so
- * the last one stored is the latest state. A write that fails is tried again a few
- * times, each a little later: what it does not keep, the next launch does not know. Past
- * that it is given up on, as the storage reported, and the next change writes again.
+ * the last one stored is the latest state. A write that fails is tried again for as long
+ * as the app runs, each time a little later, and at once when a send is asked for: what
+ * it does not keep, the next launch does not know. Refusing sends meanwhile would guard
+ * nothing more, since this launch's attempts are held in memory until the app closes.
  */
 const persistWalletAttempts = (
   walletId: string,
@@ -250,11 +250,56 @@ const persistWalletAttempts = (
 
   const firstRead = readBack()
 
+  const mayWrite = () => storedRead === "read" && !isForgotten
+
+  /** A write already in flight as the wallet was forgotten would put back what its
+   *  deletion removed: what it stored is removed again once it has landed. */
+  const removeIfForgotten = async () => {
+    if (isForgotten) await storage.remove(walletId)
+  }
+
+  /** Whether a retry was asked for since the write in flight started: once it fails, it
+   *  is tried again at once instead of waiting. */
+  let isRetryAsked = false
+  /** Ends the wait of a write that failed, so it is tried again at once. */
+  let endRetryWait = noop
+  const retryWriteNow = () => {
+    isRetryAsked = true
+    endRetryWait()
+  }
+  const waitBeforeRetry = (retry: number): Promise<void> => {
+    if (isRetryAsked) return Promise.resolve()
+    return new Promise<void>((resolve) => {
+      const delay = Math.min(
+        STORED_ATTEMPTS_WRITE_RETRY_DELAY_MS * 2 ** retry,
+        STORED_ATTEMPTS_WRITE_RETRY_MAX_DELAY_MS,
+      )
+      const timer = setTimeout(resolve, delay)
+      endRetryWait = () => {
+        clearTimeout(timer)
+        resolve()
+      }
+    })
+  }
+
+  const write = async () => {
+    for (let retry = 0; mayWrite(); retry += 1) {
+      isRetryAsked = false
+      const isSaved = await storage.save(walletId, new Map(held)).then(
+        () => true,
+        () => false,
+      )
+      if (isSaved) return removeIfForgotten()
+      await waitBeforeRetry(retry)
+    }
+  }
+
   /** The read a send started again, which every send waits for while it runs, until one
    *  has waited it out. Like a first read that never answers, it is then not waited for
    *  again: each send would wait it out. */
   let readAgain: Promise<void> | undefined
   const retry = (): Promise<void> => {
+    retryWriteNow()
     if (storedRead === "failed") {
       storedRead = "pending"
       readAgain = readBack()
@@ -267,27 +312,6 @@ const persistWalletAttempts = (
     })
   }
 
-  const mayWrite = () => storedRead === "read" && !isForgotten
-
-  /** A write already in flight as the wallet was forgotten would put back what its
-   *  deletion removed: what it stored is removed again once it has landed. */
-  const removeIfForgotten = async () => {
-    if (isForgotten) await storage.remove(walletId)
-  }
-
-  const write = async () => {
-    for (let retry = 0; mayWrite(); retry += 1) {
-      const isSaved = await storage.save(walletId, new Map(held)).then(
-        () => true,
-        () => false,
-      )
-      if (isSaved) return removeIfForgotten()
-      const hasRetriesLeft = retry < STORED_ATTEMPTS_WRITE_RETRIES
-      if (!hasRetriesLeft) return
-      await sleep(STORED_ATTEMPTS_WRITE_RETRY_DELAY_MS * 2 ** retry)
-    }
-  }
-
   let lastWrite: Promise<void> = firstRead
   return {
     readSettled: waitForRead(firstRead),
@@ -295,9 +319,11 @@ const persistWalletAttempts = (
     retry,
     keep: () => {
       lastWrite = lastWrite.then(write).catch(noop)
+      retryWriteNow()
     },
     forget: () => {
       isForgotten = true
+      retryWriteNow()
     },
   }
 }
@@ -334,7 +360,7 @@ export type LostAttemptsHandle = {
    *  `read` answers may be missing some. */
   isStoredRead: () => boolean
   /** Reads the attempts an earlier launch left again if their read failed, as long as a
-   *  send waits for it. */
+   *  send waits for it, and tries a write waiting to be tried again at once. */
   retryStorage: () => Promise<void>
   /** Applied to what the destination holds when it is written, not when it was read. */
   update: (change: (current: LostAttempts) => LostAttempts) => void
