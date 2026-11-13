@@ -15,6 +15,7 @@ import {
   PAN_TEST_ID,
 } from "@app/components/bottom-sheet"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { light } from "@app/rne-theme/colors"
 
 import { animatedHeightOf, translateYOf } from "../../helpers/bottom-sheet"
 import { ContextForScreen } from "../../screens/helper"
@@ -140,6 +141,19 @@ describe("BottomSheet", () => {
     fireEvent.press(getByLabelText("Close"))
 
     expect(onClose).toHaveBeenCalled()
+  })
+
+  it("dims what is behind it with the scrim token", async () => {
+    const { getByLabelText } = renderSheet()
+
+    await waitFor(() => expect(getByLabelText("Close")).toBeTruthy())
+    // The pressable fills the scrim; the first ancestor with a fill is the scrim itself.
+    let node = getByLabelText("Close").parent
+    while (node && !StyleSheet.flatten(node.props.style)?.backgroundColor) {
+      node = node.parent
+    }
+
+    expect(StyleSheet.flatten(node?.props.style).backgroundColor).toBe(light.scrim)
   })
 
   it("draws its window under the status and navigation bars, so insets.bottom is counted once", async () => {
