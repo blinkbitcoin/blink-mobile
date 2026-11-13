@@ -322,6 +322,9 @@ export const SplashMinimumRow: React.FC = () => {
         keyboardType="number-pad"
         returnKeyType="done"
         selectTextOnFocus
+        /* The title beside it is a sibling: without a name of its own the field reads
+           as a bare number. */
+        accessibilityLabel={LL.NotificationSettingsScreen.splashMinimum()}
       />
     </ListItem>
   )
