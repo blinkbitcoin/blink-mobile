@@ -28,6 +28,7 @@ export const TEST_GALOY_INSTANCE = {
 
 const colors: Record<string, string> = {
   surfaceInteractive: "#f5f5f5",
+  surfaceStatic: "#f9f9f9",
   accent: "#fc5805",
   textOnBackground: "#000",
   backgroundDefault: "#fff",
