@@ -252,12 +252,6 @@ const persistWalletAttempts = (
 
   const mayWrite = () => storedRead === "read" && !isForgotten
 
-  /** A write already in flight as the wallet was forgotten would put back what its
-   *  deletion removed: what it stored is removed again once it has landed. */
-  const removeIfForgotten = async () => {
-    if (isForgotten) await storage.remove(walletId)
-  }
-
   /** Whether a retry was asked for since the write in flight started: once it fails, it
    *  is tried again at once instead of waiting. */
   let isRetryAsked = false
@@ -282,16 +276,40 @@ const persistWalletAttempts = (
     })
   }
 
-  const write = async () => {
-    for (let retry = 0; mayWrite(); retry += 1) {
+  /** Tries a write until storage takes it, for as long as `mayTry` holds; whether it did. */
+  const writeUntilTaken = async (
+    storageWrite: () => Promise<void>,
+    mayTry: () => boolean,
+  ): Promise<boolean> => {
+    for (let retry = 0; mayTry(); retry += 1) {
       isRetryAsked = false
-      const isSaved = await storage.save(walletId, new Map(held)).then(
+      const isTaken = await storageWrite().then(
         () => true,
         () => false,
       )
-      if (isSaved) return removeIfForgotten()
+      if (isTaken) return true
       await waitBeforeRetry(retry)
     }
+    return false
+  }
+
+  /** A write already in flight as the wallet was forgotten would put back what its
+   *  deletion removed: what it stored is removed again once it has landed, until the
+   *  removal is taken too. */
+  const removeIfForgotten = async () => {
+    if (!isForgotten) return
+    await writeUntilTaken(
+      () => storage.remove(walletId),
+      () => true,
+    )
+  }
+
+  const write = async () => {
+    const isSaved = await writeUntilTaken(
+      () => storage.save(walletId, new Map(held)),
+      mayWrite,
+    )
+    if (isSaved) await removeIfForgotten()
   }
 
   /** The read a send started again, which every send waits for while it runs, until one

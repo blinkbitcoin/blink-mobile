@@ -609,6 +609,42 @@ describe("lost attempts across app launches", () => {
     expect(onDisk.has("wallet-launch-15")).toBe(false)
   })
 
+  it("keeps removing what a late write stored until the removal is taken", async () => {
+    jest.useFakeTimers()
+    const onDisk = new Map<string, ReadonlyMap<string, LostAttempts>>()
+    let landWrite: () => void = () => undefined
+    const remove = jest
+      .fn()
+      .mockRejectedValueOnce(new Error("io"))
+      .mockRejectedValueOnce(new Error("io"))
+      .mockImplementation(async (walletId: string) => {
+        onDisk.delete(walletId)
+      })
+    scopeLostAttemptsTo("wallet-launch-25", {
+      load: async () => new Map(),
+      save: (walletId, attempts) =>
+        new Promise<void>((resolve) => {
+          landWrite = () => {
+            onDisk.set(walletId, attempts)
+            resolve()
+          }
+        }),
+      remove,
+    })
+    remember("sp1abc", { unresolvedSend })
+    await jest.advanceTimersByTimeAsync(0)
+
+    forgetLostAttemptsOf("wallet-launch-25")
+    landWrite()
+    await jest.advanceTimersByTimeAsync(0)
+    expect(remove).toHaveBeenCalledTimes(1)
+    expect(onDisk.has("wallet-launch-25")).toBe(true)
+    await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_RETRY_DELAY_MS * 3)
+
+    expect(remove).toHaveBeenCalledTimes(3)
+    expect(onDisk.has("wallet-launch-25")).toBe(false)
+  })
+
   it("removes nothing after a write that lands while the wallet is still kept", async () => {
     const remove = jest.fn(async () => undefined)
     scopeLostAttemptsTo("wallet-launch-17", {
