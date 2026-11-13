@@ -2,11 +2,13 @@ import * as React from "react"
 import { gql } from "@apollo/client"
 
 import {
+  useCardApplicationStatusLazyQuery,
   useCardConsumerApplicationCreateMutation,
   useCardKycStatusLazyQuery,
 } from "@app/graphql/generated"
 import { CardApplicationAnswers } from "@app/types/card-application"
 
+import { isCardApplicationRefused } from "./use-card-application-approval"
 import { isCardKycApproved } from "./use-card-kyc-status"
 
 gql`
@@ -23,6 +25,9 @@ gql`
 export const useCardApplicationSubmit = () => {
   const [createApplication] = useCardConsumerApplicationCreateMutation()
   const [readKycStatus] = useCardKycStatusLazyQuery({ fetchPolicy: "network-only" })
+  const [readApplications] = useCardApplicationStatusLazyQuery({
+    fetchPolicy: "network-only",
+  })
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   const submitApplication = React.useCallback(
@@ -44,12 +49,20 @@ export const useCardApplicationSubmit = () => {
         })
         return data?.cardConsumerApplicationCreate.id ?? null
       } catch {
-        return null
+        /** A create whose answer was lost landed all the same, and the issuer refuses a
+         *  second one, as it does for a user back here after the wait ran out. Either
+         *  way the account's live application is the one to wait for. */
+        const { data: applicationsData } = await readApplications()
+        const liveApplication =
+          applicationsData?.me?.defaultAccount?.cardConsumerApplications?.find(
+            (application) => !isCardApplicationRefused(application.applicationStatus),
+          )
+        return liveApplication?.id ?? null
       } finally {
         setIsSubmitting(false)
       }
     },
-    [createApplication, readKycStatus],
+    [createApplication, readApplications, readKycStatus],
   )
 
   return { submitApplication, isSubmitting }
