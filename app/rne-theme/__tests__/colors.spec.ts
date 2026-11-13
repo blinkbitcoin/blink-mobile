@@ -102,6 +102,13 @@ describe("field fill values", () => {
     expect(dark.grey7).toBe("#171717")
   })
 
+  // Design ruling (Nov 2026): the disabled accent label keeps following the
+  // tappable fill, so it moves with it rather than holding the old #F2F2F4.
+  it("keeps the disabled accent label on the tappable fill", () => {
+    expect(light.textOnAccentDisabled).toBe("#ECECEE")
+    expect(dark.textOnAccentDisabled.toUpperCase()).toBe("#1D1D1D")
+  })
+
   // Static fills sit between the background and the tappable fill in both modes.
   it("orders static fills between the background and the tappable fill", () => {
     const luminance = (hex: string) => parseInt(hex.slice(1, 3), 16)
