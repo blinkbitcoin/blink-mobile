@@ -2431,6 +2431,7 @@
     "willBeSentToMempoolBy": "La transacció s'ha d'enviar a la mempool.",
     "amount": "Import",
     "addAmount": "Afegir import",
+    "slideToSelectAmount": "Llisca per triar l'import",
     "lowFunds": "Fons insuficients",
     "amountExceed": "L'import excedeix el teu saldo {balance: string}",
     "amountExceedsLimit": "La quantitat supera el teu límit diari restant de {limit: string}",

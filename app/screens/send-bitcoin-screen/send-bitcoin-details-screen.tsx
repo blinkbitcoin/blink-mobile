@@ -11,7 +11,6 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { useNumberPad } from "@app/components/amount-input-screen/use-number-pad"
 import { CurrencyKeyboard } from "@app/components/currency-keyboard"
 import { NoteInput } from "@app/components/note-input"
-import { PercentageSelector } from "@app/components/percentage-selector"
 import { Screen } from "@app/components/screen"
 import {
   useSendBitcoinInternalLimitsQuery,
@@ -30,6 +29,7 @@ import { NavigationProp, RouteProp, useNavigation } from "@react-navigation/nati
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useAppConfig, useClipboard, usePriceConversion } from "@app/hooks"
+import { useAmountSliderHint } from "@app/hooks/use-amount-slider-hint"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { ErrorHaptic } from "@app/hooks/use-error-haptic"
 import { useInitialAccessibilityFocus } from "@app/hooks/use-initial-accessibility-focus"
@@ -59,6 +59,7 @@ import {
   AmountEntryErrorSheet,
   LnurlInvoiceError,
 } from "./amount-entry/amount-entry-error-sheet"
+import { AmountSlider } from "./amount-entry/amount-slider"
 import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
 import { formatDestination } from "./format-destination"
 import { HighFeeSheet } from "./high-fee-sheet"
@@ -165,7 +166,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   } = useAppConfig()
   const [isLoadingLnurl, setIsLoadingLnurl] = useState(false)
   const [isHighFeeSheetVisible, setIsHighFeeSheetVisible] = useState(false)
-  const [selectedPercent, setSelectedPercent] = useState<number | null>(null)
+  /** The thumb is held: the screen holds its scroll so the drag stays a drag. */
+  const [isSliding, setIsSliding] = useState(false)
+  /** The sender slid to an amount on this send; review learns it, and a send that goes
+   *  through retires the slider's hint. */
+  const [hasUsedSlider, setHasUsedSlider] = useState(false)
+  const { showAmountSliderHint } = useAmountSliderHint()
 
   const { convertMoneyAmount: _convertMoneyAmount, displayCurrency } =
     usePriceConversion()
@@ -239,7 +245,6 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   const [lnurlError, setLnurlError] = useState<LnurlInvoiceError>()
 
   const setAmount = useCallback((moneyAmount: MoneyAmount<WalletOrDisplayCurrency>) => {
-    setSelectedPercent(null)
     setPaymentDetail((paymentDetail) =>
       paymentDetail?.setAmount ? paymentDetail.setAmount(moneyAmount) : paymentDetail,
     )
@@ -432,11 +437,11 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         }
       }
 
-      setSelectedPercent(null)
       setPaymentDetail(updatedPaymentDetail)
     })
 
   const selectPercent = (percent: number) => {
+    setHasUsedSlider(true)
     const amount = {
       ...sendingWalletBalance,
       amount: Math.floor((sendingWalletBalance.amount * percent) / 100),
@@ -451,7 +456,6 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         : paymentDetail,
     )
     amountPad.showAmount(amount)
-    setSelectedPercent(percent)
   }
 
   const goToNextScreen =
@@ -554,6 +558,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         } else {
           navigation.navigate("sendBitcoinConfirmation", {
             paymentDetail: paymentDetailForConfirmation,
+            usedAmountSlider: hasUsedSlider,
           })
         }
       }
@@ -626,6 +631,15 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     )
 
   const hasAmount = paymentDetail.unitOfAccountAmount.amount > 0
+
+  /** Where the slider's thumb sits: the amount's share of the balance it is sent from. */
+  const amountInWallet = hasAmount
+    ? convertMoneyAmount(paymentDetail.unitOfAccountAmount, walletCurrency)?.amount
+    : undefined
+  const balanceShare =
+    amountInWallet && sendingWalletBalance.amount > 0
+      ? amountInWallet / sendingWalletBalance.amount
+      : 0
   const isLowFunds =
     !amountStatus.validAmount &&
     amountStatus.invalidReason === AmountInvalidReason.InsufficientBalance
@@ -691,34 +705,51 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         isVisible={isHighFeeSheetVisible}
         onAccept={() => {
           setIsHighFeeSheetVisible(false)
-          navigation.navigate("sendBitcoinConfirmation", { paymentDetail })
+          navigation.navigate("sendBitcoinConfirmation", {
+            paymentDetail,
+            usedAmountSlider: hasUsedSlider,
+          })
         }}
         onClose={() => setIsHighFeeSheetVisible(false)}
       />
       <ScrollView
         ref={scrollRef}
+        scrollEnabled={!isSliding}
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         onLayout={scrollNoteIntoView}
         onContentSizeChange={scrollNoteIntoView}
       >
-        <SendHero
-          active
-          caption={formatDestination({
-            destination: paymentDetail.destination,
-            paymentType: paymentDetail.paymentType,
-            lnAddressHostname,
-          })}
-          primaryAmount={primaryAmountText}
-          secondaryAmount={
-            secondaryAmount && formatMoneyAmount({ moneyAmount: secondaryAmount })
-          }
-          primaryCurrency={primaryCurrency}
-          isEmpty={paymentDetail.canSetAmount && !hasAmount}
-          onSwapCurrency={paymentDetail.canSetAmount ? swapTypedCurrency : undefined}
-          onCaptionLongPress={handleCopyToClipboard}
-        />
+        <View style={styles.amount}>
+          <SendHero
+            active
+            caption={formatDestination({
+              destination: paymentDetail.destination,
+              paymentType: paymentDetail.paymentType,
+              lnAddressHostname,
+            })}
+            primaryAmount={primaryAmountText}
+            secondaryAmount={
+              secondaryAmount && formatMoneyAmount({ moneyAmount: secondaryAmount })
+            }
+            primaryCurrency={primaryCurrency}
+            isEmpty={paymentDetail.canSetAmount && !hasAmount}
+            onSwapCurrency={paymentDetail.canSetAmount ? swapTypedCurrency : undefined}
+            onCaptionLongPress={handleCopyToClipboard}
+          />
+          {paymentDetail.canSetAmount && (
+            <AmountSlider
+              share={balanceShare}
+              onSlide={selectPercent}
+              showHint={showAmountSliderHint}
+              onHoldChange={setIsSliding}
+              accentColor={
+                walletCurrency === WalletCurrency.Usd ? colors._green : colors.accent
+              }
+            />
+          )}
+        </View>
         <View style={styles.fields}>
           {/* The one error slot sits right above the wallet card it is usually about. */}
           <View style={styles.walletWithError}>
@@ -765,13 +796,6 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       <View style={styles.bottom}>
         {paymentDetail.canSetAmount && !isKeyboardVisible && (
           <View style={styles.pad}>
-            <PercentageSelector
-              isLocked={false}
-              loadingPercent={null}
-              selectedPercent={selectedPercent}
-              onSelect={selectPercent}
-              testIdPrefix="send"
-            />
             <CurrencyKeyboard
               onPress={amountPad.onKeyPress}
               disabledKeys={amountPad.disabledKeys}
@@ -813,6 +837,10 @@ const useStyles = makeStyles(() => ({
     justifyContent: "space-between",
     rowGap: 14,
     paddingHorizontal: 20,
+  },
+  /** The hero and the slider under it, 14 apart as drawn. */
+  amount: {
+    rowGap: 14,
   },
   fields: {
     rowGap: 14,

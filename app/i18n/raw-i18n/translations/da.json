@@ -2431,6 +2431,7 @@
     "willBeSentToMempoolBy": "Transaktionen skulle nu blive tilføjet til mempool",
     "amount": "Beløb",
     "addAmount": "Tilføj beløb",
+    "slideToSelectAmount": "Skub for at vælge beløb",
     "lowFunds": "Ikke nok midler",
     "amountExceed": "Beløbet overstiger din saldo på {balance: string}",
     "amountExceedsLimit": "Beløbet overstiger din resterende daglige grænse på {limit: string}",
