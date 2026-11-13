@@ -3,7 +3,10 @@ import { fireEvent, render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { AccountFields } from "@app/screens/settings-screen/self-custodial/account-fields"
+import { light } from "@app/rne-theme/colors"
 import theme from "@app/rne-theme/theme"
+
+import { surfaceColor } from "../../../helpers/surface-color"
 
 const mockAccountInfo = {
   identityPubkey: "abc-pubkey",
@@ -107,5 +110,14 @@ describe("AccountFields", () => {
     const { getByTestId } = renderFields()
     fireEvent.press(getByTestId("account-info-lightning-address-copy"))
     expect(mockCopyToClipboard).toHaveBeenCalledWith({ content: "user@blink.sv" })
+  })
+
+  /** A field with a copy button is a press target and keeps surfaceInteractive;
+   *  backup status has nothing to press, so it takes the surfaceStatic (blink-wip#1871). */
+  it("keeps the copyable fields surfaceInteractive and paints backup status surfaceStatic", () => {
+    const { getByText } = renderFields()
+    expect(surfaceColor(getByText("abc-pubkey"))).toBe(light.surfaceInteractive)
+    expect(surfaceColor(getByText("user@blink.sv"))).toBe(light.surfaceInteractive)
+    expect(surfaceColor(getByText("Completed"))).toBe(light.surfaceStatic)
   })
 })

@@ -3,6 +3,7 @@ import { View } from "react-native"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { InfoRow } from "./info-row"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 export const INFO_SECTION_OUTLINE_TEST_ID = "info-section-outline"
 
@@ -17,8 +18,6 @@ type InfoItem = {
 type InfoSectionProps = {
   title: string
   items: InfoItem[]
-  /** Paints the card on grey7, the static surface, for a read-only summary. */
-  inactive?: boolean
   /** Outlines the card. The outline is drawn over the card rather than as its border, so
    *  it appearing or changing colour never moves the rows. */
   outlineColor?: string
@@ -27,7 +26,6 @@ type InfoSectionProps = {
 export const InfoSection: React.FC<InfoSectionProps> = ({
   title,
   items,
-  inactive = false,
   outlineColor,
 }) => {
   const styles = useStyles()
@@ -35,7 +33,7 @@ export const InfoSection: React.FC<InfoSectionProps> = ({
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
-      <View style={[styles.card, inactive && styles.cardInactive]}>
+      <View style={styles.card}>
         {items.map((item) => (
           <InfoRow
             key={item.label}
@@ -70,14 +68,11 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 20,
   },
   card: {
-    backgroundColor: colors.surfaceInteractive,
+    ...staticSurface(colors),
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 14,
     gap: 14,
-  },
-  cardInactive: {
-    backgroundColor: colors.surfaceStatic,
   },
   outline: {
     position: "absolute",

@@ -129,7 +129,10 @@ install_package() {
     go_without "could not download @meawallet/react-native-mpp $MPP_VERSION"
   fi
 
-  integrity=$(openssl dgst -sha512 -binary "$work/package.tgz" | openssl base64 -A)
+  # Hashed with node, the one tool every yarn install has: the CI image ships no openssl.
+  # A hash that cannot be computed is a mismatch, never an install that dies half done.
+  integrity=$(node -e 'process.stdout.write(require("crypto").createHash("sha512").update(require("fs").readFileSync(process.argv[1])).digest("base64"))' "$work/package.tgz") ||
+    integrity=""
   if [ "$integrity" != "$MPP_INTEGRITY" ]; then
     go_without "integrity mismatch for @meawallet/react-native-mpp $MPP_VERSION"
   fi
