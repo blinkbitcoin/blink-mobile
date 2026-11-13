@@ -181,6 +181,41 @@ describe("IncomingTransactionSplashProvider", () => {
     expect(mockOverlay?.splash.transaction.id).toBe("b:1")
   })
 
+  it("puts a batch that lands while a splash is up in line behind it, in order", () => {
+    const splash = renderProvider()
+    const deposit = (id: string) =>
+      candidate({ transaction: { ...candidate().transaction, id } })
+
+    act(() => splash.showSplashes([deposit("a:0"), deposit("b:1")]))
+    act(() => splash.showSplashes([deposit("c:0"), deposit("d:1")]))
+
+    const closeAndRead = () => {
+      act(() => mockOverlay?.onClose({ optedOut: false }))
+      return mockOverlay?.splash.transaction.id
+    }
+    expect(mockOverlay?.splash.transaction.id).toBe("a:0")
+    expect([closeAndRead(), closeAndRead(), closeAndRead()]).toEqual([
+      "b:1",
+      "c:0",
+      "d:1",
+    ])
+  })
+
+  it("puts a second batch in line even before the first one renders", () => {
+    const splash = renderProvider()
+    const deposit = (id: string) =>
+      candidate({ transaction: { ...candidate().transaction, id } })
+
+    act(() => {
+      splash.showSplashes([deposit("a:0")])
+      splash.showSplashes([deposit("b:1")])
+    })
+    expect(mockOverlay?.splash.transaction.id).toBe("a:0")
+
+    act(() => mockOverlay?.onClose({ optedOut: false }))
+    expect(mockOverlay?.splash.transaction.id).toBe("b:1")
+  })
+
   it("drops the rest of a batch on opt-out", () => {
     const splash = renderProvider()
     const deposit = (id: string) =>

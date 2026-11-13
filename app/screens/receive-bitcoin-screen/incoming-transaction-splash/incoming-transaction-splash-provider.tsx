@@ -48,6 +48,9 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
   const seenIds = useRef(new Set<string>())
   /** Payments that came in one event behind the one on screen, shown in turn on Close. */
   const queued = useRef<ShownSplash[]>([])
+  /** Whether a splash is up, set with every change of `shown` so two events in one
+   *  tick see each other before the render. */
+  const onScreen = useRef(false)
   const splashHashes = useRef(new Set<string>())
   const foregroundSince = useRef(Date.now())
 
@@ -67,6 +70,7 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
 
   const dismiss = useCallback(() => {
     queued.current = []
+    onScreen.current = false
     setShown(null)
   }, [])
 
@@ -144,6 +148,7 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
     (candidate: SplashCandidate) => {
       const next = accept(candidate)
       if (!next) return false
+      onScreen.current = true
       setShown(next)
       return true
     },
@@ -151,14 +156,21 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
   )
 
   /** Several payments in one event, such as a batch of deposits: the first goes on
-   *  screen and the rest follow it on Close. Payments that arrive one by one still
-   *  replace each other. */
+   *  screen and the rest follow it on Close. A batch that lands while a splash is up
+   *  waits in line behind it, in order. Payments that arrive one by one still replace
+   *  each other. */
   const showSplashes = useCallback(
     (candidates: readonly SplashCandidate[]) => {
-      const [first, ...rest] = candidates
+      const accepted = candidates
         .map(accept)
         .filter((next): next is ShownSplash => next !== null)
+      if (onScreen.current) {
+        queued.current.push(...accepted)
+        return
+      }
+      const [first, ...rest] = accepted
       if (!first) return
+      onScreen.current = true
       setShown(first)
       queued.current.push(...rest)
     },
@@ -187,7 +199,9 @@ export const IncomingTransactionSplashProvider: React.FC<PropsWithChildren> = ({
         logIncomingTransactionSplashOptedOut({ source: "splash" })
         queued.current = []
       }
-      setShown(queued.current.shift() ?? null)
+      const next = queued.current.shift() ?? null
+      onScreen.current = next !== null
+      setShown(next)
     },
     [settings, LL],
   )
