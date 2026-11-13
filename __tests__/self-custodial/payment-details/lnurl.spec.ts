@@ -73,11 +73,18 @@ const { findLostSend: actualFindLostSend } = jest.requireActual<
   typeof import("@app/self-custodial/payment-details/lost-send")
 >("@app/self-custodial/payment-details/lost-send")
 
+/** Storage holding nothing from an earlier launch, and keeping nothing for the next. */
+const noStoredAttempts = {
+  load: async () => new Map(),
+  save: async () => undefined,
+  remove: async () => undefined,
+}
+
 /** Lost attempts are kept for the connected wallet for as long as the app runs, which
  *  here is the whole file: every test connects a wallet of its own, holding none. */
 let connectedWallets = 0
 beforeEach(() => {
-  scopeLostAttemptsTo(`wallet-${(connectedWallets += 1)}`)
+  scopeLostAttemptsTo(`wallet-${(connectedWallets += 1)}`, noStoredAttempts)
 })
 
 jest.mock("@app/utils/sleep", () => ({ sleep: () => Promise.resolve() }))

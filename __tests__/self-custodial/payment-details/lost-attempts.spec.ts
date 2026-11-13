@@ -448,7 +448,7 @@ describe("lost attempts across app launches", () => {
     )
   })
 
-  it("writes nothing this launch when the read fails twice, keeping what storage holds", async () => {
+  it("writes nothing while the read has failed, keeping what storage holds", async () => {
     const save = jest.fn(async () => undefined)
     scopeLostAttemptsTo("wallet-launch-13", {
       load: () => Promise.reject(new Error("io")),
@@ -543,17 +543,198 @@ describe("lost attempts across app launches", () => {
     expect(remove).not.toHaveBeenCalled()
   })
 
-  it("still sends when the wallet's storage cannot be read", async () => {
+  /** The send itself refuses to go out: the queue only orders sends. */
+  it("tells the stored attempts unread once the read failed twice", async () => {
     scopeLostAttemptsTo("wallet-launch-6", {
       load: () => Promise.reject(new Error("io")),
       save: async () => undefined,
       remove: removeNothing,
     })
 
-    await expect(lostAttemptsFor("sp1abc").oneAtATime(async () => "sent")).resolves.toBe(
-      "sent",
+    await expect(lostAttemptsFor("sp1abc").oneAtATime(async () => "ran")).resolves.toBe(
+      "ran",
     )
+    expect(lostAttemptsFor("sp1abc").isStoredRead()).toBe(false)
     expect(lostAttemptsTo("sp1abc")).toEqual({})
+  })
+
+  it("reads again on a retry once the read failed, restoring and writing as usual after", async () => {
+    const { storage: answering, saves } = storageHolding({
+      "wallet-launch-20": new Map([["sp1old", { unresolvedSend }]]),
+    })
+    const load = jest
+      .fn()
+      .mockRejectedValueOnce(new Error("io"))
+      .mockRejectedValueOnce(new Error("io"))
+      .mockImplementation(answering.load)
+    scopeLostAttemptsTo("wallet-launch-20", { ...answering, load })
+    await nextTurn()
+    const handle = lostAttemptsFor("sp1new")
+    expect(handle.isStoredRead()).toBe(false)
+
+    await handle.retryStorage()
+    remember("sp1new", { unresolvedSend })
+    await nextTurn()
+
+    expect(load).toHaveBeenCalledTimes(3)
+    expect(handle.isStoredRead()).toBe(true)
+    expect(saves.at(-1)).toEqual([
+      "wallet-launch-20",
+      new Map([
+        ["sp1old", { unresolvedSend }],
+        ["sp1new", { unresolvedSend }],
+      ]),
+    ])
+  })
+
+  it("reads again on each retry while the read keeps failing", async () => {
+    const load = jest.fn().mockRejectedValue(new Error("io"))
+    scopeLostAttemptsTo("wallet-launch-21", {
+      load,
+      save: async () => undefined,
+      remove: removeNothing,
+    })
+    await nextTurn()
+
+    await lostAttemptsFor("sp1abc").retryStorage()
+    await lostAttemptsFor("sp1abc").retryStorage()
+
+    expect(load).toHaveBeenCalledTimes(6)
+    expect(lostAttemptsFor("sp1abc").isStoredRead()).toBe(false)
+  })
+
+  it("reads nothing again on a retry once read, nor while the read is still waited for", async () => {
+    let answer: (stored: Map<string, LostAttempts>) => void = () => undefined
+    const load = jest.fn(
+      () =>
+        new Promise<Map<string, LostAttempts>>((resolve) => {
+          answer = resolve
+        }),
+    )
+    scopeLostAttemptsTo("wallet-launch-22", {
+      load,
+      save: async () => undefined,
+      remove: removeNothing,
+    })
+
+    await lostAttemptsFor("sp1abc").retryStorage()
+    answer(new Map())
+    await nextTurn()
+    await lostAttemptsFor("sp1abc").retryStorage()
+
+    expect(load).toHaveBeenCalledTimes(1)
+  })
+
+  it("waits for a read another retry started, while it runs", async () => {
+    let answer: (stored: Map<string, LostAttempts>) => void = () => undefined
+    const load = jest
+      .fn()
+      .mockRejectedValueOnce(new Error("io"))
+      .mockRejectedValueOnce(new Error("io"))
+      .mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            answer = resolve
+          }),
+      )
+    scopeLostAttemptsTo("wallet-launch-26", {
+      load,
+      save: async () => undefined,
+      remove: removeNothing,
+    })
+    await nextTurn()
+
+    const first = lostAttemptsFor("sp1abc").retryStorage()
+    let isSecondOver = false
+    const second = lostAttemptsFor("sp1def")
+      .retryStorage()
+      .then(() => {
+        isSecondOver = true
+      })
+    await nextTurn()
+    expect(isSecondOver).toBe(false)
+    answer(new Map())
+    await Promise.all([first, second])
+
+    expect(load).toHaveBeenCalledTimes(3)
+    expect(lostAttemptsFor("sp1def").isStoredRead()).toBe(true)
+  })
+
+  it("waits for a retry's read only so long", async () => {
+    jest.useFakeTimers()
+    const load = jest
+      .fn()
+      .mockRejectedValueOnce(new Error("io"))
+      .mockRejectedValueOnce(new Error("io"))
+      .mockImplementation(
+        () =>
+          new Promise(() => {
+            /** never answers */
+          }),
+      )
+    scopeLostAttemptsTo("wallet-launch-23", {
+      load,
+      save: async () => undefined,
+      remove: removeNothing,
+    })
+    await jest.advanceTimersByTimeAsync(0)
+
+    let isRetryOver = false
+    lostAttemptsFor("sp1abc")
+      .retryStorage()
+      .then(() => {
+        isRetryOver = true
+      })
+    await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_READ_TIMEOUT_MS - 1)
+    expect(isRetryOver).toBe(false)
+    await jest.advanceTimersByTimeAsync(1)
+
+    expect(isRetryOver).toBe(true)
+    expect(lostAttemptsFor("sp1abc").isStoredRead()).toBe(false)
+  })
+
+  it("waits out a read started again that does not answer only once", async () => {
+    jest.useFakeTimers()
+    const load = jest
+      .fn()
+      .mockRejectedValueOnce(new Error("io"))
+      .mockRejectedValueOnce(new Error("io"))
+      .mockImplementation(
+        () =>
+          new Promise(() => {
+            /** never answers */
+          }),
+      )
+    scopeLostAttemptsTo("wallet-launch-29", {
+      load,
+      save: async () => undefined,
+      remove: removeNothing,
+    })
+    await jest.advanceTimersByTimeAsync(0)
+    const firstRetry = lostAttemptsFor("sp1abc").retryStorage()
+    await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_READ_TIMEOUT_MS)
+    await firstRetry
+
+    let isSecondOver = false
+    lostAttemptsFor("sp1abc")
+      .retryStorage()
+      .then(() => {
+        isSecondOver = true
+      })
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(isSecondOver).toBe(true)
+    expect(load).toHaveBeenCalledTimes(3)
+    expect(lostAttemptsFor("sp1abc").isStoredRead()).toBe(false)
+  })
+
+  it("has nothing to read again before any wallet connected", async () => {
+    let fresh: typeof import("@app/self-custodial/payment-details/lost-attempts")
+    jest.isolateModules(() => {
+      fresh = jest.requireActual("@app/self-custodial/payment-details/lost-attempts")
+    })
+
+    await expect(fresh!.lostAttemptsFor("sp1abc").retryStorage()).resolves.toBeUndefined()
   })
 })
 

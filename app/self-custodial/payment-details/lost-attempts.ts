@@ -105,8 +105,8 @@ const deviceStorage: LostAttemptsStorage = {
 }
 
 /** How long a send waits for the stored attempts; past it, it is refused until they
- *  have been read back. A read that failed twice lets sends go on with this launch's
- *  attempts alone: storage that cannot be read holds back much more than these. */
+ *  have been read back. A read that failed is read again by the next send, waited for
+ *  as long. */
 export const STORED_ATTEMPTS_READ_TIMEOUT_MS = 5000
 
 /** How many times a write that failed is tried again before it is given up on, and how
@@ -116,7 +116,8 @@ export const STORED_ATTEMPTS_WRITE_RETRY_DELAY_MS = 500
 
 /**
  * How a wallet's attempts reach storage. `readSettled`: the read of what an earlier launch
- * left, as long as a send waits for it. `isRead`: whether that read has answered. `keep`:
+ * left, as long as a send waits for it. `isRead`: whether that read has read them back.
+ * `retry`: reads them again if that read failed, as long as a send waits for it. `keep`:
  * stores the attempts as they are now, after every write before it. `forget`: writes
  * nothing more, as the wallet's deletion asks, and removes again what a write already in
  * flight stores.
@@ -124,9 +125,14 @@ export const STORED_ATTEMPTS_WRITE_RETRY_DELAY_MS = 500
 type WalletPersistence = {
   readSettled: Promise<void>
   isRead: () => boolean
+  retry: () => Promise<void>
   keep: () => void
   forget: () => void
 }
+
+/** Where the read of what an earlier launch left stands. A failed one is read again by
+ *  the next send. */
+type StoredRead = "pending" | "read" | "failed"
 
 const persistenceOf = new WeakMap<Map<string, LostAttempts>, WalletPersistence>()
 
@@ -200,12 +206,15 @@ const noop = () => undefined
  * How a wallet's attempts are read back and kept between app launches.
  *
  * Read once the wallet connects. Sends wait for the read only so long, then are refused
- * until it has answered: one that never answers must not hold a send pending for good.
+ * until it has read the attempts back: one that never answers must not hold a send
+ * pending for good, and one that failed is no proof nothing was lost. A read that failed
+ * is tried once more at once; if that fails too, each send reads again, and is refused
+ * if that fails as well.
  *
- * Writes wait for the read whatever it takes: until it answers, nothing is known of what
- * an earlier launch kept, and a write would replace it with this launch's attempts alone.
- * A read that failed is tried once more; if that fails too, nothing is written this
- * launch, for the same reason, and the attempts are kept in memory only. Writes queue
+ * Writes wait for the read whatever it takes: until it has read the attempts back,
+ * nothing is known of what an earlier launch kept, and a write would replace it with this
+ * launch's attempts alone. Nothing is written while the read has failed, for the same
+ * reason; no send goes out meanwhile, so there is nothing to write either. Writes queue
  * behind each other, and each writes the attempts as they are when its turn comes, so
  * the last one stored is the latest state. A write that fails is tried again a few
  * times, each a little later: what it does not keep, the next launch does not know. Past
@@ -216,32 +225,49 @@ const persistWalletAttempts = (
   held: Map<string, LostAttempts>,
   storage: LostAttemptsStorage,
 ): WalletPersistence => {
-  let isReadable = true
-  let hasReadAnswered = false
+  let storedRead: StoredRead = "pending"
   let isForgotten = false
   /** Nothing is recorded before the read has answered, since no send goes out before. */
-  const restore = (stored: Map<string, LostAttempts>) =>
+  const restore = (stored: Map<string, LostAttempts>) => {
     stored.forEach((attempts, destination) => {
       if (!held.has(destination)) held.set(destination, attempts)
     })
+    storedRead = "read"
+  }
 
-  const readBack: Promise<void> = storage
-    .load(walletId)
-    .then(restore, () =>
-      storage.load(walletId).then(restore, () => {
-        isReadable = false
-      }),
+  const readBack = (): Promise<void> =>
+    storage
+      .load(walletId)
+      .catch(() => storage.load(walletId))
+      .then(restore, () => {
+        storedRead = "failed"
+      })
+  const waitForRead = (read: Promise<void>) =>
+    withTimeout(read, STORED_ATTEMPTS_READ_TIMEOUT_MS, "Lost attempts read").then(
+      noop,
+      noop,
     )
-    .finally(() => {
-      hasReadAnswered = true
-    })
-  const readSettled = withTimeout(
-    readBack,
-    STORED_ATTEMPTS_READ_TIMEOUT_MS,
-    "Lost attempts read",
-  ).then(noop, noop)
 
-  const mayWrite = () => isReadable && !isForgotten
+  const firstRead = readBack()
+
+  /** The read a send started again, which every send waits for while it runs, until one
+   *  has waited it out. Like a first read that never answers, it is then not waited for
+   *  again: each send would wait it out. */
+  let readAgain: Promise<void> | undefined
+  const retry = (): Promise<void> => {
+    if (storedRead === "failed") {
+      storedRead = "pending"
+      readAgain = readBack()
+    }
+    const readAgainRunning = storedRead === "pending" ? readAgain : undefined
+    if (!readAgainRunning) return Promise.resolve()
+    return waitForRead(readAgainRunning).then(() => {
+      const isStillUnanswered = readAgain === readAgainRunning && storedRead === "pending"
+      if (isStillUnanswered) readAgain = undefined
+    })
+  }
+
+  const mayWrite = () => storedRead === "read" && !isForgotten
 
   /** A write already in flight as the wallet was forgotten would put back what its
    *  deletion removed: what it stored is removed again once it has landed. */
@@ -262,10 +288,11 @@ const persistWalletAttempts = (
     }
   }
 
-  let lastWrite: Promise<void> = readBack.catch(noop)
+  let lastWrite: Promise<void> = firstRead
   return {
-    readSettled,
-    isRead: () => hasReadAnswered,
+    readSettled: waitForRead(firstRead),
+    isRead: () => storedRead === "read",
+    retry,
     keep: () => {
       lastWrite = lastWrite.then(write).catch(noop)
     },
@@ -306,6 +333,9 @@ export type LostAttemptsHandle = {
   /** Whether the attempts an earlier launch left have been read back: until then, what
    *  `read` answers may be missing some. */
   isStoredRead: () => boolean
+  /** Reads the attempts an earlier launch left again if their read failed, as long as a
+   *  send waits for it. */
+  retryStorage: () => Promise<void>
   /** Applied to what the destination holds when it is written, not when it was read. */
   update: (change: (current: LostAttempts) => LostAttempts) => void
   /**
@@ -348,6 +378,7 @@ export const lostAttemptsFor = (destination: string): LostAttemptsHandle => {
   return {
     read,
     isStoredRead: () => persistenceOf.get(byDestination)?.isRead() ?? true,
+    retryStorage: () => persistenceOf.get(byDestination)?.retry() ?? Promise.resolve(),
     update: (change) => {
       const next = change(read())
       const holdsAnAttempt = Boolean(next.lostSend || next.unresolvedSend)

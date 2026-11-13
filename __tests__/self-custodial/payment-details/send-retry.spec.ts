@@ -171,12 +171,18 @@ const sentKeys = () =>
 const lookupMatches = (callIndex: number, payment: unknown): boolean =>
   mockFindLostSend.mock.calls[callIndex][0].matches(payment)
 
+/** Storage holding nothing from an earlier launch, and keeping nothing for the next. */
+const noStoredAttempts = {
+  load: async () => new Map(),
+  save: async () => undefined,
+  remove: async () => undefined,
+}
 let connectedWallets = 0
 beforeEach(() => {
   jest.clearAllMocks()
   /** Lost attempts are kept for the connected wallet for as long as the app runs, which
    *  here is the whole file: every test connects a wallet of its own, holding none. */
-  scopeLostAttemptsTo(`wallet-${(connectedWallets += 1)}`)
+  scopeLostAttemptsTo(`wallet-${(connectedWallets += 1)}`, noStoredAttempts)
 })
 
 describe("a bitcoin send carries the attempt's idempotency key", () => {
@@ -1036,7 +1042,7 @@ describe("a send that finishes after a switch of wallet", () => {
           }),
       )
       .mockResolvedValue(sent())
-    scopeLostAttemptsTo("wallet-a")
+    scopeLostAttemptsTo("wallet-a", noStoredAttempts)
     const first = {}
     const late = attempt(
       createSendMutation(usdSpark, { telemetry: TELEMETRY, idempotencyKeyRef: first }),
@@ -1044,7 +1050,7 @@ describe("a send that finishes after a switch of wallet", () => {
     )
     await new Promise(setImmediate)
 
-    scopeLostAttemptsTo("wallet-b")
+    scopeLostAttemptsTo("wallet-b", noStoredAttempts)
     throwLate(lostResponse())
     await late
     const second = {}
@@ -1711,6 +1717,56 @@ describe("a send asked for before the wallet's stored attempts were read back", 
 
     expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.Generic)
     expect(mockSendPayment).not.toHaveBeenCalled()
+  })
+
+  /** A read that failed is no proof nothing was lost: storage may hold this very send,
+   *  paid already. */
+  it("is refused, sending nothing, when that read failed and fails again", async () => {
+    const load = jest.fn().mockRejectedValue(new Error("io"))
+    scopeLostAttemptsTo(`wallet-failed-read-${(connectedWallets += 1)}`, {
+      load,
+      save: async () => undefined,
+      remove: async () => undefined,
+    })
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress())
+    mockSendPayment.mockResolvedValue(sent())
+    const ref = {}
+
+    const result = await attempt(
+      createSendMutation(btcSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
+
+    expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.Generic)
+    expect(mockSendPayment).not.toHaveBeenCalled()
+    expect(load).toHaveBeenCalledTimes(4)
+  })
+
+  it("reads them again when that read failed, and goes on with what it reads back", async () => {
+    const load = jest
+      .fn()
+      .mockRejectedValueOnce(new Error("io"))
+      .mockRejectedValueOnce(new Error("io"))
+      .mockResolvedValue(
+        new Map([["sp1abc", { unresolvedSend: { idempotencyKey: undefined } }]]),
+      )
+    scopeLostAttemptsTo(`wallet-failed-read-${(connectedWallets += 1)}`, {
+      load,
+      save: async () => undefined,
+      remove: async () => undefined,
+    })
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress())
+    mockSendPayment.mockResolvedValue(sent())
+    const ref = {}
+
+    const result = await attempt(
+      createSendMutation(btcSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
+
+    expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.OutcomeUnknown)
+    expect(mockSendPayment).not.toHaveBeenCalled()
+    expect(load).toHaveBeenCalledTimes(3)
   })
 })
 
