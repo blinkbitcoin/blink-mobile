@@ -50,7 +50,9 @@ const lightSemantic = {
   // Field fills darkened by design ruling (Nov 2026) to improve contrast
   // against backgroundDefault; surfaceStatic stays lighter than surfaceInteractive.
   surfaceInteractive: "#ECECEE", // tappable surface, at rest
-  surfacePressed: "#E7E7E7", // surfaceInteractive while held — transient only
+  // Darkened with surfaceInteractive (design ruling, Nov 2026) to keep the old
+  // #F2F2F4 → #E7E7E7 step of 1.1:1. Pressed and focused fills share it.
+  surfacePressed: "#E1E1E3", // surfaceInteractive while held — transient only
   surfaceStatic: "#F2F2F2", // cannot be tapped, ever — cards, banners, read-only
 
   accent: "#fc5805",
