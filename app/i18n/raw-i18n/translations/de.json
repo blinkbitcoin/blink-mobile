@@ -2696,7 +2696,15 @@
         "findingAccount": "Konto für diese Zahlung wird gesucht...",
         "txNotFoundInAccounts": "Diese Zahlung wurde in keinem Konto auf diesem Gerät gefunden. Möglicherweise gehört sie zu einem abgemeldeten Konto.",
         "txLoadFailed": "Diese Zahlung konnte nicht geladen werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
-        "switchedForPayment": "Zu {identifier: string} gewechselt, um diese Zahlung anzuzeigen"
+        "switchedForPayment": "Zu {identifier: string} gewechselt, um diese Zahlung anzuzeigen",
+        "customLabel": "Eigenes Label",
+        "depositFee": "Einzahlungsgebühr",
+        "time": "Uhrzeit",
+        "transactionId": "Transaktions-ID",
+        "hash": "Hash",
+        "blinkInternalId": "Blink-interne ID",
+        "copyAllData": "Alle Daten kopieren",
+        "allData": "Transaktionsdetails"
     },
     "FeeRatesScreen": {
         "title": "Gebührensätze",

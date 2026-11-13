@@ -2696,7 +2696,15 @@
     "findingAccount": "A fizetéshez tartozó fiók keresése...",
     "txNotFoundInAccounts": "Ez a fizetés nem található az eszköz egyik fiókjában sem. Lehet, hogy egy kijelentkezett fiókhoz tartozik.",
     "txLoadFailed": "Nem sikerült betölteni ezt a fizetést. Ellenőrizze a kapcsolatot, és próbálja újra.",
-    "switchedForPayment": "Átváltás erre: {identifier: string}, hogy megjelenjen ez a fizetés"
+    "switchedForPayment": "Átváltás erre: {identifier: string}, hogy megjelenjen ez a fizetés",
+    "customLabel": "Egyéni címke",
+    "depositFee": "Befizetési díj",
+    "time": "Időpont",
+    "transactionId": "Tranzakcióazonosító",
+    "hash": "Hash",
+    "blinkInternalId": "Blink belső azonosító",
+    "copyAllData": "Összes adat másolása",
+    "allData": "Tranzakció részletei"
   },
   "FeeRatesScreen": {
     "title": "Díjszabás",

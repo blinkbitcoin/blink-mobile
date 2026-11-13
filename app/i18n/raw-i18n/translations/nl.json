@@ -2696,7 +2696,15 @@
     "findingAccount": "Account voor deze betaling zoeken...",
     "txNotFoundInAccounts": "Deze betaling is in geen enkel account op dit apparaat gevonden. Mogelijk hoort deze bij een uitgelogd account.",
     "txLoadFailed": "Kan deze betaling niet laden. Controleer uw verbinding en probeer het opnieuw.",
-    "switchedForPayment": "Overgeschakeld naar {identifier: string} om deze betaling te tonen"
+    "switchedForPayment": "Overgeschakeld naar {identifier: string} om deze betaling te tonen",
+    "customLabel": "Eigen label",
+    "depositFee": "Stortingskosten",
+    "time": "Tijd",
+    "transactionId": "Transactie-ID",
+    "hash": "Hash",
+    "blinkInternalId": "Interne Blink-ID",
+    "copyAllData": "Alle gegevens kopiëren",
+    "allData": "Transactiedetails"
   },
   "FeeRatesScreen": {
     "title": "Kostentarieven",

@@ -2696,7 +2696,15 @@
     "findingAccount": "Bu ödemenin hesabı aranıyor...",
     "txNotFoundInAccounts": "Bu ödeme bu cihazdaki hiçbir hesapta bulunamadı. Oturumu kapatılmış bir hesaba ait olabilir.",
     "txLoadFailed": "Bu ödeme yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.",
-    "switchedForPayment": "Bu ödemeyi göstermek için {identifier: string} hesabına geçildi"
+    "switchedForPayment": "Bu ödemeyi göstermek için {identifier: string} hesabına geçildi",
+    "customLabel": "Özel etiket",
+    "depositFee": "Yatırma ücreti",
+    "time": "Zaman",
+    "transactionId": "İşlem kimliği",
+    "hash": "Hash",
+    "blinkInternalId": "Blink dahili kimliği",
+    "copyAllData": "Tüm verileri kopyala",
+    "allData": "İşlem detayları"
   },
   "FeeRatesScreen": {
     "title": "Ücret oranları",

@@ -2696,7 +2696,15 @@
     "findingAccount": "Kay pagopaq cuentata maskachkan...",
     "txNotFoundInAccounts": "Kay pagoqa mana tarikurqachu kay aparatopi ima cuentapipas. Huk lluqsisqa cuentapa kanman.",
     "txLoadFailed": "Kay pagota mana cargayta atikurqachu. Conexionniykita qhaway, hukmanta ruwaykuy.",
-    "switchedForPayment": "{identifier: string}man tikrarqayku kay pagota rikuchinapaq"
+    "switchedForPayment": "{identifier: string}man tikrarqayku kay pagota rikuchinapaq",
+    "customLabel": "Kikiykiq sutichasqan",
+    "depositFee": "Waqaychaypa chiqanakuynin",
+    "time": "Pacha",
+    "transactionId": "Transacción ID",
+    "hash": "Hash",
+    "blinkInternalId": "Blink ukhu ID",
+    "copyAllData": "Tukuy willakuykunata copiay",
+    "allData": "Transacción willaykunakuna"
   },
   "FeeRatesScreen": {
     "title": "Chaninkuna",

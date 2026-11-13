@@ -2696,7 +2696,15 @@
     "findingAccount": "Traženje računa za ovu uplatu...",
     "txNotFoundInAccounts": "Ova uplata nije pronađena ni na jednom računu na ovom uređaju. Možda pripada računu koji je odjavljen.",
     "txLoadFailed": "Ovu uplatu nije moguće učitati. Provjerite vezu i pokušajte ponovno.",
-    "switchedForPayment": "Prebačeno na {identifier: string} za prikaz ove uplate"
+    "switchedForPayment": "Prebačeno na {identifier: string} za prikaz ove uplate",
+    "customLabel": "Vlastita oznaka",
+    "depositFee": "Naknada za polog",
+    "time": "Vrijeme",
+    "transactionId": "ID transakcije",
+    "hash": "Hash",
+    "blinkInternalId": "Interni Blink ID",
+    "copyAllData": "Kopiraj sve podatke",
+    "allData": "Detalji transakcije"
   },
   "FeeRatesScreen": {
     "title": "Stope naknada",

@@ -2696,7 +2696,15 @@
     "findingAccount": "Որոնվում է այս վճարման հաշիվը...",
     "txNotFoundInAccounts": "Այս վճարումը չի գտնվել այս սարքի ոչ մի հաշվում։ Այն կարող է պատկանել դուրս գրված հաշվի։",
     "txLoadFailed": "Չհաջողվեց բեռնել այս վճարումը։ Ստուգեք ձեր կապը և կրկին փորձեք։",
-    "switchedForPayment": "Անցում կատարվեց {identifier: string} հաշվին՝ այս վճարումը ցուցադրելու համար"
+    "switchedForPayment": "Անցում կատարվեց {identifier: string} հաշվին՝ այս վճարումը ցուցադրելու համար",
+    "customLabel": "Անհատական պիտակ",
+    "depositFee": "Ավանդի վճար",
+    "time": "Ժամանակ",
+    "transactionId": "Գործառնության ID",
+    "hash": "Հեշ",
+    "blinkInternalId": "Blink-ի ներքին ID",
+    "copyAllData": "Պատճենել բոլոր տվյալները",
+    "allData": "Գործառնության մանրամասներ"
   },
   "FeeRatesScreen": {
     "title": "Վճարների սակագներ",

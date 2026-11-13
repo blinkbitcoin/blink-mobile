@@ -168,9 +168,6 @@ const useStyles = makeStyles(({ colors }, { buttonWidth }: { buttonWidth: number
     alignItems: "center",
     justifyContent: "center",
   },
-  swipeButtonDisabled: {
-    backgroundColor: "#E4E9EE",
-  },
   swipeText: {
     alignSelf: "center",
     fontSize: 14,

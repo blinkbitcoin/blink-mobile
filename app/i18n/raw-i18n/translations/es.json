@@ -2696,7 +2696,15 @@
         "findingAccount": "Buscando la cuenta de este pago...",
         "txNotFoundInAccounts": "Este pago no se encontró en ninguna cuenta de este dispositivo. Puede pertenecer a una cuenta cuya sesión fue cerrada.",
         "txLoadFailed": "No se pudo cargar este pago. Verifica tu conexión e intenta de nuevo.",
-        "switchedForPayment": "Se cambió a {identifier: string} para mostrar este pago"
+        "switchedForPayment": "Se cambió a {identifier: string} para mostrar este pago",
+        "customLabel": "Etiqueta personalizada",
+        "depositFee": "Comisión de depósito",
+        "time": "Hora",
+        "transactionId": "ID de transacción",
+        "hash": "Hash",
+        "blinkInternalId": "ID interno de Blink",
+        "copyAllData": "Copiar todos los datos",
+        "allData": "Detalles de transacción"
     },
     "FeeRatesScreen": {
         "title": "Tarifas de comisiones",
