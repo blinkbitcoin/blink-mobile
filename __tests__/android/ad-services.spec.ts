@@ -15,6 +15,8 @@ const codeLines = (path: string, blockComment?: RegExp) => {
   return code.split("\n").map((line) => line.trim())
 }
 
+const AUDITED_FIREBASE_BOM = "34.2.0"
+
 const AD_PERMISSIONS = [
   "com.google.android.gms.permission.AD_ID",
   "android.permission.ACCESS_ADSERVICES_AD_ID",
@@ -33,6 +35,12 @@ describe("ads in the Android build", () => {
         analytics_default_allow_ad_personalization_signals: false,
       }),
     )
+  })
+
+  it("keeps the Firebase BoM the ad library audit covered, so re-audit the excluded ad libraries before changing it (see docs/android-firebase-ad-libraries.md)", () => {
+    const rnfbApp = JSON.parse(read("node_modules/@react-native-firebase/app/package.json"))
+
+    expect(rnfbApp.sdkVersions.android.firebase).toBe(AUDITED_FIREBASE_BOM)
   })
 
   it("leaves the ad libraries out of every configuration", () => {
