@@ -21,6 +21,7 @@ declare module "@rn-vui/themed" {
     errorBackground: string
     backdrop: string
     backdropStrong: string
+    scrim: string
 
     // Role tokens — share a value with another token today, do a different job.
     textOnAccent: string
