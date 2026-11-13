@@ -43,9 +43,11 @@ const lightSemantic = {
 
   neutral: "#E2E2E4",
 
-  surfaceInteractive: "#F2F2F4", // tappable surface, at rest
+  // Field fills darkened by design ruling (Nov 2026) to improve contrast
+  // against backgroundDefault; surfaceStatic stays lighter than surfaceInteractive.
+  surfaceInteractive: "#ECECEE", // tappable surface, at rest
   surfacePressed: "#E7E7E7", // surfaceInteractive while held — transient only
-  surfaceStatic: "#F7F7F7", // cannot be tapped, ever — cards, banners, read-only
+  surfaceStatic: "#F2F2F2", // cannot be tapped, ever — cards, banners, read-only
 
   accent: "#fc5805",
 
@@ -53,8 +55,6 @@ const lightSemantic = {
   errorBackground: "#FEE2E2",
 
   warning: "#E18E02",
-
-  info: "#4453E2", // info box tint
 
   loaderForeground: "#ecebeb",
   loaderBackground: "#f3f3f3",
@@ -80,7 +80,7 @@ const darkSemantic = {
 
   surfaceInteractive: "#1d1d1d",
   surfacePressed: "#2B2B2B",
-  surfaceStatic: "#121212",
+  surfaceStatic: "#171717", // lightened by design ruling to improve contrast
 
   accent: "#ffad0d",
 
@@ -88,8 +88,6 @@ const darkSemantic = {
   errorBackground: "#7F1D1D",
 
   warning: "#FFC563",
-
-  info: "#F0F0F7",
 
   loaderForeground: "#3c3b3b",
   loaderBackground: "#131313",
@@ -136,7 +134,6 @@ const legacyAliases = (semantic: typeof lightSemantic | typeof darkSemantic) => 
   _warningLight: semantic.staticWarningBackground,
 
   // the app blues; none of them is the brand blue
-  blue5: semantic.info,
   _blue: semantic.staticBlue,
   _lightBlue: semantic.staticBrightBlue,
   _sky: semantic.staticPaleBlue,
@@ -157,16 +154,24 @@ const roleTokens = (semantic: typeof lightSemantic | typeof darkSemantic) => ({
   success: semantic.staticSuccess,
 })
 
+// Flagged for design review: still the info box tint, with no semantic name yet.
+const legacyBlue5 = {
+  light: { blue5: "#4453E2" },
+  dark: { blue5: "#F0F0F7" },
+}
+
 const light = {
   ...lightSemantic,
   ...roleTokens(lightSemantic),
   ...legacyAliases(lightSemantic),
+  ...legacyBlue5.light,
 }
 
 const dark = {
   ...darkSemantic,
   ...roleTokens(darkSemantic),
   ...legacyAliases(darkSemantic),
+  ...legacyBlue5.dark,
 }
 
 export { light, dark }

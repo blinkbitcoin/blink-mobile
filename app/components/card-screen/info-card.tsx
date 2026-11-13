@@ -3,6 +3,7 @@ import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 const InfoCardSize = {
   Default: "default",
@@ -102,7 +103,7 @@ type StyleProps = {
 const useStyles = makeStyles(
   ({ colors }, { titleColor, isLg, bulletSpacing }: StyleProps) => ({
     container: {
-      backgroundColor: colors.surfaceInteractive,
+      ...staticSurface(colors),
       borderRadius: 8,
       padding: 14,
       gap: 10,

@@ -21,6 +21,7 @@ import {
 } from "@app/navigation/stack-param-lists"
 import { AccountTypeMode } from "@app/types/account"
 import { testProps } from "@app/utils/testProps"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 import { PhoneLoginInitiateType } from "../phone-auth-screen"
 
@@ -175,7 +176,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: 20,
   },
   banner: {
-    backgroundColor: colors.surfaceInteractive,
+    ...staticSurface(colors),
     borderRadius: 8,
     paddingHorizontal: 14,
     paddingVertical: 12,

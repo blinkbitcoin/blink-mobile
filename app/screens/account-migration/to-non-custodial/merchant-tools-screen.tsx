@@ -11,6 +11,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { useMigrationNextStep } from "@app/screens/account-migration/hooks"
 import { StepLayout } from "@app/components/step-layout"
 import { testProps } from "@app/utils/testProps"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 const TOOLS_DIVIDER_WIDTH = 1
 
@@ -113,7 +114,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingBottom: 20,
   },
   toolsCard: {
-    backgroundColor: colors.surfaceInteractive,
+    ...staticSurface(colors),
     borderRadius: 8,
     overflow: "hidden",
   },

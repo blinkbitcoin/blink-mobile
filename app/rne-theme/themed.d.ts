@@ -16,7 +16,6 @@ declare module "@rn-vui/themed" {
     surfaceStatic: string
     accent: string
     errorBackground: string
-    info: string
     backdrop: string
     backdropStrong: string
 
@@ -82,7 +81,7 @@ declare module "@rn-vui/themed" {
     /** @deprecated use backdropStrong */
     backdropWhiter: string
 
-    /** @deprecated use info */
+    /** @deprecated flagged for design review — not the brand blue, do not use */
     blue5: string
 
     /** @deprecated use staticWhite */

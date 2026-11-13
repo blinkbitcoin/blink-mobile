@@ -22,7 +22,7 @@ export const GaloyInfo: React.FC<GaloyInfoProps> = ({ children, isWarning }) => 
         <Text
           style={styles.textContainer}
           type={"p3"}
-          color={isWarning ? colors.warning : colors.info}
+          color={isWarning ? colors.warning : colors.blue5}
         >
           {children}
         </Text>
@@ -54,7 +54,7 @@ const useStyles = makeStyles(({ colors }, props: StyleProps) => ({
     width: 3,
     borderTopLeftRadius: 3,
     borderBottomLeftRadius: 3,
-    backgroundColor: props.isWarning ? colors.warning : colors.info,
+    backgroundColor: props.isWarning ? colors.warning : colors.blue5,
     height: "100%",
   },
   textContainer: {

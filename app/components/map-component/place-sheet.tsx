@@ -462,7 +462,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   requiresAppLink: {
     // Restated rather than inherited: the themed Text falls back to black, not
     // to the surrounding GaloyInfo tint.
-    color: colors.info,
+    color: colors.blue5,
     fontWeight: "700",
     textDecorationLine: "underline",
   },
