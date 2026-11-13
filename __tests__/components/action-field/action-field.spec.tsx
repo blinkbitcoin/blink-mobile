@@ -172,4 +172,33 @@ describe("ActionField", () => {
       expect(toJSON()).toBeTruthy()
     })
   })
+
+  describe("screen reader", () => {
+    it("reads the field as a button named by its value, saying what it does", () => {
+      const { getByLabelText, queryByLabelText } = render(
+        <ActionField
+          {...defaultProps}
+          label="Destination - Lightning"
+          value="alice@blink.sv"
+          valueTestID="send-review-destination"
+          actionHint="Copy"
+        />,
+      )
+
+      const field = getByLabelText("alice@blink.sv")
+      expect(field.props.accessibilityRole).toBe("button")
+      expect(field.props.accessibilityHint).toBe("Copy")
+      expect(queryByLabelText("send-review-destination")).toBeNull()
+    })
+
+    it("reports an empty field as disabled, with no hint", () => {
+      const { getByRole } = render(
+        <ActionField {...defaultProps} value={null} actionHint="Copy" />,
+      )
+
+      const field = getByRole("button")
+      expect(field.props.accessibilityState).toEqual({ disabled: true })
+      expect(field.props.accessibilityHint).toBeUndefined()
+    })
+  })
 })

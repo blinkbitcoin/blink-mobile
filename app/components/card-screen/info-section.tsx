@@ -5,18 +5,29 @@ import { makeStyles, Text } from "@rn-vui/themed"
 import { InfoRow } from "./info-row"
 import { staticSurface } from "@app/rne-theme/surfaces"
 
+export const INFO_SECTION_OUTLINE_TEST_ID = "info-section-outline"
+
 type InfoItem = {
   label: string
   value: string
   valueColor?: string
+  loading?: boolean
+  valueTestId?: string
 }
 
 type InfoSectionProps = {
   title: string
   items: InfoItem[]
+  /** Outlines the card. The outline is drawn over the card rather than as its border, so
+   *  it appearing or changing colour never moves the rows. */
+  outlineColor?: string
 }
 
-export const InfoSection: React.FC<InfoSectionProps> = ({ title, items }) => {
+export const InfoSection: React.FC<InfoSectionProps> = ({
+  title,
+  items,
+  outlineColor,
+}) => {
   const styles = useStyles()
 
   return (
@@ -29,8 +40,17 @@ export const InfoSection: React.FC<InfoSectionProps> = ({ title, items }) => {
             label={item.label}
             value={item.value}
             valueColor={item.valueColor}
+            loading={item.loading}
+            valueTestId={item.valueTestId}
           />
         ))}
+        {outlineColor ? (
+          <View
+            testID={INFO_SECTION_OUTLINE_TEST_ID}
+            pointerEvents="none"
+            style={[styles.outline, { borderColor: outlineColor }]}
+          />
+        ) : null}
       </View>
     </View>
   )
@@ -53,5 +73,14 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 10,
     paddingVertical: 14,
     gap: 14,
+  },
+  outline: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    borderRadius: 8,
+    borderWidth: 1,
   },
 }))

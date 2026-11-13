@@ -2357,11 +2357,36 @@
     "maxFeeSelected": "Αυτή είναι τα περισσότερα τέλη που θα χρεωθείτε για αυτή τη συναλλαγή. Μπορεί να είναι λιγότερα όταν πραγματοποιηθεί η πληρωμή.",
     "invoiceAlreadyPaid": "Αυτό το τιμολόγιο έχει ήδη πληρωθεί",
     "somethingWentWrong": "Κάτι πήγε στραβά",
+    "priceUpdated": "Η τιμή άλλαξε, οπότε τα ποσά ενημερώθηκαν. Ελέγξτε τα πριν από την αποστολή.",
     "paymentAlreadyAttempted": "Η πληρωμή έχει ήδη επιχειρηθεί.\n\nΑν θέλετε να στείλετε ξανά αυτή την πληρωμή, ξεκινήστε από την αρχή.",
+    "paymentMayStillLand": "Περιμένετε λίγο, πιθανότατα θα ολοκληρωθεί σύντομα. Τα χρήματά σας θα φτάσουν με ασφάλεια ή θα μείνουν σε εσάς.",
     "slideToConfirm": "Σύρετε για επιβεβαίωση",
     "slideConfirming": "Επιβεβαίωση...",
+    "slideToSend": "Σύρετε για αποστολή",
+    "calculatingFee": "Υπολογισμός τελών…",
+    "sendProgress": {
+      "reviewing": "Έλεγχος",
+      "signing": "Υπογραφή",
+      "findingRoute": "Εύρεση διαδρομής",
+      "broadcasting": "Μετάδοση",
+      "checkingDelivery": "Έλεγχος παράδοσης",
+      "retrying": "Νέα προσπάθεια",
+      "almostThere": "Σχεδόν έτοιμο",
+      "anyTimeNow": "Από στιγμή σε στιγμή",
+      "ohOh": "Ωχ",
+      "tryingAgain": "Δοκιμάζουμε ξανά"
+    },
     "copiedDestination": "Αντιγραφή προορισμού στο πρόχειρο",
-    "lightningRecommended": "Υψηλή τέλη! Συνιστούμε το Lightning.",
+    "lightningRecommended": "Υψηλή τέλη. Συνιστούμε το Lightning.",
+    "sending": "Αποστολή",
+    "sent": "Εστάλη",
+    "receipt": "Απόδειξη",
+    "fromBalance": "Από το υπόλοιπο",
+    "details": "Λεπτομέρειες",
+    "changeAmount": "Αλλαγή ποσού",
+    "tryAgain": "Δοκιμάστε ξανά",
+    "home": "Αρχική σελίδα",
+    "dustSweepSheetTitle": "Πριν στείλετε",
     "usdRemainderSweep": "Υπόλοιπο {remaining: string} ({remainingSats: string}) θα μετατραπεί σε Bitcoin. Ελάχιστο USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2405,8 +2430,15 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Η συναλλαγή πρέπει να υποβληθεί στη mempool",
     "amount": "Ποσό",
+    "addAmount": "Προσθήκη ποσού",
+    "lowFunds": "Ανεπαρκές υπόλοιπο",
     "amountExceed": "Το ποσό υπερβαίνει το υπόλοιπό σας {balance: string}",
     "amountExceedsLimit": "Το ποσό υπερβαίνει το εναπομένον όριο των {limit: string}",
+    "limitsUnavailable": "Δεν μπορέσαμε να ελέγξουμε το ημερήσιο όριό σας. Δοκιμάστε ξανά σε λίγο.",
+    "problemSheetTitle": "Ένα μικρό πρόβλημα",
+    "changeDestination": "Αλλαγή προορισμού",
+    "recipientUnreachableTitle": "Δεν ήταν δυνατή η επικοινωνία με τον παραλήπτη",
+    "recipientWrongAmountTitle": "Ο παραλήπτης όρισε λάθος ποσό",
     "upgradeAccountToIncreaseLimit": "Αναβαθμίστε τον λογαριασμό σας για να αυξήσετε το όριο σας ",
     "amountIsRequired": "Απαιτείται ποσό",
     "cost": "Kόστος",
@@ -2425,10 +2457,11 @@
     "title": "Αποστολή Bitcoin",
     "failedToFetchLnurlInvoice": "Απέτυχε η λήψη τιμολογίου lnurl",
     "lnurlInvoiceIncorrectAmount": "Ο διακομιστής lnurl απάντησε με ένα τιμολόγιο με λανθασμένο ποσό.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Συναγερμός υψηλών τελών! ",
-      "content": "Τα τέλη σας είναι περισσότερα από το 50% του ποσού που στάλθηκε. Είστε σίγουροι ότι θέλετε να προχωρήσετε;\n\nΓια να μειώσετε τα τέλη, ζητήστε από τον παραλήπτη να αποδεχτεί τη συναλλαγή μέσω Lightning",
-      "confirmButton": "Είμαι 100% σίγουρος/η"
+      "body": "Τα τέλη σας είναι το 50% ή περισσότερο του ποσού που στέλνετε. Είστε σίγουροι ότι θέλετε να συνεχίσετε;",
+      "cancelPayment": "Ακύρωση πληρωμής",
+      "acceptFee": "Αποδοχή τελών"
     },
     "copiedDestination": "Αντιγραφή προορισμού στο πρόχειρο",
     "pendingPayment": "Η πληρωμή έχει σταλεί, αλλά δεν έχει επιβεβαιωθεί ακόμη.\n\nΕίναι πιθανό η πληρωμή να μην επιβεβαιωθεί, οπότε τα χρήματα θα επιστραφούν στο λογαριασμό σας.",
@@ -2456,7 +2489,8 @@
     "sdkInsufficientFunds": "Ανεπαρκές υπόλοιπο για αυτήν τη συναλλαγή.",
     "sdkAmountTooLow": "Το ποσό είναι πολύ μικρό για μια συναλλαγή on-chain.",
     "sdkNetworkError": "Σφάλμα δικτύου. Ελέγξτε τη σύνδεσή σας και δοκιμάστε ξανά.",
-    "sdkGenericError": "Αδυναμία εκτίμησης τελών. Δοκιμάστε διαφορετικό ποσό."
+    "sdkGenericError": "Αδυναμία εκτίμησης τελών. Δοκιμάστε διαφορετικό ποσό.",
+    "onchainSelfPayment": "Αυτή είναι η διεύθυνση του δικού σας πορτοφολιού. Δεν μπορείτε να στείλετε πληρωμή on-chain στον εαυτό σας."
   },
   "SettingsScreen": {
     "createAddress": "Δημιουργία διεύθυνσης Lightning",
@@ -3115,6 +3149,13 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Ορίστε ποσό"
+  },
+  "Accessibility": {
+    "deleteKey": "Διαγραφή",
+    "swapCurrencyHint": "Αλλάζει το νόμισμα στο οποίο πληκτρολογείτε το ποσό",
+    "switchToWallet": "Αλλαγή σε {wallet: string}",
+    "copy": "Αντιγραφή",
+    "revealBalanceHint": "Εμφανίζει το υπόλοιπό σας σε αυτή την οθόνη"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Πρέπει να ενημερώσω την εφαρμογή μου με την τελευταία έκδοση. Χρησιμοποιώ την εφαρμογή {os: string} με έκδοση {version: string}.",
