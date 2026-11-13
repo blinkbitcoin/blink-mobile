@@ -6,6 +6,15 @@ import { join } from "path"
 const REPO_ROOT = join(__dirname, "..", "..")
 const read = (path: string) => readFileSync(join(REPO_ROOT, path), "utf8")
 
+const BLOCK_COMMENT = /\/\*[\s\S]*?\*\//g
+const XML_COMMENT = /<!--[\s\S]*?-->/g
+
+const codeLines = (path: string, blockComment?: RegExp) => {
+  const text = read(path)
+  const code = blockComment ? text.replace(blockComment, "") : text
+  return code.split("\n").map((line) => line.trim())
+}
+
 const AD_PERMISSIONS = [
   "com.google.android.gms.permission.AD_ID",
   "android.permission.ACCESS_ADSERVICES_AD_ID",
@@ -27,24 +36,22 @@ describe("ads in the Android build", () => {
   })
 
   it("leaves the ad libraries out of every configuration", () => {
-    const excluded = /\nconfigurations\.all \{([\s\S]*?)\n\}/.exec(
-      read("android/app/build.gradle"),
-    )?.[1]
+    const gradle = codeLines("android/app/build.gradle", BLOCK_COMMENT)
 
-    expect(excluded).toContain('exclude group: "androidx.privacysandbox.ads"')
-    expect(excluded).toContain(
+    expect(gradle).toContain('exclude group: "androidx.privacysandbox.ads"')
+    expect(gradle).toContain(
       'exclude group: "com.google.android.gms", module: "play-services-ads-identifier"',
     )
   })
 
   it.each(AD_PERMISSIONS)("removes the %s permission the libraries declare", (permission) => {
-    expect(read("android/app/src/main/AndroidManifest.xml")).toContain(
+    expect(codeLines("android/app/src/main/AndroidManifest.xml", XML_COMMENT)).toContain(
       `<uses-permission android:name="${permission}" tools:node="remove" />`,
     )
   })
 
-  it("lets R8 shrink the release build without the excluded classes", () => {
-    const rules = read("android/app/proguard-rules.pro")
+  it("tells R8 the excluded ad classes are missing on purpose", () => {
+    const rules = codeLines("android/app/proguard-rules.pro")
 
     expect(rules).toContain("-dontwarn androidx.privacysandbox.ads.**")
     expect(rules).toContain("-dontwarn com.google.android.gms.ads.identifier.**")
