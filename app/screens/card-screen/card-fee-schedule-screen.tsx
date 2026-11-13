@@ -13,6 +13,7 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { openExternalUrl } from "@app/utils/external"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 type Fee = {
   title: string
@@ -226,7 +227,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.textOnBackground,
   },
   card: {
-    backgroundColor: colors.surfaceInteractive,
+    ...staticSurface(colors),
     borderRadius: 8,
   },
   row: {
@@ -263,7 +264,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.neutral,
   },
   noticeCard: {
-    backgroundColor: colors.surfaceInteractive,
+    ...staticSurface(colors),
     borderRadius: 8,
     padding: 14,
     gap: 14,
@@ -285,7 +286,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.textSecondary,
   },
   infoBox: {
-    backgroundColor: colors.surfaceInteractive,
+    ...staticSurface(colors),
     borderLeftWidth: 2,
     borderLeftColor: colors.textOnBackground,
     borderRadius: 6,
@@ -315,7 +316,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.textOnBackground,
   },
   detailsCard: {
-    backgroundColor: colors.surfaceInteractive,
+    ...staticSurface(colors),
     borderRadius: 8,
     padding: 14,
     gap: 12,

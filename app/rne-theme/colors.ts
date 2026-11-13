@@ -35,7 +35,7 @@ const lightSemantic = {
 
   textPrimary: "#3A3C51",
   textSecondary: "#393939",
-  textMuted: "#9292A0", // 3.07:1 on backgroundDefault — secondary labels only
+  textMuted: "#8C8C97", // 3.33:1 on backgroundDefault — secondary labels only
   textDisabled: "#AEAEB8",
 
   neutral: "#E2E2E4",
