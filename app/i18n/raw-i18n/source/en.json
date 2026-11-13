@@ -3817,11 +3817,11 @@
                 "fields": {
                     "occupation": {
                         "label": "Occupation",
-                        "placeholder": "Select your occupation"
+                        "placeholder": "Select"
                     },
                     "annualSalaryRange": {
                         "label": "Annual salary",
-                        "placeholder": "Select your salary range"
+                        "placeholder": "Select salary"
                     },
                     "accountPurpose": {
                         "label": "Account purpose",
@@ -3832,7 +3832,6 @@
                         "placeholder": "Select your spending range"
                     }
                 },
-                "buttonText": "Submit application",
                 "select": "Select"
             },
             "Acknowledgement": {

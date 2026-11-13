@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Занимање",
-            "placeholder": "Изаберите своје занимање"
+            "placeholder": "Изаберите"
           },
           "annualSalaryRange": {
             "label": "Годишња плата",
-            "placeholder": "Изаберите свој распон плате"
+            "placeholder": "Изаберите плату"
           },
           "accountPurpose": {
             "label": "Сврха налога",
@@ -3823,7 +3823,6 @@
             "placeholder": "Изаберите свој распон потрошње"
           }
         },
-        "buttonText": "Пошаљи пријаву",
         "select": "изабери"
       },
       "Acknowledgement": {

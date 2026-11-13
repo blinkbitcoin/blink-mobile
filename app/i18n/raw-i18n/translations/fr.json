@@ -3747,11 +3747,11 @@
                 "fields": {
                     "occupation": {
                         "label": "Profession",
-                        "placeholder": "Sélectionnez votre profession"
+                        "placeholder": "Sélectionnez"
                     },
                     "annualSalaryRange": {
                         "label": "Salaire annuel",
-                        "placeholder": "Sélectionnez votre fourchette salariale"
+                        "placeholder": "Sélectionnez le salaire"
                     },
                     "accountPurpose": {
                         "label": "Objectif du compte",
@@ -3762,7 +3762,6 @@
                         "placeholder": "Sélectionnez votre fourchette de dépenses"
                     }
                 },
-                "buttonText": "Soumettre la demande",
                 "select": "sélectionner"
             },
             "Acknowledgement": {

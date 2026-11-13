@@ -3747,11 +3747,11 @@
                 "fields": {
                     "occupation": {
                         "label": "Ocupación",
-                        "placeholder": "Selecciona tu ocupación"
+                        "placeholder": "Selecciona"
                     },
                     "annualSalaryRange": {
                         "label": "Salario anual",
-                        "placeholder": "Selecciona tu rango salarial"
+                        "placeholder": "Selecciona el salario"
                     },
                     "accountPurpose": {
                         "label": "Propósito de la cuenta",
@@ -3762,7 +3762,6 @@
                         "placeholder": "Selecciona tu rango de gastos"
                     }
                 },
-                "buttonText": "Enviar solicitud",
                 "select": "seleccionar"
             },
             "Acknowledgement": {

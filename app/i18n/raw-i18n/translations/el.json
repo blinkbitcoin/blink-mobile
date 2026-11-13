@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Επάγγελμα",
-            "placeholder": "Επιλέξτε το επάγγελμά σας"
+            "placeholder": "Επιλέξτε"
           },
           "annualSalaryRange": {
             "label": "Ετήσιος μισθός",
-            "placeholder": "Επιλέξτε το εύρος του μισθού σας"
+            "placeholder": "Επιλέξτε μισθό"
           },
           "accountPurpose": {
             "label": "Σκοπός λογαριασμού",
@@ -3823,7 +3823,6 @@
             "placeholder": "Επιλέξτε το εύρος των δαπανών σας"
           }
         },
-        "buttonText": "Υποβολή αίτησης",
         "select": "επιλογή"
       },
       "Acknowledgement": {

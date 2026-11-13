@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Pekerjaan",
-            "placeholder": "Pilih pekerjaan Anda"
+            "placeholder": "Pilih"
           },
           "annualSalaryRange": {
             "label": "Gaji tahunan",
-            "placeholder": "Pilih rentang gaji Anda"
+            "placeholder": "Pilih gaji"
           },
           "accountPurpose": {
             "label": "Tujuan akun",
@@ -3823,7 +3823,6 @@
             "placeholder": "Pilih rentang pengeluaran Anda"
           }
         },
-        "buttonText": "Kirim aplikasi",
         "select": "pilih"
       },
       "Acknowledgement": {

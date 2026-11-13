@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Povolanie",
-            "placeholder": "Vyberte svoje povolanie"
+            "placeholder": "Vyberte"
           },
           "annualSalaryRange": {
             "label": "Ročný plat",
-            "placeholder": "Vyberte svoj platový rozsah"
+            "placeholder": "Vyberte plat"
           },
           "accountPurpose": {
             "label": "Účel účtu",
@@ -3823,7 +3823,6 @@
             "placeholder": "Vyberte svoj rozsah výdavkov"
           }
         },
-        "buttonText": "Odoslať žiadosť",
         "select": "vybrať"
       },
       "Acknowledgement": {
