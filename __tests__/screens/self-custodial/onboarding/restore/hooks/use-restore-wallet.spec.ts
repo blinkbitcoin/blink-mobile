@@ -109,6 +109,21 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
+const deferred = <T>() => {
+  let resolve: (value: T) => void = () => {}
+  const promise = new Promise<T>((settle) => {
+    resolve = settle
+  })
+  return { promise, resolve }
+}
+
+/** Lets every pending microtask run, so a restore that skipped an `await` has already
+ *  moved on by the time the test looks. */
+const flushRestore = () =>
+  new Promise((settle) => {
+    setTimeout(settle, 0)
+  })
+
 describe("useRestoreWallet", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -191,17 +206,27 @@ describe("useRestoreWallet", () => {
       id: "existing-id",
     })
 
+    const write = deferred<void>()
+    mockMarkBackupCompletedFor.mockReturnValueOnce(write.promise)
     const { result } = renderHook(() => useRestoreWallet())
 
+    let restoring: Promise<void> = Promise.resolve()
     await act(async () => {
-      await result.current.restore("word1 word2 word3", BackupMethod.Cloud)
+      restoring = result.current.restore("word1 word2 word3", BackupMethod.Cloud)
+      await flushRestore()
     })
 
     expect(mockRestore).not.toHaveBeenCalled()
     expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith("existing-id", "cloud")
-    const markOrder = mockMarkBackupCompletedFor.mock.invocationCallOrder[0]
-    const activateOrder = mockUpdateState.mock.invocationCallOrder[0]
-    expect(markOrder).toBeLessThan(activateOrder)
+    // The account stays inactive until the backup is on record.
+    expect(mockUpdateState).not.toHaveBeenCalled()
+
+    await act(async () => {
+      write.resolve()
+      await restoring
+    })
+
+    expect(mockUpdateState).toHaveBeenCalledTimes(1)
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
   })
 
@@ -209,39 +234,55 @@ describe("useRestoreWallet", () => {
    *  "this is a non-custodial account" bulletin is marked seen before the account is
    *  active and never flashes on the first home render. */
   describe("the non-custodial account bulletin", () => {
+    /** Holds the bulletin write open, so a restore that stops waiting for it shows up as
+     *  the account going active, the SDK restarting or the screen moving on too early. */
+    const expectActivationToWaitForTheWrite = async (
+      method: BackupMethod,
+      accountId: string,
+    ) => {
+      const write = deferred<void>()
+      mockMarkInfoBulletinDismissedFor.mockReturnValue(write.promise)
+      const { result } = renderHook(() => useRestoreWallet())
+
+      let restoring: Promise<void> = Promise.resolve()
+      await act(async () => {
+        restoring = result.current.restore("word1 word2 word3", method)
+        await flushRestore()
+      })
+
+      expect(mockMarkInfoBulletinDismissedFor).toHaveBeenCalledWith(accountId)
+      expect(mockUpdateState).not.toHaveBeenCalled()
+      expect(mockReinitSdk).not.toHaveBeenCalled()
+      expect(mockNavigate).not.toHaveBeenCalled()
+
+      await act(async () => {
+        write.resolve()
+        await restoring
+      })
+
+      expect(mockUpdateState).toHaveBeenCalled()
+      expect(mockReinitSdk).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
+    }
+
     it.each([BackupMethod.Manual, BackupMethod.Cloud])(
-      "is marked seen for a wallet restored with a %s phrase",
+      "is marked seen before a %s restore of a new wallet goes active",
       async (method) => {
-        const { result } = renderHook(() => useRestoreWallet())
-
-        await act(async () => {
-          await result.current.restore("word1 word2 word3", method)
-        })
-
-        expect(mockMarkInfoBulletinDismissedFor).toHaveBeenCalledWith(TEST_ACCOUNT_ID)
-        const markOrder = mockMarkInfoBulletinDismissedFor.mock.invocationCallOrder[0]
-        const activateOrder = mockUpdateState.mock.invocationCallOrder[0]
-        expect(markOrder).toBeLessThan(activateOrder)
+        await expectActivationToWaitForTheWrite(method, TEST_ACCOUNT_ID)
       },
     )
 
-    it("is marked seen for an account already on this device", async () => {
-      mockFindSelfCustodialAccountByMnemonic.mockResolvedValue({
-        status: "ok",
-        id: "existing-id",
-      })
+    it.each([BackupMethod.Manual, BackupMethod.Cloud])(
+      "is marked seen before a %s restore of an account already on this device goes active",
+      async (method) => {
+        mockFindSelfCustodialAccountByMnemonic.mockResolvedValue({
+          status: "ok",
+          id: "existing-id",
+        })
 
-      const { result } = renderHook(() => useRestoreWallet())
-
-      await act(async () => {
-        await result.current.restore("word1 word2 word3")
-      })
-
-      expect(mockMarkInfoBulletinDismissedFor).toHaveBeenCalledWith("existing-id")
-      const markOrder = mockMarkInfoBulletinDismissedFor.mock.invocationCallOrder[0]
-      const activateOrder = mockUpdateState.mock.invocationCallOrder[0]
-      expect(markOrder).toBeLessThan(activateOrder)
-    })
+        await expectActivationToWaitForTheWrite(method, "existing-id")
+      },
+    )
 
     it("is not marked for a phrase that fails validation", async () => {
       mockValidateMnemonic.mockReturnValue(false)
