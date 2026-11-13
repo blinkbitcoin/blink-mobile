@@ -8,7 +8,7 @@ import { measure, ScEvent } from "@app/self-custodial/measurement"
 import { type MoneyAmount, type WalletOrDisplayCurrency } from "@app/types/amounts"
 import { PaymentResultStatus, type ConvertParams } from "@app/types/payment"
 import { reportError } from "@app/utils/error-logging"
-import { triggerHapticFeedback } from "@app/utils/helper"
+import { haptics } from "@app/utils/haptics"
 
 import { buildConvertParams } from "../../build-convert-params"
 
@@ -95,7 +95,7 @@ export const useSelfCustodialConversion = ({
       try {
         if (!quote) {
           setErrorMessage(LL.errors.generic())
-          triggerHapticFeedback("notificationError")
+          haptics.error()
           return
         }
 
@@ -105,7 +105,7 @@ export const useSelfCustodialConversion = ({
         const isSuccess = result.status === PaymentResultStatus.Success
 
         if (isSuccess) {
-          triggerHapticFeedback("notificationSuccess")
+          haptics.success()
           await onSuccess()
           return
         }
@@ -113,12 +113,12 @@ export const useSelfCustodialConversion = ({
         /** A failed execute invalidates the pinned quote, so the retry re-quotes. */
         requote()
         setErrorMessage(result.errors?.[0]?.message ?? LL.errors.generic())
-        triggerHapticFeedback("notificationError")
+        haptics.error()
       } catch (err) {
         reportError("Self-custodial conversion execute", err)
         requote()
         setErrorMessage(err instanceof Error ? err.message : LL.errors.generic())
-        triggerHapticFeedback("notificationError")
+        haptics.error()
       } finally {
         setLoading(false)
       }

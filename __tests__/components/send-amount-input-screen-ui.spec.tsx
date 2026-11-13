@@ -6,6 +6,9 @@ import {
   AmountInputScreenUI,
   AmountInputScreenUIProps,
 } from "@app/components/amount-input-screen/amount-input-screen-ui"
+import { haptics } from "@app/utils/haptics"
+
+jest.mock("@app/utils/haptics", () => ({ haptics: { select: jest.fn() } }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
@@ -165,6 +168,21 @@ describe("AmountInputScreenUI", () => {
 
     fireEvent.press(getByTestId("galoy-icon-transfer"))
     expect(mockOnToggleCurrency).toHaveBeenCalledTimes(1)
+  })
+
+  it("fires the select haptic once per currency swap", () => {
+    const { getByTestId } = render(
+      <AmountInputScreenUI
+        {...defaultProps}
+        secondaryCurrencyFormattedAmount="1,500"
+        secondaryCurrencyCode="SAT"
+        onToggleCurrency={mockOnToggleCurrency}
+      />,
+    )
+
+    fireEvent.press(getByTestId("galoy-icon-transfer"))
+
+    expect(haptics.select).toHaveBeenCalledTimes(1)
   })
 
   it("does not render error text when no error message", () => {

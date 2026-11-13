@@ -16,6 +16,7 @@ import { SUCCESS_BADGE_DURATION_MS, SuccessBadge } from "@app/components/success
 import { useAccessibilityAnnouncement } from "@app/hooks/use-accessibility-announcement"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { fonts } from "@app/rne-theme/fonts"
+import { haptics } from "@app/utils/haptics"
 
 export const SEND_HERO_CAPTION_TEST_ID = "send-hero-caption"
 export const SEND_HERO_PRIMARY_TEST_ID = "send-hero-amount-primary"
@@ -301,7 +302,11 @@ export const SendHero: React.FC<SendHeroProps> = ({
 
   const amounts = (
     <Pressable
-      onPress={onSwapCurrency}
+      onPress={() => {
+        if (!onSwapCurrency) return
+        haptics.select()
+        onSwapCurrency()
+      }}
       disabled={!onSwapCurrency || !secondaryAmount}
       accessibilityRole={onSwapCurrency ? "button" : undefined}
       accessibilityLabel={amountLabel}

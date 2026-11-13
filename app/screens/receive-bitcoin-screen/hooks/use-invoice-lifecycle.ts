@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useLayoutEffect, useState } from "react"
-import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { useLnUpdateHashPaid } from "@app/graphql/ln-update-context"
 import { useCountdown } from "@app/hooks"
+import { haptics } from "@app/utils/haptics"
 
 import {
   GeneratePaymentRequestMutations,
@@ -50,9 +50,7 @@ export const useInvoiceLifecycle = (
       lastHash === pr.info.data.paymentHash
     ) {
       setPR((current) => current && current.setState(PaymentRequestState.Paid))
-      ReactNativeHapticFeedback.trigger("notificationSuccess", {
-        ignoreAndroidSystemSettings: true,
-      })
+      haptics.success()
     }
   }, [lastHash, pr])
 

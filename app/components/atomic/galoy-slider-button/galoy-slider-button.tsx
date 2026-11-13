@@ -7,7 +7,6 @@ import {
   View,
 } from "react-native"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
-import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 import Animated, {
   Easing,
   Extrapolation,
@@ -106,9 +105,7 @@ const GaloySliderButton = ({
 
   const commit = useCallback(async () => {
     setCommitted(true)
-    ReactNativeHapticFeedback.trigger("impactMedium", {
-      ignoreAndroidSystemSettings: true,
-    })
+    haptics.commit()
     try {
       await onSwipe()
     } finally {

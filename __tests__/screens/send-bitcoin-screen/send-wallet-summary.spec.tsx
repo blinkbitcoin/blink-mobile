@@ -12,6 +12,9 @@ import {
   SEND_WALLET_SIZER_TEST_ID,
   SendWalletSummary,
 } from "@app/screens/send-bitcoin-screen/amount-entry/send-wallet-summary"
+import { haptics } from "@app/utils/haptics"
+
+jest.mock("@app/utils/haptics", () => ({ haptics: { select: jest.fn() } }))
 
 jest.mock("@app/components/wallet-switch", () => ({
   WalletSwitch: () => null,
@@ -173,6 +176,45 @@ describe("SendWalletSummary", () => {
       fireEvent.press(screen.getByTestId("choose-wallet-to-send-from"))
 
       expect(onReveal).toHaveBeenCalledTimes(1)
+    })
+
+    it("reveals without the select haptic", () => {
+      jest.mocked(haptics.select).mockClear()
+      render(hiddenCard(jest.fn()))
+
+      fireEvent.press(screen.getByTestId("choose-wallet-to-send-from"))
+
+      expect(haptics.select).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("select haptic", () => {
+    beforeEach(() => jest.mocked(haptics.select).mockClear())
+
+    it("fires once per wallet switch", () => {
+      const onSwitch = jest.fn()
+      render(
+        <ThemeProvider theme={theme}>
+          <SendWalletSummary
+            currency={WalletCurrency.Btc}
+            balancePrimary="741 SAT"
+            onSwitch={onSwitch}
+          />
+        </ThemeProvider>,
+      )
+
+      fireEvent.press(screen.getByTestId("choose-wallet-to-send-from"))
+
+      expect(onSwitch).toHaveBeenCalledTimes(1)
+      expect(haptics.select).toHaveBeenCalledTimes(1)
+    })
+
+    it("stays silent when there is no wallet to switch to", () => {
+      render(bitcoinCard)
+
+      fireEvent.press(screen.getByTestId("choose-wallet-to-send-from"))
+
+      expect(haptics.select).not.toHaveBeenCalled()
     })
   })
 
