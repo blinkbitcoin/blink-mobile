@@ -1,6 +1,11 @@
 import * as React from "react"
 import { View } from "react-native"
-import { useNavigation } from "@react-navigation/native"
+import {
+  CommonActions,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -12,6 +17,9 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { openExternalUrl } from "@app/utils/external"
+import { toastShow } from "@app/utils/toast"
+
+import { useCardApplicationSubmit } from "./use-card-application-submit"
 
 export const CardAcknowledgementScreen: React.FC = () => {
   const styles = useStyles()
@@ -20,6 +28,9 @@ export const CardAcknowledgementScreen: React.FC = () => {
   } = useTheme()
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { params: answers } =
+    useRoute<RouteProp<RootStackParamList, "cardOnboardingAcknowledgementScreen">>()
+  const { submitApplication, isSubmitting } = useCardApplicationSubmit()
 
   const { cardESignConsentUrl, cardIssuerPrivacyPolicyUrl, cardCardholderAgreementUrl } =
     useRemoteConfig()
@@ -38,8 +49,32 @@ export const CardAcknowledgementScreen: React.FC = () => {
   ].every(Boolean)
   const isAcceptDisabled = !areAllTermsAccepted
 
+  const isAcceptingRef = React.useRef(false)
+
+  /** The application is sent, so the onboarding steps leave the stack: going back from
+   *  the wait lands on Home rather than on a step that would send it again. */
+  const sendApplication = async () => {
+    const applicationId = await submitApplication(answers)
+    if (!applicationId) {
+      toastShow({ message: LL.errors.unexpectedError(), LL })
+      return
+    }
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 1,
+        routes: [{ name: "Primary" }, { name: "cardOnboardingProcessingScreen" }],
+      }),
+    )
+  }
+
+  /** A second tap in the same frame lands before the spinner shows. Sent again, the
+   *  application would be refused as a duplicate and read as a failure. */
   const handleAccept = () => {
-    navigation.navigate("cardOnboardingProcessingScreen")
+    if (isAcceptingRef.current) return
+    isAcceptingRef.current = true
+    sendApplication().finally(() => {
+      isAcceptingRef.current = false
+    })
   }
 
   const { Acknowledgement: acknowledgementLL } = LL.CardFlow.Onboarding
@@ -51,6 +86,7 @@ export const CardAcknowledgementScreen: React.FC = () => {
           title={acknowledgementLL.acceptButton()}
           onPress={handleAccept}
           disabled={isAcceptDisabled}
+          loading={isSubmitting}
         />
       }
     >

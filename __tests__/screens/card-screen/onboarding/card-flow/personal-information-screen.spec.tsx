@@ -40,7 +40,7 @@ jest.mock("@app/components/card-screen", () => {
       return (
         <TouchableOpacity
           testID={props.testID}
-          onPress={() => props.onValueChange("selected-value")}
+          onPress={() => props.onValueChange(`${props.testID}-value`)}
         >
           <Text>{props.testID}</Text>
         </TouchableOpacity>
@@ -167,7 +167,7 @@ describe("CardPersonalInformationScreen", () => {
     expect(getByText("Select")).toBeTruthy()
   })
 
-  it("navigates to the terms step once every field is selected", async () => {
+  it("carries the answers to the terms step once every field is selected", async () => {
     const { getByText, getByTestId } = render(
       <ContextForScreen>
         <CardPersonalInformationScreen />
@@ -187,6 +187,11 @@ describe("CardPersonalInformationScreen", () => {
       fireEvent.press(getByText("Continue"))
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingAcknowledgementScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingAcknowledgementScreen", {
+      occupation: "occupation-dropdown-value",
+      annualSalary: "annual-salary-dropdown-value",
+      accountPurpose: "account-purpose-dropdown-value",
+      expectedMonthlyVolume: "expected-monthly-spending-dropdown-value",
+    })
   })
 })

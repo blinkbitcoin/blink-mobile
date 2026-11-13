@@ -3669,6 +3669,13 @@ export type CardSecretsEncryptedQueryVariables = Exact<{
 
 export type CardSecretsEncryptedQuery = { readonly __typename: 'Query', readonly cardSecretsEncrypted: { readonly __typename: 'CardSecretsEncrypted', readonly encryptedPan: { readonly __typename: 'EncryptedData', readonly iv: string, readonly data: string }, readonly encryptedCvc: { readonly __typename: 'EncryptedData', readonly iv: string, readonly data: string } } };
 
+export type CardConsumerApplicationCreateMutationVariables = Exact<{
+  input: CardConsumerApplicationCreateInput;
+}>;
+
+
+export type CardConsumerApplicationCreateMutation = { readonly __typename: 'Mutation', readonly cardConsumerApplicationCreate: { readonly __typename: 'ConsumerApplication', readonly id: string, readonly applicationStatus: ApplicationStatus } };
+
 export type CardKycStatusQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -6982,6 +6989,40 @@ export type CardSecretsEncryptedQueryHookResult = ReturnType<typeof useCardSecre
 export type CardSecretsEncryptedLazyQueryHookResult = ReturnType<typeof useCardSecretsEncryptedLazyQuery>;
 export type CardSecretsEncryptedSuspenseQueryHookResult = ReturnType<typeof useCardSecretsEncryptedSuspenseQuery>;
 export type CardSecretsEncryptedQueryResult = Apollo.QueryResult<CardSecretsEncryptedQuery, CardSecretsEncryptedQueryVariables>;
+export const CardConsumerApplicationCreateDocument = gql`
+    mutation cardConsumerApplicationCreate($input: CardConsumerApplicationCreateInput!) {
+  cardConsumerApplicationCreate(input: $input) {
+    id
+    applicationStatus
+  }
+}
+    `;
+export type CardConsumerApplicationCreateMutationFn = Apollo.MutationFunction<CardConsumerApplicationCreateMutation, CardConsumerApplicationCreateMutationVariables>;
+
+/**
+ * __useCardConsumerApplicationCreateMutation__
+ *
+ * To run a mutation, you first call `useCardConsumerApplicationCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardConsumerApplicationCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardConsumerApplicationCreateMutation, { data, loading, error }] = useCardConsumerApplicationCreateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardConsumerApplicationCreateMutation(baseOptions?: Apollo.MutationHookOptions<CardConsumerApplicationCreateMutation, CardConsumerApplicationCreateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardConsumerApplicationCreateMutation, CardConsumerApplicationCreateMutationVariables>(CardConsumerApplicationCreateDocument, options);
+      }
+export type CardConsumerApplicationCreateMutationHookResult = ReturnType<typeof useCardConsumerApplicationCreateMutation>;
+export type CardConsumerApplicationCreateMutationResult = Apollo.MutationResult<CardConsumerApplicationCreateMutation>;
+export type CardConsumerApplicationCreateMutationOptions = Apollo.BaseMutationOptions<CardConsumerApplicationCreateMutation, CardConsumerApplicationCreateMutationVariables>;
 export const CardKycStatusDocument = gql`
     query cardKycStatus {
   me {

@@ -320,6 +320,14 @@ mutation captchaRequestAuthCode($input: CaptchaRequestAuthCodeInput!) {
   }
 }
 
+mutation cardConsumerApplicationCreate($input: CardConsumerApplicationCreateInput!) {
+  cardConsumerApplicationCreate(input: $input) {
+    id
+    applicationStatus
+    __typename
+  }
+}
+
 mutation cardCreate($input: CardCreateInput!) {
   cardCreate(input: $input) {
     id
