@@ -10,6 +10,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 export const ValueStyle = {
   Bold: "bold",
@@ -193,7 +194,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   }
 
   const content = (
-    <View style={styles.valueContainer}>
+    <View style={[styles.valueContainer, !onPress && styles.valueContainerStatic]}>
       <Text style={styles.value}>{value}</Text>
       {rightIconElement}
     </View>
@@ -254,6 +255,7 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
     valueContainerDisabled: {
       opacity: 0.5,
     },
+    valueContainerStatic: staticSurface(colors),
     value: {
       flex: 1,
       color: isLarge || isBold ? colors.textOnBackground : colors.textMuted,
