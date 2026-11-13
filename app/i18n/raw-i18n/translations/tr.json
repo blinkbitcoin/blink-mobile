@@ -3848,8 +3848,7 @@
       },
       "CardProcessing": {
         "title": "Başvurunuz işleniyor",
-        "subtitle": "Hazır olduğumuzda sizi bilgilendireceğiz",
-        "buttonText": "Kapat"
+        "subtitle": "Hazır olduğumuzda sizi bilgilendireceğiz"
       }
     }
   },

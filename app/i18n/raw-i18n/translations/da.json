@@ -3848,8 +3848,7 @@
       },
       "CardProcessing": {
         "title": "Behandler din ansøgning",
-        "subtitle": "Vi giver dig besked, så snart vi er klar",
-        "buttonText": "Luk"
+        "subtitle": "Vi giver dig besked, så snart vi er klar"
       }
     }
   },

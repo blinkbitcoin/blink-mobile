@@ -3787,8 +3787,7 @@
             },
             "CardProcessing": {
                 "title": "Procesando tu solicitud",
-                "subtitle": "Te avisaremos cuando estemos listos",
-                "buttonText": "Cerrar"
+                "subtitle": "Te avisaremos cuando estemos listos"
             },
             "WelcomeInvest": {
                 "welcomeMessage": {

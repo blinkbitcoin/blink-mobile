@@ -3848,8 +3848,7 @@
       },
       "CardProcessing": {
         "title": "Processant la teva sol·licitud",
-        "subtitle": "T'avisarem quan estiguem preparats",
-        "buttonText": "Tancar"
+        "subtitle": "T'avisarem quan estiguem preparats"
       }
     }
   },
