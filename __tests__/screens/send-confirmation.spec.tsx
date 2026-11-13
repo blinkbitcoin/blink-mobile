@@ -41,8 +41,10 @@ import {
   SEND_HERO_PRIMARY_TEST_ID,
   SEND_HERO_SECONDARY_TEST_ID,
 } from "@app/screens/send-bitcoin-screen/send-hero"
+import { SEND_REVIEW_COPY_TEST_ID } from "@app/screens/send-bitcoin-screen/review/send-review-destination"
 
 import { flushEffects } from "../helpers/flush-effects"
+import { surfaceColor } from "../helpers/surface-color"
 import { waitForStableRender } from "../helpers/wait-for-stable-render"
 import { ContextForScreen } from "./helper"
 
@@ -497,6 +499,21 @@ describe("SendBitcoinConfirmationScreen", () => {
     )
 
     expect(feeRow().getByText("₦0 ($0.00)")).toBeTruthy()
+  })
+
+  it("paints the details card static and keeps the copyable destination interactive", async () => {
+    await renderSettled(
+      <ContextForScreen>
+        <Intraledger route={route} />
+      </ContextForScreen>,
+    )
+
+    expect(surfaceColor(screen.getByTestId(SEND_REVIEW_COPY_TEST_ID))).toBe(
+      colors.light.surfaceInteractive,
+    )
+    expect(surfaceColor(screen.getByTestId("Successful Fee"))).toBe(
+      colors.light.surfaceStatic,
+    )
   })
 
   it("Send Screen Confirmation - Lightning lnurl Payment", async () => {
