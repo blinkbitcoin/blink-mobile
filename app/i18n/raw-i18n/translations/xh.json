@@ -2745,7 +2745,13 @@
     "noTransaction": "Akho tshintshelwano lubonakalayo",
     "title": "Iintengiselwano/ utshintshwelano",
     "recentTransactions": "Iintengiselwano zakutsha nje",
-    "transactionHistoryTitle": "Imbali yentengiselwano"
+    "transactionHistoryTitle": "Imbali yentengiselwano",
+    "filters": "Izihluzi",
+    "sent": "Ezithunyelweyo",
+    "received": "Ezifunyenweyo",
+    "searchPlaceholder": "Khangela...",
+    "expandingSearch": "Ukwandisa ukukhangela",
+    "nothingCameBack": "Akukho nto ifunyenweyo"
   },
   "TransferScreen": {
     "title": "Udluliselo",
@@ -3035,7 +3041,7 @@
       "other": "Iintsuku"
     },
     "dollar": "Idola",
-    "all": "KONKE",
+    "all": "Konke",
     "allAccounts": "Zonke ii-akhawunti",
     "some": "Ezinye",
     "support": "Inkxaso",
@@ -3123,6 +3129,9 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Tap to set amount"
+  },
+  "Accessibility": {
+    "switchToWallet": "Tshintshela kwi-{wallet: string}"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",

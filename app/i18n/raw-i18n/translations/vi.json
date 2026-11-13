@@ -2745,7 +2745,13 @@
     "noTransaction": "Không có giao dịch để hiển thị",
     "title": "Các giao dịch",
     "recentTransactions": "Recent transactions",
-    "transactionHistoryTitle": "Lịch sử giao dịch"
+    "transactionHistoryTitle": "Lịch sử giao dịch",
+    "filters": "Bộ lọc",
+    "sent": "Đã gửi",
+    "received": "Đã nhận",
+    "searchPlaceholder": "Tìm kiếm...",
+    "expandingSearch": "Đang mở rộng tìm kiếm",
+    "nothingCameBack": "Không tìm thấy kết quả"
   },
   "TransferScreen": {
     "title": "Chuyển khoản",
@@ -3035,7 +3041,7 @@
       "other": "Ngày"
     },
     "dollar": "Đô la",
-    "all": "TẤT CẢ",
+    "all": "Tất cả",
     "allAccounts": "Tất cả tài khoản",
     "some": "Một số",
     "support": "Hỗ trợ",
@@ -3123,6 +3129,9 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
+  },
+  "Accessibility": {
+    "switchToWallet": "Chuyển sang {wallet: string}"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",

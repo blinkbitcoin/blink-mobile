@@ -950,6 +950,88 @@ describe("useSdkLifecycle: connectivity and retries", () => {
   })
 })
 
+describe("useSdkLifecycle loadMore while a page is loading", () => {
+  beforeEach(resetMocks)
+
+  it("reads one page when a second call arrives while the first is loading", async () => {
+    const sdk = buildSdk("sdk-1")
+    mockInitSdk.mockResolvedValue(sdk)
+    captureListener()
+
+    const { loadMoreTransactions: loadMoreMock } = jest.requireMock(
+      "@app/self-custodial/providers/wallet-snapshot",
+    )
+    let resolvePage: (page: unknown) => void = () => {}
+    loadMoreMock.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolvePage = resolve
+        }),
+    )
+    loadMoreMock.mockResolvedValue({ transactions: [], hasMore: true, rawCount: 20 })
+    mockGetSnapshot.mockResolvedValue({
+      wallets: [],
+      allTransactions: [],
+      hasMore: true,
+      rawTransactionCount: 0,
+    })
+
+    const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+    await waitFor(() => {
+      expect(result.current.hasMoreTransactions).toBe(true)
+    })
+
+    let first: Promise<boolean> = Promise.resolve(false)
+    let second: Promise<boolean> = Promise.resolve(false)
+    act(() => {
+      first = result.current.loadMore()
+      second = result.current.loadMore()
+    })
+    await act(async () => {
+      resolvePage({ transactions: [], hasMore: true, rawCount: 20 })
+      await Promise.all([first, second])
+    })
+
+    expect(loadMoreMock).toHaveBeenCalledTimes(1)
+    await expect(first).resolves.toBe(true)
+    await expect(second).resolves.toBe(true)
+
+    // The offset moved by one page, not two.
+    await act(async () => {
+      await result.current.loadMore()
+    })
+    expect(loadMoreMock).toHaveBeenLastCalledWith(sdk, 20)
+  })
+
+  it("resolves false when the page fails to load", async () => {
+    mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+    captureListener()
+    const { loadMoreTransactions: loadMoreMock } = jest.requireMock(
+      "@app/self-custodial/providers/wallet-snapshot",
+    )
+    loadMoreMock.mockRejectedValueOnce(new Error("sdk offline"))
+    mockGetSnapshot.mockResolvedValue({
+      wallets: [],
+      allTransactions: [],
+      hasMore: true,
+      rawTransactionCount: 0,
+    })
+
+    const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+    await waitFor(() => {
+      expect(result.current.hasMoreTransactions).toBe(true)
+    })
+
+    let loaded: boolean | undefined
+    await act(async () => {
+      loaded = await result.current.loadMore()
+    })
+
+    expect(loaded).toBe(false)
+    expect(result.current.loadingMore).toBe(false)
+  })
+})
+
 describe("useSdkLifecycle paging when the account switches or a page fails", () => {
   beforeEach(resetMocks)
 
@@ -980,7 +1062,7 @@ describe("useSdkLifecycle paging when the account switches or a page fails", () 
     )
     await waitFor(() => expect(result.current.hasMoreTransactions).toBe(true))
 
-    let pageOfA: Promise<void> = Promise.resolve()
+    let pageOfA: Promise<boolean> = Promise.resolve(false)
     act(() => {
       pageOfA = result.current.loadMore()
     })
@@ -1099,7 +1181,7 @@ describe("useSdkLifecycle paging when the account switches or a page fails", () 
       { initialProps: { accountId: "acct-A" } },
     )
     await waitFor(() => expect(result.current.hasMoreTransactions).toBe(true))
-    let pageOfA: Promise<void> = Promise.resolve()
+    let pageOfA: Promise<boolean> = Promise.resolve(false)
     act(() => {
       pageOfA = result.current.loadMore()
     })
@@ -1109,7 +1191,7 @@ describe("useSdkLifecycle paging when the account switches or a page fails", () 
     await waitFor(() => expect(result.current.hasMoreTransactions).toBe(true))
     expect(result.current.loadingMore).toBe(false)
 
-    let pageOfB: Promise<void> = Promise.resolve()
+    let pageOfB: Promise<boolean> = Promise.resolve(false)
     act(() => {
       pageOfB = result.current.loadMore()
     })

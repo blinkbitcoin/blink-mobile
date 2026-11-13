@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ActivityIndicator, SectionList, StyleSheet, Text, View } from "react-native"
+import { ActivityIndicator, SectionList, Text, View } from "react-native"
 
 import { gql } from "@apollo/client"
 import {
@@ -43,22 +43,6 @@ type Props = {
 
 const keyExtractor = (item: { id: string }) => item.id
 
-const GROUP_RADIUS = 8
-
-/** The date group reads as one card, so only its outer rows carry the corners. */
-const groupStyles = StyleSheet.create({
-  firstRow: {
-    borderTopLeftRadius: GROUP_RADIUS,
-    borderTopRightRadius: GROUP_RADIUS,
-    overflow: "hidden",
-  },
-  lastRow: {
-    borderBottomLeftRadius: GROUP_RADIUS,
-    borderBottomRightRadius: GROUP_RADIUS,
-    overflow: "hidden",
-  },
-})
-
 // Rows here are deliberately not pressable: this list only shows the history
 // with one contact, it does not navigate into a transaction.
 const renderItem = ({
@@ -69,21 +53,16 @@ const renderItem = ({
   item: { id: string }
   index: number
   section: { data: readonly { id: string }[] }
-}) => {
-  const isFirst = index === 0
-  const isLast = index === section.data.length - 1
-
-  return (
-    <View style={[isFirst && groupStyles.firstRow, isLast && groupStyles.lastRow]}>
-      <MemoizedTransactionItem
-        txid={item.id}
-        subtitle
-        isFirst={isFirst}
-        isLast={isLast}
-      />
-    </View>
-  )
-}
+}) => (
+  // The card row draws the date group's corners and dividers itself, as in the history.
+  <MemoizedTransactionItem
+    variant="card"
+    txid={item.id}
+    subtitle
+    isFirst={index === 0}
+    isLast={index === section.data.length - 1}
+  />
+)
 
 export const ContactTransactions = ({ contact }: Props) => {
   const styles = useStyles()
@@ -254,15 +233,13 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   sectionHeaderContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingBottom: 3,
-    paddingTop: 10,
+    paddingBottom: 5,
+    paddingTop: 20,
   },
 
   sectionHeaderText: {
     color: colors.textOnBackground,
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: 18,
   },
 }))

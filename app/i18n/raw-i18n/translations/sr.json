@@ -2745,7 +2745,13 @@
     "noTransaction": "Нема трансакција за приказ",
     "title": "Трансакције",
     "recentTransactions": "Недавне трансакције",
-    "transactionHistoryTitle": "Историја Трансакција"
+    "transactionHistoryTitle": "Историја трансакција",
+    "filters": "Филтери",
+    "sent": "Послате",
+    "received": "Примљене",
+    "searchPlaceholder": "Претрага...",
+    "expandingSearch": "Проширујем претрагу",
+    "nothingCameBack": "Ништа није пронађено"
   },
   "TransferScreen": {
     "title": "Трансфер",
@@ -3035,7 +3041,7 @@
       "other": "Дана"
     },
     "dollar": "Долар",
-    "all": "СВЕ",
+    "all": "Све",
     "allAccounts": "Сви налози",
     "some": "Неки",
     "support": "Подршка",
@@ -3123,6 +3129,9 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
+  },
+  "Accessibility": {
+    "switchToWallet": "Пребаци на {wallet: string}"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Морам да ажурирам апликацију на најновију верзију. Користим {os: string} апликацију са верзијом {version: string}.",

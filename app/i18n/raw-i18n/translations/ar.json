@@ -2745,7 +2745,13 @@
     "noTransaction": "لا توجد معاملة لإظهارها",
     "title": "المعاملات",
     "recentTransactions": "Recent transactions",
-    "transactionHistoryTitle": "تاريخ المعاملة"
+    "transactionHistoryTitle": "تاريخ المعاملة",
+    "filters": "عوامل التصفية",
+    "sent": "المُرسلة",
+    "received": "المُستلمة",
+    "searchPlaceholder": "البحث...",
+    "expandingSearch": "جارٍ توسيع البحث",
+    "nothingCameBack": "لا توجد نتائج"
   },
   "TransferScreen": {
     "title": "تحويل",
@@ -3123,6 +3129,9 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
+  },
+  "Accessibility": {
+    "switchToWallet": "التبديل إلى {wallet: string}"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "أحتاج إلى تحديث تطبيقي إلى أحدث إصدار. أنا أستخدم تطبيق {os: string} مع الإصدار {version: string}.",

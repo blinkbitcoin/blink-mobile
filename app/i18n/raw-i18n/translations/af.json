@@ -2745,7 +2745,13 @@
     "noTransaction": "Geen transaksies om te wys nie",
     "title": "Transaksies",
     "recentTransactions": "Onlangse transaksies",
-    "transactionHistoryTitle": "Transaksiegeskiedenis"
+    "transactionHistoryTitle": "Transaksiegeskiedenis",
+    "filters": "Filters",
+    "sent": "Gestuur",
+    "received": "Ontvang",
+    "searchPlaceholder": "Soek...",
+    "expandingSearch": "Soektog word uitgebrei",
+    "nothingCameBack": "Niks gevind nie"
   },
   "TransferScreen": {
     "title": "Plaas Oor",
@@ -3035,7 +3041,7 @@
       "other": "Dae"
     },
     "dollar": "Dollar",
-    "all": "ALLES",
+    "all": "Alles",
     "allAccounts": "Alle rekeninge",
     "some": "Sommige",
     "support": "Ondersteuning",
@@ -3123,6 +3129,9 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Stel bedrag "
+  },
+  "Accessibility": {
+    "switchToWallet": "Skakel oor na {wallet: string}"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ek moet opgradeer na die nuutste weergawe. Ek gebruik tans die {os: string} toepassing met die weergawe {version: string}.",

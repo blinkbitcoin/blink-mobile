@@ -2745,7 +2745,13 @@
     "noTransaction": "Tiada transaksi untuk dipaparkan",
     "title": "Transaksi",
     "recentTransactions": "Transaksi terkini",
-    "transactionHistoryTitle": "Rekod transaksi"
+    "transactionHistoryTitle": "Rekod transaksi",
+    "filters": "Penapis",
+    "sent": "Dihantar",
+    "received": "Diterima",
+    "searchPlaceholder": "Carian...",
+    "expandingSearch": "Meluaskan carian",
+    "nothingCameBack": "Tiada hasil"
   },
   "TransferScreen": {
     "title": "Pindahkan",
@@ -3035,7 +3041,7 @@
       "other": "Hari"
     },
     "dollar": "Dolar",
-    "all": "SEMUA",
+    "all": "Semua",
     "allAccounts": "Semua akaun",
     "some": "Sebahagian",
     "support": "Sokongan",
@@ -3123,6 +3129,9 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Tetapkan amaun"
+  },
+  "Accessibility": {
+    "switchToWallet": "Tukar kepada {wallet: string}"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Aku perlu kemaskini aplikasi ini kepada yang terkini. Aku gunakan {os: string} dengan versi aplikasi {version: string}",

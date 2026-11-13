@@ -2745,7 +2745,13 @@
     "noTransaction": "Tidak ada transaksi untuk ditampilkan",
     "title": "Semua transaksi",
     "recentTransactions": "Transaksi terbaru",
-    "transactionHistoryTitle": "Riwayat Transaksi"
+    "transactionHistoryTitle": "Riwayat transaksi",
+    "filters": "Filter",
+    "sent": "Terkirim",
+    "received": "Diterima",
+    "searchPlaceholder": "Cari...",
+    "expandingSearch": "Memperluas pencarian",
+    "nothingCameBack": "Tidak ada hasil"
   },
   "TransferScreen": {
     "title": "Transfer",
@@ -3035,7 +3041,7 @@
       "other": "Hari"
     },
     "dollar": "Dolar",
-    "all": "SEMUA",
+    "all": "Semua",
     "allAccounts": "Semua akun",
     "some": "Sebagian",
     "support": "Dukungan",
@@ -3123,6 +3129,9 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Tetapkan jumlah"
+  },
+  "Accessibility": {
+    "switchToWallet": "Beralih ke {wallet: string}"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Saya perlu memperbarui aplikasi saya ke versi terbaru. Saya menggunakan aplikasi {os: string} dengan versi {version: string}.",

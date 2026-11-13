@@ -4,6 +4,7 @@ import { MockedResponse } from "@apollo/client/testing"
 import { RouteProp } from "@react-navigation/native"
 import { act, fireEvent, render, waitFor, cleanup } from "@testing-library/react-native"
 
+import { SEND_WALLET_SUMMARY_TEST_ID as WALLET_CARD } from "@app/components/wallet-summary"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { TransactionHistoryScreen } from "@app/screens/transaction-history"
 import {
@@ -75,6 +76,8 @@ jest.mock("@app/graphql/mocks", () => {
 // screen shares one stable callback instead of a fresh closure per row —
 // a fresh closure defeats React.memo and re-renders the whole list.
 const mockOnPressIdentities: Array<(txid: string) => void> = []
+// Every render of every row, in order, so a test can follow one row's bounce prop.
+const mockRowRenders: Array<{ txid: string; highlight?: boolean; bounce?: boolean }> = []
 
 jest.mock("@app/components/transaction-item", () => {
   const React = jest.requireActual("react")
@@ -83,11 +86,19 @@ jest.mock("@app/components/transaction-item", () => {
   type Props = {
     txid: string
     highlight?: boolean
+    bounce?: boolean
     testId?: string
     onPress?: (txid: string) => void
   }
 
-  const MemoizedTransactionItem = ({ txid, highlight, testId, onPress }: Props) => {
+  const MemoizedTransactionItem = ({
+    txid,
+    highlight,
+    bounce,
+    testId,
+    onPress,
+  }: Props) => {
+    mockRowRenders.push({ txid, highlight, bounce })
     if (onPress) {
       mockOnPressIdentities.push(onPress)
     }
@@ -128,9 +139,13 @@ const mockRouteWithCurrencyFilter = (
 const buildTransactionMocks = ({
   btcTxId,
   usdTxId,
+  usdDirection = "RECEIVE",
+  btcMemo = null,
 }: {
   btcTxId: string
   usdTxId: string
+  usdDirection?: "RECEIVE" | "SEND"
+  btcMemo?: string | null
 }): MockedResponse[] => {
   const wallets = [
     {
@@ -155,7 +170,7 @@ const buildTransactionMocks = ({
       id: btcTxId,
       status: "SUCCESS",
       direction: "RECEIVE",
-      memo: null,
+      memo: btcMemo,
       createdAt: 1700000000,
       settlementAmount: 1000,
       settlementFee: 0,
@@ -191,7 +206,7 @@ const buildTransactionMocks = ({
       __typename: "Transaction",
       id: usdTxId,
       status: "SUCCESS",
-      direction: "RECEIVE",
+      direction: usdDirection,
       memo: null,
       createdAt: 1700000001,
       settlementAmount: 1000,
@@ -221,7 +236,7 @@ const buildTransactionMocks = ({
     },
   }
 
-  const makeResult = (edges: (typeof btcEdge)[]) => ({
+  const makeResult = (edges: Array<typeof btcEdge | typeof usdEdge>) => ({
     data: {
       me: {
         __typename: "User",
@@ -247,7 +262,10 @@ const buildTransactionMocks = ({
     },
   })
 
-  const makeRequest = (walletIds: string[], edges: (typeof btcEdge)[]) => ({
+  const makeRequest = (
+    walletIds: string[],
+    edges: Array<typeof btcEdge | typeof usdEdge>,
+  ) => ({
     request: {
       query: TransactionListForDefaultAccountDocument,
       variables: {
@@ -271,6 +289,7 @@ describe("TransactionHistoryScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     mockOnPressIdentities.length = 0
+    mockRowRenders.length = 0
   })
 
   afterEach(() => {
@@ -301,8 +320,7 @@ describe("TransactionHistoryScreen", () => {
     })
 
     // Force a screen re-render: a per-row closure would be rebuilt here.
-    const dropdown = screen.getByTestId("wallet-filter-dropdown")
-    await act(() => fireEvent.press(dropdown))
+    await act(() => fireEvent.press(screen.getByTestId(WALLET_CARD)))
 
     expect(mockOnPressIdentities.length).toBeGreaterThan(1)
     expect(new Set(mockOnPressIdentities).size).toBe(1)
@@ -350,12 +368,8 @@ describe("TransactionHistoryScreen", () => {
     })
     await waitForStableRender(screen)
 
-    const dropdown = screen.getByTestId("wallet-filter-dropdown")
-    await act(() => fireEvent.press(dropdown))
-
-    const btcOption = await screen.findByText("Bitcoin")
-
-    await act(() => fireEvent.press(btcOption))
+    // The wallet card cycles All → Bitcoin → Dollar; one tap from All is Bitcoin.
+    await act(() => fireEvent.press(screen.getByTestId(WALLET_CARD)))
 
     // Wait for the refetched row, then settle: the dropped row is asserted by
     // absence, and `waitFor` alone would pass on any frame that has not
@@ -423,11 +437,8 @@ describe("TransactionHistoryScreen", () => {
     })
     await waitForStableRender(screen)
 
-    const dropdown = screen.getByTestId("wallet-filter-dropdown")
-    await act(() => fireEvent.press(dropdown))
-
-    const usdOption = await screen.findByText("Dollar")
-    await act(() => fireEvent.press(usdOption))
+    // One tap from Bitcoin is Dollar.
+    await act(() => fireEvent.press(screen.getByTestId(WALLET_CARD)))
 
     await waitFor(() => {
       expect(screen.getByTestId("transaction-by-index-0").props.children).toContain(
@@ -511,5 +522,170 @@ describe("TransactionHistoryScreen", () => {
     expect(screen.getByTestId("transaction-by-index-1").props.children).toContain(
       "highlight",
     )
+  })
+
+  it("bounces a highlighted row on its first render only, not when the list rebuilds", async () => {
+    currentTxLastSeen = {
+      btcId: "507f1f77bcf86cd799439015",
+      usdId: "507f1f77bcf86cd799439025",
+    }
+    currentMocks = buildTransactionMocks({
+      btcTxId: "507f1f77bcf86cd799439030",
+      usdTxId: "507f1f77bcf86cd799439040",
+    })
+
+    const screen = render(
+      <ContextForScreen>
+        <TransactionHistoryScreen route={mockRouteWithCurrencyFilter()} />
+      </ContextForScreen>,
+    )
+    await waitFor(() => {
+      expect(screen.getByTestId("transaction-by-index-1").props.children).toContain(
+        ":highlight",
+      )
+    })
+    await waitForStableRender(screen)
+
+    // Rebuild the list, as a filter tap does: the rows render again from scratch.
+    await act(() => fireEvent.press(screen.getByTestId(WALLET_CARD)))
+    await waitForStableRender(screen)
+
+    const btcRenders = mockRowRenders.filter(
+      ({ txid, highlight }) => txid === "507f1f77bcf86cd799439030" && highlight,
+    )
+    expect(btcRenders.length).toBeGreaterThan(1)
+    expect(btcRenders[0].bounce).toBe(true)
+    expect(btcRenders.slice(1).every(({ bounce }) => bounce === false)).toBe(true)
+  })
+
+  describe("filters", () => {
+    const openFilters = async (screen: ReturnType<typeof render>) => {
+      await act(() =>
+        fireEvent.press(screen.getByTestId("transaction-history-filter-button")),
+      )
+      await screen.findByTestId("transaction-history-filters")
+    }
+
+    const shownTxIds = (screen: ReturnType<typeof render>) =>
+      screen
+        .queryAllByTestId(/^transaction-by-index-/)
+        .map((node) => String(node.props.children).split(":")[0])
+
+    it("hides received payments when Received is switched off", async () => {
+      currentTxLastSeen = {
+        btcId: "507f1f77bcf86cd799439010",
+        usdId: "507f1f77bcf86cd799439010",
+      }
+      currentMocks = buildTransactionMocks({
+        btcTxId: "507f1f77bcf86cd799439011",
+        usdTxId: "507f1f77bcf86cd799439012",
+        usdDirection: "SEND",
+      })
+
+      const screen = render(
+        <ContextForScreen>
+          <TransactionHistoryScreen route={mockRouteWithCurrencyFilter()} />
+        </ContextForScreen>,
+      )
+      await waitFor(() => expect(shownTxIds(screen)).toHaveLength(2))
+      await waitForStableRender(screen)
+
+      await openFilters(screen)
+      await act(() => fireEvent.press(screen.getByTestId("filter-received")))
+      await waitForStableRender(screen)
+
+      expect(shownTxIds(screen)).toEqual(["507f1f77bcf86cd799439012"])
+    })
+
+    it("hides sent payments when Sent is switched off", async () => {
+      currentTxLastSeen = {
+        btcId: "507f1f77bcf86cd799439010",
+        usdId: "507f1f77bcf86cd799439010",
+      }
+      currentMocks = buildTransactionMocks({
+        btcTxId: "507f1f77bcf86cd799439011",
+        usdTxId: "507f1f77bcf86cd799439012",
+        usdDirection: "SEND",
+      })
+
+      const screen = render(
+        <ContextForScreen>
+          <TransactionHistoryScreen route={mockRouteWithCurrencyFilter()} />
+        </ContextForScreen>,
+      )
+      await waitFor(() => expect(shownTxIds(screen)).toHaveLength(2))
+      await waitForStableRender(screen)
+
+      await openFilters(screen)
+      await act(() => fireEvent.press(screen.getByTestId("filter-sent")))
+      await waitForStableRender(screen)
+
+      expect(shownTxIds(screen)).toEqual(["507f1f77bcf86cd799439011"])
+    })
+
+    it("keeps only payments whose note contains the search, ignoring case", async () => {
+      jest.useFakeTimers()
+      try {
+        currentTxLastSeen = {
+          btcId: "507f1f77bcf86cd799439010",
+          usdId: "507f1f77bcf86cd799439010",
+        }
+        currentMocks = buildTransactionMocks({
+          btcTxId: "507f1f77bcf86cd799439011",
+          usdTxId: "507f1f77bcf86cd799439012",
+          btcMemo: "Morning Coffee",
+        })
+
+        const screen = render(
+          <ContextForScreen>
+            <TransactionHistoryScreen route={mockRouteWithCurrencyFilter()} />
+          </ContextForScreen>,
+        )
+        await waitFor(() => expect(shownTxIds(screen)).toHaveLength(2))
+
+        await openFilters(screen)
+        fireEvent.changeText(screen.getByTestId("transaction-history-search"), "coffee")
+        // The search waits 300 ms after typing.
+        await act(() => jest.advanceTimersByTime(300))
+
+        await waitFor(() =>
+          expect(shownTxIds(screen)).toEqual(["507f1f77bcf86cd799439011"]),
+        )
+      } finally {
+        jest.useRealTimers()
+      }
+    })
+
+    it("clears the filters when the panel closes", async () => {
+      currentTxLastSeen = {
+        btcId: "507f1f77bcf86cd799439010",
+        usdId: "507f1f77bcf86cd799439010",
+      }
+      currentMocks = buildTransactionMocks({
+        btcTxId: "507f1f77bcf86cd799439011",
+        usdTxId: "507f1f77bcf86cd799439012",
+        usdDirection: "SEND",
+      })
+
+      const screen = render(
+        <ContextForScreen>
+          <TransactionHistoryScreen route={mockRouteWithCurrencyFilter()} />
+        </ContextForScreen>,
+      )
+      await waitFor(() => expect(shownTxIds(screen)).toHaveLength(2))
+      await waitForStableRender(screen)
+
+      await openFilters(screen)
+      await act(() => fireEvent.press(screen.getByTestId("filter-received")))
+      await waitForStableRender(screen)
+      expect(shownTxIds(screen)).toHaveLength(1)
+
+      await act(() =>
+        fireEvent.press(screen.getByTestId("transaction-history-filter-button")),
+      )
+      await waitForStableRender(screen)
+
+      expect(shownTxIds(screen)).toHaveLength(2)
+    })
   })
 })

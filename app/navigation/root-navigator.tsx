@@ -680,7 +680,8 @@ export const RootStack = () => {
         options={{
           title: LL.TransactionScreen.transactionHistoryTitle(),
           presentation: "modal",
-          animation: "slide_from_bottom",
+          // Android plays slide_from_bottom for 400ms both ways; this one closes in 250ms.
+          animation: "fade_from_bottom",
           gestureEnabled: false,
         }}
       />

@@ -2745,7 +2745,13 @@
     "noTransaction": "Žádná transakce k zobrazení",
     "title": "Transakce",
     "recentTransactions": "Nedávné transakce",
-    "transactionHistoryTitle": "Transakční historie"
+    "transactionHistoryTitle": "Transakční historie",
+    "filters": "Filtry",
+    "sent": "Odeslané",
+    "received": "Přijaté",
+    "searchPlaceholder": "Hledat...",
+    "expandingSearch": "Rozšiřuji hledání",
+    "nothingCameBack": "Nic nenalezeno"
   },
   "TransferScreen": {
     "title": "Převod",
@@ -3035,7 +3041,7 @@
       "other": "Dny"
     },
     "dollar": "Dolar",
-    "all": "VŠE",
+    "all": "Vše",
     "allAccounts": "Všechny účty",
     "some": "Některé",
     "support": "Podpora",
@@ -3123,6 +3129,9 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Nastavit částku"
+  },
+  "Accessibility": {
+    "switchToWallet": "Přepnout na {wallet: string}"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Potřebuji aktualizovat aplikaci na nejnovější verzi. Používám aplikaci {os: string} s verzí {version: string}.",

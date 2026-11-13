@@ -55,6 +55,7 @@ const STATIC_SURFACES: Record<string, number> = {
   "app/screens/totp-screen/authenticator-intro-screen.tsx": 1,
   "app/screens/totp-screen/authenticator-protected-screen.tsx": 1,
   "app/screens/transaction-detail-screen/transaction-detail-screen.tsx": 2,
+  "app/screens/transaction-history/transaction-history-filters.tsx": 1,
 }
 
 const sourceFiles = (dir: string): string[] =>

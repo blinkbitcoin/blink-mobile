@@ -1,5 +1,5 @@
 import React from "react"
-import { Text as RNText, View } from "react-native"
+import { StyleSheet, Text as RNText, View } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 
 import { MemoizedTransactionItem } from "@app/components/transaction-item/transaction-item"
@@ -118,31 +118,27 @@ jest.mock("@rn-vui/themed", () => {
   ListItem.Title = ListItemTitle
   ListItem.Subtitle = ListItemSubtitle
 
+  const colors = {
+    textOnBackground: "#000000",
+    textPrimary: "#333333",
+    textSecondary: "#555555",
+    textMuted: "#999999",
+    neutral: "#CCCCCC",
+    surfaceInteractive: "#F5F5F5",
+    staticSuccess: "#00AA00",
+    accent: "#F7931A",
+  }
+
+  // The real style factories, run with these colours, so a test can read the row's own
+  // corners and divider rather than a stand-in.
   return {
     Text: (props: React.ComponentProps<typeof RNText>) => <RNText {...props} />,
     ListItem,
-    useTheme: () => ({
-      theme: {
-        colors: {
-          textPrimary: "#333333",
-          textSecondary: "#555555",
-          neutral: "#CCCCCC",
-          surfaceInteractive: "#F5F5F5",
-          staticSuccess: "#00AA00",
-          accent: "#F7931A",
-        },
-      },
-    }),
-    makeStyles: () => () => ({
-      container: {},
-      hiddenBalanceContainer: {},
-      pending: {},
-      receive: {},
-      send: {},
-      title: {},
-      subtitle: {},
-      amountWrapper: {},
-    }),
+    useTheme: () => ({ theme: { colors } }),
+    makeStyles:
+      (factory: (theme: { colors: typeof colors }, props: unknown) => object) =>
+      (props: unknown) =>
+        factory({ colors }, props),
   }
 })
 
@@ -412,6 +408,98 @@ describe("MemoizedTransactionItem", () => {
       })
       const { toJSON } = render(<MemoizedTransactionItem txid="tx-1" />)
       expect(toJSON()).toBeNull()
+    })
+  })
+
+  describe("card variant", () => {
+    const rowStyle = (screen: ReturnType<typeof render>) =>
+      StyleSheet.flatten(screen.getByTestId("transaction-item").props.style)
+
+    /** The divider is the only absolutely positioned view inside the row. */
+    const dividers = (screen: ReturnType<typeof render>) =>
+      screen
+        .UNSAFE_getAllByType(View)
+        .filter((node) => StyleSheet.flatten(node.props.style)?.position === "absolute")
+
+    it("rounds the top corners of the first row only", () => {
+      const screen = render(
+        <MemoizedTransactionItem txid="tx-1" variant="card" isFirst />,
+      )
+
+      expect(rowStyle(screen)).toMatchObject({
+        borderTopLeftRadius: 8,
+        borderTopRightRadius: 8,
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
+      })
+    })
+
+    it("rounds the bottom corners of the last row only", () => {
+      const screen = render(<MemoizedTransactionItem txid="tx-1" variant="card" isLast />)
+
+      expect(rowStyle(screen)).toMatchObject({
+        borderTopLeftRadius: 0,
+        borderTopRightRadius: 0,
+        borderBottomLeftRadius: 8,
+        borderBottomRightRadius: 8,
+      })
+    })
+
+    it("draws no divider above the first row", () => {
+      const screen = render(
+        <MemoizedTransactionItem txid="tx-1" variant="card" isFirst />,
+      )
+
+      expect(dividers(screen)).toHaveLength(0)
+    })
+
+    it("draws a 1px neutral divider inset 10 from each side above every other row", () => {
+      const screen = render(<MemoizedTransactionItem txid="tx-1" variant="card" />)
+
+      expect(dividers(screen)).toHaveLength(1)
+      expect(StyleSheet.flatten(dividers(screen)[0].props.style)).toMatchObject({
+        top: 0,
+        left: 10,
+        right: 10,
+        height: 1,
+        backgroundColor: "#CCCCCC",
+      })
+      // The line replaced a full-width top border.
+      expect(rowStyle(screen).borderTopWidth).toBeUndefined()
+    })
+  })
+
+  describe("bounce prop", () => {
+    it("does not bounce a highlighted row mounted with bounce={false}", () => {
+      render(<MemoizedTransactionItem txid="tx-1" highlight bounce={false} />)
+
+      expect(mockUseBounceInAnimation).not.toHaveBeenCalled()
+      expect(mockUseIsFocused).not.toHaveBeenCalled()
+    })
+
+    it("does not bounce a card row mounted with bounce={false}", () => {
+      render(
+        <MemoizedTransactionItem txid="tx-1" variant="card" highlight bounce={false} />,
+      )
+
+      expect(mockUseBounceInAnimation).not.toHaveBeenCalled()
+    })
+
+    it("keeps a bounce that started when bounce turns false, since it is read at mount", () => {
+      const { rerender } = render(
+        <MemoizedTransactionItem txid="tx-1" variant="card" highlight />,
+      )
+      expect(mockUseBounceInAnimation).toHaveBeenLastCalledWith(
+        expect.objectContaining({ visible: true }),
+      )
+
+      rerender(
+        <MemoizedTransactionItem txid="tx-1" variant="card" highlight bounce={false} />,
+      )
+
+      expect(mockUseBounceInAnimation).toHaveBeenLastCalledWith(
+        expect.objectContaining({ visible: true }),
+      )
     })
   })
 })

@@ -2745,7 +2745,13 @@
     "noTransaction": "Hakuna malipo ya kuonyesha",
     "title": "Mihamala yote",
     "recentTransactions": "Mihamala ya hivi karibuni",
-    "transactionHistoryTitle": "Historia ya Malipo"
+    "transactionHistoryTitle": "Historia ya malipo",
+    "filters": "Vichujio",
+    "sent": "Zilizotumwa",
+    "received": "Zilizopokelewa",
+    "searchPlaceholder": "Tafuta...",
+    "expandingSearch": "Inapanua utafutaji",
+    "nothingCameBack": "Hakuna kilichopatikana"
   },
   "TransferScreen": {
     "title": "Hamisha",
@@ -3035,7 +3041,7 @@
       "other": "Siku"
     },
     "dollar": "Dola",
-    "all": "ZOTE",
+    "all": "Zote",
     "allAccounts": "Akaunti zote",
     "some": "Baadhi",
     "support": "Msaada",
@@ -3123,6 +3129,9 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Weka kiasi"
+  },
+  "Accessibility": {
+    "switchToWallet": "Badilisha kwenda {wallet: string}"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ninahitaji kusasisha programu yangu hadi toleo jipya zaidi. Ninatumia programu ya {os: string} yenye toleo la {version: string}.",

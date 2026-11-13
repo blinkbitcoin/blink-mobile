@@ -78,10 +78,17 @@ export const getSelfCustodialWalletSnapshot = async (
     if (!hasMore) break
   }
 
+  /**
+   * Pages are read by offset, so a payment the SDK stores between two reads (a new one,
+   * or an older one it is still syncing in) shifts the later pages and can repeat a row.
+   * A repeated id reaches the lists as a duplicate key, which makes rows vanish.
+   */
+  const uniqueTransactions = dedupeTransactionsById(transactions)
+
   const usdbToken = findUsdbToken(info)
   if (
     !usdbToken &&
-    transactions.some((tx) => tx.amount.currency === WalletCurrency.Usd)
+    uniqueTransactions.some((tx) => tx.amount.currency === WalletCurrency.Usd)
   ) {
     // The expected-state breadcrumb above covers fresh wallets; a wallet WITH USD
     // history but no token entry would silently show a 0 stable balance.
@@ -100,9 +107,9 @@ export const getSelfCustodialWalletSnapshot = async (
         btcBalance: Number(info.balanceSats),
         stableBalance: getStableBalance(usdbToken),
       },
-      transactions,
+      uniqueTransactions,
     ),
-    allTransactions: transactions,
+    allTransactions: uniqueTransactions,
     hasMore,
     rawTransactionCount,
   }

@@ -2745,7 +2745,13 @@
     "noTransaction": "Mana kaniyta rikuchiy kawsayniyta qillqata sutichinaqin",
     "title": "Willanakuy ",
     "recentTransactions": "Qhipa willanakuykuna",
-    "transactionHistoryTitle": "P'anqa"
+    "transactionHistoryTitle": "P'anqa",
+    "filters": "Ch'uyanchaqkuna",
+    "sent": "Apachisqa",
+    "received": "Chaskisqa",
+    "searchPlaceholder": "Riqsichiy...",
+    "expandingSearch": "Maskayta mast'arichkan",
+    "nothingCameBack": "Manam imapas tarikunchu"
   },
   "TransferScreen": {
     "title": "Kawsayniy",
@@ -3035,7 +3041,7 @@
       "other": "P'unchawkuna"
     },
     "dollar": "Dólar",
-    "all": "LLAPAN",
+    "all": "Llapan",
     "allAccounts": "Tukuy cuentakuna",
     "some": "Wakin",
     "support": "Yanapay",
@@ -3123,6 +3129,9 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
+  },
+  "Accessibility": {
+    "switchToWallet": "{wallet: string}-man tikray"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Kaypiyta yachayninta munanichu, hamut'a kachun {os: string} app qallarichkanmi, versiyonqa {version: string} nisqan.",

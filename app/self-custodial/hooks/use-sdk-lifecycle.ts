@@ -63,7 +63,8 @@ type SdkLifecycleState = {
   lastReceivedPaymentId: string | null
   hasMoreTransactions: boolean
   loadingMore: boolean
-  loadMore: () => Promise<void>
+  /** Resolves true once a page was read, false when none was (no more pages, or it failed). */
+  loadMore: () => Promise<boolean>
   refreshWallets: () => Promise<void>
   refreshStableBalanceActive: () => Promise<void>
 }
@@ -376,27 +377,48 @@ export const useSdkLifecycle = (
     return () => clearInterval(interval)
   }, [refreshWallets])
 
-  const loadMore = useCallback(async () => {
+  // Pages are read by offset, so two reads in flight would both start at the same offset
+  // and then both advance it, skipping a page. A caller that arrives while a page is loading
+  // gets that page's promise instead of a second read. The read is keyed by connection, so
+  // a page still loading for an account the user has left never holds up the new one.
+  const loadMoreRef = useRef<{
+    sdk: BreezSdkInterface
+    request: Promise<boolean>
+  } | null>(null)
+
+  const loadMore = useCallback((): Promise<boolean> => {
     const sdk = sdkRef.current
-    if (!sdk || loadingMore || !hasMoreTransactions) return
+    if (sdk && loadMoreRef.current?.sdk === sdk) return loadMoreRef.current.request
+    if (!sdk || !hasMoreTransactions) return Promise.resolve(false)
     /** A page asked of a connection that an account switch has since replaced belongs to
      *  the account the user left: merging it would list that account's payments under the
      *  new one, and settling it would end a page the new account may be loading itself. */
     const isStale = () => sdkRef.current !== sdk
-    setLoadingMore(true)
-    try {
-      const result = await loadMoreTransactions(sdk, rawTxOffsetRef.current)
-      if (isStale()) return
-      rawTxOffsetRef.current += result.rawCount
-      setHasMoreTransactions(result.hasMore)
-      setWallets((prev) => appendTransactions(prev, result.transactions))
-      setAllTransactions((prev) => mergeOrderedTransactions(prev, result.transactions))
-    } catch (err) {
-      logSdkEvent(SdkLogLevel.Error, `Failed to load more transactions: ${err}`)
-    } finally {
-      if (!isStale()) setLoadingMore(false)
+
+    const readPage = async (): Promise<boolean> => {
+      setLoadingMore(true)
+      try {
+        const result = await loadMoreTransactions(sdk, rawTxOffsetRef.current)
+        if (isStale()) return false
+        rawTxOffsetRef.current += result.rawCount
+        setHasMoreTransactions(result.hasMore)
+        setWallets((prev) => appendTransactions(prev, result.transactions))
+        setAllTransactions((prev) => mergeOrderedTransactions(prev, result.transactions))
+        return true
+      } catch (err) {
+        logSdkEvent(SdkLogLevel.Error, `Failed to load more transactions: ${err}`)
+        return false
+      } finally {
+        if (!isStale()) setLoadingMore(false)
+      }
     }
-  }, [loadingMore, hasMoreTransactions])
+
+    const request = readPage().finally(() => {
+      if (loadMoreRef.current?.request === request) loadMoreRef.current = null
+    })
+    loadMoreRef.current = { sdk, request }
+    return request
+  }, [hasMoreTransactions])
 
   const refreshStableBalanceActive = useCallback(async () => {
     if (!sdkRef.current) return

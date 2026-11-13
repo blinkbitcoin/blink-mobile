@@ -2745,7 +2745,13 @@
     "noTransaction": "Nincs megjeleníthető tranzakció",
     "title": "Összes tranzakció",
     "recentTransactions": "Legutóbbi tranzakciók",
-    "transactionHistoryTitle": "Tranzakciótörténet"
+    "transactionHistoryTitle": "Tranzakciótörténet",
+    "filters": "Szűrők",
+    "sent": "Küldött",
+    "received": "Fogadott",
+    "searchPlaceholder": "Keresés...",
+    "expandingSearch": "Keresés bővítése",
+    "nothingCameBack": "Nincs találat"
   },
   "TransferScreen": {
     "title": "Átutalás",
@@ -3035,7 +3041,7 @@
       "other": "Nap"
     },
     "dollar": "Dollár",
-    "all": "MIND",
+    "all": "Mind",
     "allAccounts": "Összes fiók",
     "some": "Néhány",
     "support": "Támogatás",
@@ -3123,6 +3129,9 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Összeg beállítása"
+  },
+  "Accessibility": {
+    "switchToWallet": "Váltás erre: {wallet: string}"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Frissítenem kell az alkalmazásomat a legújabb verzióra. A(z) {os: string} alkalmazást használom, verziószáma: {version: string}.",

@@ -1,11 +1,16 @@
 import * as React from "react"
 import { InteractionManager, SectionList, Text, View } from "react-native"
-import { makeStyles } from "@rn-vui/themed"
+import Animated, { LinearTransition } from "react-native-reanimated"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useNavigation, RouteProp } from "@react-navigation/native"
 
+import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
+import { headerRightNoGlass } from "@app/components/header-no-glass"
 import { Screen } from "@app/components/screen"
+import { WalletSummary } from "@app/components/wallet-summary"
+import { type WalletSwitchValue as WalletValues } from "@app/components/wallet-switch"
 import {
   TransactionFragment,
   useTransactionListForDefaultAccountQuery,
@@ -14,6 +19,7 @@ import {
   TxDirection,
   TxStatus,
 } from "@app/graphql/generated"
+import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { groupTransactionsByDate } from "@app/graphql/transactions"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
@@ -27,14 +33,12 @@ import {
   type HighlightBaseline,
 } from "@app/self-custodial/mappers/transaction-highlight"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
-import {
-  WalletFilterDropdown,
-  WalletValues,
-} from "@app/components/wallet-filter-dropdown"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useHasTransitioned, useTransactionSeenState } from "@app/hooks"
+import { useDebouncedEffect } from "@app/hooks/use-debounce"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { reportError } from "@app/utils/error-logging"
+import { testProps } from "@app/utils/testProps"
 
 import {
   MemoizedTransactionItem,
@@ -43,6 +47,14 @@ import {
 import { toastShow } from "../../utils/toast"
 
 import TransactionHistorySkeleton from "./transaction-history-skeleton"
+import {
+  ALL_DIRECTIONS,
+  NoResultsCard,
+  TransactionHistoryFilters,
+  toggleDirection,
+  type DirectionFilter,
+} from "./transaction-history-filters"
+import { useHistoryWalletSummary } from "./use-history-wallet-summary"
 
 gql`
   query transactionListForDefaultAccount(
@@ -68,6 +80,16 @@ gql`
 const INITIAL_ITEMS_TO_RENDER = 14
 const RENDER_BATCH_SIZE = 14
 const QUERY_BATCH_SIZE = INITIAL_ITEMS_TO_RENDER * 1.5
+const SEARCH_DEBOUNCE_MS = 300
+const LAYOUT_TRANSITION_MS = 200
+
+/**
+ * The backend can't filter custodial history yet, so a search with no match downloads older
+ * pages to look through. Pages are as large as the API allows (`MAX_PAGINATION_PAGE_SIZE`),
+ * and the search stops once this many transactions are loaded: ~10 requests, a few seconds.
+ */
+const CUSTODIAL_SEARCH_PAGE_SIZE = 100
+const CUSTODIAL_SEARCH_CAP = 1000
 
 const keyExtractor = (item: TransactionFragment) => item.id
 
@@ -79,16 +101,75 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   route,
 }) => {
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
   const { LL, locale } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const [walletFilter, setWalletFilter] = React.useState<WalletValues>(
+  const { hideAmount } = useHideAmount()
+  const [selectedWallet, setSelectedWallet] = React.useState<WalletValues>(
     route.params?.currencyFilter ?? "ALL",
   )
+  const walletSummary = useHistoryWalletSummary(selectedWallet)
+  const walletFilter = walletSummary.wallet
+
+  // Filters live only as long as the screen and the open panel: closing either clears them.
+  const [filtersOpen, setFiltersOpen] = React.useState(false)
+  const [directions, setDirections] = React.useState<DirectionFilter>(ALL_DIRECTIONS)
+  const [searchText, setSearchText] = React.useState("")
+  const [searchQuery, setSearchQuery] = React.useState("")
+
+  useDebouncedEffect(
+    () => setSearchQuery(searchText.trim().toLowerCase()),
+    SEARCH_DEBOUNCE_MS,
+    [searchText],
+  )
+
+  const filtersActive = !directions.sent || !directions.received || searchQuery.length > 0
+
+  const toggleFilters = React.useCallback(() => {
+    setFiltersOpen((open) => {
+      if (open) {
+        setDirections(ALL_DIRECTIONS)
+        setSearchText("")
+        setSearchQuery("")
+      }
+      return !open
+    })
+  }, [])
+
+  React.useEffect(() => {
+    navigation.setOptions(
+      headerRightNoGlass(() => (
+        <GaloyIconButton
+          {...testProps("transaction-history-filter-button")}
+          name="filter"
+          size={32}
+          iconSize={20}
+          color={filtersOpen ? colors.backgroundDefault : colors.accent}
+          backgroundColor={filtersOpen ? colors.accent : colors.surfaceInteractive}
+          onPress={toggleFilters}
+          accessibilityRole="button"
+          accessibilityLabel={LL.TransactionScreen.filters()}
+          accessibilityState={{ expanded: filtersOpen }}
+        />
+      )),
+    )
+  }, [
+    navigation,
+    filtersOpen,
+    toggleFilters,
+    colors.backgroundDefault,
+    colors.accent,
+    colors.surfaceInteractive,
+    LL,
+  ])
 
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
   const {
     allTransactions: selfCustodialAllTransactions,
+    hasMoreTransactions: selfCustodialHasMore,
     loadMore: selfCustodialLoadMore,
     refreshWallets: refreshSelfCustodialWallets,
   } = useSelfCustodialWallet()
@@ -196,15 +277,36 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     return pendingIncomingTransactions ? [...pendingIncomingTransactions] : []
   }, [activeWallet.isSelfCustodial, selfCustodialPending, pendingIncomingTransactions])
 
+  const matchesFilters = React.useCallback(
+    (tx: TransactionFragment) => {
+      if (!directions.sent && tx.direction === TxDirection.Send) return false
+      if (!directions.received && tx.direction === TxDirection.Receive) return false
+      if (searchQuery && !(tx.memo ?? "").toLowerCase().includes(searchQuery))
+        return false
+      return true
+    },
+    [directions, searchQuery],
+  )
+
+  const visibleSettledTxs = React.useMemo(
+    () => (filtersActive ? settledTxs.filter(matchesFilters) : settledTxs),
+    [filtersActive, settledTxs, matchesFilters],
+  )
+
+  const visiblePendingTxs = React.useMemo(
+    () => (filtersActive ? pendingTxs.filter(matchesFilters) : pendingTxs),
+    [filtersActive, pendingTxs, matchesFilters],
+  )
+
   const sections = React.useMemo(
     () =>
       groupTransactionsByDate({
-        pendingIncomingTxs: pendingTxs,
-        txs: settledTxs,
+        pendingIncomingTxs: visiblePendingTxs,
+        txs: visibleSettledTxs,
         LL,
         locale,
       }),
-    [pendingTxs, settledTxs, LL, locale],
+    [visiblePendingTxs, visibleSettledTxs, LL, locale],
   )
 
   const allTransactions = React.useMemo(() => {
@@ -374,6 +476,85 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     markTxSeen,
   ])
 
+  const loadedCount = activeWallet.isSelfCustodial
+    ? allSelfCustodialFragments.length
+    : transactions?.edges?.length ?? 0
+
+  const hasMoreToSearch = activeWallet.isSelfCustodial
+    ? selfCustodialHasMore
+    : Boolean(transactions?.pageInfo?.hasNextPage) && loadedCount < CUSTODIAL_SEARCH_CAP
+
+  // While the filters match nothing, the expanding search owns paging: the list's own
+  // onEndReached is off, so the two can't ask for the same page at once.
+  const filteredToNothing =
+    filtersActive && visibleSettledTxs.length === 0 && visiblePendingTxs.length === 0
+
+  // A round that fails or reads nothing stalls the search it was for. Changing the filters
+  // or the wallet starts a new search; pulling to refresh retries the stalled one.
+  const searchKey = `${walletFilter}|${directions.sent}|${directions.received}|${searchQuery}`
+  const [stalledSearchKey, setStalledSearchKey] = React.useState<string | null>(null)
+
+  const isExpandingSearch =
+    filteredToNothing && hasMoreToSearch && stalledSearchKey !== searchKey
+
+  const expandingRef = React.useRef(false)
+  // The cursor last asked for: a round can end before the list re-renders with the next
+  // cursor, and asking for the same one twice would fetch the same page again.
+  const requestedCursorRef = React.useRef<string | null>(null)
+  const [expandRound, setExpandRound] = React.useState(0)
+
+  /**
+   * While the filters match nothing, keeps loading older pages until something matches, the
+   * history ends, the custodial cap is reached or a round makes no progress.
+   */
+  React.useEffect(() => {
+    if (!isExpandingSearch || expandingRef.current) return
+
+    const endCursor = transactions?.pageInfo?.endCursor
+    if (!activeWallet.isSelfCustodial) {
+      if (!endCursor || endCursor === requestedCursorRef.current) return
+      requestedCursorRef.current = endCursor
+    }
+
+    expandingRef.current = true
+    const roundSearchKey = searchKey
+    const request: Promise<boolean> = activeWallet.isSelfCustodial
+      ? selfCustodialLoadMore()
+      : fetchMore({
+          variables: {
+            first: CUSTODIAL_SEARCH_PAGE_SIZE,
+            walletIds: walletIdsByCurrency,
+            after: endCursor,
+          },
+        }).then(
+          (result) =>
+            (result.data?.me?.defaultAccount?.transactions?.edges?.length ?? 0) > 0,
+        )
+
+    request
+      .catch((err) => {
+        reportError("transaction-history-search", err)
+        return false
+      })
+      .then((progressed) => {
+        expandingRef.current = false
+        if (!progressed) {
+          requestedCursorRef.current = null
+          setStalledSearchKey(roundSearchKey)
+        }
+        setExpandRound((round) => round + 1)
+      })
+  }, [
+    isExpandingSearch,
+    expandRound,
+    searchKey,
+    activeWallet.isSelfCustodial,
+    selfCustodialLoadMore,
+    fetchMore,
+    transactions?.pageInfo?.endCursor,
+    walletIdsByCurrency,
+  ])
+
   const handleItemPress = React.useCallback(
     (txid: string) => {
       navigation.navigate("transactionDetail", { txid })
@@ -384,6 +565,10 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     [navigation],
   )
 
+  // A highlighted row bounces once per visit. Toggling a filter rebuilds the sections and
+  // remounts the rows, which would otherwise bounce the newest transaction again.
+  const bouncedTxIdsRef = React.useRef<Set<string>>(new Set())
+
   const renderItem = React.useCallback(
     ({
       item,
@@ -393,24 +578,32 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
       item: TransactionFragment
       index: number
       section: { data: readonly TransactionFragment[] }
-    }) => (
-      <MemoizedTransactionItem
-        key={`txn-${item.id}`}
-        isFirst={index === 0}
-        isLast={index === section.data.length - 1}
-        txid={item.id}
-        subtitle
-        testId={`transaction-by-index-${index}`}
-        highlight={shouldHighlightTransactionId({
-          txId: item.id,
-          createdAt: item.createdAt,
-          settlementCurrency: item.settlementCurrency,
-          memo: item.memo,
-          direction: item.direction,
-        })}
-        onPress={handleItemPress}
-      />
-    ),
+    }) => {
+      const highlight = shouldHighlightTransactionId({
+        txId: item.id,
+        createdAt: item.createdAt,
+        settlementCurrency: item.settlementCurrency,
+        memo: item.memo,
+        direction: item.direction,
+      })
+      const bounce = !bouncedTxIdsRef.current.has(item.id)
+      if (highlight) bouncedTxIdsRef.current.add(item.id)
+
+      return (
+        <MemoizedTransactionItem
+          key={`txn-${item.id}`}
+          variant="card"
+          isFirst={index === 0}
+          isLast={index === section.data.length - 1}
+          txid={item.id}
+          subtitle
+          testId={`transaction-by-index-${index}`}
+          highlight={highlight}
+          bounce={bounce}
+          onPress={handleItemPress}
+        />
+      )
+    },
     [shouldHighlightTransactionId, handleItemPress],
   )
 
@@ -442,14 +635,38 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     (!transactions && !activeWallet.isSelfCustodial) ||
     selfCustodialSettling
 
+  const { nextWallet } = walletSummary
+
+  const topBar = (
+    <View style={styles.topBar}>
+      {filtersOpen ? (
+        <TransactionHistoryFilters
+          directions={directions}
+          onToggleDirection={(direction) =>
+            setDirections((current) => toggleDirection(current, direction))
+          }
+          searchText={searchText}
+          onSearchTextChange={setSearchText}
+        />
+      ) : null}
+      <Animated.View layout={LinearTransition.duration(LAYOUT_TRANSITION_MS)}>
+        <WalletSummary
+          currency={walletFilter}
+          balancePrimary={walletSummary.balancePrimary}
+          balanceSecondary={walletSummary.balanceSecondary}
+          balanceHidden={hideAmount}
+          balanceLoading={walletSummary.balanceLoading}
+          onSwitch={nextWallet ? () => setSelectedWallet(nextWallet) : undefined}
+          switchTo={nextWallet}
+        />
+      </Animated.View>
+    </View>
+  )
+
   if (showLoadingSkeleton) {
     return (
       <Screen>
-        <WalletFilterDropdown
-          selected={walletFilter}
-          onSelectionChange={setWalletFilter}
-          loading={true}
-        />
+        {topBar}
         <View style={styles.skeletonWrapper}>
           <TransactionHistorySkeleton />
         </View>
@@ -476,6 +693,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   }
 
   const handleRefresh = async () => {
+    setStalledSearchKey(null)
     if (!activeWallet.isSelfCustodial) {
       refetch()
       return
@@ -490,38 +708,64 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 
   return (
     <Screen>
-      <WalletFilterDropdown
-        selected={walletFilter}
-        onSelectionChange={setWalletFilter}
-        loading={refreshing}
-      />
-      <SectionList
-        showsVerticalScrollIndicator={false}
-        maxToRenderPerBatch={RENDER_BATCH_SIZE}
-        initialNumToRender={INITIAL_ITEMS_TO_RENDER}
-        windowSize={TRANSACTION_LIST_WINDOW_SIZE}
-        renderItem={renderItem}
-        renderSectionHeader={renderSectionHeader}
-        ListEmptyComponent={
-          <View style={styles.noTransactionView}>
-            <Text style={styles.noTransactionText}>
-              {LL.TransactionScreen.noTransaction()}
-            </Text>
-          </View>
-        }
-        sections={sections}
-        keyExtractor={keyExtractor}
-        onEndReached={fetchNextTransactionsPage}
-        onEndReachedThreshold={0.5}
-        onRefresh={handleRefresh}
-        refreshing={refreshing}
-      />
+      {topBar}
+      <Animated.View
+        style={styles.list}
+        layout={LinearTransition.duration(LAYOUT_TRANSITION_MS)}
+      >
+        <SectionList
+          contentContainerStyle={styles.listContent}
+          stickySectionHeadersEnabled={false}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          maxToRenderPerBatch={RENDER_BATCH_SIZE}
+          initialNumToRender={INITIAL_ITEMS_TO_RENDER}
+          windowSize={TRANSACTION_LIST_WINDOW_SIZE}
+          renderItem={renderItem}
+          renderSectionHeader={renderSectionHeader}
+          ListEmptyComponent={
+            filtersActive ? (
+              <View style={styles.noResultsWrapper}>
+                <NoResultsCard expanding={isExpandingSearch} />
+              </View>
+            ) : (
+              <View style={styles.noTransactionView}>
+                <Text style={styles.noTransactionText}>
+                  {LL.TransactionScreen.noTransaction()}
+                </Text>
+              </View>
+            )
+          }
+          sections={sections}
+          keyExtractor={keyExtractor}
+          onEndReached={filteredToNothing ? undefined : fetchNextTransactionsPage}
+          onEndReachedThreshold={0.5}
+          onRefresh={handleRefresh}
+          refreshing={refreshing}
+        />
+      </Animated.View>
     </Screen>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  skeletonWrapper: { flex: 1, alignSelf: "stretch" },
+  skeletonWrapper: { flex: 1, alignSelf: "stretch", paddingHorizontal: 20 },
+  topBar: {
+    rowGap: 20,
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
+  },
+  list: {
+    flex: 1,
+  },
+  noResultsWrapper: {
+    paddingTop: 20,
+  },
+  listContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
   noTransactionText: {
     fontSize: 24,
   },
@@ -533,14 +777,13 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   sectionHeaderContainer: {
-    backgroundColor: colors.backgroundDefault,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 18,
+    paddingTop: 20,
+    paddingBottom: 5,
   },
 
   sectionHeaderText: {
     color: colors.textOnBackground,
-    fontSize: 18,
+    fontSize: 14,
+    lineHeight: 18,
   },
 }))
