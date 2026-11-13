@@ -2537,7 +2537,7 @@
         "description": "Обавештења о цени Bitcoin-а."
       }
     },
-    "splashGroup": "Екран долазне трансакције",
+    "splashGroup": "Екран примљене уплате",
     "incomingTransactionSplash": "Прикажи екран",
     "splashMinimum": "Најмањи износ (SAT)"
   },
@@ -2551,8 +2551,8 @@
     "tapToShow": "Додирните за приказ",
     "announcementHidden": "Уплата примљена",
     "announcementPending": "На блокчејну, на чекању, {amount}",
-    "toastOn": "Екран обавештења је укључен",
-    "toastOff": "Екран обавештења је искључен"
+    "toastOn": "Екран примљене уплате је укључен",
+    "toastOff": "Екран примљене уплате је искључен"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Ваш налог има више од $5",

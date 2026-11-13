@@ -2537,7 +2537,7 @@
         "description": "Thông báo về giá Bitcoin."
       }
     },
-    "splashGroup": "Màn hình giao dịch đến",
+    "splashGroup": "Màn hình nhận thanh toán",
     "incomingTransactionSplash": "Hiển thị màn hình",
     "splashMinimum": "Số tiền tối thiểu (SAT)"
   },
@@ -2551,8 +2551,8 @@
     "tapToShow": "Chạm để hiện",
     "announcementHidden": "Đã nhận thanh toán",
     "announcementPending": "Đang chờ trên chuỗi, {amount}",
-    "toastOn": "Đã bật màn hình thông báo",
-    "toastOff": "Đã tắt màn hình thông báo"
+    "toastOn": "Đã bật màn hình nhận thanh toán",
+    "toastOff": "Đã tắt màn hình nhận thanh toán"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Tài khoản của bạn có hơn $5",

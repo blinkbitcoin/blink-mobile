@@ -2537,7 +2537,7 @@
                 "description": "Notificações sobre o preço do Bitcoin"
             }
         },
-        "splashGroup": "Tela de transação recebida",
+        "splashGroup": "Tela de pagamento recebido",
         "incomingTransactionSplash": "Mostrar tela",
         "splashMinimum": "Valor mínimo (SAT)"
     },
@@ -2551,8 +2551,8 @@
         "tapToShow": "Toque para mostrar",
         "announcementHidden": "Pagamento recebido",
         "announcementPending": "Onchain pendente, {amount}",
-        "toastOn": "Tela de aviso ativada",
-        "toastOff": "Tela de aviso desativada"
+        "toastOn": "Tela de pagamento recebido ativada",
+        "toastOff": "Tela de pagamento recebido desativada"
     },
     "AccountScreen": {
         "fundsMoreThan5Dollars": "Sua conta possui mais de $5",

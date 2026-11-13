@@ -2537,7 +2537,7 @@
         "description": "Notificacions sobre el preu de Bitcoin."
       }
     },
-    "splashGroup": "Pantalla de transacció entrant",
+    "splashGroup": "Pantalla de pagament rebut",
     "incomingTransactionSplash": "Mostra la pantalla",
     "splashMinimum": "Import mínim (SAT)"
   },
@@ -2551,8 +2551,8 @@
     "tapToShow": "Prem per mostrar",
     "announcementHidden": "Pagament rebut",
     "announcementPending": "Pendent onchain, {amount}",
-    "toastOn": "Pantalla d'avís activada",
-    "toastOff": "Pantalla d'avís desactivada"
+    "toastOn": "Pantalla de pagament rebut activada",
+    "toastOff": "Pantalla de pagament rebut desactivada"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "El teu compte té més de 5$",

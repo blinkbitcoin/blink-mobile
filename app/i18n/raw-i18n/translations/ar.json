@@ -2537,7 +2537,7 @@
         "description": "إشعارات حول سعر Bitcoin."
       }
     },
-    "splashGroup": "شاشة المعاملة الواردة",
+    "splashGroup": "شاشة الدفعة المستلمة",
     "incomingTransactionSplash": "إظهار الشاشة",
     "splashMinimum": "الحد الأدنى (SAT)"
   },
@@ -2551,8 +2551,8 @@
     "tapToShow": "انقر للعرض",
     "announcementHidden": "تم استلام دفعة",
     "announcementPending": "قيد الانتظار على السلسلة، {amount}",
-    "toastOn": "شاشة الإشعار مفعّلة",
-    "toastOff": "شاشة الإشعار معطّلة"
+    "toastOn": "شاشة الدفعة المستلمة مفعّلة",
+    "toastOff": "شاشة الدفعة المستلمة معطّلة"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "حسابك يحتوي على أكثر من 5$",

@@ -2537,7 +2537,7 @@
         "description": "Notifications about the price of Bitcoin."
       }
     },
-    "splashGroup": "Οθόνη εισερχόμενης συναλλαγής",
+    "splashGroup": "Οθόνη ληφθείσας πληρωμής",
     "incomingTransactionSplash": "Εμφάνιση οθόνης",
     "splashMinimum": "Ελάχιστο ποσό (SAT)"
   },
@@ -2551,8 +2551,8 @@
     "tapToShow": "Πατήστε για εμφάνιση",
     "announcementHidden": "Η πληρωμή ελήφθη",
     "announcementPending": "Σε αναμονή on-chain, {amount}",
-    "toastOn": "Η οθόνη ειδοποίησης είναι ενεργή",
-    "toastOff": "Η οθόνη ειδοποίησης είναι ανενεργή"
+    "toastOn": "Η οθόνη ληφθείσας πληρωμής είναι ενεργή",
+    "toastOff": "Η οθόνη ληφθείσας πληρωμής είναι ανενεργή"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Ο λογαριασμός σας έχει περισσότερα από $5",
