@@ -40,20 +40,21 @@ export const GaloyButtonField = ({
           backgroundColor: colors.errorBackground,
         }
         break
+      // A tappable field: the accent stays on the icon, so the fill must not be accent
       case pressed:
         colorStyles = {
-          backgroundColor: colors.accent,
+          backgroundColor: colors.surfacePressed,
         }
         break
       case disabled:
         colorStyles = {
           opacity: 0.3,
-          backgroundColor: colors.accent,
+          backgroundColor: colors.surfaceInteractive,
         }
         break
       default:
         colorStyles = {
-          backgroundColor: colors.accent,
+          backgroundColor: colors.surfaceInteractive,
         }
     }
 
