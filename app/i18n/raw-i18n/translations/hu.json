@@ -3838,8 +3838,8 @@
           "and": ", és a",
           "cardTermsLinkText": "Blink kártya feltételeit"
         },
-        "certifyAccuracy": "Igazolom, hogy az általam megadott információk pontosak, és hogy betartok minden, a Blink Visa kártyámmal kapcsolatos szabályt és követelményt",
-        "acknowledgeSolicitation": "Tudomásul veszem, hogy a Blink Visa kártya igénylése nem minősül jogosulatlan megkeresésnek"
+        "certifyAccuracy": "Igazolom, hogy az általam megadott információk pontosak, és hogy betartok minden, a Blink kártyámmal kapcsolatos szabályt és követelményt",
+        "acknowledgeSolicitation": "Tudomásul veszem, hogy a Blink kártya igénylése nem minősül jogosulatlan megkeresésnek"
       },
       "CardPreapproved": {
         "title": "Elkészült a Blink kártyája!",

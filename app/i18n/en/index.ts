@@ -4018,14 +4018,14 @@ const en: BaseTranslation = {
         },
         privacyAndTerms: {
           text: "I accept the",
-          privacyPolicyLinkText: "Issuer's Privacy Policy",
+          privacyPolicyLinkText: "Issuer’s Privacy Policy",
           and: ", and",
           cardTermsLinkText: "Blink Card Terms",
         },
         certifyAccuracy:
-          "I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Visa Card",
+          "I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Card",
         acknowledgeSolicitation:
-          "I acknowledge that applying for the Blink Visa Card does not constitute unauthorized solicitation",
+          "I acknowledge that applying for the Blink Card does not constitute unauthorized solicitation",
       },
       CardPreapproved: {
         title: "Your Blink Card is ready!",

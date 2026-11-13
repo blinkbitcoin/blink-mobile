@@ -3838,8 +3838,8 @@
           "and": ", i",
           "cardTermsLinkText": "Condicions de la targeta Blink"
         },
-        "certifyAccuracy": "Certifico que la informació que he proporcionat és exacta i que compliré totes les normes i requisits relacionats amb la meva targeta Blink Visa",
-        "acknowledgeSolicitation": "Reconec que sol·licitar la targeta Blink Visa no constitueix una sol·licitud no autoritzada"
+        "certifyAccuracy": "Certifico que la informació que he proporcionat és exacta i que compliré totes les normes i requisits relacionats amb la meva targeta Blink",
+        "acknowledgeSolicitation": "Reconec que sol·licitar la targeta Blink no constitueix una sol·licitud no autoritzada"
       },
       "CardPreapproved": {
         "title": "La teva Blink Card està llesta!",

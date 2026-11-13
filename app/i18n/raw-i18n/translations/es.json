@@ -3777,8 +3777,8 @@
                     "and": ", y los",
                     "cardTermsLinkText": "Términos de la tarjeta Blink"
                 },
-                "certifyAccuracy": "Certifico que la información que he proporcionado es precisa y que cumpliré todas las reglas y requisitos relacionados con mi tarjeta Blink Visa",
-                "acknowledgeSolicitation": "Reconozco que solicitar la tarjeta Blink Visa no constituye una solicitud no autorizada"
+                "certifyAccuracy": "Certifico que la información que he proporcionado es precisa y que cumpliré todas las reglas y requisitos relacionados con mi tarjeta Blink",
+                "acknowledgeSolicitation": "Reconozco que solicitar la tarjeta Blink no constituye una solicitud no autorizada"
             },
             "CardPreapproved": {
                 "title": "¡Tu Blink Card está lista!",

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ScrollView, View } from "react-native"
+import { View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -7,7 +7,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { CheckboxRow } from "@app/components/card-screen/checkbox-row"
 import { IconHero } from "@app/components/icon-hero"
-import { Screen } from "@app/components/screen"
+import { StepLayout } from "@app/components/step-layout"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -45,8 +45,16 @@ export const CardAcknowledgementScreen: React.FC = () => {
   const { Acknowledgement: acknowledgementLL } = LL.CardFlow.Onboarding
 
   return (
-    <Screen>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+    <StepLayout
+      footer={
+        <GaloyPrimaryButton
+          title={acknowledgementLL.acceptButton()}
+          onPress={handleAccept}
+          disabled={isAcceptDisabled}
+        />
+      }
+    >
+      <View style={styles.content}>
         <IconHero
           icon="document-outline"
           iconColor={colors.accent}
@@ -109,43 +117,29 @@ export const CardAcknowledgementScreen: React.FC = () => {
             </Text>
           </CheckboxRow>
         </View>
-      </ScrollView>
-
-      <View style={styles.buttonsContainer}>
-        <GaloyPrimaryButton
-          title={acknowledgementLL.acceptButton()}
-          onPress={handleAccept}
-          disabled={isAcceptDisabled}
-        />
       </View>
-    </Screen>
+    </StepLayout>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
+  /** On top of the hero's own 20, so it sits 30 below the header like the other card steps. */
+  content: {
+    paddingTop: 10,
     paddingHorizontal: 20,
-    paddingBottom: 20,
   },
+  /** The design's hero keeps an empty subtitle line and its bottom padding under the
+   *  title, so the first box starts 66 below it. */
   checkboxesContainer: {
-    marginTop: 40,
-    gap: 18,
+    marginTop: 66,
+    gap: 20,
   },
   agreementText: {
     color: colors.textOnBackground,
-    lineHeight: 18,
+    lineHeight: 16,
   },
   link: {
     color: colors.accent,
     fontWeight: "700",
-  },
-  buttonsContainer: {
-    justifyContent: "flex-end",
-    marginBottom: 14,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
   },
 }))

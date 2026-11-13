@@ -3777,8 +3777,8 @@
                     "and": "、および",
                     "cardTermsLinkText": "Blink カードの規約"
                 },
-                "certifyAccuracy": "提供した情報が正確であること、および Blink Visa カードに関するすべての規則と要件を遵守することを証明します",
-                "acknowledgeSolicitation": "Blink Visa カードの申し込みが不正な勧誘に該当しないことを認めます"
+                "certifyAccuracy": "提供した情報が正確であること、および Blink カードに関するすべての規則と要件を遵守することを証明します",
+                "acknowledgeSolicitation": "Blink カードの申し込みが不正な勧誘に該当しないことを認めます"
             },
             "CardPreapproved": {
                 "title": "Blink カードの準備ができました！",

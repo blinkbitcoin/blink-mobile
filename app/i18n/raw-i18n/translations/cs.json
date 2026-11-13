@@ -3838,8 +3838,8 @@
           "and": " a",
           "cardTermsLinkText": "podmínkami karty Blink"
         },
-        "certifyAccuracy": "Potvrzuji, že informace, které jsem poskytl, jsou přesné a že budu dodržovat všechna pravidla a požadavky týkající se mé karty Blink Visa",
-        "acknowledgeSolicitation": "Beru na vědomí, že žádost o kartu Blink Visa nepředstavuje neoprávněné oslovení"
+        "certifyAccuracy": "Potvrzuji, že informace, které jsem poskytl, jsou přesné a že budu dodržovat všechna pravidla a požadavky týkající se mé karty Blink",
+        "acknowledgeSolicitation": "Beru na vědomí, že žádost o kartu Blink nepředstavuje neoprávněné oslovení"
       },
       "CardPreapproved": {
         "title": "Vaše Blink Card je připravena!",
