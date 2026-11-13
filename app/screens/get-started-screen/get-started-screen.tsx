@@ -14,7 +14,6 @@ import { useCreationBlock } from "@app/hooks/use-creation-block"
 import { useIsMounted } from "@app/hooks/use-is-mounted"
 import { useSecretMenuTrigger } from "@app/hooks/use-secret-menu-trigger"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import theme from "@app/rne-theme/theme"
 import { AccountTypeMode } from "@app/types/account"
 import { logGetStartedAction } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
@@ -50,7 +49,7 @@ export const GetStartedScreen: React.FC = () => {
   const handleSecretMenuTap = useSecretMenuTrigger()
 
   const {
-    theme: { mode },
+    theme: { mode, colors },
   } = useTheme()
   const AppLogo = mode === "dark" ? AppLogoDarkMode : AppLogoLightMode
 
@@ -135,7 +134,7 @@ export const GetStartedScreen: React.FC = () => {
   const NonProdInstanceHint =
     id === "Main" ? null : (
       <View style={styles.textInstance}>
-        <Text type={"h2"} color={theme.darkColors?.accent}>
+        <Text type={"h2"} color={colors.accent}>
           {id}
         </Text>
       </View>
