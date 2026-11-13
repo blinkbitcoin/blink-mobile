@@ -10,8 +10,8 @@ jest.mock("@rn-vui/themed", () => ({
     theme: {
       colors: {
         warning: "#E18E02",
-        surfaceInteractive: "#EAEAEA",
-        surfaceStatic: "#F9F9F9",
+        surfaceInteractive: "#ECECEE",
+        surfaceStatic: "#F2F2F2",
       },
     },
   }),
