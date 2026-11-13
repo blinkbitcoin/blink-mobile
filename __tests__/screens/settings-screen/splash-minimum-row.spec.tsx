@@ -2,6 +2,7 @@ import React from "react"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import { it } from "@jest/globals"
 
+import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { SplashMinimumRow } from "@app/screens/settings-screen/notifications-screen"
 
 import { ContextForScreen } from "../helper"
@@ -36,6 +37,10 @@ const rerenderRow = (view: ReturnType<typeof renderRow>) =>
   )
 
 describe("SplashMinimumRow", () => {
+  beforeAll(() => {
+    loadLocale("en")
+  })
+
   beforeEach(() => {
     jest.clearAllMocks()
     mockMinSats = 100
@@ -74,6 +79,13 @@ describe("SplashMinimumRow", () => {
 
     fireEvent(screen.getByDisplayValue("250"), "endEditing")
     expect(mockSetMinSats).toHaveBeenCalledWith(250)
+  })
+
+  it("names the field for a screen reader", async () => {
+    renderRow()
+    await screen.findByDisplayValue("100")
+
+    expect(screen.getByLabelText("Minimum amount (SAT)").props.value).toBe("100")
   })
 
   it("keeps a remote-config minimum that resolved while the field was focused", async () => {
