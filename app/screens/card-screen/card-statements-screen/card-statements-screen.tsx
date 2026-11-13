@@ -6,6 +6,7 @@ import { Screen } from "@app/components/screen"
 import { YearSelector } from "@app/components/year-selector"
 import { ContactSupportRow, InfoCard, StatementItem } from "@app/components/card-screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 import { useStatementsData } from "./hooks"
 
@@ -206,7 +207,7 @@ const useStyles = makeStyles(({ colors }) => ({
   currentStatementCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.surfaceInteractive,
+    ...staticSurface(colors),
     borderRadius: 8,
     paddingHorizontal: 14,
     paddingVertical: 18,

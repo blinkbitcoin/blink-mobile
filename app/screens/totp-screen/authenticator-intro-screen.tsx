@@ -17,6 +17,7 @@ import { useHardwareBackGuard } from "@app/screens/account-migration/hooks/use-h
 import { TwoFactorMethod } from "@app/types/two-factor-enforcement"
 import { logTwoFactorSetupStarted } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 type Benefit = {
   icon: IconNamesType
@@ -134,7 +135,7 @@ const useStyles = makeStyles(({ colors }) => ({
   benefitsCard: {
     marginTop: 30,
     marginHorizontal: 20,
-    backgroundColor: colors.surfaceStatic,
+    ...staticSurface(colors),
     borderRadius: 8,
     overflow: "hidden",
   },

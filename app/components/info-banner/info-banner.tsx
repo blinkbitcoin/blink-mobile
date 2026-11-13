@@ -3,6 +3,8 @@ import { View } from "react-native"
 
 import { Colors, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { staticSurface } from "@app/rne-theme/surfaces"
+
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 
 type InfoBannerProps = {
@@ -44,7 +46,7 @@ export const InfoBanner: React.FC<InfoBannerProps> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    backgroundColor: colors.surfaceInteractive,
+    ...staticSurface(colors),
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,

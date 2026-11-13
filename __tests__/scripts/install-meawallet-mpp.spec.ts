@@ -69,11 +69,13 @@ const REAL_TAR = spawnSync("sh", ["-c", "command -v tar"], {
 }).stdout.trim()
 
 /** Hashes any archive to the pinned checksum, standing in for the real package. */
-const FAKE_OPENSSL = `#!/bin/sh
-if [ "$1" = "base64" ]; then
-  cat > /dev/null
-  printf '%s' "$FAKE_DIGEST"
-fi
+const FAKE_NODE = `#!/bin/sh
+printf '%s' "$FAKE_DIGEST"
+`
+
+/** A node that cannot run, so the hash comes back empty with a failing status. */
+const BROKEN_NODE = `#!/bin/sh
+exit 1
 `
 
 let root: string
@@ -144,6 +146,7 @@ const staleFile = () => join(vendorDir(), "stale.js")
 type InstallOptions = {
   checksumMatches?: boolean
   downloadFails?: boolean
+  hashFails?: boolean
   env?: Record<string, string>
 }
 
@@ -156,11 +159,16 @@ const expectedConfig = (user = "blink", password = PASSWORD) =>
 const installEnv = ({
   checksumMatches = true,
   downloadFails = false,
+  hashFails = false,
   env = {},
 }: InstallOptions = {}): Record<string, string> => {
-  const fakeOpenssl = checksumMatches ? [join(root, "openssl-bin")] : []
+  const fakeNode = hashFails
+    ? [join(root, "broken-node-bin")]
+    : checksumMatches
+      ? [join(root, "node-bin")]
+      : []
   return {
-    PATH: [join(root, "bin"), ...fakeOpenssl, process.env.PATH ?? ""].join(":"),
+    PATH: [join(root, "bin"), ...fakeNode, process.env.PATH ?? ""].join(":"),
     HOME: home,
     TMPDIR: join(root, "tmp"),
     FAKE_CURL_LOG: curlLog(),
@@ -219,7 +227,8 @@ beforeEach(() => {
   copyFileSync(SCRIPT, join(repo, "scripts", "install-meawallet-mpp.sh"))
   writeExecutable(join(root, "bin", "curl"), FAKE_CURL)
   writeExecutable(join(root, "bin", "tar"), FAKE_TAR)
-  writeExecutable(join(root, "openssl-bin", "openssl"), FAKE_OPENSSL)
+  writeExecutable(join(root, "node-bin", "node"), FAKE_NODE)
+  writeExecutable(join(root, "broken-node-bin", "node"), BROKEN_NODE)
   mkdirSync(join(root, "tmp"))
   writeFile(curlLog(), "")
   packTarball()
@@ -375,6 +384,22 @@ describe("install-meawallet-mpp.sh installing", () => {
     expect(output).toContain("integrity mismatch")
     expect(existsSync(vendorDir())).toBe(false)
   })
+
+  /** The hash runs in a command substitution under set -e: without its fallback a node
+   *  that fails would end the install with node's status, half done. */
+  it("goes without the SDK when the archive cannot be hashed", () => {
+    giveCredentials()
+    giveConfig()
+
+    const { status, output } = install({ hashFails: true })
+
+    expect(status).toBe(0)
+    expect(output).toContain("integrity mismatch")
+    expect(existsSync(vendorDir())).toBe(false)
+    expect(existsSync(androidConfig())).toBe(false)
+    expect(existsSync(iosConfig())).toBe(false)
+    expect(readdirSync(join(root, "tmp"))).toEqual([])
+  })
 })
 
 describe("install-meawallet-mpp.sh on a machine that was provisioned before", () => {
@@ -421,6 +446,7 @@ describe("install-meawallet-mpp.sh on a machine that was provisioned before", ()
   it.each<[string, InstallOptions]>([
     ["the download fails", { downloadFails: true }],
     ["the archive fails its checksum", { checksumMatches: false }],
+    ["the archive cannot be hashed", { hashFails: true }],
   ])("removes the configuration too when %s on a new install", (_, failure) => {
     writeFile(integrityMarker(), "sha512-of-the-previous-version\n")
 
@@ -450,10 +476,10 @@ describe("install-meawallet-mpp.sh trusting a vendored copy", () => {
     giveConfig()
   })
 
-  /** Every other case fakes openssl, so this one pins the scratch script to the test
+  /** Every other case fakes the hash, so this one pins the scratch script to the test
    *  archive's real digest and runs the real pipeline: a broken digest command would
    *  answer something else, and the install would go without the SDK. */
-  it("verifies the archive with the real openssl when it matches the pinned digest", () => {
+  it("verifies the archive with the real node when it matches the pinned digest", () => {
     const digest = createHash("sha512")
       .update(readFileSync(join(root, "package.tgz")))
       .digest("base64")
@@ -526,6 +552,7 @@ describe("install-meawallet-mpp.sh with MEA_REQUIRED", () => {
   it.each<[string, () => void, InstallOptions]>([
     ["the download fails", () => undefined, { downloadFails: true }],
     ["the archive fails its checksum", () => undefined, { checksumMatches: false }],
+    ["the archive cannot be hashed", () => undefined, { hashFails: true }],
     ["the credentials are missing", revokeCredentials, {}],
     ["the configuration is missing", withdrawConfig, {}],
   ])("fails the install when %s", (_, takeAway, failure) => {
