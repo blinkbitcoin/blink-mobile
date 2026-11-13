@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Nghề nghiệp",
-            "placeholder": "Chọn nghề nghiệp của bạn"
+            "placeholder": "Chọn"
           },
           "annualSalaryRange": {
             "label": "Thu nhập hàng năm",
-            "placeholder": "Chọn mức thu nhập của bạn"
+            "placeholder": "Chọn mức lương"
           },
           "accountPurpose": {
             "label": "Mục đích tài khoản",
@@ -3823,7 +3823,6 @@
             "placeholder": "Chọn mức chi tiêu của bạn"
           }
         },
-        "buttonText": "Gửi đơn đăng ký",
         "select": "chọn"
       },
       "Acknowledgement": {

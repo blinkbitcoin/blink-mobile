@@ -3747,11 +3747,11 @@
                 "fields": {
                     "occupation": {
                         "label": "Occupazione",
-                        "placeholder": "Seleziona la tua occupazione"
+                        "placeholder": "Seleziona"
                     },
                     "annualSalaryRange": {
                         "label": "Stipendio annuale",
-                        "placeholder": "Seleziona la tua fascia di stipendio"
+                        "placeholder": "Seleziona lo stipendio"
                     },
                     "accountPurpose": {
                         "label": "Scopo dell'account",
@@ -3762,7 +3762,6 @@
                         "placeholder": "Seleziona la tua fascia di spesa"
                     }
                 },
-                "buttonText": "Invia richiesta",
                 "select": "seleziona"
             },
             "Acknowledgement": {

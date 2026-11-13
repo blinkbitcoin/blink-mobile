@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Beskæftigelse",
-            "placeholder": "Vælg din beskæftigelse"
+            "placeholder": "Vælg"
           },
           "annualSalaryRange": {
             "label": "Årlig løn",
-            "placeholder": "Vælg dit løninterval"
+            "placeholder": "Vælg løn"
           },
           "accountPurpose": {
             "label": "Kontoformål",
@@ -3823,7 +3823,6 @@
             "placeholder": "Vælg dit forbrugsinterval"
           }
         },
-        "buttonText": "Indsend ansøgning",
         "select": "vælg"
       },
       "Acknowledgement": {

@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Umsebenzi",
-            "placeholder": "Khetha umsebenzi wakho"
+            "placeholder": "Khetha"
           },
           "annualSalaryRange": {
             "label": "Umvuzo wonyaka",
-            "placeholder": "Khetha ibanga lomvuzo wakho"
+            "placeholder": "Khetha umvuzo"
           },
           "accountPurpose": {
             "label": "Injongo yeakhawunti",
@@ -3823,7 +3823,6 @@
             "placeholder": "Khetha ibanga lokuchitha kwakho"
           }
         },
-        "buttonText": "Ngenisa isicelo",
         "select": "khetha"
       },
       "Acknowledgement": {

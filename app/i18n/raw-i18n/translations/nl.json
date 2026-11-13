@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Beroep",
-            "placeholder": "Selecteer je beroep"
+            "placeholder": "Selecteer"
           },
           "annualSalaryRange": {
             "label": "Jaarsalaris",
-            "placeholder": "Selecteer je salarisniveau"
+            "placeholder": "Selecteer salaris"
           },
           "accountPurpose": {
             "label": "Accountdoel",
@@ -3823,7 +3823,6 @@
             "placeholder": "Selecteer je uitgavenniveau"
           }
         },
-        "buttonText": "Aanvraag indienen",
         "select": "selecteer"
       },
       "Acknowledgement": {

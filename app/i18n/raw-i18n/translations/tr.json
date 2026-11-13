@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Meslek",
-            "placeholder": "Mesleğinizi seçin"
+            "placeholder": "Seçin"
           },
           "annualSalaryRange": {
             "label": "Yıllık maaş",
-            "placeholder": "Maaş aralığınızı seçin"
+            "placeholder": "Maaş seçin"
           },
           "accountPurpose": {
             "label": "Hesap amacı",
@@ -3823,7 +3823,6 @@
             "placeholder": "Harcama aralığınızı seçin"
           }
         },
-        "buttonText": "Başvuruyu gönder",
         "select": "seç"
       },
       "Acknowledgement": {

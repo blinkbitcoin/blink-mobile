@@ -12677,7 +12677,7 @@ type RootTranslation = {
 						 */
 						label: string
 						/**
-						 * S​e​l​e​c​t​ ​y​o​u​r​ ​o​c​c​u​p​a​t​i​o​n
+						 * S​e​l​e​c​t
 						 */
 						placeholder: string
 					}
@@ -12687,7 +12687,7 @@ type RootTranslation = {
 						 */
 						label: string
 						/**
-						 * S​e​l​e​c​t​ ​y​o​u​r​ ​s​a​l​a​r​y​ ​r​a​n​g​e
+						 * S​e​l​e​c​t​ ​s​a​l​a​r​y
 						 */
 						placeholder: string
 					}
@@ -12712,10 +12712,6 @@ type RootTranslation = {
 						placeholder: string
 					}
 				}
-				/**
-				 * S​u​b​m​i​t​ ​a​p​p​l​i​c​a​t​i​o​n
-				 */
-				buttonText: string
 				/**
 				 * S​e​l​e​c​t
 				 */
@@ -26997,7 +26993,7 @@ export type TranslationFunctions = {
 						 */
 						label: () => LocalizedString
 						/**
-						 * Select your occupation
+						 * Select
 						 */
 						placeholder: () => LocalizedString
 					}
@@ -27007,7 +27003,7 @@ export type TranslationFunctions = {
 						 */
 						label: () => LocalizedString
 						/**
-						 * Select your salary range
+						 * Select salary
 						 */
 						placeholder: () => LocalizedString
 					}
@@ -27032,10 +27028,6 @@ export type TranslationFunctions = {
 						placeholder: () => LocalizedString
 					}
 				}
-				/**
-				 * Submit application
-				 */
-				buttonText: () => LocalizedString
 				/**
 				 * Select
 				 */

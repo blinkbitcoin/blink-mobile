@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Ocupació",
-            "placeholder": "Selecciona la teva ocupació"
+            "placeholder": "Selecciona"
           },
           "annualSalaryRange": {
             "label": "Salari anual",
-            "placeholder": "Selecciona el teu rang salarial"
+            "placeholder": "Selecciona el salari"
           },
           "accountPurpose": {
             "label": "Propòsit del compte",
@@ -3823,7 +3823,6 @@
             "placeholder": "Selecciona el teu rang de despesa"
           }
         },
-        "buttonText": "Enviar sol·licitud",
         "select": "seleccionar"
       },
       "Acknowledgement": {
