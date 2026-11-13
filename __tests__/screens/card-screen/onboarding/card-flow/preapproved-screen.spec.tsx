@@ -11,14 +11,14 @@ jest.mock("@app/components/confetti", () => {
   return { Confetti: () => <View testID="confetti" /> }
 })
 
-const mockNavigate = jest.fn()
+const mockPopTo = jest.fn()
 
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
   return {
     ...actualNav,
     useNavigation: () => ({
-      navigate: mockNavigate,
+      popTo: mockPopTo,
     }),
   }
 })
@@ -78,7 +78,7 @@ describe("CardPreapprovedScreen", () => {
     expect(getByTestId("confetti")).toBeTruthy()
   })
 
-  it("navigates to Primary on button press", async () => {
+  it("goes back to the Home under it on Close, rather than stacking another", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <CardPreapprovedScreen />
@@ -92,6 +92,6 @@ describe("CardPreapprovedScreen", () => {
       fireEvent.press(button)
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("Primary")
+    expect(mockPopTo).toHaveBeenCalledWith("Primary")
   })
 })
