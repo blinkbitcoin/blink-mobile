@@ -25,6 +25,7 @@ import {
   RESTART_RESOLVABLE_REASONS,
 } from "@app/types/migration"
 import { testProps } from "@app/utils/testProps"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 /** One footer control. The house pattern is a primary with a single secondary underneath,
  *  so each variant names exactly two. */
@@ -302,7 +303,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   card: {
     width: "100%",
-    backgroundColor: colors.surfaceInteractive,
+    ...staticSurface(colors),
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 14,
