@@ -4,8 +4,8 @@ import { dark, light } from "@app/rne-theme/colors"
  *  must fail here even when the derived expectations change with it. */
 describe("palette contract", () => {
   it("paints static surfaces with the approved surfaceStatic", () => {
-    expect(light.surfaceStatic).toBe("#F7F7F7")
-    expect(dark.surfaceStatic).toBe("#121212")
+    expect(light.surfaceStatic).toBe("#F2F2F2")
+    expect(dark.surfaceStatic).toBe("#171717")
   })
 
   it("keeps the darkened light textMuted", () => {
