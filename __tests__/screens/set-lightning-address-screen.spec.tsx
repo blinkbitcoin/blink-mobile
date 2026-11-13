@@ -7,7 +7,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
-import { expectFocusFill, flatStyle } from "../helpers/field-fill"
+import { expectFocusFill, renderedBox } from "../helpers/field-fill"
 import { ContextForScreen } from "./helper"
 
 const mockRoute: RouteProp<RootStackParamList, "setLightningAddress"> = {
@@ -113,8 +113,7 @@ describe("SetLightningAddressScreen", () => {
     })
   })
 
-  /** It does not autofocus, so it starts at rest. The fill is on the box around the text
-   *  input: the nearest View above it. */
+  /** It does not autofocus, so it starts at rest. */
   it("fills the address field, darker while it has focus", () => {
     render(
       <ContextForScreen>
@@ -122,15 +121,10 @@ describe("SetLightningAddressScreen", () => {
       </ContextForScreen>,
     )
     const field = () => screen.getByPlaceholderText("SatoshiNakamoto")
-    const box = () => {
-      let node = field().parent
-      while (node && String(node.type) !== "View") node = node.parent
-      return node
-    }
 
     expectFocusFill({
       startsFocused: false,
-      surfaces: () => [flatStyle(box()?.props.style)],
+      surfaces: () => [renderedBox(field())],
       focus: () => fireEvent(field(), "focus"),
       blur: () => fireEvent(field(), "blur"),
     })

@@ -13,7 +13,7 @@ import {
   type UseRequestPhoneCodeReturn,
 } from "@app/screens/phone-auth-screen/request-phone-code-login"
 
-import { expectFocusFill, flatStyle } from "../../helpers/field-fill"
+import { expectFocusFill, renderedBox } from "../../helpers/field-fill"
 import { flushEffects } from "../../helpers/flush-effects"
 import { ContextForScreen } from "../helper"
 
@@ -58,10 +58,9 @@ const route = {
 } as unknown as RouteProp<PhoneValidationStackParamList, "phoneLoginInitiate">
 
 /** rn-vui types `Input`'s ref as the bare TextInput underneath it, which does not fit a
- *  component type. Only the container styles are read here. */
+ *  component type. Only the container style is read here. */
 const ThemedInput = Input as unknown as React.ComponentType<{
   containerStyle: StyleProp<ViewStyle>
-  inputContainerStyle: StyleProp<ViewStyle>
 }>
 
 const renderScreen = async () => {
@@ -139,16 +138,12 @@ describe("PhoneLoginInitiateScreen", () => {
   })
 
   it("fills the number field and the country button alike, darker while the field has focus", async () => {
-    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
-    const { getByTestId, UNSAFE_getByType } = await renderScreen()
+    const { getByTestId } = await renderScreen()
     const field = getByTestId("telephoneNumber")
 
     expectFocusFill({
       startsFocused: true,
-      surfaces: () => [
-        flatStyle(UNSAFE_getByType(ThemedInput).props.inputContainerStyle),
-        countryButtonStyle(),
-      ],
+      surfaces: () => [renderedBox(field), countryButtonStyle()],
       focus: () => fireEvent(field, "focus"),
       blur: () => fireEvent(field, "blur"),
     })

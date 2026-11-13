@@ -1,6 +1,5 @@
 import React from "react"
 import { fireEvent, render, screen } from "@testing-library/react-native"
-import { Input } from "@rn-vui/themed"
 import type { RouteProp } from "@react-navigation/native"
 
 import { PhoneCodeChannelType } from "@app/graphql/generated"
@@ -8,7 +7,7 @@ import type { PhoneValidationStackParamList } from "@app/navigation/stack-param-
 import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen/phone-login-initiate-type"
 import { PhoneLoginValidationScreen } from "@app/screens/phone-auth-screen/phone-login-validation"
 
-import { expectFocusFill, flatStyle } from "../../helpers/field-fill"
+import { expectFocusFill, renderedBox } from "../../helpers/field-fill"
 import { flushEffects } from "../../helpers/flush-effects"
 import { ContextForScreen } from "../helper"
 
@@ -31,12 +30,6 @@ const route: RouteProp<PhoneValidationStackParamList, "phoneLoginValidate"> = {
   },
 }
 
-/** rn-vui types `Input`'s ref as the bare TextInput underneath it, which does not fit a
- *  component type. Only the container style is read here. */
-const ThemedInput = Input as unknown as React.ComponentType<{
-  inputContainerStyle: unknown
-}>
-
 describe("PhoneLoginValidationScreen", () => {
   it("fills the code field, darker while it has focus, and starts focused", async () => {
     render(
@@ -49,9 +42,7 @@ describe("PhoneLoginValidationScreen", () => {
 
     expectFocusFill({
       startsFocused: true,
-      surfaces: () => [
-        flatStyle(screen.UNSAFE_getByType(ThemedInput).props.inputContainerStyle),
-      ],
+      surfaces: () => [renderedBox(field)],
       focus: () => fireEvent(field, "focus"),
       blur: () => fireEvent(field, "blur"),
     })

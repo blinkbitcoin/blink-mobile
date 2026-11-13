@@ -1,4 +1,5 @@
 import { StyleProp, StyleSheet, ViewStyle } from "react-native"
+import type { ReactTestInstance } from "react-test-renderer"
 
 import { light } from "@app/rne-theme/colors"
 
@@ -9,6 +10,16 @@ export const FOCUSED_FILL = light.surfaceFocused
 
 export const flatStyle = (style: unknown): ViewStyle =>
   StyleSheet.flatten(style as StyleProp<ViewStyle>) ?? {}
+
+/** The style rendered on the box around a text field: the nearest View above it. For an
+ *  rn-vui `Input` that is its input container, after the library's own defaults (a 1px
+ *  bottom border among them) are merged under the screen's style, so a dropped override
+ *  shows here and not in the prop the screen passes. */
+export const renderedBox = (field: ReactTestInstance): ViewStyle => {
+  let node = field.parent
+  while (node && String(node.type) !== "View") node = node.parent
+  return flatStyle(node?.props.style)
+}
 
 type FocusFill = {
   /** True for a field that autofocuses: its first frame must already show the focused fill. */

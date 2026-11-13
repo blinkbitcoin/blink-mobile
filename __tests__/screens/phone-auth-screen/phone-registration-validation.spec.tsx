@@ -9,9 +9,8 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { PhoneRegistrationValidateScreen } from "@app/screens/phone-auth-screen/phone-registration-validation"
 import { LoginMethodAddition } from "@app/types/two-factor-enforcement"
 import { RouteProp } from "@react-navigation/native"
-import { Input } from "@rn-vui/themed"
 
-import { expectFocusFill, flatStyle } from "../../helpers/field-fill"
+import { expectFocusFill, renderedBox } from "../../helpers/field-fill"
 import { flushEffects } from "../../helpers/flush-effects"
 import { ContextForScreen } from "../helper"
 
@@ -85,12 +84,6 @@ const typeSmsCode = async () => {
     fireEvent.changeText(screen.getByPlaceholderText("000000"), SMS_CODE)
   })
 }
-
-/** rn-vui types `Input`'s ref as the bare TextInput underneath it, which does not fit a
- *  component type. Only the container style is read here. */
-const ThemedInput = Input as unknown as React.ComponentType<{
-  inputContainerStyle: unknown
-}>
 
 const PHONE_ADDITION = {
   addition: LoginMethodAddition.Phone,
@@ -265,9 +258,7 @@ describe("PhoneRegistrationValidateScreen", () => {
 
     expectFocusFill({
       startsFocused: true,
-      surfaces: () => [
-        flatStyle(screen.UNSAFE_getByType(ThemedInput).props.inputContainerStyle),
-      ],
+      surfaces: () => [renderedBox(field)],
       focus: () => fireEvent(field, "focus"),
       blur: () => fireEvent(field, "blur"),
     })
