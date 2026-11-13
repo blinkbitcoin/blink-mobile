@@ -5,6 +5,8 @@ import { Linking } from "react-native"
 
 import { TransactionDetailScreen } from "@app/screens/transaction-detail-screen/transaction-detail-screen"
 
+import { surfaceColor } from "../helpers/surface-color"
+
 jest.mock("@rn-vui/themed", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockThemedText(),
 )
@@ -259,6 +261,17 @@ describe("TransactionDetailScreen row actions", () => {
 
       expect(queryByTestId("hash")).toBeNull()
       expect(queryByTestId("payment-request")).toBeNull()
+    })
+  })
+
+  // The redesigned rows have no icons: a copyable row copies on tap, which is a one-line
+  // row without an icon, so the details card stays surfaceStatic (blink-wip#1871).
+  describe("row surface", () => {
+    it("paints the copyable and the plain rows on the static details card", () => {
+      const { getByText } = renderScreenWithTx(broadcastedOnChainTx(ONCHAIN_TX_HASH))
+
+      expect(surfaceColor(getByText("some description"))).toBe("#f9f9f9")
+      expect(surfaceColor(getByText("OnChain"))).toBe("#f9f9f9")
     })
   })
 })

@@ -43,6 +43,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { PaymentType as ReceiptPaymentType } from "@blinkbitcoin/blink-client"
 
 import { Screen } from "@app/components/screen"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { APPROXIMATE_PREFIX } from "@app/config"
 import { ellipsizeMiddle } from "@app/utils/helper"
@@ -574,7 +575,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
             </View>
 
             {onChainTxNotBroadcasted && (
-              <GaloyInfo backgroundColor={colors.surfaceStatic}>
+              <GaloyInfo backgroundColor={staticSurface(colors).backgroundColor}>
                 {LL.TransactionDetailScreen.txNotBroadcast({ countdown })}
               </GaloyInfo>
             )}
@@ -854,7 +855,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   card: {
-    backgroundColor: colors.surfaceStatic,
+    ...staticSurface(colors),
     borderRadius: 8,
     padding: 14,
     gap: 14,
@@ -909,7 +910,5 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlign: "center",
   },
 
-  amountDetailsContainer: {
-    backgroundColor: colors.surfaceInteractive,
-  },
+  amountDetailsContainer: staticSurface(colors),
 }))

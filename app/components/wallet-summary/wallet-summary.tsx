@@ -5,6 +5,7 @@ import { makeStyles, Text } from "@rn-vui/themed"
 import { CurrencyPill } from "@app/components/atomic/currency-pill"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import { testProps } from "@app/utils/testProps"
 
 export const WALLET_SUMMARY_TEST_ID = "wallet-summary"
@@ -75,7 +76,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     columnGap: 20,
     minHeight: 67,
-    backgroundColor: colors.surfaceStatic,
+    ...staticSurface(colors),
     borderRadius: 12,
     borderWidth: 1,
     borderColor: colors.transparent,

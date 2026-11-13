@@ -2,6 +2,7 @@ import React from "react"
 import { View } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 type MnemonicWordsGridProps = {
   words: readonly string[]
@@ -54,7 +55,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.surfaceInteractive,
+    ...staticSurface(colors),
     borderRadius: 8,
     minHeight: 50,
     paddingHorizontal: 14,

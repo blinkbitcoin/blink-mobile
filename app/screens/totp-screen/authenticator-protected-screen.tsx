@@ -8,6 +8,7 @@ import { RichText } from "@app/components/rich-text"
 import { StepLayout } from "@app/components/step-layout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 import { useTotpRegistrationFlow } from "./hooks/use-totp-registration-flow"
 
@@ -63,7 +64,7 @@ const useStyles = makeStyles(({ colors }) => ({
   tip: {
     marginTop: 30,
     marginHorizontal: 20,
-    backgroundColor: colors.surfaceStatic,
+    ...staticSurface(colors),
     borderLeftWidth: 2,
     borderLeftColor: colors.textOnBackground,
     borderRadius: 6,
