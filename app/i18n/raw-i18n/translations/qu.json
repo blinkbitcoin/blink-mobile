@@ -2357,11 +2357,36 @@
     "maxFeeSelected": "Chaynamanta kaniyta rikuyta munanpi, kaniyta rikuyta munanpi ch'usaq kayniyta rikuy munanpi kawsayniyta qillqata sutichinaqinmi. Kaniytaikuyta munanpi kawsayniyta qillqata sutichinaqinmi chaypi ch'usaq kayniyta rikuy munanpi ch'usaqta munanpi kawsayniyta qillqata sutichinaqinmi.",
     "invoiceAlreadyPaid": "Kay facturata pagasqañam",
     "somethingWentWrong": "Imapas mana allinchu kasqa",
+    "priceUpdated": "Chanin tikrakurqan, chaymi yupaykuna musuqchasqa. Manaraq kachaspa qhaway.",
     "paymentAlreadyAttempted": "Pagota ruwasqaña kanku.\n\nWatiqmanta kay pagota apachiyta munaspaykiqa, qallarimanta qallariy.",
+    "paymentMayStillLand": "Wait a moment, it will probably go through soon. Your money will arrive safely or stay with you.",
     "slideToConfirm": "Aysay chiqapchanapaq",
     "slideConfirming": "Chiqapchashanku...",
+    "slideToSend": "Aysay kachanapaq",
+    "calculatingFee": "Chiqanakuyta yupashan…",
+    "sendProgress": {
+      "reviewing": "Qhawashan",
+      "signing": "Silq'ushan",
+      "findingRoute": "Ñanta maskhashan",
+      "broadcasting": "Willashan",
+      "checkingDelivery": "Chayasqanta qhawashan",
+      "retrying": "Huktawan ruwashan",
+      "almostThere": "Yaqañam",
+      "anyTimeNow": "Kunanpacha",
+      "ohOh": "Ay ay",
+      "tryingAgain": "Huktawan kallpachashan"
+    },
     "copiedDestination": "Mayman rinanta clipboard nisqaman churasqa",
-    "lightningRecommended": "¡Hatun comisión! Lightning nisqata yuyaychayku.",
+    "lightningRecommended": "Hatun comisión. Lightning nisqata yuyaychayku.",
+    "sending": "Apachishaspa",
+    "sent": "Kachasqa",
+    "receipt": "Chaskisqa qillqa",
+    "fromBalance": "Saldomanta",
+    "details": "Detalles",
+    "changeAmount": "Sumata tikray",
+    "tryAgain": "Try again",
+    "home": "Ayllu",
+    "dustSweepSheetTitle": "Before you send",
     "usdRemainderSweep": "Puchurqan {remaining: string} ({remainingSats: string}) Bitcoin-man tikrachisqa kanqa. USD pisi: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2405,8 +2430,15 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Ruwaynin mempool nisqaman apachisqa kanan kachkan",
     "amount": "Suma",
+    "addAmount": "Suma yapay",
+    "lowFunds": "Mana kaniyuqchu",
     "amountExceed": "Mana kaniyta rikuchiy {balance: string}",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
+    "limitsUnavailable": "We couldn't check your daily limit. Try again in a moment.",
+    "problemSheetTitle": "A small problem",
+    "changeDestination": "Maymanta tikray",
+    "recipientUnreachableTitle": "Couldn't reach the recipient",
+    "recipientWrongAmountTitle": "Recipient sent the wrong amount",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
     "amountIsRequired": "Kawsayniy kiti kaniyta rikuchiy",
     "cost": "Kawsayniyta qillqata sutichinaqinmi",
@@ -2425,10 +2457,11 @@
     "title": "Bitcoin kawsayniyta qillqata sutichinaqinmi kaniyta rikuchiy",
     "failedToFetchLnurlInvoice": "Lnurl kawsayniyta qillqata sutichinaqinmi chimpuyta mana kaniyta rikuchiy.",
     "lnurlInvoiceIncorrectAmount": "Lnurl serverpi kawsayniyta qillqata sutichqinmi, ñuqaqa ch'usaqiy kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi, chaynamanta k'anchaypi mana kaniyta rikuchiy.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "¡Hatun comisión willakuy!",
-      "content": "Comisiónniyki apachisqa yupaymanta 50% aswan hatunmi. ¿Chiqaptachu qatipayta munankí?\n\nComisionkunata pisiyachinapaq, chaskiqta Lightning nisqapi chaskikunanta mañay",
-      "confirmButton": "100% seguro kashani"
+      "body": "Comisiónniyki kachanqa 50% utaq aswan kachasqayki qullqimanta. ¿Chiqachu purichiyta munanki?",
+      "cancelPayment": "Pagota t'akuy",
+      "acceptFee": "Comisiónta chaskiy"
     },
     "copiedDestination": "Mayman rinanta clipboard nisqaman churasqa",
     "pendingPayment": "Pagota apachisqaña, ichaqa manaraq chiqapchasqachu.\n\nPagoqa mana chiqapchakuyta atinmanchu, chaypiqa qullqiqa cuentaykiman kutinqa.",
@@ -2456,7 +2489,8 @@
     "sdkInsufficientFunds": "Mana kaniyuqchu kay ruwaykunapaq.",
     "sdkAmountTooLow": "Yupayqa pisillam on-chain ruwaykunapaq.",
     "sdkNetworkError": "Llika pantay. Tinkisqaykita qhaway hinaspa watiqmanta ruway.",
-    "sdkGenericError": "Mana chaninchayta atinichu. Huk yupaywan watiqmanta ruway."
+    "sdkGenericError": "Mana chaninchayta atinichu. Huk yupaywan watiqmanta ruway.",
+    "onchainSelfPayment": "Kayqa kikiykipa billeteraykiq direccionninmi. Manam on-chain qullqita kikiykiman apachiyta atinkichu."
   },
   "SettingsScreen": {
     "createAddress": "Lightning tinkunata ruray",
@@ -3115,6 +3149,13 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
+  },
+  "Accessibility": {
+    "deleteKey": "Pichay",
+    "swapCurrencyHint": "Chaninta qillqanaykipaq qullqita tikran",
+    "switchToWallet": "{wallet: string}-man tikray",
+    "copy": "Kopiay",
+    "revealBalanceHint": "Kay pantallapi puchuq qullqiykita rikuchin"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Kaypiyta yachayninta munanichu, hamut'a kachun {os: string} app qallarichkanmi, versiyonqa {version: string} nisqan.",

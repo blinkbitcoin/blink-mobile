@@ -2357,11 +2357,36 @@
     "maxFeeSelected": "Ez a maximális díj, amit ezen tranzakcióért felszámíthatunk. Lehet, hogy kevesebb lesz, miután a fizetés megtörtént.",
     "invoiceAlreadyPaid": "Ez a fizetési kérelem már kifizetésre került",
     "somethingWentWrong": "Valami hiba történt",
+    "priceUpdated": "Az ár megváltozott, ezért az összegek frissültek. Küldés előtt ellenőrizd őket.",
     "paymentAlreadyAttempted": "A fizetés kisérlet már megtörtént.\n\nHa újra szeretnéd küldeni ezt a fizetést, kezdd elölről.",
+    "paymentMayStillLand": "Várj egy kicsit, valószínűleg hamarosan teljesül. A pénzed biztonságban megérkezik, vagy nálad marad.",
     "slideToConfirm": "Húzd el a megerősítéshez",
     "slideConfirming": "Megerősítés...",
+    "slideToSend": "Húzd el a küldéshez",
+    "calculatingFee": "Díj kiszámítása…",
+    "sendProgress": {
+      "reviewing": "Ellenőrzés",
+      "signing": "Aláírás",
+      "findingRoute": "Útvonal keresése",
+      "broadcasting": "Továbbítás",
+      "checkingDelivery": "Kézbesítés ellenőrzése",
+      "retrying": "Újrapróbálás",
+      "almostThere": "Mindjárt kész",
+      "anyTimeNow": "Bármelyik pillanatban",
+      "ohOh": "Ajjaj",
+      "tryingAgain": "Újra próbáljuk"
+    },
     "copiedDestination": "Címzett a vágólapra másolva",
-    "lightningRecommended": "Magas díj! Lightning használata ajánlott.",
+    "lightningRecommended": "Magas díj. Lightning használata ajánlott.",
+    "sending": "Küldés",
+    "sent": "Elküldve",
+    "receipt": "Nyugta",
+    "fromBalance": "Egyenlegről",
+    "details": "Részletek",
+    "changeAmount": "Összeg módosítása",
+    "tryAgain": "Próbáld újra",
+    "home": "Kezdőlap",
+    "dustSweepSheetTitle": "Küldés előtt",
     "usdRemainderSweep": "A fennmaradó {remaining: string} ({remainingSats: string}) Bitcoinra lesz váltva. USD minimum: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2405,8 +2430,15 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "A tranzakciót elküldjük a mempoolba",
     "amount": "Összeg",
+    "addAmount": "Összeg hozzáadása",
+    "lowFunds": "Nincs elegendő egyenleg",
     "amountExceed": "Az összeg meghaladja az egyenlegedet: {balance: string}",
     "amountExceedsLimit": "Az összeg meghaladja a napi limitet: {limit: string}",
+    "limitsUnavailable": "Nem tudtuk ellenőrizni a napi limitedet. Próbáld újra egy pillanat múlva.",
+    "problemSheetTitle": "Egy kis probléma",
+    "changeDestination": "Cél módosítása",
+    "recipientUnreachableTitle": "Nem sikerült elérni a címzettet",
+    "recipientWrongAmountTitle": "A címzett hibás összeget adott meg",
     "upgradeAccountToIncreaseLimit": "Magasabb tranzakciós limithez magasabb szintű felhasználói fiókra váltás szükséges",
     "amountIsRequired": "Az összeg kötelező",
     "cost": "Költség",
@@ -2425,10 +2457,11 @@
     "title": "Bitcoin küldése",
     "failedToFetchLnurlInvoice": "Nem sikerült lekérni az LNURL fizetési kérelmet",
     "lnurlInvoiceIncorrectAmount": "Az LNURL szerver helytelen összegű fizetési kérelemmel válaszolt.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Magas díj figyelmeztetés!",
-      "content": "A díjad több, mint 50%kal nagyobb, mint az elküldött összeg. Biztos vagy benne, hogy folytatod?\n\nA díjak csökkentése érdekében kérd meg a címzettet, hogy fogadja a tranzakciót Lightning hálózaton.",
-      "confirmButton": "Biztos vagyok benne."
+      "body": "A díj a küldött összeg 50%-a vagy több. Biztosan folytatod?",
+      "cancelPayment": "Fizetés megszakítása",
+      "acceptFee": "Díj elfogadása"
     },
     "copiedDestination": "Címzett a vágólapra másolva.",
     "pendingPayment": "A fizetés elküldve, de még nem érkezett visszaigazolás.\n\n Visszaigazolás hiányában a pénz visszakerül a számládra.",
@@ -2456,7 +2489,8 @@
     "sdkInsufficientFunds": "Nincs elegendő egyenleg ehhez a tranzakcióhoz.",
     "sdkAmountTooLow": "Az összeg túl alacsony egy on-chain tranzakcióhoz.",
     "sdkNetworkError": "Hálózati hiba. Ellenőrizze a kapcsolatot és próbálja újra.",
-    "sdkGenericError": "Nem sikerült megbecsülni a díjakat. Próbáljon másik összeget."
+    "sdkGenericError": "Nem sikerült megbecsülni a díjakat. Próbáljon másik összeget.",
+    "onchainSelfPayment": "Ez az Ön saját tárcájának címe. Nem küldhet on-chain fizetést saját magának."
   },
   "SettingsScreen": {
     "createAddress": "Lightning cím létrehozása",
@@ -3115,6 +3149,13 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Összeg beállítása"
+  },
+  "Accessibility": {
+    "deleteKey": "Törlés",
+    "swapCurrencyHint": "Átváltja a pénznemet, amelyben az összeget megadja",
+    "switchToWallet": "Váltás erre: {wallet: string}",
+    "copy": "Másol",
+    "revealBalanceHint": "Megjeleníti az egyenlegét ezen a képernyőn"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Frissítenem kell az alkalmazásomat a legújabb verzióra. A(z) {os: string} alkalmazást használom, verziószáma: {version: string}.",

@@ -2357,11 +2357,36 @@
     "maxFeeSelected": "Jedná se o maximální poplatek, který vám bude za tuto transakci účtován. Po provedení platby může být nakonec nižší.",
     "invoiceAlreadyPaid": "Tato faktura již byla zaplacena",
     "somethingWentWrong": "Něco se pokazilo",
+    "priceUpdated": "Cena se změnila, proto byly částky aktualizovány. Před odesláním je zkontrolujte.",
     "paymentAlreadyAttempted": "Platba již byla pokusena.\n\nPokud chcete tuto platbu odeslat znovu, začněte od začátku.",
+    "paymentMayStillLand": "Chvíli počkejte, platba nejspíš brzy projde. Vaše peníze buď bezpečně dorazí, nebo vám zůstanou.",
     "slideToConfirm": "Přejeďte pro potvrzení",
     "slideConfirming": "Potvrzování...",
+    "slideToSend": "Přejeďte pro odeslání",
+    "calculatingFee": "Výpočet poplatku…",
+    "sendProgress": {
+      "reviewing": "Kontrola",
+      "signing": "Podepisování",
+      "findingRoute": "Hledání trasy",
+      "broadcasting": "Vysílání",
+      "checkingDelivery": "Ověřování doručení",
+      "retrying": "Opakování",
+      "almostThere": "Skoro hotovo",
+      "anyTimeNow": "Každou chvíli",
+      "ohOh": "Ajaj",
+      "tryingAgain": "Zkoušíme znovu"
+    },
     "copiedDestination": "Cíl zkopírován do schránky",
-    "lightningRecommended": "Vysoký poplatek! Doporučujeme Lightning.",
+    "lightningRecommended": "Vysoký poplatek. Doporučujeme Lightning.",
+    "sending": "Odesílání",
+    "sent": "Odesláno",
+    "receipt": "Účtenka",
+    "fromBalance": "Ze zůstatku",
+    "details": "Podrobnosti",
+    "changeAmount": "Změnit částku",
+    "tryAgain": "Zkusit znovu",
+    "home": "Domů",
+    "dustSweepSheetTitle": "Před odesláním",
     "usdRemainderSweep": "Zbývajících {remaining: string} ({remainingSats: string}) bude převedeno na Bitcoin. Minimum v USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2405,8 +2430,15 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transakce by měla být odeslána do mempoolu",
     "amount": "Částka",
+    "addAmount": "Přidat částku",
+    "lowFunds": "Nedostatek prostředků",
     "amountExceed": "Částka přesahuje váš zůstatek ve výši {balance: string}",
     "amountExceedsLimit": "Částka přesahuje váš zbývající denní limit {limit: string}",
+    "limitsUnavailable": "Nepodařilo se ověřit váš denní limit. Zkuste to za chvíli znovu.",
+    "problemSheetTitle": "Malý problém",
+    "changeDestination": "Změnit příjemce",
+    "recipientUnreachableTitle": "Nepodařilo se spojit s příjemcem",
+    "recipientWrongAmountTitle": "Příjemce uvedl špatnou částku",
     "upgradeAccountToIncreaseLimit": "Upgradujte svůj účet a zvyšte svůj limit",
     "amountIsRequired": "Je požadována částka",
     "cost": "Náklady",
@@ -2425,10 +2457,11 @@
     "title": "Odeslat Bitcoin",
     "failedToFetchLnurlInvoice": "Nepodařilo se načíst lnurl fakturu",
     "lnurlInvoiceIncorrectAmount": "Server lnurl odpověděl fakturou s nesprávnou částkou.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Upozornění na vysoký poplatek!",
-      "content": "Váš poplatek je více než o 50 % vyšší než odesílaná částka. Opravdu chcete pokračovat?\n\nPro snížení poplatků požádejte příjemce, aby přijal transakci přes Lightning",
-      "confirmButton": "Jsem si 100% jistý/á"
+      "body": "Váš poplatek je 50 % nebo více z odesílané částky. Opravdu chcete pokračovat?",
+      "cancelPayment": "Zrušit platbu",
+      "acceptFee": "Přijmout poplatek"
     },
     "copiedDestination": "Cíl zkopírován do schránky",
     "pendingPayment": "Platba byla odeslána, ale dosud nebyla potvrzena.\n\nJe možné, že platba nebude potvrzena a v takovém případě budou prostředky vráceny na váš účet.",
@@ -2456,7 +2489,8 @@
     "sdkInsufficientFunds": "Nedostatek prostředků pro tuto transakci.",
     "sdkAmountTooLow": "Částka je příliš nízká pro on-chain transakci.",
     "sdkNetworkError": "Chyba sítě. Zkontrolujte připojení a zkuste to znovu.",
-    "sdkGenericError": "Nelze odhadnout poplatky. Zkuste jiný částku."
+    "sdkGenericError": "Nelze odhadnout poplatky. Zkuste jiný částku.",
+    "onchainSelfPayment": "Toto je adresa vaší vlastní peněženky. Nemůžete poslat on-chain platbu sami sobě."
   },
   "SettingsScreen": {
     "createAddress": "Vytvořit Lightning adresu",
@@ -3115,6 +3149,13 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Nastavit částku"
+  },
+  "Accessibility": {
+    "deleteKey": "Smazat",
+    "swapCurrencyHint": "Přepne měnu, ve které zadáváte částku",
+    "switchToWallet": "Přepnout na {wallet: string}",
+    "copy": "Kopírovat",
+    "revealBalanceHint": "Zobrazí váš zůstatek na této obrazovce"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Potřebuji aktualizovat aplikaci na nejnovější verzi. Používám aplikaci {os: string} s verzí {version: string}.",

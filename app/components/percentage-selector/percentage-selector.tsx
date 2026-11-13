@@ -1,14 +1,8 @@
 import React, { useMemo } from "react"
-import {
-  ActivityIndicator,
-  StyleProp,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from "react-native"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { StyleProp, View, ViewStyle } from "react-native"
+import { makeStyles } from "@rn-vui/themed"
 
-import { testProps } from "@app/utils/testProps"
+import { Chip } from "@app/components/atomic/chip"
 
 export const PERCENTAGE_OPTIONS = [25, 50, 75, 100] as const
 const DEFAULT_TEST_ID_PREFIX = "convert"
@@ -41,9 +35,6 @@ export const PercentageSelector = <T extends number = number>({
   containerStyle,
   formatLabel = (option) => `${option}%`,
 }: PercentageSelectorProps<T>) => {
-  const {
-    theme: { colors },
-  } = useTheme()
   const styles = useStyles()
   // the default list only applies when options is omitted, where T is plain number
   const opts = useMemo(
@@ -56,70 +47,28 @@ export const PercentageSelector = <T extends number = number>({
 
   return (
     <View style={[styles.row, containerStyle]}>
-      {opts.map((p) => {
-        const loading = loadingPercent === p
-        const isSelected = !loading && selectedPercent === p
-        const isDisabled = isLocked || (disabledOptions?.includes(p) ?? false)
-        return (
-          <TouchableOpacity
-            key={p}
-            {...testProps(`${testIdPrefix}-${p}%`)}
-            style={[
-              styles.chip,
-              isSelected && styles.chipSelected,
-              isDisabled && styles.chipDisabled,
-            ]}
-            disabled={isDisabled}
-            onPress={() => onSelect(p)}
-            accessibilityRole="button"
-            // after testProps, which would otherwise read the test ID out to screen readers
-            accessibilityLabel={formatLabel(p)}
-            accessibilityState={{
-              selected: isSelected,
-              disabled: isDisabled,
-              busy: loading,
-            }}
-          >
-            {loading ? (
-              <ActivityIndicator color={colors.accent} />
-            ) : (
-              <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>
-                {formatLabel(p)}
-              </Text>
-            )}
-          </TouchableOpacity>
-        )
-      })}
+      {opts.map((p) => (
+        <Chip
+          key={p}
+          label={formatLabel(p)}
+          testID={`${testIdPrefix}-${p}%`}
+          loading={loadingPercent === p}
+          selected={selectedPercent === p}
+          disabled={isLocked || (disabledOptions?.includes(p) ?? false)}
+          onPress={() => onSelect(p)}
+        />
+      ))}
     </View>
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(() => ({
   row: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    flexWrap: "wrap",
+    justifyContent: "center",
     alignItems: "center",
+    gap: 10,
     width: "100%",
-  },
-  chip: {
-    backgroundColor: colors.surfaceInteractive,
-    borderRadius: 100,
-    alignItems: "center",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    minWidth: 64,
-  },
-  chipSelected: {
-    backgroundColor: colors.accent,
-  },
-  chipDisabled: {
-    opacity: 0.5,
-  },
-  chipText: {
-    color: colors.accent,
-    fontWeight: "bold",
-  },
-  chipTextSelected: {
-    color: colors.textOnAccent,
   },
 }))

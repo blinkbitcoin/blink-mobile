@@ -2357,11 +2357,36 @@
         "maxFeeSelected": "Tarifa máxima que se cobrará por esta transacción. Podría ser menor una vez se realice el pago.",
         "invoiceAlreadyPaid": "Esta factura ya ha sido pagada.",
         "somethingWentWrong": "Algo salió mal",
+        "priceUpdated": "El precio cambió, así que los montos se actualizaron. Revísalos antes de enviar.",
         "paymentAlreadyAttempted": "El pago ya se intentó.\n\nSi deseas enviar este pago nuevamente, comienza desde el principio del proceso.",
+        "paymentMayStillLand": "Espera un momento, probablemente se complete pronto. Tu dinero llegará de forma segura o se quedará contigo.",
         "slideToConfirm": "Desliza para confirmar",
         "slideConfirming": "Confirmando...",
+        "slideToSend": "Desliza para enviar",
+        "calculatingFee": "Calculando la comisión…",
+        "sendProgress": {
+            "reviewing": "Revisando",
+            "signing": "Firmando",
+            "findingRoute": "Buscando ruta",
+            "broadcasting": "Transmitiendo",
+            "checkingDelivery": "Verificando la entrega",
+            "retrying": "Reintentando",
+            "almostThere": "Ya casi",
+            "anyTimeNow": "En cualquier momento",
+            "ohOh": "Uy, uy",
+            "tryingAgain": "Intentando de nuevo"
+        },
         "copiedDestination": "Destino copiado al portapapeles",
         "lightningRecommended": "Tasa elevada. Recomendamos Lightning.",
+        "sending": "Enviando",
+        "sent": "Enviado",
+        "receipt": "Recibo",
+        "fromBalance": "Desde el saldo",
+        "details": "Detalles",
+        "changeAmount": "Cambiar cantidad",
+        "tryAgain": "Intentar de nuevo",
+        "home": "Inicio",
+        "dustSweepSheetTitle": "Antes de enviar",
         "usdRemainderSweep": "Restante {remaining: string} ({remainingSats: string}) se convertirá a Bitcoin. Mínimo en USD: {minimum: string}."
     },
     "SendBitcoinDestinationScreen": {
@@ -2405,8 +2430,15 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "La transacción debe enviarse a la Mempool.",
         "amount": "Cantidad",
+        "addAmount": "Añade una cantidad",
+        "lowFunds": "Fondos insuficientes",
         "amountExceed": "La cantidad excede su saldo de {balance: string}",
         "amountExceedsLimit": "El importe supera tu límite diario restante de {limit: string}",
+        "limitsUnavailable": "No pudimos comprobar tu límite diario. Inténtalo de nuevo en un momento.",
+        "problemSheetTitle": "Un pequeño problema",
+        "changeDestination": "Cambiar destino",
+        "recipientUnreachableTitle": "No se pudo contactar con el destinatario",
+        "recipientWrongAmountTitle": "El destinatario indicó un importe incorrecto",
         "upgradeAccountToIncreaseLimit": "Actualiza tu cuenta para aumentar tu límite",
         "amountIsRequired": "Se requiere cantidad",
         "cost": "Costo",
@@ -2425,10 +2457,11 @@
         "title": "Enviar Bitcoin",
         "failedToFetchLnurlInvoice": "Error al obtener la factura de lnurl",
         "lnurlInvoiceIncorrectAmount": "El servidor lnurl ha enviado una factura con un importe incorrecto.",
-        "confirmFeesModal": {
+        "highFeeSheet": {
             "title": "Alerta de tarifa alta!",
-            "content": "Tu tarifa es un 50% más grande que la cantidad enviada. ¿Estás seguro de que quieres continuar?\n\nPara reducir la tarifa, pide al receptor que acepte la transacción a través de Lightning.",
-            "confirmButton": "Estoy 100% seguro"
+            "body": "Tu tarifa es el 50% o más del monto que envías. ¿Seguro que quieres continuar?",
+            "cancelPayment": "Cancelar pago",
+            "acceptFee": "Aceptar tarifa"
         },
         "copiedDestination": "Destino copiado al portapapeles",
         "pendingPayment": "El pago ha sido enviado, pero aún no se ha confirmado.\n\nEs posible que el pago no se confirme, en cuyo caso los fondos se devolverán a su cuenta.\nBETA",
@@ -2456,7 +2489,8 @@
         "sdkInsufficientFunds": "Fondos insuficientes para esta transacción.",
         "sdkAmountTooLow": "El monto es muy bajo para una transacción on-chain.",
         "sdkNetworkError": "Error de red. Verifica tu conexión e intenta de nuevo.",
-        "sdkGenericError": "No se pueden estimar las comisiones. Intenta con un monto diferente."
+        "sdkGenericError": "No se pueden estimar las comisiones. Intenta con un monto diferente.",
+        "onchainSelfPayment": "Esta es la dirección de tu propia billetera. No puedes enviarte un pago on-chain a ti mismo."
     },
     "SettingsScreen": {
         "createAddress": "Crear dirección Lightning",
@@ -3115,6 +3149,13 @@
     },
     "AmountInputButton": {
         "tapToSetAmount": "Fijar cantidad"
+    },
+    "Accessibility": {
+        "deleteKey": "Borrar",
+        "swapCurrencyHint": "Cambia la moneda en la que escribes la cantidad",
+        "switchToWallet": "Cambiar a {wallet: string}",
+        "copy": "Copiar",
+        "revealBalanceHint": "Muestra tu saldo en esta pantalla"
     },
     "AppUpdate": {
         "needToUpdateSupportMessage": "Necesito actualizar la aplicación a la última versión. Utilizo la aplicación para {os: string} con la versión {version: string}.",

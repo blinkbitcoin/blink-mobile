@@ -2357,11 +2357,36 @@
     "maxFeeSelected": "Ini adalah biaya maksimum yang akan dikenakan untuk transaksi ini. Biaya mungkin lebih rendah setelah pembayaran dilakukan.",
     "invoiceAlreadyPaid": "Faktur ini telah dibayar",
     "somethingWentWrong": "Terjadi kesalahan",
+    "priceUpdated": "Harga berubah, jadi jumlahnya diperbarui. Periksa sebelum mengirim.",
     "paymentAlreadyAttempted": "Pembayaran telah dicoba sebelumnya.\n\nJika Anda ingin mengirim pembayaran ini lagi, mulailah dari awal.",
+    "paymentMayStillLand": "Tunggu sebentar, kemungkinan akan segera berhasil. Uang Anda akan tiba dengan aman atau tetap bersama Anda.",
     "slideToConfirm": "Geser untuk Konfirmasi",
     "slideConfirming": "Mengkonfirmasi...",
+    "slideToSend": "Geser untuk Kirim",
+    "calculatingFee": "Menghitung biaya…",
+    "sendProgress": {
+      "reviewing": "Meninjau",
+      "signing": "Menandatangani",
+      "findingRoute": "Mencari rute",
+      "broadcasting": "Menyiarkan",
+      "checkingDelivery": "Memeriksa pengiriman",
+      "retrying": "Mencoba ulang",
+      "almostThere": "Hampir selesai",
+      "anyTimeNow": "Sebentar lagi",
+      "ohOh": "Aduh",
+      "tryingAgain": "Mencoba lagi"
+    },
     "copiedDestination": "Tujuan disalin ke papan klip",
-    "lightningRecommended": "Biaya tinggi! Kami merekomendasikan Lightning.",
+    "lightningRecommended": "Biaya tinggi. Kami merekomendasikan Lightning.",
+    "sending": "Mengirim",
+    "sent": "Terkirim",
+    "receipt": "Struk",
+    "fromBalance": "Dari Saldo",
+    "details": "Detail",
+    "changeAmount": "Ubah jumlah",
+    "tryAgain": "Coba lagi",
+    "home": "Beranda",
+    "dustSweepSheetTitle": "Sebelum mengirim",
     "usdRemainderSweep": "Sisa {remaining: string} ({remainingSats: string}) akan dikonversi ke Bitcoin. Minimum USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2405,8 +2430,15 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksi akan dikirim ke mempool",
     "amount": "Jumlah",
+    "addAmount": "Tambahkan jumlah",
+    "lowFunds": "Dana tidak cukup",
     "amountExceed": "Jumlah melebihi saldo Anda sebesar {balance: string}",
     "amountExceedsLimit": "Jumlah melebihi batas harian Anda yang tersisa sebesar {limit: string}",
+    "limitsUnavailable": "Kami tidak dapat memeriksa batas harian Anda. Coba lagi sebentar lagi.",
+    "problemSheetTitle": "Ada sedikit masalah",
+    "changeDestination": "Ubah tujuan",
+    "recipientUnreachableTitle": "Tidak dapat menghubungi penerima",
+    "recipientWrongAmountTitle": "Penerima mencantumkan jumlah yang salah",
     "upgradeAccountToIncreaseLimit": "Tingkatkan akun Anda untuk meningkatkan batas",
     "amountIsRequired": "Jumlah diperlukan",
     "cost": "Biaya",
@@ -2425,10 +2457,11 @@
     "title": "Kirim Bitcoin",
     "failedToFetchLnurlInvoice": "Gagal mengambil faktur lnurl",
     "lnurlInvoiceIncorrectAmount": "Server lnurl merespons dengan faktur dengan jumlah yang salah.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Peringatan biaya tinggi!",
-      "content": "Biaya Anda lebih dari 50% lebih besar dari jumlah yang dikirim. Apakah Anda yakin ingin melanjutkan?\n\nUntuk mengurangi biaya, mintalah penerima menerima transaksi melalui Lightning.",
-      "confirmButton": "Saya 100% yakin"
+      "body": "Biaya Anda 50% atau lebih dari jumlah yang Anda kirim. Yakin ingin melanjutkan?",
+      "cancelPayment": "Batalkan pembayaran",
+      "acceptFee": "Terima biaya"
     },
     "copiedDestination": "Tujuan disalin ke papan klip",
     "pendingPayment": "Pembayaran telah dikirim, tetapi belum dikonfirmasi.\n\nAda kemungkinan pembayaran tidak akan dikonfirmasi, dalam hal ini dana akan dikembalikan ke akun Anda.",
@@ -2456,7 +2489,8 @@
     "sdkInsufficientFunds": "Dana tidak cukup untuk transaksi ini.",
     "sdkAmountTooLow": "Jumlah terlalu rendah untuk transaksi on-chain.",
     "sdkNetworkError": "Kesalahan jaringan. Periksa koneksi Anda dan coba lagi.",
-    "sdkGenericError": "Tidak dapat memperkirakan biaya. Coba jumlah yang berbeda."
+    "sdkGenericError": "Tidak dapat memperkirakan biaya. Coba jumlah yang berbeda.",
+    "onchainSelfPayment": "Ini adalah alamat dompet Anda sendiri. Anda tidak dapat mengirim pembayaran on-chain ke diri sendiri."
   },
   "SettingsScreen": {
     "createAddress": "Buat alamat Lightning",
@@ -3115,6 +3149,13 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Tetapkan jumlah"
+  },
+  "Accessibility": {
+    "deleteKey": "Hapus",
+    "swapCurrencyHint": "Mengganti mata uang untuk mengetik jumlah",
+    "switchToWallet": "Beralih ke {wallet: string}",
+    "copy": "Salin",
+    "revealBalanceHint": "Menampilkan saldo Anda di layar ini"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Saya perlu memperbarui aplikasi saya ke versi terbaru. Saya menggunakan aplikasi {os: string} dengan versi {version: string}.",

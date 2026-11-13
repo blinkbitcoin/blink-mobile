@@ -2357,11 +2357,36 @@
     "maxFeeSelected": "Aquesta és la comissió màxima que se't cobrarà per aquesta transacció. Pot acabar sent inferior un cop s'hagi realitzat el pagament.",
     "invoiceAlreadyPaid": "Aquesta factura ja ha estat pagada",
     "somethingWentWrong": "Alguna cosa ha anat malament",
+    "priceUpdated": "El preu ha canviat, així que els imports s'han actualitzat. Revisa'ls abans d'enviar.",
     "paymentAlreadyAttempted": "Pagament ja intentat.\n\nSi vols enviar aquest pagament de nou, comença des de zero.",
+    "paymentMayStillLand": "Espera un moment, probablement es completarà aviat. Els teus diners arribaran amb seguretat o es quedaran amb tu.",
     "slideToConfirm": "Llisca per confirmar",
     "slideConfirming": "Confirmant...",
+    "slideToSend": "Llisca per enviar",
+    "calculatingFee": "Calculant la comissió…",
+    "sendProgress": {
+      "reviewing": "Revisant",
+      "signing": "Signant",
+      "findingRoute": "Cercant una ruta",
+      "broadcasting": "Difonent",
+      "checkingDelivery": "Comprovant el lliurament",
+      "retrying": "Reintentant",
+      "almostThere": "Gairebé hi som",
+      "anyTimeNow": "En qualsevol moment",
+      "ohOh": "Ui ui",
+      "tryingAgain": "Tornant-ho a provar"
+    },
     "copiedDestination": "Destinació copiada al porta-retalls",
-    "lightningRecommended": "Comissió alta! Recomanem utilitzar Lightning.",
+    "lightningRecommended": "Comissió alta. Recomanem utilitzar Lightning.",
+    "sending": "Enviant",
+    "sent": "Enviat",
+    "receipt": "Rebut",
+    "fromBalance": "Des del saldo",
+    "details": "Detalls",
+    "changeAmount": "Canvia l'import",
+    "tryAgain": "Torna-ho a provar",
+    "home": "Inici",
+    "dustSweepSheetTitle": "Abans d'enviar",
     "usdRemainderSweep": "Resta {remaining: string} ({remainingSats: string}) i es convertirà a Bitcoin. Mínim d'USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2405,8 +2430,15 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "La transacció s'ha d'enviar a la mempool.",
     "amount": "Import",
+    "addAmount": "Afegir import",
+    "lowFunds": "Fons insuficients",
     "amountExceed": "L'import excedeix el teu saldo {balance: string}",
     "amountExceedsLimit": "La quantitat supera el teu límit diari restant de {limit: string}",
+    "limitsUnavailable": "No hem pogut comprovar el teu límit diari. Torna-ho a provar d'aquí a un moment.",
+    "problemSheetTitle": "Un petit problema",
+    "changeDestination": "Canvia la destinació",
+    "recipientUnreachableTitle": "No s'ha pogut contactar amb el destinatari",
+    "recipientWrongAmountTitle": "El destinatari ha indicat un import incorrecte",
     "upgradeAccountToIncreaseLimit": "Actualitza el teu compte per incrementar els teus límits",
     "amountIsRequired": "L'import és necessari",
     "cost": "Cost",
@@ -2425,10 +2457,11 @@
     "title": "Envia Bitcoin",
     "failedToFetchLnurlInvoice": "No s'ha pogut obtenir la factura lnurl",
     "lnurlInvoiceIncorrectAmount": "El servidor de lnurl ha enviat una factura amb un import incorrecte.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Alerta d'altes comissions !",
-      "content": "La comissió és més gran que el 50% de l'import enviat. Estàs segur que vols continuar?\n\nPer reduir les comissions, demana al receptor que accepti la transacció a través de Lightning.",
-      "confirmButton": "Estic 100% segur"
+      "body": "La teva comissió és el 50% o més de l'import que envies. Segur que vols continuar?",
+      "cancelPayment": "Cancel·la el pagament",
+      "acceptFee": "Accepta la comissió"
     },
     "copiedDestination": "Destinació copiada al porta-retalls",
     "pendingPayment": "El pagament s'ha enviat, però encara no s'ha confirmat.\n\nÉs possible que el pagament no es confirmi, en aquest cas els fons es retornaran al teu compte.",
@@ -2456,7 +2489,8 @@
     "sdkInsufficientFunds": "No hi ha prou fons per a aquesta transacció.",
     "sdkAmountTooLow": "L'import és massa baix per a una transacció on-chain.",
     "sdkNetworkError": "Error de xarxa. Comproveu la connexió i torneu-ho a provar.",
-    "sdkGenericError": "No s'han pogut estimar les comissions. Proveu un import diferent."
+    "sdkGenericError": "No s'han pogut estimar les comissions. Proveu un import diferent.",
+    "onchainSelfPayment": "Aquesta és l'adreça del vostre propi moneder. No us podeu enviar un pagament on-chain a vós mateix."
   },
   "SettingsScreen": {
     "createAddress": "Crea una adreça Lightning",
@@ -3115,6 +3149,13 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Estableix l'import"
+  },
+  "Accessibility": {
+    "deleteKey": "Esborra",
+    "swapCurrencyHint": "Canvia la moneda en què escrius l'import",
+    "switchToWallet": "Canvia a {wallet: string}",
+    "copy": "Copiar",
+    "revealBalanceHint": "Mostra el teu saldo en aquesta pantalla"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Necessito actualitzar l'aplicació a la última versió. Utilitzo  la aplicació per a {os: string} versió {version: string}.",

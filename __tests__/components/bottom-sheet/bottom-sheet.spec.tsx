@@ -13,6 +13,7 @@ import {
   BottomSheet,
   CLOSE_DURATION_MS,
   PAN_TEST_ID,
+  SCRIM_TEST_ID,
 } from "@app/components/bottom-sheet"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { light } from "@app/rne-theme/colors"
@@ -135,10 +136,12 @@ describe("BottomSheet", () => {
 
   it("closes when the scrim behind it is pressed", async () => {
     const onClose = jest.fn()
-    const { getByLabelText } = renderSheet({ onClose })
+    const { getByTestId } = renderSheet({ onClose })
 
-    await waitFor(() => expect(getByLabelText("Close")).toBeTruthy())
-    fireEvent.press(getByLabelText("Close"))
+    // Hidden from screen readers, which close the sheet with their escape gesture.
+    const scrim = () => getByTestId(SCRIM_TEST_ID, { includeHiddenElements: true })
+    await waitFor(() => expect(scrim()).toBeTruthy())
+    fireEvent.press(scrim())
 
     expect(onClose).toHaveBeenCalled()
   })
@@ -528,12 +531,12 @@ describe("BottomSheet", () => {
     })
 
     it("puts up no scrim, so what it sits beside keeps its own touches", async () => {
-      const { getByText, queryByLabelText } = renderSheet({ presentation: "inline" })
+      const { getByText, queryByTestId } = renderSheet({ presentation: "inline" })
 
       await waitFor(() => expect(getByText("content")).toBeTruthy())
       // The scrim is the only thing that presses to close, and it is what would
       // be swallowing the panning of the map this sits beside.
-      expect(queryByLabelText("Close")).toBeNull()
+      expect(queryByTestId(SCRIM_TEST_ID, { includeHiddenElements: true })).toBeNull()
     })
 
     it("is still dragged away the same way the modal one is", async () => {
