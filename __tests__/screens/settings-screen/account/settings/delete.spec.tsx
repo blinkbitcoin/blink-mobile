@@ -1,6 +1,6 @@
 import React from "react"
-import { Alert, AlertButton } from "react-native"
-import { act, fireEvent, render, screen } from "@testing-library/react-native"
+import { Alert, AlertButton, StyleSheet } from "react-native"
+import { act, fireEvent, render, screen, within } from "@testing-library/react-native"
 
 import { ThemeProvider, createTheme } from "@rn-vui/themed"
 
@@ -222,6 +222,20 @@ describe("Delete", () => {
     await pressAlertButton(0, "Cancel")
 
     expect(screen.queryByTestId("delete-modal")).toBeNull()
+  })
+
+  it("stacks the confirm and cancel buttons in their own column", async () => {
+    await openDeletionModal()
+
+    const buttons = screen.getByTestId("delete-modal-buttons")
+
+    expect(StyleSheet.flatten(buttons.props.style)).toMatchObject({
+      flexDirection: "column",
+      rowGap: 12,
+    })
+    const [confirm, cancel] = within(buttons).getAllByRole("button")
+    expect(confirm).toBeDisabled()
+    expect(cancel).toBeEnabled()
   })
 
   it("keeps the confirm button disabled until the keyword is typed", async () => {
