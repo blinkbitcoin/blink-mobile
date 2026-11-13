@@ -167,6 +167,26 @@ describe("loadLostAttempts", () => {
     expect(await loadLostAttempts("/documents/other-wallet", NOW)).toEqual(new Map())
   })
 
+  /** A payment can stay pending, or the wallet offline, well past a day: the attempt
+   *  stays as long as a Lightning payment can be pending, whatever the phone's clock did
+   *  in between, as long as it did not jump past that. */
+  it("keeps an attempt for two weeks, and one dated ahead of the phone's clock", async () => {
+    const dayMs = 24 * 60 * 60 * 1000
+    stored({
+      sp1week: {
+        lostSend: lostSend(NOW - 13 * dayMs),
+        unresolvedSend: unresolvedSend(NOW - 13 * dayMs),
+      },
+      sp1ahead: { lostSend: lostSend(NOW + 7 * dayMs) },
+    })
+
+    expect(LOST_ATTEMPTS_TTL_MS).toBe(14 * dayMs)
+    expect([...(await loadLostAttempts(WALLET, NOW)).keys()]).toEqual([
+      "sp1week",
+      "sp1ahead",
+    ])
+  })
+
   it("drops an attempt past its time, keeping one that is not", async () => {
     stored({
       sp1old: { lostSend: lostSend(NOW - LOST_ATTEMPTS_TTL_MS) },

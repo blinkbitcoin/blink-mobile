@@ -11,11 +11,13 @@ import type {
 } from "../payment-details/lost-attempts"
 
 /**
- * How long a lost attempt outlives the app: the lookup's own window. A payment whose
- * outcome is still unknown a day later has settled one way or the other, and its sender
- * has seen it in their history.
+ * How long a lost attempt outlives the app, from its latest attempt: past the longest a
+ * Lightning payment can stay pending (its HTLCs time out within about two weeks), so its
+ * outcome is settled one way or the other, and its sender has seen it in their history.
+ * Not for good: a look that cannot read the history (more sends since than it reads, or
+ * a send the wallet never describes) would refuse every send to the destination forever.
  */
-export const LOST_ATTEMPTS_TTL_MS = 24 * 60 * 60 * 1000
+export const LOST_ATTEMPTS_TTL_MS = 14 * 24 * 60 * 60 * 1000
 
 const keyFor = (walletId: string) => `selfCustodialLostAttempts:${walletId}`
 
