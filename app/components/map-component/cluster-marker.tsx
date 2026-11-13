@@ -12,8 +12,8 @@ import { useMarkerSettle } from "./use-marker-settle"
 // steps green to amber to orange — the colour stays put and only the number
 // changes.
 //
-// `_green` and not `success`: our palette defines no `success`, so reading it
-// resolves to @rn-vui's own green and paints every cluster a library colour.
+// `staticSuccess` and not `success`: the map is a fixed-colour surface, and
+// `success` is a role token free to change with the theme.
 const CLUSTER_SIZE = 50
 const VIEWBOX = 45
 const OUTER_RADIUS = 22.5
@@ -41,7 +41,7 @@ export const ClusterMarker: React.FC<Props> = React.memo(({ cluster, onPress }) 
   // Discs are react-native-svg like the pins are, so they need the same paint
   // window before tracking can be turned off — see use-marker-settle.
   const { markerRef, tracksViewChanges } = useMarkerSettle(
-    `${colors.success}|${cluster.count}`,
+    `${colors.staticSuccess}|${cluster.count}`,
   )
 
   return (
@@ -64,14 +64,14 @@ export const ClusterMarker: React.FC<Props> = React.memo(({ cluster, onPress }) 
             cx={VIEWBOX / 2}
             cy={VIEWBOX / 2}
             r={OUTER_RADIUS}
-            fill={colors.success}
+            fill={colors.staticSuccess}
             fillOpacity={OUTER_OPACITY}
           />
           <Circle
             cx={VIEWBOX / 2}
             cy={VIEWBOX / 2}
             r={INNER_RADIUS}
-            fill={colors.success}
+            fill={colors.staticSuccess}
             fillOpacity={INNER_OPACITY}
           />
         </Svg>
