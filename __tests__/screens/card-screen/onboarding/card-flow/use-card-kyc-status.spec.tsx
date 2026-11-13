@@ -8,6 +8,7 @@ import {
   OnboardingStatus,
 } from "@app/graphql/generated"
 import {
+  isCardKycApproved,
   isCardKycSubmitted,
   useCardKycStatus,
 } from "@app/screens/card-screen/onboarding/card-flow/use-card-kyc-status"
@@ -80,6 +81,23 @@ describe("isCardKycSubmitted", () => {
 
   it("reads an unknown account as not submitted", () => {
     expect(isCardKycSubmitted(undefined)).toBe(false)
+  })
+})
+
+describe("isCardKycApproved", () => {
+  it("is true only for an approved card verification", () => {
+    expect(
+      isCardKycApproved(accountWith(OnboardingStatus.Approved, KycFlowType.Card)),
+    ).toBe(true)
+    expect(
+      isCardKycApproved(accountWith(OnboardingStatus.Processing, KycFlowType.Card)),
+    ).toBe(false)
+    expect(
+      isCardKycApproved(
+        accountWith(OnboardingStatus.Approved, KycFlowType.UpgradeLevelTwo),
+      ),
+    ).toBe(false)
+    expect(isCardKycApproved(undefined)).toBe(false)
   })
 })
 

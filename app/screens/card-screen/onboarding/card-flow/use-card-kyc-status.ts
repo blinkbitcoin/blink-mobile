@@ -41,6 +41,9 @@ export const isCardKycSubmitted = (account: KycAccount): boolean =>
   isCardFlow(account) &&
   SUBMITTED_STATUSES.some((status) => status === account?.onboardingStatus)
 
+export const isCardKycApproved = (account: KycAccount): boolean =>
+  isCardFlow(account) && account?.onboardingStatus === OnboardingStatus.Approved
+
 /** Reads the card verification afresh on each call, since it moves on the issuer's side
  *  while the app is away in the verification web flow. */
 export const useCardKycStatus = () => {

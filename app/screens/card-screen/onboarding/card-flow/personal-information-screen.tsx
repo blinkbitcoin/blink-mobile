@@ -9,6 +9,7 @@ import { DropdownComponent } from "@app/components/card-screen"
 import { StepLayout } from "@app/components/step-layout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { CardApplicationAnswers } from "@app/types/card-application"
 
 import {
   MOCK_ACCOUNT_PURPOSE_OPTIONS,
@@ -28,16 +29,24 @@ export const CardPersonalInformationScreen: React.FC = () => {
   const [accountPurpose, setAccountPurpose] = React.useState<string>()
   const [expectedMonthlyVolume, setExpectedMonthlyVolume] = React.useState<string>()
 
-  const allFieldsSelected =
+  const answers: CardApplicationAnswers | undefined =
     selectedOccupation && annualSalaryRange && accountPurpose && expectedMonthlyVolume
-  const isNextDisabled = !allFieldsSelected
-  const nextButtonTitle = allFieldsSelected
+      ? {
+          occupation: selectedOccupation,
+          annualSalary: annualSalaryRange,
+          accountPurpose,
+          expectedMonthlyVolume,
+        }
+      : undefined
+  const isNextDisabled = !answers
+  const nextButtonTitle = answers
     ? LL.common.continue()
     : LL.CardFlow.Onboarding.PersonalInformation.select()
 
+  /** Nothing is sent from here: the terms step sends these with the application. */
   const handleNext = () => {
-    if (!allFieldsSelected) return
-    navigation.navigate("cardOnboardingAcknowledgementScreen")
+    if (!answers) return
+    navigation.navigate("cardOnboardingAcknowledgementScreen", answers)
   }
 
   return (
