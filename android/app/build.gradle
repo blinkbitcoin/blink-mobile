@@ -148,6 +148,19 @@ android {
     }
 }
 
+/**
+ * Firebase Analytics brings Google's ad libraries along: the Privacy Sandbox ad services
+ * and the advertising ID client. Blink shows no ads, so they are left out of the APK,
+ * where app stores read them as ads. Analytics still references them, and reaching one
+ * mostly loses analytics events silently instead of crashing. That is safe only under
+ * the conditions in docs/android-firebase-ad-libraries.md, which also says how to check
+ * them again after a Firebase upgrade.
+ */
+configurations.all {
+    exclude group: "androidx.privacysandbox.ads"
+    exclude group: "com.google.android.gms", module: "play-services-ads-identifier"
+}
+
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
