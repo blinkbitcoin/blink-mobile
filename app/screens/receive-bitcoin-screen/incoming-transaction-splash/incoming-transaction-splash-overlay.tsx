@@ -221,11 +221,12 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
     [],
   )
 
-  /** What a screen reader says for the payment, on landing and on the hero. */
+  /** What a screen reader says for the payment, on landing, on the hero and on reveal.
+   *  `hidden` is what the screen shows: a hidden amount, once revealed, is read out. */
   const spokenLine = useCallback(
-    (shown: ShownSplash) => {
+    (shown: ShownSplash, hidden = shown.amountHidden) => {
       const pending = isPendingOnchain(shown)
-      if (shown.amountHidden) {
+      if (hidden) {
         // A hidden amount is not read out either.
         return pending
           ? LL.IncomingTransactionSplash.pendingOnchain()
@@ -384,8 +385,11 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
   }, [splash])
 
   const reveal = useCallback(() => {
-    if (interactive) setRevealed(true)
-  }, [interactive])
+    if (!interactive) return
+    setRevealed(true)
+    // Focus stays on the hero, and a relabelled element is not read again by itself.
+    AccessibilityInfo.announceForAccessibility(spokenLine(displayed, false))
+  }, [interactive, spokenLine, displayed])
 
   const close = useCallback(() => {
     if (interactive) onClose({ optedOut })
@@ -503,7 +507,9 @@ export const IncomingTransactionSplashOverlay: React.FC<Props> = ({
               accessible
               accessibilityRole={masked ? "button" : "text"}
               accessibilityLabel={
-                masked ? LL.IncomingTransactionSplash.tapToShow() : spokenLine(displayed)
+                masked
+                  ? LL.IncomingTransactionSplash.tapToShow()
+                  : spokenLine(displayed, false)
               }
               testID="incoming-transaction-splash-reveal"
             >
