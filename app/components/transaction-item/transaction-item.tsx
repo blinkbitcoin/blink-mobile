@@ -301,7 +301,7 @@ const useStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
     flexWrap: "wrap",
   },
   receive: {
-    color: colors.staticSuccess,
+    color: colors.success,
     textAlign: "right",
     flexWrap: "wrap",
   },

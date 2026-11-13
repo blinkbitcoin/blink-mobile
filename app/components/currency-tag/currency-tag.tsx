@@ -34,7 +34,7 @@ export const CurrencyTag: FC<CurrencyTagProps> = ({ walletCurrency }) => {
     },
     USD: {
       textColor: colors.textOnBackground,
-      backgroundColor: colors.staticSuccess,
+      backgroundColor: colors.success,
     },
   }
 

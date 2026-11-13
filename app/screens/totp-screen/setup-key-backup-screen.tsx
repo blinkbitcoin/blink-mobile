@@ -67,7 +67,7 @@ export const SetupKeyBackupScreen: React.FC = () => {
     >
       <IconHero
         icon="key-outline"
-        iconColor={colors.staticSuccess}
+        iconColor={colors.success}
         title={LL.AuthenticatorOnboarding.backupTitle()}
         subtitle={
           <Text type="p3" style={styles.description}>

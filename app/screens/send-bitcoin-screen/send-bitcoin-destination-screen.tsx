@@ -1142,7 +1142,7 @@ const usestyles = makeStyles(({ colors }) => ({
     borderWidth: 1,
   },
   validInputContainer: {
-    borderColor: colors.staticSuccess,
+    borderColor: colors.success,
     borderWidth: 1,
   },
   warningInputContainer: {
@@ -1244,7 +1244,7 @@ const usestyles = makeStyles(({ colors }) => ({
   },
   disabledInput: { opacity: 0.6 },
   borderFocusedInput: {
-    borderColor: colors.staticSuccess,
+    borderColor: colors.success,
     borderWidth: 1,
     borderBottomWidth: 1,
   },

@@ -8,7 +8,7 @@ jest.mock("@rn-vui/themed", () => ({
   useTheme: () => ({
     theme: {
       colors: {
-        staticSuccess: "#00C853",
+        success: "#00C853",
       },
     },
   }),

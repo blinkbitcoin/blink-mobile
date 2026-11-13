@@ -12,7 +12,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useIsFocused, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Button } from "@rn-vui/base"
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import { Colors, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
@@ -74,7 +74,7 @@ const useStyles = makeStyles(({ colors }, { screenWidth }: { screenWidth: number
   icon: { paddingRight: 12, paddingTop: 3 },
 
   item: {
-    backgroundColor: colors._lightBlue,
+    backgroundColor: colors.staticBrightBlue,
     borderRadius: 16,
     width: screenWidth,
   },
@@ -98,12 +98,12 @@ const useStyles = makeStyles(({ colors }, { screenWidth }: { screenWidth: number
   },
 
   titleStyle: {
-    color: colors._lightBlue,
+    color: colors.staticBrightBlue,
     fontWeight: "bold",
   },
 
   titleStyleDisabled: {
-    color: colors._lightBlue,
+    color: colors.staticBrightBlue,
   },
 
   titleStyleFulfilled: {
@@ -155,6 +155,16 @@ const convertToQuizQuestionForSectionScreen = (
 type Props = {
   route: RouteProp<RootStackParamList, "earnsSection">
 }
+
+// The header sits on the section's fixed blue backdrop, so it never inverts.
+export const earnSectionHeaderOptions = (colors: Colors) => ({
+  headerStyle: { backgroundColor: colors.staticBlue },
+  headerTintColor: colors.staticWhite,
+  headerTitleStyle: {
+    fontWeight: "bold" as const,
+    fontSize: 18,
+  },
+})
 
 export const EarnSection = ({ route }: Props) => {
   const {
@@ -291,7 +301,7 @@ export const EarnSection = ({ route }: Props) => {
   }
 
   return (
-    <Screen backgroundColor={colors._blue} statusBar="light-content">
+    <Screen backgroundColor={colors.staticBlue} statusBar="light-content">
       <View style={styles.container}>
         <Carousel
           data={cards}

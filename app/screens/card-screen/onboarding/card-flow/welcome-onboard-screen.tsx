@@ -31,7 +31,7 @@ export const WelcomeOnboardScreen: React.FC = () => {
               <Icon
                 name={"heart-outline"}
                 type="ionicon"
-                color={colors.staticSuccess}
+                color={colors.success}
                 size={40}
               />
             </View>

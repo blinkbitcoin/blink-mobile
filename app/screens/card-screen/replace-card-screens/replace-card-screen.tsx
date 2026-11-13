@@ -110,7 +110,7 @@ export const ReplaceCardScreen: React.FC = () => {
       buttonLabel: LL.CardFlow.ReplaceCard.Status.buttonLabel(),
       navigateTo: "cardDashboardScreen",
       iconName: "delivery",
-      iconColor: colors.staticSuccess,
+      iconColor: colors.success,
       lastFour: result.lastFour,
       cardId: result.id,
     })
@@ -121,7 +121,7 @@ export const ReplaceCardScreen: React.FC = () => {
     completeFlow,
     navigation,
     LL,
-    colors.staticSuccess,
+    colors.success,
   ])
 
   const loading = replaceLoading || lockLoading
@@ -141,7 +141,7 @@ export const ReplaceCardScreen: React.FC = () => {
       case Step.Delivery:
         return {
           icon: "delivery",
-          iconColor: colors.staticSuccess,
+          iconColor: colors.success,
           title: LL.CardFlow.ReplaceCard.Delivery.title(),
           subtitle: LL.CardFlow.ReplaceCard.Delivery.subtitle(),
           buttonLabel: state.selectedDelivery
@@ -153,7 +153,7 @@ export const ReplaceCardScreen: React.FC = () => {
       case Step.Confirm:
         return {
           icon: "approved",
-          iconColor: colors.staticSuccess,
+          iconColor: colors.success,
           title: LL.CardFlow.ReplaceCard.Confirm.title(),
           subtitle: LL.CardFlow.ReplaceCard.Confirm.subtitle(),
           buttonLabel: LL.CardFlow.ReplaceCard.Confirm.submitRequest(),

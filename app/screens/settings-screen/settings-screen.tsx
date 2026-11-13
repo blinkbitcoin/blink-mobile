@@ -253,7 +253,6 @@ const useStyles = makeStyles(({ colors }) => ({
     position: "absolute",
     right: 9,
     top: 9,
-    color: colors.staticDarkGrey,
     backgroundColor: colors.textOnBackground,
     textAlign: "center",
     verticalAlign: "middle",

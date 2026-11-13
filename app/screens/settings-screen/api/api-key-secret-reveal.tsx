@@ -70,7 +70,7 @@ const ApiKeySecretRevealContent: React.FC<
       <View style={styles.body}>
         <IconHero
           icon="check-badge"
-          iconColor={colors.staticSuccess}
+          iconColor={colors.success}
           title={name}
           subtitle={LL.ApiScreen.secretWarning()}
         />

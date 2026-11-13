@@ -200,7 +200,7 @@ describe("CloudBackupScreen", () => {
     const iconHeroMock = IconHero as unknown as jest.Mock
     const props = iconHeroMock.mock.calls[0][0]
 
-    expect(props.iconColor).toBe(theme.lightColors?.staticSuccess)
+    expect(props.iconColor).toBe(theme.lightColors?.success)
     expect(props.icon).toBe("cloud")
   })
 

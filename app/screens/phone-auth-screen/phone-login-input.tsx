@@ -1,6 +1,6 @@
 import { CountryCode as PhoneNumberCountryCode } from "libphonenumber-js/mobile"
 import * as React from "react"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 import { CountryCode } from "react-native-country-picker-modal"
 
@@ -61,8 +61,7 @@ const useStyles = makeStyles(({ colors }) => ({
    *  button that does not twitch between a "+1" and a "+503". */
   countryPickerButtonStyle: {
     minWidth: 110,
-    borderColor: colors.accent4,
-    borderWidth: 2,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
     paddingHorizontal: 10,
     flexDirection: "row",
@@ -82,11 +81,15 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   inputContainerStyle: {
     flex: 1,
-    borderWidth: 2,
-    borderBottomWidth: 2,
+    borderWidth: 0,
+    borderBottomWidth: 0,
     paddingHorizontal: 10,
-    borderColor: colors.accent4,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
+  },
+  /** Applied to the country picker too: it always looks like the number field. */
+  fieldFocused: {
+    backgroundColor: colors.surfaceFocused,
   },
   errorContainer: {
     marginBottom: 20,
@@ -112,6 +115,8 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
   const styles = useStyles()
 
   const phoneInputRef = useRef<InputRef>(null)
+  // The field autofocuses on mount, so start focused: no resting fill flashes first.
+  const [isFieldFocused, setIsFieldFocused] = useState(true)
 
   const navigation =
     useNavigation<
@@ -266,19 +271,27 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
             countryCodes={supportedCountries as CountryCode[]}
             onSelect={handleCountrySelect}
             onClose={handleCountryPickerClose}
-            buttonStyle={styles.countryPickerButtonStyle}
+            buttonStyle={[
+              styles.countryPickerButtonStyle,
+              isFieldFocused && styles.fieldFocused,
+            ]}
           />
           <Input
             {...testProps("telephoneNumber")}
             ref={phoneInputRef}
             placeholder={PLACEHOLDER_PHONE_NUMBER}
             containerStyle={styles.inputComponentContainerStyle}
-            inputContainerStyle={styles.inputContainerStyle}
+            inputContainerStyle={[
+              styles.inputContainerStyle,
+              isFieldFocused && styles.fieldFocused,
+            ]}
             renderErrorMessage={false}
             textContentType="telephoneNumber"
             keyboardType="phone-pad"
             value={phoneInputInfo?.rawPhoneNumber}
             onChangeText={setPhoneNumber}
+            onFocus={() => setIsFieldFocused(true)}
+            onBlur={() => setIsFieldFocused(false)}
             autoFocus={true}
           />
         </View>

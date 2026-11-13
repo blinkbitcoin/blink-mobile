@@ -143,16 +143,16 @@ jest.mock("@rn-vui/themed", () => {
     makeStyles:
       (fn: (theme: { colors: Record<string, string> }) => Record<string, object>) => () =>
         fn({ colors: { accent: "#fc5805" } }),
-    Text: ({ children }: { children: React.ReactNode }) =>
-      ReactActual.createElement("Text", null, children),
-    useTheme: () => ({ theme: { mode: mockThemeMode } }),
+    Text: ({ children, color }: { children: React.ReactNode; color?: string }) =>
+      ReactActual.createElement("Text", { color }, children),
+    useTheme: () => ({
+      theme: {
+        mode: mockThemeMode,
+        colors: { accent: mockThemeMode === "dark" ? "#ffad0d" : "#fc5805" },
+      },
+    }),
   }
 })
-
-jest.mock("@app/rne-theme/theme", () => ({
-  __esModule: true,
-  default: { darkColors: { staticBrandOrange: "#fc5805" } },
-}))
 
 jest.mock("@app/assets/logo/app-logo-dark.svg", () => "AppLogoDark")
 jest.mock("@app/assets/logo/blink-logo-light.svg", () => "AppLogoLight")
@@ -199,6 +199,23 @@ describe("GetStartedScreen", () => {
     const { getByText } = render(<GetStartedScreen />)
 
     expect(getByText("Staging")).toBeTruthy()
+  })
+
+  it("names the instance in the dark theme's accent under a dark theme", () => {
+    mockInstanceId = "Staging"
+
+    const { getByText } = render(<GetStartedScreen />)
+
+    expect(getByText("Staging").props.color).toBe("#ffad0d")
+  })
+
+  it("names the instance in the light theme's accent under a light theme", () => {
+    mockInstanceId = "Staging"
+    mockThemeMode = "light"
+
+    const { getByText } = render(<GetStartedScreen />)
+
+    expect(getByText("Staging").props.color).toBe("#fc5805")
   })
 
   it("swaps the logo for the light one under a light theme", () => {

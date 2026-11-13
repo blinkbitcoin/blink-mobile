@@ -11,9 +11,6 @@ const aliasToSemantic: Record<string, string> = {
   white: "backgroundDefault",
   black: "textOnBackground",
   primary: "accent",
-  primary3: "accent2",
-  primary4: "accent3",
-  primary5: "accent4",
   grey0: "textPrimary",
   grey1: "textSecondary",
   grey2: "textMuted",
@@ -37,6 +34,9 @@ const aliasToSemantic: Record<string, string> = {
   _primary1: "staticBrandYellow",
   _primary2: "staticBrandSunset",
   _warningLight: "staticWarningBackground",
+  _blue: "staticBlue",
+  _lightBlue: "staticBrightBlue",
+  _sky: "staticPaleBlue",
 }
 
 // Role tokens share their source token's value until design gives them their own.
@@ -47,6 +47,8 @@ const roleToSource: Record<string, string> = {
   textPlaceholder: "neutral",
   borderStrong: "textDisabled",
   surfaceInactive: "textDisabled",
+  surfaceFocused: "surfacePressed",
+  success: "staticSuccess",
 }
 
 describe("color token aliases", () => {
@@ -88,16 +90,43 @@ describe("color token aliases", () => {
 describe("field fill values", () => {
   it("uses the ruled field fills in light mode", () => {
     expect(light.surfaceInteractive).toBe("#ECECEE")
+    expect(light.surfacePressed).toBe("#E1E1E3")
     expect(light.surfaceStatic).toBe("#F2F2F2")
   })
 
   it("uses the ruled field fills in dark mode", () => {
     expect(dark.surfaceInteractive.toUpperCase()).toBe("#1D1D1D")
+    expect(dark.surfacePressed).toBe("#2B2B2B")
     expect(dark.surfaceStatic).toBe("#171717")
   })
 
-  it("keeps the legacy grey5 and grey7 aliases on the ruled values", () => {
+  // Design ruling (Nov 2026): the pressed and focused fill keeps the step it had
+  // over the resting fill before surfaceInteractive darkened (#F2F2F4 → #E7E7E7).
+  it("keeps the pressed fill at least 1.1:1 from the resting fill", () => {
+    const channel = (hex: string, i: number) => {
+      const v = parseInt(hex.slice(1 + 2 * i, 3 + 2 * i), 16) / 255
+      return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4
+    }
+    const luminance = (hex: string) =>
+      0.2126 * channel(hex, 0) + 0.7152 * channel(hex, 1) + 0.0722 * channel(hex, 2)
+    const contrast = (a: string, b: string) => {
+      const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x)
+      return (hi + 0.05) / (lo + 0.05)
+    }
+
+    expect(
+      contrast(light.surfaceInteractive, light.surfacePressed),
+    ).toBeGreaterThanOrEqual(1.1)
+    expect(contrast(dark.surfaceInteractive, dark.surfacePressed)).toBeGreaterThanOrEqual(
+      1.1,
+    )
+    expect(light.surfaceFocused).toBe(light.surfacePressed)
+    expect(dark.surfaceFocused).toBe(dark.surfacePressed)
+  })
+
+  it("keeps the legacy grey5, grey6 and grey7 aliases on the ruled values", () => {
     expect(light.grey5).toBe("#ECECEE")
+    expect(light.grey6).toBe("#E1E1E3")
     expect(light.grey7).toBe("#F2F2F2")
     expect(dark.grey7).toBe("#171717")
   })
@@ -126,8 +155,8 @@ describe("field fill values", () => {
   })
 })
 
-// No semantic alias yet: flagged for design review in colors.ts.
-const blues = ["blue5", "_blue", "_lightBlue", "_sky"]
+// No semantic alias: flagged for design review in colors.ts.
+const flagged = ["blue5"]
 
 describe("legacy name inventory", () => {
   // colors.ts, themed.d.ts, the alias map above and the eslint rule each list the
@@ -140,7 +169,9 @@ describe("legacy name inventory", () => {
   ].map(([, name]) => name)
 
   it("marks exactly the aliased and flagged names deprecated in themed.d.ts", () => {
-    expect(deprecated.sort()).toEqual([...Object.keys(aliasToSemantic), ...blues].sort())
+    expect(deprecated.sort()).toEqual(
+      [...Object.keys(aliasToSemantic), ...flagged].sort(),
+    )
   })
 })
 

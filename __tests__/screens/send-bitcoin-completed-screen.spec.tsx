@@ -252,6 +252,18 @@ describe("SendBitcoinCompletedScreen", () => {
     expect(within(pendingTextElement).getByTestId("PENDING")).toBeTruthy()
   })
 
+  it("tints the Pending icon with the warning token", async () => {
+    render(
+      <ContextForScreen>
+        <Pending />
+      </ContextForScreen>,
+    )
+
+    const icon = await screen.findByTestId("icon-warning")
+    expect(icon.props.color).toBe(light.warning)
+    expect(icon.props.color).not.toBe(light.staticBrandOrange)
+  })
+
   it("render successAction - LUD 09 - message", async () => {
     const lud09MessageRoute = {
       key: "sendBitcoinCompleted",

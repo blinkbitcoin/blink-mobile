@@ -126,9 +126,7 @@ const SuccessIconComponent: React.FC<{
     const iconMap = {
       SUCCESS: () => <GaloyIcon name="payment-success" size={100} />,
       QUEUED: () => <GaloyIcon name="payment-pending" size={100} />,
-      PENDING: () => (
-        <GaloyIcon name="warning" color={colors.staticBrandOrange} size={100} />
-      ),
+      PENDING: () => <GaloyIcon name="warning" color={colors.warning} size={100} />,
     }
     return iconMap[status]()
   }

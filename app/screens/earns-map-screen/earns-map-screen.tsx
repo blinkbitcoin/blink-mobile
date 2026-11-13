@@ -282,14 +282,14 @@ const EarnMapScreenContent: React.FC = () => {
     return (
       <Screen edges={["left", "right"]}>
         <View style={styles.loadingView}>
-          <ActivityIndicator size="large" color={colors._blue} />
+          <ActivityIndicator size="large" color={colors.staticBlue} />
         </View>
       </Screen>
     )
   }
 
   const backgroundColor =
-    currSection < sectionsData.length ? colors._sky : colors.staticBrandOrange
+    currSection < sectionsData.length ? colors.staticPaleBlue : colors.staticBrandOrange
 
   const continueNotRewards = () => {
     setNotRewards(true)
@@ -363,7 +363,7 @@ const EarnMapScreenContent: React.FC = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   contentContainer: {
-    backgroundColor: colors._lightBlue,
+    backgroundColor: colors.staticBrightBlue,
     flexGrow: 1,
   },
   bottomContainer: {

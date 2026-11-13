@@ -71,7 +71,7 @@ export const MigrationMerchantToolsScreen: React.FC = () => {
     >
       <IconHero
         icon="receive"
-        iconColor={colors.staticSuccess}
+        iconColor={colors.success}
         title={merchantToolsLL.title()}
         subtitle={merchantToolsLL.body()}
       />

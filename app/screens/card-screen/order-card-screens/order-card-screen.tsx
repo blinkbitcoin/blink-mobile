@@ -110,7 +110,7 @@ export const OrderCardScreen: React.FC = () => {
       buttonLabel: LL.CardFlow.CardStatus.PhysicalCardOrdered.buttonLabel(),
       navigateTo: "cardCreatePinScreen",
       iconName: "delivery",
-      iconColor: colors.staticSuccess,
+      iconColor: colors.success,
       lastFour: result.lastFour,
       cardId: result.id,
     })
@@ -124,7 +124,7 @@ export const OrderCardScreen: React.FC = () => {
     completeFlow,
     navigation,
     LL,
-    colors.staticSuccess,
+    colors.success,
   ])
 
   const getStepConfig = (): StepConfig => {
@@ -132,7 +132,7 @@ export const OrderCardScreen: React.FC = () => {
       case Step.Shipping:
         return {
           icon: "delivery",
-          iconColor: colors.staticSuccess,
+          iconColor: colors.success,
           title: LL.CardFlow.OrderPhysicalCard.Shipping.title(),
           subtitle: LL.CardFlow.OrderPhysicalCard.Shipping.subtitle(),
           buttonLabel: LL.common.continue(),
@@ -142,7 +142,7 @@ export const OrderCardScreen: React.FC = () => {
       case Step.Confirm:
         return {
           icon: "delivery",
-          iconColor: colors.staticSuccess,
+          iconColor: colors.success,
           title: LL.CardFlow.OrderPhysicalCard.Confirm.title(),
           subtitle: LL.CardFlow.OrderPhysicalCard.Confirm.subtitle(),
           buttonLabel: LL.CardFlow.OrderPhysicalCard.Confirm.placeOrder(),

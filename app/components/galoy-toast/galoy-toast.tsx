@@ -32,7 +32,7 @@ const ToastRow = ({ type, text1, text2, onPress, hide }: ToastRowProps) => {
   const { width } = useWindowDimensions()
   const { left, right } = useSafeAreaInsets()
   const accent = {
-    success: colors.staticSuccess,
+    success: colors.success,
     error: colors.error,
     warning: colors.warning,
   }[type]

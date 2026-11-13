@@ -20,6 +20,9 @@ const lightStatic = {
   staticBrandYellow: "#FFBE0B",
   staticBrandSunset: "#FB5607",
   staticWarningBackground: "#FFF9E5",
+  staticBlue: "#3050C4",
+  staticBrightBlue: "#3553FF",
+  staticPaleBlue: "#C3CCFF",
 }
 
 // static tokens are identical in both modes by definition
@@ -47,13 +50,12 @@ const lightSemantic = {
   // Field fills darkened by design ruling (Nov 2026) to improve contrast
   // against backgroundDefault; surfaceStatic stays lighter than surfaceInteractive.
   surfaceInteractive: "#ECECEE", // tappable surface, at rest
-  surfacePressed: "#E7E7E7", // surfaceInteractive while held — transient only
+  // Darkened with surfaceInteractive (design ruling, Nov 2026) to keep the old
+  // #F2F2F4 → #E7E7E7 step of 1.1:1. Pressed and focused fills share it.
+  surfacePressed: "#E1E1E3", // surfaceInteractive while held — transient only
   surfaceStatic: "#F2F2F2", // cannot be tapped, ever — cards, banners, read-only
 
   accent: "#fc5805",
-  accent2: "#fd800b", // accent2–4 are the mirrored ramp kept for existing gradients
-  accent3: "#fe990d",
-  accent4: "#ffad0d",
 
   error: "#DC2626",
   errorBackground: "#FEE2E2",
@@ -89,9 +91,6 @@ const darkSemantic = {
   surfaceStatic: "#171717", // lightened by design ruling to improve contrast
 
   accent: "#ffad0d",
-  accent2: "#fe990d",
-  accent3: "#fd800b",
-  accent4: "#fc5805",
 
   error: "#DC2626",
   errorBackground: "#7F1D1D",
@@ -115,9 +114,6 @@ const legacyAliases = (semantic: typeof lightSemantic | typeof darkSemantic) => 
   black: semantic.textOnBackground,
 
   primary: semantic.accent,
-  primary3: semantic.accent2,
-  primary4: semantic.accent3,
-  primary5: semantic.accent4,
 
   grey0: semantic.textPrimary,
   grey1: semantic.textSecondary,
@@ -146,6 +142,11 @@ const legacyAliases = (semantic: typeof lightSemantic | typeof darkSemantic) => 
   _primary1: semantic.staticBrandYellow,
   _primary2: semantic.staticBrandSunset,
   _warningLight: semantic.staticWarningBackground,
+
+  // the app blues; none of them is the brand blue
+  _blue: semantic.staticBlue,
+  _lightBlue: semantic.staticBrightBlue,
+  _sky: semantic.staticPaleBlue,
 })
 
 // Role tokens that share a value with another token today but do a different job.
@@ -157,37 +158,30 @@ const roleTokens = (semantic: typeof lightSemantic | typeof darkSemantic) => ({
   textPlaceholder: semantic.neutral,
   borderStrong: semantic.textDisabled, // focused input underline
   surfaceInactive: semantic.textDisabled, // unselected currency pill and bubble
+  surfaceFocused: semantic.surfacePressed, // input field fill while focused
+  // Brand success green. Overrides the UI library default (#52C41A) that
+  // `colors.success` fell back to, since the palette never defined it.
+  success: semantic.staticSuccess,
 })
 
-// Flagged for design review (see proposal §2.1/§5): none of the app blues is the
-// brand blue. Scheduled for removal, so they get no semantic alias.
-const legacyBlues = {
-  light: {
-    blue5: "#4453E2",
-    _blue: "#3050C4",
-    _lightBlue: "#3553FF",
-    _sky: "#C3CCFF",
-  },
-  dark: {
-    blue5: "#F0F0F7",
-    _blue: "#3050C4",
-    _lightBlue: "#3553FF",
-    _sky: "#C3CCFF",
-  },
+// Flagged for design review: still the info box tint, with no semantic name yet.
+const legacyBlue5 = {
+  light: { blue5: "#4453E2" },
+  dark: { blue5: "#F0F0F7" },
 }
 
 const light = {
   ...lightSemantic,
   ...roleTokens(lightSemantic),
   ...legacyAliases(lightSemantic),
-  ...legacyBlues.light,
+  ...legacyBlue5.light,
 }
 
 const dark = {
   ...darkSemantic,
   ...roleTokens(darkSemantic),
   ...legacyAliases(darkSemantic),
-  ...legacyBlues.dark,
+  ...legacyBlue5.dark,
 }
 
 export { light, dark }

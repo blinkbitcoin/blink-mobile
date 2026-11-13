@@ -76,7 +76,7 @@ describe("MnemonicWordInput", () => {
     const wrong = renderInput({ wrong: true }).toJSON() as ReactTestRendererJSON
 
     expect(StyleSheet.flatten(correct.props.style).borderColor).toBe(
-      theme.lightColors?.staticSuccess,
+      theme.lightColors?.success,
     )
     expect(StyleSheet.flatten(wrong.props.style).borderColor).toBe(
       theme.lightColors?.error,

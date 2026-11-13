@@ -8,7 +8,10 @@ import TypesafeI18n from "@app/i18n/i18n-react"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import theme from "@app/rne-theme/theme"
 import { RouteProp } from "@react-navigation/native"
+
+import { expectFocusFill, renderedBox } from "../../helpers/field-fill"
 
 const mockNavigate = jest.fn()
 
@@ -264,6 +267,27 @@ describe("EmailRegistrationInitiateScreen", () => {
       pressNotNow()
 
       expect(mockNavigate).toHaveBeenCalledWith("onboarding", { screen: "supportScreen" })
+    })
+  })
+
+  /** The app's theme, not rn-vui's default: the fills are tokens only it defines. */
+  it("fills the email field, darker while it has focus, and starts focused", () => {
+    render(
+      <ThemeProvider theme={theme}>
+        <TypesafeI18n locale="en">
+          <EmailRegistrationInitiateScreen route={makeRoute(undefined)} />
+        </TypesafeI18n>
+      </ThemeProvider>,
+    )
+    const field = screen.getByPlaceholderText(
+      LL.EmailRegistrationInitiateScreen.placeholder(),
+    )
+
+    expectFocusFill({
+      startsFocused: true,
+      surfaces: () => [renderedBox(field)],
+      focus: () => fireEvent(field, "focus"),
+      blur: () => fireEvent(field, "blur"),
     })
   })
 })

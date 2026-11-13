@@ -33,7 +33,7 @@ export const CardTransactionItem: React.FC<CardTransactionItemProps> = ({
       text: LL.CardFlow.TransactionStatus.pending(),
     },
     [CardTransactionUiStatus.Completed]: {
-      color: colors.staticSuccess,
+      color: colors.success,
       text: LL.CardFlow.TransactionStatus.completed(),
     },
     [CardTransactionUiStatus.Declined]: {
@@ -41,7 +41,7 @@ export const CardTransactionItem: React.FC<CardTransactionItemProps> = ({
       text: LL.CardFlow.TransactionStatus.declined(),
     },
     [CardTransactionUiStatus.Reversed]: {
-      color: colors.staticBrandOrange,
+      color: colors.accent,
       text: LL.CardFlow.TransactionStatus.reversed(),
     },
   }

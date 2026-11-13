@@ -28,7 +28,7 @@ export const ConfirmFeesModal: React.FC<ConfirmFeesModalProps> = ({
       isVisible={isVisible}
       toggleModal={cancel}
       title={LL.SendBitcoinScreen.confirmFeesModal.title()}
-      image={<GaloyIcon name="info" size={80} color={colors.accent2} />}
+      image={<GaloyIcon name="info" size={80} color={colors.accent} />}
       body={
         <View style={styles.body}>
           <Text type={"p2"} style={styles.warningText}>

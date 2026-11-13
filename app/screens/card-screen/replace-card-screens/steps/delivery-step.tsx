@@ -80,7 +80,7 @@ export const DeliveryStep: React.FC<DeliveryStepProps> = ({
               title={deliveryLL.standardDelivery()}
               subtitle={getDays(Delivery.Standard)}
               value={getPrice(Delivery.Standard)}
-              valueColor={colors.staticSuccess}
+              valueColor={colors.success}
               isSelected={selectedDelivery === Delivery.Standard}
               onPress={() => onSelectDelivery(Delivery.Standard)}
             />

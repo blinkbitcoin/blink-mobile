@@ -67,7 +67,7 @@ export const BackupMethodScreen: React.FC = () => {
     >
       <IconHero
         icon="cloud"
-        iconColor={colors.staticSuccess}
+        iconColor={colors.success}
         title={LL.BackupScreen.BackupMethod.title()}
         subtitle={LL.BackupScreen.BackupMethod.subtitle({ provider: cloudProvider })}
       />

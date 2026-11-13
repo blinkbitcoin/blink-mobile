@@ -34,7 +34,7 @@ const STATIC_RULE = "no-restricted-properties"
 // A plain theme-aware screen: not in either static* override.
 const SCREEN = "app/screens/home-screen/lint-fixture.tsx"
 const STATIC_ALLOWED = "app/screens/receive-bitcoin-screen/lint-fixture.tsx"
-const STATIC_UNDER_REVIEW = "app/components/circle/circle.tsx"
+const FIXED_SURFACE = "app/components/blink-card/blink-card.tsx"
 
 const lint = async (code: string, filePath = SCREEN): Promise<Message[]> => {
   const [result] = await eslint.lintText(code, {
@@ -137,10 +137,17 @@ describe("static color token lint", () => {
     expect(await lint("const c = colors.staticWhite", STATIC_ALLOWED)).toEqual([])
   })
 
-  it("only warns in files whose static tokens are under review", async () => {
-    expect(await lint("const c = colors.staticWhite", STATIC_UNDER_REVIEW)).toEqual([
-      expect.objectContaining({ ruleId: STATIC_RULE, severity: WARN }),
-    ])
+  it("allows static tokens on a component that paints a fixed-colour surface", async () => {
+    expect(await lint("const c = colors.staticWhite", FIXED_SURFACE)).toEqual([])
+  })
+
+  it("allows a single use with a disable comment that says why", async () => {
+    const code = [
+      "// eslint-disable-next-line no-restricted-properties -- a shadow is black in both modes",
+      "const c = colors.staticBlack",
+    ].join("\n")
+
+    expect(await lint(code)).toEqual([])
   })
 
   it("errors on every static token", async () => {
