@@ -160,7 +160,7 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(() => ({
   screenStyle: {
     padding: 20,
     flexGrow: 1,
@@ -170,27 +170,8 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "flex-end",
     marginBottom: 14,
   },
-
-  inputContainer: {
-    marginBottom: 20,
-    flexDirection: "row",
-    alignItems: "stretch",
-    minHeight: 48,
-  },
   textContainer: {
     marginBottom: 20,
   },
   viewWrapper: { flex: 1 },
-
-  inputContainerStyle: {
-    flex: 1,
-    borderWidth: 0,
-    borderBottomWidth: 0,
-    paddingHorizontal: 10,
-    backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
-  },
-  errorContainer: {
-    marginBottom: 20,
-  },
 }))
