@@ -3,6 +3,7 @@ import { View, TouchableOpacity } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
+import { fonts } from "@app/rne-theme/fonts"
 
 const PLACEHOLDER = "—"
 
@@ -14,6 +15,14 @@ type ActionFieldProps = {
   /** What pressing does, for screen readers; without it they read the shown value. */
   accessibilityLabel?: string
   testID?: string
+  /** Identifies the value itself, where a test needs to read it rather than the field. */
+  valueTestID?: string
+  /** A value that is one unbreakable string — an address, an invoice — shortens in the
+   *  middle on this many lines instead of wrapping. */
+  numberOfLines?: number
+  iconSize?: number
+  /** What the action does, for a screen reader: the icon alone says nothing to it. */
+  actionHint?: string
 }
 
 export const ActionField: React.FC<ActionFieldProps> = ({
@@ -23,6 +32,10 @@ export const ActionField: React.FC<ActionFieldProps> = ({
   label,
   accessibilityLabel,
   testID,
+  valueTestID,
+  numberOfLines,
+  iconSize = 20,
+  actionHint,
 }) => {
   const styles = useStyles()
   const {
@@ -41,12 +54,21 @@ export const ActionField: React.FC<ActionFieldProps> = ({
         style={styles.valueContainer}
         testID={testID}
         accessibilityRole="button"
-        accessibilityLabel={accessibilityLabel}
+        /* The label above is read just before it, so the button is named by its value. */
+        accessibilityLabel={accessibilityLabel ?? value ?? PLACEHOLDER}
+        accessibilityHint={hasValue ? actionHint : undefined}
         accessibilityState={{ disabled: !hasValue }}
       >
-        <Text style={styles.value}>{value ?? PLACEHOLDER}</Text>
+        <Text
+          style={styles.value}
+          numberOfLines={numberOfLines}
+          ellipsizeMode={numberOfLines ? "middle" : undefined}
+          testID={valueTestID}
+        >
+          {value ?? PLACEHOLDER}
+        </Text>
         <View style={styles.actionButton}>
-          <GaloyIcon name={icon} size={20} color={iconColor} />
+          <GaloyIcon name={icon} size={iconSize} color={iconColor} />
         </View>
       </TouchableOpacity>
     </View>
@@ -60,8 +82,7 @@ const useStyles = makeStyles(({ colors }) => ({
   label: {
     color: colors.textOnBackground,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
   },
   valueContainer: {
@@ -70,14 +91,14 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "space-between",
     backgroundColor: colors.surfaceInteractive,
     borderRadius: 8,
-    height: 50,
+    columnGap: 12,
+    minHeight: 50,
     paddingHorizontal: 10,
   },
   value: {
     color: colors.textOnBackground,
     fontSize: 16,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 22,
     flex: 1,
   },

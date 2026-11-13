@@ -2357,11 +2357,32 @@
     "maxFeeSelected": "Hierdie is die maksimum fooi wat jy sal betaal vir hierdie transaksie. Dit mag dalk minder wees as die betaling voltooi is.",
     "invoiceAlreadyPaid": "Hierdie faktuur is reeds betaal",
     "somethingWentWrong": "Iets het verkeerd geloop",
+    "priceUpdated": "Die prys het geskuif, so die bedrae is opgedateer. Gaan dit na voordat jy stuur.",
     "paymentAlreadyAttempted": "Betaling reeds geprobeer.\n\nAs jy hierdie betaling weer wil stuur, begin van voor af.",
     "slideToConfirm": "Gly om te bevestig",
     "slideConfirming": "Besig om te bevestig...",
+    "slideToSend": "Gly om te stuur",
+    "calculatingFee": "Bereken fooi…",
+    "sendProgress": {
+      "reviewing": "Hersien",
+      "signing": "Teken",
+      "findingRoute": "Soek roete",
+      "broadcasting": "Saai uit",
+      "checkingDelivery": "Kontroleer aflewering",
+      "retrying": "Probeer weer",
+      "almostThere": "Amper daar",
+      "anyTimeNow": "Enige oomblik nou",
+      "ohOh": "O jee",
+      "tryingAgain": "Probeer nog 'n keer"
+    },
     "copiedDestination": "Bestemming na knipbord oorgedra",
-    "lightningRecommended": "Hoë fooi! Ons beveel Lightning aan.",
+    "lightningRecommended": "Hoë fooi. Ons beveel Lightning aan.",
+    "sending": "Besig om te stuur",
+    "sent": "Gestuur",
+    "receipt": "Kwitansie",
+    "fromBalance": "Van Balans",
+    "details": "Besonderhede",
+    "changeAmount": "Verander bedrag",
     "usdRemainderSweep": "Oorblywende {remaining: string} ({remainingSats: string}) sal na Bitcoin omgeskakel word. USD-minimum: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2405,6 +2426,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksie behoort aan mempool voorgelê te word",
     "amount": "Bedrag",
+    "addAmount": "Voeg bedrag by",
+    "lowFunds": "Nie genoeg fondse",
     "amountExceed": "Bedrag oorskry jou saldo van {balance: string}",
     "amountExceedsLimit": "Bedrag oorskry jou oorblywende daaglikse limiet van {limit: string}",
     "upgradeAccountToIncreaseLimit": "Opgradeer jou rekening om jou limiet te verhoog",
@@ -2456,7 +2479,8 @@
     "sdkInsufficientFunds": "Nie genoeg fondse vir hierdie transaksie nie.",
     "sdkAmountTooLow": "Bedrag is te laag vir 'n on-chain transaksie.",
     "sdkNetworkError": "Netwerkfout. Kontroleer asseblief jou verbinding en probeer weer.",
-    "sdkGenericError": "Kan nie fooie skat nie. Probeer asseblief 'n ander bedrag."
+    "sdkGenericError": "Kan nie fooie skat nie. Probeer asseblief 'n ander bedrag.",
+    "onchainSelfPayment": "Dit is jou eie beursie se adres. Jy kan nie 'n on-chain betaling aan jouself stuur nie."
   },
   "SettingsScreen": {
     "createAddress": "Skep Lightning-adres",
@@ -3115,6 +3139,13 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Stel bedrag "
+  },
+  "Accessibility": {
+    "deleteKey": "Vee uit",
+    "swapCurrencyHint": "Wissel die geldeenheid waarin jy die bedrag tik",
+    "switchToWallet": "Skakel oor na {wallet: string}",
+    "copy": "Kopieer",
+    "revealBalanceHint": "Wys jou saldo op hierdie skerm"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ek moet opgradeer na die nuutste weergawe. Ek gebruik tans die {os: string} toepassing met die weergawe {version: string}.",
