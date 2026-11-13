@@ -25,6 +25,10 @@ const lightStatic = {
 // static tokens are identical in both modes by definition
 const darkStatic = lightStatic
 
+// Dims the screen behind a modal or sheet. Black in both modes: the backdrop tokens
+// invert and would brighten the screen in dark mode.
+const scrim = "rgba(0, 0, 0, 0.5)"
+
 const lightSemantic = {
   ...lightStatic,
 
@@ -62,9 +66,7 @@ const lightSemantic = {
   backdrop: "rgba(0, 0, 0, 0.06)",
   backdropStrong: "rgba(0, 0, 0, 0.12)",
 
-  // Dims the screen behind a modal or sheet. Black in both modes: the backdrop
-  // tokens invert and would brighten the screen in dark mode.
-  scrim: "rgba(0, 0, 0, 0.5)",
+  scrim,
 }
 
 const darkSemantic = {
@@ -102,7 +104,7 @@ const darkSemantic = {
   backdrop: "rgba(255, 255, 255, 0.06)",
   backdropStrong: "rgba(255, 255, 255, 0.12)",
 
-  scrim: "rgba(0, 0, 0, 0.5)",
+  scrim,
 }
 
 // Deprecated legacy aliases. Every value is a reference into the semantic palette,

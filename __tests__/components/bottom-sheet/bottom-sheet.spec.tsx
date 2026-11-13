@@ -153,7 +153,8 @@ describe("BottomSheet", () => {
       node = node.parent
     }
 
-    expect(StyleSheet.flatten(node?.props.style).backgroundColor).toBe(light.scrim)
+    expect(node).not.toBeNull()
+    expect(StyleSheet.flatten(node?.props.style)?.backgroundColor).toBe(light.scrim)
   })
 
   it("draws its window under the status and navigation bars, so insets.bottom is counted once", async () => {
