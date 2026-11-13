@@ -12,7 +12,8 @@ type SucceededPaymentListener = (payment: Payment, info: SucceededPaymentInfo) =
 
 const listeners = new Set<SucceededPaymentListener>()
 
-/** Ids the SDK has reported pending and not yet succeeded. */
+/** Ids the SDK has reported pending and not yet succeeded or failed, for the wallet
+ *  connected now. */
 const pendingIds = new Set<string>()
 
 /**
@@ -29,6 +30,16 @@ export const onSucceededPayment = (listener: SucceededPaymentListener): (() => v
 
 export const notePendingPayment = (payment: Payment): void => {
   pendingIds.add(payment.id)
+}
+
+/** A failed payment never succeeds: its id is not kept for the app's lifetime. */
+export const noteFailedPayment = (payment: Payment): void => {
+  pendingIds.delete(payment.id)
+}
+
+/** The wallet disconnected: a claim seen starting on it says nothing about the next one. */
+export const clearPendingPayments = (): void => {
+  pendingIds.clear()
 }
 
 export const emitSucceededPayment = (payment: Payment): void => {

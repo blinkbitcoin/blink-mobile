@@ -34,7 +34,12 @@ import {
   REFRESH_EVENTS,
 } from "../providers/sdk-events"
 import { emitNewDeposits } from "../providers/new-deposits"
-import { emitSucceededPayment, notePendingPayment } from "../providers/succeeded-payments"
+import {
+  clearPendingPayments,
+  emitSucceededPayment,
+  noteFailedPayment,
+  notePendingPayment,
+} from "../providers/succeeded-payments"
 import { validateStoredNetwork } from "../providers/validate-network"
 import {
   getOnlineState,
@@ -277,6 +282,9 @@ export const useSdkLifecycle = (
         if (observedPayment && event.tag === SdkEventTags.PaymentSucceeded) {
           emitSucceededPayment(observedPayment)
         }
+        if (observedPayment && event.tag === SdkEventTags.PaymentFailed) {
+          noteFailedPayment(observedPayment)
+        }
 
         if (!REFRESH_EVENTS.has(event.tag)) return
 
@@ -349,6 +357,7 @@ export const useSdkLifecycle = (
       mounted = false
       abortRef.current = true
       resetBackoff()
+      clearPendingPayments()
 
       const sdk = sdkRef.current
       const listenerId = listenerIdRef.current
