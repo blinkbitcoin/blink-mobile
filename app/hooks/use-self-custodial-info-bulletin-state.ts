@@ -13,6 +13,21 @@ const DISMISSED_KEY_PREFIX = "selfCustodialInfoBulletinDismissed"
 const dismissedKeyFor = (accountId: string): string =>
   `${DISMISSED_KEY_PREFIX}:${accountId}`
 
+/**
+ * Records the bulletin as already seen for an account. A restore calls this before the
+ * account becomes active: a user who restores a wallet knows what kind of account it is.
+ * A failed write only means the bulletin shows once, so it is reported, never thrown.
+ */
+export const markSelfCustodialInfoBulletinDismissedFor = async (
+  accountId: string,
+): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(dismissedKeyFor(accountId), "true")
+  } catch (err) {
+    reportError("Self-custodial info bulletin dismiss write", err)
+  }
+}
+
 type SelfCustodialInfoBulletinState = {
   shouldShow: boolean
   dismiss: () => void
@@ -26,9 +41,10 @@ type DismissalState = {
 const INITIAL_DISMISSAL: DismissalState = { accountId: null, isDismissed: false }
 
 /**
- * Controls the one-time "this is a non-custodial account" home bulletin shown to
- * self-custodial accounts. Persisted per account so it shows once and stays dismissed after
- * the user closes it or follows its link, the same way the backup-completed state is tracked.
+ * Controls the one-time "this is a non-custodial account" home bulletin shown to new and
+ * migrated self-custodial accounts; a restore marks it seen up front. Persisted per account
+ * so it shows once and stays dismissed after the user closes it or follows its link, the
+ * same way the backup-completed state is tracked.
  * The dismissal is keyed to the account it was read for, so switching accounts never flashes
  * the previous one's state.
  */
@@ -58,9 +74,7 @@ export const useSelfCustodialInfoBulletinState = (): SelfCustodialInfoBulletinSt
   const dismiss = useCallback(() => {
     if (!activeSelfCustodialAccountId) return
     setDismissal({ accountId: activeSelfCustodialAccountId, isDismissed: true })
-    AsyncStorage.setItem(dismissedKeyFor(activeSelfCustodialAccountId), "true").catch(
-      (err) => reportError("Self-custodial info bulletin dismiss write", err),
-    )
+    markSelfCustodialInfoBulletinDismissedFor(activeSelfCustodialAccountId)
   }, [activeSelfCustodialAccountId])
 
   const shouldShow =
