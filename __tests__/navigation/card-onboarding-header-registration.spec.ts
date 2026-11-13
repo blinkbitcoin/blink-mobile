@@ -55,6 +55,14 @@ describe("card onboarding header controls in root-navigator", () => {
     })
   })
 
+  /** The design leaves the wait without a way back or out: it ends on its own. */
+  it("leaves the processing wait without back and close buttons", () => {
+    const options = registration("cardOnboardingProcessingScreen")
+
+    expect(options).toContain("...noHeaderBack")
+    expect(options).not.toContain("headerCloseControlOptions")
+  })
+
   /** An unset title would fall back to the route name. */
   it("leaves the verify identity step untitled, as the design does", () => {
     expect(registration("cardOnboardingVerifyIdentityScreen")).toContain('title: ""')

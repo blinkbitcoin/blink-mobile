@@ -3848,7 +3848,7 @@
       },
       "CardProcessing": {
         "title": "Başvurunuz işleniyor",
-        "subtitle": "Hazır olduğumuzda sizi bilgilendireceğiz"
+        "subtitle": "Bu işlem bir dakikaya kadar sürebilir"
       }
     }
   },

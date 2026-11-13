@@ -12785,7 +12785,7 @@ type RootTranslation = {
 				 */
 				title: string
 				/**
-				 * W​e​ ​w​i​l​l​ ​n​o​t​i​f​y​ ​y​o​u​ ​o​n​c​e​ ​w​e​ ​a​r​e​ ​r​e​a​d​y
+				 * T​h​i​s​ ​c​a​n​ ​t​a​k​e​ ​u​p​ ​t​o​ ​a​ ​m​i​n​u​t​e
 				 */
 				subtitle: string
 			}
@@ -27108,7 +27108,7 @@ export type TranslationFunctions = {
 				 */
 				title: () => LocalizedString
 				/**
-				 * We will notify you once we are ready
+				 * This can take up to a minute
 				 */
 				subtitle: () => LocalizedString
 			}

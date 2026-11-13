@@ -3787,7 +3787,7 @@
             },
             "CardProcessing": {
                 "title": "Dein Antrag wird bearbeitet",
-                "subtitle": "Wir benachrichtigen dich, sobald wir bereit sind"
+                "subtitle": "Das kann bis zu einer Minute dauern"
             },
             "WelcomeInvest": {
                 "welcomeMessage": {

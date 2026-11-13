@@ -3787,7 +3787,7 @@
             },
             "CardProcessing": {
                 "title": "申請を処理中",
-                "subtitle": "準備ができ次第、お知らせします"
+                "subtitle": "最大1分ほどかかる場合があります"
             },
             "WelcomeInvest": {
                 "welcomeMessage": {

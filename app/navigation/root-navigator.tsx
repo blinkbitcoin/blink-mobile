@@ -985,8 +985,7 @@ export const RootStack = () => {
         component={CardProcessingScreen}
         options={{
           title: "",
-          headerBackVisible: false,
-          ...headerCloseControlOptions(),
+          ...noHeaderBack,
         }}
       />
       <RootNavigator.Screen
