@@ -105,6 +105,40 @@ with open(db, "w") as f:
 ' "$DB" "$udid"
     ;;
 
+  # Real `simctl clone` refuses a booted source and copies the device's whole
+  # data directory. Both semantics are modelled so the tests that depend on
+  # them (fallback-when-booted, login-state fidelity) cannot pass vacuously.
+  clone)
+    src="${2:?}"; newname="${3:?}"
+    state=$(awk -F'|' -v u="$src" '$1==u {print $3}' "$DB")
+    [ -n "$state" ] || { echo "fake xcrun: no such device $src" >&2; exit 1; }
+    [ "$state" = "Booted" ] && { echo "fake xcrun: unable to clone a booted device" >&2; exit 1; }
+    udid="FAKE-CLONE-$(date +%s)-$RANDOM"
+    printf '%s|%s|Shutdown\n' "$udid" "$newname" >> "$DB"
+    if [ -n "${FAKE_APP_ROOT:-}" ] && [ -d "$FAKE_APP_ROOT/$src" ]; then
+      mkdir -p "$FAKE_APP_ROOT"
+      cp -R "$FAKE_APP_ROOT/$src" "$FAKE_APP_ROOT/$udid"
+    fi
+    echo "$udid"
+    ;;
+
+  rename)
+    udid="${2:?}"; newname="${3:?}"
+    python3 -c '
+import sys
+db, udid, newname = sys.argv[1], sys.argv[2], sys.argv[3]
+rows = [l.strip().split("|") for l in open(db) if l.strip()]
+found = False
+with open(db, "w") as f:
+    for u, n, s in rows:
+        if u == udid:
+            found = True
+            n = newname
+        f.write("%s|%s|%s\n" % (u, n, s))
+sys.exit(0 if found else 1)
+' "$DB" "$udid" "$newname" || { echo "fake xcrun: no such device $udid" >&2; exit 1; }
+    ;;
+
   spawn) exit 0 ;;  # `defaults write` on the device — recorded in the args log above
 
   terminate) exit 0 ;;  # app process kill — nothing to model beyond the log entry
