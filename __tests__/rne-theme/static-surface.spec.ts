@@ -24,6 +24,7 @@ const DEFINITIONS = ["colors.ts", "themed.d.ts", "surfaces.ts"].map((name) =>
 // The surfaces blink-wip#1871 moved to the static fill, and how many in each file. A swap
 // put back to `surfaceInteractive` lowers a count, which the guard above can't see.
 const STATIC_SURFACES: Record<string, number> = {
+  "app/components/atomic/galoy-info/galoy-info.tsx": 1,
   "app/components/card-screen/info-card.tsx": 1,
   "app/components/card-screen/info-section.tsx": 1,
   "app/components/card-screen/input-field.tsx": 1,
@@ -49,10 +50,11 @@ const STATIC_SURFACES: Record<string, number> = {
   "app/screens/conversion-flow/conversion-fee-row.tsx": 1,
   "app/screens/home-screen/home-screen.tsx": 1,
   "app/screens/redeem-lnurl-withdrawal-screen/redeem-bitcoin-result-screen.tsx": 1,
+  "app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen.tsx": 1,
   "app/screens/settings-screen/self-custodial/account-fields.tsx": 1,
   "app/screens/totp-screen/authenticator-intro-screen.tsx": 1,
   "app/screens/totp-screen/authenticator-protected-screen.tsx": 1,
-  "app/screens/transaction-detail-screen/transaction-detail-screen.tsx": 3,
+  "app/screens/transaction-detail-screen/transaction-detail-screen.tsx": 2,
   "app/screens/transaction-history/transaction-history-filters.tsx": 1,
 }
 

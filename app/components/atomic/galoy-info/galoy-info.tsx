@@ -2,23 +2,19 @@ import React, { ReactNode } from "react"
 import { View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 type GaloyInfoProps = {
   highlight?: boolean
   isWarning?: boolean
-  backgroundColor?: string
   children: ReactNode
 }
 
-export const GaloyInfo: React.FC<GaloyInfoProps> = ({
-  children,
-  isWarning,
-  backgroundColor,
-}) => {
+export const GaloyInfo: React.FC<GaloyInfoProps> = ({ children, isWarning }) => {
   const {
     theme: { colors },
   } = useTheme()
-  const styles = useStyles({ isWarning, backgroundColor })
+  const styles = useStyles({ isWarning })
 
   return (
     <View style={styles.container}>
@@ -38,7 +34,6 @@ export const GaloyInfo: React.FC<GaloyInfoProps> = ({
 
 type StyleProps = {
   isWarning?: boolean
-  backgroundColor?: string
 }
 
 const useStyles = makeStyles(({ colors }, props: StyleProps) => ({
@@ -54,7 +49,7 @@ const useStyles = makeStyles(({ colors }, props: StyleProps) => ({
     paddingVertical: 6,
     borderTopRightRadius: 8,
     borderBottomRightRadius: 8,
-    backgroundColor: props.backgroundColor ?? colors.surfaceInteractive,
+    ...staticSurface(colors),
   },
   verticalLine: {
     width: 3,
