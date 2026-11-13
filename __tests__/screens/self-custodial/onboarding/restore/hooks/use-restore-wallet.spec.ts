@@ -1,3 +1,4 @@
+import { it } from "@jest/globals"
 import {
   Network as mockSparkNetwork,
   SdkError_Tags as SdkErrorTags,
@@ -26,6 +27,7 @@ const mockMarkBackupCompletedFor = jest.fn()
 const mockReloadSelfCustodialAccounts = jest.fn()
 const mockFindSelfCustodialAccountByMnemonic = jest.fn()
 const mockValidateMnemonic = jest.fn().mockReturnValue(true)
+const mockMarkInfoBulletinDismissedFor = jest.fn()
 
 jest.mock("bip39", () => ({
   validateMnemonic: (...args: string[]) => mockValidateMnemonic(...args),
@@ -86,6 +88,11 @@ jest.mock("@app/self-custodial/providers/backup-state", () => ({
   BackupMethod: { Manual: "manual", Cloud: "cloud", Recovery: "recovery" },
 }))
 
+jest.mock("@app/hooks/use-self-custodial-info-bulletin-state", () => ({
+  markSelfCustodialInfoBulletinDismissedFor: (...args: string[]) =>
+    mockMarkInfoBulletinDismissedFor(...args),
+}))
+
 jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
@@ -102,6 +109,21 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
+const deferred = <T>() => {
+  let resolve: (value: T) => void = () => {}
+  const promise = new Promise<T>((settle) => {
+    resolve = settle
+  })
+  return { promise, resolve }
+}
+
+/** Lets every pending microtask run, so a restore that skipped an `await` has already
+ *  moved on by the time the test looks. */
+const flushRestore = () =>
+  new Promise((settle) => {
+    setTimeout(settle, 0)
+  })
+
 describe("useRestoreWallet", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -112,6 +134,7 @@ describe("useRestoreWallet", () => {
       id: null,
     })
     mockValidateMnemonic.mockReturnValue(true)
+    mockMarkInfoBulletinDismissedFor.mockResolvedValue(undefined)
   })
 
   it("starts with idle status", () => {
@@ -183,18 +206,95 @@ describe("useRestoreWallet", () => {
       id: "existing-id",
     })
 
+    const write = deferred<void>()
+    mockMarkBackupCompletedFor.mockReturnValueOnce(write.promise)
     const { result } = renderHook(() => useRestoreWallet())
 
+    let restoring: Promise<void> = Promise.resolve()
     await act(async () => {
-      await result.current.restore("word1 word2 word3", BackupMethod.Cloud)
+      restoring = result.current.restore("word1 word2 word3", BackupMethod.Cloud)
+      await flushRestore()
     })
 
     expect(mockRestore).not.toHaveBeenCalled()
     expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith("existing-id", "cloud")
-    const markOrder = mockMarkBackupCompletedFor.mock.invocationCallOrder[0]
-    const activateOrder = mockUpdateState.mock.invocationCallOrder[0]
-    expect(markOrder).toBeLessThan(activateOrder)
+    // The account stays inactive until the backup is on record.
+    expect(mockUpdateState).not.toHaveBeenCalled()
+
+    await act(async () => {
+      write.resolve()
+      await restoring
+    })
+
+    expect(mockUpdateState).toHaveBeenCalledTimes(1)
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
+  })
+
+  /** A user who restores a wallet knows what kind of account it is, so the home
+   *  "this is a non-custodial account" bulletin is marked seen before the account is
+   *  active and never flashes on the first home render. */
+  describe("the non-custodial account bulletin", () => {
+    /** Holds the bulletin write open, so a restore that stops waiting for it shows up as
+     *  the account going active, the SDK restarting or the screen moving on too early. */
+    const expectActivationToWaitForTheWrite = async (
+      method: BackupMethod,
+      accountId: string,
+    ) => {
+      const write = deferred<void>()
+      mockMarkInfoBulletinDismissedFor.mockReturnValue(write.promise)
+      const { result } = renderHook(() => useRestoreWallet())
+
+      let restoring: Promise<void> = Promise.resolve()
+      await act(async () => {
+        restoring = result.current.restore("word1 word2 word3", method)
+        await flushRestore()
+      })
+
+      expect(mockMarkInfoBulletinDismissedFor).toHaveBeenCalledWith(accountId)
+      expect(mockUpdateState).not.toHaveBeenCalled()
+      expect(mockReinitSdk).not.toHaveBeenCalled()
+      expect(mockNavigate).not.toHaveBeenCalled()
+
+      await act(async () => {
+        write.resolve()
+        await restoring
+      })
+
+      expect(mockUpdateState).toHaveBeenCalled()
+      expect(mockReinitSdk).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
+    }
+
+    it.each([BackupMethod.Manual, BackupMethod.Cloud])(
+      "is marked seen before a %s restore of a new wallet goes active",
+      async (method) => {
+        await expectActivationToWaitForTheWrite(method, TEST_ACCOUNT_ID)
+      },
+    )
+
+    it.each([BackupMethod.Manual, BackupMethod.Cloud])(
+      "is marked seen before a %s restore of an account already on this device goes active",
+      async (method) => {
+        mockFindSelfCustodialAccountByMnemonic.mockResolvedValue({
+          status: "ok",
+          id: "existing-id",
+        })
+
+        await expectActivationToWaitForTheWrite(method, "existing-id")
+      },
+    )
+
+    it("is not marked for a phrase that fails validation", async () => {
+      mockValidateMnemonic.mockReturnValue(false)
+
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.restore("not a phrase")
+      })
+
+      expect(mockMarkInfoBulletinDismissedFor).not.toHaveBeenCalled()
+    })
   })
 
   /**

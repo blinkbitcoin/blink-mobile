@@ -28,6 +28,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
 
 import { flushEffects } from "../helpers/flush-effects"
+import { surfaceColor } from "../helpers/surface-color"
 import { waitForStableRender } from "../helpers/wait-for-stable-render"
 import { ContextForScreen } from "./helper"
 
@@ -404,6 +405,22 @@ describe("SendBitcoinConfirmationScreen", () => {
     )
 
     expect(feeRow().getByText("₦0 ($0.00)")).toBeTruthy()
+  })
+
+  it("paints the review fields static and keeps the copyable destination interactive", async () => {
+    await renderSettled(
+      <ContextForScreen>
+        <Intraledger route={route} />
+      </ContextForScreen>,
+    )
+
+    const [copyDestination] = screen
+      .UNSAFE_getAllByType(TouchableOpacity)
+      .filter((node) => node.props.hitSlop === 30)
+    expect(surfaceColor(copyDestination)).toBe(colors.light.surfaceInteractive)
+    expect(surfaceColor(screen.getByLabelText("Successful Fee"))).toBe(
+      colors.light.surfaceStatic,
+    )
   })
 
   it("Send Screen Confirmation - Lightning lnurl Payment", async () => {
