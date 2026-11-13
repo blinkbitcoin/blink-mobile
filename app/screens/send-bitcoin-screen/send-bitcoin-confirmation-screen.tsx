@@ -49,6 +49,7 @@ import {
 } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
 import { ellipsizeMiddle } from "@app/utils/helper"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 gql`
   query sendBitcoinConfirmationScreen {
@@ -147,6 +148,22 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     fee.status === "loading" || (fee.status === "error" && !fee.amount)
   const dustNotEvaluable =
     dustWarning.status === "pending" || dustWarning.status === "blocked"
+  // A blocked dust check stays a plain disable until #1273 N1 is ruled.
+  const isCalculating = feeUnavailable || dustWarning.status === "pending"
+
+  const progress = LL.SendBitcoinConfirmationScreen.sendProgress
+  const sendProgressLabels = [
+    progress.reviewing(),
+    progress.signing(),
+    progress.findingRoute(),
+    progress.broadcasting(),
+    progress.checkingDelivery(),
+    progress.retrying(),
+    progress.almostThere(),
+    progress.anyTimeNow(),
+    progress.ohOh(),
+    progress.tryingAgain(),
+  ]
 
   const defaultAmount = formatMoneyAmount({ moneyAmount: ZeroUsdMoneyAmount })
   let currencyFeeAmount = defaultAmount
@@ -501,7 +518,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         </View>
         <View style={styles.fieldContainer}>
           <Text style={styles.fieldTitleText}>{LL.common.from()}</Text>
-          <View style={styles.fieldBackground}>
+          <View style={[styles.fieldBackground, styles.fieldBackgroundStatic]}>
             <View style={styles.walletSelectorTypeContainer}>
               <CurrencyPill
                 currency={sendingWalletDescriptor.currency}
@@ -543,7 +560,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         </View>
         <View style={styles.fieldContainer}>
           <Text style={styles.fieldTitleText}>{LL.SendBitcoinScreen.amount()}</Text>
-          <View style={styles.fieldBackground}>
+          <View style={[styles.fieldBackground, styles.fieldBackgroundStatic]}>
             <Text type="p2">
               {formatDisplayAndWalletAmount({
                 primaryAmount: unitOfAccountAmount,
@@ -556,7 +573,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         {note ? (
           <View style={styles.fieldContainer}>
             <Text style={styles.fieldTitleText}>{LL.SendBitcoinScreen.note()}</Text>
-            <View style={styles.fieldBackground}>
+            <View style={[styles.fieldBackground, styles.fieldBackgroundStatic]}>
               <Text type="p2" style={styles.noteText}>
                 {note}
               </Text>
@@ -573,6 +590,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           <View
             style={[
               styles.fieldBackground,
+              styles.fieldBackgroundStatic,
               isLightningRecommended() ? styles.warningOutline : undefined,
             ]}
           >
@@ -622,8 +640,19 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             <View style={styles.sliderContainer}>
               <GaloySliderButton
                 isLoading={sendPaymentLoading || isVerifying}
-                initialText={LL.SendBitcoinConfirmationScreen.slideToConfirm()}
-                loadingText={LL.SendBitcoinConfirmationScreen.slideConfirming()}
+                initialText={LL.SendBitcoinConfirmationScreen.slideToSend()}
+                loadingText={LL.SendBitcoinConfirmationScreen.sendProgress.reviewing()}
+                busyLabels={sendProgressLabels}
+                disabledText={
+                  isCalculating
+                    ? LL.SendBitcoinConfirmationScreen.calculatingFee()
+                    : undefined
+                }
+                accentColor={
+                  sendingWalletDescriptor.currency === WalletCurrency.Usd
+                    ? colors._green
+                    : colors.accent
+                }
                 onSwipe={handleSendPayment}
                 disabled={
                   !validAmount || !sendPayment || feeUnavailable || dustNotEvaluable
@@ -660,6 +689,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderRadius: 10,
     alignItems: "center",
   },
+  fieldBackgroundStatic: staticSurface(colors),
   warningOutline: {
     borderColor: colors.warning,
     borderWidth: 2,
