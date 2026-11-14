@@ -10,6 +10,7 @@ import { StepLayout } from "@app/components/step-layout"
 import { KycFlowType } from "@app/graphql/generated"
 import { useKycFlow } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 type Requirement = {
   icon: IconNamesType
@@ -66,7 +67,7 @@ export const CardVerifyIdentityScreen: React.FC = () => {
       <View style={styles.content}>
         <IconHero
           icon="document-outline"
-          iconColor={colors._green}
+          iconColor={colors.success}
           title={LL.CardFlow.Onboarding.CardVerifyIdentity.title()}
           subtitle={
             <Text type="p3" style={styles.description}>
@@ -82,7 +83,7 @@ export const CardVerifyIdentityScreen: React.FC = () => {
               <React.Fragment key={requirement.icon}>
                 {hasDivider && (
                   <Divider
-                    color={colors.grey4}
+                    color={colors.neutral}
                     width={DIVIDER_WIDTH}
                     style={styles.divider}
                   />
@@ -108,14 +109,14 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingTop: 10,
   },
   description: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     textAlign: "center",
   },
   /** On the static card surface: the requirements are read, never pressed. */
   requirementsCard: {
     marginTop: 30,
     marginHorizontal: 20,
-    backgroundColor: colors.grey7,
+    ...staticSurface(colors),
     borderRadius: 8,
     overflow: "hidden",
   },

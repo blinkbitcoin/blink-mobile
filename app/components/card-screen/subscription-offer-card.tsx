@@ -2,6 +2,8 @@ import React from "react"
 import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { staticSurface } from "@app/rne-theme/surfaces"
+
 export type OfferTone = "default" | "positive" | "accent"
 
 export type OfferSummaryRow = {
@@ -31,9 +33,9 @@ export const SubscriptionOfferCard: React.FC<SubscriptionOfferCardProps> = ({
   } = useTheme()
 
   const toneColor: Record<OfferTone, string> = {
-    default: colors.black,
-    positive: colors._green,
-    accent: colors.primary,
+    default: colors.textOnBackground,
+    positive: colors.success,
+    accent: colors.accent,
   }
 
   return (
@@ -45,14 +47,14 @@ export const SubscriptionOfferCard: React.FC<SubscriptionOfferCardProps> = ({
         <Text type="h1" bold color={toneColor[priceTone]} style={styles.centered}>
           {price}
         </Text>
-        <Text type="p3" color={colors.grey2} style={styles.caption}>
+        <Text type="p3" color={colors.textMuted} style={styles.caption}>
           {caption}
         </Text>
       </View>
 
       {rows.map((row) => (
         <View key={row.label} style={styles.row}>
-          <Text type="p3" color={colors.grey2} style={styles.rowText}>
+          <Text type="p3" color={colors.textMuted} style={styles.rowText}>
             {row.label}
           </Text>
           <Text type="p3" bold color={toneColor[row.tone]} style={styles.rowText}>
@@ -66,7 +68,7 @@ export const SubscriptionOfferCard: React.FC<SubscriptionOfferCardProps> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   card: {
-    backgroundColor: colors.grey7,
+    ...staticSurface(colors),
     borderRadius: 12,
     padding: 14,
     gap: 14,

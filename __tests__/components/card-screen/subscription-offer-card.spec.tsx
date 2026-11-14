@@ -49,10 +49,10 @@ describe("SubscriptionOfferCard", () => {
     )
 
     expect(StyleSheet.flatten(getByText("$1,000.00").props.style).color).toBe(
-      light.primary,
+      light.accent,
     )
     expect(StyleSheet.flatten(getByText("First year free").props.style).color).toBe(
-      light._green,
+      light.success,
     )
     expect(StyleSheet.flatten(getByText("Nov 10, 2027").props.style).color).toBe(
       light.black,

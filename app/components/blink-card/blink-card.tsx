@@ -53,7 +53,12 @@ export const BlinkCard: React.FC<BlinkCardProps> = ({
     <View style={[styles.cardWrapper, { width: cardWidth, height: cardHeight }]}>
       <View style={[styles.card, { width: cardWidth, height: cardHeight }]}>
         <View style={styles.topRow}>
-          <GaloyIcon name="blink-icon" width={98} height={30} color={colors.staticWhite} />
+          <GaloyIcon
+            name="blink-icon"
+            width={98}
+            height={30}
+            color={colors.staticWhite}
+          />
           <GaloyIcon
             name="visa-platinum"
             width={69}

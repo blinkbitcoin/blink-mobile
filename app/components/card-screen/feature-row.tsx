@@ -32,15 +32,15 @@ export const FeatureRow: React.FC<FeatureRowProps> = ({
     <View style={styles.row}>
       <GaloyIcon
         name={icon}
-        color={colors._black}
-        backgroundColor={colors.primary}
+        color={colors.textOnAccent}
+        backgroundColor={colors.accent}
         size={ICON_SIZE}
         containerSize={ICON_CONTAINER_SIZE}
       />
       <View style={styles.textContainer}>
         <Text type="p2">{title}</Text>
         {hasSubtitle && (
-          <Text type="p3" color={colors.grey2}>
+          <Text type="p3" color={colors.textMuted}>
             {subtitle}
           </Text>
         )}
@@ -71,7 +71,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
   },
   badge: {
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -79,6 +79,6 @@ const useStyles = makeStyles(({ colors }) => ({
   badgeText: {
     fontSize: 10,
     lineHeight: 13,
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
 }))
