@@ -1,3 +1,5 @@
+import { FeePolicy } from "@breeztech/breez-sdk-spark-react-native"
+
 import { WalletCurrency } from "@app/graphql/generated"
 import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction"
 
@@ -168,5 +170,61 @@ describe("createSelfCustodialSparkPaymentDetails", () => {
     const updated = detail.setSendingWalletDescriptor(newDescriptor)
 
     expect(updated.sendingWalletDescriptor).toEqual(newDescriptor)
+  })
+})
+
+describe("createSelfCustodialSparkPaymentDetails send-all", () => {
+  const balance = {
+    amount: 100_000,
+    currency: WalletCurrency.Btc,
+    currencyCode: WalletCurrency.Btc,
+  }
+  const lastFeeParams = () =>
+    mockCreateGetFee.mock.calls[mockCreateGetFee.mock.calls.length - 1][0]
+  const lastSendParams = () =>
+    mockCreateSendMutation.mock.calls[mockCreateSendMutation.mock.calls.length - 1][0]
+
+  beforeEach(() => {
+    mockCreateGetFee.mockClear()
+    mockCreateSendMutation.mockClear()
+  })
+
+  it("offers a send-all on the Bitcoin wallet only", () => {
+    expect(createSelfCustodialSparkPaymentDetails(createParams()).canSendMax).toBe(true)
+    expect(
+      createSelfCustodialSparkPaymentDetails(
+        createParams({
+          sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
+        }),
+      ).canSendMax,
+    ).toBe(false)
+  })
+
+  it("quotes and sends a send-all with the fee taken out", () => {
+    const sendAll = createSelfCustodialSparkPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+
+    expect(sendAll.isSendingMax).toBe(true)
+    expect(sendAll.isFeeIncluded).toBe(true)
+    expect(lastFeeParams().feePolicy).toBe(FeePolicy.FeesIncluded)
+    expect(lastSendParams().feePolicy).toBe(FeePolicy.FeesIncluded)
+  })
+
+  it("leaves a plain amount's fee on top", () => {
+    createSelfCustodialSparkPaymentDetails(createParams()).setAmount!(balance)
+
+    expect(lastFeeParams().feePolicy).toBeUndefined()
+  })
+
+  it("drops the send-all on a wallet switch", () => {
+    const switched = createSelfCustodialSparkPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    ).setSendingWalletDescriptor({ id: "w-other", currency: WalletCurrency.Btc })
+
+    expect(switched.isSendingMax).toBe(false)
+    expect(lastFeeParams().feePolicy).toBeUndefined()
   })
 })

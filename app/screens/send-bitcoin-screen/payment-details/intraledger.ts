@@ -166,6 +166,8 @@ export const createIntraledgerPaymentDetails = <T extends WalletCurrency>(
     setConvertMoneyAmount,
     setAmount,
     canSetAmount: true,
+    // A Blink-to-Blink send has no fee, so 100% is the whole balance as it stands.
+    canSendMax: true,
     idempotencyKeyRef,
     ...setMemo,
     ...sendPaymentAndGetFee,

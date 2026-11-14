@@ -65,11 +65,12 @@ export const useSelfCustodialFeeRail = ({
     isActive && settlementAmount?.amount ? settlementAmount.amount : undefined
   const address = isActive ? paymentDetail?.destination : undefined
 
-  const { tiers, error, hasQuote, isQuoting, quote } = useOnchainFeeTiers(
-    sdk ?? null,
+  const { tiers, error, hasQuote, isQuoting, quote } = useOnchainFeeTiers({
+    sdk: sdk ?? null,
     address,
     amountSats,
-  )
+    isFeeIncluded: Boolean(paymentDetail?.isFeeIncluded),
+  })
   const errorMessage = error ? resolveSdkErrorMessage(error, LL) : undefined
 
   return {

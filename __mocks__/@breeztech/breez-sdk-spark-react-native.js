@@ -82,6 +82,7 @@ module.exports = {
   InputType_Tags: { SparkAddress: "SparkAddress", BitcoinAddress: "BitcoinAddress" },
   Network: { Mainnet: 0, Regtest: 1 },
   OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
+  FeePolicy: { FeesExcluded: 0, FeesIncluded: 1 },
   SendPaymentMethod_Tags: {
     BitcoinAddress: "BitcoinAddress",
     Bolt11Invoice: "Bolt11Invoice",

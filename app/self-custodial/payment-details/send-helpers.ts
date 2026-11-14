@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import {
+  FeePolicy,
   OnchainConfirmationSpeed,
   PaymentStatus,
   type BreezSdkInterface,
@@ -53,6 +54,7 @@ type PrepareParams = {
   amount: bigint | undefined
   tokenIdentifier?: string
   conversionOptions?: ConversionOptions
+  feePolicy?: FeePolicy
   /** The quote review showed, for a send that converts dollars on the way out. */
   quoteRef?: QuoteRef
 }
@@ -81,6 +83,17 @@ export const hasQuoteMoved = (reviewed: SendQuote | undefined, fresh: SendQuote)
   (reviewed.feeSats !== fresh.feeSats ||
     reviewed.amountIn !== fresh.amountIn ||
     reviewed.amountOut !== fresh.amountOut)
+
+/**
+ * A send-all on the Bitcoin wallet: the SDK takes the fee out of the balance, so the
+ * wallet spends exactly what it holds. The Dollar wallet's send-all converts on the way
+ * out and waits on the SDK's answer for how the fee meets that (#2048 SA5).
+ */
+export const sendAllFeePolicy = (
+  sendMax: boolean | undefined,
+  currency: WalletCurrency,
+): FeePolicy | undefined =>
+  sendMax && currency === WalletCurrency.Btc ? FeePolicy.FeesIncluded : undefined
 
 /** A send stopped before anything went out, because its quote moved. */
 export const quoteMovedFailure = () => ({
@@ -125,6 +138,7 @@ const toPrepareOptions = (params: PrepareParams) => ({
   amount: params.amount,
   tokenIdentifier: params.tokenIdentifier,
   conversionOptions: params.conversionOptions,
+  feePolicy: params.feePolicy,
 })
 
 const asGetFeeAmount = <T extends WalletCurrency>(feeSats: number) =>
