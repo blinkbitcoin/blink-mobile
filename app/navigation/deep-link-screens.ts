@@ -53,7 +53,6 @@ export const DEEP_LINK_SCREENS: NonNullable<
   accountMigrationEntry: "account-migration",
   cardOnboardingWelcomeScreen: "card/onboarding",
   cardOnboardingSubscribeScreen: "card/onboarding/subscribe",
-  cardOnboardingVerifyIdentityScreen: "card/onboarding/verify-identity",
   cardOnboardingLoadingScreen: "card/onboarding/loading",
   cardOnboardingPersonalInfoScreen: "card/onboarding/personal-info",
   cardOnboardingAcknowledgementScreen: "card/onboarding/acknowledgement",

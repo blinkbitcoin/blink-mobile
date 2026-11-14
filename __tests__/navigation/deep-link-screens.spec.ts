@@ -53,6 +53,15 @@ describe("deep-linkable routes", () => {
   })
 
   /**
+   * The identity step starts the card KYC, and the agreements are accepted on the
+   * subscribe step before it. A link landing on it would start the KYC with none of them
+   * accepted. It is reached from the subscribe step alone.
+   */
+  it("links to no card onboarding step that starts the KYC", () => {
+    expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingVerifyIdentityScreen")
+  })
+
+  /**
    * The code screen and the backup take the setup key as a param. A link landing on
    * either would show a key the registration never issued, and offer to save it as the
    * account's. The registration is reached from its own start alone.
