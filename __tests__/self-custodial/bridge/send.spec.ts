@@ -7,6 +7,7 @@ import {
   extractLightningFee,
   extractLnurlFee,
   extractOnchainFees,
+  identifyPreparedSend,
   prepareLnurl,
   prepareSend,
   resolveSendTokenIdentifier,
@@ -25,6 +26,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   SendPaymentMethod_Tags: {
     BitcoinAddress: "BitcoinAddress",
     Bolt11Invoice: "Bolt11Invoice",
+    SparkInvoice: "SparkInvoice",
   },
   SendPaymentOptions: {
     BitcoinAddress: jest
@@ -118,6 +120,42 @@ describe("extractLightningFee", () => {
     }
 
     expect(extractLightningFee(prepared as never)).toBeNull()
+  })
+})
+
+describe("identifyPreparedSend", () => {
+  it("finds a Lightning send by its invoice's payment hash", () => {
+    const prepared = {
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
+    }
+
+    expect(identifyPreparedSend(prepared as never)).toEqual({ paymentHash: "hash-1" })
+  })
+
+  it("finds a Spark invoice send by the invoice itself", () => {
+    const prepared = {
+      paymentMethod: {
+        tag: "SparkInvoice",
+        inner: { sparkInvoiceDetails: { invoice: "spark1invoice" } },
+      },
+    }
+
+    expect(identifyPreparedSend(prepared as never)).toEqual({
+      sparkInvoice: "spark1invoice",
+    })
+  })
+
+  it("has nothing to find a send to a bare address by", () => {
+    const prepared = { paymentMethod: { tag: "BitcoinAddress", inner: {} } }
+
+    expect(identifyPreparedSend(prepared as never)).toBeUndefined()
+  })
+
+  it("has nothing to find a send by when the quote names no method", () => {
+    expect(identifyPreparedSend({} as never)).toBeUndefined()
   })
 })
 

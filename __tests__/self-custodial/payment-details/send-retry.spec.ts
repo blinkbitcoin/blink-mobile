@@ -13,9 +13,9 @@ import {
 import {
   createSendMutation,
   createSendMutationOnchain,
-  identifyPreparedSend,
   runSelfCustodialSend,
 } from "@app/self-custodial/payment-details/send-helpers"
+import { identifyPreparedSend } from "@app/self-custodial/bridge/send"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { reportError } from "@app/utils/error-logging"
 import * as measurement from "@app/self-custodial/measurement"

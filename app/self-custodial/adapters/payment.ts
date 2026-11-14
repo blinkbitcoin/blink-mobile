@@ -26,11 +26,11 @@ import {
   extractLightningFee,
   extractOnchainFees,
   hasTokenLeg,
+  identifyPreparedSend,
   prepareSend,
   resolveSendTokenIdentifier,
   toSdkSendAmount,
 } from "../bridge"
-import { identifyPreparedSend } from "../payment-details/send-helpers"
 
 const failed = (message: string): PaymentAdapterResult => ({
   status: PaymentResultStatus.Failed,

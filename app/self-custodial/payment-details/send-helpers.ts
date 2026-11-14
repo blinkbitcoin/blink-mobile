@@ -2,11 +2,9 @@
 import {
   OnchainConfirmationSpeed,
   PaymentStatus,
-  SendPaymentMethod_Tags as MethodTag,
   type BreezSdkInterface,
   type ConversionOptions,
   type Payment,
-  type PrepareSendPaymentResponse,
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
@@ -37,9 +35,11 @@ import {
   extractLightningFee,
   extractOnchainFees,
   hasTokenLeg,
+  identifyPreparedSend,
   mapAmountAdjustment,
   prepareSend,
   type PreparedTokenLegs,
+  type SendIdentity,
 } from "../bridge"
 import {
   measure,
@@ -204,25 +204,6 @@ const reportSendFailure = (
   return { __typename: "GraphQLApplicationError", message: classifySdkError(err) }
 }
 
-/**
- * What a prepared send can be found by in the wallet's history once dispatched: the
- * invoice's payment hash for Lightning, the invoice itself for a Spark invoice. A send to
- * a bare Spark or bitcoin address carries nothing no other payment shares.
- */
-export const identifyPreparedSend = (
-  prepared: PrepareSendPaymentResponse,
-): SendIdentity | undefined => {
-  const method = prepared.paymentMethod
-  if (!method) return undefined
-  if (method.tag === MethodTag.Bolt11Invoice) {
-    return { paymentHash: method.inner.invoiceDetails.paymentHash }
-  }
-  if (method.tag === MethodTag.SparkInvoice) {
-    return { sparkInvoice: method.inner.sparkInvoiceDetails.invoice }
-  }
-  return undefined
-}
-
 type SendRail = { scope: string; confirmationSpeed?: OnchainConfirmationSpeed }
 
 /**
@@ -298,9 +279,6 @@ export const createSendMutationOnchain = (
       confirmationSpeed: TIER_TO_SPEED[feeTier],
     })
 }
-
-/** What a dispatched send can be found by in the wallet's history. */
-export type SendIdentity = { paymentHash?: string; sparkInvoice?: string }
 
 /** The key what an attempt was asked for is kept under: what its payment is found by. */
 const identityKeyOf = ({

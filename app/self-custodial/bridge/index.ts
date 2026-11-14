@@ -36,6 +36,7 @@ export {
   prepareSend,
   executeSend,
   hasTokenLeg,
+  identifyPreparedSend,
   extractOnchainFees,
   extractLightningFee,
   toSdkSendAmount,
@@ -50,6 +51,7 @@ export type {
   PreparedTokenLegs,
   PrepareSendOptions,
   PrepareLnurlOptions,
+  SendIdentity,
 } from "./send"
 export { listDeposits, claimDeposit, refundDeposit, getRecommendedFees } from "./deposits"
 export type { ClaimOutcome, MappedDeposit, NetworkFeeRates } from "./deposits"

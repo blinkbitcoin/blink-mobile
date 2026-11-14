@@ -56,6 +56,28 @@ export const extractLightningFee = (
   return null
 }
 
+/** What a dispatched send can be found by in the wallet's history. */
+export type SendIdentity = { paymentHash?: string; sparkInvoice?: string }
+
+/**
+ * What a prepared send can be found by in the wallet's history once dispatched: the
+ * invoice's payment hash for Lightning, the invoice itself for a Spark invoice. A send to
+ * a bare Spark or bitcoin address carries nothing no other payment shares.
+ */
+export const identifyPreparedSend = (
+  prepared: PrepareSendPaymentResponse,
+): SendIdentity | undefined => {
+  const method = prepared.paymentMethod
+  if (!method) return undefined
+  if (method.tag === MethodTag.Bolt11Invoice) {
+    return { paymentHash: method.inner.invoiceDetails.paymentHash }
+  }
+  if (method.tag === MethodTag.SparkInvoice) {
+    return { sparkInvoice: method.inner.sparkInvoiceDetails.invoice }
+  }
+  return undefined
+}
+
 export type PrepareSendOptions = {
   paymentRequest: string
   amount: bigint | undefined
