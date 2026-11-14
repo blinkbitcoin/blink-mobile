@@ -2405,6 +2405,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Գործարքը պետք է ուղարկվի mempool",
     "amount": "Չափ",
+    "addAmount": "Ավելացնել գումար",
+    "lowFunds": "Բավարար միջոցներ չկան",
     "amountExceed": "Գումարի չափը գերազանցում է Ձեր {balance: string} հաշվեկշիռը",
     "amountExceedsLimit": "Գումարի չափը գերազանցում է {limit: string}ի Ձեր օրական սահմանաչափը",
     "upgradeAccountToIncreaseLimit": "Թարմացրեք Ձեր հաշիվը Ձեր սահմանաչափը բարձրացնելու համար",
@@ -2456,7 +2458,8 @@
     "sdkInsufficientFunds": "Այս գործարքի համար բավարար միջոցներ չկան։",
     "sdkAmountTooLow": "Գումարը չափազանց փոքր է on-chain գործարքի համար։",
     "sdkNetworkError": "Ցանցի սխալ։ Խնդրում ենք ստուգել ձեր կապը և փորձել կրկին։",
-    "sdkGenericError": "Հնարավոր չէ հաշվարկել վճարները։ Խնդրում ենք փորձել այլ գումար։"
+    "sdkGenericError": "Հնարավոր չէ հաշվարկել վճարները։ Խնդրում ենք փորձել այլ գումար։",
+    "onchainSelfPayment": "Սա Ձեր սեփական դրամապանակի հասցեն է։ Դուք չեք կարող on-chain վճարում ուղարկել Ձեզ։"
   },
   "SettingsScreen": {
     "createAddress": "Ստեղծել Lightning հասցե",
@@ -3115,6 +3118,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
+  },
+  "Accessibility": {
+    "deleteKey": "Ջնջել",
+    "swapCurrencyHint": "Փոխում է արժույթը, որով մուտքագրում եք գումարը",
+    "switchToWallet": "Անցնել {wallet: string}-ին",
+    "copy": "Պատճենել"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ես պետք է թարմացնել հավելվածը։ Ես օգտագործում եմ {os: string} հավելվածը {version: string} տարբերակով։ ",

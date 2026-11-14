@@ -2405,6 +2405,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "A tranzakciót elküldjük a mempoolba",
     "amount": "Összeg",
+    "addAmount": "Összeg hozzáadása",
+    "lowFunds": "Nincs elegendő egyenleg",
     "amountExceed": "Az összeg meghaladja az egyenlegedet: {balance: string}",
     "amountExceedsLimit": "Az összeg meghaladja a napi limitet: {limit: string}",
     "upgradeAccountToIncreaseLimit": "Magasabb tranzakciós limithez magasabb szintű felhasználói fiókra váltás szükséges",
@@ -2456,7 +2458,8 @@
     "sdkInsufficientFunds": "Nincs elegendő egyenleg ehhez a tranzakcióhoz.",
     "sdkAmountTooLow": "Az összeg túl alacsony egy on-chain tranzakcióhoz.",
     "sdkNetworkError": "Hálózati hiba. Ellenőrizze a kapcsolatot és próbálja újra.",
-    "sdkGenericError": "Nem sikerült megbecsülni a díjakat. Próbáljon másik összeget."
+    "sdkGenericError": "Nem sikerült megbecsülni a díjakat. Próbáljon másik összeget.",
+    "onchainSelfPayment": "Ez az Ön saját tárcájának címe. Nem küldhet on-chain fizetést saját magának."
   },
   "SettingsScreen": {
     "createAddress": "Lightning cím létrehozása",
@@ -3115,6 +3118,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Összeg beállítása"
+  },
+  "Accessibility": {
+    "deleteKey": "Törlés",
+    "swapCurrencyHint": "Átváltja a pénznemet, amelyben az összeget megadja",
+    "switchToWallet": "Váltás erre: {wallet: string}",
+    "copy": "Másol"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Frissítenem kell az alkalmazásomat a legújabb verzióra. A(z) {os: string} alkalmazást használom, verziószáma: {version: string}.",

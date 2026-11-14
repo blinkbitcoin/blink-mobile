@@ -20,6 +20,13 @@ export const addAmount = async (amount: string, LL: TranslationFunctions) => {
     .withTimeout(timeout)
 }
 
+/** The send amount step types on its in-screen keypad; there is no modal to confirm. */
+export const typeSendAmount = async (amount: string) => {
+  for (const char of amount) {
+    await tap(by.id(`Key ${char}`))
+  }
+}
+
 export const slideSlider = async () => {
   const slider = element(by.id("slider"))
   await waitFor(slider).toBeVisible().withTimeout(timeout)

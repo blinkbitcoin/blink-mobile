@@ -2405,6 +2405,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transactie wordt naar de mempool verzonden",
     "amount": "Bedrag",
+    "addAmount": "Bedrag toevoegen",
+    "lowFunds": "Onvoldoende saldo",
     "amountExceed": "Bedrag overschrijdt uw saldo van {balance: string}",
     "amountExceedsLimit": "Bedrag overschrijdt uw resterende dagelijkse limiet van {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgrade uw account om uw limiet te verhogen",
@@ -2456,7 +2458,8 @@
     "sdkInsufficientFunds": "Onvoldoende saldo voor deze transactie.",
     "sdkAmountTooLow": "Het bedrag is te laag voor een on-chain transactie.",
     "sdkNetworkError": "Netwerkfout. Controleer uw verbinding en probeer het opnieuw.",
-    "sdkGenericError": "Kan kosten niet schatten. Probeer een ander bedrag."
+    "sdkGenericError": "Kan kosten niet schatten. Probeer een ander bedrag.",
+    "onchainSelfPayment": "Dit is het adres van uw eigen wallet. U kunt geen on-chain betaling naar uzelf sturen."
   },
   "SettingsScreen": {
     "createAddress": "Lightning-adres aanmaken",
@@ -3115,6 +3118,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Stel bedrag in"
+  },
+  "Accessibility": {
+    "deleteKey": "Wissen",
+    "swapCurrencyHint": "Wisselt de valuta waarin je het bedrag invoert",
+    "switchToWallet": "Overschakelen naar {wallet: string}",
+    "copy": "Kopiëren"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ik moet mijn app bijwerken naar de nieuwste versie. Ik gebruik de app {os: string} met versie {version: string}.",

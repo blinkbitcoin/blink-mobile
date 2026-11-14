@@ -2405,6 +2405,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksi akan dikirim ke mempool",
     "amount": "Jumlah",
+    "addAmount": "Tambahkan jumlah",
+    "lowFunds": "Dana tidak cukup",
     "amountExceed": "Jumlah melebihi saldo Anda sebesar {balance: string}",
     "amountExceedsLimit": "Jumlah melebihi batas harian Anda yang tersisa sebesar {limit: string}",
     "upgradeAccountToIncreaseLimit": "Tingkatkan akun Anda untuk meningkatkan batas",
@@ -2456,7 +2458,8 @@
     "sdkInsufficientFunds": "Dana tidak cukup untuk transaksi ini.",
     "sdkAmountTooLow": "Jumlah terlalu rendah untuk transaksi on-chain.",
     "sdkNetworkError": "Kesalahan jaringan. Periksa koneksi Anda dan coba lagi.",
-    "sdkGenericError": "Tidak dapat memperkirakan biaya. Coba jumlah yang berbeda."
+    "sdkGenericError": "Tidak dapat memperkirakan biaya. Coba jumlah yang berbeda.",
+    "onchainSelfPayment": "Ini adalah alamat dompet Anda sendiri. Anda tidak dapat mengirim pembayaran on-chain ke diri sendiri."
   },
   "SettingsScreen": {
     "createAddress": "Buat alamat Lightning",
@@ -3115,6 +3118,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Tetapkan jumlah"
+  },
+  "Accessibility": {
+    "deleteKey": "Hapus",
+    "swapCurrencyHint": "Mengganti mata uang untuk mengetik jumlah",
+    "switchToWallet": "Beralih ke {wallet: string}",
+    "copy": "Salin"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Saya perlu memperbarui aplikasi saya ke versi terbaru. Saya menggunakan aplikasi {os: string} dengan versi {version: string}.",

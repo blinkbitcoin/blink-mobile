@@ -7688,6 +7688,14 @@ type RootTranslation = {
 		 */
 		amount: string
 		/**
+		 * A​d​d​ ​a​m​o​u​n​t
+		 */
+		addAmount: string
+		/**
+		 * L​o​w​ ​f​u​n​d​s
+		 */
+		lowFunds: string
+		/**
 		 * A​m​o​u​n​t​ ​e​x​c​e​e​d​s​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}
 		 * @param {string} balance
 		 */
@@ -7899,6 +7907,10 @@ type RootTranslation = {
 		 * U​n​a​b​l​e​ ​t​o​ ​e​s​t​i​m​a​t​e​ ​f​e​e​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​a​m​o​u​n​t​.
 		 */
 		sdkGenericError: string
+		/**
+		 * T​h​i​s​ ​i​s​ ​y​o​u​r​ ​o​w​n​ ​w​a​l​l​e​t​'​s​ ​a​d​d​r​e​s​s​.​ ​Y​o​u​ ​c​a​n​'​t​ ​s​e​n​d​ ​a​n​ ​o​n​-​c​h​a​i​n​ ​p​a​y​m​e​n​t​ ​t​o​ ​y​o​u​r​s​e​l​f​.
+		 */
+		onchainSelfPayment: string
 	}
 	ApiScreen: {
 		/**
@@ -10429,6 +10441,25 @@ type RootTranslation = {
 		 * S​e​t​ ​a​m​o​u​n​t
 		 */
 		tapToSetAmount: string
+	}
+	Accessibility: {
+		/**
+		 * C​o​p​y
+		 */
+		copy: string
+		/**
+		 * D​e​l​e​t​e
+		 */
+		deleteKey: string
+		/**
+		 * S​w​i​t​c​h​e​s​ ​t​h​e​ ​c​u​r​r​e​n​c​y​ ​y​o​u​ ​t​y​p​e​ ​t​h​e​ ​a​m​o​u​n​t​ ​i​n
+		 */
+		swapCurrencyHint: string
+		/**
+		 * S​w​i​t​c​h​ ​t​o​ ​{​w​a​l​l​e​t​}
+		 * @param {string} wallet
+		 */
+		switchToWallet: RequiredParams<'wallet'>
 	}
 	AppUpdate: {
 		/**
@@ -22025,6 +22056,14 @@ export type TranslationFunctions = {
 		 */
 		amount: () => LocalizedString
 		/**
+		 * Add amount
+		 */
+		addAmount: () => LocalizedString
+		/**
+		 * Low funds
+		 */
+		lowFunds: () => LocalizedString
+		/**
 		 * Amount exceeds your balance of {balance}
 		 */
 		amountExceed: (arg: { balance: string }) => LocalizedString
@@ -22234,6 +22273,10 @@ export type TranslationFunctions = {
 		 * Unable to estimate fees. Please try a different amount.
 		 */
 		sdkGenericError: () => LocalizedString
+		/**
+		 * This is your own wallet's address. You can't send an on-chain payment to yourself.
+		 */
+		onchainSelfPayment: () => LocalizedString
 	}
 	ApiScreen: {
 		/**
@@ -24704,6 +24747,24 @@ export type TranslationFunctions = {
 		 * Set amount
 		 */
 		tapToSetAmount: () => LocalizedString
+	}
+	Accessibility: {
+		/**
+		 * Copy
+		 */
+		copy: () => LocalizedString
+		/**
+		 * Delete
+		 */
+		deleteKey: () => LocalizedString
+		/**
+		 * Switches the currency you type the amount in
+		 */
+		swapCurrencyHint: () => LocalizedString
+		/**
+		 * Switch to {wallet}
+		 */
+		switchToWallet: (arg: { wallet: string }) => LocalizedString
 	}
 	AppUpdate: {
 		/**
