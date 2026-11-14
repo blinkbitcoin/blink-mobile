@@ -2405,6 +2405,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Трансакција треба да буде прослеђена у мемпул",
     "amount": "Износ",
+    "addAmount": "Додај износ",
+    "lowFunds": "Nedovoljno sredstava",
     "amountExceed": "Износ прелази ваше стање од {balance: string}",
     "amountExceedsLimit": "Износ прелази ваш дневни лимит од {limit: string}",
     "upgradeAccountToIncreaseLimit": "Надоградите свој налог да бисте повећали лимит",
@@ -2456,7 +2458,8 @@
     "sdkInsufficientFunds": "Nedovoljno sredstava za ovu transakciju.",
     "sdkAmountTooLow": "Iznos je prenizak za on-chain transakciju.",
     "sdkNetworkError": "Greška mreže. Proverite vezu i pokušajte ponovo.",
-    "sdkGenericError": "Nije moguće proceniti naknade. Pokušajte sa drugim iznosom."
+    "sdkGenericError": "Nije moguće proceniti naknade. Pokušajte sa drugim iznosom.",
+    "onchainSelfPayment": "Ovo je adresa vašeg sopstvenog novčanika. Ne možete poslati on-chain uplatu sami sebi."
   },
   "SettingsScreen": {
     "createAddress": "Направи Lightning адресу",
@@ -3115,6 +3118,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
+  },
+  "Accessibility": {
+    "deleteKey": "Обриши",
+    "swapCurrencyHint": "Мења валуту у којој уносите износ",
+    "switchToWallet": "Пребаци на {wallet: string}",
+    "copy": "Копирај"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Морам да ажурирам апликацију на најновију верзију. Користим {os: string} апликацију са верзијом {version: string}.",

@@ -2449,6 +2449,8 @@ const en: BaseTranslation = {
   SendBitcoinScreen: {
     willBeSentToMempoolBy: "Transaction should be submitted to mempool",
     amount: "Amount",
+    addAmount: "Add amount",
+    lowFunds: "Low funds",
     amountExceed: "Amount exceeds your balance of {balance: string}",
     amountExceedsLimit: "Amount exceeds your remaining daily limit of {limit: string}",
     upgradeAccountToIncreaseLimit: "Upgrade your account to increase your limit",
@@ -2515,6 +2517,8 @@ const en: BaseTranslation = {
     sdkAmountTooLow: "Amount is too low for an on-chain transaction.",
     sdkNetworkError: "Network error. Please check your connection and try again.",
     sdkGenericError: "Unable to estimate fees. Please try a different amount.",
+    onchainSelfPayment:
+      "This is your own wallet's address. You can't send an on-chain payment to yourself.",
   },
   ApiScreen: {
     keysGroupTitle: "API keys",
@@ -3272,6 +3276,12 @@ const en: BaseTranslation = {
   },
   AmountInputButton: {
     tapToSetAmount: "Set amount",
+  },
+  Accessibility: {
+    copy: "Copy",
+    deleteKey: "Delete",
+    swapCurrencyHint: "Switches the currency you type the amount in",
+    switchToWallet: "Switch to {wallet: string}",
   },
   AppUpdate: {
     needToUpdateSupportMessage:
