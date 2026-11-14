@@ -1,10 +1,10 @@
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import { type FeeTierInfo, type FeeTierOption } from "@app/types/fee-tiers"
 
 import { type PaymentDetail } from "../payment-details/index.types"
 
-import { type FeeTierInfo, type FeeTierOption } from "./fee-tiers.types"
 import { useCustodialOnchainFeeTiers } from "./use-custodial-onchain-fee-tiers"
 import {
   type SdkFeeError,

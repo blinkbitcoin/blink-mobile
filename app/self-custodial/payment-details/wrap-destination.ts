@@ -3,13 +3,13 @@ import { PaymentType } from "@blinkbitcoin/blink-client"
 import { LnUrlPayServiceResponse } from "lnurl-pay"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import {
   type CreatePaymentDetailParams,
   isSendDestination,
   type ParseDestinationResult,
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { toBtcMoneyAmount } from "@app/types/amounts"
+import { FeeTierOption } from "@app/types/fee-tiers"
 import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction"
 
 import { createSelfCustodialLightningPaymentDetails } from "./lightning"

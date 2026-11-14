@@ -3,10 +3,7 @@ import { renderHook, waitFor } from "@testing-library/react-native"
 import { ApolloError } from "@apollo/client"
 import { GraphQLError } from "graphql"
 
-import {
-  FeeTierOption,
-  FeeUnit,
-} from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
+import { FeeTierOption, FeeUnit } from "@app/types/fee-tiers"
 import { OnchainFeeQuote } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { useCustodialOnchainFeeTiers } from "@app/screens/send-bitcoin-screen/hooks/use-custodial-onchain-fee-tiers"
 
