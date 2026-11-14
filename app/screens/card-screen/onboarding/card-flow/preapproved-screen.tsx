@@ -31,6 +31,7 @@ export const CardPreapprovedScreen: React.FC = () => {
           icon="check-badge"
           iconColor={colors.success}
           title={LL.CardFlow.Onboarding.CardPreapproved.title()}
+          subtitle={LL.CardFlow.Onboarding.CardPreapproved.subtitle()}
         />
       </ScrollView>
       <View style={styles.buttonsContainer}>
