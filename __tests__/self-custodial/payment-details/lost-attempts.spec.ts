@@ -5,6 +5,7 @@ import {
   lostAttemptsTo,
   scopeLostAttemptsTo,
   STORED_ATTEMPTS_READ_TIMEOUT_MS,
+  STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS,
   STORED_ATTEMPTS_WRITE_RETRY_DELAY_MS,
   STORED_ATTEMPTS_WRITE_RETRY_MAX_DELAY_MS,
   withoutSettled,
@@ -851,6 +852,298 @@ describe("lost attempts across app launches", () => {
     })
 
     await expect(fresh!.lostAttemptsFor("sp1abc").retryStorage()).resolves.toBeUndefined()
+  })
+})
+
+describe("the attempt a send stores before it goes out", () => {
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  const withUnresolved = (current: LostAttempts): LostAttempts => ({
+    ...current,
+    unresolvedSend,
+  })
+  const withLost =
+    (hash: string) =>
+    (current: LostAttempts): LostAttempts => ({ ...current, lostSend: lostSend(hash) })
+
+  it("is stored with what the destination holds, and is not held itself", async () => {
+    const { storage, saves } = storageHolding()
+    scopeLostAttemptsTo("wallet-ahead-1", storage)
+    remember("sp1abc", { lostSend: lostSend("hash-1") })
+    remember("sp1def", { unresolvedSend })
+    const attempts = lostAttemptsFor("sp1abc")
+
+    let storedInFlight: unknown
+    let heldInFlight: LostAttempts | undefined
+    await attempts.oneAtATime(async () => {
+      await attempts.writeAhead(withUnresolved).written
+      storedInFlight = saves.at(-1)
+      heldInFlight = lostAttemptsTo("sp1abc")
+    })
+
+    expect(storedInFlight).toEqual([
+      "wallet-ahead-1",
+      new Map<string, LostAttempts>([
+        ["sp1abc", { lostSend: lostSend("hash-1"), unresolvedSend }],
+        ["sp1def", { unresolvedSend }],
+      ]),
+    ])
+    expect(heldInFlight).toEqual({ lostSend: lostSend("hash-1") })
+  })
+
+  it("is taken back once its send has finished, however it finished", async () => {
+    const { storage, saves } = storageHolding()
+    scopeLostAttemptsTo("wallet-ahead-2", storage)
+    const attempts = lostAttemptsFor("sp1abc")
+
+    await attempts.oneAtATime(async () => {
+      await attempts.writeAhead(withUnresolved).written
+    })
+    await nextTurn()
+    const storedAfterSent = saves.at(-1)
+    await attempts
+      .oneAtATime(async () => {
+        await attempts.writeAhead(withUnresolved).written
+        throw new Error("failed")
+      })
+      .catch(() => undefined)
+    await nextTurn()
+
+    expect(storedAfterSent).toEqual(["wallet-ahead-2", new Map()])
+    expect(saves.at(-1)).toEqual(["wallet-ahead-2", new Map()])
+  })
+
+  it("is waited for until it is stored", async () => {
+    let land: () => void = () => undefined
+    scopeLostAttemptsTo("wallet-ahead-3", {
+      load: async () => new Map(),
+      save: () =>
+        new Promise<void>((resolve) => {
+          land = resolve
+        }),
+      remove: removeNothing,
+    })
+    await nextTurn()
+
+    let isWritten = false
+    lostAttemptsFor("sp1abc")
+      .writeAhead(withUnresolved)
+      .written.then(() => {
+        isWritten = true
+      })
+    await nextTurn()
+    const isWrittenBeforeStored = isWritten
+    land()
+    await nextTurn()
+
+    expect(isWrittenBeforeStored).toBe(false)
+    expect(isWritten).toBe(true)
+  })
+
+  /** A write that does not answer must not hold the send back for good. */
+  it("is waited for only so long when the write does not answer", async () => {
+    jest.useFakeTimers()
+    scopeLostAttemptsTo("wallet-ahead-4", {
+      load: async () => new Map(),
+      save: () =>
+        new Promise(() => {
+          /** never answers */
+        }),
+      remove: removeNothing,
+    })
+    await jest.advanceTimersByTimeAsync(0)
+
+    let isWritten = false
+    lostAttemptsFor("sp1abc")
+      .writeAhead(withUnresolved)
+      .written.then(() => {
+        isWritten = true
+      })
+    await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS - 1)
+    const isWrittenBeforeTimeout = isWritten
+    await jest.advanceTimersByTimeAsync(1)
+
+    expect(isWrittenBeforeTimeout).toBe(false)
+    expect(isWritten).toBe(true)
+  })
+
+  it("is waited for only so long when the write keeps failing", async () => {
+    jest.useFakeTimers()
+    scopeLostAttemptsTo("wallet-ahead-5", {
+      load: async () => new Map(),
+      save: jest.fn().mockRejectedValue(new Error("disk full")),
+      remove: removeNothing,
+    })
+    await jest.advanceTimersByTimeAsync(0)
+
+    let isWritten = false
+    lostAttemptsFor("sp1abc")
+      .writeAhead(withUnresolved)
+      .written.then(() => {
+        isWritten = true
+      })
+    await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS - 1)
+    const isWrittenBeforeTimeout = isWritten
+    await jest.advanceTimersByTimeAsync(1)
+
+    expect(isWrittenBeforeTimeout).toBe(false)
+    expect(isWritten).toBe(true)
+  })
+
+  it("is stored again with what came to be known, while its send is in flight", async () => {
+    const { storage, saves } = storageHolding()
+    scopeLostAttemptsTo("wallet-ahead-6", storage)
+    const attempts = lostAttemptsFor("sp1abc")
+
+    let storedInFlight: unknown
+    await attempts.oneAtATime(async () => {
+      const ahead = attempts.writeAhead(withLost("hash-1"))
+      await ahead.written
+      ahead.update(withLost("hash-2"))
+      await nextTurn()
+      storedInFlight = saves.at(-1)
+    })
+
+    expect(storedInFlight).toEqual([
+      "wallet-ahead-6",
+      new Map([["sp1abc", { lostSend: lostSend("hash-2") }]]),
+    ])
+  })
+
+  /** What came too late belongs to a send that has finished, and the next send to the
+   *  destination stores its own attempt. */
+  it("is neither stored again nor taken back once its send has finished", async () => {
+    const { storage, saves } = storageHolding()
+    scopeLostAttemptsTo("wallet-ahead-7", storage)
+    const attempts = lostAttemptsFor("sp1abc")
+
+    let firstAhead: ReturnType<typeof attempts.writeAhead> | undefined
+    await attempts.oneAtATime(async () => {
+      firstAhead = attempts.writeAhead(withLost("hash-1"))
+      await firstAhead.written
+    })
+    let storedInFlight: unknown
+    let savesBeforeLateUpdate = 0
+    let savesAfterLateUpdate = 0
+    await attempts.oneAtATime(async () => {
+      await attempts.writeAhead(withLost("hash-2")).written
+      savesBeforeLateUpdate = saves.length
+      firstAhead?.update(withLost("hash-late"))
+      firstAhead?.end()
+      await nextTurn()
+      savesAfterLateUpdate = saves.length
+      storedInFlight = saves.at(-1)
+    })
+
+    expect(savesAfterLateUpdate).toBe(savesBeforeLateUpdate)
+    expect(storedInFlight).toEqual([
+      "wallet-ahead-7",
+      new Map([["sp1abc", { lostSend: lostSend("hash-2") }]]),
+    ])
+  })
+
+  it("is taken back at once when its send needs it no more, before its turn ends", async () => {
+    const { storage, saves } = storageHolding()
+    scopeLostAttemptsTo("wallet-ahead-12", storage)
+    const attempts = lostAttemptsFor("sp1abc")
+
+    let storedOnceEnded: unknown
+    await attempts.oneAtATime(async () => {
+      const ahead = attempts.writeAhead(withUnresolved)
+      await ahead.written
+      ahead.end()
+      await nextTurn()
+      storedOnceEnded = saves.at(-1)
+    })
+
+    expect(storedOnceEnded).toEqual(["wallet-ahead-12", new Map()])
+  })
+
+  it("stores nothing more for a wallet forgotten while its send is in flight", async () => {
+    const { storage, saves } = storageHolding()
+    scopeLostAttemptsTo("wallet-ahead-9", storage)
+    const attempts = lostAttemptsFor("sp1abc")
+
+    let savesAtForget = 0
+    await attempts.oneAtATime(async () => {
+      const ahead = attempts.writeAhead(withUnresolved)
+      await ahead.written
+      forgetLostAttemptsOf("wallet-ahead-9")
+      savesAtForget = saves.length
+      ahead.update(withLost("hash-1"))
+      ahead.end()
+    })
+    await nextTurn()
+
+    expect(saves).toHaveLength(savesAtForget)
+  })
+
+  it("is stored for the wallet its send went out from, after a switch to another", async () => {
+    const first = storageHolding()
+    const second = storageHolding()
+    scopeLostAttemptsTo("wallet-ahead-10", first.storage)
+    const attempts = lostAttemptsFor("sp1abc")
+
+    await attempts.oneAtATime(async () => {
+      const ahead = attempts.writeAhead(withUnresolved)
+      scopeLostAttemptsTo("wallet-ahead-11", second.storage)
+      await ahead.written
+    })
+    await nextTurn()
+
+    expect(first.saves[0]).toEqual([
+      "wallet-ahead-10",
+      new Map([["sp1abc", { unresolvedSend }]]),
+    ])
+    expect(second.saves).toEqual([])
+  })
+
+  /** The app's next launch starts with a memory of its own, and reads back what this one
+   *  stored while the send was still in flight. */
+  it("is read back by the next launch when the app closed with its send in flight", async () => {
+    const stored = new Map<string, Map<string, LostAttempts>>()
+    const storage: LostAttemptsStorage = {
+      load: async (walletId) => new Map(stored.get(walletId) ?? []),
+      save: async (walletId, attempts) => {
+        stored.set(walletId, new Map(attempts))
+      },
+      remove: removeNothing,
+    }
+    scopeLostAttemptsTo("wallet-ahead-8", storage)
+    const attempts = lostAttemptsFor("sp1abc")
+    attempts.oneAtATime(async () => {
+      await attempts.writeAhead(withUnresolved).written
+      return new Promise(() => {
+        /** the SDK never answers: the app closes first */
+      })
+    })
+    await nextTurn()
+
+    let nextLaunch: typeof import("@app/self-custodial/payment-details/lost-attempts")
+    jest.isolateModules(() => {
+      nextLaunch = jest.requireActual("@app/self-custodial/payment-details/lost-attempts")
+    })
+    nextLaunch!.scopeLostAttemptsTo("wallet-ahead-8", storage)
+    const seen = await nextLaunch!
+      .lostAttemptsFor("sp1abc")
+      .oneAtATime(async () => nextLaunch!.lostAttemptsTo("sp1abc"))
+
+    expect(seen).toEqual({ unresolvedSend })
+  })
+
+  it("has nothing to store before any wallet connected", async () => {
+    let fresh: typeof import("@app/self-custodial/payment-details/lost-attempts")
+    jest.isolateModules(() => {
+      fresh = jest.requireActual("@app/self-custodial/payment-details/lost-attempts")
+    })
+
+    const ahead = fresh!.lostAttemptsFor("sp1abc").writeAhead(withUnresolved)
+    ahead.update(withUnresolved)
+    ahead.end()
+
+    await expect(ahead.written).resolves.toBeUndefined()
   })
 })
 

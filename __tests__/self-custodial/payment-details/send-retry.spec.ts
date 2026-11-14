@@ -8,6 +8,9 @@ import {
   lostAttemptsTo,
   scopeLostAttemptsTo,
   STORED_ATTEMPTS_READ_TIMEOUT_MS,
+  STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS,
+  type LostAttempts,
+  type LostAttemptsStorage,
   type RequestedAs,
 } from "@app/self-custodial/payment-details/lost-attempts"
 import {
@@ -1767,6 +1770,339 @@ describe("a send asked for before the wallet's stored attempts were read back", 
     expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.OutcomeUnknown)
     expect(mockSendPayment).not.toHaveBeenCalled()
     expect(load).toHaveBeenCalledTimes(3)
+  })
+})
+
+describe("a send in flight when the app closes", () => {
+  beforeEach(() => {
+    resetSendMocks()
+    mockSendPayment.mockResolvedValue(sent())
+  })
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  const nextTurn = () => new Promise(setImmediate)
+
+  /** Storage that outlives the app: what one launch stores, the next one reads back. */
+  const storageAcrossLaunches = () => {
+    const stored = new Map<string, Map<string, LostAttempts>>()
+    const saves: Array<Map<string, LostAttempts>> = []
+    const storage: LostAttemptsStorage = {
+      load: async (walletId) => new Map(stored.get(walletId) ?? []),
+      save: async (walletId, attempts) => {
+        saves.push(new Map(attempts))
+        stored.set(walletId, new Map(attempts))
+      },
+      remove: async (walletId) => {
+        stored.delete(walletId)
+      },
+    }
+    return {
+      storage,
+      storedFor: (walletId: string) => stored.get(walletId),
+      saves,
+    }
+  }
+
+  /** The app sends, and is closed before the SDK answers. */
+  const closedInFlight = async (
+    walletId: string,
+    storage: LostAttemptsStorage,
+    params: typeof btcSpark | typeof btcLightning,
+  ) => {
+    scopeLostAttemptsTo(walletId, storage)
+    mockSendPayment.mockReturnValueOnce(
+      new Promise(() => {
+        /** never answers: the app closes first */
+      }),
+    )
+    const ref = {}
+    attempt(
+      createSendMutation(params, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
+    while (mockSendPayment.mock.calls.length === 0) await nextTurn()
+  }
+
+  /** The app's next launch: a memory of its own, over the same storage and wallet. */
+  const sendOnNextLaunch = (
+    walletId: string,
+    storage: LostAttemptsStorage,
+    params: typeof btcSpark | typeof btcLightning,
+  ) => {
+    let sends: typeof import("@app/self-custodial/payment-details/send-helpers")
+    let attempts: typeof import("@app/self-custodial/payment-details/lost-attempts")
+    jest.isolateModules(() => {
+      sends = jest.requireActual("@app/self-custodial/payment-details/send-helpers")
+      attempts = jest.requireActual("@app/self-custodial/payment-details/lost-attempts")
+    })
+    attempts!.scopeLostAttemptsTo(walletId, storage)
+    const ref = {}
+    return attempt(
+      sends!.createSendMutation(params, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+      NEXT_KEY,
+    )
+  }
+
+  it("is looked for by its key on the next launch, and not sent again once found", async () => {
+    const { storage } = storageAcrossLaunches()
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress())
+    mockFindPaymentUnderKey.mockResolvedValue({
+      status: "found",
+      payment: { id: KEY },
+      failed: [],
+    })
+
+    await closedInFlight("wallet-closed-1", storage, btcSpark)
+    const result = await sendOnNextLaunch("wallet-closed-1", storage, btcSpark)
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(mockFindPaymentUnderKey).toHaveBeenCalledWith(
+      expect.objectContaining({ key: KEY }),
+    )
+    expect(mockSendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("is sent on the next launch once the wallet shows it never went out", async () => {
+    const { storage } = storageAcrossLaunches()
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress())
+    mockFindPaymentUnderKey.mockResolvedValue({ status: "not-found", failed: [] })
+
+    await closedInFlight("wallet-closed-2", storage, btcSpark)
+    const result = await sendOnNextLaunch("wallet-closed-2", storage, btcSpark)
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(mockFindPaymentUnderKey).toHaveBeenCalledWith(
+      expect.objectContaining({ key: KEY }),
+    )
+    expect(sentKeys()).toEqual([KEY, NEXT_KEY])
+  })
+
+  it("is looked for by its invoice on the next launch, and not paid again once found", async () => {
+    const { storage } = storageAcrossLaunches()
+    mockPrepareSendPayment.mockResolvedValue(bolt11("hash-1"))
+    mockFindLostSend.mockResolvedValue({
+      status: "found",
+      payment: { id: "p1" },
+      failed: [],
+    })
+
+    await closedInFlight("wallet-closed-3", storage, btcLightning)
+    const result = await sendOnNextLaunch("wallet-closed-3", storage, btcLightning)
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(
+      lookupMatches(0, {
+        details: { tag: "Lightning", inner: { htlcDetails: { paymentHash: "hash-1" } } },
+      }),
+    ).toBe(true)
+    expect(mockSendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("is looked for by its Spark invoice on the next launch, and not paid again once found", async () => {
+    const { storage } = storageAcrossLaunches()
+    mockPrepareSendPayment.mockResolvedValue(sparkInvoice("spark1inv"))
+    mockFindLostSend.mockResolvedValue({
+      status: "found",
+      payment: { id: "p1" },
+      failed: [],
+    })
+
+    await closedInFlight("wallet-closed-11", storage, btcSpark)
+    const result = await sendOnNextLaunch("wallet-closed-11", storage, btcSpark)
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(
+      lookupMatches(0, {
+        details: { tag: "Token", inner: { invoiceDetails: { invoice: "spark1inv" } } },
+      }),
+    ).toBe(true)
+    expect(mockSendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  /** One without a key can be told apart from no other send to the address: the sender
+   *  is pointed at their history, as after one that threw. */
+  it("leaves a dollar send to an address to the sender's history on the next launch", async () => {
+    const { storage } = storageAcrossLaunches()
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress("usdb-token-id"))
+
+    await closedInFlight("wallet-closed-4", storage, usdSpark)
+    const result = await sendOnNextLaunch("wallet-closed-4", storage, usdSpark)
+
+    expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.OutcomeUnknown)
+    expect(mockSendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  /** An app closed right after must not take a send the SDK answered for one lost. */
+  it("takes its attempt back before anything else is stored, once the SDK answered it", async () => {
+    const { storage, saves } = storageAcrossLaunches()
+    scopeLostAttemptsTo("wallet-closed-12", storage)
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress())
+    const ref = {}
+
+    await attempt(
+      createSendMutation(btcSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
+    await nextTurn()
+
+    expect(saves[0].has("sp1abc")).toBe(true)
+    expect(saves.slice(1).some((saved) => saved.has("sp1abc"))).toBe(false)
+  })
+
+  it("leaves nothing stored once the SDK has answered it", async () => {
+    const { storage, storedFor } = storageAcrossLaunches()
+    scopeLostAttemptsTo("wallet-closed-5", storage)
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress())
+    const ref = {}
+
+    await attempt(
+      createSendMutation(btcSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
+    await nextTurn()
+
+    expect(storedFor("wallet-closed-5")).toEqual(new Map())
+  })
+
+  it("leaves nothing stored once the SDK refused it before dispatch", async () => {
+    const { storage, storedFor } = storageAcrossLaunches()
+    scopeLostAttemptsTo("wallet-closed-6", storage)
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress())
+    mockSendPayment.mockRejectedValueOnce(sdkError("InsufficientFunds"))
+    const ref = {}
+
+    await attempt(
+      createSendMutation(btcSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
+    await nextTurn()
+
+    expect(storedFor("wallet-closed-6")).toEqual(new Map())
+  })
+
+  it("goes out only once its attempt is stored", async () => {
+    let land: () => void = () => undefined
+    const save = jest.fn().mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          land = resolve
+        }),
+    )
+    scopeLostAttemptsTo("wallet-closed-7", {
+      load: async () => new Map(),
+      save,
+      remove: async () => undefined,
+    })
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress())
+    const ref = {}
+
+    const pending = attempt(
+      createSendMutation(btcSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
+    await nextTurn()
+    const sentBeforeStored = mockSendPayment.mock.calls.length
+    land()
+    const result = await pending
+
+    expect(save).toHaveBeenCalledWith(
+      "wallet-closed-7",
+      new Map([
+        [
+          "sp1abc",
+          { unresolvedSend: { idempotencyKey: KEY, recordedAtMs: expect.any(Number) } },
+        ],
+      ]),
+    )
+    expect(sentBeforeStored).toBe(0)
+    expect(result.status).toBe(PaymentSendResult.Success)
+  })
+
+  /** Refusing the send would guard nothing this launch's memory does not: the attempt is
+   *  held there if the send throws, and the write keeps being tried. */
+  it("goes out once it has waited long enough for its attempt to be stored", async () => {
+    jest.useFakeTimers()
+    scopeLostAttemptsTo("wallet-closed-8", {
+      load: async () => new Map(),
+      save: () =>
+        new Promise(() => {
+          /** never answers */
+        }),
+      remove: async () => undefined,
+    })
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress())
+    const ref = {}
+
+    const pending = attempt(
+      createSendMutation(btcSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+      ref,
+    )
+    await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS - 1)
+    const sentBeforeTimeout = mockSendPayment.mock.calls.length
+    await jest.advanceTimersByTimeAsync(1)
+    const result = await pending
+
+    expect(sentBeforeTimeout).toBe(0)
+    expect(result.status).toBe(PaymentSendResult.Success)
+  })
+
+  /** Read alongside the quote, the wallet's clock is most often known by then. */
+  it("is stored with the wallet's clock already read", async () => {
+    const { storage, storedFor, saves } = storageAcrossLaunches()
+    mockListPayments.mockResolvedValue({ payments: [{ id: "p0", timestamp: 1_000n }] })
+    mockPrepareSendPayment.mockImplementation(async () => {
+      await nextTurn()
+      return bolt11("hash-1")
+    })
+
+    await closedInFlight("wallet-closed-9", storage, btcLightning)
+
+    expect(storedFor("wallet-closed-9")?.get("lnbc1...")?.lostSend?.walletClockSec).toBe(
+      1_000,
+    )
+    expect(saves).toHaveLength(1)
+  })
+
+  it("is stored once for a send to an address, which the wallet's clock adds nothing to", async () => {
+    const { storage, saves } = storageAcrossLaunches()
+    let answerClock: (answer: unknown) => void = () => undefined
+    mockListPayments.mockReturnValueOnce(
+      new Promise((resolve) => {
+        answerClock = resolve
+      }),
+    )
+    mockPrepareSendPayment.mockResolvedValue(sparkAddress())
+
+    await closedInFlight("wallet-closed-14", storage, btcSpark)
+    answerClock({ payments: [{ id: "p0", timestamp: 1_000n }] })
+    await nextTurn()
+
+    expect(saves).toHaveLength(1)
+  })
+
+  it("is stored again with the wallet's clock once read, if the send went out first", async () => {
+    const { storage, storedFor } = storageAcrossLaunches()
+    let answerClock: (answer: unknown) => void = () => undefined
+    mockListPayments.mockReturnValueOnce(
+      new Promise((resolve) => {
+        answerClock = resolve
+      }),
+    )
+    mockPrepareSendPayment.mockResolvedValue(bolt11("hash-1"))
+
+    await closedInFlight("wallet-closed-10", storage, btcLightning)
+    const clockBeforeRead =
+      storedFor("wallet-closed-10")?.get("lnbc1...")?.lostSend?.walletClockSec
+    answerClock({ payments: [{ id: "p0", timestamp: 1_000n }] })
+    await nextTurn()
+
+    expect(clockBeforeRead).toBe(0)
+    expect(storedFor("wallet-closed-10")?.get("lnbc1...")?.lostSend?.walletClockSec).toBe(
+      1_000,
+    )
   })
 })
 

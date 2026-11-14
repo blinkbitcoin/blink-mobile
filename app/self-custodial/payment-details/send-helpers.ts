@@ -788,6 +788,14 @@ const sendAfterEarlierAttempts = async <
   const blockedAtBest = await clearEarlierAttempts(invocationKey)
   if (blockedAtBest) return blockedAtBest
 
+  /** The wallet's clock, read alongside the quote, so it is most often known by the time
+   *  the send goes out, for the attempt stored before it does. */
+  let walletClockKnown: number | undefined
+  const walletClockRead = readWalletClockSec(sdk).then((walletClockSec) => {
+    walletClockKnown = walletClockSec
+    return walletClockSec
+  })
+
   /** Nothing has moved before the send itself, so a quote that fails is safe to report
    *  as a failure and try again. It can fail because a lost attempt this retry was let
    *  through for already spent the funds, though: that attempt is looked for then, so
@@ -856,6 +864,45 @@ const sendAfterEarlierAttempts = async <
     return reportSent(result)
   }
 
+  /** What this attempt leaves to be looked for before the next send to the destination,
+   *  should its outcome be lost: by what it paid, or, with nothing to find it by, as an
+   *  attempt whose outcome is unresolved. */
+  const unresolvedAttempt: UnresolvedSend = {
+    idempotencyKey,
+    recordedAtMs: startedAtMs,
+    requestedAs,
+  }
+  const attemptAt = (walletClockSec: number) => ({
+    startedAtMs,
+    walletClockSec,
+    idempotencyKey,
+    requestedAs,
+  })
+  const lostAttemptAt =
+    (walletClockSec: number) =>
+    (current: LostAttempts): LostAttempts =>
+      identity
+        ? {
+            ...current,
+            lostSend: withAttempt(current.lostSend, {
+              ...attemptAt(walletClockSec),
+              identity,
+            }),
+          }
+        : { ...current, unresolvedSend: unresolvedAttempt }
+
+  /** Stored before the send goes out, and waited for a moment: the app can be closed with
+   *  the send in flight, and the next launch must look for it before paying again. The
+   *  wallet's clock goes with it once read, if it was not yet. */
+  const writtenAhead = attempts.writeAhead(lostAttemptAt(walletClockKnown ?? 0))
+  const isClockStillToCome = identity !== undefined && walletClockKnown === undefined
+  if (isClockStillToCome) {
+    walletClockRead.then((walletClockSec) =>
+      writtenAhead.update(lostAttemptAt(walletClockSec)),
+    )
+  }
+  await writtenAhead.written
+
   /** Only the SDK call itself decides whether the send went out, whether it rejects or
    *  throws on the spot: whatever is done with its answer afterwards runs outside, where
    *  a throw cannot be taken for a lost send. */
@@ -865,7 +912,12 @@ const sendAfterEarlierAttempts = async <
       (result) => ({ result }),
       (error: unknown) => ({ error }),
     )
-  if ("result" in dispatch) return reportDispatched(dispatch.result)
+  /** Answered, the attempt leaves nothing to look for: it is taken back before the
+   *  bookkeeping stores anything. */
+  if ("result" in dispatch) {
+    writtenAhead.end()
+    return reportDispatched(dispatch.result)
+  }
   const err = dispatch.error
   const isRaisedBeforeDispatch = CODES_RAISED_BEFORE_DISPATCH.has(classifySdkError(err))
   /** The SDK refused it on the way in: this attempt ends here as a failure, whatever is
@@ -878,12 +930,7 @@ const sendAfterEarlierAttempts = async <
 
   if (!identity) {
     if (isRaisedBeforeDispatch) return failure(err)
-    const unresolvedNow: UnresolvedSend = {
-      idempotencyKey,
-      recordedAtMs: startedAtMs,
-      requestedAs,
-    }
-    attempts.update((current) => ({ ...current, unresolvedSend: unresolvedNow }))
+    attempts.update((current) => ({ ...current, unresolvedSend: unresolvedAttempt }))
     if (idempotencyKey) return failure(err)
     /** No "send anyway" yet: the history cannot show this payment until the wallet has
      *  caught up. It is offered on the next try, once the sender has had time to look. */
@@ -895,18 +942,9 @@ const sendAfterEarlierAttempts = async <
    *  the same, in both cases: a new amount or wallet starts the key over, whether
    *  anything was dispatched is the SDK's word and not this code's, and the send made
    *  next has only the lookup between it and paying twice. */
-  const walletClockSec = await readWalletClockSec(sdk)
-  const thisAttempt = {
-    startedAtMs,
-    walletClockSec,
-    identity,
-    idempotencyKey,
-    requestedAs,
-  }
-  const withThisAttempt = (current: LostAttempts): LostAttempts => ({
-    ...current,
-    lostSend: withAttempt(current.lostSend, thisAttempt),
-  })
+  const walletClockSec = await walletClockRead
+  const thisAttempt = { ...attemptAt(walletClockSec), identity }
+  const withThisAttempt = lostAttemptAt(walletClockSec)
   const isLookedForNow = !idempotencyKey && !isRaisedBeforeDispatch
   if (isLookedForNow) {
     const thisAndEarlier = withAttempt(attempts.read().lostSend, thisAttempt)

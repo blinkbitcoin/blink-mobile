@@ -1,7 +1,8 @@
 /**
- * What sends that threw after dispatch leave behind for the next send to the same
- * destination. It depends on nothing of the send path, so the wallet lifecycle can scope
- * it without pulling that in; only on where it keeps them across app launches.
+ * What sends that threw after dispatch, or were in flight when the app closed, leave
+ * behind for the next send to the same destination. It depends on nothing of the send
+ * path, so the wallet lifecycle can scope it without pulling that in; only on where it
+ * keeps them across app launches.
  */
 import type { ConvertAttemptRef } from "@app/types/payment"
 import { withTimeout } from "@app/utils/with-timeout"
@@ -13,11 +14,11 @@ import {
 } from "../storage/lost-attempts"
 
 /**
- * The attempts of a send that threw after dispatch without their payment turning up: the
- * payment hash of each invoice they paid (or, for a Spark invoice, the invoice itself),
- * when the first of them was made, and the idempotency key they all went out under, if
- * they shared one. A retry under that key is refused by the SDK as a duplicate, so it
- * needs no look first; any other send does.
+ * The attempts of a send that threw after dispatch, or was in flight when the app closed,
+ * without their payment turning up: the payment hash of each invoice they paid (or, for a
+ * Spark invoice, the invoice itself), when the first of them was made, and the idempotency
+ * key they all went out under, if they shared one. A retry under that key is refused by
+ * the SDK as a duplicate, so it needs no look first; any other send does.
  */
 export type LostSend = {
   startedAtMs: number
@@ -26,7 +27,7 @@ export type LostSend = {
   lastAttemptAtMs?: number
   /**
    * When the newest send the wallet held was made, by the server's clock, as the
-   * earliest of the attempts was lost (unix seconds; 0 when it held none or could not
+   * earliest of the attempts went out (unix seconds; 0 when it held none or could not
    * be read). The attempts' payments are no older than it, whatever the phone's clock
    * says, so the look reaches back from it as well as from `startedAtMs`.
    */
@@ -51,14 +52,15 @@ export type LostSend = {
 export type RequestedAs = { entered: string; settlement: string }
 
 /**
- * An attempt that threw after dispatch and left nothing its payment could be found by in
- * the wallet's history by what it paid (a send to a Spark or bitcoin address): the key it
- * went out under, if any. A retry under that key is safe, since the SDK refuses it as a
- * duplicate. Under any other key it is safe only once the wallet shows whether the
- * attempt went out: the SDK records a keyed payment with the key as its id, so it is
- * asked for by that id. An attempt that went out without a key cannot be told apart from
- * any other send to the same address, so it is refused until the sender has checked
- * their history. When it was recorded is what lets it lapse across app launches.
+ * An attempt that threw after dispatch, or was in flight when the app closed, and left
+ * nothing its payment could be found by in the wallet's history by what it paid (a send
+ * to a Spark or bitcoin address): the key it went out under, if any. A retry under that
+ * key is safe, since the SDK refuses it as a duplicate. Under any other key it is safe
+ * only once the wallet shows whether the attempt went out: the SDK records a keyed
+ * payment with the key as its id, so it is asked for by that id. An attempt that went out
+ * without a key cannot be told apart from any other send to the same address, so it is
+ * refused until the sender has checked their history. When it was recorded is what lets
+ * it lapse across app launches.
  */
 export type UnresolvedSend = {
   idempotencyKey?: string
@@ -113,13 +115,38 @@ export const STORED_ATTEMPTS_READ_TIMEOUT_MS = 5000
 export const STORED_ATTEMPTS_WRITE_RETRY_DELAY_MS = 500
 export const STORED_ATTEMPTS_WRITE_RETRY_MAX_DELAY_MS = 30_000
 
+/** How long a send waits for the attempt it is about to make to be stored; past it, it
+ *  goes out all the same, as it would if the write had failed. */
+export const STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS = 2000
+
+/**
+ * The attempt a send stored before it went out. `written`: once it is stored, or once the
+ * send has waited for it long enough. `update`: stores it again with what came to be known
+ * since, for as long as the send is in flight. `end`: takes it back as soon as the send's
+ * outcome needs it no more, before anything else is stored: a send the SDK answered must
+ * leave no trace an app closed right after would take for one lost.
+ */
+export type AttemptWrittenAhead = {
+  written: Promise<void>
+  update: (attempt: (current: LostAttempts) => LostAttempts) => void
+  end: () => void
+}
+
+const NOTHING_WRITTEN_AHEAD: AttemptWrittenAhead = {
+  written: Promise.resolve(),
+  update: () => undefined,
+  end: () => undefined,
+}
+
 /**
  * How a wallet's attempts reach storage. `readSettled`: the read of what an earlier launch
  * left, as long as a send waits for it. `isRead`: whether that read has read them back.
  * `retry`: reads them again if that read failed, as long as a send waits for it, and
  * tries a write waiting to be tried again at once. `keep`: stores the attempts as they are
  * now, after every write before it. `forget`: writes nothing more, as the wallet's
- * deletion asks, and removes again what a write already in flight stores.
+ * deletion asks, and removes again what a write already in flight stores. `writeAhead`:
+ * stores the attempt a send to the destination is about to make with the rest, until
+ * `endInFlight` takes it back.
  */
 type WalletPersistence = {
   readSettled: Promise<void>
@@ -127,6 +154,11 @@ type WalletPersistence = {
   retry: () => Promise<void>
   keep: () => void
   forget: () => void
+  writeAhead: (
+    destination: string,
+    attempt: (current: LostAttempts) => LostAttempts,
+  ) => AttemptWrittenAhead
+  endInFlight: (destination: string) => void
 }
 
 /** Where the read of what an earlier launch left stands. A failed one is read again by
@@ -219,6 +251,12 @@ const noop = () => undefined
  * as the app runs, each time a little later, and at once when a send is asked for: what
  * it does not keep, the next launch does not know. Refusing sends meanwhile would guard
  * nothing more, since this launch's attempts are held in memory until the app closes.
+ *
+ * A send's attempt is stored before the send goes out, and stays stored while it is in
+ * flight: the app can be closed before the SDK answers, and an attempt recorded only once
+ * it has would be gone with the app, leaving the next launch nothing to look for before
+ * paying again. It is stored with the attempts held and never put into them, since those
+ * are what a send settles by its outcome.
  */
 const persistWalletAttempts = (
   walletId: string,
@@ -304,9 +342,19 @@ const persistWalletAttempts = (
     )
   }
 
+  /** The attempt each send in flight is about to make, by destination. */
+  const inFlight = new Map<string, { attempt: (current: LostAttempts) => LostAttempts }>()
+  const toStore = (): Map<string, LostAttempts> => {
+    const stored = new Map(held)
+    inFlight.forEach(({ attempt }, destination) =>
+      stored.set(destination, attempt(held.get(destination) ?? {})),
+    )
+    return stored
+  }
+
   const write = async () => {
     const isSaved = await writeUntilTaken(
-      () => storage.save(walletId, new Map(held)),
+      () => storage.save(walletId, toStore()),
       mayWrite,
     )
     if (isSaved) await removeIfForgotten()
@@ -331,17 +379,52 @@ const persistWalletAttempts = (
   }
 
   let lastWrite: Promise<void> = firstRead
+  /** Settles once that write has stored the attempts, or once nothing may be written. */
+  const keep = (): Promise<void> => {
+    lastWrite = lastWrite.then(write).catch(noop)
+    retryWriteNow()
+    return lastWrite
+  }
+
+  const writeAhead = (
+    destination: string,
+    attempt: (current: LostAttempts) => LostAttempts,
+  ): AttemptWrittenAhead => {
+    const ahead = { attempt }
+    inFlight.set(destination, ahead)
+    const written = withTimeout(
+      keep(),
+      STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS,
+      "Lost attempt write ahead",
+    ).then(noop, noop)
+    /** A send that has finished has nothing in flight to update or take back, and the
+     *  next send to the destination stores its own attempt. */
+    const isStillInFlight = () => inFlight.get(destination) === ahead
+    const update = (next: (current: LostAttempts) => LostAttempts) => {
+      if (!isStillInFlight()) return
+      ahead.attempt = next
+      keep()
+    }
+    const end = () => {
+      if (!isStillInFlight()) return
+      inFlight.delete(destination)
+      keep()
+    }
+    return { written, update, end }
+  }
+
   return {
     readSettled: waitForRead(firstRead),
     isRead: () => storedRead === "read",
     retry,
-    keep: () => {
-      lastWrite = lastWrite.then(write).catch(noop)
-      retryWriteNow()
-    },
+    keep,
     forget: () => {
       isForgotten = true
       retryWriteNow()
+    },
+    writeAhead,
+    endInFlight: (destination) => {
+      if (inFlight.delete(destination)) keep()
     },
   }
 }
@@ -383,6 +466,15 @@ export type LostAttemptsHandle = {
   /** Applied to what the destination holds when it is written, not when it was read. */
   update: (change: (current: LostAttempts) => LostAttempts) => void
   /**
+   * Stores the attempt a send is about to make, applied to what the destination holds,
+   * before the send goes out, so the next launch looks for it should the app close while
+   * it is in flight. Stored only: what is held stays as it is, for the send to settle by
+   * its outcome. Taken back by `end` once its outcome needs it no more, or at the latest
+   * once the send's turn (`oneAtATime`) ends, by when whatever it leaves to look for is
+   * held, and stored from there.
+   */
+  writeAhead: (attempt: (current: LostAttempts) => LostAttempts) => AttemptWrittenAhead
+  /**
    * Runs a send once every earlier send to the destination has finished, however it
    * finished. One at a time, each send reads what the one before it left behind and
    * settles only what it made itself: two in flight at once could each act on the
@@ -407,7 +499,8 @@ export const lostAttemptsFor = (destination: string): LostAttemptsHandle => {
       inFlight.get(key) ??
       persistenceOf.get(byDestination)?.readSettled ??
       Promise.resolve()
-    const result = turn.then(send)
+    const endInFlight = () => persistenceOf.get(byDestination)?.endInFlight(key)
+    const result = turn.then(send).finally(endInFlight)
     const done = result.then(
       () => undefined,
       () => undefined,
@@ -430,6 +523,8 @@ export const lostAttemptsFor = (destination: string): LostAttemptsHandle => {
       else byDestination.delete(key)
       persistenceOf.get(byDestination)?.keep()
     },
+    writeAhead: (attempt) =>
+      persistenceOf.get(byDestination)?.writeAhead(key, attempt) ?? NOTHING_WRITTEN_AHEAD,
     oneAtATime: (send, sameSendKey) => {
       if (sameSendKey === undefined) return queueBehindEarlierSends(send)
 
