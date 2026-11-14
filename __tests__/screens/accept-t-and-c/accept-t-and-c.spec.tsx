@@ -11,6 +11,12 @@ import { BLOCKED_COUNTRIES_FAQ_LINK } from "@app/config"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c/accept-t-and-c"
 import { MigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
+import {
+  clearPendingRestore,
+  holdPendingRestore,
+  readPendingRestore,
+} from "@app/screens/self-custodial/onboarding/restore/pending-restore"
+import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 import { AccountMode } from "@app/types/account"
 import { StorageFailure } from "@app/utils/storage/storage-failure"
 
@@ -21,13 +27,14 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 const mockNavigate = jest.fn()
+const mockGoBack = jest.fn()
 let mockFlow = "migration"
 let mockMode: string | undefined
 let mockHasRouteParams = true
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
   useRoute: () => ({
     params: mockHasRouteParams ? { flow: mockFlow, mode: mockMode } : undefined,
   }),
@@ -84,6 +91,16 @@ jest.mock("@app/screens/get-started-screen/use-create-device-account", () => ({
   }),
 }))
 
+const mockRestore = jest.fn()
+let mockRestoreStatus = "idle"
+jest.mock(
+  "@app/screens/self-custodial/onboarding/restore/hooks/use-restore-wallet",
+  () => ({
+    RestoreWalletStatus: { Idle: "idle", Restoring: "restoring", Error: "error" },
+    useRestoreWallet: () => ({ restore: mockRestore, status: mockRestoreStatus }),
+  }),
+)
+
 const mockOpenInAppBrowser = jest.fn()
 jest.mock("react-native-inappbrowser-reborn", () => ({
   __esModule: true,
@@ -99,6 +116,9 @@ describe("AcceptTermsAndConditionsScreen", () => {
     mockAppCheckToken = undefined
     mockHasRouteParams = true
     mockCreateDeviceAccountAndLogin.mockResolvedValue(undefined)
+    mockRestore.mockResolvedValue(undefined)
+    mockRestoreStatus = "idle"
+    clearPendingRestore()
     loadLocale("en")
   })
 
@@ -344,6 +364,94 @@ describe("AcceptTermsAndConditionsScreen", () => {
         mode: AccountMode.Enhanced,
       }),
     )
+  })
+
+  /** The terms are the restore's last step, as they are creation's: Accept runs the
+   *  restore the phrase screen or the cloud backup handed over. */
+  describe("before a self-custodial restore", () => {
+    const renderRestoreTerms = async () => {
+      mockFlow = "selfCustodialRestore"
+      const view = render(
+        <ContextForScreen>
+          <AcceptTermsAndConditionsScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+      return view
+    }
+
+    const accept = async () => {
+      fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+      await flushEffects()
+    }
+
+    it("restores the held phrase on accept", async () => {
+      holdPendingRestore({ mnemonic: "word1 word2 word3", method: BackupMethod.Cloud })
+      await renderRestoreTerms()
+
+      await accept()
+
+      expect(mockRestore).toHaveBeenCalledTimes(1)
+      expect(mockRestore).toHaveBeenCalledWith("word1 word2 word3", BackupMethod.Cloud)
+      expect(mockSaveCheckpoint).not.toHaveBeenCalled()
+    })
+
+    it("does not restore until Accept is pressed", async () => {
+      holdPendingRestore({ mnemonic: "word1 word2 word3", method: BackupMethod.Manual })
+      await renderRestoreTerms()
+
+      expect(mockRestore).not.toHaveBeenCalled()
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    it("stays on the terms when the restore fails, so Accept can retry", async () => {
+      holdPendingRestore({ mnemonic: "word1 word2 word3", method: BackupMethod.Manual })
+      mockRestore.mockRejectedValueOnce(new Error("restore failed"))
+      await renderRestoreTerms()
+
+      await accept()
+      await accept()
+
+      expect(mockRestore).toHaveBeenCalledTimes(2)
+      expect(mockGoBack).not.toHaveBeenCalled()
+      expect(readPendingRestore()).not.toBeNull()
+    })
+
+    it("goes back to the phrase when none is held", async () => {
+      await renderRestoreTerms()
+
+      await accept()
+
+      expect(mockRestore).not.toHaveBeenCalled()
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+    })
+
+    it("shows Accept busy while the restore runs", async () => {
+      mockRestoreStatus = "restoring"
+      await renderRestoreTerms()
+
+      expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled).toBe(true)
+    })
+
+    it("keeps a newer request's phrase when an older terms screen leaves late", async () => {
+      holdPendingRestore({ mnemonic: "word1 word2 word3", method: BackupMethod.Manual })
+      const { unmount } = await renderRestoreTerms()
+      const newer = { mnemonic: "word4 word5 word6", method: BackupMethod.Manual }
+      holdPendingRestore(newer)
+
+      unmount()
+
+      expect(readPendingRestore()).toBe(newer)
+    })
+
+    it("drops the held phrase once the terms leave the stack", async () => {
+      holdPendingRestore({ mnemonic: "word1 word2 word3", method: BackupMethod.Manual })
+      const { unmount } = await renderRestoreTerms()
+
+      unmount()
+
+      expect(readPendingRestore()).toBeNull()
+    })
   })
 
   describe("outside the migration", () => {

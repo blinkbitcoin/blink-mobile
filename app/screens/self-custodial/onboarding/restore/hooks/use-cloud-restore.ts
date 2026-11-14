@@ -69,7 +69,7 @@ export const useCloudRestore = () => {
     resolveErrorMessage,
     loading: cloudLoading,
   } = usePlatformCloudBackup()
-  const { restore, status: restoreStatus } = useRestoreWallet()
+  const { requestRestore, status: restoreStatus } = useRestoreWallet()
 
   const [step, setStep] = useState<CloudStep>(CloudStep.Loading)
   const [entries, setEntries] = useState<ReadonlyArray<CloudBackupEntry>>([])
@@ -100,17 +100,35 @@ export const useCloudRestore = () => {
     [resolveErrorMessage, LL],
   )
 
+  /** The terms open over this screen, so once the phrase is handed to them it offers the
+   *  backups it found: backing out of the terms lands on a pick, not on a spinner or a
+   *  password form with nothing left to wait for. A pick that turns out encrypted asks
+   *  for its password afresh. */
+  const handOffToTerms = useCallback(
+    async (mnemonic: string) => {
+      await requestRestore(mnemonic, BackupMethod.Cloud)
+      setBackupContent(null)
+      setPassword("")
+      setPasswordError(null)
+      setStep(CloudStep.Picker)
+    },
+    [requestRestore],
+  )
+
+  /** `offered` is what the screen falls back to after the handoff, so it is kept before
+   *  the password step too: a password-protected backup goes to the terms all the same. */
   const proceedWithBackup = useCallback(
-    async (content: string) => {
+    async (content: string, offered: ReadonlyArray<CloudBackupEntry>) => {
+      setEntries(offered)
       if (isEncryptedBackup(content)) {
         setBackupContent(content)
         setStep(CloudStep.Password)
         return
       }
       const { mnemonic } = parseBackupPayload(content)
-      await restore(mnemonic, BackupMethod.Cloud)
+      await handOffToTerms(mnemonic)
     },
-    [restore],
+    [handOffToTerms],
   )
 
   const handlePick = useCallback(
@@ -133,13 +151,13 @@ export const useCloudRestore = () => {
           return
         }
         rememberAccessToken(result.accessToken)
-        await proceedWithBackup(result.content)
+        await proceedWithBackup(result.content, entries)
       } catch (err) {
         reportError(RestoreErrorContext.CloudDownload, err)
         setStep(CloudStep.Error)
       }
     },
-    [downloadById, proceedWithBackup, showFailure, rememberAccessToken],
+    [downloadById, proceedWithBackup, showFailure, rememberAccessToken, entries],
   )
 
   const loadCloudBackups = useCallback(async () => {
@@ -172,11 +190,12 @@ export const useCloudRestore = () => {
           return
         }
         rememberAccessToken(result.accessToken)
-        if (!parseBackupMetadata(result.content)) {
+        const metadata = parseBackupMetadata(result.content)
+        if (!metadata) {
           setStep(CloudStep.NotFound)
           return
         }
-        await proceedWithBackup(result.content)
+        await proceedWithBackup(result.content, [{ fileId: files[0].id, metadata }])
         return
       }
 
@@ -222,7 +241,7 @@ export const useCloudRestore = () => {
       }
 
       if (downloaded.length === 1) {
-        await proceedWithBackup(downloaded[0].content)
+        await proceedWithBackup(downloaded[0].content, [downloaded[0].entry])
         return
       }
 
@@ -267,8 +286,8 @@ export const useCloudRestore = () => {
       return
     }
 
-    await restore(mnemonic, BackupMethod.Cloud).catch(() => undefined)
-  }, [backupContent, password, restore, LL])
+    await handOffToTerms(mnemonic).catch(() => undefined)
+  }, [backupContent, password, handOffToTerms, LL])
 
   const isLoading =
     step === CloudStep.Loading ||
