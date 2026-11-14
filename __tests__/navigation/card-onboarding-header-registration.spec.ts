@@ -30,6 +30,7 @@ describe("card onboarding header controls in root-navigator", () => {
       "cardOnboardingWelcomeScreen",
       "cardOnboardingPersonalInfoScreen",
       "cardOnboardingPreapprovedScreen",
+      "cardOnboardingDeclinedScreen",
     ]
 
     CLOSE_ONLY_ROUTES.forEach((route) => {
@@ -52,6 +53,14 @@ describe("card onboarding header controls in root-navigator", () => {
       expect(options).not.toContain("noHeaderBack")
       expect(options).toContain("...headerCloseControlOptions()")
     })
+  })
+
+  /** The design leaves the wait without a way back or out: it ends on its own. */
+  it("leaves the processing wait without back and close buttons", () => {
+    const options = registration("cardOnboardingProcessingScreen")
+
+    expect(options).toContain("...noHeaderBack")
+    expect(options).not.toContain("headerCloseControlOptions")
   })
 
   /** The design gives this step a back arrow and the membership name, and no close. */

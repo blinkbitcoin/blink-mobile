@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "المهنة",
-            "placeholder": "اختر مهنتك"
+            "placeholder": "اختر"
           },
           "annualSalaryRange": {
             "label": "الراتب السنوي",
-            "placeholder": "اختر نطاق راتبك"
+            "placeholder": "اختر الراتب"
           },
           "accountPurpose": {
             "label": "غرض الحساب",
@@ -3823,7 +3823,6 @@
             "placeholder": "اختر نطاق إنفاقك"
           }
         },
-        "buttonText": "تقديم الطلب",
         "select": "اختر"
       },
       "Acknowledgement": {
@@ -3839,18 +3838,21 @@
           "and": "، و",
           "cardTermsLinkText": "شروط بطاقة Blink"
         },
-        "certifyAccuracy": "أُقر بأن المعلومات التي قدمتها دقيقة وأنني سألتزم بجميع القواعد والمتطلبات المتعلقة ببطاقة Blink Visa الخاصة بي",
-        "acknowledgeSolicitation": "أُقر بأن التقدم بطلب للحصول على بطاقة Blink Visa لا يشكل التماسًا غير مصرح به"
+        "certifyAccuracy": "أُقر بأن المعلومات التي قدمتها دقيقة وأنني سألتزم بجميع القواعد والمتطلبات المتعلقة ببطاقة Blink الخاصة بي",
+        "acknowledgeSolicitation": "أُقر بأن التقدم بطلب للحصول على بطاقة Blink لا يشكل التماسًا غير مصرح به"
       },
       "CardPreapproved": {
         "title": "بطاقة Blink الخاصة بك جاهزة!",
         "subtitle": "يمكنك الآن تفعيل بطاقتك والبدء في استخدامها",
         "buttonText": "إغلاق"
       },
+      "CardDeclined": {
+        "title": "لم نتمكن من الموافقة على طلب بطاقتك",
+        "subtitle": "سيتواصل معك مدير حسابك."
+      },
       "CardProcessing": {
         "title": "جارٍ معالجة طلبك",
-        "subtitle": "سنُعلمك بمجرد أن نكون جاهزين",
-        "buttonText": "إغلاق"
+        "subtitle": "قد يستغرق هذا ما يصل إلى دقيقة"
       }
     }
   },

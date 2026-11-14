@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Llamk'ay",
-            "placeholder": "Llamk'ayniykita akllay"
+            "placeholder": "Akllay"
           },
           "annualSalaryRange": {
             "label": "Watantin qullqi",
-            "placeholder": "Qullqi rakinniykita akllay"
+            "placeholder": "Qullqiykita akllay"
           },
           "accountPurpose": {
             "label": "Akawunta munay",
@@ -3823,7 +3823,6 @@
             "placeholder": "Gastay rakinniykita akllay"
           }
         },
-        "buttonText": "Mañakuyta apachiy",
         "select": "akllay"
       },
       "Acknowledgement": {
@@ -3839,18 +3838,21 @@
           "and": ", chaymanta",
           "cardTermsLinkText": "Blink tarjeta kamachikuykuna"
         },
-        "certifyAccuracy": "Willakuni chay willayniykuna cheqaq kasqanta, Blink Visa tarjetaywan tupaq llapan kamachikuykunata hunt'anaytawan",
-        "acknowledgeSolicitation": "Riqsini Blink Visa tarjetata mañakuyqa mana saqisqa mañakuychu kasqanta"
+        "certifyAccuracy": "Willakuni chay willayniykuna cheqaq kasqanta, Blink tarjetaywan tupaq llapan kamachikuykunata hunt'anaytawan",
+        "acknowledgeSolicitation": "Riqsini Blink tarjetata mañakuyqa mana saqisqa mañakuychu kasqanta"
       },
       "CardPreapproved": {
         "title": "Blink tarjetaykiqa listañam!",
         "subtitle": "Kunanqa tarjetaykita activayta atinkiñam, hinaspa llamk'achiyta qallariy",
         "buttonText": "Wisq'ay"
       },
+      "CardDeclined": {
+        "title": "Manam tarjeta mañakuyniykita chaskiyta atirqaykuchu",
+        "subtitle": "Cuentaykita kamachiqmi rimapayasunki."
+      },
       "CardProcessing": {
         "title": "Mañakuyniykita rurachkanku",
-        "subtitle": "Wakichasqa kaptiyku willasqaykiku",
-        "buttonText": "Wisq'ay"
+        "subtitle": "Kayqa huk minutokama unanmanmi"
       }
     }
   },

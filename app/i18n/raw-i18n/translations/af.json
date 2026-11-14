@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Beroep",
-            "placeholder": "Kies jou beroep"
+            "placeholder": "Kies"
           },
           "annualSalaryRange": {
             "label": "Jaarlikse salaris",
-            "placeholder": "Kies jou salarisreeks"
+            "placeholder": "Kies salaris"
           },
           "accountPurpose": {
             "label": "Rekeningdoel",
@@ -3823,7 +3823,6 @@
             "placeholder": "Kies jou bestedingsreeks"
           }
         },
-        "buttonText": "Dien aansoek in",
         "select": "kies"
       },
       "Acknowledgement": {
@@ -3839,18 +3838,21 @@
           "and": ", en",
           "cardTermsLinkText": "Blink-kaartvoorwaardes"
         },
-        "certifyAccuracy": "Ek bevestig dat die inligting wat ek verskaf het akkuraat is en dat ek alle reëls en vereistes met betrekking tot my Blink Visa-kaart sal nakom",
-        "acknowledgeSolicitation": "Ek erken dat die aansoek om die Blink Visa-kaart nie ongemagtigde werwing uitmaak nie"
+        "certifyAccuracy": "Ek bevestig dat die inligting wat ek verskaf het akkuraat is en dat ek alle reëls en vereistes met betrekking tot my Blink-kaart sal nakom",
+        "acknowledgeSolicitation": "Ek erken dat die aansoek om die Blink-kaart nie ongemagtigde werwing uitmaak nie"
       },
       "CardPreapproved": {
         "title": "Jou Blink-kaart is gereed!",
         "subtitle": "Jy kan nou jou kaart aktiveer en dit begin gebruik",
         "buttonText": "Sluit"
       },
+      "CardDeclined": {
+        "title": "Ons kon nie jou kaartaansoek goedkeur nie",
+        "subtitle": "Jou rekeningbestuurder sal in verbinding tree."
+      },
       "CardProcessing": {
         "title": "Verwerk jou aansoek",
-        "subtitle": "Ons sal jou in kennis stel sodra ons gereed is",
-        "buttonText": "Sluit"
+        "subtitle": "Dit kan tot 'n minuut duur"
       }
     }
   },

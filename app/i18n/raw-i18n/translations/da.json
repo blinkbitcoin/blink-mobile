@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Beskæftigelse",
-            "placeholder": "Vælg din beskæftigelse"
+            "placeholder": "Vælg"
           },
           "annualSalaryRange": {
             "label": "Årlig løn",
-            "placeholder": "Vælg dit løninterval"
+            "placeholder": "Vælg løn"
           },
           "accountPurpose": {
             "label": "Kontoformål",
@@ -3823,7 +3823,6 @@
             "placeholder": "Vælg dit forbrugsinterval"
           }
         },
-        "buttonText": "Indsend ansøgning",
         "select": "vælg"
       },
       "Acknowledgement": {
@@ -3839,18 +3838,21 @@
           "and": ", og",
           "cardTermsLinkText": "Blink-kortvilkår"
         },
-        "certifyAccuracy": "Jeg bekræfter, at de oplysninger, jeg har givet, er korrekte, og at jeg vil overholde alle regler og krav vedrørende mit Blink Visa-kort",
-        "acknowledgeSolicitation": "Jeg anerkender, at ansøgning om Blink Visa-kortet ikke udgør uautoriseret henvendelse"
+        "certifyAccuracy": "Jeg bekræfter, at de oplysninger, jeg har givet, er korrekte, og at jeg vil overholde alle regler og krav vedrørende mit Blink-kort",
+        "acknowledgeSolicitation": "Jeg anerkender, at ansøgning om Blink-kortet ikke udgør uautoriseret henvendelse"
       },
       "CardPreapproved": {
         "title": "Dit Blink-kort er klar!",
         "subtitle": "Du kan nu aktivere dit kort og begynde at bruge det",
         "buttonText": "Luk"
       },
+      "CardDeclined": {
+        "title": "Vi kunne ikke godkende din kortansøgning",
+        "subtitle": "Din kontoansvarlige kontakter dig."
+      },
       "CardProcessing": {
         "title": "Behandler din ansøgning",
-        "subtitle": "Vi giver dig besked, så snart vi er klar",
-        "buttonText": "Luk"
+        "subtitle": "Det kan tage op til et minut"
       }
     }
   },

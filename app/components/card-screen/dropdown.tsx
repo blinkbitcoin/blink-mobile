@@ -9,6 +9,8 @@ import { makeStyles, useTheme, Text } from "@rn-vui/themed"
 import Icon from "react-native-vector-icons/Ionicons"
 import ReactNativeModal from "react-native-modal"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+
 export interface DropdownOption {
   value: string
   label: string
@@ -87,7 +89,7 @@ export const DropdownComponent: React.FC<DropdownProps> = ({
             </View>
 
             <View style={styles.iconContainer}>
-              <Icon name="chevron-down" size={24} color={colors.accent} />
+              <GaloyIcon name="caret-down" size={16} color={colors.accent} />
             </View>
           </View>
         </View>
@@ -141,9 +143,10 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     backgroundColor: colors.surfaceInteractive,
     alignItems: "center",
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    minHeight: 60,
+    paddingLeft: 14,
+    paddingRight: 10,
+    paddingVertical: 5,
+    minHeight: 50,
     borderRadius: 8,
   },
   contentContainer: {
@@ -155,7 +158,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginTop: 2,
   },
   placeholderText: {
-    color: colors.textDisabled,
+    color: colors.textMuted,
   },
   iconContainer: {
     marginLeft: 12,

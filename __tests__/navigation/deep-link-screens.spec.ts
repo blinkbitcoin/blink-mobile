@@ -62,6 +62,23 @@ describe("deep-linkable routes", () => {
   })
 
   /**
+   * The terms step sends the additional data it is handed with the card application,
+   * and the wait follows the application it is handed. A crafted link would fill in the
+   * application's answers, or open the wait with nothing to follow. Both are reached
+   * from the step before them alone.
+   */
+  it("links to no card application step that acts on its params", () => {
+    expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingAcknowledgementScreen")
+    expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingProcessingScreen")
+  })
+
+  it("still links to the card onboarding steps that need nothing handed to them", () => {
+    expect(DEEP_LINK_SCREENS).toHaveProperty("cardOnboardingPersonalInfoScreen")
+    expect(DEEP_LINK_SCREENS).toHaveProperty("cardOnboardingPreapprovedScreen")
+    expect(DEEP_LINK_SCREENS).toHaveProperty("cardOnboardingDeclinedScreen")
+  })
+
+  /**
    * The code screen and the backup take the setup key as a param. A link landing on
    * either would show a key the registration never issued, and offer to save it as the
    * account's. The registration is reached from its own start alone.

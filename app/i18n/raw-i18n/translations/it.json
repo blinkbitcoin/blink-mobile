@@ -3747,11 +3747,11 @@
                 "fields": {
                     "occupation": {
                         "label": "Occupazione",
-                        "placeholder": "Seleziona la tua occupazione"
+                        "placeholder": "Seleziona"
                     },
                     "annualSalaryRange": {
                         "label": "Stipendio annuale",
-                        "placeholder": "Seleziona la tua fascia di stipendio"
+                        "placeholder": "Seleziona lo stipendio"
                     },
                     "accountPurpose": {
                         "label": "Scopo dell'account",
@@ -3762,7 +3762,6 @@
                         "placeholder": "Seleziona la tua fascia di spesa"
                     }
                 },
-                "buttonText": "Invia richiesta",
                 "select": "seleziona"
             },
             "Acknowledgement": {
@@ -3778,18 +3777,21 @@
                     "and": ", e i",
                     "cardTermsLinkText": "Termini della carta Blink"
                 },
-                "certifyAccuracy": "Certifico che le informazioni che ho fornito sono accurate e che rispetterò tutte le regole e i requisiti relativi alla mia carta Blink Visa",
-                "acknowledgeSolicitation": "Riconosco che richiedere la carta Blink Visa non costituisce una sollecitazione non autorizzata"
+                "certifyAccuracy": "Certifico che le informazioni che ho fornito sono accurate e che rispetterò tutte le regole e i requisiti relativi alla mia carta Blink",
+                "acknowledgeSolicitation": "Riconosco che richiedere la carta Blink non costituisce una sollecitazione non autorizzata"
             },
             "CardPreapproved": {
                 "title": "La tua Blink Card è pronta!",
                 "subtitle": "Ora puoi attivare la tua carta e iniziare a usarla",
                 "buttonText": "Chiudi"
             },
+            "CardDeclined": {
+                "title": "Non siamo riusciti ad approvare la tua richiesta di carta",
+                "subtitle": "Il tuo account manager ti contatterà."
+            },
             "CardProcessing": {
                 "title": "Elaborazione della tua richiesta",
-                "subtitle": "Ti avviseremo non appena saremo pronti",
-                "buttonText": "Chiudi"
+                "subtitle": "Potrebbe volerci fino a un minuto"
             },
             "WelcomeInvest": {
                 "welcomeMessage": {

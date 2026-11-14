@@ -1,5 +1,7 @@
 import * as React from "react"
 import { View } from "react-native"
+import { useFocusEffect, useIsFocused, useNavigation } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Divider, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
@@ -10,7 +12,10 @@ import { StepLayout } from "@app/components/step-layout"
 import { KycFlowType } from "@app/graphql/generated"
 import { useKycFlow } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { staticSurface } from "@app/rne-theme/surfaces"
+
+import { useCardKycStatus } from "./use-card-kyc-status"
 
 type Requirement = {
   icon: IconNamesType
@@ -26,11 +31,31 @@ export const CardVerifyIdentityScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const isFocused = useIsFocused()
 
-  const { startKyc } = useKycFlow({
+  const { startKyc, loading: isStartingKyc } = useKycFlow({
     type: KycFlowType.Card,
     headerTitle: LL.CardFlow.Onboarding.kycHeaderTitle(),
   })
+  const { readKycStatus, isKycSubmitted, isCheckingKyc } = useCardKycStatus()
+
+  /** The verification web flow tells the app nothing when it ends, so the step reads the
+   *  issuer's review whenever the user is back on it: on the way back from the web flow,
+   *  or on a later visit after the app was closed past it. */
+  useFocusEffect(
+    React.useCallback(() => {
+      readKycStatus()
+    }, [readKycStatus]),
+  )
+
+  /** Replaced rather than pushed: a submitted verification is never started again. */
+  React.useEffect(() => {
+    if (!isFocused || !isKycSubmitted) return
+    navigation.replace("cardOnboardingPersonalInfoScreen")
+  }, [isFocused, isKycSubmitted, navigation])
+
+  const isContinueLoading = isCheckingKyc || isStartingKyc
 
   const requirements: Requirement[] = [
     {
@@ -61,6 +86,7 @@ export const CardVerifyIdentityScreen: React.FC = () => {
         <GaloyPrimaryButton
           title={LL.CardFlow.Onboarding.CardVerifyIdentity.buttonText()}
           onPress={handleContinue}
+          loading={isContinueLoading}
         />
       }
     >

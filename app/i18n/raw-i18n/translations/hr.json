@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Zanimanje",
-            "placeholder": "Odaberite svoje zanimanje"
+            "placeholder": "Odaberite"
           },
           "annualSalaryRange": {
             "label": "Godišnja plaća",
-            "placeholder": "Odaberite svoj raspon plaće"
+            "placeholder": "Odaberite plaću"
           },
           "accountPurpose": {
             "label": "Svrha računa",
@@ -3823,7 +3823,6 @@
             "placeholder": "Odaberite svoj raspon potrošnje"
           }
         },
-        "buttonText": "Pošalji prijavu",
         "select": "odaberi"
       },
       "Acknowledgement": {
@@ -3839,18 +3838,21 @@
           "and": ", i",
           "cardTermsLinkText": "Uvjete kartice Blink"
         },
-        "certifyAccuracy": "Potvrđujem da su podaci koje sam dao točni i da ću se pridržavati svih pravila i zahtjeva povezanih s mojom karticom Blink Visa",
-        "acknowledgeSolicitation": "Potvrđujem da podnošenje zahtjeva za karticu Blink Visa ne predstavlja neovlašteno oglašavanje"
+        "certifyAccuracy": "Potvrđujem da su podaci koje sam dao točni i da ću se pridržavati svih pravila i zahtjeva povezanih s mojom karticom Blink",
+        "acknowledgeSolicitation": "Potvrđujem da podnošenje zahtjeva za karticu Blink ne predstavlja neovlašteno oglašavanje"
       },
       "CardPreapproved": {
         "title": "Vaša Blink kartica je spremna!",
         "subtitle": "Sada možete aktivirati svoju karticu i početi je koristiti",
         "buttonText": "Zatvori"
       },
+      "CardDeclined": {
+        "title": "Nismo mogli odobriti vaš zahtjev za karticu",
+        "subtitle": "Vaš upravitelj računa javit će vam se."
+      },
       "CardProcessing": {
         "title": "Obrađujemo vašu prijavu",
-        "subtitle": "Obavijestit ćemo te čim budemo spremni",
-        "buttonText": "Zatvori"
+        "subtitle": "Ovo može potrajati do jedne minute"
       }
     }
   },

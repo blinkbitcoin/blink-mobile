@@ -55,9 +55,8 @@ export const DEEP_LINK_SCREENS: NonNullable<
   cardOnboardingSubscribeScreen: "card/onboarding/subscribe",
   cardOnboardingLoadingScreen: "card/onboarding/loading",
   cardOnboardingPersonalInfoScreen: "card/onboarding/personal-info",
-  cardOnboardingAcknowledgementScreen: "card/onboarding/acknowledgement",
-  cardOnboardingProcessingScreen: "card/onboarding/processing",
   cardOnboardingPreapprovedScreen: "card/onboarding/preapproved",
+  cardOnboardingDeclinedScreen: "card/onboarding/declined",
   cardOnboardingApprovedScreen: "card/onboarding/approved",
   transactionDetail: {
     path: "transaction/:txid",

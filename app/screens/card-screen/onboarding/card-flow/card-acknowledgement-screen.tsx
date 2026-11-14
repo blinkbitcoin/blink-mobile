@@ -1,17 +1,25 @@
 import * as React from "react"
-import { ScrollView, View } from "react-native"
-import { useNavigation } from "@react-navigation/native"
+import { View } from "react-native"
+import {
+  CommonActions,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { CheckboxRow } from "@app/components/card-screen/checkbox-row"
 import { IconHero } from "@app/components/icon-hero"
-import { Screen } from "@app/components/screen"
+import { StepLayout } from "@app/components/step-layout"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { openExternalUrl } from "@app/utils/external"
+import { toastShow } from "@app/utils/toast"
+
+import { useCardApplicationSubmit } from "./use-card-application-submit"
 
 export const CardAcknowledgementScreen: React.FC = () => {
   const styles = useStyles()
@@ -20,6 +28,9 @@ export const CardAcknowledgementScreen: React.FC = () => {
   } = useTheme()
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { params: answers } =
+    useRoute<RouteProp<RootStackParamList, "cardOnboardingAcknowledgementScreen">>()
+  const { submitApplication, isSubmitting } = useCardApplicationSubmit()
 
   const { cardESignConsentUrl, cardIssuerPrivacyPolicyUrl, cardCardholderAgreementUrl } =
     useRemoteConfig()
@@ -38,15 +49,51 @@ export const CardAcknowledgementScreen: React.FC = () => {
   ].every(Boolean)
   const isAcceptDisabled = !areAllTermsAccepted
 
+  const isAcceptingRef = React.useRef(false)
+
+  /** The application is sent, so the onboarding steps leave the stack: going back from
+   *  the wait lands on Home rather than on a step that would send it again. */
+  const sendApplication = async () => {
+    const applicationId = await submitApplication(answers)
+    if (!applicationId) {
+      toastShow({ message: LL.errors.unexpectedError(), LL })
+      return
+    }
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 1,
+        routes: [
+          { name: "Primary" },
+          { name: "cardOnboardingProcessingScreen", params: { applicationId } },
+        ],
+      }),
+    )
+  }
+
+  /** A second tap in the same frame lands before the spinner shows. Sent again, the
+   *  application would be refused as a duplicate and read as a failure. */
   const handleAccept = () => {
-    navigation.navigate("cardOnboardingProcessingScreen")
+    if (isAcceptingRef.current) return
+    isAcceptingRef.current = true
+    sendApplication().finally(() => {
+      isAcceptingRef.current = false
+    })
   }
 
   const { Acknowledgement: acknowledgementLL } = LL.CardFlow.Onboarding
 
   return (
-    <Screen>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+    <StepLayout
+      footer={
+        <GaloyPrimaryButton
+          title={acknowledgementLL.acceptButton()}
+          onPress={handleAccept}
+          disabled={isAcceptDisabled}
+          loading={isSubmitting}
+        />
+      }
+    >
+      <View style={styles.content}>
         <IconHero
           icon="document-outline"
           iconColor={colors.accent}
@@ -109,43 +156,29 @@ export const CardAcknowledgementScreen: React.FC = () => {
             </Text>
           </CheckboxRow>
         </View>
-      </ScrollView>
-
-      <View style={styles.buttonsContainer}>
-        <GaloyPrimaryButton
-          title={acknowledgementLL.acceptButton()}
-          onPress={handleAccept}
-          disabled={isAcceptDisabled}
-        />
       </View>
-    </Screen>
+    </StepLayout>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
+  /** On top of the hero's own 20, so it sits 30 below the header like the other card steps. */
+  content: {
+    paddingTop: 10,
     paddingHorizontal: 20,
-    paddingBottom: 20,
   },
+  /** The design's hero keeps an empty subtitle line and its bottom padding under the
+   *  title, so the first box starts 66 below it. */
   checkboxesContainer: {
-    marginTop: 40,
-    gap: 18,
+    marginTop: 66,
+    gap: 20,
   },
   agreementText: {
     color: colors.textOnBackground,
-    lineHeight: 18,
+    lineHeight: 16,
   },
   link: {
     color: colors.accent,
     fontWeight: "700",
-  },
-  buttonsContainer: {
-    justifyContent: "flex-end",
-    marginBottom: 14,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
   },
 }))

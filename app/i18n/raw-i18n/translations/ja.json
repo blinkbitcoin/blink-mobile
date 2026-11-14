@@ -3747,11 +3747,11 @@
                 "fields": {
                     "occupation": {
                         "label": "職業",
-                        "placeholder": "職業を選択してください"
+                        "placeholder": "選択してください"
                     },
                     "annualSalaryRange": {
                         "label": "年収",
-                        "placeholder": "年収の範囲を選択してください"
+                        "placeholder": "年収を選択してください"
                     },
                     "accountPurpose": {
                         "label": "アカウントの目的",
@@ -3762,7 +3762,6 @@
                         "placeholder": "支出の範囲を選択してください"
                     }
                 },
-                "buttonText": "申請を提出",
                 "select": "選択"
             },
             "Acknowledgement": {
@@ -3778,18 +3777,21 @@
                     "and": "、および",
                     "cardTermsLinkText": "Blink カードの規約"
                 },
-                "certifyAccuracy": "提供した情報が正確であること、および Blink Visa カードに関するすべての規則と要件を遵守することを証明します",
-                "acknowledgeSolicitation": "Blink Visa カードの申し込みが不正な勧誘に該当しないことを認めます"
+                "certifyAccuracy": "提供した情報が正確であること、および Blink カードに関するすべての規則と要件を遵守することを証明します",
+                "acknowledgeSolicitation": "Blink カードの申し込みが不正な勧誘に該当しないことを認めます"
             },
             "CardPreapproved": {
                 "title": "Blink カードの準備ができました！",
                 "subtitle": "カードを有効化して、すぐにご利用いただけます",
                 "buttonText": "閉じる"
             },
+            "CardDeclined": {
+                "title": "カードのお申し込みを承認できませんでした",
+                "subtitle": "担当のアカウントマネージャーからご連絡いたします。"
+            },
             "CardProcessing": {
                 "title": "申請を処理中",
-                "subtitle": "準備ができ次第、お知らせします",
-                "buttonText": "閉じる"
+                "subtitle": "最大1分ほどかかる場合があります"
             },
             "WelcomeInvest": {
                 "welcomeMessage": {

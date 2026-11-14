@@ -90,6 +90,7 @@ import BlinkIcon from "@app/assets/icons-redesign/blink-icon.svg"
 import BtcBook from "@app/assets/icons-redesign/btc-book.svg"
 import Btcpay from "@app/assets/icons-redesign/btcpay.svg"
 import CloseCrossWithBackground from "@app/assets/icons-redesign/close-cross-with-background.svg"
+import Declined from "@app/assets/icons-redesign/declined.svg"
 import GooglePay from "@app/assets/icons/google-pay.svg"
 import LightningAddress from "@app/assets/icons-redesign/lightning-address.svg"
 import PaymentError from "@app/assets/icons-redesign/payment-error.svg"
@@ -231,6 +232,7 @@ const customSvgMap = {
   "blink-icon": BlinkIcon,
   "btc-book": BtcBook,
   "close-cross-with-background": CloseCrossWithBackground,
+  "declined": Declined,
   "google-pay": GooglePay,
   "lightning-address": LightningAddress,
   "payment-error": PaymentError,

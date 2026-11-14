@@ -39,9 +39,7 @@ export const CardSubscriptionScreen: React.FC = () => {
   const [isFeeScheduleAgreed, setIsFeeScheduleAgreed] = React.useState(false)
   const [isAgreed, setIsAgreed] = React.useState(false)
 
-  /** Accept starts the card KYC, so the terms, the privacy policy and the cardholder
-   *  agreement are accepted here first: no later step may be the first to ask for them. */
-  const isSubscribeReady = isNoticeAccepted && isFeeScheduleAgreed && isAgreed
+  const isSubscribeReady = isNoticeAccepted && isFeeScheduleAgreed
   const isAcceptDisabled = isSubscribeVariant ? !isSubscribeReady : !isAgreed
 
   /** The free offer has nothing to subscribe to yet, so its header carries no title. Set
@@ -106,34 +104,36 @@ export const CardSubscriptionScreen: React.FC = () => {
           </>
         )}
 
-        <CheckboxRow checked={isAgreed} onPress={() => setIsAgreed(!isAgreed)}>
-          <Text type="p3" style={styles.agreementText}>
-            {LL.CardFlow.Onboarding.CardSubscription.agreement.text()}{" "}
-            <Text
-              bold
-              color={colors.accent}
-              onPress={() => openExternalUrl(cardTermsAndConditionsUrl)}
-            >
-              {LL.CardFlow.Onboarding.CardSubscription.agreement.termsOfService()}
+        {!isSubscribeVariant && (
+          <CheckboxRow checked={isAgreed} onPress={() => setIsAgreed(!isAgreed)}>
+            <Text type="p3" style={styles.agreementText}>
+              {LL.CardFlow.Onboarding.CardSubscription.agreement.text()}{" "}
+              <Text
+                bold
+                color={colors.accent}
+                onPress={() => openExternalUrl(cardTermsAndConditionsUrl)}
+              >
+                {LL.CardFlow.Onboarding.CardSubscription.agreement.termsOfService()}
+              </Text>
+              ,{" "}
+              <Text
+                bold
+                color={colors.accent}
+                onPress={() => openExternalUrl(cardPrivacyPolicyUrl)}
+              >
+                {LL.CardFlow.Onboarding.CardSubscription.agreement.privacyPolicy()}
+              </Text>
+              , {LL.CardFlow.Onboarding.CardSubscription.agreement.and()}{" "}
+              <Text
+                bold
+                color={colors.accent}
+                onPress={() => openExternalUrl(cardCardholderAgreementUrl)}
+              >
+                {LL.CardFlow.Onboarding.CardSubscription.agreement.cardholderAgreement()}
+              </Text>
             </Text>
-            ,{" "}
-            <Text
-              bold
-              color={colors.accent}
-              onPress={() => openExternalUrl(cardPrivacyPolicyUrl)}
-            >
-              {LL.CardFlow.Onboarding.CardSubscription.agreement.privacyPolicy()}
-            </Text>
-            , {LL.CardFlow.Onboarding.CardSubscription.agreement.and()}{" "}
-            <Text
-              bold
-              color={colors.accent}
-              onPress={() => openExternalUrl(cardCardholderAgreementUrl)}
-            >
-              {LL.CardFlow.Onboarding.CardSubscription.agreement.cardholderAgreement()}
-            </Text>
-          </Text>
-        </CheckboxRow>
+          </CheckboxRow>
+        )}
       </View>
 
       <View style={styles.buttonsContainer}>

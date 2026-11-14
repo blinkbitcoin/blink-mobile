@@ -142,6 +142,7 @@ import {
   CardPersonalInformationScreen,
   CardAcknowledgementScreen,
   CardPreapprovedScreen,
+  CardDeclinedScreen,
   CardProcessingScreen,
   CardApprovedScreen,
 } from "@app/screens/card-screen/onboarding"
@@ -987,13 +988,21 @@ export const RootStack = () => {
         component={CardProcessingScreen}
         options={{
           title: "",
-          headerBackVisible: false,
-          ...headerCloseControlOptions(),
+          ...noHeaderBack,
         }}
       />
       <RootNavigator.Screen
         name="cardOnboardingPreapprovedScreen"
         component={CardPreapprovedScreen}
+        options={{
+          title: "",
+          ...noHeaderBack,
+          ...headerCloseControlOptions(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingDeclinedScreen"
+        component={CardDeclinedScreen}
         options={{
           title: "",
           ...noHeaderBack,

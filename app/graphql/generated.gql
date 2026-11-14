@@ -320,6 +320,14 @@ mutation captchaRequestAuthCode($input: CaptchaRequestAuthCodeInput!) {
   }
 }
 
+mutation cardConsumerApplicationCreate($input: CardConsumerApplicationCreateInput!) {
+  cardConsumerApplicationCreate(input: $input) {
+    id
+    applicationStatus
+    __typename
+  }
+}
+
 mutation cardCreate($input: CardCreateInput!) {
   cardCreate(input: $input) {
     id
@@ -1345,6 +1353,25 @@ query card {
   }
 }
 
+query cardApplicationStatus {
+  me {
+    id
+    defaultAccount {
+      id
+      ... on ConsumerAccount {
+        cardConsumerApplications {
+          id
+          applicationStatus
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
 query cardBalance($cardId: ID!) {
   cardBalance(cardId: $cardId) {
     available
@@ -1362,6 +1389,22 @@ query cardHolder($cardId: ID!) {
   cardHolder(cardId: $cardId) {
     firstName
     lastName
+    __typename
+  }
+}
+
+query cardKycStatus {
+  me {
+    id
+    defaultAccount {
+      ... on ConsumerAccount {
+        id
+        onboardingStatus
+        flowType
+        __typename
+      }
+      __typename
+    }
     __typename
   }
 }

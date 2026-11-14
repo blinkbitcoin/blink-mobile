@@ -12677,7 +12677,7 @@ type RootTranslation = {
 						 */
 						label: string
 						/**
-						 * S​e​l​e​c​t​ ​y​o​u​r​ ​o​c​c​u​p​a​t​i​o​n
+						 * S​e​l​e​c​t
 						 */
 						placeholder: string
 					}
@@ -12687,7 +12687,7 @@ type RootTranslation = {
 						 */
 						label: string
 						/**
-						 * S​e​l​e​c​t​ ​y​o​u​r​ ​s​a​l​a​r​y​ ​r​a​n​g​e
+						 * S​e​l​e​c​t​ ​s​a​l​a​r​y
 						 */
 						placeholder: string
 					}
@@ -12712,10 +12712,6 @@ type RootTranslation = {
 						placeholder: string
 					}
 				}
-				/**
-				 * S​u​b​m​i​t​ ​a​p​p​l​i​c​a​t​i​o​n
-				 */
-				buttonText: string
 				/**
 				 * S​e​l​e​c​t
 				 */
@@ -12746,7 +12742,7 @@ type RootTranslation = {
 					 */
 					text: string
 					/**
-					 * I​s​s​u​e​r​'​s​ ​P​r​i​v​a​c​y​ ​P​o​l​i​c​y
+					 * I​s​s​u​e​r​’​s​ ​P​r​i​v​a​c​y​ ​P​o​l​i​c​y
 					 */
 					privacyPolicyLinkText: string
 					/**
@@ -12759,11 +12755,11 @@ type RootTranslation = {
 					cardTermsLinkText: string
 				}
 				/**
-				 * I​ ​c​e​r​t​i​f​y​ ​t​h​a​t​ ​t​h​e​ ​i​n​f​o​r​m​a​t​i​o​n​ ​I​ ​h​a​v​e​ ​p​r​o​v​i​d​e​d​ ​i​s​ ​a​c​c​u​r​a​t​e​ ​a​n​d​ ​t​h​a​t​ ​I​ ​w​i​l​l​ ​a​b​i​d​e​ ​b​y​ ​a​l​l​ ​t​h​e​ ​r​u​l​e​s​ ​a​n​d​ ​r​e​q​u​i​r​e​m​e​n​t​s​ ​r​e​l​a​t​e​d​ ​t​o​ ​m​y​ ​B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d
+				 * I​ ​c​e​r​t​i​f​y​ ​t​h​a​t​ ​t​h​e​ ​i​n​f​o​r​m​a​t​i​o​n​ ​I​ ​h​a​v​e​ ​p​r​o​v​i​d​e​d​ ​i​s​ ​a​c​c​u​r​a​t​e​ ​a​n​d​ ​t​h​a​t​ ​I​ ​w​i​l​l​ ​a​b​i​d​e​ ​b​y​ ​a​l​l​ ​t​h​e​ ​r​u​l​e​s​ ​a​n​d​ ​r​e​q​u​i​r​e​m​e​n​t​s​ ​r​e​l​a​t​e​d​ ​t​o​ ​m​y​ ​B​l​i​n​k​ ​C​a​r​d
 				 */
 				certifyAccuracy: string
 				/**
-				 * I​ ​a​c​k​n​o​w​l​e​d​g​e​ ​t​h​a​t​ ​a​p​p​l​y​i​n​g​ ​f​o​r​ ​t​h​e​ ​B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d​ ​d​o​e​s​ ​n​o​t​ ​c​o​n​s​t​i​t​u​t​e​ ​u​n​a​u​t​h​o​r​i​z​e​d​ ​s​o​l​i​c​i​t​a​t​i​o​n
+				 * I​ ​a​c​k​n​o​w​l​e​d​g​e​ ​t​h​a​t​ ​a​p​p​l​y​i​n​g​ ​f​o​r​ ​t​h​e​ ​B​l​i​n​k​ ​C​a​r​d​ ​d​o​e​s​ ​n​o​t​ ​c​o​n​s​t​i​t​u​t​e​ ​u​n​a​u​t​h​o​r​i​z​e​d​ ​s​o​l​i​c​i​t​a​t​i​o​n
 				 */
 				acknowledgeSolicitation: string
 			}
@@ -12781,19 +12777,25 @@ type RootTranslation = {
 				 */
 				buttonText: string
 			}
+			CardDeclined: {
+				/**
+				 * W​e​ ​c​o​u​l​d​n​'​t​ ​a​p​p​r​o​v​e​ ​y​o​u​r​ ​c​a​r​d​ ​a​p​p​l​i​c​a​t​i​o​n
+				 */
+				title: string
+				/**
+				 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​m​a​n​a​g​e​r​ ​w​i​l​l​ ​b​e​ ​i​n​ ​t​o​u​c​h​.
+				 */
+				subtitle: string
+			}
 			CardProcessing: {
 				/**
 				 * P​r​o​c​e​s​s​i​n​g​ ​y​o​u​r​ ​a​p​p​l​i​c​a​t​i​o​n
 				 */
 				title: string
 				/**
-				 * W​e​ ​w​i​l​l​ ​n​o​t​i​f​y​ ​y​o​u​ ​o​n​c​e​ ​w​e​ ​a​r​e​ ​r​e​a​d​y
+				 * T​h​i​s​ ​c​a​n​ ​t​a​k​e​ ​u​p​ ​t​o​ ​a​ ​m​i​n​u​t​e
 				 */
 				subtitle: string
-				/**
-				 * C​l​o​s​e
-				 */
-				buttonText: string
 			}
 		}
 	}
@@ -26997,7 +26999,7 @@ export type TranslationFunctions = {
 						 */
 						label: () => LocalizedString
 						/**
-						 * Select your occupation
+						 * Select
 						 */
 						placeholder: () => LocalizedString
 					}
@@ -27007,7 +27009,7 @@ export type TranslationFunctions = {
 						 */
 						label: () => LocalizedString
 						/**
-						 * Select your salary range
+						 * Select salary
 						 */
 						placeholder: () => LocalizedString
 					}
@@ -27032,10 +27034,6 @@ export type TranslationFunctions = {
 						placeholder: () => LocalizedString
 					}
 				}
-				/**
-				 * Submit application
-				 */
-				buttonText: () => LocalizedString
 				/**
 				 * Select
 				 */
@@ -27066,7 +27064,7 @@ export type TranslationFunctions = {
 					 */
 					text: () => LocalizedString
 					/**
-					 * Issuer's Privacy Policy
+					 * Issuer’s Privacy Policy
 					 */
 					privacyPolicyLinkText: () => LocalizedString
 					/**
@@ -27079,11 +27077,11 @@ export type TranslationFunctions = {
 					cardTermsLinkText: () => LocalizedString
 				}
 				/**
-				 * I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Visa Card
+				 * I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Card
 				 */
 				certifyAccuracy: () => LocalizedString
 				/**
-				 * I acknowledge that applying for the Blink Visa Card does not constitute unauthorized solicitation
+				 * I acknowledge that applying for the Blink Card does not constitute unauthorized solicitation
 				 */
 				acknowledgeSolicitation: () => LocalizedString
 			}
@@ -27101,19 +27099,25 @@ export type TranslationFunctions = {
 				 */
 				buttonText: () => LocalizedString
 			}
+			CardDeclined: {
+				/**
+				 * We couldn't approve your card application
+				 */
+				title: () => LocalizedString
+				/**
+				 * Your account manager will be in touch.
+				 */
+				subtitle: () => LocalizedString
+			}
 			CardProcessing: {
 				/**
 				 * Processing your application
 				 */
 				title: () => LocalizedString
 				/**
-				 * We will notify you once we are ready
+				 * This can take up to a minute
 				 */
 				subtitle: () => LocalizedString
-				/**
-				 * Close
-				 */
-				buttonText: () => LocalizedString
 			}
 		}
 	}

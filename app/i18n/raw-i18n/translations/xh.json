@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Umsebenzi",
-            "placeholder": "Khetha umsebenzi wakho"
+            "placeholder": "Khetha"
           },
           "annualSalaryRange": {
             "label": "Umvuzo wonyaka",
-            "placeholder": "Khetha ibanga lomvuzo wakho"
+            "placeholder": "Khetha umvuzo"
           },
           "accountPurpose": {
             "label": "Injongo yeakhawunti",
@@ -3823,7 +3823,6 @@
             "placeholder": "Khetha ibanga lokuchitha kwakho"
           }
         },
-        "buttonText": "Ngenisa isicelo",
         "select": "khetha"
       },
       "Acknowledgement": {
@@ -3839,18 +3838,21 @@
           "and": ", kunye",
           "cardTermsLinkText": "neMigaqo yeKhadi leBlink"
         },
-        "certifyAccuracy": "Ndiqinisekisa ukuba ulwazi endilunikile luchanekile nokuba ndiza kuthobela yonke imithetho neemfuno ezinxulumene neKhadi lam leBlink Visa",
-        "acknowledgeSolicitation": "Ndiyavuma ukuba ukufaka isicelo seKhadi leBlink Visa akubuyisi sicelo esingagunyaziswanga"
+        "certifyAccuracy": "Ndiqinisekisa ukuba ulwazi endilunikile luchanekile nokuba ndiza kuthobela yonke imithetho neemfuno ezinxulumene neKhadi lam leBlink",
+        "acknowledgeSolicitation": "Ndiyavuma ukuba ukufaka isicelo seKhadi leBlink akubuyisi sicelo esingagunyaziswanga"
       },
       "CardPreapproved": {
         "title": "iKhadi lakho le-Blink lilungile!",
         "subtitle": "Ngoku ungalenza lisebenze ikhadi lakho uze uqalise ukulisebenzisa",
         "buttonText": "Vala"
       },
+      "CardDeclined": {
+        "title": "Asikwazanga ukwamkela isicelo sakho sekhadi",
+        "subtitle": "Umphathi weakhawunti yakho uza kunxibelelana nawe."
+      },
       "CardProcessing": {
         "title": "Siqhuba isicelo sakho",
-        "subtitle": "Siza kukwazisa xa sele silungile",
-        "buttonText": "Vala"
+        "subtitle": "Oku kunokuthatha ukuya kumzuzu omnye"
       }
     }
   },

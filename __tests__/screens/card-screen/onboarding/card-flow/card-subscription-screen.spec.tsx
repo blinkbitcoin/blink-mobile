@@ -68,12 +68,6 @@ afterEach(() => {
 
 const NOTICE_CHECKBOX_INDEX = 0
 const FEE_SCHEDULE_CHECKBOX_INDEX = 1
-const AGREEMENT_CHECKBOX_INDEX = 2
-const ALL_SUBSCRIBE_CHECKBOXES = [
-  NOTICE_CHECKBOX_INDEX,
-  FEE_SCHEDULE_CHECKBOX_INDEX,
-  AGREEMENT_CHECKBOX_INDEX,
-]
 
 const renderScreen = async () => {
   const screen = render(
@@ -129,21 +123,10 @@ describe("CardSubscriptionScreen - free offer", () => {
     expect(mockSetOptions).toHaveBeenCalledWith({ title: "" })
   })
 
-  it("keeps the identity check closed until the agreements are accepted", async () => {
+  it("opens the identity check once both checkboxes are accepted", async () => {
     const { getByText, getAllByTestId } = await renderScreen()
 
     await checkBoxes(getAllByTestId, [NOTICE_CHECKBOX_INDEX, FEE_SCHEDULE_CHECKBOX_INDEX])
-    await act(async () => {
-      fireEvent.press(getByText("Accept"))
-    })
-
-    expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
-  })
-
-  it("opens the identity check once every checkbox is accepted", async () => {
-    const { getByText, getAllByTestId } = await renderScreen()
-
-    await checkBoxes(getAllByTestId, ALL_SUBSCRIBE_CHECKBOXES)
     await act(async () => {
       fireEvent.press(getByText("Accept"))
     })
@@ -183,28 +166,12 @@ describe("CardSubscriptionScreen - paid offer", () => {
     ).toBeTruthy()
   })
 
-  /** Accept starts the card KYC, so the agreements are asked for before it. */
-  it("asks to accept the agreements on this step", async () => {
-    const { getByText, getAllByTestId } = await renderScreen()
+  /** The terms moved to the acknowledgement step at the end of the flow. */
+  it("leaves the terms out of this step", async () => {
+    const { queryByText, getAllByTestId } = await renderScreen()
 
-    expect(getByText("Terms of Service")).toBeTruthy()
-    expect(getByText("Privacy Policy")).toBeTruthy()
-    expect(getByText("Cardholder Agreement")).toBeTruthy()
-    expect(getAllByTestId("checkbox-unchecked")).toHaveLength(3)
-  })
-
-  it("opens the agreement links when pressed", async () => {
-    const { getByText } = await renderScreen()
-
-    await act(async () => {
-      fireEvent.press(getByText("Terms of Service"))
-      fireEvent.press(getByText("Privacy Policy"))
-      fireEvent.press(getByText("Cardholder Agreement"))
-    })
-
-    expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/terms")
-    expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/privacy")
-    expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/cardholder")
+    expect(queryByText("Terms of Service")).toBeNull()
+    expect(getAllByTestId("checkbox-unchecked")).toHaveLength(2)
   })
 
   it("navigates to the fee schedule screen when the link is pressed", async () => {
@@ -249,33 +216,10 @@ describe("CardSubscriptionScreen - paid offer", () => {
     expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
   })
 
-  it("keeps the button disabled when only the agreements are accepted", async () => {
-    const { getByText, getAllByTestId } = await renderScreen()
-
-    await checkBoxes(getAllByTestId, [AGREEMENT_CHECKBOX_INDEX])
-    await act(async () => {
-      fireEvent.press(getByText("Accept"))
-    })
-
-    expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
-  })
-
-  /** Accept starts the card KYC: renewal and fee schedule alone never reach it. */
-  it("keeps the identity check closed until the agreements are accepted", async () => {
+  it("opens the identity check once renewal and fee schedule are accepted", async () => {
     const { getByText, getAllByTestId } = await renderScreen()
 
     await checkBoxes(getAllByTestId, [NOTICE_CHECKBOX_INDEX, FEE_SCHEDULE_CHECKBOX_INDEX])
-    await act(async () => {
-      fireEvent.press(getByText("Accept"))
-    })
-
-    expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
-  })
-
-  it("opens the identity check once renewal, fee schedule and agreements are accepted", async () => {
-    const { getByText, getAllByTestId } = await renderScreen()
-
-    await checkBoxes(getAllByTestId, ALL_SUBSCRIBE_CHECKBOXES)
     await act(async () => {
       fireEvent.press(getByText("Accept"))
     })
@@ -286,7 +230,7 @@ describe("CardSubscriptionScreen - paid offer", () => {
   it("unchecks a checkbox when pressed again", async () => {
     const { getByText, getAllByTestId, getByTestId } = await renderScreen()
 
-    await checkBoxes(getAllByTestId, ALL_SUBSCRIBE_CHECKBOXES)
+    await checkBoxes(getAllByTestId, [NOTICE_CHECKBOX_INDEX, FEE_SCHEDULE_CHECKBOX_INDEX])
     await act(async () => {
       fireEvent.press(getAllByTestId("checkbox-checked")[NOTICE_CHECKBOX_INDEX])
     })

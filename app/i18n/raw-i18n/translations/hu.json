@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Foglalkozás",
-            "placeholder": "Válaszd ki a foglalkozásodat"
+            "placeholder": "Válassz"
           },
           "annualSalaryRange": {
             "label": "Éves fizetés",
-            "placeholder": "Válaszd ki a fizetési sávodat"
+            "placeholder": "Válassz fizetést"
           },
           "accountPurpose": {
             "label": "Fiók célja",
@@ -3823,7 +3823,6 @@
             "placeholder": "Válaszd ki a költési sávodat"
           }
         },
-        "buttonText": "Pályázat beküldése",
         "select": "kiválaszt"
       },
       "Acknowledgement": {
@@ -3839,18 +3838,21 @@
           "and": ", és a",
           "cardTermsLinkText": "Blink kártya feltételeit"
         },
-        "certifyAccuracy": "Igazolom, hogy az általam megadott információk pontosak, és hogy betartok minden, a Blink Visa kártyámmal kapcsolatos szabályt és követelményt",
-        "acknowledgeSolicitation": "Tudomásul veszem, hogy a Blink Visa kártya igénylése nem minősül jogosulatlan megkeresésnek"
+        "certifyAccuracy": "Igazolom, hogy az általam megadott információk pontosak, és hogy betartok minden, a Blink kártyámmal kapcsolatos szabályt és követelményt",
+        "acknowledgeSolicitation": "Tudomásul veszem, hogy a Blink kártya igénylése nem minősül jogosulatlan megkeresésnek"
       },
       "CardPreapproved": {
         "title": "Elkészült a Blink kártyája!",
         "subtitle": "Most már aktiválhatja a kártyáját, és elkezdheti használni",
         "buttonText": "Bezárás"
       },
+      "CardDeclined": {
+        "title": "Nem tudtuk jóváhagyni a kártyaigénylését",
+        "subtitle": "A fiókkezelője felveszi Önnel a kapcsolatot."
+      },
       "CardProcessing": {
         "title": "Pályázatod feldolgozása",
-        "subtitle": "Értesítünk, amint készen állunk",
-        "buttonText": "Bezárás"
+        "subtitle": "Ez akár egy percig is eltarthat"
       }
     }
   },

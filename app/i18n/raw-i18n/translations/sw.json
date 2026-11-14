@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Kazi",
-            "placeholder": "Chagua kazi yako"
+            "placeholder": "Chagua"
           },
           "annualSalaryRange": {
             "label": "Mshahara wa kila mwaka",
-            "placeholder": "Chagua kiwango cha mshahara wako"
+            "placeholder": "Chagua mshahara"
           },
           "accountPurpose": {
             "label": "Madhumuni ya akaunti",
@@ -3823,7 +3823,6 @@
             "placeholder": "Chagua kiwango cha matumizi yako"
           }
         },
-        "buttonText": "Wasilisha maombi",
         "select": "chagua"
       },
       "Acknowledgement": {
@@ -3839,18 +3838,21 @@
           "and": ", na",
           "cardTermsLinkText": "Masharti ya Kadi ya Blink"
         },
-        "certifyAccuracy": "Ninathibitisha kwamba maelezo niliyotoa ni sahihi na kwamba nitazingatia sheria na mahitaji yote yanayohusiana na Kadi yangu ya Blink Visa",
-        "acknowledgeSolicitation": "Ninatambua kwamba kuomba Kadi ya Blink Visa si ombi lisiloidhinishwa"
+        "certifyAccuracy": "Ninathibitisha kwamba maelezo niliyotoa ni sahihi na kwamba nitazingatia sheria na mahitaji yote yanayohusiana na Kadi yangu ya Blink",
+        "acknowledgeSolicitation": "Ninatambua kwamba kuomba Kadi ya Blink si ombi lisiloidhinishwa"
       },
       "CardPreapproved": {
         "title": "Blink Card yako iko tayari!",
         "subtitle": "Sasa unaweza kuwasha kadi yako na kuanza kuitumia",
         "buttonText": "Funga"
       },
+      "CardDeclined": {
+        "title": "Hatukuweza kuidhinisha ombi lako la kadi",
+        "subtitle": "Msimamizi wa akaunti yako atawasiliana nawe."
+      },
       "CardProcessing": {
         "title": "Tunashughulikia maombi yako",
-        "subtitle": "Tutakujulisha mara tu tutakapokuwa tayari",
-        "buttonText": "Funga"
+        "subtitle": "Hii inaweza kuchukua hadi dakika moja"
       }
     }
   },

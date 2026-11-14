@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Povolání",
-            "placeholder": "Vyberte své povolání"
+            "placeholder": "Vyberte"
           },
           "annualSalaryRange": {
             "label": "Roční plat",
-            "placeholder": "Vyberte svůj platový rozsah"
+            "placeholder": "Vyberte plat"
           },
           "accountPurpose": {
             "label": "Účel účtu",
@@ -3823,7 +3823,6 @@
             "placeholder": "Vyberte svůj rozsah výdajů"
           }
         },
-        "buttonText": "Odeslat žádost",
         "select": "vybrat"
       },
       "Acknowledgement": {
@@ -3839,18 +3838,21 @@
           "and": " a",
           "cardTermsLinkText": "podmínkami karty Blink"
         },
-        "certifyAccuracy": "Potvrzuji, že informace, které jsem poskytl, jsou přesné a že budu dodržovat všechna pravidla a požadavky týkající se mé karty Blink Visa",
-        "acknowledgeSolicitation": "Beru na vědomí, že žádost o kartu Blink Visa nepředstavuje neoprávněné oslovení"
+        "certifyAccuracy": "Potvrzuji, že informace, které jsem poskytl, jsou přesné a že budu dodržovat všechna pravidla a požadavky týkající se mé karty Blink",
+        "acknowledgeSolicitation": "Beru na vědomí, že žádost o kartu Blink nepředstavuje neoprávněné oslovení"
       },
       "CardPreapproved": {
         "title": "Vaše Blink Card je připravena!",
         "subtitle": "Nyní si můžete kartu aktivovat a začít ji používat",
         "buttonText": "Zavřít"
       },
+      "CardDeclined": {
+        "title": "Vaši žádost o kartu jsme nemohli schválit",
+        "subtitle": "Váš správce účtu se vám ozve."
+      },
       "CardProcessing": {
         "title": "Zpracováváme vaši žádost",
-        "subtitle": "Dáme ti vědět, jakmile budeme připraveni",
-        "buttonText": "Zavřít"
+        "subtitle": "Může to trvat až minutu"
       }
     }
   },
