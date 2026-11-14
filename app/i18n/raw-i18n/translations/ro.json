@@ -3847,8 +3847,8 @@
         "buttonText": "Închide"
       },
       "CardDeclined": {
-        "title": "Nu am putut aproba cererea ta de card",
-        "subtitle": "Managerul tău de cont te va contacta."
+        "title": "Nu am putut aproba cererea dumneavoastră de card",
+        "subtitle": "Managerul dumneavoastră de cont vă va contacta."
       },
       "CardProcessing": {
         "title": "Se procesează cererea ta",

@@ -3847,8 +3847,8 @@
         "buttonText": "Bezárás"
       },
       "CardDeclined": {
-        "title": "Nem tudtuk jóváhagyni a kártyaigénylésedet",
-        "subtitle": "A fiókkezelőd felveszi veled a kapcsolatot."
+        "title": "Nem tudtuk jóváhagyni a kártyaigénylését",
+        "subtitle": "A fiókkezelője felveszi Önnel a kapcsolatot."
       },
       "CardProcessing": {
         "title": "Pályázatod feldolgozása",

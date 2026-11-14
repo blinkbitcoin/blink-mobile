@@ -3847,8 +3847,8 @@
         "buttonText": "Zatvori"
       },
       "CardDeclined": {
-        "title": "Nismo mogli odobriti tvoj zahtjev za karticu",
-        "subtitle": "Tvoj upravitelj računa javit će ti se."
+        "title": "Nismo mogli odobriti vaš zahtjev za karticu",
+        "subtitle": "Vaš upravitelj računa javit će vam se."
       },
       "CardProcessing": {
         "title": "Obrađujemo vašu prijavu",

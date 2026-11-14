@@ -3786,8 +3786,8 @@
                 "buttonText": "Schließen"
             },
             "CardDeclined": {
-                "title": "Wir konnten deinen Kartenantrag nicht genehmigen",
-                "subtitle": "Dein Kundenbetreuer wird sich bei dir melden."
+                "title": "Wir konnten Ihren Kartenantrag nicht genehmigen",
+                "subtitle": "Ihr Kundenbetreuer wird sich bei Ihnen melden."
             },
             "CardProcessing": {
                 "title": "Dein Antrag wird bearbeitet",
