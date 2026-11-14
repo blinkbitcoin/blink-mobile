@@ -26,12 +26,12 @@ export type ConfettiProps = {
 }
 
 const celebrationPalette = (colors: Colors): string[] => [
-  colors._green,
-  colors.primary,
-  colors._orange,
-  colors.red,
-  colors._blue,
-  colors._sky,
+  colors.success,
+  colors.accent,
+  colors.staticBrandOrange,
+  colors.error,
+  colors.staticBlue,
+  colors.staticPaleBlue,
 ]
 
 /** A one-shot burst shooting up from the bottom of the screen, drawn by

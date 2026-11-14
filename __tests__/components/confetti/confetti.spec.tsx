@@ -72,12 +72,12 @@ describe("Confetti", () => {
     renderConfetti()
 
     expect(lastCannonProps().colors).toEqual([
-      light._green,
-      light.primary,
-      light._orange,
-      light.red,
-      light._blue,
-      light._sky,
+      light.success,
+      light.accent,
+      light.staticBrandOrange,
+      light.error,
+      light.staticBlue,
+      light.staticPaleBlue,
     ])
   })
 
