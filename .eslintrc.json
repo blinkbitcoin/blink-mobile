@@ -215,6 +215,7 @@
       { "property": "staticLighterGrey", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
       { "property": "staticDarkGrey", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
       { "property": "staticCardPill", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
+      { "property": "staticCardBackground", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
       { "property": "staticBrandOrange", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
       { "property": "staticSuccess", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
       { "property": "staticBrandYellow", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
@@ -275,7 +276,9 @@
         "app/components/map-component/pin-shape.tsx",
         "app/components/map-component/cluster-marker.tsx",
         // wallet-brand button: Apple/Google set its colours
-        "app/components/card-screen/add-to-wallet-button.tsx"
+        "app/components/card-screen/add-to-wallet-button.tsx",
+        // confetti pieces: a fixed celebration palette that reads the same in both modes
+        "app/components/confetti/**"
       ],
       "rules": {
         "no-restricted-properties": "off"

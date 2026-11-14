@@ -3655,8 +3655,14 @@
         "paymentTitle": "Πληρωμή",
         "acceptButton": "Αποδοχή",
         "payButton": "Συνέχεια και πληρωμή",
-        "cardTitle": "Blink Private",
+        "cardTitle": "Blink Orange",
+        "free": "Δωρεάν",
+        "forNow": "προς το παρόν",
         "perYear": "ανά έτος",
+        "freeBreakdown": {
+          "card": "Blink Card",
+          "memberBenefits": "Άλλα προνόμια μέλους"
+        },
         "status": {
           "label": "Κατάσταση",
           "specialOfferLabel": "Ειδική προσφορά",
@@ -3677,35 +3683,55 @@
           "text": "Έχω ελέγξει και συμφωνώ με τον",
           "linkText": "Πίνακα Χρεώσεων της Blink Card"
         },
-        "renew": "Καταλαβαίνω ότι η συνδρομή μου θα ανανεωθεί αυτόματα σε {months: number} μήνες"
+        "renew": "Καταλαβαίνω ότι η συνδρομή μου θα ανανεωθεί αυτόματα σε {months: number} μήνες",
+        "freeNotice": "Κατανοώ ότι το Blink Orange είναι δωρεάν προς το παρόν και ότι ενδέχεται αργότερα να εισαχθεί συνδρομή μέλους, με προειδοποίηση"
+      },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Επαληθεύστε την ταυτότητά σας",
+        "description": "Για να ενεργοποιήσετε την Blink Card σας, ο εκδότης της κάρτας πρέπει να επαληθεύσει ποιος είστε (KYC). Θα χρειαστείτε:",
+        "requirements": {
+          "governmentId": "Ένα κρατικό έγγραφο ταυτότητας",
+          "selfie": "Μια selfie / έλεγχο ζωντάνιας",
+          "proofOfAddress": "Αποδεικτικό διεύθυνσης",
+          "questions": "Μερικές ερωτήσεις για εσάς"
+        },
+        "buttonText": "Συνέχεια"
       },
       "CardIntroducing": {
         "title": "Σας παρουσιάζουμε",
         "cardInfo": {
-          "bitcoinCard": "Την κάρτα Visa της Blink",
+          "bitcoinCard": "Η Blink Card",
           "for": "για",
-          "maximalist": "Bitcoin maximalists"
+          "bitcoiners": "Bitcoiners"
         },
         "buttonText": "Συνέχεια"
       },
       "CardDetails": {
-        "title": "Επιπλέον προνόμια",
+        "title": "Τι περιλαμβάνεται",
         "features": {
-          "accountManager": "Αποκλειστικός διαχειριστής λογαριασμού",
-          "support": "Υποστήριξη κατά προτεραιότητα",
-          "onchainDeposits": "50% επιστροφή στα τέλη συναλλαγών",
-          "circularEconomies": "$100 σε κυκλικές οικονομίες"
+          "card": {
+            "title": "Blink Card",
+            "subtitle": "η κάρτα Visa σας, έτοιμη σήμερα"
+          },
+          "accountManager": {
+            "title": "Προσωπικός διαχειριστής λογαριασμού",
+            "subtitle": "και υποστήριξη προτεραιότητας"
+          },
+          "businessAccounts": "Επαγγελματικοί λογαριασμοί",
+          "virtualAccounts": "Εικονικοί λογαριασμοί"
         },
-        "andMore": "... και περισσότερα μέσα στο 2026",
+        "availableIn": "σε {months} μήνες",
+        "footnote": "Ορισμένες λειτουργίες θα είναι διαθέσιμες μέσα σε {months} μήνες. Η κάρτα είναι έτοιμη σήμερα.",
         "buttonText": "Συνέχεια"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Καλώς ήρθατε",
-          "subtitle": "στο Blink Private",
+          "subtitle": "στο Blink Orange",
           "paragraphs": {
-            "body1": "Κάποιος σας σκέφτηκε και πρότεινε να σας προσκαλέσουμε στο Blink Private. Πιθανότατα επειδή είστε ένας εξαιρετικός Bitcoiner.",
-            "body2": "Ο στόχος μας για το 2026 είναι να γεμίσουμε το πρόγραμμα με τόσα πολλά οφέλη, ώστε η ανανέωση την επόμενη χρονιά να είναι αυτονόητη."
+            "body1": "Κάποιος σας σκέφτηκε και πρότεινε να σας προσκαλέσουμε στο Blink Orange. Πιθανότατα επειδή είστε ένας εξαιρετικός Bitcoiner.",
+            "body2": "Το Blink Orange είναι το πρώτο επίπεδο της συνδρομής μέλους του Blink για Bitcoiners, μόνο με πρόσκληση. Η Blink Card και ο προσωπικός σας διαχειριστής λογαριασμού είναι δύο από τις πρώτες υπηρεσίες που προσφέρουμε — τα υπόλοιπα τα χτίζουμε μέχρι το 2027."
           }
         },
         "buttonText": "Πάμε"
@@ -3817,7 +3843,8 @@
         "acknowledgeSolicitation": "Αναγνωρίζω ότι η αίτηση για την κάρτα Blink Visa δεν συνιστά μη εξουσιοδοτημένη προσέλκυση"
       },
       "CardPreapproved": {
-        "title": "You have been pre-approved for the Blink Visa card!",
+        "title": "Η Blink Card σας είναι έτοιμη!",
+        "subtitle": "Μπορείτε τώρα να ενεργοποιήσετε την κάρτα σας και να αρχίσετε να τη χρησιμοποιείτε",
         "buttonText": "Close"
       },
       "CardProcessing": {

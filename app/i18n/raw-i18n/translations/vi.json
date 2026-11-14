@@ -3655,8 +3655,14 @@
         "paymentTitle": "Thanh toán",
         "acceptButton": "Chấp nhận",
         "payButton": "Tiếp tục và Thanh toán",
-        "cardTitle": "Blink Riêng tư",
+        "cardTitle": "Blink Orange",
+        "free": "Miễn phí",
+        "forNow": "hiện tại",
         "perYear": "mỗi năm",
+        "freeBreakdown": {
+          "card": "Thẻ Blink",
+          "memberBenefits": "Các quyền lợi thành viên khác"
+        },
         "status": {
           "label": "Trạng thái",
           "specialOfferLabel": "Ưu đãi đặc biệt",
@@ -3677,35 +3683,55 @@
           "text": "Tôi đã xem xét và đồng ý với",
           "linkText": "Biểu Phí Blink Card"
         },
-        "renew": "Tôi hiểu rằng gói đăng ký của tôi sẽ tự động gia hạn sau {months: number} tháng"
+        "renew": "Tôi hiểu rằng gói đăng ký của tôi sẽ tự động gia hạn sau {months: number} tháng",
+        "freeNotice": "Tôi hiểu rằng Blink Orange hiện miễn phí và có thể áp dụng phí thành viên sau này, kèm thông báo trước"
+      },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Xác minh danh tính của bạn",
+        "description": "Để kích hoạt Thẻ Blink, đơn vị phát hành thẻ cần xác minh bạn là ai (KYC). Bạn sẽ cần:",
+        "requirements": {
+          "governmentId": "Giấy tờ tùy thân do chính phủ cấp",
+          "selfie": "Ảnh selfie / kiểm tra người thật",
+          "proofOfAddress": "Bằng chứng địa chỉ",
+          "questions": "Một vài câu hỏi về bạn"
+        },
+        "buttonText": "Tiếp tục"
       },
       "CardIntroducing": {
         "title": "Giới thiệu",
         "cardInfo": {
-          "bitcoinCard": "Thẻ Visa Blink",
+          "bitcoinCard": "Thẻ Blink",
           "for": "dành cho",
-          "maximalist": "Người theo chủ nghĩa Bitcoin tối đa"
+          "bitcoiners": "Bitcoiner"
         },
         "buttonText": "Tiếp tục"
       },
       "CardDetails": {
-        "title": "Đặc quyền bổ sung",
+        "title": "Bao gồm những gì",
         "features": {
-          "accountManager": "Quản lý tài khoản chuyên trách",
-          "support": "Hỗ trợ ưu tiên",
-          "onchainDeposits": "Hoàn 50% phí giao dịch",
-          "circularEconomies": "100 $ cho kinh tế tuần hoàn"
+          "card": {
+            "title": "Thẻ Blink",
+            "subtitle": "thẻ Visa của bạn, sẵn sàng ngay hôm nay"
+          },
+          "accountManager": {
+            "title": "Quản lý tài khoản cá nhân",
+            "subtitle": "và hỗ trợ ưu tiên"
+          },
+          "businessAccounts": "Tài khoản doanh nghiệp",
+          "virtualAccounts": "Tài khoản ảo"
         },
-        "andMore": "... và nhiều hơn nữa vào năm 2026",
+        "availableIn": "trong {months} tháng",
+        "footnote": "Một số tính năng sẽ có trong vòng {months} tháng. Thẻ đã sẵn sàng ngay hôm nay.",
         "buttonText": "Tiếp tục"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Chào mừng bạn",
-          "subtitle": "Đến Blink Riêng tư",
+          "subtitle": "Đến Blink Orange",
           "paragraphs": {
-            "body1": "Ai đó đã nghĩ về bạn và đề xuất rằng chúng tôi nên mời bạn tham gia Blink Riêng tư. Có lẽ vì bạn là một Bitcoiner tuyệt vời.",
-            "body2": "Mục tiêu của chúng tôi cho năm 2026 là lấp đầy chương trình với nhiều ưu đãi đến mức việc gia hạn năm sau là điều hiển nhiên."
+            "body1": "Ai đó đã nghĩ về bạn và đề xuất rằng chúng tôi nên mời bạn tham gia Blink Orange. Có lẽ vì bạn là một Bitcoiner tuyệt vời.",
+            "body2": "Blink Orange là cấp độ đầu tiên trong chương trình thành viên của Blink dành cho Bitcoiner, chỉ dành cho người được mời. Thẻ Blink và người quản lý tài khoản cá nhân của bạn là hai trong số những dịch vụ đầu tiên chúng tôi cung cấp — phần còn lại chúng tôi sẽ xây dựng đến năm 2027."
           }
         },
         "buttonText": "Bắt đầu nào"
@@ -3817,7 +3843,8 @@
         "acknowledgeSolicitation": "Tôi thừa nhận rằng việc đăng ký Thẻ Blink Visa không cấu thành hành vi chào mời trái phép"
       },
       "CardPreapproved": {
-        "title": "Bạn đã được phê duyệt trước cho thẻ Blink Visa!",
+        "title": "Thẻ Blink của bạn đã sẵn sàng!",
+        "subtitle": "Giờ bạn có thể kích hoạt thẻ và bắt đầu sử dụng",
         "buttonText": "Đóng"
       },
       "CardProcessing": {

@@ -3655,8 +3655,14 @@
         "paymentTitle": "Fizetés",
         "acceptButton": "Elfogadás",
         "payButton": "Folytatás és Fizetés",
-        "cardTitle": "Blink Privát",
+        "cardTitle": "Blink Orange",
+        "free": "Ingyenes",
+        "forNow": "egyelőre",
         "perYear": "évente",
+        "freeBreakdown": {
+          "card": "Blink kártya",
+          "memberBenefits": "Egyéb tagsági előnyök"
+        },
         "status": {
           "label": "Állapot",
           "specialOfferLabel": "Különleges ajánlat",
@@ -3677,35 +3683,55 @@
           "text": "Átnéztem és elfogadom a következőt:",
           "linkText": "Blink Card díjszabása"
         },
-        "renew": "Megértem, hogy az előfizetésem {months: number} hónap múlva automatikusan megújul"
+        "renew": "Megértem, hogy az előfizetésem {months: number} hónap múlva automatikusan megújul",
+        "freeNotice": "Tudomásul veszem, hogy a Blink Orange egyelőre ingyenes, és hogy később, előzetes értesítéssel tagsági díjat vezethetnek be"
+      },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Igazolja személyazonosságát",
+        "description": "Blink kártyája aktiválásához a kártyakibocsátónak ellenőriznie kell, ki Ön (KYC). Szüksége lesz:",
+        "requirements": {
+          "governmentId": "Hatósági személyazonosító igazolványra",
+          "selfie": "Szelfire / élőségvizsgálatra",
+          "proofOfAddress": "Lakcímigazolásra",
+          "questions": "Néhány Önre vonatkozó kérdésre"
+        },
+        "buttonText": "Tovább"
       },
       "CardIntroducing": {
         "title": "Bemutatjuk",
         "cardInfo": {
-          "bitcoinCard": "A Blink Visa kártya",
+          "bitcoinCard": "A Blink kártya",
           "for": "a",
-          "maximalist": "Bitcoin Maximalistáknak"
+          "bitcoiners": "Bitcoinereknek"
         },
         "buttonText": "Tovább"
       },
       "CardDetails": {
-        "title": "További előnyök",
+        "title": "Mit tartalmaz",
         "features": {
-          "accountManager": "Dedikált fiókkezelő",
-          "support": "Elsőbbségi támogatás",
-          "onchainDeposits": "50% visszatérítés a tranzakciós díjakból",
-          "circularEconomies": "100 $ körkörös gazdaságoknak"
+          "card": {
+            "title": "Blink kártya",
+            "subtitle": "a Visa kártyád, már ma kész"
+          },
+          "accountManager": {
+            "title": "Személyes ügyfélmenedzser",
+            "subtitle": "és elsőbbségi támogatás"
+          },
+          "businessAccounts": "Üzleti számlák",
+          "virtualAccounts": "Virtuális számlák"
         },
-        "andMore": "... és még több jön 2026-ban",
+        "availableIn": "{months} hónap múlva",
+        "footnote": "Egyes funkciók {months} hónapon belül lesznek elérhetők. A kártya már ma kész.",
         "buttonText": "Tovább"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Üdvözöljük a fedélzeten",
-          "subtitle": "A Blink Privátban",
+          "subtitle": "A Blink Orange-ban",
           "paragraphs": {
-            "body1": "Valaki gondolt rád és javasolta, hogy meghívjunk a Blink Privátba. Valószínűleg azért, mert fantasztikus Bitcoiner vagy.",
-            "body2": "Célunk 2026-ra az, hogy a programot annyi jósággal töltsük meg, hogy nyilvánvaló legyen jövőre megújítani."
+            "body1": "Valaki gondolt rád és javasolta, hogy meghívjunk a Blink Orange-ba. Valószínűleg azért, mert fantasztikus Bitcoiner vagy.",
+            "body2": "A Blink Orange a Blink tagságának első szintje Bitcoinereknek, csak meghívással. A Blink kártya és a személyes ügyfélmenedzsered az első szolgáltatásaink közül kettő — a többit 2027-ig építjük."
           }
         },
         "buttonText": "Rajta"
@@ -3817,7 +3843,8 @@
         "acknowledgeSolicitation": "Tudomásul veszem, hogy a Blink Visa kártya igénylése nem minősül jogosulatlan megkeresésnek"
       },
       "CardPreapproved": {
-        "title": "Előzetesen jóváhagyták a Blink Visa kártyáját!",
+        "title": "Elkészült a Blink kártyája!",
+        "subtitle": "Most már aktiválhatja a kártyáját, és elkezdheti használni",
         "buttonText": "Bezárás"
       },
       "CardProcessing": {

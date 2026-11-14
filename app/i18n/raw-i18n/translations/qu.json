@@ -3655,8 +3655,14 @@
         "paymentTitle": "Pagay",
         "acceptButton": "Chaskiy",
         "payButton": "Ñawpaqman rispa Pagay",
-        "cardTitle": "Blink Sapalla",
+        "cardTitle": "Blink Orange",
+        "free": "Mana qullqiyuq",
+        "forNow": "kunanpaq",
         "perYear": "watanpi",
+        "freeBreakdown": {
+          "card": "Blink tarjeta",
+          "memberBenefits": "Huk ayllu allinkunakuna"
+        },
         "status": {
           "label": "Kayninpi",
           "specialOfferLabel": "Sapaq ofrecimiento",
@@ -3677,35 +3683,55 @@
           "text": "Qhawarini hinaspa arinini",
           "linkText": "Blink Card qullqi tabla"
         },
-        "renew": "Yachani suscripciónníy {months: number} killapi automáticamente musuqchakunanta"
+        "renew": "Yachani suscripciónníy {months: number} killapi automáticamente musuqchakunanta",
+        "freeNotice": "Hamut'ani Blink Orange kunanpaq mana qullqiyuq kasqanta, qhipamanmi ayllu qullqi churakunman, ñawpaqta willaspa"
+      },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Pi kasqaykita chiqaqchay",
+        "description": "Blink tarjetaykita kawsachinapaq, tarjeta qukuqmi pi kasqaykita chiqaqchanan (KYC). Kaykunatam munanki:",
+        "requirements": {
+          "governmentId": "Gobiernopa qusqan DNI",
+          "selfie": "Selfie / kawsasqa kasqayki qhawarichiy",
+          "proofOfAddress": "Maypi tiyasqaykipa pruebaqnin",
+          "questions": "Wakin tapukuykuna qammanta"
+        },
+        "buttonText": "Ñawpaqman"
       },
       "CardIntroducing": {
         "title": "Riqsichispa",
         "cardInfo": {
-          "bitcoinCard": "Blink Visa tarjeta",
+          "bitcoinCard": "Blink tarjeta",
           "for": "kaqpaq",
-          "maximalist": "Bitcoin Maximalistakuna"
+          "bitcoiners": "Bitcoinerkuna"
         },
         "buttonText": "Ñawpaqman"
       },
       "CardDetails": {
-        "title": "Yapay allinkunakuna",
+        "title": "Ima kachkan",
         "features": {
-          "accountManager": "Sapaq kawaq akawuntapaq",
-          "support": "Ñawpaq yanapay",
-          "onchainDeposits": "50% kutichiy comisión transacciónmanta",
-          "circularEconomies": "$100 muyuq ekonomiyakunapaq"
+          "card": {
+            "title": "Blink tarjeta",
+            "subtitle": "Visa tarjetayki, kunan p'unchaw wakichisqa"
+          },
+          "accountManager": {
+            "title": "Sapan cuenta kamachiq",
+            "subtitle": "ñawpaq yanapaywan"
+          },
+          "businessAccounts": "Llamkay cuentakuna",
+          "virtualAccounts": "Virtual cuentakuna"
         },
-        "andMore": "... astawanraq 2026-pi hamushan",
+        "availableIn": "{months} killapi",
+        "footnote": "Wakin ruraykunaqa {months} killa ukhupi kanqa. Tarjetaqa kunan p'unchaw wakichisqa.",
         "buttonText": "Ñawpaqman"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Allin hamusqa",
-          "subtitle": "Blink Sapallaman",
+          "subtitle": "Blink Orangeman",
           "paragraphs": {
-            "body1": "Pipas qanpi yuyarqa chaymanta nirqa Blink Sapallaman waqyanaykuta. Ichapas huk allin Bitcoiner kasqaykirayku.",
-            "body2": "2026 watapaq munayninchisqa programata allin kaqkunawan huntachiymi, chayna hamuq watapi musuqyachinapaq allinmi kanqa."
+            "body1": "Pipas qanpi yuyarqa chaymanta nirqa Blink Orangeman waqyanaykuta. Ichapas huk allin Bitcoiner kasqaykirayku.",
+            "body2": "Blink Orangeqa Bitcoinerkunapaq Blink ayllupa ñawpaq patanmi, waqyasqakunallapaq. Blink tarjetapas sapan cuenta kamachiqniykipas ñawpaq llamkaykunamanta iskaymi — kaqnintaqa 2027 watakama ruraykuchkaniku."
           }
         },
         "buttonText": "Haku"
@@ -3817,7 +3843,8 @@
         "acknowledgeSolicitation": "Riqsini Blink Visa tarjetata mañakuyqa mana saqisqa mañakuychu kasqanta"
       },
       "CardPreapproved": {
-        "title": "Blink Visa tarjetapaq ñawpaqta aprobado kasqanki!",
+        "title": "Blink tarjetaykiqa listañam!",
+        "subtitle": "Kunanqa tarjetaykita activayta atinkiñam, hinaspa llamk'achiyta qallariy",
         "buttonText": "Wisq'ay"
       },
       "CardProcessing": {

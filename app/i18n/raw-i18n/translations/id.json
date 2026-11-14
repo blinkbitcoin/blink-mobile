@@ -3655,8 +3655,14 @@
         "paymentTitle": "Pembayaran",
         "acceptButton": "Terima",
         "payButton": "Lanjutkan dan Bayar",
-        "cardTitle": "Blink Pribadi",
+        "cardTitle": "Blink Orange",
+        "free": "Gratis",
+        "forNow": "untuk saat ini",
         "perYear": "per tahun",
+        "freeBreakdown": {
+          "card": "Blink Card",
+          "memberBenefits": "Manfaat anggota lainnya"
+        },
         "status": {
           "label": "Status",
           "specialOfferLabel": "Penawaran khusus",
@@ -3677,35 +3683,55 @@
           "text": "Saya telah meninjau dan menyetujui",
           "linkText": "Jadwal Biaya Blink Card"
         },
-        "renew": "Saya memahami bahwa langganan saya akan diperpanjang secara otomatis dalam {months: number} bulan"
+        "renew": "Saya memahami bahwa langganan saya akan diperpanjang secara otomatis dalam {months: number} bulan",
+        "freeNotice": "Saya memahami bahwa Blink Orange gratis untuk saat ini, dan biaya keanggotaan dapat diberlakukan nanti, dengan pemberitahuan"
+      },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Verifikasi identitas Anda",
+        "description": "Untuk mengaktifkan Blink Card Anda, penerbit kartu harus memverifikasi siapa Anda (KYC). Anda akan memerlukan:",
+        "requirements": {
+          "governmentId": "Tanda pengenal resmi dari pemerintah",
+          "selfie": "Swafoto / pemeriksaan keaktifan",
+          "proofOfAddress": "Bukti alamat",
+          "questions": "Beberapa pertanyaan tentang Anda"
+        },
+        "buttonText": "Lanjutkan"
       },
       "CardIntroducing": {
         "title": "Memperkenalkan",
         "cardInfo": {
-          "bitcoinCard": "Kartu Visa Blink",
+          "bitcoinCard": "Blink Card",
           "for": "untuk",
-          "maximalist": "Maksimalis Bitcoin"
+          "bitcoiners": "Bitcoiner"
         },
         "buttonText": "Lanjutkan"
       },
       "CardDetails": {
-        "title": "Keuntungan tambahan",
+        "title": "Yang termasuk",
         "features": {
-          "accountManager": "Manajer akun khusus",
-          "support": "Dukungan prioritas",
-          "onchainDeposits": "Pengembalian 50% biaya transaksi",
-          "circularEconomies": "$100 untuk ekonomi sirkular"
+          "card": {
+            "title": "Blink Card",
+            "subtitle": "kartu Visa Anda, siap hari ini"
+          },
+          "accountManager": {
+            "title": "Manajer akun pribadi",
+            "subtitle": "dan dukungan prioritas"
+          },
+          "businessAccounts": "Akun bisnis",
+          "virtualAccounts": "Akun virtual"
         },
-        "andMore": "... dan lainnya segera hadir di 2026",
+        "availableIn": "dalam {months} bulan",
+        "footnote": "Beberapa fitur akan tersedia dalam {months} bulan. Kartu siap hari ini.",
         "buttonText": "Lanjutkan"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Selamat datang",
-          "subtitle": "Di Blink Pribadi",
+          "subtitle": "Di Blink Orange",
           "paragraphs": {
-            "body1": "Seseorang memikirkan Anda dan menyarankan agar kami mengundang Anda ke Blink Pribadi. Mungkin karena Anda adalah Bitcoiner yang luar biasa.",
-            "body2": "Tujuan kami untuk 2026 adalah mengisi program dengan begitu banyak keuntungan sehingga sudah jelas untuk memperbarui tahun depan."
+            "body1": "Seseorang memikirkan Anda dan menyarankan agar kami mengundang Anda ke Blink Orange. Mungkin karena Anda adalah Bitcoiner yang luar biasa.",
+            "body2": "Blink Orange adalah tingkat pertama keanggotaan Blink untuk para Bitcoiner, hanya dengan undangan. Blink Card dan manajer akun pribadi Anda adalah dua layanan pertama yang kami tawarkan — sisanya sedang kami bangun hingga 2027."
           }
         },
         "buttonText": "Ayo mulai"
@@ -3817,7 +3843,8 @@
         "acknowledgeSolicitation": "Saya mengakui bahwa mengajukan permohonan Kartu Blink Visa bukan merupakan permintaan yang tidak sah"
       },
       "CardPreapproved": {
-        "title": "Anda telah disetujui sebelumnya untuk kartu Blink Visa!",
+        "title": "Blink Card Anda sudah siap!",
+        "subtitle": "Sekarang Anda dapat mengaktifkan kartu dan mulai menggunakannya",
         "buttonText": "Tutup"
       },
       "CardProcessing": {

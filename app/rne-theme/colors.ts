@@ -15,6 +15,7 @@ const lightStatic = {
   staticLighterGrey: "#E6EBEf",
   staticDarkGrey: "#1d1d1d",
   staticCardPill: "#393939",
+  staticCardBackground: "#FF6418",
   staticBrandOrange: "#FF7e1c",
   staticSuccess: "#00A700",
   staticBrandYellow: "#FFBE0B",

@@ -3655,8 +3655,14 @@
         "paymentTitle": "الدفع",
         "acceptButton": "قبول",
         "payButton": "متابعة والدفع",
-        "cardTitle": "بلينك الخاصة",
+        "cardTitle": "Blink Orange",
+        "free": "مجاني",
+        "forNow": "حاليًا",
         "perYear": "سنوياً",
+        "freeBreakdown": {
+          "card": "بطاقة Blink",
+          "memberBenefits": "مزايا العضوية الأخرى"
+        },
         "status": {
           "label": "الحالة",
           "specialOfferLabel": "عرض خاص",
@@ -3677,35 +3683,55 @@
           "text": "لقد راجعتُ وأوافق على",
           "linkText": "جدول رسوم Blink Card"
         },
-        "renew": "أفهم أن اشتراكي سيتجدد تلقائيًا خلال {months: number} شهرًا"
+        "renew": "أفهم أن اشتراكي سيتجدد تلقائيًا خلال {months: number} شهرًا",
+        "freeNotice": "أفهم أن Blink Orange مجاني حاليًا، وأنه قد تُفرض رسوم عضوية لاحقًا مع إشعار مسبق"
+      },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "تحقق من هويتك",
+        "description": "لتفعيل بطاقة Blink، يجب على جهة إصدار البطاقة التحقق من هويتك (KYC). ستحتاج إلى:",
+        "requirements": {
+          "governmentId": "هوية صادرة عن جهة حكومية",
+          "selfie": "صورة سيلفي / فحص الحيوية",
+          "proofOfAddress": "إثبات العنوان",
+          "questions": "بعض الأسئلة عنك"
+        },
+        "buttonText": "متابعة"
       },
       "CardIntroducing": {
         "title": "تقديم",
         "cardInfo": {
-          "bitcoinCard": "بطاقة Blink Visa",
+          "bitcoinCard": "بطاقة Blink",
           "for": "لـ",
-          "maximalist": "أنصار البيتكوين"
+          "bitcoiners": "مستخدمي البيتكوين"
         },
         "buttonText": "متابعة"
       },
       "CardDetails": {
-        "title": "مزايا إضافية",
+        "title": "ما الذي يتضمنه",
         "features": {
-          "accountManager": "مدير حساب مخصص",
-          "support": "دعم ذو أولوية",
-          "onchainDeposits": "استرداد 50% على رسوم المعاملات",
-          "circularEconomies": "100$ للاقتصادات الدائرية"
+          "card": {
+            "title": "بطاقة Blink",
+            "subtitle": "بطاقة Visa الخاصة بك، جاهزة اليوم"
+          },
+          "accountManager": {
+            "title": "مدير حساب شخصي",
+            "subtitle": "ودعم ذو أولوية"
+          },
+          "businessAccounts": "حسابات الأعمال",
+          "virtualAccounts": "حسابات افتراضية"
         },
-        "andMore": "... والمزيد قادم في 2026",
+        "availableIn": "خلال {months} شهرًا",
+        "footnote": "ستتوفر بعض الميزات خلال {months} شهرًا. البطاقة جاهزة اليوم.",
         "buttonText": "متابعة"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "مرحباً بك على متن",
-          "subtitle": "إلى Blink الخاصة",
+          "subtitle": "إلى Blink Orange",
           "paragraphs": {
-            "body1": "فكر فيك شخص ما واقترح أن ندعوك إلى Blink الخاصة. ربما لأنك بيتكويني رائع.",
-            "body2": "هدفنا لعام 2026 هو ملء البرنامج بالكثير من المزايا بحيث سيكون من الواضح التجديد في العام القادم."
+            "body1": "فكر فيك شخص ما واقترح أن ندعوك إلى Blink Orange. ربما لأنك بيتكويني رائع.",
+            "body2": "Blink Orange هي المستوى الأول من عضوية Blink لمستخدمي البيتكوين، بالدعوة فقط. بطاقة Blink ومدير حسابك الشخصي هما من أولى الخدمات التي نقدمها — والباقي نبنيه حتى عام 2027."
           }
         },
         "buttonText": "هيا بنا"
@@ -3817,7 +3843,8 @@
         "acknowledgeSolicitation": "أُقر بأن التقدم بطلب للحصول على بطاقة Blink Visa لا يشكل التماسًا غير مصرح به"
       },
       "CardPreapproved": {
-        "title": "لقد تمت الموافقة المسبقة على بطاقة Blink Visa الخاصة بك!",
+        "title": "بطاقة Blink الخاصة بك جاهزة!",
+        "subtitle": "يمكنك الآن تفعيل بطاقتك والبدء في استخدامها",
         "buttonText": "إغلاق"
       },
       "CardProcessing": {

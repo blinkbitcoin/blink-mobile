@@ -3655,8 +3655,14 @@
         "paymentTitle": "Plată",
         "acceptButton": "Acceptă",
         "payButton": "Continuă și Plătește",
-        "cardTitle": "Blink Privat",
+        "cardTitle": "Blink Orange",
+        "free": "Gratuit",
+        "forNow": "deocamdată",
         "perYear": "pe an",
+        "freeBreakdown": {
+          "card": "Blink Card",
+          "memberBenefits": "Alte beneficii pentru membri"
+        },
         "status": {
           "label": "Status",
           "specialOfferLabel": "Ofertă specială",
@@ -3677,35 +3683,55 @@
           "text": "Am examinat și sunt de acord cu",
           "linkText": "Grila de Tarife Blink Card"
         },
-        "renew": "Înțeleg că abonamentul meu se va reînnoi automat în {months: number} luni"
+        "renew": "Înțeleg că abonamentul meu se va reînnoi automat în {months: number} luni",
+        "freeNotice": "Înțeleg că Blink Orange este gratuit deocamdată și că ulterior ar putea fi introdusă o taxă de membru, cu notificare prealabilă"
+      },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Verificați-vă identitatea",
+        "description": "Pentru a vă activa Blink Card, emitentul cardului trebuie să verifice cine sunteți (KYC). Veți avea nevoie de:",
+        "requirements": {
+          "governmentId": "Un act de identitate emis de stat",
+          "selfie": "Un selfie / verificare de prezență",
+          "proofOfAddress": "Dovada adresei",
+          "questions": "Câteva întrebări despre dumneavoastră"
+        },
+        "buttonText": "Continuă"
       },
       "CardIntroducing": {
         "title": "Prezentare",
         "cardInfo": {
-          "bitcoinCard": "Cardul Visa Blink",
+          "bitcoinCard": "Blink Card",
           "for": "pentru",
-          "maximalist": "Maximaliștii Bitcoin"
+          "bitcoiners": "Bitcoineri"
         },
         "buttonText": "Continuă"
       },
       "CardDetails": {
-        "title": "Avantaje suplimentare",
+        "title": "Ce este inclus",
         "features": {
-          "accountManager": "Manager de cont dedicat",
-          "support": "Suport prioritar",
-          "onchainDeposits": "50% înapoi din comisioanele de tranzacție",
-          "circularEconomies": "100 $ pentru economii circulare"
+          "card": {
+            "title": "Blink Card",
+            "subtitle": "cardul tău Visa, gata astăzi"
+          },
+          "accountManager": {
+            "title": "Manager de cont personal",
+            "subtitle": "și asistență prioritară"
+          },
+          "businessAccounts": "Conturi de afaceri",
+          "virtualAccounts": "Conturi virtuale"
         },
-        "andMore": "... și mai multe vin în 2026",
+        "availableIn": "în {months} luni",
+        "footnote": "Unele funcții vor fi disponibile în cel mult {months} luni. Cardul este gata astăzi.",
         "buttonText": "Continuă"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Bun venit la bord",
-          "subtitle": "La Blink Privat",
+          "subtitle": "La Blink Orange",
           "paragraphs": {
-            "body1": "Cineva s-a gândit la tine și a sugerat că ar trebui să te invităm la Blink Privat. Probabil pentru că ești un Bitcoiner grozav.",
-            "body2": "Obiectivul nostru pentru 2026 este să umplem programul cu atâtea avantaje încât va fi evident să reînnoiești anul viitor."
+            "body1": "Cineva s-a gândit la tine și a sugerat că ar trebui să te invităm la Blink Orange. Probabil pentru că ești un Bitcoiner grozav.",
+            "body2": "Blink Orange este primul nivel al calității de membru Blink pentru Bitcoineri, doar pe bază de invitație. Blink Card și managerul tău personal de cont sunt două dintre primele servicii pe care le oferim — restul îl construim până în 2027."
           }
         },
         "buttonText": "Hai să mergem"
@@ -3817,7 +3843,8 @@
         "acknowledgeSolicitation": "Recunosc că solicitarea cardului Blink Visa nu constituie o solicitare neautorizată"
       },
       "CardPreapproved": {
-        "title": "Ați fost pre-aprobat pentru cardul Blink Visa!",
+        "title": "Blink Card-ul dumneavoastră este gata!",
+        "subtitle": "Acum vă puteți activa cardul și puteți începe să îl folosiți",
         "buttonText": "Închide"
       },
       "CardProcessing": {

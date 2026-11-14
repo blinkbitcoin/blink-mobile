@@ -45,18 +45,27 @@ describe("headerCloseControlOptions", () => {
   })
 
   /** The native header item is sized to the button's margin box, and a touch outside it
-   *  never reaches the button, so the whole 48dp box has to be footprint. */
-  it("gives the close a 48dp box with no negative margin, 20dp from the edge", () => {
+   *  never reaches the button, so the whole 48dp box has to be footprint. The header
+   *  insets its right item by 16, so 4 of padding on the right puts the circle 20dp from
+   *  the edge and the left takes the rest of the box. */
+  it("gives the close a 48dp box with no negative margin, its circle 20dp from the edge", () => {
     const { getByTestId } = renderCloseControl()
 
     const style = StyleSheet.flatten(getByTestId("close").props.style)
     expect(style).toMatchObject({
       width: 48,
       height: 48,
-      paddingRight: 7,
-      marginRight: 13,
+      paddingTop: 7,
+      paddingBottom: 7,
+      paddingRight: 4,
+      paddingLeft: 10,
     })
-    const margins = [style.marginTop, style.marginBottom, style.marginLeft]
+    const margins = [
+      style.marginTop,
+      style.marginBottom,
+      style.marginLeft,
+      style.marginRight,
+    ]
     expect(margins.filter((margin) => typeof margin === "number" && margin < 0)).toEqual(
       [],
     )

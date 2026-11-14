@@ -3655,8 +3655,14 @@
         "paymentTitle": "Плаћање",
         "acceptButton": "Прихвати",
         "payButton": "Настави и Плати",
-        "cardTitle": "Blink Приватни",
+        "cardTitle": "Blink Orange",
+        "free": "Бесплатно",
+        "forNow": "за сада",
         "perYear": "годишње",
+        "freeBreakdown": {
+          "card": "Blink Card",
+          "memberBenefits": "Остале чланске погодности"
+        },
         "status": {
           "label": "Статус",
           "specialOfferLabel": "Посебна понуда",
@@ -3677,35 +3683,55 @@
           "text": "Прегледао сам и слажем се са",
           "linkText": "Ценовником накнада за Blink Card"
         },
-        "renew": "Разумем да ће се моја претплата аутоматски обновити за {months: number} месеци"
+        "renew": "Разумем да ће се моја претплата аутоматски обновити за {months: number} месеци",
+        "freeNotice": "Разумем да је Blink Orange за сада бесплатан и да се чланарина може увести касније, уз претходно обавештење"
+      },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Потврдите свој идентитет",
+        "description": "Да бисте активирали своју Blink Card, издавалац картице мора да потврди ко сте (KYC). Биће вам потребно:",
+        "requirements": {
+          "governmentId": "Службени лични документ",
+          "selfie": "Селфи / провера живости",
+          "proofOfAddress": "Доказ о адреси",
+          "questions": "Неколико питања о вама"
+        },
+        "buttonText": "Настави"
       },
       "CardIntroducing": {
         "title": "Представљамо",
         "cardInfo": {
-          "bitcoinCard": "Blink Visa картица",
+          "bitcoinCard": "Blink Card",
           "for": "за",
-          "maximalist": "Биткоин Максималисте"
+          "bitcoiners": "Биткоинере"
         },
         "buttonText": "Настави"
       },
       "CardDetails": {
-        "title": "Додатне погодности",
+        "title": "Шта је укључено",
         "features": {
-          "accountManager": "Посвећени менаџер налога",
-          "support": "Приоритетна подршка",
-          "onchainDeposits": "50% повраћаја на провизије за трансакције",
-          "circularEconomies": "100 $ за циркуларне економије"
+          "card": {
+            "title": "Blink Card",
+            "subtitle": "ваша Visa картица, спремна већ данас"
+          },
+          "accountManager": {
+            "title": "Лични менаџер налога",
+            "subtitle": "и приоритетна подршка"
+          },
+          "businessAccounts": "Пословни налози",
+          "virtualAccounts": "Виртуелни налози"
         },
-        "andMore": "... и још тога долази 2026.",
+        "availableIn": "за {months} месеци",
+        "footnote": "Неке функције биће доступне у року од {months} месеци. Картица је спремна већ данас.",
         "buttonText": "Настави"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Добродошли на борд",
-          "subtitle": "У Blink Приватни",
+          "subtitle": "У Blink Orange",
           "paragraphs": {
-            "body1": "Неко је мислио на вас и предложио да вас позовемо у Blink Приватни. Вероватно зато што сте сјајан Биткоинер.",
-            "body2": "Наш циљ за 2026. је да напунимо програм са толико погодности да ће бити очигледно да се исплати обновити следеће године."
+            "body1": "Неко је мислио на вас и предложио да вас позовемо у Blink Orange. Вероватно зато што сте сјајан Биткоинер.",
+            "body2": "Blink Orange је први ниво Blink чланства за Биткоинере, само уз позивницу. Blink Card и ваш лични менаџер налога су две од првих услуга које нудимо — остало градимо до 2027."
           }
         },
         "buttonText": "Хајде"
@@ -3817,7 +3843,8 @@
         "acknowledgeSolicitation": "Признајем да подношење захтева за картицу Blink Visa не представља неовлашћено обраћање"
       },
       "CardPreapproved": {
-        "title": "Претходно сте одобрени за Blink Visa картицу!",
+        "title": "Ваша Blink Card је спремна!",
+        "subtitle": "Сада можете да активирате своју картицу и почнете да је користите",
         "buttonText": "Затвори"
       },
       "CardProcessing": {

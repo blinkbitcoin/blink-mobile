@@ -3655,8 +3655,14 @@
         "paymentTitle": "Intlawulo",
         "acceptButton": "Yamkela",
         "payButton": "Qhubeka kwaye Uhlawule",
-        "cardTitle": "Blink Yabucala",
+        "cardTitle": "Blink Orange",
+        "free": "Simahla",
+        "forNow": "okwangoku",
         "perYear": "ngonyaka",
+        "freeBreakdown": {
+          "card": "Ikhadi le-Blink",
+          "memberBenefits": "Ezinye izibonelelo zobulungu"
+        },
         "status": {
           "label": "Isimo",
           "specialOfferLabel": "Inikelo elikhethekileyo",
@@ -3677,35 +3683,55 @@
           "text": "Ndiyiphengululile kwaye ndiyavuma",
           "linkText": "Ishedyuli Yeentlawulo ye-Blink Card"
         },
-        "renew": "Ndiyaqonda ukuba ubhaliso lwam luya kuhlaziywa ngokuzenzekelayo kwiinyanga ezili-{months: number}"
+        "renew": "Ndiyaqonda ukuba ubhaliso lwam luya kuhlaziywa ngokuzenzekelayo kwiinyanga ezili-{months: number}",
+        "freeNotice": "Ndiyaqonda ukuba i-Blink Orange isimahla okwangoku, kwaye kunokwenzeka ukuba kuziswe umrhumo wobulungu kamva, ngesaziso"
+      },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Qinisekisa ubuwena bakho",
+        "description": "Ukuze uvule iKhadi lakho le-Blink, umkhuphi wekhadi kufuneka aqinisekise ukuba ungubani (KYC). Uya kudinga:",
+        "requirements": {
+          "governmentId": "Isazisi esikhutshwe ngurhulumente",
+          "selfie": "Iselfie / uvavanyo lokuphila",
+          "proofOfAddress": "Ubungqina bedilesi",
+          "questions": "Imibuzo embalwa ngawe"
+        },
+        "buttonText": "Qhubeka"
       },
       "CardIntroducing": {
         "title": "Ukwazisa",
         "cardInfo": {
-          "bitcoinCard": "Ikhadi le-Blink Visa",
+          "bitcoinCard": "Ikhadi le-Blink",
           "for": "le",
-          "maximalist": "Abathandi be-Bitcoin"
+          "bitcoiners": "ama-Bitcoiner"
         },
         "buttonText": "Qhubeka"
       },
       "CardDetails": {
-        "title": "Inzuzo ezongezelelweyo",
+        "title": "Okubandakanyiweyo",
         "features": {
-          "accountManager": "Umphathi weakhawunti ozinikeleyo",
-          "support": "Inkxaso ephambili",
-          "onchainDeposits": "50% ubuyiselo kwiimali zotshintsho",
-          "circularEconomies": "$100 kwiikhonomi ezijikeleziyo"
+          "card": {
+            "title": "Ikhadi le-Blink",
+            "subtitle": "ikhadi lakho le-Visa, lilungile namhlanje"
+          },
+          "accountManager": {
+            "title": "Umphathi weakhawunti yakho",
+            "subtitle": "kunye nenkxaso ephambili"
+          },
+          "businessAccounts": "Iiakhawunti zeshishini",
+          "virtualAccounts": "Iiakhawunti zedijithali"
         },
-        "andMore": "... nokunye okuninzi kuzayo ngo-2026",
+        "availableIn": "kwiinyanga ezi-{months}",
+        "footnote": "Ezinye iimpawu ziya kufumaneka kwiinyanga ezi-{months}. Ikhadi lilungile namhlanje.",
         "buttonText": "Qhubeka"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Wamkelekile",
-          "subtitle": "Kwi-Blink Yabucala",
+          "subtitle": "Kwi-Blink Orange",
           "paragraphs": {
-            "body1": "Umntu othile wacinga ngawe waza wacebisa ukuba sikumeme kwi-Blink Yabucala. Mhlawumbi ngenxa yokuba ungum-Bitcoiner omangalisayo.",
-            "body2": "Injongo yethu ngo-2026 kukuzalisa inkqubo ngezinto ezininzi ezintle kangangokuba kuya kucaca ukuba kufanele uhlaziye kunyaka ozayo."
+            "body1": "Umntu othile wacinga ngawe waza wacebisa ukuba sikumeme kwi-Blink Orange. Mhlawumbi ngenxa yokuba ungum-Bitcoiner omangalisayo.",
+            "body2": "I-Blink Orange linqanaba lokuqala lobulungu be-Blink kuma-Bitcoiner, ngesimemo kuphela. Ikhadi le-Blink kunye nomphathi weakhawunti yakho ziinkonzo ezimbini zokuqala esizinikezelayo — ezinye sisazakha ukuya kutsho ngo-2027."
           }
         },
         "buttonText": "Masiye"
@@ -3817,7 +3843,8 @@
         "acknowledgeSolicitation": "Ndiyavuma ukuba ukufaka isicelo seKhadi leBlink Visa akubuyisi sicelo esingagunyaziswanga"
       },
       "CardPreapproved": {
-        "title": "Uvunyiwe ngaphambili ikhadi le-Blink Visa!",
+        "title": "iKhadi lakho le-Blink lilungile!",
+        "subtitle": "Ngoku ungalenza lisebenze ikhadi lakho uze uqalise ukulisebenzisa",
         "buttonText": "Vala"
       },
       "CardProcessing": {

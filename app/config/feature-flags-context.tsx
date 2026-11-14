@@ -442,6 +442,15 @@ const readBoolean = (key: string, fallback: boolean): boolean =>
 const readNumber = (key: string, fallback: number): number =>
   activatedValue(key)?.asNumber() ?? fallback
 
+/** For a key where 0 is a real setting: `asNumber()` also yields 0 for an empty or
+ *  malformed console value, so only a value that parses as a number is taken. */
+const readParsedNumber = (key: string, fallback: number): number => {
+  const raw = activatedValue(key)?.asString().trim() ?? ""
+  const parsed = Number(raw)
+  const isNumeric = raw !== "" && Number.isFinite(parsed)
+  return isNumeric ? parsed : fallback
+}
+
 const readString = (key: string, fallback: string): string =>
   activatedValue(key)?.asString() ?? fallback
 
@@ -547,7 +556,9 @@ const readRemoteConfig = (): RemoteConfig => {
     defaultRemoteConfig.cardIssuerPrivacyPolicyUrl,
   )
 
-  const cardSubscriptionPriceUsd = readNumber(
+  /** A price of 0 is the free offer, so a malformed value keeps the shipped price rather
+   *  than making the membership free. */
+  const cardSubscriptionPriceUsd = readParsedNumber(
     CardSubscriptionPriceUsdKey,
     defaultRemoteConfig.cardSubscriptionPriceUsd,
   )

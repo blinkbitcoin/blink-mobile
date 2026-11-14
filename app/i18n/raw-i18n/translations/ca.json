@@ -3655,8 +3655,14 @@
         "paymentTitle": "Pagament",
         "acceptButton": "Acceptar",
         "payButton": "Continuar i Pagar",
-        "cardTitle": "Blink Privat",
+        "cardTitle": "Blink Orange",
+        "free": "Gratis",
+        "forNow": "de moment",
         "perYear": "per any",
+        "freeBreakdown": {
+          "card": "Blink Card",
+          "memberBenefits": "Altres avantatges de membre"
+        },
         "status": {
           "label": "Estat",
           "specialOfferLabel": "Oferta especial",
@@ -3677,35 +3683,55 @@
           "text": "He revisat i accepto la",
           "linkText": "Taula de Tarifes de Blink Card"
         },
-        "renew": "Entenc que la meva subscripció es renovarà automàticament en {months: number} mesos"
+        "renew": "Entenc que la meva subscripció es renovarà automàticament en {months: number} mesos",
+        "freeNotice": "Entenc que Blink Orange és gratuït de moment i que més endavant es podria introduir una quota de membre, amb avís previ"
+      },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Verifica la teva identitat",
+        "description": "Per activar la teva Blink Card, l'emissor de la targeta ha de verificar qui ets (KYC). Necessitaràs:",
+        "requirements": {
+          "governmentId": "Un document d'identitat oficial",
+          "selfie": "Una selfie / prova de vida",
+          "proofOfAddress": "Comprovant de domicili",
+          "questions": "Unes quantes preguntes sobre tu"
+        },
+        "buttonText": "Continuar"
       },
       "CardIntroducing": {
         "title": "Presentant",
         "cardInfo": {
-          "bitcoinCard": "La targeta Visa de Blink",
+          "bitcoinCard": "La Blink Card",
           "for": "per a",
-          "maximalist": "Bitcoin Maximalistes"
+          "bitcoiners": "Bitcoiners"
         },
         "buttonText": "Continuar"
       },
       "CardDetails": {
-        "title": "Avantatges addicionals",
+        "title": "Què inclou",
         "features": {
-          "accountManager": "Gestor de comptes dedicat",
-          "support": "Suport prioritari",
-          "onchainDeposits": "50% de reemborsament en comissions de transacció",
-          "circularEconomies": "100$ per a economies circulars"
+          "card": {
+            "title": "Blink Card",
+            "subtitle": "la teva targeta Visa, llesta avui"
+          },
+          "accountManager": {
+            "title": "Gestor de compte personal",
+            "subtitle": "i suport prioritari"
+          },
+          "businessAccounts": "Comptes d'empresa",
+          "virtualAccounts": "Comptes virtuals"
         },
-        "andMore": "... i més per venir el 2026",
+        "availableIn": "d'aquí a {months} mesos",
+        "footnote": "Algunes funcions estaran disponibles d'aquí a {months} mesos. La targeta està llesta avui.",
         "buttonText": "Continuar"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Benvingut a bord",
-          "subtitle": "A Blink Privat",
+          "subtitle": "A Blink Orange",
           "paragraphs": {
-            "body1": "Algú va pensar en tu i va suggerir que t'hauríem de convidar a Blink Privat. Probablement perquè ets un Bitcoiner increïble.",
-            "body2": "El nostre objectiu per al 2026 és omplir el programa amb tantes coses bones que serà obvi renovar l'any vinent."
+            "body1": "Algú va pensar en tu i va suggerir que t'hauríem de convidar a Blink Orange. Probablement perquè ets un Bitcoiner increïble.",
+            "body2": "Blink Orange és el primer nivell de la membresia de Blink per a Bitcoiners, només per invitació. La Blink Card i el teu gestor de compte personal són dos dels primers serveis que oferim — la resta l'anem construint fins al 2027."
           }
         },
         "buttonText": "Anem-hi"
@@ -3817,7 +3843,8 @@
         "acknowledgeSolicitation": "Reconec que sol·licitar la targeta Blink Visa no constitueix una sol·licitud no autoritzada"
       },
       "CardPreapproved": {
-        "title": "Has estat preaprovat per a la targeta Blink Visa!",
+        "title": "La teva Blink Card està llesta!",
+        "subtitle": "Ara pots activar la teva targeta i començar a fer-la servir",
         "buttonText": "Tancar"
       },
       "CardProcessing": {

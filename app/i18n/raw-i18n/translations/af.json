@@ -3655,8 +3655,14 @@
         "paymentTitle": "Betaling",
         "acceptButton": "Aanvaar",
         "payButton": "Gaan voort en Betaal",
-        "cardTitle": "Blink Privaat",
+        "cardTitle": "Blink Orange",
+        "free": "Gratis",
+        "forNow": "vir nou",
         "perYear": "per jaar",
+        "freeBreakdown": {
+          "card": "Blink-kaart",
+          "memberBenefits": "Ander lidvoordele"
+        },
         "status": {
           "label": "Status",
           "specialOfferLabel": "Spesiale aanbod",
@@ -3677,35 +3683,55 @@
           "text": "Ek het nagegaan en stem in tot die",
           "linkText": "Blink Card-fooiskedule"
         },
-        "renew": "Ek verstaan dat my intekening outomaties oor {months: number} maande sal hernu"
+        "renew": "Ek verstaan dat my intekening outomaties oor {months: number} maande sal hernu",
+        "freeNotice": "Ek verstaan dat Blink Orange vir nou gratis is, en dat 'n lidmaatskapfooi later ingestel kan word, met kennisgewing"
+      },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Verifieer jou identiteit",
+        "description": "Om jou Blink-kaart te aktiveer, moet die kaartuitreiker verifieer wie jy is (KYC). Jy sal nodig hê:",
+        "requirements": {
+          "governmentId": "'n Regeringsuitgereikte ID",
+          "selfie": "'n Selfie / lewendheidstoets",
+          "proofOfAddress": "Bewys van adres",
+          "questions": "'n Paar vrae oor jou"
+        },
+        "buttonText": "Gaan voort"
       },
       "CardIntroducing": {
         "title": "Bekendstelling",
         "cardInfo": {
-          "bitcoinCard": "Die Blink Visa-kaart",
+          "bitcoinCard": "Die Blink-kaart",
           "for": "vir",
-          "maximalist": "Bitcoin Maksimaliste"
+          "bitcoiners": "Bitcoiners"
         },
         "buttonText": "Gaan voort"
       },
       "CardDetails": {
-        "title": "Bykomende voordele",
+        "title": "Wat is ingesluit",
         "features": {
-          "accountManager": "Toegewyde rekeningbestuurder",
-          "support": "Prioriteit-ondersteuning",
-          "onchainDeposits": "50% terug op transaksiegelde",
-          "circularEconomies": "$100 vir sirkulêre ekonomieë"
+          "card": {
+            "title": "Blink-kaart",
+            "subtitle": "jou Visa-kaart, vandag gereed"
+          },
+          "accountManager": {
+            "title": "Persoonlike rekeningbestuurder",
+            "subtitle": "en prioriteitsondersteuning"
+          },
+          "businessAccounts": "Besigheidsrekeninge",
+          "virtualAccounts": "Virtuele rekeninge"
         },
-        "andMore": "... en meer kom in 2026",
+        "availableIn": "oor {months} maande",
+        "footnote": "Sommige funksies sal binne {months} maande beskikbaar wees. Die kaart is vandag gereed.",
         "buttonText": "Gaan voort"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Welkom aan boord",
-          "subtitle": "By Blink Privaat",
+          "subtitle": "By Blink Orange",
           "paragraphs": {
-            "body1": "Iemand het aan jou gedink en voorgestel dat ons jou na Blink Privaat moet nooi. Waarskynlik omdat jy 'n wonderlike Bitcoiner is.",
-            "body2": "Ons doel vir 2026 is om die program met soveel goedighede te vul dat dit voor die hand liggend sal wees om volgende jaar te hernu."
+            "body1": "Iemand het aan jou gedink en voorgestel dat ons jou na Blink Orange moet nooi. Waarskynlik omdat jy 'n wonderlike Bitcoiner is.",
+            "body2": "Blink Orange is die eerste vlak van Blink se lidmaatskap vir Bitcoiners, op uitnodiging. Die Blink-kaart en jou persoonlike rekeningbestuurder is twee van die eerste dienste wat ons bied — die res bou ons tot in 2027."
           }
         },
         "buttonText": "Kom ons gaan"
@@ -3817,7 +3843,8 @@
         "acknowledgeSolicitation": "Ek erken dat die aansoek om die Blink Visa-kaart nie ongemagtigde werwing uitmaak nie"
       },
       "CardPreapproved": {
-        "title": "Jy is vooraf goedgekeur vir die Blink Visa-kaart!",
+        "title": "Jou Blink-kaart is gereed!",
+        "subtitle": "Jy kan nou jou kaart aktiveer en dit begin gebruik",
         "buttonText": "Sluit"
       },
       "CardProcessing": {

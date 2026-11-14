@@ -3655,8 +3655,14 @@
         "paymentTitle": "Վճարում",
         "acceptButton": "Ընդունել",
         "payButton": "Շարունակել և վճարել",
-        "cardTitle": "Blink Private",
+        "cardTitle": "Blink Orange",
+        "free": "Անվճար",
+        "forNow": "առայժմ",
         "perYear": "տարեկան",
+        "freeBreakdown": {
+          "card": "Blink քարտ",
+          "memberBenefits": "Անդամակցության այլ առավելություններ"
+        },
         "status": {
           "label": "Կարգավիճակ",
           "specialOfferLabel": "Հատուկ առաջարկ",
@@ -3677,35 +3683,55 @@
           "text": "Ես ծանոթացել եմ և համաձայն եմ",
           "linkText": "Blink Card-ի վճարների սանդղակին"
         },
-        "renew": "Հասկանում եմ, որ իմ բաժանորդագրությունն ավտոմատ կերպով կթարմացվի {months: number} ամսից"
+        "renew": "Հասկանում եմ, որ իմ բաժանորդագրությունն ավտոմատ կերպով կթարմացվի {months: number} ամսից",
+        "freeNotice": "Ես հասկանում եմ, որ Blink Orange-ը առայժմ անվճար է, և որ ավելի ուշ՝ նախնական ծանուցմամբ, կարող է սահմանվել անդամավճար"
+      },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Հաստատեք Ձեր ինքնությունը",
+        "description": "Ձեր Blink քարտն ակտիվացնելու համար քարտի թողարկողը պետք է հաստատի, թե ով եք Դուք (KYC)։ Ձեզ անհրաժեշտ կլինի՝",
+        "requirements": {
+          "governmentId": "Պետական անձը հաստատող փաստաթուղթ",
+          "selfie": "Սելֆի / կենդանության ստուգում",
+          "proofOfAddress": "Հասցեի ապացույց",
+          "questions": "Մի քանի հարց Ձեր մասին"
+        },
+        "buttonText": "Շարունակել"
       },
       "CardIntroducing": {
         "title": "Ներկայացնում ենք",
         "cardInfo": {
-          "bitcoinCard": "Blink Visa քարտը",
+          "bitcoinCard": "Blink քարտը",
           "for": "համար",
-          "maximalist": "Bitcoin մաքսիմալիստների"
+          "bitcoiners": "բիթքոյներների"
         },
         "buttonText": "Շարունակել"
       },
       "CardDetails": {
-        "title": "Լրացուցիչ առավելություններ",
+        "title": "Ինչ է ներառված",
         "features": {
-          "accountManager": "Անձնական հաշվի կառավարիչ",
-          "support": "Առաջնահերթ աջակցություն",
-          "onchainDeposits": "Գործարքի վճարների 50% վերադարձ",
-          "circularEconomies": "$100 շրջանաձև տնտեսություններին"
+          "card": {
+            "title": "Blink քարտ",
+            "subtitle": "Ձեր Visa քարտը՝ պատրաստ այսօր"
+          },
+          "accountManager": {
+            "title": "Անձնական հաշվի մենեջեր",
+            "subtitle": "և առաջնահերթ աջակցություն"
+          },
+          "businessAccounts": "Բիզնես հաշիվներ",
+          "virtualAccounts": "Վիրտուալ հաշիվներ"
         },
-        "andMore": "... և ավելին` 2026-ին",
+        "availableIn": "{months} ամսից",
+        "footnote": "Որոշ գործառույթներ հասանելի կլինեն {months} ամսվա ընթացքում։ Քարտը պատրաստ է այսօր։",
         "buttonText": "Շարունակել"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Բարի գալուստ",
-          "subtitle": "Blink Private",
+          "subtitle": "Blink Orange",
           "paragraphs": {
-            "body1": "Ինչ-որ մեկը մտածել է Ձեր մասին և առաջարկել, որ մենք Ձեզ հրավիրենք Blink Private։ Հավանաբար այն պատճառով, որ Դուք հիանալի բիթքոյներ եք։",
-            "body2": "Մեր նպատակը 2026-ի համար ծրագրում այնքան շատ առավելություններ ավելացնելն է, որ հաջորդ տարի երկարաձգելը դառնա ինքնըստինքյան ակնհայտ։"
+            "body1": "Ինչ-որ մեկը մտածել է Ձեր մասին և առաջարկել, որ մենք Ձեզ հրավիրենք Blink Orange։ Հավանաբար այն պատճառով, որ Դուք հիանալի բիթքոյներ եք։",
+            "body2": "Blink Orange-ը Blink-ի անդամակցության առաջին մակարդակն է բիթքոյներների համար՝ միայն հրավերով։ Blink քարտը և Ձեր անձնական հաշվի մենեջերը մեր առաջարկած առաջին ծառայություններից երկուսն են — մնացածը մենք կառուցում ենք մինչև 2027 թվականը։"
           }
         },
         "buttonText": "Սկսենք"
@@ -3817,7 +3843,8 @@
         "acknowledgeSolicitation": "Ես գիտակցում եմ, որ Blink Visa քարտի համար դիմելը չի համարվում չարտոնված դիմում"
       },
       "CardPreapproved": {
-        "title": "You have been pre-approved for the Blink Visa card!",
+        "title": "Ձեր Blink քարտը պատրաստ է!",
+        "subtitle": "Այժմ կարող եք ակտիվացնել ձեր քարտը և սկսել օգտագործել այն",
         "buttonText": "Close"
       },
       "CardProcessing": {

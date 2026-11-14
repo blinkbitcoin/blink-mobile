@@ -3655,8 +3655,14 @@
         "paymentTitle": "Platba",
         "acceptButton": "Prijať",
         "payButton": "Pokračovať a Zaplatiť",
-        "cardTitle": "Blink Súkromný",
+        "cardTitle": "Blink Orange",
+        "free": "Zadarmo",
+        "forNow": "zatiaľ",
         "perYear": "za rok",
+        "freeBreakdown": {
+          "card": "Blink Card",
+          "memberBenefits": "Ďalšie členské výhody"
+        },
         "status": {
           "label": "Stav",
           "specialOfferLabel": "Špeciálna ponuka",
@@ -3677,35 +3683,55 @@
           "text": "Skontroloval som a súhlasím s dokumentom",
           "linkText": "Sadzobník poplatkov Blink Card"
         },
-        "renew": "Rozumiem, že moje predplatné sa automaticky obnoví o {months: number} mesiacov"
+        "renew": "Rozumiem, že moje predplatné sa automaticky obnoví o {months: number} mesiacov",
+        "freeNotice": "Rozumiem, že Blink Orange je zatiaľ zadarmo a že členský poplatok môže byť neskôr zavedený, s predchádzajúcim upozornením"
+      },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Overte svoju totožnosť",
+        "description": "Na aktiváciu vašej Blink Card musí vydavateľ karty overiť, kto ste (KYC). Budete potrebovať:",
+        "requirements": {
+          "governmentId": "Úradný doklad totožnosti",
+          "selfie": "Selfie / overenie živosti",
+          "proofOfAddress": "Doklad o adrese",
+          "questions": "Niekoľko otázok o vás"
+        },
+        "buttonText": "Pokračovať"
       },
       "CardIntroducing": {
         "title": "Predstavujeme",
         "cardInfo": {
-          "bitcoinCard": "Karta Blink Visa",
+          "bitcoinCard": "Blink Card",
           "for": "pre",
-          "maximalist": "Bitcoin maximalistov"
+          "bitcoiners": "Bitcoinerov"
         },
         "buttonText": "Pokračovať"
       },
       "CardDetails": {
-        "title": "Ďalšie výhody",
+        "title": "Čo je zahrnuté",
         "features": {
-          "accountManager": "Vyhradený správca účtu",
-          "support": "Prioritná podpora",
-          "onchainDeposits": "50% späť z transakčných poplatkov",
-          "circularEconomies": "100 $ pre cirkulárne ekonomiky"
+          "card": {
+            "title": "Blink Card",
+            "subtitle": "vaša karta Visa, pripravená už dnes"
+          },
+          "accountManager": {
+            "title": "Osobný manažér účtu",
+            "subtitle": "a prioritná podpora"
+          },
+          "businessAccounts": "Firemné účty",
+          "virtualAccounts": "Virtuálne účty"
         },
-        "andMore": "... a ďalšie prídu v roku 2026",
+        "availableIn": "o {months} mesiacov",
+        "footnote": "Niektoré funkcie budú dostupné do {months} mesiacov. Karta je pripravená už dnes.",
         "buttonText": "Pokračovať"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Vitajte na palube",
-          "subtitle": "V Blink Súkromný",
+          "subtitle": "V Blink Orange",
           "paragraphs": {
-            "body1": "Niekto na vás myslel a navrhol, aby sme vás pozvali do Blink Súkromný. Pravdepodobne preto, že ste skvelý Bitcoiner.",
-            "body2": "Naším cieľom pre rok 2026 je naplniť program toľkými výhodami, že bude zrejmé, že sa oplatí budúci rok obnoviť."
+            "body1": "Niekto na vás myslel a navrhol, aby sme vás pozvali do Blink Orange. Pravdepodobne preto, že ste skvelý Bitcoiner.",
+            "body2": "Blink Orange je prvá úroveň členstva v Blinku pre Bitcoinerov, iba na pozvánku. Blink Card a váš osobný manažér účtu sú dve z prvých služieb, ktoré ponúkame — zvyšok budujeme do roku 2027."
           }
         },
         "buttonText": "Poďme na to"
@@ -3817,7 +3843,8 @@
         "acknowledgeSolicitation": "Beriem na vedomie, že žiadosť o kartu Blink Visa nepredstavuje neoprávnené oslovenie"
       },
       "CardPreapproved": {
-        "title": "Boli ste predbežne schválení pre kartu Blink Visa!",
+        "title": "Vaša Blink Card je pripravená!",
+        "subtitle": "Teraz si môžete kartu aktivovať a začať ju používať",
         "buttonText": "Zavrieť"
       },
       "CardProcessing": {

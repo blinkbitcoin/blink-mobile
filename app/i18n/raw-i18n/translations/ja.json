@@ -3655,8 +3655,14 @@
                 "paymentTitle": "お支払い",
                 "acceptButton": "承諾",
                 "payButton": "続行して支払う",
-                "cardTitle": "Blink プライベート",
+                "cardTitle": "Blink Orange",
+                "free": "無料",
+                "forNow": "現時点では",
                 "perYear": "年額",
+                "freeBreakdown": {
+                    "card": "Blink カード",
+                    "memberBenefits": "その他のメンバー特典"
+                },
                 "status": {
                     "label": "ステータス",
                     "specialOfferLabel": "特別オファー",
@@ -3677,35 +3683,55 @@
                     "text": "以下を確認し、同意します：",
                     "linkText": "Blink Card 手数料表"
                 },
-                "renew": "サブスクリプションが{months: number}か月後に自動的に更新されることを理解しています"
+                "renew": "サブスクリプションが{months: number}か月後に自動的に更新されることを理解しています",
+                "freeNotice": "Blink Orange は現時点では無料であり、今後事前の通知のうえで会費が導入される可能性があることを理解しています"
+            },
+            "CardVerifyIdentity": {
+                "headerTitle": "Blink Orange",
+                "title": "本人確認",
+                "description": "Blink カードを有効にするには、カード発行会社による本人確認（KYC）が必要です。必要なもの：",
+                "requirements": {
+                    "governmentId": "政府発行の身分証明書",
+                    "selfie": "セルフィー / 生体確認",
+                    "proofOfAddress": "住所証明書類",
+                    "questions": "あなたに関するいくつかの質問"
+                },
+                "buttonText": "続ける"
             },
             "CardIntroducing": {
                 "title": "ご紹介",
                 "cardInfo": {
-                    "bitcoinCard": "Blink Visaカード",
+                    "bitcoinCard": "Blink カード",
                     "for": "",
-                    "maximalist": "ビットコインマキシマリスト向け"
+                    "bitcoiners": "ビットコイナー向け"
                 },
                 "buttonText": "続ける"
             },
             "CardDetails": {
-                "title": "追加特典",
+                "title": "含まれるもの",
                 "features": {
-                    "accountManager": "専任アカウントマネージャー",
-                    "support": "優先サポート",
-                    "onchainDeposits": "取引手数料の50%キャッシュバック",
-                    "circularEconomies": "循環型経済に100ドル"
+                    "card": {
+                        "title": "Blink カード",
+                        "subtitle": "あなたの Visa カード、今日から使えます"
+                    },
+                    "accountManager": {
+                        "title": "専任のアカウントマネージャー",
+                        "subtitle": "優先サポート付き"
+                    },
+                    "businessAccounts": "ビジネス口座",
+                    "virtualAccounts": "バーチャル口座"
                 },
-                "andMore": "... さらに2026年に追加予定",
+                "availableIn": "{months}か月後",
+                "footnote": "一部の機能は{months}か月以内に利用可能になります。カードは今日から使えます。",
                 "buttonText": "続ける"
             },
             "WelcomeOnboard": {
                 "welcomeMessage": {
                     "title": "ようこそ",
-                    "subtitle": "Blink プライベートへ",
+                    "subtitle": "Blink Orange へ",
                     "paragraphs": {
-                        "body1": "あなたのことを考えた方が、Blink プライベートにお招きすることを提案しました。おそらくあなたが素晴らしいビットコイナーだからです。",
-                        "body2": "2026年の私たちの目標は、来年の更新が当然と思えるほど多くの特典でプログラムを充実させることです。"
+                        "body1": "あなたのことを考えた方が、Blink Orange にお招きすることを提案しました。おそらくあなたが素晴らしいビットコイナーだからです。",
+                        "body2": "Blink Orange は、招待制のビットコイナー向け Blink メンバーシップの最初のティアです。Blink カードと専任のアカウントマネージャーは、私たちが提供する最初のサービスのうちの2つです。残りは2027年にかけて構築していきます。"
                     }
                 },
                 "buttonText": "始めましょう"
@@ -3756,7 +3782,8 @@
                 "acknowledgeSolicitation": "Blink Visa カードの申し込みが不正な勧誘に該当しないことを認めます"
             },
             "CardPreapproved": {
-                "title": "Blink Visaカードの事前承認が完了しました！",
+                "title": "Blink カードの準備ができました！",
+                "subtitle": "カードを有効化して、すぐにご利用いただけます",
                 "buttonText": "閉じる"
             },
             "CardProcessing": {

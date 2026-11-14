@@ -3655,8 +3655,14 @@
         "paymentTitle": "Plaćanje",
         "acceptButton": "Prihvati",
         "payButton": "Nastavi i Plati",
-        "cardTitle": "Blink Privatni",
+        "cardTitle": "Blink Orange",
+        "free": "Besplatno",
+        "forNow": "za sada",
         "perYear": "godišnje",
+        "freeBreakdown": {
+          "card": "Blink kartica",
+          "memberBenefits": "Ostale članske pogodnosti"
+        },
         "status": {
           "label": "Status",
           "specialOfferLabel": "Posebna ponuda",
@@ -3677,35 +3683,55 @@
           "text": "Pregledao sam i slažem se s dokumentom",
           "linkText": "Cjenik naknada za Blink Card"
         },
-        "renew": "Razumijem da će se moja pretplata automatski obnoviti za {months: number} mjeseci"
+        "renew": "Razumijem da će se moja pretplata automatski obnoviti za {months: number} mjeseci",
+        "freeNotice": "Razumijem da je Blink Orange za sada besplatan te da se članarina može uvesti kasnije, uz prethodnu obavijest"
+      },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Potvrdite svoj identitet",
+        "description": "Da biste aktivirali svoju Blink karticu, izdavatelj kartice mora potvrditi tko ste (KYC). Trebat će vam:",
+        "requirements": {
+          "governmentId": "Službeni identifikacijski dokument",
+          "selfie": "Selfie / provjera živosti",
+          "proofOfAddress": "Dokaz o adresi",
+          "questions": "Nekoliko pitanja o vama"
+        },
+        "buttonText": "Nastavi"
       },
       "CardIntroducing": {
         "title": "Predstavljamo",
         "cardInfo": {
-          "bitcoinCard": "Blink Visa kartica",
+          "bitcoinCard": "Blink kartica",
           "for": "za",
-          "maximalist": "Bitcoin Maksimaliste"
+          "bitcoiners": "Bitcoinere"
         },
         "buttonText": "Nastavi"
       },
       "CardDetails": {
-        "title": "Dodatne pogodnosti",
+        "title": "Što je uključeno",
         "features": {
-          "accountManager": "Posvećeni upravitelj računa",
-          "support": "Prioritetna podrška",
-          "onchainDeposits": "50% povrata na naknade za transakcije",
-          "circularEconomies": "100 $ za kružne ekonomije"
+          "card": {
+            "title": "Blink kartica",
+            "subtitle": "vaša Visa kartica, spremna već danas"
+          },
+          "accountManager": {
+            "title": "Osobni upravitelj računa",
+            "subtitle": "i prioritetna podrška"
+          },
+          "businessAccounts": "Poslovni računi",
+          "virtualAccounts": "Virtualni računi"
         },
-        "andMore": "... i još toga dolazi 2026.",
+        "availableIn": "za {months} mjeseci",
+        "footnote": "Neke značajke bit će dostupne u roku od {months} mjeseci. Kartica je spremna već danas.",
         "buttonText": "Nastavi"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Dobrodošli na brod",
-          "subtitle": "U Blink Privatni",
+          "subtitle": "U Blink Orange",
           "paragraphs": {
-            "body1": "Netko je mislio na vas i predložio da vas pozovemo u Blink Privatni. Vjerojatno zato što ste sjajan Bitcoiner.",
-            "body2": "Naš cilj za 2026. je napuniti program s toliko pogodnosti da će biti očito da se isplati obnoviti sljedeće godine."
+            "body1": "Netko je mislio na vas i predložio da vas pozovemo u Blink Orange. Vjerojatno zato što ste sjajan Bitcoiner.",
+            "body2": "Blink Orange je prva razina Blink članstva za Bitcoinere, samo uz pozivnicu. Blink kartica i vaš osobni upravitelj računa dvije su od prvih usluga koje nudimo — ostatak gradimo do 2027."
           }
         },
         "buttonText": "Idemo"
@@ -3817,7 +3843,8 @@
         "acknowledgeSolicitation": "Potvrđujem da podnošenje zahtjeva za karticu Blink Visa ne predstavlja neovlašteno oglašavanje"
       },
       "CardPreapproved": {
-        "title": "Unaprijed ste odobreni za Blink Visa karticu!",
+        "title": "Vaša Blink kartica je spremna!",
+        "subtitle": "Sada možete aktivirati svoju karticu i početi je koristiti",
         "buttonText": "Zatvori"
       },
       "CardProcessing": {

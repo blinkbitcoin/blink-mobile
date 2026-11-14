@@ -3655,8 +3655,14 @@
         "paymentTitle": "Okusasula",
         "acceptButton": "Kkiriza",
         "payButton": "Weyongere era Osasula",
-        "cardTitle": "Blink Ekyama",
+        "cardTitle": "Blink Orange",
+        "free": "Bwereere",
+        "forNow": "kati",
         "perYear": "buli mwaka",
+        "freeBreakdown": {
+          "card": "Kaadi ya Blink",
+          "memberBenefits": "Ebirungi ebirala eby'obwammemba"
+        },
         "status": {
           "label": "Embeera",
           "specialOfferLabel": "Ekirabo eky'enjawulo",
@@ -3677,35 +3683,55 @@
           "text": "Nkakasizza era nkkiriza",
           "linkText": "Oluwendo lw'ebisale bya Blink Card"
         },
-        "renew": "Ntegeera nti okwewandiisa kwange kujja kuddaabirizibwa okwokwokka nga wayiseewo emyezi {months: number}"
+        "renew": "Ntegeera nti okwewandiisa kwange kujja kuddaabirizibwa okwokwokka nga wayiseewo emyezi {months: number}",
+        "freeNotice": "Ntegeera nti Blink Orange ya bwereere kati, era nti ssente z'obwammemba ziyinza okutandikibwawo oluvannyuma, nga tutegeezeddwa"
+      },
+      "CardVerifyIdentity": {
+        "headerTitle": "Blink Orange",
+        "title": "Kakasa ebikukwatako",
+        "description": "Okusobola okukozesa Kaadi yo eya Blink, akola kaadi alina okukakasa ggwe ani (KYC). Ojja kwetaaga:",
+        "requirements": {
+          "governmentId": "Endagamuntu eyagabibwa gavumenti",
+          "selfie": "Ekifaananyi kya selfie / okukebera nti oli mulamu",
+          "proofOfAddress": "Obukakafu bw'ekifo w'obeera",
+          "questions": "Ebibuuzo bitono ebikukwatako"
+        },
+        "buttonText": "Weyongere"
       },
       "CardIntroducing": {
         "title": "Okwanjula",
         "cardInfo": {
-          "bitcoinCard": "Kaadi ya Blink Visa",
+          "bitcoinCard": "Kaadi ya Blink",
           "for": "ya",
-          "maximalist": "Abantu ba Bitcoin"
+          "bitcoiners": "Ba Bitcoiner"
         },
         "buttonText": "Weyongere"
       },
       "CardDetails": {
-        "title": "Ebirala ebirungi",
+        "title": "Ebigirimu",
         "features": {
-          "accountManager": "Omukozi w'akawunti ow'enjawulo",
-          "support": "Obuyambi obw'okusooka",
-          "onchainDeposits": "50% okuddizibwa ku ssente z'okutambula",
-          "circularEconomies": "$100 eri ekonomiya ezeetooloola"
+          "card": {
+            "title": "Kaadi ya Blink",
+            "subtitle": "kaadi yo eya Visa, etegese leero"
+          },
+          "accountManager": {
+            "title": "Omuddukanya w'akawunti yo ey'enjawulo",
+            "subtitle": "n'obuyambi obukulembezebwa"
+          },
+          "businessAccounts": "Akawunti za bizinensi",
+          "virtualAccounts": "Akawunti ez'oku yintaneti"
         },
-        "andMore": "... n'ebirala bijja mu 2026",
+        "availableIn": "mu myezi {months}",
+        "footnote": "Ebimu ku bintu bijja kubaawo mu myezi {months}. Kaadi etegese leero.",
         "buttonText": "Weyongere"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Tukusanyukidde",
-          "subtitle": "Mu Blink Ekyama",
+          "subtitle": "Mu Blink Orange",
           "paragraphs": {
-            "body1": "Omuntu eyalowooza ku ggwe era n'ateesa nti tusaanye okukuyita mu Blink Ekyama. Oboolyawo kubanga oli Bitcoiner omulungi nnyo.",
-            "body2": "Ekigendererwa kyaffe mu 2026 kwe kutekamu pulogulamu ebirungi ebingi nti kiriba kirabika okuddamu okuwandiisa omwaka ogujja."
+            "body1": "Omuntu eyalowooza ku ggwe era n'ateesa nti tusaanye okukuyita mu Blink Orange. Oboolyawo kubanga oli Bitcoiner omulungi nnyo.",
+            "body2": "Blink Orange gwe mutendera ogusooka ogw'obwammemba bwa Blink eri ba Bitcoiner, ku kuyitibwa kwokka. Kaadi ya Blink n'omuddukanya w'akawunti yo ey'enjawulo ze mpeereza bbiri ku ezisooka ze tuwaayo — ebisigadde tubizimba okutuusa mu 2027."
           }
         },
         "buttonText": "Ka tugende"
@@ -3817,7 +3843,8 @@
         "acknowledgeSolicitation": "Ntegeera nti okusaba kaadi ya Blink Visa tekitegeeza kusaba okutakkirizibwa"
       },
       "CardPreapproved": {
-        "title": "Okakasiddwa okusookera ku kaadi ya Blink Visa!",
+        "title": "Kaadi yo eya Blink etegese!",
+        "subtitle": "Kati osobola okuggulawo kaadi yo n'otandika okugikozesa",
         "buttonText": "Ggalawo"
       },
       "CardProcessing": {

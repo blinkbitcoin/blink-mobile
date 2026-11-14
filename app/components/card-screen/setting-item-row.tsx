@@ -3,6 +3,7 @@ import { Pressable, StyleProp, TextStyle, View, ViewStyle } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
+import { fonts } from "@app/rne-theme/fonts"
 
 const ICON_SIZE = 16
 
@@ -109,16 +110,14 @@ const useStyles = makeStyles(({ colors }, { hovering, hasSubtitle }: StyleProps)
     },
     title: {
       color: colors.textOnBackground,
-      fontFamily: "Source Sans Pro",
+      fontFamily: fonts.regular,
       fontSize: 14,
-      fontWeight: "400",
       lineHeight: 20,
     },
     subtitle: {
       color: colors.textMuted,
-      fontFamily: "Source Sans Pro",
+      fontFamily: fonts.regular,
       fontSize: 14,
-      fontWeight: "400",
       lineHeight: 20,
     },
   }
