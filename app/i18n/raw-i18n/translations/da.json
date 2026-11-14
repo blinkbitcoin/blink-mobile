@@ -2536,7 +2536,23 @@
         "title": "Prisændringer",
         "description": "Notifikationer om Bitcoin-prisen."
       }
-    }
+    },
+    "splashGroup": "Skærm for modtaget betaling",
+    "incomingTransactionSplash": "Vis skærm",
+    "splashMinimum": "Minimumsbeløb (SAT)"
+  },
+  "IncomingTransactionSplash": {
+    "youReceived": "Du har modtaget",
+    "pendingOnchain": "Afventende onchain",
+    "note": "Note",
+    "dontShowAgain": "Vis ikke dette igen",
+    "details": "Detaljer",
+    "announcement": "Du har modtaget {amount}",
+    "tapToShow": "Tryk for at vise",
+    "announcementHidden": "Betaling modtaget",
+    "announcementPending": "Afventende onchain, {amount}",
+    "toastOn": "Skærm for modtaget betaling er slået til",
+    "toastOff": "Skærm for modtaget betaling er slået fra"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Din konto har mere end $5",

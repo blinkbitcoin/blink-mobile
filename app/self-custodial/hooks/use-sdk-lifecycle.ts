@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { AppState } from "react-native"
 
-import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  type BreezSdkInterface,
+  SdkEvent_Tags as SdkEventTags,
+} from "@breeztech/breez-sdk-spark-react-native"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useBackoffRetry } from "@app/hooks/use-backoff-retry"
@@ -30,6 +33,13 @@ import {
   PAYMENT_RECEIVED_EVENTS,
   REFRESH_EVENTS,
 } from "../providers/sdk-events"
+import { emitNewDeposits } from "../providers/new-deposits"
+import {
+  clearPendingPayments,
+  emitSucceededPayment,
+  noteFailedPayment,
+  notePendingPayment,
+} from "../providers/succeeded-payments"
 import { validateStoredNetwork } from "../providers/validate-network"
 import {
   getOnlineState,
@@ -253,13 +263,28 @@ export const useSdkLifecycle = (
       setSdk(connectedSdk)
       setConnectedAccountId(accountId)
 
+      /** Deposits the first sync turns up were already there: only later ones are new. */
+      let hasSynced = false
       const listenerId = await addSdkEventListener(connectedSdk, async (event) => {
         if (!mounted) return
+        if (event.tag === SdkEventTags.Synced) hasSynced = true
+        if (hasSynced && event.tag === SdkEventTags.NewDeposits) {
+          emitNewDeposits(event.inner.newDeposits)
+        }
 
         /** Ahead of the refresh filter: a failed send is not a refresh event, but it is
          *  the only word a pending send gets of its failure. Gated to Enhanced inside. */
         const observedPayment = extractObservedPayment(event)
         if (observedPayment) measureObservedPayment(observedPayment)
+        if (observedPayment && event.tag === SdkEventTags.PaymentPending) {
+          notePendingPayment(observedPayment)
+        }
+        if (observedPayment && event.tag === SdkEventTags.PaymentSucceeded) {
+          emitSucceededPayment(observedPayment)
+        }
+        if (observedPayment && event.tag === SdkEventTags.PaymentFailed) {
+          noteFailedPayment(observedPayment)
+        }
 
         if (!REFRESH_EVENTS.has(event.tag)) return
 
@@ -332,6 +357,7 @@ export const useSdkLifecycle = (
       mounted = false
       abortRef.current = true
       resetBackoff()
+      clearPendingPayments()
 
       const sdk = sdkRef.current
       const listenerId = listenerIdRef.current

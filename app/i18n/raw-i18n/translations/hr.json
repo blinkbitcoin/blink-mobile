@@ -2536,7 +2536,23 @@
         "title": "Promjene cijena",
         "description": "Obavijesti o cijeni Bitcoina."
       }
-    }
+    },
+    "splashGroup": "Zaslon primljene uplate",
+    "incomingTransactionSplash": "Prikaži zaslon",
+    "splashMinimum": "Najmanji iznos (SAT)"
+  },
+  "IncomingTransactionSplash": {
+    "youReceived": "Primili ste",
+    "pendingOnchain": "Onchain u tijeku",
+    "note": "Bilješka",
+    "dontShowAgain": "Ne prikazuj više",
+    "details": "Detalji",
+    "announcement": "Primili ste {amount}",
+    "tapToShow": "Dodirnite za prikaz",
+    "announcementHidden": "Uplata primljena",
+    "announcementPending": "Onchain u tijeku, {amount}",
+    "toastOn": "Zaslon primljene uplate je uključen",
+    "toastOff": "Zaslon primljene uplate je isključen"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Vaš račun ima više od $5",

@@ -2536,7 +2536,23 @@
         "title": "Zmenu ceny",
         "description": "Oznámenia o cene bitcoinu."
       }
-    }
+    },
+    "splashGroup": "Obrazovka prijatej platby",
+    "incomingTransactionSplash": "Zobraziť obrazovku",
+    "splashMinimum": "Minimálna suma (SAT)"
+  },
+  "IncomingTransactionSplash": {
+    "youReceived": "Prijali ste",
+    "pendingOnchain": "Čakajúce onchain",
+    "note": "Poznámka",
+    "dontShowAgain": "Toto už nezobrazovať",
+    "details": "Podrobnosti",
+    "announcement": "Prijali ste {amount}",
+    "tapToShow": "Klepnutím zobrazíte",
+    "announcementHidden": "Platba prijatá",
+    "announcementPending": "Čakajúce onchain, {amount}",
+    "toastOn": "Obrazovka prijatej platby je zapnutá",
+    "toastOff": "Obrazovka prijatej platby je vypnutá"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Váš účet má viac ako 5 USD",

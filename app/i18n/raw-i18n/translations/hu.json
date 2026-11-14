@@ -2536,7 +2536,23 @@
         "title": "Árváltozások",
         "description": "Értesítések a Bitcoin áráról."
       }
-    }
+    },
+    "splashGroup": "Beérkezett fizetés képernyője",
+    "incomingTransactionSplash": "Képernyő megjelenítése",
+    "splashMinimum": "Minimum összeg (SAT)"
+  },
+  "IncomingTransactionSplash": {
+    "youReceived": "Kaptál",
+    "pendingOnchain": "Onchain függőben",
+    "note": "Megjegyzés",
+    "dontShowAgain": "Ne mutasd többé",
+    "details": "Részletek",
+    "announcement": "{amount} érkezett",
+    "tapToShow": "Koppints a megjelenítéshez",
+    "announcementHidden": "Fizetés beérkezett",
+    "announcementPending": "Onchain függőben, {amount}",
+    "toastOn": "Beérkezett fizetés képernyője bekapcsolva",
+    "toastOff": "Beérkezett fizetés képernyője kikapcsolva"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "A számládon több mint 5 dollár van",

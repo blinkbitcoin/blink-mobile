@@ -8324,6 +8324,66 @@ type RootTranslation = {
 				description: string
 			}
 		}
+		/**
+		 * I​n​c​o​m​i​n​g​ ​t​r​a​n​s​a​c​t​i​o​n​ ​s​p​l​a​s​h
+		 */
+		splashGroup: string
+		/**
+		 * S​h​o​w​ ​s​p​l​a​s​h​ ​s​c​r​e​e​n
+		 */
+		incomingTransactionSplash: string
+		/**
+		 * M​i​n​i​m​u​m​ ​a​m​o​u​n​t​ ​(​S​A​T​)
+		 */
+		splashMinimum: string
+	}
+	IncomingTransactionSplash: {
+		/**
+		 * Y​o​u​ ​r​e​c​e​i​v​e​d
+		 */
+		youReceived: string
+		/**
+		 * P​e​n​d​i​n​g​ ​O​n​C​h​a​i​n
+		 */
+		pendingOnchain: string
+		/**
+		 * N​o​t​e
+		 */
+		note: string
+		/**
+		 * D​o​n​’​t​ ​s​h​o​w​ ​m​e​ ​t​h​i​s​ ​a​g​a​i​n
+		 */
+		dontShowAgain: string
+		/**
+		 * D​e​t​a​i​l​s
+		 */
+		details: string
+		/**
+		 * Y​o​u​ ​r​e​c​e​i​v​e​d​ ​{​a​m​o​u​n​t​}
+		 * @param {string} amount
+		 */
+		announcement: RequiredParams<'amount'>
+		/**
+		 * T​a​p​ ​t​o​ ​s​h​o​w
+		 */
+		tapToShow: string
+		/**
+		 * P​a​y​m​e​n​t​ ​r​e​c​e​i​v​e​d
+		 */
+		announcementHidden: string
+		/**
+		 * P​e​n​d​i​n​g​ ​O​n​C​h​a​i​n​,​ ​{​a​m​o​u​n​t​}
+		 * @param {string} amount
+		 */
+		announcementPending: RequiredParams<'amount'>
+		/**
+		 * S​p​l​a​s​h​ ​s​c​r​e​e​n​ ​i​s​ ​o​n
+		 */
+		toastOn: string
+		/**
+		 * S​p​l​a​s​h​ ​s​c​r​e​e​n​ ​i​s​ ​o​f​f
+		 */
+		toastOff: string
 	}
 	AccountScreen: {
 		/**
@@ -22653,6 +22713,64 @@ export type TranslationFunctions = {
 				description: () => LocalizedString
 			}
 		}
+		/**
+		 * Incoming transaction splash
+		 */
+		splashGroup: () => LocalizedString
+		/**
+		 * Show splash screen
+		 */
+		incomingTransactionSplash: () => LocalizedString
+		/**
+		 * Minimum amount (SAT)
+		 */
+		splashMinimum: () => LocalizedString
+	}
+	IncomingTransactionSplash: {
+		/**
+		 * You received
+		 */
+		youReceived: () => LocalizedString
+		/**
+		 * Pending OnChain
+		 */
+		pendingOnchain: () => LocalizedString
+		/**
+		 * Note
+		 */
+		note: () => LocalizedString
+		/**
+		 * Don’t show me this again
+		 */
+		dontShowAgain: () => LocalizedString
+		/**
+		 * Details
+		 */
+		details: () => LocalizedString
+		/**
+		 * You received {amount}
+		 */
+		announcement: (arg: { amount: string }) => LocalizedString
+		/**
+		 * Tap to show
+		 */
+		tapToShow: () => LocalizedString
+		/**
+		 * Payment received
+		 */
+		announcementHidden: () => LocalizedString
+		/**
+		 * Pending OnChain, {amount}
+		 */
+		announcementPending: (arg: { amount: string }) => LocalizedString
+		/**
+		 * Splash screen is on
+		 */
+		toastOn: () => LocalizedString
+		/**
+		 * Splash screen is off
+		 */
+		toastOff: () => LocalizedString
 	}
 	AccountScreen: {
 		/**

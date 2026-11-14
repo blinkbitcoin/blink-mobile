@@ -46,7 +46,7 @@ export const GaloySecondaryButton: FunctionComponent<GaloySecondaryButtonProps> 
       buttonStyle={styles.buttonStyle}
       disabledStyle={styles.disabledStyle}
       titleStyle={[styles.buttonTitleStyle, props.titleStyle]}
-      disabledTitleStyle={styles.disabledTitleStyle}
+      disabledTitleStyle={[styles.disabledTitleStyle, props.disabledTitleStyle]}
       loadingProps={{
         color: colors.accent,
       }}

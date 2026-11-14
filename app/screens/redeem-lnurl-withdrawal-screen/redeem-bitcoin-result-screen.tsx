@@ -12,7 +12,6 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "../../utils/testProps"
-import { withMyLnUpdateSub } from "../receive-bitcoin-screen/my-ln-updates-sub"
 
 import { useLnurlWithdrawRedemption } from "./hooks"
 
@@ -143,7 +142,7 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
   )
 }
 
-export default withMyLnUpdateSub(RedeemBitcoinResultScreen)
+export default RedeemBitcoinResultScreen
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {

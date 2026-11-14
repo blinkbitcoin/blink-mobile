@@ -2536,7 +2536,23 @@
         "title": "Canvis de preu",
         "description": "Notificacions sobre el preu de Bitcoin."
       }
-    }
+    },
+    "splashGroup": "Pantalla de pagament rebut",
+    "incomingTransactionSplash": "Mostra la pantalla",
+    "splashMinimum": "Import mínim (SAT)"
+  },
+  "IncomingTransactionSplash": {
+    "youReceived": "Has rebut",
+    "pendingOnchain": "Pendent onchain",
+    "note": "Nota",
+    "dontShowAgain": "No ho tornis a mostrar",
+    "details": "Detalls",
+    "announcement": "Has rebut {amount}",
+    "tapToShow": "Prem per mostrar",
+    "announcementHidden": "Pagament rebut",
+    "announcementPending": "Pendent onchain, {amount}",
+    "toastOn": "Pantalla de pagament rebut activada",
+    "toastOff": "Pantalla de pagament rebut desactivada"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "El teu compte té més de 5$",

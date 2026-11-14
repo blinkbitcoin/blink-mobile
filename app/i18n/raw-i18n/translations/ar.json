@@ -2536,7 +2536,23 @@
         "title": "تغيّرات الأسعار",
         "description": "إشعارات حول سعر Bitcoin."
       }
-    }
+    },
+    "splashGroup": "شاشة الدفعة المستلمة",
+    "incomingTransactionSplash": "إظهار الشاشة",
+    "splashMinimum": "الحد الأدنى (SAT)"
+  },
+  "IncomingTransactionSplash": {
+    "youReceived": "استلمت",
+    "pendingOnchain": "قيد الانتظار على السلسلة",
+    "note": "ملاحظة",
+    "dontShowAgain": "لا تُظهر هذا مرة أخرى",
+    "details": "التفاصيل",
+    "announcement": "استلمت {amount}",
+    "tapToShow": "انقر للعرض",
+    "announcementHidden": "تم استلام دفعة",
+    "announcementPending": "قيد الانتظار على السلسلة، {amount}",
+    "toastOn": "شاشة الدفعة المستلمة مفعّلة",
+    "toastOff": "شاشة الدفعة المستلمة معطّلة"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "حسابك يحتوي على أكثر من 5$",
