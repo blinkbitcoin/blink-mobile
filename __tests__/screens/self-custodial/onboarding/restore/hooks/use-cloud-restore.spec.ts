@@ -1067,6 +1067,66 @@ describe("useCloudRestore after the handoff to the terms", () => {
     ])
   })
 
+  it("offers the backup as a pick, not the password form, once a decrypted phrase is handed to the terms", async () => {
+    mockListBackups.mockResolvedValue({
+      success: true,
+      entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
+      accessToken: "token",
+    })
+    mockDownloadById.mockResolvedValue({
+      success: true,
+      content: buildEncryptedBackup("pubkey1", "decrypted words"),
+    })
+
+    const { result } = renderHook(() => useCloudRestore())
+    await waitFor(() => {
+      expect(result.current.isPassword).toBe(true)
+    })
+
+    act(() => result.current.setPassword("secret"))
+    await act(async () => {
+      await result.current.handleDecrypt()
+    })
+
+    expect(mockRequestRestore).toHaveBeenCalledWith("decrypted words", "cloud")
+    expect(result.current.isPassword).toBe(false)
+    expect(result.current.isPicker).toBe(true)
+    expect(result.current.entries).toEqual([
+      expect.objectContaining({ fileId: "file-1" }),
+    ])
+    expect(result.current.password).toBe("")
+  })
+
+  it("keeps the password form when the password is wrong", async () => {
+    jest
+      .requireMock("@app/utils/backup-payload")
+      .parseEncryptedBackupPayload.mockImplementationOnce(() => {
+        throw new BackupPayloadError(BackupPayloadErrorReason.WrongPassword, "auth tag")
+      })
+    mockListBackups.mockResolvedValue({
+      success: true,
+      entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
+      accessToken: "token",
+    })
+    mockDownloadById.mockResolvedValue({
+      success: true,
+      content: buildEncryptedBackup("pubkey1", "decrypted words"),
+    })
+
+    const { result } = renderHook(() => useCloudRestore())
+    await waitFor(() => {
+      expect(result.current.isPassword).toBe(true)
+    })
+
+    await act(async () => {
+      await result.current.handleDecrypt()
+    })
+
+    expect(mockRequestRestore).not.toHaveBeenCalled()
+    expect(result.current.isPassword).toBe(true)
+    expect(result.current.passwordError).toBe("Wrong password")
+  })
+
   it("keeps every backup on offer after a picked one is handed to the terms", async () => {
     mockListBackups.mockResolvedValue({
       success: true,

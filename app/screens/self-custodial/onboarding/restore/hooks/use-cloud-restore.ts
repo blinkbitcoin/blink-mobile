@@ -101,21 +101,34 @@ export const useCloudRestore = () => {
   )
 
   /** The terms open over this screen, so once the phrase is handed to them it offers the
-   *  backups it found: backing out of the terms lands on a pick, not on a spinner with
-   *  nothing left to wait for. */
+   *  backups it found: backing out of the terms lands on a pick, not on a spinner or a
+   *  password form with nothing left to wait for. A pick that turns out encrypted asks
+   *  for its password afresh. */
+  const handOffToTerms = useCallback(
+    async (mnemonic: string) => {
+      await requestRestore(mnemonic, BackupMethod.Cloud)
+      setBackupContent(null)
+      setPassword("")
+      setPasswordError(null)
+      setStep(CloudStep.Picker)
+    },
+    [requestRestore],
+  )
+
+  /** `offered` is what the screen falls back to after the handoff, so it is kept before
+   *  the password step too: a password-protected backup goes to the terms all the same. */
   const proceedWithBackup = useCallback(
     async (content: string, offered: ReadonlyArray<CloudBackupEntry>) => {
+      setEntries(offered)
       if (isEncryptedBackup(content)) {
         setBackupContent(content)
         setStep(CloudStep.Password)
         return
       }
       const { mnemonic } = parseBackupPayload(content)
-      await requestRestore(mnemonic, BackupMethod.Cloud)
-      setEntries(offered)
-      setStep(CloudStep.Picker)
+      await handOffToTerms(mnemonic)
     },
-    [requestRestore],
+    [handOffToTerms],
   )
 
   const handlePick = useCallback(
@@ -273,8 +286,8 @@ export const useCloudRestore = () => {
       return
     }
 
-    await requestRestore(mnemonic, BackupMethod.Cloud).catch(() => undefined)
-  }, [backupContent, password, requestRestore, LL])
+    await handOffToTerms(mnemonic).catch(() => undefined)
+  }, [backupContent, password, handOffToTerms, LL])
 
   const isLoading =
     step === CloudStep.Loading ||
