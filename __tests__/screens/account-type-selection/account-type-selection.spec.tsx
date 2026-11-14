@@ -250,7 +250,7 @@ describe("AccountTypeSelectionScreen", () => {
     })
   })
 
-  it("navigates to restore method screen for self-custodial restore", async () => {
+  it("asks for the terms before the restore method on a self-custodial restore", async () => {
     mockMode.mockReturnValue("restore")
 
     const { getByTestId } = render(<AccountTypeSelectionScreen />)
@@ -259,7 +259,10 @@ describe("AccountTypeSelectionScreen", () => {
     fireEvent.press(getByTestId("continue-button"))
     await flushEffects()
 
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialRestoreMethod")
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
+      flow: "selfCustodialRestore",
+    })
   })
 
   it("does not navigate when nothing selected", async () => {

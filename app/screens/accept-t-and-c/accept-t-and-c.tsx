@@ -109,6 +109,11 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
       return
     }
 
+    if (flow === "selfCustodialRestore") {
+      navigation.navigate("selfCustodialRestoreMethod")
+      return
+    }
+
     if (flow === "phone" || !appCheckToken) {
       fallbackToPhoneLogin()
       return

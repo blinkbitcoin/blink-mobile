@@ -346,6 +346,36 @@ describe("AcceptTermsAndConditionsScreen", () => {
     )
   })
 
+  it("routes the self-custodial restore flow to the restore method", async () => {
+    mockFlow = "selfCustodialRestore"
+    render(
+      <ContextForScreen>
+        <AcceptTermsAndConditionsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+
+    await waitFor(() =>
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialRestoreMethod"),
+    )
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+    expect(mockSaveCheckpoint).not.toHaveBeenCalled()
+  })
+
+  it("does not leave the restore terms until Accept is pressed", async () => {
+    mockFlow = "selfCustodialRestore"
+    render(
+      <ContextForScreen>
+        <AcceptTermsAndConditionsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
   describe("outside the migration", () => {
     const renderAndAccept = async () => {
       render(

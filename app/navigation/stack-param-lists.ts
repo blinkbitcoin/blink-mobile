@@ -446,7 +446,7 @@ export type PrimaryStackParamList = {
 }
 
 export type NewAccountFlowParamsList = {
-  flow: "phone" | "trial" | "selfCustodial" | "migration"
+  flow: "phone" | "trial" | "selfCustodial" | "selfCustodialRestore" | "migration"
   /** The self-custodial region mode chosen before terms, carried through to wallet
    *  creation, which stores it against the account it provisions. */
   mode?: AccountMode
