@@ -36,6 +36,8 @@ import { reportError } from "@app/utils/error-logging"
 import { normalizeMnemonic } from "@app/utils/mnemonic"
 import { toastShow } from "@app/utils/toast"
 
+import { holdPendingRestore } from "../pending-restore"
+
 const RestoreWalletStatus = {
   Idle: "idle",
   Restoring: "restoring",
@@ -187,7 +189,24 @@ export const useRestoreWallet = () => {
     ],
   )
 
-  return { restore, status }
+  /** The terms come last, as they do on creation: the phrase is checked first so a typo
+   *  never reaches them, then held in memory until Accept on the terms runs `restore`. */
+  const requestRestore = useCallback(
+    async (mnemonic: string, method: BackupMethod = BackupMethod.Manual) => {
+      const normalized = normalizeMnemonic(mnemonic)
+      if (!validateMnemonic(normalized)) {
+        setStatus(RestoreWalletStatus.Error)
+        toastShow({ message: LL.RestoreScreen.invalidMnemonic(), LL })
+        return
+      }
+      setStatus(RestoreWalletStatus.Idle)
+      holdPendingRestore({ mnemonic: normalized, method })
+      navigation.navigate("acceptTermsAndConditions", { flow: "selfCustodialRestore" })
+    },
+    [LL, navigation],
+  )
+
+  return { restore, requestRestore, status }
 }
 
 export { RestoreWalletStatus }

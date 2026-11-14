@@ -76,14 +76,12 @@ export const AccountTypeSelectionScreen: React.FC = () => {
       return
     }
 
-    /** A restored wallet is new to this install, so it accepts the same terms a created
-     *  one does before the restore method is offered. */
-    navigation.navigate("acceptTermsAndConditions", { flow: "selfCustodialRestore" })
+    navigation.navigate("selfCustodialRestoreMethod")
   }
 
   /** The account count behind `isFirstSignupRuleReady` is read by one path only: the
    *  custodial creation, whose first-signup rule needs it. Restore navigates straight to
-   *  login or the restore terms, and a self-custodial creation is answered after the mode
+   *  login or the restore method, and a self-custodial creation is answered after the mode
    *  screen, so neither ever asks. Waiting on it in those modes disabled Continue over a
    *  rule that was never going to be consulted, and the registry re-hydrates whenever the
    *  active account changes, so the wait could return mid-session and swallow a press. */

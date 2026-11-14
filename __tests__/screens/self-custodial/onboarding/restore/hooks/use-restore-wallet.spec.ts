@@ -9,6 +9,10 @@ import {
   useRestoreWallet,
   RestoreWalletStatus,
 } from "@app/screens/self-custodial/onboarding/restore/hooks/use-restore-wallet"
+import {
+  clearPendingRestore,
+  readPendingRestore,
+} from "@app/screens/self-custodial/onboarding/restore/pending-restore"
 import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 import { getSelfCustodialAccountMode } from "@app/store/persistent-state/self-custodial-account-mode"
 import { getSelfCustodialServerAccountMode } from "@app/store/persistent-state/self-custodial-server-account-mode"
@@ -591,6 +595,69 @@ describe("useRestoreWallet", () => {
 
     await act(async () => {
       resolveRestore!()
+    })
+  })
+
+  /** The terms come last, as on creation: a request checks the phrase, holds it and
+   *  opens the terms, and only Accept there runs the restore. */
+  describe("a restore request", () => {
+    beforeEach(() => clearPendingRestore())
+
+    it("holds the phrase and opens the terms without restoring", async () => {
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.requestRestore("  WORD1 word2  word3 ", BackupMethod.Cloud)
+      })
+
+      expect(mockNavigate).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
+        flow: "selfCustodialRestore",
+      })
+      expect(readPendingRestore()).toEqual({
+        mnemonic: "word1 word2 word3",
+        method: BackupMethod.Cloud,
+      })
+      expect(mockFindSelfCustodialAccountByMnemonic).not.toHaveBeenCalled()
+      expect(mockRestore).not.toHaveBeenCalled()
+      expect(mockUpdateState).not.toHaveBeenCalled()
+    })
+
+    it("records a typed phrase as a manual backup", async () => {
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.requestRestore("word1 word2 word3")
+      })
+
+      expect(readPendingRestore()?.method).toBe(BackupMethod.Manual)
+    })
+
+    it("keeps the phrase out of the navigation params", async () => {
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.requestRestore("word1 word2 word3")
+      })
+
+      const [, params] = mockNavigate.mock.calls[0]
+      expect(JSON.stringify(params)).not.toContain("word1")
+    })
+
+    it("never shows the terms for a phrase that fails validation", async () => {
+      mockValidateMnemonic.mockReturnValue(false)
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.requestRestore("not a phrase")
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Invalid recovery phrase" }),
+      )
+      expect(result.current.status).toBe(RestoreWalletStatus.Error)
+      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(readPendingRestore()).toBeNull()
     })
   })
 

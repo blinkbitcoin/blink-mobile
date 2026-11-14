@@ -20,6 +20,14 @@ import {
   MigrationCheckpoint,
   useMigrationCheckpoint,
 } from "@app/screens/account-migration/hooks"
+import {
+  RestoreWalletStatus,
+  useRestoreWallet,
+} from "@app/screens/self-custodial/onboarding/restore/hooks/use-restore-wallet"
+import {
+  clearPendingRestore,
+  readPendingRestore,
+} from "@app/screens/self-custodial/onboarding/restore/pending-restore"
 
 import { Screen } from "../../components/screen"
 import { PhoneLoginInitiateType } from "../phone-auth-screen"
@@ -51,6 +59,17 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
   const { deviceAccountEnabled } = useFeatureFlags()
   const appCheckToken = useAppCheckToken({ skip: !deviceAccountEnabled })
   const { createDeviceAccountAndLogin, loading } = useCreateDeviceAccount()
+  const { restore, status: restoreStatus } = useRestoreWallet()
+
+  const isRestoreFlow = flow === "selfCustodialRestore"
+  /** The held phrase outlives Accept on purpose: an operator outage sends "Try again
+   *  later" back here, and Accept must have the phrase to retry. It goes once the terms
+   *  leave the stack, whether the restore landed or the user backed out. */
+  React.useEffect(() => {
+    if (!isRestoreFlow) return
+    const held = readPendingRestore()
+    return () => clearPendingRestore(held)
+  }, [isRestoreFlow])
 
   const fallbackToPhoneLogin = () => {
     navigation.navigate("login", {
@@ -96,7 +115,20 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
     }
   }
 
-  const isAcceptBusy = loading || isSavingTerms
+  /** Restore reports its own failures (a toast, or the outage screen); Accept stays here
+   *  so the user can try again or back out. Without a held phrase there is nothing to
+   *  accept for, so the screen returns to where the phrase is given. */
+  const acceptRestoreTerms = async () => {
+    const pending = readPendingRestore()
+    if (!pending) {
+      navigation.goBack()
+      return
+    }
+    await restore(pending.mnemonic, pending.method).catch(() => undefined)
+  }
+
+  const isAcceptBusy =
+    loading || isSavingTerms || restoreStatus === RestoreWalletStatus.Restoring
 
   const action = async () => {
     if (flow === "migration") {
@@ -109,8 +141,8 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
       return
     }
 
-    if (flow === "selfCustodialRestore") {
-      navigation.navigate("selfCustodialRestoreMethod")
+    if (isRestoreFlow) {
+      await acceptRestoreTerms()
       return
     }
 

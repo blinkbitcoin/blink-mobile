@@ -69,7 +69,7 @@ export const useCloudRestore = () => {
     resolveErrorMessage,
     loading: cloudLoading,
   } = usePlatformCloudBackup()
-  const { restore, status: restoreStatus } = useRestoreWallet()
+  const { requestRestore, status: restoreStatus } = useRestoreWallet()
 
   const [step, setStep] = useState<CloudStep>(CloudStep.Loading)
   const [entries, setEntries] = useState<ReadonlyArray<CloudBackupEntry>>([])
@@ -100,17 +100,22 @@ export const useCloudRestore = () => {
     [resolveErrorMessage, LL],
   )
 
+  /** The terms open over this screen, so once the phrase is handed to them it offers the
+   *  backups it found: backing out of the terms lands on a pick, not on a spinner with
+   *  nothing left to wait for. */
   const proceedWithBackup = useCallback(
-    async (content: string) => {
+    async (content: string, offered: ReadonlyArray<CloudBackupEntry>) => {
       if (isEncryptedBackup(content)) {
         setBackupContent(content)
         setStep(CloudStep.Password)
         return
       }
       const { mnemonic } = parseBackupPayload(content)
-      await restore(mnemonic, BackupMethod.Cloud)
+      await requestRestore(mnemonic, BackupMethod.Cloud)
+      setEntries(offered)
+      setStep(CloudStep.Picker)
     },
-    [restore],
+    [requestRestore],
   )
 
   const handlePick = useCallback(
@@ -133,13 +138,13 @@ export const useCloudRestore = () => {
           return
         }
         rememberAccessToken(result.accessToken)
-        await proceedWithBackup(result.content)
+        await proceedWithBackup(result.content, entries)
       } catch (err) {
         reportError(RestoreErrorContext.CloudDownload, err)
         setStep(CloudStep.Error)
       }
     },
-    [downloadById, proceedWithBackup, showFailure, rememberAccessToken],
+    [downloadById, proceedWithBackup, showFailure, rememberAccessToken, entries],
   )
 
   const loadCloudBackups = useCallback(async () => {
@@ -172,11 +177,12 @@ export const useCloudRestore = () => {
           return
         }
         rememberAccessToken(result.accessToken)
-        if (!parseBackupMetadata(result.content)) {
+        const metadata = parseBackupMetadata(result.content)
+        if (!metadata) {
           setStep(CloudStep.NotFound)
           return
         }
-        await proceedWithBackup(result.content)
+        await proceedWithBackup(result.content, [{ fileId: files[0].id, metadata }])
         return
       }
 
@@ -222,7 +228,7 @@ export const useCloudRestore = () => {
       }
 
       if (downloaded.length === 1) {
-        await proceedWithBackup(downloaded[0].content)
+        await proceedWithBackup(downloaded[0].content, [downloaded[0].entry])
         return
       }
 
@@ -267,8 +273,8 @@ export const useCloudRestore = () => {
       return
     }
 
-    await restore(mnemonic, BackupMethod.Cloud).catch(() => undefined)
-  }, [backupContent, password, restore, LL])
+    await requestRestore(mnemonic, BackupMethod.Cloud).catch(() => undefined)
+  }, [backupContent, password, requestRestore, LL])
 
   const isLoading =
     step === CloudStep.Loading ||
