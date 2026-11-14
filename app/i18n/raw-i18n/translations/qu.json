@@ -3843,7 +3843,8 @@
         "acknowledgeSolicitation": "Riqsini Blink Visa tarjetata mañakuyqa mana saqisqa mañakuychu kasqanta"
       },
       "CardPreapproved": {
-        "title": "Blink tarjetapaq aprobado kasqanki!",
+        "title": "Blink tarjetaykiqa listañam!",
+        "subtitle": "Kunanqa tarjetaykita activayta atinkiñam, hinaspa llamk'achiyta qallariy",
         "buttonText": "Wisq'ay"
       },
       "CardProcessing": {

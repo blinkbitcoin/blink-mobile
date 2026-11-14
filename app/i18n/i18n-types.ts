@@ -12769,9 +12769,13 @@ type RootTranslation = {
 			}
 			CardPreapproved: {
 				/**
-				 * Y​o​u​ ​h​a​v​e​ ​b​e​e​n​ ​a​p​p​r​o​v​e​d​ ​f​o​r​ ​t​h​e​ ​B​l​i​n​k​ ​C​a​r​d​!
+				 * Y​o​u​r​ ​B​l​i​n​k​ ​C​a​r​d​ ​i​s​ ​r​e​a​d​y​!
 				 */
 				title: string
+				/**
+				 * Y​o​u​ ​c​a​n​ ​n​o​w​ ​a​c​t​i​v​a​t​e​ ​y​o​u​r​ ​c​a​r​d​ ​a​n​d​ ​s​t​a​r​t​ ​u​s​i​n​g​ ​i​t
+				 */
+				subtitle: string
 				/**
 				 * C​l​o​s​e
 				 */
@@ -27085,9 +27089,13 @@ export type TranslationFunctions = {
 			}
 			CardPreapproved: {
 				/**
-				 * You have been approved for the Blink Card!
+				 * Your Blink Card is ready!
 				 */
 				title: () => LocalizedString
+				/**
+				 * You can now activate your card and start using it
+				 */
+				subtitle: () => LocalizedString
 				/**
 				 * Close
 				 */

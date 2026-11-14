@@ -3843,7 +3843,8 @@
         "acknowledgeSolicitation": "Ntegeera nti okusaba kaadi ya Blink Visa tekitegeeza kusaba okutakkirizibwa"
       },
       "CardPreapproved": {
-        "title": "Okkiriziddwa okufuna Kaadi ya Blink!",
+        "title": "Kaadi yo eya Blink etegese!",
+        "subtitle": "Kati osobola okuggulawo kaadi yo n'otandika okugikozesa",
         "buttonText": "Ggalawo"
       },
       "CardProcessing": {

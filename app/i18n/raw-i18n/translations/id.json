@@ -3843,7 +3843,8 @@
         "acknowledgeSolicitation": "Saya mengakui bahwa mengajukan permohonan Kartu Blink Visa bukan merupakan permintaan yang tidak sah"
       },
       "CardPreapproved": {
-        "title": "Anda telah disetujui untuk Blink Card!",
+        "title": "Blink Card Anda sudah siap!",
+        "subtitle": "Sekarang Anda dapat mengaktifkan kartu dan mulai menggunakannya",
         "buttonText": "Tutup"
       },
       "CardProcessing": {

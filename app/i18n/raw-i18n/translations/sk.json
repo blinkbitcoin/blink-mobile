@@ -3843,7 +3843,8 @@
         "acknowledgeSolicitation": "Beriem na vedomie, že žiadosť o kartu Blink Visa nepredstavuje neoprávnené oslovenie"
       },
       "CardPreapproved": {
-        "title": "Boli ste schválení pre Blink Card!",
+        "title": "Vaša Blink Card je pripravená!",
+        "subtitle": "Teraz si môžete kartu aktivovať a začať ju používať",
         "buttonText": "Zavrieť"
       },
       "CardProcessing": {

@@ -41,7 +41,7 @@ describe("CardPreapprovedScreen", () => {
     expect(toJSON()).toBeTruthy()
   })
 
-  it("displays preapproved title", async () => {
+  it("says the card is ready and that it can be activated now", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <CardPreapprovedScreen />
@@ -50,7 +50,8 @@ describe("CardPreapprovedScreen", () => {
 
     await act(async () => {})
 
-    expect(getByText("You have been approved for the Blink Card!")).toBeTruthy()
+    expect(getByText("Your Blink Card is ready!")).toBeTruthy()
+    expect(getByText("You can now activate your card and start using it")).toBeTruthy()
   })
 
   it("displays continue button", async () => {

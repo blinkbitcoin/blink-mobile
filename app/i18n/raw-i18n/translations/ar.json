@@ -3843,7 +3843,8 @@
         "acknowledgeSolicitation": "أُقر بأن التقدم بطلب للحصول على بطاقة Blink Visa لا يشكل التماسًا غير مصرح به"
       },
       "CardPreapproved": {
-        "title": "تمت الموافقة على حصولك على بطاقة Blink!",
+        "title": "بطاقة Blink الخاصة بك جاهزة!",
+        "subtitle": "يمكنك الآن تفعيل بطاقتك والبدء في استخدامها",
         "buttonText": "إغلاق"
       },
       "CardProcessing": {

@@ -3843,7 +3843,8 @@
         "acknowledgeSolicitation": "Ninatambua kwamba kuomba Kadi ya Blink Visa si ombi lisiloidhinishwa"
       },
       "CardPreapproved": {
-        "title": "Umeidhinishwa kwa Blink Card!",
+        "title": "Blink Card yako iko tayari!",
+        "subtitle": "Sasa unaweza kuwasha kadi yako na kuanza kuitumia",
         "buttonText": "Funga"
       },
       "CardProcessing": {

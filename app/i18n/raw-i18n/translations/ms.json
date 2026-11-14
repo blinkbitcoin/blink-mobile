@@ -3843,7 +3843,8 @@
         "acknowledgeSolicitation": "Saya mengakui bahawa memohon Kad Blink Visa bukan merupakan permohonan yang tidak dibenarkan"
       },
       "CardPreapproved": {
-        "title": "Anda telah diluluskan untuk Kad Blink!",
+        "title": "Kad Blink anda sudah sedia!",
+        "subtitle": "Anda kini boleh mengaktifkan kad anda dan mula menggunakannya",
         "buttonText": "Tutup"
       },
       "CardProcessing": {

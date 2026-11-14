@@ -3843,7 +3843,8 @@
         "acknowledgeSolicitation": "Tudomásul veszem, hogy a Blink Visa kártya igénylése nem minősül jogosulatlan megkeresésnek"
       },
       "CardPreapproved": {
-        "title": "Jóváhagyták a Blink kártyáját!",
+        "title": "Elkészült a Blink kártyája!",
+        "subtitle": "Most már aktiválhatja a kártyáját, és elkezdheti használni",
         "buttonText": "Bezárás"
       },
       "CardProcessing": {

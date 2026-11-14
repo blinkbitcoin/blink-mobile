@@ -3843,7 +3843,8 @@
         "acknowledgeSolicitation": "Αναγνωρίζω ότι η αίτηση για την κάρτα Blink Visa δεν συνιστά μη εξουσιοδοτημένη προσέλκυση"
       },
       "CardPreapproved": {
-        "title": "Έχετε εγκριθεί για την Blink Card!",
+        "title": "Η Blink Card σας είναι έτοιμη!",
+        "subtitle": "Μπορείτε τώρα να ενεργοποιήσετε την κάρτα σας και να αρχίσετε να τη χρησιμοποιείτε",
         "buttonText": "Close"
       },
       "CardProcessing": {

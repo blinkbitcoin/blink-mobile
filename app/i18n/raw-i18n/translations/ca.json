@@ -3843,7 +3843,8 @@
         "acknowledgeSolicitation": "Reconec que sol·licitar la targeta Blink Visa no constitueix una sol·licitud no autoritzada"
       },
       "CardPreapproved": {
-        "title": "Has estat aprovat per a la Blink Card!",
+        "title": "La teva Blink Card està llesta!",
+        "subtitle": "Ara pots activar la teva targeta i començar a fer-la servir",
         "buttonText": "Tancar"
       },
       "CardProcessing": {

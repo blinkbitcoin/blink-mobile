@@ -3843,7 +3843,8 @@
         "acknowledgeSolicitation": "Ek erken dat die aansoek om die Blink Visa-kaart nie ongemagtigde werwing uitmaak nie"
       },
       "CardPreapproved": {
-        "title": "Jy is goedgekeur vir die Blink-kaart!",
+        "title": "Jou Blink-kaart is gereed!",
+        "subtitle": "Jy kan nou jou kaart aktiveer en dit begin gebruik",
         "buttonText": "Sluit"
       },
       "CardProcessing": {

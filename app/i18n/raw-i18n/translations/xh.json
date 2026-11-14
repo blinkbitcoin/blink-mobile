@@ -3843,7 +3843,8 @@
         "acknowledgeSolicitation": "Ndiyavuma ukuba ukufaka isicelo seKhadi leBlink Visa akubuyisi sicelo esingagunyaziswanga"
       },
       "CardPreapproved": {
-        "title": "Uvunyiwe ukufumana iKhadi le-Blink!",
+        "title": "iKhadi lakho le-Blink lilungile!",
+        "subtitle": "Ngoku ungalenza lisebenze ikhadi lakho uze uqalise ukulisebenzisa",
         "buttonText": "Vala"
       },
       "CardProcessing": {
