@@ -132,7 +132,6 @@ export const NetworkErrorComponent: React.FC = () => {
     if ("statusCode" in networkError) {
       if (networkError.statusCode >= 500) {
         if (!suppressTransportToasts) {
-          // TODO translation
           toastShow({
             message: (translations) => translations.errors.network.server(),
             LL,
@@ -165,12 +164,17 @@ export const NetworkErrorComponent: React.FC = () => {
 
           default:
             if (!suppressTransportToasts) {
-              // TODO translation
               toastShow({
                 message: (translations) =>
-                  `StatusCode: ${
-                    networkError.statusCode
-                  }\nError code: ${errorCode}\n${translations.errors.network.request()}`,
+                  [
+                    translations.errors.network.statusCode({
+                      statusCode: networkError.statusCode,
+                    }),
+                    errorCode && translations.errors.network.errorCode({ errorCode }),
+                    translations.errors.network.request(),
+                  ]
+                    .filter(Boolean)
+                    .join("\n"),
                 LL,
               })
             }
@@ -184,7 +188,6 @@ export const NetworkErrorComponent: React.FC = () => {
 
     if ("message" in networkError && networkError.message === "Network request failed") {
       if (!suppressTransportToasts) {
-        // TODO translation
         toastShow({
           message: (translations) => translations.errors.network.connection(),
           LL,

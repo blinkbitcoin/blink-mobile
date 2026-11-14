@@ -3051,7 +3051,9 @@
         "network": {
             "server": "Erro no servidor. Tente novamente mais tarde",
             "request": "Solicitação de problema.\nEntre em contato com o suporte se o problema persistir",
-            "connection": "Problema de conexão.\nVerifique sua conexão com a internet"
+            "connection": "Problema de conexão.\nVerifique sua conexão com a internet",
+            "statusCode": "Status code: {statusCode: number}",
+            "errorCode": "Error code: {errorCode: string}"
         },
         "unexpectedError": "Ocorreu um erro inesperado",
         "restartApp": "Por favor, reinicie o aplicativo.",

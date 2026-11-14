@@ -6,6 +6,8 @@ import { render, waitFor } from "@testing-library/react-native"
 
 import { injectJs } from "react-native-webln"
 
+import { i18nObject } from "@app/i18n/i18n-util"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { WebViewScreen } from "@app/screens/webview/webview"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { ContextForScreen } from "./helper"
@@ -17,6 +19,8 @@ type TestRoute = {
 }
 
 const mockInjectJavaScript = jest.fn()
+// Flipped off to hand the screen a null ref, as a WebView that is not mounted yet does.
+let mockExposeWebViewHandle = true
 
 jest.mock("react-native-webview", () => {
   const ReactActual = jest.requireActual<typeof React>("react")
@@ -24,10 +28,14 @@ jest.mock("react-native-webview", () => {
 
   const MockWebView = ReactActual.forwardRef<unknown, React.ComponentProps<typeof View>>(
     (props, ref) => {
-      ReactActual.useImperativeHandle(ref, () => ({
-        injectJavaScript: mockInjectJavaScript,
-        goBack: jest.fn(),
-      }))
+      ReactActual.useImperativeHandle(ref, () =>
+        mockExposeWebViewHandle
+          ? {
+              injectJavaScript: mockInjectJavaScript,
+              goBack: jest.fn(),
+            }
+          : null,
+      )
       return <View {...props} testID="webview" />
     },
   )
@@ -111,6 +119,7 @@ const simulateLoad = (webViewInstance: ReactTestInstance, url: string) => {
 describe("WebViewScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockExposeWebViewHandle = true
   })
 
   describe("allowsInlineMediaPlayback property", () => {
@@ -188,6 +197,24 @@ describe("WebViewScreen", () => {
 
       const webViewInstance = await getWebView(mockRouteForMediaCapture)
       expect(webViewInstance.props.allowsInlineMediaPlayback).toBe(true)
+    })
+  })
+
+  describe("webview not ready", () => {
+    it("shows the translated error and injects nothing", async () => {
+      loadLocale("en")
+      const LL = i18nObject("en")
+      mockExposeWebViewHandle = false
+      const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {})
+
+      const webViewInstance = await getWebView(mockRoute)
+      simulateLoad(webViewInstance, FIAT_URL)
+
+      expect(alertSpy).toHaveBeenCalledWith(
+        LL.common.error(),
+        LL.GaloyAddressScreen.somethingWentWrong(),
+      )
+      expect(mockInjectJavaScript).not.toHaveBeenCalled()
     })
   })
 

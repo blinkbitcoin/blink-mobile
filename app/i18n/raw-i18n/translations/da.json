@@ -3051,7 +3051,9 @@
     "network": {
       "server": "Serverfejl. Prøv igen senere",
       "request": "Problem med anmodning.\nKontakt support, hvis problemet fortsætter",
-      "connection": "Forbindelsesproblem.\nTjek din internetforbindelse"
+      "connection": "Forbindelsesproblem.\nTjek din internetforbindelse",
+      "statusCode": "Status code: {statusCode: number}",
+      "errorCode": "Error code: {errorCode: string}"
     },
     "unexpectedError": "Uventet fejl opstod",
     "restartApp": "Genstart venligst applikationen.",
