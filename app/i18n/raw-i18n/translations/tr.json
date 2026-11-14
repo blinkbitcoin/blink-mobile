@@ -2183,7 +2183,9 @@
     "updateAvailable": "Bir güncelleme mevcut\nGüncellemek için dokun",
     "useLightning": "Lightning ağını kullanıyoruz. ",
     "myAccounts": "Bakiyeler",
-    "walletCountNotTwo": "Cüzdan sayısı 2 değil. Bu hesabın tüm cüzdanlarını ve fonlarını görmek için lütfen kontrol panelini kullanın"
+    "walletCountNotTwo": "Cüzdan sayısı 2 değil. Bu hesabın tüm cüzdanlarını ve fonlarını görmek için lütfen kontrol panelini kullanın",
+    "bulletinPosition": "Bildirim {position: number}/{total: number}",
+    "bulletinReadMore": "Devamını oku"
   },
   "PinScreen": {
     "attemptUnrecorded": "Deneme güvenli şekilde kaydedilemedi.",

@@ -2183,7 +2183,9 @@
     "updateAvailable": "Ažuriranje je dostupno.\nDodirnite za ažuriranje sada",
     "useLightning": "Koristimo Lightning Network.",
     "myAccounts": "Stanja",
-    "walletCountNotTwo": "Broj novčanika nije 2. Molimo koristite nadzornu ploču za pregled svih novčanika i sredstava ovog računa"
+    "walletCountNotTwo": "Broj novčanika nije 2. Molimo koristite nadzornu ploču za pregled svih novčanika i sredstava ovog računa",
+    "bulletinPosition": "Obavijest {position: number} od {total: number}",
+    "bulletinReadMore": "Pročitaj više"
   },
   "PinScreen": {
     "attemptUnrecorded": "Pokušaj nije moguće sigurno zabilježiti.",

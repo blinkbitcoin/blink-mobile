@@ -1,6 +1,7 @@
 import React from "react"
 import { fireEvent, render } from "@testing-library/react-native"
 
+import { BulletinCarouselItemContext } from "@app/components/notifications/bulletin-carousel-context"
 import { TwoFactorNudgeCard } from "@app/custodial/components/two-factor-nudge-card"
 
 const mockNavigate = jest.fn()
@@ -85,6 +86,24 @@ describe("TwoFactorNudgeCard", () => {
 
     expect(mockMarkPromptShown).toHaveBeenCalledTimes(1)
     /** The nudge has no reason to report: only the reminder bulletin carries one. */
+    expect(mockMarkPromptShown).toHaveBeenCalledWith("home_card", undefined)
+  })
+
+  /** The carousel mounts the cards out of view too: one behind another card is not
+   *  shown until the user swipes to it. */
+  it("reports itself as shown only once it is the carousel's card in view", () => {
+    const inCarousel = (isActive: boolean) => (
+      <BulletinCarouselItemContext.Provider value={{ isActive }}>
+        <TwoFactorNudgeCard />
+      </BulletinCarouselItemContext.Provider>
+    )
+    const { rerender } = render(inCarousel(false))
+
+    expect(mockMarkPromptShown).not.toHaveBeenCalled()
+
+    rerender(inCarousel(true))
+
+    expect(mockMarkPromptShown).toHaveBeenCalledTimes(1)
     expect(mockMarkPromptShown).toHaveBeenCalledWith("home_card", undefined)
   })
 

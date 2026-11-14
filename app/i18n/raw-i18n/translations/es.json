@@ -2183,7 +2183,9 @@
         "updateAvailable": "Hay una actualización disponible.\nToque para actualizar ahora",
         "useLightning": "Usamos la red Lightning.",
         "myAccounts": "Saldos",
-        "walletCountNotTwo": "El recuento de billeteras no es 2. Utilice el panel para ver todas las billeteras y fondos de esta cuenta."
+        "walletCountNotTwo": "El recuento de billeteras no es 2. Utilice el panel para ver todas las billeteras y fondos de esta cuenta.",
+        "bulletinPosition": "Notificación {position: number} de {total: number}",
+        "bulletinReadMore": "Leer más"
     },
     "PinScreen": {
         "attemptUnrecorded": "No se ha podido registrar el intento de forma segura.",
