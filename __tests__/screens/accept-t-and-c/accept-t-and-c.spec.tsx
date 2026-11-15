@@ -28,13 +28,32 @@ const LL = i18nObject("en")
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
+const mockSetOptions = jest.fn()
+type BeforeRemoveEvent = {
+  data: { action: { type: string } }
+  preventDefault: () => void
+}
+let mockBeforeRemove: ((event: BeforeRemoveEvent) => void) | null = null
+const mockAddListener = jest.fn(
+  (_name: string, listener: (event: BeforeRemoveEvent) => void) => {
+    mockBeforeRemove = listener
+    return () => {
+      mockBeforeRemove = null
+    }
+  },
+)
 let mockFlow = "migration"
 let mockMode: string | undefined
 let mockHasRouteParams = true
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    goBack: mockGoBack,
+    setOptions: mockSetOptions,
+    addListener: mockAddListener,
+  }),
   useRoute: () => ({
     params: mockHasRouteParams ? { flow: mockFlow, mode: mockMode } : undefined,
   }),
@@ -118,6 +137,7 @@ describe("AcceptTermsAndConditionsScreen", () => {
     mockCreateDeviceAccountAndLogin.mockResolvedValue(undefined)
     mockRestore.mockResolvedValue(undefined)
     mockRestoreStatus = "idle"
+    mockBeforeRemove = null
     clearPendingRestore()
     loadLocale("en")
   })
@@ -442,6 +462,38 @@ describe("AcceptTermsAndConditionsScreen", () => {
       unmount()
 
       expect(readPendingRestore()).toBe(newer)
+    })
+
+    /** Backing out mid-restore and accepting again from a new terms screen would race
+     *  the running restore, so the user's own ways back are held until it answers. */
+    describe("while the restore runs", () => {
+      const removeWith = (type: string) => {
+        const preventDefault = jest.fn()
+        mockBeforeRemove?.({ data: { action: { type } }, preventDefault })
+        return preventDefault
+      }
+
+      it("refuses the header and hardware back, and the swipe", async () => {
+        mockRestoreStatus = "restoring"
+        await renderRestoreTerms()
+
+        expect(removeWith("GO_BACK")).toHaveBeenCalled()
+        expect(removeWith("POP")).toHaveBeenCalled()
+        expect(mockSetOptions).toHaveBeenCalledWith({ gestureEnabled: false })
+      })
+
+      it("lets a reset the app dispatches through", async () => {
+        mockRestoreStatus = "restoring"
+        await renderRestoreTerms()
+
+        expect(removeWith("RESET")).not.toHaveBeenCalled()
+      })
+
+      it("holds nothing when no restore is running", async () => {
+        await renderRestoreTerms()
+
+        expect(mockBeforeRemove).toBeNull()
+      })
     })
 
     it("drops the held phrase once the terms leave the stack", async () => {

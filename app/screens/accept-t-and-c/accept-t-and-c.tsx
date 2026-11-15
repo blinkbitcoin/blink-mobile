@@ -11,6 +11,7 @@ import { toastShow } from "@app/utils/toast"
 import { StorageFailure } from "@app/utils/storage/storage-failure"
 import { BLOCKED_COUNTRIES_FAQ_LINK } from "@app/config"
 import { useFeatureFlags } from "@app/config/feature-flags-context"
+import { useCodeCheckHold } from "@app/hooks/use-code-check-hold"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -127,8 +128,13 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
     await restore(pending.mnemonic, pending.method).catch(() => undefined)
   }
 
-  const isAcceptBusy =
-    loading || isSavingTerms || restoreStatus === RestoreWalletStatus.Restoring
+  const isRestoring = restoreStatus === RestoreWalletStatus.Restoring
+  /** A restore that is running is not left behind: backing out mid-restore and accepting
+   *  again from a new terms screen would race it, and its answer would navigate from a
+   *  screen the user had already left. */
+  useCodeCheckHold(isRestoring)
+
+  const isAcceptBusy = loading || isSavingTerms || isRestoring
 
   const action = async () => {
     if (flow === "migration") {

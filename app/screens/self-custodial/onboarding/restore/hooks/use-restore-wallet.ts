@@ -7,7 +7,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
+import { createInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { markSelfCustodialInfoBulletinDismissedFor } from "@app/hooks/use-self-custodial-info-bulletin-state"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
@@ -46,6 +46,12 @@ const RestoreWalletStatus = {
 
 type RestoreWalletStatus = (typeof RestoreWalletStatus)[keyof typeof RestoreWalletStatus]
 
+/** One restore at a time across the app, not per screen: the terms screen that started a
+ *  restore can be left and a new one opened over the same phrase. Two restores of one
+ *  phrase would both miss the account index, which the bridge only writes once the SDK
+ *  is up, and provision two accounts for it. */
+const restoreGuard = createInFlightGuard()
+
 export const useRestoreWallet = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -53,7 +59,6 @@ export const useRestoreWallet = () => {
   const { retry: reinitSdk } = useSelfCustodialWallet()
   const { reloadSelfCustodialAccounts } = useAccountRegistry()
   const [status, setStatus] = useState<RestoreWalletStatus>(RestoreWalletStatus.Idle)
-  const guard = useInFlightGuard()
   const network = useSparkNetwork()
   const lnurlServer = useLnurlServer()
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
@@ -84,7 +89,7 @@ export const useRestoreWallet = () => {
    *  bundle follows it there. A typed phrase leaves the bundle on the device. */
   const restore = useCallback(
     async (mnemonic: string, method: BackupMethod = BackupMethod.Manual) => {
-      await guard.run(async () => {
+      await restoreGuard.run(async () => {
         setStatus(RestoreWalletStatus.Restoring)
 
         const normalized = normalizeMnemonic(mnemonic)
@@ -175,7 +180,6 @@ export const useRestoreWallet = () => {
       })
     },
     [
-      guard,
       activateAccount,
       adoptServerMode,
       reinitSdk,

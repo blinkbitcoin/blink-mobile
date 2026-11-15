@@ -577,6 +577,37 @@ describe("useRestoreWallet", () => {
     })
   })
 
+  /** The lock is the app's, not the screen's: a terms screen left mid-restore and a new
+   *  one opened must not start a second restore of the same phrase, which would miss the
+   *  account index too and provision a second account. */
+  it("runs one restore at a time across screens that come and go", async () => {
+    const pending = deferred<{ serverMode: null; isServerModeKnown: boolean }>()
+    mockRestore.mockReturnValueOnce(pending.promise)
+
+    const first = renderHook(() => useRestoreWallet())
+    let firstRestore: Promise<void> = Promise.resolve()
+    act(() => {
+      firstRestore = first.result.current.restore("word1 word2 word3")
+    })
+    await act(flushRestore)
+    first.unmount()
+
+    const second = renderHook(() => useRestoreWallet())
+    await act(async () => {
+      await second.result.current.restore("word1 word2 word3")
+    })
+
+    expect(mockRestore).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      pending.resolve({ serverMode: null, isServerModeKnown: true })
+      await firstRestore
+    })
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
+  })
+
   it("sets restoring status during restore", async () => {
     let resolveRestore: () => void
     mockRestore.mockReturnValue(
