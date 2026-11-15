@@ -128,7 +128,9 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
     await restore(pending.mnemonic, pending.method).catch(() => undefined)
   }
 
-  const isRestoring = restoreStatus === RestoreWalletStatus.Restoring
+  /** The restore status is the app's, so it counts only on the restore's own terms: a
+   *  restore left running must not hold the terms of a creation, a migration or a login. */
+  const isRestoring = isRestoreFlow && restoreStatus === RestoreWalletStatus.Restoring
   /** A restore that is running is not left behind: backing out mid-restore and accepting
    *  again from a new terms screen would race it, and its answer would navigate from a
    *  screen the user had already left. */

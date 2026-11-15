@@ -506,6 +506,81 @@ describe("AcceptTermsAndConditionsScreen", () => {
     })
   })
 
+  /** The restore's status is the app's, so a restore left running past its hold is still
+   *  Restoring while the user goes on to another flow's terms. Those terms answer to
+   *  their own flow: Accept stays free and the way back is not held. */
+  describe("while a restore runs elsewhere", () => {
+    const renderOtherTerms = async (flow: string) => {
+      mockFlow = flow
+      mockRestoreStatus = "restoring"
+      render(
+        <ContextForScreen>
+          <AcceptTermsAndConditionsScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+    }
+
+    const accept = async () => {
+      fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+      await flushEffects()
+    }
+
+    it("lets the migration terms be accepted", async () => {
+      await renderOtherTerms("migration")
+
+      expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled).toBe(false)
+      await accept()
+
+      expect(mockSaveCheckpoint).toHaveBeenCalledWith(MigrationCheckpoint.BackupMethod)
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupMethod")
+    })
+
+    it("lets the self-custodial creation terms be accepted", async () => {
+      mockMode = AccountMode.Enhanced
+      await renderOtherTerms("selfCustodial")
+
+      expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled).toBe(false)
+      await accept()
+
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialWalletCreation", {
+        mode: AccountMode.Enhanced,
+      })
+    })
+
+    it("lets the phone terms be accepted", async () => {
+      await renderOtherTerms("phone")
+
+      expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled).toBe(false)
+      await accept()
+
+      expect(mockNavigate).toHaveBeenCalledWith("login", {
+        type: PhoneLoginInitiateType.CreateAccount,
+      })
+    })
+
+    it("lets the trial terms be accepted", async () => {
+      mockAppCheckToken = "app-check-token"
+      await renderOtherTerms("trial")
+
+      expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled).toBe(false)
+      await accept()
+
+      expect(mockCreateDeviceAccountAndLogin).toHaveBeenCalledWith("app-check-token")
+    })
+
+    it("holds no way back on any of them", async () => {
+      for (const flow of ["migration", "selfCustodial", "phone", "trial"]) {
+        mockSetOptions.mockClear()
+        await renderOtherTerms(flow)
+
+        expect(mockBeforeRemove).toBeNull()
+        expect(mockSetOptions).not.toHaveBeenCalledWith({ gestureEnabled: false })
+        screen.unmount()
+      }
+    })
+  })
+
   describe("outside the migration", () => {
     const renderAndAccept = async () => {
       render(

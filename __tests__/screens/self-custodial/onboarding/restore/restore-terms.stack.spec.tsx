@@ -188,17 +188,31 @@ jest.mock("@app/components/success-animation/success-text-animation", () => {
 const Stack = createNativeStackNavigator<RootStackParamList>()
 const navigationRef = createNavigationContainerRef<RootStackParamList>()
 
+/** Home, with the way into a restore and, for a flow that is not one, into creation's
+ *  terms. */
 const HomeStub = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   return (
-    <Pressable
-      testID="open-restore"
-      onPress={() => navigation.navigate("selfCustodialRestoreMethod")}
-    >
-      <Text>home</Text>
-    </Pressable>
+    <>
+      <Pressable
+        testID="open-restore"
+        onPress={() => navigation.navigate("selfCustodialRestoreMethod")}
+      >
+        <Text>home</Text>
+      </Pressable>
+      <Pressable
+        testID="open-creation-terms"
+        onPress={() =>
+          navigation.navigate("acceptTermsAndConditions", { flow: "selfCustodial" })
+        }
+      >
+        <Text>create</Text>
+      </Pressable>
+    </>
   )
 }
+
+const WalletCreationStub = () => <Text>creating</Text>
 
 /** Where the phrase is given: the real request behind it, which checks the phrase,
  *  holds it and opens the terms. */
@@ -244,6 +258,10 @@ const renderStack = async () => {
             <Stack.Screen
               name="selfCustodialOperatorUnreachable"
               component={OutageStub}
+            />
+            <Stack.Screen
+              name="selfCustodialWalletCreation"
+              component={WalletCreationStub}
             />
           </Stack.Navigator>
         </NavigationContainer>
@@ -344,7 +362,9 @@ describe("the restore's terms in a stack", () => {
    *  restore still running, and be free once it answers, never an Accept that does
    *  nothing for the rest of the session. */
   describe("a restore left running past the hold", () => {
-    const leaveRestoreARunning = async () => {
+    /** Restore A started, held, and left once the hold ran out: back on the restore
+     *  method with A still running. */
+    const leaveRestoreAPastTheHold = async () => {
       let failA: (err: unknown) => void = () => {}
       mockSelfCustodialRestoreWallet.mockImplementationOnce(
         () =>
@@ -368,7 +388,11 @@ describe("the restore's terms in a stack", () => {
       })
       await pressHardwareBack()
       expect(currentRoute()).toBe("selfCustodialRestoreMethod")
+      return { failA }
+    }
 
+    const leaveRestoreARunning = async () => {
+      const { failA } = await leaveRestoreAPastTheHold()
       await press(screen.getByTestId("request-b"))
       expect(currentRoute()).toBe("acceptTermsAndConditions")
       return { failA }
@@ -410,6 +434,25 @@ describe("the restore's terms in a stack", () => {
         expect.objectContaining({ mnemonic: "phrase b" }),
       )
       expect(currentRoute()).toBe("selfCustodialBackupSuccess")
+    })
+
+    /** The running restore is the restore's terms' business only: creation's terms,
+     *  opened while it runs, take Accept and the way back as their own. */
+    it("leaves the terms of another flow free", async () => {
+      await leaveRestoreAPastTheHold()
+      await pressHardwareBack()
+      expect(currentRoute()).toBe("Primary")
+
+      await press(screen.getByTestId("open-creation-terms"))
+      expect(currentRoute()).toBe("acceptTermsAndConditions")
+      expect(isAcceptBusy()).toBe(false)
+
+      await pressHardwareBack()
+      expect(currentRoute()).toBe("Primary")
+
+      await press(screen.getByTestId("open-creation-terms"))
+      await pressAccept()
+      expect(currentRoute()).toBe("selfCustodialWalletCreation")
     })
   })
 })
