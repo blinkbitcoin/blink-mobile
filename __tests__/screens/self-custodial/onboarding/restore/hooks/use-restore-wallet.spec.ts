@@ -5,6 +5,7 @@ import {
 } from "@breeztech/breez-sdk-spark-react-native"
 import { renderHook, act } from "@testing-library/react-native"
 
+import { InFlightStatus } from "@app/hooks/use-in-flight-guard"
 import {
   useRestoreWallet,
   RestoreWalletStatus,
@@ -13,6 +14,7 @@ import {
   clearPendingRestore,
   readPendingRestore,
 } from "@app/screens/self-custodial/onboarding/restore/pending-restore"
+import { RestoreConnectTimeoutError } from "@app/self-custodial/bridge"
 import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 import { getSelfCustodialAccountMode } from "@app/store/persistent-state/self-custodial-account-mode"
 import { getSelfCustodialServerAccountMode } from "@app/store/persistent-state/self-custodial-server-account-mode"
@@ -51,6 +53,7 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
 
 jest.mock("@app/self-custodial/bridge", () => ({
   selfCustodialRestoreWallet: (...args: unknown[]) => mockRestore(...args),
+  RestoreConnectTimeoutError: class RestoreConnectTimeoutError extends Error {},
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
@@ -128,18 +131,20 @@ const flushRestore = () =>
     setTimeout(settle, 0)
   })
 
-describe("useRestoreWallet", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockRestore.mockResolvedValue({ serverMode: null, isServerModeKnown: true })
-    mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
-    mockFindSelfCustodialAccountByMnemonic.mockResolvedValue({
-      status: "ok",
-      id: null,
-    })
-    mockValidateMnemonic.mockReturnValue(true)
-    mockMarkInfoBulletinDismissedFor.mockResolvedValue(undefined)
+const resetMocks = () => {
+  jest.clearAllMocks()
+  mockRestore.mockResolvedValue({ serverMode: null, isServerModeKnown: true })
+  mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
+  mockFindSelfCustodialAccountByMnemonic.mockResolvedValue({
+    status: "ok",
+    id: null,
   })
+  mockValidateMnemonic.mockReturnValue(true)
+  mockMarkInfoBulletinDismissedFor.mockResolvedValue(undefined)
+}
+
+describe("useRestoreWallet", () => {
+  beforeEach(resetMocks)
 
   it("starts with idle status", () => {
     const { result } = renderHook(() => useRestoreWallet())
@@ -214,7 +219,7 @@ describe("useRestoreWallet", () => {
     mockMarkBackupCompletedFor.mockReturnValueOnce(write.promise)
     const { result } = renderHook(() => useRestoreWallet())
 
-    let restoring: Promise<void> = Promise.resolve()
+    let restoring: Promise<unknown> = Promise.resolve()
     await act(async () => {
       restoring = result.current.restore("word1 word2 word3", BackupMethod.Cloud)
       await flushRestore()
@@ -248,7 +253,7 @@ describe("useRestoreWallet", () => {
       mockMarkInfoBulletinDismissedFor.mockReturnValue(write.promise)
       const { result } = renderHook(() => useRestoreWallet())
 
-      let restoring: Promise<void> = Promise.resolve()
+      let restoring: Promise<unknown> = Promise.resolve()
       await act(async () => {
         restoring = result.current.restore("word1 word2 word3", method)
         await flushRestore()
@@ -585,7 +590,7 @@ describe("useRestoreWallet", () => {
     mockRestore.mockReturnValueOnce(pending.promise)
 
     const first = renderHook(() => useRestoreWallet())
-    let firstRestore: Promise<void> = Promise.resolve()
+    let firstRestore: Promise<unknown> = Promise.resolve()
     act(() => {
       firstRestore = first.result.current.restore("word1 word2 word3")
     })
@@ -739,6 +744,19 @@ describe("useRestoreWallet", () => {
       expect(result.current.status).toBe(RestoreWalletStatus.Error)
     })
 
+    /** A connect that never answered is the same outage, not a phrase to go and check. */
+    it("treats a connect that never answered as one", async () => {
+      mockRestore.mockRejectedValue(new RestoreConnectTimeoutError())
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.restore("word1 word2 word3").catch(() => {})
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialOperatorUnreachable")
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
     it("keeps the generic toast for every other failure", async () => {
       mockRestore.mockRejectedValue(new Error("storage full"))
       const { result } = renderHook(() => useRestoreWallet())
@@ -780,6 +798,177 @@ describe("useRestoreWallet", () => {
       const update = await runRestore()
 
       expect(update(undefined)).toBeUndefined()
+    })
+  })
+})
+
+/** Restoring is the app's, and outlives the screen that started it. */
+describe("useRestoreWallet across screens", () => {
+  beforeEach(resetMocks)
+
+  /** A screen the restore moved on from can come back into view, the success screen
+   *  backed out of or the mode question left, and must not be busy for a restore that
+   *  is over. */
+  describe("once a restore lands", () => {
+    it("is idle again for a new account", async () => {
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.restore("word1 word2 word3")
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
+      expect(result.current.status).toBe(RestoreWalletStatus.Idle)
+    })
+
+    it("is idle again for an account already on the device", async () => {
+      mockFindSelfCustodialAccountByMnemonic.mockResolvedValue({
+        status: "ok",
+        id: "existing-id",
+      })
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.restore("word1 word2 word3")
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
+      expect(result.current.status).toBe(RestoreWalletStatus.Idle)
+    })
+
+    it("is idle again when the mode is still to be asked", async () => {
+      mockRestore.mockResolvedValue({ serverMode: null, isServerModeKnown: false })
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.restore("word1 word2 word3")
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "selfCustodialChooseExperience",
+        expect.anything(),
+      )
+      expect(result.current.status).toBe(RestoreWalletStatus.Idle)
+    })
+
+    it("clears an earlier failure", async () => {
+      mockRestore.mockRejectedValueOnce(new Error("storage full"))
+      const { result } = renderHook(() => useRestoreWallet())
+      await act(async () => {
+        await expect(result.current.restore("word1 word2 word3")).rejects.toThrow(
+          "storage full",
+        )
+      })
+      expect(result.current.status).toBe(RestoreWalletStatus.Error)
+
+      await act(async () => {
+        await result.current.restore("word1 word2 word3")
+      })
+
+      expect(result.current.status).toBe(RestoreWalletStatus.Idle)
+    })
+  })
+
+  /** Restoring is the app's: the terms screen that started a restore can be left once
+   *  its hold runs out and a new one opened while the restore still runs. That one shows
+   *  the restore running, never an Accept that quietly does nothing. */
+  describe("a restore still running from a screen that was left", () => {
+    type Restored = { serverMode: null; isServerModeKnown: boolean }
+
+    const startOnAScreenThatIsLeft = async () => {
+      const pending = { resolve: (_restored: Restored) => {} }
+      let rejectPending: (err: unknown) => void = () => {}
+      mockRestore.mockReturnValueOnce(
+        new Promise<Restored>((resolve, reject) => {
+          pending.resolve = resolve
+          rejectPending = reject
+        }),
+      )
+      const first = renderHook(() => useRestoreWallet())
+      let firstRestore: Promise<unknown> = Promise.resolve()
+      act(() => {
+        firstRestore = first.result.current.restore("word1 word2 word3").catch(() => {})
+      })
+      await act(flushRestore)
+      first.unmount()
+      return { pending, rejectPending, firstRestore }
+    }
+
+    it("shows on a screen opened after it as running", async () => {
+      const { pending, firstRestore } = await startOnAScreenThatIsLeft()
+
+      const second = renderHook(() => useRestoreWallet())
+
+      expect(second.result.current.status).toBe(RestoreWalletStatus.Restoring)
+
+      await act(async () => {
+        pending.resolve({ serverMode: null, isServerModeKnown: true })
+        await firstRestore
+      })
+    })
+
+    it("turns a second restore away, and says so", async () => {
+      const { pending, firstRestore } = await startOnAScreenThatIsLeft()
+      const second = renderHook(() => useRestoreWallet())
+
+      let attempt: unknown
+      await act(async () => {
+        attempt = await second.result.current.restore("word4 word5 word6")
+      })
+
+      expect(attempt).toBe(InFlightStatus.AlreadyRunning)
+      expect(mockRestore).toHaveBeenCalledTimes(1)
+
+      await act(async () => {
+        pending.resolve({ serverMode: null, isServerModeKnown: true })
+        await firstRestore
+      })
+    })
+
+    it("frees the new screen once it settles", async () => {
+      const { pending, firstRestore } = await startOnAScreenThatIsLeft()
+      const second = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        pending.resolve({ serverMode: null, isServerModeKnown: true })
+        await firstRestore
+      })
+
+      expect(second.result.current.status).toBe(RestoreWalletStatus.Idle)
+    })
+
+    /** The whole of it, as the review laid it out: restore A on a screen left once its
+     *  hold ran out, Accept B on the screen opened after it, then A failing late. */
+    it("lets the new screen restore once a late outage has answered", async () => {
+      const { rejectPending, firstRestore } = await startOnAScreenThatIsLeft()
+      const second = renderHook(() => useRestoreWallet())
+
+      let turnedAway: unknown
+      await act(async () => {
+        turnedAway = await second.result.current.restore("word4 word5 word6")
+      })
+      expect(turnedAway).toBe(InFlightStatus.AlreadyRunning)
+
+      await act(async () => {
+        rejectPending(new RestoreConnectTimeoutError())
+        await firstRestore
+      })
+
+      expect(mockNavigate).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialOperatorUnreachable")
+      expect(second.result.current.status).toBe(RestoreWalletStatus.Idle)
+
+      let retried: unknown
+      await act(async () => {
+        retried = await second.result.current.restore("word4 word5 word6")
+      })
+
+      expect(retried).toBe(InFlightStatus.Ran)
+      expect(mockRestore).toHaveBeenCalledTimes(2)
+      expect(mockRestore).toHaveBeenLastCalledWith(
+        expect.objectContaining({ mnemonic: "word4 word5 word6" }),
+      )
+      expect(mockNavigate).toHaveBeenLastCalledWith("selfCustodialBackupSuccess")
     })
   })
 })

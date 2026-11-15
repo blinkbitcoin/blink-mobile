@@ -29,7 +29,10 @@ import {
 import { startSdkLogger } from "../diagnostics/sdk-log-files"
 import { recoverLnurlServerMode } from "../lnurl-server-mode"
 import { addSelfCustodialAccountId } from "../storage/account-index"
-import { finishPendingStorageRemovals } from "../storage/storage-removal"
+import {
+  finishPendingStorageRemovals,
+  markStorageForRemoval,
+} from "../storage/storage-removal"
 
 const createSdkConfig = (
   network: Network,
@@ -307,6 +310,50 @@ type RestoredWallet = {
   isServerModeKnown: boolean
 }
 
+/** How long a restore waits for its SDK to connect. The restore holds the app-wide
+ *  restore lock, so a connect that hangs on the network must not hold it for good. */
+export const RESTORE_CONNECT_TIMEOUT_MS = 60_000
+
+export class RestoreConnectTimeoutError extends Error {
+  constructor() {
+    super(`SDK connect did not answer within ${RESTORE_CONNECT_TIMEOUT_MS}ms`)
+    this.name = "RestoreConnectTimeoutError"
+  }
+}
+
+/**
+ * The restore's connect, given up after `RESTORE_CONNECT_TIMEOUT_MS`. The native connect
+ * cannot be cancelled, so a given-up one is retired instead: a connect that has not yet
+ * reached its point of no return is refused, one that answers late is disconnected, and
+ * the storage it may have written is marked for removal at the next launch. Its account
+ * id is never registered, and the next attempt gets a fresh one, so letting the restore
+ * lock go while the native connect may still finish cannot provision a second account.
+ */
+const initRestoreSdk = async (params: InitSdkParams): Promise<BreezSdkInterface> => {
+  const connecting = initSdk(params)
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const timedOut = new Promise<never>((_, reject) => {
+    timer = setTimeout(
+      () => reject(new RestoreConnectTimeoutError()),
+      RESTORE_CONNECT_TIMEOUT_MS,
+    )
+  })
+  try {
+    return await Promise.race([connecting, timedOut])
+  } catch (err) {
+    if (err instanceof RestoreConnectTimeoutError) {
+      retireSdkStorage(params.storageDir)
+      connecting.then(disconnectSdk).catch(() => undefined)
+      await markStorageForRemoval(params.storageDir).catch((markErr) =>
+        reportError("Wallet restore storage removal", markErr),
+      )
+    }
+    throw err
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 export const selfCustodialRestoreWallet = async ({
   accountId,
   mnemonic,
@@ -328,7 +375,7 @@ export const selfCustodialRestoreWallet = async ({
       networkLabelFor(network),
     )
     if (!labelled) throw new Error("Failed to store mnemonic network")
-    const sdk = await initSdk({
+    const sdk = await initRestoreSdk({
       mnemonic: normalized,
       storageDir: storageDirFor(accountId, network),
       network,

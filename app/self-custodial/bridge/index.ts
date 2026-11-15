@@ -9,6 +9,7 @@ export {
   removeSdkEventListener,
   selfCustodialCreateWallet,
   selfCustodialRestoreWallet,
+  RestoreConnectTimeoutError,
 } from "./lifecycle"
 export {
   getWalletInfo,

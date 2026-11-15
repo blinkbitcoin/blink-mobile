@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback, useState, useSyncExternalStore } from "react"
 import { validateMnemonic } from "bip39"
 import Crypto from "react-native-quick-crypto"
 
@@ -7,7 +7,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { createInFlightGuard } from "@app/hooks/use-in-flight-guard"
+import { createInFlightGuard, InFlightStatus } from "@app/hooks/use-in-flight-guard"
 import { markSelfCustodialInfoBulletinDismissedFor } from "@app/hooks/use-self-custodial-info-bulletin-state"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
@@ -15,7 +15,10 @@ import {
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
 import { logSelfCustodialRestoreCompleted } from "@app/self-custodial/analytics"
-import { selfCustodialRestoreWallet } from "@app/self-custodial/bridge"
+import {
+  RestoreConnectTimeoutError,
+  selfCustodialRestoreWallet,
+} from "@app/self-custodial/bridge"
 import { useLnurlServer } from "@app/self-custodial/hooks/use-lnurl-server"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { measureFor, ScEvent } from "@app/self-custodial/measurement"
@@ -52,13 +55,30 @@ type RestoreWalletStatus = (typeof RestoreWalletStatus)[keyof typeof RestoreWall
  *  is up, and provision two accounts for it. */
 const restoreGuard = createInFlightGuard()
 
+/** An outage and a wrong phrase are indistinguishable inside the restore's catch, and the
+ *  generic "check your phrase" toast sends an outage victim looking for a mistake they did
+ *  not make. A connect that never answered is the same outage. */
+const isOperatorOutage = (err: unknown): boolean =>
+  err instanceof RestoreConnectTimeoutError ||
+  classifySdkError(err) === SelfCustodialErrorCode.NetworkError
+
 export const useRestoreWallet = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { updateState, persistentState } = usePersistentStateContext()
   const { retry: reinitSdk } = useSelfCustodialWallet()
   const { reloadSelfCustodialAccounts } = useAccountRegistry()
-  const [status, setStatus] = useState<RestoreWalletStatus>(RestoreWalletStatus.Idle)
+  /** What this screen's last restore or request ended in, an error or nothing. */
+  const [settledStatus, setSettledStatus] = useState<RestoreWalletStatus>(
+    RestoreWalletStatus.Idle,
+  )
+  /** Restoring is the app's, not this screen's: a screen opened while a restore started
+   *  elsewhere is still running shows it busy, rather than an Accept that does nothing. */
+  const isRestoreRunning = useSyncExternalStore(
+    restoreGuard.subscribe,
+    restoreGuard.isRunning,
+  )
+  const status = isRestoreRunning ? RestoreWalletStatus.Restoring : settledStatus
   const network = useSparkNetwork()
   const lnurlServer = useLnurlServer()
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
@@ -86,15 +106,22 @@ export const useRestoreWallet = () => {
 
   /** `method` is where the phrase came from, recorded as the account's backup: a
    *  cloud restore means the seed is already in the cloud, so the emergency
-   *  bundle follows it there. A typed phrase leaves the bundle on the device. */
+   *  bundle follows it there. A typed phrase leaves the bundle on the device.
+   *
+   *  Resolves to `AlreadyRunning` when a restore started elsewhere still runs; that one's
+   *  answer is the one the user gets. A restore that lands leaves the status Idle, so the
+   *  screen it moved on from is not left busy for it, should the user come back there. */
   const restore = useCallback(
-    async (mnemonic: string, method: BackupMethod = BackupMethod.Manual) => {
-      await restoreGuard.run(async () => {
-        setStatus(RestoreWalletStatus.Restoring)
+    async (
+      mnemonic: string,
+      method: BackupMethod = BackupMethod.Manual,
+    ): Promise<InFlightStatus> => {
+      const result = await restoreGuard.attempt(async () => {
+        setSettledStatus(RestoreWalletStatus.Idle)
 
         const normalized = normalizeMnemonic(mnemonic)
         if (!validateMnemonic(normalized)) {
-          setStatus(RestoreWalletStatus.Error)
+          setSettledStatus(RestoreWalletStatus.Error)
           toastShow({ message: LL.RestoreScreen.invalidMnemonic(), LL })
           return
         }
@@ -165,12 +192,8 @@ export const useRestoreWallet = () => {
           navigation.navigate("selfCustodialBackupSuccess")
         } catch (err) {
           reportError("Wallet restore", err)
-          setStatus(RestoreWalletStatus.Error)
-          // An outage and a wrong phrase are indistinguishable inside this
-          // catch, and the generic "check your phrase" toast sends an outage
-          // victim looking for a mistake they did not make, so the operators
-          // being unreachable gets its own screen.
-          if (classifySdkError(err) === SelfCustodialErrorCode.NetworkError) {
+          setSettledStatus(RestoreWalletStatus.Error)
+          if (isOperatorOutage(err)) {
             navigation.navigate("selfCustodialOperatorUnreachable")
             return
           }
@@ -178,6 +201,7 @@ export const useRestoreWallet = () => {
           throw err
         }
       })
+      return result.status
     },
     [
       activateAccount,
@@ -199,11 +223,11 @@ export const useRestoreWallet = () => {
     async (mnemonic: string, method: BackupMethod = BackupMethod.Manual) => {
       const normalized = normalizeMnemonic(mnemonic)
       if (!validateMnemonic(normalized)) {
-        setStatus(RestoreWalletStatus.Error)
+        setSettledStatus(RestoreWalletStatus.Error)
         toastShow({ message: LL.RestoreScreen.invalidMnemonic(), LL })
         return
       }
-      setStatus(RestoreWalletStatus.Idle)
+      setSettledStatus(RestoreWalletStatus.Idle)
       holdPendingRestore({ mnemonic: normalized, method })
       navigation.navigate("acceptTermsAndConditions", { flow: "selfCustodialRestore" })
     },
