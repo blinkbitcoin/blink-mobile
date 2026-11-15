@@ -221,7 +221,7 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
         onLoadProgress={(e: WebViewProgressEvent) => {
           if (jsInjected.current || e.nativeEvent.progress <= 0.75) return
           if (!webview.current) {
-            Alert.alert("Error", "Webview not ready")
+            Alert.alert(LL.common.error(), LL.GaloyAddressScreen.somethingWentWrong())
             return
           }
           // Latch before injecting, and in a ref rather than state: two progress

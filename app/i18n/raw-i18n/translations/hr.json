@@ -3051,7 +3051,9 @@
     "network": {
       "server": "Pogreška servera. Molimo pokušajte ponovo kasnije",
       "request": "Problem zahtjeva.\nKontaktirajte podršku ako problem potraje",
-      "connection": "Problem s vezom.\nProvjerite svoju internetsku vezu"
+      "connection": "Problem s vezom.\nProvjerite svoju internetsku vezu",
+      "statusCode": "Status code: {statusCode: number}",
+      "errorCode": "Error code: {errorCode: string}"
     },
     "unexpectedError": "Došlo je do neočekivane pogreške",
     "restartApp": "Molimo ponovno pokrenite aplikaciju.",

@@ -3051,7 +3051,9 @@
         "network": {
             "server": "Server Error. Per favore riprova.",
             "request": "Request issue\nContatta l'assistenza se il problema persiste",
-            "connection": "Problema di connessione.\nVerificare la connessione a Internet"
+            "connection": "Problema di connessione.\nVerificare la connessione a Internet",
+            "statusCode": "Status code: {statusCode: number}",
+            "errorCode": "Error code: {errorCode: string}"
         },
         "unexpectedError": "Si è verificato un errore imprevisto",
         "restartApp": "Per favore riavvia l'applicazione",

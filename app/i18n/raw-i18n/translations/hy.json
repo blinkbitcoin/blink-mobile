@@ -3051,7 +3051,9 @@
     "network": {
       "server": "Սերվերի սխալ։ Խնդրում ենք կրկին փորձել ավելի ուշ",
       "request": "Հարցման խնդիր։\nԿապ հաստատեք աջակցության ծառայության հետ խնդրի չվերանալու դեպքում։ ",
-      "connection": "Կապի խնդիր։\nՍտուգեք Ձեր համացանցի կապը "
+      "connection": "Կապի խնդիր։\nՍտուգեք Ձեր համացանցի կապը ",
+      "statusCode": "Status code: {statusCode: number}",
+      "errorCode": "Error code: {errorCode: string}"
     },
     "unexpectedError": "Անսպասելի սխալ",
     "restartApp": "Խնդրում ենք վերաթողարկել հավելվածը։ ",

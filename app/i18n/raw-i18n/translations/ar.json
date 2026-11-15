@@ -3051,7 +3051,9 @@
     "network": {
       "server": "خطأ في الخادم. الرجاء معاودة المحاولة في وقت لاحق",
       "request": "طلب مشكلة.\nاتصل بالدعم إذا استمرت المشكلة.",
-      "connection": "مشكلة في الاتصال.\nتأكدت من اتصالك بالانترنت."
+      "connection": "مشكلة في الاتصال.\nتأكدت من اتصالك بالانترنت.",
+      "statusCode": "Status code: {statusCode: number}",
+      "errorCode": "Error code: {errorCode: string}"
     },
     "unexpectedError": "حدث خطأ غير متوقع",
     "restartApp": "أعد تشغيل التطبيق من فضلك.",
