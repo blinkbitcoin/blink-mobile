@@ -99,6 +99,7 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
           type: "success",
           message: LL.ProfileScreen.removedAccount({ identifier }),
           LL,
+          privateValues: [identifier],
         })
         return
       case "fallbackToSelfCustodial":

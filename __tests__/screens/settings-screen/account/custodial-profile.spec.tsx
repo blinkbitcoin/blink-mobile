@@ -35,17 +35,19 @@ jest.mock("@app/hooks/use-logout-and-route", () => ({
 }))
 
 const mockSetActiveAccountId = jest.fn()
+let mockActiveAccount = { id: "self-custodial-active", type: "self-custodial" }
 jest.mock("@app/hooks/use-account-registry", () => ({
   ...jest.requireActual("@app/hooks/use-account-registry"),
   useAccountRegistry: () => ({
     accounts: [],
-    activeAccount: { id: "self-custodial-active", type: "self-custodial" },
+    activeAccount: mockActiveAccount,
     setActiveAccountId: mockSetActiveAccountId,
   }),
 }))
 
+const mockToastShow = jest.fn()
 jest.mock("@app/utils/toast", () => ({
-  toastShow: jest.fn(),
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
 
 describe("ProfileScreen (custodial row on Switch account)", () => {
@@ -53,6 +55,7 @@ describe("ProfileScreen (custodial row on Switch account)", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    mockActiveAccount = { id: "self-custodial-active", type: "self-custodial" }
     loadLocale("en")
     LL = i18nObject("en")
   })
@@ -78,5 +81,34 @@ describe("ProfileScreen (custodial row on Switch account)", () => {
     expect(mockSaveToken).toHaveBeenCalledWith("mock-token-1")
     expect(mockPopTo).toHaveBeenCalledWith("Primary")
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** The identifier is the account's username or phone number, and the toast's message is
+   *  logged to analytics: it is handed over as private so only the device shows it. */
+  it("keeps the removed account's identifier out of analytics", async () => {
+    mockActiveAccount = { id: "custodial", type: "custodial" }
+    render(
+      <ContextForScreen>
+        <ProfileScreen
+          identifier="TestUser"
+          token="mock-token-1"
+          nextProfileToken="mock-token-2"
+          selected={true}
+          lnAddressHostname="blink.sv"
+        />
+      </ContextForScreen>,
+    )
+
+    fireEvent.press(screen.getByTestId("close"))
+    await act(async () => {
+      fireEvent.press(screen.getByText(LL.common.confirm()))
+    })
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: LL.ProfileScreen.removedAccount({ identifier: "TestUser" }),
+        privateValues: ["TestUser"],
+      }),
+    )
   })
 })

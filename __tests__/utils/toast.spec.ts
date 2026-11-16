@@ -106,4 +106,34 @@ describe("toastShow", () => {
       }),
     )
   })
+
+  /** The event leaves the device, so an address or username the message spells out must
+   *  not go with it; the person reading the toast still sees it. */
+  it("shows private values on screen but logs a placeholder in their place", () => {
+    const showSpy = jest.spyOn(Toast, "show")
+
+    toastShow({
+      message: "You removed account alice@blink.sv. Bye alice@blink.sv.",
+      LL: mockLL,
+      type: "success",
+      privateValues: ["alice@blink.sv"],
+    })
+
+    expect(showSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        text2: "You removed account alice@blink.sv. Bye alice@blink.sv.",
+      }),
+    )
+    const [{ message }] = mockLogToastShown.mock.calls[0]
+    expect(message).toBe("You removed account [redacted]. Bye [redacted].")
+    expect(message).not.toContain("alice")
+  })
+
+  it("leaves the logged message alone when a private value is blank", () => {
+    toastShow({ message: "Removed", LL: mockLL, privateValues: ["", "  "] })
+
+    expect(mockLogToastShown).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Removed" }),
+    )
+  })
 })

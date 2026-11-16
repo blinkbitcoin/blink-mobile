@@ -1,4 +1,5 @@
 import { act, renderHook } from "@testing-library/react-native"
+import { it } from "@jest/globals"
 
 import { useAccountRemoval } from "@app/screens/settings-screen/self-custodial/use-account-removal"
 
@@ -182,6 +183,30 @@ describe("useAccountRemoval", () => {
       }),
     )
   })
+
+  /** The name is the account's full lightning address, and the toast's message is logged
+   *  to analytics: it is handed over as private so only the device shows it. */
+  it.each([
+    { removed: true, outcome: "switched-to-self-custodial" },
+    { removed: false, outcome: "remained" },
+    { removed: false, outcome: "logged-out" },
+  ])(
+    "keeps the removed account's address out of analytics (%j)",
+    async ({ removed, outcome }) => {
+      mockDeleteWallet.mockResolvedValue({ removed, outcome })
+      const { result } = renderHook(() => useAccountRemoval())
+
+      act(() => result.current.requestRemoval("account-a", "alice@blink.sv"))
+      await act(() => result.current.runPendingRemoval())
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.stringContaining("alice@blink.sv"),
+          privateValues: ["alice@blink.sv"],
+        }),
+      )
+    },
+  )
 
   it("drops a confirmed removal once it is cancelled", async () => {
     const { result } = renderHook(() => useAccountRemoval())

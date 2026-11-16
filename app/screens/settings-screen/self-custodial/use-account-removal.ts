@@ -93,6 +93,7 @@ export const useAccountRemoval = (): UseAccountRemovalResult => {
         ? LL.ProfileScreen.removedAccount({ identifier })
         : failureMessage(identifier, outcome),
       LL,
+      privateValues: [identifier],
     })
   }, [
     deleteWallet,

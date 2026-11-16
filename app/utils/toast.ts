@@ -6,18 +6,35 @@ import { i18nObject } from "@app/i18n/i18n-util"
 
 import { logToastShown } from "./analytics"
 
+export const REDACTED_TOAST_VALUE = "[redacted]"
+
+/** The message is logged verbatim, so a value from the user's own data would leave the
+ *  device with it. Blank values are skipped: replacing "" would splice the placeholder
+ *  between every character. */
+const redact = (message: string, privateValues: ReadonlyArray<string>): string =>
+  privateValues
+    .filter((value) => value.trim() !== "")
+    .reduce(
+      (redacted, value) => redacted.replaceAll(value, REDACTED_TOAST_VALUE),
+      message,
+    )
+
 export const toastShow = ({
   message,
   LL,
   onHide,
   type = "error",
   autoHide,
+  privateValues = [],
 }: {
   message: ((translations: TranslationFunctions) => string) | string
   LL: TranslationFunctions
   onHide?: () => void
   type?: ToastType
   autoHide?: boolean
+  /** Values from the user's own data that the message spells out, such as an account's
+   *  address or username: the toast shows them, the analytics event gets a placeholder. */
+  privateValues?: ReadonlyArray<string>
 }): void => {
   const englishTranslation = i18nObject("en")
   const englishMessage =
@@ -31,7 +48,7 @@ export const toastShow = ({
   }
 
   logToastShown({
-    message: englishMessage,
+    message: redact(englishMessage, privateValues),
     type,
     isTranslated: translatedMessage !== englishMessage,
   })
