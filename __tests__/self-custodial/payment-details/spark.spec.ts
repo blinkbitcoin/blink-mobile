@@ -218,6 +218,18 @@ describe("createSelfCustodialSparkPaymentDetails send-all", () => {
     expect(lastFeeParams().feePolicy).toBeUndefined()
   })
 
+  it("puts the fee back on top once an amount is typed", () => {
+    const typed = createSelfCustodialSparkPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    ).setAmount!(balance)
+
+    expect(typed.isSendingMax).toBe(false)
+    expect(typed.isFeeIncluded).toBe(false)
+    expect(lastFeeParams().feePolicy).toBeUndefined()
+    expect(lastSendParams().feePolicy).toBeUndefined()
+  })
+
   it("drops the send-all on a wallet switch", () => {
     const switched = createSelfCustodialSparkPaymentDetails(createParams()).setAmount!(
       balance,

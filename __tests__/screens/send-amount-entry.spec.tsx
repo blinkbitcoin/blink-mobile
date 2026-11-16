@@ -491,6 +491,34 @@ describe("free amount", () => {
     )
   })
 
+  /** #2048: typing an amount, or sliding back under 100%, puts the fee back on top. */
+  it("turns the send-all off once an amount is typed after 100%", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    slideTo(100)
+    await settle()
+    fireEvent.press(screen.getByTestId("Key ⌫"))
+    await settle()
+
+    expect(mockSetAmount.mock.calls.at(-1)?.[1]).toBeFalsy()
+  })
+
+  it("turns the send-all off when the slider goes back under 100%", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    slideTo(100)
+    await settle()
+    slideTo(90)
+    await settle()
+
+    expect(mockSetAmount).toHaveBeenLastCalledWith(
+      expect.objectContaining({ amount: Math.floor((btcWallet.balance * 90) / 100) }),
+      false,
+    )
+  })
+
   it("sends 100% as a plain amount where the rail has no send-all", async () => {
     renderScreen(intraledgerDestination({ canSendMax: false }))
     await settle()

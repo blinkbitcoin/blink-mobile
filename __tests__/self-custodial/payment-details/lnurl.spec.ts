@@ -2041,6 +2041,35 @@ describe("createSelfCustodialLnurlPaymentDetails send-all", () => {
     expect(await feePolicyOf(sendAll)).toBe(FEES_INCLUDED)
   })
 
+  it("sends a send-all with the fee taken out, not only quotes it", async () => {
+    mockExecuteLnurl.mockResolvedValue({
+      payment: { id: "p1", status: 0 /* PaymentStatus.Completed */ },
+    })
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+    if (!sendAll.canSendPayment) throw new Error("expected canSendPayment")
+
+    await sendAll.sendPaymentMutation({} as never)
+
+    expect(mockPrepareLnurl).toHaveBeenLastCalledWith(
+      expect.any(Object),
+      expect.objectContaining({ feePolicy: FEES_INCLUDED }),
+    )
+  })
+
+  it("puts the fee back on top once an amount is typed", async () => {
+    const typed = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    ).setAmount!(balance)
+
+    expect(typed.isSendingMax).toBe(false)
+    expect(typed.isFeeIncluded).toBe(false)
+    expect(await feePolicyOf(typed)).toBeUndefined()
+  })
+
   it("leaves a plain Bitcoin amount's fee on top", async () => {
     const plain =
       createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(balance)
