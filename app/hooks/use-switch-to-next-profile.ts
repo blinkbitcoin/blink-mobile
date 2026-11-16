@@ -25,8 +25,17 @@ export const SwitchProfileOutcome = {
 export type SwitchProfileOutcome =
   (typeof SwitchProfileOutcome)[keyof typeof SwitchProfileOutcome]
 
+/** Runs the navigation that ends the switch. A caller whose screen refuses to be left
+ *  while it works (the account deletion lock) hands its own way through here. */
+type LeaveScreen = (navigate: () => void) => void
+
+const leaveDirectly: LeaveScreen = (navigate) => navigate()
+
 type UseSwitchToNextProfileResult = {
-  switchToNextProfile: (tokenToDeactivate: string) => Promise<SwitchProfileOutcome>
+  switchToNextProfile: (
+    tokenToDeactivate: string,
+    leave?: LeaveScreen,
+  ) => Promise<SwitchProfileOutcome>
 }
 
 export const useSwitchToNextProfile = (): UseSwitchToNextProfileResult => {
@@ -39,6 +48,7 @@ export const useSwitchToNextProfile = (): UseSwitchToNextProfileResult => {
 
   const switchToNextProfile = async (
     tokenToDeactivate: string,
+    leave: LeaveScreen = leaveDirectly,
   ): Promise<SwitchProfileOutcome> => {
     const read = await KeyStoreWrapper.readSessionProfiles()
     const profiles = read.status === "found" ? read.profiles : []
@@ -73,12 +83,12 @@ export const useSwitchToNextProfile = (): UseSwitchToNextProfileResult => {
      *
      *  Read now rather than at the call, and from the lock's own ref rather than a mirror
      *  of it: a relock raised during the awaits above lands there at once, while any state
-     *  copied from it is still a commit behind. */
-    if (readIsAppLocked()) {
-      returnToGate()
-    } else {
-      navigation.navigate("Primary")
-    }
+     *  copied from it is still a commit behind.
+     *
+     *  Home is the one already on the stack: `navigate` would push a second one and leave
+     *  the screen the switch started from underneath it, still reachable with back. */
+    const isAppLocked = readIsAppLocked()
+    leave(() => (isAppLocked ? returnToGate() : navigation.popTo("Primary")))
     return SwitchProfileOutcome.Switched
   }
 

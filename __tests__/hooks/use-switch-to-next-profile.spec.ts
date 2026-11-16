@@ -1,4 +1,5 @@
 import { act, renderHook } from "@testing-library/react-native"
+import { it } from "@jest/globals"
 
 import {
   SwitchProfileOutcome,
@@ -8,6 +9,7 @@ import {
 const mockLogout = jest.fn()
 const mockSaveToken = jest.fn()
 const mockNavigate = jest.fn()
+const mockPopTo = jest.fn()
 const mockToastShow = jest.fn()
 const mockReportError = jest.fn()
 const mockReadSessionProfiles = jest.fn()
@@ -27,7 +29,7 @@ jest.mock("@app/hooks", () => ({
 }))
 
 jest.mock("@react-navigation/native", () => ({
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({ navigate: mockNavigate, popTo: mockPopTo }),
 }))
 
 /** Whether the app lock is up when the session dies. The real context pulls in native
@@ -92,7 +94,7 @@ describe("useSwitchToNextProfile", () => {
 
     expect(switchResult).toBe(SwitchProfileOutcome.Switched)
     expect(mockSaveToken).toHaveBeenCalledWith("tok-b")
-    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockPopTo).not.toHaveBeenCalled()
     expect(mockReturnToGate).toHaveBeenCalledTimes(1)
   })
 
@@ -130,7 +132,7 @@ describe("useSwitchToNextProfile", () => {
 
     expect(await switchDone).toBe(SwitchProfileOutcome.Switched)
     expect(mockSaveToken).toHaveBeenCalledWith("tok-b")
-    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockPopTo).not.toHaveBeenCalled()
     expect(mockReturnToGate).toHaveBeenCalledTimes(1)
   })
 
@@ -161,7 +163,8 @@ describe("useSwitchToNextProfile", () => {
       await switchDone
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("Primary")
+    expect(mockPopTo).toHaveBeenCalledWith("Primary")
+    expect(mockNavigate).not.toHaveBeenCalled()
     expect(mockReturnToGate).not.toHaveBeenCalled()
   })
 
@@ -187,7 +190,8 @@ describe("useSwitchToNextProfile", () => {
     expect(mockLogout.mock.invocationCallOrder[0]).toBeLessThan(
       mockSaveToken.mock.invocationCallOrder[0],
     )
-    expect(mockNavigate).toHaveBeenCalledWith("Primary")
+    expect(mockPopTo).toHaveBeenCalledWith("Primary")
+    expect(mockNavigate).not.toHaveBeenCalled()
     expect(mockToastShow).toHaveBeenCalled()
   })
 
@@ -208,7 +212,35 @@ describe("useSwitchToNextProfile", () => {
     })
     expect(mockSaveToken).not.toHaveBeenCalled()
     expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockPopTo).not.toHaveBeenCalled()
     expect(mockToastShow).not.toHaveBeenCalled()
+  })
+
+  /** A screen that refuses to be left while it works lets only its own navigation
+   *  through; the switch's way home has to be handed to it rather than run around it. */
+  it.each([
+    { locked: false, expectedCall: "popTo" },
+    { locked: true, expectedCall: "returnToGate" },
+  ])("leaves through the caller's own way out (%j)", async ({ locked, expectedCall }) => {
+    mockIsAppLocked = locked
+    storeProfiles([profileA, profileB])
+    const leave = jest.fn()
+
+    const { result } = renderHook(() => useSwitchToNextProfile())
+    await act(async () => {
+      await result.current.switchToNextProfile("tok-a", leave)
+    })
+
+    expect(leave).toHaveBeenCalledTimes(1)
+    expect(mockPopTo).not.toHaveBeenCalled()
+    expect(mockReturnToGate).not.toHaveBeenCalled()
+
+    leave.mock.calls[0][0]()
+    if (expectedCall === "popTo") {
+      expect(mockPopTo).toHaveBeenCalledWith("Primary")
+    } else {
+      expect(mockReturnToGate).toHaveBeenCalledTimes(1)
+    }
   })
 
   // An unreadable store must never reach the caller as "no other profile":
@@ -235,6 +267,7 @@ describe("useSwitchToNextProfile", () => {
     })
     expect(mockSaveToken).not.toHaveBeenCalled()
     expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockPopTo).not.toHaveBeenCalled()
   })
 
   it("treats an empty store as no next profile", async () => {

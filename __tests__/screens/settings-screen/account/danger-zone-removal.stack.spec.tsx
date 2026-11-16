@@ -7,13 +7,13 @@ import React, { useSyncExternalStore } from "react"
 import { Alert, AlertButton, BackHandler, Text } from "react-native"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import {
+  CommonActions,
   createNavigationContainerRef,
   NavigationContainer,
 } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { createTheme, ThemeProvider } from "@rn-vui/themed"
 
-import { SwitchProfileOutcome } from "@app/hooks/use-switch-to-next-profile"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -138,24 +138,41 @@ jest.mock("@app/graphql/generated", () => ({
   }),
 }))
 
-const mockSwitchToNextProfile = jest.fn()
-jest.mock("@app/hooks/use-switch-to-next-profile", () => ({
-  ...jest.requireActual("@app/hooks/use-switch-to-next-profile"),
-  useSwitchToNextProfile: () => ({ switchToNextProfile: mockSwitchToNextProfile }),
+/** The profile switch runs for real, so the way it leaves meets the real lock on the real
+ *  stack. Only what it reaches past the screen is stood in for: the saved profiles, the
+ *  token store, and the app lock's flag. */
+const mockReadSessionProfiles = jest.fn()
+jest.mock("@app/utils/storage/secureStorage", () => ({
+  __esModule: true,
+  default: {
+    readSessionProfiles: (...args: unknown[]) => mockReadSessionProfiles(...args),
+  },
 }))
 
+jest.mock("@app/navigation/navigation-container-wrapper", () => ({
+  useAuthenticationContext: () => ({
+    readIsAppLocked: () => false,
+    setAppLocked: jest.fn(),
+  }),
+}))
+
+const mockLogout = jest.fn()
 jest.mock("@app/hooks/use-logout", () => ({
   __esModule: true,
-  default: () => ({ logout: jest.fn() }),
+  default: () => ({ logout: mockLogout }),
 }))
 
+const mockRouteAfterLogout = jest.fn()
 jest.mock("@app/hooks/use-logout-and-route", () => ({
-  useLogoutAndRoute: () => ({ routeAfterLogout: jest.fn() }),
+  useLogoutAndRoute: () => ({ routeAfterLogout: mockRouteAfterLogout }),
 }))
 
 jest.mock("@app/hooks", () => ({
   ...jest.requireActual("@app/hooks"),
-  useAppConfig: () => ({ appConfig: { token: "custodial-token" } }),
+  useAppConfig: () => ({
+    appConfig: { token: "custodial-token" },
+    saveToken: jest.fn().mockResolvedValue(undefined),
+  }),
 }))
 
 jest.mock("@app/hooks/use-display-currency", () => ({
@@ -332,7 +349,18 @@ describe("Danger zone removal under the real lock", () => {
         .mockImplementation((title, _body, buttons) =>
           alertCalls.push({ title, buttons }),
         )
-      mockSwitchToNextProfile.mockResolvedValue(SwitchProfileOutcome.Switched)
+      mockReadSessionProfiles.mockResolvedValue({
+        status: "found",
+        profiles: [{ token: "custodial-token" }, { token: "next-token" }],
+      })
+      mockLogout.mockResolvedValue({ isAppLockKept: false })
+      /** Get started is not on this stack; resetting to Home stands in for it, which is
+       *  enough to show whether the lock lets the way out through. */
+      mockRouteAfterLogout.mockImplementation(() =>
+        navigationRef.dispatch(
+          CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }),
+        ),
+      )
     })
 
     it("covers the screen and refuses the back key while the mutation runs", async () => {
@@ -351,16 +379,72 @@ describe("Danger zone removal under the real lock", () => {
       expect(routeNames()).toEqual(["Primary", "settings", "accountScreen"])
     })
 
-    it("lifts the cover and says goodbye once the deletion lands", async () => {
+    /** The account is gone once the mutation lands, and the switch then reads the store,
+     *  signs the dead session out and saves the next token: all that time the screen
+     *  under the cover renders for whichever session comes next. */
+    it("keeps the cover up and the back key refused while the profile switch runs", async () => {
+      const profilesRead = deferred<unknown>()
+      mockReadSessionProfiles.mockReturnValue(profilesRead.promise)
       const mutation = await startDeletion()
 
       await act(async () => {
         mutation.resolve({ data: { accountDelete: { success: true, errors: [] } } })
       })
 
-      expect(screen.queryByTestId("account-deletion-lock")).toBeNull()
-      expect(mockSwitchToNextProfile).toHaveBeenCalledWith("custodial-token")
+      expect(screen.getByTestId("account-deletion-lock")).toBeTruthy()
+      await act(async () => {
+        pressHardwareBack()
+      })
+      expect(routeNames()).toEqual(["Primary", "settings", "accountScreen"])
+
+      await act(async () => {
+        profilesRead.resolve({
+          status: "found",
+          profiles: [{ token: "custodial-token" }, { token: "next-token" }],
+        })
+      })
+
+      expect(routeNames()).toEqual(["Primary"])
       expect(alertCalls.at(-1)?.title).toBe("Bye!")
+    })
+
+    /** `navigate("Primary")` pushed a second Home over the deleted account's screen, and
+     *  back from Home went back to it. */
+    it("leaves no way back to the deleted account's screen once switched", async () => {
+      const mutation = await startDeletion()
+
+      await act(async () => {
+        mutation.resolve({ data: { accountDelete: { success: true, errors: [] } } })
+      })
+      await act(async () => {
+        pressHardwareBack()
+      })
+
+      expect(routeNames()).toEqual(["Primary"])
+      expect(
+        screen.queryByText("Close account", { includeHiddenElements: true }),
+      ).toBeNull()
+    })
+
+    it("stays covered until the farewell is acknowledged when it was the last profile, then leaves", async () => {
+      mockReadSessionProfiles.mockResolvedValue({
+        status: "found",
+        profiles: [{ token: "custodial-token" }],
+      })
+      const mutation = await startDeletion()
+
+      await act(async () => {
+        mutation.resolve({ data: { accountDelete: { success: true, errors: [] } } })
+      })
+
+      expect(alertCalls.at(-1)?.title).toBe("Bye!")
+      expect(screen.getByTestId("account-deletion-lock")).toBeTruthy()
+      expect(routeNames()).toEqual(["Primary", "settings", "accountScreen"])
+
+      await pressLastAlertButton("OK")
+
+      expect(mockRouteAfterLogout).toHaveBeenCalledWith(false)
+      expect(routeNames()).toEqual(["Primary"])
     })
 
     it("gives the way back when the server refuses the deletion", async () => {

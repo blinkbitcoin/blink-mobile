@@ -51,6 +51,7 @@ const mockToastShow = toastShow as jest.Mock
 const mockLogout = jest.fn()
 const mockSaveToken = jest.fn()
 const mockNavigate = jest.fn()
+const mockPopTo = jest.fn()
 const mockReset = jest.fn()
 /** Where a session the backend no longer accepts leaves for: the gate, lock raised. What
  *  that does is its own spec. */
@@ -59,6 +60,7 @@ const mockSetAppUnlocked = jest.fn()
 
 const mockNavigation = {
   navigate: mockNavigate,
+  popTo: mockPopTo,
   reset: mockReset,
 }
 
@@ -187,7 +189,8 @@ describe("NetworkErrorComponent", () => {
         message: "Switched account",
         LL: expect.any(Object),
       })
-      expect(mockNavigate).toHaveBeenCalledWith("Primary")
+      expect(mockPopTo).toHaveBeenCalledWith("Primary")
+      expect(mockNavigate).not.toHaveBeenCalled()
       expect(mockClearNetworkError).toHaveBeenCalled()
     })
   })
