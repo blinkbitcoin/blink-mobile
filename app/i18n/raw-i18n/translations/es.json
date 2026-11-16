@@ -4278,7 +4278,8 @@
         "invalidInput": "Los datos del pago parecen inválidos. Por favor revísalos e inténtalo de nuevo.",
         "generic": "El pago no pudo completarse. Inténtalo en un momento, o usa un monto menor.",
         "outcomeUnknown": "Es posible que este pago ya se haya realizado. Revisa tu historial de transacciones antes de enviarlo de nuevo.",
-        "earlierPaymentFound": "Tu pago anterior a este destino ya se realizó, por un monto distinto. Revísalo antes de volver a enviar."
+        "earlierPaymentFound": "Tu pago anterior a este destino ya se realizó, por un monto distinto. Revísalo antes de volver a enviar.",
+        "earlierConversionFound": "Tu transferencia anterior ya se realizó, por un monto distinto. Revísala en tu historial de transacciones antes de volver a transferir."
     },
     "SelfCustodialNetworkMismatch": {
         "toast": "Esta cuenta se creó en {network}. Cambia a {network} para usarla."

@@ -4278,7 +4278,8 @@
     "invalidInput": "Detalji plaćanja izgledaju nevažeći. Molimo provjerite i pokušajte ponovno.",
     "generic": "Plaćanje nije moglo biti dovršeno. Pokušajte ponovno za trenutak ili upotrijebite manji iznos.",
     "outcomeUnknown": "Ovo plaćanje je možda već izvršeno. Provjerite povijest transakcija prije ponovnog slanja.",
-    "earlierPaymentFound": "Vaše prethodno plaćanje na ovo odredište već je izvršeno, na drugi iznos. Provjerite ga prije ponovnog slanja."
+    "earlierPaymentFound": "Vaše prethodno plaćanje na ovo odredište već je izvršeno, na drugi iznos. Provjerite ga prije ponovnog slanja.",
+    "earlierConversionFound": "Vaša prethodna konverzija već je izvršena, na drugi iznos. Provjerite je u povijesti transakcija prije ponovne konverzije."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Ovaj račun je stvoren na mreži {network}. Prebacite se na {network} kako biste ga koristili."

@@ -4278,7 +4278,8 @@
     "invalidInput": "Iinkcukacha zentlawulo zibonakala zingafanelekanga. Nceda uphinde ujonge uphinde uzame.",
     "generic": "Intlawulo ayizange igqibekise. Zama kwakhona kwakamsinya, okanye usebenzise isixa esincinci.",
     "outcomeUnknown": "Le ntlawulo isenokuba sele iphumelele. Jonga imbali yeentengiselwano zakho ngaphambi kokuyithumela kwakhona.",
-    "earlierPaymentFound": "Intlawulo yakho yangaphambili kule ndawo sele iphumelele, ngesixa esahlukileyo. Yijonge ngaphambi kokuthumela kwakhona."
+    "earlierPaymentFound": "Intlawulo yakho yangaphambili kule ndawo sele iphumelele, ngesixa esahlukileyo. Yijonge ngaphambi kokuthumela kwakhona.",
+    "earlierConversionFound": "Uguqulo lwakho lwangaphambili sele luphumelele, ngesixa esahlukileyo. Lujonge kwimbali yeentengiselwano zakho ngaphambi kokuguqula kwakhona."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Le akhawunti yenziwe kwi-{network}. Tshintshela kwi-{network} ukuze uyisebenzise."

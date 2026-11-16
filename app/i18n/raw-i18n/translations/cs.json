@@ -4278,7 +4278,8 @@
     "invalidInput": "Detaily platby vypadají neplatně. Zkontrolujte je a zkuste to znovu.",
     "generic": "Platbu nebylo možné dokončit. Zkuste to za chvíli znovu nebo použijte menší částku.",
     "outcomeUnknown": "Tato platba už možná proběhla. Než ji odešlete znovu, zkontrolujte historii transakcí.",
-    "earlierPaymentFound": "Vaše předchozí platba na tento cíl už proběhla, ale na jinou částku. Než odešlete znovu, zkontrolujte ji."
+    "earlierPaymentFound": "Vaše předchozí platba na tento cíl už proběhla, ale na jinou částku. Než odešlete znovu, zkontrolujte ji.",
+    "earlierConversionFound": "Váš předchozí převod už proběhl, ale na jinou částku. Než provedete převod znovu, zkontrolujte ho v historii transakcí."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Tento účet byl vytvořen v síti {network}. Chcete-li jej použít, přepněte na {network}."

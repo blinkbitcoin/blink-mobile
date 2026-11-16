@@ -29,6 +29,8 @@ const conversionErrorMessage = (
 ): string => {
   const ownWords: Record<string, () => string> = {
     [ConvertErrorCode.OutcomeUnknown]: LL.SelfCustodialError.outcomeUnknown,
+    [ConvertErrorCode.EarlierConversionFound]:
+      LL.SelfCustodialError.earlierConversionFound,
     [ConvertErrorCode.HistoryUnavailable]: LL.errors.generic,
   }
   const translate = error?.code === undefined ? undefined : ownWords[error.code]

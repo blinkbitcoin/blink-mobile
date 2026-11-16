@@ -191,6 +191,9 @@ export const ConvertErrorCode = {
   /** Nothing was converted: the wallet's history could not be read, and a conversion
    *  that went out without it could not be told apart from what came before. */
   HistoryUnavailable: "history_unavailable",
+  /** Nothing was converted: an earlier conversion that may have been lost turned out to
+   *  have gone through, for another amount or the other way, and is the user's to check. */
+  EarlierConversionFound: "earlier_conversion_found",
 } as const
 
 export type ConvertErrorCode = (typeof ConvertErrorCode)[keyof typeof ConvertErrorCode]
@@ -282,6 +285,9 @@ export type UnresolvedConversion = {
   walletClockSec: number
   knownPaymentIds: ReadonlyArray<string>
   expectedDeliveries: ReadonlyArray<{ tokenIdentifier?: string; amount: number }>
+  /** When the latest attempt went out: until a few minutes after it, a look that does
+   *  not find the conversion is no proof it never delivered. */
+  lastAttemptAtMs: number
 }
 
 /**

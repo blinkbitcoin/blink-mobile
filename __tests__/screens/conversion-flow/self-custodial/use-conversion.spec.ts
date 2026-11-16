@@ -62,6 +62,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
       },
       SelfCustodialError: {
         outcomeUnknown: () => "Check your history",
+        earlierConversionFound: () => "Your earlier transfer went through",
       },
     },
   }),
@@ -553,6 +554,25 @@ describe("useSelfCustodialConversion", () => {
       })
 
       expect(result.current.errorMessage).toBe("Check your history")
+    })
+
+    it("points the user at an earlier transfer that turned out to have gone through", async () => {
+      mockGetQuote.mockResolvedValue(
+        makeQuote({
+          execute: jest.fn().mockResolvedValue({
+            status: PaymentResultStatus.Failed,
+            errors: [{ message: "raw", code: ConvertErrorCode.EarlierConversionFound }],
+          }),
+        }),
+      )
+
+      const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+      await waitFor(() => expect(result.current.canExecute).toBe(true))
+      await act(async () => {
+        await result.current.execute()
+      })
+
+      expect(result.current.errorMessage).toBe("Your earlier transfer went through")
     })
 
     it("asks to try again, not the SDK's words, when the wallet's history was unreadable", async () => {

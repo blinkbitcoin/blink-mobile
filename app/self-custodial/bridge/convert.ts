@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import {
   AmountAdjustmentReason,
+  PaymentDetails,
   PaymentRequest,
   PrepareSendPaymentRequest,
   PrepareSendPaymentResponse,
@@ -9,6 +10,7 @@ import {
   SendPaymentRequest,
   type BreezSdkInterface,
   type ConversionEstimate,
+  type Payment,
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { toUsdMoneyAmount } from "@app/types/amounts"
@@ -39,8 +41,12 @@ import {
 import {
   CODES_RAISED_BEFORE_DISPATCH,
   findLostConversion,
+  isAboutAmount,
+  isAboutDelivered,
+  isDeliveryAsExpected,
   markReceivedHistory,
   type ExpectedDelivery,
+  type LostConversionLook,
 } from "../payment-details/lost-send"
 import { classifySdkError } from "../sdk-error"
 
@@ -293,11 +299,72 @@ const prepareConversion = async (
 
 const OUTCOME_UNKNOWN_MESSAGE = "Conversion outcome unknown"
 const HISTORY_UNAVAILABLE_MESSAGE = "Wallet history unavailable"
+const EARLIER_CONVERSION_MESSAGE = "Earlier conversion found"
+
+/** Which way a conversion went, told by what it delivered: dollars for one from bitcoin,
+ *  bitcoin for one to it. */
+const directionDeliveredBy = (payment: Payment): ConvertDirection | undefined => {
+  const { details } = payment
+  if (!details) return undefined
+  if (PaymentDetails.Token.instanceOf(details)) return ConvertDirection.BtcToUsd
+  if (PaymentDetails.Spark.instanceOf(details)) return ConvertDirection.UsdToBtc
+  return undefined
+}
+
+/**
+ * Whether what a lost conversion delivered is this conversion asked again rather than
+ * another: the same way, paying in about as much, or, before the wallet has filled in
+ * what it paid in, delivering about as much as this one is quoted to.
+ */
+const isDeliveryOf = (
+  payment: Payment,
+  { estimate, params }: Pick<ConversionExecution, "estimate" | "params">,
+): boolean => {
+  if (directionDeliveredBy(payment) !== params.direction) return false
+  const paidIn = payment.conversionDetails?.conversions?.[0]?.from.amount
+  if (paidIn !== undefined) {
+    return isAboutAmount(toNumber(paidIn), toNumber(estimate.amountIn))
+  }
+  return isAboutDelivered(toNumber(payment.amount), toNumber(estimate.amountOut))
+}
 
 /** The token a conversion delivers: the dollar token for one from bitcoin, none (sats)
  *  for one to it. */
 const deliveredTokenOf = (direction: ConvertDirection): string | undefined =>
   direction === ConvertDirection.BtcToUsd ? requireSparkTokenIdentifier() : undefined
+
+/**
+ * How long after a lost conversion went out a look that does not find it is no proof it
+ * never delivered: the pool's swap can outlast the SDK's own wait for it, and the look
+ * after that. Until then the next conversion is refused; after it, the look's answer
+ * stands.
+ */
+export const LOST_CONVERSION_DELIVERY_WINDOW_MS = 5 * 60 * 1000
+
+/**
+ * What is left of a lost conversion once one delivery of it is found: that payment known,
+ * and the attempt it delivered for no longer looked for (the oldest, when the wallet does
+ * not tell which). Nothing once no attempt is left: any other may still deliver, so
+ * finding one never settles the rest.
+ */
+const withoutDeliveryOf = <L extends LostConversionLook>(
+  lost: L,
+  payment: Payment,
+): L | undefined => {
+  const matched = lost.expectedDeliveries.findIndex((delivery) =>
+    isDeliveryAsExpected(payment, delivery),
+  )
+  const settled = Math.max(matched, 0)
+  const expectedDeliveries = lost.expectedDeliveries.filter(
+    (_, index) => index !== settled,
+  )
+  if (expectedDeliveries.length === 0) return undefined
+  return {
+    ...lost,
+    expectedDeliveries,
+    knownPaymentIds: [...lost.knownPaymentIds, payment.id],
+  }
+}
 
 /**
  * Sends a quoted conversion so that a retry can never convert twice.
@@ -308,9 +375,16 @@ const deliveredTokenOf = (direction: ConvertDirection): string | undefined =>
  * wallet and never pays that invoice, and the payment the swap delivers is all it leaves
  * in the history. So where the wallet's received payments stand is marked before it goes
  * out, and one that throws after dispatch is looked for as an own conversion delivered
- * after that mark. When it does not turn up, the attempt ref keeps the mark, and every
- * later conversion on that ref looks for it again and is refused until it is found,
- * telling the user to check their history.
+ * after that mark. When it does not turn up, the attempt ref keeps the mark, and the next
+ * conversion on that ref looks for it first:
+ * - found, it is reported, and nothing more is converted: as this conversion when it is
+ *   the same one asked again, as an earlier one otherwise, for the user to check; any
+ *   other attempt it holds is still looked for;
+ * - read to its end without it, a few minutes after it went out, the lost conversion
+ *   never delivered, and this one goes out, settling it once it does; sooner, it may
+ *   still deliver, and this one is refused;
+ * - unreadable, nothing is known, and this one is refused, telling the user to check
+ *   their history.
  */
 type ConversionExecution = {
   prepared: PrepareSendPaymentResponse
@@ -332,18 +406,26 @@ const executePrepared = async (
   const keepUnresolved = (unresolved: UnresolvedConversion | undefined) => {
     attemptRef.unresolvedConversion = unresolved
   }
+  const isThisConversion = (payment: Payment) =>
+    isDeliveryOf(payment, { estimate, params })
 
   const earlier = attemptRef.unresolvedConversion
   if (earlier) {
-    /** The earlier conversion is looked for again first. Found, it is what this one
-     *  reports, and nothing more is converted: the funds it moved are the ones this
-     *  retry would move a second time. Still missing, it keeps every retry refused. */
     const lookup = await findLostConversion({ sdk, lost: earlier })
-    if (lookup.status !== "found") {
+    if (lookup.status === "unreadable") {
       return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
     }
-    keepUnresolved(undefined)
-    return { status: PaymentResultStatus.Success }
+    if (lookup.status === "found") {
+      keepUnresolved(withoutDeliveryOf(earlier, lookup.payment))
+      if (isThisConversion(lookup.payment)) return { status: PaymentResultStatus.Success }
+      return failed(EARLIER_CONVERSION_MESSAGE, ConvertErrorCode.EarlierConversionFound)
+    }
+    /** Not found so soon after it went out, it may still deliver. */
+    const canStillDeliver =
+      Date.now() - earlier.lastAttemptAtMs < LOST_CONVERSION_DELIVERY_WINDOW_MS
+    if (canStillDeliver) {
+      return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
+    }
   }
   const swapTelemetry = {
     direction: params.direction,
@@ -366,6 +448,8 @@ const executePrepared = async (
     const response = await sdk.sendPayment(
       SendPaymentRequest.create({ prepareResponse: prepared }),
     )
+    /** Out, it settles the lost conversion it was let through past. */
+    keepUnresolved(undefined)
     /** By the SDK's word on the payment, as for sends: a conversion normally comes back
      *  completed, and one that does not is held until its outcome is announced. */
     measureSettlement(
@@ -391,23 +475,36 @@ const executePrepared = async (
       return failed(err instanceof Error ? err.message : `Conversion failed: ${err}`)
     }
 
+    /** Looked for together with the lost conversion it was let through past, from the
+     *  earlier mark: either may have delivered by now. */
     const thisDelivery: ExpectedDelivery = {
       tokenIdentifier: deliveredTokenOf(params.direction),
       amount: toNumber(estimate.amountOut),
     }
     const lost: UnresolvedConversion = {
-      startedAtMs,
-      ...mark,
-      expectedDeliveries: [thisDelivery],
+      ...(earlier ?? { startedAtMs, ...mark }),
+      knownPaymentIds: [
+        ...new Set([...(earlier?.knownPaymentIds ?? []), ...mark.knownPaymentIds]),
+      ],
+      expectedDeliveries: [...(earlier?.expectedDeliveries ?? []), thisDelivery],
+      lastAttemptAtMs: startedAtMs,
     }
     const look = await findLostConversion({ sdk, lost })
-    if (look.status === "found") {
+    const isFoundAsThis = look.status === "found" && isThisConversion(look.payment)
+    if (isFoundAsThis) {
+      keepUnresolved(undefined)
       measureIn(startedIn, ScEvent.SwapCompleted, swapTelemetry)
       return { status: PaymentResultStatus.Success }
     }
 
+    /** What an earlier conversion delivered leaves this one unaccounted for: it is not
+     *  looked for again, and this one still is. */
+    const knownPaymentIds =
+      look.status === "found"
+        ? [...lost.knownPaymentIds, look.payment.id]
+        : lost.knownPaymentIds
     reportSwapFailed()
-    keepUnresolved(lost)
+    keepUnresolved({ ...lost, knownPaymentIds })
     return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
   }
 }

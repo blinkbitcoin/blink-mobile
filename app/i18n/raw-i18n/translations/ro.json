@@ -4278,7 +4278,8 @@
     "invalidInput": "Detaliile plății par invalide. Te rog verifică și încearcă din nou.",
     "generic": "Plata nu a putut fi finalizată. Încearcă din nou într-un moment, sau folosește o sumă mai mică.",
     "outcomeUnknown": "Este posibil ca această plată să fi fost deja efectuată. Verifică istoricul tranzacțiilor înainte de a o trimite din nou.",
-    "earlierPaymentFound": "Plata ta anterioară către această destinație a fost deja efectuată, pentru o altă sumă. Verifică-o înainte de a trimite din nou."
+    "earlierPaymentFound": "Plata ta anterioară către această destinație a fost deja efectuată, pentru o altă sumă. Verifică-o înainte de a trimite din nou.",
+    "earlierConversionFound": "Conversia ta anterioară a fost deja efectuată, pentru o altă sumă. Verific-o în istoricul tranzacțiilor înainte de a converti din nou."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Acest cont a fost creat pe {network}. Comută la {network} pentru a-l folosi."

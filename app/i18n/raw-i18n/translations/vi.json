@@ -4278,7 +4278,8 @@
     "invalidInput": "Chi tiết thanh toán có vẻ không hợp lệ. Vui lòng xem lại và thử lại.",
     "generic": "Không thể hoàn tất thanh toán. Hãy thử lại sau một lát, hoặc dùng số tiền nhỏ hơn.",
     "outcomeUnknown": "Khoản thanh toán này có thể đã được thực hiện. Hãy kiểm tra lịch sử giao dịch trước khi gửi lại.",
-    "earlierPaymentFound": "Khoản thanh toán trước đó của bạn tới địa chỉ này đã được thực hiện, với số tiền khác. Hãy kiểm tra trước khi gửi lại."
+    "earlierPaymentFound": "Khoản thanh toán trước đó của bạn tới địa chỉ này đã được thực hiện, với số tiền khác. Hãy kiểm tra trước khi gửi lại.",
+    "earlierConversionFound": "Lần chuyển đổi trước của bạn đã được thực hiện, với số tiền khác. Hãy kiểm tra trong lịch sử giao dịch trước khi chuyển đổi lại."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Tài khoản này được tạo trên {network}. Chuyển sang {network} để sử dụng."
