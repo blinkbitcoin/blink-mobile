@@ -72,8 +72,17 @@ describe("deep-linkable routes", () => {
     expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingProcessingScreen")
   })
 
-  it("still links to the card onboarding steps that need nothing handed to them", () => {
-    expect(DEEP_LINK_SCREENS).toHaveProperty("cardOnboardingPersonalInfoScreen")
+  /**
+   * The additional data step leads to the terms step, which submits the card
+   * application. A link landing on it would submit one with the subscribe step's notices
+   * and the card KYC both skipped. It is reached from the identity step alone, once the
+   * verification is submitted.
+   */
+  it("links to no card onboarding step that leads to the application", () => {
+    expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingPersonalInfoScreen")
+  })
+
+  it("still links to the card onboarding steps that only show an outcome", () => {
     expect(DEEP_LINK_SCREENS).toHaveProperty("cardOnboardingPreapprovedScreen")
     expect(DEEP_LINK_SCREENS).toHaveProperty("cardOnboardingDeclinedScreen")
   })
