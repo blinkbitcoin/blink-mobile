@@ -515,6 +515,7 @@ export type CaptchaCreateChallengePayload = {
 export type CaptchaCreateChallengeResult = {
   readonly __typename: 'CaptchaCreateChallengeResult';
   readonly challengeCode: Scalars['String']['output'];
+  /** @deprecated Always false. */
   readonly failbackMode: Scalars['Boolean']['output'];
   readonly id: Scalars['String']['output'];
   readonly newCaptcha: Scalars['Boolean']['output'];
