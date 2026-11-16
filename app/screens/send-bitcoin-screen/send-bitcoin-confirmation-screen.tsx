@@ -77,6 +77,7 @@ import { PaymentSendExtraInfo } from "./payment-details/index.types"
 import { useReviewFeeText } from "./review/use-review-fee-text"
 import { usePaymentFailure } from "./review/use-payment-failure"
 import { useReviewQuote } from "./review/use-review-quote"
+import { useSettledAmountText } from "./review/use-settled-amount-text"
 import { PaymentErrorActions } from "./payment-error-actions"
 import { PaymentSendCompletedStatus, useSendPayment } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
@@ -99,6 +100,7 @@ gql`
 
 type Props = { route: RouteProp<RootStackParamList, "sendBitcoinConfirmation"> }
 
+// eslint-disable-next-line max-lines-per-function -- review, the send and Sent share one component; splitting it solely to meet the line cap is a refactor of its own
 const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const {
     theme: { colors },
@@ -298,6 +300,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const heroSecondaryText =
     heroSecondaryAmount && formatMoneyAmount({ moneyAmount: heroSecondaryAmount })
 
+  const { hero, settle } = useSettledAmountText(paymentDetail, leadsWithWalletCurrency, {
+    heroPrimaryText,
+    heroSecondaryText,
+  })
+
   const {
     stageRef,
     heroRef,
@@ -324,7 +331,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
    *  is spoken as Sent appears, also when it first appears on the sender's return. */
   useAccessibilityAnnouncement(
     sentPlay
-      ? LL.SendBitcoinConfirmationScreen.sentAnnouncement({ amount: heroPrimaryText })
+      ? LL.SendBitcoinConfirmationScreen.sentAnnouncement({
+          amount: hero.heroPrimaryText,
+        })
       : undefined,
   )
 
@@ -351,6 +360,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         }).catch((err) => reportError("send-bitcoin-confirmation:save-contact", err))
       }
 
+      const sent = settle(extraInfo?.settled)
       const isSuccess = status === "SUCCESS"
       const params: RootStackParamList["sendBitcoinCompleted"] = {
         arrivalAtMempoolEstimate: extraInfo?.arrivalAtMempoolEstimate,
@@ -362,6 +372,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         satAmount,
         currencyFeeAmount,
         satFeeAmount,
+        ...sent.receipt,
         destination,
         paymentType: paymentDetail?.paymentType,
         createdAt: transaction?.createdAt,
@@ -387,8 +398,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         holdSettledSend()
         sentReceiptRef.current = params
         await playSent({
-          primaryAmount: heroPrimaryText,
-          hasSecondaryAmount: Boolean(heroSecondaryText),
+          primaryAmount: sent.heroPrimaryText,
+          hasSecondaryAmount: Boolean(sent.heroSecondaryText),
         })
         return
       }
@@ -404,8 +415,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       isRouteLive,
       usedAmountSlider,
       markAmountSliderLearned,
-      heroPrimaryText,
-      heroSecondaryText,
+      settle,
       saveLnAddressContact,
       paymentType,
       destination,
@@ -713,8 +723,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                     ? LL.SendBitcoinConfirmationScreen.sent()
                     : LL.SendBitcoinConfirmationScreen.sending()
                 }
-                primaryAmount={heroPrimaryText}
-                secondaryAmount={heroSecondaryText}
+                primaryAmount={hero.heroPrimaryText}
+                secondaryAmount={hero.heroSecondaryText}
                 sentProgress={heroProgress}
                 isSent={isSent}
                 sentPlay={sentPlay}

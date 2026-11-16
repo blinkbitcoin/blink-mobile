@@ -2708,6 +2708,38 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       expect(lastSliderProps().disabled).toBe(true)
     })
 
+    /** blink-wip#2048 SR2: the send is prepared again at the slide, so the fee, and with
+     *  it what arrives, can move off review's quote. The receipt keeps what went out. */
+    it("shows Sent and hands the receipt what the SDK says went out", async () => {
+      mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
+      btcFee(100)
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "SUCCESS",
+        extraInfo: { settled: { amountSats: 880, feeSats: 120 } },
+      })
+      await renderReview(feeIncludedRoute(1000))
+      expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("900 SAT")
+
+      await slideAndOpenReceipt()
+
+      expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("880 SAT")
+      const reducer = navigationDispatchMock.mock.calls
+        .map(([action]) => action)
+        .find((action) => typeof action === "function")
+      const reset = reducer({ index: 0, routes: [] }) as {
+        payload: { routes: { name: string; params: Record<string, unknown> }[] }
+      }
+      const completed = reset.payload.routes.find(
+        (entry) => entry.name === "sendBitcoinCompleted",
+      )
+      expect(
+        `${completed?.params.currencyAmount} ${completed?.params.satAmount}`,
+      ).toContain("880")
+      expect(
+        `${completed?.params.currencyFeeAmount} ${completed?.params.satFeeAmount}`,
+      ).toContain("120")
+    })
+
     it("keeps the slider off until the fee it takes out is quoted", async () => {
       // A max-fee estimate leaves the slider on for a fee paid on top; one taken out of
       // the amount has to be the real quote.

@@ -51,6 +51,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
       IncreasedToAvoidDust: "IncreasedToAvoidDust",
     },
     BitcoinNetwork: { Bitcoin: 0, Regtest: 4 },
+    FeePolicy: { FeesExcluded: 0, FeesIncluded: 1 },
     InputType_Tags: { SparkAddress: "SparkAddress" },
     Network: { Mainnet: 0, Regtest: 1 },
     PaymentType: { Send: 0, Receive: 1 },

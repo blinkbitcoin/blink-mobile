@@ -12,6 +12,7 @@ import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
 import {
   GetFee,
   IdempotencyKeyRef,
+  PaymentSendExtraInfo,
   SendPaymentMutation,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import {
@@ -98,6 +99,34 @@ export const sendAllFeePolicy = (
 ): FeePolicy | undefined =>
   sendMax && currency === WalletCurrency.Btc ? FeePolicy.FeesIncluded : undefined
 
+/**
+ * The SDK reports the fee policy it applied, which may differ from the one asked for
+ * (blink-wip#2048 SR3). A send-all that came back with the fee on top would show the
+ * balance less the fee while spending the balance plus it, so its quote and its send
+ * stop here, before anything goes out.
+ */
+export const assertFeePolicyApplied = (
+  requested: FeePolicy | undefined,
+  prepared: { feePolicy: FeePolicy },
+) => {
+  if (
+    requested === FeePolicy.FeesIncluded &&
+    prepared.feePolicy !== FeePolicy.FeesIncluded
+  ) {
+    throw new Error("The SDK did not take the fee out of the amount")
+  }
+}
+
+/** What went out, for a send whose fee came out of the amount: review only had a quote,
+ *  and the SDK prepares the send again (blink-wip#2048 SR2). */
+export const settledOf = (
+  requested: FeePolicy | undefined,
+  payment: Payment | undefined,
+): PaymentSendExtraInfo | undefined =>
+  requested === FeePolicy.FeesIncluded && payment
+    ? { settled: { amountSats: Number(payment.amount), feeSats: Number(payment.fees) } }
+    : undefined
+
 /** What a send reports about itself: the rail category and the wallet spent from, never
  *  the destination, amount, or counterparty. */
 export type SendTelemetry = {
@@ -177,6 +206,7 @@ export const createGetFee = <T extends WalletCurrency>(
   return async (): Promise<SelfCustodialFeeResult<T>> => {
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
+      assertFeePolicyApplied(params.feePolicy, prepared)
       const feeSats = extractLightningFee(prepared) ?? 0
       const amountAdjustment = mapAmountAdjustment(
         prepared.conversionEstimate?.amountAdjustment,
@@ -195,6 +225,7 @@ export const createGetFeeOnchain = <T extends WalletCurrency>(
   return async (): Promise<SelfCustodialFeeResult<T>> => {
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
+      assertFeePolicyApplied(params.feePolicy, prepared)
       const fees = extractOnchainFees(prepared)
       if (!fees) {
         return feeFailure<T>(
@@ -262,12 +293,22 @@ const runSendMutation = (
       params: telemetryParams(telemetry),
       settlement: sendSettlement(telemetryParams(telemetry)),
     },
-    prepare: () => prepareSend(params.sdk, toPrepareOptions(params)),
+    prepare: async () => {
+      const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
+      assertFeePolicyApplied(params.feePolicy, prepared)
+      return prepared
+    },
     identify: identifyPreparedSend,
     execute: (prepared, idempotencyKey) =>
       executeSend(params.sdk, prepared, { confirmationSpeed, idempotencyKey }),
-    sentOutcome: () => ({ status: PaymentSendResult.Success }),
-    foundOutcome: () => ({ status: PaymentSendResult.Success }),
+    sentOutcome: ({ payment }) => ({
+      status: PaymentSendResult.Success,
+      extraInfo: settledOf(params.feePolicy, payment),
+    }),
+    foundOutcome: (payment) => ({
+      status: PaymentSendResult.Success,
+      extraInfo: settledOf(params.feePolicy, payment),
+    }),
     failure: (err) => ({
       status: PaymentSendResult.Failure,
       errors: [reportSendFailure(scope, err)],

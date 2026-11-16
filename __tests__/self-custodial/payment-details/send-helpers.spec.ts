@@ -60,6 +60,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
       IncreasedToAvoidDust: "IncreasedToAvoidDust",
     },
     BitcoinNetwork: { Bitcoin: 0, Regtest: 4 },
+    FeePolicy: { FeesExcluded: 0, FeesIncluded: 1 },
     InputType_Tags: { SparkAddress: "SparkAddress" },
     Network: { Mainnet: 0, Regtest: 1 },
     SendPaymentMethod_Tags: {
@@ -1731,5 +1732,120 @@ describe("findPaymentUnderKey", () => {
     const result = await settle(lookup())
 
     expect(result.status).toBe("unreadable")
+  })
+})
+
+/** blink-wip#2048: a send-all asks the SDK to take the fee out of the balance. */
+describe("a send-all", () => {
+  const FEES_EXCLUDED = 0
+  const FEES_INCLUDED = 1
+  const sendAll = {
+    sdk: mockSdk,
+    paymentRequest: "lnbc1...",
+    amount: BigInt(100_000),
+    feePolicy: FEES_INCLUDED,
+  }
+
+  const onchainPrepared = {
+    paymentMethod: {
+      tag: "BitcoinAddress",
+      inner: {
+        feeQuote: {
+          speedFast: { userFeeSat: BigInt(500), l1BroadcastFeeSat: BigInt(300) },
+          speedMedium: { userFeeSat: BigInt(250), l1BroadcastFeeSat: BigInt(150) },
+          speedSlow: { userFeeSat: BigInt(100), l1BroadcastFeeSat: BigInt(60) },
+        },
+      },
+    },
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  /** SR2: the SDK prepares the send again, so what went out can differ from review. */
+  it("reports what the SDK says went out, for Sent and the receipt", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
+      feePolicy: FEES_INCLUDED,
+    })
+    mockSendPayment.mockResolvedValue({
+      payment: { id: "p1", status: 0, amount: BigInt(99_120), fees: BigInt(880) },
+    })
+
+    const result = await createSendMutation(sendAll as never, { telemetry })()
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.extraInfo).toEqual({ settled: { amountSats: 99_120, feeSats: 880 } })
+  })
+
+  it("reports nothing extra for a plain amount, whose figures review already had", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
+      feePolicy: FEES_EXCLUDED,
+    })
+    mockSendPayment.mockResolvedValue({
+      payment: { id: "p1", status: 0, amount: BigInt(100_000), fees: BigInt(880) },
+    })
+
+    const result = await createSendMutation(
+      { ...sendAll, feePolicy: undefined } as never,
+      { telemetry },
+    )()
+
+    expect(result.extraInfo).toBeUndefined()
+  })
+
+  /** SR3: the fee on top of the whole balance would spend more than the wallet holds. */
+  it("sends nothing when the SDK did not take the fee out of the amount", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
+      feePolicy: FEES_EXCLUDED,
+    })
+
+    const result = await createSendMutation(sendAll as never, { telemetry })()
+
+    expect(result.status).toBe(PaymentSendResult.Failure)
+    expect(mockSendPayment).not.toHaveBeenCalled()
+  })
+
+  it("sends nothing on-chain either when the SDK did not take the fee out", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      ...onchainPrepared,
+      feePolicy: FEES_EXCLUDED,
+    })
+
+    const result = await createSendMutationOnchain(
+      { ...sendAll, paymentRequest: "bc1q..." } as never,
+      "medium",
+      { telemetry: telemetryOnchain },
+    )()
+
+    expect(result.status).toBe(PaymentSendResult.Failure)
+    expect(mockSendPayment).not.toHaveBeenCalled()
+  })
+
+  it("fails the quote rather than show a fee the SDK would put on top", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      ...onchainPrepared,
+      feePolicy: FEES_EXCLUDED,
+    })
+
+    const result = await createGetFeeOnchain(
+      { ...sendAll, paymentRequest: "bc1q..." } as never,
+      "medium",
+    )()
+
+    expect(result.amount).toBeUndefined()
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.Generic)
   })
 })
