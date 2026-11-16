@@ -14,10 +14,7 @@ import { useAppConfig } from "@app/hooks"
 import useLogout from "@app/hooks/use-logout"
 import { useLogoutAndRoute } from "@app/hooks/use-logout-and-route"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
-import { useNavigation } from "@react-navigation/native"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useTheme, Text, makeStyles } from "@rn-vui/themed"
 
 import {
@@ -46,7 +43,6 @@ gql`
 export const Delete = () => {
   const styles = useStyles()
 
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { logout } = useLogout()
   const { routeAfterLogout } = useLogoutAndRoute()
   const { appConfig } = useAppConfig()
@@ -65,7 +61,7 @@ export const Delete = () => {
     theme: { colors },
   } = useTheme()
 
-  const { setAccountIsBeingDeleted } = useAccountDeleteContext()
+  const { setAccountIsBeingDeleted, leaveWhileDeleting } = useAccountDeleteContext()
 
   const [deleteAccount] = useAccountDeleteMutation({ fetchPolicy: "no-cache" })
 
@@ -117,29 +113,26 @@ export const Delete = () => {
     }
   }
 
-  /** The deletion hides every way off this screen while it runs; a deletion that did not
+  /** The lock takes every way off this screen away while it runs; a deletion that did not
    *  happen has to give them back, or the user is left on a dead screen with no exit. */
-  const releaseDeletionLock = () => {
-    navigation.setOptions({ headerLeft: undefined, gestureEnabled: true })
-    setAccountIsBeingDeleted(false)
-  }
+  const releaseDeletionLock = () => setAccountIsBeingDeleted(false)
 
   const deleteUserAccount = async () => {
     try {
       const accountToDeleteToken = appConfig.token
 
-      navigation.setOptions({
-        headerLeft: () => null, // Hides the default back button
-        gestureEnabled: false, // Disables swipe to go back gesture
-      })
       setAccountIsBeingDeleted(true)
 
       const res = await deleteAccount()
 
       if (res.data?.accountDelete?.success) {
-        setAccountIsBeingDeleted(false)
-
-        const outcome = await switchToNextProfile(accountToDeleteToken)
+        /** The lock stays up from here on: the account is gone, and the screen under the
+         *  cover is about to render for whichever session comes next. It is left only
+         *  through the lock, by the switch or by the farewell's OK, and never given back. */
+        const outcome = await switchToNextProfile(
+          accountToDeleteToken,
+          leaveWhileDeleting,
+        )
         const hasSwitched = outcome === SwitchProfileOutcome.Switched
         /** Kept until a logout says otherwise: no logout ran means no lock was dropped,
          *  and the switched path leaves the session it moved to in front of it. */
@@ -167,7 +160,7 @@ export const Delete = () => {
             text: LL.common.ok(),
             onPress: () => {
               if (!hasSwitched) {
-                routeAfterLogout(isAppLockKeptByLogout)
+                leaveWhileDeleting(() => routeAfterLogout(isAppLockKeptByLogout))
               }
             },
           },

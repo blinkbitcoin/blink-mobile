@@ -67,9 +67,15 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   }),
 }))
 
+const mockLeaveWhileDeleting = jest.fn((navigate: () => void) => navigate())
+const wasLockReleased = () =>
+  mockSetAccountIsBeingDeleted.mock.calls.some(
+    ([isBeingDeleted]) => isBeingDeleted === false,
+  )
 jest.mock("@app/screens/settings-screen/account/account-delete-context", () => ({
   useAccountDeleteContext: () => ({
     setAccountIsBeingDeleted: mockSetAccountIsBeingDeleted,
+    leaveWhileDeleting: (navigate: () => void) => mockLeaveWhileDeleting(navigate),
   }),
 }))
 
@@ -275,16 +281,21 @@ describe("Delete", () => {
     expect(mockDeleteAccount).not.toHaveBeenCalled()
   })
 
-  /** A deletion in flight cannot be backed out of half-way, so every exit is taken away
-   *  for as long as it runs. */
-  it("takes the back button and the swipe gesture away while the deletion runs", async () => {
+  /** A deletion in flight cannot be backed out of half-way. The lock takes every exit
+   *  away for as long as it runs (pinned in account-delete-context.spec), so it has to be
+   *  up before the mutation starts. */
+  it("raises the lock before the deletion runs", async () => {
+    let lockedWhenMutationStarted = false
+    mockDeleteAccount.mockImplementation(async () => {
+      lockedWhenMutationStarted = mockSetAccountIsBeingDeleted.mock.calls.some(
+        ([isBeingDeleted]) => isBeingDeleted === true,
+      )
+      return { data: { accountDelete: { success: true, errors: [] } } }
+    })
     await openDeletionModal()
     await confirmDeletion()
 
-    const [hideOptions] = mockSetOptions.mock.calls[0]
-    expect(hideOptions.gestureEnabled).toBe(false)
-    expect(hideOptions.headerLeft()).toBeNull()
-    expect(mockSetAccountIsBeingDeleted).toHaveBeenCalledWith(true)
+    expect(lockedWhenMutationStarted).toBe(true)
   })
 
   describe("when the deletion succeeds", () => {
@@ -293,7 +304,58 @@ describe("Delete", () => {
       await confirmDeletion()
 
       expect(mockDeleteAccount).toHaveBeenCalledTimes(1)
-      expect(mockSwitchToNextProfile).toHaveBeenCalledWith("custodial-token")
+      expect(mockSwitchToNextProfile).toHaveBeenCalledWith(
+        "custodial-token",
+        expect.any(Function),
+      )
+    })
+
+    /** The account is gone and the screen under the cover is about to render for the next
+     *  session, so the cover and the blocked exits stay up through the switch. */
+    it("keeps the lock up through the profile switch and the farewell", async () => {
+      let lockReleasedDuringSwitch = false
+      mockSwitchToNextProfile.mockImplementation(async () => {
+        lockReleasedDuringSwitch = wasLockReleased()
+        return SwitchProfileOutcome.Switched
+      })
+      await openDeletionModal()
+      await confirmDeletion()
+      await pressAlertButton(alertCalls.length - 1, "OK")
+
+      expect(lockReleasedDuringSwitch).toBe(false)
+      expect(mockSetAccountIsBeingDeleted).not.toHaveBeenCalledWith(false)
+    })
+
+    /** The lock refuses every way off the screen but its own: the switch's way home is
+     *  handed the lock's way through, not run around it. */
+    it("lets the switch leave the screen only through the lock", async () => {
+      const goHome = jest.fn()
+      mockSwitchToNextProfile.mockImplementation(
+        async (_token: string, leave: (navigate: () => void) => void) => {
+          leave(goHome)
+          return SwitchProfileOutcome.Switched
+        },
+      )
+      await openDeletionModal()
+      await confirmDeletion()
+
+      expect(mockLeaveWhileDeleting).toHaveBeenCalledTimes(1)
+      expect(goHome).toHaveBeenCalledTimes(1)
+    })
+
+    it("leaves for get-started through the lock when it was the last profile", async () => {
+      mockSwitchToNextProfile.mockResolvedValue(SwitchProfileOutcome.NoOtherProfile)
+      await openDeletionModal()
+      await confirmDeletion()
+      expect(mockLeaveWhileDeleting).not.toHaveBeenCalled()
+
+      await pressAlertButton(alertCalls.length - 1, "OK")
+
+      expect(mockLeaveWhileDeleting).toHaveBeenCalledTimes(1)
+      expect(mockReset).toHaveBeenCalledWith({
+        index: 0,
+        routes: [{ name: "getStarted" }],
+      })
     })
 
     /** Another profile is left on the device, so the app stays signed in on that one
@@ -411,8 +473,8 @@ describe("Delete", () => {
       })
     })
 
-    /** The deletion hid the back button and the swipe gesture; a deletion that did not
-     *  happen has to give them back or the user is stuck on a dead screen. */
+    /** The lock took every way off the screen away; a deletion that did not happen has
+     *  to release it or the user is stuck on a dead screen. */
     it("gives the user their way off the screen back", async () => {
       mockDeleteAccount.mockResolvedValue({
         data: { accountDelete: { success: false, errors: [] } },
@@ -420,10 +482,6 @@ describe("Delete", () => {
       await openDeletionModal()
       await confirmDeletion()
 
-      expect(mockSetOptions).toHaveBeenLastCalledWith({
-        headerLeft: undefined,
-        gestureEnabled: true,
-      })
       expect(mockSetAccountIsBeingDeleted).toHaveBeenLastCalledWith(false)
     })
   })
@@ -448,10 +506,6 @@ describe("Delete", () => {
       await openDeletionModal()
       await confirmDeletion()
 
-      expect(mockSetOptions).toHaveBeenLastCalledWith({
-        headerLeft: undefined,
-        gestureEnabled: true,
-      })
       expect(mockSetAccountIsBeingDeleted).toHaveBeenLastCalledWith(false)
     })
   })

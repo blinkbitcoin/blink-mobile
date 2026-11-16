@@ -25,12 +25,17 @@ const ANDROID_BACK_BUTTON_CIRCLE = {
   marginRight: 0,
 } as const
 
+/** Hidden from both screen readers, each by its own prop: `importantForAccessibility` is
+ *  Android only and `accessibilityElementsHidden` iOS only, and `accessible={false}` hides
+ *  neither, it only stops the wrapper being one element. Without both, VoiceOver or
+ *  TalkBack still focuses an inert "Go back" nobody can see. */
 export const InvisibleBackButton = (): React.ReactNode => {
   const styles = useStyles()
   return (
     <View
       pointerEvents="none"
       accessible={false}
+      accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
       style={styles.container}
     >
@@ -94,6 +99,18 @@ export const headerBackControl = ({
 
   return HeaderBack
 }
+
+/** Built once so every navigator hands `headerLeft` the same function. Calling the factory
+ *  inside a navigator's screenOptions would mint a new identity on each render, which stays
+ *  invisible only while native-stack invokes headerLeft instead of rendering it as an
+ *  element; the day that changes, the back button would remount on every render. */
+export const defaultHeaderBack = headerBackControl()
+
+/** Same reasoning as `defaultHeaderBack`: built once so the screens that refuse a back
+ *  press hand `headerLeft` a stable identity instead of minting one per render. A
+ *  `headerLeft` returning null is not a substitute: with no left view, react-native-screens
+ *  shows the platform's own back arrow, which pops the screen natively. */
+export const suppressedHeaderBack = headerBackControl({ canGoBack: false })
 
 /** The platform check sits inside the factory rather than in a module constant so the
  *  spec can vary `Platform.OS` per case without re-importing the module. makeStyles

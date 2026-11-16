@@ -161,6 +161,24 @@ describe("headerBackControl", () => {
     expect(queryByLabelText(BACK_BUTTON_LABEL)).toBeNull()
   })
 
+  /** The query above passes on either platform's prop alone, so it can't tell that one is
+   *  missing. Each screen reader reads only its own, so each is asserted by name. */
+  it("hides the placeholder from VoiceOver and from TalkBack, each by its own prop", () => {
+    const { getByLabelText } = renderHeaderLeft(
+      headerBackControl({ canGoBack: false })(headerProps),
+    )
+
+    let placeholder = getByLabelText(BACK_BUTTON_LABEL, { includeHiddenElements: true })
+    while (placeholder.props.pointerEvents !== "none" && placeholder.parent) {
+      placeholder = placeholder.parent
+    }
+
+    expect(placeholder.props).toMatchObject({
+      accessibilityElementsHidden: true,
+      importantForAccessibility: "no-hide-descendants",
+    })
+  })
+
   /* Both cases assert the correction this component owns, not the final on-screen
    * position: HeaderBackButton's own platform styles are frozen when its module loads,
    * so they stay on the iOS branch whatever this test does to Platform. */
