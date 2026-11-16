@@ -175,7 +175,11 @@ export const useOnchainFeeTierOptions = ({
       if (!currentDetail.unitOfAccountAmount.amount || !restored.canSetAmount) {
         return restored
       }
-      return restored.setAmount(currentDetail.unitOfAccountAmount)
+      // A send-all stays one: dropped, the fee would go back on top of the whole balance.
+      return restored.setAmount(
+        currentDetail.unitOfAccountAmount,
+        currentDetail.isSendingMax,
+      )
     },
     [isSelfCustodial, sdk, paymentDestination, convertMoneyAmount],
   )
