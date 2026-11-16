@@ -90,6 +90,12 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
   log: jest.fn(),
 }))
 
+const mockMarkStorageForRemoval = jest.fn()
+jest.mock("@app/self-custodial/storage/storage-removal", () => ({
+  finishPendingStorageRemovals: () => Promise.resolve(),
+  markStorageForRemoval: (...args: unknown[]) => mockMarkStorageForRemoval(...args),
+}))
+
 jest.mock("@app/self-custodial/logging", () => ({
   createSdkLogListener: jest.fn().mockReturnValue({ log: jest.fn() }),
 }))
@@ -100,10 +106,14 @@ import {
   addSdkEventListener,
   disconnectSdk,
   initSdk,
+  readmitSdkStorage,
   removeSdkEventListener,
+  RestoreConnectTimeoutError,
+  SdkStorageRetiredError,
   selfCustodialCreateWallet,
   selfCustodialRestoreWallet,
 } from "@app/self-custodial/bridge"
+import { RESTORE_CONNECT_TIMEOUT_MS } from "@app/self-custodial/bridge/lifecycle"
 import { sparkTokenIdentifier } from "@app/self-custodial/config"
 import { addSelfCustodialAccountId } from "@app/self-custodial/storage/account-index"
 
@@ -650,5 +660,143 @@ describe("selfCustodialRestoreWallet", () => {
     ).rejects.toThrow("Account index unreadable")
 
     expect(mockDeleteMnemonic).toHaveBeenCalledTimes(1)
+  })
+  /** The restore holds the app-wide restore lock while it waits, so a connect that hangs
+   *  on the network is given up rather than holding it, and with it every later restore,
+   *  for the rest of the session. */
+  describe("when the SDK connect never answers", () => {
+    const restoreParams = {
+      accountId: "test-account",
+      mnemonic: "any valid words",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+      lnurlServer: TEST_LNURL_SERVER,
+    }
+
+    let resolveConnect: (sdk: unknown) => void = () => {}
+    let rejectConnect: (err: unknown) => void = () => {}
+
+    beforeEach(() => {
+      jest.useFakeTimers()
+      mockMarkStorageForRemoval.mockResolvedValue(undefined)
+      mockConnect.mockImplementation(
+        () =>
+          new Promise((resolve, reject) => {
+            resolveConnect = resolve
+            rejectConnect = reject
+          }),
+      )
+    })
+
+    /** Retiring is the process's, so a directory a test gave up on is let back in for
+     *  the tests after it. */
+    afterEach(() => {
+      mockMarkStorageForRemoval.mock.calls.forEach(([storageDir]) =>
+        readmitSdkStorage(storageDir),
+      )
+      jest.useRealTimers()
+    })
+
+    /** Starts a restore and lets its connect hang past the limit. */
+    const restorePastTheLimit = async () => {
+      const settled = selfCustodialRestoreWallet(restoreParams).catch(
+        (err: unknown) => err,
+      )
+      await jest.advanceTimersByTimeAsync(RESTORE_CONNECT_TIMEOUT_MS)
+      return settled
+    }
+
+    it("gives the restore up as an outage", async () => {
+      expect(await restorePastTheLimit()).toBeInstanceOf(RestoreConnectTimeoutError)
+    })
+
+    it("waits the full limit before giving up", async () => {
+      let isSettled = false
+      selfCustodialRestoreWallet(restoreParams)
+        .catch(() => undefined)
+        .finally(() => {
+          isSettled = true
+        })
+
+      await jest.advanceTimersByTimeAsync(RESTORE_CONNECT_TIMEOUT_MS - 1)
+      expect(isSettled).toBe(false)
+
+      await jest.advanceTimersByTimeAsync(1)
+      expect(isSettled).toBe(true)
+    })
+
+    it("rolls back the stored phrase and never registers the account", async () => {
+      await restorePastTheLimit()
+
+      expect(mockDeleteMnemonic).toHaveBeenCalledTimes(1)
+      expect(mockedAddAccountId).not.toHaveBeenCalled()
+    })
+
+    it("marks the given-up wallet's storage for removal", async () => {
+      await restorePastTheLimit()
+
+      expect(mockMarkStorageForRemoval).toHaveBeenCalledWith(
+        expect.stringContaining("test-account"),
+      )
+    })
+
+    it("still gives up when the storage cannot be marked", async () => {
+      mockMarkStorageForRemoval.mockRejectedValueOnce(new Error("disk full"))
+
+      expect(await restorePastTheLimit()).toBeInstanceOf(RestoreConnectTimeoutError)
+      expect(mockDeleteMnemonic).toHaveBeenCalledTimes(1)
+    })
+
+    /** The native connect cannot be cancelled, so one that answers after the restore
+     *  gave up on it must not stay connected to a wallet nothing will ever open. */
+    it("disconnects a connect that answers late", async () => {
+      await restorePastTheLimit()
+      expect(mockDisconnect).not.toHaveBeenCalled()
+
+      resolveConnect(makeSdk())
+      await jest.advanceTimersByTimeAsync(0)
+
+      expect(mockDisconnect).toHaveBeenCalledTimes(1)
+    })
+
+    it("lets a connect that fails late fail quietly", async () => {
+      await restorePastTheLimit()
+      const reportsSoFar = mockRecordError.mock.calls.length
+
+      rejectConnect(new Error("late failure"))
+      await jest.advanceTimersByTimeAsync(0)
+
+      expect(mockRecordError).toHaveBeenCalledTimes(reportsSoFar)
+    })
+
+    /** A connect still short of its point of no return is refused outright, so nothing
+     *  is written for a wallet the restore already gave up on. */
+    it("refuses the given-up wallet's storage to any later connect", async () => {
+      await restorePastTheLimit()
+      mockConnect.mockResolvedValue(makeSdk())
+
+      await expect(
+        initSdk({
+          mnemonic: "any valid words",
+          storageDir: mockMarkStorageForRemoval.mock.calls[0][0],
+          network: Network.Regtest,
+          leewaySatPerVbyte: 1,
+          lnurlDomain: TEST_LNURL_DOMAIN,
+        }),
+      ).rejects.toBeInstanceOf(SdkStorageRetiredError)
+    })
+
+    it("leaves a connect that answers in time alone", async () => {
+      const restoring = selfCustodialRestoreWallet(restoreParams)
+      await jest.advanceTimersByTimeAsync(0)
+      resolveConnect(makeSdk())
+      await restoring
+
+      await jest.advanceTimersByTimeAsync(RESTORE_CONNECT_TIMEOUT_MS)
+
+      expect(mockMarkStorageForRemoval).not.toHaveBeenCalled()
+      expect(mockDeleteMnemonic).not.toHaveBeenCalled()
+      expect(mockedAddAccountId).toHaveBeenCalledTimes(1)
+    })
   })
 })

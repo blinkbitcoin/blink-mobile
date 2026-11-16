@@ -57,7 +57,7 @@ export const RestoreMethodScreen: React.FC = () => {
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { read, loading: credentialLoading } = useCredentialBackup()
-  const { restore } = useRestoreWallet()
+  const { requestRestore } = useRestoreWallet()
   const cloudProvider = getCloudProviderName(LL)
 
   /** read() itself can reject (native module failure); this handler is wired straight to
@@ -69,12 +69,12 @@ export const RestoreMethodScreen: React.FC = () => {
         showRestoreErrorToast(result.error, LL)
         return
       }
-      await restore(result.mnemonic).catch(() => {})
+      await requestRestore(result.mnemonic).catch(() => {})
     } catch (err) {
       reportError("Restore credential read", err)
       toastShow({ message: LL.RestoreScreen.restoreFailed(), LL })
     }
-  }, [read, restore, LL])
+  }, [read, requestRestore, LL])
 
   return (
     <OnboardingScreenLayout

@@ -29,6 +29,11 @@ export const OperatorUnreachableScreen: React.FC = () => {
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
+  /** Close abandons the attempt, so it returns to the restore method already in the stack
+   *  rather than pushing a second one: the screens it leaves, the terms among them, close
+   *  with it, and the phrase the terms held goes with them. */
+  const closeToRestoreMethod = () => navigation.popTo("selfCustodialRestoreMethod")
+
   return (
     <OnboardingScreenLayout
       footer={
@@ -40,7 +45,7 @@ export const OperatorUnreachableScreen: React.FC = () => {
           />
           <GaloySecondaryButton
             title={LL.common.close()}
-            onPress={() => navigation.navigate("selfCustodialRestoreMethod")}
+            onPress={closeToRestoreMethod}
             {...testProps("outage-close-button")}
           />
         </>

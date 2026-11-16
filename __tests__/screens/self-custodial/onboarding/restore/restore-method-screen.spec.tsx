@@ -35,11 +35,11 @@ jest.mock("@app/screens/self-custodial/onboarding/hooks/use-credential-backup", 
   }),
 }))
 
-const mockRestore = jest.fn()
+const mockRequestRestore = jest.fn()
 jest.mock(
   "@app/screens/self-custodial/onboarding/restore/hooks/use-restore-wallet",
   () => ({
-    useRestoreWallet: () => ({ restore: mockRestore }),
+    useRestoreWallet: () => ({ requestRestore: mockRequestRestore }),
   }),
 )
 
@@ -166,7 +166,7 @@ describe("RestoreMethodScreen", () => {
         walletIdentifier: "pubkey-1",
         mnemonic: "word1 word2 word3",
       })
-      mockRestore.mockResolvedValue(undefined)
+      mockRequestRestore.mockResolvedValue(undefined)
 
       const { getByTestId } = render(
         <ContextForScreen>
@@ -179,7 +179,7 @@ describe("RestoreMethodScreen", () => {
         fireEvent.press(getByTestId(passwordManagerTestId()))
       })
 
-      expect(mockRestore).toHaveBeenCalledWith("word1 word2 word3")
+      expect(mockRequestRestore).toHaveBeenCalledWith("word1 word2 word3")
       expect(mockToastShow).not.toHaveBeenCalled()
     })
 
@@ -191,7 +191,7 @@ describe("RestoreMethodScreen", () => {
         walletIdentifier: "pubkey-1",
         mnemonic: "word1 word2 word3",
       })
-      mockRestore.mockRejectedValue(new Error("restore failed"))
+      mockRequestRestore.mockRejectedValue(new Error("restore failed"))
 
       const { getByTestId } = render(
         <ContextForScreen>
@@ -204,7 +204,7 @@ describe("RestoreMethodScreen", () => {
         fireEvent.press(getByTestId(passwordManagerTestId()))
       })
 
-      expect(mockRestore).toHaveBeenCalledWith("word1 word2 word3")
+      expect(mockRequestRestore).toHaveBeenCalledWith("word1 word2 word3")
       expect(mockReportError).not.toHaveBeenCalled()
       expect(mockToastShow).not.toHaveBeenCalled()
     })
@@ -223,7 +223,7 @@ describe("RestoreMethodScreen", () => {
         fireEvent.press(getByTestId(passwordManagerTestId()))
       })
 
-      expect(mockRestore).not.toHaveBeenCalled()
+      expect(mockRequestRestore).not.toHaveBeenCalled()
       expect(mockToastShow).not.toHaveBeenCalled()
     })
 
@@ -244,7 +244,7 @@ describe("RestoreMethodScreen", () => {
       expect(mockToastShow).toHaveBeenCalledWith(
         expect.objectContaining({ message: LL.RestoreScreen.noBackupFound() }),
       )
-      expect(mockRestore).not.toHaveBeenCalled()
+      expect(mockRequestRestore).not.toHaveBeenCalled()
     })
 
     it("shows the noBackupFound toast on unsupported platform", async () => {
@@ -291,7 +291,7 @@ describe("RestoreMethodScreen", () => {
       expect(mockToastShow).toHaveBeenCalledWith(
         expect.objectContaining({ message: LL.RestoreScreen.restoreFailed() }),
       )
-      expect(mockRestore).not.toHaveBeenCalled()
+      expect(mockRequestRestore).not.toHaveBeenCalled()
     })
 
     /** read() itself can reject (native module failure); the async onPress handler must
@@ -317,7 +317,7 @@ describe("RestoreMethodScreen", () => {
       expect(mockToastShow).toHaveBeenCalledWith(
         expect.objectContaining({ message: LL.RestoreScreen.restoreFailed() }),
       )
-      expect(mockRestore).not.toHaveBeenCalled()
+      expect(mockRequestRestore).not.toHaveBeenCalled()
     })
 
     it("shows the restoreFailed toast on unknown errors", async () => {
@@ -337,7 +337,7 @@ describe("RestoreMethodScreen", () => {
       expect(mockToastShow).toHaveBeenCalledWith(
         expect.objectContaining({ message: LL.RestoreScreen.restoreFailed() }),
       )
-      expect(mockRestore).not.toHaveBeenCalled()
+      expect(mockRequestRestore).not.toHaveBeenCalled()
     })
   })
 })

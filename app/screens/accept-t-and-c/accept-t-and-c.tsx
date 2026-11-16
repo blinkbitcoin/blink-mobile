@@ -11,6 +11,7 @@ import { toastShow } from "@app/utils/toast"
 import { StorageFailure } from "@app/utils/storage/storage-failure"
 import { BLOCKED_COUNTRIES_FAQ_LINK } from "@app/config"
 import { useFeatureFlags } from "@app/config/feature-flags-context"
+import { useCodeCheckHold } from "@app/hooks/use-code-check-hold"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -20,6 +21,14 @@ import {
   MigrationCheckpoint,
   useMigrationCheckpoint,
 } from "@app/screens/account-migration/hooks"
+import {
+  RestoreWalletStatus,
+  useRestoreWallet,
+} from "@app/screens/self-custodial/onboarding/restore/hooks/use-restore-wallet"
+import {
+  clearPendingRestore,
+  readPendingRestore,
+} from "@app/screens/self-custodial/onboarding/restore/pending-restore"
 
 import { Screen } from "../../components/screen"
 import { PhoneLoginInitiateType } from "../phone-auth-screen"
@@ -51,6 +60,17 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
   const { deviceAccountEnabled } = useFeatureFlags()
   const appCheckToken = useAppCheckToken({ skip: !deviceAccountEnabled })
   const { createDeviceAccountAndLogin, loading } = useCreateDeviceAccount()
+  const { restore, status: restoreStatus } = useRestoreWallet()
+
+  const isRestoreFlow = flow === "selfCustodialRestore"
+  /** The held phrase outlives Accept on purpose: an operator outage sends "Try again
+   *  later" back here, and Accept must have the phrase to retry. It goes once the terms
+   *  leave the stack, whether the restore landed or the user backed out. */
+  React.useEffect(() => {
+    if (!isRestoreFlow) return
+    const held = readPendingRestore()
+    return () => clearPendingRestore(held)
+  }, [isRestoreFlow])
 
   const fallbackToPhoneLogin = () => {
     navigation.navigate("login", {
@@ -96,7 +116,27 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
     }
   }
 
-  const isAcceptBusy = loading || isSavingTerms
+  /** Restore reports its own failures (a toast, or the outage screen); Accept stays here
+   *  so the user can try again or back out. Without a held phrase there is nothing to
+   *  accept for, so the screen returns to where the phrase is given. */
+  const acceptRestoreTerms = async () => {
+    const pending = readPendingRestore()
+    if (!pending) {
+      navigation.goBack()
+      return
+    }
+    await restore(pending.mnemonic, pending.method).catch(() => undefined)
+  }
+
+  /** The restore status is the app's, so it counts only on the restore's own terms: a
+   *  restore left running must not hold the terms of a creation, a migration or a login. */
+  const isRestoring = isRestoreFlow && restoreStatus === RestoreWalletStatus.Restoring
+  /** A restore that is running is not left behind: backing out mid-restore and accepting
+   *  again from a new terms screen would race it, and its answer would navigate from a
+   *  screen the user had already left. */
+  useCodeCheckHold(isRestoring)
+
+  const isAcceptBusy = loading || isSavingTerms || isRestoring
 
   const action = async () => {
     if (flow === "migration") {
@@ -106,6 +146,11 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
 
     if (flow === "selfCustodial") {
       navigation.navigate("selfCustodialWalletCreation", { mode })
+      return
+    }
+
+    if (isRestoreFlow) {
+      await acceptRestoreTerms()
       return
     }
 

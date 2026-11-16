@@ -1,6 +1,7 @@
 import React from "react"
 
 import { fireEvent, render, screen } from "@testing-library/react-native"
+import { StackActions, StackRouter } from "@react-navigation/native"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -13,10 +14,11 @@ let LL: TranslationFunctions
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
+const mockPopTo = jest.fn()
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
+  useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack, popTo: mockPopTo }),
 }))
 
 const renderScreen = () =>
@@ -59,11 +61,42 @@ describe("OperatorUnreachableScreen", () => {
     expect(mockGoBack).toHaveBeenCalled()
   })
 
-  it("leaves the restore flow entirely on close", () => {
+  /** Close abandons the attempt: the terms below it have to leave the stack, since that
+   *  is what drops the phrase they hold. A plain navigate would push a second restore
+   *  method on top and leave the terms, and the phrase, where they were. */
+  it("returns to the restore method already in the stack on close", () => {
     renderScreen()
 
     fireEvent.press(screen.getByTestId("outage-close-button"))
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialRestoreMethod")
+
+    expect(mockPopTo).toHaveBeenCalledWith("selfCustodialRestoreMethod")
+    expect(mockNavigate).not.toHaveBeenCalled()
+
+    const routeNames = [
+      "selfCustodialRestoreMethod",
+      "acceptTermsAndConditions",
+      "selfCustodialOperatorUnreachable",
+    ]
+    const options = { routeNames, routeParamList: {}, routeGetIdList: {} }
+    const stack = {
+      stale: false as const,
+      type: "stack" as const,
+      key: "stack",
+      index: 2,
+      routeNames,
+      preloadedRoutes: [],
+      routes: routeNames.map((name) => ({ key: name, name })),
+    }
+    const [[target]] = mockPopTo.mock.calls
+    const next = StackRouter({}).getStateForAction(
+      stack,
+      StackActions.popTo(target),
+      options,
+    )
+
+    expect(next?.routes.map((route) => route.name)).toEqual([
+      "selfCustodialRestoreMethod",
+    ])
   })
 
   it("links to support", () => {

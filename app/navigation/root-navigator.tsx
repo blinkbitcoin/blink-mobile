@@ -1040,7 +1040,7 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="selfCustodialBackupSuccess"
         component={BackupSuccessScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
       <RootNavigator.Screen
         name="selfCustodialChooseExperience"
