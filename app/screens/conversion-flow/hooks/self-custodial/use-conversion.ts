@@ -6,7 +6,6 @@ import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { type TranslationFunctions } from "@app/i18n/i18n-types"
 import { measure, ScEvent } from "@app/self-custodial/measurement"
-import { conversionAttemptRef } from "@app/self-custodial/payment-details/lost-attempts"
 import { type MoneyAmount, type WalletOrDisplayCurrency } from "@app/types/amounts"
 import {
   ConvertErrorCode,
@@ -122,11 +121,8 @@ export const useSelfCustodialConversion = ({
         }
 
         /** No conversion_attempt/result here: those are the custodial account's events,
-         *  and the swap reports itself through the bridge's sc_swap_* events. The attempt
-         *  ref is the wallet's, which outlives every re-quote and this screen: a
-         *  conversion that may have gone out must stop the next one from converting the
-         *  same funds again. */
-        const result = await quote.execute(conversionAttemptRef())
+         *  and the swap reports itself through the bridge's sc_swap_* events. */
+        const result = await quote.execute()
         const isSuccess = result.status === PaymentResultStatus.Success
 
         if (isSuccess) {

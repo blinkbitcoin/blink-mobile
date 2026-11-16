@@ -49,6 +49,16 @@ const unresolvedSend = (recordedAtMs = NOW - 1000) => ({
   recordedAtMs,
 })
 
+const lostConversion = (startedAtMs = NOW - 1000) => ({
+  startedAtMs,
+  lastAttemptAtMs: startedAtMs,
+  walletClockSec: 1_700_000_000,
+  knownPaymentIds: ["rcv-before"],
+  expectedDeliveries: [
+    { tokenIdentifier: "usdb-token-id", amount: 1_370_000, isAutomatic: false },
+  ],
+})
+
 const stored = (value: unknown) => store.set(STORAGE_KEY, JSON.stringify(value))
 
 beforeEach(() => {
@@ -274,6 +284,62 @@ describe("loadLostAttempts", () => {
         ["sp1def", { lostSend: lostSend() }],
       ]),
     )
+  })
+
+  it("reads back a wallet's lost conversion", async () => {
+    stored({ "<own conversions>": { lostConversion: lostConversion() } })
+
+    expect(await loadLostAttempts(WALLET, NOW)).toEqual(
+      new Map([["<own conversions>", { lostConversion: lostConversion() }]]),
+    )
+  })
+
+  it("keeps a lost conversion while its latest attempt is recent, dropping it after", async () => {
+    const recentRetry = {
+      ...lostConversion(NOW - LOST_ATTEMPTS_TTL_MS - 1000),
+      lastAttemptAtMs: NOW - 1000,
+    }
+    stored({ "<own conversions>": { lostConversion: recentRetry } })
+    expect((await loadLostAttempts(WALLET, NOW)).get("<own conversions>")).toEqual({
+      lostConversion: recentRetry,
+    })
+
+    stored({
+      "<own conversions>": { lostConversion: lostConversion(NOW - LOST_ATTEMPTS_TTL_MS) },
+    })
+    expect(await loadLostAttempts(WALLET, NOW)).toEqual(new Map())
+  })
+
+  it("drops a lost conversion that does not read as one", async () => {
+    stored({
+      a: { lostConversion: { ...lostConversion(), walletClockSec: "now" } },
+      b: { lostConversion: { ...lostConversion(), knownPaymentIds: "rcv-before" } },
+      c: { lostConversion: { ...lostConversion(), lastAttemptAtMs: "now" } },
+      d: { lostConversion: "lost" },
+      i: { lostConversion: { ...lostConversion(), lastAttemptAtMs: undefined } },
+      j: {
+        lostConversion: {
+          ...lostConversion(),
+          expectedDeliveries: [{ tokenIdentifier: "usdb-token-id", amount: 1_370_000 }],
+        },
+      },
+      e: { lostConversion: { ...lostConversion(), expectedDeliveries: undefined } },
+      f: {
+        lostConversion: {
+          ...lostConversion(),
+          expectedDeliveries: [{ tokenIdentifier: "usdb-token-id" }],
+        },
+      },
+      h: {
+        lostConversion: {
+          ...lostConversion(),
+          expectedDeliveries: [{ tokenIdentifier: 7, amount: 1_370_000 }],
+        },
+      },
+      g: { lostConversion: { ...lostConversion(), expectedDeliveries: [7] } },
+    })
+
+    expect(await loadLostAttempts(WALLET, NOW)).toEqual(new Map())
   })
 
   it("holds nothing when what was stored is not a record of destinations", async () => {

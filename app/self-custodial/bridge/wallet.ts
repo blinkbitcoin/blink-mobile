@@ -178,9 +178,12 @@ export const newestSentPaymentTimestamp = async (
 /** One page of the payments created at or after `fromTimestamp` (unix seconds). */
 export type PaymentsPage = { fromTimestamp: bigint; limit: number; offset: number }
 
+/** Which payments a page lists, and in what order. */
+type PaymentsListed = { paymentType: PaymentType; sortAscending: boolean }
+
 const listPaymentsOfTypeSince = (
   sdk: BreezSdkInterface,
-  paymentType: PaymentType,
+  { paymentType, sortAscending }: PaymentsListed,
   { fromTimestamp, limit, offset }: PaymentsPage,
 ) =>
   sdk.listPayments({
@@ -192,19 +195,40 @@ const listPaymentsOfTypeSince = (
     toTimestamp: undefined,
     offset,
     limit,
-    sortAscending: false,
+    sortAscending,
   })
 
 /** One page of the outgoing payments created at or after `fromTimestamp` (unix seconds),
  *  newest first, in any status: what a send whose outcome the SDK lost is looked up
  *  against. */
 export const listSentPaymentsSince = (sdk: BreezSdkInterface, page: PaymentsPage) =>
-  listPaymentsOfTypeSince(sdk, PaymentType.Send, page)
+  listPaymentsOfTypeSince(
+    sdk,
+    { paymentType: PaymentType.Send, sortAscending: false },
+    page,
+  )
 
-/** The same page of the incoming payments: what a conversion whose outcome the SDK lost
- *  is looked up against, since the payment its swap delivered is all it leaves. */
+/** The same page of the incoming payments: where the wallet's received payments stand as
+ *  a conversion goes out. */
 export const listReceivedPaymentsSince = (sdk: BreezSdkInterface, page: PaymentsPage) =>
-  listPaymentsOfTypeSince(sdk, PaymentType.Receive, page)
+  listPaymentsOfTypeSince(
+    sdk,
+    { paymentType: PaymentType.Receive, sortAscending: false },
+    page,
+  )
+
+/** The same page of the incoming payments, oldest first: what a conversion whose outcome
+ *  the SDK lost is looked up against, since the payment its swap delivered is all it
+ *  leaves, and it comes in soon after the conversion went out. */
+export const listReceivedPaymentsOldestFirst = (
+  sdk: BreezSdkInterface,
+  page: PaymentsPage,
+) =>
+  listPaymentsOfTypeSince(
+    sdk,
+    { paymentType: PaymentType.Receive, sortAscending: true },
+    page,
+  )
 
 const EXPORT_PAGE_SIZE = 100
 /** 500 pages × 100 payments: far beyond any real wallet, so hitting it means the SDK

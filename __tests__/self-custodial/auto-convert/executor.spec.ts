@@ -363,6 +363,34 @@ describe("executeAutoConvert", () => {
     expect(outcome).toEqual({ status: "failed" })
   })
 
+  it("returns Failed when the conversion's outcome is unknown, to be looked for again", async () => {
+    mockGetConversionQuote.mockResolvedValue({
+      execute: jest.fn().mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "unknown", code: ConvertErrorCode.OutcomeUnknown }],
+      }),
+    })
+
+    const outcome = await executeAutoConvert(sdkWith([]), baseParams)
+
+    expect(outcome).toEqual({ status: "failed" })
+  })
+
+  /** The next trigger decides: one of these sats that completed is taken for this
+   *  receive's before anything is quoted. */
+  it("returns Failed when an earlier conversion turns up instead, to be tried again", async () => {
+    mockGetConversionQuote.mockResolvedValue({
+      execute: jest.fn().mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "earlier", code: ConvertErrorCode.EarlierConversionFound }],
+      }),
+    })
+
+    const outcome = await executeAutoConvert(sdkWith([]), baseParams)
+
+    expect(outcome).toEqual({ status: "failed" })
+  })
+
   it("treats a listPayments failure as 'no prior conversion' (fail-open)", async () => {
     mockGetConversionQuote.mockResolvedValue(successQuote())
     const sdk = {

@@ -15,6 +15,7 @@ import { withTimeout } from "@app/utils/with-timeout"
 
 import {
   getPaymentById,
+  listReceivedPaymentsOldestFirst,
   listReceivedPaymentsSince,
   listSentPaymentsSince,
   newestSentPaymentTimestamp,
@@ -147,7 +148,7 @@ const SENT_PAYMENTS: HistoryKind = {
 /** What a conversion delivered is matched whether or not the wallet has labeled it as a
  *  conversion's yet, so nothing received stands in for one unmatched. */
 const RECEIVED_PAYMENTS: HistoryKind = {
-  listPage: listReceivedPaymentsSince,
+  listPage: listReceivedPaymentsOldestFirst,
   isUndescribed: () => false,
 }
 
@@ -165,6 +166,9 @@ type ScanHistoryParams = {
   since: bigint
   matches: (payment: Payment) => boolean
   kind: HistoryKind
+  /** Whether a payment is past what the look needs to read: once a page read oldest
+   *  first reaches one, every page after it is later still. */
+  isPastLook?: (payment: Payment) => boolean
   /** Filled as the pages come in rather than returned at the end, so what a look already
    *  saw outlives the look itself. A page that fails, a history with no end, and a look
    *  abandoned at its deadline all leave the caller whatever the pages before showed. */
@@ -181,6 +185,7 @@ const scanHistorySince = async ({
   since,
   matches,
   kind,
+  isPastLook,
   into,
   isExpired,
 }: ScanHistoryParams): Promise<void> => {
@@ -208,7 +213,8 @@ const scanHistorySince = async ({
     if (payments.some(kind.isUndescribed)) into.hasUndescribedSend = true
 
     const isLastPage = payments.length < LOST_SEND_PAGE_SIZE
-    const isLookOver = isLastPage || isExpired()
+    const isPastWhatIsLookedFor = isPastLook !== undefined && payments.some(isPastLook)
+    const isLookOver = isLastPage || isPastWhatIsLookedFor || isExpired()
     if (isLookOver) return
   }
 
@@ -255,7 +261,10 @@ export const findLostSend = ({
   return lookForPayment({ sdk, since, matches, kind: SENT_PAYMENTS })
 }
 
-type LookForPaymentParams = Pick<ScanHistoryParams, "sdk" | "since" | "matches" | "kind">
+type LookForPaymentParams = Pick<
+  ScanHistoryParams,
+  "sdk" | "since" | "matches" | "kind" | "isPastLook"
+>
 
 /** The looks themselves, over the payments of one kind made since `since`. */
 const lookForPayment = async ({
@@ -263,6 +272,7 @@ const lookForPayment = async ({
   since,
   matches,
   kind,
+  isPastLook,
 }: LookForPaymentParams): Promise<LostSendLookup> => {
   let lastLook: LostSendLookup = { status: "not-found", failed: [] }
 
@@ -284,6 +294,7 @@ const lookForPayment = async ({
           since,
           matches,
           kind,
+          isPastLook,
           into: scan,
           isExpired: () => isOver,
         }),
@@ -482,9 +493,14 @@ export const markReceivedHistory = async (
 /**
  * What a conversion was quoted to deliver: dollars, which the wallet records as a payment
  * of that token (`tokenIdentifier`), or bitcoin, a Spark payment, and about how much, in
- * that asset's base units.
+ * that asset's base units; and whether auto-convert made it, which tells whose it is to
+ * settle once found.
  */
-export type ExpectedDelivery = { tokenIdentifier?: string; amount: number }
+export type ExpectedDelivery = {
+  tokenIdentifier?: string
+  amount: number
+  isAutomatic: boolean
+}
 
 /** How far an amount can be from the one a quote named and still be it: the quote's
  *  slippage, and some. */
@@ -559,10 +575,16 @@ const isUnlabeledDelivery = (
   expectedDeliveries.some((delivery) => isDeliveryAsExpected(payment, delivery))
 
 /** A lost conversion as it is looked for: where the received payments stood as it went
- *  out, and what each of its attempts was quoted to deliver. */
+ *  out, what each of its attempts was quoted to deliver, and when the latest went out. */
 export type LostConversionLook = ReceivedHistoryMark & {
   expectedDeliveries: ReadonlyArray<ExpectedDelivery>
+  lastAttemptAtMs: number
 }
+
+/** How far past a lost conversion's latest attempt its delivery is looked for: a day, far
+ *  past the minutes a swap takes to deliver, so a phone clock behind the server's by up
+ *  to a day still reaches it, and a busy wallet's later receives are never read. */
+const LOST_CONVERSION_LOOK_AHEAD_SECONDS = LOST_SEND_LOOKBACK_SECONDS
 
 /**
  * Whether a payment in the wallet's history is what a conversion lost after `lost` was
@@ -583,7 +605,8 @@ export const isPaymentOfLostConversion = (
 
 /**
  * What a conversion lost after `lost` was marked delivered, looked for as `findLostSend`
- * looks for a send, from the mark's time.
+ * looks for a send: from the mark's time, oldest first, up to a day past its latest
+ * attempt.
  */
 export const findLostConversion = ({
   sdk,
@@ -591,13 +614,17 @@ export const findLostConversion = ({
 }: {
   sdk: BreezSdkInterface
   lost: LostConversionLook
-}): Promise<LostSendLookup> =>
-  lookForPayment({
+}): Promise<LostSendLookup> => {
+  const lookUntilSec =
+    Math.floor(lost.lastAttemptAtMs / 1000) + LOST_CONVERSION_LOOK_AHEAD_SECONDS
+  return lookForPayment({
     sdk,
     since: BigInt(lost.walletClockSec),
     matches: (payment) => isPaymentOfLostConversion(lost, payment),
     kind: RECEIVED_PAYMENTS,
+    isPastLook: (payment) => Number(payment.timestamp) > lookUntilSec,
   })
+}
 
 /**
  * The failures the SDK raises before it sends anything: the amount, the request or the

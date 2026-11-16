@@ -1,13 +1,15 @@
 /**
  * What sends that threw after dispatch, or were in flight when the app closed, leave
- * behind for the next send to the same destination. It depends on nothing of the send
- * path, so the wallet lifecycle can scope it without pulling that in; only on where it
- * keeps them across app launches.
+ * behind for the next send to the same destination, and conversions for the next
+ * conversion in the same wallet. It depends on nothing of the send path, so the wallet
+ * lifecycle can scope it without pulling that in; only on where it keeps them across app
+ * launches.
  */
-import type { ConvertAttemptRef } from "@app/types/payment"
 import { withTimeout } from "@app/utils/with-timeout"
 
+import type { ExpectedDelivery } from "./lost-send"
 import {
+  holdsAnAttempt,
   loadLostAttempts,
   removeLostAttempts,
   saveLostAttempts,
@@ -69,8 +71,37 @@ export type UnresolvedSend = {
   requestedAs?: RequestedAs
 }
 
-/** What a send's lost attempts leave behind for the next send to the same destination. */
-export type LostAttempts = { lostSend?: LostSend; unresolvedSend?: UnresolvedSend }
+/**
+ * Conversions that threw after dispatch, or were in flight when the app closed, without
+ * what they delivered turning up in the wallet's history: when the first and the latest
+ * were made, where the wallet's received payments stood as the first went out (the time
+ * the look reads from, in unix seconds, and every payment it knew then, with each delivery
+ * since found to be another conversion's), and what each was quoted to deliver, which is
+ * what the next conversion looks for what they delivered by.
+ */
+export type LostConversion = {
+  startedAtMs: number
+  lastAttemptAtMs: number
+  walletClockSec: number
+  knownPaymentIds: ReadonlyArray<string>
+  expectedDeliveries: ReadonlyArray<ExpectedDelivery>
+}
+
+/** What a send's lost attempts leave behind for the next send to the same destination,
+ *  and lost conversions for the next conversion. */
+export type LostAttempts = {
+  lostSend?: LostSend
+  unresolvedSend?: UnresolvedSend
+  lostConversion?: LostConversion
+}
+
+/**
+ * Where a wallet's conversions keep what they lost: all of them under one destination,
+ * since each moves the same balance, and any of them could convert again what a lost one
+ * already did. No payment request reads this way, so no send's destination is taken for
+ * it.
+ */
+export const OWN_CONVERSIONS = "<own conversions>"
 
 /**
  * Lost attempts, by destination, kept across app launches.
@@ -518,8 +549,7 @@ export const lostAttemptsFor = (destination: string): LostAttemptsHandle => {
     retryStorage: () => persistenceOf.get(byDestination)?.retry() ?? Promise.resolve(),
     update: (change) => {
       const next = change(read())
-      const holdsAnAttempt = Boolean(next.lostSend || next.unresolvedSend)
-      if (holdsAnAttempt) byDestination.set(key, next)
+      if (holdsAnAttempt(next)) byDestination.set(key, next)
       else byDestination.delete(key)
       persistenceOf.get(byDestination)?.keep()
     },
@@ -542,20 +572,6 @@ export const lostAttemptsFor = (destination: string): LostAttemptsHandle => {
       return result
     },
   }
-}
-
-/**
- * The manual conversions' attempt ref, by wallet, for as long as the app runs. Not kept
- * on the conversion screen, for the reason lost sends are not kept on the payment detail:
- * the screen is built anew each time it is opened, so a user who backs out after a lost
- * conversion and opens it again would start from nothing and could convert twice.
- */
-const conversionAttemptRefs = new WeakMap<Map<string, LostAttempts>, ConvertAttemptRef>()
-
-export const conversionAttemptRef = (): ConvertAttemptRef => {
-  const held = conversionAttemptRefs.get(connectedWalletAttempts) ?? {}
-  conversionAttemptRefs.set(connectedWalletAttempts, held)
-  return held
 }
 
 /** What the connected wallet holds for a destination. */

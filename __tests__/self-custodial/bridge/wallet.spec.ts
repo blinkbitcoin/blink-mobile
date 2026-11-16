@@ -7,6 +7,7 @@ import {
   getWalletInfo,
   listAllPayments,
   listPayments,
+  listReceivedPaymentsOldestFirst,
   listReceivedPaymentsSince,
   listSentPaymentsSince,
   registerLightningAddress,
@@ -260,6 +261,22 @@ describe("listReceivedPaymentsSince", () => {
       limit: 50,
       sortAscending: false,
     })
+  })
+})
+
+describe("listReceivedPaymentsOldestFirst", () => {
+  it("asks for the same page of incoming payments, oldest first", () => {
+    const listPaymentsFn = jest.fn().mockResolvedValue({ payments: [] })
+
+    listReceivedPaymentsOldestFirst({ listPayments: listPaymentsFn } as never, {
+      fromTimestamp: BigInt(1747691078),
+      limit: 50,
+      offset: 0,
+    })
+
+    expect(listPaymentsFn).toHaveBeenCalledWith(
+      expect.objectContaining({ typeFilter: [1], sortAscending: true }),
+    )
   })
 })
 

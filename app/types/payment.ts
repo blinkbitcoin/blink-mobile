@@ -188,8 +188,9 @@ export const ConvertErrorCode = {
   /** A conversion threw after it was dispatched and its payment could not be found, so
    *  it may have gone through: no further conversion is sent until the user has checked. */
   OutcomeUnknown: "outcome_unknown",
-  /** Nothing was converted: the wallet's history could not be read, and a conversion
-   *  that went out without it could not be told apart from what came before. */
+  /** Nothing was converted: what the wallet's history or its earlier conversions hold
+   *  could not be read, and a conversion that went out without it could not be told
+   *  apart from what came before. */
   HistoryUnavailable: "history_unavailable",
   /** Nothing was converted: an earlier conversion that may have been lost turned out to
    *  have gone through, for another amount or the other way, and is the user's to check. */
@@ -273,35 +274,10 @@ export const resolveDustAdjustment = (
   return amountInSourceCurrency >= fromWalletBalance ? null : amountAdjustment
 }
 
-/**
- * A conversion that threw after dispatch without turning up in the wallet's history: when
- * it went out, where the wallet's received payments stood then (the time the look reads
- * from, in unix seconds, and every payment it knew then), and what each attempt was quoted
- * to deliver (the dollar token, or bitcoin, and about how much, in base units),
- * which is what the next conversion looks for what it delivered by.
- */
-export type UnresolvedConversion = {
-  startedAtMs: number
-  walletClockSec: number
-  knownPaymentIds: ReadonlyArray<string>
-  expectedDeliveries: ReadonlyArray<{ tokenIdentifier?: string; amount: number }>
-  /** When the latest attempt went out: until a few minutes after it, a look that does
-   *  not find the conversion is no proof it never delivered. */
-  lastAttemptAtMs: number
-}
-
-/**
- * What a conversion that may have gone out leaves for the next one in the same wallet.
- * Every quote pays a fresh invoice, so a retry is a new payment that a lost one would be
- * doubled by; the holder outlives the quotes so the retry can be refused until the lost
- * one is found.
- */
-export type ConvertAttemptRef = { unresolvedConversion?: UnresolvedConversion }
-
 export type ConvertQuote = {
   feeAmount: UsdMoneyAmount
   amountAdjustment?: ConvertAmountAdjustment
-  execute: (attemptRef?: ConvertAttemptRef) => Promise<PaymentAdapterResult>
+  execute: () => Promise<PaymentAdapterResult>
 }
 
 export type GetConversionQuoteAdapter = (

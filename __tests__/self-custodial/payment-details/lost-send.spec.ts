@@ -104,7 +104,10 @@ const received = (
 const LOST = {
   walletClockSec: MARK_SEC,
   knownPaymentIds: ["rcv-before"],
-  expectedDeliveries: [{ tokenIdentifier: DOLLAR_TOKEN, amount: QUOTED_OUT }],
+  expectedDeliveries: [
+    { tokenIdentifier: DOLLAR_TOKEN, amount: QUOTED_OUT, isAutomatic: false },
+  ],
+  lastAttemptAtMs: (MARK_SEC + 1) * 1000,
 }
 
 describe("isPaymentOfLostConversion", () => {
@@ -216,7 +219,10 @@ describe("isPaymentOfLostConversion", () => {
   })
 
   it("takes an unlabeled Spark payment for a conversion to bitcoin", () => {
-    const toBitcoin = { ...LOST, expectedDeliveries: [{ amount: 5000 }] }
+    const toBitcoin = {
+      ...LOST,
+      expectedDeliveries: [{ amount: 5000, isAutomatic: false }],
+    }
     const sats = received("rcv-sats", MARK_SEC + 5, { tag: "Spark", amount: 5000 })
 
     expect(isPaymentOfLostConversion(toBitcoin, sats as never)).toBe(true)
@@ -400,7 +406,7 @@ describe("findLostConversion", () => {
     jest.useRealTimers()
   })
 
-  it("reads the payments received from the mark's second on, once the wallet caught up", async () => {
+  it("reads the payments received from the mark's second on, oldest first, once the wallet caught up", async () => {
     const sdk = walletAnswering([delivery()])
 
     await settle(findLostConversion({ sdk: sdk as never, lost: LOST }))
@@ -412,8 +418,25 @@ describe("findLostConversion", () => {
         fromTimestamp: BigInt(MARK_SEC),
         offset: 0,
         limit: PAGE_SIZE,
+        sortAscending: true,
       }),
     )
+  })
+
+  /** A busy wallet keeps receiving long after the conversion went out; what came in a day
+   *  later can no longer be its delivery, and is never read. */
+  it("stops reading once a page reaches a day past the latest attempt", async () => {
+    const DAY = 24 * 60 * 60
+    const pastTheLook = MARK_SEC + 1 + DAY + 1
+    const page = Array.from({ length: PAGE_SIZE }, (_, i) =>
+      received(`rcv-${i}`, i === PAGE_SIZE - 1 ? pastTheLook : MARK_SEC + 5),
+    )
+    const sdk = walletAnswering(page, page, page)
+
+    const lookup = await settle(findLostConversion({ sdk: sdk as never, lost: LOST }))
+
+    expect(lookup.status).toBe("not-found")
+    expect(sdk.listPayments).toHaveBeenCalledTimes(3)
   })
 
   it("finds what the lost conversion delivered", async () => {

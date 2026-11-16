@@ -21,9 +21,7 @@ import {
   ConvertDirection,
   ConvertErrorCode,
   PaymentResultStatus,
-  type ConvertAttemptRef,
   type ConvertParams,
-  type UnresolvedConversion,
   type ConvertQuote,
   type GetConversionQuoteAdapter,
   type PaymentAdapterResult,
@@ -38,6 +36,12 @@ import {
   measureSettlement,
   ScEvent,
 } from "../measurement"
+import {
+  lostAttemptsFor,
+  OWN_CONVERSIONS,
+  type LostAttemptsHandle,
+  type LostConversion,
+} from "../payment-details/lost-attempts"
 import {
   CODES_RAISED_BEFORE_DISPATCH,
   findLostConversion,
@@ -342,19 +346,41 @@ const deliveredTokenOf = (direction: ConvertDirection): string | undefined =>
 export const LOST_CONVERSION_DELIVERY_WINDOW_MS = 5 * 60 * 1000
 
 /**
- * What is left of a lost conversion once one delivery of it is found: that payment known,
- * and the attempt it delivered for no longer looked for (the oldest, when the wallet does
- * not tell which). Nothing once no attempt is left: any other may still deliver, so
- * finding one never settles the rest.
+ * Which of a lost conversion's attempts a delivery found settles: the one it delivers for,
+ * of the conversion's own kind first. Without one, the oldest, but auto-convert tells no
+ * one what it finds, so it settles only an attempt of its own, and none for a delivery
+ * of a transfer the user made: that one is the user's to be told of, or their own retry
+ * would convert it again.
  */
-const withoutDeliveryOf = <L extends LostConversionLook>(
+const settledAttemptOf = (
+  lost: LostConversionLook,
+  payment: Payment,
+  isAutomatic: boolean,
+): number | undefined => {
+  const matches = (delivery: ExpectedDelivery) => isDeliveryAsExpected(payment, delivery)
+  const own = lost.expectedDeliveries.findIndex(
+    (delivery) => delivery.isAutomatic === isAutomatic && matches(delivery),
+  )
+  if (own >= 0) return own
+  const other = lost.expectedDeliveries.findIndex(matches)
+  if (other >= 0) return isAutomatic ? undefined : other
+  if (!isAutomatic) return 0
+  const oldestAutomatic = lost.expectedDeliveries.findIndex(
+    (delivery) => delivery.isAutomatic,
+  )
+  return oldestAutomatic >= 0 ? oldestAutomatic : undefined
+}
+
+/**
+ * What is left of a lost conversion once a delivery found settles one of its attempts:
+ * that payment known, and that attempt no longer looked for. Nothing once no attempt is
+ * left: any other may still deliver, so finding one never settles the rest.
+ */
+const withoutAttempt = <L extends LostConversionLook>(
   lost: L,
+  settled: number,
   payment: Payment,
 ): L | undefined => {
-  const matched = lost.expectedDeliveries.findIndex((delivery) =>
-    isDeliveryAsExpected(payment, delivery),
-  )
-  const settled = Math.max(matched, 0)
   const expectedDeliveries = lost.expectedDeliveries.filter(
     (_, index) => index !== settled,
   )
@@ -375,8 +401,9 @@ const withoutDeliveryOf = <L extends LostConversionLook>(
  * wallet and never pays that invoice, and the payment the swap delivers is all it leaves
  * in the history. So where the wallet's received payments stand is marked before it goes
  * out, and one that throws after dispatch is looked for as an own conversion delivered
- * after that mark. When it does not turn up, the attempt ref keeps the mark, and the next
- * conversion on that ref looks for it first:
+ * after that mark. When it does not turn up, the mark is kept with the wallet's lost
+ * attempts, across app launches, and the next conversion in the wallet, manual or
+ * automatic, looks for it first:
  * - found, it is reported, and nothing more is converted: as this conversion when it is
  *   the same one asked again, as an earlier one otherwise, for the user to check; any
  *   other attempt it holds is still looked for;
@@ -385,6 +412,10 @@ const withoutDeliveryOf = <L extends LostConversionLook>(
  *   still deliver, and this one is refused;
  * - unreadable, nothing is known, and this one is refused, telling the user to check
  *   their history.
+ *
+ * One conversion runs at a time in a wallet, from that look to its own outcome: two at
+ * once would each find nothing lost and both go out, a screen opened again while the
+ * first is still being looked for included.
  */
 type ConversionExecution = {
   prepared: PrepareSendPaymentResponse
@@ -394,29 +425,51 @@ type ConversionExecution = {
    *  context's SDK, so its outcome belongs to that context too. */
   startedIn: number
   params: ConvertParams
-  attemptRef: ConvertAttemptRef
 }
 
-const executePrepared = async (
+const executePrepared = (
   sdk: BreezSdkInterface,
-  { prepared, estimate, startedIn, params, attemptRef }: ConversionExecution,
+  execution: ConversionExecution,
 ): Promise<PaymentAdapterResult> => {
-  /** Written through these rather than after each await: one conversion runs on a ref at
-   *  a time (the screen's in-flight guard; auto-convert passes a ref of its own). */
-  const keepUnresolved = (unresolved: UnresolvedConversion | undefined) => {
-    attemptRef.unresolvedConversion = unresolved
+  /** Taken once: a conversion that finishes after a switch of wallet settles its own
+   *  wallet's lost conversion, not the next one's. */
+  const attempts = lostAttemptsFor(OWN_CONVERSIONS)
+  return attempts.oneAtATime(() =>
+    convertAfterEarlierConversions(sdk, attempts, execution),
+  )
+}
+
+/** The conversion itself, alone among the wallet's conversions. */
+const convertAfterEarlierConversions = async (
+  sdk: BreezSdkInterface,
+  attempts: LostAttemptsHandle,
+  { prepared, estimate, startedIn, params }: ConversionExecution,
+): Promise<PaymentAdapterResult> => {
+  /** Nothing is converted while what an earlier launch lost has not been read back: a
+   *  conversion it lost may be this one, done already. */
+  await attempts.retryStorage()
+  if (!attempts.isStoredRead()) {
+    return failed(HISTORY_UNAVAILABLE_MESSAGE, ConvertErrorCode.HistoryUnavailable)
   }
+
+  const isAutomatic = params.source === "auto_convert"
+  const keepLost = (lostConversion: LostConversion | undefined) =>
+    attempts.update((current) => ({ ...current, lostConversion }))
   const isThisConversion = (payment: Payment) =>
     isDeliveryOf(payment, { estimate, params })
 
-  const earlier = attemptRef.unresolvedConversion
+  const earlier = attempts.read().lostConversion
   if (earlier) {
     const lookup = await findLostConversion({ sdk, lost: earlier })
     if (lookup.status === "unreadable") {
       return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
     }
     if (lookup.status === "found") {
-      keepUnresolved(withoutDeliveryOf(earlier, lookup.payment))
+      const settled = settledAttemptOf(earlier, lookup.payment, isAutomatic)
+      if (settled === undefined) {
+        return failed(EARLIER_CONVERSION_MESSAGE, ConvertErrorCode.EarlierConversionFound)
+      }
+      keepLost(withoutAttempt(earlier, settled, lookup.payment))
       if (isThisConversion(lookup.payment)) return { status: PaymentResultStatus.Success }
       return failed(EARLIER_CONVERSION_MESSAGE, ConvertErrorCode.EarlierConversionFound)
     }
@@ -449,7 +502,7 @@ const executePrepared = async (
       SendPaymentRequest.create({ prepareResponse: prepared }),
     )
     /** Out, it settles the lost conversion it was let through past. */
-    keepUnresolved(undefined)
+    if (earlier) keepLost(undefined)
     /** By the SDK's word on the payment, as for sends: a conversion normally comes back
      *  completed, and one that does not is held until its outcome is announced. */
     measureSettlement(
@@ -480,8 +533,9 @@ const executePrepared = async (
     const thisDelivery: ExpectedDelivery = {
       tokenIdentifier: deliveredTokenOf(params.direction),
       amount: toNumber(estimate.amountOut),
+      isAutomatic,
     }
-    const lost: UnresolvedConversion = {
+    const lost: LostConversion = {
       ...(earlier ?? { startedAtMs, ...mark }),
       knownPaymentIds: [
         ...new Set([...(earlier?.knownPaymentIds ?? []), ...mark.knownPaymentIds]),
@@ -492,7 +546,7 @@ const executePrepared = async (
     const look = await findLostConversion({ sdk, lost })
     const isFoundAsThis = look.status === "found" && isThisConversion(look.payment)
     if (isFoundAsThis) {
-      keepUnresolved(undefined)
+      keepLost(undefined)
       measureIn(startedIn, ScEvent.SwapCompleted, swapTelemetry)
       return { status: PaymentResultStatus.Success }
     }
@@ -504,7 +558,7 @@ const executePrepared = async (
         ? [...lost.knownPaymentIds, look.payment.id]
         : lost.knownPaymentIds
     reportSwapFailed()
-    keepUnresolved({ ...lost, knownPaymentIds })
+    keepLost({ ...lost, knownPaymentIds })
     return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
   }
 }
@@ -520,8 +574,7 @@ const toConvertQuote = (
   return {
     feeAmount: toUsdMoneyAmount(feeCents),
     amountAdjustment: mapAmountAdjustment(estimate.amountAdjustment),
-    execute: (attemptRef = {}) =>
-      executePrepared(sdk, { prepared, estimate, startedIn, params, attemptRef }),
+    execute: () => executePrepared(sdk, { prepared, estimate, startedIn, params }),
   }
 }
 

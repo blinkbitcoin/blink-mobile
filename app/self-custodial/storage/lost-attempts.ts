@@ -5,6 +5,7 @@ import { loadJsonOrThrow, removeOrThrow, saveJson } from "@app/utils/storage"
 
 import type {
   LostAttempts,
+  LostConversion,
   LostSend,
   RequestedAs,
   UnresolvedSend,
@@ -60,9 +61,27 @@ const isLostSend = (value: unknown): value is LostSend => {
   return hasTimes && hasIdentities && hasValidOptionals
 }
 
-/** A lost send lapses with its latest attempt, never with its first. */
-const lastAttemptOf = (lostSend: LostSend): number =>
-  lostSend.lastAttemptAtMs ?? lostSend.startedAtMs
+/** Lost attempts lapse with the latest of them, never with the first. */
+const lastAttemptOf = (lost: { startedAtMs: number; lastAttemptAtMs?: number }): number =>
+  lost.lastAttemptAtMs ?? lost.startedAtMs
+
+const isExpectedDelivery = (value: unknown): boolean =>
+  isRecord(value) &&
+  isOptional(value.tokenIdentifier, "string") &&
+  typeof value.amount === "number" &&
+  typeof value.isAutomatic === "boolean"
+
+const isLostConversion = (value: unknown): value is LostConversion => {
+  if (!isRecord(value)) return false
+  const hasTimes =
+    typeof value.startedAtMs === "number" &&
+    typeof value.lastAttemptAtMs === "number" &&
+    typeof value.walletClockSec === "number"
+  const hasDeliveries =
+    Array.isArray(value.expectedDeliveries) &&
+    value.expectedDeliveries.every(isExpectedDelivery)
+  return hasTimes && isStringArray(value.knownPaymentIds) && hasDeliveries
+}
 
 const isUnresolvedSend = (value: unknown): value is UnresolvedSend => {
   if (!isRecord(value)) return false
@@ -77,23 +96,27 @@ const isFresh = (recordedAtMs: number | undefined, nowMs: number): boolean =>
 
 /**
  * What a stored destination still holds: each attempt that reads as one and is not past
- * its time. A malformed or stale half is dropped without the other, since one lost attempt
- * unreadable is no reason to forget the other.
+ * its time. A malformed or stale one is dropped without the others, since one lost attempt
+ * unreadable is no reason to forget another.
  */
 const freshAttemptsOf = (value: unknown, nowMs: number): LostAttempts => {
   if (!isRecord(value)) return {}
-  const { lostSend, unresolvedSend } = value
+  const { lostSend, unresolvedSend, lostConversion } = value
   const isLostSendKept = isLostSend(lostSend) && isFresh(lastAttemptOf(lostSend), nowMs)
   const isUnresolvedKept =
     isUnresolvedSend(unresolvedSend) && isFresh(unresolvedSend.recordedAtMs, nowMs)
+  const isConversionKept =
+    isLostConversion(lostConversion) && isFresh(lastAttemptOf(lostConversion), nowMs)
   return {
     ...(isLostSendKept ? { lostSend } : {}),
     ...(isUnresolvedKept ? { unresolvedSend } : {}),
+    ...(isConversionKept ? { lostConversion } : {}),
   }
 }
 
-const holdsAnAttempt = (attempts: LostAttempts): boolean =>
-  Boolean(attempts.lostSend || attempts.unresolvedSend)
+/** Whether a destination still holds anything lost: one that holds nothing is not kept. */
+export const holdsAnAttempt = (attempts: LostAttempts): boolean =>
+  Boolean(attempts.lostSend || attempts.unresolvedSend || attempts.lostConversion)
 
 /**
  * The lost attempts a wallet left when the app last ran, by destination. Empty when there

@@ -129,6 +129,7 @@ module.exports = {
     Input: jest.fn().mockImplementation((args) => ({ tag: "Input", inner: args })),
   },
   GetSparkStatusRequest: { create: (p) => p },
+  ListPaymentsRequest: { create: (p) => p },
   PrepareSendPaymentRequest: { create: (p) => p },
   RegisterLightningAddressRequest: { create: (p) => p },
   SendPaymentRequest: { create: (p) => p },

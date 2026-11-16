@@ -246,5 +246,9 @@ export const executeAutoConvert = async (
   if (result.status === PaymentResultStatus.Success) {
     return { status: AutoConvertStatus.Converted }
   }
+  /** Tried again on the next trigger, also when a conversion that may have been lost is
+   *  still unknown or turned out to be another one: each try looks for it before anything
+   *  goes out, and one of these sats that completed is taken for this receive's by
+   *  `hasAlreadyConverted` before anything is quoted. */
   return { status: AutoConvertStatus.Failed }
 }

@@ -1,8 +1,8 @@
 import {
-  conversionAttemptRef,
   forgetLostAttemptsOf,
   lostAttemptsFor,
   lostAttemptsTo,
+  OWN_CONVERSIONS,
   scopeLostAttemptsTo,
   STORED_ATTEMPTS_READ_TIMEOUT_MS,
   STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS,
@@ -119,6 +119,30 @@ describe("the lost-attempt store", () => {
     scopeLostAttemptsTo("wallet-a")
 
     expect(lostAttemptsTo("sp1abc")).toEqual({ unresolvedSend })
+  })
+
+  /** Every conversion moves the same balance: what one lost is the next one's to look
+   *  for, whatever it converts, so a destination holding only that is kept. */
+  it("keeps a wallet's lost conversion for its conversions, apart from any send", () => {
+    const lostConversion = {
+      startedAtMs: 1,
+      lastAttemptAtMs: 1,
+      walletClockSec: 0,
+      knownPaymentIds: [],
+      expectedDeliveries: [
+        { tokenIdentifier: "usdb-token-id", amount: 1_370_000, isAutomatic: false },
+      ],
+    }
+    lostAttemptsFor(OWN_CONVERSIONS).update((current) => ({ ...current, lostConversion }))
+
+    expect(lostAttemptsTo(OWN_CONVERSIONS)).toEqual({ lostConversion })
+    expect(lostAttemptsTo("sp1abc")).toEqual({})
+
+    lostAttemptsFor(OWN_CONVERSIONS).update((current) => ({
+      ...current,
+      lostConversion: undefined,
+    }))
+    expect(lostAttemptsTo(OWN_CONVERSIONS)).toEqual({})
   })
 
   /** A send still in flight when the wallet changes writes where its wallet's are. */
@@ -1269,19 +1293,5 @@ describe("sends to a destination, one at a time", () => {
 
     release()
     await held
-  })
-})
-
-describe("conversionAttemptRef", () => {
-  it("is one holder per wallet, kept while another wallet is connected", () => {
-    scopeLostAttemptsTo("wallet-a")
-    const walletA = conversionAttemptRef()
-    expect(conversionAttemptRef()).toBe(walletA)
-
-    scopeLostAttemptsTo("wallet-b")
-    expect(conversionAttemptRef()).not.toBe(walletA)
-
-    scopeLostAttemptsTo("wallet-a")
-    expect(conversionAttemptRef()).toBe(walletA)
   })
 })
