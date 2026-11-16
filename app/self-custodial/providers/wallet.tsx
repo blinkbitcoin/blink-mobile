@@ -292,11 +292,22 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     ? allTransactions
     : NO_TRANSACTIONS
 
+  /**
+   * Ready, like the transactions above, only describes the account the connection is on.
+   * Between a switch and the new connection, a balance still empty for the account now
+   * selected must read as loading: ready with no wallets shows a confirmed 0. Every other
+   * status passes through, so a wallet that never connects still shows its error.
+   */
+  const isReadyStatus =
+    status === ActiveWalletStatus.Ready || status === ActiveWalletStatus.Degraded
+  const activeAccountStatus =
+    isReadyStatus && !isSdkOnActiveAccount ? ActiveWalletStatus.Loading : status
+
   const value = useMemo(
     (): SelfCustodialWalletContextValue => ({
       wallets,
       allTransactions: activeAccountTransactions,
-      status,
+      status: activeAccountStatus,
       accountType: AccountType.SelfCustodial,
       retry,
       sdk,
@@ -315,7 +326,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     [
       wallets,
       activeAccountTransactions,
-      status,
+      activeAccountStatus,
       retry,
       sdk,
       connectedAccountId,
