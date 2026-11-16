@@ -299,6 +299,58 @@ describe("CardSubscriptionScreen - paid offer", () => {
   })
 })
 
+describe("CardSubscriptionScreen - price change while mounted", () => {
+  beforeEach(() => {
+    loadLocale("en")
+    jest.clearAllMocks()
+    mockUseRoute.mockReturnValue({ name: "cardOnboardingSubscribeScreen" })
+  })
+
+  const changePrice = async (
+    rerender: ReturnType<typeof render>["rerender"],
+    priceUsd: number,
+  ) => {
+    mockPriceUsd = priceUsd
+    await act(async () => {
+      rerender(
+        <ContextForScreen>
+          <CardSubscriptionScreen />
+        </ContextForScreen>,
+      )
+    })
+  }
+
+  const priceChanges = [
+    { from: "free", to: "paid", fromPriceUsd: 0, toPriceUsd: 1000 },
+    { from: "paid", to: "free", fromPriceUsd: 1000, toPriceUsd: 0 },
+  ]
+
+  priceChanges.forEach(({ from, to, fromPriceUsd, toPriceUsd }) => {
+    it(`asks again for the notice when the offer turns from ${from} to ${to}`, async () => {
+      mockPriceUsd = fromPriceUsd
+      const { getByText, getAllByTestId, getByTestId, rerender } = await renderScreen()
+
+      await checkBoxes(getAllByTestId, ALL_SUBSCRIBE_CHECKBOXES)
+      await changePrice(rerender, toPriceUsd)
+      await act(async () => {
+        fireEvent.press(getByText("Accept"))
+      })
+
+      expect(getAllByTestId("checkbox-unchecked")).toHaveLength(1)
+      expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
+
+      await act(async () => {
+        fireEvent.press(getByTestId("checkbox-unchecked"))
+      })
+      await act(async () => {
+        fireEvent.press(getByText("Accept"))
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
+    })
+  })
+})
+
 describe("CardSubscriptionScreen - payment variant", () => {
   beforeEach(() => {
     loadLocale("en")

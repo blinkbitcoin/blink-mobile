@@ -20,6 +20,13 @@ import {
 
 const SUBSCRIBE_ROUTE: keyof RootStackParamList = "cardOnboardingSubscribeScreen"
 
+const Notice = {
+  Free: "free",
+  Paid: "paid",
+} as const
+
+type NoticeType = (typeof Notice)[keyof typeof Notice]
+
 export const CardSubscriptionScreen: React.FC = () => {
   const styles = useStyles()
   const {
@@ -35,7 +42,11 @@ export const CardSubscriptionScreen: React.FC = () => {
     useRemoteConfig()
   const { isFree, ...offerCard } = useSubscriptionOffer({ isSubscribeVariant })
 
-  const [isNoticeAccepted, setIsNoticeAccepted] = React.useState(false)
+  /** The price comes from Remote Config and can change while mounted, so the notice
+   *  is accepted by variant: a checked free notice does not accept the paid one. */
+  const [acceptedNotice, setAcceptedNotice] = React.useState<NoticeType | null>(null)
+  const notice = isFree ? Notice.Free : Notice.Paid
+  const isNoticeAccepted = acceptedNotice === notice
   const [isFeeScheduleAgreed, setIsFeeScheduleAgreed] = React.useState(false)
   const [isAgreed, setIsAgreed] = React.useState(false)
 
@@ -61,6 +72,8 @@ export const CardSubscriptionScreen: React.FC = () => {
         months: SUBSCRIPTION_RENEWAL_MONTHS,
       })
 
+  const toggleNotice = () => setAcceptedNotice(isNoticeAccepted ? null : notice)
+
   const handleAccept = () => {
     if (isSubscribeVariant) {
       navigation.navigate("cardOnboardingVerifyIdentityScreen")
@@ -77,10 +90,7 @@ export const CardSubscriptionScreen: React.FC = () => {
 
         {isSubscribeVariant && (
           <>
-            <CheckboxRow
-              checked={isNoticeAccepted}
-              onPress={() => setIsNoticeAccepted(!isNoticeAccepted)}
-            >
+            <CheckboxRow checked={isNoticeAccepted} onPress={toggleNotice}>
               <Text type="p3" style={styles.agreementText}>
                 {noticeText}
               </Text>
