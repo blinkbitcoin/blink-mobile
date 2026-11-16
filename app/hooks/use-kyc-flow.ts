@@ -26,6 +26,16 @@ type UseKycFlowParams = {
   headerTitle?: string
 }
 
+/** One press of the start, set aside when the user leaves the screen before it answers. */
+type StartAttempt = { isAbandoned: boolean }
+
+/**
+ * The flow types whose start is still unanswered, shared by every mounted screen: a user
+ * who leaves the step and opens it again before the first start answers gets a new
+ * screen, which must not start a second verification.
+ */
+const kycStartsInFlight = new Set<KycFlowType | undefined>()
+
 export const useKycFlow = ({
   firstName,
   lastName,
@@ -56,91 +66,132 @@ export const useKycFlow = ({
    * the user is back on it: a tap during the push cannot open a second one.
    */
   const isWebFlowOpenRef = useRef(false)
+  /** The press still waiting for its answer, if any. */
+  const pendingAttemptRef = useRef<StartAttempt | null>(null)
 
   const releaseStart = useCallback(() => {
     isStartingRef.current = false
     setLoading(false)
   }, [])
 
+  /**
+   * Leaving the screen, by closing it or going back, sets the pending press aside: its
+   * late answer must not navigate, alert or go back from a screen the user already left.
+   * The hold is released here, so the step is usable again if the user returns to it.
+   */
+  const abandonPendingStart = useCallback(() => {
+    const pendingAttempt = pendingAttemptRef.current
+    if (!pendingAttempt) return
+
+    pendingAttempt.isAbandoned = true
+    pendingAttemptRef.current = null
+    releaseStart()
+  }, [releaseStart])
+
   useFocusEffect(
     useCallback(() => {
-      if (!isWebFlowOpenRef.current) return
-
-      isWebFlowOpenRef.current = false
-      releaseStart()
-    }, [releaseStart]),
-  )
-
-  const requestKyc = useCallback(async () => {
-    try {
-      const res = await kycFlowStart({
-        variables: {
-          input: { firstName: firstName?.trim(), lastName: lastName?.trim(), type },
-        },
-      })
-
-      const token = res.data?.kycFlowStart?.tokenWeb ?? ""
-      const workflowRunId = res.data?.kycFlowStart?.workflowRunId ?? ""
-
-      const query = new URLSearchParams({
-        token,
-        ...(locale && { lang: locale }),
-        ...(mode && { theme: mode }),
-      }).toString()
-
-      const workflowRunIdParam = workflowRunId ? `&workflow_run_id=${workflowRunId}` : ""
-      const url = `${kycUrl}/webflow?${query}${workflowRunIdParam}`
-
-      navigate("webView", {
-        url,
-        headerTitle: headerTitle ?? LL.UpgradeAccountModal.title(),
-      })
-      isWebFlowOpenRef.current = true
-    } catch (err) {
-      console.error("error:", err)
-      const message = err instanceof Error ? err.message : ""
-
-      if (message.match(/canceled/i)) {
-        goBack()
-        return
+      if (isWebFlowOpenRef.current) {
+        isWebFlowOpenRef.current = false
+        releaseStart()
       }
 
-      Alert.alert(
-        LL.FullOnboarding.error(),
-        `${LL.GaloyAddressScreen.somethingWentWrong()}\n\n${message}`,
-        [
-          {
-            text: LL.common.ok(),
-            onPress: () => {
-              goBack()
-            },
+      return abandonPendingStart
+    }, [releaseStart, abandonPendingStart]),
+  )
+
+  const requestKyc = useCallback(
+    async (attempt: StartAttempt) => {
+      try {
+        const res = await kycFlowStart({
+          variables: {
+            input: { firstName: firstName?.trim(), lastName: lastName?.trim(), type },
           },
-        ],
-      )
-    }
-  }, [
-    LL,
-    firstName,
-    lastName,
-    type,
-    headerTitle,
-    locale,
-    mode,
-    navigate,
-    goBack,
-    kycFlowStart,
-    kycUrl,
-  ])
+        })
+        if (attempt.isAbandoned) return
+
+        const token = res.data?.kycFlowStart?.tokenWeb ?? ""
+        const workflowRunId = res.data?.kycFlowStart?.workflowRunId ?? ""
+
+        const query = new URLSearchParams({
+          token,
+          ...(locale && { lang: locale }),
+          ...(mode && { theme: mode }),
+        }).toString()
+
+        const workflowRunIdParam = workflowRunId
+          ? `&workflow_run_id=${workflowRunId}`
+          : ""
+        const url = `${kycUrl}/webflow?${query}${workflowRunIdParam}`
+
+        /** Settled before the push: the push blurs this screen, and that blur must not
+         *  read the verification it opened as one the user left. */
+        pendingAttemptRef.current = null
+        isWebFlowOpenRef.current = true
+        navigate("webView", {
+          url,
+          headerTitle: headerTitle ?? LL.UpgradeAccountModal.title(),
+        })
+      } catch (err) {
+        console.error("error:", err)
+        if (attempt.isAbandoned) return
+
+        const message = err instanceof Error ? err.message : ""
+
+        if (message.match(/canceled/i)) {
+          goBack()
+          return
+        }
+
+        Alert.alert(
+          LL.FullOnboarding.error(),
+          `${LL.GaloyAddressScreen.somethingWentWrong()}\n\n${message}`,
+          [
+            {
+              text: LL.common.ok(),
+              onPress: () => {
+                goBack()
+              },
+            },
+          ],
+        )
+      }
+    },
+    [
+      LL,
+      firstName,
+      lastName,
+      type,
+      headerTitle,
+      locale,
+      mode,
+      navigate,
+      goBack,
+      kycFlowStart,
+      kycUrl,
+    ],
+  )
 
   const startKyc = useCallback((): Promise<void> => {
-    if (isStartingRef.current) return Promise.resolve()
+    const isAlreadyStarting = isStartingRef.current || kycStartsInFlight.has(type)
+    if (isAlreadyStarting) return Promise.resolve()
 
+    const attempt: StartAttempt = { isAbandoned: false }
+    pendingAttemptRef.current = attempt
+    kycStartsInFlight.add(type)
     isStartingRef.current = true
     setLoading(true)
-    return requestKyc().finally(() => {
-      if (!isWebFlowOpenRef.current) releaseStart()
+
+    return requestKyc(attempt).finally(() => {
+      kycStartsInFlight.delete(type)
+      const isStillPending = pendingAttemptRef.current === attempt
+      if (isStillPending) pendingAttemptRef.current = null
+
+      /** A press set aside was released when the user left, and an opened web flow is
+       *  released when the user is back on the screen. */
+      const isReleasedElsewhere = attempt.isAbandoned || isWebFlowOpenRef.current
+      if (!isReleasedElsewhere) releaseStart()
     })
-  }, [requestKyc, releaseStart])
+  }, [type, requestKyc, releaseStart])
 
   return { startKyc, loading }
 }
