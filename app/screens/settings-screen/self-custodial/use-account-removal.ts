@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack"
 
@@ -17,6 +17,10 @@ import { useAccountDeleteContext } from "../account/account-delete-context"
 import { navigateAfterAccountDelete } from "./navigate-after-account-delete"
 
 type PendingRemoval = { accountId: string; identifier: string }
+
+/** The confirm modal closes in 300 ms (react-native-modal's default `animationOutTiming`,
+ *  which CustomModal keeps); past this its hide is not coming. */
+export const REMOVAL_HIDE_FALLBACK_MS = 1_000
 
 type UseAccountRemovalResult = {
   /** Called on confirm: only records the removal, the confirm modal is still closing. */
@@ -42,16 +46,39 @@ export const useAccountRemoval = (): UseAccountRemovalResult => {
   const { setAccountIsBeingDeleted, leaveWhileDeleting } = useAccountDeleteContext()
 
   const pendingRemoval = useRef<PendingRemoval | null>(null)
+  const hideFallback = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const runPendingRemovalRef = useRef<() => Promise<void>>(async () => {})
 
-  const requestRemoval = useCallback((accountId: string, identifier: string) => {
-    pendingRemoval.current = { accountId, identifier }
+  const clearHideFallback = useCallback(() => {
+    if (hideFallback.current) clearTimeout(hideFallback.current)
+    hideFallback.current = null
   }, [])
 
-  /** A hide that never reported (it can be skipped on iOS) would leave a confirmed removal
-   *  waiting, and the next Cancel's hide would run it although the user just declined. */
+  /** The hide is what normally starts the removal, but it can be skipped (on iOS among
+   *  others), and a confirmed removal must not then silently never run. The fallback runs
+   *  it once the close animation has had more than enough time; whichever comes first
+   *  takes the pending removal, so it runs once. */
+  const requestRemoval = useCallback(
+    (accountId: string, identifier: string) => {
+      pendingRemoval.current = { accountId, identifier }
+      clearHideFallback()
+      hideFallback.current = setTimeout(() => {
+        hideFallback.current = null
+        runPendingRemovalRef.current()
+      }, REMOVAL_HIDE_FALLBACK_MS)
+    },
+    [clearHideFallback],
+  )
+
+  /** Also covers a hide that never reported: a confirmed removal left waiting would run on
+   *  the next Cancel's hide although the user just declined. */
   const cancelRemoval = useCallback(() => {
+    clearHideFallback()
     pendingRemoval.current = null
-  }, [])
+  }, [clearHideFallback])
+
+  /** Off the screen, nothing is left to run the removal under, so the fallback goes too. */
+  useEffect(() => clearHideFallback, [clearHideFallback])
 
   /** A failed removal of the last account lands on Get started, which has no way back
    *  to the account, so offering a retry there would promise something the app can't do. */
@@ -67,6 +94,7 @@ export const useAccountRemoval = (): UseAccountRemovalResult => {
   )
 
   const runPendingRemoval = useCallback(async () => {
+    clearHideFallback()
     const removal = pendingRemoval.current
     if (!removal) return
     pendingRemoval.current = null
@@ -96,6 +124,7 @@ export const useAccountRemoval = (): UseAccountRemovalResult => {
       privateValues: [identifier],
     })
   }, [
+    clearHideFallback,
     deleteWallet,
     setAccountIsBeingDeleted,
     leaveWhileDeleting,
@@ -104,6 +133,10 @@ export const useAccountRemoval = (): UseAccountRemovalResult => {
     failureMessage,
     LL,
   ])
+
+  /** The fallback fires a render or more after it was armed, so it calls the latest
+   *  removal rather than the one it closed over. */
+  runPendingRemovalRef.current = runPendingRemoval
 
   return { requestRemoval, cancelRemoval, runPendingRemoval }
 }

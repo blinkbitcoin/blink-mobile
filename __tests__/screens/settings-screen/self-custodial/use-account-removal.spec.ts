@@ -1,7 +1,10 @@
 import { act, renderHook } from "@testing-library/react-native"
 import { it } from "@jest/globals"
 
-import { useAccountRemoval } from "@app/screens/settings-screen/self-custodial/use-account-removal"
+import {
+  REMOVAL_HIDE_FALLBACK_MS,
+  useAccountRemoval,
+} from "@app/screens/settings-screen/self-custodial/use-account-removal"
 
 const mockPopTo = jest.fn()
 const mockDispatch = jest.fn()
@@ -207,6 +210,83 @@ describe("useAccountRemoval", () => {
       )
     },
   )
+
+  describe("when the confirm modal's hide never reports", () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+      mockDeleteWallet.mockResolvedValue({ removed: true, outcome: "remained" })
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    /** A skipped hide must not leave a confirmed removal silently never starting. */
+    it("starts the removal once the close animation has long finished", async () => {
+      const { result } = renderHook(() => useAccountRemoval())
+
+      act(() => result.current.requestRemoval("account-a", "Anon user"))
+      await act(async () => {
+        jest.advanceTimersByTime(REMOVAL_HIDE_FALLBACK_MS - 1)
+      })
+      expect(mockDeleteWallet).not.toHaveBeenCalled()
+
+      await act(async () => {
+        jest.advanceTimersByTime(1)
+      })
+      expect(mockSetAccountIsBeingDeleted).toHaveBeenCalledWith(true, "Anon user")
+      expect(mockDeleteWallet).toHaveBeenCalledTimes(1)
+      expect(mockDeleteWallet).toHaveBeenCalledWith("account-a")
+    })
+
+    it("does not run it again when a late hide arrives after the fallback", async () => {
+      const { result } = renderHook(() => useAccountRemoval())
+
+      act(() => result.current.requestRemoval("account-a", "Anon user"))
+      await act(async () => {
+        jest.advanceTimersByTime(REMOVAL_HIDE_FALLBACK_MS)
+      })
+      await act(() => result.current.runPendingRemoval())
+
+      expect(mockDeleteWallet).toHaveBeenCalledTimes(1)
+    })
+
+    it("does not run it a second time when the hide does come in time", async () => {
+      const { result } = renderHook(() => useAccountRemoval())
+
+      act(() => result.current.requestRemoval("account-a", "Anon user"))
+      await act(() => result.current.runPendingRemoval())
+      await act(async () => {
+        jest.advanceTimersByTime(REMOVAL_HIDE_FALLBACK_MS)
+      })
+
+      expect(mockDeleteWallet).toHaveBeenCalledTimes(1)
+    })
+
+    it("runs nothing once the removal is cancelled", async () => {
+      const { result } = renderHook(() => useAccountRemoval())
+
+      act(() => result.current.requestRemoval("account-a", "Anon user"))
+      act(() => result.current.cancelRemoval())
+      await act(async () => {
+        jest.advanceTimersByTime(REMOVAL_HIDE_FALLBACK_MS)
+      })
+
+      expect(mockDeleteWallet).not.toHaveBeenCalled()
+    })
+
+    it("runs nothing once the screen that asked for it is gone", async () => {
+      const { result, unmount } = renderHook(() => useAccountRemoval())
+
+      act(() => result.current.requestRemoval("account-a", "Anon user"))
+      unmount()
+      await act(async () => {
+        jest.advanceTimersByTime(REMOVAL_HIDE_FALLBACK_MS)
+      })
+
+      expect(mockDeleteWallet).not.toHaveBeenCalled()
+    })
+  })
 
   it("drops a confirmed removal once it is cancelled", async () => {
     const { result } = renderHook(() => useAccountRemoval())
