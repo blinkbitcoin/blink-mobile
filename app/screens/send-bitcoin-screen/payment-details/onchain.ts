@@ -388,7 +388,6 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     ...sendPaymentAndGetFee,
     canSendMax: true,
     isSendingMax,
-    isFeeIncluded: Boolean(isSendingMax),
   } as const
 }
 

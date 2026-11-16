@@ -35,7 +35,6 @@ import {
   ZeroUsdMoneyAmount,
 } from "@app/types/amounts"
 import { useSendDustWarning, useTranslateSdkError } from "@app/self-custodial/hooks"
-import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { logPaymentAttempt, logPaymentResult } from "@app/utils/analytics"
 import { reportError } from "@app/utils/error-logging"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
@@ -161,8 +160,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     },
   } = useAppConfig()
 
-  const { fee, recipientAmount, isAwaitingIncludedFee, requote } =
-    useReviewQuote(paymentDetail)
+  const { fee, recipientAmount, isAwaitingIncludedFee } = useReviewQuote(paymentDetail)
 
   const settledFee = fee.status === "set" ? fee : undefined
 
@@ -328,11 +326,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         return
       }
 
-      if (errorsMessage === SelfCustodialErrorCode.QuoteMoved) {
-        requote()
-        return
-      }
-
       if (status === "ALREADY_PAID") {
         setPaymentError(LL.SendBitcoinConfirmationScreen.invoiceAlreadyPaid())
         ReactNativeHapticFeedback.trigger("notificationError", {
@@ -413,7 +406,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     navigateToCompleted,
     verifyPaymentSettled,
     translateSdkError,
-    requote,
   ])
 
   let validAmount = true
@@ -651,7 +643,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             disabled={
               !validAmount ||
               !sendPayment ||
-              Boolean(paymentFailure) ||
               isAwaitingIncludedFee ||
               feeUnavailable ||
               dustNotEvaluable

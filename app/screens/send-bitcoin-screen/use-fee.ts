@@ -118,11 +118,7 @@ gql`
   }
 `
 
-/** `quoteRound` asks for a fresh quote each time it changes, for a quote that moved. */
-const useFee = <T extends WalletCurrency>(
-  getFeeFn?: GetFee<T> | null,
-  quoteRound = 0,
-): FeeType => {
+const useFee = <T extends WalletCurrency>(getFeeFn?: GetFee<T> | null): FeeType => {
   const [fee, setFee] = useState<FeeType>({
     status: "unset",
   })
@@ -188,7 +184,6 @@ const useFee = <T extends WalletCurrency>(
     getFee()
   }, [
     getFeeFn,
-    quoteRound,
     setFee,
     lnInvoiceFeeProbe,
     lnNoAmountInvoiceFeeProbe,

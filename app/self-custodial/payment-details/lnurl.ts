@@ -59,10 +59,6 @@ import {
   findLostSend,
   type LostSendLookup,
   sendSettlement,
-  hasQuoteMoved,
-  QuoteRef,
-  quoteMovedFailure,
-  quoteOf,
 } from "./send-helpers"
 
 const SAT_TO_MILLISAT = BigInt(1000)
@@ -277,8 +273,6 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
   )
   const isUsdSend = sendingWalletDescriptor.currency === WalletCurrency.Usd
   const payRequest = lnurlParamsToPayRequest(lnurlParams, lnurl)
-  /** The quote review showed for a dollar send, which the send checks before it pays. */
-  const quoteRef: QuoteRef = {}
 
   // Only the note the user typed travels as the comment. The destination's description
   // just prefills the note field, and the receiver shows the comment as the payer's note,
@@ -444,22 +438,6 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
       return sendFailure(err)
     }
 
-    /** A dollar send converts at the price of the moment: one that moved since review
-     *  stops here, before it is sent, for the sender to see it again. */
-    if (
-      isUsdSend &&
-      hasQuoteMoved(
-        quoteRef.current,
-        quoteOf(extractLnurlFee(prepared), prepared.conversionEstimate),
-      )
-    ) {
-      measureIn(startedIn, ScEvent.PaymentSendFailed, {
-        ...sendTelemetry,
-        error_code: SelfCustodialErrorCode.QuoteMoved,
-      })
-      return quoteMovedFailure()
-    }
-
     const paymentHash = prepared.invoiceDetails.paymentHash
     const attempt = { startedIn, settlement: sendSettlementTelemetry }
     rememberAttemptTelemetry(paymentHash, attempt)
@@ -508,8 +486,6 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
           try {
             const prepared = await prepareLnurl(sdk, prepareOptions)
             const feeSats = extractLnurlFee(prepared)
-            if (isUsdSend)
-              quoteRef.current = quoteOf(feeSats, prepared.conversionEstimate)
             return { amount: asBtcSettlementAmount<T>(feeSats) }
           } catch (err) {
             return feeFailure<T>("Self-custodial LNURL fee", err)
@@ -601,8 +577,6 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     successAction,
     setSuccessAction,
     isMerchant,
-    // The SDK takes a dollar send's fee out of its amount (FeesIncluded).
-    isFeeIncluded: isUsdSend,
     ...(destinationSpecifiedAmount
       ? { canSetAmount: false as const, destinationSpecifiedAmount }
       : { canSetAmount: true as const, setAmount }),

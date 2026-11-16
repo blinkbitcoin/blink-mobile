@@ -47,11 +47,7 @@ type UseSendPaymentResult = {
    * sendPayment being defined.
    */
   hasAttemptedSend: boolean
-  /**
-   * The send went out, or may have, and no further attempt is allowed from this payment:
-   * the only way on is Home. False before the first attempt and after a failure raised
-   * before anything was sent.
-   */
+  /** The send went out, or is still going out: an attempt holds the lock until it fails. */
   isSendSpent: boolean
 }
 
@@ -67,7 +63,6 @@ const NOTHING_SENT_CODES: ReadonlySet<string> = new Set([
   SelfCustodialErrorCode.InsufficientFunds,
   SelfCustodialErrorCode.BelowMinimum,
   SelfCustodialErrorCode.InvalidInput,
-  SelfCustodialErrorCode.QuoteMoved,
   IDEMPOTENCY_KEY_UNAVAILABLE,
 ])
 
@@ -261,10 +256,10 @@ export const useSendPayment = (
   // Sticky: money may have moved, so the caller must stop trusting its balance snapshot.
   const [hasAttemptedSend, setHasAttemptedSend] = useState(false)
   /**
-   * Whether a further attempt is barred. Set for good by the first attempt: a throw or a
-   * failure may have moved money, and not every rail dedupes a retry (self-custodial
-   * Lightning invoices and on-chain carry no key). Lifted only for a failure classified
-   * as raised before the send.
+   * Whether a further attempt is barred. Kept apart from hasAttemptedSend because the two
+   * answer different questions: a send that failed or threw must be retryable (same key,
+   * so the backend refuses a true duplicate), while the balance check must stay off for
+   * the rest of the mount regardless.
    */
   const [sendLocked, setSendLocked] = useState(false)
   // Tracks loading for mutations that bypass Apollo (e.g. self-custodial SDK calls)
@@ -356,19 +351,15 @@ export const useSendPayment = (
             if (errors) {
               errorsMessage = getErrorMessages(errors)
             }
-            if (
-              status === PaymentSendResult.Failure &&
-              isNothingSentFailure(errorsMessage)
-            ) {
+            if (status === PaymentSendResult.Failure) {
               setSendLocked(false)
             }
             return { status, errorsMessage, extraInfo, transaction }
           } catch (err) {
-            // A throw is the ambiguous case: the request may have landed, so the send
-            // stays locked unless the throw says nothing went out.
-            if (err instanceof Error && isNothingSentFailure(err.message)) {
-              setSendLocked(false)
-            }
+            // A throw is precisely the ambiguous case — the request may have landed. Let
+            // the user attempt again under the same key, so a true duplicate comes back
+            // as a 409 the screen can resolve, instead of dead-ending on a live payment.
+            setSendLocked(false)
             throw err
           } finally {
             setLocalLoading(false)
