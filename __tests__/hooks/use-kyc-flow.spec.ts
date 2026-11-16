@@ -6,12 +6,16 @@ import { KycFlowType } from "@app/graphql/generated"
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
+let mockFocusEffect: () => void = () => {}
 
 jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({
     navigate: mockNavigate,
     goBack: mockGoBack,
   }),
+  useFocusEffect: (effect: () => void) => {
+    mockFocusEffect = effect
+  },
 }))
 
 jest.mock("@rn-vui/themed", () => ({
@@ -430,7 +434,7 @@ describe("useKycFlow", () => {
     )
   })
 
-  it("sets loading true during startKyc, false after a successful mutation", async () => {
+  it("keeps loading while the web flow is open and clears it once the user is back", async () => {
     let resolvePromise: (value: {
       data: { kycFlowStart: { tokenWeb: string; workflowRunId: string } }
     }) => void
@@ -462,6 +466,12 @@ describe("useKycFlow", () => {
         },
       })
       await startPromise!
+    })
+
+    expect(result.current.loading).toBe(true)
+
+    act(() => {
+      mockFocusEffect()
     })
 
     expect(result.current.loading).toBe(false)
@@ -499,5 +509,143 @@ describe("useKycFlow", () => {
       "error:",
       expect.objectContaining({ message: "Network failure" }),
     )
+  })
+
+  it("starts one verification when pressed twice before the first one answers", async () => {
+    let resolvePromise: (value: {
+      data: { kycFlowStart: { tokenWeb: string; workflowRunId: string } }
+    }) => void
+    mockKycFlowStart.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolvePromise = resolve
+        }),
+    )
+
+    const { result } = renderHook(() => useKycFlow())
+
+    let firstStart: Promise<void>
+    await act(async () => {
+      firstStart = result.current.startKyc()
+      result.current.startKyc()
+    })
+
+    expect(mockKycFlowStart).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      resolvePromise!({ data: { kycFlowStart: { tokenWeb: "t", workflowRunId: "w" } } })
+      await firstStart!
+    })
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+  })
+
+  it("opens no second web flow until the user is back from the first one", async () => {
+    mockKycFlowStart.mockResolvedValue({
+      data: { kycFlowStart: { tokenWeb: "t", workflowRunId: "w" } },
+    })
+
+    const { result } = renderHook(() => useKycFlow())
+
+    await act(async () => {
+      await result.current.startKyc()
+    })
+    await act(async () => {
+      await result.current.startKyc()
+    })
+
+    expect(mockKycFlowStart).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+
+    act(() => {
+      mockFocusEffect()
+    })
+    await act(async () => {
+      await result.current.startKyc()
+    })
+
+    expect(mockKycFlowStart).toHaveBeenCalledTimes(2)
+    expect(mockNavigate).toHaveBeenCalledTimes(2)
+  })
+
+  it("keeps the start held when the screen is focused again before the first one answers", async () => {
+    let resolvePromise: (value: {
+      data: { kycFlowStart: { tokenWeb: string; workflowRunId: string } }
+    }) => void
+    mockKycFlowStart.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolvePromise = resolve
+        }),
+    )
+
+    const { result } = renderHook(() => useKycFlow())
+
+    let firstStart: Promise<void>
+    await act(async () => {
+      firstStart = result.current.startKyc()
+    })
+    act(() => {
+      mockFocusEffect()
+    })
+    await act(async () => {
+      result.current.startKyc()
+    })
+
+    expect(result.current.loading).toBe(true)
+    expect(mockKycFlowStart).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      resolvePromise!({ data: { kycFlowStart: { tokenWeb: "t", workflowRunId: "w" } } })
+      await firstStart!
+    })
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+  })
+
+  it("lets the user try again when the error alert itself fails", async () => {
+    captureConsoleError()
+    mockKycFlowStart.mockRejectedValue(new Error("Network failure"))
+    ;(Alert.alert as jest.Mock).mockImplementationOnce(() => {
+      throw new Error("Alert unavailable")
+    })
+
+    const { result } = renderHook(() => useKycFlow())
+
+    await act(async () => {
+      await expect(result.current.startKyc()).rejects.toThrow("Alert unavailable")
+    })
+
+    expect(result.current.loading).toBe(false)
+
+    await act(async () => {
+      await result.current.startKyc()
+    })
+
+    expect(mockKycFlowStart).toHaveBeenCalledTimes(2)
+  })
+
+  it("lets the user start the verification again after a failed start", async () => {
+    captureConsoleError()
+    mockKycFlowStart.mockRejectedValueOnce(new Error("Network failure"))
+    mockKycFlowStart.mockResolvedValueOnce({
+      data: { kycFlowStart: { tokenWeb: "t", workflowRunId: "w" } },
+    })
+
+    const { result } = renderHook(() => useKycFlow())
+
+    await act(async () => {
+      await result.current.startKyc()
+    })
+
+    expect(Alert.alert).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalled()
+
+    await act(async () => {
+      await result.current.startKyc()
+    })
+
+    expect(mockKycFlowStart).toHaveBeenCalledTimes(2)
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
   })
 })
