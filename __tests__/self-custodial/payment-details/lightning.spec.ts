@@ -372,9 +372,12 @@ describe("createSelfCustodialLightningPaymentDetails send-all", () => {
   }
   const lastFeeParams = () =>
     mockCreateGetFee.mock.calls[mockCreateGetFee.mock.calls.length - 1][0]
+  const lastSendParams = () =>
+    mockCreateSendMutation.mock.calls[mockCreateSendMutation.mock.calls.length - 1][0]
 
   beforeEach(() => {
     mockCreateGetFee.mockClear()
+    mockCreateSendMutation.mockClear()
   })
 
   it("sends all of an invoice with no amount, the fee taken out", () => {
@@ -386,6 +389,31 @@ describe("createSelfCustodialLightningPaymentDetails send-all", () => {
     expect(sendAll.isSendingMax).toBe(true)
     expect(sendAll.isFeeIncluded).toBe(true)
     expect(lastFeeParams().feePolicy).toBe(FEES_INCLUDED)
+    expect(lastSendParams().feePolicy).toBe(FEES_INCLUDED)
+  })
+
+  it("puts the fee back on top once an amount is typed", () => {
+    const typed = createSelfCustodialLightningPaymentDetails(
+      createParams({ hasAmount: false }),
+    ).setAmount!(balance, true).setAmount!(balance)
+
+    expect(typed.isSendingMax).toBe(false)
+    expect(typed.isFeeIncluded).toBe(false)
+    expect(lastFeeParams().feePolicy).toBeUndefined()
+    expect(lastSendParams().feePolicy).toBeUndefined()
+  })
+
+  it("drops the send-all on a wallet switch", () => {
+    const switched = createSelfCustodialLightningPaymentDetails(
+      createParams({ hasAmount: false }),
+    ).setAmount!(balance, true).setSendingWalletDescriptor({
+      id: "w-other",
+      currency: WalletCurrency.Btc,
+    })
+
+    expect(switched.isSendingMax).toBe(false)
+    expect(lastFeeParams().feePolicy).toBeUndefined()
+    expect(lastSendParams().feePolicy).toBeUndefined()
   })
 
   it("offers no send-all on an invoice with its own amount", () => {
