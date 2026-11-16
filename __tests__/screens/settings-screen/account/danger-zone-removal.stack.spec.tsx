@@ -339,7 +339,11 @@ describe("Danger zone removal under the real lock", () => {
       await startDeletion()
 
       expect(screen.getByTestId("account-deletion-lock")).toBeTruthy()
-      expect(screen.getByText("Close account")).toBeTruthy()
+      /** Still mounted under the cover, but out of reach of a screen reader. */
+      expect(
+        screen.getByText("Close account", { includeHiddenElements: true }),
+      ).toBeTruthy()
+      expect(screen.queryByText("Close account")).toBeNull()
 
       await act(async () => {
         pressHardwareBack()

@@ -16,7 +16,6 @@ import {
   suppressedHeaderBack,
 } from "@app/components/header-back-control/header-back-control"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { testProps } from "@app/utils/testProps"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 type AccountDeleteContextType = {
@@ -104,13 +103,36 @@ export const AccountDeleteContextProvider: React.FC<PropsWithChildren> = ({
 
   /** The screen stays mounted under an opaque cover rather than being swapped out: the
    *  component running the removal lives inside it and has to see the removal through,
-   *  and the switch that happens mid-removal must not be visible through the cover. */
+   *  and the switch that happens mid-removal must not be visible through the cover.
+   *
+   *  Opaque is only what the eye gets. VoiceOver and TalkBack read the tree, not the
+   *  pixels, so while locked the screen underneath is taken out of the accessibility tree
+   *  and out of touch, and the cover is what they announce: the account and the status. */
   return (
     <AccountDeleteContext.Provider value={value}>
       <View style={styles.fill}>
-        {children}
+        <View
+          style={styles.fill}
+          pointerEvents={isLocked ? "none" : "auto"}
+          accessibilityElementsHidden={isLocked}
+          importantForAccessibility={isLocked ? "no-hide-descendants" : "auto"}
+          testID="account-deletion-screen"
+        >
+          {children}
+        </View>
         {lock && (
-          <View style={styles.cover} {...testProps("account-deletion-lock")}>
+          <View
+            style={styles.cover}
+            testID="account-deletion-lock"
+            accessible
+            accessibilityViewIsModal
+            accessibilityLiveRegion="polite"
+            accessibilityRole="progressbar"
+            accessibilityState={{ busy: true }}
+            accessibilityLabel={[lock.identifier, LL.AccountScreen.accountBeingDeleted()]
+              .filter(Boolean)
+              .join(", ")}
+          >
             <ActivityIndicator />
             {lock.identifier ? (
               <Text type="p1" bold>

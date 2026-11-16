@@ -121,6 +121,79 @@ describe("AccountDeleteContextProvider", () => {
     expect(coverStyle.opacity ?? 1).toBe(1)
   })
 
+  /** VoiceOver and TalkBack read the tree, not the pixels: an opaque cover alone still
+   *  lets them find, read out and activate the next account's screen underneath. */
+  it("takes the screen under the cover out of the accessibility tree and out of touch", () => {
+    const { getByTestId, queryByText } = render(
+      <AccountDeleteContextProvider>
+        <LockController />
+      </AccountDeleteContextProvider>,
+    )
+    expect(queryByText("Anon user", { includeHiddenElements: false })).toBeTruthy()
+
+    act(() => controls.setAccountIsBeingDeleted?.(true, "satoshi"))
+
+    expect(queryByText("Anon user", { includeHiddenElements: false })).toBeNull()
+    expect(
+      getByTestId("account-deletion-screen", { includeHiddenElements: true }).props,
+    ).toMatchObject({
+      pointerEvents: "none",
+      accessibilityElementsHidden: true,
+      importantForAccessibility: "no-hide-descendants",
+    })
+  })
+
+  it("announces the cover as the screen's status, naming the account", () => {
+    const { getByTestId } = render(
+      <AccountDeleteContextProvider>
+        <LockController />
+      </AccountDeleteContextProvider>,
+    )
+
+    act(() => controls.setAccountIsBeingDeleted?.(true, "satoshi"))
+
+    expect(getByTestId("account-deletion-lock").props).toMatchObject({
+      accessible: true,
+      accessibilityViewIsModal: true,
+      accessibilityLiveRegion: "polite",
+      accessibilityRole: "progressbar",
+      accessibilityState: { busy: true },
+      accessibilityLabel: "satoshi, Your account is being closed, please wait...",
+    })
+  })
+
+  it("announces only the status when the account has no name", () => {
+    const { getByTestId } = render(
+      <AccountDeleteContextProvider>
+        <LockController />
+      </AccountDeleteContextProvider>,
+    )
+
+    act(() => controls.setAccountIsBeingDeleted?.(true))
+
+    expect(getByTestId("account-deletion-lock").props.accessibilityLabel).toBe(
+      "Your account is being closed, please wait...",
+    )
+  })
+
+  it("gives the screen back to assistive technology and touch once the lock lifts", () => {
+    const { getByTestId, queryByText } = render(
+      <AccountDeleteContextProvider>
+        <LockController />
+      </AccountDeleteContextProvider>,
+    )
+
+    act(() => controls.setAccountIsBeingDeleted?.(true, "satoshi"))
+    act(() => controls.setAccountIsBeingDeleted?.(false))
+
+    expect(queryByText("Anon user", { includeHiddenElements: false })).toBeTruthy()
+    expect(getByTestId("account-deletion-screen").props).toMatchObject({
+      pointerEvents: "auto",
+      accessibilityElementsHidden: false,
+      importantForAccessibility: "auto",
+    })
+  })
+
   it("keeps the screen mounted under the cover so the removal it runs is not torn down", () => {
     render(
       <AccountDeleteContextProvider>
