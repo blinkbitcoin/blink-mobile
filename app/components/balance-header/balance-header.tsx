@@ -72,12 +72,15 @@ export const BalanceHeader: React.FC<Props> = ({
             {loading ? (
               <Loader />
             ) : (
+              // One line, shrunk to fit. Android also shrinks against amountWrapper's
+              // fixed height; the line limit keeps that from resting on the height.
               <Text
                 {...testProps("balance-value")}
                 style={styles.primaryBalanceText}
                 allowFontScaling
                 maxFontSizeMultiplier={MAX_BALANCE_FONT_SIZE_MULTIPLIER}
                 adjustsFontSizeToFit
+                numberOfLines={1}
               >
                 {formattedBalance}
               </Text>
