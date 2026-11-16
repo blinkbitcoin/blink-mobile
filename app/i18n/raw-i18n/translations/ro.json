@@ -3720,8 +3720,7 @@
             "title": "Manager de cont personal",
             "subtitle": "și asistență prioritară"
           },
-          "businessAccounts": "Conturi de afaceri",
-          "virtualAccounts": "Conturi virtuale"
+          "onOffRamping": "Intrări și ieșiri de bani"
         },
         "availableIn": "în {months} luni",
         "footnote": "Unele funcții vor fi disponibile în cel mult {months} luni. Cardul este gata astăzi.",

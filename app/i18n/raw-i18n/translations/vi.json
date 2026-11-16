@@ -3720,8 +3720,7 @@
             "title": "Quản lý tài khoản cá nhân",
             "subtitle": "và hỗ trợ ưu tiên"
           },
-          "businessAccounts": "Tài khoản doanh nghiệp",
-          "virtualAccounts": "Tài khoản ảo"
+          "onOffRamping": "Nạp và rút tiền"
         },
         "availableIn": "trong {months} tháng",
         "footnote": "Một số tính năng sẽ có trong vòng {months} tháng. Thẻ đã sẵn sàng ngay hôm nay.",

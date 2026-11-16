@@ -3681,8 +3681,7 @@
                         "title": "Personal account manager",
                         "subtitle": "and priority support"
                     },
-                    "businessAccounts": "Business accounts",
-                    "virtualAccounts": "Virtual accounts"
+                    "onOffRamping": "On/Off ramping"
                 },
                 "availableIn": "in {months:number} months",
                 "footnote": "Some features will be available within {months:number} months. The card is ready today.",

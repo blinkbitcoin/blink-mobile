@@ -3720,8 +3720,7 @@
             "title": "Osobni upravitelj računa",
             "subtitle": "i prioritetna podrška"
           },
-          "businessAccounts": "Poslovni računi",
-          "virtualAccounts": "Virtualni računi"
+          "onOffRamping": "Uplate i isplate novca"
         },
         "availableIn": "za {months} mjeseci",
         "footnote": "Neke značajke bit će dostupne u roku od {months} mjeseci. Kartica je spremna već danas.",

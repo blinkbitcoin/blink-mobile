@@ -3720,8 +3720,7 @@
             "title": "Persoonlike rekeningbestuurder",
             "subtitle": "en prioriteitsondersteuning"
           },
-          "businessAccounts": "Besigheidsrekeninge",
-          "virtualAccounts": "Virtuele rekeninge"
+          "onOffRamping": "Geld in en uit"
         },
         "availableIn": "oor {months} maande",
         "footnote": "Sommige funksies sal binne {months} maande beskikbaar wees. Die kaart is vandag gereed.",

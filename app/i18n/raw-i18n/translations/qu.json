@@ -3720,8 +3720,7 @@
             "title": "Sapan cuenta kamachiq",
             "subtitle": "ñawpaq yanapaywan"
           },
-          "businessAccounts": "Llamkay cuentakuna",
-          "virtualAccounts": "Virtual cuentakuna"
+          "onOffRamping": "Qullqi yaykuchiy hurquypas"
         },
         "availableIn": "{months} killapi",
         "footnote": "Wakin ruraykunaqa {months} killa ukhupi kanqa. Tarjetaqa kunan p'unchaw wakichisqa.",

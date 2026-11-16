@@ -3720,8 +3720,7 @@
                         "title": "Gerente de conta pessoal",
                         "subtitle": "e suporte prioritário"
                     },
-                    "businessAccounts": "Contas empresariais",
-                    "virtualAccounts": "Contas virtuais"
+                    "onOffRamping": "Entrada e saída de dinheiro"
                 },
                 "availableIn": "em {months} meses",
                 "footnote": "Alguns recursos estarão disponíveis em até {months} meses. O cartão está pronto hoje.",

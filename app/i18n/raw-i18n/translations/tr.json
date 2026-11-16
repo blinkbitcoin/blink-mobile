@@ -3720,8 +3720,7 @@
             "title": "Kişisel hesap yöneticisi",
             "subtitle": "ve öncelikli destek"
           },
-          "businessAccounts": "İşletme hesapları",
-          "virtualAccounts": "Sanal hesaplar"
+          "onOffRamping": "Para girişi ve çıkışı"
         },
         "availableIn": "{months} ay içinde",
         "footnote": "Bazı özellikler {months} ay içinde kullanıma sunulacak. Kart bugün hazır.",

@@ -3720,8 +3720,7 @@
             "title": "Meneja binafsi wa akaunti",
             "subtitle": "na usaidizi wa kipaumbele"
           },
-          "businessAccounts": "Akaunti za biashara",
-          "virtualAccounts": "Akaunti pepe"
+          "onOffRamping": "Kuingiza na kutoa pesa"
         },
         "availableIn": "baada ya miezi {months}",
         "footnote": "Baadhi ya vipengele vitapatikana ndani ya miezi {months}. Kadi iko tayari leo.",

@@ -3720,8 +3720,7 @@
                         "title": "Account manager personale",
                         "subtitle": "e supporto prioritario"
                     },
-                    "businessAccounts": "Conti aziendali",
-                    "virtualAccounts": "Conti virtuali"
+                    "onOffRamping": "Entrate e uscite di denaro"
                 },
                 "availableIn": "tra {months} mesi",
                 "footnote": "Alcune funzionalità saranno disponibili entro {months} mesi. La carta è pronta oggi.",

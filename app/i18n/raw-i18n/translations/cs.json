@@ -3720,8 +3720,7 @@
             "title": "Osobní správce účtu",
             "subtitle": "a prioritní podpora"
           },
-          "businessAccounts": "Firemní účty",
-          "virtualAccounts": "Virtuální účty"
+          "onOffRamping": "Vklad a výběr peněz"
         },
         "availableIn": "za {months} měsíců",
         "footnote": "Některé funkce budou dostupné do {months} měsíců. Karta je připravená už dnes.",
