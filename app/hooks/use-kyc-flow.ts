@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef } from "react"
 import { Alert } from "react-native"
-import { useNavigation } from "@react-navigation/native"
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
@@ -46,10 +46,32 @@ export const useKycFlow = ({
   } = useAppConfig()
 
   const [loading, setLoading] = useState(false)
+  /**
+   * Taken in the same frame as the press, before `loading` reaches the button, so a
+   * second tap cannot start a second verification and push a second web flow.
+   */
+  const isStartingRef = useRef(false)
+  /**
+   * The web flow is pushed over the screen, so an opened verification stays held until
+   * the user is back on it: a tap during the push cannot open a second one.
+   */
+  const isWebFlowOpenRef = useRef(false)
 
-  const startKyc = useCallback(async () => {
-    setLoading(true)
+  const releaseStart = useCallback(() => {
+    isStartingRef.current = false
+    setLoading(false)
+  }, [])
 
+  useFocusEffect(
+    useCallback(() => {
+      if (!isWebFlowOpenRef.current) return
+
+      isWebFlowOpenRef.current = false
+      releaseStart()
+    }, [releaseStart]),
+  )
+
+  const requestKyc = useCallback(async () => {
     try {
       const res = await kycFlowStart({
         variables: {
@@ -73,13 +95,13 @@ export const useKycFlow = ({
         url,
         headerTitle: headerTitle ?? LL.UpgradeAccountModal.title(),
       })
+      isWebFlowOpenRef.current = true
     } catch (err) {
       console.error("error:", err)
       const message = err instanceof Error ? err.message : ""
 
       if (message.match(/canceled/i)) {
         goBack()
-        setLoading(false)
         return
       }
 
@@ -95,8 +117,6 @@ export const useKycFlow = ({
           },
         ],
       )
-    } finally {
-      setLoading(false)
     }
   }, [
     LL,
@@ -111,6 +131,16 @@ export const useKycFlow = ({
     kycFlowStart,
     kycUrl,
   ])
+
+  const startKyc = useCallback((): Promise<void> => {
+    if (isStartingRef.current) return Promise.resolve()
+
+    isStartingRef.current = true
+    setLoading(true)
+    return requestKyc().finally(() => {
+      if (!isWebFlowOpenRef.current) releaseStart()
+    })
+  }, [requestKyc, releaseStart])
 
   return { startKyc, loading }
 }
