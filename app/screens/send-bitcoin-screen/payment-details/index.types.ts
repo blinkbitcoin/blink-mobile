@@ -121,10 +121,16 @@ export type SendPaymentMutation = (
   extraInfo?: PaymentSendExtraInfo
 }>
 
+/** What the self-custodial SDK says went out: the amount that reached the recipient and
+ *  the fee, in sats. */
+export type PaymentSettled = { amountSats: number; feeSats: number }
+
 export type PaymentSendExtraInfo = {
   arrivalAtMempoolEstimate?: number
   preimage?: string | null
   successAction?: LNURLPaySuccessAction
+  /** Set for a send whose fee came out of the amount, where review only had a quote. */
+  settled?: PaymentSettled
 }
 
 export type SetAmount<T extends WalletCurrency> = (

@@ -72,6 +72,7 @@ import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
 import { PaymentSendExtraInfo } from "./payment-details/index.types"
 import { useReviewFeeText } from "./review/use-review-fee-text"
 import { useReviewQuote } from "./review/use-review-quote"
+import { SentAmountText, useSettledAmountText } from "./review/use-settled-amount-text"
 import { PaymentSendCompletedStatus, useSendPayment } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
 import { formatDestination } from "./format-destination"
@@ -282,6 +283,13 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const heroSecondaryText =
     heroSecondaryAmount && formatMoneyAmount({ moneyAmount: heroSecondaryAmount })
 
+  /** Once a send whose fee came out of the amount lands, Sent and the receipt show what
+   *  the SDK says went out rather than review's quote (blink-wip#2048 SR2). */
+  const settledText = useSettledAmountText(paymentDetail, leadsWithWalletCurrency)
+  const [sentText, setSentText] = React.useState<SentAmountText>()
+  const shownHeroPrimary = sentText?.heroPrimaryText ?? heroPrimaryText
+  const shownHeroSecondary = sentText ? sentText.heroSecondaryText : heroSecondaryText
+
   const {
     stageRef,
     heroRef,
@@ -301,7 +309,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
    *  is spoken; a replay of the same send stays quiet. */
   useAccessibilityAnnouncement(
     sentPlay
-      ? `${LL.SendBitcoinConfirmationScreen.sent()}, ${heroPrimaryText}`
+      ? `${LL.SendBitcoinConfirmationScreen.sent()}, ${shownHeroPrimary}`
       : undefined,
   )
 
@@ -328,6 +336,17 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         }).catch((err) => reportError("send-bitcoin-confirmation:save-contact", err))
       }
 
+      const settled = extraInfo?.settled && settledText(extraInfo.settled)
+      if (settled) setSentText(settled)
+      const shown = settled || {
+        heroPrimaryText,
+        heroSecondaryText,
+        currencyAmount,
+        satAmount,
+        currencyFeeAmount,
+        satFeeAmount,
+      }
+
       const isSuccess = status === "SUCCESS"
       const params: RootStackParamList["sendBitcoinCompleted"] = {
         arrivalAtMempoolEstimate: extraInfo?.arrivalAtMempoolEstimate,
@@ -335,10 +354,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         successAction: extraInfo?.successAction ?? paymentDetail?.successAction,
         preimage: extraInfo?.preimage ?? undefined,
         note,
-        currencyAmount,
-        satAmount,
-        currencyFeeAmount,
-        satFeeAmount,
+        currencyAmount: shown.currencyAmount,
+        satAmount: shown.satAmount,
+        currencyFeeAmount: shown.currencyFeeAmount,
+        satFeeAmount: shown.satFeeAmount,
         destination: formatDestination({
           destination,
           paymentType,
@@ -357,8 +376,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         haptics.success()
         sentReceiptRef.current = params
         const sent = playSent({
-          primaryAmount: heroPrimaryText,
-          hasSecondaryAmount: Boolean(heroSecondaryText),
+          primaryAmount: shown.heroPrimaryText,
+          hasSecondaryAmount: Boolean(shown.heroSecondaryText),
         })
         saveContact()
         await sent
@@ -377,6 +396,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       markAmountSliderLearned,
       heroPrimaryText,
       heroSecondaryText,
+      settledText,
       saveLnAddressContact,
       paymentType,
       destination,
@@ -670,8 +690,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                     ? LL.SendBitcoinConfirmationScreen.sent()
                     : LL.SendBitcoinConfirmationScreen.sending()
                 }
-                primaryAmount={heroPrimaryText}
-                secondaryAmount={heroSecondaryText}
+                primaryAmount={shownHeroPrimary}
+                secondaryAmount={shownHeroSecondary}
                 sentProgress={heroProgress}
                 isSent={isSent}
                 sentPlay={sentPlay}

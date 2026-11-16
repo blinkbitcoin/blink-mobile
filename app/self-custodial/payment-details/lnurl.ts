@@ -55,11 +55,13 @@ import {
 import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 
 import {
+  assertFeePolicyApplied,
   feeFailure,
   findLostSend,
   type LostSendLookup,
   sendAllFeePolicy,
   sendSettlement,
+  settledOf,
 } from "./send-helpers"
 
 const SAT_TO_MILLISAT = BigInt(1000)
@@ -279,6 +281,9 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
   const isSendingMax =
     !destinationSpecifiedAmount &&
     sendAllFeePolicy(params.sendMax, sendingWalletDescriptor.currency) !== undefined
+  /** What a send-all asks of the SDK. A dollar send always takes its fee out too, but it
+   *  keeps main's handling: its quote and receipt are not checked against the SDK's. */
+  const sendAllPolicy = isSendingMax ? FeePolicy.FeesIncluded : undefined
   const payRequest = lnurlParamsToPayRequest(lnurlParams, lnurl)
 
   // Only the note the user typed travels as the comment. The destination's description
@@ -348,6 +353,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     extraInfo: {
       preimage: extractPreimage(payment),
       successAction: sdkSuccessActionToLib(successAction),
+      ...settledOf(sendAllPolicy, payment),
     },
   })
 
@@ -440,6 +446,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     let prepared
     try {
       prepared = await prepareLnurl(sdk, prepareOptions)
+      assertFeePolicyApplied(sendAllPolicy, prepared)
     } catch (err) {
       reportFailed(err)
       return sendFailure(err)
@@ -492,6 +499,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
         getFee: async () => {
           try {
             const prepared = await prepareLnurl(sdk, prepareOptions)
+            assertFeePolicyApplied(sendAllPolicy, prepared)
             const feeSats = extractLnurlFee(prepared)
             return { amount: asBtcSettlementAmount<T>(feeSats) }
           } catch (err) {

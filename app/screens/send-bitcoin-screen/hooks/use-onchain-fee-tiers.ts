@@ -8,6 +8,7 @@ import {
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { extractOnchainFees, prepareSend } from "@app/self-custodial/bridge"
+import { assertFeePolicyApplied } from "@app/self-custodial/payment-details/send-helpers"
 import { FEE_TIER_ETA_MINUTES } from "@app/types/payment"
 import { reportError } from "@app/utils/error-logging"
 
@@ -153,6 +154,10 @@ export const useOnchainFeeTiers = ({
           feePolicy: isFeeIncluded ? FeePolicy.FeesIncluded : undefined,
         })
         if (isStale()) return null
+        assertFeePolicyApplied(
+          isFeeIncluded ? FeePolicy.FeesIncluded : undefined,
+          prepared,
+        )
 
         const fees = extractOnchainFees(prepared)
         if (!fees) {
