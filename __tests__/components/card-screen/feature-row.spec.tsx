@@ -40,7 +40,19 @@ describe("FeatureRow", () => {
     renderRow(<FeatureRow icon="headset" title="Personal account manager" />)
 
     expect(mockIconProps).toHaveBeenCalledWith(
-      expect.objectContaining({ size: 17, containerSize: 26 }),
+      expect.objectContaining({ size: 16, containerSize: 26 }),
+    )
+  })
+
+  /** The design moved the circles off the accent: a light icon on the neutral fill. */
+  it("draws the icon light on a neutral circle", () => {
+    renderRow(<FeatureRow icon="headset" title="Personal account manager" />)
+
+    expect(mockIconProps).toHaveBeenCalledWith(
+      expect.objectContaining({
+        color: theme.lightColors?.textOnBackground,
+        backgroundColor: theme.lightColors?.neutral,
+      }),
     )
   })
 
@@ -58,7 +70,7 @@ describe("FeatureRow", () => {
 
   it("shows the badge when given", () => {
     const { getByText } = renderRow(
-      <FeatureRow icon="wallet" title="Business accounts" badge="in 12 months" />,
+      <FeatureRow icon="bitcoin" title="On/Off ramping" badge="in 12 months" />,
     )
 
     expect(getByText("in 12 months")).toBeTruthy()
@@ -67,10 +79,10 @@ describe("FeatureRow", () => {
   /** An empty string would otherwise reach the tree as bare text outside a `Text`. */
   it("renders nothing extra for an empty subtitle or badge", () => {
     const { toJSON } = renderRow(
-      <FeatureRow icon="wallet" title="Virtual accounts" subtitle="" badge="" />,
+      <FeatureRow icon="bitcoin" title="On/Off ramping" subtitle="" badge="" />,
     )
     const { toJSON: plain } = renderRow(
-      <FeatureRow icon="wallet" title="Virtual accounts" />,
+      <FeatureRow icon="bitcoin" title="On/Off ramping" />,
     )
 
     expect(toJSON()).toEqual(plain())

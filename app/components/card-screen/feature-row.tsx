@@ -11,7 +11,7 @@ export type FeatureRowProps = {
   badge?: string
 }
 
-const ICON_SIZE = 17
+const ICON_SIZE = 16
 const ICON_CONTAINER_SIZE = 26
 
 export const FeatureRow: React.FC<FeatureRowProps> = ({
@@ -32,8 +32,8 @@ export const FeatureRow: React.FC<FeatureRowProps> = ({
     <View style={styles.row}>
       <GaloyIcon
         name={icon}
-        color={colors.textOnAccent}
-        backgroundColor={colors.accent}
+        color={colors.textOnBackground}
+        backgroundColor={colors.neutral}
         size={ICON_SIZE}
         containerSize={ICON_CONTAINER_SIZE}
       />
