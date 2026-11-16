@@ -6,17 +6,30 @@ import { KycFlowType } from "@app/graphql/generated"
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
-let mockFocusEffect: () => void = () => {}
+type FocusEffect = () => (() => void) | void
+let mockFocusEffect: FocusEffect = () => {}
+let mockLeaveScreen: () => void = () => {}
 
-jest.mock("@react-navigation/native", () => ({
-  useNavigation: () => ({
-    navigate: mockNavigate,
-    goBack: mockGoBack,
-  }),
-  useFocusEffect: (effect: () => void) => {
-    mockFocusEffect = effect
-  },
-}))
+// Runs the effect the way React Navigation does: on focus when the screen mounts, and its
+// cleanup when the user leaves or the screen unmounts. A later call of mockFocusEffect is
+// the user coming back to the screen.
+jest.mock("@react-navigation/native", () => {
+  const { useEffect } = jest.requireActual("react")
+  return {
+    useNavigation: () => ({
+      navigate: mockNavigate,
+      goBack: mockGoBack,
+    }),
+    useFocusEffect: (effect: FocusEffect) => {
+      mockFocusEffect = effect
+      useEffect(() => {
+        const leave = effect()
+        mockLeaveScreen = () => leave?.()
+        return leave
+      }, [effect])
+    },
+  }
+})
 
 jest.mock("@rn-vui/themed", () => ({
   useTheme: () => ({
@@ -69,29 +82,29 @@ const recordedAlertButtons = (): RecordedAlertButton[] =>
 
 const navigatedUrl = (): string => mockNavigate.mock.calls[0][1].url as string
 
+let activeConsoleErrorSpy: jest.SpyInstance | undefined
+
+// Silences the console.error the hook logs for a failure the test programmed,
+// and hands it back so the test can assert the log happened. Restoring from
+// afterEach rather than at the end of each test is what makes it leak-proof:
+// an assertion failing first would skip an inline mockRestore() and leave
+// console.error muted for every test after it, exactly when the suite is
+// already red and its output matters most.
+const captureConsoleError = () => {
+  activeConsoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+  return activeConsoleErrorSpy
+}
+
+beforeEach(() => {
+  jest.clearAllMocks()
+})
+
+afterEach(() => {
+  activeConsoleErrorSpy?.mockRestore()
+  activeConsoleErrorSpy = undefined
+})
+
 describe("useKycFlow", () => {
-  let activeConsoleErrorSpy: jest.SpyInstance | undefined
-
-  // Silences the console.error the hook logs for a failure the test programmed,
-  // and hands it back so the test can assert the log happened. Restoring from
-  // afterEach rather than at the end of each test is what makes it leak-proof:
-  // an assertion failing first would skip an inline mockRestore() and leave
-  // console.error muted for every test after it, exactly when the suite is
-  // already red and its output matters most.
-  const captureConsoleError = () => {
-    activeConsoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
-    return activeConsoleErrorSpy
-  }
-
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
-  afterEach(() => {
-    activeConsoleErrorSpy?.mockRestore()
-    activeConsoleErrorSpy = undefined
-  })
-
   it("returns loading false initially", () => {
     const { result } = renderHook(() => useKycFlow())
 
@@ -646,6 +659,180 @@ describe("useKycFlow", () => {
     })
 
     expect(mockKycFlowStart).toHaveBeenCalledTimes(2)
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("useKycFlow when the user leaves before the start answers", () => {
+  const answered = { data: { kycFlowStart: { tokenWeb: "t", workflowRunId: "w" } } }
+
+  /** A start whose answer the test hands over when it wants. */
+  const deferStart = () => {
+    const deferred: {
+      resolve: (value: typeof answered) => void
+      reject: (reason: Error) => void
+    } = { resolve: () => {}, reject: () => {} }
+    mockKycFlowStart.mockImplementationOnce(
+      () =>
+        new Promise((resolve, reject) => {
+          deferred.resolve = resolve
+          deferred.reject = reject
+        }),
+    )
+    return deferred
+  }
+
+  it("does not open the web flow from a screen the user closed", async () => {
+    const start = deferStart()
+    const { result } = renderHook(() => useKycFlow())
+
+    let pendingStart: Promise<void>
+    await act(async () => {
+      pendingStart = result.current.startKyc()
+    })
+    act(() => {
+      mockLeaveScreen()
+    })
+
+    expect(result.current.loading).toBe(false)
+
+    await act(async () => {
+      start.resolve(answered)
+      await pendingStart!
+    })
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(result.current.loading).toBe(false)
+  })
+
+  it("does not open the web flow once the screen is gone", async () => {
+    const start = deferStart()
+    const { result, unmount } = renderHook(() => useKycFlow())
+
+    let pendingStart: Promise<void>
+    await act(async () => {
+      pendingStart = result.current.startKyc()
+    })
+    unmount()
+
+    await act(async () => {
+      start.resolve(answered)
+      await pendingStart!
+    })
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("shows no error and goes nowhere when the start fails once the screen is gone", async () => {
+    captureConsoleError()
+    const start = deferStart()
+    const { result, unmount } = renderHook(() => useKycFlow())
+
+    let pendingStart: Promise<void>
+    await act(async () => {
+      pendingStart = result.current.startKyc()
+    })
+    unmount()
+
+    await act(async () => {
+      start.reject(new Error("Network failure"))
+      await pendingStart!
+    })
+
+    expect(Alert.alert).not.toHaveBeenCalled()
+    expect(mockGoBack).not.toHaveBeenCalled()
+  })
+
+  it("does not go back for a cancelled start the user already left", async () => {
+    captureConsoleError()
+    const start = deferStart()
+    const { result } = renderHook(() => useKycFlow())
+
+    let pendingStart: Promise<void>
+    await act(async () => {
+      pendingStart = result.current.startKyc()
+    })
+    act(() => {
+      mockLeaveScreen()
+    })
+
+    await act(async () => {
+      start.reject(new Error("Request canceled"))
+      await pendingStart!
+    })
+
+    expect(mockGoBack).not.toHaveBeenCalled()
+  })
+
+  it("starts no second verification from a screen opened again before the first answers", async () => {
+    const firstStart = deferStart()
+    const firstVisit = renderHook(() => useKycFlow())
+
+    let pendingStart: Promise<void>
+    await act(async () => {
+      pendingStart = firstVisit.result.current.startKyc()
+    })
+    firstVisit.unmount()
+
+    const secondVisit = renderHook(() => useKycFlow())
+    await act(async () => {
+      await secondVisit.result.current.startKyc()
+    })
+
+    expect(mockKycFlowStart).toHaveBeenCalledTimes(1)
+    expect(secondVisit.result.current.loading).toBe(false)
+
+    await act(async () => {
+      firstStart.resolve(answered)
+      await pendingStart!
+    })
+    mockKycFlowStart.mockResolvedValueOnce(answered)
+    await act(async () => {
+      await secondVisit.result.current.startKyc()
+    })
+
+    expect(mockKycFlowStart).toHaveBeenCalledTimes(2)
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+  })
+
+  it("lets another verification type start while one is unanswered", async () => {
+    const cardStart = deferStart()
+    const cardStep = renderHook(() => useKycFlow({ type: KycFlowType.Card }))
+    const upgradeStep = renderHook(() => useKycFlow())
+    mockKycFlowStart.mockResolvedValueOnce(answered)
+
+    let pendingCardStart: Promise<void>
+    await act(async () => {
+      pendingCardStart = cardStep.result.current.startKyc()
+    })
+    await act(async () => {
+      await upgradeStep.result.current.startKyc()
+    })
+
+    expect(mockKycFlowStart).toHaveBeenCalledTimes(2)
+
+    await act(async () => {
+      cardStart.resolve(answered)
+      await pendingCardStart!
+    })
+  })
+
+  it("keeps an opened verification held through the blur its own push causes", async () => {
+    mockKycFlowStart.mockResolvedValueOnce(answered)
+    const { result } = renderHook(() => useKycFlow())
+
+    await act(async () => {
+      await result.current.startKyc()
+    })
+    act(() => {
+      mockLeaveScreen()
+    })
+    await act(async () => {
+      await result.current.startKyc()
+    })
+
+    expect(result.current.loading).toBe(true)
+    expect(mockKycFlowStart).toHaveBeenCalledTimes(1)
     expect(mockNavigate).toHaveBeenCalledTimes(1)
   })
 })
