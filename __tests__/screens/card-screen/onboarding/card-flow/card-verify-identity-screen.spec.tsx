@@ -7,11 +7,12 @@ import { ContextForScreen } from "../../../helper"
 
 const mockStartKyc = jest.fn()
 const mockUseKycFlow = jest.fn()
+let mockIsStartingKyc = false
 
 jest.mock("@app/hooks", () => ({
   useKycFlow: (params: unknown) => {
     mockUseKycFlow(params)
-    return { startKyc: mockStartKyc }
+    return { startKyc: mockStartKyc, loading: mockIsStartingKyc }
   },
 }))
 
@@ -29,6 +30,7 @@ describe("CardVerifyIdentityScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
+    mockIsStartingKyc = false
   })
 
   it("explains that the card issuer has to verify who the user is", async () => {
@@ -68,5 +70,18 @@ describe("CardVerifyIdentityScreen", () => {
     })
 
     expect(mockStartKyc).toHaveBeenCalledTimes(1)
+  })
+
+  it("holds Continue while the verification is starting", async () => {
+    mockIsStartingKyc = true
+    const { getByTestId, queryByText } = await renderScreen()
+
+    await act(async () => {
+      fireEvent.press(getByTestId("Continue"))
+    })
+
+    expect(queryByText("Continue")).toBeNull()
+    expect(getByTestId("Continue").props.accessibilityState).toMatchObject({ busy: true })
+    expect(mockStartKyc).not.toHaveBeenCalled()
   })
 })

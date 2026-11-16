@@ -27,7 +27,7 @@ export const CardVerifyIdentityScreen: React.FC = () => {
   } = useTheme()
   const { LL } = useI18nContext()
 
-  const { startKyc } = useKycFlow({
+  const { startKyc, loading: isStartingKyc } = useKycFlow({
     type: KycFlowType.Card,
     headerTitle: LL.CardFlow.Onboarding.kycHeaderTitle(),
   })
@@ -61,6 +61,7 @@ export const CardVerifyIdentityScreen: React.FC = () => {
         <GaloyPrimaryButton
           title={LL.CardFlow.Onboarding.CardVerifyIdentity.buttonText()}
           onPress={handleContinue}
+          loading={isStartingKyc}
         />
       }
     >
