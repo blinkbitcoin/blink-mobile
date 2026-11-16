@@ -42,12 +42,19 @@ describe("CardDetailsScreen", () => {
     expect(getByText("and priority support")).toBeTruthy()
   })
 
-  it("marks the accounts that come later with when they arrive", async () => {
+  it("marks on/off ramping as coming later, with when it arrives", async () => {
     const { getByText, getAllByText } = await renderScreen()
 
-    expect(getByText("Business accounts")).toBeTruthy()
-    expect(getByText("Virtual accounts")).toBeTruthy()
-    expect(getAllByText("in 12 months")).toHaveLength(2)
+    expect(getByText("On/Off ramping")).toBeTruthy()
+    expect(getAllByText("in 12 months")).toHaveLength(1)
+  })
+
+  /** Business and virtual accounts are Builder services and up, not Blink Orange's. */
+  it("lists none of the higher tiers' accounts", async () => {
+    const { queryByText } = await renderScreen()
+
+    expect(queryByText("Business accounts")).toBeNull()
+    expect(queryByText("Virtual accounts")).toBeNull()
   })
 
   it("explains the wait with the same number of months as the badges", async () => {

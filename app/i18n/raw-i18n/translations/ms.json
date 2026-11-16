@@ -3721,8 +3721,7 @@
             "title": "Pengurus akaun peribadi",
             "subtitle": "dan sokongan keutamaan"
           },
-          "businessAccounts": "Akaun perniagaan",
-          "virtualAccounts": "Akaun maya"
+          "onOffRamping": "Wang masuk dan keluar"
         },
         "availableIn": "dalam {months} bulan",
         "footnote": "Sesetengah ciri akan tersedia dalam tempoh {months} bulan. Kad sedia hari ini.",

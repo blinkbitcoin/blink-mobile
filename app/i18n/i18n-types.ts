@@ -12303,13 +12303,9 @@ type RootTranslation = {
 						subtitle: string
 					}
 					/**
-					 * B​u​s​i​n​e​s​s​ ​a​c​c​o​u​n​t​s
+					 * O​n​/​O​f​f​ ​r​a​m​p​i​n​g
 					 */
-					businessAccounts: string
-					/**
-					 * V​i​r​t​u​a​l​ ​a​c​c​o​u​n​t​s
-					 */
-					virtualAccounts: string
+					onOffRamping: string
 				}
 				/**
 				 * i​n​ ​{​m​o​n​t​h​s​}​ ​m​o​n​t​h​s
@@ -26679,13 +26675,9 @@ export type TranslationFunctions = {
 						subtitle: () => LocalizedString
 					}
 					/**
-					 * Business accounts
+					 * On/Off ramping
 					 */
-					businessAccounts: () => LocalizedString
-					/**
-					 * Virtual accounts
-					 */
-					virtualAccounts: () => LocalizedString
+					onOffRamping: () => LocalizedString
 				}
 				/**
 				 * in {months} months

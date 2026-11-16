@@ -3721,8 +3721,7 @@
             "title": "Személyes ügyfélmenedzser",
             "subtitle": "és elsőbbségi támogatás"
           },
-          "businessAccounts": "Üzleti számlák",
-          "virtualAccounts": "Virtuális számlák"
+          "onOffRamping": "Be- és kifizetések"
         },
         "availableIn": "{months} hónap múlva",
         "footnote": "Egyes funkciók {months} hónapon belül lesznek elérhetők. A kártya már ma kész.",

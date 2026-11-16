@@ -3721,8 +3721,7 @@
                         "title": "専任のアカウントマネージャー",
                         "subtitle": "優先サポート付き"
                     },
-                    "businessAccounts": "ビジネス口座",
-                    "virtualAccounts": "バーチャル口座"
+                    "onOffRamping": "入金と出金"
                 },
                 "availableIn": "{months}か月後",
                 "footnote": "一部の機能は{months}か月以内に利用可能になります。カードは今日から使えます。",

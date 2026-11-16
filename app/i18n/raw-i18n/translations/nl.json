@@ -3721,8 +3721,7 @@
             "title": "Persoonlijke accountmanager",
             "subtitle": "en voorrang bij support"
           },
-          "businessAccounts": "Zakelijke rekeningen",
-          "virtualAccounts": "Virtuele rekeningen"
+          "onOffRamping": "Geld storten en opnemen"
         },
         "availableIn": "over {months} maanden",
         "footnote": "Sommige functies komen binnen {months} maanden beschikbaar. De kaart is vandaag klaar.",

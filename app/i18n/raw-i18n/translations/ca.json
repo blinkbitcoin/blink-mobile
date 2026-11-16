@@ -3721,8 +3721,7 @@
             "title": "Gestor de compte personal",
             "subtitle": "i suport prioritari"
           },
-          "businessAccounts": "Comptes d'empresa",
-          "virtualAccounts": "Comptes virtuals"
+          "onOffRamping": "Entrada i sortida de diners"
         },
         "availableIn": "d'aquí a {months} mesos",
         "footnote": "Algunes funcions estaran disponibles d'aquí a {months} mesos. La targeta està llesta avui.",
