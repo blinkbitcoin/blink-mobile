@@ -4,6 +4,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { type TranslationFunctions } from "@app/i18n/i18n-types"
 import { measure, ScEvent } from "@app/self-custodial/measurement"
 import { conversionAttemptRef } from "@app/self-custodial/payment-details/lost-attempts"
 import { type MoneyAmount, type WalletOrDisplayCurrency } from "@app/types/amounts"
@@ -11,6 +12,7 @@ import {
   ConvertErrorCode,
   PaymentResultStatus,
   type ConvertParams,
+  type PaymentError,
 } from "@app/types/payment"
 import { reportError } from "@app/utils/error-logging"
 import { triggerHapticFeedback } from "@app/utils/helper"
@@ -18,6 +20,20 @@ import { triggerHapticFeedback } from "@app/utils/helper"
 import { buildConvertParams } from "../../build-convert-params"
 
 import { useConversionQuote } from "../use-conversion-quote"
+
+/** What a failed conversion tells the user: the app's own words for the outcomes the
+ *  bridge names, the SDK's message for anything else. */
+const conversionErrorMessage = (
+  LL: TranslationFunctions,
+  error: PaymentError | undefined,
+): string => {
+  const ownWords: Record<string, () => string> = {
+    [ConvertErrorCode.OutcomeUnknown]: LL.SelfCustodialError.outcomeUnknown,
+    [ConvertErrorCode.HistoryUnavailable]: LL.errors.generic,
+  }
+  const translate = error?.code === undefined ? undefined : ownWords[error.code]
+  return translate?.() ?? error?.message ?? LL.errors.generic()
+}
 
 type Params = {
   fromCurrency: WalletCurrency
@@ -119,12 +135,7 @@ export const useSelfCustodialConversion = ({
 
         /** A failed execute invalidates the pinned quote, so the retry re-quotes. */
         requote()
-        const error = result.errors?.[0]
-        setErrorMessage(
-          error?.code === ConvertErrorCode.OutcomeUnknown
-            ? LL.SelfCustodialError.outcomeUnknown()
-            : error?.message ?? LL.errors.generic(),
-        )
+        setErrorMessage(conversionErrorMessage(LL, result.errors?.[0]))
         triggerHapticFeedback("notificationError")
       } catch (err) {
         reportError("Self-custodial conversion execute", err)

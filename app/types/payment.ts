@@ -188,6 +188,9 @@ export const ConvertErrorCode = {
   /** A conversion threw after it was dispatched and its payment could not be found, so
    *  it may have gone through: no further conversion is sent until the user has checked. */
   OutcomeUnknown: "outcome_unknown",
+  /** Nothing was converted: the wallet's history could not be read, and a conversion
+   *  that went out without it could not be told apart from what came before. */
+  HistoryUnavailable: "history_unavailable",
 } as const
 
 export type ConvertErrorCode = (typeof ConvertErrorCode)[keyof typeof ConvertErrorCode]
@@ -267,13 +270,18 @@ export const resolveDustAdjustment = (
   return amountInSourceCurrency >= fromWalletBalance ? null : amountAdjustment
 }
 
-/** A conversion that threw after dispatch without turning up in the wallet's history:
- *  the wallet's own invoice it paid, when it went out, and the wallet's clock then
- *  (unix seconds), which is what the next conversion looks for it by. */
+/**
+ * A conversion that threw after dispatch without turning up in the wallet's history: when
+ * it went out, where the wallet's received payments stood then (the time the look reads
+ * from, in unix seconds, and every payment it knew then), and what each attempt was quoted
+ * to deliver (the dollar token, or bitcoin, and about how much, in base units),
+ * which is what the next conversion looks for what it delivered by.
+ */
 export type UnresolvedConversion = {
-  invoice: string
   startedAtMs: number
   walletClockSec: number
+  knownPaymentIds: ReadonlyArray<string>
+  expectedDeliveries: ReadonlyArray<{ tokenIdentifier?: string; amount: number }>
 }
 
 /**

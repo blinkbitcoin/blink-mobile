@@ -8,6 +8,7 @@ import {
   ReceivePaymentRequest,
   SendPaymentRequest,
   type BreezSdkInterface,
+  type ConversionEstimate,
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { toUsdMoneyAmount } from "@app/types/amounts"
@@ -37,9 +38,9 @@ import {
 } from "../measurement"
 import {
   CODES_RAISED_BEFORE_DISPATCH,
-  findLostSend,
-  isPaymentOfLostSend,
-  readWalletClockSec,
+  findLostConversion,
+  markReceivedHistory,
+  type ExpectedDelivery,
 } from "../payment-details/lost-send"
 import { classifySdkError } from "../sdk-error"
 
@@ -102,14 +103,8 @@ const buildConversionOptions = (direction: ConvertDirection) => ({
   completionTimeoutSecs: undefined,
 })
 
-/** A quoted conversion and the wallet's own invoice it pays, which is what the
- *  conversion can be found by in the wallet's history if its response is lost. */
-type QuotedConversion = {
+type PreparedConversion = {
   prepared: PrepareSendPaymentResponse
-  invoice: string
-}
-
-type PreparedConversion = QuotedConversion & {
   tokenDecimals: number
 }
 
@@ -119,19 +114,22 @@ const prepareConversionWithDestination = async (
     direction,
     destinationAmount,
   }: { direction: ConvertDirection; destinationAmount: bigint },
-): Promise<QuotedConversion> => {
+): Promise<PrepareSendPaymentResponse> => {
   const isBtcToUsd = direction === ConvertDirection.BtcToUsd
   const tokenIdentifier = isBtcToUsd ? requireSparkTokenIdentifier() : undefined
-  const invoice = await createOwnSparkInvoice(sdk, destinationAmount, tokenIdentifier)
-  const prepared = await sdk.prepareSendPayment(
+  const paymentRequest = await createOwnSparkInvoice(
+    sdk,
+    destinationAmount,
+    tokenIdentifier,
+  )
+  return sdk.prepareSendPayment(
     PrepareSendPaymentRequest.create({
-      paymentRequest: new PaymentRequest.Input({ input: invoice }),
+      paymentRequest: new PaymentRequest.Input({ input: paymentRequest }),
       amount: destinationAmount,
       tokenIdentifier,
       conversionOptions: buildConversionOptions(direction),
     }),
   )
-  return { prepared, invoice }
 }
 
 const fetchLimitsOrThrow = async (
@@ -258,53 +256,66 @@ const prepareConversion = async (
     direction: params.direction,
     destinationAmount: discoveryDestination,
   })
-  const discoveryEstimate = discovery.prepared.conversionEstimate
-  if (!discoveryEstimate) return { ...discovery, tokenDecimals }
+  const discoveryEstimate = discovery.conversionEstimate
+  if (!discoveryEstimate) return { prepared: discovery, tokenDecimals }
 
   const discoveryAmountIn = BigInt(toNumber(discoveryEstimate.amountIn))
   const discoveryAmountOut = BigInt(toNumber(discoveryEstimate.amountOut))
-  if (discoveryAmountIn === 0n) return { ...discovery, tokenDecimals }
+  if (discoveryAmountIn === 0n) return { prepared: discovery, tokenDecimals }
 
   const initialTarget = (discoveryAmountOut * inputAmount) / discoveryAmountIn
-  if (initialTarget <= 0n) return { ...discovery, tokenDecimals }
+  if (initialTarget <= 0n) return { prepared: discovery, tokenDecimals }
 
-  const final = await prepareConversionWithDestination(sdk, {
+  const prepared = await prepareConversionWithDestination(sdk, {
     direction: params.direction,
     destinationAmount: initialTarget,
   })
 
-  const finalEstimate = final.prepared.conversionEstimate
+  const finalEstimate = prepared.conversionEstimate
   const finalAmountIn = BigInt(toNumber(finalEstimate?.amountIn ?? 0n))
-  if (finalAmountIn <= inputAmount) return { ...final, tokenDecimals }
+  if (finalAmountIn <= inputAmount) return { prepared, tokenDecimals }
 
   /** SDK forced full-balance to avoid dust; correcting would swap the user's typed amount for the pool minimum. */
   if (finalEstimate?.amountAdjustment === AmountAdjustmentReason.IncreasedToAvoidDust) {
-    return { ...final, tokenDecimals }
+    return { prepared, tokenDecimals }
   }
 
   // Final overshoots: shrink by the observed ratio and re-quote once.
   const correctedTarget = (initialTarget * inputAmount) / finalAmountIn
-  if (correctedTarget <= 0n) return { ...discovery, tokenDecimals }
+  if (correctedTarget <= 0n) return { prepared: discovery, tokenDecimals }
 
   const corrected = await prepareConversionWithDestination(sdk, {
     direction: params.direction,
     destinationAmount: correctedTarget,
   })
-  return { ...corrected, tokenDecimals }
+  return { prepared: corrected, tokenDecimals }
 }
 
 const OUTCOME_UNKNOWN_MESSAGE = "Conversion outcome unknown"
+const HISTORY_UNAVAILABLE_MESSAGE = "Wallet history unavailable"
+
+/** The token a conversion delivers: the dollar token for one from bitcoin, none (sats)
+ *  for one to it. */
+const deliveredTokenOf = (direction: ConvertDirection): string | undefined =>
+  direction === ConvertDirection.BtcToUsd ? requireSparkTokenIdentifier() : undefined
 
 /**
  * Sends a quoted conversion so that a retry can never convert twice.
  *
- * A conversion is a token leg, which the SDK takes no idempotency key on, and every quote
- * pays a fresh invoice, so a retry after a lost response would be a second conversion.
- * A conversion that throws after dispatch is looked for by its invoice; when it does not
- * turn up, the attempt ref keeps it, and every later conversion on that ref looks for it
- * again and is refused until it is found, telling the user to check their history.
+ * A conversion is a token leg, which the SDK takes no idempotency key on, so a retry
+ * after a lost response would be a second conversion. Nor can it be found by the invoice
+ * it was quoted against: the SDK makes a conversion to the wallet itself inside the
+ * wallet and never pays that invoice, and the payment the swap delivers is all it leaves
+ * in the history. So where the wallet's received payments stand is marked before it goes
+ * out, and one that throws after dispatch is looked for as an own conversion delivered
+ * after that mark. When it does not turn up, the attempt ref keeps the mark, and every
+ * later conversion on that ref looks for it again and is refused until it is found,
+ * telling the user to check their history.
  */
-type ConversionExecution = QuotedConversion & {
+type ConversionExecution = {
+  prepared: PrepareSendPaymentResponse
+  /** What the quote pays in and is to deliver. */
+  estimate: ConversionEstimate
   /** The measurement context the quote was made in: the quote closes over that
    *  context's SDK, so its outcome belongs to that context too. */
   startedIn: number
@@ -314,7 +325,7 @@ type ConversionExecution = QuotedConversion & {
 
 const executePrepared = async (
   sdk: BreezSdkInterface,
-  { prepared, invoice, startedIn, params, attemptRef }: ConversionExecution,
+  { prepared, estimate, startedIn, params, attemptRef }: ConversionExecution,
 ): Promise<PaymentAdapterResult> => {
   /** Written through these rather than after each await: one conversion runs on a ref at
    *  a time (the screen's in-flight guard; auto-convert passes a ref of its own). */
@@ -327,16 +338,7 @@ const executePrepared = async (
     /** The earlier conversion is looked for again first. Found, it is what this one
      *  reports, and nothing more is converted: the funds it moved are the ones this
      *  retry would move a second time. Still missing, it keeps every retry refused. */
-    const lookup = await findLostSend({
-      sdk,
-      startedAtMs: earlier.startedAtMs,
-      walletClockSec: earlier.walletClockSec,
-      matches: (payment) =>
-        isPaymentOfLostSend(
-          { paymentHashes: [], sparkInvoices: [earlier.invoice] },
-          payment,
-        ),
-    })
+    const lookup = await findLostConversion({ sdk, lost: earlier })
     if (lookup.status !== "found") {
       return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
     }
@@ -346,6 +348,17 @@ const executePrepared = async (
   const swapTelemetry = {
     direction: params.direction,
     source: params.source ?? "manual",
+  }
+
+  /** Read before the conversion goes out, so what it delivers is told apart from every
+   *  payment received before it. Unread, nothing is converted: a conversion lost without
+   *  it could never be found again. */
+  const mark = await markReceivedHistory(sdk).catch((err: unknown) => {
+    recordConvertError(err, params, "markReceivedHistory")
+    return undefined
+  })
+  if (!mark) {
+    return failed(HISTORY_UNAVAILABLE_MESSAGE, ConvertErrorCode.HistoryUnavailable)
   }
 
   const startedAtMs = Date.now()
@@ -378,33 +391,30 @@ const executePrepared = async (
       return failed(err instanceof Error ? err.message : `Conversion failed: ${err}`)
     }
 
-    const walletClockSec = await readWalletClockSec(sdk)
-    const lost = await findLostSend({
-      sdk,
+    const thisDelivery: ExpectedDelivery = {
+      tokenIdentifier: deliveredTokenOf(params.direction),
+      amount: toNumber(estimate.amountOut),
+    }
+    const lost: UnresolvedConversion = {
       startedAtMs,
-      walletClockSec,
-      matches: (payment) =>
-        isPaymentOfLostSend({ paymentHashes: [], sparkInvoices: [invoice] }, payment),
-    })
-    if (lost.status === "found") {
+      ...mark,
+      expectedDeliveries: [thisDelivery],
+    }
+    const look = await findLostConversion({ sdk, lost })
+    if (look.status === "found") {
       measureIn(startedIn, ScEvent.SwapCompleted, swapTelemetry)
       return { status: PaymentResultStatus.Success }
     }
 
     reportSwapFailed()
-    keepUnresolved({ invoice, startedAtMs, walletClockSec })
+    keepUnresolved(lost)
     return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
   }
 }
 
 const toConvertQuote = (
   sdk: BreezSdkInterface,
-  {
-    prepared,
-    invoice,
-    tokenDecimals,
-    startedIn,
-  }: PreparedConversion & { startedIn: number },
+  { prepared, tokenDecimals, startedIn }: PreparedConversion & { startedIn: number },
   params: ConvertParams,
 ): ConvertQuote | null => {
   const estimate = prepared.conversionEstimate
@@ -414,7 +424,7 @@ const toConvertQuote = (
     feeAmount: toUsdMoneyAmount(feeCents),
     amountAdjustment: mapAmountAdjustment(estimate.amountAdjustment),
     execute: (attemptRef = {}) =>
-      executePrepared(sdk, { prepared, invoice, startedIn, params, attemptRef }),
+      executePrepared(sdk, { prepared, estimate, startedIn, params, attemptRef }),
   }
 }
 

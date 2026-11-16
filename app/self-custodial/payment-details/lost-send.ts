@@ -1,4 +1,7 @@
 import {
+  ConversionInfo,
+  ConversionPurpose,
+  ConversionStatus,
   PaymentDetails,
   PaymentStatus,
   type BreezSdkInterface,
@@ -12,10 +15,13 @@ import { withTimeout } from "@app/utils/with-timeout"
 
 import {
   getPaymentById,
+  listReceivedPaymentsSince,
   listSentPaymentsSince,
   newestSentPaymentTimestamp,
   syncSelfCustodialWallet,
+  type PaymentsPage,
 } from "../bridge/wallet"
+import { conversionInfoOf } from "../mappers/transaction"
 import { SelfCustodialErrorCode } from "../sdk-error"
 
 import { type LostSend } from "./lost-attempts"
@@ -121,8 +127,33 @@ const isFailedPayment = (payment: Payment): boolean =>
   payment.status === PaymentStatus.Failed
 
 /**
- * One look: the wallet catches up with the server, then its outgoing payments in the
- * window are read page by page, until the pages run short or the cap is hit. A completed
+ * The payments a look reads, page by page, and the ones among them that may be the
+ * attempt with nothing to match it by: while one is in the window, the look cannot say
+ * the attempt is absent.
+ */
+type HistoryKind = {
+  listPage: (
+    sdk: BreezSdkInterface,
+    page: PaymentsPage,
+  ) => ReturnType<typeof listSentPaymentsSince>
+  isUndescribed: (payment: Payment) => boolean
+}
+
+const SENT_PAYMENTS: HistoryKind = {
+  listPage: listSentPaymentsSince,
+  isUndescribed: isUndescribedSend,
+}
+
+/** What a conversion delivered is matched whether or not the wallet has labeled it as a
+ *  conversion's yet, so nothing received stands in for one unmatched. */
+const RECEIVED_PAYMENTS: HistoryKind = {
+  listPage: listReceivedPaymentsSince,
+  isUndescribed: () => false,
+}
+
+/**
+ * One look: the wallet catches up with the server, then its payments of the kind looked
+ * for in the window are read page by page, until the pages run short or the cap is hit. A completed
  * match does not end it: an older attempt's failed payment may sit on a later page, and
  * that attempt reports its end only once it is seen. Throws when the history could not
  * be read, except that a page failing, or the cap, after a landed match was made takes
@@ -133,6 +164,7 @@ type ScanHistoryParams = {
   sdk: BreezSdkInterface
   since: bigint
   matches: (payment: Payment) => boolean
+  kind: HistoryKind
   /** Filled as the pages come in rather than returned at the end, so what a look already
    *  saw outlives the look itself. A page that fails, a history with no end, and a look
    *  abandoned at its deadline all leave the caller whatever the pages before showed. */
@@ -148,6 +180,7 @@ const scanHistorySince = async ({
   sdk,
   since,
   matches,
+  kind,
   into,
   isExpired,
 }: ScanHistoryParams): Promise<void> => {
@@ -165,14 +198,14 @@ const scanHistorySince = async ({
   if (isExpired()) return
 
   for (let page = 0; page < LOST_SEND_MAX_PAGES; page += 1) {
-    const { payments } = await listSentPaymentsSince(sdk, {
+    const { payments } = await kind.listPage(sdk, {
       fromTimestamp: since,
       limit: LOST_SEND_PAGE_SIZE,
       offset: page * LOST_SEND_PAGE_SIZE,
     })
 
     into.matches.push(...payments.filter(matches))
-    if (payments.some(isUndescribedSend)) into.hasUndescribedSend = true
+    if (payments.some(kind.isUndescribed)) into.hasUndescribedSend = true
 
     const isLastPage = payments.length < LOST_SEND_PAGE_SIZE
     const isLookOver = isLastPage || isExpired()
@@ -211,7 +244,7 @@ const withoutPayment = (
  * which is "unreadable" and never "not-found", so it can still never make a send look
  * safe to repeat.
  */
-export const findLostSend = async ({
+export const findLostSend = ({
   sdk,
   startedAtMs,
   walletClockSec,
@@ -219,6 +252,18 @@ export const findLostSend = async ({
 }: FindLostSendParams): Promise<LostSendLookup> => {
   const earliestSec = Math.min(Math.floor(startedAtMs / 1000), walletClockSec)
   const since = BigInt(Math.max(0, earliestSec - LOST_SEND_LOOKBACK_SECONDS))
+  return lookForPayment({ sdk, since, matches, kind: SENT_PAYMENTS })
+}
+
+type LookForPaymentParams = Pick<ScanHistoryParams, "sdk" | "since" | "matches" | "kind">
+
+/** The looks themselves, over the payments of one kind made since `since`. */
+const lookForPayment = async ({
+  sdk,
+  since,
+  matches,
+  kind,
+}: LookForPaymentParams): Promise<LostSendLookup> => {
   let lastLook: LostSendLookup = { status: "not-found", failed: [] }
 
   for (let attempt = 1; attempt <= LOST_SEND_ATTEMPTS; attempt += 1) {
@@ -238,6 +283,7 @@ export const findLostSend = async ({
           sdk,
           since,
           matches,
+          kind,
           into: scan,
           isExpired: () => isOver,
         }),
@@ -386,6 +432,172 @@ export const isPaymentOfLostSend = (
   const sparkInvoice = sparkInvoiceOf(payment)
   return sparkInvoice !== undefined && lost.sparkInvoices.includes(sparkInvoice)
 }
+
+/**
+ * Where the wallet's received payments stood as a conversion went out, which is what is
+ * told apart from what the conversion delivers: the time the look reads from (unix
+ * seconds), and every payment received since then that the mark read. The time is a day
+ * before the earlier of the newest payment received and the phone's own clock, so a phone
+ * set ahead, or a payment stamped ahead (a token payment carries its sender's clock), does
+ * not on its own put it after the delivery, and each payment in that day is known, so
+ * none is taken for it. When the wallet received more in that day than a page holds, the
+ * time is the oldest one read instead: nothing the mark did not read is taken for
+ * unknown. A wallet that received nothing is read from its start, with nothing to tell
+ * apart, rather than from a phone clock that may be ahead.
+ */
+export type ReceivedHistoryMark = {
+  walletClockSec: number
+  knownPaymentIds: ReadonlyArray<string>
+}
+
+/**
+ * Reads where the wallet's received payments stand. Throws when they cannot be read, or
+ * not in time: a conversion that cannot be told apart from what came before must not go
+ * out, since nothing could find it again should its outcome be lost.
+ */
+export const markReceivedHistory = async (
+  sdk: BreezSdkInterface,
+  nowMs: number = Date.now(),
+): Promise<ReceivedHistoryMark> => {
+  const { payments } = await withTimeout(
+    listReceivedPaymentsSince(sdk, {
+      fromTimestamp: 0n,
+      limit: LOST_SEND_PAGE_SIZE,
+      offset: 0,
+    }),
+    LOST_SEND_ATTEMPT_TIMEOUT_MS,
+    "Received history mark",
+  )
+  if (payments.length === 0) return { walletClockSec: 0, knownPaymentIds: [] }
+  const nowSec = Math.floor(nowMs / 1000)
+  const newestSec = Number(payments[0].timestamp)
+  const dayBefore = Math.max(0, Math.min(newestSec, nowSec) - LOST_SEND_LOOKBACK_SECONDS)
+  const isPageFull = payments.length === LOST_SEND_PAGE_SIZE
+  const oldestRead = isPageFull ? Number(payments[payments.length - 1].timestamp) : 0
+  const walletClockSec = Math.max(dayBefore, oldestRead)
+  const known = payments.filter((payment) => Number(payment.timestamp) >= walletClockSec)
+  return { walletClockSec, knownPaymentIds: known.map((payment) => payment.id) }
+}
+
+/**
+ * What a conversion was quoted to deliver: dollars, which the wallet records as a payment
+ * of that token (`tokenIdentifier`), or bitcoin, a Spark payment, and about how much, in
+ * that asset's base units.
+ */
+export type ExpectedDelivery = { tokenIdentifier?: string; amount: number }
+
+/** How far an amount can be from the one a quote named and still be it: the quote's
+ *  slippage, and some. */
+const AMOUNT_TOLERANCE_BPS = 100
+
+/** How far above the quote a delivery can come in and still be it: the pool's price can
+ *  move in the user's favour between the quote and the swap, with no cap but this one. */
+const DELIVERY_SURPLUS_BPS = 1000
+
+/** Whether an amount is about the one a quote named, either way. */
+export const isAboutAmount = (amount: number, quoted: number): boolean =>
+  Math.abs(amount - quoted) <= (quoted * AMOUNT_TOLERANCE_BPS) / 10_000
+
+/** Whether a delivered amount is what a quote named: not much below it, as slippage
+ *  allows, and up to a better price above it. */
+export const isAboutDelivered = (amount: number, quoted: number): boolean => {
+  const isAboveFloor = amount >= quoted - (quoted * AMOUNT_TOLERANCE_BPS) / 10_000
+  const isBelowCeiling = amount <= quoted + (quoted * DELIVERY_SURPLUS_BPS) / 10_000
+  return isAboveFloor && isBelowCeiling
+}
+
+const isDelivering = (status: ConversionStatus): boolean =>
+  status === ConversionStatus.Completed || status === ConversionStatus.Pending
+
+/**
+ * Whether a payment in the wallet's history is what a conversion this app made delivered:
+ * one that paid the wallet's own invoice, and delivered or is still delivering. The SDK
+ * makes such a conversion in the wallet and never pays the invoice, so the payment the
+ * swap delivers is all it leaves in the history. The Stable Balance's own conversions,
+ * those paying someone else, and the refund of one that failed (a leg of it as well) are
+ * none of these.
+ */
+const isDeliveryOfOwnConversion = (payment: Payment): boolean => {
+  const info = conversionInfoOf(payment)
+  if (!info || !ConversionInfo.Amm.instanceOf(info)) return false
+  const { purpose } = info.inner
+  const isOwn =
+    purpose !== undefined && ConversionPurpose.SelfTransfer.instanceOf(purpose)
+  const status = payment.conversionDetails?.status ?? info.inner.status
+  return isOwn && isDelivering(status)
+}
+
+/** Whether the wallet records a payment the way a delivery of that asset comes in. */
+const isRecordedAs = (
+  payment: Payment,
+  { tokenIdentifier }: ExpectedDelivery,
+): boolean => {
+  const { details } = payment
+  if (!details) return false
+  if (tokenIdentifier === undefined) return PaymentDetails.Spark.instanceOf(details)
+  const isToken = PaymentDetails.Token.instanceOf(details)
+  return isToken && details.inner.metadata.identifier === tokenIdentifier
+}
+
+/** Whether a payment delivers what an attempt was quoted to: its asset, about as much. */
+export const isDeliveryAsExpected = (payment: Payment, delivery: ExpectedDelivery) =>
+  isRecordedAs(payment, delivery) &&
+  isAboutDelivered(Number(payment.amount), delivery.amount)
+
+/**
+ * Whether a payment may be what a conversion delivered before the wallet says so: received
+ * with no conversion recorded on it, as the asset a lost conversion was quoted to deliver,
+ * and about as much. The SDK records a delivery as its conversion's leg once its own call
+ * to the pool answers; one whose answer was lost is recorded so only later, once the SDK
+ * finds that the swap ran.
+ */
+const isUnlabeledDelivery = (
+  payment: Payment,
+  expectedDeliveries: ReadonlyArray<ExpectedDelivery>,
+): boolean =>
+  conversionInfoOf(payment) === undefined &&
+  expectedDeliveries.some((delivery) => isDeliveryAsExpected(payment, delivery))
+
+/** A lost conversion as it is looked for: where the received payments stood as it went
+ *  out, and what each of its attempts was quoted to deliver. */
+export type LostConversionLook = ReceivedHistoryMark & {
+  expectedDeliveries: ReadonlyArray<ExpectedDelivery>
+}
+
+/**
+ * Whether a payment in the wallet's history is what a conversion lost after `lost` was
+ * marked delivered: received since the mark, none of the payments the mark already knew,
+ * and an own conversion's delivery, or one not labeled as such yet.
+ */
+export const isPaymentOfLostConversion = (
+  lost: LostConversionLook,
+  payment: Payment,
+): boolean => {
+  const isSinceMark = Number(payment.timestamp) >= lost.walletClockSec
+  const isKnown = lost.knownPaymentIds.includes(payment.id)
+  const isDelivery =
+    isDeliveryOfOwnConversion(payment) ||
+    isUnlabeledDelivery(payment, lost.expectedDeliveries)
+  return isSinceMark && !isKnown && isDelivery
+}
+
+/**
+ * What a conversion lost after `lost` was marked delivered, looked for as `findLostSend`
+ * looks for a send, from the mark's time.
+ */
+export const findLostConversion = ({
+  sdk,
+  lost,
+}: {
+  sdk: BreezSdkInterface
+  lost: LostConversionLook
+}): Promise<LostSendLookup> =>
+  lookForPayment({
+    sdk,
+    since: BigInt(lost.walletClockSec),
+    matches: (payment) => isPaymentOfLostConversion(lost, payment),
+    kind: RECEIVED_PAYMENTS,
+  })
 
 /**
  * The failures the SDK raises before it sends anything: the amount, the request or the

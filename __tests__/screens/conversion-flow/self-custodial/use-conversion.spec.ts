@@ -555,6 +555,25 @@ describe("useSelfCustodialConversion", () => {
       expect(result.current.errorMessage).toBe("Check your history")
     })
 
+    it("asks to try again, not the SDK's words, when the wallet's history was unreadable", async () => {
+      mockGetQuote.mockResolvedValue(
+        makeQuote({
+          execute: jest.fn().mockResolvedValue({
+            status: PaymentResultStatus.Failed,
+            errors: [{ message: "raw", code: ConvertErrorCode.HistoryUnavailable }],
+          }),
+        }),
+      )
+
+      const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+      await waitFor(() => expect(result.current.canExecute).toBe(true))
+      await act(async () => {
+        await result.current.execute()
+      })
+
+      expect(result.current.errorMessage).toBe("Generic error")
+    })
+
     it("hands every quote the same attempt ref, so a re-quote cannot convert again", async () => {
       const firstExecute = unknownOutcome()
       const secondExecute = unknownOutcome()

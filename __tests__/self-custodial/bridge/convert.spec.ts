@@ -24,15 +24,20 @@ import { AccountMode } from "@app/types/account"
 const mockFetchLimits = jest.fn()
 const mockRequireTokenId = jest.fn(() => "usdb-token-id")
 const mockRecordError = jest.fn()
-const mockFindLostSend = jest.fn()
-const WALLET_CLOCK_SEC = 1_700_000_000
-const mockReadWalletClockSec = jest.fn(() => Promise.resolve(WALLET_CLOCK_SEC))
+const mockFindLostConversion = jest.fn()
+/** Where the wallet's received payments stood as the conversion went out. */
+const MARK = { walletClockSec: 1_700_000_000, knownPaymentIds: ["rcv-before"] }
+const mockMarkReceivedHistory = jest.fn()
 
 jest.mock("@app/self-custodial/payment-details/lost-send", () => ({
   ...jest.requireActual("@app/self-custodial/payment-details/lost-send"),
-  findLostSend: (...args: unknown[]) => mockFindLostSend(...args),
-  readWalletClockSec: () => mockReadWalletClockSec(),
+  findLostConversion: (...args: unknown[]) => mockFindLostConversion(...args),
+  markReceivedHistory: (...args: unknown[]) => mockMarkReceivedHistory(...args),
 }))
+
+beforeEach(() => {
+  mockMarkReceivedHistory.mockResolvedValue(MARK)
+})
 
 jest.mock("@app/self-custodial/analytics-identity", () => ({
   /** The identity owner's own spec covers when delivery is safe; here it is in place. */
@@ -291,7 +296,7 @@ describe("createGetConversionQuote — error handling", () => {
       toAmount: toUsdMoneyAmount(137),
       direction: ConvertDirection.BtcToUsd,
     })
-    mockFindLostSend.mockResolvedValue({ status: "not-found" })
+    mockFindLostConversion.mockResolvedValue({ status: "not-found" })
     const result = await quote!.execute()
 
     expect(result.status).toBe("failed")
@@ -463,7 +468,7 @@ describe("swap telemetry", () => {
       network: "mainnet",
     })
     mockFetchLimits.mockResolvedValue({ minFromAmount: 1000, minToAmount: 0 })
-    mockFindLostSend.mockResolvedValue({ status: "not-found" })
+    mockFindLostConversion.mockResolvedValue({ status: "not-found" })
   })
 
   afterAll(() => {
@@ -531,15 +536,20 @@ describe("swap telemetry", () => {
   it("does not report a rejection that arrives after a switch to another account", async () => {
     const sdk = createSdk()
     let rejectSend: (err: unknown) => void = () => undefined
-    sdk.sendPayment.mockImplementation(
-      () =>
-        new Promise((_resolve, reject) => {
-          rejectSend = reject
-        }),
-    )
+    /** The conversion goes out only once the wallet's received payments are marked. */
+    const sendStarted = new Promise<void>((started) => {
+      sdk.sendPayment.mockImplementation(
+        () =>
+          new Promise((_resolve, reject) => {
+            rejectSend = reject
+            started()
+          }),
+      )
+    })
     const quote = await createGetConversionQuote(sdk as never)(params)
 
     const executing = quote!.execute()
+    await sendStarted
     setMeasurementContext({
       accountId: "sc-2",
       mode: AccountMode.Enhanced,
@@ -562,7 +572,7 @@ describe("swap telemetry", () => {
   })
 
   it("reports a thrown conversion the wallet turns out to hold as completed", async () => {
-    mockFindLostSend.mockResolvedValue({ status: "found", payment: { id: "cv-1" } })
+    mockFindLostConversion.mockResolvedValue({ status: "found", payment: { id: "cv-1" } })
     const sdk = createSdk()
     sdk.sendPayment.mockRejectedValue(new Error("connection reset"))
 
@@ -574,16 +584,21 @@ describe("swap telemetry", () => {
 })
 
 describe("createGetConversionQuote — a conversion whose response is lost", () => {
-  const OWN_INVOICE = "sp1own-spark-address"
-
   const throwingSdk = () => ({
     prepareSendPayment: jest.fn().mockResolvedValue({
       paymentMethod: {},
-      conversionEstimate: { fee: BigInt(0), amountAdjustment: undefined },
+      conversionEstimate: {
+        fee: BigInt(0),
+        amountIn: BigInt(5000),
+        amountOut: BigInt(1_370_000),
+        amountAdjustment: undefined,
+      },
     }),
     sendPayment: jest.fn().mockRejectedValue(new Error("connection reset")),
-    receivePayment: jest.fn().mockResolvedValue({ paymentRequest: OWN_INVOICE }),
+    receivePayment: jest.fn().mockResolvedValue({ paymentRequest: "sp1own-invoice" }),
     getInfo: jest.fn().mockResolvedValue({ tokenBalances: {} }),
+    listPayments: jest.fn(),
+    syncWallet: jest.fn().mockResolvedValue({}),
   })
 
   const quoteFor = (sdk: ReturnType<typeof throwingSdk>) =>
@@ -593,44 +608,94 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
       direction: ConvertDirection.BtcToUsd,
     })
 
-  const paymentOfInvoice = (invoice: string) => ({
-    details: { tag: "Spark", inner: { invoiceDetails: { invoice } } },
-  })
-
   beforeEach(() => {
     jest.clearAllMocks()
+    mockMarkReceivedHistory.mockResolvedValue(MARK)
     mockFetchLimits.mockResolvedValue({ minFromAmount: null, minToAmount: null })
   })
 
-  it("looks for the conversion by the wallet's own invoice it paid", async () => {
-    mockFindLostSend.mockResolvedValue({ status: "not-found" })
+  it("marks where the wallet's received payments stand before the conversion goes out", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found" })
     const sdk = throwingSdk()
 
     await (await quoteFor(sdk))!.execute()
 
-    const { matches } = mockFindLostSend.mock.calls[0][0]
-    expect(matches(paymentOfInvoice(OWN_INVOICE))).toBe(true)
-    expect(matches(paymentOfInvoice("sp1someone-else"))).toBe(false)
+    const [markedAt] = mockMarkReceivedHistory.mock.invocationCallOrder
+    const [sentAt] = sdk.sendPayment.mock.invocationCallOrder
+    expect(markedAt).toBeLessThan(sentAt)
   })
 
-  it("reports the conversion as done when the wallet holds it", async () => {
-    mockFindLostSend.mockResolvedValue({ status: "found", payment: { id: "c1" } })
+  it("converts nothing when the wallet's received payments cannot be read", async () => {
+    mockMarkReceivedHistory.mockRejectedValue(new Error("storage failed"))
+    const sdk = throwingSdk()
+
+    const result = await (await quoteFor(sdk))!.execute()
+
+    expect(result.errors?.[0].code).toBe(ConvertErrorCode.HistoryUnavailable)
+    expect(sdk.sendPayment).not.toHaveBeenCalled()
+    expect(mockRecordError).toHaveBeenCalled()
+  })
+
+  it("looks for what the conversion delivered after the mark", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found" })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+
+    expect(mockFindLostConversion).toHaveBeenCalledWith({
+      sdk,
+      lost: {
+        startedAtMs: expect.any(Number),
+        ...MARK,
+        expectedDeliveries: [{ tokenIdentifier: "usdb-token-id", amount: 1_370_000 }],
+      },
+    })
+  })
+
+  it("expects bitcoin, with no token, from a lost conversion to bitcoin", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+    sdk.getInfo.mockResolvedValue({
+      tokenBalances: {
+        "usdb-token-id": {
+          balance: 1_000_000_000n,
+          tokenMetadata: { identifier: "usdb-token-id", decimals: 6 },
+        },
+      },
+    })
+
+    await (await createGetConversionQuote(sdk as never)({
+      fromAmount: toUsdMoneyAmount(137),
+      toAmount: toBtcMoneyAmount(5000),
+      direction: ConvertDirection.UsdToBtc,
+    }))!.execute()
+
+    expect(mockFindLostConversion.mock.calls[0][0].lost.expectedDeliveries).toEqual([
+      { tokenIdentifier: undefined, amount: 1_370_000 },
+    ])
+  })
+
+  it("reports the conversion as done when the wallet holds what it delivered", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "found", payment: { id: "c1" } })
 
     const result = await (await quoteFor(throwingSdk()))!.execute()
 
     expect(result.status).toBe("success")
   })
 
-  it("looks for it back from the wallet's own clock", async () => {
-    mockFindLostSend.mockResolvedValue({ status: "not-found" })
+  it("does not look for a conversion the SDK refused on the way in", async () => {
+    const sdk = throwingSdk()
+    sdk.sendPayment.mockRejectedValue({ tag: "InsufficientFunds", inner: ["no funds"] })
 
-    await (await quoteFor(throwingSdk()))!.execute()
+    const result = await (await quoteFor(sdk))!.execute()
 
-    expect(mockFindLostSend.mock.calls[0][0].walletClockSec).toBe(WALLET_CLOCK_SEC)
+    expect(result.status).toBe("failed")
+    expect(result.errors?.[0].code).toBeUndefined()
+    expect(mockFindLostConversion).not.toHaveBeenCalled()
   })
 
   it("refuses every later conversion on the ref while it cannot be found", async () => {
-    mockFindLostSend.mockResolvedValue({ status: "not-found" })
+    mockFindLostConversion.mockResolvedValue({ status: "not-found" })
     const sdk = throwingSdk()
     const attemptRef = {}
 
@@ -642,22 +707,23 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
   })
 
-  it("looks for the lost conversion again, by its own invoice, before refusing a retry", async () => {
-    mockFindLostSend.mockResolvedValue({ status: "not-found" })
+  it("looks for the lost conversion again, from its own mark, before refusing a retry", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found" })
     const sdk = throwingSdk()
     const attemptRef = {}
 
     await (await quoteFor(sdk))!.execute(attemptRef)
+    mockMarkReceivedHistory.mockResolvedValue({ walletClockSec: 1, knownPaymentIds: [] })
     await (await quoteFor(sdk))!.execute(attemptRef)
 
-    expect(mockFindLostSend).toHaveBeenCalledTimes(2)
-    const retryLookup = mockFindLostSend.mock.calls[1][0]
-    expect(retryLookup.walletClockSec).toBe(WALLET_CLOCK_SEC)
-    expect(retryLookup.matches(paymentOfInvoice(OWN_INVOICE))).toBe(true)
+    expect(mockFindLostConversion).toHaveBeenCalledTimes(2)
+    expect(mockFindLostConversion.mock.calls[1][0].lost).toEqual(
+      mockFindLostConversion.mock.calls[0][0].lost,
+    )
   })
 
   it("reports a retry as the lost conversion once it turns up, converting nothing more", async () => {
-    mockFindLostSend
+    mockFindLostConversion
       .mockResolvedValueOnce({ status: "not-found" })
       .mockResolvedValueOnce({ status: "found", payment: { id: "c1" } })
     const sdk = throwingSdk()
@@ -671,7 +737,7 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
   })
 
   it("converts again normally once the lost conversion was found", async () => {
-    mockFindLostSend
+    mockFindLostConversion
       .mockResolvedValueOnce({ status: "not-found" })
       .mockResolvedValueOnce({ status: "found", payment: { id: "c1" } })
     const sdk = throwingSdk()
@@ -687,12 +753,84 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
   })
 
   it("does not carry the refusal to a conversion with its own attempt ref", async () => {
-    mockFindLostSend.mockResolvedValue({ status: "not-found" })
+    mockFindLostConversion.mockResolvedValue({ status: "not-found" })
     const sdk = throwingSdk()
 
     await (await quoteFor(sdk))!.execute({})
     await (await quoteFor(sdk))!.execute({})
 
     expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  /**
+   * The wallet as the SDK (0.27.1) records a conversion to itself: the invoice the quote
+   * was made against is never paid, and what the swap delivered comes in as a token
+   * payment, a leg of a self-transfer conversion, after everything received before.
+   */
+  it("finds a lost conversion in a wallet that records it as the SDK does", async () => {
+    const actual = jest.requireActual("@app/self-custodial/payment-details/lost-send")
+    mockMarkReceivedHistory.mockImplementation(actual.markReceivedHistory)
+    mockFindLostConversion.mockImplementation(actual.findLostConversion)
+    const receivedBefore = {
+      id: "rcv-before",
+      timestamp: BigInt(MARK.walletClockSec),
+      amount: BigInt(2100),
+      status: 0,
+      details: { tag: "Spark", inner: { invoiceDetails: undefined } },
+    }
+    const delivered = {
+      id: "rcv-usdb",
+      timestamp: BigInt(MARK.walletClockSec + 3),
+      amount: BigInt(1_370_000),
+      status: 0,
+      details: {
+        tag: "Token",
+        inner: {
+          invoiceDetails: undefined,
+          conversionInfo: {
+            tag: "Amm",
+            inner: { status: 1, purpose: { tag: "SelfTransfer" } },
+          },
+        },
+      },
+      conversionDetails: { status: 1, conversions: [] },
+    }
+    const sdk = throwingSdk()
+    sdk.listPayments
+      .mockResolvedValueOnce({ payments: [receivedBefore] })
+      .mockResolvedValue({ payments: [delivered, receivedBefore] })
+
+    const result = await (await quoteFor(sdk))!.execute()
+
+    expect(result.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  /** The SDK labels a delivery as its conversion's once its own call to the pool answers;
+   *  when that answer is the one lost, the delivery comes in as a plain token payment. */
+  it("finds a lost conversion the wallet has not labeled as one yet", async () => {
+    const actual = jest.requireActual("@app/self-custodial/payment-details/lost-send")
+    mockMarkReceivedHistory.mockImplementation(actual.markReceivedHistory)
+    mockFindLostConversion.mockImplementation(actual.findLostConversion)
+    const unlabeled = {
+      id: "rcv-usdb",
+      /** Delivered now, by the server's clock: nothing was received before it. */
+      timestamp: BigInt(Math.floor(Date.now() / 1000)),
+      amount: BigInt(1_370_000),
+      status: 1,
+      details: {
+        tag: "Token",
+        inner: { invoiceDetails: undefined, metadata: { identifier: "usdb-token-id" } },
+      },
+    }
+    const sdk = throwingSdk()
+    sdk.listPayments
+      .mockResolvedValueOnce({ payments: [] })
+      .mockResolvedValue({ payments: [unlabeled] })
+
+    const result = await (await quoteFor(sdk))!.execute()
+
+    expect(result.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
   })
 })
