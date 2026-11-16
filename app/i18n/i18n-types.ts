@@ -12459,10 +12459,6 @@ type RootTranslation = {
 			}
 			CardVerifyIdentity: {
 				/**
-				 * B​l​i​n​k​ ​O​r​a​n​g​e
-				 */
-				headerTitle: string
-				/**
 				 * V​e​r​i​f​y​ ​y​o​u​r​ ​i​d​e​n​t​i​t​y
 				 */
 				title: string
@@ -26827,10 +26823,6 @@ export type TranslationFunctions = {
 				freeNotice: () => LocalizedString
 			}
 			CardVerifyIdentity: {
-				/**
-				 * Blink Orange
-				 */
-				headerTitle: () => LocalizedString
 				/**
 				 * Verify your identity
 				 */

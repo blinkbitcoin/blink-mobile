@@ -3690,7 +3690,6 @@
         "freeNotice": "أفهم أن Blink Orange مجاني حاليًا، وأنه قد تُفرض رسوم عضوية لاحقًا مع إشعار مسبق"
       },
       "CardVerifyIdentity": {
-        "headerTitle": "Blink Orange",
         "title": "تحقق من هويتك",
         "description": "لتفعيل بطاقة Blink، يجب على جهة إصدار البطاقة التحقق من هويتك (KYC). ستحتاج إلى:",
         "requirements": {

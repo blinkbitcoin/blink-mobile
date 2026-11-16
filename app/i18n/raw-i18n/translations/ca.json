@@ -3690,7 +3690,6 @@
         "freeNotice": "Entenc que Blink Orange és gratuït de moment i que més endavant es podria introduir una quota de membre, amb avís previ"
       },
       "CardVerifyIdentity": {
-        "headerTitle": "Blink Orange",
         "title": "Verifica la teva identitat",
         "description": "Per activar la teva Blink Card, l'emissor de la targeta ha de verificar qui ets (KYC). Necessitaràs:",
         "requirements": {

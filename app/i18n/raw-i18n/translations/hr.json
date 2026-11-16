@@ -3690,7 +3690,6 @@
         "freeNotice": "Razumijem da je Blink Orange za sada besplatan te da se članarina može uvesti kasnije, uz prethodnu obavijest"
       },
       "CardVerifyIdentity": {
-        "headerTitle": "Blink Orange",
         "title": "Potvrdite svoj identitet",
         "description": "Da biste aktivirali svoju Blink karticu, izdavatelj kartice mora potvrditi tko ste (KYC). Trebat će vam:",
         "requirements": {

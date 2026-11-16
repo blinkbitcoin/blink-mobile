@@ -3690,7 +3690,6 @@
         "freeNotice": "Tôi hiểu rằng Blink Orange hiện miễn phí và có thể áp dụng phí thành viên sau này, kèm thông báo trước"
       },
       "CardVerifyIdentity": {
-        "headerTitle": "Blink Orange",
         "title": "Xác minh danh tính của bạn",
         "description": "Để kích hoạt Thẻ Blink, đơn vị phát hành thẻ cần xác minh bạn là ai (KYC). Bạn sẽ cần:",
         "requirements": {

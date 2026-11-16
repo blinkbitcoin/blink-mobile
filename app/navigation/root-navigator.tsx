@@ -1003,7 +1003,9 @@ export const RootStack = () => {
         name="cardOnboardingVerifyIdentityScreen"
         component={CardVerifyIdentityScreen}
         options={{
-          title: LL.CardFlow.Onboarding.CardVerifyIdentity.headerTitle(),
+          /** The design leaves this step untitled. */
+          title: "",
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen

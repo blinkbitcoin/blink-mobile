@@ -44,6 +44,7 @@ describe("card onboarding header controls in root-navigator", () => {
     const BACK_AND_CLOSE_ROUTES = [
       "cardOnboardingIntroducingScreen",
       "cardOnboardingDetailsScreen",
+      "cardOnboardingVerifyIdentityScreen",
     ]
 
     BACK_AND_CLOSE_ROUTES.forEach((route) => {
@@ -54,12 +55,8 @@ describe("card onboarding header controls in root-navigator", () => {
     })
   })
 
-  /** The design gives this step a back arrow and the membership name, and no close. */
-  it("titles the verify identity step and leaves the close button out", () => {
-    const options = registration("cardOnboardingVerifyIdentityScreen")
-
-    expect(options).toContain("CardVerifyIdentity.headerTitle()")
-    expect(options).not.toContain("headerCloseControlOptions")
-    expect(options).not.toContain("noHeaderBack")
+  /** An unset title would fall back to the route name. */
+  it("leaves the verify identity step untitled, as the design does", () => {
+    expect(registration("cardOnboardingVerifyIdentityScreen")).toContain('title: ""')
   })
 })
