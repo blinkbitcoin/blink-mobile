@@ -274,7 +274,10 @@ describe("CardSubscriptionScreen - price change while mounted", () => {
       mockPriceUsd = fromPriceUsd
       const { getByText, getAllByTestId, getByTestId, rerender } = await renderScreen()
 
-      await checkBoxes(getAllByTestId, ALL_SUBSCRIBE_CHECKBOXES)
+      await checkBoxes(getAllByTestId, [
+        NOTICE_CHECKBOX_INDEX,
+        FEE_SCHEDULE_CHECKBOX_INDEX,
+      ])
       await changePrice(rerender, toPriceUsd)
       await act(async () => {
         fireEvent.press(getByText("Accept"))
