@@ -401,9 +401,10 @@ const withoutAttempt = <L extends LostConversionLook>(
  * wallet and never pays that invoice, and the payment the swap delivers is all it leaves
  * in the history. So where the wallet's received payments stand is marked before it goes
  * out, and one that throws after dispatch is looked for as an own conversion delivered
- * after that mark. When it does not turn up, the mark is kept with the wallet's lost
- * attempts, across app launches, and the next conversion in the wallet, manual or
- * automatic, looks for it first:
+ * after that mark. The mark is stored with the wallet's lost attempts before the
+ * conversion goes out, so an app closed with it in flight leaves it to be looked for too,
+ * and is kept when it does not turn up, across app launches. The next conversion in the
+ * wallet, manual or automatic, looks for it first:
  * - found, it is reported, and nothing more is converted: as this conversion when it is
  *   the same one asked again, as an earlier one otherwise, for the user to check; any
  *   other attempt it holds is still looked for;
@@ -497,11 +498,38 @@ const convertAfterEarlierConversions = async (
   }
 
   const startedAtMs = Date.now()
+  const thisDelivery: ExpectedDelivery = {
+    tokenIdentifier: deliveredTokenOf(params.direction),
+    amount: toNumber(estimate.amountOut),
+    isAutomatic,
+  }
+  /** What this conversion leaves to be looked for should its outcome be lost: with the
+   *  lost conversion it was let through past, from the earlier mark, since either may
+   *  deliver. */
+  const lost: LostConversion = {
+    ...(earlier ?? { startedAtMs, ...mark }),
+    knownPaymentIds: [
+      ...new Set([...(earlier?.knownPaymentIds ?? []), ...mark.knownPaymentIds]),
+    ],
+    expectedDeliveries: [...(earlier?.expectedDeliveries ?? []), thisDelivery],
+    lastAttemptAtMs: startedAtMs,
+  }
+  /** Stored before the conversion goes out, and waited for a moment: the app can be
+   *  closed with it in flight, and the next launch must look for it before converting
+   *  again. */
+  const writtenAhead = attempts.writeAhead((current) => ({
+    ...current,
+    lostConversion: lost,
+  }))
+  await writtenAhead.written
+
   try {
     const response = await sdk.sendPayment(
       SendPaymentRequest.create({ prepareResponse: prepared }),
     )
-    /** Out, it settles the lost conversion it was let through past. */
+    /** Answered, it leaves nothing to look for: taken back before anything else is
+     *  stored. Out, it settles the lost conversion it was let through past. */
+    writtenAhead.end()
     if (earlier) keepLost(undefined)
     /** By the SDK's word on the payment, as for sends: a conversion normally comes back
      *  completed, and one that does not is held until its outcome is announced. */
@@ -529,24 +557,13 @@ const convertAfterEarlierConversions = async (
     }
 
     /** Looked for together with the lost conversion it was let through past, from the
-     *  earlier mark: either may have delivered by now. */
-    const thisDelivery: ExpectedDelivery = {
-      tokenIdentifier: deliveredTokenOf(params.direction),
-      amount: toNumber(estimate.amountOut),
-      isAutomatic,
-    }
-    const lost: LostConversion = {
-      ...(earlier ?? { startedAtMs, ...mark }),
-      knownPaymentIds: [
-        ...new Set([...(earlier?.knownPaymentIds ?? []), ...mark.knownPaymentIds]),
-      ],
-      expectedDeliveries: [...(earlier?.expectedDeliveries ?? []), thisDelivery],
-      lastAttemptAtMs: startedAtMs,
-    }
+     *  earlier mark: either may have delivered by now. What was stored ahead stays
+     *  stored meanwhile, and is taken back only once what the look leaves is held. */
     const look = await findLostConversion({ sdk, lost })
     const isFoundAsThis = look.status === "found" && isThisConversion(look.payment)
     if (isFoundAsThis) {
       keepLost(undefined)
+      writtenAhead.end()
       measureIn(startedIn, ScEvent.SwapCompleted, swapTelemetry)
       return { status: PaymentResultStatus.Success }
     }
@@ -559,6 +576,7 @@ const convertAfterEarlierConversions = async (
         : lost.knownPaymentIds
     reportSwapFailed()
     keepLost({ ...lost, knownPaymentIds })
+    writtenAhead.end()
     return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
   }
 }

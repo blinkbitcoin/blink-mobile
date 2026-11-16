@@ -18,6 +18,7 @@ import {
 import {
   OWN_CONVERSIONS,
   scopeLostAttemptsTo,
+  STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS,
   type LostAttempts,
   type LostAttemptsStorage,
 } from "@app/self-custodial/payment-details/lost-attempts"
@@ -1483,5 +1484,311 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
     )
     expect(result.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionFound)
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("a conversion in flight when the app closes", () => {
+  const params = {
+    fromAmount: toBtcMoneyAmount(5000),
+    toAmount: toUsdMoneyAmount(137),
+    direction: ConvertDirection.BtcToUsd,
+  }
+
+  const walletSdk = () => ({
+    prepareSendPayment: jest.fn().mockResolvedValue({
+      paymentMethod: {},
+      conversionEstimate: {
+        fee: BigInt(0),
+        amountIn: BigInt(5000),
+        amountOut: BigInt(1_370_000),
+        amountAdjustment: undefined,
+      },
+    }),
+    sendPayment: jest.fn().mockResolvedValue({ payment: { id: "c1", status: 0 } }),
+    receivePayment: jest.fn().mockResolvedValue({ paymentRequest: "sp1own-invoice" }),
+    getInfo: jest.fn().mockResolvedValue({ tokenBalances: {} }),
+    listPayments: jest.fn().mockResolvedValue({ payments: [] }),
+    syncWallet: jest.fn().mockResolvedValue({}),
+  })
+
+  const delivery = (id: string, paidIn: number) => ({
+    status: "found",
+    payment: {
+      id,
+      amount: BigInt(1_370_000),
+      details: { tag: "Token", inner: { metadata: { identifier: "usdb-token-id" } } },
+      conversionDetails: {
+        status: 1,
+        conversions: [{ from: { amount: BigInt(paidIn) } }],
+      },
+    },
+    failed: [],
+  })
+
+  const storageAcrossLaunches = () => {
+    const stored = new Map<string, Map<string, LostAttempts>>()
+    const saves: Array<Map<string, LostAttempts>> = []
+    const storage: LostAttemptsStorage = {
+      load: async (walletId) => new Map(stored.get(walletId) ?? []),
+      save: async (walletId, attempts) => {
+        saves.push(new Map(attempts))
+        stored.set(walletId, new Map(attempts))
+      },
+      remove: async (walletId) => {
+        stored.delete(walletId)
+      },
+    }
+    return { storage, saves, storedFor: (walletId: string) => stored.get(walletId) }
+  }
+
+  /** The app converts, and is closed before the SDK answers. */
+  const closedInFlight = async (
+    walletId: string,
+    storage: LostAttemptsStorage,
+    sdk: ReturnType<typeof walletSdk>,
+  ) => {
+    scopeLostAttemptsTo(walletId, storage)
+    sdk.sendPayment.mockReturnValueOnce(
+      new Promise(() => {
+        /** never answers: the app closes first */
+      }),
+    )
+    const quote = await createGetConversionQuote(sdk as never)(params)
+    quote!.execute()
+    while (sdk.sendPayment.mock.calls.length === 0) await nextTurn()
+  }
+
+  /** The app's next launch: a memory of its own, over the same storage and wallet. */
+  const convertOnNextLaunch = async (
+    walletId: string,
+    storage: LostAttemptsStorage,
+    sdk: ReturnType<typeof walletSdk>,
+  ) => {
+    let bridge: typeof import("@app/self-custodial/bridge/convert")
+    let attempts: typeof import("@app/self-custodial/payment-details/lost-attempts")
+    jest.isolateModules(() => {
+      bridge = jest.requireActual("@app/self-custodial/bridge/convert")
+      attempts = jest.requireActual("@app/self-custodial/payment-details/lost-attempts")
+    })
+    attempts!.scopeLostAttemptsTo(walletId, storage)
+    const quote = await bridge!.createGetConversionQuote(sdk as never)(params)
+    return quote!.execute()
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockMarkReceivedHistory.mockResolvedValue(MARK)
+    mockFetchLimits.mockResolvedValue({ minFromAmount: null, minToAmount: null })
+  })
+
+  it("is looked for on the next launch, and not converted again once found", async () => {
+    const { storage } = storageAcrossLaunches()
+    mockFindLostConversion.mockResolvedValue(delivery("rcv-usdb", 5000))
+    const sdk = walletSdk()
+
+    await closedInFlight("wallet-closed-1", storage, sdk)
+    const result = await convertOnNextLaunch("wallet-closed-1", storage, sdk)
+
+    expect(mockFindLostConversion).toHaveBeenCalledWith({
+      sdk,
+      lost: {
+        startedAtMs: expect.any(Number),
+        lastAttemptAtMs: expect.any(Number),
+        ...MARK,
+        expectedDeliveries: [
+          { tokenIdentifier: "usdb-token-id", amount: 1_370_000, isAutomatic: false },
+        ],
+      },
+    })
+    expect(result.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("converts on the next launch once the history shows it never delivered", async () => {
+    const { storage } = storageAcrossLaunches()
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = walletSdk()
+
+    await closedInFlight("wallet-closed-2", storage, sdk)
+    afterTheDeliveryWindow()
+    const result = await convertOnNextLaunch("wallet-closed-2", storage, sdk)
+
+    expect(result.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("goes out only once its attempt is stored", async () => {
+    let storeIt: () => void = () => undefined
+    const saves: Array<Map<string, LostAttempts>> = []
+    scopeLostAttemptsTo("wallet-ahead", {
+      ...noStoredAttempts,
+      save: (_walletId, attempts) =>
+        new Promise<void>((resolve) => {
+          saves.push(new Map(attempts))
+          storeIt = resolve
+        }),
+    })
+    const sdk = walletSdk()
+    const quote = await createGetConversionQuote(sdk as never)(params)
+
+    const executing = quote!.execute()
+    while (saves.length === 0) await nextTurn()
+    await nextTurn()
+    expect(saves[0].get(OWN_CONVERSIONS)?.lostConversion).toMatchObject(MARK)
+    expect(sdk.sendPayment).not.toHaveBeenCalled()
+
+    storeIt()
+    while (sdk.sendPayment.mock.calls.length === 0) await nextTurn()
+    storeIt()
+    await executing
+  })
+
+  it("goes out after a moment when its attempt cannot be stored", async () => {
+    scopeLostAttemptsTo("wallet-unstored", {
+      ...noStoredAttempts,
+      save: () =>
+        new Promise<void>(() => {
+          /** storage never answers */
+        }),
+    })
+    const sdk = walletSdk()
+    const quote = await createGetConversionQuote(sdk as never)(params)
+    jest.useFakeTimers()
+    try {
+      const executing = quote!.execute()
+      await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS - 1)
+      expect(sdk.sendPayment).not.toHaveBeenCalled()
+
+      await jest.advanceTimersByTimeAsync(1)
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+      await executing
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
+  it("takes its attempt back before anything else is stored once the SDK answers", async () => {
+    const { storage, saves, storedFor } = storageAcrossLaunches()
+    scopeLostAttemptsTo("wallet-answered", storage)
+    const sdk = walletSdk()
+
+    await (await createGetConversionQuote(sdk as never)(params))!.execute()
+    await nextTurn()
+
+    const storedAhead = saves.findIndex((save) => save.has(OWN_CONVERSIONS))
+    expect(storedAhead).toBeGreaterThanOrEqual(0)
+    expect(saves[storedAhead + 1].has(OWN_CONVERSIONS)).toBe(false)
+    expect(storedFor("wallet-answered")?.has(OWN_CONVERSIONS)).toBe(false)
+  })
+
+  it("takes its attempt back before settling the lost conversion it went out past", async () => {
+    const { storage, saves } = storageAcrossLaunches()
+    scopeLostAttemptsTo("wallet-settled", storage)
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = walletSdk()
+    sdk.sendPayment.mockRejectedValueOnce(new Error("connection reset"))
+    await (await createGetConversionQuote(sdk as never)(params))!.execute()
+    await nextTurn()
+    afterTheDeliveryWindow()
+    let answeredAt = 0
+    sdk.sendPayment.mockImplementationOnce(async () => {
+      answeredAt = saves.length
+      return { payment: { id: "c2", status: 0 } }
+    })
+
+    await (await createGetConversionQuote(sdk as never)(params))!.execute()
+    await nextTurn()
+
+    const savesOnceAnswered = saves.slice(answeredAt)
+    expect(savesOnceAnswered.length).toBeGreaterThan(0)
+    savesOnceAnswered.forEach((save) => expect(save.has(OWN_CONVERSIONS)).toBe(false))
+  })
+
+  it("stores nothing once a conversion is refused on the way in", async () => {
+    const { storage, storedFor } = storageAcrossLaunches()
+    scopeLostAttemptsTo("wallet-refused", storage)
+    const sdk = walletSdk()
+    sdk.sendPayment.mockRejectedValue({ tag: "InsufficientFunds", inner: ["no funds"] })
+
+    await (await createGetConversionQuote(sdk as never)(params))!.execute()
+    await nextTurn()
+
+    expect(storedFor("wallet-refused")?.has(OWN_CONVERSIONS)).toBe(false)
+  })
+
+  it("is stored with the lost conversion it was let through past, from the earlier mark", async () => {
+    const { storage, saves } = storageAcrossLaunches()
+    scopeLostAttemptsTo("wallet-past", storage)
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = walletSdk()
+    sdk.sendPayment.mockRejectedValueOnce(new Error("connection reset"))
+    await (await createGetConversionQuote(sdk as never)(params))!.execute()
+    await nextTurn()
+    const earlier = saves.at(-1)?.get(OWN_CONVERSIONS)?.lostConversion
+    afterTheDeliveryWindow()
+    mockMarkReceivedHistory.mockResolvedValue({ walletClockSec: 1, knownPaymentIds: [] })
+    let storedAsItWentOut: LostAttempts | undefined
+    sdk.sendPayment.mockImplementationOnce(async () => {
+      storedAsItWentOut = saves.at(-1)?.get(OWN_CONVERSIONS)
+      return { payment: { id: "c2", status: 0 } }
+    })
+
+    await (await createGetConversionQuote(sdk as never)(params))!.execute()
+
+    expect(storedAsItWentOut?.lostConversion).toEqual({
+      ...earlier,
+      expectedDeliveries: [
+        ...(earlier?.expectedDeliveries ?? []),
+        { tokenIdentifier: "usdb-token-id", amount: 1_370_000, isAutomatic: false },
+      ],
+      lastAttemptAtMs: expect.any(Number),
+    })
+  })
+
+  /** Every save once the conversion threw: what was stored ahead is taken back as soon
+   *  as what the look leaves is held, so none of them stores the attempt as it went out. */
+  const savesOnceThrown = (
+    sdk: ReturnType<typeof walletSdk>,
+    saves: Array<Map<string, LostAttempts>>,
+  ) => {
+    let thrownAt = 0
+    sdk.sendPayment.mockImplementation(async () => {
+      thrownAt = saves.length
+      throw new Error("connection reset")
+    })
+    return () => saves.slice(thrownAt)
+  }
+
+  it("keeps what its look leaves, not what was stored ahead, once it is lost", async () => {
+    const { storage, saves } = storageAcrossLaunches()
+    scopeLostAttemptsTo("wallet-looked", storage)
+    mockFindLostConversion.mockResolvedValue(delivery("rcv-earlier", 9000))
+    const sdk = walletSdk()
+    const thrownSaves = savesOnceThrown(sdk, saves)
+
+    await (await createGetConversionQuote(sdk as never)(params))!.execute()
+    await nextTurn()
+
+    expect(thrownSaves().length).toBeGreaterThan(0)
+    thrownSaves().forEach((save) =>
+      expect(save.get(OWN_CONVERSIONS)?.lostConversion).toMatchObject({
+        knownPaymentIds: [...MARK.knownPaymentIds, "rcv-earlier"],
+      }),
+    )
+  })
+
+  it("stores nothing more once the look finds the conversion", async () => {
+    const { storage, saves } = storageAcrossLaunches()
+    scopeLostAttemptsTo("wallet-found", storage)
+    mockFindLostConversion.mockResolvedValue(delivery("rcv-usdb", 5000))
+    const sdk = walletSdk()
+    const thrownSaves = savesOnceThrown(sdk, saves)
+
+    const result = await (await createGetConversionQuote(sdk as never)(params))!.execute()
+    await nextTurn()
+
+    expect(result.status).toBe("success")
+    expect(thrownSaves().length).toBeGreaterThan(0)
+    thrownSaves().forEach((save) => expect(save.has(OWN_CONVERSIONS)).toBe(false))
   })
 })
