@@ -785,4 +785,176 @@ describe("onchain fee tier gating", () => {
       true,
     )
   })
+
+  it("opens the error sheet on crossing the daily limit, and Change amount empties the amount (A3)", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalAllowance.remaining = 500
+
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+    for (let i = 0; i < 4; i += 1) fireEvent.press(screen.getByTestId("Key 9"))
+    await flushAsync()
+    await flushAsync()
+
+    const sheet = within(await screen.findByTestId(ERROR_SHEET_TEST_ID))
+    expect(sheet.getByText(LL.SendBitcoinScreen.problemSheetTitle())).toBeTruthy()
+
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinConfirmationScreen.changeAmount()))
+    })
+    await flushAsync()
+
+    expect(errorSheet()).toBeNull()
+    expect(screen.getByText(LL.SendBitcoinScreen.addAmount())).toBeTruthy()
+  })
+})
+
+describe("daily limit that could not be read", () => {
+  const renderOnchain = async () => {
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+  }
+
+  it("keeps Next off and opens the sheet, since nobody checked the limit", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalLimitsQuery.error = new Error("limits unavailable")
+
+    await renderOnchain()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+
+    const sheet = within(await screen.findByTestId(ERROR_SHEET_TEST_ID))
+    expect(sheet.getByText(LL.SendBitcoinScreen.problemSheetTitle())).toBeTruthy()
+    expect(sheet.getByText(LL.SendBitcoinScreen.limitsUnavailable())).toBeTruthy()
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      true,
+    )
+  })
+
+  it("reads the limit again on Try again", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalLimitsQuery.error = new Error("limits unavailable")
+
+    await renderOnchain()
+    const sheet = within(await screen.findByTestId(ERROR_SHEET_TEST_ID))
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinConfirmationScreen.tryAgain()))
+    })
+
+    expect(mockWithdrawalLimitsQuery.refetch).toHaveBeenCalledTimes(1)
+  })
+
+  // A remaining limit of 0 reads as no limit, as on main (blink-wip#1273 G1, senior dev).
+})
+
+describe("high-fee sheet (blink-wip#1323)", () => {
+  const HIGH_FEE_SHEET_TEST_ID = "high-fee-sheet"
+
+  /** One unit typed is 4,164 sats at this price. */
+  const highFeeQuote = {
+    data: { fast: { amount: 5000 }, medium: { amount: 5000 }, slow: { amount: 5000 } },
+  }
+
+  const pressNextOnHighFeeSend = async () => {
+    const LL = i18nObject("en")
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    await flushAsync()
+    await waitFor(() => {
+      expect(
+        screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled,
+      ).toBe(false)
+    })
+    await act(async () => {
+      fireEvent.press(screen.getByTestId(LL.common.next()))
+    })
+    await flushAsync()
+  }
+
+  beforeEach(() => {
+    loadLocale("en")
+    mockQuoteFees.mockResolvedValue(highFeeQuote)
+    mockNavigate.mockClear()
+    mockDispatch.mockClear()
+  })
+
+  it("opens on Next instead of going to review", async () => {
+    const LL = i18nObject("en")
+    await pressNextOnHighFeeSend()
+
+    const sheet = within(await screen.findByTestId(HIGH_FEE_SHEET_TEST_ID))
+    expect(sheet.getByText(LL.SendBitcoinScreen.highFeeSheet.title())).toBeTruthy()
+    expect(
+      sheet.getByText(LL.SendBitcoinScreen.highFeeSheet.cancelPayment()),
+    ).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "sendBitcoinConfirmation",
+      expect.anything(),
+    )
+  })
+
+  it("continues to review once the fee is accepted", async () => {
+    const LL = i18nObject("en")
+    await pressNextOnHighFeeSend()
+
+    const sheet = within(await screen.findByTestId(HIGH_FEE_SHEET_TEST_ID))
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinScreen.highFeeSheet.acceptFee()))
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "sendBitcoinConfirmation",
+      expect.anything(),
+    )
+  })
+
+  it("starts the send over on Cancel payment", async () => {
+    const LL = i18nObject("en")
+    await pressNextOnHighFeeSend()
+
+    const sheet = within(await screen.findByTestId(HIGH_FEE_SHEET_TEST_ID))
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinScreen.highFeeSheet.cancelPayment()))
+    })
+
+    expect(mockDispatch).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "sendBitcoinConfirmation",
+      expect.anything(),
+    )
+  })
+
+  it("goes straight to review while the fee is under half the amount", async () => {
+    // 2,081 sats is just under half of 4,164.
+    mockQuoteFees.mockResolvedValue({
+      data: { fast: { amount: 2081 }, medium: { amount: 2081 }, slow: { amount: 2081 } },
+    })
+    await pressNextOnHighFeeSend()
+
+    expect(screen.queryByTestId(HIGH_FEE_SHEET_TEST_ID)).toBeNull()
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "sendBitcoinConfirmation",
+      expect.anything(),
+    )
+  })
 })
