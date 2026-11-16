@@ -25,12 +25,17 @@ const ANDROID_BACK_BUTTON_CIRCLE = {
   marginRight: 0,
 } as const
 
+/** Hidden from both screen readers, each by its own prop: `importantForAccessibility` is
+ *  Android only and `accessibilityElementsHidden` iOS only, and `accessible={false}` hides
+ *  neither, it only stops the wrapper being one element. Without both, VoiceOver or
+ *  TalkBack still focuses an inert "Go back" nobody can see. */
 export const InvisibleBackButton = (): React.ReactNode => {
   const styles = useStyles()
   return (
     <View
       pointerEvents="none"
       accessible={false}
+      accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
       style={styles.container}
     >
