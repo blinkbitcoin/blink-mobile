@@ -3689,7 +3689,6 @@
         "freeNotice": "Blink Orange'ın şimdilik ücretsiz olduğunu ve ileride önceden bildirilerek bir üyelik ücreti getirilebileceğini anlıyorum"
       },
       "CardVerifyIdentity": {
-        "headerTitle": "Blink Orange",
         "title": "Kimliğinizi doğrulayın",
         "description": "Blink kartınızı etkinleştirmek için kart sağlayıcısının kim olduğunuzu doğrulaması gerekir (KYC). İhtiyacınız olanlar:",
         "requirements": {

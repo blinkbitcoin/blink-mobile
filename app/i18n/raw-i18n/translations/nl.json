@@ -3689,7 +3689,6 @@
         "freeNotice": "Ik begrijp dat Blink Orange voorlopig gratis is en dat er later, met aankondiging, een lidmaatschapsbijdrage kan worden ingevoerd"
       },
       "CardVerifyIdentity": {
-        "headerTitle": "Blink Orange",
         "title": "Verifieer uw identiteit",
         "description": "Om uw Blink Card te activeren, moet de kaartuitgever verifiëren wie u bent (KYC). U hebt nodig:",
         "requirements": {

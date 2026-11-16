@@ -3910,7 +3910,6 @@ const en: BaseTranslation = {
         freeNotice: "I understand Blink Orange is free for now, and that a membership fee may be introduced later, with notice",
       },
       CardVerifyIdentity: {
-        headerTitle: "Blink Orange",
         title: "Verify your identity",
         description: "To activate your Blink Card, the card issuer must verify who you are (KYC). You will need:",
         requirements: {

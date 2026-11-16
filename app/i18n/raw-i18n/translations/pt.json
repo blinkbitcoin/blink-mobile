@@ -3689,7 +3689,6 @@
                 "freeNotice": "Entendo que o Blink Orange é gratuito por enquanto e que uma taxa de associação pode ser introduzida mais tarde, com aviso prévio"
             },
             "CardVerifyIdentity": {
-                "headerTitle": "Blink Orange",
                 "title": "Verifique sua identidade",
                 "description": "Para ativar seu Cartão Blink, o emissor do cartão precisa verificar quem você é (KYC). Você vai precisar de:",
                 "requirements": {

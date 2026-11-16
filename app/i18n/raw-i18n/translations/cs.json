@@ -3689,7 +3689,6 @@
         "freeNotice": "Rozumím, že Blink Orange je prozatím zdarma a že členský poplatek může být později zaveden, s předchozím upozorněním"
       },
       "CardVerifyIdentity": {
-        "headerTitle": "Blink Orange",
         "title": "Ověřte svou totožnost",
         "description": "K aktivaci vaší Blink Card musí vydavatel karty ověřit, kdo jste (KYC). Budete potřebovat:",
         "requirements": {

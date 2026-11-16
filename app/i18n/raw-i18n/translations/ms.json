@@ -3689,7 +3689,6 @@
         "freeNotice": "Saya faham bahawa Blink Orange percuma buat masa ini, dan yuran keahlian mungkin diperkenalkan kemudian, dengan notis"
       },
       "CardVerifyIdentity": {
-        "headerTitle": "Blink Orange",
         "title": "Sahkan identiti anda",
         "description": "Untuk mengaktifkan Kad Blink anda, pengeluar kad perlu mengesahkan siapa anda (KYC). Anda akan memerlukan:",
         "requirements": {
