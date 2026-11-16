@@ -159,22 +159,6 @@ export const createGetFeeOnchain = <T extends WalletCurrency>(
   }
 }
 
-/**
- * What a dispatched send reports. Only a completed payment is sent: the SDK hands a
- * payment back as soon as it is dispatched, and one still in flight, or with no status,
- * may yet fail, so the sender sees it as pending rather than celebrated as sent.
- */
-export const sendResultOf = (payment: Payment | undefined): PaymentSendResult => {
-  switch (payment?.status) {
-    case PaymentStatus.Completed:
-      return PaymentSendResult.Success
-    case PaymentStatus.Failed:
-      return PaymentSendResult.Failure
-    default:
-      return PaymentSendResult.Pending
-  }
-}
-
 const reportSendFailure = (
   scope: string,
   err: unknown,
@@ -198,7 +182,7 @@ export const createSendMutation = (
         sendSettlement(telemetryParams(telemetry)),
         startedIn,
       )
-      return { status: sendResultOf(response?.payment) }
+      return { status: PaymentSendResult.Success }
     } catch (err) {
       measureIn(startedIn, ScEvent.PaymentSendFailed, {
         ...telemetryParams(telemetry),
@@ -228,7 +212,7 @@ export const createSendMutationOnchain = (
         sendSettlement(telemetryParams(telemetry)),
         startedIn,
       )
-      return { status: sendResultOf(response?.payment) }
+      return { status: PaymentSendResult.Success }
     } catch (err) {
       measureIn(startedIn, ScEvent.PaymentSendFailed, {
         ...telemetryParams(telemetry),
