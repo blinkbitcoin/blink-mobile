@@ -10012,6 +10012,10 @@ type RootTranslation = {
 		 */
 		ok: string
 		/**
+		 * O​k​a​y
+		 */
+		okay: string
+		/**
 		 * o​r
 		 */
 		or: string
@@ -24458,6 +24462,10 @@ export type TranslationFunctions = {
 		 * OK
 		 */
 		ok: () => LocalizedString
+		/**
+		 * Okay
+		 */
+		okay: () => LocalizedString
 		/**
 		 * or
 		 */

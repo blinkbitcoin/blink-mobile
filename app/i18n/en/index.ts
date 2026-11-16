@@ -3146,6 +3146,7 @@ const en: BaseTranslation = {
     note: "Note",
     notification: "Notification",
     ok: "OK",
+    okay: "Okay",
     or: "or",
     openWallet: "Open Wallet",
     onchain: "Onchain",
