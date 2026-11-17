@@ -7,6 +7,8 @@ import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 import { GaloyIconButton } from "../atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "../atomic/galoy-primary-button"
 
+import { radius } from "@app/rne-theme/radius"
+
 export type NotificationCardUIProps = {
   title: string
   text: string
@@ -97,7 +99,7 @@ export const NotificationCardUI: React.FC<NotificationCardUIProps> = ({
 const useStyles = makeStyles(({ colors }) => ({
   buttonContainer: {
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     flexDirection: "column",
   },
   contentSection: {
@@ -127,7 +129,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "column",
     padding: 14,
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     minHeight: 80,
     justifyContent: "center",
     alignItems: "center",

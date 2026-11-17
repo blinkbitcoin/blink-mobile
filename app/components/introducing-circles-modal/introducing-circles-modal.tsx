@@ -3,6 +3,7 @@ import { View } from "react-native"
 import Modal from "react-native-modal"
 
 import { useApolloClient } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { setIntroducingCirclesModalShown } from "@app/graphql/client-only-query"
 import { useIntroducingCirclesModalShownQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -93,7 +94,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   modalCard: {
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 16,
+    borderRadius: radius.popup,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",

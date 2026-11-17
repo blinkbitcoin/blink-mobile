@@ -2,6 +2,7 @@ import * as React from "react"
 import { useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { testProps } from "@app/utils/testProps"
 import { useTheme } from "@react-navigation/native"
@@ -35,7 +36,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderBottomWidth: 0,
     paddingHorizontal: 10,
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     marginRight: 0,
   },
   fieldFocused: {

@@ -1,6 +1,7 @@
 import React from "react"
 import { Animated, Easing, Pressable, StyleProp, View, ViewStyle } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { staticSurface } from "@app/rne-theme/surfaces"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -89,7 +90,7 @@ export const WarningCard: React.FC<React.PropsWithChildren<WarningCardProps>> = 
 
 const useStyles = makeStyles(({ colors }) => ({
   card: {
-    borderRadius: 8,
+    borderRadius: radius.default,
     padding: 14,
     borderWidth: 1,
     borderColor: colors.warning,

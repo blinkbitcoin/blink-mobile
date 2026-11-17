@@ -3,6 +3,7 @@ import { ScrollView, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
@@ -304,7 +305,7 @@ const useStyles = makeStyles(({ colors }) => ({
   card: {
     width: "100%",
     ...staticSurface(colors),
-    borderRadius: 8,
+    borderRadius: radius.default,
     paddingHorizontal: 10,
     paddingVertical: 14,
     gap: 14,

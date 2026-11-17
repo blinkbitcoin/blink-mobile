@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import InAppBrowser from "react-native-inappbrowser-reborn"
 
+import { radius } from "@app/rne-theme/radius"
 import { Screen } from "@app/components/screen"
 import { ContactSupportRow, SettingItemRow, SwitchRow } from "@app/components/card-screen"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
@@ -267,7 +268,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   settingsGroupContainer: {
     marginTop: 0,
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
   dividerStyle: {
     marginHorizontal: 22,

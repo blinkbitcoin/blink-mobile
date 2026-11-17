@@ -254,7 +254,7 @@ describe("GaloyToast", () => {
           paddingHorizontal: 12,
           paddingVertical: 14,
           borderWidth: 1,
-          borderRadius: 8,
+          borderRadius: 12,
           borderColor: dark[accent],
           backgroundColor: dark.surfaceStatic,
         })

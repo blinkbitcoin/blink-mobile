@@ -4,6 +4,7 @@ import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Divider, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { SettingItemRow } from "@app/components/card-screen"
@@ -136,7 +137,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginTop: 30,
     marginHorizontal: 20,
     ...staticSurface(colors),
-    borderRadius: 8,
+    borderRadius: radius.default,
     overflow: "hidden",
   },
   divider: {

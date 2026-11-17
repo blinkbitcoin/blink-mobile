@@ -3,6 +3,7 @@ import { Pressable, View } from "react-native"
 
 import { Colors, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
 type ThemeColor = keyof Colors
@@ -54,7 +55,7 @@ export const SettingsCard: React.FC<SettingsCardProps> = ({
 
 const useStyles = makeStyles(({ colors }, { borderColor }: { borderColor?: string }) => ({
   container: {
-    borderRadius: 12,
+    borderRadius: radius.default,
     backgroundColor: colors.surfaceInteractive,
     padding: 14,
     borderWidth: borderColor ? 1 : 0,

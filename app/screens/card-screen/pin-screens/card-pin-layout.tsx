@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react"
 import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { Screen } from "@app/components/screen"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -181,7 +182,7 @@ const useStyles = makeStyles(({ colors }) => ({
     minWidth: 124,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    borderRadius: 8,
+    borderRadius: radius.default,
     borderWidth: 1,
     borderColor: colors.accent,
     backgroundColor: colors.surfaceInteractive,

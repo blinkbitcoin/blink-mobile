@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { Pressable, StyleProp, TextStyle, View, ViewStyle } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
 const ICON_SIZE = 16
@@ -98,7 +99,7 @@ const useStyles = makeStyles(({ colors }, { hovering, hasSubtitle }: StyleProps)
       flexDirection: "row",
       alignItems: "center",
       backgroundColor: hovering ? colors.neutral : baseBackground,
-      borderRadius: hasSubtitle ? 8 : 0,
+      borderRadius: hasSubtitle ? radius.default : 0,
       paddingVertical: 14,
       paddingLeft: 14,
       paddingRight: 10,

@@ -4,6 +4,7 @@ import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { SettingItemRow } from "@app/components/card-screen"
 import { IconHero } from "@app/components/icon-hero"
@@ -108,7 +109,7 @@ const useStyles = makeStyles(({ colors }) => ({
   /** The card's surface sits behind the row, so the row's own pressed shade shows. */
   option: {
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     overflow: "hidden",
   },
   manualCopy: {

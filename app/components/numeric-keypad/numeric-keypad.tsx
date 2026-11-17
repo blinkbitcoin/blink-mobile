@@ -2,6 +2,7 @@ import React, { useCallback } from "react"
 import { Pressable, View, StyleProp, ViewStyle } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
 
@@ -120,7 +121,7 @@ const useStyles = makeStyles(({ colors }) => ({
   key: {
     flex: 1,
     minHeight: 54,
-    borderRadius: 12,
+    borderRadius: radius.default,
     borderWidth: 1,
     borderColor: colors.neutral,
     alignItems: "center",

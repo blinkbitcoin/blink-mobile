@@ -1,5 +1,7 @@
 import { makeStyles } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
+
 export const useSharedStepStyles = makeStyles(({ colors }) => ({
   section: {
     gap: 3,
@@ -13,7 +15,7 @@ export const useSharedStepStyles = makeStyles(({ colors }) => ({
   },
   settingsGroupContainer: {
     marginTop: 0,
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
   dividerStyle: {
     marginHorizontal: 22,

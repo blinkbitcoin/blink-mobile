@@ -3,6 +3,7 @@ import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -141,7 +142,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     paddingLeft: 14,
     paddingRight: 10,
     paddingVertical: 14,

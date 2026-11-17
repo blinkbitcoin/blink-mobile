@@ -1,6 +1,7 @@
 import React from "react"
 import { StyleProp, TouchableWithoutFeedback, View, ViewStyle } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
 import { Text, makeStyles } from "@rn-vui/themed"
 
@@ -87,7 +88,7 @@ const useStyles = makeStyles(
       justifyContent: "space-between",
       padding: 10,
       paddingVertical: 14,
-      borderRadius: 8,
+      borderRadius: radius.default,
       opacity: disabled ? 0.4 : 1,
       backgroundColor: colors.surfaceInteractive,
       height: "100%",

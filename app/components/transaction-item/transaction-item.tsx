@@ -21,6 +21,7 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useBounceInAnimation } from "@app/components/animations"
 import { toWalletAmount } from "@app/types/amounts"
+import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
 
 import { IconTransaction } from "../icon-transactions"
@@ -288,8 +289,8 @@ const useStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
     overflow: "hidden",
     backgroundColor: props.highlight ? colors.neutral : colors.surfaceInteractive,
     borderTopWidth: (props.isFirst && props.isOnHomeScreen) || !props.isFirst ? 1 : 0,
-    borderBottomLeftRadius: props.isLast && props.isOnHomeScreen ? 12 : 0,
-    borderBottomRightRadius: props.isLast && props.isOnHomeScreen ? 12 : 0,
+    borderBottomLeftRadius: props.isLast && props.isOnHomeScreen ? radius.default : 0,
+    borderBottomRightRadius: props.isLast && props.isOnHomeScreen ? radius.default : 0,
   },
   hiddenBalanceContainer: {
     fontSize: 16,

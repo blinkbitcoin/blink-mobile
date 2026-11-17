@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   MAY_1_2024_12_AM_UTC_MINUS_6,
@@ -80,7 +81,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "space-between",
     padding: 16,
-    borderRadius: 10,
+    borderRadius: radius.default,
     backgroundColor: colors.surfaceInteractive,
   },
   textContainer: {

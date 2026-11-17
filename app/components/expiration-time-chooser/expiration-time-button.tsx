@@ -1,6 +1,7 @@
 import React from "react"
 import { Pressable, PressableProps, StyleProp, View, ViewStyle } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
 import { useTheme, Text, makeStyles } from "@rn-vui/themed"
@@ -79,7 +80,7 @@ const useStyles = makeStyles(({ colors }, props: { big?: boolean }) => ({
   pressableBase: {
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: radius.default,
     minHeight: props.big ? 60 : 50,
     justifyContent: "center",
   },

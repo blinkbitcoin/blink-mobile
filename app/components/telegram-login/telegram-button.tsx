@@ -1,5 +1,6 @@
 import React, { FC, PropsWithChildren } from "react"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
 import { TouchableHighlight } from "@app/utils/touchable-wrapper"
@@ -39,7 +40,7 @@ const useStyles = makeStyles(({ colors }) => ({
   buttonStyle: {
     minHeight: 50,
     backgroundColor: "#229ED9",
-    borderRadius: 8,
+    borderRadius: radius.default,
     paddingHorizontal: 16,
   },
   titleStyle: {

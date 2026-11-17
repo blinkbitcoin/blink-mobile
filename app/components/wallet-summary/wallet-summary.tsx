@@ -1,6 +1,7 @@
 import React, { FunctionComponent } from "react"
 import { View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -76,7 +77,7 @@ const useStyles = makeStyles(({ colors }) => ({
     ...staticSurface(colors),
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 8,
+    borderRadius: radius.default,
     padding: 14,
   },
   amountsContainer: {

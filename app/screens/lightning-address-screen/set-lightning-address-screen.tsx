@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
@@ -271,7 +272,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: radius.default,
     minHeight: 60,
     backgroundColor: colors.surfaceInteractive,
     alignItems: "center",

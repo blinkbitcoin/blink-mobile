@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { IconHero } from "@app/components/icon-hero"
 import { CloseHeader } from "@app/components/close-header"
@@ -122,7 +123,7 @@ const useStyles = makeStyles(({ colors }) => ({
   limitOptionSelected: {
     borderColor: colors.accent,
     backgroundColor: colors.surfacePressed,
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
   limitSeparator: {
     width: "97%",

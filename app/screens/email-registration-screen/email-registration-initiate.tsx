@@ -7,6 +7,7 @@ import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Input, Text, makeStyles } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -52,7 +53,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderBottomWidth: 0,
     paddingHorizontal: 10,
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
   fieldFocused: {
     backgroundColor: colors.surfaceFocused,

@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from "react"
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native"
 import { FlatList } from "react-native-gesture-handler"
 import { gql } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { Screen } from "@app/components/screen"
 import { UserContact, useContactsQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
@@ -279,7 +280,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   itemContainer: {
-    borderRadius: 8,
+    borderRadius: radius.default,
     backgroundColor: colors.surfaceInteractive,
   },
 

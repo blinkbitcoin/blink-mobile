@@ -3,6 +3,8 @@ import { Pressable, View } from "react-native"
 
 import { Text, makeStyles } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
+
 type SuggestionBarProps = {
   suggestions: readonly string[]
   onSelect: (value: string) => void
@@ -50,7 +52,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     alignItems: "center",
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     paddingVertical: 12,
   },
   text: {

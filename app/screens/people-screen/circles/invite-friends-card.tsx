@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Alert, Share, View } from "react-native"
 
 import { gql } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { InviteModal } from "@app/components/invite-modal"
 import { PressableCard } from "@app/components/pressable-card"
@@ -78,7 +79,7 @@ const useStyles = makeStyles(({ colors }) => ({
     display: "flex",
     flexDirection: "row",
     marginBottom: 20,
-    borderRadius: 12,
+    borderRadius: radius.default,
     padding: 12,
     columnGap: 4,
     alignItems: "center",

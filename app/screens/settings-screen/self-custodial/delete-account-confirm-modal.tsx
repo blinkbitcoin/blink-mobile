@@ -3,6 +3,7 @@ import { TextInput, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
@@ -90,7 +91,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.neutral,
     padding: 12,
     color: colors.textOnBackground,
-    borderRadius: 8,
+    borderRadius: radius.default,
     textAlign: "center",
   },
 }))

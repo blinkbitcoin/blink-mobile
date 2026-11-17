@@ -9,6 +9,7 @@ import React, {
 import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 import { FlatList } from "react-native-gesture-handler"
 import { gql } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
 import { useAppConfig, useDisplayCurrency } from "@app/hooks"
@@ -1129,7 +1130,7 @@ const usestyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     overflow: "hidden",
     backgroundColor: colors.surfacePressed,
-    borderRadius: 10,
+    borderRadius: radius.default,
     borderColor: colors.transparent,
     borderWidth: 1,
     justifyContent: "center",
@@ -1260,7 +1261,7 @@ const usestyles = makeStyles(({ colors }) => ({
     borderColor: colors.transparent,
     borderWidth: 1,
     marginHorizontal: 32,
-    borderRadius: 8,
+    borderRadius: radius.default,
     overflow: "hidden",
   },
   listContainerSelected: {

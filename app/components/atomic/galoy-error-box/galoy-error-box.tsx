@@ -5,6 +5,8 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "../galoy-icon"
 
+import { radius } from "@app/rne-theme/radius"
+
 type GaloyErrorBoxProps = {
   errorMessage: string
   noIcon?: boolean
@@ -35,7 +37,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "flex-start",
     paddingHorizontal: 8,
     paddingVertical: 6,
-    borderRadius: 8,
+    borderRadius: radius.default,
     backgroundColor: colors.errorBackground,
     zIndex: 1,
   },

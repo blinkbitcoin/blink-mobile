@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Pressable, StyleSheet, TextInput, View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -149,7 +150,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   currencyInputGroup: {
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 12,
+    borderRadius: radius.default,
     borderWidth: 1,
     borderColor: "transparent",
   },
@@ -167,18 +168,18 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.surfacePressed,
   },
   singleRow: {
-    borderRadius: 12,
+    borderRadius: radius.default,
     paddingVertical: 15,
   },
   topRow: {
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    borderTopLeftRadius: radius.default,
+    borderTopRightRadius: radius.default,
     paddingTop: 15,
     paddingBottom: 27,
   },
   bottomRow: {
-    borderBottomLeftRadius: 12,
-    borderBottomRightRadius: 12,
+    borderBottomLeftRadius: radius.default,
+    borderBottomRightRadius: radius.default,
     paddingTop: 27,
     paddingBottom: 15,
   },

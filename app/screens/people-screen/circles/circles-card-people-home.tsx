@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 import { useCountUp } from "use-count-up"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { getcBackValue } from "@app/components/circle"
 import { PressableCard } from "@app/components/pressable-card"
@@ -104,7 +105,7 @@ const useStyles = makeStyles(({ colors }) => ({
     display: "flex",
     flexDirection: "column",
     marginBottom: 20,
-    borderRadius: 12,
+    borderRadius: radius.default,
     padding: 12,
     paddingBottom: 0,
     rowGap: 14,

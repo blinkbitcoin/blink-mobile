@@ -4,6 +4,7 @@ import { PanGestureHandler } from "react-native-gesture-handler"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 
 import { gql } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
@@ -659,7 +660,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.surfaceInteractive,
     padding: 14,
     minHeight: 60,
-    borderRadius: 10,
+    borderRadius: radius.default,
     alignItems: "center",
   },
   fieldBackgroundStatic: staticSurface(colors),

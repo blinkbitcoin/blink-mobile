@@ -8,6 +8,7 @@ import {
   OptionRow,
   ShippingAddressForm,
 } from "@app/components/card-screen"
+import { radius } from "@app/rne-theme/radius"
 import { CheckboxRow } from "@app/components/checkbox-row"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
@@ -151,7 +152,7 @@ const useLocalStyles = makeStyles(() => ({
     gap: 17,
   },
   deliveryCard: {
-    borderRadius: 8,
+    borderRadius: radius.default,
     overflow: "hidden",
   },
 }))

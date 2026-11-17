@@ -5,6 +5,7 @@ import Modal from "react-native-modal"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
@@ -151,7 +152,7 @@ const useCustodialStyles = makeStyles(({ colors }) => ({
   },
   modalCard: {
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 16,
+    borderRadius: radius.popup,
     paddingVertical: 18,
   },
   cardTitleContainer: {

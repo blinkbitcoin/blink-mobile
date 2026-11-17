@@ -4,6 +4,7 @@ import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { OptionCard, OptionCardGroup } from "@app/components/option-card-group"
 import { Screen } from "@app/components/screen"
@@ -177,7 +178,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   banner: {
     ...staticSurface(colors),
-    borderRadius: 8,
+    borderRadius: radius.default,
     paddingHorizontal: 14,
     paddingVertical: 12,
     marginBottom: 16,

@@ -4,6 +4,7 @@ import Animated from "react-native-reanimated"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { AmountInputModal } from "@app/components/amount-input/amount-input-modal"
 import { useAlternatingSpin } from "@app/components/animations"
 import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
@@ -166,7 +167,7 @@ export const ReceiveAmountRow: React.FC<ReceiveAmountRowProps> = ({
 const useStyles = makeStyles(({ colors }) => ({
   container: {
     flexDirection: "row",
-    borderRadius: 12,
+    borderRadius: radius.default,
     minHeight: 67,
     overflow: "hidden",
     backgroundColor: colors.surfaceInteractive,

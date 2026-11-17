@@ -9,6 +9,7 @@ import ReactNativeModal from "react-native-modal"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
 import { fonts } from "@app/rne-theme/fonts"
@@ -124,7 +125,7 @@ const useStyles = makeStyles(({ colors }) => ({
   fieldBackground: {
     flexDirection: "row",
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 10,
+    borderRadius: radius.default,
     alignItems: "center",
     paddingHorizontal: 14,
     paddingVertical: 12,
@@ -152,7 +153,7 @@ const useStyles = makeStyles(({ colors }) => ({
   optionRow: {
     flexDirection: "row",
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 10,
+    borderRadius: radius.default,
     alignItems: "center",
     paddingHorizontal: 14,
     paddingVertical: 12,

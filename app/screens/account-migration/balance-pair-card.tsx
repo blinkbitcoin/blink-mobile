@@ -3,6 +3,7 @@ import { ActivityIndicator, View } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { InfoRow } from "@app/components/card-screen/info-row"
 import { testProps } from "@app/utils/testProps"
 import { staticSurface } from "@app/rne-theme/surfaces"
@@ -64,7 +65,7 @@ const useStyles = makeStyles(({ colors }) => ({
   card: {
     width: "100%",
     ...staticSurface(colors),
-    borderRadius: 8,
+    borderRadius: radius.default,
     paddingHorizontal: 14,
     paddingVertical: 10,
     gap: 10,

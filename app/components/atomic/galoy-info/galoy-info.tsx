@@ -2,6 +2,7 @@ import React, { ReactNode } from "react"
 import { View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { radius } from "@app/rne-theme/radius"
 import { staticSurface } from "@app/rne-theme/surfaces"
 
 type GaloyInfoProps = {
@@ -47,8 +48,8 @@ const useStyles = makeStyles(({ colors }, props: StyleProps) => ({
     justifyContent: "flex-start",
     paddingHorizontal: 8,
     paddingVertical: 6,
-    borderTopRightRadius: 8,
-    borderBottomRightRadius: 8,
+    borderTopRightRadius: radius.default,
+    borderBottomRightRadius: radius.default,
     ...staticSurface(colors),
   },
   verticalLine: {

@@ -1,5 +1,6 @@
 import { Linking, Pressable, Share, View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -126,7 +127,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.surfaceInteractive,
     paddingVertical: 16,
     paddingHorizontal: 8,
-    borderRadius: 8,
+    borderRadius: radius.default,
     columnGap: 20,
   },
   address: {

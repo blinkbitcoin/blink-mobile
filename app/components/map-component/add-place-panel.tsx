@@ -18,6 +18,7 @@ import {
   buildPlaceSubmission,
   formatCoordinates,
 } from "@app/btcmap"
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { BottomSheet } from "@app/components/bottom-sheet"
@@ -415,7 +416,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     alignItems: "center",
     columnGap: 12,
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     minHeight: 60,
     paddingLeft: 14,
     paddingRight: 10,
@@ -433,7 +434,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     alignItems: "center",
     columnGap: 10,
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     minHeight: 60,
     paddingLeft: 14,
     paddingRight: 10,

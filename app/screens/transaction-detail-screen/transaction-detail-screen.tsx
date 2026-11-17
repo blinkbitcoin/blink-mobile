@@ -3,6 +3,7 @@ import { ActivityIndicator, Linking, Pressable, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { ScrollView } from "react-native-gesture-handler"
 import { useFragment } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -672,7 +673,7 @@ const useStyles = makeStyles(({ colors }) => ({
     padding: 14,
     backgroundColor: colors.surfaceInteractive,
     alignItems: "center",
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
   valueContainerStatic: staticSurface(colors),
   value: {

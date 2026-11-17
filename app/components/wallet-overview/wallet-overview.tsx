@@ -3,6 +3,7 @@ import ContentLoader, { Rect } from "react-content-loader/native"
 import { Pressable, View } from "react-native"
 
 import { gql } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { DisabledFeature } from "@app/components/disabled-feature"
 import { useRestrictedRegion } from "@app/components/restricted-region"
 import { useWalletOverviewScreenQuery, WalletCurrency } from "@app/graphql/generated"
@@ -388,7 +389,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.surfaceInteractive,
     display: "flex",
     flexDirection: "column",
-    borderRadius: 12,
+    borderRadius: radius.default,
     padding: 12,
     paddingBottom: 5,
   },

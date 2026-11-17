@@ -2,6 +2,7 @@ import React from "react"
 import { View } from "react-native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button/galoy-icon-button"
 import { IconNamesType } from "@app/components/atomic/galoy-icon/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -97,7 +98,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "space-around",
     alignItems: "center",
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 12,
+    borderRadius: radius.default,
     height: 94,
     marginHorizontal: 20,
     marginTop: 14,

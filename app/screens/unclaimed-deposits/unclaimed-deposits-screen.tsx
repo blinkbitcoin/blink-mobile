@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, TextInput, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { CheckboxRow } from "@app/components/checkbox-row"
@@ -231,7 +232,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   card: {
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 12,
+    borderRadius: radius.default,
     padding: 20,
     gap: 14,
   },
@@ -278,7 +279,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   fieldInput: {
     backgroundColor: colors.backgroundDefault,
-    borderRadius: 10,
+    borderRadius: radius.default,
     paddingHorizontal: 14,
     minHeight: 48,
     justifyContent: "center",
@@ -290,7 +291,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   fieldGroup: {
     backgroundColor: colors.backgroundDefault,
-    borderRadius: 10,
+    borderRadius: radius.default,
     paddingHorizontal: 14,
     paddingVertical: 10,
     gap: 12,

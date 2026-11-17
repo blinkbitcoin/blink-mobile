@@ -3,6 +3,7 @@ import { ScrollView, View } from "react-native"
 
 import { Divider, makeStyles, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { SettingItemRow } from "@app/components/card-screen"
@@ -115,7 +116,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   toolsCard: {
     ...staticSurface(colors),
-    borderRadius: 8,
+    borderRadius: radius.default,
     overflow: "hidden",
   },
   toolsDivider: {

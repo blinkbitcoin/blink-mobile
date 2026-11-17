@@ -5,6 +5,8 @@ import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
 
+import { radius } from "@app/rne-theme/radius"
+
 type PasswordInputProps = {
   label: string
   value: string
@@ -79,7 +81,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     minHeight: 50,
     paddingLeft: 14,
     paddingRight: 10,

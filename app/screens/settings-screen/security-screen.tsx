@@ -2,6 +2,7 @@ import * as React from "react"
 import { useCallback, useMemo, useState } from "react"
 import { View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { useHideBalanceSetting } from "@app/hooks/use-hide-balance-setting"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import type { TranslationFunctions } from "@app/i18n/i18n-types"
@@ -260,7 +261,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   settingContainer: {
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 12,
+    borderRadius: radius.default,
   },
   textContainer: {
     color: colors.textDisabled,

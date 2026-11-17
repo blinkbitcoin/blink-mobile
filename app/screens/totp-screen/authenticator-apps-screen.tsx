@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import GoogleAuthenticatorIcon from "@app/assets/icons/authenticator-apps/google-authenticator.svg"
 import ProtonAuthenticatorIcon from "@app/assets/icons/authenticator-apps/proton-authenticator.svg"
 import TwoFasAuthIcon from "@app/assets/icons/authenticator-apps/twofas-auth.svg"
@@ -180,7 +181,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 14,
     paddingLeft: 14,
     paddingRight: 10,
-    borderRadius: 8,
+    borderRadius: radius.default,
     backgroundColor: colors.surfaceInteractive,
   },
   appIcon: {

@@ -3,6 +3,7 @@ import { Pressable, View } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
 
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
@@ -68,7 +69,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     maxWidth: "50%",
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     borderWidth: 1,
     borderColor: "transparent",
     paddingHorizontal: 14,

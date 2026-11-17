@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react"
 import { AppState, View, ScrollView } from "react-native"
 import ViewShot, { type ViewShotRef } from "react-native-view-shot"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "@app/components/screen"
 import {
@@ -442,7 +443,7 @@ const useStyles = makeStyles(({ colors }) => ({
     overflow: "hidden",
     gap: 20,
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 10,
+    borderRadius: radius.default,
     alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 14,
