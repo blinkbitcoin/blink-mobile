@@ -167,10 +167,11 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   } = useAppConfig()
   const [isLoadingLnurl, setIsLoadingLnurl] = useState(false)
   const [isHighFeeSheetVisible, setIsHighFeeSheetVisible] = useState(false)
-  /** The thumb is held: the screen holds its scroll so the drag stays a drag. */
+  /** The thumb is held: the screen holds its scroll so the drag stays a drag, and the
+   *  on-chain fee is quoted once it is let go. */
   const [isSliding, setIsSliding] = useState(false)
-  /** The sender slid to an amount on this send; review learns it, and a send that goes
-   *  through retires the slider's hint. */
+  /** The sender slid on this send; review learns it, and a send that goes through retires
+   *  the slider's hint, even when the amount was typed over after. They have seen it work. */
   const [hasUsedSlider, setHasUsedSlider] = useState(false)
   const { showAmountSliderHint } = useAmountSliderHint()
 
@@ -205,6 +206,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     isSelfCustodial,
     paymentDestination,
     convertMoneyAmount: _convertMoneyAmount,
+    isAmountSliding: isSliding,
   })
 
   /**

@@ -42,6 +42,9 @@ type FeeTierOptionsParams = {
   isSelfCustodial: boolean
   paymentDestination: ParseDestinationResult | undefined
   convertMoneyAmount: ConvertMoneyAmount | undefined
+  /** The amount is still moving under the sender's finger on the slider: the custodial
+   *  quote waits for it to settle, so a drag asks for one fee rather than one a percent. */
+  isAmountSliding?: boolean
 }
 
 export const useOnchainFeeTierOptions = ({
@@ -49,6 +52,7 @@ export const useOnchainFeeTierOptions = ({
   isSelfCustodial,
   paymentDestination,
   convertMoneyAmount,
+  isAmountSliding = false,
 }: FeeTierOptionsParams) => {
   const { sdk } = useSelfCustodialWallet()
   const { formatMoneyAmount, moneyAmountToDisplayCurrencyString } = useDisplayCurrency()
@@ -76,7 +80,7 @@ export const useOnchainFeeTierOptions = ({
   })
   const custodialRail = useCustodialFeeRail({
     paymentDetail,
-    isActive: !isSelfCustodial && isOnchain,
+    isActive: !isSelfCustodial && isOnchain && !isAmountSliding,
   })
 
   /** The one place the rail is chosen; everything below reads the winner plainly. */
