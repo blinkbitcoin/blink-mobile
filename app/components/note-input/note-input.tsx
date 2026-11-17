@@ -6,7 +6,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
-import { GaloyIcon } from "../atomic/galoy-icon"
+import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 
 export type NoteInputProps = {
   onBlur?: (() => void) | undefined
@@ -19,7 +19,10 @@ export type NoteInputProps = {
   fontSize?: number
   /** Replaces "Add note" as both the placeholder and the field's accessibility label. */
   placeholder?: string
+  /** Defaults to textOnBackground. */
+  placeholderTextColor?: string
   maxLength?: number
+  icon?: IconNamesType
 }
 
 export const NoteInput: React.FC<NoteInputProps> = ({
@@ -32,7 +35,9 @@ export const NoteInput: React.FC<NoteInputProps> = ({
   iconSize = 18,
   fontSize = 16,
   placeholder,
+  placeholderTextColor,
   maxLength = 500,
+  icon = "note",
 }) => {
   const { LL } = useI18nContext()
   const label = placeholder ?? LL.NoteInput.addNote()
@@ -55,7 +60,7 @@ export const NoteInput: React.FC<NoteInputProps> = ({
           accessibilityLabel={label}
           style={[styles.noteInput, { fontSize }]}
           placeholder={label}
-          placeholderTextColor={colors.textOnBackground}
+          placeholderTextColor={placeholderTextColor ?? colors.textOnBackground}
           onChangeText={onChangeText}
           onBlur={onBlur}
           value={value}
@@ -65,7 +70,7 @@ export const NoteInput: React.FC<NoteInputProps> = ({
           ref={textInputRef}
         />
         <TouchableOpacity style={styles.noteIconContainer} onPress={focusTextInput}>
-          <GaloyIcon name={"note"} size={iconSize} color={colors.accent} />
+          <GaloyIcon name={icon} size={iconSize} color={colors.accent} />
         </TouchableOpacity>
       </View>
     </View>
