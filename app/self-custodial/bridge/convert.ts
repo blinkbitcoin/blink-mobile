@@ -22,6 +22,7 @@ import {
   ConvertDirection,
   ConvertErrorCode,
   PaymentResultStatus,
+  type ConvertExecuteOptions,
   type ConvertParams,
   type ConvertQuote,
   type GetConversionQuoteAdapter,
@@ -307,6 +308,7 @@ const OUTCOME_UNKNOWN_MESSAGE = "Conversion outcome unknown"
 const HISTORY_UNAVAILABLE_MESSAGE = "Wallet history unavailable"
 const EARLIER_CONVERSION_MESSAGE = "Earlier conversion found"
 const CONVERSION_FAILED_MESSAGE = "Conversion failed"
+const ALREADY_CONVERTED_MESSAGE = "Already converted"
 
 /** Which way a conversion went, told by what it delivered: dollars for one from bitcoin,
  *  bitcoin for one to it. */
@@ -466,7 +468,7 @@ type ConversionExecution = {
    *  context's SDK, so its outcome belongs to that context too. */
   startedIn: number
   params: ConvertParams
-}
+} & ConvertExecuteOptions
 
 const executePrepared = (
   sdk: BreezSdkInterface,
@@ -484,7 +486,7 @@ const executePrepared = (
 const convertAfterEarlierConversions = async (
   sdk: BreezSdkInterface,
   attempts: LostAttemptsHandle,
-  { prepared, estimate, startedIn, params }: ConversionExecution,
+  { prepared, estimate, startedIn, params, isConvertedMeanwhile }: ConversionExecution,
 ): Promise<PaymentAdapterResult> => {
   /** Nothing is converted while what an earlier launch lost has not been read back: a
    *  conversion it lost may be this one, done already. */
@@ -519,6 +521,21 @@ const convertAfterEarlierConversions = async (
       Date.now() - earlier.lastAttemptAtMs < LOST_CONVERSION_DELIVERY_WINDOW_MS
     if (canStillDeliver) {
       return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
+    }
+  }
+  /** What was decided before the turn came is asked again now, when no other conversion
+   *  in the wallet can go out: auto-convert's receive may have been converted meanwhile,
+   *  by the user included. Unanswered, nothing is converted. */
+  if (isConvertedMeanwhile) {
+    const isConverted = await isConvertedMeanwhile().catch((err: unknown) => {
+      recordConvertError(err, params, "isConvertedMeanwhile")
+      return undefined
+    })
+    if (isConverted === undefined) {
+      return failed(HISTORY_UNAVAILABLE_MESSAGE, ConvertErrorCode.HistoryUnavailable)
+    }
+    if (isConverted) {
+      return failed(ALREADY_CONVERTED_MESSAGE, ConvertErrorCode.AlreadyConverted)
     }
   }
   const swapTelemetry = {
@@ -634,7 +651,8 @@ const toConvertQuote = (
   return {
     feeAmount: toUsdMoneyAmount(feeCents),
     amountAdjustment: mapAmountAdjustment(estimate.amountAdjustment),
-    execute: () => executePrepared(sdk, { prepared, estimate, startedIn, params }),
+    execute: (options) =>
+      executePrepared(sdk, { prepared, estimate, startedIn, params, ...options }),
   }
 }
 

@@ -1702,6 +1702,73 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
   })
 })
 
+describe("a conversion asked once its turn comes whether it was converted meanwhile", () => {
+  const params = {
+    fromAmount: toBtcMoneyAmount(5000),
+    toAmount: toUsdMoneyAmount(137),
+    direction: ConvertDirection.BtcToUsd,
+  }
+
+  const walletSdk = () => ({
+    prepareSendPayment: jest.fn().mockResolvedValue({
+      paymentMethod: {},
+      conversionEstimate: {
+        fee: BigInt(0),
+        amountIn: BigInt(5000),
+        amountOut: BigInt(1_370_000),
+        amountAdjustment: undefined,
+      },
+    }),
+    sendPayment: jest.fn().mockResolvedValue({ payment: { id: "c1", status: 0 } }),
+    receivePayment: jest.fn().mockResolvedValue({ paymentRequest: "sp1own-invoice" }),
+    getInfo: jest.fn().mockResolvedValue({ tokenBalances: {} }),
+    listPayments: jest.fn().mockResolvedValue({ payments: [] }),
+    syncWallet: jest.fn().mockResolvedValue({}),
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockMarkReceivedHistory.mockResolvedValue(MARK)
+    mockFetchLimits.mockResolvedValue({ minFromAmount: null, minToAmount: null })
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+  })
+
+  it("converts nothing once its turn comes when what it was to convert was converted", async () => {
+    const sdk = walletSdk()
+
+    const result = await (await createGetConversionQuote(sdk as never)(params))!.execute({
+      isConvertedMeanwhile: async () => true,
+    })
+
+    expect(result.errors?.[0].code).toBe(ConvertErrorCode.AlreadyConverted)
+    expect(mockMarkReceivedHistory).not.toHaveBeenCalled()
+    expect(sdk.sendPayment).not.toHaveBeenCalled()
+  })
+
+  it("converts nothing when its turn comes and that cannot be told", async () => {
+    const sdk = walletSdk()
+
+    const result = await (await createGetConversionQuote(sdk as never)(params))!.execute({
+      isConvertedMeanwhile: () => Promise.reject(new Error("storage failed")),
+    })
+
+    expect(result.errors?.[0].code).toBe(ConvertErrorCode.HistoryUnavailable)
+    expect(sdk.sendPayment).not.toHaveBeenCalled()
+    expect(mockRecordError).toHaveBeenCalled()
+  })
+
+  it("goes out when nothing was converted while it waited", async () => {
+    const sdk = walletSdk()
+
+    const result = await (await createGetConversionQuote(sdk as never)(params))!.execute({
+      isConvertedMeanwhile: async () => false,
+    })
+
+    expect(result.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+})
+
 describe("a conversion in flight when the app closes", () => {
   const params = {
     fromAmount: toBtcMoneyAmount(5000),

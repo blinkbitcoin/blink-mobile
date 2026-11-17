@@ -198,6 +198,9 @@ export const ConvertErrorCode = {
   /** Nothing was delivered: the SDK answered that the conversion failed, which settles
    *  it, so it can be tried again. */
   ConversionFailed: "conversion_failed",
+  /** Nothing was converted: what it was to convert was converted while it waited for its
+   *  turn in the wallet. */
+  AlreadyConverted: "already_converted",
 } as const
 
 export type ConvertErrorCode = (typeof ConvertErrorCode)[keyof typeof ConvertErrorCode]
@@ -277,10 +280,17 @@ export const resolveDustAdjustment = (
   return amountInSourceCurrency >= fromWalletBalance ? null : amountAdjustment
 }
 
+/** How a quoted conversion goes out. `isConvertedMeanwhile` is asked once its turn in the
+ *  wallet has come, right before it goes out: true when what it is to convert was
+ *  converted while it waited. A throw converts nothing either. */
+export type ConvertExecuteOptions = {
+  isConvertedMeanwhile?: () => Promise<boolean>
+}
+
 export type ConvertQuote = {
   feeAmount: UsdMoneyAmount
   amountAdjustment?: ConvertAmountAdjustment
-  execute: () => Promise<PaymentAdapterResult>
+  execute: (options?: ConvertExecuteOptions) => Promise<PaymentAdapterResult>
 }
 
 export type GetConversionQuoteAdapter = (
