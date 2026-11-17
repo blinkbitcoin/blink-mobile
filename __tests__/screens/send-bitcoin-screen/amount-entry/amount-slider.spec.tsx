@@ -12,6 +12,7 @@ import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import {
   AMOUNT_SLIDER_BADGE_TEST_ID,
+  AMOUNT_SLIDER_HINT_TEST_ID,
   AMOUNT_SLIDER_PAN_TEST_ID,
   AMOUNT_SLIDER_TEST_ID,
   AMOUNT_SLIDER_TRACK_TEST_ID,
@@ -84,6 +85,12 @@ const drag = (from: number, to: number) =>
     { state: State.END, x: xAt(to) },
   ])
 
+/** A screen reader's swipe up (increment) or down (decrement) on the slider. */
+const swipe = (actionName: "increment" | "decrement") =>
+  fireEvent(screen.getByTestId(AMOUNT_SLIDER_TEST_ID), "accessibilityAction", {
+    nativeEvent: { actionName },
+  })
+
 const touchAreaWidth = () =>
   (StyleSheet.flatten(screen.getByTestId(AMOUNT_SLIDER_TEST_ID).props.style) as ViewStyle)
     .width
@@ -127,13 +134,30 @@ describe("AmountSlider", () => {
     it("shows 'Slide to select amount' by default", async () => {
       await renderSlider()
 
-      expect(screen.getByText(LL.SendBitcoinScreen.slideToSelectAmount())).toBeTruthy()
+      expect(
+        screen.getByText(LL.SendBitcoinScreen.slideToSelectAmount(), {
+          includeHiddenElements: true,
+        }),
+      ).toBeTruthy()
     })
 
     it("leaves it out once the sender has learned the slider", async () => {
       await renderSlider({ showHint: false })
 
-      expect(screen.queryByText(LL.SendBitcoinScreen.slideToSelectAmount())).toBeNull()
+      expect(
+        screen.queryByTestId(AMOUNT_SLIDER_HINT_TEST_ID, { includeHiddenElements: true }),
+      ).toBeNull()
+    })
+
+    // The slider reads the same words as its label, so the hint isn't read twice.
+    it("is hidden from screen readers on both platforms", async () => {
+      await renderSlider()
+
+      const hint = screen.getByTestId(AMOUNT_SLIDER_HINT_TEST_ID, {
+        includeHiddenElements: true,
+      })
+      expect(hint.props.accessibilityElementsHidden).toBe(true)
+      expect(hint.props.importantForAccessibility).toBe("no-hide-descendants")
     })
   })
 
@@ -196,6 +220,81 @@ describe("AmountSlider", () => {
       await drag(0, 30)
 
       expect(onHoldChange.mock.calls).toEqual([[true], [false]])
+    })
+  })
+
+  describe("screen reader", () => {
+    it("is one adjustable element named for what it does", async () => {
+      await renderSlider({ share: 0.25 })
+
+      const slider = screen.getByTestId(AMOUNT_SLIDER_TEST_ID)
+      expect(slider.props.accessible).toBe(true)
+      expect(slider.props.accessibilityRole).toBe("adjustable")
+      expect(slider.props.accessibilityLabel).toBe(
+        LL.SendBitcoinScreen.slideToSelectAmount(),
+      )
+      expect(slider.props.accessibilityActions).toEqual([
+        { name: "increment" },
+        { name: "decrement" },
+      ])
+    })
+
+    it.each([
+      [0, 0],
+      [0.25, 25],
+      [0.999, 100],
+      // Typed over the balance: pinned at 100%, as the thumb is.
+      [1.4, 100],
+    ])("reads a share of %p as %i%%", async (share, now) => {
+      await renderSlider({ share })
+
+      expect(screen.getByTestId(AMOUNT_SLIDER_TEST_ID).props.accessibilityValue).toEqual({
+        min: 0,
+        max: 100,
+        now,
+      })
+    })
+
+    it.each([
+      [0, "increment", 10],
+      [0.23, "increment", 30],
+      [0.23, "decrement", 20],
+      [0.3, "increment", 40],
+      [0.3, "decrement", 20],
+      // The step to 90% and over lands on the full balance, as a drag past 96% does.
+      [0.9, "increment", 100],
+      [0.91, "increment", 100],
+      [1, "increment", 100],
+      [1, "decrement", 90],
+      [0, "decrement", 0],
+    ] as const)("steps %p by a tenth on %s to %i%%", async (share, action, percent) => {
+      const onSlide = await renderSlider({ share })
+
+      swipe(action)
+
+      expect(onSlide).toHaveBeenCalledTimes(1)
+      expect(onSlide).toHaveBeenCalledWith(percent)
+    })
+
+    it("ignores any other action", async () => {
+      const onSlide = await renderSlider({ share: 0.5 })
+
+      fireEvent(screen.getByTestId(AMOUNT_SLIDER_TEST_ID), "accessibilityAction", {
+        nativeEvent: { actionName: "activate" },
+      })
+
+      expect(onSlide).not.toHaveBeenCalled()
+    })
+
+    it("holds no thumb, buzzes nothing and shows no badge on a step", async () => {
+      const onHoldChange = jest.fn()
+      await renderSlider({ share: 0.5, onHoldChange })
+
+      swipe("increment")
+
+      expect(onHoldChange).not.toHaveBeenCalled()
+      expect(haptics.grab).not.toHaveBeenCalled()
+      expect(screen.queryByTestId(AMOUNT_SLIDER_BADGE_TEST_ID)).toBeNull()
     })
   })
 
