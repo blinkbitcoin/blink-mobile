@@ -3,6 +3,7 @@ import { Text as ReactNativeText, View } from "react-native"
 import { act, render, fireEvent } from "@testing-library/react-native"
 
 import { CurrencyKeyboard } from "@app/components/currency-keyboard/currency-keyboard"
+import { haptics } from "@app/utils/haptics"
 import {
   getDisabledKeys,
   Key,
@@ -143,6 +144,17 @@ describe("CurrencyKeyboard", () => {
 
     expect(mockOnPress).not.toHaveBeenCalled()
   })
+
+  it("buzzes on every accessibility click of the same accepted key", () => {
+    const onPress = jest.fn().mockReturnValue(true)
+    const { getByText } = render(<CurrencyKeyboard onPress={onPress} />)
+    const key = getByText("1")
+
+    fireEvent(key, "click")
+    fireEvent(key, "click")
+
+    expect(haptics.tap).toHaveBeenCalledTimes(2)
+  })
 })
 
 /** Mirrors `useNumberPad`: the handler closes over the amount of the render it came from. */
@@ -163,6 +175,7 @@ const StatefulPad = ({ initial }: { initial: string }) => {
 
 describe("CurrencyKeyboard held backspace", () => {
   beforeEach(() => {
+    jest.clearAllMocks()
     jest.useFakeTimers()
   })
 
@@ -210,6 +223,21 @@ describe("CurrencyKeyboard held backspace", () => {
     })
 
     expect(onPress).toHaveBeenCalledTimes(2)
+  })
+
+  it("buzzes once for a held backspace, including the release", () => {
+    const onPress = jest.fn().mockReturnValue(true)
+    const { getByTestId } = render(<CurrencyKeyboard onPress={onPress} />)
+    const key = getByTestId("Key ⌫")
+
+    fireEvent(key, "pressIn")
+    act(() => {
+      jest.advanceTimersByTime(600)
+    })
+    fireEvent(key, "pressOut")
+    fireEvent(key, "press")
+
+    expect(haptics.tap).toHaveBeenCalledTimes(1)
   })
 })
 

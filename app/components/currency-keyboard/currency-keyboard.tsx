@@ -85,8 +85,11 @@ const Key = ({
   const handleKeyPressRef = useRef(handleKeyPress)
   handleKeyPressRef.current = handleKeyPress
   const repeatTimer = useRef<ReturnType<typeof setInterval> | null>(null)
-  /** One haptic per gesture: a held backspace deletes repeatedly but buzzes once. */
+  /** One haptic per pointer gesture: a held backspace deletes repeatedly but buzzes once.
+   *  Armed only by pressIn. An accessibility click calls onPress and never pressIn, so it
+   *  must not leave the guard set. */
   const hasTapped = useRef(false)
+  const pointerDown = useRef(false)
 
   const stopRepeat = useCallback(() => {
     if (!repeatTimer.current) return
@@ -96,14 +99,20 @@ const Key = ({
 
   const press = (key: KeyType) => {
     const accepted = handleKeyPressRef.current(key)
-    if (accepted && !hasTapped.current) {
-      hasTapped.current = true
+    if (accepted && !(pointerDown.current && hasTapped.current)) {
+      hasTapped.current = pointerDown.current
       haptics.tap()
     }
     return accepted
   }
 
+  const endPointerGesture = () => {
+    pointerDown.current = false
+    hasTapped.current = false
+  }
+
   const handlePressIn = (key: KeyType) => {
+    pointerDown.current = true
     hasTapped.current = false
     if (safeMode) return
     if (key !== KeyType.Backspace) return
@@ -131,7 +140,10 @@ const Key = ({
         pressed && styles.keyPressedBg,
       ]}
       onPressIn={() => handlePressIn(numberPadKey)}
-      onPress={() => press(numberPadKey)}
+      onPress={() => {
+        press(numberPadKey)
+        endPointerGesture()
+      }}
       onPressOut={stopRepeat}
       {...testProps(`${KEY_TEST_ID_PREFIX} ${numberPadKey}`)}
       accessibilityRole="button"
