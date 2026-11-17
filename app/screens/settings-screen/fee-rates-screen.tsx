@@ -360,6 +360,7 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 24,
   },
   groupCard: {
+    marginTop: 0,
     paddingVertical: 5,
   },
   hiddenDivider: {

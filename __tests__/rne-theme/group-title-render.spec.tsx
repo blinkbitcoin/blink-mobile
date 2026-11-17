@@ -95,12 +95,32 @@ describe("group titles render textSecondary, 5px above their content", () => {
     expect(ancestorStyle(label, "gap")).toBe(groupTitleGap)
   })
 
-  it("card InputField", () => {
-    const { getByText } = renderThemed(<InputField label="Daily spending" value="100" />)
+  it("card InputField puts 5px under the label and keeps 3px above helper text", () => {
+    const { getByText } = renderThemed(
+      <InputField label="Daily spending" value="100" helperText="Optional" />,
+    )
     const label = getByText("Daily spending")
 
-    expect(styleOf(label).color).toBe(light.textSecondary)
-    expect(ancestorStyle(label, "gap")).toBe(groupTitleGap)
+    expect(styleOf(label)).toMatchObject({
+      color: light.textSecondary,
+      marginBottom: groupTitleGap,
+    })
+    expect(ancestorStyle(label, "gap")).toBeUndefined()
+    expect(styleOf(getByText("Optional")).marginTop).toBe(3)
+  })
+
+  it("card InputField keeps 3px under an editable field", () => {
+    const { getByText } = renderThemed(
+      <InputField
+        label="Daily spending"
+        value="100"
+        helperText="Optional"
+        onChangeText={jest.fn()}
+      />,
+    )
+
+    expect(styleOf(getByText("Daily spending")).marginBottom).toBe(groupTitleGap)
+    expect(ancestorStyle(getByText("Optional"), "marginTop")).toBe(3)
   })
 
   it("PasswordInput", () => {

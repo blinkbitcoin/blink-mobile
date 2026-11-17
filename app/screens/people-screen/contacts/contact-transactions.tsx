@@ -12,6 +12,7 @@ import { groupTransactionsByDate } from "@app/graphql/transactions"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useContactTransactions } from "@app/hooks/use-contact-transactions"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 import { useSelfCustodialTransactionFragments } from "@app/self-custodial/hooks/use-self-custodial-transaction-fragments"
 import { radius } from "@app/rne-theme/radius"
 import { AccountType } from "@app/types/wallet"
@@ -257,13 +258,13 @@ const useStyles = makeStyles(({ colors }) => ({
   sectionHeaderContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingBottom: 3,
     paddingTop: 10,
   },
 
   sectionHeaderText: {
-    color: colors.textOnBackground,
+    color: colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
+    marginBottom: groupTitleGap,
   },
 }))

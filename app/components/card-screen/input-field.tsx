@@ -178,7 +178,7 @@ export const InputField: React.FC<InputFieldProps> = ({
           )}
         </View>
         {reserveHelperLine && (
-          <View style={styles.helperTextContainer}>
+          <View style={[styles.helperTextContainer, styles.helperSpacing]}>
             {displayHelperText ? (
               <View style={styles.helperTextRow}>
                 {isError && (
@@ -220,7 +220,13 @@ export const InputField: React.FC<InputFieldProps> = ({
       <Text style={styles.label}>{label}</Text>
       {pressableContent}
       {helperText ? (
-        <Text style={[styles.helperText, isError && styles.helperTextError]}>
+        <Text
+          style={[
+            styles.helperText,
+            styles.helperSpacing,
+            isError && styles.helperTextError,
+          ]}
+        >
           {helperText}
         </Text>
       ) : null}
@@ -233,15 +239,14 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
   const isLarge = size === InputSize.Large
 
   return {
-    container: {
-      gap: groupTitleGap,
-    },
+    container: {},
     label: {
       color: colors.textSecondary,
       fontSize: 14,
       fontFamily: "Source Sans Pro",
       fontWeight: "400",
       lineHeight: 20,
+      marginBottom: groupTitleGap,
     },
     valueContainer: {
       backgroundColor: colors.surfaceInteractive,
@@ -277,6 +282,9 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
     },
     helperTextError: {
       color: colors.error,
+    },
+    helperSpacing: {
+      marginTop: 3,
     },
     helperTextContainer: {
       minHeight: 13,

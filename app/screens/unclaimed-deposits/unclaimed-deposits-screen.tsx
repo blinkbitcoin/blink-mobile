@@ -28,7 +28,6 @@ import {
   useRecommendedFeeTiers,
 } from "./hooks/use-recommended-fee-tiers"
 import { addressPlaceholderFor, openMempoolTx } from "./utils"
-import { groupTitleGap } from "@app/rne-theme/tokens"
 
 export const UnclaimedDepositsScreen: React.FC = () => {
   const styles = useStyles()
@@ -275,8 +274,8 @@ const useStyles = makeStyles(({ colors }) => ({
   fieldLabel: {
     fontSize: 13,
     fontFamily: fonts.bold,
-    color: colors.textSecondary,
-    marginBottom: groupTitleGap,
+    color: colors.textMuted,
+    marginBottom: 8,
   },
   fieldInput: {
     backgroundColor: colors.backgroundDefault,

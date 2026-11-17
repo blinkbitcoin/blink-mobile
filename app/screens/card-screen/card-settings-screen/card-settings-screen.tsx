@@ -275,7 +275,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginHorizontal: 22,
   },
   dangerZoneSection: {
-    gap: groupTitleGap,
+    gap: 3,
   },
   dangerZoneTitle: {
     color: colors.error,
