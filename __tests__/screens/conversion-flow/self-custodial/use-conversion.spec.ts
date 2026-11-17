@@ -1,3 +1,4 @@
+import { it } from "@jest/globals"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 
@@ -575,12 +576,15 @@ describe("useSelfCustodialConversion", () => {
       expect(result.current.errorMessage).toBe("Your earlier transfer went through")
     })
 
-    it("asks to try again, not the SDK's words, when the wallet's history was unreadable", async () => {
+    it.each([
+      ["the wallet's history was unreadable", ConvertErrorCode.HistoryUnavailable],
+      ["the SDK answered that the conversion failed", ConvertErrorCode.ConversionFailed],
+    ])("asks to try again, not the SDK's words, when %s", async (_, code) => {
       mockGetQuote.mockResolvedValue(
         makeQuote({
           execute: jest.fn().mockResolvedValue({
             status: PaymentResultStatus.Failed,
-            errors: [{ message: "raw", code: ConvertErrorCode.HistoryUnavailable }],
+            errors: [{ message: "raw", code }],
           }),
         }),
       )

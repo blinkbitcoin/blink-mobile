@@ -3,6 +3,7 @@ import {
   AmountAdjustmentReason,
   PaymentDetails,
   PaymentRequest,
+  PaymentStatus,
   PrepareSendPaymentRequest,
   PrepareSendPaymentResponse,
   ReceivePaymentMethod,
@@ -305,6 +306,7 @@ const prepareConversion = async (
 const OUTCOME_UNKNOWN_MESSAGE = "Conversion outcome unknown"
 const HISTORY_UNAVAILABLE_MESSAGE = "Wallet history unavailable"
 const EARLIER_CONVERSION_MESSAGE = "Earlier conversion found"
+const CONVERSION_FAILED_MESSAGE = "Conversion failed"
 
 /** Which way a conversion went, told by what it delivered: dollars for one from bitcoin,
  *  bitcoin for one to it. */
@@ -559,9 +561,8 @@ const convertAfterEarlierConversions = async (
       SendPaymentRequest.create({ prepareResponse: prepared }),
     )
     /** Answered, it leaves nothing to look for: taken back before anything else is
-     *  stored. Out, it settles the lost conversion it was let through past. */
+     *  stored. */
     writtenAhead.end()
-    if (earlier) keepLost(undefined)
     /** By the SDK's word on the payment, as for sends: a conversion normally comes back
      *  completed, and one that does not is held until its outcome is announced. */
     measureSettlement(
@@ -572,6 +573,15 @@ const convertAfterEarlierConversions = async (
       },
       startedIn,
     )
+    /** Failed, as sends are: the SDK hands back the delivery it waited for, which a swap
+     *  that expired or was returned leaves failed. Nothing delivered settles nothing, so
+     *  the lost conversion it was let through past is still looked for. */
+    const isConversionFailed = response?.payment?.status === PaymentStatus.Failed
+    if (isConversionFailed) {
+      return failed(CONVERSION_FAILED_MESSAGE, ConvertErrorCode.ConversionFailed)
+    }
+    /** Out, it settles the lost conversion it was let through past. */
+    if (earlier) keepLost(undefined)
     return { status: PaymentResultStatus.Success }
   } catch (err) {
     recordConvertError(err, params, "executePrepared")

@@ -31,6 +31,7 @@ const conversionErrorMessage = (
     [ConvertErrorCode.EarlierConversionFound]:
       LL.SelfCustodialError.earlierConversionFound,
     [ConvertErrorCode.HistoryUnavailable]: LL.errors.generic,
+    [ConvertErrorCode.ConversionFailed]: LL.errors.generic,
   }
   const translate = error?.code === undefined ? undefined : ownWords[error.code]
   return translate?.() ?? error?.message ?? LL.errors.generic()

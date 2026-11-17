@@ -1,5 +1,8 @@
 import { it } from "@jest/globals"
-import { AmountAdjustmentReason } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  AmountAdjustmentReason,
+  PaymentStatus,
+} from "@breeztech/breez-sdk-spark-react-native"
 
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import {
@@ -599,6 +602,17 @@ describe("swap telemetry", () => {
     expect(mockLogEvent).not.toHaveBeenCalled()
   })
 
+  it("reports a conversion the SDK answered as failed", async () => {
+    const sdk = createSdk()
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "cv-1", status: FAILED } })
+
+    const quote = await createGetConversionQuote(sdk as never)(params)
+    const result = await quote!.execute()
+
+    expect(result.status).toBe("failed")
+    expect(loggedEvents()).toEqual(["sc_swap_failed"])
+  })
+
   it("reports a thrown conversion as failed", async () => {
     const sdk = createSdk()
     sdk.sendPayment.mockRejectedValue(new Error("send failed"))
@@ -1010,6 +1024,44 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
       { tokenIdentifier: "usdb-token-id", amount: 2_000_000, isAutomatic: false },
     ])
     expect(nextLook.knownPaymentIds).toContain("rcv-usdb")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("fails a conversion the SDK answers failed, still looking for the lost one it went out past", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(foundDelivery())
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    sdk.sendPayment.mockResolvedValueOnce({
+      payment: { id: "c2", status: PaymentStatus.Failed },
+    })
+    const replacement = await (await quoteFor(sdk))!.execute()
+    const next = await (await quoteFor(sdk))!.execute()
+
+    expect(replacement.status).toBe("failed")
+    expect(replacement.errors?.[0].code).toBe(ConvertErrorCode.ConversionFailed)
+    expect(mockFindLostConversion.mock.calls[2][0].lost.expectedDeliveries).toHaveLength(
+      1,
+    )
+    expect(next.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("leaves nothing to look for once the SDK answers a conversion failed", async () => {
+    const sdk = throwingSdk()
+    sdk.sendPayment
+      .mockResolvedValueOnce({ payment: { id: "c1", status: PaymentStatus.Failed } })
+      .mockResolvedValueOnce({ payment: { id: "c2", status: PaymentStatus.Completed } })
+
+    await (await quoteFor(sdk))!.execute()
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.status).toBe("success")
+    expect(mockFindLostConversion).not.toHaveBeenCalled()
     expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
   })
 

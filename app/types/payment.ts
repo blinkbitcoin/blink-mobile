@@ -195,6 +195,9 @@ export const ConvertErrorCode = {
   /** Nothing was converted: an earlier conversion that may have been lost turned out to
    *  have gone through, for another amount or the other way, and is the user's to check. */
   EarlierConversionFound: "earlier_conversion_found",
+  /** Nothing was delivered: the SDK answered that the conversion failed, which settles
+   *  it, so it can be tried again. */
+  ConversionFailed: "conversion_failed",
 } as const
 
 export type ConvertErrorCode = (typeof ConvertErrorCode)[keyof typeof ConvertErrorCode]
