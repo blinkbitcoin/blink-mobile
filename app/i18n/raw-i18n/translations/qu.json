@@ -4279,7 +4279,8 @@
     "generic": "Quy mana tukukuyta atinmi. Pisi kutilla suyay hinaspa kaqmanta rurariy, utaq aswan huch'uy qullqitaqa rurariy.",
     "outcomeUnknown": "Kay qullqi kutichiyqa ñachá rirqanña. Manaraq kaqmanta kachaspa, transaccionniykikunap willakuyninta qhaway.",
     "earlierPaymentFound": "Ñawpaq qullqi kachasqaykiqa kay maymanqa ñam rirqanña, huk chaninwan. Manaraq kaqmanta kachaspa qhaway.",
-    "earlierConversionFound": "Ñawpaq tukuyniykiqa ñam rirqanña, huk chaninwan. Manaraq kaqmanta tukuspa, rurasqaykikunapi qhaway."
+    "earlierConversionFound": "Ñawpaq tukuyniykiqa ñam rirqanña, huk chaninwan. Manaraq kaqmanta tukuspa, rurasqaykikunapi qhaway.",
+    "convertedMeanwhile": "Kay chaninman rikchakuq tukuyqa kunallanmi rirqan. Kaykunata kaqmanta manaraq takyachispa, qullqiykita qhaway."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Kay cuentaqa {network} pi kamarisqa karqan. Llamk'achinapaq {network} man tikray."

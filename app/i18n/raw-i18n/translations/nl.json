@@ -4279,7 +4279,8 @@
     "generic": "De betaling kon niet worden voltooid. Probeer het zo opnieuw, of gebruik een kleiner bedrag.",
     "outcomeUnknown": "Deze betaling is mogelijk al uitgevoerd. Controleer je transactiegeschiedenis voordat je hem opnieuw verstuurt.",
     "earlierPaymentFound": "Je eerdere betaling naar deze bestemming is al uitgevoerd, voor een ander bedrag. Controleer hem voordat je opnieuw verstuurt.",
-    "earlierConversionFound": "Je eerdere wissel is al uitgevoerd, voor een ander bedrag. Controleer hem in je transactiegeschiedenis voordat je opnieuw wisselt."
+    "earlierConversionFound": "Je eerdere wissel is al uitgevoerd, voor een ander bedrag. Controleer hem in je transactiegeschiedenis voordat je opnieuw wisselt.",
+    "convertedMeanwhile": "Er is net een wissel van ongeveer dit bedrag uitgevoerd. Controleer je saldo voordat je deze opnieuw bevestigt."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Dit account is aangemaakt op {network}. Schakel over naar {network} om het te gebruiken."

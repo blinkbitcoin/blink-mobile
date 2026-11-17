@@ -4477,6 +4477,8 @@ const en: BaseTranslation = {
       "Your earlier payment to this destination already went through, for a different amount. Check it before sending again.",
     earlierConversionFound:
       "Your earlier transfer already went through, for a different amount. Check it in your transaction history before transferring again.",
+    convertedMeanwhile:
+      "A transfer of about this amount just went through. Check your balance before confirming this one again.",
   },
   SelfCustodialNetworkMismatch: {
     toast:

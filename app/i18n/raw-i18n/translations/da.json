@@ -4279,7 +4279,8 @@
     "generic": "Betalingen kunne ikke gennemføres. Prøv igen om et øjeblik eller brug et mindre beløb.",
     "outcomeUnknown": "Denne betaling er muligvis allerede gennemført. Tjek din transaktionshistorik, før du sender den igen.",
     "earlierPaymentFound": "Din tidligere betaling til denne modtager er allerede gennemført, med et andet beløb. Tjek den, før du sender igen.",
-    "earlierConversionFound": "Din tidligere konvertering er allerede gennemført, med et andet beløb. Tjek den i din transaktionshistorik, før du konverterer igen."
+    "earlierConversionFound": "Din tidligere konvertering er allerede gennemført, med et andet beløb. Tjek den i din transaktionshistorik, før du konverterer igen.",
+    "convertedMeanwhile": "En konvertering af omtrent dette beløb er netop gennemført. Tjek din saldo, før du bekræfter denne igen."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Denne konto blev oprettet på {network}. Skift til {network} for at bruge den."

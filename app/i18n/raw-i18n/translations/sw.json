@@ -4279,7 +4279,8 @@
     "generic": "Malipo hayakuweza kukamilika. Jaribu tena baada ya muda mfupi, au tumia kiasi kidogo.",
     "outcomeUnknown": "Malipo haya huenda tayari yamefanyika. Angalia historia ya miamala yako kabla ya kuyatuma tena.",
     "earlierPaymentFound": "Malipo yako ya awali kwenda kwenye anwani hii tayari yamefanyika, kwa kiasi tofauti. Yaangalie kabla ya kutuma tena.",
-    "earlierConversionFound": "Ubadilishaji wako wa awali tayari umefanyika, kwa kiasi tofauti. Uangalie katika historia ya miamala yako kabla ya kubadilisha tena."
+    "earlierConversionFound": "Ubadilishaji wako wa awali tayari umefanyika, kwa kiasi tofauti. Uangalie katika historia ya miamala yako kabla ya kubadilisha tena.",
+    "convertedMeanwhile": "Ubadilishaji wa kiasi kinachokaribiana na hiki umefanyika sasa hivi. Angalia salio lako kabla ya kuthibitisha huu tena."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Akaunti hii iliundwa kwenye {network}. Badilisha hadi {network} ili kuitumia."

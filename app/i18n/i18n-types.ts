@@ -14128,6 +14128,10 @@ type RootTranslation = {
 		 * Y​o​u​r​ ​e​a​r​l​i​e​r​ ​t​r​a​n​s​f​e​r​ ​a​l​r​e​a​d​y​ ​w​e​n​t​ ​t​h​r​o​u​g​h​,​ ​f​o​r​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​a​m​o​u​n​t​.​ ​C​h​e​c​k​ ​i​t​ ​i​n​ ​y​o​u​r​ ​t​r​a​n​s​a​c​t​i​o​n​ ​h​i​s​t​o​r​y​ ​b​e​f​o​r​e​ ​t​r​a​n​s​f​e​r​r​i​n​g​ ​a​g​a​i​n​.
 		 */
 		earlierConversionFound: string
+		/**
+		 * A​ ​t​r​a​n​s​f​e​r​ ​o​f​ ​a​b​o​u​t​ ​t​h​i​s​ ​a​m​o​u​n​t​ ​j​u​s​t​ ​w​e​n​t​ ​t​h​r​o​u​g​h​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​b​e​f​o​r​e​ ​c​o​n​f​i​r​m​i​n​g​ ​t​h​i​s​ ​o​n​e​ ​a​g​a​i​n​.
+		 */
+		convertedMeanwhile: string
 	}
 	SelfCustodialNetworkMismatch: {
 		/**
@@ -28382,6 +28386,10 @@ export type TranslationFunctions = {
 		 * Your earlier transfer already went through, for a different amount. Check it in your transaction history before transferring again.
 		 */
 		earlierConversionFound: () => LocalizedString
+		/**
+		 * A transfer of about this amount just went through. Check your balance before confirming this one again.
+		 */
+		convertedMeanwhile: () => LocalizedString
 	}
 	SelfCustodialNetworkMismatch: {
 		/**

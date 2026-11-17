@@ -4279,7 +4279,8 @@
     "generic": "Pembayaran tidak dapat diselesaikan. Cuba lagi sekejap, atau gunakan jumlah yang lebih kecil.",
     "outcomeUnknown": "Pembayaran ini mungkin sudah berjaya. Semak sejarah transaksi anda sebelum menghantarnya semula.",
     "earlierPaymentFound": "Pembayaran anda yang terdahulu ke destinasi ini sudah berjaya, dengan jumlah yang berbeza. Semaknya sebelum menghantar semula.",
-    "earlierConversionFound": "Penukaran anda yang terdahulu sudah berjaya, dengan jumlah yang berbeza. Semaknya dalam sejarah transaksi anda sebelum menukar semula."
+    "earlierConversionFound": "Penukaran anda yang terdahulu sudah berjaya, dengan jumlah yang berbeza. Semaknya dalam sejarah transaksi anda sebelum menukar semula.",
+    "convertedMeanwhile": "Penukaran dengan jumlah yang hampir sama baru sahaja berjaya. Semak baki anda sebelum mengesahkan penukaran ini semula."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Akaun ini dicipta pada {network}. Tukar ke {network} untuk menggunakannya."

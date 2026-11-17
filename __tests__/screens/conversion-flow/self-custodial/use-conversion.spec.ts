@@ -64,6 +64,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
       SelfCustodialError: {
         outcomeUnknown: () => "Check your history",
         earlierConversionFound: () => "Your earlier transfer went through",
+        convertedMeanwhile: () => "A transfer of about this amount went through",
       },
     },
   }),
@@ -574,6 +575,28 @@ describe("useSelfCustodialConversion", () => {
       })
 
       expect(result.current.errorMessage).toBe("Your earlier transfer went through")
+    })
+
+    it("asks the user to confirm again, on a new quote, a transfer of about an amount that went through while it waited", async () => {
+      const convertedMeanwhile = jest.fn().mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "raw", code: ConvertErrorCode.AlreadyConverted }],
+      })
+      mockGetQuote
+        .mockResolvedValueOnce(makeQuote({ execute: convertedMeanwhile }))
+        .mockResolvedValueOnce(makeQuote())
+
+      const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+      await waitFor(() => expect(result.current.canExecute).toBe(true))
+      await act(async () => {
+        await result.current.execute()
+      })
+
+      expect(result.current.errorMessage).toBe(
+        "A transfer of about this amount went through",
+      )
+      expect(mockOnSuccess).not.toHaveBeenCalled()
+      await waitFor(() => expect(mockGetQuote).toHaveBeenCalledTimes(2))
     })
 
     it.each([

@@ -4279,7 +4279,8 @@
     "generic": "Platbu sa nepodarilo dokončiť. Skúste znova o chvíľu alebo použite menšiu sumu.",
     "outcomeUnknown": "Táto platba už možno prebehla. Pred opätovným odoslaním si skontrolujte históriu transakcií.",
     "earlierPaymentFound": "Vaša predchádzajúca platba na tento cieľ už prebehla, no na inú sumu. Pred opätovným odoslaním ju skontrolujte.",
-    "earlierConversionFound": "Vaša predchádzajúca konverzia už prebehla, no na inú sumu. Pred ďalšou konverziou ju skontrolujte v histórii transakcií."
+    "earlierConversionFound": "Vaša predchádzajúca konverzia už prebehla, no na inú sumu. Pred ďalšou konverziou ju skontrolujte v histórii transakcií.",
+    "convertedMeanwhile": "Práve prebehla konverzia na podobnú sumu. Pred opätovným potvrdením tejto konverzie si skontrolujte zostatok."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Tento účet bol vytvorený v sieti {network}. Ak ho chcete použiť, prepnite na {network}."
