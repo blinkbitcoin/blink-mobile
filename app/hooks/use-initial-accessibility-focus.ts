@@ -10,22 +10,26 @@ export const INITIAL_FOCUS_DELAY_MS = 500
  * Moves screen reader focus, each time the screen gains focus, to the element its next
  * step most likely starts from, rather than the back arrow every screen opens on.
  *
- * `target` is read when the screen gains focus, not on every change, so a target that
- * moves while the sender works (keypad, then Next) never pulls focus away mid-task.
- * A no-op when no screen reader runs.
+ * The first `target` the screen gives after gaining focus is the one focused, even when
+ * it changes before the delay ends, so a target that moves while the sender works
+ * (keypad, then Next) never pulls focus away mid-task. Pass `undefined` while the screen
+ * is still loading and doesn't know its target yet. A no-op when no screen reader runs.
  */
 export const useInitialAccessibilityFocus = (
   target: RefObject<View | null> | undefined,
 ) => {
-  const targetRef = useRef(target)
-  targetRef.current = target
+  const latestTargetRef = useRef(target)
+  latestTargetRef.current = target
+  const focusTargetRef = useRef<RefObject<View | null> | undefined>(undefined)
+  if (!focusTargetRef.current) focusTargetRef.current = target
 
   useFocusEffect(
     useCallback(() => {
       let isActive = true
+      focusTargetRef.current = latestTargetRef.current
       const timer = setTimeout(async () => {
         const isScreenReaderOn = await AccessibilityInfo.isScreenReaderEnabled()
-        const node = targetRef.current?.current
+        const node = focusTargetRef.current?.current
         if (isActive && isScreenReaderOn && node) {
           AccessibilityInfo.sendAccessibilityEvent(node, "focus")
         }

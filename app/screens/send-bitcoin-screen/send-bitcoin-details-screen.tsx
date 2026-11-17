@@ -293,13 +293,16 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   ])
 
   /** Screen reader focus starts where the send goes next: the keypad while there is no
-   *  amount to send yet, Next once there is one (a fixed invoice, or back from review). */
+   *  amount to send yet, Next once there is one (a fixed invoice, or back from review).
+   *  No target until the payment detail loads, since neither is on screen before then. */
   const firstKeyRef = useRef<View>(null)
   const nextRef = useRef<View>(null)
   const isAwaitingAmount =
     Boolean(paymentDetail?.canSetAmount) &&
     !(paymentDetail && paymentDetail.unitOfAccountAmount.amount > 0)
-  useInitialAccessibilityFocus(isAwaitingAmount ? firstKeyRef : nextRef)
+  useInitialAccessibilityFocus(
+    paymentDetail ? (isAwaitingAmount ? firstKeyRef : nextRef) : undefined,
+  )
 
   /** Held rather than blanked: the seeding above waits for the region, so without this the
    *  user sits on an empty screen for as long as the country takes to resolve. */

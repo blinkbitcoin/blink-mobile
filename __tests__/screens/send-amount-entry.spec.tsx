@@ -721,6 +721,16 @@ describe("screen reader focus on open", () => {
     expect(focusedTestIds()).toEqual(["Key 1"])
   })
 
+  it("stays on the keypad when the sender types before the delay ends", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    typeKeys("1")
+    await passFocusDelay()
+
+    expect(focusedTestIds()).toEqual(["Key 1"])
+  })
+
   it("lands on Next when the invoice fixes the amount", async () => {
     renderScreen(invoiceDestination)
     await settle()
