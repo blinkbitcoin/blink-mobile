@@ -1767,6 +1767,75 @@ describe("a conversion asked once its turn comes whether it was converted meanwh
     expect(result.status).toBe("success")
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
   })
+
+  describe("with auto-convert and the user's own conversion", () => {
+    const receive = {
+      satsAmount: 5000,
+      usdCentsAmount: 137,
+      isStableBalanceActive: false,
+      recordCreatedAtMs: 0,
+    }
+
+    /** The user's conversion of the received sats, as the history holds it once done. */
+    const completedConversion = {
+      id: "c-user",
+      timestamp: BigInt(Math.floor(Date.now() / 1000)),
+      conversionDetails: { status: 1, conversions: [{ from: { amount: BigInt(5000) } }] },
+    }
+
+    /** Holds the SDK's answer to the next conversion until it is given. */
+    const holdNextSend = (sdk: ReturnType<typeof walletSdk>) => {
+      let answer: (response: unknown) => void = () => undefined
+      sdk.sendPayment.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            answer = resolve
+          }),
+      )
+      return (response: unknown) => answer(response)
+    }
+
+    it("does not convert a receive the user converted while it waited for its turn", async () => {
+      const sdk = walletSdk()
+      const answerUser = holdNextSend(sdk)
+      const userConversion = (await createGetConversionQuote(sdk as never)(
+        params,
+      ))!.execute()
+      while (sdk.sendPayment.mock.calls.length === 0) await nextTurn()
+
+      const automatic = executeAutoConvert(sdk as never, receive)
+      for (let turn = 0; turn < 20; turn += 1) await nextTurn()
+      const sentWhileWaiting = sdk.sendPayment.mock.calls.length
+      sdk.listPayments.mockResolvedValue({ payments: [completedConversion] })
+      answerUser({ payment: { id: "c-user", status: 0 } })
+
+      expect(sentWhileWaiting).toBe(1)
+      expect(await automatic).toEqual({ status: "already-converted" })
+      expect((await userConversion).status).toBe("success")
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+    })
+
+    /** The user's conversion is theirs to ask for, of the amount they chose: it waits for
+     *  the auto-conversion ahead of it, then goes out. */
+    it("lets the user's conversion go out once the auto-conversion ahead of it is done", async () => {
+      const sdk = walletSdk()
+      const answerAutomatic = holdNextSend(sdk)
+      const automatic = executeAutoConvert(sdk as never, receive)
+      while (sdk.sendPayment.mock.calls.length === 0) await nextTurn()
+
+      const userConversion = (await createGetConversionQuote(sdk as never)(
+        params,
+      ))!.execute()
+      for (let turn = 0; turn < 10; turn += 1) await nextTurn()
+      const sentMeanwhile = sdk.sendPayment.mock.calls.length
+      answerAutomatic({ payment: { id: "c-auto", status: 0 } })
+
+      expect(await automatic).toEqual({ status: "converted" })
+      expect((await userConversion).status).toBe("success")
+      expect(sentMeanwhile).toBe(1)
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+    })
+  })
 })
 
 describe("a conversion in flight when the app closes", () => {

@@ -126,45 +126,49 @@ type PriorConversionMatch = {
   claimedConversionIds: ReadonlySet<string>
 }
 
-const hasAlreadyConverted = async (
+/** Whether the history holds such a conversion. Throws when it cannot be read. */
+const isConvertedInHistory = async (
   sdk: BreezSdkInterface,
   match: PriorConversionMatch,
 ): Promise<boolean> => {
-  try {
-    const response = await sdk.listPayments(
-      ListPaymentsRequest.create({ offset: 0, limit: 50 }),
-    )
-    return response.payments.some((payment) => {
-      const details = payment.conversionDetails
-      if (!details || details.status !== ConversionStatus.Completed) return false
+  const response = await sdk.listPayments(
+    ListPaymentsRequest.create({ offset: 0, limit: 50 }),
+  )
+  return response.payments.some((payment) => {
+    const details = payment.conversionDetails
+    if (!details || details.status !== ConversionStatus.Completed) return false
 
-      if (match.claimedConversionIds.has(payment.id)) return false
+    if (match.claimedConversionIds.has(payment.id)) return false
 
-      const paymentMs = Number(payment.timestamp) * 1000
-      if (paymentMs < match.recordCreatedAtMs) return false
+    const paymentMs = Number(payment.timestamp) * 1000
+    if (paymentMs < match.recordCreatedAtMs) return false
 
-      /** 0.22 persists the status but rebuilds the legs on retrieval, so a settled
-       *  conversion can surface with none while its child payment is still syncing.
-       *  Matching is the safe side: a false match skips one auto-convert, a false miss
-       *  converts the user's sats a second time. */
-      if (!details.conversions?.length) {
-        reportError(
-          "hasAlreadyConverted",
-          `completed conversion ${payment.id} has no legs; treating as already converted`,
-          /** The comment above declares this an expected SDK state, so it belongs in the
-           *  breadcrumb trail rather than the non-fatal list, where the payment id in the
-           *  message would open a separate issue on every occurrence. */
-          { expected: true },
-        )
-        return true
-      }
+    /** 0.22 persists the status but rebuilds the legs on retrieval, so a settled
+     *  conversion can surface with none while its child payment is still syncing.
+     *  Matching is the safe side: a false match skips one auto-convert, a false miss
+     *  converts the user's sats a second time. */
+    if (!details.conversions?.length) {
+      reportError(
+        "hasAlreadyConverted",
+        `completed conversion ${payment.id} has no legs; treating as already converted`,
+        /** The comment above declares this an expected SDK state, so it belongs in the
+         *  breadcrumb trail rather than the non-fatal list, where the payment id in the
+         *  message would open a separate issue on every occurrence. */
+        { expected: true },
+      )
+      return true
+    }
 
-      return matchesConversionAmount(payment, match.satsAmount, match.toleranceBps)
-    })
-  } catch {
-    return false
-  }
+    return matchesConversionAmount(payment, match.satsAmount, match.toleranceBps)
+  })
 }
+
+/** The check before anything is quoted: a history that cannot be read is taken for no
+ *  such conversion, and the one asked again in the conversion's turn decides. */
+const hasAlreadyConverted = (
+  sdk: BreezSdkInterface,
+  match: PriorConversionMatch,
+): Promise<boolean> => isConvertedInHistory(sdk, match).catch(() => false)
 
 /** Picks the most recent unclaimed completed conversion within tolerance, for pairing. */
 export const findRecentConversionId = async (
@@ -206,12 +210,13 @@ export const executeAutoConvert = async (
 
   const toleranceBps =
     params.amountMatchToleranceBps ?? DEFAULT_AMOUNT_MATCH_TOLERANCE_BPS
-  const alreadyConverted = await hasAlreadyConverted(sdk, {
+  const priorConversion: PriorConversionMatch = {
     satsAmount: params.satsAmount,
     recordCreatedAtMs: params.recordCreatedAtMs,
     toleranceBps,
     claimedConversionIds: params.claimedConversionIds ?? new Set(),
-  })
+  }
+  const alreadyConverted = await hasAlreadyConverted(sdk, priorConversion)
   if (alreadyConverted) {
     return { status: AutoConvertStatus.AlreadyConverted }
   }
@@ -242,9 +247,18 @@ export const executeAutoConvert = async (
   }
   if (!quote) return { status: AutoConvertStatus.Failed }
 
-  const result = await quote.execute()
+  /** Asked again once the conversion's turn comes: the user may have converted these sats
+   *  while it waited behind theirs. */
+  const result = await quote.execute({
+    isConvertedMeanwhile: () => isConvertedInHistory(sdk, priorConversion),
+  })
   if (result.status === PaymentResultStatus.Success) {
     return { status: AutoConvertStatus.Converted }
+  }
+  const isConvertedMeanwhile =
+    result.errors?.[0]?.code === ConvertErrorCode.AlreadyConverted
+  if (isConvertedMeanwhile) {
+    return { status: AutoConvertStatus.AlreadyConverted }
   }
   /** Tried again on the next trigger, also when a conversion that may have been lost is
    *  still unknown or turned out to be another one: each try looks for it before anything

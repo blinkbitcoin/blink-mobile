@@ -391,6 +391,47 @@ describe("executeAutoConvert", () => {
     expect(outcome).toEqual({ status: "failed" })
   })
 
+  it("returns AlreadyConverted when the receive was converted while the conversion waited its turn", async () => {
+    mockGetConversionQuote.mockResolvedValue({
+      execute: jest.fn().mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "converted", code: ConvertErrorCode.AlreadyConverted }],
+      }),
+    })
+
+    const outcome = await executeAutoConvert(sdkWith([]), baseParams)
+
+    expect(outcome).toEqual({ status: "already-converted" })
+  })
+
+  /** Unlike the check before quoting, the one in the conversion's turn does not take a
+   *  history it cannot read for no prior conversion. */
+  it("asks again in the conversion's turn, without taking an unreadable history for none", async () => {
+    const quote = successQuote()
+    mockGetConversionQuote.mockResolvedValue(quote)
+    const listPayments = jest
+      .fn()
+      .mockResolvedValueOnce({ payments: [] })
+      .mockResolvedValueOnce({
+        payments: [
+          {
+            conversionDetails: {
+              status: "Completed",
+              conversions: [{ from: { amount: 5000n } }],
+            },
+            timestamp: 2000n,
+          },
+        ],
+      })
+      .mockRejectedValueOnce(new Error("network"))
+
+    await executeAutoConvert({ listPayments } as never, baseParams)
+    const [{ isConvertedMeanwhile }] = quote.execute.mock.calls[0]
+
+    await expect(isConvertedMeanwhile()).resolves.toBe(true)
+    await expect(isConvertedMeanwhile()).rejects.toThrow("network")
+  })
+
   it("treats a listPayments failure as 'no prior conversion' (fail-open)", async () => {
     mockGetConversionQuote.mockResolvedValue(successQuote())
     const sdk = {
