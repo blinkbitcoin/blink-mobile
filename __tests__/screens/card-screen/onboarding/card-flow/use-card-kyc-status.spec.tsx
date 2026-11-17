@@ -106,7 +106,8 @@ describe("useCardKycStatus", () => {
     const { result } = renderStatus([])
 
     expect(result.current.isKycSubmitted).toBe(false)
-    expect(result.current.isCheckingKyc).toBe(false)
+    expect(result.current.isKycStatusKnown).toBe(false)
+    expect(result.current.hasKycStatusError).toBe(false)
   })
 
   it("reports a submitted card verification once read", async () => {
@@ -117,12 +118,48 @@ describe("useCardKycStatus", () => {
     act(() => {
       result.current.readKycStatus()
     })
-    expect(result.current.isCheckingKyc).toBe(true)
+    expect(result.current.isKycStatusKnown).toBe(false)
 
     await waitForNextUpdate()
 
-    expect(result.current.isCheckingKyc).toBe(false)
+    expect(result.current.isKycStatusKnown).toBe(true)
     expect(result.current.isKycSubmitted).toBe(true)
+  })
+
+  it("reports a failed read as an error, with the status still unknown", async () => {
+    const { result, waitForNextUpdate } = renderStatus([
+      { request: { query: CardKycStatusDocument }, error: new Error("offline") },
+    ])
+
+    act(() => {
+      result.current.readKycStatus()
+    })
+    await waitForNextUpdate()
+
+    expect(result.current.hasKycStatusError).toBe(true)
+    expect(result.current.isKycStatusKnown).toBe(false)
+    expect(result.current.isKycSubmitted).toBe(false)
+  })
+
+  it("clears the error once a later read answers", async () => {
+    const { result, waitForNextUpdate } = renderStatus([
+      { request: { query: CardKycStatusDocument }, error: new Error("offline") },
+      statusResponse(OnboardingStatus.AwaitingInput, KycFlowType.Card),
+    ])
+
+    act(() => {
+      result.current.readKycStatus()
+    })
+    await waitForNextUpdate()
+    expect(result.current.hasKycStatusError).toBe(true)
+
+    act(() => {
+      result.current.readKycStatus()
+    })
+    await waitForNextUpdate()
+
+    expect(result.current.hasKycStatusError).toBe(false)
+    expect(result.current.isKycStatusKnown).toBe(true)
   })
 
   it("reads the review again on each call instead of trusting the last answer", async () => {

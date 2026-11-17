@@ -39,7 +39,8 @@ export const CardVerifyIdentityScreen: React.FC = () => {
     type: KycFlowType.Card,
     headerTitle: LL.CardFlow.Onboarding.kycHeaderTitle(),
   })
-  const { readKycStatus, isKycSubmitted, isCheckingKyc } = useCardKycStatus()
+  const { readKycStatus, isKycSubmitted, isKycStatusKnown, hasKycStatusError } =
+    useCardKycStatus()
 
   /** The verification web flow tells the app nothing when it ends, so the step reads the
    *  issuer's review whenever the user is back on it: on the way back from the web flow,
@@ -56,7 +57,13 @@ export const CardVerifyIdentityScreen: React.FC = () => {
     navigation.replace("cardOnboardingPersonalInfoScreen")
   }, [isFocused, isKycSubmitted, navigation])
 
-  const isContinueLoading = isCheckingKyc || isStartingKyc
+  /** Continue starts a verification only once a read has shown none was submitted: until
+   *  then it waits, and after a failed read it reads again instead. */
+  const isReadingKycStatus = !isKycStatusKnown && !hasKycStatusError
+  const isContinueLoading = isReadingKycStatus || isStartingKyc
+  const continueTitle = hasKycStatusError
+    ? LL.common.tryAgain()
+    : LL.CardFlow.Onboarding.CardVerifyIdentity.buttonText()
 
   const requirements: Requirement[] = [
     {
@@ -78,6 +85,10 @@ export const CardVerifyIdentityScreen: React.FC = () => {
   ]
 
   const handleContinue = () => {
+    if (hasKycStatusError) {
+      readKycStatus()
+      return
+    }
     startKyc()
   }
 
@@ -85,7 +96,7 @@ export const CardVerifyIdentityScreen: React.FC = () => {
     <StepLayout
       footer={
         <GaloyPrimaryButton
-          title={LL.CardFlow.Onboarding.CardVerifyIdentity.buttonText()}
+          title={continueTitle}
           onPress={handleContinue}
           loading={isContinueLoading}
         />
@@ -125,6 +136,11 @@ export const CardVerifyIdentityScreen: React.FC = () => {
             )
           })}
         </View>
+        {hasKycStatusError && (
+          <Text type="p3" style={styles.error}>
+            {LL.errors.unexpectedError()}
+          </Text>
+        )}
       </View>
     </StepLayout>
   )
@@ -152,5 +168,11 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   requirementTitle: {
     lineHeight: 18,
+  },
+  error: {
+    marginTop: 20,
+    marginHorizontal: 20,
+    color: colors.error,
+    textAlign: "center",
   },
 }))
