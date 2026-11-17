@@ -12,6 +12,10 @@ import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
 import { INITIAL_FOCUS_DELAY_MS } from "@app/hooks/use-initial-accessibility-focus"
 import {
+  AMOUNT_SLIDER_TEST_ID,
+  AmountSlider,
+} from "@app/screens/send-bitcoin-screen/amount-entry/amount-slider"
+import {
   CreatePaymentDetailParams,
   DestinationDirection,
   PaymentDestination,
@@ -29,6 +33,8 @@ import {
   ZeroBtcMoneyAmount,
 } from "@app/types/amounts"
 import { PaymentType } from "@blinkbitcoin/blink-client"
+
+import { light } from "@app/rne-theme/colors"
 
 import { ContextForScreen } from "./helper"
 
@@ -63,6 +69,8 @@ jest.mock("@app/utils/haptics", () => {
 
 /** Laid over the real fee options, so a spec can stand in a fee error the quote returned. */
 const mockFeeTierOverride: { current: Record<string, unknown> } = { current: {} }
+/** What the screen last handed the fee options, so a spec can read what it asked for. */
+const mockFeeTierArgs = jest.fn()
 
 jest.mock("@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tier-options", () => {
   const actual = jest.requireActual(
@@ -70,10 +78,13 @@ jest.mock("@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tier-options",
   )
   return {
     ...actual,
-    useOnchainFeeTierOptions: (...args: unknown[]) => ({
-      ...actual.useOnchainFeeTierOptions(...args),
-      ...mockFeeTierOverride.current,
-    }),
+    useOnchainFeeTierOptions: (...args: unknown[]) => {
+      mockFeeTierArgs(...args)
+      return {
+        ...actual.useOnchainFeeTierOptions(...args),
+        ...mockFeeTierOverride.current,
+      }
+    },
   }
 })
 
@@ -89,6 +100,9 @@ jest.mock("@app/utils/helper", () => {
   }
 })
 
+/** Set once the sender has slid to an amount on a send that went out. */
+const mockHasLearnedAmountSlider: { current?: boolean } = {}
+
 jest.mock("@app/store/persistent-state", () => ({
   ...jest.requireActual("@app/store/persistent-state"),
   usePersistentStateContext: () => ({
@@ -96,6 +110,7 @@ jest.mock("@app/store/persistent-state", () => ({
       schemaVersion: 12,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "",
+      hasLearnedAmountSlider: mockHasLearnedAmountSlider.current,
     },
     updateState: jest.fn(),
     resetState: jest.fn(),
@@ -264,10 +279,12 @@ beforeEach(() => {
   mockSavePreferredAmountCurrency.mockClear()
   mockNavigate.mockClear()
   mockFeeTierOverride.current = {}
+  mockFeeTierArgs.mockClear()
   mockHapticReject.mockClear()
   mockHapticTap.mockClear()
   mockDisplayCurrency.current = "NGN"
   mockPreferredAmountCurrency.current = undefined
+  mockHasLearnedAmountSlider.current = undefined
 })
 
 const mockSetAmount = jest.fn()
@@ -383,6 +400,10 @@ const isNextDisabled = () => nextButton().props.accessibilityState?.disabled
 const typeKeys = (...keys: string[]) =>
   keys.forEach((key) => fireEvent.press(screen.getByTestId(`Key ${key}`)))
 
+/** The slider's own drag is covered in amount-slider.spec.tsx; here it hands a percent over. */
+const amountSlider = () => screen.UNSAFE_getByType(AmountSlider)
+const slideTo = (percent: number) => act(() => amountSlider().props.onSlide(percent))
+
 describe("free amount", () => {
   /** The keypad's tap reaches the screen's pad: one per accepted key, none for a refused
    *  one. It buzzes in Android silent mode too, see haptics.spec.ts. */
@@ -399,12 +420,14 @@ describe("free amount", () => {
     expect(mockHapticTap).toHaveBeenCalledTimes(2)
   })
 
-  it("opens with the keypad, the percent chips and a disabled Add amount", async () => {
+  it("opens with the keypad, the amount slider and a disabled Add amount", async () => {
     renderScreen(intraledgerDestination())
     await settle()
 
     expect(screen.getByTestId("Key 1")).toBeTruthy()
-    expect(screen.getByTestId("send-25%")).toBeTruthy()
+    expect(screen.getByTestId(AMOUNT_SLIDER_TEST_ID)).toBeTruthy()
+    // The slider replaces the percent chips.
+    expect(screen.queryByTestId("send-25%")).toBeNull()
     expect(within(nextButton()).getByText(LL.SendBitcoinScreen.addAmount())).toBeTruthy()
     // Read as what it shows, not as its test ID "Next".
     expect(nextButton().props.accessibilityLabel).toBe(LL.SendBitcoinScreen.addAmount())
@@ -440,11 +463,11 @@ describe("free amount", () => {
     expect(colorOf("send-hero-amount-primary")).not.toBe(emptyPrimary)
   })
 
-  it("sets the chip's share of the selected wallet's balance", async () => {
+  it("sets the slider's share of the selected wallet's balance", async () => {
     renderScreen(intraledgerDestination())
     await settle()
 
-    fireEvent.press(screen.getByTestId("send-50%"))
+    slideTo(50)
     await settle()
 
     expect(mockSetAmount).toHaveBeenLastCalledWith(
@@ -458,7 +481,7 @@ describe("free amount", () => {
     renderScreen(intraledgerDestination({ canSendMax: true }))
     await settle()
 
-    fireEvent.press(screen.getByTestId("send-100%"))
+    slideTo(100)
     await settle()
 
     expect(mockSetAmount).toHaveBeenLastCalledWith(
@@ -471,7 +494,7 @@ describe("free amount", () => {
     renderScreen(intraledgerDestination())
     await settle()
 
-    fireEvent.press(screen.getByTestId("send-100%"))
+    slideTo(100)
     await settle()
 
     expect(mockSetAmount).toHaveBeenLastCalledWith(
@@ -718,13 +741,250 @@ describe("a custodial on-chain payment to the sender's own address", () => {
   })
 })
 
+describe("amount slider", () => {
+  it("shows 'Slide to select amount' until the slider is learned", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    // Read out as the slider's own label, so the caption itself is hidden from readers.
+    expect(
+      screen.getByText(LL.SendBitcoinScreen.slideToSelectAmount(), {
+        includeHiddenElements: true,
+      }),
+    ).toBeTruthy()
+  })
+
+  it("drops the hint once a slid send has gone out", async () => {
+    mockHasLearnedAmountSlider.current = true
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    expect(screen.getByTestId(AMOUNT_SLIDER_TEST_ID)).toBeTruthy()
+    expect(
+      screen.queryByText(LL.SendBitcoinScreen.slideToSelectAmount(), {
+        includeHiddenElements: true,
+      }),
+    ).toBeNull()
+  })
+
+  it("moves the thumb to a typed amount's share of the balance", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+    expect(amountSlider().props.share).toBe(0)
+
+    typeKeys("1", "0", "0")
+    await settle()
+    const typedShare = amountSlider().props.share
+    typeKeys("0")
+    await settle()
+
+    expect(typedShare).toBeGreaterThan(0)
+    // A tenfold amount sits ten times as far along, give or take a sat of rounding.
+    expect(amountSlider().props.share / typedShare).toBeCloseTo(10, 3)
+  })
+
+  it("puts the thumb at a slid share of the balance", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    slideTo(50)
+    await settle()
+
+    expect(amountSlider().props.share).toBeCloseTo(0.5, 2)
+  })
+
+  it("tells review the amount came from the slider", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    slideTo(25)
+    await settle()
+    fireEvent.press(nextButton())
+    await settle()
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "sendBitcoinConfirmation",
+      expect.objectContaining({ usedAmountSlider: true }),
+    )
+  })
+
+  // Ruled 2026-11-17: a sender who slid has seen the slider work, whatever they typed after.
+  it("still tells review the slider was used when the amount is typed over after", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    slideTo(25)
+    await settle()
+    typeKeys("⌫", "1")
+    await settle()
+    fireEvent.press(nextButton())
+    await settle()
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "sendBitcoinConfirmation",
+      expect.objectContaining({ usedAmountSlider: true }),
+    )
+  })
+
+  it("tells review a typed amount did not", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    typeKeys("1")
+    await settle()
+    fireEvent.press(nextButton())
+    await settle()
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "sendBitcoinConfirmation",
+      expect.objectContaining({ usedAmountSlider: false }),
+    )
+  })
+
+  it("holds the on-chain fee quote while the thumb is held, and lets it go on release", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+    const isAmountSliding = () =>
+      (mockFeeTierArgs.mock.lastCall?.[0] as { isAmountSliding?: boolean })
+        .isAmountSliding
+
+    expect(isAmountSliding()).toBe(false)
+    act(() => amountSlider().props.onHoldChange(true))
+    expect(isAmountSliding()).toBe(true)
+    act(() => amountSlider().props.onHoldChange(false))
+    expect(isAmountSliding()).toBe(false)
+  })
+
+  describe("with a screen reader", () => {
+    const swipe = (actionName: "increment" | "decrement") =>
+      act(() =>
+        fireEvent(screen.getByTestId(AMOUNT_SLIDER_TEST_ID), "accessibilityAction", {
+          nativeEvent: { actionName },
+        }),
+      )
+
+    it("steps the amount a tenth of the balance a swipe", async () => {
+      renderScreen(intraledgerDestination())
+      await settle()
+
+      swipe("increment")
+      await settle()
+      swipe("increment")
+      await settle()
+
+      expect(mockSetAmount).toHaveBeenLastCalledWith(
+        {
+          amount: Math.floor(btcWallet.balance / 5),
+          currency: "BTC",
+          currencyCode: "BTC",
+        },
+        false,
+      )
+      expect(screen.getByTestId(AMOUNT_SLIDER_TEST_ID).props.accessibilityValue.now).toBe(
+        20,
+      )
+    })
+
+    it("reaches the send-all where the rail supports one", async () => {
+      renderScreen(intraledgerDestination({ canSendMax: true }))
+      await settle()
+
+      slideTo(90)
+      await settle()
+      swipe("increment")
+      await settle()
+
+      expect(mockSetAmount).toHaveBeenLastCalledWith(
+        { amount: btcWallet.balance, currency: "BTC", currencyCode: "BTC" },
+        true,
+      )
+    })
+
+    it("tells review the slider was used", async () => {
+      renderScreen(intraledgerDestination())
+      await settle()
+
+      swipe("increment")
+      await settle()
+      fireEvent.press(nextButton())
+      await settle()
+
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "sendBitcoinConfirmation",
+        expect.objectContaining({ usedAmountSlider: true }),
+      )
+    })
+  })
+
+  describe("on a wallet switch", () => {
+    const switchWallet = async () => {
+      fireEvent.press(screen.getByTestId("choose-wallet-to-send-from"))
+      await settle()
+    }
+
+    it("measures the amount against the new wallet's balance", async () => {
+      renderScreen(intraledgerDestination())
+      await settle()
+      slideTo(50)
+      await settle()
+      const bitcoinShare = amountSlider().props.share
+
+      await switchWallet()
+
+      expect(bitcoinShare).toBeCloseTo(0.5, 2)
+      expect(amountSlider().props.share).not.toBeCloseTo(bitcoinShare, 2)
+    })
+
+    it("turns the fill green for the Dollar wallet", async () => {
+      renderScreen(intraledgerDestination())
+      await settle()
+      expect(amountSlider().props.accentColor).toBe(light.accent)
+
+      await switchWallet()
+
+      expect(amountSlider().props.accentColor).toBe(light._green)
+    })
+
+    it("no longer sends all after a 100% slide", async () => {
+      renderScreen(intraledgerDestination({ canSendMax: true }))
+      await settle()
+      slideTo(100)
+      await settle()
+      expect(mockSetAmount).toHaveBeenLastCalledWith(expect.anything(), true)
+      mockSetAmount.mockClear()
+
+      await switchWallet()
+
+      // The amount is set again in the new wallet, as a plain amount.
+      expect(mockSetAmount).toHaveBeenCalled()
+      expect(mockSetAmount.mock.lastCall?.[1]).not.toBe(true)
+    })
+  })
+
+  it("holds the screen's scroll while the thumb is held", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+    const scrollEnabled = () =>
+      screen
+        .UNSAFE_getAllByType(ScrollView)
+        .find((node) => node.props.keyboardShouldPersistTaps === "handled")!.props
+        .scrollEnabled
+
+    act(() => amountSlider().props.onHoldChange(true))
+    expect(scrollEnabled()).toBe(false)
+
+    act(() => amountSlider().props.onHoldChange(false))
+    expect(scrollEnabled()).toBe(true)
+  })
+})
+
 describe("fixed amount", () => {
-  it("hides the keypad and chips and offers Next straight away", async () => {
+  it("hides the keypad and slider and offers Next straight away", async () => {
     renderScreen(invoiceDestination)
     await settle()
 
     expect(screen.queryByTestId("Key 1")).toBeNull()
-    expect(screen.queryByTestId("send-25%")).toBeNull()
+    expect(screen.queryByTestId(AMOUNT_SLIDER_TEST_ID)).toBeNull()
     expect(within(nextButton()).getByText(LL.common.next())).toBeTruthy()
     expect(isNextDisabled()).toBe(false)
   })
@@ -968,12 +1228,10 @@ describe("while the note is typed", () => {
 
     showKeyboard()
     expect(screen.queryByTestId("Key 1")).toBeNull()
-    expect(screen.queryByTestId("send-25%")).toBeNull()
     expect(nextButton()).toBeTruthy()
 
     hideKeyboard()
     expect(screen.getByTestId("Key 1")).toBeTruthy()
-    expect(screen.getByTestId("send-25%")).toBeTruthy()
   })
 
   /** Android reports a closed keyboard as a keyboard change, which left a stale lift. */
