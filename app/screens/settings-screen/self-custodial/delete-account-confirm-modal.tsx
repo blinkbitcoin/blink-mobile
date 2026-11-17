@@ -4,7 +4,7 @@ import { TextInput, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { radius } from "@app/rne-theme/radius"
-import { cappedLineHeight, MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
@@ -84,7 +84,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   paragraph: {
     fontSize: 16,
-    lineHeight: cappedLineHeight(22),
+    lineHeight: 22,
     textAlign: "center",
     color: colors.textOnBackground,
   },

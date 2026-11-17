@@ -9,7 +9,6 @@ import { useDisplayCurrency } from "@app/hooks"
 import { useAccountDefaultWalletLazyQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { cappedLineHeight } from "@app/rne-theme/text-scaling"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { logParseDestinationResult } from "@app/utils/analytics"
 import { recordAppError } from "@app/utils/error-reporting"
@@ -245,7 +244,7 @@ const useStyles = makeStyles(({ colors }) => ({
   description: {
     color: colors.textSecondary,
     fontSize: 14,
-    lineHeight: cappedLineHeight(19),
+    lineHeight: 19,
   },
   checkPlaceholder: {
     width: 22,

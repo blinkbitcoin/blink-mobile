@@ -7,7 +7,6 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useFeeRatesQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
-import { cappedLineHeight } from "@app/rne-theme/text-scaling"
 import { formatDepositFeeTiers } from "@app/utils/deposit-fees"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -358,7 +357,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.textSecondary,
     fontSize: 16,
     fontWeight: "400",
-    lineHeight: cappedLineHeight(24),
+    lineHeight: 24,
   },
   groupCard: {
     marginTop: 0,

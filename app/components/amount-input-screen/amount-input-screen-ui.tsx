@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Pressable, StyleSheet, TextInput, View } from "react-native"
-import { cappedLineHeight, MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -212,7 +212,7 @@ const useStyles = makeStyles(({ colors }) => ({
   amountText: {
     fontSize: 20,
     fontWeight: "700",
-    lineHeight: cappedLineHeight(24),
+    lineHeight: 24,
     textAlign: "right",
     color: colors.textOnBackground,
   },

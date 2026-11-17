@@ -5,7 +5,6 @@ import { makeStyles, useTheme, Text, Divider } from "@rn-vui/themed"
 
 import { radius } from "@app/rne-theme/radius"
 import { DisabledFeature } from "@app/components/disabled-feature"
-import { cappedLineHeight } from "@app/rne-theme/text-scaling"
 import { testProps } from "@app/utils/testProps"
 import { groupTitleGap } from "@app/rne-theme/tokens"
 
@@ -76,7 +75,7 @@ const useStyles = makeStyles(({ colors }) => ({
   title: {
     color: colors.textSecondary,
     fontSize: 14,
-    lineHeight: cappedLineHeight(20),
+    lineHeight: 20,
   },
   groupCard: {
     marginTop: groupTitleGap,

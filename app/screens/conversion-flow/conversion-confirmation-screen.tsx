@@ -20,7 +20,6 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toBtcMoneyAmount } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
-import { cappedLineHeight } from "@app/rne-theme/text-scaling"
 
 import { ConversionFeeRow } from "./conversion-fee-row"
 import { useSelfCustodialConversion } from "./hooks"
@@ -305,7 +304,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   conversionInfoFieldTitle: {
     color: colors.textSecondary,
-    lineHeight: cappedLineHeight(25),
+    lineHeight: 25,
     fontWeight: "400",
   },
   conversionInfoFieldValue: {

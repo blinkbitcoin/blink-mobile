@@ -3,7 +3,6 @@ import { LayoutChangeEvent, StyleProp, View, ViewStyle } from "react-native"
 import { useTheme, Text, makeStyles } from "@rn-vui/themed"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { cappedLineHeight } from "@app/rne-theme/text-scaling"
 import { CARD, CardCurrency } from "@app/types/amounts"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
@@ -167,7 +166,7 @@ const useStyles = makeStyles(
     outlinedText: {
       fontSize: 16,
       fontWeight: "700",
-      lineHeight: cappedLineHeight(22),
+      lineHeight: 22,
     },
   }),
 )

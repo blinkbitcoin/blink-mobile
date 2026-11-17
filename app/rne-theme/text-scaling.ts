@@ -1,4 +1,4 @@
-import { PixelRatio, Platform } from "react-native"
+import { PixelRatio } from "react-native"
 
 /**
  * How far text may follow the OS text-size setting. Blink has no text-size control of its
@@ -25,15 +25,3 @@ export const MAX_FONT_SIZE_MULTIPLIER = 1.4
  */
 export const cappedFontScale = (): number =>
   Math.min(PixelRatio.getFontScale(), MAX_FONT_SIZE_MULTIPLIER)
-
-/**
- * A line height that stops where the text does. Android scales an explicit `lineHeight` by
- * the OS font scale but never applies the ceiling the font itself respects, so past the
- * ceiling the glyphs hold still while the line box keeps growing and the text floats in a
- * row twice its height. Dividing it back leaves the box at `lineHeight * min(scale,
- * ceiling)`. iOS clamps both already, so it is handed back untouched.
- */
-export const cappedLineHeight = (lineHeight: number): number =>
-  Platform.OS === "android"
-    ? (lineHeight * cappedFontScale()) / PixelRatio.getFontScale()
-    : lineHeight

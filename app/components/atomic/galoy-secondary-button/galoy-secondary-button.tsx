@@ -1,6 +1,5 @@
 import React, { FunctionComponent, PropsWithChildren } from "react"
 
-import { cappedLineHeight } from "@app/rne-theme/text-scaling"
 import { testProps } from "@app/utils/testProps"
 import { TouchableHighlight } from "@app/utils/touchable-wrapper"
 import { Button, ButtonProps, makeStyles, useTheme } from "@rn-vui/themed"
@@ -66,7 +65,7 @@ const useStyles = makeStyles(({ colors }, props: GaloySecondaryButtonProps) => (
   buttonTitleStyle: {
     color: props.grey ? colors.textDisabled : colors.accent,
     fontSize: 20,
-    lineHeight: cappedLineHeight(24),
+    lineHeight: 24,
     fontWeight: "700",
   },
   disabledTitleStyle: {

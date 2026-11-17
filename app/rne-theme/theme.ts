@@ -4,7 +4,7 @@ import { createTheme } from "@rn-vui/themed"
 
 import { light, dark } from "./colors"
 import { fonts } from "./fonts"
-import { cappedLineHeight, MAX_FONT_SIZE_MULTIPLIER } from "./text-scaling"
+import { MAX_FONT_SIZE_MULTIPLIER } from "./text-scaling"
 
 const theme = createTheme({
   lightColors: light,
@@ -52,27 +52,27 @@ const theme = createTheme({
         ? {
             h1: {
               fontSize: 24,
-              lineHeight: cappedLineHeight(32),
+              lineHeight: 32,
             },
             h2: {
               fontSize: 20,
-              lineHeight: cappedLineHeight(24),
+              lineHeight: 24,
             },
             p1: {
               fontSize: 18,
-              lineHeight: cappedLineHeight(24),
+              lineHeight: 24,
             },
             p2: {
               fontSize: 16,
-              lineHeight: cappedLineHeight(24),
+              lineHeight: 24,
             },
             p3: {
               fontSize: 14,
-              lineHeight: cappedLineHeight(18),
+              lineHeight: 18,
             },
             p4: {
               fontSize: 12,
-              lineHeight: cappedLineHeight(18),
+              lineHeight: 18,
             },
           }[props.type]
         : {}

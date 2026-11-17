@@ -3,7 +3,6 @@ import React from "react"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { cappedLineHeight } from "@app/rne-theme/text-scaling"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
@@ -63,7 +62,7 @@ export const RevokeApiKeyModal: React.FC<Props> = ({
 const useStyles = makeStyles(({ colors }) => ({
   body: {
     fontSize: 16,
-    lineHeight: cappedLineHeight(22),
+    lineHeight: 22,
     textAlign: "center",
     color: colors.textOnBackground,
   },

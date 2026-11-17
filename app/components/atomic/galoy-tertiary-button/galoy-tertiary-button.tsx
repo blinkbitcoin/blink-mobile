@@ -4,7 +4,6 @@ import { Pressable, PressableProps, StyleProp, View, ViewStyle } from "react-nat
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { fonts } from "@app/rne-theme/fonts"
-import { cappedLineHeight } from "@app/rne-theme/text-scaling"
 
 export type GaloyTertiaryButtonProps = {
   outline?: boolean
@@ -87,7 +86,7 @@ const useStyles = makeStyles((_, props: GaloyTertiaryButtonProps) => ({
   },
 
   buttonTitleStyle: {
-    lineHeight: cappedLineHeight(20),
+    lineHeight: 20,
     textAlign: "center",
     fontSize: 14,
     fontFamily: fonts.bold,

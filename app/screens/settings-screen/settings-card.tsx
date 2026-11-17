@@ -5,7 +5,6 @@ import { Colors, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
-import { cappedLineHeight } from "@app/rne-theme/text-scaling"
 
 type ThemeColor = keyof Colors
 
@@ -74,13 +73,13 @@ const useStyles = makeStyles(({ colors }, { borderColor }: { borderColor?: strin
   title: {
     fontSize: 14,
     fontWeight: "700",
-    lineHeight: cappedLineHeight(20),
+    lineHeight: 20,
     color: colors.textOnBackground,
   },
   description: {
     fontSize: 14,
     fontWeight: "400",
-    lineHeight: cappedLineHeight(20),
+    lineHeight: 20,
     color: colors.textOnBackground,
   },
 }))

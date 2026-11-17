@@ -5,7 +5,6 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { cappedLineHeight } from "@app/rne-theme/text-scaling"
 import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
@@ -130,7 +129,7 @@ const useStyles = makeStyles(({ colors }) => ({
   errorText: {
     color: colors.error,
     fontSize: 14,
-    lineHeight: cappedLineHeight(20),
+    lineHeight: 20,
   },
   fieldGroup: {
     gap: groupTitleGap,
@@ -138,7 +137,7 @@ const useStyles = makeStyles(({ colors }) => ({
   label: {
     color: colors.textSecondary,
     fontSize: 14,
-    lineHeight: cappedLineHeight(20),
+    lineHeight: 20,
   },
   box: {
     flexDirection: "row",
@@ -155,6 +154,6 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     color: colors.textOnBackground,
     fontSize: 14,
-    lineHeight: cappedLineHeight(20),
+    lineHeight: 20,
   },
 }))
