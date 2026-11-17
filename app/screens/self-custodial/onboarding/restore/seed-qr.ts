@@ -42,7 +42,17 @@ const decodeStandard = (digits: string): SeedQrResult => {
     : { status: SeedQrStatus.Invalid }
 }
 
+const PRINTABLE_ASCII_MIN = 0x20
+const PRINTABLE_ASCII_MAX = 0x7e
+
+/** A CompactSeedQR is random entropy; 16 random bytes are all printable text about once
+ *  in 7.5 million. A text code of the same length (a 16-character URL) is far likelier,
+ *  and must not come out as somebody's seed. */
+const isPrintableText = (bytes: Uint8Array): boolean =>
+  bytes.every((byte) => byte >= PRINTABLE_ASCII_MIN && byte <= PRINTABLE_ASCII_MAX)
+
 const decodeCompact = (entropy: Uint8Array): SeedQrResult | null => {
+  if (isPrintableText(entropy)) return null
   if (entropy.length === COMPACT_24_BYTES) return { status: SeedQrStatus.Only12Words }
   if (entropy.length !== COMPACT_12_BYTES) return null
   const mnemonic = entropyToMnemonic(Buffer.from(entropy).toString("hex"), WORDLIST)
