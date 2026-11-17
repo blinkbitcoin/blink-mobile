@@ -174,3 +174,11 @@ describe("intraledger payment details", () => {
     expect(newPaymentDetails.sendingWalletDescriptor).toEqual(sendingWalletDescriptor)
   })
 })
+
+describe("intraledger send-all", () => {
+  it("offers a send-all, since a Blink-to-Blink send has no fee", () => {
+    const detail = PaymentDetails.createIntraledgerPaymentDetails(defaultParams)
+
+    expect(detail.canSendMax).toBe(true)
+  })
+})

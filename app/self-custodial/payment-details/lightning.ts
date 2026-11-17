@@ -17,13 +17,15 @@ import { ConvertDirection } from "@app/types/payment"
 import { buildConversionType } from "../bridge"
 import { ScRail } from "../measurement"
 
-import { createGetFee, createSendMutation } from "./send-helpers"
+import { createGetFee, createSendMutation, sendAllFeePolicy } from "./send-helpers"
 
 type CreateLightningParams<T extends WalletCurrency> = {
   sdk: BreezSdkInterface
   paymentRequest: string
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
   hasAmount: boolean
+  /** Slid to 100%: the whole balance, with the fee taken out of it. */
+  sendMax?: boolean
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurrency>(
@@ -41,6 +43,11 @@ export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurre
   } = params
 
   const memo = destinationSpecifiedMemo || senderSpecifiedMemo
+  // An invoice with its own amount can't be a send-all.
+  const feePolicy = hasAmount
+    ? undefined
+    : sendAllFeePolicy(params.sendMax, sendingWalletDescriptor.currency)
+  const isSendingMax = feePolicy !== undefined
   const settlementAmount = convertMoneyAmount(
     unitOfAccountAmount,
     sendingWalletDescriptor.currency,
@@ -59,6 +66,7 @@ export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurre
           completionTimeoutSecs: undefined,
         }
       : undefined,
+    feePolicy,
   }
 
   const sendPaymentAndGetFee: PaymentDetailSendPaymentGetFee<T> = settlementAmount.amount
@@ -84,16 +92,18 @@ export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurre
           }),
       }
 
-  const setAmount: SetAmount<T> = (newAmount) =>
+  const setAmount: SetAmount<T> = (newAmount, newSendMax) =>
     createSelfCustodialLightningPaymentDetails({
       ...params,
       unitOfAccountAmount: newAmount,
+      sendMax: newSendMax,
     })
 
   const setSendingWalletDescriptor: SetSendingWalletDescriptor<T> = (desc) =>
     createSelfCustodialLightningPaymentDetails({
       ...params,
       sendingWalletDescriptor: desc,
+      sendMax: false,
     })
 
   const setConvertMoneyAmount = (fn: ConvertMoneyAmount) =>
@@ -112,7 +122,13 @@ export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurre
     setSendingWalletDescriptor,
     ...(hasAmount
       ? { canSetAmount: false as const, destinationSpecifiedAmount: unitOfAccountAmount }
-      : { canSetAmount: true as const, setAmount }),
+      : {
+          canSetAmount: true as const,
+          setAmount,
+          canSendMax: !isUsdSend,
+          isSendingMax,
+          isFeeIncluded: isSendingMax,
+        }),
     ...setMemo,
     ...sendPaymentAndGetFee,
   } as PaymentDetail<T>

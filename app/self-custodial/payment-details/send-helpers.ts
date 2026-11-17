@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import {
+  FeePolicy,
   OnchainConfirmationSpeed,
   PaymentStatus,
   type BreezSdkInterface,
@@ -10,6 +11,7 @@ import {
 import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
 import {
   GetFee,
+  PaymentSendExtraInfo,
   SendPaymentMutation,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
@@ -53,7 +55,47 @@ type PrepareParams = {
   amount: bigint | undefined
   tokenIdentifier?: string
   conversionOptions?: ConversionOptions
+  feePolicy?: FeePolicy
 }
+
+/**
+ * A send-all on the Bitcoin wallet: the SDK takes the fee out of the balance, so the
+ * wallet spends exactly what it holds. The Dollar wallet's send-all converts on the way
+ * out and waits on the SDK's answer for how the fee meets that (#2048 SA5).
+ */
+export const sendAllFeePolicy = (
+  sendMax: boolean | undefined,
+  currency: WalletCurrency,
+): FeePolicy | undefined =>
+  sendMax && currency === WalletCurrency.Btc ? FeePolicy.FeesIncluded : undefined
+
+/**
+ * The SDK reports the fee policy it applied, which may differ from the one asked for
+ * (blink-wip#2048 SR3). A send-all that came back with the fee on top would show the
+ * balance less the fee while spending the balance plus it, so its quote and its send
+ * stop here, before anything goes out.
+ */
+export const assertFeePolicyApplied = (
+  requested: FeePolicy | undefined,
+  prepared: { feePolicy: FeePolicy },
+) => {
+  if (
+    requested === FeePolicy.FeesIncluded &&
+    prepared.feePolicy !== FeePolicy.FeesIncluded
+  ) {
+    throw new Error("The SDK did not take the fee out of the amount")
+  }
+}
+
+/** What went out, for a send whose fee came out of the amount: review only had a quote,
+ *  and the SDK prepares the send again (blink-wip#2048 SR2). */
+export const settledOf = (
+  requested: FeePolicy | undefined,
+  payment: Payment | undefined,
+): PaymentSendExtraInfo | undefined =>
+  requested === FeePolicy.FeesIncluded && payment
+    ? { settled: { amountSats: Number(payment.amount), feeSats: Number(payment.fees) } }
+    : undefined
 
 /** What a send reports about itself: the rail category and the wallet spent from, never
  *  the destination, amount, or counterparty. */
@@ -87,6 +129,7 @@ const toPrepareOptions = (params: PrepareParams) => ({
   amount: params.amount,
   tokenIdentifier: params.tokenIdentifier,
   conversionOptions: params.conversionOptions,
+  feePolicy: params.feePolicy,
 })
 
 const asGetFeeAmount = <T extends WalletCurrency>(feeSats: number) =>
@@ -126,6 +169,7 @@ export const createGetFee = <T extends WalletCurrency>(
   return async (): Promise<SelfCustodialFeeResult<T>> => {
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
+      assertFeePolicyApplied(params.feePolicy, prepared)
       const feeSats = extractLightningFee(prepared) ?? 0
       const amountAdjustment = mapAmountAdjustment(
         prepared.conversionEstimate?.amountAdjustment,
@@ -144,6 +188,7 @@ export const createGetFeeOnchain = <T extends WalletCurrency>(
   return async (): Promise<SelfCustodialFeeResult<T>> => {
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
+      assertFeePolicyApplied(params.feePolicy, prepared)
       const fees = extractOnchainFees(prepared)
       if (!fees) {
         return feeFailure<T>(
@@ -176,13 +221,17 @@ export const createSendMutation = (
     measure(ScEvent.PaymentSendInitiated, telemetryParams(telemetry))
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
+      assertFeePolicyApplied(params.feePolicy, prepared)
       const response = await executeSend(params.sdk, prepared)
       measureSettlement(
         response?.payment,
         sendSettlement(telemetryParams(telemetry)),
         startedIn,
       )
-      return { status: PaymentSendResult.Success }
+      return {
+        status: PaymentSendResult.Success,
+        extraInfo: settledOf(params.feePolicy, response?.payment),
+      }
     } catch (err) {
       measureIn(startedIn, ScEvent.PaymentSendFailed, {
         ...telemetryParams(telemetry),
@@ -206,13 +255,17 @@ export const createSendMutationOnchain = (
     measure(ScEvent.PaymentSendInitiated, telemetryParams(telemetry))
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
+      assertFeePolicyApplied(params.feePolicy, prepared)
       const response = await executeSend(params.sdk, prepared, TIER_TO_SPEED[feeTier])
       measureSettlement(
         response?.payment,
         sendSettlement(telemetryParams(telemetry)),
         startedIn,
       )
-      return { status: PaymentSendResult.Success }
+      return {
+        status: PaymentSendResult.Success,
+        extraInfo: settledOf(params.feePolicy, response?.payment),
+      }
     } catch (err) {
       measureIn(startedIn, ScEvent.PaymentSendFailed, {
         ...telemetryParams(telemetry),
