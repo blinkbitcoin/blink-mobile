@@ -28,13 +28,17 @@ jobs:
       # failing tests in CI (see jest.setup-after-env.ts) and logs each retried
       # error, instead of silently re-running the whole job.
       # Two workers instead of `yarn test`'s --runInBand, which had grown past
-      # the timeout: in band, 482 of ~940 suites finished in 20 minutes. A
-      # worker past 1 GB is replaced between files, so heap growth stays
-      # bounded on this runner's 7.9 GB with no swap.
+      # the timeout: in band, ~930 suites need about 23 minutes here. A worker
+      # past 1 GB is replaced between files, so heap growth stays bounded on
+      # this runner's 7.9 GB with no swap.
       - run: yarn test:ci
         env:
           NODE_OPTIONS: --max-old-space-size=4096
-        timeout-minutes: 20
+        # About 2x the expected two-worker run: 840 suites took 10m13s here
+        # (#4361), and locally 932 take 3m20s against 2m49s for those 840, so
+        # ~12 minutes now. If green runs creep toward this, shard the
+        # job (jest --shard) rather than raising it.
+        timeout-minutes: 25
   android-unit-test:
     name: Android unit tests
     # GH-hosted: ships the Android SDK and JDK toolchains the Gradle build
