@@ -6,6 +6,7 @@ import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import type { CardTransactionGroup } from "./types"
 import { CardTransactionItem } from "./card-transaction-item"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 type CardTransactionsSectionProps = {
   groups: CardTransactionGroup[]
@@ -80,7 +81,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   dateLabel: {
     color: colors.textSecondary,
-    marginBottom: 8,
+    marginBottom: groupTitleGap,
   },
   transactionsList: {
     backgroundColor: colors.neutral,

@@ -270,7 +270,7 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 24,
   },
   currentLimitsTitle: {
-    color: colors.textOnBackground,
+    color: colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
     fontWeight: "400",

@@ -12,6 +12,7 @@ import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { staticSurface } from "@app/rne-theme/surfaces"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 export const ValueStyle = {
   Bold: "bold",
@@ -233,10 +234,10 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
 
   return {
     container: {
-      gap: 3,
+      gap: groupTitleGap,
     },
     label: {
-      color: colors.textOnBackground,
+      color: colors.textSecondary,
       fontSize: 14,
       fontFamily: "Source Sans Pro",
       fontWeight: "400",

@@ -63,6 +63,7 @@ import { ConfirmFeesModal } from "./confirm-fees-modal"
 import { isValidAmount, withConvertMoneyAmount } from "./payment-details"
 import { PaymentDetail } from "./payment-details/index.types"
 import { SendBitcoinDetailsExtraInfo } from "./send-bitcoin-details-extra-info"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 gql`
   query sendBitcoinDetailsScreen {
@@ -772,8 +773,9 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
   },
   fieldTitleText: {
+    color: colors.textSecondary,
     fontWeight: "bold",
-    marginBottom: 4,
+    marginBottom: groupTitleGap,
   },
   fieldContainer: {
     marginBottom: 12,

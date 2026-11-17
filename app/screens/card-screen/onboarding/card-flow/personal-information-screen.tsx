@@ -16,6 +16,7 @@ import {
   MOCK_EXPECTED_MONTHLY_VOLUME_OPTIONS,
   MOCK_OCCUPATION_OPTIONS,
 } from "../onboarding-mock-data"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 export const CardPersonalInformationScreen: React.FC = () => {
   const styles = useStyles()
@@ -48,7 +49,7 @@ export const CardPersonalInformationScreen: React.FC = () => {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <View style={styles.contentContainer}>
           <View style={styles.inputContainer}>
-            <Text type="p2">
+            <Text type="p2" style={styles.label}>
               {LL.CardFlow.Onboarding.PersonalInformation.fields.occupation.label()}
             </Text>
             <DropdownComponent
@@ -60,7 +61,7 @@ export const CardPersonalInformationScreen: React.FC = () => {
             />
           </View>
           <View style={styles.inputContainer}>
-            <Text type="p2">
+            <Text type="p2" style={styles.label}>
               {LL.CardFlow.Onboarding.PersonalInformation.fields.annualSalaryRange.label()}
             </Text>
             <DropdownComponent
@@ -72,7 +73,7 @@ export const CardPersonalInformationScreen: React.FC = () => {
             />
           </View>
           <View style={styles.inputContainer}>
-            <Text type="p2">
+            <Text type="p2" style={styles.label}>
               {LL.CardFlow.Onboarding.PersonalInformation.fields.accountPurpose.label()}
             </Text>
             <DropdownComponent
@@ -84,7 +85,7 @@ export const CardPersonalInformationScreen: React.FC = () => {
             />
           </View>
           <View style={styles.inputContainer}>
-            <Text type="p2">
+            <Text type="p2" style={styles.label}>
               {LL.CardFlow.Onboarding.PersonalInformation.fields.expectedMonthlyVolume.label()}
             </Text>
             <DropdownComponent
@@ -113,7 +114,7 @@ export const CardPersonalInformationScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
   scrollView: {
     flex: 1,
   },
@@ -126,7 +127,10 @@ const useStyles = makeStyles(() => ({
     gap: 20,
   },
   inputContainer: {
-    gap: 6,
+    gap: groupTitleGap,
+  },
+  label: {
+    color: colors.textSecondary,
   },
   buttonsContainer: {
     justifyContent: "flex-end",

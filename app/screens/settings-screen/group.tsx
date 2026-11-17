@@ -39,7 +39,11 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
   return (
     <View>
       {name && (
-        <Text {...testProps(name + "-group")} type="p2" style={titleStyle}>
+        <Text
+          {...testProps(name + "-group")}
+          type="p2"
+          style={[styles.title, titleStyle]}
+        >
           {name}
         </Text>
       )}
@@ -70,6 +74,9 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  title: {
+    color: colors.textSecondary,
+  },
   groupCard: {
     marginTop: groupTitleGap,
     backgroundColor: colors.surfaceInteractive,

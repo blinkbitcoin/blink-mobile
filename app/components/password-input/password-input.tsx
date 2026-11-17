@@ -4,6 +4,7 @@ import { Pressable, TextInput, View } from "react-native"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 import { radius } from "@app/rne-theme/radius"
 
@@ -74,8 +75,8 @@ const useStyles = makeStyles(({ colors }) => ({
   label: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.textOnBackground,
-    marginBottom: 3,
+    color: colors.textSecondary,
+    marginBottom: groupTitleGap,
   },
   inputContainer: {
     flexDirection: "row",

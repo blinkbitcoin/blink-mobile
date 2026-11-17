@@ -40,6 +40,7 @@ import { Screen } from "@app/components/screen"
 import { staticSurface } from "@app/rne-theme/surfaces"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { formatTimeToMempool, timeToMempool } from "./format-time"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 // Tappable icon action used in the detail rows (copy / open-in-explorer).
 // Built on GaloyIconButton (a Pressable) so taps register inside the
@@ -660,7 +661,9 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   entry: {
-    marginVertical: 4,
+    color: colors.textSecondary,
+    marginBottom: groupTitleGap,
+    marginTop: 4,
   },
 
   transactionDetailView: {

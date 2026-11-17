@@ -43,7 +43,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: groupTitleGap,
   },
   title: {
-    color: colors.textOnBackground,
+    color: colors.textSecondary,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",

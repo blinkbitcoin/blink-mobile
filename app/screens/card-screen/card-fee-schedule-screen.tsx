@@ -226,7 +226,7 @@ const useStyles = makeStyles(({ colors }) => ({
   sectionLabel: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.textOnBackground,
+    color: colors.textSecondary,
   },
   card: {
     ...staticSurface(colors),

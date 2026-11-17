@@ -8,7 +8,7 @@ export const useSharedStepStyles = makeStyles(({ colors }) => ({
     gap: groupTitleGap,
   },
   sectionTitle: {
-    color: colors.textOnBackground,
+    color: colors.textSecondary,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
