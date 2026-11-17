@@ -156,7 +156,9 @@ jest.mock("@app/components/amount-input-screen/use-number-pad", () => ({
     mockUseNumberPad(args),
 }))
 jest.mock("@app/components/currency-keyboard", () => ({ CurrencyKeyboard: () => null }))
-jest.mock("@app/components/percentage-selector", () => ({ PercentageSelector: () => null }))
+jest.mock("@app/components/percentage-selector", () => ({
+  PercentageSelector: () => null,
+}))
 jest.mock("@app/screens/send-bitcoin-screen/send-hero", () => ({
   SendHero: () => null,
 }))
@@ -361,8 +363,8 @@ describe("SendBitcoinDetailsScreen when a rate arrives after an amount was typed
   const wrapDetail = (
     detail: ReturnType<typeof createNoAmountLightningPaymentDetails>,
   ): ReturnType<typeof createNoAmountLightningPaymentDetails> => {
-    const setAmount = detail.setAmount?.bind(detail)
-    if (!setAmount) return detail
+    if (!detail.canSetAmount) return detail
+    const setAmount = detail.setAmount.bind(detail)
     return {
       ...detail,
       setAmount: (amount, isSendingMax) => {
