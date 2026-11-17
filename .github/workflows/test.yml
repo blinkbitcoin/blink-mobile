@@ -27,7 +27,11 @@ jobs:
       # Flake handling happens at test granularity now: jest retries individual
       # failing tests in CI (see jest.setup-after-env.ts) and logs each retried
       # error, instead of silently re-running the whole job.
-      - run: yarn test
+      # Two workers instead of `yarn test`'s --runInBand, which had grown past
+      # the timeout: in band, 482 of ~940 suites finished in 20 minutes. A
+      # worker past 1 GB is replaced between files, so heap growth stays
+      # bounded on this runner's 7.9 GB with no swap.
+      - run: yarn test:ci
         env:
           NODE_OPTIONS: --max-old-space-size=4096
         timeout-minutes: 20
