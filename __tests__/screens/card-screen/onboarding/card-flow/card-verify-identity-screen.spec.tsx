@@ -11,7 +11,11 @@ let mockIsStartingKyc = false
 const mockReadKycStatus = jest.fn()
 const mockReplace = jest.fn()
 const mockIsFocused = jest.fn()
-const mockKycStatus = { isKycSubmitted: false, isCheckingKyc: false }
+const mockKycStatus = {
+  isKycSubmitted: false,
+  isKycStatusKnown: true,
+  hasKycStatusError: false,
+}
 
 jest.mock("@app/hooks", () => ({
   useKycFlow: (params: unknown) => {
@@ -52,7 +56,8 @@ describe("CardVerifyIdentityScreen", () => {
     mockIsStartingKyc = false
     mockIsFocused.mockReturnValue(true)
     mockKycStatus.isKycSubmitted = false
-    mockKycStatus.isCheckingKyc = false
+    mockKycStatus.isKycStatusKnown = true
+    mockKycStatus.hasKycStatusError = false
   })
 
   it("explains that the card issuer has to verify who the user is", async () => {
@@ -136,10 +141,44 @@ describe("CardVerifyIdentityScreen", () => {
     expect(mockReplace).not.toHaveBeenCalled()
   })
 
-  it("holds Continue on its spinner while the review is being read", async () => {
-    mockKycStatus.isCheckingKyc = true
-    const { queryByText } = await renderScreen()
+  /** Covers the first render too, before the focus read has started. */
+  it("holds Continue on its spinner until a read has answered", async () => {
+    mockKycStatus.isKycStatusKnown = false
+    const { getByTestId, queryByText } = await renderScreen()
+
+    await act(async () => {
+      fireEvent.press(getByTestId("Continue"))
+    })
 
     expect(queryByText("Continue")).toBeNull()
+    expect(mockStartKyc).not.toHaveBeenCalled()
+  })
+
+  /** A failed read cannot tell whether a verification was already submitted, so the step
+   *  never starts one on it. */
+  describe("when the review cannot be read", () => {
+    beforeEach(() => {
+      mockKycStatus.isKycStatusKnown = false
+      mockKycStatus.hasKycStatusError = true
+    })
+
+    it("says so and offers to try again", async () => {
+      const { getByText, queryByText } = await renderScreen()
+
+      expect(getByText("Unexpected error occurred")).toBeTruthy()
+      expect(getByText("Try Again")).toBeTruthy()
+      expect(queryByText("Continue")).toBeNull()
+    })
+
+    it("reads the review again instead of starting a verification", async () => {
+      const { getByText } = await renderScreen()
+
+      await act(async () => {
+        fireEvent.press(getByText("Try Again"))
+      })
+
+      expect(mockReadKycStatus).toHaveBeenCalledTimes(2)
+      expect(mockStartKyc).not.toHaveBeenCalled()
+    })
   })
 })

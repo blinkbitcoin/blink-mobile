@@ -47,15 +47,20 @@ export const isCardKycApproved = (account: KycAccount): boolean =>
 /** Reads the card verification afresh on each call, since it moves on the issuer's side
  *  while the app is away in the verification web flow. */
 export const useCardKycStatus = () => {
-  const [readKycStatus, { data, loading }] = useCardKycStatusLazyQuery({
+  const [readKycStatus, { data, loading, error }] = useCardKycStatusLazyQuery({
     fetchPolicy: "network-only",
   })
 
   const account = data?.me?.defaultAccount
+  const hasKycStatusError = Boolean(error) && !loading
+  /** Known only once a read has answered. Before the first read, while one runs and after
+   *  one fails, nothing says whether a verification was already submitted. */
+  const isKycStatusKnown = Boolean(data) && !loading && !error
 
   return {
     readKycStatus,
     isKycSubmitted: isCardKycSubmitted(account),
-    isCheckingKyc: loading,
+    isKycStatusKnown,
+    hasKycStatusError,
   }
 }
