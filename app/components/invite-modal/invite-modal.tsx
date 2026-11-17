@@ -195,7 +195,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   modalCard: {
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 16,
+    borderRadius: radius.popup,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",

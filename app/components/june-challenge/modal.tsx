@@ -2,6 +2,7 @@ import * as React from "react"
 import { Linking, View } from "react-native"
 import Modal from "react-native-modal"
 
+import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useCirclesCard } from "@app/screens/people-screen/circles/use-circles-card"
 import { makeStyles, useTheme, Text } from "@rn-vui/themed"
@@ -111,7 +112,7 @@ const useStyles = makeStyles(({ colors }) => ({
   top: { marginTop: 40 },
   modalCard: {
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 16,
+    borderRadius: radius.popup,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",

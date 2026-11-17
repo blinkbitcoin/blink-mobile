@@ -5,6 +5,7 @@ import Modal from "react-native-modal"
 
 import { makeStyles, Text, TextProps, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
@@ -183,7 +184,7 @@ const useStyles = makeStyles(({ colors }, props: UseStylesProps) => ({
     backgroundColor: props.backgroundModalColor ?? colors.surfaceInteractive,
     maxHeight: "95%",
     minHeight: props.minHeight || "auto",
-    borderRadius: 16,
+    borderRadius: radius.popup,
     padding: 20,
   },
   modalCard: {

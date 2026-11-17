@@ -109,7 +109,7 @@ export const ConfirmDestinationModal: React.FC<ConfirmDestinationModalProps> = (
 const useStyles = makeStyles(({ colors }) => ({
   modalCard: {
     backgroundColor: colors.backgroundDefault,
-    borderRadius: 16,
+    borderRadius: radius.popup,
     padding: 18,
   },
   warningText: {

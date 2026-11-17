@@ -247,7 +247,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.surfaceInteractive,
     maxHeight: "80%",
     minHeight: "auto",
-    borderRadius: 16,
+    borderRadius: radius.popup,
     padding: 20,
   },
   modalCard: {

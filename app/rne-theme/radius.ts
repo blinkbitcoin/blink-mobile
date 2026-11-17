@@ -4,4 +4,8 @@ export const radius = {
    * Pills, circles and sheet grabbers keep their own radii.
    */
   default: 12,
+  /**
+   * The corner radius (px) for centred popup modals.
+   */
+  popup: 20,
 }

@@ -144,6 +144,25 @@ const TOKEN_CORNERS: Record<string, number> = {
   "app/screens/unclaimed-deposits/unclaimed-deposits-screen.tsx": 3,
 }
 
+// The centred popups moved to `radius.popup`: `custom-modal` and the modals that copy its
+// card. A popup put back to 16 lowers a count.
+const POPUP_CORNERS: Record<string, number> = {
+  "app/components/custom-modal/custom-modal.tsx": 1,
+  "app/components/introducing-circles-modal/introducing-circles-modal.tsx": 1,
+  "app/components/invite-modal/invite-modal.tsx": 1,
+  "app/components/june-challenge/modal.tsx": 1,
+  "app/components/may-challenge/modal.tsx": 1,
+  "app/components/set-default-account-modal/set-default-account-modal.tsx": 1,
+  "app/components/stablesats-modal/stablesats-modal.tsx": 1,
+  "app/screens/galoy-address-screen/address-explainer-modal.tsx": 1,
+  "app/screens/galoy-address-screen/paycode-explainer-modal.tsx": 1,
+  "app/screens/galoy-address-screen/pos-explainer-modal.tsx": 1,
+  "app/screens/send-bitcoin-screen/confirm-destination-modal.tsx": 1,
+  "app/screens/send-bitcoin-screen/confirm-fees-modal.tsx": 1,
+  "app/screens/settings-screen/account/multi-account/profile.tsx": 1,
+  "app/screens/settings-screen/account/settings/delete.tsx": 1,
+}
+
 const sourceFiles = (dir: string): string[] =>
   readdirSync(dir).flatMap((name) => {
     const path = join(dir, name)
@@ -152,8 +171,8 @@ const sourceFiles = (dir: string): string[] =>
   })
 
 describe("radius", () => {
-  it("rounds the default corner at 12", () => {
-    expect(radius.default).toBe(12)
+  it("rounds the default corner at 12 and a popup at 20", () => {
+    expect(radius).toEqual({ default: 12, popup: 20 })
   })
 
   const flagged = [
@@ -202,5 +221,16 @@ describe("radius", () => {
     )
 
     expect(counts).toEqual(TOKEN_CORNERS)
+  })
+
+  it("keeps every popup on the popup radius", () => {
+    const counts = Object.fromEntries(
+      Object.keys(POPUP_CORNERS).map((file) => [
+        file,
+        readFileSync(join(REPO_ROOT, file), "utf8").split("radius.popup").length - 1,
+      ]),
+    )
+
+    expect(counts).toEqual(POPUP_CORNERS)
   })
 })

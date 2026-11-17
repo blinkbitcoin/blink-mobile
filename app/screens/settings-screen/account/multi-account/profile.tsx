@@ -2,6 +2,7 @@ import * as React from "react"
 import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 
 import { ListItem, makeStyles, Overlay, useTheme, Text } from "@rn-vui/themed"
+import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { CommonActions, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -234,7 +235,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginHorizontal: 20,
     backgroundColor: colors.surfaceInteractive,
     padding: 20,
-    borderRadius: 20,
+    borderRadius: radius.popup,
     display: "flex",
     flexDirection: "column",
     rowGap: 20,

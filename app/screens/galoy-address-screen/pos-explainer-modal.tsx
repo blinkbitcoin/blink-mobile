@@ -2,6 +2,7 @@ import React from "react"
 import { View, TouchableOpacity } from "react-native"
 import Modal from "react-native-modal"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -12,7 +13,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.backgroundDefault,
     maxFlex: 1,
     maxHeight: "75%",
-    borderRadius: 16,
+    borderRadius: radius.popup,
     padding: 20,
   },
   titleContainer: {

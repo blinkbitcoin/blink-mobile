@@ -1,6 +1,6 @@
 import React from "react"
 
-import { Platform } from "react-native"
+import { Platform, StyleSheet } from "react-native"
 
 import { fireEvent, render } from "@testing-library/react-native"
 
@@ -60,6 +60,19 @@ const baseProps = {
 describe("CustomModal", () => {
   beforeEach(() => {
     mockThemeMode = "light"
+  })
+
+  it("rounds the popup card at 20", () => {
+    const { UNSAFE_root: root } = render(
+      <CustomModal {...baseProps} toggleModal={jest.fn()} />,
+    )
+    const radii = root
+      .findAll((node) => typeof node.type === "string")
+      .map((node) => StyleSheet.flatten(node.props.style)?.borderRadius)
+      .filter((value) => typeof value === "number")
+
+    expect(radii).toContain(20)
+    expect(radii).not.toContain(16)
   })
 
   it("does not render when invisible", () => {

@@ -263,7 +263,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginHorizontal: 20,
     backgroundColor: colors.surfaceInteractive,
     padding: 20,
-    borderRadius: 20,
+    borderRadius: radius.popup,
     display: "flex",
     flexDirection: "column",
     rowGap: 20,
