@@ -6,6 +6,8 @@ import { fonts } from "@app/rne-theme/fonts"
 
 export type GaloyTertiaryButtonProps = {
   outline?: boolean
+  /** Figma `Filled=false`: a grey5 pill with a primary label and no border. */
+  unfilled?: boolean
   clear?: boolean
   containerStyle?: StyleProp<ViewStyle>
   title: string
@@ -13,7 +15,8 @@ export type GaloyTertiaryButtonProps = {
 } & PressableProps
 
 export const GaloyTertiaryButton = (props: GaloyTertiaryButtonProps) => {
-  const { outline, clear, containerStyle, disabled, icon, ...remainingProps } = props
+  const { outline, unfilled, clear, containerStyle, disabled, icon, ...remainingProps } =
+    props
   const styles = useStyles(props)
   const {
     theme: { colors },
@@ -22,6 +25,17 @@ export const GaloyTertiaryButton = (props: GaloyTertiaryButtonProps) => {
   const pressableStyle = ({ pressed }: { pressed: boolean }): StyleProp<ViewStyle> => {
     let dynamicStyle
     switch (true) {
+      case pressed && unfilled:
+        dynamicStyle = {
+          backgroundColor: colors.surfacePressed,
+        }
+        break
+      case unfilled:
+        dynamicStyle = {
+          opacity: disabled ? 0.7 : 1,
+          backgroundColor: colors.surfaceInteractive,
+        }
+        break
       case pressed && outline:
         dynamicStyle = {
           borderColor: colors.accent,
@@ -63,7 +77,7 @@ export const GaloyTertiaryButton = (props: GaloyTertiaryButtonProps) => {
 
   let textColor = colors.textOnAccent
   if (outline) textColor = colors.textOnBackground
-  if (clear) textColor = colors.accent
+  if (clear || unfilled) textColor = colors.accent
 
   return (
     <Pressable {...remainingProps} style={pressableStyle} disabled={disabled}>

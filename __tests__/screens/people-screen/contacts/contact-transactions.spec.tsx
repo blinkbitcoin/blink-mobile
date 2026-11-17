@@ -10,7 +10,6 @@ import { TxStatus, UserContact } from "@app/graphql/generated"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { light } from "@app/rne-theme/colors"
-import { radius } from "@app/rne-theme/radius"
 import theme from "@app/rne-theme/theme"
 import { groupTitleGap } from "@app/rne-theme/tokens"
 import { ContactTransactions } from "@app/screens/people-screen/contacts/contact-transactions"
@@ -75,15 +74,23 @@ type RowProps = {
   subtitle?: boolean
   isFirst?: boolean
   isLast?: boolean
+  variant?: string
 }
 
 const mockRowProps: RowProps[] = []
 
 jest.mock("@app/components/transaction-item", () => ({
   ...jest.requireActual("@app/components/transaction-item"),
-  MemoizedTransactionItem: ({ txid, onPress, subtitle, isFirst, isLast }: RowProps) => {
+  MemoizedTransactionItem: ({
+    txid,
+    onPress,
+    subtitle,
+    isFirst,
+    isLast,
+    variant,
+  }: RowProps) => {
     const { View } = jest.requireActual("react-native")
-    mockRowProps.push({ txid, onPress, subtitle, isFirst, isLast })
+    mockRowProps.push({ txid, onPress, subtitle, isFirst, isLast, variant })
     return <View testID={`transaction-${txid}`} />
   },
 }))
@@ -464,7 +471,7 @@ describe("ContactTransactions", () => {
       ])
     })
 
-    it("rounds the group's outer corners and nothing in between", () => {
+    it("draws every row as the card row, which rounds the group's outer corners", () => {
       mockUseQuery.mockReturnValue(
         custodialQuery({
           edges: [
@@ -475,27 +482,11 @@ describe("ContactTransactions", () => {
         }),
       )
 
-      const { getByTestId } = renderContactTransactions()
+      renderContactTransactions()
 
-      /** The row wraps in the view that carries the corners, past the row component. */
-      const cornersOf = (txid: string) => {
-        let node = getByTestId(`transaction-${txid}`).parent
-        while (node && typeof node.type !== "string") node = node.parent
-        return StyleSheet.flatten(node?.props.style)
-      }
-
-      expect(radius.default).toBe(12)
-      expect(cornersOf("first-tx")).toEqual({
-        borderTopLeftRadius: radius.default,
-        borderTopRightRadius: radius.default,
-        overflow: "hidden",
-      })
-      expect(cornersOf("middle-tx")).toEqual({})
-      expect(cornersOf("last-tx")).toEqual({
-        borderBottomLeftRadius: radius.default,
-        borderBottomRightRadius: radius.default,
-        overflow: "hidden",
-      })
+      // The corners belong to the card row now (see transaction-item.test.tsx); the list
+      // only has to ask for it and say which rows open and close the group.
+      expect(mockRowProps.map(({ variant }) => variant)).toEqual(["card", "card", "card"])
     })
   })
 })
