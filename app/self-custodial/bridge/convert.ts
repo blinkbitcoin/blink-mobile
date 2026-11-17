@@ -470,6 +470,18 @@ type ConversionExecution = {
   params: ConvertParams
 } & ConvertExecuteOptions
 
+/** What a conversion that went out paid in, and which way. */
+type ConversionOut = { direction: ConvertDirection; amountIn: number }
+
+/** By the wallet's SDK, what went out while each of its conversions waited for its turn. */
+const waitingConversions = new WeakMap<BreezSdkInterface, Set<ConversionOut[]>>()
+
+const waitingIn = (sdk: BreezSdkInterface): Set<ConversionOut[]> => {
+  const held = waitingConversions.get(sdk) ?? new Set<ConversionOut[]>()
+  waitingConversions.set(sdk, held)
+  return held
+}
+
 const executePrepared = (
   sdk: BreezSdkInterface,
   execution: ConversionExecution,
@@ -477,16 +489,40 @@ const executePrepared = (
   /** Taken once: a conversion that finishes after a switch of wallet settles its own
    *  wallet's lost conversion, not the next one's. */
   const attempts = lostAttemptsFor(OWN_CONVERSIONS)
-  return attempts.oneAtATime(() =>
-    convertAfterEarlierConversions(sdk, attempts, execution),
-  )
+  const waiting = waitingIn(sdk)
+  const wentOutMeanwhile: ConversionOut[] = []
+  waiting.add(wentOutMeanwhile)
+  return attempts.oneAtATime(async () => {
+    waiting.delete(wentOutMeanwhile)
+    const result = await convertAfterEarlierConversions(sdk, attempts, {
+      ...execution,
+      wentOutMeanwhile,
+    })
+    /** Each conversion still waiting for its turn is told what this one converted. */
+    const isConverted = result.status === PaymentResultStatus.Success
+    if (isConverted) {
+      const out = {
+        direction: execution.params.direction,
+        amountIn: toNumber(execution.estimate.amountIn),
+      }
+      waiting.forEach((meanwhile) => meanwhile.push(out))
+    }
+    return result
+  })
 }
 
 /** The conversion itself, alone among the wallet's conversions. */
 const convertAfterEarlierConversions = async (
   sdk: BreezSdkInterface,
   attempts: LostAttemptsHandle,
-  { prepared, estimate, startedIn, params, isConvertedMeanwhile }: ConversionExecution,
+  {
+    prepared,
+    estimate,
+    startedIn,
+    params,
+    isConvertedMeanwhile,
+    wentOutMeanwhile,
+  }: ConversionExecution & { wentOutMeanwhile: readonly ConversionOut[] },
 ): Promise<PaymentAdapterResult> => {
   /** Nothing is converted while what an earlier launch lost has not been read back: a
    *  conversion it lost may be this one, done already. */
@@ -524,8 +560,20 @@ const convertAfterEarlierConversions = async (
     }
   }
   /** What was decided before the turn came is asked again now, when no other conversion
-   *  in the wallet can go out: auto-convert's receive may have been converted meanwhile,
-   *  by the user included. Unanswered, nothing is converted. */
+   *  in the wallet can go out. The user confirmed theirs against a balance that one of
+   *  about its amount, gone out while it waited, has spent: auto-convert's of a receive
+   *  they meant to convert themselves, or their own sent twice. Theirs is not sent, and
+   *  they confirm again against what is left. Auto-convert asks the history instead, since
+   *  two receives of one amount are two conversions. */
+  const amountIn = toNumber(estimate.amountIn)
+  const isLikeThisOne = (out: ConversionOut) =>
+    out.direction === params.direction && isAboutAmount(out.amountIn, amountIn)
+  const shouldConfirmAgain = !isAutomatic && wentOutMeanwhile.some(isLikeThisOne)
+  if (shouldConfirmAgain) {
+    return failed(ALREADY_CONVERTED_MESSAGE, ConvertErrorCode.AlreadyConverted)
+  }
+  /** Auto-convert's receive may have been converted meanwhile, by the user included.
+   *  Unanswered, nothing is converted. */
   if (isConvertedMeanwhile) {
     const isConverted = await isConvertedMeanwhile().catch((err: unknown) => {
       recordConvertError(err, params, "isConvertedMeanwhile")

@@ -199,7 +199,8 @@ export const ConvertErrorCode = {
    *  it, so it can be tried again. */
   ConversionFailed: "conversion_failed",
   /** Nothing was converted: what it was to convert was converted while it waited for its
-   *  turn in the wallet. */
+   *  turn in the wallet; for the user's own, by a conversion of about its amount, and they
+   *  confirm it again. */
   AlreadyConverted: "already_converted",
 } as const
 

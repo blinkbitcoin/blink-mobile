@@ -9,6 +9,7 @@ import {
   ConvertAmountAdjustment,
   ConvertDirection,
   ConvertErrorCode,
+  type ConvertParams,
 } from "@app/types/payment"
 import { WalletCurrency } from "@app/graphql/generated"
 
@@ -1815,24 +1816,143 @@ describe("a conversion asked once its turn comes whether it was converted meanwh
       expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
     })
 
-    /** The user's conversion is theirs to ask for, of the amount they chose: it waits for
-     *  the auto-conversion ahead of it, then goes out. */
-    it("lets the user's conversion go out once the auto-conversion ahead of it is done", async () => {
-      const sdk = walletSdk()
-      const answerAutomatic = holdNextSend(sdk)
-      const automatic = executeAutoConvert(sdk as never, receive)
+    /** A receive's auto-conversion, held in flight until it is answered. */
+    const automaticInFlight = async (sdk: ReturnType<typeof walletSdk>) => {
+      const answer = holdNextSend(sdk)
+      const outcome = executeAutoConvert(sdk as never, receive)
       while (sdk.sendPayment.mock.calls.length === 0) await nextTurn()
+      return { outcome, answer }
+    }
 
-      const userConversion = (await createGetConversionQuote(sdk as never)(
-        params,
+    /** A conversion the user confirms while the one ahead of it holds the turn. */
+    const userConversionWaiting = async (
+      sdk: ReturnType<typeof walletSdk>,
+      conversion: ConvertParams = params,
+    ) => {
+      const outcome = (await createGetConversionQuote(sdk as never)(
+        conversion,
       ))!.execute()
       for (let turn = 0; turn < 10; turn += 1) await nextTurn()
-      const sentMeanwhile = sdk.sendPayment.mock.calls.length
-      answerAutomatic({ payment: { id: "c-auto", status: 0 } })
+      return { outcome }
+    }
 
-      expect(await automatic).toEqual({ status: "converted" })
-      expect((await userConversion).status).toBe("success")
+    /** What the quotes made from here on pay in. */
+    const quotedPayingIn = (sdk: ReturnType<typeof walletSdk>, amountIn: number) =>
+      sdk.prepareSendPayment.mockResolvedValue({
+        paymentMethod: {},
+        conversionEstimate: {
+          fee: BigInt(0),
+          amountIn: BigInt(amountIn),
+          amountOut: BigInt(amountIn * 274),
+          amountAdjustment: undefined,
+        },
+      })
+
+    it("asks the user to confirm again a transfer of the amount auto-convert converted while it waited", async () => {
+      const sdk = walletSdk()
+      const automatic = await automaticInFlight(sdk)
+      const userConversion = await userConversionWaiting(sdk)
+      const sentMeanwhile = sdk.sendPayment.mock.calls.length
+      automatic.answer({ payment: { id: "c-auto", status: PaymentStatus.Completed } })
+
+      expect(await automatic.outcome).toEqual({ status: "converted" })
+      expect((await userConversion.outcome).errors?.[0].code).toBe(
+        ConvertErrorCode.AlreadyConverted,
+      )
       expect(sentMeanwhile).toBe(1)
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+      expect(mockMarkReceivedHistory).toHaveBeenCalledTimes(1)
+    })
+
+    it("asks the user to confirm again their own transfer sent twice while the first was out", async () => {
+      const sdk = walletSdk()
+      const answerFirst = holdNextSend(sdk)
+      const first = (await createGetConversionQuote(sdk as never)(params))!.execute()
+      while (sdk.sendPayment.mock.calls.length === 0) await nextTurn()
+      const second = await userConversionWaiting(sdk)
+      answerFirst({ payment: { id: "c-user", status: PaymentStatus.Completed } })
+
+      expect((await first).status).toBe("success")
+      expect((await second.outcome).errors?.[0].code).toBe(
+        ConvertErrorCode.AlreadyConverted,
+      )
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+    })
+
+    it("lets the user's transfer of another amount go out once auto-convert's is done", async () => {
+      const sdk = walletSdk()
+      const automatic = await automaticInFlight(sdk)
+      quotedPayingIn(sdk, 20_000)
+      const userConversion = await userConversionWaiting(sdk, {
+        ...params,
+        fromAmount: toBtcMoneyAmount(20_000),
+        toAmount: toUsdMoneyAmount(548),
+      })
+      automatic.answer({ payment: { id: "c-auto", status: PaymentStatus.Completed } })
+
+      expect(await automatic.outcome).toEqual({ status: "converted" })
+      expect((await userConversion.outcome).status).toBe("success")
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+    })
+
+    it("lets the user's transfer the other way go out once auto-convert's is done", async () => {
+      const sdk = walletSdk()
+      sdk.getInfo.mockResolvedValue({
+        tokenBalances: {
+          "usdb-token-id": {
+            balance: 1_000_000_000n,
+            tokenMetadata: { identifier: "usdb-token-id", decimals: 6 },
+          },
+        },
+      })
+      const automatic = await automaticInFlight(sdk)
+      const userConversion = await userConversionWaiting(sdk, {
+        fromAmount: toUsdMoneyAmount(137),
+        toAmount: toBtcMoneyAmount(5000),
+        direction: ConvertDirection.UsdToBtc,
+      })
+      automatic.answer({ payment: { id: "c-auto", status: PaymentStatus.Completed } })
+
+      expect(await automatic.outcome).toEqual({ status: "converted" })
+      expect((await userConversion.outcome).status).toBe("success")
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+    })
+
+    it("lets the user's transfer go out when auto-convert's ahead of it converted nothing", async () => {
+      const sdk = walletSdk()
+      const automatic = await automaticInFlight(sdk)
+      const userConversion = await userConversionWaiting(sdk)
+      automatic.answer({ payment: { id: "c-auto", status: PaymentStatus.Failed } })
+
+      expect(await automatic.outcome).toEqual({ status: "failed" })
+      expect((await userConversion.outcome).status).toBe("success")
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+    })
+
+    it("lets the user's transfer of that amount go out when they confirm it after auto-convert's is done", async () => {
+      const sdk = walletSdk()
+
+      const automatic = await executeAutoConvert(sdk as never, receive)
+      const userConversion = await (await createGetConversionQuote(sdk as never)(
+        params,
+      ))!.execute()
+
+      expect(automatic).toEqual({ status: "converted" })
+      expect(userConversion.status).toBe("success")
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+    })
+
+    /** Two receives of one amount are two conversions: auto-convert asks the history, not
+     *  what went out while it waited. */
+    it("converts a second receive of the same amount that waited behind the first's", async () => {
+      const sdk = walletSdk()
+      const first = await automaticInFlight(sdk)
+      const second = executeAutoConvert(sdk as never, receive)
+      for (let turn = 0; turn < 10; turn += 1) await nextTurn()
+      first.answer({ payment: { id: "c-auto-1", status: PaymentStatus.Completed } })
+
+      expect(await first.outcome).toEqual({ status: "converted" })
+      expect(await second).toEqual({ status: "converted" })
       expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
     })
   })
