@@ -51,13 +51,16 @@ export const useCardApplicationSubmit = () => {
       } catch {
         /** A create whose answer was lost landed all the same, and the issuer refuses a
          *  second one, as it does for a user back here after the wait ran out. Either
-         *  way the account's live application is the one to wait for. */
+         *  way the account's application is the one to follow: a live one is waited on,
+         *  and one the issuer already refused takes the wait straight to the decline. */
         const { data: applicationsData } = await readApplications()
-        const liveApplication =
-          applicationsData?.me?.defaultAccount?.cardConsumerApplications?.find(
-            (application) => !isCardApplicationRefused(application.applicationStatus),
-          )
-        return liveApplication?.id ?? null
+        const applications =
+          applicationsData?.me?.defaultAccount?.cardConsumerApplications ?? []
+        const liveApplication = applications.find(
+          (application) => !isCardApplicationRefused(application.applicationStatus),
+        )
+        const followedApplication = liveApplication ?? applications[0]
+        return followedApplication?.id ?? null
       } finally {
         setIsSubmitting(false)
       }

@@ -11,6 +11,7 @@ import {
   KycFlowType,
   OnboardingStatus,
 } from "@app/graphql/generated"
+import { useCardApplicationApproval } from "@app/screens/card-screen/onboarding/card-flow/use-card-application-approval"
 import { useCardApplicationSubmit } from "@app/screens/card-screen/onboarding/card-flow/use-card-application-submit"
 
 const ANSWERS = {
@@ -147,6 +148,18 @@ describe("useCardApplicationSubmit", () => {
     expect(applicationId).toBeNull()
   })
 
+  /** Apollo logs the missing field; the hook still answers null. */
+  it("answers null when the create answers without an application", async () => {
+    const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
+    const { applicationId } = await submit([
+      kycResponse(OnboardingStatus.Approved),
+      { request: createRequest(true), result: {} },
+    ])
+
+    expect(applicationId).toBeNull()
+    consoleError.mockRestore()
+  })
+
   it("answers null when the application never reaches the server", async () => {
     const { applicationId } = await submit([
       kycResponse(OnboardingStatus.Approved),
@@ -167,14 +180,45 @@ describe("useCardApplicationSubmit", () => {
     expect(applicationId).toBe("application-9")
   })
 
-  it("leaves a refused application behind instead of waiting on it", async () => {
+  /** Without an id the terms would show a generic error and offer Accept again, which
+   *  the issuer refuses: the user sees the decline instead. */
+  it("follows a landed application the issuer already refused, so the wait ends on the decline", async () => {
+    const refusedApplication = () =>
+      applicationsResponse([{ id: "application-0", status: ApplicationStatus.Denied }])
     const { applicationId } = await submit([
       kycResponse(OnboardingStatus.Approved),
       lostCreate,
-      applicationsResponse([{ id: "application-0", status: ApplicationStatus.Denied }]),
+      refusedApplication(),
     ])
 
-    expect(applicationId).toBeNull()
+    expect(applicationId).toBe("application-0")
+
+    const { result, waitFor, unmount } = renderHook(
+      () => useCardApplicationApproval("application-0"),
+      {
+        wrapper: ({ children }: PropsWithChildren) => (
+          <MockedProvider mocks={[refusedApplication()]} addTypename>
+            {children}
+          </MockedProvider>
+        ),
+      },
+    )
+    await waitFor(() => result.current === "declined")
+    expect(result.current).toBe("declined")
+    unmount()
+  })
+
+  it("waits on the live application rather than an earlier refused one", async () => {
+    const { applicationId } = await submit([
+      kycResponse(OnboardingStatus.Approved),
+      lostCreate,
+      applicationsResponse([
+        { id: "application-0", status: ApplicationStatus.Denied },
+        { id: "application-9", status: ApplicationStatus.Pending },
+      ]),
+    ])
+
+    expect(applicationId).toBe("application-9")
   })
 
   it("answers null when the applications cannot be read either", async () => {
