@@ -32,8 +32,8 @@ export const FeatureRow: React.FC<FeatureRowProps> = ({
     <View style={styles.row}>
       <GaloyIcon
         name={icon}
-        color={colors.textOnBackground}
-        backgroundColor={colors.neutral}
+        color={colors.textOnAccent}
+        backgroundColor={colors.accent}
         size={ICON_SIZE}
         containerSize={ICON_CONTAINER_SIZE}
       />

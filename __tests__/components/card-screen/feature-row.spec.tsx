@@ -44,14 +44,14 @@ describe("FeatureRow", () => {
     )
   })
 
-  /** The design moved the circles off the accent: a light icon on the neutral fill. */
-  it("draws the icon light on a neutral circle", () => {
+  /** The latest design puts the circles back on the accent: a dark icon on the accent fill. */
+  it("draws the icon dark on an accent circle", () => {
     renderRow(<FeatureRow icon="headset" title="Personal account manager" />)
 
     expect(mockIconProps).toHaveBeenCalledWith(
       expect.objectContaining({
-        color: theme.lightColors?.textOnBackground,
-        backgroundColor: theme.lightColors?.neutral,
+        color: theme.lightColors?.textOnAccent,
+        backgroundColor: theme.lightColors?.accent,
       }),
     )
   })
