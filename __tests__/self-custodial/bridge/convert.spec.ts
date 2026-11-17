@@ -673,6 +673,16 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     payment,
     failed: [],
   })
+  /** A quote paying in `amountIn` to deliver `amountOut`. */
+  const quotedOut = (amountIn: number, amountOut: number) => ({
+    paymentMethod: {},
+    conversionEstimate: {
+      fee: BigInt(0),
+      amountIn: BigInt(amountIn),
+      amountOut: BigInt(amountOut),
+      amountAdjustment: undefined,
+    },
+  })
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -844,15 +854,6 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
   })
 
   it("still looks for its other attempt once one attempt's delivery is found", async () => {
-    const quotedOut = (amountIn: number, amountOut: number) => ({
-      paymentMethod: {},
-      conversionEstimate: {
-        fee: BigInt(0),
-        amountIn: BigInt(amountIn),
-        amountOut: BigInt(amountOut),
-        amountAdjustment: undefined,
-      },
-    })
     mockFindLostConversion
       .mockResolvedValueOnce({ status: "not-found", failed: [] })
       .mockResolvedValueOnce({ status: "not-found", failed: [] })
@@ -961,6 +962,55 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
       { tokenIdentifier: "usdb-token-id", amount: 1_370_000, isAutomatic: false },
       { tokenIdentifier: "usdb-token-id", amount: 1_370_000, isAutomatic: false },
     ])
+  })
+
+  /** One delivery is all the look finds, and either attempt may have made it: it settles
+   *  one of them, and the other may still deliver. */
+  it("leaves the other attempt looked for when what the look finds could be either's", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(foundDelivery())
+      .mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    const second = await (await quoteFor(sdk))!.execute()
+    const next = await (await quoteFor(sdk))!.execute()
+
+    const nextLook = mockFindLostConversion.mock.calls[3][0].lost
+    expect(second.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(nextLook.expectedDeliveries).toEqual([
+      { tokenIdentifier: "usdb-token-id", amount: 1_370_000, isAutomatic: false },
+    ])
+    expect(nextLook.knownPaymentIds).toContain("rcv-usdb")
+    expect(next.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("reports the one let through as done when what the look finds is no other attempt's, still looking for that one", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(foundDelivery())
+      .mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+
+    sdk.prepareSendPayment.mockResolvedValue(quotedOut(7300, 2_000_000))
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    sdk.prepareSendPayment.mockResolvedValue(quotedOut(PAID_IN, 1_370_000))
+    const second = await (await quoteFor(sdk))!.execute()
+    await (await quoteFor(sdk))!.execute()
+
+    const nextLook = mockFindLostConversion.mock.calls[3][0].lost
+    expect(second.status).toBe("success")
+    expect(nextLook.expectedDeliveries).toEqual([
+      { tokenIdentifier: "usdb-token-id", amount: 2_000_000, isAutomatic: false },
+    ])
+    expect(nextLook.knownPaymentIds).toContain("rcv-usdb")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
   })
 
   it("looks for the lost conversion again, from its own mark, before a retry goes out", async () => {

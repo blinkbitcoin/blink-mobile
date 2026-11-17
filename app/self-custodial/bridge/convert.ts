@@ -51,6 +51,7 @@ import {
   markReceivedHistory,
   type ExpectedDelivery,
   type LostConversionLook,
+  type LostSendLookup,
 } from "../payment-details/lost-send"
 import { classifySdkError } from "../sdk-error"
 
@@ -392,6 +393,36 @@ const withoutAttempt = <L extends LostConversionLook>(
   }
 }
 
+/** What a look for a conversion lost as it went out leaves to look for, and whether what
+ *  it found is surely this conversion's delivery. */
+type SettledByLook = { left: LostConversion | undefined; isSurelyThis: boolean }
+
+/**
+ * What a look for this conversion, lost as it went out, settles. A delivery of it settles
+ * this attempt, the latest, and only it, since another lost attempt may still deliver;
+ * and it is surely this one's only while no attempt left could have delivered it as well.
+ * What an earlier attempt delivered is not looked for again, and this one still is.
+ */
+const settledByLook = (
+  look: LostSendLookup,
+  lost: LostConversion,
+  isThisConversion: (payment: Payment) => boolean,
+): SettledByLook => {
+  if (look.status !== "found") return { left: lost, isSurelyThis: false }
+  const { payment } = look
+  if (!isThisConversion(payment)) {
+    const knownPaymentIds = [...lost.knownPaymentIds, payment.id]
+    return { left: { ...lost, knownPaymentIds }, isSurelyThis: false }
+  }
+  const thisAttempt = lost.expectedDeliveries.length - 1
+  const left = withoutAttempt(lost, thisAttempt, payment)
+  const canBeAnotherAttempts =
+    left?.expectedDeliveries.some((delivery) =>
+      isDeliveryAsExpected(payment, delivery),
+    ) ?? false
+  return { left, isSurelyThis: !canBeAnotherAttempts }
+}
+
 /**
  * Sends a quoted conversion so that a retry can never convert twice.
  *
@@ -560,23 +591,14 @@ const convertAfterEarlierConversions = async (
      *  earlier mark: either may have delivered by now. What was stored ahead stays
      *  stored meanwhile, and is taken back only once what the look leaves is held. */
     const look = await findLostConversion({ sdk, lost })
-    const isFoundAsThis = look.status === "found" && isThisConversion(look.payment)
-    if (isFoundAsThis) {
-      keepLost(undefined)
-      writtenAhead.end()
+    const { left, isSurelyThis } = settledByLook(look, lost, isThisConversion)
+    keepLost(left)
+    writtenAhead.end()
+    if (isSurelyThis) {
       measureIn(startedIn, ScEvent.SwapCompleted, swapTelemetry)
       return { status: PaymentResultStatus.Success }
     }
-
-    /** What an earlier conversion delivered leaves this one unaccounted for: it is not
-     *  looked for again, and this one still is. */
-    const knownPaymentIds =
-      look.status === "found"
-        ? [...lost.knownPaymentIds, look.payment.id]
-        : lost.knownPaymentIds
     reportSwapFailed()
-    keepLost({ ...lost, knownPaymentIds })
-    writtenAhead.end()
     return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
   }
 }
