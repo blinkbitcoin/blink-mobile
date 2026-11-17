@@ -21,10 +21,15 @@ jest.mock(
 
 const mockNavigate = jest.fn()
 const mockSetOptions = jest.fn()
+const mockSetParams = jest.fn()
 let mockRouteParams: unknown
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate, setOptions: mockSetOptions }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    setOptions: mockSetOptions,
+    setParams: mockSetParams,
+  }),
   useRoute: () => ({ params: mockRouteParams }),
 }))
 
@@ -462,6 +467,63 @@ describe("RestorePhraseScreen", () => {
 
     expect(getByText(LL.RestoreScreen.recognizePhraseTitle())).toBeTruthy()
     expect(getByText(LL.RestoreScreen.recognizePhraseBody())).toBeTruthy()
+  })
+
+  describe("SeedQR", () => {
+    it("offers Scan SeedQR on step 1 and opens the scanner", async () => {
+      mockRouteParams = { step: 1 }
+      mockUseRestorePhrase.mockReturnValue({ ...defaultHookReturn, isStep1: true })
+
+      const { getByText } = renderScreen()
+      await flushEffects()
+      fireEvent.press(getByText(LL.RestoreScreen.scanSeedQr()))
+
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialSeedQrScanner")
+    })
+
+    it("does not offer Scan SeedQR on step 2", async () => {
+      const { queryByText } = renderScreen()
+      await flushEffects()
+
+      expect(mockMnemonicWordInput).toHaveBeenCalled()
+      expect(queryByText(LL.RestoreScreen.scanSeedQr())).toBeNull()
+    })
+
+    it("takes scanned words in as a paste and clears them from the route", async () => {
+      const scannedWords = [
+        ...["abandon", "ability", "able", "about", "above", "absent"],
+        ...["absorb", "abstract", "absurd", "abuse", "access", "accident"],
+      ]
+      const handlePaste = jest.fn(() => true)
+      mockRouteParams = { step: 1, scannedWords }
+      mockUseRestorePhrase.mockReturnValue({
+        ...defaultHookReturn,
+        isStep1: true,
+        handlePaste,
+      })
+
+      renderScreen()
+      await flushEffects()
+
+      expect(mockSetParams).toHaveBeenCalledWith({ scannedWords: undefined })
+      expect(handlePaste).toHaveBeenCalledWith(scannedWords.join(" "))
+    })
+
+    it("pastes nothing when no scan came back", async () => {
+      const handlePaste = jest.fn(() => true)
+      mockRouteParams = { step: 1 }
+      mockUseRestorePhrase.mockReturnValue({
+        ...defaultHookReturn,
+        isStep1: true,
+        handlePaste,
+      })
+
+      renderScreen()
+      await flushEffects()
+
+      expect(handlePaste).not.toHaveBeenCalled()
+      expect(mockSetParams).not.toHaveBeenCalled()
+    })
   })
 
   it("does not render the recognize-phrase warning card on step 2", async () => {
