@@ -92,6 +92,11 @@ const lostCreate: MockedResponse = {
   error: new Error("Network request failed"),
 }
 
+const rejectedCreate = (message: string): MockedResponse => ({
+  request: createRequest(true),
+  result: { errors: [new GraphQLError(message)] },
+})
+
 const renderSubmit = (mocks: MockedResponse[]) =>
   renderHook(() => useCardApplicationSubmit(), {
     wrapper: ({ children }: PropsWithChildren) => (
@@ -138,10 +143,7 @@ describe("useCardApplicationSubmit", () => {
   it("answers null when the issuer refuses the application and none is live", async () => {
     const { applicationId } = await submit([
       kycResponse(OnboardingStatus.Approved),
-      {
-        request: createRequest(true),
-        result: { errors: [new GraphQLError("Account is not invited")] },
-      },
+      rejectedCreate("Account is not invited"),
       applicationsResponse([]),
     ])
 
@@ -216,6 +218,48 @@ describe("useCardApplicationSubmit", () => {
         { id: "application-0", status: ApplicationStatus.Denied },
         { id: "application-9", status: ApplicationStatus.Pending },
       ]),
+    ])
+
+    expect(applicationId).toBe("application-9")
+  })
+
+  it("follows a locked application, which the issuer keeps on the account too", async () => {
+    const { applicationId } = await submit([
+      kycResponse(OnboardingStatus.Approved),
+      lostCreate,
+      applicationsResponse([{ id: "application-0", status: ApplicationStatus.Locked }]),
+    ])
+
+    expect(applicationId).toBe("application-0")
+  })
+
+  /** blink-card takes a new application after a cancellation, so an old one is no sign
+   *  that this create landed: the user stays on the terms and can try again. */
+  it("leaves the terms open after a cancelled application when the create never lands", async () => {
+    const { applicationId } = await submit([
+      kycResponse(OnboardingStatus.Approved),
+      lostCreate,
+      applicationsResponse([{ id: "application-0", status: ApplicationStatus.Canceled }]),
+    ])
+
+    expect(applicationId).toBeNull()
+  })
+
+  it("leaves the terms open after a cancelled application when the issuer rejects the create", async () => {
+    const { applicationId } = await submit([
+      kycResponse(OnboardingStatus.Approved),
+      rejectedCreate("Account is not invited"),
+      applicationsResponse([{ id: "application-0", status: ApplicationStatus.Canceled }]),
+    ])
+
+    expect(applicationId).toBeNull()
+  })
+
+  it("follows the application already on record when the issuer turns down a second one", async () => {
+    const { applicationId } = await submit([
+      kycResponse(OnboardingStatus.Approved),
+      rejectedCreate("An application has already been submitted for this account"),
+      applicationsResponse([{ id: "application-9", status: ApplicationStatus.Pending }]),
     ])
 
     expect(applicationId).toBe("application-9")
