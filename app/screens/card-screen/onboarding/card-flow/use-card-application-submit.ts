@@ -2,6 +2,7 @@ import * as React from "react"
 import { gql } from "@apollo/client"
 
 import {
+  ApplicationStatus,
   useCardApplicationStatusLazyQuery,
   useCardConsumerApplicationCreateMutation,
   useCardKycStatusLazyQuery,
@@ -19,6 +20,16 @@ gql`
     }
   }
 `
+
+/** The refusals the issuer keeps on the account: blink-card takes no other application
+ *  after them. A cancellation is not one, since blink-card lets the user apply again. */
+const BLOCKING_REFUSALS: ReadonlyArray<ApplicationStatus> = [
+  ApplicationStatus.Denied,
+  ApplicationStatus.Locked,
+]
+
+const isBlockingRefusal = (status: ApplicationStatus): boolean =>
+  BLOCKING_REFUSALS.some((refusal) => refusal === status)
 
 /** Sends the card application with the terms accepted, and answers the id of the
  *  application to wait for, or null when there is none. */
@@ -52,14 +63,19 @@ export const useCardApplicationSubmit = () => {
         /** A create whose answer was lost landed all the same, and the issuer refuses a
          *  second one, as it does for a user back here after the wait ran out. Either
          *  way the account's application is the one to follow: a live one is waited on,
-         *  and one the issuer already refused takes the wait straight to the decline. */
+         *  and a refusal the issuer keeps takes the wait straight to the decline. A
+         *  cancelled one says nothing about this attempt, since the user may apply again
+         *  after it, so the terms stay open to try again. */
         const { data: applicationsData } = await readApplications()
         const applications =
           applicationsData?.me?.defaultAccount?.cardConsumerApplications ?? []
         const liveApplication = applications.find(
           (application) => !isCardApplicationRefused(application.applicationStatus),
         )
-        const followedApplication = liveApplication ?? applications[0]
+        const blockingRefusal = applications.find((application) =>
+          isBlockingRefusal(application.applicationStatus),
+        )
+        const followedApplication = liveApplication ?? blockingRefusal
         return followedApplication?.id ?? null
       } finally {
         setIsSubmitting(false)
