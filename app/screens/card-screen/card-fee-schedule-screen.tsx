@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
@@ -228,7 +229,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   card: {
     ...staticSurface(colors),
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
   row: {
     flexDirection: "row",
@@ -265,7 +266,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   noticeCard: {
     ...staticSurface(colors),
-    borderRadius: 8,
+    borderRadius: radius.default,
     padding: 14,
     gap: 14,
   },
@@ -317,7 +318,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   detailsCard: {
     ...staticSurface(colors),
-    borderRadius: 8,
+    borderRadius: radius.default,
     padding: 14,
     gap: 12,
   },

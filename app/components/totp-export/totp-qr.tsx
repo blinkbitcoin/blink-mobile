@@ -4,6 +4,8 @@ import QRCode from "react-native-qrcode-svg"
 
 import { makeStyles } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
+
 type Props = {
   value: string
   size?: number
@@ -30,6 +32,6 @@ const useStyles = makeStyles(({ colors }) => ({
   spacingAround: {
     padding: 20,
     backgroundColor: colors.staticWhite,
-    borderRadius: 10,
+    borderRadius: radius.default,
   },
 }))

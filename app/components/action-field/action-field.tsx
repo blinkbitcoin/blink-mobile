@@ -2,6 +2,7 @@ import React from "react"
 import { View, TouchableOpacity } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
 const PLACEHOLDER = "—"
@@ -69,7 +70,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     height: 50,
     paddingHorizontal: 10,
   },

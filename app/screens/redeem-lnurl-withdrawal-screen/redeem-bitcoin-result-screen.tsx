@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from "react"
 import { ActivityIndicator, View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "@app/components/screen"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
@@ -160,7 +161,7 @@ const useStyles = makeStyles(({ colors }) => ({
     padding: 10,
     marginTop: 10,
     ...staticSurface(colors),
-    borderRadius: 10,
+    borderRadius: radius.default,
   },
   withdrawableDescriptionText: {
     textAlign: "center",

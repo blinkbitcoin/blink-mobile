@@ -18,6 +18,7 @@ import {
   searchPlaces,
   useBtcMapPlaceSearch,
 } from "@app/btcmap"
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { fonts } from "@app/rne-theme/fonts"
@@ -237,7 +238,7 @@ const useStyles = makeStyles(({ colors }, { topInset, bottomInset }: StyleProps)
     columnGap: 10,
     marginHorizontal: 16,
     paddingHorizontal: 16,
-    borderRadius: 12,
+    borderRadius: radius.default,
     minHeight: 48,
     backgroundColor: colors.surfaceInteractive,
   },

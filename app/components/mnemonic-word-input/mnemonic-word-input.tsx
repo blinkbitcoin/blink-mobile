@@ -3,6 +3,7 @@ import { TextInput, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
@@ -70,7 +71,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     borderWidth: 1,
     borderColor: colors.transparent,
     minHeight: 50,

@@ -8,6 +8,7 @@ import {
 } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { staticSurface } from "@app/rne-theme/surfaces"
@@ -243,7 +244,7 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
     },
     valueContainer: {
       backgroundColor: colors.surfaceInteractive,
-      borderRadius: 8,
+      borderRadius: radius.default,
       minHeight: isLarge ? 52 : 50,
       paddingLeft: 14,
       paddingRight: 10,

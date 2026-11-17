@@ -5,6 +5,8 @@ import { useTheme, Text, makeStyles } from "@rn-vui/themed"
 
 import { GaloyIcon } from "../galoy-icon"
 
+import { radius } from "@app/rne-theme/radius"
+
 export type GaloyButtonFieldProps = {
   placeholder?: string
   value?: string
@@ -61,7 +63,7 @@ export const GaloyButtonField = ({
     const sizeStyles = {
       paddingVertical: 8,
       paddingHorizontal: 12,
-      borderRadius: 8,
+      borderRadius: radius.default,
       minHeight: secondaryValue ? 60 : 40,
     }
 

@@ -3,6 +3,7 @@ import * as React from "react"
 import { View } from "react-native"
 import validator from "validator"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { useAppConfig } from "@app/hooks"
@@ -42,7 +43,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderBottomWidth: 0,
     paddingHorizontal: 10,
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
   fieldFocused: {
     backgroundColor: colors.surfaceFocused,

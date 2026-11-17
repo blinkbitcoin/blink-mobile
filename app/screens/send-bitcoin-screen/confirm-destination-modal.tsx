@@ -1,6 +1,7 @@
 import React, { Dispatch, useCallback, useState } from "react"
 import { View, TouchableOpacity } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useAppConfig } from "@app/hooks"
@@ -135,7 +136,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
   checkBoxText: {
     flex: 1,

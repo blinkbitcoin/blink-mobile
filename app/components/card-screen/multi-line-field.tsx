@@ -2,6 +2,7 @@ import React from "react"
 import { TouchableOpacity, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { staticSurface } from "@app/rne-theme/surfaces"
 
@@ -58,7 +59,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     paddingVertical: 14,
     paddingLeft: 14,
     paddingRight: 10,

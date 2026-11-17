@@ -3,6 +3,7 @@ import { ScrollView, TouchableOpacity, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import ReactNativeModal from "react-native-modal"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
 const ITEM_HEIGHT = 56
@@ -172,7 +173,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     paddingHorizontal: 10,
     paddingVertical: 14,
     gap: 10,
@@ -191,7 +192,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   modalContent: {
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     padding: 10,
     maxHeight: MODAL_MAX_HEIGHT,
   },
@@ -202,7 +203,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 12,
     gap: 10,
     minHeight: ITEM_HEIGHT,
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
   yearOptionDisabled: {
     opacity: 0.5,

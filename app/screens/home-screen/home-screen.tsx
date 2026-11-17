@@ -8,6 +8,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { ScrollView, TouchableWithoutFeedback } from "react-native-gesture-handler"
 
+import { radius } from "@app/rne-theme/radius"
 import { AppUpdate } from "@app/components/app-update/app-update"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyIcon, icons } from "@app/components/atomic/galoy-icon"
@@ -1148,7 +1149,7 @@ const useStyles = makeStyles(({ colors }) => ({
   listItemsContainer: {
     paddingHorizontal: 15,
     paddingVertical: 15,
-    borderRadius: 12,
+    borderRadius: radius.default,
     // The band itself isn't a press target; only the icon buttons on it are.
     ...staticSurface(colors),
     display: "flex",
@@ -1193,8 +1194,8 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     columnGap: 10,
     backgroundColor: colors.surfaceInteractive,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    borderTopLeftRadius: radius.default,
+    borderTopRightRadius: radius.default,
     borderColor: colors.surfaceInteractive,
     borderBottomWidth: 2,
     paddingVertical: 14,

@@ -2,6 +2,7 @@ import React from "react"
 import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { staticSurface } from "@app/rne-theme/surfaces"
 
@@ -104,7 +105,7 @@ const useStyles = makeStyles(
   ({ colors }, { titleColor, isLg, bulletSpacing }: StyleProps) => ({
     container: {
       ...staticSurface(colors),
-      borderRadius: 8,
+      borderRadius: radius.default,
       padding: 14,
       gap: 10,
     },

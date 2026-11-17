@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 
 import { gql } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyInfo } from "@app/components/atomic/galoy-info"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
@@ -485,7 +486,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderBottomWidth: 0,
     paddingHorizontal: 10,
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     marginRight: 0,
   },
   fieldFocused: {

@@ -36,6 +36,12 @@ describe("QrCodeComponent", () => {
     expect(qrCode().props.size).toBe(200)
   })
 
+  it("rounds the white frame at the default 12px corner", () => {
+    renderCode({})
+
+    expect(frameStyle()).toMatchObject({ padding: 20, borderRadius: 12 })
+  })
+
   it("lets the screen restyle the white frame around the code", () => {
     renderCode({ containerStyle: { padding: 14, borderRadius: 20 } })
 

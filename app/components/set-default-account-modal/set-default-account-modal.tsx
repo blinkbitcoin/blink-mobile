@@ -9,6 +9,7 @@ import {
   useAccountUpdateDefaultWalletIdMutation,
   useSetDefaultAccountModalQuery,
 } from "@app/graphql/generated"
+import { radius } from "@app/rne-theme/radius"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -229,7 +230,7 @@ const useStyles = makeStyles(({ colors }) => ({
     padding: 12,
     backgroundColor: colors.neutral,
     minHeight: 90,
-    borderRadius: 12,
+    borderRadius: radius.default,
     columnGap: 12,
     justifyContent: "center",
   },

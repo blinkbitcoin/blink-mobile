@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 import { CountryCode } from "react-native-country-picker-modal"
 
+import { radius } from "@app/rne-theme/radius"
 import { CountryCodePicker } from "@app/components/phone-input/country-code-picker"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyInfo } from "@app/components/atomic/galoy-info"
@@ -62,7 +63,7 @@ const useStyles = makeStyles(({ colors }) => ({
   countryPickerButtonStyle: {
     minWidth: 110,
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     paddingHorizontal: 10,
     flexDirection: "row",
     justifyContent: "center",
@@ -85,7 +86,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderBottomWidth: 0,
     paddingHorizontal: 10,
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
   /** Applied to the country picker too: it always looks like the number field. */
   fieldFocused: {

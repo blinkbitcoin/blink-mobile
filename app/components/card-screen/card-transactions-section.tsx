@@ -2,6 +2,7 @@ import React from "react"
 import { View } from "react-native"
 import { Text, makeStyles } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import type { CardTransactionGroup } from "./types"
 import { CardTransactionItem } from "./card-transaction-item"
@@ -83,7 +84,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   transactionsList: {
     backgroundColor: colors.neutral,
-    borderRadius: 8,
+    borderRadius: radius.default,
     overflow: "hidden",
     rowGap: 1,
   },

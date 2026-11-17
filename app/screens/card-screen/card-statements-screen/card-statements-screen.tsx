@@ -2,6 +2,7 @@ import React, { useCallback, useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { Screen } from "@app/components/screen"
 import { YearSelector } from "@app/components/year-selector"
 import { ContactSupportRow, InfoCard, StatementItem } from "@app/components/card-screen"
@@ -208,7 +209,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     ...staticSurface(colors),
-    borderRadius: 8,
+    borderRadius: radius.default,
     paddingHorizontal: 14,
     paddingVertical: 18,
     gap: 14,
@@ -236,6 +237,6 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   settingsGroupContainer: {
     marginTop: 0,
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
 }))

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react"
 import { View, TouchableOpacity, StyleProp, ViewStyle } from "react-native"
 import { Text, makeStyles } from "@rn-vui/themed"
+import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
 import { IconNamesType } from "../atomic/galoy-icon"
@@ -100,7 +101,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderStyle: "solid",
     backgroundColor: colors.surfaceInteractive,
     paddingHorizontal: 16,
-    borderRadius: 12,
+    borderRadius: radius.default,
     minHeight: 56,
     borderWidth: 1.5,
   },

@@ -3,6 +3,7 @@ import { View, StyleProp, ViewStyle, TextStyle } from "react-native"
 
 import { makeStyles, useTheme, Text, Divider } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { DisabledFeature } from "@app/components/disabled-feature"
 import { testProps } from "@app/utils/testProps"
 
@@ -71,7 +72,7 @@ const useStyles = makeStyles(({ colors }) => ({
   groupCard: {
     marginTop: 5,
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 12,
+    borderRadius: radius.default,
     overflow: "hidden",
   },
   divider: {

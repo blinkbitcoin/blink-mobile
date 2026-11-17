@@ -5,6 +5,8 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 
+import { radius } from "@app/rne-theme/radius"
+
 type IconTextButtonProps = {
   icon: IconNamesType
   label: string
@@ -51,7 +53,7 @@ const useStyles = makeStyles(({ colors }, { textColor }: StyleProps) => ({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     paddingHorizontal: 11,
     paddingVertical: 8,
     gap: 8,

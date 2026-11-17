@@ -3,6 +3,7 @@ import { Pressable, View } from "react-native"
 
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { SegmentedProgressBar } from "@app/components/segmented-progress-bar"
 import type {
@@ -108,7 +109,7 @@ const useStyles = makeStyles(({ colors }) => ({
    *  on, so the card reads as one of them. */
   surface: {
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 12,
+    borderRadius: radius.default,
     paddingHorizontal: 16,
     paddingVertical: 12,
     rowGap: 4,

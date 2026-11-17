@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
 
@@ -72,7 +73,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.surfaceInteractive,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: radius.default,
     flexShrink: 1,
     minWidth: 0,
   },

@@ -1,6 +1,7 @@
 import * as React from "react"
 import { View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { InputField, SwitchRow } from "@app/components/card-screen"
@@ -163,7 +164,7 @@ const useStyles = makeStyles(() => ({
   },
   scopeCard: {
     marginTop: 0,
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
   expiry: {
     rowGap: 5,

@@ -3,6 +3,7 @@ import { View } from "react-native"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { InfoRow } from "./info-row"
+import { radius } from "@app/rne-theme/radius"
 import { staticSurface } from "@app/rne-theme/surfaces"
 
 type InfoItem = {
@@ -49,7 +50,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   card: {
     ...staticSurface(colors),
-    borderRadius: 8,
+    borderRadius: radius.default,
     paddingHorizontal: 10,
     paddingVertical: 14,
     gap: 14,

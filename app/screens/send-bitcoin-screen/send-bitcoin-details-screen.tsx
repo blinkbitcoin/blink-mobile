@@ -13,6 +13,7 @@ import {
 } from "react-native"
 import ReactNativeModal from "react-native-modal"
 import { gql } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { AmountInput } from "@app/components/amount-input/amount-input"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
@@ -713,7 +714,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderStyle: "solid",
     overflow: "hidden",
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 10,
+    borderRadius: radius.default,
     alignItems: "center",
     padding: 14,
     minHeight: 60,
@@ -723,7 +724,7 @@ const useStyles = makeStyles(({ colors }) => ({
     borderStyle: "solid",
     overflow: "hidden",
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 10,
+    borderRadius: radius.default,
     alignItems: "center",
     padding: 14,
     minHeight: 60,
@@ -740,7 +741,7 @@ const useStyles = makeStyles(({ colors }) => ({
     overflow: "hidden",
     backgroundColor: colors.surfaceInteractive,
     paddingHorizontal: 14,
-    borderRadius: 10,
+    borderRadius: radius.default,
     alignItems: "center",
     marginBottom: 10,
     minHeight: 60,

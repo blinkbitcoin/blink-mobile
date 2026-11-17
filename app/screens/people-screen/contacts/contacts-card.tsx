@@ -2,6 +2,7 @@ import React, { useMemo } from "react"
 import { ActivityIndicator, View } from "react-native"
 
 import { gql } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import {
@@ -182,7 +183,7 @@ const useStyles = makeStyles(({ colors }) => ({
     display: "flex",
     flexDirection: "column",
     marginBottom: 20,
-    borderRadius: 12,
+    borderRadius: radius.default,
     padding: 12,
     justifyContent: "center",
     rowGap: 14,

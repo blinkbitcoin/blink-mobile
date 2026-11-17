@@ -9,6 +9,8 @@ import { makeStyles, useTheme, Text } from "@rn-vui/themed"
 import Icon from "react-native-vector-icons/Ionicons"
 import ReactNativeModal from "react-native-modal"
 
+import { radius } from "@app/rne-theme/radius"
+
 export interface DropdownOption {
   value: string
   label: string
@@ -144,7 +146,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 14,
     paddingVertical: 14,
     minHeight: 60,
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
   contentContainer: {
     flex: 1,
@@ -174,7 +176,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.surfaceInteractive,
     paddingHorizontal: 14,
     paddingVertical: 16,
-    borderRadius: 10,
+    borderRadius: radius.default,
     alignItems: "center",
     marginBottom: 10,
     minHeight: 60,

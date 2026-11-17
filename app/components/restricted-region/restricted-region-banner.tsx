@@ -1,6 +1,7 @@
 import * as React from "react"
 import { View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { staticSurface } from "@app/rne-theme/surfaces"
@@ -24,7 +25,7 @@ const useStyles = makeStyles(({ colors }) => ({
   container: {
     borderWidth: 1,
     borderColor: colors.accent,
-    borderRadius: 12,
+    borderRadius: radius.default,
     ...staticSurface(colors),
     padding: 14,
   },

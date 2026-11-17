@@ -1,6 +1,7 @@
 import React, { useRef } from "react"
 import { View, TextInput, StyleProp, ViewStyle, TouchableOpacity } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -72,7 +73,7 @@ const useStyles = makeStyles(
       overflow: "hidden",
       backgroundColor: colors.surfaceInteractive,
       paddingHorizontal: 10,
-      borderRadius: 10,
+      borderRadius: radius.default,
       alignItems: "center",
       minHeight: big ? 60 : 50,
       opacity: editable ? 1 : 0.5,

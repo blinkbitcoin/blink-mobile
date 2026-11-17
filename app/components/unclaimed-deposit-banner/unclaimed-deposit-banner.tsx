@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { DepositStatus, type PendingDeposit } from "@app/types/payment"
@@ -71,7 +72,7 @@ export const UnclaimedDepositBanner: React.FC<Props> = ({ deposits }) => {
 const useStyles = makeStyles(({ colors }) => ({
   container: {
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 12,
+    borderRadius: radius.default,
     padding: 14,
   },
   content: {

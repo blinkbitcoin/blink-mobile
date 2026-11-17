@@ -3,6 +3,7 @@ import { Alert, TextInput, View } from "react-native"
 import Modal from "react-native-modal"
 
 import { gql } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
@@ -272,7 +273,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.neutral,
     padding: 12,
     color: colors.textOnBackground,
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
   actionButtons: {
     display: "flex",

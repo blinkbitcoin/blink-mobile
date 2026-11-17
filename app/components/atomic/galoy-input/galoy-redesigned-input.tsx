@@ -3,13 +3,15 @@ import { StyleProp, TextInput, TextStyle, View } from "react-native"
 
 import { Input, InputProps, Text, makeStyles, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
+
 const useStyles = makeStyles(
   ({ colors }, { props, isFocused }: { props: GaloyInputProps; isFocused: boolean }) => ({
     ContainerStyle: {
       paddingBottom: 3,
       paddingTop: 3,
       marginLeft: 0,
-      borderRadius: 10,
+      borderRadius: radius.default,
       backgroundColor: colors.accent,
     },
     inputContainerFocused: {

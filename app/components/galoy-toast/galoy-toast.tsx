@@ -7,6 +7,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 import { modalContentBleed, toastSideInset, toastTopOffset } from "./toast-frame"
+import { radius } from "@app/rne-theme/radius"
 import { staticSurface } from "@app/rne-theme/surfaces"
 
 export type ToastType = "success" | "error" | "warning"
@@ -116,7 +117,7 @@ const useStyles = makeStyles(
       paddingHorizontal: 12,
       paddingVertical: 14,
       borderWidth: 1,
-      borderRadius: 8,
+      borderRadius: radius.default,
       borderColor: accent,
       ...staticSurface(colors),
     },

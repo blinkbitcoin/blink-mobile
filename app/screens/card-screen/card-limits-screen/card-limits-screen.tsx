@@ -3,6 +3,7 @@ import { ActivityIndicator, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
@@ -276,7 +277,7 @@ const useStyles = makeStyles(({ colors }) => ({
   currentLimitsCard: {
     flexDirection: "row",
     ...staticSurface(colors),
-    borderRadius: 8,
+    borderRadius: radius.default,
     minHeight: 80,
     paddingVertical: 18,
     paddingHorizontal: 10,
@@ -312,14 +313,14 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   settingsGroupContainer: {
     marginTop: 0,
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
   atmControlsFailure: {
     gap: 10,
   },
   atmSwitchCard: {
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     overflow: "hidden",
   },
   dividerStyle: {

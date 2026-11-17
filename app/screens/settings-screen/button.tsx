@@ -1,4 +1,5 @@
 import React from "react"
+import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
 import { Button, Skeleton, makeStyles } from "@rn-vui/themed"
 
@@ -30,11 +31,11 @@ const useStyles = makeStyles(
   ({ colors }, variant: "warning" | "danger" | "critical") => ({
     containerStyle: {
       height: 42,
-      borderRadius: 12,
+      borderRadius: radius.default,
     },
     buttonStyle: {
       height: 42,
-      borderRadius: 12,
+      borderRadius: radius.default,
       backgroundColor: variant === "critical" ? colors.error : colors.surfaceInteractive,
     },
     titleStyle: {

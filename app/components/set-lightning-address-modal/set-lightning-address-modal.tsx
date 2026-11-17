@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { View, TextInput } from "react-native"
 
 import { gql } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
@@ -240,7 +241,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: radius.default,
     minHeight: 60,
     backgroundColor: colors.neutral,
     alignItems: "center",

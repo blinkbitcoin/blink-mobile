@@ -3,6 +3,7 @@ import { TouchableOpacity } from "react-native"
 import Clipboard from "@react-native-clipboard/clipboard"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -93,7 +94,7 @@ const useStyles = makeStyles(({ colors }, { isHighlighted }: StyleProps) => ({
     minHeight: 48,
     paddingLeft: 14,
     paddingRight: 10,
-    borderRadius: 8,
+    borderRadius: radius.default,
     borderWidth: 1,
     borderColor: isHighlighted ? colors.accent : colors.transparent,
     backgroundColor: colors.surfaceInteractive,

@@ -9,6 +9,7 @@ import {
 } from "react-native"
 import Modal from "react-native-modal"
 import QRCode from "react-native-qrcode-svg"
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
 import { gql } from "@apollo/client"
@@ -190,7 +191,7 @@ const useStyles = makeStyles(({ colors }) => ({
   qrCard: {
     backgroundColor: colors.staticWhite,
     padding: 20,
-    borderRadius: 12,
+    borderRadius: radius.default,
   },
   modalCard: {
     backgroundColor: colors.surfaceInteractive,

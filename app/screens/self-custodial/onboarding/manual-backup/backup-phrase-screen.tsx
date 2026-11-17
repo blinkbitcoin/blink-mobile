@@ -5,6 +5,7 @@ import { makeStyles, Text } from "@rn-vui/themed"
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import {
@@ -172,7 +173,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 20,
   },
   card: {
-    borderRadius: 8,
+    borderRadius: radius.default,
     marginTop: 0,
   },
   divider: {
