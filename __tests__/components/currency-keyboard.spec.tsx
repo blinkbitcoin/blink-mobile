@@ -3,6 +3,7 @@ import { Text as ReactNativeText, View } from "react-native"
 import { act, render, fireEvent } from "@testing-library/react-native"
 
 import { CurrencyKeyboard } from "@app/components/currency-keyboard/currency-keyboard"
+import { haptics } from "@app/utils/haptics"
 import {
   getDisabledKeys,
   Key,
@@ -164,6 +165,7 @@ const StatefulPad = ({ initial }: { initial: string }) => {
 describe("CurrencyKeyboard held backspace", () => {
   beforeEach(() => {
     jest.useFakeTimers()
+    jest.clearAllMocks()
   })
 
   afterEach(() => {
@@ -199,17 +201,48 @@ describe("CurrencyKeyboard held backspace", () => {
   it("stops repeating on release", () => {
     const onPress = jest.fn().mockReturnValue(true)
     const { getByTestId } = render(<CurrencyKeyboard onPress={onPress} />)
+    const key = getByTestId("Key ⌫")
 
-    fireEvent(getByTestId("Key ⌫"), "pressIn")
+    fireEvent(key, "pressIn")
     act(() => {
       jest.advanceTimersByTime(600)
     })
-    fireEvent(getByTestId("Key ⌫"), "pressOut")
+    fireEvent(key, "pressOut")
+    fireEvent.press(key)
     act(() => {
       jest.advanceTimersByTime(1500)
     })
 
     expect(onPress).toHaveBeenCalledTimes(2)
+  })
+
+  it("does not delete again when the release press follows a repeat", () => {
+    const { getByTestId } = render(<StatefulPad initial="123456" />)
+    const key = getByTestId("Key ⌫")
+
+    fireEvent(key, "pressIn")
+    for (let tick = 0; tick < 3; tick += 1) {
+      act(() => {
+        jest.advanceTimersByTime(300)
+      })
+    }
+    fireEvent(key, "pressOut")
+    fireEvent.press(key)
+
+    expect(getByTestId("amount").props.children).toBe("123")
+    expect(haptics.tap).toHaveBeenCalledTimes(1)
+  })
+
+  it("still deletes once when a tap releases before the first repeat", () => {
+    const { getByTestId } = render(<StatefulPad initial="123456" />)
+    const key = getByTestId("Key ⌫")
+
+    fireEvent(key, "pressIn")
+    fireEvent(key, "pressOut")
+    fireEvent.press(key)
+
+    expect(getByTestId("amount").props.children).toBe("12345")
+    expect(haptics.tap).toHaveBeenCalledTimes(1)
   })
 })
 

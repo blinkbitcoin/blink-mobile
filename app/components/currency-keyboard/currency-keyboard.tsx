@@ -13,6 +13,8 @@ import { fonts } from "@app/rne-theme/fonts"
 const KEY_ROW_PREFIX = "row-"
 const KEY_TEST_ID_PREFIX = "Key"
 const BACKSPACE_REPEAT_MS = 300
+/** Release is pressOut, then press, in the same turn. A repeat already deleted. */
+const RELEASE_PRESS_WINDOW_MS = 50
 
 type CurrencyKeyboardProps = {
   /** Returns whether the press changed the amount: a refused key stays silent. */
@@ -87,6 +89,9 @@ const Key = ({
   const repeatTimer = useRef<ReturnType<typeof setInterval> | null>(null)
   /** One haptic per gesture: a held backspace deletes repeatedly but buzzes once. */
   const hasTapped = useRef(false)
+  /** A tick already deleted. The release press that follows must not delete again. */
+  const didRepeat = useRef(false)
+  const repeatReleaseAt = useRef<number | null>(null)
 
   const stopRepeat = useCallback(() => {
     if (!repeatTimer.current) return
@@ -103,15 +108,30 @@ const Key = ({
     return accepted
   }
 
+  const handlePress = (key: KeyType) => {
+    const releaseAt = repeatReleaseAt.current
+    repeatReleaseAt.current = null
+    if (releaseAt !== null && Date.now() - releaseAt < RELEASE_PRESS_WINDOW_MS) return
+    press(key)
+  }
+
   const handlePressIn = (key: KeyType) => {
     hasTapped.current = false
+    didRepeat.current = false
+    repeatReleaseAt.current = null
     if (safeMode) return
     if (key !== KeyType.Backspace) return
     stopRepeat()
     /** A refused tick means the amount is empty: stop rather than tick against nothing. */
     repeatTimer.current = setInterval(() => {
+      didRepeat.current = true
       if (!press(key)) stopRepeat()
     }, BACKSPACE_REPEAT_MS)
+  }
+
+  const handlePressOut = () => {
+    if (didRepeat.current) repeatReleaseAt.current = Date.now()
+    stopRepeat()
   }
 
   /** A key disabled mid-hold may never see its press-out. */
@@ -131,8 +151,8 @@ const Key = ({
         pressed && styles.keyPressedBg,
       ]}
       onPressIn={() => handlePressIn(numberPadKey)}
-      onPress={() => press(numberPadKey)}
-      onPressOut={stopRepeat}
+      onPress={() => handlePress(numberPadKey)}
+      onPressOut={handlePressOut}
       {...testProps(`${KEY_TEST_ID_PREFIX} ${numberPadKey}`)}
       accessibilityRole="button"
       accessibilityLabel={isBackspace ? LL.Accessibility.deleteKey() : numberPadKey}
