@@ -2685,26 +2685,28 @@
     "update": "تطبيقك قديم. لا بد من تحديث التطبيق حتى يمكن استخدامه.\n\nيمكنك التحديث من متجر PlayStore للأندرويد أو Testflight لنظام iOS"
   },
   "TransactionDetailScreen": {
-    "paid": "دفعت إلى/من",
     "received": "استقبلت",
     "sent": "أرسلت",
     "sending": "جارٍ الإرسال",
-    "receivingAccount": "Receiving Account",
-    "sendingAccount": "Sending Account",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
     "momentarily": "بعد لحظات",
     "findingAccount": "جارٍ البحث عن حساب هذه الدفعة...",
     "txNotFoundInAccounts": "لم يتم العثور على هذه الدفعة في أي حساب على هذا الجهاز. قد تكون تابعة لحساب تم تسجيل خروجه.",
     "txLoadFailed": "تعذر تحميل هذه الدفعة. تحقق من اتصالك وحاول مرة أخرى.",
     "switchedForPayment": "تم التبديل إلى {identifier: string} لعرض هذه الدفعة",
-    "customLabel": "تسمية مخصّصة",
     "depositFee": "رسوم الإيداع",
     "time": "الوقت",
     "transactionId": "معرّف المعاملة",
     "hash": "الهاش",
     "blinkInternalId": "معرّف Blink الداخلي",
-    "copyAllData": "نسخ كل البيانات",
-    "allData": "تفاصيل المعاملة"
+    "receivedTo": "استُلمت في",
+    "sentFrom": "أُرسلت من",
+    "addCustomNote": "أضف ملاحظة خاصة",
+    "openInExplorer": "افتح في المستكشف",
+    "openInDecoder": "افتح في أداة فك الترميز",
+    "sparkTransferId": "معرّف تحويل Spark",
+    "sender": "المُرسِل",
+    "recipient": "المستلم"
   },
   "FeeRatesScreen": {
     "title": "معدلات الرسوم",
@@ -4203,12 +4205,12 @@
     "title": "هذا حساب غير حافظ",
     "body": "لمعرفة المزيد، اقرأ منشور مدونتنا",
     "cta": "اقرأ"
-    },
+  },
   "StaleCloudBundleBulletin": {
     "title": "حدّث نسختك الاحتياطية السحابية",
     "body": "حزمة الطوارئ في {provider} قديمة. انسخ محفظتك احتياطيًا مرة أخرى لتحديثها.",
     "cta": "نسخ احتياطي مرة أخرى"
-    },
+  },
   "RecoveryBundleScreen": {
     "noBundleToExport": "لا توجد حزمة طوارئ بعد. يتم إنشاؤها بعد معاملتك الأولى.",
     "exportFailed": "تعذّر تنزيل حزمة الطوارئ."

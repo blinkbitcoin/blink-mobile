@@ -2685,26 +2685,28 @@
     "update": "App yo evudde ku mulembe. Okulongoosa kwetaagibwa nga app tennakozesebwa.\n\nKino osobola okukikola okuva ku PlayStore eya Android ne Testflight eya iOS"
   },
   "TransactionDetailScreen": {
-    "paid": "Zisasuddwa eri/ okuva",
     "received": "Ofunye",
     "sent": "Osindise",
     "sending": "Okusindika",
-    "receivingAccount": "Akawunti Efuna",
-    "sendingAccount": "Akawunti Esindika",
     "txNotBroadcast": "Empanyisiganya yo eri mu lunnyiriri. Kisaanye okulabika mu mempool {countdown: string}.",
     "momentarily": "akaseera katono",
     "findingAccount": "Tunoonya akawunti y'okusasula kuno...",
     "txNotFoundInAccounts": "Okusasula kuno tekuzuuliddwa mu kawunti yonna ku kyuma kino. Kuyinza okuba nga kwa kawunti eyaggibwamu.",
     "txLoadFailed": "Tetusobodde kutikka kusasula kuno. Kebera omutimbagano gwo oddemu ogezeeko.",
     "switchedForPayment": "Tukyusizza ku {identifier: string} okulaga okusasula kuno",
-    "customLabel": "Akabonero kwo",
     "depositFee": "Sente z'okutereka",
     "time": "Obudde",
     "transactionId": "Namba y'okuwanyisa",
     "hash": "Hash",
     "blinkInternalId": "Namba ya Blink ey'omunda",
-    "copyAllData": "Koppa ebikwata byonna",
-    "allData": "Ebikwata ku ntuzaanya"
+    "receivedTo": "Efunidde ku",
+    "sentFrom": "Esindikiddwa okuva ku",
+    "addCustomNote": "Yongerako ekiwandiiko kyo",
+    "openInExplorer": "Ggulawo mu explorer",
+    "openInDecoder": "Ggulawo mu decoder",
+    "sparkTransferId": "Namba ya Spark transfer",
+    "sender": "Asindika",
+    "recipient": "Afuna"
   },
   "FeeRatesScreen": {
     "title": "Emiwendo gy'ebisale",
@@ -4203,12 +4205,12 @@
     "title": "Eno ye akawunti etakuumibwa",
     "body": "Okumanya ebisingawo, soma blog yaffe",
     "cta": "Soma"
-    },
+  },
   "StaleCloudBundleBulletin": {
     "title": "Zza obuggya kkopi yo ey'omu kire",
     "body": "Ekipakiti kyo eky'obwangu mu {provider} kikadde. Koppa akawunti yo nate okukizza obuggya.",
     "cta": "Koppa nate"
-    },
+  },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Tewannabaawo kipakiti kya bwangu. Kikolebwa oluvannyuma lw'okusasula kwo okusooka.",
     "exportFailed": "Tetusobodde kuwanula kipakiti kya bwangu."

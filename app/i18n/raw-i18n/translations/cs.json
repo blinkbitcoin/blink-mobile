@@ -2685,26 +2685,28 @@
     "update": "Vaše aplikace je zastaralá. Před použitím aplikace je nutná aktualizace.\n\nTo lze provést v obchodě PlayStore pro systém Android a Testflight pro systém iOS."
   },
   "TransactionDetailScreen": {
-    "paid": "Zaplaceno do/z",
     "received": "Obdrželi jste",
     "sent": "Odeslali jste",
     "sending": "Odesílání",
-    "receivingAccount": "Přijímací zůstatek",
-    "sendingAccount": "Odesílající zůstatek",
     "txNotBroadcast": "Vaše transakce právě probíhá a za chvíli bude odeslána do Bitcoinové sítě.",
     "momentarily": "za okamžik",
     "findingAccount": "Hledání účtu pro tuto platbu...",
     "txNotFoundInAccounts": "Tato platba nebyla nalezena v žádném účtu v tomto zařízení. Může patřit k odhlášenému účtu.",
     "txLoadFailed": "Tuto platbu se nepodařilo načíst. Zkontrolujte připojení a zkuste to znovu.",
     "switchedForPayment": "Přepnuto na {identifier: string} pro zobrazení této platby",
-    "customLabel": "Vlastní štítek",
     "depositFee": "Poplatek za vklad",
     "time": "Čas",
     "transactionId": "ID transakce",
     "hash": "Hash",
     "blinkInternalId": "Interní ID Blink",
-    "copyAllData": "Kopírovat všechna data",
-    "allData": "Detaily transakce"
+    "receivedTo": "Přijato na",
+    "sentFrom": "Odesláno z",
+    "addCustomNote": "Přidat vlastní poznámku",
+    "openInExplorer": "Otevřít v průzkumníku",
+    "openInDecoder": "Otevřít v dekodéru",
+    "sparkTransferId": "ID převodu Spark",
+    "sender": "Odesílatel",
+    "recipient": "Příjemce"
   },
   "FeeRatesScreen": {
     "title": "Sazby poplatků",
@@ -4203,12 +4205,12 @@
     "title": "Toto je non-custodial účet",
     "body": "Chcete-li se dozvědět více, přečtěte si náš příspěvek na blogu",
     "cta": "Číst"
-    },
+  },
   "StaleCloudBundleBulletin": {
     "title": "Aktualizujte zálohu v cloudu",
     "body": "Váš nouzový balíček v {provider} je zastaralý. Znovu zálohujte peněženku, abyste ho aktualizovali.",
     "cta": "Znovu zálohovat"
-    },
+  },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Zatím nemáte nouzový balíček. Vytvoří se po vaší první transakci.",
     "exportFailed": "Nouzový balíček se nepodařilo stáhnout."

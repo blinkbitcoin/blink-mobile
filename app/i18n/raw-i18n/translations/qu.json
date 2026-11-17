@@ -2685,26 +2685,28 @@
     "update": "Ñuqaqmi app qatichkanmi kaniyta rikuchiy, chaymanta app qillqata sutichinaqinmi kaniyta munanki. Chaymi PlayStore Androidmanta Testflight iOSmanta kaniyta rikuchiy"
   },
   "TransactionDetailScreen": {
-    "paid": "Riqsichiy",
     "received": "Yachachichiy",
     "sent": "Apachirqanki",
     "sending": "Apachishaspa",
-    "receivingAccount": "Kawsayniyta qillqata sutichinaqin yachachinaqin sutiyuq",
-    "sendingAccount": "Kawsayniyta yachachinaqin qillqata sutiyuq",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
     "momentarily": "usqhaylla",
     "findingAccount": "Kay pagopaq cuentata maskachkan...",
     "txNotFoundInAccounts": "Kay pagoqa mana tarikurqachu kay aparatopi ima cuentapipas. Huk lluqsisqa cuentapa kanman.",
     "txLoadFailed": "Kay pagota mana cargayta atikurqachu. Conexionniykita qhaway, hukmanta ruwaykuy.",
     "switchedForPayment": "{identifier: string}man tikrarqayku kay pagota rikuchinapaq",
-    "customLabel": "Kikiykiq sutichasqan",
     "depositFee": "Waqaychaypa chiqanakuynin",
     "time": "Pacha",
     "transactionId": "Transacción ID",
     "hash": "Hash",
     "blinkInternalId": "Blink ukhu ID",
-    "copyAllData": "Tukuy willakuykunata copiay",
-    "allData": "Transacción willaykunakuna"
+    "receivedTo": "Chaskisqa",
+    "sentFrom": "Apachisqa",
+    "addCustomNote": "Notaykita yapay",
+    "openInExplorer": "Explorer-pi kichay",
+    "openInDecoder": "Decoder-pi kichay",
+    "sparkTransferId": "Spark apachiy ID",
+    "sender": "Apachiq",
+    "recipient": "Chaskiq"
   },
   "FeeRatesScreen": {
     "title": "Chaninkuna",
@@ -4203,12 +4205,12 @@
     "title": "Kayqa mana waqaychasqa kuentam",
     "body": "Astawan yachanaykipaq, blog qillqaykuta ñawinchay",
     "cta": "Ñawinchay"
-    },
+  },
   "StaleCloudBundleBulletin": {
     "title": "Phuyupi waqaychasqaykita musuqchay",
     "body": "{provider} nisqapi utqay qipiyki mawk'añam. Qullqikuqniykita hukmanta waqaychay musuqchanaykipaq.",
     "cta": "Hukmanta waqaychay"
-    },
+  },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Manaraq utqay qipi kanchu. Ñawpaq kaq pagasqaykimanta qhipata ruwakun.",
     "exportFailed": "Utqay qipita mana uraykachiyta atikurqanchu."

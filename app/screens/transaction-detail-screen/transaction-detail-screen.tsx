@@ -11,11 +11,7 @@ import { GaloyInfo } from "@app/components/atomic/galoy-info"
 import { IconTextButton } from "@app/components/icon-text-button"
 import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { NoteInput } from "@app/components/note-input"
-import { WalletSummary } from "@app/components/wallet-summary"
-import {
-  formatDateForTransaction,
-  TransactionDate,
-} from "@app/components/transaction-date"
+import { TransactionDate } from "@app/components/transaction-date"
 import { useDescriptionDisplay } from "@app/components/transaction-item"
 import { DeepPartialObject } from "@app/components/transaction-item/index.types"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
@@ -43,8 +39,9 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { PaymentType as ReceiptPaymentType } from "@blinkbitcoin/blink-client"
 
 import { Screen } from "@app/components/screen"
+import { radius } from "@app/rne-theme/radius"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
-import { APPROXIMATE_PREFIX } from "@app/config"
 import { ellipsizeMiddle } from "@app/utils/helper"
 import { testProps } from "@app/utils/testProps"
 import { formatTimeToMempool, timeToMempool } from "./format-time"
@@ -55,14 +52,14 @@ type RowProps = {
   value?: string | null | JSX.Element
   /** Long technical values (hashes, invoices) are set a size down so they wrap tidily. */
   small?: boolean
-  /** Drawn underlined: a tap opens it, a long press copies it. */
-  link?: boolean
+  /** Tapping the row copies its value; no icon is drawn. */
   onPress?: () => void
-  onLongPress?: () => void
+  /** Draws the copy icon after the value; tapping the icon copies. */
+  onCopy?: () => void
 }
 
-/** A label/value line in a details card. Tapping a copyable row copies its value. */
-const Row = ({ label, value, small, link, onPress, onLongPress }: RowProps) => {
+/** A label/value line in a details card. */
+const Row = ({ label, value, small, onPress, onCopy }: RowProps) => {
   const styles = useStyles()
   const {
     theme: { colors },
@@ -70,23 +67,34 @@ const Row = ({ label, value, small, link, onPress, onLongPress }: RowProps) => {
 
   return (
     <Pressable
-      style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
-      disabled={!onPress && !onLongPress}
+      style={({ pressed }) => [
+        styles.row,
+        onCopy && styles.rowWithCopy,
+        pressed && styles.rowPressed,
+      ]}
+      disabled={!onPress}
       onPress={onPress}
-      onLongPress={onLongPress}
       accessibilityRole={onPress ? "button" : undefined}
       testID={label}
     >
       <Text type="p3" color={colors.textSecondary} style={styles.rowLabel}>
         {label}
       </Text>
-      <Text
-        type={small ? "p4" : "p3"}
-        bold
-        style={[styles.rowValue, link && styles.rowValueLink]}
-      >
+      <Text type={small ? "p4" : "p3"} bold style={styles.rowValue}>
         {value}
       </Text>
+      {onCopy ? (
+        <Pressable
+          onPress={onCopy}
+          hitSlop={15}
+          accessibilityRole="button"
+          accessibilityLabel={label}
+          testID={`${label}-copy`}
+          style={({ pressed }) => pressed && styles.rowPressed}
+        >
+          <GaloyIcon name="copy-paste" size={14} color={colors.accent} />
+        </Pressable>
+      ) : null}
     </Pressable>
   )
 }
@@ -118,6 +126,8 @@ type Props = {
 }
 
 const CUSTOM_LABEL_MAX_LENGTH = 140
+const LIGHTNING_DECODER_URL = "https://dev.blink.sv/decode?invoice="
+const EMPTY_VALUE = "-"
 
 export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   const styles = useStyles()
@@ -142,17 +152,8 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
 
   const { data: homeData } = useHomeAuthedQuery({ fetchPolicy: "cache-only" })
 
-  const viewInExplorer = (hash: string): Promise<Linking> => {
-    if (hash.includes("-")) {
-      // if the "hash" contains a dash then it's actually a UUID from spark
-      return Linking.openURL(galoyInstance.sparkExplorer + hash)
-    }
-
-    return Linking.openURL(galoyInstance.blockExplorer + hash)
-  }
-
   const viewInLightningDecoder = (invoice: string): Promise<Linking> =>
-    Linking.openURL("https://dev.blink.sv/decode?invoice=" + invoice)
+    Linking.openURL(LIGHTNING_DECODER_URL + invoice)
 
   const { data: tx } = useFragment<TransactionFragment>({
     fragment: TransactionFragmentDoc,
@@ -382,12 +383,6 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   const secondaryAmount =
     settlementDisplayCurrency === settlementCurrency ? undefined : walletAmount
 
-  // The balance card: the wallet amount, then the display amount
-  const walletSecondaryAmount =
-    settlementDisplayCurrency === settlementCurrency
-      ? undefined
-      : `${APPROXIMATE_PREFIX} ${displayAmount}`
-
   const formattedPrimaryFeeAmount = formatCurrency({
     amountInMajorUnits: settlementDisplayFee,
     currency: settlementDisplayCurrency,
@@ -439,12 +434,19 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
     spendOrReceiveText = LL.TransactionDetailScreen.sent()
   }
 
-  const transactionHash =
+  const onChainHash =
     onChainTxBroadcasted && "transactionHash" in settlementVia
       ? settlementVia.transactionHash ?? ""
       : ""
-  const paymentHash =
+  const lnPaymentHash =
     initiationVia?.__typename === "InitiationViaLn" ? initiationVia.paymentHash : ""
+  const isSpark = selfCustodialPaymentType === PaymentType.Spark
+  // Self-custodial payments carry the Spark transfer UUID where custodial ones carry
+  // the hash: a Spark payment's payment hash, and an on-chain payment's transaction
+  // hash until the mapper keeps the Bitcoin txid.
+  const sparkTransferId = isSpark ? lnPaymentHash : isSelfCustodial ? onChainHash : ""
+  const transactionHash = isSelfCustodial ? "" : onChainHash
+  const paymentHash = isSpark ? "" : lnPaymentHash
   const paymentRequest =
     initiationVia?.__typename === "InitiationViaLn" ? initiationVia.paymentRequest : ""
   const preImage =
@@ -479,35 +481,20 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
           : ReceiptPaymentType.Lightning
 
   const hasAdvanced = Boolean(
-    transactionHash || paymentHash || preImage || paymentRequest || internalId,
+    transactionHash ||
+      sparkTransferId ||
+      paymentHash ||
+      preImage ||
+      paymentRequest ||
+      internalId,
   )
 
-  // Every row on the screen, in screen order, as one block of plain text
-  const copyAllData = () => {
-    const timeText = formatDateForTransaction({ createdAt, locale, includeTime: true })
-    const allDataText = [
-      customLabel && `${LL.TransactionDetailScreen.customLabel()}: ${customLabel}`,
-      `${spendOrReceiveText}: ${displayAmount}${secondaryAmount ? ` (${secondaryAmount})` : ""}`,
-      showFee && `${feeLabel}: ${formattedFeeText}`,
-      `${LL.TransactionDetailScreen.time()}: ${timeText}`,
-      `${LL.common.type()}: ${typeText}`,
-      counterParty && `${LL.TransactionDetailScreen.paid()}: ${counterParty}`,
-      description && `${LL.common.note()}: ${description}`,
-      transactionHash &&
-        `${LL.TransactionDetailScreen.transactionId()}: ${transactionHash}`,
-      paymentHash && `${LL.TransactionDetailScreen.hash()}: ${paymentHash}`,
-      preImage && `${LL.common.preimageProofOfPayment()}: ${preImage}`,
-      paymentRequest && `${LL.common.paymentRequest()}: ${paymentRequest}`,
-      internalId && `${LL.TransactionDetailScreen.blinkInternalId()}: ${internalId}`,
-    ]
-      .filter(Boolean)
-      .join("\n")
-
-    handleCopyToClipboard({
-      content: allDataText,
-      type: LL.TransactionDetailScreen.allData(),
-    })
-  }
+  // The Bitcoin transaction first; a Spark transfer only when there is none
+  const explorerUrl = transactionHash
+    ? galoyInstance.blockExplorer + transactionHash
+    : sparkTransferId
+      ? galoyInstance.sparkExplorer + sparkTransferId
+      : ""
 
   return (
     <Screen unsafe preset="fixed">
@@ -519,7 +506,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 <GaloyIcon
                   name={isReceive ? "receive" : "send"}
                   size={32}
-                  color={isReceive ? colors._green : colors.accent}
+                  color={colors.accent}
                 />
               </View>
               <View style={styles.heroText}>
@@ -579,31 +566,19 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
               </GaloyInfo>
             )}
 
-            <NoteInput
-              value={customLabel}
-              onChangeText={setCustomLabel}
-              editable
-              big={false}
-              fontSize={14}
-              iconSize={16}
-              placeholder={LL.TransactionDetailScreen.customLabel()}
-              maxLength={CUSTOM_LABEL_MAX_LENGTH}
-              style={styles.labelField}
-            />
-            <View style={styles.group}>
-              <Text type="p3">
-                {isReceive
-                  ? LL.TransactionDetailScreen.receivingAccount()
-                  : LL.TransactionDetailScreen.sendingAccount()}
-              </Text>
-              <WalletSummary
-                currency={settlementCurrency}
-                balancePrimary={walletAmount}
-                balanceSecondary={walletSecondaryAmount}
-              />
-            </View>
-
             <View style={styles.card}>
+              <Row
+                label={
+                  isReceive
+                    ? LL.TransactionDetailScreen.receivedTo()
+                    : LL.TransactionDetailScreen.sentFrom()
+                }
+                value={
+                  settlementCurrency === WalletCurrency.Btc
+                    ? LL.common.btcAccount()
+                    : LL.common.usdAccount()
+                }
+              />
               {showFee && <Row label={feeLabel} value={formattedFeeText} />}
               <Row
                 label={LL.TransactionDetailScreen.time()}
@@ -617,16 +592,34 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
               />
               <Row label={LL.common.type()} value={typeText} />
               {counterParty ? (
-                <Row label={LL.TransactionDetailScreen.paid()} value={counterParty} />
-              ) : null}
-              {description ? (
                 <Row
-                  label={LL.common.note()}
-                  value={description}
-                  onPress={copyRow(LL.common.note(), description)}
+                  label={
+                    isReceive
+                      ? LL.TransactionDetailScreen.sender()
+                      : LL.TransactionDetailScreen.recipient()
+                  }
+                  value={counterParty}
                 />
               ) : null}
+              {/* Always shown; a payment without a note reads "-" and copies nothing */}
+              <Row
+                label={LL.common.note()}
+                value={description || EMPTY_VALUE}
+                onPress={description ? copyRow(LL.common.note(), description) : undefined}
+              />
             </View>
+
+            <NoteInput
+              value={customLabel}
+              onChangeText={setCustomLabel}
+              editable
+              big={false}
+              fontSize={14}
+              iconSize={16}
+              placeholder={LL.TransactionDetailScreen.addCustomNote()}
+              maxLength={CUSTOM_LABEL_MAX_LENGTH}
+              style={styles.labelField}
+            />
           </View>
 
           {hasAdvanced && (
@@ -652,13 +645,22 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 {transactionHash ? (
                   <Row
                     small
-                    link
                     label={LL.TransactionDetailScreen.transactionId()}
                     value={transactionHash}
-                    onPress={() => viewInExplorer(transactionHash)}
-                    onLongPress={copyRow(
+                    onCopy={copyRow(
                       LL.TransactionDetailScreen.transactionId(),
                       transactionHash,
+                    )}
+                  />
+                ) : null}
+                {sparkTransferId ? (
+                  <Row
+                    small
+                    label={LL.TransactionDetailScreen.sparkTransferId()}
+                    value={sparkTransferId}
+                    onCopy={copyRow(
+                      LL.TransactionDetailScreen.sparkTransferId(),
+                      sparkTransferId,
                     )}
                   />
                 ) : null}
@@ -667,7 +669,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                     small
                     label={LL.TransactionDetailScreen.hash()}
                     value={paymentHash}
-                    onPress={copyRow(LL.TransactionDetailScreen.hash(), paymentHash)}
+                    onCopy={copyRow(LL.TransactionDetailScreen.hash(), paymentHash)}
                   />
                 ) : null}
                 {preImage ? (
@@ -675,17 +677,15 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                     small
                     label={LL.common.preimageProofOfPayment()}
                     value={preImage}
-                    onPress={copyRow(LL.common.preimageProofOfPayment(), preImage)}
+                    onCopy={copyRow(LL.common.preimageProofOfPayment(), preImage)}
                   />
                 ) : null}
                 {paymentRequest ? (
                   <Row
                     small
-                    link
                     label={LL.common.paymentRequest()}
                     value={paymentRequest}
-                    onPress={() => viewInLightningDecoder(paymentRequest)}
-                    onLongPress={copyRow(LL.common.paymentRequest(), paymentRequest)}
+                    onCopy={copyRow(LL.common.paymentRequest(), paymentRequest)}
                   />
                 ) : null}
                 {internalId ? (
@@ -693,18 +693,28 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                     small
                     label={LL.TransactionDetailScreen.blinkInternalId()}
                     value={internalId}
-                    onPress={copyRow(
+                    onCopy={copyRow(
                       LL.TransactionDetailScreen.blinkInternalId(),
                       internalId,
                     )}
                   />
                 ) : null}
               </View>
-              <IconTextButton
-                icon="copy-paste"
-                label={LL.TransactionDetailScreen.copyAllData()}
-                onPress={copyAllData}
-              />
+              {explorerUrl ? (
+                <IconTextButton
+                  icon="link"
+                  label={LL.TransactionDetailScreen.openInExplorer()}
+                  onPress={() => Linking.openURL(explorerUrl)}
+                  style={styles.linkButton}
+                />
+              ) : paymentRequest ? (
+                <IconTextButton
+                  icon="link"
+                  label={LL.TransactionDetailScreen.openInDecoder()}
+                  onPress={() => viewInLightningDecoder(paymentRequest)}
+                  style={styles.linkButton}
+                />
+              ) : null}
             </>
           )}
         </ScrollView>
@@ -849,13 +859,9 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingRight: 10,
   },
 
-  group: {
-    gap: 8,
-  },
-
   card: {
-    backgroundColor: colors.surfaceStatic,
-    borderRadius: 8,
+    ...staticSurface(colors),
+    borderRadius: radius.default,
     padding: 14,
     gap: 14,
   },
@@ -864,6 +870,12 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
+  },
+
+  /** Figma's copyable rows space the label, value and icon 10 apart. */
+  rowWithCopy: {
+    alignItems: "flex-start",
+    gap: 10,
   },
 
   rowPressed: {
@@ -880,8 +892,9 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlign: "right",
   },
 
-  rowValueLink: {
-    textDecorationLine: "underline",
+  linkButton: {
+    borderRadius: radius.default,
+    paddingHorizontal: 20,
   },
 
   advancedToggle: {

@@ -2685,26 +2685,28 @@
     "update": "Usetyenziso lwakho luphelelwe lixesha. Uhlaziyo luyafuneka phambi kokuba i-app isetyenziswe. Oku kunokwenziwa kwi-PlayStore ye-Android kunye ne-Testflight ye-iOS"
   },
   "TransactionDetailScreen": {
-    "paid": "Ihlawulwe ukuya/ukusuka",
     "received": "Ufumene",
     "sent": "Uthumele",
     "sending": "Iyathumela",
-    "receivingAccount": "Ukufumana iAkhawunti",
-    "sendingAccount": "Ukuthumela iAkhawunti",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
     "momentarily": "okwethutyana",
     "findingAccount": "Ikhangela i-akhawunti yale ntlawulo...",
     "txNotFoundInAccounts": "Le ntlawulo ayifumanekanga kuyo nayiphi na i-akhawunti kwesi sixhobo. Isenokuba yeye-akhawunti ephume ngaphandle.",
     "txLoadFailed": "Ayikwazanga ukulayisha le ntlawulo. Khangela uqhagamshelo lwakho uzame kwakhona.",
     "switchedForPayment": "Itshintshele ku-{identifier: string} ukubonisa le ntlawulo",
-    "customLabel": "Ileyibhile yakho",
     "depositFee": "Umrhumo wediphozithi",
     "time": "Ixesha",
     "transactionId": "I-ID yotshintshiselwano",
     "hash": "Hash",
     "blinkInternalId": "I-ID yangaphakathi ye-Blink",
-    "copyAllData": "Kopisha yonke idatha",
-    "allData": "Iinkcukacha zotshintshiselwano"
+    "receivedTo": "Ifunyenwe ku",
+    "sentFrom": "Ithunyelwe ukusuka ku",
+    "addCustomNote": "Yongeza inqaku lakho",
+    "openInExplorer": "Vula kwi-explorer",
+    "openInDecoder": "Vula kwi-decoder",
+    "sparkTransferId": "I-ID yokudluliselwa kwe-Spark",
+    "sender": "Umthumeli",
+    "recipient": "Umamkeli"
   },
   "FeeRatesScreen": {
     "title": "Amazinga emirhumo",
@@ -4203,12 +4205,12 @@
     "title": "Le yiakhawunti engagcinwanga",
     "body": "Ukufunda okungakumbi, funda ipowusti yebhlog yethu",
     "cta": "Funda"
-    },
+  },
   "StaleCloudBundleBulletin": {
     "title": "Hlaziya ugcino lwakho kwilifu",
     "body": "Ingqokelela yakho yongxamiseko ku-{provider} indala. Gcina isipaji sakho kwakhona ukuze uyihlaziye.",
     "cta": "Gcina kwakhona"
-    },
+  },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Akukabikho ngqokelela yongxamiseko. Yenziwa emva kwentengiselwano yakho yokuqala.",
     "exportFailed": "Ayikwazanga ukukhuphela ingqokelela yongxamiseko."

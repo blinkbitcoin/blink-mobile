@@ -2685,26 +2685,28 @@
     "update": "Vaša je aplikacija zastarjela. Prije upotrebe aplikacije potrebno je ažuriranje.\n\nTo se može učiniti iz PlayStorea za Android i Testflighta za iOS"
   },
   "TransactionDetailScreen": {
-    "paid": "Plaćeno za/od",
     "received": "Primili ste",
     "sent": "Poslali ste",
     "sending": "Slanje",
-    "receivingAccount": "Račun primatelj",
-    "sendingAccount": "Račun pošiljatelj",
     "txNotBroadcast": "Vaša transakcija trenutno je na čekanju i bit će emitirana na Bitcoin mrežu za koji trenutak.",
     "momentarily": "uskoro",
     "findingAccount": "Traženje računa za ovu uplatu...",
     "txNotFoundInAccounts": "Ova uplata nije pronađena ni na jednom računu na ovom uređaju. Možda pripada računu koji je odjavljen.",
     "txLoadFailed": "Ovu uplatu nije moguće učitati. Provjerite vezu i pokušajte ponovno.",
     "switchedForPayment": "Prebačeno na {identifier: string} za prikaz ove uplate",
-    "customLabel": "Vlastita oznaka",
     "depositFee": "Naknada za polog",
     "time": "Vrijeme",
     "transactionId": "ID transakcije",
     "hash": "Hash",
     "blinkInternalId": "Interni Blink ID",
-    "copyAllData": "Kopiraj sve podatke",
-    "allData": "Detalji transakcije"
+    "receivedTo": "Primljeno na",
+    "sentFrom": "Poslano s",
+    "addCustomNote": "Dodaj vlastitu bilješku",
+    "openInExplorer": "Otvori u pregledniku",
+    "openInDecoder": "Otvori u dekoderu",
+    "sparkTransferId": "ID Spark prijenosa",
+    "sender": "Pošiljatelj",
+    "recipient": "Primatelj"
   },
   "FeeRatesScreen": {
     "title": "Stope naknada",
@@ -4203,12 +4205,12 @@
     "title": "Ovo je račun bez skrbništva",
     "body": "Da biste saznali više, pročitajte naš blog post",
     "cta": "Pročitaj"
-    },
+  },
   "StaleCloudBundleBulletin": {
     "title": "Ažuriraj sigurnosnu kopiju u oblaku",
     "body": "Tvoj paket za hitne slučajeve u {provider} je zastario. Ponovno napravi sigurnosnu kopiju novčanika da ga ažuriraš.",
     "cta": "Ponovno napravi kopiju"
-    },
+  },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Još nema paketa za hitne slučajeve. Stvara se nakon tvoje prve transakcije.",
     "exportFailed": "Paket za hitne slučajeve nije moguće preuzeti."

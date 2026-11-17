@@ -2685,26 +2685,28 @@
     "update": "Aplikasi Anda sudah usang. Pembaruan diperlukan sebelum aplikasi dapat digunakan.\n\nIni dapat dilakukan melalui PlayStore untuk Android dan Testflight untuk iOS"
   },
   "TransactionDetailScreen": {
-    "paid": "Dibayar ke/dari",
     "received": "Anda menerima",
     "sent": "Anda mengirim",
     "sending": "Mengirim",
-    "receivingAccount": "Akun Penerima",
-    "sendingAccount": "Akun Pengirim",
     "txNotBroadcast": "Transaksi Anda sedang antri. Itu akan muncul di mempool {countdown: string}.",
     "momentarily": "sebentar lagi",
     "findingAccount": "Mencari akun untuk pembayaran ini...",
     "txNotFoundInAccounts": "Pembayaran ini tidak ditemukan di akun mana pun di perangkat ini. Mungkin milik akun yang telah keluar.",
     "txLoadFailed": "Tidak dapat memuat pembayaran ini. Periksa koneksi Anda dan coba lagi.",
     "switchedForPayment": "Beralih ke {identifier: string} untuk menampilkan pembayaran ini",
-    "customLabel": "Label khusus",
     "depositFee": "Biaya deposit",
     "time": "Waktu",
     "transactionId": "ID transaksi",
     "hash": "Hash",
     "blinkInternalId": "ID internal Blink",
-    "copyAllData": "Salin semua data",
-    "allData": "Detail transaksi"
+    "receivedTo": "Diterima di",
+    "sentFrom": "Dikirim dari",
+    "addCustomNote": "Tambah catatan pribadi",
+    "openInExplorer": "Buka di explorer",
+    "openInDecoder": "Buka di dekoder",
+    "sparkTransferId": "ID transfer Spark",
+    "sender": "Pengirim",
+    "recipient": "Penerima"
   },
   "FeeRatesScreen": {
     "title": "Tarif biaya",
@@ -4203,12 +4205,12 @@
     "title": "Ini adalah akun non-kustodial",
     "body": "Untuk mempelajari lebih lanjut, baca postingan blog kami",
     "cta": "Baca"
-    },
+  },
   "StaleCloudBundleBulletin": {
     "title": "Perbarui cadangan cloud-mu",
     "body": "Paket darurat kamu di {provider} sudah usang. Cadangkan dompetmu lagi untuk memperbaruinya.",
     "cta": "Cadangkan lagi"
-    },
+  },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Belum ada paket darurat. Paket dibuat setelah transaksi pertamamu.",
     "exportFailed": "Tidak dapat mengunduh paket darurat."

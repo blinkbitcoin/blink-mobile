@@ -2685,26 +2685,28 @@
     "update": "Ваша апликација је застарела. Потребно је извршити ажурирање пре него што се апликација може користити.\n\nОво можете урадити са Плеј продавнице за Андроид и Тестфлајт за „iOS“"
   },
   "TransactionDetailScreen": {
-    "paid": "Плаћено/примљено од",
     "received": "Примили сте",
     "sent": "Послали сте",
     "sending": "Слање",
-    "receivingAccount": "Рачун за примање",
-    "sendingAccount": "Рачун за слање",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
     "momentarily": "ускоро",
     "findingAccount": "Тражење налога за ову уплату...",
     "txNotFoundInAccounts": "Ова уплата није пронађена ни на једном налогу на овом уређају. Можда припада налогу који је одјављен.",
     "txLoadFailed": "Ову уплату није могуће учитати. Проверите везу и покушајте поново.",
     "switchedForPayment": "Пребачено на {identifier: string} ради приказа ове уплате",
-    "customLabel": "Прилагођена ознака",
     "depositFee": "Накнада за депозит",
     "time": "Време",
     "transactionId": "ИД трансакције",
     "hash": "Хеш",
     "blinkInternalId": "Интерни Blink ИД",
-    "copyAllData": "Копирај све податке",
-    "allData": "Детаљи трансакције"
+    "receivedTo": "Примљено на",
+    "sentFrom": "Послато са",
+    "addCustomNote": "Додај личну белешку",
+    "openInExplorer": "Отвори у претраживачу",
+    "openInDecoder": "Отвори у декодеру",
+    "sparkTransferId": "ИД Spark преноса",
+    "sender": "Пошиљалац",
+    "recipient": "Прималац"
   },
   "FeeRatesScreen": {
     "title": "Стопе накнада",
@@ -4203,12 +4205,12 @@
     "title": "Ово је не-кастодијални налог",
     "body": "Да бисте сазнали више, прочитајте наш блог пост",
     "cta": "Прочитај"
-    },
+  },
   "StaleCloudBundleBulletin": {
     "title": "Ажурирај резервну копију у облаку",
     "body": "Твој хитни пакет у {provider} је застарео. Поново направи резервну копију новчаника да би га ажурирао.",
     "cta": "Поново направи копију"
-    },
+  },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Још нема хитног пакета. Креира се након твоје прве трансакције.",
     "exportFailed": "Није могуће преузети хитни пакет."

@@ -2685,26 +2685,28 @@
     "update": "Az alkalmazása elavult. Az alkalmazás használatához frissítés szükséges.\n\nAndroid esetén a Play Áruházból, iOS esetén pedig a Testflight alkalmazáson keresztül tudod elvégezni."
   },
   "TransactionDetailScreen": {
-    "paid": "Kifizetve/kiutalva",
     "received": "Fogadott",
     "sent": "Elküldött",
     "sending": "Küld",
-    "receivingAccount": "Fogadó egyenleg",
-    "sendingAccount": "Küldő egyenleg",
     "txNotBroadcast": "Az Ön tranzakciója sorban áll. Meg fog jelenni a mempoolban {countdown: string}.",
     "momentarily": "pillanatokon belül",
     "findingAccount": "A fizetéshez tartozó fiók keresése...",
     "txNotFoundInAccounts": "Ez a fizetés nem található az eszköz egyik fiókjában sem. Lehet, hogy egy kijelentkezett fiókhoz tartozik.",
     "txLoadFailed": "Nem sikerült betölteni ezt a fizetést. Ellenőrizze a kapcsolatot, és próbálja újra.",
     "switchedForPayment": "Átváltás erre: {identifier: string}, hogy megjelenjen ez a fizetés",
-    "customLabel": "Egyéni címke",
     "depositFee": "Befizetési díj",
     "time": "Időpont",
     "transactionId": "Tranzakcióazonosító",
     "hash": "Hash",
     "blinkInternalId": "Blink belső azonosító",
-    "copyAllData": "Összes adat másolása",
-    "allData": "Tranzakció részletei"
+    "receivedTo": "Fogadva ide",
+    "sentFrom": "Küldve innen",
+    "addCustomNote": "Saját megjegyzés hozzáadása",
+    "openInExplorer": "Megnyitás blokkböngészőben",
+    "openInDecoder": "Megnyitás dekóderben",
+    "sparkTransferId": "Spark-átutalás azonosítója",
+    "sender": "Küldő",
+    "recipient": "Címzett"
   },
   "FeeRatesScreen": {
     "title": "Díjszabás",
@@ -4203,12 +4205,12 @@
     "title": "Ez egy nem letétkezelt fiók",
     "body": "További információért olvasd el blogbejegyzésünket",
     "cta": "Olvasás"
-    },
+  },
   "StaleCloudBundleBulletin": {
     "title": "Frissítsd a felhőben lévő mentést",
     "body": "A vészhelyzeti csomagod a(z) {provider} szolgáltatásban elavult. Készíts újra biztonsági mentést a tárcádról a frissítéshez.",
     "cta": "Mentés újra"
-    },
+  },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Még nincs vészhelyzeti csomag. Az első tranzakciód után jön létre.",
     "exportFailed": "Nem sikerült letölteni a vészhelyzeti csomagot."

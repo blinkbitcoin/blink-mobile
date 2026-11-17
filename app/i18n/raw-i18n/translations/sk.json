@@ -2685,26 +2685,28 @@
     "update": "Vaša aplikácia je zastaraná. Pred použitím aplikácie je potrebná aktualizácia.\n\nMôžete to urobiť v obchode PlayStore pre Android a Testflight pre iOS"
   },
   "TransactionDetailScreen": {
-    "paid": "Zaplatili ste do/z",
     "received": "Prijali ste",
     "sent": "Odoslali ste",
     "sending": "Odosielanie",
-    "receivingAccount": "Prijímajúci zostatok",
-    "sendingAccount": "Odosielajúci zostatok",
     "txNotBroadcast": "Vaša transakcia je zaradená do frontu. Mala by sa objaviť v mempoole {countdown: string}.",
     "momentarily": "momentálne",
     "findingAccount": "Hľadá sa účet pre túto platbu...",
     "txNotFoundInAccounts": "Táto platba sa nenašla v žiadnom účte v tomto zariadení. Môže patriť k odhlásenému účtu.",
     "txLoadFailed": "Túto platbu sa nepodarilo načítať. Skontrolujte pripojenie a skúste to znova.",
     "switchedForPayment": "Prepnuté na {identifier: string} na zobrazenie tejto platby",
-    "customLabel": "Vlastný štítok",
     "depositFee": "Poplatok za vklad",
     "time": "Čas",
     "transactionId": "ID transakcie",
     "hash": "Hash",
     "blinkInternalId": "Interné ID Blink",
-    "copyAllData": "Kopírovať všetky údaje",
-    "allData": "Podrobnosti transakcie"
+    "receivedTo": "Prijaté na",
+    "sentFrom": "Odoslané z",
+    "addCustomNote": "Pridať vlastnú poznámku",
+    "openInExplorer": "Otvoriť v prieskumníkovi",
+    "openInDecoder": "Otvoriť v dekodéri",
+    "sparkTransferId": "ID prevodu Spark",
+    "sender": "Odosielateľ",
+    "recipient": "Príjemca"
   },
   "FeeRatesScreen": {
     "title": "Sadzby poplatkov",
@@ -4203,12 +4205,12 @@
     "title": "Toto je non-custodial účet",
     "body": "Ak sa chcete dozvedieť viac, prečítajte si náš blogový príspevok",
     "cta": "Čítať"
-    },
+  },
   "StaleCloudBundleBulletin": {
     "title": "Aktualizuj zálohu v cloude",
     "body": "Tvoj núdzový balík v {provider} je zastaraný. Znova zálohuj peňaženku, aby si ho aktualizoval.",
     "cta": "Znova zálohovať"
-    },
+  },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Zatiaľ nemáš núdzový balík. Vytvorí sa po tvojej prvej transakcii.",
     "exportFailed": "Núdzový balík sa nepodarilo stiahnuť."
