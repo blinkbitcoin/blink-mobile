@@ -2706,7 +2706,8 @@
     "openInDecoder": "Buka dalam penyahkod",
     "sparkTransferId": "ID pemindahan Spark",
     "sender": "Penghantar",
-    "recipient": "Penerima"
+    "recipient": "Penerima",
+    "bitcoinAddress": "Alamat Bitcoin"
   },
   "FeeRatesScreen": {
     "title": "Kadar caj",

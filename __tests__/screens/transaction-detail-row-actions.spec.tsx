@@ -101,6 +101,8 @@ jest.mock("@app/i18n/i18n-react", () =>
     "TransactionDetailScreen.sparkTransferId": "spark-transfer-id",
     "TransactionDetailScreen.openInExplorer": "open-in-explorer",
     "TransactionDetailScreen.openInDecoder": "open-in-decoder",
+    "TransactionDetailScreen.bitcoinAddress": "bitcoin-address",
+    "TransactionDetailScreen.recipient": "recipient",
   }),
 )
 
@@ -110,6 +112,7 @@ const LN_PAYMENT_HASH = "0001020304050607080900010203040506070809000102030405060
 const LN_PRE_IMAGE = "6bb1e9a3bf6bcbe27a0c1f3a4b7a6a3b4b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e"
 const LN_PAYMENT_REQUEST = "lnbc10u1p0example000payment000request000string"
 const TX_ID = "tx-1"
+const ONCHAIN_ADDRESS = "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq"
 
 const baseTx = {
   __typename: "Transaction",
@@ -125,7 +128,7 @@ const baseTx = {
   settlementDisplayCurrency: "USD",
 }
 
-const broadcastedOnChainTx = (transactionHash: string) => ({
+const broadcastedOnChainTx = (transactionHash: string, address = "") => ({
   data: {
     ...baseTx,
     settlementVia: {
@@ -133,9 +136,26 @@ const broadcastedOnChainTx = (transactionHash: string) => ({
       transactionHash,
       arrivalInMempoolEstimatedAt: null,
     },
-    initiationVia: { __typename: "InitiationViaOnChain", address: "" },
+    initiationVia: { __typename: "InitiationViaOnChain", address },
   },
 })
+
+const intraLedgerTx = {
+  data: {
+    ...baseTx,
+    settlementVia: {
+      __typename: "SettlementViaIntraLedger",
+      counterPartyUsername: "alice",
+      counterPartyWalletId: "wallet-alice",
+      preImage: null,
+    },
+    initiationVia: {
+      __typename: "InitiationViaIntraLedger",
+      counterPartyUsername: "alice",
+      counterPartyWalletId: "wallet-alice",
+    },
+  },
+}
 
 const lightningTx = {
   data: {
@@ -163,7 +183,8 @@ const renderScreenWithTx = (tx: unknown) => {
 const copiedContents = () =>
   mockCopyToClipboard.mock.calls.map(([{ content }]) => content)
 
-// Each Advanced row copies from its own copy icon; the row itself does nothing.
+// Every Advanced row copies when tapped anywhere on it; its copy icon is only the cue.
+// Note and Sender/Recipient copy the same way, without an icon.
 // One button under the Advanced card opens the payment: the Bitcoin transaction on
 // the block explorer, else the Spark transfer on sparkscan, else the invoice in the
 // Lightning decoder.
@@ -194,23 +215,38 @@ describe("TransactionDetailScreen row actions", () => {
       )
     })
 
-    it("copies the transaction hash and internal id from their copy icons", () => {
+    it("copies the transaction hash and internal id when their rows are tapped", () => {
       const { getByTestId } = renderExpanded(broadcastedOnChainTx(ONCHAIN_TX_HASH))
 
-      fireEvent.press(getByTestId("transaction-id-copy"))
-      fireEvent.press(getByTestId("internal-id-copy"))
+      fireEvent.press(getByTestId("transaction-id"))
+      fireEvent.press(getByTestId("internal-id"))
 
       expect(copiedContents()).toEqual([ONCHAIN_TX_HASH, TX_ID])
       expect(openURLSpy).not.toHaveBeenCalled()
     })
 
-    it("does nothing when an Advanced row itself is tapped", () => {
-      const { getByTestId } = renderExpanded(broadcastedOnChainTx(ONCHAIN_TX_HASH))
+    it("keeps each technical value on one line, cut in the middle", () => {
+      const { getByText } = renderExpanded(broadcastedOnChainTx(ONCHAIN_TX_HASH))
 
-      fireEvent.press(getByTestId("transaction-id"))
+      const value = getByText(ONCHAIN_TX_HASH)
+      expect(value.props.numberOfLines).toBe(1)
+      expect(value.props.ellipsizeMode).toBe("middle")
+    })
 
-      expect(copiedContents()).toEqual([])
-      expect(openURLSpy).not.toHaveBeenCalled()
+    it("shows the Bitcoin address first and copies it from its row", () => {
+      const { getByTestId } = renderExpanded(
+        broadcastedOnChainTx(ONCHAIN_TX_HASH, ONCHAIN_ADDRESS),
+      )
+
+      fireEvent.press(getByTestId("bitcoin-address"))
+
+      expect(copiedContents()).toEqual([ONCHAIN_ADDRESS])
+    })
+
+    it("leaves the Bitcoin address out when the payment has none", () => {
+      const { queryByTestId } = renderExpanded(broadcastedOnChainTx(ONCHAIN_TX_HASH))
+
+      expect(queryByTestId("bitcoin-address")).toBeNull()
     })
 
     it("still copies the note when its row is tapped", () => {
@@ -243,7 +279,7 @@ describe("TransactionDetailScreen row actions", () => {
 
       expect(queryByTestId("transaction-id")).toBeNull()
       expect(queryByTestId("internal-id")).toBeNull()
-      fireEvent.press(getByTestId("spark-transfer-id-copy"))
+      fireEvent.press(getByTestId("spark-transfer-id"))
       fireEvent.press(getByLabelText("open-in-explorer"))
 
       expect(copiedContents()).toEqual([SPARK_TX_ID])
@@ -266,10 +302,10 @@ describe("TransactionDetailScreen row actions", () => {
     it("copies payment hash, preimage, payment request and internal id", () => {
       const { getByTestId } = renderExpanded(lightningTx)
 
-      fireEvent.press(getByTestId("hash-copy"))
-      fireEvent.press(getByTestId("preimage-copy"))
-      fireEvent.press(getByTestId("payment-request-copy"))
-      fireEvent.press(getByTestId("internal-id-copy"))
+      fireEvent.press(getByTestId("hash"))
+      fireEvent.press(getByTestId("preimage"))
+      fireEvent.press(getByTestId("payment-request"))
+      fireEvent.press(getByTestId("internal-id"))
 
       expect(copiedContents()).toEqual([
         LN_PAYMENT_HASH,
@@ -290,6 +326,16 @@ describe("TransactionDetailScreen row actions", () => {
 
   // A row with a copy or explorer icon is a press target, so it keeps the tappable
   // surfaceInteractive; a row with nothing to press takes the surfaceStatic (blink-wip#1871).
+  describe("intraledger transaction", () => {
+    it("copies the recipient's username when its row is tapped", () => {
+      const { getByTestId } = renderScreenWithTx(intraLedgerTx)
+
+      fireEvent.press(getByTestId("recipient"))
+
+      expect(copiedContents()).toEqual(["alice"])
+    })
+  })
+
   describe("row surface", () => {
     it("keeps the copy rows surfaceInteractive and paints a row without icons surfaceStatic", () => {
       const { getAllByTestId, getByText } = renderScreenWithTx(

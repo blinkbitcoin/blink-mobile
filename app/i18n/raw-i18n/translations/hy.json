@@ -2706,7 +2706,8 @@
     "openInDecoder": "Բացել ապակոդավորիչում",
     "sparkTransferId": "Spark փոխանցման ID",
     "sender": "Ուղարկող",
-    "recipient": "Ստացող"
+    "recipient": "Ստացող",
+    "bitcoinAddress": "Բիթքոյն հասցե"
   },
   "FeeRatesScreen": {
     "title": "Վճարների սակագներ",

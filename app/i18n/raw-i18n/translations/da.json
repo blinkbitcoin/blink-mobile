@@ -2706,7 +2706,8 @@
     "openInDecoder": "Åbn i dekoder",
     "sparkTransferId": "Spark-overførsels-ID",
     "sender": "Afsender",
-    "recipient": "Modtager"
+    "recipient": "Modtager",
+    "bitcoinAddress": "Bitcoin-adresse"
   },
   "FeeRatesScreen": {
     "title": "Gebyrsatser",

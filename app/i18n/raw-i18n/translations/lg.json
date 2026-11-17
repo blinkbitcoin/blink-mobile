@@ -2706,7 +2706,8 @@
     "openInDecoder": "Ggulawo mu decoder",
     "sparkTransferId": "Namba ya Spark transfer",
     "sender": "Asindika",
-    "recipient": "Afuna"
+    "recipient": "Afuna",
+    "bitcoinAddress": "Endagiriro ya Bitcoin"
   },
   "FeeRatesScreen": {
     "title": "Emiwendo gy'ebisale",

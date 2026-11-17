@@ -2706,7 +2706,8 @@
     "openInDecoder": "Otvoriť v dekodéri",
     "sparkTransferId": "ID prevodu Spark",
     "sender": "Odosielateľ",
-    "recipient": "Príjemca"
+    "recipient": "Príjemca",
+    "bitcoinAddress": "Bitcoinová adresa"
   },
   "FeeRatesScreen": {
     "title": "Sadzby poplatkov",

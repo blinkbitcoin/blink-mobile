@@ -2706,7 +2706,8 @@
     "openInDecoder": "افتح في أداة فك الترميز",
     "sparkTransferId": "معرّف تحويل Spark",
     "sender": "المُرسِل",
-    "recipient": "المستلم"
+    "recipient": "المستلم",
+    "bitcoinAddress": "عنوان بيتكوين"
   },
   "FeeRatesScreen": {
     "title": "معدلات الرسوم",

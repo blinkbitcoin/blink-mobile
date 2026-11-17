@@ -2706,7 +2706,8 @@
     "openInDecoder": "Decoder-pi kichay",
     "sparkTransferId": "Spark apachiy ID",
     "sender": "Apachiq",
-    "recipient": "Chaskiq"
+    "recipient": "Chaskiq",
+    "bitcoinAddress": "Bitcoin tiyana"
   },
   "FeeRatesScreen": {
     "title": "Chaninkuna",

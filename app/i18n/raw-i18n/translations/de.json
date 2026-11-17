@@ -2706,7 +2706,8 @@
         "openInDecoder": "Im Decoder öffnen",
         "sparkTransferId": "Spark-Transfer-ID",
         "sender": "Absender",
-        "recipient": "Empfänger"
+        "recipient": "Empfänger",
+        "bitcoinAddress": "Bitcoin-Adresse"
     },
     "FeeRatesScreen": {
         "title": "Gebührensätze",

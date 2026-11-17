@@ -2706,7 +2706,8 @@
     "openInDecoder": "เปิดในตัวถอดรหัส",
     "sparkTransferId": "รหัสการโอน Spark",
     "sender": "ผู้ส่ง",
-    "recipient": "ผู้รับ"
+    "recipient": "ผู้รับ",
+    "bitcoinAddress": "แอดเดรสบิตคอยน์"
   },
   "FeeRatesScreen": {
     "title": "อัตราค่าธรรมเนียม",

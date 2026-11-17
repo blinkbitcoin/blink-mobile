@@ -8957,6 +8957,10 @@ type RootTranslation = {
 		 * R​e​c​i​p​i​e​n​t
 		 */
 		recipient: string
+		/**
+		 * B​i​t​c​o​i​n​ ​a​d​d​r​e​s​s
+		 */
+		bitcoinAddress: string
 	}
 	FeeRatesScreen: {
 		/**
@@ -23333,6 +23337,10 @@ export type TranslationFunctions = {
 		 * Recipient
 		 */
 		recipient: () => LocalizedString
+		/**
+		 * Bitcoin address
+		 */
+		bitcoinAddress: () => LocalizedString
 	}
 	FeeRatesScreen: {
 		/**

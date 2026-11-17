@@ -2706,7 +2706,8 @@
     "openInDecoder": "Megnyitás dekóderben",
     "sparkTransferId": "Spark-átutalás azonosítója",
     "sender": "Küldő",
-    "recipient": "Címzett"
+    "recipient": "Címzett",
+    "bitcoinAddress": "Bitcoin-cím"
   },
   "FeeRatesScreen": {
     "title": "Díjszabás",

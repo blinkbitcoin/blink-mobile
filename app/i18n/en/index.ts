@@ -2838,6 +2838,7 @@ const en: BaseTranslation = {
     sparkTransferId: "Spark transfer ID",
     sender: "Sender",
     recipient: "Recipient",
+    bitcoinAddress: "Bitcoin address",
   },
   FeeRatesScreen: {
     title: "Fee rates",

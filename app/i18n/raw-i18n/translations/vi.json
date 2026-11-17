@@ -2706,7 +2706,8 @@
     "openInDecoder": "Mở trong trình giải mã",
     "sparkTransferId": "Mã chuyển Spark",
     "sender": "Người gửi",
-    "recipient": "Người nhận"
+    "recipient": "Người nhận",
+    "bitcoinAddress": "Địa chỉ Bitcoin"
   },
   "FeeRatesScreen": {
     "title": "Biểu phí",

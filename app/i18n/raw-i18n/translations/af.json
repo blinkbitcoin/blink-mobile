@@ -2706,7 +2706,8 @@
     "openInDecoder": "Maak oop in dekodeerder",
     "sparkTransferId": "Spark-oordrag-ID",
     "sender": "Sender",
-    "recipient": "Ontvanger"
+    "recipient": "Ontvanger",
+    "bitcoinAddress": "Bitcoin-adres"
   },
   "FeeRatesScreen": {
     "title": "Fooitariewe",

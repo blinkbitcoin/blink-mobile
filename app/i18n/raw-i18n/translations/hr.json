@@ -2706,7 +2706,8 @@
     "openInDecoder": "Otvori u dekoderu",
     "sparkTransferId": "ID Spark prijenosa",
     "sender": "Pošiljatelj",
-    "recipient": "Primatelj"
+    "recipient": "Primatelj",
+    "bitcoinAddress": "Bitcoin adresa"
   },
   "FeeRatesScreen": {
     "title": "Stope naknada",

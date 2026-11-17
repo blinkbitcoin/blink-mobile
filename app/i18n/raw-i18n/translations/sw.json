@@ -2706,7 +2706,8 @@
     "openInDecoder": "Fungua kwenye decoder",
     "sparkTransferId": "Kitambulisho cha uhamisho wa Spark",
     "sender": "Mtumaji",
-    "recipient": "Mpokeaji"
+    "recipient": "Mpokeaji",
+    "bitcoinAddress": "Anwani ya Bitcoin"
   },
   "FeeRatesScreen": {
     "title": "Viwango vya ada",

@@ -2706,7 +2706,8 @@
     "openInDecoder": "Άνοιγμα στον αποκωδικοποιητή",
     "sparkTransferId": "Αναγνωριστικό μεταφοράς Spark",
     "sender": "Αποστολέας",
-    "recipient": "Παραλήπτης"
+    "recipient": "Παραλήπτης",
+    "bitcoinAddress": "Διεύθυνση Bitcoin"
   },
   "FeeRatesScreen": {
     "title": "Ποσοστά τελών",

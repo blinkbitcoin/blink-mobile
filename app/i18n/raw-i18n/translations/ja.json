@@ -2706,7 +2706,8 @@
         "openInDecoder": "デコーダーで開く",
         "sparkTransferId": "SparkトランスファーID",
         "sender": "送信者",
-        "recipient": "受取人"
+        "recipient": "受取人",
+        "bitcoinAddress": "ビットコインアドレス"
     },
     "FeeRatesScreen": {
         "title": "手数料率",

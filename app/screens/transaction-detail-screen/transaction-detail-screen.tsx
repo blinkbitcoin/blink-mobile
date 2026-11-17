@@ -50,16 +50,17 @@ import { TransactionReceipt } from "./transaction-receipt"
 type RowProps = {
   label: string
   value?: string | null | JSX.Element
-  /** Long technical values (hashes, invoices) are set a size down so they wrap tidily. */
-  small?: boolean
-  /** Tapping the row copies its value; no icon is drawn. */
-  onPress?: () => void
-  /** Draws the copy icon after the value; tapping the icon copies. */
+  /** Tapping anywhere on the row copies its value. */
   onCopy?: () => void
+  /**
+   * Hashes, invoices, IDs and addresses: a size down, on one line with the middle cut,
+   * and the copy icon after it. The copy still holds the whole value.
+   */
+  technical?: boolean
 }
 
 /** A label/value line in a details card. */
-const Row = ({ label, value, small, onPress, onCopy }: RowProps) => {
+const Row = ({ label, value, onCopy, technical }: RowProps) => {
   const styles = useStyles()
   const {
     theme: { colors },
@@ -69,32 +70,27 @@ const Row = ({ label, value, small, onPress, onCopy }: RowProps) => {
     <Pressable
       style={({ pressed }) => [
         styles.row,
-        onCopy && styles.rowWithCopy,
+        technical && styles.rowTechnical,
         pressed && styles.rowPressed,
       ]}
-      disabled={!onPress}
-      onPress={onPress}
-      accessibilityRole={onPress ? "button" : undefined}
+      disabled={!onCopy}
+      onPress={onCopy}
+      accessibilityRole={onCopy ? "button" : undefined}
       testID={label}
     >
       <Text type="p3" color={colors.textSecondary} style={styles.rowLabel}>
         {label}
       </Text>
-      <Text type={small ? "p4" : "p3"} bold style={styles.rowValue}>
+      <Text
+        type={technical ? "p4" : "p3"}
+        bold
+        style={styles.rowValue}
+        numberOfLines={technical ? 1 : undefined}
+        ellipsizeMode={technical ? "middle" : undefined}
+      >
         {value}
       </Text>
-      {onCopy ? (
-        <Pressable
-          onPress={onCopy}
-          hitSlop={15}
-          accessibilityRole="button"
-          accessibilityLabel={label}
-          testID={`${label}-copy`}
-          style={({ pressed }) => pressed && styles.rowPressed}
-        >
-          <GaloyIcon name="copy-paste" size={14} color={colors.accent} />
-        </Pressable>
-      ) : null}
+      {technical ? <GaloyIcon name="copy-paste" size={14} color={colors.accent} /> : null}
     </Pressable>
   )
 }
@@ -460,6 +456,9 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
       ? settlementVia.counterPartyUsername || galoyInstance.name
       : ""
   const internalId = id && !isSelfCustodial ? id : ""
+  // Self-custodial payments carry no address on the fragment yet (blink-wip#2105)
+  const onChainAddress =
+    initiationVia?.__typename === "InitiationViaOnChain" ? initiationVia.address : ""
   const typeText = typeDisplay(settlementVia, selfCustodialPaymentType)
 
   // The shared receipt is the send receipt, filled from this transaction
@@ -481,7 +480,8 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
           : ReceiptPaymentType.Lightning
 
   const hasAdvanced = Boolean(
-    transactionHash ||
+    onChainAddress ||
+      transactionHash ||
       sparkTransferId ||
       paymentHash ||
       preImage ||
@@ -599,13 +599,19 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                       : LL.TransactionDetailScreen.recipient()
                   }
                   value={counterParty}
+                  onCopy={copyRow(
+                    isReceive
+                      ? LL.TransactionDetailScreen.sender()
+                      : LL.TransactionDetailScreen.recipient(),
+                    counterParty,
+                  )}
                 />
               ) : null}
               {/* Always shown; a payment without a note reads "-" and copies nothing */}
               <Row
                 label={LL.common.note()}
                 value={description || EMPTY_VALUE}
-                onPress={description ? copyRow(LL.common.note(), description) : undefined}
+                onCopy={description ? copyRow(LL.common.note(), description) : undefined}
               />
             </View>
 
@@ -615,8 +621,10 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
               editable
               big={false}
               fontSize={14}
+              icon="pencil"
               iconSize={16}
               placeholder={LL.TransactionDetailScreen.addCustomNote()}
+              placeholderTextColor={colors.textMuted}
               maxLength={CUSTOM_LABEL_MAX_LENGTH}
               style={styles.labelField}
             />
@@ -642,9 +650,20 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
           {hasAdvanced && advancedOpen && (
             <>
               <View style={styles.card}>
+                {onChainAddress ? (
+                  <Row
+                    technical
+                    label={LL.TransactionDetailScreen.bitcoinAddress()}
+                    value={onChainAddress}
+                    onCopy={copyRow(
+                      LL.TransactionDetailScreen.bitcoinAddress(),
+                      onChainAddress,
+                    )}
+                  />
+                ) : null}
                 {transactionHash ? (
                   <Row
-                    small
+                    technical
                     label={LL.TransactionDetailScreen.transactionId()}
                     value={transactionHash}
                     onCopy={copyRow(
@@ -655,7 +674,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 ) : null}
                 {sparkTransferId ? (
                   <Row
-                    small
+                    technical
                     label={LL.TransactionDetailScreen.sparkTransferId()}
                     value={sparkTransferId}
                     onCopy={copyRow(
@@ -666,7 +685,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 ) : null}
                 {paymentHash ? (
                   <Row
-                    small
+                    technical
                     label={LL.TransactionDetailScreen.hash()}
                     value={paymentHash}
                     onCopy={copyRow(LL.TransactionDetailScreen.hash(), paymentHash)}
@@ -674,7 +693,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 ) : null}
                 {preImage ? (
                   <Row
-                    small
+                    technical
                     label={LL.common.preimageProofOfPayment()}
                     value={preImage}
                     onCopy={copyRow(LL.common.preimageProofOfPayment(), preImage)}
@@ -682,7 +701,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 ) : null}
                 {paymentRequest ? (
                   <Row
-                    small
+                    technical
                     label={LL.common.paymentRequest()}
                     value={paymentRequest}
                     onCopy={copyRow(LL.common.paymentRequest(), paymentRequest)}
@@ -690,7 +709,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 ) : null}
                 {internalId ? (
                   <Row
-                    small
+                    technical
                     label={LL.TransactionDetailScreen.blinkInternalId()}
                     value={internalId}
                     onCopy={copyRow(
@@ -702,14 +721,14 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
               </View>
               {explorerUrl ? (
                 <IconTextButton
-                  icon="link"
+                  icon="arrow-square-out"
                   label={LL.TransactionDetailScreen.openInExplorer()}
                   onPress={() => Linking.openURL(explorerUrl)}
                   style={styles.linkButton}
                 />
               ) : paymentRequest ? (
                 <IconTextButton
-                  icon="link"
+                  icon="arrow-square-out"
                   label={LL.TransactionDetailScreen.openInDecoder()}
                   onPress={() => viewInLightningDecoder(paymentRequest)}
                   style={styles.linkButton}
@@ -814,9 +833,11 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 14,
   },
 
+  /** Figma `icon-hero`: its own 10 top padding sits under the body's 14. */
   hero: {
     alignItems: "center",
     gap: 10,
+    paddingTop: 10,
     paddingHorizontal: 20,
   },
 
@@ -873,7 +894,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   /** Figma's copyable rows space the label, value and icon 10 apart. */
-  rowWithCopy: {
+  rowTechnical: {
     alignItems: "flex-start",
     gap: 10,
   },

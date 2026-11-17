@@ -2706,7 +2706,8 @@
     "openInDecoder": "Kod çözücüde aç",
     "sparkTransferId": "Spark transfer kimliği",
     "sender": "Gönderen",
-    "recipient": "Alıcı"
+    "recipient": "Alıcı",
+    "bitcoinAddress": "Bitcoin adresi"
   },
   "FeeRatesScreen": {
     "title": "Ücret oranları",

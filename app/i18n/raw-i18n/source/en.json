@@ -2719,7 +2719,8 @@
         "openInDecoder": "Open in decoder",
         "sparkTransferId": "Spark transfer ID",
         "sender": "Sender",
-        "recipient": "Recipient"
+        "recipient": "Recipient",
+        "bitcoinAddress": "Bitcoin address"
     },
     "FeeRatesScreen": {
         "title": "Fee rates",

@@ -2706,7 +2706,8 @@
     "openInDecoder": "Buka di dekoder",
     "sparkTransferId": "ID transfer Spark",
     "sender": "Pengirim",
-    "recipient": "Penerima"
+    "recipient": "Penerima",
+    "bitcoinAddress": "Alamat Bitcoin"
   },
   "FeeRatesScreen": {
     "title": "Tarif biaya",

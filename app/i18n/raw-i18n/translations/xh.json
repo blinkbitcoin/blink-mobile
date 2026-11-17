@@ -2706,7 +2706,8 @@
     "openInDecoder": "Vula kwi-decoder",
     "sparkTransferId": "I-ID yokudluliselwa kwe-Spark",
     "sender": "Umthumeli",
-    "recipient": "Umamkeli"
+    "recipient": "Umamkeli",
+    "bitcoinAddress": "Idilesi ye-Bitcoin"
   },
   "FeeRatesScreen": {
     "title": "Amazinga emirhumo",

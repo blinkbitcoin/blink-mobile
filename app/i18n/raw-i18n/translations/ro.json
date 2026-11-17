@@ -2706,7 +2706,8 @@
     "openInDecoder": "Deschide în decodor",
     "sparkTransferId": "ID transfer Spark",
     "sender": "Expeditor",
-    "recipient": "Destinatar"
+    "recipient": "Destinatar",
+    "bitcoinAddress": "Adresa Bitcoin"
   },
   "FeeRatesScreen": {
     "title": "Ratele taxelor",
