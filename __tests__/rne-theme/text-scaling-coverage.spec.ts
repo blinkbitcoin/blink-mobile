@@ -105,11 +105,78 @@ const uncappedIn = (component: string): string[] =>
     return uncapped.length > 0 ? [path.relative(APP_DIR, file)] : []
   })
 
+/**
+ * Reanimated's `Animated.Text` is React Native's `Text` under another name, so the theme
+ * never reaches it. The same is true of a local alias (`import Reanimated`) and of a
+ * `createAnimatedComponent(TextInput)` binding. The walk has to name those or dropping the
+ * ceiling on the slider label stays green.
+ */
+const animatedQualifiers = (source: string): string[] => {
+  const names = new Set<string>()
+
+  for (const match of source.matchAll(
+    /import\s+(\w+)\s*(?:,\s*\{[^}]*\})?\s*from\s*"react-native-reanimated"/gs,
+  )) {
+    names.add(match[1])
+  }
+
+  for (const match of source.matchAll(
+    /import\s*\*\s*as\s+(\w+)\s*from\s*"react-native-reanimated"/gs,
+  )) {
+    names.add(match[1])
+  }
+
+  for (const imported of source.matchAll(/import\s*\{([^}]*)\}\s*from\s*"react-native"/gs)) {
+    const named = /(?:^|,)\s*Animated(?:\s+as\s+(\w+))?\s*(?:,|$)/s.exec(imported[1])
+    if (named) names.add(named[1] ?? "Animated")
+  }
+
+  return [...names]
+}
+
+const memberTags = (source: string, qualifier: string, member: string): string[] => {
+  const starts = new RegExp(`(^|[^\\w.])<${qualifier}\\.${member}(?=[\\s/>])`, "gs")
+
+  return [...source.matchAll(starts)].flatMap((start) => {
+    const from = start.index + start[0].length
+    let depth = 0
+    for (let at = from; at < source.length; at += 1) {
+      const char = source[at]
+      if (char === "{") depth += 1
+      else if (char === "}") depth -= 1
+      else if (char === ">" && depth === 0) return [source.slice(from, at)]
+    }
+    return []
+  })
+}
+
+const animatedHosts = (source: string): string[] =>
+  [...source.matchAll(/\b(\w+)\s*=\s*\w+\.createAnimatedComponent\(\s*(Text|TextInput)\s*\)/g)].map(
+    (match) => match[1],
+  )
+
+const uncappedAnimatedTags = (source: string): string[] => {
+  const members = animatedQualifiers(source).flatMap((qualifier) => [
+    ...memberTags(source, qualifier, "Text"),
+    ...memberTags(source, qualifier, "TextInput"),
+  ])
+  const hosts = animatedHosts(source).flatMap((name) => openingTags(source, name))
+
+  return [...members, ...hosts].filter((tag) => !tag.includes("maxFontSizeMultiplier"))
+}
+
+const uncappedAnimated = (): string[] =>
+  sourceFiles(APP_DIR).flatMap((file) => {
+    const uncapped = uncappedAnimatedTags(fs.readFileSync(file, "utf8"))
+    return uncapped.length > 0 ? [path.relative(APP_DIR, file)] : []
+  })
+
 describe("text scaling coverage", () => {
   const offenders = [
     ...uncappedIn("Text"),
     ...uncappedIn("TextInput"),
     ...uncappedFromBase(),
+    ...uncappedAnimated(),
   ]
 
   /**
@@ -165,5 +232,55 @@ describe("the walk's own reading", () => {
     const source = `import { View } from "react-native"`
 
     expect(reactNativeName(source, "Text")).toBeNull()
+  })
+
+  /** The slider label is this tag. Dropping the prop has to fail the walk, not pass it. */
+  it("reports an Animated.Text that drops the ceiling", () => {
+    const source = `import Animated from "react-native-reanimated"\n<Animated.Text>Slide</Animated.Text>`
+
+    expect(uncappedAnimatedTags(source)).toHaveLength(1)
+  })
+
+  it("accepts an Animated.Text that carries the ceiling", () => {
+    const source = `import Animated from "react-native-reanimated"\n<Animated.Text maxFontSizeMultiplier={CAP}>Slide</Animated.Text>`
+
+    expect(uncappedAnimatedTags(source)).toEqual([])
+  })
+
+  it("follows a renamed reanimated import", () => {
+    const source = `import Reanimated from "react-native-reanimated"\n<Reanimated.Text>Slide</Reanimated.Text>`
+
+    expect(uncappedAnimatedTags(source)).toHaveLength(1)
+  })
+
+  it("follows Animated imported from react-native under another name", () => {
+    const source = `import { Animated as Motion } from "react-native"\n<Motion.Text>Slide</Motion.Text>`
+
+    expect(uncappedAnimatedTags(source)).toHaveLength(1)
+  })
+
+  it("reports a createAnimatedComponent host that drops the ceiling", () => {
+    const source = `const AnimText = Reanimated.createAnimatedComponent(TextInput)\n<AnimText value="" />`
+
+    expect(uncappedAnimatedTags(source)).toHaveLength(1)
+  })
+
+  /**
+   * The production tag, not a toy: stripping the multiplier from the slider label is the
+   * edit that used to leave this suite green.
+   */
+  it("fails when the slider label drops the ceiling", () => {
+    const source = fs.readFileSync(
+      path.join(APP_DIR, "components/atomic/galoy-slider-button/galoy-slider-button.tsx"),
+      "utf8",
+    )
+    const stripped = source.replace(
+      "maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}\n",
+      "",
+    )
+
+    expect(stripped).not.toBe(source)
+    expect(uncappedAnimatedTags(source)).toEqual([])
+    expect(uncappedAnimatedTags(stripped)).toHaveLength(1)
   })
 })
