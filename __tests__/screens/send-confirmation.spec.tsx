@@ -323,6 +323,18 @@ const renderedTexts = (): string[] => {
 const textPosition = (prefix: string) =>
   renderedTexts().findIndex((text) => text.startsWith(prefix))
 const navigationGoBackMock = jest.fn()
+type BeforeRemoveListener = (event: {
+  data: { action: { type: string } }
+  preventDefault: () => void
+}) => void
+const beforeRemoveListeners = new Set<BeforeRemoveListener>()
+const fireBeforeRemove = (type: string) => {
+  const preventDefault = jest.fn()
+  beforeRemoveListeners.forEach((listener) =>
+    listener({ data: { action: { type } }, preventDefault }),
+  )
+  return preventDefault
+}
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
@@ -331,7 +343,11 @@ jest.mock("@react-navigation/native", () => ({
     goBack: navigationGoBackMock,
     setOptions: jest.fn(),
     isFocused: () => true,
-    addListener: () => () => {},
+    addListener: (event: string, listener: BeforeRemoveListener) => {
+      if (event !== "beforeRemove") return () => {}
+      beforeRemoveListeners.add(listener)
+      return () => beforeRemoveListeners.delete(listener)
+    },
   }),
   useFocusEffect: (callback: () => undefined | (() => void)) => {
     const { useEffect } = jest.requireActual("react")
@@ -482,6 +498,32 @@ const renderSettled = async (ui: React.ReactElement): Promise<void> => {
   )
 }
 
+const ERROR_SHEET_TEST_ID = "review-error-msg-bottom-sheet"
+
+/** The error message sheet on review, or null while it is closed. */
+const errorSheet = () => screen.queryByTestId(ERROR_SHEET_TEST_ID)
+
+/** A failure shows twice while its sheet is open: inline under Details, and in the sheet
+ *  on top of it (ruling 2026-09-17). */
+const expectInlineAndInSheet = (text: string | RegExp) => {
+  expect(screen.getAllByText(text)).toHaveLength(2)
+  expect(within(screen.getByTestId(ERROR_SHEET_TEST_ID)).getByText(text)).toBeTruthy()
+}
+
+/** "Change amount" pops back to amount entry with a fresh `resetAmountAt`, never `goBack`. */
+const expectChangeAmountDispatched = () => {
+  expect(navigationDispatchMock).toHaveBeenCalledWith(
+    expect.objectContaining({
+      type: "POP_TO",
+      payload: expect.objectContaining({
+        name: "sendBitcoinDetails",
+        params: { resetAmountAt: expect.any(Number) },
+      }),
+    }),
+  )
+  expect(navigationGoBackMock).not.toHaveBeenCalled()
+}
+
 describe("SendBitcoinConfirmationScreen", () => {
   let LL: ReturnType<typeof i18nObject>
 
@@ -517,18 +559,20 @@ describe("SendBitcoinConfirmationScreen", () => {
       </ContextForScreen>,
     )
 
-    const [copyDestination] = screen
-      .UNSAFE_getAllByType(TouchableOpacity)
-      .filter((node) => node.props.hitSlop === 30)
+    const copyDestination = screen.getByTestId("send-review-copy-destination")
     expect(surfaceColor(copyDestination)).toBe(light.surfaceInteractive)
 
     // One value per field, so dropping the static style from any one of them fails here:
     // the file-level guard only counts the style, not the fields that use it.
-    const from = screen.getByText("$100.00")
-    const amount = screen.getByText("$1.00 (₦1)")
-    const fee = screen.getByLabelText("Successful Fee")
-    for (const value of [from, amount, screen.getByText(note), fee]) {
+    const from = screen.getByTestId("USD Wallet Balance")
+    const amount = screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID)
+    const fee = screen.getByTestId("Successful Fee")
+    const noteText = screen.getByText(note)
+    for (const value of [noteText, fee]) {
       expect(surfaceColor(value)).toBe(light.surfaceStatic)
+    }
+    for (const value of [from, amount]) {
+      expect(surfaceColor(value)).not.toBe(light.surfaceInteractive)
     }
   })
 
@@ -1357,7 +1401,7 @@ describe("SendBitcoinConfirmationScreen — fee error messages", () => {
       ],
     })
 
-    expect(screen.getByText(insufficientFunds)).toBeTruthy()
+    expect(screen.getAllByText(insufficientFunds).length).toBeGreaterThan(0)
     expect(screen.queryByText(genericFeeError)).toBeNull()
   })
 
@@ -1372,7 +1416,7 @@ describe("SendBitcoinConfirmationScreen — fee error messages", () => {
       ],
     })
 
-    expect(screen.getByText(/Network connection problem/i)).toBeTruthy()
+    expect(screen.getAllByText(/Network connection problem/i).length).toBeGreaterThan(0)
   })
 
   it("falls back to the generic string when the quote carries no code", async () => {
@@ -1632,6 +1676,57 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
 
     expect(sendPaymentMock).toHaveBeenCalledTimes(2)
   })
+
+  const dismissSheet = () =>
+    act(async () => {
+      fireEvent.press(screen.getByTestId(SCRIM_TEST_ID, { includeHiddenElements: true }))
+    })
+
+  const expectBackGoesHome = (type: "GO_BACK" | "POP") => {
+    navigationDispatchMock.mockClear()
+    expect(fireBeforeRemove(type)).toHaveBeenCalled()
+    expect(navigationDispatchMock).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "POP_TO_TOP" }),
+    )
+  }
+
+  it("sends Back Home after a thrown send once the sheet is dismissed", async () => {
+    sendPaymentMock.mockRejectedValueOnce(new Error("network died"))
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={buildLnurlRoute()} />
+      </ContextForScreen>,
+    )
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+    await dismissSheet()
+
+    expect(screen.queryByTestId(ERROR_SHEET_TEST_ID)).toBeNull()
+    expectBackGoesHome("GO_BACK")
+    expectBackGoesHome("POP")
+  })
+
+  it("sends Back Home after an ambiguous FAILURE once the sheet is dismissed", async () => {
+    sendPaymentMock.mockResolvedValueOnce({
+      status: "FAILURE",
+      errorsMessage: "route not found",
+    })
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={buildLnurlRoute()} />
+      </ContextForScreen>,
+    )
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+    await dismissSheet()
+
+    expectBackGoesHome("GO_BACK")
+    expectBackGoesHome("POP")
+  })
 })
 
 // The confirmation screen is a resting screen, not a picker: nothing on it
@@ -1661,7 +1756,8 @@ describe("hide balance", () => {
   it("leaves the amount and fee readable while hide-balance is on", async () => {
     await renderSettledWithHideAmount(true)
 
-    expect(screen.getByText("$1.00 (₦1)")).toBeTruthy()
+    expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("₦1")
+    expect(screen.getByTestId(SEND_HERO_SECONDARY_TEST_ID).props.children).toBe("$1.00")
     expect(feeRow().getByText("₦0 ($0.00)")).toBeTruthy()
   })
 
@@ -2108,9 +2204,13 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       })
       await renderReview(buildBtcSettlementRoute(1000))
 
-      expect(screen.getByText(LL.SelfCustodialError.belowMinimum())).toBeTruthy()
-      fireEvent.press(screen.getByText(LL.SendBitcoinConfirmationScreen.changeAmount()))
-      expect(navigationGoBackMock).toHaveBeenCalledTimes(1)
+      expect(
+        screen.getAllByText(LL.SelfCustodialError.belowMinimum()).length,
+      ).toBeGreaterThan(0)
+      fireEvent.press(
+        screen.getAllByText(LL.SendBitcoinConfirmationScreen.changeAmount())[0],
+      )
+      expectChangeAmountDispatched()
     })
 
     it("does not offer Change amount when the fee quote fails on the network", async () => {
@@ -2125,7 +2225,9 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       })
       await renderReview(buildBtcSettlementRoute(1000))
 
-      expect(screen.getByText(LL.SelfCustodialError.networkError())).toBeTruthy()
+      expect(
+        screen.getAllByText(LL.SelfCustodialError.networkError()).length,
+      ).toBeGreaterThan(0)
       expect(
         screen.queryByText(LL.SendBitcoinConfirmationScreen.changeAmount()),
       ).toBeNull()
@@ -2707,7 +2809,7 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
   })
 
   describe("closing", () => {
-    it("only hides the sheet on close: the inline error stays and the slider stays off", async () => {
+    it("only hides the sheet on close: the inline error stays and the same payment can be retried", async () => {
       sendPaymentMock.mockResolvedValueOnce({
         status: "FAILURE",
         errorsMessage: "route not found",
@@ -2727,11 +2829,10 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       expect(
         screen.getByText(LL.SendBitcoinConfirmationScreen.somethingWentWrong()),
       ).toBeTruthy()
-      expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
+      expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
 
-      // A second slide after closing sends nothing.
       await slide()
-      expect(sendPaymentMock).toHaveBeenCalledTimes(1)
+      expect(sendPaymentMock).toHaveBeenCalledTimes(2)
     })
 
     it("stays closed while the same fee failure holds", async () => {

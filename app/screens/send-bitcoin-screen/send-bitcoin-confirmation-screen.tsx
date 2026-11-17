@@ -245,7 +245,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     hasAttemptedSend,
     isSendSpent,
   } = useSendPayment(sendPaymentMutation, paymentDetail.idempotencyKeyRef)
-  useHomeOnBackWhenSpent(isSendSpent)
+  /** sendLocked clears so the same key can be retried. A home outcome may still have
+   *  landed, so Back stays on Home after the sheet is dismissed. */
+  useHomeOnBackWhenSpent(isSendSpent || paymentFailure?.action === "home")
 
   // What the recipient gets: the amount less the fee, when the fee comes out of it.
   const displayAmount = paymentDetail.convertMoneyAmount(recipientAmount, DisplayCurrency)
@@ -364,7 +366,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
       /** Pending is not a success: no success haptic, and no Sent. */
       resetToCompleted(params)
-      haptics.success()
       saveContact()
     },
     [

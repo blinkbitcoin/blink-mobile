@@ -262,6 +262,9 @@ export const useSendPayment = (
    * the rest of the mount regardless.
    */
   const [sendLocked, setSendLocked] = useState(false)
+  /** A network attempt whose outcome is unknown. Stays set after sendLocked clears, so
+   *  Back cannot build a new payment while a retry of this one is still allowed. */
+  const [mayHaveLanded, setMayHaveLanded] = useState(false)
   // Tracks loading for mutations that bypass Apollo (e.g. self-custodial SDK calls)
   // so the UI still gets a loading signal while the mutation is in-flight.
   const [localLoading, setLocalLoading] = useState(false)
@@ -352,6 +355,7 @@ export const useSendPayment = (
               errorsMessage = getErrorMessages(errors)
             }
             if (status === PaymentSendResult.Failure) {
+              if (!isNothingSentFailure(errorsMessage)) setMayHaveLanded(true)
               setSendLocked(false)
             }
             return { status, errorsMessage, extraInfo, transaction }
@@ -359,6 +363,10 @@ export const useSendPayment = (
             // A throw is precisely the ambiguous case — the request may have landed. Let
             // the user attempt again under the same key, so a true duplicate comes back
             // as a 409 the screen can resolve, instead of dead-ending on a live payment.
+            // Back stays locked unless the throw is classified as raised before the send.
+            if (!(err instanceof Error && isNothingSentFailure(err.message))) {
+              setMayHaveLanded(true)
+            }
             setSendLocked(false)
             throw err
           } finally {
@@ -383,7 +391,7 @@ export const useSendPayment = (
 
   return {
     hasAttemptedSend,
-    isSendSpent: hasAttemptedSend && sendLocked,
+    isSendSpent: (hasAttemptedSend && sendLocked) || mayHaveLanded,
     loading,
     sendPayment,
   }
