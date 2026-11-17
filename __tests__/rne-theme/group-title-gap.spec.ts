@@ -133,6 +133,12 @@ describe("group title", () => {
     )
   })
 
+  it("SettingsGroup titles are Paragraph 14/20", () => {
+    const title = styleBlock("app/screens/settings-screen/group.tsx", "title")
+    expect(title).toMatch(/^\s*fontSize: 14,$/m)
+    expect(title).toMatch(/^\s*lineHeight: 20,$/m)
+  })
+
   it("SettingsGroup applies its title style before the caller's", () => {
     expect(source("app/screens/settings-screen/group.tsx")).toContain(
       "style={[styles.title, titleStyle]}",
