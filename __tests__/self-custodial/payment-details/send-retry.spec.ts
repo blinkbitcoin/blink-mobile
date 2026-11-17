@@ -928,7 +928,11 @@ describe("sends to one destination", () => {
     mockSendPayment.mockImplementationOnce(() => inFlight.promise)
     mockFindLostSend
       .mockResolvedValueOnce({ status: "not-found", failed: [] })
-      .mockResolvedValueOnce({ status: "found", payment: { id: "paid-a" }, failed: [] })
+      .mockResolvedValueOnce({
+        status: "found",
+        payment: heldPayment("paid-a", BigInt(1000), "hash-a"),
+        failed: [],
+      })
     const first = {}
     const second = {}
 
@@ -1088,7 +1092,7 @@ describe("a same-key retry whose quote fails", () => {
   it("reports the lost attempt's payment when the wallet holds it", async () => {
     mockFindLostSend.mockResolvedValue({
       status: "found",
-      payment: { id: "p1" },
+      payment: heldPayment("p1", BigInt(1000), "hash-1"),
       failed: [],
     })
 
@@ -1584,6 +1588,41 @@ describe("a lost attempt found by a send asked for another amount", () => {
     })
   })
 
+  /** Two attempts at the same amount, each by its own invoice: the payment of one says
+   *  nothing of the other, which is looked for again before the next send goes out. */
+  it("keeps another attempt for the same amount when it finds this send's payment", async () => {
+    mockSendPayment.mockRejectedValue(lostResponse())
+    mockFindLostSend.mockResolvedValue({ status: "not-found", failed: [] })
+    await lostUsdAttempt("USD:100", "hash-a")
+    await lostUsdAttempt("USD:100", "hash-b")
+    const sendFinding = (payment: ReturnType<typeof heldPayment>) => {
+      mockFindLostSend.mockResolvedValueOnce({ status: "found", payment, failed: [] })
+      mockPrepareSendPayment.mockResolvedValueOnce(usdQuote("hash-c"))
+      const ref = {}
+      return attempt(
+        createSendMutation(usdLightning, {
+          telemetry: TELEMETRY,
+          idempotencyKeyRef: ref,
+          requestedAs: asked("USD:100"),
+        }),
+        ref,
+        NEXT_KEY,
+      )
+    }
+
+    const first = await sendFinding(heldPayment("p-b", BigInt(100), "hash-b"))
+    const keptAfterFirst = lostAttemptsTo("lnbc1...").lostSend?.paymentHashes
+    const second = await sendFinding(heldPayment("p-a", BigInt(100), "hash-a"))
+
+    expect(keptAfterFirst).toEqual(["hash-a"])
+    expect([first.status, second.status]).toEqual([
+      PaymentSendResult.Success,
+      PaymentSendResult.Success,
+    ])
+    expect(mockSendPayment).toHaveBeenCalledTimes(2)
+    expect(lostAttemptsTo("lnbc1...")).toEqual({})
+  })
+
   it("settles a lost Spark invoice attempt with the payment found for this send", async () => {
     mockPrepareSendPayment.mockResolvedValue(sparkInvoice("spark1inv", "usdb-token-id"))
     mockSendPayment.mockRejectedValue(lostResponse())
@@ -1671,6 +1710,25 @@ describe("a lost attempt found by a send asked for another amount", () => {
 
     expect(result.status).toBe(PaymentSendResult.Success)
     expect(lostAttemptsTo("lnbc1...").lostSend?.paymentHashes).toEqual(["hash-b"])
+  })
+
+  /** The look before it went out found nothing of the earlier attempt: found to have gone
+   *  out after all, the send settles it just as it would have had its answer come back. */
+  it("settles what it went out past when the send that threw finds its own payment", async () => {
+    mockSendPayment.mockRejectedValue(lostResponse())
+    mockFindLostSend.mockResolvedValueOnce({ status: "not-found", failed: [] })
+    await lostUsdAttempt("USD:1000", "hash-a")
+
+    mockFindLostSend.mockResolvedValueOnce({ status: "not-found", failed: [] })
+    mockFindLostSend.mockResolvedValueOnce({
+      status: "found",
+      payment: heldPayment("p-b", BigInt(1000), "hash-b"),
+      failed: [],
+    })
+    const result = await lostUsdAttempt("USD:1000", "hash-b")
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(lostAttemptsTo("lnbc1...")).toEqual({})
   })
 
   it("reports the send itself when the send that threw finds its own payment", async () => {

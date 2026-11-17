@@ -410,7 +410,8 @@ const requestOf = (lost: LostSend, payment: Payment): RequestedAs | undefined =>
 }
 
 /** What a payment found in the wallet accounts for among lost attempts: the attempt that
- *  paid its own invoice, by its payment hash or Spark invoice, and no other. */
+ *  paid its own invoice, by its payment hash or Spark invoice, and no other. Any other
+ *  attempt, for whatever amount, may have paid as well. */
 const onlyAttemptOf = (payment: Payment): SettledAttempts => ({
   lostSend: {
     startedAtMs: 0,
@@ -419,25 +420,6 @@ const onlyAttemptOf = (payment: Payment): SettledAttempts => ({
     sparkInvoices: withItem([], sparkInvoiceOf(payment)),
   },
 })
-
-/** What a payment found for this send accounts for among lost attempts: every attempt
- *  made for it, but none asked for another amount, which may have paid as well. */
-const attemptsOfThisSend = (
-  lost: LostSend,
-  request: RequestedAs | undefined,
-): SettledAttempts => {
-  const isOfThisSend = (identityKey: string) =>
-    !isAnotherSendThan(lost.requestedAs?.[identityKey], request)
-  return {
-    lostSend: {
-      ...lost,
-      paymentHashes: lost.paymentHashes.filter((hash) => isOfThisSend(`hash:${hash}`)),
-      sparkInvoices: lost.sparkInvoices.filter((invoice) =>
-        isOfThisSend(`invoice:${invoice}`),
-      ),
-    },
-  }
-}
 
 /**
  * An earlier attempt's payment to the destination, made for another amount: reported as
@@ -649,11 +631,11 @@ const sendAfterEarlierAttempts = async <
   /**
    * The wallet's record of a send an earlier attempt or this one made, with the telemetry
    * of the attempt that paid it (asked for `foundRequest`). For this send, it is reported
-   * as the send, and every attempt it was looked for over is settled with it
-   * (`settleAsThisSend`). Made for another amount, it is reported as the earlier payment
-   * it is (`asEarlierSend`, by default), and settles only its own attempt
-   * (`settleAsEarlierSend`): every other one may have paid too, and stays to be looked
-   * for before anything more goes out.
+   * as the send (`settleAsThisSend`); made for another amount, as the earlier payment it
+   * is (`asEarlierSend`, by default; `settleAsEarlierSend`). Either way it settles its own
+   * attempt, and no other: every other one may have paid too, and stays to be looked for
+   * before anything more goes out. Only this send, found to have gone out, also settles
+   * what it went out past, as it would have had its answer come back.
    */
   const reportFound = (
     payment: Payment,
@@ -774,10 +756,13 @@ const sendAfterEarlierAttempts = async <
     }
     lookedFor = { ...lookedFor, lostSend: earlier }
     if (look.status === "found") {
+      /** Nothing goes out, so the payment found settles its own attempt and no other,
+       *  whichever send it is reported as. */
+      const settleItsAttempt = () => settle(onlyAttemptOf(look.payment))
       return reportFound(look.payment, {
         foundRequest: requestOf(earlier, look.payment),
-        settleAsThisSend: () => settle(attemptsOfThisSend(earlier, requestedAs)),
-        settleAsEarlierSend: () => settle(onlyAttemptOf(look.payment)),
+        settleAsThisSend: settleItsAttempt,
+        settleAsEarlierSend: settleItsAttempt,
       })
     }
     return undefined
