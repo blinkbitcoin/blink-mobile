@@ -4106,7 +4106,12 @@
         "pickBackupTitle": "Choose a wallet",
         "pickBackupDescription": "Select a backup to restore",
         "recognizePhraseTitle": "Do you recognize this backup phrase?",
-        "recognizePhraseBody": "Never enter words someone else sent you."
+        "recognizePhraseBody": "Never enter words someone else sent you.",
+        "scanSeedQr": "Scan SeedQR",
+        "seedQrInvalid": "This SeedQR isn't a valid backup phrase.",
+        "seedQrOnly12Words": "Blink restores 12-word backup phrases only.",
+        "seedQrNotSeedQr": "This isn't a valid SeedQR.",
+        "seedQrUnreadable": "Couldn't read this SeedQR. Try again."
     },
     "EmergencyRecovery": {
         "outageTitle": "Operator unreachable",

@@ -1,4 +1,5 @@
 export { RestorePhraseScreen } from "./restore-phrase-screen"
 export { RestoreMethodScreen } from "./restore-method-screen"
 export { CloudRestoreScreen } from "./cloud-restore-screen"
+export { SeedQrScannerScreen } from "./seed-qr-scanner-screen"
 export { OperatorUnreachableScreen } from "./emergency/operator-unreachable-screen"
