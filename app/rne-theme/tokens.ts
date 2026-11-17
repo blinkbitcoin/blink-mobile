@@ -17,3 +17,7 @@ export const radius = {
   lg: 16,
   full: 999,
 } as const
+
+// Space between a group or section title and the card or list it labels.
+// Not for field labels or other 3px spacing (blink-wip#2107).
+export const groupTitleGap = spacing.sm

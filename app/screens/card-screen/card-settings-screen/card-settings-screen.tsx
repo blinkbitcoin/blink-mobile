@@ -17,6 +17,7 @@ import { isIos } from "@app/utils/helper"
 import { useCardData } from "@app/hooks"
 import { CloseCardModal } from "./close-card-modal"
 import { NotificationCategory, useCloseCardAccount, useNotificationToggle } from "./hooks"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 export const CardSettingsScreen: React.FC = () => {
   const styles = useStyles()
@@ -254,10 +255,10 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 20,
   },
   notificationsSection: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   supportSection: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   sectionTitle: {
     color: colors.textOnBackground,
@@ -274,7 +275,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginHorizontal: 22,
   },
   dangerZoneSection: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   dangerZoneTitle: {
     color: colors.error,

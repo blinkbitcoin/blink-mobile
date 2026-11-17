@@ -15,6 +15,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { openExternalUrl } from "@app/utils/external"
 import { staticSurface } from "@app/rne-theme/surfaces"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 type Fee = {
   title: string
@@ -220,7 +221,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.textSecondary,
   },
   section: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   sectionLabel: {
     fontSize: 14,

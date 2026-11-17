@@ -6,6 +6,7 @@ import { makeStyles, useTheme, Text, Divider } from "@rn-vui/themed"
 import { radius } from "@app/rne-theme/radius"
 import { DisabledFeature } from "@app/components/disabled-feature"
 import { testProps } from "@app/utils/testProps"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 type SettingsGroupProps = {
   name?: string
@@ -70,7 +71,7 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   groupCard: {
-    marginTop: 5,
+    marginTop: groupTitleGap,
     backgroundColor: colors.surfaceInteractive,
     borderRadius: radius.default,
     overflow: "hidden",

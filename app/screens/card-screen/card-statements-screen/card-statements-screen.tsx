@@ -10,6 +10,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { staticSurface } from "@app/rne-theme/surfaces"
 
 import { useStatementsData } from "./hooks"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 export const CardStatementsScreen: React.FC = () => {
   const styles = useStyles()
@@ -196,7 +197,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 20,
   },
   section: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   sectionLabel: {
     color: colors.textOnBackground,

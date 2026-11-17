@@ -1,10 +1,11 @@
 import { makeStyles } from "@rn-vui/themed"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 import { radius } from "@app/rne-theme/radius"
 
 export const useSharedStepStyles = makeStyles(({ colors }) => ({
   section: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   sectionTitle: {
     color: colors.textOnBackground,
