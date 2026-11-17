@@ -105,6 +105,23 @@ describe("decodeSeedQr", () => {
     })
   })
 
+  it("does not import a seed when a URL is paired with hostile raw bytes", () => {
+    const text = "https://blink.sv"
+    const hostile = new Uint8Array(16).fill(0xff)
+    expect(decodeSeedQr({ text, rawBytes: hostile })).toEqual({
+      status: SeedQrStatus.NotSeedQr,
+    })
+    expect(Object.keys(decodeSeedQr({ text, rawBytes: hostile }))).toEqual(["status"])
+  })
+
+  it("does not treat URL packaging padded to 32 bytes as a 24-word seed", () => {
+    const url = Uint8Array.from(Buffer.from("https://blink.sv", "utf8"))
+    const packed = byteModeBitstream(url)
+    const padded = new Uint8Array(32)
+    padded.set(packed)
+    expect(decodeSeedQr({ rawBytes: padded })).toEqual({ status: SeedQrStatus.NotSeedQr })
+  })
+
   it("rejects ordinary QR content as not a SeedQR", () => {
     const text = "lnbc1500n1pj9xexampleinvoice"
     expect(

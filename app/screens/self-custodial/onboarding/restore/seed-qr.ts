@@ -88,8 +88,16 @@ export const decodeSeedQr = ({
 }): SeedQrResult => {
   if (text && /^\d+$/.test(text)) return decodeStandard(text)
 
+  // A CompactSeedQR has no readable text. A URL, invoice or address must not be
+  // recovered from its raw bytes: those can be 16 bytes and otherwise look like entropy.
+  if (text && !NON_PRINTABLE.test(text)) return { status: SeedQrStatus.NotSeedQr }
+
   if (rawBytes) {
-    for (const candidate of [rawBytes, bytesFromBitstream(rawBytes)]) {
+    const bitstream = bytesFromBitstream(rawBytes)
+    // Byte-mode packaging of a text payload. Do not treat that packaging as entropy.
+    if (bitstream && isPrintableText(bitstream)) return { status: SeedQrStatus.NotSeedQr }
+
+    for (const candidate of [rawBytes, bitstream]) {
       const result = candidate && decodeCompact(candidate)
       if (result) return result
     }
