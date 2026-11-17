@@ -400,29 +400,36 @@ const withoutAttempt = <L extends LostConversionLook>(
 type SettledByLook = { left: LostConversion | undefined; isSurelyThis: boolean }
 
 /**
- * What a look for this conversion, lost as it went out, settles. A delivery of it settles
- * this attempt, the latest, and only it, since another lost attempt may still deliver;
- * and it is surely this one's only while no attempt left could have delivered it as well.
- * What an earlier attempt delivered is not looked for again, and this one still is.
+ * What a look for this conversion, lost as it went out, settles: the attempt the delivery
+ * it found is for, by the same rule as the look before a conversion (`settledAttemptOf`),
+ * and only that one. The delivery is this conversion's only when that attempt is this
+ * one, it is this conversion by what it paid in, and no attempt left could have delivered
+ * it as well. A delivery the rule gives to no attempt, or gives to this one while what it
+ * paid in says otherwise, settles nothing and stays unknown: the next look finds it again
+ * and settles it then, telling the user, rather than hiding it here.
  */
 const settledByLook = (
   look: LostSendLookup,
   lost: LostConversion,
-  isThisConversion: (payment: Payment) => boolean,
+  {
+    isAutomatic,
+    isThisConversion,
+  }: { isAutomatic: boolean; isThisConversion: (payment: Payment) => boolean },
 ): SettledByLook => {
-  if (look.status !== "found") return { left: lost, isSurelyThis: false }
+  const nothingSettled = { left: lost, isSurelyThis: false }
+  if (look.status !== "found") return nothingSettled
   const { payment } = look
-  if (!isThisConversion(payment)) {
-    const knownPaymentIds = [...lost.knownPaymentIds, payment.id]
-    return { left: { ...lost, knownPaymentIds }, isSurelyThis: false }
-  }
-  const thisAttempt = lost.expectedDeliveries.length - 1
-  const left = withoutAttempt(lost, thisAttempt, payment)
+  const settled = settledAttemptOf(lost, payment, isAutomatic)
+  if (settled === undefined) return nothingSettled
+  const isThisAttempt = settled === lost.expectedDeliveries.length - 1
+  const isPaidInOtherwise = isThisAttempt && !isThisConversion(payment)
+  if (isPaidInOtherwise) return nothingSettled
+  const left = withoutAttempt(lost, settled, payment)
   const canBeAnotherAttempts =
     left?.expectedDeliveries.some((delivery) =>
       isDeliveryAsExpected(payment, delivery),
     ) ?? false
-  return { left, isSurelyThis: !canBeAnotherAttempts }
+  return { left, isSurelyThis: isThisAttempt && !canBeAnotherAttempts }
 }
 
 /**
@@ -601,7 +608,10 @@ const convertAfterEarlierConversions = async (
      *  earlier mark: either may have delivered by now. What was stored ahead stays
      *  stored meanwhile, and is taken back only once what the look leaves is held. */
     const look = await findLostConversion({ sdk, lost })
-    const { left, isSurelyThis } = settledByLook(look, lost, isThisConversion)
+    const { left, isSurelyThis } = settledByLook(look, lost, {
+      isAutomatic,
+      isThisConversion,
+    })
     keepLost(left)
     writtenAhead.end()
     if (isSurelyThis) {
