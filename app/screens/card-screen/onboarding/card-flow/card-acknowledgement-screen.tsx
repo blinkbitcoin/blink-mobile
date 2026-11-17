@@ -3,6 +3,7 @@ import { View } from "react-native"
 import {
   CommonActions,
   RouteProp,
+  useFocusEffect,
   useNavigation,
   useRoute,
 } from "@react-navigation/native"
@@ -20,6 +21,9 @@ import { openExternalUrl } from "@app/utils/external"
 import { toastShow } from "@app/utils/toast"
 
 import { useCardApplicationSubmit } from "./use-card-application-submit"
+
+/** One press of Accept, set aside when the user leaves the step before it answers. */
+type SendAttempt = { isAbandoned: boolean }
 
 export const CardAcknowledgementScreen: React.FC = () => {
   const styles = useStyles()
@@ -50,11 +54,27 @@ export const CardAcknowledgementScreen: React.FC = () => {
   const isAcceptDisabled = !areAllTermsAccepted
 
   const isAcceptingRef = React.useRef(false)
+  /** The press still waiting for its answer, if any. */
+  const pendingSendRef = React.useRef<SendAttempt | null>(null)
+
+  /** Leaving the step, by closing it or going back, sets the pending send aside: its late
+   *  answer must not reset the stack or show a toast over wherever the user went. The
+   *  application still goes out, and the bulletin tells the user how it ends. */
+  useFocusEffect(
+    React.useCallback(
+      () => () => {
+        const pendingSend = pendingSendRef.current
+        if (pendingSend) pendingSend.isAbandoned = true
+      },
+      [],
+    ),
+  )
 
   /** The application is sent, so the onboarding steps leave the stack: going back from
    *  the wait lands on Home rather than on a step that would send it again. */
-  const sendApplication = async () => {
+  const sendApplication = async (attempt: SendAttempt) => {
     const applicationId = await submitApplication(answers)
+    if (attempt.isAbandoned) return
     if (!applicationId) {
       toastShow({ message: LL.errors.unexpectedError(), LL })
       return
@@ -75,8 +95,12 @@ export const CardAcknowledgementScreen: React.FC = () => {
   const handleAccept = () => {
     if (isAcceptingRef.current) return
     isAcceptingRef.current = true
-    sendApplication().finally(() => {
+    const attempt: SendAttempt = { isAbandoned: false }
+    pendingSendRef.current = attempt
+    sendApplication(attempt).finally(() => {
       isAcceptingRef.current = false
+      const isStillPending = pendingSendRef.current === attempt
+      if (isStillPending) pendingSendRef.current = null
     })
   }
 

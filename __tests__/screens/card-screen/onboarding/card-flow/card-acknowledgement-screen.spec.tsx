@@ -30,14 +30,24 @@ const ANSWERS = {
   expectedMonthlyVolume: "1,000 - 1,999",
 }
 
+/** Leaving the step runs the focus effect's cleanup, as a blur or an unmount would. */
+let mockLeaveStep: () => void = () => {}
+
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
+  const { useEffect } = jest.requireActual("react")
   return {
     ...actualNav,
     useNavigation: () => ({
       dispatch: mockDispatch,
     }),
     useRoute: () => ({ params: ANSWERS }),
+    useFocusEffect: (effect: () => (() => void) | undefined) =>
+      useEffect(() => {
+        const cleanup = effect()
+        mockLeaveStep = () => cleanup?.()
+        return cleanup
+      }, [effect]),
   }
 })
 
@@ -245,6 +255,43 @@ describe("CardAcknowledgementScreen", () => {
 
     expect(mockSubmitApplication).toHaveBeenCalledTimes(1)
     expect(mockDispatch).toHaveBeenCalledTimes(1)
+  })
+
+  describe("when the user leaves before the application answers", () => {
+    const acceptAndLeave = async () => {
+      let finishSending: (applicationId: string | null) => void = () => {}
+      mockSubmitApplication.mockReturnValue(
+        new Promise<string | null>((resolve) => {
+          finishSending = resolve
+        }),
+      )
+      await acceptAll()
+      act(() => {
+        mockLeaveStep()
+      })
+      return finishSending
+    }
+
+    it("leaves the stack alone when the application lands", async () => {
+      const finishSending = await acceptAndLeave()
+
+      await act(async () => {
+        finishSending("application-1")
+      })
+
+      expect(mockDispatch).not.toHaveBeenCalled()
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
+    it("shows no toast over another screen when the application fails", async () => {
+      const finishSending = await acceptAndLeave()
+
+      await act(async () => {
+        finishSending(null)
+      })
+
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
   })
 
   it("lets the user try again after a failed send", async () => {
