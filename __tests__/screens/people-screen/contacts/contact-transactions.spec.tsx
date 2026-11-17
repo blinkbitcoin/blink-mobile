@@ -9,6 +9,7 @@ import { TRANSACTION_LIST_WINDOW_SIZE } from "@app/components/transaction-item"
 import { TxStatus, UserContact } from "@app/graphql/generated"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { radius } from "@app/rne-theme/radius"
 import theme from "@app/rne-theme/theme"
 import { ContactTransactions } from "@app/screens/people-screen/contacts/contact-transactions"
 import { AccountType } from "@app/types/wallet"
@@ -118,9 +119,6 @@ const contact: UserContact = {
   alias: "Alice",
   transactionsCount: 2,
 }
-
-/** The radius the date group's card carries, mirrored from the screen's own token. */
-const GROUP_RADIUS = 8
 
 const makeFragment = (id: string) => ({
   __typename: "Transaction" as const,
@@ -465,15 +463,16 @@ describe("ContactTransactions", () => {
         return StyleSheet.flatten(node?.props.style)
       }
 
+      expect(radius.default).toBe(12)
       expect(cornersOf("first-tx")).toEqual({
-        borderTopLeftRadius: GROUP_RADIUS,
-        borderTopRightRadius: GROUP_RADIUS,
+        borderTopLeftRadius: radius.default,
+        borderTopRightRadius: radius.default,
         overflow: "hidden",
       })
       expect(cornersOf("middle-tx")).toEqual({})
       expect(cornersOf("last-tx")).toEqual({
-        borderBottomLeftRadius: GROUP_RADIUS,
-        borderBottomRightRadius: GROUP_RADIUS,
+        borderBottomLeftRadius: radius.default,
+        borderBottomRightRadius: radius.default,
         overflow: "hidden",
       })
     })

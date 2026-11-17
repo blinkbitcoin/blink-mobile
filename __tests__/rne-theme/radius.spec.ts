@@ -1,19 +1,173 @@
 import { readdirSync, readFileSync, statSync } from "fs"
 import { join, relative } from "path"
+import * as ts from "typescript"
 
 import { radius } from "@app/rne-theme/radius"
 
 /**
  * Cards, inputs, non-pill buttons, banners, toasts and list rows take their corners from
  * `radius.default` (blink-wip#2106). 8 is deprecated and 10 was an undocumented near-miss,
- * so a literal 8 or 10 is allowed only on the pills, tags, badges and one-offs below.
+ * so an 8 or 10 corner — a literal, or a simple const that holds one — is allowed only on
+ * the pills, tags, badges and one-offs below. Token counts are radius properties, not
+ * string mentions, so a comment or an unused `radius.default` does not satisfy them.
  * The artifact under test is the style source, so source-coupling here is intentional.
  */
 
 const REPO_ROOT = join(__dirname, "..", "..")
 const APP_DIR = join(REPO_ROOT, "app")
-// A literal 8 or 10 on any corner, outside a comment.
-const OFF_SCALE = /^(?!\s*(\/\/|\/?\*)).*\bborder\w*Radius:[^,]*?\b(8|10)\b/
+const RADIUS_PROPERTY = /^border\w*Radius$/
+
+type Binding = "off-scale" | "token" | "popup" | "other"
+type Scope = Map<string, Binding>
+type RadiusHits = { offScale: number; token: number; popup: number }
+
+const emptyHits = (): RadiusHits => ({ offScale: 0, token: 0, popup: 0 })
+
+const statementsOf = (node: ts.Node): readonly ts.Statement[] | undefined => {
+  if (ts.isSourceFile(node) || ts.isModuleBlock(node) || ts.isBlock(node)) {
+    return node.statements
+  }
+  if (ts.isCaseClause(node) || ts.isDefaultClause(node)) return node.statements
+  return undefined
+}
+
+const unwrap = (expr: ts.Expression): ts.Expression => {
+  if (
+    ts.isParenthesizedExpression(expr) ||
+    ts.isAsExpression(expr) ||
+    ts.isSatisfiesExpression(expr) ||
+    ts.isNonNullExpression(expr) ||
+    ts.isTypeAssertionExpression(expr)
+  ) {
+    return unwrap(expr.expression)
+  }
+  return expr
+}
+
+const numericBinding = (value: number): Binding =>
+  value === 8 || value === 10 ? "off-scale" : "other"
+
+const radiusMember = (expr: ts.PropertyAccessExpression): Binding => {
+  if (!ts.isIdentifier(expr.expression) || expr.expression.text !== "radius") {
+    return "other"
+  }
+  if (expr.name.text === "default") return "token"
+  if (expr.name.text === "popup") return "popup"
+  return "other"
+}
+
+const lookup = (name: string, scopes: Scope[]): Binding => {
+  for (const scope of [...scopes].reverse()) {
+    const found = scope.get(name)
+    if (found) return found
+  }
+  return "other"
+}
+
+const directBinding = (expr: ts.Expression): Binding | undefined => {
+  const value = unwrap(expr)
+  if (ts.isNumericLiteral(value)) return numericBinding(Number(value.text))
+  if (ts.isPropertyAccessExpression(value)) {
+    const member = radiusMember(value)
+    return member === "other" ? undefined : member
+  }
+  return undefined
+}
+
+const variableDeclarations = (node: ts.Node): readonly ts.VariableDeclaration[] =>
+  (statementsOf(node) ?? []).flatMap((statement) =>
+    ts.isVariableStatement(statement) ? [...statement.declarationList.declarations] : [],
+  )
+
+const bindBlock = (node: ts.Node, scope: Scope, parents: Scope[]) => {
+  const declarations = variableDeclarations(node).filter(
+    (
+      declaration,
+    ): declaration is ts.VariableDeclaration & {
+      name: ts.Identifier
+      initializer: ts.Expression
+    } => ts.isIdentifier(declaration.name) && declaration.initializer !== undefined,
+  )
+  declarations.forEach((declaration) => {
+    const binding = directBinding(declaration.initializer)
+    if (binding) scope.set(declaration.name.text, binding)
+  })
+  declarations.forEach((declaration) => {
+    const initializer = unwrap(declaration.initializer)
+    if (!ts.isIdentifier(initializer)) return
+    scope.set(declaration.name.text, lookup(initializer.text, [...parents, scope]))
+  })
+}
+
+const resolveExpression = (expr: ts.Expression, scopes: Scope[]): Binding => {
+  const value = unwrap(expr)
+  if (ts.isNumericLiteral(value)) return numericBinding(Number(value.text))
+  if (ts.isIdentifier(value)) return lookup(value.text, scopes)
+  if (ts.isPropertyAccessExpression(value)) return radiusMember(value)
+  return "other"
+}
+
+const isValueJoin = (kind: ts.SyntaxKind) =>
+  kind === ts.SyntaxKind.AmpersandAmpersandToken ||
+  kind === ts.SyntaxKind.BarBarToken ||
+  kind === ts.SyntaxKind.QuestionQuestionToken
+
+const noteRadius = (expr: ts.Expression, scopes: Scope[], hits: RadiusHits) => {
+  const value = unwrap(expr)
+  if (ts.isConditionalExpression(value)) {
+    noteRadius(value.whenTrue, scopes, hits)
+    noteRadius(value.whenFalse, scopes, hits)
+    return
+  }
+  if (ts.isBinaryExpression(value) && isValueJoin(value.operatorToken.kind)) {
+    noteRadius(value.left, scopes, hits)
+    noteRadius(value.right, scopes, hits)
+    return
+  }
+  const binding = resolveExpression(value, scopes)
+  if (binding === "off-scale") hits.offScale += 1
+  if (binding === "token") hits.token += 1
+  if (binding === "popup") hits.popup += 1
+}
+
+const propertyName = (name: ts.PropertyName): string | undefined => {
+  if (ts.isIdentifier(name) || ts.isStringLiteral(name)) return name.text
+  return undefined
+}
+
+const visitNode = (node: ts.Node, scopes: Scope[], hits: RadiusHits) => {
+  const statements = statementsOf(node)
+  if (statements) {
+    const scope: Scope = new Map()
+    bindBlock(node, scope, scopes)
+    const next = [...scopes, scope]
+    statements.forEach((statement) => visitNode(statement, next, hits))
+    return
+  }
+  if (ts.isPropertyAssignment(node)) {
+    const name = propertyName(node.name)
+    if (name !== undefined && RADIUS_PROPERTY.test(name)) {
+      noteRadius(node.initializer, scopes, hits)
+      return
+    }
+  }
+  ts.forEachChild(node, (child) => visitNode(child, scopes, hits))
+}
+
+const scanSource = (source: string): RadiusHits => {
+  const file = ts.createSourceFile(
+    "radius-policy.tsx",
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TSX,
+  )
+  const hits = emptyHits()
+  visitNode(file, [], hits)
+  return hits
+}
+
+const scanFile = (file: string): RadiusHits => scanSource(readFileSync(file, "utf8"))
 
 // The radii #2106 left alone, and how many in each file: pills, tags, badges, the 32px
 // icon container, the app-logo tile and a 1px divider.
@@ -83,6 +237,7 @@ const TOKEN_CORNERS: Record<string, number> = {
   "app/components/telegram-login/telegram-button.tsx": 1,
   "app/components/totp-export/totp-copy.tsx": 1,
   "app/components/totp-export/totp-qr.tsx": 1,
+  "app/components/transaction-item/transaction-item.tsx": 2,
   "app/components/unclaimed-deposit-banner/unclaimed-deposit-banner.tsx": 1,
   "app/components/wallet-filter-dropdown/wallet-filter-dropdown.tsx": 1,
   "app/components/wallet-overview/wallet-overview.tsx": 1,
@@ -114,6 +269,7 @@ const TOKEN_CORNERS: Record<string, number> = {
   "app/screens/people-screen/circles/invite-friends-card.tsx": 1,
   "app/screens/people-screen/circles/share-circles-card.tsx": 1,
   "app/screens/people-screen/contacts/all-contacts.tsx": 1,
+  "app/screens/people-screen/contacts/contact-transactions.tsx": 4,
   "app/screens/people-screen/contacts/contacts-card.tsx": 1,
   "app/screens/phone-auth-screen/phone-login-input.tsx": 2,
   "app/screens/phone-auth-screen/phone-login-validation.tsx": 1,
@@ -170,42 +326,63 @@ const sourceFiles = (dir: string): string[] =>
     return /\.tsx?$/.test(name) ? [path] : []
   })
 
+const styleSource = (body: string) => `const styles = { ${body} }`
+
 describe("radius", () => {
   it("rounds the default corner at 12 and a popup at 20", () => {
     expect(radius).toEqual({ default: 12, popup: 20 })
   })
 
   const flagged = [
-    "    borderRadius: 8,",
-    "    borderRadius: 10,",
-    "    borderTopRightRadius: 8,",
-    "      borderRadius: hasSubtitle ? 8 : 0,",
+    styleSource("borderRadius: 8,"),
+    styleSource("borderRadius: 10,"),
+    styleSource("borderTopRightRadius: 8,"),
+    styleSource("borderRadius: hasSubtitle ? 8 : 0,"),
+    "/* rationale */ const styles = { borderRadius: 8 }",
+    "const GROUP_RADIUS = 8\nconst styles = { borderTopLeftRadius: GROUP_RADIUS }",
+    "const GROUP_RADIUS = 10\nconst styles = { borderRadius: GROUP_RADIUS }",
   ]
-  flagged.forEach((line) => {
-    it(`flags ${line.trim()}`, () => {
-      expect(OFF_SCALE.test(line)).toBe(true)
+  flagged.forEach((source) => {
+    it(`flags ${source.replace(/\s+/g, " ").trim()}`, () => {
+      expect(scanSource(source).offScale).toBeGreaterThan(0)
     })
   })
 
   const allowed = [
-    "    borderRadius: radius.default,",
-    "    borderRadius: 12,",
-    "    borderRadius: 100,",
-    "    shadowRadius: 8,",
-    "    // borderRadius: 8 was the old default",
+    styleSource("borderRadius: radius.default,"),
+    styleSource("borderRadius: 12,"),
+    styleSource("borderRadius: 100,"),
+    styleSource("shadowRadius: 8,"),
+    "// borderRadius: 8 was the old default",
+    "const decoy = radius.default\n// radius.default\nconst styles = { borderRadius: 12 }",
+    "/* radius.popup */\nconst note = radius.popup\nconst styles = { borderRadius: 16 }",
   ]
-  allowed.forEach((line) => {
-    it(`allows ${line.trim()}`, () => {
-      expect(OFF_SCALE.test(line)).toBe(false)
+  allowed.forEach((source) => {
+    it(`allows ${source.replace(/\s+/g, " ").trim()}`, () => {
+      expect(scanSource(source).offScale).toBe(0)
     })
+  })
+
+  it("does not count a decoy token next to a literal 12 or 16", () => {
+    expect(
+      scanSource(
+        "const decoy = radius.default\n// radius.popup\nconst styles = { borderRadius: 12, borderTopLeftRadius: 16 }",
+      ),
+    ).toEqual({ offScale: 0, token: 0, popup: 0 })
+  })
+
+  it("counts an alias of the token as a token corner, not an 8", () => {
+    expect(
+      scanSource(
+        "const GROUP_RADIUS = radius.default\nconst styles = { borderTopLeftRadius: GROUP_RADIUS }",
+      ),
+    ).toEqual({ offScale: 0, token: 1, popup: 0 })
   })
 
   it("uses 8 or 10 only on the documented pills, tags and badges", () => {
     const counts: Record<string, number> = {}
     sourceFiles(APP_DIR).forEach((file) => {
-      const hits = readFileSync(file, "utf8")
-        .split("\n")
-        .filter((line) => OFF_SCALE.test(line)).length
+      const hits = scanFile(file).offScale
       if (hits) counts[relative(REPO_ROOT, file)] = hits
     })
 
@@ -216,7 +393,7 @@ describe("radius", () => {
     const counts = Object.fromEntries(
       Object.keys(TOKEN_CORNERS).map((file) => [
         file,
-        readFileSync(join(REPO_ROOT, file), "utf8").split("radius.default").length - 1,
+        scanFile(join(REPO_ROOT, file)).token,
       ]),
     )
 
@@ -227,7 +404,7 @@ describe("radius", () => {
     const counts = Object.fromEntries(
       Object.keys(POPUP_CORNERS).map((file) => [
         file,
-        readFileSync(join(REPO_ROOT, file), "utf8").split("radius.popup").length - 1,
+        scanFile(join(REPO_ROOT, file)).popup,
       ]),
     )
 
