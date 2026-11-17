@@ -36,7 +36,7 @@ export const CardDetailsScreen: React.FC = () => {
         subtitle: LL.CardFlow.Onboarding.CardDetails.features.accountManager.subtitle(),
       },
       {
-        icon: "bitcoin" as const,
+        icon: "wallet" as const,
         title: LL.CardFlow.Onboarding.CardDetails.features.onOffRamping(),
         badge: upcomingBadge,
       },

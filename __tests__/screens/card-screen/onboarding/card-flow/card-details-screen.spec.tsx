@@ -49,6 +49,14 @@ describe("CardDetailsScreen", () => {
     expect(getAllByText("in 12 months")).toHaveLength(1)
   })
 
+  it("draws each service with the design's icon", async () => {
+    const { getByTestId } = await renderScreen()
+
+    expect(getByTestId("icon-card")).toBeTruthy()
+    expect(getByTestId("icon-headset")).toBeTruthy()
+    expect(getByTestId("icon-wallet")).toBeTruthy()
+  })
+
   /** Business and virtual accounts are Builder services and up, not Blink Orange's. */
   it("lists none of the higher tiers' accounts", async () => {
     const { queryByText } = await renderScreen()
