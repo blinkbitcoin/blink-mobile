@@ -11,6 +11,7 @@ import { formatDepositFeeTiers } from "@app/utils/deposit-fees"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { SettingsGroup } from "./group"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 gql`
   query feeRates {
@@ -350,15 +351,16 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 20,
   },
   section: {
-    gap: 5,
+    gap: groupTitleGap,
   },
   sectionTitle: {
-    color: colors.textOnBackground,
+    color: colors.textSecondary,
     fontSize: 16,
     fontWeight: "400",
     lineHeight: 24,
   },
   groupCard: {
+    marginTop: 0,
     paddingVertical: 5,
   },
   hiddenDivider: {

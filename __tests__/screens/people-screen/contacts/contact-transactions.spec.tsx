@@ -9,8 +9,10 @@ import { TRANSACTION_LIST_WINDOW_SIZE } from "@app/components/transaction-item"
 import { TxStatus, UserContact } from "@app/graphql/generated"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { light } from "@app/rne-theme/colors"
 import { radius } from "@app/rne-theme/radius"
 import theme from "@app/rne-theme/theme"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 import { ContactTransactions } from "@app/screens/people-screen/contacts/contact-transactions"
 import { AccountType } from "@app/types/wallet"
 
@@ -412,6 +414,25 @@ describe("ContactTransactions", () => {
       while (container && typeof container.type !== "string") container = container.parent
 
       expect(StyleSheet.flatten(container?.props.style)).toMatchObject({ flex: 1 })
+    })
+
+    it("draws the date group title in textSecondary, 5px above the group", () => {
+      mockUseQuery.mockReturnValue(
+        custodialQuery({ edges: [{ node: makeFragment("custodial-tx") }] }),
+      )
+
+      const screen = renderContactTransactions()
+      const list = screen.UNSAFE_getByType(SectionList)
+      const title = list.props.sections[0].title as string
+      const header = list.props.renderSectionHeader({ section: { title } })
+      const rendered = render(header)
+
+      expect(StyleSheet.flatten(rendered.getByText(title).props.style)).toMatchObject({
+        color: light.textSecondary,
+        fontSize: 14,
+        lineHeight: 20,
+        marginBottom: groupTitleGap,
+      })
     })
 
     it("dates every row, so a payment is placed within its day", () => {

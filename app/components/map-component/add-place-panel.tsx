@@ -25,6 +25,7 @@ import { BottomSheet } from "@app/components/bottom-sheet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { fonts } from "@app/rne-theme/fonts"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 // Phosphor draws its X at about 70% of the box, so 24 is what puts the glyph at
 // the 17.5 the design draws in its 20 frame.
@@ -403,7 +404,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     rowGap: 16,
   },
   field: {
-    rowGap: 8,
+    rowGap: groupTitleGap,
   },
   label: {
     fontSize: 14,

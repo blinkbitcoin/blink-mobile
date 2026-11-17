@@ -14,6 +14,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { SettingsGroup } from "../group"
 import { ApiKeySecretReveal } from "./api-key-secret-reveal"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 const MAX_KEY_NAME_LENGTH = 64
 
@@ -123,7 +124,9 @@ export const ApiKeyCreateScreen: React.FC = () => {
         </Text>
 
         <View style={styles.expiry}>
-          <Text type="p3">{LL.ApiScreen.expiry()}</Text>
+          <Text type="p3" color={colors.textSecondary}>
+            {LL.ApiScreen.expiry()}
+          </Text>
           <PercentageSelector
             testIdPrefix="api-key-expiry"
             options={EXPIRY_OPTIONS}
@@ -167,7 +170,7 @@ const useStyles = makeStyles(() => ({
     borderRadius: radius.default,
   },
   expiry: {
-    rowGap: 5,
+    rowGap: groupTitleGap,
   },
   // wraps rather than clips when large accessibility text outgrows a narrow screen
   expiryOptions: {

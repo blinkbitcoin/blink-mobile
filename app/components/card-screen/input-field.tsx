@@ -12,6 +12,7 @@ import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { staticSurface } from "@app/rne-theme/surfaces"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 export const ValueStyle = {
   Bold: "bold",
@@ -177,7 +178,7 @@ export const InputField: React.FC<InputFieldProps> = ({
           )}
         </View>
         {reserveHelperLine && (
-          <View style={styles.helperTextContainer}>
+          <View style={[styles.helperTextContainer, styles.helperSpacing]}>
             {displayHelperText ? (
               <View style={styles.helperTextRow}>
                 {isError && (
@@ -219,7 +220,13 @@ export const InputField: React.FC<InputFieldProps> = ({
       <Text style={styles.label}>{label}</Text>
       {pressableContent}
       {helperText ? (
-        <Text style={[styles.helperText, isError && styles.helperTextError]}>
+        <Text
+          style={[
+            styles.helperText,
+            styles.helperSpacing,
+            isError && styles.helperTextError,
+          ]}
+        >
           {helperText}
         </Text>
       ) : null}
@@ -232,15 +239,14 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
   const isLarge = size === InputSize.Large
 
   return {
-    container: {
-      gap: 3,
-    },
+    container: {},
     label: {
-      color: colors.textOnBackground,
+      color: colors.textSecondary,
       fontSize: 14,
       fontFamily: "Source Sans Pro",
       fontWeight: "400",
       lineHeight: 20,
+      marginBottom: groupTitleGap,
     },
     valueContainer: {
       backgroundColor: colors.surfaceInteractive,
@@ -276,6 +282,9 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
     },
     helperTextError: {
       color: colors.error,
+    },
+    helperSpacing: {
+      marginTop: 3,
     },
     helperTextContainer: {
       minHeight: 13,

@@ -16,6 +16,7 @@ import { OnboardingStatus } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { getKycBannerConfig } from "./get-kyc-banner-config"
 import { usePersonalDetailsData } from "./hooks"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 export const CardPersonalDetailsScreen: React.FC = () => {
   const styles = useStyles()
@@ -190,10 +191,10 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 18,
   },
   section: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   sectionTitle: {
-    color: colors.textOnBackground,
+    color: colors.textSecondary,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",

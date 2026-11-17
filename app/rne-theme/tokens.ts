@@ -17,3 +17,7 @@ export const radius = {
   lg: 16,
   full: 999,
 } as const
+
+// Space between a title and the card, field, group or button it labels. The title
+// itself is `colors.textSecondary` (blink-wip#2107).
+export const groupTitleGap = spacing.sm

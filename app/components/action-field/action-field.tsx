@@ -4,6 +4,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 const PLACEHOLDER = "—"
 
@@ -56,10 +57,10 @@ export const ActionField: React.FC<ActionFieldProps> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   label: {
-    color: colors.textOnBackground,
+    color: colors.textSecondary,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",

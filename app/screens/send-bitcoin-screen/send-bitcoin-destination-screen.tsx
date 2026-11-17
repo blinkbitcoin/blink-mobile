@@ -66,6 +66,7 @@ import {
   sanitizePhoneNumber,
 } from "@app/utils/phone"
 import { isInt } from "validator"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 gql`
   query sendBitcoinDestination {
@@ -1161,8 +1162,9 @@ const usestyles = makeStyles(({ colors }) => ({
     color: colors.textOnBackground,
   },
   fieldTitleText: {
+    color: colors.textSecondary,
     fontWeight: "bold",
-    marginBottom: 5,
+    marginBottom: groupTitleGap,
   },
   iconContainer: {
     justifyContent: "center",

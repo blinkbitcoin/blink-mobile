@@ -19,6 +19,7 @@ import { useCardData } from "@app/hooks"
 
 import { LimitField, useCardAtmControls, useCardLimits } from "./hooks"
 import { createCurrencyFormatters } from "../utils"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 const toAtmLimitValue = (cents: number | null) =>
   cents === null ? "" : toMajorUnit(cents).toString()
@@ -269,7 +270,7 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 24,
   },
   currentLimitsTitle: {
-    color: colors.textOnBackground,
+    color: colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
     fontWeight: "400",
@@ -281,7 +282,7 @@ const useStyles = makeStyles(({ colors }) => ({
     minHeight: 80,
     paddingVertical: 18,
     paddingHorizontal: 10,
-    marginTop: 3,
+    marginTop: groupTitleGap,
   },
   currentLimitColumn: {
     flex: 1,

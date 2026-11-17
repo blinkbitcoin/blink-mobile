@@ -51,6 +51,7 @@ import {
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
 import { ellipsizeMiddle } from "@app/utils/helper"
 import { staticSurface } from "@app/rne-theme/surfaces"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 gql`
   query sendBitcoinConfirmationScreen {
@@ -669,8 +670,9 @@ const useStyles = makeStyles(({ colors }) => ({
     borderWidth: 2,
   },
   fieldTitleText: {
+    color: colors.textSecondary,
     fontWeight: "bold",
-    marginBottom: 4,
+    marginBottom: groupTitleGap,
   },
   walletSelectorTypeContainer: {
     justifyContent: "center",

@@ -11,6 +11,7 @@ import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-
 import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { testProps } from "@app/utils/testProps"
 import { staticSurface } from "@app/rne-theme/surfaces"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 type FieldProps = {
   label: string
@@ -131,10 +132,10 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 20,
   },
   fieldGroup: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   label: {
-    color: colors.textOnBackground,
+    color: colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
   },

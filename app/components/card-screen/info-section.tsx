@@ -5,6 +5,7 @@ import { makeStyles, Text } from "@rn-vui/themed"
 import { InfoRow } from "./info-row"
 import { radius } from "@app/rne-theme/radius"
 import { staticSurface } from "@app/rne-theme/surfaces"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 type InfoItem = {
   label: string
@@ -39,10 +40,10 @@ export const InfoSection: React.FC<InfoSectionProps> = ({ title, items }) => {
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   title: {
-    color: colors.textOnBackground,
+    color: colors.textSecondary,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",

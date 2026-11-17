@@ -6,6 +6,7 @@ import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { fonts } from "@app/rne-theme/fonts"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 const addressTypes = {
   lightning: "lightning",
@@ -103,7 +104,7 @@ const useStyles = makeStyles(({ colors }) => ({
   container: {
     display: "flex",
     flexDirection: "column",
-    rowGap: 20,
+    rowGap: groupTitleGap,
     width: "100%",
   },
   titleContainer: {
@@ -114,6 +115,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: "100%",
   },
   addressTitle: {
+    color: colors.textSecondary,
     fontSize: 16,
     lineHeight: 24,
     flexShrink: 1,

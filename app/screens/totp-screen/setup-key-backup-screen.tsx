@@ -17,6 +17,7 @@ import { useHardwareBackGuard } from "@app/screens/account-migration/hooks/use-h
 import { testProps } from "@app/utils/testProps"
 
 import { useSetupKeyBackup } from "./hooks/use-setup-key-backup"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 const OPTION_ICON_SIZE = 20
 
@@ -113,10 +114,10 @@ const useStyles = makeStyles(({ colors }) => ({
     overflow: "hidden",
   },
   manualCopy: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   manualCopyLabel: {
-    color: colors.textOnBackground,
+    color: colors.textSecondary,
     lineHeight: 20,
   },
 }))

@@ -1,4 +1,5 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { fireEvent, render } from "@testing-library/react-native"
 
 import { MockedProvider, MockedResponse } from "@apollo/client/testing"
@@ -11,7 +12,9 @@ import { defaultFeeRatesConfig, FeeRatesConfig } from "@app/config/feature-flags
 import { FeeRatesDocument } from "@app/graphql/generated"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { light } from "@app/rne-theme/colors"
 import theme from "@app/rne-theme/theme"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 import { FeeRatesScreen } from "@app/screens/settings-screen/fee-rates-screen"
 import { detectDefaultLocale } from "@app/utils/locale-detector"
 
@@ -79,6 +82,32 @@ describe("FeeRatesScreen", () => {
     loadLocale("en")
     mockFeeRatesConfig = { ...defaultFeeRatesConfig }
     mockInactivityFeeEnabled = true
+  })
+
+  it("puts each fee section card 5px under its title", () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    for (const name of ["Send", "Receive", "Transfer"]) {
+      let section = getByText(name).parent
+      while (section && StyleSheet.flatten(section.props.style)?.gap !== groupTitleGap) {
+        section = section.parent
+      }
+      expect(section).toBeTruthy()
+
+      const card = section?.findAll(
+        (node) => StyleSheet.flatten(node.props.style)?.borderRadius === 12,
+      )[0]
+      expect(StyleSheet.flatten(card?.props.style)).toMatchObject({ marginTop: 0 })
+      expect(StyleSheet.flatten(getByText(name).props.style)).toMatchObject({
+        color: light.textSecondary,
+        fontSize: 16,
+        fontWeight: "400",
+      })
+    }
   })
 
   it("renders Send, Receive and Transfer sections with remote-config default rates", async () => {

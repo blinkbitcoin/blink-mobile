@@ -13,6 +13,7 @@ import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
 import { fonts } from "@app/rne-theme/fonts"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 type OptionItem<T extends string> = {
   id: T
@@ -119,8 +120,8 @@ const useStyles = makeStyles(({ colors }) => ({
   title: {
     fontSize: 14,
     fontFamily: fonts.bold,
-    color: colors.textOnBackground,
-    marginBottom: 6,
+    color: colors.textSecondary,
+    marginBottom: groupTitleGap,
   },
   fieldBackground: {
     flexDirection: "row",
