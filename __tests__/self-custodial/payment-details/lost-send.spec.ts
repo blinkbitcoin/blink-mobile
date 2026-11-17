@@ -379,6 +379,8 @@ describe("markReceivedHistory", () => {
 
 describe("findLostConversion", () => {
   const PAGE_SIZE = 50
+  /** A second past the day after the lost conversion's latest attempt. */
+  const PAST_THE_LOOK = MARK_SEC + 1 + 24 * 60 * 60 + 1
 
   /** A wallet of its own per test: the bridge keeps one sync in flight per wallet. */
   const walletAnswering = (...pages: Array<ReadonlyArray<unknown>>) => {
@@ -426,10 +428,8 @@ describe("findLostConversion", () => {
   /** A busy wallet keeps receiving long after the conversion went out; what came in a day
    *  later can no longer be its delivery, and is never read. */
   it("stops reading once a page reaches a day past the latest attempt", async () => {
-    const DAY = 24 * 60 * 60
-    const pastTheLook = MARK_SEC + 1 + DAY + 1
     const page = Array.from({ length: PAGE_SIZE }, (_, i) =>
-      received(`rcv-${i}`, i === PAGE_SIZE - 1 ? pastTheLook : MARK_SEC + 5),
+      received(`rcv-${i}`, i === PAGE_SIZE - 1 ? PAST_THE_LOOK : MARK_SEC + 5),
     )
     const sdk = walletAnswering(page, page, page)
 
@@ -437,6 +437,15 @@ describe("findLostConversion", () => {
 
     expect(lookup.status).toBe("not-found")
     expect(sdk.listPayments).toHaveBeenCalledTimes(3)
+  })
+
+  it("does not take a delivery past that day, on the page that reaches it, for the lost one", async () => {
+    const later = delivery({ id: "rcv-later", timestamp: PAST_THE_LOOK })
+    const sdk = walletAnswering([later], [later], [later])
+
+    const lookup = await settle(findLostConversion({ sdk: sdk as never, lost: LOST }))
+
+    expect(lookup.status).toBe("not-found")
   })
 
   it("finds what the lost conversion delivered", async () => {

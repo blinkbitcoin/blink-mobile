@@ -209,11 +209,14 @@ const scanHistorySince = async ({
       offset: page * LOST_SEND_PAGE_SIZE,
     })
 
-    into.matches.push(...payments.filter(matches))
-    if (payments.some(kind.isUndescribed)) into.hasUndescribedSend = true
+    /** Read up to where the look ends only: a payment past it, on the page that reaches
+     *  it, is no more what is looked for than one on a later page. */
+    const withinLook = payments.filter((payment) => !isPastLook?.(payment))
+    into.matches.push(...withinLook.filter(matches))
+    if (withinLook.some(kind.isUndescribed)) into.hasUndescribedSend = true
 
     const isLastPage = payments.length < LOST_SEND_PAGE_SIZE
-    const isPastWhatIsLookedFor = isPastLook !== undefined && payments.some(isPastLook)
+    const isPastWhatIsLookedFor = withinLook.length < payments.length
     const isLookOver = isLastPage || isPastWhatIsLookedFor || isExpired()
     if (isLookOver) return
   }
