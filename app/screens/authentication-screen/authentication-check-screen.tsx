@@ -38,12 +38,29 @@ export const AuthenticationCheckScreen: React.FC = () => {
 
   useEffect(() => {
     ;(async () => {
-      const isPinEnabled = await KeyStoreWrapper.getIsPinEnabled()
+      /** Fails closed, like the resume gate: a read that could not answer is
+       *  treated as enabled, so a storage fault sends the user to a lock they
+       *  can pass rather than past a lock they cannot see. */
+      const pinRead = await KeyStoreWrapper.readIsPinEnabled()
+      const isPinEnabled = pinRead.status !== "no"
+      const biometricsRead = await KeyStoreWrapper.readIsBiometricsEnabled()
+      const isBiometricsEnabled = biometricsRead.status !== "no"
 
-      if (
-        (await BiometricWrapper.isSensorAvailable()) &&
-        (await KeyStoreWrapper.getIsBiometricsEnabled())
-      ) {
+      /**
+       * A lock we inferred rather than read is not one we can promise the user
+       * can pass: the PIN screen would compare against a secret it also cannot
+       * read. The authentication screen still routes to the PIN and always shows
+       * a way out: a logout that takes the lock with it on a device that stores
+       * no wallet, and removing the wallets on one that does, where a logout
+       * would keep the lock and come straight back here.
+       */
+      const isLockUncertain =
+        pinRead.status === "failed" || biometricsRead.status === "failed"
+
+      const isBiometricPromptUsable =
+        (await BiometricWrapper.isSensorAvailable()) && isBiometricsEnabled
+
+      if (isBiometricPromptUsable || isLockUncertain) {
         navigation.replace("authentication", {
           screenPurpose: AuthenticationScreenPurpose.Authenticate,
           isPinEnabled,
@@ -55,11 +72,13 @@ export const AuthenticationCheckScreen: React.FC = () => {
           isResume,
         })
       } else {
-        /** Only a cold start opens a device session, and only it owes the user the home
-         *  screen; a resume whose lock was turned off meanwhile just steps back. */
-        completeUnlock(() => {
-          updateDeviceSessionCount(client)
-          navigation.replace("Primary")
+        /** Only a cold start opens a device session, and only one with an account to show
+         *  owes the user the home screen: without one it lands on the landing screen, and
+         *  a resume whose lock was turned off meanwhile just steps back. */
+        completeUnlock((coldStartRoute) => {
+          const isOpeningHome = coldStartRoute === "Primary"
+          if (isOpeningHome) updateDeviceSessionCount(client)
+          navigation.replace(coldStartRoute)
         })
       }
     })()

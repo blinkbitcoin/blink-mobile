@@ -105,28 +105,49 @@ export const merchantUrl = (
   placeId: number,
 ): string => `${BTCMAP_SITE_URL}/merchant/${details?.osmId ?? placeId}`
 
+type Directions = {
+  /** Resolves only when the Google Maps app is installed. */
+  probe: string
+  /** Directions in the Google Maps app, opened when `probe` resolves. */
+  google: string
+  /** Directions in whatever the device has instead. */
+  fallback: string
+}
+
 /**
- * A platform maps URL for a coordinate. Without a name there is nothing to
- * label the pin with, and an empty label turns both platforms' URLs into a text
- * search that finds nothing — so the bare-coordinate form is used instead.
+ * Directions to a place: in Google Maps when it is installed, otherwise in the
+ * maps app the platform gives everyone — Apple Maps on iOS, and on Android the
+ * `geo:` chooser, which reaches Organic Maps, OsmAnd and phones without Google
+ * services. A web page is never the answer: it cannot navigate.
+ *
+ * Google is sent a coordinate, not the name. A name there is a search, which
+ * can land on a different shop, so its pin reads as the coordinate instead of
+ * "Satoshi Coffee". `geo:` takes the name as a label, so it keeps it.
+ *
+ * On Android `google` is the cross-platform Maps URL, which the app claims and
+ * opens on its route preview; `google.navigation:` would skip straight to
+ * turn-by-turn, so it is only the probe.
  */
-export const directionsUrl = (
+export const directionsUrls = (
   place: { latitude: number; longitude: number },
   name: string | undefined,
   platform: "ios" | "android",
-): string => {
+): Directions => {
   const { latitude, longitude } = place
-  const label = name ? encodeURIComponent(name) : ""
+  const destination = `${latitude},${longitude}`
 
   if (platform === "ios") {
-    return label
-      ? `maps:0,0?q=${label}@${latitude},${longitude}`
-      : `maps:0,0?ll=${latitude},${longitude}`
+    const google = `comgooglemaps://?daddr=${destination}`
+    return { probe: google, google, fallback: `maps://?daddr=${destination}` }
   }
 
-  return label
-    ? `geo:${latitude},${longitude}?q=${latitude},${longitude}(${label})`
-    : `geo:${latitude},${longitude}?q=${latitude},${longitude}`
+  // An empty "()" turns geo: into a text search that finds nothing.
+  const label = name ? `(${encodeURIComponent(name)})` : ""
+  return {
+    probe: `google.navigation:q=${destination}`,
+    google: `https://www.google.com/maps/dir/?api=1&destination=${destination}`,
+    fallback: `geo:${destination}?q=${destination}${label}`,
+  }
 }
 
 /** Web links get the in-app browser; tel:, geo:/maps: and lightning: must not. */

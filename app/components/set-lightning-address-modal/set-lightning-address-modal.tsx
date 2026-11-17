@@ -3,6 +3,7 @@ import { View, TextInput } from "react-native"
 import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { gql } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
@@ -179,6 +180,9 @@ export const SetLightningAddressModalUI = ({
     case SetUsernameError.ADDRESS_UNAVAILABLE:
       errorMessage = LL.SetAddressModal.Errors.addressUnavailable()
       break
+    case SetUsernameError.SERVER_UNREACHABLE:
+      errorMessage = LL.SetAddressModal.Errors.serverUnreachable()
+      break
     case SetUsernameError.UNKNOWN_ERROR:
       errorMessage = LL.SetAddressModal.Errors.unknownError()
       break
@@ -208,7 +212,7 @@ export const SetLightningAddressModalUI = ({
               onChangeText={setLnAddress}
               value={lnAddress}
               placeholder={"SatoshiNakamoto"}
-              placeholderTextColor={colors.grey3}
+              placeholderTextColor={colors.textDisabled}
             />
             <Text type={"p1"}>{`@${hostname}`}</Text>
           </View>
@@ -239,9 +243,9 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: radius.default,
     minHeight: 60,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     alignItems: "center",
     justifyContent: "space-between",
   },
@@ -252,7 +256,7 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlignVertical: "center",
     fontSize: 18,
     lineHeight: 24,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   centerAlign: {
     textAlign: "center",

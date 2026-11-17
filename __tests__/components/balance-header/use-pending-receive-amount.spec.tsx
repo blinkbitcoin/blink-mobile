@@ -393,6 +393,34 @@ describe("usePendingReceiveAmount", () => {
       expect(result.current.pendingReceiveAmountText).toBe("$100.00")
     })
 
+    it("counts a deposit claimed early until its transfer credits the balance", () => {
+      const { result } = renderHook(() =>
+        usePendingReceiveAmount({
+          deposits: [
+            deposit({
+              id: "a:0",
+              amount: {
+                amount: 4_000,
+                currency: WalletCurrency.Btc,
+                currencyCode: "BTC",
+              },
+            }),
+            deposit({
+              id: "b:1",
+              status: DepositStatus.Claiming,
+              amount: {
+                amount: 6_000,
+                currency: WalletCurrency.Btc,
+                currencyCode: "BTC",
+              },
+            }),
+          ],
+        }),
+      )
+
+      expect(result.current.pendingReceiveAmountText).toBe("$100.00")
+    })
+
     it("excludes non-immature deposits (claimable, error, refunded are the banner's job)", () => {
       const { result } = renderHook(() =>
         usePendingReceiveAmount({

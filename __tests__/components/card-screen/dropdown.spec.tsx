@@ -9,11 +9,11 @@ jest.mock("@rn-vui/themed", () => ({
   useTheme: () => ({
     theme: {
       colors: {
-        primary: "#3B82F6",
-        grey1: "#999999",
-        grey3: "#CCCCCC",
-        grey4: "#E0E0E0",
-        grey5: "#F5F5F5",
+        accent: "#3B82F6",
+        textSecondary: "#999999",
+        textDisabled: "#CCCCCC",
+        neutral: "#E0E0E0",
+        surfaceInteractive: "#F5F5F5",
       },
     },
   }),
@@ -139,6 +139,37 @@ describe("DropdownComponent", () => {
       fireEvent.press(getByText("Canada"))
 
       expect(mockOnValueChange).toHaveBeenCalledWith("ca")
+    })
+  })
+
+  describe("accessibility", () => {
+    it("announces the row as the control it is, and whether the list is open", () => {
+      // Without the role the row is read as the answer it currently shows,
+      // with nothing to say it can be changed.
+      const { getByTestId } = render(
+        <DropdownComponent {...defaultProps} placeholder="Select a country" />,
+      )
+
+      expect(getByTestId("dropdown").props.accessibilityRole).toBe("button")
+      expect(getByTestId("dropdown").props.accessibilityState).toMatchObject({
+        expanded: false,
+      })
+
+      fireEvent.press(getByTestId("dropdown"))
+
+      expect(getByTestId("dropdown").props.accessibilityState).toMatchObject({
+        expanded: true,
+      })
+    })
+
+    it("says so when there is nothing to open", () => {
+      const { getByTestId } = render(
+        <DropdownComponent {...defaultProps} disabled={true} />,
+      )
+
+      expect(getByTestId("dropdown").props.accessibilityState).toMatchObject({
+        disabled: true,
+      })
     })
   })
 

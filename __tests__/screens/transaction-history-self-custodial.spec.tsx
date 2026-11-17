@@ -4,20 +4,26 @@ import React from "react"
 import { act, render, waitFor } from "@testing-library/react-native"
 import { InteractionManager, SectionList } from "react-native"
 
+import { markTxLastSeenId } from "@app/graphql/client-only-query"
 import { TransactionHistoryScreen } from "@app/screens/transaction-history"
+import {
+  defaultPersistentState,
+  type PersistentState,
+} from "@app/store/persistent-state/state-migrations"
+import { getTxLastSeenIds } from "@app/store/persistent-state/tx-last-seen"
 import { ActiveWalletStatus, AccountType } from "@app/types/wallet"
 
 import { flushEffects } from "../helpers/flush-effects"
 
 jest.mock("@rn-vui/themed", () => {
   const colors: Record<string, string> = {
-    grey0: "#ccc",
-    grey1: "#aaa",
-    grey2: "#999",
-    grey5: "#f5f5f5",
-    primary: "#fc5805",
-    black: "#000",
-    white: "#fff",
+    textPrimary: "#ccc",
+    textSecondary: "#aaa",
+    textMuted: "#999",
+    surfaceInteractive: "#f5f5f5",
+    accent: "#fc5805",
+    textOnBackground: "#000",
+    backgroundDefault: "#fff",
   }
   return {
     makeStyles:
@@ -46,7 +52,12 @@ jest.mock("@app/components/wallet-filter-dropdown", () => ({
 }))
 
 jest.mock("@app/components/transaction-item", () => ({
-  MemoizedTransactionItem: () => null,
+  MemoizedTransactionItem: ({ txid, highlight }: { txid: string; highlight?: boolean }) =>
+    React.createElement(
+      "Text",
+      { testID: `tx-${txid}` },
+      highlight ? "highlight" : "no-highlight",
+    ),
   useDescriptionDisplay: () => "",
 }))
 
@@ -67,11 +78,39 @@ const mockUseTransactionListQuery = jest.fn()
 jest.mock("@app/graphql/generated", () => ({
   useTransactionListForDefaultAccountQuery: () => mockUseTransactionListQuery(),
   useWalletOverviewScreenQuery: () => ({ data: undefined }),
+  useTxLastSeenQuery: () => ({ data: { txLastSeen: { btcId: "", usdId: "" } } }),
   WalletCurrency: { Btc: "BTC", Usd: "USD" },
   TxDirection: { Receive: "RECEIVE", Send: "SEND" },
   TxStatus: { Pending: "PENDING", Failure: "FAILURE", Success: "SUCCESS" },
   TransactionFragmentDoc: {},
+  HomeAuthedDocument: {},
 }))
+
+jest.mock("@app/graphql/client-only-query", () => ({ markTxLastSeenId: jest.fn() }))
+
+/** Re-renders its readers on every update, as the real provider does, so a test sees what
+ *  the screen does with its own writes and not only the state it started from. */
+let mockPersistentState: PersistentState
+const mockPersistentStateListeners = new Set<() => void>()
+const mockUpdateState = jest.fn((updater: (prev: PersistentState) => PersistentState) => {
+  mockPersistentState = updater(mockPersistentState)
+  mockPersistentStateListeners.forEach((rerender) => rerender())
+})
+jest.mock("@app/store/persistent-state", () => {
+  const { useEffect, useReducer } = jest.requireActual<typeof import("react")>("react")
+  return {
+    usePersistentStateContext: () => {
+      const [, rerender] = useReducer((count: number) => count + 1, 0)
+      useEffect(() => {
+        mockPersistentStateListeners.add(rerender)
+        return () => {
+          mockPersistentStateListeners.delete(rerender)
+        }
+      }, [])
+      return { persistentState: mockPersistentState, updateState: mockUpdateState }
+    },
+  }
+})
 
 const custodialQueryWithData = {
   data: {
@@ -141,17 +180,11 @@ jest.mock("@app/hooks/use-price-conversion", () => ({
 }))
 
 const mockTransitionState = { hasTransitioned: true }
+/** The screen reads the seen state through the barrel; only that hook stays real here. */
 jest.mock("@app/hooks", () => ({
   useHasTransitioned: () => mockTransitionState.hasTransitioned,
-  useTransactionSeenState: () => ({
-    hasUnseenBtcTx: false,
-    hasUnseenUsdTx: false,
-    lastSeenBtcId: "",
-    lastSeenUsdId: "",
-    latestBtcTxId: undefined,
-    latestUsdTxId: undefined,
-    markTxSeen: jest.fn(),
-  }),
+  useTransactionSeenState: jest.requireActual("@app/hooks/use-transaction-seen-state")
+    .useTransactionSeenState,
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
@@ -183,6 +216,17 @@ const route = {
   params: { wallets: [{ id: "btc-1", walletCurrency: "BTC" as const }] },
 }
 
+const SELF_CUSTODIAL_ACCOUNT_ID = "self-custodial-account"
+
+const buildFragment = (id: string, settlementCurrency: string, createdAt: number) => ({
+  id,
+  status: "SUCCESS",
+  direction: "RECEIVE",
+  settlementCurrency,
+  settlementAmount: 1000,
+  createdAt,
+})
+
 const setActiveWallet = (isSelfCustodial: boolean) => {
   mockUseActiveWallet.mockReturnValue({
     wallets: [
@@ -212,11 +256,19 @@ describe("TransactionHistoryScreen — self-custodial behavior", () => {
     mockTransitionState.hasTransitioned = true
     mockSelfCustodialState.allTransactions = []
     mockToTransactionFragments.mockReturnValue([])
+    /** An account that already has its seen record, so these tests read the seen state
+     *  itself rather than the start of a new or restored account. */
+    mockPersistentState = {
+      ...defaultPersistentState,
+      activeAccountId: SELF_CUSTODIAL_ACCOUNT_ID,
+      txLastSeenByAccountId: { [SELF_CUSTODIAL_ACCOUNT_ID]: { btcId: "", usdId: "" } },
+    }
     mockUseApolloClient.mockReturnValue({
       cache: {
         identify: () => "Transaction:fake-id",
         batch: mockCacheBatch,
       },
+      readQuery: jest.fn(),
       writeFragment: jest.fn(),
     })
     interactionsSpy = jest
@@ -352,6 +404,130 @@ describe("TransactionHistoryScreen — self-custodial behavior", () => {
 
     expect(queryByTestId("transaction-history-skeleton")).toBeTruthy()
     expect(UNSAFE_queryByType(SectionList)).toBeNull()
+  })
+
+  describe("seen state", () => {
+    const btcNew = buildFragment("sc-btc-new", "BTC", 5)
+    const usdNew = buildFragment("sc-usd-new", "USD", 3)
+
+    const renderWithSelfCustodialHistory = (currencyFilter?: string) => {
+      mockSelfCustodialState.allTransactions = [
+        { id: btcNew.id, amount: { currency: "BTC" }, timestamp: btcNew.createdAt },
+        { id: usdNew.id, amount: { currency: "USD" }, timestamp: usdNew.createdAt },
+      ]
+      mockToTransactionFragments.mockReturnValue([
+        btcNew,
+        usdNew,
+        buildFragment("sc-btc-old", "BTC", 1),
+      ])
+      setActiveWallet(true)
+
+      return render(
+        <TransactionHistoryScreen
+          route={
+            currencyFilter
+              ? ({ ...route, params: { ...route.params, currencyFilter } } as never)
+              : route
+          }
+        />,
+      )
+    }
+
+    it("records the newest transaction of each currency on device", () => {
+      renderWithSelfCustodialHistory()
+
+      expect(getTxLastSeenIds(mockPersistentState)).toEqual({
+        btcId: "sc-btc-new",
+        usdId: "sc-usd-new",
+      })
+      expect(markTxLastSeenId).not.toHaveBeenCalled()
+    })
+
+    it("records only the filtered currency", () => {
+      renderWithSelfCustodialHistory("BTC")
+
+      expect(getTxLastSeenIds(mockPersistentState)).toEqual({
+        btcId: "sc-btc-new",
+        usdId: "",
+      })
+    })
+
+    it("keys the device store by the active self-custodial account", () => {
+      renderWithSelfCustodialHistory()
+
+      expect(mockPersistentState.txLastSeenByAccountId).toEqual({
+        [SELF_CUSTODIAL_ACCOUNT_ID]: { btcId: "sc-btc-new", usdId: "sc-usd-new" },
+      })
+    })
+
+    describe("after a restore", () => {
+      /** The record a restore starts: no ids yet, and a cutoff at 10s. */
+      const restoredRecord = { btcId: "", usdId: "", announceSinceMs: 10_000 }
+
+      const renderRestoredHistory = (receive: ReturnType<typeof buildFragment>) => {
+        mockPersistentState = {
+          ...mockPersistentState,
+          txLastSeenByAccountId: { [SELF_CUSTODIAL_ACCOUNT_ID]: restoredRecord },
+        }
+        mockSelfCustodialState.allTransactions = [
+          { id: receive.id, amount: { currency: "BTC" }, timestamp: receive.createdAt },
+        ]
+        mockToTransactionFragments.mockReturnValue([receive])
+        setActiveWallet(true)
+
+        return render(<TransactionHistoryScreen route={route} />)
+      }
+
+      it("does not highlight or mark seen a receive from before the record started", async () => {
+        const { getByTestId } = renderRestoredHistory(
+          buildFragment("sc-btc-replayed", "BTC", 9),
+        )
+        await flushEffects()
+
+        expect(getByTestId("tx-sc-btc-replayed").props.children).toBe("no-highlight")
+        expect(getTxLastSeenIds(mockPersistentState)).toEqual(restoredRecord)
+      })
+
+      it("highlights and marks seen a receive from after the record started", async () => {
+        const { getByTestId } = renderRestoredHistory(
+          buildFragment("sc-btc-after", "BTC", 11),
+        )
+        await flushEffects()
+
+        expect(getByTestId("tx-sc-btc-after").props.children).toBe("highlight")
+        expect(getTxLastSeenIds(mockPersistentState).btcId).toBe("sc-btc-after")
+      })
+    })
+
+    it("keeps the custodial account on the Apollo cache", () => {
+      setActiveWallet(false)
+      mockUseTransactionListQuery.mockReturnValue({
+        ...custodialQueryWithData,
+        data: {
+          me: {
+            defaultAccount: {
+              id: "account-id",
+              pendingIncomingTransactions: [],
+              transactions: {
+                edges: [{ node: buildFragment("custodial-btc", "BTC", 4) }],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        },
+      })
+
+      render(<TransactionHistoryScreen route={route} />)
+
+      expect(markTxLastSeenId).toHaveBeenCalledWith(
+        expect.objectContaining({
+          accountId: "account-id",
+          currency: "BTC",
+          id: "custodial-btc",
+        }),
+      )
+      expect(mockUpdateState).not.toHaveBeenCalled()
+    })
   })
 
   it("renders the list once the enter transition finishes", () => {

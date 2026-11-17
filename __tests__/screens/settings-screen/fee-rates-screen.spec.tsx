@@ -1,4 +1,5 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { fireEvent, render } from "@testing-library/react-native"
 
 import { MockedProvider, MockedResponse } from "@apollo/client/testing"
@@ -11,17 +12,49 @@ import { defaultFeeRatesConfig, FeeRatesConfig } from "@app/config/feature-flags
 import { FeeRatesDocument } from "@app/graphql/generated"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { light } from "@app/rne-theme/colors"
 import theme from "@app/rne-theme/theme"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 import { FeeRatesScreen } from "@app/screens/settings-screen/fee-rates-screen"
 import { detectDefaultLocale } from "@app/utils/locale-detector"
 
 import { ContextForScreen } from "../helper"
 
 let mockFeeRatesConfig: FeeRatesConfig
+let mockInactivityFeeEnabled: boolean
 jest.mock("@app/config/feature-flags-context", () => ({
   ...jest.requireActual("@app/config/feature-flags-context"),
-  useRemoteConfig: () => ({ feeRatesConfig: mockFeeRatesConfig }),
+  useRemoteConfig: () => ({
+    feeRatesConfig: mockFeeRatesConfig,
+    inactivityFeeEnabled: mockInactivityFeeEnabled,
+  }),
 }))
+
+const inactivityFeeMocks = (usdCentsPerMonth: number): ReadonlyArray<MockedResponse> => [
+  {
+    request: { query: FeeRatesDocument },
+    result: {
+      data: {
+        globals: {
+          __typename: "Globals",
+          feesInformation: {
+            __typename: "FeesInformation",
+            deposit: {
+              __typename: "DepositFeesInformation",
+              minBankFee: "2500",
+              minBankFeeThreshold: "1000000",
+              tiers: [
+                { __typename: "DepositFeeTier", maxAmount: "1000000", amount: "2500" },
+                { __typename: "DepositFeeTier", maxAmount: null, amount: "5000" },
+              ],
+            },
+            inactivityFee: { __typename: "InactivityFeeInformation", usdCentsPerMonth },
+          },
+        },
+      },
+    },
+  },
+]
 
 const Stack = createNativeStackNavigator()
 
@@ -48,10 +81,37 @@ describe("FeeRatesScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     mockFeeRatesConfig = { ...defaultFeeRatesConfig }
+    mockInactivityFeeEnabled = true
+  })
+
+  it("puts each fee section card 5px under its title", () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    for (const name of ["Send", "Receive", "Transfer"]) {
+      let section = getByText(name).parent
+      while (section && StyleSheet.flatten(section.props.style)?.gap !== groupTitleGap) {
+        section = section.parent
+      }
+      expect(section).toBeTruthy()
+
+      const card = section?.findAll(
+        (node) => StyleSheet.flatten(node.props.style)?.borderRadius === 12,
+      )[0]
+      expect(StyleSheet.flatten(card?.props.style)).toMatchObject({ marginTop: 0 })
+      expect(StyleSheet.flatten(getByText(name).props.style)).toMatchObject({
+        color: light.textSecondary,
+        fontSize: 16,
+        fontWeight: "400",
+      })
+    }
   })
 
   it("renders Send, Receive and Transfer sections with remote-config default rates", async () => {
-    const { getByText, getAllByText, queryByText, findByText } = render(
+    const { getByText, getAllByText, findByText } = render(
       <ContextForScreen>
         <FeeRatesScreen />
       </ContextForScreen>,
@@ -62,10 +122,16 @@ describe("FeeRatesScreen", () => {
     expect(getByText("Transfer")).toBeTruthy()
 
     expect(getByText("Lightning")).toBeTruthy()
-    expect(getAllByText("no fee")).toHaveLength(3)
+    expect(getAllByText("no fee")).toHaveLength(4)
+
+    // An onchain send is priced by the payout queue it is put on, so each of
+    // the three speeds the send screen offers is quoted at its own rate.
+    expect(getByText("Onchain Priority (~10m)")).toBeTruthy()
     expect(getByText("from ~0.9%")).toBeTruthy()
-    expect(queryByText("Onchain standard (~4h)")).toBeNull()
-    expect(queryByText("Onchain economy")).toBeNull()
+    expect(getByText("Onchain Standard (~4h)")).toBeTruthy()
+    expect(getByText("from ~0.6%")).toBeTruthy()
+    expect(getByText("Onchain Economy (~24h)")).toBeTruthy()
+    expect(getByText("from ~0.4%")).toBeTruthy()
 
     expect(getByText("Transfer fee")).toBeTruthy()
     expect(getByText("0.5%")).toBeTruthy()
@@ -73,41 +139,123 @@ describe("FeeRatesScreen", () => {
     await findByText("2,500 SAT")
   })
 
-  it("shows the lightning send fee once remote config sets non-zero rates", async () => {
-    mockFeeRatesConfig = {
-      ...defaultFeeRatesConfig,
-      lightningSendBps: 20,
-      lightningRoutingBps: 10,
-    }
+  it("shows the lightning send rate alone once remote config sets a non-zero rate", async () => {
+    mockFeeRatesConfig = { ...defaultFeeRatesConfig, lightningSendBps: 20 }
 
-    const { getByText, findByText } = render(
+    const { getByText, queryByText, findByText } = render(
       <ContextForScreen>
         <FeeRatesScreen />
       </ContextForScreen>,
     )
 
-    expect(getByText("0.2% + ~0.1% routing fee")).toBeTruthy()
+    expect(getByText("0.2%")).toBeTruthy()
+    // The rate is quoted on its own — no routing-fee addendum, and not the
+    // "from ~" hedge the onchain tiers carry.
+    expect(queryByText(/routing/i)).toBeNull()
+    expect(queryByText("from ~0.2%")).toBeNull()
 
     await findByText("2,500 SAT")
   })
 
-  it("shows onchain standard and economy tiers when remote config enables them", async () => {
+  it("reprices each onchain tier independently from remote config", async () => {
     mockFeeRatesConfig = {
       ...defaultFeeRatesConfig,
-      onchainStandardBps: 60,
-      onchainEconomyBps: 40,
+      onchainPriorityBps: 120,
+      onchainStandardBps: 75,
+      onchainEconomyBps: 0,
     }
 
-    const { getByText, findByText } = render(
+    const { getByText, getAllByText, queryByText, findByText } = render(
       <ContextForScreen>
         <FeeRatesScreen />
       </ContextForScreen>,
     )
 
-    expect(getByText("Onchain standard (~4h)")).toBeTruthy()
-    expect(getByText("from ~0.6%")).toBeTruthy()
-    expect(getByText("Onchain economy")).toBeTruthy()
-    expect(getByText("from ~0.4%")).toBeTruthy()
+    expect(getByText("from ~1.2%")).toBeTruthy()
+    expect(getByText("from ~0.75%")).toBeTruthy()
+    // A repriced tier must not leave its shipped fallback on screen.
+    expect(queryByText("from ~0.9%")).toBeNull()
+    expect(queryByText("from ~0.6%")).toBeNull()
+    // Zero is free, not hidden: the row stays and reads "no fee".
+    expect(getByText("Onchain Economy (~24h)")).toBeTruthy()
+    expect(getAllByText("no fee")).toHaveLength(5)
+
+    await findByText("2,500 SAT")
+  })
+
+  it("hides only the onchain tiers remote config sets negative", async () => {
+    mockFeeRatesConfig = { ...defaultFeeRatesConfig, onchainStandardBps: -1 }
+
+    const { getByText, queryByText, findByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    expect(queryByText("Onchain Standard (~4h)")).toBeNull()
+    expect(queryByText("from ~0.6%")).toBeNull()
+    expect(getByText("Onchain Priority (~10m)")).toBeTruthy()
+    expect(getByText("Onchain Economy (~24h)")).toBeTruthy()
+
+    await findByText("2,500 SAT")
+  })
+
+  it("pairs the free lightning threshold row with a no-fee value", async () => {
+    const { getAllByText, findByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    // Labels and values render in tree order, so the value belonging to a row
+    // is the entry immediately after its label.
+    const cells = getAllByText(/^(Lightning below 100 SAT|Intraledger|no fee)$/).map(
+      (node) => node.children.join(""),
+    )
+    const labelIndex = cells.indexOf("Lightning below 100 SAT")
+
+    expect(labelIndex).toBeGreaterThanOrEqual(0)
+    expect(cells[labelIndex + 1]).toBe("no fee")
+
+    await findByText("2,500 SAT")
+  })
+
+  it("renders every Send row in the order the design specifies", async () => {
+    const { getAllByText, findByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    // Anchored so "Lightning transactions" in the Receive section cannot match.
+    const sendLabels = getAllByText(
+      /^(Lightning|Lightning below 100 SAT|Intraledger|Onchain Priority \(~10m\)|Onchain Standard \(~4h\)|Onchain Economy \(~24h\))$/,
+    ).map((node) => node.children.join(""))
+
+    expect(sendLabels).toEqual([
+      "Lightning",
+      "Lightning below 100 SAT",
+      "Intraledger",
+      "Onchain Priority (~10m)",
+      "Onchain Standard (~4h)",
+      "Onchain Economy (~24h)",
+    ])
+
+    await findByText("2,500 SAT")
+  })
+
+  it("hides the free lightning threshold row when lightning sends are hidden", async () => {
+    mockFeeRatesConfig = { ...defaultFeeRatesConfig, lightningSendBps: -1 }
+
+    const { queryByText, getByText, findByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    expect(queryByText("Lightning")).toBeNull()
+    expect(queryByText("Lightning below 100 SAT")).toBeNull()
+    expect(getByText("Intraledger")).toBeTruthy()
 
     await findByText("2,500 SAT")
   })
@@ -125,6 +273,78 @@ describe("FeeRatesScreen", () => {
     expect(queryByText("Transfer fee")).toBeNull()
 
     await findByText("2,500 SAT")
+  })
+
+  it("quotes the API's inactivity fee for both custodial balances", async () => {
+    const { getAllByText, findByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    await findByText("Inactivity >12 months")
+
+    // Labels and values render in tree order, so each row's value is the
+    // entry immediately after its label. The backend charges one amount per
+    // balance, so both rows carry the same usdCentsPerMonth.
+    const cells = getAllByText(
+      /^(Inactivity >12 months|Bitcoin Balance|Dollar Balance|\$1\/month)$/,
+    ).map((node) => node.children.join(""))
+
+    expect(cells).toEqual([
+      "Inactivity >12 months",
+      "Bitcoin Balance",
+      "$1/month",
+      "Dollar Balance",
+      "$1/month",
+    ])
+  })
+
+  it("quotes a fractional inactivity fee to the cent", async () => {
+    const { findAllByText, queryByText } = renderWithApolloMocks(inactivityFeeMocks(150))
+
+    expect(await findAllByText("$1.50/month")).toHaveLength(2)
+    expect(queryByText("$1/month")).toBeNull()
+  })
+
+  it("keeps the inactivity rows and reads no fee when the API charges zero", async () => {
+    const { findByText, getByText, getAllByText } = renderWithApolloMocks(
+      inactivityFeeMocks(0),
+    )
+
+    expect(await findByText("Inactivity >12 months")).toBeTruthy()
+    expect(getByText("Bitcoin Balance")).toBeTruthy()
+    expect(getByText("Dollar Balance")).toBeTruthy()
+    // 4 from Send and Receive, plus one per inactivity row.
+    expect(getAllByText("no fee")).toHaveLength(6)
+  })
+
+  it("hides the Inactivity section when remote config turns it off", async () => {
+    mockInactivityFeeEnabled = false
+
+    const { queryByText, findByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    await findByText("2,500 SAT")
+
+    expect(queryByText("Inactivity >12 months")).toBeNull()
+    expect(queryByText("Bitcoin Balance")).toBeNull()
+    expect(queryByText("$1/month")).toBeNull()
+  })
+
+  it("hides the Inactivity section until the API returns the fee", async () => {
+    const { queryByText, findByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    expect(queryByText("Inactivity >12 months")).toBeNull()
+
+    expect(await findByText("Inactivity >12 months")).toBeTruthy()
   })
 
   it("renders onchain receive fees from the API", async () => {
@@ -160,13 +380,16 @@ describe("FeeRatesScreen", () => {
       },
     ]
 
-    const { getByText, findByText } = renderWithApolloMocks(errorMocks)
+    const { getByText, queryByText, findByText } = renderWithApolloMocks(errorMocks)
 
     expect(await findByText("Unable to fetch fees at this time")).toBeTruthy()
     expect(getByText("Try Again")).toBeTruthy()
 
     expect(getByText("from ~0.9%")).toBeTruthy()
     expect(getByText("0.5%")).toBeTruthy()
+    // The amount is the API's, so a failed query shows no inactivity rows
+    // rather than a fallback price.
+    expect(queryByText("Inactivity >12 months")).toBeNull()
   })
 
   it("recovers via Try Again after a failed query", async () => {
@@ -195,6 +418,10 @@ describe("FeeRatesScreen", () => {
                     },
                     { __typename: "DepositFeeTier", maxAmount: null, amount: "5000" },
                   ],
+                },
+                inactivityFee: {
+                  __typename: "InactivityFeeInformation",
+                  usdCentsPerMonth: 100,
                 },
               },
             },
@@ -239,6 +466,10 @@ describe("FeeRatesScreen", () => {
                     { __typename: "DepositFeeTier", maxAmount: null, amount: "5000" },
                   ],
                 },
+                inactivityFee: {
+                  __typename: "InactivityFeeInformation",
+                  usdCentsPerMonth: 100,
+                },
               },
             },
           },
@@ -276,6 +507,10 @@ describe("FeeRatesScreen", () => {
                     },
                     { __typename: "DepositFeeTier", maxAmount: null, amount: "0" },
                   ],
+                },
+                inactivityFee: {
+                  __typename: "InactivityFeeInformation",
+                  usdCentsPerMonth: 100,
                 },
               },
             },

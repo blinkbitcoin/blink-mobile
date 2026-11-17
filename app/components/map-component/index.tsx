@@ -1,6 +1,12 @@
 import debounce from "lodash.debounce"
 import React from "react"
-import { ActivityIndicator, LayoutChangeEvent, Pressable, View } from "react-native"
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  LayoutChangeEvent,
+  Pressable,
+  View,
+} from "react-native"
 import MapView, { Region } from "react-native-maps"
 import { PermissionStatus, RESULTS, request } from "react-native-permissions"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -10,27 +16,48 @@ import {
   BtcMapPlace,
   LatLng,
   PlaceCategory,
+  PlaceSubmission,
   placesInCategories,
   useBtcMapPlaceNames,
   useBtcMapPlaces,
+  useSubmitBtcMapPlace,
 } from "@app/btcmap"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { updateMapLastCoords } from "@app/graphql/client-only-query"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useLevel } from "@app/graphql/level-context"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { LOCATION_PERMISSION, getUserRegion } from "@app/screens/map-screen/functions"
-import { useFocusEffect } from "@react-navigation/native"
+import { AccountType } from "@app/types/wallet"
+import { reportError } from "@app/utils/error-logging"
+import { toastShow } from "@app/utils/toast"
+import { generateSecureRandomUUID } from "@app/utils/uuid"
+import { useBottomTabBarStyle } from "@app/navigation/bottom-tab-bar-style"
+import { fonts } from "@app/rne-theme/fonts"
+import { PrimaryStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  BottomTabBarHeightContext,
+  BottomTabNavigationProp,
+} from "@react-navigation/bottom-tabs"
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { isIOS } from "@rn-vui/base"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
+import { AddPlacePanel } from "./add-place-panel"
 import { CategoryFilterSheet } from "./category-filter-sheet"
 import { ClusterMarker, ClusterMarkerData } from "./cluster-marker"
 import { Viewport, placeLabels } from "./label-collision"
 import LocationButtonCopy from "./location-button-copy"
-import { MapSearchBar, searchBarBottom } from "./map-search-bar"
+import { MAP_CONTROL_INSET, searchBarBottom } from "./map-layout"
+import { MapSearchBar } from "./map-search-bar"
 import MapStyles from "./map-styles.json"
 import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
 import { truncateLabel } from "./marker-layout"
+import { PinnedPlaceMarker } from "./pinned-place-marker"
 import { PlaceLabelMarker } from "./place-label-marker"
+import { PlaceLocator } from "./place-locator"
 import { PlaceMarker } from "./place-marker"
 import { PlaceSearchModal } from "./place-search-modal"
 import { PlaceSheet } from "./place-sheet"
@@ -51,6 +78,10 @@ const EMPTY_LABELS: ReadonlySet<number> = new Set()
 const SAVE_COORDS_DEBOUNCE_MS = 1000
 const FLY_TO_DURATION_MS = 350
 
+// Hoisted so the effect that sets it has one object to depend on rather than a
+// fresh one every run. See the tab bar effect below.
+const HIDDEN_TAB_BAR = { display: "none" } as const
+
 type Props = {
   userLocation: Region
   userCoords?: LatLng
@@ -70,9 +101,36 @@ export default function MapComponent({
     theme: { colors, mode: themeMode },
   } = useTheme()
   const insets = useSafeAreaInsets()
+  const navigation =
+    useNavigation<BottomTabNavigationProp<PrimaryStackParamList, "Map">>()
+  const tabBarStyle = useBottomTabBarStyle()
   const styles = useStyles({ topInset: insets.top })
   const client = useApolloClient()
   const { LL } = useI18nContext()
+
+  // Adding a place is a level-two custodial-account feature: the submission
+  // goes to BTC Map through our own backend, which needs a Blink session
+  // behind it and rejects anything below account level two.
+  // Which account is signed in comes from the registry rather than from
+  // `useActiveWallet().isSelfCustodial`, for two reasons. The registry has the
+  // answer before the self-custodial SDK has reported, so the button never
+  // flashes into view; and it leaves this component unsubscribed from both
+  // wallets, which a map wants — every balance that moves would otherwise
+  // re-render the whole screen, marker list included, to re-decide one button.
+  // The kill switch gates it too: emptying the pins while submissions keep
+  // flowing to the backend is the outcome `btcMapPlacesEnabled` exists to avoid.
+  const isAuthed = useIsAuthed()
+  const { activeAccount } = useAccountRegistry()
+  const isSelfCustodialAccount = activeAccount?.type === AccountType.SelfCustodial
+  const { isAtLeastLevelTwo } = useLevel()
+  const { btcMapPlacesEnabled } = useRemoteConfig()
+  // A dev build skips the gate so the flow can be walked through without a
+  // level-two custodial account behind it. `__DEV__` is inlined to false in
+  // release bundles, so this cannot open the button in a shipped app. The
+  // backend still refuses a submission the account is not entitled to make.
+  const canAddPlace =
+    __DEV__ ||
+    (isAuthed && !isSelfCustodialAccount && isAtLeastLevelTwo && btcMapPlacesEnabled)
 
   const mapViewRef = React.useRef<MapView>(null)
   const openSettingsModalRef = React.useRef<OpenSettingsElement>(null)
@@ -86,12 +144,50 @@ export default function MapComponent({
   const [selectedPlace, setSelectedPlace] = React.useState<BtcMapPlace | null>(null)
   const [isSearchOpen, setSearchOpen] = React.useState(false)
   const [isFilterOpen, setFilterOpen] = React.useState(false)
+  // Aiming the pin and saying what is under it are one step, on one screen: the
+  // map keeps the top half and the form takes the bottom.
+  const [isAddingPlace, setAddingPlace] = React.useState(false)
+  // Where the place being added was fixed by the panel's Continue, or null
+  // while the pin is still being aimed. See `PinnedPlaceMarker`.
+  const [pinnedLocation, setPinnedLocation] = React.useState<LatLng | null>(null)
+  // The map's bottom edge is the screen's only when nothing is drawn below it.
+  // The tab bar and the add-place form each already pay for the system bar, so
+  // adding it again would lift the controls past 20. Read from the context
+  // rather than useBottomTabBarHeight, which throws outside a tab navigator.
+  const tabBarHeight = React.useContext(BottomTabBarHeightContext) ?? 0
+  const bottomControlOffset =
+    MAP_CONTROL_INSET + (tabBarHeight > 0 || isAddingPlace ? 0 : insets.bottom)
+  // Read by the submit handler after its awaits, when the attempt may have been
+  // closed, and by the cluster handler, which has to stay a stable callback.
+  // Synced in an effect rather than during render: writing a ref in the render
+  // body is impure under concurrent rendering, and every reader runs after the
+  // commit.
+  const isAddingPlaceRef = React.useRef(isAddingPlace)
+  React.useEffect(() => {
+    isAddingPlaceRef.current = isAddingPlace
+  }, [isAddingPlace])
+  // Which attempt at adding a place is the current one. The submit handler
+  // reads it after its awaits, when what comes back may belong to an attempt
+  // that has since been abandoned and replaced.
+  //
+  // A ref rather than state, and written where the attempt starts rather than
+  // synced from a render: nothing on screen is drawn from it. What used to be
+  // drawn from it was the form's `key`, and the form is now unmounted outright
+  // when the attempt ends, which is what throws away what was typed.
+  const addSessionRef = React.useRef(0)
+  // The idempotency key of the attempt: the backend deduplicates submissions on
+  // it, so every retry of one attempt reuses it and a new attempt mints one.
+  // Null until the attempt's first send — minting one is async, because a UUID's
+  // randomness has to come from the platform CSPRNG (see `utils/uuid.ts`), and
+  // an attempt abandoned before submitting never needs one.
+  const submissionIdRef = React.useRef<string | null>(null)
   // Empty means "everything", not "nothing" — see `placesInCategories`.
   const [categories, setCategories] = React.useState<ReadonlySet<PlaceCategory>>(
     () => new Set(),
   )
 
   const { places: allPlaces, isLoading, hasError, refresh } = useBtcMapPlaces()
+  const { submitPlace } = useSubmitBtcMapPlace()
 
   // The map tab is never unmounted, so returning to it days later would
   // otherwise show whatever was cached when the process started. `refresh` is a
@@ -232,6 +328,15 @@ export default function MapComponent({
   // fresh callback and re-render the lot of them.
   const regionRef = React.useRef(region)
 
+  // The camera is somewhere for the whole of a fling or a fly-to, not only once
+  // it stops, and confirming the pin reads this ref — so it follows the camera
+  // rather than its last resting place. Nothing but the ref: this fires every
+  // frame of a gesture, and re-rendering ~29k points' worth of markers on each
+  // of them is what `region` being written only on settle exists to avoid.
+  const handleRegionChange = React.useCallback((nextRegion: Region) => {
+    regionRef.current = nextRegion
+  }, [])
+
   const handleRegionChangeComplete = React.useCallback(
     (nextRegion: Region) => {
       regionRef.current = nextRegion
@@ -243,6 +348,10 @@ export default function MapComponent({
 
   const handleClusterPress = React.useCallback(
     (cluster: ClusterMarkerData) => {
+      // Same reason the pins go quiet below: while the pin is being placed the
+      // map is being aimed, and flying off to a cluster takes it off whatever
+      // was being aimed at. From the ref, so that this stays one callback.
+      if (isAddingPlaceRef.current) return
       mapViewRef.current?.animateToRegion(
         regionForCluster(cluster, regionRef.current),
         FLY_TO_DURATION_MS,
@@ -251,11 +360,130 @@ export default function MapComponent({
     [regionForCluster],
   )
 
+  // While the pin is being placed, a tap on the map is aiming rather than
+  // asking about somewhere that is already on it, so the existing pins go quiet
+  // instead of opening a sheet over the thing being aimed.
   const handlePlacePress = React.useCallback((place: BtcMapPlace) => {
+    // From the ref, like the cluster handler's: a callback keyed on the state
+    // would change identity whenever it flipped and re-render the markers.
+    if (isAddingPlaceRef.current) return
     setSelectedPlace(place)
   }, [])
 
+  const startAddingPlace = React.useCallback(() => {
+    setSelectedPlace(null)
+    addSessionRef.current += 1
+    // The next attempt's id is minted on its first send — see the ref above.
+    submissionIdRef.current = null
+    setPinnedLocation(null)
+    setAddingPlace(true)
+  }, [])
+
+  const stopAddingPlace = React.useCallback(() => {
+    setAddingPlace(false)
+    setPinnedLocation(null)
+  }, [])
+
+  // The panel runs to the bottom of the screen while a place is being added,
+  // covering the tab bar the way the place sheet's own window covers it. This
+  // one has no window on purpose — the map above it has to stay pannable while
+  // the form is filled in — so the bar is taken away rather than drawn over.
+  //
+  // Set on the way back too, rather than restored from a cleanup, and to the
+  // navigator's own style rather than to nothing: `setOptions` merges over
+  // `screenOptions` instead of falling back to them, and it outlives the effect
+  // that set it. A cleanup would leave this screen holding whichever style was
+  // current the moment the panel closed — switch to dark afterwards and every
+  // other tab's bar repaints from the navigator while the map's stays light.
+  // Owning the option on every run instead means the theme is followed for
+  // free, and nothing is written to a screen that has already been torn down.
+  React.useEffect(() => {
+    navigation.setOptions({ tabBarStyle: isAddingPlace ? HIDDEN_TAB_BAR : tabBarStyle })
+  }, [isAddingPlace, navigation, tabBarStyle])
+
+  /**
+   * Sends the place and answers the form with what to say about it.
+   *
+   * A failure is the form's to report rather than this screen's: it belongs
+   * beside the button that would retry it, on the sheet that still holds
+   * everything that was typed. Success is a toast, since the panel closes
+   * itself on it and there is nothing left to say it on.
+   *
+   * Both awaits are long enough for the attempt underneath to be abandoned and
+   * another one started, so what comes back is applied to the form only while
+   * it still belongs to the attempt on screen. The success toast is the one
+   * exception: it announces a place BTC Map now has, which stays true whatever
+   * the form has done since.
+   */
+  const handlePlaceSubmit = React.useCallback(
+    async (submission: PlaceSubmission): Promise<string | null> => {
+      const attempt = addSessionRef.current
+
+      let submissionId = submissionIdRef.current
+      if (!submissionId) {
+        try {
+          submissionId = await generateSecureRandomUUID()
+        } catch (mintingError) {
+          // No id, no send: without the idempotency key the backend cannot
+          // deduplicate, so the place must not go out without one. What failed
+          // here is the device's CSPRNG, not the connection, so the form gets
+          // the generic error rather than connection advice — and the failure
+          // is a defect worth a non-fatal, not a silent catch.
+          reportError("mintBtcMapSubmissionId", mintingError)
+          return LL.errors.generic()
+        }
+        // Abandoned while the id was being minted. Nothing to send — and the id
+        // must not be left in the ref for the next attempt to pick up, since
+        // the backend deduplicates on it and would take the next place as an
+        // edit of this one.
+        if (addSessionRef.current !== attempt) return null
+        // No race to atomically avoid: the form's in-flight guard means only
+        // one send per attempt is ever between its first line and this one.
+        // eslint-disable-next-line require-atomic-updates
+        submissionIdRef.current = submissionId
+      }
+      const outcome = await submitPlace(submission, submissionId)
+
+      // Success is announced even when the attempt that sent it has since been
+      // abandoned: the place is on its way to BTC Map either way, and an
+      // unannounced success invites a resubmission under a new submissionId —
+      // which the backend can no longer deduplicate.
+      if (outcome.submitted) {
+        toastShow({
+          message: (translations) => translations.MapScreen.placeSubmitted(),
+          LL,
+          type: "success",
+        })
+
+        // Leaving the attempt open would let its next send arrive as an edit of
+        // the place BTC Map just took, so it closes — by the panel, which
+        // slides out on the null and only then asks to be taken away, rather
+        // than by pulling it out from under itself here. An abandoned
+        // attempt's panel is already gone, so there is nothing to close.
+        return null
+      }
+
+      // A failure belongs to the form that sent it: a response for an attempt
+      // that is no longer the one on screen closes nothing and reports nothing
+      // over a later attempt.
+      if (!isAddingPlaceRef.current || addSessionRef.current !== attempt) {
+        return null
+      }
+
+      // The form stays open with the reason on it: what was typed is exactly
+      // what a retry should send, under the same submissionId. A refusal is
+      // about the place and a dropped request is about the connection, so they
+      // do not share a sentence — but neither of them borrows the backend's,
+      // which only ever comes back in English.
+      return outcome.refused
+        ? LL.MapScreen.placeRefused()
+        : LL.MapScreen.placeSubmissionFailed()
+    },
+    [LL, submitPlace],
+  )
+
   const closeSheet = React.useCallback(() => setSelectedPlace(null), [])
+  const closeFilter = React.useCallback(() => setFilterOpen(false), [])
 
   // The sheet cannot open in the same breath as the search closes on iOS: both
   // are native modals, and iOS silently drops one presented while another is
@@ -298,89 +526,143 @@ export default function MapComponent({
   }, [])
 
   return (
-    <View style={styles.viewContainer}>
-      <MapView
-        ref={mapViewRef}
-        style={styles.map}
-        onLayout={handleLayout}
-        showsUserLocation={permissionsStatus === RESULTS.GRANTED}
-        showsMyLocationButton={false}
-        initialRegion={userLocation}
-        // The basemap draws its own restaurants, shops and stations, which read
-        // as merchants we vouch for and bury the ones we do. Suppressing them
-        // takes both mechanisms: the style sheet is Google's and only reaches
-        // Android, while iOS renders Apple Maps, which ignores it and honours
-        // this prop instead.
-        showsPointsOfInterests={false}
-        customMapStyle={themeMode === "dark" ? MapStyles.dark : MapStyles.light}
-        onRegionChangeComplete={handleRegionChangeComplete}
-        moveOnMarkerPress={false}
-        rotateEnabled={false}
-        pitchEnabled={false}
-        toolbarEnabled={false}
-      >
-        {clusters.map((cluster) => (
-          <ClusterMarker
-            key={`cluster-${cluster.id}`}
-            cluster={cluster}
-            onPress={handleClusterPress}
-          />
-        ))}
-        {places.map((place) => (
-          <PlaceMarker key={place.id} place={place} onPress={handlePlacePress} />
-        ))}
-        {/* Separate markers, not children of the pins: a name arriving has to
-            mount something new rather than resize a pin that has already
-            rasterised — see place-marker.tsx.
-
-            Only the names that won a place in the collision pass are mounted. A
-            pin whose name lost still draws; it is the name that is dropped, not
-            the merchant. */}
-        {places.map((place) => {
-          const name = labelledPlaceIds.has(place.id)
-            ? labelNames.get(place.id)
-            : undefined
-          return name ? (
-            <PlaceLabelMarker
-              key={`label-${place.id}`}
-              place={place}
-              name={name}
-              onPress={handlePlacePress}
+    // Android resizes its own window for the keyboard; iOS does not, so this is
+    // what gives the two halves below a shorter screen to split there. They keep
+    // splitting it evenly, which is the point: typing takes room from the map as
+    // well as the form, so the pin being aimed stays in view while the name of
+    // what it is pointing at is typed. Only while there is a form — otherwise
+    // the search modal's own keyboard would resize the map behind it.
+    <KeyboardAvoidingView
+      style={styles.viewContainer}
+      behavior={isIOS && isAddingPlace ? "padding" : undefined}
+    >
+      <View style={styles.mapArea}>
+        <MapView
+          ref={mapViewRef}
+          style={styles.map}
+          onLayout={handleLayout}
+          showsUserLocation={permissionsStatus === RESULTS.GRANTED}
+          showsMyLocationButton={false}
+          initialRegion={userLocation}
+          // The basemap draws its own restaurants, shops and stations, which read
+          // as merchants we vouch for and bury the ones we do. Suppressing them
+          // takes both mechanisms: the style sheet is Google's and only reaches
+          // Android, while iOS renders Apple Maps, which ignores it and honours
+          // this prop instead.
+          showsPointsOfInterests={false}
+          customMapStyle={themeMode === "dark" ? MapStyles.dark : MapStyles.light}
+          onRegionChange={handleRegionChange}
+          onRegionChangeComplete={handleRegionChangeComplete}
+          moveOnMarkerPress={false}
+          rotateEnabled={false}
+          pitchEnabled={false}
+          toolbarEnabled={false}
+        >
+          {clusters.map((cluster) => (
+            <ClusterMarker
+              key={`cluster-${cluster.id}`}
+              cluster={cluster}
+              onPress={handleClusterPress}
             />
-          ) : null
-        })}
-      </MapView>
+          ))}
+          {places.map((place) => (
+            <PlaceMarker key={place.id} place={place} onPress={handlePlacePress} />
+          ))}
+          {/* Separate markers, not children of the pins: a name arriving has to
+              mount something new rather than resize a pin that has already
+              rasterised — see place-marker.tsx.
 
-      <MapSearchBar
-        topInset={insets.top}
-        onSearchPress={() => setSearchOpen(true)}
-        onFilterPress={() => setFilterOpen(true)}
-        isFiltered={categories.size > 0}
-      />
+              Only the names that won a place in the collision pass are mounted.
+              A pin whose name lost still draws; it is the name that is dropped,
+              not the merchant. */}
+          {places.map((place) => {
+            const name = labelledPlaceIds.has(place.id)
+              ? labelNames.get(place.id)
+              : undefined
+            return name ? (
+              <PlaceLabelMarker
+                key={`label-${place.id}`}
+                place={place}
+                name={name}
+                onPress={handlePlacePress}
+              />
+            ) : null
+          })}
+          {isAddingPlace && pinnedLocation && (
+            <PinnedPlaceMarker coordinate={pinnedLocation} />
+          )}
+        </MapView>
 
-      {isLoading && !allPlaces.length && (
-        <View style={styles.statusPill}>
-          <ActivityIndicator size="small" color={colors.primary} />
-          <Text style={styles.statusText}>{LL.MapScreen.loadingPlaces()}</Text>
-        </View>
-      )}
+        {/* Both are about reading the map, and neither belongs over a map that
+            is being used to point at something. */}
+        {!isAddingPlace && (
+          <>
+            <MapSearchBar
+              topInset={insets.top}
+              onSearchPress={() => setSearchOpen(true)}
+              onFilterPress={() => setFilterOpen(true)}
+              isFiltered={categories.size > 0}
+            />
 
-      {hasError && (
-        <Pressable style={styles.statusPill} onPress={refresh}>
-          <GaloyIcon name="warning" size={16} color={colors.error} />
-          <Text style={styles.statusText}>{LL.MapScreen.placesError()}</Text>
-          <Text style={styles.retryText}>{LL.common.tryAgain()}</Text>
-        </Pressable>
-      )}
-
-      {permissionsStatus !== RESULTS.UNAVAILABLE &&
-        permissionsStatus !== RESULTS.LIMITED && (
-          <LocationButtonCopy
-            requestPermissions={requestLocationPermission}
-            permissionStatus={permissionsStatus}
-            centerOnUser={centerOnUser}
-          />
+            {canAddPlace && (
+              <Pressable
+                testID="open-add-place"
+                style={[styles.addPlace, { bottom: bottomControlOffset }]}
+                onPress={startAddingPlace}
+                accessibilityRole="button"
+              >
+                <GaloyIcon name="plus" size={16} color={colors.accent} />
+                <Text style={styles.addPlaceText}>{LL.MapScreen.addPlace()}</Text>
+              </Pressable>
+            )}
+          </>
         )}
+
+        {/* Aimed by panning until Continue, and a marker on the place after
+            it — the second step sends the coordinate Continue took, so a
+            crosshair still asking to be moved would be moving nothing. */}
+        {isAddingPlace && !pinnedLocation && <PlaceLocator />}
+
+        {isLoading && !allPlaces.length && (
+          <View style={styles.statusPill}>
+            <ActivityIndicator size="small" color={colors.accent} />
+            <Text style={styles.statusText}>{LL.MapScreen.loadingPlaces()}</Text>
+          </View>
+        )}
+
+        {hasError && (
+          <Pressable style={styles.statusPill} onPress={refresh}>
+            <GaloyIcon name="warning" size={16} color={colors.error} />
+            <Text style={styles.statusText}>{LL.MapScreen.placesError()}</Text>
+            <Text style={styles.retryText}>{LL.common.tryAgain()}</Text>
+          </Pressable>
+        )}
+
+        {permissionsStatus !== RESULTS.UNAVAILABLE &&
+          permissionsStatus !== RESULTS.LIMITED && (
+            // Centring on yourself and then nudging the pin onto your own shop is
+            // the common way to place one, so this stays on the map throughout.
+            <LocationButtonCopy
+              bottom={bottomControlOffset}
+              requestPermissions={requestLocationPermission}
+              permissionStatus={permissionsStatus}
+              centerOnUser={centerOnUser}
+            />
+          )}
+      </View>
+
+      {/* The other half of the screen, and the other half of the question. It
+          is unmounted when the attempt ends, which is what throws away what was
+          typed — so the map gets all of itself back and a next attempt starts
+          on an empty form. */}
+      {isAddingPlace && (
+        <AddPlacePanel
+          location={center}
+          onSubmit={handlePlaceSubmit}
+          onClose={stopAddingPlace}
+          onPin={setPinnedLocation}
+        />
+      )}
 
       <OpenSettingsModal ref={openSettingsModalRef} />
 
@@ -399,11 +681,11 @@ export default function MapComponent({
         isVisible={isFilterOpen}
         selected={categories}
         onChange={setCategories}
-        onClose={() => setFilterOpen(false)}
+        onClose={closeFilter}
       />
 
       <PlaceSheet place={selectedPlace} userLocation={coords} onClose={closeSheet} />
-    </View>
+    </KeyboardAvoidingView>
   )
 }
 
@@ -415,6 +697,14 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
 
   viewContainer: { flex: 1 },
 
+  // Everything drawn on the map is positioned inside this rather than over the
+  // whole screen, so that "the bottom of the map" means the top of the form
+  // while one is open and the top of the tab bar when none is. The pin's
+  // centre — which is the coordinate being submitted — comes out right for the
+  // same reason: it is the centre of the map view, whatever height that view
+  // currently has.
+  mapArea: { flex: 1 },
+
   statusPill: {
     position: "absolute",
     // Under the search bar, which now owns the top edge of the map.
@@ -423,7 +713,7 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
     flexDirection: "row",
     alignItems: "center",
     columnGap: 8,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 8,
@@ -431,12 +721,29 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
   },
   statusText: {
     fontSize: 13,
-    color: colors.black,
+    color: colors.textOnBackground,
     flexShrink: 1,
   },
   retryText: {
     fontSize: 13,
-    fontWeight: "600",
-    color: colors.primary,
+    fontFamily: fonts.bold,
+    color: colors.accent,
+  },
+  addPlace: {
+    position: "absolute",
+    left: MAP_CONTROL_INSET,
+    zIndex: 99,
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 6,
+    backgroundColor: colors.backgroundDefault,
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+  },
+  addPlaceText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: colors.textOnBackground,
   },
 }))

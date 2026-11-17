@@ -18,5 +18,5 @@
       "@types/jest"
     ]
   },
-  "include": ["app", "e2e", "__tests__", "__mocks__"]
+  "include": ["app", "e2e", "__tests__", "__mocks__", "jest.setup-after-env.ts"]
 }

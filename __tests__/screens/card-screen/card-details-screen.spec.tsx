@@ -1,5 +1,5 @@
 import React from "react"
-import { render, fireEvent, act } from "@testing-library/react-native"
+import { render, fireEvent, act, within } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardDetailsScreen } from "@app/screens/card-screen/card-details-screen"
@@ -17,6 +17,8 @@ jest.mock("react-native-linear-gradient", () => ({
 const mockGoBack = jest.fn()
 const mockSetOptions = jest.fn()
 const mockNavigate = jest.fn()
+const mockPush = jest.fn()
+const mockDispatch = jest.fn()
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
   return {
@@ -25,9 +27,21 @@ jest.mock("@react-navigation/native", () => {
       goBack: mockGoBack,
       setOptions: mockSetOptions,
       navigate: mockNavigate,
+      push: mockPush,
+      dispatch: mockDispatch,
+      getState: () => ({ key: "stack-key" }),
     }),
+    useRoute: () => ({ key: "card-details-route-key" }),
   }
 })
+
+/** The gate removes the screen by name rather than saying "back", so a result
+ *  landing after something else was pushed cannot pop that instead. */
+const expectGateBouncedTheScreen = () => {
+  expect(mockDispatch).toHaveBeenCalledTimes(1)
+  const [action] = mockDispatch.mock.calls[0]
+  expect(action.source).toBe("card-details-route-key")
+}
 
 const mockCopyToClipboard = jest.fn()
 const mockUseClipboard = jest.fn((_clearAfterMs?: number) => ({
@@ -47,8 +61,59 @@ jest.mock("@app/utils/biometricAuthentication", () => ({
   },
 }))
 
+const mockReadIsPinEnabled = jest.fn()
+const mockReadIsBiometricsEnabled = jest.fn()
+jest.mock("@app/utils/storage/secureStorage", () => ({
+  __esModule: true,
+  default: {
+    readIsPinEnabled: () => mockReadIsPinEnabled(),
+    readIsBiometricsEnabled: () => mockReadIsBiometricsEnabled(),
+    /** Read by the account registry the screen renders under. */
+    getSessionProfiles: jest.fn().mockResolvedValue([]),
+  },
+}))
+
+jest.mock("@app/utils/toast", () => ({
+  toastShow: jest.fn(),
+}))
+
+import { toastShow } from "@app/utils/toast"
+
+let mockHolderName = ""
+jest.mock("@app/hooks/use-card-holder", () => ({
+  useCardHolder: () => ({
+    firstName: "",
+    lastName: "",
+    fullName: mockHolderName,
+    loading: false,
+  }),
+}))
+
+let mockSecrets: { pan: string; cvc: string } | undefined
+let mockSecretsHasFailed = false
+const mockFetchSecrets = jest.fn()
+jest.mock("@app/screens/card-screen/hooks/use-card-secrets", () => ({
+  useCardSecrets: () => ({
+    secrets: mockSecrets,
+    hasFailed: mockSecretsHasFailed,
+    fetchSecrets: mockFetchSecrets,
+  }),
+}))
+
+let mockScreenGuard: "on" | "pending" | "failed" = "on"
+jest.mock("@app/utils/screen-security", () => ({
+  acquireScreenSecurity: () => {
+    const ready = {
+      on: () => Promise.resolve(),
+      pending: () => new Promise<void>(() => {}),
+      failed: () => Promise.reject(new Error("screen guard unavailable")),
+    }[mockScreenGuard]()
+    return { ready, release: () => Promise.resolve() }
+  },
+}))
+
 const mockUseCardData = jest.fn()
-jest.mock("@app/screens/card-screen/hooks/use-card-data", () => ({
+jest.mock("@app/hooks/use-card-data", () => ({
   useCardData: () => mockUseCardData(),
 }))
 
@@ -82,7 +147,20 @@ const defaultCardData = {
 
 const setupMocks = (overrides?: { cardData?: Partial<typeof defaultCardData> }) => {
   mockUseCardData.mockReturnValue({ ...defaultCardData, ...overrides?.cardData })
-  mockIsSensorAvailable.mockResolvedValue(false)
+  mockSecrets = undefined
+  mockSecretsHasFailed = false
+  mockHolderName = ""
+  mockScreenGuard = "on"
+  /** Default arrangement: a biometrics user passing the prompt. The gate fails
+   *  closed in every unauthenticated arrangement, so most cases need a pass. */
+  mockReadIsPinEnabled.mockResolvedValue({ status: "no" })
+  mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
+  mockIsSensorAvailable.mockResolvedValue(true)
+  mockAuthenticate.mockImplementation(
+    (_desc: string, onSuccess: () => void, _onFail: () => void) => {
+      onSuccess()
+    },
+  )
 }
 
 describe("CardDetailsScreen", () => {
@@ -97,30 +175,8 @@ describe("CardDetailsScreen", () => {
     jest.useRealTimers()
   })
 
-  describe("biometric authentication", () => {
-    it("skips biometric when sensor is not available", async () => {
-      mockIsSensorAvailable.mockResolvedValue(false)
-
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Card number")).toBeTruthy()
-      expect(mockAuthenticate).not.toHaveBeenCalled()
-    })
-
-    it("triggers biometric when sensor is available", async () => {
-      mockIsSensorAvailable.mockResolvedValue(true)
-      mockAuthenticate.mockImplementation(
-        (_desc: string, onSuccess: () => void, _onFail: () => void) => {
-          onSuccess()
-        },
-      )
-
+  describe("local auth gate", () => {
+    it("authenticates through the biometric prompt", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardDetailsScreen />
@@ -137,8 +193,30 @@ describe("CardDetailsScreen", () => {
       expect(getByText("Card number")).toBeTruthy()
     })
 
-    it("navigates back on biometric failure", async () => {
-      mockIsSensorAvailable.mockResolvedValue(true)
+    it("does not open when the sensor is unavailable; challenges the pin instead", async () => {
+      /** The old gate's fail-open: a missing sensor rendered the card details with
+       *  no challenge at all. */
+      mockReadIsPinEnabled.mockResolvedValue({ status: "yes" })
+      mockIsSensorAvailable.mockResolvedValue(false)
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(queryByText("Card number")).toBeNull()
+      expect(mockAuthenticate).not.toHaveBeenCalled()
+      expect(mockPush).toHaveBeenCalledWith(
+        "pin",
+        expect.objectContaining({ screenPurpose: "ChallengePin" }),
+      )
+    })
+
+    it("falls back to the pin challenge on biometric failure", async () => {
+      mockReadIsPinEnabled.mockResolvedValue({ status: "yes" })
       mockAuthenticate.mockImplementation(
         (_desc: string, _onSuccess: () => void, onFail: () => void) => {
           onFail()
@@ -153,7 +231,70 @@ describe("CardDetailsScreen", () => {
 
       await act(async () => {})
 
-      expect(mockGoBack).toHaveBeenCalled()
+      expect(mockPush).toHaveBeenCalledWith(
+        "pin",
+        expect.objectContaining({ screenPurpose: "ChallengePin" }),
+      )
+      expect(mockDispatch).not.toHaveBeenCalled()
+    })
+
+    it("explains and navigates back on biometric failure with no pin to fall back to", async () => {
+      mockAuthenticate.mockImplementation(
+        (_desc: string, _onSuccess: () => void, onFail: () => void) => {
+          onFail()
+        },
+      )
+
+      render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(toastShow).toHaveBeenCalled()
+      expectGateBouncedTheScreen()
+    })
+
+    it("bounces silently when the pin challenge is declined", async () => {
+      mockReadIsPinEnabled.mockResolvedValue({ status: "yes" })
+      mockIsSensorAvailable.mockResolvedValue(false)
+
+      render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      const challengeParams = mockPush.mock.calls.find(
+        ([routeName]) => routeName === "pin",
+      )?.[1]
+      await act(async () => challengeParams.onChallengeFailure())
+
+      /** The user cancelled and knows why; setup advice here would mislead. */
+      expect(toastShow).not.toHaveBeenCalled()
+      expectGateBouncedTheScreen()
+    })
+
+    it("fails closed when no factor is configured at all", async () => {
+      mockReadIsPinEnabled.mockResolvedValue({ status: "no" })
+      mockReadIsBiometricsEnabled.mockResolvedValue({ status: "no" })
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(queryByText("Card number")).toBeNull()
+      expect(mockAuthenticate).not.toHaveBeenCalled()
+      expect(toastShow).toHaveBeenCalled()
+      expectGateBouncedTheScreen()
     })
   })
 
@@ -361,7 +502,7 @@ describe("CardDetailsScreen", () => {
   })
 
   describe("copy interactions", () => {
-    it("copies lastFour when card number field is pressed", async () => {
+    it("does not copy the last four before the full card number arrives", async () => {
       const { getByTestId } = render(
         <ContextForScreen>
           <CardDetailsScreen />
@@ -370,15 +511,13 @@ describe("CardDetailsScreen", () => {
 
       await act(async () => {})
 
+      expect(within(getByTestId("card-number-field")).getByText("—")).toBeTruthy()
+
       await act(async () => {
         fireEvent.press(getByTestId("card-number-field"))
       })
 
-      expect(mockCopyToClipboard).toHaveBeenCalledWith(
-        expect.objectContaining({
-          content: "4242",
-        }),
-      )
+      expect(mockCopyToClipboard).not.toHaveBeenCalled()
     })
 
     it("initializes clipboard with 60s auto-clear", async () => {
@@ -391,6 +530,139 @@ describe("CardDetailsScreen", () => {
       await act(async () => {})
 
       expect(mockUseClipboard).toHaveBeenCalledWith(60_000)
+    })
+  })
+
+  describe("card secrets", () => {
+    const renderDetails = async () => {
+      const screen = render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+      return screen
+    }
+
+    it("asks for the secrets of the card once the user is authenticated", async () => {
+      await renderDetails()
+
+      expect(mockFetchSecrets).toHaveBeenCalledWith("card-1")
+    })
+
+    it("never asks for the secrets when authentication fails", async () => {
+      mockAuthenticate.mockImplementation(
+        (_desc: string, _onSuccess: () => void, onFail: () => void) => {
+          onFail()
+        },
+      )
+
+      await renderDetails()
+
+      expect(mockFetchSecrets).not.toHaveBeenCalled()
+    })
+
+    it("shows the full card number, the CVV and the holder once loaded", async () => {
+      mockSecrets = { pan: "4549880051539745", cvc: "342" }
+      mockHolderName = "Satoshi Nakamoto"
+
+      const { getByTestId, queryByTestId } = await renderDetails()
+
+      expect(queryByTestId("card-secrets-loading")).toBeNull()
+      expect(
+        within(getByTestId("card-number-field")).getByText("4549 8800 5153 9745"),
+      ).toBeTruthy()
+      expect(within(getByTestId("card-cvv-field")).getByText("342")).toBeTruthy()
+      expect(
+        within(getByTestId("card-holder-field")).getByText("Satoshi Nakamoto"),
+      ).toBeTruthy()
+    })
+
+    it("copies the full card number, the CVV and the holder name", async () => {
+      mockSecrets = { pan: "4549880051539745", cvc: "342" }
+      mockHolderName = "Satoshi Nakamoto"
+
+      const { getByTestId } = await renderDetails()
+
+      await act(async () => {
+        fireEvent.press(getByTestId("card-number-field"))
+        fireEvent.press(getByTestId("card-cvv-field"))
+        fireEvent.press(getByTestId("card-holder-field"))
+      })
+
+      const copied = mockCopyToClipboard.mock.calls.map(([params]) => params.content)
+      expect(copied).toEqual(["4549880051539745", "342", "Satoshi Nakamoto"])
+    })
+
+    it("shows a loader and no retry until the secrets arrive", async () => {
+      const { getByTestId, queryByText } = await renderDetails()
+
+      expect(getByTestId("card-secrets-loading")).toBeTruthy()
+      expect(queryByText("Try Again")).toBeNull()
+    })
+
+    it("shows the failure and asks for the secrets again from its retry", async () => {
+      mockSecretsHasFailed = true
+
+      const { getByText, getByTestId } = await renderDetails()
+
+      expect(getByText("Unexpected error occurred")).toBeTruthy()
+      await act(async () => {
+        fireEvent.press(getByTestId("card-number-field"))
+      })
+      expect(mockCopyToClipboard).not.toHaveBeenCalled()
+
+      mockFetchSecrets.mockClear()
+      await act(async () => {
+        fireEvent.press(getByText("Try Again"))
+      })
+
+      expect(mockFetchSecrets).toHaveBeenCalledWith("card-1")
+    })
+  })
+
+  describe("screen protection", () => {
+    const renderDetails = async () => {
+      const screen = render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+      return screen
+    }
+
+    it("keeps the card secrets unfetched and hidden while the screen guard is pending", async () => {
+      mockScreenGuard = "pending"
+      mockSecrets = { pan: "4549880051539745", cvc: "342" }
+
+      const { getByTestId, queryByTestId } = await renderDetails()
+
+      expect(getByTestId("screen-security-activating")).toBeTruthy()
+      expect(mockFetchSecrets).not.toHaveBeenCalled()
+      expect(queryByTestId("card-number-field")).toBeNull()
+      expect(queryByTestId("card-cvv-field")).toBeNull()
+    })
+
+    it("never mounts the card secrets when the screen guard fails", async () => {
+      mockScreenGuard = "failed"
+      mockSecrets = { pan: "4549880051539745", cvc: "342" }
+
+      const { getByTestId, queryByTestId } = await renderDetails()
+      await act(async () => {
+        jest.runAllTimers()
+      })
+
+      expect(getByTestId("screen-security-error")).toBeTruthy()
+      expect(mockFetchSecrets).not.toHaveBeenCalled()
+      expect(queryByTestId("card-number-field")).toBeNull()
+      expect(queryByTestId("card-cvv-field")).toBeNull()
+    })
+
+    it("asks for the secrets once the user and the screen guard are both cleared", async () => {
+      await renderDetails()
+
+      expect(mockFetchSecrets).toHaveBeenCalledWith("card-1")
     })
   })
 

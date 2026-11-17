@@ -3,7 +3,9 @@ import { Pressable, View } from "react-native"
 
 import { Colors, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
+import { cappedLineHeight } from "@app/rne-theme/text-scaling"
 
 type ThemeColor = keyof Colors
 
@@ -31,7 +33,7 @@ export const SettingsCard: React.FC<SettingsCardProps> = ({
   } = useTheme()
 
   const resolvedBorder = borderColor ? String(colors[borderColor]) : undefined
-  const resolvedIcon = iconColor ? String(colors[iconColor]) : String(colors.grey2)
+  const resolvedIcon = iconColor ? String(colors[iconColor]) : String(colors.textMuted)
   const resolvedTitle = titleColor ? String(colors[titleColor]) : undefined
 
   const styles = useStyles({ borderColor: resolvedBorder })
@@ -46,7 +48,7 @@ export const SettingsCard: React.FC<SettingsCardProps> = ({
           </Text>
           <Text style={styles.description}>{description}</Text>
         </View>
-        <GaloyIcon name="caret-right" size={20} color={String(colors.primary)} />
+        <GaloyIcon name="caret-right" size={20} color={String(colors.accent)} />
       </View>
     </Pressable>
   )
@@ -54,8 +56,8 @@ export const SettingsCard: React.FC<SettingsCardProps> = ({
 
 const useStyles = makeStyles(({ colors }, { borderColor }: { borderColor?: string }) => ({
   container: {
-    borderRadius: 12,
-    backgroundColor: colors.grey5,
+    borderRadius: radius.default,
+    backgroundColor: colors.surfaceInteractive,
     padding: 14,
     borderWidth: borderColor ? 1 : 0,
     borderColor: borderColor ?? "transparent",
@@ -72,13 +74,13 @@ const useStyles = makeStyles(({ colors }, { borderColor }: { borderColor?: strin
   title: {
     fontSize: 14,
     fontWeight: "700",
-    lineHeight: 20,
-    color: colors.black,
+    lineHeight: cappedLineHeight(20),
+    color: colors.textOnBackground,
   },
   description: {
     fontSize: 14,
     fontWeight: "400",
-    lineHeight: 20,
-    color: colors.black,
+    lineHeight: cappedLineHeight(20),
+    color: colors.textOnBackground,
   },
 }))

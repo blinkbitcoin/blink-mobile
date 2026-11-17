@@ -35,7 +35,7 @@ export const StepsProgressBar: React.FC<StepsProgressBarProps> = ({
       <SegmentedProgressBar
         total={steps.length}
         filled={currentStep}
-        fillColor={colors.primary}
+        fillColor={colors.accent}
       />
       <View style={styles.labelsContainer}>
         {steps.map((label, index) => (
@@ -65,6 +65,6 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 10,
     lineHeight: 13,
     fontWeight: "400",
-    color: colors.grey2,
+    color: colors.textMuted,
   },
 }))

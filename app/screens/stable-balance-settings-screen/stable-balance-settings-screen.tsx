@@ -12,6 +12,7 @@ import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { WalletCurrency } from "@app/graphql/generated"
 import { formatUsdInDisplay } from "@app/utils/amounts"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { StableBalanceConfirmModal } from "./stable-balance-confirm-modal"
 import { useStableBalanceToggle, useStableBalanceToggleQuote } from "./hooks"
@@ -159,10 +160,10 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 16,
   },
   title: {
-    fontWeight: "600",
+    fontFamily: fonts.bold,
   },
   description: {
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   row: {
     flexDirection: "row",
@@ -171,17 +172,17 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 12,
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    borderColor: colors.grey4,
+    borderColor: colors.neutral,
   },
   rowLabel: {
     flex: 1,
     gap: 2,
   },
   rowTitle: {
-    fontWeight: "600",
+    fontFamily: fonts.bold,
   },
   rowHint: {
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   spinner: {
     marginRight: 4,

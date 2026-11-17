@@ -3,13 +3,39 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useAppConfig } from "@app/hooks"
 import useLogout from "@app/hooks/use-logout"
+import { useReturnToGate } from "@app/hooks/use-return-to-gate"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
+/**
+ * Why this is not just `ProfileProps | undefined`: callers answer "no other
+ * profile" with a full logout, which erases every saved session. Collapsing a
+ * failed read into that answer would delete the very profiles the read could
+ * not see, so the unreadable case has to reach the caller as its own outcome.
+ */
+export const SwitchProfileOutcome = {
+  Switched: "switched",
+  NoOtherProfile: "noOtherProfile",
+  ProfilesUnreadable: "profilesUnreadable",
+} as const
+export type SwitchProfileOutcome =
+  (typeof SwitchProfileOutcome)[keyof typeof SwitchProfileOutcome]
+
+/** Runs the navigation that ends the switch. A caller whose screen refuses to be left
+ *  while it works (the account deletion lock) hands its own way through here. */
+type LeaveScreen = (navigate: () => void) => void
+
+const leaveDirectly: LeaveScreen = (navigate) => navigate()
+
 type UseSwitchToNextProfileResult = {
-  switchToNextProfile: (tokenToDeactivate: string) => Promise<ProfileProps | undefined>
+  switchToNextProfile: (
+    tokenToDeactivate: string,
+    leave?: LeaveScreen,
+  ) => Promise<SwitchProfileOutcome>
 }
 
 export const useSwitchToNextProfile = (): UseSwitchToNextProfileResult => {
@@ -17,29 +43,53 @@ export const useSwitchToNextProfile = (): UseSwitchToNextProfileResult => {
   const { logout } = useLogout()
   const { saveToken } = useAppConfig()
   const { LL } = useI18nContext()
+  const { readIsAppLocked } = useAuthenticationContext()
+  const returnToGate = useReturnToGate()
 
   const switchToNextProfile = async (
     tokenToDeactivate: string,
-  ): Promise<ProfileProps | undefined> => {
-    const profiles = await KeyStoreWrapper.getSessionProfiles()
+    leave: LeaveScreen = leaveDirectly,
+  ): Promise<SwitchProfileOutcome> => {
+    const read = await KeyStoreWrapper.readSessionProfiles()
+    const profiles = read.status === "found" ? read.profiles : []
     const nextProfile = profiles.find((profile) => profile.token !== tokenToDeactivate)
 
+    // The dead session goes either way: this deactivation is scoped to its own
+    // token and never rewrites the list from an empty read.
     await logout({
       stateToDefault: false,
       token: tokenToDeactivate,
       isValidToken: false,
     })
 
-    if (nextProfile) {
-      await saveToken(nextProfile.token)
-      toastShow({
-        type: "success",
-        message: LL.ProfileScreen.switchAccount(),
-        LL,
-      })
-      navigation.navigate("Primary")
+    if (read.status === "failed") {
+      reportError("switch to next profile", read.err)
+      return SwitchProfileOutcome.ProfilesUnreadable
     }
-    return nextProfile
+
+    if (!nextProfile) return SwitchProfileOutcome.NoOtherProfile
+
+    await saveToken(nextProfile.token)
+    toastShow({
+      type: "success",
+      message: LL.ProfileScreen.switchAccount(),
+      LL,
+    })
+    /** Behind a lock that has not been answered, the screens under the lock still
+     *  belong to the session that just died: answered, a resume lock steps back onto
+     *  them, now running under the next session's token. So the whole stack goes and
+     *  the gate asks again from a cold start, which lands on home for the new session.
+     *  Without a lock up, home is where the switch lands.
+     *
+     *  Read now rather than at the call, and from the lock's own ref rather than a mirror
+     *  of it: a relock raised during the awaits above lands there at once, while any state
+     *  copied from it is still a commit behind.
+     *
+     *  Home is the one already on the stack: `navigate` would push a second one and leave
+     *  the screen the switch started from underneath it, still reachable with back. */
+    const isAppLocked = readIsAppLocked()
+    leave(() => (isAppLocked ? returnToGate() : navigation.popTo("Primary")))
+    return SwitchProfileOutcome.Switched
   }
 
   return { switchToNextProfile }

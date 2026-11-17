@@ -1,25 +1,44 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 
-import { fireEvent, render, waitFor } from "@testing-library/react-native"
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
+import { HEADER_ICON_TOUCH_SIZE } from "@app/components/header-no-glass"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { ViewBackupPhraseScreen } from "@app/screens/self-custodial/onboarding/manual-backup/view-backup-phrase-screen"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
-import { ContextForScreen } from "../../../helper"
+import { ContextForScreen, ContextForScreenWithTheme } from "../../../helper"
 
 const mockNavigate = jest.fn()
+const mockPush = jest.fn()
 const mockGoBack = jest.fn()
 const mockSetOptions = jest.fn()
+const mockDispatch = jest.fn()
+/** One object for every render, like the real hook: the auth gate's effect is keyed
+ *  on it, and a fresh object per render would re-prompt on every re-render. */
+const mockNavigation = {
+  navigate: mockNavigate,
+  push: mockPush,
+  goBack: mockGoBack,
+  setOptions: mockSetOptions,
+  dispatch: mockDispatch,
+  getState: () => ({ key: "stack-key" }),
+}
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({
-    navigate: mockNavigate,
-    goBack: mockGoBack,
-    setOptions: mockSetOptions,
-  }),
+  useNavigation: () => mockNavigation,
+  useRoute: () => ({ key: "view-backup-phrase-route-key" }),
 }))
+
+/** The gate removes the screen by name rather than saying "back", so a result
+ *  landing after something else was pushed cannot pop that instead. */
+const expectGateBouncedTheScreen = () => {
+  expect(mockDispatch).toHaveBeenCalledTimes(1)
+  const [action] = mockDispatch.mock.calls[0]
+  expect(action.source).toBe("view-backup-phrase-route-key")
+}
 
 const mockIsSensorAvailable = jest.fn()
 const mockAuthenticate = jest.fn()
@@ -30,6 +49,25 @@ jest.mock("@app/utils/biometricAuthentication", () => ({
     authenticate: (...args: unknown[]) => mockAuthenticate(...args),
   },
 }))
+
+const mockReleaseScreenSecurity = jest.fn(() => Promise.resolve())
+let mockLeaseReady: Promise<void> = Promise.resolve()
+jest.mock("@app/utils/screen-security", () => ({
+  acquireScreenSecurity: () => ({
+    ready: mockLeaseReady,
+    release: mockReleaseScreenSecurity,
+  }),
+}))
+
+const deferred = <T,>() => {
+  let resolve: (value: T) => void = () => {}
+  let reject: (reason: Error) => void = () => {}
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res
+    reject = rej
+  })
+  return { promise, resolve, reject }
+}
 
 const renderHeaderRight = () => {
   const calls = mockSetOptions.mock.calls
@@ -49,15 +87,24 @@ const headerRightWasInstalled = () =>
 const mockCopyToClipboard = jest.fn()
 jest.mock("@app/hooks", () => ({
   useClipboard: () => ({ copyToClipboard: mockCopyToClipboard }),
+  // The gate is the subject under test here: real hooks, mocked native layers.
+  useLocalAuthGate: jest.requireActual("@app/hooks/use-local-auth-gate").useLocalAuthGate,
+  useAuthGateFailureHandler: jest.requireActual("@app/hooks/use-local-auth-gate")
+    .useAuthGateFailureHandler,
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => ({ sparkCompatibleWalletsUrl: "https://spark.example" }),
 }))
 
-jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", () => ({
-  useWalletMnemonic: () =>
+/** Wrapped in a jest.fn so the deferral is assertable: the mnemonic must not be
+ *  pulled while authentication is pending. */
+const mockUseWalletMnemonic = jest.fn(
+  () =>
     "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain",
+)
+jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", () => ({
+  useWalletMnemonic: () => mockUseWalletMnemonic(),
 }))
 
 const mockOpenExternalUrl = jest.fn()
@@ -65,19 +112,149 @@ jest.mock("@app/utils/external", () => ({
   openExternalUrl: (...args: unknown[]) => mockOpenExternalUrl(...args),
 }))
 
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
+}))
+
 loadLocale("en")
 const LL = i18nObject("en")
 
 describe("ViewBackupPhraseScreen", () => {
-  let mockGetIsBiometricsEnabled: jest.SpyInstance
+  let mockReadIsBiometricsEnabled: jest.SpyInstance
+  let mockReadIsPinEnabled: jest.SpyInstance
+
+  /** The pin challenge resolves through callbacks handed to the pin route. */
+  const challengeParams = () =>
+    mockPush.mock.calls.find(([routeName]) => routeName === "pin")?.[1]
 
   beforeEach(() => {
     jest.clearAllMocks()
-    // biometrics disabled by default: the gate passes without prompting
-    mockGetIsBiometricsEnabled = jest
-      .spyOn(KeyStoreWrapper, "getIsBiometricsEnabled")
-      .mockResolvedValue(false)
+    // no factor configured by default: the reveal keeps its one-tap access
+    // (the screen's explicit `required: false` product decision)
+    mockReadIsBiometricsEnabled = jest
+      .spyOn(KeyStoreWrapper, "readIsBiometricsEnabled")
+      .mockResolvedValue({ status: "no" })
+    mockReadIsPinEnabled = jest
+      .spyOn(KeyStoreWrapper, "readIsPinEnabled")
+      .mockResolvedValue({ status: "no" })
     mockIsSensorAvailable.mockResolvedValue(true)
+    mockLeaseReady = Promise.resolve()
+  })
+
+  /** Until the screen guard is actually on, neither the words nor the header Copy
+   *  action may exist — a pending or failed registration must not paint the
+   *  mnemonic. */
+  describe("screen security gate", () => {
+    it("shows no words and installs no Copy action while registration is pending", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <ViewBackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+
+      expect(queryByText("youth")).toBeNull()
+      expect(headerRightWasInstalled()).toBe(false)
+
+      registration.resolve(undefined)
+      await waitFor(() => expect(queryByText("youth")).toBeTruthy())
+      expect(headerRightWasInstalled()).toBe(true)
+    })
+
+    it("keeps the words unmounted after registration fails", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      const { queryByText, findByTestId } = render(
+        <ContextForScreen>
+          <ViewBackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+      registration.reject(new Error("native failure"))
+
+      expect(await findByTestId("screen-security-retry")).toBeTruthy()
+      expect(queryByText("youth")).toBeNull()
+      expect(headerRightWasInstalled()).toBe(false)
+    })
+
+    /** The prompt shows nothing sensitive, so it runs while the guard registers,
+     *  and the words still wait for both. */
+    it("keeps the words hidden after authenticating until the guard is on", async () => {
+      mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
+      mockAuthenticate.mockImplementation((_desc: string, onSuccess: () => void) => {
+        onSuccess()
+      })
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <ViewBackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await waitFor(() => expect(mockAuthenticate).toHaveBeenCalledTimes(1))
+
+      expect(queryByText("youth")).toBeNull()
+      expect(mockUseWalletMnemonic).not.toHaveBeenCalled()
+
+      registration.resolve(undefined)
+      await waitFor(() => expect(queryByText("youth")).toBeTruthy())
+    })
+  })
+
+  /** A theme flip re-acquires the guard to apply the new mask color, and the gate
+   *  mounts its content again while that lands. The authentication is held above
+   *  the gate, so it survives that. */
+  describe("a theme flip after the gate opened", () => {
+    const renderInMode = (mode: "light" | "dark") => (
+      <ContextForScreenWithTheme mode={mode}>
+        <ViewBackupPhraseScreen />
+      </ContextForScreenWithTheme>
+    )
+
+    it("does not prompt again for a user who already authenticated", async () => {
+      mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
+      mockAuthenticate.mockImplementation((_desc: string, onSuccess: () => void) => {
+        onSuccess()
+      })
+
+      const { getByText, rerender } = render(renderInMode("light"))
+      await waitFor(() => expect(getByText("youth")).toBeTruthy())
+
+      rerender(renderInMode("dark"))
+      await act(async () => {})
+
+      // The gate did re-activate: the first lease was handed back for a new one.
+      expect(mockReleaseScreenSecurity).toHaveBeenCalledTimes(1)
+      await waitFor(() => expect(getByText("youth")).toBeTruthy())
+      expect(mockAuthenticate).toHaveBeenCalledTimes(1)
+    })
+
+    it("still accepts a pin challenge that was on screen when the theme flipped", async () => {
+      mockReadIsPinEnabled.mockResolvedValue({ status: "yes" })
+
+      const { getByText, rerender } = render(renderInMode("light"))
+      await waitFor(() =>
+        expect(mockPush).toHaveBeenCalledWith(
+          "pin",
+          expect.objectContaining({ screenPurpose: "ChallengePin" }),
+        ),
+      )
+
+      rerender(renderInMode("dark"))
+      await act(async () => {})
+      expect(mockReleaseScreenSecurity).toHaveBeenCalledTimes(1)
+
+      await act(async () => challengeParams().onChallengeSuccess())
+
+      await waitFor(() => expect(getByText("youth")).toBeTruthy())
+      expect(mockPush).toHaveBeenCalledTimes(1)
+    })
   })
 
   it("renders all 12 words once the mnemonic loads", async () => {
@@ -125,7 +302,14 @@ describe("ViewBackupPhraseScreen", () => {
     expect(button.props.accessibilityLabel).toBe(
       LL.BackupScreen.ManualBackup.Phrase.copy(),
     )
-    expect(button.props.hitSlop).toEqual({ top: 12, bottom: 12, left: 12, right: 12 })
+    // `hitSlop` never reaches past the native header item, so the box itself is 48dp.
+    expect(button.props.hitSlop).toBeUndefined()
+    expect(StyleSheet.flatten(button.props.style)).toMatchObject({
+      minWidth: HEADER_ICON_TOUCH_SIZE,
+      minHeight: HEADER_ICON_TOUCH_SIZE,
+      alignItems: "flex-end",
+      justifyContent: "center",
+    })
   })
 
   it("renders the do-not-share warning card", async () => {
@@ -220,7 +404,7 @@ describe("ViewBackupPhraseScreen", () => {
   })
 
   it("shows the phrase after successful biometric auth when the setting is enabled", async () => {
-    mockGetIsBiometricsEnabled.mockResolvedValue(true)
+    mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
     mockAuthenticate.mockImplementation((_desc: string, onSuccess: () => void) => {
       onSuccess()
     })
@@ -240,7 +424,7 @@ describe("ViewBackupPhraseScreen", () => {
   })
 
   it("goes back without showing the phrase when biometric auth fails", async () => {
-    mockGetIsBiometricsEnabled.mockResolvedValue(true)
+    mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
     mockAuthenticate.mockImplementation(
       (_desc: string, _onSuccess: () => void, onFail: () => void) => {
         onFail()
@@ -253,12 +437,15 @@ describe("ViewBackupPhraseScreen", () => {
       </ContextForScreen>,
     )
 
-    await waitFor(() => expect(mockGoBack).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(mockDispatch).toHaveBeenCalledTimes(1))
+    expectGateBouncedTheScreen()
+    expect(mockToastShow).toHaveBeenCalledTimes(1)
     expect(queryByText("youth")).toBeNull()
+    expect(mockUseWalletMnemonic).not.toHaveBeenCalled()
   })
 
   it("does not show the phrase while biometric auth is pending", async () => {
-    mockGetIsBiometricsEnabled.mockResolvedValue(true)
+    mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
     mockAuthenticate.mockImplementation(() => {
       // user has not responded to the prompt yet
     })
@@ -271,10 +458,12 @@ describe("ViewBackupPhraseScreen", () => {
 
     await waitFor(() => expect(mockAuthenticate).toHaveBeenCalledTimes(1))
     expect(queryByText("youth")).toBeNull()
+    // The deferral: nothing has pulled the mnemonic out of the keystore yet.
+    expect(mockUseWalletMnemonic).not.toHaveBeenCalled()
   })
 
   it("does not install the header Copy button while biometric auth is pending", async () => {
-    mockGetIsBiometricsEnabled.mockResolvedValue(true)
+    mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
     mockAuthenticate.mockImplementation(() => {
       // user has not responded to the prompt yet
     })
@@ -295,7 +484,7 @@ describe("ViewBackupPhraseScreen", () => {
   })
 
   it("does not install the header Copy button when biometric auth fails", async () => {
-    mockGetIsBiometricsEnabled.mockResolvedValue(true)
+    mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
     mockAuthenticate.mockImplementation(
       (_desc: string, _onSuccess: () => void, onFail: () => void) => {
         onFail()
@@ -308,12 +497,12 @@ describe("ViewBackupPhraseScreen", () => {
       </ContextForScreen>,
     )
 
-    await waitFor(() => expect(mockGoBack).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(mockDispatch).toHaveBeenCalledTimes(1))
     expect(headerRightWasInstalled()).toBe(false)
   })
 
   it("installs the header Copy button once biometric auth succeeds", async () => {
-    mockGetIsBiometricsEnabled.mockResolvedValue(true)
+    mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
     mockAuthenticate.mockImplementation((_desc: string, onSuccess: () => void) => {
       onSuccess()
     })
@@ -334,5 +523,87 @@ describe("ViewBackupPhraseScreen", () => {
         content: expect.stringContaining("captain"),
       }),
     )
+  })
+
+  describe("pin fallback", () => {
+    it("challenges the pin for a pin-only user instead of waving them through", async () => {
+      /** The headline fix: pin on, biometrics off used to open the phrase with no
+       *  challenge at all. */
+      mockReadIsPinEnabled.mockResolvedValue({ status: "yes" })
+
+      const { getByText, queryByText } = render(
+        <ContextForScreen>
+          <ViewBackupPhraseScreen />
+        </ContextForScreen>,
+      )
+
+      await waitFor(() =>
+        expect(mockPush).toHaveBeenCalledWith(
+          "pin",
+          expect.objectContaining({ screenPurpose: "ChallengePin" }),
+        ),
+      )
+      expect(mockAuthenticate).not.toHaveBeenCalled()
+      expect(queryByText("youth")).toBeNull()
+      expect(headerRightWasInstalled()).toBe(false)
+      expect(mockUseWalletMnemonic).not.toHaveBeenCalled()
+
+      await act(async () => challengeParams().onChallengeSuccess())
+
+      await waitFor(() => expect(getByText("youth")).toBeTruthy())
+      expect(mockUseWalletMnemonic).toHaveBeenCalled()
+    })
+
+    it("falls back to the pin challenge when the biometric prompt fails", async () => {
+      mockReadIsPinEnabled.mockResolvedValue({ status: "yes" })
+      mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
+      mockAuthenticate.mockImplementation(
+        (_desc: string, _onSuccess: () => void, onFail: () => void) => {
+          onFail()
+        },
+      )
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <ViewBackupPhraseScreen />
+        </ContextForScreen>,
+      )
+
+      await waitFor(() =>
+        expect(mockPush).toHaveBeenCalledWith(
+          "pin",
+          expect.objectContaining({ screenPurpose: "ChallengePin" }),
+        ),
+      )
+      expect(mockDispatch).not.toHaveBeenCalled()
+      expect(queryByText("youth")).toBeNull()
+
+      await act(async () => challengeParams().onChallengeFailure())
+
+      expectGateBouncedTheScreen()
+      /** A deliberate decline bounces silently — the user cancelled and knows
+       *  why; the settings-advice toast is for the can't-authenticate causes. */
+      expect(mockToastShow).not.toHaveBeenCalled()
+      expect(queryByText("youth")).toBeNull()
+    })
+
+    it("fails closed when biometrics is enabled but the sensor is gone and no pin is set", async () => {
+      /** The old gate's second fail-open: a user with biometrics enabled whose
+       *  enrolment vanished sailed straight through to the phrase. */
+      mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
+      mockIsSensorAvailable.mockResolvedValue(false)
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <ViewBackupPhraseScreen />
+        </ContextForScreen>,
+      )
+
+      await waitFor(() => expect(mockDispatch).toHaveBeenCalledTimes(1))
+      expect(mockAuthenticate).not.toHaveBeenCalled()
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
+      expect(queryByText("youth")).toBeNull()
+      expect(mockUseWalletMnemonic).not.toHaveBeenCalled()
+    })
   })
 })

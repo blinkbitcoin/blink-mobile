@@ -36,7 +36,7 @@ const LL = i18nObject("en")
 
 /** Reads the palette from inside the same provider the modal renders under, so the
  *  colour assertion follows the theme instead of hardcoding a hex. */
-let themeColors: { primary: string } | undefined
+let themeColors: { accent: string } | undefined
 const ThemeProbe: React.FC = () => {
   themeColors = useTheme().theme.colors
   return null
@@ -83,11 +83,11 @@ describe("RestrictedRegionModal", () => {
 
   /** The brand primary, matching the custodial full-screen block, so the two sanctions
    *  surfaces read as one feature. It must not fall back to the warning colour. */
-  it("tints the icon with the theme primary", () => {
+  it("tints the icon with the theme accent", () => {
     renderModal(jest.fn())
 
     expect(mockGaloyIcon).toHaveBeenCalledWith(
-      expect.objectContaining({ name: "warning", color: themeColors?.primary }),
+      expect.objectContaining({ name: "warning", color: themeColors?.accent }),
     )
   })
 

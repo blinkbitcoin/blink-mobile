@@ -12,6 +12,7 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
+import { useHasSparkToken } from "@app/self-custodial/hooks/use-spark-network"
 import { addBounded } from "@app/utils/bounded-collections"
 import { reportError } from "@app/utils/error-logging"
 import { toNumber } from "@app/utils/helper"
@@ -224,6 +225,7 @@ export const useAutoConvertListener = (): void => {
   const wallet = useSelfCustodialWallet()
   const { sdk, lastReceivedPaymentId, refreshWallets } = wallet
   const { isAnonMode } = useSelfCustodialAccountMode()
+  const hasSparkToken = useHasSparkToken()
   // Defaults unknown to not-active so existing records still process.
   const isStableBalanceActive = wallet.isStableBalanceActive ?? false
   const { convertMoneyAmount } = usePriceConversion()
@@ -300,8 +302,9 @@ export const useAutoConvertListener = (): void => {
 
   useEffect(() => {
     if (!sdk || !convertMoneyAmount) return
-    /** Anon Mode receives stay bitcoin: pending records wait until the mode is off. */
-    if (isAnonMode) return
+    /** Anon Mode receives stay bitcoin: pending records wait until the mode is off. So
+     *  do they on a network with no dollar token, rather than spend their attempts. */
+    if (isAnonMode || !hasSparkToken) return
     if (!lastReceivedPaymentId) return
     if (processedPaymentIdsRef.current.has(lastReceivedPaymentId)) return
     addBounded(
@@ -343,13 +346,14 @@ export const useAutoConvertListener = (): void => {
     lastReceivedPaymentId,
     convertMoneyAmount,
     isAnonMode,
+    hasSparkToken,
     processWithInFlightLock,
   ])
 
   useEffect(() => {
     if (!sdk || !convertMoneyAmount) return
     /** An Anon interval re-arms the replay, so exit picks up every pending record. */
-    if (isAnonMode) {
+    if (isAnonMode || !hasSparkToken) {
       initialReplayDoneRef.current = false
       return
     }
@@ -408,6 +412,7 @@ export const useAutoConvertListener = (): void => {
     sdk,
     convertMoneyAmount,
     isAnonMode,
+    hasSparkToken,
     processWithInFlightLock,
     autoConvertMaxAttempts,
   ])

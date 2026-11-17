@@ -17,6 +17,7 @@ jest.mock("react-native-share", () => ({
 
 jest.mock("@app/self-custodial/config", () => ({
   requireSparkTokenIdentifier: () => "test-token-id",
+  sparkTokenIdentifier: () => "test-token-id",
 }))
 
 const mockUseSelfCustodialWallet = jest.fn()

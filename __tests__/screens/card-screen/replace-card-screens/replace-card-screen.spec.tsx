@@ -62,7 +62,7 @@ jest.mock("@app/utils/helper", () => ({
 const mockCardReplace = jest.fn()
 const mockLockCard = jest.fn()
 
-jest.mock("@app/screens/card-screen/hooks", () => ({
+jest.mock("@app/hooks/use-card-data", () => ({
   useCardData: () => ({ card: { id: "card-123", cardType: "PHYSICAL" } }),
 }))
 
@@ -115,7 +115,11 @@ describe("ReplaceCardScreen", () => {
     loadLocale("en")
     jest.clearAllMocks()
     mockAddListener.mockReturnValue(jest.fn())
-    mockCardReplace.mockResolvedValue({ lastFour: "4321", cardType: "VIRTUAL" })
+    mockCardReplace.mockResolvedValue({
+      id: "replacement-card",
+      lastFour: "4321",
+      cardType: "VIRTUAL",
+    })
     mockLockCard.mockResolvedValue(true)
   })
 
@@ -349,7 +353,11 @@ describe("ReplaceCardScreen", () => {
     })
 
     it("submits and navigates to status screen", async () => {
-      mockCardReplace.mockResolvedValueOnce({ lastFour: "4321", cardType: "VIRTUAL" })
+      mockCardReplace.mockResolvedValueOnce({
+        id: "replacement-card",
+        lastFour: "4321",
+        cardType: "VIRTUAL",
+      })
 
       const { getByText } = render(
         <ContextForScreen>
@@ -374,7 +382,7 @@ describe("ReplaceCardScreen", () => {
         iconName: "delivery",
         iconColor: expect.any(String),
         lastFour: "4321",
-        holderName: "",
+        cardId: "replacement-card",
       })
     })
 
@@ -404,7 +412,7 @@ describe("ReplaceCardScreen", () => {
     beforeEach(() => {
       jest
         .spyOn(
-          jest.requireMock("@app/screens/card-screen/hooks") as {
+          jest.requireMock("@app/hooks/use-card-data") as {
             useCardData: () => { card: { id: string; cardType: string } }
           },
           "useCardData",

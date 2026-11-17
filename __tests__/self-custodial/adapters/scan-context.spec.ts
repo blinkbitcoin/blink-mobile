@@ -34,7 +34,21 @@ describe("createSelfCustodialScanContext", () => {
     expect(createSelfCustodialScanContext([], Network.Mainnet).myWalletIds).toEqual([])
   })
 
-  it("returns an empty lnurlDomains list (intraledger lookup is disabled in self-custodial)", () => {
-    expect(createSelfCustodialScanContext([], Network.Mainnet).lnurlDomains).toEqual([])
+  /**
+   * The domains are what lets a Blink pay code be recognised as naming an account
+   * instead of being fetched as an opaque lnurl. Paying one over the ledger is refused
+   * separately, by the sender, since a self-custodial wallet has no token for it.
+   */
+  it("declares the network's own domain first, so an address is spelled with it", () => {
+    const { lnurlDomains } = createSelfCustodialScanContext([], Network.Mainnet)
+
+    expect(lnurlDomains[0]).toBe("blink.sv")
+    expect(lnurlDomains).toContain("pay.blink.sv")
+  })
+
+  it("declares the regtest domains on regtest, and none of production's", () => {
+    const { lnurlDomains } = createSelfCustodialScanContext([], Network.Regtest)
+
+    expect(lnurlDomains).toEqual(["staging.blink.sv", "pay.staging.blink.sv"])
   })
 })

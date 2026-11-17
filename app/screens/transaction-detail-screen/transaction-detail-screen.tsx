@@ -3,6 +3,7 @@ import { ActivityIndicator, Linking, Pressable, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { ScrollView } from "react-native-gesture-handler"
 import { useFragment } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -26,16 +27,20 @@ import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useAppConfig, useClipboard, useTransactionSeenState } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { useSelfCustodialTransactionFragments } from "@app/self-custodial/hooks/use-self-custodial-transaction-fragments"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { toWalletAmount } from "@app/types/amounts"
-import { PaymentType } from "@app/types/transaction"
+import { NO_TRANSACTIONS, PaymentType } from "@app/types/transaction"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { IconTransaction } from "@app/components/icon-transactions"
 import { Screen } from "@app/components/screen"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { formatTimeToMempool, timeToMempool } from "./format-time"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 // Tappable icon action used in the detail rows (copy / open-in-explorer).
 // Built on GaloyIconButton (a Pressable) so taps register inside the
@@ -73,7 +78,12 @@ const Row = ({
       {content ? (
         content
       ) : (
-        <View style={styles.valueContainer}>
+        <View
+          style={[
+            styles.valueContainer,
+            icons.length === 0 && styles.valueContainerStatic,
+          ]}
+        >
           <Text selectable={false} style={styles.value}>
             {value}
           </Text>
@@ -157,18 +167,28 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   const [timer, setTimer] = React.useState<number>(0)
 
   const { LL, locale } = useI18nContext()
-  const { isSelfCustodial, wallets } = useActiveWallet()
+  const { isSelfCustodial } = useActiveWallet()
+  const { allTransactions: selfCustodialAllTransactions } = useSelfCustodialWallet()
   const { copyToClipboard } = useClipboard()
   const { formatCurrency } = useDisplayCurrency()
 
-  const selfCustodialPaymentType = React.useMemo(() => {
-    if (!isSelfCustodial) return undefined
-    for (const wallet of wallets) {
-      const match = wallet.transactions.find((t) => t.id === txid)
-      if (match) return match.paymentType
-    }
-    return undefined
-  }, [isSelfCustodial, wallets, txid])
+  /** The same list home reads, so both screens resolve the same newest transaction and
+   *  therefore agree on the seen-state id they write and compare. */
+  const selfCustodialTransactions = React.useMemo(
+    () => (isSelfCustodial ? selfCustodialAllTransactions : NO_TRANSACTIONS),
+    [isSelfCustodial, selfCustodialAllTransactions],
+  )
+
+  const selfCustodialPaymentType = React.useMemo(
+    () =>
+      selfCustodialTransactions.find((transaction) => transaction.id === txid)
+        ?.paymentType,
+    [selfCustodialTransactions, txid],
+  )
+
+  const selfCustodialFragments = useSelfCustodialTransactionFragments(
+    selfCustodialTransactions,
+  )
 
   const hasTxData = Boolean(tx) && Object.keys(tx).length > 0
   const { status: resolveStatus, retry: retryResolve } = useResolveTransactionAccount({
@@ -205,9 +225,16 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
       ? formatTimeToMempool(timeDiff, LL, locale)
       : ""
 
-  const { latestBtcTxId, latestUsdTxId, markTxSeen } = useTransactionSeenState(
-    homeData?.me?.defaultAccount?.id || "",
-  )
+  /**
+   * Empty for custodial, which leaves the seen state reading the cached home query;
+   * self-custodial has no such cache and must be handed its own transactions, or the
+   * screen could never tell that the one being read is the newest and mark it seen.
+   */
+  const { latestBtcTxId, latestUsdTxId, markTxSeen } = useTransactionSeenState({
+    accountId: homeData?.me?.defaultAccount?.id || "",
+    isSelfCustodial,
+    transactions: selfCustodialFragments,
+  })
 
   React.useEffect(() => {
     let intervalId: NodeJS.Timeout
@@ -381,7 +408,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   } else if (onChainTxNotBroadcasted) {
     spendOrReceiveText = LL.TransactionDetailScreen.sending()
   } else {
-    spendOrReceiveText = LL.TransactionDetailScreen.spent()
+    spendOrReceiveText = LL.TransactionDetailScreen.sent()
   }
 
   return (
@@ -406,11 +433,10 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
             {/* Pinned to one line: leaving it unbounded lets Android re-break
                 it after the first word on a re-layout, and since the container
                 height is already fixed by the first measure pass the wrapped
-                word lands outside it and is clipped — "You spent" silently
+                word lands outside it and is clipped — "You sent" silently
                 renders as "You". Shrink rather than ellipsize when the line
-                genuinely doesn't fit, so a long locale (the longest is ms
-                "Anda dah belanjakan") stays whole under accessibility font
-                scaling instead of losing its tail. */}
+                genuinely doesn't fit, so a long locale stays whole under
+                accessibility font scaling instead of losing its tail. */}
             <Text type="h2" numberOfLines={1} adjustsFontSizeToFit>
               {spendOrReceiveText}
             </Text>
@@ -616,9 +642,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginVertical: 6,
   },
 
-  amountDetailsContainer: {
-    backgroundColor: colors.grey5,
-  },
+  amountDetailsContainer: staticSurface(colors),
 
   amountView: {
     alignItems: "center",
@@ -637,7 +661,9 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   entry: {
-    marginVertical: 4,
+    color: colors.textSecondary,
+    marginBottom: groupTitleGap,
+    marginTop: 4,
   },
 
   transactionDetailView: {
@@ -648,10 +674,11 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     minHeight: 60,
     padding: 14,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     alignItems: "center",
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
+  valueContainerStatic: staticSurface(colors),
   value: {
     flex: 1,
     fontSize: 14,

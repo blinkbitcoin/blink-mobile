@@ -43,6 +43,12 @@ const baseParams = {
 }
 
 const lnAddressHostname = "blink.sv"
+/** What a self-custodial sender adds: pay over lightning, never over the ledger. */
+const selfCustodialParams = {
+  ...baseParams,
+  preferLnurlForInternalHandles: true,
+  canPayIntraledger: false,
+}
 const fakeSdk = { id: "sdk" } as never
 
 describe("resolveDestination", () => {
@@ -204,7 +210,7 @@ describe("resolveDestination", () => {
         lnAddressHostname,
       )
 
-      expect(mockParseDestination).toHaveBeenCalledWith(baseParams)
+      expect(mockParseDestination).toHaveBeenCalledWith(selfCustodialParams)
       expect(mockResolveUsername).toHaveBeenCalledWith(
         parsed,
         lnAddressHostname,
@@ -233,7 +239,7 @@ describe("resolveDestination", () => {
       await resolveLnAddress("esaudeveloper@blink.sv")
 
       expect(mockParseDestination).toHaveBeenCalledWith({
-        ...baseParams,
+        ...selfCustodialParams,
         rawInput: "esaudeveloper@blink.sv",
       })
     })
@@ -258,7 +264,7 @@ describe("resolveDestination", () => {
         SparkNetwork.Regtest,
       )
       expect(mockParseDestination).toHaveBeenCalledWith({
-        ...baseParams,
+        ...selfCustodialParams,
         rawInput: "sparkrt1qabc",
       })
     })

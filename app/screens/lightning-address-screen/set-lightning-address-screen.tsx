@@ -6,6 +6,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
@@ -63,6 +64,7 @@ export const SetLightningAddressScreen: React.FC<{
   const [error, setError] = useState<SetUsernameError | undefined>()
   const [username, setUsername] = useState("")
   const [showSuccess, setShowSuccess] = useState(false)
+  const [isFieldFocused, setIsFieldFocused] = useState(false)
   const { onboarding } = route.params
 
   const {
@@ -168,6 +170,9 @@ export const SetLightningAddressScreen: React.FC<{
     case SetUsernameError.ADDRESS_UNAVAILABLE:
       errorMessage = LL.SetAddressModal.Errors.addressUnavailable()
       break
+    case SetUsernameError.SERVER_UNREACHABLE:
+      errorMessage = LL.SetAddressModal.Errors.serverUnreachable()
+      break
     case SetUsernameError.UNKNOWN_ERROR:
       errorMessage = LL.SetAddressModal.Errors.unknownError()
       break
@@ -197,16 +202,20 @@ export const SetLightningAddressScreen: React.FC<{
           {LL.SetAddressModal.itCannotBeChanged()}
         </Text>
 
-        <View style={styles.textInputContainerStyle}>
+        <View
+          style={[styles.textInputContainerStyle, isFieldFocused && styles.fieldFocused]}
+        >
           <TextInput
             maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
             autoCorrect={false}
             autoComplete="off"
             style={styles.textInputStyle}
             onChangeText={onChangeUsername}
+            onFocus={() => setIsFieldFocused(true)}
+            onBlur={() => setIsFieldFocused(false)}
             value={username}
             placeholder={"SatoshiNakamoto"}
-            placeholderTextColor={colors.grey3}
+            placeholderTextColor={colors.textDisabled}
           />
           <Text type={"p1"}>{`@${lnAddressHostname}`}</Text>
         </View>
@@ -241,7 +250,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   successAnimationContainer: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -265,17 +274,18 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: radius.default,
     minHeight: 60,
-    backgroundColor: colors.grey5,
-    borderWidth: 2,
-    borderColor: colors.primary5,
+    backgroundColor: colors.surfaceInteractive,
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  fieldFocused: {
+    backgroundColor: colors.surfaceFocused,
   },
   textInputStyle: {
     flex: 1,
     fontSize: 18,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

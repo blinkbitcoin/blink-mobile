@@ -5,6 +5,8 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 
+import { radius } from "@app/rne-theme/radius"
+
 type IconTextButtonProps = {
   icon: IconNamesType
   label: string
@@ -24,8 +26,8 @@ export const IconTextButton: React.FC<IconTextButtonProps> = ({
     theme: { colors },
   } = useTheme()
 
-  const resolvedIconColor = iconColor ?? colors.primary
-  const resolvedTextColor = textColor ?? colors.primary
+  const resolvedIconColor = iconColor ?? colors.accent
+  const resolvedTextColor = textColor ?? colors.accent
   const styles = useStyles({ textColor: resolvedTextColor })
 
   return (
@@ -50,8 +52,8 @@ const useStyles = makeStyles(({ colors }, { textColor }: StyleProps) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     paddingHorizontal: 11,
     paddingVertical: 8,
     gap: 8,

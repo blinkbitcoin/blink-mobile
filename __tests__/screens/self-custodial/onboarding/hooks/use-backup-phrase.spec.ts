@@ -1,6 +1,9 @@
 import { renderHook, act, waitFor } from "@testing-library/react-native"
 
-import { useBackupPhrase } from "@app/screens/self-custodial/onboarding/hooks/use-backup-phrase"
+import {
+  useBackupCountdownDeadline,
+  useBackupPhrase,
+} from "@app/screens/self-custodial/onboarding/hooks/use-backup-phrase"
 import { PhraseStep } from "@app/navigation/stack-param-lists"
 
 const mockNavigate = jest.fn()
@@ -36,9 +39,11 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
+const MNEMONIC =
+  "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain"
+let mockMnemonic = MNEMONIC
 jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", () => ({
-  useWalletMnemonic: () =>
-    "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain",
+  useWalletMnemonic: () => mockMnemonic,
 }))
 
 jest.mock("react-native-inappbrowser-reborn", () => ({
@@ -46,13 +51,26 @@ jest.mock("react-native-inappbrowser-reborn", () => ({
   default: { open: jest.fn(() => Promise.resolve()) },
 }))
 
+/** The deadline the screen would hold above its gate; the countdown itself is mocked. */
+const getDeadline = () => new Date(0)
+
 describe("useBackupPhrase", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockMnemonic = MNEMONIC
+  })
+
+  it("shows no words while the mnemonic has not loaded", () => {
+    mockMnemonic = ""
+
+    const { result } = renderHook(() => useBackupPhrase(PhraseStep.First, getDeadline))
+
+    expect(result.current.firstCard).toEqual([])
+    expect(result.current.secondCard).toEqual([])
   })
 
   it("returns first 6 words split into two cards for step 1", async () => {
-    const { result } = renderHook(() => useBackupPhrase(PhraseStep.First))
+    const { result } = renderHook(() => useBackupPhrase(PhraseStep.First, getDeadline))
 
     await waitFor(() => {
       expect(result.current.firstCard).toHaveLength(3)
@@ -62,7 +80,7 @@ describe("useBackupPhrase", () => {
   })
 
   it("returns last 6 words split into two cards for step 2", async () => {
-    const { result } = renderHook(() => useBackupPhrase(PhraseStep.Second))
+    const { result } = renderHook(() => useBackupPhrase(PhraseStep.Second, getDeadline))
 
     await waitFor(() => {
       expect(result.current.firstCard).toHaveLength(3)
@@ -72,7 +90,7 @@ describe("useBackupPhrase", () => {
   })
 
   it("navigates to step 2 on continue from step 1", async () => {
-    const { result } = renderHook(() => useBackupPhrase(PhraseStep.First))
+    const { result } = renderHook(() => useBackupPhrase(PhraseStep.First, getDeadline))
 
     await waitFor(() => expect(result.current.firstCard.length).toBeGreaterThan(0))
     act(() => result.current.handleContinue())
@@ -83,7 +101,7 @@ describe("useBackupPhrase", () => {
   })
 
   it("navigates to confirm screen on continue from step 2", async () => {
-    const { result } = renderHook(() => useBackupPhrase(PhraseStep.Second))
+    const { result } = renderHook(() => useBackupPhrase(PhraseStep.Second, getDeadline))
 
     await waitFor(() => expect(result.current.firstCard.length).toBeGreaterThan(0))
     act(() => result.current.handleContinue())
@@ -95,22 +113,50 @@ describe("useBackupPhrase", () => {
   })
 
   it("returns 'Continue' as button title for step 1 when expired", () => {
-    const { result } = renderHook(() => useBackupPhrase(PhraseStep.First))
+    const { result } = renderHook(() => useBackupPhrase(PhraseStep.First, getDeadline))
     expect(result.current.buttonTitle).toBe("Continue")
   })
 
   it("returns 'I have saved it' as button title for step 2", () => {
-    const { result } = renderHook(() => useBackupPhrase(PhraseStep.Second))
+    const { result } = renderHook(() => useBackupPhrase(PhraseStep.Second, getDeadline))
     expect(result.current.buttonTitle).toBe("I have saved it")
   })
 
   it("button is not disabled for step 1 when expired", () => {
-    const { result } = renderHook(() => useBackupPhrase(PhraseStep.First))
+    const { result } = renderHook(() => useBackupPhrase(PhraseStep.First, getDeadline))
     expect(result.current.isButtonDisabled).toBe(false)
   })
 
   it("button is not disabled for step 2", () => {
-    const { result } = renderHook(() => useBackupPhrase(PhraseStep.Second))
+    const { result } = renderHook(() => useBackupPhrase(PhraseStep.Second, getDeadline))
     expect(result.current.isButtonDisabled).toBe(false)
+  })
+})
+
+/** The screen holds this above its screen-security gate, so it must not move when the
+ *  gate mounts the words again, and must not start before they first show. */
+describe("useBackupCountdownDeadline", () => {
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  it("fixes the deadline ten seconds after its first call, not after its creation", () => {
+    const now = jest.spyOn(Date, "now").mockReturnValue(1_000)
+    const { result } = renderHook(() => useBackupCountdownDeadline())
+
+    now.mockReturnValue(50_000)
+
+    expect(result.current().getTime()).toBe(60_000)
+  })
+
+  it("returns the same deadline on every later call and render", () => {
+    const now = jest.spyOn(Date, "now").mockReturnValue(1_000)
+    const { result, rerender } = renderHook(() => useBackupCountdownDeadline())
+    const first = result.current()
+
+    now.mockReturnValue(99_000)
+    rerender({})
+
+    expect(result.current()).toBe(first)
   })
 })

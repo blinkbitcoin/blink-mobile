@@ -4,6 +4,7 @@ import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { CheckboxRow } from "@app/components/checkbox-row"
@@ -13,8 +14,12 @@ import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { DepositStatus } from "@app/types/payment"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
-import { buildFeeTierOptions } from "../send-bitcoin-screen/fee-tier-options"
+import {
+  buildFeeTierOptions,
+  feeTierLabels,
+} from "../send-bitcoin-screen/fee-tier-options"
 import { FeeTierOption } from "../send-bitcoin-screen/hooks/fee-tiers.types"
 
 import { DepositErrorMessage } from "./deposit-error-message"
@@ -49,11 +54,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
   const feeTierOptions = buildFeeTierOptions({
     hasQuote: hasFeeRateQuote,
     tiers: feeTiers,
-    labels: {
-      [FeeTierOption.Fast]: LL.SendBitcoinScreen.fast(),
-      [FeeTierOption.Medium]: LL.SendBitcoinScreen.medium(),
-      [FeeTierOption.Slow]: LL.SendBitcoinScreen.slow(),
-    },
+    labels: feeTierLabels(LL),
     formatFee: ({ feeAmount }) => LL.UnclaimedDeposit.feeRateUnit({ rate: feeAmount }),
     locale,
   })
@@ -112,34 +113,41 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                 <Text style={styles.txLink} numberOfLines={1} ellipsizeMode="middle">
                   {deposit.txid}
                 </Text>
-                <GaloyIcon name="link" size={12} color={colors.primary} />
+                <GaloyIcon name="link" size={12} color={colors.accent} />
               </Pressable>
 
               {deposit.status === DepositStatus.Immature && (
                 <Text style={styles.mutedText}>{LL.UnclaimedDeposit.immature()}</Text>
               )}
 
-              {deposit.status !== DepositStatus.Immature && !isRefunding && (
-                <View style={styles.actions}>
-                  {isProcessing(deposit.id, DepositActionType.Claim) ? (
-                    <ActivityIndicator size="small" color={colors.primary} />
-                  ) : (
-                    <GaloyTertiaryButton
-                      title={LL.UnclaimedDeposit.claim()}
-                      onPress={() => handleClaim(deposit)}
-                      disabled={isClaimDisabled}
-                      {...testProps(`claim-${deposit.id}`)}
-                    />
-                  )}
-                  <GaloyTertiaryButton
-                    title={LL.UnclaimedDeposit.refund()}
-                    outline
-                    onPress={() => setRefundDepositId(deposit.id)}
-                    disabled={isBusy}
-                    {...testProps(`refund-toggle-${deposit.id}`)}
-                  />
-                </View>
+              {/** Claimed early: the provider has it, so neither claim nor refund applies. */}
+              {deposit.status === DepositStatus.Claiming && (
+                <Text style={styles.mutedText}>{LL.UnclaimedDeposit.claiming()}</Text>
               )}
+
+              {deposit.status !== DepositStatus.Immature &&
+                deposit.status !== DepositStatus.Claiming &&
+                !isRefunding && (
+                  <View style={styles.actions}>
+                    {isProcessing(deposit.id, DepositActionType.Claim) ? (
+                      <ActivityIndicator size="small" color={colors.accent} />
+                    ) : (
+                      <GaloyTertiaryButton
+                        title={LL.UnclaimedDeposit.claim()}
+                        onPress={() => handleClaim(deposit)}
+                        disabled={isClaimDisabled}
+                        {...testProps(`claim-${deposit.id}`)}
+                      />
+                    )}
+                    <GaloyTertiaryButton
+                      title={LL.UnclaimedDeposit.refund()}
+                      outline
+                      onPress={() => setRefundDepositId(deposit.id)}
+                      disabled={isBusy}
+                      {...testProps(`refund-toggle-${deposit.id}`)}
+                    />
+                  </View>
+                )}
 
               {isRefunding && (
                 <View style={styles.refundPanel}>
@@ -152,7 +160,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                         maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
                         style={styles.fieldInputText}
                         placeholder={addressPlaceholderFor(network)}
-                        placeholderTextColor={colors.grey2}
+                        placeholderTextColor={colors.textMuted}
                         value={refundAddress}
                         onChangeText={setRefundAddress}
                         autoCapitalize="none"
@@ -190,7 +198,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                       {...testProps("cancel-refund")}
                     />
                     {isProcessing(deposit.id, DepositActionType.Refund) ? (
-                      <ActivityIndicator size="small" color={colors.primary} />
+                      <ActivityIndicator size="small" color={colors.accent} />
                     ) : (
                       <GaloyTertiaryButton
                         title={LL.UnclaimedDeposit.refundNow()}
@@ -221,19 +229,19 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   emptyText: {
     textAlign: "center",
-    color: colors.grey2,
+    color: colors.textMuted,
     marginTop: 40,
   },
   card: {
-    backgroundColor: colors.grey5,
-    borderRadius: 12,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     padding: 20,
     gap: 14,
   },
   cardTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   txRow: {
     flexDirection: "row",
@@ -242,13 +250,13 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   txLink: {
     fontSize: 12,
-    color: colors.primary,
+    color: colors.accent,
     fontFamily: "Source Sans Pro",
     flex: 1,
   },
   mutedText: {
     fontSize: 12,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   errorText: {
     fontSize: 12,
@@ -263,29 +271,29 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 14,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: colors.grey4,
+    borderTopColor: colors.neutral,
   },
   fieldLabel: {
     fontSize: 13,
-    fontWeight: "600",
-    color: colors.grey2,
+    fontFamily: fonts.bold,
+    color: colors.textMuted,
     marginBottom: 8,
   },
   fieldInput: {
-    backgroundColor: colors.white,
-    borderRadius: 10,
+    backgroundColor: colors.backgroundDefault,
+    borderRadius: radius.default,
     paddingHorizontal: 14,
     minHeight: 48,
     justifyContent: "center",
   },
   fieldInputText: {
     fontSize: 14,
-    color: colors.black,
+    color: colors.textOnBackground,
     fontFamily: "Source Sans Pro",
   },
   fieldGroup: {
-    backgroundColor: colors.white,
-    borderRadius: 10,
+    backgroundColor: colors.backgroundDefault,
+    borderRadius: radius.default,
     paddingHorizontal: 14,
     paddingVertical: 10,
     gap: 12,

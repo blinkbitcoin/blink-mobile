@@ -7,12 +7,14 @@ import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 import { GaloyIconButton } from "../atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "../atomic/galoy-primary-button"
 
+import { radius } from "@app/rne-theme/radius"
+
 export type NotificationCardUIProps = {
   title: string
   text: string
   icon?: IconNamesType
   /** Omitting the action renders an inert card: no press feedback, no button role. */
-  action?: () => Promise<void>
+  action?: () => void | Promise<void>
   loading?: boolean
   dismissAction?: () => void
   buttonLabel?: string
@@ -35,7 +37,7 @@ export const NotificationCardUI: React.FC<NotificationCardUIProps> = ({
   if (loading) {
     return (
       <TouchableOpacity style={styles.loadingButtonContainer}>
-        <ActivityIndicator size="small" color={colors.primary} />
+        <ActivityIndicator size="small" color={colors.accent} />
       </TouchableOpacity>
     )
   }
@@ -46,7 +48,7 @@ export const NotificationCardUI: React.FC<NotificationCardUIProps> = ({
         <View style={styles.contentRow}>
           {icon && (
             <View style={styles.leftIconContainer}>
-              <GaloyIcon name={icon} color={colors.primary} size={24} />
+              <GaloyIcon name={icon} color={colors.accent} size={24} />
             </View>
           )}
           <View style={styles.textColumn}>
@@ -96,8 +98,8 @@ export const NotificationCardUI: React.FC<NotificationCardUIProps> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   buttonContainer: {
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     flexDirection: "column",
   },
   contentSection: {
@@ -126,14 +128,14 @@ const useStyles = makeStyles(({ colors }) => ({
   loadingButtonContainer: {
     flexDirection: "column",
     padding: 14,
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     minHeight: 80,
     justifyContent: "center",
     alignItems: "center",
   },
   bodyText: {
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   buttonActionContainer: {
     paddingHorizontal: 14,
@@ -155,6 +157,6 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 14,
     lineHeight: 20,
     fontWeight: "700",
-    color: colors.white,
+    color: colors.textOnAccent,
   },
 }))

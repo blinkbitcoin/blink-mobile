@@ -3,6 +3,7 @@ import { View } from "react-native"
 import { Marker } from "react-native-maps"
 
 import { BtcMapPlace } from "@app/btcmap"
+import { fonts } from "@app/rne-theme/fonts"
 import { Text, makeStyles } from "@rn-vui/themed"
 
 import {
@@ -105,17 +106,17 @@ const useStyles = makeStyles(({ colors, mode }) => ({
     maxWidth: LABEL_MAX_WIDTH,
     fontSize: LABEL_FONT_SIZE,
     lineHeight: LABEL_LINE_HEIGHT,
-    fontWeight: "600",
-    color: colors.black,
+    fontFamily: fonts.bold,
+    color: colors.textOnBackground,
     // Beside the pin, not under it: the text grows away from the pin rather
     // than to both sides of it.
     textAlign: "left",
     // React Native has no text halo, and a label has to stay readable over
-    // whatever the basemap puts behind it. `colors.white` is the background
+    // whatever the basemap puts behind it. `colors.backgroundDefault` is the background
     // token, so it inverts with the mode and the halo is always the opposite of
     // the glyphs — black behind white text in dark mode, and in light mode the
     // darkened white above rather than the flat one, which the basemap swallows.
-    textShadowColor: mode === "dark" ? colors.white : LABEL_HALO_COLOR_LIGHT,
+    textShadowColor: mode === "dark" ? colors.backgroundDefault : LABEL_HALO_COLOR_LIGHT,
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 3,
   },

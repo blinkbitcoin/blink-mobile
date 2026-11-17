@@ -1,9 +1,10 @@
 import { CountryCode as PhoneNumberCountryCode } from "libphonenumber-js/mobile"
 import * as React from "react"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 import { CountryCode } from "react-native-country-picker-modal"
 
+import { radius } from "@app/rne-theme/radius"
 import { CountryCodePicker } from "@app/components/phone-input/country-code-picker"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyInfo } from "@app/components/atomic/galoy-info"
@@ -61,9 +62,8 @@ const useStyles = makeStyles(({ colors }) => ({
    *  button that does not twitch between a "+1" and a "+503". */
   countryPickerButtonStyle: {
     minWidth: 110,
-    borderColor: colors.primary5,
-    borderWidth: 2,
-    borderRadius: 8,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     paddingHorizontal: 10,
     flexDirection: "row",
     justifyContent: "center",
@@ -82,11 +82,15 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   inputContainerStyle: {
     flex: 1,
-    borderWidth: 2,
-    borderBottomWidth: 2,
+    borderWidth: 0,
+    borderBottomWidth: 0,
     paddingHorizontal: 10,
-    borderColor: colors.primary5,
-    borderRadius: 8,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
+  },
+  /** Applied to the country picker too: it always looks like the number field. */
+  fieldFocused: {
+    backgroundColor: colors.surfaceFocused,
   },
   errorContainer: {
     marginBottom: 20,
@@ -112,6 +116,8 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
   const styles = useStyles()
 
   const phoneInputRef = useRef<InputRef>(null)
+  // The field autofocuses on mount, so start focused: no resting fill flashes first.
+  const [isFieldFocused, setIsFieldFocused] = useState(true)
 
   const navigation =
     useNavigation<
@@ -208,7 +214,7 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
     return (
       <Screen>
         <View style={styles.loadingView}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={colors.accent} />
         </View>
       </Screen>
     )
@@ -266,19 +272,27 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
             countryCodes={supportedCountries as CountryCode[]}
             onSelect={handleCountrySelect}
             onClose={handleCountryPickerClose}
-            buttonStyle={styles.countryPickerButtonStyle}
+            buttonStyle={[
+              styles.countryPickerButtonStyle,
+              isFieldFocused && styles.fieldFocused,
+            ]}
           />
           <Input
             {...testProps("telephoneNumber")}
             ref={phoneInputRef}
             placeholder={PLACEHOLDER_PHONE_NUMBER}
             containerStyle={styles.inputComponentContainerStyle}
-            inputContainerStyle={styles.inputContainerStyle}
+            inputContainerStyle={[
+              styles.inputContainerStyle,
+              isFieldFocused && styles.fieldFocused,
+            ]}
             renderErrorMessage={false}
             textContentType="telephoneNumber"
             keyboardType="phone-pad"
             value={phoneInputInfo?.rawPhoneNumber}
             onChangeText={setPhoneNumber}
+            onFocus={() => setIsFieldFocused(true)}
+            onBlur={() => setIsFieldFocused(false)}
             autoFocus={true}
           />
         </View>

@@ -1,0 +1,31 @@
+name: "Fastlane"
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "ios/fastlane/**"
+      - "ios/Gemfile"
+      - "ios/Gemfile.lock"
+      - ".github/workflows/fastlane.yml"
+# The tests only read the checkout, so the token reads it and nothing more, and is not left in it.
+permissions:
+  contents: read
+jobs:
+  fastlane:
+    name: Fastlane
+    runs-on: ubuntu-latest
+    env:
+      BUNDLE_GEMFILE: ${{ github.workspace }}/ios/Gemfile
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      # The Ruby the build machine runs fastlane with (flake.nix). On 3.4 the lockfile cannot
+      # load fastlane, since abbrev left the default gems and the lockfile does not carry it.
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+      - name: Test the fastlane lanes
+        working-directory: ios
+        run: bundle exec ruby -e 'ARGV.each { |file| require File.expand_path(file) }' fastlane/test/*_test.rb

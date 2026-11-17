@@ -42,7 +42,6 @@ jest.mock("@react-native-firebase/crashlytics", () => ({
 const mockIsRegionPending = jest.fn(() => false)
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceRestricted: () => false,
   useDollarBalanceGate: () => ({
     isGated: false,
     isRegionPending: mockIsRegionPending(),

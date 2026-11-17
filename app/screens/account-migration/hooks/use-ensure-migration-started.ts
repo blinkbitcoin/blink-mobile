@@ -4,6 +4,7 @@ import { gql } from "@apollo/client"
 
 import { useMigrationStartMutation } from "@app/graphql/generated"
 import { isNetworkFailure } from "@app/graphql/transport-error"
+import { MigrationRejectionCode } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 
 gql`
@@ -27,6 +28,9 @@ type UseEnsureMigrationStartedOptions = {
 type UseEnsureMigrationStarted = {
   isStarted: boolean
   isRejected: boolean
+  /** Refused while an incoming deposit has not confirmed: unlike a rejection it clears on
+   *  a retry, once the deposit has landed. */
+  isDepositPending: boolean
   hasConnectionIssue: boolean
   retry: () => void
 }
@@ -36,9 +40,10 @@ type UseEnsureMigrationStarted = {
  * commit screen. The backend mutation is idempotent, so nothing here needs a durable
  * latch beyond not firing twice for one arrival, and a rejected start leaves the status
  * at NOT_STARTED, which is what keeps a user the server refuses from being sealed into a
- * flow they cannot finish. The refusal reason is deliberately not parsed: the backend
- * maps its dollar-balance rejection onto the same MIGRATION_STATE_CONFLICT code as a real
- * state conflict, so telling them apart would mean matching on message text.
+ * flow they cannot finish. Only one refusal reason is parsed, the pending deposit, which
+ * has its own code and clears by itself. The rest stay final: the backend maps its
+ * dollar-balance rejection onto the same MIGRATION_STATE_CONFLICT code as a real state
+ * conflict, so telling those apart would mean matching on message text.
  */
 export const useEnsureMigrationStarted = ({
   skip,
@@ -46,6 +51,7 @@ export const useEnsureMigrationStarted = ({
   const [startMigration] = useMigrationStartMutation()
   const [isStarted, setIsStarted] = useState(false)
   const [isRejected, setIsRejected] = useState(false)
+  const [isDepositPending, setIsDepositPending] = useState(false)
   const [hasConnectionIssue, setHasConnectionIssue] = useState(false)
   const [attempt, setAttempt] = useState(0)
 
@@ -58,20 +64,48 @@ export const useEnsureMigrationStarted = ({
    */
   const firedAttemptRef = useRef(-1)
 
+  /**
+   * Whether an answer still speaks for the screen: only an unmount or a newer attempt
+   * retires one. A change to skip does not, since skip only holds the next attempt back:
+   * an accepted start dropped because one of its inputs flipped while it was out would
+   * leave the lock armed server-side with nothing here to fire the start again.
+   */
+  const isMountedRef = useRef(true)
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
+
   /** A settled outcome stays settled however often the caller asks: retrying a refusal only
    *  replays the same answer, and re-firing an accepted start would re-arm an armed lock. */
   const retry = useCallback(() => {
     if (isRejected || isStarted) return
     setHasConnectionIssue(false)
+    setIsDepositPending(false)
     setAttempt((previous) => previous + 1)
   }, [isRejected, isStarted])
 
+  /** A settled outcome also keeps a retry asked for before it settled from firing: an
+   *  accepted start answering after the caller requested another needs no second one. */
+  const isSettled = isStarted || isRejected
+
+  /**
+   * Whether any attempt has been accepted. An acceptance is never stale: the server has
+   * the run, whichever request carried it. So it settles the start even when a newer
+   * attempt has gone out since (the shared retry can send one while the first is still
+   * out), and nothing that answers afterwards undoes it: the repeat's refusal, or its
+   * dropped connection, is about a start the server already holds. Read through a ref
+   * because those later answers land in closures from before the acceptance.
+   */
+  const isAcceptedRef = useRef(false)
+
   useEffect(() => {
-    if (skip || firedAttemptRef.current === attempt) return
+    if (skip || isSettled || firedAttemptRef.current === attempt) return
 
     firedAttemptRef.current = attempt
-
-    let isActive = true
+    const isCurrent = () => isMountedRef.current && firedAttemptRef.current === attempt
 
     const run = async () => {
       try {
@@ -86,17 +120,40 @@ export const useEnsureMigrationStarted = ({
             "Migration start empty payload",
             new Error("migrationStart returned no payload"),
           )
-          if (!isActive) return
+          if (!isCurrent() || isAcceptedRef.current) return
           setHasConnectionIssue(true)
           return
         }
 
         const [rejection] = payload.errors ?? []
-        if (rejection)
-          reportError("Migration start rejected", new Error(rejection.message))
-        if (!isActive) return
-        setIsRejected(Boolean(rejection))
-        setIsStarted(!rejection)
+        if (!rejection) {
+          if (!isMountedRef.current) return
+          isAcceptedRef.current = true
+          /** An answer settles the connection question too: an earlier attempt's dropped
+           *  request may have raised it after the caller asked for this one. The deposit
+           *  flag likewise: a newer attempt's refusal may have raised it after the retry
+           *  that sent that attempt cleared it. */
+          setHasConnectionIssue(false)
+          setIsRejected(false)
+          setIsDepositPending(false)
+          setIsStarted(true)
+          return
+        }
+
+        /** Expected while a deposit confirms, so it is not reported as a failure. */
+        const isPendingDepositRefusal =
+          rejection.code === MigrationRejectionCode.PendingDeposit
+        if (isPendingDepositRefusal) {
+          if (!isCurrent() || isAcceptedRef.current) return
+          setHasConnectionIssue(false)
+          setIsDepositPending(true)
+          return
+        }
+
+        reportError("Migration start rejected", new Error(rejection.message))
+        if (!isCurrent() || isAcceptedRef.current) return
+        setHasConnectionIssue(false)
+        setIsRejected(true)
       } catch (err) {
         const isRetryable = isNetworkFailure(err)
 
@@ -104,18 +161,14 @@ export const useEnsureMigrationStarted = ({
          *  about it; the caller's retry is what sends the next one. */
         if (!isRetryable) reportError("Migration start failed", err)
 
-        if (!isActive) return
+        if (!isCurrent() || isAcceptedRef.current) return
         setHasConnectionIssue(isRetryable)
         setIsRejected(!isRetryable)
       }
     }
 
     run()
+  }, [skip, isSettled, attempt, startMigration])
 
-    return () => {
-      isActive = false
-    }
-  }, [skip, attempt, startMigration])
-
-  return { isStarted, isRejected, hasConnectionIssue, retry }
+  return { isStarted, isRejected, isDepositPending, hasConnectionIssue, retry }
 }

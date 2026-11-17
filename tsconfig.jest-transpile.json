@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.jest.json",
+  "compilerOptions": {
+    // ts-jest >= 29.2 reads transpile mode from here; 29.1 needs the transformer option in jest.config.js.
+    "isolatedModules": true,
+    "module": "commonjs",
+    // The base "bundler" resolution is rejected with commonjs, and customConditions needs bundler/node16.
+    "moduleResolution": "node10",
+    "customConditions": null
+  }
+}

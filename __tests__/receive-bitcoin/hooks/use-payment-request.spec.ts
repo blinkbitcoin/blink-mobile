@@ -44,6 +44,7 @@ jest.mock("@app/graphql/generated", () => ({
   useLnNoAmountInvoiceCreateMutation: () => [mockLnNoAmountInvoiceCreate],
   useLnUsdInvoiceCreateMutation: () => [mockLnUsdInvoiceCreate],
   useOnChainAddressCurrentMutation: () => [mockOnChainAddressCurrent],
+  useOnChainAddressCreateMutation: () => [jest.fn()],
 }))
 
 const mockUseLnUpdateHashPaid = jest.fn()
@@ -53,7 +54,6 @@ jest.mock("@app/graphql/ln-update-context", () => ({
 
 const mockUseDollarBalanceRestricted = jest.fn(() => false)
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceRestricted: () => mockUseDollarBalanceRestricted(),
   useDollarBalanceGate: () => ({
     isGated: mockUseDollarBalanceRestricted(),
     isRegionPending: false,

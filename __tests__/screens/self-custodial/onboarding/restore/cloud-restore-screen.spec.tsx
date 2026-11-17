@@ -24,6 +24,12 @@ jest.mock("@react-navigation/native", () => ({
   }),
 }))
 
+const mockReleaseScreenSecurity = jest.fn(() => Promise.resolve())
+const mockAcquireScreenSecurity = jest.fn()
+jest.mock("@app/utils/screen-security", () => ({
+  acquireScreenSecurity: () => mockAcquireScreenSecurity(),
+}))
+
 const mockLoadCloudBackups = jest.fn()
 const mockHandlePick = jest.fn()
 const mockHandleDecrypt = jest.fn()
@@ -84,6 +90,10 @@ const renderScreen = async (state: Partial<RestoreState>) => {
 describe("CloudRestoreScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockAcquireScreenSecurity.mockReturnValue({
+      ready: Promise.resolve(),
+      release: mockReleaseScreenSecurity,
+    })
     restoreState = idleState
   })
 
@@ -175,5 +185,45 @@ describe("CloudRestoreScreen", () => {
     expect(queryByTestId("no-backup-title")).toBeNull()
     expect(queryByTestId("cloud-backup-picker-description")).toBeNull()
     expect(queryByTestId("restore-decrypt-button")).toBeNull()
+  })
+
+  /**
+   * The decryption password is typed on the password step, and PasswordInput's eye toggle
+   * shows it in plain text, so a recents snapshot or a screen recorder would capture it,
+   * and with the cloud file that opens the wallet. Guarded from the first render rather
+   * than from the password step, so no step paints unguarded.
+   */
+  describe("screenshot protection", () => {
+    it("guards the password step", async () => {
+      await renderScreen({ isPassword: true })
+
+      expect(mockAcquireScreenSecurity).toHaveBeenCalledTimes(1)
+    })
+
+    it("keeps the guard on every other step", async () => {
+      const otherSteps: Partial<RestoreState>[] = [
+        { isLoading: true },
+        { isPicker: true },
+        { hasError: true },
+        { isNotFound: true },
+        {},
+      ]
+      for (const step of otherSteps) {
+        jest.clearAllMocks()
+
+        const { unmount } = await renderScreen(step)
+
+        expect(mockAcquireScreenSecurity).toHaveBeenCalledTimes(1)
+        unmount()
+      }
+    })
+
+    it("drops the guard on unmount", async () => {
+      const { unmount } = await renderScreen({ isPassword: true })
+
+      unmount()
+
+      expect(mockReleaseScreenSecurity).toHaveBeenCalledTimes(1)
+    })
   })
 })

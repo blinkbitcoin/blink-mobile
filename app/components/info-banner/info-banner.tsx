@@ -3,6 +3,9 @@ import { View } from "react-native"
 
 import { Colors, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
+import { staticSurface } from "@app/rne-theme/surfaces"
+
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 
 type InfoBannerProps = {
@@ -17,8 +20,8 @@ export const InfoBanner: React.FC<InfoBannerProps> = ({
   children,
   title,
   icon,
-  iconColor = "black",
-  titleColor = "primary",
+  iconColor = "textOnBackground",
+  titleColor = "accent",
 }) => {
   const styles = useStyles()
   const {
@@ -44,8 +47,8 @@ export const InfoBanner: React.FC<InfoBannerProps> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    backgroundColor: colors.grey5,
-    borderRadius: 12,
+    ...staticSurface(colors),
+    borderRadius: radius.default,
     paddingHorizontal: 16,
     paddingVertical: 14,
     gap: 14,
@@ -64,6 +67,6 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 16,
     fontWeight: "400",
     lineHeight: 22,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
 }))

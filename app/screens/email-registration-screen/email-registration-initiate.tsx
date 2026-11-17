@@ -7,6 +7,7 @@ import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Input, Text, makeStyles } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -15,6 +16,11 @@ import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { useUserEmailRegistrationInitiateMutation } from "@app/graphql/generated"
+import { useLoginMethods } from "@app/screens/settings-screen/account/login-methods-hook"
+import {
+  LoginMethodAddition,
+  TotpStepUpErrorCode,
+} from "@app/types/two-factor-enforcement"
 
 const useStyles = makeStyles(({ colors }) => ({
   screenStyle: {
@@ -43,11 +49,14 @@ const useStyles = makeStyles(({ colors }) => ({
 
   inputContainerStyle: {
     flex: 1,
-    borderWidth: 2,
-    borderBottomWidth: 2,
+    borderWidth: 0,
+    borderBottomWidth: 0,
     paddingHorizontal: 10,
-    borderColor: colors.primary5,
-    borderRadius: 8,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
+  },
+  fieldFocused: {
+    backgroundColor: colors.surfaceFocused,
   },
   errorContainer: {
     marginBottom: 20,
@@ -59,6 +68,7 @@ gql`
     userEmailRegistrationInitiate(input: $input) {
       errors {
         message
+        code
       }
       emailRegistrationId
       me {
@@ -87,16 +97,32 @@ export const EmailRegistrationInitiateScreen: React.FC<
     >()
 
   const [emailInput, setEmailInput] = React.useState<string>("")
+  // The field autofocuses on mount, so start focused: no resting fill flashes first.
+  const [isFieldFocused, setIsFieldFocused] = React.useState(true)
   const [errorMessage, setErrorMessage] = React.useState<string>("")
   const [loading, setLoading] = React.useState<boolean>(false)
   const { onboarding = false, hasUsername = false } = route.params ?? {}
 
   const { LL } = useI18nContext()
   const [setEmailMutation] = useUserEmailRegistrationInitiateMutation()
+  /** With an authenticator, the server asks for its code to add the address. */
+  const { hasAuthenticator } = useLoginMethods()
+
+  const askForCode = () =>
+    navigation.navigate("loginMethodCode", {
+      addition: LoginMethodAddition.Email,
+      email: emailInput,
+      onboarding,
+      hasUsername,
+    })
 
   const submit = async () => {
     if (!validator.isEmail(emailInput)) {
       setErrorMessage(LL.EmailRegistrationInitiateScreen.invalidEmail())
+      return
+    }
+    if (hasAuthenticator) {
+      askForCode()
       return
     }
 
@@ -108,6 +134,12 @@ export const EmailRegistrationInitiateScreen: React.FC<
       })
 
       const errors = data?.userEmailRegistrationInitiate.errors
+      /** An authenticator added on another device since the account was last read. */
+      const isCodeRequired = errors?.[0]?.code === TotpStepUpErrorCode.CodeRequired
+      if (isCodeRequired) {
+        askForCode()
+        return
+      }
       if (errors && errors.length > 0) {
         console.log(errors, "errors")
         setErrorMessage(errors[0].message)
@@ -167,7 +199,12 @@ export const EmailRegistrationInitiateScreen: React.FC<
             {...testProps(LL.EmailRegistrationInitiateScreen.placeholder())}
             placeholder={LL.EmailRegistrationInitiateScreen.placeholder()}
             autoCapitalize="none"
-            inputContainerStyle={styles.inputContainerStyle}
+            inputContainerStyle={[
+              styles.inputContainerStyle,
+              isFieldFocused && styles.fieldFocused,
+            ]}
+            onFocus={() => setIsFieldFocused(true)}
+            onBlur={() => setIsFieldFocused(false)}
             renderErrorMessage={false}
             textContentType="emailAddress"
             keyboardType="email-address"

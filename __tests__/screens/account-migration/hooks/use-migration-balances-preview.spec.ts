@@ -35,7 +35,6 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceRestricted: () => false,
   useDollarBalanceRestriction: () => ({ isRestricted: false, isRegionPending: false }),
 }))
 
@@ -134,5 +133,58 @@ describe("useMigrationBalancesPreview", () => {
 
     expect(result.current.isReady).toBe(true)
     expect(result.current.expectedReceiveSats).toBe(0)
+  })
+
+  describe("refreshing the figures", () => {
+    const renderWithRefetches = (
+      refetchPreview: jest.Mock,
+      refetchBalances: jest.Mock,
+    ) => {
+      mockUseMigrationPreview.mockReturnValue({
+        ...previewSource(previewOf(990)),
+        refetch: refetchPreview,
+      })
+      mockUseCustodialWalletBalances.mockReturnValue({
+        ...balancesSource(true),
+        refetch: refetchBalances,
+      })
+      return renderHook(() =>
+        useMigrationBalancesPreview({
+          provisionedAccountId: "sc-account-1",
+          isProvisionedAccountLoading: false,
+        }),
+      )
+    }
+
+    it("answers true once both sources have answered", async () => {
+      const refetchPreview = jest.fn().mockResolvedValue(undefined)
+      const refetchBalances = jest.fn().mockResolvedValue(undefined)
+      const { result } = renderWithRefetches(refetchPreview, refetchBalances)
+
+      await expect(result.current.refresh()).resolves.toBe(true)
+      expect(refetchPreview).toHaveBeenCalledTimes(1)
+      expect(refetchBalances).toHaveBeenCalledTimes(1)
+    })
+
+    it("answers false when either source fails", async () => {
+      const { result } = renderWithRefetches(
+        jest.fn().mockRejectedValue(new Error("network")),
+        jest.fn().mockResolvedValue(undefined),
+      )
+
+      await expect(result.current.refresh()).resolves.toBe(false)
+    })
+
+    it("refreshes both sources on a retry and swallows a failure", async () => {
+      const refetchPreview = jest.fn().mockRejectedValue(new Error("network"))
+      const refetchBalances = jest.fn().mockResolvedValue(undefined)
+      const { result } = renderWithRefetches(refetchPreview, refetchBalances)
+
+      result.current.retry()
+      await Promise.resolve()
+
+      expect(refetchPreview).toHaveBeenCalledTimes(1)
+      expect(refetchBalances).toHaveBeenCalledTimes(1)
+    })
   })
 })

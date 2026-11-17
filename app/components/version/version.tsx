@@ -14,7 +14,7 @@ import { testProps } from "../../utils/testProps"
 
 const useStyles = makeStyles(({ colors }) => ({
   version: {
-    color: colors.grey0,
+    color: colors.textPrimary,
     marginTop: 18,
     textAlign: "center",
   },

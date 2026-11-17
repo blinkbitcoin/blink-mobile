@@ -2,6 +2,7 @@ import React from "react"
 import { View } from "react-native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button/galoy-icon-button"
 import { IconNamesType } from "@app/components/atomic/galoy-icon/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -80,8 +81,8 @@ export const CardActionButtons: React.FC<CardActionButtonsProps> = ({
               iconSize={action.iconSize}
               text={action.label}
               onPress={action.onPress}
-              color={isActiveFrozen ? colors.error : colors.primary}
-              backgroundColor={isActiveFrozen ? colors.error9 : colors.grey4}
+              color={isActiveFrozen ? colors.error : colors.accent}
+              backgroundColor={isActiveFrozen ? colors.errorBackground : colors.neutral}
               loading={action.loading}
             />
           </View>
@@ -96,8 +97,8 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    backgroundColor: colors.grey5,
-    borderRadius: 12,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     height: 94,
     marginHorizontal: 20,
     marginTop: 14,

@@ -1,10 +1,12 @@
 import React, { FunctionComponent } from "react"
 import { View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { WalletAmount } from "@app/types/amounts"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import { Text, makeStyles } from "@rn-vui/themed"
 
 import { CurrencyPill } from "../atomic/currency-pill"
@@ -72,10 +74,10 @@ export const WalletSummary: FunctionComponent<WalletSummaryProps> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   walletSummaryContainer: {
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 8,
+    borderRadius: radius.default,
     padding: 14,
   },
   amountsContainer: {

@@ -3,17 +3,25 @@ import ContentLoader, { Rect } from "react-content-loader/native"
 import { Pressable, View } from "react-native"
 
 import { gql } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { DisabledFeature } from "@app/components/disabled-feature"
 import { useRestrictedRegion } from "@app/components/restricted-region"
 import { useWalletOverviewScreenQuery, WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { getBtcWallet, getUsdWallet, WalletBalance } from "@app/graphql/wallets-utils"
+import {
+  AccountBalance,
+  getBtcWallet,
+  getCardAccount,
+  getUsdWallet,
+  getWallets,
+} from "@app/graphql/wallets-utils"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useDollarBalanceGate } from "@app/hooks/use-dollar-balance-restricted"
-import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { TranslationFunctions } from "@app/i18n/i18n-types"
+import { GateReason } from "@app/types/account"
+import { CARD, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -25,14 +33,15 @@ import { NotificationBadge } from "@app/components/notification-badge"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { CurrencyPill, useEqualPillWidth } from "../atomic/currency-pill"
 
-const CARD_NUMBER_MASK = "••••"
+/** The skeleton fills the row exactly, so the balances replace it without moving the list. */
+const BALANCE_ROW_HEIGHT = 45
 
 const Loader = () => {
   const styles = useStyles()
   return (
-    <View style={styles.loaderContainer}>
+    <View style={styles.loaderContainer} testID="balance-skeleton">
       <ContentLoader
-        height={45}
+        height={BALANCE_ROW_HEIGHT}
         width={"60%"}
         speed={1.2}
         backgroundColor={styles.loaderBackground.color}
@@ -60,13 +69,36 @@ gql`
   }
 `
 
+type UnavailableLabelInputs = {
+  reason: GateReason | null
+  isRestrictedRegion: boolean
+}
+
+/**
+ * A network with no dollar token, Anon and an undetermined region each get their own
+ * words; a decided restriction keeps the region label. The sanctions block outranks the
+ * undetermined region, in the same order the gated tap resolves: a sanctioned row opens
+ * the sanctions modal, so a label inviting the user to pull and retry would promise a
+ * check that cannot reopen it.
+ */
+const unavailableLabelFor = (
+  { reason, isRestrictedRegion }: UnavailableLabelInputs,
+  LL: TranslationFunctions,
+): string => {
+  if (reason === GateReason.Network) return LL.StablesatsRestriction.networkWalletLabel()
+  if (reason === GateReason.Anon) return LL.StablesatsRestriction.anonModeWalletLabel()
+  if (isRestrictedRegion) return LL.StablesatsRestriction.walletLabel()
+  if (reason === GateReason.UnknownRegion) {
+    return LL.StablesatsRestriction.unknownRegionWalletLabel()
+  }
+  return LL.StablesatsRestriction.walletLabel()
+}
+
 type Props = {
   loading: boolean
   setIsStablesatModalVisible: (value: boolean) => void
   onGatedTap?: () => void
-  wallets?: readonly WalletBalance[]
-  hasCard?: boolean
-  cardLastFour?: string | null
+  accounts?: readonly AccountBalance[]
   showBtcNotification?: boolean
   showUsdNotification?: boolean
 }
@@ -75,22 +107,24 @@ const WalletOverview: React.FC<Props> = ({
   loading,
   setIsStablesatModalVisible,
   onGatedTap,
-  wallets,
-  hasCard = false,
-  cardLastFour,
+  accounts,
   showBtcNotification = false,
   showUsdNotification = false,
 }) => {
-  const { isGated: isDollarBalanceGated, isRegionPending } = useDollarBalanceGate()
+  const {
+    isGated: isDollarBalanceGated,
+    isRegionPending,
+    reason: dollarBalanceGateReason,
+  } = useDollarBalanceGate()
   const { isRestrictedRegion } = useRestrictedRegion()
   const isDollarRowUnavailable = isDollarBalanceGated || isRestrictedRegion
-  const { isAnonMode } = useSelfCustodialAccountMode()
   const { hideAmount, toggleHideAmount } = useHideAmount()
 
   const { LL } = useI18nContext()
-  const unavailableLabel = isAnonMode
-    ? LL.StablesatsRestriction.anonModeWalletLabel()
-    : LL.StablesatsRestriction.walletLabel()
+  const unavailableLabel = unavailableLabelFor(
+    { reason: dollarBalanceGateReason, isRestrictedRegion },
+    LL,
+  )
   const isAuthed = useIsAuthed()
   const {
     theme: { colors },
@@ -105,19 +139,27 @@ const WalletOverview: React.FC<Props> = ({
   let usdInDisplayCurrencyFormatted: string | undefined = "$0.00"
   let btcInUnderlyingCurrency: string | undefined = "0 sat"
   let usdInUnderlyingCurrency: string | undefined = undefined
+  let cardBalanceFormatted: string | undefined = undefined
+  let cardInDisplayCurrency: string | undefined = undefined
 
-  const hasWallets = wallets && wallets.length > 0
+  /** Only supplied wallets make the fallback query unnecessary: a card on its own does
+   *  not carry the wallet balances, so it still needs them from the query. */
+  const suppliedWallets = getWallets(accounts)
+  const hasWallets = Boolean(suppliedWallets?.length)
   const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed || hasWallets })
-  const resolvedWallets = hasWallets ? wallets : data?.me?.defaultAccount?.wallets
+  const wallets = hasWallets ? suppliedWallets : data?.me?.defaultAccount?.wallets
+  const cardAccount = getCardAccount(accounts)
+  const cardBalance = cardAccount?.balance
+  const isCardBalanceKnown = cardBalance !== undefined
 
-  const hasUsdBalance = (getUsdWallet(resolvedWallets)?.balance ?? 0) > 0
+  const hasUsdBalance = (getUsdWallet(wallets)?.balance ?? 0) > 0
   /** A gated balance still shows its amount (the row stays disabled); the label only
    *  stands in when there is nothing to show. */
   const showsUnavailableLabel = isDollarRowUnavailable && !hasUsdBalance
 
   if (isAuthed || hasWallets) {
-    const btcWallet = getBtcWallet(resolvedWallets)
-    const usdWallet = getUsdWallet(resolvedWallets)
+    const btcWallet = getBtcWallet(wallets)
+    const usdWallet = getUsdWallet(wallets)
 
     const btcWalletBalance = toBtcMoneyAmount(btcWallet?.balance ?? NaN)
 
@@ -140,22 +182,28 @@ const WalletOverview: React.FC<Props> = ({
     }
   }
 
+  if (isCardBalanceKnown) {
+    const cardMoneyAmount = toBtcMoneyAmount(cardBalance)
+    cardBalanceFormatted = formatMoneyAmount({ moneyAmount: cardMoneyAmount })
+    cardInDisplayCurrency = moneyAmountToDisplayCurrencyString({
+      moneyAmount: cardMoneyAmount,
+      isApproximate: true,
+    })
+  }
+  const isCardBalanceLoading = loading || !isCardBalanceKnown
+
   const openTransactionHistory = (currencyFilter: WalletCurrency) => {
-    if (!resolvedWallets || resolvedWallets.length === 0) return
+    if (!wallets || wallets.length === 0) return
     navigation.navigate("transactionHistory", {
-      wallets: resolvedWallets,
+      wallets,
       currencyFilter,
     })
   }
 
   const [pressedBtc, setPressedBtc] = useState(false)
   const [pressedUsd, setPressedUsd] = useState(false)
+  const [pressedCard, setPressedCard] = useState(false)
   const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
-
-  const showCardLastFour = Boolean(cardLastFour) && !hideAmount
-  const maskedCardNumber = showCardLastFour
-    ? `${CARD_NUMBER_MASK} ${cardLastFour}`
-    : CARD_NUMBER_MASK
 
   /** The dollar row rides the same loader while the region resolves, and stays inert
    *  meanwhile: reading the unresolved region as unrestricted is what showed a restricted
@@ -251,7 +299,7 @@ const WalletOverview: React.FC<Props> = ({
                 <NotificationBadge visible={showUsdNotification} />
               </View>
               <Pressable onPress={() => setIsStablesatModalVisible(true)}>
-                <GaloyIcon color={colors.grey1} name="question" size={18} />
+                <GaloyIcon color={colors.textSecondary} name="question" size={18} />
               </Pressable>
             </View>
             {isDollarBalanceLoading ? (
@@ -288,23 +336,44 @@ const WalletOverview: React.FC<Props> = ({
         </Pressable>
       </DisabledFeature>
 
-      {hasCard && (
+      {cardAccount && (
         <>
           <View style={styles.separator} />
-          <Pressable onPress={() => navigation.navigate("cardDashboardScreen")}>
+          <Pressable
+            onPressIn={() => setPressedCard(true)}
+            onPressOut={() => setPressedCard(false)}
+            onPress={() => navigation.navigate("cardDashboardScreen")}
+          >
             <View style={styles.displayTextView}>
               <View style={styles.currency}>
-                <CurrencyPill
-                  currency={WalletCurrency.Usd}
-                  label={LL.common.card()}
-                  highlighted={false}
-                  containerSize="medium"
-                  containerStyle={[pillWidthStyle, styles.cardPillBackground]}
-                />
+                <View style={styles.bubbleWrapper} pointerEvents="box-none">
+                  <View style={pressedCard && styles.pressedOpacity}>
+                    <CurrencyPill
+                      currency={CARD}
+                      containerSize="medium"
+                      containerStyle={pillWidthStyle}
+                      onLayout={onPillLayout(CARD)}
+                    />
+                  </View>
+                </View>
               </View>
-              <Text type="p1" bold>
-                {maskedCardNumber}
-              </Text>
+              {isCardBalanceLoading ? (
+                <Loader />
+              ) : hideAmount ? (
+                <HiddenBalancePlaceholder size="small" />
+              ) : (
+                <View style={[styles.hideableArea, pressedCard && styles.pressedOpacity]}>
+                  <Text
+                    type="p1"
+                    bold
+                    style={styles.boldBalance}
+                    {...testProps("card-balance")}
+                  >
+                    {cardBalanceFormatted}
+                  </Text>
+                  <Text type="p3">{cardInDisplayCurrency}</Text>
+                </View>
+              )}
             </View>
           </Pressable>
         </>
@@ -317,10 +386,10 @@ export default WalletOverview
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     display: "flex",
     flexDirection: "column",
-    borderRadius: 12,
+    borderRadius: radius.default,
     padding: 12,
     paddingBottom: 5,
   },
@@ -341,13 +410,13 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    minHeight: 45,
+    minHeight: BALANCE_ROW_HEIGHT,
     marginVertical: 4,
     marginTop: 5,
   },
   separator: {
     height: 1,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     marginVertical: 2,
   },
   titleSeparator: {
@@ -379,11 +448,6 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "flex-end",
-    height: 45,
-    marginTop: 5,
   },
   pressedOpacity: { opacity: 0.7 },
-  cardPillBackground: {
-    backgroundColor: colors._cardPill,
-  },
 }))

@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import InAppBrowser from "react-native-inappbrowser-reborn"
 
+import { radius } from "@app/rne-theme/radius"
 import { Screen } from "@app/components/screen"
 import { ContactSupportRow, SettingItemRow, SwitchRow } from "@app/components/card-screen"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
@@ -13,9 +14,10 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { isIos } from "@app/utils/helper"
 
-import { useCardData } from "../hooks/use-card-data"
+import { useCardData } from "@app/hooks"
 import { CloseCardModal } from "./close-card-modal"
 import { NotificationCategory, useCloseCardAccount, useNotificationToggle } from "./hooks"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 export const CardSettingsScreen: React.FC = () => {
   const styles = useStyles()
@@ -79,7 +81,7 @@ export const CardSettingsScreen: React.FC = () => {
   const handleAddToMobileWallet = () => {
     navigation.navigate("cardAddToMobileWalletScreen", {
       lastFour: card?.lastFour ?? "",
-      holderName: "",
+      cardId: card?.id ?? "",
     })
   }
 
@@ -253,13 +255,13 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 20,
   },
   notificationsSection: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   supportSection: {
-    gap: 3,
+    gap: groupTitleGap,
   },
   sectionTitle: {
-    color: colors.black,
+    color: colors.textSecondary,
     fontFamily: "Source Sans Pro",
     fontSize: 14,
     fontWeight: "400",
@@ -267,7 +269,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   settingsGroupContainer: {
     marginTop: 0,
-    borderRadius: 8,
+    borderRadius: radius.default,
   },
   dividerStyle: {
     marginHorizontal: 22,

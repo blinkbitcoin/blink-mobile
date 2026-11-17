@@ -90,6 +90,55 @@ describe("resolveDestination (integration: real parser)", () => {
     expect(mockWrapDestination).toHaveBeenCalled()
   })
 
+  /**
+   * The domains a self-custodial sender declares are what let a Blink pay code be
+   * recognised as naming an account. They must not also route it over the ledger: the
+   * wallet has no token for that mutation, and the recipient's own address is the whole
+   * point of recognising it.
+   */
+  it("keeps a self-custodial send on LNURL even when the recipient is on a declared domain", async () => {
+    const accountDefaultWalletQuery = jest.fn().mockResolvedValue({
+      data: { accountDefaultWallet: { id: "recipient-wallet-id" } },
+    })
+
+    const result = await resolveDestination(
+      {
+        rawInput: "esaudeveloper@blink.sv",
+        myWalletIds: ["my-wallet-id"],
+        bitcoinNetwork: Network.Mainnet,
+        lnurlDomains: [lnAddressHostname, "pay.blink.sv"],
+        accountDefaultWalletQuery: accountDefaultWalletQuery as never,
+      },
+      { sdk: fakeSdk, network: mockSparkNetwork.Regtest },
+      lnAddressHostname,
+    )
+
+    expect(result.valid && result.validDestination.paymentType).toBe(PaymentType.Lnurl)
+    expect(accountDefaultWalletQuery).not.toHaveBeenCalled()
+  })
+
+  it("still pays a custodial send to a declared domain over the ledger", async () => {
+    const accountDefaultWalletQuery = jest.fn().mockResolvedValue({
+      data: { accountDefaultWallet: { id: "recipient-wallet-id" } },
+    })
+
+    const result = await resolveDestination(
+      {
+        rawInput: "esaudeveloper@blink.sv",
+        myWalletIds: ["my-wallet-id"],
+        bitcoinNetwork: Network.Mainnet,
+        lnurlDomains: [lnAddressHostname, "pay.blink.sv"],
+        accountDefaultWalletQuery: accountDefaultWalletQuery as never,
+      },
+      { sdk: null, network: mockSparkNetwork.Regtest },
+      lnAddressHostname,
+    )
+
+    expect(result.valid && result.validDestination.paymentType).toBe(
+      PaymentType.Intraledger,
+    )
+  })
+
   it("routes a custodial send to a non-custodial Blink username through LNURL via the flag fallback", async () => {
     // No custodial wallet for the handle: the recipient is self-custodial, not custodial.
     const accountDefaultWalletQuery = jest.fn().mockResolvedValue({

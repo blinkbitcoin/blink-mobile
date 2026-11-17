@@ -13,12 +13,12 @@ jest.mock("@react-navigation/native", () => ({
 
 jest.mock("@rn-vui/themed", () => {
   const colors = {
-    grey0: "#ccc",
-    grey2: "#999",
-    grey5: "#f5f5f5",
-    primary: "#fc5805",
-    black: "#000",
-    white: "#fff",
+    textPrimary: "#ccc",
+    textMuted: "#999",
+    surfaceInteractive: "#f5f5f5",
+    accent: "#fc5805",
+    textOnBackground: "#000",
+    backgroundDefault: "#fff",
   }
   return {
     makeStyles:

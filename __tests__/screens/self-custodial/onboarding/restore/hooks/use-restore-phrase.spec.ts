@@ -7,7 +7,7 @@ import {
 import { PhraseStep } from "@app/navigation/stack-param-lists"
 
 const mockNavigate = jest.fn()
-const mockRestore = jest.fn()
+const mockRequestRestore = jest.fn()
 const mockGetString = jest.fn()
 
 jest.mock("@react-navigation/native", () => ({
@@ -53,7 +53,7 @@ jest.mock(
     RestoreWalletStatus: { Idle: "idle", Restoring: "restoring", Error: "error" },
     useRestoreWallet: () => ({
       status: "idle",
-      restore: mockRestore,
+      requestRestore: mockRequestRestore,
     }),
   }),
 )
@@ -250,13 +250,13 @@ describe("useRestorePhrase", () => {
     })
 
     expect(result.current.validationError).toBe("Invalid mnemonic")
-    expect(mockRestore).not.toHaveBeenCalled()
+    expect(mockRequestRestore).not.toHaveBeenCalled()
   })
 
   it("calls restore with valid mnemonic", async () => {
     mockBip39State.allFilled = true
     mockBip39State.words = "valid a b c d e f g h i j k".split(" ")
-    mockRestore.mockResolvedValue(undefined)
+    mockRequestRestore.mockResolvedValue(undefined)
 
     const { result } = renderHook(() => useRestorePhrase({ step: PhraseStep.Second }))
 
@@ -264,7 +264,7 @@ describe("useRestorePhrase", () => {
       await result.current.handleRestore()
     })
 
-    expect(mockRestore).toHaveBeenCalledWith("valid a b c d e f g h i j k")
+    expect(mockRequestRestore).toHaveBeenCalledWith("valid a b c d e f g h i j k")
     expect(result.current.validationError).toBeNull()
   })
 
@@ -273,7 +273,7 @@ describe("useRestorePhrase", () => {
   it("swallows a rejecting restore instead of rethrowing", async () => {
     mockBip39State.allFilled = true
     mockBip39State.words = "valid a b c d e f g h i j k".split(" ")
-    mockRestore.mockRejectedValue(new Error("restore failed"))
+    mockRequestRestore.mockRejectedValue(new Error("restore failed"))
 
     const { result } = renderHook(() => useRestorePhrase({ step: PhraseStep.Second }))
 

@@ -98,6 +98,6 @@ const useStyles = makeStyles(({ colors }) => ({
   lineStyle: {
     height: 1,
     width: 16,
-    backgroundColor: colors.black,
+    backgroundColor: colors.textOnBackground,
   },
 }))

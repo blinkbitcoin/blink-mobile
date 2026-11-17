@@ -1,8 +1,9 @@
+import { it } from "@jest/globals"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 
 import {
   toMajorUnit,
-  toMinorUnit,
+  parseDollarsToCents,
   ellipsizeMiddle,
   formatCardDisplayNumber,
   maskDigits,
@@ -115,29 +116,39 @@ describe("maskDigits", () => {
   })
 })
 
-describe("toMinorUnit", () => {
-  it("converts whole major units to minor units", () => {
-    expect(toMinorUnit("10")).toBe(1000)
+describe("parseDollarsToCents", () => {
+  it.each<[string, number]>([
+    ["100", 10000],
+    ["100.5", 10050],
+    ["100.50", 10050],
+    ["100,50", 10050],
+    ["0.05", 5],
+    [".5", 50],
+    ["5.", 500],
+    [" 12.30 ", 1230],
+    ["0", 0],
+  ])("reads %p as %p cents", (text, cents) => {
+    expect(parseDollarsToCents(text)).toBe(cents)
   })
 
-  it("converts major units with decimals to minor units", () => {
-    expect(toMinorUnit("10.50")).toBe(1050)
+  it.each<[string, string]>([
+    ["a numeric prefix", "100abc"],
+    ["letters only", "abc"],
+    ["a repeated separator", "1..5"],
+    ["two separators", "1.2.3"],
+    ["mixed separators", "1,000.50"],
+    ["more than two decimals", "1.234"],
+    ["a sign", "-5"],
+    ["an exponent", "1e3"],
+    ["a separator alone", "."],
+    ["nothing", ""],
+  ])("rejects %s", (_case, text) => {
+    expect(parseDollarsToCents(text)).toBeNull()
   })
 
-  it("rounds fractional minor units", () => {
-    expect(toMinorUnit("10.555")).toBe(1056)
-  })
-
-  it("converts zero", () => {
-    expect(toMinorUnit("0")).toBe(0)
-  })
-
-  it("handles large amounts", () => {
-    expect(toMinorUnit("99999")).toBe(9999900)
-  })
-
-  it("returns NaN for non-numeric input", () => {
-    expect(toMinorUnit("abc")).toBeNaN()
+  it("takes the most a GraphQL Int holds and rejects anything above it", () => {
+    expect(parseDollarsToCents("21474836.47")).toBe(2_147_483_647)
+    expect(parseDollarsToCents("21474836.48")).toBeNull()
   })
 })
 

@@ -23,9 +23,11 @@ jest.mock("@app/utils/toast", () => ({
   toastShow: jest.fn(),
 }))
 
-const mockUseBiometricGate = jest.fn().mockReturnValue(true)
-jest.mock("@app/screens/card-screen/hooks/use-biometric-gate", () => ({
-  useBiometricGate: (...args: unknown[]) => mockUseBiometricGate(...args),
+const mockUseLocalAuthGate = jest.fn().mockReturnValue(true)
+const mockAuthFailureHandler = jest.fn()
+jest.mock("@app/hooks/use-local-auth-gate", () => ({
+  useLocalAuthGate: (...args: unknown[]) => mockUseLocalAuthGate(...args),
+  useAuthGateFailureHandler: () => mockAuthFailureHandler,
 }))
 
 const mockUpdatePin = jest.fn().mockResolvedValue(true)
@@ -42,7 +44,7 @@ describe("CardChangePinScreen", () => {
     mockNavigate.mockClear()
     mockGoBack.mockClear()
     mockAddListener.mockReturnValue(jest.fn())
-    mockUseBiometricGate.mockReturnValue(true)
+    mockUseLocalAuthGate.mockReturnValue(true)
     mockUpdatePin.mockResolvedValue(true)
   })
 
@@ -50,9 +52,9 @@ describe("CardChangePinScreen", () => {
     await flushEffects()
   })
 
-  describe("biometric gate", () => {
-    it("does not render when biometric not authenticated", async () => {
-      mockUseBiometricGate.mockReturnValue(false)
+  describe("local auth gate", () => {
+    it("does not render when the gate has not authenticated", async () => {
+      mockUseLocalAuthGate.mockReturnValue(false)
 
       const { queryByText } = render(
         <ContextForScreen>
@@ -66,7 +68,7 @@ describe("CardChangePinScreen", () => {
       expect(queryByText("New PIN")).toBeNull()
     })
 
-    it("calls useBiometricGate with required true", async () => {
+    it("calls useLocalAuthGate with required true", async () => {
       render(
         <ContextForScreen>
           <CardChangePinScreen />
@@ -75,8 +77,22 @@ describe("CardChangePinScreen", () => {
 
       await flushEffects()
 
-      expect(mockUseBiometricGate).toHaveBeenCalledWith(
+      expect(mockUseLocalAuthGate).toHaveBeenCalledWith(
         expect.objectContaining({ required: true }),
+      )
+    })
+
+    it("wires the shared failure handler as the gate's onFailure", async () => {
+      render(
+        <ContextForScreen>
+          <CardChangePinScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      expect(mockUseLocalAuthGate).toHaveBeenCalledWith(
+        expect.objectContaining({ onFailure: mockAuthFailureHandler }),
       )
     })
   })

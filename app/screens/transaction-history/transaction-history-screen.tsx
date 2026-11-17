@@ -2,14 +2,13 @@ import * as React from "react"
 import { InteractionManager, SectionList, Text, View } from "react-native"
 import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { makeStyles } from "@rn-vui/themed"
-import { gql, useApolloClient } from "@apollo/client"
+import { gql } from "@apollo/client"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useNavigation, RouteProp } from "@react-navigation/native"
 
 import { Screen } from "@app/components/screen"
 import {
   TransactionFragment,
-  TransactionFragmentDoc,
   useTransactionListForDefaultAccountQuery,
   useWalletOverviewScreenQuery,
   WalletCurrency,
@@ -19,12 +18,10 @@ import {
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { groupTransactionsByDate } from "@app/graphql/transactions"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { shouldHighlightById } from "@app/custodial/mappers/transaction-highlight"
-import { getTransactionDescription } from "@app/self-custodial/mappers/transaction-description"
-import { toTransactionFragments } from "@app/self-custodial/mappers/to-transaction-fragment"
+import { useSelfCustodialTransactionFragments } from "@app/self-custodial/hooks/use-self-custodial-transaction-fragments"
+import { NO_TRANSACTIONS } from "@app/types/transaction"
 import {
   resolveHighlightBaseline,
   shouldHighlightByTimestamp,
@@ -90,7 +87,6 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   )
 
   const isAuthed = useIsAuthed()
-  const client = useApolloClient()
   const activeWallet = useActiveWallet()
   const {
     allTransactions: selfCustodialAllTransactions,
@@ -98,8 +94,6 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     refreshWallets: refreshSelfCustodialWallets,
   } = useSelfCustodialWallet()
   const [selfCustodialRefreshing, setSelfCustodialRefreshing] = React.useState(false)
-  const { convertMoneyAmount, displayCurrency } = usePriceConversion()
-  const { fractionDigits } = useDisplayCurrency()
   const { feeReimbursementMemo } = useRemoteConfig()
   const hasTransitioned = useHasTransitioned()
 
@@ -167,33 +161,14 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     dataToRender?.me?.defaultAccount?.pendingIncomingTransactions
   const transactions = dataToRender?.me?.defaultAccount?.transactions
 
-  const selfCustodialDisplayInfo = React.useMemo(
-    () =>
-      convertMoneyAmount
-        ? { displayCurrency, convertMoneyAmount, fractionDigits }
-        : undefined,
-    [convertMoneyAmount, displayCurrency, fractionDigits],
+  const selfCustodialSourceTransactions = React.useMemo(
+    () => (activeWallet.isSelfCustodial ? selfCustodialAllTransactions : NO_TRANSACTIONS),
+    [activeWallet.isSelfCustodial, selfCustodialAllTransactions],
   )
 
-  const allSelfCustodialFragments = React.useMemo(() => {
-    if (!activeWallet.isSelfCustodial) return []
-
-    const describe = (tx: Parameters<typeof getTransactionDescription>[0]) =>
-      getTransactionDescription(tx, LL)
-
-    const fragments = toTransactionFragments(
-      selfCustodialAllTransactions,
-      selfCustodialDisplayInfo,
-      describe,
-    )
-
-    return fragments.filter((tx) => tx.status !== TxStatus.Failure)
-  }, [
-    activeWallet.isSelfCustodial,
-    selfCustodialAllTransactions,
-    selfCustodialDisplayInfo,
-    LL,
-  ])
+  const allSelfCustodialFragments = useSelfCustodialTransactionFragments(
+    selfCustodialSourceTransactions,
+  )
 
   const selfCustodialFragments = React.useMemo(() => {
     if (walletFilter === "ALL") return allSelfCustodialFragments
@@ -211,25 +186,6 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     () => selfCustodialFragments.filter((tx) => tx.status === TxStatus.Pending),
     [selfCustodialFragments],
   )
-
-  React.useEffect(() => {
-    if (allSelfCustodialFragments.length === 0) return
-    const task = InteractionManager.runAfterInteractions(() => {
-      client.cache.batch({
-        update: (cache) => {
-          allSelfCustodialFragments.forEach((tx) => {
-            cache.writeFragment({
-              id: cache.identify({ __typename: "Transaction", id: tx.id }),
-              fragment: TransactionFragmentDoc,
-              fragmentName: "Transaction",
-              data: tx,
-            })
-          })
-        },
-      })
-    })
-    return () => task.cancel()
-  }, [client, allSelfCustodialFragments])
 
   const settledTxs = React.useMemo(() => {
     if (activeWallet.isSelfCustodial) return selfCustodialSettled
@@ -266,8 +222,13 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     lastSeenUsdId,
     latestBtcTxId,
     latestUsdTxId,
+    isNewEnoughToAnnounce,
     markTxSeen,
-  } = useTransactionSeenState(accountId || "", allTransactions)
+  } = useTransactionSeenState({
+    accountId: accountId || "",
+    isSelfCustodial: activeWallet.isSelfCustodial,
+    transactions: allTransactions,
+  })
 
   const [seenTxIds, setSeenTxIds] = React.useState<Set<string>>(new Set())
 
@@ -289,6 +250,11 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
       return
     }
 
+    /** Only the custodial cache read can land after the first render, so only it fills
+     *  in an id the baseline is missing. The device store is there from the start: an
+     *  empty id is that baseline, and a later one could only be this screen's own mark. */
+    if (activeWallet.isSelfCustodial) return
+
     const missingBtc = !highlightBaselineLastSeen.btcId && lastSeenBtcId
     const missingUsd = !highlightBaselineLastSeen.usdId && lastSeenUsdId
 
@@ -298,7 +264,13 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
         usdId: missingUsd ? lastSeenUsdId : highlightBaselineLastSeen.usdId,
       })
     }
-  }, [loading, highlightBaselineLastSeen, lastSeenBtcId, lastSeenUsdId])
+  }, [
+    loading,
+    highlightBaselineLastSeen,
+    lastSeenBtcId,
+    lastSeenUsdId,
+    activeWallet.isSelfCustodial,
+  ])
 
   const lastSeenIdForAll = React.useMemo(() => {
     if (!highlightBaselineLastSeen?.btcId || !highlightBaselineLastSeen?.usdId) return ""
@@ -342,6 +314,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
         settlementCurrency === WalletCurrency.Btc ? latestBtcTxId : latestUsdTxId
 
       if (activeWallet.isSelfCustodial) {
+        if (!isNewEnoughToAnnounce({ createdAt })) return false
         return shouldHighlightByTimestamp({
           createdAt,
           baselineCreatedAt:
@@ -372,6 +345,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
       latestUsdTxId,
       activeWallet.isSelfCustodial,
       lastSeenCreatedAt,
+      isNewEnoughToAnnounce,
     ],
   )
 
@@ -568,14 +542,14 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   sectionHeaderContainer: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
     flexDirection: "row",
     justifyContent: "space-between",
     padding: 18,
   },
 
   sectionHeaderText: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 18,
   },
 }))

@@ -20,7 +20,7 @@ function ScreenWithoutScrolling(props: ScreenProps) {
   const style = props.style || {}
   const backgroundStyle = props.backgroundColor
     ? { backgroundColor: props.backgroundColor }
-    : { backgroundColor: colors.white }
+    : { backgroundColor: colors.backgroundDefault }
 
   const Wrapper = props.unsafe ? View : SafeAreaView
 
@@ -39,7 +39,7 @@ function ScreenWithoutScrolling(props: ScreenProps) {
     >
       <StatusBar
         barStyle={props.statusBar || statusBarContent}
-        backgroundColor={colors.white}
+        backgroundColor={colors.backgroundDefault}
       />
       <Wrapper style={[preset.inner, style]} edges={edges}>
         {props.children}
@@ -59,7 +59,7 @@ function ScreenWithScrolling(props: ScreenProps) {
   const style = props.style || {}
   const backgroundStyle = props.backgroundColor
     ? { backgroundColor: props.backgroundColor }
-    : { backgroundColor: colors.white }
+    : { backgroundColor: colors.backgroundDefault }
   const Wrapper = props.unsafe ? View : SafeAreaView
 
   const edges: Edge[] | undefined = props.unsafe
@@ -77,7 +77,7 @@ function ScreenWithScrolling(props: ScreenProps) {
     >
       <StatusBar
         barStyle={props.statusBar || statusBarContent}
-        backgroundColor={colors.white}
+        backgroundColor={colors.backgroundDefault}
       />
       <Wrapper style={[preset.outer, backgroundStyle]} edges={edges}>
         <ScrollView

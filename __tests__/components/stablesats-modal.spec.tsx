@@ -18,16 +18,16 @@ jest.mock("react-native/Libraries/Linking/Linking", () => ({
 
 jest.mock("@rn-vui/themed", () => {
   const colors = {
-    grey0: "#ccc",
-    grey1: "#aaa",
-    grey2: "#999",
-    grey3: "#666",
-    grey5: "#f5f5f5",
-    primary: "#fc5805",
-    black: "#000",
-    white: "#fff",
-    _white: "#ffffff",
-    _green: "#00a700",
+    textPrimary: "#ccc",
+    textSecondary: "#aaa",
+    textMuted: "#999",
+    textDisabled: "#666",
+    surfaceInteractive: "#f5f5f5",
+    accent: "#fc5805",
+    textOnBackground: "#000",
+    backgroundDefault: "#fff",
+    staticWhite: "#ffffff",
+    staticSuccess: "#00a700",
     transparent: "transparent",
     error: "#e22d2d",
   }

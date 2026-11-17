@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react"
 import { AppState, View, ScrollView } from "react-native"
 import ViewShot, { type ViewShotRef } from "react-native-view-shot"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "@app/components/screen"
 import {
@@ -126,7 +127,7 @@ const SuccessIconComponent: React.FC<{
     const iconMap = {
       SUCCESS: () => <GaloyIcon name="payment-success" size={100} />,
       QUEUED: () => <GaloyIcon name="payment-pending" size={100} />,
-      PENDING: () => <GaloyIcon name="warning" color={colors._orange} size={100} />,
+      PENDING: () => <GaloyIcon name="warning" color={colors.warning} size={100} />,
     }
     return iconMap[status]()
   }
@@ -421,7 +422,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   viewShot: {
     flexGrow: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
   },
   completedText: {
     textAlign: "center",
@@ -441,8 +442,8 @@ const useStyles = makeStyles(({ colors }) => ({
   successActionFieldContainer: {
     overflow: "hidden",
     gap: 20,
-    backgroundColor: colors.grey5,
-    borderRadius: 10,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 14,

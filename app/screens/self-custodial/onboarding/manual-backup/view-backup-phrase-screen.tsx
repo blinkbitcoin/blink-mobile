@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect } from "react"
+import React, { useLayoutEffect } from "react"
 import { ActivityIndicator, ScrollView, View } from "react-native"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -7,53 +7,64 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
-import { headerRightNoGlass, noHeaderRight } from "@app/components/header-no-glass"
+import {
+  HEADER_ICON_TOUCH_SIZE,
+  headerRightNoGlass,
+  noHeaderRight,
+} from "@app/components/header-no-glass"
 import { WarningCard } from "@app/components/warning-card"
 import { MnemonicWordsGrid } from "@app/components/mnemonic-words-grid"
 import { Screen } from "@app/components/screen"
+import { ScreenSecurityGate } from "@app/components/screen-security-gate"
 import { SparkCompatibleInfo } from "@app/components/spark-compatible-info"
-import { useScreenSecurity } from "@app/hooks/use-screen-security"
+import {
+  useAuthGateFailureHandler,
+  useLocalAuthGate,
+} from "@app/hooks/use-local-auth-gate"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useBiometricGate } from "@app/screens/card-screen/hooks/use-biometric-gate"
 import { testProps } from "@app/utils/testProps"
 
 import { useViewBackupPhrase } from "../hooks"
 
-// The clear tertiary button has no padding, so its hit area is the text bounds.
-const HEADER_BUTTON_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 }
+type ViewBackupPhraseContentProps = {
+  isAuthenticated: boolean
+}
 
-export const ViewBackupPhraseScreen: React.FC = () => {
-  const { LL } = useI18nContext()
+/** The gate mounts this only once the screenshot guard is actually on — the words
+ *  and the header Copy action must not exist while registration is pending. */
+const ViewBackupPhraseContent: React.FC<ViewBackupPhraseContentProps> = ({
+  isAuthenticated,
+}) => {
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
+
+  if (!isAuthenticated) {
+    return (
+      <Screen preset="fixed">
+        <ActivityIndicator style={styles.loader} color={colors.accent} />
+      </Screen>
+    )
+  }
+
+  return <BackupPhraseContent />
+}
+
+/** Mounted only once the gate has passed: useViewBackupPhrase pulls the mnemonic
+ *  out of the keystore, so neither the words nor the header Copy handler exist
+ *  anywhere in the tree while authentication is still pending. */
+const BackupPhraseContent: React.FC = () => {
+  const { LL } = useI18nContext()
+  const styles = useStyles()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
-  useScreenSecurity()
-
-  const handleAuthFailure = useCallback(() => navigation.goBack(), [navigation])
-
-  const authenticated = useBiometricGate({
-    description: LL.BackupScreen.ManualBackup.Phrase.authDescription(),
-    onFailure: handleAuthFailure,
-    onlyIfBiometricsEnabled: true,
-  })
 
   const { words, handleCopy, handleTestBackup } = useViewBackupPhrase()
 
   const copyLabel = LL.BackupScreen.ManualBackup.Phrase.copy()
 
-  // The header sits outside the `!authenticated` early return below, so it has to
-  // gate itself: without this the Copy button is mounted — and copies the full
-  // mnemonic — while the biometric prompt is still pending.
   useLayoutEffect(() => {
-    if (!authenticated) {
-      navigation.setOptions(noHeaderRight)
-      return
-    }
-
     navigation.setOptions(
       headerRightNoGlass(() => (
         <GaloyTertiaryButton
@@ -61,21 +72,17 @@ export const ViewBackupPhraseScreen: React.FC = () => {
           title={copyLabel}
           onPress={handleCopy}
           containerStyle={styles.headerButton}
-          hitSlop={HEADER_BUTTON_HIT_SLOP}
           {...testProps("backup-phrase-copy")}
           accessibilityLabel={copyLabel}
         />
       )),
     )
-  }, [navigation, authenticated, copyLabel, handleCopy, styles])
-
-  if (!authenticated) {
-    return (
-      <Screen preset="fixed">
-        <ActivityIndicator style={styles.loader} color={colors.primary} />
-      </Screen>
-    )
-  }
+    /** Header options outlive the component that set them — the route keeps the
+     *  last value and unmounting the setter does not revert it. Without this the
+     *  gate would hide the phrase while leaving Copy live in the header, one tap
+     *  away from the clipboard, exactly while the guard is off. */
+    return () => navigation.setOptions(noHeaderRight)
+  }, [navigation, copyLabel, handleCopy, styles])
 
   return (
     <Screen preset="fixed">
@@ -99,6 +106,31 @@ export const ViewBackupPhraseScreen: React.FC = () => {
   )
 }
 
+export const ViewBackupPhraseScreen: React.FC = () => {
+  const { LL } = useI18nContext()
+  const handleAuthFailure = useAuthGateFailureHandler()
+
+  /** Held above the gate, which mounts its content again each time it re-activates
+   *  (a theme flip re-acquires the guard to apply the new mask color). Inside it, a
+   *  user who already authenticated would be prompted again, and a pin challenge
+   *  still on screen would answer a mount that is gone. The prompt shows nothing
+   *  sensitive, so it can run while the guard registers: the words still need both. */
+  const isAuthenticated = useLocalAuthGate({
+    description: LL.BackupScreen.ManualBackup.Phrase.authDescription(),
+    onFailure: handleAuthFailure,
+    // Product decision (blink-wip#1064): with NO app lock configured, the user
+    // keeps one-tap access to their own backup phrase — the backup path is not
+    // blocked behind lock setup. A factor they did configure is still enforced.
+    required: false,
+  })
+
+  return (
+    <ScreenSecurityGate>
+      <ViewBackupPhraseContent isAuthenticated={isAuthenticated} />
+    </ScreenSecurityGate>
+  )
+}
+
 const useStyles = makeStyles(() => ({
   loader: {
     flex: 1,
@@ -111,8 +143,14 @@ const useStyles = makeStyles(() => ({
     paddingBottom: 20,
     gap: 20,
   },
+  // The header touch box. `hitSlop` can't reach past the native header item, so the
+  // box itself grows, its text kept against the right edge where it was.
   headerButton: {
     marginRight: 16,
+    minWidth: HEADER_ICON_TOUCH_SIZE,
+    minHeight: HEADER_ICON_TOUCH_SIZE,
+    alignItems: "flex-end",
+    justifyContent: "center",
   },
   buttonsContainer: {
     gap: 10,

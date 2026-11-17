@@ -11,8 +11,8 @@ import { getInviteLink } from "@app/config/appinfo"
 import { useCirclesQuery, WelcomeProfile } from "@app/graphql/generated"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { logBreadcrumb } from "@app/utils/error-reporting"
 import theme from "@app/rne-theme/theme"
-import crashlytics from "@react-native-firebase/crashlytics"
 import { makeStyles, Text, ThemeProvider, useTheme } from "@rn-vui/themed"
 
 export const useCirclesCard = () => {
@@ -72,7 +72,7 @@ export const useCirclesCard = () => {
 
       await Share.open(shareOptions)
     } catch (error) {
-      crashlytics().log("User didn't share")
+      logBreadcrumb("User didn't share")
     }
   }
 
@@ -104,15 +104,15 @@ const ShareImageComponent: React.FC<ShareImageProps & React.RefAttributes<View>>
         <View style={styles.usernameContainer}>
           <LinearGradient
             style={styles.usernameContainerGrad}
-            colors={[colors._primary2, colors._primary1]}
+            colors={[colors.staticBrandSunset, colors.staticBrandYellow]}
             useAngle={true}
             angle={190}
             angleCenter={{ x: 0.5, y: 0.5 }}
           >
-            <Text type="h1" style={styles.boldText} color={colors.white}>
+            <Text type="h1" style={styles.boldText} color={colors.backgroundDefault}>
               {LL.Circles.myBlinkCircles()}
             </Text>
-            <Text type="p2" color={colors.white}>
+            <Text type="p2" color={colors.backgroundDefault}>
               {lnAddress}
             </Text>
           </LinearGradient>
@@ -158,7 +158,7 @@ const ShareImageComponent: React.FC<ShareImageProps & React.RefAttributes<View>>
         </Text>
         <View style={styles.buildUrCircle}>
           <Text type="p2">{LL.Circles.buildYourCircle()} </Text>
-          <Text type="p1" style={styles.boldText} color={colors.primary}>
+          <Text type="p1" style={styles.boldText} color={colors.accent}>
             get.blink.sv
           </Text>
         </View>
@@ -185,7 +185,7 @@ const useStyles = makeStyles(({ colors }) => ({
 
     height: 480,
     width: (480 * 3) / 4,
-    backgroundColor: colors._black,
+    backgroundColor: colors.staticBlack,
     position: "absolute",
 
     display: "flex",
@@ -224,7 +224,7 @@ const useStyles = makeStyles(({ colors }) => ({
     right: 20,
     width: 120,
     textAlign: "left",
-    color: colors.grey3,
+    color: colors.textDisabled,
   },
   boldText: { fontWeight: "700" },
   rankText: {

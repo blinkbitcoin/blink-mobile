@@ -38,9 +38,19 @@ export const GaloyCurrencyBubbleText = ({
       text={isBtc ? BTC_TEXT : USD_TEXT}
       textSize={textSize}
       highlighted={highlighted}
-      color={highlighted ? (isBtc ? colors.white : colors._white) : colors._white}
+      color={
+        highlighted
+          ? isBtc
+            ? colors.textOnAccent
+            : colors.staticWhite
+          : colors.staticWhite
+      }
       backgroundColor={
-        highlighted ? (isBtc ? colors.primary : colors._green) : colors.grey3
+        highlighted
+          ? isBtc
+            ? colors.accent
+            : colors.staticSuccess
+          : colors.surfaceInactive
       }
       containerSize={containerSize}
     />

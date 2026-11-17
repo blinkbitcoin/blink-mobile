@@ -4,6 +4,7 @@ import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native"
 import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { FlatList } from "react-native-gesture-handler"
 import { gql } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { Screen } from "@app/components/screen"
 import { UserContact, useContactsQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
@@ -198,7 +199,7 @@ export const AllContactsScreen: React.FC = () => {
   } else if (loading) {
     ListEmptyContent = (
       <View style={styles.activityIndicatorContainer}>
-        <ActivityIndicator size="large" color={colors.primary} />
+        <ActivityIndicator size="large" color={colors.accent} />
       </View>
     )
   } else {
@@ -242,7 +243,7 @@ export const AllContactsScreen: React.FC = () => {
               containerStyle={styles.itemContainer}
               onPress={() => navigation.navigate("contactDetail", { contact: item })}
             >
-              <GaloyIcon name={"user"} size={24} color={colors.primary} />
+              <GaloyIcon name={"user"} size={24} color={colors.accent} />
               <ListItem.Content>
                 <ListItem.Title style={styles.itemText}>{displayHandle}</ListItem.Title>
               </ListItem.Content>
@@ -276,11 +277,11 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 18,
     marginTop: 30,
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 
   emptyListTitle: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
@@ -292,22 +293,22 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   itemContainer: {
-    borderRadius: 8,
-    backgroundColor: colors.grey5,
+    borderRadius: radius.default,
+    backgroundColor: colors.surfaceInteractive,
   },
 
   listContainer: { flexGrow: 1 },
 
   searchBarContainer: {
-    backgroundColor: colors.white,
-    borderBottomColor: colors.white,
-    borderTopColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
+    borderBottomColor: colors.backgroundDefault,
+    borderTopColor: colors.backgroundDefault,
     marginHorizontal: 26,
     marginVertical: 8,
   },
 
   searchBarInputContainerStyle: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
 
   searchBarRightIconStyle: {
@@ -315,13 +316,13 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   searchBarText: {
-    color: colors.black,
+    color: colors.textOnBackground,
     textDecorationLine: "none",
   },
 
-  itemText: { color: colors.black },
+  itemText: { color: colors.textOnBackground },
 
   icon: {
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

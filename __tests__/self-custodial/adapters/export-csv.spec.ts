@@ -8,6 +8,7 @@ import { createBuildTransactionsCsvBase64 } from "@app/self-custodial/adapters/e
 
 jest.mock("@app/self-custodial/config", () => ({
   requireSparkTokenIdentifier: () => "test-token-id",
+  sparkTokenIdentifier: () => "test-token-id",
 }))
 
 const completedReceive = {

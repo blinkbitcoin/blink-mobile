@@ -66,10 +66,16 @@ export const AppStateWrapper: React.FC = () => {
       secondsInBackground >= 0 && secondsInBackground < gracePeriodSecondsRef.current
     if (isWithinGracePeriod) return
 
-    const isLockEnabled =
-      (await KeyStoreWrapper.getIsPinEnabled()) ||
-      (await KeyStoreWrapper.getIsBiometricsEnabled())
-    if (!isLockEnabled) return
+    /** Fails closed: a store that cannot answer whether a lock is set must not
+     *  answer "no". Collapsing that to false is what would leave the app open
+     *  after a resume for a user who does have a lock, and the migrated slots
+     *  can report a failed read during the window before the first unlock. */
+    const [pin, biometrics] = await Promise.all([
+      KeyStoreWrapper.readIsPinEnabled(),
+      KeyStoreWrapper.readIsBiometricsEnabled(),
+    ])
+    const isLockDisabled = pin.status === "no" && biometrics.status === "no"
+    if (isLockDisabled) return
 
     /** Both halves are needed: the flag defers incoming deep links until the unlock, and
      *  the navigation is what actually puts the lock in front of the user. */

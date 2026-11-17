@@ -3,6 +3,7 @@ import { ScrollView, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
@@ -25,6 +26,7 @@ import {
   RESTART_RESOLVABLE_REASONS,
 } from "@app/types/migration"
 import { testProps } from "@app/utils/testProps"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 /** One footer control. The house pattern is a primary with a single secondary underneath,
  *  so each variant names exactly two. */
@@ -112,8 +114,15 @@ export const MigrationContactSupportScreen: React.FC = () => {
   /** The commit path resets Home underneath before handing over, so it backs out the same
    *  way rather than to a commit screen the migration has already left behind. */
   const isCloseRefusedOrigin = params?.origin === MigrationSupportOrigin.CloseRefused
+  /** The gate is underneath this one too, but here it is worth returning to: the handover
+   *  is only offered once retries have failed, so the gate answers with its retry screen
+   *  instead of handing over again. A user who acted on the advice needs that door. */
+  const isGateStorageOrigin = params?.origin === MigrationSupportOrigin.GateStorage
   const isBackToScreenBeneath =
-    isResumeOrigin || isReceiveDelayedOrigin || isCloseRefusedOrigin
+    isResumeOrigin ||
+    isReceiveDelayedOrigin ||
+    isCloseRefusedOrigin ||
+    isGateStorageOrigin
   const isBackToCommitScreen = !isGateOrigin && !isBackToScreenBeneath
   const handleBack = useCallback(() => {
     if (isGateOrigin) return
@@ -241,7 +250,7 @@ export const MigrationContactSupportScreen: React.FC = () => {
       <View style={styles.container}>
         <IconHero
           icon={variant.icon}
-          iconColor={colors.primary}
+          iconColor={colors.accent}
           title={variant.title}
           subtitle={variant.body}
         />
@@ -295,8 +304,8 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   card: {
     width: "100%",
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
+    ...staticSurface(colors),
+    borderRadius: radius.default,
     paddingHorizontal: 10,
     paddingVertical: 14,
     gap: 14,
@@ -307,7 +316,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "flex-start",
   },
   label: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 16,
     fontFamily: "Source Sans Pro",
     fontWeight: "400",
@@ -316,7 +325,7 @@ const useStyles = makeStyles(({ colors }) => ({
   /** No numberOfLines: every value renders complete, wrapping as needed, because support
    *  needs the whole string (account id, pubkey), never a truncated one. */
   value: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",

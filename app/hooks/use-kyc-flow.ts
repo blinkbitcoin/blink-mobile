@@ -52,7 +52,9 @@ export const useKycFlow = ({
 
     try {
       const res = await kycFlowStart({
-        variables: { input: { firstName, lastName, type } },
+        variables: {
+          input: { firstName: firstName?.trim(), lastName: lastName?.trim(), type },
+        },
       })
 
       const token = res.data?.kycFlowStart?.tokenWeb ?? ""

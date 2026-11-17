@@ -1,7 +1,21 @@
 import React from "react"
 import { render } from "@testing-library/react-native"
 
+import { i18nObject } from "@app/i18n/i18n-util"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
+
 import { MigrationEntryScreen } from "@app/screens/account-migration/to-non-custodial/migration-entry-screen"
+import {
+  MigrationSupportOrigin,
+  MigrationSupportReason,
+  ServerMigrationFlow,
+} from "@app/types/migration"
+import {
+  markAppForegrounded,
+  markMigrationReceiveChecked,
+  resetMigrationReceiveWait,
+  setMigrationReceiveOverdue,
+} from "@app/screens/account-migration/utils/migration-receive-wait"
 import { AccountType } from "@app/types/wallet"
 
 const mockReplace = jest.fn()
@@ -32,8 +46,49 @@ let mockIsAtCommitPoint = false
 /** Kept alongside isAtCommitPoint so a screen wired back to the looser flag fails here
  *  instead of silently resuming a pre-commit checkpoint again (#4109). */
 let mockHasResumableCheckpoint = false
+let mockIsStartConfirmed = false
+let mockCheckpointOwnerId: string | null = "owner-1"
 let mockCheckpointLoading = false
 let mockSelfCustodialDisabled = false
+/** Unlocked and not started by default, the state a fresh migration really reads; a test
+ *  that needs the server holding a flow says so with holdFlowOnServer. */
+let mockFlow: ServerMigrationFlow = ServerMigrationFlow.NotStarted
+let mockLockLoading = false
+
+jest.mock("@app/screens/account-migration/hooks/use-migration-lock", () => ({
+  useMigrationLock: () => ({
+    flow: mockFlow,
+    loading: mockLockLoading,
+    refetch: jest.fn(),
+  }),
+}))
+
+loadLocale("en")
+const LL = i18nObject("en")
+
+jest.mock("@app/i18n/i18n-react", () => ({
+  useI18nContext: () => ({ LL: mockLL }),
+}))
+const mockLL = LL
+
+/** The real receive-wait module, seeded the way the background resume publishes to it, so
+ *  the routing is checked against the module's own rule rather than a stand-in for it. */
+const makeReceiveOverdue = (): void => {
+  setMigrationReceiveOverdue(true)
+}
+
+/** Overdue, and a check that started after the app last came back has looked and found
+ *  nothing. */
+const makeReceiveSupportDue = (): void => {
+  setMigrationReceiveOverdue(true)
+  markAppForegrounded(1_000)
+  markMigrationReceiveChecked(2_000)
+}
+
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: readonly unknown[]) => mockToastShow(...args),
+}))
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   useMigrationCheckpoint: () => ({
@@ -41,6 +96,8 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
     replaceToCheckpoint: mockReplaceToCheckpoint,
     isAtCommitPoint: mockIsAtCommitPoint,
     hasResumableCheckpoint: mockHasResumableCheckpoint,
+    isStartConfirmed: mockIsStartConfirmed,
+    checkpointOwnerId: mockCheckpointOwnerId,
   }),
   useSelfCustodialDisabled: () => mockSelfCustodialDisabled,
 }))
@@ -55,6 +112,11 @@ jest.mock("@app/config/feature-flags-context", () => ({
   }),
 }))
 
+/** The server reports a migration in progress: the account is locked into the flow. */
+const holdFlowOnServer = (): void => {
+  mockFlow = ServerMigrationFlow.Open
+}
+
 describe("MigrationEntryScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -62,8 +124,13 @@ describe("MigrationEntryScreen", () => {
     mockActiveAccountType = AccountType.Custodial
     mockIsAtCommitPoint = false
     mockHasResumableCheckpoint = false
+    mockIsStartConfirmed = false
+    mockCheckpointOwnerId = "owner-1"
+    resetMigrationReceiveWait()
     mockCheckpointLoading = false
     mockSelfCustodialDisabled = false
+    mockFlow = ServerMigrationFlow.NotStarted
+    mockLockLoading = false
     mockRemoteConfigReady = true
     mockRegistryLoading = false
   })
@@ -76,6 +143,7 @@ describe("MigrationEntryScreen", () => {
   })
 
   it("resumes at the stored checkpoint once the flow reached the commit point", () => {
+    holdFlowOnServer()
     mockIsAtCommitPoint = true
     mockHasResumableCheckpoint = true
 
@@ -97,6 +165,7 @@ describe("MigrationEntryScreen", () => {
   })
 
   it("routes to the gate instead of resuming when the kill-switch is off", () => {
+    holdFlowOnServer()
     mockSelfCustodialDisabled = true
     mockIsAtCommitPoint = true
 
@@ -152,5 +221,195 @@ describe("MigrationEntryScreen", () => {
 
     expect(mockReplace).toHaveBeenCalledWith("Primary")
     expect(mockGoBack).not.toHaveBeenCalled()
+  })
+
+  describe("the server owns whether a migration is still open", () => {
+    /** A device that left off on the commit screen: everything local says resume. */
+    const arriveWithCommitPointCheckpoint = (): void => {
+      mockIsAtCommitPoint = true
+      mockHasResumableCheckpoint = true
+    }
+
+    it("resumes while the server still holds the flow", () => {
+      arriveWithCommitPointCheckpoint()
+      holdFlowOnServer()
+
+      render(<MigrationEntryScreen />)
+
+      expect(mockReplaceToCheckpoint).toHaveBeenCalledTimes(1)
+      expect(mockReplace).not.toHaveBeenCalled()
+    })
+
+    it("starts over once support has cleared the flow, whatever the device remembers", () => {
+      arriveWithCommitPointCheckpoint()
+      mockIsStartConfirmed = true
+
+      render(<MigrationEntryScreen />)
+
+      expect(mockReplace).toHaveBeenCalledWith("accountMigrationStart")
+      expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+    })
+
+    /**
+     * The funds already moved and the swap into the new wallet is still pending on this
+     * device; the background resume finishes it once they land. Resuming would ask the
+     * server to start a migration it already finished and hand the user to support, and the
+     * gate would walk them into a new run that drops the figure the swap waits on. So the
+     * entry says the funds are on their way and leaves the flow alone.
+     */
+    describe("a completed migration this device has not swapped out of yet", () => {
+      const arriveAwaitingSwap = (): void => {
+        arriveWithCommitPointCheckpoint()
+        mockFlow = ServerMigrationFlow.Completed
+      }
+
+      it("says the funds are on their way and goes back, entering no flow", () => {
+        arriveAwaitingSwap()
+
+        render(<MigrationEntryScreen />)
+
+        expect(mockToastShow).toHaveBeenCalledWith(
+          expect.objectContaining({
+            message: LL.AccountMigration.transferInProgress.body(),
+          }),
+        )
+        expect(mockGoBack).toHaveBeenCalledTimes(1)
+        expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+        expect(mockReplace).not.toHaveBeenCalled()
+      })
+
+      /** Overdue, but not yet confirmed missing by a check since the app came back: the
+       *  user still goes back, told the wait is unusual rather than seconds old. */
+      it("says the wait is taking longer while the overdue receive awaits a fresh check", () => {
+        arriveAwaitingSwap()
+        makeReceiveOverdue()
+
+        render(<MigrationEntryScreen />)
+
+        expect(mockToastShow).toHaveBeenCalledWith(
+          expect.objectContaining({
+            message: LL.AccountMigration.transferDelayed.body(),
+          }),
+        )
+        expect(mockGoBack).toHaveBeenCalledTimes(1)
+      })
+
+      /** The look that found nothing began before the app came back: it says nothing about
+       *  the funds now (timers stop in the background), so the user is told, not handed over. */
+      it("keeps the notice while the only empty look predates the return to the app", () => {
+        arriveAwaitingSwap()
+        setMigrationReceiveOverdue(true)
+        markMigrationReceiveChecked(1_000)
+        markAppForegrounded(2_000)
+
+        render(<MigrationEntryScreen />)
+
+        expect(mockToastShow).toHaveBeenCalledWith(
+          expect.objectContaining({
+            message: LL.AccountMigration.transferDelayed.body(),
+          }),
+        )
+        expect(mockReplace).not.toHaveBeenCalled()
+      })
+
+      it("goes home when there is nothing to go back to", () => {
+        arriveAwaitingSwap()
+        mockCanGoBack = false
+
+        render(<MigrationEntryScreen />)
+
+        expect(mockReplace).toHaveBeenCalledWith("Primary")
+        expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+      })
+
+      /** Past the notice window, and still missing on a check taken since the app came
+       *  back, the funds are genuinely late: support takes over, with the delayed reason. */
+      it("hands a receive that is genuinely late to support instead", () => {
+        arriveAwaitingSwap()
+        makeReceiveSupportDue()
+
+        render(<MigrationEntryScreen />)
+
+        expect(mockReplace).toHaveBeenCalledWith("accountMigrationContactSupport", {
+          reason: MigrationSupportReason.ReceiveDelayed,
+          origin: MigrationSupportOrigin.Resume,
+          custodialAccountId: "owner-1",
+        })
+        expect(mockToastShow).not.toHaveBeenCalled()
+        expect(mockGoBack).not.toHaveBeenCalled()
+      })
+
+      /** A disabled stack shows the unavailable screen at the gate, whatever the phase. */
+      it("leaves the kill-switch in charge", () => {
+        arriveAwaitingSwap()
+        mockSelfCustodialDisabled = true
+
+        render(<MigrationEntryScreen />)
+
+        expect(mockReplace).toHaveBeenCalledWith("accountMigrationStart")
+        expect(mockToastShow).not.toHaveBeenCalled()
+      })
+    })
+
+    /** A dollar balance holds the start back after the commit screen recorded its step, and
+     *  the conversion that empties it returns here: not started means not started yet, and
+     *  the commit screen is where it starts. */
+    it("returns to the commit screen when the server never accepted the start", () => {
+      arriveWithCommitPointCheckpoint()
+      mockIsStartConfirmed = false
+
+      render(<MigrationEntryScreen />)
+
+      expect(mockReplaceToCheckpoint).toHaveBeenCalledTimes(1)
+      expect(mockReplace).not.toHaveBeenCalled()
+    })
+
+    it("waits for the server rather than resuming on a stale record", () => {
+      arriveWithCommitPointCheckpoint()
+      holdFlowOnServer()
+      mockLockLoading = true
+
+      render(<MigrationEntryScreen />)
+
+      expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+      expect(mockReplace).not.toHaveBeenCalled()
+    })
+
+    /** The gate blocks a failed read with a retry, so nothing is decided on a guess. */
+    it("hands an unanswered read to the gate instead of resuming on a guess", () => {
+      arriveWithCommitPointCheckpoint()
+      mockFlow = ServerMigrationFlow.Unanswered
+
+      render(<MigrationEntryScreen />)
+
+      expect(mockReplace).toHaveBeenCalledWith("accountMigrationStart")
+      expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+    })
+
+    /** Unlike a failed read, a phase this build does not know comes back the same on every
+     *  retry, and the gate would only walk the user to the same dead end: support. */
+    it("hands a phase this build does not know to support", () => {
+      arriveWithCommitPointCheckpoint()
+      mockFlow = ServerMigrationFlow.Unrecognised
+
+      render(<MigrationEntryScreen />)
+
+      expect(mockReplace).toHaveBeenCalledWith("accountMigrationContactSupport", {
+        reason: MigrationSupportReason.StatusUnrecognised,
+        origin: MigrationSupportOrigin.Resume,
+        custodialAccountId: "owner-1",
+      })
+      expect(mockReplace).not.toHaveBeenCalledWith("accountMigrationStart")
+      expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+    })
+
+    /** Before the commit point there is no run for the phase to say anything about. */
+    it("starts a pre-commit flow at the gate whatever phase the server reports", () => {
+      mockFlow = ServerMigrationFlow.Unrecognised
+
+      render(<MigrationEntryScreen />)
+
+      expect(mockReplace).toHaveBeenCalledWith("accountMigrationStart")
+    })
   })
 })

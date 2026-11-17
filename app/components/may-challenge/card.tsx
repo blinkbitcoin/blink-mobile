@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   MAY_1_2024_12_AM_UTC_MINUS_6,
@@ -62,12 +63,12 @@ export const MayChallengeCard: React.FC = () => {
             <Text type="p1" bold>
               {LL.Circles.mayChallenge.title()}
             </Text>
-            <Text color={colors.grey3}>{countDown}</Text>
+            <Text color={colors.textDisabled}>{countDown}</Text>
           </View>
           <Text type="p2">{LL.Circles.mayChallenge.description()}</Text>
         </View>
         <View>
-          <GaloyIcon color={colors.primary} size={28} name="rank" />
+          <GaloyIcon color={colors.accent} size={28} name="rank" />
         </View>
       </View>
     </PressableCard>
@@ -80,8 +81,8 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "space-between",
     padding: 16,
-    borderRadius: 10,
-    backgroundColor: colors.grey5,
+    borderRadius: radius.default,
+    backgroundColor: colors.surfaceInteractive,
   },
   textContainer: {
     flex: 1,

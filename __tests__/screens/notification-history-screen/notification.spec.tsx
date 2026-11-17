@@ -5,7 +5,7 @@ import { fireEvent, render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { BLINK_DEEP_LINK_PREFIX } from "@app/config"
-import { Icon, StatefulNotification } from "@app/graphql/generated"
+import { Icon, StatefulNotificationsQuery } from "@app/graphql/generated"
 import { light } from "@app/rne-theme/colors"
 import theme from "@app/rne-theme/theme"
 import { Notification } from "@app/screens/notification-history-screen/notification"
@@ -22,9 +22,14 @@ const FIXED_NOW_MS = Date.UTC(2026, 0, 15, 12, 0, 0)
 const THIRTY_SECONDS_AGO = Math.floor(FIXED_NOW_MS / 1000) - 30
 const ACKNOWLEDGED_AT = Math.floor(FIXED_NOW_MS / 1000) - 60
 
+/** A notification as the history query returns it, the shape the row is typed from. */
+type HistoryNotification = NonNullable<
+  StatefulNotificationsQuery["me"]
+>["statefulNotificationsWithoutBulletinEnabled"]["nodes"][number]
+
 const makeNotification = (
-  overrides: Partial<StatefulNotification> = {},
-): StatefulNotification => ({
+  overrides: Partial<HistoryNotification> = {},
+): HistoryNotification => ({
   __typename: "StatefulNotification",
   id: "notification-1",
   title: "Self-custodial accounts have arrived",
@@ -37,7 +42,7 @@ const makeNotification = (
   ...overrides,
 })
 
-const renderNotification = (notification: StatefulNotification) =>
+const renderNotification = (notification: HistoryNotification) =>
   render(
     <ThemeProvider theme={theme}>
       <Notification {...notification} />
@@ -106,15 +111,15 @@ describe("Notification", () => {
     const notification = makeNotification({ icon: Icon.Bell })
     const { getByText, getByTestId } = renderNotification(notification)
 
-    expect(getByText(notification.body)).toHaveStyle({ color: light.black })
-    expect(getByTestId("icon-bell").props.color).toBe(light.black)
+    expect(getByText(notification.body)).toHaveStyle({ color: light.textOnBackground })
+    expect(getByTestId("icon-bell").props.color).toBe(light.textOnBackground)
   })
 
   it("renders acknowledged text greyed out", () => {
     const notification = makeNotification({ acknowledgedAt: ACKNOWLEDGED_AT })
     const { getByText } = renderNotification(notification)
 
-    expect(getByText(notification.body)).toHaveStyle({ color: light.grey2 })
+    expect(getByText(notification.body)).toHaveStyle({ color: light.textMuted })
   })
 
   it("greys out the icon variant once acknowledged", () => {
@@ -124,14 +129,14 @@ describe("Notification", () => {
     })
     const { getByTestId } = renderNotification(notification)
 
-    expect(getByTestId("icon-bell").props.color).toBe(light.grey2)
+    expect(getByTestId("icon-bell").props.color).toBe(light.textMuted)
   })
 
   it("greys out the text when acknowledgedAt arrives after mount", () => {
     const notification = makeNotification()
     const { getByText, rerender } = renderNotification(notification)
 
-    expect(getByText(notification.body)).toHaveStyle({ color: light.black })
+    expect(getByText(notification.body)).toHaveStyle({ color: light.textOnBackground })
 
     rerender(
       <ThemeProvider theme={theme}>
@@ -139,7 +144,7 @@ describe("Notification", () => {
       </ThemeProvider>,
     )
 
-    expect(getByText(notification.body)).toHaveStyle({ color: light.grey2 })
+    expect(getByText(notification.body)).toHaveStyle({ color: light.textMuted })
   })
 
   it("opens the blink deep link when pressed with a deep link action", () => {

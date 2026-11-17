@@ -1,12 +1,24 @@
 import React from "react"
-import { render, screen, fireEvent, waitFor } from "@testing-library/react-native"
+import { Alert } from "react-native"
+import { act, render, screen, fireEvent, waitFor } from "@testing-library/react-native"
+
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
+import { BLOCKED_COUNTRIES_FAQ_LINK } from "@app/config"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c/accept-t-and-c"
 import { MigrationCheckpoint } from "@app/screens/account-migration/hooks"
+import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
+import {
+  clearPendingRestore,
+  holdPendingRestore,
+  readPendingRestore,
+} from "@app/screens/self-custodial/onboarding/restore/pending-restore"
+import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 import { AccountMode } from "@app/types/account"
+import { StorageFailure } from "@app/utils/storage/storage-failure"
 
 import { ContextForScreen } from "../helper"
 import { flushEffects } from "../../helpers/flush-effects"
@@ -15,16 +27,51 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 const mockNavigate = jest.fn()
+const mockGoBack = jest.fn()
+const mockSetOptions = jest.fn()
+type BeforeRemoveEvent = {
+  data: { action: { type: string } }
+  preventDefault: () => void
+}
+let mockBeforeRemove: ((event: BeforeRemoveEvent) => void) | null = null
+const mockAddListener = jest.fn(
+  (_name: string, listener: (event: BeforeRemoveEvent) => void) => {
+    mockBeforeRemove = listener
+    return () => {
+      mockBeforeRemove = null
+    }
+  },
+)
 let mockFlow = "migration"
 let mockMode: string | undefined
+let mockHasRouteParams = true
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
-  useRoute: () => ({ params: { flow: mockFlow, mode: mockMode } }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    goBack: mockGoBack,
+    setOptions: mockSetOptions,
+    addListener: mockAddListener,
+  }),
+  useRoute: () => ({
+    params: mockHasRouteParams ? { flow: mockFlow, mode: mockMode } : undefined,
+  }),
 }))
 
 const mockSaveCheckpoint = jest.fn()
+const mockToastShow = jest.fn()
+const mockReportError = jest.fn()
+
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
+jest.mock("@app/utils/toast", () => ({
+  ...jest.requireActual("@app/utils/toast"),
+  toastShow: (args: unknown) => mockToastShow(args),
+}))
 
 /** Keeps the real device-location module (and its ip-country lookup) out of the suite. */
 jest.mock("@app/hooks/use-device-location", () => ({
@@ -49,24 +96,49 @@ jest.mock("@app/config/feature-flags-context", () => ({
   useFeatureFlags: () => ({ deviceAccountEnabled: false }),
 }))
 
+let mockAppCheckToken: string | undefined
 jest.mock("@app/screens/get-started-screen/use-device-token", () => ({
   __esModule: true,
-  default: () => undefined,
+  default: () => mockAppCheckToken,
 }))
 
+const mockCreateDeviceAccountAndLogin = jest.fn()
 jest.mock("@app/screens/get-started-screen/use-create-device-account", () => ({
   useCreateDeviceAccount: () => ({
-    createDeviceAccountAndLogin: jest.fn(),
+    createDeviceAccountAndLogin: mockCreateDeviceAccountAndLogin,
     loading: false,
   }),
+}))
+
+const mockRestore = jest.fn()
+let mockRestoreStatus = "idle"
+jest.mock(
+  "@app/screens/self-custodial/onboarding/restore/hooks/use-restore-wallet",
+  () => ({
+    RestoreWalletStatus: { Idle: "idle", Restoring: "restoring", Error: "error" },
+    useRestoreWallet: () => ({ restore: mockRestore, status: mockRestoreStatus }),
+  }),
+)
+
+const mockOpenInAppBrowser = jest.fn()
+jest.mock("react-native-inappbrowser-reborn", () => ({
+  __esModule: true,
+  default: { open: (...args: unknown[]) => mockOpenInAppBrowser(...args) },
 }))
 
 describe("AcceptTermsAndConditionsScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockSaveCheckpoint.mockResolvedValue(true)
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
     mockFlow = "migration"
     mockMode = undefined
+    mockAppCheckToken = undefined
+    mockHasRouteParams = true
+    mockCreateDeviceAccountAndLogin.mockResolvedValue(undefined)
+    mockRestore.mockResolvedValue(undefined)
+    mockRestoreStatus = "idle"
+    mockBeforeRemove = null
+    clearPendingRestore()
     loadLocale("en")
   })
 
@@ -85,8 +157,63 @@ describe("AcceptTermsAndConditionsScreen", () => {
     )
   })
 
+  /** Two taps landing before React commits the busy button: the second must not issue a
+   *  second save, whose answer would navigate a second time. */
+  describe("while the acceptance is being saved", () => {
+    let landSave: () => void = () => undefined
+    beforeEach(() => {
+      mockSaveCheckpoint.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            landSave = () => resolve({ isSaved: true, failure: null })
+          }),
+      )
+    })
+
+    it("saves and advances once however fast the taps come", async () => {
+      render(
+        <ContextForScreen>
+          <AcceptTermsAndConditionsScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      const { onPress } = screen.UNSAFE_getByType(GaloyPrimaryButton).props
+      await act(async () => {
+        onPress()
+        onPress()
+      })
+      await act(async () => landSave())
+      await flushEffects()
+
+      expect(mockSaveCheckpoint).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).toHaveBeenCalledTimes(1)
+    })
+
+    it("shows the button busy until the save answers", async () => {
+      render(
+        <ContextForScreen>
+          <AcceptTermsAndConditionsScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+      await flushEffects()
+      expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled).toBe(true)
+
+      await act(async () => landSave())
+      await flushEffects()
+
+      expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled).toBe(false)
+    })
+  })
+
   it("does not advance past the terms when the checkpoint write fails", async () => {
-    mockSaveCheckpoint.mockResolvedValue(false)
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.Unknown,
+    })
     render(
       <ContextForScreen>
         <AcceptTermsAndConditionsScreen />
@@ -100,6 +227,130 @@ describe("AcceptTermsAndConditionsScreen", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
+  /** A Continue that answers a tap with nothing reads as a broken button, so the refusal
+   *  has to be said out loud, and as the device's: "try again later" hides that the funds
+   *  are safe and the problem is the store. */
+  it("says the progress was not saved when the store refused", async () => {
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.Unknown,
+    })
+    render(
+      <ContextForScreen>
+        <AcceptTermsAndConditionsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+    await flushEffects()
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: LL.AccountMigration.storageUnavailable.notSavedBody(),
+      }),
+    )
+  })
+
+  /** Turned away before it reached the store, for want of an owner: not the device's
+   *  failure, so it is not blamed on the device. */
+  it("keeps the generic apology for a write that never reached the store", async () => {
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+    render(
+      <ContextForScreen>
+        <AcceptTermsAndConditionsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+    await flushEffects()
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: LL.errors.generic() }),
+    )
+  })
+
+  /** saveCheckpoint stays silent about a save it turned away before the store, so the
+   *  screen reports it: once, however many taps the dropped owner lookup costs. */
+  it("reports a save refused for want of an owner, once", async () => {
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+    render(
+      <ContextForScreen>
+        <AcceptTermsAndConditionsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+    await flushEffects()
+    fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledTimes(2)
+    const ownerlessReports = mockReportError.mock.calls.filter(
+      ([operation]) => operation === "Migration terms",
+    )
+    expect(ownerlessReports).toHaveLength(1)
+  })
+
+  /** The store already reported its own refusal; a second report would double the event. */
+  it("leaves a refusal the store reported to the store's report", async () => {
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.Unknown,
+    })
+    render(
+      <ContextForScreen>
+        <AcceptTermsAndConditionsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+    await flushEffects()
+
+    expect(mockToastShow).toHaveBeenCalledTimes(1)
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  /** The one failure the user can go and fix gets its own words. */
+  it("names a full device rather than apologizing generically", async () => {
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.OutOfSpace,
+    })
+    render(
+      <ContextForScreen>
+        <AcceptTermsAndConditionsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+    await flushEffects()
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: LL.AccountMigration.storageUnavailable.notSavedOutOfSpaceBody(),
+      }),
+    )
+  })
+
+  it("says nothing when the write lands", async () => {
+    render(
+      <ContextForScreen>
+        <AcceptTermsAndConditionsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+    await flushEffects()
+
+    expect(mockToastShow).not.toHaveBeenCalled()
+  })
+
   it("checkpoints past the terms only when Accept is pressed", async () => {
     render(
       <ContextForScreen>
@@ -111,6 +362,7 @@ describe("AcceptTermsAndConditionsScreen", () => {
     expect(mockSaveCheckpoint).not.toHaveBeenCalled()
 
     fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+    await flushEffects()
 
     expect(mockSaveCheckpoint).toHaveBeenCalledWith(MigrationCheckpoint.BackupMethod)
   })
@@ -132,5 +384,299 @@ describe("AcceptTermsAndConditionsScreen", () => {
         mode: AccountMode.Enhanced,
       }),
     )
+  })
+
+  /** The terms are the restore's last step, as they are creation's: Accept runs the
+   *  restore the phrase screen or the cloud backup handed over. */
+  describe("before a self-custodial restore", () => {
+    const renderRestoreTerms = async () => {
+      mockFlow = "selfCustodialRestore"
+      const view = render(
+        <ContextForScreen>
+          <AcceptTermsAndConditionsScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+      return view
+    }
+
+    const accept = async () => {
+      fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+      await flushEffects()
+    }
+
+    it("restores the held phrase on accept", async () => {
+      holdPendingRestore({ mnemonic: "word1 word2 word3", method: BackupMethod.Cloud })
+      await renderRestoreTerms()
+
+      await accept()
+
+      expect(mockRestore).toHaveBeenCalledTimes(1)
+      expect(mockRestore).toHaveBeenCalledWith("word1 word2 word3", BackupMethod.Cloud)
+      expect(mockSaveCheckpoint).not.toHaveBeenCalled()
+    })
+
+    it("does not restore until Accept is pressed", async () => {
+      holdPendingRestore({ mnemonic: "word1 word2 word3", method: BackupMethod.Manual })
+      await renderRestoreTerms()
+
+      expect(mockRestore).not.toHaveBeenCalled()
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    it("stays on the terms when the restore fails, so Accept can retry", async () => {
+      holdPendingRestore({ mnemonic: "word1 word2 word3", method: BackupMethod.Manual })
+      mockRestore.mockRejectedValueOnce(new Error("restore failed"))
+      await renderRestoreTerms()
+
+      await accept()
+      await accept()
+
+      expect(mockRestore).toHaveBeenCalledTimes(2)
+      expect(mockGoBack).not.toHaveBeenCalled()
+      expect(readPendingRestore()).not.toBeNull()
+    })
+
+    it("goes back to the phrase when none is held", async () => {
+      await renderRestoreTerms()
+
+      await accept()
+
+      expect(mockRestore).not.toHaveBeenCalled()
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+    })
+
+    it("shows Accept busy while the restore runs", async () => {
+      mockRestoreStatus = "restoring"
+      await renderRestoreTerms()
+
+      expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled).toBe(true)
+    })
+
+    it("keeps a newer request's phrase when an older terms screen leaves late", async () => {
+      holdPendingRestore({ mnemonic: "word1 word2 word3", method: BackupMethod.Manual })
+      const { unmount } = await renderRestoreTerms()
+      const newer = { mnemonic: "word4 word5 word6", method: BackupMethod.Manual }
+      holdPendingRestore(newer)
+
+      unmount()
+
+      expect(readPendingRestore()).toBe(newer)
+    })
+
+    /** Backing out mid-restore and accepting again from a new terms screen would race
+     *  the running restore, so the user's own ways back are held until it answers. */
+    describe("while the restore runs", () => {
+      const removeWith = (type: string) => {
+        const preventDefault = jest.fn()
+        mockBeforeRemove?.({ data: { action: { type } }, preventDefault })
+        return preventDefault
+      }
+
+      it("refuses the header and hardware back, and the swipe", async () => {
+        mockRestoreStatus = "restoring"
+        await renderRestoreTerms()
+
+        expect(removeWith("GO_BACK")).toHaveBeenCalled()
+        expect(removeWith("POP")).toHaveBeenCalled()
+        expect(mockSetOptions).toHaveBeenCalledWith({ gestureEnabled: false })
+      })
+
+      it("lets a reset the app dispatches through", async () => {
+        mockRestoreStatus = "restoring"
+        await renderRestoreTerms()
+
+        expect(removeWith("RESET")).not.toHaveBeenCalled()
+      })
+
+      it("holds nothing when no restore is running", async () => {
+        await renderRestoreTerms()
+
+        expect(mockBeforeRemove).toBeNull()
+      })
+    })
+
+    it("drops the held phrase once the terms leave the stack", async () => {
+      holdPendingRestore({ mnemonic: "word1 word2 word3", method: BackupMethod.Manual })
+      const { unmount } = await renderRestoreTerms()
+
+      unmount()
+
+      expect(readPendingRestore()).toBeNull()
+    })
+  })
+
+  /** The restore's status is the app's, so a restore left running past its hold is still
+   *  Restoring while the user goes on to another flow's terms. Those terms answer to
+   *  their own flow: Accept stays free and the way back is not held. */
+  describe("while a restore runs elsewhere", () => {
+    const renderOtherTerms = async (flow: string) => {
+      mockFlow = flow
+      mockRestoreStatus = "restoring"
+      render(
+        <ContextForScreen>
+          <AcceptTermsAndConditionsScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+    }
+
+    const accept = async () => {
+      fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+      await flushEffects()
+    }
+
+    it("lets the migration terms be accepted", async () => {
+      await renderOtherTerms("migration")
+
+      expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled).toBe(false)
+      await accept()
+
+      expect(mockSaveCheckpoint).toHaveBeenCalledWith(MigrationCheckpoint.BackupMethod)
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupMethod")
+    })
+
+    it("lets the self-custodial creation terms be accepted", async () => {
+      mockMode = AccountMode.Enhanced
+      await renderOtherTerms("selfCustodial")
+
+      expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled).toBe(false)
+      await accept()
+
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialWalletCreation", {
+        mode: AccountMode.Enhanced,
+      })
+    })
+
+    it("lets the phone terms be accepted", async () => {
+      await renderOtherTerms("phone")
+
+      expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled).toBe(false)
+      await accept()
+
+      expect(mockNavigate).toHaveBeenCalledWith("login", {
+        type: PhoneLoginInitiateType.CreateAccount,
+      })
+    })
+
+    it("lets the trial terms be accepted", async () => {
+      mockAppCheckToken = "app-check-token"
+      await renderOtherTerms("trial")
+
+      expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled).toBe(false)
+      await accept()
+
+      expect(mockCreateDeviceAccountAndLogin).toHaveBeenCalledWith("app-check-token")
+    })
+
+    it("holds no way back on any of them", async () => {
+      for (const flow of ["migration", "selfCustodial", "phone", "trial"]) {
+        mockSetOptions.mockClear()
+        await renderOtherTerms(flow)
+
+        expect(mockBeforeRemove).toBeNull()
+        expect(mockSetOptions).not.toHaveBeenCalledWith({ gestureEnabled: false })
+        screen.unmount()
+      }
+    })
+  })
+
+  describe("outside the migration", () => {
+    const renderAndAccept = async () => {
+      render(
+        <ContextForScreen>
+          <AcceptTermsAndConditionsScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+      fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+      await flushEffects()
+    }
+
+    it("sends the phone flow to the phone login", async () => {
+      mockFlow = "phone"
+
+      await renderAndAccept()
+
+      expect(mockNavigate).toHaveBeenCalledWith("login", {
+        type: PhoneLoginInitiateType.CreateAccount,
+      })
+    })
+
+    it("treats a screen opened without params as the phone flow", async () => {
+      mockHasRouteParams = false
+
+      await renderAndAccept()
+
+      expect(mockNavigate).toHaveBeenCalledWith("login", {
+        type: PhoneLoginInitiateType.CreateAccount,
+      })
+    })
+
+    it("sends a trial without an app check token to the phone login", async () => {
+      mockFlow = "trial"
+
+      await renderAndAccept()
+
+      expect(mockCreateDeviceAccountAndLogin).not.toHaveBeenCalled()
+      expect(mockNavigate).toHaveBeenCalledWith("login", {
+        type: PhoneLoginInitiateType.CreateAccount,
+      })
+    })
+
+    it("creates a device account for a trial with an app check token", async () => {
+      mockFlow = "trial"
+      mockAppCheckToken = "app-check-token"
+
+      await renderAndAccept()
+
+      expect(mockCreateDeviceAccountAndLogin).toHaveBeenCalledWith("app-check-token")
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    it("falls back to the phone login when the device account cannot be created", async () => {
+      mockFlow = "trial"
+      mockAppCheckToken = "app-check-token"
+      mockCreateDeviceAccountAndLogin.mockRejectedValue(new Error("refused"))
+
+      await renderAndAccept()
+
+      expect(mockNavigate).toHaveBeenCalledWith("login", {
+        type: PhoneLoginInitiateType.CreateAccount,
+      })
+    })
+
+    it("flags a flow it does not know", async () => {
+      const alert = jest.spyOn(Alert, "alert").mockImplementation(() => undefined)
+      mockFlow = "unexpected"
+      mockAppCheckToken = "app-check-token"
+
+      await renderAndAccept()
+
+      expect(alert).toHaveBeenCalledWith("unknown flow")
+      alert.mockRestore()
+    })
+  })
+
+  it("opens the terms and the blocked-countries page in the in-app browser", async () => {
+    render(
+      <ContextForScreen>
+        <AcceptTermsAndConditionsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(
+      screen.getByText(LL.AcceptTermsAndConditionsScreen.termsAndConditions()),
+    )
+    fireEvent.press(
+      screen.getByText(LL.AcceptTermsAndConditionsScreen.prohibitedCountry()),
+    )
+
+    expect(mockOpenInAppBrowser).toHaveBeenNthCalledWith(
+      1,
+      "https://www.blink.sv/en/terms-conditions",
+    )
+    expect(mockOpenInAppBrowser).toHaveBeenNthCalledWith(2, BLOCKED_COUNTRIES_FAQ_LINK)
   })
 })

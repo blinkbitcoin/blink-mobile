@@ -51,6 +51,46 @@ describe("react-native-modal mock", () => {
     expect(onBackButtonPress).toHaveBeenCalledTimes(1)
   })
 
+  it("calls onModalHide once the modal closes, and only then", () => {
+    // dropdown.tsx applies the tapped option here rather than on the tap, so a
+    // stand-in that never fired it would leave every spec driving a dropdown
+    // watching nothing happen — and one that fired it on mount would apply a
+    // choice nobody had made.
+    const onModalHide = jest.fn()
+    const { rerender } = render(
+      <ModalMock isVisible={false} onModalHide={onModalHide}>
+        <Text>inside</Text>
+      </ModalMock>,
+    )
+
+    expect(onModalHide).not.toHaveBeenCalled()
+
+    rerender(
+      <ModalMock isVisible={true} onModalHide={onModalHide}>
+        <Text>inside</Text>
+      </ModalMock>,
+    )
+
+    expect(onModalHide).not.toHaveBeenCalled()
+
+    rerender(
+      <ModalMock isVisible={false} onModalHide={onModalHide}>
+        <Text>inside</Text>
+      </ModalMock>,
+    )
+
+    expect(onModalHide).toHaveBeenCalledTimes(1)
+
+    // A re-render while it is still closed is not a second dismissal.
+    rerender(
+      <ModalMock isVisible={false} onModalHide={onModalHide}>
+        <Text>inside</Text>
+      </ModalMock>,
+    )
+
+    expect(onModalHide).toHaveBeenCalledTimes(1)
+  })
+
   it("is importable the way jest.mock consumes it", () => {
     const required = jest.requireActual("@mocks/react-native-modal-mock")
 

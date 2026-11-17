@@ -1,9 +1,10 @@
 import React, { useState } from "react"
 import { TextInput, View } from "react-native"
-import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
+import { cappedLineHeight, MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
@@ -12,12 +13,14 @@ type Props = {
   isVisible: boolean
   onClose: () => void
   onConfirm: () => void | Promise<void>
+  onModalHide?: () => void
 }
 
 export const DeleteAccountConfirmModal: React.FC<Props> = ({
   isVisible,
   onClose,
   onConfirm,
+  onModalHide,
 }) => {
   const styles = useStyles()
   const {
@@ -59,7 +62,7 @@ export const DeleteAccountConfirmModal: React.FC<Props> = ({
             onChangeText={setConfirmText}
             value={confirmText}
             placeholder={LL.support.delete()}
-            placeholderTextColor={colors.grey3}
+            placeholderTextColor={colors.textDisabled}
             {...testProps("self-custodial-danger-zone-delete-input")}
           />
         </View>
@@ -69,6 +72,7 @@ export const DeleteAccountConfirmModal: React.FC<Props> = ({
       primaryButtonOnPress={handleConfirm}
       secondaryButtonTitle={LL.common.cancel()}
       secondaryButtonOnPress={handleClose}
+      onModalHide={onModalHide}
       {...testProps("self-custodial-confirm-removal-modal")}
     />
   )
@@ -80,16 +84,16 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   paragraph: {
     fontSize: 16,
-    lineHeight: 22,
+    lineHeight: cappedLineHeight(22),
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   textInput: {
     fontSize: 16,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     padding: 12,
-    color: colors.black,
-    borderRadius: 8,
+    color: colors.textOnBackground,
+    borderRadius: radius.default,
     textAlign: "center",
   },
 }))

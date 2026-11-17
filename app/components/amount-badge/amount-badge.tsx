@@ -128,7 +128,7 @@ const useStyles = makeStyles(
     text: {
       fontSize: 20,
       flexShrink: 1,
-      color: variant === "incoming" ? colors._green : colors.grey2,
+      color: variant === "incoming" ? colors.success : colors.textMuted,
     },
   }),
 )

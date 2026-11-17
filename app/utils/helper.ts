@@ -99,8 +99,30 @@ export const formatCardDisplayNumber = (
   return (masked.match(new RegExp(`.{1,${groupSize}}`, "g")) ?? [masked]).join(" ")
 }
 
-export const toMinorUnit = (dollars: string): number =>
-  Math.round(parseFloat(dollars) * 100)
+/** The most a GraphQL `Int` holds, which is how the API takes an amount in cents. */
+const GRAPHQL_INT_MAX = 2_147_483_647
+
+/** Whole dollars and up to two decimals, after a dot or a comma: the decimal pad shows
+ *  whichever separator the device's locale uses. */
+const DOLLAR_AMOUNT = /^(\d*)(?:[.,](\d{0,2}))?$/
+
+/**
+ * Cents for an amount the user typed, or null when the text is not one whole amount. It
+ * takes the text only when all of it is the amount, rather than the leading number a
+ * `parseFloat` would read out of `100abc` or `100,50`, so nothing is saved that the user
+ * did not type.
+ */
+export const parseDollarsToCents = (dollars: string): number | null => {
+  const match = DOLLAR_AMOUNT.exec(dollars.trim())
+  if (!match) return null
+
+  const [, whole, fraction = ""] = match
+  const hasDigits = whole !== "" || fraction !== ""
+  if (!hasDigits) return null
+
+  const cents = Number(whole || "0") * 100 + Number(fraction.padEnd(2, "0"))
+  return cents <= GRAPHQL_INT_MAX ? cents : null
+}
 
 export const toMajorUnit = (cents: number): number => cents / 100
 

@@ -114,7 +114,7 @@ jest.mock("@rn-vui/themed", () => {
   return {
     makeStyles:
       (fn: (theme: { colors: Record<string, string> }) => Record<string, object>) => () =>
-        fn({ colors: { error: "#f00", grey2: "#777", grey5: "#eee" } }),
+        fn({ colors: { error: "#f00", textMuted: "#777", surfaceInteractive: "#eee" } }),
     Text: ({ children }: { children: React.ReactNode }) =>
       ReactActual.createElement("Text", null, children),
     useTheme: () => ({ theme: { mode: "dark" } }),

@@ -2,20 +2,24 @@ import React, { useState, useCallback, useEffect, useRef } from "react"
 import { Alert } from "react-native"
 
 import useLogout from "@app/hooks/use-logout"
+import { useLogoutAndRoute } from "@app/hooks/use-logout-and-route"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useAppConfig } from "@app/hooks"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { toastShow } from "@app/utils/toast"
-import { useNavigation } from "@react-navigation/native"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useSwitchToNextProfile } from "@app/hooks/use-switch-to-next-profile"
+import {
+  SwitchProfileOutcome,
+  useSwitchToNextProfile,
+} from "@app/hooks/use-switch-to-next-profile"
 
 import { NetworkErrorCode } from "./error-code"
 import { useNetworkError } from "./network-error-context"
 
 export const NetworkErrorComponent: React.FC = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  /** A session the backend no longer accepts ends here whatever screen is up, the lock
+   *  screen included. Where it lands is the logout's answer, taken through the shared
+   *  route: the gate while the lock is kept, the landing screen once it went. */
+  const { logoutAndRoute, routeAfterLogout } = useLogoutAndRoute()
 
   const { networkError, clearNetworkError, token: networkErrorToken } = useNetworkError()
   const { LL } = useI18nContext()
@@ -23,6 +27,19 @@ export const NetworkErrorComponent: React.FC = () => {
   const { appConfig } = useAppConfig()
   const { switchToNextProfile } = useSwitchToNextProfile()
   const { isSelfCustodial: isSelfCustodialActive } = useActiveWallet()
+
+  /**
+   * A self-custodial session does not toast for a backend it does not need. Every query
+   * still reaching the backend from such a session is one the user did not ask for —
+   * an app-version check, a scan context that is discarded, a price the SDK already
+   * supplied — so a toast per failure is a stream of alarms about nothing the user can
+   * act on, while their wallet goes on working.
+   *
+   * Only the two generic transport toasts are suppressed. An authentication failure
+   * still routes to `handleTokenExpiry`, and a request the user actually made reports
+   * its own failure at the screen that made it.
+   */
+  const suppressTransportToasts = isSelfCustodialActive
 
   const [showedAlert, setShowedAlert] = useState(false)
   const isHandlingTokenExpiry = useRef(false)
@@ -43,11 +60,10 @@ export const NetworkErrorComponent: React.FC = () => {
       if (!currentToken) {
         // Stale 401 from in-flight queries while the user is on self-custodial.
         if (isSelfCustodialActive) return
-        await logout()
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "getStarted" }],
-        })
+        // No active token right now says nothing about what is stored: a 401
+        // arriving mid-switch lands here, and erasing on it would take the
+        // account the user is switching to.
+        await logoutAndRoute({ preserveStoredCredentials: true })
         return
       }
 
@@ -59,37 +75,40 @@ export const NetworkErrorComponent: React.FC = () => {
         return
       }
 
-      const nextProfile = await switchToNextProfile(networkErrorToken)
-      if (nextProfile) {
+      const outcome = await switchToNextProfile(networkErrorToken)
+      if (outcome === SwitchProfileOutcome.Switched) {
         return
       }
 
       // Custodial session is dead but the user is on self-custodial; skip re-login modal.
       if (isSelfCustodialActive) return
 
+      // The logout below erases every saved session, which is only correct when
+      // we know there is none left. An unreadable store is ignorance, not that
+      // knowledge, so keep the list and sign out of everything else.
+      const isStoreUnreadable = outcome === SwitchProfileOutcome.ProfilesUnreadable
+
       if (!showedAlert) {
         setShowedAlert(true)
-        await logout()
+        const { isAppLockKept } = await logout({
+          preserveStoredCredentials: isStoreUnreadable,
+        })
         Alert.alert(LL.common.reauth(), "", [
           {
             text: LL.common.ok(),
             onPress: () => {
               setShowedAlert(false)
-              navigation.reset({
-                index: 0,
-                routes: [{ name: "getStarted" }],
-              })
+              routeAfterLogout(isAppLockKept)
             },
           },
         ])
       }
     } catch (error) {
       console.error("Error handling token expiry:", error)
-      await logout()
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "getStarted" }],
-      })
+      // Same rule as above, and this branch knows even less: something threw
+      // mid-teardown, so the saved list stays rather than being erased on a
+      // guess. A stale entry costs one failed switch; erasing costs sessions.
+      await logoutAndRoute({ preserveStoredCredentials: true })
     } finally {
       resetSyncFlag()
     }
@@ -97,8 +116,9 @@ export const NetworkErrorComponent: React.FC = () => {
     appConfig.token,
     isSelfCustodialActive,
     logout,
+    logoutAndRoute,
+    routeAfterLogout,
     LL,
-    navigation,
     networkErrorToken,
     showedAlert,
     switchToNextProfile,
@@ -111,11 +131,12 @@ export const NetworkErrorComponent: React.FC = () => {
 
     if ("statusCode" in networkError) {
       if (networkError.statusCode >= 500) {
-        // TODO translation
-        toastShow({
-          message: (translations) => translations.errors.network.server(),
-          LL,
-        })
+        if (!suppressTransportToasts) {
+          toastShow({
+            message: (translations) => translations.errors.network.server(),
+            LL,
+          })
+        }
         clearNetworkError()
         return
       }
@@ -142,14 +163,21 @@ export const NetworkErrorComponent: React.FC = () => {
             break
 
           default:
-            // TODO translation
-            toastShow({
-              message: (translations) =>
-                `StatusCode: ${
-                  networkError.statusCode
-                }\nError code: ${errorCode}\n${translations.errors.network.request()}`,
-              LL,
-            })
+            if (!suppressTransportToasts) {
+              toastShow({
+                message: (translations) =>
+                  [
+                    translations.errors.network.statusCode({
+                      statusCode: networkError.statusCode,
+                    }),
+                    errorCode && translations.errors.network.errorCode({ errorCode }),
+                    translations.errors.network.request(),
+                  ]
+                    .filter(Boolean)
+                    .join("\n"),
+                LL,
+              })
+            }
             break
         }
 
@@ -159,14 +187,15 @@ export const NetworkErrorComponent: React.FC = () => {
     }
 
     if ("message" in networkError && networkError.message === "Network request failed") {
-      // TODO translation
-      toastShow({
-        message: (translations) => translations.errors.network.connection(),
-        LL,
-      })
+      if (!suppressTransportToasts) {
+        toastShow({
+          message: (translations) => translations.errors.network.connection(),
+          LL,
+        })
+      }
       clearNetworkError()
     }
-  }, [networkError, clearNetworkError, LL, handleTokenExpiry])
+  }, [networkError, clearNetworkError, LL, handleTokenExpiry, suppressTransportToasts])
 
   return <></>
 }

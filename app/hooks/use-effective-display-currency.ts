@@ -15,6 +15,10 @@ import { AccountType } from "@app/types/wallet"
 
 import { useAccountRegistry } from "./use-account-registry"
 
+/** Held until a preference is known: the account's own, or the one the device's region
+ *  implies once {@link useDisplayCurrencyFromRegion} has been able to read it. */
+export const DEFAULT_DISPLAY_CURRENCY = "USD"
+
 type EffectiveDisplayCurrencyReturn = {
   displayCurrency: string
   setDisplayCurrency: (currency: string) => Promise<void>
@@ -54,14 +58,16 @@ export const useEffectiveDisplayCurrency = (): EffectiveDisplayCurrencyReturn =>
 
   if (isSelfCustodial) {
     return {
-      displayCurrency: getSelfCustodialDisplayCurrency(persistentState),
+      displayCurrency:
+        getSelfCustodialDisplayCurrency(persistentState) ?? DEFAULT_DISPLAY_CURRENCY,
       setDisplayCurrency: setDisplayCurrencySelfCustodial,
       loading: false,
     }
   }
 
   return {
-    displayCurrency: data?.me?.defaultAccount?.displayCurrency ?? "USD",
+    displayCurrency:
+      data?.me?.defaultAccount?.displayCurrency ?? DEFAULT_DISPLAY_CURRENCY,
     setDisplayCurrency: setDisplayCurrencyCustodial,
     loading: queryLoading || mutationLoading,
   }

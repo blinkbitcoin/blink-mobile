@@ -1,3 +1,4 @@
+import { it } from "@jest/globals"
 import React from "react"
 import { render, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -44,13 +45,26 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
 }))
 
 const mockDispatch = jest.fn()
+type BeforeRemoveEvent = {
+  data: { action: { type: string } }
+  preventDefault: () => void
+}
+let mockBeforeRemove: ((event: BeforeRemoveEvent) => void) | null = null
+const mockAddListener = jest.fn(
+  (_name: string, listener: (event: BeforeRemoveEvent) => void) => {
+    mockBeforeRemove = listener
+    return () => {
+      mockBeforeRemove = null
+    }
+  },
+)
 const mockRouteParams = jest.fn<
   { reBackup?: boolean; message?: string } | undefined,
   []
 >()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ dispatch: mockDispatch }),
+  useNavigation: () => ({ dispatch: mockDispatch, addListener: mockAddListener }),
   useRoute: () => ({ params: mockRouteParams() }),
   CommonActions: {
     reset: (config: { index: number; routes: Array<{ name: string }> }) => ({
@@ -67,6 +81,7 @@ describe("BackupSuccessScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockRouteParams.mockReturnValue(undefined)
+    mockBeforeRemove = null
   })
 
   it("renders success message", async () => {
@@ -177,5 +192,68 @@ describe("BackupSuccessScreen", () => {
     jest.useRealTimers()
 
     expect(mockClearCheckpoint).not.toHaveBeenCalled()
+  })
+  /** Leaving clears the reset to Primary this screen holds, and every way here lands
+   *  with the flow already over: a restore's terms behind it, the account already
+   *  active. So the user's back goes home at once instead. */
+  describe("on the user's back", () => {
+    const HOME_RESET = expect.objectContaining({
+      type: "RESET",
+      payload: { index: 0, routes: [{ name: "Primary" }] },
+    })
+
+    const removeWith = (type: string) => {
+      const preventDefault = jest.fn()
+      act(() => {
+        mockBeforeRemove?.({ data: { action: { type } }, preventDefault })
+      })
+      return preventDefault
+    }
+
+    it.each(["GO_BACK", "POP"])("goes home at once on %s", async (type) => {
+      render(
+        <ContextForScreen>
+          <BackupSuccessScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+      mockDispatch.mockClear()
+
+      const preventDefault = removeWith(type)
+
+      expect(preventDefault).toHaveBeenCalledTimes(1)
+      expect(mockDispatch).toHaveBeenCalledTimes(1)
+      expect(mockDispatch).toHaveBeenCalledWith(HOME_RESET)
+    })
+
+    /** The reset it dispatches is a removal too, and so is a logout or a gate: those
+     *  go through untouched, or going home would refuse itself. */
+    it("lets a removal the app dispatched through", async () => {
+      render(
+        <ContextForScreen>
+          <BackupSuccessScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+      mockDispatch.mockClear()
+
+      const preventDefault = removeWith("RESET")
+
+      expect(preventDefault).not.toHaveBeenCalled()
+      expect(mockDispatch).not.toHaveBeenCalled()
+    })
+
+    it("stops listening once the screen is gone", async () => {
+      const { unmount } = render(
+        <ContextForScreen>
+          <BackupSuccessScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      unmount()
+
+      expect(mockBeforeRemove).toBeNull()
+    })
   })
 })

@@ -1,0 +1,172 @@
+import { createExternalStore, useExternalStore } from "@app/utils/external-store"
+import { loadJson, saveJson } from "@app/utils/storage"
+
+/**
+ * Developer-only overrides for the two self-custodial rollout flags.
+ *
+ * Those flags arrive from Firebase Remote Config and ship defaulting to `false`, and
+ * `fetchAndActivate` needs Google Play Services — so on an emulator without them the
+ * fetch fails, every flag silently falls back to its default, and the self-custodial
+ * path is simply absent: Get Started routes straight to custodial login. Editing the
+ * shipped default to test is a change you then have to remember not to commit.
+ *
+ * Three states rather than a boolean, because `docs/self-custodial-rollout.md` asks for
+ * the flag to be flipped *both* ways: forcing a flag off while Remote Config says on is
+ * the rollback scenario, and is not reachable with an on/off toggle that only adds.
+ *
+ * Hard-gated to `__DEV__`, like {@link module:app/config/simulated-outage}: a release
+ * build reads {@link NO_OVERRIDES} whatever is stored and refuses to write.
+ */
+
+export const FlagOverride = {
+  /** Honour whatever Remote Config resolved to. */
+  Default: "default",
+  On: "on",
+  Off: "off",
+} as const
+
+export type FlagOverride = (typeof FlagOverride)[keyof typeof FlagOverride]
+
+export const FLAG_OVERRIDES: readonly FlagOverride[] = [
+  FlagOverride.Default,
+  FlagOverride.On,
+  FlagOverride.Off,
+]
+
+export type FeatureFlagOverrides = {
+  nonCustodialEnabled: FlagOverride
+  stableBalanceEnabled: FlagOverride
+}
+
+const NO_OVERRIDES: FeatureFlagOverrides = Object.freeze({
+  nonCustodialEnabled: FlagOverride.Default,
+  stableBalanceEnabled: FlagOverride.Default,
+})
+
+const OVERRIDES_KEY = "developerFeatureFlagOverrides"
+
+const isSimulationAvailable = (): boolean => __DEV__
+
+const isFlagOverride = (value: unknown): value is FlagOverride =>
+  FLAG_OVERRIDES.includes(value as FlagOverride)
+
+const isDefaulted = (overrides: FeatureFlagOverrides): boolean =>
+  overrides.nonCustodialEnabled === FlagOverride.Default &&
+  overrides.stableBalanceEnabled === FlagOverride.Default
+
+const parseStored = (raw: unknown): FeatureFlagOverrides => {
+  if (!raw || typeof raw !== "object") return NO_OVERRIDES
+  const { nonCustodialEnabled, stableBalanceEnabled } = raw as Partial<
+    Record<keyof FeatureFlagOverrides, unknown>
+  >
+  if (!isFlagOverride(nonCustodialEnabled) || !isFlagOverride(stableBalanceEnabled)) {
+    return NO_OVERRIDES
+  }
+  const parsed = { nonCustodialEnabled, stableBalanceEnabled }
+  return isDefaulted(parsed) ? NO_OVERRIDES : parsed
+}
+
+const store = createExternalStore<FeatureFlagOverrides>(NO_OVERRIDES)
+
+export const subscribeToFeatureFlagOverrides = store.subscribe
+
+const getSnapshot = (): FeatureFlagOverrides =>
+  isSimulationAvailable() ? store.get() : NO_OVERRIDES
+
+/**
+ * Reads the stored overrides into memory. Called once at startup, before the flag
+ * context first renders, so an override survives the reload that applies it.
+ */
+export const hydrateFeatureFlagOverrides = async (): Promise<void> => {
+  if (!isSimulationAvailable()) return
+  store.set(parseStored(await loadJson(OVERRIDES_KEY)))
+}
+
+export const setFeatureFlagOverride = (patch: Partial<FeatureFlagOverrides>): void => {
+  if (!isSimulationAvailable()) return
+  const current = store.get()
+  const next: FeatureFlagOverrides = { ...current, ...patch }
+  if (
+    next.nonCustodialEnabled === current.nonCustodialEnabled &&
+    next.stableBalanceEnabled === current.stableBalanceEnabled
+  ) {
+    return
+  }
+  store.set(isDefaulted(next) ? NO_OVERRIDES : next)
+  // Best effort: losing the write costs the next launch its override, nothing more.
+  saveJson(OVERRIDES_KEY, store.get()).catch(() => {})
+}
+
+export const getFeatureFlagOverrides = (): FeatureFlagOverrides => getSnapshot()
+
+export const useFeatureFlagOverrides = (): FeatureFlagOverrides =>
+  useExternalStore(store, getSnapshot)
+
+/** Test seam: drops the in-memory overrides without touching storage. */
+export const resetFeatureFlagOverridesForTests = store.reset
+
+/** Applies one override to the value Remote Config resolved to. */
+export const applyFlagOverride = (
+  remoteValue: boolean,
+  override: FlagOverride,
+): boolean => {
+  if (override === FlagOverride.On) return true
+  if (override === FlagOverride.Off) return false
+  return remoteValue
+}
+
+export type SelfCustodialFlags = {
+  nonCustodialEnabled: boolean
+  stableBalanceEnabled: boolean
+}
+
+/**
+ * What Remote Config resolved to, plus whether the console has vouched for
+ * `nonCustodialEnabled`. Omitted, it has.
+ */
+export type RemoteSelfCustodialFlags = SelfCustodialFlags & {
+  isNonCustodialFlagSettled?: boolean
+}
+
+/**
+ * The two self-custodial rollout flags as the app should read them: each override
+ * applied, then the cascade — Stable Balance cannot be on while self-custodial is off,
+ * since it is a feature *of* a self-custodial account.
+ *
+ * Order matters. Overriding `nonCustodialEnabled` off takes Stable Balance with it,
+ * which is what the rollback scenario in `docs/self-custodial-rollout.md` expects; the
+ * cascade applied first would let a forced Stable Balance survive it.
+ *
+ * The cascade reads the console's word, not the shipped default: the default turns
+ * self-custodial on so a first launch can offer it, but what builds on it must still go
+ * dark when the console turns it off on a device whose fetch never landed. A developer
+ * override of `nonCustodialEnabled` is a word as good as the console's.
+ *
+ * Exported and pure so the flag context and its spec share one derivation. It lives
+ * here rather than in `feature-flags-context.tsx` because importing that pulls in
+ * Firebase Remote Config, which a unit test should not have to stand up.
+ */
+export const deriveSelfCustodialFlags = (
+  { isNonCustodialFlagSettled = true, ...remote }: RemoteSelfCustodialFlags,
+  overrides: FeatureFlagOverrides,
+): SelfCustodialFlags => {
+  const nonCustodialEnabled = applyFlagOverride(
+    remote.nonCustodialEnabled,
+    overrides.nonCustodialEnabled,
+  )
+  const isNonCustodialVouchedFor =
+    overrides.nonCustodialEnabled === FlagOverride.Default
+      ? isNonCustodialFlagSettled && nonCustodialEnabled
+      : nonCustodialEnabled
+  const stableBalanceEnabled = applyFlagOverride(
+    remote.stableBalanceEnabled,
+    overrides.stableBalanceEnabled,
+  )
+  return {
+    nonCustodialEnabled,
+    stableBalanceEnabled: isNonCustodialVouchedFor && stableBalanceEnabled,
+  }
+}
+
+/** What `deriveSelfCustodialFlags` reads when nothing is overridden. */
+export const NO_FLAG_OVERRIDES: FeatureFlagOverrides = NO_OVERRIDES

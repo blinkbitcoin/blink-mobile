@@ -189,7 +189,7 @@ export const NotificationsProvider: React.FC<React.PropsWithChildren> = ({
               <GaloyIcon
                 name={modalInfo.icon as IconNamesType}
                 size={100}
-                color={colors.primary3}
+                color={colors.accent}
               />
             )
           }

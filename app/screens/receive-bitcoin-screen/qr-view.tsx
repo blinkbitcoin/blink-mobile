@@ -89,12 +89,17 @@ const QRViewBase: React.FC<Props> = ({
     (!isPayCode || isPayCodeAndCanUsePayCode)
 
   const styles = useStyles()
-  const { width, scale } = useWindowDimensions()
-  const baseSize = Math.round(QR_BASE_RATIO * width) - 2 * QR_CONTAINER_PADDING
-  const qrSize =
+  const { width, height, scale } = useWindowDimensions()
+  /** A square has to fit the window's shorter edge, which is the width in portrait and
+   *  the height in landscape. Sizing off the width alone clipped the code once the
+   *  screen could rotate, and a clipped QR cannot be scanned. */
+  const shortestEdge = Math.min(width, height)
+  const baseSize = Math.round(QR_BASE_RATIO * shortestEdge) - 2 * QR_CONTAINER_PADDING
+  const preferredSize =
     Platform.OS === "android" && scale > QR_ANDROID_HIGH_DPI_SCALE
       ? QR_ANDROID_HIGH_DPI_SIZE
       : baseSize
+  const qrSize = Math.min(preferredSize, shortestEdge - 2 * QR_CONTAINER_PADDING)
 
   const { LL } = useI18nContext()
 
@@ -135,7 +140,7 @@ const QRViewBase: React.FC<Props> = ({
       return (
         <View {...testProps("Converting")} style={[styles.container, style]}>
           <View style={styles.convertingContent}>
-            <ActivityIndicator size="large" color={colors.primary} />
+            <ActivityIndicator size="large" color={colors.accent} />
             <Text type="p2" style={styles.convertingText}>
               {LL.ReceiveScreen.pleaseWaitForConversion()}
             </Text>
@@ -176,7 +181,7 @@ const QRViewBase: React.FC<Props> = ({
                 {err}
               </Text>
             ) : (
-              <ActivityIndicator size="large" color={colors.primary} />
+              <ActivityIndicator size="large" color={colors.accent} />
             )}
           </View>
         </View>
@@ -229,12 +234,12 @@ const useStyles = makeStyles(({ colors }) => ({
   container: {
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: colors._white,
+    backgroundColor: colors.staticWhite,
     width: "100%",
     height: undefined,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: colors.grey5,
+    borderColor: colors.surfaceInteractive,
     aspectRatio: 1,
     alignSelf: "center",
     padding: 28,
@@ -261,7 +266,7 @@ const useStyles = makeStyles(({ colors }) => ({
     rowGap: 12,
   },
   convertingText: {
-    color: colors._black,
+    color: colors.staticBlack,
     textAlign: "center",
   },
   logoOverlay: {

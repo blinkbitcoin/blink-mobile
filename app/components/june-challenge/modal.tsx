@@ -2,6 +2,7 @@ import * as React from "react"
 import { Linking, View } from "react-native"
 import Modal from "react-native-modal"
 
+import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useCirclesCard } from "@app/screens/people-screen/circles/use-circles-card"
 import { makeStyles, useTheme, Text } from "@rn-vui/themed"
@@ -37,7 +38,7 @@ export const JuneChallengeModal: React.FC<Props> = ({ isVisible, setIsVisible })
       isVisible={isVisible}
       backdropOpacity={0.8}
       backdropTransitionOutTiming={0}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       onBackdropPress={acknowledgeModal}
     >
       <View style={styles.modalCard}>
@@ -48,7 +49,7 @@ export const JuneChallengeModal: React.FC<Props> = ({ isVisible, setIsVisible })
             size="medium"
             onPress={acknowledgeModal}
           />
-          <GaloyIcon style={styles.top} name="rank" size={40} color={colors.primary} />
+          <GaloyIcon style={styles.top} name="rank" size={40} color={colors.accent} />
           <Text type="h1" bold>
             {LL.Circles.juneChallenge.title()}
           </Text>
@@ -61,17 +62,17 @@ export const JuneChallengeModal: React.FC<Props> = ({ isVisible, setIsVisible })
             {LL.Circles.learnMore()}
             <Text
               style={styles.underline}
-              color={colors.grey3}
+              color={colors.textDisabled}
               onPress={() => Linking.openURL(LEARN_MORE_PAGE_URL)}
             >
               {LEARN_MORE_PAGE_URL}
             </Text>
           </Text>
-          {/* <Text style={styles.reminder} type="p3" color={colors.grey3}>
+          {/* <Text style={styles.reminder} type="p3" color={colors.textDisabled}>
             {LL.Circles.connectOnSocial()}
             <Text
               style={styles.underline}
-              color={colors.grey3}
+              color={colors.textDisabled}
               onPress={() => Linking.openURL(SOCIAL_LINK_TREE)}
             >
               {SOCIAL_LINK_TREE}
@@ -81,7 +82,7 @@ export const JuneChallengeModal: React.FC<Props> = ({ isVisible, setIsVisible })
             {LL.Circles.fullDetails()}
             <Text
               style={styles.underline}
-              color={colors.grey3}
+              color={colors.textDisabled}
               onPress={() => Linking.openURL(CHALLENGE_PAGE_URL)}
             >
               {CHALLENGE_PAGE}
@@ -89,7 +90,7 @@ export const JuneChallengeModal: React.FC<Props> = ({ isVisible, setIsVisible })
           </Text> */}
         </View>
       </View>
-      <GaloyToast />
+      <GaloyToast inModal />
     </Modal>
   )
 }
@@ -110,8 +111,8 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   top: { marginTop: 40 },
   modalCard: {
-    backgroundColor: colors.grey5,
-    borderRadius: 16,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.popup,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -124,7 +125,7 @@ const useStyles = makeStyles(({ colors }) => ({
   reminder: {
     textAlign: "center",
     paddingHorizontal: 20,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   underline: {
     textDecorationLine: "underline",

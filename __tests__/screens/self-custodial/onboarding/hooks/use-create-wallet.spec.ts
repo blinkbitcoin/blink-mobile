@@ -21,6 +21,7 @@ jest.mock("@app/self-custodial/hooks/use-provision-self-custodial-account", () =
 
 jest.mock("@app/store/persistent-state", () => ({
   usePersistentStateContext: () => ({
+    persistentState: { galoyAuthToken: "" },
     updateState: mockUpdateState,
   }),
 }))

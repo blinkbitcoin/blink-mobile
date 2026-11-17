@@ -4,6 +4,7 @@ import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
@@ -51,7 +52,7 @@ export const MnemonicWordInput = forwardRef<
         ref={inputRef}
         style={styles.input}
         placeholder={placeholder}
-        placeholderTextColor={colors.grey2}
+        placeholderTextColor={colors.textMuted}
         value={value}
         onChangeText={onChangeText}
         onFocus={onFocus}
@@ -60,7 +61,7 @@ export const MnemonicWordInput = forwardRef<
         keyboardType="visible-password"
         {...testProps(testID ?? `word-input-${index}`)}
       />
-      <GaloyIcon name="pencil" size={16} color={colors.primary} />
+      <GaloyIcon name="pencil" size={16} color={colors.accent} />
     </View>
   )
 })
@@ -71,8 +72,8 @@ const useStyles = makeStyles(({ colors }) => ({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     borderWidth: 1,
     borderColor: colors.transparent,
     minHeight: 50,
@@ -85,13 +86,13 @@ const useStyles = makeStyles(({ colors }) => ({
   wordNumber: {
     width: 24,
     fontSize: 14,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   wordNumberHidden: {
     opacity: 0,
   },
   correct: {
-    borderColor: colors._green,
+    borderColor: colors.success,
   },
   error: {
     borderColor: colors.error,
@@ -100,6 +101,6 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     fontSize: 14,
     fontFamily: "SourceSansPro-Regular",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

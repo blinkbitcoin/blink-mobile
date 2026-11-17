@@ -20,6 +20,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toBtcMoneyAmount } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
+import { cappedLineHeight } from "@app/rne-theme/text-scaling"
 
 import { ConversionFeeRow } from "./conversion-fee-row"
 import { useSelfCustodialConversion } from "./hooks"
@@ -28,6 +29,7 @@ import { Screen } from "@app/components/screen"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
+import { staticSurface } from "@app/rne-theme/surfaces"
 
 type Props = {
   route: RouteProp<RootStackParamList, "conversionConfirmation">
@@ -224,7 +226,7 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
           <View style={styles.walletSeparator}>
             <View style={styles.line}></View>
             <TouchableOpacity style={styles.switchButton} disabled>
-              <GaloyIcon name="arrow-down" color={colors.grey3} size={25} />
+              <GaloyIcon name="arrow-down" color={colors.textDisabled} size={25} />
             </TouchableOpacity>
           </View>
           <View style={styles.toFieldContainer}>
@@ -288,7 +290,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   conversionInfoCard: {
     margin: 20,
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderRadius: 13,
     padding: 20,
   },
@@ -299,16 +301,20 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: 0,
   },
   conversionRateText: {
-    color: colors.grey0,
+    color: colors.textPrimary,
   },
-  conversionInfoFieldTitle: { color: colors.grey1, lineHeight: 25, fontWeight: "400" },
+  conversionInfoFieldTitle: {
+    color: colors.textSecondary,
+    lineHeight: cappedLineHeight(25),
+    fontWeight: "400",
+  },
   conversionInfoFieldValue: {
-    color: colors.grey1,
+    color: colors.textSecondary,
     fontWeight: "bold",
     fontSize: 20,
   },
   conversionInfoFieldConvertValue: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
     fontWeight: "normal",
   },
@@ -339,7 +345,7 @@ const useStyles = makeStyles(({ colors }) => ({
     position: "relative",
   },
   line: {
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     height: 1,
     flex: 1,
   },
@@ -349,7 +355,7 @@ const useStyles = makeStyles(({ colors }) => ({
     height: 43,
     width: 43,
     borderRadius: 50,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -360,12 +366,12 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   infoContainer: {
     marginHorizontal: 20,
-    backgroundColor: colors.grey5,
+    ...staticSurface(colors),
     borderRadius: 6,
     padding: 20,
     paddingVertical: 12,
     borderLeftWidth: 2,
-    borderLeftColor: colors.black,
+    borderLeftColor: colors.textOnBackground,
   },
   sliderContainer: {
     padding: 20,

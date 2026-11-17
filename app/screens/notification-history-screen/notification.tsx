@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { StatefulNotification } from "@app/graphql/generated"
+import { StatefulNotificationsQuery } from "@app/graphql/generated"
 import { Icon, Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { View, Linking } from "react-native"
 import { timeAgo, toGaloyIconName } from "./utils"
@@ -7,7 +7,22 @@ import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 import { BLINK_DEEP_LINK_PREFIX } from "@app/config"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
-export const Notification: React.FC<StatefulNotification> = ({
+/** A notification as the history query returns it. */
+type HistoryNotification = NonNullable<
+  StatefulNotificationsQuery["me"]
+>["statefulNotificationsWithoutBulletinEnabled"]["nodes"][number]
+
+/**
+ * Only what the row shows, typed from the history query rather than from the schema: a
+ * field the schema gains, on the notification or on its action, changes nothing here,
+ * and a field the query stops selecting is a compile error where the row is used.
+ */
+type NotificationProps = Pick<
+  HistoryNotification,
+  "title" | "body" | "createdAt" | "acknowledgedAt" | "icon" | "action"
+>
+
+export const Notification: React.FC<NotificationProps> = ({
   title,
   body,
   createdAt,
@@ -28,7 +43,7 @@ export const Notification: React.FC<StatefulNotification> = ({
   }, [acknowledgedAt, isAcknowledged])
 
   const iconName = toGaloyIconName(icon)
-  const iconColor = isAcknowledged ? colors.grey2 : colors.black
+  const iconColor = isAcknowledged ? colors.textMuted : colors.textOnBackground
 
   return (
     <TouchableWithoutFeedback
@@ -72,7 +87,7 @@ const useStyles = makeStyles(
     container: {
       padding: 10,
       borderBottomWidth: 1,
-      borderBottomColor: colors.grey5,
+      borderBottomColor: colors.surfaceInteractive,
       display: "flex",
       flexDirection: "row",
       columnGap: 12,
@@ -86,7 +101,7 @@ const useStyles = makeStyles(
       flex: 1,
     },
     text: {
-      color: isAcknowledged ? colors.grey2 : colors.black,
+      color: isAcknowledged ? colors.textMuted : colors.textOnBackground,
     },
   }),
 )

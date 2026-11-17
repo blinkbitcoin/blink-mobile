@@ -1,8 +1,9 @@
-import { StyleProp, TextStyle } from "react-native"
+import { Platform, StyleProp, TextStyle } from "react-native"
 
 import { createTheme } from "@rn-vui/themed"
 
 import { light, dark } from "./colors"
+import { fonts } from "./fonts"
 import { cappedLineHeight, MAX_FONT_SIZE_MULTIPLIER } from "./text-scaling"
 
 const theme = createTheme({
@@ -32,9 +33,19 @@ const theme = createTheme({
       },
     },
     Text: (props, { colors }) => {
+      /**
+       * Bold picks the bold face by name, with or without a `type`.
+       *
+       * Android loads `fonts/<fontFamily>.ttf`, or `<fontFamily>_bold.ttf` for a weight of
+       * 700 or more, and falls back to Roboto when that file is missing. So on Android bold
+       * text must carry no weight. iOS resolves the name to the bundled face; the 700 there
+       * only matters if the face is ever missing, where it falls back to the system Bold
+       * rather than Regular.
+       */
       const universalStyle = {
-        color: props.color || colors.black,
-        fontFamily: "SourceSansPro-Regular",
+        color: props.color || colors.textOnBackground,
+        fontFamily: props.bold ? fonts.bold : fonts.regular,
+        ...(props.bold && Platform.OS === "ios" ? { fontWeight: "700" as const } : {}),
       }
 
       const sizeStyle = props.type
@@ -42,32 +53,26 @@ const theme = createTheme({
             h1: {
               fontSize: 24,
               lineHeight: cappedLineHeight(32),
-              fontWeight: props.bold ? "600" : "400",
             },
             h2: {
               fontSize: 20,
               lineHeight: cappedLineHeight(24),
-              fontWeight: props.bold ? "600" : "400",
             },
             p1: {
               fontSize: 18,
               lineHeight: cappedLineHeight(24),
-              fontWeight: props.bold ? "600" : "400",
             },
             p2: {
               fontSize: 16,
               lineHeight: cappedLineHeight(24),
-              fontWeight: props.bold ? "600" : "400",
             },
             p3: {
               fontSize: 14,
               lineHeight: cappedLineHeight(18),
-              fontWeight: props.bold ? "600" : "400",
             },
             p4: {
               fontSize: 12,
               lineHeight: cappedLineHeight(18),
-              fontWeight: props.bold ? "600" : "400",
             },
           }[props.type]
         : {}

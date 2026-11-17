@@ -26,8 +26,20 @@ const MIGRATION_OPERATIONS = [
 ]
 
 /** Deleting the account cannot be undone, and the resend cannot authenticate itself either:
- *  it spent the only token that could. */
-const IRREVERSIBLE_OPERATIONS = [...MIGRATION_OPERATIONS, "accountDelete"]
+ *  it spent the only token that could. An authenticator's code check spends its
+ *  registration: a resend after a lost answer is refused though the first turned it on.
+ *  Removing the authenticator spends one of the hour's code checks on every try, as do
+ *  the login method additions it guards. A card limit removal that landed leaves nothing
+ *  for a resend to remove. */
+const IRREVERSIBLE_OPERATIONS = [
+  ...MIGRATION_OPERATIONS,
+  "accountDelete",
+  "userTotpRegistrationValidate",
+  "userTotpDelete",
+  "userEmailRegistrationInitiate",
+  "userPhoneRegistrationValidate",
+  "cardSpendingLimitRemove",
+]
 
 /**
  * The on-chain fee quotes, single-speed and by-speed alike. A silent resend with backoff
@@ -58,6 +70,18 @@ describe("shouldRetryOperation", () => {
 
   it("does not retry a non-idempotent payment send", () => {
     expect(shouldRetryOperation(networkError, NON_IDEMPOTENT_PAYMENT)).toBe(false)
+  })
+
+  it("retries a BTC Map place submission, which its submissionId makes idempotent", () => {
+    // btcMapPlaceSubmit stays off the no-retry list on purpose: every retry of
+    // an attempt carries the attempt's client-minted submissionId, so a resent
+    // request updates the original submission instead of duplicating the place.
+    // If that keying ever goes away, this operation belongs on the no-retry list.
+    expect(shouldRetryOperation(networkError, "btcMapPlaceSubmit")).toBe(true)
+  })
+
+  it("does not resend a new on-chain address request, which mints one per landing", () => {
+    expect(shouldRetryOperation(networkError, "onChainAddressCreate")).toBe(false)
   })
 
   it("does not retry an on-chain send-all", () => {
@@ -98,6 +122,16 @@ describe("shouldRetryUnauthorized", () => {
    *  second, irreversible landing. */
   it("does not retry a 401 on a non-idempotent payment send", () => {
     expect(shouldRetryUnauthorized(unauthorizedError, NON_IDEMPOTENT_PAYMENT)).toBe(false)
+  })
+
+  it("retries a 401 on a BTC Map place submission, idempotent by submissionId", () => {
+    // Same reasoning as the transport retry: the resent request carries the
+    // attempt's submissionId, so the backend deduplicates it.
+    expect(shouldRetryUnauthorized(unauthorizedError, "btcMapPlaceSubmit")).toBe(true)
+  })
+
+  it("does not retry a 401 on a new on-chain address request", () => {
+    expect(shouldRetryUnauthorized(unauthorizedError, "onChainAddressCreate")).toBe(false)
   })
 
   IRREVERSIBLE_OPERATIONS.forEach((operationName) => {

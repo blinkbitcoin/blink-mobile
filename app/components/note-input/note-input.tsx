@@ -2,6 +2,7 @@ import React, { useRef } from "react"
 import { View, TextInput, StyleProp, ViewStyle, TouchableOpacity } from "react-native"
 import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
+import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -49,7 +50,7 @@ export const NoteInput: React.FC<NoteInputProps> = ({
           {...testProps("add-note")}
           style={[styles.noteInput, { fontSize }]}
           placeholder={LL.NoteInput.addNote()}
-          placeholderTextColor={colors.black}
+          placeholderTextColor={colors.textOnBackground}
           onChangeText={onChangeText}
           onBlur={onBlur}
           value={value}
@@ -59,7 +60,7 @@ export const NoteInput: React.FC<NoteInputProps> = ({
           ref={textInputRef}
         />
         <TouchableOpacity style={styles.noteIconContainer} onPress={focusTextInput}>
-          <GaloyIcon name={"note"} size={iconSize} color={colors.primary} />
+          <GaloyIcon name={"note"} size={iconSize} color={colors.accent} />
         </TouchableOpacity>
       </View>
     </View>
@@ -72,9 +73,9 @@ const useStyles = makeStyles(
       flexDirection: "row",
       borderStyle: "solid",
       overflow: "hidden",
-      backgroundColor: colors.grey5,
+      backgroundColor: colors.surfaceInteractive,
       paddingHorizontal: 10,
-      borderRadius: 10,
+      borderRadius: radius.default,
       alignItems: "center",
       minHeight: big ? 60 : 50,
       opacity: editable ? 1 : 0.5,
@@ -97,7 +98,7 @@ const useStyles = makeStyles(
     },
     noteInput: {
       flex: 1,
-      color: colors.black,
+      color: colors.textOnBackground,
       fontWeight: "400",
       lineHeight: 20,
     },

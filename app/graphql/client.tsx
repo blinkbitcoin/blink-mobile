@@ -36,6 +36,10 @@ import { loadString, saveString } from "../utils/storage"
 import { useApolloRebuildLifecycle } from "./hooks/use-apollo-rebuild-lifecycle"
 import { useEffectiveAuthToken } from "./hooks/use-effective-auth-token"
 import { AnalyticsContainer } from "./analytics"
+import {
+  recordBlinkServiceTransportError,
+  resetBlinkServicesStatus,
+} from "./blink-services-status"
 import { createCache } from "./cache"
 import { useRealtimePriceQuery } from "./generated"
 import { createServerTimeLink } from "./server-time"
@@ -151,6 +155,7 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
         // only network error are managed globally
         if (networkError) {
           console.log(`[Network error]: ${networkError}`)
+          recordBlinkServiceTransportError(networkError)
           if (!hasNetworkErrorRef.current) {
             setNetworkError(networkError)
             hasNetworkErrorRef.current = true
@@ -231,6 +236,10 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
           httpLink,
         ]),
       )
+
+      /** A new client means a new connection, and possibly a new instance or token, so
+       *  what the old one observed says nothing about this one. */
+      resetBlinkServicesStatus()
 
       const cache = createCache()
 

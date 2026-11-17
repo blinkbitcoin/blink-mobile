@@ -1,9 +1,12 @@
 import { Linking, Pressable, Share, View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 const addressTypes = {
   lightning: "lightning",
@@ -73,11 +76,11 @@ const AddressComponent: React.FC<AddressComponentprops> = ({
         <View style={styles.iconsContainer}>
           {useGlobeIcon && (
             <Pressable onPress={() => Linking.openURL(address)}>
-              <GaloyIcon name="globe" size={20} color={colors.black} />
+              <GaloyIcon name="globe" size={20} color={colors.textOnBackground} />
             </Pressable>
           )}
           <Pressable onPress={handleCopyToClipboard}>
-            <GaloyIcon name="copy-paste" size={20} color={colors.black} />
+            <GaloyIcon name="copy-paste" size={20} color={colors.textOnBackground} />
           </Pressable>
           <Pressable
             onPress={() => {
@@ -87,7 +90,7 @@ const AddressComponent: React.FC<AddressComponentprops> = ({
               })
             }}
           >
-            <GaloyIcon name="share" size={20} color={colors.black} />
+            <GaloyIcon name="share" size={20} color={colors.textOnBackground} />
           </Pressable>
         </View>
       </View>
@@ -101,7 +104,7 @@ const useStyles = makeStyles(({ colors }) => ({
   container: {
     display: "flex",
     flexDirection: "column",
-    rowGap: 20,
+    rowGap: groupTitleGap,
     width: "100%",
   },
   titleContainer: {
@@ -112,6 +115,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: "100%",
   },
   addressTitle: {
+    color: colors.textSecondary,
     fontSize: 16,
     lineHeight: 24,
     flexShrink: 1,
@@ -122,14 +126,14 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     paddingVertical: 16,
     paddingHorizontal: 8,
-    borderRadius: 8,
+    borderRadius: radius.default,
     columnGap: 20,
   },
   address: {
-    color: colors.black,
+    color: colors.textOnBackground,
     fontSize: 14,
     lineHeight: 24,
   },
@@ -141,11 +145,11 @@ const useStyles = makeStyles(({ colors }) => ({
     columnGap: 5,
   },
   descriptionText: {
-    color: colors.primary,
+    color: colors.accent,
     textDecorationLine: "underline",
     fontSize: 14,
     lineHeight: 18,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
   },
   iconsContainer: {
     display: "flex",

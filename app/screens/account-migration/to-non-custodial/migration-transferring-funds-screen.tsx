@@ -3,7 +3,7 @@ import { Text } from "react-native"
 import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
-import { useNavigation } from "@react-navigation/native"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -33,6 +33,9 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { params: routeParams } =
+    useRoute<RouteProp<RootStackParamList, "accountMigrationTransferringFunds">>()
+  const isDepositChecked = routeParams?.isDepositChecked === true
 
   /** The custodial id comes from the completion hook rather than a second owner query of
    *  this screen's own: two no-cache reads of the same id can disagree for a render after
@@ -71,8 +74,9 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     navigation.navigate("accountMigrationContactSupport", {
       reason: MigrationSupportReason.ReceiveDelayed,
       origin: MigrationSupportOrigin.ReceiveDelayed,
+      custodialAccountId: custodialAccountId ?? undefined,
     })
-  }, [navigation])
+  }, [navigation, custodialAccountId])
 
   const [isCloseUnavailable, setIsCloseUnavailable] = useState(false)
   const [completionAttempt, setCompletionAttempt] = useState(0)
@@ -96,12 +100,14 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     failureReason,
     isClockOutOfSync,
     hasConnectionIssue,
+    isDepositPending,
     retry,
   } = useMigrationTransfer({
     custodialAccountId,
     selfCustodialAccountId: migrationAccountId,
     expectedReceiveSats: migrationExpectedReceiveSats,
     skip: isTransferSkipped,
+    isDepositChecked,
   })
 
   useEffect(() => {
@@ -272,12 +278,25 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
   const waitingFooter = isDelayedNoticeShown ? delayedFooter : undefined
   const screenFooter = isRecoverable ? recoverableFooter : waitingFooter
 
+  /**
+   * A commit refused for a deposit still confirming moved nothing, and the figures the user
+   * approved were read before that deposit, so they no longer say what the migration will
+   * send. The commit screen is where they are read again: it waits for the deposit to land
+   * and has the user approve the new figures, rather than this screen committing the old
+   * ones once it clears.
+   */
+  useEffect(() => {
+    if (!isDepositPending) return
+    navigation.popTo("accountMigrationBalancesOverview", { isDepositRefused: true })
+  }, [isDepositPending, navigation])
+
   return (
-    <Screen preset="fixed">
+    <Screen preset="fixed" headerShown={false}>
       <StatusScreenLayout
         icon="clock"
         iconColor={colors.warning}
-        iconBackgroundColor={colors._warningLight}
+        // eslint-disable-next-line no-restricted-properties -- no themed warning tile token yet; the tile stays pale in dark mode
+        iconBackgroundColor={colors.staticWarningBackground}
         footer={screenFooter}
       >
         <Text maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER} style={styles.message}>
@@ -293,7 +312,7 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 18,
     lineHeight: 24,
     fontWeight: "400",
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "center",
   },
 }))

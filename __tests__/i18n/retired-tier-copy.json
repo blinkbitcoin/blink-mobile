@@ -1,0 +1,120 @@
+{
+  "en": {
+    "current": ["Priority", "Standard", "Economy"],
+    "retired": ["Fast", "Medium", "Slow"]
+  },
+  "locales": {
+    "af": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Vinnig", "Medium", "Stadig"]
+    },
+    "ar": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["سريع", "متوسط", "بطيء"]
+    },
+    "ca": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Ràpid", "Mitjà", "Lent"]
+    },
+    "cs": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Rychlý", "Střední", "Pomalý"]
+    },
+    "da": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Hurtig", "Medium", "Langsom"]
+    },
+    "de": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Schnell", "Mittel", "Langsam"]
+    },
+    "el": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Γρήγορη", "Μεσαία", "Αργή"]
+    },
+    "es": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Rápido", "Medio", "Lento"]
+    },
+    "fr": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Rapide", "Moyen", "Lent"]
+    },
+    "hr": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Brzo", "Srednje", "Sporo"]
+    },
+    "hu": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Gyors", "Közepes", "Lassú"]
+    },
+    "hy": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Արագ", "Միջին", "Դանդաղ"]
+    },
+    "id": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Cepat", "Sedang", "Lambat"]
+    },
+    "it": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Veloce", "Medio", "Lento"]
+    },
+    "ja": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["高速", "中速", "低速"]
+    },
+    "lg": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Mangu", "Wakati", "Mpola"]
+    },
+    "ms": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Cepat", "Sederhana", "Perlahan"]
+    },
+    "nl": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Snel", "Gemiddeld", "Langzaam"]
+    },
+    "pt": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Rápido", "Médio", "Lento"]
+    },
+    "qu": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Usqhay", "Chawpi", "Allillamanta"]
+    },
+    "ro": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Rapid", "Mediu", "Lent"]
+    },
+    "sk": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Rýchly", "Stredný", "Pomalý"]
+    },
+    "sr": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Брзо", "Средње", "Споро"]
+    },
+    "sw": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Haraka", "Wastani", "Polepole"]
+    },
+    "th": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["เร็ว", "ปานกลาง", "ช้า"]
+    },
+    "tr": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Hızlı", "Orta", "Yavaş"]
+    },
+    "vi": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Nhanh", "Trung bình", "Chậm"]
+    },
+    "xh": {
+      "translatedFrom": ["Priority", "Standard", "Economy"],
+      "retired": ["Ngokukhawuleza", "Phakathi", "Ngokucothayo"]
+    }
+  }
+}

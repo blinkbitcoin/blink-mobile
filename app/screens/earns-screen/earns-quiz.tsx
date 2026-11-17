@@ -55,29 +55,29 @@ const useStyles = makeStyles(({ colors }) => ({
 
   bottomContainer: {
     alignItems: "center",
-    backgroundColor: colors._white,
+    backgroundColor: colors.staticWhite,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingTop: 0,
-    shadowColor: colors.grey2,
+    shadowColor: colors.textMuted,
     shadowOpacity: 5,
     shadowRadius: 8,
   },
 
   buttonStyle: {
-    backgroundColor: colors._lightBlue,
+    backgroundColor: colors.staticBrightBlue,
     borderRadius: 32,
     width: 224,
   },
 
   completedTitleStyle: {
-    color: colors._lightBlue,
+    color: colors.staticBrightBlue,
     fontSize: 18,
     fontWeight: "bold",
   },
 
   correctAnswerText: {
-    color: colors._green,
+    color: colors.staticSuccess,
     flex: 1,
     fontSize: 16,
   },
@@ -98,7 +98,7 @@ const useStyles = makeStyles(({ colors }) => ({
 
   modalBackground: {
     alignItems: "center",
-    backgroundColor: colors._white,
+    backgroundColor: colors.staticWhite,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     justifyContent: "flex-end",
@@ -117,7 +117,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   quizButtonStyle: {
-    backgroundColor: colors._lightBlue,
+    backgroundColor: colors.staticBrightBlue,
     height: 50,
     width: 50,
     borderRadius: 50,
@@ -126,13 +126,13 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   quizButtonTitleStyle: {
-    color: colors._white,
+    color: colors.staticWhite,
     fontWeight: "bold",
     fontSize: 16,
   },
 
   quizCorrectButtonStyle: {
-    backgroundColor: colors._green,
+    backgroundColor: colors.staticSuccess,
     height: 50,
     width: 50,
     borderRadius: 50,
@@ -156,13 +156,13 @@ const useStyles = makeStyles(({ colors }) => ({
 
   text: {
     fontSize: 24,
-    color: colors._black,
+    color: colors.staticBlack,
   },
 
   answerChoiceText: {
     fontSize: 20,
     flex: 1,
-    color: colors._black,
+    color: colors.staticBlack,
   },
 
   textContainer: {
@@ -171,7 +171,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   textEarn: {
-    color: colors._darkGrey,
+    color: colors.staticDarkGrey,
     fontSize: 16,
     fontWeight: "bold",
   },
@@ -180,11 +180,11 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 32,
     fontWeight: "bold",
     paddingBottom: 12,
-    color: colors._black,
+    color: colors.staticBlack,
   },
 
   titleStyle: {
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 18,
     fontWeight: "bold",
   },
@@ -196,7 +196,7 @@ const useStyles = makeStyles(({ colors }) => ({
 
   modalBodyText: {
     fontSize: 17,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "left",
   },
 
@@ -470,7 +470,7 @@ export const EarnQuiz = ({ route }: Props) => {
   })
 
   return (
-    <Screen backgroundColor={colors._lighterGrey} unsafe>
+    <Screen backgroundColor={colors.staticLighterGrey} unsafe>
       <Modal
         style={{ marginHorizontal: 0, marginBottom: 0, flexGrow: 1 }}
         isVisible={quizVisible}
@@ -490,7 +490,7 @@ export const EarnQuiz = ({ route }: Props) => {
             <GaloyIcon
               name="minus"
               size={72}
-              color={colors._lightGrey}
+              color={colors.staticLightGrey}
               style={{ height: 40, top: -30 }}
             />
           </View>
@@ -533,7 +533,7 @@ export const EarnQuiz = ({ route }: Props) => {
           </View>
         </ScrollView>
       </SafeAreaView>
-      <CloseCross onPress={async () => close()} color={colors._darkGrey} />
+      <CloseCross onPress={async () => close()} color={colors.staticDarkGrey} />
       <SafeAreaView style={styles.bottomContainer}>
         <View style={{ paddingVertical: 12 }}>
           {(completed && (
@@ -575,7 +575,7 @@ export const EarnQuiz = ({ route }: Props) => {
         isVisible={showModal}
         toggleModal={closeModal}
         title={getModalErrorMessages(quizErrorCode as ValidateQuizCodeErrorsType).title}
-        backgroundModalColor={colors.white}
+        backgroundModalColor={colors.backgroundDefault}
         body={
           <View style={styles.modalBody}>
             <Text

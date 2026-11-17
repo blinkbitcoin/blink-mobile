@@ -92,8 +92,9 @@ export const projectToScreen = (
   return { x, y }
 }
 
-// Per-character advance as a fraction of the font size, for the label's 12dp
-// semibold system face.
+// Per-character advance as a fraction of the font size, measured on the 12dp
+// semibold system face the label used to draw. It now draws Source Sans Pro
+// Bold, which sets narrower, so these err wide: the safe direction below.
 //
 // Measuring the real thing means laying every name out off-screen, which costs
 // more than the placement it would inform; three buckets get within a few

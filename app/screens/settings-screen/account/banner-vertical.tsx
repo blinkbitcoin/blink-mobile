@@ -135,10 +135,10 @@ const useStyles = makeStyles(({ colors }) => ({
     rowGap: 1,
   },
   containerStyle: {
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
   },
   titleStyle: {
-    color: colors.primary,
+    color: colors.accent,
     fontWeight: "bold",
     fontSize: 50,
     includeFontPadding: false,

@@ -5,6 +5,7 @@ import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { AmountInput } from "@app/components/amount-input"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
@@ -207,10 +208,10 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   currencyInputContainer: {
     padding: 20,
-    borderRadius: 10,
+    borderRadius: radius.default,
   },
   infoText: {
-    color: colors.grey2,
+    color: colors.textMuted,
     fontSize: 14,
   },
   withdrawalErrorText: {
@@ -234,7 +235,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   button: {
     height: 60,
-    borderRadius: 10,
+    borderRadius: radius.default,
     marginTop: 40,
   },
   contentContainer: {

@@ -76,7 +76,11 @@ const ProgressBar = ({ progress }: ProgressProps) => {
       {/* pass props to style object to remove inline style */}
       {/* eslint-disable react-native/no-inline-styles */}
       <View
-        style={{ width: `${balanceWidth}%`, height: 3, backgroundColor: colors._white }}
+        style={{
+          width: `${balanceWidth}%`,
+          height: 3,
+          backgroundColor: colors.staticWhite,
+        }}
       />
       {/* eslint-enable react-native/no-inline-styles */}
     </View>
@@ -286,13 +290,14 @@ const EarnMapScreenContent: React.FC = () => {
     return (
       <Screen edges={["left", "right"]}>
         <View style={styles.loadingView}>
-          <ActivityIndicator size="large" color={colors._blue} />
+          <ActivityIndicator size="large" color={colors.staticBlue} />
         </View>
       </Screen>
     )
   }
 
-  const backgroundColor = currSection < sectionsData.length ? colors._sky : colors._orange
+  const backgroundColor =
+    currSection < sectionsData.length ? colors.staticPaleBlue : colors.staticBrandOrange
 
   const continueNotRewards = () => {
     setNotRewards(true)
@@ -350,7 +355,7 @@ const EarnMapScreenContent: React.FC = () => {
         isVisible={showModal}
         toggleModal={() => setShowModal(false)}
         title={LL.EarnScreen.customMessages.oneSectionADay.title()}
-        backgroundModalColor={colors.white}
+        backgroundModalColor={colors.backgroundDefault}
         body={
           <View style={styles.modalBody}>
             <Text
@@ -372,7 +377,7 @@ const EarnMapScreenContent: React.FC = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   contentContainer: {
-    backgroundColor: colors._lightBlue,
+    backgroundColor: colors.staticBrightBlue,
     flexGrow: 1,
   },
   bottomContainer: {
@@ -397,7 +402,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: BADGER_WIDTH,
   },
   finishText: {
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 18,
     position: "absolute",
     right: 30,
@@ -413,18 +418,18 @@ const useStyles = makeStyles(({ colors }) => ({
     alignSelf: "center",
   },
   textStyleBox: {
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 16,
     fontWeight: "bold",
     marginHorizontal: 10,
   },
-  progressContainer: { backgroundColor: colors._darkGrey, margin: 10 },
+  progressContainer: { backgroundColor: colors.staticDarkGrey, margin: 10 },
   position: { height: 40 },
   loadingView: { flex: 1, justifyContent: "center", alignItems: "center" },
   fullView: { position: "absolute", width: "100%" },
   modalBodyText: {
     fontSize: 17,
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "left",
   },
   modalBody: {

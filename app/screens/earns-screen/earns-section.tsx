@@ -1,6 +1,7 @@
 import * as React from "react"
 import { useState } from "react"
-import { Dimensions, Text, View, Alert } from "react-native"
+import { Text, useWindowDimensions, View, Alert } from "react-native"
+import { HeaderTitle } from "@react-navigation/elements"
 import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { useSharedValue } from "react-native-reanimated"
@@ -13,7 +14,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useIsFocused, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Button } from "@rn-vui/base"
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import { Colors, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
@@ -24,8 +25,6 @@ import {
   getCardsFromSection,
   getQuizQuestionsContent,
 } from "./helpers"
-
-const { width: screenWidth } = Dimensions.get("window")
 
 export type QuizQuestion = {
   id: string
@@ -54,15 +53,13 @@ export type QuizSectionContent = {
   content: QuizQuestionContent[]
 }
 
-const svgWidth = screenWidth
-
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(({ colors }, { screenWidth }: { screenWidth: number }) => ({
   container: {
     alignItems: "center",
     flex: 1,
   },
   buttonStyleDisabled: {
-    backgroundColor: colors._white,
+    backgroundColor: colors.staticWhite,
     borderRadius: 24,
     marginHorizontal: 60,
     marginVertical: 32,
@@ -79,13 +76,13 @@ const useStyles = makeStyles(({ colors }) => ({
   icon: { paddingRight: 12, paddingTop: 3 },
 
   item: {
-    backgroundColor: colors._lightBlue,
+    backgroundColor: colors.staticBrightBlue,
     borderRadius: 16,
-    width: svgWidth,
+    width: screenWidth,
   },
 
   itemTitle: {
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 20,
     fontWeight: "bold",
     height: 72,
@@ -96,28 +93,28 @@ const useStyles = makeStyles(({ colors }) => ({
   svgContainer: { paddingVertical: 12 },
 
   textButton: {
-    backgroundColor: colors._white,
+    backgroundColor: colors.staticWhite,
     borderRadius: 24,
     marginHorizontal: 60,
     marginVertical: 32,
   },
 
   titleStyle: {
-    color: colors._lightBlue,
+    color: colors.staticBrightBlue,
     fontWeight: "bold",
   },
 
   titleStyleDisabled: {
-    color: colors._lightBlue,
+    color: colors.staticBrightBlue,
   },
 
   titleStyleFulfilled: {
-    color: colors._white,
+    color: colors.staticWhite,
   },
 
   unlock: {
     alignSelf: "center",
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
@@ -125,7 +122,7 @@ const useStyles = makeStyles(({ colors }) => ({
 
   unlockQuestion: {
     alignSelf: "center",
-    color: colors._white,
+    color: colors.staticWhite,
     fontSize: 16,
     paddingTop: 18,
   },
@@ -161,11 +158,29 @@ type Props = {
   route: RouteProp<RootStackParamList, "earnsSection">
 }
 
+// The header sits on the section's fixed blue backdrop, so it never inverts.
+const earnsHeaderTitleStyle = { fontWeight: "bold" as const, fontSize: 18 }
+
+const renderEarnsHeaderTitle = (props: { children: string; tintColor?: string }) => (
+  <HeaderTitle
+    {...props}
+    maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+    style={earnsHeaderTitleStyle}
+  />
+)
+
+export const earnSectionHeaderOptions = (colors: Colors) => ({
+  headerStyle: { backgroundColor: colors.staticBlue },
+  headerTintColor: colors.staticWhite,
+  headerTitle: renderEarnsHeaderTitle,
+})
+
 export const EarnSection = ({ route }: Props) => {
   const {
     theme: { colors },
   } = useTheme()
-  const styles = useStyles()
+  const { width: screenWidth } = useWindowDimensions()
+  const styles = useStyles({ screenWidth })
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "earnsSection">>()
@@ -246,7 +261,7 @@ export const EarnSection = ({ route }: Props) => {
             disabled={!item.enabled}
           >
             <View style={styles.svgContainer}>
-              {SVGs({ name: item.id, width: svgWidth })}
+              {SVGs({ name: item.id, width: screenWidth })}
             </View>
           </TouchableOpacity>
           <View>
@@ -281,7 +296,7 @@ export const EarnSection = ({ route }: Props) => {
                   <GaloyIcon
                     name="check-circle"
                     size={36}
-                    color={colors._white}
+                    color={colors.staticWhite}
                     style={styles.icon}
                   />
                 ) : undefined
@@ -307,7 +322,7 @@ export const EarnSection = ({ route }: Props) => {
   }
 
   return (
-    <Screen backgroundColor={colors._blue} statusBar="light-content">
+    <Screen backgroundColor={colors.staticBlue} statusBar="light-content">
       <View style={styles.container}>
         <Carousel
           data={cards}

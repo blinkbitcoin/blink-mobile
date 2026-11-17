@@ -3,8 +3,11 @@ import { View, StyleProp, ViewStyle, TextStyle } from "react-native"
 
 import { makeStyles, useTheme, Text, Divider } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { DisabledFeature } from "@app/components/disabled-feature"
+import { cappedLineHeight } from "@app/rne-theme/text-scaling"
 import { testProps } from "@app/utils/testProps"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 type SettingsGroupProps = {
   name?: string
@@ -37,7 +40,7 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
   return (
     <View>
       {name && (
-        <Text {...testProps(name + "-group")} type="p2" style={titleStyle}>
+        <Text {...testProps(name + "-group")} style={[styles.title, titleStyle]}>
           {name}
         </Text>
       )}
@@ -53,7 +56,10 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
               <View key={index}>
                 <Element />
                 {hasDividerBelow && (
-                  <Divider color={colors.grey4} style={[styles.divider, dividerStyle]} />
+                  <Divider
+                    color={colors.neutral}
+                    style={[styles.divider, dividerStyle]}
+                  />
                 )}
               </View>
             )
@@ -65,10 +71,17 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  // Figma section title: Paragraph 14/20. Set here because the caller's titleStyle
+  // used to replace the theme's text style whenever it was undefined.
+  title: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    lineHeight: cappedLineHeight(20),
+  },
   groupCard: {
-    marginTop: 5,
-    backgroundColor: colors.grey5,
-    borderRadius: 12,
+    marginTop: groupTitleGap,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     overflow: "hidden",
   },
   divider: {

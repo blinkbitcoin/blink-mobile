@@ -3,18 +3,20 @@ import { StyleProp, TextInput, TextStyle, View } from "react-native"
 
 import { Input, InputProps, Text, makeStyles, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
+
 const useStyles = makeStyles(
   ({ colors }, { props, isFocused }: { props: GaloyInputProps; isFocused: boolean }) => ({
     ContainerStyle: {
       paddingBottom: 3,
       paddingTop: 3,
       marginLeft: 0,
-      borderRadius: 10,
-      backgroundColor: colors.primary4,
+      borderRadius: radius.default,
+      backgroundColor: colors.accent,
     },
     inputContainerFocused: {
-      borderColor: colors.primary,
-      backgroundColor: colors.white,
+      borderColor: colors.accent,
+      backgroundColor: colors.backgroundDefault,
       marginLeft: -7,
       marginRight: -7,
     },
@@ -24,11 +26,11 @@ const useStyles = makeStyles(
     labelComponentStyles: {
       marginBottom: 9,
       fontWeight: "400",
-      color: colors.grey5,
+      color: colors.surfaceInteractive,
       marginLeft: isFocused ? 2 : 10,
     },
     errorMessageStyles: {
-      color: props.caption ? colors.grey5 : colors.error,
+      color: props.caption ? colors.surfaceInteractive : colors.error,
       textTransform: "capitalize",
       marginTop: 9,
       marginLeft: isFocused ? 2 : 10,
@@ -75,7 +77,7 @@ const GaloyInputFunctions = (
           remainingProps.errorMessage ? styles.errorStateStyle : null,
           isFocused ? styles.inputContainerFocused : null,
         ]}
-        placeholderTextColor={colors.grey4}
+        placeholderTextColor={colors.textPlaceholder}
         onFocus={(e) => {
           setIsFocused(true)
           remainingProps.onFocus?.(e)

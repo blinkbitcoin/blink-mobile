@@ -22,7 +22,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 jest.mock("@rn-vui/themed", () => {
-  const colors = { warning: "#f80", _black: "#000", black: "#000" }
+  const colors = { warning: "#f80", staticBlack: "#000", textOnBackground: "#000" }
   return {
     makeStyles:
       (fn: (theme: { colors: Record<string, string> }) => Record<string, object>) => () =>

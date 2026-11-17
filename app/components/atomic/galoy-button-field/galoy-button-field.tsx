@@ -5,6 +5,8 @@ import { useTheme, Text, makeStyles } from "@rn-vui/themed"
 
 import { GaloyIcon } from "../galoy-icon"
 
+import { radius } from "@app/rne-theme/radius"
+
 export type GaloyButtonFieldProps = {
   placeholder?: string
   value?: string
@@ -37,30 +39,31 @@ export const GaloyButtonField = ({
     switch (true) {
       case error:
         colorStyles = {
-          backgroundColor: colors.error9,
+          backgroundColor: colors.errorBackground,
         }
         break
+      // A tappable field: the accent stays on the icon, so the fill must not be accent
       case pressed:
         colorStyles = {
-          backgroundColor: colors.primary4,
+          backgroundColor: colors.surfacePressed,
         }
         break
       case disabled:
         colorStyles = {
           opacity: 0.3,
-          backgroundColor: colors.primary5,
+          backgroundColor: colors.surfaceInteractive,
         }
         break
       default:
         colorStyles = {
-          backgroundColor: colors.primary5,
+          backgroundColor: colors.surfaceInteractive,
         }
     }
 
     const sizeStyles = {
       paddingVertical: 8,
       paddingHorizontal: 12,
-      borderRadius: 8,
+      borderRadius: radius.default,
       minHeight: secondaryValue ? 60 : 40,
     }
 
@@ -91,7 +94,7 @@ export const GaloyButtonField = ({
             style={styles.iconStyle}
             name={iconName}
             size={20}
-            color={error ? colors.error : colors.primary}
+            color={error ? colors.error : colors.accent}
           />
         )}
       </View>

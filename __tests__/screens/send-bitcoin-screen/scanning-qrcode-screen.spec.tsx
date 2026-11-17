@@ -1,5 +1,6 @@
 import React from "react"
 import { Alert } from "react-native"
+import type { ReactTestInstance } from "react-test-renderer"
 import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import {
   act,
@@ -99,6 +100,11 @@ jest.mock("react-native-image-picker", () => ({
 }))
 
 const mockToastShow = jest.fn()
+jest.mock("react-native-safe-area-context", () => ({
+  ...jest.requireActual("react-native-safe-area-context"),
+  useSafeAreaInsets: () => ({ top: 24, bottom: 48, left: 0, right: 0 }),
+}))
+
 jest.mock("@app/utils/toast", () => ({
   ...jest.requireActual("@app/utils/toast"),
   toastShow: (...args: unknown[]) => mockToastShow(...args),
@@ -389,6 +395,113 @@ describe("ScanningQRCodeScreen", () => {
     await fireScan("lnbc1second")
 
     expect(mockResolveDestination).toHaveBeenCalledTimes(2)
+  })
+
+  /**
+   * The controls used to sit at fixed offsets from the window edge. From Android 15 the
+   * window runs under the system bars, so those offsets put the gallery and clipboard
+   * buttons behind the navigation bar and the close button behind the status bar.
+   */
+  describe("clearing the system bars", () => {
+    const flattenedStyle = (node: { props: { style?: unknown } }) =>
+      Object.assign({}, ...[node.props.style].flat(Infinity).filter(Boolean)) as Record<
+        string,
+        number | undefined
+      >
+
+    const styleOfAncestorWith = (node: ReactTestInstance | null, key: string) => {
+      let current = node
+      while (current) {
+        const style = flattenedStyle(current)
+        if (style[key] !== undefined) return style
+        current = current.parent
+      }
+      throw new Error(`no ancestor carries a ${key} style`)
+    }
+
+    it("offsets the bottom controls by the bottom inset", async () => {
+      const screen = await renderScreen()
+      const gallery = screen.getByTestId("open-gallery")
+
+      expect(styleOfAncestorWith(gallery, "bottom").bottom).toBe(48 + 24)
+    })
+
+    it("offsets the close button by the top inset", async () => {
+      const screen = await renderScreen()
+      const closeIcon = screen.UNSAFE_getAllByProps({ name: "close" })[0]
+      const closeContainer = closeIcon.parent?.parent
+
+      expect(flattenedStyle(closeContainer as never).marginTop).toBe(24 + 16)
+    })
+  })
+
+  /**
+   * A merchant till code resolves through an LNURL service, and that service failing
+   * says nothing about the code. Reporting it as an invalid QR sent a shopper, and the
+   * ticket they filed, after a parser bug that was not there.
+   */
+  it("tells the user the code could not be processed when the lnurl service fails", async () => {
+    mockResolveDestination.mockResolvedValue({
+      valid: false,
+      invalidReason: "LnurlServiceError",
+      invalidPaymentDestination: { paymentType: "lnurl" },
+    })
+
+    await renderScreen()
+    await fireScan("https://za.wigroup.co/bill/172366037")
+
+    await waitFor(() =>
+      expect(alertSpy).toHaveBeenCalledWith(
+        "Code Not Available",
+        expect.stringContaining("We could not process this code"),
+        expect.anything(),
+      ),
+    )
+    expect(alertSpy).not.toHaveBeenCalledWith(
+      "Invalid QR Code",
+      expect.anything(),
+      expect.anything(),
+    )
+  })
+
+  it("keeps scanning alive after the code could not be processed", async () => {
+    mockResolveDestination.mockResolvedValue({
+      valid: false,
+      invalidReason: "LnurlServiceError",
+      invalidPaymentDestination: { paymentType: "lnurl" },
+    })
+
+    await renderScreen()
+    await fireScan("https://za.wigroup.co/bill/172366037")
+
+    await waitFor(() => expect(alertSpy).toHaveBeenCalled())
+    const [, , buttons] = alertSpy.mock.calls[0]
+    await act(async () => {
+      buttons?.[0].onPress?.()
+    })
+
+    await fireScan("https://za.wigroup.co/bill/172366038")
+
+    expect(mockResolveDestination).toHaveBeenCalledTimes(2)
+  })
+
+  it("still reports an unknown non-url destination as an invalid QR", async () => {
+    mockResolveDestination.mockResolvedValue({
+      valid: false,
+      invalidReason: "UnknownDestination",
+      invalidPaymentDestination: { paymentType: "unknown" },
+    })
+
+    await renderScreen()
+    await fireScan("not-a-destination")
+
+    await waitFor(() =>
+      expect(alertSpy).toHaveBeenCalledWith(
+        "Invalid QR Code",
+        expect.stringContaining("not a valid Bitcoin address"),
+        expect.anything(),
+      ),
+    )
   })
 
   describe("picking a QR from the gallery", () => {

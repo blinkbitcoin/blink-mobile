@@ -35,7 +35,7 @@ export const BackupPhraseSecurityChecks: React.FC<Props> = ({ onContinue }) => {
         <View style={styles.content}>
           <IconHero
             icon="eye-slash"
-            iconColor={colors.primary}
+            iconColor={colors.accent}
             title={LL.BackupScreen.ManualBackup.Alerts.title()}
           />
           <RevealedCheckboxList

@@ -1,39 +1,72 @@
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
+
+import type { PinFailureState } from "@app/utils/storage/secureStorage"
 
 import { clampLockedUntil, remainingLockoutMs } from "./pin-lockout"
+
+const MS_PER_SECOND = 1000
 
 /**
  * Well under a second, so the keypad comes back just after the lock truly
  * lifts. A one-second tick would leave it dead for up to a second too long,
- * and rounding the other way would lift it early — which on a lockout is the
+ * and rounding the other way would lift it early, which on a lockout is the
  * side that matters.
  */
 const TICK_MS = 250
 
+/** Ceiled, so the last partial second still reads "1" and not "0", and the lock
+ *  never rounds in the user's favour: it reads zero only once nothing is left. */
+const secondsLeft = (lock: PinFailureState, now: number): number =>
+  Math.ceil(remainingLockoutMs(lock, now) / MS_PER_SECOND)
+
 type LockoutCountdown = {
-  /** Millisecond-precise, so the lock never rounds in the user's favour. */
-  readonly remainingMs: number
-  /** Ceiled, so the last partial second still reads "1" and not "0". */
   readonly remainingSeconds: number
   readonly isLocked: boolean
+  /** Counts this lock again from the clock as it reads now. For a caller that
+   *  learns the lock is still in force after this countdown ran out. It is handed
+   *  the lock rather than reading the one this render holds, which is a render
+   *  behind the state the caller is setting beside the call. */
+  readonly resync: (lock: PinFailureState) => void
 }
 
 /**
- * Counts a lock down to zero. `lockedUntil` is epoch ms, 0 meaning no lock.
+ * Counts a lock down to zero. `lockedUntil` is epoch ms, 0 meaning no lock, and
+ * `attempts` is the failure count the lock was started for, which is what
+ * bounds it.
  *
- * Takes a number rather than a Date so callers need no memoisation, and stops
- * its own interval once the lock elapses.
+ * Follows the two numbers in the state rather than the object, so callers need
+ * no memoisation, and stops its own interval once the lock elapses. It holds
+ * whole seconds, so the screen renders once a second and not once a tick.
  */
 export const useLockoutCountdown = (
-  lockedUntil: number,
-  onLockedUntilRepaired?: (now: number) => void,
+  { attempts, lockedUntil }: PinFailureState,
+  onLockedUntilRepaired: (now: number) => void,
 ): LockoutCountdown => {
   const onLockedUntilRepairedRef = useRef(onLockedUntilRepaired)
   onLockedUntilRepairedRef.current = onLockedUntilRepaired
 
-  const [remainingMs, setRemainingMs] = useState(() =>
-    remainingLockoutMs(lockedUntil, Date.now()),
+  const [countedLock, setCountedLock] = useState({ attempts, lockedUntil })
+  const [remainingSeconds, setRemainingSeconds] = useState(() =>
+    secondsLeft({ attempts, lockedUntil }, Date.now()),
   )
+  const [resyncs, setResyncs] = useState(0)
+
+  /** A lock that arrives with a render is counted in that same render. Left to
+   *  the effect below, one frame would be committed still reporting the lock
+   *  before it, and a keypad reading that frame is live for as long as it is on
+   *  screen. Setting state while rendering makes React render again before it
+   *  commits anything.
+   *
+   *  Compared with Object.is, so a number that is not one still equals itself:
+   *  with `!==` it never would, and this would render without end. */
+  const isSameLock =
+    Object.is(countedLock.attempts, attempts) &&
+    Object.is(countedLock.lockedUntil, lockedUntil)
+  const isNewLock = !isSameLock
+  if (isNewLock) {
+    setCountedLock({ attempts, lockedUntil })
+    setRemainingSeconds(secondsLeft({ attempts, lockedUntil }, Date.now()))
+  }
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | undefined
@@ -41,31 +74,42 @@ export const useLockoutCountdown = (
 
     const tick = () => {
       const now = Date.now()
-      const repairedLockedUntil = clampLockedUntil(effectiveLockedUntil, now)
+      const repairedLockedUntil = clampLockedUntil(
+        { attempts, lockedUntil: effectiveLockedUntil },
+        now,
+      )
       if (repairedLockedUntil !== effectiveLockedUntil) {
         effectiveLockedUntil = repairedLockedUntil
-        onLockedUntilRepairedRef.current?.(now)
+        onLockedUntilRepairedRef.current(now)
       }
-      const remaining = remainingLockoutMs(effectiveLockedUntil, now)
-      setRemainingMs(remaining)
-      if (remaining <= 0 && interval) clearInterval(interval)
+      const seconds = secondsLeft({ attempts, lockedUntil: effectiveLockedUntil }, now)
+      setRemainingSeconds(seconds)
+      if (seconds <= 0 && interval) clearInterval(interval)
     }
 
-    // Resync immediately, so a fresh lock never renders a stale value first.
+    // Once at once, so a clock that moved since the render is caught without
+    // waiting a tick for it.
     tick()
 
-    if (remainingLockoutMs(effectiveLockedUntil, Date.now()) > 0) {
+    const isStillLocked =
+      secondsLeft({ attempts, lockedUntil: effectiveLockedUntil }, Date.now()) > 0
+    if (isStillLocked) {
       interval = setInterval(tick, TICK_MS)
     }
 
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [lockedUntil])
+  }, [attempts, lockedUntil, resyncs])
+
+  const resync = useCallback((lock: PinFailureState) => {
+    setRemainingSeconds(secondsLeft(lock, Date.now()))
+    setResyncs((count) => count + 1)
+  }, [])
 
   return {
-    remainingMs,
-    remainingSeconds: Math.ceil(remainingMs / 1000),
-    isLocked: remainingMs > 0,
+    remainingSeconds,
+    isLocked: remainingSeconds > 0,
+    resync,
   }
 }

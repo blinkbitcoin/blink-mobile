@@ -250,6 +250,30 @@ describe("lnurl payment details", () => {
     expect(newPaymentDetails.unitOfAccountAmount).toEqual(unitOfAccountAmount)
   })
 
+  describe("comment", () => {
+    const paramsWithDescription = {
+      ...defaultParamsWithoutInvoice,
+      destinationSpecifiedMemo: "Pay to user@blink.sv",
+    }
+
+    it("sends no comment while the note shows the destination description", () => {
+      const paymentDetails = createLnurlPaymentDetails(paramsWithDescription)
+
+      expect(paymentDetails.memo).toBe("Pay to user@blink.sv")
+      expect(paymentDetails).toMatchObject({ comment: undefined })
+    })
+
+    it("sends the note the user typed as the comment", () => {
+      const paymentDetails = createLnurlPaymentDetails(paramsWithDescription)
+      if (!paymentDetails.canSetMemo) throw new Error("Memo is unable to be set")
+
+      expect(paymentDetails.setMemo("dinner")).toMatchObject({
+        memo: "dinner",
+        comment: "dinner",
+      })
+    })
+  })
+
   it("can set sending wallet descriptor", () => {
     const paymentDetails = createLnurlPaymentDetails(defaultParamsWithoutInvoice)
     const sendingWalletDescriptor = {

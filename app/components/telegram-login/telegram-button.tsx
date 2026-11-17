@@ -1,5 +1,6 @@
 import React, { FC, PropsWithChildren } from "react"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
 import { TouchableHighlight } from "@app/utils/touchable-wrapper"
@@ -39,17 +40,17 @@ const useStyles = makeStyles(({ colors }) => ({
   buttonStyle: {
     minHeight: 50,
     backgroundColor: "#229ED9",
-    borderRadius: 8,
+    borderRadius: radius.default,
     paddingHorizontal: 16,
   },
   titleStyle: {
     fontSize: 20,
     lineHeight: 24,
-    fontWeight: "600",
-    color: colors.white,
+    fontWeight: "700",
+    color: colors.backgroundDefault,
   },
   disabledTitleStyle: {
-    color: colors.grey3,
+    color: colors.textDisabled,
   },
   disabledStyle: {
     opacity: 1,

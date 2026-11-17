@@ -69,7 +69,7 @@ export const PriceHistory = () => {
   function ToolTip({ x, y }: { x: SharedValue<number>; y: SharedValue<number> }) {
     return (
       <>
-        <Circle cx={x} cy={y} r={8} color={colors.primary} />
+        <Circle cx={x} cy={y} r={8} color={colors.accent} />
       </>
     )
   }
@@ -100,7 +100,7 @@ export const PriceHistory = () => {
     currentPriceData && startPriceData
       ? (currentPriceData - startPriceData) / startPriceData
       : 0
-  const color = delta > 0 ? { color: colors._green } : { color: colors.red }
+  const color = delta > 0 ? { color: colors.success } : { color: colors.error }
 
   const activePrice = useDerivedValue(() => {
     const price = isActive
@@ -148,7 +148,7 @@ export const PriceHistory = () => {
       <View {...testProps(LL.PriceHistoryScreen.satPrice())} style={styles.textView}>
         <AnimatedText
           text={activePrice}
-          style={[styles.priceText, { color: colors.black }]}
+          style={[styles.priceText, { color: colors.textOnBackground }]}
         />
         <View style={styles.subtextContainer}>
           {!isActive && !loading ? (
@@ -161,7 +161,7 @@ export const PriceHistory = () => {
           ) : (
             <AnimatedText
               text={activeTimestamp}
-              style={[styles.subtext, { color: colors.black }]}
+              style={[styles.subtext, { color: colors.textOnBackground }]}
             />
           )}
         </View>
@@ -175,7 +175,7 @@ export const PriceHistory = () => {
               <>
                 <Line
                   points={points.y}
-                  color={colors.primary}
+                  color={colors.accent}
                   strokeWidth={2}
                   curveType="natural"
                 />
@@ -190,7 +190,7 @@ export const PriceHistory = () => {
           </CartesianChart>
         ) : (
           <View style={styles.verticalAlignment}>
-            <ActivityIndicator animating size="large" color={colors.primary} />
+            <ActivityIndicator animating size="large" color={colors.accent} />
           </View>
         )}
       </View>
@@ -297,7 +297,7 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 24,
   },
   buttonStyleTimeActive: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     borderRadius: 40,
     width: 48,
     height: 48,
@@ -322,7 +322,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: 16,
   },
   titleStyleTime: {
-    color: colors.grey3,
+    color: colors.textDisabled,
   },
   screen: {
     paddingVertical: 16,

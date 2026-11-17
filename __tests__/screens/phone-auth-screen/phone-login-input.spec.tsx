@@ -1,7 +1,7 @@
 import React from "react"
 import { StyleProp, StyleSheet, ViewStyle } from "react-native"
 import { Input } from "@rn-vui/themed"
-import { render } from "@testing-library/react-native"
+import { fireEvent, render } from "@testing-library/react-native"
 import type { RouteProp } from "@react-navigation/native"
 
 import { PhoneCodeChannelType } from "@app/graphql/generated"
@@ -13,6 +13,7 @@ import {
   type UseRequestPhoneCodeReturn,
 } from "@app/screens/phone-auth-screen/request-phone-code-login"
 
+import { expectFocusFill, renderedBox } from "../../helpers/field-fill"
 import { flushEffects } from "../../helpers/flush-effects"
 import { ContextForScreen } from "../helper"
 
@@ -134,5 +135,17 @@ describe("PhoneLoginInitiateScreen", () => {
     expect(button.minWidth).toBe(110)
     expect(button.width).toBeUndefined()
     expect(button.flexBasis).toBeUndefined()
+  })
+
+  it("fills the number field and the country button alike, darker while the field has focus", async () => {
+    const { getByTestId } = await renderScreen()
+    const field = getByTestId("telephoneNumber")
+
+    expectFocusFill({
+      startsFocused: true,
+      surfaces: () => [renderedBox(field), countryButtonStyle()],
+      focus: () => fireEvent(field, "focus"),
+      blur: () => fireEvent(field, "blur"),
+    })
   })
 })

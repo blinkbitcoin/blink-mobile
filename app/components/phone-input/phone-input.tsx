@@ -7,6 +7,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react"
 import { View, StyleProp, ViewStyle } from "react-native"
 import { CountryCode } from "react-native-country-picker-modal"
 import { Input, makeStyles } from "@rn-vui/themed"
+import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
 import useDeviceLocation from "@app/hooks/use-device-location"
 import { useSupportedCountriesQuery } from "@app/graphql/generated"
@@ -179,8 +180,8 @@ const useStyles = makeStyles(({ colors }, props: { bgColor?: string }) => ({
     minHeight: 60,
   },
   countryPickerButtonStyle: {
-    backgroundColor: props.bgColor || colors.grey5,
-    borderRadius: 8,
+    backgroundColor: props.bgColor || colors.surfaceInteractive,
+    borderRadius: radius.default,
     paddingHorizontal: 15,
     flexDirection: "row",
     justifyContent: "center",
@@ -197,8 +198,8 @@ const useStyles = makeStyles(({ colors }, props: { bgColor?: string }) => ({
     borderWidth: 1,
     borderColor: colors.transparent,
     paddingHorizontal: 10,
-    backgroundColor: props.bgColor || colors.grey5,
-    borderRadius: 8,
+    backgroundColor: props.bgColor || colors.surfaceInteractive,
+    borderRadius: radius.default,
   },
   /** The paste control shares the row with the number, and the field only clips at its own
    *  edge: without a gap the two read as one string once the OS text size grows the number

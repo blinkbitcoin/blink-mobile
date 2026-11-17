@@ -2,9 +2,11 @@ import React from "react"
 import { View } from "react-native"
 import { Text, makeStyles } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import type { CardTransactionGroup } from "./types"
 import { CardTransactionItem } from "./card-transaction-item"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 type CardTransactionsSectionProps = {
   groups: CardTransactionGroup[]
@@ -66,24 +68,24 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   header: {
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
     marginBottom: 8,
   },
   emptyText: {
     textAlign: "center",
-    color: colors.grey2,
+    color: colors.textMuted,
     marginTop: 40,
   },
   groupContainer: {
     marginBottom: 16,
   },
   dateLabel: {
-    color: colors.grey1,
-    marginBottom: 8,
+    color: colors.textSecondary,
+    marginBottom: groupTitleGap,
   },
   transactionsList: {
-    backgroundColor: colors.grey4,
-    borderRadius: 8,
+    backgroundColor: colors.neutral,
+    borderRadius: radius.default,
     overflow: "hidden",
     rowGap: 1,
   },

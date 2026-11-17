@@ -4,6 +4,7 @@ import { PanGestureHandler } from "react-native-gesture-handler"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 
 import { gql } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
@@ -11,7 +12,6 @@ import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeho
 import { PaymentDestinationDisplay } from "@app/components/payment-destination-display"
 import { Screen } from "@app/components/screen"
 import { WarningBanner } from "@app/components/warning-banner"
-import { HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config"
 import { Transaction, WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { isIdempotencyConflict } from "@app/graphql/is-idempotency-conflict"
@@ -50,6 +50,8 @@ import {
 } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
 import { ellipsizeMiddle } from "@app/utils/helper"
+import { staticSurface } from "@app/rne-theme/surfaces"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 gql`
   query sendBitcoinConfirmationScreen {
@@ -413,7 +415,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     })
     if (!validAmount) {
       invalidAmountErrorMessage = LL.SendBitcoinScreen.amountExceed({
-        balance: hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : btcPrimaryText,
+        balance: btcPrimaryText,
       })
     }
   }
@@ -429,7 +431,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     })
     if (!validAmount) {
       invalidAmountErrorMessage = LL.SendBitcoinScreen.amountExceed({
-        balance: hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : usdPrimaryText,
+        balance: usdPrimaryText,
       })
     }
   }
@@ -496,13 +498,13 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               onPress={handleCopyToClipboard}
               hitSlop={30}
             >
-              <GaloyIcon name={"copy-paste"} size={18} color={colors.primary} />
+              <GaloyIcon name={"copy-paste"} size={18} color={colors.accent} />
             </TouchableOpacity>
           </View>
         </View>
         <View style={styles.fieldContainer}>
           <Text style={styles.fieldTitleText}>{LL.common.from()}</Text>
-          <View style={styles.fieldBackground}>
+          <View style={[styles.fieldBackground, styles.fieldBackgroundStatic]}>
             <View style={styles.walletSelectorTypeContainer}>
               <CurrencyPill
                 currency={sendingWalletDescriptor.currency}
@@ -511,32 +513,40 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 onLayout={onPillLayout(sendingWalletDescriptor.currency)}
               />
             </View>
-            <View style={styles.walletSelectorInfoContainer}>
-              <View style={styles.walletSelectorTypeTextContainer}>
-                {hideAmount ? (
-                  <HiddenBalancePlaceholder size="small" />
-                ) : sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
-                  <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
-                ) : (
-                  <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
-                )}
-              </View>
-              {!hideAmount && (
-                <View style={styles.walletSelectorBalanceContainer}>
-                  {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
-                    <Text>{btcSecondaryText}</Text>
-                  ) : (
-                    <Text>{usdSecondaryText}</Text>
-                  )}
-                </View>
+            <View
+              style={
+                hideAmount
+                  ? styles.walletSelectorInfoContainerHidden
+                  : styles.walletSelectorInfoContainer
+              }
+            >
+              {hideAmount ? (
+                <HiddenBalancePlaceholder size="small" />
+              ) : (
+                <>
+                  <View style={styles.walletSelectorTypeTextContainer}>
+                    {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
+                      <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
+                    ) : (
+                      <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
+                    )}
+                  </View>
+                  <View style={styles.walletSelectorBalanceContainer}>
+                    {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
+                      <Text>{btcSecondaryText}</Text>
+                    ) : (
+                      <Text>{usdSecondaryText}</Text>
+                    )}
+                  </View>
+                  <View />
+                </>
               )}
-              <View />
             </View>
           </View>
         </View>
         <View style={styles.fieldContainer}>
           <Text style={styles.fieldTitleText}>{LL.SendBitcoinScreen.amount()}</Text>
-          <View style={styles.fieldBackground}>
+          <View style={[styles.fieldBackground, styles.fieldBackgroundStatic]}>
             <Text type="p2">
               {formatDisplayAndWalletAmount({
                 primaryAmount: unitOfAccountAmount,
@@ -549,7 +559,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         {note ? (
           <View style={styles.fieldContainer}>
             <Text style={styles.fieldTitleText}>{LL.SendBitcoinScreen.note()}</Text>
-            <View style={styles.fieldBackground}>
+            <View style={[styles.fieldBackground, styles.fieldBackgroundStatic]}>
               <Text type="p2" style={styles.noteText}>
                 {note}
               </Text>
@@ -566,6 +576,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           <View
             style={[
               styles.fieldBackground,
+              styles.fieldBackgroundStatic,
               isLightningRecommended() ? styles.warningOutline : undefined,
             ]}
           >
@@ -647,19 +658,21 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     borderStyle: "solid",
     overflow: "hidden",
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     padding: 14,
     minHeight: 60,
-    borderRadius: 10,
+    borderRadius: radius.default,
     alignItems: "center",
   },
+  fieldBackgroundStatic: staticSurface(colors),
   warningOutline: {
     borderColor: colors.warning,
     borderWidth: 2,
   },
   fieldTitleText: {
+    color: colors.textSecondary,
     fontWeight: "bold",
-    marginBottom: 4,
+    marginBottom: groupTitleGap,
   },
   walletSelectorTypeContainer: {
     justifyContent: "center",
@@ -669,6 +682,13 @@ const useStyles = makeStyles(({ colors }) => ({
   walletSelectorInfoContainer: {
     flex: 1,
     flexDirection: "column",
+  },
+  // The placeholder is a single 12pt row, so it cannot reuse the two-line
+  // layout above: walletSelectorTypeTextContainer is flex-end, which pins a
+  // lone child to the bottom of the column and drops it below the pill.
+  walletSelectorInfoContainerHidden: {
+    flex: 1,
+    justifyContent: "center",
   },
   walletSelectorTypeTextContainer: {
     flex: 1,

@@ -88,6 +88,18 @@ describe("headerBackControl", () => {
     await waitFor(() => expect(mockGoBack).toHaveBeenCalledTimes(1))
   })
 
+  it("runs the screen's own way out, instead of going back, when it hands one", async () => {
+    const onPress = jest.fn()
+    const { getByLabelText } = renderHeaderLeft(
+      headerBackControl({ onPress })(headerProps),
+    )
+
+    fireEvent.press(getByLabelText(BACK_BUTTON_LABEL))
+
+    await waitFor(() => expect(onPress).toHaveBeenCalledTimes(1))
+    expect(mockGoBack).not.toHaveBeenCalled()
+  })
+
   /* The crash #4176 fixed: the KYC webview (webview.tsx) and the account-delete flow
    * (delete.tsx) both hand `setOptions` a headerLeft that calls no hooks, so whatever this
    * control puts there first must not call any either. */
@@ -149,6 +161,24 @@ describe("headerBackControl", () => {
     expect(queryByLabelText(BACK_BUTTON_LABEL)).toBeNull()
   })
 
+  /** The query above passes on either platform's prop alone, so it can't tell that one is
+   *  missing. Each screen reader reads only its own, so each is asserted by name. */
+  it("hides the placeholder from VoiceOver and from TalkBack, each by its own prop", () => {
+    const { getByLabelText } = renderHeaderLeft(
+      headerBackControl({ canGoBack: false })(headerProps),
+    )
+
+    let placeholder = getByLabelText(BACK_BUTTON_LABEL, { includeHiddenElements: true })
+    while (placeholder.props.pointerEvents !== "none" && placeholder.parent) {
+      placeholder = placeholder.parent
+    }
+
+    expect(placeholder.props).toMatchObject({
+      accessibilityElementsHidden: true,
+      importantForAccessibility: "no-hide-descendants",
+    })
+  })
+
   /* Both cases assert the correction this component owns, not the final on-screen
    * position: HeaderBackButton's own platform styles are frozen when its module loads,
    * so they stay on the iOS branch whatever this test does to Platform. */
@@ -165,8 +195,33 @@ describe("headerBackControl", () => {
 
     const { getByLabelText } = renderHeaderLeft(headerBackControl()(headerProps))
 
+    // -10 for the native inset only: the touch box below grows right, never by a
+    // negative margin, and the title follows it with no margin of its own.
     expect(backButtonStyle(getByLabelText(BACK_BUTTON_LABEL))).toMatchObject({
       marginLeft: -10,
+      marginRight: 0,
     })
+  })
+
+  /** The Android press is a borderless 40dp ripple clipped to the button's box. In the
+   *  default ~30dp box it showed as a rounded square; the 48dp header touch box shows
+   *  the whole circle. */
+  it("gives the Android button the header touch box, which the press ripple fits in", () => {
+    Object.defineProperty(Platform, "OS", { configurable: true, value: "android" })
+
+    const { getByLabelText } = renderHeaderLeft(headerBackControl()(headerProps))
+
+    expect(backButtonStyle(getByLabelText(BACK_BUTTON_LABEL))).toMatchObject({
+      width: 48,
+      height: 48,
+    })
+  })
+
+  it("leaves the iOS button its own size, where the press is a fade, not a ripple", () => {
+    const { getByLabelText } = renderHeaderLeft(headerBackControl()(headerProps))
+
+    const style = backButtonStyle(getByLabelText(BACK_BUTTON_LABEL))
+    expect(style.width).toBeUndefined()
+    expect(style.height).toBeUndefined()
   })
 })

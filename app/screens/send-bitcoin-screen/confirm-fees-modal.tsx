@@ -1,6 +1,7 @@
 import React from "react"
 import { View } from "react-native"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -28,7 +29,7 @@ export const ConfirmFeesModal: React.FC<ConfirmFeesModalProps> = ({
       isVisible={isVisible}
       toggleModal={cancel}
       title={LL.SendBitcoinScreen.confirmFeesModal.title()}
-      image={<GaloyIcon name="info" size={80} color={colors.primary3} />}
+      image={<GaloyIcon name="info" size={80} color={colors.accent} />}
       body={
         <View style={styles.body}>
           <Text type={"p2"} style={styles.warningText}>
@@ -46,8 +47,8 @@ export const ConfirmFeesModal: React.FC<ConfirmFeesModalProps> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   modalCard: {
-    backgroundColor: colors.white,
-    borderRadius: 16,
+    backgroundColor: colors.backgroundDefault,
+    borderRadius: radius.popup,
     padding: 18,
   },
   warningText: {

@@ -10,6 +10,11 @@ type IconHeroProps = {
   iconColor: string
   title: string
   subtitle?: React.ReactNode
+  /**
+   * Caps the title, for a screen whose title is one unbreakable thing — a lightning
+   * address — rather than a sentence. Left open otherwise, so a heading still wraps.
+   */
+  titleLines?: number
 }
 
 export const IconHero: React.FC<IconHeroProps> = ({
@@ -17,6 +22,7 @@ export const IconHero: React.FC<IconHeroProps> = ({
   iconColor,
   title,
   subtitle,
+  titleLines,
 }) => {
   const styles = useStyles()
 
@@ -30,7 +36,9 @@ export const IconHero: React.FC<IconHeroProps> = ({
         <GaloyIcon name={icon} size={34} color={iconColor} />
       </View>
       <View style={styles.textContainer}>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title} numberOfLines={titleLines} ellipsizeMode="middle">
+          {title}
+        </Text>
         {hasVisibleTextSubtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
         {isPlainTextSubtitle ? null : subtitle}
       </View>
@@ -49,11 +57,12 @@ const useStyles = makeStyles(({ colors }) => ({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     alignItems: "center",
     justifyContent: "center",
   },
   textContainer: {
+    alignSelf: "stretch",
     alignItems: "center",
     gap: 8,
   },
@@ -62,6 +71,7 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 24,
     fontWeight: "700",
     textAlign: "center",
+    width: "100%",
   },
   subtitle: {
     fontSize: 16,

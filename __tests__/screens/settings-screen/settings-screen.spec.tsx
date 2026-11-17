@@ -8,6 +8,18 @@ jest.mock("@app/self-custodial/hooks/use-backup-nudge-state", () => ({
   }),
 }))
 
+const mockTwoFactorEnforcement = {
+  tier: 0,
+  hasAuthenticator: false,
+  shouldShowNudgeCard: false,
+  shouldShowSettingsBanner: false,
+  markPromptShown: jest.fn(),
+  dismissNudgeCard: jest.fn(),
+}
+jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
+  useTwoFactorEnforcement: () => mockTwoFactorEnforcement,
+}))
+
 const mockUseIsAuthed = jest.fn(() => true)
 jest.mock("@app/graphql/is-authed-context", () => ({
   ...jest.requireActual("@app/graphql/is-authed-context"),
@@ -180,6 +192,9 @@ jest.mock("@react-navigation/native", () => ({
         }
       }
     },
+    /** The email row's re-verification watches the screen's focus. */
+    isFocused: () => true,
+    addListener: () => () => {},
   }),
   useIsFocused: () => true,
 }))
@@ -692,9 +707,10 @@ describe("Settings Screen", () => {
     expect(screen.getByTestId("Advanced-group")).toBeTruthy()
     expect(screen.getByText("Export all transactions")).toBeTruthy()
     expect(screen.getByText("API integration")).toBeTruthy()
+    expect(screen.queryByText("Download logs")).toBeNull()
   })
 
-  it("shows CSV export without API access for a self-custodial account", async () => {
+  it("shows CSV export and Download logs without API access for a self-custodial account", async () => {
     mockAccountRegistryOverride.activeAccount = {
       id: "sc-1",
       type: AccountType.SelfCustodial,
@@ -710,6 +726,7 @@ describe("Settings Screen", () => {
 
     expect(screen.getByTestId("Advanced-group")).toBeTruthy()
     expect(screen.getByText("Export all transactions")).toBeTruthy()
+    expect(screen.getByText("Download logs")).toBeTruthy()
     expect(screen.queryByText("API integration")).toBeNull()
   })
 
@@ -797,6 +814,25 @@ describe("Settings Screen Anon gating", () => {
     expect(screen.getByLabelText("Ways to get paid")).toBeTruthy()
   })
 
+  it("keeps Download logs open in Anon mode while Contact us is gated", async () => {
+    mockIsAnonMode = true
+    mockAccountRegistryOverride.activeAccount = {
+      id: "sc-1",
+      type: AccountType.SelfCustodial,
+    }
+
+    render(
+      <ContextForScreen>
+        <SettingsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(screen.getByLabelText("Need help? Contact us.")).toBeTruthy()
+    expect(screen.getByText("Download logs")).toBeTruthy()
+    mockAccountRegistryOverride.activeAccount = undefined
+  })
+
   it("routes a tap on the gated group to the Enhanced prompt", async () => {
     mockIsAnonMode = true
 
@@ -810,5 +846,48 @@ describe("Settings Screen Anon gating", () => {
     fireEvent.press(screen.getByLabelText("Ways to get paid"))
 
     expect(mockPromptEnhancedMode).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("Settings Screen two-factor banner", () => {
+  const bannerTitle = "Set two-factor authentication"
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockUseIsAuthed.mockReturnValue(true)
+    mockAccountRegistryOverride.activeAccount = undefined
+    mockIsRestrictedRegion = false
+    mockIsAnonMode = false
+    loadLocale("en")
+    testState = createTestState()
+    mockTwoFactorEnforcement.shouldShowSettingsBanner = true
+    mockTwoFactorEnforcement.tier = 1
+  })
+
+  afterEach(() => {
+    mockTwoFactorEnforcement.shouldShowSettingsBanner = false
+  })
+
+  const renderSettings = () =>
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+  it("shows the banner when the provider flags it", async () => {
+    renderSettings()
+    await flushEffects()
+
+    expect(screen.getByText(bannerTitle)).toBeTruthy()
+  })
+
+  it("keeps the banner off when the provider does not flag it", async () => {
+    mockTwoFactorEnforcement.shouldShowSettingsBanner = false
+
+    renderSettings()
+    await flushEffects()
+
+    expect(screen.queryByText(bannerTitle)).toBeNull()
   })
 })

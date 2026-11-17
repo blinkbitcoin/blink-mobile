@@ -9,6 +9,7 @@ import {
 } from "react-native"
 import Modal from "react-native-modal"
 import QRCode from "react-native-qrcode-svg"
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
 import { gql } from "@apollo/client"
@@ -102,7 +103,7 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
     <Modal
       isVisible={isVisible}
       backdropOpacity={0.8}
-      backdropColor={colors.white}
+      backdropColor={colors.backgroundDefault}
       backdropTransitionOutTiming={0}
       onBackdropPress={acknowledgeModal}
     >
@@ -137,8 +138,8 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
           <View style={styles.actions}>
             <View style={styles.copyContainer}>
               <TouchableOpacity onPress={handleCopyToClipboard}>
-                <Text color={colors.grey2}>
-                  <GaloyIcon name="copy-paste" size={16} color={colors.grey2} />
+                <Text color={colors.textMuted}>
+                  <GaloyIcon name="copy-paste" size={16} color={colors.textMuted} />
                   <Text> </Text>
                   {LL.PeopleScreen.copy()}
                 </Text>
@@ -146,8 +147,8 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
             </View>
             <View style={styles.shareContainer}>
               <TouchableOpacity onPress={share}>
-                <Text color={colors.grey2}>
-                  <GaloyIcon name="share" size={16} color={colors.grey2} />
+                <Text color={colors.textMuted}>
+                  <GaloyIcon name="share" size={16} color={colors.textMuted} />
                   <Text> </Text>
                   {LL.Circles.share()}
                 </Text>
@@ -172,7 +173,7 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
           </View>
         </View>
       </View>
-      <GaloyToast />
+      <GaloyToast inModal />
     </Modal>
   )
 }
@@ -188,13 +189,13 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   cross: {},
   qrCard: {
-    backgroundColor: colors._white,
+    backgroundColor: colors.staticWhite,
     padding: 20,
-    borderRadius: 12,
+    borderRadius: radius.default,
   },
   modalCard: {
-    backgroundColor: colors.grey5,
-    borderRadius: 16,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.popup,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",

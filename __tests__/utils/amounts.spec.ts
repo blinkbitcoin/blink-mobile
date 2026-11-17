@@ -1,6 +1,12 @@
 import { WalletCurrency } from "@app/graphql/generated"
 import {
+  DisplayCurrency,
+  type MoneyAmount,
+  type WalletOrDisplayCurrency,
+} from "@app/types/amounts"
+import {
   centsToTokenBaseUnits,
+  formatUsdInDisplay,
   msatsToSats,
   satsToMsats,
   toSatsAmount,
@@ -140,5 +146,41 @@ describe("msatsToSats", () => {
 describe("sat <-> msat round-trip", () => {
   it("survives sats -> msats -> sats for whole-sat values", () => {
     expect(msatsToSats(satsToMsats(2500))).toBe(2500)
+  })
+})
+
+describe("formatUsdInDisplay", () => {
+  const formatMoneyAmount = ({
+    moneyAmount,
+  }: {
+    moneyAmount: MoneyAmount<WalletOrDisplayCurrency>
+  }) => `${moneyAmount.amount} ${moneyAmount.currencyCode}`
+
+  it("formats the amount in the display currency when it converts", () => {
+    const convertMoneyAmount = () => ({
+      amount: 4250,
+      currency: DisplayCurrency,
+      currencyCode: "EUR",
+    })
+
+    expect(formatUsdInDisplay(5000, { formatMoneyAmount, convertMoneyAmount })).toBe(
+      "4250 EUR",
+    )
+  })
+
+  it("formats the raw dollars while no converter is loaded", () => {
+    expect(formatUsdInDisplay(5000, { formatMoneyAmount })).toBe("5000 USD")
+  })
+
+  it("formats the raw dollars when the converter has no dollar rate", () => {
+    const convertMoneyAmount = () => ({
+      amount: Number.NaN,
+      currency: DisplayCurrency,
+      currencyCode: "SAT",
+    })
+
+    expect(formatUsdInDisplay(5000, { formatMoneyAmount, convertMoneyAmount })).toBe(
+      "5000 USD",
+    )
   })
 })

@@ -46,7 +46,7 @@ export const AccountId: React.FC = () => {
         loading={loading}
         title={maskId(accountId)}
         action={null}
-        rightIcon={<GaloyIcon name="copy-paste" size={20} color={colors.primary} />}
+        rightIcon={<GaloyIcon name="copy-paste" size={20} color={colors.accent} />}
         rightIconAction={() =>
           copyToClipboard({
             content: accountId,

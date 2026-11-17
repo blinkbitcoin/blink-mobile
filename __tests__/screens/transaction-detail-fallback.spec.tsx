@@ -58,6 +58,16 @@ jest.mock("@app/hooks/use-display-currency", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockDisplayCurrency(),
 )
 
+const mockNoFragments: unknown[] = []
+jest.mock("@app/self-custodial/hooks/use-self-custodial-transaction-fragments", () => ({
+  useSelfCustodialTransactionFragments: () => mockNoFragments,
+}))
+
+const mockSelfCustodialWallet: { allTransactions: unknown[] } = { allTransactions: [] }
+jest.mock("@app/self-custodial/providers/wallet", () => ({
+  useSelfCustodialWallet: () => mockSelfCustodialWallet,
+}))
+
 let mockActiveWallet: { isSelfCustodial: boolean; wallets: unknown[] } = {
   isSelfCustodial: false,
   wallets: [],
@@ -70,36 +80,14 @@ jest.mock("@react-navigation/native", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockNavigation(),
 )
 
-const LLText = () => ""
-jest.mock("@app/i18n/i18n-react", () => ({
-  useI18nContext: () => ({
-    LL: {
-      common: {
-        date: LLText,
-        fees: LLText,
-        description: LLText,
-        type: LLText,
-        preimageProofOfPayment: LLText,
-        paymentRequest: LLText,
-        hasBeenCopiedToClipboard: LLText,
-        tryAgain: () => "try-again",
-      },
-      TransactionDetailScreen: {
-        received: LLText,
-        sending: LLText,
-        spent: LLText,
-        paid: LLText,
-        receivingAccount: LLText,
-        sendingAccount: LLText,
-        txNotBroadcast: LLText,
-        findingAccount: () => "finding-account",
-        txNotFoundInAccounts: () => "tx-not-found",
-        txLoadFailed: () => "tx-load-failed",
-      },
-    },
-    locale: "en",
+jest.mock("@app/i18n/i18n-react", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockI18n({
+    "common.tryAgain": "try-again",
+    "TransactionDetailScreen.findingAccount": "finding-account",
+    "TransactionDetailScreen.txNotFoundInAccounts": "tx-not-found",
+    "TransactionDetailScreen.txLoadFailed": "tx-load-failed",
   }),
-}))
+)
 
 const mockRetry = jest.fn()
 let mockResolveStatus: ResolveTransactionAccountStatus = "resolving"
@@ -129,6 +117,7 @@ describe("TransactionDetailScreen resolver fallback", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveWallet = { isSelfCustodial: false, wallets: [] }
+    mockSelfCustodialWallet.allTransactions = []
   })
 
   it("passes txid, cache state and the payload hint to the resolver", () => {
@@ -180,10 +169,8 @@ describe("TransactionDetailScreen resolver fallback", () => {
     // hasTx keeps the resolver settled on "resolved"; with the fragment still
     // empty the screen must show the actionable failure state, not a spinner.
     mockResolveStatus = "resolved"
-    mockActiveWallet = {
-      isSelfCustodial: true,
-      wallets: [{ transactions: [{ id: "tx-1", paymentType: "spark" }] }],
-    }
+    mockActiveWallet = { isSelfCustodial: true, wallets: [] }
+    mockSelfCustodialWallet.allTransactions = [{ id: "tx-1", paymentType: "spark" }]
     mockUseFragment.mockReturnValue({ data: {} })
     const { getByText, queryByText } = render(<TransactionDetailScreen route={route} />)
 

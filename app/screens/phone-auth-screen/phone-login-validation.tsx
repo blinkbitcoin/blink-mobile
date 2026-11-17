@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 
 import { gql } from "@apollo/client"
+import { radius } from "@app/rne-theme/radius"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyInfo } from "@app/components/atomic/galoy-info"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
@@ -200,6 +201,8 @@ export const PhoneLoginValidationScreen: React.FC<PhoneLoginValidationScreenProp
   const isUpgradeFlow = currentLevel === AccountLevel.Zero
 
   const [code, _setCode] = useState("")
+  // The field autofocuses on mount, so start focused: no resting fill flashes first.
+  const [isFieldFocused, setIsFieldFocused] = useState(true)
   // Wait 2.5 minutes before allowing another code request
   const [secondsRemaining, setSecondsRemaining] = useState<number>(150)
   const { phone, channel, onboarding } = route.params
@@ -381,14 +384,14 @@ export const PhoneLoginValidationScreen: React.FC<PhoneLoginValidationScreenProp
         <ActivityIndicator
           style={styles.activityIndicator}
           size="large"
-          color={colors.primary}
+          color={colors.accent}
         />
       )
       break
     case ValidatePhoneCodeStatus.WaitingForCode:
       extraInfoContent = (
         <View style={styles.timerRow}>
-          <Text type="p3" color={colors.grey3}>
+          <Text type="p3" color={colors.textDisabled}>
             {LL.PhoneLoginValidationScreen.sendAgain()} {parseTimer(secondsRemaining)}
           </Text>
         </View>
@@ -416,7 +419,12 @@ export const PhoneLoginValidationScreen: React.FC<PhoneLoginValidationScreenProp
         <Input
           placeholder="000000"
           containerStyle={styles.inputComponentContainerStyle}
-          inputContainerStyle={styles.inputContainerStyle}
+          inputContainerStyle={[
+            styles.inputContainerStyle,
+            isFieldFocused && styles.fieldFocused,
+          ]}
+          onFocus={() => setIsFieldFocused(true)}
+          onBlur={() => setIsFieldFocused(false)}
           inputStyle={styles.inputStyle}
           value={code}
           onChangeText={setCode}
@@ -474,12 +482,15 @@ const useStyles = makeStyles(({ colors }) => ({
   inputContainerStyle: {
     minWidth: 160,
     minHeight: 60,
-    borderWidth: 2,
-    borderBottomWidth: 2,
+    borderWidth: 0,
+    borderBottomWidth: 0,
     paddingHorizontal: 10,
-    borderColor: colors.primary5,
-    borderRadius: 8,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
     marginRight: 0,
+  },
+  fieldFocused: {
+    backgroundColor: colors.surfaceFocused,
   },
   inputStyle: {
     fontSize: 24,

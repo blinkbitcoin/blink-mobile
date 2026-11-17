@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react"
+import { useCallback } from "react"
 import Clipboard from "@react-native-clipboard/clipboard"
 
 import { toastShow } from "@app/utils/toast"
@@ -9,34 +9,42 @@ type CopyToClipboardParams = {
   message?: string
 }
 
+// One shared pending clear across all hook instances, deliberately surviving
+// unmount: clearAfterMs exists so secrets (seed phrase, recovery bundle)
+// don't linger in the clipboard, and users typically navigate away right
+// after copying. The clipboard is a single global slot, so any newer copy
+// makes an older pending clear obsolete; keeping the timer per-instance would
+// let a departed screen wipe content copied later elsewhere. Direct callers
+// of Clipboard.setString must cancel the timer first. Checking the current
+// clipboard content before clearing also protects writes made outside the app.
+let pendingClearTimer: ReturnType<typeof setTimeout> | undefined
+let pendingClearGeneration = 0
+
+/** Cancels a scheduled clipboard wipe. Call before any Clipboard.setString
+ * that bypasses copyToClipboard, so a clear armed by an earlier secret copy
+ * cannot wipe the newer content. */
+export const cancelPendingClipboardClear = (): void => {
+  pendingClearGeneration += 1
+  clearTimeout(pendingClearTimer)
+  pendingClearTimer = undefined
+}
+
+const clearClipboardIfCurrent = async (
+  content: string,
+  generation: number,
+): Promise<void> => {
+  const current = await Clipboard.getString()
+  if (generation === pendingClearGeneration && current === content) {
+    Clipboard.setString("")
+  }
+}
+
 export const useClipboard = (clearAfterMs?: number) => {
   const { LL } = useI18nContext()
-  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-  // Content awaiting a timed clear; null once cleared or superseded
-  const pendingContentRef = useRef<string | null>(null)
-
-  const clearPendingContent = useCallback(async (): Promise<void> => {
-    clearTimeout(timerRef.current)
-    const content = pendingContentRef.current
-    pendingContentRef.current = null
-    if (!content) return
-    // Only wipe if the clipboard still holds what we copied — the user may
-    // have copied something else since
-    const current = await Clipboard.getString()
-    if (current === content) Clipboard.setString("")
-  }, [])
-
-  useEffect(() => {
-    return () => {
-      // Clear immediately rather than dropping the scheduled clear, so a
-      // copied secret never outlives the screen that promised to clear it
-      clearPendingContent().catch(() => {})
-    }
-  }, [clearPendingContent])
 
   const copyToClipboard = useCallback(
     ({ content, message }: CopyToClipboardParams): void => {
-      clearTimeout(timerRef.current)
+      cancelPendingClipboardClear()
       Clipboard.setString(content)
       toastShow({
         type: "success",
@@ -44,15 +52,14 @@ export const useClipboard = (clearAfterMs?: number) => {
         LL,
       })
       if (clearAfterMs) {
-        pendingContentRef.current = content
-        timerRef.current = setTimeout(() => {
-          clearPendingContent().catch(() => {})
+        const generation = pendingClearGeneration
+        pendingClearTimer = setTimeout(() => {
+          pendingClearTimer = undefined
+          clearClipboardIfCurrent(content, generation).catch(() => {})
         }, clearAfterMs)
-      } else {
-        pendingContentRef.current = null
       }
     },
-    [LL, clearAfterMs, clearPendingContent],
+    [LL, clearAfterMs],
   )
 
   return { copyToClipboard }

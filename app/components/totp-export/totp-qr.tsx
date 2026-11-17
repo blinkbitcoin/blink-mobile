@@ -1,14 +1,29 @@
 import React from "react"
-import { View } from "react-native"
+import { StyleProp, View, ViewStyle } from "react-native"
 import QRCode from "react-native-qrcode-svg"
 
 import { makeStyles } from "@rn-vui/themed"
 
-export const QrCodeComponent = ({ value }: { value: string }) => {
+import { radius } from "@app/rne-theme/radius"
+
+type Props = {
+  value: string
+  size?: number
+  /** Overrides the white frame around the code. */
+  containerStyle?: StyleProp<ViewStyle>
+}
+
+const DEFAULT_SIZE = 200
+
+export const QrCodeComponent = ({
+  value,
+  size = DEFAULT_SIZE,
+  containerStyle,
+}: Props) => {
   const styles = useStyles()
   return (
-    <View style={styles.spacingAround}>
-      <QRCode value={value} size={200} />
+    <View style={[styles.spacingAround, containerStyle]}>
+      <QRCode value={value} size={size} />
     </View>
   )
 }
@@ -16,7 +31,7 @@ export const QrCodeComponent = ({ value }: { value: string }) => {
 const useStyles = makeStyles(({ colors }) => ({
   spacingAround: {
     padding: 20,
-    backgroundColor: colors._white,
-    borderRadius: 10,
+    backgroundColor: colors.staticWhite,
+    borderRadius: radius.default,
   },
 }))

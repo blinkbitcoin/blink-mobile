@@ -2,6 +2,7 @@ const remoteConfig = {
   fetchAndActivate: jest.fn(() => Promise.resolve(true)),
 
   getValue: jest.fn((key) => ({
+    getSource: () => "remote",
     asBoolean: () => {
       if (key === "deviceAccountEnabledRestAuth") return false
       return false

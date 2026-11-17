@@ -29,9 +29,12 @@ export const resolveMerchantChoiceDestination = async ({
   params: ParseDestinationParams
   sdk: BreezSdkInterface | null
 }): Promise<ParseDestinationResult> => {
+  /** A self-custodial sender has no ledger to pay a till code over, connected sdk and all. */
+  const intraledgerDomains = sdk ? [] : params.lnurlDomains
+
   const destination = await resolveLnurlDestination({
     parsedLnurlDestination: merchantChoiceToLnurlDestination(merchant),
-    lnurlDomains: params.lnurlDomains,
+    lnurlDomains: intraledgerDomains,
     accountDefaultWalletQuery: params.accountDefaultWalletQuery,
     myWalletIds: params.myWalletIds,
   })

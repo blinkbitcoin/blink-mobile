@@ -1,3 +1,4 @@
+import { it } from "@jest/globals"
 import { act, renderHook } from "@testing-library/react-hooks"
 
 jest.mock("@apollo/client", () => {
@@ -26,7 +27,23 @@ jest.mock("@app/graphql/client-only-query", () => ({
   markTxLastSeenId: jest.fn(),
 }))
 
+let mockIsSelfCustodial = false
+
+const mockUpdateState = jest.fn()
+let mockPersistentState: PersistentState
+
+jest.mock("@app/store/persistent-state", () => ({
+  usePersistentStateContext: () => ({
+    persistentState: mockPersistentState,
+    updateState: mockUpdateState,
+  }),
+}))
+
 import { useTransactionSeenState } from "@app/hooks/use-transaction-seen-state"
+import {
+  defaultPersistentState,
+  type PersistentState,
+} from "@app/store/persistent-state/state-migrations"
 import { useApolloClient } from "@apollo/client"
 import {
   TxDirection,
@@ -77,6 +94,8 @@ const buildTx = (overrides: Partial<TransactionFragment>): TransactionFragment =
     ...overrides,
   }) as TransactionFragment
 
+const SELF_CUSTODIAL_ACCOUNT_ID = "self-custodial-account"
+
 describe("useTransactionSeenState", () => {
   const accountId = "account-id"
   let mockClient: { readQuery: jest.Mock }
@@ -88,6 +107,12 @@ describe("useTransactionSeenState", () => {
       data: { txLastSeen: { btcId: "", usdId: "" } },
     } as never)
     mockMarkTxLastSeenId.mockReset()
+    mockIsSelfCustodial = false
+    mockUpdateState.mockReset()
+    mockPersistentState = {
+      ...defaultPersistentState,
+      activeAccountId: SELF_CUSTODIAL_ACCOUNT_ID,
+    }
   })
 
   it("derives latest ids from provided transactions", () => {
@@ -101,7 +126,13 @@ describe("useTransactionSeenState", () => {
       buildTx({ id: "usd-new", createdAt: 3, settlementCurrency: WalletCurrency.Usd }),
     ]
 
-    const { result } = renderHook(() => useTransactionSeenState(accountId, transactions))
+    const { result } = renderHook(() =>
+      useTransactionSeenState({
+        accountId,
+        isSelfCustodial: mockIsSelfCustodial,
+        transactions,
+      }),
+    )
 
     expect(mockClient.readQuery).not.toHaveBeenCalled()
     expect(result.current.latestBtcTxId).toBe("btc-new")
@@ -142,11 +173,49 @@ describe("useTransactionSeenState", () => {
       },
     })
 
-    const { result } = renderHook(() => useTransactionSeenState(accountId))
+    const { result } = renderHook(() =>
+      useTransactionSeenState({ accountId, isSelfCustodial: mockIsSelfCustodial }),
+    )
 
     expect(mockClient.readQuery).toHaveBeenCalledTimes(1)
     expect(result.current.latestBtcTxId).toBe("pending-btc")
     expect(result.current.latestUsdTxId).toBe("settled-usd")
+  })
+
+  it("falls back to only the pending transactions when the cache has no edges", () => {
+    mockClient.readQuery.mockReturnValue({
+      me: {
+        defaultAccount: {
+          pendingIncomingTransactions: [buildTx({ id: "pending-only", createdAt: 7 })],
+          transactions: { edges: [] },
+        },
+      },
+    })
+
+    const { result } = renderHook(() =>
+      useTransactionSeenState({ accountId, isSelfCustodial: mockIsSelfCustodial }),
+    )
+
+    expect(result.current.latestBtcTxId).toBe("pending-only")
+  })
+
+  it("falls back to only the settled transactions when nothing is pending", () => {
+    mockClient.readQuery.mockReturnValue({
+      me: {
+        defaultAccount: {
+          pendingIncomingTransactions: null,
+          transactions: {
+            edges: [{ node: buildTx({ id: "settled-only", createdAt: 6 }) }],
+          },
+        },
+      },
+    })
+
+    const { result } = renderHook(() =>
+      useTransactionSeenState({ accountId, isSelfCustodial: mockIsSelfCustodial }),
+    )
+
+    expect(result.current.latestBtcTxId).toBe("settled-only")
   })
 
   it("handles transaction arrays", () => {
@@ -155,10 +224,26 @@ describe("useTransactionSeenState", () => {
       buildTx({ id: "usd-array", createdAt: 3, settlementCurrency: WalletCurrency.Usd }),
     ]
 
-    const { result } = renderHook(() => useTransactionSeenState(accountId, transactions))
+    const { result } = renderHook(() =>
+      useTransactionSeenState({
+        accountId,
+        isSelfCustodial: mockIsSelfCustodial,
+        transactions,
+      }),
+    )
 
     expect(result.current.latestBtcTxId).toBe("btc-array")
     expect(result.current.latestUsdTxId).toBe("usd-array")
+  })
+
+  it("runs the last-seen query for the custodial account it is keyed by", () => {
+    renderHook(() =>
+      useTransactionSeenState({ accountId, isSelfCustodial: mockIsSelfCustodial }),
+    )
+
+    expect(mockUseTxLastSeenQuery).toHaveBeenCalledWith(
+      expect.objectContaining({ variables: { accountId }, skip: false }),
+    )
   })
 
   it("marks the latest transaction as seen for the requested currency", () => {
@@ -170,7 +255,13 @@ describe("useTransactionSeenState", () => {
       }),
     ]
 
-    const { result } = renderHook(() => useTransactionSeenState(accountId, transactions))
+    const { result } = renderHook(() =>
+      useTransactionSeenState({
+        accountId,
+        isSelfCustodial: mockIsSelfCustodial,
+        transactions,
+      }),
+    )
 
     act(() => {
       result.current.markTxSeen(WalletCurrency.Btc)
@@ -181,6 +272,275 @@ describe("useTransactionSeenState", () => {
       accountId,
       currency: WalletCurrency.Btc,
       id: "btc-to-mark",
+    })
+  })
+
+  describe("self-custodial account", () => {
+    const btcTx = buildTx({
+      id: "sc-btc",
+      createdAt: 4,
+      settlementCurrency: WalletCurrency.Btc,
+    })
+    const usdTx = buildTx({
+      id: "sc-usd",
+      createdAt: 3,
+      settlementCurrency: WalletCurrency.Usd,
+    })
+
+    /** An account that already has a record, from before announce times existed. */
+    const withRecord = (record: {
+      btcId: string
+      usdId: string
+      announceSinceMs?: number
+    }): PersistentState => ({
+      ...defaultPersistentState,
+      activeAccountId: SELF_CUSTODIAL_ACCOUNT_ID,
+      txLastSeenByAccountId: { [SELF_CUSTODIAL_ACCOUNT_ID]: record },
+    })
+
+    beforeEach(() => {
+      mockIsSelfCustodial = true
+    })
+
+    it("reads the seen state from the device, not the Apollo cache", () => {
+      mockUseTxLastSeenQuery.mockReturnValue({
+        data: { txLastSeen: { btcId: "sc-btc", usdId: "sc-usd" } },
+      } as never)
+      mockPersistentState = {
+        ...defaultPersistentState,
+        activeAccountId: SELF_CUSTODIAL_ACCOUNT_ID,
+        txLastSeenByAccountId: {
+          [SELF_CUSTODIAL_ACCOUNT_ID]: { btcId: "", usdId: "" },
+        },
+      }
+
+      const { result } = renderHook(() =>
+        useTransactionSeenState({
+          accountId,
+          isSelfCustodial: mockIsSelfCustodial,
+          transactions: [btcTx, usdTx],
+        }),
+      )
+
+      expect(result.current.hasUnseenBtcTx).toBe(true)
+      expect(result.current.hasUnseenUsdTx).toBe(true)
+    })
+
+    it("skips the last-seen query instead of watching a cache nothing reads", () => {
+      renderHook(() =>
+        useTransactionSeenState({
+          accountId,
+          isSelfCustodial: mockIsSelfCustodial,
+          transactions: [btcTx, usdTx],
+        }),
+      )
+
+      expect(mockUseTxLastSeenQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ skip: true }),
+      )
+    })
+
+    it("treats a stored transaction as already seen across a cold start", () => {
+      mockPersistentState = {
+        ...defaultPersistentState,
+        activeAccountId: SELF_CUSTODIAL_ACCOUNT_ID,
+        txLastSeenByAccountId: {
+          [SELF_CUSTODIAL_ACCOUNT_ID]: { btcId: "sc-btc", usdId: "sc-usd" },
+        },
+      }
+
+      const { result } = renderHook(() =>
+        useTransactionSeenState({
+          accountId,
+          isSelfCustodial: mockIsSelfCustodial,
+          transactions: [btcTx, usdTx],
+        }),
+      )
+
+      expect(result.current.hasUnseenBtcTx).toBe(false)
+      expect(result.current.hasUnseenUsdTx).toBe(false)
+    })
+
+    it("treats a record with nothing in it as nothing seen yet", () => {
+      mockPersistentState = withRecord({ btcId: "", usdId: "" })
+
+      const { result } = renderHook(() =>
+        useTransactionSeenState({
+          accountId,
+          isSelfCustodial: mockIsSelfCustodial,
+          transactions: [btcTx, usdTx],
+        }),
+      )
+
+      expect(result.current.lastSeenBtcId).toBe("")
+      expect(result.current.hasUnseenBtcTx).toBe(true)
+    })
+
+    it("announces nothing for an account with no record, and starts one now", () => {
+      const now = 1_793_840_000_000
+      jest.spyOn(Date, "now").mockReturnValue(now)
+
+      const { result } = renderHook(() =>
+        useTransactionSeenState({
+          accountId,
+          isSelfCustodial: mockIsSelfCustodial,
+          transactions: [btcTx, usdTx],
+        }),
+      )
+
+      expect(result.current.hasUnseenBtcTx).toBe(false)
+      expect(result.current.hasUnseenUsdTx).toBe(false)
+      expect(mockUpdateState).toHaveBeenCalledTimes(1)
+      const [updater] = mockUpdateState.mock.calls[0]
+      expect(updater(mockPersistentState).txLastSeenByAccountId).toEqual({
+        [SELF_CUSTODIAL_ACCOUNT_ID]: { btcId: "", usdId: "", announceSinceMs: now },
+      })
+      jest.restoreAllMocks()
+    })
+
+    describe("after a restore, while the wallet replays its history", () => {
+      const startedAtMs = 1_793_840_000_000
+      const startedAt = startedAtMs / 1000
+
+      it.each([
+        [
+          "does not announce a payment made before the record started",
+          startedAt - 30 * 24 * 60 * 60,
+          false,
+        ],
+        ["announces a payment that arrives after it", startedAt + 60, true],
+      ])("%s", (_label, createdAt, announced) => {
+        mockPersistentState = withRecord({
+          btcId: "",
+          usdId: "",
+          announceSinceMs: startedAtMs,
+        })
+
+        const { result } = renderHook(() =>
+          useTransactionSeenState({
+            accountId,
+            isSelfCustodial: mockIsSelfCustodial,
+            transactions: [buildTx({ id: "replayed", createdAt })],
+          }),
+        )
+
+        expect(result.current.hasUnseenBtcTx).toBe(announced)
+        expect(mockUpdateState).not.toHaveBeenCalled()
+      })
+
+      /** Payment times are whole seconds; the record's start has milliseconds. */
+      it.each([
+        ["announces a payment in the second the record started", startedAt, true],
+        ["does not announce one from the second before", startedAt - 1, false],
+      ])("%s", (_label, createdAt, announced) => {
+        mockPersistentState = withRecord({
+          btcId: "",
+          usdId: "",
+          announceSinceMs: startedAtMs + 999,
+        })
+
+        const { result } = renderHook(() =>
+          useTransactionSeenState({
+            accountId,
+            isSelfCustodial: mockIsSelfCustodial,
+            transactions: [buildTx({ id: "same-second", createdAt })],
+          }),
+        )
+
+        expect(result.current.hasUnseenBtcTx).toBe(announced)
+      })
+
+      it("keeps the start time when a transaction is marked seen", () => {
+        mockPersistentState = withRecord({
+          btcId: "",
+          usdId: "",
+          announceSinceMs: startedAtMs,
+        })
+
+        const { result } = renderHook(() =>
+          useTransactionSeenState({
+            accountId,
+            isSelfCustodial: mockIsSelfCustodial,
+            transactions: [buildTx({ id: "new", createdAt: startedAt + 60 })],
+          }),
+        )
+
+        act(() => {
+          result.current.markTxSeen(WalletCurrency.Btc)
+        })
+
+        const [updater] = mockUpdateState.mock.calls[0]
+        expect(updater(mockPersistentState).txLastSeenByAccountId).toEqual({
+          [SELF_CUSTODIAL_ACCOUNT_ID]: {
+            btcId: "new",
+            usdId: "",
+            announceSinceMs: startedAtMs,
+          },
+        })
+      })
+    })
+
+    it("never falls back to cached custodial transactions", () => {
+      mockClient.readQuery.mockReturnValue({
+        me: {
+          defaultAccount: {
+            pendingIncomingTransactions: [
+              buildTx({ id: "custodial-btc", createdAt: 99 }),
+            ],
+            transactions: { edges: [] },
+          },
+        },
+      })
+
+      const { result } = renderHook(() =>
+        useTransactionSeenState({ accountId, isSelfCustodial: mockIsSelfCustodial }),
+      )
+
+      expect(mockClient.readQuery).not.toHaveBeenCalled()
+      expect(result.current.latestBtcTxId).toBe("")
+      expect(result.current.hasUnseenBtcTx).toBe(false)
+    })
+
+    it("marks seen on device instead of the Apollo cache", () => {
+      mockPersistentState = withRecord({ btcId: "", usdId: "" })
+
+      const { result } = renderHook(() =>
+        useTransactionSeenState({
+          accountId,
+          isSelfCustodial: mockIsSelfCustodial,
+          transactions: [btcTx],
+        }),
+      )
+
+      act(() => {
+        result.current.markTxSeen(WalletCurrency.Btc)
+      })
+
+      expect(mockMarkTxLastSeenId).not.toHaveBeenCalled()
+      expect(mockUpdateState).toHaveBeenCalledTimes(1)
+
+      const [updater] = mockUpdateState.mock.calls[0]
+      expect(updater(mockPersistentState).txLastSeenByAccountId).toEqual({
+        [SELF_CUSTODIAL_ACCOUNT_ID]: { btcId: "sc-btc", usdId: "" },
+      })
+    })
+
+    it("does not mark anything when there is no transaction for the currency", () => {
+      mockPersistentState = withRecord({ btcId: "", usdId: "" })
+
+      const { result } = renderHook(() =>
+        useTransactionSeenState({
+          accountId,
+          isSelfCustodial: mockIsSelfCustodial,
+          transactions: [btcTx],
+        }),
+      )
+
+      act(() => {
+        result.current.markTxSeen(WalletCurrency.Usd)
+      })
+
+      expect(mockUpdateState).not.toHaveBeenCalled()
     })
   })
 })

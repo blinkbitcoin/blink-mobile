@@ -37,11 +37,11 @@ export const NfcHeaderButton: React.FC<NfcHeaderButtonProps> = ({ visible, onPre
           accessibilityRole="button"
           onPress={onPress}
         >
-          <CustomIcon name="nfc" color={colors.black} size={24} />
+          <CustomIcon name="nfc" color={colors.textOnBackground} size={24} />
         </TouchableOpacity>
       )),
     )
-  }, [visible, onPress, navigation, colors.black, styles.nfcIcon])
+  }, [visible, onPress, navigation, colors.textOnBackground, styles.nfcIcon])
 
   return null
 }

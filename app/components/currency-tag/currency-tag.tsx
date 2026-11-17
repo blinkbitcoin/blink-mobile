@@ -30,12 +30,12 @@ export const CurrencyTag: FC<CurrencyTagProps> = ({ walletCurrency }) => {
 
   const currencyStyling = {
     BTC: {
-      textColor: colors.white,
-      backgroundColor: colors.primary,
+      textColor: colors.textOnAccent,
+      backgroundColor: colors.accent,
     },
     USD: {
-      textColor: colors.black,
-      backgroundColor: colors._green,
+      textColor: colors.textOnBackground,
+      backgroundColor: colors.success,
     },
   }
 

@@ -10,6 +10,7 @@ import ErrorBoundary from "react-native-error-boundary"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import "react-native-reanimated"
 import { RootSiblingParent } from "react-native-root-siblings"
+import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context"
 // for URL; need a polyfill on react native
 import "react-native-url-polyfill/auto"
 
@@ -21,13 +22,23 @@ import { GaloyToast } from "./components/galoy-toast"
 import { NotificationsProvider } from "./components/notifications/index"
 import { PushNotificationComponent } from "./components/push-notification"
 import { FeatureFlagContextProvider } from "./config/feature-flags-context"
+import { hydrateFeatureFlagOverrides } from "./config/feature-flag-overrides"
+import { hydrateSimulatedOutage } from "./config/simulated-outage"
+import { CustodialRestrictionsProvider } from "./custodial/providers/restrictions"
+import { TwoFactorEnforcementProvider } from "./custodial/providers/two-factor-enforcement"
+import { WindDownStatusProvider } from "./screens/account-migration/hooks/use-wind-down-status"
 import { CustodialWalletProvider } from "./custodial/providers/wallet"
 import {
   AccountModeSyncMount,
   AutoConvertListenerMount,
+  DisplayCurrencyFromRegionMount,
+  RecoveryBundleListenerMount,
+  TelemetryContextMount,
+  LaunchCleanupMount,
 } from "./self-custodial/components"
 import { AutoConvertStatusProvider } from "./self-custodial/providers/auto-convert-status"
 import { BackupStateProvider } from "./self-custodial/providers/backup-state"
+import { SelfCustodialFiatRatesProvider } from "./self-custodial/providers/fiat-rates"
 import { SelfCustodialWalletProvider } from "./self-custodial/providers/wallet"
 import { GaloyClient } from "./graphql/client"
 import { NetworkErrorComponent } from "./graphql/network-error-component"
@@ -53,53 +64,79 @@ const defaultLocale = detectDefaultLocale()
 loadLocale(defaultLocale)
 if (__DEV__) console.log(`Loaded default locale: ${defaultLocale}`)
 
+// Developer-only, and a no-op in a release build. Started here rather than in an effect
+// so a simulated outage is already in memory by the time the Apollo client is built,
+// which is what makes a reload reproduce a cold start with the backend already down.
+hydrateSimulatedOutage()
+hydrateFeatureFlagOverrides()
+
 /**
  * This is the root component of our app.
  */
 export const App = () => (
   /* eslint-disable-next-line react-native/no-inline-styles */
   <GestureHandlerRootView style={{ flex: 1 }}>
-    <PersistentStateProvider>
-      <TypesafeI18n locale={detectDefaultLocale()}>
-        <GaloyClient>
-          <GaloyThemeProvider>
-            <FeatureFlagContextProvider>
-              <CustodialWalletProvider>
-                <SelfCustodialWalletProvider>
-                  <BackupStateProvider>
-                    <AutoConvertStatusProvider>
-                      <ActionsProvider>
-                        <MigrationBlockerProvider>
-                          <NavigationContainerWrapper>
-                            <ErrorBoundary FallbackComponent={ErrorScreen}>
-                              <RootSiblingParent>
-                                <EnhancedModePromptProvider>
-                                  <RestrictedRegionProvider>
-                                    <NotificationsProvider>
-                                      <AppStateWrapper />
-                                      <PushNotificationComponent />
-                                      <AutoConvertListenerMount />
-                                      <AccountModeSyncMount />
-                                      <RootStack />
-                                      <NetworkErrorComponent />
-                                      <ActionModals />
-                                    </NotificationsProvider>
-                                  </RestrictedRegionProvider>
-                                </EnhancedModePromptProvider>
-                                <GaloyToast />
-                              </RootSiblingParent>
-                            </ErrorBoundary>
-                          </NavigationContainerWrapper>
-                        </MigrationBlockerProvider>
-                      </ActionsProvider>
-                    </AutoConvertStatusProvider>
-                  </BackupStateProvider>
-                </SelfCustodialWalletProvider>
-              </CustodialWalletProvider>
-            </FeatureFlagContextProvider>
-          </GaloyThemeProvider>
-        </GaloyClient>
-      </TypesafeI18n>
-    </PersistentStateProvider>
+    {/* Every screen reads its window insets from here. React Navigation supplies a
+        provider of its own inside each navigator, but only there and only after the
+        first frame, so anything rendered outside or before it measured zero insets
+        and drew under the system bars. */}
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+      <PersistentStateProvider>
+        <TypesafeI18n locale={detectDefaultLocale()}>
+          <GaloyClient>
+            <GaloyThemeProvider>
+              <FeatureFlagContextProvider>
+                <CustodialWalletProvider>
+                  <CustodialRestrictionsProvider>
+                    <WindDownStatusProvider>
+                      <TwoFactorEnforcementProvider>
+                        <SelfCustodialWalletProvider>
+                          {/* Inside the wallet provider, which supplies the SDK it reads the
+                              fiat feed from, and above everything that prices an amount. */}
+                          <SelfCustodialFiatRatesProvider>
+                            <BackupStateProvider>
+                              <AutoConvertStatusProvider>
+                                <ActionsProvider>
+                                  <MigrationBlockerProvider>
+                                    <NavigationContainerWrapper>
+                                      <ErrorBoundary FallbackComponent={ErrorScreen}>
+                                        <RootSiblingParent>
+                                          <EnhancedModePromptProvider>
+                                            <RestrictedRegionProvider>
+                                              <NotificationsProvider>
+                                                <AppStateWrapper />
+                                                <PushNotificationComponent />
+                                                <AutoConvertListenerMount />
+                                                <AccountModeSyncMount />
+                                                <TelemetryContextMount />
+                                                <DisplayCurrencyFromRegionMount />
+                                                <RecoveryBundleListenerMount />
+                                                <LaunchCleanupMount />
+                                                <RootStack />
+                                                <NetworkErrorComponent />
+                                                <ActionModals />
+                                              </NotificationsProvider>
+                                            </RestrictedRegionProvider>
+                                          </EnhancedModePromptProvider>
+                                          <GaloyToast />
+                                        </RootSiblingParent>
+                                      </ErrorBoundary>
+                                    </NavigationContainerWrapper>
+                                  </MigrationBlockerProvider>
+                                </ActionsProvider>
+                              </AutoConvertStatusProvider>
+                            </BackupStateProvider>
+                          </SelfCustodialFiatRatesProvider>
+                        </SelfCustodialWalletProvider>
+                      </TwoFactorEnforcementProvider>
+                    </WindDownStatusProvider>
+                  </CustodialRestrictionsProvider>
+                </CustodialWalletProvider>
+              </FeatureFlagContextProvider>
+            </GaloyThemeProvider>
+          </GaloyClient>
+        </TypesafeI18n>
+      </PersistentStateProvider>
+    </SafeAreaProvider>
   </GestureHandlerRootView>
 )

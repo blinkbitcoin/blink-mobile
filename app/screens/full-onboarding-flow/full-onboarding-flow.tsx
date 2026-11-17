@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { ActivityIndicator, Alert, View } from "react-native"
 import { Input, Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
@@ -55,12 +55,6 @@ export const FullOnboardingFlowScreen: React.FC = () => {
     )
   }
 
-  useEffect(() => {
-    if (onboardingStatus === OnboardingStatus.AwaitingInput) {
-      startKyc()
-    }
-  }, [onboardingStatus, startKyc])
-
   if (loading) {
     return (
       <Screen
@@ -70,7 +64,7 @@ export const FullOnboardingFlowScreen: React.FC = () => {
         style={styles.screenStyle}
       >
         <View style={styles.verticalAlignment}>
-          <ActivityIndicator animating size="large" color={colors.primary} />
+          <ActivityIndicator animating size="large" color={colors.accent} />
         </View>
       </Screen>
     )
@@ -127,7 +121,7 @@ export const FullOnboardingFlowScreen: React.FC = () => {
           <GaloyPrimaryButton
             onPress={confirmNames}
             title={LL.common.next()}
-            disabled={!firstName || !lastName}
+            disabled={!firstName.trim() || !lastName.trim()}
             loading={loadingKyc}
           />
         </View>

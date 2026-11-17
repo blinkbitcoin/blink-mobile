@@ -4,6 +4,7 @@ import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { cappedLineHeight } from "@app/rne-theme/text-scaling"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -63,8 +64,8 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   paragraph: {
     fontSize: 16,
-    lineHeight: 22,
+    lineHeight: cappedLineHeight(22),
     textAlign: "center",
-    color: colors.black,
+    color: colors.textOnBackground,
   },
 }))

@@ -40,7 +40,7 @@ export const ConvertToBtcModalUI: React.FC<Props> = ({
     <CustomModal
       isVisible={isVisible}
       toggleModal={toggleModal}
-      image={<GaloyIcon name="warning" size={80} color={colors.primary} />}
+      image={<GaloyIcon name="warning" size={80} color={colors.accent} />}
       title={LL.ConvertDollarToBitcoinModal.title()}
       titleMaxWidth="100%"
       body={

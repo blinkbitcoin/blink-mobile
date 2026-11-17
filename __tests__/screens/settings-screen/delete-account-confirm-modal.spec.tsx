@@ -23,7 +23,12 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 jest.mock("@rn-vui/themed", () => {
-  const colors = { grey3: "#bbb", grey4: "#ddd", grey5: "#eee", black: "#000" }
+  const colors = {
+    textDisabled: "#bbb",
+    neutral: "#ddd",
+    surfaceInteractive: "#eee",
+    textOnBackground: "#000",
+  }
   return {
     makeStyles:
       (fn: (theme: { colors: Record<string, string> }) => Record<string, object>) => () =>
@@ -42,6 +47,7 @@ const lastModalProps: {
   primaryButtonOnPress?: () => void
   secondaryButtonOnPress?: () => void
   toggleModal?: () => void
+  onModalHide?: () => void
 } = {}
 jest.mock("@app/components/custom-modal/custom-modal", () => {
   const ReactActual = jest.requireActual("react")
@@ -55,6 +61,7 @@ jest.mock("@app/components/custom-modal/custom-modal", () => {
       primaryButtonOnPress: () => void
       secondaryButtonOnPress?: () => void
       toggleModal: () => void
+      onModalHide?: () => void
     }) => {
       lastModalProps.isVisible = props.isVisible
       lastModalProps.title = props.title
@@ -63,6 +70,7 @@ jest.mock("@app/components/custom-modal/custom-modal", () => {
       lastModalProps.primaryButtonOnPress = props.primaryButtonOnPress
       lastModalProps.secondaryButtonOnPress = props.secondaryButtonOnPress
       lastModalProps.toggleModal = props.toggleModal
+      lastModalProps.onModalHide = props.onModalHide
       return props.isVisible
         ? ReactActual.createElement("View", { testID: "custom-modal" }, props.body)
         : null
@@ -180,5 +188,21 @@ describe("DeleteAccountConfirmModal", () => {
     lastModalProps.toggleModal?.()
 
     expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it("passes onModalHide through so removal can wait for the modal to close", () => {
+    const onModalHide = jest.fn()
+    render(
+      <DeleteAccountConfirmModal
+        isVisible={true}
+        onClose={() => {}}
+        onConfirm={() => {}}
+        onModalHide={onModalHide}
+      />,
+    )
+
+    lastModalProps.onModalHide?.()
+
+    expect(onModalHide).toHaveBeenCalledTimes(1)
   })
 })

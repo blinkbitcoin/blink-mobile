@@ -1,6 +1,6 @@
 # Contributing
 
-Galoy is an open source project and so contributions to this repository are welcome.  If this is your first contribution then please take a look at the issues in the backlog with the [good first issue](https://github.com/GaloyMoney/blink-mobile/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) tag.  If you would like to discuss anything with the team before picking up an issue then feel free to join our [public workspace on mattermost](https://chat.blink.sv).
+Galoy is an open source project and so contributions to this repository are welcome.  If this is your first contribution then please take a look at the issues in the backlog with the [good first issue](https://github.com/GaloyMoney/blink-mobile/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) tag.  If you would like to discuss anything with the team before picking up an issue then feel free to join our [Telegram community](https://t.me/blinkbtc).
 
 ## Pull Request Process
 

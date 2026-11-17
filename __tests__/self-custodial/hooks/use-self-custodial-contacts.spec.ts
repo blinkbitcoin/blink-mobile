@@ -8,26 +8,20 @@ const mockListContacts = jest.fn()
 const mockFindOrCreateContact = jest.fn()
 const mockUpdateContact = jest.fn()
 const mockDeleteContact = jest.fn()
-const mockListPayments = jest.fn()
-const mockMapTransactions = jest.fn()
+const mockFetchContactPaymentsPage = jest.fn()
 const mockUseSelfCustodialWallet = jest.fn()
 
-jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
-  // eslint-disable-next-line camelcase
-  PaymentDetails_Tags: { Lightning: "Lightning", Spark: "Spark" },
-  PaymentType: { Send: "Send", Receive: "Receive" },
-}))
+jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({}))
 
 jest.mock("@app/self-custodial/bridge", () => ({
   listContacts: (...args: unknown[]) => mockListContacts(...args),
   findOrCreateContact: (...args: unknown[]) => mockFindOrCreateContact(...args),
   updateContact: (...args: unknown[]) => mockUpdateContact(...args),
   deleteContact: (...args: unknown[]) => mockDeleteContact(...args),
-  listPayments: (...args: unknown[]) => mockListPayments(...args),
 }))
 
-jest.mock("@app/self-custodial/mappers/transaction", () => ({
-  mapSelfCustodialTransactions: (...args: unknown[]) => mockMapTransactions(...args),
+jest.mock("@app/self-custodial/providers/contact-payments", () => ({
+  fetchContactPaymentsPage: (...args: unknown[]) => mockFetchContactPaymentsPage(...args),
 }))
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({
@@ -65,8 +59,11 @@ describe("useSelfCustodialContacts", () => {
     mockFindOrCreateContact.mockResolvedValue(undefined)
     mockUpdateContact.mockResolvedValue(undefined)
     mockDeleteContact.mockResolvedValue(undefined)
-    mockListPayments.mockResolvedValue({ payments: [] })
-    mockMapTransactions.mockReturnValue([])
+    mockFetchContactPaymentsPage.mockResolvedValue({
+      transactions: [],
+      rawOffset: 0,
+      hasMore: false,
+    })
     mockUseSelfCustodialWallet.mockReturnValue({ sdk: mockSdk })
   })
 
@@ -88,6 +85,20 @@ describe("useSelfCustodialContacts", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
+    expect(mockListContacts).not.toHaveBeenCalled()
+  })
+
+  it("list() answers with nothing while the wallet is not connected", async () => {
+    mockUseSelfCustodialWallet.mockReturnValue({ sdk: null })
+    const { result } = renderHook(() => useSelfCustodialContacts())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    let contacts: Awaited<ReturnType<typeof result.current.list>>["contacts"] = []
+    await act(async () => {
+      ;({ contacts } = await result.current.list())
+    })
+
+    expect(contacts).toEqual([])
     expect(mockListContacts).not.toHaveBeenCalled()
   })
 
@@ -146,6 +157,21 @@ describe("useSelfCustodialContacts", () => {
     })
   })
 
+  it("update() keeps the name when only the payment identifier changes", async () => {
+    const { result } = renderHook(() => useSelfCustodialContacts())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.update("c1", { paymentIdentifier: "alice@other.sv" })
+    })
+
+    expect(mockUpdateContact).toHaveBeenCalledWith(mockSdk, {
+      id: "c1",
+      name: "Alice",
+      paymentIdentifier: "alice@other.sv",
+    })
+  })
+
   it("update() rejects when the contact id is unknown", async () => {
     const { result } = renderHook(() => useSelfCustodialContacts())
     await waitFor(() => expect(result.current.loading).toBe(false))
@@ -166,44 +192,105 @@ describe("useSelfCustodialContacts", () => {
     expect(mockDeleteContact).toHaveBeenCalledWith(mockSdk, "c1")
   })
 
-  it("getTransactions() returns an empty list when the contact id is unknown", async () => {
+  it("getTransactions() returns an exhausted page when the wallet is not connected", async () => {
+    mockUseSelfCustodialWallet.mockReturnValue({ sdk: null })
+
     const { result } = renderHook(() => useSelfCustodialContacts())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    const txs = await result.current.getTransactions("missing")
+    const page = await result.current.getTransactions("alice@blink.sv")
 
-    expect(txs).toEqual([])
-    expect(mockListPayments).not.toHaveBeenCalled()
+    expect(page).toEqual({ transactions: [], nextCursor: null })
+    expect(mockFetchContactPaymentsPage).not.toHaveBeenCalled()
   })
 
-  it("getTransactions() filters payments to those matching the contact's lnAddress", async () => {
-    const matchingPayment = {
-      paymentType: "Send",
-      details: {
-        tag: "Lightning",
-        inner: { lnurlPayInfo: { lnAddress: "ALICE@BLINK.SV" } },
-      },
-    }
-    const nonMatchingPayment = {
-      paymentType: "Send",
-      details: {
-        tag: "Lightning",
-        inner: { lnurlPayInfo: { lnAddress: "stranger@blink.sv" } },
-      },
-    }
-    const sparkPayment = {
-      paymentType: "Send",
-      details: { tag: "Spark", inner: {} },
-    }
-    mockListPayments.mockResolvedValue({
-      payments: [matchingPayment, nonMatchingPayment, sparkPayment],
+  it("getTransactions() asks for the payments from the start of the history", async () => {
+    mockFetchContactPaymentsPage.mockResolvedValue({
+      transactions: [{ id: "tx-1" }],
+      rawOffset: 20,
+      hasMore: true,
     })
 
     const { result } = renderHook(() => useSelfCustodialContacts())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    await result.current.getTransactions("c1")
+    const page = await result.current.getTransactions("alice@blink.sv")
 
-    expect(mockMapTransactions).toHaveBeenCalledWith([matchingPayment])
+    expect(mockFetchContactPaymentsPage).toHaveBeenCalledWith(
+      mockSdk,
+      "alice@blink.sv",
+      0,
+    )
+    expect(page).toEqual({ transactions: [{ id: "tx-1" }], nextCursor: "20" })
+  })
+
+  it("getTransactions() resumes from the cursor it handed out", async () => {
+    mockFetchContactPaymentsPage.mockResolvedValue({
+      transactions: [],
+      rawOffset: 60,
+      hasMore: false,
+    })
+
+    const { result } = renderHook(() => useSelfCustodialContacts())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    const page = await result.current.getTransactions("alice@blink.sv", "40")
+
+    expect(mockFetchContactPaymentsPage).toHaveBeenCalledWith(
+      mockSdk,
+      "alice@blink.sv",
+      40,
+    )
+    expect(page.nextCursor).toBeNull()
+  })
+
+  it("getTransactions() restarts rather than passing a cursor it did not issue", async () => {
+    mockFetchContactPaymentsPage.mockResolvedValue({
+      transactions: [],
+      rawOffset: 0,
+      hasMore: false,
+    })
+
+    const { result } = renderHook(() => useSelfCustodialContacts())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await result.current.getTransactions("alice@blink.sv", "not-a-number")
+
+    expect(mockFetchContactPaymentsPage).toHaveBeenCalledWith(
+      mockSdk,
+      "alice@blink.sv",
+      0,
+    )
+  })
+
+  it("holds no contacts when the first read fails, and stops loading", async () => {
+    // A failed read leaves the screen with nothing to match against rather than a
+    // half-populated list, and must not spin forever.
+    mockListContacts.mockRejectedValue(new Error("sdk unavailable"))
+
+    const { result } = renderHook(() => useSelfCustodialContacts())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    await expect(result.current.update("c1", { displayName: "Alice 2" })).rejects.toThrow(
+      /Contact c1 not found/,
+    )
+  })
+
+  it("ignores a read that answers after it unmounts", async () => {
+    let rejectRead: (error: Error) => void = () => {}
+    mockListContacts.mockReturnValue(
+      new Promise((_resolve, reject) => {
+        rejectRead = reject
+      }),
+    )
+
+    const { unmount } = renderHook(() => useSelfCustodialContacts())
+    unmount()
+
+    await act(async () => {
+      rejectRead(new Error("late"))
+    })
+
+    expect(mockListContacts).toHaveBeenCalledWith(mockSdk)
   })
 })

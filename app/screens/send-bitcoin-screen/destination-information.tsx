@@ -76,6 +76,21 @@ const destinationStateToInformation = (
             text: translate.SendBitcoinDestinationScreen.usernameDoesNotExistAdvice(),
           },
         }
+      case InvalidDestinationReason.DestinationUnverifiable:
+        return {
+          error: translate.SendBitcoinDestinationScreen.destinationUnverifiable({
+            lnAddress: toLnAddress(
+              (
+                sendBitcoinReducerState?.invalidDestination
+                  .invalidPaymentDestination as IntraledgerPaymentDestination
+              ).handle,
+            ),
+            bankName,
+          }),
+          adviceTooltip: {
+            text: translate.SendBitcoinDestinationScreen.destinationUnverifiableAdvice(),
+          },
+        }
       case InvalidDestinationReason.SelfPayment:
         return {
           error: translate.SendBitcoinDestinationScreen.selfPaymentError({
@@ -90,6 +105,10 @@ const destinationStateToInformation = (
           adviceTooltip: {
             text: translate.SendBitcoinDestinationScreen.selfPaymentAdvice(),
           },
+        }
+      case InvalidDestinationReason.LnurlServiceError:
+        return {
+          error: translate.SendBitcoinDestinationScreen.lnurlServiceError(),
         }
       case InvalidDestinationReason.LnurlError ||
         InvalidDestinationReason.LnurlUnsupported:

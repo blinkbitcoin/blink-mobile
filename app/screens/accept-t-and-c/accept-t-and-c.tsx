@@ -6,8 +6,13 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { reportError } from "@app/utils/error-logging"
+import { toastShow } from "@app/utils/toast"
+import { StorageFailure } from "@app/utils/storage/storage-failure"
 import { BLOCKED_COUNTRIES_FAQ_LINK } from "@app/config"
 import { useFeatureFlags } from "@app/config/feature-flags-context"
+import { useCodeCheckHold } from "@app/hooks/use-code-check-hold"
+import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
@@ -16,6 +21,14 @@ import {
   MigrationCheckpoint,
   useMigrationCheckpoint,
 } from "@app/screens/account-migration/hooks"
+import {
+  RestoreWalletStatus,
+  useRestoreWallet,
+} from "@app/screens/self-custodial/onboarding/restore/hooks/use-restore-wallet"
+import {
+  clearPendingRestore,
+  readPendingRestore,
+} from "@app/screens/self-custodial/onboarding/restore/pending-restore"
 
 import { Screen } from "../../components/screen"
 import { PhoneLoginInitiateType } from "../phone-auth-screen"
@@ -33,10 +46,31 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
   const route = useRoute<RouteProp<RootStackParamList, "acceptTermsAndConditions">>()
   const { flow, mode } = route.params || { flow: "phone" }
   const { saveCheckpoint } = useMigrationCheckpoint()
+  /** saveCheckpoint reports a store that refused, but not a save it turned away for want of
+   *  an owner, which never reached the store. That one repeats on every tap while the owner
+   *  lookup is down, so it is reported once for as long as the screen is mounted, as the
+   *  commit screen does: one failure is one event, however many taps it costs. */
+  const hasReportedOwnerlessSaveRef = React.useRef(false)
+  /** The guard holds a second tap before React has committed the disabled button; the
+   *  state is what shows the button busy. Without either, two taps issue two saves and
+   *  both answers navigate. */
+  const { run: runExclusively } = useInFlightGuard()
+  const [isSavingTerms, setIsSavingTerms] = React.useState(false)
 
   const { deviceAccountEnabled } = useFeatureFlags()
   const appCheckToken = useAppCheckToken({ skip: !deviceAccountEnabled })
   const { createDeviceAccountAndLogin, loading } = useCreateDeviceAccount()
+  const { restore, status: restoreStatus } = useRestoreWallet()
+
+  const isRestoreFlow = flow === "selfCustodialRestore"
+  /** The held phrase outlives Accept on purpose: an operator outage sends "Try again
+   *  later" back here, and Accept must have the phrase to retry. It goes once the terms
+   *  leave the stack, whether the restore landed or the user backed out. */
+  React.useEffect(() => {
+    if (!isRestoreFlow) return
+    const held = readPendingRestore()
+    return () => clearPendingRestore(held)
+  }, [isRestoreFlow])
 
   const fallbackToPhoneLogin = () => {
     navigation.navigate("login", {
@@ -44,19 +78,79 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
     })
   }
 
+  const resolveNotSavedMessage = (failure: StorageFailure | null): string => {
+    const { storageUnavailable } = LL.AccountMigration
+    if (failure === StorageFailure.OutOfSpace) {
+      return storageUnavailable.notSavedOutOfSpaceBody()
+    }
+    if (failure !== null) return storageUnavailable.notSavedBody()
+    return LL.errors.generic()
+  }
+
+  /** The acceptance is part of the migration's consent trail, so advance only once the
+   *  checkpoint write lands; otherwise a failed write would later re-prompt for terms the
+   *  user already accepted. */
+  const acceptMigrationTerms = async () => {
+    setIsSavingTerms(true)
+    try {
+      const { isSaved, failure } = await saveCheckpoint(MigrationCheckpoint.BackupMethod)
+      /** A Continue that answers a tap with nothing reads as a broken button. A store that
+       *  refused is named as the device's, a full disk most of all since the user can go
+       *  and fix it; a write turned away before it reached the store (no owner yet) is not
+       *  the device's fault and keeps the generic copy. */
+      if (!isSaved) {
+        const isRefusedWithoutOwner = failure === null
+        if (isRefusedWithoutOwner && !hasReportedOwnerlessSaveRef.current) {
+          hasReportedOwnerlessSaveRef.current = true
+          reportError(
+            "Migration terms",
+            new Error("Migration checkpoint save refused without an owner"),
+          )
+        }
+        toastShow({ message: resolveNotSavedMessage(failure), LL })
+        return
+      }
+      navigation.navigate("selfCustodialBackupMethod")
+    } finally {
+      setIsSavingTerms(false)
+    }
+  }
+
+  /** Restore reports its own failures (a toast, or the outage screen); Accept stays here
+   *  so the user can try again or back out. Without a held phrase there is nothing to
+   *  accept for, so the screen returns to where the phrase is given. */
+  const acceptRestoreTerms = async () => {
+    const pending = readPendingRestore()
+    if (!pending) {
+      navigation.goBack()
+      return
+    }
+    await restore(pending.mnemonic, pending.method).catch(() => undefined)
+  }
+
+  /** The restore status is the app's, so it counts only on the restore's own terms: a
+   *  restore left running must not hold the terms of a creation, a migration or a login. */
+  const isRestoring = isRestoreFlow && restoreStatus === RestoreWalletStatus.Restoring
+  /** A restore that is running is not left behind: backing out mid-restore and accepting
+   *  again from a new terms screen would race it, and its answer would navigate from a
+   *  screen the user had already left. */
+  useCodeCheckHold(isRestoring)
+
+  const isAcceptBusy = loading || isSavingTerms || isRestoring
+
   const action = async () => {
     if (flow === "migration") {
-      /** The acceptance is part of the migration's consent trail, so advance only once the
-       *  checkpoint write lands; otherwise a failed write would later re-prompt for terms the
-       *  user already accepted. */
-      const saved = await saveCheckpoint(MigrationCheckpoint.BackupMethod)
-      if (!saved) return
-      navigation.navigate("selfCustodialBackupMethod")
+      await runExclusively(acceptMigrationTerms)
       return
     }
 
     if (flow === "selfCustodial") {
       navigation.navigate("selfCustodialWalletCreation", { mode })
+      return
+    }
+
+    if (isRestoreFlow) {
+      await acceptRestoreTerms()
       return
     }
 
@@ -102,8 +196,8 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
           <GaloyPrimaryButton
             title={LL.AcceptTermsAndConditionsScreen.accept()}
             onPress={action}
-            loading={loading}
-            disabled={loading}
+            loading={isAcceptBusy}
+            disabled={isAcceptBusy}
           />
         </View>
       </View>
@@ -111,7 +205,7 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(() => ({
   screenStyle: {
     padding: 20,
     flexGrow: 1,
@@ -121,27 +215,8 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "flex-end",
     marginBottom: 14,
   },
-
-  inputContainer: {
-    marginBottom: 20,
-    flexDirection: "row",
-    alignItems: "stretch",
-    minHeight: 48,
-  },
   textContainer: {
     marginBottom: 20,
   },
   viewWrapper: { flex: 1 },
-
-  inputContainerStyle: {
-    flex: 1,
-    borderWidth: 2,
-    borderBottomWidth: 2,
-    paddingHorizontal: 10,
-    borderColor: colors.primary5,
-    borderRadius: 8,
-  },
-  errorContainer: {
-    marginBottom: 20,
-  },
 }))

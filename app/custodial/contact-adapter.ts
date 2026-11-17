@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react"
 
+import { gql } from "@apollo/client"
 import {
   useContactsQuery,
   useUserContactUpdateAliasMutation,
@@ -9,9 +10,23 @@ import {
   type Contact,
   type ContactAdapter,
   type ContactListResult,
+  type ContactTransactionsPage,
 } from "@app/types/contact"
-import { type NormalizedTransaction } from "@app/types/transaction"
 import { AccountType } from "@app/types/wallet"
+
+gql`
+  mutation userContactUpdateAlias($input: UserContactUpdateAliasInput!) {
+    userContactUpdateAlias(input: $input) {
+      errors {
+        message
+      }
+      contact {
+        alias
+        id
+      }
+    }
+  }
+`
 
 const unsupported = (operation: string): Error =>
   new Error(`Custodial contacts do not support ${operation}`)
@@ -82,8 +97,15 @@ export const useCustodialContactAdapter = (): ContactAdapter & {
     throw unsupported("deleting contacts")
   }, [])
 
+  /**
+   * Custodial contact history is resolved by the `transactionListForContact` query, which
+   * pages through Apollo, so the adapter has nothing to answer here.
+   */
   const getTransactions = useCallback(
-    async (_contactId: string): Promise<NormalizedTransaction[]> => [],
+    async (_contactId: string): Promise<ContactTransactionsPage> => ({
+      transactions: [],
+      nextCursor: null,
+    }),
     [],
   )
 

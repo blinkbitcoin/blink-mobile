@@ -9,8 +9,11 @@ import {
 import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { staticSurface } from "@app/rne-theme/surfaces"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 export const ValueStyle = {
   Bold: "bold",
@@ -49,6 +52,10 @@ type InputFieldProps = {
   loading?: boolean
   disabled?: boolean
   keyboardType?: KeyboardTypeOptions
+  maxLength?: number
+  /** Keeps a line under the field for helper or error text, so the layout doesn't jump
+   *  when one appears. Turn it off for a field that never shows either. */
+  reserveHelperLine?: boolean
   formatDisplay?: (value: string) => string
   testID?: string
 } & IconProps
@@ -78,6 +85,8 @@ export const InputField: React.FC<InputFieldProps> = ({
   loading = false,
   disabled = false,
   keyboardType,
+  maxLength,
+  reserveHelperLine = true,
   formatDisplay,
   testID,
 }) => {
@@ -130,7 +139,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   const isError = Boolean(validationError) || error
 
   const rightIconElement = rightIcon ? (
-    <GaloyIcon name={rightIcon} size={20} color={colors.primary} />
+    <GaloyIcon name={rightIcon} size={20} color={colors.accent} />
   ) : null
 
   if (isEditable) {
@@ -151,10 +160,11 @@ export const InputField: React.FC<InputFieldProps> = ({
               onChangeText?.(text)
             }}
             placeholder={placeholder ?? label}
-            placeholderTextColor={colors.grey3}
-            selectionColor={colors.primary}
+            placeholderTextColor={colors.textDisabled}
+            selectionColor={colors.accent}
             accessibilityLabel={label}
             keyboardType={keyboardType}
+            maxLength={maxLength}
             editable={!disabled}
             onFocus={() => setIsFocused(true)}
             onBlur={() => {
@@ -164,29 +174,31 @@ export const InputField: React.FC<InputFieldProps> = ({
             }}
           />
           {loading ? (
-            <ActivityIndicator size="small" color={colors.primary} />
+            <ActivityIndicator size="small" color={colors.accent} />
           ) : (
             rightIconElement
           )}
         </View>
-        <View style={styles.helperTextContainer}>
-          {displayHelperText ? (
-            <View style={styles.helperTextRow}>
-              {isError && (
-                <GaloyIcon name="warning-circle" size={12} color={colors.error} />
-              )}
-              <Text style={[styles.helperText, isError && styles.helperTextError]}>
-                {displayHelperText}
-              </Text>
-            </View>
-          ) : null}
-        </View>
+        {reserveHelperLine && (
+          <View style={[styles.helperTextContainer, styles.helperSpacing]}>
+            {displayHelperText ? (
+              <View style={styles.helperTextRow}>
+                {isError && (
+                  <GaloyIcon name="warning-circle" size={12} color={colors.error} />
+                )}
+                <Text style={[styles.helperText, isError && styles.helperTextError]}>
+                  {displayHelperText}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+        )}
       </View>
     )
   }
 
   const content = (
-    <View style={styles.valueContainer}>
+    <View style={[styles.valueContainer, !onPress && styles.valueContainerStatic]}>
       <Text style={styles.value}>{value}</Text>
       {rightIconElement}
     </View>
@@ -210,7 +222,13 @@ export const InputField: React.FC<InputFieldProps> = ({
       <Text style={styles.label}>{label}</Text>
       {pressableContent}
       {helperText ? (
-        <Text style={[styles.helperText, isError && styles.helperTextError]}>
+        <Text
+          style={[
+            styles.helperText,
+            styles.helperSpacing,
+            isError && styles.helperTextError,
+          ]}
+        >
           {helperText}
         </Text>
       ) : null}
@@ -223,19 +241,18 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
   const isLarge = size === InputSize.Large
 
   return {
-    container: {
-      gap: 3,
-    },
+    container: {},
     label: {
-      color: colors.black,
+      color: colors.textSecondary,
       fontSize: 14,
       fontFamily: "Source Sans Pro",
       fontWeight: "400",
       lineHeight: 20,
+      marginBottom: groupTitleGap,
     },
     valueContainer: {
-      backgroundColor: colors.grey5,
-      borderRadius: 8,
+      backgroundColor: colors.surfaceInteractive,
+      borderRadius: radius.default,
       minHeight: isLarge ? 52 : 50,
       paddingLeft: 14,
       paddingRight: 10,
@@ -247,9 +264,10 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
     valueContainerDisabled: {
       opacity: 0.5,
     },
+    valueContainerStatic: staticSurface(colors),
     value: {
       flex: 1,
-      color: isLarge || isBold ? colors.black : colors.grey2,
+      color: isLarge || isBold ? colors.textOnBackground : colors.textMuted,
       fontSize: isLarge ? 18 : isBold ? 14 : 16,
       fontFamily: "Source Sans Pro",
       fontWeight: isLarge ? "400" : isBold ? "700" : "400",
@@ -259,13 +277,16 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
       padding: 0,
     },
     helperText: {
-      color: colors.black,
+      color: colors.textOnBackground,
       fontSize: 10,
       lineHeight: 13,
       fontWeight: "400",
     },
     helperTextError: {
       color: colors.error,
+    },
+    helperSpacing: {
+      marginTop: 3,
     },
     helperTextContainer: {
       minHeight: 13,

@@ -4,8 +4,8 @@ import HomeIcon from "@app/assets/icons/home.svg"
 import LearnIcon from "@app/assets/icons/learn.svg"
 import MapIcon from "@app/assets/icons/map.svg"
 import ScanIcon from "@app/assets/icons/scan.svg"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { TranslationFunctions } from "@app/i18n/i18n-types"
 import {
   ConversionConfirmationScreen,
   ConversionDetailsScreen,
@@ -49,10 +49,21 @@ import { ThemeScreen } from "@app/screens/settings-screen/theme-screen"
 import { FeeRatesScreen } from "@app/screens/settings-screen/fee-rates-screen"
 import { TransactionLimitsScreen } from "@app/screens/settings-screen/transaction-limits-screen"
 import {
+  AuthenticatorAppsScreen,
+  AuthenticatorIntroScreen,
+  AuthenticatorProtectedScreen,
+  SetupKeyBackupScreen,
+  LoginMethodCodeScreen,
+  loginMethodCodeCopy,
+  TotpDeleteValidateScreen,
   TotpLoginValidateScreen,
   TotpRegistrationInitiateScreen,
   TotpRegistrationValidateScreen,
 } from "@app/screens/totp-screen"
+import {
+  TwoFactorNonCustodialScreen,
+  TwoFactorSetupScreen,
+} from "@app/screens/two-factor-enforcement"
 import { WebViewScreen } from "@app/screens/webview/webview"
 import { testProps } from "@app/utils/testProps"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
@@ -63,7 +74,6 @@ import {
 } from "@react-navigation/native-stack"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import {
   AuthenticationCheckScreen,
@@ -73,7 +83,7 @@ import {
 import { PinScreen } from "../screens/authentication-screen/pin-screen"
 import { unlockScreenOptions } from "../screens/authentication-screen/unlock-screen"
 import { EarnMapScreen } from "../screens/earns-map-screen"
-import { EarnQuiz, EarnSection } from "../screens/earns-screen"
+import { EarnQuiz, EarnSection, earnSectionHeaderOptions } from "../screens/earns-screen"
 import { SectionCompleted } from "../screens/earns-screen/section-completed"
 import { AccountTypeSelectionScreen } from "../screens/account-type-selection"
 import { GetStartedScreen } from "../screens/get-started-screen"
@@ -95,12 +105,15 @@ import { UnclaimedDepositsScreen } from "../screens/unclaimed-deposits/unclaimed
 
 import { OfflineGate } from "@app/self-custodial/components"
 import { useSelfCustodialUnavailable } from "@app/self-custodial/hooks/use-unavailable"
-import { usePersistentStateContext } from "@app/store/persistent-state"
 import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-screen"
 import { CardFeeScheduleScreen } from "@app/screens/card-screen/card-fee-schedule-screen"
-import { headerBackControl } from "@app/components/header-back-control/header-back-control"
+import {
+  defaultHeaderBack,
+  headerBackControl,
+  suppressedHeaderBack,
+} from "@app/components/header-back-control/header-back-control"
 import { headerCloseControlOptions } from "@app/components/header-close-control"
-import { headerRightNoGlass } from "@app/components/header-no-glass"
+import { headerIconTouchArea, headerRightNoGlass } from "@app/components/header-no-glass"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
 import {
   CardAddToMobileWalletScreen,
@@ -123,6 +136,13 @@ import {
   WelcomeOnboardScreen,
   CardSubscriptionScreen,
   LoadingCardScreen,
+  WelcomeInvestScreen,
+  SelectInvestScreen,
+  TermSheetScreen,
+  TransferInvestScreen,
+  InsufficientBalanceScreen,
+  DepositPendingScreen,
+  CompanyValuationScreen,
   CardPersonalInformationScreen,
   CardAcknowledgementScreen,
   CardPreapprovedScreen,
@@ -143,6 +163,7 @@ import {
   ViewBackupSecurityChecksScreen,
   ViewBackupPhraseScreen,
   BackupPhraseConfirmScreen,
+  BundleExportScreen,
   BackupSuccessScreen,
   ChooseExperienceScreen,
   WalletCreationScreen,
@@ -152,6 +173,7 @@ import {
   RestoreMethodScreen,
   RestorePhraseScreen,
   CloudRestoreScreen,
+  OperatorUnreachableScreen,
 } from "@app/screens/self-custodial/onboarding/restore"
 import {
   MigrationBalancesOverviewScreen,
@@ -172,11 +194,14 @@ import {
   PrimaryStackParamList,
   RootStackParamList,
 } from "./stack-param-lists"
-import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
+import { useBottomTabBarStyle } from "./bottom-tab-bar-style"
 import { useResumeCompletedMigration } from "@app/screens/account-migration/hooks/use-resume-completed-migration"
+
+import { HomeGate } from "./home-gate"
+import { LAUNCH_ROUTE } from "./unlock-routes"
 import { WindDownReceiveGate } from "@app/screens/account-migration/wind-down-receive-gate"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
-import { StyleSheet, Text as RNText, TextStyle, TouchableOpacity } from "react-native"
+import { StyleSheet, Text as RNText, TouchableOpacity } from "react-native"
 
 import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { RouteProp, useNavigation } from "@react-navigation/native"
@@ -191,15 +216,6 @@ const DeveloperScreen: React.ComponentType | null = __DEV__
   ? // eslint-disable-next-line @typescript-eslint/no-var-requires
     require("../screens/developer-screen").DeveloperScreen
   : null
-
-/** Built once so every navigator hands `headerLeft` the same function. Calling the factory
- *  inside a navigator's screenOptions would mint a new identity on each render, which stays
- *  invisible only while native-stack invokes headerLeft instead of rendering it as an
- *  element; the day that changes, the back button would remount on every render. */
-const defaultHeaderBack = headerBackControl()
-/** Same reasoning as `defaultHeaderBack`: built once so the screens that refuse a back
- *  press hand `headerLeft` a stable identity instead of minting one per render. */
-const suppressedHeaderBack = headerBackControl({ canGoBack: false })
 
 const tabBarLabelStyles = StyleSheet.create({
   label: {
@@ -231,19 +247,6 @@ const tabBarLabelStyles = StyleSheet.create({
  */
 const renderHeaderTitle = (props: { children: string; tintColor?: string }) => (
   <HeaderTitle {...props} maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER} />
-)
-
-/** Frozen once, like the renderers below, so the heading keeps one style object. */
-const earnsHeaderTitleStyle: TextStyle = { fontWeight: "bold", fontSize: 18 }
-
-/** The earns section's own heading: the shared renderer with the weight and size that
- *  screen declares, since a title renderer leaves `headerTitleStyle` unread. */
-const renderEarnsHeaderTitle = (props: { children: string; tintColor?: string }) => (
-  <HeaderTitle
-    {...props}
-    maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
-    style={earnsHeaderTitleStyle}
-  />
 )
 
 const renderTabBarLabel = ({ color, children }: { color: string; children: string }) => (
@@ -319,23 +322,131 @@ const ConversionDetailsGated = withOfflineGate(ConversionDetailsScreen)
 const ConversionConfirmationGated = withOfflineGate(ConversionConfirmationScreen)
 const UnclaimedDepositsGated = withOfflineGate(UnclaimedDepositsScreen)
 
+/** The card investment onboarding leg, kept out of RootStack so that function stays under
+ *  the max-lines-per-function limit. A fragment rather than a component: the navigator
+ *  reads its Screen children directly, and only fragments and groups are flattened. */
+const investmentOnboardingScreens = () => (
+  <>
+    <RootNavigator.Screen
+      name="cardOnboardingWelcomeInvestScreen"
+      component={WelcomeInvestScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingCompanyValuationScreen"
+      component={CompanyValuationScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingSelectInvestScreen"
+      component={SelectInvestScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingTermSheetScreen"
+      component={TermSheetScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingTransferInvestScreen"
+      component={TransferInvestScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingInsufficientBalanceScreen"
+      component={InsufficientBalanceScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingDepositPendingScreen"
+      component={DepositPendingScreen}
+      options={{ headerShown: false }}
+    />
+  </>
+)
+
+/** The two-factor enforcement leg, out of RootStack for the same line limit. Leaving
+ *  any of these screens is something the account is held to, so none can be swiped
+ *  away: each exit goes through the screen's own control, which does the counting. */
+const twoFactorEnforcementScreens = () => (
+  <>
+    <RootNavigator.Screen
+      name="twoFactorSetup"
+      component={TwoFactorSetupScreen}
+      options={{ headerShown: false, gestureEnabled: false }}
+    />
+    <RootNavigator.Screen
+      name="twoFactorNonCustodial"
+      component={TwoFactorNonCustodialScreen}
+      options={{ headerShown: false, gestureEnabled: false }}
+    />
+  </>
+)
+
+/** The authenticator registration, from the onboarding to the key's backup, out of
+ *  RootStack for the same line limit. Every route shares the totpRegistration prefix,
+ *  which is how the flow finds where it began and the gate tells a remedy apart. The
+ *  backup takes no swipe: it is the one chance to keep the key, which an accidental
+ *  swipe would close for good; its back arrow still leaves. */
+const totpRegistrationScreens = (LL: TranslationFunctions) => (
+  <>
+    <RootNavigator.Screen
+      name="totpRegistrationIntro"
+      component={AuthenticatorIntroScreen}
+      options={{ title: "", gestureEnabled: false }}
+    />
+    <RootNavigator.Screen
+      name="totpRegistrationApps"
+      component={AuthenticatorAppsScreen}
+      options={{ title: "" }}
+    />
+    <RootNavigator.Screen
+      name="totpRegistrationInitiate"
+      component={TotpRegistrationInitiateScreen}
+      options={{
+        title: LL.TotpRegistrationInitiateScreen.title(),
+      }}
+    />
+    <RootNavigator.Screen
+      name="totpRegistrationValidate"
+      component={TotpRegistrationValidateScreen}
+      options={{
+        title: LL.TotpRegistrationValidateScreen.title(),
+      }}
+    />
+    <RootNavigator.Screen
+      name="totpRegistrationBackup"
+      component={SetupKeyBackupScreen}
+      options={{ title: "", gestureEnabled: false }}
+    />
+    <RootNavigator.Screen
+      name="totpRegistrationDone"
+      component={AuthenticatorProtectedScreen}
+      options={{ title: "" }}
+    />
+  </>
+)
+
+// eslint-disable-next-line max-lines-per-function -- RootStack is one flat route table; splitting it solely to meet the line cap would scatter screen registrations that are read as a single list
 export const RootStack = () => {
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
-  const isAuthed = useIsAuthed()
   const { LL } = useI18nContext()
-  const { persistentState } = usePersistentStateContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-  const hasAccount = isAuthed || Boolean(persistentState.activeAccountId)
   const shouldShowUnavailable = useSelfCustodialUnavailable()
 
   if (shouldShowUnavailable) {
     return <TemporarilyUnavailableScreen />
   }
 
+  /** Every launch starts at the gate, with an account or without. Starting a device that
+   *  has none on the landing screen put that screen in front of a lock that could still be
+   *  set, and from there a new account can be opened with no credentials: it lists every
+   *  wallet the device stores. The gate sends a launch with nothing to unlock straight on
+   *  to where it used to start. */
   return (
     <RootNavigator.Navigator
       screenOptions={{
@@ -344,11 +455,11 @@ export const RootStack = () => {
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
         headerTitle: renderHeaderTitle,
-        headerTintColor: colors.black,
+        headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
       }}
-      initialRouteName={hasAccount ? "authenticationCheck" : "getStarted"}
+      initialRouteName={LAUNCH_ROUTE}
     >
       <RootNavigator.Screen
         name="getStarted"
@@ -418,7 +529,7 @@ export const RootStack = () => {
               onPress={() => navigation.setParams({ scanPressed: Date.now() })}
               style={styles.SendBitcoinScreenScanIcon}
             >
-              <ScanIcon fill={colors.black} />
+              <ScanIcon fill={colors.textOnBackground} />
             </TouchableOpacity>
           )),
         }}
@@ -496,14 +607,7 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="earnsSection"
         component={EarnSection}
-        options={{
-          headerStyle: { backgroundColor: colors._blue },
-          headerTintColor: colors._white,
-          /** A `headerTitle` renderer takes over from `headerTitleStyle`, which native
-           *  stack then ignores, so this screen states its own heading rather than losing
-           *  the weight and size it was given. */
-          headerTitle: renderEarnsHeaderTitle,
-        }}
+        options={earnSectionHeaderOptions(colors)}
       />
       <RootNavigator.Screen
         name="earnsQuiz"
@@ -707,26 +811,26 @@ export const RootStack = () => {
           title: LL.common.codeConfirmation(),
         }}
       />
-      <RootNavigator.Screen
-        name="totpRegistrationInitiate"
-        component={TotpRegistrationInitiateScreen}
-        options={{
-          title: LL.TotpRegistrationInitiateScreen.title(),
-        }}
-      />
-      <RootNavigator.Screen
-        name="totpRegistrationValidate"
-        component={TotpRegistrationValidateScreen}
-        options={{
-          title: LL.TotpRegistrationValidateScreen.title(),
-        }}
-      />
+      {twoFactorEnforcementScreens()}
+      {totpRegistrationScreens(LL)}
       <RootNavigator.Screen
         name="totpLoginValidate"
         component={TotpLoginValidateScreen}
         options={{
           title: LL.TotpLoginValidateScreen.title(),
         }}
+      />
+      <RootNavigator.Screen
+        name="totpDeleteValidate"
+        component={TotpDeleteValidateScreen}
+        options={{ title: LL.AccountScreen.totp() }}
+      />
+      <RootNavigator.Screen
+        name="loginMethodCode"
+        component={LoginMethodCodeScreen}
+        options={({ route }) => ({
+          title: loginMethodCodeCopy(LL, route.params.addition).title,
+        })}
       />
       <RootNavigator.Screen
         name="webView"
@@ -882,6 +986,7 @@ export const RootStack = () => {
           ...headerCloseControlOptions(),
         }}
       />
+      {investmentOnboardingScreens()}
       <RootNavigator.Screen
         name="cardOnboardingPersonalInfoScreen"
         component={CardPersonalInformationScreen}
@@ -969,9 +1074,14 @@ export const RootStack = () => {
         }}
       />
       <RootNavigator.Screen
+        name="selfCustodialBackupBundleExport"
+        component={BundleExportScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
         name="selfCustodialBackupSuccess"
         component={BackupSuccessScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
       <RootNavigator.Screen
         name="selfCustodialChooseExperience"
@@ -1053,6 +1163,11 @@ export const RootStack = () => {
         component={CloudRestoreScreen}
         options={{ title: "" }}
       />
+      <RootNavigator.Screen
+        name="selfCustodialOperatorUnreachable"
+        component={OperatorUnreachableScreen}
+        options={{ title: "" }}
+      />
     </RootNavigator.Navigator>
   )
 }
@@ -1074,7 +1189,7 @@ export const OnboardingNavigator = () => {
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
         headerTitle: renderHeaderTitle,
-        headerTintColor: colors.black,
+        headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
       }}
     >
@@ -1130,7 +1245,7 @@ export const ContactNavigator = () => {
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
         headerTitle: renderHeaderTitle,
-        headerTintColor: colors.black,
+        headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
       }}
@@ -1147,7 +1262,7 @@ export const ContactNavigator = () => {
       <StackContacts.Screen
         name="contactDetail"
         component={ContactsDetailScreen}
-        options={{ headerShown: false }}
+        options={{ title: "" }}
       />
       <StackContacts.Screen
         name="allContacts"
@@ -1189,7 +1304,7 @@ export const PhoneLoginNavigator = () => {
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
         headerTitle: renderHeaderTitle,
-        headerTintColor: colors.black,
+        headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
       }}
@@ -1222,11 +1337,10 @@ export const PhoneLoginNavigator = () => {
 const Tab = createBottomTabNavigator<PrimaryStackParamList>()
 
 export const PrimaryNavigator = () => {
-  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
-  const insets = useSafeAreaInsets()
+  const tabBarStyle = useBottomTabBarStyle()
 
   const { LL } = useI18nContext()
 
@@ -1234,93 +1348,83 @@ export const PrimaryNavigator = () => {
    *  here, before any screen renders, since no screen in the flow is mounted to do it. */
   useResumeCompletedMigration()
 
-  const migrationBlocker = useMigrationBlocker()
-  if (migrationBlocker.isVisible) return <MigrationGate />
-
   return (
-    <Tab.Navigator
-      initialRouteName="Home"
-      screenOptions={{
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.grey2,
-        tabBarStyle: [
-          styles.bottomNavigatorStyle,
-          {
-            height: 60 + insets.bottom,
-            paddingBottom: insets.bottom,
-          },
-        ],
-        tabBarLabel: renderTabBarLabel,
-        tabBarHideOnKeyboard: true,
-      }}
-    >
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          title: LL.HomeScreen.title(),
-          tabBarAccessibilityLabel: LL.HomeScreen.title(),
-          tabBarButtonTestID: LL.HomeScreen.title(),
-          tabBarIcon: ({ color }: { color: string }) => (
-            <HomeIcon {...testProps("Home")} fill={color} color={color} />
-          ),
-          headerShown: false,
+    <HomeGate>
+      <Tab.Navigator
+        initialRouteName="Home"
+        screenOptions={{
+          tabBarActiveTintColor: colors.accent,
+          tabBarInactiveTintColor: colors.textMuted,
+          tabBarStyle,
+          tabBarLabel: renderTabBarLabel,
+          tabBarHideOnKeyboard: true,
         }}
-      />
-      <Tab.Screen
-        name="People"
-        component={ContactNavigator}
-        options={{
-          headerShown: false,
-          title: LL.PeopleScreen.title(),
-          tabBarAccessibilityLabel: LL.PeopleScreen.title(),
-          tabBarButtonTestID: LL.PeopleScreen.title(),
-          tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) => (
-            <PeopleTabIcon color={color} focused={focused} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Map"
-        component={MapScreen}
-        options={{
-          title: LL.MapScreen.title(),
-          headerShown: false,
-          tabBarAccessibilityLabel: LL.MapScreen.title(),
-          tabBarButtonTestID: LL.MapScreen.title(),
-          tabBarIcon: ({ color }: { color: string }) => <MapIcon color={color} />,
-        }}
-      />
-      <Tab.Screen
-        name="Earn"
-        component={EarnMapScreen}
-        options={{
-          title: LL.EarnScreen.title(),
-          headerShown: false,
-          tabBarAccessibilityLabel: LL.EarnScreen.title(),
-          tabBarButtonTestID: LL.EarnScreen.title(),
-          tabBarIcon: ({ color }: { color: string }) => (
-            <LearnIcon {...testProps("Earn")} color={color} />
-          ),
-        }}
-      />
-    </Tab.Navigator>
+      >
+        <Tab.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            title: LL.HomeScreen.title(),
+            tabBarAccessibilityLabel: LL.HomeScreen.title(),
+            tabBarButtonTestID: LL.HomeScreen.title(),
+            tabBarIcon: ({ color }: { color: string }) => (
+              <HomeIcon {...testProps("Home")} fill={color} color={color} />
+            ),
+            headerShown: false,
+          }}
+        />
+        <Tab.Screen
+          name="People"
+          component={ContactNavigator}
+          options={{
+            headerShown: false,
+            title: LL.PeopleScreen.title(),
+            tabBarAccessibilityLabel: LL.PeopleScreen.title(),
+            tabBarButtonTestID: LL.PeopleScreen.title(),
+            tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) => (
+              <PeopleTabIcon color={color} focused={focused} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Map"
+          component={MapScreen}
+          options={{
+            title: LL.MapScreen.title(),
+            headerShown: false,
+            tabBarAccessibilityLabel: LL.MapScreen.title(),
+            tabBarButtonTestID: LL.MapScreen.title(),
+            tabBarIcon: ({ color }: { color: string }) => <MapIcon color={color} />,
+          }}
+        />
+        <Tab.Screen
+          name="Earn"
+          component={EarnMapScreen}
+          options={{
+            title: LL.EarnScreen.title(),
+            headerShown: false,
+            tabBarAccessibilityLabel: LL.EarnScreen.title(),
+            tabBarButtonTestID: LL.EarnScreen.title(),
+            tabBarIcon: ({ color }: { color: string }) => (
+              <LearnIcon {...testProps("Earn")} color={color} />
+            ),
+          }}
+        />
+      </Tab.Navigator>
+    </HomeGate>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  bottomNavigatorStyle: {
-    paddingTop: 4,
-    backgroundColor: colors.white,
-    borderTopColor: colors.grey4,
-  },
   headerStyle: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundDefault,
   },
   title: {
-    color: colors.black,
+    color: colors.textOnBackground,
   },
+  // 48dp box around the 18dp icon: the margin gives back the 15dp it grew by.
   SendBitcoinScreenScanIcon: {
-    marginRight: 20,
+    ...headerIconTouchArea,
+    marginRight: 5,
   },
 }))

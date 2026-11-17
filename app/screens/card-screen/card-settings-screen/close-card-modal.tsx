@@ -3,6 +3,7 @@ import { Alert, TextInput, View } from "react-native"
 import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { radius } from "@app/rne-theme/radius"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
@@ -73,7 +74,7 @@ export const CloseCardModal: React.FC<CloseCardModalProps> = ({
             onChangeText={setConfirmText}
             value={confirmText}
             placeholder={LL.CardFlow.CardSettings.closeCardClose()}
-            placeholderTextColor={colors.grey3}
+            placeholderTextColor={colors.textDisabled}
           />
         </View>
       }
@@ -94,18 +95,18 @@ const useStyles = makeStyles(({ colors }) => ({
   warning: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   instruction: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.grey0,
+    color: colors.textPrimary,
   },
   textInput: {
     fontSize: 16,
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
     padding: 12,
-    color: colors.black,
-    borderRadius: 8,
+    color: colors.textOnBackground,
+    borderRadius: radius.default,
   },
 }))

@@ -7,10 +7,12 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useFeeRatesQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
+import { cappedLineHeight } from "@app/rne-theme/text-scaling"
 import { formatDepositFeeTiers } from "@app/utils/deposit-fees"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { SettingsGroup } from "./group"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 
 gql`
   query feeRates {
@@ -23,6 +25,9 @@ gql`
             maxAmount
             amount
           }
+        }
+        inactivityFee {
+          usdCentsPerMonth
         }
       }
     }
@@ -55,6 +60,24 @@ const depositTierLabel = (
 // no rows remain), 0 renders as "no fee", positive values render the rate.
 const isRowVisible = (bps: number): boolean => bps >= 0
 
+// Lightning sends under this amount are not charged. Fixed server-side rather
+// than priced through feeRatesConfig, so it is a constant here; move it onto
+// the remote config if it ever needs to change without an app release.
+const LIGHTNING_FREE_BELOW_SATS = 100
+
+// The inactivity fee applies after this many months without a user action.
+// Set by the fee terms, not priced, so it is a constant like the one above.
+const INACTIVITY_THRESHOLD_MONTHS = 12
+
+// Whole dollars render bare ("$1"), anything else to the cent ("$1.50").
+const formatUsdCents = (cents: number): string => {
+  const usd = cents / 100
+  return `$${usd.toLocaleString("en-US", {
+    minimumFractionDigits: Number.isInteger(usd) ? 0 : 2,
+    maximumFractionDigits: 2,
+  })}`
+}
+
 type FeeRateRowProps = {
   label: string
   value: string
@@ -81,7 +104,7 @@ const LoadingRow: React.FC = () => {
   } = useTheme()
   return (
     <View style={styles.feeRow}>
-      <ActivityIndicator testID="fee-rates-loading" animating color={colors.primary} />
+      <ActivityIndicator testID="fee-rates-loading" animating color={colors.accent} />
     </View>
   )
 }
@@ -109,7 +132,7 @@ const ErrorRow: React.FC<ErrorRowProps> = ({ onRetry }) => {
 export const FeeRatesScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
-  const { feeRatesConfig } = useRemoteConfig()
+  const { feeRatesConfig, inactivityFeeEnabled } = useRemoteConfig()
 
   const { data, loading, error, refetch } = useFeeRatesQuery({
     fetchPolicy: "cache-and-network",
@@ -117,6 +140,8 @@ export const FeeRatesScreen: React.FC = () => {
   })
 
   const deposit = data?.globals?.feesInformation.deposit
+  const inactivityUsdCentsPerMonth =
+    data?.globals?.feesInformation.inactivityFee.usdCentsPerMonth
 
   // The hook's error state already surfaces a failed retry; the catch only
   // prevents an unhandled promise rejection.
@@ -133,21 +158,26 @@ export const FeeRatesScreen: React.FC = () => {
     const items: React.FC[] = []
     if (isRowVisible(feeRatesConfig.lightningSendBps)) {
       items.push(function LightningSendRow() {
-        const isFree =
-          feeRatesConfig.lightningSendBps === 0 && feeRatesConfig.lightningRoutingBps <= 0
         return (
           <FeeRateRow
             label={LL.FeeRatesScreen.lightning()}
             value={
-              isFree
+              feeRatesConfig.lightningSendBps === 0
                 ? LL.FeeRatesScreen.noFee()
-                : LL.FeeRatesScreen.lightningSendFee({
-                    fee: formatBps(feeRatesConfig.lightningSendBps),
-                    routingFee: formatBps(
-                      Math.max(feeRatesConfig.lightningRoutingBps, 0),
-                    ),
-                  })
+                : formatBps(feeRatesConfig.lightningSendBps)
             }
+          />
+        )
+      })
+      // Qualifies the row above, so it is gated on the same flag: hiding
+      // lightning sends must not leave its exemption stranded on its own.
+      items.push(function LightningBelowThresholdRow() {
+        return (
+          <FeeRateRow
+            label={LL.FeeRatesScreen.lightningBelowThreshold({
+              threshold: LIGHTNING_FREE_BELOW_SATS.toLocaleString("en-US"),
+            })}
+            value={LL.FeeRatesScreen.noFee()}
           />
         )
       })
@@ -247,6 +277,27 @@ export const FeeRatesScreen: React.FC = () => {
     ]
   }, [LL, feeRatesConfig])
 
+  // The backend charges one amount per balance, so both rows quote the same
+  // value. Hidden until it loads: the Receive section already surfaces the
+  // query's loading and error states.
+  const inactivityItems = useMemo(() => {
+    if (!inactivityFeeEnabled || inactivityUsdCentsPerMonth === undefined) return []
+    const value =
+      inactivityUsdCentsPerMonth === 0
+        ? LL.FeeRatesScreen.noFee()
+        : LL.FeeRatesScreen.usdPerMonth({
+            amount: formatUsdCents(inactivityUsdCentsPerMonth),
+          })
+    return [
+      function InactivityBitcoinRow() {
+        return <FeeRateRow label={LL.common.btcAccount()} value={value} />
+      },
+      function InactivityDollarRow() {
+        return <FeeRateRow label={LL.common.usdAccount()} value={value} />
+      },
+    ]
+  }, [LL, inactivityFeeEnabled, inactivityUsdCentsPerMonth])
+
   return (
     <Screen preset="scroll">
       <View style={styles.content}>
@@ -276,6 +327,18 @@ export const FeeRatesScreen: React.FC = () => {
             />
           </View>
         )}
+        {inactivityItems.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
+              {LL.FeeRatesScreen.inactivity({ months: INACTIVITY_THRESHOLD_MONTHS })}
+            </Text>
+            <SettingsGroup
+              items={inactivityItems}
+              containerStyle={styles.groupCard}
+              dividerStyle={styles.hiddenDivider}
+            />
+          </View>
+        )}
       </View>
     </Screen>
   )
@@ -289,15 +352,16 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 20,
   },
   section: {
-    gap: 5,
+    gap: groupTitleGap,
   },
   sectionTitle: {
-    color: colors.black,
+    color: colors.textSecondary,
     fontSize: 16,
     fontWeight: "400",
-    lineHeight: 24,
+    lineHeight: cappedLineHeight(24),
   },
   groupCard: {
+    marginTop: 0,
     paddingVertical: 5,
   },
   hiddenDivider: {
@@ -314,10 +378,10 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   feeLabel: {
     flex: 1,
-    color: colors.grey1,
+    color: colors.textSecondary,
   },
   feeValue: {
-    color: colors.black,
+    color: colors.textOnBackground,
     textAlign: "right",
     flexShrink: 0,
   },
