@@ -90,6 +90,16 @@ const Key = ({
    *  must not leave the guard set. */
   const hasTapped = useRef(false)
   const pointerDown = useRef(false)
+  /** A repeat tick already deleted. Release still emits onPress; that press must not delete again. */
+  const repeatFired = useRef(false)
+  /** Cleared if the release onPress follows pressOut. If it never comes, the timeout drops the guard. */
+  const releaseGuard = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const clearReleaseGuard = useCallback(() => {
+    if (!releaseGuard.current) return
+    clearTimeout(releaseGuard.current)
+    releaseGuard.current = null
+  }, [])
 
   const stopRepeat = useCallback(() => {
     if (!repeatTimer.current) return
@@ -114,13 +124,35 @@ const Key = ({
   const handlePressIn = (key: KeyType) => {
     pointerDown.current = true
     hasTapped.current = false
+    repeatFired.current = false
+    clearReleaseGuard()
     if (safeMode) return
     if (key !== KeyType.Backspace) return
     stopRepeat()
     /** A refused tick means the amount is empty: stop rather than tick against nothing. */
     repeatTimer.current = setInterval(() => {
+      repeatFired.current = true
       if (!press(key)) stopRepeat()
     }, BACKSPACE_REPEAT_MS)
+  }
+
+  const handlePressOut = () => {
+    stopRepeat()
+    if (!repeatFired.current) return
+    clearReleaseGuard()
+    releaseGuard.current = setTimeout(() => {
+      repeatFired.current = false
+      pointerDown.current = false
+      hasTapped.current = false
+      releaseGuard.current = null
+    }, 0)
+  }
+
+  const handlePress = () => {
+    clearReleaseGuard()
+    if (!repeatFired.current) press(numberPadKey)
+    repeatFired.current = false
+    endPointerGesture()
   }
 
   /** A key disabled mid-hold may never see its press-out. */
@@ -128,7 +160,13 @@ const Key = ({
     if (disabled) stopRepeat()
   }, [disabled, stopRepeat])
 
-  useEffect(() => stopRepeat, [stopRepeat])
+  useEffect(
+    () => () => {
+      stopRepeat()
+      clearReleaseGuard()
+    },
+    [stopRepeat, clearReleaseGuard],
+  )
 
   return (
     <Pressable
@@ -140,11 +178,8 @@ const Key = ({
         pressed && styles.keyPressedBg,
       ]}
       onPressIn={() => handlePressIn(numberPadKey)}
-      onPress={() => {
-        press(numberPadKey)
-        endPointerGesture()
-      }}
-      onPressOut={stopRepeat}
+      onPress={handlePress}
+      onPressOut={handlePressOut}
       {...testProps(`${KEY_TEST_ID_PREFIX} ${numberPadKey}`)}
       accessibilityRole="button"
       accessibilityLabel={isBackspace ? LL.Accessibility.deleteKey() : numberPadKey}

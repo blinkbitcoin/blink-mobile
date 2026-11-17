@@ -238,6 +238,51 @@ describe("CurrencyKeyboard held backspace", () => {
     fireEvent(key, "press")
 
     expect(haptics.tap).toHaveBeenCalledTimes(1)
+    expect(onPress).toHaveBeenCalledTimes(2)
+  })
+
+  it("does not delete again when a repeated hold is released", () => {
+    const { getByTestId } = render(<StatefulPad initial="12345" />)
+    const key = getByTestId("Key ⌫")
+
+    fireEvent(key, "pressIn")
+    for (let tick = 0; tick < 2; tick += 1) {
+      act(() => {
+        jest.advanceTimersByTime(300)
+      })
+    }
+    fireEvent(key, "pressOut")
+    fireEvent(key, "press")
+
+    expect(getByTestId("amount").props.children).toBe("123")
+  })
+
+  it("still deletes once when a short tap is released before a repeat", () => {
+    const onPress = jest.fn().mockReturnValue(true)
+    const { getByTestId } = render(<CurrencyKeyboard onPress={onPress} />)
+    const key = getByTestId("Key ⌫")
+
+    fireEvent(key, "pressIn")
+    fireEvent(key, "pressOut")
+    fireEvent(key, "press")
+
+    expect(onPress).toHaveBeenCalledTimes(1)
+  })
+
+  it("still deletes on the next accessibility click after a repeated hold", () => {
+    const onPress = jest.fn().mockReturnValue(true)
+    const { getByTestId } = render(<CurrencyKeyboard onPress={onPress} />)
+    const key = getByTestId("Key ⌫")
+
+    fireEvent(key, "pressIn")
+    act(() => {
+      jest.advanceTimersByTime(600)
+    })
+    fireEvent(key, "pressOut")
+    fireEvent(key, "press")
+    fireEvent(key, "click")
+
+    expect(onPress).toHaveBeenCalledTimes(3)
   })
 })
 
