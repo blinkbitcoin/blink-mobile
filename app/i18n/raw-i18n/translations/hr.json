@@ -4093,7 +4093,12 @@
     "pickBackupTitle": "Odaberite novčanik",
     "pickBackupDescription": "Odaberite sigurnosnu kopiju za vraćanje",
     "recognizePhraseTitle": "Prepoznajete li ovu frazu za sigurnosnu kopiju?",
-    "recognizePhraseBody": "Nikada ne unosite riječi koje vam je poslao netko drugi."
+    "recognizePhraseBody": "Nikada ne unosite riječi koje vam je poslao netko drugi.",
+    "scanSeedQr": "Skeniraj SeedQR",
+    "seedQrInvalid": "Ovaj SeedQR nije ispravna pričuvna fraza.",
+    "seedQrOnly12Words": "Blink vraća samo pričuvne fraze od 12 riječi.",
+    "seedQrNotSeedQr": "Ovo nije ispravan SeedQR.",
+    "seedQrUnreadable": "Ovaj SeedQR nije moguće pročitati. Pokušajte ponovno."
   },
   "EmergencyRecovery": {
     "outageTitle": "Operater nedostupan",

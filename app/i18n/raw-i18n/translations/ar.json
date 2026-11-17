@@ -4093,7 +4093,12 @@
     "pickBackupTitle": "اختر محفظة",
     "pickBackupDescription": "اختر نسخة احتياطية للاستعادة",
     "recognizePhraseTitle": "هل تتعرّف على عبارة النسخ الاحتياطي هذه؟",
-    "recognizePhraseBody": "لا تُدخل أبدًا كلمات أرسلها لك شخص آخر."
+    "recognizePhraseBody": "لا تُدخل أبدًا كلمات أرسلها لك شخص آخر.",
+    "scanSeedQr": "مسح SeedQR",
+    "seedQrInvalid": "رمز SeedQR هذا ليس عبارة نسخ احتياطي صحيحة.",
+    "seedQrOnly12Words": "يستعيد Blink عبارات النسخ الاحتياطي المكونة من 12 كلمة فقط.",
+    "seedQrNotSeedQr": "هذا ليس رمز SeedQR صالحًا.",
+    "seedQrUnreadable": "تعذّرت قراءة رمز SeedQR هذا. حاول مرة أخرى."
   },
   "EmergencyRecovery": {
     "outageTitle": "تعذّر الوصول إلى المشغّل",

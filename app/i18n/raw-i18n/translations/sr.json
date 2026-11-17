@@ -4093,7 +4093,12 @@
     "pickBackupTitle": "Изаберите новчаник",
     "pickBackupDescription": "Изаберите резервну копију за враћање",
     "recognizePhraseTitle": "Да ли препознајете ову фразу за резервну копију?",
-    "recognizePhraseBody": "Никада не уносите речи које вам је послао неко други."
+    "recognizePhraseBody": "Никада не уносите речи које вам је послао неко други.",
+    "scanSeedQr": "Скенирај SeedQR",
+    "seedQrInvalid": "Овај SeedQR није важећа резервна фраза.",
+    "seedQrOnly12Words": "Blink враћа само резервне фразе од 12 речи.",
+    "seedQrNotSeedQr": "Ово није важећи SeedQR.",
+    "seedQrUnreadable": "Није могуће прочитати овај SeedQR. Покушајте поново."
   },
   "EmergencyRecovery": {
     "outageTitle": "Оператер није доступан",

@@ -4093,7 +4093,12 @@
     "pickBackupTitle": "Επιλέξτε πορτοφόλι",
     "pickBackupDescription": "Επιλέξτε ένα αντίγραφο ασφαλείας για επαναφορά",
     "recognizePhraseTitle": "Αναγνωρίζετε αυτή τη φράση αντιγράφου ασφαλείας;",
-    "recognizePhraseBody": "Μην εισάγετε ποτέ λέξεις που σας έστειλε κάποιος άλλος."
+    "recognizePhraseBody": "Μην εισάγετε ποτέ λέξεις που σας έστειλε κάποιος άλλος.",
+    "scanSeedQr": "Σάρωση SeedQR",
+    "seedQrInvalid": "Αυτό το SeedQR δεν είναι έγκυρη φράση αντιγράφου ασφαλείας.",
+    "seedQrOnly12Words": "Το Blink επαναφέρει μόνο φράσεις αντιγράφου ασφαλείας 12 λέξεων.",
+    "seedQrNotSeedQr": "Αυτό δεν είναι έγκυρο SeedQR.",
+    "seedQrUnreadable": "Δεν ήταν δυνατή η ανάγνωση αυτού του SeedQR. Δοκιμάστε ξανά."
   },
   "EmergencyRecovery": {
     "outageTitle": "Ο πάροχος δεν είναι προσβάσιμος",

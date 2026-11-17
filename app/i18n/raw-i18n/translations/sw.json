@@ -4093,7 +4093,12 @@
     "pickBackupTitle": "Chagua pochi",
     "pickBackupDescription": "Chagua nakala rudufu ya kurejesha",
     "recognizePhraseTitle": "Je, unaitambua kaulisiri hii ya nakala rudufu?",
-    "recognizePhraseBody": "Kamwe usiweke maneno uliyotumiwa na mtu mwingine."
+    "recognizePhraseBody": "Kamwe usiweke maneno uliyotumiwa na mtu mwingine.",
+    "scanSeedQr": "Piga SeedQR",
+    "seedQrInvalid": "SeedQR hii si kifungu cha akiba sahihi.",
+    "seedQrOnly12Words": "Blink hurejesha vifungu vya akiba vya maneno 12 pekee.",
+    "seedQrNotSeedQr": "Hii si SeedQR sahihi.",
+    "seedQrUnreadable": "Imeshindwa kusoma SeedQR hii. Jaribu tena."
   },
   "EmergencyRecovery": {
     "outageTitle": "Mwendeshaji hapatikani",

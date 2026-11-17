@@ -4093,7 +4093,12 @@
     "pickBackupTitle": "Ընտրեք դրամապանակ",
     "pickBackupDescription": "Ընտրեք պահեստավորում վերականգնելու համար",
     "recognizePhraseTitle": "Ճանաչո՞ւմ եք այս պահուստային արտահայտությունը:",
-    "recognizePhraseBody": "Երբեք մի՛ մուտքագրեք բառեր, որ ուրիշն է ուղարկել ձեզ:"
+    "recognizePhraseBody": "Երբեք մի՛ մուտքագրեք բառեր, որ ուրիշն է ուղարկել ձեզ:",
+    "scanSeedQr": "Սկանավորել SeedQR",
+    "seedQrInvalid": "Այս SeedQR-ը վավեր պահեստային արտահայտություն չէ:",
+    "seedQrOnly12Words": "Blink-ը վերականգնում է միայն 12 բառից բաղկացած պահեստային արտահայտություններ:",
+    "seedQrNotSeedQr": "Սա վավեր SeedQR չէ:",
+    "seedQrUnreadable": "Չհաջողվեց կարդալ այս SeedQR-ը: Փորձեք կրկին:"
   },
   "EmergencyRecovery": {
     "outageTitle": "Օպերատորն անհասանելի է",

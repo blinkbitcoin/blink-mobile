@@ -4093,7 +4093,12 @@
     "pickBackupTitle": "Akllay wallet",
     "pickBackupDescription": "Akllay huk waqaychasqa kutichinaykipaq",
     "recognizePhraseTitle": "¿Kay waqaychana rimaykunata reqsinkichu?",
-    "recognizePhraseBody": "Ama hayk'aqpas hukkuna apachisqan simikunata churaychu."
+    "recognizePhraseBody": "Ama hayk'aqpas hukkuna apachisqan simikunata churaychu.",
+    "scanSeedQr": "SeedQR kaniy",
+    "seedQrInvalid": "Kay SeedQR manam allin waqaychana rimaychu.",
+    "seedQrOnly12Words": "Blink 12 simiyuq waqaychana rimaykunallata kutichin.",
+    "seedQrNotSeedQr": "Kayqa manam allin SeedQRchu.",
+    "seedQrUnreadable": "Mana atikunchu kay SeedQR ñawiriyta. Wakmanta kallpachakuy."
   },
   "EmergencyRecovery": {
     "outageTitle": "Operadorwan mana tinkiy atikunchu",

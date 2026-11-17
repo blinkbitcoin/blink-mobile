@@ -4093,7 +4093,12 @@
     "pickBackupTitle": "Chọn một ví",
     "pickBackupDescription": "Chọn bản sao lưu để khôi phục",
     "recognizePhraseTitle": "Bạn có nhận ra cụm từ sao lưu này không?",
-    "recognizePhraseBody": "Không bao giờ nhập các từ mà người khác gửi cho bạn."
+    "recognizePhraseBody": "Không bao giờ nhập các từ mà người khác gửi cho bạn.",
+    "scanSeedQr": "Quét SeedQR",
+    "seedQrInvalid": "SeedQR này không phải là cụm từ sao lưu hợp lệ.",
+    "seedQrOnly12Words": "Blink chỉ khôi phục cụm từ sao lưu 12 từ.",
+    "seedQrNotSeedQr": "Đây không phải là SeedQR hợp lệ.",
+    "seedQrUnreadable": "Không thể đọc SeedQR này. Vui lòng thử lại."
   },
   "EmergencyRecovery": {
     "outageTitle": "Không kết nối được nhà vận hành",

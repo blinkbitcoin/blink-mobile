@@ -4093,7 +4093,12 @@
         "pickBackupTitle": "Elige una cartera",
         "pickBackupDescription": "Selecciona una copia de seguridad para restaurar",
         "recognizePhraseTitle": "¿Reconoce esta frase de respaldo?",
-        "recognizePhraseBody": "Nunca introduzca palabras que otra persona le haya enviado."
+        "recognizePhraseBody": "Nunca introduzca palabras que otra persona le haya enviado.",
+        "scanSeedQr": "Escanear SeedQR",
+        "seedQrInvalid": "Este SeedQR no es una frase de respaldo válida.",
+        "seedQrOnly12Words": "Blink solo restaura frases de respaldo de 12 palabras.",
+        "seedQrNotSeedQr": "Esto no es un SeedQR válido.",
+        "seedQrUnreadable": "No se pudo leer este SeedQR. Inténtalo de nuevo."
     },
     "EmergencyRecovery": {
         "outageTitle": "Operador inaccesible",

@@ -4093,7 +4093,12 @@
         "pickBackupTitle": "Choisissez un portefeuille",
         "pickBackupDescription": "Sélectionnez une sauvegarde à restaurer",
         "recognizePhraseTitle": "Reconnaissez-vous cette phrase de sauvegarde ?",
-        "recognizePhraseBody": "N'entrez jamais des mots qu'une autre personne vous a envoyés."
+        "recognizePhraseBody": "N'entrez jamais des mots qu'une autre personne vous a envoyés.",
+        "scanSeedQr": "Scanner un SeedQR",
+        "seedQrInvalid": "Ce SeedQR n'est pas une phrase de sauvegarde valide.",
+        "seedQrOnly12Words": "Blink restaure uniquement les phrases de sauvegarde de 12 mots.",
+        "seedQrNotSeedQr": "Ce n'est pas un SeedQR valide.",
+        "seedQrUnreadable": "Impossible de lire ce SeedQR. Réessayez."
     },
     "EmergencyRecovery": {
         "outageTitle": "Opérateur injoignable",
