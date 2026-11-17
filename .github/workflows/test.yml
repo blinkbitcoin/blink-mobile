@@ -55,6 +55,14 @@ jobs:
           path: node_modules
           key: node-modules-${{ runner.os }}-${{ hashFiles('yarn.lock', 'patches/**') }}
       - run: yarn install --frozen-lockfile
+      # Pin the JDK the build is made for. ubuntu-latest moved to Ubuntu 26.04
+      # in November 2026, whose default JDK is 25, and Gradle 8.13 fails on it
+      # before configuring anything ("Unsupported class file major version
+      # 69"). React Native 0.85 builds with JDK 17.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
       # Caches ~/.gradle/caches and the wrapper between runs.
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew :app:testDebugUnitTest
