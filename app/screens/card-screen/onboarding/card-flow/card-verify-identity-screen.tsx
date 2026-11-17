@@ -10,6 +10,7 @@ import { StepLayout } from "@app/components/step-layout"
 import { KycFlowType } from "@app/graphql/generated"
 import { useKycFlow } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { radius } from "@app/rne-theme/radius"
 import { staticSurface } from "@app/rne-theme/surfaces"
 
 type Requirement = {
@@ -118,7 +119,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginTop: 30,
     marginHorizontal: 20,
     ...staticSurface(colors),
-    borderRadius: 8,
+    borderRadius: radius.default,
     overflow: "hidden",
   },
   divider: {
