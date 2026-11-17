@@ -58,11 +58,18 @@ const ipapiAdapter: IpLookupAdapter = async (timeout) => {
   return data?.country_code as CountryCode | undefined
 }
 
+// Free fallback, no key and no daily limit: answers the caller's address with "/myip"
+const vpndetectionAdapter: IpLookupAdapter = async (timeout) => {
+  const { data } = await axios.get("https://api.vpndetection.io/myip", { timeout })
+  return data?.location?.country as CountryCode | undefined
+}
+
 export const DEFAULT_ADAPTERS: IpLookupAdapter[] = [
   ipinfoAdapter,
   proxycheckAdapter,
   ipifyAdapter,
   ipapiAdapter,
+  vpndetectionAdapter,
 ]
 
 if (
