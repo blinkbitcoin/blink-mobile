@@ -1487,7 +1487,6 @@ describe("SendBitcoinConfirmationScreen — slide to send", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockUseNonCustodialConversionLimits.mockReturnValue(undefined)
     loadLocale("en")
     LL = i18nObject("en")
     mockUseSendPayment.mockReturnValue({
