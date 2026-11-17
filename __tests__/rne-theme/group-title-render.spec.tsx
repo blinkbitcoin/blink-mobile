@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleSheet, Text } from "react-native"
+import { StyleProp, StyleSheet, Text, TextStyle } from "react-native"
 import { render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
@@ -21,8 +21,8 @@ import { SettingsGroup } from "@app/screens/settings-screen/group"
 
 type HostNode = { props: { style?: unknown }; parent: HostNode | null }
 
-const styleOf = (node: unknown) =>
-  StyleSheet.flatten((node as HostNode).props.style as never) ?? {}
+const styleOf = (node: unknown): TextStyle =>
+  StyleSheet.flatten((node as HostNode).props.style as StyleProp<TextStyle>) ?? {}
 
 /** The nearest ancestor that sets `prop`, and its value. */
 const ancestorStyle = (node: unknown, prop: string) => {
