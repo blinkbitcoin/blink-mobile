@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react"
-import { LayoutChangeEvent, View, useWindowDimensions } from "react-native"
+import {
+  AccessibilityActionEvent,
+  LayoutChangeEvent,
+  View,
+  useWindowDimensions,
+} from "react-native"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import Animated, {
   Easing,
@@ -18,6 +23,7 @@ export const AMOUNT_SLIDER_TEST_ID = "send-amount-slider"
 export const AMOUNT_SLIDER_BADGE_TEST_ID = "send-amount-slider-badge"
 export const AMOUNT_SLIDER_TRACK_TEST_ID = "send-amount-slider-track"
 export const AMOUNT_SLIDER_PAN_TEST_ID = "send-amount-slider-pan"
+export const AMOUNT_SLIDER_HINT_TEST_ID = "send-amount-slider-hint"
 
 const THUMB_SIZE = 18
 /** The held thumb's ring, drawn 10 out from the thumb all round. */
@@ -45,6 +51,8 @@ const BADGE_HEIGHT = 21
 /** From here on the drag is the whole balance, which a rail that can send all sends with
  *  the fee taken out. */
 const SNAP_TO_FULL_PERCENT = 96
+/** A screen reader's swipe up or down moves the thumb a tenth of the balance. */
+const ACCESSIBILITY_STEP = 10
 const MOVE_MS = 220
 const PRESS_MS = 120
 /** Figma's ring is the foreground at 10%. */
@@ -53,16 +61,31 @@ const HALO_OPACITY = 0.1
 const THUMB_SHADOW_BLUR = 12
 const THUMB_SHADOW_ALPHA = "33"
 
+const ACCESSIBILITY_ACTIONS = [{ name: "increment" }, { name: "decrement" }]
+
 const clamp = (value: number, max: number) => {
   "worklet"
   return Math.min(Math.max(value, 0), max)
 }
 
+const snapToFull = (percent: number) => {
+  "worklet"
+  return percent >= SNAP_TO_FULL_PERCENT ? 100 : percent
+}
+
 const percentAt = (position: number, travel: number) => {
   "worklet"
   if (travel <= 0) return 0
-  const percent = Math.round((position / travel) * 100)
-  return percent >= SNAP_TO_FULL_PERCENT ? 100 : percent
+  return snapToFull(Math.round((position / travel) * 100))
+}
+
+/** The next tenth up or down from where the thumb is, so a typed 23% steps to 30% or 20%. */
+const steppedPercent = (percent: number, direction: 1 | -1) => {
+  const next =
+    direction > 0
+      ? Math.floor(percent / ACCESSIBILITY_STEP) * ACCESSIBILITY_STEP + ACCESSIBILITY_STEP
+      : Math.ceil(percent / ACCESSIBILITY_STEP) * ACCESSIBILITY_STEP - ACCESSIBILITY_STEP
+  return snapToFull(clamp(next, 100))
 }
 
 type AmountSliderProps = {
@@ -105,6 +128,7 @@ export const AmountSlider: React.FC<AmountSliderProps> = ({
   const lastPercent = useSharedValue(-1)
 
   const isHeld = heldPercent !== null
+  const sharePercent = Math.round(clamp(share, 1) * 100)
 
   // A typed amount glides the thumb into place; while held, the finger has it.
   useEffect(() => {
@@ -134,6 +158,13 @@ export const AmountSlider: React.FC<AmountSliderProps> = ({
   const release = () => {
     onHoldChange?.(false)
     setHeldPercent(null)
+  }
+
+  /** A screen reader can't drag, so its swipes step the same amount a drag would set,
+   *  100% included. */
+  const onAccessibilityAction = ({ nativeEvent }: AccessibilityActionEvent) => {
+    if (nativeEvent.actionName === "increment") onSlide(steppedPercent(sharePercent, 1))
+    if (nativeEvent.actionName === "decrement") onSlide(steppedPercent(sharePercent, -1))
   }
 
   const pan = Gesture.Pan()
@@ -190,6 +221,12 @@ export const AmountSlider: React.FC<AmountSliderProps> = ({
         <View
           style={[styles.touchArea, { width: touchAreaWidth }]}
           testID={AMOUNT_SLIDER_TEST_ID}
+          accessible
+          accessibilityRole="adjustable"
+          accessibilityLabel={LL.SendBitcoinScreen.slideToSelectAmount()}
+          accessibilityValue={{ min: 0, max: 100, now: sharePercent }}
+          accessibilityActions={ACCESSIBILITY_ACTIONS}
+          onAccessibilityAction={onAccessibilityAction}
         >
           <View
             style={styles.track}
@@ -225,7 +262,13 @@ export const AmountSlider: React.FC<AmountSliderProps> = ({
         </View>
       </GestureDetector>
       {showHint && (
-        <Text type="p4" style={styles.caption}>
+        <Text
+          type="p4"
+          style={styles.caption}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+          testID={AMOUNT_SLIDER_HINT_TEST_ID}
+        >
           {LL.SendBitcoinScreen.slideToSelectAmount()}
         </Text>
       )}
