@@ -54,7 +54,7 @@ export const SubscriptionOfferCard: React.FC<SubscriptionOfferCardProps> = ({
 
       {rows.map((row) => (
         <View key={row.label} style={styles.row}>
-          <Text type="p3" color={colors.textMuted} style={styles.rowText}>
+          <Text type="p3" color={colors.textSecondary} style={styles.rowText}>
             {row.label}
           </Text>
           <Text type="p3" bold color={toneColor[row.tone]} style={styles.rowText}>
