@@ -272,6 +272,8 @@ const SplashToggleRow: React.FC = () => {
   )
 }
 
+/** `SettingsGroup` also calls each row as a plain function to drop the null ones, so
+ *  these hooks run as the group's own too. Every hook must come before the early return. */
 export const SplashMinimumRow: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()

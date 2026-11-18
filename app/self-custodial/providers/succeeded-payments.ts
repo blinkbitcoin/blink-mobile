@@ -5,8 +5,8 @@ import { reportError } from "@app/utils/error-logging"
 export type SucceededPaymentInfo = {
   /** The SDK reported this payment pending earlier in this session: its claim was seen
    *  starting live, so it is a new payment whatever its `timestamp` says. That timestamp
-   *  is when the payment was created (for a receive, when its invoice was), not when it
-   *  settled. A restore's replay of past payments arrives completed, never pending. */
+   *  is when the payment was created (for a receive, when the inbound transfer was), not
+   *  when it settled. A restore's replay of past payments arrives completed, never pending. */
   claimSeenLive: boolean
 }
 

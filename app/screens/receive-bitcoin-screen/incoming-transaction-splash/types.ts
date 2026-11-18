@@ -24,8 +24,9 @@ export type SplashCandidate = {
    *  for self-custodial payments, so a wallet sync replaying old ones never fires. */
   createdAtIsSettlement?: boolean
   /** Self-custodial: the SDK reported this payment pending earlier in this session, so it
-   *  settled live. Its time is when it was created (for a receive, when its invoice was),
-   *  which can be well before the app last came to the foreground. */
+   *  settled live. Its time is when the SDK's operators created the inbound transfer, not
+   *  when it settled, and that can be before the app last came to the foreground: the
+   *  user leaves the app to pay from another wallet and comes back. */
   claimSeenLive?: boolean
   /** A self-custodial deposit the SDK has seen but not claimed. It is not a transaction
    *  yet, so Details opens the unclaimed deposits screen instead. */
