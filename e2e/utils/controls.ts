@@ -209,7 +209,7 @@ const trackBox = async (
   handleWidth: number,
 ): Promise<{ x: number; width: number }> => {
   let current = handle
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 6; i += 1) {
     const parent = await current.parentElement()
     const parentLocation = await parent.getLocation()
     const parentSize = await parent.getSize()
