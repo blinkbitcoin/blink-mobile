@@ -1,7 +1,7 @@
 import * as React from "react"
 import { View } from "react-native"
 
-import { CheckBox, makeStyles } from "@rn-vui/themed"
+import { CheckBox, makeStyles, useTheme } from "@rn-vui/themed"
 
 type CheckboxRowProps = {
   checked: boolean
@@ -15,6 +15,9 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
   children,
 }) => {
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
 
   return (
     <View style={styles.checkboxRow}>
@@ -23,6 +26,7 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
         iconType="ionicon"
         checkedIcon={"checkbox"}
         uncheckedIcon={"square-outline"}
+        uncheckedColor={colors.textDisabled}
         onPress={onPress}
         containerStyle={styles.checkboxStyle}
       />
@@ -37,8 +41,10 @@ const useStyles = makeStyles(() => ({
     alignItems: "center",
   },
   /** The icon's glyph sits inset in its box, so 12 leaves the design's 14 between the
-   *  drawn box and the text. */
+   *  drawn box and the text. Transparent, since the design draws the box straight on
+   *  the screen. */
   checkboxStyle: {
+    backgroundColor: "transparent",
     padding: 0,
     margin: 0,
     marginRight: 12,
