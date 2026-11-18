@@ -90,6 +90,9 @@ const GaloySliderButton = ({
 
   const [trackWidth, setTrackWidth] = useState(0)
   const [committed, setCommitted] = useState(false)
+  /** Bumped each time a swipe settles. An `onSwipe` that resolves at once batches the
+   *  busy render away, so the reset can't wait for `busy` to go true and back. */
+  const [settled, setSettled] = useState(0)
   const busy = committed || isLoading
   const travel = Math.max(trackWidth - HANDLE_SIZE, 0)
 
@@ -101,7 +104,7 @@ const GaloySliderButton = ({
       hasCommitted.value = false
       X.value = withSpring(0)
     }
-  }, [busy, X, hasCommitted])
+  }, [busy, settled, X, hasCommitted])
 
   const commit = useCallback(async () => {
     setCommitted(true)
@@ -112,6 +115,7 @@ const GaloySliderButton = ({
       await onSwipe()
     } finally {
       setCommitted(false)
+      setSettled((n) => n + 1)
     }
   }, [onSwipe])
 

@@ -148,6 +148,14 @@ describe("GaloySliderButton", () => {
       expect(onSwipe).toHaveBeenCalledTimes(1)
     })
 
+    it("sends again after an onSwipe that settles at once", async () => {
+      // e.g. a conversion re-quoting on swipe: `isLoading` never turns on in between.
+      const onSwipe = await renderSlider({ onSwipe: jest.fn() })
+      await drag(TRAVEL)
+      await drag(TRAVEL)
+      expect(onSwipe).toHaveBeenCalledTimes(2)
+    })
+
     it("does not send while disabled", async () => {
       const onSwipe = await renderSlider({ disabled: true })
       await drag(TRAVEL)
@@ -283,6 +291,16 @@ describe("GaloySliderButton", () => {
       await activate()
 
       expect(onSwipe).toHaveBeenCalledTimes(1)
+    })
+
+    it("sends again on a second activate after an onSwipe that settles at once", async () => {
+      const onSwipe = jest.fn()
+      await renderSlider({ onSwipe })
+
+      await activate()
+      await activate()
+
+      expect(onSwipe).toHaveBeenCalledTimes(2)
     })
 
     it("ignores activate while disabled and says so", async () => {
