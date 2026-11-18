@@ -18,6 +18,7 @@ import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-details/intraledger"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import * as PaymentDetailsLightning from "@app/screens/send-bitcoin-screen/payment-details/lightning"
+import * as PriceConversion from "@app/hooks/use-price-conversion"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
@@ -1490,9 +1491,21 @@ describe("hide balance", () => {
 
 describe("SendBitcoinConfirmationScreen — slide to send", () => {
   let LL: ReturnType<typeof i18nObject>
+  const actualUsePriceConversion = PriceConversion.usePriceConversion
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
 
   beforeEach(() => {
     jest.clearAllMocks()
+    // A price that is there from the first render: through MockLink it sometimes lands
+    // after the flush, and the dust check reads pending or not depending on the race.
+    jest.spyOn(PriceConversion, "usePriceConversion").mockImplementation(() => ({
+      ...actualUsePriceConversion(),
+      convertMoneyAmount: convertMoneyAmountMock,
+      priceStatus: PriceConversion.PriceStatus.Ready,
+    }))
     loadLocale("en")
     LL = i18nObject("en")
     mockUseSendPayment.mockReturnValue({
