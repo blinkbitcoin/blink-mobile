@@ -15,7 +15,7 @@ import {
 import { CUSTODIAL_PAYOUT_ETA_MINUTES } from "@app/screens/send-bitcoin-screen/hooks/use-custodial-onchain-fee-tiers"
 import { FEE_TIER_ETA_MINUTES } from "@app/types/payment"
 
-import { LEDGER, TIER_KEY_NAMES } from "../../i18n/fee-tier-ledger"
+import { TIER_KEY_NAMES } from "../../i18n/fee-tier-ledger"
 
 /**
  * The source file is typed as the loose BaseTranslation; the generated shape is the real
@@ -33,7 +33,7 @@ loadLocale("en")
 const labels = feeTierLabels(i18nObject("en"))
 
 /** Words these tiers have been called before. None of them may reach a screen again. */
-const SUPERSEDED_TIER_NAMES = LEDGER.en.retired
+const SUPERSEDED_TIER_NAMES = ["Fast", "Medium", "Slow", "Fastest", "Normal", "Half hour"]
 
 const escapeRegExp = (value: string): string =>
   value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")

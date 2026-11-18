@@ -144,11 +144,12 @@ describe("BottomSheet", () => {
   })
 
   it("dims what is behind it with the scrim token", async () => {
-    const { getByLabelText } = renderSheet()
+    const { getByTestId } = renderSheet()
 
-    await waitFor(() => expect(getByLabelText("Close")).toBeTruthy())
+    const press = () => getByTestId(SCRIM_TEST_ID, { includeHiddenElements: true })
+    await waitFor(() => expect(press()).toBeTruthy())
     // The pressable fills the scrim; the first ancestor with a fill is the scrim itself.
-    let node = getByLabelText("Close").parent
+    let node = press().parent
     while (node && !StyleSheet.flatten(node.props.style)?.backgroundColor) {
       node = node.parent
     }

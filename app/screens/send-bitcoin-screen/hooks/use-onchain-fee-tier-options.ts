@@ -7,15 +7,16 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { wrapDestination } from "@app/self-custodial/payment-details/wrap-destination"
-import { toWalletAmount } from "@app/types/amounts"
+import { toWalletAmount, type WalletAmount } from "@app/types/amounts"
 
-import { buildFeeTierOptions, feeTierLabels } from "../fee-tier-options"
+import { buildFeeTierOptions } from "../fee-tier-options"
 import { type ParseDestinationResult } from "../payment-destination/index.types"
 import { ConvertMoneyAmount, type PaymentDetail } from "../payment-details/index.types"
 
 import { type FeeTierInfo, FeeTierOption, FeeUnit } from "./fee-tiers.types"
 import { useCustodialFeeRail, useSelfCustodialFeeRail } from "./use-fee-rail"
 import { PAYOUT_SPEED_BY_FEE_TIER } from "./use-custodial-onchain-fee-tiers"
+import { useFeeTierLabels } from "./use-fee-tier-labels"
 
 /**
  * Read off the tier rather than guessed from the rail, so a cents fee can never be handed
@@ -32,6 +33,11 @@ const CURRENCY_BY_FEE_UNIT: Record<FeeUnit, WalletCurrency> = {
 const toTierWalletAmount = ({ feeAmount, feeUnit }: FeeTierInfo) =>
   toWalletAmount({ amount: feeAmount, currency: CURRENCY_BY_FEE_UNIT[feeUnit] })
 
+type NextFeeQuote = {
+  selectedTierFee: WalletAmount<WalletCurrency>
+  hasFeeQuote: boolean
+}
+
 type FeeTierOptionsParams = {
   paymentDetail: PaymentDetail<WalletCurrency> | null
   isSelfCustodial: boolean
@@ -47,7 +53,8 @@ export const useOnchainFeeTierOptions = ({
 }: FeeTierOptionsParams) => {
   const { sdk } = useSelfCustodialWallet()
   const { formatMoneyAmount, moneyAmountToDisplayCurrencyString } = useDisplayCurrency()
-  const { LL, locale } = useI18nContext()
+  const { locale } = useI18nContext()
+  const feeTierLabels = useFeeTierLabels()
   /**
    * Held as "nothing picked yet" rather than seeded with a default, because isSelfCustodial
    * reads false until the wallet finishes initializing. Deriving the fallback on each render
@@ -78,15 +85,16 @@ export const useOnchainFeeTierOptions = ({
   const feeRail = isSelfCustodial ? selfCustodialRail : custodialRail
 
   /**
-   * The spinner stays custodial-only, because the SDK answers fast enough that one would
-   * merely flicker. It is the single field the rails do not answer alike.
+   * The custodial quote follows the amount, so while it is out Next waits for it. The
+   * self-custodial one only goes out from Next, so it is the button's own spinner instead.
    */
   const isQuotingFees = !isSelfCustodial && custodialRail.isQuoting
+  const isQuotingFeesForNext = isSelfCustodial && selfCustodialRail.isQuoting
 
   const feeTierOptions = buildFeeTierOptions({
     hasQuote: feeRail.hasQuote,
     tiers: feeRail.tiers,
-    labels: feeTierLabels(LL),
+    labels: feeTierLabels,
     /**
      * Display currency, like the confirmation screen; the wallet amount only stands in
      * while the price is still loading.
@@ -107,6 +115,28 @@ export const useOnchainFeeTierOptions = ({
    * probing a second time, so it judges the payment by its own quote.
    */
   const selectedTierFee = toTierWalletAmount(feeRail.tiers[feeTier])
+
+  /**
+   * What Next judges the payment by. A self-custodial on-chain send is quoted here, once,
+   * and stops Next with null when the SDK could not build it (its reason shows as the fee
+   * error). Every other send already holds whatever quote it is going to get.
+   */
+  const quoteSelfCustodial = selfCustodialRail.quote
+  const hasFeeQuote = feeRail.hasQuote
+  const quoteFeesForNext = useCallback(async (): Promise<NextFeeQuote | null> => {
+    if (!isSelfCustodial || !isOnchain) return { selectedTierFee, hasFeeQuote }
+
+    const tiers = await quoteSelfCustodial()
+    if (!tiers) return null
+    return { selectedTierFee: toTierWalletAmount(tiers[feeTier]), hasFeeQuote: true }
+  }, [
+    isSelfCustodial,
+    isOnchain,
+    selectedTierFee,
+    hasFeeQuote,
+    quoteSelfCustodial,
+    feeTier,
+  ])
 
   const rebuildForTier = useCallback(
     (
@@ -178,9 +208,11 @@ export const useOnchainFeeTierOptions = ({
     feeTierOptions,
     isOnchain,
     selectedTierFee,
-    hasFeeQuote: feeRail.hasQuote,
+    hasFeeQuote,
     feeTierErrorMessage: feeRail.errorMessage,
-    isFeeTierErrorBlocking: feeRail.isErrorBlocking,
+    isSelfPayment: feeRail.isSelfPayment,
     isQuotingFees,
+    isQuotingFeesForNext,
+    quoteFeesForNext,
   }
 }

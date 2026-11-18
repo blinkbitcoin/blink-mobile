@@ -133,6 +133,8 @@ export type RootStackParamList = {
     paymentDestination: PaymentDestination
     /** Handed on from the destination step; see it there. */
     sendingWalletId?: string
+    /** Set when review's "Change amount" returns here: the amount starts again from zero. */
+    resetAmountAt?: number
   }
   merchantSelection: {
     merchants: MerchantChoice[]
@@ -168,6 +170,8 @@ export type RootStackParamList = {
     destination?: string
     paymentType?: string
     createdAt?: number
+    /** Review already played Sent, so the receipt opens straight away. */
+    hasShownSuccess?: boolean
   }
   setLightningAddress: { onboarding?: boolean }
   language: undefined
