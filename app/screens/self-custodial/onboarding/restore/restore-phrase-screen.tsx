@@ -22,6 +22,7 @@ import {
   PhraseStep,
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
+import { radius } from "@app/rne-theme/radius"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 
@@ -322,7 +323,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginTop: 14,
     paddingVertical: 8,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: radius.default,
     backgroundColor: colors.surfaceInteractive,
   },
   scanButtonPressed: {

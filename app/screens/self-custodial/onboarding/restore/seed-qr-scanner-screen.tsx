@@ -121,7 +121,7 @@ const SeedQrScannerContent: React.FC = () => {
 
   if (isCameraUnavailable) {
     return (
-      <Screen>
+      <Screen headerShown={false}>
         <View style={styles.permissionMissing}>
           <Text type="h1" style={styles.permissionMissingText}>
             {LL.ScanningQRCodeScreen.noCamera()}
@@ -139,7 +139,7 @@ const SeedQrScannerContent: React.FC = () => {
     }
 
     return (
-      <Screen>
+      <Screen headerShown={false}>
         <View style={styles.permissionMissing}>
           <Text type="h1" style={styles.permissionMissingText}>
             {LL.ScanningQRCodeScreen.permissionCamera()}
@@ -194,7 +194,7 @@ const SeedQrScannerContent: React.FC = () => {
 export const SeedQrScannerScreen: React.FC = () => {
   const navigation = useNavigation()
   return (
-    <ScreenSecurityGate failOpen onBack={navigation.goBack}>
+    <ScreenSecurityGate onBack={navigation.goBack}>
       <SeedQrScannerContent />
     </ScreenSecurityGate>
   )

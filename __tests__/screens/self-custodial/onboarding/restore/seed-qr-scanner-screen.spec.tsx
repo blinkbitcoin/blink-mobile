@@ -100,6 +100,29 @@ describe("SeedQrScannerScreen", () => {
     expect(lastReadCode).not.toBeNull()
   })
 
+  it("keeps the camera off when screen protection fails", async () => {
+    let rejectLease: (error: Error) => void = () => {}
+    const ready = new Promise<void>((_, reject) => {
+      rejectLease = reject
+    })
+    mockAcquireScreenSecurity.mockReturnValue({
+      ready,
+      release: jest.fn(() => Promise.resolve()),
+    })
+
+    const { getByText, getByTestId } = await renderScanner()
+    expect(lastReadCode).toBeNull()
+
+    await act(async () => {
+      rejectLease(new Error("native failure"))
+    })
+
+    expect(lastReadCode).toBeNull()
+    expect(getByText(LL.errors.screenSecurityUnavailable())).toBeTruthy()
+    expect(getByTestId("screen-security-retry")).toBeTruthy()
+    expect(getByTestId("screen-security-back")).toBeTruthy()
+  })
+
   it("hands a Standard SeedQR's words back to step 1 as a scan", async () => {
     await renderScanner()
     scan({ codeStringValue: STANDARD_12 })
