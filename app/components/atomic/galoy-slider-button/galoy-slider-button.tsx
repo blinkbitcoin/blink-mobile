@@ -66,7 +66,7 @@ type SwipeButtonPropsType = {
   disabledText?: string
   isLoading?: boolean
   disabled?: boolean
-  /** Handle colour; defaults to `primary`. */
+  /** Handle colour; defaults to `accent`. The arrow on it is white in both themes. */
   accentColor?: string
   /** The handle, the one element a screen reader reaches, e.g. to move focus to it. */
   handleRef?: Ref<View>
@@ -245,7 +245,9 @@ const GaloySliderButton = ({
           <GaloyIcon
             size={30}
             name={isRTL ? "arrow-left" : "arrow-right"}
-            color={colors._white}
+            // Design ruling: the arrow is white on every handle colour, in both themes.
+            // eslint-disable-next-line no-restricted-properties
+            color={colors.staticWhite}
           />
         </Animated.View>
       </GestureDetector>
