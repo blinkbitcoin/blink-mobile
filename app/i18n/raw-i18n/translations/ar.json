@@ -2370,8 +2370,8 @@
       "checkingDelivery": "جارٍ التحقق من التسليم",
       "almostThere": "أوشكنا على الانتهاء",
       "anyTimeNow": "في أي لحظة الآن",
-      "ohOh": "أوه أوه",
-      "tryingAgain": "نحاول مرة أخرى"
+      "hangTight": "انتظر قليلاً",
+      "stillOnItsWay": "لا تزال في الطريق"
     },
     "copiedDestination": "تم نسخ الوجهة إلى الحافظة",
     "lightningRecommended": "رسوم مرتفعة! نوصي باستخدام Lightning.",

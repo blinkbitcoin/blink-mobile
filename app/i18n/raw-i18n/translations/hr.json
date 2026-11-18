@@ -2370,8 +2370,8 @@
       "checkingDelivery": "Provjera isporuke",
       "almostThere": "Skoro gotovo",
       "anyTimeNow": "Svakog trena",
-      "ohOh": "Ups",
-      "tryingAgain": "Pokušavamo ponovno"
+      "hangTight": "Samo malo",
+      "stillOnItsWay": "Još je na putu"
     },
     "copiedDestination": "Odredište kopirano u međuspremnik",
     "lightningRecommended": "Visoka naknada! Preporučujemo Lightning.",

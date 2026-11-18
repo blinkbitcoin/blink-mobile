@@ -2370,8 +2370,8 @@
       "checkingDelivery": "Đang kiểm tra giao nhận",
       "almostThere": "Sắp xong",
       "anyTimeNow": "Sắp rồi",
-      "ohOh": "Ôi",
-      "tryingAgain": "Thử lại lần nữa"
+      "hangTight": "Chờ chút nhé",
+      "stillOnItsWay": "Vẫn đang trên đường"
     },
     "copiedDestination": "Đã sao chép địa chỉ đích vào bộ nhớ tạm",
     "lightningRecommended": "Phí cao! Chúng tôi khuyên bạn nên dùng Lightning.",

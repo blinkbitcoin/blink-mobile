@@ -182,7 +182,7 @@ describe("GaloySliderButton", () => {
   })
 
   describe("busy", () => {
-    const labels = ["Reviewing", "Signing", "Oh oh"]
+    const labels = ["Reviewing", "Signing", "Hang tight"]
 
     it("locks into the busy state as soon as the send commits", async () => {
       await renderSlider({ busyLabels: labels, onSwipe: () => new Promise(() => {}) })
@@ -208,11 +208,11 @@ describe("GaloySliderButton", () => {
       expect(screen.getByText("Signing", { exact: false })).toBeTruthy()
 
       act(() => jest.advanceTimersByTime(3000 - typingTime("Signing")))
-      act(() => jest.advanceTimersByTime(typingTime("Oh oh")))
-      expect(screen.getByText("Oh oh", { exact: false })).toBeTruthy()
+      act(() => jest.advanceTimersByTime(typingTime("Hang tight")))
+      expect(screen.getByText("Hang tight", { exact: false })).toBeTruthy()
 
       act(() => jest.advanceTimersByTime(30000))
-      expect(screen.getByText("Oh oh", { exact: false })).toBeTruthy()
+      expect(screen.getByText("Hang tight", { exact: false })).toBeTruthy()
       expect(screen.queryByText("Reviewing", { exact: false })).toBeNull()
     })
 

@@ -2370,8 +2370,8 @@
       "checkingDelivery": "กำลังตรวจสอบการส่งถึง",
       "almostThere": "ใกล้เสร็จแล้ว",
       "anyTimeNow": "อีกไม่นาน",
-      "ohOh": "อุ๊ย",
-      "tryingAgain": "ลองอีกครั้ง"
+      "hangTight": "รอสักครู่",
+      "stillOnItsWay": "ยังอยู่ระหว่างทาง"
     },
     "copiedDestination": "คัดลอกปลายทางไปยังคลิปบอร์ดแล้ว",
     "lightningRecommended": "ค่าธรรมเนียมสูง! แนะนำให้ใช้ Lightning",

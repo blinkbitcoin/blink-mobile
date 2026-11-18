@@ -2370,8 +2370,8 @@
       "checkingDelivery": "Առաքումը ստուգվում է",
       "almostThere": "Գրեթե պատրաստ է",
       "anyTimeNow": "Ցանկացած պահի",
-      "ohOh": "Վայ",
-      "tryingAgain": "Կրկին փորձում ենք"
+      "hangTight": "Մի փոքր սպասեք",
+      "stillOnItsWay": "Դեռ ճանապարհին է"
     },
     "copiedDestination": "Նպատակակետը պատծենվել է ջամանակավոր շտեմարանում",
     "lightningRecommended": "Բարձր միջնորդավճար։ Խորհուրդ ենք տալիս Lightning-ը։",

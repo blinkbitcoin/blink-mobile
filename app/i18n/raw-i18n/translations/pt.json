@@ -2370,8 +2370,8 @@
             "checkingDelivery": "Verificando entrega",
             "almostThere": "Quase lá",
             "anyTimeNow": "A qualquer momento",
-            "ohOh": "Opa",
-            "tryingAgain": "Tentando de novo"
+            "hangTight": "Aguenta aí",
+            "stillOnItsWay": "Ainda a caminho"
         },
         "copiedDestination": "Copiado destino para a área de transferência",
         "lightningRecommended": "Alta taxa! Recomendamos Lightning.",

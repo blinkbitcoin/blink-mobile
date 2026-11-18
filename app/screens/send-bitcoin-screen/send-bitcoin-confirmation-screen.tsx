@@ -168,8 +168,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     progress.checkingDelivery(),
     progress.almostThere(),
     progress.anyTimeNow(),
-    progress.ohOh(),
-    progress.tryingAgain(),
+    progress.hangTight(),
+    progress.stillOnItsWay(),
   ]
 
   const defaultAmount = formatMoneyAmount({ moneyAmount: ZeroUsdMoneyAmount })

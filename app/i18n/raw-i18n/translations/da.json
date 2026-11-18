@@ -2370,8 +2370,8 @@
       "checkingDelivery": "Tjekker levering",
       "almostThere": "Næsten der",
       "anyTimeNow": "Når som helst nu",
-      "ohOh": "Øv",
-      "tryingAgain": "Forsøger igen"
+      "hangTight": "Hæng i",
+      "stillOnItsWay": "Stadig på vej"
     },
     "copiedDestination": "Copied destination to clipboard",
     "lightningRecommended": "High fee! We recommend Lightning.",
