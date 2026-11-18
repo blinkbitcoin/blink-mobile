@@ -15,19 +15,22 @@ type GaloyErrorBoxProps = {
   /** The unfilled variant is a bare centred line, for an error that sits right above the
    *  field it is about (which carries the red outline) rather than in a box of its own. */
   filled?: boolean
+  /** Speaks the error as it appears, for an error that shows without moving focus. Off by
+   *  default, since a screen that opens with an error is already read. */
+  announce?: boolean
 }
 
 export const GaloyErrorBox: React.FC<GaloyErrorBoxProps> = ({
   errorMessage,
   noIcon,
   filled = true,
+  announce = false,
 }) => {
   const {
     theme: { colors, mode },
   } = useTheme()
   const styles = useStyles()
-  /** An error appears without moving focus, so a screen reader would never read it. */
-  useAccessibilityAnnouncement(errorMessage)
+  useAccessibilityAnnouncement(announce ? errorMessage : undefined)
 
   if (!filled) {
     return (
