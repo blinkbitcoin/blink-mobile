@@ -1152,6 +1152,12 @@ describe("SendBitcoinConfirmationScreen — fee error messages", () => {
   const genericFeeError = /Unable to calculate fee/i
   const insufficientFunds = /Not enough funds to cover the amount and network fees/i
 
+  /** The fee row's matches. A failed quote also dims the slider to the generic string. */
+  const inFeeRow = (matcher: RegExp) => {
+    const inSlider = within(screen.getByTestId("slider")).queryAllByText(matcher)
+    return screen.queryAllByText(matcher).filter((node) => !inSlider.includes(node))
+  }
+
   const renderWithFee = async (fee: Record<string, unknown>) => {
     mockUseFee.mockReturnValue(fee)
     const view = render(
@@ -1174,7 +1180,7 @@ describe("SendBitcoinConfirmationScreen — fee error messages", () => {
     })
 
     expect(screen.getByText(insufficientFunds)).toBeTruthy()
-    expect(screen.queryByText(genericFeeError)).toBeNull()
+    expect(inFeeRow(genericFeeError)).toHaveLength(0)
   })
 
   it("translates the network-error code too", async () => {
@@ -1194,7 +1200,7 @@ describe("SendBitcoinConfirmationScreen — fee error messages", () => {
   it("falls back to the generic string when the quote carries no code", async () => {
     await renderWithFee({ status: "error" })
 
-    expect(screen.getByText(genericFeeError)).toBeTruthy()
+    expect(inFeeRow(genericFeeError)).toHaveLength(1)
   })
 
   // Custodial errors are raw GraphQL text, not something to put in front of a user, and
@@ -1210,7 +1216,7 @@ describe("SendBitcoinConfirmationScreen — fee error messages", () => {
       ],
     })
 
-    expect(screen.getByText(genericFeeError)).toBeTruthy()
+    expect(inFeeRow(genericFeeError)).toHaveLength(1)
     expect(screen.queryByText(/Unbalanced transaction/i)).toBeNull()
   })
 
@@ -1220,7 +1226,7 @@ describe("SendBitcoinConfirmationScreen — fee error messages", () => {
       amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
     })
 
-    expect(screen.queryByText(genericFeeError)).toBeNull()
+    expect(inFeeRow(genericFeeError)).toHaveLength(0)
     expect(screen.queryByText(insufficientFunds)).toBeNull()
   })
 })
@@ -1543,14 +1549,16 @@ describe("SendBitcoinConfirmationScreen — slide to send", () => {
     expect(lastSliderProps().disabled).toBe(true)
   })
 
-  it("reads 'Calculating fee…' when the fee quote failed without an amount", async () => {
+  it("says the fee failed, not that it is calculating, when the quote failed without an amount", async () => {
     mockUseFee.mockReturnValue({ status: "error" })
 
     await renderRoute(buildUsdSettlementRoute(200))
 
+    expect(lastSliderProps().disabled).toBe(true)
+    expect(lastSliderProps().disabledText).toBe(LL.common.feeError())
     expect(
-      screen.getByText(LL.SendBitcoinConfirmationScreen.calculatingFee()),
-    ).toBeTruthy()
+      screen.queryByText(LL.SendBitcoinConfirmationScreen.calculatingFee()),
+    ).toBeNull()
   })
 
   it("reads 'Calculating fee…' while the dust check is pending", async () => {
