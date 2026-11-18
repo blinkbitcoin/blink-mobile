@@ -18,6 +18,9 @@ import mocks from "@app/graphql/mocks"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import SendBitcoinCompletedScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-completed-screen"
 
+import { fonts } from "@app/rne-theme/fonts"
+
+import { surfaceColor } from "../helpers/surface-color"
 import { ContextForScreen, ContextForScreenWithTheme } from "./helper"
 import { AppStateStatus, Linking, StyleSheet, View, ViewStyle } from "react-native"
 import { light, dark } from "@app/rne-theme/colors"
@@ -239,10 +242,19 @@ describe("SendBitcoinCompletedScreen actions", () => {
     screenshotState.isTakingScreenshot = false
   })
 
-  it("goes home from the Close button under Share", () => {
+  it("puts Close under Share", () => {
     renderReceipt()
 
-    expect(screen.getByText(LL.common.share())).toBeTruthy()
+    const labels = screen
+      .getAllByText(new RegExp(`^(${LL.common.share()}|${LL.common.close()})$`))
+      .map((node) => node.props.children)
+
+    expect(labels).toEqual([LL.common.share(), LL.common.close()])
+  })
+
+  it("goes home from the Close button", () => {
+    renderReceipt()
+
     fireEvent.press(screen.getByText(LL.common.close()))
 
     expect(mockPopToTop).toHaveBeenCalledTimes(1)
@@ -252,7 +264,19 @@ describe("SendBitcoinCompletedScreen actions", () => {
     screenshotState.isTakingScreenshot = true
     renderReceipt()
 
+    expect(screen.getByText("$0.03")).toBeTruthy()
     expect(screen.queryByText(LL.common.close())).toBeNull()
+  })
+
+  it("bolds the row values and leaves the labels regular", () => {
+    renderReceipt()
+
+    const fontOf = (text: string) =>
+      StyleSheet.flatten(screen.getByText(text).props.style).fontFamily
+
+    expect(fontOf("$0.03")).toBe(fonts.bold)
+    expect(fontOf("(25 SAT)")).toBe(fonts.bold)
+    expect(fontOf(LL.SendBitcoinScreen.amount())).toBe(fonts.regular)
   })
 })
 
@@ -263,33 +287,48 @@ describe("SendBitcoinCompletedScreen recipient", () => {
     screenshotState.isTakingScreenshot = false
   })
 
-  it("prints an on-chain recipient in full and lets it wrap", () => {
-    const onchainRoute = {
+  const renderRecipient = (paymentType: "onchain" | "lnurl", destination: string) => {
+    const route = {
       key: "sendBitcoinCompleted",
       name: "sendBitcoinCompleted",
       params: {
         status: "SUCCESS",
         currencyAmount: "$100.00",
         satAmount: "100,100 SAT",
-        destination: "bc1p5d7rjq7g6rdk2yhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg3297",
-        paymentType: "onchain",
+        destination,
+        paymentType,
         createdAt: 1747691078,
       },
     } as const
 
     render(
       <ContextForScreen>
-        <SuccessAction route={onchainRoute} />
+        <SuccessAction route={route} />
       </ContextForScreen>,
     )
 
     act(() => {
       jest.advanceTimersByTime(2300)
     })
+  }
 
-    const recipient = screen.getByText(onchainRoute.params.destination)
+  it("prints an on-chain recipient in full and lets it wrap", () => {
+    const taprootAddress =
+      "bc1p5d7rjq7g6rdk2yhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg3297"
+    renderRecipient("onchain", taprootAddress)
+
+    const recipient = screen.getByText(taprootAddress)
     expect(recipient.props.numberOfLines).toBeUndefined()
     expect(recipient.props.ellipsizeMode).toBeUndefined()
+  })
+
+  it("shortens a bech32 LNURL recipient in the middle", () => {
+    const lnurl =
+      "LNURL1DP68GURN8GHJ7CN5VDCXZ7FWV4UXZMTSD3JJUCM0D5H5Y4ZR9A25JNZW24FYCTMSV9UJ76F0XAYXKVJ3D5U4SCF52F6YCAELVD6HYUN9DE3HJ0242DZZVCTDDA6KUAPAX5S4RG46"
+    renderRecipient("lnurl", lnurl)
+
+    expect(screen.queryByText(lnurl)).toBeNull()
+    expect(screen.getByText(`${lnurl.slice(0, 13)}...${lnurl.slice(-8)}`)).toBeTruthy()
   })
 })
 
@@ -1035,17 +1074,6 @@ describe("SendBitcoinCompletedScreen", () => {
   })
 })
 
-type HostNode = { props: { style?: unknown }; parent: HostNode | null }
-
-/** The background of the nearest surface that paints one around a value. */
-const surfaceColor = (node: HostNode) => {
-  for (let current: HostNode | null = node; current; current = current.parent) {
-    const { backgroundColor } = StyleSheet.flatten(current.props.style as never) ?? {}
-    if (backgroundColor) return backgroundColor
-  }
-  return undefined
-}
-
 /** A success action is read, not pressed. Its URL is a text link with no icon, which
  *  does not make the field a press target, so the field keeps the static grey7
  *  (blink-wip#1871, blink-wip#1309). */
@@ -1094,7 +1122,7 @@ describe("SendBitcoinCompletedScreen success action surface", () => {
       const url = await waitFor(() =>
         screen.findByText(urlRoute.params.successAction.url),
       )
-      expect(surfaceColor(url as never)).toBe(grey7)
+      expect(surfaceColor(url)).toBe(grey7)
     })
   })
 })
