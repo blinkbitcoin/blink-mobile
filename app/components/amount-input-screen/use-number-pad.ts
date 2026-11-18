@@ -27,6 +27,8 @@ type UseNumberPadArgs = {
   walletCurrency: WalletCurrency
   /** Undefined until prices load; the pad still takes keys, it just can't mirror amounts. */
   convertMoneyAmount?: ConvertMoneyAmount
+  /** The caller's amount, re-read whenever what the typed digits mean changes. */
+  amountOfRecord?: MoneyAmount<WalletOrDisplayCurrency>
   onAmountChange: (amount: MoneyAmount<WalletOrDisplayCurrency>) => void
 }
 
@@ -42,6 +44,7 @@ type UseNumberPadArgs = {
 export const useNumberPad = ({
   walletCurrency,
   convertMoneyAmount,
+  amountOfRecord,
   onAmountChange,
 }: UseNumberPadArgs) => {
   const client = useApolloClient()
@@ -63,6 +66,29 @@ export const useNumberPad = ({
       currencyInfo,
     })
   })
+
+  /** What the typed digits mean, as set from outside the pad: the sending wallet, and the
+   *  display currency a rate arriving or being lost swaps. When either moves, the pad
+   *  re-reads the amount of record rather than reading its digits in the new unit. It
+   *  waits until the caller's amount and conversion have caught up, which the converted
+   *  amount's currency code shows. A wallet currency typed in follows the sending wallet. */
+  const display = currencyInfo[DisplayCurrency]
+  const meaning = `${walletCurrency}:${display.currencyCode}:${display.minorUnitToMajorUnitOffset}:${display.showFractionDigits}`
+  const [readMeaning, setReadMeaning] = useState(meaning)
+  if (meaning !== readMeaning && convertMoneyAmount) {
+    const currency =
+      padState.currency === DisplayCurrency ? DisplayCurrency : walletCurrency
+    const { currencyCode } = currencyInfo[currency]
+    const reread = amountOfRecord
+      ? convertMoneyAmount(amountOfRecord, currency)
+      : { amount: 0, currency, currencyCode }
+    if (reread.currencyCode === currencyCode && Number.isFinite(reread.amount)) {
+      setReadMeaning(meaning)
+      setPadState(
+        moneyAmountToNumberPadReducerState({ moneyAmount: reread, currencyInfo }),
+      )
+    }
+  }
 
   const toMoneyAmount = useCallback(
     (state: NumberPadReducerState) =>

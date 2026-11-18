@@ -139,8 +139,11 @@ jest.mock("@app/hooks/use-price-conversion", () => {
   }
   return {
     ...actual,
-    usePriceConversion: () =>
-      mockDisplayCurrency.current === "USD" ? usdConverters : actual.usePriceConversion(),
+    /** The real hook always runs, so a spec can change the display currency mid-render. */
+    usePriceConversion: () => {
+      const converters = actual.usePriceConversion()
+      return mockDisplayCurrency.current === "USD" ? usdConverters : converters
+    },
   }
 })
 
@@ -314,23 +317,25 @@ const invoiceDestination = {
     }),
 } as unknown as PaymentDestination
 
-const renderScreen = (
+const sendScreen = (
   paymentDestination: PaymentDestination,
   { hideAmount = false }: { hideAmount?: boolean } = {},
-) =>
-  render(
-    <ContextForScreen>
-      <HideAmountContextProvider value={{ hideAmount, toggleHideAmount: jest.fn() }}>
-        <SendBitcoinDetailsScreen
-          route={{
-            key: "sendBitcoinDetailsScreen",
-            name: "sendBitcoinDetails",
-            params: { paymentDestination },
-          }}
-        />
-      </HideAmountContextProvider>
-    </ContextForScreen>,
-  )
+) => (
+  <ContextForScreen>
+    <HideAmountContextProvider value={{ hideAmount, toggleHideAmount: jest.fn() }}>
+      <SendBitcoinDetailsScreen
+        route={{
+          key: "sendBitcoinDetailsScreen",
+          name: "sendBitcoinDetails",
+          params: { paymentDestination },
+        }}
+      />
+    </HideAmountContextProvider>
+  </ContextForScreen>
+)
+
+const renderScreen = (...args: Parameters<typeof sendScreen>) =>
+  render(sendScreen(...args))
 
 const settle = async () => {
   await flushAsync()
@@ -458,6 +463,39 @@ describe("free amount", () => {
 
     expect(screen.getByTestId(`${WalletCurrency.Usd} Wallet Balance`)).toBeTruthy()
     expect(isNextDisabled()).toBe(false)
+  })
+  /** The keypad keeps digits, not an amount. When the display currency changes under it
+   *  (a rate arriving or being lost), it has to re-read the amount that will be sent, or
+   *  "22" typed in naira would read, and keep typing, as $22. */
+  it("re-reads the typed amount when the display currency changes mid-entry", async () => {
+    const destination = intraledgerDestination()
+    const view = renderScreen(destination)
+    await settle()
+    typeKeys("2", "2")
+    await settle()
+
+    mockDisplayCurrency.current = "USD"
+    view.rerender(sendScreen(destination))
+    await settle()
+
+    const [carried] = mockSetAmount.mock.calls[mockSetAmount.mock.calls.length - 1]
+    expect(carried.currency).toBe(WalletCurrency.Btc)
+    const cents = Math.round(carried.amount * mockUsdCentsPerUnit.BTC)
+    expect(screen.getByTestId("send-hero-amount-primary").props.children).toBe(
+      `$${(cents / 100).toFixed(2)}`,
+    )
+
+    typeKeys("⌫")
+    await settle()
+
+    expect(mockSetAmount).toHaveBeenLastCalledWith(
+      {
+        amount: Math.floor(cents / 10) * 10,
+        currency: "DisplayCurrency",
+        currencyCode: "USD",
+      },
+      undefined,
+    )
   })
 })
 

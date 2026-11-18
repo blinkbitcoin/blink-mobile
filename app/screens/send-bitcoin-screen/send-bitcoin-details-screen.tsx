@@ -237,6 +237,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       defaultWallet?.walletCurrency ??
       WalletCurrency.Btc,
     convertMoneyAmount: paymentDetail?.convertMoneyAmount ?? _convertMoneyAmount,
+    amountOfRecord: paymentDetail?.unitOfAccountAmount,
     onAmountChange: setAmount,
   })
 
