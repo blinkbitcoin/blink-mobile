@@ -250,6 +250,25 @@ describe("IncomingTransactionSplashOverlay", () => {
     expect(mockFinishers).toHaveLength(1)
   })
 
+  it("swallows Android back during the entrance and closes once settled", async () => {
+    jest.replaceProperty(Platform, "OS", "android")
+    renderOverlay(payment("a", 1_000))
+    await layOutAmount()
+    const modal = () => screen.UNSAFE_getByType(Modal)
+    act(() => modal().props.onShow())
+    act(() => jest.advanceTimersByTime(FRAME_MS))
+
+    act(() => modal().props.onRequestClose())
+    expect(onClose).not.toHaveBeenCalled()
+
+    finishNext()
+    act(() => jest.runOnlyPendingTimers())
+    act(() => modal().props.onRequestClose())
+
+    expect(onClose).toHaveBeenCalledTimes(1)
+    expect(onClose).toHaveBeenCalledWith({ optedOut: false })
+  })
+
   it("reads the payment, Details and Close by name to a screen reader", async () => {
     renderOverlay(payment("a", 1_000))
     await landAndSettle()

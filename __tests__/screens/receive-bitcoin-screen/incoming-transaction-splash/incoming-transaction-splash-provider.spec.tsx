@@ -1,5 +1,5 @@
 import React from "react"
-import { AppState, Keyboard } from "react-native"
+import { AppState, AppStateStatus, Keyboard } from "react-native"
 import { act, render } from "@testing-library/react-native"
 import { it } from "@jest/globals"
 
@@ -9,13 +9,14 @@ import { IncomingTransactionSplashProvider } from "@app/screens/receive-bitcoin-
 import { SplashCandidate } from "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/types"
 
 const mockNavigate = jest.fn()
+let mockAppLocked = false
 jest.mock("@app/navigation/navigation-container-wrapper", () => ({
   navigationRef: {
     isReady: () => true,
     getCurrentRoute: () => ({ name: "Home" }),
     navigate: (...args: unknown[]) => mockNavigate(...args),
   },
-  useAuthenticationContext: () => ({ isAppLocked: false }),
+  useAuthenticationContext: () => ({ isAppLocked: mockAppLocked }),
 }))
 
 jest.mock("@app/graphql/hide-amount-context", () => ({
@@ -82,6 +83,16 @@ const candidate = (overrides: Partial<SplashCandidate> = {}): SplashCandidate =>
     ...overrides,
   }) as SplashCandidate
 
+/** The provider's AppState listener, captured as it subscribes. */
+const captureAppState = () => {
+  const ref: { current: ((state: AppStateStatus) => void) | null } = { current: null }
+  jest.spyOn(AppState, "addEventListener").mockImplementation((_type, handler) => {
+    ref.current = handler as (state: AppStateStatus) => void
+    return { remove: jest.fn() } as never
+  })
+  return ref
+}
+
 const renderProvider = () => {
   const context: { current: ReturnType<typeof useIncomingTransactionSplash> | null } = {
     current: null,
@@ -90,19 +101,22 @@ const renderProvider = () => {
     context.current = useIncomingTransactionSplash()
     return null
   }
-  render(
+  const tree = () => (
     <IncomingTransactionSplashProvider>
       <Probe />
-    </IncomingTransactionSplashProvider>,
+    </IncomingTransactionSplashProvider>
   )
+  const { rerender } = render(tree())
   if (!context.current) throw new Error("context not mounted")
-  return context.current
+  return Object.assign(context.current, { rerender: () => rerender(tree()) })
 }
 
 describe("IncomingTransactionSplashProvider", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    jest.restoreAllMocks()
     mockOverlay = null
+    mockAppLocked = false
     Object.defineProperty(AppState, "currentState", {
       value: "active",
       configurable: true,
@@ -227,5 +241,120 @@ describe("IncomingTransactionSplashProvider", () => {
     act(() => splash.refresh(deposit("b:1")))
 
     expect(mockOverlay).toBeNull()
+  })
+
+  describe("lifecycle", () => {
+    it("dismisses the splash and its queue when the app goes to the background", () => {
+      const appState = captureAppState()
+      const splash = renderProvider()
+      const deposit = (id: string) =>
+        candidate({ transaction: { ...candidate().transaction, id } })
+
+      act(() => splash.showSplashes([deposit("a:0"), deposit("b:1")]))
+      mockOverlay = null
+      act(() => appState.current?.("inactive"))
+      act(() => splash.refresh(deposit("a:0")))
+      expect(mockOverlay).not.toBeNull()
+
+      act(() => appState.current?.("background"))
+      mockOverlay = null
+      act(() => splash.refresh(deposit("a:0")))
+      expect(mockOverlay).toBeNull()
+
+      act(() => {
+        expect(splash.showSplash(deposit("c:0"))).toBe(true)
+      })
+      act(() => mockOverlay?.onClose({ optedOut: false }))
+      mockOverlay = null
+      act(() => splash.refresh(deposit("b:1")))
+
+      expect(mockOverlay).toBeNull()
+    })
+
+    it("dismisses the splash when the app locks", () => {
+      const splash = renderProvider()
+
+      act(() => {
+        splash.showSplash(candidate())
+      })
+      mockAppLocked = true
+      act(() => splash.rerender())
+      mockOverlay = null
+      act(() => splash.refresh(candidate()))
+
+      expect(mockOverlay).toBeNull()
+    })
+
+    /** A payment made while the app was away settled before it came back. */
+    it("measures freshness from the latest return to the foreground", () => {
+      jest.useFakeTimers({ now: Date.now() })
+      const appState = captureAppState()
+      const splash = renderProvider()
+      const createdAt = Math.floor(Date.now() / 1000) + 30 * 60
+      const away = candidate({
+        transaction: { ...candidate().transaction, id: "away", createdAt },
+      })
+
+      jest.advanceTimersByTime(60 * 60 * 1000)
+      act(() => appState.current?.("active"))
+
+      act(() => {
+        expect(splash.showSplash(away)).toBe(false)
+      })
+      jest.useRealTimers()
+    })
+
+    /** A restore replays the payment completed; the same id can still land live later. */
+    it("does not remember a replayed payment, so its live event still shows", () => {
+      const splash = renderProvider()
+      const twoHoursAgo = NOW_S - 2 * 60 * 60
+      const replayed = candidate({
+        transaction: { ...candidate().transaction, id: "p1", createdAt: twoHoursAgo },
+      })
+
+      act(() => {
+        expect(splash.showSplash(replayed)).toBe(false)
+        expect(splash.showSplash({ ...replayed, claimSeenLive: true })).toBe(true)
+      })
+    })
+  })
+
+  describe("Details", () => {
+    it("opens the unclaimed deposits screen for a deposit", () => {
+      const splash = renderProvider()
+
+      act(() => {
+        splash.showSplash(candidate({ paymentType: "onchain", unclaimedDeposit: true }))
+      })
+      act(() => mockOverlay?.onDetails({ optedOut: false }))
+
+      expect(mockNavigate).toHaveBeenCalledWith("unclaimedDepositsScreen")
+    })
+
+    it("opens the transaction for any other payment", () => {
+      const splash = renderProvider()
+
+      act(() => {
+        splash.showSplash(candidate())
+      })
+      act(() => mockOverlay?.onDetails({ optedOut: false }))
+
+      expect(mockNavigate).toHaveBeenCalledWith("transactionDetail", { txid: "tx-1" })
+    })
+
+    /** Ruled by product: Details leaves the splash, and the line behind it goes too,
+     *  whatever the splash on screen is. */
+    it("drops the splashes queued behind it, whatever the splash on screen is", () => {
+      const splash = renderProvider()
+      const deposit = (id: string) =>
+        candidate({ transaction: { ...candidate().transaction, id } })
+
+      act(() => splash.showSplashes([deposit("a:0"), deposit("b:1")]))
+      act(() => mockOverlay?.onDetails({ optedOut: false }))
+      mockOverlay = null
+      act(() => splash.refresh(deposit("b:1")))
+
+      expect(mockOverlay).toBeNull()
+    })
   })
 })
