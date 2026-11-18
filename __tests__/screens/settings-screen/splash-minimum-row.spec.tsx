@@ -88,6 +88,42 @@ describe("SplashMinimumRow", () => {
     expect(screen.getByLabelText("Minimum amount (SAT)").props.value).toBe("100")
   })
 
+  /** Android back leaves the screen before the field's end-editing event reaches it. */
+  it("saves a value typed and left without ending the edit", async () => {
+    const view = renderRow()
+    const input = await screen.findByDisplayValue("100")
+
+    fireEvent(input, "focus")
+    fireEvent.changeText(input, "250")
+    view.unmount()
+
+    expect(mockSetMinSats).toHaveBeenCalledTimes(1)
+    expect(mockSetMinSats).toHaveBeenCalledWith(250)
+  })
+
+  it("saves nothing more on leaving once the edit has ended", async () => {
+    const view = renderRow()
+    const input = await screen.findByDisplayValue("100")
+
+    fireEvent(input, "focus")
+    fireEvent.changeText(input, "250")
+    fireEvent(input, "endEditing")
+    view.unmount()
+
+    expect(mockSetMinSats).toHaveBeenCalledTimes(1)
+  })
+
+  it("saves nothing on leaving with text that is not an amount", async () => {
+    const view = renderRow()
+    const input = await screen.findByDisplayValue("100")
+
+    fireEvent(input, "focus")
+    fireEvent.changeText(input, "abc")
+    view.unmount()
+
+    expect(mockSetMinSats).not.toHaveBeenCalled()
+  })
+
   it("keeps a remote-config minimum that resolved while the field was focused", async () => {
     const view = renderRow()
     const input = await screen.findByDisplayValue("100")

@@ -245,7 +245,7 @@ export const NotificationSettingsScreen: React.FC = () => {
   )
 }
 
-const SplashToggleRow: React.FC = () => {
+export const SplashToggleRow: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const { enabled, setEnabled } = useSplashSettings()
@@ -272,6 +272,12 @@ const SplashToggleRow: React.FC = () => {
   )
 }
 
+/** A whole number of sats, or null for text that is not one. */
+const toMinimum = (text: string): number | null => {
+  const value = Number.parseInt(text, 10)
+  return Number.isFinite(value) && value >= 0 ? value : null
+}
+
 /** `SettingsGroup` also calls each row as a plain function to drop the null ones, so
  *  these hooks run as the group's own too. Every hook must come before the early return. */
 export const SplashMinimumRow: React.FC = () => {
@@ -288,6 +294,21 @@ export const SplashMinimumRow: React.FC = () => {
     if (focusedDraft.current === null) setDraft(String(minSats))
   }, [minSats])
 
+  /** Leaving the screen mid-edit (Android back) unmounts the field before its end-editing
+   *  event reaches it: what was typed is saved here instead of lost. */
+  const latest = React.useRef({ draft, minSats, setMinSats })
+  latest.current = { draft, minSats, setMinSats }
+  React.useEffect(
+    () => () => {
+      const started = focusedDraft.current
+      const { draft: typed, minSats: saved, setMinSats: save } = latest.current
+      if (started === null || typed === started) return
+      const value = toMinimum(typed)
+      if (value !== null && value !== saved) save(value)
+    },
+    [],
+  )
+
   const commit = () => {
     const untouched = draft === focusedDraft.current
     focusedDraft.current = null
@@ -296,8 +317,8 @@ export const SplashMinimumRow: React.FC = () => {
       setDraft(String(minSats))
       return
     }
-    const value = Number.parseInt(draft, 10)
-    if (Number.isFinite(value) && value >= 0) {
+    const value = toMinimum(draft)
+    if (value !== null) {
       if (value !== minSats) setMinSats(value)
       return
     }
