@@ -125,7 +125,7 @@ describe("GaloySliderButton", () => {
       expect(screen.getByText("Slide to send")).toBeTruthy()
     })
 
-    it("sends once the drag passes 70% of the travel", async () => {
+    it("sends on release past 70% of the travel", async () => {
       const onSwipe = await renderSlider({
         onSwipe: jest.fn(() => new Promise(() => {})),
       })
@@ -146,6 +146,18 @@ describe("GaloySliderButton", () => {
         { state: State.END, translationX: TRAVEL },
       ])
       expect(onSwipe).toHaveBeenCalledTimes(1)
+    })
+
+    it("does not send when dragged past 70% and back before release", async () => {
+      const onSwipe = await renderSlider()
+      await pan([
+        { state: State.BEGAN, translationX: 0 },
+        { state: State.ACTIVE, translationX: 0 },
+        { state: State.ACTIVE, translationX: TRAVEL * 0.9 },
+        { state: State.ACTIVE, translationX: TRAVEL * 0.5 },
+        { state: State.END, translationX: TRAVEL * 0.5 },
+      ])
+      expect(onSwipe).not.toHaveBeenCalled()
     })
 
     it("sends again after an onSwipe that settles at once", async () => {

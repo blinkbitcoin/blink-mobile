@@ -30,7 +30,7 @@ import { GaloyIcon } from "../galoy-icon"
 
 const TRACK_HEIGHT = 60
 const HANDLE_SIZE = 60
-/** Share of the travel the handle must cover before the send commits. */
+/** Share of the travel the handle must be past, on release, for the send to commit. */
 const COMMIT_THRESHOLD = 0.7
 /** Share of the travel after which the handle starts fading out. */
 const HANDLE_FADE_START = 0.9
@@ -127,17 +127,17 @@ const GaloySliderButton = ({
     .onUpdate((e) => {
       if (hasCommitted.value) return
       const distance = isRTL ? -e.translationX : e.translationX
-      const next = Math.min(Math.max(distance, 0), travel)
-      if (next >= travel * COMMIT_THRESHOLD) {
-        hasCommitted.value = true
-        X.value = withTiming(travel, {
-          duration: COMPLETE_DURATION_MS,
-          easing: Easing.out(Easing.cubic),
-        })
-        runOnJS(commit)()
-        return
-      }
-      X.value = next
+      X.value = Math.min(Math.max(distance, 0), travel)
+    })
+    // Sends only on release, so a user who went too far can still slide back.
+    .onEnd((_e, success) => {
+      if (!success || hasCommitted.value || X.value < travel * COMMIT_THRESHOLD) return
+      hasCommitted.value = true
+      X.value = withTiming(travel, {
+        duration: COMPLETE_DURATION_MS,
+        easing: Easing.out(Easing.cubic),
+      })
+      runOnJS(commit)()
     })
     .onFinalize(() => {
       if (!hasCommitted.value) {
