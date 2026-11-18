@@ -185,7 +185,12 @@ export const clickOnText = async (text: string) => {
 }
 
 export const swipeButton = async (title: string) => {
-  const handle = await $(selector(title, "Other"))
+  // On iOS the handle is a Button whose name is its testID, with the title as its label.
+  const handle = await $(
+    process.env.E2E_DEVICE === "ios"
+      ? `//XCUIElementTypeButton[@name="slider" and @label="${title}"]`
+      : selector(title),
+  )
   await handle.waitForDisplayed({ timeout })
 
   const location = await handle.getLocation()
