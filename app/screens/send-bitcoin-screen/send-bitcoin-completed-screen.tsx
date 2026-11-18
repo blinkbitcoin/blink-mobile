@@ -37,6 +37,9 @@ import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
+import { PaymentDetailType } from "./payment-details/index.types"
+import { receiptDestination } from "./receipt-destination"
+
 type StatusProcessed = "SUCCESS" | "PENDING" | "QUEUED"
 
 interface Props {
@@ -170,7 +173,7 @@ const PaymentDetailsSection: React.FC<{
   usernameTitle: string
   destination?: string
   createdAt?: number
-  paymentType?: PaymentType | string
+  paymentType?: PaymentDetailType
   LL: TranslationFunctions
 }> = ({
   currencyAmount,
@@ -214,7 +217,11 @@ const PaymentDetailsSection: React.FC<{
         />
         <SuccessActionComponent
           title={LL.SendBitcoinScreen.recipient()}
-          text={destination}
+          text={
+            destination && paymentType
+              ? receiptDestination(paymentType, destination)
+              : destination
+          }
           key="recipient"
           visible={Boolean(destination)}
         />
