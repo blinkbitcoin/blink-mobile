@@ -35,6 +35,7 @@ import { useInitialAccessibilityFocus } from "@app/hooks/use-initial-accessibili
 import { useKeyboardVisible } from "@app/hooks/use-keyboard-visible"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { radius } from "@app/rne-theme/radius"
 import {
   DisplayCurrency,
   greaterThan,
@@ -743,7 +744,7 @@ const useStyles = makeStyles(() => ({
   /** Same height as the priority row above it, as drawn. */
   noteField: {
     minHeight: 42,
-    borderRadius: 8,
+    borderRadius: radius.default,
     paddingVertical: 8,
     paddingLeft: 14,
     paddingRight: 10,

@@ -284,7 +284,7 @@ const TOKEN_CORNERS: Record<string, number> = {
   "app/screens/send-bitcoin-screen/send-bitcoin-completed-screen.tsx": 1,
   "app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen.tsx": 1,
   "app/screens/send-bitcoin-screen/send-bitcoin-destination-screen.tsx": 2,
-  "app/screens/send-bitcoin-screen/send-bitcoin-details-screen.tsx": 3,
+  "app/screens/send-bitcoin-screen/send-bitcoin-details-screen.tsx": 1,
   "app/screens/settings-screen/account/settings/delete.tsx": 1,
   "app/screens/settings-screen/api/api-key-create-screen.tsx": 1,
   "app/screens/settings-screen/button.tsx": 2,

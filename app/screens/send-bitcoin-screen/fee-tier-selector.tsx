@@ -7,6 +7,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
 import { fonts } from "@app/rne-theme/fonts"
+import { radius } from "@app/rne-theme/radius"
 
 type OptionItem<T extends string> = {
   id: T
@@ -114,7 +115,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     columnGap: 12,
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     /** Matches the note field below; the padding lets it grow with the font scale. */
     minHeight: 42,
     paddingVertical: 8,
@@ -146,7 +147,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     columnGap: 14,
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 12,
+    borderRadius: radius.default,
     paddingVertical: 14,
     paddingLeft: 14,
     paddingRight: 10,
