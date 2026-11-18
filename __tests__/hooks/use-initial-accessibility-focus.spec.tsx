@@ -107,6 +107,24 @@ describe("useInitialAccessibilityFocus", () => {
     expect(mockSendAccessibilityEvent).toHaveBeenCalledWith(keypad.current, "focus")
   })
 
+  it("focuses a target that only arrives after the delay", async () => {
+    const keypad = nodeRef("keypad")
+    const { rerender } = renderHook(
+      ({ target }: { target: RefObject<View | null> | undefined }) =>
+        useInitialAccessibilityFocus(target),
+      { initialProps: { target: undefined as RefObject<View | null> | undefined } },
+    )
+    await passDelay()
+
+    rerender({ target: keypad })
+    await passDelay()
+    rerender({ target: nodeRef("next") })
+    await passDelay()
+
+    expect(mockSendAccessibilityEvent).toHaveBeenCalledTimes(1)
+    expect(mockSendAccessibilityEvent).toHaveBeenCalledWith(keypad.current, "focus")
+  })
+
   it("doesn't pull focus again when the target changes later", async () => {
     const { rerender } = renderHook(
       ({ target }: { target: RefObject<View | null> }) =>
