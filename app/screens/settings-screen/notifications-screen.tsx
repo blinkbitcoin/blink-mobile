@@ -18,6 +18,7 @@ import { ListItem, makeStyles, Text } from "@rn-vui/themed"
 import { Screen } from "@app/components/screen"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { Switch } from "@app/components/atomic/switch"
+import { radius } from "@app/rne-theme/radius"
 import {
   toastSplashSetting,
   useSplashSettings,
@@ -366,7 +367,7 @@ const useStyles = makeStyles(({ colors }) => ({
     minWidth: 72,
     paddingVertical: 6,
     paddingHorizontal: 10,
-    borderRadius: 8,
+    borderRadius: radius.default,
     backgroundColor: colors.surfaceInteractive,
     color: colors.textOnBackground,
     fontSize: 16,

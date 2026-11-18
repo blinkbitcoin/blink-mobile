@@ -37,6 +37,7 @@ import { SuccessGlow } from "@app/components/success-glow"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { fonts } from "@app/rne-theme/fonts"
+import { radius } from "@app/rne-theme/radius"
 import { toBtcMoneyAmount } from "@app/types/amounts"
 
 import type { ShownSplash } from "./incoming-transaction-splash-provider"
@@ -682,7 +683,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 14,
     paddingHorizontal: 10,
     paddingVertical: 14,
-    borderRadius: 8,
+    borderRadius: radius.default,
     backgroundColor: "rgba(255, 255, 255, 0.1)",
   },
   noteLabel: {
