@@ -126,7 +126,9 @@ const animatedQualifiers = (source: string): string[] => {
     names.add(match[1])
   }
 
-  for (const imported of source.matchAll(/import\s*\{([^}]*)\}\s*from\s*"react-native"/gs)) {
+  for (const imported of source.matchAll(
+    /import\s*\{([^}]*)\}\s*from\s*"react-native"/gs,
+  )) {
     const named = /(?:^|,)\s*Animated(?:\s+as\s+(\w+))?\s*(?:,|$)/s.exec(imported[1])
     if (named) names.add(named[1] ?? "Animated")
   }
@@ -151,9 +153,11 @@ const memberTags = (source: string, qualifier: string, member: string): string[]
 }
 
 const animatedHosts = (source: string): string[] =>
-  [...source.matchAll(/\b(\w+)\s*=\s*\w+\.createAnimatedComponent\(\s*(Text|TextInput)\s*\)/g)].map(
-    (match) => match[1],
-  )
+  [
+    ...source.matchAll(
+      /\b(\w+)\s*=\s*\w+\.createAnimatedComponent\(\s*(Text|TextInput)\s*\)/g,
+    ),
+  ].map((match) => match[1])
 
 const uncappedAnimatedTags = (source: string): string[] => {
   const members = animatedQualifiers(source).flatMap((qualifier) => [
