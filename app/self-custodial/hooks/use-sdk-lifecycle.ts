@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { AppState } from "react-native"
+import RNFS from "react-native-fs"
 
 import {
   type BreezSdkInterface,
@@ -33,7 +34,7 @@ import {
   PAYMENT_RECEIVED_EVENTS,
   REFRESH_EVENTS,
 } from "../providers/sdk-events"
-import { emitNewDeposits } from "../providers/new-deposits"
+import { depositsToAnnounce, emitNewDeposits } from "../providers/new-deposits"
 import {
   clearPendingPayments,
   emitSucceededPayment,
@@ -92,6 +93,16 @@ const teardownSdk = async (
 ): Promise<void> => {
   if (listenerId) await removeSdkEventListener(sdk, listenerId)
   await disconnectSdk(sdk)
+}
+
+/** Read before the SDK creates the directory. An unreadable one counts as existing, so
+ *  a failed check never hides a deposit. */
+const isStorageAbsent = async (storageDir: string): Promise<boolean> => {
+  try {
+    return !(await RNFS.exists(storageDir))
+  } catch {
+    return false
+  }
 }
 
 export const useSdkLifecycle = (
@@ -247,9 +258,11 @@ export const useSdkLifecycle = (
     const accountId = activeSelfCustodialAccountId
 
     const connectAndListen = async (mnemonic: string) => {
+      const storageDir = storageDirFor(accountId, network)
+      const freshStorage = await isStorageAbsent(storageDir)
       const connectedSdk = await initSdk({
         mnemonic,
-        storageDir: storageDirFor(accountId, network),
+        storageDir,
         network,
         leewaySatPerVbyte: depositClaimLeewayRef.current,
         lnurlDomain,
@@ -269,7 +282,8 @@ export const useSdkLifecycle = (
         if (!mounted) return
         if (event.tag === SdkEventTags.Synced) hasSynced = true
         if (hasSynced && event.tag === SdkEventTags.NewDeposits) {
-          emitNewDeposits(event.inner.newDeposits)
+          const deposits = depositsToAnnounce(event.inner.newDeposits, { freshStorage })
+          if (deposits.length > 0) emitNewDeposits(deposits)
         }
 
         /** Ahead of the refresh filter: a failed send is not a refresh event, but it is

@@ -2,6 +2,7 @@ import { it } from "@jest/globals"
 import { type DepositInfo } from "@breeztech/breez-sdk-spark-react-native"
 
 import {
+  depositsToAnnounce,
   emitNewDeposits,
   onNewDeposits,
 } from "@app/self-custodial/providers/new-deposits"
@@ -21,5 +22,23 @@ describe("new deposits", () => {
 
     unsubscribeThrowing()
     unsubscribeAfter()
+  })
+})
+
+describe("depositsToAnnounce", () => {
+  const mature = { txid: "old", vout: 0, isMature: true } as DepositInfo
+  const immature = { txid: "live", vout: 0, isMature: false } as DepositInfo
+
+  it("keeps only immature deposits on storage created by this connect", () => {
+    expect(depositsToAnnounce([mature, immature], { freshStorage: true })).toEqual([
+      immature,
+    ])
+  })
+
+  it("keeps every deposit on storage that already existed", () => {
+    expect(depositsToAnnounce([mature, immature], { freshStorage: false })).toEqual([
+      mature,
+      immature,
+    ])
   })
 })

@@ -4,7 +4,10 @@ import { renderHook, act, waitFor } from "@testing-library/react-native"
 import { ActiveWalletStatus } from "@app/types/wallet"
 import { useSdkLifecycle } from "@app/self-custodial/hooks/use-sdk-lifecycle"
 import { onNewDeposits } from "@app/self-custodial/providers/new-deposits"
-import { onSucceededPayment } from "@app/self-custodial/providers/succeeded-payments"
+import {
+  emitSucceededPayment,
+  onSucceededPayment,
+} from "@app/self-custodial/providers/succeeded-payments"
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   Network: { Mainnet: 0, Regtest: 1 },
@@ -24,6 +27,13 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
 
 jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
   useSparkNetwork: () => mockSparkNetwork.Regtest,
+}))
+
+/** Whether the account's SDK storage directory was there before connect. */
+const mockStorageExists = jest.fn()
+jest.mock("react-native-fs", () => ({
+  __esModule: true,
+  default: { exists: (...args: unknown[]) => mockStorageExists(...args) },
 }))
 
 const mockReadMnemonicWithStatus = jest.fn()
@@ -129,6 +139,7 @@ const buildSdk = (id: string) => ({ id }) as unknown as object
 
 const resetMocks = () => {
   jest.clearAllMocks()
+  mockStorageExists.mockResolvedValue(true)
   mockDepositClaimLeewayVbyte = 7
   mockReadMnemonicWithStatus.mockResolvedValue({
     status: "found",
@@ -1200,5 +1211,142 @@ describe("useSdkLifecycle: payment observers", () => {
     unsubscribe()
 
     expect(mockGetSnapshot.mock.calls).toHaveLength(snapshotCallsBefore + 1)
+  })
+
+  const payment = (id: string) => ({ id, paymentType: 1, method: 0, status: 0 })
+  const deposit = (txid: string, isMature: boolean) => ({ txid, vout: 0, isMature })
+
+  /** Connects, and hands back what the splash's `NewDeposits` observer heard. */
+  const connectWithDepositObserver = async () => {
+    mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+    const listener = captureListener()
+    const heard: Array<Array<{ txid: string }>> = []
+    const unsubscribe = onNewDeposits((deposits) => {
+      heard.push([...deposits] as Array<{ txid: string }>)
+    })
+    const hook = renderHook(() => useSdkLifecycle("acct-1", 0))
+    await waitFor(() => {
+      expect(listener.current).not.toBeNull()
+    })
+    const send = async (event: { tag: string; inner?: unknown }) => {
+      await act(async () => {
+        await listener.current?.(event)
+      })
+    }
+    return { heard, send, unsubscribe, hook }
+  }
+
+  it("drops the deposits the first sync turns up and forwards later ones", async () => {
+    const { heard, send, unsubscribe } = await connectWithDepositObserver()
+
+    await send({ tag: "NewDeposits", inner: { newDeposits: [deposit("old", false)] } })
+    await send({ tag: "Synced" })
+    await send({ tag: "NewDeposits", inner: { newDeposits: [deposit("new", false)] } })
+    unsubscribe()
+
+    expect(heard).toEqual([[expect.objectContaining({ txid: "new" })]])
+  })
+
+  /** A restore whose first deposit scan failed: the next scan reports the old unclaimed
+   *  deposits as new. A live one comes from the mempool, immature. */
+  it("on storage created by this connect, forwards only immature deposits", async () => {
+    mockStorageExists.mockResolvedValue(false)
+    const { heard, send, unsubscribe } = await connectWithDepositObserver()
+
+    await send({ tag: "Synced" })
+    await send({
+      tag: "NewDeposits",
+      inner: { newDeposits: [deposit("old", true), deposit("live", false)] },
+    })
+    await send({ tag: "NewDeposits", inner: { newDeposits: [deposit("old-2", true)] } })
+    unsubscribe()
+
+    expect(mockStorageExists).toHaveBeenCalledWith("/tmp/acct-1")
+    expect(heard).toEqual([[expect.objectContaining({ txid: "live" })]])
+  })
+
+  /** It confirmed while the app was in the background: a real arrival. */
+  it("on storage that already existed, forwards a mature deposit", async () => {
+    const { heard, send, unsubscribe } = await connectWithDepositObserver()
+
+    await send({ tag: "Synced" })
+    await send({
+      tag: "NewDeposits",
+      inner: { newDeposits: [deposit("confirmed", true)] },
+    })
+    unsubscribe()
+
+    expect(heard).toEqual([[expect.objectContaining({ txid: "confirmed" })]])
+  })
+
+  it("treats storage it cannot check as existing", async () => {
+    mockStorageExists.mockRejectedValue(new Error("unreadable"))
+    const { heard, send, unsubscribe, hook } = await connectWithDepositObserver()
+
+    await send({ tag: "Synced" })
+    await send({
+      tag: "NewDeposits",
+      inner: { newDeposits: [deposit("confirmed", true)] },
+    })
+    unsubscribe()
+
+    expect(hook.result.current.sdk).not.toBeNull()
+    expect(heard).toEqual([[expect.objectContaining({ txid: "confirmed" })]])
+  })
+
+  it("marks a success live when the same payment was reported pending first", async () => {
+    mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+    const listener = captureListener()
+    const live: boolean[] = []
+    const unsubscribe = onSucceededPayment((_payment, info) => {
+      live.push(info.claimSeenLive)
+    })
+    renderHook(() => useSdkLifecycle("acct-1", 0))
+    await waitFor(() => {
+      expect(listener.current).not.toBeNull()
+    })
+
+    await act(async () => {
+      await listener.current?.({
+        tag: "PaymentPending",
+        inner: { payment: payment("p1") },
+      })
+      await listener.current?.({
+        tag: "PaymentSucceeded",
+        inner: { payment: payment("p1") },
+      })
+      await listener.current?.({
+        tag: "PaymentSucceeded",
+        inner: { payment: payment("p2") },
+      })
+    })
+    unsubscribe()
+
+    expect(live).toEqual([true, false])
+  })
+
+  it("forgets the pending payments of a wallet that disconnects", async () => {
+    mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+    const listener = captureListener()
+    const live: boolean[] = []
+    const unsubscribe = onSucceededPayment((_payment, info) => {
+      live.push(info.claimSeenLive)
+    })
+    const { unmount } = renderHook(() => useSdkLifecycle("acct-1", 0))
+    await waitFor(() => {
+      expect(listener.current).not.toBeNull()
+    })
+
+    await act(async () => {
+      await listener.current?.({
+        tag: "PaymentPending",
+        inner: { payment: payment("p1") },
+      })
+    })
+    unmount()
+    emitSucceededPayment(payment("p1") as never)
+    unsubscribe()
+
+    expect(live).toEqual([false])
   })
 })
