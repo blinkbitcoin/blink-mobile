@@ -1625,7 +1625,6 @@ describe("SendBitcoinConfirmationScreen — slide to send", () => {
       progress.findingRoute(),
       progress.broadcasting(),
       progress.checkingDelivery(),
-      progress.retrying(),
       progress.almostThere(),
       progress.anyTimeNow(),
       progress.ohOh(),

@@ -7537,10 +7537,6 @@ type RootTranslation = {
 			 */
 			checkingDelivery: string
 			/**
-			 * R​e​-​t​r​y​i​n​g
-			 */
-			retrying: string
-			/**
 			 * A​l​m​o​s​t​ ​t​h​e​r​e
 			 */
 			almostThere: string
@@ -21964,10 +21960,6 @@ export type TranslationFunctions = {
 			 * Checking delivery
 			 */
 			checkingDelivery: () => LocalizedString
-			/**
-			 * Re-trying
-			 */
-			retrying: () => LocalizedString
 			/**
 			 * Almost there
 			 */

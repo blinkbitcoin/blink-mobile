@@ -160,7 +160,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     progress.findingRoute(),
     progress.broadcasting(),
     progress.checkingDelivery(),
-    progress.retrying(),
     progress.almostThere(),
     progress.anyTimeNow(),
     progress.ohOh(),

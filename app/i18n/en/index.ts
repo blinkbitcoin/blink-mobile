@@ -2395,7 +2395,6 @@ const en: BaseTranslation = {
       findingRoute: "Finding route",
       broadcasting: "Broadcasting",
       checkingDelivery: "Checking delivery",
-      retrying: "Re-trying",
       almostThere: "Almost there",
       anyTimeNow: "Any time now",
       ohOh: "Oh oh",
