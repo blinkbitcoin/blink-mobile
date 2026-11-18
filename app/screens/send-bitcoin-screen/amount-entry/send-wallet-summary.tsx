@@ -38,6 +38,7 @@ type SendWalletSummaryProps = {
   inactive?: boolean
 }
 
+// TODO(#4360): becomes a thin wrapper over WalletSummary once #4360 merges.
 export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
   currency,
   balancePrimary,
