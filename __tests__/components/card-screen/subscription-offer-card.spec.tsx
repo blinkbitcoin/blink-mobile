@@ -58,4 +58,23 @@ describe("SubscriptionOfferCard", () => {
       light.black,
     )
   })
+
+  it("draws the row labels a step lighter than the caption, as the design does", () => {
+    const { getByText } = renderCard(
+      <SubscriptionOfferCard
+        title="Blink Orange"
+        price="Free"
+        priceTone="positive"
+        caption="for now"
+        rows={[{ label: "Blink Card", value: "$0.00", tone: "default" }]}
+      />,
+    )
+
+    expect(StyleSheet.flatten(getByText("Blink Card").props.style).color).toBe(
+      light.textSecondary,
+    )
+    expect(StyleSheet.flatten(getByText("for now").props.style).color).toBe(
+      light.textMuted,
+    )
+  })
 })
