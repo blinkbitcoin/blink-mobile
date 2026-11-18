@@ -90,10 +90,6 @@ jest.mock("@app/hooks", () => ({
     },
 }))
 
-jest.mock("@app/screens/receive-bitcoin-screen/my-ln-updates-sub", () => ({
-  withMyLnUpdateSub: (Comp: unknown) => Comp,
-}))
-
 jest.mock("@app/screens/receive-bitcoin-screen/qr-view", () => ({
   QRView: () => null,
 }))
