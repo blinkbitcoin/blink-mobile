@@ -1,5 +1,7 @@
 import { type DepositInfo } from "@breeztech/breez-sdk-spark-react-native"
 
+import { reportError } from "@app/utils/error-logging"
+
 type NewDepositsListener = (deposits: readonly DepositInfo[]) => void
 
 const listeners = new Set<NewDepositsListener>()
@@ -17,6 +19,14 @@ export const onNewDeposits = (listener: NewDepositsListener): (() => void) => {
   }
 }
 
+/** Called ahead of the wallet refresh the same event triggers: a listener that throws
+ *  must not cancel it, so each runs alone. */
 export const emitNewDeposits = (deposits: readonly DepositInfo[]): void => {
-  listeners.forEach((listener) => listener(deposits))
+  listeners.forEach((listener) => {
+    try {
+      listener(deposits)
+    } catch (err) {
+      reportError("New deposits listener", err)
+    }
+  })
 }

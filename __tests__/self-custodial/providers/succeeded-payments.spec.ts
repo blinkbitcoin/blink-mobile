@@ -53,4 +53,19 @@ describe("succeeded payments", () => {
 
     expect(claimSeenLive()).toEqual([false, false])
   })
+
+  it("still reaches the other listeners when one throws", () => {
+    const unsubscribeThrowing = onSucceededPayment(() => {
+      throw new Error("observer broke")
+    })
+    const after = jest.fn()
+    const unsubscribeAfter = onSucceededPayment(after)
+
+    expect(() => emitSucceededPayment(payment("a"))).not.toThrow()
+    expect(listener).toHaveBeenCalledTimes(1)
+    expect(after).toHaveBeenCalledTimes(1)
+
+    unsubscribeThrowing()
+    unsubscribeAfter()
+  })
 })

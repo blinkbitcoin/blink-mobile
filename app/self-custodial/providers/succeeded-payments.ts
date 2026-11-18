@@ -1,5 +1,7 @@
 import { type Payment } from "@breeztech/breez-sdk-spark-react-native"
 
+import { reportError } from "@app/utils/error-logging"
+
 export type SucceededPaymentInfo = {
   /** The SDK reported this payment pending earlier in this session: its claim was seen
    *  starting live, so it is a new payment whatever its `timestamp` says. That timestamp
@@ -42,7 +44,15 @@ export const clearPendingPayments = (): void => {
   pendingIds.clear()
 }
 
+/** Called ahead of the wallet refresh and the stable-balance conversion the same event
+ *  triggers. A listener that throws must not cost the user either, so each runs alone. */
 export const emitSucceededPayment = (payment: Payment): void => {
   const info = { claimSeenLive: pendingIds.delete(payment.id) }
-  listeners.forEach((listener) => listener(payment, info))
+  listeners.forEach((listener) => {
+    try {
+      listener(payment, info)
+    } catch (err) {
+      reportError("Succeeded payment listener", err)
+    }
+  })
 }

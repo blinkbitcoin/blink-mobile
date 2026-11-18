@@ -3,6 +3,8 @@ import { renderHook, act, waitFor } from "@testing-library/react-native"
 
 import { ActiveWalletStatus } from "@app/types/wallet"
 import { useSdkLifecycle } from "@app/self-custodial/hooks/use-sdk-lifecycle"
+import { onNewDeposits } from "@app/self-custodial/providers/new-deposits"
+import { onSucceededPayment } from "@app/self-custodial/providers/succeeded-payments"
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   Network: { Mainnet: 0, Regtest: 1 },
@@ -1136,5 +1138,67 @@ describe("useSdkLifecycle paging when the account switches or a page fails", () 
     expect(result.current.loadingMore).toBe(false)
     expect(result.current.hasMoreTransactions).toBe(false)
     expect(result.current.allTransactions).toEqual([{ id: "older-payment-of-b" }])
+  })
+})
+
+describe("useSdkLifecycle: payment observers", () => {
+  beforeEach(resetMocks)
+
+  /** The splash hears a payment ahead of the refresh. The refresh and the id behind the
+   *  stable-balance conversion must land whatever that observer does. */
+  it("refreshes and surfaces the payment when a succeeded-payment observer throws", async () => {
+    mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+    const listener = captureListener()
+    const unsubscribe = onSucceededPayment(() => {
+      throw new Error("observer broke")
+    })
+
+    const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+
+    await waitFor(() => {
+      expect(listener.current).not.toBeNull()
+    })
+
+    const snapshotCallsBefore = mockGetSnapshot.mock.calls.length
+
+    await act(async () => {
+      await listener.current?.({
+        tag: "PaymentSucceeded",
+        inner: { payment: { id: "p1", paymentType: 1, method: 0, status: 0 } },
+      })
+    })
+    unsubscribe()
+
+    expect(mockGetSnapshot.mock.calls).toHaveLength(snapshotCallsBefore + 1)
+    expect(result.current.lastReceivedPaymentId).toBe("p1")
+  })
+
+  it("refreshes when a new-deposits observer throws", async () => {
+    mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+    const listener = captureListener()
+    const unsubscribe = onNewDeposits(() => {
+      throw new Error("observer broke")
+    })
+
+    renderHook(() => useSdkLifecycle("acct-1", 0))
+
+    await waitFor(() => {
+      expect(listener.current).not.toBeNull()
+    })
+    await act(async () => {
+      await listener.current?.({ tag: "Synced" })
+    })
+
+    const snapshotCallsBefore = mockGetSnapshot.mock.calls.length
+
+    await act(async () => {
+      await listener.current?.({
+        tag: "NewDeposits",
+        inner: { newDeposits: [{ txid: "t1", vout: 0 }] },
+      })
+    })
+    unsubscribe()
+
+    expect(mockGetSnapshot.mock.calls).toHaveLength(snapshotCallsBefore + 1)
   })
 })
