@@ -14,6 +14,12 @@ import {
 import { useCardApplicationApproval } from "@app/screens/card-screen/onboarding/card-flow/use-card-application-approval"
 import { useCardApplicationSubmit } from "@app/screens/card-screen/onboarding/card-flow/use-card-application-submit"
 
+const mockLogError = jest.fn()
+
+jest.mock("@app/utils/log-error", () => ({
+  logError: (args: unknown) => mockLogError(args),
+}))
+
 const ANSWERS = {
   occupation: "15-1132",
   annualSalary: "50,000 - 74,999",
@@ -87,6 +93,11 @@ const applicationsResponse = (
   },
 })
 
+const failedApplicationsRead: MockedResponse = {
+  request: { query: CardApplicationStatusDocument },
+  error: new Error("Network request failed"),
+}
+
 const lostCreate: MockedResponse = {
   request: createRequest(true),
   error: new Error("Network request failed"),
@@ -116,6 +127,47 @@ const submit = async (mocks: MockedResponse[]) => {
 }
 
 describe("useCardApplicationSubmit", () => {
+  beforeEach(() => {
+    mockLogError.mockClear()
+  })
+
+  it("records nothing when the create lands", async () => {
+    await submit([kycResponse(OnboardingStatus.Approved), createResponse(true)])
+
+    expect(mockLogError).not.toHaveBeenCalled()
+  })
+
+  it("records a lost create without the answers, and still follows the landed application", async () => {
+    const { applicationId } = await submit([
+      kycResponse(OnboardingStatus.Approved),
+      lostCreate,
+      applicationsResponse([{ id: "application-1", status: ApplicationStatus.Pending }]),
+    ])
+
+    expect(applicationId).toBe("application-1")
+    expect(mockLogError).toHaveBeenCalledTimes(1)
+    expect(mockLogError).toHaveBeenCalledWith({
+      scope: "card-application-create",
+      error: expect.objectContaining({ message: "Network request failed" }),
+    })
+    const recorded = JSON.stringify(mockLogError.mock.calls)
+    Object.values(ANSWERS).forEach((answer) => expect(recorded).not.toContain(answer))
+  })
+
+  it("records the read-back too when it fails, and answers null", async () => {
+    const { applicationId } = await submit([
+      kycResponse(OnboardingStatus.Approved),
+      lostCreate,
+      failedApplicationsRead,
+    ])
+
+    expect(applicationId).toBeNull()
+    expect(mockLogError).toHaveBeenCalledTimes(2)
+    expect(mockLogError).toHaveBeenLastCalledWith({
+      scope: "card-application-read-back",
+      error: expect.objectContaining({ message: "Network request failed" }),
+    })
+  })
   it("sends an approved verification to the issuer at once", async () => {
     const { applicationId } = await submit([
       kycResponse(OnboardingStatus.Approved),
