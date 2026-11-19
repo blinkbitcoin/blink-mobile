@@ -18,6 +18,7 @@ import {
 } from "@testing-library/react-native"
 
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { ActiveWalletStatus } from "@app/types/wallet"
 import { INITIAL_FOCUS_DELAY_MS } from "@app/hooks/use-initial-accessibility-focus"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 import { PreferredAmountCurrency } from "@app/graphql/client-only-query"
@@ -30,6 +31,7 @@ import * as PaymentDetailsLightning from "@app/screens/send-bitcoin-screen/payme
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
+import { SendBitcoinConfirmationGated } from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-gated"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import type { useNonCustodialConversionLimits } from "@app/self-custodial/hooks/use-non-custodial-conversion-limits"
 import * as colors from "@app/rne-theme/colors"
@@ -77,6 +79,13 @@ jest.mock("@app/store/persistent-state", () => ({
     updateState: jest.fn(),
     resetState: jest.fn(),
   }),
+}))
+
+jest.mock("@app/self-custodial/components/payment-offline-notice", () => ({
+  PaymentOfflineNotice: () => {
+    const { Text: RnText } = jest.requireActual("react-native")
+    return <RnText testID="payment-offline-notice">offline</RnText>
+  },
 }))
 
 jest.mock("@app/hooks/use-account-registry", () => ({
@@ -2513,5 +2522,117 @@ describe("SendBitcoinConfirmationScreen — Sent", () => {
       "Primary",
       "sendBitcoinCompleted",
     ])
+  })
+})
+
+describe("a settled self-custodial send under the offline gate", () => {
+  let LL: ReturnType<typeof i18nObject>
+  const mockedAppState = AppState as { currentState: unknown }
+  const originalAppState = mockedAppState.currentState
+
+  const selfCustodialWallet = (status: ActiveWalletStatus) => ({
+    isSelfCustodial: true,
+    isReady: status === ActiveWalletStatus.Ready,
+    needsBackendAuth: false,
+    wallets: [],
+    status,
+    accountType: "self-custodial",
+  })
+
+  beforeEach(() => {
+    LL = i18nObject("en")
+    mockedAppState.currentState = "active"
+    sendPaymentMock.mockResolvedValue({ status: "SUCCESS" })
+    useActiveWalletMock.mockReturnValue(selfCustodialWallet(ActiveWalletStatus.Ready))
+  })
+
+  afterEach(() => {
+    mockedAppState.currentState = originalAppState
+    jest.restoreAllMocks()
+  })
+
+  const renderGated = async () => {
+    const view = render(
+      <ContextForScreen>
+        <SendBitcoinConfirmationGated route={route} />
+      </ContextForScreen>,
+    )
+    await waitFor(
+      () => {
+        expect(feeRow().getByText(settledFeeMatcher)).toBeTruthy()
+      },
+      { timeout: SETTLE_TIMEOUT_MS },
+    )
+    return view
+  }
+
+  const slide = async () => {
+    answerMeasurements()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+  }
+
+  const goOffline = (view: { rerender: (ui: React.ReactElement) => void }) => {
+    useActiveWalletMock.mockReturnValue(selfCustodialWallet(ActiveWalletStatus.Offline))
+    view.rerender(
+      <ContextForScreen>
+        <SendBitcoinConfirmationGated route={route} />
+      </ContextForScreen>,
+    )
+  }
+
+  it("still shows the offline notice before the payment lands", () => {
+    useActiveWalletMock.mockReturnValue(selfCustodialWallet(ActiveWalletStatus.Offline))
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinConfirmationGated route={route} />
+      </ContextForScreen>,
+    )
+
+    expect(screen.getByTestId("payment-offline-notice")).toBeTruthy()
+    expect(screen.queryByTestId("slider")).toBeNull()
+  })
+
+  it("keeps Sent, and still opens the receipt, when the wallet goes offline during the hold", async () => {
+    const view = await renderGated()
+    await slide()
+    goOffline(view)
+
+    expect(screen.queryByTestId("payment-offline-notice")).toBeNull()
+    expect(screen.getByTestId(SEND_HERO_CAPTION_TEST_ID).props.children).toBe(
+      LL.SendBitcoinConfirmationScreen.sent(),
+    )
+    expect(screen.getByText(LL.SendBitcoinConfirmationScreen.receipt())).toBeTruthy()
+
+    await act(async () => {
+      fireEvent.press(screen.getByText(LL.SendBitcoinConfirmationScreen.receipt()))
+    })
+
+    const reducer = navigationDispatchMock.mock.calls
+      .map(([action]) => action)
+      .find((action) => typeof action === "function")
+    const reset = reducer({ key: "root", index: 2, routes: [] }) as {
+      payload: { routes: Array<{ name: string; params?: { status?: string } }> }
+    }
+    expect(reset.payload.routes.map(({ name }) => name)).toEqual([
+      "Primary",
+      "sendBitcoinCompleted",
+    ])
+    expect(reset.payload.routes[1].params).toMatchObject({ status: "SUCCESS" })
+  })
+
+  it("keeps Sent when the wallet goes offline during a screen-reader hold", async () => {
+    jest.spyOn(AccessibilityInfo, "isScreenReaderEnabled").mockResolvedValue(true)
+    const view = await renderGated()
+    await act(async () => {})
+    await slide()
+    goOffline(view)
+
+    expect(screen.queryByTestId("payment-offline-notice")).toBeNull()
+    expect(screen.getByText(LL.SendBitcoinConfirmationScreen.receipt())).toBeTruthy()
+    expect(screen.getByText(LL.common.close())).toBeTruthy()
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
   })
 })
