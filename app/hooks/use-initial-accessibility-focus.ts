@@ -6,10 +6,15 @@ import { useFocusEffect } from "@react-navigation/native"
  *  element of a new screen themselves and would otherwise take the focus straight back. */
 export const INITIAL_FOCUS_DELAY_MS = 500
 
-const focusForScreenReader = async (target: RefObject<View | null> | undefined) => {
+const focusForScreenReader = async (
+  target: RefObject<View | null> | undefined,
+  isStillFocused: () => boolean,
+) => {
   const isScreenReaderOn = await AccessibilityInfo.isScreenReaderEnabled()
   const node = target?.current
-  if (isScreenReaderOn && node) AccessibilityInfo.sendAccessibilityEvent(node, "focus")
+  if (isStillFocused() && isScreenReaderOn && node) {
+    AccessibilityInfo.sendAccessibilityEvent(node, "focus")
+  }
 }
 
 /**
@@ -30,20 +35,21 @@ export const useInitialAccessibilityFocus = (
   const focusTargetRef = useRef<RefObject<View | null> | undefined>(undefined)
   if (!focusTargetRef.current) focusTargetRef.current = target
   const isAwaitingTargetRef = useRef(false)
+  const isFocusedRef = useRef(false)
 
   useFocusEffect(
     useCallback(() => {
-      let isActive = true
+      isFocusedRef.current = true
       focusTargetRef.current = latestTargetRef.current
       const timer = setTimeout(() => {
         if (!focusTargetRef.current) {
           isAwaitingTargetRef.current = true
           return
         }
-        if (isActive) focusForScreenReader(focusTargetRef.current)
+        focusForScreenReader(focusTargetRef.current, () => isFocusedRef.current)
       }, INITIAL_FOCUS_DELAY_MS)
       return () => {
-        isActive = false
+        isFocusedRef.current = false
         isAwaitingTargetRef.current = false
         clearTimeout(timer)
       }
@@ -54,6 +60,6 @@ export const useInitialAccessibilityFocus = (
   useEffect(() => {
     if (!hasTarget || !isAwaitingTargetRef.current) return
     isAwaitingTargetRef.current = false
-    focusForScreenReader(focusTargetRef.current)
+    focusForScreenReader(focusTargetRef.current, () => isFocusedRef.current)
   }, [hasTarget])
 }

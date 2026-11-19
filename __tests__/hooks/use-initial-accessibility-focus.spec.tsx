@@ -148,6 +148,24 @@ describe("useInitialAccessibilityFocus", () => {
     expect(mockSendAccessibilityEvent).not.toHaveBeenCalled()
   })
 
+  it("leaves focus alone when the screen goes while the screen reader check runs", async () => {
+    let answer: (isOn: boolean) => void = () => undefined
+    mockIsScreenReaderEnabled.mockReturnValue(
+      new Promise<boolean>((resolve) => {
+        answer = resolve
+      }),
+    )
+    const { unmount } = renderHook(() => useInitialAccessibilityFocus(nodeRef("next")))
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(INITIAL_FOCUS_DELAY_MS)
+    })
+
+    unmount()
+    await act(async () => answer(true))
+
+    expect(mockSendAccessibilityEvent).not.toHaveBeenCalled()
+  })
+
   it("can focus a primary button through its pressableRef", async () => {
     const pressableRef = createRef<View>()
     const Screen = () => {
