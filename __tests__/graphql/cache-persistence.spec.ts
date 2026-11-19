@@ -352,6 +352,55 @@ describe("createPersistedCache", () => {
     expect(await storedBlob()).toBeNull()
   })
 
+  it("leaves an account's cache and its markers as they are for a session without a token", async () => {
+    await persistAccountA()
+
+    const { cache } = await openSession("")
+
+    expect(readUsername(cache)).toBeUndefined()
+    expect(await storedBlob()).toContain("alice")
+    expect(await storedOwner()).toBe(cacheOwnerTag(TOKEN_A))
+    expect(await storage.getItem(SCHEMA_VERSION_KEY)).toBe(SCHEMA_VERSION)
+  })
+
+  it("gives the cache back to its account after a session without a token", async () => {
+    await persistAccountA()
+    await openSession("")
+
+    const { cache } = await openSession(TOKEN_A)
+
+    expect(readUsername(cache)).toBe("alice")
+  })
+
+  it("still clears the cache for another account after a session without a token", async () => {
+    await persistAccountA()
+    await openSession("")
+
+    const { cache } = await openSession(TOKEN_B)
+
+    expect(readUsername(cache)).toBeUndefined()
+    expect(await storedBlob()).toBeNull()
+  })
+
+  const unownedCaches: Array<[string, () => Promise<void>]> = [
+    [
+      "a full logout removed its markers",
+      () => storage.multiRemove([SCHEMA_VERSION_KEY, CACHE_OWNER_KEY]),
+    ],
+    ["it names no owner", () => storage.removeItem(CACHE_OWNER_KEY)],
+    ["it is of another schema", () => storage.setItem(SCHEMA_VERSION_KEY, "0")],
+  ]
+  for (const [reason, disown] of unownedCaches) {
+    it(`clears the cache for a session without a token once ${reason}`, async () => {
+      await persistAccountA()
+      await disown()
+
+      await openSession("")
+
+      expect(await storedBlob()).toBeNull()
+    })
+  }
+
   it("stops before clearing anything when superseded as the markers are read", async () => {
     await persistAccountA()
 

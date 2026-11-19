@@ -59,16 +59,27 @@ export const shouldRestorePersistedCache = ({
   storedOwner === cacheOwnerTag(token)
 
 /**
+ * Whether the stored cache still belongs to an account: one of this schema, with its owner
+ * named. Only that account can restore it.
+ */
+const isOwnedCache = ({
+  storedOwner,
+  storedSchemaVersion,
+}: {
+  storedOwner: string | null
+  storedSchemaVersion: string | null
+}): boolean => storedSchemaVersion === CACHE_SCHEMA_VERSION && storedOwner !== null
+
+/**
  * Marks the cache just cleared as the session's, and answers whether it now is: true only
- * once both the schema version and the owner are stored. A session without a token owns
- * none. Whenever the answer is false, the owner left from an earlier session is removed
- * too, so nothing written later can pass for that session's cache.
+ * once both the schema version and the owner are stored. Whenever the answer is false,
+ * the owner left from an earlier session is removed too, so nothing written later can
+ * pass for that session's cache.
  */
 const storeOwnerOf = async (token: string): Promise<boolean> => {
   const isSchemaStored = await saveString(SCHEMA_VERSION_KEY, CACHE_SCHEMA_VERSION)
-  const canOwn = isSchemaStored && Boolean(token)
   const isOwnerStored =
-    canOwn && (await saveString(CACHE_OWNER_KEY, cacheOwnerTag(token)))
+    isSchemaStored && (await saveString(CACHE_OWNER_KEY, cacheOwnerTag(token)))
   if (!isOwnerStored) {
     /** Best effort: the cache was just cleared, so an owner left behind owns nothing. */
     await removeOrThrow(CACHE_OWNER_KEY).catch(() => undefined)
@@ -83,7 +94,8 @@ export type PersistedCache = {
    * one, and only then turns persistence on. Persistence stays off whenever it cannot be
    * told whose the cache is: without a token, when the markers that name the owner could
    * not be stored, or when storage failed on the way. The session then runs on its
-   * in-memory cache alone, and the next client build tries again. Never rejects.
+   * in-memory cache alone, and the next client build tries again. A session without a
+   * token restores nothing and leaves an account's cache where it is. Never rejects.
    */
   readonly open: (token: string, isSuperseded: () => boolean) => Promise<void>
 }
@@ -108,6 +120,17 @@ export const createPersistedCache = (cache: InMemoryCache): PersistedCache => {
     ])
     if (isSuperseded()) return
 
+    if (!token) {
+      /** No session to persist for, so persistence stays off. A cache an account still
+       *  owns is left as it is, markers included, for that account to come back to: a
+       *  sign-out that keeps the stored credentials, or a switch to a self-custodial
+       *  account. One nobody owns any more, as after a full logout removed its markers,
+       *  is cleared. */
+      const isCacheKept = isOwnedCache({ storedOwner, storedSchemaVersion })
+      if (!isCacheKept) await persistor.purge()
+      return
+    }
+
     const isOwnCache = shouldRestorePersistedCache({
       token,
       storedOwner,
@@ -119,7 +142,7 @@ export const createPersistedCache = (cache: InMemoryCache): PersistedCache => {
        *  write replaces it, under the same owner. */
       await persistor.restore().catch((err) => reportError("Apollo cache restore", err))
     } else {
-      // Another account's, no account's, or an outdated cache: never shown here.
+      // Another account's, or an outdated cache: never shown here.
       await persistor.purge()
       if (isSuperseded()) return
       const isOwnedNow = await storeOwnerOf(token)
