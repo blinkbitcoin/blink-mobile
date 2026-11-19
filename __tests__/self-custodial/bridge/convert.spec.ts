@@ -101,16 +101,32 @@ jest.mock("@app/self-custodial/config", () => ({
   SparkToken: { Label: "USDB", DefaultDecimals: 6 },
 }))
 
-/** The phone's clock, moved past the window in which a lost conversion may still
- *  deliver. */
+/**
+ * The phone's clock and real time, both moved past the window in which a lost conversion
+ * may still deliver. Real time is the React Native preset's `performance.now`, itself a
+ * mock answering the clock as it was at setup: it is moved by its return value, and put
+ * back by its implementation, since restoring a spy on a mock would leave it answering
+ * nothing.
+ */
 let movedClock: jest.SpyInstance | undefined
+const realTime = performance.now as jest.Mock
+const clockAtSetup = Date.now
+const PAST_THE_WINDOW_MS = LOST_CONVERSION_DELIVERY_WINDOW_MS + 1
+/** Real time moved on by `ms` from where it stands. */
+const realTimePasses = (ms: number) => {
+  realTime.mockReturnValue(performance.now() + ms)
+}
 const afterTheDeliveryWindow = () => {
-  const movedTo = Date.now() + LOST_CONVERSION_DELIVERY_WINDOW_MS + 1
+  const movedTo = Date.now() + PAST_THE_WINDOW_MS
+  movedClock?.mockRestore()
   movedClock = jest.spyOn(Date, "now").mockReturnValue(movedTo)
+  realTimePasses(PAST_THE_WINDOW_MS)
 }
 afterEach(() => {
   movedClock?.mockRestore()
   movedClock = undefined
+  realTime.mockReset()
+  realTime.mockImplementation(clockAtSetup)
 })
 
 const createSdk = () => ({
@@ -885,6 +901,72 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     expect(retry.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
   })
+
+  /** A phone clock corrected forward after running offline, or set by hand, must not make
+   *  a conversion just sent look past its window while it can still deliver. */
+  it("refuses a later conversion while real time is within the window, the phone's clock moved six minutes ahead", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    movedClock = jest.spyOn(Date, "now").mockReturnValue(Date.now() + 6 * 60 * 1000)
+    realTimePasses(60 * 1000)
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("lets a later conversion through once real time is past the window too", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+    sdk.sendPayment.mockRejectedValueOnce(new Error("connection reset"))
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
+
+    await (await quoteFor(sdk))!.execute()
+    movedClock = jest.spyOn(Date, "now").mockReturnValue(Date.now() + 6 * 60 * 1000)
+    realTimePasses(PAST_THE_WINDOW_MS)
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("refuses a later conversion while the phone's clock is within the window, real time past it", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    realTimePasses(PAST_THE_WINDOW_MS)
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it.each([
+    ["real time", () => realTime.mockReturnValue(Number.NaN)],
+    [
+      "the phone's clock",
+      () => {
+        movedClock = jest.spyOn(Date, "now").mockReturnValue(Number.NaN)
+      },
+    ],
+  ])(
+    "takes the window as not run out when %s answers no number",
+    async (_, unreadable) => {
+      mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+      const sdk = throwingSdk()
+
+      await (await quoteFor(sdk))!.execute()
+      afterTheDeliveryWindow()
+      unreadable()
+      const retry = await (await quoteFor(sdk))!.execute()
+
+      expect(retry.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+    },
+  )
 
   it("counts that window from the lost conversion's latest attempt", async () => {
     mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
@@ -2143,12 +2225,9 @@ describe("a conversion in flight when the app closes", () => {
     while (sdk.sendPayment.mock.calls.length === 0) await nextTurn()
   }
 
-  /** The app's next launch: a memory of its own, over the same storage and wallet. */
-  const convertOnNextLaunch = async (
-    walletId: string,
-    storage: LostAttemptsStorage,
-    sdk: ReturnType<typeof walletSdk>,
-  ) => {
+  /** The app's next launch: a memory of its own, over the same storage and wallet, that
+   *  converts as many times as asked. */
+  const nextLaunchOf = async (walletId: string, storage: LostAttemptsStorage) => {
     let bridge: typeof import("@app/self-custodial/bridge/convert")
     let attempts: typeof import("@app/self-custodial/payment-details/lost-attempts")
     jest.isolateModules(() => {
@@ -2156,9 +2235,19 @@ describe("a conversion in flight when the app closes", () => {
       attempts = jest.requireActual("@app/self-custodial/payment-details/lost-attempts")
     })
     attempts!.scopeLostAttemptsTo(walletId, storage)
-    const quote = await bridge!.createGetConversionQuote(sdk as never)(params)
-    return quote!.execute()
+    return {
+      convert: async (sdk: ReturnType<typeof walletSdk>) => {
+        const quote = await bridge!.createGetConversionQuote(sdk as never)(params)
+        return quote!.execute()
+      },
+    }
   }
+
+  const convertOnNextLaunch = async (
+    walletId: string,
+    storage: LostAttemptsStorage,
+    sdk: ReturnType<typeof walletSdk>,
+  ) => (await nextLaunchOf(walletId, storage)).convert(sdk)
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -2194,15 +2283,21 @@ describe("a conversion in flight when the app closes", () => {
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
   })
 
-  it("converts on the next launch once the history shows it never delivered", async () => {
+  /** Real time cannot be read across launches, so the next launch counts the window from
+   *  when it read the lost conversion back, whatever the phone's clock says. */
+  it("converts on the next launch once the history shows it never delivered, a window after reading it back", async () => {
     const { storage } = storageAcrossLaunches()
     mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
     const sdk = walletSdk()
 
     await closedInFlight("wallet-closed-2", storage, sdk)
     afterTheDeliveryWindow()
-    const result = await convertOnNextLaunch("wallet-closed-2", storage, sdk)
+    const nextLaunch = await nextLaunchOf("wallet-closed-2", storage)
+    const readBack = await nextLaunch.convert(sdk)
+    realTimePasses(PAST_THE_WINDOW_MS)
+    const result = await nextLaunch.convert(sdk)
 
+    expect(readBack.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
     expect(result.status).toBe("success")
     expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
   })
