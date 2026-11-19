@@ -331,10 +331,13 @@ describe("isDeliveryAsExpected", () => {
 })
 
 describe("markReceivedHistory", () => {
+  /** A wallet of its own per call: the bridge keeps one sync in flight per wallet. */
+  const caughtUp = () => jest.fn().mockResolvedValue({})
+
   it("reads the newest payments received, from the start of the history", async () => {
     const listPayments = jest.fn().mockResolvedValue({ payments: [] })
 
-    await markReceivedHistory({ listPayments } as never)
+    await markReceivedHistory({ listPayments, syncWallet: caughtUp() } as never)
 
     expect(listPayments).toHaveBeenCalledWith({
       typeFilter: [RECEIVE],
@@ -353,9 +356,60 @@ describe("markReceivedHistory", () => {
   const DAY = 24 * 60 * 60
   const markAt = (payments: ReadonlyArray<unknown>, nowSec = NOW_SEC) =>
     markReceivedHistory(
-      { listPayments: jest.fn().mockResolvedValue({ payments }) } as never,
+      {
+        listPayments: jest.fn().mockResolvedValue({ payments }),
+        syncWallet: caughtUp(),
+      } as never,
       nowSec * 1000,
     )
+
+  it("catches the wallet up before it reads the payments received", async () => {
+    const order: string[] = []
+    const syncWallet = jest.fn(async () => {
+      order.push("sync")
+      return {}
+    })
+    const listPayments = jest.fn(async () => {
+      order.push("list")
+      return { payments: [] }
+    })
+
+    await markReceivedHistory({ listPayments, syncWallet } as never)
+
+    expect(order).toEqual(["sync", "list"])
+  })
+
+  it("throws, reading nothing, when the wallet cannot catch up", async () => {
+    const offline = new Error("offline")
+    const listPayments = jest.fn()
+
+    await expect(
+      markReceivedHistory({
+        listPayments,
+        syncWallet: jest.fn().mockRejectedValue(offline),
+      } as never),
+    ).rejects.toBe(offline)
+    expect(listPayments).not.toHaveBeenCalled()
+  })
+
+  it("throws when the wallet does not catch up in time", async () => {
+    jest.useFakeTimers()
+    try {
+      const listPayments = jest.fn()
+      const failure = markReceivedHistory({
+        listPayments,
+        syncWallet: jest.fn().mockReturnValue(new Promise(() => {})),
+      } as never).catch((err: unknown) => err)
+      await jest.advanceTimersByTimeAsync(15_000)
+
+      expect(await failure).toEqual(
+        new Error("Received history mark sync timed out after 15000ms"),
+      )
+      expect(listPayments).not.toHaveBeenCalled()
+    } finally {
+      jest.useRealTimers()
+    }
+  })
 
   it("reads from a day before the newest payment received, knowing every one since", async () => {
     const mark = await markAt([
@@ -411,7 +465,9 @@ describe("markReceivedHistory", () => {
     const unreadable = new Error("storage failed")
     const listPayments = jest.fn().mockRejectedValue(unreadable)
 
-    await expect(markReceivedHistory({ listPayments } as never)).rejects.toBe(unreadable)
+    await expect(
+      markReceivedHistory({ listPayments, syncWallet: caughtUp() } as never),
+    ).rejects.toBe(unreadable)
   })
 
   it("throws when the history does not answer in time", async () => {
@@ -419,9 +475,10 @@ describe("markReceivedHistory", () => {
     try {
       const listPayments = jest.fn().mockReturnValue(new Promise(() => {}))
 
-      const failure = markReceivedHistory({ listPayments } as never).catch(
-        (err: unknown) => err,
-      )
+      const failure = markReceivedHistory({
+        listPayments,
+        syncWallet: caughtUp(),
+      } as never).catch((err: unknown) => err)
       await jest.advanceTimersByTimeAsync(15_000)
 
       expect(await failure).toEqual(
@@ -479,6 +536,63 @@ describe("findLostConversion", () => {
         sortAscending: true,
       }),
     )
+  })
+
+  /**
+   * A wallet whose local history is behind: a payment sent to it while it was offline is
+   * taken in only once it catches up. The mark catches up first, so that payment is known,
+   * and the look after a lost conversion does not take it for the delivery.
+   */
+  it("does not take an older payment a catch-up revealed for a lost conversion's delivery", async () => {
+    const nowMs = (MARK_SEC + 100) * 1000
+    const recorded: Array<ReturnType<typeof received>> = [
+      received("rcv-before", MARK_SEC),
+    ]
+    const takenInOnCatchUp = [
+      received("rcv-older-similar", MARK_SEC + 2, { tag: "Token", amount: QUOTED_OUT }),
+    ]
+    const sdk = {
+      syncWallet: jest.fn(async () => {
+        recorded.push(...takenInOnCatchUp.splice(0))
+        return {}
+      }),
+      listPayments: jest.fn(
+        async ({
+          fromTimestamp,
+          offset,
+          limit,
+          sortAscending,
+        }: {
+          fromTimestamp: bigint
+          offset: number
+          limit: number
+          sortAscending: boolean
+        }) => {
+          const since = recorded.filter((payment) => payment.timestamp >= fromTimestamp)
+          const ordered = [...since].sort((a, b) =>
+            Number(sortAscending ? a.timestamp - b.timestamp : b.timestamp - a.timestamp),
+          )
+          return { payments: ordered.slice(offset, offset + limit) }
+        },
+      ),
+    }
+
+    const mark = await markReceivedHistory(sdk as never, nowMs)
+    const lookup = await settle(
+      findLostConversion({
+        sdk: sdk as never,
+        lost: {
+          ...mark,
+          expectedDeliveries: [
+            { tokenIdentifier: DOLLAR_TOKEN, amount: QUOTED_OUT, isAutomatic: false },
+          ],
+          lastAttemptAtMs: nowMs,
+        },
+      }),
+    )
+
+    expect(mark.knownPaymentIds).toContain("rcv-older-similar")
+    expect(lookup.status).toBe("not-found")
   })
 
   /** A busy wallet keeps receiving long after the conversion went out; what came in a day

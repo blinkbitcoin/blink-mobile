@@ -465,14 +465,24 @@ export type ReceivedHistoryMark = {
 }
 
 /**
- * Reads where the wallet's received payments stand. Throws when they cannot be read, or
- * not in time: a conversion that cannot be told apart from what came before must not go
- * out, since nothing could find it again should its outcome be lost.
+ * Reads where the wallet's received payments stand, once the wallet has caught up: a
+ * payment sent to it that it has not taken in yet (one sent while it was offline) would be
+ * missing from the mark, and could turn up in a later look as what the conversion
+ * delivered. Caught up, every payment received since the mark that the mark does not know
+ * came in after it, which is what tells a delivery apart from what came before. Throws when
+ * the wallet cannot catch up, or the payments cannot be read, or not in time: a conversion
+ * that cannot be told apart from what came before must not go out, since nothing could
+ * find it again should its outcome be lost.
  */
 export const markReceivedHistory = async (
   sdk: BreezSdkInterface,
   nowMs: number = Date.now(),
 ): Promise<ReceivedHistoryMark> => {
+  await withTimeout(
+    syncSelfCustodialWallet(sdk),
+    LOST_SEND_ATTEMPT_TIMEOUT_MS,
+    "Received history mark sync",
+  )
   const { payments } = await withTimeout(
     listReceivedPaymentsSince(sdk, {
       fromTimestamp: 0n,
@@ -613,7 +623,9 @@ const LOST_CONVERSION_LOOK_AHEAD_SECONDS = LOST_SEND_LOOKBACK_SECONDS
 /**
  * Whether a payment in the wallet's history is what a conversion lost after `lost` was
  * marked delivered: received since the mark, none of the payments the mark already knew,
- * and an own conversion's delivery, or one not labeled as such yet.
+ * and an own conversion's delivery, or one not labeled as such yet. The mark is taken
+ * once the wallet has caught up (`markReceivedHistory`), so a payment it does not know
+ * came in after it, and an older one revealed by a later catch-up is already known.
  */
 export const isPaymentOfLostConversion = (
   lost: LostConversionLook,
