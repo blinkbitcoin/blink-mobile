@@ -917,14 +917,13 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
   })
 
-  it("lets a later conversion through once real time is past the window too", async () => {
+  it("lets a later conversion through once real time is past the window", async () => {
     mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
     const sdk = throwingSdk()
     sdk.sendPayment.mockRejectedValueOnce(new Error("connection reset"))
     sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
 
     await (await quoteFor(sdk))!.execute()
-    movedClock = jest.spyOn(Date, "now").mockReturnValue(Date.now() + 6 * 60 * 1000)
     realTimePasses(PAST_THE_WINDOW_MS)
     const retry = await (await quoteFor(sdk))!.execute()
 
@@ -932,41 +931,52 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
   })
 
-  it("refuses a later conversion while the phone's clock is within the window, real time past it", async () => {
+  /** A phone clock corrected back, by an hour or by years, must not keep conversions
+   *  refused for as long as it was moved. */
+  it("lets a later conversion through once real time is past the window, the phone's clock moved back an hour", async () => {
     mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
     const sdk = throwingSdk()
+    sdk.sendPayment.mockRejectedValueOnce(new Error("connection reset"))
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
 
     await (await quoteFor(sdk))!.execute()
+    movedClock = jest.spyOn(Date, "now").mockReturnValue(Date.now() - 60 * 60 * 1000)
     realTimePasses(PAST_THE_WINDOW_MS)
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  /** A swap the pool ran late in a long call, as one the phone suspended, delivers from
+   *  when its outcome was lost, not from when it went out. */
+  it("counts the window from when the outcome was lost, however long the call took", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+    sdk.sendPayment.mockImplementationOnce(async () => {
+      realTimePasses(PAST_THE_WINDOW_MS)
+      throw new Error("connection reset")
+    })
+
+    await (await quoteFor(sdk))!.execute()
     const retry = await (await quoteFor(sdk))!.execute()
 
     expect(retry.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
   })
 
-  it.each([
-    ["real time", () => realTime.mockReturnValue(Number.NaN)],
-    [
-      "the phone's clock",
-      () => {
-        movedClock = jest.spyOn(Date, "now").mockReturnValue(Number.NaN)
-      },
-    ],
-  ])(
-    "takes the window as not run out when %s answers no number",
-    async (_, unreadable) => {
-      mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
-      const sdk = throwingSdk()
+  it("takes the window as not run out when real time answers no number", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
 
-      await (await quoteFor(sdk))!.execute()
-      afterTheDeliveryWindow()
-      unreadable()
-      const retry = await (await quoteFor(sdk))!.execute()
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    realTime.mockReturnValue(Number.NaN)
+    const retry = await (await quoteFor(sdk))!.execute()
 
-      expect(retry.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
-      expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
-    },
-  )
+    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
 
   it("counts that window from the lost conversion's latest attempt", async () => {
     mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })

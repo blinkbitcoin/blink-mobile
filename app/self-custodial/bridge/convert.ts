@@ -354,8 +354,8 @@ export const LOST_CONVERSION_DELIVERY_WINDOW_MS = 5 * 60 * 1000
 /**
  * By this app launch's clock, which only moves forward with real time and which no change
  * of the phone's clock moves, when each lost conversion's latest attempt was first known:
- * when it went out, lost in this launch, or when this launch first read it back. Keyed by
- * that attempt's time.
+ * when its outcome was lost, in this launch, or when this launch first read it back. Keyed
+ * by that attempt's time.
  */
 const firstKnownAt = new Map<number, number>()
 
@@ -374,16 +374,13 @@ const isWithinDeliveryWindow = (elapsedMs: number): boolean =>
 
 /**
  * Whether a lost conversion not found may still deliver: its delivery window has not run
- * out by the phone's clock, or not by real time. The phone's clock alone can jump forward
- * (corrected after running offline, or set by hand) and make a conversion just sent look
- * long gone; real time cannot be read across app launches, so a launch counts it from when
- * it first read the conversion back.
+ * out by real time. Never by the phone's clock, which a correction moves either way:
+ * ahead, a conversion just sent would look long gone; back, conversions would stay refused
+ * for as long as it was moved. Real time cannot be read across app launches, so a launch
+ * counts it from when it first read the conversion back, never less than it really was.
  */
-const canStillDeliver = (lastAttemptAtMs: number): boolean => {
-  const isInWindowByPhone = isWithinDeliveryWindow(Date.now() - lastAttemptAtMs)
-  const isInWindowByRealTime = isWithinDeliveryWindow(realMsKnown(lastAttemptAtMs))
-  return isInWindowByPhone || isInWindowByRealTime
-}
+const canStillDeliver = (lastAttemptAtMs: number): boolean =>
+  isWithinDeliveryWindow(realMsKnown(lastAttemptAtMs))
 
 /** Whether a delivery found is what any of a lost conversion's attempts was quoted to
  *  deliver. */
@@ -649,7 +646,6 @@ const convertAfterEarlierConversions = async (
   }
 
   const startedAtMs = Date.now()
-  const startedAtRealMs = performance.now()
   const thisDelivery: ExpectedDelivery = {
     tokenIdentifier: deliveredTokenOf(params.direction),
     amount: toNumber(estimate.amountOut),
@@ -707,6 +703,8 @@ const convertAfterEarlierConversions = async (
     if (earlier) keepLost(undefined)
     return { status: PaymentResultStatus.Success }
   } catch (err) {
+    /** When its outcome was lost: a swap that ran late in a long call delivers from then. */
+    const lostAtRealMs = performance.now()
     recordConvertError(err, params, "executePrepared")
     const errorCode = classifySdkError(err)
     const reportSwapFailed = () =>
@@ -728,8 +726,8 @@ const convertAfterEarlierConversions = async (
       isAutomatic,
       isThisConversion,
     })
-    /** Kept, it is looked for again within its window, counted from when it went out. */
-    if (left) firstKnownAt.set(left.lastAttemptAtMs, startedAtRealMs)
+    /** Kept, it is looked for again within its window, counted from when it was lost. */
+    if (left) firstKnownAt.set(left.lastAttemptAtMs, lostAtRealMs)
     keepLost(left)
     writtenAhead.end()
     if (isSurelyThis) {
