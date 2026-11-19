@@ -1971,9 +1971,55 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
         amount: 1_370_000,
         amountIn: 5000,
         isAutomatic: true,
+        receiveRecordedAtMs: receive.recordCreatedAtMs,
       },
     ])
     expect(nextLook.knownPaymentIds).toContain("rcv-usdb")
+  })
+
+  /** Auto-convert converts receives of about one amount alike: what one receive's lost
+   *  conversion delivered is not another's, whose sats are still to convert. */
+  it("does not take another receive's lost conversion for this one's, converting it once that one is settled", async () => {
+    const laterReceive = {
+      ...receive,
+      recordCreatedAtMs: receive.recordCreatedAtMs + 60_000,
+    }
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(deliveredDollars(receive.satsAmount))
+    const sdk = walletLosingTheFirstConversion()
+
+    await executeAutoConvert(sdk as never, receive)
+    const second = await executeAutoConvert(sdk as never, laterReceive)
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
+    const third = await executeAutoConvert(sdk as never, laterReceive)
+
+    expect(second).toEqual({ status: "failed" })
+    expect(third).toEqual({ status: "converted" })
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  /** The user's transfer is never auto-convert's, whatever amount they both are. */
+  it("does not report the user's transfer as done for what a lost auto-conversion of about its amount delivered", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(deliveredDollars(receive.satsAmount))
+    const sdk = walletLosingTheFirstConversion()
+    const usersTransfer = async () =>
+      (await createGetConversionQuote(sdk as never)({
+        fromAmount: toBtcMoneyAmount(receive.satsAmount),
+        toAmount: toUsdMoneyAmount(receive.usdCentsAmount),
+        direction: ConvertDirection.BtcToUsd,
+      }))!.execute()
+
+    await executeAutoConvert(sdk as never, receive)
+    const first = await usersTransfer()
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
+    const again = await usersTransfer()
+
+    expect(first.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionFound)
+    expect(again.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
   })
 
   it("holds a manual conversion back until the lost auto-conversion is looked for", async () => {

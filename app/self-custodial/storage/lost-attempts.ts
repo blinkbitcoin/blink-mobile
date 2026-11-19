@@ -70,6 +70,7 @@ const isExpectedDelivery = (value: unknown): boolean =>
   isOptional(value.tokenIdentifier, "string") &&
   typeof value.amount === "number" &&
   isOptional(value.amountIn, "number") &&
+  isOptional(value.receiveRecordedAtMs, "number") &&
   typeof value.isAutomatic === "boolean"
 
 const isLostConversion = (value: unknown): value is LostConversion => {

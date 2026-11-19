@@ -516,6 +516,8 @@ export type ExpectedDelivery = {
   amount: number
   amountIn?: number
   isAutomatic: boolean
+  /** For auto-convert's: when the receive it converts was recorded. */
+  receiveRecordedAtMs?: number
 }
 
 /** How far an amount can be from the one a quote named and still be it: the quote's

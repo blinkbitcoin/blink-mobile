@@ -175,6 +175,9 @@ export type ConvertParams = {
   direction: ConvertDirection
   /** Telemetry only: whether the user drove the swap or the auto-convert rule did. */
   source?: ConvertSource
+  /** For auto-convert: when the receive it converts was recorded, which tells that
+   *  receive's conversion from another receive's of about the same amount. */
+  receiveRecordedAtMs?: number
 }
 
 export type ConversionLimits = {

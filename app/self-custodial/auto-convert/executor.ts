@@ -234,6 +234,7 @@ export const executeAutoConvert = async (
     },
     direction: ConvertDirection.BtcToUsd,
     source: "auto_convert",
+    receiveRecordedAtMs: params.recordCreatedAtMs,
   }
 
   let quote

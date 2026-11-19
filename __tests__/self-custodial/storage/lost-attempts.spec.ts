@@ -313,6 +313,45 @@ describe("loadLostAttempts", () => {
     )
   })
 
+  it("reads back which receive an attempt of auto-convert's converts", async () => {
+    const automatic = {
+      ...lostConversion(),
+      expectedDeliveries: [
+        {
+          tokenIdentifier: "usdb-token-id",
+          amount: 1_370_000,
+          isAutomatic: true,
+          receiveRecordedAtMs: NOW - 60_000,
+        },
+      ],
+    }
+    stored({ "<own conversions>": { lostConversion: automatic } })
+
+    expect(await loadLostAttempts(WALLET, NOW)).toEqual(
+      new Map([["<own conversions>", { lostConversion: automatic }]]),
+    )
+  })
+
+  it("drops a lost conversion whose attempt names its receive by anything but a time", async () => {
+    stored({
+      "<own conversions>": {
+        lostConversion: {
+          ...lostConversion(),
+          expectedDeliveries: [
+            {
+              tokenIdentifier: "usdb-token-id",
+              amount: 1_370_000,
+              isAutomatic: true,
+              receiveRecordedAtMs: "yesterday",
+            },
+          ],
+        },
+      },
+    })
+
+    expect(await loadLostAttempts(WALLET, NOW)).toEqual(new Map())
+  })
+
   it("keeps a lost conversion while its latest attempt is recent, dropping it after", async () => {
     const recentRetry = {
       ...lostConversion(NOW - LOST_ATTEMPTS_TTL_MS - 1000),

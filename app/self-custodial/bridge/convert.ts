@@ -607,7 +607,15 @@ const convertAfterEarlierConversions = async (
         return failed(EARLIER_CONVERSION_MESSAGE, ConvertErrorCode.EarlierConversionFound)
       }
       keepLost(withoutAttempt(earlier, settled, lookup.payment))
-      if (isThisConversion(lookup.payment)) return { status: PaymentResultStatus.Success }
+      /** This conversion's own only when the attempt it settles is this request asked
+       *  again: the user's transfer, never auto-convert's, or auto-convert's of the same
+       *  receive, since it converts receives of about one amount alike. Another one is
+       *  told, and this one asked again once it is settled. */
+      const isThisRequest =
+        earlier.expectedDeliveries[settled].receiveRecordedAtMs ===
+        params.receiveRecordedAtMs
+      const isThisRequestsDelivery = isThisRequest && isThisConversion(lookup.payment)
+      if (isThisRequestsDelivery) return { status: PaymentResultStatus.Success }
       return failed(EARLIER_CONVERSION_MESSAGE, ConvertErrorCode.EarlierConversionFound)
     }
     /** Not found so soon after it went out, it may still deliver. */
@@ -664,6 +672,7 @@ const convertAfterEarlierConversions = async (
     amount: toNumber(estimate.amountOut),
     amountIn: toNumber(estimate.amountIn),
     isAutomatic,
+    receiveRecordedAtMs: params.receiveRecordedAtMs,
   }
   /** What this conversion leaves to be looked for should its outcome be lost: with the
    *  lost conversion it was let through past, from the earlier mark, since either may
