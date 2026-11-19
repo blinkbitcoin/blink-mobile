@@ -68,22 +68,31 @@ export const useNumberPad = ({
   })
 
   /** What the typed digits mean, as set from outside the pad: the sending wallet, and the
-   *  display currency a rate arriving or being lost swaps. When either moves, the pad
-   *  re-reads the amount of record rather than reading its digits in the new unit. It
-   *  waits until the caller's amount and conversion have caught up, which the converted
-   *  amount's currency code shows. A wallet currency typed in follows the sending wallet. */
+   *  display currency a rate arriving or being lost swaps. When the one the pad types in
+   *  moves, the pad re-reads the amount of record rather than reading its digits in the
+   *  new unit. It waits until the caller's amount and conversion have caught up, which the
+   *  converted amount's currency code shows. A wallet currency typed in follows the
+   *  sending wallet; display digits stay as typed across a wallet switch. */
   const display = currencyInfo[DisplayCurrency]
-  const meaning = `${walletCurrency}:${display.currencyCode}:${display.minorUnitToMajorUnitOffset}:${display.showFractionDigits}`
-  const [readMeaning, setReadMeaning] = useState(meaning)
-  if (meaning !== readMeaning && convertMoneyAmount) {
-    const currency =
-      padState.currency === DisplayCurrency ? DisplayCurrency : walletCurrency
+  const displayMeaning = `${display.currencyCode}:${display.minorUnitToMajorUnitOffset}:${display.showFractionDigits}`
+  const [read, setRead] = useState({ displayMeaning, walletCurrency })
+  const isTypingDisplay = padState.currency === DisplayCurrency
+  const hasMeaningMoved = isTypingDisplay
+    ? displayMeaning !== read.displayMeaning
+    : walletCurrency !== read.walletCurrency
+  if (
+    (displayMeaning !== read.displayMeaning || walletCurrency !== read.walletCurrency) &&
+    !hasMeaningMoved
+  ) {
+    setRead({ displayMeaning, walletCurrency })
+  } else if (hasMeaningMoved && convertMoneyAmount) {
+    const currency = isTypingDisplay ? DisplayCurrency : walletCurrency
     const { currencyCode } = currencyInfo[currency]
     const reread = amountOfRecord
       ? convertMoneyAmount(amountOfRecord, currency)
       : { amount: 0, currency, currencyCode }
     if (reread.currencyCode === currencyCode && Number.isFinite(reread.amount)) {
-      setReadMeaning(meaning)
+      setRead({ displayMeaning, walletCurrency })
       setPadState(
         moneyAmountToNumberPadReducerState({ moneyAmount: reread, currencyInfo }),
       )

@@ -93,6 +93,12 @@ const satsOnlyConvert = <T extends WalletOrDisplayCurrency>(
   }
 }
 
+/** One key per act, so each press reads the state the last one left. */
+const typeKeys = (
+  result: { current: { onKeyPress: (key: (typeof Key)[keyof typeof Key]) => void } },
+  ...keys: (typeof Key)[keyof typeof Key][]
+) => keys.forEach((key) => act(() => result.current.onKeyPress(key)))
+
 type PadProps = {
   walletCurrency: WalletCurrency
   convert: typeof convertMoneyAmount
@@ -175,11 +181,8 @@ describe("useNumberPad", () => {
       walletCurrency: WalletCurrency.Btc,
       convert: satsOnlyConvert,
     })
-    act(() =>
-      ([Key[1], Key[0], Key[0], Key[0]] as const).forEach((key) =>
-        result.current.onKeyPress(key),
-      ),
-    )
+    typeKeys(result, Key[1], Key[0], Key[0], Key[0])
+    expect(result.current.typedAmountText).toBe("1,000")
     rerender({
       walletCurrency: WalletCurrency.Btc,
       convert: satsOnlyConvert,
@@ -213,11 +216,8 @@ describe("useNumberPad", () => {
       walletCurrency: WalletCurrency.Btc,
       convert: convertMoneyAmount,
     })
-    act(() =>
-      ([Key[1], Key[0], Key.Decimal, Key[5], Key[0]] as const).forEach((key) =>
-        result.current.onKeyPress(key),
-      ),
-    )
+    typeKeys(result, Key[1], Key[0], Key.Decimal, Key[5], Key[0])
+    expect(result.current.typedAmountText).toBe("$10.50")
 
     mockDisplay.currencyInfo = satsOnlyCurrencyInfo
     rerender({
@@ -249,5 +249,22 @@ describe("useNumberPad", () => {
 
     expect(result.current.padCurrency).toBe(WalletCurrency.Usd)
     expect(mockSavePreferredAmountCurrency).not.toHaveBeenCalled()
+  })
+
+  it("keeps the display digits as typed when the sending wallet switches", () => {
+    mockPreferredCurrencyData.data = { preferredAmountCurrency: "display" }
+    const { result, rerender } = renderPadWith({
+      walletCurrency: WalletCurrency.Btc,
+      convert: convertMoneyAmount,
+    })
+    typeKeys(result, Key[1], Key.Decimal)
+
+    rerender({
+      walletCurrency: WalletCurrency.Usd,
+      convert: convertMoneyAmount,
+      amountOfRecord: { amount: 100, currency: DisplayCurrency, currencyCode: "USD" },
+    })
+
+    expect(result.current.typedAmountText).toBe("$1.")
   })
 })
