@@ -1849,7 +1849,7 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
       direction: ConvertDirection.BtcToUsd,
     }))!.execute()
 
-    expect(automatic).toEqual({ status: "deferred", retryAfterMs: 0 })
+    expect(automatic).toEqual({ status: "deferred" })
     const usersLook = mockFindLostConversion.mock.calls[2][0].lost
     expect(usersLook.expectedDeliveries).toEqual([
       {

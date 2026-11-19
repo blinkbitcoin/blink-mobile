@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef } from "react"
 
 import {
   GetPaymentRequest,
@@ -110,6 +110,13 @@ const isRetryableNow = (record: PendingAutoConvert, nowMs: number): boolean => {
   return elapsed >= RETRY_COOLDOWN_MS
 }
 
+/** A receive whose payment came in, by its invoice. */
+type PaidReceive = {
+  invoice: string
+  paymentId: string
+  satsReceived: number
+}
+
 type RunAutoConvertParams = {
   sdk: BreezSdkInterface
   record: PendingAutoConvert
@@ -123,7 +130,7 @@ type RunAutoConvertParams = {
   onConverting?: (invoice: string) => void
   onSettled?: (invoice: string) => void
   onConverted?: () => void
-  /** Asks for the pending receives to be tried again after the given wait. */
+  /** Asks for this receive to be tried again after the given wait. */
   onDeferred?: (retryAfterMs: number) => void
 }
 
@@ -205,7 +212,10 @@ const runAutoConvert = async ({
      *  them all up and drop the receive unconverted. */
     if (outcome.status === AutoConvertStatus.Deferred) {
       await releaseAutoConvertAttempt(record.paymentRequest)
-      onDeferred?.(outcome.retryAfterMs)
+      /** A wait for the user has no end to try again at: a later trigger tries. */
+      const { retryAfterMs } = outcome
+      const isWaitTimed = retryAfterMs !== undefined
+      if (isWaitTimed) onDeferred?.(retryAfterMs)
       return
     }
 
@@ -287,24 +297,28 @@ export const useAutoConvertListener = (): void => {
   const initialReplayDoneRef = useRef(false)
 
   /** A receive that waited behind an earlier conversion has no trigger of its own left:
-   *  the pending receives are replayed once the wait and the cooldown are over, so it goes
-   *  out within the launch that waited, however long that one stays open. */
-  const [replayRequest, setReplayRequest] = useState(0)
-  const handledReplayRequestRef = useRef(0)
-  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-  const replayAfterWait = useCallback((retryAfterMs: number) => {
-    if (retryTimerRef.current !== undefined) clearTimeout(retryTimerRef.current)
-    retryTimerRef.current = setTimeout(() => {
-      retryTimerRef.current = undefined
-      setReplayRequest((requested) => requested + 1)
+   *  it alone is tried again once the wait and the cooldown are over, so it goes out
+   *  within the launch that waited, however long that one stays open. One timer per
+   *  receive, run with the listener as it is when it fires. */
+  const retryTimersRef = useRef(new Map<string, ReturnType<typeof setTimeout>>())
+  const retryReceiveRef = useRef<((receive: PaidReceive) => void) | undefined>(undefined)
+  const retryAfterWait = useCallback((receive: PaidReceive, retryAfterMs: number) => {
+    const timers = retryTimersRef.current
+    const earlier = timers.get(receive.invoice)
+    if (earlier !== undefined) clearTimeout(earlier)
+    const timer = setTimeout(() => {
+      timers.delete(receive.invoice)
+      retryReceiveRef.current?.(receive)
     }, retryAfterMs + RETRY_COOLDOWN_MS)
+    timers.set(receive.invoice, timer)
   }, [])
-  useEffect(
-    () => () => {
-      if (retryTimerRef.current !== undefined) clearTimeout(retryTimerRef.current)
-    },
-    [],
-  )
+  useEffect(() => {
+    const timers = retryTimersRef.current
+    return () => {
+      timers.forEach((timer) => clearTimeout(timer))
+      timers.clear()
+    }
+  }, [])
 
   const waitOptions = useMemo<WaitForPaymentOptions>(
     () => ({
@@ -343,7 +357,15 @@ export const useAutoConvertListener = (): void => {
           onConverting: markConverting,
           onSettled: markSettled,
           onConverted: handleConverted,
-          onDeferred: replayAfterWait,
+          onDeferred: (retryAfterMs) =>
+            retryAfterWait(
+              {
+                invoice: record.paymentRequest,
+                paymentId: params.paymentId,
+                satsReceived: params.satsReceived,
+              },
+              retryAfterMs,
+            ),
         })
       } finally {
         inFlightInvoicesRef.current.delete(record.paymentRequest)
@@ -357,9 +379,49 @@ export const useAutoConvertListener = (): void => {
       markConverting,
       markSettled,
       handleConverted,
-      replayAfterWait,
+      retryAfterWait,
     ],
   )
+
+  /** A paid receive tried now, unless it is no longer pending, its cooldown runs, or it
+   *  was paired already. */
+  const tryPaidReceive = useCallback(
+    async (
+      activeSdk: BreezSdkInterface,
+      convert: ConvertMoneyAmount,
+      { invoice, paymentId, satsReceived }: PaidReceive,
+    ): Promise<void> => {
+      const record = await findPendingAutoConvert(invoice)
+      if (!record) return
+      if (!isRetryableNow(record, Date.now())) return
+
+      const { pairedReceiveIds } = await buildClaimedConversionIds()
+      if (pairedReceiveIds.has(paymentId)) {
+        await removePendingAutoConvert(invoice)
+        return
+      }
+
+      await processWithInFlightLock({
+        sdk: activeSdk,
+        record,
+        paymentId,
+        satsReceived,
+        convert,
+      })
+    },
+    [processWithInFlightLock],
+  )
+
+  useEffect(() => {
+    retryReceiveRef.current = (receive) => {
+      if (!sdk || !convertMoneyAmount) return
+      const isOutOfAutoConvert = isAnonMode || !hasSparkToken
+      if (isOutOfAutoConvert) return
+      tryPaidReceive(sdk, convertMoneyAmount, receive).catch((err) =>
+        reportError("auto-convert-listener retry", err),
+      )
+    }
+  })
 
   useEffect(() => {
     if (!sdk || !convertMoneyAmount) return
@@ -381,22 +443,10 @@ export const useAutoConvertListener = (): void => {
       const invoice = extractLightningInvoiceFromPayment(payment)
       if (!invoice) return
 
-      const record = await findPendingAutoConvert(invoice)
-      if (!record) return
-      if (!isRetryableNow(record, Date.now())) return
-
-      const { pairedReceiveIds } = await buildClaimedConversionIds()
-      if (pairedReceiveIds.has(lastReceivedPaymentId)) {
-        await removePendingAutoConvert(invoice)
-        return
-      }
-
-      await processWithInFlightLock({
-        sdk,
-        record,
+      await tryPaidReceive(sdk, convertMoneyAmount, {
+        invoice,
         paymentId: lastReceivedPaymentId,
         satsReceived: toNumber(payment.amount),
-        convert: convertMoneyAmount,
       })
     }
 
@@ -407,7 +457,7 @@ export const useAutoConvertListener = (): void => {
     convertMoneyAmount,
     isAnonMode,
     hasSparkToken,
-    processWithInFlightLock,
+    tryPaidReceive,
   ])
 
   useEffect(() => {
@@ -417,11 +467,8 @@ export const useAutoConvertListener = (): void => {
       initialReplayDoneRef.current = false
       return
     }
-    const isRetryRequested = replayRequest !== handledReplayRequestRef.current
-    const isReplayDue = !initialReplayDoneRef.current || isRetryRequested
-    if (!isReplayDue) return
+    if (initialReplayDoneRef.current) return
     initialReplayDoneRef.current = true
-    handledReplayRequestRef.current = replayRequest
 
     const replay = async () => {
       const nowMs = Date.now()
@@ -476,6 +523,5 @@ export const useAutoConvertListener = (): void => {
     hasSparkToken,
     processWithInFlightLock,
     autoConvertMaxAttempts,
-    replayRequest,
   ])
 }

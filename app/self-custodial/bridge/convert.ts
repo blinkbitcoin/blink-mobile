@@ -611,8 +611,16 @@ const convertAfterEarlierConversions = async (
           knownPaymentIds: [...earlier.knownPaymentIds, lookup.payment.id],
         })
       }
-      if (settled === undefined) {
+      if (isOfNoAttempt) {
         return failed(EARLIER_CONVERSION_MESSAGE, ConvertErrorCode.EarlierConversionFound)
+      }
+      /** What auto-convert finds of the user's own stays theirs, unsettled: until they
+       *  are told of it, every look finds it again. */
+      if (settled === undefined) {
+        return failed(
+          EARLIER_CONVERSION_MESSAGE,
+          ConvertErrorCode.UsersEarlierTransferFound,
+        )
       }
       keepLost(withoutAttempt(earlier, settled, lookup.payment))
       /** This conversion's own only when the attempt it settles is this request asked

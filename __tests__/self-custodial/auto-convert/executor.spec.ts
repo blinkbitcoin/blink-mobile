@@ -416,6 +416,22 @@ describe("executeAutoConvert", () => {
     })
   }
 
+  /** The user's own transfer is theirs to be told of: no wait of auto-convert's ends it. */
+  it("returns Deferred with no wait when an earlier transfer of the user's turns up", async () => {
+    mockGetConversionQuote.mockResolvedValue({
+      execute: jest.fn().mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [
+          { message: "earlier", code: ConvertErrorCode.UsersEarlierTransferFound },
+        ],
+      }),
+    })
+
+    const outcome = await executeAutoConvert(sdkWith([]), baseParams)
+
+    expect(outcome).toEqual({ status: "deferred" })
+  })
+
   /** A conversion that went out and whose outcome was lost is an attempt of its own. */
   it("returns Failed when the conversion went out and its outcome is unknown", async () => {
     mockGetConversionQuote.mockResolvedValue({
