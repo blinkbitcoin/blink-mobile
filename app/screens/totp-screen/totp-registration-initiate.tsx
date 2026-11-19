@@ -89,7 +89,10 @@ export const TotpRegistrationInitiateScreen: React.FC = () => {
   const { params } = useRoute<RouteProp<RootStackParamList, "totpRegistrationInitiate">>()
   const offersOnboarding = params?.offersOnboarding === true
 
-  const [totpRegistrationInitiate] = useUserTotpRegistrationInitiateMutation()
+  // The TOTP seed must never reach the cache, which is persisted to AsyncStorage.
+  const [totpRegistrationInitiate] = useUserTotpRegistrationInitiateMutation({
+    fetchPolicy: "no-cache",
+  })
 
   const { LL } = useI18nContext()
 

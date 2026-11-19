@@ -27,10 +27,18 @@ jobs:
       # Flake handling happens at test granularity now: jest retries individual
       # failing tests in CI (see jest.setup-after-env.ts) and logs each retried
       # error, instead of silently re-running the whole job.
-      - run: yarn test
+      # Two workers instead of `yarn test`'s --runInBand, which had grown past
+      # the timeout: in band, ~930 suites need about 23 minutes here. A worker
+      # past 1 GB is replaced between files, so heap growth stays bounded on
+      # this runner's 7.9 GB with no swap.
+      - run: yarn test:ci
         env:
           NODE_OPTIONS: --max-old-space-size=4096
-        timeout-minutes: 20
+        # About 2x the expected two-worker run: 840 suites took 10m13s here
+        # (#4361), and locally 932 take 3m20s against 2m49s for those 840, so
+        # ~12 minutes now. If green runs creep toward this, shard the
+        # job (jest --shard) rather than raising it.
+        timeout-minutes: 25
   android-unit-test:
     name: Android unit tests
     # GH-hosted: ships the Android SDK and JDK toolchains the Gradle build
@@ -47,6 +55,14 @@ jobs:
           path: node_modules
           key: node-modules-${{ runner.os }}-${{ hashFiles('yarn.lock', 'patches/**') }}
       - run: yarn install --frozen-lockfile
+      # Pin the JDK the build is made for. ubuntu-latest moved to Ubuntu 26.04
+      # in November 2026, whose default JDK is 25, and Gradle 8.13 fails on it
+      # before configuring anything ("Unsupported class file major version
+      # 69"). React Native 0.85 builds with JDK 17.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
       # Caches ~/.gradle/caches and the wrapper between runs.
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew :app:testDebugUnitTest
