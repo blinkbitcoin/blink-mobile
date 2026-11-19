@@ -1,16 +1,18 @@
 import React from "react"
 import { StyleSheet } from "react-native"
 import { fireEvent, render } from "@testing-library/react-native"
+import { StackActions } from "@react-navigation/native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import theme from "@app/rne-theme/theme"
 import { headerCloseControlOptions } from "@app/components/header-close-control"
 
 const mockNavigate = jest.fn()
+const mockDispatch = jest.fn()
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({ navigate: mockNavigate, dispatch: mockDispatch }),
 }))
 
 const renderCloseControl = (params?: Parameters<typeof headerCloseControlOptions>[0]) => {
@@ -42,6 +44,27 @@ describe("headerCloseControlOptions", () => {
     fireEvent.press(getByTestId("icon-close"))
 
     expect(mockNavigate).toHaveBeenCalledWith("settings")
+  })
+
+  /** Navigating from the end of a flow stacks a second Home over the screens it closes. */
+  it("pops back to the Home under it when the screen ends a flow", () => {
+    const { getByTestId } = renderCloseControl({ shouldPopTo: true })
+
+    fireEvent.press(getByTestId("icon-close"))
+
+    expect(mockDispatch).toHaveBeenCalledWith(StackActions.popTo("Primary"))
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("pops back to the route it is given", () => {
+    const { getByTestId } = renderCloseControl({
+      navigateTo: "settings",
+      shouldPopTo: true,
+    })
+
+    fireEvent.press(getByTestId("icon-close"))
+
+    expect(mockDispatch).toHaveBeenCalledWith(StackActions.popTo("settings"))
   })
 
   /** The native header item is sized to the button's margin box, and a touch outside it
