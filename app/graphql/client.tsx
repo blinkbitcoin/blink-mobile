@@ -1,4 +1,3 @@
-import { AsyncStorageWrapper, CachePersistor } from "apollo3-cache-persist"
 import { createClient } from "graphql-ws"
 import jsSha256 from "js-sha256"
 import React, { PropsWithChildren, useCallback, useEffect, useRef, useState } from "react"
@@ -19,9 +18,7 @@ import { createPersistedQueryLink } from "@apollo/client/link/persisted-queries"
 import { RetryLink } from "@apollo/client/link/retry"
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions"
 import { getMainDefinition } from "@apollo/client/utilities"
-import AsyncStorage from "@react-native-async-storage/async-storage"
 
-import { SCHEMA_VERSION_KEY } from "@app/config"
 import { useAppConfig } from "@app/hooks"
 import { AccountRegistryProvider } from "@app/hooks/use-account-registry"
 import { useEffectiveLanguage } from "@app/hooks/use-effective-language"
@@ -31,7 +28,6 @@ import { getAppCheckToken } from "@app/screens/get-started-screen/use-device-tok
 import { getLanguageFromString, getLocaleFromLanguage } from "@app/utils/locale-detector"
 
 import { isIos } from "../utils/helper"
-import { loadString, saveString } from "../utils/storage"
 
 import { useApolloRebuildLifecycle } from "./hooks/use-apollo-rebuild-lifecycle"
 import { useEffectiveAuthToken } from "./hooks/use-effective-auth-token"
@@ -41,6 +37,7 @@ import {
   resetBlinkServicesStatus,
 } from "./blink-services-status"
 import { createCache } from "./cache"
+import { createPersistedCache, PersistedCache } from "./cache-persistence"
 import { useRealtimePriceQuery } from "./generated"
 import { createServerTimeLink } from "./server-time"
 import { HideAmountContainer } from "./hide-amount-component"
@@ -78,6 +75,10 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
   const { registerActiveClient } = useApolloRebuildLifecycle(effectiveToken)
 
   useEffect(() => {
+    /** Set when this client is superseded. Its persisted cache is retired so a late
+     *  write from the outgoing session cannot land in the next session's cache. */
+    let cancelled = false
+    let persistedCache: PersistedCache | undefined
     ;(async () => {
       const token = effectiveToken
 
@@ -243,20 +244,8 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
 
       const cache = createCache()
 
-      const persistor = new CachePersistor({
-        cache,
-        storage: new AsyncStorageWrapper(AsyncStorage),
-        debug: __DEV__,
-
-        persistenceMapper: async (_data) => {
-          // TODO:
-          // we should only store the last 20 transactions to keep the cache small
-          // there could be other data to filter as well
-          // filter your cached data and queries
-          // return filteredData
-          return _data
-        },
-      })
+      const cachePersistence = createPersistedCache(cache)
+      persistedCache = cachePersistence
 
       const readableVersion = DeviceInfo.getReadableVersion()
 
@@ -268,27 +257,11 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
         connectToDevTools: true,
       })
 
-      const SCHEMA_VERSION = "1"
-
-      // Read the current version from AsyncStorage.
-      const currentVersion = await loadString(SCHEMA_VERSION_KEY)
-
-      if (currentVersion === SCHEMA_VERSION) {
-        // Skip restore in self-custodial mode so the persisted custodial cache cannot leak.
-        if (token) {
-          await persistor.restore()
-        }
-      } else {
-        // Otherwise, we'll want to purge the outdated persisted cache
-        // and mark ourselves as having updated to the latest version.
-
-        // init the DB. will be override if a cache exists
-        await persistor.purge()
-        await saveString(SCHEMA_VERSION_KEY, SCHEMA_VERSION)
-      }
+      await cachePersistence.open(token, () => cancelled)
+      if (cancelled) return
 
       if (token) {
-        client.onClearStore(persistor.purge)
+        client.onClearStore(cachePersistence.persistor.purge)
       }
 
       registerActiveClient(client)
@@ -297,9 +270,12 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
         isAuthed: Boolean(token),
       })
       clearNetworkError()
-
-      return () => client.cache.reset()
     })()
+
+    return () => {
+      cancelled = true
+      persistedCache?.retire()
+    }
   }, [effectiveToken, appConfig.galoyInstance, clearNetworkError, registerActiveClient])
 
   // Before we show the app, we have to wait for our state to be ready.
