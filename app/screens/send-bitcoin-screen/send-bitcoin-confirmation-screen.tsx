@@ -60,7 +60,7 @@ import {
 import { ETA_MINUTES } from "./hooks/use-onchain-fee-tiers"
 import { SendReviewDestination } from "./review/send-review-destination"
 import { useSentTransition } from "./review/use-sent-transition"
-import { useHoldSettledSend } from "./settled-send-hold"
+import { useSettledSendHold } from "./settled-send-hold"
 import { SendHero } from "./send-hero"
 import { useSendBalances } from "./hooks/use-send-wallets"
 import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
@@ -173,10 +173,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   /** The receipt a landed payment opens from Sent, kept until the sender asks for it. */
   const sentReceiptRef =
     React.useRef<RootStackParamList["sendBitcoinCompleted"]>(undefined)
-  /** False once the offline gate has already dropped review, so a success that resolves
-   *  after that still opens the receipt instead of writing into an unmounted Sent. */
+  /** False once review has unmounted, so a success that resolves after that never
+   *  writes into an unmounted Sent. */
   const isMountedRef = React.useRef(false)
-  const holdSettledSend = useHoldSettledSend()
+  const { hold: holdSettledSend, isRouteLive } = useSettledSendHold()
 
   React.useEffect(() => {
     isMountedRef.current = true
@@ -364,22 +364,22 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         ReactNativeHapticFeedback.trigger("notificationSuccess", {
           ignoreAndroidSystemSettings: true,
         })
+        saveContact()
         /** PaymentSucceeded refreshes the wallet, and a failed refresh marks it offline.
          *  The gate would then unmount Sent and drop the receipt timer, so the hold is
          *  taken before this function yields. If the gate already won, open the receipt
-         *  now: the payment landed either way. */
+         *  now: the payment landed either way. If the sender left instead, the route is
+         *  gone with it, and their new place in the app stays as it is. */
         if (!isMountedRef.current) {
-          resetToCompleted({ ...params, hasShownSuccess: false })
+          if (isRouteLive()) resetToCompleted({ ...params, hasShownSuccess: false })
           return
         }
         holdSettledSend()
         sentReceiptRef.current = params
-        const sent = playSent({
+        await playSent({
           primaryAmount: heroPrimaryText,
           hasSecondaryAmount: Boolean(heroSecondaryText),
         })
-        saveContact()
-        await sent
         return
       }
 
@@ -391,6 +391,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       playSent,
       resetToCompleted,
       holdSettledSend,
+      isRouteLive,
       heroPrimaryText,
       heroSecondaryText,
       saveLnAddressContact,

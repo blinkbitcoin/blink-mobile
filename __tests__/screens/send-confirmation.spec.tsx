@@ -2733,6 +2733,79 @@ describe("a settled self-custodial send under the offline gate", () => {
     })
   })
 
+  /** A Lightning-address send whose answer comes after review has gone, either because
+   *  the gate dropped it or because the sender left. */
+  const lnurlRoute = {
+    key: "sendBitcoinConfirmationScreen",
+    name: "sendBitcoinConfirmation",
+    params: {
+      paymentDetail:
+        PaymentDetailsLightning.createLnurlPaymentDetails(defaultLightningParams),
+    },
+  } as const
+
+  const renderLnurlInFlight = async () => {
+    let answer: (result: { status: string }) => void = () => {}
+    sendPaymentMock.mockReturnValueOnce(
+      new Promise((resolve) => {
+        answer = resolve
+      }),
+    )
+    const view = render(
+      <ContextForScreen>
+        <SendBitcoinConfirmationGated route={lnurlRoute} />
+      </ContextForScreen>,
+    )
+    answerMeasurements()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+    expect(sendPaymentMock).toHaveBeenCalledTimes(1)
+    return { view, answer: (result: { status: string }) => answer(result) }
+  }
+
+  it("saves the Lightning address when the gate dropped review before success", async () => {
+    const { view, answer } = await renderLnurlInFlight()
+    useActiveWalletMock.mockReturnValue(selfCustodialWallet(ActiveWalletStatus.Offline))
+    view.rerender(
+      <ContextForScreen>
+        <SendBitcoinConfirmationGated route={lnurlRoute} />
+      </ContextForScreen>,
+    )
+    expect(screen.getByTestId("payment-offline-notice")).toBeTruthy()
+
+    await act(async () => {
+      answer({ status: "SUCCESS" })
+    })
+
+    expect(saveLnAddressContactMock).toHaveBeenCalledTimes(1)
+    expect(saveLnAddressContactMock).toHaveBeenCalledWith({
+      paymentType: "lnurl",
+      destination: defaultLightningParams.lnurl,
+      isMerchant: false,
+    })
+    expect(navigationDispatchMock).toHaveBeenCalledTimes(1)
+  })
+
+  /** Back stays open while the send is answering. Once the sender has left, a late
+   *  success must not reset the stack under whatever they opened next. */
+  it("leaves navigation alone, and still saves the Lightning address, when the sender left before success", async () => {
+    const { view, answer } = await renderLnurlInFlight()
+    view.unmount()
+
+    await act(async () => {
+      answer({ status: "SUCCESS" })
+    })
+
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
+    expect(saveLnAddressContactMock).toHaveBeenCalledTimes(1)
+    expect(saveLnAddressContactMock).toHaveBeenCalledWith({
+      paymentType: "lnurl",
+      destination: defaultLightningParams.lnurl,
+      isMerchant: false,
+    })
+  })
+
   it("keeps Sent when the wallet goes offline during a screen-reader hold", async () => {
     jest.spyOn(AccessibilityInfo, "isScreenReaderEnabled").mockResolvedValue(true)
     const view = await renderGated()
