@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from "fs"
 import { join, relative } from "path"
 
-import { circleDiameterThatContainsSquare } from "@app/components/atomic/galoy-icon/galoy-icon"
+import { iconButtonSizes } from "@app/components/atomic/galoy-icon-button"
 import {
   HEADER_ICON_BUTTON_TOUCH_PADDING,
   HEADER_ICON_TOUCH_SIZE,
@@ -49,9 +49,9 @@ describe("header touch area", () => {
   })
 
   it("pads a medium icon button out to the 48dp box", () => {
-    expect(
-      circleDiameterThatContainsSquare(24) + 2 * HEADER_ICON_BUTTON_TOUCH_PADDING,
-    ).toBe(HEADER_ICON_TOUCH_SIZE)
+    expect(iconButtonSizes.medium.circle + 2 * HEADER_ICON_BUTTON_TOUCH_PADDING).toBe(
+      HEADER_ICON_TOUCH_SIZE,
+    )
     expect(headerIconButtonTouchPaddingAbove).not.toHaveProperty("bottom")
   })
 

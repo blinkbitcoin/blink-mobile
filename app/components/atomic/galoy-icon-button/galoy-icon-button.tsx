@@ -12,12 +12,7 @@ import {
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import {
-  GaloyIcon,
-  IconNamesType,
-  IconWeight,
-  circleDiameterThatContainsSquare,
-} from "../galoy-icon/galoy-icon"
+import { GaloyIcon, IconNamesType, IconWeight } from "../galoy-icon/galoy-icon"
 
 export type GaloyIconButtonProps = {
   name: IconNamesType
@@ -37,11 +32,12 @@ export type GaloyIconButtonProps = {
   touchPadding?: number | Insets
 }
 
-const sizeMapping = {
-  small: 16,
-  medium: 24,
-  large: 36,
-}
+/** Figma's `galoy-icon-button` sizes, in dp: the circle and the icon frame inside it. */
+export const iconButtonSizes = {
+  small: { circle: 20, icon: 16 },
+  medium: { circle: 32, icon: 20 },
+  large: { circle: 44, icon: 32 },
+} as const
 
 const touchBoxStyle = (contentSize: number, padding: number | Insets): ViewStyle => {
   const {
@@ -84,10 +80,8 @@ export const GaloyIconButton = ({
   const isDisabled = disabled || loading
 
   const isNumericSize = typeof size === "number"
-  const resolvedIconSize = iconSize ?? (isNumericSize ? size : sizeMapping[size])
-  const iconContainerSize = isNumericSize
-    ? size
-    : circleDiameterThatContainsSquare(resolvedIconSize)
+  const resolvedIconSize = iconSize ?? (isNumericSize ? size : iconButtonSizes[size].icon)
+  const iconContainerSize = isNumericSize ? size : iconButtonSizes[size].circle
 
   const styles = useStyles({
     iconContainerSize,
@@ -167,7 +161,7 @@ export const GaloyIconButton = ({
               <GaloyIcon
                 name={name}
                 size={resolvedIconSize}
-                containerSize={isNumericSize ? size : undefined}
+                containerSize={iconContainerSize}
                 weight={weight}
                 {...resolvedProps}
               />

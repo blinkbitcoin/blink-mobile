@@ -1205,8 +1205,8 @@ const useStyles = makeStyles(({ colors }) => ({
     flexGrow: 1,
     alignItems: "center",
   },
-  // The price and menu touch boxes grow 7dp up and sideways into the row's margins (no
-  // room is free below them). The icons stay 13dp down (6 + 0 + 7) and the balance at 47dp.
+  // The price and menu touch boxes grow 8dp up and sideways into the row's margins (no
+  // room is free below them). The icons sit 14dp down (6 + 0 + 8) and the balance at 46dp.
   balanceContainer: {
     marginTop: 6,
     flexDirection: "column",

@@ -1,9 +1,10 @@
 import React from "react"
 import { View } from "react-native"
 
-import { makeStyles, Text } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
+import { iconButtonSizes } from "../atomic/galoy-icon-button"
 
 type IconHeroProps = {
   icon: IconNamesType
@@ -25,6 +26,9 @@ export const IconHero: React.FC<IconHeroProps> = ({
   titleLines,
 }) => {
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
 
   const isPlainTextSubtitle = typeof subtitle === "string"
   /** An empty string skips the subtitle Text entirely, so it never adds a blank line. */
@@ -32,9 +36,15 @@ export const IconHero: React.FC<IconHeroProps> = ({
 
   return (
     <View style={styles.container}>
-      <View style={styles.iconContainer}>
-        <GaloyIcon name={icon} size={34} color={iconColor} />
-      </View>
+      {/* Figma draws a large icon button here; it is drawn at that size, not as a
+          button, so screen readers don't stop on a decoration. */}
+      <GaloyIcon
+        name={icon}
+        size={iconButtonSizes.large.icon}
+        containerSize={iconButtonSizes.large.circle}
+        color={iconColor}
+        backgroundColor={colors.surfaceInteractive}
+      />
       <View style={styles.textContainer}>
         <Text bold style={styles.title} numberOfLines={titleLines} ellipsizeMode="middle">
           {title}
@@ -46,20 +56,12 @@ export const IconHero: React.FC<IconHeroProps> = ({
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(() => ({
   container: {
     alignItems: "center",
     paddingTop: 20,
     paddingHorizontal: 40,
     gap: 14,
-  },
-  iconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.surfaceInteractive,
-    alignItems: "center",
-    justifyContent: "center",
   },
   textContainer: {
     alignSelf: "stretch",

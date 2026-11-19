@@ -9,8 +9,18 @@ import { flushEffects } from "../helpers/flush-effects"
 jest.mock("@app/components/atomic/galoy-icon", () => {
   const { Text } = jest.requireActual("react-native")
   return {
-    GaloyIcon: ({ name }: { name: string }) => (
-      <Text testID={`icon-${name}`}>{name}</Text>
+    GaloyIcon: ({
+      name,
+      size,
+      containerSize,
+    }: {
+      name: string
+      size: number
+      containerSize: number
+    }) => (
+      <Text testID={`icon-${name}`} size={size} containerSize={containerSize}>
+        {name}
+      </Text>
     ),
   }
 })
@@ -158,5 +168,19 @@ describe("IconHero", () => {
     )
     await flushEffects()
     expect(getByTestId("icon-cloud-arrow-up")).toBeTruthy()
+  })
+
+  it("draws the icon at the large icon button's size, 32dp in a 44dp circle", async () => {
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <IconHero icon="cloud-arrow-up" iconColor="green" title="Title" />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(getByTestId("icon-cloud-arrow-up").props).toMatchObject({
+      size: 32,
+      containerSize: 44,
+    })
   })
 })

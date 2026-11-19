@@ -73,16 +73,16 @@ describe("CloseHeader", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  /** No room is free under the row, so the box grows up and sideways only (48×41dp),
+  /** No room is free under the row, so the box grows up and sideways only (48×40dp),
    *  into the row's padding, and never by a negative margin. */
-  it("gives the close a 48×41dp box that takes no layout from the row", async () => {
+  it("gives the close a 48×40dp box that takes no layout from the row", async () => {
     const { getByTestId } = await renderHeader({ testID: "flow-close" })
 
     const style = StyleSheet.flatten(getByTestId("flow-close").props.style)
     expect(style).toMatchObject({
       width: 48,
-      height: 41,
-      paddingTop: 7,
+      height: 40,
+      paddingTop: 8,
       paddingBottom: 0,
     })
     const margins = [

@@ -78,10 +78,10 @@ describe("headerCloseControlOptions", () => {
     expect(style).toMatchObject({
       width: 48,
       height: 48,
-      paddingTop: 7,
-      paddingBottom: 7,
+      paddingTop: 8,
+      paddingBottom: 8,
       paddingRight: 4,
-      paddingLeft: 10,
+      paddingLeft: 12,
     })
     const margins = [
       style.marginTop,

@@ -1,4 +1,4 @@
-import { circleDiameterThatContainsSquare } from "../atomic/galoy-icon/galoy-icon"
+import { iconButtonSizes } from "../atomic/galoy-icon-button/galoy-icon-button"
 
 /**
  * The smallest touch box a header control gets, in dp (Material's 48dp minimum). On Android the new
@@ -19,13 +19,13 @@ export const headerIconTouchArea = {
   justifyContent: "center",
 } as const
 
-/** A medium `GaloyIconButton` is a 34dp circle (24dp icon); this much `touchPadding`
+/** A medium `GaloyIconButton` is a 32dp circle (20dp icon); this much `touchPadding`
  *  on each side makes it the 48dp header box. */
 export const HEADER_ICON_BUTTON_TOUCH_PADDING =
-  (HEADER_ICON_TOUCH_SIZE - circleDiameterThatContainsSquare(24)) / 2
+  (HEADER_ICON_TOUCH_SIZE - iconButtonSizes.medium.circle) / 2
 
 /** For an in-screen header row with no room under its buttons: the box grows up and
- *  sideways only (48×41dp), so nothing below the row moves. */
+ *  sideways only (48×40dp), so nothing below the row moves. */
 export const headerIconButtonTouchPaddingAbove = {
   top: HEADER_ICON_BUTTON_TOUCH_PADDING,
   right: HEADER_ICON_BUTTON_TOUCH_PADDING,
