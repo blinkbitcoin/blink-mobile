@@ -266,6 +266,7 @@ export type AccountWindDown = {
   readonly __typename: 'AccountWindDown';
   readonly finalDeadline: Scalars['Timestamp']['output'];
   readonly gateArmsAt: Scalars['Timestamp']['output'];
+  readonly reason: WindDownReason;
   readonly receiveDisabledAt: Scalars['Timestamp']['output'];
   readonly status: WindDownStatus;
   readonly timezone: Scalars['String']['output'];
@@ -3295,6 +3296,12 @@ export const WelcomeRange = {
 } as const;
 
 export type WelcomeRange = typeof WelcomeRange[keyof typeof WelcomeRange];
+export const WindDownReason = {
+  LevelZero: 'LEVEL_ZERO',
+  Region: 'REGION'
+} as const;
+
+export type WindDownReason = typeof WindDownReason[keyof typeof WindDownReason];
 export const WindDownStatus = {
   GatedClosed: 'GATED_CLOSED',
   PreCutoff: 'PRE_CUTOFF',
@@ -11436,6 +11443,7 @@ export type ResolversTypes = {
   WelcomeLeaderboardInput: WelcomeLeaderboardInput;
   WelcomeProfile: ResolverTypeWrapper<WelcomeProfile>;
   WelcomeRange: WelcomeRange;
+  WindDownReason: WindDownReason;
   WindDownStatus: WindDownStatus;
 };
 
@@ -11820,6 +11828,7 @@ export type AccountUpdateNotificationSettingsPayloadResolvers<ContextType = any,
 export type AccountWindDownResolvers<ContextType = any, ParentType extends ResolversParentTypes['AccountWindDown'] = ResolversParentTypes['AccountWindDown']> = {
   finalDeadline?: Resolver<ResolversTypes['Timestamp'], ParentType, ContextType>;
   gateArmsAt?: Resolver<ResolversTypes['Timestamp'], ParentType, ContextType>;
+  reason?: Resolver<ResolversTypes['WindDownReason'], ParentType, ContextType>;
   receiveDisabledAt?: Resolver<ResolversTypes['Timestamp'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['WindDownStatus'], ParentType, ContextType>;
   timezone?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
