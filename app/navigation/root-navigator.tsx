@@ -1057,7 +1057,7 @@ export const RootStack = () => {
         options={{
           title: "",
           ...noHeaderBack,
-          ...headerCloseControlOptions(),
+          ...headerCloseControlOptions({ shouldPopTo: true }),
         }}
       />
       <RootNavigator.Screen
@@ -1066,7 +1066,7 @@ export const RootStack = () => {
         options={{
           title: "",
           ...noHeaderBack,
-          ...headerCloseControlOptions(),
+          ...headerCloseControlOptions({ shouldPopTo: true }),
         }}
       />
       <RootNavigator.Screen

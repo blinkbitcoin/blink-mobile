@@ -29,8 +29,6 @@ describe("card onboarding header controls in root-navigator", () => {
     const CLOSE_ONLY_ROUTES = [
       "cardOnboardingWelcomeScreen",
       "cardOnboardingPersonalInfoScreen",
-      "cardOnboardingPreapprovedScreen",
-      "cardOnboardingDeclinedScreen",
     ]
 
     CLOSE_ONLY_ROUTES.forEach((route) => {
@@ -38,6 +36,22 @@ describe("card onboarding header controls in root-navigator", () => {
 
       expect(options).toContain("...noHeaderBack")
       expect(options).toContain("...headerCloseControlOptions()")
+    })
+  })
+
+  /** The wait replaced itself with the outcome over the Home, so the X pops back to that
+   *  Home, as the footer does, instead of stacking a second one. */
+  it("closes the outcome screens onto the Home under them", () => {
+    const OUTCOME_ROUTES = [
+      "cardOnboardingPreapprovedScreen",
+      "cardOnboardingDeclinedScreen",
+    ]
+
+    OUTCOME_ROUTES.forEach((route) => {
+      const options = registration(route)
+
+      expect(options).toContain("...noHeaderBack")
+      expect(options).toContain("...headerCloseControlOptions({ shouldPopTo: true })")
     })
   })
 
