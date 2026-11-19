@@ -9,6 +9,7 @@ import { DropdownComponent } from "@app/components/card-screen"
 import { StepLayout } from "@app/components/step-layout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 import { CardApplicationAnswers } from "@app/types/card-application"
 
 import {
@@ -61,7 +62,7 @@ export const CardPersonalInformationScreen: React.FC = () => {
     >
       <View style={styles.content}>
         <View style={styles.inputContainer}>
-          <Text type="p3">
+          <Text type="p3" style={styles.label}>
             {LL.CardFlow.Onboarding.PersonalInformation.fields.occupation.label()}
           </Text>
           <DropdownComponent
@@ -73,7 +74,7 @@ export const CardPersonalInformationScreen: React.FC = () => {
           />
         </View>
         <View style={styles.inputContainer}>
-          <Text type="p3">
+          <Text type="p3" style={styles.label}>
             {LL.CardFlow.Onboarding.PersonalInformation.fields.annualSalaryRange.label()}
           </Text>
           <DropdownComponent
@@ -85,7 +86,7 @@ export const CardPersonalInformationScreen: React.FC = () => {
           />
         </View>
         <View style={styles.inputContainer}>
-          <Text type="p3">
+          <Text type="p3" style={styles.label}>
             {LL.CardFlow.Onboarding.PersonalInformation.fields.accountPurpose.label()}
           </Text>
           <DropdownComponent
@@ -97,7 +98,7 @@ export const CardPersonalInformationScreen: React.FC = () => {
           />
         </View>
         <View style={styles.inputContainer}>
-          <Text type="p3">
+          <Text type="p3" style={styles.label}>
             {LL.CardFlow.Onboarding.PersonalInformation.fields.expectedMonthlyVolume.label()}
           </Text>
           <DropdownComponent
@@ -113,13 +114,16 @@ export const CardPersonalInformationScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
   content: {
     paddingTop: 10,
     paddingHorizontal: 20,
     gap: 20,
   },
   inputContainer: {
-    gap: 3,
+    gap: groupTitleGap,
+  },
+  label: {
+    color: colors.textSecondary,
   },
 }))

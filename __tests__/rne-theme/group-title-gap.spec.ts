@@ -29,6 +29,7 @@ const TITLE_GAPS: Record<string, number> = {
   "app/screens/card-screen/card-personal-details-screen/card-personal-details-screen.tsx": 1,
   "app/screens/card-screen/card-settings-screen/card-settings-screen.tsx": 2,
   "app/screens/card-screen/card-statements-screen/card-statements-screen.tsx": 1,
+  "app/screens/card-screen/onboarding/card-flow/personal-information-screen.tsx": 1,
   "app/screens/card-screen/order-card-screens/steps/shared-styles.ts": 1,
   "app/screens/card-screen/replace-card-screens/steps/shared-styles.ts": 1,
   "app/screens/galoy-address-screen/address-component.tsx": 1,
@@ -69,6 +70,10 @@ const TITLE_STYLES: [string, string][] = [
   [
     "app/screens/card-screen/card-statements-screen/card-statements-screen.tsx",
     "sectionLabel",
+  ],
+  [
+    "app/screens/card-screen/onboarding/card-flow/personal-information-screen.tsx",
+    "label",
   ],
   ["app/screens/card-screen/order-card-screens/steps/shared-styles.ts", "sectionTitle"],
   ["app/screens/card-screen/replace-card-screens/steps/shared-styles.ts", "sectionTitle"],
@@ -157,13 +162,6 @@ describe("group title", () => {
   })
 
   it("leaves titles outside the 14px regular contract unchanged", () => {
-    const personal = source(
-      "app/screens/card-screen/onboarding/card-flow/personal-information-screen.tsx",
-    )
-    expect(personal).not.toContain("groupTitleGap")
-    expect(personal).not.toContain("textSecondary")
-    expect(personal).toContain("gap: 6,")
-
     const deposits = styleBlock(
       "app/screens/unclaimed-deposits/unclaimed-deposits-screen.tsx",
       "fieldLabel",
