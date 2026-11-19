@@ -9,6 +9,12 @@ const theme = createTheme({
   lightColors: light,
   darkColors: dark,
   mode: "light",
+  /**
+   * The components below draw their text with React Native's own `Text` or `TextInput`, not
+   * the themed `Text`, so without a face they draw the platform font (the Button title even
+   * names Android's `sans-serif-medium`). The theme's style comes first, so a caller's own
+   * face still wins.
+   */
   components: {
     Button: {
       containerStyle: {
@@ -18,6 +24,32 @@ const theme = createTheme({
         paddingHorizontal: 32,
         paddingVertical: 8,
         borderRadius: 50,
+      },
+      titleStyle: {
+        fontFamily: fonts.bold,
+      },
+    },
+    Input: {
+      inputStyle: {
+        fontFamily: fonts.regular,
+      },
+      errorStyle: {
+        fontFamily: fonts.regular,
+      },
+    },
+    SearchBar: {
+      inputStyle: {
+        fontFamily: fonts.regular,
+      },
+    },
+    ListItemTitle: {
+      style: {
+        fontFamily: fonts.regular,
+      },
+    },
+    ListItemSubtitle: {
+      style: {
+        fontFamily: fonts.regular,
       },
     },
     Text: (props, { colors }) => {

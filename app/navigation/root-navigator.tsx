@@ -204,6 +204,7 @@ import { TouchableOpacity } from "react-native"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { ApiScreen } from "@app/screens/settings-screen/api-screen"
 import { ApiKeyCreateScreen } from "@app/screens/settings-screen/api/api-key-create-screen"
+import { fonts } from "@app/rne-theme/fonts"
 
 // Required lazily (not statically imported) so the developer screen module —
 // its debugScreen query, token copy/share UI and instance override controls —
@@ -409,6 +410,7 @@ export const RootStack = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
+        headerBackTitleStyle: styles.backTitle,
         headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
@@ -1142,6 +1144,7 @@ export const OnboardingNavigator = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
+        headerBackTitleStyle: styles.backTitle,
         headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
       }}
@@ -1197,6 +1200,7 @@ export const ContactNavigator = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
+        headerBackTitleStyle: styles.backTitle,
         headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
@@ -1255,6 +1259,7 @@ export const PhoneLoginNavigator = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
+        headerBackTitleStyle: styles.backTitle,
         headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
@@ -1310,7 +1315,7 @@ export const PrimaryNavigator = () => {
           tabBarLabelStyle: {
             paddingBottom: 6,
             fontSize: 12,
-            fontWeight: "bold",
+            fontFamily: fonts.bold,
             width: "100%",
           },
           tabBarHideOnKeyboard: true,
@@ -1375,8 +1380,15 @@ const useStyles = makeStyles(({ colors }) => ({
   headerStyle: {
     backgroundColor: colors.backgroundDefault,
   },
+  // Heading 2/Bold. The native header draws the platform font unless it names a face.
   title: {
     color: colors.textOnBackground,
+    fontFamily: fonts.bold,
+    fontSize: 20,
+  },
+  // The iOS back button label, which is native text too.
+  backTitle: {
+    fontFamily: fonts.regular,
   },
   // 48dp box around the 18dp icon: the margin gives back the 15dp it grew by.
   SendBitcoinScreenScanIcon: {
