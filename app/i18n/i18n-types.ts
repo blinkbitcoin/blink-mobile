@@ -7494,6 +7494,10 @@ type RootTranslation = {
 		 */
 		somethingWentWrong: string
 		/**
+		 * T​h​e​ ​p​r​i​c​e​ ​m​o​v​e​d​,​ ​s​o​ ​t​h​e​ ​a​m​o​u​n​t​s​ ​w​e​r​e​ ​u​p​d​a​t​e​d​.​ ​C​h​e​c​k​ ​t​h​e​m​ ​b​e​f​o​r​e​ ​y​o​u​ ​s​e​n​d​.
+		 */
+		priceUpdated: string
+		/**
 		 * P​a​y​m​e​n​t​ ​a​l​r​e​a​d​y​ ​a​t​t​e​m​p​t​e​d​.​
 	​
 	​I​f​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​s​e​n​d​ ​t​h​i​s​ ​p​a​y​m​e​n​t​ ​a​g​a​i​n​,​ ​s​t​a​r​t​ ​f​r​o​m​ ​s​c​r​a​t​c​h​.
@@ -7508,13 +7512,87 @@ type RootTranslation = {
 		 */
 		slideConfirming: string
 		/**
+		 * S​l​i​d​e​ ​t​o​ ​s​e​n​d
+		 */
+		slideToSend: string
+		/**
+		 * C​a​l​c​u​l​a​t​i​n​g​ ​f​e​e​…
+		 */
+		calculatingFee: string
+		sendProgress: {
+			/**
+			 * R​e​v​i​e​w​i​n​g
+			 */
+			reviewing: string
+			/**
+			 * S​i​g​n​i​n​g
+			 */
+			signing: string
+			/**
+			 * F​i​n​d​i​n​g​ ​r​o​u​t​e
+			 */
+			findingRoute: string
+			/**
+			 * B​r​o​a​d​c​a​s​t​i​n​g
+			 */
+			broadcasting: string
+			/**
+			 * C​h​e​c​k​i​n​g​ ​d​e​l​i​v​e​r​y
+			 */
+			checkingDelivery: string
+			/**
+			 * R​e​-​t​r​y​i​n​g
+			 */
+			retrying: string
+			/**
+			 * A​l​m​o​s​t​ ​t​h​e​r​e
+			 */
+			almostThere: string
+			/**
+			 * A​n​y​ ​t​i​m​e​ ​n​o​w
+			 */
+			anyTimeNow: string
+			/**
+			 * O​h​ ​o​h
+			 */
+			ohOh: string
+			/**
+			 * T​r​y​i​n​g​ ​a​g​a​i​n
+			 */
+			tryingAgain: string
+		}
+		/**
 		 * C​o​p​i​e​d​ ​d​e​s​t​i​n​a​t​i​o​n​ ​t​o​ ​c​l​i​p​b​o​a​r​d
 		 */
 		copiedDestination: string
 		/**
-		 * H​i​g​h​ ​f​e​e​!​ ​W​e​ ​r​e​c​o​m​m​e​n​d​ ​L​i​g​h​t​n​i​n​g​.
+		 * H​i​g​h​ ​f​e​e​.​ ​W​e​ ​r​e​c​o​m​m​e​n​d​ ​L​i​g​h​t​n​i​n​g​.
 		 */
 		lightningRecommended: string
+		/**
+		 * S​e​n​d​i​n​g
+		 */
+		sending: string
+		/**
+		 * S​e​n​t
+		 */
+		sent: string
+		/**
+		 * R​e​c​e​i​p​t
+		 */
+		receipt: string
+		/**
+		 * F​r​o​m​ ​B​a​l​a​n​c​e
+		 */
+		fromBalance: string
+		/**
+		 * D​e​t​a​i​l​s
+		 */
+		details: string
+		/**
+		 * C​h​a​n​g​e​ ​a​m​o​u​n​t
+		 */
+		changeAmount: string
 		/**
 		 * R​e​m​a​i​n​i​n​g​ ​{​r​e​m​a​i​n​i​n​g​}​ ​(​{​r​e​m​a​i​n​i​n​g​S​a​t​s​}​)​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​B​i​t​c​o​i​n​.​ ​U​S​D​ ​m​i​n​i​m​u​m​:​ ​{​m​i​n​i​m​u​m​}​.
 		 * @param {string} minimum
@@ -7688,6 +7766,14 @@ type RootTranslation = {
 		 */
 		amount: string
 		/**
+		 * A​d​d​ ​a​m​o​u​n​t
+		 */
+		addAmount: string
+		/**
+		 * L​o​w​ ​f​u​n​d​s
+		 */
+		lowFunds: string
+		/**
 		 * A​m​o​u​n​t​ ​e​x​c​e​e​d​s​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}
 		 * @param {string} balance
 		 */
@@ -7697,6 +7783,26 @@ type RootTranslation = {
 		 * @param {string} limit
 		 */
 		amountExceedsLimit: RequiredParams<'limit'>
+		/**
+		 * W​e​ ​c​o​u​l​d​n​'​t​ ​c​h​e​c​k​ ​y​o​u​r​ ​d​a​i​l​y​ ​l​i​m​i​t​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​.
+		 */
+		limitsUnavailable: string
+		/**
+		 * A​ ​s​m​a​l​l​ ​p​r​o​b​l​e​m
+		 */
+		problemSheetTitle: string
+		/**
+		 * C​h​a​n​g​e​ ​d​e​s​t​i​n​a​t​i​o​n
+		 */
+		changeDestination: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​r​e​a​c​h​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t
+		 */
+		recipientUnreachableTitle: string
+		/**
+		 * R​e​c​i​p​i​e​n​t​ ​s​e​n​t​ ​t​h​e​ ​w​r​o​n​g​ ​a​m​o​u​n​t
+		 */
+		recipientWrongAmountTitle: string
 		/**
 		 * U​p​g​r​a​d​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​t​o​ ​i​n​c​r​e​a​s​e​ ​y​o​u​r​ ​l​i​m​i​t
 		 */
@@ -7899,6 +8005,10 @@ type RootTranslation = {
 		 * U​n​a​b​l​e​ ​t​o​ ​e​s​t​i​m​a​t​e​ ​f​e​e​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​a​m​o​u​n​t​.
 		 */
 		sdkGenericError: string
+		/**
+		 * T​h​i​s​ ​i​s​ ​y​o​u​r​ ​o​w​n​ ​w​a​l​l​e​t​'​s​ ​a​d​d​r​e​s​s​.​ ​Y​o​u​ ​c​a​n​'​t​ ​s​e​n​d​ ​a​n​ ​o​n​-​c​h​a​i​n​ ​p​a​y​m​e​n​t​ ​t​o​ ​y​o​u​r​s​e​l​f​.
+		 */
+		onchainSelfPayment: string
 	}
 	ApiScreen: {
 		/**
@@ -9902,6 +10012,10 @@ type RootTranslation = {
 		 */
 		ok: string
 		/**
+		 * O​k​a​y
+		 */
+		okay: string
+		/**
 		 * o​r
 		 */
 		or: string
@@ -10439,6 +10553,33 @@ type RootTranslation = {
 		 * S​e​t​ ​a​m​o​u​n​t
 		 */
 		tapToSetAmount: string
+	}
+	Accessibility: {
+		/**
+		 * B​a​l​a​n​c​e​ ​h​i​d​d​e​n
+		 */
+		balanceHidden: string
+		/**
+		 * C​o​p​y
+		 */
+		copy: string
+		/**
+		 * D​e​l​e​t​e
+		 */
+		deleteKey: string
+		/**
+		 * S​h​o​w​s​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​o​n​ ​t​h​i​s​ ​s​c​r​e​e​n
+		 */
+		revealBalanceHint: string
+		/**
+		 * S​w​i​t​c​h​e​s​ ​t​h​e​ ​c​u​r​r​e​n​c​y​ ​y​o​u​ ​t​y​p​e​ ​t​h​e​ ​a​m​o​u​n​t​ ​i​n
+		 */
+		swapCurrencyHint: string
+		/**
+		 * S​w​i​t​c​h​ ​t​o​ ​{​w​a​l​l​e​t​}
+		 * @param {string} wallet
+		 */
+		switchToWallet: RequiredParams<'wallet'>
 	}
 	AppUpdate: {
 		/**
@@ -21872,6 +22013,10 @@ export type TranslationFunctions = {
 		 */
 		somethingWentWrong: () => LocalizedString
 		/**
+		 * The price moved, so the amounts were updated. Check them before you send.
+		 */
+		priceUpdated: () => LocalizedString
+		/**
 		 * Payment already attempted.
 
 	If you want to send this payment again, start from scratch.
@@ -21886,13 +22031,87 @@ export type TranslationFunctions = {
 		 */
 		slideConfirming: () => LocalizedString
 		/**
+		 * Slide to send
+		 */
+		slideToSend: () => LocalizedString
+		/**
+		 * Calculating fee…
+		 */
+		calculatingFee: () => LocalizedString
+		sendProgress: {
+			/**
+			 * Reviewing
+			 */
+			reviewing: () => LocalizedString
+			/**
+			 * Signing
+			 */
+			signing: () => LocalizedString
+			/**
+			 * Finding route
+			 */
+			findingRoute: () => LocalizedString
+			/**
+			 * Broadcasting
+			 */
+			broadcasting: () => LocalizedString
+			/**
+			 * Checking delivery
+			 */
+			checkingDelivery: () => LocalizedString
+			/**
+			 * Re-trying
+			 */
+			retrying: () => LocalizedString
+			/**
+			 * Almost there
+			 */
+			almostThere: () => LocalizedString
+			/**
+			 * Any time now
+			 */
+			anyTimeNow: () => LocalizedString
+			/**
+			 * Oh oh
+			 */
+			ohOh: () => LocalizedString
+			/**
+			 * Trying again
+			 */
+			tryingAgain: () => LocalizedString
+		}
+		/**
 		 * Copied destination to clipboard
 		 */
 		copiedDestination: () => LocalizedString
 		/**
-		 * High fee! We recommend Lightning.
+		 * High fee. We recommend Lightning.
 		 */
 		lightningRecommended: () => LocalizedString
+		/**
+		 * Sending
+		 */
+		sending: () => LocalizedString
+		/**
+		 * Sent
+		 */
+		sent: () => LocalizedString
+		/**
+		 * Receipt
+		 */
+		receipt: () => LocalizedString
+		/**
+		 * From Balance
+		 */
+		fromBalance: () => LocalizedString
+		/**
+		 * Details
+		 */
+		details: () => LocalizedString
+		/**
+		 * Change amount
+		 */
+		changeAmount: () => LocalizedString
 		/**
 		 * Remaining {remaining} ({remainingSats}) will be converted to Bitcoin. USD minimum: {minimum}.
 		 */
@@ -22046,6 +22265,14 @@ export type TranslationFunctions = {
 		 */
 		amount: () => LocalizedString
 		/**
+		 * Add amount
+		 */
+		addAmount: () => LocalizedString
+		/**
+		 * Low funds
+		 */
+		lowFunds: () => LocalizedString
+		/**
 		 * Amount exceeds your balance of {balance}
 		 */
 		amountExceed: (arg: { balance: string }) => LocalizedString
@@ -22053,6 +22280,26 @@ export type TranslationFunctions = {
 		 * Amount exceeds your remaining daily limit of {limit}
 		 */
 		amountExceedsLimit: (arg: { limit: string }) => LocalizedString
+		/**
+		 * We couldn't check your daily limit. Try again in a moment.
+		 */
+		limitsUnavailable: () => LocalizedString
+		/**
+		 * A small problem
+		 */
+		problemSheetTitle: () => LocalizedString
+		/**
+		 * Change destination
+		 */
+		changeDestination: () => LocalizedString
+		/**
+		 * Couldn't reach the recipient
+		 */
+		recipientUnreachableTitle: () => LocalizedString
+		/**
+		 * Recipient sent the wrong amount
+		 */
+		recipientWrongAmountTitle: () => LocalizedString
 		/**
 		 * Upgrade your account to increase your limit
 		 */
@@ -22255,6 +22502,10 @@ export type TranslationFunctions = {
 		 * Unable to estimate fees. Please try a different amount.
 		 */
 		sdkGenericError: () => LocalizedString
+		/**
+		 * This is your own wallet's address. You can't send an on-chain payment to yourself.
+		 */
+		onchainSelfPayment: () => LocalizedString
 	}
 	ApiScreen: {
 		/**
@@ -24212,6 +24463,10 @@ export type TranslationFunctions = {
 		 */
 		ok: () => LocalizedString
 		/**
+		 * Okay
+		 */
+		okay: () => LocalizedString
+		/**
 		 * or
 		 */
 		or: () => LocalizedString
@@ -24733,6 +24988,32 @@ export type TranslationFunctions = {
 		 * Set amount
 		 */
 		tapToSetAmount: () => LocalizedString
+	}
+	Accessibility: {
+		/**
+		 * Balance hidden
+		 */
+		balanceHidden: () => LocalizedString
+		/**
+		 * Copy
+		 */
+		copy: () => LocalizedString
+		/**
+		 * Delete
+		 */
+		deleteKey: () => LocalizedString
+		/**
+		 * Shows your balance on this screen
+		 */
+		revealBalanceHint: () => LocalizedString
+		/**
+		 * Switches the currency you type the amount in
+		 */
+		swapCurrencyHint: () => LocalizedString
+		/**
+		 * Switch to {wallet}
+		 */
+		switchToWallet: (arg: { wallet: string }) => LocalizedString
 	}
 	AppUpdate: {
 		/**

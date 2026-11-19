@@ -254,7 +254,6 @@ describe("locale parity", () => {
       it("interpolates the same placeholders as the English source", () => {
         expect(placeholderDrift(localeFile, parsed)).toEqual([])
       })
-
       if (localeFile in TRANSLATED_CUSTODY_TERMS) {
         it("names the account types custodial and non-custodial", () => {
           expect(translatedCustodyTerms(localeFile, parsed)).toEqual([])
@@ -264,6 +263,7 @@ describe("locale parity", () => {
           expect(missingAccountTypeTerms(parsed)).toEqual([])
         })
       }
+
     })
   })
 })

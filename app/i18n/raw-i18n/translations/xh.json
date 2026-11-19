@@ -2357,11 +2357,36 @@
     "maxFeeSelected": "Lo ngowona mrhumo uphezulu oza kubizwa ngawo kule ntengiselwano. Inokuphela incinci xa intlawulo yenziwe.",
     "invoiceAlreadyPaid": "Le invoyisi sele ihlawuliwe",
     "somethingWentWrong": "Ikhona into engahambi kakuhle",
+    "priceUpdated": "Ixabiso litshintshile, ngoko izixa zihlaziyiwe. Zijonge ngaphambi kokuba uthumele.",
     "paymentAlreadyAttempted": "Intlawulo sele izanyiwe.\n\nUkuba ufuna ukuthumela le ntlawulo kwakhona, qala ekuqaleni.",
+    "paymentMayStillLand": "Wait a moment, it will probably go through soon. Your money will arrive safely or stay with you.",
     "slideToConfirm": "Slaydisha ukuqinisekisa",
     "slideConfirming": "Iyaqinisekisa...",
+    "slideToSend": "Slaydisha ukuthumela",
+    "calculatingFee": "Ibala umrhumo…",
+    "sendProgress": {
+      "reviewing": "Iyahlola",
+      "signing": "Iyatyikitya",
+      "findingRoute": "Ifuna indlela",
+      "broadcasting": "Iyasasaza",
+      "checkingDelivery": "Ijonga ukufika",
+      "retrying": "Iphinda izama",
+      "almostThere": "Phantse sigqibile",
+      "anyTimeNow": "Nanini na ngoku",
+      "ohOh": "Hayi bo",
+      "tryingAgain": "Siphinda sizame"
+    },
     "copiedDestination": "Ikopishwe indawo ekuya kuyo kwibhodi eqhotyoshwayo",
-    "lightningRecommended": "Imirhumo iphezulu! Sincoma i-Lightning.",
+    "lightningRecommended": "Imirhumo iphezulu. Sincoma i-Lightning.",
+    "sending": "Iyathumela",
+    "sent": "Ithunyelwe",
+    "receipt": "Irisithi",
+    "fromBalance": "Ukusuka kwiBhalansi",
+    "details": "Iinkcukacha",
+    "changeAmount": "Tshintsha isixa",
+    "tryAgain": "Try again",
+    "home": "Ekhaya",
+    "dustSweepSheetTitle": "Before you send",
     "usdRemainderSweep": "Iseleyo {remaining: string} ({remainingSats: string}) iya kuguqulelwa kwiBitcoin. USD ephantsi kakhulu: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2405,8 +2430,15 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Intlawulo kufuneka ithunyelwe kwi-mempool",
     "amount": "Isixa",
+    "addAmount": "Yongeza isixa",
+    "lowFunds": "Imali ayonelanga",
     "amountExceed": "Imali idlula ibhalansi yakho {balance: string}",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
+    "limitsUnavailable": "We couldn't check your daily limit. Try again in a moment.",
+    "problemSheetTitle": "A small problem",
+    "changeDestination": "Tshintsha indawo ekuyiwa kuyo",
+    "recipientUnreachableTitle": "Couldn't reach the recipient",
+    "recipientWrongAmountTitle": "Recipient sent the wrong amount",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
     "amountIsRequired": "Imali iyafuneka",
     "cost": "Iindleko",
@@ -2456,7 +2488,8 @@
     "sdkInsufficientFunds": "Imali ayonelanga kulo msebenzi.",
     "sdkAmountTooLow": "Imali iphantsi kakhulu kumsebenzi we-on-chain.",
     "sdkNetworkError": "Impazamo yenethiwekhi. Khawujonge unxibelelwano lwakho uze uzame kwakhona.",
-    "sdkGenericError": "Ayikwazi ukuqikelela iintlawulo. Nceda uzame imali eyahlukileyo."
+    "sdkGenericError": "Ayikwazi ukuqikelela iintlawulo. Nceda uzame imali eyahlukileyo.",
+    "onchainSelfPayment": "Le yidilesi yesipaji sakho. Awungekhe uzithumelele intlawulo ye-on-chain."
   },
   "SettingsScreen": {
     "createAddress": "Yenza idilesi ye-Lightning",
@@ -2972,6 +3005,7 @@
     "note": "Note",
     "notification": "Notification",
     "ok": "KULUNGILE",
+    "okay": "Kulungile",
     "or": "okanye",
     "openWallet": "Open Wallet",
     "onchain": "Onchain",
@@ -3117,6 +3151,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Tap to set amount"
+  },
+  "Accessibility": {
+    "deleteKey": "Cima",
+    "swapCurrencyHint": "Itshintsha imali obhala ngayo isixa",
+    "switchToWallet": "Tshintshela kwi-{wallet: string}",
+    "copy": "Khuphela",
+    "balanceHidden": "Ibhalansi ifihliwe",
+    "revealBalanceHint": "Ibonisa ibhalansi yakho kwesi skrini"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",

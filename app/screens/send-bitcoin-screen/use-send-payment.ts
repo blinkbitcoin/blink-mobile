@@ -17,6 +17,7 @@ import {
   Transaction,
 } from "@app/graphql/generated"
 import { getErrorMessages } from "@app/graphql/utils"
+import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { reportError } from "@app/utils/error-logging"
 
 import {
@@ -46,6 +47,8 @@ type UseSendPaymentResult = {
    * sendPayment being defined.
    */
   hasAttemptedSend: boolean
+  /** The send went out, or is still going out: an attempt holds the lock until it fails. */
+  isSendSpent: boolean
 }
 
 /**
@@ -54,6 +57,19 @@ type UseSendPaymentResult = {
  * weakness this header exists to close.
  */
 export const IDEMPOTENCY_KEY_UNAVAILABLE = "idempotency-key-unavailable"
+
+/** Failures raised before anything is sent, so the payment can be attempted again. */
+const NOTHING_SENT_CODES: ReadonlySet<string> = new Set([
+  SelfCustodialErrorCode.InsufficientFunds,
+  SelfCustodialErrorCode.BelowMinimum,
+  SelfCustodialErrorCode.InvalidInput,
+  IDEMPOTENCY_KEY_UNAVAILABLE,
+])
+
+/** True only for a failure classified as raised before the send. Server text, an
+ *  unclassified code or no reason at all may have moved money. */
+export const isNothingSentFailure = (raw: string | undefined): boolean =>
+  raw !== undefined && NOTHING_SENT_CODES.has(raw)
 
 gql`
   mutation intraLedgerPaymentSend($input: IntraLedgerPaymentSendInput!) {
@@ -367,6 +383,7 @@ export const useSendPayment = (
 
   return {
     hasAttemptedSend,
+    isSendSpent: hasAttemptedSend && sendLocked,
     loading,
     sendPayment,
   }

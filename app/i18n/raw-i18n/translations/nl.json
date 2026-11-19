@@ -2357,11 +2357,36 @@
     "maxFeeSelected": "Dit zijn de maximale kosten die voor deze transactie in rekening worden gebracht. Het kan uiteindelijk minder zijn zodra de betaling is gedaan.",
     "invoiceAlreadyPaid": "Deze factuur is al betaald",
     "somethingWentWrong": "Er is iets misgegaan",
+    "priceUpdated": "De prijs is veranderd, dus de bedragen zijn bijgewerkt. Controleer ze voordat je verzendt.",
     "paymentAlreadyAttempted": "Betaling al geprobeerd.\n\nAls je deze betaling opnieuw wilt doen, begin dan opnieuw.",
+    "paymentMayStillLand": "Wacht even, de betaling gaat waarschijnlijk snel door. Uw geld komt veilig aan of blijft bij u.",
     "slideToConfirm": "Veeg om te bevestigen",
     "slideConfirming": "Bevestigen...",
+    "slideToSend": "Veeg om te verzenden",
+    "calculatingFee": "Kosten berekenen…",
+    "sendProgress": {
+      "reviewing": "Controleren",
+      "signing": "Ondertekenen",
+      "findingRoute": "Route zoeken",
+      "broadcasting": "Uitzenden",
+      "checkingDelivery": "Aflevering controleren",
+      "retrying": "Opnieuw proberen",
+      "almostThere": "Bijna klaar",
+      "anyTimeNow": "Elk moment nu",
+      "ohOh": "Oei",
+      "tryingAgain": "Nog een poging"
+    },
     "copiedDestination": "Bestemming naar het klembord gekopieerd",
-    "lightningRecommended": "Hoge kosten! We raden Lightning aan.",
+    "lightningRecommended": "Hoge kosten. We raden Lightning aan.",
+    "sending": "Verzenden",
+    "sent": "Verzonden",
+    "receipt": "Bon",
+    "fromBalance": "Van saldo",
+    "details": "Details",
+    "changeAmount": "Bedrag wijzigen",
+    "tryAgain": "Opnieuw proberen",
+    "home": "Thuisscherm",
+    "dustSweepSheetTitle": "Voordat u verstuurt",
     "usdRemainderSweep": "Resterend saldo {remaining: string} ({remainingSats: string}) wordt omgezet naar Bitcoin. USD-minimum: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2405,8 +2430,15 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transactie wordt naar de mempool verzonden",
     "amount": "Bedrag",
+    "addAmount": "Bedrag toevoegen",
+    "lowFunds": "Onvoldoende saldo",
     "amountExceed": "Bedrag overschrijdt uw saldo van {balance: string}",
     "amountExceedsLimit": "Bedrag overschrijdt uw resterende dagelijkse limiet van {limit: string}",
+    "limitsUnavailable": "We konden uw dagelijkse limiet niet controleren. Probeer het zo opnieuw.",
+    "problemSheetTitle": "Een klein probleem",
+    "changeDestination": "Bestemming wijzigen",
+    "recipientUnreachableTitle": "Kon de ontvanger niet bereiken",
+    "recipientWrongAmountTitle": "De ontvanger gaf een verkeerd bedrag op",
     "upgradeAccountToIncreaseLimit": "Upgrade uw account om uw limiet te verhogen",
     "amountIsRequired": "Bedrag is vereist",
     "cost": "Kosten",
@@ -2456,7 +2488,8 @@
     "sdkInsufficientFunds": "Onvoldoende saldo voor deze transactie.",
     "sdkAmountTooLow": "Het bedrag is te laag voor een on-chain transactie.",
     "sdkNetworkError": "Netwerkfout. Controleer uw verbinding en probeer het opnieuw.",
-    "sdkGenericError": "Kan kosten niet schatten. Probeer een ander bedrag."
+    "sdkGenericError": "Kan kosten niet schatten. Probeer een ander bedrag.",
+    "onchainSelfPayment": "Dit is het adres van uw eigen wallet. U kunt geen on-chain betaling naar uzelf sturen."
   },
   "SettingsScreen": {
     "createAddress": "Lightning-adres aanmaken",
@@ -2972,6 +3005,7 @@
     "note": "Noot",
     "notification": "Melding",
     "ok": "OK",
+    "okay": "Oké",
     "or": "of",
     "openWallet": "Open Wallet",
     "onchain": "Onchain",
@@ -3117,6 +3151,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Stel bedrag in"
+  },
+  "Accessibility": {
+    "deleteKey": "Wissen",
+    "swapCurrencyHint": "Wisselt de valuta waarin je het bedrag invoert",
+    "switchToWallet": "Overschakelen naar {wallet: string}",
+    "copy": "Kopiëren",
+    "balanceHidden": "Saldo verborgen",
+    "revealBalanceHint": "Toont je saldo op dit scherm"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ik moet mijn app bijwerken naar de nieuwste versie. Ik gebruik de app {os: string} met versie {version: string}.",
