@@ -1641,7 +1641,7 @@ describe("useAutoConvertListener — trying a waiting receive again", () => {
     expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1waiting")
   })
 
-  it("tries nothing when the retry comes once Anon Mode is on", async () => {
+  it("holds a retry that comes while Anon Mode is on, running it once the mode is off", async () => {
     pendingReceive()
     const { rerender } = renderHook(() => useAutoConvertListener())
     await waitFor(() => expect(mockReleaseAutoConvertAttempt).toHaveBeenCalledTimes(1))
@@ -1649,14 +1649,21 @@ describe("useAutoConvertListener — trying a waiting receive again", () => {
     mockIsAnonMode = true
     rerender({})
     await advance(DELIVERY_WINDOW_MS + RETRY_COOLDOWN_MS)
-
     expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    mockIsAnonMode = false
+    rerender({})
+
+    await waitFor(() =>
+      expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1waiting"),
+    )
+    expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(2)
   })
 
-  it("tries nothing when the retry comes once the wallet is gone", async () => {
+  it("holds a retry that comes while the wallet is gone, running it once it is back", async () => {
     pendingReceive()
     const { rerender } = renderHook(() => useAutoConvertListener())
     await waitFor(() => expect(mockReleaseAutoConvertAttempt).toHaveBeenCalledTimes(1))
+    const wallet = mockUseSelfCustodialWallet.mock.results[0].value
 
     mockUseSelfCustodialWallet.mockReturnValue({
       sdk: undefined,
@@ -1666,8 +1673,19 @@ describe("useAutoConvertListener — trying a waiting receive again", () => {
     })
     rerender({})
     await advance(DELIVERY_WINDOW_MS + RETRY_COOLDOWN_MS)
-
     expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    mockUseSelfCustodialWallet.mockReturnValue(wallet)
+    rerender({})
+
+    await waitFor(() =>
+      expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1waiting"),
+    )
+    expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(2)
+    const lookupsOnceRun = mockFindPendingAutoConvert.mock.calls.length
+    rerender({})
+    rerender({})
+    await advance(1000)
+    expect(mockFindPendingAutoConvert).toHaveBeenCalledTimes(lookupsOnceRun)
   })
 
   it("reports a retry that fails, trying nothing", async () => {

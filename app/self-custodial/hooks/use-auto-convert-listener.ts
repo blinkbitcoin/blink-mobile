@@ -435,15 +435,25 @@ export const useAutoConvertListener = (): void => {
     [processWithInFlightLock],
   )
 
+  /** A retry that comes while the listener cannot run it, with no wallet or price yet, or
+   *  in a mode that holds auto-convert, is held until it can, rather than lost: nothing
+   *  else would try that receive again in this launch. */
+  const heldRetriesRef = useRef(new Map<string, PaidReceive>())
   useEffect(() => {
-    retryReceiveRef.current = (receive) => {
-      if (!sdk || !convertMoneyAmount) return
-      const isOutOfAutoConvert = isAnonMode || !hasSparkToken
-      if (isOutOfAutoConvert) return
+    const runOrHold = (receive: PaidReceive) => {
+      const isHeldByMode = isAnonMode || !hasSparkToken
+      if (!sdk || !convertMoneyAmount || isHeldByMode) {
+        heldRetriesRef.current.set(receive.invoice, receive)
+        return
+      }
       tryPaidReceive(sdk, convertMoneyAmount, receive).catch((err) =>
         reportError("auto-convert-listener retry", err),
       )
     }
+    retryReceiveRef.current = runOrHold
+    const held = [...heldRetriesRef.current.values()]
+    heldRetriesRef.current.clear()
+    held.forEach(runOrHold)
   })
 
   useEffect(() => {
