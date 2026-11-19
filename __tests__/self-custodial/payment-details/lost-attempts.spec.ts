@@ -939,7 +939,7 @@ describe("the attempt a send stores before it goes out", () => {
     expect(saves.at(-1)).toEqual(["wallet-ahead-2", new Map()])
   })
 
-  it("is waited for until it is stored", async () => {
+  it("is waited for until it is stored, and answers as stored", async () => {
     let land: () => void = () => undefined
     scopeLostAttemptsTo("wallet-ahead-3", {
       load: async () => new Map(),
@@ -951,23 +951,24 @@ describe("the attempt a send stores before it goes out", () => {
     })
     await nextTurn()
 
-    let isWritten = false
+    let written: boolean | undefined
     lostAttemptsFor("sp1abc")
       .writeAhead(withUnresolved)
-      .written.then(() => {
-        isWritten = true
+      .written.then((isStored) => {
+        written = isStored
       })
     await nextTurn()
-    const isWrittenBeforeStored = isWritten
+    const writtenBeforeStored = written
     land()
     await nextTurn()
 
-    expect(isWrittenBeforeStored).toBe(false)
-    expect(isWritten).toBe(true)
+    expect(writtenBeforeStored).toBeUndefined()
+    expect(written).toBe(true)
   })
 
-  /** A write that does not answer must not hold the send back for good. */
-  it("is waited for only so long when the write does not answer", async () => {
+  /** A write that does not answer must not hold the send back for good, nor let it go
+   *  out with nothing stored for the next launch to look for. */
+  it("answers as not stored once the write has not answered in time", async () => {
     jest.useFakeTimers()
     scopeLostAttemptsTo("wallet-ahead-4", {
       load: async () => new Map(),
@@ -979,21 +980,21 @@ describe("the attempt a send stores before it goes out", () => {
     })
     await jest.advanceTimersByTimeAsync(0)
 
-    let isWritten = false
+    let written: boolean | undefined
     lostAttemptsFor("sp1abc")
       .writeAhead(withUnresolved)
-      .written.then(() => {
-        isWritten = true
+      .written.then((isStored) => {
+        written = isStored
       })
     await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS - 1)
-    const isWrittenBeforeTimeout = isWritten
+    const writtenBeforeTimeout = written
     await jest.advanceTimersByTimeAsync(1)
 
-    expect(isWrittenBeforeTimeout).toBe(false)
-    expect(isWritten).toBe(true)
+    expect(writtenBeforeTimeout).toBeUndefined()
+    expect(written).toBe(false)
   })
 
-  it("is waited for only so long when the write keeps failing", async () => {
+  it("answers as not stored once the write has kept failing for as long", async () => {
     jest.useFakeTimers()
     scopeLostAttemptsTo("wallet-ahead-5", {
       load: async () => new Map(),
@@ -1002,18 +1003,78 @@ describe("the attempt a send stores before it goes out", () => {
     })
     await jest.advanceTimersByTimeAsync(0)
 
-    let isWritten = false
+    let written: boolean | undefined
     lostAttemptsFor("sp1abc")
       .writeAhead(withUnresolved)
-      .written.then(() => {
-        isWritten = true
+      .written.then((isStored) => {
+        written = isStored
       })
     await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS - 1)
-    const isWrittenBeforeTimeout = isWritten
+    const writtenBeforeTimeout = written
     await jest.advanceTimersByTimeAsync(1)
 
-    expect(isWrittenBeforeTimeout).toBe(false)
-    expect(isWritten).toBe(true)
+    expect(writtenBeforeTimeout).toBeUndefined()
+    expect(written).toBe(false)
+  })
+
+  it("answers as stored once a write that failed at first lands in time", async () => {
+    jest.useFakeTimers()
+    const save = jest
+      .fn()
+      .mockRejectedValueOnce(new Error("busy"))
+      .mockResolvedValue(undefined)
+    scopeLostAttemptsTo("wallet-ahead-5b", {
+      load: async () => new Map(),
+      save,
+      remove: removeNothing,
+    })
+    await jest.advanceTimersByTimeAsync(0)
+
+    let written: boolean | undefined
+    lostAttemptsFor("sp1abc")
+      .writeAhead(withUnresolved)
+      .written.then((isStored) => {
+        written = isStored
+      })
+    await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS - 1)
+
+    expect(save).toHaveBeenCalledTimes(2)
+    expect(written).toBe(true)
+  })
+
+  it("answers as not stored when storage throws as it is asked to write", async () => {
+    scopeLostAttemptsTo("wallet-ahead-throwing", {
+      load: async () => new Map(),
+      save: () => {
+        throw new Error("storage unavailable")
+      },
+      remove: removeNothing,
+    })
+    await nextTurn()
+
+    const ahead = lostAttemptsFor("sp1abc").writeAhead(withUnresolved)
+
+    await expect(ahead.written).resolves.toBe(false)
+  })
+
+  it("answers as not stored when the wallet is deleted while it is written", async () => {
+    let land: () => void = () => undefined
+    scopeLostAttemptsTo("wallet-ahead-deleted", {
+      load: async () => new Map(),
+      save: () =>
+        new Promise<void>((resolve) => {
+          land = resolve
+        }),
+      remove: async () => undefined,
+    })
+    await nextTurn()
+
+    const ahead = lostAttemptsFor("sp1abc").writeAhead(withUnresolved)
+    await nextTurn()
+    forgetLostAttemptsOf("wallet-ahead-deleted")
+    land()
+
+    await expect(ahead.written).resolves.toBe(false)
   })
 
   it("is stored again with what came to be known, while its send is in flight", async () => {
@@ -1157,7 +1218,7 @@ describe("the attempt a send stores before it goes out", () => {
     expect(seen).toEqual({ unresolvedSend })
   })
 
-  it("has nothing to store before any wallet connected", async () => {
+  it("stores nothing before any wallet connected, so the send does not go out", async () => {
     let fresh: typeof import("@app/self-custodial/payment-details/lost-attempts")
     jest.isolateModules(() => {
       fresh = jest.requireActual("@app/self-custodial/payment-details/lost-attempts")
@@ -1167,7 +1228,7 @@ describe("the attempt a send stores before it goes out", () => {
     ahead.update(withUnresolved)
     ahead.end()
 
-    await expect(ahead.written).resolves.toBeUndefined()
+    await expect(ahead.written).resolves.toBe(false)
   })
 })
 

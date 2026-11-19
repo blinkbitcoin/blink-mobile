@@ -2079,32 +2079,73 @@ describe("a send in flight when the app closes", () => {
     expect(result.status).toBe(PaymentSendResult.Success)
   })
 
-  /** Refusing the send would guard nothing this launch's memory does not: the attempt is
-   *  held there if the send throws, and the write keeps being tried. */
-  it("goes out once it has waited long enough for its attempt to be stored", async () => {
+  /** An app closed with the send in flight would leave the next launch nothing to look
+   *  for before paying again, so a send whose attempt is not stored does not go out. */
+  it.each([
+    [
+      "storage never answers",
+      () =>
+        new Promise<void>(() => {
+          /** never answers */
+        }),
+    ],
+    ["the write keeps failing", () => Promise.reject(new Error("disk full"))],
+  ])(
+    "does not go out when its attempt cannot be stored in time, as %s",
+    async (label, save) => {
+      jest.useFakeTimers()
+      scopeLostAttemptsTo(`wallet-closed-8-${label}`, {
+        load: async () => new Map(),
+        save,
+        remove: async () => undefined,
+      })
+      mockPrepareSendPayment.mockResolvedValue(sparkAddress())
+      const ref = {}
+
+      const pending = attempt(
+        createSendMutation(btcSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
+        ref,
+      )
+      await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS)
+      const result = await pending
+
+      expect(result.status).toBe(PaymentSendResult.Failure)
+      expect(mockSendPayment).not.toHaveBeenCalled()
+    },
+  )
+
+  it("pays nothing twice across a restart when its attempt was never stored", async () => {
     jest.useFakeTimers()
-    scopeLostAttemptsTo("wallet-closed-8", {
+    scopeLostAttemptsTo("wallet-closed-never-stored", {
       load: async () => new Map(),
       save: () =>
         new Promise(() => {
-          /** never answers */
+          /** never answers: the app closes first */
         }),
       remove: async () => undefined,
     })
     mockPrepareSendPayment.mockResolvedValue(sparkAddress())
     const ref = {}
-
     const pending = attempt(
       createSendMutation(btcSpark, { telemetry: TELEMETRY, idempotencyKeyRef: ref }),
       ref,
     )
-    await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS - 1)
-    const sentBeforeTimeout = mockSendPayment.mock.calls.length
-    await jest.advanceTimersByTimeAsync(1)
-    const result = await pending
+    await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS)
+    const refused = await pending
+    const sentBeforeRestart = mockSendPayment.mock.calls.length
+    jest.useRealTimers()
 
-    expect(sentBeforeTimeout).toBe(0)
-    expect(result.status).toBe(PaymentSendResult.Success)
+    const { storage } = storageAcrossLaunches()
+    const onNextLaunch = await sendOnNextLaunch(
+      "wallet-closed-never-stored",
+      storage,
+      btcSpark,
+    )
+
+    expect(refused.status).toBe(PaymentSendResult.Failure)
+    expect(sentBeforeRestart).toBe(0)
+    expect(onNextLaunch.status).toBe(PaymentSendResult.Success)
+    expect(mockSendPayment).toHaveBeenCalledTimes(1)
   })
 
   /** Read alongside the quote, the wallet's clock is most often known by then. */

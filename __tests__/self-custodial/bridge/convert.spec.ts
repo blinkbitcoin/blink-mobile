@@ -2233,28 +2233,91 @@ describe("a conversion in flight when the app closes", () => {
     await executing
   })
 
-  it("goes out after a moment when its attempt cannot be stored", async () => {
-    scopeLostAttemptsTo("wallet-unstored", {
-      ...noStoredAttempts,
+  it.each([
+    [
+      "storage never answers",
+      () =>
+        new Promise<void>(() => {
+          /** never answers */
+        }),
+    ],
+    ["the write keeps failing", () => Promise.reject(new Error("disk full"))],
+  ])(
+    "does not go out when its attempt cannot be stored in time, as %s",
+    async (label, save) => {
+      scopeLostAttemptsTo(`wallet-unstored-${label}`, { ...noStoredAttempts, save })
+      const sdk = walletSdk()
+      const quote = await createGetConversionQuote(sdk as never)(params)
+      jest.useFakeTimers()
+      try {
+        const executing = quote!.execute()
+        await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS)
+        const result = await executing
+
+        expect(result.errors?.[0].code).toBe(ConvertErrorCode.HistoryUnavailable)
+        expect(sdk.sendPayment).not.toHaveBeenCalled()
+      } finally {
+        jest.useRealTimers()
+      }
+    },
+  )
+
+  it("converts nothing twice across a restart when its attempt was never stored", async () => {
+    const sdk = walletSdk()
+    scopeLostAttemptsTo("wallet-never-stored", {
+      load: async () => new Map(),
       save: () =>
         new Promise<void>(() => {
-          /** storage never answers */
+          /** never answers: the app closes first */
         }),
+      remove: async () => undefined,
+    })
+    const quote = await createGetConversionQuote(sdk as never)(params)
+    jest.useFakeTimers()
+    let refused: Awaited<ReturnType<NonNullable<typeof quote>["execute"]>>
+    try {
+      const executing = quote!.execute()
+      await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS)
+      refused = await executing
+    } finally {
+      jest.useRealTimers()
+    }
+    const callsBeforeRestart = sdk.sendPayment.mock.calls.length
+
+    const { storage } = storageAcrossLaunches()
+    const onNextLaunch = await convertOnNextLaunch("wallet-never-stored", storage, sdk)
+
+    expect(refused.errors?.[0].code).toBe(ConvertErrorCode.HistoryUnavailable)
+    expect(callsBeforeRestart).toBe(0)
+    expect(onNextLaunch.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("takes back the attempt it could not store, leaving nothing to look for", async () => {
+    let failSaves = true
+    const saves: Array<Map<string, LostAttempts>> = []
+    scopeLostAttemptsTo("wallet-taken-back", {
+      ...noStoredAttempts,
+      save: async (_walletId, attempts) => {
+        if (failSaves) throw new Error("disk full")
+        saves.push(new Map(attempts))
+      },
     })
     const sdk = walletSdk()
     const quote = await createGetConversionQuote(sdk as never)(params)
     jest.useFakeTimers()
     try {
       const executing = quote!.execute()
-      await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS - 1)
-      expect(sdk.sendPayment).not.toHaveBeenCalled()
-
-      await jest.advanceTimersByTimeAsync(1)
-      expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+      await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS)
       await executing
+      failSaves = false
+      await jest.advanceTimersByTimeAsync(60_000)
     } finally {
       jest.useRealTimers()
     }
+
+    expect(saves.at(-1)?.get(OWN_CONVERSIONS)).toBeUndefined()
+    expect(sdk.sendPayment).not.toHaveBeenCalled()
   })
 
   it("takes its attempt back before anything else is stored once the SDK answers", async () => {

@@ -636,12 +636,15 @@ const convertAfterEarlierConversions = async (
   }
   /** Stored before the conversion goes out, and waited for a moment: the app can be
    *  closed with it in flight, and the next launch must look for it before converting
-   *  again. */
+   *  again. Not stored in time, it does not go out; the end of its turn takes it back. */
   const writtenAhead = attempts.writeAhead((current) => ({
     ...current,
     lostConversion: lost,
   }))
-  await writtenAhead.written
+  const isStoredAhead = await writtenAhead.written
+  if (!isStoredAhead) {
+    return failed(HISTORY_UNAVAILABLE_MESSAGE, ConvertErrorCode.HistoryUnavailable)
+  }
 
   try {
     const response = await sdk.sendPayment(

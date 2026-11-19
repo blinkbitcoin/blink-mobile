@@ -147,24 +147,30 @@ export const STORED_ATTEMPTS_WRITE_RETRY_DELAY_MS = 500
 export const STORED_ATTEMPTS_WRITE_RETRY_MAX_DELAY_MS = 30_000
 
 /** How long a send waits for the attempt it is about to make to be stored; past it, it
- *  goes out all the same, as it would if the write had failed. */
+ *  does not go out, as it would not had the write failed. */
 export const STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS = 2000
 
 /**
- * The attempt a send stored before it went out. `written`: once it is stored, or once the
- * send has waited for it long enough. `update`: stores it again with what came to be known
- * since, for as long as the send is in flight. `end`: takes it back as soon as the send's
- * outcome needs it no more, before anything else is stored: a send the SDK answered must
- * leave no trace an app closed right after would take for one lost.
+ * The attempt a send stored before it went out. `written`: whether it is stored, answered
+ * once it is, or as not stored once the write failed, nothing may be written, or the send
+ * has waited for it long enough; a send whose attempt is not stored does not go out, since
+ * an app closed with it in flight would leave the next launch nothing to look for before
+ * paying again. `update`: stores it again with what came to be known since, for as long as
+ * the send is in flight. `end`: takes it back as soon as the send's outcome needs it no
+ * more, before anything else is stored: a send the SDK answered must leave no trace an
+ * app closed right after would take for one lost. One that did not go out is taken back
+ * as its turn ends.
  */
 export type AttemptWrittenAhead = {
-  written: Promise<void>
+  written: Promise<boolean>
   update: (attempt: (current: LostAttempts) => LostAttempts) => void
   end: () => void
 }
 
+/** With no wallet's storage in place there is nowhere to store the attempt, so it is
+ *  never stored, and the send does not go out. */
 const NOTHING_WRITTEN_AHEAD: AttemptWrittenAhead = {
-  written: Promise.resolve(),
+  written: Promise.resolve(false),
   update: () => undefined,
   end: () => undefined,
 }
@@ -286,8 +292,9 @@ const noop = () => undefined
  * A send's attempt is stored before the send goes out, and stays stored while it is in
  * flight: the app can be closed before the SDK answers, and an attempt recorded only once
  * it has would be gone with the app, leaving the next launch nothing to look for before
- * paying again. It is stored with the attempts held and never put into them, since those
- * are what a send settles by its outcome.
+ * paying again. So a send whose attempt is not stored in time does not go out at all. It
+ * is stored with the attempts held and never put into them, since those are what a send
+ * settles by its outcome.
  */
 const persistWalletAttempts = (
   walletId: string,
@@ -383,12 +390,14 @@ const persistWalletAttempts = (
     return stored
   }
 
-  const write = async () => {
+  /** Whether the attempts it wrote stay stored: saved, and the wallet not forgotten. */
+  const write = async (): Promise<boolean> => {
     const isSaved = await writeUntilTaken(
       () => storage.save(walletId, toStore()),
       mayWrite,
     )
     if (isSaved) await removeIfForgotten()
+    return isSaved && !isForgotten
   }
 
   /** The read a send started again, which every send waits for while it runs, until one
@@ -409,12 +418,14 @@ const persistWalletAttempts = (
     })
   }
 
-  let lastWrite: Promise<void> = firstRead
-  /** Settles once that write has stored the attempts, or once nothing may be written. */
-  const keep = (): Promise<void> => {
-    lastWrite = lastWrite.then(write).catch(noop)
+  let lastWrite: Promise<unknown> = firstRead
+  /** Settles once that write has stored the attempts, as stored, or once nothing may be
+   *  written, as not. */
+  const keep = (): Promise<boolean> => {
+    const thisWrite = lastWrite.then(write).catch(() => false)
+    lastWrite = thisWrite
     retryWriteNow()
-    return lastWrite
+    return thisWrite
   }
 
   const writeAhead = (
@@ -427,7 +438,10 @@ const persistWalletAttempts = (
       keep(),
       STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS,
       "Lost attempt write ahead",
-    ).then(noop, noop)
+    ).then(
+      (isStored) => isStored,
+      () => false,
+    )
     /** A send that has finished has nothing in flight to update or take back, and the
      *  next send to the destination stores its own attempt. */
     const isStillInFlight = () => inFlight.get(destination) === ahead

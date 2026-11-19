@@ -877,8 +877,9 @@ const sendAfterEarlierAttempts = async <
         : { ...current, unresolvedSend: unresolvedAttempt }
 
   /** Stored before the send goes out, and waited for a moment: the app can be closed with
-   *  the send in flight, and the next launch must look for it before paying again. The
-   *  wallet's clock goes with it once read, if it was not yet. */
+   *  the send in flight, and the next launch must look for it before paying again. Not
+   *  stored in time, it does not go out; the end of its turn takes it back. The wallet's
+   *  clock goes with it once read, if it was not yet. */
   const writtenAhead = attempts.writeAhead(lostAttemptAt(walletClockKnown ?? 0))
   const isClockStillToCome = identity !== undefined && walletClockKnown === undefined
   if (isClockStillToCome) {
@@ -886,7 +887,10 @@ const sendAfterEarlierAttempts = async <
       writtenAhead.update(lostAttemptAt(walletClockSec)),
     )
   }
-  await writtenAhead.written
+  const isStoredAhead = await writtenAhead.written
+  if (!isStoredAhead) {
+    return failure(new Error("Attempt not stored before the send"))
+  }
 
   /** Only the SDK call itself decides whether the send went out, whether it rejects or
    *  throws on the spot: whatever is done with its answer afterwards runs outside, where
