@@ -1,5 +1,6 @@
 import React from "react"
-import { act, render } from "@testing-library/react-native"
+import { AppState } from "react-native"
+import { act, fireEvent, render } from "@testing-library/react-native"
 import { mnemonicToEntropy, wordlists } from "bip39"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -15,12 +16,16 @@ type ReadCode = (event: {
   nativeEvent: { codeStringValue?: string; codeRawBase64?: string }
 }) => void
 
+type CameraError = (event: { nativeEvent: { errorMessage: string } }) => void
+
 let lastReadCode: ReadCode | null = null
+let lastCameraError: CameraError | null = null
 jest.mock("react-native-camera-kit", () => {
   const ReactImpl = jest.requireActual("react")
   return {
-    Camera: (props: { onReadCode?: ReadCode }) => {
+    Camera: (props: { onReadCode?: ReadCode; onError?: CameraError }) => {
       lastReadCode = props.onReadCode ?? null
+      lastCameraError = props.onError ?? null
       return ReactImpl.createElement("Camera")
     },
     CameraType: { Back: "back" },
@@ -28,9 +33,10 @@ jest.mock("react-native-camera-kit", () => {
 })
 
 const mockCheck = jest.fn()
+const mockRequest = jest.fn()
 jest.mock("react-native-permissions", () => ({
   check: (...args: unknown[]) => mockCheck(...args),
-  request: jest.fn().mockResolvedValue("denied"),
+  request: (...args: unknown[]) => mockRequest(...args),
   PERMISSIONS: { IOS: { CAMERA: "ios-camera" }, ANDROID: { CAMERA: "android-camera" } },
   RESULTS: { GRANTED: "granted", UNAVAILABLE: "unavailable" },
 }))
@@ -50,6 +56,11 @@ type ToastArgs = {
 const mockToastShow = jest.fn<void, [ToastArgs]>()
 jest.mock("@app/utils/toast", () => ({
   toastShow: (args: ToastArgs) => mockToastShow(args),
+}))
+
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
 }))
 
 const mockAcquireScreenSecurity = jest.fn()
@@ -83,11 +94,30 @@ const scan = (nativeEvent: { codeStringValue?: string; codeRawBase64?: string })
   act(() => readCode({ nativeEvent }))
 }
 
+const appStateListeners = new Set<(state: string) => void>()
+
+const bringAppToFront = async () => {
+  await act(async () => {
+    appStateListeners.forEach((listener) => listener("active"))
+  })
+  await flushEffects()
+}
+
 describe("SeedQrScannerScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     lastReadCode = null
+    lastCameraError = null
+    appStateListeners.clear()
+    jest.spyOn(AppState, "addEventListener").mockImplementation(((
+      event: string,
+      listener: (state: string) => void,
+    ) => {
+      if (event === "change") appStateListeners.add(listener)
+      return { remove: () => appStateListeners.delete(listener) }
+    }) as unknown as typeof AppState.addEventListener)
     mockCheck.mockResolvedValue("granted")
+    mockRequest.mockResolvedValue("denied")
     mockAcquireScreenSecurity.mockReturnValue({
       ready: Promise.resolve(),
       release: jest.fn(() => Promise.resolve()),
@@ -190,5 +220,50 @@ describe("SeedQrScannerScreen", () => {
     expect(getByText(LL.ScanningQRCodeScreen.permissionCamera())).toBeTruthy()
     expect(getByText(LL.ScanningQRCodeScreen.openSettings())).toBeTruthy()
     expect(lastReadCode).toBeNull()
+  })
+
+  it("opens the camera on return from Settings once access is granted there", async () => {
+    mockCheck.mockResolvedValue("denied")
+    const { getByText } = await renderScanner()
+    expect(getByText(LL.ScanningQRCodeScreen.permissionCamera())).toBeTruthy()
+    expect(mockRequest).toHaveBeenCalledTimes(1)
+
+    mockCheck.mockResolvedValue("granted")
+    await bringAppToFront()
+
+    expect(lastReadCode).not.toBeNull()
+    expect(mockRequest).toHaveBeenCalledTimes(1)
+  })
+
+  it("stays on the permission screen when Settings still denies the camera", async () => {
+    mockCheck.mockResolvedValue("blocked")
+    mockRequest.mockResolvedValue("blocked")
+    const { getByText } = await renderScanner()
+
+    await bringAppToFront()
+
+    expect(getByText(LL.ScanningQRCodeScreen.permissionCamera())).toBeTruthy()
+    expect(lastReadCode).toBeNull()
+    expect(mockRequest).toHaveBeenCalledTimes(1)
+  })
+
+  it("takes down a camera that failed to start and offers Try Again or Back", async () => {
+    const { getByText, getByTestId } = await renderScanner()
+    const cameraError = lastCameraError
+    if (!cameraError) throw new Error("camera has no error handler")
+
+    lastReadCode = null
+    act(() => cameraError({ nativeEvent: { errorMessage: "CameraX bind failed" } }))
+
+    expect(lastReadCode).toBeNull()
+    expect(getByText(LL.RestoreScreen.seedQrCameraFailed())).toBeTruthy()
+    expect(mockReportError).toHaveBeenCalledTimes(1)
+    expect(String(mockReportError.mock.calls[0][1])).not.toContain("CameraX")
+
+    fireEvent.press(getByTestId("seed-qr-scanner-back"))
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+
+    fireEvent.press(getByTestId("seed-qr-scanner-retry"))
+    expect(lastReadCode).not.toBeNull()
   })
 })

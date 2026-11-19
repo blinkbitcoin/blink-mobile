@@ -4098,7 +4098,8 @@
     "seedQrInvalid": "Bu SeedQR geçerli bir yedekleme ifadesi değil.",
     "seedQrOnly12Words": "Blink yalnızca 12 kelimelik yedekleme ifadelerini geri yükler.",
     "seedQrNotSeedQr": "Bu geçerli bir SeedQR değil.",
-    "seedQrUnreadable": "Bu SeedQR okunamadı. Tekrar deneyin."
+    "seedQrUnreadable": "Bu SeedQR okunamadı. Tekrar deneyin.",
+    "seedQrCameraFailed": "Kamera başlatılamadı. Tekrar deneyin."
   },
   "EmergencyRecovery": {
     "outageTitle": "Operatöre ulaşılamıyor",

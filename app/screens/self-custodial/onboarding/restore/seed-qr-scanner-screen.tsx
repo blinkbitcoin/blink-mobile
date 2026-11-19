@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import {
   Alert,
+  AppState,
   Linking,
   Platform,
   Pressable,
@@ -19,11 +20,13 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { Screen } from "@app/components/screen"
 import { ScreenSecurityGate } from "@app/components/screen-security-gate"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
+import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
 
@@ -31,6 +34,9 @@ import { decodeSeedQr, SeedQrStatus } from "./seed-qr"
 
 const CLOSE_BUTTON_GAP = 16
 const LABEL_GAP = 30
+
+const CAMERA_PERMISSION =
+  Platform.OS === "ios" ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA
 
 type RejectedStatus = Exclude<SeedQrStatus, typeof SeedQrStatus.Ok>
 
@@ -63,6 +69,7 @@ const SeedQrScannerContent: React.FC = () => {
 
   const [hasPermission, setHasPermission] = useState(false)
   const [isCameraUnavailable, setIsCameraUnavailable] = useState(false)
+  const [hasCameraFailed, setHasCameraFailed] = useState(false)
   /** The camera reports the same code many times a second: one scan is acted on, and a
    *  rejection toasts once until it hides. */
   const doneRef = useRef(false)
@@ -70,21 +77,42 @@ const SeedQrScannerContent: React.FC = () => {
 
   useEffect(() => {
     const checkPermission = async () => {
-      const permission =
-        Platform.OS === "ios" ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA
-      const result = await check(permission)
+      const result = await check(CAMERA_PERMISSION)
       if (result === RESULTS.GRANTED) {
         setHasPermission(true)
         return
       }
-      const requestResult = await request(permission)
+      const requestResult = await request(CAMERA_PERMISSION)
       if (requestResult === RESULTS.UNAVAILABLE) {
         setIsCameraUnavailable(true)
         return
       }
-      setHasPermission(requestResult === RESULTS.GRANTED)
+      if (requestResult === RESULTS.GRANTED) setHasPermission(true)
     }
     checkPermission()
+  }, [])
+
+  /** Access granted in Settings only shows once the app is back in front: check again
+   *  then, without asking again. */
+  useEffect(() => {
+    if (hasPermission) return undefined
+    let isMounted = true
+    const subscription = AppState.addEventListener("change", async (state) => {
+      if (state !== "active") return
+      const result = await check(CAMERA_PERMISSION)
+      if (isMounted && result === RESULTS.GRANTED) setHasPermission(true)
+    })
+    return () => {
+      isMounted = false
+      subscription.remove()
+    }
+  }, [hasPermission])
+
+  /** The native message stays out of the report: only the fact that the camera
+   *  did not start is sent. */
+  const handleCameraError = useCallback(() => {
+    reportError("seed-qr-scanner", new Error("SeedQR scanner camera failed to start"))
+    setHasCameraFailed(true)
   }, [])
 
   const handleReadCode = useCallback(
@@ -131,6 +159,30 @@ const SeedQrScannerContent: React.FC = () => {
     )
   }
 
+  if (hasCameraFailed) {
+    return (
+      <Screen headerShown={false}>
+        <View style={styles.permissionMissing}>
+          <Text type="h1" style={styles.permissionMissingText}>
+            {LL.RestoreScreen.seedQrCameraFailed()}
+          </Text>
+          <View style={styles.cameraFailedButtons}>
+            <GaloyPrimaryButton
+              title={LL.common.tryAgain()}
+              onPress={() => setHasCameraFailed(false)}
+              {...testProps("seed-qr-scanner-retry")}
+            />
+            <GaloySecondaryButton
+              title={LL.common.back()}
+              onPress={navigation.goBack}
+              {...testProps("seed-qr-scanner-back")}
+            />
+          </View>
+        </View>
+      </Screen>
+    )
+  }
+
   if (!hasPermission) {
     const openSettings = () => {
       Linking.openSettings().catch(() => {
@@ -163,6 +215,7 @@ const SeedQrScannerContent: React.FC = () => {
           scanBarcode={true}
           allowedBarcodeTypes={["qr"]}
           onReadCode={handleReadCode}
+          onError={handleCameraError}
           style={StyleSheet.absoluteFill}
         />
       )}
@@ -242,6 +295,11 @@ const useStyles = makeStyles(
     permissionMissingText: {
       width: "80%",
       textAlign: "center",
+    },
+    cameraFailedButtons: {
+      alignSelf: "stretch",
+      paddingHorizontal: 20,
+      rowGap: 12,
     },
   }),
 )

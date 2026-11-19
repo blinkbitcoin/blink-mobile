@@ -4098,7 +4098,8 @@
     "seedQrInvalid": "Այս SeedQR-ը վավեր պահեստային արտահայտություն չէ:",
     "seedQrOnly12Words": "Blink-ը վերականգնում է միայն 12 բառից բաղկացած պահեստային արտահայտություններ:",
     "seedQrNotSeedQr": "Սա վավեր SeedQR չէ:",
-    "seedQrUnreadable": "Չհաջողվեց կարդալ այս SeedQR-ը: Փորձեք կրկին:"
+    "seedQrUnreadable": "Չհաջողվեց կարդալ այս SeedQR-ը: Փորձեք կրկին:",
+    "seedQrCameraFailed": "Չհաջողվեց միացնել տեսախցիկը: Փորձեք կրկին:"
   },
   "EmergencyRecovery": {
     "outageTitle": "Օպերատորն անհասանելի է",

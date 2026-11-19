@@ -4098,7 +4098,8 @@
         "seedQrInvalid": "Ce SeedQR n'est pas une phrase de sauvegarde valide.",
         "seedQrOnly12Words": "Blink restaure uniquement les phrases de sauvegarde de 12 mots.",
         "seedQrNotSeedQr": "Ce n'est pas un SeedQR valide.",
-        "seedQrUnreadable": "Impossible de lire ce SeedQR. Réessayez."
+        "seedQrUnreadable": "Impossible de lire ce SeedQR. Réessayez.",
+        "seedQrCameraFailed": "Impossible de démarrer l'appareil photo. Réessayez."
     },
     "EmergencyRecovery": {
         "outageTitle": "Opérateur injoignable",

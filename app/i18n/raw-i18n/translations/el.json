@@ -4098,7 +4098,8 @@
     "seedQrInvalid": "Αυτό το SeedQR δεν είναι έγκυρη φράση αντιγράφου ασφαλείας.",
     "seedQrOnly12Words": "Το Blink επαναφέρει μόνο φράσεις αντιγράφου ασφαλείας 12 λέξεων.",
     "seedQrNotSeedQr": "Αυτό δεν είναι έγκυρο SeedQR.",
-    "seedQrUnreadable": "Δεν ήταν δυνατή η ανάγνωση αυτού του SeedQR. Δοκιμάστε ξανά."
+    "seedQrUnreadable": "Δεν ήταν δυνατή η ανάγνωση αυτού του SeedQR. Δοκιμάστε ξανά.",
+    "seedQrCameraFailed": "Δεν ήταν δυνατή η εκκίνηση της κάμερας. Δοκιμάστε ξανά."
   },
   "EmergencyRecovery": {
     "outageTitle": "Ο πάροχος δεν είναι προσβάσιμος",

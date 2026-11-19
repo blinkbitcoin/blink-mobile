@@ -4098,7 +4098,8 @@
     "seedQrInvalid": "SeedQR này không phải là cụm từ sao lưu hợp lệ.",
     "seedQrOnly12Words": "Blink chỉ khôi phục cụm từ sao lưu 12 từ.",
     "seedQrNotSeedQr": "Đây không phải là SeedQR hợp lệ.",
-    "seedQrUnreadable": "Không thể đọc SeedQR này. Vui lòng thử lại."
+    "seedQrUnreadable": "Không thể đọc SeedQR này. Vui lòng thử lại.",
+    "seedQrCameraFailed": "Không thể khởi động máy ảnh. Vui lòng thử lại."
   },
   "EmergencyRecovery": {
     "outageTitle": "Không kết nối được nhà vận hành",

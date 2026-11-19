@@ -4098,7 +4098,8 @@
     "seedQrInvalid": "SeedQR hii si kifungu cha akiba sahihi.",
     "seedQrOnly12Words": "Blink hurejesha vifungu vya akiba vya maneno 12 pekee.",
     "seedQrNotSeedQr": "Hii si SeedQR sahihi.",
-    "seedQrUnreadable": "Imeshindwa kusoma SeedQR hii. Jaribu tena."
+    "seedQrUnreadable": "Imeshindwa kusoma SeedQR hii. Jaribu tena.",
+    "seedQrCameraFailed": "Imeshindwa kuwasha kamera. Jaribu tena."
   },
   "EmergencyRecovery": {
     "outageTitle": "Mwendeshaji hapatikani",

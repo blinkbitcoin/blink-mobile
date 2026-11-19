@@ -4098,7 +4098,8 @@
     "seedQrInvalid": "Aquest SeedQR no és una frase de còpia de seguretat vàlida.",
     "seedQrOnly12Words": "Blink només restaura frases de còpia de seguretat de 12 paraules.",
     "seedQrNotSeedQr": "Això no és un SeedQR vàlid.",
-    "seedQrUnreadable": "No s'ha pogut llegir aquest SeedQR. Torna-ho a intentar."
+    "seedQrUnreadable": "No s'ha pogut llegir aquest SeedQR. Torna-ho a intentar.",
+    "seedQrCameraFailed": "No s'ha pogut iniciar la càmera. Torna-ho a intentar."
   },
   "EmergencyRecovery": {
     "outageTitle": "Operador inaccessible",

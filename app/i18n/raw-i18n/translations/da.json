@@ -4098,7 +4098,8 @@
     "seedQrInvalid": "Denne SeedQR er ikke en gyldig backup-frase.",
     "seedQrOnly12Words": "Blink gendanner kun backup-fraser på 12 ord.",
     "seedQrNotSeedQr": "Dette er ikke en gyldig SeedQR.",
-    "seedQrUnreadable": "Kunne ikke læse denne SeedQR. Prøv igen."
+    "seedQrUnreadable": "Kunne ikke læse denne SeedQR. Prøv igen.",
+    "seedQrCameraFailed": "Kunne ikke starte kameraet. Prøv igen."
   },
   "EmergencyRecovery": {
     "outageTitle": "Operatør kan ikke nås",

@@ -4098,7 +4098,8 @@
     "seedQrInvalid": "Le SeedQR ayilobinzana lokugcina elisebenzayo.",
     "seedQrOnly12Words": "I-Blink ibuyisela kuphela amabinzana okugcina anamagama ali-12.",
     "seedQrNotSeedQr": "Le ayisiyo SeedQR esebenzayo.",
-    "seedQrUnreadable": "Ayikwazanga ukufunda le SeedQR. Zama kwakhona."
+    "seedQrUnreadable": "Ayikwazanga ukufunda le SeedQR. Zama kwakhona.",
+    "seedQrCameraFailed": "Ayikwazanga ukuqalisa ikhamera. Zama kwakhona."
   },
   "EmergencyRecovery": {
     "outageTitle": "Umqhubi akafikeleleki",

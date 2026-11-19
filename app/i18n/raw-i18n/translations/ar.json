@@ -4098,7 +4098,8 @@
     "seedQrInvalid": "رمز SeedQR هذا ليس عبارة نسخ احتياطي صحيحة.",
     "seedQrOnly12Words": "يستعيد Blink عبارات النسخ الاحتياطي المكونة من 12 كلمة فقط.",
     "seedQrNotSeedQr": "هذا ليس رمز SeedQR صالحًا.",
-    "seedQrUnreadable": "تعذّرت قراءة رمز SeedQR هذا. حاول مرة أخرى."
+    "seedQrUnreadable": "تعذّرت قراءة رمز SeedQR هذا. حاول مرة أخرى.",
+    "seedQrCameraFailed": "تعذّر تشغيل الكاميرا. حاول مرة أخرى."
   },
   "EmergencyRecovery": {
     "outageTitle": "تعذّر الوصول إلى المشغّل",

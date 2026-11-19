@@ -4098,7 +4098,8 @@
     "seedQrInvalid": "Овај SeedQR није важећа резервна фраза.",
     "seedQrOnly12Words": "Blink враћа само резервне фразе од 12 речи.",
     "seedQrNotSeedQr": "Ово није важећи SeedQR.",
-    "seedQrUnreadable": "Није могуће прочитати овај SeedQR. Покушајте поново."
+    "seedQrUnreadable": "Није могуће прочитати овај SeedQR. Покушајте поново.",
+    "seedQrCameraFailed": "Није могуће покренути камеру. Покушајте поново."
   },
   "EmergencyRecovery": {
     "outageTitle": "Оператер није доступан",

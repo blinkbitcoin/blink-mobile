@@ -4098,7 +4098,8 @@
     "seedQrInvalid": "Deze SeedQR is geen geldige back-upzin.",
     "seedQrOnly12Words": "Blink herstelt alleen back-upzinnen van 12 woorden.",
     "seedQrNotSeedQr": "Dit is geen geldige SeedQR.",
-    "seedQrUnreadable": "Kan deze SeedQR niet lezen. Probeer opnieuw."
+    "seedQrUnreadable": "Kan deze SeedQR niet lezen. Probeer opnieuw.",
+    "seedQrCameraFailed": "Kan de camera niet starten. Probeer opnieuw."
   },
   "EmergencyRecovery": {
     "outageTitle": "Operator onbereikbaar",

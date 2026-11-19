@@ -4098,7 +4098,8 @@
     "seedQrInvalid": "Acest SeedQR nu este o frază de backup validă.",
     "seedQrOnly12Words": "Blink restaurează doar fraze de backup de 12 cuvinte.",
     "seedQrNotSeedQr": "Acesta nu este un SeedQR valid.",
-    "seedQrUnreadable": "Nu s-a putut citi acest SeedQR. Încearcă din nou."
+    "seedQrUnreadable": "Nu s-a putut citi acest SeedQR. Încearcă din nou.",
+    "seedQrCameraFailed": "Camera nu a putut porni. Încearcă din nou."
   },
   "EmergencyRecovery": {
     "outageTitle": "Operator inaccesibil",

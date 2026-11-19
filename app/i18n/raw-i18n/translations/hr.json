@@ -4098,7 +4098,8 @@
     "seedQrInvalid": "Ovaj SeedQR nije ispravna pričuvna fraza.",
     "seedQrOnly12Words": "Blink vraća samo pričuvne fraze od 12 riječi.",
     "seedQrNotSeedQr": "Ovo nije ispravan SeedQR.",
-    "seedQrUnreadable": "Ovaj SeedQR nije moguće pročitati. Pokušajte ponovno."
+    "seedQrUnreadable": "Ovaj SeedQR nije moguće pročitati. Pokušajte ponovno.",
+    "seedQrCameraFailed": "Kameru nije moguće pokrenuti. Pokušajte ponovno."
   },
   "EmergencyRecovery": {
     "outageTitle": "Operater nedostupan",

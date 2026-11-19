@@ -4324,6 +4324,7 @@ const en: BaseTranslation = {
     seedQrOnly12Words: "Blink restores 12-word backup phrases only.",
     seedQrNotSeedQr: "This isn't a valid SeedQR.",
     seedQrUnreadable: "Couldn't read this SeedQR. Try again.",
+    seedQrCameraFailed: "Couldn't start the camera. Try again.",
   },
   EmergencyRecovery: {
     // Restore could not reach the Spark operators.

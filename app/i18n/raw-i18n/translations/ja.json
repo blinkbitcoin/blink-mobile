@@ -4098,7 +4098,8 @@
         "seedQrInvalid": "このSeedQRは有効なバックアップフレーズではありません。",
         "seedQrOnly12Words": "Blinkで復元できるのは12単語のバックアップフレーズのみです。",
         "seedQrNotSeedQr": "有効なSeedQRではありません。",
-        "seedQrUnreadable": "このSeedQRを読み取れませんでした。もう一度お試しください。"
+        "seedQrUnreadable": "このSeedQRを読み取れませんでした。もう一度お試しください。",
+        "seedQrCameraFailed": "カメラを起動できませんでした。もう一度お試しください。"
     },
     "EmergencyRecovery": {
         "outageTitle": "オペレーターに接続できません",

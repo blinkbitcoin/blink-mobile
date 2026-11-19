@@ -4098,7 +4098,8 @@
     "seedQrInvalid": "Tento SeedQR není platná záložní fráze.",
     "seedQrOnly12Words": "Blink obnovuje pouze záložní fráze o 12 slovech.",
     "seedQrNotSeedQr": "Toto není platný SeedQR.",
-    "seedQrUnreadable": "Tento SeedQR se nepodařilo přečíst. Zkuste to znovu."
+    "seedQrUnreadable": "Tento SeedQR se nepodařilo přečíst. Zkuste to znovu.",
+    "seedQrCameraFailed": "Fotoaparát se nepodařilo spustit. Zkuste to znovu."
   },
   "EmergencyRecovery": {
     "outageTitle": "Operátor je nedostupný",

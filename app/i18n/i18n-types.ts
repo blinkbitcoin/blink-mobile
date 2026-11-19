@@ -13699,6 +13699,10 @@ type RootTranslation = {
 		 * C​o​u​l​d​n​'​t​ ​r​e​a​d​ ​t​h​i​s​ ​S​e​e​d​Q​R​.​ ​T​r​y​ ​a​g​a​i​n​.
 		 */
 		seedQrUnreadable: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​s​t​a​r​t​ ​t​h​e​ ​c​a​m​e​r​a​.​ ​T​r​y​ ​a​g​a​i​n​.
+		 */
+		seedQrCameraFailed: string
 	}
 	EmergencyRecovery: {
 		/**
@@ -27962,6 +27966,10 @@ export type TranslationFunctions = {
 		 * Couldn't read this SeedQR. Try again.
 		 */
 		seedQrUnreadable: () => LocalizedString
+		/**
+		 * Couldn't start the camera. Try again.
+		 */
+		seedQrCameraFailed: () => LocalizedString
 	}
 	EmergencyRecovery: {
 		/**

@@ -4098,7 +4098,8 @@
     "seedQrInvalid": "SeedQR นี้ไม่ใช่วลีสำรองที่ถูกต้อง",
     "seedQrOnly12Words": "Blink กู้คืนได้เฉพาะวลีสำรอง 12 คำเท่านั้น",
     "seedQrNotSeedQr": "นี่ไม่ใช่ SeedQR ที่ถูกต้อง",
-    "seedQrUnreadable": "ไม่สามารถอ่าน SeedQR นี้ได้ โปรดลองอีกครั้ง"
+    "seedQrUnreadable": "ไม่สามารถอ่าน SeedQR นี้ได้ โปรดลองอีกครั้ง",
+    "seedQrCameraFailed": "ไม่สามารถเปิดกล้องได้ โปรดลองอีกครั้ง"
   },
   "EmergencyRecovery": {
     "outageTitle": "ไม่สามารถเชื่อมต่อผู้ให้บริการ",
