@@ -189,7 +189,8 @@ describe("paying a fixed-amount BOLT11 invoice from a self-custodial wallet", ()
   beforeEach(() => {
     jest.clearAllMocks()
     mockPrepareSendPayment.mockResolvedValue(lightningQuote)
-    /** Only a completed payment reports SUCCESS; one still in flight is PENDING. */
+    /** The SDK's payment only feeds the settlement telemetry; every dispatched send
+     *  reports SUCCESS whatever its status. */
     mockSendPayment.mockResolvedValue({ payment: { status: PaymentStatus.Completed } })
   })
 

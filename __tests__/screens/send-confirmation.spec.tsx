@@ -40,9 +40,14 @@ import { INFO_SECTION_OUTLINE_TEST_ID } from "@app/components/card-screen/info-s
 import { SEND_REVIEW_DESTINATION_TEST_ID } from "@app/screens/send-bitcoin-screen/review/send-review-destination"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import {
+  SEND_HERO_CAPTION_TEST_ID,
   SEND_HERO_PRIMARY_TEST_ID,
   SEND_HERO_SECONDARY_TEST_ID,
 } from "@app/screens/send-bitcoin-screen/send-hero"
+import {
+  SENT_HOLD_MS,
+  SENT_TIMELINE_MS,
+} from "@app/screens/send-bitcoin-screen/review/use-sent-transition"
 
 import { flushEffects } from "../helpers/flush-effects"
 import { surfaceColor } from "../helpers/surface-color"
@@ -323,12 +328,14 @@ const renderedTexts = (): string[] => {
 const textPosition = (prefix: string) =>
   renderedTexts().findIndex((text) => text.startsWith(prefix))
 const navigationGoBackMock = jest.fn()
+const navigationPopToTopMock = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
     dispatch: navigationDispatchMock,
     navigate: jest.fn(),
     goBack: navigationGoBackMock,
+    popToTop: navigationPopToTopMock,
     setOptions: jest.fn(),
     isFocused: () => true,
     addListener: () => () => {},
@@ -659,6 +666,18 @@ describe("SendBitcoinConfirmationScreen", () => {
         expect.anything(),
       )
       expect(navigationDispatchMock).toHaveBeenCalled()
+    })
+
+    it("goes straight to the receipt, with no Sent on review", async () => {
+      await sendPending()
+
+      expect(
+        screen.queryByText(i18nObject("en").SendBitcoinConfirmationScreen.receipt()),
+      ).toBeNull()
+      expect(screen.getByTestId(SEND_HERO_CAPTION_TEST_ID).props.children).toBe(
+        i18nObject("en").SendBitcoinConfirmationScreen.sending(),
+      )
+      expect(navigationDispatchMock).toHaveBeenCalledTimes(1)
     })
 
     it("still reaches its outcome when saving the contact fails", async () => {
@@ -2298,9 +2317,201 @@ describe("SendBitcoinConfirmationScreen — Sent and the screen reader", () => {
     })
 
     expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledWith(
-      `${LL.SendBitcoinConfirmationScreen.sent()}, ${amount}`,
+      LL.SendBitcoinConfirmationScreen.sentAnnouncement({ amount }),
     )
     expect(screen.queryByTestId("slider")).toBeNull()
     expect(screen.getByTestId("slider", { includeHiddenElements: true })).toBeTruthy()
+  })
+})
+
+describe("SendBitcoinConfirmationScreen — Sent", () => {
+  let LL: ReturnType<typeof i18nObject>
+  /** React Native's jest mock leaves `currentState` a function, never "active". */
+  const mockedAppState = AppState as { currentState: unknown }
+  const originalAppState = mockedAppState.currentState
+
+  beforeEach(() => {
+    LL = i18nObject("en")
+    mockedAppState.currentState = "active"
+    sendPaymentMock.mockResolvedValue({ status: "SUCCESS" })
+  })
+
+  afterEach(() => {
+    mockedAppState.currentState = originalAppState
+    jest.restoreAllMocks()
+  })
+
+  const renderReview = () =>
+    renderSettled(
+      <ContextForScreen>
+        <Intraledger route={route} />
+      </ContextForScreen>,
+    )
+
+  const slide = async () => {
+    answerMeasurements()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+  }
+
+  /** The view that takes `goneWhenSent`: the first one above the node that sets either
+   *  screen reader's hiding prop. */
+  const hidingWrapper = (node: ReturnType<typeof screen.getByTestId>) => {
+    let at: typeof node | null = node
+    while (at && at.props.importantForAccessibility === undefined) at = at.parent
+    if (!at) throw new Error("no view above the node hides it from a screen reader")
+    return at
+  }
+
+  /** The three things that dissolve into Sent: the back row, the details and the slider. */
+  const dissolvingWrappers = () => [
+    hidingWrapper(screen.getByLabelText("Go back", { includeHiddenElements: true })),
+    hidingWrapper(
+      screen.getByText(LL.SendBitcoinConfirmationScreen.fromBalance(), {
+        includeHiddenElements: true,
+      }),
+    ),
+    hidingWrapper(screen.getByTestId("slider", { includeHiddenElements: true })),
+  ]
+
+  const completedReset = () => {
+    const reducer = navigationDispatchMock.mock.calls
+      .map(([action]) => action)
+      .find((action) => typeof action === "function")
+    if (!reducer) throw new Error("no reset was dispatched")
+    return reducer({ key: "root", index: 2, routes: [] }) as {
+      type: string
+      payload: { index: number; routes: Array<{ name: string; params?: unknown }> }
+    }
+  }
+
+  it("keeps the back row, the details and the slider reachable on review", async () => {
+    await renderReview()
+
+    const wrappers = dissolvingWrappers()
+    expect(wrappers).toHaveLength(3)
+    wrappers.forEach((wrapper) => {
+      expect(wrapper.props.accessibilityElementsHidden).toBe(false)
+      expect(wrapper.props.importantForAccessibility).toBe("auto")
+      expect(wrapper.props.pointerEvents).toBe("auto")
+    })
+  })
+
+  /** VoiceOver reads `accessibilityElementsHidden`, TalkBack `importantForAccessibility`:
+   *  each is checked by name, so dropping either one fails. */
+  it("hides the back row, the details and the slider from both screen readers once sent", async () => {
+    await renderReview()
+
+    await slide()
+
+    dissolvingWrappers().forEach((wrapper) => {
+      expect(wrapper.props.accessibilityElementsHidden).toBe(true)
+      expect(wrapper.props.importantForAccessibility).toBe("no-hide-descendants")
+      expect(wrapper.props.pointerEvents).toBe("none")
+    })
+  })
+
+  it("leaves the hero and the actions reachable once sent", async () => {
+    await renderReview()
+
+    await slide()
+
+    expect(screen.getByLabelText(LL.SendBitcoinConfirmationScreen.sent())).toBeTruthy()
+    expect(screen.getByText(LL.SendBitcoinConfirmationScreen.receipt())).toBeTruthy()
+    expect(screen.getByText(LL.common.close())).toBeTruthy()
+  })
+
+  it("shows no actions before the payment lands", async () => {
+    await renderReview()
+
+    expect(screen.queryByText(LL.SendBitcoinConfirmationScreen.receipt())).toBeNull()
+    expect(screen.getByTestId(SEND_HERO_CAPTION_TEST_ID).props.children).toBe(
+      LL.SendBitcoinConfirmationScreen.sending(),
+    )
+  })
+
+  it("reads Sent in the hero and stays on review", async () => {
+    await renderReview()
+
+    await slide()
+
+    expect(screen.getByTestId(SEND_HERO_CAPTION_TEST_ID).props.children).toBe(
+      LL.SendBitcoinConfirmationScreen.sent(),
+    )
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
+    expect(navigationPopToTopMock).not.toHaveBeenCalled()
+  })
+
+  it("buzzes as Sent starts, before anything navigates", async () => {
+    await renderReview()
+
+    await slide()
+
+    expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledWith(
+      "notificationSuccess",
+      {
+        ignoreAndroidSystemSettings: true,
+      },
+    )
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
+  })
+
+  it("opens the receipt from Receipt, over Home, skipping its success icon", async () => {
+    await renderReview()
+    await slide()
+
+    await act(async () => {
+      fireEvent.press(screen.getByText(LL.SendBitcoinConfirmationScreen.receipt()))
+    })
+
+    const reset = completedReset()
+    expect(reset.type).toBe("RESET")
+    expect(reset.payload.routes.map(({ name }) => name)).toEqual([
+      "Primary",
+      "sendBitcoinCompleted",
+    ])
+    expect(reset.payload.index).toBe(1)
+    expect(reset.payload.routes[1].params).toMatchObject({
+      status: "SUCCESS",
+      hasShownSuccess: true,
+    })
+  })
+
+  it("goes home from Close, with no receipt", async () => {
+    await renderReview()
+    await slide()
+
+    await act(async () => {
+      fireEvent.press(screen.getByText(LL.common.close()))
+    })
+
+    expect(navigationPopToTopMock).toHaveBeenCalledTimes(1)
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
+  })
+
+  /** The hold's own timing is the hook's spec; this is that its end opens the receipt. */
+  it("opens the receipt by itself once Sent has held", async () => {
+    const setTimeoutSpy = jest.spyOn(global, "setTimeout")
+    await renderReview()
+    await slide()
+
+    const hold = setTimeoutSpy.mock.calls.find(
+      ([, delay]) =>
+        typeof delay === "number" &&
+        delay > SENT_HOLD_MS &&
+        delay <= SENT_TIMELINE_MS + SENT_HOLD_MS,
+    )
+    expect(hold).toBeDefined()
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
+
+    await act(async () => {
+      ;(hold?.[0] as () => void)()
+    })
+
+    expect(completedReset().payload.routes.map(({ name }) => name)).toEqual([
+      "Primary",
+      "sendBitcoinCompleted",
+    ])
   })
 })

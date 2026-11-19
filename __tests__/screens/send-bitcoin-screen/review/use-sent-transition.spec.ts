@@ -1,11 +1,20 @@
-import { AccessibilityInfo, AppState, AppStateStatus } from "react-native"
-import { act, renderHook } from "@testing-library/react-native"
+import React from "react"
+import {
+  AccessibilityInfo,
+  AppState,
+  AppStateStatus,
+  BackHandler,
+  View,
+} from "react-native"
+import Animated, { getAnimatedStyle } from "react-native-reanimated"
+import { act, render, renderHook, screen } from "@testing-library/react-native"
 
 import {
   SENT_HOLD_MS,
   SENT_TIMELINE_MS,
   useSentTransition,
 } from "@app/screens/send-bitcoin-screen/review/use-sent-transition"
+import { sentHeroGrowth } from "@app/screens/send-bitcoin-screen/send-hero"
 
 type Listener = () => void
 
@@ -267,6 +276,169 @@ describe("useSentTransition", () => {
       advance(SENT_HOLD_MS * 10)
 
       expect(onHoldEnd).not.toHaveBeenCalled()
+    })
+  })
+  describe("while Sent holds", () => {
+    const backPressHandlers = () =>
+      jest
+        .mocked(BackHandler.addEventListener)
+        .mock.calls.filter(([event]) => event === "hardwareBackPress")
+        .map(([, handler]) => handler)
+
+    beforeEach(() => {
+      jest.spyOn(BackHandler, "addEventListener")
+    })
+
+    it("leaves back alone on review", () => {
+      renderTransition()
+
+      expect(backPressHandlers()).toHaveLength(0)
+      expect(mockNavigation.setOptions).not.toHaveBeenCalled()
+    })
+
+    /** The actions are the way out: back would land on a review that already paid. */
+    it("blocks the swipe back and swallows the hardware back", async () => {
+      const { result } = renderTransition()
+
+      await playSent(result)
+
+      expect(mockNavigation.setOptions).toHaveBeenCalledWith({ gestureEnabled: false })
+      const handlers = backPressHandlers()
+      expect(handlers).toHaveLength(1)
+      expect(handlers[0]()).toBe(true)
+    })
+
+    it("lets the hardware back go once review is gone", async () => {
+      const remove = jest.fn()
+      jest.mocked(BackHandler.addEventListener).mockReturnValue({ remove })
+      const { result, unmount } = renderTransition()
+
+      await playSent(result)
+      unmount()
+
+      expect(remove).toHaveBeenCalledTimes(1)
+    })
+
+    it("does not open the receipt after review is gone", async () => {
+      const onHoldEnd = jest.fn()
+      const { result, unmount } = renderHook(() => useSentTransition({ onHoldEnd }))
+
+      await playSent(result)
+      unmount()
+      advance(SENT_TIMELINE_MS + SENT_HOLD_MS * 2)
+
+      expect(onHoldEnd).not.toHaveBeenCalled()
+    })
+  })
+
+  /** Each platform hides from its own screen reader by its own prop, so both are read. */
+  describe("what dissolves into Sent", () => {
+    it("stays in the accessibility tree on review", () => {
+      const { result } = renderTransition()
+
+      expect(result.current.goneWhenSent.accessibilityElementsHidden).toBe(false)
+      expect(result.current.goneWhenSent.importantForAccessibility).toBe("auto")
+    })
+
+    it("leaves the accessibility tree on both platforms once Sent plays", async () => {
+      const { result } = renderTransition()
+
+      await playSent(result)
+
+      expect(result.current.goneWhenSent.accessibilityElementsHidden).toBe(true)
+      expect(result.current.goneWhenSent.importantForAccessibility).toBe(
+        "no-hide-descendants",
+      )
+    })
+
+    it("leaves it as soon as the payment lands, even while Sent waits to replay", async () => {
+      Object.defineProperty(AppState, "currentState", {
+        value: "background",
+        configurable: true,
+      })
+      const { result } = renderTransition()
+
+      await playSent(result)
+
+      expect(result.current.sentPlay).toBe(0)
+      expect(result.current.goneWhenSent.accessibilityElementsHidden).toBe(true)
+      expect(result.current.goneWhenSent.importantForAccessibility).toBe(
+        "no-hide-descendants",
+      )
+    })
+  })
+
+  describe("centring the hero", () => {
+    const STAGE = { x: 0, y: 0, width: 360, height: 800 }
+    const HERO = { x: 0, y: 120, width: 360, height: 110 }
+
+    /** The hook's refs on real views, so the hero's travel can be read off its style. */
+    const renderStage = () => {
+      const transition: { current?: ReturnType<typeof useSentTransition> } = {}
+      const Stage = () => {
+        const sent = useSentTransition()
+        transition.current = sent
+        return React.createElement(
+          View,
+          { ref: sent.stageRef, testID: "stage" },
+          React.createElement(Animated.View, {
+            ref: sent.heroRef,
+            testID: "hero",
+            style: sent.heroStyle,
+          }),
+        )
+      }
+      render(React.createElement(Stage))
+      return transition as { current: ReturnType<typeof useSentTransition> }
+    }
+
+    /** Each native view answers with its own frame, read off its test ID. */
+    const answerMeasurements = () =>
+      screen.UNSAFE_root.findAll((node) =>
+        jest.isMockFunction(node.instance?.measureInWindow),
+      ).forEach((node) => {
+        const frame = node.props.testID === "stage" ? STAGE : HERO
+        node.instance.measureInWindow = jest.fn(
+          (callback: (x: number, y: number, width: number, height: number) => void) =>
+            callback(frame.x, frame.y, frame.width, frame.height),
+        )
+      })
+
+    it("blooms the glow from the middle of the screen, out to the screen's height", async () => {
+      const transition = renderStage()
+      answerMeasurements()
+
+      await playSent(transition)
+
+      expect(transition.current.glowFrame).toEqual({
+        centerX: STAGE.width / 2,
+        centerY: STAGE.height / 2,
+        radius: STAGE.height,
+      })
+    })
+
+    it("lands the grown hero on the middle of the screen", async () => {
+      const transition = renderStage()
+      answerMeasurements()
+
+      await playSent(transition)
+      advance(SENT_TIMELINE_MS)
+
+      const grownHeight = HERO.height + sentHeroGrowth(AMOUNTS)
+      const travel = STAGE.height / 2 - (HERO.y - STAGE.y + grownHeight / 2)
+      expect(getAnimatedStyle(screen.getByTestId("hero"))).toMatchObject({
+        transform: [{ translateY: travel }],
+      })
+    })
+
+    it("still plays Sent where the screen cannot be measured, with no glow", async () => {
+      const { result } = renderTransition()
+
+      await playSent(result)
+      advance(SENT_TIMELINE_MS)
+
+      expect(result.current.glowFrame).toBeUndefined()
+      expect(progressOf(result.current)).toEqual({ hero: 1, glow: 1 })
     })
   })
 })
