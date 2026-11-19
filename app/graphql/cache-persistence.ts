@@ -1,7 +1,18 @@
+import { AsyncStorageWrapper, CachePersistor } from "apollo3-cache-persist"
 import { sha256 } from "js-sha256"
+
+import { InMemoryCache, NormalizedCacheObject } from "@apollo/client"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+
+import { CACHE_OWNER_KEY, SCHEMA_VERSION_KEY } from "@app/config"
+import { reportError } from "@app/utils/error-logging"
+import { loadString, removeOrThrow, saveString } from "@app/utils/storage"
 
 /** Where Apollo writes mutation results that have no id to normalize under. */
 const ROOT_MUTATION = "ROOT_MUTATION"
+
+/** The version of what the persisted cache holds: a cache of another one is never restored. */
+export const CACHE_SCHEMA_VERSION = "1"
 
 /**
  * Filters the serialized cache before it is written to AsyncStorage, which is
@@ -46,3 +57,85 @@ export const shouldRestorePersistedCache = ({
   Boolean(token) &&
   storedSchemaVersion === schemaVersion &&
   storedOwner === cacheOwnerTag(token)
+
+/**
+ * Marks the cache just cleared as the session's, and answers whether it now is: true only
+ * once both the schema version and the owner are stored. A session without a token owns
+ * none. Whenever the answer is false, the owner left from an earlier session is removed
+ * too, so nothing written later can pass for that session's cache.
+ */
+const storeOwnerOf = async (token: string): Promise<boolean> => {
+  const isSchemaStored = await saveString(SCHEMA_VERSION_KEY, CACHE_SCHEMA_VERSION)
+  const canOwn = isSchemaStored && Boolean(token)
+  const isOwnerStored =
+    canOwn && (await saveString(CACHE_OWNER_KEY, cacheOwnerTag(token)))
+  if (!isOwnerStored) {
+    /** Best effort: the cache was just cleared, so an owner left behind owns nothing. */
+    await removeOrThrow(CACHE_OWNER_KEY).catch(() => undefined)
+  }
+  return isOwnerStored
+}
+
+export type PersistedCache = {
+  readonly persistor: CachePersistor<NormalizedCacheObject>
+  /**
+   * Restores the persisted cache into the session that wrote it, or clears it for this
+   * one, and only then turns persistence on. Persistence stays off whenever it cannot be
+   * told whose the cache is: without a token, when the markers that name the owner could
+   * not be stored, or when storage failed on the way. The session then runs on its
+   * in-memory cache alone, and the next client build tries again. Never rejects.
+   */
+  readonly open: (token: string, isSuperseded: () => boolean) => Promise<void>
+}
+
+/**
+ * The persisted cache of one client build: the persistor over AsyncStorage, created
+ * paused, so nothing reaches disk before `open` knows whose cache it is writing.
+ */
+export const createPersistedCache = (cache: InMemoryCache): PersistedCache => {
+  const persistor = new CachePersistor({
+    cache,
+    storage: new AsyncStorageWrapper(AsyncStorage),
+    debug: __DEV__,
+    persistenceMapper: async (data) => stripUnpersistableEntries(data),
+  })
+  persistor.pause()
+
+  const openFor = async (token: string, isSuperseded: () => boolean): Promise<void> => {
+    const [storedSchemaVersion, storedOwner] = await Promise.all([
+      loadString(SCHEMA_VERSION_KEY),
+      loadString(CACHE_OWNER_KEY),
+    ])
+    if (isSuperseded()) return
+
+    const isOwnCache = shouldRestorePersistedCache({
+      token,
+      storedOwner,
+      storedSchemaVersion,
+      schemaVersion: CACHE_SCHEMA_VERSION,
+    })
+    if (isOwnCache) {
+      /** Its own cache it cannot read back is no reason to stop persisting: the next
+       *  write replaces it, under the same owner. */
+      await persistor.restore().catch((err) => reportError("Apollo cache restore", err))
+    } else {
+      // Another account's, no account's, or an outdated cache: never shown here.
+      await persistor.purge()
+      if (isSuperseded()) return
+      const isOwnedNow = await storeOwnerOf(token)
+      if (!isOwnedNow) return
+    }
+    if (isSuperseded()) return
+    persistor.resume()
+  }
+
+  const open = async (token: string, isSuperseded: () => boolean): Promise<void> => {
+    try {
+      await openFor(token, isSuperseded)
+    } catch (err) {
+      reportError("Apollo cache persistence", err)
+    }
+  }
+
+  return { persistor, open }
+}
