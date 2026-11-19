@@ -49,7 +49,6 @@ import {
   useSendPayment,
 } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
-import { ellipsizeMiddle } from "@app/utils/helper"
 import { staticSurface } from "@app/rne-theme/surfaces"
 import { groupTitleGap } from "@app/rne-theme/tokens"
 
@@ -243,15 +242,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               satAmount,
               currencyFeeAmount,
               satFeeAmount,
-              destination:
-                paymentDetail?.paymentType === "intraledger"
-                  ? destination
-                  : ellipsizeMiddle(destination, {
-                      maxLength: 50,
-                      maxResultLeft: 13,
-                      maxResultRight: 8,
-                    }),
-              paymentType: paymentDetail?.paymentType,
+              destination,
+              paymentType,
               createdAt: transaction?.createdAt,
             },
           },

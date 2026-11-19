@@ -10,7 +10,10 @@ import {
   MerchantChoice,
   ReceiveDestination,
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
-import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
+import {
+  PaymentDetail,
+  PaymentDetailType,
+} from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { PaymentSendCompletedStatus } from "@app/screens/send-bitcoin-screen/use-send-payment"
 import { DrainConversionReturn } from "@app/screens/conversion-flow/drain-conversion"
 import { AccountMode, AccountTypeMode, CreationBlockReason } from "@app/types/account"
@@ -166,7 +169,7 @@ export type RootStackParamList = {
     currencyFeeAmount?: string
     satFeeAmount?: string
     destination?: string
-    paymentType?: string
+    paymentType?: PaymentDetailType
     createdAt?: number
   }
   setLightningAddress: { onboarding?: boolean }
