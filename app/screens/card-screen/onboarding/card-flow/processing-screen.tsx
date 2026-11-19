@@ -10,7 +10,7 @@ import { useDashedLineFlow } from "@app/components/animations"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { isBackwardAction, RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { useCardApplicationApproval } from "./use-card-application-approval"
 
@@ -66,6 +66,20 @@ export const CardProcessingScreen: React.FC = () => {
     /** A minute without an answer leaves it to the home and a bulletin. */
     if (approvalWait === "timedOut") navigation.popTo("Primary")
   }, [approvalWait, navigation])
+
+  /**
+   * The wait has no way out: leaving it would drop the poll, and an answer arriving after
+   * would never reach its screen. The route switches the swipe off and this refuses the
+   * Android hardware back, while the screen's own replace and popTo still go through.
+   */
+  React.useEffect(
+    () =>
+      navigation.addListener("beforeRemove", (event) => {
+        if (!isBackwardAction(event.data.action)) return
+        event.preventDefault()
+      }),
+    [navigation],
+  )
 
   return (
     <Screen preset="fixed">
