@@ -401,6 +401,77 @@ describe("createPersistedCache", () => {
     })
   }
 
+  it("drops a write a retired build had not started", async () => {
+    const { cache, persisted } = await openSession(TOKEN_A)
+    writeMe(cache, "alice")
+    await persistAfterWrite()
+
+    writeMe(cache, "alice later")
+    jest.advanceTimersByTime(PERSIST_DEBOUNCE_MS)
+    persisted.retire()
+    await settle()
+
+    expect(await storedBlob()).toContain("alice")
+    expect(await storedBlob()).not.toContain("alice later")
+  })
+
+  it("persists nothing a retired build writes later, nor serializes its cache for it", async () => {
+    const { cache, persisted } = await openSession(TOKEN_A)
+    persisted.retire()
+    const serialize = jest.spyOn(cache, "extract")
+
+    writeMe(cache, "alice")
+    await persistAfterWrite()
+
+    expect(await storedBlob()).toBeNull()
+    expect(serialize).not.toHaveBeenCalled()
+    serialize.mockRestore()
+  })
+
+  it("lets the next build read whose cache it is only once a write already started lands", async () => {
+    const { cache: cacheOfA, persisted: persistedOfA } = await openSession(TOKEN_A)
+    let landWrite: () => void = () => undefined
+    storage.setItem.mockImplementation(async (key: string, value: string) => {
+      if (key === BLOB_KEY) {
+        await new Promise<void>((resolve) => {
+          landWrite = resolve
+        })
+      }
+      return realSetItem?.(key, value)
+    })
+    writeMe(cacheOfA, "alice")
+    await persistAfterWrite()
+    persistedOfA.retire()
+
+    const openingB = openSession(TOKEN_B)
+    await settle()
+    expect(await storedOwner()).toBe(cacheOwnerTag(TOKEN_A))
+    landWrite()
+    await openingB
+
+    expect(await storedBlob()).toBeNull()
+    expect(await storedOwner()).toBe(cacheOwnerTag(TOKEN_B))
+  })
+
+  it("keeps the next build's open going after a write fails", async () => {
+    const { cache, persisted } = await openSession(TOKEN_A)
+    failSetItemFor([BLOB_KEY])
+    const libraryLog = jest.spyOn(console, "error").mockImplementation(() => undefined)
+    writeMe(cache, "alice")
+
+    await expect(persisted.persistor.persist()).rejects.toThrow("storage unavailable")
+    storage.setItem.mockImplementation(realSetItem)
+    await openSession(TOKEN_B)
+
+    expect(await storedOwner()).toBe(cacheOwnerTag(TOKEN_B))
+    expect(libraryLog).toHaveBeenCalledWith(
+      "[apollo-cache-persist]",
+      "Error persisting cache",
+      expect.any(Error),
+    )
+    libraryLog.mockRestore()
+  })
+
   it("stops before clearing anything when superseded as the markers are read", async () => {
     await persistAccountA()
 

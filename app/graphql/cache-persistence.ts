@@ -1,4 +1,4 @@
-import { AsyncStorageWrapper, CachePersistor } from "apollo3-cache-persist"
+import { CachePersistor } from "apollo3-cache-persist"
 import { sha256 } from "js-sha256"
 
 import { InMemoryCache, NormalizedCacheObject } from "@apollo/client"
@@ -59,6 +59,19 @@ export const shouldRestorePersistedCache = ({
   storedOwner === cacheOwnerTag(token)
 
 /**
+ * The latest piece of work on the persisted cache, from any client build. Each cache write
+ * and each `open` waits for the one before, so a write a superseded build had already
+ * started lands before the next build reads whose cache it is, and is cleared with it.
+ */
+let latestCacheWork: Promise<unknown> = Promise.resolve()
+
+const afterEarlierCacheWork = <T>(work: () => Promise<T>): Promise<T> => {
+  const thisWork = latestCacheWork.then(work)
+  latestCacheWork = thisWork.catch(() => undefined)
+  return thisWork
+}
+
+/**
  * Whether the stored cache still belongs to an account: one of this schema, with its owner
  * named. Only that account can restore it.
  */
@@ -98,6 +111,11 @@ export type PersistedCache = {
    * token restores nothing and leaves an account's cache where it is. Never rejects.
    */
   readonly open: (token: string, isSuperseded: () => boolean) => Promise<void>
+  /**
+   * Ends the build's persistence once it is superseded. A write it has not started yet is
+   * dropped; one already started lands before the next build's `open` runs.
+   */
+  readonly retire: () => void
 }
 
 /**
@@ -105,9 +123,21 @@ export type PersistedCache = {
  * paused, so nothing reaches disk before `open` knows whose cache it is writing.
  */
 export const createPersistedCache = (cache: InMemoryCache): PersistedCache => {
+  let isRetired = false
+  /** Writes wait their turn, and a retired build writes nothing more. Reads and removals
+   *  go straight through: neither can put one account's data under another's name. */
+  const storage = {
+    getItem: (key: string) => AsyncStorage.getItem(key),
+    setItem: (key: string, value: string) =>
+      afterEarlierCacheWork(async () => {
+        if (isRetired) return
+        await AsyncStorage.setItem(key, value)
+      }),
+    removeItem: (key: string) => AsyncStorage.removeItem(key),
+  }
   const persistor = new CachePersistor({
     cache,
-    storage: new AsyncStorageWrapper(AsyncStorage),
+    storage,
     debug: __DEV__,
     persistenceMapper: async (data) => stripUnpersistableEntries(data),
   })
@@ -152,13 +182,19 @@ export const createPersistedCache = (cache: InMemoryCache): PersistedCache => {
     persistor.resume()
   }
 
-  const open = async (token: string, isSuperseded: () => boolean): Promise<void> => {
-    try {
-      await openFor(token, isSuperseded)
-    } catch (err) {
-      reportError("Apollo cache persistence", err)
-    }
+  const open = (token: string, isSuperseded: () => boolean): Promise<void> =>
+    afterEarlierCacheWork(async () => {
+      try {
+        await openFor(token, isSuperseded)
+      } catch (err) {
+        reportError("Apollo cache persistence", err)
+      }
+    })
+
+  const retire = () => {
+    isRetired = true
+    persistor.pause()
   }
 
-  return { persistor, open }
+  return { persistor, open, retire }
 }

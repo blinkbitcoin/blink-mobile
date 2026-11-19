@@ -75,7 +75,7 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
   const { registerActiveClient } = useApolloRebuildLifecycle(effectiveToken)
 
   useEffect(() => {
-    /** Set when this client is superseded. Its persistor is paused so a late
+    /** Set when this client is superseded. Its persisted cache is retired so a late
      *  write from the outgoing session cannot land in the next session's cache. */
     let cancelled = false
     let persistedCache: PersistedCache | undefined
@@ -274,7 +274,7 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
 
     return () => {
       cancelled = true
-      persistedCache?.persistor.pause()
+      persistedCache?.retire()
     }
   }, [effectiveToken, appConfig.galoyInstance, clearNetworkError, registerActiveClient])
 
