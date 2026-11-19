@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useCallback } from "react"
 import { View, TextInput, Keyboard, Modal } from "react-native"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -9,13 +9,12 @@ import { radius } from "@app/rne-theme/radius"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "@app/components/screen"
 import {
   validateUsername,
   SetUsernameError,
 } from "@app/components/set-lightning-address-modal"
-import { SuccessIconAnimation } from "@app/components/success-animation"
+import { SuccessScreen } from "@app/components/success-screen"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -47,8 +46,6 @@ gql`
     }
   }
 `
-
-const SUCCESS_DELAY = 2000
 
 export const SetLightningAddressScreen: React.FC<{
   route: RouteProp<RootStackParamList, "setLightningAddress">
@@ -141,19 +138,13 @@ export const SetLightningAddressScreen: React.FC<{
     setShowSuccess(true)
   }
 
-  useEffect(() => {
-    if (!showSuccess) return
-
-    const time = setTimeout(() => {
-      if (onboarding) {
-        navigateSupportNoBackAllow()
-        return
-      }
-      navigation.navigate("settings")
-    }, SUCCESS_DELAY)
-
-    return () => clearTimeout(time)
-  }, [showSuccess, onboarding, navigation, navigateSupportNoBackAllow])
+  const leaveAfterSuccess = useCallback(() => {
+    if (onboarding) {
+      navigateSupportNoBackAllow()
+      return
+    }
+    navigation.navigate("settings")
+  }, [onboarding, navigation, navigateSupportNoBackAllow])
 
   let errorMessage = ""
   switch (error) {
@@ -181,18 +172,16 @@ export const SetLightningAddressScreen: React.FC<{
     <Screen>
       <Modal
         visible={showSuccess}
-        transparent
         animationType="fade"
+        statusBarTranslucent
+        navigationBarTranslucent
         onRequestClose={() => setShowSuccess(false)}
       >
-        <View style={styles.successAnimationContainer}>
-          <SuccessIconAnimation>
-            <GaloyIcon name="lightning-address" size={110} />
-            <Text type="h2" style={styles.successText}>
-              {LL.common.success()}
-            </Text>
-          </SuccessIconAnimation>
-        </View>
+        <SuccessScreen
+          title={LL.SetAddressModal.addressSet()}
+          subtitle={`${username}@${lnAddressHostname}`}
+          onHoldEnd={leaveAfterSuccess}
+        />
       </Modal>
 
       <View style={styles.content}>
@@ -241,17 +230,6 @@ export const SetLightningAddressScreen: React.FC<{
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  successText: {
-    marginTop: 20,
-    textAlign: "center",
-    alignSelf: "center",
-  },
-  successAnimationContainer: {
-    flex: 1,
-    backgroundColor: colors.backgroundDefault,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   content: {
     flex: 1,
     paddingHorizontal: 20,

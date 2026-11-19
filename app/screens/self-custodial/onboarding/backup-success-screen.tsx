@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useRef } from "react"
+import React, { useCallback, useEffect } from "react"
 
-import { makeStyles, Text } from "@rn-vui/themed"
 import {
   CommonActions,
   RouteProp,
@@ -8,35 +7,24 @@ import {
   useRoute,
 } from "@react-navigation/native"
 
-import { Screen } from "@app/components/screen"
-import { SuccessScreenLayout } from "@app/components/success-screen-layout"
+import { SuccessScreen } from "@app/components/success-screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { isBackwardAction, RootStackParamList } from "@app/navigation/stack-param-lists"
 
 type SuccessRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupSuccess">
 
-const NAVIGATE_HOME_DELAY_MS = 2000
-
 export const BackupSuccessScreen: React.FC = () => {
   const { LL } = useI18nContext()
-  const styles = useStyles()
   const navigation = useNavigation()
   const params = useRoute<SuccessRouteProp>().params
   const reBackup = params?.reBackup ?? false
   const customMessage = params?.message
-  const holdTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   /** Never clears the migration checkpoint: a standalone backup by another account must
    *  not wipe a pending migration, and a completed migration already cleared its own. */
   const navigateToHome = useCallback(() => {
     navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }))
   }, [navigation])
-
-  const handleAnimationComplete = useCallback(() => {
-    holdTimerRef.current = setTimeout(navigateToHome, NAVIGATE_HOME_DELAY_MS)
-  }, [navigateToHome])
-
-  useEffect(() => () => clearTimeout(holdTimerRef.current), [])
 
   /** Every way here lands with the work done and only this screen's reset to Primary
    *  ahead, which leaving clears. So the user's back goes home at once rather than back
@@ -58,20 +46,5 @@ export const BackupSuccessScreen: React.FC = () => {
 
   const message = customMessage ?? fallbackMessage
 
-  return (
-    <Screen preset="fixed" headerShown={false}>
-      <SuccessScreenLayout onAnimationComplete={handleAnimationComplete}>
-        <Text style={styles.message}>{message}</Text>
-      </SuccessScreenLayout>
-    </Screen>
-  )
+  return <SuccessScreen title={message} onHoldEnd={navigateToHome} />
 }
-
-const useStyles = makeStyles(() => ({
-  message: {
-    fontSize: 18,
-    lineHeight: 24,
-    textAlign: "center",
-    width: 264,
-  },
-}))

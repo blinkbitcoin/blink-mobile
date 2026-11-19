@@ -1,6 +1,7 @@
 import React from "react"
 import { render, act } from "@testing-library/react-native"
 
+import { SUCCESS_SCREEN_EXIT_MS } from "@app/components/success-screen"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { ConversionSuccessScreen } from "@app/screens/conversion-flow/conversion-success-screen"
 
@@ -24,7 +25,7 @@ jest.mock("@react-navigation/native", () => {
   }
 })
 
-const SUCCESS_DELAY = 3000
+const SUCCESS_DELAY = SUCCESS_SCREEN_EXIT_MS
 
 describe("ConversionSuccessScreen", () => {
   beforeEach(() => {

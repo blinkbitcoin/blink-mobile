@@ -2783,6 +2783,7 @@
     "title": "Setare {bankName: string} adresă",
     "mainTitle": "Alegeți Adresa Lightning",
     "setLightningAddress": "Setare adresă Lightning",
+    "addressSet": "Adresă Lightning setată",
     "Errors": {
       "tooShort": "Adresa trebuie să aibă cel puțin 3 caractere",
       "tooLong": "Adresa poate să aibă cel mult 50 de caractere",
@@ -2906,6 +2907,7 @@
   },
   "EmailRegistrationValidateScreen": {
     "header": "Pentru a vă confirma adresa de e-mail, introduceți codul pe care tocmai vi l-am trimis pe {email: string}",
+    "emailVerified": "E-mail verificat",
     "success": "E-mail {email: string} confirmat cu succes"
   },
   "EmailLoginInitiateScreen": {

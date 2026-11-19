@@ -2783,6 +2783,7 @@
         "title": "Définir l’adresse {bankName: string}",
         "mainTitle": "Choisir une adresse Lightning",
         "setLightningAddress": "Définir l'adresse Lightning",
+        "addressSet": "Adresse Lightning définie",
         "Errors": {
             "tooShort": "L’adresse doit contenir au moins 3 caractères",
             "tooLong": "L’adresse ne peut excéder plus de 50 caractères",
@@ -2906,6 +2907,7 @@
     },
     "EmailRegistrationValidateScreen": {
         "header": "Pour valider votre adresse e-mail, saisissez le code que nous venons de vous envoyer à {email: string}",
+        "emailVerified": "E-mail vérifié",
         "success": "E-mail {email: string} a été validé avec succès"
     },
     "EmailLoginInitiateScreen": {

@@ -82,6 +82,20 @@ jest.mock("@app/components/atomic/galoy-icon", () => {
   }
 })
 
+jest.mock("@app/components/success-badge", () => {
+  const ReactActual = jest.requireActual("react")
+  const { View } = jest.requireActual("react-native")
+  return {
+    SuccessBadge: () => ReactActual.createElement(View, { testID: "success-badge" }),
+  }
+})
+
+const mockTriggerHapticFeedback = jest.fn()
+jest.mock("@app/utils/helper", () => ({
+  ...jest.requireActual("@app/utils/helper"),
+  triggerHapticFeedback: (...args: unknown[]) => mockTriggerHapticFeedback(...args),
+}))
+
 jest.mock("@app/screens/receive-bitcoin-screen/my-ln-updates-sub", () => {
   const ReactActual = jest.requireActual("react")
   const { View } = jest.requireActual("react-native")
@@ -190,7 +204,7 @@ describe("RedeemBitcoinResultScreen", () => {
     expect(lastCallArg.walletId).toBeUndefined()
   })
 
-  it("renders the success icon when the hook reports paid=true", async () => {
+  it("draws the success badge in, with the success haptic, when the hook reports paid=true", async () => {
     mockUseLnurlWithdrawRedemption.mockReturnValue({
       paid: true,
       errorMessage: "",
@@ -201,7 +215,10 @@ describe("RedeemBitcoinResultScreen", () => {
 
     await flushEffects()
 
-    expect(queryByTestId("icon-payment-success")).toBeTruthy()
+    expect(queryByTestId("success-badge")).toBeTruthy()
+    expect(queryByTestId("icon-payment-success")).toBeNull()
+    expect(mockTriggerHapticFeedback).toHaveBeenCalledTimes(1)
+    expect(mockTriggerHapticFeedback).toHaveBeenCalledWith("notificationSuccess")
   })
 
   it("renders the error message when the hook reports an errorMessage", async () => {

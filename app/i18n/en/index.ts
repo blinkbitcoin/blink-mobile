@@ -2916,6 +2916,7 @@ const en: BaseTranslation = {
     title: "Set {bankName: string} address",
     mainTitle: "Choose Lightning Address",
     setLightningAddress: "Set Lightning address",
+    addressSet: "Lightning address set",
     Errors: {
       tooShort: "Address must be at least 3 characters long",
       tooLong: "Address must be at most 50 characters long",
@@ -3052,6 +3053,7 @@ const en: BaseTranslation = {
   EmailRegistrationValidateScreen: {
     header:
       "To confirm your email address, enter the code we just sent you on {email: string}",
+    emailVerified: "Email verified",
     success: "Email {email: string} confirmed successfully",
   },
   EmailLoginInitiateScreen: {

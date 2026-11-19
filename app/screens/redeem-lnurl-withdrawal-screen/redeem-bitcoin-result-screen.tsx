@@ -2,12 +2,13 @@ import React, { useEffect, useMemo } from "react"
 import { ActivityIndicator, View } from "react-native"
 
 import { radius } from "@app/rne-theme/radius"
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "@app/components/screen"
+import { SuccessBadge } from "@app/components/success-badge"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { staticSurface } from "@app/rne-theme/surfaces"
+import { triggerHapticFeedback } from "@app/utils/helper"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -16,6 +17,9 @@ import { testProps } from "../../utils/testProps"
 import { withMyLnUpdateSub } from "../receive-bitcoin-screen/my-ln-updates-sub"
 
 import { useLnurlWithdrawRedemption } from "./hooks"
+
+/** Holds the old seal's place on the screen. */
+const SUCCESS_BADGE_SIZE = 96
 
 type Prop = {
   route: RouteProp<RootStackParamList, "redeemBitcoinResult">
@@ -65,12 +69,17 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
     navigation.setOptions({ title: LL.RedeemBitcoinScreen.title() })
   }, [navigation, LL])
 
+  useEffect(() => {
+    if (paid) triggerHapticFeedback("notificationSuccess")
+  }, [paid])
+
+  /** The success badge draws itself in where the result lands; the screen stays. */
   const renderSuccessView = useMemo(() => {
     if (!paid) return null
     return (
       <View style={styles.container}>
         <View {...testProps("Success Icon")} style={styles.container}>
-          <GaloyIcon name={"payment-success"} size={128} />
+          <SuccessBadge size={SUCCESS_BADGE_SIZE} />
         </View>
       </View>
     )

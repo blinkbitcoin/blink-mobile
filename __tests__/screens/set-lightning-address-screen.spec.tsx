@@ -1,7 +1,8 @@
 import React from "react"
-import { render, fireEvent, waitFor, screen } from "@testing-library/react-native"
+import { act, render, fireEvent, waitFor, screen } from "@testing-library/react-native"
 import { RouteProp } from "@react-navigation/native"
 
+import { SUCCESS_SCREEN_EXIT_MS } from "@app/components/success-screen"
 import { SetLightningAddressScreen } from "@app/screens/lightning-address-screen/set-lightning-address-screen"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -9,6 +10,19 @@ import { i18nObject } from "@app/i18n/i18n-util"
 
 import { expectFocusFill, renderedBox } from "../helpers/field-fill"
 import { ContextForScreen } from "./helper"
+
+const mockNavigate = jest.fn()
+const mockReplace = jest.fn()
+jest.mock("@react-navigation/native", () => ({
+  ...jest.requireActual("@react-navigation/native"),
+  useNavigation: () => ({ navigate: mockNavigate, replace: mockReplace }),
+}))
+
+const mockUpdateUsername = jest.fn()
+jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
+  useUserUpdateUsernameMutation: () => [mockUpdateUsername, { loading: false }],
+}))
 
 const mockRoute: RouteProp<RootStackParamList, "setLightningAddress"> = {
   key: "set-address",
@@ -127,6 +141,67 @@ describe("SetLightningAddressScreen", () => {
       surfaces: () => [renderedBox(field())],
       focus: () => fireEvent(field(), "focus"),
       blur: () => fireEvent(field(), "blur"),
+    })
+  })
+
+  describe("once the address is set", () => {
+    const settingsRoute: RouteProp<RootStackParamList, "setLightningAddress"> = {
+      ...mockRoute,
+      params: { onboarding: false },
+    }
+
+    const setAddress = async (route = settingsRoute) => {
+      render(
+        <ContextForScreen>
+          <SetLightningAddressScreen route={route} />
+        </ContextForScreen>,
+      )
+      fireEvent.changeText(screen.getByPlaceholderText("SatoshiNakamoto"), "satoshi")
+      await act(async () => {
+        fireEvent.press(screen.getByText(LL.SetAddressModal.setLightningAddress()))
+      })
+    }
+
+    beforeEach(() => {
+      jest.useFakeTimers()
+      jest.clearAllMocks()
+      mockUpdateUsername.mockResolvedValue({
+        data: {
+          userUpdateUsername: { errors: [], user: { id: "1", username: "satoshi" } },
+        },
+      })
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it("shows the success screen with the new address", async () => {
+      await setAddress()
+
+      expect(screen.getByText(LL.SetAddressModal.addressSet())).toBeTruthy()
+      expect(screen.getByText(/^satoshi@/)).toBeTruthy()
+    })
+
+    it("returns to Settings once the success screen has held", async () => {
+      await setAddress()
+
+      act(() => jest.advanceTimersByTime(SUCCESS_SCREEN_EXIT_MS - 1))
+      expect(mockNavigate).not.toHaveBeenCalled()
+
+      act(() => jest.advanceTimersByTime(1))
+      expect(mockNavigate).toHaveBeenCalledWith("settings")
+    })
+
+    it("moves on to support, with no way back, during onboarding", async () => {
+      await setAddress(mockRoute)
+
+      act(() => jest.advanceTimersByTime(SUCCESS_SCREEN_EXIT_MS))
+
+      expect(mockReplace).toHaveBeenCalledWith("onboarding", {
+        screen: "supportScreen",
+        params: { canGoBack: false },
+      })
     })
   })
 })

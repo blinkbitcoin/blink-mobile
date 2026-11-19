@@ -4,37 +4,10 @@ import { render, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
+import { SUCCESS_SCREEN_EXIT_MS } from "@app/components/success-screen"
 import { BackupSuccessScreen } from "@app/screens/self-custodial/onboarding/backup-success-screen"
 import { ContextForScreen } from "../../helper"
 import { flushEffects } from "../../../helpers/flush-effects"
-
-jest.mock("@app/components/success-animation/success-icon-animation", () => {
-  const { View } = jest.requireActual("react-native")
-  return {
-    SuccessIconAnimation: ({ children }: { children: React.ReactNode }) => (
-      <View>{children}</View>
-    ),
-  }
-})
-
-jest.mock("@app/components/success-animation/success-text-animation", () => {
-  const { useEffect } = jest.requireActual("react")
-  const { View } = jest.requireActual("react-native")
-  const CompletedTextAnimation = ({
-    children,
-    onComplete,
-  }: {
-    children: React.ReactNode
-    onComplete?: () => void
-  }) => {
-    /** Firing from an effect keeps the callback inside React's act() scope. */
-    useEffect(() => {
-      onComplete?.()
-    }, [onComplete])
-    return <View>{children}</View>
-  }
-  return { CompletedTextAnimation }
-})
 
 const mockClearCheckpoint = jest.fn()
 jest.mock("@app/screens/account-migration/hooks", () => ({
@@ -150,7 +123,7 @@ describe("BackupSuccessScreen", () => {
     await flushEffects()
   })
 
-  it("holds the screen after the animation and then navigates home", async () => {
+  it("holds the screen 3 s after the badge settles and then navigates home", async () => {
     jest.useFakeTimers({ doNotFake: ["setImmediate"] })
     render(
       <ContextForScreen>
@@ -160,12 +133,12 @@ describe("BackupSuccessScreen", () => {
     await flushEffects()
 
     act(() => {
-      jest.advanceTimersByTime(0)
+      jest.advanceTimersByTime(SUCCESS_SCREEN_EXIT_MS - 1)
     })
     expect(mockDispatch).not.toHaveBeenCalled()
 
     act(() => {
-      jest.advanceTimersByTime(2000)
+      jest.advanceTimersByTime(1)
     })
     jest.useRealTimers()
 
@@ -187,7 +160,7 @@ describe("BackupSuccessScreen", () => {
     await flushEffects()
 
     act(() => {
-      jest.advanceTimersByTime(2000)
+      jest.advanceTimersByTime(SUCCESS_SCREEN_EXIT_MS)
     })
     jest.useRealTimers()
 

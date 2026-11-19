@@ -2783,6 +2783,7 @@
     "title": "Indstil {bankName: string} adresse",
     "mainTitle": "Vælg Lightning-adresse",
     "setLightningAddress": "Indstil Lightning-adresse",
+    "addressSet": "Lightning-adresse indstillet",
     "Errors": {
       "tooShort": "Adressen skal være mindst 3 tegn lang",
       "tooLong": "Adressen må maksimalt være 50 tegn lang",
@@ -2906,6 +2907,7 @@
   },
   "EmailRegistrationValidateScreen": {
     "header": "For at bekræfte din e-mail-adresse skal du indtaste koden, vi lige har sendt dig på {email: string}",
+    "emailVerified": "E-mail bekræftet",
     "success": "E-mail {email: string} bekræftet med succes"
   },
   "EmailLoginInitiateScreen": {

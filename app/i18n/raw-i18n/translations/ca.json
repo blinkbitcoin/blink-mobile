@@ -2783,6 +2783,7 @@
     "title": "Estableix la teva adreça {bankName: string} ",
     "mainTitle": "Tria l'adreça Lightning",
     "setLightningAddress": "Configura la adreça Lightning",
+    "addressSet": "Adreça Lightning configurada",
     "Errors": {
       "tooShort": "L'adreça ha de tenir almenys 3 caràcters",
       "tooLong": "L'adreça pot ser com a màxim de 50 caràcters",
@@ -2906,6 +2907,7 @@
   },
   "EmailRegistrationValidateScreen": {
     "header": "Per confirmar la teva adreça electrònica, introdueix el codi que hem enviat a {email: string}",
+    "emailVerified": "Correu electrònic verificat",
     "success": "El correu electrònic {email: string} s'ha confirmat correctament"
   },
   "EmailLoginInitiateScreen": {

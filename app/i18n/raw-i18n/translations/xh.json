@@ -2783,6 +2783,7 @@
     "title": "Set {bankName: string} address",
     "mainTitle": "Khetha Idilesi ye-Lightning",
     "setLightningAddress": "Seta idilesi ye-Lightning",
+    "addressSet": "Idilesi ye-Lightning isetiwe",
     "Errors": {
       "tooShort": "Address must be at least 3 characters long",
       "tooLong": "Address must be at most 50 characters long",
@@ -2906,6 +2907,7 @@
   },
   "EmailRegistrationValidateScreen": {
     "header": "Ukuqinisekisa idilesi yakho ye-imeyile, faka ikhowudi esisanda kukuthumela yona ku-{email: string}",
+    "emailVerified": "I-imeyile iqinisekisiwe",
     "success": "I-imeyile {email: string} iqinisekiswe ngempumelelo"
   },
   "EmailLoginInitiateScreen": {

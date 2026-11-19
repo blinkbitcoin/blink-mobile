@@ -2783,6 +2783,7 @@
     "title": "Teeka {bankName: string} endagiriro",
     "mainTitle": "Londa Endagiriro ya Lightning",
     "setLightningAddress": "Kola endagiriro ya Lightning",
+    "addressSet": "Endagiriro ya Lightning ekoleddwa",
     "Errors": {
       "tooShort": "Endagiriro eteekwa okuba ekitono n'ennukuta nga 3 obuwanvu",
       "tooLong": "Endagiriro eteekwa ennyo okuba n'ennukuta 50",
@@ -2906,6 +2907,7 @@
   },
   "EmailRegistrationValidateScreen": {
     "header": "Okukakasa email yo, yingiza koodi gy'etukusindikidde ku {email: string}",
+    "emailVerified": "Email ekakasiddwa",
     "success": "Email {email: string} ekakasiddwa bulungi"
   },
   "EmailLoginInitiateScreen": {
