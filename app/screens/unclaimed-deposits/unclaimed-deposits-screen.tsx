@@ -9,14 +9,16 @@ import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-butto
 import { CheckboxRow } from "@app/components/checkbox-row"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useFeeTierLabels } from "@app/screens/send-bitcoin-screen/hooks/use-fee-tier-labels"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { DepositStatus } from "@app/types/payment"
 import { testProps } from "@app/utils/testProps"
 import { fonts } from "@app/rne-theme/fonts"
 
-import { buildFeeTierOptions } from "../send-bitcoin-screen/fee-tier-options"
+import {
+  buildFeeTierOptions,
+  feeTierLabels,
+} from "../send-bitcoin-screen/fee-tier-options"
 import { FeeTierOption } from "../send-bitcoin-screen/hooks/fee-tiers.types"
 
 import { DepositErrorMessage } from "./deposit-error-message"
@@ -33,7 +35,6 @@ export const UnclaimedDepositsScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL, locale } = useI18nContext()
-  const feeTierLabels = useFeeTierLabels()
   const { sdk } = useSelfCustodialWallet()
   const network = useSparkNetwork()
 
@@ -52,7 +53,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
   const feeTierOptions = buildFeeTierOptions({
     hasQuote: hasFeeRateQuote,
     tiers: feeTiers,
-    labels: feeTierLabels,
+    labels: feeTierLabels(LL),
     formatFee: ({ feeAmount }) => LL.UnclaimedDeposit.feeRateUnit({ rate: feeAmount }),
     locale,
   })

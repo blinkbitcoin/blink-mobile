@@ -80,7 +80,7 @@ missing pieces as findings:
 | Check | What it runs | Hard gate? |
 |-------|--------------|-----------|
 | **Check Code** | `yarn check-code` = `tsc:check` + `eslint:check` + `check:translations` + `check:codegen` + `graphql-check` | Yes |
-| **Tests** | Jest (`yarn test`) | Yes — the gate reviewers cite |
+| **Tests** | Jest (`yarn test:ci`: two workers; `yarn test` runs in band locally) | Yes — the gate reviewers cite |
 | **Audit** | dependency advisories (`make audit`) | Yes |
 | **Conventional commits** | PR title/commit format | Yes |
 | **CodeQL / spelling / qlty** | static analysis, typos | Yes |

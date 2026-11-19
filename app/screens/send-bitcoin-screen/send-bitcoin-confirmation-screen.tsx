@@ -43,6 +43,7 @@ import {
 } from "@app/types/amounts"
 import { useSendDustWarning, useTranslateSdkError } from "@app/self-custodial/hooks"
 import { logPaymentAttempt, logPaymentResult } from "@app/utils/analytics"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 import { reportError } from "@app/utils/error-logging"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -56,7 +57,6 @@ import {
   CUSTODIAL_PAYOUT_ETA_MINUTES,
   feeTierFromPayoutSpeed,
 } from "./hooks/use-custodial-onchain-fee-tiers"
-import { useHomeOnBackWhenSpent } from "./hooks/use-home-on-back-when-spent"
 import { ETA_MINUTES } from "./hooks/use-onchain-fee-tiers"
 import { SendReviewDestination } from "./review/send-review-destination"
 import { useSentTransition } from "./review/use-sent-transition"
@@ -237,9 +237,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     loading: sendPaymentLoading,
     sendPayment,
     hasAttemptedSend,
-    isSendSpent,
   } = useSendPayment(sendPaymentMutation, paymentDetail.idempotencyKeyRef)
-  useHomeOnBackWhenSpent(isSendSpent)
 
   // What the recipient gets: the amount less the fee, when the fee comes out of it.
   const displayAmount = paymentDetail.convertMoneyAmount(recipientAmount, DisplayCurrency)
@@ -668,8 +666,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               paymentType={paymentType}
               onCopy={handleCopyToClipboard}
             />
-            <View style={styles.group}>
-              <Text type="p3">{LL.SendBitcoinConfirmationScreen.fromBalance()}</Text>
+            <View>
+              <Text type="p3" style={styles.fieldTitleText}>
+                {LL.SendBitcoinConfirmationScreen.fromBalance()}
+              </Text>
               <SendWalletSummary
                 inactive
                 currency={sendingWalletDescriptor.currency}
@@ -690,7 +690,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 title={LL.SendBitcoinConfirmationScreen.details()}
                 items={detailItems}
                 outlineColor={detailsOutline}
-                inactive
               />
               {blockingError ? (
                 <View style={styles.errorWithAction}>
@@ -812,6 +811,12 @@ const useStyles = makeStyles(({ colors }) => ({
   details: {
     rowGap: 14,
   },
+  /** A title above a card, as on the Destination field and the Details card. */
+  fieldTitleText: {
+    color: colors.textSecondary,
+    marginBottom: groupTitleGap,
+  },
+  /** The Details card and the notices under it. */
   group: {
     rowGap: 7,
   },
