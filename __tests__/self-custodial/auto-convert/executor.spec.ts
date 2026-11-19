@@ -286,7 +286,10 @@ describe("executeAutoConvert", () => {
       baseParams,
     )
 
-    expect(outcome).toEqual({ status: "already-converted" })
+    expect(outcome).toEqual({
+      status: "already-converted",
+      conversionPaymentId: "conv-legless",
+    })
     expect(mockGetConversionQuote).not.toHaveBeenCalled()
     /** Declared expected: the payment id keeps the breadcrumb useful without opening a
      *  separate non-fatal for every occurrence. */
@@ -545,7 +548,10 @@ describe("executeAutoConvert", () => {
       { ...baseParams, claimedConversionIds: new Set(["conv-paired-elsewhere"]) },
     )
 
-    expect(outcome).toEqual({ status: "already-converted" })
+    expect(outcome).toEqual({
+      status: "already-converted",
+      conversionPaymentId: "conv-unclaimed",
+    })
     expect(mockGetConversionQuote).not.toHaveBeenCalled()
   })
 })

@@ -60,10 +60,22 @@ const MAX_IN_FLIGHT_INVOICES = 50
  */
 let latestConversionTurn: Promise<unknown> = Promise.resolve()
 
-/** Conversions paired with a receive while the app runs: claimed for every later turn at
- *  once, even should the pairing not reach storage. */
-const claimedWhileRunning = new Set<string>()
-const MAX_CLAIMED_WHILE_RUNNING = 200
+/** By receive, the conversion paired with it whose pairing has not reached storage yet:
+ *  claimed for every other receive at once, and stored before its own receive is tried
+ *  again, which would otherwise convert its sats twice. */
+const unstoredPairings = new Map<string, string>()
+
+/** Pairs a receive with its conversion, durably: the receive is removed only once this
+ *  answers, and should the write fail, it throws with the pairing still held here. */
+const storePairing = async (receivePaymentId: string, conversionPaymentId: string) => {
+  unstoredPairings.set(receivePaymentId, conversionPaymentId)
+  await markAutoConvertPairing({
+    receivePaymentId,
+    conversionPaymentId,
+    pairedAtMs: Date.now(),
+  })
+  unstoredPairings.delete(receivePaymentId)
+}
 
 const afterEarlierReceivesConvert = <T>(turn: () => Promise<T>): Promise<T> => {
   const thisTurn = latestConversionTurn.then(turn)
@@ -169,6 +181,17 @@ const runAutoConvert = async ({
 
     const usdCentsAmount = convertSatsToUsdCents(satsReceived, convert)
     const outcome = await afterEarlierReceivesConvert(async () => {
+      /** Converted already, with its pairing still to store: stored now, and nothing more
+       *  converted. */
+      const unstoredConversion = unstoredPairings.get(paymentId)
+      const isConvertedButUnstored = unstoredConversion !== undefined
+      if (isConvertedButUnstored) {
+        await storePairing(paymentId, unstoredConversion)
+        return {
+          status: AutoConvertStatus.Converted,
+          conversionPaymentId: unstoredConversion,
+        }
+      }
       /** Read in its turn: every receive converted before it is paired by then. */
       const { claimedConversionIds } = await buildClaimedConversionIds()
       const converted = await executeAutoConvert(sdk, {
@@ -189,16 +212,14 @@ const runAutoConvert = async ({
             toleranceBps: amountMatchToleranceBps,
             claimedConversionIds,
           }))
-        if (conversionId) {
-          addBounded(claimedWhileRunning, conversionId, MAX_CLAIMED_WHILE_RUNNING)
-          /** Unstored, it throws, and the receive is kept rather than removed as paired:
-           *  its next try finds its own conversion. */
-          await markAutoConvertPairing({
-            receivePaymentId: paymentId,
-            conversionPaymentId: conversionId,
-            pairedAtMs: Date.now(),
-          })
-        }
+        /** Unstored, it throws, and the receive is kept rather than removed as paired. */
+        if (conversionId) await storePairing(paymentId, conversionId)
+      }
+      /** One the history shows for it is paired too before the receive goes, so no other
+       *  receive takes it for its own once this launch is over. */
+      if (converted.status === AutoConvertStatus.AlreadyConverted) {
+        const { conversionPaymentId: foundConversionId } = converted
+        if (foundConversionId) await storePairing(paymentId, foundConversionId)
       }
       return converted
     })
@@ -241,7 +262,7 @@ const buildClaimedConversionIds = async (): Promise<{
   pairedReceiveIds: ReadonlySet<string>
 }> => {
   const pairings = await listAutoConvertPairings()
-  const claimedConversionIds = new Set<string>(claimedWhileRunning)
+  const claimedConversionIds = new Set<string>(unstoredPairings.values())
   const pairedReceiveIds = new Set<string>()
   pairings.forEach((p) => {
     claimedConversionIds.add(p.conversionPaymentId)

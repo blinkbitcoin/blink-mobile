@@ -129,15 +129,16 @@ type PriorConversionMatch = {
   claimedConversionIds: ReadonlySet<string>
 }
 
-/** Whether the history holds such a conversion. Throws when it cannot be read. */
-const isConvertedInHistory = async (
+/** Such a conversion in the history, if one is there. Throws when the history cannot be
+ *  read. */
+const findConvertedInHistory = async (
   sdk: BreezSdkInterface,
   match: PriorConversionMatch,
-): Promise<boolean> => {
+): Promise<Payment | undefined> => {
   const response = await sdk.listPayments(
     ListPaymentsRequest.create({ offset: 0, limit: 50 }),
   )
-  return response.payments.some((payment) => {
+  const converted = response.payments.find((payment) => {
     const details = payment.conversionDetails
     if (!details || details.status !== ConversionStatus.Completed) return false
 
@@ -164,14 +165,23 @@ const isConvertedInHistory = async (
 
     return matchesConversionAmount(payment, match.satsAmount, match.toleranceBps)
   })
+  return converted
 }
 
-/** The check before anything is quoted: a history that cannot be read is taken for no
- *  such conversion, and the one asked again in the conversion's turn decides. */
-const hasAlreadyConverted = (
+/** Whether the history holds such a conversion. Throws when it cannot be read. */
+const isConvertedInHistory = async (
   sdk: BreezSdkInterface,
   match: PriorConversionMatch,
-): Promise<boolean> => isConvertedInHistory(sdk, match).catch(() => false)
+): Promise<boolean> => (await findConvertedInHistory(sdk, match)) !== undefined
+
+/** The check before anything is quoted, naming the conversion it finds for the pairing:
+ *  a history that cannot be read is taken for no such conversion, and the one asked
+ *  again in the conversion's turn decides. */
+const findAlreadyConverted = (
+  sdk: BreezSdkInterface,
+  match: PriorConversionMatch,
+): Promise<Payment | undefined> =>
+  findConvertedInHistory(sdk, match).catch(() => undefined)
 
 /** Picks the most recent unclaimed completed conversion within tolerance, for pairing. */
 export const findRecentConversionId = async (
@@ -219,9 +229,12 @@ export const executeAutoConvert = async (
     toleranceBps,
     claimedConversionIds: params.claimedConversionIds ?? new Set(),
   }
-  const alreadyConverted = await hasAlreadyConverted(sdk, priorConversion)
-  if (alreadyConverted) {
-    return { status: AutoConvertStatus.AlreadyConverted }
+  const alreadyConvertedBy = await findAlreadyConverted(sdk, priorConversion)
+  if (alreadyConvertedBy) {
+    return {
+      status: AutoConvertStatus.AlreadyConverted,
+      conversionPaymentId: alreadyConvertedBy.id,
+    }
   }
 
   const convertParams: ConvertParams = {

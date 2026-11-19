@@ -40,7 +40,8 @@ export type AutoConvertStatus = (typeof AutoConvertStatus)[keyof typeof AutoConv
 export type AutoConvertOutcome =
   /** With the conversion's own payment when the bridge names it, for the pairing. */
   | { status: typeof AutoConvertStatus.Converted; conversionPaymentId?: string }
-  | { status: typeof AutoConvertStatus.AlreadyConverted }
+  /** With the conversion found in the history when there is one, for the pairing. */
+  | { status: typeof AutoConvertStatus.AlreadyConverted; conversionPaymentId?: string }
   | { status: typeof AutoConvertStatus.SkippedBelowMin }
   | { status: typeof AutoConvertStatus.SkippedStableBalanceActive }
   /** With how long, at most, until it can go out: none when it waits for the user, which

@@ -1185,6 +1185,109 @@ describe("useAutoConvertListener — receives of one amount converting at once",
     expect(mockRemovePendingAutoConvert).not.toHaveBeenCalledWith("lnbcUnstored")
   })
 
+  /** A receive whose conversion went out but whose pairing did not reach storage is
+   *  converted already: tried again, it stores the pairing, and converts nothing more. */
+  it("stores the pairing of a receive that converted before trying it again, converting nothing more", async () => {
+    const sdk = makeSdk({
+      listPayments: jest
+        .fn()
+        .mockResolvedValue({ payments: [makeLightningPayment("lnbcPairLater")] }),
+    })
+    setupDefaults(sdk)
+    mockListPendingAutoConverts.mockResolvedValue([
+      makeRecord({ paymentRequest: "lnbcPairLater" }),
+    ])
+    mockFindPendingAutoConvert.mockResolvedValue(
+      makeRecord({ paymentRequest: "lnbcPairLater" }),
+    )
+    mockExecuteAutoConvert.mockResolvedValue({
+      status: AutoConvertStatus.Converted,
+      conversionPaymentId: "conversion-paired-later",
+    })
+    mockMarkAutoConvertPairing.mockRejectedValueOnce(new Error("storage unavailable"))
+    const first = renderHook(() => useAutoConvertListener())
+    await waitFor(() => expect(mockMarkAutoConvertPairing).toHaveBeenCalledTimes(1))
+    expect(mockRemovePendingAutoConvert).not.toHaveBeenCalled()
+    first.unmount()
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() =>
+      expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbcPairLater"),
+    )
+    expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    expect(mockMarkAutoConvertPairing).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        receivePaymentId: "pid-lnbcPairLater",
+        conversionPaymentId: "conversion-paired-later",
+      }),
+    )
+  })
+
+  /** The conversion the history shows for a receive is paired before the receive goes,
+   *  so no other receive takes it for its own after a restart. */
+  it("pairs a receive with the conversion the history shows before removing it", async () => {
+    const sdk = makeSdk({
+      listPayments: jest
+        .fn()
+        .mockResolvedValue({ payments: [makeLightningPayment("lnbcFoundConverted")] }),
+    })
+    setupDefaults(sdk)
+    mockListPendingAutoConverts.mockResolvedValue([
+      makeRecord({ paymentRequest: "lnbcFoundConverted" }),
+    ])
+    mockFindPendingAutoConvert.mockResolvedValue(
+      makeRecord({ paymentRequest: "lnbcFoundConverted" }),
+    )
+    mockExecuteAutoConvert.mockResolvedValue({
+      status: AutoConvertStatus.AlreadyConverted,
+      conversionPaymentId: "conversion-in-history",
+    })
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() =>
+      expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbcFoundConverted"),
+    )
+    expect(mockMarkAutoConvertPairing).toHaveBeenCalledWith(
+      expect.objectContaining({
+        receivePaymentId: "pid-lnbcFoundConverted",
+        conversionPaymentId: "conversion-in-history",
+      }),
+    )
+  })
+
+  it("keeps a receive the history shows converted while its pairing cannot be stored", async () => {
+    const sdk = makeSdk({
+      listPayments: jest
+        .fn()
+        .mockResolvedValue({ payments: [makeLightningPayment("lnbcFoundUnstored")] }),
+    })
+    setupDefaults(sdk)
+    mockListPendingAutoConverts.mockResolvedValue([
+      makeRecord({ paymentRequest: "lnbcFoundUnstored" }),
+    ])
+    mockFindPendingAutoConvert.mockResolvedValue(
+      makeRecord({ paymentRequest: "lnbcFoundUnstored" }),
+    )
+    mockExecuteAutoConvert.mockResolvedValue({
+      status: AutoConvertStatus.AlreadyConverted,
+      conversionPaymentId: "conversion-found-unstored",
+    })
+    mockMarkAutoConvertPairing.mockRejectedValueOnce(new Error("storage unavailable"))
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => expect(mockMarkAutoConvertPairing).toHaveBeenCalledTimes(1))
+    await waitFor(() =>
+      expect(mockReportError).toHaveBeenCalledWith(
+        "auto-convert-listener replay",
+        expect.any(Error),
+      ),
+    )
+    expect(mockRemovePendingAutoConvert).not.toHaveBeenCalled()
+  })
+
   it("lets the next receive convert after one whose turn failed", async () => {
     const sdk = makeSdk({
       getPayment: jest.fn(async ({ paymentId }: { paymentId: string }) => ({
