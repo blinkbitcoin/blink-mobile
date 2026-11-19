@@ -159,4 +159,15 @@ describe("IconHero", () => {
     await flushEffects()
     expect(getByTestId("icon-cloud-arrow-up")).toBeTruthy()
   })
+
+  it("marks a text title as a heading, so a screen reader can jump to it", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <IconHero icon="warning" iconColor="orange" title="A small problem" />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(getByText("A small problem").props.accessibilityRole).toBe("header")
+  })
 })

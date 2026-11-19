@@ -1,21 +1,25 @@
 import React, { useState } from "react"
-import { ActivityIndicator, TouchableOpacity, View } from "react-native"
+import { ScrollView, View } from "react-native"
 import { PanGestureHandler } from "react-native-gesture-handler"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 
 import { gql } from "@apollo/client"
-import { radius } from "@app/rne-theme/radius"
-import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { Chip } from "@app/components/atomic/chip"
+import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
-import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
-import { PaymentDestinationDisplay } from "@app/components/payment-destination-display"
+import { InfoSection } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { WarningBanner } from "@app/components/warning-banner"
-import { Transaction, WalletCurrency } from "@app/graphql/generated"
+import { PreferredAmountCurrency } from "@app/graphql/client-only-query"
+import {
+  Transaction,
+  usePreferredAmountCurrencyQuery,
+  WalletCurrency,
+} from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { isIdempotencyConflict } from "@app/graphql/is-idempotency-conflict"
-import { useClipboard, useDisplayCurrency } from "@app/hooks"
+import { useAppConfig, useClipboard, useDisplayCurrency } from "@app/hooks"
+import { useInitialAccessibilityFocus } from "@app/hooks/use-initial-accessibility-focus"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
@@ -31,27 +35,36 @@ import {
   ZeroUsdMoneyAmount,
 } from "@app/types/amounts"
 import { useSendDustWarning, useTranslateSdkError } from "@app/self-custodial/hooks"
-import { isSelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { logPaymentAttempt, logPaymentResult } from "@app/utils/analytics"
+import { groupTitleGap } from "@app/rne-theme/tokens"
 import { reportError } from "@app/utils/error-logging"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import { testProps } from "../../utils/testProps"
+import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
+import { isAmountFixableError } from "./amount-fixable-error"
+import { feeTierLabels, formatEta } from "./fee-tier-options"
+import { FeeTierOption } from "./hooks/fee-tiers.types"
+import {
+  CUSTODIAL_PAYOUT_ETA_MINUTES,
+  feeTierFromPayoutSpeed,
+} from "./hooks/use-custodial-onchain-fee-tiers"
+import { ETA_MINUTES } from "./hooks/use-onchain-fee-tiers"
+import { SendReviewDestination } from "./review/send-review-destination"
+import { SendHero } from "./send-hero"
 import { useSendBalances } from "./hooks/use-send-wallets"
 import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
 import { PaymentSendExtraInfo } from "./payment-details/index.types"
-import useFee from "./use-fee"
+import { useReviewFeeText } from "./review/use-review-fee-text"
+import { useReviewQuote } from "./review/use-review-quote"
 import {
   IDEMPOTENCY_KEY_UNAVAILABLE,
   PaymentSendCompletedStatus,
   useSendPayment,
 } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
-import { ellipsizeMiddle } from "@app/utils/helper"
-import { staticSurface } from "@app/rne-theme/surfaces"
-import { groupTitleGap } from "@app/rne-theme/tokens"
+import { formatDestination } from "./format-destination"
 
 gql`
   query sendBitcoinConfirmationScreen {
@@ -82,17 +95,24 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       NativeStackNavigationProp<RootStackParamList, "sendBitcoinConfirmation">
     >()
 
-  const { hideAmount } = useHideAmount()
-  const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
-
   const { paymentDetail } = route.params
+
+  const { hideAmount } = useHideAmount()
+  /** A tap on the wallet card shows the balance on this screen only: the global setting
+   *  and the home screen's state stay as they are. */
+  const [isBalanceRevealed, setIsBalanceRevealed] = useState(false)
+
+  /** Screen reader focus starts on slide to send, the step review leads to; while the fee
+   *  is still being worked out, the handle reads as calculating. */
+  const sliderHandleRef = React.useRef<View>(null)
+  useInitialAccessibilityFocus(sliderHandleRef)
+  const isBalanceHidden = hideAmount && !isBalanceRevealed
 
   const {
     destination,
     paymentType,
     sendingWalletDescriptor,
     sendPaymentMutation,
-    getFee,
     settlementAmount,
     memo: note,
     unitOfAccountAmount,
@@ -100,12 +120,16 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     isSendingMax,
   } = paymentDetail
 
-  const {
-    formatDisplayAndWalletAmount,
-    getSecondaryAmountIfCurrencyIsDifferent,
-    formatMoneyAmount,
-  } = useDisplayCurrency()
+  const { getSecondaryAmountIfCurrencyIsDifferent, formatMoneyAmount } =
+    useDisplayCurrency()
   const saveLnAddressContact = useSaveLnAddressContact()
+
+  /** A typed amount reads back in the currency the sender last swapped the keypad to; a
+   *  fixed amount leads with the display currency, as amount entry does. */
+  const { data: preferredData } = usePreferredAmountCurrencyQuery()
+  const leadsWithWalletCurrency =
+    paymentDetail.canSetAmount &&
+    preferredData?.preferredAmountCurrency === PreferredAmountCurrency.Default
 
   const { btcWallet, usdWallet } = useSendBalances()
 
@@ -114,25 +138,29 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const usdBalanceMoneyAmount = toUsdMoneyAmount(usdWallet?.balance)
 
   const btcPrimaryText = formatMoneyAmount({ moneyAmount: btcBalanceMoneyAmount })
-  const btcSecondaryText = formatMoneyAmount({
-    moneyAmount: convertMoneyAmount(btcBalanceMoneyAmount, DisplayCurrency),
-    isApproximate: true,
-  })
-
   const usdPrimaryText = formatMoneyAmount({ moneyAmount: usdBalanceMoneyAmount })
-  const usdSecondaryText = formatMoneyAmount({
-    moneyAmount: convertMoneyAmount(usdBalanceMoneyAmount, WalletCurrency.Btc),
-    isApproximate: true,
-  })
-
-  const [paymentError, setPaymentError] = useState<string | undefined>(undefined)
+  const [paymentFailure, setPaymentFailure] = useState<
+    { message: string; canChangeAmount: boolean } | undefined
+  >(undefined)
+  const paymentError = paymentFailure?.message
+  const setPaymentError = React.useCallback(
+    (message: string, raw?: string) =>
+      setPaymentFailure({ message, canChangeAmount: isAmountFixableError(raw) }),
+    [],
+  )
   const [isVerifying, setIsVerifying] = useState(false)
   const verifyPaymentSettled = useVerifyPaymentSettled()
-  const { LL } = useI18nContext()
+  const { LL, locale } = useI18nContext()
   const translateSdkError = useTranslateSdkError()
   const { copyToClipboard } = useClipboard()
+  const tierLabels = feeTierLabels(LL)
+  const {
+    appConfig: {
+      galoyInstance: { lnAddressHostname },
+    },
+  } = useAppConfig()
 
-  const fee = useFee(getFee)
+  const { fee, recipientAmount, isAwaitingIncludedFee } = useReviewQuote(paymentDetail)
 
   const settledFee = fee.status === "set" ? fee : undefined
 
@@ -150,10 +178,25 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     fee.status === "loading" || (fee.status === "error" && !fee.amount)
   const dustNotEvaluable =
     dustWarning.status === "pending" || dustWarning.status === "blocked"
+  // A blocked dust check stays a plain disable until #1273 N1 is ruled.
+  const isCalculating = feeUnavailable || dustWarning.status === "pending"
 
-  const defaultAmount = formatMoneyAmount({ moneyAmount: ZeroUsdMoneyAmount })
-  let currencyFeeAmount = defaultAmount
-  let satFeeAmount = defaultAmount
+  const progress = LL.SendBitcoinConfirmationScreen.sendProgress
+  const sendProgressLabels = [
+    progress.reviewing(),
+    progress.signing(),
+    progress.findingRoute(),
+    progress.broadcasting(),
+    progress.checkingDelivery(),
+    progress.retrying(),
+    progress.almostThere(),
+    progress.anyTimeNow(),
+    progress.ohOh(),
+    progress.tryingAgain(),
+  ]
+
+  const { feeDisplayText, currencyFeeAmount, satFeeAmount, feeErrorCode, feeErrorText } =
+    useReviewFeeText({ fee, paymentDetail, leadsWithWalletCurrency })
 
   const {
     loading: sendPaymentLoading,
@@ -161,41 +204,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     hasAttemptedSend,
   } = useSendPayment(sendPaymentMutation, paymentDetail.idempotencyKeyRef)
 
-  // Self-custodial fee failures carry a classified SDK code; custodial ones carry raw
-  // GraphQL text that is not fit to show, so only the former replaces the generic string.
-  const feeErrorCode = fee.status === "error" ? fee.errors?.[0]?.message : undefined
-  const feeErrorText =
-    (isSelfCustodialErrorCode(feeErrorCode)
-      ? translateSdkError(feeErrorCode)
-      : undefined) ?? String(LL.common.feeError())
-  let feeDisplayText = feeErrorText
-  currencyFeeAmount = feeErrorText
-  satFeeAmount = feeErrorText
-  if (fee.amount) {
-    const feeDisplayAmount = paymentDetail.convertMoneyAmount(fee.amount, DisplayCurrency)
-    feeDisplayText = formatDisplayAndWalletAmount({
-      displayAmount: feeDisplayAmount,
-      walletAmount: fee.amount,
-    })
-
-    currencyFeeAmount = formatMoneyAmount({
-      moneyAmount: feeDisplayAmount,
-    })
-
-    const secondaryFeeAmount = getSecondaryAmountIfCurrencyIsDifferent({
-      primaryAmount: feeDisplayAmount,
-      walletAmount: paymentDetail.convertMoneyAmount(fee.amount, WalletCurrency.Btc),
-      displayAmount: paymentDetail.convertMoneyAmount(fee.amount, DisplayCurrency),
-    })
-    satFeeAmount = formatMoneyAmount({
-      moneyAmount: secondaryFeeAmount ?? ZeroUsdMoneyAmount,
-    })
-  }
-
-  const displayAmount = paymentDetail.convertMoneyAmount(
-    settlementAmount,
-    DisplayCurrency,
-  )
+  // What the recipient gets: the amount less the fee, when the fee comes out of it.
+  const displayAmount = paymentDetail.convertMoneyAmount(recipientAmount, DisplayCurrency)
 
   const currencyAmount = formatMoneyAmount({
     moneyAmount: displayAmount,
@@ -203,12 +213,25 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const secondaryAmount = getSecondaryAmountIfCurrencyIsDifferent({
     primaryAmount: displayAmount,
-    walletAmount: paymentDetail.convertMoneyAmount(settlementAmount, WalletCurrency.Btc),
-    displayAmount: paymentDetail.convertMoneyAmount(settlementAmount, DisplayCurrency),
+    walletAmount: paymentDetail.convertMoneyAmount(recipientAmount, WalletCurrency.Btc),
+    displayAmount: paymentDetail.convertMoneyAmount(recipientAmount, DisplayCurrency),
   })
 
   const satAmount = formatMoneyAmount({
     moneyAmount: secondaryAmount ?? ZeroUsdMoneyAmount,
+  })
+
+  /** The hero pairs the display currency with the sending wallet's, the pair the keypad
+   *  swaps between, led by whichever the sender typed in. */
+  const heroWalletAmount = paymentDetail.convertMoneyAmount(
+    recipientAmount,
+    sendingWalletDescriptor.currency,
+  )
+  const heroPrimaryAmount = leadsWithWalletCurrency ? heroWalletAmount : displayAmount
+  const heroSecondaryAmount = getSecondaryAmountIfCurrencyIsDifferent({
+    primaryAmount: heroPrimaryAmount,
+    walletAmount: heroWalletAmount,
+    displayAmount,
   })
 
   const navigateToCompleted = React.useCallback(
@@ -243,14 +266,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               satAmount,
               currencyFeeAmount,
               satFeeAmount,
-              destination:
-                paymentDetail?.paymentType === "intraledger"
-                  ? destination
-                  : ellipsizeMiddle(destination, {
-                      maxLength: 50,
-                      maxResultLeft: 13,
-                      maxResultRight: 8,
-                    }),
+              destination: formatDestination({
+                destination,
+                paymentType,
+                lnAddressHostname,
+              }),
               paymentType: paymentDetail?.paymentType,
               createdAt: transaction?.createdAt,
             },
@@ -271,6 +291,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       navigation,
       paymentType,
       destination,
+      lnAddressHostname,
       paymentDetail,
       note,
       currencyAmount,
@@ -314,6 +335,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       setPaymentError(
         translateSdkError(errorsMessage) ||
           LL.SendBitcoinConfirmationScreen.somethingWentWrong(),
+        errorsMessage,
       )
       ReactNativeHapticFeedback.trigger("notificationError", {
         ignoreAndroidSystemSettings: true,
@@ -368,6 +390,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           err.message === IDEMPOTENCY_KEY_UNAVAILABLE
             ? LL.SendBitcoinConfirmationScreen.somethingWentWrong()
             : err.message || err.toString(),
+          err.message,
         )
       }
     }
@@ -397,9 +420,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     ? paymentDetail.convertMoneyAmount(fee.amount, settlementAmount.currency)
     : zeroSettlementAmount
 
+  // A fee taken out of the amount is already inside it.
   const totalAmount = addMoneyAmounts({
     a: settlementAmount,
-    b: feeInSettlementCurrency,
+    b: paymentDetail.isFeeIncluded ? zeroSettlementAmount : feeInSettlementCurrency,
   })
 
   const skipBalanceCheck = isSendingMax || hasAttemptedSend
@@ -414,7 +438,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       lessThanOrEqualTo: btcBalanceMoneyAmount,
     })
     if (!validAmount) {
-      invalidAmountErrorMessage = LL.SendBitcoinScreen.amountExceed({
+      invalidAmountErrorMessage = LL.SendBitcoinConfirmationScreen.totalExceed({
         balance: btcPrimaryText,
       })
     }
@@ -430,7 +454,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       lessThanOrEqualTo: usdBalanceMoneyAmount,
     })
     if (!validAmount) {
-      invalidAmountErrorMessage = LL.SendBitcoinScreen.amountExceed({
+      invalidAmountErrorMessage = LL.SendBitcoinConfirmationScreen.totalExceed({
         balance: usdPrimaryText,
       })
     }
@@ -443,165 +467,146 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     })
   }
 
-  const errorMessage = paymentError || invalidAmountErrorMessage
-
-  const transactionType = () => {
-    if (paymentType === "intraledger") return LL.common.intraledger()
-    if (paymentType === "onchain") return LL.common.onchain()
-    if (paymentType === "lightning") return LL.common.lightning()
-    if (paymentType === "lnurl") return LL.common.lightning()
-    if (paymentType === "spark") return LL.common.spark()
-  }
-
-  const isLightningRecommended = () => {
+  const isLightningRecommended = (() => {
     const ratioFeeToAmount = 50 // 2%
 
-    if (!fee.amount) return false
+    if (!fee.amount || paymentType !== "onchain") return false
 
     const feeMultiplied = multiplyMoneyAmounts({
       value: fee.amount,
       multiplier: ratioFeeToAmount,
     })
 
-    if (
-      paymentType === "onchain" &&
-      greaterThan({ value: feeMultiplied, greaterThan: totalAmount })
-    )
-      return true
-    return false
-  }
+    return greaterThan({ value: feeMultiplied, greaterThan: totalAmount })
+  })()
 
-  const LightningRecommendedComponent = isLightningRecommended() ? (
-    <View style={styles.feeWarning}>
-      <WarningBanner numberOfLines={1}>
-        {LL.SendBitcoinConfirmationScreen.lightningRecommended()}
-      </WarningBanner>
-    </View>
-  ) : (
-    <></>
-  )
+  const sendingWalletBalance =
+    sendingWalletDescriptor.currency === WalletCurrency.Btc
+      ? btcBalanceMoneyAmount
+      : usdBalanceMoneyAmount
+  const walletBalanceSecondary = getSecondaryAmountIfCurrencyIsDifferent({
+    primaryAmount: sendingWalletBalance,
+    walletAmount: sendingWalletBalance,
+    displayAmount: convertMoneyAmount(sendingWalletBalance, DisplayCurrency),
+  })
+
+  /** Custodial sends carry the payout speed, self-custodial ones the SDK tier; each rail
+   *  has its own broadcast windows. */
+  const priorityTier: FeeTierOption | undefined =
+    paymentType === "onchain"
+      ? paymentDetail.feeTier ?? feeTierFromPayoutSpeed(paymentDetail.payoutSpeed)
+      : undefined
+  const priorityEtaMinutes =
+    priorityTier &&
+    (paymentDetail.feeTier ? ETA_MINUTES : CUSTODIAL_PAYOUT_ETA_MINUTES)[priorityTier]
+
+  const isFeeLoading = fee.status === "loading" || fee.status === "unset"
+  const isMaxFee = fee.status === "error" && Boolean(fee.amount)
+  const isFeeFailed = fee.status === "error" && !fee.amount
+
+  // A failed quote leaves the row blank; its reason goes under the card with the other errors.
+  const feeValue = isFeeFailed ? "—" : `${feeDisplayText}${isMaxFee ? " *" : ""}`
+
+  const detailItems = [
+    ...(priorityTier && priorityEtaMinutes !== undefined
+      ? [
+          {
+            label: LL.SendBitcoinScreen.feeTier(),
+            value: `${tierLabels[priorityTier]} ~ ${formatEta(priorityEtaMinutes, locale)}`,
+          },
+        ]
+      : []),
+    {
+      label: LL.SendBitcoinConfirmationScreen.feeLabel(),
+      value: feeValue,
+      loading: isFeeLoading,
+      valueTestId: fee.status === "set" ? "Successful Fee" : undefined,
+    },
+    ...(note ? [{ label: LL.common.note(), value: note }] : []),
+  ]
+
+  /** One slot under the card, first match wins: what blocks the send (red) before the
+   *  high-fee advisory (warning). */
+  const blockingError =
+    paymentError || invalidAmountErrorMessage || (isFeeFailed ? feeErrorText : "")
+  // Offered only when the error on show is about the amount; a network or invoice failure
+  // is not fixed by going back to change it.
+  const canChangeAmount = paymentFailure
+    ? paymentFailure.canChangeAmount
+    : Boolean(invalidAmountErrorMessage) ||
+      (isFeeFailed && isAmountFixableError(feeErrorCode))
+  const detailsOutline =
+    invalidAmountErrorMessage || isFeeFailed
+      ? colors.error
+      : isLightningRecommended
+        ? colors.warning
+        : undefined
 
   return (
-    <Screen preset="scroll" style={styles.screenStyle} keyboardOffset="navigationHeader">
-      <View style={styles.sendBitcoinConfirmationContainer}>
-        <View style={styles.fieldContainer}>
-          <Text style={styles.fieldTitleText}>
-            {LL.SendBitcoinScreen.destination()} - {transactionType()}
+    <Screen preset="fixed" keyboardOffset="navigationHeader">
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+        <View style={styles.hero}>
+          <SendHero
+            caption={LL.SendBitcoinConfirmationScreen.sending()}
+            primaryAmount={formatMoneyAmount({ moneyAmount: heroPrimaryAmount })}
+            secondaryAmount={
+              heroSecondaryAmount &&
+              formatMoneyAmount({ moneyAmount: heroSecondaryAmount })
+            }
+          />
+        </View>
+        <SendReviewDestination
+          destination={destination}
+          paymentType={paymentType}
+          onCopy={handleCopyToClipboard}
+        />
+        <View>
+          <Text type="p3" style={styles.fieldTitleText}>
+            {LL.SendBitcoinConfirmationScreen.fromBalance()}
           </Text>
-          <View style={styles.fieldBackground}>
-            <PaymentDestinationDisplay
-              destination={destination}
-              paymentType={paymentType}
-            />
-            <TouchableOpacity
-              style={styles.iconContainer}
-              onPress={handleCopyToClipboard}
-              hitSlop={30}
-            >
-              <GaloyIcon name={"copy-paste"} size={18} color={colors.accent} />
-            </TouchableOpacity>
-          </View>
+          <SendWalletSummary
+            inactive
+            currency={sendingWalletDescriptor.currency}
+            isBalanceHidden={isBalanceHidden}
+            onReveal={isBalanceHidden ? () => setIsBalanceRevealed(true) : undefined}
+            balancePrimary={formatMoneyAmount({ moneyAmount: sendingWalletBalance })}
+            balanceSecondary={
+              walletBalanceSecondary &&
+              formatMoneyAmount({
+                moneyAmount: walletBalanceSecondary,
+                isApproximate: true,
+              })
+            }
+          />
         </View>
-        <View style={styles.fieldContainer}>
-          <Text style={styles.fieldTitleText}>{LL.common.from()}</Text>
-          <View style={[styles.fieldBackground, styles.fieldBackgroundStatic]}>
-            <View style={styles.walletSelectorTypeContainer}>
-              <CurrencyPill
-                currency={sendingWalletDescriptor.currency}
-                containerSize="medium"
-                containerStyle={pillWidthStyle}
-                onLayout={onPillLayout(sendingWalletDescriptor.currency)}
-              />
+        <View style={styles.group}>
+          <InfoSection
+            title={LL.SendBitcoinConfirmationScreen.details()}
+            items={detailItems}
+            outlineColor={detailsOutline}
+          />
+          {blockingError ? (
+            <View style={styles.errorWithAction}>
+              <GaloyErrorBox errorMessage={blockingError} filled={false} />
+              {canChangeAmount ? (
+                <Chip
+                  label={LL.SendBitcoinConfirmationScreen.changeAmount()}
+                  onPress={() => navigation.goBack()}
+                  style={styles.changeAmountChip}
+                />
+              ) : null}
             </View>
-            <View
-              style={
-                hideAmount
-                  ? styles.walletSelectorInfoContainerHidden
-                  : styles.walletSelectorInfoContainer
-              }
-            >
-              {hideAmount ? (
-                <HiddenBalancePlaceholder size="small" />
-              ) : (
-                <>
-                  <View style={styles.walletSelectorTypeTextContainer}>
-                    {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
-                      <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
-                    ) : (
-                      <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
-                    )}
-                  </View>
-                  <View style={styles.walletSelectorBalanceContainer}>
-                    {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
-                      <Text>{btcSecondaryText}</Text>
-                    ) : (
-                      <Text>{usdSecondaryText}</Text>
-                    )}
-                  </View>
-                  <View />
-                </>
-              )}
-            </View>
-          </View>
-        </View>
-        <View style={styles.fieldContainer}>
-          <Text style={styles.fieldTitleText}>{LL.SendBitcoinScreen.amount()}</Text>
-          <View style={[styles.fieldBackground, styles.fieldBackgroundStatic]}>
-            <Text type="p2">
-              {formatDisplayAndWalletAmount({
-                primaryAmount: unitOfAccountAmount,
-                displayAmount,
-                walletAmount: settlementAmount,
-              })}
-            </Text>
-          </View>
-        </View>
-        {note ? (
-          <View style={styles.fieldContainer}>
-            <Text style={styles.fieldTitleText}>{LL.SendBitcoinScreen.note()}</Text>
-            <View style={[styles.fieldBackground, styles.fieldBackgroundStatic]}>
-              <Text type="p2" style={styles.noteText}>
-                {note}
-              </Text>
-            </View>
-          </View>
-        ) : null}
-        <View style={styles.fieldContainer}>
-          <View style={styles.feeTextContainer}>
-            <Text style={styles.fieldTitleText}>
-              {LL.SendBitcoinConfirmationScreen.feeLabel()}
-            </Text>
-            {LightningRecommendedComponent}
-          </View>
-          <View
-            style={[
-              styles.fieldBackground,
-              styles.fieldBackgroundStatic,
-              isLightningRecommended() ? styles.warningOutline : undefined,
-            ]}
-          >
-            {fee.status === "loading" && <ActivityIndicator />}
-            {fee.status === "set" && (
-              <Text type="p2" {...testProps("Successful Fee")}>
-                {feeDisplayText}
-              </Text>
-            )}
-            {fee.status === "error" && Boolean(fee.amount) && (
-              <Text type="p2">{feeDisplayText} *</Text>
-            )}
-            {fee.status === "error" && !fee.amount && (
-              <Text type="p2">{feeErrorText}</Text>
-            )}
-          </View>
-          {fee.status === "error" && Boolean(fee.amount) && (
-            <Text type="p2" style={styles.maxFeeWarningText}>
+          ) : isLightningRecommended ? (
+            <WarningBanner>
+              {LL.SendBitcoinConfirmationScreen.lightningRecommended()}
+            </WarningBanner>
+          ) : null}
+          {isMaxFee ? (
+            <Text type="p3" style={styles.footnote}>
               {"*" + LL.SendBitcoinConfirmationScreen.maxFeeSelected()}
             </Text>
-          )}
-        </View>
-
-        {dustWarning.status === "visible" ? (
-          <View style={styles.fieldContainer}>
+          ) : null}
+          {dustWarning.status === "visible" ? (
             <WarningBanner>
               {LL.SendBitcoinConfirmationScreen.usdRemainderSweep({
                 remaining: formatMoneyAmount({ moneyAmount: dustWarning.remaining }),
@@ -611,32 +616,39 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 minimum: formatMoneyAmount({ moneyAmount: dustWarning.minimum }),
               })}
             </WarningBanner>
-          </View>
-        ) : null}
-        {errorMessage ? (
-          <View style={styles.errorContainer}>
-            <Text type="p2" style={styles.errorText}>
-              {errorMessage}
-            </Text>
-          </View>
-        ) : null}
-        <View style={styles.buttonContainer}>
-          {/* disable slide gestures in area around the slider button */}
-          <PanGestureHandler>
-            <View style={styles.sliderContainer}>
-              <GaloySliderButton
-                isLoading={sendPaymentLoading || isVerifying}
-                initialText={LL.SendBitcoinConfirmationScreen.slideToConfirm()}
-                loadingText={LL.SendBitcoinConfirmationScreen.slideConfirming()}
-                onSwipe={handleSendPayment}
-                disabled={
-                  !validAmount || !sendPayment || feeUnavailable || dustNotEvaluable
-                }
-              />
-            </View>
-          </PanGestureHandler>
+          ) : null}
         </View>
-      </View>
+      </ScrollView>
+      {/* disable slide gestures in area around the slider button */}
+      <PanGestureHandler>
+        <View style={styles.sliderContainer}>
+          <GaloySliderButton
+            isLoading={sendPaymentLoading || isVerifying}
+            initialText={LL.SendBitcoinConfirmationScreen.slideToSend()}
+            loadingText={LL.SendBitcoinConfirmationScreen.sendProgress.reviewing()}
+            busyLabels={sendProgressLabels}
+            disabledText={
+              isCalculating
+                ? LL.SendBitcoinConfirmationScreen.calculatingFee()
+                : undefined
+            }
+            accentColor={
+              sendingWalletDescriptor.currency === WalletCurrency.Usd
+                ? colors._green
+                : colors.accent
+            }
+            onSwipe={handleSendPayment}
+            handleRef={sliderHandleRef}
+            disabled={
+              !validAmount ||
+              !sendPayment ||
+              isAwaitingIncludedFee ||
+              feeUnavailable ||
+              dustNotEvaluable
+            }
+          />
+        </View>
+      </PanGestureHandler>
     </Screen>
   )
 }
@@ -644,107 +656,41 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 export default SendBitcoinConfirmationScreen
 
 const useStyles = makeStyles(({ colors }) => ({
-  sendBitcoinConfirmationContainer: {
+  scroll: {
     flex: 1,
   },
-  fieldContainer: {
+  /** Figma's body column: 14 between blocks, 20 at the sides, the hero flush with the
+   *  header. */
+  scrollContent: {
+    rowGap: 14,
     paddingHorizontal: 20,
-    marginBottom: 12,
+    paddingBottom: 20,
   },
-  noteText: {
-    flex: 1,
+  /** Holds the amounts 10 further off the destination than the blocks below sit apart. */
+  hero: {
+    paddingBottom: 10,
   },
-  fieldBackground: {
-    flexDirection: "row",
-    borderStyle: "solid",
-    overflow: "hidden",
-    backgroundColor: colors.surfaceInteractive,
-    padding: 14,
-    minHeight: 60,
-    borderRadius: radius.default,
-    alignItems: "center",
-  },
-  fieldBackgroundStatic: staticSurface(colors),
-  warningOutline: {
-    borderColor: colors.warning,
-    borderWidth: 2,
-  },
+  /** A title above a card, as on the Destination field and the Details card. */
   fieldTitleText: {
     color: colors.textSecondary,
-    fontWeight: "bold",
     marginBottom: groupTitleGap,
   },
-  walletSelectorTypeContainer: {
-    justifyContent: "center",
-    alignItems: "flex-start",
-    marginRight: 28,
+  /** The Details card and the notices under it. */
+  group: {
+    rowGap: 7,
   },
-  walletSelectorInfoContainer: {
-    flex: 1,
-    flexDirection: "column",
+  errorWithAction: {
+    rowGap: 12,
   },
-  // The placeholder is a single 12pt row, so it cannot reuse the two-line
-  // layout above: walletSelectorTypeTextContainer is flex-end, which pins a
-  // lone child to the bottom of the column and drops it below the pill.
-  walletSelectorInfoContainerHidden: {
-    flex: 1,
-    justifyContent: "center",
+  changeAmountChip: {
+    alignSelf: "center",
   },
-  walletSelectorTypeTextContainer: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  walletCurrencyText: {
-    fontWeight: "bold",
-    fontSize: 18,
-  },
-  walletSelectorBalanceContainer: {
-    flex: 1,
-    flexDirection: "row",
-  },
-  buttonContainer: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  errorContainer: {
-    padding: 20,
-  },
-  errorText: {
-    color: colors.error,
-    textAlign: "center",
-  },
-  maxFeeWarningText: {
-    color: colors.warning,
-    fontWeight: "bold",
-  },
-  noteIconContainer: {
-    marginRight: 12,
-    justifyContent: "center",
-    alignItems: "flex-start",
-  },
-  noteIcon: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  screenStyle: {
-    paddingTop: 20,
-    flexGrow: 1,
-  },
-  iconContainer: {
-    justifyContent: "center",
-    alignItems: "flex-start",
-    paddingLeft: 20,
-  },
-  feeWarning: {
-    paddingBottom: 4,
-    flex: 0.95,
-  },
-  feeTextContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+  footnote: {
+    color: colors.textMuted,
   },
   sliderContainer: {
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 20,
   },
 }))

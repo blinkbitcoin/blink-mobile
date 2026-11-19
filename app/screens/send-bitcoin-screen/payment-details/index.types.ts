@@ -30,6 +30,7 @@ import {
 } from "@app/types/amounts"
 import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction"
 import { WalletDescriptor } from "@app/types/wallets"
+import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
 export type ConvertMoneyAmount = <W extends WalletOrDisplayCurrency>(
@@ -161,6 +162,9 @@ type BasePaymentDetail<T extends WalletCurrency> = {
   setSendingWalletDescriptor: SetSendingWalletDescriptor<T>
   canSendMax?: boolean
   isSendingMax?: boolean
+  /** The fee comes out of the amount sent, so the recipient gets the amount less the fee:
+   *  a send-all, or a dollar send to a Lightning address. */
+  isFeeIncluded?: boolean
   setMemo?: SetMemo<T>
   canSetMemo: boolean
   setAmount?: SetAmount<T>
@@ -208,6 +212,9 @@ export type PaymentDetailSetSuccessAction<T extends WalletCurrency> = {
 export type PaymentDetailSetPayoutSpeed<T extends WalletCurrency> = {
   setPayoutSpeed?: SetPayoutSpeed<T>
   payoutSpeed?: PayoutSpeed
+  /** Self-custodial on-chain only: the tier the fee was quoted and the send is made on.
+   *  Read-only, for the review screen; changing it means rebuilding the detail. */
+  feeTier?: FeeTierOption
 }
 
 /**
