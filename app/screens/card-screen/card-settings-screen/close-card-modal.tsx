@@ -5,6 +5,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { radius } from "@app/rne-theme/radius"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 
 type CloseCardModalProps = {
   isVisible: boolean
@@ -101,6 +102,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.textPrimary,
   },
   textInput: {
+    fontFamily: fonts.regular,
     fontSize: 16,
     backgroundColor: colors.neutral,
     padding: 12,

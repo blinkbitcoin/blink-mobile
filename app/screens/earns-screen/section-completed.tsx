@@ -6,6 +6,7 @@ import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Button } from "@rn-vui/base"
 import { makeStyles, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { CloseCross } from "../../components/close-cross"
 import { MountainHeader } from "../../components/mountain-header"
@@ -35,6 +36,7 @@ const useStyles = makeStyles(({ colors }) => ({
   divider: { flex: 0.5, minHeight: 30 },
 
   headerSection: {
+    fontFamily: fonts.regular,
     color: colors.staticWhite,
     fontSize: 16,
     paddingTop: 18,
@@ -43,14 +45,14 @@ const useStyles = makeStyles(({ colors }) => ({
   titleSection: {
     color: colors.staticWhite,
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     paddingTop: 6,
   },
 
   titleStyle: {
     color: colors.staticBrightBlue,
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     flex: 1,
     justifyContent: "center",
   },

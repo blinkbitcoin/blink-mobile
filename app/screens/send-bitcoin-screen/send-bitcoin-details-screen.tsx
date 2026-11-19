@@ -64,6 +64,7 @@ import { isValidAmount, withConvertMoneyAmount } from "./payment-details"
 import { PaymentDetail } from "./payment-details/index.types"
 import { SendBitcoinDetailsExtraInfo } from "./send-bitcoin-details-extra-info"
 import { groupTitleGap } from "@app/rne-theme/tokens"
+import { fonts } from "@app/rne-theme/fonts"
 
 gql`
   query sendBitcoinDetailsScreen {
@@ -761,7 +762,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
   },
   walletCurrencyText: {
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     fontSize: 18,
   },
   walletSelectorTypeTextContainer: {
@@ -774,7 +775,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   fieldTitleText: {
     color: colors.textSecondary,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     marginBottom: groupTitleGap,
   },
   fieldContainer: {
@@ -804,7 +805,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexGrow: 1,
   },
   amountText: {
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
   },
   amountRightMaxField: {
     flexDirection: "row",

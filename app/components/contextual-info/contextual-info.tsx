@@ -17,6 +17,7 @@ import {
   FormattedDepositFeeTier,
   formatDepositFeeTiers,
 } from "@app/utils/deposit-fees"
+import { fonts } from "@app/rne-theme/fonts"
 
 type FeesInformation = {
   deposit: DepositFeesInformation
@@ -186,7 +187,7 @@ const useStyles = makeStyles(({ colors }) => ({
   linkText: {
     color: colors.textSecondary,
     fontSize: 14,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
     textAlign: "center",
   },
@@ -199,7 +200,7 @@ const useStyles = makeStyles(({ colors }) => ({
   depositFeeText: {
     color: colors.textSecondary,
     fontSize: 14,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
     flex: 1,
   },

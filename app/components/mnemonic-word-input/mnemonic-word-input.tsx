@@ -5,6 +5,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
 
@@ -98,7 +99,7 @@ const useStyles = makeStyles(({ colors }) => ({
   input: {
     flex: 1,
     fontSize: 14,
-    fontFamily: "SourceSansPro-Regular",
+    fontFamily: fonts.regular,
     color: colors.textOnBackground,
   },
 }))

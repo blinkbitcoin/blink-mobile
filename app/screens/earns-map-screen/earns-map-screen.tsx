@@ -39,6 +39,7 @@ import TextBlock from "./text-block-medium.svg"
 import { useQuizServer } from "./use-quiz-server"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useState } from "react"
+import { fonts } from "@app/rne-theme/fonts"
 
 type SideType = "left" | "right"
 interface IInBetweenTile {
@@ -380,6 +381,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: BADGER_WIDTH,
   },
   bottomSectionText: {
+    fontFamily: fonts.regular,
     color: "white",
     textAlign: "center",
     fontSize: 16,
@@ -388,6 +390,7 @@ const useStyles = makeStyles(({ colors }) => ({
     width: BADGER_WIDTH,
   },
   finishText: {
+    fontFamily: fonts.regular,
     color: colors.staticWhite,
     fontSize: 18,
     position: "absolute",
@@ -406,7 +409,7 @@ const useStyles = makeStyles(({ colors }) => ({
   textStyleBox: {
     color: colors.staticWhite,
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     marginHorizontal: 10,
   },
   progressContainer: { backgroundColor: colors.staticDarkGrey, margin: 10 },
@@ -414,6 +417,7 @@ const useStyles = makeStyles(({ colors }) => ({
   loadingView: { flex: 1, justifyContent: "center", alignItems: "center" },
   fullView: { position: "absolute", width: "100%" },
   modalBodyText: {
+    fontFamily: fonts.regular,
     fontSize: 17,
     color: colors.textOnBackground,
     textAlign: "left",

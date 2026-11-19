@@ -243,6 +243,7 @@ const useStyles = makeStyles(({ colors }, { topInset, bottomInset }: StyleProps)
     backgroundColor: colors.surfaceInteractive,
   },
   input: {
+    fontFamily: fonts.regular,
     flex: 1,
     fontSize: 16,
     color: colors.textOnBackground,

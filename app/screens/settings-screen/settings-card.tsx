@@ -5,6 +5,7 @@ import { Colors, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
+import { fonts } from "@app/rne-theme/fonts"
 
 type ThemeColor = keyof Colors
 
@@ -72,13 +73,13 @@ const useStyles = makeStyles(({ colors }, { borderColor }: { borderColor?: strin
   },
   title: {
     fontSize: 14,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 20,
     color: colors.textOnBackground,
   },
   description: {
     fontSize: 14,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
     color: colors.textOnBackground,
   },

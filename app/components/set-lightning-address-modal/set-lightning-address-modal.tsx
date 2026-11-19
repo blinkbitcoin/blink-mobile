@@ -6,6 +6,7 @@ import { radius } from "@app/rne-theme/radius"
 import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 import {
   useUserUpdateUsernameMutation,
@@ -248,6 +249,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "space-between",
   },
   textInputStyle: {
+    fontFamily: fonts.regular,
     paddingTop: 0,
     paddingBottom: 0,
     flex: 1,

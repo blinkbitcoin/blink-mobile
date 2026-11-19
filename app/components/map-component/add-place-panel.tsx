@@ -423,6 +423,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     paddingRight: 10,
   },
   input: {
+    fontFamily: fonts.regular,
     flex: 1,
     alignSelf: "stretch",
     fontSize: 16,
@@ -473,11 +474,11 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
   },
   chipText: {
     color: colors.accent,
-    fontFamily: "SourceSansPro-Bold",
+    fontFamily: fonts.bold,
   },
   chipTextSelected: {
     color: colors.textOnAccent,
-    fontFamily: "SourceSansPro-Bold",
+    fontFamily: fonts.bold,
   },
   note: {
     flexDirection: "row",

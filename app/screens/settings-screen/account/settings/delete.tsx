@@ -22,6 +22,7 @@ import {
   SwitchProfileOutcome,
   useSwitchToNextProfile,
 } from "@app/hooks/use-switch-to-next-profile"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { SettingsButton } from "../../button"
 import { useAccountDeleteContext } from "../account-delete-context"
@@ -269,6 +270,7 @@ const useStyles = makeStyles(({ colors }) => ({
     rowGap: 20,
   },
   textInput: {
+    fontFamily: fonts.regular,
     fontSize: 16,
     backgroundColor: colors.neutral,
     padding: 12,

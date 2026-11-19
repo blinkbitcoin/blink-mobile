@@ -7,6 +7,7 @@ import { radius } from "@app/rne-theme/radius"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 type Props = {
   isVisible: boolean
@@ -87,6 +88,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.textOnBackground,
   },
   textInput: {
+    fontFamily: fonts.regular,
     fontSize: 16,
     backgroundColor: colors.neutral,
     padding: 12,

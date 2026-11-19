@@ -7,6 +7,7 @@ import { GaloyIcon } from "../atomic/galoy-icon"
 import { groupTitleGap } from "@app/rne-theme/tokens"
 
 import { radius } from "@app/rne-theme/radius"
+import { fonts } from "@app/rne-theme/fonts"
 
 type PasswordInputProps = {
   label: string
@@ -88,6 +89,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingRight: 10,
   },
   input: {
+    fontFamily: fonts.regular,
     flex: 1,
     fontSize: 14,
     lineHeight: 20,

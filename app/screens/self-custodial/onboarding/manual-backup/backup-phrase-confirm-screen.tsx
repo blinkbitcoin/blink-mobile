@@ -18,6 +18,7 @@ import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
 import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { useBackupConfirm, useCompleteBackup } from "../hooks"
 import { type Challenge, isValidChallenges } from "../utils"
@@ -288,7 +289,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     fontSize: 14,
     color: colors.textOnBackground,
-    fontFamily: "SourceSansPro-Regular",
+    fontFamily: fonts.regular,
   },
   errorContainer: {
     flexDirection: "row",

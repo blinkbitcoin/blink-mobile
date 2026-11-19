@@ -2,6 +2,7 @@ import React from "react"
 import { Pressable, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
 
@@ -67,8 +68,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     color: colors.textOnBackground,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
   },
   centered: {

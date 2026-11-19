@@ -3,6 +3,7 @@ import { View, TouchableOpacity, StyleProp, ViewStyle } from "react-native"
 import { Text, makeStyles } from "@rn-vui/themed"
 import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { IconNamesType } from "../atomic/galoy-icon"
 import { OptionIcon } from "./option-icon"
@@ -116,7 +117,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   label: {
     fontSize: 20,
-    fontWeight: "500",
+    fontFamily: fonts.regular,
   },
   labelSelected: {
     color: colors.accent,
@@ -135,7 +136,7 @@ const useStyles = makeStyles(({ colors }) => ({
   recommended: {
     fontStyle: "italic",
     fontSize: 15,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     marginLeft: 8,
     color: colors.textMuted,
   },

@@ -10,6 +10,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import MonkeyTyping from "@app/assets/images/monkey-typing.gif"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const LoadingCardScreen: React.FC = () => {
   const styles = useStyles()
@@ -92,7 +93,7 @@ const useStyles = makeStyles(({ colors }) => ({
   welcomeTitle: {
     paddingHorizontal: 20,
     textAlign: "center",
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     marginBottom: 20,
   },
   bodySubText: {

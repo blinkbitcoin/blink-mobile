@@ -9,6 +9,7 @@ import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { BalanceMode } from "@app/hooks/use-balance-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 /** The 32pt balance sits directly under the fixed-size home header chrome;
  *  uncapped Dynamic Type makes it overrun the username row above. */
@@ -125,7 +126,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   primaryBalanceText: {
     fontSize: 32,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     color: colors.textOnBackground,
   },
   loaderBackground: {
@@ -135,6 +136,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.loaderForeground,
   },
   satsOnlyText: {
+    fontFamily: fonts.regular,
     marginTop: 4,
     fontSize: 12,
     textAlign: "center",
@@ -147,7 +149,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   modeToggleText: {
     fontSize: 11,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.textMuted,
     letterSpacing: 0.6,
   },

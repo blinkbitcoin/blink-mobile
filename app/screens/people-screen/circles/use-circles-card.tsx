@@ -14,6 +14,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { logBreadcrumb } from "@app/utils/error-reporting"
 import theme from "@app/rne-theme/theme"
 import { makeStyles, Text, ThemeProvider, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const useCirclesCard = () => {
   const shareImgRef = useRef<View | null>(null)
@@ -226,7 +227,7 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlign: "left",
     color: colors.textDisabled,
   },
-  boldText: { fontWeight: "700" },
+  boldText: { fontFamily: fonts.bold },
   rankText: {
     paddingHorizontal: 40,
   },

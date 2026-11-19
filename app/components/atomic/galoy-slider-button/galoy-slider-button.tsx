@@ -15,6 +15,7 @@ import Animated, {
 
 import { testProps } from "@app/utils/testProps"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { GaloyIcon } from "../galoy-icon"
 
@@ -171,7 +172,7 @@ const useStyles = makeStyles(({ colors }, { buttonWidth }: { buttonWidth: number
   swipeText: {
     alignSelf: "center",
     fontSize: 14,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     zIndex: 2,
     color: colors.textMuted,
   },

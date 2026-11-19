@@ -9,6 +9,7 @@ import {
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const PERCENTAGE_OPTIONS = [25, 50, 75, 100] as const
 const DEFAULT_TEST_ID_PREFIX = "convert"
@@ -117,7 +118,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   chipText: {
     color: colors.accent,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
   },
   chipTextSelected: {
     color: colors.textOnAccent,

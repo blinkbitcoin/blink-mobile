@@ -67,6 +67,7 @@ import {
 } from "@app/utils/phone"
 import { isInt } from "validator"
 import { groupTitleGap } from "@app/rne-theme/tokens"
+import { fonts } from "@app/rne-theme/fonts"
 
 gql`
   query sendBitcoinDestination {
@@ -1163,7 +1164,7 @@ const usestyles = makeStyles(({ colors }) => ({
   },
   fieldTitleText: {
     color: colors.textSecondary,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     marginBottom: groupTitleGap,
   },
   iconContainer: {
@@ -1184,6 +1185,7 @@ const usestyles = makeStyles(({ colors }) => ({
   },
   searchBarText: {
     color: colors.textOnBackground,
+    fontFamily: fonts.regular,
     textDecorationLine: "none",
   },
   icon: {
@@ -1207,7 +1209,7 @@ const usestyles = makeStyles(({ colors }) => ({
   emptyListTitle: {
     color: colors.warning,
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     textAlign: "center",
   },
   itemContainer: {

@@ -17,6 +17,7 @@ import { DisplayCurrency, toUsdMoneyAmount } from "@app/types/amounts"
 import { useNavigation, useFocusEffect } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 const useStyles = makeStyles(({ colors }) => ({
   limitWrapper: {
@@ -33,17 +34,17 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: 5,
   },
   valueFieldType: {
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     fontSize: 15,
     paddingBottom: 8,
   },
   valueRemaining: {
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     color: colors.success,
     maxWidth: "50%",
   },
   valueTotal: {
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     color: colors.textDisabled,
     maxWidth: "50%",
   },
@@ -60,7 +61,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   errorText: {
     color: colors.error,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     fontSize: 18,
     marginBottom: 20,
   },

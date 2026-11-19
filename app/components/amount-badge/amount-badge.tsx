@@ -6,6 +6,7 @@ import { makeStyles } from "@rn-vui/themed"
 
 import { useDropInOutAnimation } from "@app/components/animations"
 import { GaloyIcon, type IconNamesType } from "@app/components/atomic/galoy-icon"
+import { fonts } from "@app/rne-theme/fonts"
 
 /** Exported: whoever arbitrates the badge slot must keep a badge mounted for
  *  exactly `durationOut` after it hides, or its exit animation is cut off. */
@@ -130,6 +131,7 @@ const useStyles = makeStyles(
       alignSelf: "center",
     },
     text: {
+      fontFamily: fonts.regular,
       fontSize: 20,
       flexShrink: 1,
       color: variant === "incoming" ? colors.success : colors.textMuted,

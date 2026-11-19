@@ -17,6 +17,7 @@ import { useSelfCustodialTransactionFragments } from "@app/self-custodial/hooks/
 import { radius } from "@app/rne-theme/radius"
 import { AccountType } from "@app/types/wallet"
 import { makeStyles, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { toastShow } from "../../../utils/toast"
 
@@ -239,6 +240,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   noTransactionText: {
+    fontFamily: fonts.regular,
     fontSize: 24,
   },
 
@@ -262,6 +264,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   sectionHeaderText: {
+    fontFamily: fonts.regular,
     color: colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,

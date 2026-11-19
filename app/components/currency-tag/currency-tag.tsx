@@ -3,6 +3,7 @@ import { Text, View } from "react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { makeStyles, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 const useStyles = makeStyles(() => ({
   currencyTag: {
@@ -13,6 +14,7 @@ const useStyles = makeStyles(() => ({
     alignItems: "center",
   },
   currencyText: {
+    fontFamily: fonts.regular,
     fontSize: 12,
   },
 }))
