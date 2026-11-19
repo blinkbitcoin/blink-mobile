@@ -31,6 +31,10 @@ export const SENT_TIMELINE_MS = Math.max(
 /** How long a settled Sent stays on screen before it hands over to the receipt. */
 export const SENT_HOLD_MS = 4000
 
+/** The navigation actions a sender's back takes: the header arrow, the hardware back and
+ *  the swipe. Receipt's reset and Close's pop to top are not among them. */
+const BACKWARD_ACTIONS = ["GO_BACK", "POP"]
+
 type Frame = { x: number; y: number; width: number; height: number }
 
 const measureInWindow = (view: View | null): Promise<Frame | undefined> =>
@@ -79,6 +83,13 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
   /** With a screen reader on, Sent holds until the sender taps: a timer would move the
    *  screen away while they are still finding Receipt and Close. */
   const [isScreenReaderOn, setIsScreenReaderOn] = useState(false)
+  /** Receipt and Close take touches and focus only once they start to fade in, not while
+   *  they sit invisible over the slot the slider left. */
+  const [areActionsLive, setAreActionsLive] = useState(false)
+  /** Set the moment a landed payment is accepted, before Sent has measured or drawn
+   *  anything: from then on the sender leaves through Receipt, Close or the hold only. */
+  const isSettledRef = useRef(false)
+  const [isSettled, setIsSettled] = useState(false)
 
   const amountsRef = useRef<SentAmounts>(undefined)
   /** Bumped by every play and every rewind, so a play still measuring knows it lost. */
@@ -106,13 +117,38 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
     [heroTravel, heroProgress],
   )
 
+  /** Read from a ref, so back is shut in the same tick success is accepted rather than on
+   *  the render after it, while Sent is still measuring. */
   useEffect(() => {
-    if (!isSent) return
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => isSettledRef.current,
+    )
+    const removeBeforeRemove = navigation.addListener("beforeRemove", (event) => {
+      if (!isSettledRef.current) return
+      if (!BACKWARD_ACTIONS.includes(event.data.action.type)) return
+      event.preventDefault()
+    })
+    return () => {
+      subscription.remove()
+      removeBeforeRemove()
+    }
+  }, [navigation])
+
+  useEffect(() => {
+    if (!isSettled) return
     // A screen option, not a header one: review has no native header to rebuild mid-animation.
     navigation.setOptions({ gestureEnabled: false })
-    const subscription = BackHandler.addEventListener("hardwareBackPress", () => true)
-    return () => subscription.remove()
-  }, [isSent, navigation])
+  }, [isSettled, navigation])
+
+  useEffect(() => {
+    if (!sentPlay) {
+      setAreActionsLive(false)
+      return
+    }
+    const timer = setTimeout(() => setAreActionsLive(true), ACTIONS_DELAY_MS)
+    return () => clearTimeout(timer)
+  }, [sentPlay])
 
   const rewind = useCallback(() => {
     playIdRef.current += 1
@@ -204,9 +240,11 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
       setIsInView(canBeSeen())
       replayIfPending()
     }
+    /** Any state but active covers review: iOS sits in inactive under Control Centre,
+     *  Siri, the app switcher and the start of a lock. */
     const appStateSubscription = AppState.addEventListener("change", (state) => {
-      if (state === "background") leave()
       if (state === "active") comeBack()
+      else leave()
     })
     const removeBlurListener = navigation.addListener("blur", leave)
     const removeFocusListener = navigation.addListener("focus", comeBack)
@@ -243,6 +281,8 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
 
   const playSent = useCallback(
     async (amounts: SentAmounts) => {
+      isSettledRef.current = true
+      setIsSettled(true)
       amountsRef.current = amounts
       if (canBeSeen()) {
         await play()
@@ -273,6 +313,7 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
     goneWhenSent,
     heroStyle,
     actionsStyle,
+    areActionsLive,
     playSent,
   }
 }

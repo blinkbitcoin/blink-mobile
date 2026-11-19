@@ -114,7 +114,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   /** Screen reader focus starts on slide to send, the step review leads to; while the fee
    *  is still being worked out, the handle reads as calculating. */
   const sliderHandleRef = React.useRef<View>(null)
-  useInitialAccessibilityFocus(sliderHandleRef)
   const isBalanceHidden = hideAmount && !isBalanceRevealed
 
   const {
@@ -296,8 +295,14 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     goneWhenSent,
     heroStyle,
     actionsStyle,
+    areActionsLive,
     playSent,
   } = sentTransition
+
+  /** Read each time review regains focus: once Sent has played the slider is hidden, so a
+   *  return from the lock screen leaves focus to the screen reader instead of sending it
+   *  to a control nobody can see. */
+  useInitialAccessibilityFocus(isSent ? undefined : sliderHandleRef)
 
   /** Review turns into Sent in place, with no new screen to land focus on, so the result
    *  is spoken once per play: a Sent rewound in the background speaks again when it
@@ -364,7 +369,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
          *  taken before this function yields. If the gate already won, open the receipt
          *  now: the payment landed either way. */
         if (!isMountedRef.current) {
-          resetToCompleted(params)
+          resetToCompleted({ ...params, hasShownSuccess: false })
           return
         }
         holdSettledSend()
@@ -786,6 +791,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         {isSent ? (
           <Animated.View
             style={[styles.sentActions, { bottom: bottomInset }, actionsStyle]}
+            testID="sent-actions"
+            pointerEvents={areActionsLive ? "auto" : "none"}
+            accessibilityElementsHidden={!areActionsLive}
+            importantForAccessibility={areActionsLive ? "auto" : "no-hide-descendants"}
           >
             <GaloyPrimaryButton
               title={LL.SendBitcoinConfirmationScreen.receipt()}

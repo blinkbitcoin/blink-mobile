@@ -58,6 +58,9 @@ describe("useSentTransition", () => {
   beforeEach(() => {
     jest.useFakeTimers()
     jest.clearAllMocks()
+    /** React Native's mock is a bare jest.fn, which restoreAllMocks leaves as the last case
+     *  set it: one case's screen reader would otherwise stay on for every case after it. */
+    jest.spyOn(AccessibilityInfo, "isScreenReaderEnabled").mockResolvedValue(false)
     mockNavigation.listeners = {}
     mockNavigation.isFocused.mockReturnValue(true)
     appStateListeners = []
@@ -289,11 +292,52 @@ describe("useSentTransition", () => {
       jest.spyOn(BackHandler, "addEventListener")
     })
 
+    /** A back the sender takes, as navigation hands it to `beforeRemove`. */
+    const tryToLeave = (type: string) => {
+      const event = { data: { action: { type } }, preventDefault: jest.fn() }
+      act(() =>
+        (mockNavigation.listeners.beforeRemove ?? []).forEach((listener) =>
+          (listener as unknown as (e: typeof event) => void)(event),
+        ),
+      )
+      return event.preventDefault
+    }
+
     it("leaves back alone on review", () => {
       renderTransition()
 
-      expect(backPressHandlers()).toHaveLength(0)
+      expect(backPressHandlers().map((handler) => handler())).toEqual([false])
+      expect(tryToLeave("GO_BACK")).not.toHaveBeenCalled()
       expect(mockNavigation.setOptions).not.toHaveBeenCalled()
+    })
+
+    /** Sent measures the screen before it draws, and a native measurement can be slow.
+     *  The payment has landed by then, so back is shut the moment success is accepted. */
+    it("shuts back the moment the payment is accepted, while Sent is still measuring", () => {
+      const { result } = renderTransition()
+      /** A view whose measurement never answers, so Sent stays measuring. */
+      const unanswered = { measureInWindow: jest.fn() } as unknown as View
+      ;(result.current.stageRef as { current: View | null }).current = unanswered
+
+      act(() => {
+        result.current.playSent(AMOUNTS)
+      })
+
+      expect(result.current.isSent).toBe(false)
+      expect(backPressHandlers().map((handler) => handler())).toEqual([true])
+      expect(tryToLeave("GO_BACK")).toHaveBeenCalledTimes(1)
+      expect(tryToLeave("POP")).toHaveBeenCalledTimes(1)
+      expect(mockNavigation.setOptions).toHaveBeenCalledWith({ gestureEnabled: false })
+    })
+
+    /** Receipt resets the stack and Close pops to Home: neither is a back. */
+    it("lets Receipt and Close leave while Sent holds", async () => {
+      const { result } = renderTransition()
+
+      await playSent(result)
+
+      expect(tryToLeave("RESET")).not.toHaveBeenCalled()
+      expect(tryToLeave("POP_TO_TOP")).not.toHaveBeenCalled()
     })
 
     /** The actions are the way out: back would land on a review that already paid. */
@@ -306,6 +350,7 @@ describe("useSentTransition", () => {
       const handlers = backPressHandlers()
       expect(handlers).toHaveLength(1)
       expect(handlers[0]()).toBe(true)
+      expect(tryToLeave("GO_BACK")).toHaveBeenCalledTimes(1)
     })
 
     it("lets the hardware back go once review is gone", async () => {
@@ -328,6 +373,89 @@ describe("useSentTransition", () => {
       advance(SENT_TIMELINE_MS + SENT_HOLD_MS * 2)
 
       expect(onHoldEnd).not.toHaveBeenCalled()
+    })
+  })
+
+  /** iOS sits in inactive under Control Centre, Siri, the app switcher and the start of a
+   *  lock: review is covered there as much as in the background. */
+  describe("while iOS covers review", () => {
+    it("rewinds a play that inactive interrupts, and replays it in full on return", async () => {
+      const { result } = renderTransition()
+
+      await playSent(result)
+      advance(SENT_TIMELINE_MS / 4)
+      setAppState("inactive")
+
+      expect(result.current.sentPlay).toBe(0)
+      expect(progressOf(result.current)).toEqual({ hero: 0, glow: 0 })
+
+      setAppState("active")
+      await act(async () => {})
+      advance(SENT_TIMELINE_MS)
+      expect(progressOf(result.current)).toEqual({ hero: 1, glow: 1 })
+    })
+
+    it("stops the hold while inactive, and starts it over on return", async () => {
+      const onHoldEnd = jest.fn()
+      const { result } = renderHook(() => useSentTransition({ onHoldEnd }))
+
+      await playSent(result)
+      advance(SENT_TIMELINE_MS + SENT_HOLD_MS / 2)
+      setAppState("inactive")
+      advance(SENT_HOLD_MS * 4)
+      expect(onHoldEnd).not.toHaveBeenCalled()
+
+      setAppState("active")
+      advance(SENT_HOLD_MS - 1)
+      expect(onHoldEnd).not.toHaveBeenCalled()
+      advance(1)
+      expect(onHoldEnd).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe("Receipt and Close", () => {
+    const ACTIONS_DELAY_MS = 500
+
+    it("stay out of reach on review", () => {
+      const { result } = renderTransition()
+
+      expect(result.current.areActionsLive).toBe(false)
+    })
+
+    it("go live as they start to fade in, not while invisible", async () => {
+      const { result } = renderTransition()
+
+      await playSent(result)
+      advance(ACTIONS_DELAY_MS - 1)
+      expect(result.current.areActionsLive).toBe(false)
+
+      advance(1)
+      expect(result.current.areActionsLive).toBe(true)
+    })
+
+    it("go out of reach again when a play is rewound", async () => {
+      const { result } = renderTransition()
+
+      await playSent(result)
+      advance(ACTIONS_DELAY_MS / 2)
+      setAppState("background")
+      advance(ACTIONS_DELAY_MS * 4)
+
+      expect(result.current.areActionsLive).toBe(false)
+    })
+
+    it("stay out of reach while a payment that landed away waits to replay", async () => {
+      Object.defineProperty(AppState, "currentState", {
+        value: "background",
+        configurable: true,
+      })
+      const { result } = renderTransition()
+
+      await playSent(result)
+      advance(ACTIONS_DELAY_MS * 4)
+
+      expect(result.current.isSent).toBe(true)
+      expect(result.current.areActionsLive).toBe(false)
     })
   })
 
