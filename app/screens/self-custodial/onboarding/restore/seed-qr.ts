@@ -76,6 +76,14 @@ const bytesFromBitstream = (raw: Uint8Array): Uint8Array | null => {
   return bytes
 }
 
+const QR_PAD_BYTES = new Set([0x00, 0xec, 0x11])
+
+/** After a real payload come a zero terminator and pad bytes only. Entropy that merely
+ *  starts like byte-mode packaging (40 12 ff…) carries on with random bytes. */
+const endsInPadding = (raw: Uint8Array, count: number): boolean =>
+  (raw[count + 1] & 0x0f) === 0 &&
+  raw.subarray(count + 2).every((byte) => QR_PAD_BYTES.has(byte))
+
 // eslint-disable-next-line no-control-regex
 const NON_PRINTABLE = /[\u0000-\u0008\u000e-\u001f\u007f-\u009f�]/
 
@@ -97,7 +105,13 @@ export const decodeSeedQr = ({
   if (rawBytes) {
     const bitstream = bytesFromBitstream(rawBytes)
     // Byte-mode packaging of a text payload. Do not treat that packaging as entropy.
-    if (bitstream && isPrintableText(bitstream)) return { status: SeedQrStatus.NotSeedQr }
+    if (
+      bitstream &&
+      isPrintableText(bitstream) &&
+      endsInPadding(rawBytes, bitstream.length)
+    ) {
+      return { status: SeedQrStatus.NotSeedQr }
+    }
 
     for (const candidate of [rawBytes, bitstream]) {
       const result = candidate && decodeCompact(candidate)

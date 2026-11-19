@@ -89,6 +89,16 @@ describe("decodeSeedQr", () => {
       })
     })
 
+    /** 40 12 reads as byte-mode packaging of one printable byte, but no padding follows. */
+    it("decodes entropy that starts like text packaging but is not padded", () => {
+      const entropy = new Uint8Array(16).fill(0xff)
+      entropy.set([0x40, 0x12])
+      expect(decodeSeedQr({ rawBytes: entropy })).toEqual({
+        status: SeedQrStatus.Ok,
+        words: entropyToMnemonic(Buffer.from(entropy).toString("hex")).split(" "),
+      })
+    })
+
     it("names a 24-word code as unsupported", () => {
       expect(decodeSeedQr({ rawBytes: compactBytes(PHRASE_24) })).toEqual({
         status: SeedQrStatus.Only12Words,
