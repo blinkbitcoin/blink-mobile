@@ -181,10 +181,7 @@ const EXCEPTIONS: Record<string, number> = {
   "app/components/currency-tag/currency-tag.tsx": 1,
   "app/components/map-component/place-sheet.tsx": 1,
   "app/components/wallet-filter-dropdown/wallet-filter-dropdown.tsx": 1,
-  // Send 3.0 draws the 42-high priority row and note field at 8 (send only; ruled with design).
-  "app/screens/send-bitcoin-screen/fee-tier-selector.tsx": 1,
   "app/screens/send-bitcoin-screen/send-bitcoin-destination-screen.tsx": 1,
-  "app/screens/send-bitcoin-screen/send-bitcoin-details-screen.tsx": 1,
   "app/screens/totp-screen/authenticator-apps-screen.tsx": 1,
 }
 
@@ -284,10 +281,11 @@ const TOKEN_CORNERS: Record<string, number> = {
   "app/screens/self-custodial/onboarding/manual-backup/backup-phrase-screen.tsx": 1,
   "app/screens/send-bitcoin-screen/amount-entry/send-wallet-summary.tsx": 1,
   "app/screens/send-bitcoin-screen/confirm-destination-modal.tsx": 1,
-  "app/screens/send-bitcoin-screen/fee-tier-selector.tsx": 1,
+  "app/screens/send-bitcoin-screen/fee-tier-selector.tsx": 2,
   "app/screens/send-bitcoin-screen/send-bitcoin-completed-screen.tsx": 1,
   "app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen.tsx": 1,
   "app/screens/send-bitcoin-screen/send-bitcoin-destination-screen.tsx": 2,
+  "app/screens/send-bitcoin-screen/send-bitcoin-details-screen.tsx": 1,
   "app/screens/settings-screen/account/settings/delete.tsx": 1,
   "app/screens/settings-screen/api/api-key-create-screen.tsx": 1,
   "app/screens/settings-screen/button.tsx": 2,

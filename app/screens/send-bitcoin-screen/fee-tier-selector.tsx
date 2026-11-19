@@ -115,7 +115,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     columnGap: 12,
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 8,
+    borderRadius: radius.default,
     /** Matches the note field below; the padding lets it grow with the font scale. */
     minHeight: 42,
     paddingVertical: 8,
