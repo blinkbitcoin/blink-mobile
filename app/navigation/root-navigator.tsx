@@ -1048,6 +1048,7 @@ export const RootStack = () => {
         options={{
           title: "",
           ...noHeaderBack,
+          gestureEnabled: false,
         }}
       />
       <RootNavigator.Screen

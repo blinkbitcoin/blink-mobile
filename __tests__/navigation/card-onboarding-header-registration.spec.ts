@@ -64,6 +64,14 @@ describe("card onboarding header controls in root-navigator", () => {
     expect(options).not.toContain("headerCloseControlOptions")
   })
 
+  /** The native stack cannot refuse the swipe once it starts, so the route switches it
+   *  off and the screen refuses the hardware back itself. */
+  it("switches the swipe off on the processing wait", () => {
+    expect(registration("cardOnboardingProcessingScreen")).toContain(
+      "gestureEnabled: false",
+    )
+  })
+
   /** An unset title would fall back to the route name. */
   it("leaves the verify identity step untitled, as the design does", () => {
     expect(registration("cardOnboardingVerifyIdentityScreen")).toContain('title: ""')

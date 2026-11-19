@@ -1,3 +1,4 @@
+import { it } from "@jest/globals"
 import React from "react"
 import { render, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -19,6 +20,18 @@ const mockPopTo = jest.fn()
 const mockReplace = jest.fn()
 const mockUseApproval = jest.fn()
 const mockUseDashedLineFlow = jest.fn()
+const mockRemoveListener = jest.fn()
+type BeforeRemoveEvent = {
+  data: { action: { type: string } }
+  preventDefault: () => void
+}
+let beforeRemoveListener: ((event: BeforeRemoveEvent) => void) | undefined
+const mockAddListener = jest.fn(
+  (eventName: string, listener: (event: BeforeRemoveEvent) => void) => {
+    if (eventName === "beforeRemove") beforeRemoveListener = listener
+    return mockRemoveListener
+  },
+)
 
 jest.mock("@app/components/animations", () => ({
   useDashedLineFlow: (params: unknown) => {
@@ -35,6 +48,7 @@ jest.mock("@react-navigation/native", () => {
       navigate: mockNavigate,
       popTo: mockPopTo,
       replace: mockReplace,
+      addListener: mockAddListener,
     }),
     useRoute: () => ({ params: { applicationId: "application-1" } }),
   }
@@ -62,7 +76,14 @@ describe("CardProcessingScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
+    beforeRemoveListener = undefined
   })
+
+  const leave = (type: string) => {
+    const preventDefault = jest.fn()
+    beforeRemoveListener?.({ data: { action: { type } }, preventDefault })
+    return preventDefault
+  }
 
   it("says the application is being processed and how long it can take", async () => {
     const { getByText } = await renderScreen("waiting")
@@ -121,5 +142,33 @@ describe("CardProcessingScreen", () => {
     expect(mockPopTo).toHaveBeenCalledWith("Primary")
     expect(mockNavigate).not.toHaveBeenCalled()
     expect(mockReplace).not.toHaveBeenCalled()
+  })
+
+  /** Leaving would drop the poll, and an answer arriving after would never reach its
+   *  screen: the Android back raises GO_BACK and the swipe POP. */
+  it.each(["GO_BACK", "POP"])(
+    "refuses the user's own way back (%s) while it waits",
+    async (type) => {
+      await renderScreen("waiting")
+
+      expect(leave(type)).toHaveBeenCalled()
+    },
+  )
+
+  it.each(["REPLACE", "POP_TO", "RESET"])(
+    "lets the screen's own way on (%s) go through",
+    async (type) => {
+      await renderScreen("waiting")
+
+      expect(leave(type)).not.toHaveBeenCalled()
+    },
+  )
+
+  it("stops refusing once it leaves", async () => {
+    const { unmount } = await renderScreen("waiting")
+
+    unmount()
+
+    expect(mockRemoveListener).toHaveBeenCalled()
   })
 })
