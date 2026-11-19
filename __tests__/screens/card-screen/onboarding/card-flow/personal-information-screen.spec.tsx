@@ -1,6 +1,8 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { light } from "@app/rne-theme/colors"
 
 import { CardPersonalInformationScreen } from "@app/screens/card-screen/onboarding/card-flow/personal-information-screen"
 import { ContextForScreen } from "../../../helper"
@@ -114,6 +116,28 @@ describe("CardPersonalInformationScreen", () => {
     await act(async () => {})
 
     expect(getByText("Expected monthly spending")).toBeTruthy()
+  })
+
+  it("draws every field title in the secondary text color, as the design does", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardPersonalInformationScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    const titles = [
+      "Occupation",
+      "Annual salary",
+      "Account purpose",
+      "Expected monthly spending",
+    ]
+    titles.forEach((title) => {
+      expect(StyleSheet.flatten(getByText(title).props.style).color).toBe(
+        light.textSecondary,
+      )
+    })
   })
 
   it("prompts each field with the design's placeholder", async () => {
