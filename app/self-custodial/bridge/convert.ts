@@ -51,6 +51,7 @@ import {
   isAboutDelivered,
   isDeliveryAsExpected,
   markReceivedHistory,
+  paidInOf,
   type ExpectedDelivery,
   type LostConversionLook,
   type LostSendLookup,
@@ -330,9 +331,9 @@ const isDeliveryOf = (
   { estimate, params }: Pick<ConversionExecution, "estimate" | "params">,
 ): boolean => {
   if (directionDeliveredBy(payment) !== params.direction) return false
-  const paidIn = payment.conversionDetails?.conversions?.[0]?.from.amount
+  const paidIn = paidInOf(payment)
   if (paidIn !== undefined) {
-    return isAboutAmount(toNumber(paidIn), toNumber(estimate.amountIn))
+    return isAboutAmount(paidIn, toNumber(estimate.amountIn))
   }
   return isAboutDelivered(toNumber(payment.amount), toNumber(estimate.amountOut))
 }
@@ -350,12 +351,17 @@ const deliveredTokenOf = (direction: ConvertDirection): string | undefined =>
  */
 export const LOST_CONVERSION_DELIVERY_WINDOW_MS = 5 * 60 * 1000
 
+/** Whether a delivery found is what any of a lost conversion's attempts was quoted to
+ *  deliver. */
+const isDeliveryOfAnyAttempt = (lost: LostConversionLook, payment: Payment): boolean =>
+  lost.expectedDeliveries.some((delivery) => isDeliveryAsExpected(payment, delivery))
+
 /**
  * Which of a lost conversion's attempts a delivery found settles: the one it delivers for,
- * of the conversion's own kind first. Without one, the oldest, but auto-convert tells no
- * one what it finds, so it settles only an attempt of its own, and none for a delivery
- * of a transfer the user made: that one is the user's to be told of, or their own retry
- * would convert it again.
+ * of the conversion's own kind first, and none when it delivers for none of them, since it
+ * is then no proof that any of them delivered. Auto-convert tells no one what it finds, so
+ * it settles only an attempt of its own, and none for a delivery of a transfer the user
+ * made: that one is the user's to be told of, or their own retry would convert it again.
  */
 const settledAttemptOf = (
   lost: LostConversionLook,
@@ -367,13 +373,9 @@ const settledAttemptOf = (
     (delivery) => delivery.isAutomatic === isAutomatic && matches(delivery),
   )
   if (own >= 0) return own
+  if (isAutomatic) return undefined
   const other = lost.expectedDeliveries.findIndex(matches)
-  if (other >= 0) return isAutomatic ? undefined : other
-  if (!isAutomatic) return 0
-  const oldestAutomatic = lost.expectedDeliveries.findIndex(
-    (delivery) => delivery.isAutomatic,
-  )
-  return oldestAutomatic >= 0 ? oldestAutomatic : undefined
+  return other >= 0 ? other : undefined
 }
 
 /**
@@ -545,6 +547,18 @@ const convertAfterEarlierConversions = async (
     }
     if (lookup.status === "found") {
       const settled = settledAttemptOf(earlier, lookup.payment, isAutomatic)
+      /** A delivery none of its attempts was quoted for is told once and known from then
+       *  on, so the attempts are looked for past it: it settles none of them, and each may
+       *  still deliver. One an attempt of the user's was quoted for stays unknown, for
+       *  their own retry to be told of. */
+      const isOfNoAttempt =
+        settled === undefined && !isDeliveryOfAnyAttempt(earlier, lookup.payment)
+      if (isOfNoAttempt) {
+        keepLost({
+          ...earlier,
+          knownPaymentIds: [...earlier.knownPaymentIds, lookup.payment.id],
+        })
+      }
       if (settled === undefined) {
         return failed(EARLIER_CONVERSION_MESSAGE, ConvertErrorCode.EarlierConversionFound)
       }
@@ -606,6 +620,7 @@ const convertAfterEarlierConversions = async (
   const thisDelivery: ExpectedDelivery = {
     tokenIdentifier: deliveredTokenOf(params.direction),
     amount: toNumber(estimate.amountOut),
+    amountIn: toNumber(estimate.amountIn),
     isAutomatic,
   }
   /** What this conversion leaves to be looked for should its outcome be lost: with the

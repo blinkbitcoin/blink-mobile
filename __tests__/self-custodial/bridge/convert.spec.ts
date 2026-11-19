@@ -629,10 +629,24 @@ describe("swap telemetry", () => {
       status: "found",
       payment: {
         id: "cv-1",
+        amount: BigInt(1_370_000),
         details: { tag: "Token", inner: { metadata: { identifier: "usdb-token-id" } } },
+        conversionDetails: {
+          status: 1,
+          conversions: [{ from: { amount: BigInt(5000) } }],
+        },
       },
     })
     const sdk = createSdk()
+    sdk.prepareSendPayment.mockResolvedValue({
+      paymentMethod: {},
+      conversionEstimate: {
+        fee: BigInt(0),
+        amountIn: BigInt(5000),
+        amountOut: BigInt(1_370_000),
+        amountAdjustment: undefined,
+      },
+    })
     sdk.sendPayment.mockRejectedValue(new Error("connection reset"))
 
     const quote = await createGetConversionQuote(sdk as never)(params)
@@ -744,7 +758,12 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
         lastAttemptAtMs: expect.any(Number),
         ...MARK,
         expectedDeliveries: [
-          { tokenIdentifier: "usdb-token-id", amount: 1_370_000, isAutomatic: false },
+          {
+            tokenIdentifier: "usdb-token-id",
+            amount: 1_370_000,
+            amountIn: 5000,
+            isAutomatic: false,
+          },
         ],
       },
     })
@@ -769,7 +788,12 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     }))!.execute()
 
     expect(mockFindLostConversion.mock.calls[0][0].lost.expectedDeliveries).toEqual([
-      { tokenIdentifier: undefined, amount: 1_370_000, isAutomatic: false },
+      {
+        tokenIdentifier: undefined,
+        amount: 1_370_000,
+        amountIn: 5000,
+        isAutomatic: false,
+      },
     ])
   })
 
@@ -895,7 +919,12 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     const lastLook = mockFindLostConversion.mock.calls.at(-1)?.[0].lost
     expect(found.status).toBe("success")
     expect(lastLook.expectedDeliveries).toEqual([
-      { tokenIdentifier: "usdb-token-id", amount: 2_000_000, isAutomatic: false },
+      {
+        tokenIdentifier: "usdb-token-id",
+        amount: 2_000_000,
+        amountIn: 7300,
+        isAutomatic: false,
+      },
     ])
     expect(lastLook.knownPaymentIds).toContain("rcv-usdb")
     expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
@@ -981,8 +1010,18 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     expect(mockFindLostConversion.mock.calls[2][0].lost).toMatchObject(fromFirstMark)
     expect(mockFindLostConversion.mock.calls[3][0].lost).toMatchObject(fromFirstMark)
     expect(mockFindLostConversion.mock.calls[3][0].lost.expectedDeliveries).toEqual([
-      { tokenIdentifier: "usdb-token-id", amount: 1_370_000, isAutomatic: false },
-      { tokenIdentifier: "usdb-token-id", amount: 1_370_000, isAutomatic: false },
+      {
+        tokenIdentifier: "usdb-token-id",
+        amount: 1_370_000,
+        amountIn: 5000,
+        isAutomatic: false,
+      },
+      {
+        tokenIdentifier: "usdb-token-id",
+        amount: 1_370_000,
+        amountIn: 5000,
+        isAutomatic: false,
+      },
     ])
   })
 
@@ -1004,7 +1043,12 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     const nextLook = mockFindLostConversion.mock.calls[3][0].lost
     expect(second.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
     expect(nextLook.expectedDeliveries).toEqual([
-      { tokenIdentifier: "usdb-token-id", amount: 1_370_000, isAutomatic: false },
+      {
+        tokenIdentifier: "usdb-token-id",
+        amount: 1_370_000,
+        amountIn: 5000,
+        isAutomatic: false,
+      },
     ])
     expect(nextLook.knownPaymentIds).toContain("rcv-usdb")
     expect(next.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
@@ -1029,7 +1073,12 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     const nextLook = mockFindLostConversion.mock.calls[3][0].lost
     expect(second.status).toBe("success")
     expect(nextLook.expectedDeliveries).toEqual([
-      { tokenIdentifier: "usdb-token-id", amount: 2_000_000, isAutomatic: false },
+      {
+        tokenIdentifier: "usdb-token-id",
+        amount: 2_000_000,
+        amountIn: 7300,
+        isAutomatic: false,
+      },
     ])
     expect(nextLook.knownPaymentIds).toContain("rcv-usdb")
     expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
@@ -1057,7 +1106,12 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     const nextLook = mockFindLostConversion.mock.calls[3][0].lost
     expect(second.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
     expect(nextLook.expectedDeliveries).toEqual([
-      { tokenIdentifier: "usdb-token-id", amount: 2_000_000, isAutomatic: false },
+      {
+        tokenIdentifier: "usdb-token-id",
+        amount: 2_000_000,
+        amountIn: 7300,
+        isAutomatic: false,
+      },
     ])
     expect(nextLook.knownPaymentIds).toContain("rcv-earlier")
     expect(firstAgain.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
@@ -1189,19 +1243,45 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     },
   )
 
-  it("converts normally after an earlier conversion was reported", async () => {
+  it("keeps the lost conversion when one of another amount is found, refusing every retry until its own delivery turns up", async () => {
+    const otherAmount = delivered({ id: "rcv-other", paidIn: 9000 })
     mockFindLostConversion
       .mockResolvedValueOnce({ status: "not-found" })
-      .mockResolvedValueOnce(foundDelivery(delivered({ paidIn: 9000 })))
+      .mockResolvedValueOnce(foundDelivery(otherAmount))
+      .mockResolvedValueOnce({ status: "not-found" })
+      .mockResolvedValueOnce(foundDelivery(delivered({ paidIn: PAID_IN })))
+    const sdk = throwingSdk()
+    sdk.sendPayment.mockRejectedValueOnce(new Error("connection reset"))
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
+
+    await (await quoteFor(sdk))!.execute()
+    const reported = await (await quoteFor(sdk))!.execute()
+    const refused = await (await quoteFor(sdk))!.execute()
+    const found = await (await quoteFor(sdk))!.execute()
+
+    expect(reported.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionFound)
+    expect(refused.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(found.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+    const lookAfterReport = mockFindLostConversion.mock.calls[2][0].lost
+    expect(lookAfterReport.knownPaymentIds).toContain("rcv-other")
+    expect(lookAfterReport.expectedDeliveries).toEqual([
+      expect.objectContaining({ amountIn: PAID_IN, amount: 1_370_000 }),
+    ])
+  })
+
+  it("keeps the lost conversion when one of another amount is found after the delivery window, still sending nothing", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found" })
+      .mockResolvedValueOnce(foundDelivery(delivered({ id: "rcv-other", paidIn: 9000 })))
     const sdk = throwingSdk()
 
     await (await quoteFor(sdk))!.execute()
-    await (await quoteFor(sdk))!.execute()
-    sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
-    const next = await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    const retry = await (await quoteFor(sdk))!.execute()
 
-    expect(next.status).toBe("success")
-    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionFound)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
   })
 
   it("converts again normally once the lost conversion was found", async () => {
@@ -1311,7 +1391,12 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
         lastAttemptAtMs: expect.any(Number),
         ...MARK,
         expectedDeliveries: [
-          { tokenIdentifier: "usdb-token-id", amount: 1_370_000, isAutomatic: false },
+          {
+            tokenIdentifier: "usdb-token-id",
+            amount: 1_370_000,
+            amountIn: 5000,
+            isAutomatic: false,
+          },
         ],
       },
     })
@@ -1324,7 +1409,12 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
       walletClockSec: 1_600_000_000,
       knownPaymentIds: ["rcv-old"],
       expectedDeliveries: [
-        { tokenIdentifier: "usdb-token-id", amount: 1_370_000, isAutomatic: false },
+        {
+          tokenIdentifier: "usdb-token-id",
+          amount: 1_370_000,
+          amountIn: 5000,
+          isAutomatic: false,
+        },
       ],
     }
     scopeLostAttemptsTo("wallet-relaunched", {
@@ -1490,22 +1580,29 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
   })
 
-  /** What turned up was another conversion, so these sats were never converted: the
-   *  next trigger converts them, the lost one settled. */
-  it("converts the receive on a later trigger once the lost one turns out to be another", async () => {
+  /** What turned up paid in another amount, so it is another conversion and settles
+   *  nothing: the lost one may still deliver, so the next trigger converts nothing, and
+   *  only once its delivery window is past do these sats go out again. */
+  it("keeps the lost conversion when what turns up is another, converting again only past its delivery window", async () => {
     mockFindLostConversion
       .mockResolvedValueOnce({ status: "not-found", failed: [] })
       .mockResolvedValueOnce(deliveredDollars(9000))
+      .mockResolvedValue({ status: "not-found", failed: [] })
     const sdk = walletLosingTheFirstConversion()
 
     await executeAutoConvert(sdk as never, receive)
     const second = await executeAutoConvert(sdk as never, receive)
     sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
     const third = await executeAutoConvert(sdk as never, receive)
+    afterTheDeliveryWindow()
+    const fourth = await executeAutoConvert(sdk as never, receive)
 
-    expect(second).toEqual({ status: "failed" })
-    expect(third).toEqual({ status: "converted" })
+    expect([second, third]).toEqual([{ status: "failed" }, { status: "failed" }])
+    expect(fourth).toEqual({ status: "converted" })
     expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+    expect(mockFindLostConversion.mock.calls[2][0].lost.knownPaymentIds).toContain(
+      "rcv-usdb",
+    )
   })
 
   /** Auto-convert tells no one what it finds: a lost transfer the user made stays theirs
@@ -1558,9 +1655,16 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
     }))!.execute()
 
     expect(automatic).toEqual({ status: "failed" })
-    expect(mockFindLostConversion.mock.calls[2][0].lost.expectedDeliveries).toEqual([
-      { tokenIdentifier: "usdb-token-id", amount: 2_466_000, isAutomatic: false },
+    const usersLook = mockFindLostConversion.mock.calls[2][0].lost
+    expect(usersLook.expectedDeliveries).toEqual([
+      {
+        tokenIdentifier: "usdb-token-id",
+        amount: 2_466_000,
+        amountIn: 9000,
+        isAutomatic: false,
+      },
     ])
+    expect(usersLook.knownPaymentIds).not.toContain("rcv-usdb")
     expect(retry.status).toBe("success")
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
   })
@@ -1591,7 +1695,12 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
 
     expect(automatic).toEqual({ status: "failed" })
     expect(mockFindLostConversion.mock.calls[2][0].lost.expectedDeliveries).toEqual([
-      { tokenIdentifier: "usdb-token-id", amount: 2_466_000, isAutomatic: false },
+      {
+        tokenIdentifier: "usdb-token-id",
+        amount: 2_466_000,
+        amountIn: 9000,
+        isAutomatic: false,
+      },
     ])
   })
 
@@ -1666,7 +1775,12 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
     const nextLook = mockFindLostConversion.mock.calls[3][0].lost
     expect(manual.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
     expect(nextLook.expectedDeliveries).toEqual([
-      { tokenIdentifier: "usdb-token-id", amount: 1_370_000, isAutomatic: true },
+      {
+        tokenIdentifier: "usdb-token-id",
+        amount: 1_370_000,
+        amountIn: 5000,
+        isAutomatic: true,
+      },
     ])
     expect(nextLook.knownPaymentIds).toContain("rcv-usdb")
   })
@@ -2067,7 +2181,12 @@ describe("a conversion in flight when the app closes", () => {
         lastAttemptAtMs: expect.any(Number),
         ...MARK,
         expectedDeliveries: [
-          { tokenIdentifier: "usdb-token-id", amount: 1_370_000, isAutomatic: false },
+          {
+            tokenIdentifier: "usdb-token-id",
+            amount: 1_370_000,
+            amountIn: 5000,
+            isAutomatic: false,
+          },
         ],
       },
     })
@@ -2210,7 +2329,12 @@ describe("a conversion in flight when the app closes", () => {
       ...earlier,
       expectedDeliveries: [
         ...(earlier?.expectedDeliveries ?? []),
-        { tokenIdentifier: "usdb-token-id", amount: 1_370_000, isAutomatic: false },
+        {
+          tokenIdentifier: "usdb-token-id",
+          amount: 1_370_000,
+          amountIn: 5000,
+          isAutomatic: false,
+        },
       ],
       lastAttemptAtMs: expect.any(Number),
     })
@@ -2260,7 +2384,12 @@ describe("a conversion in flight when the app closes", () => {
       expect(save.get(OWN_CONVERSIONS)?.lostConversion).toMatchObject({
         knownPaymentIds: [...MARK.knownPaymentIds, "rcv-earlier"],
         expectedDeliveries: [
-          { tokenIdentifier: "usdb-token-id", amount: 2_000_000, isAutomatic: false },
+          {
+            tokenIdentifier: "usdb-token-id",
+            amount: 2_000_000,
+            amountIn: 7300,
+            isAutomatic: false,
+          },
         ],
       }),
     )

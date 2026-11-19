@@ -3,8 +3,10 @@ import { ConversionStatus, PaymentStatus } from "@breeztech/breez-sdk-spark-reac
 
 import {
   findLostConversion,
+  isDeliveryAsExpected,
   isPaymentOfLostConversion,
   markReceivedHistory,
+  paidInOf,
 } from "@app/self-custodial/payment-details/lost-send"
 
 const mockReportError = jest.fn()
@@ -271,6 +273,60 @@ describe("isPaymentOfLostConversion", () => {
 
     expect(isPaymentOfLostConversion(LOST, refunded as never)).toBe(false)
     expect(isPaymentOfLostConversion(LOST, delivered as never)).toBe(true)
+  })
+})
+
+describe("isDeliveryAsExpected", () => {
+  const QUOTED_IN = 5000
+  /** Dollars delivered, paying in `paidIn` once the wallet has filled in its legs. */
+  const dollarsDelivered = (paidIn?: number, amount = QUOTED_OUT) => ({
+    id: "rcv-usdb",
+    amount: BigInt(amount),
+    details: { tag: "Token", inner: { metadata: { identifier: DOLLAR_TOKEN } } },
+    conversionDetails: {
+      status: 1,
+      conversions: paidIn === undefined ? [] : [{ from: { amount: BigInt(paidIn) } }],
+    },
+  })
+  const expected = {
+    tokenIdentifier: DOLLAR_TOKEN,
+    amount: QUOTED_OUT,
+    amountIn: QUOTED_IN,
+    isAutomatic: false,
+  }
+
+  it("takes a delivery of the attempt's asset and amount, paying in about what it was quoted to", () => {
+    const payment = dollarsDelivered(QUOTED_IN + 50)
+
+    expect(isDeliveryAsExpected(payment as never, expected)).toBe(true)
+  })
+
+  it("passes over a delivery of the same amount that paid in another one", () => {
+    const anotherConversion = dollarsDelivered(QUOTED_IN + 51)
+
+    expect(isDeliveryAsExpected(anotherConversion as never, expected)).toBe(false)
+  })
+
+  it("judges by the delivery alone while what it paid in is not filled in yet", () => {
+    expect(isDeliveryAsExpected(dollarsDelivered() as never, expected)).toBe(true)
+  })
+
+  it("judges by the delivery alone for an attempt stored before what it paid in was", () => {
+    const { amountIn: _, ...storedBefore } = expected
+
+    expect(isDeliveryAsExpected(dollarsDelivered(9000) as never, storedBefore)).toBe(true)
+  })
+
+  it("passes over a delivery of another amount, whatever it paid in", () => {
+    const payment = dollarsDelivered(QUOTED_IN, QUOTED_OUT * 2)
+
+    expect(isDeliveryAsExpected(payment as never, expected)).toBe(false)
+  })
+
+  it("reads what a delivery paid in from its first leg, or nothing", () => {
+    expect(paidInOf(dollarsDelivered(QUOTED_IN) as never)).toBe(QUOTED_IN)
+    expect(paidInOf(dollarsDelivered() as never)).toBeUndefined()
+    expect(paidInOf({ id: "rcv" } as never)).toBeUndefined()
   })
 })
 

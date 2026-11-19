@@ -69,6 +69,7 @@ const isExpectedDelivery = (value: unknown): boolean =>
   isRecord(value) &&
   isOptional(value.tokenIdentifier, "string") &&
   typeof value.amount === "number" &&
+  isOptional(value.amountIn, "number") &&
   typeof value.isAutomatic === "boolean"
 
 const isLostConversion = (value: unknown): value is LostConversion => {

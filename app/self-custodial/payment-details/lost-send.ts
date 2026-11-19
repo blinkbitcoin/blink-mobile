@@ -496,12 +496,14 @@ export const markReceivedHistory = async (
 /**
  * What a conversion was quoted to deliver: dollars, which the wallet records as a payment
  * of that token (`tokenIdentifier`), or bitcoin, a Spark payment, and about how much, in
- * that asset's base units; and whether auto-convert made it, which tells whose it is to
- * settle once found.
+ * that asset's base units; what it was quoted to pay in (`amountIn`, in the base units of
+ * the asset it converts from; absent from attempts stored before it was recorded); and
+ * whether auto-convert made it, which tells whose it is to settle once found.
  */
 export type ExpectedDelivery = {
   tokenIdentifier?: string
   amount: number
+  amountIn?: number
   isAutomatic: boolean
 }
 
@@ -558,10 +560,29 @@ const isRecordedAs = (
   return isToken && details.inner.metadata.identifier === tokenIdentifier
 }
 
-/** Whether a payment delivers what an attempt was quoted to: its asset, about as much. */
-export const isDeliveryAsExpected = (payment: Payment, delivery: ExpectedDelivery) =>
-  isRecordedAs(payment, delivery) &&
-  isAboutDelivered(Number(payment.amount), delivery.amount)
+/** What a conversion's delivery paid in, once the wallet has filled in its legs. */
+export const paidInOf = (payment: Payment): number | undefined => {
+  const paidIn = payment.conversionDetails?.conversions?.[0]?.from.amount
+  return paidIn === undefined ? undefined : Number(paidIn)
+}
+
+/**
+ * Whether a payment delivers what an attempt was quoted to: its asset, about as much, and,
+ * once both are known, for about what the attempt was quoted to pay in. A delivery that
+ * paid in another amount is another conversion's, whatever it delivered.
+ */
+export const isDeliveryAsExpected = (payment: Payment, delivery: ExpectedDelivery) => {
+  const paidIn = paidInOf(payment)
+  const isPaidInAsQuoted =
+    paidIn === undefined ||
+    delivery.amountIn === undefined ||
+    isAboutAmount(paidIn, delivery.amountIn)
+  return (
+    isRecordedAs(payment, delivery) &&
+    isAboutDelivered(Number(payment.amount), delivery.amount) &&
+    isPaidInAsQuoted
+  )
+}
 
 /**
  * Whether a payment may be what a conversion delivered before the wallet says so: received

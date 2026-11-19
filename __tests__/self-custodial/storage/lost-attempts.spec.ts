@@ -294,6 +294,25 @@ describe("loadLostAttempts", () => {
     )
   })
 
+  it("reads back what each attempt of a lost conversion was quoted to pay in", async () => {
+    const quoted = {
+      ...lostConversion(),
+      expectedDeliveries: [
+        {
+          tokenIdentifier: "usdb-token-id",
+          amount: 1_370_000,
+          amountIn: 5000,
+          isAutomatic: false,
+        },
+      ],
+    }
+    stored({ "<own conversions>": { lostConversion: quoted } })
+
+    expect(await loadLostAttempts(WALLET, NOW)).toEqual(
+      new Map([["<own conversions>", { lostConversion: quoted }]]),
+    )
+  })
+
   it("keeps a lost conversion while its latest attempt is recent, dropping it after", async () => {
     const recentRetry = {
       ...lostConversion(NOW - LOST_ATTEMPTS_TTL_MS - 1000),
@@ -337,6 +356,19 @@ describe("loadLostAttempts", () => {
         },
       },
       g: { lostConversion: { ...lostConversion(), expectedDeliveries: [7] } },
+      k: {
+        lostConversion: {
+          ...lostConversion(),
+          expectedDeliveries: [
+            {
+              tokenIdentifier: "usdb-token-id",
+              amount: 1_370_000,
+              amountIn: "5000",
+              isAutomatic: false,
+            },
+          ],
+        },
+      },
     })
 
     expect(await loadLostAttempts(WALLET, NOW)).toEqual(new Map())
