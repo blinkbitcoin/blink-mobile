@@ -2380,6 +2380,7 @@
     "sending": "Odesílání",
     "sent": "Odesláno",
     "receipt": "Účtenka",
+    "sentAnnouncement": "Odesláno, {amount: string}",
     "fromBalance": "Ze zůstatku",
     "details": "Podrobnosti",
     "changeAmount": "Změnit částku",

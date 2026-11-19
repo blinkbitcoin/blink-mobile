@@ -2380,6 +2380,7 @@
     "sending": "Iyathumela",
     "sent": "Ithunyelwe",
     "receipt": "Irisithi",
+    "sentAnnouncement": "Ithunyelwe, {amount: string}",
     "fromBalance": "Ukusuka kwiBhalansi",
     "details": "Iinkcukacha",
     "changeAmount": "Tshintsha isixa",

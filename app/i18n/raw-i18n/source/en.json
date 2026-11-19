@@ -2342,6 +2342,7 @@
         "sending": "Sending",
         "sent": "Sent",
         "receipt": "Receipt",
+        "sentAnnouncement": "Sent, {amount: string}",
         "fromBalance": "From Balance",
         "details": "Details",
         "changeAmount": "Change amount",

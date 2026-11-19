@@ -2380,6 +2380,7 @@
     "sending": "Okusindika",
     "sent": "Kisindikiddwa",
     "receipt": "Lisiiti",
+    "sentAnnouncement": "Kisindikiddwa, {amount: string}",
     "fromBalance": "Okuva ku Balance",
     "details": "Ebisingawo",
     "changeAmount": "Kyusa omuwendo",

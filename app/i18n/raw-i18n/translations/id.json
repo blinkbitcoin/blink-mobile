@@ -2380,6 +2380,7 @@
     "sending": "Mengirim",
     "sent": "Terkirim",
     "receipt": "Struk",
+    "sentAnnouncement": "Terkirim, {amount: string}",
     "fromBalance": "Dari Saldo",
     "details": "Detail",
     "changeAmount": "Ubah jumlah",

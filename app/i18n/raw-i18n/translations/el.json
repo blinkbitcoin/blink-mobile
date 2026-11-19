@@ -2380,6 +2380,7 @@
     "sending": "Αποστολή",
     "sent": "Εστάλη",
     "receipt": "Απόδειξη",
+    "sentAnnouncement": "Εστάλη, {amount: string}",
     "fromBalance": "Από το υπόλοιπο",
     "details": "Λεπτομέρειες",
     "changeAmount": "Αλλαγή ποσού",

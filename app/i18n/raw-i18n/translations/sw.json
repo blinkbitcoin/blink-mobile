@@ -2380,6 +2380,7 @@
     "sending": "Inatuma",
     "sent": "Imetumwa",
     "receipt": "Risiti",
+    "sentAnnouncement": "Imetumwa, {amount: string}",
     "fromBalance": "Kutoka Salio",
     "details": "Maelezo",
     "changeAmount": "Badilisha kiasi",

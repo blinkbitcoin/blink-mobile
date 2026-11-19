@@ -2380,6 +2380,7 @@
         "sending": "Enviando",
         "sent": "Enviado",
         "receipt": "Comprovante",
+        "sentAnnouncement": "Enviado, {amount: string}",
         "fromBalance": "Do saldo",
         "details": "Detalhes",
         "changeAmount": "Alterar valor",

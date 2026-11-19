@@ -2380,6 +2380,7 @@
     "sending": "Trimitere",
     "sent": "Trimis",
     "receipt": "Chitanță",
+    "sentAnnouncement": "Trimis, {amount: string}",
     "fromBalance": "Din sold",
     "details": "Detalii",
     "changeAmount": "Schimbă suma",

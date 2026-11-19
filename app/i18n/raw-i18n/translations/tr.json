@@ -2380,6 +2380,7 @@
     "sending": "Gönderiliyor",
     "sent": "Gönderildi",
     "receipt": "Makbuz",
+    "sentAnnouncement": "Gönderildi, {amount: string}",
     "fromBalance": "Bakiyeden",
     "details": "Detaylar",
     "changeAmount": "Tutarı değiştir",

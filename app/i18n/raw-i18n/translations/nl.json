@@ -2380,6 +2380,7 @@
     "sending": "Verzenden",
     "sent": "Verzonden",
     "receipt": "Bon",
+    "sentAnnouncement": "Verzonden, {amount: string}",
     "fromBalance": "Van saldo",
     "details": "Details",
     "changeAmount": "Bedrag wijzigen",

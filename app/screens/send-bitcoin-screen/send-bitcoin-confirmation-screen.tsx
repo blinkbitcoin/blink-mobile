@@ -288,10 +288,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   } = sentTransition
 
   /** Review turns into Sent in place, with no new screen to land focus on, so the result
-   *  is spoken; a replay of the same send stays quiet. */
+   *  is spoken once per play: a Sent rewound in the background speaks again when it
+   *  replays. */
   useAccessibilityAnnouncement(
     sentPlay
-      ? `${LL.SendBitcoinConfirmationScreen.sent()}, ${heroPrimaryText}`
+      ? LL.SendBitcoinConfirmationScreen.sentAnnouncement({ amount: heroPrimaryText })
       : undefined,
   )
 
@@ -620,7 +621,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         : undefined
 
   return (
-    <Screen preset="fixed" keyboardOffset="navigationHeader" edges={["left", "right"]}>
+    <Screen preset="fixed" edges={["left", "right"]}>
       <View
         ref={stageRef}
         style={[styles.stage, { paddingTop: topInset, paddingBottom: bottomInset }]}

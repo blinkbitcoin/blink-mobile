@@ -2380,6 +2380,7 @@
     "sending": "Apachishaspa",
     "sent": "Kachasqa",
     "receipt": "Chaskisqa qillqa",
+    "sentAnnouncement": "Kachasqa, {amount: string}",
     "fromBalance": "Saldomanta",
     "details": "Detalles",
     "changeAmount": "Sumata tikray",

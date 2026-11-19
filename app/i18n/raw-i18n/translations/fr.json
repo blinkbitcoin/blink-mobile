@@ -2380,6 +2380,7 @@
         "sending": "Envoi en cours",
         "sent": "Envoyé",
         "receipt": "Reçu",
+        "sentAnnouncement": "Envoyé, {amount: string}",
         "fromBalance": "Depuis le solde",
         "details": "Détails",
         "changeAmount": "Modifier le montant",

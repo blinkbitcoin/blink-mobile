@@ -2380,6 +2380,7 @@
     "sending": "جارٍ الإرسال",
     "sent": "تم الإرسال",
     "receipt": "الإيصال",
+    "sentAnnouncement": "تم الإرسال، {amount: string}",
     "fromBalance": "من الرصيد",
     "details": "التفاصيل",
     "changeAmount": "تغيير المبلغ",

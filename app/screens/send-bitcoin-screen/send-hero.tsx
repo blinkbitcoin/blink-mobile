@@ -1,5 +1,5 @@
 import React, { useEffect } from "react"
-import { Pressable, View } from "react-native"
+import { PixelRatio, Pressable, View } from "react-native"
 import Animated, {
   Easing,
   interpolate,
@@ -87,23 +87,25 @@ export const SENT_BADGE_END_MS = SENT_BADGE_DELAY_MS + SUCCESS_BADGE_DURATION_MS
 const sentPrimaryFontSize = (amount: string): number => entryAmountFontSize(amount, false)
 
 /** How much taller the hero stands once sent, so a caller centring it can allow for the
- *  growth. Every line holds to one, so the growth is exact. */
+ *  growth. Every line holds to one, so the growth is exact. The text lines follow the OS
+ *  text size, line box included, where the icon frame does not. */
 export const sentHeroGrowth = ({
   primaryAmount,
   hasSecondaryAmount,
 }: {
   primaryAmount: string
   hasSecondaryAmount: boolean
-}): number =>
-  ICON_FRAME_SIZE.sent -
-  ICON_FRAME_SIZE.review +
-  SENT_ICON_EXTRA_GAP +
-  CAPTION_LINE_HEIGHT.sent -
-  CAPTION_LINE_HEIGHT.review +
-  sentPrimaryFontSize(primaryAmount) +
-  ENTRY_LINE_HEIGHT_OFFSET -
-  LINE_HEIGHT.inactive.primary +
-  (hasSecondaryAmount ? SENT_LINE_HEIGHT.secondary - LINE_HEIGHT.inactive.secondary : 0)
+}): number => {
+  const iconGrowth = ICON_FRAME_SIZE.sent - ICON_FRAME_SIZE.review + SENT_ICON_EXTRA_GAP
+  const textGrowth =
+    CAPTION_LINE_HEIGHT.sent -
+    CAPTION_LINE_HEIGHT.review +
+    sentPrimaryFontSize(primaryAmount) +
+    ENTRY_LINE_HEIGHT_OFFSET -
+    LINE_HEIGHT.inactive.primary +
+    (hasSecondaryAmount ? SENT_LINE_HEIGHT.secondary - LINE_HEIGHT.inactive.secondary : 0)
+  return iconGrowth + textGrowth * PixelRatio.getFontScale()
+}
 
 type SendHeroProps = {
   /** The line above the amount: the destination while entering it, what the screen is

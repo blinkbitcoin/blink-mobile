@@ -2380,6 +2380,7 @@
     "sending": "Besig om te stuur",
     "sent": "Gestuur",
     "receipt": "Kwitansie",
+    "sentAnnouncement": "Gestuur, {amount: string}",
     "fromBalance": "Van Balans",
     "details": "Besonderhede",
     "changeAmount": "Verander bedrag",

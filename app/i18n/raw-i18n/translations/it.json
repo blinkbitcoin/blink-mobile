@@ -2380,6 +2380,7 @@
         "sending": "Invio",
         "sent": "Inviato",
         "receipt": "Ricevuta",
+        "sentAnnouncement": "Inviato, {amount: string}",
         "fromBalance": "Dal saldo",
         "details": "Dettagli",
         "changeAmount": "Modifica importo",

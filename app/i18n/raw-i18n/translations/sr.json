@@ -2380,6 +2380,7 @@
     "sending": "Слање",
     "sent": "Послато",
     "receipt": "Потврда",
+    "sentAnnouncement": "Послато, {amount: string}",
     "fromBalance": "Са салда",
     "details": "Детаљи",
     "changeAmount": "Промени износ",

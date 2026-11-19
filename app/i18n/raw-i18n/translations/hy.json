@@ -2380,6 +2380,7 @@
     "sending": "Ուղարկվում է",
     "sent": "Ուղարկված է",
     "receipt": "Անդորրագիր",
+    "sentAnnouncement": "Ուղարկված է, {amount: string}",
     "fromBalance": "Հաշվեկշռից",
     "details": "Մանրամասներ",
     "changeAmount": "Փոխել գումարը",

@@ -7582,6 +7582,11 @@ type RootTranslation = {
 		 */
 		receipt: string
 		/**
+		 * S​e​n​t​,​ ​{​a​m​o​u​n​t​}
+		 * @param {string} amount
+		 */
+		sentAnnouncement: RequiredParams<'amount'>
+		/**
 		 * F​r​o​m​ ​B​a​l​a​n​c​e
 		 */
 		fromBalance: string
@@ -22076,6 +22081,10 @@ export type TranslationFunctions = {
 		 * Receipt
 		 */
 		receipt: () => LocalizedString
+		/**
+		 * Sent, {amount}
+		 */
+		sentAnnouncement: (arg: { amount: string }) => LocalizedString
 		/**
 		 * From Balance
 		 */

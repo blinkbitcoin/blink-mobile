@@ -2380,6 +2380,7 @@
     "sending": "Enviant",
     "sent": "Enviat",
     "receipt": "Rebut",
+    "sentAnnouncement": "Enviat, {amount: string}",
     "fromBalance": "Des del saldo",
     "details": "Detalls",
     "changeAmount": "Canvia l'import",

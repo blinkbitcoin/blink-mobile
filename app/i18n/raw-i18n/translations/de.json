@@ -2380,6 +2380,7 @@
         "sending": "Wird gesendet",
         "sent": "Gesendet",
         "receipt": "Beleg",
+        "sentAnnouncement": "Gesendet, {amount: string}",
         "fromBalance": "Vom Guthaben",
         "details": "Details",
         "changeAmount": "Betrag ändern",

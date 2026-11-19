@@ -2380,6 +2380,7 @@
     "sending": "กำลังส่ง",
     "sent": "ส่งแล้ว",
     "receipt": "ใบเสร็จ",
+    "sentAnnouncement": "ส่งแล้ว {amount: string}",
     "fromBalance": "จากยอดคงเหลือ",
     "details": "รายละเอียด",
     "changeAmount": "เปลี่ยนจำนวนเงิน",

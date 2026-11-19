@@ -2380,6 +2380,7 @@
     "sending": "Odosielanie",
     "sent": "Odoslané",
     "receipt": "Potvrdenie",
+    "sentAnnouncement": "Odoslané, {amount: string}",
     "fromBalance": "Zo zostatku",
     "details": "Podrobnosti",
     "changeAmount": "Zmeniť sumu",

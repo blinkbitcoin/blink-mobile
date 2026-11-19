@@ -2380,6 +2380,7 @@
     "sending": "Đang gửi",
     "sent": "Đã gửi",
     "receipt": "Biên nhận",
+    "sentAnnouncement": "Đã gửi, {amount: string}",
     "fromBalance": "Từ số dư",
     "details": "Chi tiết",
     "changeAmount": "Đổi số tiền",

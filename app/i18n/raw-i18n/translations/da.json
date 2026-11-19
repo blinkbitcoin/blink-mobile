@@ -2380,6 +2380,7 @@
     "sending": "Sender",
     "sent": "Sendt",
     "receipt": "Kvittering",
+    "sentAnnouncement": "Sendt, {amount: string}",
     "fromBalance": "Fra saldo",
     "details": "Detaljer",
     "changeAmount": "Skift beløb",
