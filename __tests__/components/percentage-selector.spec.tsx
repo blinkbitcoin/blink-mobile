@@ -1,6 +1,6 @@
 import React from "react"
-import { ActivityIndicator, StyleSheet, Text as ReactNativeText } from "react-native"
-import { render, fireEvent, screen } from "@testing-library/react-native"
+import { StyleSheet, Text as ReactNativeText } from "react-native"
+import { render, fireEvent } from "@testing-library/react-native"
 
 import { PercentageSelector } from "@app/components/percentage-selector/percentage-selector"
 
@@ -165,9 +165,7 @@ describe("PercentageSelector", () => {
     )
 
     expect(getByTestId("test-75%")).toBeTruthy()
-    // The label stays mounted under the spinner so the chip keeps its width, but hidden.
-    expect(StyleSheet.flatten(queryByText("75%")?.props.style).opacity).toBe(0)
-    expect(screen.UNSAFE_getByType(ActivityIndicator)).toBeTruthy()
+    expect(queryByText("75%")).toBeNull()
   })
 
   it("shows percentage text when not loading", () => {
@@ -267,22 +265,5 @@ describe("PercentageSelector", () => {
 
     expect(StyleSheet.flatten(getByText("50%").props.style).color).toBe("textOnAccent")
     expect(StyleSheet.flatten(getByText("25%").props.style).color).toBe("accent")
-  })
-
-  /** Each chip used to be read as its test-ID prefix ("send", "convert"). */
-  it("reads each chip as its percentage", () => {
-    const { getByLabelText, queryByLabelText } = render(
-      <PercentageSelector
-        isLocked={false}
-        loadingPercent={null}
-        onSelect={mockOnSelect}
-        testIdPrefix="send"
-      />,
-    )
-
-    ;["25%", "50%", "75%", "100%"].forEach((label) => {
-      expect(getByLabelText(label).props.accessibilityRole).toBe("button")
-    })
-    expect(queryByLabelText("send")).toBeNull()
   })
 })

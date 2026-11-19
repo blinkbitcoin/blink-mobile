@@ -349,12 +349,11 @@ const typeKeys = (...keys: string[]) =>
   keys.forEach((key) => fireEvent.press(screen.getByTestId(`Key ${key}`)))
 
 describe("free amount", () => {
-  it("opens with the keypad, the percent chips and a disabled Add amount", async () => {
+  it("opens with the keypad and a disabled Add amount", async () => {
     renderScreen(intraledgerDestination())
     await settle()
 
     expect(screen.getByTestId("Key 1")).toBeTruthy()
-    expect(screen.getByTestId("send-25%")).toBeTruthy()
     expect(within(nextButton()).getByText(LL.SendBitcoinScreen.addAmount())).toBeTruthy()
     // Read as what it shows, not as its test ID "Next".
     expect(nextButton().props.accessibilityLabel).toBe(LL.SendBitcoinScreen.addAmount())
@@ -388,46 +387,6 @@ describe("free amount", () => {
     expect(emptyPrimary).not.toBe(emptySecondary)
     expect(colorOf("send-hero-amount-secondary")).toBe(emptyPrimary)
     expect(colorOf("send-hero-amount-primary")).not.toBe(emptyPrimary)
-  })
-
-  it("sets the chip's share of the selected wallet's balance", async () => {
-    renderScreen(intraledgerDestination())
-    await settle()
-
-    fireEvent.press(screen.getByTestId("send-50%"))
-    await settle()
-
-    expect(mockSetAmount).toHaveBeenLastCalledWith(
-      { amount: Math.floor(btcWallet.balance / 2), currency: "BTC", currencyCode: "BTC" },
-      false,
-    )
-    expect(isNextDisabled()).toBe(false)
-  })
-
-  it("sends the whole balance as a send-all where the rail supports one", async () => {
-    renderScreen(intraledgerDestination({ canSendMax: true }))
-    await settle()
-
-    fireEvent.press(screen.getByTestId("send-100%"))
-    await settle()
-
-    expect(mockSetAmount).toHaveBeenLastCalledWith(
-      { amount: btcWallet.balance, currency: "BTC", currencyCode: "BTC" },
-      true,
-    )
-  })
-
-  it("sends 100% as a plain amount where the rail has no send-all", async () => {
-    renderScreen(intraledgerDestination())
-    await settle()
-
-    fireEvent.press(screen.getByTestId("send-100%"))
-    await settle()
-
-    expect(mockSetAmount).toHaveBeenLastCalledWith(
-      { amount: btcWallet.balance, currency: "BTC", currencyCode: "BTC" },
-      false,
-    )
   })
 
   /** ₦22 is past the bitcoin balance against the mocked price (see the switch spec below). */
@@ -677,12 +636,11 @@ describe("a custodial on-chain payment to the sender's own address", () => {
 })
 
 describe("fixed amount", () => {
-  it("hides the keypad and chips and offers Next straight away", async () => {
+  it("hides the keypad and offers Next straight away", async () => {
     renderScreen(invoiceDestination)
     await settle()
 
     expect(screen.queryByTestId("Key 1")).toBeNull()
-    expect(screen.queryByTestId("send-25%")).toBeNull()
     expect(within(nextButton()).getByText(LL.common.next())).toBeTruthy()
     expect(isNextDisabled()).toBe(false)
   })
@@ -821,7 +779,7 @@ describe("wallet summary balance lines", () => {
 /**
  * The summary replaced the choose-wallet picker, the one place hide-balance let the send
  * flow reveal an amount (#4125), so it keeps the picker's rule rather than the old inline
- * field's mask: the balance is what the user switches wallets and picks a percentage by.
+ * field's mask: the balance is what the user switches wallets by.
  */
 describe("wallet summary under hide-balance", () => {
   const expectBalanceShown = () =>
@@ -885,12 +843,10 @@ describe("while the note is typed", () => {
 
     showKeyboard()
     expect(screen.queryByTestId("Key 1")).toBeNull()
-    expect(screen.queryByTestId("send-25%")).toBeNull()
     expect(nextButton()).toBeTruthy()
 
     hideKeyboard()
     expect(screen.getByTestId("Key 1")).toBeTruthy()
-    expect(screen.getByTestId("send-25%")).toBeTruthy()
   })
 
   /** Android reports a closed keyboard as a keyboard change, which left a stale lift. */

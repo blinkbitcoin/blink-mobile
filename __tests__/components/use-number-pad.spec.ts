@@ -131,12 +131,12 @@ describe("useNumberPad", () => {
   it("swaps currency from the amount of record, not the rounded mirror", () => {
     mockPreferredCurrencyData.data = { preferredAmountCurrency: "display" }
     const { result } = renderPad()
-    const chipAmount = toBtcMoneyAmount(1001)
+    const walletAmount = toBtcMoneyAmount(1001)
 
-    act(() => result.current.showAmount(chipAmount))
+    act(() => result.current.showAmount(walletAmount))
     expect(result.current.padAmount.amount).toBe(90)
 
-    act(() => result.current.toggleCurrency(WalletCurrency.Btc, chipAmount))
+    act(() => result.current.toggleCurrency(WalletCurrency.Btc, walletAmount))
 
     expect(result.current.padCurrency).toBe(WalletCurrency.Btc)
     expect(result.current.padAmount.amount).toBe(1001)

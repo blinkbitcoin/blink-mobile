@@ -35,7 +35,7 @@ type UseNumberPadArgs = {
 /**
  * The state behind an in-screen number pad: what the user has typed, which currency they
  * are typing in, and which keys are live. It holds only the typed value — the screen's own
- * amount stays the amount of record, so a percent chip can hand it an exact wallet amount
+ * amount stays the amount of record, so a wallet switch can hand it an exact amount
  * while the pad shows that amount rounded to the currency being typed in.
  *
  * The canonical pad: every screen with a keypad should drive `CurrencyKeyboard` from this
@@ -112,7 +112,7 @@ export const useNumberPad = ({
     [padState, onAmountChange, toMoneyAmount],
   )
 
-  /** Mirrors an amount set from outside the pad (a chip, a wallet switch) without
+  /** Mirrors an amount set from outside the pad (a wallet switch) without
    *  reporting it back, so the caller's exact amount is never replaced by the rounded one.
    *  A change of currency is saved as the preference, whoever makes it, because review
    *  leads with the preferred currency and must read the amount the way the pad showed it. */
