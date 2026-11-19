@@ -102,7 +102,7 @@ export const SuccessBadge: React.FC<SuccessBadgeProps> = ({
     [scale],
   )
 
-  const stroke = color ?? colors._green
+  const stroke = color ?? colors.success
 
   return (
     <Animated.View style={[{ width: size, height: size }, popStyle]}>
