@@ -67,6 +67,19 @@ describe("SuccessScreen", () => {
     expect(screen.getByText("Body")).toBeTruthy()
   })
 
+  /** In a centred column Android measures a bold line at its natural width and clipped
+   *  the word it wrapped: "Your backup phrase is correct" lost "correct" on device. */
+  it("runs the title and subtitle the full width, so no wrapped word is clipped", () => {
+    renderScreen({ subtitle: "satoshi@blink.sv" })
+
+    for (const text of [TITLE, "satoshi@blink.sv"]) {
+      expect(StyleSheet.flatten(screen.getByText(text).props.style)).toMatchObject({
+        width: "100%",
+        textAlign: "center",
+      })
+    }
+  })
+
   it("buzzes the success haptic once as it opens, not on re-render", () => {
     renderScreen()
     screen.rerender(

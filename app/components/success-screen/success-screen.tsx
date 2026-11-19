@@ -172,8 +172,11 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     gap: 14,
   },
+  /** The full width, as IconHero's own title: in a centred column Android measures a
+   *  bold line at its natural width and clips the last word it wraps. */
   centred: {
     textAlign: "center",
+    width: "100%",
   },
   actions: {
     paddingHorizontal: 20,
