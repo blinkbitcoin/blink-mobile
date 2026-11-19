@@ -1,5 +1,5 @@
 import React, { useEffect } from "react"
-import { PixelRatio, Pressable, View } from "react-native"
+import { Pressable, View } from "react-native"
 import Animated, {
   Easing,
   interpolate,
@@ -16,6 +16,7 @@ import { SUCCESS_BADGE_DURATION_MS, SuccessBadge } from "@app/components/success
 import { useAccessibilityAnnouncement } from "@app/hooks/use-accessibility-announcement"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { fonts } from "@app/rne-theme/fonts"
+import { cappedFontScale, MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 export const SEND_HERO_CAPTION_TEST_ID = "send-hero-caption"
 export const SEND_HERO_PRIMARY_TEST_ID = "send-hero-amount-primary"
@@ -88,7 +89,8 @@ const sentPrimaryFontSize = (amount: string): number => entryAmountFontSize(amou
 
 /** How much taller the hero stands once sent, so a caller centring it can allow for the
  *  growth. Every line holds to one, so the growth is exact. The text lines follow the OS
- *  text size, line box included, where the icon frame does not. */
+ *  text size up to the same ceiling their `maxFontSizeMultiplier` sets, line box
+ *  included, where the icon frame does not. */
 export const sentHeroGrowth = ({
   primaryAmount,
   hasSecondaryAmount,
@@ -104,7 +106,7 @@ export const sentHeroGrowth = ({
     ENTRY_LINE_HEIGHT_OFFSET -
     LINE_HEIGHT.inactive.primary +
     (hasSecondaryAmount ? SENT_LINE_HEIGHT.secondary - LINE_HEIGHT.inactive.secondary : 0)
-  return iconGrowth + textGrowth * PixelRatio.getFontScale()
+  return iconGrowth + textGrowth * cappedFontScale()
 }
 
 type SendHeroProps = {
@@ -291,6 +293,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
       onAccessibilityAction={onCaptionLongPress}
     >
       <Animated.Text
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         numberOfLines={1}
         ellipsizeMode="middle"
         style={[styles.caption, isMorphing && sentCaptionStyle]}
@@ -324,6 +327,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
           isMorphing && sentPrimaryStyle,
         ]}
         adjustsFontSizeToFit
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         numberOfLines={1}
         testID={SEND_HERO_PRIMARY_TEST_ID}
       >
@@ -346,6 +350,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
             active && secondaryStyle,
             isMorphing && sentSecondaryStyle,
           ]}
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           numberOfLines={1}
           testID={SEND_HERO_SECONDARY_TEST_ID}
         >

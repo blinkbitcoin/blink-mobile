@@ -9,6 +9,7 @@ import TypesafeI18n from "@app/i18n/i18n-react"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { SuccessBadge } from "@app/components/success-badge"
 import { light } from "@app/rne-theme/colors"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import theme from "@app/rne-theme/theme"
 import {
   SEND_HERO_CAPTION_TEST_ID,
@@ -222,6 +223,22 @@ describe("SendHero", () => {
     })
   })
 
+  /** Reanimated's Animated.Text is React Native's Text, which the theme's ceiling never
+   *  reaches, so each line carries it, the same one `sentHeroGrowth` centres by. */
+  it("caps every line at the text-size ceiling", () => {
+    renderHero({ secondaryAmount: "746 SAT" })
+
+    for (const testID of [
+      SEND_HERO_CAPTION_TEST_ID,
+      SEND_HERO_PRIMARY_TEST_ID,
+      SEND_HERO_SECONDARY_TEST_ID,
+    ]) {
+      expect(screen.getByTestId(testID).props.maxFontSizeMultiplier).toBe(
+        MAX_FONT_SIZE_MULTIPLIER,
+      )
+    }
+  })
+
   describe("sentHeroGrowth", () => {
     afterEach(() => {
       jest.restoreAllMocks()
@@ -245,11 +262,20 @@ describe("SendHero", () => {
 
     /** The text lines follow the OS text size, line box included; the icon frame does not. */
     it("scales the text lines' growth with the OS text size, and not the icon's", () => {
-      jest.spyOn(PixelRatio, "getFontScale").mockReturnValue(2)
+      jest.spyOn(PixelRatio, "getFontScale").mockReturnValue(1.2)
 
-      expect(sentHeroGrowth({ primaryAmount: "$10.00", hasSecondaryAmount: true })).toBe(
-        38 + 2 * (4 + (36 + 2 - 24) + (22 - 20)),
-      )
+      expect(
+        sentHeroGrowth({ primaryAmount: "$10.00", hasSecondaryAmount: true }),
+      ).toBeCloseTo(38 + 1.2 * (4 + (36 + 2 - 24) + (22 - 20)), 5)
+    })
+
+    /** The lines stop growing at the ceiling, so the centring stops with them. */
+    it("stops the text lines' growth at the text-size ceiling", () => {
+      jest.spyOn(PixelRatio, "getFontScale").mockReturnValue(3)
+
+      expect(
+        sentHeroGrowth({ primaryAmount: "$10.00", hasSecondaryAmount: true }),
+      ).toBeCloseTo(38 + MAX_FONT_SIZE_MULTIPLIER * (4 + (36 + 2 - 24) + (22 - 20)), 5)
     })
   })
 
