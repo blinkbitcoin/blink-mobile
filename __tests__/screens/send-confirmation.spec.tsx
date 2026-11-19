@@ -30,6 +30,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
 import { light } from "@app/rne-theme/colors"
 import { INFO_SECTION_OUTLINE_TEST_ID } from "@app/components/card-screen/info-section"
+import { SEND_REVIEW_DESTINATION_TEST_ID } from "@app/screens/send-bitcoin-screen/review/send-review-destination"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import {
   SEND_HERO_PRIMARY_TEST_ID,
@@ -458,17 +459,15 @@ describe("SendBitcoinConfirmationScreen", () => {
       </ContextForScreen>,
     )
 
-    const [copyDestination] = screen
-      .UNSAFE_getAllByType(TouchableOpacity)
-      .filter((node) => node.props.hitSlop === 30)
-    expect(surfaceColor(copyDestination)).toBe(light.surfaceInteractive)
+    // The destination is review's one press target: it copies.
+    const destination = screen.getByTestId(SEND_REVIEW_DESTINATION_TEST_ID)
+    expect(surfaceColor(destination)).toBe(light.surfaceInteractive)
 
-    // One value per field, so dropping the static style from any one of them fails here:
-    // the file-level guard only counts the style, not the fields that use it.
-    const from = screen.getByText("$100.00")
-    const amount = screen.getByText("$1.00 (₦1)")
-    const fee = screen.getByLabelText("Successful Fee")
-    for (const value of [from, amount, screen.getByText(note), fee]) {
+    // One value per card, so dropping the static style from any one of them fails here:
+    // the file-level guard only counts the style, not the cards that use it.
+    const from = screen.getByTestId(`${WalletCurrency.Usd} Wallet Balance`)
+    const fee = screen.getByTestId("Successful Fee")
+    for (const value of [from, screen.getByText(note), fee]) {
       expect(surfaceColor(value)).toBe(light.surfaceStatic)
     }
   })
@@ -1535,7 +1534,8 @@ describe("hide balance", () => {
   it("leaves the amount and fee readable while hide-balance is on", async () => {
     await renderSettledWithHideAmount(true)
 
-    expect(screen.getByText("$1.00 (₦1)")).toBeTruthy()
+    expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("₦1")
+    expect(screen.getByTestId(SEND_HERO_SECONDARY_TEST_ID).props.children).toBe("$1.00")
     expect(feeRow().getByText("₦0 ($0.00)")).toBeTruthy()
   })
 
@@ -1551,7 +1551,7 @@ describe("SendBitcoinConfirmationScreen — slide to send", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockUseNonCustodialConversionLimits.mockReturnValue(undefined)
+    mockUseNonCustodialConversionLimits.mockReturnValue(defaultConversionLimits)
     loadLocale("en")
     LL = i18nObject("en")
     mockUseSendPayment.mockReturnValue({
@@ -1742,14 +1742,22 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
     hideAmount = false,
     toggleHideAmount = jest.fn(),
   ) => {
-    render(
+    const view = render(
       <ContextForScreen>
         <HideAmountContextProvider value={{ hideAmount, toggleHideAmount }}>
           <Intraledger route={paymentRoute} />
         </HideAmountContextProvider>
       </ContextForScreen>,
     )
-    await flushEffects()
+    // One flush did not always reach the price query, so the hero still read the
+    // currency fallback on a loaded machine. Wait for the price, then for the tree to
+    // go quiet.
+    await waitFor(() =>
+      expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).not.toBe(
+        LL.common.currencySyncIssue(),
+      ),
+    )
+    await waitForStableRender(view)
   }
 
   const outlineColor = () => {
@@ -1759,7 +1767,7 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockUseNonCustodialConversionLimits.mockReturnValue(undefined)
+    mockUseNonCustodialConversionLimits.mockReturnValue(defaultConversionLimits)
     loadLocale("en")
     LL = i18nObject("en")
     mockUseSendPayment.mockReturnValue({
@@ -2025,7 +2033,7 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
     })
   })
 
-  describe("a fee taken out of the amount, and a quote that moved", () => {
+  describe("a fee taken out of the amount", () => {
     const feeIncludedRoute = (sats: number) => {
       const base = buildOnchainRoute(sats)
       return {
