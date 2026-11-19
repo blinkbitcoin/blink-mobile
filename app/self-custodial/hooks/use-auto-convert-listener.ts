@@ -60,6 +60,11 @@ const MAX_IN_FLIGHT_INVOICES = 50
  */
 let latestConversionTurn: Promise<unknown> = Promise.resolve()
 
+/** Conversions paired with a receive while the app runs: claimed for every later turn at
+ *  once, even should the pairing not reach storage. */
+const claimedWhileRunning = new Set<string>()
+const MAX_CLAIMED_WHILE_RUNNING = 200
+
 const afterEarlierReceivesConvert = <T>(turn: () => Promise<T>): Promise<T> => {
   const thisTurn = latestConversionTurn.then(turn)
   latestConversionTurn = thisTurn.catch(() => undefined)
@@ -165,12 +170,17 @@ const runAutoConvert = async ({
         claimedConversionIds,
       })
       if (converted.status === AutoConvertStatus.Converted) {
-        const conversionId = await findRecentConversionId(sdk, {
-          satsAmount: satsReceived,
-          toleranceBps: amountMatchToleranceBps,
-          claimedConversionIds,
-        })
+        /** The conversion's own payment, as the bridge names it; looked up in the history
+         *  only when it does not, as a payment whose legs are still syncing may not show. */
+        const conversionId =
+          converted.conversionPaymentId ??
+          (await findRecentConversionId(sdk, {
+            satsAmount: satsReceived,
+            toleranceBps: amountMatchToleranceBps,
+            claimedConversionIds,
+          }))
         if (conversionId) {
+          addBounded(claimedWhileRunning, conversionId, MAX_CLAIMED_WHILE_RUNNING)
           await markAutoConvertPairing({
             receivePaymentId: paymentId,
             conversionPaymentId: conversionId,
@@ -215,7 +225,7 @@ const buildClaimedConversionIds = async (): Promise<{
   pairedReceiveIds: ReadonlySet<string>
 }> => {
   const pairings = await listAutoConvertPairings()
-  const claimedConversionIds = new Set<string>()
+  const claimedConversionIds = new Set<string>(claimedWhileRunning)
   const pairedReceiveIds = new Set<string>()
   pairings.forEach((p) => {
     claimedConversionIds.add(p.conversionPaymentId)

@@ -431,8 +431,12 @@ const withoutAttempt = <L extends LostConversionLook>(
 }
 
 /** What a look for a conversion lost as it went out leaves to look for, and whether what
- *  it found is surely this conversion's delivery. */
-type SettledByLook = { left: LostConversion | undefined; isSurelyThis: boolean }
+ *  it found is surely this conversion's delivery, which it then names. */
+type SettledByLook = {
+  left: LostConversion | undefined
+  isSurelyThis: boolean
+  deliveredPaymentId?: string
+}
 
 /**
  * What a look for this conversion, lost as it went out, settles: the attempt the delivery
@@ -464,7 +468,11 @@ const settledByLook = (
     left?.expectedDeliveries.some((delivery) =>
       isDeliveryAsExpected(payment, delivery),
     ) ?? false
-  return { left, isSurelyThis: isThisAttempt && !canBeAnotherAttempts }
+  return {
+    left,
+    isSurelyThis: isThisAttempt && !canBeAnotherAttempts,
+    deliveredPaymentId: payment.id,
+  }
 }
 
 /**
@@ -615,7 +623,12 @@ const convertAfterEarlierConversions = async (
         earlier.expectedDeliveries[settled].receiveRecordedAtMs ===
         params.receiveRecordedAtMs
       const isThisRequestsDelivery = isThisRequest && isThisConversion(lookup.payment)
-      if (isThisRequestsDelivery) return { status: PaymentResultStatus.Success }
+      if (isThisRequestsDelivery) {
+        return {
+          status: PaymentResultStatus.Success,
+          deliveredPaymentId: lookup.payment.id,
+        }
+      }
       return failed(EARLIER_CONVERSION_MESSAGE, ConvertErrorCode.EarlierConversionFound)
     }
     /** Not found so soon after it went out, it may still deliver. */
@@ -723,7 +736,10 @@ const convertAfterEarlierConversions = async (
     }
     /** Out, it settles the lost conversion it was let through past. */
     if (earlier) keepLost(undefined)
-    return { status: PaymentResultStatus.Success }
+    return {
+      status: PaymentResultStatus.Success,
+      deliveredPaymentId: response?.payment?.id,
+    }
   } catch (err) {
     /** When its outcome was lost: a swap that ran late in a long call delivers from then. */
     const lostAtRealMs = performance.now()
@@ -746,7 +762,7 @@ const convertAfterEarlierConversions = async (
      *  stored ahead stays stored meanwhile, and is taken back only once what the look
      *  leaves is held. */
     const look = await findLostConversion({ sdk, lost, isLabelRequired: true })
-    const { left, isSurelyThis } = settledByLook(look, lost, {
+    const { left, isSurelyThis, deliveredPaymentId } = settledByLook(look, lost, {
       isAutomatic,
       isThisConversion,
     })
@@ -756,7 +772,7 @@ const convertAfterEarlierConversions = async (
     writtenAhead.end()
     if (isSurelyThis) {
       measureIn(startedIn, ScEvent.SwapCompleted, swapTelemetry)
-      return { status: PaymentResultStatus.Success }
+      return { status: PaymentResultStatus.Success, deliveredPaymentId }
     }
     reportSwapFailed()
     return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)

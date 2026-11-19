@@ -20,6 +20,8 @@ export type PaymentResultStatus =
 export type PaymentAdapterResult = {
   status: PaymentResultStatus
   errors?: PaymentError[]
+  /** For a conversion that went through: the payment it delivered, when known. */
+  deliveredPaymentId?: string
   extraInfo?: {
     arrivalAtMempoolEstimate?: number
     preimage?: string | null

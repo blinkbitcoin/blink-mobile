@@ -1045,7 +1045,12 @@ describe("useAutoConvertListener — receives of one amount converting at once",
   /** The wallet as the executor sees it: conversions go out one at a time, as the bridge
    *  runs them, and one already in the history that no receive has claimed is taken for
    *  these sats, as `isConvertedInHistory` takes it. */
+  /** Conversions are named per wallet: claims the listener keeps while the app runs
+   *  never match another test's. */
+  let walletsMade = 0
   const walletConvertingOneAtATime = () => {
+    walletsMade += 1
+    const walletName = `wallet-${walletsMade}`
     const history: string[] = []
     const pairings: Array<{ receivePaymentId: string; conversionPaymentId: string }> = []
     let landFirst: () => void = () => undefined
@@ -1054,12 +1059,9 @@ describe("useAutoConvertListener — receives of one amount converting at once",
     mockMarkAutoConvertPairing.mockImplementation(async (pairing) => {
       pairings.push(pairing)
     })
-    mockFindRecentConversionId.mockImplementation(
-      async (
-        _sdk: unknown,
-        { claimedConversionIds }: { claimedConversionIds: Set<string> },
-      ) => [...history].reverse().find((id) => !claimedConversionIds.has(id)),
-    )
+    /** The history shows none of them yet, as a conversion whose legs are still
+     *  syncing: the pairing has only what the bridge names. */
+    mockFindRecentConversionId.mockResolvedValue(undefined)
     mockExecuteAutoConvert.mockImplementation(
       (
         _sdk: unknown,
@@ -1073,17 +1075,19 @@ describe("useAutoConvertListener — receives of one amount converting at once",
               landFirst = resolve
             })
           }
-          history.push(`conversion-${history.length + 1}`)
-          return { status: AutoConvertStatus.Converted }
+          const conversionPaymentId = `${walletName}-conversion-${history.length + 1}`
+          history.push(conversionPaymentId)
+          return { status: AutoConvertStatus.Converted, conversionPaymentId }
         })
         bridgeTurn = turn.catch(() => undefined)
         return turn
       },
     )
-    return { history, pairings, landFirst: () => landFirst() }
+    const conversion = (n: number) => `${walletName}-conversion-${n}`
+    return { history, pairings, conversion, landFirst: () => landFirst() }
   }
 
-  it("converts and pairs each of two receives of one amount whose conversions overlap", async () => {
+  it("converts and pairs each of two receives of one amount whose conversions overlap, before the history shows them", async () => {
     const sdk = makeSdk({
       getPayment: jest.fn(async ({ paymentId }: { paymentId: string }) => ({
         payment: makeLightningPayment(paymentId.replace("pid-", ""), 5000n),
@@ -1101,7 +1105,7 @@ describe("useAutoConvertListener — receives of one amount converting at once",
         createdAtMs: invoice === "lnbcFirst" ? 1_000_000 : 1_000_500,
       }),
     )
-    const { history, pairings, landFirst } = walletConvertingOneAtATime()
+    const { history, pairings, conversion, landFirst } = walletConvertingOneAtATime()
     mockUseSelfCustodialWallet.mockReturnValue({
       ...wallet,
       lastReceivedPaymentId: "pid-lnbcFirst",
@@ -1118,17 +1122,58 @@ describe("useAutoConvertListener — receives of one amount converting at once",
     landFirst()
 
     await waitFor(() => expect(mockRemovePendingAutoConvert).toHaveBeenCalledTimes(2))
-    expect(history).toEqual(["conversion-1", "conversion-2"])
+    expect(history).toEqual([conversion(1), conversion(2)])
     expect(pairings).toEqual([
       expect.objectContaining({
         receivePaymentId: "pid-lnbcFirst",
-        conversionPaymentId: "conversion-1",
+        conversionPaymentId: conversion(1),
       }),
       expect.objectContaining({
         receivePaymentId: "pid-lnbcSecond",
-        conversionPaymentId: "conversion-2",
+        conversionPaymentId: conversion(2),
       }),
     ])
+  })
+
+  /** A conversion paired while the app runs is claimed for the next receive at once, so
+   *  a pairing that does not reach storage cannot hand the first one's to the second. */
+  it("keeps the first receive's conversion claimed for the second when its pairing is not stored", async () => {
+    const sdk = makeSdk({
+      getPayment: jest.fn(async ({ paymentId }: { paymentId: string }) => ({
+        payment: makeLightningPayment(paymentId.replace("pid-", ""), 5000n),
+      })),
+    })
+    setupDefaults(sdk)
+    const wallet = {
+      sdk,
+      isStableBalanceActive: false,
+      refreshWallets: mockRefreshWallets,
+    }
+    mockFindPendingAutoConvert.mockImplementation(async (invoice: string) =>
+      makeRecord({ paymentRequest: invoice }),
+    )
+    const { history, conversion, landFirst } = walletConvertingOneAtATime()
+    mockMarkAutoConvertPairing.mockRejectedValueOnce(new Error("storage unavailable"))
+    mockUseSelfCustodialWallet.mockReturnValue({
+      ...wallet,
+      lastReceivedPaymentId: "pid-lnbcUnstored",
+    })
+    const { rerender } = renderHook(() => useAutoConvertListener())
+    await waitFor(() => expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1))
+
+    mockUseSelfCustodialWallet.mockReturnValue({
+      ...wallet,
+      lastReceivedPaymentId: "pid-lnbcAfter",
+    })
+    rerender({})
+    await waitFor(() => expect(mockRecordAutoConvertAttempt).toHaveBeenCalledTimes(2))
+    landFirst()
+
+    await waitFor(() =>
+      expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbcAfter"),
+    )
+    expect(history).toEqual([conversion(1), conversion(2)])
+    expect(mockRemovePendingAutoConvert).not.toHaveBeenCalledWith("lnbcUnstored")
   })
 
   it("lets the next receive convert after one whose turn failed", async () => {

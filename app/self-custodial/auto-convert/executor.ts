@@ -254,7 +254,10 @@ export const executeAutoConvert = async (
     isConvertedMeanwhile: () => isConvertedInHistory(sdk, priorConversion),
   })
   if (result.status === PaymentResultStatus.Success) {
-    return { status: AutoConvertStatus.Converted }
+    return {
+      status: AutoConvertStatus.Converted,
+      conversionPaymentId: result.deliveredPaymentId,
+    }
   }
   const errorCode = result.errors?.[0]?.code
   const isConvertedMeanwhile = errorCode === ConvertErrorCode.AlreadyConverted

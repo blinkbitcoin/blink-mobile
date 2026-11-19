@@ -38,7 +38,8 @@ export const AutoConvertStatus = {
 export type AutoConvertStatus = (typeof AutoConvertStatus)[keyof typeof AutoConvertStatus]
 
 export type AutoConvertOutcome =
-  | { status: typeof AutoConvertStatus.Converted }
+  /** With the conversion's own payment when the bridge names it, for the pairing. */
+  | { status: typeof AutoConvertStatus.Converted; conversionPaymentId?: string }
   | { status: typeof AutoConvertStatus.AlreadyConverted }
   | { status: typeof AutoConvertStatus.SkippedBelowMin }
   | { status: typeof AutoConvertStatus.SkippedStableBalanceActive }

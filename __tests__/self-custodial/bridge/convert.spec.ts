@@ -1570,6 +1570,7 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     const result = await (await quoteFor(sdk))!.execute()
 
     expect(result.status).toBe("success")
+    expect(result.deliveredPaymentId).toBe("rcv-usdb")
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
   })
 
@@ -1752,7 +1753,7 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
     const second = await executeAutoConvert(sdk as never, receive)
 
     expect(first).toEqual({ status: "failed" })
-    expect(second).toEqual({ status: "converted" })
+    expect(second).toEqual({ status: "converted", conversionPaymentId: "rcv-usdb" })
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
   })
 
@@ -1789,7 +1790,7 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
     const fourth = await executeAutoConvert(sdk as never, receive)
 
     expect([second, third]).toEqual([{ status: "deferred" }, { status: "deferred" }])
-    expect(fourth).toEqual({ status: "converted" })
+    expect(fourth).toEqual({ status: "converted", conversionPaymentId: "c2" })
     expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
     expect(mockFindLostConversion.mock.calls[2][0].lost.knownPaymentIds).toContain(
       "rcv-usdb",
@@ -1995,7 +1996,7 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
     const third = await executeAutoConvert(sdk as never, laterReceive)
 
     expect(second).toEqual({ status: "deferred" })
-    expect(third).toEqual({ status: "converted" })
+    expect(third).toEqual({ status: "converted", conversionPaymentId: "c2" })
     expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
   })
 
@@ -2206,7 +2207,10 @@ describe("a conversion asked once its turn comes whether it was converted meanwh
       const sentMeanwhile = sdk.sendPayment.mock.calls.length
       automatic.answer({ payment: { id: "c-auto", status: PaymentStatus.Completed } })
 
-      expect(await automatic.outcome).toEqual({ status: "converted" })
+      expect(await automatic.outcome).toEqual({
+        status: "converted",
+        conversionPaymentId: "c-auto",
+      })
       expect((await userConversion.outcome).errors?.[0].code).toBe(
         ConvertErrorCode.AlreadyConverted,
       )
@@ -2241,7 +2245,10 @@ describe("a conversion asked once its turn comes whether it was converted meanwh
       })
       automatic.answer({ payment: { id: "c-auto", status: PaymentStatus.Completed } })
 
-      expect(await automatic.outcome).toEqual({ status: "converted" })
+      expect(await automatic.outcome).toEqual({
+        status: "converted",
+        conversionPaymentId: "c-auto",
+      })
       expect((await userConversion.outcome).status).toBe("success")
       expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
     })
@@ -2264,7 +2271,10 @@ describe("a conversion asked once its turn comes whether it was converted meanwh
       })
       automatic.answer({ payment: { id: "c-auto", status: PaymentStatus.Completed } })
 
-      expect(await automatic.outcome).toEqual({ status: "converted" })
+      expect(await automatic.outcome).toEqual({
+        status: "converted",
+        conversionPaymentId: "c-auto",
+      })
       expect((await userConversion.outcome).status).toBe("success")
       expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
     })
@@ -2288,7 +2298,7 @@ describe("a conversion asked once its turn comes whether it was converted meanwh
         params,
       ))!.execute()
 
-      expect(automatic).toEqual({ status: "converted" })
+      expect(automatic).toEqual({ status: "converted", conversionPaymentId: "c1" })
       expect(userConversion.status).toBe("success")
       expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
     })
@@ -2302,8 +2312,11 @@ describe("a conversion asked once its turn comes whether it was converted meanwh
       for (let turn = 0; turn < 10; turn += 1) await nextTurn()
       first.answer({ payment: { id: "c-auto-1", status: PaymentStatus.Completed } })
 
-      expect(await first.outcome).toEqual({ status: "converted" })
-      expect(await second).toEqual({ status: "converted" })
+      expect(await first.outcome).toEqual({
+        status: "converted",
+        conversionPaymentId: "c-auto-1",
+      })
+      expect(await second).toEqual({ status: "converted", conversionPaymentId: "c1" })
       expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
     })
   })

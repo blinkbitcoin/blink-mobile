@@ -217,6 +217,19 @@ describe("executeAutoConvert", () => {
     expect(mockGetConversionQuote).toHaveBeenCalled()
   })
 
+  it("names the conversion the bridge says it delivered, for the pairing", async () => {
+    mockGetConversionQuote.mockResolvedValue({
+      execute: jest.fn().mockResolvedValue({
+        status: PaymentResultStatus.Success,
+        deliveredPaymentId: "conversion-1",
+      }),
+    })
+
+    const outcome = await executeAutoConvert(sdkWith([]), baseParams)
+
+    expect(outcome).toEqual({ status: "converted", conversionPaymentId: "conversion-1" })
+  })
+
   it("tolerates ±5% amount drift when matching prior conversions", async () => {
     const outcome = await executeAutoConvert(
       sdkWith([
