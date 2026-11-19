@@ -47,8 +47,10 @@ const PRINTABLE_ASCII_MAX = 0x7e
 
 /** A CompactSeedQR is random entropy; 16 random bytes are all printable text about once
  *  in 7.5 million. A text code of the same length (a 16-character URL) is far likelier,
- *  and must not come out as somebody's seed. */
+ *  and must not come out as somebody's seed.
+ *  No bytes is no text: entropy starting 40 00 reads as an empty byte-mode payload. */
 const isPrintableText = (bytes: Uint8Array): boolean =>
+  bytes.length > 0 &&
   bytes.every((byte) => byte >= PRINTABLE_ASCII_MIN && byte <= PRINTABLE_ASCII_MAX)
 
 const decodeCompact = (entropy: Uint8Array): SeedQrResult | null => {

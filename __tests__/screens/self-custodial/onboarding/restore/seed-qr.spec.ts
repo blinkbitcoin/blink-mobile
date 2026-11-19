@@ -1,4 +1,4 @@
-import { mnemonicToEntropy, wordlists } from "bip39"
+import { entropyToMnemonic, mnemonicToEntropy, wordlists } from "bip39"
 
 import {
   decodeSeedQr,
@@ -79,6 +79,16 @@ describe("decodeSeedQr", () => {
       ).toEqual({ status: SeedQrStatus.Ok, words: PHRASE_12.split(" ") })
     })
 
+    /** 40 00 also reads as byte-mode packaging of no text at all (1 seed in 4096). */
+    it("decodes entropy that starts 40 00 instead of reading it as empty text", () => {
+      const entropy = new Uint8Array(16).fill(0xff)
+      entropy.set([0x40, 0x00])
+      expect(decodeSeedQr({ rawBytes: entropy })).toEqual({
+        status: SeedQrStatus.Ok,
+        words: entropyToMnemonic(Buffer.from(entropy).toString("hex")).split(" "),
+      })
+    })
+
     it("names a 24-word code as unsupported", () => {
       expect(decodeSeedQr({ rawBytes: compactBytes(PHRASE_24) })).toEqual({
         status: SeedQrStatus.Only12Words,
@@ -118,6 +128,16 @@ describe("decodeSeedQr", () => {
     const url = Uint8Array.from(Buffer.from("https://blink.sv", "utf8"))
     const packed = byteModeBitstream(url)
     const padded = new Uint8Array(32)
+    padded.set(packed)
+    expect(decodeSeedQr({ rawBytes: padded })).toEqual({ status: SeedQrStatus.NotSeedQr })
+  })
+
+  it("does not treat one character of text padded to 16 bytes as a seed", () => {
+    const packed = byteModeBitstream(Uint8Array.from(Buffer.from("a", "utf8")))
+    const padded = new Uint8Array(16)
+    for (let i = packed.length; i < padded.length; i += 1) {
+      padded[i] = (i - packed.length) % 2 === 0 ? 0xec : 0x11
+    }
     padded.set(packed)
     expect(decodeSeedQr({ rawBytes: padded })).toEqual({ status: SeedQrStatus.NotSeedQr })
   })
