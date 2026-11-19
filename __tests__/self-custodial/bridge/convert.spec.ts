@@ -1789,7 +1789,10 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
     afterTheDeliveryWindow()
     const fourth = await executeAutoConvert(sdk as never, receive)
 
-    expect([second, third]).toEqual([{ status: "deferred" }, { status: "deferred" }])
+    expect([second, third]).toEqual([
+      { status: "deferred", retryAfterMs: 0 },
+      { status: "deferred", retryAfterMs: LOST_CONVERSION_DELIVERY_WINDOW_MS },
+    ])
     expect(fourth).toEqual({ status: "converted", conversionPaymentId: "c2" })
     expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
     expect(mockFindLostConversion.mock.calls[2][0].lost.knownPaymentIds).toContain(
@@ -1846,7 +1849,7 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
       direction: ConvertDirection.BtcToUsd,
     }))!.execute()
 
-    expect(automatic).toEqual({ status: "deferred" })
+    expect(automatic).toEqual({ status: "deferred", retryAfterMs: 0 })
     const usersLook = mockFindLostConversion.mock.calls[2][0].lost
     expect(usersLook.expectedDeliveries).toEqual([
       {
@@ -1885,7 +1888,7 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
     const automatic = await executeAutoConvert(sdk as never, receive)
     await executeAutoConvert(sdk as never, receive)
 
-    expect(automatic).toEqual({ status: "deferred" })
+    expect(automatic).toEqual({ status: "deferred", retryAfterMs: 0 })
     expect(mockFindLostConversion.mock.calls[2][0].lost.expectedDeliveries).toEqual([
       {
         tokenIdentifier: "usdb-token-id",
@@ -1995,7 +1998,7 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
     sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
     const third = await executeAutoConvert(sdk as never, laterReceive)
 
-    expect(second).toEqual({ status: "deferred" })
+    expect(second).toEqual({ status: "deferred", retryAfterMs: 0 })
     expect(third).toEqual({ status: "converted", conversionPaymentId: "c2" })
     expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
   })

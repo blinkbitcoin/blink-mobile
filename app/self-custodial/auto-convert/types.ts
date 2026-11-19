@@ -30,7 +30,7 @@ export const AutoConvertStatus = {
   SkippedBelowMin: "skipped-below-min",
   SkippedStableBalanceActive: "skipped-stable-balance-active",
   /** Nothing went out: it waits behind an earlier conversion that may have been lost, so
-   *  the wait is no attempt of its own. */
+   *  the wait is no attempt of its own, and is tried again once the wait is over. */
   Deferred: "deferred",
   Failed: "failed",
 } as const
@@ -43,7 +43,8 @@ export type AutoConvertOutcome =
   | { status: typeof AutoConvertStatus.AlreadyConverted }
   | { status: typeof AutoConvertStatus.SkippedBelowMin }
   | { status: typeof AutoConvertStatus.SkippedStableBalanceActive }
-  | { status: typeof AutoConvertStatus.Deferred }
+  /** With how long, at most, until it can go out. */
+  | { status: typeof AutoConvertStatus.Deferred; retryAfterMs: number }
   | { status: typeof AutoConvertStatus.Failed }
 
 /** Links a receive paymentId to the conversion paymentId performed for it. */

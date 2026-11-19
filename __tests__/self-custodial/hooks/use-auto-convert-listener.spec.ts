@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from "@testing-library/react-native"
+import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 import { useAutoConvertListener } from "@app/self-custodial/hooks/use-auto-convert-listener"
 
@@ -129,6 +129,10 @@ const makeLightningPayment = (invoice: string, amount = 5000n) => ({
   amount,
   details: { tag: "Lightning", inner: { invoice } },
 })
+
+/** The bridge's delivery window for a lost conversion, and the listener's cooldown. */
+const DELIVERY_WINDOW_MS = 5 * 60 * 1000
+const RETRY_COOLDOWN_MS = 30_000
 
 const baseRemoteConfig = {
   autoConvertMaxAttempts: 3,
@@ -1242,7 +1246,10 @@ describe("useAutoConvertListener — waiting behind an earlier conversion", () =
     mockFindPendingAutoConvert.mockResolvedValue(
       makeRecord({ paymentRequest: "lnbc1dollar" }),
     )
-    mockExecuteAutoConvert.mockResolvedValue({ status: AutoConvertStatus.Deferred })
+    mockExecuteAutoConvert.mockResolvedValue({
+      status: AutoConvertStatus.Deferred,
+      retryAfterMs: DELIVERY_WINDOW_MS,
+    })
 
     renderHook(() => useAutoConvertListener())
 
@@ -1282,6 +1289,7 @@ describe("useAutoConvertListener — waiting behind an earlier conversion", () =
       const isLastLaunch = launch > waitingLaunches
       mockExecuteAutoConvert.mockResolvedValue({
         status: isLastLaunch ? AutoConvertStatus.Converted : AutoConvertStatus.Deferred,
+        retryAfterMs: DELIVERY_WINDOW_MS,
       })
       const { unmount } = renderHook(() => useAutoConvertListener())
       await waitFor(() => expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(launch))
@@ -1302,6 +1310,141 @@ describe("useAutoConvertListener — waiting behind an earlier conversion", () =
 
     expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1pending")
     expect(record.attempts).toBe(1)
+  })
+})
+
+describe("useAutoConvertListener — trying a waiting receive again", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    jest.useFakeTimers({ doNotFake: ["nextTick", "setImmediate", "queueMicrotask"] })
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  /** A pending receive whose attempts are kept as storage keeps them. */
+  const pendingReceive = () => {
+    const record: { attempts: number; lastAttemptAtMs: number | undefined } = makeRecord({
+      paymentRequest: "lnbc1waiting",
+    })
+    const sdk = makeSdk({
+      listPayments: jest
+        .fn()
+        .mockResolvedValue({ payments: [makeLightningPayment("lnbc1waiting")] }),
+    })
+    setupDefaults(sdk)
+    mockFindPendingAutoConvert.mockImplementation(async () => ({ ...record }))
+    mockListPendingAutoConverts.mockImplementation(async () => [{ ...record }])
+    mockRecordAutoConvertAttempt.mockImplementation(async (_: string, atMs: number) => {
+      record.attempts += 1
+      record.lastAttemptAtMs = atMs
+    })
+    mockReleaseAutoConvertAttempt.mockImplementation(async () => {
+      record.attempts = Math.max(0, record.attempts - 1)
+    })
+    mockExecuteAutoConvert
+      .mockResolvedValueOnce({
+        status: AutoConvertStatus.Deferred,
+        retryAfterMs: DELIVERY_WINDOW_MS,
+      })
+      .mockResolvedValue({ status: AutoConvertStatus.Converted })
+  }
+
+  const advance = async (ms: number) => {
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(ms)
+    })
+  }
+
+  it("tries a receive that waited again once the wait and the cooldown are over, in the same launch", async () => {
+    pendingReceive()
+    renderHook(() => useAutoConvertListener())
+    await waitFor(() => expect(mockReleaseAutoConvertAttempt).toHaveBeenCalledTimes(1))
+
+    await advance(DELIVERY_WINDOW_MS + RETRY_COOLDOWN_MS - 1000)
+    expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    await advance(1000)
+
+    await waitFor(() =>
+      expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1waiting"),
+    )
+    expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(2)
+  })
+
+  it("keeps only the latest retry for receives that wait one after another", async () => {
+    pendingReceive()
+    const second = makeRecord({ paymentRequest: "lnbc1alsoWaiting" })
+    mockListPendingAutoConverts.mockImplementation(async () => [
+      makeRecord({ paymentRequest: "lnbc1waiting", attempts: 0 }),
+      second,
+    ])
+    mockFindPendingAutoConvert.mockImplementation(async (invoice: string) =>
+      makeRecord({ paymentRequest: invoice }),
+    )
+    const sdk = makeSdk({
+      listPayments: jest.fn().mockResolvedValue({
+        payments: [
+          makeLightningPayment("lnbc1waiting"),
+          makeLightningPayment("lnbc1alsoWaiting"),
+        ],
+      }),
+    })
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: null,
+      isStableBalanceActive: false,
+      refreshWallets: mockRefreshWallets,
+    })
+    mockExecuteAutoConvert
+      .mockReset()
+      .mockResolvedValueOnce({
+        status: AutoConvertStatus.Deferred,
+        retryAfterMs: DELIVERY_WINDOW_MS,
+      })
+      .mockResolvedValueOnce({
+        status: AutoConvertStatus.Deferred,
+        retryAfterMs: 0,
+      })
+      .mockResolvedValue({ status: AutoConvertStatus.Converted })
+    renderHook(() => useAutoConvertListener())
+    await waitFor(() => expect(mockReleaseAutoConvertAttempt).toHaveBeenCalledTimes(2))
+
+    await advance(RETRY_COOLDOWN_MS)
+    await waitFor(() => expect(mockRemovePendingAutoConvert).toHaveBeenCalledTimes(2))
+    await advance(DELIVERY_WINDOW_MS)
+
+    expect(mockListPendingAutoConverts).toHaveBeenCalledTimes(2)
+    expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(4)
+  })
+
+  it("replays nothing again when it renders anew with nothing to try again", async () => {
+    pendingReceive()
+    mockExecuteAutoConvert
+      .mockReset()
+      .mockResolvedValue({ status: AutoConvertStatus.Failed })
+    const { rerender } = renderHook(() => useAutoConvertListener())
+    await waitFor(() => expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1))
+
+    mockUsePriceConversion.mockReturnValue({
+      convertMoneyAmount: (a: { amount: number }) => ({ amount: a.amount }),
+    })
+    rerender({})
+    await advance(1000)
+
+    expect(mockListPendingAutoConverts).toHaveBeenCalledTimes(1)
+  })
+
+  it("tries nothing again once the listener is gone", async () => {
+    pendingReceive()
+    const { unmount } = renderHook(() => useAutoConvertListener())
+    await waitFor(() => expect(mockReleaseAutoConvertAttempt).toHaveBeenCalledTimes(1))
+
+    unmount()
+    expect(jest.getTimerCount()).toBe(0)
+    await advance(DELIVERY_WINDOW_MS + RETRY_COOLDOWN_MS)
+
+    expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
   })
 })
 

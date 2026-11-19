@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import {
   GetPaymentRequest,
@@ -123,6 +123,8 @@ type RunAutoConvertParams = {
   onConverting?: (invoice: string) => void
   onSettled?: (invoice: string) => void
   onConverted?: () => void
+  /** Asks for the pending receives to be tried again after the given wait. */
+  onDeferred?: (retryAfterMs: number) => void
 }
 
 const runAutoConvert = async ({
@@ -138,6 +140,7 @@ const runAutoConvert = async ({
   onConverting,
   onSettled,
   onConverted,
+  onDeferred,
 }: RunAutoConvertParams): Promise<void> => {
   // Re-read storage so concurrent invocations agree on the cap state instead
   // of each trusting their own (potentially pre-stamp) snapshot of `attempts`.
@@ -202,6 +205,7 @@ const runAutoConvert = async ({
      *  them all up and drop the receive unconverted. */
     if (outcome.status === AutoConvertStatus.Deferred) {
       await releaseAutoConvertAttempt(record.paymentRequest)
+      onDeferred?.(outcome.retryAfterMs)
       return
     }
 
@@ -282,6 +286,26 @@ export const useAutoConvertListener = (): void => {
   const inFlightInvoicesRef = useRef<Set<string>>(new Set())
   const initialReplayDoneRef = useRef(false)
 
+  /** A receive that waited behind an earlier conversion has no trigger of its own left:
+   *  the pending receives are replayed once the wait and the cooldown are over, so it goes
+   *  out within the launch that waited, however long that one stays open. */
+  const [replayRequest, setReplayRequest] = useState(0)
+  const handledReplayRequestRef = useRef(0)
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const replayAfterWait = useCallback((retryAfterMs: number) => {
+    if (retryTimerRef.current !== undefined) clearTimeout(retryTimerRef.current)
+    retryTimerRef.current = setTimeout(() => {
+      retryTimerRef.current = undefined
+      setReplayRequest((requested) => requested + 1)
+    }, retryAfterMs + RETRY_COOLDOWN_MS)
+  }, [])
+  useEffect(
+    () => () => {
+      if (retryTimerRef.current !== undefined) clearTimeout(retryTimerRef.current)
+    },
+    [],
+  )
+
   const waitOptions = useMemo<WaitForPaymentOptions>(
     () => ({
       maxAttempts: autoConvertPollMaxAttempts,
@@ -319,6 +343,7 @@ export const useAutoConvertListener = (): void => {
           onConverting: markConverting,
           onSettled: markSettled,
           onConverted: handleConverted,
+          onDeferred: replayAfterWait,
         })
       } finally {
         inFlightInvoicesRef.current.delete(record.paymentRequest)
@@ -332,6 +357,7 @@ export const useAutoConvertListener = (): void => {
       markConverting,
       markSettled,
       handleConverted,
+      replayAfterWait,
     ],
   )
 
@@ -391,8 +417,11 @@ export const useAutoConvertListener = (): void => {
       initialReplayDoneRef.current = false
       return
     }
-    if (initialReplayDoneRef.current) return
+    const isRetryRequested = replayRequest !== handledReplayRequestRef.current
+    const isReplayDue = !initialReplayDoneRef.current || isRetryRequested
+    if (!isReplayDue) return
     initialReplayDoneRef.current = true
+    handledReplayRequestRef.current = replayRequest
 
     const replay = async () => {
       const nowMs = Date.now()
@@ -447,5 +476,6 @@ export const useAutoConvertListener = (): void => {
     hasSparkToken,
     processWithInFlightLock,
     autoConvertMaxAttempts,
+    replayRequest,
   ])
 }

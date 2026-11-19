@@ -16,7 +16,10 @@ import {
 import { reportError } from "@app/utils/error-logging"
 import { toNumber } from "@app/utils/helper"
 
-import { createGetConversionQuote } from "../bridge/convert"
+import {
+  createGetConversionQuote,
+  LOST_CONVERSION_DELIVERY_WINDOW_MS,
+} from "../bridge/convert"
 import { fetchConversionLimits } from "../bridge/limits"
 import { fetchUsdbDecimals } from "../bridge/token-balance"
 
@@ -264,15 +267,22 @@ export const executeAutoConvert = async (
   if (isConvertedMeanwhile) {
     return { status: AutoConvertStatus.AlreadyConverted }
   }
-  /** Nothing went out: an earlier conversion that may have been lost can still deliver,
-   *  or turned out to be another one, and is settled now. Tried again on the next trigger,
-   *  where it is looked for before anything goes out, and one of these sats that
-   *  completed is taken for this receive's by `hasAlreadyConverted` before any quote. */
-  const isBehindEarlierConversion =
-    errorCode === ConvertErrorCode.EarlierConversionPending ||
-    errorCode === ConvertErrorCode.EarlierConversionFound
-  if (isBehindEarlierConversion) {
-    return { status: AutoConvertStatus.Deferred }
+  /** Nothing went out, behind an earlier conversion that may have been lost. Tried again
+   *  once the wait is over, where it is looked for before anything goes out, and one of
+   *  these sats that completed is taken for this receive's by `hasAlreadyConverted`
+   *  before any quote. One that can still deliver does so within its window, which this
+   *  launch counts from no earlier than now; one that turned up as another is settled. */
+  const isWaitingForEarlierDelivery =
+    errorCode === ConvertErrorCode.EarlierConversionPending
+  if (isWaitingForEarlierDelivery) {
+    return {
+      status: AutoConvertStatus.Deferred,
+      retryAfterMs: LOST_CONVERSION_DELIVERY_WINDOW_MS,
+    }
+  }
+  const isEarlierSettledNow = errorCode === ConvertErrorCode.EarlierConversionFound
+  if (isEarlierSettledNow) {
+    return { status: AutoConvertStatus.Deferred, retryAfterMs: 0 }
   }
   return { status: AutoConvertStatus.Failed }
 }

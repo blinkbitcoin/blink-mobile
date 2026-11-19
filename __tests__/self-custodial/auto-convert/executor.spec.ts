@@ -11,7 +11,11 @@ const mockGetConversionQuote = jest.fn()
 const mockFetchLimits = jest.fn()
 const mockFetchDecimals = jest.fn()
 
+/** The bridge's delivery window for a lost conversion. */
+const DELIVERY_WINDOW_MS = 5 * 60 * 1000
+
 jest.mock("@app/self-custodial/bridge/convert", () => ({
+  LOST_CONVERSION_DELIVERY_WINDOW_MS: 5 * 60 * 1000,
   createGetConversionQuote:
     () =>
     (...args: unknown[]) =>
@@ -391,11 +395,13 @@ describe("executeAutoConvert", () => {
 
   /** The next trigger decides: one of these sats that completed is taken for this
    *  receive's before anything is quoted. */
-  const waitsBehindEarlierConversion: Array<[string, string]> = [
-    ["turns up as another one", ConvertErrorCode.EarlierConversionFound],
-    ["may still deliver", ConvertErrorCode.EarlierConversionPending],
+  /** One that can still deliver does so within its window; one that turned up as another
+   *  is settled, and the receive can go out at once. */
+  const waitsBehindEarlierConversion: Array<[string, string, number]> = [
+    ["turns up as another one", ConvertErrorCode.EarlierConversionFound, 0],
+    ["may still deliver", ConvertErrorCode.EarlierConversionPending, DELIVERY_WINDOW_MS],
   ]
-  for (const [why, code] of waitsBehindEarlierConversion) {
+  for (const [why, code, retryAfterMs] of waitsBehindEarlierConversion) {
     it(`returns Deferred when an earlier conversion ${why}, as nothing went out`, async () => {
       mockGetConversionQuote.mockResolvedValue({
         execute: jest.fn().mockResolvedValue({
@@ -406,7 +412,7 @@ describe("executeAutoConvert", () => {
 
       const outcome = await executeAutoConvert(sdkWith([]), baseParams)
 
-      expect(outcome).toEqual({ status: "deferred" })
+      expect(outcome).toEqual({ status: "deferred", retryAfterMs })
     })
   }
 
