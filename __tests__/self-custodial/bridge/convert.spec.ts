@@ -769,6 +769,7 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
 
     expect(mockFindLostConversion).toHaveBeenCalledWith({
       sdk,
+      isLabelRequired: true,
       lost: {
         startedAtMs: expect.any(Number),
         lastAttemptAtMs: expect.any(Number),
@@ -1518,7 +1519,11 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
 
     const result = await (await quoteFor(sdk))!.execute()
 
-    expect(mockFindLostConversion).toHaveBeenCalledWith({ sdk, lost: lostConversion })
+    expect(mockFindLostConversion).toHaveBeenCalledWith({
+      sdk,
+      lost: lostConversion,
+      isLabelRequired: true,
+    })
     expect(result.status).toBe("success")
     expect(sdk.sendPayment).not.toHaveBeenCalled()
   })
@@ -1568,32 +1573,126 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
   })
 
-  /** The SDK labels a delivery as its conversion's once its own call to the pool answers;
-   *  when that answer is the one lost, the delivery comes in as a plain token payment. */
-  it("finds a lost conversion the wallet has not labeled as one yet", async () => {
+  /** As the wallet records a dollar payment the conversion did not label: a plain token
+   *  payment of about what the quote delivers, as any receive of that amount is. */
+  const unlabeledDollars = (id: string) => ({
+    id,
+    /** Delivered now, by the server's clock: nothing was received before it. */
+    timestamp: BigInt(Math.floor(Date.now() / 1000)),
+    amount: BigInt(1_370_000),
+    status: 0,
+    details: {
+      tag: "Token",
+      inner: { invoiceDetails: undefined, metadata: { identifier: "usdb-token-id" } },
+    },
+  })
+
+  /** As the SDK (0.27.1) labels a delivery of its own conversion to the wallet. */
+  const labeledDelivery = (id: string) => ({
+    ...unlabeledDollars(id),
+    details: {
+      tag: "Token",
+      inner: {
+        invoiceDetails: undefined,
+        metadata: { identifier: "usdb-token-id" },
+        conversionInfo: {
+          tag: "Amm",
+          inner: { status: 1, purpose: { tag: "SelfTransfer" } },
+        },
+      },
+    },
+    conversionDetails: { status: 1, conversions: [] },
+  })
+
+  const recordedAsTheSdkDoes = () => {
     const actual = jest.requireActual("@app/self-custodial/payment-details/lost-send")
     mockMarkReceivedHistory.mockImplementation(actual.markReceivedHistory)
     mockFindLostConversion.mockImplementation(actual.findLostConversion)
-    const unlabeled = {
-      id: "rcv-usdb",
-      /** Delivered now, by the server's clock: nothing was received before it. */
-      timestamp: BigInt(Math.floor(Date.now() / 1000)),
-      amount: BigInt(1_370_000),
-      status: 1,
-      details: {
-        tag: "Token",
-        inner: { invoiceDetails: undefined, metadata: { identifier: "usdb-token-id" } },
-      },
+  }
+
+  describe("with the wallet's history as the SDK records it", () => {
+    /** The looks wait between tries; the waits run here without being waited out. Real
+     *  time and the phone's clock stay as the tests set them. */
+    beforeEach(() => {
+      jest.useFakeTimers({
+        doNotFake: ["nextTick", "setImmediate", "queueMicrotask", "performance", "Date"],
+      })
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    const executedOverTime = async (sdk: ReturnType<typeof throwingSdk>) => {
+      const pending = (await quoteFor(sdk))!.execute()
+      for (let wait = 0; wait < 10; wait += 1) {
+        await jest.advanceTimersByTimeAsync(2000)
+      }
+      return pending
     }
-    const sdk = throwingSdk()
-    sdk.listPayments
-      .mockResolvedValueOnce({ payments: [] })
-      .mockResolvedValue({ payments: [unlabeled] })
 
-    const result = await (await quoteFor(sdk))!.execute()
+    /** The SDK labels a delivery as its conversion's once its own call to the pool answers,
+     *  and one whose answer it lost once it finds the swap ran; until then a payment of
+     *  about the quoted amount may be anyone's. */
+    it("does not take a payment not labeled yet for the delivery of a conversion just lost", async () => {
+      recordedAsTheSdkDoes()
+      const sdk = throwingSdk()
+      sdk.listPayments
+        .mockResolvedValueOnce({ payments: [] })
+        .mockResolvedValue({ payments: [unlabeledDollars("rcv-usdb")] })
 
-    expect(result.status).toBe("success")
-    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+      const result = await executedOverTime(sdk)
+
+      expect(result.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+    })
+
+    it("takes an ordinary receive of about the quoted amount for no conversion while the lost one may still deliver, settling only on its labeled delivery", async () => {
+      recordedAsTheSdkDoes()
+      const ordinaryReceive = unlabeledDollars("rcv-from-a-friend")
+      const sdk = throwingSdk()
+      sdk.listPayments
+        .mockResolvedValueOnce({ payments: [] })
+        .mockResolvedValue({ payments: [ordinaryReceive] })
+
+      await executedOverTime(sdk)
+      const retry = await executedOverTime(sdk)
+      sdk.listPayments.mockResolvedValue({
+        payments: [labeledDelivery("rcv-usdb"), ordinaryReceive],
+      })
+      const labeled = await executedOverTime(sdk)
+
+      expect(retry.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+      const lookOfTheLabeledOne = mockFindLostConversion.mock.calls.at(-1)?.[0]
+      expect(lookOfTheLabeledOne.lost.expectedDeliveries).toEqual([
+        expect.objectContaining({ amount: 1_370_000, amountIn: PAID_IN }),
+      ])
+      expect(lookOfTheLabeledOne.lost.knownPaymentIds).not.toContain("rcv-from-a-friend")
+      expect(labeled.status).toBe("success")
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+      sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
+      const next = await executedOverTime(sdk)
+      expect(next.status).toBe("success")
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+    })
+
+    /** The SDK never labels the delivery of a conversion it was stopped in the middle of,
+     *  as an app closed while it converted. */
+    it("takes a delivery still not labeled once the window has run out with none labeled", async () => {
+      recordedAsTheSdkDoes()
+      const sdk = throwingSdk()
+      sdk.listPayments
+        .mockResolvedValueOnce({ payments: [] })
+        .mockResolvedValue({ payments: [] })
+
+      await executedOverTime(sdk)
+      sdk.listPayments.mockResolvedValue({ payments: [unlabeledDollars("rcv-usdb")] })
+      afterTheDeliveryWindow()
+      const retry = await executedOverTime(sdk)
+
+      expect(retry.status).toBe("success")
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+    })
   })
 })
 
@@ -2275,6 +2374,7 @@ describe("a conversion in flight when the app closes", () => {
 
     expect(mockFindLostConversion).toHaveBeenCalledWith({
       sdk,
+      isLabelRequired: true,
       lost: {
         startedAtMs: expect.any(Number),
         lastAttemptAtMs: expect.any(Number),

@@ -145,8 +145,9 @@ const SENT_PAYMENTS: HistoryKind = {
   isUndescribed: isUndescribedSend,
 }
 
-/** What a conversion delivered is matched whether or not the wallet has labeled it as a
- *  conversion's yet, so nothing received stands in for one unmatched. */
+/** What a conversion delivered is matched once the wallet has labeled it as a
+ *  conversion's, or past its window whether or not it has, so nothing received stands in
+ *  for one unmatched. */
 const RECEIVED_PAYMENTS: HistoryKind = {
   listPage: listReceivedPaymentsOldestFirst,
   isUndescribed: () => false,
@@ -594,18 +595,31 @@ export const isDeliveryAsExpected = (payment: Payment, delivery: ExpectedDeliver
   )
 }
 
+/** Whether the wallet records no conversion purpose on a payment: no conversion at all,
+ *  or a delivering one recorded without its purpose. */
+const hasNoConversionPurpose = (payment: Payment): boolean => {
+  const info = conversionInfoOf(payment)
+  if (!info) return true
+  if (!ConversionInfo.Amm.instanceOf(info)) return false
+  const status = payment.conversionDetails?.status ?? info.inner.status
+  return info.inner.purpose === undefined && isDelivering(status)
+}
+
 /**
  * Whether a payment may be what a conversion delivered before the wallet says so: received
  * with no conversion recorded on it, as the asset a lost conversion was quoted to deliver,
  * and about as much. The SDK records a delivery as its conversion's leg once its own call
  * to the pool answers; one whose answer was lost is recorded so only later, once the SDK
- * finds that the swap ran.
+ * finds that the swap ran, and one of a conversion the SDK was stopped in the middle of
+ * never is. One the SDK could not record its conversion's details for as its call failed
+ * is labeled later with no purpose. Any receive of about that amount looks the same, so
+ * it counts only once the conversion can no longer deliver (`findLostConversion`).
  */
 const isUnlabeledDelivery = (
   payment: Payment,
   expectedDeliveries: ReadonlyArray<ExpectedDelivery>,
 ): boolean =>
-  conversionInfoOf(payment) === undefined &&
+  hasNoConversionPurpose(payment) &&
   expectedDeliveries.some((delivery) => isDeliveryAsExpected(payment, delivery))
 
 /** A lost conversion as it is looked for: where the received payments stood as it went
@@ -639,24 +653,40 @@ export const isPaymentOfLostConversion = (
   return isSinceMark && !isKnown && isDelivery
 }
 
+/** Whether a payment is what a conversion lost after `lost` was marked delivered, and the
+ *  wallet has labeled it as an own conversion's delivery. */
+const isLabeledPaymentOfLostConversion = (
+  lost: LostConversionLook,
+  payment: Payment,
+): boolean =>
+  isDeliveryOfOwnConversion(payment) && isPaymentOfLostConversion(lost, payment)
+
 /**
  * What a conversion lost after `lost` was marked delivered, looked for as `findLostSend`
  * looks for a send: from the mark's time, oldest first, up to a day past its latest
- * attempt.
+ * attempt. With `isLabelRequired`, only a delivery the wallet has labeled as a
+ * conversion's counts: while the conversion may still deliver, a payment not labeled yet
+ * may be any receive of about its amount, and the SDK labels a delivery of its own,
+ * usually within seconds.
  */
 export const findLostConversion = ({
   sdk,
   lost,
+  isLabelRequired,
 }: {
   sdk: BreezSdkInterface
   lost: LostConversionLook
+  isLabelRequired: boolean
 }): Promise<LostSendLookup> => {
   const lookUntilSec =
     Math.floor(lost.lastAttemptAtMs / 1000) + LOST_CONVERSION_LOOK_AHEAD_SECONDS
+  const isOfLostConversion = isLabelRequired
+    ? isLabeledPaymentOfLostConversion
+    : isPaymentOfLostConversion
   return lookForPayment({
     sdk,
     since: BigInt(lost.walletClockSec),
-    matches: (payment) => isPaymentOfLostConversion(lost, payment),
+    matches: (payment) => isOfLostConversion(lost, payment),
     kind: RECEIVED_PAYMENTS,
     isPastLook: (payment) => Number(payment.timestamp) > lookUntilSec,
   })

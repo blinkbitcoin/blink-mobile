@@ -33,6 +33,14 @@ type DeliveryShape = {
   paymentStatus?: PaymentStatus
 }
 
+/** A delivery as the SDK records it when it could not store its conversion's details. */
+const withoutPurpose = <T extends ReturnType<typeof delivery>>(payment: T): T => {
+  payment.details.inner.conversionInfo.inner.purpose = undefined as unknown as {
+    tag: "SelfTransfer"
+  }
+  return payment
+}
+
 /**
  * What the SDK (0.27.1) lists for a conversion this app makes by paying the wallet's own
  * invoice: the payment the swap delivered, recorded with the conversion it is a leg of
@@ -153,13 +161,18 @@ describe("isPaymentOfLostConversion", () => {
     expect(isPaymentOfLostConversion(LOST, ongoing as never)).toBe(false)
   })
 
-  it("passes over a conversion leg with no purpose recorded", () => {
-    const unknownPurpose = delivery()
-    unknownPurpose.details.inner.conversionInfo.inner.purpose = undefined as unknown as {
-      tag: "SelfTransfer"
-    }
+  /** The SDK labels a delivery with no purpose when it could not record its conversion's
+   *  details as its call failed, and finds the swap ran afterwards: as good as unlabeled. */
+  it("takes a conversion leg with no purpose recorded as a delivery not labeled yet", () => {
+    const unknownPurpose = withoutPurpose(delivery())
 
-    expect(isPaymentOfLostConversion(LOST, unknownPurpose as never)).toBe(false)
+    expect(isPaymentOfLostConversion(LOST, unknownPurpose as never)).toBe(true)
+  })
+
+  it("passes over a leg with no purpose recorded that delivers nothing", () => {
+    const refund = withoutPurpose(delivery({ legStatus: ConversionStatus.Refunded }))
+
+    expect(isPaymentOfLostConversion(LOST, refund as never)).toBe(false)
   })
 
   it("passes over a conversion another provider made", () => {
@@ -524,7 +537,9 @@ describe("findLostConversion", () => {
   it("reads the payments received from the mark's second on, oldest first, once the wallet caught up", async () => {
     const sdk = walletAnswering([delivery()])
 
-    await settle(findLostConversion({ sdk: sdk as never, lost: LOST }))
+    await settle(
+      findLostConversion({ sdk: sdk as never, lost: LOST, isLabelRequired: false }),
+    )
 
     expect(sdk.syncWallet).toHaveBeenCalled()
     expect(sdk.listPayments).toHaveBeenCalledWith(
@@ -588,6 +603,7 @@ describe("findLostConversion", () => {
           ],
           lastAttemptAtMs: nowMs,
         },
+        isLabelRequired: false,
       }),
     )
 
@@ -603,7 +619,9 @@ describe("findLostConversion", () => {
     )
     const sdk = walletAnswering(page, page, page)
 
-    const lookup = await settle(findLostConversion({ sdk: sdk as never, lost: LOST }))
+    const lookup = await settle(
+      findLostConversion({ sdk: sdk as never, lost: LOST, isLabelRequired: false }),
+    )
 
     expect(lookup.status).toBe("not-found")
     expect(sdk.listPayments).toHaveBeenCalledTimes(3)
@@ -613,7 +631,9 @@ describe("findLostConversion", () => {
     const later = delivery({ id: "rcv-later", timestamp: PAST_THE_LOOK })
     const sdk = walletAnswering([later], [later], [later])
 
-    const lookup = await settle(findLostConversion({ sdk: sdk as never, lost: LOST }))
+    const lookup = await settle(
+      findLostConversion({ sdk: sdk as never, lost: LOST, isLabelRequired: false }),
+    )
 
     expect(lookup.status).toBe("not-found")
   })
@@ -622,9 +642,41 @@ describe("findLostConversion", () => {
     const delivered = delivery()
     const sdk = walletAnswering([received("rcv-friend"), delivered])
 
-    const lookup = await settle(findLostConversion({ sdk: sdk as never, lost: LOST }))
+    const lookup = await settle(
+      findLostConversion({ sdk: sdk as never, lost: LOST, isLabelRequired: false }),
+    )
 
     expect(lookup).toEqual({ status: "found", payment: delivered, failed: [] })
+  })
+
+  /** While the conversion may still deliver, a payment not labeled yet may be anyone's. */
+  it("takes only a labeled delivery when one is required, passing over one not labeled yet", async () => {
+    const unlabeled = received("rcv-unlabeled", MARK_SEC + 5, {
+      tag: "Token",
+      amount: QUOTED_OUT,
+    })
+    const labeled = delivery()
+    const sdk = walletAnswering([unlabeled, labeled])
+
+    const lookup = await settle(
+      findLostConversion({ sdk: sdk as never, lost: LOST, isLabelRequired: true }),
+    )
+
+    expect(lookup).toEqual({ status: "found", payment: labeled, failed: [] })
+  })
+
+  it("answers not-found for a payment not labeled yet when a labeled delivery is required", async () => {
+    const unlabeled = received("rcv-unlabeled", MARK_SEC + 5, {
+      tag: "Token",
+      amount: QUOTED_OUT,
+    })
+    const sdk = walletAnswering([unlabeled], [unlabeled], [unlabeled])
+
+    const lookup = await settle(
+      findLostConversion({ sdk: sdk as never, lost: LOST, isLabelRequired: true }),
+    )
+
+    expect(lookup.status).toBe("not-found")
   })
 
   it("answers not-found once every look read the history without it", async () => {
@@ -634,7 +686,9 @@ describe("findLostConversion", () => {
       [received("rcv-friend")],
     )
 
-    const lookup = await settle(findLostConversion({ sdk: sdk as never, lost: LOST }))
+    const lookup = await settle(
+      findLostConversion({ sdk: sdk as never, lost: LOST, isLabelRequired: false }),
+    )
 
     expect(lookup).toEqual({ status: "not-found", failed: [] })
     expect(sdk.listPayments).toHaveBeenCalledTimes(3)
@@ -646,7 +700,9 @@ describe("findLostConversion", () => {
     const bare = { ...received("rcv-bare"), details: undefined }
     const sdk = walletAnswering([bare], [bare], [bare])
 
-    const lookup = await settle(findLostConversion({ sdk: sdk as never, lost: LOST }))
+    const lookup = await settle(
+      findLostConversion({ sdk: sdk as never, lost: LOST, isLabelRequired: false }),
+    )
 
     expect(lookup.status).toBe("not-found")
   })
@@ -656,7 +712,9 @@ describe("findLostConversion", () => {
     const sdk = walletAnswering([], [], [])
     sdk.syncWallet.mockRejectedValue(offline)
 
-    const lookup = await settle(findLostConversion({ sdk: sdk as never, lost: LOST }))
+    const lookup = await settle(
+      findLostConversion({ sdk: sdk as never, lost: LOST, isLabelRequired: false }),
+    )
 
     expect(lookup).toEqual({ status: "unreadable", error: offline })
   })

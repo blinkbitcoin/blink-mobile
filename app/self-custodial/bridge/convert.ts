@@ -572,7 +572,20 @@ const convertAfterEarlierConversions = async (
 
   const earlier = attempts.read().lostConversion
   if (earlier) {
-    const lookup = await findLostConversion({ sdk, lost: earlier })
+    /** Within its window a lost conversion may still deliver, and only a delivery the
+     *  wallet has labeled as a conversion's proves it did: the SDK labels one whose
+     *  answer it lost once it finds the swap ran, seconds after, on a later pass, or as it
+     *  starts again, while a payment not labeled yet may be any receive of about that
+     *  amount. Past the window, the conversion's own outcome is settled, and one still
+     *  unlabeled is a delivery the SDK never recorded, as of a conversion it was stopped
+     *  in the middle of. Read once, so that what the look takes and what not finding
+     *  means agree. */
+    const isWithinWindow = canStillDeliver(earlier.lastAttemptAtMs)
+    const lookup = await findLostConversion({
+      sdk,
+      lost: earlier,
+      isLabelRequired: isWithinWindow,
+    })
     if (lookup.status === "unreadable") {
       return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
     }
@@ -598,7 +611,7 @@ const convertAfterEarlierConversions = async (
       return failed(EARLIER_CONVERSION_MESSAGE, ConvertErrorCode.EarlierConversionFound)
     }
     /** Not found so soon after it went out, it may still deliver. */
-    if (canStillDeliver(earlier.lastAttemptAtMs)) {
+    if (isWithinWindow) {
       return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
     }
   }
@@ -719,9 +732,11 @@ const convertAfterEarlierConversions = async (
     }
 
     /** Looked for together with the lost conversion it was let through past, from the
-     *  earlier mark: either may have delivered by now. What was stored ahead stays
-     *  stored meanwhile, and is taken back only once what the look leaves is held. */
-    const look = await findLostConversion({ sdk, lost })
+     *  earlier mark: either may have delivered by now. This one has just gone out, so
+     *  only a delivery the wallet has labeled counts, as within any window. What was
+     *  stored ahead stays stored meanwhile, and is taken back only once what the look
+     *  leaves is held. */
+    const look = await findLostConversion({ sdk, lost, isLabelRequired: true })
     const { left, isSurelyThis } = settledByLook(look, lost, {
       isAutomatic,
       isThisConversion,
