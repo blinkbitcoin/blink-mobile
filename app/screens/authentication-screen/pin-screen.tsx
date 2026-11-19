@@ -1,6 +1,7 @@
 import * as React from "react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Alert, Text, TouchableOpacity, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -273,6 +274,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
     return (
       <View style={styles.pinPadButtonContainer}>
         <Button
+          titleProps={{ maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER }}
           buttonStyle={styles.pinPadButton}
           titleStyle={styles.pinPadButtonTitle}
           disabled={attempts.isInputDisabled}
@@ -323,10 +325,22 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
       </View>
       <View style={styles.helperTextContainer}>
         {/* Both lines, so a countdown never hides how many tries are left. */}
-        <Text style={styles.helperText}>{attemptsText()}</Text>
-        {noticeText ? <Text style={styles.helperText}>{noticeText}</Text> : null}
+        <Text maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER} style={styles.helperText}>
+          {attemptsText()}
+        </Text>
+        {noticeText ? (
+          <Text
+            maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+            style={styles.helperText}
+          >
+            {noticeText}
+          </Text>
+        ) : null}
         {attempts.isLocked ? (
-          <Text style={styles.helperText}>
+          <Text
+            maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+            style={styles.helperText}
+          >
             {LL.PinScreen.tryAgainIn({ time: parseTimer(attempts.remainingSeconds) })}
           </Text>
         ) : null}
@@ -352,6 +366,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
           {buttonComponentForDigit("0")}
           <View style={styles.pinPadButtonContainer}>
             <Button
+              titleProps={{ maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER }}
               testID="pinPadBackspace"
               buttonStyle={styles.pinPadButton}
               disabled={attempts.isInputDisabled}
@@ -370,7 +385,10 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
             accessibilityRole="button"
             testID="pinScreenForgotPin"
           >
-            <Text style={styles.forgotPinText}>
+            <Text
+              maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+              style={styles.forgotPinText}
+            >
               {LL.AuthenticationScreen.forgotPin()}
             </Text>
           </TouchableOpacity>

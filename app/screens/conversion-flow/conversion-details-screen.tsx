@@ -39,6 +39,7 @@ import {
 } from "@app/types/amounts"
 
 import { Screen } from "@app/components/screen"
+import { cappedFontScale } from "@app/rne-theme/text-scaling"
 import { testProps } from "@app/utils/testProps"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useDollarBalanceRestrictionGuard } from "@app/hooks/use-dollar-balance-restriction-guard"
@@ -908,7 +909,9 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
     flexDirection: "column",
     marginHorizontal: 20,
     marginTop: 16,
-    ...(currencyInput ? { minHeight: 70 } : {}),
+    /** The selector clips what overflows it, so the row that holds the amount has to grow
+     *  with the amount: fixed, the figure loses its top half at the larger text sizes. */
+    ...(currencyInput ? { minHeight: 70 * cappedFontScale() } : {}),
   },
   walletSelectorContainer: {
     flexDirection: "column",
