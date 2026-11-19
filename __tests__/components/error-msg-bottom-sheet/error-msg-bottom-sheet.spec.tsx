@@ -71,6 +71,38 @@ describe("ErrorMsgBottomSheet", () => {
     expect(onPrimaryPress).not.toHaveBeenCalled()
   })
 
+  it("takes no action from a tap that lands while it slides out", async () => {
+    const onSecondaryPress = jest.fn()
+    const props = {
+      title: "A small problem",
+      body: "The payment could not be completed.",
+      primaryLabel: "Try again",
+      secondaryLabel: "Accept $2.89 fee",
+      onClose: jest.fn(),
+      onPrimaryPress: jest.fn(),
+      onSecondaryPress,
+      testID: SHEET_TEST_ID,
+    }
+    const { rerender } = render(
+      <ContextForScreen>
+        <ErrorMsgBottomSheet isVisible {...props} />
+      </ContextForScreen>,
+    )
+    const primary = screen.getByText("Try again")
+    const secondary = screen.getByText("Accept $2.89 fee")
+
+    rerender(
+      <ContextForScreen>
+        <ErrorMsgBottomSheet isVisible={false} {...props} />
+      </ContextForScreen>,
+    )
+    fireEvent.press(primary)
+    fireEvent.press(secondary)
+
+    expect(props.onPrimaryPress).not.toHaveBeenCalled()
+    expect(onSecondaryPress).not.toHaveBeenCalled()
+  })
+
   it("offers no second action unless one is given", () => {
     renderSheet()
 

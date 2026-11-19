@@ -24,13 +24,16 @@ type ErrorMsgBottomSheetProps = {
 /**
  * Figma's `error-msg-bottom-sheet` (Send 3.0, blink-wip#1275): something the
  * user can't fix on the screen they are on, told as a title, a body and the one
- * action that resolves it. A warning the user may accept adds that as a secondary action. It sits on top of the screen's inline error rather
- * than replacing it, so the error is still there once the sheet is dismissed.
+ * action that resolves it. A warning the user may accept adds that as a secondary
+ * action. It sits on top of the screen's inline error rather than replacing it, so the
+ * error is still there once the sheet is dismissed.
  *
  * Its outline is the top edge only, with no sides.
  *
  * It rests on its content and doesn't expand: messages are short. Swiping it
  * down, pressing the scrim or Android back closes it without taking the action.
+ * Its buttons stop answering once it is closing, so a second tap as it slides out
+ * can't take an action twice.
  */
 export const ErrorMsgBottomSheet: React.FC<ErrorMsgBottomSheetProps> = ({
   isVisible,
@@ -49,6 +52,10 @@ export const ErrorMsgBottomSheet: React.FC<ErrorMsgBottomSheetProps> = ({
     theme: { colors },
   } = useTheme()
 
+  const whileOpen = (action: () => void) => () => {
+    if (isVisible) action()
+  }
+
   return (
     <BottomSheet
       isVisible={isVisible}
@@ -66,9 +73,15 @@ export const ErrorMsgBottomSheet: React.FC<ErrorMsgBottomSheetProps> = ({
             subtitle={body}
           />
           <View style={styles.actions}>
-            <GaloyPrimaryButton title={primaryLabel} onPress={onPrimaryPress} />
+            <GaloyPrimaryButton
+              title={primaryLabel}
+              onPress={whileOpen(onPrimaryPress)}
+            />
             {secondaryLabel && onSecondaryPress ? (
-              <GaloySecondaryButton title={secondaryLabel} onPress={onSecondaryPress} />
+              <GaloySecondaryButton
+                title={secondaryLabel}
+                onPress={whileOpen(onSecondaryPress)}
+              />
             ) : null}
           </View>
         </View>
