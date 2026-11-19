@@ -51,6 +51,20 @@ const ORPHAN_TIMEOUT_MS = 2 * 60 * 1000
 const MAX_PROCESSED_PAYMENT_IDS = 200
 const MAX_IN_FLIGHT_INVOICES = 50
 
+/**
+ * The latest receive's turn to convert, from any receive. Each converts and pairs its
+ * conversion before the next one's turn, which reads the conversions claimed only then:
+ * two receives of one amount converting at once would otherwise each take the first one's
+ * conversion for their own, and the second one's sats would never be converted.
+ */
+let latestConversionTurn: Promise<unknown> = Promise.resolve()
+
+const afterEarlierReceivesConvert = <T>(turn: () => Promise<T>): Promise<T> => {
+  const thisTurn = latestConversionTurn.then(turn)
+  latestConversionTurn = thisTurn.catch(() => undefined)
+  return thisTurn
+}
+
 type ConvertMoneyAmount = NonNullable<
   ReturnType<typeof usePriceConversion>["convertMoneyAmount"]
 >
@@ -100,7 +114,6 @@ type RunAutoConvertParams = {
   maxAttempts: number
   waitOptions: WaitForPaymentOptions
   amountMatchToleranceBps: number
-  claimedConversionIds: ReadonlySet<string>
   onConverting?: (invoice: string) => void
   onSettled?: (invoice: string) => void
   onConverted?: () => void
@@ -116,7 +129,6 @@ const runAutoConvert = async ({
   maxAttempts,
   waitOptions,
   amountMatchToleranceBps,
-  claimedConversionIds,
   onConverting,
   onSettled,
   onConverted,
@@ -140,29 +152,35 @@ const runAutoConvert = async ({
     await recordAutoConvertAttempt(record.paymentRequest, Date.now())
 
     const usdCentsAmount = convertSatsToUsdCents(satsReceived, convert)
-    const outcome = await executeAutoConvert(sdk, {
-      satsAmount: satsReceived,
-      usdCentsAmount,
-      isStableBalanceActive,
-      recordCreatedAtMs: record.createdAtMs,
-      amountMatchToleranceBps,
-      claimedConversionIds,
+    const outcome = await afterEarlierReceivesConvert(async () => {
+      /** Read in its turn: every receive converted before it is paired by then. */
+      const { claimedConversionIds } = await buildClaimedConversionIds()
+      const converted = await executeAutoConvert(sdk, {
+        satsAmount: satsReceived,
+        usdCentsAmount,
+        isStableBalanceActive,
+        recordCreatedAtMs: record.createdAtMs,
+        amountMatchToleranceBps,
+        claimedConversionIds,
+      })
+      if (converted.status === AutoConvertStatus.Converted) {
+        const conversionId = await findRecentConversionId(sdk, {
+          satsAmount: satsReceived,
+          toleranceBps: amountMatchToleranceBps,
+          claimedConversionIds,
+        })
+        if (conversionId) {
+          await markAutoConvertPairing({
+            receivePaymentId: paymentId,
+            conversionPaymentId: conversionId,
+            pairedAtMs: Date.now(),
+          })
+        }
+      }
+      return converted
     })
 
     if (outcome.status === AutoConvertStatus.Converted) {
-      const conversionId = await findRecentConversionId(sdk, {
-        satsAmount: satsReceived,
-        toleranceBps: amountMatchToleranceBps,
-        claimedConversionIds,
-      })
-      if (conversionId) {
-        await markAutoConvertPairing({
-          receivePaymentId: paymentId,
-          conversionPaymentId: conversionId,
-          pairedAtMs: Date.now(),
-        })
-      }
-
       await removePendingAutoConvert(record.paymentRequest)
       onConverted?.()
       return
@@ -260,7 +278,6 @@ export const useAutoConvertListener = (): void => {
       paymentId: string
       satsReceived: number
       convert: ConvertMoneyAmount
-      claimedConversionIds: ReadonlySet<string>
     }): Promise<void> => {
       const { record } = params
       if (inFlightInvoicesRef.current.has(record.paymentRequest)) return
@@ -280,7 +297,6 @@ export const useAutoConvertListener = (): void => {
           maxAttempts: autoConvertMaxAttempts,
           waitOptions,
           amountMatchToleranceBps: autoConvertAmountMatchToleranceBps,
-          claimedConversionIds: params.claimedConversionIds,
           onConverting: markConverting,
           onSettled: markSettled,
           onConverted: handleConverted,
@@ -324,7 +340,7 @@ export const useAutoConvertListener = (): void => {
       if (!record) return
       if (!isRetryableNow(record, Date.now())) return
 
-      const { claimedConversionIds, pairedReceiveIds } = await buildClaimedConversionIds()
+      const { pairedReceiveIds } = await buildClaimedConversionIds()
       if (pairedReceiveIds.has(lastReceivedPaymentId)) {
         await removePendingAutoConvert(invoice)
         return
@@ -336,7 +352,6 @@ export const useAutoConvertListener = (): void => {
         paymentId: lastReceivedPaymentId,
         satsReceived: toNumber(payment.amount),
         convert: convertMoneyAmount,
-        claimedConversionIds,
       })
     }
 
@@ -384,8 +399,7 @@ export const useAutoConvertListener = (): void => {
           return
         }
 
-        const { claimedConversionIds, pairedReceiveIds } =
-          await buildClaimedConversionIds()
+        const { pairedReceiveIds } = await buildClaimedConversionIds()
         if (pairedReceiveIds.has(paid.paymentId)) {
           await removePendingAutoConvert(record.paymentRequest)
           return
@@ -397,7 +411,6 @@ export const useAutoConvertListener = (): void => {
           paymentId: paid.paymentId,
           satsReceived: paid.amount,
           convert: convertMoneyAmount,
-          claimedConversionIds,
         })
       }
 

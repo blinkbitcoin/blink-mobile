@@ -1031,6 +1031,138 @@ describe("useAutoConvertListener — mount replay", () => {
   })
 })
 
+describe("useAutoConvertListener — receives of one amount converting at once", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  /** The wallet as the executor sees it: conversions go out one at a time, as the bridge
+   *  runs them, and one already in the history that no receive has claimed is taken for
+   *  these sats, as `isConvertedInHistory` takes it. */
+  const walletConvertingOneAtATime = () => {
+    const history: string[] = []
+    const pairings: Array<{ receivePaymentId: string; conversionPaymentId: string }> = []
+    let landFirst: () => void = () => undefined
+    let bridgeTurn: Promise<unknown> = Promise.resolve()
+    mockListAutoConvertPairings.mockImplementation(async () => [...pairings])
+    mockMarkAutoConvertPairing.mockImplementation(async (pairing) => {
+      pairings.push(pairing)
+    })
+    mockFindRecentConversionId.mockImplementation(
+      async (
+        _sdk: unknown,
+        { claimedConversionIds }: { claimedConversionIds: Set<string> },
+      ) => [...history].reverse().find((id) => !claimedConversionIds.has(id)),
+    )
+    mockExecuteAutoConvert.mockImplementation(
+      (
+        _sdk: unknown,
+        { claimedConversionIds }: { claimedConversionIds: Set<string> },
+      ) => {
+        const turn = bridgeTurn.then(async () => {
+          const isTakenAsConverted = history.some((id) => !claimedConversionIds.has(id))
+          if (isTakenAsConverted) return { status: AutoConvertStatus.AlreadyConverted }
+          if (history.length === 0) {
+            await new Promise<void>((resolve) => {
+              landFirst = resolve
+            })
+          }
+          history.push(`conversion-${history.length + 1}`)
+          return { status: AutoConvertStatus.Converted }
+        })
+        bridgeTurn = turn.catch(() => undefined)
+        return turn
+      },
+    )
+    return { history, pairings, landFirst: () => landFirst() }
+  }
+
+  it("converts and pairs each of two receives of one amount whose conversions overlap", async () => {
+    const sdk = makeSdk({
+      getPayment: jest.fn(async ({ paymentId }: { paymentId: string }) => ({
+        payment: makeLightningPayment(paymentId.replace("pid-", ""), 5000n),
+      })),
+    })
+    setupDefaults(sdk)
+    const wallet = {
+      sdk,
+      isStableBalanceActive: false,
+      refreshWallets: mockRefreshWallets,
+    }
+    mockFindPendingAutoConvert.mockImplementation(async (invoice: string) =>
+      makeRecord({
+        paymentRequest: invoice,
+        createdAtMs: invoice === "lnbcFirst" ? 1_000_000 : 1_000_500,
+      }),
+    )
+    const { history, pairings, landFirst } = walletConvertingOneAtATime()
+    mockUseSelfCustodialWallet.mockReturnValue({
+      ...wallet,
+      lastReceivedPaymentId: "pid-lnbcFirst",
+    })
+    const { rerender } = renderHook(() => useAutoConvertListener())
+    await waitFor(() => expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1))
+
+    mockUseSelfCustodialWallet.mockReturnValue({
+      ...wallet,
+      lastReceivedPaymentId: "pid-lnbcSecond",
+    })
+    rerender({})
+    await waitFor(() => expect(mockRecordAutoConvertAttempt).toHaveBeenCalledTimes(2))
+    landFirst()
+
+    await waitFor(() => expect(mockRemovePendingAutoConvert).toHaveBeenCalledTimes(2))
+    expect(history).toEqual(["conversion-1", "conversion-2"])
+    expect(pairings).toEqual([
+      expect.objectContaining({
+        receivePaymentId: "pid-lnbcFirst",
+        conversionPaymentId: "conversion-1",
+      }),
+      expect.objectContaining({
+        receivePaymentId: "pid-lnbcSecond",
+        conversionPaymentId: "conversion-2",
+      }),
+    ])
+  })
+
+  it("lets the next receive convert after one whose turn failed", async () => {
+    const sdk = makeSdk({
+      getPayment: jest.fn(async ({ paymentId }: { paymentId: string }) => ({
+        payment: makeLightningPayment(paymentId.replace("pid-", ""), 5000n),
+      })),
+    })
+    setupDefaults(sdk)
+    const wallet = {
+      sdk,
+      isStableBalanceActive: false,
+      refreshWallets: mockRefreshWallets,
+    }
+    mockFindPendingAutoConvert.mockImplementation(async (invoice: string) =>
+      makeRecord({ paymentRequest: invoice }),
+    )
+    mockExecuteAutoConvert
+      .mockRejectedValueOnce(new Error("bridge unavailable"))
+      .mockResolvedValue({ status: AutoConvertStatus.Converted })
+    mockUseSelfCustodialWallet.mockReturnValue({
+      ...wallet,
+      lastReceivedPaymentId: "pid-lnbcFailing",
+    })
+    const { rerender } = renderHook(() => useAutoConvertListener())
+    await waitFor(() => expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1))
+
+    mockUseSelfCustodialWallet.mockReturnValue({
+      ...wallet,
+      lastReceivedPaymentId: "pid-lnbcNext",
+    })
+    rerender({})
+
+    await waitFor(() =>
+      expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbcNext"),
+    )
+    expect(mockRemovePendingAutoConvert).not.toHaveBeenCalledWith("lnbcFailing")
+  })
+})
+
 describe("useAutoConvertListener — isRetryableNow gate", () => {
   const FIXED_NOW = 2_000_000_000_000
 
