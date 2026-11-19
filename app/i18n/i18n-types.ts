@@ -7504,6 +7504,10 @@ type RootTranslation = {
 		 */
 		paymentAlreadyAttempted: string
 		/**
+		 * W​a​i​t​ ​a​ ​m​o​m​e​n​t​,​ ​i​t​ ​w​i​l​l​ ​p​r​o​b​a​b​l​y​ ​g​o​ ​t​h​r​o​u​g​h​ ​s​o​o​n​.​ ​Y​o​u​r​ ​m​o​n​e​y​ ​w​i​l​l​ ​a​r​r​i​v​e​ ​s​a​f​e​l​y​ ​o​r​ ​s​t​a​y​ ​w​i​t​h​ ​y​o​u​.
+		 */
+		paymentMayStillLand: string
+		/**
 		 * S​l​i​d​e​ ​t​o​ ​C​o​n​f​i​r​m
 		 */
 		slideToConfirm: string
@@ -7593,6 +7597,18 @@ type RootTranslation = {
 		 * C​h​a​n​g​e​ ​a​m​o​u​n​t
 		 */
 		changeAmount: string
+		/**
+		 * T​r​y​ ​a​g​a​i​n
+		 */
+		tryAgain: string
+		/**
+		 * H​o​m​e
+		 */
+		home: string
+		/**
+		 * B​e​f​o​r​e​ ​y​o​u​ ​s​e​n​d
+		 */
+		dustSweepSheetTitle: string
 		/**
 		 * R​e​m​a​i​n​i​n​g​ ​{​r​e​m​a​i​n​i​n​g​}​ ​(​{​r​e​m​a​i​n​i​n​g​S​a​t​s​}​)​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​B​i​t​c​o​i​n​.​ ​U​S​D​ ​m​i​n​i​m​u​m​:​ ​{​m​i​n​i​m​u​m​}​.
 		 * @param {string} minimum
@@ -7879,21 +7895,23 @@ type RootTranslation = {
 		 * T​h​e​ ​l​n​u​r​l​ ​s​e​r​v​e​r​ ​r​e​s​p​o​n​d​e​d​ ​w​i​t​h​ ​a​n​ ​i​n​v​o​i​c​e​ ​w​i​t​h​ ​a​n​ ​i​n​c​o​r​r​e​c​t​ ​a​m​o​u​n​t​.
 		 */
 		lnurlInvoiceIncorrectAmount: string
-		confirmFeesModal: {
+		highFeeSheet: {
 			/**
 			 * H​i​g​h​ ​f​e​e​ ​a​l​e​r​t​!
 			 */
 			title: string
 			/**
-			 * Y​o​u​r​ ​f​e​e​ ​i​s​ ​m​o​r​e​ ​t​h​a​n​ ​5​0​%​ ​b​i​g​g​e​r​ ​t​h​a​n​ ​t​h​e​ ​a​m​o​u​n​t​ ​s​e​n​t​.​ ​A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​p​r​o​c​e​e​d​?​
-		​
-		​T​o​ ​r​e​d​u​c​e​ ​f​e​e​s​,​ ​a​s​k​ ​t​h​e​ ​r​e​c​e​i​v​e​r​ ​t​o​ ​a​c​c​e​p​t​ ​t​r​a​n​s​a​c​t​i​o​n​ ​v​i​a​ ​L​i​g​h​t​n​i​n​g
+			 * Y​o​u​r​ ​f​e​e​ ​i​s​ ​5​0​%​ ​o​r​ ​m​o​r​e​ ​o​f​ ​t​h​e​ ​a​m​o​u​n​t​ ​y​o​u​'​r​e​ ​s​e​n​d​i​n​g​.​ ​A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​p​r​o​c​e​e​d​?
 			 */
-			content: string
+			body: string
 			/**
-			 * I​'​m​ ​1​0​0​%​ ​s​u​r​e
+			 * C​a​n​c​e​l​ ​p​a​y​m​e​n​t
 			 */
-			confirmButton: string
+			cancelPayment: string
+			/**
+			 * A​c​c​e​p​t​ ​f​e​e
+			 */
+			acceptFee: string
 		}
 		/**
 		 * C​o​p​i​e​d​ ​d​e​s​t​i​n​a​t​i​o​n​ ​t​o​ ​c​l​i​p​b​o​a​r​d
@@ -22023,6 +22041,10 @@ export type TranslationFunctions = {
 		 */
 		paymentAlreadyAttempted: () => LocalizedString
 		/**
+		 * Wait a moment, it will probably go through soon. Your money will arrive safely or stay with you.
+		 */
+		paymentMayStillLand: () => LocalizedString
+		/**
 		 * Slide to Confirm
 		 */
 		slideToConfirm: () => LocalizedString
@@ -22112,6 +22134,18 @@ export type TranslationFunctions = {
 		 * Change amount
 		 */
 		changeAmount: () => LocalizedString
+		/**
+		 * Try again
+		 */
+		tryAgain: () => LocalizedString
+		/**
+		 * Home
+		 */
+		home: () => LocalizedString
+		/**
+		 * Before you send
+		 */
+		dustSweepSheetTitle: () => LocalizedString
 		/**
 		 * Remaining {remaining} ({remainingSats}) will be converted to Bitcoin. USD minimum: {minimum}.
 		 */
@@ -22376,21 +22410,23 @@ export type TranslationFunctions = {
 		 * The lnurl server responded with an invoice with an incorrect amount.
 		 */
 		lnurlInvoiceIncorrectAmount: () => LocalizedString
-		confirmFeesModal: {
+		highFeeSheet: {
 			/**
 			 * High fee alert!
 			 */
 			title: () => LocalizedString
 			/**
-			 * Your fee is more than 50% bigger than the amount sent. Are you sure you want to proceed?
-	
-		To reduce fees, ask the receiver to accept transaction via Lightning
+			 * Your fee is 50% or more of the amount you're sending. Are you sure you want to proceed?
 			 */
-			content: () => LocalizedString
+			body: () => LocalizedString
 			/**
-			 * I'm 100% sure
+			 * Cancel payment
 			 */
-			confirmButton: () => LocalizedString
+			cancelPayment: () => LocalizedString
+			/**
+			 * Accept fee
+			 */
+			acceptFee: () => LocalizedString
 		}
 		/**
 		 * Copied destination to clipboard

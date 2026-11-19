@@ -13,6 +13,7 @@ import {
   BottomSheet,
   CLOSE_DURATION_MS,
   PAN_TEST_ID,
+  SCRIM_TEST_ID,
 } from "@app/components/bottom-sheet"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { light } from "@app/rne-theme/colors"
@@ -135,12 +136,45 @@ describe("BottomSheet", () => {
 
   it("closes when the scrim behind it is pressed", async () => {
     const onClose = jest.fn()
-    const { getByLabelText } = renderSheet({ onClose })
+    const { getByTestId } = renderSheet({ onClose })
 
-    await waitFor(() => expect(getByLabelText("Close")).toBeTruthy())
-    fireEvent.press(getByLabelText("Close"))
+    // Hidden from screen readers, which close the sheet with their escape gesture.
+    const scrim = () => getByTestId(SCRIM_TEST_ID, { includeHiddenElements: true })
+    await waitFor(() => expect(scrim()).toBeTruthy())
+    fireEvent.press(scrim())
 
     expect(onClose).toHaveBeenCalled()
+  })
+
+  // Each platform reads its own prop: VoiceOver skips `accessibilityElementsHidden`,
+  // TalkBack skips `importantForAccessibility`. Either alone hides it in a test.
+  it("hides the scrim from VoiceOver and TalkBack alike, as no control of its own", async () => {
+    const { getByTestId } = renderSheet()
+
+    const scrim = () => getByTestId(SCRIM_TEST_ID, { includeHiddenElements: true })
+    await waitFor(() => expect(scrim()).toBeTruthy())
+
+    expect(scrim().props.accessibilityElementsHidden).toBe(true)
+    expect(scrim().props.importantForAccessibility).toBe("no-hide-descendants")
+    expect(scrim().props.accessibilityRole).toBeUndefined()
+    expect(scrim().props.accessibilityLabel).toBeUndefined()
+  })
+
+  it("keeps a screen reader inside the sheet", async () => {
+    const { getByTestId } = renderSheet()
+
+    await waitFor(() => expect(getByTestId(SHEET_TEST_ID)).toBeTruthy())
+    expect(getByTestId(SHEET_TEST_ID).props.accessibilityViewIsModal).toBe(true)
+  })
+
+  it("outlines the top and both sides unless told the top edge only", async () => {
+    const { getByTestId } = renderSheet()
+
+    await waitFor(() => expect(getByTestId(SHEET_TEST_ID)).toBeTruthy())
+    const sheet = StyleSheet.flatten(getByTestId(SHEET_TEST_ID).props.style)
+    expect(sheet.borderWidth).toBe(1)
+    expect(sheet.borderLeftWidth).not.toBe(0)
+    expect(sheet.borderRightWidth).not.toBe(0)
   })
 
   it("dims what is behind it with the scrim token", async () => {
@@ -529,12 +563,12 @@ describe("BottomSheet", () => {
     })
 
     it("puts up no scrim, so what it sits beside keeps its own touches", async () => {
-      const { getByText, queryByLabelText } = renderSheet({ presentation: "inline" })
+      const { getByText, queryByTestId } = renderSheet({ presentation: "inline" })
 
       await waitFor(() => expect(getByText("content")).toBeTruthy())
       // The scrim is the only thing that presses to close, and it is what would
       // be swallowing the panning of the map this sits beside.
-      expect(queryByLabelText("Close")).toBeNull()
+      expect(queryByTestId(SCRIM_TEST_ID, { includeHiddenElements: true })).toBeNull()
     })
 
     it("is still dragged away the same way the modal one is", async () => {
