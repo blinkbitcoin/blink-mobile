@@ -49,7 +49,6 @@ import {
   CUSTODIAL_PAYOUT_ETA_MINUTES,
   feeTierFromPayoutSpeed,
 } from "./hooks/use-custodial-onchain-fee-tiers"
-import { useHomeOnBackWhenSpent } from "./hooks/use-home-on-back-when-spent"
 import { ETA_MINUTES } from "./hooks/use-onchain-fee-tiers"
 import { SendReviewDestination } from "./review/send-review-destination"
 import { SendHero } from "./send-hero"
@@ -202,9 +201,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     loading: sendPaymentLoading,
     sendPayment,
     hasAttemptedSend,
-    isSendSpent,
   } = useSendPayment(sendPaymentMutation, paymentDetail.idempotencyKeyRef)
-  useHomeOnBackWhenSpent(isSendSpent)
 
   // What the recipient gets: the amount less the fee, when the fee comes out of it.
   const displayAmount = paymentDetail.convertMoneyAmount(recipientAmount, DisplayCurrency)
