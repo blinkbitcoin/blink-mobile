@@ -137,7 +137,7 @@ const GaloySliderButton = ({
       {!disabled && (
         <Animated.Text
           maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
-          style={[styles.swipeText, AnimatedStyles.swipeText]}
+          style={[styles.swipeText, styles.knobClearance, AnimatedStyles.swipeText]}
         >
           {initialText}
         </Animated.Text>
@@ -177,18 +177,19 @@ const useStyles = makeStyles(({ colors }, { buttonWidth }: { buttonWidth: number
   },
   swipeText: {
     alignSelf: "center",
-    /** The knob rides over the left of the track, so the label keeps clear of it rather
-     *  than running underneath: at the larger text sizes it grew into the knob and read as
-     *  a half word. Wrapping inside what is left still fits the track's height. */
-    /** Only the left needs clearing: the knob rests there and the label reads to its
-     *  right. Padding both sides would cost the label twice the room on a small screen. */
-    paddingLeft: SWIPE_KNOB_SIZE + 10,
-    paddingRight: 12,
     textAlign: "center",
     fontSize: 14,
     fontWeight: "400",
     zIndex: 2,
     color: colors.textMuted,
+  },
+  /** The knob rides over the left of the track, so the idle label keeps clear of it rather
+   *  than running underneath: at the larger text sizes it grew into the knob and read as a
+   *  half word. Only the left needs clearing, as the label reads to the knob's right. The
+   *  loading label goes without it: the knob is gone by then and the label centres. */
+  knobClearance: {
+    paddingLeft: SWIPE_KNOB_SIZE + 10,
+    paddingRight: 12,
   },
   loadingContainer: {
     display: "flex",
