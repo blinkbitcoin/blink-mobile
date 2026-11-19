@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Pekerjaan",
-            "placeholder": "Pilih pekerjaan Anda"
+            "placeholder": "Pilih"
           },
           "annualSalaryRange": {
             "label": "Gaji tahunan",
-            "placeholder": "Pilih rentang gaji Anda"
+            "placeholder": "Pilih gaji"
           },
           "accountPurpose": {
             "label": "Tujuan akun",
@@ -3823,7 +3823,6 @@
             "placeholder": "Pilih rentang pengeluaran Anda"
           }
         },
-        "buttonText": "Kirim aplikasi",
         "select": "pilih"
       },
       "Acknowledgement": {
@@ -3839,18 +3838,21 @@
           "and": ", dan",
           "cardTermsLinkText": "Ketentuan Kartu Blink"
         },
-        "certifyAccuracy": "Saya menyatakan bahwa informasi yang saya berikan akurat dan bahwa saya akan mematuhi semua aturan dan persyaratan terkait Kartu Blink Visa saya",
-        "acknowledgeSolicitation": "Saya mengakui bahwa mengajukan permohonan Kartu Blink Visa bukan merupakan permintaan yang tidak sah"
+        "certifyAccuracy": "Saya menyatakan bahwa informasi yang saya berikan akurat dan bahwa saya akan mematuhi semua aturan dan persyaratan terkait Kartu Blink saya",
+        "acknowledgeSolicitation": "Saya mengakui bahwa mengajukan permohonan Kartu Blink bukan merupakan permintaan yang tidak sah"
       },
       "CardPreapproved": {
         "title": "Blink Card Anda sudah siap!",
         "subtitle": "Sekarang Anda dapat mengaktifkan kartu dan mulai menggunakannya",
         "buttonText": "Tutup"
       },
+      "CardDeclined": {
+        "title": "Kami tidak dapat menyetujui pengajuan kartu Anda",
+        "subtitle": "Manajer akun Anda akan menghubungi Anda."
+      },
       "CardProcessing": {
         "title": "Memproses aplikasi Anda",
-        "subtitle": "Kami akan memberi tahu Anda setelah kami siap",
-        "buttonText": "Tutup"
+        "subtitle": "Ini bisa memakan waktu hingga satu menit"
       }
     }
   },

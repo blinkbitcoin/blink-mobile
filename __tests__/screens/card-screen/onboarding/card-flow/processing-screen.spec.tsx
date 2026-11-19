@@ -1,7 +1,9 @@
+import { it } from "@jest/globals"
 import React from "react"
-import { render, fireEvent, act } from "@testing-library/react-native"
+import { render, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
+import { CardApprovalWait } from "@app/screens/card-screen/onboarding/card-flow/use-card-application-approval"
 import { CardProcessingScreen } from "@app/screens/card-screen/onboarding/card-flow/processing-screen"
 import { ContextForScreen } from "../../../helper"
 
@@ -14,6 +16,29 @@ jest.mock("react-native-linear-gradient", () => ({
 }))
 
 const mockNavigate = jest.fn()
+const mockPopTo = jest.fn()
+const mockReplace = jest.fn()
+const mockUseApproval = jest.fn()
+const mockUseDashedLineFlow = jest.fn()
+const mockRemoveListener = jest.fn()
+type BeforeRemoveEvent = {
+  data: { action: { type: string } }
+  preventDefault: () => void
+}
+let beforeRemoveListener: ((event: BeforeRemoveEvent) => void) | undefined
+const mockAddListener = jest.fn(
+  (eventName: string, listener: (event: BeforeRemoveEvent) => void) => {
+    if (eventName === "beforeRemove") beforeRemoveListener = listener
+    return mockRemoveListener
+  },
+)
+
+jest.mock("@app/components/animations", () => ({
+  useDashedLineFlow: (params: unknown) => {
+    mockUseDashedLineFlow(params)
+    return { animatedProps: {}, dashArray: "5 5" }
+  },
+}))
 
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
@@ -21,78 +46,129 @@ jest.mock("@react-navigation/native", () => {
     ...actualNav,
     useNavigation: () => ({
       navigate: mockNavigate,
+      popTo: mockPopTo,
+      replace: mockReplace,
+      addListener: mockAddListener,
     }),
+    useRoute: () => ({ params: { applicationId: "application-1" } }),
   }
 })
+
+jest.mock(
+  "@app/screens/card-screen/onboarding/card-flow/use-card-application-approval",
+  () => ({
+    useCardApplicationApproval: (applicationId: string) => mockUseApproval(applicationId),
+  }),
+)
+
+const renderScreen = async (approvalWait: CardApprovalWait) => {
+  mockUseApproval.mockReturnValue(approvalWait)
+  const screen = render(
+    <ContextForScreen>
+      <CardProcessingScreen />
+    </ContextForScreen>,
+  )
+  await act(async () => {})
+  return screen
+}
 
 describe("CardProcessingScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
+    beforeRemoveListener = undefined
   })
 
-  it("renders without crashing", async () => {
-    const { toJSON } = render(
-      <ContextForScreen>
-        <CardProcessingScreen />
-      </ContextForScreen>,
-    )
+  const leave = (type: string) => {
+    const preventDefault = jest.fn()
+    beforeRemoveListener?.({ data: { action: { type } }, preventDefault })
+    return preventDefault
+  }
 
-    await act(async () => {})
-
-    expect(toJSON()).toBeTruthy()
-  })
-
-  it("displays processing title", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <CardProcessingScreen />
-      </ContextForScreen>,
-    )
-
-    await act(async () => {})
+  it("says the application is being processed and how long it can take", async () => {
+    const { getByText } = await renderScreen("waiting")
 
     expect(getByText("Processing your application")).toBeTruthy()
+    expect(getByText("This can take up to a minute")).toBeTruthy()
   })
 
-  it("displays subtitle", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <CardProcessingScreen />
-      </ContextForScreen>,
-    )
+  it("flows the line's dashes, as long as the gaps, toward the card", async () => {
+    await renderScreen("waiting")
 
-    await act(async () => {})
-
-    expect(getByText("We will notify you once we are ready")).toBeTruthy()
-  })
-
-  it("displays close button", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <CardProcessingScreen />
-      </ContextForScreen>,
-    )
-
-    await act(async () => {})
-
-    expect(getByText("Close")).toBeTruthy()
-  })
-
-  it("navigates to Primary on button press", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <CardProcessingScreen />
-      </ContextForScreen>,
-    )
-
-    await act(async () => {})
-
-    const button = getByText("Close")
-    await act(async () => {
-      fireEvent.press(button)
+    expect(mockUseDashedLineFlow).toHaveBeenCalledWith({
+      dashLength: 89 / 18,
+      gapLength: 89 / 18,
     })
+  })
 
-    expect(mockNavigate).toHaveBeenCalledWith("Primary")
+  it("offers no button while it waits", async () => {
+    const { queryByRole } = await renderScreen("waiting")
+
+    expect(queryByRole("button")).toBeNull()
+  })
+
+  it("follows the application it was handed", async () => {
+    await renderScreen("waiting")
+
+    expect(mockUseApproval).toHaveBeenCalledWith("application-1")
+  })
+
+  it("stays put while the issuer has not answered", async () => {
+    await renderScreen("waiting")
+
+    expect(mockReplace).not.toHaveBeenCalled()
+    expect(mockPopTo).not.toHaveBeenCalled()
+  })
+
+  it("celebrates an approval on the approved screen, in its place", async () => {
+    await renderScreen("approved")
+
+    expect(mockReplace).toHaveBeenCalledWith("cardOnboardingPreapprovedScreen")
+    expect(mockPopTo).not.toHaveBeenCalled()
+  })
+
+  it("breaks a refusal on the declined screen, in its place", async () => {
+    await renderScreen("declined")
+
+    expect(mockReplace).toHaveBeenCalledWith("cardOnboardingDeclinedScreen")
+    expect(mockPopTo).not.toHaveBeenCalled()
+  })
+
+  /** Navigating there would stack a second Home over this screen, which would stay
+   *  frozen underneath it. */
+  it("goes back to the Home under it when the minute is up without an answer", async () => {
+    await renderScreen("timedOut")
+
+    expect(mockPopTo).toHaveBeenCalledWith("Primary")
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockReplace).not.toHaveBeenCalled()
+  })
+
+  /** Leaving would drop the poll, and an answer arriving after would never reach its
+   *  screen: the Android back raises GO_BACK and the swipe POP. */
+  it.each(["GO_BACK", "POP"])(
+    "refuses the user's own way back (%s) while it waits",
+    async (type) => {
+      await renderScreen("waiting")
+
+      expect(leave(type)).toHaveBeenCalled()
+    },
+  )
+
+  it.each(["REPLACE", "POP_TO", "RESET"])(
+    "lets the screen's own way on (%s) go through",
+    async (type) => {
+      await renderScreen("waiting")
+
+      expect(leave(type)).not.toHaveBeenCalled()
+    },
+  )
+
+  it("stops refusing once it leaves", async () => {
+    const { unmount } = await renderScreen("waiting")
+
+    unmount()
+
+    expect(mockRemoveListener).toHaveBeenCalled()
   })
 })

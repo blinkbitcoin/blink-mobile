@@ -3808,11 +3808,11 @@
         "fields": {
           "occupation": {
             "label": "Ocupació",
-            "placeholder": "Selecciona la teva ocupació"
+            "placeholder": "Selecciona"
           },
           "annualSalaryRange": {
             "label": "Salari anual",
-            "placeholder": "Selecciona el teu rang salarial"
+            "placeholder": "Selecciona el salari"
           },
           "accountPurpose": {
             "label": "Propòsit del compte",
@@ -3823,7 +3823,6 @@
             "placeholder": "Selecciona el teu rang de despesa"
           }
         },
-        "buttonText": "Enviar sol·licitud",
         "select": "seleccionar"
       },
       "Acknowledgement": {
@@ -3839,18 +3838,21 @@
           "and": ", i",
           "cardTermsLinkText": "Condicions de la targeta Blink"
         },
-        "certifyAccuracy": "Certifico que la informació que he proporcionat és exacta i que compliré totes les normes i requisits relacionats amb la meva targeta Blink Visa",
-        "acknowledgeSolicitation": "Reconec que sol·licitar la targeta Blink Visa no constitueix una sol·licitud no autoritzada"
+        "certifyAccuracy": "Certifico que la informació que he proporcionat és exacta i que compliré totes les normes i requisits relacionats amb la meva targeta Blink",
+        "acknowledgeSolicitation": "Reconec que sol·licitar la targeta Blink no constitueix una sol·licitud no autoritzada"
       },
       "CardPreapproved": {
         "title": "La teva Blink Card està llesta!",
         "subtitle": "Ara pots activar la teva targeta i començar a fer-la servir",
         "buttonText": "Tancar"
       },
+      "CardDeclined": {
+        "title": "No hem pogut aprovar la teva sol·licitud de targeta",
+        "subtitle": "El teu gestor de compte es posarà en contacte amb tu."
+      },
       "CardProcessing": {
         "title": "Processant la teva sol·licitud",
-        "subtitle": "T'avisarem quan estiguem preparats",
-        "buttonText": "Tancar"
+        "subtitle": "Això pot trigar fins a un minut"
       }
     }
   },

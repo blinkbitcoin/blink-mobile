@@ -14,6 +14,7 @@ import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/
 import { PaymentSendCompletedStatus } from "@app/screens/send-bitcoin-screen/use-send-payment"
 import { DrainConversionReturn } from "@app/screens/conversion-flow/drain-conversion"
 import { AccountMode, AccountTypeMode, CreationBlockReason } from "@app/types/account"
+import { CardApplicationAnswers } from "@app/types/card-application"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
 import {
@@ -326,9 +327,10 @@ export type RootStackParamList = {
   cardOnboardingDepositPendingScreen: undefined
   cardOnboardingCompanyValuationScreen: undefined
   cardOnboardingPersonalInfoScreen: undefined
-  cardOnboardingAcknowledgementScreen: undefined
+  cardOnboardingAcknowledgementScreen: CardApplicationAnswers
   cardOnboardingPreapprovedScreen: undefined
-  cardOnboardingProcessingScreen: undefined
+  cardOnboardingDeclinedScreen: undefined
+  cardOnboardingProcessingScreen: { applicationId: string }
   cardOnboardingApprovedScreen: undefined
   selfCustodialBackupMethod: undefined
   selfCustodialCloudBackup: undefined

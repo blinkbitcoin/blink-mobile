@@ -3992,11 +3992,11 @@ const en: BaseTranslation = {
         fields: {
           occupation: {
             label: "Occupation",
-            placeholder: "Select your occupation",
+            placeholder: "Select",
           },
           annualSalaryRange: {
             label: "Annual salary",
-            placeholder: "Select your salary range",
+            placeholder: "Select salary",
           },
           accountPurpose: {
             label: "Account purpose",
@@ -4007,7 +4007,6 @@ const en: BaseTranslation = {
             placeholder: "Select your spending range",
           },
         },
-        buttonText: "Submit application",
         select: "Select",
       },
       Acknowledgement: {
@@ -4019,24 +4018,27 @@ const en: BaseTranslation = {
         },
         privacyAndTerms: {
           text: "I accept the",
-          privacyPolicyLinkText: "Issuer's Privacy Policy",
+          privacyPolicyLinkText: "Issuer’s Privacy Policy",
           and: ", and",
           cardTermsLinkText: "Blink Card Terms",
         },
         certifyAccuracy:
-          "I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Visa Card",
+          "I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Card",
         acknowledgeSolicitation:
-          "I acknowledge that applying for the Blink Visa Card does not constitute unauthorized solicitation",
+          "I acknowledge that applying for the Blink Card does not constitute unauthorized solicitation",
       },
       CardPreapproved: {
         title: "Your Blink Card is ready!",
         subtitle: "You can now activate your card and start using it",
         buttonText: "Close",
       },
+      CardDeclined: {
+        title: "We couldn't approve your card application",
+        subtitle: "Your account manager will be in touch.",
+      },
       CardProcessing: {
         title: "Processing your application",
-        subtitle: "We will notify you once we are ready",
-        buttonText: "Close",
+        subtitle: "This can take up to a minute",
       },
     },
   },

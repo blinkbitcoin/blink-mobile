@@ -3747,11 +3747,11 @@
                 "fields": {
                     "occupation": {
                         "label": "Beruf",
-                        "placeholder": "Wähle deinen Beruf"
+                        "placeholder": "Auswählen"
                     },
                     "annualSalaryRange": {
                         "label": "Jahresgehalt",
-                        "placeholder": "Wähle deine Gehaltsspanne"
+                        "placeholder": "Gehalt auswählen"
                     },
                     "accountPurpose": {
                         "label": "Kontozweck",
@@ -3762,7 +3762,6 @@
                         "placeholder": "Wähle deine Ausgabenspanne"
                     }
                 },
-                "buttonText": "Antrag einreichen",
                 "select": "auswählen"
             },
             "Acknowledgement": {
@@ -3778,18 +3777,21 @@
                     "and": " und die",
                     "cardTermsLinkText": "Blink Card-Bedingungen"
                 },
-                "certifyAccuracy": "Ich bestätige, dass die von mir angegebenen Informationen korrekt sind und dass ich alle Regeln und Anforderungen im Zusammenhang mit meiner Blink Visa Card einhalten werde",
-                "acknowledgeSolicitation": "Ich erkenne an, dass die Beantragung der Blink Visa Card keine unbefugte Aufforderung darstellt"
+                "certifyAccuracy": "Ich bestätige, dass die von mir angegebenen Informationen korrekt sind und dass ich alle Regeln und Anforderungen im Zusammenhang mit meiner Blink Card einhalten werde",
+                "acknowledgeSolicitation": "Ich erkenne an, dass die Beantragung der Blink Card keine unbefugte Aufforderung darstellt"
             },
             "CardPreapproved": {
                 "title": "Ihre Blink Card ist bereit!",
                 "subtitle": "Sie können Ihre Karte jetzt aktivieren und mit der Nutzung beginnen",
                 "buttonText": "Schließen"
             },
+            "CardDeclined": {
+                "title": "Wir konnten Ihren Kartenantrag nicht genehmigen",
+                "subtitle": "Ihr Kundenbetreuer wird sich bei Ihnen melden."
+            },
             "CardProcessing": {
                 "title": "Dein Antrag wird bearbeitet",
-                "subtitle": "Wir benachrichtigen dich, sobald wir bereit sind",
-                "buttonText": "Schließen"
+                "subtitle": "Das kann bis zu einer Minute dauern"
             },
             "WelcomeInvest": {
                 "welcomeMessage": {

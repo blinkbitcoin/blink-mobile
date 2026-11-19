@@ -1,5 +1,5 @@
 import React from "react"
-import { useNavigation } from "@react-navigation/native"
+import { StackActions, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useTheme } from "@rn-vui/themed"
 
@@ -10,6 +10,9 @@ import { HEADER_ICON_BUTTON_TOUCH_PADDING, headerRightNoGlass } from "../header-
 
 type HeaderCloseControlParams = {
   navigateTo?: keyof RootStackParamList
+  /** Pops back to `navigateTo` instead of navigating to it. A screen that ends a flow
+   *  closes onto the Home already under it, since navigating stacks a second one. */
+  shouldPopTo?: boolean
 }
 
 /** The native header already insets its right item by 16 on both platforms (Android
@@ -28,15 +31,24 @@ const CLOSE_TOUCH_PADDING = {
 
 const HeaderCloseButton: React.FC<Required<HeaderCloseControlParams>> = ({
   navigateTo,
+  shouldPopTo,
 }) => {
   const {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
+  const close = () => {
+    if (shouldPopTo) {
+      navigation.dispatch(StackActions.popTo(navigateTo))
+      return
+    }
+    navigation.navigate(navigateTo as never)
+  }
+
   return (
     <GaloyIconButton
-      onPress={() => navigation.navigate(navigateTo as never)}
+      onPress={close}
       size="medium"
       name="close"
       backgroundColor={colors.surfaceInteractive}
@@ -50,5 +62,8 @@ const HeaderCloseButton: React.FC<Required<HeaderCloseControlParams>> = ({
 // export: a bare `headerRight: <close button>` would get the glass capsule back.
 export const headerCloseControlOptions = ({
   navigateTo = "Primary",
+  shouldPopTo = false,
 }: HeaderCloseControlParams = {}) =>
-  headerRightNoGlass(() => <HeaderCloseButton navigateTo={navigateTo} />)
+  headerRightNoGlass(() => (
+    <HeaderCloseButton navigateTo={navigateTo} shouldPopTo={shouldPopTo} />
+  ))
