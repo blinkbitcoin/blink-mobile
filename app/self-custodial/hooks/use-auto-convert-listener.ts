@@ -28,6 +28,7 @@ import {
   pruneExpiredAutoConvertPairings,
   pruneExpiredAutoConverts,
   recordAutoConvertAttempt,
+  releaseAutoConvertAttempt,
   removePendingAutoConvert,
   waitForPaymentCompleted,
   type PendingAutoConvert,
@@ -183,6 +184,14 @@ const runAutoConvert = async ({
     if (outcome.status === AutoConvertStatus.Converted) {
       await removePendingAutoConvert(record.paymentRequest)
       onConverted?.()
+      return
+    }
+
+    /** A try that only waited behind an earlier conversion sent nothing, so it spends
+     *  none of the receive's attempts: launches that each wait anew could otherwise use
+     *  them all up and drop the receive unconverted. */
+    if (outcome.status === AutoConvertStatus.Deferred) {
+      await releaseAutoConvertAttempt(record.paymentRequest)
       return
     }
 

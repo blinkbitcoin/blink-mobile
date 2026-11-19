@@ -256,14 +256,20 @@ export const executeAutoConvert = async (
   if (result.status === PaymentResultStatus.Success) {
     return { status: AutoConvertStatus.Converted }
   }
-  const isConvertedMeanwhile =
-    result.errors?.[0]?.code === ConvertErrorCode.AlreadyConverted
+  const errorCode = result.errors?.[0]?.code
+  const isConvertedMeanwhile = errorCode === ConvertErrorCode.AlreadyConverted
   if (isConvertedMeanwhile) {
     return { status: AutoConvertStatus.AlreadyConverted }
   }
-  /** Tried again on the next trigger, also when a conversion that may have been lost is
-   *  still unknown or turned out to be another one: each try looks for it before anything
-   *  goes out, and one of these sats that completed is taken for this receive's by
-   *  `hasAlreadyConverted` before anything is quoted. */
+  /** Nothing went out: an earlier conversion that may have been lost can still deliver,
+   *  or turned out to be another one, and is settled now. Tried again on the next trigger,
+   *  where it is looked for before anything goes out, and one of these sats that
+   *  completed is taken for this receive's by `hasAlreadyConverted` before any quote. */
+  const isBehindEarlierConversion =
+    errorCode === ConvertErrorCode.EarlierConversionPending ||
+    errorCode === ConvertErrorCode.EarlierConversionFound
+  if (isBehindEarlierConversion) {
+    return { status: AutoConvertStatus.Deferred }
+  }
   return { status: AutoConvertStatus.Failed }
 }

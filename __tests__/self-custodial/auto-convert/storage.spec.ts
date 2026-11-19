@@ -7,6 +7,7 @@ import {
   pruneExpiredAutoConvertPairings,
   pruneExpiredAutoConverts,
   recordAutoConvertAttempt,
+  releaseAutoConvertAttempt,
   removePendingAutoConvert,
 } from "@app/self-custodial/auto-convert/storage"
 
@@ -162,6 +163,38 @@ describe("auto-convert storage", () => {
     it("no-ops when the record isn't found", async () => {
       mockGetItem.mockResolvedValue(JSON.stringify([makeRecord()]))
       await recordAutoConvertAttempt("lnbc1missing", 100)
+      expect(mockSetItem).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("releaseAutoConvertAttempt", () => {
+    it("takes back one attempt, keeping when it was stamped for the cooldown", async () => {
+      mockGetItem.mockResolvedValue(
+        JSON.stringify([
+          makeRecord({
+            paymentRequest: "lnbc1",
+            attempts: 2,
+            lastAttemptAtMs: 9_999_999,
+          }),
+        ]),
+      )
+      await releaseAutoConvertAttempt("lnbc1")
+      const written = writtenRecords()
+      expect(written[0].attempts).toBe(1)
+      expect(written[0].lastAttemptAtMs).toBe(9_999_999)
+    })
+
+    it("never takes the attempts below none", async () => {
+      mockGetItem.mockResolvedValue(
+        JSON.stringify([makeRecord({ paymentRequest: "lnbc1", attempts: 0 })]),
+      )
+      await releaseAutoConvertAttempt("lnbc1")
+      expect(writtenRecords()[0].attempts).toBe(0)
+    })
+
+    it("no-ops when the record isn't found", async () => {
+      mockGetItem.mockResolvedValue(JSON.stringify([makeRecord()]))
+      await releaseAutoConvertAttempt("lnbc1missing")
       expect(mockSetItem).not.toHaveBeenCalled()
     })
   })

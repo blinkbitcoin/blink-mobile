@@ -378,11 +378,31 @@ describe("executeAutoConvert", () => {
 
   /** The next trigger decides: one of these sats that completed is taken for this
    *  receive's before anything is quoted. */
-  it("returns Failed when an earlier conversion turns up instead, to be tried again", async () => {
+  const waitsBehindEarlierConversion: Array<[string, string]> = [
+    ["turns up as another one", ConvertErrorCode.EarlierConversionFound],
+    ["may still deliver", ConvertErrorCode.EarlierConversionPending],
+  ]
+  for (const [why, code] of waitsBehindEarlierConversion) {
+    it(`returns Deferred when an earlier conversion ${why}, as nothing went out`, async () => {
+      mockGetConversionQuote.mockResolvedValue({
+        execute: jest.fn().mockResolvedValue({
+          status: PaymentResultStatus.Failed,
+          errors: [{ message: "earlier", code }],
+        }),
+      })
+
+      const outcome = await executeAutoConvert(sdkWith([]), baseParams)
+
+      expect(outcome).toEqual({ status: "deferred" })
+    })
+  }
+
+  /** A conversion that went out and whose outcome was lost is an attempt of its own. */
+  it("returns Failed when the conversion went out and its outcome is unknown", async () => {
     mockGetConversionQuote.mockResolvedValue({
       execute: jest.fn().mockResolvedValue({
         status: PaymentResultStatus.Failed,
-        errors: [{ message: "earlier", code: ConvertErrorCode.EarlierConversionFound }],
+        errors: [{ message: "unknown", code: ConvertErrorCode.OutcomeUnknown }],
       }),
     })
 

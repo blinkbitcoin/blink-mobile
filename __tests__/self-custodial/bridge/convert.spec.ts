@@ -899,7 +899,7 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     await (await quoteFor(sdk))!.execute()
     const retry = await (await quoteFor(sdk))!.execute()
 
-    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
   })
 
@@ -914,7 +914,7 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     realTimePasses(60 * 1000)
     const retry = await (await quoteFor(sdk))!.execute()
 
-    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
   })
 
@@ -962,7 +962,7 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     await (await quoteFor(sdk))!.execute()
     const retry = await (await quoteFor(sdk))!.execute()
 
-    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
   })
 
@@ -975,7 +975,7 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     realTime.mockReturnValue(Number.NaN)
     const retry = await (await quoteFor(sdk))!.execute()
 
-    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
   })
 
@@ -988,7 +988,7 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     await (await quoteFor(sdk))!.execute()
     const third = await (await quoteFor(sdk))!.execute()
 
-    expect(third.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(third.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
     expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
   })
 
@@ -1144,7 +1144,7 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
       },
     ])
     expect(nextLook.knownPaymentIds).toContain("rcv-usdb")
-    expect(next.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(next.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
     expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
   })
 
@@ -1207,7 +1207,7 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
       },
     ])
     expect(nextLook.knownPaymentIds).toContain("rcv-earlier")
-    expect(firstAgain.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(firstAgain.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
     expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
   })
 
@@ -1353,7 +1353,7 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     const found = await (await quoteFor(sdk))!.execute()
 
     expect(reported.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionFound)
-    expect(refused.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(refused.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
     expect(found.status).toBe("success")
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
     const lookAfterReport = mockFindLostConversion.mock.calls[2][0].lost
@@ -1662,7 +1662,7 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
       })
       const labeled = await executedOverTime(sdk)
 
-      expect(retry.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+      expect(retry.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
       const lookOfTheLabeledOne = mockFindLostConversion.mock.calls.at(-1)?.[0]
       expect(lookOfTheLabeledOne.lost.expectedDeliveries).toEqual([
         expect.objectContaining({ amount: 1_370_000, amountIn: PAID_IN }),
@@ -1788,7 +1788,7 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
     afterTheDeliveryWindow()
     const fourth = await executeAutoConvert(sdk as never, receive)
 
-    expect([second, third]).toEqual([{ status: "failed" }, { status: "failed" }])
+    expect([second, third]).toEqual([{ status: "deferred" }, { status: "deferred" }])
     expect(fourth).toEqual({ status: "converted" })
     expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
     expect(mockFindLostConversion.mock.calls[2][0].lost.knownPaymentIds).toContain(
@@ -1845,7 +1845,7 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
       direction: ConvertDirection.BtcToUsd,
     }))!.execute()
 
-    expect(automatic).toEqual({ status: "failed" })
+    expect(automatic).toEqual({ status: "deferred" })
     const usersLook = mockFindLostConversion.mock.calls[2][0].lost
     expect(usersLook.expectedDeliveries).toEqual([
       {
@@ -1884,7 +1884,7 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
     const automatic = await executeAutoConvert(sdk as never, receive)
     await executeAutoConvert(sdk as never, receive)
 
-    expect(automatic).toEqual({ status: "failed" })
+    expect(automatic).toEqual({ status: "deferred" })
     expect(mockFindLostConversion.mock.calls[2][0].lost.expectedDeliveries).toEqual([
       {
         tokenIdentifier: "usdb-token-id",
@@ -1994,7 +1994,7 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
     sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
     const third = await executeAutoConvert(sdk as never, laterReceive)
 
-    expect(second).toEqual({ status: "failed" })
+    expect(second).toEqual({ status: "deferred" })
     expect(third).toEqual({ status: "converted" })
     expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
   })
@@ -2453,7 +2453,7 @@ describe("a conversion in flight when the app closes", () => {
     realTimePasses(PAST_THE_WINDOW_MS)
     const result = await nextLaunch.convert(sdk)
 
-    expect(readBack.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(readBack.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
     expect(result.status).toBe("success")
     expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
   })

@@ -12,6 +12,7 @@ const mockMarkAutoConvertPairing = jest.fn()
 const mockPruneExpiredAutoConverts = jest.fn()
 const mockPruneExpiredAutoConvertPairings = jest.fn()
 const mockRecordAutoConvertAttempt = jest.fn()
+const mockReleaseAutoConvertAttempt = jest.fn()
 const mockRemovePendingAutoConvert = jest.fn()
 const mockUseSelfCustodialWallet = jest.fn()
 const mockUseRemoteConfig = jest.fn()
@@ -24,6 +25,7 @@ jest.mock("@app/self-custodial/auto-convert", () => ({
     AlreadyConverted: "already-converted",
     SkippedBelowMin: "skipped-below-min",
     SkippedStableBalanceActive: "skipped-stable-balance-active",
+    Deferred: "deferred",
     Failed: "failed",
   },
   executeAutoConvert: (...args: unknown[]) => mockExecuteAutoConvert(...args),
@@ -36,6 +38,8 @@ jest.mock("@app/self-custodial/auto-convert", () => ({
     mockPruneExpiredAutoConvertPairings(...args),
   pruneExpiredAutoConverts: (...args: unknown[]) => mockPruneExpiredAutoConverts(...args),
   recordAutoConvertAttempt: (...args: unknown[]) => mockRecordAutoConvertAttempt(...args),
+  releaseAutoConvertAttempt: (...args: unknown[]) =>
+    mockReleaseAutoConvertAttempt(...args),
   removePendingAutoConvert: (...args: unknown[]) => mockRemovePendingAutoConvert(...args),
   waitForPaymentCompleted: (...args: unknown[]) => mockWaitForPaymentCompleted(...args),
 }))
@@ -45,6 +49,7 @@ const AutoConvertStatus = {
   AlreadyConverted: "already-converted",
   SkippedBelowMin: "skipped-below-min",
   SkippedStableBalanceActive: "skipped-stable-balance-active",
+  Deferred: "deferred",
   Failed: "failed",
 } as const
 
@@ -161,6 +166,7 @@ const setupDefaults = (sdk: ListenerSdk) => {
   mockFindPendingAutoConvert.mockResolvedValue(undefined)
   mockFindRecentConversionId.mockResolvedValue(undefined)
   mockRecordAutoConvertAttempt.mockResolvedValue(undefined)
+  mockReleaseAutoConvertAttempt.mockResolvedValue(undefined)
   mockRemovePendingAutoConvert.mockResolvedValue(undefined)
   mockWaitForPaymentCompleted.mockResolvedValue(true)
   mockExecuteAutoConvert.mockResolvedValue({ status: AutoConvertStatus.Converted })
@@ -1160,6 +1166,97 @@ describe("useAutoConvertListener — receives of one amount converting at once",
       expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbcNext"),
     )
     expect(mockRemovePendingAutoConvert).not.toHaveBeenCalledWith("lnbcFailing")
+  })
+})
+
+describe("useAutoConvertListener — waiting behind an earlier conversion", () => {
+  let movedClock: jest.SpyInstance | undefined
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  afterEach(() => {
+    movedClock?.mockRestore()
+    movedClock = undefined
+  })
+
+  it("takes back the attempt of a try that only waited, keeping the record", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbc1dollar", 5000n) }),
+    })
+    setupDefaults(sdk)
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1dollar",
+      isStableBalanceActive: false,
+      refreshWallets: mockRefreshWallets,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(
+      makeRecord({ paymentRequest: "lnbc1dollar" }),
+    )
+    mockExecuteAutoConvert.mockResolvedValue({ status: AutoConvertStatus.Deferred })
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() =>
+      expect(mockReleaseAutoConvertAttempt).toHaveBeenCalledWith("lnbc1dollar"),
+    )
+    expect(mockRemovePendingAutoConvert).not.toHaveBeenCalled()
+    expect(mockRefreshWallets).not.toHaveBeenCalled()
+  })
+
+  /** A lost conversion's window starts anew on every launch: launches that each retry
+   *  within it must not use the receive's attempts up and drop it unconverted. */
+  it("keeps a receive through launches that each wait behind the earlier conversion, converting it once one can", async () => {
+    const record: { attempts: number; lastAttemptAtMs: number | undefined } = makeRecord({
+      paymentRequest: "lnbc1pending",
+    })
+    const waitingLaunches = baseRemoteConfig.autoConvertMaxAttempts + 2
+    let nowMs = 2_000_000
+    movedClock = jest.spyOn(Date, "now").mockImplementation(() => nowMs)
+
+    for (let launch = 1; launch <= waitingLaunches + 1; launch += 1) {
+      const sdk = makeSdk({
+        listPayments: jest
+          .fn()
+          .mockResolvedValue({ payments: [makeLightningPayment("lnbc1pending")] }),
+      })
+      setupDefaults(sdk)
+      mockFindPendingAutoConvert.mockImplementation(async () => ({ ...record }))
+      mockListPendingAutoConverts.mockImplementation(async () => [{ ...record }])
+      mockRecordAutoConvertAttempt.mockImplementation(async (_: string, atMs: number) => {
+        record.attempts += 1
+        record.lastAttemptAtMs = atMs
+      })
+      mockReleaseAutoConvertAttempt.mockImplementation(async () => {
+        record.attempts = Math.max(0, record.attempts - 1)
+      })
+      const isLastLaunch = launch > waitingLaunches
+      mockExecuteAutoConvert.mockResolvedValue({
+        status: isLastLaunch ? AutoConvertStatus.Converted : AutoConvertStatus.Deferred,
+      })
+      const { unmount } = renderHook(() => useAutoConvertListener())
+      await waitFor(() => expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(launch))
+      await waitFor(() =>
+        expect(
+          isLastLaunch ? mockRemovePendingAutoConvert : mockReleaseAutoConvertAttempt,
+        ).toHaveBeenCalled(),
+      )
+      unmount()
+      if (!isLastLaunch) {
+        expect(mockRemovePendingAutoConvert).not.toHaveBeenCalled()
+        mockReleaseAutoConvertAttempt.mockClear()
+      }
+      /** Each launch comes after the cooldown, and within the earlier conversion's window
+       *  as that launch counts it. */
+      nowMs += 60_000
+    }
+
+    expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1pending")
+    expect(record.attempts).toBe(1)
   })
 })
 

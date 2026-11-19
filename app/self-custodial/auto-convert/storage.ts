@@ -117,6 +117,20 @@ export const recordAutoConvertAttempt = (
     await writeAll(records)
   })
 
+/** Takes back the attempt stamped for a try that sent nothing, so a wait spends none of
+ *  the receive's attempts. When it was stamped stays, for the cooldown before the next. */
+export const releaseAutoConvertAttempt = (paymentRequest: string): Promise<void> =>
+  withWriteLock(async () => {
+    const records = await readAll()
+    const index = records.findIndex((r) => r.paymentRequest === paymentRequest)
+    if (index === -1) return
+    records[index] = {
+      ...records[index],
+      attempts: Math.max(0, records[index].attempts - 1),
+    }
+    await writeAll(records)
+  })
+
 export const pruneExpiredAutoConverts = (nowMs: number): Promise<void> =>
   withWriteLock(async () => {
     const records = await readAll()

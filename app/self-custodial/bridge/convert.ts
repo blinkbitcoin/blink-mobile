@@ -620,7 +620,7 @@ const convertAfterEarlierConversions = async (
     }
     /** Not found so soon after it went out, it may still deliver. */
     if (isWithinWindow) {
-      return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
+      return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.EarlierConversionPending)
     }
   }
   /** What was decided before the turn came is asked again now, when no other conversion

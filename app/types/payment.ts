@@ -191,6 +191,9 @@ export const ConvertErrorCode = {
   /** A conversion threw after it was dispatched and its payment could not be found, so
    *  it may have gone through: no further conversion is sent until the user has checked. */
   OutcomeUnknown: "outcome_unknown",
+  /** Nothing was converted: an earlier conversion that may have been lost can still
+   *  deliver, so none goes out until it turns up or the time it could take has passed. */
+  EarlierConversionPending: "earlier_conversion_pending",
   /** Nothing was converted: what the wallet's history or its earlier conversions hold
    *  could not be read, and a conversion that went out without it could not be told
    *  apart from what came before. */

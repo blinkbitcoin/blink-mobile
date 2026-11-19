@@ -558,6 +558,27 @@ describe("useSelfCustodialConversion", () => {
       expect(result.current.errorMessage).toBe("Check your history")
     })
 
+    /** Nothing went out, but the earlier transfer may still go through: the user checks
+     *  their history before trying again, as for one whose outcome is unknown. */
+    it("tells the user to check their history while an earlier transfer may still go through", async () => {
+      mockGetQuote.mockResolvedValue(
+        makeQuote({
+          execute: jest.fn().mockResolvedValue({
+            status: PaymentResultStatus.Failed,
+            errors: [{ message: "raw", code: ConvertErrorCode.EarlierConversionPending }],
+          }),
+        }),
+      )
+
+      const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+      await waitFor(() => expect(result.current.canExecute).toBe(true))
+      await act(async () => {
+        await result.current.execute()
+      })
+
+      expect(result.current.errorMessage).toBe("Check your history")
+    })
+
     it("points the user at an earlier transfer that turned out to have gone through", async () => {
       mockGetQuote.mockResolvedValue(
         makeQuote({
