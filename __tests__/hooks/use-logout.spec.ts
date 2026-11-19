@@ -323,6 +323,10 @@ describe("useLogout", () => {
 
       expect(mockedStore.removeSessionProfiles).toHaveBeenCalledTimes(1)
       expect(mockAsyncStorage.multiRemove).toHaveBeenCalledTimes(1)
+      expect(mockAsyncStorage.multiRemove).toHaveBeenCalledWith([
+        "schema_version_key",
+        "apollo_cache_owner_key",
+      ])
       expect(mockClearToken).toHaveBeenCalledTimes(1)
       expect(mockResetState).toHaveBeenCalledTimes(1)
     })
