@@ -170,6 +170,17 @@ const writePairings = async (pairings: AutoConvertPairing[]): Promise<void> => {
   }
 }
 
+/** Writes the pairings, reporting and throwing a failure: a pairing not stored is no
+ *  claim, so its caller has to know, and keeps the receive. */
+const writePairingsOrThrow = async (pairings: AutoConvertPairing[]): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(PAIRINGS_STORAGE_KEY, JSON.stringify(pairings))
+  } catch (err) {
+    reportError("auto-convert-storage writePairings", err)
+    throw err
+  }
+}
+
 export const listAutoConvertPairings = (): Promise<AutoConvertPairing[]> => readPairings()
 
 export const markAutoConvertPairing = (pairing: AutoConvertPairing): Promise<void> =>
@@ -181,7 +192,7 @@ export const markAutoConvertPairing = (pairing: AutoConvertPairing): Promise<voi
         p.conversionPaymentId !== pairing.conversionPaymentId,
     )
     deduplicated.push(pairing)
-    await writePairings(deduplicated)
+    await writePairingsOrThrow(deduplicated)
   })
 
 export const pruneExpiredAutoConvertPairings = (nowMs: number): Promise<void> =>

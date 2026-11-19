@@ -191,6 +191,8 @@ const runAutoConvert = async ({
           }))
         if (conversionId) {
           addBounded(claimedWhileRunning, conversionId, MAX_CLAIMED_WHILE_RUNNING)
+          /** Unstored, it throws, and the receive is kept rather than removed as paired:
+           *  its next try finds its own conversion. */
           await markAutoConvertPairing({
             receivePaymentId: paymentId,
             conversionPaymentId: conversionId,
