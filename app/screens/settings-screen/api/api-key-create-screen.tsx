@@ -38,7 +38,9 @@ export const ApiKeyCreateScreen: React.FC = () => {
   const [secret, setSecret] = React.useState<string | null>(null)
   const [hasError, setHasError] = React.useState(false)
 
+  // The key secret must never reach the cache, which is persisted to AsyncStorage.
   const [apiKeyCreate, { loading }] = useApiKeyCreateMutation({
+    fetchPolicy: "no-cache",
     refetchQueries: [{ query: ApiKeysDocument }],
   })
 
