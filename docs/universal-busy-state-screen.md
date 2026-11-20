@@ -72,6 +72,7 @@ Glyphs are sized `CHIP_GLYPH_SIZE` (32) and coloured by the caller, e.g.
 | Chip-row top padding | 10 (Figma `menu item` frame)                                |
 | Screen padding       | 20 horizontal, 20 bottom                                    |
 | Error button group   | pinned bottom; 10 top, 20 sides/bottom, 10 between buttons  |
+| Overflow             | copy scrolls; the error reserves the button group's height  |
 
 Every one of these is a constant in `app/components/busy-state/config.ts`.
 
@@ -297,6 +298,9 @@ Rules:
   `{ text: body }` when there is a body.
 - Error: the text block is `accessibilityRole="alert"` and the title + body are
   announced on mount.
+- Test IDs are bare `testID`s, never `testProps`: that also sets the ID as the
+  accessibility label, which would replace the buttons' localized titles and the
+  copy the alert block reads out.
 - `useReducedMotion()` ⇒ the resting state renders immediately, nothing moves,
   dashes included.
 

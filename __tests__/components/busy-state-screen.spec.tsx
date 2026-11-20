@@ -1,6 +1,6 @@
 import React from "react"
-import { AccessibilityInfo, BackHandler, Text as RNText } from "react-native"
-import { act, fireEvent, render } from "@testing-library/react-native"
+import { AccessibilityInfo, BackHandler, Text as RNText, StyleSheet } from "react-native"
+import { act, fireEvent, render, screen, within } from "@testing-library/react-native"
 
 import { ThemeProvider } from "@rn-vui/themed"
 
@@ -107,6 +107,23 @@ describe("BusyStateScreen", () => {
 
     expect(getByText(TITLE)).toBeTruthy()
     expect(queryByTestId("busy-state-body")).toBeNull()
+  })
+
+  it("labels the busy copy by its title, with no test ID as a label", () => {
+    render(screenFor({ completion: { kind: "timed" }, onDone: jest.fn() }))
+
+    expect(screen.getByRole("progressbar", { name: TITLE })).toBeTruthy()
+    expect(screen.queryAllByLabelText(/busy-state/)).toHaveLength(0)
+  })
+
+  it("scrolls the busy copy rather than running off the screen", () => {
+    render(screenFor({ completion: { kind: "timed" }, onDone: jest.fn() }))
+
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("busy-state-scroll").props.contentContainerStyle,
+      ),
+    ).toMatchObject({ flexGrow: 1, paddingTop: 0, paddingBottom: 20 })
   })
 
   it("holds a timed completion for the full signal duration", () => {
@@ -243,6 +260,75 @@ describe("BusyStateScreen", () => {
       expect(onRetry).toHaveBeenCalledTimes(1)
       expect(onBack).toHaveBeenCalledTimes(1)
       expect(onClose).toHaveBeenCalledTimes(1)
+    })
+
+    it("names each button by its localized title, not its test ID", () => {
+      render(
+        failing({
+          title: "Failed",
+          onRetry: jest.fn(),
+          onBack: jest.fn(),
+          onClose: jest.fn(),
+        }),
+      )
+
+      // The label itself, not `getByRole`'s `name`: that also matches on the
+      // text inside, so it passes even when the test ID overrides the label.
+      const labels = screen
+        .getAllByRole("button")
+        .map((button) => [button.props.testID, button.props.accessibilityLabel])
+
+      expect(labels).toEqual([
+        ["busy-state-retry", LL.common.tryAgain()],
+        ["busy-state-back", LL.common.back()],
+        ["busy-state-close", LL.common.close()],
+      ])
+    })
+
+    it("reads the alert from its copy, with no test ID as a label", () => {
+      render(failing({ title: "Failed", body: "No connection", onBack: jest.fn() }))
+
+      const alert = screen.getByRole("alert")
+      expect(alert.props.accessibilityLabel).toBeUndefined()
+      expect(within(alert).getByText("Failed")).toBeTruthy()
+      expect(within(alert).getByText("No connection")).toBeTruthy()
+      expect(screen.queryAllByLabelText(/busy-state/)).toHaveLength(0)
+    })
+
+    it("scrolls long copy clear of all three buttons", () => {
+      const BUTTONS_HEIGHT = 190
+      const longBody = "No connection. ".repeat(80)
+      render(
+        failing({
+          title: "Failed",
+          body: longBody,
+          onRetry: jest.fn(),
+          onBack: jest.fn(),
+          onClose: jest.fn(),
+        }),
+      )
+
+      const contentInset = () =>
+        StyleSheet.flatten(
+          screen.getByTestId("busy-state-error-scroll").props.contentContainerStyle,
+        )
+
+      // Nothing to reserve before the button bar has been laid out.
+      expect(contentInset()).toMatchObject({ paddingTop: 0, paddingBottom: 20 })
+
+      fireEvent(screen.getByTestId("busy-state-actions"), "layout", {
+        nativeEvent: { layout: { x: 0, y: 0, width: 360, height: BUTTONS_HEIGHT } },
+      })
+
+      // The same inset at the top keeps fitting copy centred where the busy
+      // state put it; at the bottom it keeps the last line above the buttons.
+      expect(contentInset()).toMatchObject({
+        flexGrow: 1,
+        justifyContent: "center",
+        paddingTop: BUTTONS_HEIGHT,
+        paddingBottom: 20 + BUTTONS_HEIGHT,
+      })
+      expect(screen.getByText(longBody)).toBeTruthy()
     })
 
     it("holds onDone back while the error shows", () => {

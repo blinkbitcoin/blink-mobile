@@ -1,5 +1,5 @@
-import React, { useEffect } from "react"
-import { AccessibilityInfo, View } from "react-native"
+import React, { useEffect, useState } from "react"
+import { AccessibilityInfo, LayoutChangeEvent, View } from "react-native"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -7,7 +7,6 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { testProps } from "@app/utils/testProps"
 
 import { BusyStateBody } from "./busy-state-body"
 import { BusyStateChip } from "./busy-state-chip"
@@ -56,7 +55,11 @@ type ErrorAction = {
  * Buttons stack in a fixed order — Try Again, Back, Close — and the first one
  * present is the primary button; the rest are secondary. The button group is
  * pinned to the bottom over the body, as in Figma, so the title does not move
- * when a busy state turns into this one.
+ * when a busy state turns into this one. The body reserves the group's measured
+ * height, so long copy or a large font scrolls clear of it instead of under it.
+ *
+ * The buttons take a bare `testID`: `testProps` would also set the machine ID as
+ * the accessibility label, over the localized title the buttons derive.
  */
 export const BusyStateErrorView: React.FC<{ error: BusyStateError }> = ({ error }) => {
   const styles = useStyles()
@@ -64,6 +67,7 @@ export const BusyStateErrorView: React.FC<{ error: BusyStateError }> = ({ error 
   const {
     theme: { colors },
   } = useTheme()
+  const [buttonsHeight, setButtonsHeight] = useState(0)
 
   const { title, body, onRetry, onBack, onClose } = error
 
@@ -91,10 +95,17 @@ export const BusyStateErrorView: React.FC<{ error: BusyStateError }> = ({ error 
         body={body}
         testIdPrefix="busy-state-error"
         textAccessibility={{ accessible: true, accessibilityRole: "alert" }}
+        overlayInset={buttonsHeight}
       />
 
       {actions.length > 0 && (
-        <View style={styles.buttons}>
+        <View
+          style={styles.buttons}
+          onLayout={(event: LayoutChangeEvent) =>
+            setButtonsHeight(event.nativeEvent.layout.height)
+          }
+          testID="busy-state-actions"
+        >
           {actions.map(({ key, title: label, onPress }, index) =>
             index === 0 ? (
               <GaloyPrimaryButton
@@ -102,7 +113,7 @@ export const BusyStateErrorView: React.FC<{ error: BusyStateError }> = ({ error 
                 title={label}
                 onPress={onPress}
                 containerStyle={styles.button}
-                {...testProps(`busy-state-${key}`)}
+                testID={`busy-state-${key}`}
               />
             ) : (
               <GaloySecondaryButton
@@ -110,7 +121,7 @@ export const BusyStateErrorView: React.FC<{ error: BusyStateError }> = ({ error 
                 title={label}
                 onPress={onPress}
                 containerStyle={styles.button}
-                {...testProps(`busy-state-${key}`)}
+                testID={`busy-state-${key}`}
               />
             ),
           )}
