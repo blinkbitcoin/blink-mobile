@@ -63,6 +63,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
       },
       SelfCustodialError: {
         outcomeUnknown: () => "Check your history",
+        earlierConversionPending: () => "Still being confirmed",
         earlierConversionFound: () => "Your earlier transfer went through",
         convertedMeanwhile: () => "A transfer of about this amount went through",
       },
@@ -558,9 +559,9 @@ describe("useSelfCustodialConversion", () => {
       expect(result.current.errorMessage).toBe("Check your history")
     })
 
-    /** Nothing went out, but the earlier transfer may still go through: the user checks
-     *  their history before trying again, as for one whose outcome is unknown. */
-    it("tells the user to check their history while an earlier transfer may still go through", async () => {
+    /** Nothing went out, and the earlier transfer may still go through: nothing in the
+     *  history unblocks it, only time does, so the user is told to wait. */
+    it("tells the user to try again in a few minutes while an earlier transfer may still go through", async () => {
       mockGetQuote.mockResolvedValue(
         makeQuote({
           execute: jest.fn().mockResolvedValue({
@@ -576,7 +577,7 @@ describe("useSelfCustodialConversion", () => {
         await result.current.execute()
       })
 
-      expect(result.current.errorMessage).toBe("Check your history")
+      expect(result.current.errorMessage).toBe("Still being confirmed")
     })
 
     it("points the user at an earlier transfer that turned out to have gone through", async () => {

@@ -4278,6 +4278,7 @@
     "invalidInput": "Die betaalbesonderhede lyk ongeldig. Kyk asseblief en probeer weer.",
     "generic": "Die betaling kon nie voltooi word nie. Probeer oor 'n oomblik weer, of gebruik 'n kleiner bedrag.",
     "outcomeUnknown": "Hierdie betaling is dalk reeds deur. Gaan jou transaksiegeskiedenis na voordat jy dit weer stuur.",
+    "earlierConversionPending": "Jou vorige omskakeling word nog bevestig. Probeer oor 'n paar minute weer.",
     "earlierPaymentFound": "Jou vorige betaling aan hierdie bestemming is reeds deur, vir 'n ander bedrag. Gaan dit na voordat jy weer stuur.",
     "earlierConversionFound": "Jou vorige omskakeling is reeds deur, vir 'n ander bedrag. Gaan dit in jou transaksiegeskiedenis na voordat jy weer omskakel.",
     "convertedMeanwhile": "'n Omskakeling van ongeveer hierdie bedrag het pas deurgegaan. Gaan jou saldo na voordat jy hierdie een weer bevestig."

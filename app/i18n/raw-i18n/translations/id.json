@@ -4278,6 +4278,7 @@
     "invalidInput": "Detail pembayaran tampak tidak valid. Harap periksa dan coba lagi.",
     "generic": "Pembayaran tidak dapat diselesaikan. Coba lagi sebentar, atau gunakan jumlah yang lebih kecil.",
     "outcomeUnknown": "Pembayaran ini mungkin sudah berhasil. Periksa riwayat transaksi Anda sebelum mengirimnya lagi.",
+    "earlierConversionPending": "Konversi Anda sebelumnya masih dikonfirmasi. Coba lagi dalam beberapa menit.",
     "earlierPaymentFound": "Pembayaran Anda sebelumnya ke tujuan ini sudah berhasil, dengan jumlah yang berbeda. Periksa sebelum mengirim lagi.",
     "earlierConversionFound": "Konversi Anda sebelumnya sudah berhasil, dengan jumlah yang berbeda. Periksa di riwayat transaksi Anda sebelum mengonversi lagi.",
     "convertedMeanwhile": "Konversi dengan jumlah yang hampir sama baru saja berhasil. Periksa saldo Anda sebelum mengonfirmasi konversi ini lagi."

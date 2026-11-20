@@ -4278,6 +4278,7 @@
     "invalidInput": "A fizetés adatai érvénytelennek tűnnek. Kérjük, ellenőrizd, és próbáld újra.",
     "generic": "A fizetés nem sikerült. Próbáld újra egy pillanat múlva, vagy használj kisebb összeget.",
     "outcomeUnknown": "Lehet, hogy ez a fizetés már teljesült. Mielőtt újra elküldenéd, nézd meg a tranzakcióid előzményeit.",
+    "earlierConversionPending": "A korábbi átváltásod megerősítése még folyamatban van. Próbáld újra néhány perc múlva.",
     "earlierPaymentFound": "A korábbi fizetésed erre a címre már teljesült, de más összeggel. Nézd meg, mielőtt újra küldenél.",
     "earlierConversionFound": "A korábbi átváltásod már teljesült, de más összeggel. Nézd meg a tranzakciós előzményeidben, mielőtt újra váltanál.",
     "convertedMeanwhile": "Épp most teljesült egy nagyjából ekkora összegű átváltás. Nézd meg az egyenlegedet, mielőtt újra megerősítenéd ezt."

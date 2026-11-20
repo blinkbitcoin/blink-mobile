@@ -4278,6 +4278,7 @@
         "invalidInput": "Les détails du paiement semblent invalides. Veuillez les vérifier et réessayer.",
         "generic": "Le paiement n'a pas pu être finalisé. Réessayez dans un instant, ou utilisez un montant plus petit.",
         "outcomeUnknown": "Ce paiement a peut-être déjà été effectué. Vérifiez votre historique de transactions avant de le renvoyer.",
+        "earlierConversionPending": "Votre conversion précédente est encore en cours de confirmation. Réessayez dans quelques minutes.",
         "earlierPaymentFound": "Votre paiement précédent vers cette destination a déjà été effectué, pour un montant différent. Vérifiez-le avant de renvoyer.",
         "earlierConversionFound": "Votre conversion précédente a déjà été effectuée, pour un montant différent. Vérifiez-la dans votre historique de transactions avant de convertir à nouveau.",
         "convertedMeanwhile": "Une conversion d'un montant proche vient d'être effectuée. Vérifiez votre solde avant de confirmer à nouveau celle-ci."

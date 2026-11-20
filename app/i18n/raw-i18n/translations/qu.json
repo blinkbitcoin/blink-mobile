@@ -4278,6 +4278,7 @@
     "invalidInput": "Quy yachayninkuna mana allinmi kashan. Ama hina kaspa qhawariy hinaspa kaqmanta rurariy.",
     "generic": "Quy mana tukukuyta atinmi. Pisi kutilla suyay hinaspa kaqmanta rurariy, utaq aswan huch'uy qullqitaqa rurariy.",
     "outcomeUnknown": "Kay qullqi kutichiyqa ñachá rirqanña. Manaraq kaqmanta kachaspa, transaccionniykikunap willakuyninta qhaway.",
+    "earlierConversionPending": "Ñawpaq tukuyniykiqa manaraqmi takyachisqachu. Huk iskay minutomanta kaqmanta ruraykuy.",
     "earlierPaymentFound": "Ñawpaq qullqi kachasqaykiqa kay maymanqa ñam rirqanña, huk chaninwan. Manaraq kaqmanta kachaspa qhaway.",
     "earlierConversionFound": "Ñawpaq tukuyniykiqa ñam rirqanña, huk chaninwan. Manaraq kaqmanta tukuspa, rurasqaykikunapi qhaway.",
     "convertedMeanwhile": "Kay chaninman rikchakuq tukuyqa kunallanmi rirqan. Kaykunata kaqmanta manaraq takyachispa, qullqiykita qhaway."

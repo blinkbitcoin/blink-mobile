@@ -4278,6 +4278,7 @@
     "invalidInput": "Detaily platby vypadají neplatně. Zkontrolujte je a zkuste to znovu.",
     "generic": "Platbu nebylo možné dokončit. Zkuste to za chvíli znovu nebo použijte menší částku.",
     "outcomeUnknown": "Tato platba už možná proběhla. Než ji odešlete znovu, zkontrolujte historii transakcí.",
+    "earlierConversionPending": "Váš předchozí převod se stále potvrzuje. Zkuste to znovu za několik minut.",
     "earlierPaymentFound": "Vaše předchozí platba na tento cíl už proběhla, ale na jinou částku. Než odešlete znovu, zkontrolujte ji.",
     "earlierConversionFound": "Váš předchozí převod už proběhl, ale na jinou částku. Než provedete převod znovu, zkontrolujte ho v historii transakcí.",
     "convertedMeanwhile": "Právě proběhl převod na podobnou částku. Než tento převod znovu potvrdíte, zkontrolujte svůj zůstatek."

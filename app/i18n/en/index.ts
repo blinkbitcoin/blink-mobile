@@ -4473,6 +4473,8 @@ const en: BaseTranslation = {
       "The payment could not be completed. Try again in a moment, or use a smaller amount.",
     outcomeUnknown:
       "This payment may already have gone through. Check your transaction history before sending it again.",
+    earlierConversionPending:
+      "Your earlier transfer is still being confirmed. Try again in a few minutes.",
     earlierPaymentFound:
       "Your earlier payment to this destination already went through, for a different amount. Check it before sending again.",
     earlierConversionFound:

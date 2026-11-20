@@ -4278,6 +4278,7 @@
     "invalidInput": "Els detalls del pagament semblen invàlids. Si us plau, revisa'ls i torna-ho a provar.",
     "generic": "No s'ha pogut completar el pagament. Torna-ho a provar en un moment, o utilitza un import més petit.",
     "outcomeUnknown": "És possible que aquest pagament ja s'hagi fet. Comprova el teu historial de transaccions abans de tornar-lo a enviar.",
+    "earlierConversionPending": "La teva conversió anterior encara s'està confirmant. Torna-ho a provar d'aquí a uns minuts.",
     "earlierPaymentFound": "El teu pagament anterior a aquesta destinació ja s'ha fet, per un import diferent. Comprova'l abans de tornar a enviar.",
     "earlierConversionFound": "La teva conversió anterior ja s'ha fet, per un import diferent. Comprova-la al teu historial de transaccions abans de tornar a convertir.",
     "convertedMeanwhile": "Acaba de fer-se una conversió d'un import semblant a aquest. Comprova el teu saldo abans de tornar a confirmar aquesta."

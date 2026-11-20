@@ -4278,6 +4278,7 @@
         "invalidInput": "Die Zahlungsdetails scheinen ungültig zu sein. Bitte überprüfen und erneut versuchen.",
         "generic": "Die Zahlung konnte nicht abgeschlossen werden. Versuche es in einem Moment erneut oder verwende einen kleineren Betrag.",
         "outcomeUnknown": "Diese Zahlung wurde möglicherweise bereits ausgeführt. Prüfe deinen Transaktionsverlauf, bevor du sie erneut sendest.",
+        "earlierConversionPending": "Dein früherer Umtausch wird noch bestätigt. Versuche es in ein paar Minuten erneut.",
         "earlierPaymentFound": "Deine frühere Zahlung an dieses Ziel wurde bereits ausgeführt, mit einem anderen Betrag. Prüfe sie, bevor du erneut sendest.",
         "earlierConversionFound": "Dein früherer Umtausch wurde bereits ausgeführt, mit einem anderen Betrag. Prüfe ihn in deinem Transaktionsverlauf, bevor du erneut umtauschst.",
         "convertedMeanwhile": "Ein Umtausch über ungefähr diesen Betrag wurde gerade ausgeführt. Prüfe dein Guthaben, bevor du diesen erneut bestätigst."

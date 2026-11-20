@@ -14121,6 +14121,10 @@ type RootTranslation = {
 		 */
 		outcomeUnknown: string
 		/**
+		 * Y​o​u​r​ ​e​a​r​l​i​e​r​ ​t​r​a​n​s​f​e​r​ ​i​s​ ​s​t​i​l​l​ ​b​e​i​n​g​ ​c​o​n​f​i​r​m​e​d​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​f​e​w​ ​m​i​n​u​t​e​s​.
+		 */
+		earlierConversionPending: string
+		/**
 		 * Y​o​u​r​ ​e​a​r​l​i​e​r​ ​p​a​y​m​e​n​t​ ​t​o​ ​t​h​i​s​ ​d​e​s​t​i​n​a​t​i​o​n​ ​a​l​r​e​a​d​y​ ​w​e​n​t​ ​t​h​r​o​u​g​h​,​ ​f​o​r​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​a​m​o​u​n​t​.​ ​C​h​e​c​k​ ​i​t​ ​b​e​f​o​r​e​ ​s​e​n​d​i​n​g​ ​a​g​a​i​n​.
 		 */
 		earlierPaymentFound: string
@@ -28378,6 +28382,10 @@ export type TranslationFunctions = {
 		 * This payment may already have gone through. Check your transaction history before sending it again.
 		 */
 		outcomeUnknown: () => LocalizedString
+		/**
+		 * Your earlier transfer is still being confirmed. Try again in a few minutes.
+		 */
+		earlierConversionPending: () => LocalizedString
 		/**
 		 * Your earlier payment to this destination already went through, for a different amount. Check it before sending again.
 		 */
