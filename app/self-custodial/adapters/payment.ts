@@ -56,6 +56,11 @@ const adapterIdempotencyKey = (paymentHash: string | undefined): Promise<string>
     ? Promise.resolve(uuidv5(paymentHash, INVOICE_KEY_NAMESPACE))
     : generateSecureRandomUUID()
 
+/**
+ * The send `usePayments` hands out. No screen sends through it yet: the send flow pays
+ * through the payment details, which keep one key across a send's retries. It keys its
+ * sends as above all the same, so the first caller to use it cannot pay an invoice twice.
+ */
 export const createSendPayment = (sdk: BreezSdkInterface): SendPaymentAdapter => {
   return async ({ destination, amount }) => {
     try {
