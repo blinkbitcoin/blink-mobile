@@ -1,6 +1,7 @@
 import { renderHook, act } from "@testing-library/react-hooks"
 
 import { cancelPendingClipboardClear, useClipboard } from "@app/hooks/use-clipboard"
+import { haptics } from "@app/utils/haptics"
 
 const mockSetString = jest.fn()
 const mockGetString = jest.fn(() => Promise.resolve(""))
@@ -17,6 +18,8 @@ const flushMicrotasks = async () =>
     await Promise.resolve()
     await Promise.resolve()
   })
+
+jest.mock("@app/utils/haptics", () => ({ haptics: { select: jest.fn() } }))
 
 jest.mock("@app/utils/toast", () => ({
   toastShow: (params: { type: string; message: string }) => mockToastShow(params),
@@ -45,6 +48,37 @@ describe("useClipboard", () => {
   })
 
   describe("copyToClipboard", () => {
+    it("fires the select haptic once per copy, with the toast", () => {
+      const order: string[] = []
+      mockSetString.mockImplementationOnce(() => order.push("copy"))
+      jest.mocked(haptics.select).mockImplementationOnce(() => order.push("haptic"))
+      mockToastShow.mockImplementationOnce(() => order.push("toast"))
+      const { result } = renderHook(() => useClipboard())
+
+      act(() => {
+        result.current.copyToClipboard({ content: "test content" })
+      })
+
+      expect(haptics.select).toHaveBeenCalledTimes(1)
+      expect(order).toEqual(["copy", "haptic", "toast"])
+    })
+
+    it("doesn't fire the haptic again when the clipboard auto-clears", async () => {
+      mockGetString.mockResolvedValueOnce("secret")
+      const { result } = renderHook(() => useClipboard(1000))
+
+      act(() => {
+        result.current.copyToClipboard({ content: "secret" })
+      })
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+      await flushMicrotasks()
+
+      expect(mockSetString).toHaveBeenLastCalledWith("")
+      expect(haptics.select).toHaveBeenCalledTimes(1)
+    })
+
     it("copies content to clipboard", () => {
       const { result } = renderHook(() => useClipboard())
 
