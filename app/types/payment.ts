@@ -203,9 +203,6 @@ export const ConvertErrorCode = {
   /** Nothing was converted: an earlier conversion that may have been lost turned out to
    *  have gone through, for another amount or the other way, and is the user's to check. */
   EarlierConversionFound: "earlier_conversion_found",
-  /** Nothing was converted: a transfer of the user's that may have been lost turned up,
-   *  and is left for them to be told of; auto-convert waits until they have been. */
-  UsersEarlierTransferFound: "users_earlier_transfer_found",
   /** Nothing was delivered: the SDK answered that the conversion failed, which settles
    *  it, so it can be tried again. */
   ConversionFailed: "conversion_failed",

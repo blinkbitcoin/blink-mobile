@@ -297,11 +297,5 @@ export const executeAutoConvert = async (
   if (isEarlierSettledNow) {
     return { status: AutoConvertStatus.Deferred, retryAfterMs: 0 }
   }
-  /** Waits for the user to be told of their own transfer: trying again before then finds
-   *  it again, so only a later trigger tries. */
-  const isWaitingForUser = errorCode === ConvertErrorCode.UsersEarlierTransferFound
-  if (isWaitingForUser) {
-    return { status: AutoConvertStatus.Deferred }
-  }
   return { status: AutoConvertStatus.Failed }
 }

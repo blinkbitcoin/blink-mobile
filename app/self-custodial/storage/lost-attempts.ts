@@ -3,7 +3,10 @@ import type { Network } from "@breeztech/breez-sdk-spark-react-native"
 import { reportError } from "@app/utils/error-logging"
 import { loadJsonOrThrow, removeOrThrow, saveJson } from "@app/utils/storage"
 
+import { ConvertDirection } from "@app/types/payment"
+
 import type {
+  FoundUserTransfer,
   LostAttempts,
   LostConversion,
   LostSend,
@@ -93,8 +96,34 @@ const isUnresolvedSend = (value: unknown): value is UnresolvedSend => {
   return hasValidKey && hasValidRequest && isOptional(value.recordedAtMs, "number")
 }
 
+const CONVERT_DIRECTIONS: ReadonlyArray<unknown> = Object.values(ConvertDirection)
+
+const isOptionalDirection = (value: unknown): boolean =>
+  value === undefined || CONVERT_DIRECTIONS.includes(value)
+
+const isFoundUserTransfer = (value: unknown): value is FoundUserTransfer =>
+  isRecord(value) &&
+  typeof value.paymentId === "string" &&
+  isOptionalDirection(value.direction) &&
+  typeof value.amount === "number" &&
+  isOptional(value.paidIn, "number") &&
+  typeof value.foundAtMs === "number"
+
 const isFresh = (recordedAtMs: number | undefined, nowMs: number): boolean =>
   recordedAtMs !== undefined && nowMs - recordedAtMs < LOST_ATTEMPTS_TTL_MS
+
+/** The user's found transfers still to be told of: each that reads as one and is not past
+ *  its time, as long as the user has had to see it in their history. */
+const freshFoundTransfersOf = (
+  value: unknown,
+  nowMs: number,
+): ReadonlyArray<FoundUserTransfer> => {
+  if (!Array.isArray(value)) return []
+  return value.filter(
+    (found): found is FoundUserTransfer =>
+      isFoundUserTransfer(found) && isFresh(found.foundAtMs, nowMs),
+  )
+}
 
 /**
  * What a stored destination still holds: each attempt that reads as one and is not past
@@ -109,16 +138,25 @@ const freshAttemptsOf = (value: unknown, nowMs: number): LostAttempts => {
     isUnresolvedSend(unresolvedSend) && isFresh(unresolvedSend.recordedAtMs, nowMs)
   const isConversionKept =
     isLostConversion(lostConversion) && isFresh(lastAttemptOf(lostConversion), nowMs)
+  const foundUserTransfers = freshFoundTransfersOf(value.foundUserTransfers, nowMs)
+  const hasFoundTransfers = foundUserTransfers.length > 0
   return {
     ...(isLostSendKept ? { lostSend } : {}),
     ...(isUnresolvedKept ? { unresolvedSend } : {}),
     ...(isConversionKept ? { lostConversion } : {}),
+    ...(hasFoundTransfers ? { foundUserTransfers } : {}),
   }
 }
 
-/** Whether a destination still holds anything lost: one that holds nothing is not kept. */
+/** Whether a destination still holds anything lost, or found to tell of: one that holds
+ *  nothing is not kept. */
 export const holdsAnAttempt = (attempts: LostAttempts): boolean =>
-  Boolean(attempts.lostSend || attempts.unresolvedSend || attempts.lostConversion)
+  Boolean(
+    attempts.lostSend ||
+      attempts.unresolvedSend ||
+      attempts.lostConversion ||
+      attempts.foundUserTransfers?.length,
+  )
 
 /**
  * The lost attempts a wallet left when the app last ran, by destination. Empty when there

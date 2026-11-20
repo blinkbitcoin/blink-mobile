@@ -1,4 +1,6 @@
+import { ConvertDirection } from "@app/types/payment"
 import {
+  holdsAnAttempt,
   LOST_ATTEMPTS_TTL_MS,
   loadLostAttempts,
   lostAttemptsWalletId,
@@ -411,6 +413,82 @@ describe("loadLostAttempts", () => {
     })
 
     expect(await loadLostAttempts(WALLET, NOW)).toEqual(new Map())
+  })
+
+  /** A lost transfer of the user's auto-convert found delivered, still to be told of. */
+  const foundUserTransfer = (foundAtMs = NOW - 1000) => ({
+    paymentId: "rcv-usdb",
+    direction: ConvertDirection.BtcToUsd,
+    amount: 2_466_000,
+    paidIn: 9000,
+    foundAtMs,
+  })
+
+  it("reads back the user's transfers auto-convert found, for their next transfer to be told of", async () => {
+    const withoutWay = { paymentId: "rcv-usdb-2", amount: 1_370_000, foundAtMs: NOW }
+    stored({
+      "<own conversions>": { foundUserTransfers: [foundUserTransfer(), withoutWay] },
+    })
+
+    expect(await loadLostAttempts(WALLET, NOW)).toEqual(
+      new Map([
+        ["<own conversions>", { foundUserTransfers: [foundUserTransfer(), withoutWay] }],
+      ]),
+    )
+  })
+
+  it("keeps a found transfer for two weeks from when it was found, dropping it after", async () => {
+    const recent = foundUserTransfer(NOW - LOST_ATTEMPTS_TTL_MS + 1000)
+    stored({
+      "<own conversions>": {
+        lostConversion: lostConversion(),
+        foundUserTransfers: [foundUserTransfer(NOW - LOST_ATTEMPTS_TTL_MS), recent],
+      },
+    })
+    expect((await loadLostAttempts(WALLET, NOW)).get("<own conversions>")).toEqual({
+      lostConversion: lostConversion(),
+      foundUserTransfers: [recent],
+    })
+
+    stored({
+      "<own conversions>": {
+        foundUserTransfers: [foundUserTransfer(NOW - LOST_ATTEMPTS_TTL_MS)],
+      },
+    })
+    expect(await loadLostAttempts(WALLET, NOW)).toEqual(new Map())
+  })
+
+  it("drops a found transfer that does not read as one, keeping the rest", async () => {
+    stored({
+      "<own conversions>": {
+        lostConversion: lostConversion(),
+        foundUserTransfers: [
+          { ...foundUserTransfer(), paymentId: 7 },
+          { ...foundUserTransfer(), direction: "sideways" },
+          { ...foundUserTransfer(), amount: "2466000" },
+          { ...foundUserTransfer(), paidIn: "9000" },
+          { ...foundUserTransfer(), foundAtMs: String(NOW - 1000) },
+          "rcv-usdb",
+        ],
+      },
+      "other": { foundUserTransfers: "rcv-usdb" },
+    })
+
+    expect(await loadLostAttempts(WALLET, NOW)).toEqual(
+      new Map([["<own conversions>", { lostConversion: lostConversion() }]]),
+    )
+  })
+
+  it("keeps a destination holding only found transfers, and saves none holding none", async () => {
+    await saveLostAttempts(
+      WALLET,
+      new Map([["<own conversions>", { foundUserTransfers: [foundUserTransfer()] }]]),
+    )
+
+    expect(await loadLostAttempts(WALLET, NOW)).toEqual(
+      new Map([["<own conversions>", { foundUserTransfers: [foundUserTransfer()] }]]),
+    )
+    expect(holdsAnAttempt({ foundUserTransfers: [] })).toBe(false)
   })
 
   it("holds nothing when what was stored is not a record of destinations", async () => {

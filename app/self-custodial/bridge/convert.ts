@@ -41,6 +41,7 @@ import {
 import {
   lostAttemptsFor,
   OWN_CONVERSIONS,
+  type FoundUserTransfer,
   type LostAttemptsHandle,
   type LostConversion,
 } from "../payment-details/lost-attempts"
@@ -321,22 +322,42 @@ const directionDeliveredBy = (payment: Payment): ConvertDirection | undefined =>
   return undefined
 }
 
+/** What a delivery is told apart from another by: the way it went, what it paid in once
+ *  the wallet has filled that in, and what it delivered. */
+type DeliveryFacts = {
+  direction?: ConvertDirection
+  paidIn?: number
+  amount: number
+}
+
+const deliveryFactsOf = (payment: Payment): DeliveryFacts => ({
+  direction: directionDeliveredBy(payment),
+  paidIn: paidInOf(payment),
+  amount: toNumber(payment.amount),
+})
+
 /**
  * Whether what a lost conversion delivered is this conversion asked again rather than
  * another: the same way, paying in about as much, or, before the wallet has filled in
  * what it paid in, delivering about as much as this one is quoted to.
  */
 const isDeliveryOf = (
-  payment: Payment,
+  { direction, paidIn, amount }: DeliveryFacts,
   { estimate, params }: Pick<ConversionExecution, "estimate" | "params">,
 ): boolean => {
-  if (directionDeliveredBy(payment) !== params.direction) return false
-  const paidIn = paidInOf(payment)
+  if (direction !== params.direction) return false
   if (paidIn !== undefined) {
     return isAboutAmount(paidIn, toNumber(estimate.amountIn))
   }
-  return isAboutDelivered(toNumber(payment.amount), toNumber(estimate.amountOut))
+  return isAboutDelivered(amount, toNumber(estimate.amountOut))
 }
+
+/** A transfer of the user's found delivered, as their next transfer is told of it. */
+const foundUserTransferOf = (payment: Payment): FoundUserTransfer => ({
+  paymentId: payment.id,
+  ...deliveryFactsOf(payment),
+  foundAtMs: Date.now(),
+})
 
 /** The token a conversion delivers: the dollar token for one from bitcoin, none (sats)
  *  for one to it. */
@@ -381,11 +402,6 @@ const isWithinDeliveryWindow = (elapsedMs: number): boolean =>
  */
 const canStillDeliver = (lastAttemptAtMs: number): boolean =>
   isWithinDeliveryWindow(realMsKnown(lastAttemptAtMs))
-
-/** Whether a delivery found is what any of a lost conversion's attempts was quoted to
- *  deliver. */
-const isDeliveryOfAnyAttempt = (lost: LostConversionLook, payment: Payment): boolean =>
-  lost.expectedDeliveries.some((delivery) => isDeliveryAsExpected(payment, delivery))
 
 /**
  * Which of a lost conversion's attempts a delivery found settles: the one it delivers for,
@@ -576,7 +592,24 @@ const convertAfterEarlierConversions = async (
   const keepLost = (lostConversion: LostConversion | undefined) =>
     attempts.update((current) => ({ ...current, lostConversion }))
   const isThisConversion = (payment: Payment) =>
-    isDeliveryOf(payment, { estimate, params })
+    isDeliveryOf(deliveryFactsOf(payment), { estimate, params })
+
+  /** A lost transfer of the user's that auto-convert found delivered is told of on their
+   *  next one, as the look would have told them had it found it: done when this one is
+   *  it asked again, gone through when it is another. Told once, the oldest first. */
+  const foundTransfers = isAutomatic ? [] : attempts.read().foundUserTransfers ?? []
+  const [foundTransfer, ...stillToTell] = foundTransfers
+  if (foundTransfer) {
+    attempts.update((current) => ({ ...current, foundUserTransfers: stillToTell }))
+    const isThisTransfer = isDeliveryOf(foundTransfer, { estimate, params })
+    if (isThisTransfer) {
+      return {
+        status: PaymentResultStatus.Success,
+        deliveredPaymentId: foundTransfer.paymentId,
+      }
+    }
+    return failed(EARLIER_CONVERSION_MESSAGE, ConvertErrorCode.EarlierConversionFound)
+  }
 
   const earlier = attempts.read().lostConversion
   if (earlier) {
@@ -598,31 +631,35 @@ const convertAfterEarlierConversions = async (
       return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
     }
     if (lookup.status === "found") {
-      const settled = settledAttemptOf(earlier, lookup.payment, isAutomatic)
+      const { payment } = lookup
+      const settled = settledAttemptOf(earlier, payment, isAutomatic)
+      /** The attempt it delivers for, whoever made it, the user's first. */
+      const deliveredFor = settledAttemptOf(earlier, payment, false)
       /** A delivery none of its attempts was quoted for is told once and known from then
        *  on, so the attempts are looked for past it: it settles none of them, and each may
-       *  still deliver. One an attempt of the user's was quoted for stays unknown, for
-       *  their own retry to be told of. */
-      const isOfNoAttempt =
-        settled === undefined && !isDeliveryOfAnyAttempt(earlier, lookup.payment)
-      if (isOfNoAttempt) {
+       *  still deliver. */
+      if (deliveredFor === undefined) {
         keepLost({
           ...earlier,
-          knownPaymentIds: [...earlier.knownPaymentIds, lookup.payment.id],
+          knownPaymentIds: [...earlier.knownPaymentIds, payment.id],
         })
-      }
-      if (isOfNoAttempt) {
         return failed(EARLIER_CONVERSION_MESSAGE, ConvertErrorCode.EarlierConversionFound)
       }
-      /** What auto-convert finds of the user's own stays theirs, unsettled: until they
-       *  are told of it, every look finds it again. */
+      /** What auto-convert finds of the user's own is settled, and kept for their next
+       *  transfer to be told of: left unsettled, every look would find it again, and no
+       *  receive would convert until the user transferred once more. */
       if (settled === undefined) {
-        return failed(
-          EARLIER_CONVERSION_MESSAGE,
-          ConvertErrorCode.UsersEarlierTransferFound,
-        )
+        attempts.update((current) => ({
+          ...current,
+          lostConversion: withoutAttempt(earlier, deliveredFor, payment),
+          foundUserTransfers: [
+            ...(current.foundUserTransfers ?? []),
+            foundUserTransferOf(payment),
+          ],
+        }))
+        return failed(EARLIER_CONVERSION_MESSAGE, ConvertErrorCode.EarlierConversionFound)
       }
-      keepLost(withoutAttempt(earlier, settled, lookup.payment))
+      keepLost(withoutAttempt(earlier, settled, payment))
       /** This conversion's own only when the attempt it settles is this request asked
        *  again: the user's transfer, never auto-convert's, or auto-convert's of the same
        *  receive, since it converts receives of about one amount alike. Another one is
@@ -630,11 +667,11 @@ const convertAfterEarlierConversions = async (
       const isThisRequest =
         earlier.expectedDeliveries[settled].receiveRecordedAtMs ===
         params.receiveRecordedAtMs
-      const isThisRequestsDelivery = isThisRequest && isThisConversion(lookup.payment)
+      const isThisRequestsDelivery = isThisRequest && isThisConversion(payment)
       if (isThisRequestsDelivery) {
         return {
           status: PaymentResultStatus.Success,
-          deliveredPaymentId: lookup.payment.id,
+          deliveredPaymentId: payment.id,
         }
       }
       return failed(EARLIER_CONVERSION_MESSAGE, ConvertErrorCode.EarlierConversionFound)

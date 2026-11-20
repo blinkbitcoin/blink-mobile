@@ -1800,68 +1800,141 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
     )
   })
 
-  /** Auto-convert tells no one what it finds: a lost transfer the user made stays theirs
-   *  to be told of, or their own retry would convert it again. */
-  it("leaves a lost manual transfer it finds for the user to be told of", async () => {
-    mockFindLostConversion
-      .mockResolvedValueOnce({ status: "not-found", failed: [] })
-      .mockResolvedValue(deliveredDollars(9000, 2_466_000))
-    const sdk = walletLosingTheFirstConversion()
-    const manualSats = 9000
+  /** A lost transfer of the user's, of 9000 sats, and auto-convert's receive of 5000 behind
+   *  it: what the user's lost transfer delivered turns up on auto-convert's look. */
+  const manualSats = 9000
+  const quotePayingIn = (
+    sdk: ReturnType<typeof walletLosingTheFirstConversion>,
+    sats: number,
+  ) =>
     sdk.prepareSendPayment.mockResolvedValue({
       paymentMethod: {},
       conversionEstimate: {
         fee: BigInt(0),
-        amountIn: BigInt(manualSats),
-        amountOut: BigInt(2_466_000),
+        amountIn: BigInt(sats),
+        amountOut: BigInt(sats * 274),
         amountAdjustment: undefined,
       },
     })
-    const manual = await createGetConversionQuote(sdk as never)({
-      fromAmount: toBtcMoneyAmount(manualSats),
-      toAmount: toUsdMoneyAmount(247),
-      direction: ConvertDirection.BtcToUsd,
-    })
-    await manual!.execute()
-    sdk.prepareSendPayment.mockResolvedValue({
-      paymentMethod: {},
-      conversionEstimate: {
-        fee: BigInt(0),
-        amountIn: BigInt(receive.satsAmount),
-        amountOut: BigInt(1_370_000),
-        amountAdjustment: undefined,
-      },
-    })
-
-    const automatic = await executeAutoConvert(sdk as never, receive)
-    sdk.prepareSendPayment.mockResolvedValue({
-      paymentMethod: {},
-      conversionEstimate: {
-        fee: BigInt(0),
-        amountIn: BigInt(manualSats),
-        amountOut: BigInt(2_466_000),
-        amountAdjustment: undefined,
-      },
-    })
-    const retry = await (await createGetConversionQuote(sdk as never)({
-      fromAmount: toBtcMoneyAmount(manualSats),
-      toAmount: toUsdMoneyAmount(247),
+  const transferManually = async (
+    sdk: ReturnType<typeof walletLosingTheFirstConversion>,
+    sats = manualSats,
+  ) => {
+    quotePayingIn(sdk, sats)
+    return (await createGetConversionQuote(sdk as never)({
+      fromAmount: toBtcMoneyAmount(sats),
+      toAmount: toUsdMoneyAmount(Math.round(sats * 0.0274)),
       direction: ConvertDirection.BtcToUsd,
     }))!.execute()
+  }
+  const autoConvert = (sdk: ReturnType<typeof walletLosingTheFirstConversion>) => {
+    quotePayingIn(sdk, receive.satsAmount)
+    return executeAutoConvert(sdk as never, receive)
+  }
+  const userTransferFoundByAutoConvert = async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(deliveredDollars(manualSats, manualSats * 274))
+      .mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = walletLosingTheFirstConversion()
+    await transferManually(sdk)
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c-auto", status: 0 } })
+    const automatic = await autoConvert(sdk)
+    return { sdk, automatic }
+  }
 
-    expect(automatic).toEqual({ status: "deferred" })
-    const usersLook = mockFindLostConversion.mock.calls[2][0].lost
-    expect(usersLook.expectedDeliveries).toEqual([
-      {
-        tokenIdentifier: "usdb-token-id",
-        amount: 2_466_000,
-        amountIn: 9000,
-        isAutomatic: false,
-      },
-    ])
-    expect(usersLook.knownPaymentIds).not.toContain("rcv-usdb")
-    expect(retry.status).toBe("success")
+  /** Left unsettled, every look of auto-convert's would find it again, and no receive
+   *  would convert until the user transferred once more. */
+  it("settles a lost manual transfer it finds, and converts the receive on its next try with no transfer of the user's", async () => {
+    const { sdk, automatic } = await userTransferFoundByAutoConvert()
+    const next = await autoConvert(sdk)
+
+    expect(automatic).toEqual({ status: "deferred", retryAfterMs: 0 })
+    expect(next).toEqual({ status: "converted", conversionPaymentId: "c-auto" })
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+    expect(mockFindLostConversion).toHaveBeenCalledTimes(2)
+  })
+
+  /** Told as the user's own look would have told them: done, since it is the transfer
+   *  they asked for again, and never converted a second time. */
+  it("tells the user's next transfer of that amount it went through, converting nothing", async () => {
+    const { sdk } = await userTransferFoundByAutoConvert()
+    const retry = await transferManually(sdk)
+
+    expect(retry).toEqual({ status: "success", deliveredPaymentId: "rcv-usdb" })
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("tells the user's next transfer of another amount the earlier one went through, once", async () => {
+    const { sdk } = await userTransferFoundByAutoConvert()
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c-user", status: 0 } })
+    const other = await transferManually(sdk, 20_000)
+    const again = await transferManually(sdk, 20_000)
+
+    expect(other.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionFound)
+    expect(again).toEqual({ status: "success", deliveredPaymentId: "c-user" })
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  /** Told by what it paid in once the wallet tells it: 8500 sats would deliver within the
+   *  quote's margin of what 9000 delivered, yet are another transfer. */
+  it("does not take the user's next transfer paying in another amount for the one found", async () => {
+    const { sdk } = await userTransferFoundByAutoConvert()
+    const other = await transferManually(sdk, 8500)
+
+    expect(other.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionFound)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  /** Told by the way it went as well: a transfer back to bitcoin of about the amount is
+   *  not the dollars it delivered. */
+  it("does not take the user's next transfer the other way for the one found", async () => {
+    const { sdk } = await userTransferFoundByAutoConvert()
+    sdk.getInfo.mockResolvedValue({
+      tokenBalances: {
+        "usdb-token-id": {
+          balance: 1_000_000_000n,
+          tokenMetadata: { identifier: "usdb-token-id", decimals: 6 },
+        },
+      },
+    })
+    const otherWay = await (await createGetConversionQuote(sdk as never)({
+      fromAmount: toUsdMoneyAmount(247),
+      toAmount: toBtcMoneyAmount(manualSats),
+      direction: ConvertDirection.UsdToBtc,
+    }))!.execute()
+
+    expect(otherWay.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionFound)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("tells the user of each transfer it found, the oldest first", async () => {
+    const secondDelivery = {
+      ...deliveredDollars(20_000, 20_000 * 274),
+      payment: {
+        ...deliveredDollars(20_000, 20_000 * 274).payment,
+        id: "rcv-usdb-2",
+      },
+    }
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(deliveredDollars(manualSats, manualSats * 274))
+      .mockResolvedValueOnce(secondDelivery)
+    const sdk = walletLosingTheFirstConversion()
+    await transferManually(sdk)
+    afterTheDeliveryWindow()
+    await transferManually(sdk, 20_000)
+    await autoConvert(sdk)
+    await autoConvert(sdk)
+
+    const first = await transferManually(sdk)
+    const second = await transferManually(sdk, 20_000)
+
+    expect(first).toEqual({ status: "success", deliveredPaymentId: "rcv-usdb" })
+    expect(second).toEqual({ status: "success", deliveredPaymentId: "rcv-usdb-2" })
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
   })
 
   it("leaves a lost manual transfer alone when what it finds is no attempt's", async () => {

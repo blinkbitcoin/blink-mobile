@@ -5,6 +5,7 @@
  * lifecycle can scope it without pulling that in; only on where it keeps them across app
  * launches.
  */
+import type { ConvertDirection } from "@app/types/payment"
 import { withTimeout } from "@app/utils/with-timeout"
 
 import type { ExpectedDelivery } from "./lost-send"
@@ -87,12 +88,29 @@ export type LostConversion = {
   expectedDeliveries: ReadonlyArray<ExpectedDelivery>
 }
 
+/**
+ * A transfer of the user's whose outcome was lost, found delivered by auto-convert, which
+ * settles it so that it waits for nothing, and keeps what the user's next transfer is told
+ * by: what it delivered (in base units), the way it went and what it paid in once the
+ * wallet tells them, and when it was found, which is what lets it lapse across app
+ * launches.
+ */
+export type FoundUserTransfer = {
+  paymentId: string
+  direction?: ConvertDirection
+  amount: number
+  paidIn?: number
+  foundAtMs: number
+}
+
 /** What a send's lost attempts leave behind for the next send to the same destination,
- *  and lost conversions for the next conversion. */
+ *  and lost conversions for the next conversion, with the user's transfers auto-convert
+ *  found delivered, oldest first. */
 export type LostAttempts = {
   lostSend?: LostSend
   unresolvedSend?: UnresolvedSend
   lostConversion?: LostConversion
+  foundUserTransfers?: ReadonlyArray<FoundUserTransfer>
 }
 
 /**

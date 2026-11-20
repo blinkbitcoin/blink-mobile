@@ -1528,30 +1528,25 @@ describe("useAutoConvertListener — trying a waiting receive again", () => {
     expect(mockListPendingAutoConverts).toHaveBeenCalledTimes(1)
   })
 
-  /** A transfer of the user's that auto-convert must leave for them is found again on
-   *  every try until they are told of it: trying again on a timer would only spin, and
-   *  touch nothing else pending either. */
-  it("waits for the user without trying again, leaving an unpaid receive alone", async () => {
+  /** The bridge settles a lost transfer of the user's it finds, for their next transfer
+   *  to be told of, and asks for no wait: the receive behind it converts in the same
+   *  launch, with no transfer of the user's in between, before its record could lapse. */
+  it("converts a receive that waited behind the user's own lost transfer in the same launch", async () => {
     pendingReceive()
-    mockListPendingAutoConverts.mockImplementation(async () => [
-      makeRecord({ paymentRequest: "lnbc1waiting" }),
-      makeRecord({ paymentRequest: "lnbc1unpaid" }),
-    ])
     mockExecuteAutoConvert
       .mockReset()
-      .mockResolvedValue({ status: AutoConvertStatus.Deferred })
+      .mockResolvedValueOnce({ status: AutoConvertStatus.Deferred, retryAfterMs: 0 })
+      .mockResolvedValue({ status: AutoConvertStatus.Converted })
     renderHook(() => useAutoConvertListener())
     await waitFor(() => expect(mockReleaseAutoConvertAttempt).toHaveBeenCalledTimes(1))
 
-    await advance(10 * (DELIVERY_WINDOW_MS + RETRY_COOLDOWN_MS))
+    await advance(RETRY_COOLDOWN_MS)
 
-    expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
-    expect(
-      mockRecordAutoConvertAttempt.mock.calls.filter(
-        ([invoice]) => invoice === "lnbc1unpaid",
-      ),
-    ).toHaveLength(1)
-    expect(mockRemovePendingAutoConvert).not.toHaveBeenCalled()
+    await waitFor(() =>
+      expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1waiting"),
+    )
+    expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(2)
+    expect(mockListPendingAutoConverts).toHaveBeenCalledTimes(1)
   })
 
   it("leaves an unpaid receive alone while it tries a waiting one again", async () => {

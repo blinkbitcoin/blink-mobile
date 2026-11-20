@@ -235,10 +235,7 @@ const runAutoConvert = async ({
      *  them all up and drop the receive unconverted. */
     if (outcome.status === AutoConvertStatus.Deferred) {
       await releaseAutoConvertAttempt(record.paymentRequest)
-      /** A wait for the user has no end to try again at: a later trigger tries. */
-      const { retryAfterMs } = outcome
-      const isWaitTimed = retryAfterMs !== undefined
-      if (isWaitTimed) onDeferred?.(retryAfterMs)
+      onDeferred?.(outcome.retryAfterMs)
       return
     }
 

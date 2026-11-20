@@ -44,9 +44,8 @@ export type AutoConvertOutcome =
   | { status: typeof AutoConvertStatus.AlreadyConverted; conversionPaymentId?: string }
   | { status: typeof AutoConvertStatus.SkippedBelowMin }
   | { status: typeof AutoConvertStatus.SkippedStableBalanceActive }
-  /** With how long, at most, until it can go out: none when it waits for the user, which
-   *  no time ends. */
-  | { status: typeof AutoConvertStatus.Deferred; retryAfterMs?: number }
+  /** With how long, at most, until it can go out. */
+  | { status: typeof AutoConvertStatus.Deferred; retryAfterMs: number }
   | { status: typeof AutoConvertStatus.Failed }
 
 /** Links a receive paymentId to the conversion paymentId performed for it. */
