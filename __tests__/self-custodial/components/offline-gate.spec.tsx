@@ -89,4 +89,20 @@ describe("OfflineGate", () => {
     expect(getByTestId("child")).toBeTruthy()
     expect(queryByTestId("offline-notice")).toBeNull()
   })
+
+  it("keeps children when a settled send bypasses a blocked wallet", () => {
+    mockUseActiveWallet.mockReturnValue({
+      isSelfCustodial: true,
+      status: ActiveWalletStatus.Offline,
+    })
+
+    const { getByTestId, queryByTestId } = render(
+      <OfflineGate bypass>
+        <Child />
+      </OfflineGate>,
+    )
+
+    expect(getByTestId("child")).toBeTruthy()
+    expect(queryByTestId("offline-notice")).toBeNull()
+  })
 })

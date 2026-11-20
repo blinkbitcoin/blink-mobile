@@ -100,6 +100,29 @@ describe("useSaveLnAddressContact", () => {
     expect(mockContactCreate).not.toHaveBeenCalled()
   })
 
+  /** Saving the contact runs after the payment landed, so its failure must never surface
+   *  as one: it resolves unsaved and leaves a breadcrumb. */
+  it("resolves unsaved and leaves a breadcrumb without the handle when the contact mutation rejects", async () => {
+    mockContactCreate.mockRejectedValueOnce(
+      new Error("contact user@example.com could not be created"),
+    )
+    const { result } = renderHook(() => useSaveLnAddressContact())
+
+    const response = await result.current({
+      paymentType: PaymentType.Lnurl,
+      destination: "user@example.com",
+      isMerchant: false,
+    })
+
+    expect(response).toEqual({ saved: false, handle: "user@example.com" })
+    expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+      expect.stringContaining("[contacts] auto-save failed"),
+    )
+    expect(mockCrashlyticsLog).not.toHaveBeenCalledWith(
+      expect.stringContaining("user@example.com"),
+    )
+  })
+
   describe("self-custodial branch", () => {
     it("saves the contact through the bridge when sdk is available", async () => {
       mockIsSelfCustodial = true

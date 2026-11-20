@@ -36,7 +36,7 @@ import ReceiveScreen from "@app/screens/receive-bitcoin-screen/receive-screen"
 import RedeemBitcoinDetailScreen from "@app/screens/redeem-lnurl-withdrawal-screen/redeem-bitcoin-detail-screen"
 import RedeemBitcoinResultScreen from "@app/screens/redeem-lnurl-withdrawal-screen/redeem-bitcoin-result-screen"
 import SendBitcoinCompletedScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-completed-screen"
-import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
+import { SendBitcoinConfirmationGated } from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-gated"
 import SendBitcoinDestinationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-destination-screen"
 import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
 import MerchantSelectionScreen from "@app/screens/send-bitcoin-screen/merchant-selection-screen"
@@ -300,7 +300,6 @@ const withOfflineGate = <P extends object>(Screen: React.ComponentType<P>) => {
 const ScanningQRCodeGated = withOfflineGate(ScanningQRCodeScreen)
 const SendBitcoinDestinationGated = withOfflineGate(SendBitcoinDestinationScreen)
 const SendBitcoinDetailsGated = withOfflineGate(SendBitcoinDetailsScreen)
-const SendBitcoinConfirmationGated = withOfflineGate(SendBitcoinConfirmationScreen)
 const MerchantSelectionGated = withOfflineGate(MerchantSelectionScreen)
 const ReceiveOfflineGated = withOfflineGate(ReceiveScreen)
 const ReceiveGated: React.FC = () => (
@@ -537,7 +536,8 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="sendBitcoinDetails"
         component={SendBitcoinDetailsGated}
-        options={{ title: LL.SendBitcoinScreen.title() }}
+        // The screen leads with its own send icon and destination, so the bar stays bare.
+        options={{ title: "" }}
       />
       <RootNavigator.Screen
         name="merchantSelection"
@@ -547,12 +547,18 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="sendBitcoinConfirmation"
         component={SendBitcoinConfirmationGated}
-        options={{ title: LL.SendBitcoinScreen.title() }}
+        // Headerless so the Sent glow can fill the screen; review draws its own back row.
+        options={{ headerShown: false }}
       />
       <RootNavigator.Screen
         name="sendBitcoinCompleted"
         component={SendBitcoinCompletedScreen}
-        options={{ title: LL.SendBitcoinScreen.title(), headerShown: false }}
+        options={({ route }) => ({
+          title: LL.SendBitcoinScreen.title(),
+          headerShown: false,
+          // Sent already played on review, so the receipt replaces it in one cut.
+          animation: route.params.hasShownSuccess ? "none" : "default",
+        })}
       />
       <RootNavigator.Screen
         name="receiveBitcoin"

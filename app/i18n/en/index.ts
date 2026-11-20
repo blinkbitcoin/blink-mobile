@@ -2383,12 +2383,36 @@ const en: BaseTranslation = {
       "This is the maximum fee you will be charged for this transaction.  It may end up being less once the payment has been made.",
     invoiceAlreadyPaid: "This invoice has already been paid",
     somethingWentWrong: "Something went wrong",
+    priceUpdated: "The price moved, so the amounts were updated. Check them before you send.",
     paymentAlreadyAttempted:
       "Payment already attempted.\n\nIf you want to send this payment again, start from scratch.",
     slideToConfirm: "Slide to Confirm",
     slideConfirming: "Confirming...",
+    slideToSend: "Slide to send",
+    calculatingFee: "Calculating fee…",
+    sendProgress: {
+      reviewing: "Reviewing",
+      signing: "Signing",
+      findingRoute: "Finding route",
+      broadcasting: "Broadcasting",
+      checkingDelivery: "Checking delivery",
+      retrying: "Re-trying",
+      almostThere: "Almost there",
+      anyTimeNow: "Any time now",
+      ohOh: "Oh oh",
+      tryingAgain: "Trying again",
+    },
     copiedDestination: "Copied destination to clipboard",
-    lightningRecommended: "High fee! We recommend Lightning.",
+    lightningRecommended: "High fee. We recommend Lightning.",
+    sending: "Sending",
+    sent: "Sent",
+    receipt: "Receipt",
+    /** Spoken once Sent plays, since review turns into it in place with no new screen
+     *  for a screen reader to land on. */
+    sentAnnouncement: "Sent, {amount: string}",
+    fromBalance: "From Balance",
+    details: "Details",
+    changeAmount: "Change amount",
     usdRemainderSweep:
       "Remaining {remaining: string} ({remainingSats: string}) will be converted to Bitcoin. USD minimum: {minimum: string}.",
   },
@@ -2449,6 +2473,8 @@ const en: BaseTranslation = {
   SendBitcoinScreen: {
     willBeSentToMempoolBy: "Transaction should be submitted to mempool",
     amount: "Amount",
+    addAmount: "Add amount",
+    lowFunds: "Low funds",
     amountExceed: "Amount exceeds your balance of {balance: string}",
     amountExceedsLimit: "Amount exceeds your remaining daily limit of {limit: string}",
     upgradeAccountToIncreaseLimit: "Upgrade your account to increase your limit",
@@ -2502,9 +2528,7 @@ const en: BaseTranslation = {
      * (10m / 4h / 24h, CUSTODIAL_PAYOUT_ETA_MINUTES) and the self-custodial mempool fee
      * rates (10m / 30m / 60m, FEE_TIER_ETA_MINUTES). They name the relative speed within a
      * rail, not an absolute time — don't tune either one for a single rail's window without
-     * splitting the keys per domain first. The feeTier heading above reads "Transaction
-     * priority" directly over the "Priority" option; that repetition is known and left for
-     * design to settle.
+     * splitting the keys per domain first.
      */
     fast: "Priority",
     medium: "Standard",
@@ -2515,6 +2539,8 @@ const en: BaseTranslation = {
     sdkAmountTooLow: "Amount is too low for an on-chain transaction.",
     sdkNetworkError: "Network error. Please check your connection and try again.",
     sdkGenericError: "Unable to estimate fees. Please try a different amount.",
+    onchainSelfPayment:
+      "This is your own wallet's address. You can't send an on-chain payment to yourself.",
   },
   ApiScreen: {
     keysGroupTitle: "API keys",
@@ -3274,6 +3300,14 @@ const en: BaseTranslation = {
   },
   AmountInputButton: {
     tapToSetAmount: "Set amount",
+  },
+  Accessibility: {
+    balanceHidden: "Balance hidden",
+    copy: "Copy",
+    deleteKey: "Delete",
+    revealBalanceHint: "Shows your balance on this screen",
+    swapCurrencyHint: "Switches the currency you type the amount in",
+    switchToWallet: "Switch to {wallet: string}",
   },
   AppUpdate: {
     needToUpdateSupportMessage:

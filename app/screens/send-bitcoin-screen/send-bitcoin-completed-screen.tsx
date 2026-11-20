@@ -275,7 +275,7 @@ const HeaderSection: React.FC<{
 }
 
 const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
-  const [showSuccessIcon, setShowSuccessIcon] = useState(true)
+  const [showSuccessIcon, setShowSuccessIcon] = useState(!route.params.hasShownSuccess)
   const viewRef = useRef<ViewShotRef>(null)
 
   const {
@@ -314,9 +314,10 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
   const { isTakingScreenshot, captureAndShare } = useScreenshot(viewRef)
 
   useEffect(() => {
+    if (!showSuccessIcon) return
     const timer = setTimeout(() => setShowSuccessIcon(false), successIconDuration)
     return () => clearTimeout(timer)
-  }, [successIconDuration])
+  }, [showSuccessIcon, successIconDuration])
 
   const handleNavigateHome = useCallback(() => navigation.popToTop(), [navigation])
 

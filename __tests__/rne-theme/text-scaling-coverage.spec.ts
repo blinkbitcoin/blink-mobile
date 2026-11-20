@@ -270,12 +270,13 @@ describe("the walk's own reading", () => {
   })
 
   /**
-   * The production tag, not a toy: stripping the multiplier from the slider label is the
-   * edit that used to leave this suite green.
+   * A production tag, not a toy: stripping the multiplier from the send hero's caption is
+   * the kind of edit that used to leave this suite green. (The slider label it once named
+   * is a themed `Text` now, which the theme caps.)
    */
-  it("fails when the slider label drops the ceiling", () => {
+  it("fails when the send hero caption drops the ceiling", () => {
     const source = fs.readFileSync(
-      path.join(APP_DIR, "components/atomic/galoy-slider-button/galoy-slider-button.tsx"),
+      path.join(APP_DIR, "screens/send-bitcoin-screen/send-hero.tsx"),
       "utf8",
     )
     const stripped = source.replace(
