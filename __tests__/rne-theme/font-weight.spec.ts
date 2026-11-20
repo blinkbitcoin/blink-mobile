@@ -91,3 +91,48 @@ describe("font weights", () => {
     expect(offenders(LITERAL_FACE)).toEqual([])
   })
 })
+
+/**
+ * `@rn-vui/base` components never see the theme, so its default faces don't reach them:
+ * the base Button title names Android's `sans-serif-medium`, and the base SearchBar input
+ * names none. Each use has to pass its own face.
+ */
+describe("@rn-vui/base text faces", () => {
+  const baseImports = sourceFiles(APP_DIR)
+    .map((file) => ({ file, source: readFileSync(file, "utf8") }))
+    .filter(({ source }) => /from "@rn-vui\/base"/.test(source))
+
+  // Every use in the app is self-closing, with `/>` on its own line.
+  const elements = (tag: string) =>
+    baseImports
+      .filter(({ source }) =>
+        new RegExp(`import \\{[^}]*\\b${tag}\\b[^}]*\\} from "@rn-vui/base"`).test(
+          source,
+        ),
+      )
+      .flatMap(({ file, source }) =>
+        [...source.matchAll(new RegExp(`<${tag}\\b[\\s\\S]*?\\n\\s*/>`, "g"))].map(
+          (match) => ({ file: relative(REPO_ROOT, file), props: match[0] }),
+        ),
+      )
+
+  it("gives every base Button with a title its own title face", () => {
+    const buttons = elements("Button").filter(({ props }) => /\btitle=/.test(props))
+
+    expect(buttons.length).toBeGreaterThan(0)
+    expect(
+      buttons.filter(({ props }) => !/\btitleStyle=/.test(props)).map(({ file }) => file),
+    ).toEqual([])
+  })
+
+  it("gives every base SearchBar its own input face", () => {
+    const searchBars = elements("SearchBar")
+
+    expect(searchBars.length).toBeGreaterThan(0)
+    expect(
+      searchBars
+        .filter(({ props }) => !/\binputStyle=/.test(props))
+        .map(({ file }) => file),
+    ).toEqual([])
+  })
+})

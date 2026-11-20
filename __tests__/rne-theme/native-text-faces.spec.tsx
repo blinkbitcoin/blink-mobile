@@ -2,12 +2,19 @@ import React from "react"
 import { Platform, StyleSheet, TextStyle } from "react-native"
 
 import { render } from "@testing-library/react-native"
+import {
+  DefaultTheme,
+  ThemeProvider as NavigationThemeProvider,
+} from "@react-navigation/native"
 import { Button, Input, ListItem, SearchBar, ThemeProvider } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
+import { light } from "@app/rne-theme/colors"
 import { fonts } from "@app/rne-theme/fonts"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import theme from "@app/rne-theme/theme"
+import { earnSectionHeaderOptions } from "@app/screens/earns-screen/earns-section"
 
 /**
  * These draw their text with React Native's own Text or TextInput, which knows nothing
@@ -79,6 +86,36 @@ describe("native text faces", () => {
     expect(flatten(getByDisplayValue("satoshi").props.style).fontFamily).toBe(
       fonts.regular,
     )
+  })
+
+  // The theme gives Input both the text-size ceiling and the face. Two `Input` entries in
+  // the theme object would let the second silently replace the first.
+  it("keeps the text-size ceiling on input text alongside the face", () => {
+    const { getByDisplayValue } = withTheme(<Input value="satoshi" />)
+    const input = getByDisplayValue("satoshi")
+
+    expect(input.props.maxFontSizeMultiplier).toBe(MAX_FONT_SIZE_MULTIPLIER)
+    expect(flatten(input.props.style).fontFamily).toBe(fonts.regular)
+  })
+
+  // A `headerTitle` function gets no `headerTitleStyle`, and the library's HeaderTitle
+  // otherwise names the platform font.
+  const platforms = ["android", "ios"] as const
+  platforms.forEach((os) => {
+    it(`draws the Earn section header title in the bold face on ${os}`, () => {
+      Platform.OS = os
+      const { headerTitle } = earnSectionHeaderOptions(light)
+      const { getByText } = render(
+        <NavigationThemeProvider value={DefaultTheme}>
+          {headerTitle({ children: "Earn", tintColor: light.staticWhite })}
+        </NavigationThemeProvider>,
+      )
+      const style = flatten(getByText("Earn").props.style)
+
+      expect(style.fontFamily).toBe(fonts.bold)
+      expect(style.fontSize).toBe(18)
+      expect(BOLD_WEIGHTS).not.toContain(style.fontWeight)
+    })
   })
 
   it("draws search bar text in the regular face", () => {
