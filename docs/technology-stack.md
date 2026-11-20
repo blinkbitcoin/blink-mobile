@@ -85,6 +85,7 @@
 | react-native-nfc-manager | NFC support |
 | react-native-fingerprint-scanner | Biometric auth |
 | react-native-device-info | Device information |
+| react-native-haptic-feedback | Haptics, used only through `app/utils/haptics.ts` (lint-enforced, see [Haptics](./haptics.md)) |
 
 ### Storage & Security
 | Package | Purpose |
