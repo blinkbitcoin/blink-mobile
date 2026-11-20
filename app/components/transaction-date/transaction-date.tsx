@@ -1,5 +1,6 @@
 import React from "react"
 import { Text } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { TxStatus } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -63,7 +64,15 @@ export const TransactionDate = ({
 }: TransactionDateProps) => {
   const { LL, locale } = useI18nContext()
   if (status === "PENDING") {
-    return <Text>{LL.common.pending().toUpperCase()}</Text>
+    return (
+      <Text maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}>
+        {LL.common.pending().toUpperCase()}
+      </Text>
+    )
   }
-  return <Text>{formatDateForTransaction({ createdAt, locale, includeTime })}</Text>
+  return (
+    <Text maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}>
+      {formatDateForTransaction({ createdAt, locale, includeTime })}
+    </Text>
+  )
 }

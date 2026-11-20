@@ -76,6 +76,15 @@ const drag = (distance: number) =>
 
 const typingTime = (text: string) => 35 * text.length
 
+/** The style of the box the label sits in: the nearest ancestor that pads it. */
+const labelBoxStyle = (text: string) => {
+  let node = screen.getByText(text).parent
+  while (node && StyleSheet.flatten(node.props.style)?.paddingHorizontal === undefined) {
+    node = node.parent
+  }
+  return StyleSheet.flatten(node?.props.style) as ViewStyle | undefined
+}
+
 const handleColor = () =>
   (StyleSheet.flatten(screen.getByTestId("slider").props.style) as ViewStyle)
     .backgroundColor
@@ -109,6 +118,13 @@ describe("GaloySliderButton", () => {
     it("ignores the disabled label while enabled", async () => {
       await renderSlider({ disabledText: "Calculating fee…" })
       expect(screen.queryByText("Calculating fee…")).toBeNull()
+    })
+
+    /* The handle rests over the start of the track, so the label keeps clear of it rather
+       than running underneath at the larger text sizes. */
+    it("keeps the label clear of the handle", async () => {
+      await renderSlider()
+      expect(labelBoxStyle("Slide to send")?.paddingHorizontal).toBe(HANDLE_SIZE)
     })
 
     it("paints the handle in the accent colour", async () => {

@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { Alert, TextInput, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { radius } from "@app/rne-theme/radius"
@@ -67,6 +68,7 @@ export const CloseCardModal: React.FC<CloseCardModalProps> = ({
             })}
           </Text>
           <TextInput
+            maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
             autoCapitalize="none"
             style={styles.textInput}
             onChangeText={setConfirmText}
