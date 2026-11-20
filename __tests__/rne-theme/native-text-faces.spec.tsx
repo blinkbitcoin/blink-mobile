@@ -6,11 +6,17 @@ import {
   DefaultTheme,
   ThemeProvider as NavigationThemeProvider,
 } from "@react-navigation/native"
-import { Button, Input, ListItem, SearchBar, ThemeProvider } from "@rn-vui/themed"
+import {
+  Button,
+  Input,
+  ListItem,
+  SearchBar,
+  ThemeProvider,
+  useTheme,
+} from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
-import { light } from "@app/rne-theme/colors"
 import { fonts } from "@app/rne-theme/fonts"
 import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import theme from "@app/rne-theme/theme"
@@ -30,6 +36,16 @@ const withTheme = (node: React.ReactElement) =>
   render(<ThemeProvider theme={theme}>{node}</ThemeProvider>)
 
 const flatten = (style: unknown) => StyleSheet.flatten(style as TextStyle)
+
+// The navigator hands the options the theme's colors, so the title is built from them here.
+const EarnHeaderTitle = () => {
+  const {
+    theme: { colors },
+  } = useTheme()
+  const { headerTitle } = earnSectionHeaderOptions(colors)
+
+  return headerTitle({ children: "Earn", tintColor: colors.staticWhite })
+}
 
 describe("native text faces", () => {
   const originalOS = Platform.OS
@@ -104,10 +120,9 @@ describe("native text faces", () => {
   platforms.forEach((os) => {
     it(`draws the Earn section header title in the bold face on ${os}`, () => {
       Platform.OS = os
-      const { headerTitle } = earnSectionHeaderOptions(light)
-      const { getByText } = render(
+      const { getByText } = withTheme(
         <NavigationThemeProvider value={DefaultTheme}>
-          {headerTitle({ children: "Earn", tintColor: light.staticWhite })}
+          <EarnHeaderTitle />
         </NavigationThemeProvider>,
       )
       const style = flatten(getByText("Earn").props.style)
