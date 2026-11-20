@@ -14,6 +14,7 @@ import {
 } from "@app/self-custodial/measurement"
 import { AccountMode } from "@app/types/account"
 import { createSelfCustodialLnurlPaymentDetails } from "@app/self-custodial/payment-details/lnurl"
+import { scopeLostAttemptsTo } from "@app/self-custodial/payment-details/lost-attempts"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 
 const mockPrepareLnurl = jest.fn()
@@ -28,12 +29,28 @@ jest.mock("@app/self-custodial/analytics-identity", () => ({
   onEnhancedIdentityApplied: () => () => undefined,
 }))
 
-jest.mock("@app/self-custodial/bridge", () => ({
-  prepareLnurl: (...args: unknown[]) => mockPrepareLnurl(...args),
-  executeLnurl: (...args: unknown[]) => mockExecuteLnurl(...args),
-  extractLnurlFee: (...args: unknown[]) => mockExtractLnurlFee(...args),
+/** The wallet's history, read by the lost-send lookup straight from the wallet bridge. */
+jest.mock("@app/self-custodial/bridge/wallet", () => ({
+  newestSentPaymentTimestamp: () => Promise.resolve(undefined),
   listSentPaymentsSince: (...args: unknown[]) => mockListSentPaymentsSince(...args),
   syncSelfCustodialWallet: (...args: unknown[]) => mockSyncSelfCustodialWallet(...args),
+}))
+
+/** A dollar send converts on the way out, and the SDK's quote says so with an estimate:
+ *  what the send flow reads to leave the idempotency key off. */
+const QUOTED_CONVERSION = { amountIn: BigInt(1), amountOut: BigInt(1) }
+
+jest.mock("@app/self-custodial/bridge", () => ({
+  prepareLnurl: async (...args: unknown[]) => {
+    const quoted = await mockPrepareLnurl(...args)
+    const options = args[1] as { conversionOptions?: unknown } | undefined
+    return options?.conversionOptions
+      ? { conversionEstimate: QUOTED_CONVERSION, ...quoted }
+      : quoted
+  },
+  hasTokenLeg: jest.requireActual("@app/self-custodial/bridge/send").hasTokenLeg,
+  executeLnurl: (...args: unknown[]) => mockExecuteLnurl(...args),
+  extractLnurlFee: (...args: unknown[]) => mockExtractLnurlFee(...args),
   buildConversionType: jest.fn().mockReturnValue({ tag: "ToBitcoin" }),
   resolveSendTokenIdentifier: (currency: WalletCurrency) =>
     currency === WalletCurrency.Usd ? "usdb-token-id" : undefined,
@@ -45,16 +62,30 @@ jest.mock("@app/self-custodial/bridge", () => ({
  *  have their own spec; here only when it is asked, and what is done with its answer. */
 const mockFindLostSend = jest.fn()
 
-jest.mock("@app/self-custodial/payment-details/send-helpers", () => ({
-  ...jest.requireActual("@app/self-custodial/payment-details/send-helpers"),
+jest.mock("@app/self-custodial/payment-details/lost-send", () => ({
+  ...jest.requireActual("@app/self-custodial/payment-details/lost-send"),
   findLostSend: (...args: unknown[]) => mockFindLostSend(...args),
 }))
 
 /** The real lookup, for the tests that run it against a history shaped the way the
  *  wallet writes it. Its waits between looks are skipped. */
 const { findLostSend: actualFindLostSend } = jest.requireActual<
-  typeof import("@app/self-custodial/payment-details/send-helpers")
->("@app/self-custodial/payment-details/send-helpers")
+  typeof import("@app/self-custodial/payment-details/lost-send")
+>("@app/self-custodial/payment-details/lost-send")
+
+/** Storage holding nothing from an earlier launch, and keeping nothing for the next. */
+const noStoredAttempts = {
+  load: async () => new Map(),
+  save: async () => undefined,
+  remove: async () => undefined,
+}
+
+/** Lost attempts are kept for the connected wallet for as long as the app runs, which
+ *  here is the whole file: every test connects a wallet of its own, holding none. */
+let connectedWallets = 0
+beforeEach(() => {
+  scopeLostAttemptsTo(`wallet-${(connectedWallets += 1)}`, noStoredAttempts)
+})
 
 jest.mock("@app/utils/sleep", () => ({ sleep: () => Promise.resolve() }))
 jest.mock("@app/utils/error-logging", () => ({ reportError: jest.fn() }))
@@ -81,6 +112,8 @@ jest.mock("@app/self-custodial/sdk-error", () => {
       NetworkError: "sc_network_error",
       InvalidInput: "sc_invalid_input",
       Generic: "sc_generic",
+      OutcomeUnknown: "sc_outcome_unknown",
+      EarlierPaymentFound: "sc_earlier_payment_found",
     },
     classifySdkError: (err: { tag?: string } | unknown) => {
       const t = (err as { tag?: string })?.tag
@@ -1484,6 +1517,8 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
   /** A new amount or wallet starts the key over, and with it goes the SDK's refusal of a
    *  duplicate. The attempt that threw is remembered all the same, so the send made after
    *  that looks for its payment first. */
+  /** The earlier attempt was asked for another amount: its payment is shown as the earlier
+   *  payment it is, never as this send, and nothing more goes out. */
   it("remembers a bitcoin attempt that threw, for the send made after a new amount", async () => {
     const detail = createSelfCustodialLnurlPaymentDetails(createParams())
     if (!detail.idempotencyKeyRef) throw new Error("expected idempotencyKeyRef")
@@ -1504,7 +1539,9 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
 
     expect(mockFindLostSend).toHaveBeenCalledTimes(1)
     expect(lastLookup().matches(paymentOf(QUOTED_HASH, PENDING))).toBe(true)
-    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.status).toBe(PaymentSendResult.Failure)
+    expect(result.errors?.[0]?.message).toBe("sc_earlier_payment_found")
+    expect(result.extraInfo?.earlierPaymentId).toBe("found-1")
     expect(mockExecuteLnurl).not.toHaveBeenCalled()
   })
 
@@ -1576,6 +1613,34 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
       expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
     })
 
+    /** SDK 0.27 finishes a Lightning send that committed funds before the SSP was asked
+     *  to pay, on a later sync. Until then the wallet records the committed swap as a send
+     *  it cannot describe: Pending, with no invoice and no hash to match. */
+    it("pays nothing again while the wallet holds a committed send it has not described", async () => {
+      const detail = createSelfCustodialLnurlPaymentDetails(usdParams())
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      const first = await detail.sendPaymentMutation({} as never)
+      expect(first.status).toBe(PaymentSendResult.Failure)
+
+      historyShows({
+        id: "transfer-1",
+        status: PENDING,
+        timestamp: BigInt(Math.floor(Date.now() / 1000)),
+        details: undefined,
+      })
+      const retry = await detail.sendPaymentMutation({} as never)
+
+      expect(retry.status).toBe(PaymentSendResult.Failure)
+      expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+
+      /** A later sync resumes the send, and its payment carries the invoice it paid. */
+      historyShows(lostSendRecord(QUOTED_HASH))
+      const later = await detail.sendPaymentMutation({} as never)
+
+      expect(later.status).toBe(PaymentSendResult.Success)
+      expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+    })
+
     it("sends nothing on the retry while the wallet cannot catch up with the server", async () => {
       const detail = createSelfCustodialLnurlPaymentDetails(usdParams())
       if (!detail.canSendPayment) throw new Error("expected canSendPayment")
@@ -1601,6 +1666,52 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
       expect(retry.errors?.[0]?.message).toBe(SelfCustodialErrorCode.NetworkError)
       expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
     })
+  })
+})
+
+describe("createSelfCustodialLnurlPaymentDetails lost attempts", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  /** The identifier is the server's word, and another endpoint may give the same one:
+   *  a lost send to one must not be taken for a send to the other. */
+  it("keeps them by the lnurl the sender gave, not by the identifier it names", async () => {
+    const usd = {
+      sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
+      unitOfAccountAmount: {
+        amount: 100,
+        currency: WalletCurrency.Usd,
+        currencyCode: "USD",
+      },
+    }
+    const sendTo = (lnurl: string) => {
+      const detail = createSelfCustodialLnurlPaymentDetails(
+        createParams({
+          ...usd,
+          lnurl,
+          lnurlParams: baseLnurlParams({ identifier: "same@example.com" }),
+        }),
+      )
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      return detail.sendPaymentMutation({} as never)
+    }
+    mockPrepareLnurl.mockResolvedValue(quote())
+    mockExecuteLnurl
+      .mockRejectedValueOnce({ tag: "NetworkError" })
+      .mockResolvedValueOnce({
+        payment: { id: "p2", status: 0, timestamp: BigInt(1), details: undefined },
+        successAction: undefined,
+      })
+    mockFindLostSend.mockResolvedValue({ status: "not-found", failed: [] })
+
+    await sendTo("lnurl1first")
+    mockFindLostSend.mockClear()
+    const other = await sendTo("lnurl1second")
+
+    expect(other.status).toBe(PaymentSendResult.Success)
+    expect(mockFindLostSend).not.toHaveBeenCalled()
+    expect(mockExecuteLnurl).toHaveBeenCalledTimes(2)
   })
 })
 
@@ -1944,5 +2055,85 @@ describe("createSelfCustodialLnurlPaymentDetails send telemetry", () => {
         "sc_payment_send_failed",
       ])
     })
+  })
+})
+
+describe("createSelfCustodialLnurlPaymentDetails reporting a bitcoin send", () => {
+  const lostResponse = { tag: "NetworkError" }
+  const detailFor = (sats: number, key: string) => {
+    const detail = createSelfCustodialLnurlPaymentDetails(
+      createParams({
+        unitOfAccountAmount: {
+          amount: sats,
+          currency: WalletCurrency.Btc,
+          currencyCode: WalletCurrency.Btc,
+        },
+        idempotencyKeyRef: { current: key },
+      }),
+    )
+    if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+    return detail
+  }
+  const earlierPayment = (sats: number) => ({
+    id: "p-earlier",
+    status: 0,
+    amount: BigInt(sats),
+    timestamp: BigInt(1_700_000_000),
+    details: {
+      tag: "Lightning",
+      inner: { htlcDetails: { paymentHash: QUOTED_HASH, preimage: "pre" } },
+    },
+  })
+
+  beforeEach(() => {
+    ;[mockPrepareLnurl, mockExecuteLnurl, mockFindLostSend].forEach((mock) =>
+      mock.mockReset(),
+    )
+    mockPrepareLnurl.mockResolvedValue(quote())
+  })
+
+  it("reports a send whose answer came without a payment as sent", async () => {
+    mockExecuteLnurl.mockResolvedValue({ successAction: undefined })
+
+    const result = await detailFor(1500, "key-a").sendPaymentMutation({} as never)
+
+    expect(result).toEqual({
+      status: PaymentSendResult.Success,
+      transaction: undefined,
+      extraInfo: { preimage: undefined, successAction: undefined },
+    })
+  })
+
+  it("reports an earlier attempt's payment for another amount as that payment", async () => {
+    mockExecuteLnurl.mockRejectedValueOnce(lostResponse)
+    await detailFor(1500, "key-a").sendPaymentMutation({} as never)
+
+    mockFindLostSend.mockResolvedValue({
+      status: "found",
+      payment: earlierPayment(1500),
+      failed: [],
+    })
+    const result = await detailFor(2500, "key-b").sendPaymentMutation({} as never)
+
+    expect(result.status).toBe(PaymentSendResult.Failure)
+    expect(result.errors?.[0]?.message).toBe("sc_earlier_payment_found")
+    expect(result.extraInfo?.earlierPaymentId).toBe("p-earlier")
+    expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+  })
+
+  it("reports an earlier attempt's payment for the same amount as the send", async () => {
+    mockExecuteLnurl.mockRejectedValueOnce(lostResponse)
+    await detailFor(1500, "key-a").sendPaymentMutation({} as never)
+
+    mockFindLostSend.mockResolvedValue({
+      status: "found",
+      payment: earlierPayment(1500),
+      failed: [],
+    })
+    const result = await detailFor(1500, "key-b").sendPaymentMutation({} as never)
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.extraInfo?.preimage).toBe("pre")
+    expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
   })
 })

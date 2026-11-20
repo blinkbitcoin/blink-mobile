@@ -2362,7 +2362,8 @@
     "slideConfirming": "Okukakasa",
     "copiedDestination": "Gy'eziraga wawanduukuluddwa ku lutimbe",
     "lightningRecommended": "Ebisale ebingi! Tukukubiriza okukozesa Lightning.",
-    "usdRemainderSweep": "Ekisigaddewo {remaining: string} ({remainingSats: string}) kijja kufuulibwa Bitcoin. Ekitundu ekisembayo eky'USD: {minimum: string}."
+    "usdRemainderSweep": "Ekisigaddewo {remaining: string} ({remainingSats: string}) kijja kufuulibwa Bitcoin. Ekitundu ekisembayo eky'USD: {minimum: string}.",
+    "sendAnyway": "Nkebedde ebyafaayo byange, weereza wadde kiri kityo"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} amannya g'omukozesa endagiriro ya {bankName: string}.",
@@ -4275,7 +4276,12 @@
     "belowMinimum": "Omuwendo guli wansi w'omuwendo omutono ogwetagisa eby'okusasula kuno. Gezaako omuwendo omunene.",
     "networkError": "Ekizibu ky'okuyungibwa ku mukutu. Kebera enkolagana yo oddemu ogezeeko.",
     "invalidInput": "Ebikwata ku kusasula bifaanana nga si bituufu. Wonna obyebibebule oddemu ogezeeko.",
-    "generic": "Okusasula tekuyinzizza kuwedwa. Ddamu ogezeeko mu kaseera, oba kozesa omuwendo omutono."
+    "generic": "Okusasula tekuyinzizza kuwedwa. Ddamu ogezeeko mu kaseera, oba kozesa omuwendo omutono.",
+    "outcomeUnknown": "Okusasula kuno kuyinza okuba nga kwatambula dda. Kebera ebyafaayo by'enkolagana zo nga tonnakuweereza nate.",
+    "earlierConversionPending": "Okukyusa kwo okwasooka kukyakakasibwa. Ddamu ogezeeko oluvannyuma lw'eddakiika ntono.",
+    "earlierPaymentFound": "Okusasula kwo okwasooka eri ekifo kino kwatambula dda, naye ku muwendo omulala. Kikebere nga tonnaweereza nate.",
+    "earlierConversionFound": "Okukyusa kwo okwasooka kwatambula dda, naye ku muwendo omulala. Kikebere mu byafaayo by'ensimbi zo nga tonnakyusa nate.",
+    "convertedMeanwhile": "Okukyusa okw'omuwendo ogufaanana guno kwakatambula. Kebera ssente zo ezisigaddewo nga tonnakakasa kuno nate."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Akawunti eno yakolebwa ku {network}. Kyuka odde ku {network} okugikozesa."

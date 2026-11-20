@@ -2391,6 +2391,7 @@ const en: BaseTranslation = {
     lightningRecommended: "High fee! We recommend Lightning.",
     usdRemainderSweep:
       "Remaining {remaining: string} ({remainingSats: string}) will be converted to Bitcoin. USD minimum: {minimum: string}.",
+    sendAnyway: "I checked my history, send anyway",
   },
   SendBitcoinDestinationScreen: {
     usernameNowAddress:
@@ -4470,6 +4471,16 @@ const en: BaseTranslation = {
     invalidInput: "The payment details look invalid. Please review and try again.",
     generic:
       "The payment could not be completed. Try again in a moment, or use a smaller amount.",
+    outcomeUnknown:
+      "This payment may already have gone through. Check your transaction history before sending it again.",
+    earlierConversionPending:
+      "Your earlier transfer is still being confirmed. Try again in a few minutes.",
+    earlierPaymentFound:
+      "Your earlier payment to this destination already went through, for a different amount. Check it before sending again.",
+    earlierConversionFound:
+      "Your earlier transfer already went through, for a different amount. Check it in your transaction history before transferring again.",
+    convertedMeanwhile:
+      "A transfer of about this amount just went through. Check your balance before confirming this one again.",
   },
   SelfCustodialNetworkMismatch: {
     toast:

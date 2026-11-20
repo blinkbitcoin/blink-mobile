@@ -1,10 +1,15 @@
+import { it } from "@jest/globals"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { useSelfCustodialConversion } from "@app/screens/conversion-flow/hooks/self-custodial/use-conversion"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
-import { ConvertDirection, PaymentResultStatus } from "@app/types/payment"
+import {
+  ConvertDirection,
+  ConvertErrorCode,
+  PaymentResultStatus,
+} from "@app/types/payment"
 
 const mockGetQuote = jest.fn()
 const mockConvertMoneyAmount = jest.fn()
@@ -55,6 +60,12 @@ jest.mock("@app/i18n/i18n-react", () => ({
     LL: {
       errors: {
         generic: () => "Generic error",
+      },
+      SelfCustodialError: {
+        outcomeUnknown: () => "Check your history",
+        earlierConversionPending: () => "Still being confirmed",
+        earlierConversionFound: () => "Your earlier transfer went through",
+        convertedMeanwhile: () => "A transfer of about this amount went through",
       },
     },
   }),
@@ -526,6 +537,110 @@ describe("useSelfCustodialConversion", () => {
       await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
 
       expect(quotesShown()).toHaveLength(0)
+    })
+  })
+
+  describe("a conversion whose outcome is unknown", () => {
+    const unknownOutcome = () =>
+      jest.fn().mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "raw", code: ConvertErrorCode.OutcomeUnknown }],
+      })
+
+    it("tells the user to check their history", async () => {
+      mockGetQuote.mockResolvedValue(makeQuote({ execute: unknownOutcome() }))
+
+      const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+      await waitFor(() => expect(result.current.canExecute).toBe(true))
+      await act(async () => {
+        await result.current.execute()
+      })
+
+      expect(result.current.errorMessage).toBe("Check your history")
+    })
+
+    /** Nothing went out, and the earlier transfer may still go through: nothing in the
+     *  history unblocks it, only time does, so the user is told to wait. */
+    it("tells the user to try again in a few minutes while an earlier transfer may still go through", async () => {
+      mockGetQuote.mockResolvedValue(
+        makeQuote({
+          execute: jest.fn().mockResolvedValue({
+            status: PaymentResultStatus.Failed,
+            errors: [{ message: "raw", code: ConvertErrorCode.EarlierConversionPending }],
+          }),
+        }),
+      )
+
+      const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+      await waitFor(() => expect(result.current.canExecute).toBe(true))
+      await act(async () => {
+        await result.current.execute()
+      })
+
+      expect(result.current.errorMessage).toBe("Still being confirmed")
+    })
+
+    it("points the user at an earlier transfer that turned out to have gone through", async () => {
+      mockGetQuote.mockResolvedValue(
+        makeQuote({
+          execute: jest.fn().mockResolvedValue({
+            status: PaymentResultStatus.Failed,
+            errors: [{ message: "raw", code: ConvertErrorCode.EarlierConversionFound }],
+          }),
+        }),
+      )
+
+      const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+      await waitFor(() => expect(result.current.canExecute).toBe(true))
+      await act(async () => {
+        await result.current.execute()
+      })
+
+      expect(result.current.errorMessage).toBe("Your earlier transfer went through")
+    })
+
+    it("asks the user to confirm again, on a new quote, a transfer of about an amount that went through while it waited", async () => {
+      const convertedMeanwhile = jest.fn().mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "raw", code: ConvertErrorCode.AlreadyConverted }],
+      })
+      mockGetQuote
+        .mockResolvedValueOnce(makeQuote({ execute: convertedMeanwhile }))
+        .mockResolvedValueOnce(makeQuote())
+
+      const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+      await waitFor(() => expect(result.current.canExecute).toBe(true))
+      await act(async () => {
+        await result.current.execute()
+      })
+
+      expect(result.current.errorMessage).toBe(
+        "A transfer of about this amount went through",
+      )
+      expect(mockOnSuccess).not.toHaveBeenCalled()
+      await waitFor(() => expect(mockGetQuote).toHaveBeenCalledTimes(2))
+    })
+
+    it.each([
+      ["the wallet's history was unreadable", ConvertErrorCode.HistoryUnavailable],
+      ["the SDK answered that the conversion failed", ConvertErrorCode.ConversionFailed],
+    ])("asks to try again, not the SDK's words, when %s", async (_, code) => {
+      mockGetQuote.mockResolvedValue(
+        makeQuote({
+          execute: jest.fn().mockResolvedValue({
+            status: PaymentResultStatus.Failed,
+            errors: [{ message: "raw", code }],
+          }),
+        }),
+      )
+
+      const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+      await waitFor(() => expect(result.current.canExecute).toBe(true))
+      await act(async () => {
+        await result.current.execute()
+      })
+
+      expect(result.current.errorMessage).toBe("Generic error")
     })
   })
 })
