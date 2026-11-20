@@ -55,6 +55,12 @@ describe("react-native-haptic-feedback import rule", () => {
     expect(await restrictedImportErrors("__tests__/utils/some.spec.ts")).toHaveLength(0)
   })
 
+  it("refuses the library in the legacy key store, which may import secure-key-store", async () => {
+    expect(
+      await restrictedImportErrors("app/utils/storage/legacy-key-store.ts"),
+    ).toHaveLength(1)
+  })
+
   it("still refuses Crashlytics in the files exempt from the haptics path", async () => {
     const eslint = new ESLint({ cwd: ROOT })
     const [result] = await eslint.lintText(
