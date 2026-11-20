@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Pressable, StyleSheet, TextInput, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -70,6 +71,7 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
               {primaryCurrencyFormattedAmount || "0"}
             </Text>
             <TextInput
+              maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
               value=""
               showSoftInputOnFocus={false}
               onChangeText={(e) => {

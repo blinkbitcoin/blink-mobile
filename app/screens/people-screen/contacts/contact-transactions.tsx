@@ -1,5 +1,6 @@
 import * as React from "react"
 import { ActivityIndicator, SectionList, StyleSheet, Text, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { gql } from "@apollo/client"
 import {
@@ -146,7 +147,12 @@ export const ContactTransactions = ({ contact }: Props) => {
   const renderSectionHeader = React.useCallback(
     ({ section: { title } }: { section: { title: string } }) => (
       <View style={styles.sectionHeaderContainer}>
-        <Text style={styles.sectionHeaderText}>{title}</Text>
+        <Text
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+          style={styles.sectionHeaderText}
+        >
+          {title}
+        </Text>
       </View>
     ),
     [styles.sectionHeaderContainer, styles.sectionHeaderText],
@@ -210,7 +216,12 @@ export const ContactTransactions = ({ contact }: Props) => {
     </View>
   ) : (
     <View style={styles.noTransactionView} testID="contact-no-transactions">
-      <Text style={styles.noTransactionText}>{LL.TransactionScreen.noTransaction()}</Text>
+      <Text
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+        style={styles.noTransactionText}
+      >
+        {LL.TransactionScreen.noTransaction()}
+      </Text>
     </View>
   )
 

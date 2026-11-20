@@ -67,6 +67,7 @@ import {
 import { WebViewScreen } from "@app/screens/webview/webview"
 import { testProps } from "@app/utils/testProps"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import { HeaderTitle } from "@react-navigation/elements"
 import {
   createNativeStackNavigator,
   NativeStackNavigationProp,
@@ -200,7 +201,9 @@ import { HomeGate } from "./home-gate"
 import { LAUNCH_ROUTE } from "./unlock-routes"
 import { WindDownReceiveGate } from "@app/screens/account-migration/wind-down-receive-gate"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
-import { TouchableOpacity } from "react-native"
+import { StyleSheet, Text as RNText, TouchableOpacity } from "react-native"
+
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { ApiScreen } from "@app/screens/settings-screen/api-screen"
 import { ApiKeyCreateScreen } from "@app/screens/settings-screen/api/api-key-create-screen"
@@ -214,6 +217,61 @@ const DeveloperScreen: React.ComponentType | null = __DEV__
   ? // eslint-disable-next-line @typescript-eslint/no-var-requires
     require("../screens/developer-screen").DeveloperScreen
   : null
+
+const tabBarLabelStyles = StyleSheet.create({
+  label: {
+    paddingBottom: 6,
+    fontSize: 12,
+    fontFamily: fonts.bold,
+    width: "100%",
+    textAlign: "center",
+  },
+})
+
+// Heading 2/Bold, as `styles.title`. A `headerTitle` function gets no `headerTitleStyle`, and
+// the library's `HeaderTitle` otherwise draws the platform font at 17 on iOS.
+const headerTitleStyles = StyleSheet.create({
+  title: {
+    fontFamily: fonts.bold,
+    fontSize: 20,
+  },
+})
+
+/**
+ * The tab labels are drawn by the navigator's own Text, which the theme's ceiling never
+ * reaches, and they sit in a bar of fixed height: at the largest OS text sizes they grow
+ * out of it and clip to "Hom..", "Peop..". Rendering the label here is what lets them carry
+ * the same ceiling as the rest of the app, and it replaces `tabBarLabelStyle`, which the
+ * navigator only applies to the label it renders itself.
+ *
+ * Built once, like the header controls above, so the option keeps one identity across
+ * renders rather than remounting every label.
+ */
+/**
+ * The header title is drawn by the navigator too, and it is the widest single line in the
+ * app: at the largest OS text sizes it grows until a screen name clips mid-word
+ * ("Lightning in…"). Wrapping the library's own title keeps its placement and tint, and
+ * adds the Source Sans Pro face and the ceiling the rest of the app follows.
+ *
+ * Built once for the same reason as the controls above.
+ */
+const renderHeaderTitle = (props: { children: string; tintColor?: string }) => (
+  <HeaderTitle
+    {...props}
+    maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+    style={headerTitleStyles.title}
+  />
+)
+
+const renderTabBarLabel = ({ color, children }: { color: string; children: string }) => (
+  <RNText
+    style={[tabBarLabelStyles.label, { color }]}
+    maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+    numberOfLines={1}
+  >
+    {children}
+  </RNText>
+)
 
 /**
  * The swipe stays blocked for every entry: leaving by gesture is undirected, so the arrow is
@@ -411,6 +469,7 @@ export const RootStack = () => {
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
         headerBackTitleStyle: styles.backTitle,
+        headerTitle: renderHeaderTitle,
         headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
@@ -1145,6 +1204,7 @@ export const OnboardingNavigator = () => {
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
         headerBackTitleStyle: styles.backTitle,
+        headerTitle: renderHeaderTitle,
         headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
       }}
@@ -1201,6 +1261,7 @@ export const ContactNavigator = () => {
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
         headerBackTitleStyle: styles.backTitle,
+        headerTitle: renderHeaderTitle,
         headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
@@ -1260,6 +1321,7 @@ export const PhoneLoginNavigator = () => {
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
         headerBackTitleStyle: styles.backTitle,
+        headerTitle: renderHeaderTitle,
         headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
@@ -1312,12 +1374,7 @@ export const PrimaryNavigator = () => {
           tabBarActiveTintColor: colors.accent,
           tabBarInactiveTintColor: colors.textMuted,
           tabBarStyle,
-          tabBarLabelStyle: {
-            paddingBottom: 6,
-            fontSize: 12,
-            fontFamily: fonts.bold,
-            width: "100%",
-          },
+          tabBarLabel: renderTabBarLabel,
           tabBarHideOnKeyboard: true,
         }}
       >

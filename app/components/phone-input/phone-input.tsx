@@ -157,6 +157,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
           isDisabled && styles.disabledInput,
           inputContainerStyle,
         ]}
+        inputStyle={styles.input}
         renderErrorMessage={false}
         textContentType="telephoneNumber"
         keyboardType="phone-pad"
@@ -199,6 +200,12 @@ const useStyles = makeStyles(({ colors }, props: { bgColor?: string }) => ({
     paddingHorizontal: 10,
     backgroundColor: props.bgColor || colors.surfaceInteractive,
     borderRadius: radius.default,
+  },
+  /** The paste control shares the row with the number, and the field only clips at its own
+   *  edge: without a gap the two read as one string once the OS text size grows the number
+   *  into it. Reserving it costs nothing at the sizes where the number already fits. */
+  input: {
+    paddingRight: 8,
   },
   disabledInput: { opacity: 0.6 },
 }))

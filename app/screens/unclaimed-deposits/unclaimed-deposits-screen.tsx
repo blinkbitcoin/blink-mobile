@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { ActivityIndicator, Pressable, TextInput, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -156,6 +157,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                     </Text>
                     <View style={styles.fieldInput}>
                       <TextInput
+                        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
                         style={styles.fieldInputText}
                         placeholder={addressPlaceholderFor(network)}
                         placeholderTextColor={colors.textMuted}

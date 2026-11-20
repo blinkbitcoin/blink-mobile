@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import {
   LatLng,
@@ -305,6 +306,7 @@ export const AddPlacePanel: React.FC<Props> = ({
             <Text style={styles.label}>{LL.MapScreen.placeName()}</Text>
             <View style={styles.inputRow}>
               <TextInput
+                maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
                 testID="place-name-input"
                 style={styles.input}
                 value={name}

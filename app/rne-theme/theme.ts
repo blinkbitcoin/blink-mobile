@@ -4,6 +4,7 @@ import { createTheme } from "@rn-vui/themed"
 
 import { light, dark } from "./colors"
 import { fonts } from "./fonts"
+import { MAX_FONT_SIZE_MULTIPLIER } from "./text-scaling"
 
 const theme = createTheme({
   lightColors: light,
@@ -17,6 +18,12 @@ const theme = createTheme({
    */
   components: {
     Button: {
+      /** A button draws its title with rn-vui's own Text, which the theme's Text entry
+       *  never reaches, so the ceiling travels through the props that Text receives.
+       *  Without it the primary action is the one label that keeps growing. */
+      titleProps: {
+        maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER,
+      },
       containerStyle: {
         borderRadius: 50,
       },
@@ -29,7 +36,10 @@ const theme = createTheme({
         fontFamily: fonts.bold,
       },
     },
+    /** rn-vui's Input forwards what it does not consume to the TextInput underneath, so
+     *  the ceiling reaches typed text and placeholders the same way it reaches labels. */
     Input: {
+      maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER,
       inputStyle: {
         fontFamily: fonts.regular,
       },
@@ -98,6 +108,7 @@ const theme = createTheme({
         : {}
 
       return {
+        maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER,
         style: {
           ...universalStyle,
           ...sizeStyle,

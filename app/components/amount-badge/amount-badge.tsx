@@ -1,12 +1,13 @@
 import * as React from "react"
-// RN's Text, not the themed one: only the plain component honours
-// maxFontSizeMultiplier, and capping the scale is the point of this badge.
+// RN's Text, not the themed one, so the theme's ceiling does not reach it: the badge
+// carries the shared ceiling itself, since capping the scale is the point of this slot.
 import { Animated, Pressable, Text } from "react-native"
 import { makeStyles } from "@rn-vui/themed"
 
 import { useDropInOutAnimation } from "@app/components/animations"
 import { GaloyIcon, type IconNamesType } from "@app/components/atomic/galoy-icon"
 import { fonts } from "@app/rne-theme/fonts"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 /** Exported: whoever arbitrates the badge slot must keep a badge mounted for
  *  exactly `durationOut` after it hides, or its exit animation is cut off. */
@@ -16,11 +17,6 @@ export const AMOUNT_BADGE_ANIMATION = {
   durationIn: 180,
   durationOut: 180,
 } as const
-
-/** The badge sits in a fixed-height slot between the balance and the wallet
- *  cards; uncapped Dynamic Type overruns it (#4120). Same ceiling as the
- *  balance above it. */
-const MAX_BADGE_FONT_SIZE_MULTIPLIER = 1.4
 
 /** Matches chain.svg's native 18x18 viewBox. */
 const ICON_SIZE = 18
@@ -105,7 +101,7 @@ export const AmountBadge: React.FC<Props> = ({
               style={styles.text}
               numberOfLines={1}
               ellipsizeMode="tail"
-              maxFontSizeMultiplier={MAX_BADGE_FONT_SIZE_MULTIPLIER}
+              maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
             >
               {amountText}
             </Text>

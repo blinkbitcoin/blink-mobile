@@ -17,6 +17,8 @@ import { testProps } from "@app/utils/testProps"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { fonts } from "@app/rne-theme/fonts"
 
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
+
 import { GaloyIcon } from "../galoy-icon"
 
 /** The track spans the screen less the padding its callers put either side. */
@@ -24,6 +26,8 @@ const TRACK_INSET = 40
 /** How far short of the track's end the travel stops. Not the handle's width, which is
  *  60: this is the pre-existing figure, kept so the commit threshold does not move. */
 const TRAVEL_INSET = 50
+/** The knob's diameter, which the label has to stay clear of. */
+const SWIPE_KNOB_SIZE = 60
 const isRTL = I18nManager.isRTL
 
 type SwipeButtonPropsType = {
@@ -132,7 +136,10 @@ const GaloySliderButton = ({
         </GestureDetector>
       )}
       {!disabled && (
-        <Animated.Text style={[styles.swipeText, AnimatedStyles.swipeText]}>
+        <Animated.Text
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+          style={[styles.swipeText, styles.knobClearance, AnimatedStyles.swipeText]}
+        >
           {initialText}
         </Animated.Text>
       )}
@@ -162,8 +169,8 @@ const useStyles = makeStyles(({ colors }, { buttonWidth }: { buttonWidth: number
   swipeButton: {
     position: "absolute",
     left: 0,
-    height: 60,
-    width: 60,
+    height: SWIPE_KNOB_SIZE,
+    width: SWIPE_KNOB_SIZE,
     borderRadius: 30,
     zIndex: 3,
     alignItems: "center",
@@ -171,10 +178,19 @@ const useStyles = makeStyles(({ colors }, { buttonWidth }: { buttonWidth: number
   },
   swipeText: {
     alignSelf: "center",
+    textAlign: "center",
     fontSize: 14,
     fontFamily: fonts.regular,
     zIndex: 2,
     color: colors.textMuted,
+  },
+  /** The knob rides over the left of the track, so the idle label keeps clear of it rather
+   *  than running underneath: at the larger text sizes it grew into the knob and read as a
+   *  half word. Only the left needs clearing, as the label reads to the knob's right. The
+   *  loading label goes without it: the knob is gone by then and the label centres. */
+  knobClearance: {
+    paddingLeft: SWIPE_KNOB_SIZE + 10,
+    paddingRight: 12,
   },
   loadingContainer: {
     display: "flex",

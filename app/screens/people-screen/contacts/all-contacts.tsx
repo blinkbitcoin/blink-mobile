@@ -1,6 +1,7 @@
 import * as React from "react"
 import { useCallback, useMemo, useState } from "react"
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { FlatList } from "react-native-gesture-handler"
 import { gql } from "@apollo/client"
 import { radius } from "@app/rne-theme/radius"
@@ -159,6 +160,7 @@ export const AllContactsScreen: React.FC = () => {
   if (contacts.length > 0) {
     SearchBarContent = (
       <SearchBar
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         {...testProps(LL.common.search())}
         placeholder={LL.common.search()}
         value={searchText}
@@ -187,7 +189,12 @@ export const AllContactsScreen: React.FC = () => {
   if (contacts.length > 0) {
     ListEmptyContent = (
       <View style={styles.emptyListNoMatching}>
-        <Text style={styles.emptyListTitle}>{LL.PeopleScreen.noMatchingContacts()}</Text>
+        <Text
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+          style={styles.emptyListTitle}
+        >
+          {LL.PeopleScreen.noMatchingContacts()}
+        </Text>
       </View>
     )
   } else if (loading) {
@@ -200,12 +207,18 @@ export const AllContactsScreen: React.FC = () => {
     ListEmptyContent = (
       <View style={styles.emptyListNoContacts}>
         <Text
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           {...testProps(LL.PeopleScreen.noContactsTitle())}
           style={styles.emptyListTitle}
         >
           {LL.PeopleScreen.noContactsTitle()}
         </Text>
-        <Text style={styles.emptyListText}>{LL.PeopleScreen.noContactsYet()}</Text>
+        <Text
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+          style={styles.emptyListText}
+        >
+          {LL.PeopleScreen.noContactsYet()}
+        </Text>
       </View>
     )
   }
