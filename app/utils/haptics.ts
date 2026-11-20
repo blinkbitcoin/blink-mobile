@@ -34,7 +34,7 @@ const INTENTS = {
     type: pick("selection", "soft"),
     ignoreAndroidSystemSettings: true,
   },
-  /** A chip, wallet switch, currency swap, option pick, long-press copy. */
+  /** A chip, wallet switch, currency swap, option pick, or a copy that shows the toast. */
   select: {
     type: pick("selection", "impactLight"),
     ignoreAndroidSystemSettings: false,
