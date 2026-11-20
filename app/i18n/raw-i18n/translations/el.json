@@ -2783,6 +2783,7 @@
     "title": "Ορίστε {bankName: string} την διεύθυνση",
     "mainTitle": "Επιλέξτε Διεύθυνση Lightning",
     "setLightningAddress": "Ορίστε την διεύθυνσή σας στο Lightning",
+    "addressSet": "Η διεύθυνση Lightning ορίστηκε",
     "Errors": {
       "tooShort": "Η διεύθυνση πρέπει να έχει τουλάχιστον 3 χαρακτήρες ",
       "tooLong": "Η διεύθυνση πρέπει να είναι μέχρι 50 χαρακτήσρες",
@@ -2906,6 +2907,7 @@
   },
   "EmailRegistrationValidateScreen": {
     "header": "Για να επιβεβαιώσετε το email σας, πληκτρολογήστε τον κωδικό που μόλις σας στείλαμε στο {email: string}",
+    "emailVerified": "Το email επαληθεύτηκε",
     "success": "Email {email: string} επιτυχής επιβεβαίωση "
   },
   "EmailLoginInitiateScreen": {

@@ -1,12 +1,6 @@
-import React, { useEffect } from "react"
-import { View } from "react-native"
+import React, { useCallback } from "react"
 
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { Screen } from "@app/components/screen"
-import {
-  SuccessIconAnimation,
-  CompletedTextAnimation,
-} from "@app/components/success-animation"
+import { SuccessScreen } from "@app/components/success-screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   ChooseExperienceEntry,
@@ -21,9 +15,6 @@ import {
   useRoute,
 } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { Text, makeStyles } from "@rn-vui/themed"
-
-const CALLBACK_DELAY = 3000
 
 /** Rebuilds the path the drain came from, with the Anon switch preselected to resume it. */
 const MODE_SELECTION_RETURN = CommonActions.reset({
@@ -42,8 +33,6 @@ const MODE_SELECTION_RETURN = CommonActions.reset({
 })
 
 export const ConversionSuccessScreen = () => {
-  const styles = useStyles()
-
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "conversionSuccess">>()
   const route = useRoute<RouteProp<RootStackParamList, "conversionSuccess">>()
@@ -51,50 +40,24 @@ export const ConversionSuccessScreen = () => {
   const { LL } = useI18nContext()
   const returnTo = route.params?.returnTo
 
-  useEffect(() => {
-    /** A drain conversion resumes the flow that demanded it (migration entry, or the mode
-     *  selection for the Anon switch); a standalone one returns to Home. */
-    const continueAfterSuccess = () => {
-      if (returnTo === DrainConversionReturn.Migration) {
-        navigation.replace("accountMigrationEntry")
-        return
-      }
-      if (returnTo === DrainConversionReturn.ModeSelection) {
-        navigation.dispatch(MODE_SELECTION_RETURN)
-        return
-      }
-      navigation.popToTop()
+  /** A drain conversion resumes the flow that demanded it (migration entry, or the mode
+   *  selection for the Anon switch); a standalone one returns to Home. */
+  const continueAfterSuccess = useCallback(() => {
+    if (returnTo === DrainConversionReturn.Migration) {
+      navigation.replace("accountMigrationEntry")
+      return
     }
-    const timeout = setTimeout(continueAfterSuccess, CALLBACK_DELAY)
-    return () => clearTimeout(timeout)
+    if (returnTo === DrainConversionReturn.ModeSelection) {
+      navigation.dispatch(MODE_SELECTION_RETURN)
+      return
+    }
+    navigation.popToTop()
   }, [navigation, returnTo])
 
   return (
-    <Screen preset="scroll" style={styles.screen} headerShown={false}>
-      <View style={styles.container}>
-        <SuccessIconAnimation>
-          <GaloyIcon name={"payment-success"} size={128} />
-        </SuccessIconAnimation>
-        <CompletedTextAnimation>
-          <Text type="h2" style={styles.successText}>
-            {LL.ConversionSuccessScreen.message()}
-          </Text>
-        </CompletedTextAnimation>
-      </View>
-    </Screen>
+    <SuccessScreen
+      title={LL.ConversionSuccessScreen.message()}
+      onHoldEnd={continueAfterSuccess}
+    />
   )
 }
-
-const useStyles = makeStyles(() => ({
-  successText: {
-    marginTop: 20,
-  },
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  screen: {
-    flexGrow: 1,
-  },
-}))

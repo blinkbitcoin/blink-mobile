@@ -2783,6 +2783,7 @@
     "title": "486\nStel {bankName: string} adres",
     "mainTitle": "Kies Lightning-adres",
     "setLightningAddress": "Stel Lightning-adres",
+    "addressSet": "Lightning-adres gestel",
     "Errors": {
       "tooShort": "Adres moet minstens 3 karakters lank wees",
       "tooLong": "Adres kan nie meer as 50 karakters lank wees nie",
@@ -2906,6 +2907,7 @@
   },
   "EmailRegistrationValidateScreen": {
     "header": "Om jou epos te bevestig, tik die kode in wat ons gestuur het na {email: string}",
+    "emailVerified": "Epos geverifieer",
     "success": "Epos {email: string} suksesvol bevestig"
   },
   "EmailLoginInitiateScreen": {

@@ -2783,6 +2783,7 @@
         "title": "{bankName: string}アドレスを設定する",
         "mainTitle": "Lightningアドレスを選択",
         "setLightningAddress": "Lightningアドレスを設定",
+        "addressSet": "Lightningアドレスを設定しました",
         "Errors": {
             "tooShort": "アドレスは3文字以上で入力してください",
             "tooLong": "アドレスは50文字以上でなければなりません",
@@ -2906,6 +2907,7 @@
     },
     "EmailRegistrationValidateScreen": {
         "header": "メールアドレスを認証するには、{email: string} 宛てに先ほどお送りしたコードを入力してください。",
+        "emailVerified": "メールアドレスを認証しました",
         "success": "メールアドレス{email: string}が正常に認証されました"
     },
     "EmailLoginInitiateScreen": {

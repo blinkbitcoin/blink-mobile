@@ -1,5 +1,6 @@
 import React from "react"
 import { act, fireEvent, render } from "@testing-library/react-native"
+import { SafeAreaProvider } from "react-native-safe-area-context"
 
 import { ThemeProvider } from "@rn-vui/themed"
 import TypesafeI18n from "@app/i18n/i18n-react"
@@ -31,14 +32,6 @@ jest.mock("@app/graphql/generated", () => ({
   useUserEmailRegistrationValidateMutation: () => [mockEmailVerify, { loading: false }],
 }))
 
-jest.mock("@app/components/success-animation", () => {
-  const ReactActual = jest.requireActual("react")
-  return {
-    SuccessIconAnimation: ({ children }: { children: React.ReactNode }) =>
-      ReactActual.createElement(ReactActual.Fragment, null, children),
-  }
-})
-
 jest.mock("@app/components/code-input", () => {
   const ReactActual = jest.requireActual("react")
   const { Pressable, Text } = jest.requireActual("react-native")
@@ -52,18 +45,26 @@ jest.mock("@app/components/code-input", () => {
   }
 })
 
+import { SUCCESS_SCREEN_EXIT_MS } from "@app/components/success-screen"
 import { EmailRegistrationValidateScreen } from "@app/screens/email-registration-screen/email-registration-validate"
 
 jest.useFakeTimers()
 
 loadLocale("en")
 
-const SUCCESS_DELAY = 2000
+const SUCCESS_DELAY = SUCCESS_SCREEN_EXIT_MS
+
+const SAFE_AREA = {
+  frame: { x: 0, y: 0, width: 360, height: 800 },
+  insets: { top: 0, left: 0, right: 0, bottom: 0 },
+}
 
 const wrap = (ui: React.ReactElement) => (
-  <ThemeProvider>
-    <TypesafeI18n locale="en">{ui}</TypesafeI18n>
-  </ThemeProvider>
+  <SafeAreaProvider initialMetrics={SAFE_AREA}>
+    <ThemeProvider>
+      <TypesafeI18n locale="en">{ui}</TypesafeI18n>
+    </ThemeProvider>
+  </SafeAreaProvider>
 )
 
 const makeRoute = (
@@ -88,6 +89,42 @@ describe("EmailRegistrationValidateScreen — navigation after success", () => {
     jest.clearAllMocks()
     mockEmailVerify.mockResolvedValue(verifiedResponse)
     mockUpdateCurrentProfile.mockResolvedValue(undefined)
+  })
+
+  it("shows the success screen with the verified email", async () => {
+    const { getByTestId, getByText } = render(
+      wrap(
+        <EmailRegistrationValidateScreen
+          route={makeRoute({ emailRegistrationId: "id", email: "a@b.com" })}
+        />,
+      ),
+    )
+
+    await act(async () => {
+      fireEvent.press(getByTestId("submit-code"))
+    })
+
+    expect(getByText("Email verified")).toBeTruthy()
+    expect(getByText("a@b.com")).toBeTruthy()
+  })
+
+  it("stays put until the success screen has held", async () => {
+    const { getByTestId } = render(
+      wrap(
+        <EmailRegistrationValidateScreen
+          route={makeRoute({ emailRegistrationId: "id", email: "a@b.com" })}
+        />,
+      ),
+    )
+
+    await act(async () => {
+      fireEvent.press(getByTestId("submit-code"))
+    })
+    act(() => {
+      jest.advanceTimersByTime(SUCCESS_DELAY - 1)
+    })
+
+    expect(mockPopTo).not.toHaveBeenCalled()
   })
 
   it("pops back to the existing Settings screen when the flow started from Settings", async () => {

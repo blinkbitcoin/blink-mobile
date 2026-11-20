@@ -2783,6 +2783,7 @@
     "title": "Nastavte adresu {bankName: string}",
     "mainTitle": "Zvoľte Lightning adresu",
     "setLightningAddress": "Nastavte Lightning adresu",
+    "addressSet": "Lightning adresa nastavená",
     "Errors": {
       "tooShort": "Adresa musí mať aspoň 3 znaky",
       "tooLong": "Adresa môže mať maximálne 50 znakov",
@@ -2906,6 +2907,7 @@
   },
   "EmailRegistrationValidateScreen": {
     "header": "Ak chcete potvrdiť svoju e-mailovú adresu, zadajte kód, ktorý sme vám práve poslali na {email: string}.",
+    "emailVerified": "E-mail overený",
     "success": "E-mail {email: string} bol úspešne potvrdený"
   },
   "EmailLoginInitiateScreen": {

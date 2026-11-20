@@ -2783,6 +2783,7 @@
     "title": "Stel het adres van {bankName: string} in",
     "mainTitle": "Kies Lightning-adres",
     "setLightningAddress": "Lightning-adres instellen",
+    "addressSet": "Lightning-adres ingesteld",
     "Errors": {
       "tooShort": "Adres moet minimaal 3 tekens lang zijn",
       "tooLong": "Het adres mag maximaal 50 tekens lang zijn",
@@ -2906,6 +2907,7 @@
   },
   "EmailRegistrationValidateScreen": {
     "header": "Om uw e-mailadres te bevestigen, voert u de code in die we u zojuist hebben gestuurd op {email: string}",
+    "emailVerified": "E-mail geverifieerd",
     "success": "E-mail {email: string} succesvol bevestigd"
   },
   "EmailLoginInitiateScreen": {

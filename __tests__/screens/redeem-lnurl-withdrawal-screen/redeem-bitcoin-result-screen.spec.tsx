@@ -1,6 +1,6 @@
 import React from "react"
-import { ActivityIndicator } from "react-native"
-import { render } from "@testing-library/react-native"
+import { AccessibilityInfo, ActivityIndicator } from "react-native"
+import { render, waitFor } from "@testing-library/react-native"
 
 import RedeemBitcoinResultScreen from "@app/screens/redeem-lnurl-withdrawal-screen/redeem-bitcoin-result-screen"
 import { WalletCurrency } from "@app/graphql/generated"
@@ -39,6 +39,7 @@ jest.mock("@app/hooks/use-display-currency", () => ({
 jest.mock("@app/i18n/i18n-react", () => {
   let cached: {
     LL: {
+      common: { success: () => string }
       RedeemBitcoinScreen: {
         title: () => string
         redeemAmountFrom: () => string
@@ -51,6 +52,7 @@ jest.mock("@app/i18n/i18n-react", () => {
       if (!cached) {
         cached = {
           LL: {
+            common: { success: () => "Success!" },
             RedeemBitcoinScreen: {
               title: () => "Redeem Bitcoin",
               redeemAmountFrom: () => "Redeem 10 sats from example.com",
@@ -81,6 +83,20 @@ jest.mock("@app/components/atomic/galoy-icon", () => {
       ReactActual.createElement(View, { testID: `icon-${name}` }),
   }
 })
+
+jest.mock("@app/components/success-badge", () => {
+  const ReactActual = jest.requireActual("react")
+  const { View } = jest.requireActual("react-native")
+  return {
+    SuccessBadge: () => ReactActual.createElement(View, { testID: "success-badge" }),
+  }
+})
+
+const mockTriggerHapticFeedback = jest.fn()
+jest.mock("@app/utils/helper", () => ({
+  ...jest.requireActual("@app/utils/helper"),
+  triggerHapticFeedback: (...args: unknown[]) => mockTriggerHapticFeedback(...args),
+}))
 
 jest.mock("@app/screens/receive-bitcoin-screen/my-ln-updates-sub", () => {
   const ReactActual = jest.requireActual("react")
@@ -146,6 +162,7 @@ const buildRoute = () => {
 describe("RedeemBitcoinResultScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    jest.spyOn(AccessibilityInfo, "announceForAccessibility").mockImplementation(() => {})
     mockUseLnurlWithdrawRedemption.mockReturnValue({
       paid: false,
       errorMessage: "",
@@ -190,7 +207,7 @@ describe("RedeemBitcoinResultScreen", () => {
     expect(lastCallArg.walletId).toBeUndefined()
   })
 
-  it("renders the success icon when the hook reports paid=true", async () => {
+  it("draws the success badge in, with the success haptic, when the hook reports paid=true", async () => {
     mockUseLnurlWithdrawRedemption.mockReturnValue({
       paid: true,
       errorMessage: "",
@@ -201,7 +218,40 @@ describe("RedeemBitcoinResultScreen", () => {
 
     await flushEffects()
 
-    expect(queryByTestId("icon-payment-success")).toBeTruthy()
+    expect(queryByTestId("success-badge")).toBeTruthy()
+    expect(queryByTestId("icon-payment-success")).toBeNull()
+    expect(mockTriggerHapticFeedback).toHaveBeenCalledTimes(1)
+    expect(mockTriggerHapticFeedback).toHaveBeenCalledWith("notificationSuccess")
+  })
+
+  it("speaks success and labels the badge for screen readers once paid", async () => {
+    mockUseLnurlWithdrawRedemption.mockReturnValue({
+      paid: true,
+      errorMessage: "",
+      lnServiceErrorReason: "",
+    })
+
+    const { getByTestId } = render(<RedeemBitcoinResultScreen route={buildRoute()} />)
+
+    await flushEffects()
+
+    expect(getByTestId("Success Icon").props).toMatchObject({
+      accessible: true,
+      accessibilityRole: "image",
+      accessibilityLabel: "Success!",
+    })
+    await waitFor(() =>
+      expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledWith("Success!"),
+    )
+    expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledTimes(1)
+  })
+
+  it("speaks nothing while the redemption is still running", async () => {
+    render(<RedeemBitcoinResultScreen route={buildRoute()} />)
+
+    await flushEffects()
+
+    expect(AccessibilityInfo.announceForAccessibility).not.toHaveBeenCalled()
   })
 
   it("renders the error message when the hook reports an errorMessage", async () => {

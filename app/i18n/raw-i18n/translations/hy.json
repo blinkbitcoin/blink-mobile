@@ -2783,6 +2783,7 @@
     "title": "Սահմանել {bankName: string} հասցե",
     "mainTitle": "Ընտրեք Lightning հասցե",
     "setLightningAddress": "Սահմանել Lightning հասցե",
+    "addressSet": "Lightning հասցեն սահմանված է",
     "Errors": {
       "tooShort": "Հասցեն պետք է ունենա առնվազն 3 նիշ",
       "tooLong": "Հասցեն պետք է ունենա առնվազն 50 նիշ",
@@ -2906,6 +2907,7 @@
   },
   "EmailRegistrationValidateScreen": {
     "header": "Ձեր էլ․ հասցեն հաստատելու համար մուտքագրեք ծածկագիրը, որը ուղարկվել է {email: string}ին",
+    "emailVerified": "Էլ․ հասցեն հաստատված է",
     "success": "Էլ․ հասցեն {email: string} հաջողությամբ հաստատվել է"
   },
   "EmailLoginInitiateScreen": {

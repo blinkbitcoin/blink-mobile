@@ -2783,6 +2783,7 @@
     "title": "{bankName: string} cím beállítása",
     "mainTitle": "Lightning cím kiválasztása",
     "setLightningAddress": "Állítsd be a Lightning címed",
+    "addressSet": "Lightning cím beállítva",
     "Errors": {
       "tooShort": "A cím legalább 3 karakter hosszú kell legyen",
       "tooLong": "A cím legfeljebb 50 karakter hosszú lehet",
@@ -2906,6 +2907,7 @@
   },
   "EmailRegistrationValidateScreen": {
     "header": "Az email cím megerősítéséhez add meg a kódot, amit most küldtünk a következő email címre: {email: string}",
+    "emailVerified": "Email cím megerősítve",
     "success": "Az {email: string} email cím sikeresen megerősítve"
   },
   "EmailLoginInitiateScreen": {
