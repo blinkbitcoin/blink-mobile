@@ -1224,6 +1224,126 @@ describe("useAutoConvertListener — receives of one amount converting at once",
     )
   })
 
+  /** Its last allowed attempt converted, and its pairing did not reach storage: the next
+   *  trigger stores the pairing before the attempt cap could drop the receive, and
+   *  converts nothing more. */
+  it("stores the pairing of a receive whose last allowed attempt converted before the cap drops it", async () => {
+    const record: { attempts: number; lastAttemptAtMs: number | undefined } = makeRecord({
+      paymentRequest: "lnbcLastAttempt",
+      attempts: 2,
+    })
+    const sdk = makeSdk({
+      listPayments: jest
+        .fn()
+        .mockResolvedValue({ payments: [makeLightningPayment("lnbcLastAttempt")] }),
+    })
+    setupDefaults(sdk)
+    mockListPendingAutoConverts.mockImplementation(async () => [{ ...record }])
+    mockFindPendingAutoConvert.mockImplementation(async () => ({ ...record }))
+    mockRecordAutoConvertAttempt.mockImplementation(async (_: string, atMs: number) => {
+      record.attempts += 1
+      record.lastAttemptAtMs = atMs
+    })
+    mockExecuteAutoConvert.mockResolvedValue({
+      status: AutoConvertStatus.Converted,
+      conversionPaymentId: "conversion-of-the-last-attempt",
+    })
+    mockMarkAutoConvertPairing.mockRejectedValueOnce(new Error("storage unavailable"))
+    const first = renderHook(() => useAutoConvertListener())
+    await waitFor(() => expect(mockMarkAutoConvertPairing).toHaveBeenCalledTimes(1))
+    first.unmount()
+    record.lastAttemptAtMs = 0
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() =>
+      expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbcLastAttempt"),
+    )
+    expect(record.attempts).toBe(3)
+    expect(mockRefreshWallets).toHaveBeenCalledTimes(1)
+    expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    expect(mockMarkAutoConvertPairing).toHaveBeenCalledTimes(2)
+    expect(mockMarkAutoConvertPairing).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        receivePaymentId: "pid-lnbcLastAttempt",
+        conversionPaymentId: "conversion-of-the-last-attempt",
+      }),
+    )
+  })
+
+  /** Stored in its turn: a receive converting meanwhile reads the conversions claimed in
+   *  its own turn, and the pairing waits for it rather than landing while it reads. */
+  it("stores a converted receive's pairing only once the receive converting ahead of it is done", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbcConverting") }),
+      listPayments: jest.fn().mockResolvedValue({
+        payments: [
+          makeLightningPayment("lnbcPairWaits"),
+          makeLightningPayment("lnbcConverting"),
+        ],
+      }),
+    })
+    setupDefaults(sdk)
+    mockFindPendingAutoConvert.mockImplementation(async (invoice: string) =>
+      makeRecord({ paymentRequest: invoice }),
+    )
+    mockListPendingAutoConverts.mockResolvedValue([
+      makeRecord({ paymentRequest: "lnbcPairWaits" }),
+    ])
+    mockExecuteAutoConvert.mockResolvedValueOnce({
+      status: AutoConvertStatus.Converted,
+      conversionPaymentId: "conversion-pair-waits",
+    })
+    mockMarkAutoConvertPairing.mockRejectedValueOnce(new Error("storage unavailable"))
+    const first = renderHook(() => useAutoConvertListener())
+    await waitFor(() => expect(mockMarkAutoConvertPairing).toHaveBeenCalledTimes(1))
+    first.unmount()
+
+    let finishConverting: (outcome: unknown) => void = () => undefined
+    mockExecuteAutoConvert.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finishConverting = resolve
+        }),
+    )
+    let releaseReplay: (records: unknown[]) => void = () => undefined
+    mockListPendingAutoConverts.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releaseReplay = resolve
+        }),
+    )
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbcConverting",
+      isStableBalanceActive: false,
+      refreshWallets: mockRefreshWallets,
+    })
+    renderHook(() => useAutoConvertListener())
+    await waitFor(() => expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(2))
+    releaseReplay([makeRecord({ paymentRequest: "lnbcPairWaits" })])
+    await waitFor(() => expect(mockFindPendingAutoConvert).toHaveBeenCalledTimes(3))
+    for (let turn = 0; turn < 10; turn += 1) await act(async () => undefined)
+    const storedWhileConverting = mockMarkAutoConvertPairing.mock.calls.length
+
+    finishConverting({
+      status: AutoConvertStatus.Converted,
+      conversionPaymentId: "conversion-ahead",
+    })
+
+    await waitFor(() =>
+      expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbcPairWaits"),
+    )
+    expect(storedWhileConverting).toBe(1)
+    expect(
+      mockMarkAutoConvertPairing.mock.calls.map(
+        ([pairing]) => pairing.conversionPaymentId,
+      ),
+    ).toEqual(["conversion-pair-waits", "conversion-ahead", "conversion-pair-waits"])
+  })
+
   /** The conversion the history shows for a receive is paired before the receive goes,
    *  so no other receive takes it for its own after a restart. */
   it("pairs a receive with the conversion the history shows before removing it", async () => {

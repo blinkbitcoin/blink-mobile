@@ -161,6 +161,18 @@ const runAutoConvert = async ({
   onConverted,
   onDeferred,
 }: RunAutoConvertParams): Promise<void> => {
+  /** Converted already, with its pairing still to store: stored in its turn before
+   *  anything else, the attempt cap included, since storing a pairing is no attempt to
+   *  convert, and a receive dropped at the cap would leave its conversion unpaired. */
+  const unstoredConversion = unstoredPairings.get(paymentId)
+  const isConvertedButUnstored = unstoredConversion !== undefined
+  if (isConvertedButUnstored) {
+    await afterEarlierReceivesConvert(() => storePairing(paymentId, unstoredConversion))
+    await removePendingAutoConvert(record.paymentRequest)
+    onConverted?.()
+    return
+  }
+
   // Re-read storage so concurrent invocations agree on the cap state instead
   // of each trusting their own (potentially pre-stamp) snapshot of `attempts`.
   const liveRecord = await findPendingAutoConvert(record.paymentRequest)
@@ -181,17 +193,6 @@ const runAutoConvert = async ({
 
     const usdCentsAmount = convertSatsToUsdCents(satsReceived, convert)
     const outcome = await afterEarlierReceivesConvert(async () => {
-      /** Converted already, with its pairing still to store: stored now, and nothing more
-       *  converted. */
-      const unstoredConversion = unstoredPairings.get(paymentId)
-      const isConvertedButUnstored = unstoredConversion !== undefined
-      if (isConvertedButUnstored) {
-        await storePairing(paymentId, unstoredConversion)
-        return {
-          status: AutoConvertStatus.Converted,
-          conversionPaymentId: unstoredConversion,
-        }
-      }
       /** Read in its turn: every receive converted before it is paired by then. */
       const { claimedConversionIds } = await buildClaimedConversionIds()
       const converted = await executeAutoConvert(sdk, {
