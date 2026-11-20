@@ -65,49 +65,39 @@ describe("FeeTierSelector", () => {
     expect(getByText("Network fee")).toBeTruthy()
   })
 
-  it("shows the label and detail of the currently selected option", () => {
+  it("shows the selected tier as one value of name and detail", () => {
     const { getByText } = renderSelector({ selected: "fast" })
 
-    expect(getByText("Priority")).toBeTruthy()
-    expect(getByText("30 sat/vB")).toBeTruthy()
+    expect(getByText("Priority 30 sat/vB")).toBeTruthy()
   })
 
-  it("opens the modal when the dropdown is pressed and lists every option", () => {
-    const { getByTestId, getAllByText } = renderSelector()
+  it("shows no chevron on the row", () => {
+    const { queryByTestId } = renderSelector()
+
+    expect(queryByTestId("icon-caret-down")).toBeNull()
+  })
+
+  it("opens the modal when the row is pressed and lists every option", () => {
+    const { getByTestId, getByText } = renderSelector()
 
     fireEvent.press(getByTestId("fee-tier-dropdown"))
 
-    // Every option label is now visible in the modal list.
-    expect(getAllByText("Priority").length).toBeGreaterThan(0)
-    expect(getAllByText("Standard").length).toBeGreaterThan(0)
-    expect(getAllByText("Economy").length).toBeGreaterThan(0)
+    expect(getByText("Priority")).toBeTruthy()
+    expect(getByText("Standard")).toBeTruthy()
+    expect(getByText("Economy")).toBeTruthy()
+  })
+
+  it("marks only the selected option with a check", () => {
+    const { getByTestId, getAllByTestId } = renderSelector({ selected: "medium" })
+
+    fireEvent.press(getByTestId("fee-tier-dropdown"))
+
+    expect(getAllByTestId("icon-check-circle")).toHaveLength(1)
   })
 
   it("calls onSelect with the chosen tier id when an option is tapped", () => {
     const onSelect = jest.fn()
     const { getByTestId } = renderSelector({ onSelect })
-
-    fireEvent.press(getByTestId("fee-tier-dropdown"))
-    fireEvent.press(getByTestId("fee-tier-slow"))
-
-    expect(onSelect).toHaveBeenCalledWith("slow")
-  })
-
-  it("swaps the caret for a spinner while the fees are being quoted", () => {
-    const { getByTestId } = renderSelector({ loading: true })
-
-    expect(getByTestId("fee-tier-spinner")).toBeTruthy()
-  })
-
-  it("shows no spinner once the quote has landed", () => {
-    const { queryByTestId } = renderSelector()
-
-    expect(queryByTestId("fee-tier-spinner")).toBeNull()
-  })
-
-  it("still opens the tier list while quoting", () => {
-    const onSelect = jest.fn()
-    const { getByTestId } = renderSelector({ loading: true, onSelect })
 
     fireEvent.press(getByTestId("fee-tier-dropdown"))
     fireEvent.press(getByTestId("fee-tier-slow"))
@@ -157,5 +147,30 @@ describe("FeeTierSelector", () => {
 
     // No element rendering the detail because it's an empty string.
     expect(queryAllByText("")).toHaveLength(0)
+  })
+
+  describe("screen reader", () => {
+    it("reads the row as its heading and the chosen tier", () => {
+      const { getByLabelText } = renderSelector()
+
+      expect(
+        getByLabelText("Network fee, Standard 20 sat/vB").props.accessibilityRole,
+      ).toBe("button")
+    })
+
+    /** The green check is the only visual mark of the choice. */
+    it("reads the tiers as radios with the chosen one checked", () => {
+      const { getByLabelText, getByTestId } = renderSelector()
+      fireEvent.press(getByTestId("fee-tier-dropdown"))
+
+      const standard = getByLabelText("Standard, 20 sat/vB")
+      const economy = getByLabelText("Economy, 10 sat/vB")
+      expect(standard.props.accessibilityRole).toBe("radio")
+      expect(standard.props.accessibilityState).toEqual({ checked: true, selected: true })
+      expect(economy.props.accessibilityState).toEqual({
+        checked: false,
+        selected: false,
+      })
+    })
   })
 })

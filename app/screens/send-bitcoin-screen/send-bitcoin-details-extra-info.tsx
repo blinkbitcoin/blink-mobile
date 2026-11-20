@@ -1,7 +1,7 @@
 import React, { useRef, useCallback, useState } from "react"
 
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
-import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import { AccountLevel } from "@app/graphql/level-context"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
@@ -45,7 +45,7 @@ export const SendBitcoinDetailsExtraInfo = ({
   const styles = useStyles()
 
   if (errorMessage) {
-    return <GaloyErrorBox errorMessage={errorMessage} />
+    return <GaloyErrorBox errorMessage={errorMessage} filled={false} announce />
   }
 
   if (amountStatus.validAmount) {
@@ -57,6 +57,8 @@ export const SendBitcoinDetailsExtraInfo = ({
       return (
         <>
           <GaloyErrorBox
+            filled={false}
+            announce
             errorMessage={LL.SendBitcoinScreen.amountExceedsLimit({
               limit: formatMoneyAmount({
                 moneyAmount: amountStatus.remainingLimit,
@@ -76,7 +78,10 @@ export const SendBitcoinDetailsExtraInfo = ({
             </Text>
           ) : null}
           {currentLevel === "ONE" ? (
-            <GaloyPrimaryButton
+            <GaloyTertiaryButton
+              clear
+              containerStyle={styles.increaseLimitsButton}
+              hitSlop={12}
               title={LL.TransactionLimitsScreen.increaseLimits()}
               onPress={() => navigation.navigate("fullOnboardingFlow")}
             />
@@ -86,6 +91,8 @@ export const SendBitcoinDetailsExtraInfo = ({
     case AmountInvalidReason.InsufficientBalance:
       return (
         <GaloyErrorBox
+          filled={false}
+          announce
           errorMessage={LL.SendBitcoinScreen.amountExceed({
             balance: formatMoneyAmount({ moneyAmount: amountStatus.balance }),
           })}
@@ -100,7 +107,14 @@ const useStyles = makeStyles(() => {
   return {
     upgradeAccountText: {
       marginTop: 5,
+      marginBottom: 10,
+      textAlign: "center",
       textDecorationLine: "underline",
+    },
+    increaseLimitsButton: {
+      alignSelf: "center",
+      marginTop: 5,
+      marginBottom: 10,
     },
   }
 })
