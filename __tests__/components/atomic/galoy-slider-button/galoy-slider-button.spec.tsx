@@ -120,9 +120,14 @@ describe("GaloySliderButton", () => {
      * larger text sizes it otherwise grew under the handle and read as a half word. */
     it("keeps the idle label clear of the handle", async () => {
       await renderSlider()
-      const container = screen.getByText("Slide to send").parent?.parent
-      const style = StyleSheet.flatten(container?.props.style) as ViewStyle
-      expect(style.paddingHorizontal).toBe(HANDLE_SIZE)
+      let node = screen.getByText("Slide to send").parent
+      let padding: ViewStyle["paddingHorizontal"]
+      while (node && padding === undefined) {
+        padding = (StyleSheet.flatten(node.props.style) as ViewStyle | undefined)
+          ?.paddingHorizontal
+        node = node.parent
+      }
+      expect(padding).toBe(HANDLE_SIZE)
     })
   })
 
