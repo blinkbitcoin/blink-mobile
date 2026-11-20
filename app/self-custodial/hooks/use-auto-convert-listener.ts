@@ -452,7 +452,7 @@ export const useAutoConvertListener = (): void => {
     const held = [...heldRetriesRef.current.values()]
     heldRetriesRef.current.clear()
     held.forEach(runOrHold)
-  })
+  }, [sdk, convertMoneyAmount, isAnonMode, hasSparkToken, tryPaidReceive])
 
   useEffect(() => {
     if (!sdk || !convertMoneyAmount) return

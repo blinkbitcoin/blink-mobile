@@ -1803,6 +1803,59 @@ describe("useAutoConvertListener — trying a waiting receive again", () => {
     expect(mockFindPendingAutoConvert).toHaveBeenCalledTimes(lookupsOnceRun)
   })
 
+  it("holds a retry that comes while the price is not known, running it once it is", async () => {
+    pendingReceive()
+    const { rerender } = renderHook(() => useAutoConvertListener())
+    await waitFor(() => expect(mockReleaseAutoConvertAttempt).toHaveBeenCalledTimes(1))
+    const price = mockUsePriceConversion.mock.results[0].value
+
+    mockUsePriceConversion.mockReturnValue({ convertMoneyAmount: undefined })
+    rerender({})
+    await advance(DELIVERY_WINDOW_MS + RETRY_COOLDOWN_MS)
+    expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    mockUsePriceConversion.mockReturnValue(price)
+    rerender({})
+
+    await waitFor(() =>
+      expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1waiting"),
+    )
+    expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(2)
+  })
+
+  it("holds a retry that comes on a network with no dollar token, running it once there is one", async () => {
+    pendingReceive()
+    const { rerender } = renderHook(() => useAutoConvertListener())
+    await waitFor(() => expect(mockReleaseAutoConvertAttempt).toHaveBeenCalledTimes(1))
+
+    mockHasSparkToken = false
+    rerender({})
+    await advance(DELIVERY_WINDOW_MS + RETRY_COOLDOWN_MS)
+    expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    mockHasSparkToken = true
+    rerender({})
+
+    await waitFor(() =>
+      expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1waiting"),
+    )
+    expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(2)
+  })
+
+  it("runs a retry with the listener as it is when the retry fires", async () => {
+    pendingReceive()
+    const { rerender } = renderHook(() => useAutoConvertListener())
+    await waitFor(() => expect(mockReleaseAutoConvertAttempt).toHaveBeenCalledTimes(1))
+    const wallet = mockUseSelfCustodialWallet.mock.results[0].value
+
+    mockUseSelfCustodialWallet.mockReturnValue({ ...wallet, isStableBalanceActive: true })
+    rerender({})
+    await advance(DELIVERY_WINDOW_MS + RETRY_COOLDOWN_MS)
+
+    await waitFor(() => expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(2))
+    expect(mockExecuteAutoConvert.mock.calls[1][1]).toEqual(
+      expect.objectContaining({ isStableBalanceActive: true }),
+    )
+  })
+
   it("reports a retry that fails, trying nothing", async () => {
     pendingReceive()
     renderHook(() => useAutoConvertListener())
