@@ -175,6 +175,8 @@ Before accepting new helper code, check the repo already has the utility — rev
 - The shared password `validatePassword` utility (with at most a custom regex) instead of
   ad-hoc JS validation — "custom JS password logic is almost always the wrong path"
   (#3835, the bluntest rejection in the sample).
+- `haptics.<intent>()` from `app/utils/haptics.ts` for any vibration. Importing
+  `react-native-haptic-feedback` directly is a lint error; see [Haptics](./haptics.md).
 - `useInFlightGuard` for concurrent-call protection, "same pattern as use-create-wallet /
   use-restore-wallet" (#3868).
 - **Extend existing GraphQL queries rather than adding new ones**: adding `cards { id }`
@@ -411,6 +413,8 @@ Deep reviews label structural findings by principle, and authors answer per-prin
 - [ ] External links go through `openExternalUrl` (#3899).
 - [ ] Route types updated in `app/navigation/stack-param-lists.ts`; watch for Android
       Fabric jank with non-native-stack navigators (#3840).
+- [ ] A new haptic uses an existing intent where one fits, fires in the press handler (not
+      an effect), and stays silent when the press changes nothing ([Haptics](./haptics.md)).
 - [ ] All states of an enum-driven UI rendered deliberately (loading / error / each status
       value) (#3899, #3824).
 
