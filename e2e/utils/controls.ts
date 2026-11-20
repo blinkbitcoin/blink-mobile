@@ -185,23 +185,46 @@ export const clickOnText = async (text: string) => {
 }
 
 export const swipeButton = async (title: string) => {
-  const sliderButton = await $(selector(title, "Other"))
-  await sliderButton.waitForDisplayed({ timeout })
+  // On iOS the handle is a Button whose name is its testID, with the title as its label.
+  const handle = await $(
+    process.env.E2E_DEVICE === "ios"
+      ? `//XCUIElementTypeButton[@name="slider" and @label="${title}"]`
+      : selector(title),
+  )
+  await handle.waitForDisplayed({ timeout })
 
-  const location = await sliderButton.getLocation()
-  const size = await sliderButton.getSize()
+  const location = await handle.getLocation()
+  const size = await handle.getSize()
+  const track = await trackBox(handle, size.width)
 
-  const thumbWidthPercentage = 0.1
-
-  const thumbWidth = size.width * thumbWidthPercentage
-  const startX = location.x + thumbWidth
+  const startX = location.x + size.width / 2
   const startY = location.y + size.height / 2
+  const endX = track.x + track.width - 1
 
-  const endX = location.x + size.width
   await driver.touchAction([
     { action: "press", x: startX, y: startY },
     { action: "wait", ms: 1500 },
     { action: "moveTo", x: endX, y: startY },
     "release",
   ])
+}
+
+const trackBox = async (
+  handle: WebdriverIO.Element,
+  handleWidth: number,
+): Promise<{ x: number; width: number }> => {
+  let current = handle
+  for (let i = 0; i < 6; i += 1) {
+    const parent = await current.parentElement()
+    const parentLocation = await parent.getLocation()
+    const parentSize = await parent.getSize()
+    if (parentSize.width > handleWidth + 1) {
+      return { x: parentLocation.x, width: parentSize.width }
+    }
+    current = parent
+  }
+
+  const { width: windowWidth } = await browser.getWindowRect()
+  const location = await handle.getLocation()
+  return { x: location.x, width: windowWidth - location.x * 2 }
 }

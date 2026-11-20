@@ -150,6 +150,27 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     fee.status === "loading" || (fee.status === "error" && !fee.amount)
   const dustNotEvaluable =
     dustWarning.status === "pending" || dustWarning.status === "blocked"
+  // A blocked dust check stays a plain disable until #1273 N1 is ruled.
+  const isCalculating = fee.status === "loading" || dustWarning.status === "pending"
+  // A failed quote says so, matching the fee row, instead of implying a wait will help.
+  let sliderDisabledText: string | undefined
+  if (isCalculating)
+    sliderDisabledText = LL.SendBitcoinConfirmationScreen.calculatingFee()
+  else if (fee.status === "error" && !fee.amount)
+    sliderDisabledText = LL.common.feeError()
+
+  const progress = LL.SendBitcoinConfirmationScreen.sendProgress
+  const sendProgressLabels = [
+    progress.reviewing(),
+    progress.signing(),
+    progress.findingRoute(),
+    progress.broadcasting(),
+    progress.checkingDelivery(),
+    progress.almostThere(),
+    progress.anyTimeNow(),
+    progress.hangTight(),
+    progress.stillOnItsWay(),
+  ]
 
   const defaultAmount = formatMoneyAmount({ moneyAmount: ZeroUsdMoneyAmount })
   let currencyFeeAmount = defaultAmount
@@ -626,8 +647,15 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             <View style={styles.sliderContainer}>
               <GaloySliderButton
                 isLoading={sendPaymentLoading || isVerifying}
-                initialText={LL.SendBitcoinConfirmationScreen.slideToConfirm()}
-                loadingText={LL.SendBitcoinConfirmationScreen.slideConfirming()}
+                initialText={LL.SendBitcoinConfirmationScreen.slideToSend()}
+                loadingText={LL.SendBitcoinConfirmationScreen.sendProgress.reviewing()}
+                busyLabels={sendProgressLabels}
+                disabledText={sliderDisabledText}
+                accentColor={
+                  sendingWalletDescriptor.currency === WalletCurrency.Usd
+                    ? colors.success
+                    : colors.accent
+                }
                 onSwipe={handleSendPayment}
                 disabled={
                   !validAmount || !sendPayment || feeUnavailable || dustNotEvaluable
