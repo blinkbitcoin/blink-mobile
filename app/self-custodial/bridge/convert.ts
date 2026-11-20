@@ -392,15 +392,16 @@ const deliveredTokenOf = (direction: ConvertDirection): string | undefined =>
 export const LOST_CONVERSION_DELIVERY_WINDOW_MS = 5 * 60 * 1000
 
 /**
- * By this app launch's clock, which only moves forward with real time and which no change
- * of the phone's clock moves, when each lost conversion's latest attempt was first known:
- * when its outcome was lost, in this launch, or when this launch first read it back. Keyed
- * by that attempt's time.
+ * By this app launch's clock (`performance.now`), which only moves forward and which no
+ * change of the phone's clock moves, when each lost conversion's latest attempt was first
+ * known: when its outcome was lost, in this launch, or when this launch first read it
+ * back. Keyed by that attempt's time. The clock counts the time the phone is awake: it may
+ * stop while the phone sleeps, which only makes a window last longer.
  */
 const firstKnownAt = new Map<number, number>()
 
-/** Real time this launch has known a lost conversion's latest attempt for. */
-const realMsKnown = (lastAttemptAtMs: number): number => {
+/** How long, by that clock, this launch has known a lost conversion's latest attempt. */
+const msKnownThisLaunch = (lastAttemptAtMs: number): number => {
   const now = performance.now()
   const knownAt = firstKnownAt.get(lastAttemptAtMs) ?? now
   firstKnownAt.set(lastAttemptAtMs, knownAt)
@@ -414,13 +415,15 @@ const isWithinDeliveryWindow = (elapsedMs: number): boolean =>
 
 /**
  * Whether a lost conversion not found may still deliver: its delivery window has not run
- * out by real time. Never by the phone's clock, which a correction moves either way:
- * ahead, a conversion just sent would look long gone; back, conversions would stay refused
- * for as long as it was moved. Real time cannot be read across app launches, so a launch
- * counts it from when it first read the conversion back, never less than it really was.
+ * out by this launch's clock. Never by the phone's clock, which a correction moves either
+ * way: ahead, a conversion just sent would look long gone; back, conversions would stay
+ * refused for as long as it was moved. This launch's clock cannot be read across app
+ * launches, so a launch counts from when it first read the conversion back, never less
+ * than the time that really passed, and a window can last longer than its five minutes,
+ * never shorter.
  */
 const canStillDeliver = (lastAttemptAtMs: number): boolean =>
-  isWithinDeliveryWindow(realMsKnown(lastAttemptAtMs))
+  isWithinDeliveryWindow(msKnownThisLaunch(lastAttemptAtMs))
 
 /**
  * Which of a lost conversion's attempts a delivery found settles: the one it delivers for,
@@ -826,7 +829,7 @@ const convertAfterEarlierConversions = async (
     }
   } catch (err) {
     /** When its outcome was lost: a swap that ran late in a long call delivers from then. */
-    const lostAtRealMs = performance.now()
+    const lostAtLaunchMs = performance.now()
     recordConvertError(err, params, "executePrepared")
     const errorCode = classifySdkError(err)
     const reportSwapFailed = () =>
@@ -851,7 +854,7 @@ const convertAfterEarlierConversions = async (
       isThisConversion,
     })
     /** Kept, it is looked for again within its window, counted from when it was lost. */
-    if (left) firstKnownAt.set(left.lastAttemptAtMs, lostAtRealMs)
+    if (left) firstKnownAt.set(left.lastAttemptAtMs, lostAtLaunchMs)
     keepLost(left)
     writtenAhead.end()
     if (isSurelyThis) {
