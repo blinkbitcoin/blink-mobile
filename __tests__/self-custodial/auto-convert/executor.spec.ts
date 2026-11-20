@@ -474,6 +474,55 @@ describe("executeAutoConvert", () => {
     await expect(isConvertedMeanwhile()).rejects.toThrow("network")
   })
 
+  /** A receive's turn to convert holds every later receive's: a history the SDK never
+   *  answers is given up on, before the quote as no prior conversion, and in the turn as
+   *  unreadable. */
+  describe("with a history the SDK never answers", () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    const neverAnswers = () => new Promise<never>(() => {})
+    const HISTORY_READ_BOUND_MS = 15_000
+
+    it("quotes once the read before it has waited long enough", async () => {
+      const quote = successQuote()
+      mockGetConversionQuote.mockResolvedValue(quote)
+      const sdk = { listPayments: jest.fn(neverAnswers) }
+
+      const outcome = executeAutoConvert(sdk as never, baseParams)
+      await jest.advanceTimersByTimeAsync(HISTORY_READ_BOUND_MS - 1)
+      expect(mockGetConversionQuote).not.toHaveBeenCalled()
+      await jest.advanceTimersByTimeAsync(1)
+
+      expect(await outcome).toEqual({ status: "converted" })
+      expect(mockGetConversionQuote).toHaveBeenCalledTimes(1)
+    })
+
+    it("answers the check in the conversion's turn as unreadable once it has waited long enough", async () => {
+      const quote = successQuote()
+      mockGetConversionQuote.mockResolvedValue(quote)
+      const listPayments = jest
+        .fn()
+        .mockResolvedValueOnce({ payments: [] })
+        .mockImplementation(neverAnswers)
+
+      await executeAutoConvert({ listPayments } as never, baseParams)
+      const [{ isConvertedMeanwhile }] = quote.execute.mock.calls[0]
+      const failure = isConvertedMeanwhile().then(
+        () => undefined,
+        (err: Error) => err.message,
+      )
+      await jest.advanceTimersByTimeAsync(HISTORY_READ_BOUND_MS)
+
+      expect(await failure).toBe("Auto-convert history read timed out after 15000ms")
+    })
+  })
+
   it("treats a listPayments failure as 'no prior conversion' (fail-open)", async () => {
     mockGetConversionQuote.mockResolvedValue(successQuote())
     const sdk = {
@@ -548,6 +597,24 @@ describe("findRecentConversionId", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+  })
+
+  it("finds none once a history the SDK never answers has been waited on long enough", async () => {
+    jest.useFakeTimers()
+    try {
+      const sdk = { listPayments: jest.fn(() => new Promise<never>(() => {})) }
+
+      const found = findRecentConversionId(sdk as never, {
+        satsAmount: 5000,
+        toleranceBps: 500,
+        claimedConversionIds: new Set(),
+      })
+      await jest.advanceTimersByTimeAsync(15_000)
+
+      expect(await found).toBeUndefined()
+    } finally {
+      jest.useRealTimers()
+    }
   })
 
   it("returns the id of the first completed conversion within tolerance", async () => {

@@ -15,6 +15,7 @@ import {
 } from "@app/types/payment"
 import { reportError } from "@app/utils/error-logging"
 import { toNumber } from "@app/utils/helper"
+import { withTimeout } from "@app/utils/with-timeout"
 
 import {
   createGetConversionQuote,
@@ -94,6 +95,18 @@ export const fetchAutoConvertMinSats = async (
 
 export const DEFAULT_AMOUNT_MATCH_TOLERANCE_BPS = 500 // 5%
 
+/** How long a read of the history waits on the SDK. These reads run in a receive's turn to
+ *  convert, which every later receive waits behind, so one that never answers is taken
+ *  as unreadable rather than left holding them all. */
+const HISTORY_READ_TIMEOUT_MS = 15_000
+
+const listRecentPayments = (sdk: BreezSdkInterface) =>
+  withTimeout(
+    sdk.listPayments(ListPaymentsRequest.create({ offset: 0, limit: 50 })),
+    HISTORY_READ_TIMEOUT_MS,
+    "Auto-convert history read",
+  )
+
 /** Absolute floor on the tolerance window so tiny amounts still match. */
 const AMOUNT_MATCH_TOLERANCE_FLOOR = 50
 
@@ -135,9 +148,7 @@ const findConvertedInHistory = async (
   sdk: BreezSdkInterface,
   match: PriorConversionMatch,
 ): Promise<Payment | undefined> => {
-  const response = await sdk.listPayments(
-    ListPaymentsRequest.create({ offset: 0, limit: 50 }),
-  )
+  const response = await listRecentPayments(sdk)
   const converted = response.payments.find((payment) => {
     const details = payment.conversionDetails
     if (!details || details.status !== ConversionStatus.Completed) return false
@@ -193,9 +204,7 @@ export const findRecentConversionId = async (
   },
 ): Promise<string | undefined> => {
   try {
-    const response = await sdk.listPayments(
-      ListPaymentsRequest.create({ offset: 0, limit: 50 }),
-    )
+    const response = await listRecentPayments(sdk)
     const candidate = response.payments.find((payment) => {
       const details = payment.conversionDetails
       if (!details || details.status !== ConversionStatus.Completed) return false

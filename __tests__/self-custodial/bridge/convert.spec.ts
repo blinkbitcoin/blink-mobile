@@ -2471,6 +2471,99 @@ describe("a conversion asked once its turn comes whether it was converted meanwh
   })
 })
 
+/** Conversions go out one at a time: a call the SDK never answers is waited on only so
+ *  long, so it holds no later conversion until the app restarts. */
+describe("a conversion the SDK never answers", () => {
+  const params = {
+    fromAmount: toBtcMoneyAmount(5000),
+    toAmount: toUsdMoneyAmount(137),
+    direction: ConvertDirection.BtcToUsd,
+  }
+  const receive = {
+    satsAmount: 20_000,
+    usdCentsAmount: 548,
+    isStableBalanceActive: false,
+    recordCreatedAtMs: 0,
+  }
+  const neverAnswers = () => new Promise<never>(() => {})
+  const SEND_BOUND_MS = 90_000
+  const QUOTE_BOUND_MS = 60_000
+
+  const walletSdk = () => ({
+    prepareSendPayment: jest.fn().mockResolvedValue({
+      paymentMethod: {},
+      conversionEstimate: {
+        fee: BigInt(0),
+        amountIn: BigInt(5000),
+        amountOut: BigInt(1_370_000),
+        amountAdjustment: undefined,
+      },
+    }),
+    sendPayment: jest.fn(neverAnswers),
+    receivePayment: jest.fn().mockResolvedValue({ paymentRequest: "sp1own-invoice" }),
+    getInfo: jest.fn().mockResolvedValue({ tokenBalances: {} }),
+    listPayments: jest.fn().mockResolvedValue({ payments: [] }),
+    syncWallet: jest.fn().mockResolvedValue({}),
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    jest.useFakeTimers({
+      doNotFake: ["nextTick", "setImmediate", "queueMicrotask", "performance", "Date"],
+    })
+    mockMarkReceivedHistory.mockResolvedValue(MARK)
+    mockFetchLimits.mockResolvedValue({ minFromAmount: null, minToAmount: null })
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  it("takes a conversion it waited on long enough for one whose outcome was lost, and lets the next one in the wallet have its turn", async () => {
+    const sdk = walletSdk()
+    const stuck = (await createGetConversionQuote(sdk as never)(params))!.execute()
+    let isSettled = false
+    stuck.then(() => {
+      isSettled = true
+    })
+    const automatic = executeAutoConvert(sdk as never, receive)
+    await jest.advanceTimersByTimeAsync(SEND_BOUND_MS - 1)
+    const isSettledBeforeTheBound = isSettled
+    await jest.advanceTimersByTimeAsync(1)
+
+    expect(isSettledBeforeTheBound).toBe(false)
+    expect((await stuck).errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(await automatic).toEqual({
+      status: "deferred",
+      retryAfterMs: LOST_CONVERSION_DELIVERY_WINDOW_MS,
+    })
+    expect(mockFindLostConversion).toHaveBeenCalledTimes(2)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("gives up on a quote it waited on long enough", async () => {
+    const sdk = walletSdk()
+    sdk.prepareSendPayment.mockImplementation(neverAnswers)
+
+    let isSettled = false
+    const failure = createGetConversionQuote(sdk as never)(params).then(
+      () => undefined,
+      (err: Error) => err.message,
+    )
+    failure.then(() => {
+      isSettled = true
+    })
+    await jest.advanceTimersByTimeAsync(QUOTE_BOUND_MS - 1)
+    const isSettledBeforeTheBound = isSettled
+    await jest.advanceTimersByTimeAsync(1)
+
+    expect(isSettledBeforeTheBound).toBe(false)
+    expect(await failure).toBe("Conversion quote timed out after 60000ms")
+    expect(sdk.sendPayment).not.toHaveBeenCalled()
+  })
+})
+
 describe("a conversion in flight when the app closes", () => {
   const params = {
     fromAmount: toBtcMoneyAmount(5000),

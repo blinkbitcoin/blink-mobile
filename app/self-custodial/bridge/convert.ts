@@ -30,6 +30,7 @@ import {
 } from "@app/types/payment"
 import { centsToTokenBaseUnits, tokenBaseUnitsToCents } from "@app/utils/amounts"
 import { toNumber } from "@app/utils/helper"
+import { withTimeout } from "@app/utils/with-timeout"
 
 import { MAX_SLIPPAGE_BPS, requireSparkTokenIdentifier } from "../config"
 import {
@@ -306,6 +307,19 @@ const prepareConversion = async (
   })
   return { prepared: corrected, tokenDecimals }
 }
+
+/**
+ * How long a conversion waits on the SDK before it stops waiting, in the quote and in the
+ * call that sends it. Conversions go out one at a time, so a call that never comes back
+ * would otherwise hold every later one, auto-convert's and the user's alike, until the app
+ * restarts. Only the wait is bounded: the call is left running, as cancelling SDK work
+ * can wedge it. The quote's few calls answer within seconds; the send's waits for the swap
+ * to complete, which the SDK itself gives up on after 30 seconds by default
+ * (`completionTimeoutSecs`), and one past this bound goes down the path of a conversion
+ * whose outcome was lost, looked for before anything converts again.
+ */
+const CONVERSION_QUOTE_TIMEOUT_MS = 60_000
+const CONVERSION_SEND_TIMEOUT_MS = 90_000
 
 const OUTCOME_UNKNOWN_MESSAGE = "Conversion outcome unknown"
 const HISTORY_UNAVAILABLE_MESSAGE = "Wallet history unavailable"
@@ -779,8 +793,10 @@ const convertAfterEarlierConversions = async (
   }
 
   try {
-    const response = await sdk.sendPayment(
-      SendPaymentRequest.create({ prepareResponse: prepared }),
+    const response = await withTimeout(
+      sdk.sendPayment(SendPaymentRequest.create({ prepareResponse: prepared })),
+      CONVERSION_SEND_TIMEOUT_MS,
+      "Conversion send",
     )
     /** Answered, it leaves nothing to look for: taken back before anything else is
      *  stored. */
@@ -868,7 +884,11 @@ export const createGetConversionQuote =
   async (params) => {
     const startedIn = measurementGeneration()
     try {
-      const context = await prepareConversion(sdk, params)
+      const context = await withTimeout(
+        prepareConversion(sdk, params),
+        CONVERSION_QUOTE_TIMEOUT_MS,
+        "Conversion quote",
+      )
       return toConvertQuote(sdk, { ...context, startedIn }, params)
     } catch (err) {
       recordConvertError(err, params, "getConversionQuote")
