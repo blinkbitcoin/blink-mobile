@@ -1468,7 +1468,7 @@
           "routing": {
             "question": "Hvordan muliggør Lightning-netværket brugere at betale hinanden, hvis de ikke er direkte forbundet gennem en betalingskanal",
             "text": "Du tænker måske, at det ville være besværligt at opsætte en betalingskanal med hundredvis af virksomheder, men nej. Det formidable ved Lightning-netværket er, at det er et netværk af sammenkoblede kanaler.\n\nLad os sige, at Bob overbeviste sin ven Carol om også at tilslutte sig Lightning-netværket. Alice har en kanal med Bob, og Bob har en kanal med Carol. Alice og Carol kan derefter betale hinanden ved at 'route' gennem Bob.\n\nNogle ret smarte kryptografiske tricks garanterer, at Bob ikke kan stjæle pengene, mens de passerer gennem ham.\n\nNår du foretager en betaling på Lightning-netværket, søger dit knudepunkt efter en sti af kanaler mellem dig og din destination. Dette er, hvad der refereres til som routing. Dette forløber selvfølgelig helt automatisk iblandt de involverede Lightning-knudepunkter, således at dette sker øjeblikkeligt.\n",
-            "title": "Ruting",
+            "title": "Routing",
             "answers": [
               "Ved at bruge et netværk af mellemmænd til at route betalinger mellem brugere",
               "Ved at bruge teleportation til øjeblikkeligt at overføre bitcoin fra den ene bruger til den anden",
@@ -3161,7 +3161,7 @@
     "inviteFriends": "Inviter en ven",
     "buildYourCircle": "Byg dine cirkler",
     "myBlinkCircles": "Mine Blink Cirkler",
-    "someones": "{username: string}s",
+    "someones": "{username: string}'s",
     "groupEffort": "Udbredelse af Bitcoin er en gruppeindsats.\nInviter en ven og send dem sats for at begynde at opbygge dine cirkler.",
     "drivingAdoption": "Jeg bidrager til udbredelsen af Bitcoin med Blink.",
     "connectOnSocial": "Følg på sociale medier: ",
