@@ -653,7 +653,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 disabledText={sliderDisabledText}
                 accentColor={
                   sendingWalletDescriptor.currency === WalletCurrency.Usd
-                    ? colors._green
+                    ? colors.success
                     : colors.accent
                 }
                 onSwipe={handleSendPayment}

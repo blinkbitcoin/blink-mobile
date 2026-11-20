@@ -1625,7 +1625,7 @@ describe("SendBitcoinConfirmationScreen — slide to send", () => {
   it("uses the Dollar accent for a Dollar send", async () => {
     await renderRoute(buildUsdSettlementRoute(200))
 
-    expect(lastSliderProps().accentColor).toBe(colors.dark._green)
+    expect(lastSliderProps().accentColor).toBe(colors.dark.success)
   })
 
   it("uses the primary accent for a Bitcoin send", async () => {
