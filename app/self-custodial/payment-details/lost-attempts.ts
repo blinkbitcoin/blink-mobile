@@ -632,7 +632,8 @@ export const takeSendAnyway = (unresolved: UnresolvedSend | undefined): boolean 
 /**
  * What is left of a destination's lost attempts once a send has accounted for some: the
  * lost attempts it looked for or retried under their own key, and an unresolved attempt
- * under the key it went out with. Anything else stays.
+ * under the key it went out with. Anything else stays, whatever else the destination
+ * holds included.
  */
 export type SettledAttempts = { lostSend?: LostSend; unresolvedSend?: UnresolvedSend }
 
@@ -648,7 +649,7 @@ export const withoutSettled = (
     current.unresolvedSend && current.unresolvedSend === settled.unresolvedSend
       ? undefined
       : current.unresolvedSend
-  return { lostSend, unresolvedSend }
+  return { ...current, lostSend, unresolvedSend }
 }
 
 const withoutIdentities = (lost: LostSend, settled: LostSend): LostSend | undefined => {

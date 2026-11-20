@@ -216,6 +216,31 @@ describe("settling lost attempts", () => {
     expect(settled.lostSend?.requestedAs).toBeUndefined()
   })
 
+  it("keeps what a send does not settle, as a lost conversion and the transfers found", () => {
+    const lostConversion = {
+      startedAtMs: 1,
+      lastAttemptAtMs: 1,
+      walletClockSec: 0,
+      knownPaymentIds: [],
+      expectedDeliveries: [],
+    }
+    const foundUserTransfers = [
+      { paymentId: "rcv-usdb", amount: 1_370_000, isLabeled: true, foundAtMs: 1 },
+    ]
+
+    const settled = withoutSettled(
+      { lostSend: lostSend("hash-1"), lostConversion, foundUserTransfers },
+      { lostSend: lostSend("hash-1") },
+    )
+
+    expect(settled).toEqual({
+      lostSend: undefined,
+      unresolvedSend: undefined,
+      lostConversion,
+      foundUserTransfers,
+    })
+  })
+
   it("leaves an unresolved attempt another send recorded meanwhile", () => {
     const recordedMeanwhile = { idempotencyKey: undefined }
 
