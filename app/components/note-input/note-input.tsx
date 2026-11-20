@@ -1,5 +1,6 @@
 import React, { useRef } from "react"
 import { View, TextInput, StyleProp, ViewStyle, TouchableOpacity } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -45,6 +46,7 @@ export const NoteInput: React.FC<NoteInputProps> = ({
     <View style={[styles.fieldBackground, style]}>
       <View style={styles.noteContainer}>
         <TextInput
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           {...testProps("add-note")}
           style={[styles.noteInput, { fontSize }]}
           placeholder={LL.NoteInput.addNote()}

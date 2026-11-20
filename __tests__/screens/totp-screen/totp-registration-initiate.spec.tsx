@@ -38,6 +38,7 @@ let mockIsAccountRead = true
 let mockAccountReadError: Error | undefined
 const mockRereadAccount = jest.fn()
 const mockTotpInitiate = jest.fn()
+const mockTotpInitiateOptions = jest.fn()
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
   useTotpRegistrationScreenQuery: () => ({
@@ -47,7 +48,10 @@ jest.mock("@app/graphql/generated", () => ({
     error: mockAccountReadError,
     refetch: mockRereadAccount,
   }),
-  useUserTotpRegistrationInitiateMutation: () => [mockTotpInitiate, { loading: false }],
+  useUserTotpRegistrationInitiateMutation: (options: unknown) => {
+    mockTotpInitiateOptions(options)
+    return [mockTotpInitiate, { loading: false }]
+  },
 }))
 
 const mockMarkStart = jest.fn()
@@ -152,6 +156,14 @@ describe("TotpRegistrationInitiateScreen", () => {
       totpRegistrationId: "reg",
       secret: "SECRET",
     })
+  })
+
+  it("keeps the setup key out of the Apollo cache, which is persisted to disk", async () => {
+    await renderScreen()
+
+    expect(mockTotpInitiateOptions).toHaveBeenCalledWith(
+      expect.objectContaining({ fetchPolicy: "no-cache" }),
+    )
   })
 
   it("shows the setup key first, highlighted, and the QR code for another device after it", async () => {

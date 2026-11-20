@@ -115,6 +115,15 @@ describe("GaloySliderButton", () => {
       await renderSlider({ accentColor: "#00A700" })
       expect(handleColor()).toBe("#00A700")
     })
+
+    /* The handle rests on the start of the track, so the idle label keeps clear of it: at the
+     * larger text sizes it otherwise grew under the handle and read as a half word. */
+    it("keeps the idle label clear of the handle", async () => {
+      await renderSlider()
+      const container = screen.getByText("Slide to send").parent?.parent
+      const style = StyleSheet.flatten(container?.props.style) as ViewStyle
+      expect(style.paddingHorizontal).toBe(HANDLE_SIZE)
+    })
   })
 
   describe("drag", () => {

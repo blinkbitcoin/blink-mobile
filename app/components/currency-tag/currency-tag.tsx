@@ -1,5 +1,6 @@
 import React, { FC } from "react"
 import { Text, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -46,6 +47,7 @@ export const CurrencyTag: FC<CurrencyTagProps> = ({ walletCurrency }) => {
       }}
     >
       <Text
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         style={{
           ...styles.currencyText,
           color: currencyStyling[walletCurrency].textColor,
