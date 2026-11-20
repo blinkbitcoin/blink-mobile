@@ -15,6 +15,18 @@ import {
 
 import { ContextForScreen } from "../screens/helper"
 
+/** Reduce Motion is read once at startup, so each test sets it before rendering. */
+const mockReduceMotion = { enabled: false }
+jest.mock("react-native-reanimated", () => {
+  const actual = jest.requireActual("react-native-reanimated")
+  return {
+    ...actual,
+    __esModule: true,
+    default: actual.default,
+    useReducedMotion: () => mockReduceMotion.enabled,
+  }
+})
+
 jest.mock("react-native-haptic-feedback", () => ({
   __esModule: true,
   default: { trigger: jest.fn() },
@@ -72,6 +84,7 @@ describe("SuccessScreen", () => {
   afterEach(() => {
     jest.useRealTimers()
     jest.restoreAllMocks()
+    mockReduceMotion.enabled = false
   })
 
   it("shows the badge, the title, the subtitle and the body", () => {
@@ -154,6 +167,18 @@ describe("SuccessScreen", () => {
     renderScreen({ onHoldEnd })
 
     act(() => jest.advanceTimersByTime(SUCCESS_SCREEN_EXIT_MS - 1))
+    expect(onHoldEnd).not.toHaveBeenCalled()
+
+    act(() => jest.advanceTimersByTime(1))
+    expect(onHoldEnd).toHaveBeenCalledTimes(1)
+  })
+
+  it("holds 3 s from opening with Reduce Motion, as the badge lands at once", () => {
+    mockReduceMotion.enabled = true
+    const onHoldEnd = jest.fn()
+    renderScreen({ onHoldEnd })
+
+    act(() => jest.advanceTimersByTime(SUCCESS_HOLD_MS - 1))
     expect(onHoldEnd).not.toHaveBeenCalled()
 
     act(() => jest.advanceTimersByTime(1))

@@ -3,6 +3,7 @@ import { LayoutChangeEvent, View } from "react-native"
 import Animated, {
   Easing,
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
   withDelay,
   withTiming,
@@ -30,7 +31,8 @@ const SLIDE_MS = 120
 const SLIDE_DISTANCE = 16
 /** How long a settled screen with no actions stays up before it moves on. */
 export const SUCCESS_HOLD_MS = 3000
-/** From mount to the screen moving on by itself. */
+/** From mount to the screen moving on by itself. With Reduce Motion the badge lands at
+ *  once, so it is the hold alone. */
 export const SUCCESS_SCREEN_EXIT_MS = SUCCESS_BADGE_DURATION_MS + SUCCESS_HOLD_MS
 
 export const SUCCESS_SCREEN_TEST_ID = "success-screen"
@@ -51,7 +53,7 @@ type SuccessScreenProps = {
  * and whatever the caller adds rising in under it. A screen with no actions moves on by
  * itself `SUCCESS_HOLD_MS` after the badge settles, screen reader on or not; the title and
  * subtitle are spoken as it opens. Reanimated's default reduce-motion handling jumps every step to its
- * end.
+ * end, and the hold then runs from mount.
  */
 export const SuccessScreen: React.FC<SuccessScreenProps> = ({
   title,
@@ -74,6 +76,8 @@ export const SuccessScreen: React.FC<SuccessScreenProps> = ({
   onHoldEndRef.current = onHoldEnd
   const hasActions = Boolean(actions)
   const hasSize = Boolean(size)
+  /** Read from the same system flag Reanimated's animations follow. */
+  const reduceMotion = useReducedMotion()
 
   /** Title and subtitle are one element, and spoken together as the screen opens. */
   const label = [title, subtitle].filter(Boolean).join(", ")
@@ -100,9 +104,10 @@ export const SuccessScreen: React.FC<SuccessScreenProps> = ({
 
   useEffect(() => {
     if (hasActions) return
-    const timer = setTimeout(() => onHoldEndRef.current?.(), SUCCESS_SCREEN_EXIT_MS)
+    const exitMs = reduceMotion ? SUCCESS_HOLD_MS : SUCCESS_SCREEN_EXIT_MS
+    const timer = setTimeout(() => onHoldEndRef.current?.(), exitMs)
     return () => clearTimeout(timer)
-  }, [hasActions])
+  }, [hasActions, reduceMotion])
 
   const slideStyle = useAnimatedStyle(
     () => ({
