@@ -107,6 +107,7 @@ const isFoundUserTransfer = (value: unknown): value is FoundUserTransfer =>
   isOptionalDirection(value.direction) &&
   typeof value.amount === "number" &&
   isOptional(value.paidIn, "number") &&
+  typeof value.isLabeled === "boolean" &&
   typeof value.foundAtMs === "number"
 
 const isFresh = (recordedAtMs: number | undefined, nowMs: number): boolean =>

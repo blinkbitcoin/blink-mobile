@@ -48,6 +48,7 @@ import {
 import {
   CODES_RAISED_BEFORE_DISPATCH,
   findLostConversion,
+  isDeliveryOfOwnConversion,
   isAboutAmount,
   isAboutDelivered,
   isDeliveryAsExpected,
@@ -353,9 +354,13 @@ const isDeliveryOf = (
 }
 
 /** A transfer of the user's found delivered, as their next transfer is told of it. */
-const foundUserTransferOf = (payment: Payment): FoundUserTransfer => ({
+const foundUserTransferOf = (
+  payment: Payment,
+  isLabeled: boolean,
+): FoundUserTransfer => ({
   paymentId: payment.id,
   ...deliveryFactsOf(payment),
+  isLabeled,
   foundAtMs: Date.now(),
 })
 
@@ -596,12 +601,17 @@ const convertAfterEarlierConversions = async (
 
   /** A lost transfer of the user's that auto-convert found delivered is told of on their
    *  next one, as the look would have told them had it found it: done when this one is
-   *  it asked again, gone through when it is another. Told once, the oldest first. */
+   *  it asked again, gone through when it is another, and to be checked when it is this
+   *  one by a payment the wallet never labeled. Told once, the oldest first. */
   const foundTransfers = isAutomatic ? [] : attempts.read().foundUserTransfers ?? []
   const [foundTransfer, ...stillToTell] = foundTransfers
   if (foundTransfer) {
     attempts.update((current) => ({ ...current, foundUserTransfers: stillToTell }))
     const isThisTransfer = isDeliveryOf(foundTransfer, { estimate, params })
+    const isThisTransferUnlabeled = isThisTransfer && !foundTransfer.isLabeled
+    if (isThisTransferUnlabeled) {
+      return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
+    }
     if (isThisTransfer) {
       return {
         status: PaymentResultStatus.Success,
@@ -632,6 +642,11 @@ const convertAfterEarlierConversions = async (
     }
     if (lookup.status === "found") {
       const { payment } = lookup
+      /** Labeled as a conversion's delivery: always so within the window, whose look
+       *  takes nothing else. Past it, one the wallet never labeled may be any receive of
+       *  about that amount, as well as the delivery of a conversion the SDK was stopped in
+       *  the middle of. */
+      const isLabeled = isWithinWindow || isDeliveryOfOwnConversion(payment)
       const settled = settledAttemptOf(earlier, payment, isAutomatic)
       /** The attempt it delivers for, whoever made it, the user's first. */
       const deliveredFor = settledAttemptOf(earlier, payment, false)
@@ -654,7 +669,7 @@ const convertAfterEarlierConversions = async (
           lostConversion: withoutAttempt(earlier, deliveredFor, payment),
           foundUserTransfers: [
             ...(current.foundUserTransfers ?? []),
-            foundUserTransferOf(payment),
+            foundUserTransferOf(payment, isLabeled),
           ],
         }))
         return failed(EARLIER_CONVERSION_MESSAGE, ConvertErrorCode.EarlierConversionFound)
@@ -668,6 +683,14 @@ const convertAfterEarlierConversions = async (
         earlier.expectedDeliveries[settled].receiveRecordedAtMs ===
         params.receiveRecordedAtMs
       const isThisRequestsDelivery = isThisRequest && isThisConversion(payment)
+      /** The user is asked to check their history rather than told their transfer is done
+       *  by a payment that may be anyone's. Auto-convert takes it for its receive's
+       *  conversion: converting the receive again would convert it twice were it the
+       *  delivery. */
+      const shouldAskTheUserToCheck = isThisRequestsDelivery && !isAutomatic && !isLabeled
+      if (shouldAskTheUserToCheck) {
+        return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
+      }
       if (isThisRequestsDelivery) {
         return {
           status: PaymentResultStatus.Success,

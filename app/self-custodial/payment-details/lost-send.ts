@@ -551,7 +551,7 @@ const isDelivering = (status: ConversionStatus): boolean =>
  * those paying someone else, and the refund of one that failed (a leg of it as well) are
  * none of these.
  */
-const isDeliveryOfOwnConversion = (payment: Payment): boolean => {
+export const isDeliveryOfOwnConversion = (payment: Payment): boolean => {
   const info = conversionInfoOf(payment)
   if (!info || !ConversionInfo.Amm.instanceOf(info)) return false
   const { purpose } = info.inner

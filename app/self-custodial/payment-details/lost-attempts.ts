@@ -92,14 +92,15 @@ export type LostConversion = {
  * A transfer of the user's whose outcome was lost, found delivered by auto-convert, which
  * settles it so that it waits for nothing, and keeps what the user's next transfer is told
  * by: what it delivered (in base units), the way it went and what it paid in once the
- * wallet tells them, and when it was found, which is what lets it lapse across app
- * launches.
+ * wallet tells them, whether the wallet labeled it as a conversion's delivery, and when it
+ * was found, which is what lets it lapse across app launches.
  */
 export type FoundUserTransfer = {
   paymentId: string
   direction?: ConvertDirection
   amount: number
   paidIn?: number
+  isLabeled: boolean
   foundAtMs: number
 }
 

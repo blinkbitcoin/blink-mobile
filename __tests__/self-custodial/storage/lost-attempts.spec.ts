@@ -421,11 +421,17 @@ describe("loadLostAttempts", () => {
     direction: ConvertDirection.BtcToUsd,
     amount: 2_466_000,
     paidIn: 9000,
+    isLabeled: true,
     foundAtMs,
   })
 
   it("reads back the user's transfers auto-convert found, for their next transfer to be told of", async () => {
-    const withoutWay = { paymentId: "rcv-usdb-2", amount: 1_370_000, foundAtMs: NOW }
+    const withoutWay = {
+      paymentId: "rcv-usdb-2",
+      amount: 1_370_000,
+      isLabeled: false,
+      foundAtMs: NOW,
+    }
     stored({
       "<own conversions>": { foundUserTransfers: [foundUserTransfer(), withoutWay] },
     })
@@ -467,6 +473,7 @@ describe("loadLostAttempts", () => {
           { ...foundUserTransfer(), direction: "sideways" },
           { ...foundUserTransfer(), amount: "2466000" },
           { ...foundUserTransfer(), paidIn: "9000" },
+          { ...foundUserTransfer(), isLabeled: "yes" },
           { ...foundUserTransfer(), foundAtMs: String(NOW - 1000) },
           "rcv-usdb",
         ],
