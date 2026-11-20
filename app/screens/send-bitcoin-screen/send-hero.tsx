@@ -12,6 +12,7 @@ import { IconHero } from "@app/components/icon-hero"
 import { useAccessibilityAnnouncement } from "@app/hooks/use-accessibility-announcement"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { fonts } from "@app/rne-theme/fonts"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 export const SEND_HERO_CAPTION_TEST_ID = "send-hero-caption"
 export const SEND_HERO_PRIMARY_TEST_ID = "send-hero-amount-primary"
@@ -193,6 +194,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
       }
     >
       <Animated.Text
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         style={[
           styles.amount,
           {
@@ -209,6 +211,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
       </Animated.Text>
       {secondaryAmount ? (
         <Animated.Text
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           style={[
             styles.amount,
             {
