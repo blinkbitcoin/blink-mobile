@@ -2312,7 +2312,10 @@ describe("a conversion asked once its turn comes whether it was converted meanwh
       answerUser({ payment: { id: "c-user", status: 0 } })
 
       expect(sentWhileWaiting).toBe(1)
-      expect(await automatic).toEqual({ status: "already-converted" })
+      expect(await automatic).toEqual({
+        status: "already-converted",
+        conversionPaymentId: "c-user",
+      })
       expect((await userConversion).status).toBe("success")
       expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
     })

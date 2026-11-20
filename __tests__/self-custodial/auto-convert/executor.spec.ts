@@ -446,6 +446,49 @@ describe("executeAutoConvert", () => {
     expect(outcome).toEqual({ status: "already-converted" })
   })
 
+  /** The check in the conversion's turn names the conversion it found, so the receive is
+   *  paired with it before it goes, and no later receive takes it for its own. */
+  it("names the conversion the check in the conversion's turn found, for the pairing", async () => {
+    const listPayments = jest
+      .fn()
+      .mockResolvedValueOnce({ payments: [] })
+      .mockResolvedValueOnce({
+        payments: [
+          {
+            id: "converted-meanwhile",
+            conversionDetails: {
+              status: "Completed",
+              conversions: [{ from: { amount: 5000n } }],
+            },
+            timestamp: 2000n,
+          },
+        ],
+      })
+    mockGetConversionQuote.mockResolvedValue({
+      execute: async ({
+        isConvertedMeanwhile,
+      }: {
+        isConvertedMeanwhile: () => Promise<boolean>
+      }) => {
+        const isConverted = await isConvertedMeanwhile()
+        const code = isConverted
+          ? ConvertErrorCode.AlreadyConverted
+          : ConvertErrorCode.ConversionFailed
+        return {
+          status: PaymentResultStatus.Failed,
+          errors: [{ message: "converted", code }],
+        }
+      },
+    })
+
+    const outcome = await executeAutoConvert({ listPayments } as never, baseParams)
+
+    expect(outcome).toEqual({
+      status: "already-converted",
+      conversionPaymentId: "converted-meanwhile",
+    })
+  })
+
   /** Unlike the check before quoting, the one in the conversion's turn does not take a
    *  history it cannot read for no prior conversion. */
   it("asks again in the conversion's turn, without taking an unreadable history for none", async () => {

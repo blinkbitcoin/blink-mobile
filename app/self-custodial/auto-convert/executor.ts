@@ -179,12 +179,6 @@ const findConvertedInHistory = async (
   return converted
 }
 
-/** Whether the history holds such a conversion. Throws when it cannot be read. */
-const isConvertedInHistory = async (
-  sdk: BreezSdkInterface,
-  match: PriorConversionMatch,
-): Promise<boolean> => (await findConvertedInHistory(sdk, match)) !== undefined
-
 /** The check before anything is quoted, naming the conversion it finds for the pairing:
  *  a history that cannot be read is taken for no such conversion, and the one asked
  *  again in the conversion's turn decides. */
@@ -274,9 +268,13 @@ export const executeAutoConvert = async (
   if (!quote) return { status: AutoConvertStatus.Failed }
 
   /** Asked again once the conversion's turn comes: the user may have converted these sats
-   *  while it waited behind theirs. */
+   *  while it waited behind theirs. The conversion it finds is kept for the pairing. */
+  let convertedMeanwhile: Payment | undefined
   const result = await quote.execute({
-    isConvertedMeanwhile: () => isConvertedInHistory(sdk, priorConversion),
+    isConvertedMeanwhile: async () => {
+      convertedMeanwhile = await findConvertedInHistory(sdk, priorConversion)
+      return convertedMeanwhile !== undefined
+    },
   })
   if (result.status === PaymentResultStatus.Success) {
     return {
@@ -287,7 +285,10 @@ export const executeAutoConvert = async (
   const errorCode = result.errors?.[0]?.code
   const isConvertedMeanwhile = errorCode === ConvertErrorCode.AlreadyConverted
   if (isConvertedMeanwhile) {
-    return { status: AutoConvertStatus.AlreadyConverted }
+    return {
+      status: AutoConvertStatus.AlreadyConverted,
+      conversionPaymentId: convertedMeanwhile?.id,
+    }
   }
   /** Nothing went out, behind an earlier conversion that may have been lost. Tried again
    *  once the wait is over, where it is looked for before anything goes out, and one of
