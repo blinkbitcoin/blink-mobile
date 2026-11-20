@@ -88,6 +88,17 @@ describe("deep-linkable routes", () => {
   })
 
   /**
+   * The declined bulletin opens this path: core's notifications send it for the
+   * declined deep link screen, so renaming it here would leave the bulletin opening
+   * nothing.
+   */
+  it("links the declined screen at the path the declined bulletin opens", () => {
+    expect(DEEP_LINK_SCREENS.cardOnboardingDeclinedScreen).toBe(
+      "card/onboarding/declined",
+    )
+  })
+
+  /**
    * The code screen and the backup take the setup key as a param. A link landing on
    * either would show a key the registration never issued, and offer to save it as the
    * account's. The registration is reached from its own start alone.
