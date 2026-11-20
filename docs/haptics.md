@@ -2,8 +2,8 @@
 
 Every vibration in the app goes through one helper, `app/utils/haptics.ts`. A caller names
 what happened (`haptics.select()`, `haptics.success()`), and the helper decides how it feels
-on each platform and whether it follows the phone's silent and vibration settings. That
-way one kind of moment feels the same everywhere, and its feel can be changed in one place.
+on each platform and whether it buzzes while the ringer is silent. The phone's own
+haptics switch always wins (see below). That way one kind of moment feels the same everywhere, and its feel can be changed in one place.
 
 Ticket: [blinkbitcoin/blink-wip#2041](https://github.com/blinkbitcoin/blink-wip/issues/2041)
 (phase 2 of #1312).
@@ -27,6 +27,18 @@ even when the ringer is silent. With it off, the library drops the buzz on a sil
 Only the light touches (`select`, `grab`) follow the phone. The keypad tap and the refusal
 buzz anyway, so typing never feels dead and a refusal is never silent (ruled 2026-10-30).
 The outcomes and the slide commit keep the setting they had before the helper existed.
+
+**The phone's haptics switch always wins.** With System Haptics off on iOS, or Touch
+feedback off on Android (Settings > Sound & vibration), no intent buzzes, whatever its
+silent-mode value. iOS does this natively: `UIFeedbackGenerator` plays nothing while
+System Haptics is off. Upstream `react-native-haptic-feedback` only checks the Android
+ringer mode, so `patches/react-native-haptic-feedback+2.3.3.patch` adds a
+`Settings.System.HAPTIC_FEEDBACK_ENABLED` check ahead of everything else in `trigger`.
+`__tests__/utils/haptics-native-patch.spec.ts` pins the patch to the installed version
+and checks the installed module carries it.
+
+To check it on a device: `adb shell settings put system haptic_feedback_enabled 0`, press
+a Convert percent chip, and nothing should buzz; set it back to `1` and it ticks.
 
 **Why the Android types are duration-based:** `react-native-haptic-feedback` sends its
 `keyboardTap` and `clockTick` types through `Vibrator.vibrate(long)`, using the
@@ -71,10 +83,13 @@ Importing it anywhere is a lint error, except in:
 
 The exemption is its own override, which repeats the other restricted paths
 (`react-native-secure-key-store`, `@react-native-firebase/crashlytics`), so those stay
-blocked in the helper and in specs. If you add a restricted path to the base rule, add it
-to every override that re-declares `no-restricted-imports` too.
+blocked in the helper and in specs. `app/utils/storage/legacy-key-store.ts` may import
+`react-native-secure-key-store`, so its override re-declares the rule without that path and
+keeps the haptics and Crashlytics paths. If you add a restricted path to the base rule, add
+it to every override that re-declares `no-restricted-imports` too.
 `__tests__/utils/haptics-import-rule.spec.ts` runs ESLint on a direct import from a
-screen, a component, a hook, the helper and a spec, so dropping the rule fails CI.
+screen, a component, a hook, the legacy key store, the helper and a spec, so dropping the
+rule fails CI.
 
 ---
 

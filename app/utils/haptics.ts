@@ -10,7 +10,9 @@ type HapticIntent = {
   type: HapticType
   /**
    * Ignoring them buzzes even when the phone is on silent: the library drops anything that
-   * respects them while the ringer is silent.
+   * respects them while the ringer is silent. Neither value overrides the phone's haptics
+   * switch: with Touch feedback off on Android (patches/react-native-haptic-feedback+2.3.3.patch)
+   * or System Haptics off on iOS, nothing buzzes.
    */
   ignoreAndroidSystemSettings: boolean
 }
