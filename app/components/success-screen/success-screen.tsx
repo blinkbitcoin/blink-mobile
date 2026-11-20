@@ -49,8 +49,8 @@ type SuccessScreenProps = {
 /**
  * The one "it worked" screen: the success badge drawing itself in over a glow, a bold title
  * and whatever the caller adds rising in under it. A screen with no actions moves on by
- * itself `SUCCESS_HOLD_MS` after the badge settles, screen reader on or not; the title is
- * spoken as it opens. Reanimated's default reduce-motion handling jumps every step to its
+ * itself `SUCCESS_HOLD_MS` after the badge settles, screen reader on or not; the title and
+ * subtitle are spoken as it opens. Reanimated's default reduce-motion handling jumps every step to its
  * end.
  */
 export const SuccessScreen: React.FC<SuccessScreenProps> = ({
@@ -73,20 +73,30 @@ export const SuccessScreen: React.FC<SuccessScreenProps> = ({
   const onHoldEndRef = useRef(onHoldEnd)
   onHoldEndRef.current = onHoldEnd
   const hasActions = Boolean(actions)
+  const hasSize = Boolean(size)
 
-  useAccessibilityAnnouncement(title)
+  /** Title and subtitle are one element, and spoken together as the screen opens. */
+  const label = [title, subtitle].filter(Boolean).join(", ")
+  useAccessibilityAnnouncement(label)
 
   useEffect(() => {
     triggerHapticFeedback("notificationSuccess")
-    glowProgress.value = withTiming(1, {
-      duration: GLOW_BLOOM_MS,
-      easing: Easing.out(Easing.quad),
-    })
     slideProgress.value = withDelay(
       SLIDE_DELAY_MS,
       withTiming(1, { duration: SLIDE_MS, easing: Easing.out(Easing.quad) }),
     )
-  }, [glowProgress, slideProgress])
+  }, [slideProgress])
+
+  /** The glow can only mount once the screen is measured, so it blooms from then, as Sent
+   *  blooms once it has measured. Started at mount, a slow first open spent the bloom
+   *  before the glow was there and showed only its end, a flash. */
+  useEffect(() => {
+    if (!hasSize) return
+    glowProgress.value = withTiming(1, {
+      duration: GLOW_BLOOM_MS,
+      easing: Easing.out(Easing.quad),
+    })
+  }, [hasSize, glowProgress])
 
   useEffect(() => {
     if (hasActions) return
@@ -131,14 +141,21 @@ export const SuccessScreen: React.FC<SuccessScreenProps> = ({
             iconFrameStyle={styles.iconFrame}
             title={
               <Animated.View style={[styles.text, slideStyle]}>
-                <Text type="h2" bold style={styles.centred} accessibilityRole="header">
-                  {title}
-                </Text>
-                {subtitle ? (
-                  <Text type="p1" style={styles.centred}>
-                    {subtitle}
+                <View
+                  style={styles.text}
+                  accessible
+                  accessibilityRole="header"
+                  accessibilityLabel={label}
+                >
+                  <Text type="h2" bold style={styles.centred}>
+                    {title}
                   </Text>
-                ) : null}
+                  {subtitle ? (
+                    <Text type="p1" style={styles.centred}>
+                      {subtitle}
+                    </Text>
+                  ) : null}
+                </View>
                 {children}
               </Animated.View>
             }

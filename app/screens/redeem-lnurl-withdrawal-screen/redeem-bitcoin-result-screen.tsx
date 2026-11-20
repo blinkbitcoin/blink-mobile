@@ -4,6 +4,7 @@ import { ActivityIndicator, View } from "react-native"
 import { radius } from "@app/rne-theme/radius"
 import { Screen } from "@app/components/screen"
 import { SuccessBadge } from "@app/components/success-badge"
+import { useAccessibilityAnnouncement } from "@app/hooks/use-accessibility-announcement"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -13,7 +14,6 @@ import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import { testProps } from "../../utils/testProps"
 import { withMyLnUpdateSub } from "../receive-bitcoin-screen/my-ln-updates-sub"
 
 import { useLnurlWithdrawRedemption } from "./hooks"
@@ -73,17 +73,26 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
     if (paid) triggerHapticFeedback("notificationSuccess")
   }, [paid])
 
+  /** The badge is the only sign it worked, and appearing moves no focus. */
+  useAccessibilityAnnouncement(paid ? LL.common.success() : undefined)
+
   /** The success badge draws itself in where the result lands; the screen stays. */
   const renderSuccessView = useMemo(() => {
     if (!paid) return null
     return (
       <View style={styles.container}>
-        <View {...testProps("Success Icon")} style={styles.container}>
+        <View
+          testID="Success Icon"
+          accessible
+          accessibilityRole="image"
+          accessibilityLabel={LL.common.success()}
+          style={styles.container}
+        >
           <SuccessBadge size={SUCCESS_BADGE_SIZE} />
         </View>
       </View>
     )
-  }, [paid, styles])
+  }, [paid, styles, LL])
 
   const renderErrorView = useMemo(() => {
     if (errorMessage === "") return null

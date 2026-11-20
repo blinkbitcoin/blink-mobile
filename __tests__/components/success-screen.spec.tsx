@@ -37,6 +37,21 @@ const bloom = () =>
       StyleSheet.flatten(node.props.style)?.experimental_backgroundImage !== undefined,
   )[0]
 
+/** Matches the glow's bloom on Sent. */
+const GLOW_BLOOM_MS = 600
+
+const layOut = ({ width, height } = { width: 360, height: 800 }) =>
+  fireEvent(screen.getByTestId(SUCCESS_SCREEN_TEST_ID), "layout", {
+    nativeEvent: { layout: { x: 0, y: 0, width, height } },
+  })
+
+const bloomScale = () => {
+  const node = bloom()
+  if (!node) throw new Error("no glow on screen")
+  const [{ scale }] = getAnimatedStyle(node).transform as [{ scale: number }]
+  return scale
+}
+
 /** The view that slides the title and extras in. */
 const slidingText = () => {
   let node = screen.getByText(TITLE).parent
@@ -50,6 +65,7 @@ describe("SuccessScreen", () => {
     jest.useFakeTimers()
     jest.mocked(ReactNativeHapticFeedback.trigger).mockClear()
     jest.spyOn(AccessibilityInfo, "announceForAccessibility").mockImplementation(() => {})
+    jest.mocked(AccessibilityInfo.announceForAccessibility).mockClear()
     jest.spyOn(AccessibilityInfo, "isScreenReaderEnabled").mockResolvedValue(false)
   })
 
@@ -58,13 +74,30 @@ describe("SuccessScreen", () => {
     jest.restoreAllMocks()
   })
 
-  it("shows the badge, the title as a header, the subtitle and the body", () => {
+  it("shows the badge, the title, the subtitle and the body", () => {
     renderScreen({ subtitle: "satoshi@blink.sv", children: <Text>Body</Text> })
 
     expect(screen.UNSAFE_getByType(SuccessBadge).props.size).toBe(49)
-    expect(screen.getByRole("header", { name: TITLE })).toBeTruthy()
+    expect(screen.getByText(TITLE)).toBeTruthy()
     expect(screen.getByText("satoshi@blink.sv")).toBeTruthy()
     expect(screen.getByText("Body")).toBeTruthy()
+  })
+
+  it("reads the title and subtitle as one header", () => {
+    renderScreen({ subtitle: "satoshi@blink.sv" })
+
+    const headers = screen.getAllByRole("header")
+    expect(headers).toHaveLength(1)
+    expect(headers[0].props).toMatchObject({
+      accessible: true,
+      accessibilityLabel: `${TITLE}, satoshi@blink.sv`,
+    })
+  })
+
+  it("reads the title alone as the header when there is no subtitle", () => {
+    renderScreen()
+
+    expect(screen.getByRole("header").props.accessibilityLabel).toBe(TITLE)
   })
 
   /** In a centred column Android measures a bold line at its natural width and clipped
@@ -95,7 +128,17 @@ describe("SuccessScreen", () => {
     )
   })
 
-  it("speaks the title once", () => {
+  it("speaks the title and subtitle together, once", () => {
+    renderScreen({ subtitle: "satoshi@blink.sv" })
+    act(() => jest.runOnlyPendingTimers())
+
+    expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledTimes(1)
+    expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledWith(
+      `${TITLE}, satoshi@blink.sv`,
+    )
+  })
+
+  it("speaks the title alone when there is no subtitle", () => {
     renderScreen()
     act(() => jest.runOnlyPendingTimers())
 
@@ -168,9 +211,7 @@ describe("SuccessScreen", () => {
     renderScreen()
     expect(bloom()).toBeUndefined()
 
-    fireEvent(screen.getByTestId(SUCCESS_SCREEN_TEST_ID), "layout", {
-      nativeEvent: { layout: { x: 0, y: 0, width: 360, height: 800 } },
-    })
+    layOut()
 
     expect(StyleSheet.flatten(bloom()?.props.style)).toMatchObject({
       left: 180 - 800,
@@ -178,6 +219,28 @@ describe("SuccessScreen", () => {
       width: 1600,
       height: 1600,
     })
+  })
+
+  /** On a slow first open the layout landed after a bloom started at mount had run its
+   *  course, and the glow only flashed. */
+  it("starts the bloom when the glow is laid out, however late that is", () => {
+    renderScreen()
+    act(() => jest.advanceTimersByTime(GLOW_BLOOM_MS))
+    layOut()
+
+    expect(bloomScale()).toBeLessThan(0.01)
+
+    act(() => jest.advanceTimersByTime(GLOW_BLOOM_MS))
+    expect(bloomScale()).toBe(1)
+  })
+
+  it("does not restart the bloom when the screen is laid out again", () => {
+    renderScreen()
+    layOut()
+    act(() => jest.advanceTimersByTime(GLOW_BLOOM_MS))
+    layOut({ width: 360, height: 760 })
+
+    expect(bloomScale()).toBe(1)
   })
 
   it("slides the title up 16 px into place once the check lands", () => {
