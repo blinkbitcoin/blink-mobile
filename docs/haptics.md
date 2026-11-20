@@ -68,8 +68,8 @@ the keypad, slide-to-send and inline-refusal work that builds on this helper.
 | `error`   | the same screen                                                                                                  | Already paid, a failed status, or a repeat attempt that can't be confirmed as settled |
 
 A copy fires once: between the clipboard write and the toast, and not again when the
-clipboard auto-clears. Only an actual change of choice gets the tick, so a press that
-changes nothing stays silent.
+clipboard auto-clears. Every press of an enabled control ticks, re-selecting the current
+choice included. A disabled or locked control stays silent.
 
 ---
 
