@@ -12,6 +12,7 @@ import { WalletSwitch } from "@app/components/wallet-switch"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { radius } from "@app/rne-theme/radius"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import { fonts } from "@app/rne-theme/fonts"
 import { testProps } from "@app/utils/testProps"
 
@@ -151,7 +152,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 14,
   },
   cardInactive: {
-    backgroundColor: colors.surfaceStatic,
+    ...staticSurface(colors),
   },
   cardError: {
     borderColor: colors.error,
