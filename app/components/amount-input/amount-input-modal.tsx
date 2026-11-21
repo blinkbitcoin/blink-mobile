@@ -18,6 +18,7 @@ export type AmountInputModalProps = {
   maxAmount?: MoneyAmount<WalletOrDisplayCurrency>
   maxAmountIsBalance?: boolean
   minAmount?: MoneyAmount<WalletOrDisplayCurrency>
+  getAmountWarning?: (amount: MoneyAmount<WalletOrDisplayCurrency>) => string | undefined
   isOpen: boolean
   close: () => void
 }
@@ -49,6 +50,7 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
   maxAmount,
   maxAmountIsBalance,
   minAmount,
+  getAmountWarning,
   convertMoneyAmount,
   isOpen,
   close,
@@ -93,6 +95,7 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
             maxAmount={maxAmount}
             maxAmountIsBalance={maxAmountIsBalance}
             minAmount={minAmount}
+            getAmountWarning={getAmountWarning}
           />
         </Pressable>
       </Pressable>

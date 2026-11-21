@@ -66,6 +66,7 @@ type ReceiveAmountRowProps = {
   onToggleWallet: () => void
   canToggleWallet: boolean
   disabled?: boolean
+  getAmountWarning?: (amount: MoneyAmount<WalletOrDisplayCurrency>) => string | undefined
 }
 
 export const ReceiveAmountRow: React.FC<ReceiveAmountRowProps> = ({
@@ -77,6 +78,7 @@ export const ReceiveAmountRow: React.FC<ReceiveAmountRowProps> = ({
   onToggleWallet,
   canToggleWallet,
   disabled,
+  getAmountWarning,
 }) => {
   const styles = useStyles()
   const {
@@ -157,6 +159,7 @@ export const ReceiveAmountRow: React.FC<ReceiveAmountRowProps> = ({
         walletCurrency={walletCurrency}
         convertMoneyAmount={convertMoneyAmount}
         onSetAmount={onSetAmount}
+        getAmountWarning={getAmountWarning}
         isOpen={isModalOpen}
         close={() => setIsModalOpen(false)}
       />

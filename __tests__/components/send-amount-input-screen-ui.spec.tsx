@@ -181,6 +181,34 @@ describe("AmountInputScreenUI", () => {
     expect(getByText("Maximum exceeded")).toBeTruthy()
   })
 
+  it("renders a warning in the error slot without disabling Set Amount", () => {
+    const { getByTestId } = render(
+      <AmountInputScreenUI
+        {...defaultProps}
+        warningMessage="Amount will be consumed by the deposit fee"
+        onSetAmountPress={mockOnSetAmountPress}
+      />,
+    )
+
+    expect(getByTestId("amount-input-warning").props.children).toBe(
+      "Amount will be consumed by the deposit fee",
+    )
+    expect(getByTestId("set-amount-button").props.accessibilityState.disabled).toBeFalsy()
+  })
+
+  it("shows the error, not the warning, when both are set", () => {
+    const { getByText, queryByTestId } = render(
+      <AmountInputScreenUI
+        {...defaultProps}
+        errorMessage="Maximum exceeded"
+        warningMessage="Amount will be consumed by the deposit fee"
+      />,
+    )
+
+    expect(getByText("Maximum exceeded")).toBeTruthy()
+    expect(queryByTestId("amount-input-warning")).toBeNull()
+  })
+
   it("renders CurrencyKeyboard", () => {
     const { getByTestId } = render(<AmountInputScreenUI {...defaultProps} />)
 
