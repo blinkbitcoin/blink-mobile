@@ -337,6 +337,39 @@ describe("MerchantSelectionScreen", () => {
     )
   })
 
+  it("tries the same merchant again from the pop-up", async () => {
+    resolveMerchantChoiceDestinationMock.mockRejectedValue(new Error("LNURL failed"))
+    renderScreen()
+    fireEvent.press(
+      screen.getByLabelText(`${merchants[1].title}. ${merchants[1].description}`),
+    )
+    await waitFor(() => expect(mockNotifyModal).toHaveBeenCalledTimes(1))
+
+    mockNotifyModal.mock.calls[0][0].primaryButtonAction()
+
+    await waitFor(() =>
+      expect(resolveMerchantChoiceDestinationMock).toHaveBeenCalledTimes(2),
+    )
+    expect(resolveMerchantChoiceDestinationMock.mock.calls[1]).toEqual(
+      resolveMerchantChoiceDestinationMock.mock.calls[0],
+    )
+  })
+
+  /** A retry is the screen's to make: once the user has left it, nothing is resolved. */
+  it("does not try again from the pop-up once the screen has lost focus", async () => {
+    resolveMerchantChoiceDestinationMock.mockRejectedValue(new Error("LNURL failed"))
+    renderScreen()
+    fireEvent.press(
+      screen.getByLabelText(`${merchants[1].title}. ${merchants[1].description}`),
+    )
+    await waitFor(() => expect(mockNotifyModal).toHaveBeenCalledTimes(1))
+
+    mockFocusCleanups.forEach((cleanup) => cleanup())
+    mockNotifyModal.mock.calls[0][0].primaryButtonAction()
+
+    expect(resolveMerchantChoiceDestinationMock).toHaveBeenCalledTimes(1)
+  })
+
   it("does not navigate or alert when resolution completes after blur", async () => {
     let resolveSelectedMerchant: (
       value: Awaited<ReturnType<typeof resolveMerchantChoiceDestination>>,
