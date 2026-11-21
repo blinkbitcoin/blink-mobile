@@ -170,7 +170,7 @@ describe("IconHero", () => {
     expect(getByTestId("icon-cloud-arrow-up")).toBeTruthy()
   })
 
-  it("draws the icon at the large icon button's size, 32dp in a 44dp circle", async () => {
+  it("draws the icon at the large icon button's size, 36dp in a 50dp circle", async () => {
     const { getByTestId } = render(
       <ContextForScreen>
         <IconHero icon="cloud-arrow-up" iconColor="green" title="Title" />
@@ -179,8 +179,8 @@ describe("IconHero", () => {
     await flushEffects()
 
     expect(getByTestId("icon-cloud-arrow-up").props).toMatchObject({
-      size: 32,
-      containerSize: 44,
+      size: 36,
+      containerSize: 50,
     })
   })
 })

@@ -36,7 +36,7 @@ export type GaloyIconButtonProps = {
 export const iconButtonSizes = {
   small: { circle: 20, icon: 16 },
   medium: { circle: 32, icon: 20 },
-  large: { circle: 44, icon: 32 },
+  large: { circle: 50, icon: 36 },
 } as const
 
 const touchBoxStyle = (contentSize: number, padding: number | Insets): ViewStyle => {
