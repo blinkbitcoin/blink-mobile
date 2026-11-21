@@ -114,7 +114,7 @@ describe("GaloyIconButton sizes", () => {
   it.each([
     ["small", 20, 16],
     ["medium", 32, 20],
-    ["large", 50, 36],
+    ["large", 44, 32],
   ] as const)("draws %s as a %ddp circle with a %ddp icon", (size, circle, icon) => {
     const { getByTestId } = renderWithTheme(<GaloyIconButton name="close" size={size} />)
 
