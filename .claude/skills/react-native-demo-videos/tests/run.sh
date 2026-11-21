@@ -249,10 +249,35 @@ DEMO_UDID=DEMO-UDID DEMO_ANDROID_SERIAL=emulator-5554 \
   "$SCRIPTS/record-flow.sh" pick "$WORK/flow.yaml" "$WORK/droid-out" --serial emulator-5554 >/dev/null 2>&1
 check "--serial disambiguates to android" "0" "$?"
 
+# Android is NOT exempt from the clearState guard: since the claimed port lives
+# in the debug_http_host preference, clearing app state deletes the Metro
+# pointer and the next launch dials 10.0.2.2:8081 - another agent's bundler.
+# (The old exemption rested on "Metro reaches an emulator over adb reverse",
+# which is wrong twice over: an emulator resolves to 10.0.2.2 and never
+# consults a reverse tunnel.)
+reset_droid
+out=$(DEMO_ANDROID_SERIAL=emulator-5554 \
+  "$SCRIPTS/record-flow.sh" droidclear "$WORK/clearflow.yaml" "$WORK/droid-out" 2>&1)
+check "android clearState without re-pointing is refused" "1" "$?"
+check "the refusal names the preference that gets wiped" "yes" \
+  "$(echo "$out" | grep -q "debug_http_host" && echo yes || echo no)"
+
+reset_droid
+cat > "$WORK/droid-clearflow-ok.yaml" <<'YAML'
+appId: ${APP_ID}
+---
+# point-app-at-metro is re-run after this clearing launch
+- launchApp:
+    clearState: true
+YAML
+DEMO_ANDROID_SERIAL=emulator-5554 \
+  "$SCRIPTS/record-flow.sh" droidclearok "$WORK/droid-clearflow-ok.yaml" "$WORK/droid-out" >/dev/null 2>&1
+check "acknowledging the re-point in the flow satisfies the guard" "0" "$?"
+
 reset_droid
 DEMO_ANDROID_SERIAL=emulator-5554 \
-  "$SCRIPTS/record-flow.sh" droidclear "$WORK/clearflow.yaml" "$WORK/droid-out" >/dev/null 2>&1
-check "android skips the clearState guard (adb reverse, not app data)" "0" "$?"
+  "$SCRIPTS/record-flow.sh" droidclearwaive "$WORK/clearflow.yaml" "$WORK/droid-out" --allow-clear-state >/dev/null 2>&1
+check "--allow-clear-state waives it on android too" "0" "$?"
 
 out=$(DEMO_APP_ID_ANDROID= DEMO_ANDROID_SERIAL=emulator-5554 \
   "$SCRIPTS/record-flow.sh" noapp "$WORK/flow.yaml" "$WORK/droid-out" 2>&1)
@@ -400,6 +425,19 @@ DEMO_SESSION_DIR="$WSESS" DEMO_UDID=DEMO-UDID \
 check "the maestro version probe runs once per session, not per recording" "1" \
   "$(grep -c "maestro --version" "$FAKE_ARGS_LOG")"
 
+# Android used to pay the full ~20s warmup on EVERY recording, purely because
+# it had no session dir to keep the marker in. It has one now.
+reset_droid; rm -rf "$WSESS"; mkdir -p "$WSESS"
+DEMO_SESSION_DIR="$WSESS" DEMO_ANDROID_SERIAL=emulator-5554 \
+  "$SCRIPTS/record-flow.sh" droidwarm1 "$WORK/flow.yaml" "$WORK/droid-out" >/dev/null 2>&1
+check "the first android recording of a session warms up" "1" \
+  "$(grep -c "_warmup.yaml" "$FAKE_ARGS_LOG")"
+reset_droid
+DEMO_SESSION_DIR="$WSESS" DEMO_ANDROID_SERIAL=emulator-5554 \
+  "$SCRIPTS/record-flow.sh" droidwarm2 "$WORK/flow.yaml" "$WORK/droid-out" >/dev/null 2>&1
+check "the second android recording in the same session skips it" "0" \
+  "$(grep -c "_warmup.yaml" "$FAKE_ARGS_LOG")"
+
 reset_logs; rm -rf "$WSESS"; mkdir -p "$WSESS"
 DEMO_SKIP_WARMUP=1 DEMO_SESSION_DIR="$WSESS" DEMO_UDID=DEMO-UDID \
   "$SCRIPTS/record-flow.sh" warm5 "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
@@ -474,6 +512,15 @@ T0=$(py_now)
 DUR=$(python3 -c "print('%.1f' % (float('$(py_now)') - float('$T0')))")
 check "gif encode of the 2s clip stays under the runaway budget (15s)" "yes" \
   "$(python3 -c "print('yes' if float('$DUR') < 15 else 'no (${DUR}s)')")"
+
+# The count in SKILL.md is documentation that rots silently - it drifted to 105
+# against 97 actual once. Comparing it here makes the drift a red build instead
+# of a number nobody checks.
+DOC_COUNT=$(grep -o '# [0-9]\+ assertions' "$TESTS_DIR/../SKILL.md" 2>/dev/null | head -1 | grep -o '[0-9]\+' || echo "")
+ACTUAL_COUNT=$((PASS + FAIL))
+if [ -n "$DOC_COUNT" ] && [ "$DOC_COUNT" != "$ACTUAL_COUNT" ]; then
+  bad "SKILL.md documents the suite's own size" "$DOC_COUNT assertions" "$ACTUAL_COUNT"
+fi
 
 echo
 echo "-------------------------------------"

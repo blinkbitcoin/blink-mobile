@@ -268,7 +268,7 @@ threshold with a TEMP constant and say so in the PR comment.
 ## After Editing the Scripts
 
 ```bash
-"$SKILL/tests/run.sh"     # 105 assertions, ~50s, exits non-zero on failure
+"$SKILL/tests/run.sh"     # 110 assertions, ~50s, exits non-zero on failure
 ```
 
 Fakes `xcrun`, `adb` (the full screenrecord start/kill -2/pull lifecycle) and
