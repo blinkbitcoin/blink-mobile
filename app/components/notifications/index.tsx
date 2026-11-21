@@ -1,18 +1,35 @@
-import React, { useState, createContext, useContext, useCallback, useMemo } from "react"
+import React, {
+  useState,
+  createContext,
+  useContext,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react"
 
-import { Text, makeStyles, useTheme } from "@rn-vui/themed"
+import { IconNamesType } from "../atomic/galoy-icon"
+import { MessagePopup } from "./message-popup"
 
-import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
-import CustomModal from "../custom-modal/custom-modal"
+export { MessagePopup } from "./message-popup"
+
+/** What a message tells the user, which picks its icon: the action worked; something
+ *  failed and nothing is lost; something failed and the user could lose something if
+ *  they ignore it; or neutral news. */
+export const MessageIcon = {
+  Success: "payment-success",
+  Alert: "warning-circle",
+  Warning: "warning",
+  Info: "info",
+} as const satisfies Record<string, IconNamesType>
 
 type NotifyModalArgs = {
   title: string
   text: string
   icon?: IconNamesType
   primaryButtonTitle: string
-  primaryButtonAction?: () => Promise<void>
-  secondaryButtonTitle?: string
-  secondaryButtonAction?: () => Promise<void>
+  /** The button's remedy, or the follow-up a message that only informs leads to. */
+  primaryButtonAction?: () => void
+  /** The close icon, the backdrop and the back button. */
   dismissAction?: () => void
 }
 
@@ -49,15 +66,12 @@ export const NotificationsProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   const [modalNotifications, setModalNotifications] = useState<NotifyModalArgs[]>([])
-  const [modalPrimaryIsLoading, setModalPrimaryIsLoading] = useState(false)
-  const [modalSecondaryIsLoading, setModalSecondaryIsLoading] = useState(false)
+  const [isModalClosing, setIsModalClosing] = useState(false)
+  const isModalClosingRef = useRef(false)
+  /** The way out the user took, run once the pop-up is off the screen. */
+  const modalExitRef = useRef<(() => void) | undefined>(undefined)
   const [cardNotifications, setCardNotifications] = useState<NotifyCardArgs[]>([])
   const [cardIsLoading, setCardIsLoading] = useState(false)
-
-  const {
-    theme: { colors },
-  } = useTheme()
-  const styles = useStyles()
 
   const notifyModal = useCallback(
     (args: NotifyModalArgs) => {
@@ -65,10 +79,6 @@ export const NotificationsProvider: React.FC<React.PropsWithChildren> = ({
     },
     [setModalNotifications],
   )
-
-  const dismissModal = useCallback(() => {
-    setModalNotifications((notifications) => notifications.slice(1))
-  }, [setModalNotifications])
 
   const notifyCard = useCallback(
     (args: NotifyCardArgs) => {
@@ -84,54 +94,28 @@ export const NotificationsProvider: React.FC<React.PropsWithChildren> = ({
   const activeCard = cardNotifications[0]
   const activeNotification = modalNotifications[0]
 
-  const modalInfo = useMemo(() => {
-    if (!activeNotification) {
-      return null
-    }
+  /**
+   * One way out per pop-up: a second tap while it closes, on the button or the backdrop,
+   * is not taken, even when both land before the next render. What it leads to runs once
+   * the pop-up is off the screen, so a route it takes (the login gate raises a biometric
+   * prompt as it opens) is never covered by it, and a pop-up the action raises shows
+   * after this one.
+   */
+  const closeModal = useCallback((exit?: () => void) => {
+    if (isModalClosingRef.current) return
+    isModalClosingRef.current = true
+    modalExitRef.current = exit
+    setIsModalClosing(true)
+  }, [])
 
-    const toggleModal = () => {
-      dismissModal()
-      if (activeNotification.dismissAction) {
-        activeNotification.dismissAction()
-      }
-    }
-
-    const primaryButtonAction = async () => {
-      if (activeNotification.primaryButtonAction) {
-        setModalPrimaryIsLoading(true)
-        await activeNotification.primaryButtonAction()
-        setModalPrimaryIsLoading(false)
-      }
-      dismissModal()
-    }
-
-    const secondaryButtonAction = async () => {
-      if (activeNotification.secondaryButtonAction) {
-        setModalSecondaryIsLoading(true)
-        await activeNotification.secondaryButtonAction()
-        setModalSecondaryIsLoading(false)
-      }
-      dismissModal()
-    }
-
-    return {
-      title: activeNotification.title,
-      isVisible: Boolean(activeNotification),
-      toggleModal,
-      showCloseIcon: Boolean(activeNotification.dismissAction),
-      primaryButtonTitle: activeNotification.primaryButtonTitle,
-      primaryButtonAction,
-      secondaryButtonTitle: activeNotification.secondaryButtonTitle,
-      secondaryButtonAction,
-      text: activeNotification.text,
-      icon: activeNotification.icon,
-    }
-  }, [
-    activeNotification,
-    dismissModal,
-    setModalPrimaryIsLoading,
-    setModalSecondaryIsLoading,
-  ])
+  const onModalHide = useCallback(() => {
+    const exit = modalExitRef.current
+    modalExitRef.current = undefined
+    isModalClosingRef.current = false
+    setModalNotifications((notifications) => notifications.slice(1))
+    setIsModalClosing(false)
+    exit?.()
+  }, [])
 
   const cardInfo = useMemo(() => {
     if (!activeCard) {
@@ -172,42 +156,20 @@ export const NotificationsProvider: React.FC<React.PropsWithChildren> = ({
     >
       {children}
 
-      {modalInfo && (
-        <CustomModal
-          isVisible={modalInfo.isVisible}
-          toggleModal={modalInfo.toggleModal}
-          title={modalInfo.title}
-          showCloseIconButton={modalInfo.showCloseIcon}
-          primaryButtonTitle={modalInfo.primaryButtonTitle}
-          primaryButtonOnPress={modalInfo.primaryButtonAction}
-          primaryButtonLoading={modalPrimaryIsLoading}
-          secondaryButtonOnPress={modalInfo.secondaryButtonAction}
-          secondaryButtonTitle={modalInfo.secondaryButtonTitle}
-          secondaryButtonLoading={modalSecondaryIsLoading}
-          image={
-            modalInfo.icon && (
-              <GaloyIcon
-                name={modalInfo.icon as IconNamesType}
-                size={100}
-                color={colors.accent}
-              />
-            )
-          }
-          body={
-            <Text type="h2" style={styles.bodyText}>
-              {modalInfo.text}
-            </Text>
-          }
+      {activeNotification && (
+        <MessagePopup
+          isVisible={!isModalClosing}
+          onClose={() => closeModal(activeNotification.dismissAction)}
+          onModalHide={onModalHide}
+          icon={activeNotification.icon}
+          title={activeNotification.title}
+          text={activeNotification.text}
+          buttonTitle={activeNotification.primaryButtonTitle}
+          onButtonPress={() => closeModal(activeNotification.primaryButtonAction)}
         />
       )}
     </NotificationModalContext.Provider>
   )
 }
-
-const useStyles = makeStyles(() => ({
-  bodyText: {
-    textAlign: "center",
-  },
-}))
 
 export const useNotifications = () => useContext(NotificationModalContext)
