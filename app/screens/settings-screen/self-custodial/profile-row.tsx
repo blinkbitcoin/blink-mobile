@@ -12,6 +12,7 @@ import { ListItem, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button/galoy-icon-button"
+import { HEADER_ICON_BUTTON_TOUCH_PADDING } from "@app/components/header-no-glass"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -199,7 +200,9 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
           ) : (
             <GaloyIconButton
               name="close"
-              size="small"
+              size="medium"
+              touchPadding={HEADER_ICON_BUTTON_TOUCH_PADDING}
+              style={styles.removeButton}
               onPress={handleRemovePress}
               backgroundColor={colors.neutral}
               testID={`delete-button-${accountId}`}
@@ -239,6 +242,11 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   spacer: {
     width: 20,
+  },
+  /** The 48dp touch box reaches into the row's padding, so the row keeps its height and
+   *  the title gives up only the circle's width. */
+  removeButton: {
+    margin: -HEADER_ICON_BUTTON_TOUCH_PADDING,
   },
   subtleText: {
     color: colors.textMuted,

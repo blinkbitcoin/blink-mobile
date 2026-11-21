@@ -1,4 +1,5 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -81,6 +82,52 @@ describe("ProfileScreen (custodial row on Switch account)", () => {
     expect(mockSaveToken).toHaveBeenCalledWith("mock-token-1")
     expect(mockPopTo).toHaveBeenCalledWith("Primary")
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** A 20dp circle with no touch padding read too small for a destructive action, and a
+   *  near miss landed on the row and switched account. The 48dp box takes its 8dp each
+   *  side back as margin, so the row lays it out at the circle's 32dp. */
+  it("draws the remove button as a 32dp circle in a 48dp touch box", () => {
+    render(
+      <ContextForScreen>
+        <ProfileScreen
+          identifier="TestUser"
+          token="mock-token-1"
+          selected={false}
+          lnAddressHostname="blink.sv"
+        />
+      </ContextForScreen>,
+    )
+    const style = StyleSheet.flatten(screen.getByTestId("close").props.style)
+
+    expect(style).toMatchObject({
+      width: 48,
+      height: 48,
+      paddingTop: 8,
+      paddingRight: 8,
+      paddingBottom: 8,
+      paddingLeft: 8,
+      margin: -8,
+    })
+  })
+
+  it("asks to log out without switching account when the remove button is pressed", () => {
+    render(
+      <ContextForScreen>
+        <ProfileScreen
+          identifier="TestUser"
+          token="mock-token-1"
+          selected={false}
+          lnAddressHostname="blink.sv"
+        />
+      </ContextForScreen>,
+    )
+
+    fireEvent.press(screen.getByTestId("close"))
+
+    expect(screen.getByText(LL.ProfileScreen.fromThisDevice())).toBeTruthy()
+    expect(mockSaveToken).not.toHaveBeenCalled()
+    expect(mockSetActiveAccountId).not.toHaveBeenCalled()
   })
 
   /** The identifier is the account's username or phone number, and the toast's message is

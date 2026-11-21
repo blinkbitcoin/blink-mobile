@@ -15,6 +15,7 @@ import useLogout from "@app/hooks/use-logout"
 import { useLogoutAndRoute } from "@app/hooks/use-logout-and-route"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button/galoy-icon-button"
+import { HEADER_ICON_BUTTON_TOUCH_PADDING } from "@app/components/header-no-glass"
 import Modal from "react-native-modal"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
@@ -195,7 +196,9 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
           ) : (
             <GaloyIconButton
               name="close"
-              size="small"
+              size="medium"
+              touchPadding={HEADER_ICON_BUTTON_TOUCH_PADDING}
+              style={styles.removeButton}
               onPress={openModal}
               backgroundColor={colors.neutral}
             />
@@ -227,6 +230,11 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   spacerStyle: {
     width: 20,
+  },
+  /** The 48dp touch box reaches into the row's padding, so the row keeps its height and
+   *  the title gives up only the circle's width. */
+  removeButton: {
+    margin: -HEADER_ICON_BUTTON_TOUCH_PADDING,
   },
   subtitle: {
     color: colors.textMuted,
