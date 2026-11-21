@@ -17,7 +17,6 @@ const BACKSPACE_REPEAT_MS = 300
 type CurrencyKeyboardProps = {
   /** Returns whether the press changed the amount: a refused key stays silent. */
   onPress: (pressed: KeyType) => boolean
-  safeMode?: boolean
   disabledKeys?: ReadonlySet<KeyType>
   disabled?: boolean
   /** The first key, "1": where screen reader focus lands to start typing an amount. */
@@ -26,7 +25,6 @@ type CurrencyKeyboardProps = {
 
 export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
   onPress,
-  safeMode = false,
   disabledKeys,
   disabled = false,
   firstKeyRef,
@@ -51,7 +49,6 @@ export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
                 key={key}
                 numberPadKey={key}
                 handleKeyPress={onPress}
-                safeMode={safeMode}
                 disabled={isKeyDisabled}
                 pressableRef={key === KeyType[1] ? firstKeyRef : undefined}
               />
@@ -66,13 +63,11 @@ export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
 const Key = ({
   handleKeyPress,
   numberPadKey,
-  safeMode,
   disabled,
   pressableRef,
 }: {
   numberPadKey: KeyType
   handleKeyPress: (key: KeyType) => boolean
-  safeMode?: boolean
   disabled?: boolean
   pressableRef?: Ref<View>
 }) => {
@@ -126,7 +121,6 @@ const Key = ({
     hasTapped.current = false
     repeatFired.current = false
     clearReleaseGuard()
-    if (safeMode) return
     if (key !== KeyType.Backspace) return
     stopRepeat()
     /** A refused tick means the amount is empty: stop rather than tick against nothing. */

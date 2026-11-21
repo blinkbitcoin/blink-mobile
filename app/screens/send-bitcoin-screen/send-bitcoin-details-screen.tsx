@@ -696,7 +696,6 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
             <CurrencyKeyboard
               onPress={amountPad.onKeyPress}
               disabledKeys={amountPad.disabledKeys}
-              safeMode
               firstKeyRef={firstKeyRef}
             />
           </View>
