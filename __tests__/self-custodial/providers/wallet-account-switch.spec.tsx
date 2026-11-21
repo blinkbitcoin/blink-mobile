@@ -249,3 +249,48 @@ describe("SelfCustodialWalletProvider — the transactions across an account swi
     await waitFor(() => expect(result.current.allTransactions).toEqual([]))
   })
 })
+
+describe("SelfCustodialWalletProvider — the status across an account switch", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockActiveAccountId = ACCOUNT_A
+    mockActiveAccountType = "self-custodial"
+    mockConnection = { sdk: sdkA, connectedAccountId: ACCOUNT_A }
+    mockTransactions = []
+    mockLifecycle.status = "ready"
+  })
+
+  it("reads ready while the connection is the active account's", async () => {
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => expect(result.current.status).toBe("ready"))
+  })
+
+  it("reads loading, not ready, while the connection is still the previous account's", async () => {
+    mockActiveAccountId = ACCOUNT_B
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => expect(result.current.status).toBe("loading"))
+  })
+
+  it("reads loading, not degraded, while the new account's connection is on its way", async () => {
+    mockActiveAccountId = ACCOUNT_B
+    mockConnection = { sdk: null, connectedAccountId: null }
+    mockLifecycle.status = "degraded"
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => expect(result.current.status).toBe("loading"))
+  })
+
+  it("passes an error through while no connection is up", async () => {
+    mockActiveAccountId = ACCOUNT_B
+    mockConnection = { sdk: null, connectedAccountId: null }
+    mockLifecycle.status = "error"
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => expect(result.current.status).toBe("error"))
+  })
+})
