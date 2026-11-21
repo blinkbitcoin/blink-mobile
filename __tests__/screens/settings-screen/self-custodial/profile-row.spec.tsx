@@ -1,5 +1,6 @@
 import React from "react"
 import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
+import { StyleSheet } from "react-native"
 import { act, fireEvent, render } from "@testing-library/react-native"
 import { it } from "@jest/globals"
 
@@ -120,20 +121,6 @@ jest.mock(
 jest.mock("@app/components/atomic/galoy-icon", () => ({
   GaloyIcon: () => null,
 }))
-
-jest.mock("@app/components/atomic/galoy-icon-button/galoy-icon-button", () => {
-  const ReactActual = jest.requireActual("react")
-  const { TouchableOpacity } = jest.requireActual("react-native")
-  return {
-    GaloyIconButton: ({
-      onPress,
-      ...props
-    }: {
-      onPress?: () => void
-      [key: string]: unknown
-    }) => ReactActual.createElement(TouchableOpacity, { onPress, ...props }),
-  }
-})
 
 const mockNavigate = jest.fn()
 const mockPopTo = jest.fn()
@@ -352,6 +339,39 @@ describe("ProfileRow", () => {
 
     expect(deleteButton.props.accessibilityLabel).toBe("Remove account")
     expect(deleteButton.props.accessibilityRole).toBe("button")
+  })
+
+  /** A 20dp circle with no touch padding read too small for a destructive action, and a
+   *  near miss landed on the row and switched account. The 48dp box takes its 8dp each
+   *  side back as margin, so the row lays it out at the circle's 32dp. */
+  it("draws the delete button as a 32dp circle in a 48dp touch box", () => {
+    const { getByTestId } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+    const style = StyleSheet.flatten(
+      getByTestId(`delete-button-${TEST_ENTRY_ID}`).props.style,
+    )
+
+    expect(style).toMatchObject({
+      width: 48,
+      height: 48,
+      paddingTop: 8,
+      paddingRight: 8,
+      paddingBottom: 8,
+      paddingLeft: 8,
+      margin: -8,
+    })
+  })
+
+  it("opens the removal without switching account when the delete button is pressed", async () => {
+    const { getByTestId, findByTestId } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
+
+    expect(await findByTestId("delete-modal")).toBeTruthy()
+    expect(setActiveAccountId).not.toHaveBeenCalled()
   })
 
   /** The row is a single accessibility element, so VoiceOver never focuses the nested
