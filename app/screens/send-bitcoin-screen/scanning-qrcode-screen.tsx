@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { gql } from "@apollo/client"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { MessageIcon, useNotifications } from "@app/components/notifications"
 import {
   useAccountDefaultWalletLazyQuery,
   useRealtimePriceQuery,
@@ -113,6 +114,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
   })
 
   const { LL } = useI18nContext()
+  const { notifyModal } = useNotifications()
   const insets = useSafeAreaInsets()
   const { displayCurrency } = useDisplayCurrency()
   const { sdk } = useSelfCustodialWallet()
@@ -149,7 +151,16 @@ export const ScanningQRCodeScreen: React.FC = () => {
   }, [])
 
   const loadInBrowser = (url: string) => {
-    Linking.openURL(url).catch((err) => Alert.alert(err.toString()))
+    Linking.openURL(url).catch((err: unknown) => {
+      reportError("scanning-qrcode", toError(err))
+      notifyModal({
+        icon: MessageIcon.Alert,
+        title: LL.Messages.linkFailedTitle(),
+        text: LL.Messages.linkFailedBody(),
+        primaryButtonTitle: LL.Messages.tryAgain(),
+        primaryButtonAction: () => loadInBrowser(url),
+      })
+    })
   }
 
   function isValidHttpUrl(input: string) {

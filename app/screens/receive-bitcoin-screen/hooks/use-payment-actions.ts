@@ -1,6 +1,7 @@
 import { useCallback } from "react"
-import { Alert, Share } from "react-native"
+import { Share } from "react-native"
 
+import { MessageIcon, useNotifications } from "@app/components/notifications"
 import { cancelPendingClipboardClear } from "@app/hooks/use-clipboard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
@@ -26,6 +27,7 @@ export const usePaymentActions = ({
   invoiceType,
 }: PaymentActionsInput) => {
   const { LL } = useI18nContext()
+  const { notifyModal } = useNotifications()
 
   const copyToClipboard = useCallback(() => {
     if (!copyableContent) return
@@ -46,10 +48,16 @@ export const usePaymentActions = ({
     } catch (err) {
       if (err instanceof Error) {
         reportError("payment-actions", err)
-        Alert.alert(err.message)
+        notifyModal({
+          icon: MessageIcon.Alert,
+          title: LL.Messages.shareFailedTitle(),
+          text: LL.Messages.shareCopyFailedBody(),
+          primaryButtonTitle: LL.Messages.copy(),
+          primaryButtonAction: copyToClipboard,
+        })
       }
     }
-  }, [copyableContent])
+  }, [copyableContent, copyToClipboard, notifyModal, LL])
 
   return { copyToClipboard, share }
 }

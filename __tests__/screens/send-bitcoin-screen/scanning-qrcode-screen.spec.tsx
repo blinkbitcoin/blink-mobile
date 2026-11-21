@@ -1,5 +1,5 @@
 import React from "react"
-import { Alert } from "react-native"
+import { Alert, Linking } from "react-native"
 import type { ReactTestInstance } from "react-test-renderer"
 import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import {
@@ -137,6 +137,12 @@ const fireScan = async (qrPayload: string) => {
     lastReadCode?.({ nativeEvent: { codeStringValue: qrPayload } })
   })
 }
+
+const mockNotifyModal = jest.fn()
+jest.mock("@app/components/notifications", () => ({
+  ...jest.requireActual("@app/components/notifications"),
+  useNotifications: () => ({ notifyModal: mockNotifyModal }),
+}))
 
 describe("ScanningQRCodeScreen", () => {
   const custodialScanContext = {
@@ -329,6 +335,46 @@ describe("ScanningQRCodeScreen", () => {
 
     await waitFor(() => expect(alertSpy).toHaveBeenCalled())
     expect(mockReplace).not.toHaveBeenCalled()
+  })
+
+  /** No app on the phone takes the link: say so, log the reason, and Try again opens the
+   *  same link once more. */
+  it("offers to try a link again that the phone could not open", async () => {
+    const link = "https://example.com/menu"
+    const openURL = jest
+      .spyOn(Linking, "openURL")
+      .mockRejectedValueOnce(new Error("No Activity found"))
+      .mockResolvedValueOnce(true)
+    mockResolveDestination.mockResolvedValue({
+      valid: false,
+      invalidReason: InvalidDestinationReason.UnknownDestination,
+      invalidPaymentDestination: {},
+    })
+
+    await renderScreen()
+    await fireScan(link)
+    await waitFor(() => expect(alertSpy).toHaveBeenCalled())
+    const [, , buttons] = alertSpy.mock.calls.at(-1) ?? []
+    await act(async () => {
+      buttons?.find((button) => button.text === "Yes")?.onPress?.()
+    })
+
+    expect(mockReportError).toHaveBeenCalled()
+    const message = mockNotifyModal.mock.lastCall?.[0]
+    expect(message).toMatchObject({
+      icon: "warning-circle",
+      title: "Couldn't open this link",
+      text: "Your phone couldn't open it. Try again in a moment.",
+      primaryButtonTitle: "Try again",
+    })
+
+    await act(async () => {
+      message.primaryButtonAction()
+    })
+
+    expect(openURL).toHaveBeenCalledTimes(2)
+    expect(openURL).toHaveBeenLastCalledWith(link)
+    openURL.mockRestore()
   })
 
   it("skips processing when bitcoinNetwork is unavailable (self-custodial not ready)", async () => {

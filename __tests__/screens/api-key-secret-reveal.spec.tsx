@@ -1,5 +1,5 @@
 import React from "react"
-import { Alert, AlertButton } from "react-native"
+import { Alert, AlertButton, Share } from "react-native"
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -60,6 +60,12 @@ const deferred = <T,>() => {
   })
   return { promise, resolve, reject }
 }
+
+const mockNotifyModal = jest.fn()
+jest.mock("@app/components/notifications", () => ({
+  ...jest.requireActual("@app/components/notifications"),
+  useNotifications: () => ({ notifyModal: mockNotifyModal }),
+}))
 
 loadLocale("en")
 const LL = i18nObject("en")
@@ -150,6 +156,32 @@ describe("ApiKeySecretReveal", () => {
     expect(screen.queryByText(API_KEY_SECRET)).toBeNull()
 
     fireEvent.press(screen.getByTestId("api-key-secret"))
+
+    expect(Clipboard.setString).toHaveBeenCalledWith(API_KEY_SECRET)
+  })
+
+  /** The secret is shown once: a share that fails says to copy it before leaving, and
+   *  the button copies it. */
+  it("offers to copy the key when sharing fails", async () => {
+    jest.spyOn(Share, "share").mockRejectedValue(new Error("share sheet failed"))
+    renderReveal()
+    await screen.findByTestId("api-key-secret")
+
+    await act(async () => {
+      fireEvent.press(screen.getByText(LL.common.share()))
+    })
+
+    const message = mockNotifyModal.mock.lastCall?.[0]
+    expect(message).toMatchObject({
+      icon: "warning",
+      title: LL.Messages.shareFailedTitle(),
+      text: LL.Messages.shareKeyFailedBody(),
+      primaryButtonTitle: LL.Messages.copyKey(),
+    })
+    const Clipboard = jest.requireMock("@react-native-clipboard/clipboard")
+    jest.mocked(Clipboard.setString).mockClear()
+
+    act(() => message.primaryButtonAction())
 
     expect(Clipboard.setString).toHaveBeenCalledWith(API_KEY_SECRET)
   })

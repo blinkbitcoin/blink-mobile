@@ -109,6 +109,12 @@ const renderScreen = (mode: "light" | "dark" = "light", routeParams = route.para
     </ContextForScreenWithTheme>,
   )
 
+const mockNotifyModal = jest.fn()
+jest.mock("@app/components/notifications", () => ({
+  ...jest.requireActual("@app/components/notifications"),
+  useNotifications: () => ({ notifyModal: mockNotifyModal }),
+}))
+
 describe("MerchantSelectionScreen", () => {
   const resolveMerchantChoiceDestinationMock =
     resolveMerchantChoiceDestination as jest.MockedFunction<
@@ -305,7 +311,14 @@ describe("MerchantSelectionScreen", () => {
     )
 
     await waitFor(() => expect(mockRecordError).toHaveBeenCalledWith(error))
-    expect(Alert.alert).toHaveBeenCalledWith(error.toString(), "", [{ text: "OK" }])
+    expect(mockNotifyModal).toHaveBeenCalledWith(
+      expect.objectContaining({
+        icon: "warning-circle",
+        title: "Couldn't load this merchant",
+        text: "Check your connection and try again, or pick another merchant.",
+        primaryButtonTitle: "Try again",
+      }),
+    )
     expect(screen.queryByTestId(`merchant-${merchants[1].id}-selected`)).toBeNull()
 
     resolveMerchantChoiceDestinationMock.mockResolvedValue({

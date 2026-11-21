@@ -1,10 +1,21 @@
 import { renderHook, act } from "@testing-library/react-hooks"
-import { Share, Alert } from "react-native"
+import { Share } from "react-native"
 
 import { usePaymentActions } from "@app/screens/receive-bitcoin-screen/hooks/use-payment-actions"
 import { Invoice } from "@app/screens/receive-bitcoin-screen/payment/index.types"
 
+const mockNotifyModal = jest.fn()
+jest.mock("@app/components/notifications", () => ({
+  ...jest.requireActual("@app/components/notifications"),
+  useNotifications: () => ({ notifyModal: mockNotifyModal }),
+}))
+
 const mockLL = {
+  Messages: {
+    shareFailedTitle: () => "Couldn't open sharing",
+    shareCopyFailedBody: () => "Copy it and paste it where you need it.",
+    copy: () => "Copy",
+  },
   ReceiveScreen: {
     copyClipboard: jest.fn(() => "Copied lightning invoice"),
     copyClipboardBitcoin: jest.fn(() => "Copied bitcoin address"),
@@ -139,10 +150,9 @@ describe("usePaymentActions", () => {
       expect(shareSpy).toHaveBeenCalledWith({ message: "lnbc1invoice" })
     })
 
-    it("records error on share failure", async () => {
+    it("records error on share failure, and offers to copy instead", async () => {
       const error = new Error("Share failed")
       jest.spyOn(Share, "share").mockRejectedValue(error)
-      const alertSpy = jest.spyOn(Alert, "alert")
 
       const { result } = renderHook(() =>
         usePaymentActions({
@@ -156,7 +166,17 @@ describe("usePaymentActions", () => {
       })
 
       expect(mockRecordError).toHaveBeenCalledWith(error)
-      expect(alertSpy).toHaveBeenCalledWith("Share failed")
+      const message = mockNotifyModal.mock.lastCall?.[0]
+      expect(message).toMatchObject({
+        icon: "warning-circle",
+        title: "Couldn't open sharing",
+        text: "Copy it and paste it where you need it.",
+        primaryButtonTitle: "Copy",
+      })
+
+      act(() => message.primaryButtonAction())
+
+      expect(mockSetString).toHaveBeenCalledWith("lnbc1invoice")
     })
 
     it("ignores non-Error rejection", async () => {

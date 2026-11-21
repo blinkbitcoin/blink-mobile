@@ -1,8 +1,8 @@
-import React, { useCallback, useState } from "react"
-import { Alert } from "react-native"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 
 import { gql } from "@apollo/client"
 import { CodeInput } from "@app/components/code-input"
+import { MessageIcon, useNotifications } from "@app/components/notifications"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import {
   SettingsScreenDocument,
@@ -12,6 +12,7 @@ import {
 import { isNetworkFailure } from "@app/graphql/transport-error"
 import { useAppConfig } from "@app/hooks"
 import { useCodeCheckHold } from "@app/hooks/use-code-check-hold"
+import { useIsMounted } from "@app/hooks/use-is-mounted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logTwoFactorSetupCompleted } from "@app/utils/analytics"
@@ -78,6 +79,10 @@ export const TotpRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
   const authToken = appConfig.token
 
   const { LL } = useI18nContext()
+  const { notifyModal } = useNotifications()
+  const isMounted = useIsMounted()
+  /** The send below, which Try again hands the same code to again. */
+  const sendRef = useRef<(code: string) => void>(() => {})
   /** Read before the registration lands: once it does, the account owes nothing, and
    *  what the event measures is the tier the setup answered. */
   const { tier, isEnforced } = useTwoFactorEnforcement()
@@ -145,7 +150,15 @@ export const TotpRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
           return
         }
         console.error(err)
-        Alert.alert(LL.common.error())
+        notifyModal({
+          icon: MessageIcon.Alert,
+          title: LL.Messages.twoFactorOnFailedTitle(),
+          text: LL.Messages.checkConnectionBody(),
+          primaryButtonTitle: LL.Messages.tryAgain(),
+          primaryButtonAction: () => {
+            if (isMounted()) sendRef.current(code)
+          },
+        })
       } finally {
         setLoading(false)
       }
@@ -161,8 +174,13 @@ export const TotpRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
       totpRegistrationValidate,
       enabledAccountId,
       showBackup,
+      notifyModal,
+      isMounted,
     ],
   )
+  useEffect(() => {
+    sendRef.current = send
+  }, [send])
 
   /**
    * A code accepted after the user left would enable the authenticator with the setup

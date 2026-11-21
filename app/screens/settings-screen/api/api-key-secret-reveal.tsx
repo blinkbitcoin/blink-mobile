@@ -9,6 +9,7 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
 import { IconHero } from "@app/components/icon-hero"
+import { MessageIcon, useNotifications } from "@app/components/notifications"
 import { Screen } from "@app/components/screen"
 import { ScreenSecurityGate } from "@app/components/screen-security-gate"
 import { QrCodeComponent } from "@app/components/totp-export"
@@ -39,6 +40,7 @@ const ApiKeySecretRevealContent: React.FC<
   Props & { onDone: () => void; onShownChange: (shown: boolean) => void }
 > = ({ secret, name, onDone, onShownChange }) => {
   const { LL } = useI18nContext()
+  const { notifyModal } = useNotifications()
   const styles = useStyles()
 
   React.useEffect(() => {
@@ -60,7 +62,13 @@ const ApiKeySecretRevealContent: React.FC<
     } catch (err) {
       if (err instanceof Error) {
         recordAppError(err)
-        Alert.alert(err.message)
+        notifyModal({
+          icon: MessageIcon.Warning,
+          title: LL.Messages.shareFailedTitle(),
+          text: LL.Messages.shareKeyFailedBody(),
+          primaryButtonTitle: LL.Messages.copyKey(),
+          primaryButtonAction: copySecret,
+        })
       }
     }
   }
