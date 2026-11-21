@@ -1,8 +1,9 @@
-import React from "react"
+import React, { useState } from "react"
 import { Text as ReactNativeText, View } from "react-native"
-import { render, fireEvent } from "@testing-library/react-native"
+import { act, render, fireEvent } from "@testing-library/react-native"
 
 import { CurrencyKeyboard } from "@app/components/currency-keyboard/currency-keyboard"
+import { haptics } from "@app/utils/haptics"
 import {
   getDisabledKeys,
   Key,
@@ -22,6 +23,11 @@ jest.mock("@rn-vui/themed", () => ({
     keyText: {},
     backspaceIcon: { color: "primary" },
   }),
+}))
+
+jest.mock("@app/utils/haptics", () => ({ haptics: { tap: jest.fn() } }))
+jest.mock("@app/i18n/i18n-react", () => ({
+  useI18nContext: () => ({ LL: { Accessibility: { deleteKey: () => "Delete" } } }),
 }))
 
 jest.mock("@app/components/atomic/galoy-icon", () => ({
@@ -137,6 +143,146 @@ describe("CurrencyKeyboard", () => {
     fireEvent.press(getByTestId("Key ⌫"))
 
     expect(mockOnPress).not.toHaveBeenCalled()
+  })
+
+  it("buzzes on every accessibility click of the same accepted key", () => {
+    const onPress = jest.fn().mockReturnValue(true)
+    const { getByText } = render(<CurrencyKeyboard onPress={onPress} />)
+    const key = getByText("1")
+
+    fireEvent(key, "click")
+    fireEvent(key, "click")
+
+    expect(haptics.tap).toHaveBeenCalledTimes(2)
+  })
+})
+
+/** Mirrors `useNumberPad`: the handler closes over the amount of the render it came from. */
+const StatefulPad = ({ initial }: { initial: string }) => {
+  const [amount, setAmount] = useState(initial)
+  const onPress = (key: Key) => {
+    if (key !== Key.Backspace || amount === "") return false
+    setAmount(amount.slice(0, -1))
+    return true
+  }
+  return (
+    <>
+      <ReactNativeText testID="amount">{amount}</ReactNativeText>
+      <CurrencyKeyboard onPress={onPress} />
+    </>
+  )
+}
+
+describe("CurrencyKeyboard held backspace", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    jest.useFakeTimers()
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  it("deletes one more character on every repeat tick", () => {
+    const { getByTestId } = render(<StatefulPad initial="123456" />)
+
+    fireEvent(getByTestId("Key ⌫"), "pressIn")
+    /** One act per tick: on a device each tick is its own task, with a render in between. */
+    for (let tick = 0; tick < 3; tick += 1) {
+      act(() => {
+        jest.advanceTimersByTime(300)
+      })
+    }
+
+    expect(getByTestId("amount").props.children).toBe("123")
+  })
+
+  it("stops repeating once a tick is refused", () => {
+    const onPress = jest.fn().mockReturnValue(false)
+    const { getByTestId } = render(<CurrencyKeyboard onPress={onPress} />)
+
+    fireEvent(getByTestId("Key ⌫"), "pressIn")
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+
+    expect(onPress).toHaveBeenCalledTimes(1)
+  })
+
+  it("stops repeating on release", () => {
+    const onPress = jest.fn().mockReturnValue(true)
+    const { getByTestId } = render(<CurrencyKeyboard onPress={onPress} />)
+
+    fireEvent(getByTestId("Key ⌫"), "pressIn")
+    act(() => {
+      jest.advanceTimersByTime(600)
+    })
+    fireEvent(getByTestId("Key ⌫"), "pressOut")
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+
+    expect(onPress).toHaveBeenCalledTimes(2)
+  })
+
+  it("buzzes once for a held backspace, including the release", () => {
+    const onPress = jest.fn().mockReturnValue(true)
+    const { getByTestId } = render(<CurrencyKeyboard onPress={onPress} />)
+    const key = getByTestId("Key ⌫")
+
+    fireEvent(key, "pressIn")
+    act(() => {
+      jest.advanceTimersByTime(600)
+    })
+    fireEvent(key, "pressOut")
+    fireEvent(key, "press")
+
+    expect(haptics.tap).toHaveBeenCalledTimes(1)
+    expect(onPress).toHaveBeenCalledTimes(2)
+  })
+
+  it("does not delete again when a repeated hold is released", () => {
+    const { getByTestId } = render(<StatefulPad initial="12345" />)
+    const key = getByTestId("Key ⌫")
+
+    fireEvent(key, "pressIn")
+    for (let tick = 0; tick < 2; tick += 1) {
+      act(() => {
+        jest.advanceTimersByTime(300)
+      })
+    }
+    fireEvent(key, "pressOut")
+    fireEvent(key, "press")
+
+    expect(getByTestId("amount").props.children).toBe("123")
+  })
+
+  it("still deletes once when a short tap is released before a repeat", () => {
+    const onPress = jest.fn().mockReturnValue(true)
+    const { getByTestId } = render(<CurrencyKeyboard onPress={onPress} />)
+    const key = getByTestId("Key ⌫")
+
+    fireEvent(key, "pressIn")
+    fireEvent(key, "pressOut")
+    fireEvent(key, "press")
+
+    expect(onPress).toHaveBeenCalledTimes(1)
+  })
+
+  it("still deletes on the next accessibility click after a repeated hold", () => {
+    const onPress = jest.fn().mockReturnValue(true)
+    const { getByTestId } = render(<CurrencyKeyboard onPress={onPress} />)
+    const key = getByTestId("Key ⌫")
+
+    fireEvent(key, "pressIn")
+    act(() => {
+      jest.advanceTimersByTime(600)
+    })
+    fireEvent(key, "pressOut")
+    fireEvent(key, "press")
+    fireEvent(key, "click")
+
+    expect(onPress).toHaveBeenCalledTimes(3)
   })
 })
 
@@ -287,6 +433,38 @@ describe("getDisabledKeys", () => {
 
       expect(disabled.has(Key.Decimal)).toBe(true)
       expect(disabled.has(Key.Backspace)).toBe(false)
+    })
+  })
+
+  describe("screen reader", () => {
+    const mockOnPress = jest.fn()
+
+    it("reads every key as a button named for what it types", () => {
+      const { getByLabelText, queryByLabelText } = render(
+        <CurrencyKeyboard onPress={mockOnPress} />,
+      )
+
+      ;["0", "1", "5", "9", "."].forEach((label) => {
+        expect(getByLabelText(label).props.accessibilityRole).toBe("button")
+      })
+      expect(queryByLabelText("Key 1")).toBeNull()
+    })
+
+    it("names the backspace key, which shows only an icon", () => {
+      const { getByLabelText } = render(<CurrencyKeyboard onPress={mockOnPress} />)
+
+      fireEvent.press(getByLabelText("Delete"))
+
+      expect(mockOnPress).toHaveBeenCalledWith(Key.Backspace)
+    })
+
+    it("reports a refused key as disabled", () => {
+      const { getByLabelText } = render(
+        <CurrencyKeyboard onPress={mockOnPress} disabledKeys={new Set([Key.Decimal])} />,
+      )
+
+      expect(getByLabelText(".").props.accessibilityState).toEqual({ disabled: true })
+      expect(getByLabelText("1").props.accessibilityState).toEqual({ disabled: false })
     })
   })
 })

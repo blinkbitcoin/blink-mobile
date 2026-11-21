@@ -8,6 +8,8 @@ import { groupTitleGap, spacing } from "@app/rne-theme/tokens"
  * drawn in `textSecondary` (blink-wip#2107, Figma `section` 31473:4243). The gap replaced
  * hardcoded 3, 4, 6, 8 and 20; the colour replaced `textOnBackground` and `textMuted`.
  * Headings (h1/h2, bold section headers) and titles beside a field are out of scope.
+ * The Send 3.0 amount screen has neither: its priority label sits inside the row beside
+ * the selected tier, and its wallet and note fields carry no title above them.
  * A title that is not regular 14px stays out, except the Galoy address and fee-rate titles,
  * which were already regular 16px. Send is being replaced and is not judged for size.
  * The artifact under test is the style source, so source-coupling here is intentional.
@@ -33,10 +35,8 @@ const TITLE_GAPS: Record<string, number> = {
   "app/screens/card-screen/replace-card-screens/steps/shared-styles.ts": 1,
   "app/screens/galoy-address-screen/address-component.tsx": 1,
   "app/screens/people-screen/contacts/contact-transactions.tsx": 1,
-  "app/screens/send-bitcoin-screen/fee-tier-selector.tsx": 1,
   "app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen.tsx": 1,
   "app/screens/send-bitcoin-screen/send-bitcoin-destination-screen.tsx": 1,
-  "app/screens/send-bitcoin-screen/send-bitcoin-details-screen.tsx": 1,
   "app/screens/settings-screen/api/api-key-create-screen.tsx": 1,
   "app/screens/settings-screen/fee-rates-screen.tsx": 1,
   "app/screens/settings-screen/group.tsx": 1,
@@ -74,7 +74,6 @@ const TITLE_STYLES: [string, string][] = [
   ["app/screens/card-screen/replace-card-screens/steps/shared-styles.ts", "sectionTitle"],
   ["app/screens/galoy-address-screen/address-component.tsx", "addressTitle"],
   ["app/screens/people-screen/contacts/contact-transactions.tsx", "sectionHeaderText"],
-  ["app/screens/send-bitcoin-screen/fee-tier-selector.tsx", "title"],
   [
     "app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen.tsx",
     "fieldTitleText",
@@ -83,7 +82,6 @@ const TITLE_STYLES: [string, string][] = [
     "app/screens/send-bitcoin-screen/send-bitcoin-destination-screen.tsx",
     "fieldTitleText",
   ],
-  ["app/screens/send-bitcoin-screen/send-bitcoin-details-screen.tsx", "fieldTitleText"],
   ["app/screens/settings-screen/fee-rates-screen.tsx", "sectionTitle"],
   ["app/screens/settings-screen/group.tsx", "title"],
   ["app/screens/settings-screen/self-custodial/account-fields.tsx", "label"],
@@ -95,10 +93,8 @@ const TOKEN_USE = /^\s*(gap|rowGap|marginTop|marginBottom): groupTitleGap,$/
 
 // Send is being replaced. Its bold titles stay as this PR left them.
 const SEND_TITLES = new Set([
-  "app/screens/send-bitcoin-screen/fee-tier-selector.tsx",
   "app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen.tsx",
   "app/screens/send-bitcoin-screen/send-bitcoin-destination-screen.tsx",
-  "app/screens/send-bitcoin-screen/send-bitcoin-details-screen.tsx",
 ])
 
 // Regular 16px before this migration. Size stays; colour and gap follow the rule.
@@ -181,6 +177,20 @@ describe("group title", () => {
         "dangerZoneSection",
       ),
     ).toMatch(/gap: 3,/)
+  })
+
+  it("keeps the Send 3.0 amount screen's labels inside their fields", () => {
+    const selector = source("app/screens/send-bitcoin-screen/fee-tier-selector.tsx")
+    expect(selector).toMatch(
+      /<View style=\{styles\.row\}>\s*<Text style=\{styles\.title\}>\{title\}<\/Text>\s*<Text style=\{styles\.value\}>/,
+    )
+    expect(selector).not.toContain("groupTitleGap")
+
+    const details = source(
+      "app/screens/send-bitcoin-screen/send-bitcoin-details-screen.tsx",
+    )
+    expect(details).not.toContain("fieldTitleText")
+    expect(details).not.toContain("groupTitleGap")
   })
 
   it("the API key expiry label is textSecondary", () => {
