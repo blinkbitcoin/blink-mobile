@@ -110,6 +110,12 @@ jest.mock("@app/components/code-input", () => {
   }
 })
 
+const mockNotifyModal = jest.fn()
+jest.mock("@app/components/notifications", () => ({
+  ...jest.requireActual("@app/components/notifications"),
+  useNotifications: () => ({ notifyModal: mockNotifyModal }),
+}))
+
 loadLocale("en")
 const LL = i18nObject("en")
 
@@ -167,7 +173,12 @@ describe("TotpDeleteValidateScreen", () => {
     await submitCode()
 
     expect(hasLeft()).toBe(true)
-    expect(Alert.alert).toHaveBeenCalledWith(LL.AccountScreen.totpDeactivated())
+    expect(mockNotifyModal).toHaveBeenCalledWith({
+      icon: "payment-success",
+      title: LL.Messages.twoFactorOffTitle(),
+      text: LL.Messages.twoFactorOffBody(),
+      primaryButtonTitle: LL.Messages.okay(),
+    })
   })
 
   /** The app lock can go up over the screen while the code is checked. */
@@ -292,7 +303,12 @@ describe("TotpDeleteValidateScreen", () => {
       await submitCode()
 
       expect(hasLeft()).toBe(true)
-      expect(Alert.alert).toHaveBeenCalledWith(LL.AccountScreen.totpDeactivated())
+      expect(mockNotifyModal).toHaveBeenCalledWith({
+        icon: "payment-success",
+        title: LL.Messages.twoFactorOffTitle(),
+        text: LL.Messages.twoFactorOffBody(),
+        primaryButtonTitle: LL.Messages.okay(),
+      })
     })
 
     it("says an error when the account cannot be read back either", async () => {
@@ -449,6 +465,7 @@ describe("TotpDeleteValidateScreen", () => {
 
       expect(hasLeft()).toBe(false)
       expect(Alert.alert).not.toHaveBeenCalled()
+      expect(mockNotifyModal).not.toHaveBeenCalled()
     })
 
     /** The user came back to a new code screen once the hold let go: the old answer
@@ -468,6 +485,7 @@ describe("TotpDeleteValidateScreen", () => {
 
       expect(hasLeft()).toBe(false)
       expect(Alert.alert).not.toHaveBeenCalled()
+      expect(mockNotifyModal).not.toHaveBeenCalled()
       expect(lastCodeInput().loading).toBe(true)
     })
 
@@ -486,6 +504,7 @@ describe("TotpDeleteValidateScreen", () => {
 
       expect(hasLeft()).toBe(false)
       expect(Alert.alert).not.toHaveBeenCalled()
+      expect(mockNotifyModal).not.toHaveBeenCalled()
     })
 
     it("says no error once the screen is gone", async () => {
@@ -501,6 +520,8 @@ describe("TotpDeleteValidateScreen", () => {
       await act(async () => fail(new Error("rate limited")))
 
       expect(Alert.alert).not.toHaveBeenCalled()
+
+      expect(mockNotifyModal).not.toHaveBeenCalled()
     })
   })
 

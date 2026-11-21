@@ -93,6 +93,12 @@ jest.mock("react-native-modal", () => ({
   },
 }))
 
+const mockNotifyModal = jest.fn()
+jest.mock("@app/components/notifications", () => ({
+  ...jest.requireActual("@app/components/notifications"),
+  useNotifications: () => ({ notifyModal: mockNotifyModal }),
+}))
+
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
@@ -104,12 +110,15 @@ jest.mock("@app/i18n/i18n-react", () => ({
         warning: () => "Warning",
         yes: () => "Yes",
       },
+      Messages: {
+        accountClosedTitle: () => "Your account is closed",
+        accountClosedBody: () => "We may keep some records where the law requires it.",
+        okay: () => "Okay",
+      },
       support: {
-        bye: () => "Bye",
         delete: () => "delete",
         deleteAccount: () => "Delete account",
         deleteAccountBalanceWarning: () => "You still hold a balance",
-        deleteAccountConfirmation: () => "Your account has been deleted",
         deleteAccountError: ({ email }: { email: string }) => `Write to ${email}`,
         deleteAccountWarning: () => "This cannot be undone",
         finalConfirmationAccountDeletionTitle: () => "Are you sure?",
@@ -170,6 +179,15 @@ const confirmDeletion = async () => {
     fireEvent.press(screen.getByText("confirm-from-ll"))
   })
   await pressAlertButton(alertCalls.length - 1, "OK")
+}
+
+/** The farewell the deletion queued; the pop-up runs its button once it is off the screen. */
+const farewell = () => mockNotifyModal.mock.lastCall?.[0]
+
+const acknowledgeFarewell = async () => {
+  await act(async () => {
+    farewell()?.primaryButtonAction()
+  })
 }
 
 describe("Delete", () => {
@@ -320,7 +338,7 @@ describe("Delete", () => {
       })
       await openDeletionModal()
       await confirmDeletion()
-      await pressAlertButton(alertCalls.length - 1, "OK")
+      await acknowledgeFarewell()
 
       expect(lockReleasedDuringSwitch).toBe(false)
       expect(mockSetAccountIsBeingDeleted).not.toHaveBeenCalledWith(false)
@@ -349,7 +367,7 @@ describe("Delete", () => {
       await confirmDeletion()
       expect(mockLeaveWhileDeleting).not.toHaveBeenCalled()
 
-      await pressAlertButton(alertCalls.length - 1, "OK")
+      await acknowledgeFarewell()
 
       expect(mockLeaveWhileDeleting).toHaveBeenCalledTimes(1)
       expect(mockReset).toHaveBeenCalledWith({
@@ -363,7 +381,7 @@ describe("Delete", () => {
     it("keeps the session when another profile takes over", async () => {
       await openDeletionModal()
       await confirmDeletion()
-      await pressAlertButton(alertCalls.length - 1, "OK")
+      await acknowledgeFarewell()
 
       expect(mockLogout).not.toHaveBeenCalled()
       expect(mockReset).not.toHaveBeenCalled()
@@ -379,7 +397,7 @@ describe("Delete", () => {
         preserveStoredCredentials: false,
       })
 
-      await pressAlertButton(alertCalls.length - 1, "OK")
+      await acknowledgeFarewell()
 
       expect(mockReset).toHaveBeenCalledWith({
         index: 0,
@@ -400,7 +418,7 @@ describe("Delete", () => {
         preserveStoredCredentials: true,
       })
 
-      await pressAlertButton(alertCalls.length - 1, "OK")
+      await acknowledgeFarewell()
 
       expect(mockReset).toHaveBeenCalledWith({
         index: 0,
@@ -418,7 +436,7 @@ describe("Delete", () => {
       mockLogout.mockResolvedValue({ isAppLockKept: true })
       await openDeletionModal()
       await confirmDeletion()
-      await pressAlertButton(alertCalls.length - 1, "OK")
+      await acknowledgeFarewell()
 
       expect(mockSetAppLocked).toHaveBeenCalledTimes(1)
       expect(mockReset).toHaveBeenCalledWith({
@@ -430,10 +448,40 @@ describe("Delete", () => {
 
     /** The switched path runs no logout, so nothing dropped the lock: the session it moved
      *  to stays in front of it rather than the user being sent anywhere. */
+    it("says the account is closed with the pop-up", async () => {
+      await openDeletionModal()
+      await confirmDeletion()
+
+      expect(farewell()).toMatchObject({
+        icon: "payment-success",
+        title: "Your account is closed",
+        text: "We may keep some records where the law requires it.",
+        primaryButtonTitle: "Okay",
+        isRequired: true,
+      })
+    })
+
+    /** Closing the farewell with the close icon or the backdrop leaves the same way. */
+    it("leaves for get-started when the farewell is closed instead", async () => {
+      mockSwitchToNextProfile.mockResolvedValue(SwitchProfileOutcome.NoOtherProfile)
+      await openDeletionModal()
+      await confirmDeletion()
+
+      await act(async () => {
+        farewell()?.dismissAction()
+      })
+
+      expect(mockLeaveWhileDeleting).toHaveBeenCalledTimes(1)
+      expect(mockReset).toHaveBeenCalledWith({
+        index: 0,
+        routes: [{ name: "getStarted" }],
+      })
+    })
+
     it("routes nowhere when another profile took over", async () => {
       await openDeletionModal()
       await confirmDeletion()
-      await pressAlertButton(alertCalls.length - 1, "OK")
+      await acknowledgeFarewell()
 
       expect(mockReset).not.toHaveBeenCalled()
       expect(mockSetAppLocked).not.toHaveBeenCalled()

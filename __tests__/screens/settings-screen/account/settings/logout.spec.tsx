@@ -7,6 +7,12 @@ import { LogOut } from "@app/screens/settings-screen/account/settings/logout"
 
 const mockLogout = jest.fn()
 const mockRouteAfterLogout = jest.fn()
+const mockNotifyModal = jest.fn()
+
+jest.mock("@app/components/notifications", () => ({
+  ...jest.requireActual("@app/components/notifications"),
+  useNotifications: () => ({ notifyModal: mockNotifyModal }),
+}))
 
 jest.mock("@app/hooks/use-logout", () => ({
   __esModule: true,
@@ -44,15 +50,18 @@ jest.mock("@app/i18n/i18n-react", () => ({
       },
       common: {
         cancel: () => "Cancel",
-        loggedOut: () => "Logged out",
-        ok: () => "OK",
+      },
+      Messages: {
+        loggedOutTitle: () => "You're logged out",
+        loggedOutBody: () => "You can log back in at any time.",
+        okay: () => "Okay",
       },
     },
   }),
 }))
 
-/** Both steps of the logout are Alert buttons, so the spy has to hand them back rather than
- *  just record that an alert happened. */
+/** The confirmation is an Alert, so the spy has to hand its buttons back rather than just
+ *  record that an alert happened. */
 const alertCalls: Array<{ title: string; body?: string; buttons?: AlertButton[] }> = []
 
 const pressAlertButton = async (call: number, label: string) => {
@@ -61,6 +70,9 @@ const pressAlertButton = async (call: number, label: string) => {
     await button?.onPress?.()
   })
 }
+
+/** The farewell the logout queued, whose ways out the specs take as the pop-up would. */
+const farewell = () => mockNotifyModal.mock.calls[0]?.[0]
 
 describe("LogOut", () => {
   beforeEach(() => {
@@ -108,7 +120,7 @@ describe("LogOut", () => {
     fireEvent.press(getByTestId("logout-row"))
 
     await pressAlertButton(0, "I understand")
-    await pressAlertButton(1, "OK")
+    act(() => farewell().primaryButtonAction())
 
     expect(mockRouteAfterLogout).toHaveBeenCalledWith(true)
   })
@@ -119,15 +131,28 @@ describe("LogOut", () => {
     fireEvent.press(getByTestId("logout-row"))
 
     await pressAlertButton(0, "I understand")
-    await pressAlertButton(1, "OK")
+    act(() => farewell().primaryButtonAction())
 
     expect(mockRouteAfterLogout).toHaveBeenCalledWith(false)
   })
 
+  /** Closing the farewell with the close icon or the backdrop leaves the same way: the user
+   *  is never left on the settings of an account that is gone. */
+  it("routes the same way when the farewell is closed instead", async () => {
+    mockLogout.mockResolvedValue({ isAppLockKept: true })
+    const { getByTestId } = render(<LogOut />)
+    fireEvent.press(getByTestId("logout-row"))
+
+    await pressAlertButton(0, "I understand")
+    act(() => farewell().dismissAction())
+
+    expect(mockRouteAfterLogout).toHaveBeenCalledWith(true)
+  })
+
   /**
-   * The gate raises a biometric prompt the moment it opens, so an alert left to fire over
-   * it would cover the only thing the user can answer. The farewell is acknowledged first
-   * and the route is taken from its own callback.
+   * The gate raises a biometric prompt the moment it opens, so a pop-up left over it would
+   * cover the only thing the user can answer. The farewell is acknowledged first and the
+   * route is taken from its own callback.
    */
   it("says goodbye before routing, never after", async () => {
     const { getByTestId } = render(<LogOut />)
@@ -135,11 +160,17 @@ describe("LogOut", () => {
 
     await pressAlertButton(0, "I understand")
 
-    expect(alertCalls).toHaveLength(2)
-    expect(alertCalls[1].title).toBe("Logged out")
+    expect(alertCalls).toHaveLength(1)
+    expect(farewell()).toMatchObject({
+      icon: "info",
+      title: "You're logged out",
+      text: "You can log back in at any time.",
+      primaryButtonTitle: "Okay",
+      isRequired: true,
+    })
     expect(mockRouteAfterLogout).not.toHaveBeenCalled()
 
-    await pressAlertButton(1, "OK")
+    act(() => farewell().primaryButtonAction())
 
     expect(mockRouteAfterLogout).toHaveBeenCalledTimes(1)
   })
