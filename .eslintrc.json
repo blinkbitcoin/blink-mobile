@@ -258,6 +258,7 @@
         // QR code and camera
         "app/screens/receive-bitcoin-screen/**",
         "app/screens/send-bitcoin-screen/scanning-qrcode-screen.tsx",
+        "app/screens/self-custodial/onboarding/restore/seed-qr-scanner-screen.tsx",
         "app/components/totp-export/totp-qr.tsx",
         "app/components/invite-modal/**",
         // earn section, which is not light/dark aware

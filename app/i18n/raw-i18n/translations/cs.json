@@ -4093,7 +4093,13 @@
     "pickBackupTitle": "Vyberte peněženku",
     "pickBackupDescription": "Vyberte zálohu k obnovení",
     "recognizePhraseTitle": "Poznáváte tuto zálohovací frázi?",
-    "recognizePhraseBody": "Nikdy nezadávejte slova, která vám poslal někdo jiný."
+    "recognizePhraseBody": "Nikdy nezadávejte slova, která vám poslal někdo jiný.",
+    "scanSeedQr": "Naskenovat SeedQR",
+    "seedQrInvalid": "Tento SeedQR není platná záložní fráze.",
+    "seedQrOnly12Words": "Blink obnovuje pouze záložní fráze o 12 slovech.",
+    "seedQrNotSeedQr": "Toto není platný SeedQR.",
+    "seedQrUnreadable": "Tento SeedQR se nepodařilo přečíst. Zkuste to znovu.",
+    "seedQrCameraFailed": "Fotoaparát se nepodařilo spustit. Zkuste to znovu."
   },
   "EmergencyRecovery": {
     "outageTitle": "Operátor je nedostupný",

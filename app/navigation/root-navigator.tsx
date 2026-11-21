@@ -174,6 +174,7 @@ import {
   RestorePhraseScreen,
   CloudRestoreScreen,
   OperatorUnreachableScreen,
+  SeedQrScannerScreen,
 } from "@app/screens/self-custodial/onboarding/restore"
 import {
   MigrationBalancesOverviewScreen,
@@ -1172,6 +1173,11 @@ export const RootStack = () => {
         name="selfCustodialRestorePhrase"
         component={RestorePhraseScreen}
         options={{ title: LL.RestoreScreen.phraseTitle(), headerRight: () => null }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialSeedQrScanner"
+        component={SeedQrScannerScreen}
+        options={{ title: LL.RestoreScreen.scanSeedQr(), headerShown: false }}
       />
       <RootNavigator.Screen
         name="selfCustodialCloudRestore"

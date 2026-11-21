@@ -4093,7 +4093,13 @@
     "pickBackupTitle": "Pilih dompet",
     "pickBackupDescription": "Pilih sandaran untuk dipulihkan",
     "recognizePhraseTitle": "Adakah anda mengenali frasa sandaran ini?",
-    "recognizePhraseBody": "Jangan sekali-kali masukkan perkataan yang dihantar oleh orang lain."
+    "recognizePhraseBody": "Jangan sekali-kali masukkan perkataan yang dihantar oleh orang lain.",
+    "scanSeedQr": "Imbas SeedQR",
+    "seedQrInvalid": "SeedQR ini bukan frasa sandaran yang sah.",
+    "seedQrOnly12Words": "Blink hanya memulihkan frasa sandaran 12 perkataan.",
+    "seedQrNotSeedQr": "Ini bukan SeedQR yang sah.",
+    "seedQrUnreadable": "Tidak dapat membaca SeedQR ini. Cuba lagi.",
+    "seedQrCameraFailed": "Tidak dapat memulakan kamera. Cuba lagi."
   },
   "EmergencyRecovery": {
     "outageTitle": "Pengendali tidak dapat dihubungi",

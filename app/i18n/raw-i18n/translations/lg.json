@@ -4093,7 +4093,13 @@
     "pickBackupTitle": "Londa wallet",
     "pickBackupDescription": "Londa kopiyo y'okuzzaawo",
     "recognizePhraseTitle": "Omanyi ebigambo bino eby'okukuuma?",
-    "recognizePhraseBody": "Toteekangamu bigambo omuntu omulala by'akuweereza."
+    "recognizePhraseBody": "Toteekangamu bigambo omuntu omulala by'akuweereza.",
+    "scanSeedQr": "Sikaaninga SeedQR",
+    "seedQrInvalid": "SeedQR eno si bigambo by'enkalakkalira bituufu.",
+    "seedQrOnly12Words": "Blink ezzaawo bigambo by'enkalakkalira eby'ebigambo 12 byokka.",
+    "seedQrNotSeedQr": "Eno si SeedQR entuufu.",
+    "seedQrUnreadable": "Tetusobodde kusoma SeedQR eno. Ddamu ogezeeko.",
+    "seedQrCameraFailed": "Tetusobodde kutandika kamera. Ddamu ogezeeko."
   },
   "EmergencyRecovery": {
     "outageTitle": "Omukugu tatuukibwako",

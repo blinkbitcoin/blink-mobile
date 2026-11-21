@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef } from "react"
-import { ActivityIndicator, View } from "react-native"
+import { ActivityIndicator, Pressable, View } from "react-native"
 
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -22,6 +22,7 @@ import {
   PhraseStep,
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
+import { radius } from "@app/rne-theme/radius"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 
@@ -210,6 +211,23 @@ const RestorePhraseContent: React.FC<RestorePhraseContentProps> = ({ step, resto
         })}
       </View>
 
+      {isStep1 && (
+        <Pressable
+          onPress={() => navigation.navigate("selfCustodialSeedQrScanner")}
+          style={({ pressed }) => [
+            styles.scanButton,
+            pressed && styles.scanButtonPressed,
+          ]}
+          accessibilityRole="button"
+          {...testProps("restore-scan-seed-qr")}
+        >
+          <Text type="p3" bold color={colors.accent}>
+            {LL.RestoreScreen.scanSeedQr()}
+          </Text>
+          <GaloyIcon name="qr-code" size={16} color={colors.accent} />
+        </Pressable>
+      )}
+
       <View style={styles.errorContainer}>
         {showError && (
           <>
@@ -238,6 +256,8 @@ export const RestorePhraseScreen: React.FC = () => {
     isPhraseStep(stepParam) && (stepParam === PhraseStep.First || wordsOk)
   const step = hasValidParams ? stepParam : PhraseStep.First
   const initialWords = hasValidParams && wordsOk ? wordsParam : undefined
+  const scannedWords = params?.scannedWords
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   useEffect(() => {
     if (hasValidParams) return
@@ -255,6 +275,16 @@ export const RestorePhraseScreen: React.FC = () => {
    *  is up: the clipboard read and the restore both hang off presses, so nothing
    *  sensitive happens before the guard is on. */
   const restore = useRestorePhrase({ step, initialWords })
+  const { handlePaste } = restore
+
+  /** A SeedQR scan comes back as a paste of all 12 words, so it takes the same path:
+   *  words filled, then on to step 2 for review. Cleared first so the words don't stay
+   *  behind in this route's params. */
+  useEffect(() => {
+    if (!scannedWords) return
+    navigation.setParams({ scannedWords: undefined })
+    handlePaste(scannedWords.join(" "))
+  }, [scannedWords, navigation, handlePaste])
 
   return (
     // Input-only screen: the user types a phrase they already hold. Failing closed
@@ -284,6 +314,20 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   inputList: {
     gap: 10,
+  },
+  scanButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginTop: 14,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: radius.default,
+    backgroundColor: colors.surfaceInteractive,
+  },
+  scanButtonPressed: {
+    backgroundColor: colors.surfacePressed,
   },
   // The header touch box. `hitSlop` can't reach past the native header item, so the
   // box itself grows, its text kept against the right edge where it was.
