@@ -1,6 +1,7 @@
 import React from "react"
 import { Alert } from "react-native"
 
+import { MessageIcon, useNotifications } from "@app/components/notifications"
 import useLogout from "@app/hooks/use-logout"
 import { useLogoutAndRoute } from "@app/hooks/use-logout-and-route"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -11,6 +12,7 @@ import { useLoginMethods } from "../login-methods-hook"
 export const LogOut = () => {
   const { phone, bothEmailAndPhoneVerified, email, emailVerified } = useLoginMethods()
   const { LL } = useI18nContext()
+  const { notifyModal } = useNotifications()
 
   const { logout } = useLogout()
   const { routeAfterLogout } = useLogoutAndRoute()
@@ -46,20 +48,23 @@ export const LogOut = () => {
     const { isAppLockKept } = await logout()
 
     /**
-     * The farewell is acknowledged before the route is taken, not after. The route can now
-     * be the gate, which raises a biometric prompt the moment it opens, and an alert left
-     * to fire over that prompt covers the only thing the user can answer.
+     * The farewell is acknowledged before the route is taken, not after, however it is
+     * closed. The route can now be the gate, which raises a biometric prompt the moment it
+     * opens, and a pop-up left over that prompt covers the only thing the user can answer.
      *
      * Which way out it is stays the logout's to decide: a lock kept because the device
      * still stores a wallet is owed an answer, so it returns through the gate rather than
      * landing on the screen that can open that wallet again.
      */
-    Alert.alert(LL.common.loggedOut(), "", [
-      {
-        text: LL.common.ok(),
-        onPress: () => routeAfterLogout(isAppLockKept),
-      },
-    ])
+    const leave = () => routeAfterLogout(isAppLockKept)
+    notifyModal({
+      icon: MessageIcon.Info,
+      title: LL.Messages.loggedOutTitle(),
+      text: LL.Messages.loggedOutBody(),
+      primaryButtonTitle: LL.Messages.okay(),
+      primaryButtonAction: leave,
+      dismissAction: leave,
+    })
   }
 
   return (

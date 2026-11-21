@@ -1,5 +1,5 @@
 import React from "react"
-import { Alert, AlertButton } from "react-native"
+import { Alert } from "react-native"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -77,6 +77,12 @@ jest.mock("@app/components/code-input", () => {
   }
 })
 
+const mockNotifyModal = jest.fn()
+jest.mock("@app/components/notifications", () => ({
+  ...jest.requireActual("@app/components/notifications"),
+  useNotifications: () => ({ notifyModal: mockNotifyModal }),
+}))
+
 loadLocale("en")
 const LL = i18nObject("en")
 
@@ -113,10 +119,9 @@ const deferRun = () => {
   return { answer: (outcome: object) => answer(outcome), fail: (err: Error) => fail(err) }
 }
 
-const pressSuccessOk = () => {
-  const [, , buttons] = jest.mocked(Alert.alert).mock.calls[0]
-  ;(buttons as AlertButton[])[0].onPress?.()
-}
+/** The pop-up runs its button, or its close, once it is off the screen. */
+const pressSuccessOk = () => mockNotifyModal.mock.calls[0][0].primaryButtonAction()
+const closeSuccess = () => mockNotifyModal.mock.calls[0][0].dismissAction()
 
 const lastCodeInput = () => mockCodeInput.mock.calls.at(-1)?.[0]
 
@@ -361,17 +366,27 @@ describe("LoginMethodCodeScreen", () => {
       mockRun.mockResolvedValue(PHONE_ADDED)
       await submitCode()
 
-      expect(Alert.alert).toHaveBeenCalledWith(
-        LL.PhoneRegistrationValidateScreen.successTitle(),
-        undefined,
-        expect.any(Array),
-      )
+      expect(mockNotifyModal.mock.calls[0][0]).toMatchObject({
+        icon: "payment-success",
+        title: LL.Messages.phoneAddedTitle(),
+        text: LL.Messages.phoneLoginBody(),
+        primaryButtonTitle: LL.Messages.okay(),
+      })
       pressSuccessOk()
 
       expect(mockPopTo).toHaveBeenCalledWith("settings")
     })
 
-    /** The success alert outlives a stack an account switch reset under it. */
+    it("goes back to the settings when the success is closed instead", async () => {
+      mockRun.mockResolvedValue(PHONE_ADDED)
+      await submitCode()
+
+      closeSuccess()
+
+      expect(mockPopTo).toHaveBeenCalledWith("settings")
+    })
+
+    /** The success pop-up outlives a stack an account switch reset under it. */
     it("goes nowhere from the success once the session is gone", async () => {
       mockRun.mockResolvedValue(PHONE_ADDED)
       await submitCode()
@@ -397,8 +412,25 @@ describe("LoginMethodCodeScreen", () => {
 
     await submitCode()
 
-    expect(Alert.alert).toHaveBeenCalledWith(LL.common.error())
+    expect(mockNotifyModal.mock.calls[0][0]).toMatchObject({
+      icon: "warning-circle",
+      title: LL.Messages.loginMethodFailedTitle(),
+      text: LL.Messages.checkConnectionBody(),
+      primaryButtonTitle: LL.Messages.tryAgain(),
+    })
     expect(lastCodeInput().loading).toBe(false)
+  })
+
+  it("sends the same code again from Try again", async () => {
+    mockRun.mockRejectedValueOnce(new Error("network")).mockResolvedValue(PHONE_ADDED)
+    await submitCode()
+
+    await act(async () => {
+      mockNotifyModal.mock.calls[0][0].primaryButtonAction()
+    })
+
+    expect(mockRun).toHaveBeenCalledTimes(2)
+    expect(mockRun.mock.calls[1][0].totpCode).toBe(mockRun.mock.calls[0][0].totpCode)
   })
 
   it("checks one code at a time", async () => {

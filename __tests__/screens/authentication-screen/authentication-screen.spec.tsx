@@ -25,6 +25,12 @@ const mockGoBack = jest.fn()
 const mockNavigate = jest.fn()
 const mockSetAppUnlocked = jest.fn()
 const mockLogout = jest.fn()
+const mockNotifyModal = jest.fn()
+
+jest.mock("@app/components/notifications", () => ({
+  ...jest.requireActual("@app/components/notifications"),
+  useNotifications: () => ({ notifyModal: mockNotifyModal }),
+}))
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -142,6 +148,10 @@ const pressAlertButton = async (text: string) => {
     await button.onPress?.()
   })
 }
+
+/** Takes the farewell's button, as the pop-up runs it once it is off the screen. */
+const acknowledgeFarewell = () =>
+  act(() => mockNotifyModal.mock.lastCall?.[0].primaryButtonAction())
 
 describe("AuthenticationScreen", () => {
   beforeEach(() => {
@@ -350,7 +360,7 @@ describe("AuthenticationScreen", () => {
 
       fireEvent.press(screen.getByLabelText("Log Out"))
       await pressAlertButton("Confirm")
-      await pressAlertButton("OK")
+      acknowledgeFarewell()
 
       expect(mockLogout).toHaveBeenCalledTimes(1)
       expect(mockLogout).toHaveBeenCalledWith()
@@ -370,7 +380,7 @@ describe("AuthenticationScreen", () => {
 
       fireEvent.press(screen.getByLabelText("Log Out"))
       await pressAlertButton("Confirm")
-      await pressAlertButton("OK")
+      acknowledgeFarewell()
 
       expect(mockSetAppUnlocked).toHaveBeenCalledTimes(1)
       expect(mockSetAppUnlocked.mock.invocationCallOrder[0]).toBeLessThan(
@@ -388,13 +398,35 @@ describe("AuthenticationScreen", () => {
 
       fireEvent.press(screen.getByLabelText("Log Out"))
       await pressAlertButton("Confirm")
-      await pressAlertButton("OK")
+      acknowledgeFarewell()
 
       expect(mockLogout).toHaveBeenCalledTimes(1)
       expect(mockReturnToGate).toHaveBeenCalledTimes(1)
       expect(mockReset).not.toHaveBeenCalled()
       /** The lock is still set, so the flag stays where returning to the gate puts it. */
       expect(mockSetAppUnlocked).not.toHaveBeenCalled()
+    })
+
+    it("says so with the pop-up, and leaves the same way when it is closed", async () => {
+      mockLogout.mockResolvedValue({ isAppLockKept: true })
+      renderScreen(true)
+      await flushEffects()
+
+      fireEvent.press(screen.getByLabelText("Log Out"))
+      await pressAlertButton("Confirm")
+
+      const farewell = mockNotifyModal.mock.lastCall?.[0]
+      expect(farewell).toMatchObject({
+        icon: "info",
+        title: "You're logged out",
+        text: "You can log back in at any time.",
+        primaryButtonTitle: "Okay",
+      })
+      expect(mockReturnToGate).not.toHaveBeenCalled()
+
+      act(() => farewell.dismissAction())
+
+      expect(mockReturnToGate).toHaveBeenCalledTimes(1)
     })
 
     it("stays put until the confirmation is accepted", async () => {

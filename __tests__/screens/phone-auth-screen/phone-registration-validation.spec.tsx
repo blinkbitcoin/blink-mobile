@@ -1,5 +1,5 @@
 import React from "react"
-import { Alert, AlertButton } from "react-native"
+import { Alert } from "react-native"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
 import { PhoneCodeChannelType } from "@app/graphql/generated"
@@ -13,6 +13,12 @@ import { RouteProp } from "@react-navigation/native"
 import { expectFocusFill, renderedBox } from "../../helpers/field-fill"
 import { flushEffects } from "../../helpers/flush-effects"
 import { ContextForScreen } from "../helper"
+
+const mockNotifyModal = jest.fn()
+jest.mock("@app/components/notifications", () => ({
+  ...jest.requireActual("@app/components/notifications"),
+  useNotifications: () => ({ notifyModal: mockNotifyModal }),
+}))
 
 loadLocale("en")
 const LL = i18nObject("en")
@@ -109,11 +115,24 @@ describe("PhoneRegistrationValidateScreen", () => {
       variables: { input: { phone: PHONE, code: SMS_CODE } },
     })
     expect(mockUpdateCurrentProfile).toHaveBeenCalledTimes(1)
-    const [title, , buttons] = jest.mocked(Alert.alert).mock.calls[0]
-    expect(title).toBe(LL.PhoneRegistrationValidateScreen.successTitle())
-    ;(buttons as AlertButton[])[0].onPress?.()
+    const success = mockNotifyModal.mock.calls[0][0]
+    expect(success).toMatchObject({
+      icon: "payment-success",
+      title: LL.Messages.phoneConfirmedTitle(),
+      text: LL.Messages.phoneLoginBody(),
+      primaryButtonTitle: LL.Messages.okay(),
+    })
+    success.primaryButtonAction()
     expect(mockPop).toHaveBeenCalledWith(2)
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("goes back the same way when the success is closed instead", async () => {
+    await typeSmsCode()
+
+    mockNotifyModal.mock.calls[0][0].dismissAction()
+
+    expect(mockPop).toHaveBeenCalledWith(2)
   })
 
   it("sends the SMS code on with the authenticator's on an account that has one", async () => {
@@ -136,7 +155,7 @@ describe("PhoneRegistrationValidateScreen", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("loginMethodCode", PHONE_ADDITION)
     expect(mockUpdateCurrentProfile).not.toHaveBeenCalled()
-    expect(Alert.alert).not.toHaveBeenCalled()
+    expect(mockNotifyModal).not.toHaveBeenCalled()
   })
 
   it("says a wrong SMS code and offers to send another", async () => {
@@ -244,10 +263,8 @@ describe("PhoneRegistrationValidateScreen", () => {
 
     await typeSmsCode()
 
-    expect(Alert.alert).toHaveBeenCalledWith(
-      LL.PhoneRegistrationValidateScreen.successTitle(),
-      undefined,
-      expect.any(Array),
+    expect(mockNotifyModal).toHaveBeenCalledWith(
+      expect.objectContaining({ title: LL.Messages.phoneConfirmedTitle() }),
     )
   })
 

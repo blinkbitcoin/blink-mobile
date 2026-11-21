@@ -3,6 +3,7 @@ import { Alert, View } from "react-native"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
+import { MessageIcon, useNotifications } from "@app/components/notifications"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { recordAppError } from "@app/utils/error-reporting"
 import { RouteProp, useNavigation } from "@react-navigation/native"
@@ -43,6 +44,7 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
   const { routeAfterLogout } = useLogoutAndRoute()
   const { escape, confirmRemoveWallets } = useForgottenPinEscape()
   const { LL } = useI18nContext()
+  const { notifyModal } = useNotifications()
 
   const handleAuthenticationSuccess = React.useCallback(async () => {
     if (screenPurpose === AuthenticationScreenPurpose.Authenticate) {
@@ -81,15 +83,18 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
 
   const logoutFromLock = async () => {
     const { isAppLockKept } = await logout()
-    Alert.alert(LL.common.logout(), LL.common.loggedOut(), [
-      {
-        text: LL.common.ok(),
-        /** Both ways out live in the shared logout route: a lock the logout kept is owed
-         *  an answer and goes back through the gate, and one that went takes the flag with
-         *  it and lands on the landing screen. */
-        onPress: () => routeAfterLogout(isAppLockKept),
-      },
-    ])
+    /** Both ways out live in the shared logout route: a lock the logout kept is owed an
+     *  answer and goes back through the gate, and one that went takes the flag with it
+     *  and lands on the landing screen. */
+    const leave = () => routeAfterLogout(isAppLockKept)
+    notifyModal({
+      icon: MessageIcon.Info,
+      title: LL.Messages.loggedOutTitle(),
+      text: LL.Messages.loggedOutBody(),
+      primaryButtonTitle: LL.Messages.okay(),
+      primaryButtonAction: leave,
+      dismissAction: leave,
+    })
   }
 
   const confirmLogout = () => {

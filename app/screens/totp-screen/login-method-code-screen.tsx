@@ -1,9 +1,10 @@
-import React, { useCallback, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { Alert } from "react-native"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { CodeInput } from "@app/components/code-input"
+import { MessageIcon, useNotifications } from "@app/components/notifications"
 import {
   LoginMethodAdditionOutcome,
   useLoginMethodAddition,
@@ -72,6 +73,7 @@ const emailOnboardingOf = (params: LoginMethodAdditionParams): EmailOnboardingPa
  */
 export const LoginMethodCodeScreen: React.FC = () => {
   const { LL } = useI18nContext()
+  const { notifyModal } = useNotifications()
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "loginMethodCode">>()
   const { params } = useRoute<RouteProp<RootStackParamList, "loginMethodCode">>()
@@ -126,6 +128,9 @@ export const LoginMethodCodeScreen: React.FC = () => {
   /** What the screen shows for how the addition ended. */
   const showOutcome = useCallback(
     (outcome: LoginMethodAdditionOutcome, isOwnSession: () => boolean) => {
+      const backToSettings = () => {
+        if (isOwnSession()) navigation.popTo("settings")
+      }
       switch (outcome.result) {
         case LoginMethodAdditionResult.EmailRegistered:
           isAdditionDoneRef.current = true
@@ -137,14 +142,14 @@ export const LoginMethodCodeScreen: React.FC = () => {
           break
         case LoginMethodAdditionResult.PhoneAdded:
           isAdditionDoneRef.current = true
-          Alert.alert(LL.PhoneRegistrationValidateScreen.successTitle(), undefined, [
-            {
-              text: LL.common.ok(),
-              onPress: () => {
-                if (isOwnSession()) navigation.popTo("settings")
-              },
-            },
-          ])
+          notifyModal({
+            icon: MessageIcon.Success,
+            title: LL.Messages.phoneAddedTitle(),
+            text: LL.Messages.phoneLoginBody(),
+            primaryButtonTitle: LL.Messages.okay(),
+            primaryButtonAction: backToSettings,
+            dismissAction: backToSettings,
+          })
           break
         case LoginMethodAdditionResult.Refused:
           sayRefusal(outcome.refusal)
@@ -153,8 +158,11 @@ export const LoginMethodCodeScreen: React.FC = () => {
           break
       }
     },
-    [LL, navigation, params, sayRefusal],
+    [LL, navigation, notifyModal, params, sayRefusal],
   )
+
+  /** The code field's own send, which Try again hands the same code to again. */
+  const sendRef = useRef<(code: string) => void>(() => {})
 
   /** Only the screen and the session the code was sent from show its answer: one the
    *  user has left, or a stack an account switch reset, is not moved by it. */
@@ -167,12 +175,22 @@ export const LoginMethodCodeScreen: React.FC = () => {
         const outcome = await run({ params, totpCode: code, isOwnSession })
         if (isOwnSession()) showOutcome(outcome, isOwnSession)
       } catch {
-        if (isOwnSession()) Alert.alert(LL.common.error())
+        if (isOwnSession()) {
+          notifyModal({
+            icon: MessageIcon.Alert,
+            title: LL.Messages.loginMethodFailedTitle(),
+            text: LL.Messages.checkConnectionBody(),
+            primaryButtonTitle: LL.Messages.tryAgain(),
+            primaryButtonAction: () => {
+              if (isOwnSession()) sendRef.current(code)
+            },
+          })
+        }
       } finally {
         setLoading(false)
       }
     },
-    [captureSession, run, params, showOutcome, LL],
+    [captureSession, run, params, showOutcome, notifyModal, LL],
   )
 
   /** An answer that lands after the user left would move a screen they never sent the
@@ -185,6 +203,9 @@ export const LoginMethodCodeScreen: React.FC = () => {
     (code: string) => runOnce(() => runWithCode(code)),
     [runOnce, runWithCode],
   )
+  useEffect(() => {
+    sendRef.current = send
+  }, [send])
 
   return (
     <CodeInput
