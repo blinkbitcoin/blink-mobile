@@ -226,8 +226,11 @@ prove nothing — the difference has to come from the code, not from how you
 tapped. (A content *wait* may target per-side text when the two sides land on
 different screens by design; the taps stay identical.)
 
-For a JS-only change, a file checkout plus fast refresh (~12s) is enough. A
-branch detach is only needed when native code differs.
+For a JS-only change, a file checkout plus the simulator skill's
+`reload-app.sh` (~5s; it confirms via Metro that the bundle was actually
+re-served) is enough — no relaunch between sides, and TEMP `initialRouteName`
+edits are re-applied, which fast refresh alone would miss. A branch detach is
+only needed when native code differs.
 
 Consider whether the `before` is worth recording at all: for a crash or a
 missing screen, a single still plus a sentence is often clearer than a video of
@@ -260,7 +263,7 @@ threshold with a TEMP constant and say so in the PR comment.
 ## After Editing the Scripts
 
 ```bash
-"$SKILL/tests/run.sh"     # 87 assertions, ~30s, exits non-zero on failure
+"$SKILL/tests/run.sh"     # 88 assertions, ~30s, exits non-zero on failure
 ```
 
 Fakes `xcrun`, `adb` (the full screenrecord start/kill -2/pull lifecycle) and
