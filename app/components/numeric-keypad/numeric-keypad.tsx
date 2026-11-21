@@ -5,6 +5,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const NumericKey = {
   0: "0",
@@ -135,9 +136,8 @@ const useStyles = makeStyles(({ colors }) => ({
     opacity: 0.5,
   },
   keyText: {
-    fontFamily: "Source Sans Pro",
+    fontFamily: fonts.bold,
     fontSize: 28,
-    fontWeight: "700",
     lineHeight: 32,
     color: colors.textOnBackground,
     textAlign: "center",

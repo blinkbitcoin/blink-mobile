@@ -14,6 +14,7 @@ import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { staticSurface } from "@app/rne-theme/surfaces"
 import { groupTitleGap } from "@app/rne-theme/tokens"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const ValueStyle = {
   Bold: "bold",
@@ -245,8 +246,7 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
     label: {
       color: colors.textSecondary,
       fontSize: 14,
-      fontFamily: "Source Sans Pro",
-      fontWeight: "400",
+      fontFamily: fonts.regular,
       lineHeight: 20,
       marginBottom: groupTitleGap,
     },
@@ -269,8 +269,7 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
       flex: 1,
       color: isLarge || isBold ? colors.textOnBackground : colors.textMuted,
       fontSize: isLarge ? 18 : isBold ? 14 : 16,
-      fontFamily: "Source Sans Pro",
-      fontWeight: isLarge ? "400" : isBold ? "700" : "400",
+      fontFamily: !isLarge && isBold ? fonts.bold : fonts.regular,
       lineHeight: isLarge ? 24 : isBold ? 20 : 22,
     },
     editableInput: {
@@ -280,7 +279,7 @@ const useStyles = makeStyles(({ colors }, { valueStyle, size }: StyleProps) => {
       color: colors.textOnBackground,
       fontSize: 10,
       lineHeight: 13,
-      fontWeight: "400",
+      fontFamily: fonts.regular,
     },
     helperTextError: {
       color: colors.error,

@@ -5,6 +5,8 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackHeaderBackProps } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
+import { fonts } from "@app/rne-theme/fonts"
+
 import { headerIconTouchArea } from "../header-no-glass"
 
 // native-stack wraps headerLeft in react-native-screens' ScreenStackHeaderLeftView,
@@ -71,6 +73,7 @@ const HeaderBackButtonWithTheme = ({
       pressColor={colors.surfaceInteractive}
       pressOpacity={1}
       style={styles.backButton}
+      labelStyle={styles.backLabel}
     />
   )
 }
@@ -126,6 +129,12 @@ const useStyles = makeStyles(() => {
     backButton: {
       marginLeft: backButtonInsetCorrection,
       ...(isAndroid && ANDROID_BACK_BUTTON_CIRCLE),
+    },
+    // The iOS label ("Back" or the previous title). HeaderBackButton draws it in the
+    // navigation theme's System font, and headerBackTitleStyle only reaches the native
+    // back item this control replaces.
+    backLabel: {
+      fontFamily: fonts.regular,
     },
   }
 })

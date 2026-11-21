@@ -3,10 +3,11 @@ import { ActivityIndicator } from "react-native"
 
 import { useAppConfig } from "@app/hooks"
 import { Text, makeStyles } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 const useStyles = makeStyles(() => ({
   highlight: {
-    fontWeight: "800",
+    fontFamily: fonts.bold,
     fontSize: 15,
   },
   primaryTextStyle: {

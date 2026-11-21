@@ -5,6 +5,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { isIos } from "@app/utils/helper"
+import { fonts } from "@app/rne-theme/fonts"
 
 type AddToWalletButtonProps = {
   onPress: () => void
@@ -67,8 +68,7 @@ const useStyles = makeStyles(({ colors }) => ({
   buttonText: {
     color: colors.staticDarkGrey,
     fontSize: 20,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 24,
   },
 }))

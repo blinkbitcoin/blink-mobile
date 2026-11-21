@@ -105,7 +105,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
   },
   action: {
     fontSize: 15,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.accent,
   },
   listContent: {

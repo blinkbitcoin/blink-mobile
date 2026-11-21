@@ -15,6 +15,7 @@ import { recordAppError } from "@app/utils/error-reporting"
 import { testProps } from "@app/utils/testProps"
 import { useScanContext } from "@app/hooks/use-scan-context"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { resolveMerchantChoiceDestination } from "./payment-destination/merchant"
 import { isSendDestination, MerchantChoice } from "./payment-destination/index.types"
@@ -238,7 +239,7 @@ const useStyles = makeStyles(({ colors }) => ({
   title: {
     color: colors.textOnBackground,
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     marginBottom: 4,
   },
   description: {

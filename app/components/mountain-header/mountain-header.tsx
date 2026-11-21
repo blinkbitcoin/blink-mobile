@@ -4,6 +4,7 @@ import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { makeStyles } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 import Montain from "./mointains-cloud-01.svg"
 
@@ -14,6 +15,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   headerSection: {
+    fontFamily: fonts.regular,
     color: colors.staticWhite,
     fontSize: 16,
     paddingTop: 18,
@@ -26,7 +28,7 @@ const useStyles = makeStyles(({ colors }) => ({
   titleSection: {
     color: colors.staticWhite,
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     paddingTop: 6,
   },
 

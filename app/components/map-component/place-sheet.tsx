@@ -463,7 +463,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
     // Restated rather than inherited: the themed Text falls back to black, not
     // to the surrounding GaloyInfo tint.
     color: colors.blue5,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     textDecorationLine: "underline",
   },
   status: {
@@ -536,7 +536,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   rowLink: {
     flex: 1,
     fontSize: 14,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.accent,
     textDecorationLine: "underline",
   },

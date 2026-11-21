@@ -4,6 +4,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { fonts } from "@app/rne-theme/fonts"
 
 const DOWNLOADED_OPACITY = 0.4
 
@@ -80,22 +81,19 @@ const useStyles = makeStyles(({ colors }) => ({
   title: {
     color: colors.textOnBackground,
     fontSize: 16,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 22,
   },
   subtitle1: {
     color: colors.textMuted,
     fontSize: 12,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 18,
   },
   subtitle2: {
     color: colors.textMuted,
     fontSize: 10,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 13,
   },
   downloadButton: {

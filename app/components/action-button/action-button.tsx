@@ -6,6 +6,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 const ICON_SIZE = 16
 
@@ -86,7 +87,7 @@ const useStyles = makeStyles(({ colors }) => ({
   label: {
     flexShrink: 1,
     fontSize: 14,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     color: colors.textOnBackground,
   },
   // Same footprint as the icon, so the row does not shift while it spins.

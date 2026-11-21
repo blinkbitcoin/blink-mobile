@@ -4,6 +4,7 @@ import { Pressable, View } from "react-native"
 
 import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { Key as KeyType } from "../amount-input-screen/number-pad-reducer"
 
@@ -145,7 +146,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   keyText: {
     fontSize: 26,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 30,
     textAlign: "center",
   },

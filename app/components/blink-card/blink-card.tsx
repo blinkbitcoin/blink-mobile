@@ -9,6 +9,7 @@ import { useCardHolder } from "@app/hooks/use-card-holder"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { formatCardValidThruDisplay } from "@app/utils/date"
 import { formatCardDisplayNumber } from "@app/utils/helper"
+import { fonts } from "@app/rne-theme/fonts"
 
 const CARD_ASPECT_RATIO = 1.584
 const CARD_MAX_WIDTH = 400
@@ -129,9 +130,8 @@ const useStyles = makeStyles(({ colors }) => ({
     textShadowColor: "rgba(0, 0, 0, 0.3)",
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
-    fontFamily: "Source Sans Pro",
+    fontFamily: fonts.regular,
     fontStyle: "normal",
-    fontWeight: "400",
     lineHeight: 32,
     marginBottom: 7,
   },
@@ -146,8 +146,7 @@ const useStyles = makeStyles(({ colors }) => ({
   holderName: {
     color: colors.staticWhite,
     fontSize: 14,
-    fontWeight: "700",
-    fontFamily: "Source Sans Pro",
+    fontFamily: fonts.bold,
     lineHeight: 20,
     textShadowColor: "rgba(0, 0, 0, 0.3)",
     textShadowOffset: { width: 0, height: 1 },
@@ -162,9 +161,8 @@ const useStyles = makeStyles(({ colors }) => ({
   validThruLabel: {
     color: colors.staticWhite,
     fontSize: 10,
-    fontFamily: "Source Sans Pro",
+    fontFamily: fonts.regular,
     fontStyle: "normal",
-    fontWeight: "400",
     lineHeight: 13,
     textShadowColor: "rgba(0, 0, 0, 0.3)",
     textShadowOffset: { width: 0, height: 1 },
@@ -173,9 +171,8 @@ const useStyles = makeStyles(({ colors }) => ({
   validThruValue: {
     color: colors.staticWhite,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
+    fontFamily: fonts.regular,
     fontStyle: "normal",
-    fontWeight: "400",
     lineHeight: 20,
     textShadowColor: "rgba(0, 0, 0, 0.3)",
     textShadowOffset: { width: 0, height: 1 },
@@ -216,16 +213,14 @@ const useStyles = makeStyles(({ colors }) => ({
   frozenTitle: {
     color: colors.staticWhite,
     fontSize: 20,
-    fontWeight: "700",
-    fontFamily: "Source Sans Pro",
+    fontFamily: fonts.bold,
     fontStyle: "normal",
     lineHeight: 24,
   },
   frozenSubtitle: {
     color: colors.staticWhite,
     fontSize: 12,
-    fontWeight: "400",
-    fontFamily: "Source Sans Pro",
+    fontFamily: fonts.regular,
     fontStyle: "normal",
     lineHeight: 18,
   },
