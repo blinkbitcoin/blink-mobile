@@ -2536,7 +2536,23 @@
                 "title": "Preisänderungen",
                 "description": "Benachrichtigungen über den Preis von Bitcoin."
             }
-        }
+        },
+        "splashGroup": "Anzeige bei Zahlungseingang",
+        "incomingTransactionSplash": "Bildschirm anzeigen",
+        "splashMinimum": "Mindestbetrag (SAT)"
+    },
+    "IncomingTransactionSplash": {
+        "youReceived": "Du hast erhalten",
+        "pendingOnchain": "Onchain ausstehend",
+        "note": "Notiz",
+        "dontShowAgain": "Nicht mehr anzeigen",
+        "details": "Details",
+        "announcement": "Du hast {amount} erhalten",
+        "tapToShow": "Antippen zum Anzeigen",
+        "announcementHidden": "Zahlung erhalten",
+        "announcementPending": "Onchain ausstehend, {amount}",
+        "toastOn": "Anzeige bei Zahlungseingang ist an",
+        "toastOff": "Anzeige bei Zahlungseingang ist aus"
     },
     "AccountScreen": {
         "fundsMoreThan5Dollars": "Ihr Konto hat mehr als $5",

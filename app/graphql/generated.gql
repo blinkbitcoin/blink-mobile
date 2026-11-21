@@ -2424,8 +2424,27 @@ subscription myLnUpdates {
     }
     update {
       ... on LnUpdate {
-        paymentHash
         status
+        transaction {
+          ...Transaction
+          __typename
+        }
+        __typename
+      }
+      ... on IntraLedgerUpdate {
+        txNotificationType
+        transaction {
+          ...Transaction
+          __typename
+        }
+        __typename
+      }
+      ... on OnChainUpdate {
+        txNotificationType
+        transaction {
+          ...Transaction
+          __typename
+        }
         __typename
       }
       __typename

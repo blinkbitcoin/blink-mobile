@@ -82,21 +82,6 @@ jest.mock("@app/components/atomic/galoy-icon", () => {
   }
 })
 
-jest.mock("@app/screens/receive-bitcoin-screen/my-ln-updates-sub", () => {
-  const ReactActual = jest.requireActual("react")
-  const { View } = jest.requireActual("react-native")
-  return {
-    withMyLnUpdateSub:
-      <P extends object>(Component: React.ComponentType<P>) =>
-      (props: P) =>
-        ReactActual.createElement(
-          View,
-          { testID: "my-ln-update-sub-wrapper" },
-          ReactActual.createElement(Component, props),
-        ),
-  }
-})
-
 jest.mock("@rn-vui/themed", () => {
   const ReactActual = jest.requireActual("react")
   return {
@@ -267,13 +252,5 @@ describe("RedeemBitcoinResultScreen", () => {
     expect(queryByText("Your payment may still be completing.")).toBeTruthy()
     // eslint-disable-next-line camelcase
     expect(UNSAFE_queryByType(ActivityIndicator)).toBeNull()
-  })
-
-  it("wraps the screen in withMyLnUpdateSub so the custodial paid signal stays subscribed (HOC contract)", async () => {
-    const { queryByTestId } = render(<RedeemBitcoinResultScreen route={buildRoute()} />)
-
-    await flushEffects()
-
-    expect(queryByTestId("my-ln-update-sub-wrapper")).toBeTruthy()
   })
 })

@@ -73,6 +73,7 @@ export const ScEvent = {
   SwapCompleted: "sc_swap_completed",
   SwapFailed: "sc_swap_failed",
   BlinkPaymentSent: "sc_blink_payment_sent",
+  IncomingTxSplashOptedOut: "sc_incoming_tx_splash_opted_out",
 } as const
 
 export type ScEvent = (typeof ScEvent)[keyof typeof ScEvent]

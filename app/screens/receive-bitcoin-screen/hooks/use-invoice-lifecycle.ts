@@ -12,6 +12,7 @@ import {
   PaymentRequestState,
   PaymentRequestCreationData,
 } from "../payment/index.types"
+import { useIncomingTransactionSplash } from "../incoming-transaction-splash/incoming-transaction-splash-context"
 import { createPaymentRequest } from "../payment/payment-request"
 
 export const useInvoiceLifecycle = (
@@ -43,6 +44,7 @@ export const useInvoiceLifecycle = (
   }, [])
 
   const lastHash = useLnUpdateHashPaid()
+  const { isSplashShownForHash } = useIncomingTransactionSplash()
   useEffect(() => {
     if (
       pr?.state === PaymentRequestState.Created &&
@@ -50,11 +52,13 @@ export const useInvoiceLifecycle = (
       lastHash === pr.info.data.paymentHash
     ) {
       setPR((current) => current && current.setState(PaymentRequestState.Paid))
+      // One payment, one buzz: the splash plays its own haptic on impact.
+      if (isSplashShownForHash(lastHash)) return
       ReactNativeHapticFeedback.trigger("notificationSuccess", {
         ignoreAndroidSystemSettings: true,
       })
     }
-  }, [lastHash, pr])
+  }, [lastHash, pr, isSplashShownForHash])
 
   const expiresAt =
     pr?.info?.data?.invoiceType === Invoice.Lightning && pr.info?.data?.expiresAt

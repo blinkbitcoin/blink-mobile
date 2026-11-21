@@ -17,6 +17,16 @@ jest.mock("@app/graphql/ln-update-context", () => ({
   useLnUpdateHashPaid: () => mockUseLnUpdateHashPaid(),
 }))
 
+const mockIsSplashShownForHash = jest.fn((_hash: string) => false)
+jest.mock(
+  "@app/screens/receive-bitcoin-screen/incoming-transaction-splash/incoming-transaction-splash-context",
+  () => ({
+    useIncomingTransactionSplash: () => ({
+      isSplashShownForHash: (hash: string) => mockIsSplashShownForHash(hash),
+    }),
+  }),
+)
+
 const mockUseCountdown = jest.fn()
 jest.mock("@app/hooks", () => ({
   useCountdown: (...args: unknown[]) => mockUseCountdown(...args),
@@ -72,6 +82,7 @@ describe("useInvoiceLifecycle", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockUseLnUpdateHashPaid.mockReturnValue(null)
+    mockIsSplashShownForHash.mockReturnValue(false)
     mockUseCountdown.mockReturnValue({ remainingSeconds: 0, isExpired: false })
   })
 
@@ -147,6 +158,30 @@ describe("useInvoiceLifecycle", () => {
     expect(mockHaptic).toHaveBeenCalledWith("notificationSuccess", {
       ignoreAndroidSystemSettings: true,
     })
+  })
+
+  /** One payment, one buzz: the splash plays its own haptic on impact. */
+  it("marks the invoice paid without a haptic when the splash showed for it", () => {
+    const paidPR = createMockPR({ state: PaymentRequestState.Paid })
+    const mockPR = createMockPR({
+      state: PaymentRequestState.Created,
+      info: {
+        data: {
+          invoiceType: Invoice.Lightning,
+          paymentHash: "abc123",
+        },
+      },
+      setState: jest.fn(() => paidPR),
+    })
+    mockCreatePaymentRequest.mockReturnValue(mockPR)
+    mockUseLnUpdateHashPaid.mockReturnValue("abc123")
+    mockIsSplashShownForHash.mockReturnValue(true)
+
+    renderHook(() => useInvoiceLifecycle(stablePrcd, mockMutations as never))
+
+    expect(mockPR.setState).toHaveBeenCalledWith(PaymentRequestState.Paid)
+    expect(mockIsSplashShownForHash).toHaveBeenCalledWith("abc123")
+    expect(mockHaptic).not.toHaveBeenCalled()
   })
 
   it("does not trigger haptic when hash does not match", () => {

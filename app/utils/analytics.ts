@@ -344,3 +344,15 @@ type LogLoginMethodCodeFailedParams = {
 export const logLoginMethodCodeFailed = (params: LogLoginMethodCodeFailedParams) => {
   analytics().logEvent("login_method_code_failed", { login_method: params.loginMethod })
 }
+
+/** The splash reports one thing only: that someone turned it off, and from where. A
+ *  self-custodial account reports it through its own gate, so only Enhanced sends it. */
+export const logIncomingTransactionSplashOptedOut = (params: {
+  source: "splash" | "settings"
+}) => {
+  if (!isCustodialAnalyticsDomain()) {
+    measure(ScEvent.IncomingTxSplashOptedOut, { source: params.source })
+    return
+  }
+  logCustodialEvent("incoming_tx_splash_opted_out", { source: params.source })
+}

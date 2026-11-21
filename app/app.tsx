@@ -50,6 +50,11 @@ import { NavigationContainerWrapper } from "./navigation/navigation-container-wr
 import { RootStack } from "./navigation/root-navigator"
 import { MigrationBlockerProvider } from "./screens/account-migration/hooks/use-migration-blocker"
 import { ErrorScreen } from "./screens/error-screen"
+import {
+  IncomingTransactionSplashProvider,
+  SelfCustodialSplashMount,
+} from "./screens/receive-bitcoin-screen/incoming-transaction-splash"
+import { MyLnUpdateSub } from "./screens/receive-bitcoin-screen/my-ln-updates-sub"
 import { PersistentStateProvider } from "./store/persistent-state"
 import { detectDefaultLocale } from "./utils/locale-detector"
 import "./utils/logs"
@@ -104,17 +109,22 @@ export const App = () => (
                                           <EnhancedModePromptProvider>
                                             <RestrictedRegionProvider>
                                               <NotificationsProvider>
-                                                <AppStateWrapper />
-                                                <PushNotificationComponent />
-                                                <AutoConvertListenerMount />
-                                                <AccountModeSyncMount />
-                                                <TelemetryContextMount />
-                                                <DisplayCurrencyFromRegionMount />
-                                                <RecoveryBundleListenerMount />
-                                                <LaunchCleanupMount />
-                                                <RootStack />
-                                                <NetworkErrorComponent />
-                                                <ActionModals />
+                                                <IncomingTransactionSplashProvider>
+                                                  <MyLnUpdateSub>
+                                                    <AppStateWrapper />
+                                                    <PushNotificationComponent />
+                                                    <AutoConvertListenerMount />
+                                                    <AccountModeSyncMount />
+                                                    <TelemetryContextMount />
+                                                    <DisplayCurrencyFromRegionMount />
+                                                    <RecoveryBundleListenerMount />
+                                                    <LaunchCleanupMount />
+                                                    <RootStack />
+                                                    <NetworkErrorComponent />
+                                                    <ActionModals />
+                                                    <SelfCustodialSplashMount />
+                                                  </MyLnUpdateSub>
+                                                </IncomingTransactionSplashProvider>
                                               </NotificationsProvider>
                                             </RestrictedRegionProvider>
                                           </EnhancedModePromptProvider>

@@ -36,18 +36,16 @@ import { toastShow } from "@app/utils/toast"
 import { RECEIVE_ACTIONS_GAP, RECEIVE_INPUTS_GUTTER } from "./layout"
 import { NfcHeaderButton } from "./nfc-header-button"
 import { QRView } from "./qr-view"
-import { withMyLnUpdateSub } from "./my-ln-updates-sub"
 import { Invoice, InvoiceType, PaymentRequestState } from "./payment/index.types"
 import {
   useDisplayPaymentRequest,
   useNfcReceive,
   useOnchainResolver,
+  usePaidDismiss,
   usePaymentRequest,
   useReceiveCarousel,
   useReceiveFlow,
 } from "./hooks"
-
-const AUTO_DISMISS_DELAY = 5000
 
 const SELF_CUSTODIAL_BLOCKED_STATUSES: ActiveWalletStatus[] = [
   ActiveWalletStatus.Error,
@@ -235,13 +233,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     }, [openTrialModal]),
   )
 
-  const isConverting = requestState.state === PaymentRequestState.Converting
-
-  useEffect(() => {
-    if (requestState.state !== PaymentRequestState.Paid) return
-    const id = setTimeout(() => navigation.goBack(), AUTO_DISMISS_DELAY)
-    return () => clearTimeout(id)
-  }, [requestState.state, navigation])
+  const { completed, converting } = usePaidDismiss(requestState.state)
 
   const onchainAmountRowCurrency = isSelfCustodial
     ? WalletCurrency.Btc
@@ -274,8 +266,8 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
             type={requestState.info?.data?.invoiceType || requestState.type}
             getFullUri={requestState.info?.data?.getFullUriFn}
             loading={requestState.state === PaymentRequestState.Loading}
-            completed={requestState.state === PaymentRequestState.Paid}
-            converting={isConverting}
+            completed={completed}
+            converting={converting}
             err={
               requestState.state === PaymentRequestState.Error
                 ? LL.ReceiveScreen.error()
@@ -295,8 +287,8 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
             getFullUri={onchain.getFullUriFn}
             // The address on screen keeps working while New makes another, so it stays.
             loading={onchain.loading || (isGeneratingAddress && !onchain.address)}
-            completed={requestState.state === PaymentRequestState.Paid}
-            converting={isConverting}
+            completed={completed}
+            converting={converting}
             err={
               onchain.failed && !isGeneratingAddress
                 ? LL.ReceiveScreen.onchainAddressLoadFailed()
@@ -489,4 +481,4 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 }))
 
-export default withMyLnUpdateSub(ReceiveScreen)
+export default ReceiveScreen

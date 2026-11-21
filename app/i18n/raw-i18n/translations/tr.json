@@ -2536,7 +2536,23 @@
         "title": "Fiyat değişiklikleri",
         "description": "Bitcoin fiyatı hakkında bildirimler."
       }
-    }
+    },
+    "splashGroup": "Alınan ödeme ekranı",
+    "incomingTransactionSplash": "Ekranı göster",
+    "splashMinimum": "En düşük tutar (SAT)"
+  },
+  "IncomingTransactionSplash": {
+    "youReceived": "Aldınız",
+    "pendingOnchain": "Onchain beklemede",
+    "note": "Not",
+    "dontShowAgain": "Bunu bir daha gösterme",
+    "details": "Ayrıntılar",
+    "announcement": "{amount} aldınız",
+    "tapToShow": "Göstermek için dokunun",
+    "announcementHidden": "Ödeme alındı",
+    "announcementPending": "Onchain beklemede, {amount}",
+    "toastOn": "Alınan ödeme ekranı açık",
+    "toastOff": "Alınan ödeme ekranı kapalı"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Hesabınızda 5 dolardan fazla para var",

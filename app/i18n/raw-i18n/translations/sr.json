@@ -2536,7 +2536,23 @@
         "title": "Промене цена",
         "description": "Обавештења о цени Bitcoin-а."
       }
-    }
+    },
+    "splashGroup": "Екран примљене уплате",
+    "incomingTransactionSplash": "Прикажи екран",
+    "splashMinimum": "Најмањи износ (SAT)"
+  },
+  "IncomingTransactionSplash": {
+    "youReceived": "Примили сте",
+    "pendingOnchain": "На блокчејну, на чекању",
+    "note": "Белешка",
+    "dontShowAgain": "Не приказуј више",
+    "details": "Детаљи",
+    "announcement": "Примили сте {amount}",
+    "tapToShow": "Додирните за приказ",
+    "announcementHidden": "Уплата примљена",
+    "announcementPending": "На блокчејну, на чекању, {amount}",
+    "toastOn": "Екран примљене уплате је укључен",
+    "toastOff": "Екран примљене уплате је искључен"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Ваш налог има више од $5",
