@@ -175,6 +175,7 @@ export const PhoneRegistrationValidateScreen: React.FC<
             primaryButtonTitle: LL.Messages.okay(),
             primaryButtonAction: backToStart,
             dismissAction: backToStart,
+            isRequired: true,
           })
         }
       } catch (err) {

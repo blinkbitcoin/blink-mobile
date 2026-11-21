@@ -222,6 +222,7 @@ describe("WebViewScreen", () => {
         title: LL.Messages.pageNotReadyTitle(),
         text: LL.Messages.pageNotReadyBody(),
         primaryButtonTitle: LL.Messages.okay(),
+        isRequired: true,
       })
       expect(mockInjectJavaScript).not.toHaveBeenCalled()
     })

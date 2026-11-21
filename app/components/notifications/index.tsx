@@ -4,8 +4,13 @@ import React, {
   useContext,
   useCallback,
   useMemo,
+  useEffect,
   useRef,
 } from "react"
+
+import { useAuthenticationContext } from "@app/navigation/authentication-context"
+import { usePersistentStateContext } from "@app/store/persistent-state"
+import { resolveSessionKey } from "@app/store/persistent-state/account-key"
 
 import { IconNamesType } from "../atomic/galoy-icon"
 import { MessagePopup } from "./message-popup"
@@ -31,7 +36,18 @@ type NotifyModalArgs = {
   primaryButtonAction?: () => void
   /** The close icon, the backdrop and the back button. */
   dismissAction?: () => void
+  /**
+   * A message whose way out finishes what the user started: leaving a flow that is done,
+   * or a page that cannot work, or the session that just ended. It stays until the user
+   * answers it, through the app relocking too, and comes back once the lock is answered,
+   * so the user can never carry on without its way out having run. Any other message
+   * only informs or offers a remedy the screen still offers, and a relock drops it.
+   */
+  isRequired?: boolean
 }
+
+/** A message in the queue, with the relocks that had happened when it was raised. */
+type QueuedModal = NotifyModalArgs & { id: number; lockCount: number }
 
 type NotifyCardArgs = {
   title: string
@@ -65,20 +81,76 @@ export const NotificationModalContext = createContext<NotificationModalContextTy
 export const NotificationsProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
-  const [modalNotifications, setModalNotifications] = useState<NotifyModalArgs[]>([])
-  const [isModalClosing, setIsModalClosing] = useState(false)
-  const isModalClosingRef = useRef(false)
-  /** The way out the user took, run once the pop-up is off the screen. */
-  const modalExitRef = useRef<(() => void) | undefined>(undefined)
+  const [modalNotifications, setModalNotifications] = useState<QueuedModal[]>([])
+  const nextModalIdRef = useRef(0)
+  /** The pop-up closing and the way out the user took, run once it is off the screen. */
+  const [closingModalId, setClosingModalId] = useState<number | undefined>(undefined)
+  const closingModalRef = useRef<{ id: number; exit?: () => void } | undefined>(undefined)
   const [cardNotifications, setCardNotifications] = useState<NotifyCardArgs[]>([])
   const [cardIsLoading, setCardIsLoading] = useState(false)
 
+  /**
+   * The resume relock pushes the unlock screen under the global pop-up, which would stay
+   * on top of it and answerable: a way out taken there runs from under the lock, where a
+   * screen's own route is not in front and its follow-up is lost, and a copy lands on the
+   * phone's clipboard before anyone unlocked. So a pop-up raised before a lock is never
+   * shown while that lock is up. Counted in render, so the pop-up is gone in the same
+   * commit as the lock comes up, with no frame in which it can still be pressed.
+   */
+  const { isAppLocked, readIsAppLocked } = useAuthenticationContext()
+  const lockCountRef = useRef(0)
+  const wasAppLockedRef = useRef(isAppLocked)
+  if (isAppLocked && !wasAppLockedRef.current) lockCountRef.current += 1
+  wasAppLockedRef.current = isAppLocked
+  const lockCount = lockCountRef.current
+
+  const isUnderLock = useCallback(
+    (notification: QueuedModal) =>
+      readIsAppLocked() && notification.lockCount < lockCountRef.current,
+    [readIsAppLocked],
+  )
+
   const notifyModal = useCallback(
     (args: NotifyModalArgs) => {
-      setModalNotifications((notifications) => [...notifications, args])
+      const id = nextModalIdRef.current
+      nextModalIdRef.current += 1
+      setModalNotifications((notifications) => [
+        ...notifications,
+        { ...args, id, lockCount: lockCountRef.current },
+      ])
     },
     [setModalNotifications],
   )
+
+  /**
+   * A lock drops the messages that only inform, and stops any way out still closing: the
+   * pop-up came off the screen without its follow-up running, so it is owed again and
+   * comes back after the unlock rather than being taken from under the lock.
+   */
+  useEffect(() => {
+    if (lockCount === 0) return
+    closingModalRef.current = undefined
+    setClosingModalId(undefined)
+    setModalNotifications((notifications) =>
+      notifications.filter(
+        (notification) => notification.isRequired || notification.lockCount === lockCount,
+      ),
+    )
+  }, [lockCount])
+
+  /** A message held behind the lock belongs to the session it was raised in: one ended
+   *  from the lock screen, or switched away from, must not greet the next one, nor take
+   *  its way out (a logout's leads to the gate) from inside it. */
+  const { persistentState } = usePersistentStateContext()
+  const sessionKey = resolveSessionKey(persistentState)
+  const sessionKeyRef = useRef(sessionKey)
+  useEffect(() => {
+    if (sessionKeyRef.current === sessionKey) return
+    sessionKeyRef.current = sessionKey
+    setModalNotifications((notifications) =>
+      notifications.filter((notification) => !isUnderLock(notification)),
+    )
+  }, [sessionKey, isUnderLock])
 
   const notifyCard = useCallback(
     (args: NotifyCardArgs) => {
@@ -92,7 +164,11 @@ export const NotificationsProvider: React.FC<React.PropsWithChildren> = ({
   }, [setCardNotifications])
 
   const activeCard = cardNotifications[0]
-  const activeNotification = modalNotifications[0]
+  const activeNotification = modalNotifications.find(
+    (notification) =>
+      (notification.isRequired || notification.lockCount === lockCount) &&
+      !(isAppLocked && notification.lockCount < lockCount),
+  )
 
   /**
    * One way out per pop-up: a second tap while it closes, on the button or the backdrop,
@@ -101,21 +177,28 @@ export const NotificationsProvider: React.FC<React.PropsWithChildren> = ({
    * prompt as it opens) is never covered by it, and a pop-up the action raises shows
    * after this one.
    */
-  const closeModal = useCallback((exit?: () => void) => {
-    if (isModalClosingRef.current) return
-    isModalClosingRef.current = true
-    modalExitRef.current = exit
-    setIsModalClosing(true)
+  const closeModal = useCallback((id: number, exit?: () => void) => {
+    if (closingModalRef.current) return
+    closingModalRef.current = { id, exit }
+    setClosingModalId(id)
   }, [])
 
   const onModalHide = useCallback(() => {
-    const exit = modalExitRef.current
-    modalExitRef.current = undefined
-    isModalClosingRef.current = false
-    setModalNotifications((notifications) => notifications.slice(1))
-    setIsModalClosing(false)
-    exit?.()
-  }, [])
+    const closing = closingModalRef.current
+    if (!closing) return
+    closingModalRef.current = undefined
+    setClosingModalId(undefined)
+
+    /** A lock that came up while it was closing keeps it: it is answered after the
+     *  unlock, with its screen in front again. */
+    const notification = modalNotifications.find(({ id }) => id === closing.id)
+    if (notification && isUnderLock(notification)) return
+
+    setModalNotifications((notifications) =>
+      notifications.filter(({ id }) => id !== closing.id),
+    )
+    closing.exit?.()
+  }, [modalNotifications, isUnderLock])
 
   const cardInfo = useMemo(() => {
     if (!activeCard) {
@@ -158,14 +241,19 @@ export const NotificationsProvider: React.FC<React.PropsWithChildren> = ({
 
       {activeNotification && (
         <MessagePopup
-          isVisible={!isModalClosing}
-          onClose={() => closeModal(activeNotification.dismissAction)}
+          key={activeNotification.id}
+          isVisible={closingModalId !== activeNotification.id}
+          onClose={() =>
+            closeModal(activeNotification.id, activeNotification.dismissAction)
+          }
           onModalHide={onModalHide}
           icon={activeNotification.icon}
           title={activeNotification.title}
           text={activeNotification.text}
           buttonTitle={activeNotification.primaryButtonTitle}
-          onButtonPress={() => closeModal(activeNotification.primaryButtonAction)}
+          onButtonPress={() =>
+            closeModal(activeNotification.id, activeNotification.primaryButtonAction)
+          }
         />
       )}
     </NotificationModalContext.Provider>

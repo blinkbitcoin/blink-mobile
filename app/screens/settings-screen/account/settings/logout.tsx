@@ -64,6 +64,7 @@ export const LogOut = () => {
       primaryButtonTitle: LL.Messages.okay(),
       primaryButtonAction: leave,
       dismissAction: leave,
+      isRequired: true,
     })
   }
 

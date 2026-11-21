@@ -24,6 +24,7 @@ import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
 import { TwoFactorSessionPrompt } from "@app/types/two-factor-enforcement"
 
+import { AuthenticationContextProvider } from "./authentication-context"
 import { DEEP_LINK_SCREENS } from "./deep-link-screens"
 import { isMigrationRoute } from "./migration-routes"
 import { RootStackParamList } from "./stack-param-lists"
@@ -95,27 +96,11 @@ const isResetWarranted = (
  *  owed lands is the lock's call and no trigger's: see mustRouteThroughUnlock below. */
 type ResetTrigger = "gate-armed" | "unlock-cleared"
 
-export type AuthenticationContextType = {
-  isAppLocked: boolean
-  /**
-   * The same answer without waiting for a commit, for the callers that read it outside a
-   * render: a lock raised during an awaited piece of work is already true here while the
-   * state, and any mirror of it, is still a commit behind. Written by the two setters, so
-   * it is never the stale one.
-   */
-  readIsAppLocked: () => boolean
-  setAppUnlocked: () => void
-  setAppLocked: () => void
-}
-
-// The initial value will never be null because the provider will always pass a non null value
-// eslint-disable-next-line
-// @ts-ignore
-const AuthenticationContext = React.createContext<AuthenticationContextType>(null)
-
-export const AuthenticationContextProvider = AuthenticationContext.Provider
-
-export const useAuthenticationContext = () => React.useContext(AuthenticationContext)
+export {
+  AuthenticationContextProvider,
+  useAuthenticationContext,
+} from "./authentication-context"
+export type { AuthenticationContextType } from "./authentication-context"
 
 export const processLinkForAction = (url: string): Action | null => {
   // grab action query param

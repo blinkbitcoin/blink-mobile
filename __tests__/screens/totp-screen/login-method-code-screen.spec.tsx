@@ -378,6 +378,7 @@ describe("LoginMethodCodeScreen", () => {
         title: LL.Messages.phoneAddedTitle(),
         text: LL.Messages.phoneLoginBody(),
         primaryButtonTitle: LL.Messages.okay(),
+        isRequired: true,
       })
       pressSuccessOk()
 

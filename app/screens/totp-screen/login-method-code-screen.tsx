@@ -151,6 +151,7 @@ export const LoginMethodCodeScreen: React.FC = () => {
             primaryButtonTitle: LL.Messages.okay(),
             primaryButtonAction: backToSettings,
             dismissAction: backToSettings,
+            isRequired: true,
           })
           break
         case LoginMethodAdditionResult.Refused:

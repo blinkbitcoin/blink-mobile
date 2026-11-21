@@ -239,6 +239,7 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
               primaryButtonTitle: LL.Messages.okay(),
               primaryButtonAction: closePage,
               dismissAction: closePage,
+              isRequired: true,
             })
             return
           }

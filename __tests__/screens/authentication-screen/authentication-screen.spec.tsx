@@ -421,6 +421,7 @@ describe("AuthenticationScreen", () => {
         title: "You're logged out",
         text: "You can log back in at any time.",
         primaryButtonTitle: "Okay",
+        isRequired: true,
       })
       expect(mockReturnToGate).not.toHaveBeenCalled()
 

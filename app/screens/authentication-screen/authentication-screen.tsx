@@ -94,6 +94,7 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
       primaryButtonTitle: LL.Messages.okay(),
       primaryButtonAction: leave,
       dismissAction: leave,
+      isRequired: true,
     })
   }
 

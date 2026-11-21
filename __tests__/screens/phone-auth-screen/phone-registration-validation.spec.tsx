@@ -129,6 +129,7 @@ describe("PhoneRegistrationValidateScreen", () => {
       title: LL.Messages.phoneConfirmedTitle(),
       text: LL.Messages.phoneLoginBody(),
       primaryButtonTitle: LL.Messages.okay(),
+      isRequired: true,
     })
     success.primaryButtonAction()
     expect(mockPop).toHaveBeenCalledWith(2)

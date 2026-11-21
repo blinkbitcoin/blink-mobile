@@ -166,6 +166,7 @@ describe("LogOut", () => {
       title: "You're logged out",
       text: "You can log back in at any time.",
       primaryButtonTitle: "Okay",
+      isRequired: true,
     })
     expect(mockRouteAfterLogout).not.toHaveBeenCalled()
 

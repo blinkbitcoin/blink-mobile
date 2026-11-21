@@ -9,6 +9,12 @@ import {
   NotificationsProvider,
   useNotifications,
 } from "@app/components/notifications"
+import { AuthenticationContextProvider } from "@app/navigation/authentication-context"
+
+const mockSession = { galoyAuthToken: "token-a", activeAccountId: undefined }
+jest.mock("@app/store/persistent-state", () => ({
+  usePersistentStateContext: () => ({ persistentState: mockSession }),
+}))
 
 jest.mock("@rn-vui/themed", () => {
   const colors = {
@@ -72,14 +78,42 @@ const message = (overrides: Partial<Message> = {}): Message => ({
   ...overrides,
 })
 
+let setLocked: (isLocked: boolean) => void = () => {}
+let rerenderApp: () => void = () => {}
+
+/** The app's lock, which the resume relock raises and the unlock screen lowers. */
+const App: React.FC<React.PropsWithChildren> = ({ children }) => {
+  const [isAppLocked, setIsAppLocked] = React.useState(false)
+  const [, setRenderCount] = React.useState(0)
+  setLocked = setIsAppLocked
+  rerenderApp = () => setRenderCount((count) => count + 1)
+  const value = React.useMemo(
+    () => ({
+      isAppLocked,
+      readIsAppLocked: () => isAppLocked,
+      setAppLocked: () => setIsAppLocked(true),
+      setAppUnlocked: () => setIsAppLocked(false),
+    }),
+    [isAppLocked],
+  )
+  return (
+    <AuthenticationContextProvider value={value}>
+      <NotificationsProvider>{children}</NotificationsProvider>
+    </AuthenticationContextProvider>
+  )
+}
+
 const notify = (...messages: Message[]) => {
   render(
-    <NotificationsProvider>
+    <App>
       <Notifier messages={messages} />
-    </NotificationsProvider>,
+    </App>,
   )
   fireEvent.press(screen.getByTestId("notify"))
 }
+
+const relock = () => act(() => setLocked(true))
+const unlock = () => act(() => setLocked(false))
 
 describe("NotificationsProvider pop-up", () => {
   it("shows the icon, the title, the line and the button", () => {
@@ -164,9 +198,9 @@ describe("NotificationsProvider pop-up", () => {
       return null
     }
     render(
-      <NotificationsProvider>
+      <App>
         <Capture />
-      </NotificationsProvider>,
+      </App>,
     )
     act(() =>
       notifyAgain(
@@ -182,5 +216,101 @@ describe("NotificationsProvider pop-up", () => {
     fireEvent.press(screen.getByTestId("primary-Try again"))
 
     expect(screen.getByText("Still couldn't load this merchant")).toBeTruthy()
+  })
+
+  describe("when the app relocks", () => {
+    beforeEach(() => {
+      mockSession.galoyAuthToken = "token-a"
+    })
+
+    /** Nothing in it can be answered from under the lock: a copy would land on the
+     *  phone's clipboard before anyone unlocked. */
+    it("takes the pop-up off the screen while the lock is up", () => {
+      notify(message({ isRequired: true }))
+
+      relock()
+
+      expect(screen.queryByText("Phone number confirmed")).toBeNull()
+    })
+
+    it("brings a required pop-up back after the unlock and runs its way out then", () => {
+      const leave = jest.fn()
+      notify(message({ isRequired: true, primaryButtonAction: leave }))
+
+      relock()
+      expect(leave).not.toHaveBeenCalled()
+      unlock()
+
+      expect(screen.getByText("Phone number confirmed")).toBeTruthy()
+      fireEvent.press(screen.getByTestId("primary-Okay"))
+      expect(leave).toHaveBeenCalledTimes(1)
+    })
+
+    it("drops a pop-up that only informs, without running its action", () => {
+      const copy = jest.fn()
+      notify(message({ title: "Couldn't open sharing", primaryButtonAction: copy }))
+
+      relock()
+      unlock()
+
+      expect(screen.queryByText("Couldn't open sharing")).toBeNull()
+      expect(copy).not.toHaveBeenCalled()
+    })
+
+    it("keeps the required one and shows only it after the unlock", () => {
+      notify(message({ title: "Couldn't open sharing" }), message({ isRequired: true }))
+
+      relock()
+      unlock()
+
+      expect(screen.queryByText("Couldn't open sharing")).toBeNull()
+      expect(screen.getByText("Phone number confirmed")).toBeTruthy()
+    })
+
+    /** The way out the user took while it was closing would run under the lock, where
+     *  the screen it moves is not in front, and be lost: it is asked again instead. */
+    it("does not take a way out the lock interrupted, and asks again after it", () => {
+      const leave = jest.fn()
+      notify(message({ isRequired: true, primaryButtonAction: leave }))
+
+      /** The hide that would run the way out lands after the lock, in the same act. */
+      act(() => {
+        fireEvent.press(screen.getByTestId("primary-Okay"))
+        setLocked(true)
+      })
+      expect(leave).not.toHaveBeenCalled()
+
+      unlock()
+      fireEvent.press(screen.getByTestId("primary-Okay"))
+      expect(leave).toHaveBeenCalledTimes(1)
+    })
+
+    /** The lock screen's own logout says goodbye from under the lock it raised over. */
+    it("shows a pop-up raised while the lock is up", () => {
+      render(
+        <App>
+          <Notifier messages={[message({ title: "You're logged out" })]} />
+        </App>,
+      )
+      relock()
+
+      fireEvent.press(screen.getByTestId("notify"))
+
+      expect(screen.getByText("You're logged out")).toBeTruthy()
+    })
+
+    /** A logout from the lock screen ends the session the held pop-up belongs to. */
+    it("drops a held pop-up once the session it was raised in has ended", () => {
+      const leave = jest.fn()
+      notify(message({ isRequired: true, primaryButtonAction: leave }))
+
+      relock()
+      mockSession.galoyAuthToken = "token-b"
+      act(() => rerenderApp())
+      unlock()
+
+      expect(screen.queryByText("Phone number confirmed")).toBeNull()
+      expect(leave).not.toHaveBeenCalled()
+    })
   })
 })

@@ -457,6 +457,7 @@ describe("Delete", () => {
         title: "Your account is closed",
         text: "We may keep some records where the law requires it.",
         primaryButtonTitle: "Okay",
+        isRequired: true,
       })
     })
 

@@ -172,6 +172,7 @@ export const Delete = () => {
           primaryButtonTitle: LL.Messages.okay(),
           primaryButtonAction: leave,
           dismissAction: leave,
+          isRequired: true,
         })
       } else {
         /** The server can answer with neither a success nor a rejection, which reading the
