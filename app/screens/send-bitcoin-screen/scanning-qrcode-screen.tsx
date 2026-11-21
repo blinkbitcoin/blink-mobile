@@ -150,22 +150,25 @@ export const ScanningQRCodeScreen: React.FC = () => {
     checkPermission()
   }, [])
 
-  const loadInBrowser = (url: string) => {
-    Linking.openURL(url).catch(() => {
-      /** The phone's error quotes the link, which can carry a token: only the failure
-       *  is reported. */
-      reportError("scanning-qrcode", new Error("No app could open a scanned link"))
-      notifyModal({
-        icon: MessageIcon.Alert,
-        title: LL.Messages.linkFailedTitle(),
-        text: LL.Messages.linkFailedBody(),
-        primaryButtonTitle: LL.Messages.tryAgain(),
-        primaryButtonAction: () => {
-          if (navigation.isFocused()) loadInBrowser(url)
-        },
+  const loadInBrowser = React.useCallback(
+    (url: string) => {
+      Linking.openURL(url).catch(() => {
+        /** The phone's error quotes the link, which can carry a token: only the failure
+         *  is reported. */
+        reportError("scanning-qrcode", new Error("No app could open a scanned link"))
+        notifyModal({
+          icon: MessageIcon.Alert,
+          title: LL.Messages.linkFailedTitle(),
+          text: LL.Messages.linkFailedBody(),
+          primaryButtonTitle: LL.Messages.tryAgain(),
+          primaryButtonAction: () => {
+            if (navigation.isFocused()) loadInBrowser(url)
+          },
+        })
       })
-    })
-  }
+    },
+    [LL, navigation, notifyModal],
+  )
 
   function isValidHttpUrl(input: string) {
     let url
@@ -339,6 +342,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
     sdk,
     sparkNetwork,
     lnAddressHostname,
+    loadInBrowser,
   ])
 
   const handleCodeScanned = React.useCallback(
