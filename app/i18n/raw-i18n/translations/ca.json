@@ -2685,18 +2685,29 @@
     "update": "La teva apliació esta obsoleta. Es necessari actulitzar l'aplicació abans d'utilitzar-la.\n\nEs pot actualitzar a la PlayStore per Android o Testflight per iOS"
   },
   "TransactionDetailScreen": {
-    "paid": "Pagat a/de",
     "received": "Has rebut",
     "sent": "Has enviat",
     "sending": "Enviant",
-    "receivingAccount": "Compte receptor",
-    "sendingAccount": "Compte d'enviament",
     "txNotBroadcast": "La teva transacció està en cua. Hauria d'aparèixer a la mempool {countdown: string}.",
     "momentarily": "momentàniament",
     "findingAccount": "S'està cercant el compte d'aquest pagament...",
     "txNotFoundInAccounts": "Aquest pagament no s'ha trobat en cap compte d'aquest dispositiu. Pot pertànyer a un compte desconnectat.",
     "txLoadFailed": "No s'ha pogut carregar aquest pagament. Comprova la connexió i torna-ho a provar.",
-    "switchedForPayment": "S'ha canviat a {identifier: string} per mostrar aquest pagament"
+    "switchedForPayment": "S'ha canviat a {identifier: string} per mostrar aquest pagament",
+    "depositFee": "Comissió de dipòsit",
+    "time": "Hora",
+    "transactionId": "ID de la transacció",
+    "hash": "Hash",
+    "blinkInternalId": "ID intern de Blink",
+    "receivedTo": "Rebut a",
+    "sentFrom": "Enviat des de",
+    "addCustomNote": "Afegeix una nota personal",
+    "openInExplorer": "Obre a l'explorador",
+    "openInDecoder": "Obre al descodificador",
+    "sparkTransferId": "ID de la transferència Spark",
+    "sender": "Remitent",
+    "recipient": "Destinatari",
+    "bitcoinAddress": "Adreça Bitcoin"
   },
   "FeeRatesScreen": {
     "title": "Tarifes de comissions",
@@ -4195,12 +4206,12 @@
     "title": "Aquest és un compte no custodi",
     "body": "Per saber-ne més, llegeix la nostra entrada del blog",
     "cta": "Llegeix"
-    },
+  },
   "StaleCloudBundleBulletin": {
     "title": "Actualitza la teva còpia al núvol",
     "body": "El teu paquet d'emergència a {provider} no està actualitzat. Torna a fer una còpia de seguretat de la cartera per actualitzar-lo.",
     "cta": "Torna a fer la còpia"
-    },
+  },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Encara no hi ha cap paquet d'emergència. Es crea després de la teva primera transacció.",
     "exportFailed": "No s'ha pogut baixar el paquet d'emergència."

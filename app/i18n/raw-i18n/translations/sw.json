@@ -2685,18 +2685,29 @@
     "update": "Aplikisheni yako imepitwa na wakati. Sahihisho linahitajika kabla aplikisheni inaweza kutumiwa.\n\nHii inaweza kufanywa kutoka kwenye PlayStore kwa Android na Testflight kwa iOS"
   },
   "TransactionDetailScreen": {
-    "paid": "Imelipwa kutoka/kuelekea",
     "received": "Ulipokea",
     "sent": "Ulituma",
     "sending": "Inatuma",
-    "receivingAccount": "Akaunti ya Kupokelea",
-    "sendingAccount": "Akaunti ya Kutuma",
     "txNotBroadcast": "Muamala wako umeorodheshwa. Unapaswa kuonekana kwenye mempool {countdown: string}.",
     "momentarily": "muda mfupi",
     "findingAccount": "Inatafuta akaunti ya malipo haya...",
     "txNotFoundInAccounts": "Malipo haya hayakupatikana katika akaunti yoyote kwenye kifaa hiki. Huenda ni ya akaunti iliyotoka.",
     "txLoadFailed": "Imeshindwa kupakia malipo haya. Angalia muunganisho wako kisha ujaribu tena.",
-    "switchedForPayment": "Imebadilisha hadi {identifier: string} ili kuonyesha malipo haya"
+    "switchedForPayment": "Imebadilisha hadi {identifier: string} ili kuonyesha malipo haya",
+    "depositFee": "Ada ya kuweka",
+    "time": "Muda",
+    "transactionId": "Kitambulisho cha muamala",
+    "hash": "Hash",
+    "blinkInternalId": "Kitambulisho cha ndani cha Blink",
+    "receivedTo": "Imepokelewa kwenye",
+    "sentFrom": "Imetumwa kutoka",
+    "addCustomNote": "Ongeza dokezo lako",
+    "openInExplorer": "Fungua kwenye explorer",
+    "openInDecoder": "Fungua kwenye decoder",
+    "sparkTransferId": "Kitambulisho cha uhamisho wa Spark",
+    "sender": "Mtumaji",
+    "recipient": "Mpokeaji",
+    "bitcoinAddress": "Anwani ya Bitcoin"
   },
   "FeeRatesScreen": {
     "title": "Viwango vya ada",
@@ -4195,12 +4206,12 @@
     "title": "Hii ni akaunti isiyo ya udhamini",
     "body": "Ili kujifunza zaidi, soma chapisho letu la blogu",
     "cta": "Soma"
-    },
+  },
   "StaleCloudBundleBulletin": {
     "title": "Sasisha nakala yako ya wingu",
     "body": "Kifurushi chako cha dharura kwenye {provider} kimepitwa na wakati. Hifadhi nakala ya mkoba wako tena ili kukisasisha.",
     "cta": "Hifadhi nakala tena"
-    },
+  },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Bado hakuna kifurushi cha dharura. Kinaundwa baada ya muamala wako wa kwanza.",
     "exportFailed": "Imeshindwa kupakua kifurushi cha dharura."

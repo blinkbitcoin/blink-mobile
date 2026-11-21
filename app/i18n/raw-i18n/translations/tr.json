@@ -2685,18 +2685,29 @@
     "update": "Uygulamanızın modası geçmiş. Uygulamanın kullanılabilmesi için bir güncelleme gereklidir.\n\nBu, Android için PlayStore'dan ve iOS için Testflight'tan yapılabilir"
   },
   "TransactionDetailScreen": {
-    "paid": "Ödendi/Ödedi",
     "received": "Size geldi",
     "sent": "Gönderdiniz",
     "sending": "Gönderiliyor",
-    "receivingAccount": "Alıcı Bakiye",
-    "sendingAccount": "Gönderen Bakiye",
     "txNotBroadcast": "İşleminiz sıraya alındı. Mempool'da görünmelidir {countdown: string}.",
     "momentarily": "anlık olarak",
     "findingAccount": "Bu ödemenin hesabı aranıyor...",
     "txNotFoundInAccounts": "Bu ödeme bu cihazdaki hiçbir hesapta bulunamadı. Oturumu kapatılmış bir hesaba ait olabilir.",
     "txLoadFailed": "Bu ödeme yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.",
-    "switchedForPayment": "Bu ödemeyi göstermek için {identifier: string} hesabına geçildi"
+    "switchedForPayment": "Bu ödemeyi göstermek için {identifier: string} hesabına geçildi",
+    "depositFee": "Yatırma ücreti",
+    "time": "Zaman",
+    "transactionId": "İşlem kimliği",
+    "hash": "Hash",
+    "blinkInternalId": "Blink dahili kimliği",
+    "receivedTo": "Alındığı bakiye",
+    "sentFrom": "Gönderildiği bakiye",
+    "addCustomNote": "Özel not ekle",
+    "openInExplorer": "Explorer'da aç",
+    "openInDecoder": "Kod çözücüde aç",
+    "sparkTransferId": "Spark transfer kimliği",
+    "sender": "Gönderen",
+    "recipient": "Alıcı",
+    "bitcoinAddress": "Bitcoin adresi"
   },
   "FeeRatesScreen": {
     "title": "Ücret oranları",
@@ -4195,12 +4206,12 @@
     "title": "Bu, saklamasız bir hesaptır",
     "body": "Daha fazla bilgi için blog yazımızı okuyun",
     "cta": "Oku"
-    },
+  },
   "StaleCloudBundleBulletin": {
     "title": "Bulut yedeğini güncelle",
     "body": "{provider} içindeki acil durum paketin güncel değil. Güncellemek için cüzdanını yeniden yedekle.",
     "cta": "Yeniden yedekle"
-    },
+  },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Henüz acil durum paketi yok. İlk işleminden sonra oluşturulur.",
     "exportFailed": "Acil durum paketi indirilemedi."

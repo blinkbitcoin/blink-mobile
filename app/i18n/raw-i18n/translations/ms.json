@@ -2685,18 +2685,29 @@
     "update": "Aplikasi anda bukan versi terkini. Kemaskini diperlukan sebelum aplikasi dapat digunakan\n\nKemaskini boleh dilakukan dsri PlayStore untuk Android dan Testflight untuk iOS"
   },
   "TransactionDetailScreen": {
-    "paid": "Bayar kepada/daripada",
     "received": "Anda dah terima",
     "sent": "Anda dah hantar",
     "sending": "Menghantar",
-    "receivingAccount": "Akaun penerimaan",
-    "sendingAccount": "Akaun penghantar",
     "txNotBroadcast": "Transaksi anda tergendala dan akan disiarkan dalam rangkaian Bitcoin sebentar lagi",
     "momentarily": "sebentar lagi",
     "findingAccount": "Mencari akaun untuk pembayaran ini...",
     "txNotFoundInAccounts": "Pembayaran ini tidak ditemui dalam mana-mana akaun pada peranti ini. Ia mungkin milik akaun yang telah log keluar.",
     "txLoadFailed": "Tidak dapat memuatkan pembayaran ini. Semak sambungan anda dan cuba lagi.",
-    "switchedForPayment": "Bertukar kepada {identifier: string} untuk memaparkan pembayaran ini"
+    "switchedForPayment": "Bertukar kepada {identifier: string} untuk memaparkan pembayaran ini",
+    "depositFee": "Caj deposit",
+    "time": "Masa",
+    "transactionId": "ID transaksi",
+    "hash": "Hash",
+    "blinkInternalId": "ID dalaman Blink",
+    "receivedTo": "Diterima ke",
+    "sentFrom": "Dihantar dari",
+    "addCustomNote": "Tambah nota tersuai",
+    "openInExplorer": "Buka dalam explorer",
+    "openInDecoder": "Buka dalam penyahkod",
+    "sparkTransferId": "ID pemindahan Spark",
+    "sender": "Penghantar",
+    "recipient": "Penerima",
+    "bitcoinAddress": "Alamat Bitcoin"
   },
   "FeeRatesScreen": {
     "title": "Kadar caj",
@@ -4195,12 +4206,12 @@
     "title": "Ini ialah akaun bukan kustodial",
     "body": "Untuk mengetahui lebih lanjut, baca catatan blog kami",
     "cta": "Baca"
-    },
+  },
   "StaleCloudBundleBulletin": {
     "title": "Kemas kini sandaran awan anda",
     "body": "Bundel kecemasan anda dalam {provider} sudah lapuk. Sandarkan dompet anda sekali lagi untuk mengemas kininya.",
     "cta": "Sandarkan semula"
-    },
+  },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Belum ada bundel kecemasan. Ia dicipta selepas transaksi pertama anda.",
     "exportFailed": "Tidak dapat memuat turun bundel kecemasan."

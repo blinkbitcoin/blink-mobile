@@ -2685,18 +2685,29 @@
     "update": "Je app is verouderd. Er is een update nodig voordat de app kan worden gebruikt.\n\nDit kan vanuit de PlayStore voor Android en AppStore voor iOS"
   },
   "TransactionDetailScreen": {
-    "paid": "Betaald van/naar",
     "received": "Jij ontving",
     "sent": "Jij verzond",
     "sending": "Verzenden",
-    "receivingAccount": "Ontvangend saldo",
-    "sendingAccount": "Verzendend saldo",
     "txNotBroadcast": "Uw transactie is momenteel in behandeling en wordt binnen enkele ogenblikken naar het Bitcoin-netwerk verzonden.",
     "momentarily": "binnenkort",
     "findingAccount": "Account voor deze betaling zoeken...",
     "txNotFoundInAccounts": "Deze betaling is in geen enkel account op dit apparaat gevonden. Mogelijk hoort deze bij een uitgelogd account.",
     "txLoadFailed": "Kan deze betaling niet laden. Controleer uw verbinding en probeer het opnieuw.",
-    "switchedForPayment": "Overgeschakeld naar {identifier: string} om deze betaling te tonen"
+    "switchedForPayment": "Overgeschakeld naar {identifier: string} om deze betaling te tonen",
+    "depositFee": "Stortingskosten",
+    "time": "Tijd",
+    "transactionId": "Transactie-ID",
+    "hash": "Hash",
+    "blinkInternalId": "Interne Blink-ID",
+    "receivedTo": "Ontvangen op",
+    "sentFrom": "Verzonden vanaf",
+    "addCustomNote": "Eigen notitie toevoegen",
+    "openInExplorer": "Openen in explorer",
+    "openInDecoder": "Openen in decoder",
+    "sparkTransferId": "Spark-transfer-ID",
+    "sender": "Afzender",
+    "recipient": "Ontvanger",
+    "bitcoinAddress": "Bitcoin-adres"
   },
   "FeeRatesScreen": {
     "title": "Kostentarieven",
@@ -4195,12 +4206,12 @@
     "title": "Dit is een niet-bewaarde rekening",
     "body": "Lees ons blogbericht voor meer informatie",
     "cta": "Lezen"
-    },
+  },
   "StaleCloudBundleBulletin": {
     "title": "Werk je cloudback-up bij",
     "body": "Je noodbundel in {provider} is verouderd. Maak opnieuw een back-up van je portemonnee om hem bij te werken.",
     "cta": "Opnieuw back-up maken"
-    },
+  },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Nog geen noodbundel. Die wordt gemaakt na je eerste transactie.",
     "exportFailed": "Kan de noodbundel niet downloaden."

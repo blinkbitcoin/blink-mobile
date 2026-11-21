@@ -8868,10 +8868,6 @@ type RootTranslation = {
 	}
 	TransactionDetailScreen: {
 		/**
-		 * P​a​i​d​ ​t​o​/​f​r​o​m
-		 */
-		paid: string
-		/**
 		 * Y​o​u​ ​r​e​c​e​i​v​e​d
 		 */
 		received: string
@@ -8883,14 +8879,6 @@ type RootTranslation = {
 		 * S​e​n​d​i​n​g
 		 */
 		sending: string
-		/**
-		 * R​e​c​e​i​v​i​n​g​ ​B​a​l​a​n​c​e
-		 */
-		receivingAccount: string
-		/**
-		 * S​e​n​d​i​n​g​ ​B​a​l​a​n​c​e
-		 */
-		sendingAccount: string
 		/**
 		 * Y​o​u​r​ ​t​r​a​n​s​a​c​t​i​o​n​ ​i​s​ ​q​u​e​u​e​d​.​ ​I​t​ ​s​h​o​u​l​d​ ​a​p​p​e​a​r​ ​i​n​ ​t​h​e​ ​m​e​m​p​o​o​l​ ​{​c​o​u​n​t​d​o​w​n​}​.
 		 * @param {string} countdown
@@ -8917,6 +8905,62 @@ type RootTranslation = {
 		 * @param {string} identifier
 		 */
 		switchedForPayment: RequiredParams<'identifier'>
+		/**
+		 * D​e​p​o​s​i​t​ ​f​e​e
+		 */
+		depositFee: string
+		/**
+		 * T​i​m​e
+		 */
+		time: string
+		/**
+		 * T​r​a​n​s​a​c​t​i​o​n​ ​I​D
+		 */
+		transactionId: string
+		/**
+		 * H​a​s​h
+		 */
+		hash: string
+		/**
+		 * B​l​i​n​k​ ​i​n​t​e​r​n​a​l​ ​I​D
+		 */
+		blinkInternalId: string
+		/**
+		 * R​e​c​e​i​v​e​d​ ​t​o
+		 */
+		receivedTo: string
+		/**
+		 * S​e​n​t​ ​f​r​o​m
+		 */
+		sentFrom: string
+		/**
+		 * A​d​d​ ​c​u​s​t​o​m​ ​n​o​t​e
+		 */
+		addCustomNote: string
+		/**
+		 * O​p​e​n​ ​i​n​ ​e​x​p​l​o​r​e​r
+		 */
+		openInExplorer: string
+		/**
+		 * O​p​e​n​ ​i​n​ ​d​e​c​o​d​e​r
+		 */
+		openInDecoder: string
+		/**
+		 * S​p​a​r​k​ ​t​r​a​n​s​f​e​r​ ​I​D
+		 */
+		sparkTransferId: string
+		/**
+		 * S​e​n​d​e​r
+		 */
+		sender: string
+		/**
+		 * R​e​c​i​p​i​e​n​t
+		 */
+		recipient: string
+		/**
+		 * B​i​t​c​o​i​n​ ​a​d​d​r​e​s​s
+		 */
+		bitcoinAddress: string
 	}
 	FeeRatesScreen: {
 		/**
@@ -23206,10 +23250,6 @@ export type TranslationFunctions = {
 	}
 	TransactionDetailScreen: {
 		/**
-		 * Paid to/from
-		 */
-		paid: () => LocalizedString
-		/**
 		 * You received
 		 */
 		received: () => LocalizedString
@@ -23221,14 +23261,6 @@ export type TranslationFunctions = {
 		 * Sending
 		 */
 		sending: () => LocalizedString
-		/**
-		 * Receiving Balance
-		 */
-		receivingAccount: () => LocalizedString
-		/**
-		 * Sending Balance
-		 */
-		sendingAccount: () => LocalizedString
 		/**
 		 * Your transaction is queued. It should appear in the mempool {countdown}.
 		 */
@@ -23253,6 +23285,62 @@ export type TranslationFunctions = {
 		 * Switched to {identifier} to show this payment
 		 */
 		switchedForPayment: (arg: { identifier: string }) => LocalizedString
+		/**
+		 * Deposit fee
+		 */
+		depositFee: () => LocalizedString
+		/**
+		 * Time
+		 */
+		time: () => LocalizedString
+		/**
+		 * Transaction ID
+		 */
+		transactionId: () => LocalizedString
+		/**
+		 * Hash
+		 */
+		hash: () => LocalizedString
+		/**
+		 * Blink internal ID
+		 */
+		blinkInternalId: () => LocalizedString
+		/**
+		 * Received to
+		 */
+		receivedTo: () => LocalizedString
+		/**
+		 * Sent from
+		 */
+		sentFrom: () => LocalizedString
+		/**
+		 * Add custom note
+		 */
+		addCustomNote: () => LocalizedString
+		/**
+		 * Open in explorer
+		 */
+		openInExplorer: () => LocalizedString
+		/**
+		 * Open in decoder
+		 */
+		openInDecoder: () => LocalizedString
+		/**
+		 * Spark transfer ID
+		 */
+		sparkTransferId: () => LocalizedString
+		/**
+		 * Sender
+		 */
+		sender: () => LocalizedString
+		/**
+		 * Recipient
+		 */
+		recipient: () => LocalizedString
+		/**
+		 * Bitcoin address
+		 */
+		bitcoinAddress: () => LocalizedString
 	}
 	FeeRatesScreen: {
 		/**

@@ -1,5 +1,5 @@
 import React from "react"
-import { TouchableOpacity } from "react-native"
+import { StyleProp, TouchableOpacity, ViewStyle } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -13,6 +13,8 @@ type IconTextButtonProps = {
   onPress: () => void
   iconColor?: string
   textColor?: string
+  /** Merged over the container, e.g. Figma `button-field`'s radius and padding. */
+  style?: StyleProp<ViewStyle>
 }
 
 export const IconTextButton: React.FC<IconTextButtonProps> = ({
@@ -21,6 +23,7 @@ export const IconTextButton: React.FC<IconTextButtonProps> = ({
   onPress,
   iconColor,
   textColor,
+  style,
 }) => {
   const {
     theme: { colors },
@@ -32,7 +35,7 @@ export const IconTextButton: React.FC<IconTextButtonProps> = ({
 
   return (
     <TouchableOpacity
-      style={styles.container}
+      style={[styles.container, style]}
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={label}

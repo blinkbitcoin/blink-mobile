@@ -7,7 +7,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
-import { GaloyIcon } from "../atomic/galoy-icon"
+import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 
 export type NoteInputProps = {
   onBlur?: (() => void) | undefined
@@ -18,6 +18,12 @@ export type NoteInputProps = {
   big?: boolean
   iconSize?: number
   fontSize?: number
+  /** Replaces "Add note" as both the placeholder and the field's accessibility label. */
+  placeholder?: string
+  /** Defaults to textOnBackground. */
+  placeholderTextColor?: string
+  maxLength?: number
+  icon?: IconNamesType
 }
 
 export const NoteInput: React.FC<NoteInputProps> = ({
@@ -29,8 +35,13 @@ export const NoteInput: React.FC<NoteInputProps> = ({
   big = true,
   iconSize = 18,
   fontSize = 16,
+  placeholder,
+  placeholderTextColor,
+  maxLength = 500,
+  icon = "note",
 }) => {
   const { LL } = useI18nContext()
+  const label = placeholder ?? LL.NoteInput.addNote()
   const styles = useStyles({ editable: Boolean(editable), big })
   const {
     theme: { colors },
@@ -48,19 +59,20 @@ export const NoteInput: React.FC<NoteInputProps> = ({
         <TextInput
           maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           {...testProps("add-note")}
+          accessibilityLabel={label}
           style={[styles.noteInput, { fontSize }]}
-          placeholder={LL.NoteInput.addNote()}
-          placeholderTextColor={colors.textOnBackground}
+          placeholder={label}
+          placeholderTextColor={placeholderTextColor ?? colors.textOnBackground}
           onChangeText={onChangeText}
           onBlur={onBlur}
           value={value}
           editable={editable}
           selectTextOnFocus
-          maxLength={500}
+          maxLength={maxLength}
           ref={textInputRef}
         />
         <TouchableOpacity style={styles.noteIconContainer} onPress={focusTextInput}>
-          <GaloyIcon name={"note"} size={iconSize} color={colors.accent} />
+          <GaloyIcon name={icon} size={iconSize} color={colors.accent} />
         </TouchableOpacity>
       </View>
     </View>

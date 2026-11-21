@@ -2685,18 +2685,29 @@
     "update": "แอปของคุณเป็นเวอร์ชั่นที่เก่าเกินไป จะต้องอัพเดทก่อนจึงจะใช้งานได้\n\nหากใช้แอนดรอยด์ คุณสามารถอัพเดทได้ที่ PlayStore หรือหากใช้ iOS สามารถอัพเดทได้ที่ Testflight"
   },
   "TransactionDetailScreen": {
-    "paid": "จ่ายเงินให้/มาจาก",
     "received": "คุณได้รับ",
     "sent": "คุณได้ส่ง",
     "sending": "กำลังส่ง",
-    "receivingAccount": "Receiving Account",
-    "sendingAccount": "Sending Account",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
     "momentarily": "ในอีกสักครู่",
     "findingAccount": "กำลังค้นหาบัญชีของการชำระเงินนี้...",
     "txNotFoundInAccounts": "ไม่พบการชำระเงินนี้ในบัญชีใด ๆ บนอุปกรณ์นี้ อาจเป็นของบัญชีที่ออกจากระบบไปแล้ว",
     "txLoadFailed": "ไม่สามารถโหลดการชำระเงินนี้ได้ ตรวจสอบการเชื่อมต่อของคุณแล้วลองอีกครั้ง",
-    "switchedForPayment": "สลับไปที่ {identifier: string} เพื่อแสดงการชำระเงินนี้"
+    "switchedForPayment": "สลับไปที่ {identifier: string} เพื่อแสดงการชำระเงินนี้",
+    "depositFee": "ค่าธรรมเนียมการฝาก",
+    "time": "เวลา",
+    "transactionId": "รหัสธุรกรรม",
+    "hash": "แฮช",
+    "blinkInternalId": "รหัสภายในของ Blink",
+    "receivedTo": "รับเข้า",
+    "sentFrom": "ส่งจาก",
+    "addCustomNote": "เพิ่มบันทึกส่วนตัว",
+    "openInExplorer": "เปิดใน Explorer",
+    "openInDecoder": "เปิดในตัวถอดรหัส",
+    "sparkTransferId": "รหัสการโอน Spark",
+    "sender": "ผู้ส่ง",
+    "recipient": "ผู้รับ",
+    "bitcoinAddress": "แอดเดรสบิตคอยน์"
   },
   "FeeRatesScreen": {
     "title": "อัตราค่าธรรมเนียม",
@@ -4195,12 +4206,12 @@
     "title": "นี่คือบัญชีแบบไม่ฝากดูแล",
     "body": "อ่านบล็อกโพสต์ของเราเพื่อเรียนรู้เพิ่มเติม",
     "cta": "อ่าน"
-    },
+  },
   "StaleCloudBundleBulletin": {
     "title": "อัปเดตข้อมูลสำรองบนคลาวด์",
     "body": "ชุดข้อมูลฉุกเฉินของคุณใน {provider} ไม่เป็นปัจจุบัน สำรองข้อมูลกระเป๋าเงินอีกครั้งเพื่ออัปเดต",
     "cta": "สำรองข้อมูลอีกครั้ง"
-    },
+  },
   "RecoveryBundleScreen": {
     "noBundleToExport": "ยังไม่มีชุดข้อมูลฉุกเฉิน ระบบจะสร้างหลังจากธุรกรรมแรกของคุณ",
     "exportFailed": "ไม่สามารถดาวน์โหลดชุดข้อมูลฉุกเฉินได้"

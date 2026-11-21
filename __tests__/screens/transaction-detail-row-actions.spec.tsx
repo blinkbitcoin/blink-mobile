@@ -16,10 +16,12 @@ jest.mock("react-native-safe-area-context", () =>
 jest.mock("@app/components/screen", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockScreen(),
 )
-// IconAction renders a GaloyIconButton; the shared mock reduces it to a plain
-// Pressable so the explorer / copy icons can be pressed by testID.
+// The close button is a GaloyIconButton; the shared mock reduces it to a plain Pressable.
 jest.mock("@app/components/atomic/galoy-icon-button", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockGaloyIconButton(),
+)
+jest.mock("@app/components/atomic/galoy-primary-button", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockGaloyPrimaryButton(),
 )
 jest.mock("@app/graphql/generated", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockGeneratedGraphql(),
@@ -41,14 +43,16 @@ jest.mock("@app/components/wallet-summary", () => ({
 
 jest.mock("@app/components/transaction-date", () => ({
   TransactionDate: () => null,
+  formatDateForTransaction: () => "24 Jul 2024, 06:26",
 }))
 
 jest.mock("@app/components/atomic/galoy-info", () => ({
   GaloyInfo: () => null,
 }))
 
+let mockDescription = "some description"
 jest.mock("@app/components/transaction-item", () => ({
-  useDescriptionDisplay: () => "some description",
+  useDescriptionDisplay: () => mockDescription,
 }))
 
 // These specs always render with a populated fragment; the multi-account
@@ -70,8 +74,9 @@ jest.mock("@app/hooks", () =>
     .mockAppHooks({ getCopyToClipboard: () => mockCopyToClipboard }),
 )
 
+let mockIsSelfCustodial = false
 jest.mock("@app/hooks/use-active-wallet", () => ({
-  useActiveWallet: () => ({ isSelfCustodial: false, wallets: [] }),
+  useActiveWallet: () => ({ isSelfCustodial: mockIsSelfCustodial, wallets: [] }),
 }))
 
 const mockNoTransactions: unknown[] = []
@@ -83,8 +88,22 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({ allTransactions: mockNoTransactions }),
 }))
 
+// Rows are found by their label, so the labels the spec presses get a copy.
 jest.mock("@app/i18n/i18n-react", () =>
-  jest.requireActual("../helpers/transaction-detail-mocks").mockI18n(),
+  jest.requireActual("../helpers/transaction-detail-mocks").mockI18n({
+    "common.advanced": "advanced",
+    "common.note": "note",
+    "common.preimageProofOfPayment": "preimage",
+    "common.paymentRequest": "payment-request",
+    "TransactionDetailScreen.transactionId": "transaction-id",
+    "TransactionDetailScreen.hash": "hash",
+    "TransactionDetailScreen.blinkInternalId": "internal-id",
+    "TransactionDetailScreen.sparkTransferId": "spark-transfer-id",
+    "TransactionDetailScreen.openInExplorer": "open-in-explorer",
+    "TransactionDetailScreen.openInDecoder": "open-in-decoder",
+    "TransactionDetailScreen.bitcoinAddress": "bitcoin-address",
+    "TransactionDetailScreen.recipient": "recipient",
+  }),
 )
 
 const ONCHAIN_TX_HASH = "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"
@@ -93,6 +112,7 @@ const LN_PAYMENT_HASH = "0001020304050607080900010203040506070809000102030405060
 const LN_PRE_IMAGE = "6bb1e9a3bf6bcbe27a0c1f3a4b7a6a3b4b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e"
 const LN_PAYMENT_REQUEST = "lnbc10u1p0example000payment000request000string"
 const TX_ID = "tx-1"
+const ONCHAIN_ADDRESS = "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq"
 
 const baseTx = {
   __typename: "Transaction",
@@ -108,7 +128,7 @@ const baseTx = {
   settlementDisplayCurrency: "USD",
 }
 
-const broadcastedOnChainTx = (transactionHash: string) => ({
+const broadcastedOnChainTx = (transactionHash: string, address = "") => ({
   data: {
     ...baseTx,
     settlementVia: {
@@ -116,9 +136,26 @@ const broadcastedOnChainTx = (transactionHash: string) => ({
       transactionHash,
       arrivalInMempoolEstimatedAt: null,
     },
-    initiationVia: { __typename: "InitiationViaOnChain", address: "" },
+    initiationVia: { __typename: "InitiationViaOnChain", address },
   },
 })
+
+const intraLedgerTx = {
+  data: {
+    ...baseTx,
+    settlementVia: {
+      __typename: "SettlementViaIntraLedger",
+      counterPartyUsername: "alice",
+      counterPartyWalletId: "wallet-alice",
+      preImage: null,
+    },
+    initiationVia: {
+      __typename: "InitiationViaIntraLedger",
+      counterPartyUsername: "alice",
+      counterPartyWalletId: "wallet-alice",
+    },
+  },
+}
 
 const lightningTx = {
   data: {
@@ -146,80 +183,159 @@ const renderScreenWithTx = (tx: unknown) => {
 const copiedContents = () =>
   mockCopyToClipboard.mock.calls.map(([{ content }]) => content)
 
-// Regression guards for the #3732 / #3898 icon-row rework: every copy /
-// open-in-explorer icon on the detail rows must fire its handler with the
-// right payload when tapped.
-describe("TransactionDetailScreen row icon actions", () => {
+// Every Advanced row copies when tapped anywhere on it; its copy icon is only the cue.
+// Note and Sender/Recipient copy the same way, without an icon.
+// One button under the Advanced card opens the payment: the Bitcoin transaction on
+// the block explorer, else the Spark transfer on sparkscan, else the invoice in the
+// Lightning decoder.
+describe("TransactionDetailScreen row actions", () => {
   const openURLSpy = jest.spyOn(Linking, "openURL").mockResolvedValue(undefined)
 
   beforeEach(() => {
     openURLSpy.mockClear()
     mockCopyToClipboard.mockClear()
+    mockIsSelfCustodial = false
+    mockDescription = "some description"
   })
 
-  describe("broadcasted onchain transaction", () => {
-    it("opens the hex transaction hash on the block explorer", () => {
-      const { getByTestId } = renderScreenWithTx(broadcastedOnChainTx(ONCHAIN_TX_HASH))
+  const renderExpanded = (tx: unknown) => {
+    const screen = renderScreenWithTx(tx)
+    fireEvent.press(screen.getByTestId("advanced"))
+    return screen
+  }
 
-      fireEvent.press(getByTestId("arrow-square-out"))
+  describe("broadcasted onchain transaction", () => {
+    it("opens the transaction hash on the block explorer", () => {
+      const { getByLabelText } = renderExpanded(broadcastedOnChainTx(ONCHAIN_TX_HASH))
+
+      fireEvent.press(getByLabelText("open-in-explorer"))
 
       expect(openURLSpy).toHaveBeenCalledWith(
         "https://mempool.space/tx/" + ONCHAIN_TX_HASH,
       )
     })
 
-    it("opens a spark transaction (UUID hash with dashes) on the spark explorer", () => {
-      const { getByTestId } = renderScreenWithTx(broadcastedOnChainTx(SPARK_TX_ID))
+    it("copies the transaction hash and internal id when their rows are tapped", () => {
+      const { getByTestId } = renderExpanded(broadcastedOnChainTx(ONCHAIN_TX_HASH))
 
-      fireEvent.press(getByTestId("arrow-square-out"))
+      fireEvent.press(getByTestId("transaction-id"))
+      fireEvent.press(getByTestId("internal-id"))
 
-      expect(openURLSpy).toHaveBeenCalledWith("https://sparkscan.io/tx/" + SPARK_TX_ID)
+      expect(copiedContents()).toEqual([ONCHAIN_TX_HASH, TX_ID])
+      expect(openURLSpy).not.toHaveBeenCalled()
     })
 
-    it("copies the transaction hash, description and internal id", () => {
-      const { getAllByTestId } = renderScreenWithTx(broadcastedOnChainTx(ONCHAIN_TX_HASH))
+    it("keeps each technical value on one line, cut in the middle", () => {
+      const { getByText } = renderExpanded(broadcastedOnChainTx(ONCHAIN_TX_HASH))
 
-      // rows in render order: transaction hash, description, Blink internal id
-      const copyIcons = getAllByTestId("copy-paste")
-      expect(copyIcons).toHaveLength(3)
-      copyIcons.forEach((icon) => fireEvent.press(icon))
+      const value = getByText(ONCHAIN_TX_HASH)
+      expect(value.props.numberOfLines).toBe(1)
+      expect(value.props.ellipsizeMode).toBe("middle")
+    })
 
-      expect(copiedContents()).toEqual([ONCHAIN_TX_HASH, "some description", TX_ID])
+    it("shows the Bitcoin address first and copies it from its row", () => {
+      const { getByTestId } = renderExpanded(
+        broadcastedOnChainTx(ONCHAIN_TX_HASH, ONCHAIN_ADDRESS),
+      )
+
+      fireEvent.press(getByTestId("bitcoin-address"))
+
+      expect(copiedContents()).toEqual([ONCHAIN_ADDRESS])
+    })
+
+    it("leaves the Bitcoin address out when the payment has none", () => {
+      const { queryByTestId } = renderExpanded(broadcastedOnChainTx(ONCHAIN_TX_HASH))
+
+      expect(queryByTestId("bitcoin-address")).toBeNull()
+    })
+
+    it("still copies the note when its row is tapped", () => {
+      const { getByTestId } = renderScreenWithTx(broadcastedOnChainTx(ONCHAIN_TX_HASH))
+
+      fireEvent.press(getByTestId("note"))
+
+      expect(copiedContents()).toEqual(["some description"])
+    })
+
+    it("shows a dash for a payment without a note, and copies nothing", () => {
+      mockDescription = ""
+      const { getByTestId, getByText } = renderScreenWithTx(
+        broadcastedOnChainTx(ONCHAIN_TX_HASH),
+      )
+
+      expect(getByText("-")).toBeTruthy()
+      fireEvent.press(getByTestId("note"))
+
+      expect(copiedContents()).toEqual([])
+    })
+  })
+
+  describe("self-custodial onchain transaction", () => {
+    it("shows the Spark transfer ID and opens it on sparkscan", () => {
+      mockIsSelfCustodial = true
+      const { getByLabelText, getByTestId, queryByTestId } = renderExpanded(
+        broadcastedOnChainTx(SPARK_TX_ID),
+      )
+
+      expect(queryByTestId("transaction-id")).toBeNull()
+      expect(queryByTestId("internal-id")).toBeNull()
+      fireEvent.press(getByTestId("spark-transfer-id"))
+      fireEvent.press(getByLabelText("open-in-explorer"))
+
+      expect(copiedContents()).toEqual([SPARK_TX_ID])
+      expect(openURLSpy).toHaveBeenCalledWith("https://sparkscan.io/tx/" + SPARK_TX_ID)
     })
   })
 
   describe("lightning transaction", () => {
     it("opens the payment request in the lightning decoder", () => {
-      const { getByTestId } = renderScreenWithTx(lightningTx)
+      const { getByLabelText, queryByLabelText } = renderExpanded(lightningTx)
 
-      fireEvent.press(getByTestId("arrow-square-out"))
+      expect(queryByLabelText("open-in-explorer")).toBeNull()
+      fireEvent.press(getByLabelText("open-in-decoder"))
 
       expect(openURLSpy).toHaveBeenCalledWith(
         "https://dev.blink.sv/decode?invoice=" + LN_PAYMENT_REQUEST,
       )
     })
 
-    it("copies description, payment hash, preimage, payment request and internal id", () => {
-      const { getAllByTestId } = renderScreenWithTx(lightningTx)
+    it("copies payment hash, preimage, payment request and internal id", () => {
+      const { getByTestId } = renderExpanded(lightningTx)
 
-      // rows in render order: description, hash, preimage, payment request,
-      // Blink internal id
-      const copyIcons = getAllByTestId("copy-paste")
-      expect(copyIcons).toHaveLength(5)
-      copyIcons.forEach((icon) => fireEvent.press(icon))
+      fireEvent.press(getByTestId("hash"))
+      fireEvent.press(getByTestId("preimage"))
+      fireEvent.press(getByTestId("payment-request"))
+      fireEvent.press(getByTestId("internal-id"))
 
       expect(copiedContents()).toEqual([
-        "some description",
         LN_PAYMENT_HASH,
         LN_PRE_IMAGE,
         LN_PAYMENT_REQUEST,
         TX_ID,
       ])
+      expect(openURLSpy).not.toHaveBeenCalled()
+    })
+
+    it("keeps the technical rows folded away until Advanced is opened", () => {
+      const { queryByTestId } = renderScreenWithTx(lightningTx)
+
+      expect(queryByTestId("hash")).toBeNull()
+      expect(queryByTestId("payment-request")).toBeNull()
     })
   })
 
   // A row with a copy or explorer icon is a press target, so it keeps the tappable
   // surfaceInteractive; a row with nothing to press takes the surfaceStatic (blink-wip#1871).
+  describe("intraledger transaction", () => {
+    it("copies the recipient's username when its row is tapped", () => {
+      const { getByTestId } = renderScreenWithTx(intraLedgerTx)
+
+      fireEvent.press(getByTestId("recipient"))
+
+      expect(copiedContents()).toEqual(["alice"])
+    })
+  })
+
   describe("row surface", () => {
     it("keeps the copy rows surfaceInteractive and paints a row without icons surfaceStatic", () => {
       const { getAllByTestId, getByText } = renderScreenWithTx(

@@ -2685,18 +2685,29 @@
         "update": "L'applicazione è obsoleta. È necessario un aggiornamento prima di poter utilizzare l'app.\n\nL'aggiornamento può essere effettuato dal PlayStore per Android e da Testflight per iOS."
     },
     "TransactionDetailScreen": {
-        "paid": "Pagato a/da",
         "received": "Hai ricevuto",
         "sent": "Hai inviato",
         "sending": "Invio",
-        "receivingAccount": "Conto di ricezione",
-        "sendingAccount": "Invio dell'account",
         "txNotBroadcast": "La tua transazione è in coda. Dovrebbe apparire nel mempool {countdown: string}.",
         "momentarily": "momentaneamente",
         "findingAccount": "Ricerca dell'account per questo pagamento...",
         "txNotFoundInAccounts": "Questo pagamento non è stato trovato in nessun account su questo dispositivo. Potrebbe appartenere a un account disconnesso.",
         "txLoadFailed": "Impossibile caricare questo pagamento. Controlla la connessione e riprova.",
-        "switchedForPayment": "Passato a {identifier: string} per mostrare questo pagamento"
+        "switchedForPayment": "Passato a {identifier: string} per mostrare questo pagamento",
+        "depositFee": "Commissione di deposito",
+        "time": "Ora",
+        "transactionId": "ID transazione",
+        "hash": "Hash",
+        "blinkInternalId": "ID interno Blink",
+        "receivedTo": "Ricevuto su",
+        "sentFrom": "Inviato da",
+        "addCustomNote": "Aggiungi una nota personale",
+        "openInExplorer": "Apri nell'explorer",
+        "openInDecoder": "Apri nel decoder",
+        "sparkTransferId": "ID trasferimento Spark",
+        "sender": "Mittente",
+        "recipient": "Destinatario",
+        "bitcoinAddress": "Indirizzo Bitcoin"
     },
     "FeeRatesScreen": {
         "title": "Tariffe delle commissioni",

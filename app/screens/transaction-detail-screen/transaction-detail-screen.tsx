@@ -1,18 +1,19 @@
 import * as React from "react"
-import { ActivityIndicator, Linking, Pressable, View } from "react-native"
+import { ActivityIndicator, Linking, Pressable, StyleSheet, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { ScrollView } from "react-native-gesture-handler"
+import { type ViewShotRef } from "react-native-view-shot"
 import { useFragment } from "@apollo/client"
-import { radius } from "@app/rne-theme/radius"
-import { IconNamesType } from "@app/components/atomic/galoy-icon"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyInfo } from "@app/components/atomic/galoy-info"
+import { IconTextButton } from "@app/components/icon-text-button"
 import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
+import { NoteInput } from "@app/components/note-input"
 import { TransactionDate } from "@app/components/transaction-date"
 import { useDescriptionDisplay } from "@app/components/transaction-item"
 import { DeepPartialObject } from "@app/components/transaction-item/index.types"
-import { WalletSummary } from "@app/components/wallet-summary"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useResolveTransactionAccount } from "@app/hooks/use-resolve-transaction-account"
 import {
@@ -25,6 +26,7 @@ import {
 } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useAppConfig, useClipboard, useTransactionSeenState } from "@app/hooks"
+import { useScreenshot } from "@app/hooks/use-screenshot"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialTransactionFragments } from "@app/self-custodial/hooks/use-self-custodial-transaction-fragments"
@@ -33,70 +35,63 @@ import { toWalletAmount } from "@app/types/amounts"
 import { NO_TRANSACTIONS, PaymentType } from "@app/types/transaction"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { makeStyles, Text } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { PaymentType as ReceiptPaymentType } from "@blinkbitcoin/blink-client"
 
-import { IconTransaction } from "@app/components/icon-transactions"
 import { Screen } from "@app/components/screen"
+import { radius } from "@app/rne-theme/radius"
 import { staticSurface } from "@app/rne-theme/surfaces"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
+import { ellipsizeMiddle } from "@app/utils/helper"
+import { testProps } from "@app/utils/testProps"
 import { formatTimeToMempool, timeToMempool } from "./format-time"
-import { groupTitleGap } from "@app/rne-theme/tokens"
+import { TransactionReceipt } from "./transaction-receipt"
 
-// Tappable icon action used in the detail rows (copy / open-in-explorer).
-// Built on GaloyIconButton (a Pressable) so taps register inside the
-// gesture-handler ScrollView and the icon gets pressed-state feedback —
-// unlike the previous TouchableWithoutFeedback, whose injected responder
-// props were dropped by GaloyIcon (regressed in #3703, see #3732).
-export const IconAction = ({
-  name,
-  onPress,
-}: {
-  name: IconNamesType
-  onPress: () => void
-}) => <GaloyIconButton name={name} size={22} iconOnly onPress={onPress} />
+type RowProps = {
+  label: string
+  value?: string | null | JSX.Element
+  /** Tapping anywhere on the row copies its value. */
+  onCopy?: () => void
+  /**
+   * Hashes, invoices, IDs and addresses: a size down, on one line with the middle cut,
+   * and the copy icon after it. The copy still holds the whole value.
+   */
+  technical?: boolean
+}
 
-const Row = ({
-  entry,
-  value,
-  content,
-  icons = [],
-}: {
-  entry: string
-  value?: string | null | undefined | JSX.Element
-  content?: JSX.Element
-  icons?: JSX.Element[]
-}) => {
+/** A label/value line in a details card. */
+const Row = ({ label, value, onCopy, technical }: RowProps) => {
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
 
   return (
-    <View style={styles.description}>
-      <View style={styles.container}>
-        <Text style={styles.entry} selectable={false}>
-          {entry}
-        </Text>
-      </View>
-      {content ? (
-        content
-      ) : (
-        <View
-          style={[
-            styles.valueContainer,
-            icons.length === 0 && styles.valueContainerStatic,
-          ]}
-        >
-          <Text selectable={false} style={styles.value}>
-            {value}
-          </Text>
-          {icons.length > 0 && (
-            <View style={styles.valueIcons}>
-              {icons.map((icon, index) => (
-                <React.Fragment key={index}>{icon}</React.Fragment>
-              ))}
-            </View>
-          )}
-        </View>
-      )}
-    </View>
+    <Pressable
+      style={({ pressed }) => [
+        styles.row,
+        technical && styles.rowTechnical,
+        pressed && styles.rowPressed,
+      ]}
+      disabled={!onCopy}
+      onPress={onCopy}
+      accessibilityRole={onCopy ? "button" : undefined}
+      testID={label}
+    >
+      <Text type="p3" color={colors.textSecondary} style={styles.rowLabel}>
+        {label}
+      </Text>
+      <Text
+        type={technical ? "p4" : "p3"}
+        bold
+        style={styles.rowValue}
+        numberOfLines={technical ? 1 : undefined}
+        ellipsizeMode={technical ? "middle" : undefined}
+      >
+        {value}
+      </Text>
+      {technical ? <GaloyIcon name="copy-paste" size={14} color={colors.accent} /> : null}
+    </Pressable>
   )
 }
 
@@ -126,9 +121,22 @@ type Props = {
   route: RouteProp<RootStackParamList, "transactionDetail">
 }
 
+const CUSTOM_LABEL_MAX_LENGTH = 140
+const LIGHTNING_DECODER_URL = "https://dev.blink.sv/decode?invoice="
+const EMPTY_VALUE = "-"
+
 export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
   const insets = useSafeAreaInsets()
+
+  const viewRef = React.useRef<ViewShotRef>(null)
+  const { isTakingScreenshot, captureAndShare } = useScreenshot(viewRef)
+  // Not saved yet: the label lives only while the screen is open
+  const [customLabel, setCustomLabel] = React.useState("")
+  const [advancedOpen, setAdvancedOpen] = React.useState(false)
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { hideAmount, toggleHideAmount } = useHideAmount()
@@ -140,17 +148,8 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
 
   const { data: homeData } = useHomeAuthedQuery({ fetchPolicy: "cache-only" })
 
-  const viewInExplorer = (hash: string): Promise<Linking> => {
-    if (hash.includes("-")) {
-      // if the "hash" contains a dash then it's actually a UUID from spark
-      return Linking.openURL(galoyInstance.sparkExplorer + hash)
-    }
-
-    return Linking.openURL(galoyInstance.blockExplorer + hash)
-  }
-
   const viewInLightningDecoder = (invoice: string): Promise<Linking> =>
-    Linking.openURL("https://dev.blink.sv/decode?invoice=" + invoice)
+    Linking.openURL(LIGHTNING_DECODER_URL + invoice)
 
   const { data: tx } = useFragment<TransactionFragment>({
     fragment: TransactionFragmentDoc,
@@ -284,6 +283,20 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
         <View style={[styles.outerContainer, { paddingBottom: insets.bottom }]}>
           <View style={[styles.amountDetailsContainer, { paddingTop: insets.top }]}>
             <View accessible={false} style={styles.closeIconContainer}>
+              <Pressable
+                {...testProps("transaction-detail-back")}
+                style={styles.backButton}
+                onPress={navigation.goBack}
+                accessibilityRole="button"
+                accessibilityLabel={LL.common.back()}
+              >
+                <GaloyIcon
+                  name="arrow-left"
+                  size={24}
+                  weight="bold"
+                  color={colors.textOnBackground}
+                />
+              </Pressable>
               <GaloyIconButton
                 name="close"
                 onPress={navigation.goBack}
@@ -349,12 +362,22 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
 
   const isReceive = tx.direction === "RECEIVE"
 
-  const walletCurrency = settlementCurrency as WalletCurrency
-
   const displayAmount = formatCurrency({
-    amountInMajorUnits: settlementDisplayAmount,
+    amountInMajorUnits: Math.abs(Number(settlementDisplayAmount)),
     currency: settlementDisplayCurrency,
+    withSign: false,
   })
+
+  // What moved in the wallet's own currency
+  const walletAmount = formatMoneyAmount({
+    moneyAmount: toWalletAmount({
+      amount: Math.abs(settlementAmount),
+      currency: settlementCurrency,
+    }),
+  })
+  // The hero's second line, only when the wallet currency isn't the display currency
+  const secondaryAmount =
+    settlementDisplayCurrency === settlementCurrency ? undefined : walletAmount
 
   const formattedPrimaryFeeAmount = formatCurrency({
     amountInMajorUnits: settlementDisplayFee,
@@ -377,17 +400,10 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   const formattedFeeText =
     formattedPrimaryFeeAmount +
     (formattedSecondaryFeeAmount ? ` (${formattedSecondaryFeeAmount})` : ``)
-  const Wallet = (
-    <WalletSummary
-      amountType={isReceive ? "RECEIVE" : "SEND"}
-      settlementAmount={toWalletAmount({
-        amount: Math.abs(settlementAmount),
-        currency: settlementCurrency,
-      })}
-      txDisplayAmount={settlementDisplayAmount}
-      txDisplayCurrency={settlementDisplayCurrency}
-    />
-  )
+
+  // Sends always show their fee; a receive only when it was charged one (on-chain deposits)
+  const feeLabel = isReceive ? LL.TransactionDetailScreen.depositFee() : LL.common.fees()
+  const showFee = !isReceive || settlementFee !== 0
 
   const handleCopyToClipboard = ({
     content,
@@ -402,6 +418,9 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
     })
   }
 
+  const copyRow = (type: string, content: string) => () =>
+    handleCopyToClipboard({ content, type })
+
   let spendOrReceiveText = ""
   if (isReceive) {
     spendOrReceiveText = LL.TransactionDetailScreen.received()
@@ -411,220 +430,363 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
     spendOrReceiveText = LL.TransactionDetailScreen.sent()
   }
 
+  const onChainHash =
+    onChainTxBroadcasted && "transactionHash" in settlementVia
+      ? settlementVia.transactionHash ?? ""
+      : ""
+  const lnPaymentHash =
+    initiationVia?.__typename === "InitiationViaLn" ? initiationVia.paymentHash : ""
+  const isSpark = selfCustodialPaymentType === PaymentType.Spark
+  // Self-custodial payments carry the Spark transfer UUID where custodial ones carry
+  // the hash: a Spark payment's payment hash, and an on-chain payment's transaction
+  // hash until the mapper keeps the Bitcoin txid.
+  const sparkTransferId = isSpark ? lnPaymentHash : isSelfCustodial ? onChainHash : ""
+  const transactionHash = isSelfCustodial ? "" : onChainHash
+  const paymentHash = isSpark ? "" : lnPaymentHash
+  const paymentRequest =
+    initiationVia?.__typename === "InitiationViaLn" ? initiationVia.paymentRequest : ""
+  const preImage =
+    (settlementVia?.__typename === "SettlementViaLn" ||
+      settlementVia?.__typename === "SettlementViaIntraLedger") &&
+    settlementVia.preImage
+      ? settlementVia.preImage
+      : ""
+  const counterParty =
+    settlementVia?.__typename === "SettlementViaIntraLedger"
+      ? settlementVia.counterPartyUsername || galoyInstance.name
+      : ""
+  const internalId = id && !isSelfCustodial ? id : ""
+  // Self-custodial payments carry no address on the fragment yet (blink-wip#2105)
+  const onChainAddress =
+    initiationVia?.__typename === "InitiationViaOnChain" ? initiationVia.address : ""
+  const typeText = typeDisplay(settlementVia, selfCustodialPaymentType)
+
+  // The shared receipt is the send receipt, filled from this transaction
+  const ellipsize = (value: string) =>
+    ellipsizeMiddle(value, { maxLength: 50, maxResultLeft: 13, maxResultRight: 8 })
+  const otherParty =
+    initiationVia?.__typename === "InitiationViaOnChain" && initiationVia.address
+      ? ellipsize(initiationVia.address)
+      : initiationVia?.__typename === "InitiationViaLn" && initiationVia.paymentRequest
+        ? ellipsize(initiationVia.paymentRequest)
+        : counterParty
+  const receiptPaymentType =
+    selfCustodialPaymentType === PaymentType.Spark
+      ? typeText
+      : settlementVia?.__typename === "SettlementViaOnChain"
+        ? ReceiptPaymentType.Onchain
+        : settlementVia?.__typename === "SettlementViaIntraLedger"
+          ? ReceiptPaymentType.Intraledger
+          : ReceiptPaymentType.Lightning
+
+  const hasAdvanced = Boolean(
+    onChainAddress ||
+      transactionHash ||
+      sparkTransferId ||
+      paymentHash ||
+      preImage ||
+      paymentRequest ||
+      internalId,
+  )
+
+  // The Bitcoin transaction first; a Spark transfer only when there is none
+  const explorerUrl = transactionHash
+    ? galoyInstance.blockExplorer + transactionHash
+    : sparkTransferId
+      ? galoyInstance.sparkExplorer + sparkTransferId
+      : ""
+
   return (
     <Screen unsafe preset="fixed">
-      <View style={[styles.outerContainer, { paddingBottom: insets.bottom }]}>
-        <View style={[styles.amountDetailsContainer, { paddingTop: insets.top }]}>
-          <View accessible={false} style={styles.closeIconContainer}>
-            <GaloyIconButton
-              name="close"
-              onPress={navigation.goBack}
-              iconOnly={true}
-              size={"large"}
-            />
-          </View>
-          <View style={styles.amountView}>
-            <IconTransaction
-              isReceive={isReceive}
-              walletCurrency={walletCurrency}
-              pending={false}
-              onChain={settlementVia?.__typename === "SettlementViaOnChain"}
-            />
-            {/* Pinned to one line: leaving it unbounded lets Android re-break
-                it after the first word on a re-layout, and since the container
-                height is already fixed by the first measure pass the wrapped
-                word lands outside it and is clipped — "You sent" silently
-                renders as "You". Shrink rather than ellipsize when the line
-                genuinely doesn't fit, so a long locale stays whole under
-                accessibility font scaling instead of losing its tail. */}
-            <Text type="h2" numberOfLines={1} adjustsFontSizeToFit>
-              {spendOrReceiveText}
-            </Text>
-            <Pressable hitSlop={10} onPress={toggleHideAmount}>
-              <View style={styles.amountWrapper}>
-                {hideAmount ? (
-                  <HiddenBalancePlaceholder size="small" />
-                ) : (
-                  <Text type="h1">{displayAmount}</Text>
-                )}
+      <View style={[styles.outerContainer, { paddingTop: insets.top }]}>
+        <ScrollView contentContainerStyle={styles.body}>
+          <View style={styles.section}>
+            <View style={styles.hero}>
+              <View style={styles.heroIcon}>
+                <GaloyIcon
+                  name={isReceive ? "receive" : "send"}
+                  size={32}
+                  color={colors.accent}
+                />
               </View>
-            </Pressable>
-          </View>
-        </View>
+              <View style={styles.heroText}>
+                {/* Pinned to one line: leaving it unbounded lets Android re-break
+                    it after the first word on a re-layout, and since the container
+                    height is already fixed by the first measure pass the wrapped
+                    word lands outside it and is clipped — "You sent" silently
+                    renders as "You". Shrink rather than ellipsize when the line
+                    genuinely doesn't fit, so a long locale stays whole under
+                    accessibility font scaling instead of losing its tail. */}
+                <Text
+                  type="p3"
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  style={styles.centered}
+                  testID="transaction-heading"
+                >
+                  {spendOrReceiveText}
+                </Text>
+                {/* Hiding keeps both amount lines laid out but invisible, with the
+                    placeholder drawn over them, so the hero is the same height either
+                    way at any font size and nothing below it moves. */}
+                <Pressable
+                  hitSlop={10}
+                  onPress={toggleHideAmount}
+                  style={styles.amounts}
+                  accessibilityRole="button"
+                >
+                  <View
+                    style={[styles.amounts, hideAmount && styles.invisible]}
+                    importantForAccessibility={
+                      hideAmount ? "no-hide-descendants" : "auto"
+                    }
+                    accessibilityElementsHidden={hideAmount}
+                  >
+                    <Text type="h1" bold style={styles.centered}>
+                      {displayAmount}
+                    </Text>
+                    {secondaryAmount ? (
+                      <Text type="p3" style={styles.centered}>
+                        {secondaryAmount}
+                      </Text>
+                    ) : null}
+                  </View>
+                  {hideAmount && (
+                    <View style={styles.hiddenOverlay}>
+                      <HiddenBalancePlaceholder size="small" />
+                    </View>
+                  )}
+                </Pressable>
+              </View>
+            </View>
 
-        <ScrollView contentContainerStyle={styles.transactionDetailView}>
-          {onChainTxNotBroadcasted && (
-            <View style={styles.txNotBroadcast}>
-              <GaloyInfo>
+            {onChainTxNotBroadcasted && (
+              <GaloyInfo backgroundColor={colors.surfaceStatic}>
                 {LL.TransactionDetailScreen.txNotBroadcast({ countdown })}
               </GaloyInfo>
-            </View>
-          )}
-          {onChainTxBroadcasted && (
-            <View>
+            )}
+
+            <View style={styles.card}>
               <Row
-                entry="Transaction Hash"
+                label={
+                  isReceive
+                    ? LL.TransactionDetailScreen.receivedTo()
+                    : LL.TransactionDetailScreen.sentFrom()
+                }
                 value={
-                  ("transactionHash" in settlementVia &&
-                    settlementVia?.transactionHash) ||
-                  ""
+                  settlementCurrency === WalletCurrency.Btc
+                    ? LL.common.btcAccount()
+                    : LL.common.usdAccount()
                 }
-                icons={[
-                  <IconAction
-                    key="explorer"
-                    name="arrow-square-out"
-                    onPress={() =>
-                      viewInExplorer(
-                        ("transactionHash" in settlementVia &&
-                          settlementVia?.transactionHash) ||
-                          "",
-                      )
-                    }
-                  />,
-                  <IconAction
-                    key="copy"
-                    name="copy-paste"
-                    onPress={() =>
-                      handleCopyToClipboard({
-                        content:
-                          ("transactionHash" in settlementVia &&
-                            settlementVia?.transactionHash) ||
-                          "",
-                        type: "Transaction Hash",
-                      })
-                    }
-                  />,
-                ]}
+              />
+              {showFee && <Row label={feeLabel} value={formattedFeeText} />}
+              <Row
+                label={LL.TransactionDetailScreen.time()}
+                value={
+                  <TransactionDate
+                    createdAt={createdAt}
+                    status={status}
+                    includeTime={true}
+                  />
+                }
+              />
+              <Row label={LL.common.type()} value={typeText} />
+              {counterParty ? (
+                <Row
+                  label={
+                    isReceive
+                      ? LL.TransactionDetailScreen.sender()
+                      : LL.TransactionDetailScreen.recipient()
+                  }
+                  value={counterParty}
+                  onCopy={copyRow(
+                    isReceive
+                      ? LL.TransactionDetailScreen.sender()
+                      : LL.TransactionDetailScreen.recipient(),
+                    counterParty,
+                  )}
+                />
+              ) : null}
+              {/* Always shown; a payment without a note reads "-" and copies nothing */}
+              <Row
+                label={LL.common.note()}
+                value={description || EMPTY_VALUE}
+                onCopy={description ? copyRow(LL.common.note(), description) : undefined}
               />
             </View>
-          )}
-          <Row
-            entry={
-              isReceive
-                ? LL.TransactionDetailScreen.receivingAccount()
-                : LL.TransactionDetailScreen.sendingAccount()
-            }
-            content={Wallet}
-          />
 
-          <Row
-            entry={LL.common.date()}
-            value={
-              <TransactionDate createdAt={createdAt} status={status} includeTime={true} />
-            }
-          />
-          {!isReceive && <Row entry={LL.common.fees()} value={formattedFeeText} />}
-          <Row
-            entry={LL.common.description()}
-            value={description}
-            icons={[
-              <IconAction
-                key="copy"
-                name="copy-paste"
-                onPress={() =>
-                  handleCopyToClipboard({
-                    content: description ?? "",
-                    type: LL.common.description(),
-                  })
-                }
-              />,
-            ]}
-          />
-          {settlementVia?.__typename === "SettlementViaIntraLedger" && (
-            <Row
-              entry={LL.TransactionDetailScreen.paid()}
-              value={settlementVia.counterPartyUsername || galoyInstance.name}
+            <NoteInput
+              value={customLabel}
+              onChangeText={setCustomLabel}
+              editable
+              big={false}
+              fontSize={14}
+              icon="pencil"
+              iconSize={16}
+              placeholder={LL.TransactionDetailScreen.addCustomNote()}
+              placeholderTextColor={colors.textMuted}
+              maxLength={CUSTOM_LABEL_MAX_LENGTH}
+              style={styles.labelField}
             />
-          )}
-          <Row
-            entry={LL.common.type()}
-            value={typeDisplay(settlementVia, selfCustodialPaymentType)}
-          />
-          {initiationVia?.__typename === "InitiationViaLn" &&
-            initiationVia?.paymentHash && (
-              <Row
-                entry="Hash"
-                value={initiationVia?.paymentHash}
-                icons={[
-                  <IconAction
-                    key="copy"
-                    name="copy-paste"
-                    onPress={() =>
-                      handleCopyToClipboard({
-                        content: initiationVia?.paymentHash ?? "",
-                        type: "Hash",
-                      })
-                    }
-                  />,
-                ]}
-              />
-            )}
+          </View>
 
-          {(settlementVia?.__typename === "SettlementViaLn" ||
-            settlementVia?.__typename === "SettlementViaIntraLedger") &&
-            settlementVia?.preImage && (
-              <Row
-                entry={LL.common.preimageProofOfPayment()}
-                value={settlementVia?.preImage}
-                icons={[
-                  <IconAction
-                    key="copy"
-                    name="copy-paste"
-                    onPress={() =>
-                      handleCopyToClipboard({
-                        content: settlementVia?.preImage ?? "",
-                        type: LL.common.preimageProofOfPayment(),
-                      })
-                    }
-                  />,
-                ]}
+          {hasAdvanced && (
+            <Pressable
+              style={styles.advancedToggle}
+              onPress={() => setAdvancedOpen((open) => !open)}
+              accessibilityRole="button"
+              accessibilityState={{ expanded: advancedOpen }}
+              {...testProps(LL.common.advanced())}
+            >
+              <GaloyIcon
+                name={advancedOpen ? "caret-down" : "caret-right"}
+                size={16}
+                color={colors.textOnBackground}
               />
-            )}
-          {initiationVia?.__typename === "InitiationViaLn" &&
-            initiationVia?.paymentRequest && (
-              <Row
-                entry={LL.common.paymentRequest()}
-                value={initiationVia?.paymentRequest}
-                icons={[
-                  <IconAction
-                    key="explorer"
-                    name="arrow-square-out"
-                    onPress={() =>
-                      viewInLightningDecoder(initiationVia?.paymentRequest ?? "")
-                    }
-                  />,
-                  <IconAction
-                    key="copy"
-                    name="copy-paste"
-                    onPress={() =>
-                      handleCopyToClipboard({
-                        content: initiationVia?.paymentRequest ?? "",
-                        type: LL.common.paymentRequest(),
-                      })
-                    }
-                  />,
-                ]}
-              />
-            )}
-          {id && !isSelfCustodial && (
-            <Row
-              entry="Blink Internal Id"
-              value={id}
-              icons={[
-                <IconAction
-                  key="copy"
-                  name="copy-paste"
-                  onPress={() =>
-                    handleCopyToClipboard({
-                      content: id,
-                      type: "Blink Internal Id",
-                    })
-                  }
-                />,
-              ]}
-            />
+              <Text type="p3">{LL.common.advanced()}</Text>
+            </Pressable>
+          )}
+
+          {hasAdvanced && advancedOpen && (
+            <>
+              <View style={styles.card}>
+                {onChainAddress ? (
+                  <Row
+                    technical
+                    label={LL.TransactionDetailScreen.bitcoinAddress()}
+                    value={onChainAddress}
+                    onCopy={copyRow(
+                      LL.TransactionDetailScreen.bitcoinAddress(),
+                      onChainAddress,
+                    )}
+                  />
+                ) : null}
+                {transactionHash ? (
+                  <Row
+                    technical
+                    label={LL.TransactionDetailScreen.transactionId()}
+                    value={transactionHash}
+                    onCopy={copyRow(
+                      LL.TransactionDetailScreen.transactionId(),
+                      transactionHash,
+                    )}
+                  />
+                ) : null}
+                {sparkTransferId ? (
+                  <Row
+                    technical
+                    label={LL.TransactionDetailScreen.sparkTransferId()}
+                    value={sparkTransferId}
+                    onCopy={copyRow(
+                      LL.TransactionDetailScreen.sparkTransferId(),
+                      sparkTransferId,
+                    )}
+                  />
+                ) : null}
+                {paymentHash ? (
+                  <Row
+                    technical
+                    label={LL.TransactionDetailScreen.hash()}
+                    value={paymentHash}
+                    onCopy={copyRow(LL.TransactionDetailScreen.hash(), paymentHash)}
+                  />
+                ) : null}
+                {preImage ? (
+                  <Row
+                    technical
+                    label={LL.common.preimageProofOfPayment()}
+                    value={preImage}
+                    onCopy={copyRow(LL.common.preimageProofOfPayment(), preImage)}
+                  />
+                ) : null}
+                {paymentRequest ? (
+                  <Row
+                    technical
+                    label={LL.common.paymentRequest()}
+                    value={paymentRequest}
+                    onCopy={copyRow(LL.common.paymentRequest(), paymentRequest)}
+                  />
+                ) : null}
+                {internalId ? (
+                  <Row
+                    technical
+                    label={LL.TransactionDetailScreen.blinkInternalId()}
+                    value={internalId}
+                    onCopy={copyRow(
+                      LL.TransactionDetailScreen.blinkInternalId(),
+                      internalId,
+                    )}
+                  />
+                ) : null}
+              </View>
+              {explorerUrl ? (
+                <IconTextButton
+                  icon="arrow-square-out"
+                  label={LL.TransactionDetailScreen.openInExplorer()}
+                  onPress={() => Linking.openURL(explorerUrl)}
+                  style={styles.linkButton}
+                />
+              ) : paymentRequest ? (
+                <IconTextButton
+                  icon="arrow-square-out"
+                  label={LL.TransactionDetailScreen.openInDecoder()}
+                  onPress={() => viewInLightningDecoder(paymentRequest)}
+                  style={styles.linkButton}
+                />
+              ) : null}
+            </>
           )}
         </ScrollView>
+
+        <View style={[styles.buttonGroup, { paddingBottom: 20 + insets.bottom }]}>
+          <GaloyPrimaryButton
+            title={LL.common.share()}
+            onPress={captureAndShare}
+            loading={isTakingScreenshot}
+          />
+        </View>
+
+        {/* What Share captures: the send receipt, drawn off screen at the size of the
+            screen and only while the capture runs. */}
+        {isTakingScreenshot && (
+          <TransactionReceipt
+            ref={viewRef}
+            isReceive={isReceive}
+            currencyAmount={displayAmount}
+            satAmount={secondaryAmount}
+            currencyFeeAmount={showFee ? formattedPrimaryFeeAmount : undefined}
+            satFeeAmount={showFee ? formattedSecondaryFeeAmount : undefined}
+            counterParty={otherParty}
+            createdAt={createdAt}
+            paymentType={receiptPaymentType}
+            note={tx.memo ?? undefined}
+          />
+        )}
+
+        {/* Centred on the close button. */}
+        <Pressable
+          {...testProps("transaction-detail-back")}
+          style={[styles.backButton, styles.backButtonFloating, { top: insets.top + 8 }]}
+          onPress={navigation.goBack}
+          accessibilityRole="button"
+          accessibilityLabel={LL.common.back()}
+        >
+          <GaloyIcon
+            name="arrow-left"
+            size={24}
+            weight="bold"
+            color={colors.textOnBackground}
+          />
+        </Pressable>
+
+        <View style={[styles.closeButton, { top: insets.top + 14 }]}>
+          <GaloyIconButton
+            name="close"
+            size="medium"
+            backgroundColor={colors.surfaceInteractive}
+            onPress={navigation.goBack}
+          />
+        </View>
       </View>
     </Screen>
   )
@@ -633,65 +795,140 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
 const useStyles = makeStyles(({ colors }) => ({
   closeIconContainer: {
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingRight: 10,
   },
 
-  amountText: {
-    fontSize: 18,
-    marginVertical: 6,
+  /** Figma header `icon-left`: arrow-back with 11/12/11/14 padding. */
+  backButton: {
+    paddingTop: 11,
+    paddingRight: 12,
+    paddingBottom: 11,
+    paddingLeft: 14,
   },
 
-  amountDetailsContainer: staticSurface(colors),
-
-  amountView: {
-    alignItems: "center",
-    justifyContent: "center",
-    transform: [{ translateY: -12 }],
+  closeButton: {
+    position: "absolute",
+    right: 20,
   },
 
-  amountWrapper: {
-    minHeight: 36,
-    justifyContent: "center",
-    alignItems: "center",
+  backButtonFloating: {
+    position: "absolute",
+    left: 0,
   },
 
-  description: {
-    marginBottom: 6,
-  },
-
-  entry: {
-    color: colors.textSecondary,
-    marginBottom: groupTitleGap,
-    marginTop: 4,
-  },
-
-  transactionDetailView: {
-    marginHorizontal: 24,
-    paddingVertical: 12,
-  },
-  valueContainer: {
-    flexDirection: "row",
-    minHeight: 60,
-    padding: 14,
-    backgroundColor: colors.surfaceInteractive,
-    alignItems: "center",
-    borderRadius: radius.default,
-  },
-  valueContainerStatic: staticSurface(colors),
-  value: {
+  outerContainer: {
     flex: 1,
-    fontSize: 14,
-    fontWeight: "bold",
   },
-  valueIcons: {
+
+  body: {
+    paddingHorizontal: 20,
+    paddingTop: 14,
+    paddingBottom: 10,
+    gap: 14,
+  },
+
+  section: {
+    gap: 14,
+  },
+
+  /** Figma `icon-hero`: its own 10 top padding sits under the body's 14. */
+  hero: {
+    alignItems: "center",
+    gap: 10,
+    paddingTop: 10,
+    paddingHorizontal: 20,
+  },
+
+  heroIcon: {
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  heroText: {
+    alignSelf: "stretch",
+    alignItems: "center",
+    gap: 5,
+  },
+
+  centered: {
+    textAlign: "center",
+  },
+
+  amounts: {
+    alignSelf: "stretch",
+    alignItems: "center",
+    gap: 5,
+  },
+
+  invisible: {
+    opacity: 0,
+  },
+
+  hiddenOverlay: {
+    ...StyleSheet.absoluteFill,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  labelField: {
+    borderRadius: 8,
+    paddingLeft: 14,
+    paddingRight: 10,
+  },
+
+  card: {
+    ...staticSurface(colors),
+    borderRadius: radius.default,
+    padding: 14,
+    gap: 14,
+  },
+
+  row: {
     flexDirection: "row",
     alignItems: "center",
-    marginLeft: 12,
+    gap: 5,
+  },
+
+  /** Figma's copyable rows space the label, value and icon 10 apart. */
+  rowTechnical: {
+    alignItems: "flex-start",
     gap: 10,
   },
-  txNotBroadcast: {
-    marginBottom: 16,
+
+  rowPressed: {
+    opacity: 0.6,
+  },
+
+  rowLabel: {
+    flex: 1,
+    maxWidth: 100,
+  },
+
+  rowValue: {
+    flex: 1,
+    textAlign: "right",
+  },
+
+  linkButton: {
+    borderRadius: radius.default,
+    paddingHorizontal: 20,
+  },
+
+  advancedToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    gap: 5,
+  },
+
+  buttonGroup: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    backgroundColor: colors.backgroundDefault,
   },
 
   resolveContainer: {
@@ -706,14 +943,7 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlign: "center",
   },
 
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    verticalAlign: "top",
-  },
-
-  outerContainer: {
-    flex: 1,
+  amountDetailsContainer: {
+    backgroundColor: colors.surfaceInteractive,
   },
 }))

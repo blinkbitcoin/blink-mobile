@@ -124,9 +124,14 @@ export const mockDisplayCurrency = () => ({
   }),
 })
 
-export const mockNavigation = () => ({
-  useNavigation: () => ({ goBack: jest.fn() }),
-})
+/** `getGoBack` hands over a spec's own `goBack` mock, read at render time like
+ *  `getCopyToClipboard` above, so a spec can assert the screen leaves. */
+export const mockNavigation = ({ getGoBack }: { getGoBack?: () => jest.Mock } = {}) => {
+  const unobservedGoBack = jest.fn()
+  return {
+    useNavigation: () => ({ goBack: getGoBack ? getGoBack() : unobservedGoBack }),
+  }
+}
 
 /**
  * `useI18nContext` with every `LL` string resolving to "", except the ones
