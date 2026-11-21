@@ -155,8 +155,9 @@ export const TotpRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
           title: LL.Messages.twoFactorOnFailedTitle(),
           text: LL.Messages.checkConnectionBody(),
           primaryButtonTitle: LL.Messages.tryAgain(),
+          /** Not from under the app lock: an accepted code moves on to the setup key. */
           primaryButtonAction: () => {
-            if (isMounted()) sendRef.current(code)
+            if (isMounted() && navigation.isFocused()) sendRef.current(code)
           },
         })
       } finally {
@@ -176,6 +177,7 @@ export const TotpRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
       showBackup,
       notifyModal,
       isMounted,
+      navigation,
     ],
   )
   useEffect(() => {

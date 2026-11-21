@@ -27,7 +27,12 @@ let mockParams: LoginMethodAdditionParams = {
 }
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ goBack: mockGoBack, replace: mockReplace, popTo: mockPopTo }),
+  useNavigation: () => ({
+    goBack: mockGoBack,
+    replace: mockReplace,
+    popTo: mockPopTo,
+    isFocused: () => mockIsFocused,
+  }),
   useRoute: () => ({ params: mockParams }),
 }))
 
@@ -78,6 +83,8 @@ jest.mock("@app/components/code-input", () => {
 })
 
 const mockNotifyModal = jest.fn()
+/** False once the app lock is pushed over the screen. */
+let mockIsFocused = true
 jest.mock("@app/components/notifications", () => ({
   ...jest.requireActual("@app/components/notifications"),
   useNotifications: () => ({ notifyModal: mockNotifyModal }),
@@ -377,6 +384,19 @@ describe("LoginMethodCodeScreen", () => {
       expect(mockPopTo).toHaveBeenCalledWith("settings")
     })
 
+    /** Popping to the settings from under a relock would take the lock with it. */
+    it("goes nowhere from the success once the app lock is over the screen", async () => {
+      mockRun.mockResolvedValue(PHONE_ADDED)
+      await submitCode()
+      mockIsFocused = false
+
+      pressSuccessOk()
+      closeSuccess()
+
+      expect(mockPopTo).not.toHaveBeenCalled()
+      mockIsFocused = true
+    })
+
     it("goes back to the settings when the success is closed instead", async () => {
       mockRun.mockResolvedValue(PHONE_ADDED)
       await submitCode()
@@ -431,6 +451,19 @@ describe("LoginMethodCodeScreen", () => {
 
     expect(mockRun).toHaveBeenCalledTimes(2)
     expect(mockRun.mock.calls[1][0].totpCode).toBe(mockRun.mock.calls[0][0].totpCode)
+  })
+
+  it("sends nothing from Try again once the app lock is over the screen", async () => {
+    mockRun.mockRejectedValueOnce(new Error("network"))
+    await submitCode()
+    mockIsFocused = false
+
+    await act(async () => {
+      mockNotifyModal.mock.calls[0][0].primaryButtonAction()
+    })
+
+    expect(mockRun).toHaveBeenCalledTimes(1)
+    mockIsFocused = true
   })
 
   it("checks one code at a time", async () => {

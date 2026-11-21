@@ -51,6 +51,8 @@ const mockNavigate = jest.fn()
 const mockReplace = jest.fn()
 const mockReset = jest.fn()
 const mockGoBack = jest.fn()
+/** False once the app lock is pushed over the screen. */
+let mockIsFocused = true
 jest.mock("@react-navigation/native", () => {
   const actual = jest.requireActual("@react-navigation/native")
   return {
@@ -60,6 +62,7 @@ jest.mock("@react-navigation/native", () => {
       replace: mockReplace,
       reset: mockReset,
       goBack: mockGoBack,
+      isFocused: () => mockIsFocused,
     }),
     useIsFocused: () => true,
   }
@@ -359,7 +362,9 @@ describe("ScanningQRCodeScreen", () => {
       buttons?.find((button) => button.text === "Yes")?.onPress?.()
     })
 
-    expect(mockReportError).toHaveBeenCalled()
+    /** The phone's error quotes the link, and a link can carry a token. */
+    expect(mockReportError).toHaveBeenCalledTimes(1)
+    expect(JSON.stringify(mockReportError.mock.calls[0])).not.toContain("example.com")
     const message = mockNotifyModal.mock.lastCall?.[0]
     expect(message).toMatchObject({
       icon: "warning-circle",
@@ -374,6 +379,14 @@ describe("ScanningQRCodeScreen", () => {
 
     expect(openURL).toHaveBeenCalledTimes(2)
     expect(openURL).toHaveBeenLastCalledWith(link)
+
+    /** Not from under the app lock. */
+    mockIsFocused = false
+    await act(async () => {
+      message.primaryButtonAction()
+    })
+    expect(openURL).toHaveBeenCalledTimes(2)
+    mockIsFocused = true
     openURL.mockRestore()
   })
 

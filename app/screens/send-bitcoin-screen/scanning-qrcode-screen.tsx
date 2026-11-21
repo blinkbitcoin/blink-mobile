@@ -151,14 +151,18 @@ export const ScanningQRCodeScreen: React.FC = () => {
   }, [])
 
   const loadInBrowser = (url: string) => {
-    Linking.openURL(url).catch((err: unknown) => {
-      reportError("scanning-qrcode", toError(err))
+    Linking.openURL(url).catch(() => {
+      /** The phone's error quotes the link, which can carry a token: only the failure
+       *  is reported. */
+      reportError("scanning-qrcode", new Error("No app could open a scanned link"))
       notifyModal({
         icon: MessageIcon.Alert,
         title: LL.Messages.linkFailedTitle(),
         text: LL.Messages.linkFailedBody(),
         primaryButtonTitle: LL.Messages.tryAgain(),
-        primaryButtonAction: () => loadInBrowser(url),
+        primaryButtonAction: () => {
+          if (navigation.isFocused()) loadInBrowser(url)
+        },
       })
     })
   }

@@ -20,7 +20,10 @@ let mockStackRoutes = [{ key: "totpRegistrationValidate" }]
 /** The screen's `beforeRemove` listener, as the navigator would hold it. */
 let mockBeforeRemove: ((event: BeforeRemoveEvent) => void) | undefined
 /** One navigation object for every render, as the navigator hands a screen. */
+/** False once the app lock is pushed over the screen. */
+let mockIsFocused = true
 const mockNavigation = {
+  isFocused: () => mockIsFocused,
   setOptions: (...args: unknown[]) => mockSetOptions(...args),
   setParams: (...args: unknown[]) => mockSetParams(...args),
   getState: () => ({ routes: mockStackRoutes }),
@@ -178,6 +181,7 @@ describe("TotpRegistrationValidateScreen", () => {
     mockIsEnforced = true
     mockRegistrationPrompt = undefined
     mockBeforeRemove = undefined
+    mockIsFocused = true
   })
 
   it("moves on to the backup of the setup key once the authenticator is on", async () => {
@@ -273,6 +277,22 @@ describe("TotpRegistrationValidateScreen", () => {
       mockTotpValidate.mock.calls[0][0].variables.input.totpCode,
     )
     expect(mockShowBackup).toHaveBeenCalledTimes(1)
+    consoleError.mockRestore()
+  })
+
+  /** An accepted code moves on to the setup key, which must not open from under a lock. */
+  it("sends nothing from Try again once the app lock is over the screen", async () => {
+    const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
+    mockTotpValidate.mockRejectedValueOnce(lostAnswer())
+
+    await submitCode()
+    mockIsFocused = false
+    await act(async () => {
+      mockNotifyModal.mock.lastCall?.[0].primaryButtonAction()
+    })
+
+    expect(mockTotpValidate).toHaveBeenCalledTimes(1)
+    expect(mockShowBackup).not.toHaveBeenCalled()
     consoleError.mockRestore()
   })
 

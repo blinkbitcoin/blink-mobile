@@ -15,6 +15,8 @@ type BeforeRemoveListener = (event: BeforeRemoveEvent) => void
 
 const beforeRemoveListeners: BeforeRemoveListener[] = []
 const mockGoBack = jest.fn()
+/** False once the app lock is pushed over the screen. */
+let mockIsFocused = true
 const mockSetOptions = jest.fn()
 const mockAddListener = jest.fn((event: string, listener: BeforeRemoveListener) => {
   if (event === "beforeRemove") beforeRemoveListeners.push(listener)
@@ -29,6 +31,7 @@ jest.mock("@react-navigation/native", () => {
       goBack: mockGoBack,
       setOptions: mockSetOptions,
       addListener: mockAddListener,
+      isFocused: () => mockIsFocused,
     }),
   }
 })
@@ -104,6 +107,7 @@ describe("ApiKeySecretReveal", () => {
     jest.clearAllMocks()
     beforeRemoveListeners.length = 0
     mockLeaseReady = Promise.resolve()
+    mockIsFocused = true
     jest.spyOn(Alert, "alert").mockImplementation(() => {})
   })
 
@@ -184,6 +188,24 @@ describe("ApiKeySecretReveal", () => {
     act(() => message.primaryButtonAction())
 
     expect(Clipboard.setString).toHaveBeenCalledWith(API_KEY_SECRET)
+  })
+
+  /** The clipboard is the whole phone's and the app lock covers only this app: the key
+   *  is not copied from under the lock. */
+  it("copies nothing from the pop-up once the app lock is over the screen", async () => {
+    jest.spyOn(Share, "share").mockRejectedValue(new Error("share sheet failed"))
+    renderReveal()
+    await screen.findByTestId("api-key-secret")
+    await act(async () => {
+      fireEvent.press(screen.getByText(LL.common.share()))
+    })
+    const Clipboard = jest.requireMock("@react-native-clipboard/clipboard")
+    jest.mocked(Clipboard.setString).mockClear()
+    mockIsFocused = false
+
+    act(() => mockNotifyModal.mock.lastCall?.[0].primaryButtonAction())
+
+    expect(Clipboard.setString).not.toHaveBeenCalled()
   })
 
   it("announces the key field as a copy button, not the shortened key", async () => {

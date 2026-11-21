@@ -15,6 +15,8 @@ import { flushEffects } from "../../helpers/flush-effects"
 import { ContextForScreen } from "../helper"
 
 const mockNotifyModal = jest.fn()
+/** False once the app lock is pushed over the screen. */
+let mockIsFocused = true
 jest.mock("@app/components/notifications", () => ({
   ...jest.requireActual("@app/components/notifications"),
   useNotifications: () => ({ notifyModal: mockNotifyModal }),
@@ -31,7 +33,12 @@ const mockPop = jest.fn()
 const mockGoBack = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate, pop: mockPop, goBack: mockGoBack }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    pop: mockPop,
+    goBack: mockGoBack,
+    isFocused: () => mockIsFocused,
+  }),
 }))
 
 const mockReportError = jest.fn()
@@ -106,6 +113,7 @@ describe("PhoneRegistrationValidateScreen", () => {
     jest.spyOn(console, "debug").mockImplementation(() => {})
     mockUpdateCurrentProfile.mockResolvedValue(undefined)
     mockPhoneValidate.mockResolvedValue(validated())
+    mockIsFocused = true
   })
 
   it("adds the phone number with the SMS code on an account without an authenticator", async () => {
@@ -125,6 +133,18 @@ describe("PhoneRegistrationValidateScreen", () => {
     success.primaryButtonAction()
     expect(mockPop).toHaveBeenCalledWith(2)
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** A relock pushes the lock screen over this one while the pop-up is open: popping two
+   *  would take the lock with it. */
+  it("goes nowhere from the success once the app lock is over the screen", async () => {
+    await typeSmsCode()
+    mockIsFocused = false
+
+    mockNotifyModal.mock.calls[0][0].primaryButtonAction()
+    mockNotifyModal.mock.calls[0][0].dismissAction()
+
+    expect(mockPop).not.toHaveBeenCalled()
   })
 
   it("goes back the same way when the success is closed instead", async () => {

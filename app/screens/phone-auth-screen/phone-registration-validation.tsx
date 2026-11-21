@@ -163,7 +163,11 @@ export const PhoneRegistrationValidateScreen: React.FC<
         } else {
           await updateCurrentProfile()
           setStatus(ValidatePhoneCodeStatus.Success)
-          const backToStart = () => navigation.pop(2)
+          /** Not from under the app lock, which a relock pushes over this screen while
+           *  the pop-up is open: popping two would take the lock with it. */
+          const backToStart = () => {
+            if (navigation.isFocused()) navigation.pop(2)
+          }
           notifyModal({
             icon: MessageIcon.Success,
             title: LL.Messages.phoneConfirmedTitle(),

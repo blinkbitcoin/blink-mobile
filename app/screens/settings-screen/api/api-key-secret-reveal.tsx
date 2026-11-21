@@ -41,6 +41,7 @@ const ApiKeySecretRevealContent: React.FC<
 > = ({ secret, name, onDone, onShownChange }) => {
   const { LL } = useI18nContext()
   const { notifyModal } = useNotifications()
+  const navigation = useNavigation()
   const styles = useStyles()
 
   React.useEffect(() => {
@@ -67,7 +68,11 @@ const ApiKeySecretRevealContent: React.FC<
           title: LL.Messages.shareFailedTitle(),
           text: LL.Messages.shareKeyFailedBody(),
           primaryButtonTitle: LL.Messages.copyKey(),
-          primaryButtonAction: copySecret,
+          /** Not from under the app lock: the clipboard is the whole phone's, and the
+           *  lock covers only this app. */
+          primaryButtonAction: () => {
+            if (navigation.isFocused()) copySecret()
+          },
         })
       }
     }

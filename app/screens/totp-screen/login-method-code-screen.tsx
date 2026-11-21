@@ -128,8 +128,10 @@ export const LoginMethodCodeScreen: React.FC = () => {
   /** What the screen shows for how the addition ended. */
   const showOutcome = useCallback(
     (outcome: LoginMethodAdditionOutcome, isOwnSession: () => boolean) => {
+      /** Not from under the app lock either, which a relock pushes over this screen while
+       *  the pop-up is open: popping to the settings would take the lock with it. */
       const backToSettings = () => {
-        if (isOwnSession()) navigation.popTo("settings")
+        if (isOwnSession() && navigation.isFocused()) navigation.popTo("settings")
       }
       switch (outcome.result) {
         case LoginMethodAdditionResult.EmailRegistered:
@@ -182,7 +184,7 @@ export const LoginMethodCodeScreen: React.FC = () => {
             text: LL.Messages.checkConnectionBody(),
             primaryButtonTitle: LL.Messages.tryAgain(),
             primaryButtonAction: () => {
-              if (isOwnSession()) sendRef.current(code)
+              if (isOwnSession() && navigation.isFocused()) sendRef.current(code)
             },
           })
         }
@@ -190,7 +192,7 @@ export const LoginMethodCodeScreen: React.FC = () => {
         setLoading(false)
       }
     },
-    [captureSession, run, params, showOutcome, notifyModal, LL],
+    [captureSession, run, params, showOutcome, notifyModal, navigation, LL],
   )
 
   /** An answer that lands after the user left would move a screen they never sent the
