@@ -49,6 +49,65 @@
         └───────────────────────────────────────────────┘
 ```
 
+## Code Organization: Ports, Adapters and Account Namespaces
+
+The app serves two kinds of account. A custodial account talks to the Blink backend through Apollo and GraphQL. A self-custodial account runs its own wallet through the Breez Spark SDK. Code is placed by two questions: which layer it belongs to, and which kind of account it serves.
+
+### Layers
+
+A screen asks for what it needs and does not know which kind of account answers. The data flows through these layers:
+
+```
+Screen          app/screens/<flow>         UI only, reads data through hooks
+   ↓
+Hook            app/hooks/use-<thing>.ts   picks the adapter for the active account
+   ↓
+Port            app/types/<domain>.ts      the contract, in the app's own types
+   ↓                         ↓
+Custodial adapter            Self-custodial adapter
+app/custodial/adapters       app/self-custodial/adapters
+   ↓ mappers                 ↓ mappers
+Apollo / GraphQL             app/self-custodial/bridge → Breez SDK
+```
+
+| Layer | Where | Rule |
+|---|---|---|
+| Port and app types | `app/types/` | Never imports GraphQL types, the SDK, hooks, screens or an account namespace |
+| Adapter | `app/custodial/adapters/`, `app/self-custodial/adapters/` | Implements a port. Its namespace's `mappers/` turn GraphQL or SDK shapes into app types at the boundary |
+| SDK access | `app/self-custodial/bridge/` | Wraps the Breez SDK calls. Nothing outside `app/self-custodial/` imports the SDK |
+| Shared logic | `app/utils/` | Logic that is the same for both kinds of account, such as `selectPrice` |
+| Routing hook | `app/hooks/` | Chooses the adapter for the active account. It is what a shared screen uses for account data |
+| Screen | `app/screens/<flow>/` | UI. Account-specific UI lives in its namespace's `components/` and is rendered from here |
+
+Price is the reference example of the whole chain: the `PriceSource` port in `app/types/price.ts`, one adapter per account in `app/custodial/adapters/price.ts` and `app/self-custodial/adapters/price.ts`, the pure selection in `app/utils/price-conversion.ts`, and the hook in `app/hooks/use-price-conversion.ts`. A new capability should follow the same shape: add it to a port, implement it in both adapters, and expose it through a hook.
+
+### Account namespaces
+
+Every file lives in the namespace of the account it serves:
+
+| Serves | Lives in |
+|---|---|
+| Custodial accounts only | `app/custodial/` |
+| Self-custodial accounts only | `app/self-custodial/`, `app/screens/self-custodial/`, `app/screens/settings-screen/self-custodial/` |
+| Both | everywhere else (`app/components/`, `app/hooks/`, `app/screens/`, ...) |
+
+A file that needs a comment explaining its "custodial variant" or its "self-custodial variant" is in the wrong namespace. Two components rendered on opposite branches of the same account check belong to two namespaces, not one.
+
+### Enforcement
+
+ESLint checks these boundaries (`.eslintrc.json`, `overrides`):
+
+| Files | Must not import | Level |
+|---|---|---|
+| `app/types/**` | GraphQL types, the SDK, hooks, screens, account namespaces | warning |
+| `app/utils`, `app/hooks`, `app/components`, `app/config`, `app/store`, `app/graphql` | screens, the SDK | warning |
+| `app/custodial/**`, `app/self-custodial/**` | screens | warning |
+| Shared screens | account namespaces (except their `components/`), the SDK | warning |
+| Custodial code | self-custodial code | error |
+| Self-custodial code | custodial code | error |
+
+The warnings mark code written before these rules and are being cleared step by step. New code must not add any. To clear one, move the shared piece down a layer: a type both sides need goes to `app/types`, account data reaches a screen through a hook in `app/hooks`, and code that serves one kind of account moves into its namespace.
+
 ## Component Architecture
 
 ### Provider Tree (app/app.tsx)

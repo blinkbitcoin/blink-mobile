@@ -12,8 +12,8 @@ import {
   GetFee,
   SendPaymentMutation,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
-import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import { toBtcMoneyAmount, type WalletAmount } from "@app/types/amounts"
+import { FeeTierOption } from "@app/types/fee-tiers"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 import { reportError } from "@app/utils/error-logging"
 import { sleep } from "@app/utils/sleep"
