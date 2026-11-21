@@ -13,8 +13,11 @@ import type { SecureRead } from "./secure-store"
  * The invariant is complete as of blinkbitcoin/blink-wip#1162: with the
  * mnemonics behind the read-through helper, `secureStorage.ts` no longer calls
  * the library at all, its exception in that config is gone, and this module is
- * the only door left. So on iOS the reinstall sweep is disarmed before every
- * touch rather than depending on which caller the boot path reaches first —
+ * the only door left. The purge added in blinkbitcoin/blink-wip#1163 keeps that
+ * true: its two-store half lives in `secure-store-migration.ts` as
+ * `purgeThrough`, beside the other operations that read through, so the slot list
+ * is all that stayed behind. So on iOS the reinstall sweep is disarmed before
+ * every touch rather than depending on which caller the boot path reaches first —
  * which is why the mnemonics are now cleared deliberately, by
  * `clearUninstallSurvivingKeyMaterial`, instead of by that sweep. What it
  * clears them WITH, for the accounts no list names, is `eraseEntireLegacyStore`
