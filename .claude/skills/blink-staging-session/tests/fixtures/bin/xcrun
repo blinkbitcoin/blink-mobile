@@ -1,0 +1,13 @@
+#!/bin/bash
+# Fake `xcrun simctl io <udid> screenshot <out>` - just enough for the
+# verification-shot step; writes a marker file and logs the call.
+set -uo pipefail
+echo "xcrun $*" >> "${FAKE_ARGS_LOG:-/dev/null}"
+[ "${1:-}" = "simctl" ] && shift
+case "${1:-}" in
+  io)
+    OUT="${4:?fake xcrun: screenshot needs an output path}"
+    printf 'fake-png' > "$OUT"
+    ;;
+  *) echo "fake xcrun: unsupported verb '${1:-}'" >&2; exit 64 ;;
+esac
