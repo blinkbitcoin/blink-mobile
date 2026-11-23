@@ -225,7 +225,13 @@ describe("settling lost attempts", () => {
       expectedDeliveries: [],
     }
     const foundUserTransfers = [
-      { paymentId: "rcv-usdb", amount: 1_370_000, isLabeled: true, foundAtMs: 1 },
+      {
+        paymentId: "rcv-usdb",
+        amount: 1_370_000,
+        isLabeled: true,
+        lostAtMs: 1,
+        foundAtMs: 1,
+      },
     ]
 
     const settled = withoutSettled(

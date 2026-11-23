@@ -108,6 +108,7 @@ const isFoundUserTransfer = (value: unknown): value is FoundUserTransfer =>
   typeof value.amount === "number" &&
   isOptional(value.paidIn, "number") &&
   typeof value.isLabeled === "boolean" &&
+  typeof value.lostAtMs === "number" &&
   typeof value.foundAtMs === "number"
 
 const isFresh = (recordedAtMs: number | undefined, nowMs: number): boolean =>

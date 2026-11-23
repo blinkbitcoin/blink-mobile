@@ -370,13 +370,27 @@ const isDeliveryOf = (
 /** A transfer of the user's found delivered, as their next transfer is told of it. */
 const foundUserTransferOf = (
   payment: Payment,
-  isLabeled: boolean,
+  { isLabeled, lostAtMs }: Pick<FoundUserTransfer, "isLabeled" | "lostAtMs">,
 ): FoundUserTransfer => ({
   paymentId: payment.id,
   ...deliveryFactsOf(payment),
   isLabeled,
+  lostAtMs,
   foundAtMs: Date.now(),
 })
+
+/**
+ * How soon after a lost transfer of the user's went out their next one of about its amount
+ * is taken for it asked again, and told it is done. A user retries soon after the error;
+ * later, the same amount is as likely a transfer made on purpose, which is asked to check
+ * the history once, as for a payment that may be anyone's, and goes out on the next
+ * confirm. By the phone's clock: neither answer sends anything, so a clock moved either
+ * way only swaps one answer for the other.
+ */
+const RETRY_HORIZON_MS = 30 * 60 * 1000
+
+const isSoonAfter = (lostAtMs: number): boolean =>
+  Date.now() - lostAtMs < RETRY_HORIZON_MS
 
 /** The token a conversion delivers: the dollar token for one from bitcoin, none (sats)
  *  for one to it. */
@@ -618,15 +632,16 @@ const convertAfterEarlierConversions = async (
 
   /** A lost transfer of the user's that auto-convert found delivered is told of on their
    *  next one, as the look would have told them had it found it: done when this one is
-   *  it asked again, gone through when it is another, and to be checked when it is this
-   *  one by a payment the wallet never labeled. Told once, the oldest first. */
+   *  it asked again soon after, by a delivery the wallet labeled; to be checked when it is
+   *  this one otherwise; gone through when it is another. Told once, the oldest first. */
   const foundTransfers = isAutomatic ? [] : attempts.read().foundUserTransfers ?? []
   const [foundTransfer, ...stillToTell] = foundTransfers
   if (foundTransfer) {
     attempts.update((current) => ({ ...current, foundUserTransfers: stillToTell }))
     const isThisTransfer = isDeliveryOf(foundTransfer, { estimate, params })
-    const isThisTransferUnlabeled = isThisTransfer && !foundTransfer.isLabeled
-    if (isThisTransferUnlabeled) {
+    const isProvenRetry = foundTransfer.isLabeled && isSoonAfter(foundTransfer.lostAtMs)
+    const isThisTransferToCheck = isThisTransfer && !isProvenRetry
+    if (isThisTransferToCheck) {
       return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
     }
     if (isThisTransfer) {
@@ -686,7 +701,10 @@ const convertAfterEarlierConversions = async (
           lostConversion: withoutAttempt(earlier, deliveredFor, payment),
           foundUserTransfers: [
             ...(current.foundUserTransfers ?? []),
-            foundUserTransferOf(payment, isLabeled),
+            foundUserTransferOf(payment, {
+              isLabeled,
+              lostAtMs: earlier.lastAttemptAtMs,
+            }),
           ],
         }))
         return failed(EARLIER_CONVERSION_MESSAGE, ConvertErrorCode.EarlierConversionFound)
@@ -701,10 +719,13 @@ const convertAfterEarlierConversions = async (
         params.receiveRecordedAtMs
       const isThisRequestsDelivery = isThisRequest && isThisConversion(payment)
       /** The user is asked to check their history rather than told their transfer is done
-       *  by a payment that may be anyone's. Auto-convert takes it for its receive's
-       *  conversion: converting the receive again would convert it twice were it the
-       *  delivery. */
-      const shouldAskTheUserToCheck = isThisRequestsDelivery && !isAutomatic && !isLabeled
+       *  by a payment that may be anyone's, or by one found long after it was lost, when
+       *  the same amount is as likely a transfer made on purpose. Auto-convert takes it for
+       *  its receive's conversion, which it names by the receive itself: converting the
+       *  receive again would convert it twice were it the delivery. */
+      const isProvenRetry = isLabeled && isSoonAfter(earlier.lastAttemptAtMs)
+      const shouldAskTheUserToCheck =
+        isThisRequestsDelivery && !isAutomatic && !isProvenRetry
       if (shouldAskTheUserToCheck) {
         return failed(OUTCOME_UNKNOWN_MESSAGE, ConvertErrorCode.OutcomeUnknown)
       }

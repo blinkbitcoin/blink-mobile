@@ -116,6 +116,14 @@ const PAST_THE_WINDOW_MS = LOST_CONVERSION_DELIVERY_WINDOW_MS + 1
 const realTimePasses = (ms: number) => {
   realTime.mockReturnValue(performance.now() + ms)
 }
+/** How soon after a lost transfer the user's next one of its amount is taken for a retry. */
+const RETRY_HORIZON_MS = 30 * 60 * 1000
+/** The phone's clock moved past that horizon: a transfer made on purpose, by then. */
+const afterTheRetryHorizon = () => {
+  const movedTo = Date.now() + RETRY_HORIZON_MS + 1
+  movedClock?.mockRestore()
+  movedClock = jest.spyOn(Date, "now").mockReturnValue(movedTo)
+}
 const afterTheDeliveryWindow = () => {
   const movedTo = Date.now() + PAST_THE_WINDOW_MS
   movedClock?.mockRestore()
@@ -1211,6 +1219,28 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
     expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
   })
 
+  /** The user's own retry of a lost transfer, found by a delivery the wallet labeled, is
+   *  told it is done only soon after it was lost: later, the same amount is as likely a
+   *  transfer made on purpose, asked to check the history once and sent on the next
+   *  confirm. */
+  it("asks a retry of a lost transfer to check the history once the retry horizon has passed, then lets it go out", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(foundDelivery(labeledDelivery("rcv-usdb") as never))
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    afterTheRetryHorizon()
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
+    const late = await (await quoteFor(sdk))!.execute()
+    const next = await (await quoteFor(sdk))!.execute()
+
+    expect(late.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(next).toEqual({ status: "success", deliveredPaymentId: "c2" })
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
   it("fails a conversion the SDK answers failed, still looking for the lost one it went out past", async () => {
     mockFindLostConversion
       .mockResolvedValueOnce({ status: "not-found", failed: [] })
@@ -1496,9 +1526,10 @@ describe("createGetConversionQuote — a conversion whose response is lost", () 
   })
 
   it("looks for a conversion an earlier launch lost before converting", async () => {
+    const lostAMinuteAgo = Date.now() - 60_000
     const lostConversion = {
-      startedAtMs: 1,
-      lastAttemptAtMs: 1,
+      startedAtMs: lostAMinuteAgo,
+      lastAttemptAtMs: lostAMinuteAgo,
       walletClockSec: 1_600_000_000,
       knownPaymentIds: ["rcv-old"],
       expectedDeliveries: [
@@ -1915,6 +1946,22 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
 
     expect(retry).toEqual({ status: "success", deliveredPaymentId: "rcv-usdb" })
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  /** Long after it was lost, the same amount is as likely a transfer made on purpose: it is
+   *  asked to check the history once, never told it is done, and goes out on the next
+   *  confirm. */
+  it("asks the user's next transfer of that amount to check their history once the retry horizon has passed, then lets it go out", async () => {
+    const { sdk } = await userTransferFoundByAutoConvert()
+    afterTheRetryHorizon()
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c-user", status: 0 } })
+
+    const late = await transferManually(sdk)
+    const next = await transferManually(sdk)
+
+    expect(late.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(next).toEqual({ status: "success", deliveredPaymentId: "c-user" })
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
   })
 
   it("tells the user's next transfer of another amount the earlier one went through, once", async () => {

@@ -422,6 +422,7 @@ describe("loadLostAttempts", () => {
     amount: 2_466_000,
     paidIn: 9000,
     isLabeled: true,
+    lostAtMs: foundAtMs - 60_000,
     foundAtMs,
   })
 
@@ -430,6 +431,7 @@ describe("loadLostAttempts", () => {
       paymentId: "rcv-usdb-2",
       amount: 1_370_000,
       isLabeled: false,
+      lostAtMs: NOW - 60_000,
       foundAtMs: NOW,
     }
     stored({
@@ -474,6 +476,7 @@ describe("loadLostAttempts", () => {
           { ...foundUserTransfer(), amount: "2466000" },
           { ...foundUserTransfer(), paidIn: "9000" },
           { ...foundUserTransfer(), isLabeled: "yes" },
+          { ...foundUserTransfer(), lostAtMs: String(NOW - 60_000) },
           { ...foundUserTransfer(), foundAtMs: String(NOW - 1000) },
           "rcv-usdb",
         ],
