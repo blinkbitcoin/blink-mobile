@@ -7,6 +7,7 @@ import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { UsdMoneyAmount } from "@app/types/amounts"
 import { makeStyles, Text } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 type Props = {
   usdWalletBalance: UsdMoneyAmount
@@ -68,7 +69,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   value: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     color: colors.textOnBackground,
   },
 }))

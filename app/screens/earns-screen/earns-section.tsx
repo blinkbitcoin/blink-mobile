@@ -1,6 +1,8 @@
 import * as React from "react"
 import { useState } from "react"
 import { Text, useWindowDimensions, View, Alert } from "react-native"
+import { HeaderTitle } from "@react-navigation/elements"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { useSharedValue } from "react-native-reanimated"
 import Carousel from "react-native-reanimated-carousel"
@@ -13,6 +15,7 @@ import { RouteProp, useIsFocused, useNavigation } from "@react-navigation/native
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Button } from "@rn-vui/base"
 import { Colors, makeStyles, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { Screen } from "../../components/screen"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
@@ -82,7 +85,7 @@ const useStyles = makeStyles(({ colors }, { screenWidth }: { screenWidth: number
   itemTitle: {
     color: colors.staticWhite,
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     height: 72,
     marginHorizontal: 24,
     textAlign: "center",
@@ -99,7 +102,7 @@ const useStyles = makeStyles(({ colors }, { screenWidth }: { screenWidth: number
 
   titleStyle: {
     color: colors.staticBrightBlue,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
   },
 
   titleStyleDisabled: {
@@ -108,17 +111,19 @@ const useStyles = makeStyles(({ colors }, { screenWidth }: { screenWidth: number
 
   titleStyleFulfilled: {
     color: colors.staticWhite,
+    fontFamily: fonts.bold,
   },
 
   unlock: {
     alignSelf: "center",
     color: colors.staticWhite,
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     textAlign: "center",
   },
 
   unlockQuestion: {
+    fontFamily: fonts.regular,
     alignSelf: "center",
     color: colors.staticWhite,
     fontSize: 16,
@@ -157,13 +162,20 @@ type Props = {
 }
 
 // The header sits on the section's fixed blue backdrop, so it never inverts.
+const earnsHeaderTitleStyle = { fontFamily: fonts.bold, fontSize: 18 }
+
+const renderEarnsHeaderTitle = (props: { children: string; tintColor?: string }) => (
+  <HeaderTitle
+    {...props}
+    maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+    style={earnsHeaderTitleStyle}
+  />
+)
+
 export const earnSectionHeaderOptions = (colors: Colors) => ({
   headerStyle: { backgroundColor: colors.staticBlue },
   headerTintColor: colors.staticWhite,
-  headerTitleStyle: {
-    fontWeight: "bold" as const,
-    fontSize: 18,
-  },
+  headerTitle: renderEarnsHeaderTitle,
 })
 
 export const EarnSection = ({ route }: Props) => {
@@ -256,10 +268,15 @@ export const EarnSection = ({ route }: Props) => {
             </View>
           </TouchableOpacity>
           <View>
-            <Text style={styles.itemTitle} numberOfLines={3}>
+            <Text
+              maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+              style={styles.itemTitle}
+              numberOfLines={3}
+            >
               {item.title}
             </Text>
             <Button
+              titleProps={{ maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER }}
               onPress={() => open(item.id)}
               disabled={!item.enabled}
               disabledStyle={styles.buttonStyleDisabled}
@@ -292,8 +309,15 @@ export const EarnSection = ({ route }: Props) => {
         </View>
         {!item.enabled && (
           <>
-            <Text style={styles.unlockQuestion}>{LL.EarnScreen.unlockQuestion()}</Text>
-            <Text style={styles.unlock}>{item.nonEnabledMessage}</Text>
+            <Text
+              maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+              style={styles.unlockQuestion}
+            >
+              {LL.EarnScreen.unlockQuestion()}
+            </Text>
+            <Text maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER} style={styles.unlock}>
+              {item.nonEnabledMessage}
+            </Text>
           </>
         )}
       </>

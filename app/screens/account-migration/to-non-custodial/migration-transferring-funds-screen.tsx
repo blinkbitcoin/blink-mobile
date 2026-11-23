@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { Text } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
@@ -23,6 +24,7 @@ import {
 } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const MigrationTransferringFundsScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -298,7 +300,9 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
         iconBackgroundColor={colors.staticWarningBackground}
         footer={screenFooter}
       >
-        <Text style={styles.message}>{message}</Text>
+        <Text maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER} style={styles.message}>
+          {message}
+        </Text>
       </StatusScreenLayout>
     </Screen>
   )
@@ -308,7 +312,7 @@ const useStyles = makeStyles(({ colors }) => ({
   message: {
     fontSize: 18,
     lineHeight: 24,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     color: colors.textOnBackground,
     textAlign: "center",
   },

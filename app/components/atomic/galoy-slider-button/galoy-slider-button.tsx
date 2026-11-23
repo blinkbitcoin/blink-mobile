@@ -30,7 +30,7 @@ import { GaloyIcon } from "../galoy-icon"
 
 const TRACK_HEIGHT = 60
 const HANDLE_SIZE = 60
-/** Share of the travel the handle must cover before the send commits. */
+/** Share of the travel the handle must be past, on release, for the send to commit. */
 const COMMIT_THRESHOLD = 0.7
 /** Share of the travel after which the handle starts fading out. */
 const HANDLE_FADE_START = 0.9
@@ -66,7 +66,7 @@ type SwipeButtonPropsType = {
   disabledText?: string
   isLoading?: boolean
   disabled?: boolean
-  /** Handle colour; defaults to `primary`. */
+  /** Handle colour; defaults to `accent`. The arrow on it is white in both themes. */
   accentColor?: string
   /** The handle, the one element a screen reader reaches, e.g. to move focus to it. */
   handleRef?: Ref<View>
@@ -90,6 +90,9 @@ const GaloySliderButton = ({
 
   const [trackWidth, setTrackWidth] = useState(0)
   const [committed, setCommitted] = useState(false)
+  /** Bumped each time a swipe settles. An `onSwipe` that resolves at once batches the
+   *  busy render away, so the reset can't wait for `busy` to go true and back. */
+  const [settled, setSettled] = useState(0)
   const busy = committed || isLoading
   const travel = Math.max(trackWidth - HANDLE_SIZE, 0)
 
@@ -101,7 +104,7 @@ const GaloySliderButton = ({
       hasCommitted.value = false
       X.value = withSpring(0)
     }
-  }, [busy, X, hasCommitted])
+  }, [busy, settled, X, hasCommitted])
 
   const commit = useCallback(async () => {
     setCommitted(true)
@@ -112,6 +115,7 @@ const GaloySliderButton = ({
       await onSwipe()
     } finally {
       setCommitted(false)
+      setSettled((n) => n + 1)
     }
   }, [onSwipe])
 
@@ -123,17 +127,17 @@ const GaloySliderButton = ({
     .onUpdate((e) => {
       if (hasCommitted.value) return
       const distance = isRTL ? -e.translationX : e.translationX
-      const next = Math.min(Math.max(distance, 0), travel)
-      if (next >= travel * COMMIT_THRESHOLD) {
-        hasCommitted.value = true
-        X.value = withTiming(travel, {
-          duration: COMPLETE_DURATION_MS,
-          easing: Easing.out(Easing.cubic),
-        })
-        runOnJS(commit)()
-        return
-      }
-      X.value = next
+      X.value = Math.min(Math.max(distance, 0), travel)
+    })
+    // Sends only on release, so a user who went too far can still slide back.
+    .onEnd((_e, success) => {
+      if (!success || hasCommitted.value || X.value < travel * COMMIT_THRESHOLD) return
+      hasCommitted.value = true
+      X.value = withTiming(travel, {
+        duration: COMPLETE_DURATION_MS,
+        easing: Easing.out(Easing.cubic),
+      })
+      runOnJS(commit)()
     })
     .onFinalize(() => {
       if (!hasCommitted.value) {
@@ -241,7 +245,9 @@ const GaloySliderButton = ({
           <GaloyIcon
             size={30}
             name={isRTL ? "arrow-left" : "arrow-right"}
-            color={colors._white}
+            // Design ruling: the arrow is white on every handle colour, in both themes.
+            // eslint-disable-next-line no-restricted-properties
+            color={colors.staticWhite}
           />
         </Animated.View>
       </GestureDetector>

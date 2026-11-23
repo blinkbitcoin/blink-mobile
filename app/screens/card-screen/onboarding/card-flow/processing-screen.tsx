@@ -8,6 +8,7 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const CardProcessingScreen: React.FC = () => {
   const styles = useStyles()
@@ -81,7 +82,7 @@ const useStyles = makeStyles(({ colors }) => ({
   title: {
     marginBottom: 10,
     textAlign: "center",
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
   },
   buttonsContainer: {
     justifyContent: "flex-end",

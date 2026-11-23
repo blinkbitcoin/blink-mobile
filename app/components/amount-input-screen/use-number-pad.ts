@@ -27,13 +27,15 @@ type UseNumberPadArgs = {
   walletCurrency: WalletCurrency
   /** Undefined until prices load; the pad still takes keys, it just can't mirror amounts. */
   convertMoneyAmount?: ConvertMoneyAmount
+  /** The caller's amount, re-read whenever what the typed digits mean changes. */
+  amountOfRecord?: MoneyAmount<WalletOrDisplayCurrency>
   onAmountChange: (amount: MoneyAmount<WalletOrDisplayCurrency>) => void
 }
 
 /**
  * The state behind an in-screen number pad: what the user has typed, which currency they
  * are typing in, and which keys are live. It holds only the typed value — the screen's own
- * amount stays the amount of record, so a percent chip can hand it an exact wallet amount
+ * amount stays the amount of record, so a wallet switch can hand it an exact amount
  * while the pad shows that amount rounded to the currency being typed in.
  *
  * The canonical pad: every screen with a keypad should drive `CurrencyKeyboard` from this
@@ -42,6 +44,7 @@ type UseNumberPadArgs = {
 export const useNumberPad = ({
   walletCurrency,
   convertMoneyAmount,
+  amountOfRecord,
   onAmountChange,
 }: UseNumberPadArgs) => {
   const client = useApolloClient()
@@ -63,6 +66,38 @@ export const useNumberPad = ({
       currencyInfo,
     })
   })
+
+  /** What the typed digits mean, as set from outside the pad: the sending wallet, and the
+   *  display currency a rate arriving or being lost swaps. When the one the pad types in
+   *  moves, the pad re-reads the amount of record rather than reading its digits in the
+   *  new unit. It waits until the caller's amount and conversion have caught up, which the
+   *  converted amount's currency code shows. A wallet currency typed in follows the
+   *  sending wallet; display digits stay as typed across a wallet switch. */
+  const display = currencyInfo[DisplayCurrency]
+  const displayMeaning = `${display.currencyCode}:${display.minorUnitToMajorUnitOffset}:${display.showFractionDigits}`
+  const [read, setRead] = useState({ displayMeaning, walletCurrency })
+  const isTypingDisplay = padState.currency === DisplayCurrency
+  const hasMeaningMoved = isTypingDisplay
+    ? displayMeaning !== read.displayMeaning
+    : walletCurrency !== read.walletCurrency
+  if (
+    (displayMeaning !== read.displayMeaning || walletCurrency !== read.walletCurrency) &&
+    !hasMeaningMoved
+  ) {
+    setRead({ displayMeaning, walletCurrency })
+  } else if (hasMeaningMoved && convertMoneyAmount) {
+    const currency = isTypingDisplay ? DisplayCurrency : walletCurrency
+    const { currencyCode } = currencyInfo[currency]
+    const reread = amountOfRecord
+      ? convertMoneyAmount(amountOfRecord, currency)
+      : { amount: 0, currency, currencyCode }
+    if (reread.currencyCode === currencyCode && Number.isFinite(reread.amount)) {
+      setRead({ displayMeaning, walletCurrency })
+      setPadState(
+        moneyAmountToNumberPadReducerState({ moneyAmount: reread, currencyInfo }),
+      )
+    }
+  }
 
   const toMoneyAmount = useCallback(
     (state: NumberPadReducerState) =>
@@ -86,7 +121,7 @@ export const useNumberPad = ({
     [padState, onAmountChange, toMoneyAmount],
   )
 
-  /** Mirrors an amount set from outside the pad (a chip, a wallet switch) without
+  /** Mirrors an amount set from outside the pad (a wallet switch) without
    *  reporting it back, so the caller's exact amount is never replaced by the rounded one.
    *  A change of currency is saved as the preference, whoever makes it, because review
    *  leads with the preferred currency and must read the amount the way the pad showed it. */

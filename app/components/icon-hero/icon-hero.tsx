@@ -2,6 +2,7 @@ import React from "react"
 import { View } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 
@@ -108,7 +109,7 @@ const useStyles = makeStyles(({ colors }) => ({
   title: {
     fontSize: 20,
     lineHeight: 24,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     textAlign: "center",
     width: "100%",
   },

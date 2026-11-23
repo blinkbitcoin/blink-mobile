@@ -587,7 +587,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           />
           {blockingError ? (
             <View style={styles.errorWithAction}>
-              <GaloyErrorBox errorMessage={blockingError} filled={false} />
+              <GaloyErrorBox errorMessage={blockingError} filled={false} announce />
               {canChangeAmount ? (
                 <Chip
                   label={LL.SendBitcoinConfirmationScreen.changeAmount()}
@@ -597,7 +597,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               ) : null}
             </View>
           ) : isLightningRecommended ? (
-            <WarningBanner>
+            <WarningBanner announce>
               {LL.SendBitcoinConfirmationScreen.lightningRecommended()}
             </WarningBanner>
           ) : null}
@@ -607,7 +607,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             </Text>
           ) : null}
           {dustWarning.status === "visible" ? (
-            <WarningBanner>
+            <WarningBanner announce>
               {LL.SendBitcoinConfirmationScreen.usdRemainderSweep({
                 remaining: formatMoneyAmount({ moneyAmount: dustWarning.remaining }),
                 remainingSats: formatMoneyAmount({
