@@ -3095,6 +3095,7 @@
         "downloadLogs": "Logs herunterladen",
         "exportLogsTitle": "Brieftaschen-Logs teilen",
         "exportLogsBody": "Diese Datei hilft unserem Support, Probleme mit deinen Brieftaschen zu untersuchen. Sie enthält den Zahlungsverlauf (Beträge, Rechnungen und Adressen) und die Brieftaschen-Kennungen jeder nicht verwahrten Brieftasche auf diesem Gerät, nicht nur dieser, aber niemals deine Wiederherstellungsphrasen oder Schlüssel. Teile sie nur mit unserem Support.",
+        "exportLogsAnalyticsIdNote": "Diese Datei enthält die Analyse-ID dieser Installation, damit der Support ihre App-Ereignisse sehen kann.",
         "exportLogsConfirm": "Logs teilen",
         "noLogsYet": "Es gibt noch keine Logs zum Teilen. Öffne deine Brieftasche und versuche es erneut.",
         "exportLogsError": "Logs konnten nicht exportiert werden. Bitte versuche es erneut."

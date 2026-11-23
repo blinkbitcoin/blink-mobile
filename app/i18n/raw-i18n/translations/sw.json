@@ -3095,6 +3095,7 @@
     "downloadLogs": "Pakua kumbukumbu",
     "exportLogsTitle": "Shiriki kumbukumbu za mkoba wako",
     "exportLogsBody": "Faili hili husaidia timu yetu ya usaidizi kuchunguza matatizo ya mikoba yako. Inajumuisha historia ya malipo (kiasi, ankara na anwani) na vitambulishi vya kila mkoba usio wa udhamini kwenye kifaa hiki, si huu pekee, lakini kamwe vifungu vyako vya akiba wala funguo. Ishiriki na timu yetu ya usaidizi pekee.",
+    "exportLogsAnalyticsIdNote": "Faili hili lina kitambulisho cha takwimu cha usakinishaji huu, ili timu ya usaidizi iweze kuona matukio ya programu yake.",
     "exportLogsConfirm": "Shiriki kumbukumbu",
     "noLogsYet": "Bado hakuna kumbukumbu za kushiriki. Fungua mkoba wako kisha jaribu tena.",
     "exportLogsError": "Imeshindwa kuhamisha kumbukumbu. Tafadhali jaribu tena."

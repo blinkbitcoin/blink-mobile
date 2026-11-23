@@ -3095,6 +3095,7 @@
     "downloadLogs": "Naplók letöltése",
     "exportLogsTitle": "Tárcanaplók megosztása",
     "exportLogsBody": "Ez a fájl segít az ügyfélszolgálatnak megvizsgálni a tárcáiddal kapcsolatos problémákat. Tartalmazza a fizetési előzményeket (összegek, számlák és címek) és a tárcaazonosítókat az eszköz minden nem letétkezelt tárcájáról, nem csak erről, de soha a biztonsági mentési kifejezéseidet vagy a kulcsaidat. Csak az ügyfélszolgálatunkkal oszd meg.",
+    "exportLogsAnalyticsIdNote": "Ez a fájl tartalmazza ennek a telepítésnek az analitikai azonosítóját, így az ügyfélszolgálat láthatja az alkalmazáseseményeit.",
     "exportLogsConfirm": "Naplók megosztása",
     "noLogsYet": "Még nincsenek megosztható naplók. Nyisd meg a tárcádat, és próbáld újra.",
     "exportLogsError": "A naplókat nem sikerült exportálni. Próbáld újra."

@@ -10373,6 +10373,10 @@ type RootTranslation = {
 		 */
 		exportLogsBody: string
 		/**
+		 * T​h​i​s​ ​f​i​l​e​ ​i​n​c​l​u​d​e​s​ ​t​h​i​s​ ​i​n​s​t​a​l​l​'​s​ ​a​n​a​l​y​t​i​c​s​ ​I​D​,​ ​s​o​ ​s​u​p​p​o​r​t​ ​c​a​n​ ​s​e​e​ ​i​t​s​ ​a​p​p​ ​e​v​e​n​t​s​.
+		 */
+		exportLogsAnalyticsIdNote: string
+		/**
 		 * S​h​a​r​e​ ​l​o​g​s
 		 */
 		exportLogsConfirm: string
@@ -24669,6 +24673,10 @@ export type TranslationFunctions = {
 		 * This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.
 		 */
 		exportLogsBody: () => LocalizedString
+		/**
+		 * This file includes this install's analytics ID, so support can see its app events.
+		 */
+		exportLogsAnalyticsIdNote: () => LocalizedString
 		/**
 		 * Share logs
 		 */

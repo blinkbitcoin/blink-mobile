@@ -89,6 +89,7 @@ OS: android 36
 Breez SDK: 0.27.1
 Network: mainnet
 Account mode: enhanced
+Analytics ID: 3f1c2a9e-7b4d-4e58-9a61-0c2d8e5b7f10
 Self-custodial wallets on this device: 1
 
 --- sdk.log.1 ---
@@ -99,6 +100,24 @@ Self-custodial wallets on this device: 1
 
 Each SDK line is `<UTC timestamp> <LEVEL> <target>: <source line>: <message>`. The
 header's device offset converts what the user reports in local time.
+
+### The analytics ID line
+
+`Analytics ID` appears only when the active wallet is Enhanced **and** every
+self-custodial wallet on the device is Enhanced (`shouldIncludeAnalyticsId`). It is
+absent in Incognito, before a mode is chosen, and on a device that also holds an
+Incognito wallet or one with no mode yet, because the file carries every wallet's logs.
+The disclosure adds a line saying the file includes the ID whenever it does (Telemetry
+PRD 2, R27, KB-26).
+
+It is the random per-install ID that Enhanced telemetry reports under
+(`telemetry-instance-id.ts`), never derived from a key or a device ID. **In the GA4
+BigQuery export it is the `user_id` column of Enhanced rows, not `user_pseudo_id`.**
+`user_pseudo_id` changes every time the device switches between the custodial and the
+self-custodial account, so it cannot be used to find an install. Look up one install's
+events by `user_id` for the case the user opened. Never store the ID beside the
+custodial account or use it in a report. The export only reads the ID and never creates
+one, so an install that has never been Enhanced has no ID to share.
 
 Worth grepping for:
 
@@ -123,7 +142,8 @@ It holds:
 It does not contain the backup phrase, keys or the Breez API key (checked against a real
 log on 0.26.1 and 0.27.1), and preimages are printed as `<redacted>` by the SDK since
 0.26.1; the export redacts any that slip through as well. The header carries no
-pubkey, account ID or Lightning address.
+pubkey, account ID or Lightning address. The one identifier it can carry is the
+install's analytics ID, under the rule above.
 
 From 0.27.1 the SDK also passes the identity public key to the app's JS log listener on
 every line (`LogEntry.instanceId`). The listener reads only the level and the line, and
@@ -137,5 +157,6 @@ only warn and error lines reach Crashlytics, scrubbed (`scrubSdkLogLine`);
 | Log directory, rotation, deletion | `app/self-custodial/diagnostics/sdk-log-files.ts` |
 | Logger start-up (once per process, retried without a file) | `app/self-custodial/bridge/lifecycle.ts` |
 | Export file and header | `app/self-custodial/diagnostics/export-sdk-logs.ts`, `log-export-header.ts`, `build-sdk-log-export.ts` |
+| Whether the header carries the analytics ID | `app/self-custodial/diagnostics/analytics-id-in-export.ts`, `useIncludesAnalyticsId` in `app/self-custodial/hooks/use-export-sdk-logs.ts` |
 | Share | `app/utils/share-file.ts`, `app/self-custodial/hooks/use-export-sdk-logs.ts` |
 | Settings row and disclosure | `app/screens/settings-screen/settings/advanced-export-logs.tsx` |

@@ -3095,6 +3095,7 @@
     "downloadLogs": "Unduh log",
     "exportLogsTitle": "Bagikan log dompet Anda",
     "exportLogsBody": "Berkas ini membantu tim dukungan kami menelusuri masalah pada dompet Anda. Berkas ini berisi riwayat pembayaran (jumlah, faktur, dan alamat) serta pengenal setiap dompet non-kustodial di perangkat ini, bukan hanya yang ini, tetapi tidak pernah frasa cadangan atau kunci Anda. Bagikan hanya kepada tim dukungan kami.",
+    "exportLogsAnalyticsIdNote": "File ini menyertakan ID analitik instalasi ini, agar tim dukungan dapat melihat peristiwa aplikasinya.",
     "exportLogsConfirm": "Bagikan log",
     "noLogsYet": "Belum ada log untuk dibagikan. Buka dompet Anda dan coba lagi.",
     "exportLogsError": "Tidak dapat mengekspor log. Coba lagi."

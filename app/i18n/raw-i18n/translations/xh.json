@@ -3095,6 +3095,7 @@
     "downloadLogs": "Khuphela iirekhodi",
     "exportLogsTitle": "Yabelana ngerekhodi zesipaji sakho",
     "exportLogsBody": "Le fayile inceda inkxaso iphande iingxaki zesipaji sakho. Iqulethe imbali yentlawulo (izixa, ii-invoyisi needilesi) nezichongi zesipaji ngasinye esingagcinwanga kwesi sixhobo, hayi esi kuphela, kodwa ayinazo iibinzana zakho zokugcina okanye izitshixo. Yabelana ngayo kuphela nenkxaso.",
+    "exportLogsAnalyticsIdNote": "Le fayile iquka i-ID yohlalutyo yolu fakelo, ukuze inkxaso ibone iziganeko zayo zeapp.",
     "exportLogsConfirm": "Yabelana ngerekhodi",
     "noLogsYet": "Akukabikho rekhodi zokwabelana. Vula isipaji sakho uzame kwakhona.",
     "exportLogsError": "Ayiphumelelanga ukukhuphela iirekhodi. Zama kwakhona."

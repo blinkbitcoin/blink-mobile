@@ -3095,6 +3095,7 @@
         "downloadLogs": "Descargar logs",
         "exportLogsTitle": "Compartir los logs de tu billetera",
         "exportLogsBody": "Este archivo ayuda a nuestro equipo de soporte a revisar problemas con tus billeteras. Incluye el historial de pagos (montos, facturas y direcciones) y los identificadores de cada billetera no custodial en este dispositivo, no solo de esta, pero nunca tus frases de recuperación ni tus claves. Compártelo solo con nuestro equipo de soporte.",
+        "exportLogsAnalyticsIdNote": "Este archivo incluye el ID de analítica de esta instalación, para que soporte pueda ver sus eventos en la app.",
         "exportLogsConfirm": "Compartir logs",
         "noLogsYet": "Todavía no hay logs para compartir. Abre tu billetera e inténtalo de nuevo.",
         "exportLogsError": "No se pudieron exportar tus logs. Inténtalo de nuevo."

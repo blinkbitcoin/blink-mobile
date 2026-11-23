@@ -3095,6 +3095,7 @@
     "downloadLogs": "Logbestanden downloaden",
     "exportLogsTitle": "Deel de logbestanden van je portemonnee",
     "exportLogsBody": "Dit bestand helpt ons supportteam problemen met je portemonnees te onderzoeken. Het bevat de betalingsgeschiedenis (bedragen, facturen en adressen) en de portemonnee-id's van elke niet-bewaarde portemonnee op dit apparaat, niet alleen deze, maar nooit je herstelzinnen of sleutels. Deel het alleen met ons supportteam.",
+    "exportLogsAnalyticsIdNote": "Dit bestand bevat de analyse-ID van deze installatie, zodat support de app-gebeurtenissen ervan kan zien.",
     "exportLogsConfirm": "Logbestanden delen",
     "noLogsYet": "Er zijn nog geen logbestanden om te delen. Open je portemonnee en probeer het opnieuw.",
     "exportLogsError": "Logbestanden exporteren is mislukt. Probeer het opnieuw."

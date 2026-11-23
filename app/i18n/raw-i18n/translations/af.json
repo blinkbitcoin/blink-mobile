@@ -3095,6 +3095,7 @@
     "downloadLogs": "Laai loglêers af",
     "exportLogsTitle": "Deel jou beursie se loglêers",
     "exportLogsBody": "Hierdie lêer help ons ondersteuningspan om probleme met jou beursies te ondersoek. Dit sluit die betalingsgeskiedenis (bedrae, fakture en adresse) en beursie-identifiseerders van elke nie-bewarende beursie op hierdie toestel in, nie net hierdie een nie, maar nooit jou rugsteunfrases of sleutels nie. Deel dit net met ons ondersteuningspan.",
+    "exportLogsAnalyticsIdNote": "Hierdie lêer bevat hierdie installasie se analise-ID, sodat ondersteuning sy toepassingsgebeure kan sien.",
     "exportLogsConfirm": "Deel loglêers",
     "noLogsYet": "Daar is nog geen loglêers om te deel nie. Maak jou beursie oop en probeer weer.",
     "exportLogsError": "Kon nie jou loglêers uitvoer nie. Probeer asseblief weer."

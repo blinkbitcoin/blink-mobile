@@ -3095,6 +3095,7 @@
     "downloadLogs": "Qillqakunata urquy",
     "exportLogsTitle": "Qullqikuqniykipa qillqakunanta qunakuy",
     "exportLogsBody": "Kay willañiqi yanapan yanapaqkunata qullqikuqniykikunapi sasachakuykunata qhaway. Paypiqa pagay wiñay (chaninkuna, facturas, direccionkuna) hinallataq kay dispositivopi llapa mana waqaychasqa qullqikuqniypa sutichaynin, manan kaylla chu, ichaqa manan waqaychana rimaykuna nitaq llavekuna. Yanapaqkunallawan qunakuy.",
+    "exportLogsAnalyticsIdNote": "Kay qillqaqa kay churasqap analítica ID-ninta apan, yanapaqkuna app ruwasqankunata rikunankupaq.",
     "exportLogsConfirm": "Qillqakunata qunakuy",
     "noLogsYet": "Manaraq qillqakuna kanchu qunanapaq. Qullqikuqniykita kichay, watiqmanta ruway.",
     "exportLogsError": "Qillqakunataqa manam hurquyta atirqanichu. Hukmanta kallpachakuy."

@@ -9,8 +9,10 @@ import { AccountType } from "@app/types/wallet"
 import { shareTextFile } from "@app/utils/share-file"
 
 import { networkLabelFor } from "../config"
+import { shouldIncludeAnalyticsId } from "../diagnostics/analytics-id-in-export"
 import { SDK_LOG_EXPORT_BASENAME, exportSdkLogs } from "../diagnostics/export-sdk-logs"
 import { buildLogExportHeader } from "../diagnostics/log-export-header"
+import { peekTelemetryInstanceId } from "../telemetry-instance-id"
 
 import { useSelfCustodialAccountMode } from "./use-self-custodial-account-mode"
 import { useSparkNetwork } from "./use-spark-network"
@@ -22,6 +24,21 @@ export const ExportLogsOutcome = {
 } as const
 
 export type ExportLogsOutcome = (typeof ExportLogsOutcome)[keyof typeof ExportLogsOutcome]
+
+/**
+ * Whether the export will carry the install's analytics id. One answer for the file and
+ * for the line on the disclosure that says so, so the two can never disagree.
+ */
+export const useIncludesAnalyticsId = (): boolean => {
+  const { accountMode, getModeFor } = useSelfCustodialAccountMode()
+  const { accounts } = useAccountRegistry()
+  return shouldIncludeAnalyticsId({
+    activeMode: accountMode,
+    selfCustodialModes: accounts
+      .filter((account) => account.type === AccountType.SelfCustodial)
+      .map((account) => getModeFor(account.id)),
+  })
+}
 
 /**
  * Builds the SDK log export and opens the share sheet on it. Reads files only, so it
@@ -36,6 +53,7 @@ export const useExportSdkLogs = () => {
   const network = useSparkNetwork()
   const { accountMode } = useSelfCustodialAccountMode()
   const { accounts } = useAccountRegistry()
+  const includesAnalyticsId = useIncludesAnalyticsId()
   const [loading, setLoading] = useState(false)
 
   const exportLogs = async (): Promise<ExportLogsOutcome> => {
@@ -43,12 +61,14 @@ export const useExportSdkLogs = () => {
     let path: string | null
     try {
       const now = new Date()
+      const analyticsId = includesAnalyticsId ? await peekTelemetryInstanceId() : null
       const header = buildLogExportHeader({
         appVersion: getReadableVersion(),
         os: Platform.OS,
         osVersion: Platform.Version,
         network: networkLabelFor(network),
         accountMode,
+        analyticsId,
         selfCustodialAccountCount: accounts.filter(
           (account) => account.type === AccountType.SelfCustodial,
         ).length,
@@ -67,5 +87,5 @@ export const useExportSdkLogs = () => {
     return shared ? ExportLogsOutcome.Shared : ExportLogsOutcome.Dismissed
   }
 
-  return { exportLogs, loading }
+  return { exportLogs, loading, includesAnalyticsId }
 }

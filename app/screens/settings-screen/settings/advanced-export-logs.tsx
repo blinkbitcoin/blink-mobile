@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react"
 
-import { Text } from "@rn-vui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
@@ -26,7 +26,8 @@ export const ExportLogsSetting: React.FC = () => {
 
 const ExportLogsRow: React.FC = () => {
   const { LL } = useI18nContext()
-  const { exportLogs, loading } = useExportSdkLogs()
+  const styles = useStyles()
+  const { exportLogs, loading, includesAnalyticsId } = useExportSdkLogs()
   const [isDisclosureVisible, setIsDisclosureVisible] = useState(false)
   /** Set by the confirm button and read once the disclosure is off the screen: iOS will
    *  not present the share sheet over a modal that is still animating out. */
@@ -66,7 +67,16 @@ const ExportLogsRow: React.FC = () => {
         isVisible={isDisclosureVisible}
         toggleModal={close}
         title={LL.support.exportLogsTitle()}
-        body={<Text type="p2">{LL.support.exportLogsBody()}</Text>}
+        body={
+          <>
+            <Text type="p2">{LL.support.exportLogsBody()}</Text>
+            {includesAnalyticsId && (
+              <Text type="p2" style={styles.analyticsIdNote}>
+                {LL.support.exportLogsAnalyticsIdNote()}
+              </Text>
+            )}
+          </>
+        }
         primaryButtonTitle={LL.support.exportLogsConfirm()}
         primaryButtonOnPress={confirm}
         secondaryButtonTitle={LL.common.cancel()}
@@ -77,3 +87,9 @@ const ExportLogsRow: React.FC = () => {
     </>
   )
 }
+
+const useStyles = makeStyles(() => ({
+  analyticsIdNote: {
+    marginTop: 12,
+  },
+}))
