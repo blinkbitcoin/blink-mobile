@@ -114,7 +114,8 @@ export const useOnchainFeeTiers = (
     setSeenKey(inputsKey)
     discardQuote()
   }
-  /** One quote at a time: a second press for the same inputs waits on the first. */
+  /** One quote at a time: a second press for the same inputs shares the first, and one
+   *  for new inputs starts only once the first has settled. */
   const inFlightRef = useRef<{
     key: string
     promise: Promise<OnchainFeeTiers | null>
@@ -125,17 +126,22 @@ export const useOnchainFeeTiers = (
   latestKeyRef.current = inputsKey
 
   const error = hasFailed ? failureReason : null
-  const isQuoting = inputsKey !== null && quotingKey === inputsKey
+  /** True while any quote is out, the inputs' own or one they have since moved on from:
+   *  that one still holds the wallet's leaves, so nothing may ask again until it settles. */
+  const isQuoting = quotingKey !== null
 
   const quote = useCallback((): Promise<OnchainFeeTiers | null> => {
     if (!sdk || !address || !amountSats || !inputsKey) return Promise.resolve(null)
     if (inFlightRef.current?.key === inputsKey) return inFlightRef.current.promise
+    const previous = inFlightRef.current?.promise
 
     const isStale = () => latestKeyRef.current !== inputsKey
 
     const run = async (): Promise<OnchainFeeTiers | null> => {
-      setQuotingKey(inputsKey)
       try {
+        // Queued behind an earlier quote, these inputs may be gone before it is their turn.
+        if (isStale()) return null
+
         const prepared = await prepareSend(sdk, {
           paymentRequest: address,
           amount: BigInt(amountSats),
@@ -174,7 +180,9 @@ export const useOnchainFeeTiers = (
       }
     }
 
-    const promise = run()
+    setQuotingKey(inputsKey)
+    // `run` never rejects, so the earlier quote settling is all this waits for.
+    const promise = previous ? previous.then(run) : run()
     inFlightRef.current = { key: inputsKey, promise }
     return promise
   }, [sdk, address, amountSats, inputsKey, markQuoted, markFailed])
