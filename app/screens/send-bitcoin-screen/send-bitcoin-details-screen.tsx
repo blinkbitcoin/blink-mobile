@@ -188,7 +188,6 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     isQuotingFeesForNext,
     isOnchain,
     quoteFeesForNext,
-    selectedTierFee,
   } = useOnchainFeeTierOptions({
     paymentDetail,
     isSelfCustodial,
@@ -555,17 +554,9 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
    * selector quoted: leaving before it lands is leaving without the warning. The fee this
    * screen probed on mount used to stand in for it, which the picked tier's own fee replaced.
    */
-  /** Only one of the two limits queries runs for a payment, so at most one can fail. */
-  const retryLimits = withdrawalLimitsError
-    ? () => refetchWithdrawalLimits()
-    : intraledgerLimitsError
-      ? () => refetchIntraledgerLimits()
-      : undefined
-
   const isNextDisabled =
     !goToNextScreen ||
     !amountStatus.validAmount ||
-    Boolean(retryLimits) ||
     Boolean(lnurlBoundsErrorMessage) ||
     isSelfPayment ||
     isQuotingFees

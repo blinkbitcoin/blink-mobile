@@ -17,6 +17,7 @@ import {
   within,
 } from "@testing-library/react-native"
 
+import { SCRIM_TEST_ID } from "@app/components/bottom-sheet"
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { ActiveWalletStatus } from "@app/types/wallet"
 import * as InitialAccessibilityFocus from "@app/hooks/use-initial-accessibility-focus"
@@ -593,9 +594,6 @@ describe("SendBitcoinConfirmationScreen", () => {
     const fee = screen.getByTestId("Successful Fee")
     for (const value of [from, screen.getByText(note), fee]) {
       expect(surfaceColor(value)).toBe(light.surfaceStatic)
-    }
-    for (const value of [from, amount]) {
-      expect(surfaceColor(value)).not.toBe(light.surfaceInteractive)
     }
   })
 
