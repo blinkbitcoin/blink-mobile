@@ -43,7 +43,7 @@ type Args = {
  * It also formats the dust sweep text for the banner under Details.
  *
  * Custodial fee failures carry raw text and stay inline, yet block the send just the same,
- * so they get the error haptic the sheet gives the rest.
+ * so they get the error haptic the sheet gives the rest, unless a sheet error buzzed first.
  */
 export const useReviewErrorSheet = ({
   paymentFailure,
@@ -100,8 +100,13 @@ export const useReviewErrorSheet = ({
   const sheet = useDismissibleErrorMsg<SheetContent>(
     paymentFailure ?? overBalance ?? feeError ?? noticeSlot,
   )
+  // A sheet error, even a dismissed one, already buzzed: an over-balance amount usually
+  // fails the custodial fee probe too, and the two must not buzz together.
+  const hasSheetError = Boolean(paymentFailure ?? overBalance)
   useErrorHaptic(
-    isFeeFailed && !isSelfCustodialErrorCode(feeErrorCode) ? feeErrorText : undefined,
+    isFeeFailed && !isSelfCustodialErrorCode(feeErrorCode) && !hasSheetError
+      ? feeErrorText
+      : undefined,
   )
 
   // The sheet stays mounted and only toggles `isVisible`, as `BottomSheet` expects. With

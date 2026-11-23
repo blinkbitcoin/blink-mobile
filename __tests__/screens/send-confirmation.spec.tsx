@@ -2734,6 +2734,51 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
     })
   })
 
+  /** The sheet owns the buzz: one error haptic per failure, never one more for the inline
+   *  error under it. */
+  describe("error haptic", () => {
+    const errorBuzzes = () =>
+      (ReactNativeHapticFeedback.trigger as jest.Mock).mock.calls.filter(
+        ([type]) => type === "notificationError",
+      ).length
+
+    it("buzzes once as a failed send opens the sheet", async () => {
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "FAILURE",
+        errorsMessage: "route not found",
+      })
+      await renderReview(route)
+      await slide()
+
+      expect(errorSheet()).toBeTruthy()
+      expect(errorBuzzes()).toBe(1)
+    })
+
+    it("buzzes once for a send that threw, since it may have landed", async () => {
+      sendPaymentMock.mockRejectedValueOnce(new Error("network died"))
+      await renderReview(route)
+      await slide()
+
+      expect(errorBuzzes()).toBe(1)
+    })
+
+    it("buzzes once for a custodial fee failure, which opens no sheet", async () => {
+      failFee("Unable to find a route")
+      await renderReview(route)
+
+      expect(errorSheet()).toBeNull()
+      expect(errorBuzzes()).toBe(1)
+    })
+
+    it("buzzes once when the total is over the balance and the fee probe failed too", async () => {
+      failFee("Insufficient balance")
+      await renderReview(buildUsdSettlementRoute(20000))
+
+      expectInlineAndInSheet(/Total exceeds your balance/)
+      expect(errorBuzzes()).toBe(1)
+    })
+  })
+
   describe("USD dust sweep notice (R5)", () => {
     const sweep = /will be converted to Bitcoin\. USD minimum:/i
 
