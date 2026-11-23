@@ -25,10 +25,10 @@ jest.mock("@rn-vui/themed", () => ({
   }),
 }))
 
-jest.mock("@app/utils/haptics", () => ({ haptics: { tap: jest.fn() } }))
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({ LL: { Accessibility: { deleteKey: () => "Delete" } } }),
 }))
+jest.mock("@app/utils/haptics", () => ({ haptics: { tap: jest.fn() } }))
 
 jest.mock("@app/components/atomic/galoy-icon", () => ({
   GaloyIcon: ({ name, ...props }: { name: string }) => (
@@ -144,6 +144,17 @@ describe("CurrencyKeyboard", () => {
 
     expect(mockOnPress).not.toHaveBeenCalled()
   })
+
+  it("buzzes on every accessibility click of the same accepted key", () => {
+    const onPress = jest.fn().mockReturnValue(true)
+    const { getByText } = render(<CurrencyKeyboard onPress={onPress} />)
+    const key = getByText("1")
+
+    fireEvent(key, "click")
+    fireEvent(key, "click")
+
+    expect(haptics.tap).toHaveBeenCalledTimes(2)
+  })
 })
 
 /** Mirrors `useNumberPad`: the handler closes over the amount of the render it came from. */
@@ -164,8 +175,8 @@ const StatefulPad = ({ initial }: { initial: string }) => {
 
 describe("CurrencyKeyboard held backspace", () => {
   beforeEach(() => {
-    jest.useFakeTimers()
     jest.clearAllMocks()
+    jest.useFakeTimers()
   })
 
   afterEach(() => {
@@ -201,14 +212,12 @@ describe("CurrencyKeyboard held backspace", () => {
   it("stops repeating on release", () => {
     const onPress = jest.fn().mockReturnValue(true)
     const { getByTestId } = render(<CurrencyKeyboard onPress={onPress} />)
-    const key = getByTestId("Key ⌫")
 
-    fireEvent(key, "pressIn")
+    fireEvent(getByTestId("Key ⌫"), "pressIn")
     act(() => {
       jest.advanceTimersByTime(600)
     })
-    fireEvent(key, "pressOut")
-    fireEvent.press(key)
+    fireEvent(getByTestId("Key ⌫"), "pressOut")
     act(() => {
       jest.advanceTimersByTime(1500)
     })
@@ -216,33 +225,64 @@ describe("CurrencyKeyboard held backspace", () => {
     expect(onPress).toHaveBeenCalledTimes(2)
   })
 
-  it("does not delete again when the release press follows a repeat", () => {
-    const { getByTestId } = render(<StatefulPad initial="123456" />)
+  it("buzzes once for a held backspace, including the release", () => {
+    const onPress = jest.fn().mockReturnValue(true)
+    const { getByTestId } = render(<CurrencyKeyboard onPress={onPress} />)
     const key = getByTestId("Key ⌫")
 
     fireEvent(key, "pressIn")
-    for (let tick = 0; tick < 3; tick += 1) {
+    act(() => {
+      jest.advanceTimersByTime(600)
+    })
+    fireEvent(key, "pressOut")
+    fireEvent(key, "press")
+
+    expect(haptics.tap).toHaveBeenCalledTimes(1)
+    expect(onPress).toHaveBeenCalledTimes(2)
+  })
+
+  it("does not delete again when a repeated hold is released", () => {
+    const { getByTestId } = render(<StatefulPad initial="12345" />)
+    const key = getByTestId("Key ⌫")
+
+    fireEvent(key, "pressIn")
+    for (let tick = 0; tick < 2; tick += 1) {
       act(() => {
         jest.advanceTimersByTime(300)
       })
     }
     fireEvent(key, "pressOut")
-    fireEvent.press(key)
+    fireEvent(key, "press")
 
     expect(getByTestId("amount").props.children).toBe("123")
-    expect(haptics.tap).toHaveBeenCalledTimes(1)
   })
 
-  it("still deletes once when a tap releases before the first repeat", () => {
-    const { getByTestId } = render(<StatefulPad initial="123456" />)
+  it("still deletes once when a short tap is released before a repeat", () => {
+    const onPress = jest.fn().mockReturnValue(true)
+    const { getByTestId } = render(<CurrencyKeyboard onPress={onPress} />)
     const key = getByTestId("Key ⌫")
 
     fireEvent(key, "pressIn")
     fireEvent(key, "pressOut")
-    fireEvent.press(key)
+    fireEvent(key, "press")
 
-    expect(getByTestId("amount").props.children).toBe("12345")
-    expect(haptics.tap).toHaveBeenCalledTimes(1)
+    expect(onPress).toHaveBeenCalledTimes(1)
+  })
+
+  it("still deletes on the next accessibility click after a repeated hold", () => {
+    const onPress = jest.fn().mockReturnValue(true)
+    const { getByTestId } = render(<CurrencyKeyboard onPress={onPress} />)
+    const key = getByTestId("Key ⌫")
+
+    fireEvent(key, "pressIn")
+    act(() => {
+      jest.advanceTimersByTime(600)
+    })
+    fireEvent(key, "pressOut")
+    fireEvent(key, "press")
+    fireEvent(key, "click")
+
+    expect(onPress).toHaveBeenCalledTimes(3)
   })
 })
 

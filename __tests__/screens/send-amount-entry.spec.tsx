@@ -404,6 +404,64 @@ describe("free amount", () => {
     expect(mockHapticTap).toHaveBeenCalledTimes(2)
   })
 
+  /** The empty backspace above never reaches the pad: the key is disabled. A third decimal
+   *  digit is enabled, so the pad itself has to refuse it. Naira takes no decimals here,
+   *  so the dollar is the display currency. */
+  it("leaves the amount and stays silent when the pad refuses an enabled key", async () => {
+    mockDisplayCurrency.current = "USD"
+    renderScreen(intraledgerDestination())
+    await settle()
+    const primary = () => screen.getByTestId("send-hero-amount-primary").props.children
+
+    typeKeys("1", ".", "2", "3")
+    await settle()
+    expect(primary()).toBe("$1.23")
+    expect(mockHapticTap).toHaveBeenCalledTimes(4)
+
+    typeKeys("4")
+    await settle()
+    expect(primary()).toBe("$1.23")
+    expect(mockHapticTap).toHaveBeenCalledTimes(4)
+  })
+
+  it("repeats a held backspace every 300 ms and stops at an empty amount", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+    const primary = () => screen.getByTestId("send-hero-amount-primary").props.children
+    typeKeys("1", "2", "3")
+    await settle()
+    expect(primary()).toBe("₦123")
+    mockHapticTap.mockClear()
+
+    jest.useFakeTimers()
+    try {
+      fireEvent(screen.getByTestId("Key ⌫"), "pressIn")
+      const seen = ["₦12", "₦1", "₦0"].map(() => {
+        act(() => {
+          jest.advanceTimersByTime(300)
+        })
+        return primary()
+      })
+      expect(seen).toEqual(["₦12", "₦1", "₦0"])
+
+      /** At an empty amount backspace disables, which ends the repeat: a digit typed
+       *  while the key is still held survives the ticks that would have followed. */
+      act(() => {
+        jest.advanceTimersByTime(300)
+      })
+      typeKeys("7")
+      act(() => {
+        jest.advanceTimersByTime(900)
+      })
+      expect(primary()).toBe("₦7")
+      fireEvent(screen.getByTestId("Key ⌫"), "pressOut")
+      // One for the whole hold, one for the 7.
+      expect(mockHapticTap).toHaveBeenCalledTimes(2)
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
   it("opens with the keypad and a disabled Add amount", async () => {
     renderScreen(intraledgerDestination())
     await settle()

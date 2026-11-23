@@ -2,8 +2,8 @@ import React, { Ref, useCallback, useEffect, useRef } from "react"
 import { makeStyles, Text } from "@rn-vui/themed"
 import { Pressable, View } from "react-native"
 
-import { useI18nContext } from "@app/i18n/i18n-react"
 import { radius } from "@app/rne-theme/radius"
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { haptics } from "@app/utils/haptics"
 import { testProps } from "@app/utils/testProps"
 import { fonts } from "@app/rne-theme/fonts"
@@ -13,13 +13,10 @@ import { Key as KeyType } from "../amount-input-screen/number-pad-reducer"
 const KEY_ROW_PREFIX = "row-"
 const KEY_TEST_ID_PREFIX = "Key"
 const BACKSPACE_REPEAT_MS = 300
-/** Release is pressOut, then press, in the same turn. A repeat already deleted. */
-const RELEASE_PRESS_WINDOW_MS = 50
 
 type CurrencyKeyboardProps = {
   /** Returns whether the press changed the amount: a refused key stays silent. */
   onPress: (pressed: KeyType) => boolean
-  safeMode?: boolean
   disabledKeys?: ReadonlySet<KeyType>
   disabled?: boolean
   /** The first key, "1": where screen reader focus lands to start typing an amount. */
@@ -28,7 +25,6 @@ type CurrencyKeyboardProps = {
 
 export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
   onPress,
-  safeMode = false,
   disabledKeys,
   disabled = false,
   firstKeyRef,
@@ -53,7 +49,6 @@ export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
                 key={key}
                 numberPadKey={key}
                 handleKeyPress={onPress}
-                safeMode={safeMode}
                 disabled={isKeyDisabled}
                 pressableRef={key === KeyType[1] ? firstKeyRef : undefined}
               />
@@ -68,13 +63,11 @@ export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
 const Key = ({
   handleKeyPress,
   numberPadKey,
-  safeMode,
   disabled,
   pressableRef,
 }: {
   numberPadKey: KeyType
   handleKeyPress: (key: KeyType) => boolean
-  safeMode?: boolean
   disabled?: boolean
   pressableRef?: Ref<View>
 }) => {
@@ -87,11 +80,21 @@ const Key = ({
   const handleKeyPressRef = useRef(handleKeyPress)
   handleKeyPressRef.current = handleKeyPress
   const repeatTimer = useRef<ReturnType<typeof setInterval> | null>(null)
-  /** One haptic per gesture: a held backspace deletes repeatedly but buzzes once. */
+  /** One haptic per pointer gesture: a held backspace deletes repeatedly but buzzes once.
+   *  Armed only by pressIn. An accessibility click calls onPress and never pressIn, so it
+   *  must not leave the guard set. */
   const hasTapped = useRef(false)
-  /** A tick already deleted. The release press that follows must not delete again. */
-  const didRepeat = useRef(false)
-  const repeatReleaseAt = useRef<number | null>(null)
+  const pointerDown = useRef(false)
+  /** A repeat tick already deleted. Release still emits onPress; that press must not delete again. */
+  const repeatFired = useRef(false)
+  /** Cleared if the release onPress follows pressOut. If it never comes, the timeout drops the guard. */
+  const releaseGuard = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const clearReleaseGuard = useCallback(() => {
+    if (!releaseGuard.current) return
+    clearTimeout(releaseGuard.current)
+    releaseGuard.current = null
+  }, [])
 
   const stopRepeat = useCallback(() => {
     if (!repeatTimer.current) return
@@ -101,37 +104,49 @@ const Key = ({
 
   const press = (key: KeyType) => {
     const accepted = handleKeyPressRef.current(key)
-    if (accepted && !hasTapped.current) {
-      hasTapped.current = true
+    if (accepted && !(pointerDown.current && hasTapped.current)) {
+      hasTapped.current = pointerDown.current
       haptics.tap()
     }
     return accepted
   }
 
-  const handlePress = (key: KeyType) => {
-    const releaseAt = repeatReleaseAt.current
-    repeatReleaseAt.current = null
-    if (releaseAt !== null && Date.now() - releaseAt < RELEASE_PRESS_WINDOW_MS) return
-    press(key)
+  const endPointerGesture = () => {
+    pointerDown.current = false
+    hasTapped.current = false
   }
 
   const handlePressIn = (key: KeyType) => {
+    pointerDown.current = true
     hasTapped.current = false
-    didRepeat.current = false
-    repeatReleaseAt.current = null
-    if (safeMode) return
+    repeatFired.current = false
+    clearReleaseGuard()
     if (key !== KeyType.Backspace) return
     stopRepeat()
     /** A refused tick means the amount is empty: stop rather than tick against nothing. */
     repeatTimer.current = setInterval(() => {
-      didRepeat.current = true
+      repeatFired.current = true
       if (!press(key)) stopRepeat()
     }, BACKSPACE_REPEAT_MS)
   }
 
   const handlePressOut = () => {
-    if (didRepeat.current) repeatReleaseAt.current = Date.now()
     stopRepeat()
+    if (!repeatFired.current) return
+    clearReleaseGuard()
+    releaseGuard.current = setTimeout(() => {
+      repeatFired.current = false
+      pointerDown.current = false
+      hasTapped.current = false
+      releaseGuard.current = null
+    }, 0)
+  }
+
+  const handlePress = () => {
+    clearReleaseGuard()
+    if (!repeatFired.current) press(numberPadKey)
+    repeatFired.current = false
+    endPointerGesture()
   }
 
   /** A key disabled mid-hold may never see its press-out. */
@@ -139,7 +154,13 @@ const Key = ({
     if (disabled) stopRepeat()
   }, [disabled, stopRepeat])
 
-  useEffect(() => stopRepeat, [stopRepeat])
+  useEffect(
+    () => () => {
+      stopRepeat()
+      clearReleaseGuard()
+    },
+    [stopRepeat, clearReleaseGuard],
+  )
 
   return (
     <Pressable
@@ -151,7 +172,7 @@ const Key = ({
         pressed && styles.keyPressedBg,
       ]}
       onPressIn={() => handlePressIn(numberPadKey)}
-      onPress={() => handlePress(numberPadKey)}
+      onPress={handlePress}
       onPressOut={handlePressOut}
       {...testProps(`${KEY_TEST_ID_PREFIX} ${numberPadKey}`)}
       accessibilityRole="button"

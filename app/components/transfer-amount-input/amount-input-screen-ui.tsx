@@ -43,7 +43,6 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
           onPress={onKeyPress}
           disabledKeys={disabledKeys}
           disabled={disabled}
-          safeMode
         />
       </View>
     </View>
