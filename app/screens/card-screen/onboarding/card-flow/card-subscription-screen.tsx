@@ -7,7 +7,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { SubscriptionOfferCard } from "@app/components/card-screen"
 import { CheckboxRow } from "@app/components/checkbox-row"
-import { Screen } from "@app/components/screen"
+import { StepLayout } from "@app/components/step-layout"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -86,8 +86,20 @@ export const CardSubscriptionScreen: React.FC = () => {
   }
 
   return (
-    <Screen>
-      <View style={styles.contentContainer}>
+    <StepLayout
+      footer={
+        <GaloyPrimaryButton
+          title={
+            isSubscribeVariant
+              ? LL.CardFlow.Onboarding.CardSubscription.acceptButton()
+              : LL.CardFlow.Onboarding.CardSubscription.payButton()
+          }
+          onPress={handleAccept}
+          disabled={isAcceptDisabled}
+        />
+      }
+    >
+      <View style={styles.content}>
         <SubscriptionOfferCard {...offerCard} />
 
         {isSubscribeVariant && (
@@ -153,33 +165,14 @@ export const CardSubscriptionScreen: React.FC = () => {
           </CheckboxRow>
         )}
       </View>
-
-      <View style={styles.buttonsContainer}>
-        <GaloyPrimaryButton
-          title={
-            isSubscribeVariant
-              ? LL.CardFlow.Onboarding.CardSubscription.acceptButton()
-              : LL.CardFlow.Onboarding.CardSubscription.payButton()
-          }
-          onPress={handleAccept}
-          disabled={isAcceptDisabled}
-        />
-      </View>
-    </Screen>
+    </StepLayout>
   )
 }
 
 const useStyles = makeStyles(() => ({
-  contentContainer: {
-    flex: 1,
+  content: {
     paddingHorizontal: 20,
-    paddingTop: 30,
+    paddingTop: 10,
     gap: 20,
-  },
-  buttonsContainer: {
-    justifyContent: "flex-end",
-    marginBottom: 14,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
   },
 }))
