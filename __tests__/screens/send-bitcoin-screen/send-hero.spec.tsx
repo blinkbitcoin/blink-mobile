@@ -326,14 +326,15 @@ describe("SendHero", () => {
       expect(badges()).toHaveLength(1)
     })
 
-    /** A play rewound while the sender was away holds the badge back until it replays. */
-    it("holds the badge back while a play waits to replay", () => {
+    /** A payment that landed while the sender was away holds the badge back until they
+     *  return. */
+    it("holds the badge back while no play has started", () => {
       render(sentHero({ progress: 0, isSent: true, sentPlay: 0 }))
 
       expect(badges()).toHaveLength(0)
     })
 
-    it("draws the badge from the start again on a replay", () => {
+    it("mounts the badge afresh for each play", () => {
       const { rerender } = render(sentHero({ progress: 0, isSent: true, sentPlay: 1 }))
       const firstBadge = badges()[0]
 
@@ -341,6 +342,14 @@ describe("SendHero", () => {
 
       expect(badges()).toHaveLength(1)
       expect(badges()[0]).not.toBe(firstBadge)
+    })
+
+    it("draws the badge in on a play, and shows it drawn when Sent comes back at its end", () => {
+      const { rerender } = render(sentHero({ progress: 0, isSent: true, sentPlay: 1 }))
+      expect(badges()[0].props.isDrawn).toBe(false)
+
+      rerender(sentHero({ progress: 1, isSent: true, sentPlay: 2, isSentAtEnd: true }))
+      expect(badges()[0].props.isDrawn).toBe(true)
     })
 
     it("starts from review's sizes", () => {

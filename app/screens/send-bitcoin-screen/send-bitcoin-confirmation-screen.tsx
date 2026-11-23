@@ -293,6 +293,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     heroRef,
     isSent,
     sentPlay,
+    isAtEnd,
     glowFrame,
     heroProgress,
     glowProgress,
@@ -310,8 +311,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   useInitialAccessibilityFocus(isSent ? undefined : sliderHandleRef)
 
   /** Review turns into Sent in place, with no new screen to land focus on, so the result
-   *  is spoken once per play: a Sent rewound in the background speaks again when it
-   *  replays. */
+   *  is spoken as Sent appears, also when it first appears on the sender's return. */
   useAccessibilityAnnouncement(
     sentPlay
       ? LL.SendBitcoinConfirmationScreen.sentAnnouncement({ amount: heroPrimaryText })
@@ -687,6 +687,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 sentProgress={heroProgress}
                 isSent={isSent}
                 sentPlay={sentPlay}
+                isSentAtEnd={isAtEnd}
               />
             </Animated.View>
           </View>

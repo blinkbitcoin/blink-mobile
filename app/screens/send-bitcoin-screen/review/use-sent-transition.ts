@@ -62,8 +62,8 @@ type SentAmounts = { primaryAmount: string; hasSecondaryAmount: boolean }
  * that landed after the sender switched away, could come back half drawn: the details gone
  * and inert, the actions still invisible and back held, with nothing left to press. So a
  * play that loses the screen before it settles (the app leaving, or the lock screen coming
- * up over review) is rewound to the start, and plays again in full once review is in front
- * of the sender again.
+ * up over review) is stopped, and Sent comes back at its end, fully drawn, once review is
+ * in front of the sender again. A payment that landed while they were away does the same.
  */
 export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}) => {
   const navigation = useNavigation()
@@ -76,8 +76,12 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
 
   const [isSent, setIsSent] = useState(false)
   const [glowFrame, setGlowFrame] = useState<SentGlowFrame>()
-  /** The play on screen, numbered so a replay redraws the badge; 0 while one waits. */
+  /** The play on screen, numbered so the badge mounts afresh for each; 0 while none has
+   *  started. */
   const [sentPlay, setSentPlay] = useState(0)
+  /** Sent was cut off, or landed, out of view, and came back at its end: nothing is left
+   *  to animate, the badge included. */
+  const [isAtEnd, setIsAtEnd] = useState(false)
   /** Whether review is in front of the sender; the hold only counts while it is. */
   const [isInView, setIsInView] = useState(true)
   /** With a screen reader on, Sent holds until the sender taps: a timer would move the
@@ -92,11 +96,15 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
   const [isSettled, setIsSettled] = useState(false)
 
   const amountsRef = useRef<SentAmounts>(undefined)
-  /** Bumped by every play and every rewind, so a play still measuring knows it lost. */
+  /** Bumped by every play and every interruption, so a play still measuring knows it
+   *  lost. */
   const playIdRef = useRef(0)
-  /** When the current play started; null while none has, or since one was rewound. */
+  /** When the current play started; null while none has. */
   const playStartedAtRef = useRef<number | null>(null)
-  const isReplayPendingRef = useRef(false)
+  /** Whether the hero's travel and the glow's frame are known, so an end state can be
+   *  shown without measuring a hero that has already moved. */
+  const isMeasuredRef = useRef(false)
+  const isFinishPendingRef = useRef(false)
 
   const heroProgress = useSharedValue(0)
   const detailsProgress = useSharedValue(0)
@@ -146,53 +154,51 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
       setAreActionsLive(false)
       return
     }
+    if (isAtEnd) {
+      setAreActionsLive(true)
+      return
+    }
     const timer = setTimeout(() => setAreActionsLive(true), ACTIONS_DELAY_MS)
     return () => clearTimeout(timer)
-  }, [sentPlay])
+  }, [sentPlay, isAtEnd])
 
-  const rewind = useCallback(() => {
-    playIdRef.current += 1
-    playStartedAtRef.current = null
-    for (const progress of [
-      detailsProgress,
-      heroProgress,
-      glowProgress,
-      actionsProgress,
-    ]) {
-      cancelAnimation(progress)
-      progress.value = 0
-    }
-    setSentPlay(0)
-  }, [detailsProgress, heroProgress, glowProgress, actionsProgress])
+  /** Measured with the hero still at its review position: nothing moves it before this
+   *  answers. Resolves false once a later play or an interruption has taken over. */
+  const measure = useCallback(
+    async (amounts: SentAmounts, playId: number) => {
+      const [stage, hero] = await Promise.all([
+        measureInWindow(stageRef.current),
+        measureInWindow(heroRef.current),
+      ])
+      if (playId !== playIdRef.current) return false
+
+      if (stage && hero) {
+        /** The stage runs the full screen, under the system bars, so its centre is the
+         *  screen's. */
+        const centerInStage = stage.height / 2
+        const heroCenterWhenSent =
+          hero.y - stage.y + (hero.height + sentHeroGrowth(amounts)) / 2
+        heroTravel.value = centerInStage - heroCenterWhenSent
+        setGlowFrame({
+          centerX: stage.width / 2,
+          centerY: centerInStage,
+          radius: stage.height,
+        })
+        isMeasuredRef.current = true
+      }
+      return true
+    },
+    [heroTravel],
+  )
 
   const play = useCallback(async () => {
     const amounts = amountsRef.current
     if (!amounts) return
-    isReplayPendingRef.current = false
     playIdRef.current += 1
     const playId = playIdRef.current
     playStartedAtRef.current = Date.now()
 
-    /** Measured on every play, with the hero rewound to its review position. */
-    const [stage, hero] = await Promise.all([
-      measureInWindow(stageRef.current),
-      measureInWindow(heroRef.current),
-    ])
-    if (playId !== playIdRef.current) return
-
-    if (stage && hero) {
-      /** The stage runs the full screen, under the system bars, so its centre is the
-       *  screen's. */
-      const centerInStage = stage.height / 2
-      const heroCenterWhenSent =
-        hero.y - stage.y + (hero.height + sentHeroGrowth(amounts)) / 2
-      heroTravel.value = centerInStage - heroCenterWhenSent
-      setGlowFrame({
-        centerX: stage.width / 2,
-        centerY: centerInStage,
-        radius: stage.height,
-      })
-    }
+    if (!(await measure(amounts, playId))) return
 
     setIsSent(true)
     setSentPlay(playId)
@@ -208,36 +214,74 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
       ACTIONS_DELAY_MS,
       withTiming(1, { duration: ACTIONS_FADE_MS, easing: Easing.out(Easing.quad) }),
     )
-  }, [heroTravel, detailsProgress, heroProgress, actionsProgress])
+  }, [measure, detailsProgress, heroProgress, actionsProgress])
+
+  /** Sent at its end, with no motion: measured first only if the play never got that far,
+   *  in which case the hero has not moved yet. Its hold counts from now. */
+  const finish = useCallback(async () => {
+    const amounts = amountsRef.current
+    if (!amounts) return
+    isFinishPendingRef.current = false
+    playIdRef.current += 1
+    const playId = playIdRef.current
+
+    if (!isMeasuredRef.current && !(await measure(amounts, playId))) return
+
+    playStartedAtRef.current = Date.now() - SENT_TIMELINE_MS
+    for (const progress of [
+      detailsProgress,
+      heroProgress,
+      glowProgress,
+      actionsProgress,
+    ]) {
+      cancelAnimation(progress)
+      progress.value = 1
+    }
+    setIsSent(true)
+    setIsAtEnd(true)
+    setSentPlay(playId)
+  }, [measure, detailsProgress, heroProgress, glowProgress, actionsProgress])
 
   /** The glow only mounts with the commit that sets its frame, and on a first play that
    *  commit is the whole screen turning Sent: started in `play`, the bloom could run its
    *  course before the glow was there, which then only flashed. The frame and the play
-   *  land in one batch, so this runs once per play, with the glow on screen. */
+   *  land in one batch, so this runs once per play, with the glow on screen. The badge
+   *  mounts with the same commit, so the timeline is counted from here too: a slow commit
+   *  can't run out the clock on a bloom that has only just started. */
   useEffect(() => {
-    if (!sentPlay) return
+    if (!sentPlay || isAtEnd) return
+    playStartedAtRef.current = Date.now()
     glowProgress.value = withTiming(1, {
       duration: GLOW_BLOOM_MS,
       easing: Easing.out(Easing.quad),
     })
-  }, [sentPlay, glowProgress])
+  }, [sentPlay, isAtEnd, glowProgress])
 
   const canBeSeen = useCallback(
     () => AppState.currentState === "active" && navigation.isFocused(),
     [navigation],
   )
 
-  /** A settled play is left alone: only one still under way is taken back. */
+  /** A settled play is left alone: one still under way, or still measuring, is stopped
+   *  where it is and shown at its end on return. */
   const interrupt = useCallback(() => {
     const startedAt = playStartedAtRef.current
     if (startedAt === null || Date.now() - startedAt >= SENT_TIMELINE_MS) return
-    rewind()
-    isReplayPendingRef.current = true
-  }, [rewind])
+    playIdRef.current += 1
+    for (const progress of [
+      detailsProgress,
+      heroProgress,
+      glowProgress,
+      actionsProgress,
+    ]) {
+      cancelAnimation(progress)
+    }
+    isFinishPendingRef.current = true
+  }, [detailsProgress, heroProgress, glowProgress, actionsProgress])
 
-  const replayIfPending = useCallback(() => {
-    if (isReplayPendingRef.current && canBeSeen()) play()
-  }, [canBeSeen, play])
+  const finishIfPending = useCallback(() => {
+    if (isFinishPendingRef.current && canBeSeen()) finish()
+  }, [canBeSeen, finish])
 
   useEffect(() => {
     const leave = () => {
@@ -246,7 +290,7 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
     }
     const comeBack = () => {
       setIsInView(canBeSeen())
-      replayIfPending()
+      finishIfPending()
     }
     /** Any state but active covers review: iOS sits in inactive under Control Centre,
      *  Siri, the app switcher and the start of a lock. */
@@ -261,7 +305,7 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
       removeBlurListener()
       removeFocusListener()
     }
-  }, [navigation, interrupt, replayIfPending, canBeSeen])
+  }, [navigation, interrupt, finishIfPending, canBeSeen])
 
   useEffect(() => {
     let isMounted = true
@@ -296,9 +340,10 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
         await play()
         return
       }
-      /** Landed while the sender was away: Sent waits, rewound, for them to come back. */
+      /** Landed while the sender was away: Sent waits for them, and comes back at its
+       *  end. */
       setIsSent(true)
-      isReplayPendingRef.current = true
+      isFinishPendingRef.current = true
     },
     [canBeSeen, play],
   )
@@ -314,6 +359,7 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
     heroRef,
     isSent,
     sentPlay,
+    isAtEnd,
     glowFrame,
     heroProgress,
     glowProgress,
