@@ -317,6 +317,13 @@ const prepareConversion = async (
  * to complete, which the SDK itself gives up on after 30 seconds by default
  * (`completionTimeoutSecs`), and one past this bound goes down the path of a conversion
  * whose outcome was lost, looked for before anything converts again.
+ *
+ * The turn ends at this bound while the send may still be running in the SDK. What keeps
+ * the next conversion from going out over it is the lost conversion's delivery window
+ * (`LOST_CONVERSION_DELIVERY_WINDOW_MS`), counted from here, which has to outlast what
+ * is left of that call. It does by far while the SDK gives up its swap wait at 30
+ * seconds: a change to this bound, to the window or to `completionTimeoutSecs` has to keep
+ * it so.
  */
 const CONVERSION_QUOTE_TIMEOUT_MS = 60_000
 const CONVERSION_SEND_TIMEOUT_MS = 90_000
