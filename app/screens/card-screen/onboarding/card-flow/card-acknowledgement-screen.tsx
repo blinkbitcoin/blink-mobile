@@ -11,17 +11,20 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { CheckboxRow } from "@app/components/card-screen/checkbox-row"
+import { CheckboxRow } from "@app/components/checkbox-row"
 import { IconHero } from "@app/components/icon-hero"
 import { StepLayout } from "@app/components/step-layout"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { openExternalUrl } from "@app/utils/external"
-import { fonts } from "@app/rne-theme/fonts"
 import { toastShow } from "@app/utils/toast"
 
 import { useCardApplicationSubmit } from "./use-card-application-submit"
+
+/** The design's checkbox row: 14 between the box and its text, set at 14/16. */
+const CHECKBOX_GAP = 14
+const CHECKBOX_LINE_HEIGHT = 16
 
 /** One press of Accept, set aside when the user leaves the step before it answers. */
 type SendAttempt = { isAbandoned: boolean }
@@ -127,58 +130,61 @@ export const CardAcknowledgementScreen: React.FC = () => {
 
         <View style={styles.checkboxesContainer}>
           <CheckboxRow
-            checked={isESignAccepted}
+            isChecked={isESignAccepted}
             onPress={() => setIsESignAccepted(!isESignAccepted)}
+            gap={CHECKBOX_GAP}
+            labelLineHeight={CHECKBOX_LINE_HEIGHT}
           >
-            <Text type="p3" style={styles.agreementText}>
-              {acknowledgementLL.eSignConsent.text()}{" "}
-              <Text
-                style={styles.link}
-                onPress={() => openExternalUrl(cardESignConsentUrl)}
-              >
-                {acknowledgementLL.eSignConsent.linkText()}
-              </Text>
+            {acknowledgementLL.eSignConsent.text()}{" "}
+            <Text
+              bold
+              color={colors.accent}
+              onPress={() => openExternalUrl(cardESignConsentUrl)}
+            >
+              {acknowledgementLL.eSignConsent.linkText()}
             </Text>
           </CheckboxRow>
 
           <CheckboxRow
-            checked={isPrivacyAndTermsAccepted}
+            isChecked={isPrivacyAndTermsAccepted}
             onPress={() => setIsPrivacyAndTermsAccepted(!isPrivacyAndTermsAccepted)}
+            gap={CHECKBOX_GAP}
+            labelLineHeight={CHECKBOX_LINE_HEIGHT}
           >
-            <Text type="p3" style={styles.agreementText}>
-              {acknowledgementLL.privacyAndTerms.text()}{" "}
-              <Text
-                style={styles.link}
-                onPress={() => openExternalUrl(cardIssuerPrivacyPolicyUrl)}
-              >
-                {acknowledgementLL.privacyAndTerms.privacyPolicyLinkText()}
-              </Text>
-              {acknowledgementLL.privacyAndTerms.and()}{" "}
-              <Text
-                style={styles.link}
-                onPress={() => openExternalUrl(cardCardholderAgreementUrl)}
-              >
-                {acknowledgementLL.privacyAndTerms.cardTermsLinkText()}
-              </Text>
+            {acknowledgementLL.privacyAndTerms.text()}{" "}
+            <Text
+              bold
+              color={colors.accent}
+              onPress={() => openExternalUrl(cardIssuerPrivacyPolicyUrl)}
+            >
+              {acknowledgementLL.privacyAndTerms.privacyPolicyLinkText()}
+            </Text>
+            {acknowledgementLL.privacyAndTerms.and()}{" "}
+            <Text
+              bold
+              color={colors.accent}
+              onPress={() => openExternalUrl(cardCardholderAgreementUrl)}
+            >
+              {acknowledgementLL.privacyAndTerms.cardTermsLinkText()}
             </Text>
           </CheckboxRow>
 
           <CheckboxRow
-            checked={isAccuracyCertified}
+            isChecked={isAccuracyCertified}
             onPress={() => setIsAccuracyCertified(!isAccuracyCertified)}
+            gap={CHECKBOX_GAP}
+            labelLineHeight={CHECKBOX_LINE_HEIGHT}
           >
-            <Text type="p3" style={styles.agreementText}>
-              {acknowledgementLL.certifyAccuracy()}
-            </Text>
+            {acknowledgementLL.certifyAccuracy()}
           </CheckboxRow>
 
           <CheckboxRow
-            checked={isSolicitationAcknowledged}
+            isChecked={isSolicitationAcknowledged}
             onPress={() => setIsSolicitationAcknowledged(!isSolicitationAcknowledged)}
+            gap={CHECKBOX_GAP}
+            labelLineHeight={CHECKBOX_LINE_HEIGHT}
           >
-            <Text type="p3" style={styles.agreementText}>
-              {acknowledgementLL.acknowledgeSolicitation()}
-            </Text>
+            {acknowledgementLL.acknowledgeSolicitation()}
           </CheckboxRow>
         </View>
       </View>
@@ -186,7 +192,7 @@ export const CardAcknowledgementScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(() => ({
   /** On top of the hero's own 20, so it sits 30 below the header like the other card steps. */
   content: {
     paddingTop: 10,
@@ -197,13 +203,5 @@ const useStyles = makeStyles(({ colors }) => ({
   checkboxesContainer: {
     marginTop: 66,
     gap: 20,
-  },
-  agreementText: {
-    color: colors.textOnBackground,
-    lineHeight: 16,
-  },
-  link: {
-    color: colors.accent,
-    fontFamily: fonts.bold,
   },
 }))

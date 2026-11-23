@@ -6,10 +6,6 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { CardSubscriptionScreen } from "@app/screens/card-screen/onboarding/card-flow/card-subscription-screen"
 import { ContextForScreen } from "../../../helper"
 
-jest.mock("@rn-vui/themed", () =>
-  jest.requireActual("../../../../helpers/card-flow-mocks").mockThemedWithCheckbox(),
-)
-
 const mockNavigate = jest.fn()
 const mockSetOptions = jest.fn()
 const mockUseRoute = jest.fn()
@@ -87,10 +83,10 @@ const renderScreen = async () => {
 }
 
 const checkBoxes = async (
-  getAllByTestId: (id: string) => ReturnType<typeof render>["root"][],
+  getAllByRole: ReturnType<typeof render>["getAllByRole"],
   indexes: number[],
 ) => {
-  const unchecked = getAllByTestId("checkbox-unchecked")
+  const unchecked = getAllByRole("checkbox", { checked: false })
   await act(async () => {
     indexes.forEach((index) => fireEvent.press(unchecked[index]))
   })
@@ -131,9 +127,9 @@ describe("CardSubscriptionScreen - free offer", () => {
   })
 
   it("opens the identity check once both checkboxes are accepted", async () => {
-    const { getByText, getAllByTestId } = await renderScreen()
+    const { getByText, getAllByRole } = await renderScreen()
 
-    await checkBoxes(getAllByTestId, [NOTICE_CHECKBOX_INDEX, FEE_SCHEDULE_CHECKBOX_INDEX])
+    await checkBoxes(getAllByRole, [NOTICE_CHECKBOX_INDEX, FEE_SCHEDULE_CHECKBOX_INDEX])
     await act(async () => {
       fireEvent.press(getByText("Accept"))
     })
@@ -175,10 +171,10 @@ describe("CardSubscriptionScreen - paid offer", () => {
 
   /** The terms moved to the acknowledgement step at the end of the flow. */
   it("leaves the terms out of this step", async () => {
-    const { queryByText, getAllByTestId } = await renderScreen()
+    const { queryByText, getAllByRole } = await renderScreen()
 
     expect(queryByText("Terms of Service")).toBeNull()
-    expect(getAllByTestId("checkbox-unchecked")).toHaveLength(2)
+    expect(getAllByRole("checkbox", { checked: false })).toHaveLength(2)
   })
 
   it("navigates to the fee schedule screen when the link is pressed", async () => {
@@ -202,9 +198,9 @@ describe("CardSubscriptionScreen - paid offer", () => {
   })
 
   it("keeps the button disabled when only the renew checkbox is checked", async () => {
-    const { getByText, getAllByTestId } = await renderScreen()
+    const { getByText, getAllByRole } = await renderScreen()
 
-    await checkBoxes(getAllByTestId, [NOTICE_CHECKBOX_INDEX])
+    await checkBoxes(getAllByRole, [NOTICE_CHECKBOX_INDEX])
     await act(async () => {
       fireEvent.press(getByText("Accept"))
     })
@@ -213,9 +209,9 @@ describe("CardSubscriptionScreen - paid offer", () => {
   })
 
   it("keeps the button disabled when only the fee schedule checkbox is checked", async () => {
-    const { getByText, getAllByTestId } = await renderScreen()
+    const { getByText, getAllByRole } = await renderScreen()
 
-    await checkBoxes(getAllByTestId, [FEE_SCHEDULE_CHECKBOX_INDEX])
+    await checkBoxes(getAllByRole, [FEE_SCHEDULE_CHECKBOX_INDEX])
     await act(async () => {
       fireEvent.press(getByText("Accept"))
     })
@@ -224,9 +220,9 @@ describe("CardSubscriptionScreen - paid offer", () => {
   })
 
   it("opens the identity check once renewal and fee schedule are accepted", async () => {
-    const { getByText, getAllByTestId } = await renderScreen()
+    const { getByText, getAllByRole } = await renderScreen()
 
-    await checkBoxes(getAllByTestId, [NOTICE_CHECKBOX_INDEX, FEE_SCHEDULE_CHECKBOX_INDEX])
+    await checkBoxes(getAllByRole, [NOTICE_CHECKBOX_INDEX, FEE_SCHEDULE_CHECKBOX_INDEX])
     await act(async () => {
       fireEvent.press(getByText("Accept"))
     })
@@ -235,17 +231,17 @@ describe("CardSubscriptionScreen - paid offer", () => {
   })
 
   it("unchecks a checkbox when pressed again", async () => {
-    const { getByText, getAllByTestId, getByTestId } = await renderScreen()
+    const { getByText, getAllByRole, getByRole } = await renderScreen()
 
-    await checkBoxes(getAllByTestId, [NOTICE_CHECKBOX_INDEX, FEE_SCHEDULE_CHECKBOX_INDEX])
+    await checkBoxes(getAllByRole, [NOTICE_CHECKBOX_INDEX, FEE_SCHEDULE_CHECKBOX_INDEX])
     await act(async () => {
-      fireEvent.press(getAllByTestId("checkbox-checked")[NOTICE_CHECKBOX_INDEX])
+      fireEvent.press(getAllByRole("checkbox", { checked: true })[NOTICE_CHECKBOX_INDEX])
     })
     await act(async () => {
       fireEvent.press(getByText("Accept"))
     })
 
-    expect(getByTestId("checkbox-unchecked")).toBeTruthy()
+    expect(getByRole("checkbox", { checked: false })).toBeTruthy()
     expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
   })
 })
@@ -279,22 +275,19 @@ describe("CardSubscriptionScreen - price change while mounted", () => {
   priceChanges.forEach(({ from, to, fromPriceUsd, toPriceUsd }) => {
     it(`asks again for the notice when the offer turns from ${from} to ${to}`, async () => {
       mockPriceUsd = fromPriceUsd
-      const { getByText, getAllByTestId, getByTestId, rerender } = await renderScreen()
+      const { getByText, getAllByRole, getByRole, rerender } = await renderScreen()
 
-      await checkBoxes(getAllByTestId, [
-        NOTICE_CHECKBOX_INDEX,
-        FEE_SCHEDULE_CHECKBOX_INDEX,
-      ])
+      await checkBoxes(getAllByRole, [NOTICE_CHECKBOX_INDEX, FEE_SCHEDULE_CHECKBOX_INDEX])
       await changePrice(rerender, toPriceUsd)
       await act(async () => {
         fireEvent.press(getByText("Accept"))
       })
 
-      expect(getAllByTestId("checkbox-unchecked")).toHaveLength(1)
+      expect(getAllByRole("checkbox", { checked: false })).toHaveLength(1)
       expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
 
       await act(async () => {
-        fireEvent.press(getByTestId("checkbox-unchecked"))
+        fireEvent.press(getByRole("checkbox", { checked: false }))
       })
       await act(async () => {
         fireEvent.press(getByText("Accept"))
@@ -334,10 +327,10 @@ describe("CardSubscriptionScreen - payment variant", () => {
   })
 
   it("logs the pending payment flow instead of opening the identity check", async () => {
-    const { getByText, getByTestId } = await renderScreen()
+    const { getByText, getByRole } = await renderScreen()
 
     await act(async () => {
-      fireEvent.press(getByTestId("checkbox-unchecked"))
+      fireEvent.press(getByRole("checkbox", { checked: false }))
     })
     await act(async () => {
       fireEvent.press(getByText("Continue & Pay"))

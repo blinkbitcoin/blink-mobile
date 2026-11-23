@@ -6,7 +6,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { SubscriptionOfferCard } from "@app/components/card-screen"
-import { CheckboxRow } from "@app/components/card-screen/checkbox-row"
+import { CheckboxRow } from "@app/components/checkbox-row"
 import { Screen } from "@app/components/screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -19,6 +19,10 @@ import {
 } from "./use-subscription-offer"
 
 const SUBSCRIBE_ROUTE: keyof RootStackParamList = "cardOnboardingSubscribeScreen"
+
+/** The design's checkbox row: 14 between the box and its text, set at 14/16. */
+const CHECKBOX_GAP = 14
+const CHECKBOX_LINE_HEIGHT = 16
 
 const Notice = {
   Free: "free",
@@ -88,59 +92,63 @@ export const CardSubscriptionScreen: React.FC = () => {
 
         {isSubscribeVariant && (
           <>
-            <CheckboxRow checked={isNoticeAccepted} onPress={toggleNotice}>
-              <Text type="p3" style={styles.agreementText}>
-                {noticeText}
-              </Text>
+            <CheckboxRow
+              isChecked={isNoticeAccepted}
+              onPress={toggleNotice}
+              gap={CHECKBOX_GAP}
+              labelLineHeight={CHECKBOX_LINE_HEIGHT}
+            >
+              {noticeText}
             </CheckboxRow>
 
             <CheckboxRow
-              checked={isFeeScheduleAgreed}
+              isChecked={isFeeScheduleAgreed}
               onPress={() => setIsFeeScheduleAgreed(!isFeeScheduleAgreed)}
+              gap={CHECKBOX_GAP}
+              labelLineHeight={CHECKBOX_LINE_HEIGHT}
             >
-              <Text type="p3" style={styles.agreementText}>
-                {LL.CardFlow.Onboarding.CardSubscription.feeSchedule.text()}{" "}
-                <Text
-                  type="p3"
-                  bold
-                  color={colors.accent}
-                  style={styles.agreementText}
-                  onPress={() => navigation.navigate("cardFeeScheduleScreen")}
-                >
-                  {LL.CardFlow.Onboarding.CardSubscription.feeSchedule.linkText()}
-                </Text>
+              {LL.CardFlow.Onboarding.CardSubscription.feeSchedule.text()}{" "}
+              <Text
+                bold
+                color={colors.accent}
+                onPress={() => navigation.navigate("cardFeeScheduleScreen")}
+              >
+                {LL.CardFlow.Onboarding.CardSubscription.feeSchedule.linkText()}
               </Text>
             </CheckboxRow>
           </>
         )}
 
         {!isSubscribeVariant && (
-          <CheckboxRow checked={isAgreed} onPress={() => setIsAgreed(!isAgreed)}>
-            <Text type="p3" style={styles.agreementText}>
-              {LL.CardFlow.Onboarding.CardSubscription.agreement.text()}{" "}
-              <Text
-                bold
-                color={colors.accent}
-                onPress={() => openExternalUrl(cardTermsAndConditionsUrl)}
-              >
-                {LL.CardFlow.Onboarding.CardSubscription.agreement.termsOfService()}
-              </Text>
-              ,{" "}
-              <Text
-                bold
-                color={colors.accent}
-                onPress={() => openExternalUrl(cardPrivacyPolicyUrl)}
-              >
-                {LL.CardFlow.Onboarding.CardSubscription.agreement.privacyPolicy()}
-              </Text>
-              , {LL.CardFlow.Onboarding.CardSubscription.agreement.and()}{" "}
-              <Text
-                bold
-                color={colors.accent}
-                onPress={() => openExternalUrl(cardCardholderAgreementUrl)}
-              >
-                {LL.CardFlow.Onboarding.CardSubscription.agreement.cardholderAgreement()}
-              </Text>
+          <CheckboxRow
+            isChecked={isAgreed}
+            onPress={() => setIsAgreed(!isAgreed)}
+            gap={CHECKBOX_GAP}
+            labelLineHeight={CHECKBOX_LINE_HEIGHT}
+          >
+            {LL.CardFlow.Onboarding.CardSubscription.agreement.text()}{" "}
+            <Text
+              bold
+              color={colors.accent}
+              onPress={() => openExternalUrl(cardTermsAndConditionsUrl)}
+            >
+              {LL.CardFlow.Onboarding.CardSubscription.agreement.termsOfService()}
+            </Text>
+            ,{" "}
+            <Text
+              bold
+              color={colors.accent}
+              onPress={() => openExternalUrl(cardPrivacyPolicyUrl)}
+            >
+              {LL.CardFlow.Onboarding.CardSubscription.agreement.privacyPolicy()}
+            </Text>
+            , {LL.CardFlow.Onboarding.CardSubscription.agreement.and()}{" "}
+            <Text
+              bold
+              color={colors.accent}
+              onPress={() => openExternalUrl(cardCardholderAgreementUrl)}
+            >
+              {LL.CardFlow.Onboarding.CardSubscription.agreement.cardholderAgreement()}
             </Text>
           </CheckboxRow>
         )}
@@ -167,9 +175,6 @@ const useStyles = makeStyles(() => ({
     paddingHorizontal: 20,
     paddingTop: 30,
     gap: 20,
-  },
-  agreementText: {
-    lineHeight: 16,
   },
   buttonsContainer: {
     justifyContent: "flex-end",

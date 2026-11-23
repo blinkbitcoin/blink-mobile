@@ -14,10 +14,6 @@ jest.mock("react-native-linear-gradient", () => ({
   LinearGradient: "LinearGradient",
 }))
 
-jest.mock("@rn-vui/themed", () =>
-  jest.requireActual("../../../../helpers/card-flow-mocks").mockThemedWithCheckbox(),
-)
-
 const mockDispatch = jest.fn()
 const mockSubmitApplication = jest.fn()
 const mockToastShow = jest.fn()
@@ -149,7 +145,7 @@ describe("CardAcknowledgementScreen", () => {
 
   for (const skipIndex of [0, 1, 2, 3]) {
     it(`keeps the button disabled when only checkbox ${skipIndex} is left unchecked`, async () => {
-      const { getByText, getAllByTestId } = render(
+      const { getByText, getAllByRole } = render(
         <ContextForScreen>
           <CardAcknowledgementScreen />
         </ContextForScreen>,
@@ -157,7 +153,7 @@ describe("CardAcknowledgementScreen", () => {
 
       await act(async () => {})
 
-      const unchecked = getAllByTestId("checkbox-unchecked")
+      const unchecked = getAllByRole("checkbox", { checked: false })
       await act(async () => {
         unchecked.forEach((checkbox, index) => {
           if (index !== skipIndex) fireEvent.press(checkbox)
@@ -180,7 +176,7 @@ describe("CardAcknowledgementScreen", () => {
     )
     await act(async () => {})
 
-    const unchecked = screen.getAllByTestId("checkbox-unchecked")
+    const unchecked = screen.getAllByRole("checkbox", { checked: false })
     await act(async () => {
       unchecked.forEach((checkbox) => fireEvent.press(checkbox))
     })
@@ -234,13 +230,13 @@ describe("CardAcknowledgementScreen", () => {
         finishSending = resolve
       }),
     )
-    const { getByText, getAllByTestId } = render(
+    const { getByText, getAllByRole } = render(
       <ContextForScreen>
         <CardAcknowledgementScreen />
       </ContextForScreen>,
     )
     await act(async () => {})
-    const unchecked = getAllByTestId("checkbox-unchecked")
+    const unchecked = getAllByRole("checkbox", { checked: false })
     await act(async () => {
       unchecked.forEach((checkbox) => fireEvent.press(checkbox))
     })
