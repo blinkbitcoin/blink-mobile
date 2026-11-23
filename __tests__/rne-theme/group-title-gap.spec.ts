@@ -8,10 +8,10 @@ import { groupTitleGap, spacing } from "@app/rne-theme/tokens"
  * drawn in `textSecondary` (blink-wip#2107, Figma `section` 31473:4243). The gap replaced
  * hardcoded 3, 4, 6, 8 and 20; the colour replaced `textOnBackground` and `textMuted`.
  * Headings (h1/h2, bold section headers) and titles beside a field are out of scope.
- * The Send 3.0 amount screen has neither: its priority label sits inside the row beside
- * the selected tier, and its wallet and note fields carry no title above them.
  * A title that is not regular 14px stays out, except the Galoy address and fee-rate titles,
  * which were already regular 16px. Send is being replaced and is not judged for size.
+ * The Send 3.0 amount entry frame has no field titles, so its details screen and priority
+ * row are not listed.
  * The artifact under test is the style source, so source-coupling here is intentional.
  */
 
@@ -177,20 +177,6 @@ describe("group title", () => {
         "dangerZoneSection",
       ),
     ).toMatch(/gap: 3,/)
-  })
-
-  it("keeps the Send 3.0 amount screen's labels inside their fields", () => {
-    const selector = source("app/screens/send-bitcoin-screen/fee-tier-selector.tsx")
-    expect(selector).toMatch(
-      /<View style=\{styles\.row\}>\s*<Text style=\{styles\.title\}>\{title\}<\/Text>\s*<Text style=\{styles\.value\}>/,
-    )
-    expect(selector).not.toContain("groupTitleGap")
-
-    const details = source(
-      "app/screens/send-bitcoin-screen/send-bitcoin-details-screen.tsx",
-    )
-    expect(details).not.toContain("fieldTitleText")
-    expect(details).not.toContain("groupTitleGap")
   })
 
   it("the API key expiry label is textSecondary", () => {

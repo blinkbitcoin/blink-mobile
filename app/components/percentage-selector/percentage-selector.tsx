@@ -81,18 +81,12 @@ export const PercentageSelector = <T extends number = number>({
               busy: loading,
             }}
           >
-            {/* The label keeps its space under the spinner so the chip doesn't resize. */}
-            <Text
-              style={[
-                styles.chipText,
-                isSelected && styles.chipTextSelected,
-                loading && styles.chipTextHidden,
-              ]}
-            >
-              {formatLabel(p)}
-            </Text>
-            {loading && (
-              <ActivityIndicator style={styles.spinner} color={colors.accent} />
+            {loading ? (
+              <ActivityIndicator color={colors.accent} />
+            ) : (
+              <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>
+                {formatLabel(p)}
+              </Text>
             )}
           </TouchableOpacity>
         )
@@ -104,19 +98,17 @@ export const PercentageSelector = <T extends number = number>({
 const useStyles = makeStyles(({ colors }) => ({
   row: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
+    justifyContent: "space-around",
     alignItems: "center",
-    gap: 10,
     width: "100%",
   },
   chip: {
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 20,
+    borderRadius: 100,
     alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 6,
-    paddingHorizontal: 14,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    minWidth: 64,
   },
   chipSelected: {
     backgroundColor: colors.accent,
@@ -127,18 +119,6 @@ const useStyles = makeStyles(({ colors }) => ({
   chipText: {
     color: colors.accent,
     fontFamily: fonts.bold,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  chipTextHidden: {
-    opacity: 0,
-  },
-  spinner: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
   },
   chipTextSelected: {
     color: colors.textOnAccent,

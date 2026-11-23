@@ -20,6 +20,8 @@ type FeeTierSelectorProps<T extends string> = {
   options: OptionItem<T>[]
   selected: T
   onSelect: (id: T) => void
+  /** Holds the row shut, e.g. while the fee for the tier on it is being quoted. */
+  disabled?: boolean
 }
 
 export const FeeTierSelector = <T extends string>({
@@ -27,6 +29,7 @@ export const FeeTierSelector = <T extends string>({
   options,
   selected,
   onSelect,
+  disabled = false,
 }: FeeTierSelectorProps<T>): React.ReactElement => {
   const styles = useStyles()
   const {
@@ -48,8 +51,10 @@ export const FeeTierSelector = <T extends string>({
       {/* The whole row is the tap target, so it carries no chevron. */}
       <TouchableWithoutFeedback
         onPress={() => setModalVisible(true)}
+        disabled={disabled}
         {...testProps("fee-tier-dropdown")}
         accessibilityRole="button"
+        accessibilityState={{ disabled }}
         accessibilityLabel={[title, selectedValue].filter(Boolean).join(", ")}
       >
         <View style={styles.row}>
@@ -96,7 +101,7 @@ export const FeeTierSelector = <T extends string>({
                     )}
                   </View>
                   {isSelected && (
-                    <GaloyIcon name="check-circle" size={16} color={colors._green} />
+                    <GaloyIcon name="check-circle" size={16} color={colors.success} />
                   )}
                 </View>
               </TouchableOpacity>
@@ -125,7 +130,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexShrink: 1,
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   /** Shrinks and wraps alongside the heading, so a long locale never cuts the ETA off. */
   value: {
@@ -153,7 +158,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingRight: 10,
   },
   optionRowSelected: {
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
   },
   optionContent: {
     flex: 1,
@@ -161,11 +166,11 @@ const useStyles = makeStyles(({ colors }) => ({
   optionLabel: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   optionDetail: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
 }))

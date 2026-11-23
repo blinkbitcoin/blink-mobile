@@ -194,6 +194,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
       }
     >
       <Animated.Text
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         style={[
           styles.amount,
           {
@@ -203,7 +204,6 @@ export const SendHero: React.FC<SendHeroProps> = ({
           active && primaryStyle,
         ]}
         adjustsFontSizeToFit
-        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         numberOfLines={1}
         testID={SEND_HERO_PRIMARY_TEST_ID}
       >
@@ -211,6 +211,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
       </Animated.Text>
       {secondaryAmount ? (
         <Animated.Text
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           style={[
             styles.amount,
             {
@@ -225,7 +226,6 @@ export const SendHero: React.FC<SendHeroProps> = ({
             !active && styles.settledSecondary,
             active && secondaryStyle,
           ]}
-          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           numberOfLines={1}
           testID={SEND_HERO_SECONDARY_TEST_ID}
         >

@@ -25,7 +25,7 @@ describe("inline messages and the screen reader", () => {
   })
   ;[true, false].forEach((filled) => {
     it(`speaks an error as it appears (filled: ${filled})`, () => {
-      render(wrap(<GaloyErrorBox errorMessage="Low funds" filled={filled} />))
+      render(wrap(<GaloyErrorBox errorMessage="Low funds" filled={filled} announce />))
       act(() => jest.runAllTimers())
 
       expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledWith("Low funds")
@@ -33,11 +33,11 @@ describe("inline messages and the screen reader", () => {
   })
 
   it("speaks a changed error once, and not again on a re-render", () => {
-    const { rerender } = render(wrap(<GaloyErrorBox errorMessage="Low funds" />))
+    const { rerender } = render(wrap(<GaloyErrorBox errorMessage="Low funds" announce />))
     act(() => jest.runAllTimers())
-    rerender(wrap(<GaloyErrorBox errorMessage="Low funds" />))
+    rerender(wrap(<GaloyErrorBox errorMessage="Low funds" announce />))
     act(() => jest.runAllTimers())
-    rerender(wrap(<GaloyErrorBox errorMessage="Amount too small" />))
+    rerender(wrap(<GaloyErrorBox errorMessage="Amount too small" announce />))
     act(() => jest.runAllTimers())
 
     expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledTimes(2)
@@ -47,11 +47,30 @@ describe("inline messages and the screen reader", () => {
   })
 
   it("speaks a warning banner's text", () => {
-    render(wrap(<WarningBanner>Lightning would be cheaper</WarningBanner>))
+    render(wrap(<WarningBanner announce>Lightning would be cheaper</WarningBanner>))
     act(() => jest.runAllTimers())
 
     expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledWith(
       "Lightning would be cheaper",
     )
+  })
+
+  it("stays quiet unless the screen asks it to speak", () => {
+    render(wrap(<GaloyErrorBox errorMessage="Low funds" />))
+    render(wrap(<WarningBanner>Lightning would be cheaper</WarningBanner>))
+    act(() => jest.runAllTimers())
+
+    expect(AccessibilityInfo.announceForAccessibility).not.toHaveBeenCalled()
+  })
+
+  /** The last message spoken lives in the box, so a box shown again is a new appearance. */
+  it("speaks the same error again when the box is shown again", () => {
+    const { unmount } = render(wrap(<GaloyErrorBox errorMessage="Low funds" announce />))
+    act(() => jest.runAllTimers())
+    unmount()
+    render(wrap(<GaloyErrorBox errorMessage="Low funds" announce />))
+    act(() => jest.runAllTimers())
+
+    expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledTimes(2)
   })
 })

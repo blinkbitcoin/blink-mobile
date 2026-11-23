@@ -44,9 +44,9 @@ export const GaloyPrimaryButton: FC<GaloyPrimaryButtonProps> = ({
 const useStyles = makeStyles(({ colors }) => ({
   titleStyle: {
     flexGrow: 1,
+    fontFamily: fonts.bold,
     fontSize: 20,
     lineHeight: 24,
-    fontFamily: fonts.bold,
     color: colors.textOnAccent,
   },
   disabledTitleStyle: {

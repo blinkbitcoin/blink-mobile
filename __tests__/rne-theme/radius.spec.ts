@@ -279,6 +279,7 @@ const TOKEN_CORNERS: Record<string, number> = {
   "app/screens/redeem-lnurl-withdrawal-screen/redeem-bitcoin-result-screen.tsx": 1,
   "app/screens/self-custodial/onboarding/manual-backup/backup-phrase-confirm-screen.tsx": 1,
   "app/screens/self-custodial/onboarding/manual-backup/backup-phrase-screen.tsx": 1,
+  "app/screens/send-bitcoin-screen/amount-entry/send-wallet-summary.tsx": 1,
   "app/screens/send-bitcoin-screen/confirm-destination-modal.tsx": 1,
   "app/screens/send-bitcoin-screen/fee-tier-selector.tsx": 2,
   "app/screens/send-bitcoin-screen/send-bitcoin-completed-screen.tsx": 1,

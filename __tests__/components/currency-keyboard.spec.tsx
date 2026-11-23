@@ -25,10 +25,10 @@ jest.mock("@rn-vui/themed", () => ({
   }),
 }))
 
-jest.mock("@app/utils/haptics", () => ({ haptics: { tap: jest.fn() } }))
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({ LL: { Accessibility: { deleteKey: () => "Delete" } } }),
 }))
+jest.mock("@app/utils/haptics", () => ({ haptics: { tap: jest.fn() } }))
 
 jest.mock("@app/components/atomic/galoy-icon", () => ({
   GaloyIcon: ({ name, ...props }: { name: string }) => (

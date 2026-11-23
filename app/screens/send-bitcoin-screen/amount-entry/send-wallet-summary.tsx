@@ -11,9 +11,9 @@ import { makeStyles, Text } from "@rn-vui/themed"
 import { WalletSwitch } from "@app/components/wallet-switch"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 import { radius } from "@app/rne-theme/radius"
 import { staticSurface } from "@app/rne-theme/surfaces"
-import { fonts } from "@app/rne-theme/fonts"
 import { testProps } from "@app/utils/testProps"
 
 export const SEND_WALLET_SUMMARY_TEST_ID = "choose-wallet-to-send-from"
@@ -38,6 +38,7 @@ type SendWalletSummaryProps = {
   inactive?: boolean
 }
 
+// TODO(#4360): becomes a thin wrapper over WalletSummary once #4360 merges.
 export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
   currency,
   balancePrimary,
@@ -151,9 +152,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 14,
     paddingVertical: 14,
   },
-  cardInactive: {
-    ...staticSurface(colors),
-  },
+  cardInactive: staticSurface(colors),
   cardError: {
     borderColor: colors.error,
   },
