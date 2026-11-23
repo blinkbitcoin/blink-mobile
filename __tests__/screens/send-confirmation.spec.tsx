@@ -1780,6 +1780,25 @@ describe("SendBitcoinConfirmationScreen — back after a send attempt", () => {
     })
   })
 
+  it("leaves back to Sent's own hold once the payment lands, not Home", async () => {
+    sendPaymentMock.mockImplementationOnce(() => {
+      hasAttemptedSend = true
+      return Promise.resolve({ status: "SUCCESS", extraInfo: {} })
+    })
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={buildLnurlRoute()} />
+      </ContextForScreen>,
+    )
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(pressBack()).toHaveBeenCalled()
+    expect(wentHome()).toBe(false)
+  })
+
   it("still lets the sender slide again on review, under the same payment", async () => {
     sendPaymentMock.mockImplementationOnce(() => {
       hasAttemptedSend = true

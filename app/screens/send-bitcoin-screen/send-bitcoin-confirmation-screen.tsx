@@ -255,7 +255,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     sendPayment,
     hasAttemptedSend,
   } = useSendPayment(sendPaymentMutation, paymentDetail.idempotencyKeyRef)
-  useHomeOnBackAfterSend(hasAttemptedSend)
+  // Once Sent takes over, its own hold owns back.
+  useHomeOnBackAfterSend(hasAttemptedSend && !sentTransition.isSettled)
 
   // What the recipient gets: the amount less the fee, when the fee comes out of it.
   const displayAmount = paymentDetail.convertMoneyAmount(recipientAmount, DisplayCurrency)

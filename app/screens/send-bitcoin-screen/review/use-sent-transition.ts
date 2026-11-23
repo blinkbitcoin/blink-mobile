@@ -368,6 +368,7 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
     heroStyle,
     actionsStyle,
     areActionsLive,
+    isSettled,
     playSent,
   }
 }
