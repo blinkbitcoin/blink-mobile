@@ -104,7 +104,7 @@ describe("useSentTransition", () => {
     expect(progressOf(result.current)).toEqual({ hero: 1, glow: 1 })
   })
 
-  it("rewinds a play the app leaves mid-way, and replays it in full on return", async () => {
+  it("stops a play the app leaves mid-way, and shows Sent at its end on return", async () => {
     const { result } = renderTransition()
 
     await playSent(result)
@@ -112,19 +112,14 @@ describe("useSentTransition", () => {
     advance(SENT_TIMELINE_MS / 4)
 
     setAppState("background")
-    expect(result.current.isSent).toBe(true)
-    expect(result.current.sentPlay).toBe(0)
-    expect(progressOf(result.current)).toEqual({ hero: 0, glow: 0 })
-
     advance(SENT_TIMELINE_MS * 4)
-    expect(progressOf(result.current)).toEqual({ hero: 0, glow: 0 })
+    expect(result.current.isSent).toBe(true)
+    expect(result.current.isAtEnd).toBe(false)
 
     setAppState("active")
     await act(async () => {})
     expect(result.current.sentPlay).toBeGreaterThan(firstPlay)
-    expect(result.current.heroProgress.value).toBeLessThan(1)
-
-    advance(SENT_TIMELINE_MS)
+    expect(result.current.isAtEnd).toBe(true)
     expect(progressOf(result.current)).toEqual({ hero: 1, glow: 1 })
   })
 
@@ -140,10 +135,11 @@ describe("useSentTransition", () => {
     await act(async () => {})
 
     expect(result.current.sentPlay).toBe(settledPlay)
+    expect(result.current.isAtEnd).toBe(false)
     expect(progressOf(result.current)).toEqual({ hero: 1, glow: 1 })
   })
 
-  it("holds a payment that lands while the app is away, and plays it on return", async () => {
+  it("holds a payment that lands while the app is away, and shows it at its end on return", async () => {
     Object.defineProperty(AppState, "currentState", {
       value: "background",
       configurable: true,
@@ -159,12 +155,11 @@ describe("useSentTransition", () => {
     setAppState("active")
     await act(async () => {})
     expect(result.current.sentPlay).toBeGreaterThan(0)
-
-    advance(SENT_TIMELINE_MS)
+    expect(result.current.isAtEnd).toBe(true)
     expect(progressOf(result.current)).toEqual({ hero: 1, glow: 1 })
   })
 
-  it("waits out the lock screen, then replays once review is back in front", async () => {
+  it("waits out the lock screen, then shows Sent at its end once review is back in front", async () => {
     const { result } = renderTransition()
 
     await playSent(result)
@@ -175,18 +170,16 @@ describe("useSentTransition", () => {
     setAppState("active")
     emitNavigation("blur")
     await act(async () => {})
-    expect(result.current.sentPlay).toBe(0)
+    expect(result.current.isAtEnd).toBe(false)
 
     mockNavigation.isFocused.mockReturnValue(true)
     emitNavigation("focus")
     await act(async () => {})
-    expect(result.current.sentPlay).toBeGreaterThan(0)
-
-    advance(SENT_TIMELINE_MS)
+    expect(result.current.isAtEnd).toBe(true)
     expect(progressOf(result.current)).toEqual({ hero: 1, glow: 1 })
   })
 
-  it("rewinds a play the lock screen covers mid-way", async () => {
+  it("shows Sent at its end once a lock screen that covered it mid-way goes", async () => {
     const { result } = renderTransition()
 
     await playSent(result)
@@ -194,8 +187,14 @@ describe("useSentTransition", () => {
 
     mockNavigation.isFocused.mockReturnValue(false)
     emitNavigation("blur")
-    expect(result.current.sentPlay).toBe(0)
-    expect(progressOf(result.current)).toEqual({ hero: 0, glow: 0 })
+    advance(SENT_TIMELINE_MS * 4)
+    expect(result.current.isAtEnd).toBe(false)
+
+    mockNavigation.isFocused.mockReturnValue(true)
+    emitNavigation("focus")
+    await act(async () => {})
+    expect(result.current.isAtEnd).toBe(true)
+    expect(progressOf(result.current)).toEqual({ hero: 1, glow: 1 })
   })
 
   describe("hand-over to the receipt", () => {
@@ -381,19 +380,17 @@ describe("useSentTransition", () => {
   /** iOS sits in inactive under Control Centre, Siri, the app switcher and the start of a
    *  lock: review is covered there as much as in the background. */
   describe("while iOS covers review", () => {
-    it("rewinds a play that inactive interrupts, and replays it in full on return", async () => {
+    it("stops a play that inactive interrupts, and shows Sent at its end on return", async () => {
       const { result } = renderTransition()
 
       await playSent(result)
       advance(SENT_TIMELINE_MS / 4)
       setAppState("inactive")
-
-      expect(result.current.sentPlay).toBe(0)
-      expect(progressOf(result.current)).toEqual({ hero: 0, glow: 0 })
+      expect(result.current.isAtEnd).toBe(false)
 
       setAppState("active")
       await act(async () => {})
-      advance(SENT_TIMELINE_MS)
+      expect(result.current.isAtEnd).toBe(true)
       expect(progressOf(result.current)).toEqual({ hero: 1, glow: 1 })
     })
 
@@ -435,18 +432,19 @@ describe("useSentTransition", () => {
       expect(result.current.areActionsLive).toBe(true)
     })
 
-    it("go out of reach again when a play is rewound", async () => {
+    it("are live the moment a cut-off Sent comes back at its end", async () => {
       const { result } = renderTransition()
 
       await playSent(result)
       advance(ACTIONS_DELAY_MS / 2)
       setAppState("background")
-      advance(ACTIONS_DELAY_MS * 4)
+      setAppState("active")
+      await act(async () => {})
 
-      expect(result.current.areActionsLive).toBe(false)
+      expect(result.current.areActionsLive).toBe(true)
     })
 
-    it("stay out of reach while a payment that landed away waits to replay", async () => {
+    it("stay out of reach while a payment that landed away waits for the sender", async () => {
       Object.defineProperty(AppState, "currentState", {
         value: "background",
         configurable: true,
@@ -458,6 +456,10 @@ describe("useSentTransition", () => {
 
       expect(result.current.isSent).toBe(true)
       expect(result.current.areActionsLive).toBe(false)
+
+      setAppState("active")
+      await act(async () => {})
+      expect(result.current.areActionsLive).toBe(true)
     })
   })
 
@@ -481,7 +483,7 @@ describe("useSentTransition", () => {
       )
     })
 
-    it("leaves it as soon as the payment lands, even while Sent waits to replay", async () => {
+    it("leaves it as soon as the payment lands, even while Sent waits for the sender", async () => {
       Object.defineProperty(AppState, "currentState", {
         value: "background",
         configurable: true,
@@ -540,6 +542,15 @@ describe("useSentTransition", () => {
         )
       })
 
+    const measureCount = () =>
+      screen.UNSAFE_root.findAll((node) =>
+        jest.isMockFunction(node.instance?.measureInWindow),
+      ).reduce(
+        (count, node) =>
+          count + jest.mocked(node.instance.measureInWindow).mock.calls.length,
+        0,
+      )
+
     it("blooms the glow from the middle of the screen, out to the screen's height", async () => {
       const transition = renderStage()
       answerMeasurements()
@@ -568,22 +579,45 @@ describe("useSentTransition", () => {
       expect(transition.current.glowProgress.value).toBe(1)
     })
 
-    it("blooms a replay from nothing after a rewind", async () => {
+    /** The hero has moved part of the way by then, so it is not measured again: its
+     *  travel from the first measurement stands. */
+    it("comes back from a cut-off play with the glow bloomed and the hero centred", async () => {
       const transition = renderStage()
       answerMeasurements()
 
       await playSent(transition)
       advance(GLOW_BLOOM_MS / 2)
-      expect(transition.current.glowProgress.value).toBeGreaterThan(0)
+      expect(transition.current.glowProgress.value).toBeLessThan(1)
+      const measureCalls = measureCount()
+      expect(measureCalls).toBeGreaterThan(0)
 
       setAppState("background")
-      expect(transition.current.glowProgress.value).toBe(0)
-
       setAppState("active")
       await act(async () => {})
-      expect(transition.current.glowProgress.value).toBeLessThan(0.01)
 
-      advance(GLOW_BLOOM_MS)
+      expect(transition.current.glowProgress.value).toBe(1)
+      const grownHeight = HERO.height + sentHeroGrowth(AMOUNTS)
+      const travel = STAGE.height / 2 - (HERO.y - STAGE.y + grownHeight / 2)
+      expect(getAnimatedStyle(screen.getByTestId("hero"))).toMatchObject({
+        transform: [{ translateY: travel }],
+      })
+      expect(measureCount()).toBe(measureCalls)
+    })
+
+    /** The timeline counts from the commit that mounts the glow and the badge, so a commit
+     *  slower than the whole timeline still leaves a play under way to be cut off. */
+    it("still cuts off a play whose glow took longer than the timeline to mount", async () => {
+      const transition = renderStage({
+        onGlowCommit: () => jest.advanceTimersByTime(SENT_TIMELINE_MS + 1),
+      })
+      answerMeasurements()
+
+      await playSent(transition)
+      setAppState("background")
+      setAppState("active")
+      await act(async () => {})
+
+      expect(transition.current.isAtEnd).toBe(true)
       expect(transition.current.glowProgress.value).toBe(1)
     })
 

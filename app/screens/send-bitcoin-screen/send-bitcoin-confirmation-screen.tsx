@@ -54,6 +54,7 @@ import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
 import { isAmountFixableError } from "./amount-fixable-error"
 import { feeTierLabels, formatEta } from "./fee-tier-options"
 import { FeeTierOption } from "./hooks/fee-tiers.types"
+import { useHomeOnBackAfterSend } from "./hooks/use-home-on-back-after-send"
 import {
   CUSTODIAL_PAYOUT_ETA_MINUTES,
   feeTierFromPayoutSpeed,
@@ -260,6 +261,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     sendPayment,
     hasAttemptedSend,
   } = useSendPayment(sendPaymentMutation, paymentDetail.idempotencyKeyRef)
+  // Once Sent takes over, its own hold owns back.
+  useHomeOnBackAfterSend(hasAttemptedSend && !sentTransition.isSettled)
 
   // What the recipient gets: the amount less the fee, when the fee comes out of it.
   const displayAmount = paymentDetail.convertMoneyAmount(recipientAmount, DisplayCurrency)
@@ -299,6 +302,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     heroRef,
     isSent,
     sentPlay,
+    isAtEnd,
     glowFrame,
     heroProgress,
     glowProgress,
@@ -316,8 +320,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   useInitialAccessibilityFocus(isSent ? undefined : sliderHandleRef)
 
   /** Review turns into Sent in place, with no new screen to land focus on, so the result
-   *  is spoken once per play: a Sent rewound in the background speaks again when it
-   *  replays. */
+   *  is spoken as Sent appears, also when it first appears on the sender's return. */
   useAccessibilityAnnouncement(
     sentPlay
       ? LL.SendBitcoinConfirmationScreen.sentAnnouncement({ amount: heroPrimaryText })
@@ -712,6 +715,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 sentProgress={heroProgress}
                 isSent={isSent}
                 sentPlay={sentPlay}
+                isSentAtEnd={isAtEnd}
               />
             </Animated.View>
           </View>
