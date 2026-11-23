@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { useTheme } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Confetti } from "@app/components/confetti"
@@ -11,6 +11,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 export const CardPreapprovedScreen: React.FC = () => {
+  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
@@ -37,8 +38,19 @@ export const CardPreapprovedScreen: React.FC = () => {
         icon="check-badge"
         iconColor={colors.success}
         title={LL.CardFlow.Onboarding.CardPreapproved.title()}
-        subtitle={LL.CardFlow.Onboarding.CardPreapproved.subtitle()}
+        subtitle={
+          <Text type="p3" style={styles.subtitle}>
+            {LL.CardFlow.Onboarding.CardPreapproved.subtitle()}
+          </Text>
+        }
       />
     </StepLayout>
   )
 }
+
+const useStyles = makeStyles(({ colors }) => ({
+  subtitle: {
+    color: colors.textSecondary,
+    textAlign: "center",
+  },
+}))

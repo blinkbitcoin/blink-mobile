@@ -1,6 +1,8 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import theme from "@app/rne-theme/theme"
 
 import { CardPreapprovedScreen } from "@app/screens/card-screen/onboarding/card-flow/preapproved-screen"
 import { ContextForScreen } from "../../../helper"
@@ -52,6 +54,26 @@ describe("CardPreapprovedScreen", () => {
 
     expect(getByText("Your Blink Card is ready!")).toBeTruthy()
     expect(getByText("You can now activate your card and start using it")).toBeTruthy()
+  })
+
+  it("sets the subtitle as the design's secondary paragraph", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardPreapprovedScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(
+      StyleSheet.flatten(
+        getByText("You can now activate your card and start using it").props.style,
+      ),
+    ).toMatchObject({
+      fontSize: 14,
+      lineHeight: 18,
+      color: theme.lightColors?.textSecondary,
+    })
   })
 
   it("displays continue button", async () => {
