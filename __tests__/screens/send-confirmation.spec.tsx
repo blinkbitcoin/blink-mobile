@@ -3720,6 +3720,44 @@ describe("a settled self-custodial send under the offline gate", () => {
     })
   })
 
+  it("leaves navigation alone, and still saves the Lightning address, when the sender left before pending", async () => {
+    const { view, answer } = await renderLnurlInFlight()
+    view.unmount()
+
+    await act(async () => {
+      answer({ status: "PENDING" })
+    })
+
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
+    expect(saveLnAddressContactMock).toHaveBeenCalledTimes(1)
+  })
+
+  it("opens the pending receipt when the gate dropped review before pending", async () => {
+    const { view, answer } = await renderLnurlInFlight()
+    useActiveWalletMock.mockReturnValue(selfCustodialWallet(ActiveWalletStatus.Offline))
+    view.rerender(
+      <ContextForScreen>
+        <SendBitcoinConfirmationGated route={lnurlRoute} />
+      </ContextForScreen>,
+    )
+    expect(screen.getByTestId("payment-offline-notice")).toBeTruthy()
+
+    await act(async () => {
+      answer({ status: "PENDING" })
+    })
+
+    const reducer = navigationDispatchMock.mock.calls
+      .map(([action]) => action)
+      .find((action) => typeof action === "function")
+    const reset = reducer({ key: "root", index: 2, routes: [] }) as {
+      payload: { routes: Array<{ name: string; params?: { status?: string } }> }
+    }
+    expect(reset.payload.routes[1]).toMatchObject({
+      name: "sendBitcoinCompleted",
+      params: { status: "PENDING" },
+    })
+  })
+
   it("keeps Sent when the wallet goes offline during a screen-reader hold", async () => {
     jest.spyOn(AccessibilityInfo, "isScreenReaderEnabled").mockResolvedValue(true)
     const view = await renderGated()

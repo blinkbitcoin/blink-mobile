@@ -391,8 +391,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         return
       }
 
-      /** Pending is not a success: no success haptic, and no Sent. */
-      resetToCompleted(params)
+      /** Pending: no success haptic, no Sent, and no reset once the sender has left. */
+      if (isMountedRef.current || isRouteLive()) resetToCompleted(params)
       saveContact()
     },
     [
