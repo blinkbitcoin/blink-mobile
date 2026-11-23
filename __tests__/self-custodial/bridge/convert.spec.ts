@@ -33,6 +33,11 @@ import {
   resetSettlementTracking,
   setMeasurementContext,
 } from "@app/self-custodial/measurement"
+import {
+  loadLostAttempts,
+  removeLostAttempts,
+  saveLostAttempts,
+} from "@app/self-custodial/storage/lost-attempts"
 import { AccountMode } from "@app/types/account"
 
 const mockFetchLimits = jest.fn()
@@ -47,6 +52,21 @@ jest.mock("@app/self-custodial/payment-details/lost-send", () => ({
   ...jest.requireActual("@app/self-custodial/payment-details/lost-send"),
   findLostConversion: (...args: unknown[]) => mockFindLostConversion(...args),
   markReceivedHistory: (...args: unknown[]) => mockMarkReceivedHistory(...args),
+}))
+
+/** The device's storage, in memory: what the app keeps across launches. */
+const deviceStore = new Map<string, string>()
+jest.mock("@react-native-async-storage/async-storage", () => ({
+  __esModule: true,
+  default: {
+    getItem: async (key: string) => deviceStore.get(key) ?? null,
+    setItem: async (key: string, value: string) => {
+      deviceStore.set(key, value)
+    },
+    removeItem: async (key: string) => {
+      deviceStore.delete(key)
+    },
+  },
 }))
 
 /** Storage holding nothing from an earlier launch, and keeping nothing for the next. */
@@ -1944,6 +1964,39 @@ describe("auto-convert retrying a conversion whose response was lost", () => {
     const { sdk } = await userTransferFoundByAutoConvert()
     const retry = await transferManually(sdk)
 
+    expect(retry).toEqual({ status: "success", deliveredPaymentId: "rcv-usdb" })
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  /** Kept in the device's storage, as the app keeps it: the user's next transfer, made
+   *  after the app restarted, is told of the transfer auto-convert found in the launch
+   *  before, and converts nothing. */
+  it("tells the user's next transfer of the transfer auto-convert found, after the app restarts", async () => {
+    scopeLostAttemptsTo("wallet-restarting")
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(deliveredDollars(manualSats, manualSats * 274))
+    const sdk = walletLosingTheFirstConversion()
+    await transferManually(sdk)
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c-auto", status: 0 } })
+    await autoConvert(sdk)
+    const isFoundTransferStored = async () =>
+      Boolean(
+        (await loadLostAttempts("wallet-restarting")).get(OWN_CONVERSIONS)
+          ?.foundUserTransfers,
+      )
+    for (let turn = 0; turn < 50 && !(await isFoundTransferStored()); turn += 1) {
+      await nextTurn()
+    }
+
+    scopeLostAttemptsTo("wallet-restarting-relaunched", {
+      load: () => loadLostAttempts("wallet-restarting"),
+      save: (_walletId, attempts) => saveLostAttempts("wallet-restarting", attempts),
+      remove: () => removeLostAttempts("wallet-restarting"),
+    })
+    const retry = await transferManually(sdk)
+
+    expect(await isFoundTransferStored()).toBe(false)
     expect(retry).toEqual({ status: "success", deliveredPaymentId: "rcv-usdb" })
     expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
   })
