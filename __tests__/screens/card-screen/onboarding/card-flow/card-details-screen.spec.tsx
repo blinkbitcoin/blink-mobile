@@ -54,7 +54,7 @@ describe("CardDetailsScreen", () => {
 
     expect(getByTestId("icon-card")).toBeTruthy()
     expect(getByTestId("icon-headset")).toBeTruthy()
-    expect(getByTestId("icon-wallet")).toBeTruthy()
+    expect(getByTestId("icon-bitcoin")).toBeTruthy()
   })
 
   /** Business and virtual accounts are Builder services and up, not Blink Orange's. */
