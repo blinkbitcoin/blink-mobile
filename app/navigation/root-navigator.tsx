@@ -1046,8 +1046,7 @@ export const RootStack = () => {
         name="cardOnboardingProcessingScreen"
         component={CardProcessingScreen}
         options={{
-          title: "",
-          ...noHeaderBack,
+          headerShown: false,
           gestureEnabled: false,
         }}
       />

@@ -71,10 +71,10 @@ describe("card onboarding header controls in root-navigator", () => {
   })
 
   /** The design leaves the wait without a way back or out: it ends on its own. */
-  it("leaves the processing wait without back and close buttons", () => {
+  it("leaves the processing wait without a header, so without back and close buttons", () => {
     const options = registration("cardOnboardingProcessingScreen")
 
-    expect(options).toContain("...noHeaderBack")
+    expect(options).toContain("headerShown: false")
     expect(options).not.toContain("headerCloseControlOptions")
   })
 
