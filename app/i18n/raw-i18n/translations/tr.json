@@ -2358,7 +2358,6 @@
     "invoiceAlreadyPaid": "Bu fatura zaten ödenmiştir",
     "somethingWentWrong": "Bir şeyler ters gitti",
     "paymentAlreadyAttempted": "Ödeme zaten denendi.\n\nBu ödemeyi tekrar göndermek istiyorsanız, sıfırdan başlayın.",
-    "slideToConfirm": "Onaylamak için kaydırın",
     "slideConfirming": "Onaylanıyor...",
     "slideToSend": "Göndermek için kaydırın",
     "calculatingFee": "Ücret hesaplanıyor…",

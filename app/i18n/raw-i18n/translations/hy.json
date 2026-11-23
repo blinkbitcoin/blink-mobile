@@ -2358,7 +2358,6 @@
     "invoiceAlreadyPaid": "Այս հաշիվ առաջնարդեն վճարված է",
     "somethingWentWrong": "Ինչ-որ բան այնպես չգնաց",
     "paymentAlreadyAttempted": "Վճարումը արդեն փորձվել է։\n\nԵթե ցանկանում եք կրկին ուղարկել այս վճարումը՝ սկսել ի սկբանե։",
-    "slideToConfirm": "Սահեցրեք՝ հաստատելու համար",
     "slideConfirming": "Հաստատվում է...",
     "slideToSend": "Սահեցրեք՝ ուղարկելու համար",
     "calculatingFee": "Վճարը հաշվարկվում է…",

@@ -2358,7 +2358,6 @@
     "invoiceAlreadyPaid": "تم دفع هذه الفاتورة بالفعل",
     "somethingWentWrong": "حدث خطأ ما",
     "paymentAlreadyAttempted": "تمت محاولة الدفع بالفعل.\n\nإذا أردت إرسال هذه الدفعة مرة أخرى، ابدأ من جديد.",
-    "slideToConfirm": "اسحب للتأكيد",
     "slideConfirming": "جارٍ التأكيد...",
     "slideToSend": "اسحب للإرسال",
     "calculatingFee": "جارٍ حساب العمولة…",

@@ -2358,7 +2358,6 @@
     "invoiceAlreadyPaid": "Овај рачун је већ плаћен",
     "somethingWentWrong": "Нешто је пошло наопако",
     "paymentAlreadyAttempted": "Плаћање је већ покушано.\n\nАко желите да поново пошаљете ову уплату, започните испочетка.",
-    "slideToConfirm": "Превуците за потврду",
     "slideConfirming": "Потврђивање...",
     "slideToSend": "Превуците за слање",
     "calculatingFee": "Израчунавање накнаде…",

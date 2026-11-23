@@ -7500,10 +7500,6 @@ type RootTranslation = {
 		 */
 		paymentAlreadyAttempted: string
 		/**
-		 * S​l​i​d​e​ ​t​o​ ​C​o​n​f​i​r​m
-		 */
-		slideToConfirm: string
-		/**
 		 * C​o​n​f​i​r​m​i​n​g​.​.​.
 		 */
 		slideConfirming: string
@@ -21923,10 +21919,6 @@ export type TranslationFunctions = {
 	If you want to send this payment again, start from scratch.
 		 */
 		paymentAlreadyAttempted: () => LocalizedString
-		/**
-		 * Slide to Confirm
-		 */
-		slideToConfirm: () => LocalizedString
 		/**
 		 * Confirming...
 		 */

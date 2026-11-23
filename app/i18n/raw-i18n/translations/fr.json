@@ -2358,7 +2358,6 @@
         "invoiceAlreadyPaid": "Cette facture a déjà été payée",
         "somethingWentWrong": "Une erreur est survenue",
         "paymentAlreadyAttempted": "Paiement déjà tenté.\n\nSi vous souhaitez renvoyer ce paiement, recommencez depuis le début.",
-        "slideToConfirm": "Glissez pour confirmer",
         "slideConfirming": "Confirmation en cours…",
         "slideToSend": "Glissez pour envoyer",
         "calculatingFee": "Calcul des frais…",

@@ -2358,7 +2358,6 @@
         "invoiceAlreadyPaid": "Esta factura ya ha sido pagada.",
         "somethingWentWrong": "Algo salió mal",
         "paymentAlreadyAttempted": "El pago ya se intentó.\n\nSi deseas enviar este pago nuevamente, comienza desde el principio del proceso.",
-        "slideToConfirm": "Desliza para confirmar",
         "slideConfirming": "Confirmando...",
         "slideToSend": "Desliza para enviar",
         "calculatingFee": "Calculando la comisión…",

@@ -2358,7 +2358,6 @@
         "invoiceAlreadyPaid": "Diese Invoice ist bereits bezahlt worden",
         "somethingWentWrong": "Etwas ist schief gegeangen",
         "paymentAlreadyAttempted": "Die Zahlung wurde bereits versucht.\n\nWenn Sie diese Zahlung erneut senden möchten, beginnen Sie von vorne.",
-        "slideToConfirm": "Schiebe zur Bestätigung",
         "slideConfirming": "Bestätigend…",
         "slideToSend": "Schiebe zum Senden",
         "calculatingFee": "Gebühr wird berechnet…",
