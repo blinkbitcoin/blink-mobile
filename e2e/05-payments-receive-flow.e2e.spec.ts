@@ -17,6 +17,8 @@ import {
   waitTillPressableDisplayed,
   waitTillOnHomeScreen,
   scrollUp,
+  clickByTestId,
+  testIdSelector,
 } from "./utils"
 
 loadLocale("en")
@@ -52,11 +54,11 @@ describe("Receive BTC Amount Payment Flow", () => {
 
   it("clicks on set a note button", async () => {
     await scrollDown()
-    await clickPressable("add-note")
+    await clickByTestId("add-note")
   })
 
   it("sets a memo or note", async () => {
-    const memoInput = await $(selector("add-note", "Other"))
+    const memoInput = await $(testIdSelector("add-note"))
     await memoInput.setValue(memo)
 
     // tap outside
