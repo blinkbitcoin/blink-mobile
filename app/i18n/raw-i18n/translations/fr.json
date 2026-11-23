@@ -2380,7 +2380,8 @@
         "fromBalance": "Depuis le solde",
         "details": "Détails",
         "changeAmount": "Modifier le montant",
-        "usdRemainderSweep": "Solde restant {remaining: string} ({remainingSats: string}) sera converti en Bitcoin. Minimum en USD : {minimum: string}."
+        "usdRemainderSweep": "Solde restant {remaining: string} ({remainingSats: string}) sera converti en Bitcoin. Minimum en USD : {minimum: string}.",
+        "sendAnyway": "J'ai vérifié mon historique, envoyer quand même"
     },
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "Les identifiants {bankName: string} sont maintenant les adresses {bankName: string}.",
@@ -4304,7 +4305,12 @@
         "belowMinimum": "Le montant est inférieur au minimum requis pour ce paiement. Essayez un montant plus grand.",
         "networkError": "Problème de connexion réseau. Vérifiez votre connexion et réessayez.",
         "invalidInput": "Les détails du paiement semblent invalides. Veuillez les vérifier et réessayer.",
-        "generic": "Le paiement n'a pas pu être finalisé. Réessayez dans un instant, ou utilisez un montant plus petit."
+        "generic": "Le paiement n'a pas pu être finalisé. Réessayez dans un instant, ou utilisez un montant plus petit.",
+        "outcomeUnknown": "Ce paiement a peut-être déjà été effectué. Vérifiez votre historique de transactions avant de le renvoyer.",
+        "earlierConversionPending": "Votre conversion précédente est encore en cours de confirmation. Réessayez dans quelques minutes.",
+        "earlierPaymentFound": "Votre paiement précédent vers cette destination a déjà été effectué, pour un montant différent. Vérifiez-le avant de renvoyer.",
+        "earlierConversionFound": "Votre conversion précédente a déjà été effectuée, pour un montant différent. Vérifiez-la dans votre historique de transactions avant de convertir à nouveau.",
+        "convertedMeanwhile": "Une conversion d'un montant proche vient d'être effectuée. Vérifiez votre solde avant de confirmer à nouveau celle-ci."
     },
     "SelfCustodialNetworkMismatch": {
         "toast": "Ce compte a été créé sur {network}. Passez à {network} pour l'utiliser."

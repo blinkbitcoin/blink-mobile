@@ -2380,7 +2380,8 @@
     "fromBalance": "Daripada Baki",
     "details": "Butiran",
     "changeAmount": "Tukar amaun",
-    "usdRemainderSweep": "Baki {remaining: string} ({remainingSats: string}) akan ditukar kepada Bitcoin. Minimum USD: {minimum: string}."
+    "usdRemainderSweep": "Baki {remaining: string} ({remainingSats: string}) akan ditukar kepada Bitcoin. Minimum USD: {minimum: string}.",
+    "sendAnyway": "Saya telah menyemak sejarah, hantar juga"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} id pengguna sekarang adalah {bankName: string} alamatnya.",
@@ -4304,7 +4305,12 @@
     "belowMinimum": "Jumlah berada di bawah minimum yang diperlukan untuk pembayaran ini. Cuba jumlah yang lebih besar.",
     "networkError": "Masalah sambungan rangkaian. Semak sambungan anda dan cuba lagi.",
     "invalidInput": "Butiran pembayaran kelihatan tidak sah. Sila semak dan cuba lagi.",
-    "generic": "Pembayaran tidak dapat diselesaikan. Cuba lagi sekejap, atau gunakan jumlah yang lebih kecil."
+    "generic": "Pembayaran tidak dapat diselesaikan. Cuba lagi sekejap, atau gunakan jumlah yang lebih kecil.",
+    "outcomeUnknown": "Pembayaran ini mungkin sudah berjaya. Semak sejarah transaksi anda sebelum menghantarnya semula.",
+    "earlierConversionPending": "Penukaran anda yang terdahulu masih disahkan. Cuba lagi dalam beberapa minit.",
+    "earlierPaymentFound": "Pembayaran anda yang terdahulu ke destinasi ini sudah berjaya, dengan jumlah yang berbeza. Semaknya sebelum menghantar semula.",
+    "earlierConversionFound": "Penukaran anda yang terdahulu sudah berjaya, dengan jumlah yang berbeza. Semaknya dalam sejarah transaksi anda sebelum menukar semula.",
+    "convertedMeanwhile": "Penukaran dengan jumlah yang hampir sama baru sahaja berjaya. Semak baki anda sebelum mengesahkan penukaran ini semula."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Akaun ini dicipta pada {network}. Tukar ke {network} untuk menggunakannya."

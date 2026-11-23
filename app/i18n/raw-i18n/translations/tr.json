@@ -2380,7 +2380,8 @@
     "fromBalance": "Bakiyeden",
     "details": "Detaylar",
     "changeAmount": "Tutarı değiştir",
-    "usdRemainderSweep": "Kalan {remaining: string} ({remainingSats: string}) Bitcoin'e dönüştürülecek. USD minimumu: {minimum: string}."
+    "usdRemainderSweep": "Kalan {remaining: string} ({remainingSats: string}) Bitcoin'e dönüştürülecek. USD minimumu: {minimum: string}.",
+    "sendAnyway": "Geçmişimi kontrol ettim, yine de gönder"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} kullanıcı adları artık {bankName: string} adresleridir.",
@@ -4304,7 +4305,12 @@
     "belowMinimum": "Tutar bu ödeme için gereken minimumun altında. Daha büyük bir tutar deneyin.",
     "networkError": "Ağ bağlantısı sorunu. Bağlantınızı kontrol edip tekrar deneyin.",
     "invalidInput": "Ödeme bilgileri geçersiz görünüyor. Lütfen gözden geçirip tekrar deneyin.",
-    "generic": "Ödeme tamamlanamadı. Bir an sonra tekrar deneyin veya daha küçük bir tutar kullanın."
+    "generic": "Ödeme tamamlanamadı. Bir an sonra tekrar deneyin veya daha küçük bir tutar kullanın.",
+    "outcomeUnknown": "Bu ödeme zaten gerçekleşmiş olabilir. Tekrar göndermeden önce işlem geçmişini kontrol et.",
+    "earlierConversionPending": "Önceki çevirme işlemin hâlâ onaylanıyor. Birkaç dakika sonra tekrar dene.",
+    "earlierPaymentFound": "Bu hedefe yaptığın önceki ödeme farklı bir tutarla zaten gerçekleşti. Tekrar göndermeden önce kontrol et.",
+    "earlierConversionFound": "Önceki çevirme işlemin farklı bir tutarla zaten gerçekleşti. Tekrar çevirmeden önce işlem geçmişinde kontrol et.",
+    "convertedMeanwhile": "Yaklaşık bu tutarda bir çevirme işlemi az önce gerçekleşti. Bunu tekrar onaylamadan önce bakiyeni kontrol et."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Bu hesap {network} ağında oluşturuldu. Kullanmak için {network} ağına geçin."

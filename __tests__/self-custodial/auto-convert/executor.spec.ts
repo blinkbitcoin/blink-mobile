@@ -11,7 +11,11 @@ const mockGetConversionQuote = jest.fn()
 const mockFetchLimits = jest.fn()
 const mockFetchDecimals = jest.fn()
 
+/** The bridge's delivery window for a lost conversion. */
+const DELIVERY_WINDOW_MS = 5 * 60 * 1000
+
 jest.mock("@app/self-custodial/bridge/convert", () => ({
+  LOST_CONVERSION_DELIVERY_WINDOW_MS: 5 * 60 * 1000,
   createGetConversionQuote:
     () =>
     (...args: unknown[]) =>
@@ -217,6 +221,19 @@ describe("executeAutoConvert", () => {
     expect(mockGetConversionQuote).toHaveBeenCalled()
   })
 
+  it("names the conversion the bridge says it delivered, for the pairing", async () => {
+    mockGetConversionQuote.mockResolvedValue({
+      execute: jest.fn().mockResolvedValue({
+        status: PaymentResultStatus.Success,
+        deliveredPaymentId: "conversion-1",
+      }),
+    })
+
+    const outcome = await executeAutoConvert(sdkWith([]), baseParams)
+
+    expect(outcome).toEqual({ status: "converted", conversionPaymentId: "conversion-1" })
+  })
+
   it("tolerates ±5% amount drift when matching prior conversions", async () => {
     const outcome = await executeAutoConvert(
       sdkWith([
@@ -269,7 +286,10 @@ describe("executeAutoConvert", () => {
       baseParams,
     )
 
-    expect(outcome).toEqual({ status: "already-converted" })
+    expect(outcome).toEqual({
+      status: "already-converted",
+      conversionPaymentId: "conv-legless",
+    })
     expect(mockGetConversionQuote).not.toHaveBeenCalled()
     /** Declared expected: the payment id keeps the breadcrumb useful without opening a
      *  separate non-fatal for every occurrence. */
@@ -363,6 +383,189 @@ describe("executeAutoConvert", () => {
     expect(outcome).toEqual({ status: "failed" })
   })
 
+  it("returns Failed when the conversion's outcome is unknown, to be looked for again", async () => {
+    mockGetConversionQuote.mockResolvedValue({
+      execute: jest.fn().mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "unknown", code: ConvertErrorCode.OutcomeUnknown }],
+      }),
+    })
+
+    const outcome = await executeAutoConvert(sdkWith([]), baseParams)
+
+    expect(outcome).toEqual({ status: "failed" })
+  })
+
+  /** The next trigger decides: one of these sats that completed is taken for this
+   *  receive's before anything is quoted. */
+  /** One that can still deliver does so within its window; one that turned up as another
+   *  is settled, and the receive can go out at once. */
+  const waitsBehindEarlierConversion: Array<[string, string, number]> = [
+    ["turns up as another one", ConvertErrorCode.EarlierConversionFound, 0],
+    ["may still deliver", ConvertErrorCode.EarlierConversionPending, DELIVERY_WINDOW_MS],
+  ]
+  for (const [why, code, retryAfterMs] of waitsBehindEarlierConversion) {
+    it(`returns Deferred when an earlier conversion ${why}, as nothing went out`, async () => {
+      mockGetConversionQuote.mockResolvedValue({
+        execute: jest.fn().mockResolvedValue({
+          status: PaymentResultStatus.Failed,
+          errors: [{ message: "earlier", code }],
+        }),
+      })
+
+      const outcome = await executeAutoConvert(sdkWith([]), baseParams)
+
+      expect(outcome).toEqual({ status: "deferred", retryAfterMs })
+    })
+  }
+
+  /** A conversion that went out and whose outcome was lost is an attempt of its own. */
+  it("returns Failed when the conversion went out and its outcome is unknown", async () => {
+    mockGetConversionQuote.mockResolvedValue({
+      execute: jest.fn().mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "unknown", code: ConvertErrorCode.OutcomeUnknown }],
+      }),
+    })
+
+    const outcome = await executeAutoConvert(sdkWith([]), baseParams)
+
+    expect(outcome).toEqual({ status: "failed" })
+  })
+
+  it("returns AlreadyConverted when the receive was converted while the conversion waited its turn", async () => {
+    mockGetConversionQuote.mockResolvedValue({
+      execute: jest.fn().mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "converted", code: ConvertErrorCode.AlreadyConverted }],
+      }),
+    })
+
+    const outcome = await executeAutoConvert(sdkWith([]), baseParams)
+
+    expect(outcome).toEqual({ status: "already-converted" })
+  })
+
+  /** The check in the conversion's turn names the conversion it found, so the receive is
+   *  paired with it before it goes, and no later receive takes it for its own. */
+  it("names the conversion the check in the conversion's turn found, for the pairing", async () => {
+    const listPayments = jest
+      .fn()
+      .mockResolvedValueOnce({ payments: [] })
+      .mockResolvedValueOnce({
+        payments: [
+          {
+            id: "converted-meanwhile",
+            conversionDetails: {
+              status: "Completed",
+              conversions: [{ from: { amount: 5000n } }],
+            },
+            timestamp: 2000n,
+          },
+        ],
+      })
+    mockGetConversionQuote.mockResolvedValue({
+      execute: async ({
+        isConvertedMeanwhile,
+      }: {
+        isConvertedMeanwhile: () => Promise<boolean>
+      }) => {
+        const isConverted = await isConvertedMeanwhile()
+        const code = isConverted
+          ? ConvertErrorCode.AlreadyConverted
+          : ConvertErrorCode.ConversionFailed
+        return {
+          status: PaymentResultStatus.Failed,
+          errors: [{ message: "converted", code }],
+        }
+      },
+    })
+
+    const outcome = await executeAutoConvert({ listPayments } as never, baseParams)
+
+    expect(outcome).toEqual({
+      status: "already-converted",
+      conversionPaymentId: "converted-meanwhile",
+    })
+  })
+
+  /** Unlike the check before quoting, the one in the conversion's turn does not take a
+   *  history it cannot read for no prior conversion. */
+  it("asks again in the conversion's turn, without taking an unreadable history for none", async () => {
+    const quote = successQuote()
+    mockGetConversionQuote.mockResolvedValue(quote)
+    const listPayments = jest
+      .fn()
+      .mockResolvedValueOnce({ payments: [] })
+      .mockResolvedValueOnce({
+        payments: [
+          {
+            conversionDetails: {
+              status: "Completed",
+              conversions: [{ from: { amount: 5000n } }],
+            },
+            timestamp: 2000n,
+          },
+        ],
+      })
+      .mockRejectedValueOnce(new Error("network"))
+
+    await executeAutoConvert({ listPayments } as never, baseParams)
+    const [{ isConvertedMeanwhile }] = quote.execute.mock.calls[0]
+
+    await expect(isConvertedMeanwhile()).resolves.toBe(true)
+    await expect(isConvertedMeanwhile()).rejects.toThrow("network")
+  })
+
+  /** A receive's turn to convert holds every later receive's: a history the SDK never
+   *  answers is given up on, before the quote as no prior conversion, and in the turn as
+   *  unreadable. */
+  describe("with a history the SDK never answers", () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    const neverAnswers = () => new Promise<never>(() => {})
+    const HISTORY_READ_BOUND_MS = 15_000
+
+    it("quotes once the read before it has waited long enough", async () => {
+      const quote = successQuote()
+      mockGetConversionQuote.mockResolvedValue(quote)
+      const sdk = { listPayments: jest.fn(neverAnswers) }
+
+      const outcome = executeAutoConvert(sdk as never, baseParams)
+      await jest.advanceTimersByTimeAsync(HISTORY_READ_BOUND_MS - 1)
+      expect(mockGetConversionQuote).not.toHaveBeenCalled()
+      await jest.advanceTimersByTimeAsync(1)
+
+      expect(await outcome).toEqual({ status: "converted" })
+      expect(mockGetConversionQuote).toHaveBeenCalledTimes(1)
+    })
+
+    it("answers the check in the conversion's turn as unreadable once it has waited long enough", async () => {
+      const quote = successQuote()
+      mockGetConversionQuote.mockResolvedValue(quote)
+      const listPayments = jest
+        .fn()
+        .mockResolvedValueOnce({ payments: [] })
+        .mockImplementation(neverAnswers)
+
+      await executeAutoConvert({ listPayments } as never, baseParams)
+      const [{ isConvertedMeanwhile }] = quote.execute.mock.calls[0]
+      const failure = isConvertedMeanwhile().then(
+        () => undefined,
+        (err: Error) => err.message,
+      )
+      await jest.advanceTimersByTimeAsync(HISTORY_READ_BOUND_MS)
+
+      expect(await failure).toBe("Auto-convert history read timed out after 15000ms")
+    })
+  })
+
   it("treats a listPayments failure as 'no prior conversion' (fail-open)", async () => {
     mockGetConversionQuote.mockResolvedValue(successQuote())
     const sdk = {
@@ -421,7 +624,10 @@ describe("executeAutoConvert", () => {
       { ...baseParams, claimedConversionIds: new Set(["conv-paired-elsewhere"]) },
     )
 
-    expect(outcome).toEqual({ status: "already-converted" })
+    expect(outcome).toEqual({
+      status: "already-converted",
+      conversionPaymentId: "conv-unclaimed",
+    })
     expect(mockGetConversionQuote).not.toHaveBeenCalled()
   })
 })
@@ -434,6 +640,24 @@ describe("findRecentConversionId", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+  })
+
+  it("finds none once a history the SDK never answers has been waited on long enough", async () => {
+    jest.useFakeTimers()
+    try {
+      const sdk = { listPayments: jest.fn(() => new Promise<never>(() => {})) }
+
+      const found = findRecentConversionId(sdk as never, {
+        satsAmount: 5000,
+        toleranceBps: 500,
+        claimedConversionIds: new Set(),
+      })
+      await jest.advanceTimersByTimeAsync(15_000)
+
+      expect(await found).toBeUndefined()
+    } finally {
+      jest.useRealTimers()
+    }
   })
 
   it("returns the id of the first completed conversion within tolerance", async () => {

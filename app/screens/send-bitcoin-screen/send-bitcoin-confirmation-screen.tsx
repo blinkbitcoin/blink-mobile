@@ -59,6 +59,7 @@ import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
 import { PaymentSendExtraInfo } from "./payment-details/index.types"
 import { useReviewFeeText } from "./review/use-review-fee-text"
 import { useReviewQuote } from "./review/use-review-quote"
+import { PaymentErrorActions } from "./payment-error-actions"
 import {
   IDEMPOTENCY_KEY_UNAVAILABLE,
   PaymentSendCompletedStatus,
@@ -149,6 +150,15 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       setPaymentFailure({ message, canChangeAmount: isAmountFixableError(raw) }),
     [],
   )
+  /** What the last send that did not go out said about itself, for the actions it
+   *  offers under its error. */
+  const [failedSend, setFailedSend] = useState<PaymentSendExtraInfo | undefined>(
+    undefined,
+  )
+  const clearPaymentError = React.useCallback(() => {
+    setPaymentFailure(undefined)
+    setFailedSend(undefined)
+  }, [])
   const [isVerifying, setIsVerifying] = useState(false)
   const verifyPaymentSettled = useVerifyPaymentSettled()
   const { LL, locale } = useI18nContext()
@@ -313,6 +323,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       return sendPayment
     }
 
+    setFailedSend(undefined)
     try {
       logPaymentAttempt({
         paymentType: paymentDetail.paymentType,
@@ -339,6 +350,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         return
       }
 
+      setFailedSend(extraInfo)
       setPaymentError(
         translateSdkError(errorsMessage) ||
           LL.SendBitcoinConfirmationScreen.somethingWentWrong(),
@@ -413,6 +425,13 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     translateSdkError,
   ])
 
+  /** The sender checked their history and chose to send anyway: the destination was
+   *  released, so the send goes out now, as the button says. */
+  const sendAgainAnyway = React.useCallback(() => {
+    clearPaymentError()
+    handleSendPayment()
+  }, [clearPaymentError, handleSendPayment])
+
   let validAmount = true
   let invalidAmountErrorMessage = ""
 
@@ -473,6 +492,15 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       message: LL.SendBitcoinConfirmationScreen.copiedDestination(),
     })
   }
+
+  /** What stops a send from this screen: the slider's gates, which "send anyway" honours
+   *  too, since it sends in the slider's place. */
+  const isSliderDisabled =
+    !validAmount ||
+    !sendPayment ||
+    isAwaitingIncludedFee ||
+    feeUnavailable ||
+    dustNotEvaluable
 
   const isLightningRecommended = (() => {
     const ratioFeeToAmount = 50 // 2%
@@ -624,6 +652,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               })}
             </WarningBanner>
           ) : null}
+          <PaymentErrorActions
+            failedSend={failedSend}
+            canSendAnyway={!isSliderDisabled}
+            onSendAnyway={sendAgainAnyway}
+          />
         </View>
       </ScrollView>
       {/* disable slide gestures in area around the slider button */}
@@ -642,13 +675,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             }
             onSwipe={handleSendPayment}
             handleRef={sliderHandleRef}
-            disabled={
-              !validAmount ||
-              !sendPayment ||
-              isAwaitingIncludedFee ||
-              feeUnavailable ||
-              dustNotEvaluable
-            }
+            disabled={isSliderDisabled}
           />
         </View>
       </PanGestureHandler>
