@@ -2997,6 +2997,63 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       expect(screen.getByText(LL.SelfCustodialError.generic())).toBeTruthy()
     })
   })
+
+  describe("back once the sheet is closed", () => {
+    let hasAttemptedSend = false
+
+    beforeEach(() => {
+      mockBeforeRemoveListeners.length = 0
+      hasAttemptedSend = false
+      mockUseSendPayment.mockImplementation(() => ({
+        loading: false,
+        hasAttemptedSend,
+        sendPayment: sendPaymentMock,
+      }))
+    })
+
+    afterEach(() => {
+      mockUseSendPayment.mockReset()
+      sendPaymentMock.mockReset()
+    })
+
+    const outcomes = [
+      ["a send that threw", () => Promise.reject(new Error("network died"))],
+      [
+        "an unclassified FAILURE",
+        () => Promise.resolve({ status: "FAILURE", errorsMessage: "route not found" }),
+      ],
+    ] as const
+
+    outcomes.forEach(([name, outcome]) => {
+      it(`goes Home, as the sheet says, after ${name}`, async () => {
+        sendPaymentMock.mockImplementationOnce(() => {
+          hasAttemptedSend = true
+          return outcome()
+        })
+        await renderReview(lnurlRoute())
+        await slide()
+        expect(sheetButton(LL.SendBitcoinConfirmationScreen.home())).toBeTruthy()
+
+        await act(async () => {
+          fireEvent.press(
+            screen.getByTestId(SCRIM_TEST_ID, { includeHiddenElements: true }),
+          )
+        })
+        expect(errorSheet()).toBeNull()
+
+        for (const type of ["GO_BACK", "POP"]) {
+          const preventDefault = jest.fn()
+          mockBeforeRemoveListeners.forEach((listener) =>
+            listener({ data: { action: { type } }, preventDefault }),
+          )
+          expect(preventDefault).toHaveBeenCalled()
+        }
+        expect(navigationDispatchMock).toHaveBeenCalledWith(
+          expect.objectContaining({ type: "POP_TO_TOP" }),
+        )
+      })
+    })
+  })
 })
 
 describe("SendBitcoinConfirmationScreen — high-fee sheet (blink-wip#1323)", () => {
