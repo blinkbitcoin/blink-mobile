@@ -8,6 +8,7 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { toUsdMoneyAmount } from "@app/types/amounts"
 import { formatDateFromNow } from "@app/utils/date"
 
 export const SUBSCRIPTION_RENEWAL_MONTHS = 12
@@ -25,7 +26,7 @@ export const useSubscriptionOffer = ({
 }): SubscriptionOffer => {
   const { LL, locale } = useI18nContext()
   const { cardSubscriptionPriceUsd } = useRemoteConfig()
-  const { formatCurrency } = useDisplayCurrency()
+  const { formatCurrency, formatMoneyAmount } = useDisplayCurrency()
 
   return React.useMemo(() => {
     const copy = LL.CardFlow.Onboarding.CardSubscription
@@ -33,7 +34,10 @@ export const useSubscriptionOffer = ({
       formatCurrency({ amountInMajorUnits: amount, currency: WalletCurrency.Usd })
 
     if (cardSubscriptionPriceUsd === 0) {
-      const zeroAmount = formatUsd(0)
+      const zeroAmount = formatMoneyAmount({
+        moneyAmount: toUsdMoneyAmount(0),
+        noFractionDigits: true,
+      })
       return {
         isFree: true,
         title: copy.cardTitle(),
@@ -78,5 +82,12 @@ export const useSubscriptionOffer = ({
         },
       ],
     }
-  }, [LL, cardSubscriptionPriceUsd, formatCurrency, isSubscribeVariant, locale])
+  }, [
+    LL,
+    cardSubscriptionPriceUsd,
+    formatCurrency,
+    formatMoneyAmount,
+    isSubscribeVariant,
+    locale,
+  ])
 }

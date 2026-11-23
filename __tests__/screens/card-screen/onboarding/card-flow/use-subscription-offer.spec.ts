@@ -11,8 +11,19 @@ jest.mock("@app/config/feature-flags-context", () => ({
 const mockFormatCurrency = ({ amountInMajorUnits }: { amountInMajorUnits: number }) =>
   `$${amountInMajorUnits.toFixed(2)}`
 
+const mockFormatMoneyAmount = ({
+  moneyAmount,
+  noFractionDigits,
+}: {
+  moneyAmount: { amount: number }
+  noFractionDigits?: boolean
+}) => `$${(moneyAmount.amount / 100).toFixed(noFractionDigits ? 0 : 2)}`
+
 jest.mock("@app/hooks/use-display-currency", () => ({
-  useDisplayCurrency: () => ({ formatCurrency: mockFormatCurrency }),
+  useDisplayCurrency: () => ({
+    formatCurrency: mockFormatCurrency,
+    formatMoneyAmount: mockFormatMoneyAmount,
+  }),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => {
@@ -41,8 +52,8 @@ describe("useSubscriptionOffer", () => {
       priceTone: "positive",
       caption: "for now",
       rows: [
-        { label: "Blink Card", value: "$0.00", tone: "default" },
-        { label: "Other member benefits", value: "$0.00", tone: "default" },
+        { label: "Blink Card", value: "$0", tone: "default" },
+        { label: "Other member benefits", value: "$0", tone: "default" },
       ],
     })
   })

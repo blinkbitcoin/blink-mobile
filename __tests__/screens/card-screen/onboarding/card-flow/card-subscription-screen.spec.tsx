@@ -50,6 +50,13 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   useDisplayCurrency: () => ({
     formatCurrency: ({ amountInMajorUnits }: { amountInMajorUnits: number }) =>
       `$${amountInMajorUnits.toFixed(2)}`,
+    formatMoneyAmount: ({
+      moneyAmount,
+      noFractionDigits,
+    }: {
+      moneyAmount: { amount: number }
+      noFractionDigits?: boolean
+    }) => `$${(moneyAmount.amount / 100).toFixed(noFractionDigits ? 0 : 2)}`,
   }),
 }))
 
@@ -110,7 +117,7 @@ describe("CardSubscriptionScreen - free offer", () => {
     expect(getByText("for now")).toBeTruthy()
     expect(getByText("Blink Card")).toBeTruthy()
     expect(getByText("Other member benefits")).toBeTruthy()
-    expect(getAllByText("$0.00")).toHaveLength(2)
+    expect(getAllByText("$0")).toHaveLength(2)
   })
 
   it("asks to acknowledge that a fee may come later", async () => {
