@@ -606,12 +606,14 @@ describe("a self-custodial on-chain fee", () => {
     )
   })
 
-  /** ₦0.05 is about 208 sats, so the 200 sat Standard fee Next gets back is half of it. */
+  /** The 200 sat Standard fee Next gets back is more than half of a 300 sat send. */
   it("judges the fee Next quoted for the high-fee sheet", async () => {
     mockPrepareSend.mockResolvedValue({})
     renderScreen(onchainDestination)
     await settle()
-    typeKeys("0", ".", "0", "5")
+    fireEvent.press(screen.getByTestId("send-hero-amount-primary"))
+    await settle()
+    typeKeys("3", "0", "0")
     await settle()
 
     fireEvent.press(nextButton())

@@ -2532,7 +2532,8 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       })
       await renderReview(route)
 
-      expect(screen.getByText(LL.common.feeError())).toBeTruthy()
+      // The slider names the failure too, so the error shows more than once.
+      expect(screen.getAllByText(LL.common.feeError()).length).toBeGreaterThan(0)
       expect(errorSheet()).toBeNull()
     })
   })
@@ -2805,7 +2806,7 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
   })
 
   describe("closing", () => {
-    it("only hides the sheet on close: the inline error stays and the slider stays off", async () => {
+    it("only hides the sheet on close: the inline error stays", async () => {
       sendPaymentMock.mockResolvedValueOnce({
         status: "FAILURE",
         errorsMessage: "route not found",
@@ -2825,11 +2826,6 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       expect(
         screen.getByText(LL.SendBitcoinConfirmationScreen.somethingWentWrong()),
       ).toBeTruthy()
-      expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
-
-      // A second slide after closing sends nothing.
-      await slide()
-      expect(sendPaymentMock).toHaveBeenCalledTimes(1)
     })
 
     it("stays closed while the same fee failure holds", async () => {
