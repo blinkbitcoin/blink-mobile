@@ -187,6 +187,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     feeTierOptions,
     feeTierErrorMessage,
     isSelfPayment,
+    isFeeTierAmountTooLow,
     isQuotingFees,
     isQuotingFeesForNext,
     isOnchain,
@@ -665,13 +666,16 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         onChangeAmount={clearAmount}
       />
       {/* An amount the sender fixes right here gets the light refusal, the too-low
-          on-chain amount once Next shows it. Over the daily limit opens the error sheet,
-          which buzzes for itself. */}
+          on-chain amount once Next shows it. Over the daily limit and the sender's own
+          address open the error sheet, which buzzes for itself. Every other fee error is
+          the service's, so it stays silent. */}
       <ErrorHaptic
         error={
           lnurlBoundsErrorMessage ||
           (isLowFunds ? "lowFunds" : undefined) ||
-          (amountStatus.validAmount ? feeTierErrorMessage : undefined)
+          (amountStatus.validAmount && isFeeTierAmountTooLow
+            ? feeTierErrorMessage
+            : undefined)
         }
         kind="reject"
       />

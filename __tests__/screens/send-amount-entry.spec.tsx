@@ -693,6 +693,44 @@ describe("a self-custodial on-chain fee", () => {
     expect(mockHapticReject).toHaveBeenCalledTimes(1)
   })
 
+  /** The light refusal of an amount fixed in place, like Low funds: once per showing. An
+   *  amount change hides the error, so the next Next that shows it buzzes again. */
+  it("buzzes a refusal each time Next shows the amount is too low", async () => {
+    renderScreen(onchainDestination)
+    await settle()
+    typeKeys("1")
+    await settle()
+
+    fireEvent.press(nextButton())
+    await settle()
+    expect(mockHapticReject).toHaveBeenCalledTimes(1)
+
+    fireEvent.press(screen.getByTestId("Key ⌫"))
+    typeKeys("2")
+    await settle()
+    expect(screen.queryByText(tooLow)).toBeNull()
+    expect(mockHapticReject).toHaveBeenCalledTimes(1)
+
+    fireEvent.press(nextButton())
+    await settle()
+    expect(screen.getByText(tooLow)).toBeTruthy()
+    expect(mockHapticReject).toHaveBeenCalledTimes(2)
+  })
+
+  it("stays silent for a fee error no amount fixes", async () => {
+    mockPrepareSend.mockRejectedValueOnce(new Error("Failed to select leaves"))
+    renderScreen(onchainDestination)
+    await settle()
+    typeKeys("1", "0")
+    await settle()
+
+    fireEvent.press(nextButton())
+    await settle()
+
+    expect(screen.getByText(LL.SendBitcoinScreen.sdkGenericError())).toBeTruthy()
+    expect(mockHapticReject).not.toHaveBeenCalled()
+  })
+
   /** The reported bug: a quote that failed for a cause no amount fixes left the sender
    *  stuck until they typed a different amount. Next stays on and asks again. */
   it("keeps Next on after a failed quote, and pressing it again retries", async () => {
@@ -853,6 +891,8 @@ describe("a custodial on-chain payment to the sender's own address", () => {
     expect(screen.getAllByText(selfPayment)).toHaveLength(2)
     expect(screen.queryByText(LL.common.feeError())).toBeNull()
     expect(isNextDisabled()).toBe(true)
+    // The sheet's error haptic is the one buzz; the inline error adds no refusal.
+    expect(mockHapticReject).not.toHaveBeenCalled()
   })
 
   it("leaves Next on for any other fee error, as before", async () => {
@@ -867,6 +907,7 @@ describe("a custodial on-chain payment to the sender's own address", () => {
 
     expect(screen.getByText(LL.common.feeError())).toBeTruthy()
     expect(isNextDisabled()).toBe(false)
+    expect(mockHapticReject).not.toHaveBeenCalled()
   })
 })
 

@@ -22,6 +22,11 @@ export type FeeRail = {
    * stays off. Only the custodial backend tells this apart; the SDK has no such check.
    */
   isSelfPayment: boolean
+  /**
+   * The amount is under what the rail can send on-chain, the one fee error the sender fixes
+   * on amount entry. Only the SDK reports it; every other fee error is the service's.
+   */
+  isAmountTooLow: boolean
   hasQuote: boolean
   isQuoting: boolean
 }
@@ -69,7 +74,15 @@ export const useSelfCustodialFeeRail = ({
   )
   const errorMessage = error ? resolveSdkErrorMessage(error, LL) : undefined
 
-  return { tiers, errorMessage, isSelfPayment: false, hasQuote, isQuoting, quote }
+  return {
+    tiers,
+    errorMessage,
+    isSelfPayment: false,
+    isAmountTooLow: error === FeeError.InvalidInput,
+    hasQuote,
+    isQuoting,
+    quote,
+  }
 }
 
 export const useCustodialFeeRail = ({
@@ -101,6 +114,7 @@ export const useCustodialFeeRail = ({
     tiers,
     errorMessage: hasError ? feeErrorMessage : undefined,
     isSelfPayment,
+    isAmountTooLow: false,
     hasQuote,
     isQuoting,
   }
