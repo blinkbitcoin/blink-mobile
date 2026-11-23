@@ -1,6 +1,8 @@
 import {
+  GetPaymentRequest,
   PaymentType,
   RegisterLightningAddressRequest,
+  SdkError_Tags as SdkErrorTags,
   SyncWalletRequest,
   defaultExternalSigners,
   type BreezSdkInterface,
@@ -118,19 +120,74 @@ export const listPayments = (sdk: BreezSdkInterface, offset: number, limit: numb
     sortAscending: false,
   })
 
-/** One page of the outgoing payments created at or after `fromTimestamp` (unix seconds),
- *  newest first, in any status: what a send whose outcome the SDK lost is looked up
- *  against. */
-export const listSentPaymentsSince = (
+const isTaggedError = (err: unknown): err is { tag: unknown; inner: unknown } =>
+  typeof err === "object" && err !== null && "tag" in err && "inner" in err
+
+/**
+ * How the SDK answers an id it holds no payment for. The SQLite storage the app runs on
+ * passes the missing row up as a storage error, "Underlying implementation error: Query
+ * returned no rows" (`persist/sqlite.rs` get_payment_by_id and map_sqlite_error, 0.22
+ * through 0.27.1); the SDK's other storage backends answer InvalidInput("Not found").
+ * Anything else is a wallet that could not be read, never a payment that is absent.
+ */
+const isPaymentNotFound = (err: unknown): boolean => {
+  if (!isTaggedError(err)) return false
+  const message = Array.isArray(err.inner) ? err.inner[0] : undefined
+  if (typeof message !== "string") return false
+  if (err.tag === SdkErrorTags.StorageError)
+    return /query returned no rows/i.test(message)
+  return err.tag === SdkErrorTags.InvalidInput && message === "Not found"
+}
+
+/**
+ * The payment the wallet records under `paymentId`, or undefined when it holds none.
+ * Any other failure means the wallet could not be read, and is thrown.
+ */
+export const getPaymentById = async (
   sdk: BreezSdkInterface,
-  {
-    fromTimestamp,
-    limit,
-    offset,
-  }: { fromTimestamp: bigint; limit: number; offset: number },
+  paymentId: string,
+): Promise<Payment | undefined> => {
+  try {
+    const { payment } = await sdk.getPayment(GetPaymentRequest.create({ paymentId }))
+    return payment
+  } catch (err) {
+    if (isPaymentNotFound(err)) return undefined
+    throw err
+  }
+}
+
+/** When the newest outgoing payment the wallet holds was made (unix seconds), by the
+ *  server's clock, or undefined when it holds none. */
+export const newestSentPaymentTimestamp = async (
+  sdk: BreezSdkInterface,
+): Promise<bigint | undefined> => {
+  const { payments } = await sdk.listPayments({
+    typeFilter: [PaymentType.Send],
+    statusFilter: undefined,
+    assetFilter: undefined,
+    paymentDetailsFilter: undefined,
+    fromTimestamp: undefined,
+    toTimestamp: undefined,
+    offset: 0,
+    limit: 1,
+    sortAscending: false,
+  })
+  return payments[0]?.timestamp
+}
+
+/** One page of the payments created at or after `fromTimestamp` (unix seconds). */
+export type PaymentsPage = { fromTimestamp: bigint; limit: number; offset: number }
+
+/** Which payments a page lists, and in what order. */
+type PaymentsListed = { paymentType: PaymentType; sortAscending: boolean }
+
+const listPaymentsOfTypeSince = (
+  sdk: BreezSdkInterface,
+  { paymentType, sortAscending }: PaymentsListed,
+  { fromTimestamp, limit, offset }: PaymentsPage,
 ) =>
   sdk.listPayments({
-    typeFilter: [PaymentType.Send],
+    typeFilter: [paymentType],
     statusFilter: undefined,
     assetFilter: undefined,
     paymentDetailsFilter: undefined,
@@ -138,8 +195,40 @@ export const listSentPaymentsSince = (
     toTimestamp: undefined,
     offset,
     limit,
-    sortAscending: false,
+    sortAscending,
   })
+
+/** One page of the outgoing payments created at or after `fromTimestamp` (unix seconds),
+ *  newest first, in any status: what a send whose outcome the SDK lost is looked up
+ *  against. */
+export const listSentPaymentsSince = (sdk: BreezSdkInterface, page: PaymentsPage) =>
+  listPaymentsOfTypeSince(
+    sdk,
+    { paymentType: PaymentType.Send, sortAscending: false },
+    page,
+  )
+
+/** The same page of the incoming payments: where the wallet's received payments stand as
+ *  a conversion goes out. */
+export const listReceivedPaymentsSince = (sdk: BreezSdkInterface, page: PaymentsPage) =>
+  listPaymentsOfTypeSince(
+    sdk,
+    { paymentType: PaymentType.Receive, sortAscending: false },
+    page,
+  )
+
+/** The same page of the incoming payments, oldest first: what a conversion whose outcome
+ *  the SDK lost is looked up against, since the payment its swap delivered is all it
+ *  leaves, and it comes in soon after the conversion went out. */
+export const listReceivedPaymentsOldestFirst = (
+  sdk: BreezSdkInterface,
+  page: PaymentsPage,
+) =>
+  listPaymentsOfTypeSince(
+    sdk,
+    { paymentType: PaymentType.Receive, sortAscending: true },
+    page,
+  )
 
 const EXPORT_PAGE_SIZE = 100
 /** 500 pages × 100 payments: far beyond any real wallet, so hitting it means the SDK

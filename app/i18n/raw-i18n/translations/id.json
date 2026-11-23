@@ -2383,7 +2383,8 @@
     "fromBalance": "Dari Saldo",
     "details": "Detail",
     "changeAmount": "Ubah jumlah",
-    "usdRemainderSweep": "Sisa {remaining: string} ({remainingSats: string}) akan dikonversi ke Bitcoin. Minimum USD: {minimum: string}."
+    "usdRemainderSweep": "Sisa {remaining: string} ({remainingSats: string}) akan dikonversi ke Bitcoin. Minimum USD: {minimum: string}.",
+    "sendAnyway": "Saya sudah memeriksa riwayat, tetap kirim"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} nama pengguna sekarang adalah alamat {bankName: string}.",
@@ -4307,7 +4308,12 @@
     "belowMinimum": "Jumlahnya di bawah minimum yang diperlukan untuk pembayaran ini. Coba jumlah yang lebih besar.",
     "networkError": "Masalah koneksi jaringan. Periksa koneksi Anda dan coba lagi.",
     "invalidInput": "Detail pembayaran tampak tidak valid. Harap periksa dan coba lagi.",
-    "generic": "Pembayaran tidak dapat diselesaikan. Coba lagi sebentar, atau gunakan jumlah yang lebih kecil."
+    "generic": "Pembayaran tidak dapat diselesaikan. Coba lagi sebentar, atau gunakan jumlah yang lebih kecil.",
+    "outcomeUnknown": "Pembayaran ini mungkin sudah berhasil. Periksa riwayat transaksi Anda sebelum mengirimnya lagi.",
+    "earlierConversionPending": "Konversi Anda sebelumnya masih dikonfirmasi. Coba lagi dalam beberapa menit.",
+    "earlierPaymentFound": "Pembayaran Anda sebelumnya ke tujuan ini sudah berhasil, dengan jumlah yang berbeda. Periksa sebelum mengirim lagi.",
+    "earlierConversionFound": "Konversi Anda sebelumnya sudah berhasil, dengan jumlah yang berbeda. Periksa di riwayat transaksi Anda sebelum mengonversi lagi.",
+    "convertedMeanwhile": "Konversi dengan jumlah yang hampir sama baru saja berhasil. Periksa saldo Anda sebelum mengonfirmasi konversi ini lagi."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Akun ini dibuat di {network}. Beralih ke {network} untuk menggunakannya."

@@ -2383,7 +2383,8 @@
     "fromBalance": "Des del saldo",
     "details": "Detalls",
     "changeAmount": "Canvia l'import",
-    "usdRemainderSweep": "Resta {remaining: string} ({remainingSats: string}) i es convertirà a Bitcoin. Mínim d'USD: {minimum: string}."
+    "usdRemainderSweep": "Resta {remaining: string} ({remainingSats: string}) i es convertirà a Bitcoin. Mínim d'USD: {minimum: string}.",
+    "sendAnyway": "He revisat el meu historial, envia igualment"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} nom d'usuari és ara la adreça {bankName: string}.",
@@ -4307,7 +4308,12 @@
     "belowMinimum": "L'import és inferior al mínim requerit per a aquest pagament. Prova un import més gran.",
     "networkError": "Problema de connexió de xarxa. Comprova la teva connexió i torna-ho a provar.",
     "invalidInput": "Els detalls del pagament semblen invàlids. Si us plau, revisa'ls i torna-ho a provar.",
-    "generic": "No s'ha pogut completar el pagament. Torna-ho a provar en un moment, o utilitza un import més petit."
+    "generic": "No s'ha pogut completar el pagament. Torna-ho a provar en un moment, o utilitza un import més petit.",
+    "outcomeUnknown": "És possible que aquest pagament ja s'hagi fet. Comprova el teu historial de transaccions abans de tornar-lo a enviar.",
+    "earlierConversionPending": "La teva conversió anterior encara s'està confirmant. Torna-ho a provar d'aquí a uns minuts.",
+    "earlierPaymentFound": "El teu pagament anterior a aquesta destinació ja s'ha fet, per un import diferent. Comprova'l abans de tornar a enviar.",
+    "earlierConversionFound": "La teva conversió anterior ja s'ha fet, per un import diferent. Comprova-la al teu historial de transaccions abans de tornar a convertir.",
+    "convertedMeanwhile": "Acaba de fer-se una conversió d'un import semblant a aquest. Comprova el teu saldo abans de tornar a confirmar aquesta."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Aquest compte es va crear a {network}. Canvia a {network} per utilitzar-lo."

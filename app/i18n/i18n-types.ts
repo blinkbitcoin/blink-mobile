@@ -7601,6 +7601,10 @@ type RootTranslation = {
 		 * @param {string} remainingSats
 		 */
 		usdRemainderSweep: RequiredParams<'minimum' | 'remaining' | 'remainingSats'>
+		/**
+		 * I​ ​c​h​e​c​k​e​d​ ​m​y​ ​h​i​s​t​o​r​y​,​ ​s​e​n​d​ ​a​n​y​w​a​y
+		 */
+		sendAnyway: string
 	}
 	SendBitcoinDestinationScreen: {
 		/**
@@ -14230,6 +14234,26 @@ type RootTranslation = {
 		 * T​h​e​ ​p​a​y​m​e​n​t​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​c​o​m​p​l​e​t​e​d​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​,​ ​o​r​ ​u​s​e​ ​a​ ​s​m​a​l​l​e​r​ ​a​m​o​u​n​t​.
 		 */
 		generic: string
+		/**
+		 * T​h​i​s​ ​p​a​y​m​e​n​t​ ​m​a​y​ ​a​l​r​e​a​d​y​ ​h​a​v​e​ ​g​o​n​e​ ​t​h​r​o​u​g​h​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​t​r​a​n​s​a​c​t​i​o​n​ ​h​i​s​t​o​r​y​ ​b​e​f​o​r​e​ ​s​e​n​d​i​n​g​ ​i​t​ ​a​g​a​i​n​.
+		 */
+		outcomeUnknown: string
+		/**
+		 * Y​o​u​r​ ​e​a​r​l​i​e​r​ ​t​r​a​n​s​f​e​r​ ​i​s​ ​s​t​i​l​l​ ​b​e​i​n​g​ ​c​o​n​f​i​r​m​e​d​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​f​e​w​ ​m​i​n​u​t​e​s​.
+		 */
+		earlierConversionPending: string
+		/**
+		 * Y​o​u​r​ ​e​a​r​l​i​e​r​ ​p​a​y​m​e​n​t​ ​t​o​ ​t​h​i​s​ ​d​e​s​t​i​n​a​t​i​o​n​ ​a​l​r​e​a​d​y​ ​w​e​n​t​ ​t​h​r​o​u​g​h​,​ ​f​o​r​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​a​m​o​u​n​t​.​ ​C​h​e​c​k​ ​i​t​ ​b​e​f​o​r​e​ ​s​e​n​d​i​n​g​ ​a​g​a​i​n​.
+		 */
+		earlierPaymentFound: string
+		/**
+		 * Y​o​u​r​ ​e​a​r​l​i​e​r​ ​t​r​a​n​s​f​e​r​ ​a​l​r​e​a​d​y​ ​w​e​n​t​ ​t​h​r​o​u​g​h​,​ ​f​o​r​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​a​m​o​u​n​t​.​ ​C​h​e​c​k​ ​i​t​ ​i​n​ ​y​o​u​r​ ​t​r​a​n​s​a​c​t​i​o​n​ ​h​i​s​t​o​r​y​ ​b​e​f​o​r​e​ ​t​r​a​n​s​f​e​r​r​i​n​g​ ​a​g​a​i​n​.
+		 */
+		earlierConversionFound: string
+		/**
+		 * A​ ​t​r​a​n​s​f​e​r​ ​o​f​ ​a​b​o​u​t​ ​t​h​i​s​ ​a​m​o​u​n​t​ ​j​u​s​t​ ​w​e​n​t​ ​t​h​r​o​u​g​h​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​b​e​f​o​r​e​ ​c​o​n​f​i​r​m​i​n​g​ ​t​h​i​s​ ​o​n​e​ ​a​g​a​i​n​.
+		 */
+		convertedMeanwhile: string
 	}
 	SelfCustodialNetworkMismatch: {
 		/**
@@ -22093,6 +22117,10 @@ export type TranslationFunctions = {
 		 * Remaining {remaining} ({remainingSats}) will be converted to Bitcoin. USD minimum: {minimum}.
 		 */
 		usdRemainderSweep: (arg: { minimum: string, remaining: string, remainingSats: string }) => LocalizedString
+		/**
+		 * I checked my history, send anyway
+		 */
+		sendAnyway: () => LocalizedString
 	}
 	SendBitcoinDestinationScreen: {
 		/**
@@ -28584,6 +28612,26 @@ export type TranslationFunctions = {
 		 * The payment could not be completed. Try again in a moment, or use a smaller amount.
 		 */
 		generic: () => LocalizedString
+		/**
+		 * This payment may already have gone through. Check your transaction history before sending it again.
+		 */
+		outcomeUnknown: () => LocalizedString
+		/**
+		 * Your earlier transfer is still being confirmed. Try again in a few minutes.
+		 */
+		earlierConversionPending: () => LocalizedString
+		/**
+		 * Your earlier payment to this destination already went through, for a different amount. Check it before sending again.
+		 */
+		earlierPaymentFound: () => LocalizedString
+		/**
+		 * Your earlier transfer already went through, for a different amount. Check it in your transaction history before transferring again.
+		 */
+		earlierConversionFound: () => LocalizedString
+		/**
+		 * A transfer of about this amount just went through. Check your balance before confirming this one again.
+		 */
+		convertedMeanwhile: () => LocalizedString
 	}
 	SelfCustodialNetworkMismatch: {
 		/**
