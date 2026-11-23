@@ -96,7 +96,7 @@ export const FeeTierSelector = <T extends string>({
                     )}
                   </View>
                   {isSelected && (
-                    <GaloyIcon name="check-circle" size={16} color={colors._green} />
+                    <GaloyIcon name="check-circle" size={16} color={colors.success} />
                   )}
                 </View>
               </TouchableOpacity>
