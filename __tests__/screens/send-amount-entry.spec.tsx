@@ -373,20 +373,22 @@ describe("free amount", () => {
   })
 
   /** The empty backspace above never reaches the pad: the key is disabled. A third decimal
-   *  digit is enabled, so the pad itself has to refuse it. */
+   *  digit is enabled, so the pad itself has to refuse it. Naira takes no decimals here,
+   *  so the dollar is the display currency. */
   it("leaves the amount and stays silent when the pad refuses an enabled key", async () => {
+    mockDisplayCurrency.current = "USD"
     renderScreen(intraledgerDestination())
     await settle()
     const primary = () => screen.getByTestId("send-hero-amount-primary").props.children
 
     typeKeys("1", ".", "2", "3")
     await settle()
-    expect(primary()).toBe("₦1.23")
+    expect(primary()).toBe("$1.23")
     expect(mockHapticTap).toHaveBeenCalledTimes(4)
 
     typeKeys("4")
     await settle()
-    expect(primary()).toBe("₦1.23")
+    expect(primary()).toBe("$1.23")
     expect(mockHapticTap).toHaveBeenCalledTimes(4)
   })
 
