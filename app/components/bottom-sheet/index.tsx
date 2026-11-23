@@ -474,9 +474,10 @@ export const BottomSheet: React.FC<Props> = ({
             : undefined
         }
         testID={testID}
-        // A screen reader stays inside the sheet, and its escape gesture closes it the way
-        // the scrim and Android back do.
-        accessibilityViewIsModal
+        // A screen reader stays inside a modal sheet, and its escape gesture closes it the
+        // way the scrim and Android back do. An inline sheet leaves the screen around it
+        // readable, as it does to touch.
+        accessibilityViewIsModal={!isInline}
         onAccessibilityEscape={escape}
       >
         <View style={styles.handle} />
