@@ -7,6 +7,7 @@ import {
   pruneExpiredAutoConvertPairings,
   pruneExpiredAutoConverts,
   recordAutoConvertAttempt,
+  releaseAutoConvertAttempt,
   removePendingAutoConvert,
 } from "@app/self-custodial/auto-convert/storage"
 
@@ -166,6 +167,38 @@ describe("auto-convert storage", () => {
     })
   })
 
+  describe("releaseAutoConvertAttempt", () => {
+    it("takes back one attempt, keeping when it was stamped for the cooldown", async () => {
+      mockGetItem.mockResolvedValue(
+        JSON.stringify([
+          makeRecord({
+            paymentRequest: "lnbc1",
+            attempts: 2,
+            lastAttemptAtMs: 9_999_999,
+          }),
+        ]),
+      )
+      await releaseAutoConvertAttempt("lnbc1")
+      const written = writtenRecords()
+      expect(written[0].attempts).toBe(1)
+      expect(written[0].lastAttemptAtMs).toBe(9_999_999)
+    })
+
+    it("never takes the attempts below none", async () => {
+      mockGetItem.mockResolvedValue(
+        JSON.stringify([makeRecord({ paymentRequest: "lnbc1", attempts: 0 })]),
+      )
+      await releaseAutoConvertAttempt("lnbc1")
+      expect(writtenRecords()[0].attempts).toBe(0)
+    })
+
+    it("no-ops when the record isn't found", async () => {
+      mockGetItem.mockResolvedValue(JSON.stringify([makeRecord()]))
+      await releaseAutoConvertAttempt("lnbc1missing")
+      expect(mockSetItem).not.toHaveBeenCalled()
+    })
+  })
+
   describe("pruneExpiredAutoConverts", () => {
     it("drops records older than 24h", async () => {
       const nowMs = 2_000_000_000_000
@@ -270,6 +303,27 @@ describe("auto-convert storage", () => {
       const stored = writtenPairings()
       expect(stored).toHaveLength(1)
       expect(stored[0]).toMatchObject({ conversionPaymentId: "conv-A2" })
+    })
+
+    /** A pairing not stored is no claim: the caller keeps the receive for it. */
+    it("markAutoConvertPairing fails when the pairing cannot be stored", async () => {
+      mockGetItem.mockResolvedValue(null)
+      mockSetItem.mockRejectedValueOnce(new Error("storage unavailable"))
+
+      await expect(markAutoConvertPairing(makePairing())).rejects.toThrow(
+        "storage unavailable",
+      )
+    })
+
+    it("pruneExpiredAutoConvertPairings still drops quietly a write that fails", async () => {
+      mockGetItem.mockResolvedValue(
+        JSON.stringify([makePairing({ receivePaymentId: "old", pairedAtMs: 0 })]),
+      )
+      mockSetItem.mockRejectedValueOnce(new Error("storage unavailable"))
+
+      await expect(
+        pruneExpiredAutoConvertPairings(8 * 24 * 60 * 60 * 1000),
+      ).resolves.toBeUndefined()
     })
 
     it("pruneExpiredAutoConvertPairings drops entries older than 7 days", async () => {

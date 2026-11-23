@@ -2362,7 +2362,8 @@
     "slideConfirming": "Chiqapchashanku...",
     "copiedDestination": "Mayman rinanta clipboard nisqaman churasqa",
     "lightningRecommended": "¡Hatun comisión! Lightning nisqata yuyaychayku.",
-    "usdRemainderSweep": "Puchurqan {remaining: string} ({remainingSats: string}) Bitcoin-man tikrachisqa kanqa. USD pisi: {minimum: string}."
+    "usdRemainderSweep": "Puchurqan {remaining: string} ({remainingSats: string}) Bitcoin-man tikrachisqa kanqa. USD pisi: {minimum: string}.",
+    "sendAnyway": "Willakuyniyta qhawarqanim, chaypas kachay"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} kaniyta yachanakuyta sutichinaqinmi, {bankName: string} kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi.",
@@ -4275,7 +4276,12 @@
     "belowMinimum": "Qullqiqa kay quypaq mañasqa ñut'u qullqi sayanmantaqa pisinmanmi. Aswan hatun qullqitaqa rikuychis.",
     "networkError": "Conexión sasachakuy. Conexión qhawariy hinaspa kaqmanta rurariy.",
     "invalidInput": "Quy yachayninkuna mana allinmi kashan. Ama hina kaspa qhawariy hinaspa kaqmanta rurariy.",
-    "generic": "Quy mana tukukuyta atinmi. Pisi kutilla suyay hinaspa kaqmanta rurariy, utaq aswan huch'uy qullqitaqa rurariy."
+    "generic": "Quy mana tukukuyta atinmi. Pisi kutilla suyay hinaspa kaqmanta rurariy, utaq aswan huch'uy qullqitaqa rurariy.",
+    "outcomeUnknown": "Kay qullqi kutichiyqa ñachá rirqanña. Manaraq kaqmanta kachaspa, transaccionniykikunap willakuyninta qhaway.",
+    "earlierConversionPending": "Ñawpaq tukuyniykiqa manaraqmi takyachisqachu. Huk iskay minutomanta kaqmanta ruraykuy.",
+    "earlierPaymentFound": "Ñawpaq qullqi kachasqaykiqa kay maymanqa ñam rirqanña, huk chaninwan. Manaraq kaqmanta kachaspa qhaway.",
+    "earlierConversionFound": "Ñawpaq tukuyniykiqa ñam rirqanña, huk chaninwan. Manaraq kaqmanta tukuspa, rurasqaykikunapi qhaway.",
+    "convertedMeanwhile": "Kay chaninman rikchakuq tukuyqa kunallanmi rirqan. Kaykunata kaqmanta manaraq takyachispa, qullqiykita qhaway."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Kay cuentaqa {network} pi kamarisqa karqan. Llamk'achinapaq {network} man tikray."

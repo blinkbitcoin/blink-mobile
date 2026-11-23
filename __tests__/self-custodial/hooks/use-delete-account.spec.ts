@@ -25,6 +25,7 @@ const mockClearAppLock = jest.fn()
 const mockReadSessionProfiles = jest.fn()
 const mockReadActiveToken = jest.fn()
 const mockRemoveBackupStateFor = jest.fn()
+const mockRemoveLostAttempts = jest.fn()
 const mockDeleteRecoveryBundleFile = jest.fn()
 const mockRemoveRecoveryBundleState = jest.fn()
 const mockMarkAccountDeletedForRefresh = jest.fn()
@@ -74,6 +75,11 @@ jest.mock("@app/self-custodial/diagnostics/sdk-log-files", () => ({
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
   removeBackupStateFor: (...args: unknown[]) => mockRemoveBackupStateFor(...args),
+}))
+
+jest.mock("@app/self-custodial/storage/lost-attempts", () => ({
+  ...jest.requireActual("@app/self-custodial/storage/lost-attempts"),
+  removeLostAttempts: (...args: unknown[]) => mockRemoveLostAttempts(...args),
 }))
 
 jest.mock("@app/self-custodial/recovery-bundle/storage", () => ({
@@ -166,6 +172,7 @@ const resetDeleteAccountMocks = () => {
   mockReadActiveToken.mockResolvedValue({ status: "absent" })
   mockClearToken.mockResolvedValue(true)
   mockRemoveBackupStateFor.mockResolvedValue(undefined)
+  mockRemoveLostAttempts.mockResolvedValue(undefined)
   mockDeleteRecoveryBundleFile.mockResolvedValue(undefined)
   mockRemoveRecoveryBundleState.mockResolvedValue(undefined)
   mockWaitForRefreshesToSettle.mockResolvedValue(undefined)
@@ -1181,5 +1188,80 @@ describe("useDeleteAccount: the SDK log and the wallet's storage", () => {
 
     expect(deletion).toEqual({ removed: true, outcome: "remained" })
     expect(mockResetSdkLogs).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("useDeleteAccount, the wallet's lost attempts", () => {
+  beforeEach(resetDeleteAccountMocks)
+
+  it("forgets the wallet's lost attempts on both networks", async () => {
+    const { result } = renderHook(() => useDeleteAccount())
+
+    await act(async () => {
+      await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    for (const attemptsNetwork of [mockSparkNetwork.Mainnet, mockSparkNetwork.Regtest]) {
+      expect(mockRemoveLostAttempts).toHaveBeenCalledWith(
+        `${attemptsNetwork}:${TEST_SC_ACCOUNT_ID}`,
+      )
+    }
+  })
+
+  it("forgets them right after the seed and its index entry went, ahead of the steps that can fail", async () => {
+    mockRemoveMarkedStorage.mockRejectedValue(new Error("storage removal failed"))
+    const { result } = renderHook(() => useDeleteAccount())
+
+    await act(async () => {
+      await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(mockRemoveLostAttempts).toHaveBeenCalledTimes(2)
+    expect(mockRemoveLostAttempts.mock.invocationCallOrder[0]).toBeGreaterThan(
+      mockRemoveSelfCustodialAccountId.mock.invocationCallOrder[0],
+    )
+  })
+
+  it("keeps them when the seed could not be deleted and the wallet stays", async () => {
+    mockDeleteMnemonicForAccount.mockResolvedValue(false)
+    const { result } = renderHook(() => useDeleteAccount())
+
+    await act(async () => {
+      await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(mockRemoveLostAttempts).not.toHaveBeenCalled()
+  })
+
+  it("does not fail the delete when the lost attempts cleanup throws on the spot", async () => {
+    mockRemoveLostAttempts.mockImplementation(() => {
+      throw new Error("not ready")
+    })
+    const { result } = renderHook(() => useDeleteAccount())
+
+    let deletion: DeleteAccountResult | undefined
+    await act(async () => {
+      deletion = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(deletion).toEqual({ removed: true, outcome: "logged-out" })
+    expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+      expect.stringContaining("lost attempts cleanup failed"),
+    )
+  })
+
+  it("does not fail the delete when the lost attempts will not go (best-effort, logged)", async () => {
+    mockRemoveLostAttempts.mockRejectedValue(new Error("AsyncStorage down"))
+    const { result } = renderHook(() => useDeleteAccount())
+
+    let deletion: DeleteAccountResult | undefined
+    await act(async () => {
+      deletion = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(deletion).toEqual({ removed: true, outcome: "logged-out" })
+    expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+      expect.stringContaining("lost attempts cleanup failed"),
+    )
   })
 })

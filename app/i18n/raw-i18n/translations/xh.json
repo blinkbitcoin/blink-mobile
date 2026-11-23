@@ -2362,7 +2362,8 @@
     "slideConfirming": "Iyaqinisekisa...",
     "copiedDestination": "Ikopishwe indawo ekuya kuyo kwibhodi eqhotyoshwayo",
     "lightningRecommended": "Imirhumo iphezulu! Sincoma i-Lightning.",
-    "usdRemainderSweep": "Iseleyo {remaining: string} ({remainingSats: string}) iya kuguqulelwa kwiBitcoin. USD ephantsi kakhulu: {minimum: string}."
+    "usdRemainderSweep": "Iseleyo {remaining: string} ({remainingSats: string}) iya kuguqulelwa kwiBitcoin. USD ephantsi kakhulu: {minimum: string}.",
+    "sendAnyway": "Ndijongile imbali yam, thumela noko"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "bankName:} amagama abasebenzisi ngoku {bankName: string} iidilesi.",
@@ -4275,7 +4276,12 @@
     "belowMinimum": "Isixa singaphantsi kweminimum efunekayo kule ntlawulo. Zama isixa esikhulu.",
     "networkError": "Ingxaki yoqhagamshelwano kwithungelwano. Khangela uqhagamshelwano lwakho uphinde uzame.",
     "invalidInput": "Iinkcukacha zentlawulo zibonakala zingafanelekanga. Nceda uphinde ujonge uphinde uzame.",
-    "generic": "Intlawulo ayizange igqibekise. Zama kwakhona kwakamsinya, okanye usebenzise isixa esincinci."
+    "generic": "Intlawulo ayizange igqibekise. Zama kwakhona kwakamsinya, okanye usebenzise isixa esincinci.",
+    "outcomeUnknown": "Le ntlawulo isenokuba sele iphumelele. Jonga imbali yeentengiselwano zakho ngaphambi kokuyithumela kwakhona.",
+    "earlierConversionPending": "Uguqulo lwakho lwangaphambili lusaqinisekiswa. Zama kwakhona emva kwemizuzu embalwa.",
+    "earlierPaymentFound": "Intlawulo yakho yangaphambili kule ndawo sele iphumelele, ngesixa esahlukileyo. Yijonge ngaphambi kokuthumela kwakhona.",
+    "earlierConversionFound": "Uguqulo lwakho lwangaphambili sele luphumelele, ngesixa esahlukileyo. Lujonge kwimbali yeentengiselwano zakho ngaphambi kokuguqula kwakhona.",
+    "convertedMeanwhile": "Uguqulo lwesixa esiphantse sifane nesi lusandul' ukuphumelela. Jonga ibhalansi yakho ngaphambi kokuqinisekisa olu kwakhona."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Le akhawunti yenziwe kwi-{network}. Tshintshela kwi-{network} ukuze uyisebenzise."

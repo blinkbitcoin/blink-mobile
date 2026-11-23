@@ -2362,7 +2362,8 @@
     "slideConfirming": "Confirming...",
     "copiedDestination": "Copied destination to clipboard",
     "lightningRecommended": "High fee! We recommend Lightning.",
-    "usdRemainderSweep": "Resterende {remaining: string} ({remainingSats: string}) konverteres til Bitcoin. USD-minimum: {minimum: string}."
+    "usdRemainderSweep": "Resterende {remaining: string} ({remainingSats: string}) konverteres til Bitcoin. USD-minimum: {minimum: string}.",
+    "sendAnyway": "Jeg har tjekket min historik, send alligevel"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} brugernavne er nu {bankName: string} adresser.",
@@ -4275,7 +4276,12 @@
     "belowMinimum": "Beløbet er under minimumskravet for denne betaling. Prøv et større beløb.",
     "networkError": "Problem med netværksforbindelsen. Tjek din forbindelse og prøv igen.",
     "invalidInput": "Betalingsoplysningerne ser ugyldige ud. Tjek dem og prøv igen.",
-    "generic": "Betalingen kunne ikke gennemføres. Prøv igen om et øjeblik eller brug et mindre beløb."
+    "generic": "Betalingen kunne ikke gennemføres. Prøv igen om et øjeblik eller brug et mindre beløb.",
+    "outcomeUnknown": "Denne betaling er muligvis allerede gennemført. Tjek din transaktionshistorik, før du sender den igen.",
+    "earlierConversionPending": "Din tidligere konvertering er stadig ved at blive bekræftet. Prøv igen om et par minutter.",
+    "earlierPaymentFound": "Din tidligere betaling til denne modtager er allerede gennemført, med et andet beløb. Tjek den, før du sender igen.",
+    "earlierConversionFound": "Din tidligere konvertering er allerede gennemført, med et andet beløb. Tjek den i din transaktionshistorik, før du konverterer igen.",
+    "convertedMeanwhile": "En konvertering af omtrent dette beløb er netop gennemført. Tjek din saldo, før du bekræfter denne igen."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Denne konto blev oprettet på {network}. Skift til {network} for at bruge den."
