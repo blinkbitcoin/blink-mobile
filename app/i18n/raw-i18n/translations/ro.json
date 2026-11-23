@@ -2387,7 +2387,8 @@
     "tryAgain": "Încercați din nou",
     "home": "Acasă",
     "dustSweepSheetTitle": "Înainte de a trimite",
-    "usdRemainderSweep": "Soldul rămas {remaining: string} ({remainingSats: string}) va fi convertit în Bitcoin. Minim USD: {minimum: string}."
+    "usdRemainderSweep": "Soldul rămas {remaining: string} ({remainingSats: string}) va fi convertit în Bitcoin. Minim USD: {minimum: string}.",
+    "sendAnyway": "Mi-am verificat istoricul, trimite oricum"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "Numele de utilizator {bankName: string} sunt acum adrese {bankName: string}.",
@@ -4318,7 +4319,12 @@
     "belowMinimum": "Suma este sub minimul necesar pentru această plată. Încearcă o sumă mai mare.",
     "networkError": "Problemă de conexiune la rețea. Verifică conexiunea și încearcă din nou.",
     "invalidInput": "Detaliile plății par invalide. Te rog verifică și încearcă din nou.",
-    "generic": "Plata nu a putut fi finalizată. Încearcă din nou într-un moment, sau folosește o sumă mai mică."
+    "generic": "Plata nu a putut fi finalizată. Încearcă din nou într-un moment, sau folosește o sumă mai mică.",
+    "outcomeUnknown": "Este posibil ca această plată să fi fost deja efectuată. Verifică istoricul tranzacțiilor înainte de a o trimite din nou.",
+    "earlierConversionPending": "Conversia ta anterioară este încă în curs de confirmare. Încearcă din nou peste câteva minute.",
+    "earlierPaymentFound": "Plata ta anterioară către această destinație a fost deja efectuată, pentru o altă sumă. Verifică-o înainte de a trimite din nou.",
+    "earlierConversionFound": "Conversia ta anterioară a fost deja efectuată, pentru o altă sumă. Verific-o în istoricul tranzacțiilor înainte de a converti din nou.",
+    "convertedMeanwhile": "Tocmai a fost efectuată o conversie de aproximativ aceeași sumă. Verifică-ți soldul înainte de a o confirma din nou pe aceasta."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Acest cont a fost creat pe {network}. Comută la {network} pentru a-l folosi."

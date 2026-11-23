@@ -8,6 +8,8 @@ const belowMinimum = jest.fn(() => "Below minimum")
 const networkError = jest.fn(() => "Network error")
 const invalidInput = jest.fn(() => "Invalid input")
 const generic = jest.fn(() => "Something went wrong")
+const outcomeUnknown = jest.fn(() => "Check your history")
+const earlierPaymentFound = jest.fn(() => "Your earlier payment went through")
 
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
@@ -18,6 +20,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
         networkError,
         invalidInput,
         generic,
+        outcomeUnknown,
+        earlierPaymentFound,
       },
     },
   }),
@@ -54,6 +58,16 @@ describe("useTranslateSdkError", () => {
 
     expect(result.current(SelfCustodialErrorCode.Generic)).toBe("Something went wrong")
     expect(generic).toHaveBeenCalledTimes(1)
+
+    expect(result.current(SelfCustodialErrorCode.OutcomeUnknown)).toBe(
+      "Check your history",
+    )
+    expect(outcomeUnknown).toHaveBeenCalledTimes(1)
+
+    expect(result.current(SelfCustodialErrorCode.EarlierPaymentFound)).toBe(
+      "Your earlier payment went through",
+    )
+    expect(earlierPaymentFound).toHaveBeenCalledTimes(1)
   })
 
   it("passes unknown strings through untouched", () => {

@@ -2387,7 +2387,8 @@
     "tryAgain": "Pokušajte ponovno",
     "home": "Doma",
     "dustSweepSheetTitle": "Prije slanja",
-    "usdRemainderSweep": "Preostalo {remaining: string} ({remainingSats: string}) bit će pretvoreno u Bitcoin. Minimum u USD: {minimum: string}."
+    "usdRemainderSweep": "Preostalo {remaining: string} ({remainingSats: string}) bit će pretvoreno u Bitcoin. Minimum u USD: {minimum: string}.",
+    "sendAnyway": "Povijest je provjerena, svejedno pošalji"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} korisnička imena sada su {bankName: string} adrese.",
@@ -4318,7 +4319,12 @@
     "belowMinimum": "Iznos je ispod minimuma potrebnog za ovo plaćanje. Pokušajte s većim iznosom.",
     "networkError": "Problem s mrežnom vezom. Provjerite vezu i pokušajte ponovno.",
     "invalidInput": "Detalji plaćanja izgledaju nevažeći. Molimo provjerite i pokušajte ponovno.",
-    "generic": "Plaćanje nije moglo biti dovršeno. Pokušajte ponovno za trenutak ili upotrijebite manji iznos."
+    "generic": "Plaćanje nije moglo biti dovršeno. Pokušajte ponovno za trenutak ili upotrijebite manji iznos.",
+    "outcomeUnknown": "Ovo plaćanje je možda već izvršeno. Provjerite povijest transakcija prije ponovnog slanja.",
+    "earlierConversionPending": "Vaša prethodna konverzija još se potvrđuje. Pokušajte ponovno za nekoliko minuta.",
+    "earlierPaymentFound": "Vaše prethodno plaćanje na ovo odredište već je izvršeno, na drugi iznos. Provjerite ga prije ponovnog slanja.",
+    "earlierConversionFound": "Vaša prethodna konverzija već je izvršena, na drugi iznos. Provjerite je u povijesti transakcija prije ponovne konverzije.",
+    "convertedMeanwhile": "Upravo je izvršena konverzija približno ovog iznosa. Provjerite stanje prije nego što ponovno potvrdite ovu."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Ovaj račun je stvoren na mreži {network}. Prebacite se na {network} kako biste ga koristili."

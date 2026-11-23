@@ -14,6 +14,7 @@ export {
   pruneExpiredAutoConvertPairings,
   pruneExpiredAutoConverts,
   recordAutoConvertAttempt,
+  releaseAutoConvertAttempt,
   removePendingAutoConvert,
 } from "./storage"
 export { AutoConvertStatus, ReceiveAssetMode, ReceiveRail } from "./types"

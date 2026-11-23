@@ -21,6 +21,10 @@ export const useTranslateSdkError = () => {
           return LL.SelfCustodialError.invalidInput()
         case SelfCustodialErrorCode.Generic:
           return LL.SelfCustodialError.generic()
+        case SelfCustodialErrorCode.OutcomeUnknown:
+          return LL.SelfCustodialError.outcomeUnknown()
+        case SelfCustodialErrorCode.EarlierPaymentFound:
+          return LL.SelfCustodialError.earlierPaymentFound()
         default:
           return raw
       }

@@ -65,6 +65,15 @@ describe("useSendFailureCopy", () => {
     )
   })
 
+  it("keeps the copy of a self-custodial failure that says what became of the payment", () => {
+    expect(copyFor(SelfCustodialErrorCode.OutcomeUnknown)).toBe(
+      LL.SelfCustodialError.outcomeUnknown(),
+    )
+    expect(copyFor(SelfCustodialErrorCode.EarlierPaymentFound)).toBe(
+      LL.SelfCustodialError.earlierPaymentFound(),
+    )
+  })
+
   it("says the money may still land for a send that threw, whatever its text", () => {
     expect(copyFor("socket hang up", { mayHaveSent: true })).toBe(
       LL.SendBitcoinConfirmationScreen.paymentMayStillLand(),
