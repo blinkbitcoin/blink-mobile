@@ -2534,7 +2534,8 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       })
       await renderReview(route)
 
-      expect(screen.getByText(LL.common.feeError())).toBeTruthy()
+      // The slider names the failure too, so the error shows more than once.
+      expect(screen.getAllByText(LL.common.feeError()).length).toBeGreaterThan(0)
       expect(errorSheet()).toBeNull()
     })
   })
