@@ -47,13 +47,13 @@ export const CardIntroducingScreen: React.FC = () => {
           <Text type="h2" bold>
             {LL.CardFlow.Onboarding.CardIntroducing.cardInfo.bitcoinCard()}
           </Text>
-          <View style={styles.forContainer}>
-            <View style={styles.lineStyle} />
-            <Text type="p1" style={styles.forText}>
+          <Text type="p1">
+            —{" "}
+            <Text style={styles.forText}>
               {LL.CardFlow.Onboarding.CardIntroducing.cardInfo.for()}
-            </Text>
-            <View style={styles.lineStyle} />
-          </View>
+            </Text>{" "}
+            —
+          </Text>
           <Text type="h2" bold>
             {LL.CardFlow.Onboarding.CardIntroducing.cardInfo.bitcoiners()}
           </Text>
@@ -65,7 +65,7 @@ export const CardIntroducingScreen: React.FC = () => {
 
 /** The platform check sits inside the factory rather than in a module constant so the
  *  spec can vary `Platform.OS` per case without re-importing the module. */
-const useStyles = makeStyles(({ colors }) => {
+const useStyles = makeStyles(() => {
   const italicFontStyle = Platform.OS === "ios" ? { fontStyle: "italic" as const } : {}
 
   return {
@@ -78,20 +78,9 @@ const useStyles = makeStyles(({ colors }) => {
       gap: 10,
       alignItems: "center",
     },
-    forContainer: {
-      alignItems: "center",
-      flexDirection: "row",
-      gap: 5,
-      justifyContent: "center",
-    },
     forText: {
       fontFamily: fonts.italic,
       ...italicFontStyle,
-    },
-    lineStyle: {
-      height: 1,
-      width: 16,
-      backgroundColor: colors.textOnBackground,
     },
   }
 })

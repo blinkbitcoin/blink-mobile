@@ -65,6 +65,12 @@ describe("CardIntroducingScreen", () => {
     expect(getByText("for")).toBeTruthy()
   })
 
+  it("types the dashes around 'for' as one line of text", async () => {
+    const { getByText } = await renderScreen()
+
+    expect(getByText("— for —")).toBeTruthy()
+  })
+
   it("displays bitcoiners text", async () => {
     const { getByText } = await renderScreen()
 
