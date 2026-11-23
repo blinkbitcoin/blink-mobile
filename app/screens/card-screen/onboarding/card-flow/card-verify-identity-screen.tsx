@@ -102,55 +102,49 @@ export const CardVerifyIdentityScreen: React.FC = () => {
         />
       }
     >
-      <View style={styles.content}>
-        <IconHero
-          icon="document-outline"
-          iconColor={colors.success}
-          title={LL.CardFlow.Onboarding.CardVerifyIdentity.title()}
-          subtitle={
-            <Text type="p3" style={styles.description}>
-              {LL.CardFlow.Onboarding.CardVerifyIdentity.description()}
-            </Text>
-          }
-        />
-        <View style={styles.requirementsCard}>
-          {requirements.map((requirement, index) => {
-            const hasDivider = index > 0
-
-            return (
-              <React.Fragment key={requirement.icon}>
-                {hasDivider && (
-                  <Divider
-                    color={colors.neutral}
-                    width={DIVIDER_WIDTH}
-                    style={styles.divider}
-                  />
-                )}
-                <SettingItemRow
-                  leftIcon={requirement.icon}
-                  title={requirement.title}
-                  rightIcon={null}
-                  titleStyle={styles.requirementTitle}
-                />
-              </React.Fragment>
-            )
-          })}
-        </View>
-        {hasKycStatusError && (
-          <Text type="p3" style={styles.error}>
-            {LL.errors.unexpectedError()}
+      <IconHero
+        icon="document-outline"
+        iconColor={colors.success}
+        title={LL.CardFlow.Onboarding.CardVerifyIdentity.title()}
+        subtitle={
+          <Text type="p3" style={styles.description}>
+            {LL.CardFlow.Onboarding.CardVerifyIdentity.description()}
           </Text>
-        )}
+        }
+      />
+      <View style={styles.requirementsCard}>
+        {requirements.map((requirement, index) => {
+          const hasDivider = index > 0
+
+          return (
+            <React.Fragment key={requirement.icon}>
+              {hasDivider && (
+                <Divider
+                  color={colors.neutral}
+                  width={DIVIDER_WIDTH}
+                  style={styles.divider}
+                />
+              )}
+              <SettingItemRow
+                leftIcon={requirement.icon}
+                title={requirement.title}
+                rightIcon={null}
+                titleStyle={styles.requirementTitle}
+              />
+            </React.Fragment>
+          )
+        })}
       </View>
+      {hasKycStatusError && (
+        <Text type="p3" style={styles.error}>
+          {LL.errors.unexpectedError()}
+        </Text>
+      )}
     </StepLayout>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  /** On top of the hero's own 20, so it sits 30 below the header like the other card steps. */
-  content: {
-    paddingTop: 10,
-  },
   description: {
     color: colors.textSecondary,
     textAlign: "center",

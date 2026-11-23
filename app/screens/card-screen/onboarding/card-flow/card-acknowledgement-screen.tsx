@@ -193,9 +193,7 @@ export const CardAcknowledgementScreen: React.FC = () => {
 }
 
 const useStyles = makeStyles(() => ({
-  /** On top of the hero's own 20, so it sits 30 below the header like the other card steps. */
   content: {
-    paddingTop: 10,
     paddingHorizontal: 20,
   },
   /** The design's hero keeps an empty subtitle line and its bottom padding under the
