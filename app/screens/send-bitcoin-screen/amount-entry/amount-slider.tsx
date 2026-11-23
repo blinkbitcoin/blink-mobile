@@ -100,6 +100,8 @@ type AmountSliderProps = {
   /** The thumb was taken or let go: a scrolling parent stands still meanwhile, so a drag
    *  that wanders off level is not taken for a scroll. */
   onHoldChange?: (isHeld: boolean) => void
+  /** Takes no drag and no screen-reader step, as while the quote after Next is out. */
+  disabled?: boolean
 }
 
 /**
@@ -112,6 +114,7 @@ export const AmountSlider: React.FC<AmountSliderProps> = ({
   accentColor,
   showHint = true,
   onHoldChange,
+  disabled = false,
 }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
@@ -163,12 +166,14 @@ export const AmountSlider: React.FC<AmountSliderProps> = ({
   /** A screen reader can't drag, so its swipes step the same amount a drag would set,
    *  100% included. */
   const onAccessibilityAction = ({ nativeEvent }: AccessibilityActionEvent) => {
+    if (disabled) return
     if (nativeEvent.actionName === "increment") onSlide(steppedPercent(sharePercent, 1))
     if (nativeEvent.actionName === "decrement") onSlide(steppedPercent(sharePercent, -1))
   }
 
   const pan = Gesture.Pan()
     .withTestId(AMOUNT_SLIDER_PAN_TEST_ID)
+    .enabled(!disabled)
     .minDistance(0)
     .onBegin((event) => {
       const next = clamp(event.x - TOUCH_PADDING_HORIZONTAL - THUMB_INSET, travel)
@@ -225,6 +230,7 @@ export const AmountSlider: React.FC<AmountSliderProps> = ({
           accessibilityRole="adjustable"
           accessibilityLabel={LL.SendBitcoinScreen.slideToSelectAmount()}
           accessibilityValue={{ min: 0, max: 100, now: sharePercent }}
+          accessibilityState={{ disabled }}
           accessibilityActions={ACCESSIBILITY_ACTIONS}
           onAccessibilityAction={onAccessibilityAction}
         >

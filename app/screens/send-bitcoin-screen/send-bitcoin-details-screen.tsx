@@ -788,6 +788,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               onSlide={selectPercent}
               showHint={showAmountSliderHint}
               onHoldChange={setIsSliding}
+              disabled={isQuotingFeesForNext}
               accentColor={
                 walletCurrency === WalletCurrency.Usd ? colors._green : colors.accent
               }

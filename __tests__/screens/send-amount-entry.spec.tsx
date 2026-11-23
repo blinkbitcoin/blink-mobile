@@ -950,7 +950,7 @@ describe("a self-custodial on-chain fee", () => {
       return () => release()
     }
 
-    it("holds the keypad, wallet switch, priority and note, then goes to review", async () => {
+    it("holds the keypad, slider, wallet switch, priority and note, then goes to review", async () => {
       const release = holdQuote()
       renderScreen(onchainDestination)
       await settle()
@@ -969,6 +969,9 @@ describe("a self-custodial on-chain fee", () => {
         screen.getByTestId("fee-tier-dropdown").props.accessibilityState?.disabled,
       ).toBe(true)
       expect(screen.getByTestId("add-note").props.editable).toBe(false)
+      expect(
+        screen.getByTestId(AMOUNT_SLIDER_TEST_ID).props.accessibilityState?.disabled,
+      ).toBe(true)
       expect(mockNavigate).not.toHaveBeenCalled()
 
       await act(async () => release())
@@ -981,6 +984,9 @@ describe("a self-custodial on-chain fee", () => {
       )
       expect(screen.getByTestId("Key 1").props.accessibilityState?.disabled).toBe(false)
       expect(screen.getByTestId("add-note").props.editable).toBe(true)
+      expect(
+        screen.getByTestId(AMOUNT_SLIDER_TEST_ID).props.accessibilityState?.disabled,
+      ).toBe(false)
     })
 
     it("stays on the screen when the payment changed under the quote", async () => {
