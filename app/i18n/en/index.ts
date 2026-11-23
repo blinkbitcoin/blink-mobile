@@ -3847,7 +3847,7 @@ const en: BaseTranslation = {
         buttonText: "Continue",
       },
       CardDetails: {
-        title: "What's included",
+        title: "What’s included",
         features: {
           card: {
             title: "Blink Card",
@@ -3869,7 +3869,7 @@ const en: BaseTranslation = {
           subtitle: "To Blink Orange",
           paragraphs: {
             body1: "Someone thought of you and suggested that we should invite you to Blink Orange. Probably because you are an awesome Bitcoiner.",
-            body2: "Blink Orange is the first tier of Blink's membership for Bitcoiners, by invitation. The Blink Card and your personal account manager are two of the first services we offer — the rest we're building through 2027.",
+            body2: "Blink Orange is the first tier of Blink’s membership for Bitcoiners, by invitation. The Blink Card and your personal account manager are two of the first services we offer — the rest we’re building through 2027.",
           },
         },
         buttonText: "Let's go",

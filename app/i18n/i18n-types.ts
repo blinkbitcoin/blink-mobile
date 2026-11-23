@@ -12278,7 +12278,7 @@ type RootTranslation = {
 			}
 			CardDetails: {
 				/**
-				 * W​h​a​t​'​s​ ​i​n​c​l​u​d​e​d
+				 * W​h​a​t​’​s​ ​i​n​c​l​u​d​e​d
 				 */
 				title: string
 				features: {
@@ -12338,7 +12338,7 @@ type RootTranslation = {
 						 */
 						body1: string
 						/**
-						 * B​l​i​n​k​ ​O​r​a​n​g​e​ ​i​s​ ​t​h​e​ ​f​i​r​s​t​ ​t​i​e​r​ ​o​f​ ​B​l​i​n​k​'​s​ ​m​e​m​b​e​r​s​h​i​p​ ​f​o​r​ ​B​i​t​c​o​i​n​e​r​s​,​ ​b​y​ ​i​n​v​i​t​a​t​i​o​n​.​ ​T​h​e​ ​B​l​i​n​k​ ​C​a​r​d​ ​a​n​d​ ​y​o​u​r​ ​p​e​r​s​o​n​a​l​ ​a​c​c​o​u​n​t​ ​m​a​n​a​g​e​r​ ​a​r​e​ ​t​w​o​ ​o​f​ ​t​h​e​ ​f​i​r​s​t​ ​s​e​r​v​i​c​e​s​ ​w​e​ ​o​f​f​e​r​ ​—​ ​t​h​e​ ​r​e​s​t​ ​w​e​'​r​e​ ​b​u​i​l​d​i​n​g​ ​t​h​r​o​u​g​h​ ​2​0​2​7​.
+						 * B​l​i​n​k​ ​O​r​a​n​g​e​ ​i​s​ ​t​h​e​ ​f​i​r​s​t​ ​t​i​e​r​ ​o​f​ ​B​l​i​n​k​’​s​ ​m​e​m​b​e​r​s​h​i​p​ ​f​o​r​ ​B​i​t​c​o​i​n​e​r​s​,​ ​b​y​ ​i​n​v​i​t​a​t​i​o​n​.​ ​T​h​e​ ​B​l​i​n​k​ ​C​a​r​d​ ​a​n​d​ ​y​o​u​r​ ​p​e​r​s​o​n​a​l​ ​a​c​c​o​u​n​t​ ​m​a​n​a​g​e​r​ ​a​r​e​ ​t​w​o​ ​o​f​ ​t​h​e​ ​f​i​r​s​t​ ​s​e​r​v​i​c​e​s​ ​w​e​ ​o​f​f​e​r​ ​—​ ​t​h​e​ ​r​e​s​t​ ​w​e​’​r​e​ ​b​u​i​l​d​i​n​g​ ​t​h​r​o​u​g​h​ ​2​0​2​7​.
 						 */
 						body2: string
 					}
@@ -26646,7 +26646,7 @@ export type TranslationFunctions = {
 			}
 			CardDetails: {
 				/**
-				 * What's included
+				 * What’s included
 				 */
 				title: () => LocalizedString
 				features: {
@@ -26704,7 +26704,7 @@ export type TranslationFunctions = {
 						 */
 						body1: () => LocalizedString
 						/**
-						 * Blink Orange is the first tier of Blink's membership for Bitcoiners, by invitation. The Blink Card and your personal account manager are two of the first services we offer — the rest we're building through 2027.
+						 * Blink Orange is the first tier of Blink’s membership for Bitcoiners, by invitation. The Blink Card and your personal account manager are two of the first services we offer — the rest we’re building through 2027.
 						 */
 						body2: () => LocalizedString
 					}

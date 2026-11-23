@@ -94,7 +94,7 @@ describe("WelcomeOnboardScreen", () => {
 
     expect(
       getByText(
-        "Blink Orange is the first tier of Blink's membership for Bitcoiners, by invitation. The Blink Card and your personal account manager are two of the first services we offer — the rest we're building through 2027.",
+        "Blink Orange is the first tier of Blink’s membership for Bitcoiners, by invitation. The Blink Card and your personal account manager are two of the first services we offer — the rest we’re building through 2027.",
       ),
     ).toBeTruthy()
   })
