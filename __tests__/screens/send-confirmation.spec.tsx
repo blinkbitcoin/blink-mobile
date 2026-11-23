@@ -289,6 +289,11 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => useActiveWalletMock(),
 }))
 
+type BeforeRemoveListener = (event: {
+  data: { action: { type: string } }
+  preventDefault: () => void
+}) => void
+
 const navigationDispatchMock = jest.fn()
 
 /** Sent measures the screen before it plays, and jest's native views never answer a
@@ -363,6 +368,8 @@ const textPosition = (prefix: string) =>
   renderedTexts().findIndex((text) => text.startsWith(prefix))
 const navigationGoBackMock = jest.fn()
 const navigationPopToTopMock = jest.fn()
+const navigationSetOptionsMock = jest.fn()
+const mockBeforeRemoveListeners: BeforeRemoveListener[] = []
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
@@ -370,9 +377,14 @@ jest.mock("@react-navigation/native", () => ({
     navigate: jest.fn(),
     goBack: navigationGoBackMock,
     popToTop: navigationPopToTopMock,
-    setOptions: jest.fn(),
+    setOptions: navigationSetOptionsMock,
     isFocused: () => true,
-    addListener: () => () => {},
+    addListener: (event: string, listener: BeforeRemoveListener) => {
+      if (event !== "beforeRemove") return () => undefined
+      mockBeforeRemoveListeners.push(listener)
+      return () =>
+        mockBeforeRemoveListeners.splice(mockBeforeRemoveListeners.indexOf(listener), 1)
+    },
   }),
   useFocusEffect: (callback: () => undefined | (() => void)) => {
     const { useEffect } = jest.requireActual("react")
@@ -1717,6 +1729,147 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
   })
 })
 
+describe("SendBitcoinConfirmationScreen — back after a send attempt", () => {
+  const buildLnurlRoute = () => {
+    const { createLnurlPaymentDetails } = PaymentDetailsLightning
+    return {
+      key: "sendBitcoinConfirmationScreen",
+      name: "sendBitcoinConfirmation",
+      params: { paymentDetail: createLnurlPaymentDetails(defaultLightningParams) },
+    } as const
+  }
+
+  /** What a sender's back does: the header arrow, the hardware back or the swipe. */
+  const pressBack = (type = "GO_BACK") => {
+    const preventDefault = jest.fn()
+    mockBeforeRemoveListeners.forEach((listener) =>
+      listener({ data: { action: { type } }, preventDefault }),
+    )
+    return preventDefault
+  }
+
+  const wentHome = () =>
+    navigationDispatchMock.mock.calls.some(
+      ([action]) => (action as { type?: string })?.type === "POP_TO_TOP",
+    )
+
+  /** The real hook's contract: once the mutation fires, hasAttemptedSend stays true. */
+  let hasAttemptedSend = false
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockBeforeRemoveListeners.length = 0
+    loadLocale("en")
+    hasAttemptedSend = false
+    mockUseSendPayment.mockImplementation(() => ({
+      loading: false,
+      hasAttemptedSend,
+      sendPayment: sendPaymentMock,
+    }))
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+    })
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 500000,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 10000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+  })
+
+  afterEach(() => {
+    mockUseSendPayment.mockReset()
+    sendPaymentMock.mockReset()
+  })
+
+  it("leaves back alone before the first slide", () => {
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={buildLnurlRoute()} />
+      </ContextForScreen>,
+    )
+
+    expect(pressBack()).not.toHaveBeenCalled()
+    expect(wentHome()).toBe(false)
+  })
+
+  const attempts = [
+    ["a send that threw", () => Promise.reject(new Error("network died"))],
+    [
+      "a send that answered FAILURE",
+      () => Promise.resolve({ status: "FAILURE", errorsMessage: "route not found" }),
+    ],
+  ] as const
+
+  attempts.forEach(([name, outcome]) => {
+    ;["GO_BACK", "POP"].forEach((type) => {
+      it(`sends ${type} Home after ${name}, so no new payment can be built`, async () => {
+        sendPaymentMock.mockImplementationOnce(() => {
+          hasAttemptedSend = true
+          return outcome()
+        })
+
+        render(
+          <ContextForScreen>
+            <LightningLnURL route={buildLnurlRoute()} />
+          </ContextForScreen>,
+        )
+        await act(async () => {
+          fireEvent.press(screen.getByTestId("slider"))
+        })
+
+        expect(pressBack(type)).toHaveBeenCalled()
+        expect(wentHome()).toBe(true)
+        expect(navigationSetOptionsMock).toHaveBeenCalledWith({ gestureEnabled: false })
+      })
+    })
+  })
+
+  it("leaves back to Sent's own hold once the payment lands, not Home", async () => {
+    sendPaymentMock.mockImplementationOnce(() => {
+      hasAttemptedSend = true
+      return Promise.resolve({ status: "SUCCESS", extraInfo: {} })
+    })
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={buildLnurlRoute()} />
+      </ContextForScreen>,
+    )
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(pressBack()).toHaveBeenCalled()
+    expect(wentHome()).toBe(false)
+  })
+
+  it("still lets the sender slide again on review, under the same payment", async () => {
+    sendPaymentMock.mockImplementationOnce(() => {
+      hasAttemptedSend = true
+      return Promise.reject(new Error("network died"))
+    })
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={buildLnurlRoute()} />
+      </ContextForScreen>,
+    )
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
+  })
+})
+
 // The confirmation screen is a resting screen, not a picker: nothing on it
 // has to be compared against a balance, so hide-balance applies here the way
 // it does on the home screen. The amount being authorised stays readable.
@@ -2902,6 +3055,63 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
 
       expect(errorSheet()).toBeNull()
       expect(screen.getByText(LL.SelfCustodialError.generic())).toBeTruthy()
+    })
+  })
+
+  describe("back once the sheet is closed", () => {
+    let hasAttemptedSend = false
+
+    beforeEach(() => {
+      mockBeforeRemoveListeners.length = 0
+      hasAttemptedSend = false
+      mockUseSendPayment.mockImplementation(() => ({
+        loading: false,
+        hasAttemptedSend,
+        sendPayment: sendPaymentMock,
+      }))
+    })
+
+    afterEach(() => {
+      mockUseSendPayment.mockReset()
+      sendPaymentMock.mockReset()
+    })
+
+    const outcomes = [
+      ["a send that threw", () => Promise.reject(new Error("network died"))],
+      [
+        "an unclassified FAILURE",
+        () => Promise.resolve({ status: "FAILURE", errorsMessage: "route not found" }),
+      ],
+    ] as const
+
+    outcomes.forEach(([name, outcome]) => {
+      it(`goes Home, as the sheet says, after ${name}`, async () => {
+        sendPaymentMock.mockImplementationOnce(() => {
+          hasAttemptedSend = true
+          return outcome()
+        })
+        await renderReview(lnurlRoute())
+        await slide()
+        expect(sheetButton(LL.SendBitcoinConfirmationScreen.home())).toBeTruthy()
+
+        await act(async () => {
+          fireEvent.press(
+            screen.getByTestId(SCRIM_TEST_ID, { includeHiddenElements: true }),
+          )
+        })
+        expect(errorSheet()).toBeNull()
+
+        for (const type of ["GO_BACK", "POP"]) {
+          const preventDefault = jest.fn()
+          mockBeforeRemoveListeners.forEach((listener) =>
+            listener({ data: { action: { type } }, preventDefault }),
+          )
+          expect(preventDefault).toHaveBeenCalled()
+        }
+        expect(navigationDispatchMock).toHaveBeenCalledWith(
+          expect.objectContaining({ type: "POP_TO_TOP" }),
+        )
+      })
     })
   })
 })
