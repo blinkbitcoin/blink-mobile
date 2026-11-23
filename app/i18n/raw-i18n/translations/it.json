@@ -2383,7 +2383,8 @@
         "fromBalance": "Dal saldo",
         "details": "Dettagli",
         "changeAmount": "Modifica importo",
-        "usdRemainderSweep": "Saldo rimanente {remaining: string} ({remainingSats: string}) sarà convertito in Bitcoin. Minimo USD: {minimum: string}."
+        "usdRemainderSweep": "Saldo rimanente {remaining: string} ({remainingSats: string}) sarà convertito in Bitcoin. Minimo USD: {minimum: string}.",
+        "sendAnyway": "Ho controllato la cronologia, invia comunque"
     },
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "Gli username {bankName: string} sono ora indirizzi {bankName: string}.",
@@ -4309,7 +4310,12 @@
         "belowMinimum": "L'importo è al di sotto del minimo richiesto per questo pagamento. Prova un importo più grande.",
         "networkError": "Problema di connessione di rete. Controlla la connessione e riprova.",
         "invalidInput": "I dettagli del pagamento sembrano non validi. Verificali e riprova.",
-        "generic": "Il pagamento non è stato completato. Riprova tra un momento, o usa un importo più piccolo."
+        "generic": "Il pagamento non è stato completato. Riprova tra un momento, o usa un importo più piccolo.",
+        "outcomeUnknown": "Questo pagamento potrebbe essere già andato a buon fine. Controlla la cronologia delle transazioni prima di inviarlo di nuovo.",
+        "earlierConversionPending": "La tua conversione precedente è ancora in fase di conferma. Riprova tra qualche minuto.",
+        "earlierPaymentFound": "Il tuo pagamento precedente verso questa destinazione è già andato a buon fine, per un importo diverso. Controllalo prima di inviare di nuovo.",
+        "earlierConversionFound": "La tua conversione precedente è già andata a buon fine, per un importo diverso. Controllala nella cronologia delle transazioni prima di convertire di nuovo.",
+        "convertedMeanwhile": "È appena andata a buon fine una conversione di un importo simile. Controlla il tuo saldo prima di confermare di nuovo questa."
     },
     "SelfCustodialNetworkMismatch": {
         "toast": "Questo account è stato creato su {network}. Passa a {network} per usarlo."

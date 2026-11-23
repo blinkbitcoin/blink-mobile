@@ -53,6 +53,7 @@ import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
 import { isAmountFixableError } from "./amount-fixable-error"
 import { feeTierLabels, formatEta } from "./fee-tier-options"
 import { FeeTierOption } from "./hooks/fee-tiers.types"
+import { useHomeOnBackAfterSend } from "./hooks/use-home-on-back-after-send"
 import {
   CUSTODIAL_PAYOUT_ETA_MINUTES,
   feeTierFromPayoutSpeed,
@@ -67,6 +68,7 @@ import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
 import { PaymentSendExtraInfo } from "./payment-details/index.types"
 import { useReviewFeeText } from "./review/use-review-fee-text"
 import { useReviewQuote } from "./review/use-review-quote"
+import { PaymentErrorActions } from "./payment-error-actions"
 import {
   IDEMPOTENCY_KEY_UNAVAILABLE,
   PaymentSendCompletedStatus,
@@ -156,6 +158,15 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       setPaymentFailure({ message, canChangeAmount: isAmountFixableError(raw) }),
     [],
   )
+  /** What the last send that did not go out said about itself, for the actions it
+   *  offers under its error. */
+  const [failedSend, setFailedSend] = useState<PaymentSendExtraInfo | undefined>(
+    undefined,
+  )
+  const clearPaymentError = React.useCallback(() => {
+    setPaymentFailure(undefined)
+    setFailedSend(undefined)
+  }, [])
   const [isVerifying, setIsVerifying] = useState(false)
   const verifyPaymentSettled = useVerifyPaymentSettled()
   const { LL, locale } = useI18nContext()
@@ -254,6 +265,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     sendPayment,
     hasAttemptedSend,
   } = useSendPayment(sendPaymentMutation, paymentDetail.idempotencyKeyRef)
+  // Once Sent takes over, its own hold owns back.
+  useHomeOnBackAfterSend(hasAttemptedSend && !sentTransition.isSettled)
 
   // What the recipient gets: the amount less the fee, when the fee comes out of it.
   const displayAmount = paymentDetail.convertMoneyAmount(recipientAmount, DisplayCurrency)
@@ -293,6 +306,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     heroRef,
     isSent,
     sentPlay,
+    isAtEnd,
     glowFrame,
     heroProgress,
     glowProgress,
@@ -310,8 +324,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   useInitialAccessibilityFocus(isSent ? undefined : sliderHandleRef)
 
   /** Review turns into Sent in place, with no new screen to land focus on, so the result
-   *  is spoken once per play: a Sent rewound in the background speaks again when it
-   *  replays. */
+   *  is spoken as Sent appears, also when it first appears on the sender's return. */
   useAccessibilityAnnouncement(
     sentPlay
       ? LL.SendBitcoinConfirmationScreen.sentAnnouncement({ amount: heroPrimaryText })
@@ -417,6 +430,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       return sendPayment
     }
 
+    setFailedSend(undefined)
     try {
       logPaymentAttempt({
         paymentType: paymentDetail.paymentType,
@@ -443,6 +457,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         return
       }
 
+      setFailedSend(extraInfo)
       setPaymentError(
         translateSdkError(errorsMessage) ||
           LL.SendBitcoinConfirmationScreen.somethingWentWrong(),
@@ -517,6 +532,13 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     translateSdkError,
   ])
 
+  /** The sender checked their history and chose to send anyway: the destination was
+   *  released, so the send goes out now, as the button says. */
+  const sendAgainAnyway = React.useCallback(() => {
+    clearPaymentError()
+    handleSendPayment()
+  }, [clearPaymentError, handleSendPayment])
+
   let validAmount = true
   let invalidAmountErrorMessage = ""
 
@@ -577,6 +599,15 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       message: LL.SendBitcoinConfirmationScreen.copiedDestination(),
     })
   }
+
+  /** What stops a send from this screen: the slider's gates, which "send anyway" honours
+   *  too, since it sends in the slider's place. */
+  const isSliderDisabled =
+    !validAmount ||
+    !sendPayment ||
+    isAwaitingIncludedFee ||
+    feeUnavailable ||
+    dustNotEvaluable
 
   const isLightningRecommended = (() => {
     const ratioFeeToAmount = 50 // 2%
@@ -687,6 +718,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 sentProgress={heroProgress}
                 isSent={isSent}
                 sentPlay={sentPlay}
+                isSentAtEnd={isAtEnd}
               />
             </Animated.View>
           </View>
@@ -757,6 +789,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                   })}
                 </WarningBanner>
               ) : null}
+              <PaymentErrorActions
+                failedSend={failedSend}
+                canSendAnyway={!isSliderDisabled}
+                onSendAnyway={sendAgainAnyway}
+              />
             </View>
           </Animated.View>
         </ScrollView>
@@ -780,13 +817,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               }
               onSwipe={handleSendPayment}
               handleRef={sliderHandleRef}
-              disabled={
-                !validAmount ||
-                !sendPayment ||
-                isAwaitingIncludedFee ||
-                feeUnavailable ||
-                dustNotEvaluable
-              }
+              disabled={isSliderDisabled}
             />
           </Animated.View>
         </PanGestureHandler>

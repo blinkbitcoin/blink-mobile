@@ -2383,7 +2383,8 @@
         "fromBalance": "Desde el saldo",
         "details": "Detalles",
         "changeAmount": "Cambiar cantidad",
-        "usdRemainderSweep": "Restante {remaining: string} ({remainingSats: string}) se convertirá a Bitcoin. Mínimo en USD: {minimum: string}."
+        "usdRemainderSweep": "Restante {remaining: string} ({remainingSats: string}) se convertirá a Bitcoin. Mínimo en USD: {minimum: string}.",
+        "sendAnyway": "Revisé mi historial, enviar de todos modos"
     },
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "Los nombres de usuario de {bankName: string} ahora son direcciones de {bankName: string}.",
@@ -4309,7 +4310,12 @@
         "belowMinimum": "El monto está por debajo del mínimo requerido para este pago. Prueba con un monto mayor.",
         "networkError": "Problema de conexión de red. Verifica tu conexión e inténtalo de nuevo.",
         "invalidInput": "Los datos del pago parecen inválidos. Por favor revísalos e inténtalo de nuevo.",
-        "generic": "El pago no pudo completarse. Inténtalo en un momento, o usa un monto menor."
+        "generic": "El pago no pudo completarse. Inténtalo en un momento, o usa un monto menor.",
+        "outcomeUnknown": "Es posible que este pago ya se haya realizado. Revisa tu historial de transacciones antes de enviarlo de nuevo.",
+        "earlierConversionPending": "Tu transferencia anterior todavía se está confirmando. Vuelve a intentarlo en unos minutos.",
+        "earlierPaymentFound": "Tu pago anterior a este destino ya se realizó, por un monto distinto. Revísalo antes de volver a enviar.",
+        "earlierConversionFound": "Tu transferencia anterior ya se realizó, por un monto distinto. Revísala en tu historial de transacciones antes de volver a transferir.",
+        "convertedMeanwhile": "Acaba de realizarse una transferencia de un monto similar a este. Revisa tu saldo antes de volver a confirmar esta."
     },
     "SelfCustodialNetworkMismatch": {
         "toast": "Esta cuenta se creó en {network}. Cambia a {network} para usarla."

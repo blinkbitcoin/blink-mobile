@@ -132,9 +132,11 @@ type SendHeroProps = {
   sentProgress?: SharedValue<number>
   /** The payment has landed: the sent badge mounts and draws itself in. */
   isSent?: boolean
-  /** Which play of the Sent timeline is on screen. A new one redraws the badge from the
-   *  start; 0 holds it back while a play is waiting to replay. */
+  /** Which play of the Sent timeline is on screen. A new one mounts the badge afresh;
+   *  0 holds it back while none has started. */
   sentPlay?: number
+  /** Sent came back at its end: the badge shows fully drawn. */
+  isSentAtEnd?: boolean
 }
 
 export const SendHero: React.FC<SendHeroProps> = ({
@@ -149,6 +151,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
   sentProgress,
   isSent = false,
   sentPlay = 1,
+  isSentAtEnd = false,
 }) => {
   const styles = useStyles()
   const {
@@ -371,6 +374,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
             key={sentPlay}
             size={SENT_BADGE_SIZE}
             delay={SENT_BADGE_DELAY_MS}
+            isDrawn={isSentAtEnd}
           />
         </View>
       ) : null}

@@ -15,8 +15,12 @@ import {
 } from "@app/types/payment"
 import { reportError } from "@app/utils/error-logging"
 import { toNumber } from "@app/utils/helper"
+import { withTimeout } from "@app/utils/with-timeout"
 
-import { createGetConversionQuote } from "../bridge/convert"
+import {
+  createGetConversionQuote,
+  LOST_CONVERSION_DELIVERY_WINDOW_MS,
+} from "../bridge/convert"
 import { fetchConversionLimits } from "../bridge/limits"
 import { fetchUsdbDecimals } from "../bridge/token-balance"
 
@@ -91,6 +95,18 @@ export const fetchAutoConvertMinSats = async (
 
 export const DEFAULT_AMOUNT_MATCH_TOLERANCE_BPS = 500 // 5%
 
+/** How long a read of the history waits on the SDK. These reads run in a receive's turn to
+ *  convert, which every later receive waits behind, so one that never answers is taken
+ *  as unreadable rather than left holding them all. */
+const HISTORY_READ_TIMEOUT_MS = 15_000
+
+const listRecentPayments = (sdk: BreezSdkInterface) =>
+  withTimeout(
+    sdk.listPayments(ListPaymentsRequest.create({ offset: 0, limit: 50 })),
+    HISTORY_READ_TIMEOUT_MS,
+    "Auto-convert history read",
+  )
+
 /** Absolute floor on the tolerance window so tiny amounts still match. */
 const AMOUNT_MATCH_TOLERANCE_FLOOR = 50
 
@@ -126,45 +142,51 @@ type PriorConversionMatch = {
   claimedConversionIds: ReadonlySet<string>
 }
 
-const hasAlreadyConverted = async (
+/** Such a conversion in the history, if one is there. Throws when the history cannot be
+ *  read. */
+const findConvertedInHistory = async (
   sdk: BreezSdkInterface,
   match: PriorConversionMatch,
-): Promise<boolean> => {
-  try {
-    const response = await sdk.listPayments(
-      ListPaymentsRequest.create({ offset: 0, limit: 50 }),
-    )
-    return response.payments.some((payment) => {
-      const details = payment.conversionDetails
-      if (!details || details.status !== ConversionStatus.Completed) return false
+): Promise<Payment | undefined> => {
+  const response = await listRecentPayments(sdk)
+  const converted = response.payments.find((payment) => {
+    const details = payment.conversionDetails
+    if (!details || details.status !== ConversionStatus.Completed) return false
 
-      if (match.claimedConversionIds.has(payment.id)) return false
+    if (match.claimedConversionIds.has(payment.id)) return false
 
-      const paymentMs = Number(payment.timestamp) * 1000
-      if (paymentMs < match.recordCreatedAtMs) return false
+    const paymentMs = Number(payment.timestamp) * 1000
+    if (paymentMs < match.recordCreatedAtMs) return false
 
-      /** 0.22 persists the status but rebuilds the legs on retrieval, so a settled
-       *  conversion can surface with none while its child payment is still syncing.
-       *  Matching is the safe side: a false match skips one auto-convert, a false miss
-       *  converts the user's sats a second time. */
-      if (!details.conversions?.length) {
-        reportError(
-          "hasAlreadyConverted",
-          `completed conversion ${payment.id} has no legs; treating as already converted`,
-          /** The comment above declares this an expected SDK state, so it belongs in the
-           *  breadcrumb trail rather than the non-fatal list, where the payment id in the
-           *  message would open a separate issue on every occurrence. */
-          { expected: true },
-        )
-        return true
-      }
+    /** 0.22 persists the status but rebuilds the legs on retrieval, so a settled
+     *  conversion can surface with none while its child payment is still syncing.
+     *  Matching is the safe side: a false match skips one auto-convert, a false miss
+     *  converts the user's sats a second time. */
+    if (!details.conversions?.length) {
+      reportError(
+        "hasAlreadyConverted",
+        `completed conversion ${payment.id} has no legs; treating as already converted`,
+        /** The comment above declares this an expected SDK state, so it belongs in the
+         *  breadcrumb trail rather than the non-fatal list, where the payment id in the
+         *  message would open a separate issue on every occurrence. */
+        { expected: true },
+      )
+      return true
+    }
 
-      return matchesConversionAmount(payment, match.satsAmount, match.toleranceBps)
-    })
-  } catch {
-    return false
-  }
+    return matchesConversionAmount(payment, match.satsAmount, match.toleranceBps)
+  })
+  return converted
 }
+
+/** The check before anything is quoted, naming the conversion it finds for the pairing:
+ *  a history that cannot be read is taken for no such conversion, and the one asked
+ *  again in the conversion's turn decides. */
+const findAlreadyConverted = (
+  sdk: BreezSdkInterface,
+  match: PriorConversionMatch,
+): Promise<Payment | undefined> =>
+  findConvertedInHistory(sdk, match).catch(() => undefined)
 
 /** Picks the most recent unclaimed completed conversion within tolerance, for pairing. */
 export const findRecentConversionId = async (
@@ -176,9 +198,7 @@ export const findRecentConversionId = async (
   },
 ): Promise<string | undefined> => {
   try {
-    const response = await sdk.listPayments(
-      ListPaymentsRequest.create({ offset: 0, limit: 50 }),
-    )
+    const response = await listRecentPayments(sdk)
     const candidate = response.payments.find((payment) => {
       const details = payment.conversionDetails
       if (!details || details.status !== ConversionStatus.Completed) return false
@@ -206,14 +226,18 @@ export const executeAutoConvert = async (
 
   const toleranceBps =
     params.amountMatchToleranceBps ?? DEFAULT_AMOUNT_MATCH_TOLERANCE_BPS
-  const alreadyConverted = await hasAlreadyConverted(sdk, {
+  const priorConversion: PriorConversionMatch = {
     satsAmount: params.satsAmount,
     recordCreatedAtMs: params.recordCreatedAtMs,
     toleranceBps,
     claimedConversionIds: params.claimedConversionIds ?? new Set(),
-  })
-  if (alreadyConverted) {
-    return { status: AutoConvertStatus.AlreadyConverted }
+  }
+  const alreadyConvertedBy = await findAlreadyConverted(sdk, priorConversion)
+  if (alreadyConvertedBy) {
+    return {
+      status: AutoConvertStatus.AlreadyConverted,
+      conversionPaymentId: alreadyConvertedBy.id,
+    }
   }
 
   const convertParams: ConvertParams = {
@@ -229,6 +253,7 @@ export const executeAutoConvert = async (
     },
     direction: ConvertDirection.BtcToUsd,
     source: "auto_convert",
+    receiveRecordedAtMs: params.recordCreatedAtMs,
   }
 
   let quote
@@ -242,9 +267,45 @@ export const executeAutoConvert = async (
   }
   if (!quote) return { status: AutoConvertStatus.Failed }
 
-  const result = await quote.execute()
+  /** Asked again once the conversion's turn comes: the user may have converted these sats
+   *  while it waited behind theirs. The conversion it finds is kept for the pairing. */
+  let convertedMeanwhile: Payment | undefined
+  const result = await quote.execute({
+    isConvertedMeanwhile: async () => {
+      convertedMeanwhile = await findConvertedInHistory(sdk, priorConversion)
+      return convertedMeanwhile !== undefined
+    },
+  })
   if (result.status === PaymentResultStatus.Success) {
-    return { status: AutoConvertStatus.Converted }
+    return {
+      status: AutoConvertStatus.Converted,
+      conversionPaymentId: result.deliveredPaymentId,
+    }
+  }
+  const errorCode = result.errors?.[0]?.code
+  const isConvertedMeanwhile = errorCode === ConvertErrorCode.AlreadyConverted
+  if (isConvertedMeanwhile) {
+    return {
+      status: AutoConvertStatus.AlreadyConverted,
+      conversionPaymentId: convertedMeanwhile?.id,
+    }
+  }
+  /** Nothing went out, behind an earlier conversion that may have been lost. Tried again
+   *  once the wait is over, where it is looked for before anything goes out, and one of
+   *  these sats that completed is taken for this receive's by `hasAlreadyConverted`
+   *  before any quote. One that can still deliver does so within its window, which this
+   *  launch counts from no earlier than now; one that turned up as another is settled. */
+  const isWaitingForEarlierDelivery =
+    errorCode === ConvertErrorCode.EarlierConversionPending
+  if (isWaitingForEarlierDelivery) {
+    return {
+      status: AutoConvertStatus.Deferred,
+      retryAfterMs: LOST_CONVERSION_DELIVERY_WINDOW_MS,
+    }
+  }
+  const isEarlierSettledNow = errorCode === ConvertErrorCode.EarlierConversionFound
+  if (isEarlierSettledNow) {
+    return { status: AutoConvertStatus.Deferred, retryAfterMs: 0 }
   }
   return { status: AutoConvertStatus.Failed }
 }

@@ -1,5 +1,5 @@
 import React from "react"
-import { render, screen } from "@testing-library/react-native"
+import { act, render, screen } from "@testing-library/react-native"
 import Svg, { Path } from "react-native-svg"
 import { createTheme, ThemeProvider } from "@rn-vui/themed"
 
@@ -50,5 +50,19 @@ describe("SuccessBadge", () => {
 
       expect(gap - dash).toBeCloseTo(2 * path.props.strokeWidth)
     })
+  })
+
+  /** Sent shown at its end, after the lock screen cut its play off, has nothing to draw. */
+  it("mounts fully drawn when asked to, and stays so", () => {
+    jest.useFakeTimers()
+    renderBadge({ isDrawn: true, delay: 150 })
+
+    const offsets = () =>
+      screen.UNSAFE_getAllByType(Path).map((path) => path.props.strokeDashoffset)
+    expect(offsets()).toEqual([0, 0])
+
+    act(() => jest.advanceTimersByTime(2000))
+    expect(offsets()).toEqual([0, 0])
+    jest.useRealTimers()
   })
 })
