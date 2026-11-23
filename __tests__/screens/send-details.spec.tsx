@@ -2,6 +2,7 @@ import React from "react"
 import { ApolloError } from "@apollo/client"
 import { GraphQLError } from "graphql"
 import { Satoshis, type LnUrlPayServiceResponse } from "lnurl-pay"
+import type { ReactTestInstance } from "react-test-renderer"
 
 import {
   act,
@@ -1077,6 +1078,29 @@ describe("daily limit that could not be read", () => {
     })
 
     expect(mockWithdrawalLimitsQuery.refetch).toHaveBeenCalledTimes(1)
+  })
+
+  it("keeps saying so inline once the sheet is closed", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalLimitsQuery.error = new Error("limits unavailable")
+
+    await renderOnchain()
+    const sheet = within(await screen.findByTestId(ERROR_SHEET_TEST_ID))
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinConfirmationScreen.tryAgain()))
+    })
+
+    // The sheet may still hold its copy as it slides out; the error slot holds the other.
+    const isInSheet = (node: ReactTestInstance | null): boolean =>
+      Boolean(node) &&
+      (node?.props.testID === ERROR_SHEET_TEST_ID || isInSheet(node?.parent ?? null))
+    const inline = screen
+      .queryAllByText(LL.SendBitcoinScreen.limitsUnavailable(), {
+        includeHiddenElements: true,
+      })
+      .filter((node) => !isInSheet(node))
+    expect(inline).toHaveLength(1)
   })
 
   // A remaining limit of 0 reads as no limit, as on main (blink-wip#1273 G1, senior dev).

@@ -568,12 +568,19 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   /**
    * The extra-info box shows one message, and an invalid amount is the one the sender can
-   * act on, so a fee error only takes the box once the amount is valid.
+   * act on, so a fee error only takes the box once the amount is valid. An unread limit
+   * stays in the box after its sheet is closed, unless an amount problem holds it.
    */
+  const isAmountBlocked =
+    !amountStatus.validAmount &&
+    amountStatus.invalidReason !== AmountInvalidReason.NoAmount
   const extraInfoErrorMessage =
     lnurlError?.message ||
     lnurlBoundsErrorMessage ||
-    (amountStatus.validAmount ? feeTierErrorMessage : undefined)
+    (amountStatus.validAmount ? feeTierErrorMessage : undefined) ||
+    (retryLimits && !isAmountBlocked
+      ? LL.SendBitcoinScreen.limitsUnavailable()
+      : undefined)
 
   const walletCurrency = sendingWalletDescriptor.currency
 

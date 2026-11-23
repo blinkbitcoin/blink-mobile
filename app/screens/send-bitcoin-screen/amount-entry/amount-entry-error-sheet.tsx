@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import React, { useMemo, useState } from "react"
 
 import { ErrorMsgBottomSheet } from "@app/components/error-msg-bottom-sheet"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -16,8 +16,8 @@ type Props = {
   /** The on-chain address is the sending wallet's own (blink-mobile#4261). */
   selfPaymentMessage: string | undefined
   /** The daily limit could not be read, so nothing may go on until it is: Try again reads
-   *  it again. */
-  onRetryLimits: (() => void) | undefined
+   *  it again, and settles once that read has answered. */
+  onRetryLimits: (() => Promise<unknown> | void) | undefined
   onRetry: (() => void) | undefined
   onChangeAmount: () => void
 }
@@ -52,13 +52,19 @@ export const AmountEntryErrorSheet: React.FC<Props> = ({
     [limitMessage],
   )
 
+  // A new error for each read of the limit, so one that fails again opens the sheet again.
+  const [limitsReads, setLimitsReads] = useState(0)
   const hasLimitsError = Boolean(onRetryLimits)
   const limitsError = useMemo(
     () =>
       hasLimitsError
-        ? { message: LL.SendBitcoinScreen.limitsUnavailable(), isLimitsError: true }
+        ? {
+            message: LL.SendBitcoinScreen.limitsUnavailable(),
+            isLimitsError: true,
+            read: limitsReads,
+          }
         : undefined,
-    [hasLimitsError, LL],
+    [hasLimitsError, limitsReads, LL],
   )
 
   // Held while the address stays the same, so a new amount doesn't open it again.
@@ -85,7 +91,10 @@ export const AmountEntryErrorSheet: React.FC<Props> = ({
         primaryLabel: LL.SendBitcoinConfirmationScreen.tryAgain(),
         onPrimaryPress: () => {
           sheet.dismiss()
-          onRetryLimits()
+          // A failed read is still shown inline; the sheet comes back for it either way.
+          Promise.resolve(onRetryLimits())
+            .catch(() => {})
+            .then(() => setLimitsReads((reads) => reads + 1))
         },
       }
     }

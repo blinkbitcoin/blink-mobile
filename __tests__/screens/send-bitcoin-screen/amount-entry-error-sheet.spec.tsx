@@ -167,6 +167,35 @@ describe("AmountEntryErrorSheet", () => {
       expect(onRetryLimits).toHaveBeenCalledTimes(1)
       expect(mockSheet.isVisible).toBe(false)
     })
+
+    it("opens again when the new read fails too", async () => {
+      let answer: () => void = () => {}
+      const onRetryLimits = jest.fn(
+        () =>
+          new Promise<void>((resolve) => {
+            answer = resolve
+          }),
+      )
+      renderSheet({ onRetryLimits })
+
+      press()
+      expect(mockSheet.isVisible).toBe(false)
+
+      await act(async () => answer())
+      expect(mockSheet).toMatchObject({
+        isVisible: true,
+        body: LL.SendBitcoinScreen.limitsUnavailable(),
+      })
+    })
+
+    it("opens again when the new read rejects", async () => {
+      const onRetryLimits = jest.fn(() => Promise.reject(new Error("still unavailable")))
+      renderSheet({ onRetryLimits })
+
+      await act(async () => press())
+
+      expect(mockSheet.isVisible).toBe(true)
+    })
   })
 
   describe("an on-chain address of the sending wallet (#4261)", () => {
