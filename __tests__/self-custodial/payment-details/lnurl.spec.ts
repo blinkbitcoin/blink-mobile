@@ -2224,7 +2224,9 @@ describe("createSelfCustodialLnurlPaymentDetails send-all", () => {
     expect(await feePolicyOf(switched)).toBeUndefined()
   })
 
-  it("keeps the Dollar wallet on FeesIncluded, with no send-all offered", () => {
+  /** A dollar send takes its fee out on main's path, which review doesn't treat as a
+   *  send-all: the policy is FeesIncluded, the send-all flag stays off. */
+  it("keeps the Dollar wallet on FeesIncluded, with no send-all offered", async () => {
     const detail = createSelfCustodialLnurlPaymentDetails(
       createParams({
         sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
@@ -2232,6 +2234,7 @@ describe("createSelfCustodialLnurlPaymentDetails send-all", () => {
     )
 
     expect(detail.canSendMax).toBe(false)
-    expect(detail.isFeeIncluded).toBe(true)
+    expect(detail.isFeeIncluded).toBe(false)
+    expect(await feePolicyOf(detail)).toBe(FEES_INCLUDED)
   })
 })
