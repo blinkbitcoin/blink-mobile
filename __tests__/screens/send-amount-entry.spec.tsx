@@ -583,6 +583,85 @@ describe("a self-custodial on-chain fee", () => {
     )
   })
 
+  /** The quote is for the payment on screen when Next was pressed, so nothing on that
+   *  payment may change until it lands: review would get a tier or note the user left. */
+  describe("while the quote after Next is out", () => {
+    const holdQuote = () => {
+      let release: () => void = () => {}
+      mockPrepareSend.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            release = () => resolve({})
+          }),
+      )
+      return () => release()
+    }
+
+    it("holds the keypad, wallet switch, priority and note, then goes to review", async () => {
+      const release = holdQuote()
+      renderScreen(onchainDestination)
+      await settle()
+      typeKeys("1", "0")
+      await settle()
+
+      fireEvent.press(nextButton())
+      await settle()
+
+      expect(screen.getByTestId("Key 1").props.accessibilityState?.disabled).toBe(true)
+      expect(
+        screen.getByTestId("choose-wallet-to-send-from").props.accessibilityState
+          ?.disabled,
+      ).toBe(true)
+      expect(
+        screen.getByTestId("fee-tier-dropdown").props.accessibilityState?.disabled,
+      ).toBe(true)
+      expect(screen.getByTestId("add-note").props.editable).toBe(false)
+      expect(mockNavigate).not.toHaveBeenCalled()
+
+      await act(async () => release())
+      await settle()
+
+      expect(mockPrepareSend).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "sendBitcoinConfirmation",
+        expect.anything(),
+      )
+      expect(screen.getByTestId("Key 1").props.accessibilityState?.disabled).toBe(false)
+      expect(screen.getByTestId("add-note").props.editable).toBe(true)
+    })
+
+    it("stays on the screen when the payment changed under the quote", async () => {
+      const release = holdQuote()
+      renderScreen(onchainDestination)
+      await settle()
+      typeKeys("1", "0")
+      await settle()
+
+      fireEvent.press(nextButton())
+      await settle()
+      // An edit that lands anyway, as a keyboard can commit text after the field locks.
+      await act(async () => {
+        screen.getByTestId("add-note").props.onChangeText("late note")
+      })
+
+      await act(async () => release())
+      await settle()
+
+      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(isNextDisabled()).toBe(false)
+
+      fireEvent.press(nextButton())
+      await settle()
+
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "sendBitcoinConfirmation",
+        expect.objectContaining({
+          paymentDetail: expect.objectContaining({ memo: "late note" }),
+        }),
+      )
+    })
+  })
+
   it("leaves nothing to show once the amount clears the minimum", async () => {
     renderScreen(onchainDestination)
     await settle()
