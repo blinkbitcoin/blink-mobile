@@ -9,6 +9,7 @@ import { BlinkCard } from "@app/components/blink-card/blink-card"
 import { AddToWalletButton, InfoCard } from "@app/components/card-screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { useAddToWallet } from "./hooks/use-add-to-wallet"
 
@@ -89,8 +90,7 @@ const useStyles = makeStyles(({ colors }) => ({
   title: {
     color: colors.textOnBackground,
     fontSize: 20,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 24,
     textAlign: "center",
     maxWidth: 264,
@@ -98,8 +98,7 @@ const useStyles = makeStyles(({ colors }) => ({
   subtitle: {
     color: colors.textMuted,
     fontSize: 12,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 18,
     textAlign: "center",
     maxWidth: 264,

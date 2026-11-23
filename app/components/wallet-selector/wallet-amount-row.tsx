@@ -13,6 +13,7 @@ import { CurrencyPill } from "@app/components/atomic/currency-pill"
 import { WalletCurrency } from "@app/graphql/generated"
 import { APPROXIMATE_PREFIX } from "@app/config"
 import type { InputRef } from "@app/types/themed-input"
+import { fonts } from "@app/rne-theme/fonts"
 
 export type WalletAmountRowProps = {
   inputRef: React.RefObject<InputRef | null>
@@ -165,7 +166,7 @@ const useStyles = makeStyles(({ colors }) => ({
     padding: 0,
     margin: 0,
     color: colors.textOnBackground,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
   },
   primaryNumberInputContainer: { borderBottomWidth: 0, paddingBottom: 0 },
   disabledOpacity: { opacity: 0.5 },

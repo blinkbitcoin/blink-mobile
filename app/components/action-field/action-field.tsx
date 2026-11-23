@@ -5,6 +5,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { groupTitleGap } from "@app/rne-theme/tokens"
+import { fonts } from "@app/rne-theme/fonts"
 
 const PLACEHOLDER = "—"
 
@@ -62,8 +63,7 @@ const useStyles = makeStyles(({ colors }) => ({
   label: {
     color: colors.textSecondary,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
   },
   valueContainer: {
@@ -78,8 +78,7 @@ const useStyles = makeStyles(({ colors }) => ({
   value: {
     color: colors.textOnBackground,
     fontSize: 16,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 22,
     flex: 1,
   },

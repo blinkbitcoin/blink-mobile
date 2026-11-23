@@ -2,6 +2,7 @@ import React from "react"
 import { StyleProp, TextStyle } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 type TagHandler = {
   style?: StyleProp<TextStyle>
@@ -49,7 +50,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.textMuted,
   },
   bold: {
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.textOnBackground,
   },
   link: {

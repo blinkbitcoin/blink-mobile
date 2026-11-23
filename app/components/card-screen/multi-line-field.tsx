@@ -5,6 +5,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { staticSurface } from "@app/rne-theme/surfaces"
+import { fonts } from "@app/rne-theme/fonts"
 
 type MultiLineFieldProps = {
   lines: string[]
@@ -72,8 +73,7 @@ const useStyles = makeStyles(({ colors }) => ({
   text: {
     color: colors.textMuted,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
   },
 }))

@@ -2,6 +2,7 @@ import { makeStyles } from "@rn-vui/themed"
 import { groupTitleGap } from "@app/rne-theme/tokens"
 
 import { radius } from "@app/rne-theme/radius"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const useSharedStepStyles = makeStyles(({ colors }) => ({
   section: {
@@ -10,8 +11,7 @@ export const useSharedStepStyles = makeStyles(({ colors }) => ({
   sectionTitle: {
     color: colors.textSecondary,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
   },
   settingsGroupContainer: {

@@ -5,6 +5,7 @@ import ReactNativeModal from "react-native-modal"
 
 import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { fonts } from "@app/rne-theme/fonts"
 
 const ITEM_HEIGHT = 56
 const MODAL_MAX_HEIGHT = 400
@@ -182,8 +183,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     color: colors.textOnBackground,
     fontSize: 18,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 24,
   },
   modal: {
@@ -215,8 +215,7 @@ const useStyles = makeStyles(({ colors }) => ({
   yearOptionText: {
     color: colors.textOnBackground,
     fontSize: 18,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 24,
   },
   yearOptionSelected: {
@@ -228,8 +227,7 @@ const useStyles = makeStyles(({ colors }) => ({
   yearOptionSubtext: {
     color: colors.textMuted,
     fontSize: 12,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 16,
   },
 }))

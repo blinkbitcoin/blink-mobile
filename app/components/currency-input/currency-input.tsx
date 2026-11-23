@@ -13,6 +13,7 @@ import { Input, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "@app/utils/testProps"
 import type { InputRef } from "@app/types/themed-input"
+import { fonts } from "@app/rne-theme/fonts"
 
 type AnimatedViewStyle = Animated.WithAnimatedValue<StyleProp<ViewStyle>>
 
@@ -144,7 +145,7 @@ const useStyles = makeStyles(({ colors }) => ({
     padding: 0,
     margin: 0,
     color: colors.textOnBackground,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
   },
   inputContainer: {
     borderBottomWidth: 0,

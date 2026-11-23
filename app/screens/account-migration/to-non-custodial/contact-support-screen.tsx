@@ -27,6 +27,7 @@ import {
 } from "@app/types/migration"
 import { testProps } from "@app/utils/testProps"
 import { staticSurface } from "@app/rne-theme/surfaces"
+import { fonts } from "@app/rne-theme/fonts"
 
 /** One footer control. The house pattern is a primary with a single secondary underneath,
  *  so each variant names exactly two. */
@@ -318,8 +319,7 @@ const useStyles = makeStyles(({ colors }) => ({
   label: {
     color: colors.textMuted,
     fontSize: 16,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 22,
   },
   /** No numberOfLines: every value renders complete, wrapping as needed, because support
@@ -327,8 +327,7 @@ const useStyles = makeStyles(({ colors }) => ({
   value: {
     color: colors.textOnBackground,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 20,
     textAlign: "right",
     maxWidth: 200,

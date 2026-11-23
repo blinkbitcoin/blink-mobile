@@ -5,6 +5,7 @@ import { useCountUp } from "use-count-up"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 type CircleProps = {
   heading: string
@@ -140,7 +141,7 @@ const useStyles = makeStyles(
         zIndex: -1,
       },
       circleValue: {
-        fontWeight: "700",
+        fontFamily: fonts.bold,
         fontSize: 48,
         minWidth: 60,
         textAlign: "center",

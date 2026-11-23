@@ -3,6 +3,7 @@ import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { fonts } from "@app/rne-theme/fonts"
 
 type AvatarInitialProps = {
   name: string
@@ -46,8 +47,7 @@ const useStyles = makeStyles(({ colors }, { size }: StyleProps) => ({
   text: {
     color: colors.accent,
     fontSize: size * 0.65,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: size * 0.87,
   },
 }))

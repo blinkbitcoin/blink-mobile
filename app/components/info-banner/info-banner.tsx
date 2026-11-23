@@ -5,6 +5,7 @@ import { Colors, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { radius } from "@app/rne-theme/radius"
 import { staticSurface } from "@app/rne-theme/surfaces"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 
@@ -60,12 +61,12 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   title: {
     fontSize: 16,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 22,
   },
   description: {
     fontSize: 16,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 22,
     color: colors.textMuted,
   },

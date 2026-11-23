@@ -13,6 +13,7 @@ import { cappedFontScale } from "@app/rne-theme/text-scaling"
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const CirclesCardPeopleHome = () => {
   const styles = useStyles()
@@ -147,7 +148,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   pointsNumber: {
     color: colors.textOnBackground,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     fontSize: 50,
   },
   pointsText: {

@@ -23,6 +23,7 @@ import { useBounceInAnimation } from "@app/components/animations"
 import { toWalletAmount } from "@app/types/amounts"
 import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { IconTransaction } from "../icon-transactions"
 import { TransactionDate } from "../transaction-date"
@@ -314,13 +315,13 @@ const useStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
   title: {
     fontSize: 16,
     lineHeight: 22,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
   },
   subtitle: {
     color: colors.textMuted,
     fontSize: 14,
     lineHeight: 20,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
   },
   amountWrapper: {
     alignItems: "flex-end",

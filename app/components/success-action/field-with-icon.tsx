@@ -3,6 +3,7 @@ import { View, Linking } from "react-native"
 import { makeStyles, Text } from "@rn-vui/themed"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 type TTextWithUrl = {
   text: string
@@ -73,7 +74,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "flex-start",
   },
   titleFieldBackground: {
-    fontWeight: "300",
+    fontFamily: fonts.regular,
     fontStyle: "normal",
     color: colors.textMuted,
     minWidth: 80,

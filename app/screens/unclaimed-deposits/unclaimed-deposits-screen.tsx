@@ -240,7 +240,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   cardTitle: {
     fontSize: 16,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.textOnBackground,
   },
   txRow: {
@@ -251,7 +251,7 @@ const useStyles = makeStyles(({ colors }) => ({
   txLink: {
     fontSize: 12,
     color: colors.accent,
-    fontFamily: "Source Sans Pro",
+    fontFamily: fonts.regular,
     flex: 1,
   },
   mutedText: {
@@ -289,7 +289,7 @@ const useStyles = makeStyles(({ colors }) => ({
   fieldInputText: {
     fontSize: 14,
     color: colors.textOnBackground,
-    fontFamily: "Source Sans Pro",
+    fontFamily: fonts.regular,
   },
   fieldGroup: {
     backgroundColor: colors.backgroundDefault,

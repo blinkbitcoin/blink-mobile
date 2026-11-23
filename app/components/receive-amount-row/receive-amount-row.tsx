@@ -19,6 +19,7 @@ import {
   MoneyAmount,
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
+import { fonts } from "@app/rne-theme/fonts"
 
 type FormattedAmounts = { formattedPrimary: string; formattedSecondary: string }
 
@@ -195,19 +196,19 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   amountText: {
     fontSize: 16,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 22,
     color: colors.textOnBackground,
   },
   placeholderText: {
     fontSize: 16,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 22,
     color: colors.textOnBackground,
   },
   secondaryText: {
     fontSize: 12,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 18,
     color: colors.textOnBackground,
   },

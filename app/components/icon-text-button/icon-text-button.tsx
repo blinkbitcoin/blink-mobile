@@ -6,6 +6,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 
 import { radius } from "@app/rne-theme/radius"
+import { fonts } from "@app/rne-theme/fonts"
 
 type IconTextButtonProps = {
   icon: IconNamesType
@@ -61,8 +62,7 @@ const useStyles = makeStyles(({ colors }, { textColor }: StyleProps) => ({
   label: {
     color: textColor,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 20,
   },
 }))
