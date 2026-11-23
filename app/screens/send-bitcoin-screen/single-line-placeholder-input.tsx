@@ -1,6 +1,8 @@
 import React, { forwardRef, Ref, useCallback } from "react"
 import { StyleSheet, Text, TextInput, TextInputProps, View } from "react-native"
 
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
+
 /**
  * A TextInput whose placeholder stays on one line and ends in "…" when it doesn't fit.
  * A native placeholder can't be truncated, and on Android it wraps, so the placeholder
@@ -32,13 +34,20 @@ export const SingleLinePlaceholderInput = forwardRef<TextInput, Props>(
 
     return (
       <View style={styles.container}>
-        <TextInput ref={setRefs} value={value} style={[style, styles.input]} {...props} />
+        <TextInput
+          ref={setRefs}
+          value={value}
+          style={[style, styles.input]}
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+          {...props}
+        />
         {!value && placeholder ? (
           <View
             pointerEvents="none"
             style={[styles.placeholderContainer, { left: marginLeft ?? 0 }]}
           >
             <Text
+              maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
               accessible={false}
               importantForAccessibility="no"
               numberOfLines={1}
