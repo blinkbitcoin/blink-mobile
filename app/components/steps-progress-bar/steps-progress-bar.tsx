@@ -3,6 +3,7 @@ import { TextStyle, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { SegmentedProgressBar } from "@app/components/segmented-progress-bar"
+import { fonts } from "@app/rne-theme/fonts"
 
 type StepsProgressBarProps = {
   steps: string[]
@@ -61,10 +62,9 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   label: {
     flex: 1,
-    fontFamily: "Source Sans Pro",
+    fontFamily: fonts.regular,
     fontSize: 10,
     lineHeight: 13,
-    fontWeight: "400",
     color: colors.textMuted,
   },
 }))

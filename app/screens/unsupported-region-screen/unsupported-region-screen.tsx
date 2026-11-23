@@ -10,6 +10,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { CreationBlockReason } from "@app/types/account"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 type Wording = { title: string; description: string }
 
@@ -97,7 +98,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   title: {
     fontSize: 20,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 24,
     color: colors.textOnBackground,
     textAlign: "center",

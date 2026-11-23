@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useLayoutEffect } from "react"
 import {
   AccessibilityInfo,
   AppState,
@@ -36,6 +36,8 @@ jest.mock("@react-navigation/native", () => ({
 }))
 
 const AMOUNTS = { primaryAmount: "$10.00", hasSecondaryAmount: true }
+/** The glow's bloom on Sent. */
+const GLOW_BLOOM_MS = 600
 
 let appStateListeners: Array<(state: AppStateStatus) => void> = []
 
@@ -500,9 +502,14 @@ describe("useSentTransition", () => {
     const STAGE = { x: 0, y: 0, width: 360, height: 800 }
     const HERO = { x: 0, y: 120, width: 360, height: 110 }
 
-    /** The hook's refs on real views, so the hero's travel can be read off its style. */
-    const renderStage = () => {
+    /** The hook's refs on real views, so the hero's travel can be read off its style. The
+     *  glow mounts once its frame is set, as on review, and `onGlowCommit` runs as it does. */
+    const renderStage = ({ onGlowCommit }: { onGlowCommit?: () => void } = {}) => {
       const transition: { current?: ReturnType<typeof useSentTransition> } = {}
+      const Glow = () => {
+        useLayoutEffect(() => onGlowCommit?.(), [])
+        return null
+      }
       const Stage = () => {
         const sent = useSentTransition()
         transition.current = sent
@@ -514,6 +521,7 @@ describe("useSentTransition", () => {
             testID: "hero",
             style: sent.heroStyle,
           }),
+          sent.glowFrame ? React.createElement(Glow) : null,
         )
       }
       render(React.createElement(Stage))
@@ -543,6 +551,40 @@ describe("useSentTransition", () => {
         centerY: STAGE.height / 2,
         radius: STAGE.height,
       })
+    })
+
+    /** On a slow first play the commit that mounts the glow took most of the bloom, and the
+     *  glow only flashed its end. */
+    it("starts the bloom once the glow is on screen, however long its commit takes", async () => {
+      const transition = renderStage({
+        onGlowCommit: () => jest.advanceTimersByTime(GLOW_BLOOM_MS),
+      })
+      answerMeasurements()
+
+      await playSent(transition)
+      expect(transition.current.glowProgress.value).toBeLessThan(0.01)
+
+      advance(GLOW_BLOOM_MS)
+      expect(transition.current.glowProgress.value).toBe(1)
+    })
+
+    it("blooms a replay from nothing after a rewind", async () => {
+      const transition = renderStage()
+      answerMeasurements()
+
+      await playSent(transition)
+      advance(GLOW_BLOOM_MS / 2)
+      expect(transition.current.glowProgress.value).toBeGreaterThan(0)
+
+      setAppState("background")
+      expect(transition.current.glowProgress.value).toBe(0)
+
+      setAppState("active")
+      await act(async () => {})
+      expect(transition.current.glowProgress.value).toBeLessThan(0.01)
+
+      advance(GLOW_BLOOM_MS)
+      expect(transition.current.glowProgress.value).toBe(1)
     })
 
     it("lands the grown hero on the middle of the screen", async () => {

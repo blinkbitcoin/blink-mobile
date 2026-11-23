@@ -6,6 +6,7 @@ import { InfoRow } from "./info-row"
 import { radius } from "@app/rne-theme/radius"
 import { staticSurface } from "@app/rne-theme/surfaces"
 import { groupTitleGap } from "@app/rne-theme/tokens"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const INFO_SECTION_OUTLINE_TEST_ID = "info-section-outline"
 
@@ -65,8 +66,7 @@ const useStyles = makeStyles(({ colors }) => ({
   title: {
     color: colors.textSecondary,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
   },
   card: {

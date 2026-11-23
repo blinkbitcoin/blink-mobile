@@ -1,6 +1,7 @@
 import * as React from "react"
 import { useCallback, useMemo, useState } from "react"
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { FlatList } from "react-native-gesture-handler"
 import { gql } from "@apollo/client"
 import { radius } from "@app/rne-theme/radius"
@@ -22,6 +23,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { SearchBar } from "@rn-vui/base"
 import { ListItem, makeStyles, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { fonts } from "@app/rne-theme/fonts"
 
 gql`
   query contacts {
@@ -158,6 +160,7 @@ export const AllContactsScreen: React.FC = () => {
   if (contacts.length > 0) {
     SearchBarContent = (
       <SearchBar
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         {...testProps(LL.common.search())}
         placeholder={LL.common.search()}
         value={searchText}
@@ -186,7 +189,12 @@ export const AllContactsScreen: React.FC = () => {
   if (contacts.length > 0) {
     ListEmptyContent = (
       <View style={styles.emptyListNoMatching}>
-        <Text style={styles.emptyListTitle}>{LL.PeopleScreen.noMatchingContacts()}</Text>
+        <Text
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+          style={styles.emptyListTitle}
+        >
+          {LL.PeopleScreen.noMatchingContacts()}
+        </Text>
       </View>
     )
   } else if (loading) {
@@ -199,12 +207,18 @@ export const AllContactsScreen: React.FC = () => {
     ListEmptyContent = (
       <View style={styles.emptyListNoContacts}>
         <Text
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           {...testProps(LL.PeopleScreen.noContactsTitle())}
           style={styles.emptyListTitle}
         >
           {LL.PeopleScreen.noContactsTitle()}
         </Text>
-        <Text style={styles.emptyListText}>{LL.PeopleScreen.noContactsYet()}</Text>
+        <Text
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+          style={styles.emptyListText}
+        >
+          {LL.PeopleScreen.noContactsYet()}
+        </Text>
       </View>
     )
   }
@@ -261,6 +275,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   emptyListText: {
+    fontFamily: fonts.regular,
     fontSize: 18,
     marginTop: 30,
     textAlign: "center",
@@ -270,7 +285,7 @@ const useStyles = makeStyles(({ colors }) => ({
   emptyListTitle: {
     color: colors.textOnBackground,
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     textAlign: "center",
   },
 
@@ -304,6 +319,7 @@ const useStyles = makeStyles(({ colors }) => ({
 
   searchBarText: {
     color: colors.textOnBackground,
+    fontFamily: fonts.regular,
     textDecorationLine: "none",
   },
 

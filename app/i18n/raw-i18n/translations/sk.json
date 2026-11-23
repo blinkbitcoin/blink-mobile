@@ -2369,11 +2369,10 @@
       "findingRoute": "Hľadanie trasy",
       "broadcasting": "Vysielanie",
       "checkingDelivery": "Overovanie doručenia",
-      "retrying": "Opakovanie",
       "almostThere": "Takmer hotovo",
       "anyTimeNow": "Každú chvíľu",
-      "ohOh": "Ojoj",
-      "tryingAgain": "Skúšame znova"
+      "hangTight": "Vydržte",
+      "stillOnItsWay": "Stále na ceste"
     },
     "copiedDestination": "Cieľ bol skopírovaný do schránky",
     "lightningRecommended": "Vysoký poplatok. Odporúčame Lightning.",

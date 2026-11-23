@@ -12,6 +12,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { SettingsGroup } from "./group"
 import { groupTitleGap } from "@app/rne-theme/tokens"
+import { fonts } from "@app/rne-theme/fonts"
 
 gql`
   query feeRates {
@@ -356,7 +357,7 @@ const useStyles = makeStyles(({ colors }) => ({
   sectionTitle: {
     color: colors.textSecondary,
     fontSize: 16,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 24,
   },
   groupCard: {

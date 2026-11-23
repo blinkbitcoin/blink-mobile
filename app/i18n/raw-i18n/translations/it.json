@@ -2369,11 +2369,10 @@
             "findingRoute": "Ricerca del percorso",
             "broadcasting": "Trasmissione",
             "checkingDelivery": "Verifica della consegna",
-            "retrying": "Nuovo tentativo",
             "almostThere": "Quasi fatto",
             "anyTimeNow": "A momenti",
-            "ohOh": "Oh oh",
-            "tryingAgain": "Riproviamo"
+            "hangTight": "Tieni duro",
+            "stillOnItsWay": "Ancora in viaggio"
         },
         "copiedDestination": "Destinazione copiata negli appunti",
         "lightningRecommended": "Tariffa elevata. Consigliamo Lightning",

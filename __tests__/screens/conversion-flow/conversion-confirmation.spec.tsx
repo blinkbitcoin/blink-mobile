@@ -1,6 +1,6 @@
 import React from "react"
 import { Text, TouchableOpacity } from "react-native"
-import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 import { useNavigation } from "@react-navigation/native"
 
 import { ConversionConfirmationScreen } from "@app/screens/conversion-flow"
@@ -152,17 +152,35 @@ jest.mock("@app/screens/conversion-flow/hooks/self-custodial/use-conversion", ()
     mockSelfCustodialConversion(...args),
 }))
 
+/** Set by the one case that needs the real slider: the requote swipe, whose onSwipe
+ *  settles at once. */
+let mockUseRealSlider = false
+
 jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () => {
   type Props = { onSwipe: () => void; initialText: string; disabled?: boolean }
-
-  const MockGaloySliderButton = ({ onSwipe, initialText, disabled }: Props) => (
-    <TouchableOpacity onPress={onSwipe} disabled={disabled}>
-      <Text>{initialText}</Text>
-    </TouchableOpacity>
+  const actual = jest.requireActual(
+    "@app/components/atomic/galoy-slider-button/galoy-slider-button",
   )
+  const RealGaloySliderButton = actual.default as React.ComponentType<Props>
 
-  return { __esModule: true, default: MockGaloySliderButton }
+  const MockGaloySliderButton = (props: Props) =>
+    mockUseRealSlider ? (
+      <RealGaloySliderButton {...props} />
+    ) : (
+      <TouchableOpacity onPress={props.onSwipe} disabled={props.disabled}>
+        <Text>{props.initialText}</Text>
+      </TouchableOpacity>
+    )
+
+  return { ...actual, __esModule: true, default: MockGaloySliderButton }
 })
+
+// The real slider's busy border runs a frame loop; the arc is not under test here.
+jest.mock("react-native-reanimated", () => ({
+  __esModule: true,
+  ...jest.requireActual("react-native-reanimated"),
+  useFrameCallback: jest.fn(),
+}))
 
 describe("conversion-confirmation-screen", () => {
   let LL: ReturnType<typeof i18nObject>
@@ -650,6 +668,63 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
       expect(requoteMock).toHaveBeenCalledTimes(1)
     })
     expect(executeMock).not.toHaveBeenCalled()
+  })
+
+  describe("with the real slider", () => {
+    beforeEach(() => {
+      mockUseRealSlider = true
+    })
+
+    afterEach(() => {
+      mockUseRealSlider = false
+    })
+
+    // requote() returns at once, so isLoading never turns on between the two swipes.
+    it("re-quotes again on a second swipe after a requote", async () => {
+      const requoteMock = jest.fn()
+      mockSelfCustodialConversion.mockReturnValue({
+        isQuoting: false,
+        hasQuoteError: true,
+        feeText: "",
+        adjustmentText: null,
+        canExecute: false,
+        loading: false,
+        execute: jest.fn(),
+        requote: requoteMock,
+      })
+
+      render(
+        <ContextForScreen>
+          <ConversionConfirmationScreen
+            route={{
+              key: "conversionConfirmation",
+              name: "conversionConfirmation",
+              params: {
+                fromWalletCurrency: WalletCurrency.Btc,
+                moneyAmount: {
+                  amount: 10000,
+                  currency: WalletCurrency.Btc,
+                  currencyCode: WalletCurrency.Btc,
+                },
+              },
+            }}
+          />
+        </ContextForScreen>,
+      )
+
+      // A screen reader's activate commits the same way a full slide does.
+      const activate = () =>
+        act(async () => {
+          fireEvent(screen.getByTestId("slider"), "accessibilityAction", {
+            nativeEvent: { actionName: "activate" },
+          })
+        })
+
+      await activate()
+      await activate()
+
+      expect(requoteMock).toHaveBeenCalledTimes(2)
+    })
   })
 
   it("keeps the slider disabled while the quote is still pending", () => {

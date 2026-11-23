@@ -1,11 +1,13 @@
 import React, { useState } from "react"
 import { View, TextInput } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { gql } from "@apollo/client"
 import { radius } from "@app/rne-theme/radius"
 import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 import {
   useUserUpdateUsernameMutation,
@@ -204,6 +206,7 @@ export const SetLightningAddressModalUI = ({
         <View style={styles.bodyStyle}>
           <View style={styles.textInputContainerStyle}>
             <TextInput
+              maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
               autoCorrect={false}
               autoComplete="off"
               style={styles.textInputStyle}
@@ -248,6 +251,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "space-between",
   },
   textInputStyle: {
+    fontFamily: fonts.regular,
     paddingTop: 0,
     paddingBottom: 0,
     flex: 1,

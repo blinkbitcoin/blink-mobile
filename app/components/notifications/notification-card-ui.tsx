@@ -8,6 +8,7 @@ import { GaloyIconButton } from "../atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "../atomic/galoy-primary-button"
 
 import { radius } from "@app/rne-theme/radius"
+import { fonts } from "@app/rne-theme/fonts"
 
 export type NotificationCardUIProps = {
   title: string
@@ -156,7 +157,7 @@ const useStyles = makeStyles(({ colors }) => ({
   bulletinButtonTitle: {
     fontSize: 14,
     lineHeight: 20,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.textOnAccent,
   },
 }))

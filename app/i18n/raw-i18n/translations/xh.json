@@ -2369,11 +2369,10 @@
       "findingRoute": "Ifuna indlela",
       "broadcasting": "Iyasasaza",
       "checkingDelivery": "Ijonga ukufika",
-      "retrying": "Iphinda izama",
       "almostThere": "Phantse sigqibile",
       "anyTimeNow": "Nanini na ngoku",
-      "ohOh": "Hayi bo",
-      "tryingAgain": "Siphinda sizame"
+      "hangTight": "Bambelela",
+      "stillOnItsWay": "Isesendleleni"
     },
     "copiedDestination": "Ikopishwe indawo ekuya kuyo kwibhodi eqhotyoshwayo",
     "lightningRecommended": "Imirhumo iphezulu. Sincoma i-Lightning.",

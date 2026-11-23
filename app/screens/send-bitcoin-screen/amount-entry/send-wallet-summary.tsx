@@ -43,6 +43,7 @@ type SendWalletSummaryProps = {
   onReveal?: () => void
 }
 
+// TODO(#4360): becomes a thin wrapper over WalletSummary once #4360 merges.
 export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
   currency,
   balancePrimary,

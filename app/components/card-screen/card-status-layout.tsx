@@ -6,6 +6,7 @@ import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { BlinkCard } from "@app/components/blink-card/blink-card"
 import { Screen } from "@app/components/screen"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { AddToWalletButton } from "./add-to-wallet-button"
 
@@ -121,8 +122,7 @@ const useStyles = makeStyles(({ colors }) => ({
   title: {
     color: colors.textOnBackground,
     fontSize: 20,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 24,
     textAlign: "center",
     maxWidth: 264,
@@ -130,8 +130,7 @@ const useStyles = makeStyles(({ colors }) => ({
   subtitle: {
     color: colors.textMuted,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
     textAlign: "center",
     maxWidth: 264,

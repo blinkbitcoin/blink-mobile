@@ -9,6 +9,7 @@ import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 import { modalContentBleed, toastSideInset, toastTopOffset } from "./toast-frame"
 import { radius } from "@app/rne-theme/radius"
 import { staticSurface } from "@app/rne-theme/surfaces"
+import { fonts } from "@app/rne-theme/fonts"
 
 export type ToastType = "success" | "error" | "warning"
 
@@ -124,10 +125,10 @@ const useStyles = makeStyles(
     text: {
       // Always bold, via the Bold face itself and no fontWeight. Android resolves
       // fontFamily to assets/fonts/<name>.ttf, so "Source Sans Pro" falls back to
-      // Roboto there, and the theme's Regular face plus a weight is synthesised.
+      // Roboto there, and the theme's Regular face plus a weight draws Roboto Bold.
       flex: 1,
       color: colors.textOnBackground,
-      fontFamily: "SourceSansPro-Bold",
+      fontFamily: fonts.bold,
       fontSize: 16,
       lineHeight: 22,
       includeFontPadding: false,

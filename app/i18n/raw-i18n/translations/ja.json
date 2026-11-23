@@ -2369,11 +2369,10 @@
             "findingRoute": "ルートを検索中",
             "broadcasting": "ブロードキャスト中",
             "checkingDelivery": "着金を確認中",
-            "retrying": "再試行中",
             "almostThere": "もう少しです",
             "anyTimeNow": "まもなく完了",
-            "ohOh": "おっと",
-            "tryingAgain": "もう一度試しています"
+            "hangTight": "少々お待ちください",
+            "stillOnItsWay": "まだ送信中です"
         },
         "copiedDestination": "送信先をクリップボードにコピーしました",
         "lightningRecommended": "手数料が高額です。Lightningをお勧めします。",

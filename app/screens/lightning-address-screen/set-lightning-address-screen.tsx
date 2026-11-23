@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react"
 import { View, TextInput, Keyboard, Modal } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
@@ -24,6 +25,7 @@ import {
   MyUserIdDocument,
   MyUserIdQuery,
 } from "@app/graphql/generated"
+import { fonts } from "@app/rne-theme/fonts"
 
 gql`
   mutation userUpdateUsername($input: UserUpdateUsernameInput!) {
@@ -194,6 +196,7 @@ export const SetLightningAddressScreen: React.FC<{
           style={[styles.textInputContainerStyle, isFieldFocused && styles.fieldFocused]}
         >
           <TextInput
+            maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
             autoCorrect={false}
             autoComplete="off"
             style={styles.textInputStyle}
@@ -260,6 +263,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.surfaceFocused,
   },
   textInputStyle: {
+    fontFamily: fonts.regular,
     flex: 1,
     fontSize: 18,
     color: colors.textOnBackground,

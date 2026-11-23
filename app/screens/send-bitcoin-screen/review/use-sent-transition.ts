@@ -204,15 +204,23 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
       duration: HERO_MOVE_MS,
       easing: Easing.inOut(Easing.cubic),
     })
-    glowProgress.value = withTiming(1, {
-      duration: GLOW_BLOOM_MS,
-      easing: Easing.out(Easing.quad),
-    })
     actionsProgress.value = withDelay(
       ACTIONS_DELAY_MS,
       withTiming(1, { duration: ACTIONS_FADE_MS, easing: Easing.out(Easing.quad) }),
     )
-  }, [heroTravel, detailsProgress, heroProgress, glowProgress, actionsProgress])
+  }, [heroTravel, detailsProgress, heroProgress, actionsProgress])
+
+  /** The glow only mounts with the commit that sets its frame, and on a first play that
+   *  commit is the whole screen turning Sent: started in `play`, the bloom could run its
+   *  course before the glow was there, which then only flashed. The frame and the play
+   *  land in one batch, so this runs once per play, with the glow on screen. */
+  useEffect(() => {
+    if (!sentPlay) return
+    glowProgress.value = withTiming(1, {
+      duration: GLOW_BLOOM_MS,
+      easing: Easing.out(Easing.quad),
+    })
+  }, [sentPlay, glowProgress])
 
   const canBeSeen = useCallback(
     () => AppState.currentState === "active" && navigation.isFocused(),

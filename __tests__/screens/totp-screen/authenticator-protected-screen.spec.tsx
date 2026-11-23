@@ -4,6 +4,7 @@ import { fireEvent, render, screen } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { fonts } from "@app/rne-theme/fonts"
 import { AuthenticatorProtectedScreen } from "@app/screens/totp-screen"
 
 import { ContextForScreen } from "../helper"
@@ -45,7 +46,9 @@ describe("AuthenticatorProtectedScreen", () => {
     await renderScreen()
 
     const before = screen.getByText("before")
-    expect(StyleSheet.flatten(before.props.style)).toMatchObject({ fontWeight: "700" })
+    expect(StyleSheet.flatten(before.props.style)).toMatchObject({
+      fontFamily: fonts.bold,
+    })
     expect(
       screen.getByText(/If you get a new phone, move your authenticator to it/),
     ).toBeTruthy()

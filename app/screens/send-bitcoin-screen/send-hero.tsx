@@ -317,6 +317,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
       }
     >
       <Animated.Text
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         style={[
           styles.amount,
           {
@@ -335,6 +336,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
       </Animated.Text>
       {secondaryAmount ? (
         <Animated.Text
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           style={[
             styles.amount,
             {
