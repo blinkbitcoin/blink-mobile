@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ScrollView, View } from "react-native"
+import { View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text } from "@rn-vui/themed"
@@ -7,7 +7,7 @@ import { makeStyles, Text } from "@rn-vui/themed"
 import { radius } from "@app/rne-theme/radius"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { FeatureRow, FeatureRowProps } from "@app/components/card-screen"
-import { Screen } from "@app/components/screen"
+import { StepLayout } from "@app/components/step-layout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { staticSurface } from "@app/rne-theme/surfaces"
@@ -48,8 +48,15 @@ export const CardDetailsScreen: React.FC = () => {
   }
 
   return (
-    <Screen>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+    <StepLayout
+      footer={
+        <GaloyPrimaryButton
+          title={LL.CardFlow.Onboarding.CardDetails.buttonText()}
+          onPress={handleNext}
+        />
+      }
+    >
+      <View style={styles.content}>
         <View style={styles.cardContainer}>
           {FEATURES.map((feature, index) => {
             const hasSeparator = index > 0
@@ -67,26 +74,15 @@ export const CardDetailsScreen: React.FC = () => {
             months: UPCOMING_FEATURES_MONTHS,
           })}
         </Text>
-      </ScrollView>
-
-      <View style={styles.buttonsContainer}>
-        <GaloyPrimaryButton
-          title={LL.CardFlow.Onboarding.CardDetails.buttonText()}
-          onPress={handleNext}
-        />
       </View>
-    </Screen>
+    </StepLayout>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingTop: 30,
+  content: {
+    paddingTop: 10,
     paddingHorizontal: 20,
-    paddingBottom: 20,
     gap: 20,
   },
   cardContainer: {
@@ -100,11 +96,5 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   footnote: {
     textAlign: "center",
-  },
-  buttonsContainer: {
-    justifyContent: "flex-end",
-    marginBottom: 14,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
   },
 }))

@@ -6,7 +6,7 @@ import { makeStyles, Text } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { BlinkCard } from "@app/components/blink-card/blink-card"
-import { Screen } from "@app/components/screen"
+import { StepLayout } from "@app/components/step-layout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { fonts } from "@app/rne-theme/fonts"
@@ -27,7 +27,14 @@ export const CardIntroducingScreen: React.FC = () => {
   )
 
   return (
-    <Screen>
+    <StepLayout
+      footer={
+        <GaloyPrimaryButton
+          title={LL.CardFlow.Onboarding.CardIntroducing.buttonText()}
+          onPress={() => navigation.navigate("cardOnboardingDetailsScreen")}
+        />
+      }
+    >
       <View style={styles.body}>
         <BlinkCard
           cardNumber={CARD_DISPLAY_PLACEHOLDER.cardNumber}
@@ -52,13 +59,7 @@ export const CardIntroducingScreen: React.FC = () => {
           </Text>
         </View>
       </View>
-      <View style={styles.buttonsContainer}>
-        <GaloyPrimaryButton
-          title={LL.CardFlow.Onboarding.CardIntroducing.buttonText()}
-          onPress={() => navigation.navigate("cardOnboardingDetailsScreen")}
-        />
-      </View>
-    </Screen>
+    </StepLayout>
   )
 }
 
@@ -69,16 +70,9 @@ const useStyles = makeStyles(({ colors }) => {
 
   return {
     body: {
-      flex: 1,
       paddingHorizontal: 20,
-      paddingTop: 30,
+      paddingTop: 16,
       gap: 60,
-    },
-    buttonsContainer: {
-      justifyContent: "flex-end",
-      marginBottom: 14,
-      paddingHorizontal: 20,
-      paddingBottom: 20,
     },
     textContainer: {
       gap: 10,
