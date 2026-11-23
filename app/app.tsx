@@ -33,6 +33,7 @@ import {
   AutoConvertListenerMount,
   DisplayCurrencyFromRegionMount,
   RecoveryBundleListenerMount,
+  RegionCheckTelemetryMount,
   TelemetryContextMount,
   LaunchCleanupMount,
 } from "./self-custodial/components"
@@ -109,6 +110,7 @@ export const App = () => (
                                                 <AutoConvertListenerMount />
                                                 <AccountModeSyncMount />
                                                 <TelemetryContextMount />
+                                                <RegionCheckTelemetryMount />
                                                 <DisplayCurrencyFromRegionMount />
                                                 <RecoveryBundleListenerMount />
                                                 <LaunchCleanupMount />

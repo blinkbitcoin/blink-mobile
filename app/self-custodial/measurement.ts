@@ -79,6 +79,9 @@ export const ScEvent = {
   SwapCompleted: "sc_swap_completed",
   SwapFailed: "sc_swap_failed",
   BlinkPaymentSent: "sc_blink_payment_sent",
+  /** Once per Enhanced session, when the region verdict has settled; never a country
+   *  (`region-check-outcome.ts`). */
+  RegionChecked: "sc_region_checked",
 } as const
 
 export type ScEvent = (typeof ScEvent)[keyof typeof ScEvent]
