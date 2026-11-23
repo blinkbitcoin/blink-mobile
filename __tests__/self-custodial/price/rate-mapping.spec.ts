@@ -1,7 +1,7 @@
 import { describe, expect, it } from "@jest/globals"
 
 import { toPriceRatesFromRealtimePrice } from "@app/custodial/adapters/price"
-import { toPriceRates } from "@app/self-custodial/price/rate-mapping"
+import { toPriceRates, usdPerBtcFrom } from "@app/self-custodial/price/rate-mapping"
 import { type FiatRate } from "@app/types/price"
 
 const SATS_PER_BTC = 100_000_000
@@ -122,5 +122,24 @@ describe("toPriceRates", () => {
 
   it("returns undefined for an empty feed", () => {
     expect(toPriceRates([], "USD", 2)).toBeUndefined()
+  })
+})
+
+describe("usdPerBtcFrom", () => {
+  it("reads the USD entry, whatever its casing", () => {
+    expect(
+      usdPerBtcFrom([
+        { coin: "EUR", value: 90_000 },
+        { coin: "usd", value: 100_000 },
+      ]),
+    ).toBe(100_000)
+  })
+
+  it.each([
+    ["no USD entry", [{ coin: "EUR", value: 90_000 }]],
+    ["a zero USD rate", [{ coin: "USD", value: 0 }]],
+    ["an empty feed", []],
+  ])("is undefined with %s", (_label, rates) => {
+    expect(usdPerBtcFrom(rates)).toBeUndefined()
   })
 })
