@@ -6,24 +6,41 @@ import { fonts } from "@app/rne-theme/fonts"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
 
+const DEFAULT_GAP = 10
+const DEFAULT_LABEL_LINE_HEIGHT = 20
+
+type StyleProps = {
+  gap: number
+  labelLineHeight: number
+}
+
 type CheckboxRowProps = {
-  label: string
   isChecked: boolean
   onPress: () => void
   centered?: boolean
   disabled?: boolean
   testID?: string
-}
+  /** The space between the box and its label. */
+  gap?: number
+  labelLineHeight?: number
+} & (
+  | { label: string; children?: never }
+  /** A label with inline parts, such as links, set in the row's text style. */
+  | { label?: never; children: React.ReactNode }
+)
 
 export const CheckboxRow: React.FC<CheckboxRowProps> = ({
   label,
+  children,
   isChecked,
   onPress,
   centered,
   disabled,
   testID,
+  gap = DEFAULT_GAP,
+  labelLineHeight = DEFAULT_LABEL_LINE_HEIGHT,
 }) => {
-  const styles = useStyles()
+  const styles = useStyles({ gap, labelLineHeight })
   const {
     theme: { colors },
   } = useTheme()
@@ -40,16 +57,18 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
       <View style={[styles.checkbox, isChecked && styles.checkboxChecked]}>
         {isChecked && <GaloyIcon name="check" size={14} color={colors.textOnAccent} />}
       </View>
-      <Text style={[styles.label, centered && styles.labelCentered]}>{label}</Text>
+      <Text style={[styles.label, centered && styles.labelCentered]}>
+        {children ?? label}
+      </Text>
     </Pressable>
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(({ colors }, { gap, labelLineHeight }: StyleProps) => ({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap,
   },
   checkbox: {
     width: 20,
@@ -69,7 +88,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.textOnBackground,
     fontSize: 14,
     fontFamily: fonts.regular,
-    lineHeight: 20,
+    lineHeight: labelLineHeight,
   },
   centered: {
     alignSelf: "center",
