@@ -12,7 +12,7 @@ import {
   selector,
   addSmallAmount,
   waitTillButtonDisplayed,
-  waitTillPressableDisplayed,
+  waitTillTestIdDisplayed,
   swipeButton,
 } from "./utils"
 
@@ -41,7 +41,7 @@ describe("Lightning address flow", () => {
   })
 
   it("Checks if on the SendBitcoinDetails screen", async () => {
-    await waitTillPressableDisplayed("Key 1")
+    await waitTillTestIdDisplayed("Key 1")
   })
 
   it("Go back", async () => {
@@ -81,7 +81,7 @@ describe("Lnurl Pay Flow", () => {
   })
 
   it("Checks if on the SendBitcoinDetails screen", async () => {
-    await waitTillPressableDisplayed("Key 1")
+    await waitTillTestIdDisplayed("Key 1")
   })
 
   it("Go back", async () => {
