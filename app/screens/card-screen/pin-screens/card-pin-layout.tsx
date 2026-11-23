@@ -8,6 +8,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { StepsProgressBar } from "@app/components/steps-progress-bar"
 import { NumericKeypad, NumericKey } from "@app/components/numeric-keypad"
+import { fonts } from "@app/rne-theme/fonts"
 
 const PIN_LENGTH = 4
 
@@ -159,17 +160,15 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 0,
   },
   title: {
-    fontFamily: "Source Sans Pro",
+    fontFamily: fonts.bold,
     fontSize: 14,
-    fontWeight: "700",
     lineHeight: 20,
     color: colors.textOnBackground,
     textAlign: "center",
   },
   subtitle: {
-    fontFamily: "Source Sans Pro",
+    fontFamily: fonts.regular,
     fontSize: 12,
-    fontWeight: "400",
     lineHeight: 18,
     color: colors.textMuted,
     textAlign: "center",
@@ -193,17 +192,15 @@ const useStyles = makeStyles(({ colors }) => ({
     borderColor: colors.error,
   },
   pinText: {
-    fontFamily: "Source Sans Pro",
+    fontFamily: fonts.bold,
     fontSize: 24,
-    fontWeight: "700",
     lineHeight: 32,
     color: colors.textOnBackground,
     textAlign: "center",
   },
   errorText: {
-    fontFamily: "Source Sans Pro",
+    fontFamily: fonts.regular,
     fontSize: 12,
-    fontWeight: "400",
     lineHeight: 18,
     color: colors.error,
     textAlign: "center",

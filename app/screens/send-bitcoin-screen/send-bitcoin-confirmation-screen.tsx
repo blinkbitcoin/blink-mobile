@@ -63,6 +63,7 @@ import { ETA_MINUTES } from "./hooks/use-onchain-fee-tiers"
 import { ReviewHighFeeSheet } from "./review/review-high-fee-sheet"
 import { SendReviewDestination } from "./review/send-review-destination"
 import { useSentTransition } from "./review/use-sent-transition"
+import { useSettledSendHold } from "./settled-send-hold"
 import { SendHero } from "./send-hero"
 import { useSendBalances } from "./hooks/use-send-wallets"
 import { ErrorMsgAction, useErrorMsgAction } from "./error-msg-action"
@@ -114,7 +115,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   /** Screen reader focus starts on slide to send, the step review leads to; while the fee
    *  is still being worked out, the handle reads as calculating. */
   const sliderHandleRef = React.useRef<View>(null)
-  useInitialAccessibilityFocus(sliderHandleRef)
   const isBalanceHidden = hideAmount && !isBalanceRevealed
 
   const {
@@ -179,6 +179,17 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   /** The receipt a landed payment opens from Sent, kept until the sender asks for it. */
   const sentReceiptRef =
     React.useRef<RootStackParamList["sendBitcoinCompleted"]>(undefined)
+  /** False once review has unmounted, so a success that resolves after that never
+   *  writes into an unmounted Sent. */
+  const isMountedRef = React.useRef(false)
+  const { hold: holdSettledSend, isRouteLive } = useSettledSendHold()
+
+  React.useEffect(() => {
+    isMountedRef.current = true
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
 
   const resetToCompleted = React.useCallback(
     (params: RootStackParamList["sendBitcoinCompleted"]) =>
@@ -220,7 +231,13 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const dustNotEvaluable =
     dustWarning.status === "pending" || dustWarning.status === "blocked"
   // A blocked dust check stays a plain disable until #1273 N1 is ruled.
-  const isCalculating = feeUnavailable || dustWarning.status === "pending"
+  const isCalculating = fee.status === "loading" || dustWarning.status === "pending"
+  // A failed quote says so, matching the fee row, instead of implying a wait will help.
+  let sliderDisabledText: string | undefined
+  if (isCalculating)
+    sliderDisabledText = LL.SendBitcoinConfirmationScreen.calculatingFee()
+  else if (fee.status === "error" && !fee.amount)
+    sliderDisabledText = LL.common.feeError()
 
   const progress = LL.SendBitcoinConfirmationScreen.sendProgress
   const sendProgressLabels = [
@@ -229,11 +246,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     progress.findingRoute(),
     progress.broadcasting(),
     progress.checkingDelivery(),
-    progress.retrying(),
     progress.almostThere(),
     progress.anyTimeNow(),
-    progress.ohOh(),
-    progress.tryingAgain(),
+    progress.hangTight(),
+    progress.stillOnItsWay(),
   ]
 
   const { feeDisplayText, currencyFeeAmount, satFeeAmount, feeErrorCode, feeErrorText } =
@@ -290,14 +306,21 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     goneWhenSent,
     heroStyle,
     actionsStyle,
+    areActionsLive,
     playSent,
   } = sentTransition
 
+  /** Read each time review regains focus: once Sent has played the slider is hidden, so a
+   *  return from the lock screen leaves focus to the screen reader instead of sending it
+   *  to a control nobody can see. */
+  useInitialAccessibilityFocus(isSent ? undefined : sliderHandleRef)
+
   /** Review turns into Sent in place, with no new screen to land focus on, so the result
-   *  is spoken; a replay of the same send stays quiet. */
+   *  is spoken once per play: a Sent rewound in the background speaks again when it
+   *  replays. */
   useAccessibilityAnnouncement(
     sentPlay
-      ? `${LL.SendBitcoinConfirmationScreen.sent()}, ${heroPrimaryText}`
+      ? LL.SendBitcoinConfirmationScreen.sentAnnouncement({ amount: heroPrimaryText })
       : undefined,
   )
 
@@ -352,13 +375,22 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         ReactNativeHapticFeedback.trigger("notificationSuccess", {
           ignoreAndroidSystemSettings: true,
         })
+        saveContact()
+        /** PaymentSucceeded refreshes the wallet, and a failed refresh marks it offline.
+         *  The gate would then unmount Sent and drop the receipt timer, so the hold is
+         *  taken before this function yields. If the gate already won, open the receipt
+         *  now: the payment landed either way. If the sender left instead, the route is
+         *  gone with it, and their new place in the app stays as it is. */
+        if (!isMountedRef.current) {
+          if (isRouteLive()) resetToCompleted({ ...params, hasShownSuccess: false })
+          return
+        }
+        holdSettledSend()
         sentReceiptRef.current = params
-        const sent = playSent({
+        await playSent({
           primaryAmount: heroPrimaryText,
           hasSecondaryAmount: Boolean(heroSecondaryText),
         })
-        saveContact()
-        await sent
         return
       }
 
@@ -369,6 +401,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     [
       playSent,
       resetToCompleted,
+      holdSettledSend,
+      isRouteLive,
       heroPrimaryText,
       heroSecondaryText,
       saveLnAddressContact,
@@ -645,7 +679,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         : undefined
 
   return (
-    <Screen preset="fixed" keyboardOffset="navigationHeader" edges={["left", "right"]}>
+    <Screen preset="fixed" edges={["left", "right"]}>
       <View
         ref={stageRef}
         style={[styles.stage, { paddingTop: topInset, paddingBottom: bottomInset }]}
@@ -718,7 +752,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               />
               {blockingError ? (
                 <View style={styles.errorWithAction}>
-                  <GaloyErrorBox errorMessage={blockingError} filled={false} />
+                  <GaloyErrorBox errorMessage={blockingError} filled={false} announce />
                   {canChangeAmount ? (
                     <Chip
                       label={LL.SendBitcoinConfirmationScreen.changeAmount()}
@@ -728,7 +762,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                   ) : null}
                 </View>
               ) : isLightningRecommended ? (
-                <WarningBanner>
+                <WarningBanner announce>
                   {LL.SendBitcoinConfirmationScreen.lightningRecommended()}
                 </WarningBanner>
               ) : null}
@@ -738,7 +772,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 </Text>
               ) : null}
               {errorSheet.dustSweepText ? (
-                <WarningBanner>{errorSheet.dustSweepText}</WarningBanner>
+                <WarningBanner announce>{errorSheet.dustSweepText}</WarningBanner>
               ) : null}
             </View>
           </Animated.View>
@@ -755,14 +789,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               initialText={LL.SendBitcoinConfirmationScreen.slideToSend()}
               loadingText={LL.SendBitcoinConfirmationScreen.sendProgress.reviewing()}
               busyLabels={sendProgressLabels}
-              disabledText={
-                isCalculating
-                  ? LL.SendBitcoinConfirmationScreen.calculatingFee()
-                  : undefined
-              }
+              disabledText={sliderDisabledText}
               accentColor={
                 sendingWalletDescriptor.currency === WalletCurrency.Usd
-                  ? colors._green
+                  ? colors.success
                   : colors.accent
               }
               onSwipe={handleSendPayment}
@@ -780,6 +810,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         {isSent ? (
           <Animated.View
             style={[styles.sentActions, { bottom: bottomInset }, actionsStyle]}
+            testID="sent-actions"
+            pointerEvents={areActionsLive ? "auto" : "none"}
+            accessibilityElementsHidden={!areActionsLive}
+            importantForAccessibility={areActionsLive ? "auto" : "no-hide-descendants"}
           >
             <GaloyPrimaryButton
               title={LL.SendBitcoinConfirmationScreen.receipt()}

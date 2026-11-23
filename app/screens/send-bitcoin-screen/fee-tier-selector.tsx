@@ -4,10 +4,10 @@ import ReactNativeModal from "react-native-modal"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
 import { fonts } from "@app/rne-theme/fonts"
+import { radius } from "@app/rne-theme/radius"
 
 type OptionItem<T extends string> = {
   id: T
@@ -96,7 +96,7 @@ export const FeeTierSelector = <T extends string>({
                     )}
                   </View>
                   {isSelected && (
-                    <GaloyIcon name="check-circle" size={16} color={colors._green} />
+                    <GaloyIcon name="check-circle" size={16} color={colors.success} />
                   )}
                 </View>
               </TouchableOpacity>
@@ -125,7 +125,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexShrink: 1,
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   /** Shrinks and wraps alongside the heading, so a long locale never cuts the ETA off. */
   value: {
@@ -153,7 +153,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingRight: 10,
   },
   optionRowSelected: {
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.neutral,
   },
   optionContent: {
     flex: 1,
@@ -161,11 +161,11 @@ const useStyles = makeStyles(({ colors }) => ({
   optionLabel: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black,
+    color: colors.textOnBackground,
   },
   optionDetail: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
 }))

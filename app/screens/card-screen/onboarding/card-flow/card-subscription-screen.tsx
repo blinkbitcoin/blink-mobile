@@ -16,6 +16,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { formatDateFromNow } from "@app/utils/date"
 import { openExternalUrl } from "@app/utils/external"
 import { staticSurface } from "@app/rne-theme/surfaces"
+import { fonts } from "@app/rne-theme/fonts"
 
 const SUBSCRIBE_ROUTE: keyof RootStackParamList = "cardOnboardingSubscribeScreen"
 const SUBSCRIPTION_RENEWAL_MONTHS = 12
@@ -204,14 +205,14 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.textOnBackground,
     textAlign: "center",
     marginBottom: 5,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 22,
   },
   price: {
     color: colors.accent,
     textAlign: "center",
     marginBottom: 5,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 32,
   },
   perYear: {
@@ -232,17 +233,17 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   statusPending: {
     color: colors.accent,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 20,
   },
   statusSubscribe: {
     color: colors.success,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 20,
   },
   value: {
     color: colors.textOnBackground,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 20,
   },
   checkboxesContainer: {
@@ -255,11 +256,11 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   link: {
     color: colors.accent,
-    fontWeight: "500",
+    fontFamily: fonts.regular,
   },
   feeScheduleLink: {
     color: colors.accent,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 16,
   },
   buttonsContainer: {

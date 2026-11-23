@@ -156,9 +156,6 @@ jest.mock("@app/components/amount-input-screen/use-number-pad", () => ({
     mockUseNumberPad(args),
 }))
 jest.mock("@app/components/currency-keyboard", () => ({ CurrencyKeyboard: () => null }))
-jest.mock("@app/components/percentage-selector", () => ({
-  PercentageSelector: () => null,
-}))
 jest.mock("@app/screens/send-bitcoin-screen/send-hero", () => ({
   SendHero: () => null,
 }))

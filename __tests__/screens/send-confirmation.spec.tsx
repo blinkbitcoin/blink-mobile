@@ -19,6 +19,8 @@ import {
 
 import { SCRIM_TEST_ID } from "@app/components/bottom-sheet"
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { ActiveWalletStatus } from "@app/types/wallet"
+import * as InitialAccessibilityFocus from "@app/hooks/use-initial-accessibility-focus"
 import { INITIAL_FOCUS_DELAY_MS } from "@app/hooks/use-initial-accessibility-focus"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 import { PreferredAmountCurrency } from "@app/graphql/client-only-query"
@@ -28,9 +30,11 @@ import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-details/intraledger"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import * as PaymentDetailsLightning from "@app/screens/send-bitcoin-screen/payment-details/lightning"
+import * as PriceConversion from "@app/hooks/use-price-conversion"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
+import { SendBitcoinConfirmationGated } from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-gated"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import type { useNonCustodialConversionLimits } from "@app/self-custodial/hooks/use-non-custodial-conversion-limits"
 import * as colors from "@app/rne-theme/colors"
@@ -41,9 +45,14 @@ import { INFO_SECTION_OUTLINE_TEST_ID } from "@app/components/card-screen/info-s
 import { SEND_REVIEW_DESTINATION_TEST_ID } from "@app/screens/send-bitcoin-screen/review/send-review-destination"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import {
+  SEND_HERO_CAPTION_TEST_ID,
   SEND_HERO_PRIMARY_TEST_ID,
   SEND_HERO_SECONDARY_TEST_ID,
 } from "@app/screens/send-bitcoin-screen/send-hero"
+import {
+  SENT_HOLD_MS,
+  SENT_TIMELINE_MS,
+} from "@app/screens/send-bitcoin-screen/review/use-sent-transition"
 
 import { flushEffects } from "../helpers/flush-effects"
 import { surfaceColor } from "../helpers/surface-color"
@@ -73,6 +82,13 @@ jest.mock("@app/store/persistent-state", () => ({
     updateState: jest.fn(),
     resetState: jest.fn(),
   }),
+}))
+
+jest.mock("@app/self-custodial/components/payment-offline-notice", () => ({
+  PaymentOfflineNotice: () => {
+    const { Text: RnText } = jest.requireActual("react-native")
+    return <RnText testID="payment-offline-notice">offline</RnText>
+  },
 }))
 
 jest.mock("@app/hooks/use-account-registry", () => ({
@@ -288,16 +304,38 @@ const answerMeasurements = () =>
     ),
   )
 
+/** Receipt and Close sit over the slot the slider left. They take presses and focus
+ *  only once they start to fade in, not while still invisible. */
+const sentActions = () =>
+  screen.getByTestId("sent-actions", { includeHiddenElements: true })
+
+const waitForSentActions = () =>
+  waitFor(() => {
+    expect(sentActions().props.pointerEvents).toBe("auto")
+  })
+
+const pressSentAction = async (label: string) => {
+  await waitForSentActions()
+  await act(async () => {
+    fireEvent.press(screen.getByText(label))
+  })
+}
+
+/** Sent plays only while the app is in front, and React Native's jest mock never reports
+ *  "active", so the sender is put in front of review for the slide and the tap. */
 const slideAndOpenReceipt = async () => {
-  answerMeasurements()
-  await act(async () => {
-    fireEvent.press(screen.getByTestId("slider"))
-  })
-  await act(async () => {
-    fireEvent.press(
-      screen.getByText(i18nObject("en").SendBitcoinConfirmationScreen.receipt()),
-    )
-  })
+  const appState = AppState as { currentState: unknown }
+  const previousState = appState.currentState
+  appState.currentState = "active"
+  try {
+    answerMeasurements()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+    await pressSentAction(i18nObject("en").SendBitcoinConfirmationScreen.receipt())
+  } finally {
+    appState.currentState = previousState
+  }
 }
 
 /** The screen's text in render order. `JSON.stringify` can't be used on the tree: review
@@ -324,12 +362,14 @@ const renderedTexts = (): string[] => {
 const textPosition = (prefix: string) =>
   renderedTexts().findIndex((text) => text.startsWith(prefix))
 const navigationGoBackMock = jest.fn()
+const navigationPopToTopMock = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
     dispatch: navigationDispatchMock,
     navigate: jest.fn(),
     goBack: navigationGoBackMock,
+    popToTop: navigationPopToTopMock,
     setOptions: jest.fn(),
     isFocused: () => true,
     addListener: () => () => {},
@@ -686,6 +726,18 @@ describe("SendBitcoinConfirmationScreen", () => {
         expect.anything(),
       )
       expect(navigationDispatchMock).toHaveBeenCalled()
+    })
+
+    it("goes straight to the receipt, with no Sent on review", async () => {
+      await sendPending()
+
+      expect(
+        screen.queryByText(i18nObject("en").SendBitcoinConfirmationScreen.receipt()),
+      ).toBeNull()
+      expect(screen.getByTestId(SEND_HERO_CAPTION_TEST_ID).props.children).toBe(
+        i18nObject("en").SendBitcoinConfirmationScreen.sending(),
+      )
+      expect(navigationDispatchMock).toHaveBeenCalledTimes(1)
     })
 
     it("still reaches its outcome when saving the contact fails", async () => {
@@ -1361,6 +1413,12 @@ describe("SendBitcoinConfirmationScreen — fee error messages", () => {
   const genericFeeError = /Unable to calculate fee/i
   const insufficientFunds = /Not enough funds to cover the amount and network fees/i
 
+  /** The fee row's matches. A failed quote also dims the slider to the generic string. */
+  const inFeeRow = (matcher: RegExp) => {
+    const inSlider = within(screen.getByTestId("slider")).queryAllByText(matcher)
+    return screen.queryAllByText(matcher).filter((node) => !inSlider.includes(node))
+  }
+
   const renderWithFee = async (fee: Record<string, unknown>) => {
     mockUseFee.mockReturnValue(fee)
     const view = render(
@@ -1383,7 +1441,7 @@ describe("SendBitcoinConfirmationScreen — fee error messages", () => {
     })
 
     expectInlineAndInSheet(insufficientFunds)
-    expect(screen.queryByText(genericFeeError)).toBeNull()
+    expect(inFeeRow(genericFeeError)).toHaveLength(0)
   })
 
   it("translates the network-error code too", async () => {
@@ -1403,7 +1461,7 @@ describe("SendBitcoinConfirmationScreen — fee error messages", () => {
   it("falls back to the generic string when the quote carries no code", async () => {
     await renderWithFee({ status: "error" })
 
-    expect(screen.getByText(genericFeeError)).toBeTruthy()
+    expect(inFeeRow(genericFeeError)).toHaveLength(1)
   })
 
   // Custodial errors are raw GraphQL text, not something to put in front of a user, and
@@ -1419,7 +1477,7 @@ describe("SendBitcoinConfirmationScreen — fee error messages", () => {
       ],
     })
 
-    expect(screen.getByText(genericFeeError)).toBeTruthy()
+    expect(inFeeRow(genericFeeError)).toHaveLength(1)
     expect(screen.queryByText(/Unbalanced transaction/i)).toBeNull()
   })
 
@@ -1429,7 +1487,7 @@ describe("SendBitcoinConfirmationScreen — fee error messages", () => {
       amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
     })
 
-    expect(screen.queryByText(genericFeeError)).toBeNull()
+    expect(inFeeRow(genericFeeError)).toHaveLength(0)
     expect(screen.queryByText(insufficientFunds)).toBeNull()
   })
 })
@@ -1700,10 +1758,22 @@ describe("hide balance", () => {
 
 describe("SendBitcoinConfirmationScreen — slide to send", () => {
   let LL: ReturnType<typeof i18nObject>
+  const actualUsePriceConversion = PriceConversion.usePriceConversion
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
 
   beforeEach(() => {
     jest.clearAllMocks()
     mockUseNonCustodialConversionLimits.mockReturnValue(defaultConversionLimits)
+    // A price that is there from the first render: through MockLink it sometimes lands
+    // after the flush, and the dust check reads pending or not depending on the race.
+    jest.spyOn(PriceConversion, "usePriceConversion").mockImplementation(() => ({
+      ...actualUsePriceConversion(),
+      convertMoneyAmount: convertMoneyAmountMock,
+      priceStatus: PriceConversion.PriceStatus.Ready,
+    }))
     loadLocale("en")
     LL = i18nObject("en")
     mockUseSendPayment.mockReturnValue({
@@ -1760,14 +1830,16 @@ describe("SendBitcoinConfirmationScreen — slide to send", () => {
     expect(lastSliderProps().disabled).toBe(true)
   })
 
-  it("reads 'Calculating fee…' when the fee quote failed without an amount", async () => {
+  it("says the fee failed, not that it is calculating, when the quote failed without an amount", async () => {
     mockUseFee.mockReturnValue({ status: "error" })
 
     await renderRoute(buildUsdSettlementRoute(200))
 
+    expect(lastSliderProps().disabled).toBe(true)
+    expect(lastSliderProps().disabledText).toBe(LL.common.feeError())
     expect(
-      screen.getByText(LL.SendBitcoinConfirmationScreen.calculatingFee()),
-    ).toBeTruthy()
+      screen.queryByText(LL.SendBitcoinConfirmationScreen.calculatingFee()),
+    ).toBeNull()
   })
 
   it("reads 'Calculating fee…' while the dust check is pending", async () => {
@@ -1821,7 +1893,7 @@ describe("SendBitcoinConfirmationScreen — slide to send", () => {
   it("uses the Dollar accent for a Dollar send", async () => {
     await renderRoute(buildUsdSettlementRoute(200))
 
-    expect(lastSliderProps().accentColor).toBe(colors.dark._green)
+    expect(lastSliderProps().accentColor).toBe(colors.dark.success)
   })
 
   it("uses the primary accent for a Bitcoin send", async () => {
@@ -1842,11 +1914,10 @@ describe("SendBitcoinConfirmationScreen — slide to send", () => {
       progress.findingRoute(),
       progress.broadcasting(),
       progress.checkingDelivery(),
-      progress.retrying(),
       progress.almostThere(),
       progress.anyTimeNow(),
-      progress.ohOh(),
-      progress.tryingAgain(),
+      progress.hangTight(),
+      progress.stillOnItsWay(),
     ])
   })
 })
@@ -2977,7 +3048,11 @@ describe("SendBitcoinConfirmationScreen — Sent and the screen reader", () => {
     await act(async () => {
       fireEvent.press(screen.getByTestId("slider"))
     })
-    expect(screen.getByText(LL.SendBitcoinConfirmationScreen.receipt())).toBeTruthy()
+    expect(
+      screen.getByText(LL.SendBitcoinConfirmationScreen.receipt(), {
+        includeHiddenElements: true,
+      }),
+    ).toBeTruthy()
     // The announcement goes out on the next tick.
     await act(async () => {
       await new Promise((resolve) => {
@@ -2986,9 +3061,475 @@ describe("SendBitcoinConfirmationScreen — Sent and the screen reader", () => {
     })
 
     expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledWith(
-      `${LL.SendBitcoinConfirmationScreen.sent()}, ${amount}`,
+      LL.SendBitcoinConfirmationScreen.sentAnnouncement({ amount }),
     )
     expect(screen.queryByTestId("slider")).toBeNull()
     expect(screen.getByTestId("slider", { includeHiddenElements: true })).toBeTruthy()
+  })
+})
+
+describe("SendBitcoinConfirmationScreen — Sent", () => {
+  let LL: ReturnType<typeof i18nObject>
+  /** React Native's jest mock leaves `currentState` a function, never "active". */
+  const mockedAppState = AppState as { currentState: unknown }
+  const originalAppState = mockedAppState.currentState
+
+  beforeEach(() => {
+    LL = i18nObject("en")
+    mockedAppState.currentState = "active"
+    sendPaymentMock.mockResolvedValue({ status: "SUCCESS" })
+  })
+
+  afterEach(() => {
+    mockedAppState.currentState = originalAppState
+    jest.restoreAllMocks()
+  })
+
+  const renderReview = () =>
+    renderSettled(
+      <ContextForScreen>
+        <Intraledger route={route} />
+      </ContextForScreen>,
+    )
+
+  const slide = async () => {
+    answerMeasurements()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+  }
+
+  /** The view that takes `goneWhenSent`: the first one above the node that sets either
+   *  screen reader's hiding prop. */
+  const hidingWrapper = (node: ReturnType<typeof screen.getByTestId>) => {
+    let at: typeof node | null = node
+    while (at && at.props.importantForAccessibility === undefined) at = at.parent
+    if (!at) throw new Error("no view above the node hides it from a screen reader")
+    return at
+  }
+
+  /** The three things that dissolve into Sent: the back row, the details and the slider. */
+  const dissolvingWrappers = () => [
+    hidingWrapper(screen.getByLabelText("Go back", { includeHiddenElements: true })),
+    hidingWrapper(
+      screen.getByText(LL.SendBitcoinConfirmationScreen.fromBalance(), {
+        includeHiddenElements: true,
+      }),
+    ),
+    hidingWrapper(screen.getByTestId("slider", { includeHiddenElements: true })),
+  ]
+
+  const completedReset = () => {
+    const reducer = navigationDispatchMock.mock.calls
+      .map(([action]) => action)
+      .find((action) => typeof action === "function")
+    if (!reducer) throw new Error("no reset was dispatched")
+    return reducer({ key: "root", index: 2, routes: [] }) as {
+      type: string
+      payload: { index: number; routes: Array<{ name: string; params?: unknown }> }
+    }
+  }
+
+  it("keeps the back row, the details and the slider reachable on review", async () => {
+    await renderReview()
+
+    const wrappers = dissolvingWrappers()
+    expect(wrappers).toHaveLength(3)
+    wrappers.forEach((wrapper) => {
+      expect(wrapper.props.accessibilityElementsHidden).toBe(false)
+      expect(wrapper.props.importantForAccessibility).toBe("auto")
+      expect(wrapper.props.pointerEvents).toBe("auto")
+    })
+  })
+
+  /** VoiceOver reads `accessibilityElementsHidden`, TalkBack `importantForAccessibility`:
+   *  each is checked by name, so dropping either one fails. */
+  it("hides the back row, the details and the slider from both screen readers once sent", async () => {
+    await renderReview()
+
+    await slide()
+
+    dissolvingWrappers().forEach((wrapper) => {
+      expect(wrapper.props.accessibilityElementsHidden).toBe(true)
+      expect(wrapper.props.importantForAccessibility).toBe("no-hide-descendants")
+      expect(wrapper.props.pointerEvents).toBe("none")
+    })
+  })
+
+  it("leaves the hero and the actions reachable once sent", async () => {
+    await renderReview()
+
+    await slide()
+    await waitForSentActions()
+
+    expect(screen.getByLabelText(LL.SendBitcoinConfirmationScreen.sent())).toBeTruthy()
+    expect(screen.getByText(LL.SendBitcoinConfirmationScreen.receipt())).toBeTruthy()
+    expect(screen.getByText(LL.common.close())).toBeTruthy()
+  })
+
+  it("shows no actions before the payment lands", async () => {
+    await renderReview()
+
+    expect(screen.queryByText(LL.SendBitcoinConfirmationScreen.receipt())).toBeNull()
+    expect(screen.getByTestId(SEND_HERO_CAPTION_TEST_ID).props.children).toBe(
+      LL.SendBitcoinConfirmationScreen.sending(),
+    )
+  })
+
+  it("reads Sent in the hero and stays on review", async () => {
+    await renderReview()
+
+    await slide()
+
+    expect(screen.getByTestId(SEND_HERO_CAPTION_TEST_ID).props.children).toBe(
+      LL.SendBitcoinConfirmationScreen.sent(),
+    )
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
+    expect(navigationPopToTopMock).not.toHaveBeenCalled()
+  })
+
+  /** They mount with Sent but stay invisible for the first half second; a second touch
+   *  near the slider must not open the receipt or leave before they appear. */
+  it("keeps Receipt and Close out of reach until they start to appear", async () => {
+    await renderReview()
+    await slide()
+
+    expect(sentActions().props.pointerEvents).toBe("none")
+    expect(sentActions().props.accessibilityElementsHidden).toBe(true)
+    expect(sentActions().props.importantForAccessibility).toBe("no-hide-descendants")
+    await act(async () => {
+      fireEvent.press(
+        screen.getByText(LL.SendBitcoinConfirmationScreen.receipt(), {
+          includeHiddenElements: true,
+        }),
+      )
+      fireEvent.press(
+        screen.getByText(LL.common.close(), { includeHiddenElements: true }),
+      )
+    })
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
+    expect(navigationPopToTopMock).not.toHaveBeenCalled()
+
+    await waitForSentActions()
+    expect(sentActions().props.accessibilityElementsHidden).toBe(false)
+    expect(sentActions().props.importantForAccessibility).toBe("auto")
+    await pressSentAction(LL.SendBitcoinConfirmationScreen.receipt())
+    expect(navigationDispatchMock).toHaveBeenCalledTimes(1)
+  })
+
+  /** The slider is hidden once Sent plays, so a return to review (the lock screen
+   *  lifting) must not send screen reader focus to it. */
+  it("stops aiming screen reader focus at the slider once sent", async () => {
+    const focusTarget = jest.spyOn(
+      InitialAccessibilityFocus,
+      "useInitialAccessibilityFocus",
+    )
+    await renderReview()
+    expect(focusTarget.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({ current: expect.anything() }),
+    )
+
+    await slide()
+
+    expect(focusTarget.mock.calls.at(-1)?.[0]).toBeUndefined()
+  })
+
+  it("buzzes as Sent starts, before anything navigates", async () => {
+    await renderReview()
+
+    await slide()
+
+    expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledWith(
+      "notificationSuccess",
+      {
+        ignoreAndroidSystemSettings: true,
+      },
+    )
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
+  })
+
+  it("opens the receipt from Receipt, over Home, skipping its success icon", async () => {
+    await renderReview()
+    await slide()
+
+    await pressSentAction(LL.SendBitcoinConfirmationScreen.receipt())
+
+    const reset = completedReset()
+    expect(reset.type).toBe("RESET")
+    expect(reset.payload.routes.map(({ name }) => name)).toEqual([
+      "Primary",
+      "sendBitcoinCompleted",
+    ])
+    expect(reset.payload.index).toBe(1)
+    expect(reset.payload.routes[1].params).toMatchObject({
+      status: "SUCCESS",
+      hasShownSuccess: true,
+    })
+  })
+
+  it("goes home from Close, with no receipt", async () => {
+    await renderReview()
+    await slide()
+
+    await pressSentAction(LL.common.close())
+
+    expect(navigationPopToTopMock).toHaveBeenCalledTimes(1)
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
+  })
+
+  /** The hold's own timing is the hook's spec; this is that its end opens the receipt. */
+  it("opens the receipt by itself once Sent has held", async () => {
+    const setTimeoutSpy = jest.spyOn(global, "setTimeout")
+    await renderReview()
+    await slide()
+
+    const hold = setTimeoutSpy.mock.calls.find(
+      ([, delay]) =>
+        typeof delay === "number" &&
+        delay > SENT_HOLD_MS &&
+        delay <= SENT_TIMELINE_MS + SENT_HOLD_MS,
+    )
+    expect(hold).toBeDefined()
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
+
+    await act(async () => {
+      ;(hold?.[0] as () => void)()
+    })
+
+    expect(completedReset().payload.routes.map(({ name }) => name)).toEqual([
+      "Primary",
+      "sendBitcoinCompleted",
+    ])
+  })
+})
+
+describe("a settled self-custodial send under the offline gate", () => {
+  let LL: ReturnType<typeof i18nObject>
+  const mockedAppState = AppState as { currentState: unknown }
+  const originalAppState = mockedAppState.currentState
+
+  const selfCustodialWallet = (status: ActiveWalletStatus) => ({
+    isSelfCustodial: true,
+    isReady: status === ActiveWalletStatus.Ready,
+    needsBackendAuth: false,
+    wallets: [],
+    status,
+    accountType: "self-custodial",
+  })
+
+  beforeEach(() => {
+    LL = i18nObject("en")
+    mockedAppState.currentState = "active"
+    sendPaymentMock.mockResolvedValue({ status: "SUCCESS" })
+    useActiveWalletMock.mockReturnValue(selfCustodialWallet(ActiveWalletStatus.Ready))
+  })
+
+  afterEach(() => {
+    mockedAppState.currentState = originalAppState
+    jest.restoreAllMocks()
+  })
+
+  const renderGated = async () => {
+    const view = render(
+      <ContextForScreen>
+        <SendBitcoinConfirmationGated route={route} />
+      </ContextForScreen>,
+    )
+    await waitFor(
+      () => {
+        expect(feeRow().getByText(settledFeeMatcher)).toBeTruthy()
+      },
+      { timeout: SETTLE_TIMEOUT_MS },
+    )
+    return view
+  }
+
+  const slide = async () => {
+    answerMeasurements()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+  }
+
+  const goOffline = (view: { rerender: (ui: React.ReactElement) => void }) => {
+    useActiveWalletMock.mockReturnValue(selfCustodialWallet(ActiveWalletStatus.Offline))
+    view.rerender(
+      <ContextForScreen>
+        <SendBitcoinConfirmationGated route={route} />
+      </ContextForScreen>,
+    )
+  }
+
+  it("still shows the offline notice before the payment lands", () => {
+    useActiveWalletMock.mockReturnValue(selfCustodialWallet(ActiveWalletStatus.Offline))
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinConfirmationGated route={route} />
+      </ContextForScreen>,
+    )
+
+    expect(screen.getByTestId("payment-offline-notice")).toBeTruthy()
+    expect(screen.queryByTestId("slider")).toBeNull()
+  })
+
+  it("keeps Sent, and still opens the receipt, when the wallet goes offline during the hold", async () => {
+    const view = await renderGated()
+    await slide()
+    goOffline(view)
+
+    expect(screen.queryByTestId("payment-offline-notice")).toBeNull()
+    expect(screen.getByTestId(SEND_HERO_CAPTION_TEST_ID).props.children).toBe(
+      LL.SendBitcoinConfirmationScreen.sent(),
+    )
+    expect(
+      screen.getByText(LL.SendBitcoinConfirmationScreen.receipt(), {
+        includeHiddenElements: true,
+      }),
+    ).toBeTruthy()
+
+    await pressSentAction(LL.SendBitcoinConfirmationScreen.receipt())
+
+    const reducer = navigationDispatchMock.mock.calls
+      .map(([action]) => action)
+      .find((action) => typeof action === "function")
+    const reset = reducer({ key: "root", index: 2, routes: [] }) as {
+      payload: { routes: Array<{ name: string; params?: { status?: string } }> }
+    }
+    expect(reset.payload.routes.map(({ name }) => name)).toEqual([
+      "Primary",
+      "sendBitcoinCompleted",
+    ])
+    expect(reset.payload.routes[1].params).toMatchObject({ status: "SUCCESS" })
+  })
+
+  /** The gate can win the race: the refresh marks the wallet offline while the send is
+   *  still answering. The payment landed either way, so the receipt opens, with its own
+   *  success icon, since Sent never played. */
+  it("opens the receipt with its success icon when the gate dropped review before success", async () => {
+    let answer: (result: { status: string }) => void = () => {}
+    sendPaymentMock.mockReturnValueOnce(
+      new Promise((resolve) => {
+        answer = resolve
+      }),
+    )
+    const view = await renderGated()
+    answerMeasurements()
+    act(() => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+    goOffline(view)
+    expect(screen.getByTestId("payment-offline-notice")).toBeTruthy()
+
+    await act(async () => {
+      answer({ status: "SUCCESS" })
+    })
+
+    const reducer = navigationDispatchMock.mock.calls
+      .map(([action]) => action)
+      .find((action) => typeof action === "function")
+    const reset = reducer({ key: "root", index: 2, routes: [] }) as {
+      payload: { routes: Array<{ name: string; params?: { hasShownSuccess?: boolean } }> }
+    }
+    expect(reset.payload.routes.map(({ name }) => name)).toEqual([
+      "Primary",
+      "sendBitcoinCompleted",
+    ])
+    expect(reset.payload.routes[1].params).toMatchObject({
+      status: "SUCCESS",
+      hasShownSuccess: false,
+    })
+  })
+
+  /** A Lightning-address send whose answer comes after review has gone, either because
+   *  the gate dropped it or because the sender left. */
+  const lnurlRoute = {
+    key: "sendBitcoinConfirmationScreen",
+    name: "sendBitcoinConfirmation",
+    params: {
+      paymentDetail:
+        PaymentDetailsLightning.createLnurlPaymentDetails(defaultLightningParams),
+    },
+  } as const
+
+  const renderLnurlInFlight = async () => {
+    let answer: (result: { status: string }) => void = () => {}
+    sendPaymentMock.mockReturnValueOnce(
+      new Promise((resolve) => {
+        answer = resolve
+      }),
+    )
+    const view = render(
+      <ContextForScreen>
+        <SendBitcoinConfirmationGated route={lnurlRoute} />
+      </ContextForScreen>,
+    )
+    answerMeasurements()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+    expect(sendPaymentMock).toHaveBeenCalledTimes(1)
+    return { view, answer: (result: { status: string }) => answer(result) }
+  }
+
+  it("saves the Lightning address when the gate dropped review before success", async () => {
+    const { view, answer } = await renderLnurlInFlight()
+    useActiveWalletMock.mockReturnValue(selfCustodialWallet(ActiveWalletStatus.Offline))
+    view.rerender(
+      <ContextForScreen>
+        <SendBitcoinConfirmationGated route={lnurlRoute} />
+      </ContextForScreen>,
+    )
+    expect(screen.getByTestId("payment-offline-notice")).toBeTruthy()
+
+    await act(async () => {
+      answer({ status: "SUCCESS" })
+    })
+
+    expect(saveLnAddressContactMock).toHaveBeenCalledTimes(1)
+    expect(saveLnAddressContactMock).toHaveBeenCalledWith({
+      paymentType: "lnurl",
+      destination: defaultLightningParams.lnurl,
+      isMerchant: false,
+    })
+    expect(navigationDispatchMock).toHaveBeenCalledTimes(1)
+  })
+
+  /** Back stays open while the send is answering. Once the sender has left, a late
+   *  success must not reset the stack under whatever they opened next. */
+  it("leaves navigation alone, and still saves the Lightning address, when the sender left before success", async () => {
+    const { view, answer } = await renderLnurlInFlight()
+    view.unmount()
+
+    await act(async () => {
+      answer({ status: "SUCCESS" })
+    })
+
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
+    expect(saveLnAddressContactMock).toHaveBeenCalledTimes(1)
+    expect(saveLnAddressContactMock).toHaveBeenCalledWith({
+      paymentType: "lnurl",
+      destination: defaultLightningParams.lnurl,
+      isMerchant: false,
+    })
+  })
+
+  it("keeps Sent when the wallet goes offline during a screen-reader hold", async () => {
+    jest.spyOn(AccessibilityInfo, "isScreenReaderEnabled").mockResolvedValue(true)
+    const view = await renderGated()
+    await act(async () => {})
+    await slide()
+    goOffline(view)
+
+    expect(screen.queryByTestId("payment-offline-notice")).toBeNull()
+    expect(
+      screen.getByText(LL.SendBitcoinConfirmationScreen.receipt(), {
+        includeHiddenElements: true,
+      }),
+    ).toBeTruthy()
+    expect(
+      screen.getByText(LL.common.close(), { includeHiddenElements: true }),
+    ).toBeTruthy()
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
   })
 })

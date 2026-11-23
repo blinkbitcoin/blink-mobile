@@ -8,11 +8,9 @@ import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeho
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { BalanceMode } from "@app/hooks/use-balance-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { testProps } from "@app/utils/testProps"
-
-/** The 32pt balance sits directly under the fixed-size home header chrome;
- *  uncapped Dynamic Type makes it overrun the username row above. */
-const MAX_BALANCE_FONT_SIZE_MULTIPLIER = 1.4
+import { fonts } from "@app/rne-theme/fonts"
 
 const Loader = () => {
   const styles = useStyles()
@@ -78,7 +76,7 @@ export const BalanceHeader: React.FC<Props> = ({
                 {...testProps("balance-value")}
                 style={styles.primaryBalanceText}
                 allowFontScaling
-                maxFontSizeMultiplier={MAX_BALANCE_FONT_SIZE_MULTIPLIER}
+                maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
                 adjustsFontSizeToFit
                 numberOfLines={1}
               >
@@ -89,7 +87,11 @@ export const BalanceHeader: React.FC<Props> = ({
         </TouchableOpacity>
       )}
       {isSatsOnly && !hideAmount && !loading ? (
-        <Text style={styles.satsOnlyText} {...testProps("balance-rate-notice")}>
+        <Text
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+          style={styles.satsOnlyText}
+          {...testProps("balance-rate-notice")}
+        >
           {LL.SelfCustodialStaleRate.satsOnly()}
         </Text>
       ) : null}
@@ -100,7 +102,12 @@ export const BalanceHeader: React.FC<Props> = ({
           style={styles.modeToggle}
           {...testProps("balance-mode-toggle")}
         >
-          <Text style={styles.modeToggleText}>{modeLabel}</Text>
+          <Text
+            maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+            style={styles.modeToggleText}
+          >
+            {modeLabel}
+          </Text>
         </Pressable>
       ) : null}
     </View>
@@ -125,7 +132,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   primaryBalanceText: {
     fontSize: 32,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     color: colors.textOnBackground,
   },
   loaderBackground: {
@@ -135,6 +142,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.loaderForeground,
   },
   satsOnlyText: {
+    fontFamily: fonts.regular,
     marginTop: 4,
     fontSize: 12,
     textAlign: "center",
@@ -147,7 +155,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   modeToggleText: {
     fontSize: 11,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.textMuted,
     letterSpacing: 0.6,
   },

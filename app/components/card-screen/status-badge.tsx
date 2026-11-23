@@ -4,6 +4,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { TransactionStatus } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 
 type StatusBadgeProps = {
   status: TransactionStatus
@@ -58,8 +59,7 @@ const useStyles = makeStyles((_theme, { backgroundColor }: StyleProps) => ({
   },
   text: {
     fontSize: 10,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 13,
   },
 }))

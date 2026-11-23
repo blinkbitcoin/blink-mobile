@@ -7545,10 +7545,6 @@ type RootTranslation = {
 			 */
 			checkingDelivery: string
 			/**
-			 * R​e​-​t​r​y​i​n​g
-			 */
-			retrying: string
-			/**
 			 * A​l​m​o​s​t​ ​t​h​e​r​e
 			 */
 			almostThere: string
@@ -7557,13 +7553,13 @@ type RootTranslation = {
 			 */
 			anyTimeNow: string
 			/**
-			 * O​h​ ​o​h
+			 * H​a​n​g​ ​t​i​g​h​t
 			 */
-			ohOh: string
+			hangTight: string
 			/**
-			 * T​r​y​i​n​g​ ​a​g​a​i​n
+			 * S​t​i​l​l​ ​o​n​ ​i​t​s​ ​w​a​y
 			 */
-			tryingAgain: string
+			stillOnItsWay: string
 		}
 		/**
 		 * C​o​p​i​e​d​ ​d​e​s​t​i​n​a​t​i​o​n​ ​t​o​ ​c​l​i​p​b​o​a​r​d
@@ -7585,6 +7581,11 @@ type RootTranslation = {
 		 * R​e​c​e​i​p​t
 		 */
 		receipt: string
+		/**
+		 * S​e​n​t​,​ ​{​a​m​o​u​n​t​}
+		 * @param {string} amount
+		 */
+		sentAnnouncement: RequiredParams<'amount'>
 		/**
 		 * F​r​o​m​ ​B​a​l​a​n​c​e
 		 */
@@ -22082,10 +22083,6 @@ export type TranslationFunctions = {
 			 */
 			checkingDelivery: () => LocalizedString
 			/**
-			 * Re-trying
-			 */
-			retrying: () => LocalizedString
-			/**
 			 * Almost there
 			 */
 			almostThere: () => LocalizedString
@@ -22094,13 +22091,13 @@ export type TranslationFunctions = {
 			 */
 			anyTimeNow: () => LocalizedString
 			/**
-			 * Oh oh
+			 * Hang tight
 			 */
-			ohOh: () => LocalizedString
+			hangTight: () => LocalizedString
 			/**
-			 * Trying again
+			 * Still on its way
 			 */
-			tryingAgain: () => LocalizedString
+			stillOnItsWay: () => LocalizedString
 		}
 		/**
 		 * Copied destination to clipboard
@@ -22122,6 +22119,10 @@ export type TranslationFunctions = {
 		 * Receipt
 		 */
 		receipt: () => LocalizedString
+		/**
+		 * Sent, {amount}
+		 */
+		sentAnnouncement: (arg: { amount: string }) => LocalizedString
 		/**
 		 * From Balance
 		 */

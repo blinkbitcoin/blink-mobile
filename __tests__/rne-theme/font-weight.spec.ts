@@ -2,20 +2,23 @@ import { readdirSync, readFileSync, statSync } from "fs"
 import { join, relative } from "path"
 
 /**
- * Bold in the app is 700 and there is no SemiBold face. On iOS a 600 weight draws a
- * SemiBold face; on Android a weight under 700 loads the regular file, so the same text
- * is not bold at all. The artifact under test is the style source, so source-coupling
- * here is intentional.
+ * Weight comes from the face, never from `fontWeight`. Android loads a `fontFamily` from
+ * `fonts/<name>.ttf`, or `<name>_bold.ttf` for a weight of 700 or more, and draws Roboto
+ * when that file is missing; a weight under 700 loads the regular file. So a bold weight
+ * on a Source Sans Pro face is Roboto Bold, a 600 is not bold at all, and a family named
+ * "Source Sans Pro" (iOS's family name, not a file) is Roboto. App code names a face from
+ * `@app/rne-theme/fonts`; only the theme sets a weight. The artifact under test is the
+ * style source, so source-coupling here is intentional.
  */
 
 const REPO_ROOT = join(__dirname, "..", "..")
 const APP_DIR = join(REPO_ROOT, "app")
-// A 600 or "semibold" weight, or a SemiBold face named in a string. Comments may say SemiBold.
-const SEMIBOLD =
-  /fontWeight:[^,\n]*(["'`](600|semibold)["'`]|\b600\b)|["'`][^"'`\n]*SemiBold[^"'`\n]*["'`]/i
-const THEMED_TEXT_IMPORT =
-  /import\s*(?:type\s*)?\{[^}]*\bText\b[^}]*\}\s*from\s*["']@rn-vui\/themed["']/
-const BOLD_WEIGHT = /fontWeight:[^,\n]*(["'](bold|[7-9]00)["']|\b[7-9]00\b)/
+const THEME_DIR = join(APP_DIR, "rne-theme")
+
+const WEIGHT = /\bfontWeight\s*:/
+// A face named by string instead of through `fonts`.
+const LITERAL_FACE = /\bfontFamily\s*:\s*["'`]/
+const COMMENT = /^\s*(\/\/|\/?\*)/
 
 const sourceFiles = (dir: string): string[] =>
   readdirSync(dir).flatMap((name) => {
@@ -24,62 +27,112 @@ const sourceFiles = (dir: string): string[] =>
     return /\.tsx?$/.test(name) ? [path] : []
   })
 
+const offenders = (pattern: RegExp) =>
+  sourceFiles(APP_DIR)
+    .filter((file) => !file.startsWith(THEME_DIR))
+    .flatMap((file) =>
+      readFileSync(file, "utf8")
+        .split("\n")
+        .flatMap((line, index) =>
+          !COMMENT.test(line) && pattern.test(line)
+            ? [`${relative(REPO_ROOT, file)}:${index + 1}`]
+            : [],
+        ),
+    )
+
 describe("font weights", () => {
-  const flagged = [
+  const weights = [
+    'fontWeight: "700",',
+    'fontWeight: "bold",',
     'fontWeight: "600",',
-    "fontWeight: '600',",
     "fontWeight: 600,",
-    'fontWeight: "600" as const,',
-    'fontWeight: clear ? "bold" : "600",',
-    "fontWeight: `600`,",
-    'fontWeight: "semibold",',
-    'fontFamily: "SourceSansPro-SemiBold",',
+    'fontWeight: "400",',
+    'fontWeight: "bold" as const,',
+    'fontWeight: isBold ? "700" : "400",',
+    'boldText: { fontWeight: "700" },',
   ]
-  flagged.forEach((line) => {
+  weights.forEach((line) => {
     it(`flags ${line}`, () => {
-      expect(SEMIBOLD.test(line)).toBe(true)
+      expect(WEIGHT.test(line)).toBe(true)
+    })
+  })
+
+  const literalFaces = [
+    'fontFamily: "Source Sans Pro",',
+    "fontFamily: 'SourceSansPro-Bold',",
+    'fontFamily: "SourceSansPro-SemiBold",',
+    "fontFamily: `SourceSansPro-Regular`,",
+  ]
+  literalFaces.forEach((line) => {
+    it(`flags ${line}`, () => {
+      expect(LITERAL_FACE.test(line)).toBe(true)
     })
   })
 
   const allowed = [
-    'fontWeight: "700",',
-    'fontFamily: "SourceSansPro-Bold",',
-    "// was SemiBold before #1304",
-    "// semibold system face",
+    "fontFamily: fonts.bold,",
+    "fontFamily: isBold ? fonts.bold : fonts.regular,",
+    '// fontWeight: "700" here would draw Roboto Bold',
+    ' * fontFamily: "Source Sans Pro" is Roboto on Android',
   ]
   allowed.forEach((line) => {
     it(`allows ${line}`, () => {
-      expect(SEMIBOLD.test(line)).toBe(false)
+      expect(!COMMENT.test(line) && (WEIGHT.test(line) || LITERAL_FACE.test(line))).toBe(
+        false,
+      )
     })
   })
 
-  it("never sets a 600 (SemiBold) weight in app code", () => {
-    const offenders = sourceFiles(APP_DIR).flatMap((file) =>
-      readFileSync(file, "utf8")
-        .split("\n")
-        .flatMap((line, index) =>
-          SEMIBOLD.test(line) ? [`${relative(REPO_ROOT, file)}:${index + 1}`] : [],
-        ),
-    )
-
-    expect(offenders).toEqual([])
+  it("sets no fontWeight in app code outside the theme", () => {
+    expect(offenders(WEIGHT)).toEqual([])
   })
 
-  /**
-   * The themed `Text` names a Source Sans Pro face. A weight of 700 or more on top of it
-   * makes Android look for `<face>_bold.ttf`, which does not exist, and draw Roboto Bold;
-   * bold text uses `fontFamily: fonts.bold` instead. The rules below predate that and are
-   * migrated over time, so this only fails when a new one is added. Lower the count when
-   * you migrate one.
-   */
-  it("adds no bold weight to text styled by the themed Text", () => {
-    const KNOWN_BOLD_WEIGHTS = 93
+  it("names every face through fonts, never by string", () => {
+    expect(offenders(LITERAL_FACE)).toEqual([])
+  })
+})
 
-    const boldWeights = sourceFiles(APP_DIR)
-      .map((file) => readFileSync(file, "utf8"))
-      .filter((source) => THEMED_TEXT_IMPORT.test(source))
-      .flatMap((source) => source.split("\n").filter((line) => BOLD_WEIGHT.test(line)))
+/**
+ * `@rn-vui/base` components never see the theme, so its default faces don't reach them:
+ * the base Button title names Android's `sans-serif-medium`, and the base SearchBar input
+ * names none. Each use has to pass its own face.
+ */
+describe("@rn-vui/base text faces", () => {
+  const baseImports = sourceFiles(APP_DIR)
+    .map((file) => ({ file, source: readFileSync(file, "utf8") }))
+    .filter(({ source }) => /from "@rn-vui\/base"/.test(source))
 
-    expect(boldWeights.length).toBeLessThanOrEqual(KNOWN_BOLD_WEIGHTS)
+  // Every use in the app is self-closing, with `/>` on its own line.
+  const elements = (tag: string) =>
+    baseImports
+      .filter(({ source }) =>
+        new RegExp(`import \\{[^}]*\\b${tag}\\b[^}]*\\} from "@rn-vui/base"`).test(
+          source,
+        ),
+      )
+      .flatMap(({ file, source }) =>
+        [...source.matchAll(new RegExp(`<${tag}\\b[\\s\\S]*?\\n\\s*/>`, "g"))].map(
+          (match) => ({ file: relative(REPO_ROOT, file), props: match[0] }),
+        ),
+      )
+
+  it("gives every base Button with a title its own title face", () => {
+    const buttons = elements("Button").filter(({ props }) => /\btitle=/.test(props))
+
+    expect(buttons.length).toBeGreaterThan(0)
+    expect(
+      buttons.filter(({ props }) => !/\btitleStyle=/.test(props)).map(({ file }) => file),
+    ).toEqual([])
+  })
+
+  it("gives every base SearchBar its own input face", () => {
+    const searchBars = elements("SearchBar")
+
+    expect(searchBars.length).toBeGreaterThan(0)
+    expect(
+      searchBars
+        .filter(({ props }) => !/\binputStyle=/.test(props))
+        .map(({ file }) => file),
+    ).toEqual([])
   })
 })

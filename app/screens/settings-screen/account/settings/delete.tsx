@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { Alert, TextInput, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import Modal from "react-native-modal"
 
 import { gql } from "@apollo/client"
@@ -22,6 +23,7 @@ import {
   SwitchProfileOutcome,
   useSwitchToNextProfile,
 } from "@app/hooks/use-switch-to-next-profile"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { SettingsButton } from "../../button"
 import { useAccountDeleteContext } from "../account-delete-context"
@@ -213,6 +215,7 @@ export const Delete = () => {
         </View>
         <Text type="p1">{LL.support.typeDelete({ delete: LL.support.delete() })}</Text>
         <TextInput
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           autoCapitalize="none"
           style={styles.textInput}
           onChangeText={setText}
@@ -269,6 +272,7 @@ const useStyles = makeStyles(({ colors }) => ({
     rowGap: 20,
   },
   textInput: {
+    fontFamily: fonts.regular,
     fontSize: 16,
     backgroundColor: colors.neutral,
     padding: 12,

@@ -29,6 +29,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 import { staticSurface } from "@app/rne-theme/surfaces"
+import { fonts } from "@app/rne-theme/fonts"
 
 type Props = {
   route: RouteProp<RootStackParamList, "conversionConfirmation">
@@ -305,17 +306,17 @@ const useStyles = makeStyles(({ colors }) => ({
   conversionInfoFieldTitle: {
     color: colors.textSecondary,
     lineHeight: 25,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
   },
   conversionInfoFieldValue: {
     color: colors.textSecondary,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     fontSize: 20,
   },
   conversionInfoFieldConvertValue: {
     color: colors.textMuted,
     fontSize: 14,
-    fontWeight: "normal",
+    fontFamily: fonts.regular,
   },
   errorContainer: {
     marginBottom: 10,

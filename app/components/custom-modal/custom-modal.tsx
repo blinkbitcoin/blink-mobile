@@ -216,7 +216,7 @@ const useStyles = makeStyles(({ colors }, props: UseStylesProps) => ({
   scrollViewContainer: { flexGrow: 1 },
   modalBodyText: {
     fontSize: 20,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 24,
     textAlign: "center",
     maxWidth: "80%",

@@ -6,6 +6,7 @@ import { testProps } from "@app/utils/testProps"
 import { TouchableHighlight } from "@app/utils/touchable-wrapper"
 
 import { Button, ButtonProps, makeStyles } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const TelegramLoginButton: FC<PropsWithChildren<ButtonProps>> = (props) => {
   const styles = useStyles()
@@ -46,7 +47,7 @@ const useStyles = makeStyles(({ colors }) => ({
   titleStyle: {
     fontSize: 20,
     lineHeight: 24,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.backgroundDefault,
   },
   disabledTitleStyle: {

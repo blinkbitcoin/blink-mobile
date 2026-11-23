@@ -76,20 +76,53 @@ describe("useInitialAccessibilityFocus", () => {
     expect(mockSendAccessibilityEvent).not.toHaveBeenCalled()
   })
 
-  it("focuses the target the screen has when the delay ends", async () => {
+  it("keeps the first target when it changes before the delay ends", async () => {
     const keypad = nodeRef("keypad")
-    const next = nodeRef("next")
     const { rerender } = renderHook(
       ({ target }: { target: RefObject<View | null> }) =>
         useInitialAccessibilityFocus(target),
       { initialProps: { target: keypad } },
     )
 
-    rerender({ target: next })
+    rerender({ target: nodeRef("next") })
     await passDelay()
 
     expect(mockSendAccessibilityEvent).toHaveBeenCalledTimes(1)
-    expect(mockSendAccessibilityEvent).toHaveBeenCalledWith(next.current, "focus")
+    expect(mockSendAccessibilityEvent).toHaveBeenCalledWith(keypad.current, "focus")
+  })
+
+  it("takes the first target the screen gives once it has loaded", async () => {
+    const keypad = nodeRef("keypad")
+    const { rerender } = renderHook(
+      ({ target }: { target: RefObject<View | null> | undefined }) =>
+        useInitialAccessibilityFocus(target),
+      { initialProps: { target: undefined as RefObject<View | null> | undefined } },
+    )
+
+    rerender({ target: keypad })
+    rerender({ target: nodeRef("next") })
+    await passDelay()
+
+    expect(mockSendAccessibilityEvent).toHaveBeenCalledTimes(1)
+    expect(mockSendAccessibilityEvent).toHaveBeenCalledWith(keypad.current, "focus")
+  })
+
+  it("focuses a target that only arrives after the delay", async () => {
+    const keypad = nodeRef("keypad")
+    const { rerender } = renderHook(
+      ({ target }: { target: RefObject<View | null> | undefined }) =>
+        useInitialAccessibilityFocus(target),
+      { initialProps: { target: undefined as RefObject<View | null> | undefined } },
+    )
+    await passDelay()
+
+    rerender({ target: keypad })
+    await passDelay()
+    rerender({ target: nodeRef("next") })
+    await passDelay()
+
+    expect(mockSendAccessibilityEvent).toHaveBeenCalledTimes(1)
+    expect(mockSendAccessibilityEvent).toHaveBeenCalledWith(keypad.current, "focus")
   })
 
   it("doesn't pull focus again when the target changes later", async () => {
@@ -111,6 +144,24 @@ describe("useInitialAccessibilityFocus", () => {
 
     unmount()
     await passDelay()
+
+    expect(mockSendAccessibilityEvent).not.toHaveBeenCalled()
+  })
+
+  it("leaves focus alone when the screen goes while the screen reader check runs", async () => {
+    let answer: (isOn: boolean) => void = () => undefined
+    mockIsScreenReaderEnabled.mockReturnValue(
+      new Promise<boolean>((resolve) => {
+        answer = resolve
+      }),
+    )
+    const { unmount } = renderHook(() => useInitialAccessibilityFocus(nodeRef("next")))
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(INITIAL_FOCUS_DELAY_MS)
+    })
+
+    unmount()
+    await act(async () => answer(true))
 
     expect(mockSendAccessibilityEvent).not.toHaveBeenCalled()
   })
