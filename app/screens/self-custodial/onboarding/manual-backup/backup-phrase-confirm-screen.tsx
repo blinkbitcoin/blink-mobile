@@ -19,10 +19,10 @@ import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
 import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { useBackupConfirm, useCompleteBackup } from "../hooks"
 import { type Challenge, isValidChallenges } from "../utils"
-import { fonts } from "@app/rne-theme/fonts"
 
 type ConfirmRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhraseConfirm">
 

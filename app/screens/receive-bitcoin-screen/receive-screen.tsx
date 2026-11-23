@@ -32,6 +32,7 @@ import {
 import { ActiveWalletStatus } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { RECEIVE_ACTIONS_GAP, RECEIVE_INPUTS_GUTTER } from "./layout"
 import { NfcHeaderButton } from "./nfc-header-button"
@@ -472,7 +473,7 @@ const useStyles = makeStyles(({ colors }) => ({
   paymentIdentifierText: {
     color: colors.textOnBackground,
     fontSize: 16,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 22,
     textAlign: "center",
   },

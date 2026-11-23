@@ -17,6 +17,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { getKycBannerConfig } from "./get-kyc-banner-config"
 import { usePersonalDetailsData } from "./hooks"
 import { groupTitleGap } from "@app/rne-theme/tokens"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const CardPersonalDetailsScreen: React.FC = () => {
   const styles = useStyles()
@@ -179,15 +180,13 @@ const useStyles = makeStyles(({ colors }) => ({
   fullName: {
     color: colors.textOnBackground,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 20,
   },
   cardholderLabel: {
     color: colors.textMuted,
     fontSize: 12,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 18,
   },
   section: {
@@ -196,8 +195,7 @@ const useStyles = makeStyles(({ colors }) => ({
   sectionTitle: {
     color: colors.textSecondary,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
   },
   dividerStyle: {

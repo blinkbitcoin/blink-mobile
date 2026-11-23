@@ -54,7 +54,7 @@ const useStyles = makeStyles(({ colors }) => ({
   value: {
     color: colors.textSecondary,
     fontSize: 14,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
   },
   errorValue: {
     color: colors.error,

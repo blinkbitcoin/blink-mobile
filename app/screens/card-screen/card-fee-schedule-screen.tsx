@@ -16,6 +16,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { openExternalUrl } from "@app/utils/external"
 import { staticSurface } from "@app/rne-theme/surfaces"
 import { groupTitleGap } from "@app/rne-theme/tokens"
+import { fonts } from "@app/rne-theme/fonts"
 
 type Fee = {
   title: string
@@ -246,7 +247,7 @@ const useStyles = makeStyles(({ colors }) => ({
   rowTitle: {
     fontSize: 12,
     lineHeight: 18,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.textOnBackground,
   },
   rowSubtitle: {
@@ -257,7 +258,7 @@ const useStyles = makeStyles(({ colors }) => ({
   rowValue: {
     fontSize: 14,
     lineHeight: 20,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.textOnBackground,
     textAlign: "right",
   },
@@ -279,7 +280,7 @@ const useStyles = makeStyles(({ colors }) => ({
   noticeTitle: {
     fontSize: 16,
     lineHeight: 22,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.textOnBackground,
   },
   noticeBody: {
@@ -304,7 +305,7 @@ const useStyles = makeStyles(({ colors }) => ({
   infoLink: {
     fontSize: 12,
     lineHeight: 18,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.accent,
   },
   expandTitleRow: {
@@ -329,7 +330,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.textSecondary,
   },
   detailsBold: {
-    fontWeight: "700",
+    fontFamily: fonts.bold,
   },
   buttonsContainer: {
     justifyContent: "flex-end",

@@ -18,6 +18,7 @@ import { useCardData } from "@app/hooks"
 import { CloseCardModal } from "./close-card-modal"
 import { NotificationCategory, useCloseCardAccount, useNotificationToggle } from "./hooks"
 import { groupTitleGap } from "@app/rne-theme/tokens"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const CardSettingsScreen: React.FC = () => {
   const styles = useStyles()
@@ -262,9 +263,8 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   sectionTitle: {
     color: colors.textSecondary,
-    fontFamily: "Source Sans Pro",
+    fontFamily: fonts.regular,
     fontSize: 14,
-    fontWeight: "400",
     lineHeight: 20,
   },
   settingsGroupContainer: {
@@ -280,8 +280,7 @@ const useStyles = makeStyles(({ colors }) => ({
   dangerZoneTitle: {
     color: colors.error,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
   },
   dangerZoneRowTitle: {

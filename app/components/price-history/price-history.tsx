@@ -24,6 +24,7 @@ import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { Circle } from "@shopify/react-native-skia"
 import { GaloyErrorBox } from "../atomic/galoy-error-box"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { fonts } from "@app/rne-theme/fonts"
 
 const GraphRange = {
   ONE_DAY: "ONE_DAY",
@@ -141,7 +142,9 @@ export const PriceHistory = () => {
       : styles.buttonStyleTime
   }
   const titleStyleForRange = (titleGraphRange: GraphRangeType): StyleProp<TextStyle> => {
-    return graphRange === titleGraphRange ? null : styles.titleStyleTime
+    return graphRange === titleGraphRange
+      ? styles.titleStyle
+      : [styles.titleStyle, styles.titleStyleTime]
   }
   return (
     <View style={styles.screen}>
@@ -308,7 +311,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   delta: {
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
   },
 
   pricesContainer: {
@@ -321,6 +324,11 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 16,
     marginBottom: 16,
   },
+  // Imported from @rn-vui/base, so the theme's button face does not reach it.
+  titleStyle: {
+    fontFamily: fonts.regular,
+  },
+
   titleStyleTime: {
     color: colors.textDisabled,
   },

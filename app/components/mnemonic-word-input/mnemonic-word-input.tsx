@@ -6,9 +6,9 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
-import { fonts } from "@app/rne-theme/fonts"
 
 type MnemonicWordInputProps = {
   index: number

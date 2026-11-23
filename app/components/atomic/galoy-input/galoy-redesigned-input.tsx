@@ -4,6 +4,7 @@ import { StyleProp, TextInput, TextStyle, View } from "react-native"
 import { Input, InputProps, Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { radius } from "@app/rne-theme/radius"
+import { fonts } from "@app/rne-theme/fonts"
 
 const useStyles = makeStyles(
   ({ colors }, { props, isFocused }: { props: GaloyInputProps; isFocused: boolean }) => ({
@@ -25,7 +26,7 @@ const useStyles = makeStyles(
     },
     labelComponentStyles: {
       marginBottom: 9,
-      fontWeight: "400",
+      fontFamily: fonts.regular,
       color: colors.surfaceInteractive,
       marginLeft: isFocused ? 2 : 10,
     },

@@ -5,6 +5,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { staticSurface } from "@app/rne-theme/surfaces"
+import { fonts } from "@app/rne-theme/fonts"
 
 const InfoCardSize = {
   Default: "default",
@@ -118,15 +119,13 @@ const useStyles = makeStyles(
     title: {
       color: titleColor,
       fontSize: 16,
-      fontFamily: "Source Sans Pro",
-      fontWeight: "700",
+      fontFamily: fonts.bold,
       lineHeight: 22,
     },
     standaloneTitle: {
       color: titleColor,
       fontSize: 16,
-      fontFamily: "Source Sans Pro",
-      fontWeight: "700",
+      fontFamily: fonts.bold,
       lineHeight: 22,
       paddingBottom: 5,
     },
@@ -136,8 +135,7 @@ const useStyles = makeStyles(
     description: {
       color: colors.textMuted,
       fontSize: isLg ? 16 : 14,
-      fontFamily: "Source Sans Pro",
-      fontWeight: "400",
+      fontFamily: fonts.regular,
       lineHeight: isLg ? 22 : 16,
     },
     bulletList: {
@@ -161,8 +159,7 @@ const useStyles = makeStyles(
       flex: 1,
       color: colors.textMuted,
       fontSize: isLg ? 16 : 14,
-      fontFamily: "Source Sans Pro",
-      fontWeight: "400",
+      fontFamily: fonts.regular,
       lineHeight: isLg ? 24 : 16,
     },
   }),

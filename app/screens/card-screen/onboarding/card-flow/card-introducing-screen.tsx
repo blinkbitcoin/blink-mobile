@@ -10,6 +10,7 @@ import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { formatDateFromNow } from "@app/utils/date"
+import { fonts } from "@app/rne-theme/fonts"
 
 const CARD_DISPLAY_PLACEHOLDER = {
   cardNumber: "2121212121212121",
@@ -87,7 +88,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
   },
   boldText: {
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
   },
   forContainer: {
     alignItems: "center",

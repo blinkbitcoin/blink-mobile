@@ -207,6 +207,7 @@ import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { ApiScreen } from "@app/screens/settings-screen/api-screen"
 import { ApiKeyCreateScreen } from "@app/screens/settings-screen/api/api-key-create-screen"
+import { fonts } from "@app/rne-theme/fonts"
 
 // Required lazily (not statically imported) so the developer screen module —
 // its debugScreen query, token copy/share UI and instance override controls —
@@ -221,9 +222,18 @@ const tabBarLabelStyles = StyleSheet.create({
   label: {
     paddingBottom: 6,
     fontSize: 12,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     width: "100%",
     textAlign: "center",
+  },
+})
+
+// Heading 2/Bold, as `styles.title`. A `headerTitle` function gets no `headerTitleStyle`, and
+// the library's `HeaderTitle` otherwise draws the platform font at 17 on iOS.
+const headerTitleStyles = StyleSheet.create({
+  title: {
+    fontFamily: fonts.bold,
+    fontSize: 20,
   },
 })
 
@@ -240,13 +250,17 @@ const tabBarLabelStyles = StyleSheet.create({
 /**
  * The header title is drawn by the navigator too, and it is the widest single line in the
  * app: at the largest OS text sizes it grows until a screen name clips mid-word
- * ("Lightning in…"). Wrapping the library's own title keeps its placement, font and tint
- * exactly as they are, and adds only the ceiling the rest of the app follows.
+ * ("Lightning in…"). Wrapping the library's own title keeps its placement and tint, and
+ * adds the Source Sans Pro face and the ceiling the rest of the app follows.
  *
  * Built once for the same reason as the controls above.
  */
 const renderHeaderTitle = (props: { children: string; tintColor?: string }) => (
-  <HeaderTitle {...props} maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER} />
+  <HeaderTitle
+    {...props}
+    maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+    style={headerTitleStyles.title}
+  />
 )
 
 const renderTabBarLabel = ({ color, children }: { color: string; children: string }) => (
@@ -454,6 +468,7 @@ export const RootStack = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
+        headerBackTitleStyle: styles.backTitle,
         headerTitle: renderHeaderTitle,
         headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
@@ -1189,6 +1204,7 @@ export const OnboardingNavigator = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
+        headerBackTitleStyle: styles.backTitle,
         headerTitle: renderHeaderTitle,
         headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
@@ -1245,6 +1261,7 @@ export const ContactNavigator = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
+        headerBackTitleStyle: styles.backTitle,
         headerTitle: renderHeaderTitle,
         headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
@@ -1304,6 +1321,7 @@ export const PhoneLoginNavigator = () => {
         headerBackTitle: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
+        headerBackTitleStyle: styles.backTitle,
         headerTitle: renderHeaderTitle,
         headerTintColor: colors.textOnBackground,
         headerShadowVisible: false,
@@ -1420,8 +1438,15 @@ const useStyles = makeStyles(({ colors }) => ({
   headerStyle: {
     backgroundColor: colors.backgroundDefault,
   },
+  // Heading 2/Bold. The native header draws the platform font unless it names a face.
   title: {
     color: colors.textOnBackground,
+    fontFamily: fonts.bold,
+    fontSize: 20,
+  },
+  // The iOS back button label, which is native text too.
+  backTitle: {
+    fontFamily: fonts.regular,
   },
   // 48dp box around the 18dp icon: the margin gives back the 15dp it grew by.
   SendBitcoinScreenScanIcon: {

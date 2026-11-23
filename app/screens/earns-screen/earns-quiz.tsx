@@ -40,6 +40,7 @@ import {
   skipRewardErrorCodes,
 } from "./helpers"
 import CustomModal from "@app/components/custom-modal/custom-modal"
+import { fonts } from "@app/rne-theme/fonts"
 import { ValidateQuizCodeErrorsType } from "./sections"
 
 const useStyles = makeStyles(({ colors }) => ({
@@ -73,16 +74,18 @@ const useStyles = makeStyles(({ colors }) => ({
   completedTitleStyle: {
     color: colors.staticBrightBlue,
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
   },
 
   correctAnswerText: {
+    fontFamily: fonts.regular,
     color: colors.staticSuccess,
     flex: 1,
     fontSize: 16,
   },
 
   incorrectAnswerText: {
+    fontFamily: fonts.regular,
     color: colors.error,
     fontSize: 16,
     flex: 1,
@@ -127,7 +130,7 @@ const useStyles = makeStyles(({ colors }) => ({
 
   quizButtonTitleStyle: {
     color: colors.staticWhite,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     fontSize: 16,
   },
 
@@ -155,11 +158,13 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   text: {
+    fontFamily: fonts.regular,
     fontSize: 24,
     color: colors.staticBlack,
   },
 
   answerChoiceText: {
+    fontFamily: fonts.regular,
     fontSize: 20,
     flex: 1,
     color: colors.staticBlack,
@@ -173,12 +178,12 @@ const useStyles = makeStyles(({ colors }) => ({
   textEarn: {
     color: colors.staticDarkGrey,
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
   },
 
   title: {
     fontSize: 32,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     paddingBottom: 12,
     color: colors.staticBlack,
   },
@@ -186,7 +191,7 @@ const useStyles = makeStyles(({ colors }) => ({
   titleStyle: {
     color: colors.staticWhite,
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
   },
 
   buttonRowWithFeedback: {
@@ -195,6 +200,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   modalBodyText: {
+    fontFamily: fonts.regular,
     fontSize: 17,
     color: colors.textOnBackground,
     textAlign: "left",

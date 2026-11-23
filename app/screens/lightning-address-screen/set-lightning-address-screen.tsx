@@ -26,6 +26,7 @@ import {
   MyUserIdDocument,
   MyUserIdQuery,
 } from "@app/graphql/generated"
+import { fonts } from "@app/rne-theme/fonts"
 
 gql`
   mutation userUpdateUsername($input: UserUpdateUsernameInput!) {
@@ -284,6 +285,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.surfaceFocused,
   },
   textInputStyle: {
+    fontFamily: fonts.regular,
     flex: 1,
     fontSize: 18,
     color: colors.textOnBackground,

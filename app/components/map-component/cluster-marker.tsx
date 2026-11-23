@@ -4,6 +4,7 @@ import { Marker } from "react-native-maps"
 import Svg, { Circle } from "react-native-svg"
 
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { useMarkerSettle } from "./use-marker-settle"
 
@@ -101,7 +102,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   count: {
     fontSize: 14,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     // The inner disc carries the accent at 70% in both themes, so the count is
     // pinned white rather than following the theme's inverted `black`.
     color: colors.staticWhite,

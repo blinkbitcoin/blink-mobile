@@ -3,6 +3,7 @@ import React, { FunctionComponent, PropsWithChildren } from "react"
 import { testProps } from "@app/utils/testProps"
 import { TouchableHighlight } from "@app/utils/touchable-wrapper"
 import { Button, ButtonProps, makeStyles, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { GaloyIcon, IconNamesType } from "../galoy-icon"
 
@@ -66,7 +67,7 @@ const useStyles = makeStyles(({ colors }, props: GaloySecondaryButtonProps) => (
     color: props.grey ? colors.textDisabled : colors.accent,
     fontSize: 20,
     lineHeight: 24,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
   },
   disabledTitleStyle: {
     color: props.grey ? colors.textDisabled : colors.accent,

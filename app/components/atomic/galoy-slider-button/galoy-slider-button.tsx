@@ -15,6 +15,7 @@ import Animated, {
 
 import { testProps } from "@app/utils/testProps"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
@@ -179,7 +180,7 @@ const useStyles = makeStyles(({ colors }, { buttonWidth }: { buttonWidth: number
     alignSelf: "center",
     textAlign: "center",
     fontSize: 14,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     zIndex: 2,
     color: colors.textMuted,
   },

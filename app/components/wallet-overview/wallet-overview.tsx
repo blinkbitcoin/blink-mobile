@@ -31,8 +31,8 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { NotificationBadge } from "@app/components/notification-badge"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { CurrencyPill, useEqualPillWidth } from "../atomic/currency-pill"
 import { fonts } from "@app/rne-theme/fonts"
+import { CurrencyPill, useEqualPillWidth } from "../atomic/currency-pill"
 
 /** The skeleton fills the row exactly, so the balances replace it without moving the list. */
 const BALANCE_ROW_HEIGHT = 45

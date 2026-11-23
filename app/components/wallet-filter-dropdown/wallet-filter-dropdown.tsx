@@ -7,6 +7,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { WalletCurrency } from "@app/graphql/generated"
+import { fonts } from "@app/rne-theme/fonts"
 import { CurrencyPill, useEqualPillWidth } from "../atomic/currency-pill"
 
 export type WalletValues = WalletCurrency | "ALL"
@@ -170,11 +171,11 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
   },
   walletSelectorTypeLabelBtcText: {
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     color: colors.backgroundDefault,
   },
   walletSelectorTypeLabelAllText: {
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     color: colors.accent,
   },
   walletSelectorTypeTextContainer: {

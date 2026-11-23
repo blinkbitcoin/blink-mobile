@@ -15,6 +15,7 @@ import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-moda
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { reportError } from "@app/utils/error-logging"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { CurrencyPill, useEqualPillWidth } from "../atomic/currency-pill"
 import { GaloyIconButton } from "../atomic/galoy-icon-button"
@@ -240,7 +241,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   currencyButtonText: {
     color: colors.textOnBackground,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 22,
   },
   container: {
@@ -260,7 +261,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   modalTitleText: {
     fontSize: 24,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 32,
     maxWidth: "80%",
     textAlign: "center",

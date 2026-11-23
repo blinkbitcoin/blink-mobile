@@ -23,6 +23,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { SearchBar } from "@rn-vui/base"
 import { ListItem, makeStyles, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { fonts } from "@app/rne-theme/fonts"
 
 gql`
   query contacts {
@@ -274,6 +275,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   emptyListText: {
+    fontFamily: fonts.regular,
     fontSize: 18,
     marginTop: 30,
     textAlign: "center",
@@ -283,7 +285,7 @@ const useStyles = makeStyles(({ colors }) => ({
   emptyListTitle: {
     color: colors.textOnBackground,
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     textAlign: "center",
   },
 
@@ -317,6 +319,7 @@ const useStyles = makeStyles(({ colors }) => ({
 
   searchBarText: {
     color: colors.textOnBackground,
+    fontFamily: fonts.regular,
     textDecorationLine: "none",
   },
 

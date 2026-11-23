@@ -3,6 +3,7 @@ import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
+import { fonts } from "@app/rne-theme/fonts"
 
 type OptionRowProps = {
   icon: IconNamesType
@@ -67,21 +68,18 @@ const useStyles = makeStyles(({ colors }, { highlighted }: StyleProps) => ({
   title: {
     color: colors.textOnBackground,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
   },
   subtitle: {
     color: colors.textMuted,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
   },
   value: {
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
   },
 }))
