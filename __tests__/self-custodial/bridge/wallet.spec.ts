@@ -7,6 +7,8 @@ import {
   getWalletInfo,
   listAllPayments,
   listPayments,
+  listReceivedPaymentsOldestFirst,
+  listReceivedPaymentsSince,
   listSentPaymentsSince,
   registerLightningAddress,
   syncSelfCustodialWallet,
@@ -235,6 +237,46 @@ describe("listSentPaymentsSince", () => {
       limit: 50,
       sortAscending: false,
     })
+  })
+})
+
+describe("listReceivedPaymentsSince", () => {
+  it("asks for the same page of incoming payments", () => {
+    const listPaymentsFn = jest.fn().mockResolvedValue({ payments: [] })
+
+    listReceivedPaymentsSince({ listPayments: listPaymentsFn } as never, {
+      fromTimestamp: BigInt(1747691078),
+      limit: 50,
+      offset: 100,
+    })
+
+    expect(listPaymentsFn).toHaveBeenCalledWith({
+      typeFilter: [1],
+      statusFilter: undefined,
+      assetFilter: undefined,
+      paymentDetailsFilter: undefined,
+      fromTimestamp: BigInt(1747691078),
+      toTimestamp: undefined,
+      offset: 100,
+      limit: 50,
+      sortAscending: false,
+    })
+  })
+})
+
+describe("listReceivedPaymentsOldestFirst", () => {
+  it("asks for the same page of incoming payments, oldest first", () => {
+    const listPaymentsFn = jest.fn().mockResolvedValue({ payments: [] })
+
+    listReceivedPaymentsOldestFirst({ listPayments: listPaymentsFn } as never, {
+      fromTimestamp: BigInt(1747691078),
+      limit: 50,
+      offset: 0,
+    })
+
+    expect(listPaymentsFn).toHaveBeenCalledWith(
+      expect.objectContaining({ typeFilter: [1], sortAscending: true }),
+    )
   })
 })
 

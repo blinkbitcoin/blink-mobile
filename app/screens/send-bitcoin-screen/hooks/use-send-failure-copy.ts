@@ -2,10 +2,20 @@ import { useCallback } from "react"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useTranslateSdkError } from "@app/self-custodial/hooks/use-translate-sdk-error"
-import { isSelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
+import {
+  isSelfCustodialErrorCode,
+  SelfCustodialErrorCode,
+} from "@app/self-custodial/sdk-error"
 import { logBreadcrumb } from "@app/utils/error-reporting"
 
 import { isNothingSentFailure } from "../error-msg-action"
+
+/** Codes whose own copy already says what became of the payment, and goes with the
+ *  actions offered under it. */
+const OUTCOME_CODES: ReadonlySet<string> = new Set([
+  SelfCustodialErrorCode.OutcomeUnknown,
+  SelfCustodialErrorCode.EarlierPaymentFound,
+])
 
 /**
  * The fixed copy for a send that failed. Server text is never shown: it goes to the logs.
@@ -19,6 +29,11 @@ export const useSendFailureCopy = () => {
   return useCallback(
     (raw: string | undefined, { mayHaveSent = false } = {}) => {
       logBreadcrumb(`[send] failed: ${raw}`)
+      if (raw && OUTCOME_CODES.has(raw)) {
+        return (
+          translateSdkError(raw) || LL.SendBitcoinConfirmationScreen.somethingWentWrong()
+        )
+      }
       if (isNothingSentFailure(raw)) {
         return (
           (isSelfCustodialErrorCode(raw) && translateSdkError(raw)) ||

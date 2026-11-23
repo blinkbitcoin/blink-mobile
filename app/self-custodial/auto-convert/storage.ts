@@ -117,6 +117,20 @@ export const recordAutoConvertAttempt = (
     await writeAll(records)
   })
 
+/** Takes back the attempt stamped for a try that sent nothing, so a wait spends none of
+ *  the receive's attempts. When it was stamped stays, for the cooldown before the next. */
+export const releaseAutoConvertAttempt = (paymentRequest: string): Promise<void> =>
+  withWriteLock(async () => {
+    const records = await readAll()
+    const index = records.findIndex((r) => r.paymentRequest === paymentRequest)
+    if (index === -1) return
+    records[index] = {
+      ...records[index],
+      attempts: Math.max(0, records[index].attempts - 1),
+    }
+    await writeAll(records)
+  })
+
 export const pruneExpiredAutoConverts = (nowMs: number): Promise<void> =>
   withWriteLock(async () => {
     const records = await readAll()
@@ -156,6 +170,17 @@ const writePairings = async (pairings: AutoConvertPairing[]): Promise<void> => {
   }
 }
 
+/** Writes the pairings, reporting and throwing a failure: a pairing not stored is no
+ *  claim, so its caller has to know, and keeps the receive. */
+const writePairingsOrThrow = async (pairings: AutoConvertPairing[]): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(PAIRINGS_STORAGE_KEY, JSON.stringify(pairings))
+  } catch (err) {
+    reportError("auto-convert-storage writePairings", err)
+    throw err
+  }
+}
+
 export const listAutoConvertPairings = (): Promise<AutoConvertPairing[]> => readPairings()
 
 export const markAutoConvertPairing = (pairing: AutoConvertPairing): Promise<void> =>
@@ -167,7 +192,7 @@ export const markAutoConvertPairing = (pairing: AutoConvertPairing): Promise<voi
         p.conversionPaymentId !== pairing.conversionPaymentId,
     )
     deduplicated.push(pairing)
-    await writePairings(deduplicated)
+    await writePairingsOrThrow(deduplicated)
   })
 
 export const pruneExpiredAutoConvertPairings = (nowMs: number): Promise<void> =>

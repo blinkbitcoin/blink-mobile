@@ -67,12 +67,13 @@ import { useSentTransition } from "./review/use-sent-transition"
 import { useSettledSendHold } from "./settled-send-hold"
 import { SendHero } from "./send-hero"
 import { useSendBalances } from "./hooks/use-send-wallets"
-import { ErrorMsgAction, useErrorMsgAction } from "./error-msg-action"
 import { useReviewErrorSheet } from "./hooks/use-review-error-sheet"
 import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
 import { PaymentSendExtraInfo } from "./payment-details/index.types"
 import { useReviewFeeText } from "./review/use-review-fee-text"
+import { usePaymentFailure } from "./review/use-payment-failure"
 import { useReviewQuote } from "./review/use-review-quote"
+import { PaymentErrorActions } from "./payment-error-actions"
 import { PaymentSendCompletedStatus, useSendPayment } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
 import { formatDestination } from "./format-destination"
@@ -148,21 +149,14 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const usdBalanceMoneyAmount = toUsdMoneyAmount(usdWallet?.balance)
 
   const usdPrimaryText = formatMoneyAmount({ moneyAmount: usdBalanceMoneyAmount })
-  const [paymentFailure, setPaymentFailure] = useState<
-    { message: string; canChangeAmount: boolean; action: ErrorMsgAction } | undefined
-  >(undefined)
-  const errorMsgActionFor = useErrorMsgAction(paymentDetail)
-  /** Every send failure shows inline and opens the error message sheet on top. An
-   *  explicit `action` is for failures whose outcome the raw text doesn't carry. */
-  const setPaymentError = React.useCallback(
-    (message: string, raw?: string, action?: ErrorMsgAction) =>
-      setPaymentFailure({
-        message,
-        canChangeAmount: isAmountFixableError(raw),
-        action: action ?? errorMsgActionFor(raw),
-      }),
-    [errorMsgActionFor],
-  )
+  const {
+    paymentFailure,
+    setPaymentError,
+    errorMsgActionFor,
+    failedSend,
+    setFailedSend,
+    sendAnyway,
+  } = usePaymentFailure(paymentDetail)
   const [isVerifying, setIsVerifying] = useState(false)
   const verifyPaymentSettled = useVerifyPaymentSettled()
   const { LL, locale } = useI18nContext()
@@ -426,6 +420,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       return sendPayment
     }
 
+    setFailedSend(undefined)
     try {
       logPaymentAttempt({
         paymentType: paymentDetail.paymentType,
@@ -456,6 +451,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         return
       }
 
+      setFailedSend(extraInfo)
       setPaymentError(failureCopy(errorsMessage), errorsMessage)
       ReactNativeHapticFeedback.trigger("notificationError", {
         ignoreAndroidSystemSettings: true,
@@ -524,6 +520,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     paymentDetail,
     sendPayment,
     setPaymentError,
+    setFailedSend,
     sendingWalletDescriptor,
     destination,
     navigateToCompleted,
@@ -592,6 +589,13 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       message: LL.SendBitcoinConfirmationScreen.copiedDestination(),
     })
   }
+
+  const isSliderDisabled =
+    !validAmount ||
+    !sendPayment ||
+    isAwaitingIncludedFee ||
+    feeUnavailable ||
+    dustNotEvaluable
 
   const isLightningRecommended = (() => {
     const ratioFeeToAmount = 50 // 2%
@@ -778,6 +782,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               {errorSheet.dustSweepText ? (
                 <WarningBanner announce>{errorSheet.dustSweepText}</WarningBanner>
               ) : null}
+              <PaymentErrorActions
+                failedSend={failedSend}
+                canSendAnyway={!isSliderDisabled}
+                onSendAnyway={() => sendAnyway(handleSendPayment)}
+              />
             </View>
           </Animated.View>
         </ScrollView>
@@ -801,13 +810,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               }
               onSwipe={handleSendPayment}
               handleRef={sliderHandleRef}
-              disabled={
-                !validAmount ||
-                !sendPayment ||
-                isAwaitingIncludedFee ||
-                feeUnavailable ||
-                dustNotEvaluable
-              }
+              disabled={isSliderDisabled}
             />
           </Animated.View>
         </PanGestureHandler>
