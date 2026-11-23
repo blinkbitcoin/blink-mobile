@@ -2369,11 +2369,10 @@
       "findingRoute": "Εύρεση διαδρομής",
       "broadcasting": "Μετάδοση",
       "checkingDelivery": "Έλεγχος παράδοσης",
-      "retrying": "Νέα προσπάθεια",
       "almostThere": "Σχεδόν έτοιμο",
       "anyTimeNow": "Από στιγμή σε στιγμή",
-      "ohOh": "Ωχ",
-      "tryingAgain": "Δοκιμάζουμε ξανά"
+      "hangTight": "Λίγη υπομονή",
+      "stillOnItsWay": "Ακόμα καθ' οδόν"
     },
     "copiedDestination": "Αντιγραφή προορισμού στο πρόχειρο",
     "lightningRecommended": "Υψηλή τέλη. Συνιστούμε το Lightning.",

@@ -179,7 +179,13 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const dustNotEvaluable =
     dustWarning.status === "pending" || dustWarning.status === "blocked"
   // A blocked dust check stays a plain disable until #1273 N1 is ruled.
-  const isCalculating = feeUnavailable || dustWarning.status === "pending"
+  const isCalculating = fee.status === "loading" || dustWarning.status === "pending"
+  // A failed quote says so, matching the fee row, instead of implying a wait will help.
+  let sliderDisabledText: string | undefined
+  if (isCalculating)
+    sliderDisabledText = LL.SendBitcoinConfirmationScreen.calculatingFee()
+  else if (fee.status === "error" && !fee.amount)
+    sliderDisabledText = LL.common.feeError()
 
   const progress = LL.SendBitcoinConfirmationScreen.sendProgress
   const sendProgressLabels = [
@@ -188,11 +194,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     progress.findingRoute(),
     progress.broadcasting(),
     progress.checkingDelivery(),
-    progress.retrying(),
     progress.almostThere(),
     progress.anyTimeNow(),
-    progress.ohOh(),
-    progress.tryingAgain(),
+    progress.hangTight(),
+    progress.stillOnItsWay(),
   ]
 
   const { feeDisplayText, currencyFeeAmount, satFeeAmount, feeErrorCode, feeErrorText } =
@@ -627,14 +632,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             initialText={LL.SendBitcoinConfirmationScreen.slideToSend()}
             loadingText={LL.SendBitcoinConfirmationScreen.sendProgress.reviewing()}
             busyLabels={sendProgressLabels}
-            disabledText={
-              isCalculating
-                ? LL.SendBitcoinConfirmationScreen.calculatingFee()
-                : undefined
-            }
+            disabledText={sliderDisabledText}
             accentColor={
               sendingWalletDescriptor.currency === WalletCurrency.Usd
-                ? colors._green
+                ? colors.success
                 : colors.accent
             }
             onSwipe={handleSendPayment}

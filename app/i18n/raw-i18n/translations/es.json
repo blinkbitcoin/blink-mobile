@@ -2369,11 +2369,10 @@
             "findingRoute": "Buscando ruta",
             "broadcasting": "Transmitiendo",
             "checkingDelivery": "Verificando la entrega",
-            "retrying": "Reintentando",
             "almostThere": "Ya casi",
             "anyTimeNow": "En cualquier momento",
-            "ohOh": "Uy, uy",
-            "tryingAgain": "Intentando de nuevo"
+            "hangTight": "Aguanta un poco",
+            "stillOnItsWay": "Sigue en camino"
         },
         "copiedDestination": "Destino copiado al portapapeles",
         "lightningRecommended": "Tasa elevada. Recomendamos Lightning.",
