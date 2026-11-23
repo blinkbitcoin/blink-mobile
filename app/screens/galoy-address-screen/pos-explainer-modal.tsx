@@ -7,6 +7,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 const useStyles = makeStyles(({ colors }) => ({
   modalView: {
@@ -27,7 +28,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   bodyText: {
     fontSize: 18,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
   },
 }))
 

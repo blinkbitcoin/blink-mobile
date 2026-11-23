@@ -131,6 +131,20 @@ describe("GaloySliderButton", () => {
       await renderSlider({ accentColor: "#00A700" })
       expect(handleColor()).toBe("#00A700")
     })
+
+    /* The handle rests on the start of the track, so the idle label keeps clear of it: at the
+     * larger text sizes it otherwise grew under the handle and read as a half word. */
+    it("keeps the idle label clear of the handle", async () => {
+      await renderSlider()
+      let node = screen.getByText("Slide to send").parent
+      let padding: ViewStyle["paddingHorizontal"]
+      while (node && padding === undefined) {
+        padding = (StyleSheet.flatten(node.props.style) as ViewStyle | undefined)
+          ?.paddingHorizontal
+        node = node.parent
+      }
+      expect(padding).toBe(HANDLE_SIZE)
+    })
   })
 
   describe("drag", () => {
@@ -141,7 +155,7 @@ describe("GaloySliderButton", () => {
       expect(screen.getByText("Slide to send")).toBeTruthy()
     })
 
-    it("sends once the drag passes 70% of the travel", async () => {
+    it("sends on release past 70% of the travel", async () => {
       const onSwipe = await renderSlider({
         onSwipe: jest.fn(() => new Promise(() => {})),
       })
@@ -164,6 +178,26 @@ describe("GaloySliderButton", () => {
       expect(onSwipe).toHaveBeenCalledTimes(1)
     })
 
+    it("does not send when dragged past 70% and back before release", async () => {
+      const onSwipe = await renderSlider()
+      await pan([
+        { state: State.BEGAN, translationX: 0 },
+        { state: State.ACTIVE, translationX: 0 },
+        { state: State.ACTIVE, translationX: TRAVEL * 0.9 },
+        { state: State.ACTIVE, translationX: TRAVEL * 0.5 },
+        { state: State.END, translationX: TRAVEL * 0.5 },
+      ])
+      expect(onSwipe).not.toHaveBeenCalled()
+    })
+
+    it("sends again after an onSwipe that settles at once", async () => {
+      // e.g. a conversion re-quoting on swipe: `isLoading` never turns on in between.
+      const onSwipe = await renderSlider({ onSwipe: jest.fn() })
+      await drag(TRAVEL)
+      await drag(TRAVEL)
+      expect(onSwipe).toHaveBeenCalledTimes(2)
+    })
+
     it("does not send while disabled", async () => {
       const onSwipe = await renderSlider({ disabled: true })
       await drag(TRAVEL)
@@ -178,7 +212,7 @@ describe("GaloySliderButton", () => {
   })
 
   describe("busy", () => {
-    const labels = ["Reviewing", "Signing", "Oh oh"]
+    const labels = ["Reviewing", "Signing", "Hang tight"]
 
     it("locks into the busy state as soon as the send commits", async () => {
       await renderSlider({ busyLabels: labels, onSwipe: () => new Promise(() => {}) })
@@ -204,11 +238,11 @@ describe("GaloySliderButton", () => {
       expect(screen.getByText("Signing", { exact: false })).toBeTruthy()
 
       act(() => jest.advanceTimersByTime(3000 - typingTime("Signing")))
-      act(() => jest.advanceTimersByTime(typingTime("Oh oh")))
-      expect(screen.getByText("Oh oh", { exact: false })).toBeTruthy()
+      act(() => jest.advanceTimersByTime(typingTime("Hang tight")))
+      expect(screen.getByText("Hang tight", { exact: false })).toBeTruthy()
 
       act(() => jest.advanceTimersByTime(30000))
-      expect(screen.getByText("Oh oh", { exact: false })).toBeTruthy()
+      expect(screen.getByText("Hang tight", { exact: false })).toBeTruthy()
       expect(screen.queryByText("Reviewing", { exact: false })).toBeNull()
     })
 
@@ -299,6 +333,16 @@ describe("GaloySliderButton", () => {
       await activate()
 
       expect(onSwipe).toHaveBeenCalledTimes(1)
+    })
+
+    it("sends again on a second activate after an onSwipe that settles at once", async () => {
+      const onSwipe = jest.fn()
+      await renderSlider({ onSwipe })
+
+      await activate()
+      await activate()
+
+      expect(onSwipe).toHaveBeenCalledTimes(2)
     })
 
     it("ignores activate while disabled and says so", async () => {

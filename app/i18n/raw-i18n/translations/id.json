@@ -2369,11 +2369,10 @@
       "findingRoute": "Mencari rute",
       "broadcasting": "Menyiarkan",
       "checkingDelivery": "Memeriksa pengiriman",
-      "retrying": "Mencoba ulang",
       "almostThere": "Hampir selesai",
       "anyTimeNow": "Sebentar lagi",
-      "ohOh": "Aduh",
-      "tryingAgain": "Mencoba lagi"
+      "hangTight": "Tunggu sebentar",
+      "stillOnItsWay": "Masih dalam perjalanan"
     },
     "copiedDestination": "Tujuan disalin ke papan klip",
     "lightningRecommended": "Biaya tinggi. Kami merekomendasikan Lightning.",

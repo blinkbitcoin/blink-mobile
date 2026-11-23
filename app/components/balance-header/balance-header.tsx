@@ -10,6 +10,7 @@ import { BalanceMode } from "@app/hooks/use-balance-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 const Loader = () => {
   const styles = useStyles()
@@ -131,7 +132,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   primaryBalanceText: {
     fontSize: 32,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     color: colors.textOnBackground,
   },
   loaderBackground: {
@@ -141,6 +142,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.loaderForeground,
   },
   satsOnlyText: {
+    fontFamily: fonts.regular,
     marginTop: 4,
     fontSize: 12,
     textAlign: "center",
@@ -153,7 +155,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   modeToggleText: {
     fontSize: 11,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.textMuted,
     letterSpacing: 0.6,
   },

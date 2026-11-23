@@ -5,6 +5,7 @@ import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { staticSurface } from "@app/rne-theme/surfaces"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 type WarningCardProps = {
   // Bold heading rendered above the body, alongside the warning icon.
@@ -112,15 +113,13 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 3,
   },
   titleText: {
-    // flex lets the title wrap instead of overflowing the card. Naming a
-    // weighted face ("SourceSansPro-Bold") alongside the theme's fontWeight
-    // makes Android synthesise the weight, so glyphs draw wider than they
-    // measure and long titles run past the padding. Matches InfoCard, and
-    // "Paragraph 2/Bold" in Figma: 16px, 1.375em line height, weight 700.
+    // flex lets the title wrap instead of overflowing the card. Bold comes from
+    // the Bold face with no fontWeight: on Android a weight of 700 makes it look
+    // for a `_bold` file that does not exist and draw Roboto Bold. Matches
+    // InfoCard, and "Paragraph 2/Bold" in Figma: 16px, 1.375em line height.
     flex: 1,
-    fontFamily: "Source Sans Pro",
+    fontFamily: fonts.bold,
     fontSize: 16,
-    fontWeight: "700",
     lineHeight: 22,
     // Android otherwise pads the text box beyond the line box, pushing the
     // glyphs above the icon and leaving the card taller than its content.

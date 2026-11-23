@@ -743,7 +743,7 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
   },
   addPlaceText: {
     fontSize: 14,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.textOnBackground,
   },
 }))

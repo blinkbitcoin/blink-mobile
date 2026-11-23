@@ -41,6 +41,7 @@ import {
   MemoizedTransactionItem,
   TRANSACTION_LIST_WINDOW_SIZE,
 } from "@app/components/transaction-item"
+import { fonts } from "@app/rne-theme/fonts"
 import { toastShow } from "../../utils/toast"
 
 import TransactionHistorySkeleton from "./transaction-history-skeleton"
@@ -532,6 +533,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 const useStyles = makeStyles(({ colors }) => ({
   skeletonWrapper: { flex: 1, alignSelf: "stretch" },
   noTransactionText: {
+    fontFamily: fonts.regular,
     fontSize: 24,
   },
 
@@ -549,6 +551,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   sectionHeaderText: {
+    fontFamily: fonts.regular,
     color: colors.textOnBackground,
     fontSize: 18,
   },

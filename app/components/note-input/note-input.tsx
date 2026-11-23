@@ -14,6 +14,7 @@ import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
 
@@ -138,7 +139,7 @@ const useStyles = makeStyles(
     noteInput: {
       flex: 1,
       color: colors.textOnBackground,
-      fontWeight: "400",
+      fontFamily: fonts.regular,
       lineHeight: 20,
       /** No platform padding, so the field's min height and font scale set its size. */
       paddingVertical: 0,

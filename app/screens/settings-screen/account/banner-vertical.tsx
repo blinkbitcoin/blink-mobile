@@ -21,6 +21,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useLightningAddressGated } from "@app/self-custodial/hooks/use-lightning-address-gate"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountType } from "@app/types/wallet"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const AccountBannerVertical: React.FC = () => {
   const styles = useStyles()
@@ -139,7 +140,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   titleStyle: {
     color: colors.accent,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     fontSize: 50,
     includeFontPadding: false,
   },

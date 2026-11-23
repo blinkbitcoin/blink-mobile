@@ -15,6 +15,7 @@ import { RouteProp, useIsFocused, useNavigation } from "@react-navigation/native
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Button } from "@rn-vui/base"
 import { Colors, makeStyles, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { Screen } from "../../components/screen"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
@@ -84,7 +85,7 @@ const useStyles = makeStyles(({ colors }, { screenWidth }: { screenWidth: number
   itemTitle: {
     color: colors.staticWhite,
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     height: 72,
     marginHorizontal: 24,
     textAlign: "center",
@@ -101,7 +102,7 @@ const useStyles = makeStyles(({ colors }, { screenWidth }: { screenWidth: number
 
   titleStyle: {
     color: colors.staticBrightBlue,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
   },
 
   titleStyleDisabled: {
@@ -110,17 +111,19 @@ const useStyles = makeStyles(({ colors }, { screenWidth }: { screenWidth: number
 
   titleStyleFulfilled: {
     color: colors.staticWhite,
+    fontFamily: fonts.bold,
   },
 
   unlock: {
     alignSelf: "center",
     color: colors.staticWhite,
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     textAlign: "center",
   },
 
   unlockQuestion: {
+    fontFamily: fonts.regular,
     alignSelf: "center",
     color: colors.staticWhite,
     fontSize: 16,
@@ -159,7 +162,7 @@ type Props = {
 }
 
 // The header sits on the section's fixed blue backdrop, so it never inverts.
-const earnsHeaderTitleStyle = { fontWeight: "bold" as const, fontSize: 18 }
+const earnsHeaderTitleStyle = { fontFamily: fonts.bold, fontSize: 18 }
 
 const renderEarnsHeaderTitle = (props: { children: string; tintColor?: string }) => (
   <HeaderTitle

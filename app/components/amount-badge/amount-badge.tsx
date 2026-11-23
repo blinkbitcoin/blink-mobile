@@ -6,6 +6,7 @@ import { makeStyles } from "@rn-vui/themed"
 
 import { useDropInOutAnimation } from "@app/components/animations"
 import { GaloyIcon, type IconNamesType } from "@app/components/atomic/galoy-icon"
+import { fonts } from "@app/rne-theme/fonts"
 import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 /** Exported: whoever arbitrates the badge slot must keep a badge mounted for
@@ -126,6 +127,7 @@ const useStyles = makeStyles(
       alignSelf: "center",
     },
     text: {
+      fontFamily: fonts.regular,
       fontSize: 20,
       flexShrink: 1,
       color: variant === "incoming" ? colors.success : colors.textMuted,

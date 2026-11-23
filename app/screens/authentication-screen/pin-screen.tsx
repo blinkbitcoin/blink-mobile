@@ -10,6 +10,7 @@ import { Button } from "@rn-vui/base"
 import { makeStyles } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { useUnlockScreen } from "./unlock-screen"
 import { useForgottenPinEscape } from "./use-forgotten-pin-escape"
@@ -468,12 +469,14 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   forgotPinText: {
+    fontFamily: fonts.regular,
     color: colors.textOnAccent,
     fontSize: 16,
     textDecorationLine: "underline",
   },
 
   helperText: {
+    fontFamily: fonts.regular,
     color: colors.textOnAccent,
     fontSize: 20,
   },
@@ -506,13 +509,13 @@ const useStyles = makeStyles(({ colors }) => ({
   pinPadButtonTitle: {
     color: colors.textOnAccent,
     fontSize: 26,
-    fontWeight: "500",
+    fontFamily: fonts.regular,
   },
 
   pinPadButtonTitleDisabled: {
     color: colors.textOnAccent,
     fontSize: 26,
-    fontWeight: "500",
+    fontFamily: fonts.regular,
     opacity: 0.4,
   },
 

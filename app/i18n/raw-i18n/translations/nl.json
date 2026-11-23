@@ -2369,11 +2369,10 @@
       "findingRoute": "Route zoeken",
       "broadcasting": "Uitzenden",
       "checkingDelivery": "Aflevering controleren",
-      "retrying": "Opnieuw proberen",
       "almostThere": "Bijna klaar",
       "anyTimeNow": "Elk moment nu",
-      "ohOh": "Oei",
-      "tryingAgain": "Nog een poging"
+      "hangTight": "Even volhouden",
+      "stillOnItsWay": "Nog onderweg"
     },
     "copiedDestination": "Bestemming naar het klembord gekopieerd",
     "lightningRecommended": "Hoge kosten. We raden Lightning aan.",

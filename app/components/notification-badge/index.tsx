@@ -4,6 +4,7 @@ import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated"
 import { makeStyles } from "@rn-vui/themed"
 import { useIsFocused } from "@react-navigation/native"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { useBounceInAnimation } from "../animations/bounce-in-animation"
 
@@ -107,7 +108,7 @@ const useStyles = makeStyles(
     pillText: {
       color: colors.backgroundDefault,
       fontSize: 11,
-      fontWeight: "700",
+      fontFamily: fonts.bold,
       includeFontPadding: false,
     },
   }),

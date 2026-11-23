@@ -2369,11 +2369,10 @@
       "findingRoute": "Ñanta maskhashan",
       "broadcasting": "Willashan",
       "checkingDelivery": "Chayasqanta qhawashan",
-      "retrying": "Huktawan ruwashan",
       "almostThere": "Yaqañam",
       "anyTimeNow": "Kunanpacha",
-      "ohOh": "Ay ay",
-      "tryingAgain": "Huktawan kallpachashan"
+      "hangTight": "Suyakuy",
+      "stillOnItsWay": "Ñanpiraqmi"
     },
     "copiedDestination": "Mayman rinanta clipboard nisqaman churasqa",
     "lightningRecommended": "Hatun comisión. Lightning nisqata yuyaychayku.",

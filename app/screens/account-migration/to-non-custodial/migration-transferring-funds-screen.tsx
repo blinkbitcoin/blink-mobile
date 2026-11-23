@@ -24,6 +24,7 @@ import {
 } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const MigrationTransferringFundsScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -311,7 +312,7 @@ const useStyles = makeStyles(({ colors }) => ({
   message: {
     fontSize: 18,
     lineHeight: 24,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     color: colors.textOnBackground,
     textAlign: "center",
   },

@@ -45,7 +45,7 @@ export const SendBitcoinDetailsExtraInfo = ({
   const styles = useStyles()
 
   if (errorMessage) {
-    return <GaloyErrorBox errorMessage={errorMessage} filled={false} />
+    return <GaloyErrorBox errorMessage={errorMessage} filled={false} announce />
   }
 
   if (amountStatus.validAmount) {
@@ -58,6 +58,7 @@ export const SendBitcoinDetailsExtraInfo = ({
         <>
           <GaloyErrorBox
             filled={false}
+            announce
             errorMessage={LL.SendBitcoinScreen.amountExceedsLimit({
               limit: formatMoneyAmount({
                 moneyAmount: amountStatus.remainingLimit,
@@ -91,6 +92,7 @@ export const SendBitcoinDetailsExtraInfo = ({
       return (
         <GaloyErrorBox
           filled={false}
+          announce
           errorMessage={LL.SendBitcoinScreen.amountExceed({
             balance: formatMoneyAmount({ moneyAmount: amountStatus.balance }),
           })}

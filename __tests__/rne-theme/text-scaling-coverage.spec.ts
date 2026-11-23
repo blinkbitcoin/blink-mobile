@@ -271,8 +271,7 @@ describe("the walk's own reading", () => {
 
   /**
    * A production tag, not a toy: stripping the multiplier from the send hero's caption is
-   * the kind of edit that used to leave this suite green. (The slider label it once named
-   * is a themed `Text` now, which the theme caps.)
+   * the kind of edit that used to leave this suite green.
    */
   it("fails when the send hero caption drops the ceiling", () => {
     const source = fs.readFileSync(
@@ -287,5 +286,18 @@ describe("the walk's own reading", () => {
     expect(stripped).not.toBe(source)
     expect(uncappedAnimatedTags(source)).toEqual([])
     expect(uncappedAnimatedTags(stripped)).toHaveLength(1)
+  })
+
+  /**
+   * The production file, not a toy: the slider draws its labels with the themed `Text`,
+   * which carries the ceiling, so it must hold no React Native text that drops it.
+   */
+  it("finds no uncapped text in the slider", () => {
+    const source = fs.readFileSync(
+      path.join(APP_DIR, "components/atomic/galoy-slider-button/galoy-slider-button.tsx"),
+      "utf8",
+    )
+
+    expect(uncappedAnimatedTags(source)).toEqual([])
   })
 })

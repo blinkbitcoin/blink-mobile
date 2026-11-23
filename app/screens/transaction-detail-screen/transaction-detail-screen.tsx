@@ -41,6 +41,7 @@ import { staticSurface } from "@app/rne-theme/surfaces"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { formatTimeToMempool, timeToMempool } from "./format-time"
 import { groupTitleGap } from "@app/rne-theme/tokens"
+import { fonts } from "@app/rne-theme/fonts"
 
 // Tappable icon action used in the detail rows (copy / open-in-explorer).
 // Built on GaloyIconButton (a Pressable) so taps register inside the
@@ -682,7 +683,7 @@ const useStyles = makeStyles(({ colors }) => ({
   value: {
     flex: 1,
     fontSize: 14,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
   },
   valueIcons: {
     flexDirection: "row",
