@@ -390,5 +390,13 @@ describe("GaloySliderButton", () => {
 
       expect(haptics.grab).not.toHaveBeenCalled()
     })
+
+    it("stays silent while the slider is busy", async () => {
+      await renderSlider({ isLoading: true })
+
+      await pan([{ state: State.BEGAN, translationX: 0 }])
+
+      expect(haptics.grab).not.toHaveBeenCalled()
+    })
   })
 })

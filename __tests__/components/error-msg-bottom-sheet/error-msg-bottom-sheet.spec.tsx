@@ -193,5 +193,38 @@ describe("ErrorMsgBottomSheet", () => {
 
       expect(ReactNativeHapticFeedback.trigger).not.toHaveBeenCalled()
     })
+
+    /** It stays mounted and only toggles `isVisible`, so each opening is a new buzz. */
+    it("buzzes once while open, and again each time it opens", () => {
+      const sheet = (
+        isVisible: boolean,
+        body = "The payment could not be completed.",
+      ) => (
+        <ContextForScreen>
+          <ErrorMsgBottomSheet
+            isVisible={isVisible}
+            title="A small problem"
+            body={body}
+            primaryLabel="Try again"
+            onClose={jest.fn()}
+            onPrimaryPress={jest.fn()}
+          />
+        </ContextForScreen>
+      )
+      const errorBuzzes = () =>
+        (ReactNativeHapticFeedback.trigger as jest.Mock).mock.calls.filter(
+          ([type]) => type === "notificationError",
+        ).length
+
+      const { rerender } = render(sheet(true))
+      expect(errorBuzzes()).toBe(1)
+
+      rerender(sheet(true, "Another line for the same opening."))
+      expect(errorBuzzes()).toBe(1)
+
+      rerender(sheet(false))
+      rerender(sheet(true))
+      expect(errorBuzzes()).toBe(2)
+    })
   })
 })
