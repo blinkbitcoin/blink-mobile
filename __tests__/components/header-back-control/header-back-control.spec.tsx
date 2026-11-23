@@ -3,6 +3,7 @@ import { Image, Platform, StyleProp, StyleSheet, ViewStyle } from "react-native"
 import { fireEvent, render, waitFor } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
+import { fonts } from "@app/rne-theme/fonts"
 import theme from "@app/rne-theme/theme"
 import {
   headerBackControl,
@@ -164,6 +165,23 @@ describe("headerBackControl", () => {
     )
 
     expect(rendered.UNSAFE_getByType(Image).props.tintColor).toBe("#123456")
+  })
+
+  /* headerBackTitleStyle only reaches the native back item, which this control replaces,
+   * so the label HeaderBackButton draws has to name the face itself. It also renders
+   * hidden copies to measure, so every one is checked. */
+  it("draws the iOS back label in the regular face", () => {
+    const { getAllByText } = renderHeaderLeft(
+      headerBackControl()({ ...headerProps, label: "Settings" }),
+    )
+
+    const labels = getAllByText("Settings", { includeHiddenElements: true })
+    expect(labels.length).toBeGreaterThan(0)
+    labels.forEach((label) => {
+      expect(StyleSheet.flatten(label.props.style)).toMatchObject({
+        fontFamily: fonts.regular,
+      })
+    })
   })
 
   it("renders the invisible placeholder when going back is not allowed", () => {

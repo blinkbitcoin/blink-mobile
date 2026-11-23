@@ -1,6 +1,7 @@
 import React from "react"
 import { ActivityIndicator, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 type InfoRowProps = {
   label: string
@@ -83,28 +84,26 @@ const useStyles = makeStyles(({ colors }) => ({
     maxWidth: "50%",
     color: colors.textMuted,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 20,
   },
   regularLabel: {
-    fontWeight: "400",
+    fontFamily: fonts.regular,
   },
   value: {
     flex: 1,
     color: colors.textOnBackground,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     lineHeight: 20,
     textAlign: "right",
   },
   mutedValue: {
     color: colors.textMuted,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
   },
   secondaryValue: {
-    fontWeight: "400",
+    fontFamily: fonts.regular,
   },
   loadingSlot: {
     flex: 1,

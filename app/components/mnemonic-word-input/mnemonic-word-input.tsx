@@ -1,13 +1,14 @@
 import React, { forwardRef, useImperativeHandle, useRef } from "react"
 import { TextInput, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
-import { fonts } from "@app/rne-theme/fonts"
 
 type MnemonicWordInputProps = {
   index: number
@@ -48,6 +49,7 @@ export const MnemonicWordInput = forwardRef<
         {index + 1}.
       </Text>
       <TextInput
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         ref={inputRef}
         style={styles.input}
         placeholder={placeholder}

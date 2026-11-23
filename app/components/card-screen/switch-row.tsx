@@ -2,6 +2,7 @@ import React from "react"
 import { ListItem, makeStyles } from "@rn-vui/themed"
 
 import { Switch } from "@app/components/atomic/switch"
+import { fonts } from "@app/rne-theme/fonts"
 
 type SwitchRowProps = {
   title: string
@@ -51,11 +52,11 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.textOnBackground,
     fontSize: 14,
     lineHeight: 20,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
   },
   listItemSubtitle: {
     color: colors.textMuted,
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     fontSize: 14,
     lineHeight: 16,
   },

@@ -31,6 +31,7 @@ import { CountryCode, PhoneNumber } from "libphonenumber-js/mobile"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { SearchBar } from "@rn-vui/base"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { makeStyles, useTheme, Text, ListItem } from "@rn-vui/themed"
 
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
@@ -70,6 +71,7 @@ import {
 } from "@app/utils/phone"
 import { isInt } from "validator"
 import { groupTitleGap } from "@app/rne-theme/tokens"
+import { fonts } from "@app/rne-theme/fonts"
 
 gql`
   query sendBitcoinDestination {
@@ -748,6 +750,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           onResponderRelease={() => onFocusedInput(InputType.Search)}
         >
           <SearchBar
+            maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
             {...testProps(LL.SendBitcoinScreen.placeholder())}
             placeholder={LL.SendBitcoinScreen.placeholder()}
             InputComponent={SingleLinePlaceholderInput}
@@ -1142,7 +1145,7 @@ const usestyles = makeStyles(({ colors }) => ({
   },
   fieldTitleText: {
     color: colors.textSecondary,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     marginBottom: groupTitleGap,
   },
   iconContainer: {
@@ -1163,6 +1166,7 @@ const usestyles = makeStyles(({ colors }) => ({
   },
   searchBarText: {
     color: colors.textOnBackground,
+    fontFamily: fonts.regular,
     textDecorationLine: "none",
   },
   icon: {
@@ -1186,7 +1190,7 @@ const usestyles = makeStyles(({ colors }) => ({
   emptyListTitle: {
     color: colors.warning,
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     textAlign: "center",
   },
   itemContainer: {

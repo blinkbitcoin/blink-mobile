@@ -13,6 +13,8 @@ import { WalletSwitch } from "@app/components/wallet-switch"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { fonts } from "@app/rne-theme/fonts"
+import { radius } from "@app/rne-theme/radius"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import { testProps } from "@app/utils/testProps"
 
 export const SEND_WALLET_SUMMARY_TEST_ID = "choose-wallet-to-send-from"
@@ -41,6 +43,7 @@ type SendWalletSummaryProps = {
   onReveal?: () => void
 }
 
+// TODO(#4360): becomes a thin wrapper over WalletSummary once #4360 merges.
 export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
   currency,
   balancePrimary,
@@ -159,15 +162,13 @@ const useStyles = makeStyles(({ colors }) => ({
     columnGap: 20,
     minHeight: 67,
     backgroundColor: colors.surfaceInteractive,
-    borderRadius: 12,
+    borderRadius: radius.default,
     borderWidth: 1,
     borderColor: colors.transparent,
     paddingHorizontal: 14,
     paddingVertical: 14,
   },
-  cardInactive: {
-    backgroundColor: colors.surfaceStatic,
-  },
+  cardInactive: staticSurface(colors),
   cardError: {
     borderColor: colors.error,
   },

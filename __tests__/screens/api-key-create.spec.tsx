@@ -55,11 +55,16 @@ const apiKeyCreateMock = jest.fn(() =>
   }),
 )
 
+const mockApiKeyCreateOptions = jest.fn()
+
 jest.mock("@app/graphql/generated", () => {
   const actual = jest.requireActual("@app/graphql/generated")
   return {
     ...actual,
-    useApiKeyCreateMutation: () => [apiKeyCreateMock, { loading: false }],
+    useApiKeyCreateMutation: (options: unknown) => {
+      mockApiKeyCreateOptions(options)
+      return [apiKeyCreateMock, { loading: false }]
+    },
   }
 })
 
@@ -100,6 +105,15 @@ const pressCreate = () => fireEvent.press(screen.getByTestId(LL.ApiScreen.create
 describe("ApiKeyCreateScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+  })
+
+  it("keeps the key secret out of the Apollo cache, which is persisted to disk", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(mockApiKeyCreateOptions).toHaveBeenCalledWith(
+      expect.objectContaining({ fetchPolicy: "no-cache" }),
+    )
   })
 
   it("does not submit while the name is empty", async () => {

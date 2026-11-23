@@ -74,7 +74,7 @@ type SharedProps = {
   scrollTestID?: string
   testID?: string
   /**
-   * Which edges carry the 1px `grey4` outline. The app's sheets draw it on the
+   * Which edges carry the 1px `neutral` outline. The app's sheets draw it on the
    * top and both sides; Send 3.0's sheets draw the top edge only.
    */
   outline?: "topAndSides" | "top"
@@ -474,8 +474,8 @@ export const BottomSheet: React.FC<Props> = ({
             : undefined
         }
         testID={testID}
-        // A screen reader stays inside the sheet. VoiceOver's escape (a two-finger Z)
-        // closes it the way the X and the back button do; the drag is not one they can make.
+        // A screen reader stays inside the sheet, and its escape gesture closes it the way
+        // the scrim and Android back do.
         accessibilityViewIsModal
         onAccessibilityEscape={escape}
       >

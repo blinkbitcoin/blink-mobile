@@ -17,7 +17,6 @@ import {
   Transaction,
 } from "@app/graphql/generated"
 import { getErrorMessages } from "@app/graphql/utils"
-import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { reportError } from "@app/utils/error-logging"
 
 import {
@@ -47,8 +46,6 @@ type UseSendPaymentResult = {
    * sendPayment being defined.
    */
   hasAttemptedSend: boolean
-  /** The send went out, or is still going out: an attempt holds the lock until it fails. */
-  isSendSpent: boolean
 }
 
 /**
@@ -57,19 +54,6 @@ type UseSendPaymentResult = {
  * weakness this header exists to close.
  */
 export const IDEMPOTENCY_KEY_UNAVAILABLE = "idempotency-key-unavailable"
-
-/** Failures raised before anything is sent, so the payment can be attempted again. */
-const NOTHING_SENT_CODES: ReadonlySet<string> = new Set([
-  SelfCustodialErrorCode.InsufficientFunds,
-  SelfCustodialErrorCode.BelowMinimum,
-  SelfCustodialErrorCode.InvalidInput,
-  IDEMPOTENCY_KEY_UNAVAILABLE,
-])
-
-/** True only for a failure classified as raised before the send. Server text, an
- *  unclassified code or no reason at all may have moved money. */
-export const isNothingSentFailure = (raw: string | undefined): boolean =>
-  raw !== undefined && NOTHING_SENT_CODES.has(raw)
 
 gql`
   mutation intraLedgerPaymentSend($input: IntraLedgerPaymentSendInput!) {
@@ -262,9 +246,6 @@ export const useSendPayment = (
    * the rest of the mount regardless.
    */
   const [sendLocked, setSendLocked] = useState(false)
-  /** A network attempt whose outcome is unknown. Stays set after sendLocked clears, so
-   *  Back cannot build a new payment while a retry of this one is still allowed. */
-  const [mayHaveLanded, setMayHaveLanded] = useState(false)
   // Tracks loading for mutations that bypass Apollo (e.g. self-custodial SDK calls)
   // so the UI still gets a loading signal while the mutation is in-flight.
   const [localLoading, setLocalLoading] = useState(false)
@@ -355,7 +336,6 @@ export const useSendPayment = (
               errorsMessage = getErrorMessages(errors)
             }
             if (status === PaymentSendResult.Failure) {
-              if (!isNothingSentFailure(errorsMessage)) setMayHaveLanded(true)
               setSendLocked(false)
             }
             return { status, errorsMessage, extraInfo, transaction }
@@ -363,10 +343,6 @@ export const useSendPayment = (
             // A throw is precisely the ambiguous case — the request may have landed. Let
             // the user attempt again under the same key, so a true duplicate comes back
             // as a 409 the screen can resolve, instead of dead-ending on a live payment.
-            // Back stays locked unless the throw is classified as raised before the send.
-            if (!(err instanceof Error && isNothingSentFailure(err.message))) {
-              setMayHaveLanded(true)
-            }
             setSendLocked(false)
             throw err
           } finally {
@@ -391,7 +367,6 @@ export const useSendPayment = (
 
   return {
     hasAttemptedSend,
-    isSendSpent: (hasAttemptedSend && sendLocked) || mayHaveLanded,
     loading,
     sendPayment,
   }

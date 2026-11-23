@@ -1,10 +1,24 @@
 import { useCallback } from "react"
 
 import { WalletCurrency } from "@app/graphql/generated"
+import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 
 import { isAmountFixableError } from "./amount-fixable-error"
 import { PaymentDetail } from "./payment-details/index.types"
-import { isNothingSentFailure } from "./use-send-payment"
+import { IDEMPOTENCY_KEY_UNAVAILABLE } from "./use-send-payment"
+
+/** Failures raised before anything is sent, so a new payment can be offered. */
+const NOTHING_SENT_CODES: ReadonlySet<string> = new Set([
+  SelfCustodialErrorCode.InsufficientFunds,
+  SelfCustodialErrorCode.BelowMinimum,
+  SelfCustodialErrorCode.InvalidInput,
+  IDEMPOTENCY_KEY_UNAVAILABLE,
+])
+
+/** True only for a failure classified as raised before the send. Server text, an
+ *  unclassified code or no reason at all may have moved money. */
+export const isNothingSentFailure = (raw: string | undefined): boolean =>
+  raw !== undefined && NOTHING_SENT_CODES.has(raw)
 
 /**
  * What the error message sheet on review offers (blink-wip#1278, provisional ruling

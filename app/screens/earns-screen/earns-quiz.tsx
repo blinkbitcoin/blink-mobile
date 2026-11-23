@@ -8,6 +8,7 @@ import {
   TouchableWithoutFeedback,
   Pressable,
 } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { ScrollView } from "react-native-gesture-handler"
 import Modal from "react-native-modal"
 import { SafeAreaView } from "react-native-safe-area-context"
@@ -39,6 +40,7 @@ import {
   skipRewardErrorCodes,
 } from "./helpers"
 import CustomModal from "@app/components/custom-modal/custom-modal"
+import { fonts } from "@app/rne-theme/fonts"
 import { ValidateQuizCodeErrorsType } from "./sections"
 
 const useStyles = makeStyles(({ colors }) => ({
@@ -72,16 +74,18 @@ const useStyles = makeStyles(({ colors }) => ({
   completedTitleStyle: {
     color: colors.staticBrightBlue,
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
   },
 
   correctAnswerText: {
+    fontFamily: fonts.regular,
     color: colors.staticSuccess,
     flex: 1,
     fontSize: 16,
   },
 
   incorrectAnswerText: {
+    fontFamily: fonts.regular,
     color: colors.error,
     fontSize: 16,
     flex: 1,
@@ -126,7 +130,7 @@ const useStyles = makeStyles(({ colors }) => ({
 
   quizButtonTitleStyle: {
     color: colors.staticWhite,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     fontSize: 16,
   },
 
@@ -154,11 +158,13 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   text: {
+    fontFamily: fonts.regular,
     fontSize: 24,
     color: colors.staticBlack,
   },
 
   answerChoiceText: {
+    fontFamily: fonts.regular,
     fontSize: 20,
     flex: 1,
     color: colors.staticBlack,
@@ -172,12 +178,12 @@ const useStyles = makeStyles(({ colors }) => ({
   textEarn: {
     color: colors.staticDarkGrey,
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
   },
 
   title: {
     fontSize: 32,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     paddingBottom: 12,
     color: colors.staticBlack,
   },
@@ -185,7 +191,7 @@ const useStyles = makeStyles(({ colors }) => ({
   titleStyle: {
     color: colors.staticWhite,
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
   },
 
   buttonRowWithFeedback: {
@@ -194,6 +200,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   modalBodyText: {
+    fontFamily: fonts.regular,
     fontSize: 17,
     color: colors.textOnBackground,
     textAlign: "left",
@@ -439,14 +446,27 @@ export const EarnQuiz = ({ route }: Props) => {
         <TouchableOpacity onPress={() => addRecordedAnswer(i)}>
           <View style={styles.buttonRow}>
             <View style={buttonStyleHelper(i)}>
-              <Text style={styles.quizButtonTitleStyle}>{mappingLetter[j]}</Text>
+              <Text
+                maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+                style={styles.quizButtonTitleStyle}
+              >
+                {mappingLetter[j]}
+              </Text>
             </View>
-            <Text style={styles.answerChoiceText}>{answers[i]}</Text>
+            <Text
+              maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+              style={styles.answerChoiceText}
+            >
+              {answers[i]}
+            </Text>
           </View>
         </TouchableOpacity>
         {recordedAnswer.length > 0 &&
         recordedAnswer.indexOf(i) === recordedAnswer.length - 1 ? (
-          <Text style={i === 0 ? styles.correctAnswerText : styles.incorrectAnswerText}>
+          <Text
+            maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+            style={i === 0 ? styles.correctAnswerText : styles.incorrectAnswerText}
+          >
             {feedback[i]}
           </Text>
         ) : null}
@@ -485,13 +505,16 @@ export const EarnQuiz = ({ route }: Props) => {
             contentContainerStyle={styles.answersView}
           >
             <Pressable style={styles.answersViewInner}>
-              <Text style={styles.title}>{question ?? title}</Text>
+              <Text maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER} style={styles.title}>
+                {question ?? title}
+              </Text>
               {answersShuffled}
             </Pressable>
           </ScrollView>
           <View>
             {recordedAnswer.indexOf(0) === -1 ? null : (
               <Button
+                titleProps={{ maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER }}
                 title={LL.EarnScreen.keepDigging()}
                 type="outline"
                 onPress={async () => close()}
@@ -507,8 +530,12 @@ export const EarnQuiz = ({ route }: Props) => {
         <ScrollView persistentScrollbar showsVerticalScrollIndicator bounces>
           <View style={styles.svgContainer}>{SVGs({ name: id, theme: "dark" })}</View>
           <View style={styles.textContainer}>
-            <Text style={styles.title}>{title}</Text>
-            <Text style={styles.text}>{text}</Text>
+            <Text maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER} style={styles.title}>
+              {title}
+            </Text>
+            <Text maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER} style={styles.text}>
+              {text}
+            </Text>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -517,12 +544,16 @@ export const EarnQuiz = ({ route }: Props) => {
         <View style={{ paddingVertical: 12 }}>
           {(completed && (
             <>
-              <Text style={styles.textEarn}>
+              <Text
+                maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+                style={styles.textEarn}
+              >
                 {isAvailable
                   ? LL.EarnScreen.quizComplete({ formattedNumber: amount })
                   : LL.EarnScreen.sectionsCompleted()}
               </Text>
               <Button
+                titleProps={{ maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER }}
                 title={LL.EarnScreen.reviewQuiz()}
                 type="clear"
                 titleStyle={styles.completedTitleStyle}
@@ -531,6 +562,7 @@ export const EarnQuiz = ({ route }: Props) => {
             </>
           )) || (
             <Button
+              titleProps={{ maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER }}
               title={
                 isAvailable
                   ? LL.EarnScreen.earnSats({
@@ -552,7 +584,10 @@ export const EarnQuiz = ({ route }: Props) => {
         backgroundModalColor={colors.backgroundDefault}
         body={
           <View style={styles.modalBody}>
-            <Text style={styles.modalBodyText}>
+            <Text
+              maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+              style={styles.modalBodyText}
+            >
               {getModalErrorMessages(quizErrorCode as ValidateQuizCodeErrorsType).message}
             </Text>
           </View>

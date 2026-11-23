@@ -1,11 +1,13 @@
 import * as React from "react"
 import { Text, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Button } from "@rn-vui/base"
 import { makeStyles, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { CloseCross } from "../../components/close-cross"
 import { MountainHeader } from "../../components/mountain-header"
@@ -35,6 +37,7 @@ const useStyles = makeStyles(({ colors }) => ({
   divider: { flex: 0.5, minHeight: 30 },
 
   headerSection: {
+    fontFamily: fonts.regular,
     color: colors.staticWhite,
     fontSize: 16,
     paddingTop: 18,
@@ -43,14 +46,14 @@ const useStyles = makeStyles(({ colors }) => ({
   titleSection: {
     color: colors.staticWhite,
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     paddingTop: 6,
   },
 
   titleStyle: {
     color: colors.staticBrightBlue,
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     flex: 1,
     justifyContent: "center",
   },
@@ -81,9 +84,20 @@ export const SectionCompleted: React.FC<Props> = ({ route }) => {
       <View style={styles.container}>
         <View style={styles.divider} />
         <BadgerShovelBitcoin />
-        <Text style={styles.headerSection}>{LL.EarnScreen.sectionsCompleted()}</Text>
-        <Text style={styles.titleSection}>{sectionTitle}</Text>
+        <Text
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+          style={styles.headerSection}
+        >
+          {LL.EarnScreen.sectionsCompleted()}
+        </Text>
+        <Text
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+          style={styles.titleSection}
+        >
+          {sectionTitle}
+        </Text>
         <Button
+          titleProps={{ maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER }}
           title={LL.EarnScreen.keepDigging()}
           type="solid"
           buttonStyle={styles.buttonStyle}

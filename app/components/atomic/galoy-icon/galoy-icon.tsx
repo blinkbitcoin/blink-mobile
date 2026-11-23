@@ -83,6 +83,7 @@ import {
   XCircleIcon,
 } from "phosphor-react-native"
 
+import Alert from "@app/assets/icons-redesign/alert.svg"
 import ApplePay from "@app/assets/icons/apple-pay.svg"
 import Bitcoin from "@app/assets/icons-redesign/bitcoin.svg"
 import BlinkIcon from "@app/assets/icons-redesign/blink-icon.svg"
@@ -244,6 +245,7 @@ const customSvgMap = {
   "upgrade": Upgrade,
   "visa-platinum": VisaPlatinum,
   "warning-with-background": WarningWithBackground,
+  "alert": Alert,
   "welcome": Welcome,
   "qr-code": QrCode,
   "btc-hand": BtcHand,

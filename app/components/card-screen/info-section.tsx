@@ -6,6 +6,7 @@ import { InfoRow } from "./info-row"
 import { radius } from "@app/rne-theme/radius"
 import { staticSurface } from "@app/rne-theme/surfaces"
 import { groupTitleGap } from "@app/rne-theme/tokens"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const INFO_SECTION_OUTLINE_TEST_ID = "info-section-outline"
 
@@ -20,8 +21,6 @@ type InfoItem = {
 type InfoSectionProps = {
   title: string
   items: InfoItem[]
-  /** Paints the card on grey7, the static surface, for a read-only summary. */
-  inactive?: boolean
   /** Outlines the card. The outline is drawn over the card rather than as its border, so
    *  it appearing or changing colour never moves the rows. */
   outlineColor?: string
@@ -30,7 +29,6 @@ type InfoSectionProps = {
 export const InfoSection: React.FC<InfoSectionProps> = ({
   title,
   items,
-  inactive = false,
   outlineColor,
 }) => {
   const styles = useStyles()
@@ -38,7 +36,7 @@ export const InfoSection: React.FC<InfoSectionProps> = ({
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
-      <View style={[styles.card, inactive && styles.cardInactive]}>
+      <View style={styles.card}>
         {items.map((item) => (
           <InfoRow
             key={item.label}
@@ -68,8 +66,7 @@ const useStyles = makeStyles(({ colors }) => ({
   title: {
     color: colors.textSecondary,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
   },
   card: {
@@ -79,16 +76,13 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 14,
     gap: 14,
   },
-  cardInactive: {
-    backgroundColor: colors.surfaceStatic,
-  },
   outline: {
     position: "absolute",
     top: 0,
     right: 0,
     bottom: 0,
     left: 0,
-    borderRadius: 8,
+    borderRadius: radius.default,
     borderWidth: 1,
   },
 }))

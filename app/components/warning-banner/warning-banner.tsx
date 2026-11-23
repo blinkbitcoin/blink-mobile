@@ -8,18 +8,23 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 export type WarningBannerProps = {
   children: React.ReactNode
   numberOfLines?: number
+  /** Speaks the warning as it appears, for one that shows without moving focus. Off by
+   *  default, since a screen that opens with a warning is already read. */
+  announce?: boolean
 }
 
 export const WarningBanner: React.FC<WarningBannerProps> = ({
   children,
   numberOfLines,
+  announce = false,
 }) => {
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
-  /** A warning appears without moving focus, so a screen reader would never read it. */
-  useAccessibilityAnnouncement(typeof children === "string" ? children : undefined)
+  useAccessibilityAnnouncement(
+    announce && typeof children === "string" ? children : undefined,
+  )
 
   return (
     <View style={styles.container}>

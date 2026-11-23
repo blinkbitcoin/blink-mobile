@@ -5,7 +5,7 @@ import { useTranslateSdkError } from "@app/self-custodial/hooks/use-translate-sd
 import { isSelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { logBreadcrumb } from "@app/utils/error-reporting"
 
-import { isNothingSentFailure } from "../use-send-payment"
+import { isNothingSentFailure } from "../error-msg-action"
 
 /**
  * The fixed copy for a send that failed. Server text is never shown: it goes to the logs.

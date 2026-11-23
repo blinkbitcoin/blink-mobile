@@ -11,7 +11,6 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { useNumberPad } from "@app/components/amount-input-screen/use-number-pad"
 import { CurrencyKeyboard } from "@app/components/currency-keyboard"
 import { NoteInput } from "@app/components/note-input"
-import { PercentageSelector } from "@app/components/percentage-selector"
 import { Screen } from "@app/components/screen"
 import {
   useSendBitcoinInternalLimitsQuery,
@@ -34,6 +33,7 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { ErrorHaptic } from "@app/hooks/use-error-haptic"
 import { useInitialAccessibilityFocus } from "@app/hooks/use-initial-accessibility-focus"
 import { useKeyboardVisible } from "@app/hooks/use-keyboard-visible"
+import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
@@ -165,12 +165,11 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   } = useAppConfig()
   const [isLoadingLnurl, setIsLoadingLnurl] = useState(false)
   const [isHighFeeSheetVisible, setIsHighFeeSheetVisible] = useState(false)
-  const [selectedPercent, setSelectedPercent] = useState<number | null>(null)
 
   const { convertMoneyAmount: _convertMoneyAmount, displayCurrency } =
     usePriceConversion()
   const { zeroDisplayAmount } = useDisplayCurrency()
-  const { paymentDestination, sendingWalletId, resetAmountAt } = route.params
+  const { paymentDestination, resetAmountAt, sendingWalletId } = route.params
 
   /** The wallet the caller judged able to pay, when it named one the flow offers; the
    *  flow's own default otherwise. */
@@ -239,7 +238,6 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   const [lnurlError, setLnurlError] = useState<LnurlInvoiceError>()
 
   const setAmount = useCallback((moneyAmount: MoneyAmount<WalletOrDisplayCurrency>) => {
-    setSelectedPercent(null)
     setPaymentDetail((paymentDetail) =>
       paymentDetail?.setAmount ? paymentDetail.setAmount(moneyAmount) : paymentDetail,
     )
@@ -251,6 +249,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       defaultWallet?.walletCurrency ??
       WalletCurrency.Btc,
     convertMoneyAmount: paymentDetail?.convertMoneyAmount ?? _convertMoneyAmount,
+    amountOfRecord: paymentDetail?.unitOfAccountAmount,
     onAmountChange: setAmount,
   })
 
@@ -323,13 +322,16 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   ])
 
   /** Screen reader focus starts where the send goes next: the keypad while there is no
-   *  amount to send yet, Next once there is one (a fixed invoice, or back from review). */
+   *  amount to send yet, Next once there is one (a fixed invoice, or back from review).
+   *  No target until the payment detail loads, since neither is on screen before then. */
   const firstKeyRef = useRef<View>(null)
   const nextRef = useRef<View>(null)
   const isAwaitingAmount =
     Boolean(paymentDetail?.canSetAmount) &&
     !(paymentDetail && paymentDetail.unitOfAccountAmount.amount > 0)
-  useInitialAccessibilityFocus(isAwaitingAmount ? firstKeyRef : nextRef)
+  useInitialAccessibilityFocus(
+    paymentDetail ? (isAwaitingAmount ? firstKeyRef : nextRef) : undefined,
+  )
 
   /** Held rather than blanked: the seeding above waits for the region, so without this the
    *  user sits on an empty screen for as long as the country takes to resolve. */
@@ -432,27 +434,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         }
       }
 
-      setSelectedPercent(null)
       setPaymentDetail(updatedPaymentDetail)
     })
-
-  const selectPercent = (percent: number) => {
-    const amount = {
-      ...sendingWalletBalance,
-      amount: Math.floor((sendingWalletBalance.amount * percent) / 100),
-    }
-    /** Where the rail can send the whole balance net of fees, 100% is that send-all rather
-     *  than the balance as a plain amount, which the fee would push over. */
-    const isSendAll = percent === 100 && Boolean(paymentDetail.canSendMax)
-
-    setPaymentDetail((paymentDetail) =>
-      paymentDetail?.setAmount
-        ? paymentDetail.setAmount(amount, isSendAll)
-        : paymentDetail,
-    )
-    amountPad.showAmount(amount)
-    setSelectedPercent(percent)
-  }
 
   const goToNextScreen =
     (paymentDetail.sendPaymentMutation ||
@@ -548,11 +531,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       }
 
       if (paymentDetailForConfirmation.sendPaymentMutation) {
-        const alertHighFees = shouldWarnAboutHighFee({
-          paymentDetail,
-          selectedTierFee: feeQuote.selectedTierFee,
-          hasFeeQuote: feeQuote.hasFeeQuote,
-        })
+        const alertHighFees = shouldWarnAboutHighFee({ paymentDetail, ...feeQuote })
         if (alertHighFees) {
           setIsHighFeeSheetVisible(true)
         } else {
@@ -562,6 +541,14 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         }
       }
     })
+
+  /** Only one of the two limits queries runs for a payment, so at most one can fail. Next
+   *  is left as main has it: whether an unread limit holds the send is the senior dev's. */
+  const retryLimits = withdrawalLimitsError
+    ? () => refetchWithdrawalLimits()
+    : intraledgerLimitsError
+      ? () => refetchIntraledgerLimits()
+      : undefined
 
   /**
    * Held while the custodial quote is out, because the high-fee warning is judged by the fee the
@@ -693,9 +680,6 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       />
       <HighFeeSheet
         isVisible={isHighFeeSheetVisible}
-        fee={formatMoneyAmount({
-          moneyAmount: convertMoneyAmount(selectedTierFee, DisplayCurrency),
-        })}
         onAccept={() => {
           setIsHighFeeSheetVisible(false)
           navigation.navigate("sendBitcoinConfirmation", { paymentDetail })
@@ -772,13 +756,6 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       <View style={styles.bottom}>
         {paymentDetail.canSetAmount && !isKeyboardVisible && (
           <View style={styles.pad}>
-            <PercentageSelector
-              isLocked={false}
-              loadingPercent={null}
-              selectedPercent={selectedPercent}
-              onSelect={selectPercent}
-              testIdPrefix="send"
-            />
             <CurrencyKeyboard
               onPress={amountPad.onKeyPress}
               disabledKeys={amountPad.disabledKeys}
@@ -830,7 +807,7 @@ const useStyles = makeStyles(() => ({
   /** Same height as the priority row above it, as drawn. */
   noteField: {
     minHeight: 42,
-    borderRadius: 8,
+    borderRadius: radius.default,
     paddingVertical: 8,
     paddingLeft: 14,
     paddingRight: 10,
@@ -840,7 +817,6 @@ const useStyles = makeStyles(() => ({
     paddingBottom: 20,
   },
   pad: {
-    rowGap: 14,
     paddingTop: 14,
   },
   /** A constant 20 above the CTA, whether the keypad or the note field sits over it. */

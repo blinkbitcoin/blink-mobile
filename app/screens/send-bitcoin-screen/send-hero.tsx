@@ -16,6 +16,7 @@ import { SUCCESS_BADGE_DURATION_MS, SuccessBadge } from "@app/components/success
 import { useAccessibilityAnnouncement } from "@app/hooks/use-accessibility-announcement"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { fonts } from "@app/rne-theme/fonts"
+import { cappedFontScale, MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 export const SEND_HERO_CAPTION_TEST_ID = "send-hero-caption"
 export const SEND_HERO_PRIMARY_TEST_ID = "send-hero-amount-primary"
@@ -87,23 +88,26 @@ export const SENT_BADGE_END_MS = SENT_BADGE_DELAY_MS + SUCCESS_BADGE_DURATION_MS
 const sentPrimaryFontSize = (amount: string): number => entryAmountFontSize(amount, false)
 
 /** How much taller the hero stands once sent, so a caller centring it can allow for the
- *  growth. Every line holds to one, so the growth is exact. */
+ *  growth. Every line holds to one, so the growth is exact. The text lines follow the OS
+ *  text size up to the same ceiling their `maxFontSizeMultiplier` sets, line box
+ *  included, where the icon frame does not. */
 export const sentHeroGrowth = ({
   primaryAmount,
   hasSecondaryAmount,
 }: {
   primaryAmount: string
   hasSecondaryAmount: boolean
-}): number =>
-  ICON_FRAME_SIZE.sent -
-  ICON_FRAME_SIZE.review +
-  SENT_ICON_EXTRA_GAP +
-  CAPTION_LINE_HEIGHT.sent -
-  CAPTION_LINE_HEIGHT.review +
-  sentPrimaryFontSize(primaryAmount) +
-  ENTRY_LINE_HEIGHT_OFFSET -
-  LINE_HEIGHT.inactive.primary +
-  (hasSecondaryAmount ? SENT_LINE_HEIGHT.secondary - LINE_HEIGHT.inactive.secondary : 0)
+}): number => {
+  const iconGrowth = ICON_FRAME_SIZE.sent - ICON_FRAME_SIZE.review + SENT_ICON_EXTRA_GAP
+  const textGrowth =
+    CAPTION_LINE_HEIGHT.sent -
+    CAPTION_LINE_HEIGHT.review +
+    sentPrimaryFontSize(primaryAmount) +
+    ENTRY_LINE_HEIGHT_OFFSET -
+    LINE_HEIGHT.inactive.primary +
+    (hasSecondaryAmount ? SENT_LINE_HEIGHT.secondary - LINE_HEIGHT.inactive.secondary : 0)
+  return iconGrowth + textGrowth * cappedFontScale()
+}
 
 type SendHeroProps = {
   /** The line above the amount: the destination while entering it, what the screen is
@@ -289,6 +293,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
       onAccessibilityAction={onCaptionLongPress}
     >
       <Animated.Text
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         numberOfLines={1}
         ellipsizeMode="middle"
         style={[styles.caption, isMorphing && sentCaptionStyle]}
@@ -312,6 +317,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
       }
     >
       <Animated.Text
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         style={[
           styles.amount,
           {
@@ -322,6 +328,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
           isMorphing && sentPrimaryStyle,
         ]}
         adjustsFontSizeToFit
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         numberOfLines={1}
         testID={SEND_HERO_PRIMARY_TEST_ID}
       >
@@ -329,6 +336,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
       </Animated.Text>
       {secondaryAmount ? (
         <Animated.Text
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           style={[
             styles.amount,
             {
@@ -344,6 +352,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
             active && secondaryStyle,
             isMorphing && sentSecondaryStyle,
           ]}
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           numberOfLines={1}
           testID={SEND_HERO_SECONDARY_TEST_ID}
         >

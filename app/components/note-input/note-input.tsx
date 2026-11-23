@@ -8,11 +8,13 @@ import {
   ViewStyle,
   TouchableOpacity,
 } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
 
@@ -69,6 +71,7 @@ export const NoteInput: React.FC<NoteInputProps> = ({
     >
       <View style={styles.noteContainer}>
         <TextInput
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           {...testProps("add-note")}
           accessibilityLabel={LL.NoteInput.addNote()}
           style={[styles.noteInput, { fontSize }]}
@@ -136,7 +139,7 @@ const useStyles = makeStyles(
     noteInput: {
       flex: 1,
       color: colors.textOnBackground,
-      fontWeight: "400",
+      fontFamily: fonts.regular,
       lineHeight: 20,
       /** No platform padding, so the field's min height and font scale set its size. */
       paddingVertical: 0,

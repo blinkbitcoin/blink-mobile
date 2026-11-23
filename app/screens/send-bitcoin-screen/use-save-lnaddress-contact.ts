@@ -65,7 +65,7 @@ export const useSaveLnAddressContact = () => {
         })
         return { saved: true, handle }
       } catch (err) {
-        crashlytics().log(`[contacts] auto-save failed for ${handle}: ${err}`)
+        logBreadcrumb(`[contacts] auto-save failed (${errorKind(err)})`)
         return { saved: false, handle }
       }
     },

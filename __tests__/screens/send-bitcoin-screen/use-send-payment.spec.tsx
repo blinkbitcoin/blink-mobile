@@ -238,8 +238,6 @@ describe("useSendPayment attempt gating", () => {
     expect(keysStampedOn("intraLedgerPaymentSend")).toEqual([KEY_A, KEY_A])
     // Sticky even though the send reopened: the balance may already be debited.
     expect(result.current.hasAttemptedSend).toBe(true)
-    // The same key can be retried, but Back must not be able to mint a new payment.
-    expect(result.current.isSendSpent).toBe(true)
   })
 
   it("reopens the send after a thrown mutation, rethrows, and retries under the same key", async () => {
@@ -268,7 +266,6 @@ describe("useSendPayment attempt gating", () => {
 
     expect(result.current.sendPayment).toBeDefined()
     expect(result.current.loading).toBe(false)
-    expect(result.current.isSendSpent).toBe(true)
 
     await invoke(result.current.sendPayment)
 
@@ -298,7 +295,6 @@ describe("useSendPayment attempt gating", () => {
     // Nothing reached the network, so the balance check must stay armed: the flag's
     // contract is "a send attempt reached the network", and here nothing did.
     expect(result.current.hasAttemptedSend).toBe(false)
-    expect(result.current.isSendSpent).toBe(false)
   })
 
   it("lets a mutation that bypasses Apollo send without stamping a key", async () => {

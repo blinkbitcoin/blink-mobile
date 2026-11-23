@@ -156,7 +156,6 @@ jest.mock("@app/components/amount-input-screen/use-number-pad", () => ({
     mockUseNumberPad(args),
 }))
 jest.mock("@app/components/currency-keyboard", () => ({ CurrencyKeyboard: () => null }))
-jest.mock("@app/components/percentage-selector", () => ({ PercentageSelector: () => null }))
 jest.mock("@app/screens/send-bitcoin-screen/send-hero", () => ({
   SendHero: () => null,
 }))
@@ -363,13 +362,17 @@ describe("SendBitcoinDetailsScreen when a rate arrives after an amount was typed
   ): ReturnType<typeof createNoAmountLightningPaymentDetails> => {
     const setAmount = detail.setAmount?.bind(detail)
     if (!setAmount) return detail
+    // The spread widens the union, so the wrapped detail is cast back once here.
     return {
       ...detail,
-      setAmount: (amount, isSendingMax) => {
+      setAmount: (
+        amount: MoneyAmount<WalletOrDisplayCurrency>,
+        isSendingMax?: boolean,
+      ) => {
         amountsSet.push(amount)
         return wrapDetail(setAmount(amount, isSendingMax))
       },
-    }
+    } as typeof detail
   }
 
   beforeEach(() => {
