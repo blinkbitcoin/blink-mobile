@@ -44,6 +44,8 @@ const deferred = <T>() => {
 describe("useOnchainFeeTiers", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    // Clearing keeps queued answers; a case that fails before using its own leaves them.
+    mockPrepareSend.mockReset()
     mockExtractOnchainFees.mockReturnValue(FEES)
   })
 
@@ -160,6 +162,96 @@ describe("useOnchainFeeTiers", () => {
     // Navigating with it would send 5000 sats under a screen that reads 6000.
     expect(tiers).toBeNull()
     expect(result.current.hasQuote).toBe(false)
+  })
+
+  it("stays quoting while a quote for an earlier amount is still out", async () => {
+    const request = deferred<object>()
+    mockPrepareSend.mockReturnValueOnce(request.promise)
+    const { result, rerender } = renderTiers(5000)
+
+    let pending: Promise<unknown> = Promise.resolve()
+    act(() => {
+      pending = result.current.quote()
+    })
+    rerender({ amount: 6000 })
+
+    // That quote still holds the wallet's leaves, so Next must not ask again yet.
+    expect(result.current.isQuoting).toBe(true)
+
+    await act(async () => {
+      request.resolve({})
+      await pending
+    })
+    expect(result.current.isQuoting).toBe(false)
+  })
+
+  it("starts a quote for a new amount only once the earlier one settles", async () => {
+    const first = deferred<object>()
+    const second = deferred<object>()
+    mockPrepareSend.mockReturnValueOnce(first.promise).mockReturnValueOnce(second.promise)
+    const { result, rerender } = renderTiers(5000)
+
+    let firstPending: Promise<unknown> = Promise.resolve()
+    act(() => {
+      firstPending = result.current.quote()
+    })
+    rerender({ amount: 6000 })
+
+    let secondPending: Promise<unknown> = Promise.resolve()
+    act(() => {
+      secondPending = result.current.quote()
+    })
+    await act(async () => {})
+
+    // Two quotes out at once fight over the same leaves.
+    expect(mockPrepareSend).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      first.resolve({})
+      await firstPending
+    })
+    expect(mockPrepareSend).toHaveBeenCalledTimes(2)
+    expect(mockPrepareSend).toHaveBeenLastCalledWith(mockSdk, {
+      paymentRequest: "bc1qtest",
+      amount: BigInt(6000),
+    })
+    expect(result.current.isQuoting).toBe(true)
+
+    let tiers: unknown = "unset"
+    await act(async () => {
+      second.resolve({})
+      tiers = await secondPending
+    })
+    expect(tiers).toEqual(result.current.tiers)
+    expect(result.current.isQuoting).toBe(false)
+  })
+
+  it("never asks the SDK for a queued amount that moved on while it waited", async () => {
+    const first = deferred<object>()
+    mockPrepareSend.mockReturnValueOnce(first.promise)
+    const { result, rerender } = renderTiers(5000)
+
+    let firstPending: Promise<unknown> = Promise.resolve()
+    act(() => {
+      firstPending = result.current.quote()
+    })
+    rerender({ amount: 6000 })
+    let secondPending: Promise<unknown> = Promise.resolve()
+    act(() => {
+      secondPending = result.current.quote()
+    })
+    rerender({ amount: 7000 })
+
+    let tiers: unknown = "unset"
+    await act(async () => {
+      first.resolve({})
+      await firstPending
+      tiers = await secondPending
+    })
+
+    expect(tiers).toBeNull()
+    expect(mockPrepareSend).toHaveBeenCalledTimes(1)
+    expect(result.current.isQuoting).toBe(false)
   })
 
   it("drops the quote once the amount changes", async () => {

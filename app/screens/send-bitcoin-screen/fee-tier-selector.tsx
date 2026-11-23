@@ -20,6 +20,8 @@ type FeeTierSelectorProps<T extends string> = {
   options: OptionItem<T>[]
   selected: T
   onSelect: (id: T) => void
+  /** Holds the row shut, e.g. while the fee for the tier on it is being quoted. */
+  disabled?: boolean
 }
 
 export const FeeTierSelector = <T extends string>({
@@ -27,6 +29,7 @@ export const FeeTierSelector = <T extends string>({
   options,
   selected,
   onSelect,
+  disabled = false,
 }: FeeTierSelectorProps<T>): React.ReactElement => {
   const styles = useStyles()
   const {
@@ -48,8 +51,10 @@ export const FeeTierSelector = <T extends string>({
       {/* The whole row is the tap target, so it carries no chevron. */}
       <TouchableWithoutFeedback
         onPress={() => setModalVisible(true)}
+        disabled={disabled}
         {...testProps("fee-tier-dropdown")}
         accessibilityRole="button"
+        accessibilityState={{ disabled }}
         accessibilityLabel={[title, selectedValue].filter(Boolean).join(", ")}
       >
         <View style={styles.row}>

@@ -178,6 +178,9 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   const [paymentDetail, setPaymentDetail] =
     useState<PaymentDetail<WalletCurrency> | null>(null)
+  /** The payment on screen now, so Next can tell whether the one it quoted still is. */
+  const latestPaymentDetailRef = useRef(paymentDetail)
+  latestPaymentDetailRef.current = paymentDetail
   const {
     feeTier,
     setFeeTier,
@@ -448,6 +451,9 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
        */
       const feeQuote = await quoteFeesForNext()
       if (!feeQuote) return
+      /** The screen is held while the quote is out, but the payment can still move under it
+       *  (a new price, say). Review must get the payment that was quoted, or nothing. */
+      if (latestPaymentDetailRef.current !== paymentDetail) return
 
       let paymentDetailForConfirmation: PaymentDetail<WalletCurrency> = paymentDetail
 
@@ -720,7 +726,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
                 })
               }
               hasError={isAmountError}
-              onSwitch={switchWallet || undefined}
+              onSwitch={(!isQuotingFeesForNext && switchWallet) || undefined}
             />
           </View>
           {isOnchain && (
@@ -729,6 +735,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               options={priorityOptions}
               selected={feeTier}
               onSelect={handleFeeTierChange}
+              disabled={isQuotingFeesForNext}
             />
           )}
           <NoteInput
@@ -736,7 +743,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               paymentDetail.setMemo && setPaymentDetail(paymentDetail.setMemo(text))
             }
             value={paymentDetail.memo || ""}
-            editable={paymentDetail.canSetMemo}
+            editable={paymentDetail.canSetMemo && !isQuotingFeesForNext}
             big={false}
             iconSize={16}
             fontSize={14}
@@ -750,6 +757,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
             <CurrencyKeyboard
               onPress={amountPad.onKeyPress}
               disabledKeys={amountPad.disabledKeys}
+              disabled={isQuotingFeesForNext}
               safeMode
               firstKeyRef={firstKeyRef}
             />
