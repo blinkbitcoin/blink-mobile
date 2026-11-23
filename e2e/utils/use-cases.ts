@@ -3,7 +3,13 @@ import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { i18nObject } from "../../app/i18n/i18n-util"
 import { loadLocale } from "../../app/i18n/i18n-util.sync"
 import { timeout } from "./config"
-import { clickButton, clickPressable, selector, waitTillTextDisplayed } from "./controls"
+import {
+  clickButton,
+  clickByTestId,
+  clickPressable,
+  selector,
+  waitTillTextDisplayed,
+} from "./controls"
 
 loadLocale("en")
 const LL = i18nObject("en")
@@ -45,15 +51,15 @@ export const clickOnBottomTab = async (tab: Tab) => {
 
 /** The send amount step types on its in-screen keypad; there is no modal to confirm. */
 export const addSmallAmount = async () => {
-  await clickPressable("Key .")
-  await clickPressable("Key 0")
-  await clickPressable("Key 2")
+  await clickByTestId("Key .")
+  await clickByTestId("Key 0")
+  await clickByTestId("Key 2")
 }
 
 export const enter2CentsIntoNumberPad = async (LL: TranslationFunctions) => {
-  await clickPressable("Key .")
-  await clickPressable("Key 0")
-  await clickPressable("Key 2")
+  await clickByTestId("Key .")
+  await clickByTestId("Key 0")
+  await clickByTestId("Key 2")
   await clickButton(LL.AmountInputScreen.setAmount())
 }
 
