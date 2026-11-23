@@ -2,7 +2,7 @@ import * as React from "react"
 import { View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { makeStyles, Text } from "@rn-vui/themed"
+import { Divider, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { radius } from "@app/rne-theme/radius"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -13,9 +13,13 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { staticSurface } from "@app/rne-theme/surfaces"
 
 const UPCOMING_FEATURES_MONTHS = 12
+const DIVIDER_WIDTH = 1
 
 export const CardDetailsScreen: React.FC = () => {
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
@@ -59,11 +63,17 @@ export const CardDetailsScreen: React.FC = () => {
       <View style={styles.content}>
         <View style={styles.cardContainer}>
           {FEATURES.map((feature, index) => {
-            const hasSeparator = index > 0
+            const hasDivider = index > 0
 
             return (
               <React.Fragment key={`feature-${index}`}>
-                {hasSeparator && <View style={styles.separator} />}
+                {hasDivider && (
+                  <Divider
+                    color={colors.neutral}
+                    width={DIVIDER_WIDTH}
+                    style={styles.divider}
+                  />
+                )}
                 <FeatureRow {...feature} />
               </React.Fragment>
             )
@@ -89,10 +99,8 @@ const useStyles = makeStyles(({ colors }) => ({
     ...staticSurface(colors),
     borderRadius: radius.default,
   },
-  separator: {
-    height: 1,
+  divider: {
     marginHorizontal: 14,
-    backgroundColor: colors.neutral,
   },
   footnote: {
     textAlign: "center",
