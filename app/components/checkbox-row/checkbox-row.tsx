@@ -8,6 +8,8 @@ import { GaloyIcon } from "../atomic/galoy-icon"
 
 const DEFAULT_GAP = 10
 const DEFAULT_LABEL_LINE_HEIGHT = 20
+/** Grows the 20 point box to the 44 point touch target the platforms ask for. */
+const BOX_HIT_SLOP = 12
 
 type StyleProps = {
   gap: number
@@ -25,41 +27,73 @@ type CheckboxRowProps = {
   labelLineHeight?: number
 } & (
   | { label: string; children?: never }
-  /** A label with inline parts, such as links, set in the row's text style. */
-  | { label?: never; children: React.ReactNode }
+  /**
+   * A label with inline parts, such as links, set in the row's text style. The box is
+   * then a checkbox of its own, named by `accessibilityLabel`, and the label sits beside
+   * it: inside one checkbox a screen reader could not reach the links, and activating
+   * one would toggle the box instead of opening it.
+   */
+  | { label?: never; children: React.ReactNode; accessibilityLabel: string }
 )
 
-export const CheckboxRow: React.FC<CheckboxRowProps> = ({
-  label,
-  children,
-  isChecked,
-  onPress,
-  centered,
-  disabled,
-  testID,
-  gap = DEFAULT_GAP,
-  labelLineHeight = DEFAULT_LABEL_LINE_HEIGHT,
-}) => {
+export const CheckboxRow: React.FC<CheckboxRowProps> = (props) => {
+  const {
+    isChecked,
+    onPress,
+    centered,
+    disabled,
+    testID,
+    gap = DEFAULT_GAP,
+    labelLineHeight = DEFAULT_LABEL_LINE_HEIGHT,
+  } = props
   const styles = useStyles({ gap, labelLineHeight })
   const {
     theme: { colors },
   } = useTheme()
 
+  const hasRichLabel = props.label === undefined
+  const rowStyle = [
+    styles.container,
+    centered && styles.centered,
+    disabled && styles.disabled,
+  ]
+  const labelStyle = [styles.label, centered && styles.labelCentered]
+  const box = (
+    <View style={[styles.checkbox, isChecked && styles.checkboxChecked]}>
+      {isChecked && <GaloyIcon name="check" size={14} color={colors.textOnAccent} />}
+    </View>
+  )
+
+  if (hasRichLabel) {
+    return (
+      <View style={rowStyle}>
+        <Pressable
+          disabled={disabled}
+          onPress={onPress}
+          hitSlop={BOX_HIT_SLOP}
+          accessibilityRole="checkbox"
+          accessibilityLabel={props.accessibilityLabel}
+          accessibilityState={{ checked: isChecked, disabled }}
+          testID={testID}
+        >
+          {box}
+        </Pressable>
+        <Text style={labelStyle}>{props.children}</Text>
+      </View>
+    )
+  }
+
   return (
     <Pressable
       disabled={disabled}
-      style={[styles.container, centered && styles.centered, disabled && styles.disabled]}
+      style={rowStyle}
       onPress={onPress}
       accessibilityRole="checkbox"
       accessibilityState={{ checked: isChecked }}
       testID={testID}
     >
-      <View style={[styles.checkbox, isChecked && styles.checkboxChecked]}>
-        {isChecked && <GaloyIcon name="check" size={14} color={colors.textOnAccent} />}
-      </View>
-      <Text style={[styles.label, centered && styles.labelCentered]}>
-        {children ?? label}
-      </Text>
+      {box}
+      <Text style={labelStyle}>{props.label}</Text>
     </Pressable>
   )
 }

@@ -109,6 +109,10 @@ export const CardAcknowledgementScreen: React.FC = () => {
   }
 
   const { Acknowledgement: acknowledgementLL } = LL.CardFlow.Onboarding
+  const { eSignConsent, privacyAndTerms } = acknowledgementLL
+  /** What a screen reader names each box whose label carries links. */
+  const eSignLabel = `${eSignConsent.text()} ${eSignConsent.linkText()}`
+  const privacyAndTermsLabel = `${privacyAndTerms.text()} ${privacyAndTerms.privacyPolicyLinkText()}${privacyAndTerms.and()} ${privacyAndTerms.cardTermsLinkText()}`
 
   return (
     <StepLayout
@@ -132,60 +136,63 @@ export const CardAcknowledgementScreen: React.FC = () => {
           <CheckboxRow
             isChecked={isESignAccepted}
             onPress={() => setIsESignAccepted(!isESignAccepted)}
+            accessibilityLabel={eSignLabel}
             gap={CHECKBOX_GAP}
             labelLineHeight={CHECKBOX_LINE_HEIGHT}
           >
-            {acknowledgementLL.eSignConsent.text()}{" "}
+            {eSignConsent.text()}{" "}
             <Text
               bold
               color={colors.accent}
+              accessibilityRole="link"
               onPress={() => openExternalUrl(cardESignConsentUrl)}
             >
-              {acknowledgementLL.eSignConsent.linkText()}
+              {eSignConsent.linkText()}
             </Text>
           </CheckboxRow>
 
           <CheckboxRow
             isChecked={isPrivacyAndTermsAccepted}
             onPress={() => setIsPrivacyAndTermsAccepted(!isPrivacyAndTermsAccepted)}
+            accessibilityLabel={privacyAndTermsLabel}
             gap={CHECKBOX_GAP}
             labelLineHeight={CHECKBOX_LINE_HEIGHT}
           >
-            {acknowledgementLL.privacyAndTerms.text()}{" "}
+            {privacyAndTerms.text()}{" "}
             <Text
               bold
               color={colors.accent}
+              accessibilityRole="link"
               onPress={() => openExternalUrl(cardIssuerPrivacyPolicyUrl)}
             >
-              {acknowledgementLL.privacyAndTerms.privacyPolicyLinkText()}
+              {privacyAndTerms.privacyPolicyLinkText()}
             </Text>
-            {acknowledgementLL.privacyAndTerms.and()}{" "}
+            {privacyAndTerms.and()}{" "}
             <Text
               bold
               color={colors.accent}
+              accessibilityRole="link"
               onPress={() => openExternalUrl(cardCardholderAgreementUrl)}
             >
-              {acknowledgementLL.privacyAndTerms.cardTermsLinkText()}
+              {privacyAndTerms.cardTermsLinkText()}
             </Text>
           </CheckboxRow>
 
           <CheckboxRow
+            label={acknowledgementLL.certifyAccuracy()}
             isChecked={isAccuracyCertified}
             onPress={() => setIsAccuracyCertified(!isAccuracyCertified)}
             gap={CHECKBOX_GAP}
             labelLineHeight={CHECKBOX_LINE_HEIGHT}
-          >
-            {acknowledgementLL.certifyAccuracy()}
-          </CheckboxRow>
+          />
 
           <CheckboxRow
+            label={acknowledgementLL.acknowledgeSolicitation()}
             isChecked={isSolicitationAcknowledged}
             onPress={() => setIsSolicitationAcknowledged(!isSolicitationAcknowledged)}
             gap={CHECKBOX_GAP}
             labelLineHeight={CHECKBOX_LINE_HEIGHT}
-          >
-            {acknowledgementLL.acknowledgeSolicitation()}
-          </CheckboxRow>
+          />
         </View>
       </View>
     </StepLayout>

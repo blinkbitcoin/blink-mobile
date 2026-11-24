@@ -1,5 +1,5 @@
 import React from "react"
-import { render, fireEvent, act } from "@testing-library/react-native"
+import { render, fireEvent, act, within } from "@testing-library/react-native"
 import InAppBrowser from "react-native-inappbrowser-reborn"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
@@ -314,8 +314,11 @@ describe("CardAcknowledgementScreen", () => {
     expect(queryByText("Accept")).toBeNull()
   })
 
-  it("opens the e-sign consent link when pressed", async () => {
-    const { getByText } = render(
+  /** A screen reader reaches what a box sits inside of as one element, so each document
+   *  link has to stand beside its box to be read and opened on its own. */
+  it("opens the e-sign consent from a link of its own, without ticking its box", async () => {
+    const eSignBox = { name: "I accept the E-Sign Consent" }
+    const { getByRole } = render(
       <ContextForScreen>
         <CardAcknowledgementScreen />
       </ContextForScreen>,
@@ -323,15 +326,21 @@ describe("CardAcknowledgementScreen", () => {
 
     await act(async () => {})
 
+    expect(within(getByRole("checkbox", eSignBox)).queryByRole("link")).toBeNull()
+
     await act(async () => {
-      fireEvent.press(getByText("E-Sign Consent"))
+      fireEvent.press(getByRole("link", { name: "E-Sign Consent" }))
     })
 
     expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/e-sign")
+    expect(getByRole("checkbox", { ...eSignBox, checked: false })).toBeTruthy()
   })
 
-  it("opens the privacy policy and card terms links when pressed", async () => {
-    const { getByText } = render(
+  it("opens the privacy policy and card terms from links of their own, without ticking their box", async () => {
+    const privacyAndTermsBox = {
+      name: "I accept the Issuer’s Privacy Policy, and Blink Card Terms",
+    }
+    const { getByRole } = render(
       <ContextForScreen>
         <CardAcknowledgementScreen />
       </ContextForScreen>,
@@ -339,12 +348,17 @@ describe("CardAcknowledgementScreen", () => {
 
     await act(async () => {})
 
+    expect(
+      within(getByRole("checkbox", privacyAndTermsBox)).queryByRole("link"),
+    ).toBeNull()
+
     await act(async () => {
-      fireEvent.press(getByText("Issuer’s Privacy Policy"))
-      fireEvent.press(getByText("Blink Card Terms"))
+      fireEvent.press(getByRole("link", { name: "Issuer’s Privacy Policy" }))
+      fireEvent.press(getByRole("link", { name: "Blink Card Terms" }))
     })
 
     expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/privacy")
     expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/terms")
+    expect(getByRole("checkbox", { ...privacyAndTermsBox, checked: false })).toBeTruthy()
   })
 })

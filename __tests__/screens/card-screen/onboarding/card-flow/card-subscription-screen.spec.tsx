@@ -1,5 +1,5 @@
 import React from "react"
-import { render, fireEvent, act } from "@testing-library/react-native"
+import { render, fireEvent, act, within } from "@testing-library/react-native"
 import InAppBrowser from "react-native-inappbrowser-reborn"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
@@ -177,14 +177,22 @@ describe("CardSubscriptionScreen - paid offer", () => {
     expect(getAllByRole("checkbox", { checked: false })).toHaveLength(2)
   })
 
-  it("navigates to the fee schedule screen when the link is pressed", async () => {
-    const { getByText } = await renderScreen()
+  /** A screen reader reaches what the box sits inside of as one element, so the link has
+   *  to stand beside the box to be read and opened on its own. */
+  it("opens the fee schedule from a link of its own, without ticking its box", async () => {
+    const feeScheduleBox = {
+      name: "I have reviewed and agree to the Blink Card Fee Schedule",
+    }
+    const { getByRole } = await renderScreen()
+
+    expect(within(getByRole("checkbox", feeScheduleBox)).queryByRole("link")).toBeNull()
 
     await act(async () => {
-      fireEvent.press(getByText("Blink Card Fee Schedule"))
+      fireEvent.press(getByRole("link", { name: "Blink Card Fee Schedule" }))
     })
 
     expect(mockNavigate).toHaveBeenCalledWith("cardFeeScheduleScreen")
+    expect(getByRole("checkbox", { ...feeScheduleBox, checked: false })).toBeTruthy()
   })
 
   it("button is disabled when no checkbox is checked", async () => {
@@ -340,17 +348,23 @@ describe("CardSubscriptionScreen - payment variant", () => {
     expect(consoleLogSpy).toHaveBeenCalledWith("TODO: payment flow")
   })
 
-  it("opens the agreement links when pressed", async () => {
-    const { getByText } = await renderScreen()
+  it("opens each agreement from a link of its own, without ticking the box", async () => {
+    const agreementBox = {
+      name: "I agree to the Terms of Service, Privacy Policy, and Cardholder Agreement",
+    }
+    const { getByRole } = await renderScreen()
+
+    expect(within(getByRole("checkbox", agreementBox)).queryByRole("link")).toBeNull()
 
     await act(async () => {
-      fireEvent.press(getByText("Terms of Service"))
-      fireEvent.press(getByText("Privacy Policy"))
-      fireEvent.press(getByText("Cardholder Agreement"))
+      fireEvent.press(getByRole("link", { name: "Terms of Service" }))
+      fireEvent.press(getByRole("link", { name: "Privacy Policy" }))
+      fireEvent.press(getByRole("link", { name: "Cardholder Agreement" }))
     })
 
     expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/terms")
     expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/privacy")
     expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/cardholder")
+    expect(getByRole("checkbox", { ...agreementBox, checked: false })).toBeTruthy()
   })
 })

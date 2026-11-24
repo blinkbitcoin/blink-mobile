@@ -1,6 +1,7 @@
 import React from "react"
 import { StyleSheet, Text as RNText, View } from "react-native"
-import { render, fireEvent } from "@testing-library/react-native"
+import { render, fireEvent, within } from "@testing-library/react-native"
+import type { ReactTestRendererJSON } from "react-test-renderer"
 
 import { CheckboxRow } from "@app/components/checkbox-row"
 
@@ -157,21 +158,99 @@ describe("CheckboxRow", () => {
     })
   })
 
+  /** A screen reader reads whatever sits inside an accessible element as that element, so
+   *  a link inside the checkbox could be neither reached nor opened on its own. */
   describe("rich label", () => {
-    it("sets the inline parts in the label's text, and a part keeps its own press", () => {
-      const onLinkPress = jest.fn()
-      const { getByText } = render(
-        <CheckboxRow isChecked={false} onPress={defaultProps.onPress}>
-          I agree to the <RNText onPress={onLinkPress}>Fee Schedule</RNText>
+    const onLinkPress = jest.fn()
+    /** The row is the rendered tree's root: the box and the label are its children. */
+    const rowOf = (tree: ReturnType<ReturnType<typeof render>["toJSON"]>) =>
+      tree as ReactTestRendererJSON
+    const renderRichRow = (props: { isChecked?: boolean; disabled?: boolean } = {}) =>
+      render(
+        <CheckboxRow
+          isChecked={props.isChecked ?? false}
+          disabled={props.disabled}
+          onPress={defaultProps.onPress}
+          accessibilityLabel="I agree to the Fee Schedule"
+          gap={14}
+          labelLineHeight={16}
+          testID="fee-schedule-box"
+        >
+          I agree to the{" "}
+          <RNText accessibilityRole="link" onPress={onLinkPress}>
+            Fee Schedule
+          </RNText>
         </CheckboxRow>,
       )
 
-      expect(getByText("I agree to the Fee Schedule")).toBeTruthy()
+    it("names the box after the whole label", () => {
+      const { getByRole } = renderRichRow()
 
-      fireEvent.press(getByText("Fee Schedule"))
+      expect(getByRole("checkbox", { name: "I agree to the Fee Schedule" })).toBeTruthy()
+    })
+
+    it("sets the label beside the box, with each link as an element of its own", () => {
+      const { getByRole, getByText } = renderRichRow()
+
+      const checkbox = getByRole("checkbox")
+      expect(within(checkbox).queryByRole("link")).toBeNull()
+      expect(within(checkbox).queryByText(/Fee Schedule/)).toBeNull()
+      expect(getByRole("link", { name: "Fee Schedule" })).toBeTruthy()
+      expect(getByText("I agree to the Fee Schedule")).toBeTruthy()
+    })
+
+    it("opens a link without toggling the box", () => {
+      const { getByRole } = renderRichRow()
+
+      fireEvent.press(getByRole("link", { name: "Fee Schedule" }))
 
       expect(onLinkPress).toHaveBeenCalledTimes(1)
       expect(defaultProps.onPress).not.toHaveBeenCalled()
+    })
+
+    it("toggles from the box alone, without opening a link", () => {
+      const { getByTestId } = renderRichRow()
+
+      fireEvent.press(getByTestId("fee-schedule-box"))
+
+      expect(defaultProps.onPress).toHaveBeenCalledTimes(1)
+      expect(onLinkPress).not.toHaveBeenCalled()
+    })
+
+    it("reports whether the box is checked", () => {
+      const { getByRole } = renderRichRow({ isChecked: true })
+
+      expect(getByRole("checkbox", { checked: true })).toBeTruthy()
+      expect(getByRole("checkbox").props.accessibilityState).toEqual({
+        checked: true,
+        disabled: undefined,
+      })
+    })
+
+    it("grows the box's touch target to 44 points", () => {
+      const { getByRole } = renderRichRow()
+
+      expect(getByRole("checkbox").props.hitSlop).toBe(12)
+    })
+
+    it("keeps the row's spacing and the label's line height", () => {
+      const { toJSON, getByText } = renderRichRow()
+
+      expect(StyleSheet.flatten(rowOf(toJSON()).props.style)).toMatchObject({ gap: 14 })
+      expect(
+        StyleSheet.flatten(getByText("I agree to the Fee Schedule").props.style),
+      ).toMatchObject({ lineHeight: 16 })
+    })
+
+    it("fades the row and refuses the box's presses when disabled", () => {
+      const { getByRole, toJSON } = renderRichRow({ disabled: true })
+
+      fireEvent.press(getByRole("checkbox", { disabled: true }))
+
+      expect(defaultProps.onPress).not.toHaveBeenCalled()
+      expect(StyleSheet.flatten(rowOf(toJSON()).props.style)).toMatchObject({
+        opacity: 0.5,
+      })
     })
   })
 

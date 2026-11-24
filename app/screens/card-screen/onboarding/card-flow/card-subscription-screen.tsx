@@ -74,6 +74,12 @@ export const CardSubscriptionScreen: React.FC = () => {
         months: SUBSCRIPTION_RENEWAL_MONTHS,
       })
 
+  /** What a screen reader names each box whose label carries links. */
+  const feeScheduleLL = LL.CardFlow.Onboarding.CardSubscription.feeSchedule
+  const feeScheduleLabel = `${feeScheduleLL.text()} ${feeScheduleLL.linkText()}`
+  const agreementLL = LL.CardFlow.Onboarding.CardSubscription.agreement
+  const agreementLabel = `${agreementLL.text()} ${agreementLL.termsOfService()}, ${agreementLL.privacyPolicy()}, ${agreementLL.and()} ${agreementLL.cardholderAgreement()}`
+
   const toggleNotice = () => setAcceptedNotice(isNoticeAccepted ? null : notice)
 
   const handleAccept = () => {
@@ -105,27 +111,28 @@ export const CardSubscriptionScreen: React.FC = () => {
         {isSubscribeVariant && (
           <>
             <CheckboxRow
+              label={noticeText}
               isChecked={isNoticeAccepted}
               onPress={toggleNotice}
               gap={CHECKBOX_GAP}
               labelLineHeight={CHECKBOX_LINE_HEIGHT}
-            >
-              {noticeText}
-            </CheckboxRow>
+            />
 
             <CheckboxRow
               isChecked={isFeeScheduleAgreed}
               onPress={() => setIsFeeScheduleAgreed(!isFeeScheduleAgreed)}
+              accessibilityLabel={feeScheduleLabel}
               gap={CHECKBOX_GAP}
               labelLineHeight={CHECKBOX_LINE_HEIGHT}
             >
-              {LL.CardFlow.Onboarding.CardSubscription.feeSchedule.text()}{" "}
+              {feeScheduleLL.text()}{" "}
               <Text
                 bold
                 color={colors.accent}
+                accessibilityRole="link"
                 onPress={() => navigation.navigate("cardFeeScheduleScreen")}
               >
-                {LL.CardFlow.Onboarding.CardSubscription.feeSchedule.linkText()}
+                {feeScheduleLL.linkText()}
               </Text>
             </CheckboxRow>
           </>
@@ -135,32 +142,36 @@ export const CardSubscriptionScreen: React.FC = () => {
           <CheckboxRow
             isChecked={isAgreed}
             onPress={() => setIsAgreed(!isAgreed)}
+            accessibilityLabel={agreementLabel}
             gap={CHECKBOX_GAP}
             labelLineHeight={CHECKBOX_LINE_HEIGHT}
           >
-            {LL.CardFlow.Onboarding.CardSubscription.agreement.text()}{" "}
+            {agreementLL.text()}{" "}
             <Text
               bold
               color={colors.accent}
+              accessibilityRole="link"
               onPress={() => openExternalUrl(cardTermsAndConditionsUrl)}
             >
-              {LL.CardFlow.Onboarding.CardSubscription.agreement.termsOfService()}
+              {agreementLL.termsOfService()}
             </Text>
             ,{" "}
             <Text
               bold
               color={colors.accent}
+              accessibilityRole="link"
               onPress={() => openExternalUrl(cardPrivacyPolicyUrl)}
             >
-              {LL.CardFlow.Onboarding.CardSubscription.agreement.privacyPolicy()}
+              {agreementLL.privacyPolicy()}
             </Text>
-            , {LL.CardFlow.Onboarding.CardSubscription.agreement.and()}{" "}
+            , {agreementLL.and()}{" "}
             <Text
               bold
               color={colors.accent}
+              accessibilityRole="link"
               onPress={() => openExternalUrl(cardCardholderAgreementUrl)}
             >
-              {LL.CardFlow.Onboarding.CardSubscription.agreement.cardholderAgreement()}
+              {agreementLL.cardholderAgreement()}
             </Text>
           </CheckboxRow>
         )}
