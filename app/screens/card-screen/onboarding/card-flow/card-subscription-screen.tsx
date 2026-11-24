@@ -6,8 +6,8 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { SubscriptionOfferCard } from "@app/components/card-screen"
-import { CheckboxRow } from "@app/components/card-screen/checkbox-row"
-import { Screen } from "@app/components/screen"
+import { CheckboxRow } from "@app/components/checkbox-row"
+import { StepLayout } from "@app/components/step-layout"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -19,6 +19,10 @@ import {
 } from "./use-subscription-offer"
 
 const SUBSCRIBE_ROUTE: keyof RootStackParamList = "cardOnboardingSubscribeScreen"
+
+/** The design's checkbox row: 14 between the box and its text, set at 14/16. */
+const CHECKBOX_GAP = 14
+const CHECKBOX_LINE_HEIGHT = 16
 
 const Notice = {
   Free: "free",
@@ -50,9 +54,7 @@ export const CardSubscriptionScreen: React.FC = () => {
   const [isFeeScheduleAgreed, setIsFeeScheduleAgreed] = React.useState(false)
   const [isAgreed, setIsAgreed] = React.useState(false)
 
-  /** Accept starts the card KYC, so the terms, the privacy policy and the cardholder
-   *  agreement are accepted here first: no later step may be the first to ask for them. */
-  const isSubscribeReady = isNoticeAccepted && isFeeScheduleAgreed && isAgreed
+  const isSubscribeReady = isNoticeAccepted && isFeeScheduleAgreed
   const isAcceptDisabled = isSubscribeVariant ? !isSubscribeReady : !isAgreed
 
   /** The free offer has nothing to subscribe to yet, so its header carries no title. Set
@@ -72,6 +74,9 @@ export const CardSubscriptionScreen: React.FC = () => {
         months: SUBSCRIPTION_RENEWAL_MONTHS,
       })
 
+  const feeScheduleLL = LL.CardFlow.Onboarding.CardSubscription.feeSchedule
+  const agreementLL = LL.CardFlow.Onboarding.CardSubscription.agreement
+
   const toggleNotice = () => setAcceptedNotice(isNoticeAccepted ? null : notice)
 
   const handleAccept = () => {
@@ -84,69 +89,8 @@ export const CardSubscriptionScreen: React.FC = () => {
   }
 
   return (
-    <Screen>
-      <View style={styles.contentContainer}>
-        <SubscriptionOfferCard {...offerCard} />
-
-        {isSubscribeVariant && (
-          <>
-            <CheckboxRow checked={isNoticeAccepted} onPress={toggleNotice}>
-              <Text type="p3" style={styles.agreementText}>
-                {noticeText}
-              </Text>
-            </CheckboxRow>
-
-            <CheckboxRow
-              checked={isFeeScheduleAgreed}
-              onPress={() => setIsFeeScheduleAgreed(!isFeeScheduleAgreed)}
-            >
-              <Text type="p3" style={styles.agreementText}>
-                {LL.CardFlow.Onboarding.CardSubscription.feeSchedule.text()}{" "}
-                <Text
-                  type="p3"
-                  bold
-                  color={colors.accent}
-                  style={styles.agreementText}
-                  onPress={() => navigation.navigate("cardFeeScheduleScreen")}
-                >
-                  {LL.CardFlow.Onboarding.CardSubscription.feeSchedule.linkText()}
-                </Text>
-              </Text>
-            </CheckboxRow>
-          </>
-        )}
-
-        <CheckboxRow checked={isAgreed} onPress={() => setIsAgreed(!isAgreed)}>
-          <Text type="p3" style={styles.agreementText}>
-            {LL.CardFlow.Onboarding.CardSubscription.agreement.text()}{" "}
-            <Text
-              bold
-              color={colors.accent}
-              onPress={() => openExternalUrl(cardTermsAndConditionsUrl)}
-            >
-              {LL.CardFlow.Onboarding.CardSubscription.agreement.termsOfService()}
-            </Text>
-            ,{" "}
-            <Text
-              bold
-              color={colors.accent}
-              onPress={() => openExternalUrl(cardPrivacyPolicyUrl)}
-            >
-              {LL.CardFlow.Onboarding.CardSubscription.agreement.privacyPolicy()}
-            </Text>
-            , {LL.CardFlow.Onboarding.CardSubscription.agreement.and()}{" "}
-            <Text
-              bold
-              color={colors.accent}
-              onPress={() => openExternalUrl(cardCardholderAgreementUrl)}
-            >
-              {LL.CardFlow.Onboarding.CardSubscription.agreement.cardholderAgreement()}
-            </Text>
-          </Text>
-        </CheckboxRow>
-      </View>
-
-      <View style={styles.buttonsContainer}>
+    <StepLayout
+      footer={
         <GaloyPrimaryButton
           title={
             isSubscribeVariant
@@ -156,25 +100,85 @@ export const CardSubscriptionScreen: React.FC = () => {
           onPress={handleAccept}
           disabled={isAcceptDisabled}
         />
+      }
+    >
+      <View style={styles.content}>
+        <SubscriptionOfferCard {...offerCard} />
+
+        {isSubscribeVariant && (
+          <>
+            <CheckboxRow
+              label={noticeText}
+              isChecked={isNoticeAccepted}
+              onPress={toggleNotice}
+              gap={CHECKBOX_GAP}
+              labelLineHeight={CHECKBOX_LINE_HEIGHT}
+            />
+
+            <CheckboxRow
+              isChecked={isFeeScheduleAgreed}
+              onPress={() => setIsFeeScheduleAgreed(!isFeeScheduleAgreed)}
+              gap={CHECKBOX_GAP}
+              labelLineHeight={CHECKBOX_LINE_HEIGHT}
+            >
+              {feeScheduleLL.text()}{" "}
+              <Text
+                bold
+                color={colors.accent}
+                accessibilityRole="link"
+                onPress={() => navigation.navigate("cardFeeScheduleScreen")}
+              >
+                {feeScheduleLL.linkText()}
+              </Text>
+            </CheckboxRow>
+          </>
+        )}
+
+        {!isSubscribeVariant && (
+          <CheckboxRow
+            isChecked={isAgreed}
+            onPress={() => setIsAgreed(!isAgreed)}
+            gap={CHECKBOX_GAP}
+            labelLineHeight={CHECKBOX_LINE_HEIGHT}
+          >
+            {agreementLL.text()}{" "}
+            <Text
+              bold
+              color={colors.accent}
+              accessibilityRole="link"
+              onPress={() => openExternalUrl(cardTermsAndConditionsUrl)}
+            >
+              {agreementLL.termsOfService()}
+            </Text>
+            ,{" "}
+            <Text
+              bold
+              color={colors.accent}
+              accessibilityRole="link"
+              onPress={() => openExternalUrl(cardPrivacyPolicyUrl)}
+            >
+              {agreementLL.privacyPolicy()}
+            </Text>
+            , {agreementLL.and()}{" "}
+            <Text
+              bold
+              color={colors.accent}
+              accessibilityRole="link"
+              onPress={() => openExternalUrl(cardCardholderAgreementUrl)}
+            >
+              {agreementLL.cardholderAgreement()}
+            </Text>
+          </CheckboxRow>
+        )}
       </View>
-    </Screen>
+    </StepLayout>
   )
 }
 
 const useStyles = makeStyles(() => ({
-  contentContainer: {
-    flex: 1,
+  content: {
     paddingHorizontal: 20,
-    paddingTop: 30,
+    paddingTop: 10,
     gap: 20,
-  },
-  agreementText: {
-    lineHeight: 16,
-  },
-  buttonsContainer: {
-    justifyContent: "flex-end",
-    marginBottom: 14,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
   },
 }))

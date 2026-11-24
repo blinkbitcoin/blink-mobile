@@ -1,6 +1,8 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import theme from "@app/rne-theme/theme"
 
 import { CardPreapprovedScreen } from "@app/screens/card-screen/onboarding/card-flow/preapproved-screen"
 import { ContextForScreen } from "../../../helper"
@@ -11,14 +13,14 @@ jest.mock("@app/components/confetti", () => {
   return { Confetti: () => <View testID="confetti" /> }
 })
 
-const mockNavigate = jest.fn()
+const mockPopTo = jest.fn()
 
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
   return {
     ...actualNav,
     useNavigation: () => ({
-      navigate: mockNavigate,
+      popTo: mockPopTo,
     }),
   }
 })
@@ -54,6 +56,26 @@ describe("CardPreapprovedScreen", () => {
     expect(getByText("You can now activate your card and start using it")).toBeTruthy()
   })
 
+  it("sets the subtitle as the design's secondary paragraph", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardPreapprovedScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(
+      StyleSheet.flatten(
+        getByText("You can now activate your card and start using it").props.style,
+      ),
+    ).toMatchObject({
+      fontSize: 14,
+      lineHeight: 18,
+      color: theme.lightColors?.textSecondary,
+    })
+  })
+
   it("displays continue button", async () => {
     const { getByText } = render(
       <ContextForScreen>
@@ -78,7 +100,7 @@ describe("CardPreapprovedScreen", () => {
     expect(getByTestId("confetti")).toBeTruthy()
   })
 
-  it("navigates to Primary on button press", async () => {
+  it("goes back to the Home under it on Close, rather than stacking another", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <CardPreapprovedScreen />
@@ -92,6 +114,6 @@ describe("CardPreapprovedScreen", () => {
       fireEvent.press(button)
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("Primary")
+    expect(mockPopTo).toHaveBeenCalledWith("Primary")
   })
 })

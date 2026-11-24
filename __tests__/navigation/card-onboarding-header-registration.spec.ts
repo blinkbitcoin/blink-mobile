@@ -29,7 +29,6 @@ describe("card onboarding header controls in root-navigator", () => {
     const CLOSE_ONLY_ROUTES = [
       "cardOnboardingWelcomeScreen",
       "cardOnboardingPersonalInfoScreen",
-      "cardOnboardingPreapprovedScreen",
     ]
 
     CLOSE_ONLY_ROUTES.forEach((route) => {
@@ -37,6 +36,22 @@ describe("card onboarding header controls in root-navigator", () => {
 
       expect(options).toContain("...noHeaderBack")
       expect(options).toContain("...headerCloseControlOptions()")
+    })
+  })
+
+  /** The wait replaced itself with the outcome over the Home, so the X pops back to that
+   *  Home, as the footer does, instead of stacking a second one. */
+  it("closes the outcome screens onto the Home under them", () => {
+    const OUTCOME_ROUTES = [
+      "cardOnboardingPreapprovedScreen",
+      "cardOnboardingDeclinedScreen",
+    ]
+
+    OUTCOME_ROUTES.forEach((route) => {
+      const options = registration(route)
+
+      expect(options).toContain("...noHeaderBack")
+      expect(options).toContain("...headerCloseControlOptions({ shouldPopTo: true })")
     })
   })
 
@@ -53,6 +68,22 @@ describe("card onboarding header controls in root-navigator", () => {
       expect(options).not.toContain("noHeaderBack")
       expect(options).toContain("...headerCloseControlOptions()")
     })
+  })
+
+  /** The design leaves the wait without a way back or out: it ends on its own. */
+  it("leaves the processing wait without a header, so without back and close buttons", () => {
+    const options = registration("cardOnboardingProcessingScreen")
+
+    expect(options).toContain("headerShown: false")
+    expect(options).not.toContain("headerCloseControlOptions")
+  })
+
+  /** The native stack cannot refuse the swipe once it starts, so the route switches it
+   *  off and the screen refuses the hardware back itself. */
+  it("switches the swipe off on the processing wait", () => {
+    expect(registration("cardOnboardingProcessingScreen")).toContain(
+      "gestureEnabled: false",
+    )
   })
 
   /** An unset title would fall back to the route name. */

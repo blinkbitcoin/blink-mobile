@@ -1,14 +1,10 @@
 import React from "react"
-import { render, fireEvent, act } from "@testing-library/react-native"
+import { render, fireEvent, act, within } from "@testing-library/react-native"
 import InAppBrowser from "react-native-inappbrowser-reborn"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardSubscriptionScreen } from "@app/screens/card-screen/onboarding/card-flow/card-subscription-screen"
 import { ContextForScreen } from "../../../helper"
-
-jest.mock("@rn-vui/themed", () =>
-  jest.requireActual("../../../../helpers/card-flow-mocks").mockThemedWithCheckbox(),
-)
 
 const mockNavigate = jest.fn()
 const mockSetOptions = jest.fn()
@@ -75,12 +71,6 @@ afterEach(() => {
 
 const NOTICE_CHECKBOX_INDEX = 0
 const FEE_SCHEDULE_CHECKBOX_INDEX = 1
-const AGREEMENT_CHECKBOX_INDEX = 2
-const ALL_SUBSCRIBE_CHECKBOXES = [
-  NOTICE_CHECKBOX_INDEX,
-  FEE_SCHEDULE_CHECKBOX_INDEX,
-  AGREEMENT_CHECKBOX_INDEX,
-]
 
 const renderScreen = async () => {
   const screen = render(
@@ -93,10 +83,10 @@ const renderScreen = async () => {
 }
 
 const checkBoxes = async (
-  getAllByTestId: (id: string) => ReturnType<typeof render>["root"][],
+  getAllByRole: ReturnType<typeof render>["getAllByRole"],
   indexes: number[],
 ) => {
-  const unchecked = getAllByTestId("checkbox-unchecked")
+  const unchecked = getAllByRole("checkbox", { checked: false })
   await act(async () => {
     indexes.forEach((index) => fireEvent.press(unchecked[index]))
   })
@@ -136,21 +126,10 @@ describe("CardSubscriptionScreen - free offer", () => {
     expect(mockSetOptions).toHaveBeenCalledWith({ title: "" })
   })
 
-  it("keeps the identity check closed until the agreements are accepted", async () => {
-    const { getByText, getAllByTestId } = await renderScreen()
+  it("opens the identity check once both checkboxes are accepted", async () => {
+    const { getByText, getAllByRole } = await renderScreen()
 
-    await checkBoxes(getAllByTestId, [NOTICE_CHECKBOX_INDEX, FEE_SCHEDULE_CHECKBOX_INDEX])
-    await act(async () => {
-      fireEvent.press(getByText("Accept"))
-    })
-
-    expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
-  })
-
-  it("opens the identity check once every checkbox is accepted", async () => {
-    const { getByText, getAllByTestId } = await renderScreen()
-
-    await checkBoxes(getAllByTestId, ALL_SUBSCRIBE_CHECKBOXES)
+    await checkBoxes(getAllByRole, [NOTICE_CHECKBOX_INDEX, FEE_SCHEDULE_CHECKBOX_INDEX])
     await act(async () => {
       fireEvent.press(getByText("Accept"))
     })
@@ -190,38 +169,46 @@ describe("CardSubscriptionScreen - paid offer", () => {
     ).toBeTruthy()
   })
 
-  /** Accept starts the card KYC, so the agreements are asked for before it. */
-  it("asks to accept the agreements on this step", async () => {
-    const { getByText, getAllByTestId } = await renderScreen()
+  /** The terms moved to the acknowledgement step at the end of the flow. */
+  it("leaves the terms out of this step", async () => {
+    const { queryByText, getAllByRole } = await renderScreen()
 
-    expect(getByText("Terms of Service")).toBeTruthy()
-    expect(getByText("Privacy Policy")).toBeTruthy()
-    expect(getByText("Cardholder Agreement")).toBeTruthy()
-    expect(getAllByTestId("checkbox-unchecked")).toHaveLength(3)
+    expect(queryByText("Terms of Service")).toBeNull()
+    expect(getAllByRole("checkbox", { checked: false })).toHaveLength(2)
   })
 
-  it("opens the agreement links when pressed", async () => {
-    const { getByText } = await renderScreen()
+  /** A screen reader reaches what the box sits inside of as one element, so the link has
+   *  to stand beside the box to be read and opened on its own. */
+  it("opens the fee schedule from a link of its own, without ticking its box", async () => {
+    const feeScheduleBox = {
+      name: "I have reviewed and agree to the Blink Card Fee Schedule",
+    }
+    const { getByRole } = await renderScreen()
+
+    expect(within(getByRole("checkbox", feeScheduleBox)).queryByRole("link")).toBeNull()
 
     await act(async () => {
-      fireEvent.press(getByText("Terms of Service"))
-      fireEvent.press(getByText("Privacy Policy"))
-      fireEvent.press(getByText("Cardholder Agreement"))
-    })
-
-    expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/terms")
-    expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/privacy")
-    expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/cardholder")
-  })
-
-  it("navigates to the fee schedule screen when the link is pressed", async () => {
-    const { getByText } = await renderScreen()
-
-    await act(async () => {
-      fireEvent.press(getByText("Blink Card Fee Schedule"))
+      fireEvent.press(getByRole("link", { name: "Blink Card Fee Schedule" }))
     })
 
     expect(mockNavigate).toHaveBeenCalledWith("cardFeeScheduleScreen")
+    expect(getByRole("checkbox", { ...feeScheduleBox, checked: false })).toBeTruthy()
+  })
+
+  /** The box alone is a small target, so its prose ticks it too. */
+  it("ticks the fee schedule box from its prose as well", async () => {
+    const feeScheduleBox = {
+      name: "I have reviewed and agree to the Blink Card Fee Schedule",
+    }
+    const { getByRole, getByText } = await renderScreen()
+
+    const prose = getByText("I have reviewed and agree to the Blink Card Fee Schedule")
+    expect(prose.props.onPress).toEqual(expect.any(Function))
+    await act(async () => {
+      fireEvent.press(prose)
+    })
+
+    expect(getByRole("checkbox", { ...feeScheduleBox, checked: true })).toBeTruthy()
   })
 
   it("button is disabled when no checkbox is checked", async () => {
@@ -235,9 +222,9 @@ describe("CardSubscriptionScreen - paid offer", () => {
   })
 
   it("keeps the button disabled when only the renew checkbox is checked", async () => {
-    const { getByText, getAllByTestId } = await renderScreen()
+    const { getByText, getAllByRole } = await renderScreen()
 
-    await checkBoxes(getAllByTestId, [NOTICE_CHECKBOX_INDEX])
+    await checkBoxes(getAllByRole, [NOTICE_CHECKBOX_INDEX])
     await act(async () => {
       fireEvent.press(getByText("Accept"))
     })
@@ -246,9 +233,9 @@ describe("CardSubscriptionScreen - paid offer", () => {
   })
 
   it("keeps the button disabled when only the fee schedule checkbox is checked", async () => {
-    const { getByText, getAllByTestId } = await renderScreen()
+    const { getByText, getAllByRole } = await renderScreen()
 
-    await checkBoxes(getAllByTestId, [FEE_SCHEDULE_CHECKBOX_INDEX])
+    await checkBoxes(getAllByRole, [FEE_SCHEDULE_CHECKBOX_INDEX])
     await act(async () => {
       fireEvent.press(getByText("Accept"))
     })
@@ -256,33 +243,10 @@ describe("CardSubscriptionScreen - paid offer", () => {
     expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
   })
 
-  it("keeps the button disabled when only the agreements are accepted", async () => {
-    const { getByText, getAllByTestId } = await renderScreen()
+  it("opens the identity check once renewal and fee schedule are accepted", async () => {
+    const { getByText, getAllByRole } = await renderScreen()
 
-    await checkBoxes(getAllByTestId, [AGREEMENT_CHECKBOX_INDEX])
-    await act(async () => {
-      fireEvent.press(getByText("Accept"))
-    })
-
-    expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
-  })
-
-  /** Accept starts the card KYC: renewal and fee schedule alone never reach it. */
-  it("keeps the identity check closed until the agreements are accepted", async () => {
-    const { getByText, getAllByTestId } = await renderScreen()
-
-    await checkBoxes(getAllByTestId, [NOTICE_CHECKBOX_INDEX, FEE_SCHEDULE_CHECKBOX_INDEX])
-    await act(async () => {
-      fireEvent.press(getByText("Accept"))
-    })
-
-    expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
-  })
-
-  it("opens the identity check once renewal, fee schedule and agreements are accepted", async () => {
-    const { getByText, getAllByTestId } = await renderScreen()
-
-    await checkBoxes(getAllByTestId, ALL_SUBSCRIBE_CHECKBOXES)
+    await checkBoxes(getAllByRole, [NOTICE_CHECKBOX_INDEX, FEE_SCHEDULE_CHECKBOX_INDEX])
     await act(async () => {
       fireEvent.press(getByText("Accept"))
     })
@@ -291,17 +255,17 @@ describe("CardSubscriptionScreen - paid offer", () => {
   })
 
   it("unchecks a checkbox when pressed again", async () => {
-    const { getByText, getAllByTestId, getByTestId } = await renderScreen()
+    const { getByText, getAllByRole, getByRole } = await renderScreen()
 
-    await checkBoxes(getAllByTestId, ALL_SUBSCRIBE_CHECKBOXES)
+    await checkBoxes(getAllByRole, [NOTICE_CHECKBOX_INDEX, FEE_SCHEDULE_CHECKBOX_INDEX])
     await act(async () => {
-      fireEvent.press(getAllByTestId("checkbox-checked")[NOTICE_CHECKBOX_INDEX])
+      fireEvent.press(getAllByRole("checkbox", { checked: true })[NOTICE_CHECKBOX_INDEX])
     })
     await act(async () => {
       fireEvent.press(getByText("Accept"))
     })
 
-    expect(getByTestId("checkbox-unchecked")).toBeTruthy()
+    expect(getByRole("checkbox", { checked: false })).toBeTruthy()
     expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
   })
 })
@@ -335,19 +299,19 @@ describe("CardSubscriptionScreen - price change while mounted", () => {
   priceChanges.forEach(({ from, to, fromPriceUsd, toPriceUsd }) => {
     it(`asks again for the notice when the offer turns from ${from} to ${to}`, async () => {
       mockPriceUsd = fromPriceUsd
-      const { getByText, getAllByTestId, getByTestId, rerender } = await renderScreen()
+      const { getByText, getAllByRole, getByRole, rerender } = await renderScreen()
 
-      await checkBoxes(getAllByTestId, ALL_SUBSCRIBE_CHECKBOXES)
+      await checkBoxes(getAllByRole, [NOTICE_CHECKBOX_INDEX, FEE_SCHEDULE_CHECKBOX_INDEX])
       await changePrice(rerender, toPriceUsd)
       await act(async () => {
         fireEvent.press(getByText("Accept"))
       })
 
-      expect(getAllByTestId("checkbox-unchecked")).toHaveLength(1)
+      expect(getAllByRole("checkbox", { checked: false })).toHaveLength(1)
       expect(mockNavigate).not.toHaveBeenCalledWith("cardOnboardingVerifyIdentityScreen")
 
       await act(async () => {
-        fireEvent.press(getByTestId("checkbox-unchecked"))
+        fireEvent.press(getByRole("checkbox", { checked: false }))
       })
       await act(async () => {
         fireEvent.press(getByText("Accept"))
@@ -387,10 +351,10 @@ describe("CardSubscriptionScreen - payment variant", () => {
   })
 
   it("logs the pending payment flow instead of opening the identity check", async () => {
-    const { getByText, getByTestId } = await renderScreen()
+    const { getByText, getByRole } = await renderScreen()
 
     await act(async () => {
-      fireEvent.press(getByTestId("checkbox-unchecked"))
+      fireEvent.press(getByRole("checkbox", { checked: false }))
     })
     await act(async () => {
       fireEvent.press(getByText("Continue & Pay"))
@@ -400,17 +364,23 @@ describe("CardSubscriptionScreen - payment variant", () => {
     expect(consoleLogSpy).toHaveBeenCalledWith("TODO: payment flow")
   })
 
-  it("opens the agreement links when pressed", async () => {
-    const { getByText } = await renderScreen()
+  it("opens each agreement from a link of its own, without ticking the box", async () => {
+    const agreementBox = {
+      name: "I agree to the Terms of Service, Privacy Policy, and Cardholder Agreement",
+    }
+    const { getByRole } = await renderScreen()
+
+    expect(within(getByRole("checkbox", agreementBox)).queryByRole("link")).toBeNull()
 
     await act(async () => {
-      fireEvent.press(getByText("Terms of Service"))
-      fireEvent.press(getByText("Privacy Policy"))
-      fireEvent.press(getByText("Cardholder Agreement"))
+      fireEvent.press(getByRole("link", { name: "Terms of Service" }))
+      fireEvent.press(getByRole("link", { name: "Privacy Policy" }))
+      fireEvent.press(getByRole("link", { name: "Cardholder Agreement" }))
     })
 
     expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/terms")
     expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/privacy")
     expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/cardholder")
+    expect(getByRole("checkbox", { ...agreementBox, checked: false })).toBeTruthy()
   })
 })

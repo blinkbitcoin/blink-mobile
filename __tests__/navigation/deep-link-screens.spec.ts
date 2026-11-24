@@ -62,6 +62,43 @@ describe("deep-linkable routes", () => {
   })
 
   /**
+   * The terms step sends the additional data it is handed with the card application,
+   * and the wait follows the application it is handed. A crafted link would fill in the
+   * application's answers, or open the wait with nothing to follow. Both are reached
+   * from the step before them alone.
+   */
+  it("links to no card application step that acts on its params", () => {
+    expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingAcknowledgementScreen")
+    expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingProcessingScreen")
+  })
+
+  /**
+   * The additional data step leads to the terms step, which submits the card
+   * application. A link landing on it would submit one with the subscribe step's notices
+   * and the card KYC both skipped. It is reached from the identity step alone, once the
+   * verification is submitted.
+   */
+  it("links to no card onboarding step that leads to the application", () => {
+    expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingPersonalInfoScreen")
+  })
+
+  it("still links to the card onboarding steps that only show an outcome", () => {
+    expect(DEEP_LINK_SCREENS).toHaveProperty("cardOnboardingPreapprovedScreen")
+    expect(DEEP_LINK_SCREENS).toHaveProperty("cardOnboardingDeclinedScreen")
+  })
+
+  /**
+   * The declined bulletin opens this path: core's notifications send it for the
+   * declined deep link screen, so renaming it here would leave the bulletin opening
+   * nothing.
+   */
+  it("links the declined screen at the path the declined bulletin opens", () => {
+    expect(DEEP_LINK_SCREENS.cardOnboardingDeclinedScreen).toBe(
+      "card/onboarding/declined",
+    )
+  })
+
+  /**
    * The code screen and the backup take the setup key as a param. A link landing on
    * either would show a key the registration never issued, and offer to save it as the
    * account's. The registration is reached from its own start alone.
