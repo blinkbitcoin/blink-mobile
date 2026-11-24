@@ -74,7 +74,7 @@ Apollo / GraphQL             app/self-custodial/bridge → Breez SDK
 |---|---|---|
 | Port and app types | `app/types/` | Never imports GraphQL types, the SDK, hooks, screens or an account namespace |
 | Adapter | `app/custodial/adapters/`, `app/self-custodial/adapters/` | Implements a port. Its namespace's `mappers/` turn GraphQL or SDK shapes into app types at the boundary |
-| SDK access | `app/self-custodial/bridge/` | Wraps the Breez SDK calls. Nothing outside `app/self-custodial/` imports the SDK |
+| SDK access | `app/self-custodial/bridge/` | Wraps the Breez SDK calls. Only the self-custodial namespace imports the SDK (see Enforcement for which files the lint checks) |
 | Shared logic | `app/utils/` | Logic that is the same for both kinds of account, such as `selectPrice` |
 | Routing hook | `app/hooks/` | Chooses the adapter for the active account. It is what a shared screen uses for account data |
 | Screen | `app/screens/<flow>/` | UI. Account-specific UI lives in its namespace's `components/` and is rendered from here |
@@ -95,16 +95,18 @@ A file that needs a comment explaining its "custodial variant" or its "self-cust
 
 ### Enforcement
 
-ESLint checks these boundaries (`.eslintrc.json`, `overrides`):
+ESLint checks these boundaries in `.eslintrc.json`. The warnings are `@typescript-eslint/no-restricted-imports` overrides, which match the import as written. The two errors are `import/no-restricted-paths` zones, which match the file an import resolves to, so an alias, a relative path, a type import, a re-export, a dynamic `import()` and a `require()` are all caught.
 
 | Files | Must not import | Level |
 |---|---|---|
-| `app/types/**` | GraphQL types, the SDK, hooks, screens, account namespaces | warning |
+| `app/types/**` | GraphQL types, the SDK, hooks, screens, `app/custodial`, `app/self-custodial` | warning |
 | `app/utils`, `app/hooks`, `app/components`, `app/config`, `app/store`, `app/graphql` | screens, the SDK | warning |
 | `app/custodial/**`, `app/self-custodial/**` | screens | warning |
-| Shared screens | account namespaces (except their `components/`), the SDK | warning |
-| Custodial code | self-custodial code | error |
-| Self-custodial code | custodial code | error |
+| `app/screens/**`, except `app/screens/self-custodial/**` and `app/screens/settings-screen/self-custodial/**` | `app/custodial` and `app/self-custodial` (except their `components/`), the SDK | warning |
+| `app/custodial/**` | `app/self-custodial`, `app/screens/self-custodial`, `app/screens/settings-screen/self-custodial` | error |
+| `app/self-custodial/**`, `app/screens/self-custodial/**`, `app/screens/settings-screen/self-custodial/**` | `app/custodial` | error |
+
+Not checked yet: a shared screen importing from `app/screens/self-custodial` or `app/screens/settings-screen/self-custodial`, and the SDK imported from `app/custodial`, `app/navigation`, `app/btcmap`, `app/i18n`, `app/rne-theme` or `app/app.tsx`. The self-custodial screen trees import the SDK today, and the lint allows it there.
 
 The warnings mark code written before these rules and are being cleared step by step. New code must not add any. To clear one, move the shared piece down a layer: a type both sides need goes to `app/types`, account data reaches a screen through a hook in `app/hooks`, and code that serves one kind of account moves into its namespace.
 

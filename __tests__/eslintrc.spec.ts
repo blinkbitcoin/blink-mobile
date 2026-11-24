@@ -26,6 +26,7 @@ const eslint = new ESLint({ cwd: repoRoot })
 
 const BOUNDARY_RULE = "import/no-restricted-paths"
 const LEGACY_COLOR_RULE = "no-restricted-syntax"
+const LAYER_RULE = "@typescript-eslint/no-restricted-imports"
 
 const WARN = 1
 const ERROR = 2
@@ -128,5 +129,56 @@ describe("legacy color tokens in the account namespaces", () => {
     expect(
       await severitiesOf("const c = colors.grey2", fixture, LEGACY_COLOR_RULE),
     ).toEqual([WARN])
+  })
+})
+
+/** One fixture per row of the Enforcement table in docs/architecture.md, so the table
+ *  and the configured globs cannot drift apart again. */
+describe("layer warnings", () => {
+  const SDK = "@breeztech/breez-sdk-spark-react-native"
+
+  it.each([
+    ["app/types importing a hook", "app/types/lint-fixture.ts", "@app/hooks"],
+    [
+      "app/types importing an account namespace",
+      "app/types/lint-fixture.ts",
+      "@app/custodial/two-factor-session",
+    ],
+    [
+      "a shared layer importing a screen",
+      "app/hooks/lint-fixture.ts",
+      "@app/screens/home-screen",
+    ],
+    ["a shared layer importing the SDK", "app/utils/lint-fixture.ts", SDK],
+    [
+      "an account namespace importing a screen",
+      "app/custodial/lint-fixture.ts",
+      "@app/screens/home-screen",
+    ],
+    [
+      "a shared screen importing a namespace internal",
+      "app/screens/home-screen/lint-fixture.tsx",
+      "@app/self-custodial/bridge",
+    ],
+    [
+      "a shared screen importing the SDK",
+      "app/screens/home-screen/lint-fixture.tsx",
+      SDK,
+    ],
+  ])("warns on %s", async (_case, fixture, source) => {
+    const code = `import { a } from "${source}"`
+
+    expect(await severitiesOf(code, fixture, LAYER_RULE)).toEqual([WARN])
+  })
+
+  /** Documented as allowed: the self-custodial screen trees are part of the namespace that
+   *  owns the SDK. */
+  it.each([
+    "app/screens/self-custodial/lint-fixture.tsx",
+    "app/screens/settings-screen/self-custodial/lint-fixture.tsx",
+  ])("lets %s import the SDK", async (fixture) => {
+    const code = `import { a } from "${SDK}"`
+
+    expect(await severitiesOf(code, fixture, LAYER_RULE)).toEqual([])
   })
 })
