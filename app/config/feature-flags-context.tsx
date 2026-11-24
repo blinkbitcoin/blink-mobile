@@ -256,7 +256,7 @@ export const defaultRemoteConfig: RemoteConfig = {
   cardESignConsentUrl:
     "https://legal.raincards.xyz/legal/electronic-communications-notice",
   cardIssuerPrivacyPolicyUrl: "https://www.third-national.com/privacypolicy",
-  cardSubscriptionPriceUsd: 1000,
+  cardSubscriptionPriceUsd: 0,
   cardReplacementFeeUsd: 10,
   cardUsdTransactionFeePercent: 1.21,
   cardForeignTransactionFeePercent: 2.21,
