@@ -170,6 +170,9 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   /** The thumb is held: the screen holds its scroll so the drag stays a drag, and the
    *  on-chain fee is quoted once it is let go. */
   const [isSliding, setIsSliding] = useState(false)
+  /** The held thumb has moved the amount sent. Only then does the fee quote wait for the
+   *  release: a touch that leaves the amount where it was keeps the quote it has. */
+  const [hasSlidAmount, setHasSlidAmount] = useState(false)
   /** The sender slid on this send; review learns it, and a send that goes through retires
    *  the slider's hint, even when the amount was typed over after. They have seen it work. */
   const [hasUsedSlider, setHasUsedSlider] = useState(false)
@@ -206,7 +209,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     isSelfCustodial,
     paymentDestination,
     convertMoneyAmount: _convertMoneyAmount,
-    isAmountSliding: isSliding,
+    isAmountSliding: isSliding && hasSlidAmount,
   })
 
   /**
@@ -463,6 +466,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       setPaymentDetail(updatedPaymentDetail)
     })
 
+  /** Each hold starts with the amount where it was, whatever a step before it did. */
+  const handleSliderHold = (isHeld: boolean) => {
+    setIsSliding(isHeld)
+    setHasSlidAmount(false)
+  }
+
   const selectPercent = (percent: number) => {
     setHasUsedSlider(true)
     const amount = {
@@ -473,6 +482,10 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
      *  than the balance as a plain amount, which the fee would push over. */
     const isSendAll = percent === 100 && Boolean(paymentDetail.canSendMax)
 
+    const slidSettlement = paymentDetail.setAmount?.(amount, isSendAll).settlementAmount
+    if (slidSettlement?.amount !== paymentDetail.settlementAmount.amount) {
+      setHasSlidAmount(true)
+    }
     setPaymentDetail((paymentDetail) =>
       paymentDetail?.setAmount
         ? paymentDetail.setAmount(amount, isSendAll)
@@ -790,7 +803,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               share={balanceShare}
               onSlide={selectPercent}
               showHint={showAmountSliderHint}
-              onHoldChange={setIsSliding}
+              onHoldChange={handleSliderHold}
               disabled={isQuotingFeesForNext}
               accentColor={sliderAccentColor}
             />

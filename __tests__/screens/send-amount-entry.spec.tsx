@@ -1177,18 +1177,48 @@ describe("amount slider", () => {
     )
   })
 
-  it("holds the on-chain fee quote while the thumb is held, and lets it go on release", async () => {
-    renderScreen(intraledgerDestination())
-    await settle()
+  describe("the on-chain fee quote", () => {
     const isAmountSliding = () =>
       (mockFeeTierArgs.mock.lastCall?.[0] as { isAmountSliding?: boolean })
         .isAmountSliding
+    const hold = () => act(() => amountSlider().props.onHoldChange(true))
+    const letGo = () => act(() => amountSlider().props.onHoldChange(false))
 
-    expect(isAmountSliding()).toBe(false)
-    act(() => amountSlider().props.onHoldChange(true))
-    expect(isAmountSliding()).toBe(true)
-    act(() => amountSlider().props.onHoldChange(false))
-    expect(isAmountSliding()).toBe(false)
+    it("waits while a held thumb moves the amount, and goes out on release", async () => {
+      renderScreen(intraledgerDestination())
+      await settle()
+
+      expect(isAmountSliding()).toBe(false)
+      hold()
+      slideTo(50)
+      expect(isAmountSliding()).toBe(true)
+      letGo()
+      expect(isAmountSliding()).toBe(false)
+    })
+
+    // A touch that changes nothing would drop a valid quote and ask for the same fee again.
+    it("keeps the quote it has when a touch leaves the amount where it was", async () => {
+      renderScreen(intraledgerDestination())
+      await settle()
+      slideTo(30)
+      await settle()
+
+      hold()
+      slideTo(30)
+
+      expect(isAmountSliding()).toBe(false)
+    })
+
+    it("starts each hold afresh after an amount set outside one", async () => {
+      renderScreen(intraledgerDestination())
+      await settle()
+      slideTo(30)
+      await settle()
+
+      hold()
+
+      expect(isAmountSliding()).toBe(false)
+    })
   })
 
   describe("with a screen reader", () => {
