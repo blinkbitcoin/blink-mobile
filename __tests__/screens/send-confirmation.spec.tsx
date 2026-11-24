@@ -1912,9 +1912,10 @@ describe("hide balance", () => {
 describe("SendBitcoinConfirmationScreen — slide to send", () => {
   let LL: ReturnType<typeof i18nObject>
   const actualUsePriceConversion = PriceConversion.usePriceConversion
+  let priceSpy: jest.SpyInstance
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    priceSpy.mockRestore()
   })
 
   beforeEach(() => {
@@ -1922,11 +1923,13 @@ describe("SendBitcoinConfirmationScreen — slide to send", () => {
     mockUseNonCustodialConversionLimits.mockReturnValue(defaultConversionLimits)
     // A price that is there from the first render: through MockLink it sometimes lands
     // after the flush, and the dust check reads pending or not depending on the race.
-    jest.spyOn(PriceConversion, "usePriceConversion").mockImplementation(() => ({
-      ...actualUsePriceConversion(),
-      convertMoneyAmount: convertMoneyAmountMock,
-      priceStatus: PriceConversion.PriceStatus.Ready,
-    }))
+    priceSpy = jest
+      .spyOn(PriceConversion, "usePriceConversion")
+      .mockImplementation(() => ({
+        ...actualUsePriceConversion(),
+        convertMoneyAmount: convertMoneyAmountMock,
+        priceStatus: PriceConversion.PriceStatus.Ready,
+      }))
     loadLocale("en")
     LL = i18nObject("en")
     mockUseSendPayment.mockReturnValue({
@@ -3777,6 +3780,44 @@ describe("a settled self-custodial send under the offline gate", () => {
       paymentType: "lnurl",
       destination: defaultLightningParams.lnurl,
       isMerchant: false,
+    })
+  })
+
+  it("leaves navigation alone, and still saves the Lightning address, when the sender left before pending", async () => {
+    const { view, answer } = await renderLnurlInFlight()
+    view.unmount()
+
+    await act(async () => {
+      answer({ status: "PENDING" })
+    })
+
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
+    expect(saveLnAddressContactMock).toHaveBeenCalledTimes(1)
+  })
+
+  it("opens the pending receipt when the gate dropped review before pending", async () => {
+    const { view, answer } = await renderLnurlInFlight()
+    useActiveWalletMock.mockReturnValue(selfCustodialWallet(ActiveWalletStatus.Offline))
+    view.rerender(
+      <ContextForScreen>
+        <SendBitcoinConfirmationGated route={lnurlRoute} />
+      </ContextForScreen>,
+    )
+    expect(screen.getByTestId("payment-offline-notice")).toBeTruthy()
+
+    await act(async () => {
+      answer({ status: "PENDING" })
+    })
+
+    const reducer = navigationDispatchMock.mock.calls
+      .map(([action]) => action)
+      .find((action) => typeof action === "function")
+    const reset = reducer({ key: "root", index: 2, routes: [] }) as {
+      payload: { routes: Array<{ name: string; params?: { status?: string } }> }
+    }
+    expect(reset.payload.routes[1]).toMatchObject({
+      name: "sendBitcoinCompleted",
+      params: { status: "PENDING" },
     })
   })
 

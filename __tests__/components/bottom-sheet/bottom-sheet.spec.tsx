@@ -586,6 +586,15 @@ describe("BottomSheet", () => {
       await waitFor(() => expect(onClose).toHaveBeenCalled())
     })
 
+    // The map and its controls stay beside an inline sheet, so a screen reader must keep
+    // reaching them too.
+    it("leaves the screen around it to a screen reader", async () => {
+      const { getByTestId } = renderSheet({ presentation: "inline" })
+
+      const sheet = await waitFor(() => getByTestId(SHEET_TEST_ID))
+      expect(sheet.props.accessibilityViewIsModal).toBe(false)
+    })
+
     it("takes no height of its own, so its parent decides the split", async () => {
       const { getByTestId } = renderSheet({ presentation: "inline" })
 

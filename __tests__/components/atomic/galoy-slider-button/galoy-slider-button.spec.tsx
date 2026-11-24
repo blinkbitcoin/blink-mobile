@@ -1,10 +1,12 @@
 import React from "react"
-import { StyleSheet, View, type ViewStyle } from "react-native"
+import { AccessibilityInfo, StyleSheet, type ViewStyle } from "react-native"
 import { type PanGesture, State } from "react-native-gesture-handler"
 import {
   fireGestureHandler,
   getByGestureTestId,
 } from "react-native-gesture-handler/jest-utils"
+import ReactNativeHapticFeedback from "react-native-haptic-feedback"
+import { getAnimatedStyle, useReducedMotion } from "react-native-reanimated"
 import { act, configure, fireEvent, render, screen } from "@testing-library/react-native"
 
 import GaloySliderButton, {
@@ -12,15 +14,19 @@ import GaloySliderButton, {
   SLIDER_TRACK_TEST_ID,
 } from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 
+import { reportError } from "@app/utils/error-logging"
 import { haptics } from "@app/utils/haptics"
 
 import { ContextForScreen } from "../../../screens/helper"
+
+jest.mock("@app/utils/error-logging", () => ({ reportError: jest.fn() }))
 
 // The busy border's frame loop crashes against fake timers; the arc is not under test.
 jest.mock("react-native-reanimated", () => ({
   __esModule: true,
   ...jest.requireActual("react-native-reanimated"),
   useFrameCallback: jest.fn(),
+  useReducedMotion: jest.fn(() => false),
 }))
 
 // The track's labels are drawn for sight and hidden from screen readers (the handle speaks
@@ -89,6 +95,8 @@ const labelBoxStyle = (text: string) => {
   return StyleSheet.flatten(node?.props.style) as ViewStyle | undefined
 }
 
+const handleOpacity = () => getAnimatedStyle(screen.getByTestId("slider")).opacity
+
 const handleColor = () =>
   (StyleSheet.flatten(screen.getByTestId("slider").props.style) as ViewStyle)
     .backgroundColor
@@ -129,6 +137,16 @@ describe("GaloySliderButton", () => {
     it("keeps the label clear of the handle", async () => {
       await renderSlider()
       expect(labelBoxStyle("Slide to send")?.paddingHorizontal).toBe(HANDLE_SIZE)
+    })
+
+    it("dims the handle while disabled", async () => {
+      await renderSlider({ disabled: true })
+      expect(handleOpacity()).toBe(0.5)
+    })
+
+    it("shows the handle at full strength while enabled", async () => {
+      await renderSlider()
+      expect(handleOpacity()).toBe(1)
     })
 
     it("paints the handle in the accent colour", async () => {
@@ -194,6 +212,56 @@ describe("GaloySliderButton", () => {
       expect(onSwipe).not.toHaveBeenCalled()
     })
 
+    it("does not send when the gesture is cancelled past 70%", async () => {
+      // e.g. the conversion screen's outer pan taking the gesture over.
+      const onSwipe = await renderSlider()
+      await pan([
+        { state: State.BEGAN, translationX: 0 },
+        { state: State.ACTIVE, translationX: 0 },
+        { state: State.ACTIVE, translationX: TRAVEL * 0.9 },
+        { state: State.CANCELLED, translationX: TRAVEL * 0.9 },
+      ])
+      expect(onSwipe).not.toHaveBeenCalled()
+    })
+
+    it("confirms the send with a haptic", async () => {
+      await renderSlider({ onSwipe: jest.fn(() => new Promise(() => {})) })
+      await drag(TRAVEL)
+      expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledWith("impactMedium", {
+        ignoreAndroidSystemSettings: true,
+      })
+    })
+
+    // The handle fades out over the last tenth of the travel.
+    for (const [at, opacity] of [
+      [0.9, 1],
+      [0.95, 0.5],
+      [1, 0],
+    ]) {
+      it(`shows the handle at ${opacity} opacity at ${at * 100}% of the travel`, async () => {
+        await renderSlider()
+        // Held, not released: the glide's timing doesn't step under these fake timers.
+        await pan([
+          { state: State.BEGAN, translationX: 0 },
+          { state: State.ACTIVE, translationX: 0 },
+          { state: State.ACTIVE, translationX: TRAVEL * at },
+        ])
+        for (let i = 0; i < 5; i += 1) act(() => jest.advanceTimersByTime(16))
+        expect(handleOpacity()).toBeCloseTo(opacity)
+      })
+    }
+
+    it("reports a rejected onSwipe and returns to rest", async () => {
+      const error = new Error("send failed")
+      const onSwipe = await renderSlider({
+        onSwipe: jest.fn(() => Promise.reject(error)),
+      })
+      await drag(TRAVEL)
+      expect(reportError).toHaveBeenCalledWith("Slider onSwipe", error)
+      await drag(TRAVEL)
+      expect(onSwipe).toHaveBeenCalledTimes(2)
+    })
+
     it("sends again after an onSwipe that settles at once", async () => {
       // e.g. a conversion re-quoting on swipe: `isLoading` never turns on in between.
       const onSwipe = await renderSlider({ onSwipe: jest.fn() })
@@ -231,6 +299,28 @@ describe("GaloySliderButton", () => {
       act(() => jest.advanceTimersByTime(35 * 3))
       expect(screen.getByText("Rev", { exact: false })).toBeTruthy()
       expect(screen.queryByText("Reviewing", { exact: false })).toBeNull()
+    })
+
+    it("types a character together with the marks on it", async () => {
+      // Thai "ก่อน": the tone mark ่ belongs to ก and never shows on its own.
+      await renderSlider({ busyLabels: ["ก่อน"], isLoading: true })
+      act(() => jest.advanceTimersByTime(35))
+      expect(screen.getByText("ก่", { exact: false })).toBeTruthy()
+      act(() => jest.advanceTimersByTime(35))
+      expect(screen.getByText("ก่อ", { exact: false })).toBeTruthy()
+    })
+
+    it("shows each label whole with reduce motion on", async () => {
+      jest.mocked(useReducedMotion).mockReturnValue(true)
+      try {
+        await renderSlider({ busyLabels: labels, isLoading: true })
+        expect(screen.getByText("Reviewing...")).toBeTruthy()
+
+        act(() => jest.advanceTimersByTime(3000))
+        expect(screen.getByText("Signing...")).toBeTruthy()
+      } finally {
+        jest.mocked(useReducedMotion).mockReturnValue(false)
+      }
     })
 
     it("moves to the next label every 3 seconds and holds on the last", async () => {
@@ -310,14 +400,17 @@ describe("GaloySliderButton", () => {
       expect(handle().props.accessibilityActions).toEqual([{ name: "activate" }])
     })
 
-    it("hands the native handle to handleRef, so a screen can move focus to it", async () => {
-      const handleRef = React.createRef<View>()
-      await renderSlider({ handleRef })
+    it("announces the busy label on activate", async () => {
+      const announce = jest.spyOn(AccessibilityInfo, "announceForAccessibility")
+      await renderSlider({
+        busyLabels: ["Reviewing", "Signing"],
+        onSwipe: () => new Promise<void>(() => {}),
+      })
 
-      expect(typeof handleRef.current?.measure).toBe("function")
-      expect(
-        (handleRef.current as unknown as { props: { testID?: string } }).props.testID,
-      ).toBe("slider")
+      await activate()
+
+      expect(announce).toHaveBeenCalledWith("Reviewing")
+      announce.mockRestore()
     })
 
     it("turns busy on activate, as a full slide does", async () => {
@@ -335,6 +428,20 @@ describe("GaloySliderButton", () => {
 
       await activate()
       await activate()
+
+      expect(onSwipe).toHaveBeenCalledTimes(1)
+    })
+
+    it("counts one send for activates that land before the busy render", async () => {
+      // Two in one tick: the second can't see `busy` yet, only the handle's lock.
+      const onSwipe = jest.fn(() => new Promise<void>(() => {}))
+      await renderSlider({ onSwipe })
+
+      await act(async () => {
+        const event = { nativeEvent: { actionName: "activate" } }
+        fireEvent(handle(), "accessibilityAction", event)
+        fireEvent(handle(), "accessibilityAction", event)
+      })
 
       expect(onSwipe).toHaveBeenCalledTimes(1)
     })

@@ -2360,7 +2360,6 @@
     "priceUpdated": "Cena se změnila, proto byly částky aktualizovány. Před odesláním je zkontrolujte.",
     "paymentAlreadyAttempted": "Platba již byla pokusena.\n\nPokud chcete tuto platbu odeslat znovu, začněte od začátku.",
     "paymentMayStillLand": "Chvíli počkejte, platba nejspíš brzy projde. Vaše peníze buď bezpečně dorazí, nebo vám zůstanou.",
-    "slideToConfirm": "Přejeďte pro potvrzení",
     "slideConfirming": "Potvrzování...",
     "slideToSend": "Přejeďte pro odeslání",
     "calculatingFee": "Výpočet poplatku…",
