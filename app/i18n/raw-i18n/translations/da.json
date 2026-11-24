@@ -2360,7 +2360,6 @@
     "priceUpdated": "Prisen ændrede sig, så beløbene er opdateret. Tjek dem, før du sender.",
     "paymentAlreadyAttempted": "Betalingen er allerede forsøgt gennemført.\n\nHvis du ønsker at sende denne betaling igen, venligst start forfra.",
     "paymentMayStillLand": "Vent et øjeblik, betalingen går sandsynligvis snart igennem. Dine penge kommer sikkert frem eller bliver hos dig.",
-    "slideToConfirm": "Slide to Confirm",
     "slideConfirming": "Confirming...",
     "slideToSend": "Skub for at sende",
     "calculatingFee": "Beregner gebyr…",

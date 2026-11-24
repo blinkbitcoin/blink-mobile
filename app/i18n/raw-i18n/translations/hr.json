@@ -2360,7 +2360,6 @@
     "priceUpdated": "Cijena se promijenila pa su iznosi ažurirani. Provjerite ih prije slanja.",
     "paymentAlreadyAttempted": "Plaćanje je već pokušano.\n\nAko želite ponovo poslati ovo plaćanje, počnite ispočetka.",
     "paymentMayStillLand": "Pričekajte trenutak, uplata će vjerojatno uskoro proći. Vaš novac će sigurno stići ili ostati kod vas.",
-    "slideToConfirm": "Povucite za potvrdu",
     "slideConfirming": "Potvrđivanje...",
     "slideToSend": "Povucite za slanje",
     "calculatingFee": "Izračun naknade…",

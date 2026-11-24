@@ -2360,7 +2360,6 @@
     "priceUpdated": "Giá đã thay đổi nên số tiền đã được cập nhật. Hãy kiểm tra trước khi gửi.",
     "paymentAlreadyAttempted": "Thanh toán đã được thử.\n\nNếu bạn muốn gửi lại khoản thanh toán này, hãy bắt đầu lại từ đầu.",
     "paymentMayStillLand": "Vui lòng đợi một chút, giao dịch có thể sẽ sớm hoàn tất. Tiền của bạn sẽ đến nơi an toàn hoặc vẫn ở lại với bạn.",
-    "slideToConfirm": "Vuốt để Xác nhận",
     "slideConfirming": "Đang xác nhận...",
     "slideToSend": "Vuốt để Gửi",
     "calculatingFee": "Đang tính phí…",

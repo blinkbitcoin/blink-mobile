@@ -7508,10 +7508,6 @@ type RootTranslation = {
 		 */
 		paymentMayStillLand: string
 		/**
-		 * S​l​i​d​e​ ​t​o​ ​C​o​n​f​i​r​m
-		 */
-		slideToConfirm: string
-		/**
 		 * C​o​n​f​i​r​m​i​n​g​.​.​.
 		 */
 		slideConfirming: string
@@ -22069,10 +22065,6 @@ export type TranslationFunctions = {
 		 * Wait a moment, it will probably go through soon. Your money will arrive safely or stay with you.
 		 */
 		paymentMayStillLand: () => LocalizedString
-		/**
-		 * Slide to Confirm
-		 */
-		slideToConfirm: () => LocalizedString
 		/**
 		 * Confirming...
 		 */

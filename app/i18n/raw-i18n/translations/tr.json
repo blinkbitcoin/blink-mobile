@@ -2360,7 +2360,6 @@
     "priceUpdated": "Fiyat değişti, bu yüzden tutarlar güncellendi. Göndermeden önce kontrol edin.",
     "paymentAlreadyAttempted": "Ödeme zaten denendi.\n\nBu ödemeyi tekrar göndermek istiyorsanız, sıfırdan başlayın.",
     "paymentMayStillLand": "Biraz bekleyin, büyük ihtimalle yakında gerçekleşecek. Paranız ya güvenle ulaşacak ya da sizde kalacak.",
-    "slideToConfirm": "Onaylamak için kaydırın",
     "slideConfirming": "Onaylanıyor...",
     "slideToSend": "Göndermek için kaydırın",
     "calculatingFee": "Ücret hesaplanıyor…",

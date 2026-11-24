@@ -2360,7 +2360,6 @@
         "priceUpdated": "O preço mudou, então os valores foram atualizados. Confira antes de enviar.",
         "paymentAlreadyAttempted": "Pagamento já tentado.\n\nSe você deseja enviar esse pagamento novamente, comece do zero.",
         "paymentMayStillLand": "Aguarde um momento, provavelmente será concluído em breve. Seu dinheiro chegará com segurança ou ficará com você.",
-        "slideToConfirm": "Deslize para Confirmar",
         "slideConfirming": "Confirmando...",
         "slideToSend": "Deslize para Enviar",
         "calculatingFee": "Calculando taxa…",

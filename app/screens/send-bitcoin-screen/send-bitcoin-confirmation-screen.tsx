@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useMemo, useState } from "react"
 import { Platform, ScrollView, View } from "react-native"
 import { PanGestureHandler } from "react-native-gesture-handler"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
@@ -234,18 +234,25 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   else if (fee.status === "error" && !fee.amount)
     sliderDisabledText = LL.common.feeError()
 
-  const progress = LL.SendBitcoinConfirmationScreen.sendProgress
-  const sendProgressLabels = [
-    progress.reviewing(),
-    progress.signing(),
-    progress.findingRoute(),
-    progress.broadcasting(),
-    progress.checkingDelivery(),
-    progress.almostThere(),
-    progress.anyTimeNow(),
-    progress.hangTight(),
-    progress.stillOnItsWay(),
-  ]
+  /* One label every LABEL_INTERVAL_MS (3 s), holding on the last for as long as the send
+   * takes: Reviewing 0 s, Signing 3 s, Finding route 6 s, Broadcasting 9 s, Checking
+   * delivery 12 s, Almost there 15 s, Any time now 18 s, Hang tight 21 s, Still on its way
+   * from 24 s. Product ruling: one script for every rail; an intraledger send settles in
+   * about a second, before the routing labels show. */
+  const sendProgressLabels = useMemo(() => {
+    const progress = LL.SendBitcoinConfirmationScreen.sendProgress
+    return [
+      progress.reviewing(),
+      progress.signing(),
+      progress.findingRoute(),
+      progress.broadcasting(),
+      progress.checkingDelivery(),
+      progress.almostThere(),
+      progress.anyTimeNow(),
+      progress.hangTight(),
+      progress.stillOnItsWay(),
+    ]
+  }, [LL])
 
   const { feeDisplayText, currencyFeeAmount, satFeeAmount, feeErrorCode, feeErrorText } =
     useReviewFeeText({ fee, paymentDetail, leadsWithWalletCurrency })

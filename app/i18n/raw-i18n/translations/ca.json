@@ -2360,7 +2360,6 @@
     "priceUpdated": "El preu ha canviat, així que els imports s'han actualitzat. Revisa'ls abans d'enviar.",
     "paymentAlreadyAttempted": "Pagament ja intentat.\n\nSi vols enviar aquest pagament de nou, comença des de zero.",
     "paymentMayStillLand": "Espera un moment, probablement es completarà aviat. Els teus diners arribaran amb seguretat o es quedaran amb tu.",
-    "slideToConfirm": "Llisca per confirmar",
     "slideConfirming": "Confirmant...",
     "slideToSend": "Llisca per enviar",
     "calculatingFee": "Calculant la comissió…",
