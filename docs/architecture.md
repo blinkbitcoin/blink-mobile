@@ -108,7 +108,7 @@ ESLint checks these boundaries in `.eslintrc.json`. The warnings are `@typescrip
 
 Not checked yet: a shared screen importing from `app/screens/self-custodial` or `app/screens/settings-screen/self-custodial`, and the SDK imported from `app/custodial`, `app/navigation`, `app/btcmap`, `app/i18n`, `app/rne-theme` or `app/app.tsx`. The self-custodial screen trees import the SDK today, and the lint allows it there.
 
-The warnings mark code written before these rules and are being cleared step by step. New code must not add any. To clear one, move the shared piece down a layer: a type both sides need goes to `app/types`, account data reaches a screen through a hook in `app/hooks`, and code that serves one kind of account moves into its namespace.
+The warnings mark code written before these rules and are being cleared step by step. CI does not fail on a warning yet, so keeping new code free of them is up to the author and the reviewer. To clear one, move the shared piece down a layer: a type both sides need goes to `app/types`, account data reaches a screen through a hook in `app/hooks`, and code that serves one kind of account moves into its namespace.
 
 ## Component Architecture
 

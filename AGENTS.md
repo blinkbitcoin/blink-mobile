@@ -19,4 +19,4 @@ Based on the PR's changed files, read relevant docs thoroughly:
 - Payment mutations must NOT have retry logic (handled specially in client.tsx)
 - Sensitive data → react-native-keychain, not AsyncStorage
 - All user-facing strings via typesafe-i18n
-- Place code by layer and account namespace (see "Code Organization" in /docs/architecture.md); new code must not add architecture lint warnings
+- Place code by layer and account namespace (see "Code Organization" in /docs/architecture.md); avoid adding architecture lint warnings, which CI does not fail on yet
