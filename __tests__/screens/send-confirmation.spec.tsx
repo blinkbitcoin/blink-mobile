@@ -1691,9 +1691,10 @@ describe("hide balance", () => {
 describe("SendBitcoinConfirmationScreen — slide to send", () => {
   let LL: ReturnType<typeof i18nObject>
   const actualUsePriceConversion = PriceConversion.usePriceConversion
+  let priceSpy: jest.SpyInstance
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    priceSpy.mockRestore()
   })
 
   beforeEach(() => {
@@ -1701,11 +1702,13 @@ describe("SendBitcoinConfirmationScreen — slide to send", () => {
     mockUseNonCustodialConversionLimits.mockReturnValue(defaultConversionLimits)
     // A price that is there from the first render: through MockLink it sometimes lands
     // after the flush, and the dust check reads pending or not depending on the race.
-    jest.spyOn(PriceConversion, "usePriceConversion").mockImplementation(() => ({
-      ...actualUsePriceConversion(),
-      convertMoneyAmount: convertMoneyAmountMock,
-      priceStatus: PriceConversion.PriceStatus.Ready,
-    }))
+    priceSpy = jest
+      .spyOn(PriceConversion, "usePriceConversion")
+      .mockImplementation(() => ({
+        ...actualUsePriceConversion(),
+        convertMoneyAmount: convertMoneyAmountMock,
+        priceStatus: PriceConversion.PriceStatus.Ready,
+      }))
     loadLocale("en")
     LL = i18nObject("en")
     mockUseSendPayment.mockReturnValue({

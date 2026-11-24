@@ -1,4 +1,4 @@
-import React, { Ref, useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import {
   AccessibilityActionEvent,
   AccessibilityInfo,
@@ -17,12 +17,14 @@ import Animated, {
   useAnimatedProps,
   useAnimatedStyle,
   useFrameCallback,
+  useReducedMotion,
   useSharedValue,
   withSpring,
   withTiming,
 } from "react-native-reanimated"
 import Svg, { Rect } from "react-native-svg"
 
+import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -36,7 +38,8 @@ const COMMIT_THRESHOLD = 0.7
 const HANDLE_FADE_START = 0.9
 const DISABLED_OPACITY = 0.5
 const COMPLETE_DURATION_MS = 300
-const LABEL_INTERVAL_MS = 3000
+/** How long each busy label holds before the next; the last one holds until the send ends. */
+export const LABEL_INTERVAL_MS = 3000
 const TYPE_INTERVAL_MS = 35
 const DOT_INTERVAL_MS = 350
 /** Border arc speed in revolutions per second, easing from start to end over the ramp. */
@@ -56,6 +59,8 @@ export const SLIDER_TRACK_TEST_ID = "slider-track"
 const AnimatedRect = Animated.createAnimatedComponent(Rect)
 
 type SwipeButtonPropsType = {
+  /** May return a promise; the slider stays busy until it settles. A rejection is reported
+   *  and the slider returns to rest. */
   onSwipe: () => unknown
   initialText: string
   /** Busy label when no `busyLabels` are given. */
@@ -68,8 +73,6 @@ type SwipeButtonPropsType = {
   disabled?: boolean
   /** Handle colour; defaults to `accent`. The arrow on it is white in both themes. */
   accentColor?: string
-  /** The handle, the one element a screen reader reaches, e.g. to move focus to it. */
-  handleRef?: Ref<View>
 }
 
 const GaloySliderButton = ({
@@ -81,7 +84,6 @@ const GaloySliderButton = ({
   isLoading = false,
   disabled = false,
   accentColor,
-  handleRef,
 }: SwipeButtonPropsType) => {
   const {
     theme: { colors },
@@ -113,6 +115,8 @@ const GaloySliderButton = ({
     })
     try {
       await onSwipe()
+    } catch (err) {
+      reportError("Slider onSwipe", err)
     } finally {
       setCommitted(false)
       setSettled((n) => n + 1)
@@ -120,6 +124,20 @@ const GaloySliderButton = ({
   }, [onSwipe])
 
   const onLayout = (e: LayoutChangeEvent) => setTrackWidth(e.nativeEvent.layout.width)
+
+  /** Locks the handle and glides it to the end, for the drag and the screen reader alike.
+   *  Returns false when a send is already under way: a screen-reader activate can land
+   *  mid-drag, before the busy render has disabled the pan. */
+  const lockHandle = () => {
+    "worklet"
+    if (hasCommitted.value) return false
+    hasCommitted.value = true
+    X.value = withTiming(travel, {
+      duration: COMPLETE_DURATION_MS,
+      easing: Easing.out(Easing.cubic),
+    })
+    return true
+  }
 
   const panGesture = Gesture.Pan()
     .withTestId(SLIDER_PAN_TEST_ID)
@@ -131,13 +149,8 @@ const GaloySliderButton = ({
     })
     // Sends only on release, so a user who went too far can still slide back.
     .onEnd((_e, success) => {
-      if (!success || hasCommitted.value || X.value < travel * COMMIT_THRESHOLD) return
-      hasCommitted.value = true
-      X.value = withTiming(travel, {
-        duration: COMPLETE_DURATION_MS,
-        easing: Easing.out(Easing.cubic),
-      })
-      runOnJS(commit)()
+      if (!success || X.value < travel * COMMIT_THRESHOLD) return
+      if (lockHandle()) runOnJS(commit)()
     })
     .onFinalize(() => {
       if (!hasCommitted.value) {
@@ -177,12 +190,8 @@ const GaloySliderButton = ({
    *  tap) sends the same way a full slide does. */
   const onAccessibilityAction = (event: AccessibilityActionEvent) => {
     if (event.nativeEvent.actionName !== "activate") return
-    if (busy || disabled || hasCommitted.value) return
-    hasCommitted.value = true
-    X.value = withTiming(travel, {
-      duration: COMPLETE_DURATION_MS,
-      easing: Easing.out(Easing.cubic),
-    })
+    if (busy || disabled) return
+    if (!lockHandle()) return
     AccessibilityInfo.announceForAccessibility(busyLabel)
     commit()
   }
@@ -226,7 +235,6 @@ const GaloySliderButton = ({
       )}
       <GestureDetector gesture={panGesture}>
         <Animated.View
-          ref={handleRef}
           style={[
             styles.handle,
             { backgroundColor: accentColor ?? colors.accent },
@@ -255,9 +263,11 @@ const GaloySliderButton = ({
   )
 }
 
-/** A 1px border arc that runs round the track with a breathing gap. */
+/** A 1px border arc that runs round the track with a breathing gap; with reduce motion on,
+ *  a still, closed border. */
 const BusyBorder = ({ width, color }: { width: number; color: string }) => {
   const styles = useStyles()
+  const reduceMotion = useReducedMotion()
   const inset = 0.5
   const w = width - inset * 2
   const h = TRACK_HEIGHT - inset * 2
@@ -273,9 +283,10 @@ const BusyBorder = ({ width, color }: { width: number; color: string }) => {
     const eased = t * t * (3 - 2 * t)
     const speed = ARC_SPEED_START + (ARC_SPEED_END - ARC_SPEED_START) * eased
     distance.value = (distance.value + speed * perimeter * dt) % perimeter
-  })
+  }, !reduceMotion)
 
   const animatedProps = useAnimatedProps(() => {
+    if (reduceMotion) return { strokeDasharray: [perimeter, 0], strokeDashoffset: 0 }
     const gapShare =
       ARC_GAP_MEAN + ARC_GAP_SWING * Math.sin((elapsed.value / 1000) * ARC_GAP_RATE)
     const gap = gapShare * perimeter
@@ -283,7 +294,7 @@ const BusyBorder = ({ width, color }: { width: number; color: string }) => {
       strokeDasharray: [perimeter - gap, gap],
       strokeDashoffset: -distance.value,
     }
-  }, [perimeter])
+  }, [perimeter, reduceMotion])
 
   return (
     <Svg width={width} height={TRACK_HEIGHT} style={styles.border} pointerEvents="none">
@@ -303,15 +314,22 @@ const BusyBorder = ({ width, color }: { width: number; color: string }) => {
   )
 }
 
-/** Types each label in, cycles trailing dots, and moves on every few seconds. */
+/** What the typing steps through: each character with the marks that sit on it, so a Thai
+ *  tone mark never shows on its own and an emoji is never split in half. */
+const toCharacters = (text: string): string[] => text.match(/\P{M}\p{M}*/gu) ?? []
+
+/** Types each label in, cycles trailing dots, and moves on every few seconds. With reduce
+ *  motion on, each label shows whole, with still dots. */
 const RotatingLabel = ({ labels }: { labels: readonly string[] }) => {
   const styles = useStyles()
+  const reduceMotion = useReducedMotion()
   const [index, setIndex] = useState(0)
   const [typed, setTyped] = useState(0)
-  const [dots, setDots] = useState(0)
+  const [dots, setDots] = useState(reduceMotion ? 3 : 0)
 
   const text = labels[Math.min(index, labels.length - 1)]
-  const isTyped = typed >= text.length
+  const characters = useMemo(() => toCharacters(text), [text])
+  const isTyped = reduceMotion || typed >= characters.length
 
   useEffect(() => {
     const id = setInterval(
@@ -322,26 +340,27 @@ const RotatingLabel = ({ labels }: { labels: readonly string[] }) => {
   }, [labels.length])
 
   useEffect(() => {
+    if (reduceMotion) return
     setTyped(0)
     setDots(0)
     const id = setInterval(() => {
       setTyped((n) => {
-        if (n + 1 >= text.length) clearInterval(id)
+        if (n + 1 >= characters.length) clearInterval(id)
         return n + 1
       })
     }, TYPE_INTERVAL_MS)
     return () => clearInterval(id)
-  }, [text])
+  }, [characters, reduceMotion])
 
   useEffect(() => {
-    if (!isTyped) return
+    if (!isTyped || reduceMotion) return
     const id = setInterval(() => setDots((d) => (d + 1) % 4), DOT_INTERVAL_MS)
     return () => clearInterval(id)
-  }, [isTyped])
+  }, [isTyped, reduceMotion])
 
   return (
     <Text style={styles.busyText} numberOfLines={1}>
-      {text.slice(0, typed)}
+      {isTyped ? text : characters.slice(0, typed).join("")}
       {/* Reserve the dots' width so the label does not shift as they cycle. */}
       <Text style={styles.busyText}>{".".repeat(dots)}</Text>
       <Text style={styles.hiddenDots}>{".".repeat(3 - dots)}</Text>

@@ -214,11 +214,14 @@ export const swipeButton = async (title: string) => {
 
   const location = await handle.getLocation()
   const size = await handle.getSize()
-  const track = await trackBox(handle, size.width)
+  // The track's own testID gives its rect directly: native sessions can't walk the tree.
+  const track = await $(findById("slider-track", "Other"))
+  const trackLocation = await track.getLocation()
+  const trackSize = await track.getSize()
 
   const startX = location.x + size.width / 2
   const startY = location.y + size.height / 2
-  const endX = track.x + track.width - 1
+  const endX = trackLocation.x + trackSize.width - 1
 
   await driver.touchAction([
     { action: "press", x: startX, y: startY },
@@ -226,24 +229,4 @@ export const swipeButton = async (title: string) => {
     { action: "moveTo", x: endX, y: startY },
     "release",
   ])
-}
-
-const trackBox = async (
-  handle: WebdriverIO.Element,
-  handleWidth: number,
-): Promise<{ x: number; width: number }> => {
-  let current = handle
-  for (let i = 0; i < 6; i += 1) {
-    const parent = await current.parentElement()
-    const parentLocation = await parent.getLocation()
-    const parentSize = await parent.getSize()
-    if (parentSize.width > handleWidth + 1) {
-      return { x: parentLocation.x, width: parentSize.width }
-    }
-    current = parent
-  }
-
-  const { width: windowWidth } = await browser.getWindowRect()
-  const location = await handle.getLocation()
-  return { x: location.x, width: windowWidth - location.x * 2 }
 }
