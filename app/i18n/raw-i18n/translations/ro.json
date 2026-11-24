@@ -3736,12 +3736,6 @@
         },
         "buttonText": "Hai să mergem"
       },
-      "LoadingCard": {
-        "title": "Lucrăm la cardul tău",
-        "subtitle": "Te vom notifica când va fi gata",
-        "codingBackend": "...programăm backend-ul",
-        "buttonText": "Grozav"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "Bun venit pentru a deveni parte din Blink",

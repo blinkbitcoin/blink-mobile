@@ -3736,12 +3736,6 @@
         },
         "buttonText": "Rajta"
       },
-      "LoadingCard": {
-        "title": "Dolgozunk a kártyádon",
-        "subtitle": "Értesítünk, amint elkészül",
-        "codingBackend": "...a backend kódolása",
-        "buttonText": "Szuper"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "Üdvözöljük, legyen a Blink része",

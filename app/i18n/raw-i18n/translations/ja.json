@@ -3736,12 +3736,6 @@
                 },
                 "buttonText": "始めましょう"
             },
-            "LoadingCard": {
-                "title": "カードを準備中です",
-                "subtitle": "準備ができましたらお知らせします",
-                "codingBackend": "...バックエンドをコーディング中",
-                "buttonText": "了解"
-            },
             "PersonalInformation": {
                 "title": "最終ステップ",
                 "fields": {

@@ -3736,12 +3736,6 @@
         },
         "buttonText": "Anem-hi"
       },
-      "LoadingCard": {
-        "title": "Estem treballant en la teva targeta",
-        "subtitle": "Et notificarem quan estigui llesta",
-        "codingBackend": "...programant el backend",
-        "buttonText": "Genial"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "Benvingut a formar part de Blink",

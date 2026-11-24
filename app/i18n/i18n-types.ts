@@ -12484,24 +12484,6 @@ type RootTranslation = {
 				 */
 				buttonText: string
 			}
-			LoadingCard: {
-				/**
-				 * W​e​'​r​e​ ​w​o​r​k​i​n​g​ ​o​n​ ​y​o​u​r​ ​c​a​r​d
-				 */
-				title: string
-				/**
-				 * W​e​'​l​l​ ​n​o​t​i​f​y​ ​y​o​u​ ​o​n​c​e​ ​i​t​'​s​ ​h​e​r​e
-				 */
-				subtitle: string
-				/**
-				 * .​.​.​c​o​d​i​n​g​ ​t​h​e​ ​b​a​c​k​e​n​d
-				 */
-				codingBackend: string
-				/**
-				 * N​i​c​e
-				 */
-				buttonText: string
-			}
 			WelcomeInvest: {
 				welcomeMessage: {
 					/**
@@ -26844,24 +26826,6 @@ export type TranslationFunctions = {
 				}
 				/**
 				 * Continue
-				 */
-				buttonText: () => LocalizedString
-			}
-			LoadingCard: {
-				/**
-				 * We're working on your card
-				 */
-				title: () => LocalizedString
-				/**
-				 * We'll notify you once it's here
-				 */
-				subtitle: () => LocalizedString
-				/**
-				 * ...coding the backend
-				 */
-				codingBackend: () => LocalizedString
-				/**
-				 * Nice
 				 */
 				buttonText: () => LocalizedString
 			}

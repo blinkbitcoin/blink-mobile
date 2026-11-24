@@ -3736,12 +3736,6 @@
         },
         "buttonText": "Ayo mulai"
       },
-      "LoadingCard": {
-        "title": "Kami sedang mengerjakan kartu Anda",
-        "subtitle": "Kami akan memberitahu Anda setelah siap",
-        "codingBackend": "...membuat kode backend",
-        "buttonText": "Bagus"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "Selamat datang untuk menjadi bagian dari Blink",

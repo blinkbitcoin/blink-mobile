@@ -3736,12 +3736,6 @@
         },
         "buttonText": "Πάμε"
       },
-      "LoadingCard": {
-        "title": "Ετοιμάζουμε την κάρτα σας",
-        "subtitle": "Θα σας ειδοποιήσουμε μόλις είναι έτοιμη",
-        "codingBackend": "...γράφουμε το backend",
-        "buttonText": "Τέλεια"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "Καλώς ήρθατε να γίνετε μέρος της Blink",

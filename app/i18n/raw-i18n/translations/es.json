@@ -3736,12 +3736,6 @@
                 },
                 "buttonText": "Continuar"
             },
-            "LoadingCard": {
-                "title": "Estamos trabajando en tu tarjeta",
-                "subtitle": "Te notificaremos cuando esté lista",
-                "codingBackend": "...programando el backend",
-                "buttonText": "Genial"
-            },
             "PersonalInformation": {
                 "title": "Paso final",
                 "fields": {

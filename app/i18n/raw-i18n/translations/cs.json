@@ -3736,12 +3736,6 @@
         },
         "buttonText": "Pojďme na to"
       },
-      "LoadingCard": {
-        "title": "Pracujeme na vaší kartě",
-        "subtitle": "Upozorníme vás, jakmile bude připravena",
-        "codingBackend": "...kódujeme backend",
-        "buttonText": "Skvěle"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "Vítejte, staňte se součástí Blink",

@@ -3736,12 +3736,6 @@
         },
         "buttonText": "Kom ons gaan"
       },
-      "LoadingCard": {
-        "title": "Ons werk aan jou kaart",
-        "subtitle": "Ons sal jou in kennis stel sodra dit hier is",
-        "codingBackend": "...kodeer die agterkant",
-        "buttonText": "Lekker"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "Welkom om deel van Blink te word",

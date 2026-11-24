@@ -3736,12 +3736,6 @@
                 },
                 "buttonText": "Andiamo"
             },
-            "LoadingCard": {
-                "title": "Stiamo lavorando alla tua carta",
-                "subtitle": "Ti avviseremo quando sarà pronta",
-                "codingBackend": "...programmando il backend",
-                "buttonText": "Bene"
-            },
             "PersonalInformation": {
                 "title": "Ultimo passaggio",
                 "fields": {

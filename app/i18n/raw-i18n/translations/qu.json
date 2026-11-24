@@ -3736,12 +3736,6 @@
         },
         "buttonText": "Haku"
       },
-      "LoadingCard": {
-        "title": "Tarjetaykipi llamkachkayku",
-        "subtitle": "Willasqayku listona kaptinña",
-        "codingBackend": "...backend-ta programachkayku",
-        "buttonText": "Allinmi"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "Allin hamusqa Blink-pa huk rakiynin kanaykipaq",

@@ -3736,12 +3736,6 @@
         },
         "buttonText": "هيا بنا"
       },
-      "LoadingCard": {
-        "title": "نعمل على بطاقتك",
-        "subtitle": "سنبلغك عندما تكون جاهزة",
-        "codingBackend": "...نبرمج الخلفية",
-        "buttonText": "رائع"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "مرحباً بك لتصبح جزءاً من Blink",

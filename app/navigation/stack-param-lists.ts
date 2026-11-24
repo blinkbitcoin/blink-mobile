@@ -313,7 +313,6 @@ export type RootStackParamList = {
   cardOnboardingSubscribeScreen: undefined
   cardOnboardingVerifyIdentityScreen: undefined
   cardOnboardingPaymentScreen: undefined
-  cardOnboardingLoadingScreen: undefined
   cardOnboardingWelcomeInvestScreen: undefined
   cardOnboardingSelectInvestScreen: undefined
   cardOnboardingTermSheetScreen: { selectedAmountUsd: number }

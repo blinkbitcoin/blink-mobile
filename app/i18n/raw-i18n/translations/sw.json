@@ -3736,12 +3736,6 @@
         },
         "buttonText": "Twende"
       },
-      "LoadingCard": {
-        "title": "Tunafanya kazi kwenye kadi yako",
-        "subtitle": "Tutakuarifu inapokuwa tayari",
-        "codingBackend": "...kuandika msimbo wa nyuma",
-        "buttonText": "Vizuri"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "Karibu kuwa sehemu ya Blink",

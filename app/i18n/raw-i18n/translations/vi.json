@@ -3736,12 +3736,6 @@
         },
         "buttonText": "Bắt đầu nào"
       },
-      "LoadingCard": {
-        "title": "Chúng tôi đang xử lý thẻ của bạn",
-        "subtitle": "Chúng tôi sẽ thông báo khi thẻ sẵn sàng",
-        "codingBackend": "...đang viết mã backend",
-        "buttonText": "Tuyệt"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "Chào mừng bạn trở thành một phần của Blink",

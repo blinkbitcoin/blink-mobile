@@ -3736,12 +3736,6 @@
         },
         "buttonText": "Ka tugende"
       },
-      "LoadingCard": {
-        "title": "Tukola ku kaadi yo",
-        "subtitle": "Tujja kukumanya nga efunze",
-        "codingBackend": "...kukola backend",
-        "buttonText": "Kirungi"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "Tukusanyukidde okuba ekitundu kya Blink",

@@ -136,7 +136,6 @@ import {
   WelcomeOnboardScreen,
   CardSubscriptionScreen,
   CardVerifyIdentityScreen,
-  LoadingCardScreen,
   WelcomeInvestScreen,
   SelectInvestScreen,
   TermSheetScreen,
@@ -1014,14 +1013,6 @@ export const RootStack = () => {
         component={CardSubscriptionScreen}
         options={{
           title: LL.CardFlow.Onboarding.CardSubscription.paymentTitle(),
-        }}
-      />
-      <RootNavigator.Screen
-        name="cardOnboardingLoadingScreen"
-        component={LoadingCardScreen}
-        options={{
-          title: "",
-          ...headerCloseControlOptions(),
         }}
       />
       {investmentOnboardingScreens()}

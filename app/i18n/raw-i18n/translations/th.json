@@ -3736,12 +3736,6 @@
         },
         "buttonText": "ไปกันเลย"
       },
-      "LoadingCard": {
-        "title": "เรากำลังดำเนินการบัตรของคุณ",
-        "subtitle": "เราจะแจ้งให้คุณทราบเมื่อพร้อม",
-        "codingBackend": "...กำลังเขียนโค้ดแบ็กเอนด์",
-        "buttonText": "เยี่ยม"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "ยินดีต้อนรับสู่การเป็นส่วนหนึ่งของ Blink",

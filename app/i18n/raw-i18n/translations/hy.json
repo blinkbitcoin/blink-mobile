@@ -3736,12 +3736,6 @@
         },
         "buttonText": "Սկսենք"
       },
-      "LoadingCard": {
-        "title": "Մենք աշխատում ենք Ձեր քարտի վրա",
-        "subtitle": "Կտեղեկացնենք Ձեզ, երբ այն պատրաստ լինի",
-        "codingBackend": "...մշակում ենք backend-ը",
-        "buttonText": "Հիանալի"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "Բարի գալուստ Blink-ի մի մասը դառնալու",

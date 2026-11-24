@@ -3920,12 +3920,6 @@ const en: BaseTranslation = {
         },
         buttonText: "Continue",
       },
-      LoadingCard: {
-        title: "We're working on your card",
-        subtitle: "We'll notify you once it's here",
-        codingBackend: "...coding the backend",
-        buttonText: "Nice",
-      },
       WelcomeInvest: {
         welcomeMessage: {
           title: "Welcome to become part of Blink",

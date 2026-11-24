@@ -1,3 +1,5 @@
+import { getStateFromPath } from "@react-navigation/native"
+
 import { DEEP_LINK_SCREENS } from "@app/navigation/deep-link-screens"
 
 /**
@@ -80,6 +82,16 @@ describe("deep-linkable routes", () => {
    */
   it("links to no card onboarding step that leads to the application", () => {
     expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingPersonalInfoScreen")
+  })
+
+  /**
+   * "We're working on your card" was dropped from the flow, and the screen with it: the
+   * wait goes Home on its own after a minute. Its old link must open nothing.
+   */
+  it("opens nothing at the link of the dropped card waiting screen", () => {
+    expect(
+      getStateFromPath("card/onboarding/loading", { screens: DEEP_LINK_SCREENS }),
+    ).toBeUndefined()
   })
 
   it("still links to the card onboarding step that shows a refusal", () => {

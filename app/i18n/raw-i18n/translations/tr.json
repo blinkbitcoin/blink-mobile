@@ -3736,12 +3736,6 @@
         },
         "buttonText": "Hadi başlayalım"
       },
-      "LoadingCard": {
-        "title": "Kartınız üzerinde çalışıyoruz",
-        "subtitle": "Hazır olduğunda size bildireceğiz",
-        "codingBackend": "...backend kodlanıyor",
-        "buttonText": "Güzel"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "Blink'in bir parçası olmaya hoş geldiniz",

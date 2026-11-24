@@ -3736,12 +3736,6 @@
         },
         "buttonText": "Masiye"
       },
-      "LoadingCard": {
-        "title": "Sisebenza kwikhadi lakho",
-        "subtitle": "Siza kukwazisa xa likulungele",
-        "codingBackend": "...ukubhala ikhowudi ye-backend",
-        "buttonText": "Kuhle"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "Wamkelekile ukuba ube yinxalenye yeBlink",

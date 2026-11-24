@@ -3736,12 +3736,6 @@
         },
         "buttonText": "Хајде"
       },
-      "LoadingCard": {
-        "title": "Радимо на вашој картици",
-        "subtitle": "Обавестићемо вас кад буде готова",
-        "codingBackend": "...кодирамо бекенд",
-        "buttonText": "Одлично"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "Добродошли да постанете део Блинка",

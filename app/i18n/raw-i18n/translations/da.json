@@ -3736,12 +3736,6 @@
         },
         "buttonText": "Lad os gå"
       },
-      "LoadingCard": {
-        "title": "Vi arbejder på dit kort",
-        "subtitle": "Vi giver dig besked, når det er her",
-        "codingBackend": "...koder backend",
-        "buttonText": "Fedt"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "Velkommen til at blive en del af Blink",

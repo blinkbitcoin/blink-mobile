@@ -3736,12 +3736,6 @@
         },
         "buttonText": "Idemo"
       },
-      "LoadingCard": {
-        "title": "Radimo na vašoj kartici",
-        "subtitle": "Obavijestit ćemo vas kad bude gotova",
-        "codingBackend": "...kodiramo backend",
-        "buttonText": "Super"
-      },
       "WelcomeInvest": {
         "welcomeMessage": {
           "title": "Dobrodošli da postanete dio Blinka",
