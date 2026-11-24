@@ -3682,6 +3682,14 @@ export type CardSecretsEncryptedQueryVariables = Exact<{
 
 export type CardSecretsEncryptedQuery = { readonly __typename: 'Query', readonly cardSecretsEncrypted: { readonly __typename: 'CardSecretsEncrypted', readonly encryptedPan: { readonly __typename: 'EncryptedData', readonly iv: string, readonly data: string }, readonly encryptedCvc: { readonly __typename: 'EncryptedData', readonly iv: string, readonly data: string } } };
 
+export type UnacknowledgedBulletinKeysQueryVariables = Exact<{
+  first: Scalars['Int']['input'];
+  after?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type UnacknowledgedBulletinKeysQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly unacknowledgedStatefulNotificationsWithBulletinEnabled: { readonly __typename: 'StatefulNotificationConnection', readonly pageInfo: { readonly __typename: 'PageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean }, readonly edges: ReadonlyArray<{ readonly __typename: 'StatefulNotificationEdge', readonly node: { readonly __typename: 'StatefulNotification', readonly id: string, readonly bulletinKey?: string | null, readonly createdAt: number } }> } } | null };
+
 export type LnInvoiceCreateOnBehalfOfRecipientMutationVariables = Exact<{
   input: LnInvoiceCreateOnBehalfOfRecipientInput;
 }>;
@@ -7035,6 +7043,63 @@ export type CardSecretsEncryptedQueryHookResult = ReturnType<typeof useCardSecre
 export type CardSecretsEncryptedLazyQueryHookResult = ReturnType<typeof useCardSecretsEncryptedLazyQuery>;
 export type CardSecretsEncryptedSuspenseQueryHookResult = ReturnType<typeof useCardSecretsEncryptedSuspenseQuery>;
 export type CardSecretsEncryptedQueryResult = Apollo.QueryResult<CardSecretsEncryptedQuery, CardSecretsEncryptedQueryVariables>;
+export const UnacknowledgedBulletinKeysDocument = gql`
+    query UnacknowledgedBulletinKeys($first: Int!, $after: String) {
+  me {
+    id
+    unacknowledgedStatefulNotificationsWithBulletinEnabled(
+      first: $first
+      after: $after
+    ) {
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      edges {
+        node {
+          id
+          bulletinKey
+          createdAt
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useUnacknowledgedBulletinKeysQuery__
+ *
+ * To run a query within a React component, call `useUnacknowledgedBulletinKeysQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUnacknowledgedBulletinKeysQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUnacknowledgedBulletinKeysQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *   },
+ * });
+ */
+export function useUnacknowledgedBulletinKeysQuery(baseOptions: Apollo.QueryHookOptions<UnacknowledgedBulletinKeysQuery, UnacknowledgedBulletinKeysQueryVariables> & ({ variables: UnacknowledgedBulletinKeysQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UnacknowledgedBulletinKeysQuery, UnacknowledgedBulletinKeysQueryVariables>(UnacknowledgedBulletinKeysDocument, options);
+      }
+export function useUnacknowledgedBulletinKeysLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UnacknowledgedBulletinKeysQuery, UnacknowledgedBulletinKeysQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UnacknowledgedBulletinKeysQuery, UnacknowledgedBulletinKeysQueryVariables>(UnacknowledgedBulletinKeysDocument, options);
+        }
+export function useUnacknowledgedBulletinKeysSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<UnacknowledgedBulletinKeysQuery, UnacknowledgedBulletinKeysQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<UnacknowledgedBulletinKeysQuery, UnacknowledgedBulletinKeysQueryVariables>(UnacknowledgedBulletinKeysDocument, options);
+        }
+export type UnacknowledgedBulletinKeysQueryHookResult = ReturnType<typeof useUnacknowledgedBulletinKeysQuery>;
+export type UnacknowledgedBulletinKeysLazyQueryHookResult = ReturnType<typeof useUnacknowledgedBulletinKeysLazyQuery>;
+export type UnacknowledgedBulletinKeysSuspenseQueryHookResult = ReturnType<typeof useUnacknowledgedBulletinKeysSuspenseQuery>;
+export type UnacknowledgedBulletinKeysQueryResult = Apollo.QueryResult<UnacknowledgedBulletinKeysQuery, UnacknowledgedBulletinKeysQueryVariables>;
 export const LnInvoiceCreateOnBehalfOfRecipientDocument = gql`
     mutation lnInvoiceCreateOnBehalfOfRecipient($input: LnInvoiceCreateOnBehalfOfRecipientInput!) {
   lnInvoiceCreateOnBehalfOfRecipient(input: $input) {

@@ -5,7 +5,8 @@
  * Kept on device because no backend records the investment yet: the home reads it to
  * steer the investor back to the payment, and to welcome them once it is made. It does
  * not lapse. Once signed, the record is also the mark that this account has signed, and
- * the flow refuses to be walked a second time while it stands.
+ * the flow refuses to be walked a second time while it stands; only a new invitation
+ * from the server supersedes it.
  */
 export type CardInvestmentProgress = {
   /** The amount the investor chose, which every later step derives its figures from. */
@@ -25,6 +26,10 @@ export type CardInvestmentProgress = {
   /** When the investor closed the welcome. The record stays past that, as the mark that
    *  this account signed; only the card goes. */
   welcomeDismissedAt?: number
+  /** The server's invitation bulletin the signature answered, once the signing step found
+   *  it. The home retires only this one, and reads any other investment bulletin as a new
+   *  invitation. Absent when the server could not be reached as the agreement was signed. */
+  invitationBulletinId?: string
   /** The invoice last issued for the payment, kept so a return to the transfer step pays
    *  the same claim rather than a second one, and so a payment that went through without
    *  being recorded can be found in the ledger before another invoice is minted. */
