@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import React, { Ref, useCallback, useEffect, useMemo, useState } from "react"
 import {
   AccessibilityActionEvent,
   AccessibilityInfo,
@@ -74,6 +74,8 @@ type SwipeButtonPropsType = {
   disabled?: boolean
   /** Handle colour; defaults to `accent`. The arrow on it is white in both themes. */
   accentColor?: string
+  /** The handle, the one element a screen reader reaches, e.g. to move focus to it. */
+  handleRef?: Ref<View>
 }
 
 const GaloySliderButton = ({
@@ -85,6 +87,7 @@ const GaloySliderButton = ({
   isLoading = false,
   disabled = false,
   accentColor,
+  handleRef,
 }: SwipeButtonPropsType) => {
   const {
     theme: { colors },
@@ -241,6 +244,7 @@ const GaloySliderButton = ({
       )}
       <GestureDetector gesture={panGesture}>
         <Animated.View
+          ref={handleRef}
           style={[
             styles.handle,
             { backgroundColor: accentColor ?? colors.accent },
