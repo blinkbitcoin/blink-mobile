@@ -41,6 +41,35 @@
     "@typescript-eslint/no-explicit-any": "error",
 
     "import/no-extraneous-dependencies": "error",
+    // The hard boundary between the two account namespaces (see "Account namespaces" in
+    // docs/architecture.md). Checked on resolved paths, so an alias, a relative path, a
+    // type import, a re-export, a dynamic import and a require are all caught. Its own
+    // rule, so it never replaces the options of a rule other policies share.
+    "import/no-restricted-paths": [
+      "error",
+      {
+        "zones": [
+          {
+            "target": "./app/custodial",
+            "from": [
+              "./app/self-custodial",
+              "./app/screens/self-custodial",
+              "./app/screens/settings-screen/self-custodial"
+            ],
+            "message": "Custodial code must not depend on self-custodial code."
+          },
+          {
+            "target": [
+              "./app/self-custodial",
+              "./app/screens/self-custodial",
+              "./app/screens/settings-screen/self-custodial"
+            ],
+            "from": "./app/custodial",
+            "message": "Self-custodial code must not depend on custodial code."
+          }
+        ]
+      }
+    ],
     "import/no-unresolved": "off",
     "import/prefer-default-export": "off",
 
@@ -234,6 +263,102 @@
       }
     },
     {
+      "files": ["app/types/**"],
+      "rules": {
+        "@typescript-eslint/no-restricted-imports": [
+          "warn",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "@app/graphql/generated",
+                  "@breeztech/*",
+                  "@app/hooks",
+                  "@app/hooks/*",
+                  "@app/screens/*",
+                  "@app/custodial/*",
+                  "@app/self-custodial/*"
+                ],
+                "message": "app/types holds the ports and the app's own types. It must not depend on GraphQL, the SDK, hooks, screens or an account namespace."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "app/utils/**",
+        "app/hooks/**",
+        "app/components/**",
+        "app/config/**",
+        "app/store/**",
+        "app/graphql/**"
+      ],
+      "rules": {
+        "@typescript-eslint/no-restricted-imports": [
+          "warn",
+          {
+            "patterns": [
+              {
+                "group": ["@app/screens/*"],
+                "message": "Shared code must not depend on a screen. Move what both need out of the screen."
+              },
+              {
+                "group": ["@breeztech/*"],
+                "message": "The Breez SDK is only imported inside app/self-custodial."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/custodial/**", "app/self-custodial/**"],
+      "rules": {
+        "@typescript-eslint/no-restricted-imports": [
+          "warn",
+          {
+            "patterns": [
+              {
+                "group": ["@app/screens/*"],
+                "message": "An account namespace must not depend on a screen. Move what both need to app/types or into the namespace."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/screens/**"],
+      "excludedFiles": [
+        "app/screens/self-custodial/**",
+        "app/screens/settings-screen/self-custodial/**"
+      ],
+      "rules": {
+        "@typescript-eslint/no-restricted-imports": [
+          "warn",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "@app/custodial/*",
+                  "!@app/custodial/components",
+                  "@app/self-custodial/*",
+                  "!@app/self-custodial/components"
+                ],
+                "message": "A shared screen reads account data through the hooks in app/hooks. Only a namespace's components may be rendered here."
+              },
+              {
+                "group": ["@breeztech/*"],
+                "message": "The Breez SDK is only imported inside app/self-custodial."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "files": ["app/utils/error-reporting.ts", "app/app.tsx"],
       "rules": {
         "no-restricted-imports": [
@@ -285,6 +410,12 @@
   "settings": {
     "react": {
       "version": "detect"
+    },
+    // Lets the import rules follow the @app/* alias from tsconfig.json to the file it names.
+    "import/resolver": {
+      "typescript": {
+        "project": "./tsconfig.json"
+      }
     }
   }
 }
