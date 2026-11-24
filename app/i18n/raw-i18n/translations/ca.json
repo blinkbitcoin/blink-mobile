@@ -3217,7 +3217,7 @@
       "emptyTransactions": "Encara no hi ha transaccions",
       "addFunds": "Afegir fons",
       "transactionsTitle": "Transaccions",
-      "title": "Targeta Visa",
+      "title": "Blink Card",
       "noCardAvailable": "No hi ha targetes disponibles",
       "cardNotUsable": "Aquesta targeta no està disponible per al seu ús",
       "cardUpdateError": "No s'ha pogut actualitzar l'estat de la targeta"
@@ -3376,10 +3376,10 @@
       "termsAndConditions": "Termes i condicions de la targeta",
       "privacyPolicy": "Política de privacitat de la targeta",
       "closeCardAccount": "Tancar compte de targeta",
-      "closeCardAccountDescription": "Tanca permanentment la teva targeta Visa",
+      "closeCardAccountDescription": "Tanca permanentment la teva Blink Card",
       "addToAppleWallet": "Afegir a Apple Wallet",
       "notificationToggleError": "No s'han pogut actualitzar les preferències de notificació",
-      "closeCardWarning": "Aquesta acció és permanent. La teva targeta Visa serà cancel·lada i no es podrà reactivar.",
+      "closeCardWarning": "Aquesta acció és permanent. La teva Blink Card serà cancel·lada i no es podrà reactivar.",
       "closeCardTypeClose": "Si us plau, escriu \"{close}\" per confirmar",
       "closeCardClose": "tancar",
       "closeCardFinalConfirmTitle": "Confirmació Final",
@@ -3387,7 +3387,7 @@
       "closeCardPendingTransactions": "Tens transaccions pendents. Si us plau, espera fins que es liquidin abans de tancar la teva targeta.",
       "closeCardBalanceWarning": "La teva targeta té un saldo de {balance}. Si us plau, retira els teus fons abans de tancar. Vols continuar igualment?",
       "closeCardSuccessTitle": "Compte de Targeta Tancat",
-      "closeCardSuccessSubtitle": "La teva targeta Visa ha estat tancada permanentment.",
+      "closeCardSuccessSubtitle": "La teva Blink Card ha estat tancada permanentment.",
       "closeCardSuccessButton": "Tornar a l'Inici",
       "closeCardError": "No s'ha pogut tancar el compte de targeta. Si us plau, contacta amb suport."
     },
@@ -3418,7 +3418,7 @@
     },
     "PersonalDetails": {
       "title": "Detalls personals",
-      "blinkVisaCardholder": "Titular de la targeta Blink Visa",
+      "blinkCardholder": "Titular de la Blink Card",
       "kycVerifiedInformation": "Informació KYC verificada",
       "kycVerifiedDescription": "El teu nom, data de naixement i adreça estan verificats a través del nostre procés KYC. Pots canviar la informació refent el procés KYC. No garantim l'aprovació.",
       "changeKycInformation": "Canviar informació KYC",
@@ -3444,7 +3444,7 @@
     "AddToMobileWallet": {
       "title": "Afegir a la cartera mobil",
       "addYourCard": "Afegeix la teva targeta",
-      "addYourCardDescription": "Afegeix la teva targeta Blink Visa a la cartera mobil per a pagaments rapids i segurs",
+      "addYourCardDescription": "Afegeix la teva Blink Card a la cartera mòbil per a pagaments ràpids i segurs",
       "addTo": "Afegir a",
       "Benefits": {
         "title": "Avantatges de la cartera mobil",
@@ -3455,10 +3455,10 @@
       }
     },
     "CardStatus": {
-      "title": "Targeta Visa",
+      "title": "Blink Card",
       "CardApproved": {
         "title": "Felicitats!",
-        "subtitle": "La teva targeta Blink Visa ha estat activada.",
+        "subtitle": "La teva Blink Card ha estat activada.",
         "buttonLabel": "Demanar targeta física",
         "buttonLabelDashboard": "Tauler"
       },

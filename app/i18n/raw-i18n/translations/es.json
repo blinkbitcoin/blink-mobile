@@ -3217,7 +3217,7 @@
             "emptyTransactions": "Aún no hay transacciones",
             "addFunds": "Agregar fondos",
             "transactionsTitle": "Transacciones",
-            "title": "Tarjeta Visa",
+            "title": "Blink Card",
             "noCardAvailable": "No hay tarjetas disponibles",
             "cardNotUsable": "Esta tarjeta no está disponible para su uso",
             "cardUpdateError": "No se pudo actualizar el estado de la tarjeta"
@@ -3376,10 +3376,10 @@
             "termsAndConditions": "Términos y condiciones de la tarjeta",
             "privacyPolicy": "Política de privacidad de la tarjeta",
             "closeCardAccount": "Cerrar cuenta de tarjeta",
-            "closeCardAccountDescription": "Cierra permanentemente tu tarjeta Visa",
+            "closeCardAccountDescription": "Cierra permanentemente tu Blink Card",
             "addToAppleWallet": "Agregar a Apple Wallet",
             "notificationToggleError": "Error al actualizar las preferencias de notificación",
-            "closeCardWarning": "Esta acción es permanente. Tu tarjeta Visa será cancelada y no podrá ser reactivada.",
+            "closeCardWarning": "Esta acción es permanente. Tu Blink Card será cancelada y no podrá ser reactivada.",
             "closeCardTypeClose": "Por favor escribe \"{close}\" para confirmar",
             "closeCardClose": "cerrar",
             "closeCardFinalConfirmTitle": "Confirmación Final",
@@ -3387,7 +3387,7 @@
             "closeCardPendingTransactions": "Tienes transacciones pendientes. Por favor espera a que se liquiden antes de cerrar tu tarjeta.",
             "closeCardBalanceWarning": "Tu tarjeta tiene un saldo de {balance}. Por favor retira tus fondos antes de cerrar. ¿Deseas continuar de todas formas?",
             "closeCardSuccessTitle": "Cuenta de Tarjeta Cerrada",
-            "closeCardSuccessSubtitle": "Tu tarjeta Visa ha sido cerrada permanentemente.",
+            "closeCardSuccessSubtitle": "Tu Blink Card ha sido cerrada permanentemente.",
             "closeCardSuccessButton": "Volver al Inicio",
             "closeCardError": "No se pudo cerrar la cuenta de tarjeta. Por favor contacta a soporte."
         },
@@ -3418,7 +3418,7 @@
         },
         "PersonalDetails": {
             "title": "Datos personales",
-            "blinkVisaCardholder": "Titular de tarjeta Blink Visa",
+            "blinkCardholder": "Titular de la Blink Card",
             "kycVerifiedInformation": "Información KYC verificada",
             "kycVerifiedDescription": "Tu nombre, fecha de nacimiento y dirección están verificados a través de nuestro proceso KYC. Puedes cambiar la información repitiendo el proceso KYC. No garantizamos la aprobación.",
             "changeKycInformation": "Cambiar información KYC",
@@ -3444,7 +3444,7 @@
         "AddToMobileWallet": {
             "title": "Agregar a billetera móvil",
             "addYourCard": "Agrega tu tarjeta",
-            "addYourCardDescription": "Agrega tu tarjeta Blink Visa a tu billetera móvil para pagos rápidos y seguros",
+            "addYourCardDescription": "Agrega tu Blink Card a tu billetera móvil para pagos rápidos y seguros",
             "addTo": "Agregar a",
             "Benefits": {
                 "title": "Beneficios de la billetera móvil",
@@ -3455,10 +3455,10 @@
             }
         },
         "CardStatus": {
-            "title": "Tarjeta Visa",
+            "title": "Blink Card",
             "CardApproved": {
                 "title": "¡Felicidades!",
-                "subtitle": "Tu tarjeta Blink Visa ha sido activada.",
+                "subtitle": "Tu Blink Card ha sido activada.",
                 "buttonLabel": "Solicitar tarjeta física",
                 "buttonLabelDashboard": "Panel"
             },

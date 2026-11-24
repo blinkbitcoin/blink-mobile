@@ -10800,7 +10800,7 @@ type RootTranslation = {
 				statements: string
 			}
 			/**
-			 * V​i​s​a​ ​c​a​r​d
+			 * B​l​i​n​k​ ​C​a​r​d
 			 */
 			title: string
 			/**
@@ -11321,11 +11321,11 @@ type RootTranslation = {
 			 */
 			closeCardAccount: string
 			/**
-			 * P​e​r​m​a​n​e​n​t​l​y​ ​c​l​o​s​e​ ​y​o​u​r​ ​V​i​s​a​ ​c​a​r​d
+			 * P​e​r​m​a​n​e​n​t​l​y​ ​c​l​o​s​e​ ​y​o​u​r​ ​B​l​i​n​k​ ​C​a​r​d
 			 */
 			closeCardAccountDescription: string
 			/**
-			 * T​h​i​s​ ​a​c​t​i​o​n​ ​i​s​ ​p​e​r​m​a​n​e​n​t​.​ ​Y​o​u​r​ ​V​i​s​a​ ​c​a​r​d​ ​w​i​l​l​ ​b​e​ ​c​a​n​c​e​l​e​d​ ​a​n​d​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​a​c​t​i​v​a​t​e​d​.
+			 * T​h​i​s​ ​a​c​t​i​o​n​ ​i​s​ ​p​e​r​m​a​n​e​n​t​.​ ​Y​o​u​r​ ​B​l​i​n​k​ ​C​a​r​d​ ​w​i​l​l​ ​b​e​ ​c​a​n​c​e​l​e​d​ ​a​n​d​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​a​c​t​i​v​a​t​e​d​.
 			 */
 			closeCardWarning: string
 			/**
@@ -11359,7 +11359,7 @@ type RootTranslation = {
 			 */
 			closeCardSuccessTitle: string
 			/**
-			 * Y​o​u​r​ ​V​i​s​a​ ​c​a​r​d​ ​h​a​s​ ​b​e​e​n​ ​p​e​r​m​a​n​e​n​t​l​y​ ​c​l​o​s​e​d​.
+			 * Y​o​u​r​ ​B​l​i​n​k​ ​C​a​r​d​ ​h​a​s​ ​b​e​e​n​ ​p​e​r​m​a​n​e​n​t​l​y​ ​c​l​o​s​e​d​.
 			 */
 			closeCardSuccessSubtitle: string
 			/**
@@ -11381,9 +11381,9 @@ type RootTranslation = {
 			 */
 			title: string
 			/**
-			 * B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d​h​o​l​d​e​r
+			 * B​l​i​n​k​ ​C​a​r​d​h​o​l​d​e​r
 			 */
-			blinkVisaCardholder: string
+			blinkCardholder: string
 			/**
 			 * K​Y​C​ ​v​e​r​i​f​i​e​d​ ​i​n​f​o​r​m​a​t​i​o​n
 			 */
@@ -11479,7 +11479,7 @@ type RootTranslation = {
 			 */
 			addYourCard: string
 			/**
-			 * A​d​d​ ​y​o​u​r​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d​ ​t​o​ ​y​o​u​r​ ​m​o​b​i​l​e​ ​w​a​l​l​e​t​ ​f​o​r​ ​q​u​i​c​k​ ​a​n​d​ ​s​e​c​u​r​e​ ​p​a​y​m​e​n​t​s
+			 * A​d​d​ ​y​o​u​r​ ​B​l​i​n​k​ ​C​a​r​d​ ​t​o​ ​y​o​u​r​ ​m​o​b​i​l​e​ ​w​a​l​l​e​t​ ​f​o​r​ ​q​u​i​c​k​ ​a​n​d​ ​s​e​c​u​r​e​ ​p​a​y​m​e​n​t​s
 			 */
 			addYourCardDescription: string
 			/**
@@ -11511,7 +11511,7 @@ type RootTranslation = {
 		}
 		CardStatus: {
 			/**
-			 * V​i​s​a​ ​c​a​r​d
+			 * B​l​i​n​k​ ​C​a​r​d
 			 */
 			title: string
 			CardApproved: {
@@ -11520,7 +11520,7 @@ type RootTranslation = {
 				 */
 				title: string
 				/**
-				 * Y​o​u​r​ ​B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d​ ​h​a​s​ ​b​e​e​n​ ​a​c​t​i​v​a​t​e​d​.
+				 * Y​o​u​r​ ​B​l​i​n​k​ ​C​a​r​d​ ​h​a​s​ ​b​e​e​n​ ​a​c​t​i​v​a​t​e​d​.
 				 */
 				subtitle: string
 				/**
@@ -25118,7 +25118,7 @@ export type TranslationFunctions = {
 				statements: () => LocalizedString
 			}
 			/**
-			 * Visa card
+			 * Blink Card
 			 */
 			title: () => LocalizedString
 			/**
@@ -25634,11 +25634,11 @@ export type TranslationFunctions = {
 			 */
 			closeCardAccount: () => LocalizedString
 			/**
-			 * Permanently close your Visa card
+			 * Permanently close your Blink Card
 			 */
 			closeCardAccountDescription: () => LocalizedString
 			/**
-			 * This action is permanent. Your Visa card will be canceled and cannot be reactivated.
+			 * This action is permanent. Your Blink Card will be canceled and cannot be reactivated.
 			 */
 			closeCardWarning: () => LocalizedString
 			/**
@@ -25670,7 +25670,7 @@ export type TranslationFunctions = {
 			 */
 			closeCardSuccessTitle: () => LocalizedString
 			/**
-			 * Your Visa card has been permanently closed.
+			 * Your Blink Card has been permanently closed.
 			 */
 			closeCardSuccessSubtitle: () => LocalizedString
 			/**
@@ -25692,9 +25692,9 @@ export type TranslationFunctions = {
 			 */
 			title: () => LocalizedString
 			/**
-			 * Blink Visa Cardholder
+			 * Blink Cardholder
 			 */
-			blinkVisaCardholder: () => LocalizedString
+			blinkCardholder: () => LocalizedString
 			/**
 			 * KYC verified information
 			 */
@@ -25790,7 +25790,7 @@ export type TranslationFunctions = {
 			 */
 			addYourCard: () => LocalizedString
 			/**
-			 * Add your Blink Visa card to your mobile wallet for quick and secure payments
+			 * Add your Blink Card to your mobile wallet for quick and secure payments
 			 */
 			addYourCardDescription: () => LocalizedString
 			/**
@@ -25822,7 +25822,7 @@ export type TranslationFunctions = {
 		}
 		CardStatus: {
 			/**
-			 * Visa card
+			 * Blink Card
 			 */
 			title: () => LocalizedString
 			CardApproved: {
@@ -25831,7 +25831,7 @@ export type TranslationFunctions = {
 				 */
 				title: () => LocalizedString
 				/**
-				 * Your Blink Visa Card has been activated.
+				 * Your Blink Card has been activated.
 				 */
 				subtitle: () => LocalizedString
 				/**

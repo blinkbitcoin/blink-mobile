@@ -3217,7 +3217,7 @@
       "emptyTransactions": "Încă nu există tranzacții",
       "addFunds": "Adaugă fonduri",
       "transactionsTitle": "Tranzacții",
-      "title": "Card Visa",
+      "title": "Blink Card",
       "noCardAvailable": "Niciun card disponibil",
       "cardNotUsable": "Acest card nu este disponibil pentru utilizare în acest moment",
       "cardUpdateError": "Nu s-a putut actualiza starea cardului"
@@ -3376,10 +3376,10 @@
       "termsAndConditions": "Termeni și condiții card",
       "privacyPolicy": "Politica de confidențialitate card",
       "closeCardAccount": "Închide contul cardului",
-      "closeCardAccountDescription": "Închide permanent cardul tău Visa",
+      "closeCardAccountDescription": "Închide permanent Blink Card-ul tău",
       "addToAppleWallet": "Adauga in Apple Wallet",
       "notificationToggleError": "Actualizarea setărilor de notificare a eșuat",
-      "closeCardWarning": "Această acțiune este permanentă. Cardul tău Visa va fi anulat și nu poate fi reactivat.",
+      "closeCardWarning": "Această acțiune este permanentă. Blink Card-ul tău va fi anulat și nu poate fi reactivat.",
       "closeCardTypeClose": "Te rugăm să tastezi \"{close}\" pentru a confirma",
       "closeCardClose": "închide",
       "closeCardFinalConfirmTitle": "Confirmare Finală",
@@ -3387,7 +3387,7 @@
       "closeCardPendingTransactions": "Ai tranzacții în așteptare. Te rugăm să aștepți până sunt procesate înainte de a închide cardul.",
       "closeCardBalanceWarning": "Cardul tău are un sold de {balance}. Te rugăm să retragi fondurile înainte de a închide. Vrei să continui oricum?",
       "closeCardSuccessTitle": "Cont de Card Închis",
-      "closeCardSuccessSubtitle": "Cardul tău Visa a fost închis permanent.",
+      "closeCardSuccessSubtitle": "Blink Card-ul tău a fost închis permanent.",
       "closeCardSuccessButton": "Înapoi la Pagina Principală",
       "closeCardError": "Nu s-a putut închide contul de card. Te rugăm să contactezi suportul."
     },
@@ -3418,7 +3418,7 @@
     },
     "PersonalDetails": {
       "title": "Detalii personale",
-      "blinkVisaCardholder": "Deținător card Blink Visa",
+      "blinkCardholder": "Deținător Blink Card",
       "kycVerifiedInformation": "Informații KYC verificate",
       "kycVerifiedDescription": "Numele, data nașterii și adresa dumneavoastră sunt verificate prin procesul nostru KYC. Puteți modifica informațiile refăcând procesul KYC. Nu garantăm aprobarea.",
       "changeKycInformation": "Modifică informațiile KYC",
@@ -3444,7 +3444,7 @@
     "AddToMobileWallet": {
       "title": "Adauga in portofelul mobil",
       "addYourCard": "Adauga cardul tau",
-      "addYourCardDescription": "Adauga cardul Blink Visa in portofelul mobil pentru plati rapide si sigure",
+      "addYourCardDescription": "Adaugă Blink Card-ul în portofelul mobil pentru plăți rapide și sigure",
       "addTo": "Adauga in",
       "Benefits": {
         "title": "Beneficiile portofelului mobil",
@@ -3455,10 +3455,10 @@
       }
     },
     "CardStatus": {
-      "title": "Card Visa",
+      "title": "Blink Card",
       "CardApproved": {
         "title": "Felicitări!",
-        "subtitle": "Cardul tău Blink Visa a fost activat.",
+        "subtitle": "Blink Card-ul tău a fost activat.",
         "buttonLabel": "Comandă card fizic",
         "buttonLabelDashboard": "Panou"
       },

@@ -3217,7 +3217,7 @@
       "emptyTransactions": "Još nema transakcija",
       "addFunds": "Dodaj sredstva",
       "transactionsTitle": "Transakcije",
-      "title": "Visa kartica",
+      "title": "Blink Card",
       "noCardAvailable": "Нема доступних картица",
       "cardNotUsable": "Ова картица тренутно није доступна за коришћење",
       "cardUpdateError": "Није могуће ажурирати статус картице"
@@ -3376,10 +3376,10 @@
       "termsAndConditions": "Услови и одредбе картице",
       "privacyPolicy": "Политика приватности картице",
       "closeCardAccount": "Затвори налог картице",
-      "closeCardAccountDescription": "Трајно затворите своју Visa картицу",
+      "closeCardAccountDescription": "Трајно затворите своју Blink Card",
       "addToAppleWallet": "Додај у Apple Wallet",
       "notificationToggleError": "Ажурирање подешавања обавештења није успело",
-      "closeCardWarning": "Ова радња је трајна. Ваша Visa картица ће бити отказана и не може се поново активирати.",
+      "closeCardWarning": "Ова радња је трајна. Ваша Blink Card ће бити отказана и не може се поново активирати.",
       "closeCardTypeClose": "Унесите \"{close}\" за потврду",
       "closeCardClose": "затвори",
       "closeCardFinalConfirmTitle": "Завршна потврда",
@@ -3387,7 +3387,7 @@
       "closeCardPendingTransactions": "Имате трансакције на чекању. Сачекајте да се обраде пре затварања картице.",
       "closeCardBalanceWarning": "Ваша картица има стање од {balance}. Повуците средства пре затварања. Да ли желите да наставите?",
       "closeCardSuccessTitle": "Налог картице затворен",
-      "closeCardSuccessSubtitle": "Ваша Visa картица је трајно затворена.",
+      "closeCardSuccessSubtitle": "Ваша Blink Card је трајно затворена.",
       "closeCardSuccessButton": "Назад на почетну",
       "closeCardError": "Затварање налога картице није успело. Контактирајте подршку."
     },
@@ -3418,7 +3418,7 @@
     },
     "PersonalDetails": {
       "title": "Лични подаци",
-      "blinkVisaCardholder": "Власник Blink Visa картице",
+      "blinkCardholder": "Власник картице Blink Card",
       "kycVerifiedInformation": "KYC верификоване информације",
       "kycVerifiedDescription": "Ваше име, датум рођења и адреса су верификовани кроз наш KYC процес. Можете променити информације поновним KYC процесом. Не гарантујемо одобрење.",
       "changeKycInformation": "Промени KYC информације",
@@ -3444,7 +3444,7 @@
     "AddToMobileWallet": {
       "title": "Dodaj u mobilni novcanik",
       "addYourCard": "Dodajte svoju karticu",
-      "addYourCardDescription": "Dodajte svoju Blink Visa karticu u mobilni novcanik za brza i sigurna placanja",
+      "addYourCardDescription": "Додајте своју Blink Card у мобилни новчаник за брза и сигурна плаћања",
       "addTo": "Dodaj u",
       "Benefits": {
         "title": "Prednosti mobilnog novcanika",
@@ -3455,10 +3455,10 @@
       }
     },
     "CardStatus": {
-      "title": "Visa картица",
+      "title": "Blink Card",
       "CardApproved": {
         "title": "Честитамо!",
-        "subtitle": "Ваша Blink Visa картица је активирана.",
+        "subtitle": "Ваша Blink Card је активирана.",
         "buttonLabel": "Наручи физичку картицу",
         "buttonLabelDashboard": "Контролна табла"
       },

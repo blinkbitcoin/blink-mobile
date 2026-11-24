@@ -3217,7 +3217,7 @@
       "emptyTransactions": "Aún no hay transacciones",
       "addFunds": "Agregar fondos",
       "transactionsTitle": "Transacciones",
-      "title": "Tarjeta Visa",
+      "title": "Blink tarjeta",
       "noCardAvailable": "Manan tarjetakuna kanchu",
       "cardNotUsable": "Kay tarjeta kunan mana atikunchu ruwakunapaq",
       "cardUpdateError": "Tarjetap kaynin mana hukchayta atinchu"
@@ -3376,10 +3376,10 @@
       "termsAndConditions": "Tarjeta kamachiykuna",
       "privacyPolicy": "Tarjeta pakasqa kamachiy",
       "closeCardAccount": "Tarjeta kuntata wisqay",
-      "closeCardAccountDescription": "Visa tarjetaykita wiñaypaq wisqay",
+      "closeCardAccountDescription": "Blink tarjetaykita wiñaypaq wisqay",
       "addToAppleWallet": "Yapaykuy Apple Wallet nisqaman",
       "notificationToggleError": "Mana atikurqachu willanakuy churanakuykunata",
-      "closeCardWarning": "Kay ruwayqa wiñaypaqmi. Visa tarjetaykiqa chinkachisqa kanqa, manam kutichiyta atikunkichu.",
+      "closeCardWarning": "Kay ruwayqa wiñaypaqmi. Blink tarjetaykiqa chinkachisqa kanqa, manam kutichiyta atikunkichu.",
       "closeCardTypeClose": "Ama hina kaspa \"{close}\" nispa qillqay takyachinapaq",
       "closeCardClose": "wisq'ay",
       "closeCardFinalConfirmTitle": "Qhipa Takyachiy",
@@ -3387,7 +3387,7 @@
       "closeCardPendingTransactions": "Suyachkaq ruwanakuna kapusunki. Ama hina kaspa suyay chaykunata tukurunankama tarjetaykita wisq'anaykipaq.",
       "closeCardBalanceWarning": "Tarjetaykipi {balance} saldo kachkan. Ama hina kaspa qullqiykita hurquy wisq'anaykipaq. ¿Ñawpaqman riyta munankichu?",
       "closeCardSuccessTitle": "Tarjeta Cuenta Wisq'asqa",
-      "closeCardSuccessSubtitle": "Visa tarjetaykiqa wiñaypaq wisq'asqa.",
+      "closeCardSuccessSubtitle": "Blink tarjetaykiqa wiñaypaq wisq'asqa.",
       "closeCardSuccessButton": "Qallariy panaman kutiy",
       "closeCardError": "Manam atikurqachu tarjeta cuentata wisq'ayta. Ama hina kaspa yanapakuqwan rimanakuy."
     },
@@ -3418,7 +3418,7 @@
     },
     "PersonalDetails": {
       "title": "Kikinpa willakuyninkuna",
-      "blinkVisaCardholder": "Blink Visa tarjeta hap'iq",
+      "blinkCardholder": "Blink tarjeta hap'iq",
       "kycVerifiedInformation": "KYC taripasqa willakuykuna",
       "kycVerifiedDescription": "Sutiyki, paqarisqa p'unchayniyki hinaspa tiyanayki KYC ruwayninchikwan taripasqa. Willakuykunata kutichiy atinki KYC ruwayta kutichispan. Mana ari ninata quwayku.",
       "changeKycInformation": "KYC willakuykunata tikray",
@@ -3444,7 +3444,7 @@
     "AddToMobileWallet": {
       "title": "Yapaykuy qullqi walitaman",
       "addYourCard": "Tarjetaykita yapaykuy",
-      "addYourCardDescription": "Blink Visa tarjetaykita yapaykuy qullqi walitaman utqaylla pagaypaq",
+      "addYourCardDescription": "Blink tarjetaykita yapaykuy qullqi walitaman utqaylla pagaypaq",
       "addTo": "Yapaykuy",
       "Benefits": {
         "title": "Qullqi walitap allin kayninkunan",
@@ -3455,10 +3455,10 @@
       }
     },
     "CardStatus": {
-      "title": "Visa tarjeta",
+      "title": "Blink tarjeta",
       "CardApproved": {
         "title": "¡Kusikuyki!",
-        "subtitle": "Blink Visa tarjetayki qallarisqa.",
+        "subtitle": "Blink tarjetayki qallarisqa.",
         "buttonLabel": "Tarjeta físicata mañakuy",
         "buttonLabelDashboard": "Ñawpaq panqa"
       },

@@ -3217,7 +3217,7 @@
       "emptyTransactions": "Henüz işlem yok",
       "addFunds": "Para ekle",
       "transactionsTitle": "İşlemler",
-      "title": "Visa Kartı",
+      "title": "Blink Kartı",
       "noCardAvailable": "Kullanılabilir kart yok",
       "cardNotUsable": "Bu kart şu anda kullanım için uygun değil",
       "cardUpdateError": "Kart durumu güncellenemedi"
@@ -3376,10 +3376,10 @@
       "termsAndConditions": "Kart şartları ve koşulları",
       "privacyPolicy": "Kart gizlilik politikası",
       "closeCardAccount": "Kart hesabını kapat",
-      "closeCardAccountDescription": "Visa kartınızı kalıcı olarak kapatın",
+      "closeCardAccountDescription": "Blink kartınızı kalıcı olarak kapatın",
       "addToAppleWallet": "Apple Wallet'a ekle",
       "notificationToggleError": "Bildirim ayarları güncellenemedi",
-      "closeCardWarning": "Bu işlem kalıcıdır. Visa kartınız iptal edilecek ve yeniden etkinleştirilemez.",
+      "closeCardWarning": "Bu işlem kalıcıdır. Blink kartınız iptal edilecek ve yeniden etkinleştirilemez.",
       "closeCardTypeClose": "Onaylamak için lütfen \"{close}\" yazın",
       "closeCardClose": "kapat",
       "closeCardFinalConfirmTitle": "Son Onay",
@@ -3387,7 +3387,7 @@
       "closeCardPendingTransactions": "Bekleyen işlemleriniz var. Kartınızı kapatmadan önce lütfen bunların tamamlanmasını bekleyin.",
       "closeCardBalanceWarning": "Kartınızda {balance} bakiye var. Lütfen kapatmadan önce paranızı çekin. Yine de devam etmek istiyor musunuz?",
       "closeCardSuccessTitle": "Kart Hesabı Kapatıldı",
-      "closeCardSuccessSubtitle": "Visa kartınız kalıcı olarak kapatıldı.",
+      "closeCardSuccessSubtitle": "Blink kartınız kalıcı olarak kapatıldı.",
       "closeCardSuccessButton": "Ana Sayfaya Dön",
       "closeCardError": "Kart hesabı kapatılamadı. Lütfen destek ile iletişime geçin."
     },
@@ -3418,7 +3418,7 @@
     },
     "PersonalDetails": {
       "title": "Kişisel bilgiler",
-      "blinkVisaCardholder": "Blink Visa Kart Sahibi",
+      "blinkCardholder": "Blink Kart Sahibi",
       "kycVerifiedInformation": "KYC doğrulanmış bilgiler",
       "kycVerifiedDescription": "Adınız, doğum tarihiniz ve adresiniz KYC sürecimiz aracılığıyla doğrulanmıştır. KYC sürecini tekrarlayarak bilgileri değiştirebilirsiniz. Onay garantisi vermiyoruz.",
       "changeKycInformation": "KYC bilgilerini değiştir",
@@ -3444,7 +3444,7 @@
     "AddToMobileWallet": {
       "title": "Mobil cuzdana ekle",
       "addYourCard": "Kartinizi ekleyin",
-      "addYourCardDescription": "Hizli ve guvenli odemeler icin Blink Visa kartinizi mobil cuzdaniniza ekleyin",
+      "addYourCardDescription": "Hızlı ve güvenli ödemeler için Blink kartınızı mobil cüzdanınıza ekleyin",
       "addTo": "Ekle",
       "Benefits": {
         "title": "Mobil cuzdanin avantajlari",
@@ -3455,10 +3455,10 @@
       }
     },
     "CardStatus": {
-      "title": "Visa Kartı",
+      "title": "Blink Kartı",
       "CardApproved": {
         "title": "Tebrikler!",
-        "subtitle": "Blink Visa kartınız etkinleştirildi.",
+        "subtitle": "Blink kartınız etkinleştirildi.",
         "buttonLabel": "Fiziksel kart sipariş et",
         "buttonLabelDashboard": "Gösterge Paneli"
       },

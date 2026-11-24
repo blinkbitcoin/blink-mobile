@@ -3386,7 +3386,7 @@ const en: BaseTranslation = {
         setLimits: "Set limits",
         statements: "Statements",
       },
-      title: "Visa card",
+      title: "Blink Card",
       addFunds: "Add funds",
       transactionsTitle: "Transactions",
       emptyTransactions: "No transactions yet",
@@ -3547,9 +3547,9 @@ const en: BaseTranslation = {
       termsAndConditions: "Card Terms & Conditions",
       privacyPolicy: "Card Privacy Policy",
       closeCardAccount: "Close card account",
-      closeCardAccountDescription: "Permanently close your Visa card",
+      closeCardAccountDescription: "Permanently close your Blink Card",
       closeCardWarning:
-        "This action is permanent. Your Visa card will be canceled and cannot be reactivated.",
+        "This action is permanent. Your Blink Card will be canceled and cannot be reactivated.",
       closeCardTypeClose: 'Please type "{close}" to confirm',
       closeCardClose: "close",
       closeCardFinalConfirmTitle: "Final Confirmation",
@@ -3560,14 +3560,14 @@ const en: BaseTranslation = {
       closeCardBalanceWarning:
         "Your card has a balance of {balance: string}. Please withdraw your funds before closing. Do you want to proceed anyway?",
       closeCardSuccessTitle: "Card Account Closed",
-      closeCardSuccessSubtitle: "Your Visa card has been permanently closed.",
+      closeCardSuccessSubtitle: "Your Blink Card has been permanently closed.",
       closeCardSuccessButton: "Back to Home",
       closeCardError: "Failed to close card account. Please contact support.",
       notificationToggleError: "Failed to update notification settings",
     },
     PersonalDetails: {
       title: "Personal details",
-      blinkVisaCardholder: "Blink Visa Cardholder",
+      blinkCardholder: "Blink Cardholder",
       kycVerifiedInformation: "KYC verified information",
       kycVerifiedDescription:
         "Your name, date of birth and address are verified through our KYC process. You can change the information by redoing the KYC process. We don't guarantee an approval.",
@@ -3601,7 +3601,7 @@ const en: BaseTranslation = {
       title: "Add to mobile wallet",
       addYourCard: "Add your card",
       addYourCardDescription:
-        "Add your Blink Visa card to your mobile wallet for quick and secure payments",
+        "Add your Blink Card to your mobile wallet for quick and secure payments",
       addTo: "Add to",
       Benefits: {
         title: "Benefits of mobile wallet",
@@ -3612,10 +3612,10 @@ const en: BaseTranslation = {
       },
     },
     CardStatus: {
-      title: "Visa card",
+      title: "Blink Card",
       CardApproved: {
         title: "Congratulations!",
-        subtitle: "Your Blink Visa Card has been activated.",
+        subtitle: "Your Blink Card has been activated.",
         buttonLabel: "Order physical card",
         buttonLabelDashboard: "Dashboard",
       },

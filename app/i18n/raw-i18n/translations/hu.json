@@ -3217,7 +3217,7 @@
       "emptyTransactions": "Még nincs tranzakció",
       "addFunds": "Pénz hozzáadása",
       "transactionsTitle": "Tranzakciók",
-      "title": "Visa kártya",
+      "title": "Blink kártya",
       "noCardAvailable": "Nincs elérhető kártya",
       "cardNotUsable": "Ez a kártya jelenleg nem használható",
       "cardUpdateError": "Nem sikerült frissíteni a kártya állapotát"
@@ -3376,10 +3376,10 @@
       "termsAndConditions": "Kártya feltételek",
       "privacyPolicy": "Kártya adatvédelmi szabályzat",
       "closeCardAccount": "Kártyaszámla bezárása",
-      "closeCardAccountDescription": "Véglegesen zárja be Visa kártyáját",
+      "closeCardAccountDescription": "Véglegesen zárja be Blink kártyáját",
       "addToAppleWallet": "Hozzaadas az Apple Wallethoz",
       "notificationToggleError": "Nem sikerült frissíteni az értesítési beállításokat",
-      "closeCardWarning": "Ez a művelet végleges. A Visa kártyád törlésre kerül, és nem aktiválható újra.",
+      "closeCardWarning": "Ez a művelet végleges. A Blink kártyád törlésre kerül, és nem aktiválható újra.",
       "closeCardTypeClose": "Kérjük, írd be a \"{close}\" szót a megerősítéshez",
       "closeCardClose": "bezár",
       "closeCardFinalConfirmTitle": "Végső Megerősítés",
@@ -3387,7 +3387,7 @@
       "closeCardPendingTransactions": "Függőben lévő tranzakcióid vannak. Kérjük, várd meg, amíg teljesülnek, mielőtt bezárnád a kártyádat.",
       "closeCardBalanceWarning": "A kártyádon {balance} egyenleg van. Kérjük, vedd fel a pénzed a bezárás előtt. Mindenképpen folytatod?",
       "closeCardSuccessTitle": "Kártyaszámla Bezárva",
-      "closeCardSuccessSubtitle": "A Visa kártyád véglegesen bezárásra került.",
+      "closeCardSuccessSubtitle": "A Blink kártyád véglegesen bezárásra került.",
       "closeCardSuccessButton": "Vissza a Kezdőlapra",
       "closeCardError": "Nem sikerült bezárni a kártyaszámlát. Kérjük, lépj kapcsolatba az ügyfélszolgálattal."
     },
@@ -3418,7 +3418,7 @@
     },
     "PersonalDetails": {
       "title": "Személyes adatok",
-      "blinkVisaCardholder": "Blink Visa kártyabirtokos",
+      "blinkCardholder": "Blink kártyabirtokos",
       "kycVerifiedInformation": "KYC ellenőrzött információk",
       "kycVerifiedDescription": "A neve, születési dátuma és címe a KYC folyamatunkon keresztül ellenőrizve lett. Az információkat a KYC folyamat megismétlésével módosíthatja. A jóváhagyást nem garantáljuk.",
       "changeKycInformation": "KYC információk módosítása",
@@ -3444,7 +3444,7 @@
     "AddToMobileWallet": {
       "title": "Hozzaadas a mobil tarcahoz",
       "addYourCard": "Add hozza a kartyad",
-      "addYourCardDescription": "Add hozza a Blink Visa kartyad a mobil tarcadhoz a gyors es biztonsagos fizetesekhez",
+      "addYourCardDescription": "Add hozzá a Blink kártyádat a mobil tárcádhoz a gyors és biztonságos fizetésekhez",
       "addTo": "Hozzaadas",
       "Benefits": {
         "title": "A mobil tarca elonyei",
@@ -3455,10 +3455,10 @@
       }
     },
     "CardStatus": {
-      "title": "Visa kártya",
+      "title": "Blink kártya",
       "CardApproved": {
         "title": "Gratulálunk!",
-        "subtitle": "A Blink Visa kártyád aktiválva lett.",
+        "subtitle": "A Blink kártyád aktiválva lett.",
         "buttonLabel": "Fizikai kártya rendelése",
         "buttonLabelDashboard": "Irányítópult"
       },

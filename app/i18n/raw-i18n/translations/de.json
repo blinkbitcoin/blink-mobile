@@ -3217,7 +3217,7 @@
             "emptyTransactions": "Noch keine Transaktionen",
             "addFunds": "Guthaben hinzufügen",
             "transactionsTitle": "Transaktionen",
-            "title": "Visa-Karte",
+            "title": "Blink Card",
             "noCardAvailable": "Keine Karten verfügbar",
             "cardNotUsable": "Diese Karte ist derzeit nicht verfügbar",
             "cardUpdateError": "Kartenstatus konnte nicht aktualisiert werden"
@@ -3376,10 +3376,10 @@
             "termsAndConditions": "Karten-AGB",
             "privacyPolicy": "Karten-Datenschutzrichtlinie",
             "closeCardAccount": "Kartenkonto schließen",
-            "closeCardAccountDescription": "Schließen Sie Ihre Visa-Karte dauerhaft",
+            "closeCardAccountDescription": "Schließen Sie Ihre Blink Card dauerhaft",
             "addToAppleWallet": "Zu Apple Wallet hinzufuegen",
             "notificationToggleError": "Benachrichtigungseinstellungen konnten nicht aktualisiert werden",
-            "closeCardWarning": "Diese Aktion ist dauerhaft. Deine Visa-Karte wird gekündigt und kann nicht reaktiviert werden.",
+            "closeCardWarning": "Diese Aktion ist dauerhaft. Deine Blink Card wird gekündigt und kann nicht reaktiviert werden.",
             "closeCardTypeClose": "Bitte gib \"{close}\" zur Bestätigung ein",
             "closeCardClose": "schließen",
             "closeCardFinalConfirmTitle": "Letzte Bestätigung",
@@ -3387,7 +3387,7 @@
             "closeCardPendingTransactions": "Du hast ausstehende Transaktionen. Bitte warte, bis diese abgeschlossen sind, bevor du deine Karte schließt.",
             "closeCardBalanceWarning": "Deine Karte hat ein Guthaben von {balance}. Bitte hebe dein Guthaben ab, bevor du schließt. Möchtest du trotzdem fortfahren?",
             "closeCardSuccessTitle": "Kartenkonto geschlossen",
-            "closeCardSuccessSubtitle": "Deine Visa-Karte wurde dauerhaft geschlossen.",
+            "closeCardSuccessSubtitle": "Deine Blink Card wurde dauerhaft geschlossen.",
             "closeCardSuccessButton": "Zurück zur Startseite",
             "closeCardError": "Kartenkonto konnte nicht geschlossen werden. Bitte kontaktiere den Support."
         },
@@ -3418,7 +3418,7 @@
         },
         "PersonalDetails": {
             "title": "Persönliche Daten",
-            "blinkVisaCardholder": "Blink Visa-Karteninhaber",
+            "blinkCardholder": "Blink Card-Inhaber",
             "kycVerifiedInformation": "KYC-verifizierte Informationen",
             "kycVerifiedDescription": "Ihr Name, Geburtsdatum und Adresse wurden durch unseren KYC-Prozess verifiziert. Sie können die Informationen ändern, indem Sie den KYC-Prozess erneut durchführen. Wir garantieren keine Genehmigung.",
             "changeKycInformation": "KYC-Informationen ändern",
@@ -3444,7 +3444,7 @@
         "AddToMobileWallet": {
             "title": "Zur mobilen Geldbörse hinzufügen",
             "addYourCard": "Füge deine Karte hinzu",
-            "addYourCardDescription": "Füge deine Blink Visa-Karte zu deiner mobilen Geldbörse für schnelle und sichere Zahlungen hinzu",
+            "addYourCardDescription": "Füge deine Blink Card zu deiner mobilen Geldbörse für schnelle und sichere Zahlungen hinzu",
             "addTo": "Hinzufügen zu",
             "Benefits": {
                 "title": "Vorteile der mobilen Geldbörse",
@@ -3455,10 +3455,10 @@
             }
         },
         "CardStatus": {
-            "title": "Visa-Karte",
+            "title": "Blink Card",
             "CardApproved": {
                 "title": "Herzlichen Glückwunsch!",
-                "subtitle": "Deine Blink Visa-Karte wurde aktiviert.",
+                "subtitle": "Deine Blink Card wurde aktiviert.",
                 "buttonLabel": "Physische Karte bestellen",
                 "buttonLabelDashboard": "Übersicht"
             },

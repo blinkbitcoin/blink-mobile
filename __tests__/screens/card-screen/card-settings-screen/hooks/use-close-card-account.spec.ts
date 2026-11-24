@@ -46,7 +46,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
         CardSettings: {
           closeCardError: () => "Failed to close card account",
           closeCardSuccessTitle: () => "Card Account Closed",
-          closeCardSuccessSubtitle: () => "Your Visa card has been permanently closed.",
+          closeCardSuccessSubtitle: () => "Your Blink Card has been permanently closed.",
           closeCardSuccessButton: () => "Back to Home",
         },
       },
@@ -138,7 +138,7 @@ describe("useCloseCardAccount", () => {
 
     expect(mockReplace).toHaveBeenCalledWith("cardStatusScreen", {
       title: "Card Account Closed",
-      subtitle: "Your Visa card has been permanently closed.",
+      subtitle: "Your Blink Card has been permanently closed.",
       buttonLabel: "Back to Home",
       navigateTo: "Primary",
       iconName: "info",

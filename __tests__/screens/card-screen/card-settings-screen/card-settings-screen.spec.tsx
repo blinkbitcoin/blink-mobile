@@ -346,7 +346,7 @@ describe("CardSettingsScreen", () => {
       await flushEffects()
 
       expect(getByText("Close card account")).toBeTruthy()
-      expect(getByText("Permanently close your Visa card")).toBeTruthy()
+      expect(getByText("Permanently close your Blink Card")).toBeTruthy()
     })
   })
 
@@ -514,7 +514,7 @@ describe("CardSettingsScreen", () => {
       expect(alertSpy).not.toHaveBeenCalled()
       expect(
         getByText(
-          "This action is permanent. Your Visa card will be canceled and cannot be reactivated.",
+          "This action is permanent. Your Blink Card will be canceled and cannot be reactivated.",
         ),
       ).toBeTruthy()
 

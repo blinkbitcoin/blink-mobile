@@ -3217,7 +3217,7 @@
       "emptyTransactions": "ยังไม่มีธุรกรรม",
       "addFunds": "เติมเงิน",
       "transactionsTitle": "ธุรกรรม",
-      "title": "บัตร Visa",
+      "title": "บัตร Blink",
       "noCardAvailable": "ไม่มีบัตรที่ใช้ได้",
       "cardNotUsable": "ขณะนี้บัตรนี้ไม่พร้อมใช้งาน",
       "cardUpdateError": "ไม่สามารถอัปเดตสถานะบัตรได้"
@@ -3376,10 +3376,10 @@
       "termsAndConditions": "ข้อกำหนดและเงื่อนไขของบัตร",
       "privacyPolicy": "นโยบายความเป็นส่วนตัวของบัตร",
       "closeCardAccount": "ปิดบัญชีบัตร",
-      "closeCardAccountDescription": "ปิดบัตร Visa ของคุณอย่างถาวร",
+      "closeCardAccountDescription": "ปิดบัตร Blink ของคุณอย่างถาวร",
       "addToAppleWallet": "เพิ่มไปยัง Apple Wallet",
       "notificationToggleError": "ไม่สามารถอัปเดตการตั้งค่าการแจ้งเตือนได้",
-      "closeCardWarning": "การดำเนินการนี้ถาวร บัตร Visa ของคุณจะถูกยกเลิกและไม่สามารถเปิดใช้งานใหม่ได้",
+      "closeCardWarning": "การดำเนินการนี้ถาวร บัตร Blink ของคุณจะถูกยกเลิกและไม่สามารถเปิดใช้งานใหม่ได้",
       "closeCardTypeClose": "กรุณาพิมพ์ \"{close}\" เพื่อยืนยัน",
       "closeCardClose": "ปิด",
       "closeCardFinalConfirmTitle": "การยืนยันขั้นสุดท้าย",
@@ -3387,7 +3387,7 @@
       "closeCardPendingTransactions": "คุณมีธุรกรรมที่รอดำเนินการ กรุณารอจนกว่าจะเสร็จสิ้นก่อนปิดบัตรของคุณ",
       "closeCardBalanceWarning": "บัตรของคุณมียอดคงเหลือ {balance} กรุณาถอนเงินก่อนปิด คุณต้องการดำเนินการต่อหรือไม่?",
       "closeCardSuccessTitle": "ปิดบัญชีบัตรแล้ว",
-      "closeCardSuccessSubtitle": "บัตร Visa ของคุณถูกปิดอย่างถาวรแล้ว",
+      "closeCardSuccessSubtitle": "บัตร Blink ของคุณถูกปิดอย่างถาวรแล้ว",
       "closeCardSuccessButton": "กลับสู่หน้าหลัก",
       "closeCardError": "ไม่สามารถปิดบัญชีบัตรได้ กรุณาติดต่อฝ่ายสนับสนุน"
     },
@@ -3418,7 +3418,7 @@
     },
     "PersonalDetails": {
       "title": "ข้อมูลส่วนตัว",
-      "blinkVisaCardholder": "ผู้ถือบัตร Blink Visa",
+      "blinkCardholder": "ผู้ถือบัตร Blink",
       "kycVerifiedInformation": "ข้อมูล KYC ที่ยืนยันแล้ว",
       "kycVerifiedDescription": "ชื่อ วันเกิด และที่อยู่ของคุณได้รับการยืนยันผ่านกระบวนการ KYC ของเรา คุณสามารถเปลี่ยนข้อมูลได้โดยทำ KYC ใหม่ เราไม่รับประกันการอนุมัติ",
       "changeKycInformation": "เปลี่ยนข้อมูล KYC",
@@ -3444,7 +3444,7 @@
     "AddToMobileWallet": {
       "title": "เพิ่มไปยังกระเป๋าเงินมือถือ",
       "addYourCard": "เพิ่มบัตรของคุณ",
-      "addYourCardDescription": "เพิ่มบัตร Blink Visa ไปยังกระเป๋าเงินมือถือเพื่อการชำระเงินที่รวดเร็วและปลอดภัย",
+      "addYourCardDescription": "เพิ่มบัตร Blink ไปยังกระเป๋าเงินมือถือเพื่อการชำระเงินที่รวดเร็วและปลอดภัย",
       "addTo": "เพิ่มไปยัง",
       "Benefits": {
         "title": "ประโยชน์ของกระเป๋าเงินมือถือ",
@@ -3455,10 +3455,10 @@
       }
     },
     "CardStatus": {
-      "title": "บัตร Visa",
+      "title": "บัตร Blink",
       "CardApproved": {
         "title": "ยินดีด้วย!",
-        "subtitle": "บัตร Blink Visa ของคุณได้รับการเปิดใช้งานแล้ว",
+        "subtitle": "บัตร Blink ของคุณได้รับการเปิดใช้งานแล้ว",
         "buttonLabel": "สั่งบัตรจริง",
         "buttonLabelDashboard": "แดชบอร์ด"
       },

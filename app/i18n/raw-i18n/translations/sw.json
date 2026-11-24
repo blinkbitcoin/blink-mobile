@@ -3217,7 +3217,7 @@
       "emptyTransactions": "Hakuna miamala bado",
       "addFunds": "Ongeza fedha",
       "transactionsTitle": "Miamala",
-      "title": "Kadi ya Visa",
+      "title": "Blink Card",
       "noCardAvailable": "Hakuna kadi zinazopatikana",
       "cardNotUsable": "Kadi hii haipatikani kwa matumizi kwa sasa",
       "cardUpdateError": "Imeshindwa kusasisha hali ya kadi"
@@ -3376,10 +3376,10 @@
       "termsAndConditions": "Masharti na vigezo vya kadi",
       "privacyPolicy": "Sera ya faragha ya kadi",
       "closeCardAccount": "Funga akaunti ya kadi",
-      "closeCardAccountDescription": "Funga kadi yako ya Visa kabisa",
+      "closeCardAccountDescription": "Funga Blink Card yako kabisa",
       "addToAppleWallet": "Ongeza kwenye Apple Wallet",
       "notificationToggleError": "Imeshindwa kusasisha mipangilio ya arifa",
-      "closeCardWarning": "Kitendo hiki ni cha kudumu. Kadi yako ya Visa itafutwa na haiwezi kuamilishwa tena.",
+      "closeCardWarning": "Kitendo hiki ni cha kudumu. Blink Card yako itafutwa na haiwezi kuamilishwa tena.",
       "closeCardTypeClose": "Tafadhali andika \"{close}\" kuthibitisha",
       "closeCardClose": "funga",
       "closeCardFinalConfirmTitle": "Uthibitisho wa Mwisho",
@@ -3387,7 +3387,7 @@
       "closeCardPendingTransactions": "Una miamala inayosubiri. Tafadhali subiri hadi ikamilike kabla ya kufunga kadi yako.",
       "closeCardBalanceWarning": "Kadi yako ina salio la {balance}. Tafadhali ondoa fedha zako kabla ya kufunga. Je, unataka kuendelea hata hivyo?",
       "closeCardSuccessTitle": "Akaunti ya Kadi Imefungwa",
-      "closeCardSuccessSubtitle": "Kadi yako ya Visa imefungwa kabisa.",
+      "closeCardSuccessSubtitle": "Blink Card yako imefungwa kabisa.",
       "closeCardSuccessButton": "Rudi Nyumbani",
       "closeCardError": "Imeshindwa kufunga akaunti ya kadi. Tafadhali wasiliana na msaada."
     },
@@ -3418,7 +3418,7 @@
     },
     "PersonalDetails": {
       "title": "Maelezo binafsi",
-      "blinkVisaCardholder": "Mmiliki wa Kadi ya Blink Visa",
+      "blinkCardholder": "Mmiliki wa Blink Card",
       "kycVerifiedInformation": "Maelezo ya KYC yaliyothibitishwa",
       "kycVerifiedDescription": "Jina lako, tarehe ya kuzaliwa na anwani yako yamethibitishwa kupitia mchakato wetu wa KYC. Unaweza kubadilisha maelezo kwa kurudia mchakato wa KYC. Hatuhakikishi idhini.",
       "changeKycInformation": "Badilisha maelezo ya KYC",
@@ -3444,7 +3444,7 @@
     "AddToMobileWallet": {
       "title": "Ongeza kwenye pochi ya simu",
       "addYourCard": "Ongeza kadi yako",
-      "addYourCardDescription": "Ongeza kadi yako ya Blink Visa kwenye pochi ya simu kwa malipo ya haraka na salama",
+      "addYourCardDescription": "Ongeza Blink Card yako kwenye pochi ya simu kwa malipo ya haraka na salama",
       "addTo": "Ongeza kwenye",
       "Benefits": {
         "title": "Faida za pochi ya simu",
@@ -3455,10 +3455,10 @@
       }
     },
     "CardStatus": {
-      "title": "Kadi ya Visa",
+      "title": "Blink Card",
       "CardApproved": {
         "title": "Hongera!",
-        "subtitle": "Kadi yako ya Blink Visa imeamilishwa.",
+        "subtitle": "Blink Card yako imeamilishwa.",
         "buttonLabel": "Agiza kadi halisi",
         "buttonLabelDashboard": "Dashibodi"
       },

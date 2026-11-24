@@ -46,7 +46,7 @@ jest.mock("@react-navigation/native", () => {
 
 const cardApprovedParams = {
   title: "Congratulations!",
-  subtitle: "Your Blink Visa Card has been activated.",
+  subtitle: "Your Blink Card has been activated.",
   buttonLabel: "Order physical card",
   navigateTo: "cardDashboardScreen" as const,
   iconName: "approved" as const,
@@ -131,7 +131,7 @@ describe("CardStatusScreen - Card Approved variant", () => {
 
     await act(async () => {})
 
-    expect(getByText("Your Blink Visa Card has been activated.")).toBeTruthy()
+    expect(getByText("Your Blink Card has been activated.")).toBeTruthy()
   })
 
   it("displays order physical card button", async () => {
@@ -289,7 +289,7 @@ describe("CardStatusScreen - Card Approved variant", () => {
     await act(async () => {})
 
     expect(getByText("Congratulations!")).toBeTruthy()
-    expect(getByText("Your Blink Visa Card has been activated.")).toBeTruthy()
+    expect(getByText("Your Blink Card has been activated.")).toBeTruthy()
     expect(getByText("Add to")).toBeTruthy()
     expect(getByText("Order physical card")).toBeTruthy()
   })

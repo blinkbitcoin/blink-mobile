@@ -3217,7 +3217,7 @@
       "emptyTransactions": "Belum ada transaksi",
       "addFunds": "Tambah dana",
       "transactionsTitle": "Transaksi",
-      "title": "Kad Visa",
+      "title": "Kad Blink",
       "noCardAvailable": "Tiada kad tersedia",
       "cardNotUsable": "Kad ini tidak tersedia untuk digunakan pada masa ini",
       "cardUpdateError": "Tidak dapat mengemas kini status kad"
@@ -3376,10 +3376,10 @@
       "termsAndConditions": "Terma dan syarat kad",
       "privacyPolicy": "Dasar privasi kad",
       "closeCardAccount": "Tutup akaun kad",
-      "closeCardAccountDescription": "Tutup kad Visa anda secara kekal",
+      "closeCardAccountDescription": "Tutup Kad Blink anda secara kekal",
       "addToAppleWallet": "Tambah ke Apple Wallet",
       "notificationToggleError": "Gagal mengemas kini tetapan pemberitahuan",
-      "closeCardWarning": "Tindakan ini kekal. Kad Visa anda akan dibatalkan dan tidak boleh diaktifkan semula.",
+      "closeCardWarning": "Tindakan ini kekal. Kad Blink anda akan dibatalkan dan tidak boleh diaktifkan semula.",
       "closeCardTypeClose": "Sila taip \"{close}\" untuk mengesahkan",
       "closeCardClose": "tutup",
       "closeCardFinalConfirmTitle": "Pengesahan Akhir",
@@ -3387,7 +3387,7 @@
       "closeCardPendingTransactions": "Anda mempunyai transaksi tertangguh. Sila tunggu sehingga ia diselesaikan sebelum menutup kad anda.",
       "closeCardBalanceWarning": "Kad anda mempunyai baki {balance}. Sila keluarkan dana anda sebelum menutup. Adakah anda mahu teruskan?",
       "closeCardSuccessTitle": "Akaun Kad Ditutup",
-      "closeCardSuccessSubtitle": "Kad Visa anda telah ditutup secara kekal.",
+      "closeCardSuccessSubtitle": "Kad Blink anda telah ditutup secara kekal.",
       "closeCardSuccessButton": "Kembali ke Laman Utama",
       "closeCardError": "Gagal menutup akaun kad. Sila hubungi sokongan."
     },
@@ -3418,7 +3418,7 @@
     },
     "PersonalDetails": {
       "title": "Butiran peribadi",
-      "blinkVisaCardholder": "Pemegang Kad Blink Visa",
+      "blinkCardholder": "Pemegang Kad Blink",
       "kycVerifiedInformation": "Maklumat KYC disahkan",
       "kycVerifiedDescription": "Nama, tarikh lahir dan alamat anda disahkan melalui proses KYC kami. Anda boleh menukar maklumat dengan mengulangi proses KYC. Kami tidak menjamin kelulusan.",
       "changeKycInformation": "Tukar maklumat KYC",
@@ -3444,7 +3444,7 @@
     "AddToMobileWallet": {
       "title": "Tambah ke dompet mudah alih",
       "addYourCard": "Tambah kad anda",
-      "addYourCardDescription": "Tambah kad Blink Visa ke dompet mudah alih untuk pembayaran pantas dan selamat",
+      "addYourCardDescription": "Tambah Kad Blink ke dompet mudah alih untuk pembayaran pantas dan selamat",
       "addTo": "Tambah ke",
       "Benefits": {
         "title": "Manfaat dompet mudah alih",
@@ -3455,10 +3455,10 @@
       }
     },
     "CardStatus": {
-      "title": "Kad Visa",
+      "title": "Kad Blink",
       "CardApproved": {
         "title": "Tahniah!",
-        "subtitle": "Kad Blink Visa anda telah diaktifkan.",
+        "subtitle": "Kad Blink anda telah diaktifkan.",
         "buttonLabel": "Pesan kad fizikal",
         "buttonLabelDashboard": "Papan Pemuka"
       },

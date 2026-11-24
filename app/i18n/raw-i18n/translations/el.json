@@ -3217,7 +3217,7 @@
       "emptyTransactions": "Δεν υπάρχουν συναλλαγές ακόμη",
       "addFunds": "Προσθήκη χρημάτων",
       "transactionsTitle": "Συναλλαγές",
-      "title": "Κάρτα Visa",
+      "title": "Blink Card",
       "noCardAvailable": "Δεν υπάρχουν διαθέσιμες κάρτες",
       "cardNotUsable": "Αυτή η κάρτα δεν είναι διαθέσιμη για χρήση",
       "cardUpdateError": "Αδυναμία ενημέρωσης κατάστασης κάρτας"
@@ -3376,10 +3376,10 @@
       "termsAndConditions": "Όροι και προϋποθέσεις κάρτας",
       "privacyPolicy": "Πολιτική απορρήτου κάρτας",
       "closeCardAccount": "Κλείσιμο λογαριασμού κάρτας",
-      "closeCardAccountDescription": "Κλείστε μόνιμα την κάρτα Visa σας",
+      "closeCardAccountDescription": "Κλείστε μόνιμα την Blink Card σας",
       "addToAppleWallet": "Prosthiki sto Apple Wallet",
       "notificationToggleError": "Αποτυχία ενημέρωσης ρυθμίσεων ειδοποιήσεων",
-      "closeCardWarning": "Αυτή η ενέργεια είναι μόνιμη. Η κάρτα Visa σου θα ακυρωθεί και δεν μπορεί να επανενεργοποιηθεί.",
+      "closeCardWarning": "Αυτή η ενέργεια είναι μόνιμη. Η Blink Card σου θα ακυρωθεί και δεν μπορεί να επανενεργοποιηθεί.",
       "closeCardTypeClose": "Πληκτρολόγησε \"{close}\" για επιβεβαίωση",
       "closeCardClose": "κλείσιμο",
       "closeCardFinalConfirmTitle": "Τελική Επιβεβαίωση",
@@ -3387,7 +3387,7 @@
       "closeCardPendingTransactions": "Έχεις εκκρεμείς συναλλαγές. Περίμενε μέχρι να εκκαθαριστούν πριν κλείσεις την κάρτα σου.",
       "closeCardBalanceWarning": "Η κάρτα σου έχει υπόλοιπο {balance}. Κάνε ανάληψη των χρημάτων σου πριν κλείσεις. Θέλεις να συνεχίσεις;",
       "closeCardSuccessTitle": "Ο Λογαριασμός Κάρτας Έκλεισε",
-      "closeCardSuccessSubtitle": "Η κάρτα Visa σου έχει κλείσει μόνιμα.",
+      "closeCardSuccessSubtitle": "Η Blink Card σου έχει κλείσει μόνιμα.",
       "closeCardSuccessButton": "Επιστροφή στην Αρχική",
       "closeCardError": "Αποτυχία κλεισίματος λογαριασμού κάρτας. Επικοινώνησε με την υποστήριξη."
     },
@@ -3418,7 +3418,7 @@
     },
     "PersonalDetails": {
       "title": "Προσωπικά στοιχεία",
-      "blinkVisaCardholder": "Κάτοχος κάρτας Blink Visa",
+      "blinkCardholder": "Κάτοχος της Blink Card",
       "kycVerifiedInformation": "Επαληθευμένες πληροφορίες KYC",
       "kycVerifiedDescription": "Το όνομά σας, η ημερομηνία γέννησης και η διεύθυνσή σας έχουν επαληθευτεί μέσω της διαδικασίας KYC. Μπορείτε να αλλάξετε τις πληροφορίες επαναλαμβάνοντας τη διαδικασία KYC. Δεν εγγυόμαστε έγκριση.",
       "changeKycInformation": "Αλλαγή πληροφοριών KYC",
@@ -3444,7 +3444,7 @@
     "AddToMobileWallet": {
       "title": "Prosthiki sto kinito portofoli",
       "addYourCard": "Prostheste tin karta sas",
-      "addYourCardDescription": "Prostheste tin karta Blink Visa sto kinito portofoli gia grigores kai asfales pliromes",
+      "addYourCardDescription": "Προσθέστε την Blink Card στο κινητό πορτοφόλι για γρήγορες και ασφαλείς πληρωμές",
       "addTo": "Prosthiki se",
       "Benefits": {
         "title": "Ofeloi tou kinitou portofoliou",
@@ -3455,10 +3455,10 @@
       }
     },
     "CardStatus": {
-      "title": "Κάρτα Visa",
+      "title": "Blink Card",
       "CardApproved": {
         "title": "Συγχαρητήρια!",
-        "subtitle": "Η κάρτα Blink Visa σας έχει ενεργοποιηθεί.",
+        "subtitle": "Η Blink Card σας έχει ενεργοποιηθεί.",
         "buttonLabel": "Παραγγελία φυσικής κάρτας",
         "buttonLabelDashboard": "Πίνακας"
       },

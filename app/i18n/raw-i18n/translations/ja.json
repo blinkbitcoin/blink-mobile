@@ -3217,7 +3217,7 @@
             "emptyTransactions": "取引はまだありません",
             "addFunds": "入金",
             "transactionsTitle": "取引",
-            "title": "Visaカード",
+            "title": "Blink カード",
             "noCardAvailable": "利用可能なカードがありません",
             "cardNotUsable": "このカードは現在使用できません",
             "cardUpdateError": "カードステータスを更新できませんでした"
@@ -3376,10 +3376,10 @@
             "termsAndConditions": "カード利用規約",
             "privacyPolicy": "カードプライバシーポリシー",
             "closeCardAccount": "カードアカウントを閉じる",
-            "closeCardAccountDescription": "Visaカードを永久に閉じる",
+            "closeCardAccountDescription": "Blink カードを永久に閉じる",
             "addToAppleWallet": "Apple Walletに追加",
             "notificationToggleError": "通知設定の更新に失敗しました",
-            "closeCardWarning": "この操作は取り消せません。Visaカードはキャンセルされ、再有効化できません。",
+            "closeCardWarning": "この操作は取り消せません。Blink カードはキャンセルされ、再有効化できません。",
             "closeCardTypeClose": "確認のために「{close}」と入力してください",
             "closeCardClose": "閉じる",
             "closeCardFinalConfirmTitle": "最終確認",
@@ -3387,7 +3387,7 @@
             "closeCardPendingTransactions": "保留中の取引があります。カードを閉鎖する前に決済が完了するまでお待ちください。",
             "closeCardBalanceWarning": "カードに{balance}の残高があります。閉鎖前に資金を引き出してください。それでも続行しますか？",
             "closeCardSuccessTitle": "カードアカウント閉鎖完了",
-            "closeCardSuccessSubtitle": "Visaカードは永久に閉鎖されました。",
+            "closeCardSuccessSubtitle": "Blink カードは永久に閉鎖されました。",
             "closeCardSuccessButton": "ホームに戻る",
             "closeCardError": "カードアカウントの閉鎖に失敗しました。サポートにお問い合わせください。"
         },
@@ -3418,7 +3418,7 @@
         },
         "PersonalDetails": {
             "title": "個人情報",
-            "blinkVisaCardholder": "Blink Visaカード保有者",
+            "blinkCardholder": "Blink カード保有者",
             "kycVerifiedInformation": "KYC認証済み情報",
             "kycVerifiedDescription": "お名前、生年月日、住所はKYCプロセスで認証されています。KYCプロセスを再度行うことで情報を変更できます。承認は保証されません。",
             "changeKycInformation": "KYC情報を変更",
@@ -3444,7 +3444,7 @@
         "AddToMobileWallet": {
             "title": "モバイルウォレットに追加",
             "addYourCard": "カードを追加",
-            "addYourCardDescription": "Blink Visaカードをモバイルウォレットに追加して迅速で安全な支払いを",
+            "addYourCardDescription": "Blink カードをモバイルウォレットに追加して迅速で安全な支払いを",
             "addTo": "追加",
             "Benefits": {
                 "title": "モバイルウォレットのメリット",
@@ -3455,10 +3455,10 @@
             }
         },
         "CardStatus": {
-            "title": "Visaカード",
+            "title": "Blink カード",
             "CardApproved": {
                 "title": "おめでとうございます！",
-                "subtitle": "Blink Visaカードが有効化されました。",
+                "subtitle": "Blink カードが有効化されました。",
                 "buttonLabel": "物理カードを注文",
                 "buttonLabelDashboard": "ダッシュボード"
             },

@@ -3217,7 +3217,7 @@
       "emptyTransactions": "Դեռ գործարքներ չկան",
       "addFunds": "Ավելացնել միջոցներ",
       "transactionsTitle": "Գործարքներ",
-      "title": "Visa քարտ",
+      "title": "Blink քարտ",
       "noCardAvailable": "Հասանելի քարտեր չկան",
       "cardNotUsable": "Այս քարտը ներկայումս հասանելի չէ օգտագործման համար",
       "cardUpdateError": "Չհաջողվեց թարմացնել քարտի կարգավիճակը"
@@ -3376,10 +3376,10 @@
       "termsAndConditions": "Քարտի պայմաններն ու դրույթները",
       "privacyPolicy": "Քարտի գաղտնիության քաղաքականություն",
       "closeCardAccount": "Փակել քարտային հաշիվը",
-      "closeCardAccountDescription": "Մշտապես փակել Ձեր Visa քարտը",
+      "closeCardAccountDescription": "Մշտապես փակել Ձեր Blink քարտը",
       "addToAppleWallet": "Ավելացնել Apple Wallet-ին",
       "notificationToggleError": "Չհաջողվեց թարմացնել ծանուցումների կարգավորումները",
-      "closeCardWarning": "Այս գործողությունը մշտական է։ Ձեր Visa քարտը կչեղարկվի և չի կարող կրկին ակտիվացվել։",
+      "closeCardWarning": "Այս գործողությունը մշտական է։ Ձեր Blink քարտը կչեղարկվի և չի կարող կրկին ակտիվացվել։",
       "closeCardTypeClose": "Հաստատելու համար մուտքագրեք \"{close}\"",
       "closeCardClose": "փակել",
       "closeCardFinalConfirmTitle": "Վերջնական հաստատում",
@@ -3387,7 +3387,7 @@
       "closeCardPendingTransactions": "Դուք ունեք սպասման մեջ գտնվող գործարքներ։ Խնդրում ենք սպասել, մինչև դրանք մշակվեն, նախքան քարտը փակելը։",
       "closeCardBalanceWarning": "Ձեր քարտի մնացորդը {balance} է։ Խնդրում ենք դուրս բերել Ձեր միջոցները նախքան փակելը։ Ցանկանու՞մ եք, այնուամենայնիվ, շարունակել։",
       "closeCardSuccessTitle": "Քարտային հաշիվը փակվել է",
-      "closeCardSuccessSubtitle": "Ձեր Visa քարտը մշտապես փակվել է։",
+      "closeCardSuccessSubtitle": "Ձեր Blink քարտը մշտապես փակվել է։",
       "closeCardSuccessButton": "Վերադառնալ գլխավոր էջ",
       "closeCardError": "Չհաջողվեց փակել քարտային հաշիվը։ Խնդրում ենք կապվել աջակցման թիմի հետ։"
     },
@@ -3418,7 +3418,7 @@
     },
     "PersonalDetails": {
       "title": "Անձնական տվյալներ",
-      "blinkVisaCardholder": "Blink Visa քարտապան",
+      "blinkCardholder": "Blink քարտապան",
       "kycVerifiedInformation": "KYC-ով հաստատված տվյալներ",
       "kycVerifiedDescription": "Ձեր անունը, ծննդյան ամսաթիվը և հասցեն հաստատված են մեր KYC գործընթացի միջոցով։ Դուք կարող եք փոխել տվյալները՝ կրկին անցնելով KYC գործընթացը։ Մենք չենք երաշխավորում հաստատումը։",
       "changeKycInformation": "Փոխել KYC տվյալները",
@@ -3444,7 +3444,7 @@
     "AddToMobileWallet": {
       "title": "Ավելացնել բջջային դրամապանակում",
       "addYourCard": "Ավելացնել ձեր քարտը",
-      "addYourCardDescription": "Ավելացրեք ձեր Blink Visa քարտը բջջային դրամապանակում՝ արագ և անվտանգ վճարումների համար",
+      "addYourCardDescription": "Ավելացրեք ձեր Blink քարտը բջջային դրամապանակում՝ արագ և անվտանգ վճարումների համար",
       "addTo": "Ավելացնել",
       "Benefits": {
         "title": "Բջջային դրամապանակի առավելությունները",
@@ -3455,10 +3455,10 @@
       }
     },
     "CardStatus": {
-      "title": "Վիզա քարտ",
+      "title": "Blink քարտ",
       "CardApproved": {
         "title": "Շնորհավորում ենք!",
-        "subtitle": "Ձեր Blink Visa քարտն ակտիվացվել է։",
+        "subtitle": "Ձեր Blink քարտն ակտիվացվել է։",
         "buttonLabel": "Պատվիրել ֆիզիկական քարտ",
         "buttonLabelDashboard": "Վահանակ"
       },
