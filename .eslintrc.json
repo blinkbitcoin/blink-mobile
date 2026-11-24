@@ -41,6 +41,35 @@
     "@typescript-eslint/no-explicit-any": "error",
 
     "import/no-extraneous-dependencies": "error",
+    // The hard boundary between the two account namespaces (see "Account namespaces" in
+    // docs/architecture.md). Checked on resolved paths, so an alias, a relative path, a
+    // type import, a re-export, a dynamic import and a require are all caught. Its own
+    // rule, so it never replaces the options of a rule other policies share.
+    "import/no-restricted-paths": [
+      "error",
+      {
+        "zones": [
+          {
+            "target": "./app/custodial",
+            "from": [
+              "./app/self-custodial",
+              "./app/screens/self-custodial",
+              "./app/screens/settings-screen/self-custodial"
+            ],
+            "message": "Custodial code must not depend on self-custodial code."
+          },
+          {
+            "target": [
+              "./app/self-custodial",
+              "./app/screens/self-custodial",
+              "./app/screens/settings-screen/self-custodial"
+            ],
+            "from": "./app/custodial",
+            "message": "Self-custodial code must not depend on custodial code."
+          }
+        ]
+      }
+    ],
     "import/no-unresolved": "off",
     "import/prefer-default-export": "off",
 
@@ -325,34 +354,6 @@
                 "message": "The Breez SDK is only imported inside app/self-custodial."
               }
             ]
-          }
-        ]
-      }
-    },
-    {
-      "files": ["app/custodial/**"],
-      "rules": {
-        "no-restricted-syntax": [
-          "error",
-          {
-            "selector": "ImportDeclaration[source.value=/^@app\\u002F(self-custodial|screens\\u002Fself-custodial|screens\\u002Fsettings-screen\\u002Fself-custodial)(\\u002F|$)/]",
-            "message": "Custodial code must not depend on self-custodial code."
-          }
-        ]
-      }
-    },
-    {
-      "files": [
-        "app/self-custodial/**",
-        "app/screens/self-custodial/**",
-        "app/screens/settings-screen/self-custodial/**"
-      ],
-      "rules": {
-        "no-restricted-syntax": [
-          "error",
-          {
-            "selector": "ImportDeclaration[source.value=/^@app\\u002Fcustodial(\\u002F|$)/]",
-            "message": "Self-custodial code must not depend on custodial code."
           }
         ]
       }
