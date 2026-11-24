@@ -82,9 +82,17 @@ describe("deep-linkable routes", () => {
     expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingPersonalInfoScreen")
   })
 
-  it("still links to the card onboarding steps that only show an outcome", () => {
-    expect(DEEP_LINK_SCREENS).toHaveProperty("cardOnboardingPreapprovedScreen")
+  it("still links to the card onboarding step that shows a refusal", () => {
     expect(DEEP_LINK_SCREENS).toHaveProperty("cardOnboardingDeclinedScreen")
+  })
+
+  /**
+   * The confetti screen says the card is ready. The wait opens it once the issuer has
+   * approved the application, and no bulletin links to it: the approved bulletin opens
+   * the card's own approved screen. A link would announce an approval nobody gave.
+   */
+  it("links to no card onboarding step that announces an approval", () => {
+    expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingPreapprovedScreen")
   })
 
   /**
