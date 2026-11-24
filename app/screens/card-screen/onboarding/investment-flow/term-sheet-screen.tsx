@@ -13,12 +13,8 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { staticSurface } from "@app/rne-theme/surfaces"
 
-import {
-  formatUnitCount,
-  formatUsdAmount,
-  resolveEquityPercent,
-  resolveInvestmentTerms,
-} from "./investment-terms"
+import { formatUnitCount, formatUsdAmount } from "./investment-figures"
+import { resolveEquityPercent, resolveInvestmentTerms } from "./investment-terms"
 
 type TermSheetRoute = RouteProp<RootStackParamList, "cardOnboardingTermSheetScreen">
 
@@ -57,7 +53,7 @@ export const TermSheetScreen: React.FC = () => {
   )
 
   const handleNext = () => {
-    navigation.navigate("cardOnboardingTransferInvestScreen", { selectedAmountUsd })
+    navigation.navigate("cardOnboardingSignInvestScreen", { selectedAmountUsd })
   }
 
   return (

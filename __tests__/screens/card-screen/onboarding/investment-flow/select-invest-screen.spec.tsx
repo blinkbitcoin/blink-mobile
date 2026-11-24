@@ -1,4 +1,5 @@
 import React from "react"
+import { View } from "react-native"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
@@ -55,7 +56,7 @@ describe("SelectInvestScreen", () => {
     expect(getByText("How much would you like to invest?")).toBeTruthy()
   })
 
-  it("displays credit limit options", async () => {
+  it("displays the investment options", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <SelectInvestScreen />
@@ -125,6 +126,25 @@ describe("SelectInvestScreen", () => {
     })
     expect(first.props.accessibilityState.selected).toBe(false)
     expect(second.props.accessibilityState.selected).toBe(true)
+  })
+
+  /** One choice among several: the rows are radios, and a screen reader is told they
+   *  belong to one group rather than meeting seven loose radios. */
+  it("groups the options as one radio group", async () => {
+    const screen = render(
+      <ContextForScreen>
+        <SelectInvestScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    /** The group is a plain container, not an accessibility element of its own (that
+     *  would swallow its rows), so it is found by its role prop rather than queried. */
+    const group = screen
+      .UNSAFE_getAllByType(View)
+      .find(({ props }) => props.accessibilityRole === "radiogroup")
+    expect(group).toBeTruthy()
+    expect(screen.getAllByRole("radio")).toHaveLength(7)
   })
 
   it("navigates to term sheet screen when option selected and button pressed", async () => {

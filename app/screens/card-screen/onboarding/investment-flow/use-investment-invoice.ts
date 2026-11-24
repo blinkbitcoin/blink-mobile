@@ -33,13 +33,13 @@ const INVOICE_EXPIRY_MINUTES = "30"
  *
  * English whatever the investor's language, because it is a record rather than a piece
  * of interface: the same payment has to read the same way in the books no matter whose
- * phone it came from. The signer's name belongs beside it and is missing on purpose -
+ * phone it came from. The signer's name belongs beside it and is missing on purpose:
  * the agreement holds it, the app does not, and inventing one from the paying account
  * could name someone other than who signed.
  */
 const INVOICE_MEMO = "Blink Private subscription"
 
-export type MintedInvoice = {
+type MintedInvoice = {
   paymentRequest: string
 }
 
@@ -51,8 +51,9 @@ export type MintedInvoice = {
  * types an amount against could be paid for anything, and the agreement fixes one figure
  * at one rate. This is the only shape that binds the two.
  *
- * The mutation is unauthenticated by design - it is how any payer asks a Blink account
- * for an invoice - so it answers for a custodial and a self-custodial investor alike.
+ * The mutation is unauthenticated by design, since it is how any payer asks a Blink
+ * account for an invoice, so it answers for a custodial and a self-custodial investor
+ * alike.
  */
 export const useInvestmentInvoice = (): {
   requestInvoice: (
