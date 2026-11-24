@@ -30,30 +30,41 @@ type CheckboxRowProps = {
   | { label: string; children?: never }
   /**
    * A label with inline parts, such as links, set in the row's text style. The box is
-   * then a checkbox of its own, named by `accessibilityLabel`, and the label sits beside
+   * then a checkbox of its own, named after the label's words, and the label sits beside
    * it: inside one checkbox a screen reader could not reach the links, and activating
    * one would toggle the box instead of opening it. Pressing the label's prose still
    * toggles the box, as on a plain row, while a link keeps its own press.
    */
-  | { label?: never; children: React.ReactNode; accessibilityLabel: string }
+  | { label?: never; children: React.ReactNode }
 )
 
-export const CheckboxRow: React.FC<CheckboxRowProps> = (props) => {
-  const {
-    isChecked,
-    onPress,
-    centered,
-    disabled,
-    testID,
-    gap = DEFAULT_GAP,
-    labelLineHeight = DEFAULT_LABEL_LINE_HEIGHT,
-  } = props
+/** The words a label shows, so the box is named after exactly what is on screen. */
+const textOf = (node: React.ReactNode): string => {
+  if (typeof node === "string" || typeof node === "number") return String(node)
+  if (Array.isArray(node)) return node.map(textOf).join("")
+  if (React.isValidElement<{ children?: React.ReactNode }>(node)) {
+    return textOf(node.props.children)
+  }
+  return ""
+}
+
+export const CheckboxRow: React.FC<CheckboxRowProps> = ({
+  label,
+  children,
+  isChecked,
+  onPress,
+  centered,
+  disabled,
+  testID,
+  gap = DEFAULT_GAP,
+  labelLineHeight = DEFAULT_LABEL_LINE_HEIGHT,
+}) => {
   const styles = useStyles({ gap, labelLineHeight })
   const {
     theme: { colors },
   } = useTheme()
 
-  const hasRichLabel = props.label === undefined
+  const hasRichLabel = label === undefined
   const rowStyle = [
     styles.container,
     centered && styles.centered,
@@ -77,14 +88,14 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = (props) => {
           onPress={onPress}
           hitSlop={BOX_HIT_SLOP}
           accessibilityRole="checkbox"
-          accessibilityLabel={props.accessibilityLabel}
+          accessibilityLabel={textOf(children)}
           accessibilityState={{ checked: isChecked, disabled }}
           testID={testID}
         >
           {box}
         </Pressable>
         <Text style={labelStyle} onPress={handleProsePress} suppressHighlighting>
-          {props.children}
+          {children}
         </Text>
       </View>
     )
@@ -100,7 +111,7 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = (props) => {
       testID={testID}
     >
       {box}
-      <Text style={labelStyle}>{props.label}</Text>
+      <Text style={labelStyle}>{label}</Text>
     </Pressable>
   )
 }

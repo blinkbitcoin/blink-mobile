@@ -171,7 +171,6 @@ describe("CheckboxRow", () => {
           isChecked={props.isChecked ?? false}
           disabled={props.disabled}
           onPress={defaultProps.onPress}
-          accessibilityLabel="I agree to the Fee Schedule"
           gap={14}
           labelLineHeight={16}
           testID="fee-schedule-box"
@@ -180,13 +179,24 @@ describe("CheckboxRow", () => {
           <RNText accessibilityRole="link" onPress={onLinkPress}>
             Fee Schedule
           </RNText>
+          {null}
         </CheckboxRow>,
       )
 
-    it("names the box after the whole label", () => {
+    it("names the box after the words the label shows", () => {
       const { getByRole } = renderRichRow()
 
       expect(getByRole("checkbox", { name: "I agree to the Fee Schedule" })).toBeTruthy()
+    })
+
+    it("keeps a number the label shows in the box's name", () => {
+      const { getByRole } = render(
+        <CheckboxRow isChecked={false} onPress={defaultProps.onPress}>
+          I accept the {2} documents
+        </CheckboxRow>,
+      )
+
+      expect(getByRole("checkbox", { name: "I accept the 2 documents" })).toBeTruthy()
     })
 
     it("sets the label beside the box, with each link as an element of its own", () => {

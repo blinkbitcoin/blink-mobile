@@ -110,9 +110,6 @@ export const CardAcknowledgementScreen: React.FC = () => {
 
   const { Acknowledgement: acknowledgementLL } = LL.CardFlow.Onboarding
   const { eSignConsent, privacyAndTerms } = acknowledgementLL
-  /** What a screen reader names each box whose label carries links. */
-  const eSignLabel = `${eSignConsent.text()} ${eSignConsent.linkText()}`
-  const privacyAndTermsLabel = `${privacyAndTerms.text()} ${privacyAndTerms.privacyPolicyLinkText()}${privacyAndTerms.and()} ${privacyAndTerms.cardTermsLinkText()}`
 
   return (
     <StepLayout
@@ -136,7 +133,6 @@ export const CardAcknowledgementScreen: React.FC = () => {
           <CheckboxRow
             isChecked={isESignAccepted}
             onPress={() => setIsESignAccepted(!isESignAccepted)}
-            accessibilityLabel={eSignLabel}
             gap={CHECKBOX_GAP}
             labelLineHeight={CHECKBOX_LINE_HEIGHT}
           >
@@ -154,7 +150,6 @@ export const CardAcknowledgementScreen: React.FC = () => {
           <CheckboxRow
             isChecked={isPrivacyAndTermsAccepted}
             onPress={() => setIsPrivacyAndTermsAccepted(!isPrivacyAndTermsAccepted)}
-            accessibilityLabel={privacyAndTermsLabel}
             gap={CHECKBOX_GAP}
             labelLineHeight={CHECKBOX_LINE_HEIGHT}
           >

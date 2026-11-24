@@ -74,11 +74,8 @@ export const CardSubscriptionScreen: React.FC = () => {
         months: SUBSCRIPTION_RENEWAL_MONTHS,
       })
 
-  /** What a screen reader names each box whose label carries links. */
   const feeScheduleLL = LL.CardFlow.Onboarding.CardSubscription.feeSchedule
-  const feeScheduleLabel = `${feeScheduleLL.text()} ${feeScheduleLL.linkText()}`
   const agreementLL = LL.CardFlow.Onboarding.CardSubscription.agreement
-  const agreementLabel = `${agreementLL.text()} ${agreementLL.termsOfService()}, ${agreementLL.privacyPolicy()}, ${agreementLL.and()} ${agreementLL.cardholderAgreement()}`
 
   const toggleNotice = () => setAcceptedNotice(isNoticeAccepted ? null : notice)
 
@@ -121,7 +118,6 @@ export const CardSubscriptionScreen: React.FC = () => {
             <CheckboxRow
               isChecked={isFeeScheduleAgreed}
               onPress={() => setIsFeeScheduleAgreed(!isFeeScheduleAgreed)}
-              accessibilityLabel={feeScheduleLabel}
               gap={CHECKBOX_GAP}
               labelLineHeight={CHECKBOX_LINE_HEIGHT}
             >
@@ -142,7 +138,6 @@ export const CardSubscriptionScreen: React.FC = () => {
           <CheckboxRow
             isChecked={isAgreed}
             onPress={() => setIsAgreed(!isAgreed)}
-            accessibilityLabel={agreementLabel}
             gap={CHECKBOX_GAP}
             labelLineHeight={CHECKBOX_LINE_HEIGHT}
           >
