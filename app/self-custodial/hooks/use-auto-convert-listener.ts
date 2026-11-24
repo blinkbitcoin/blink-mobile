@@ -28,6 +28,7 @@ import {
   pruneExpiredAutoConvertPairings,
   pruneExpiredAutoConverts,
   recordAutoConvertAttempt,
+  releaseAutoConvertAttempt,
   removePendingAutoConvert,
   waitForPaymentCompleted,
   type PendingAutoConvert,
@@ -50,6 +51,37 @@ const ORPHAN_TIMEOUT_MS = 2 * 60 * 1000
 
 const MAX_PROCESSED_PAYMENT_IDS = 200
 const MAX_IN_FLIGHT_INVOICES = 50
+
+/**
+ * The latest receive's turn to convert, from any receive. Each converts and pairs its
+ * conversion before the next one's turn, which reads the conversions claimed only then:
+ * two receives of one amount converting at once would otherwise each take the first one's
+ * conversion for their own, and the second one's sats would never be converted.
+ */
+let latestConversionTurn: Promise<unknown> = Promise.resolve()
+
+/** By receive, the conversion paired with it whose pairing has not reached storage yet:
+ *  claimed for every other receive at once, and stored before its own receive is tried
+ *  again, which would otherwise convert its sats twice. */
+const unstoredPairings = new Map<string, string>()
+
+/** Pairs a receive with its conversion, durably: the receive is removed only once this
+ *  answers, and should the write fail, it throws with the pairing still held here. */
+const storePairing = async (receivePaymentId: string, conversionPaymentId: string) => {
+  unstoredPairings.set(receivePaymentId, conversionPaymentId)
+  await markAutoConvertPairing({
+    receivePaymentId,
+    conversionPaymentId,
+    pairedAtMs: Date.now(),
+  })
+  unstoredPairings.delete(receivePaymentId)
+}
+
+const afterEarlierReceivesConvert = <T>(turn: () => Promise<T>): Promise<T> => {
+  const thisTurn = latestConversionTurn.then(turn)
+  latestConversionTurn = thisTurn.catch(() => undefined)
+  return thisTurn
+}
 
 type ConvertMoneyAmount = NonNullable<
   ReturnType<typeof usePriceConversion>["convertMoneyAmount"]
@@ -90,6 +122,13 @@ const isRetryableNow = (record: PendingAutoConvert, nowMs: number): boolean => {
   return elapsed >= RETRY_COOLDOWN_MS
 }
 
+/** A receive whose payment came in, by its invoice. */
+type PaidReceive = {
+  invoice: string
+  paymentId: string
+  satsReceived: number
+}
+
 type RunAutoConvertParams = {
   sdk: BreezSdkInterface
   record: PendingAutoConvert
@@ -100,10 +139,11 @@ type RunAutoConvertParams = {
   maxAttempts: number
   waitOptions: WaitForPaymentOptions
   amountMatchToleranceBps: number
-  claimedConversionIds: ReadonlySet<string>
   onConverting?: (invoice: string) => void
   onSettled?: (invoice: string) => void
   onConverted?: () => void
+  /** Asks for this receive to be tried again after the given wait. */
+  onDeferred?: (retryAfterMs: number) => void
 }
 
 const runAutoConvert = async ({
@@ -116,11 +156,23 @@ const runAutoConvert = async ({
   maxAttempts,
   waitOptions,
   amountMatchToleranceBps,
-  claimedConversionIds,
   onConverting,
   onSettled,
   onConverted,
+  onDeferred,
 }: RunAutoConvertParams): Promise<void> => {
+  /** Converted already, with its pairing still to store: stored in its turn before
+   *  anything else, the attempt cap included, since storing a pairing is no attempt to
+   *  convert, and a receive dropped at the cap would leave its conversion unpaired. */
+  const unstoredConversion = unstoredPairings.get(paymentId)
+  const isConvertedButUnstored = unstoredConversion !== undefined
+  if (isConvertedButUnstored) {
+    await afterEarlierReceivesConvert(() => storePairing(paymentId, unstoredConversion))
+    await removePendingAutoConvert(record.paymentRequest)
+    onConverted?.()
+    return
+  }
+
   // Re-read storage so concurrent invocations agree on the cap state instead
   // of each trusting their own (potentially pre-stamp) snapshot of `attempts`.
   const liveRecord = await findPendingAutoConvert(record.paymentRequest)
@@ -140,31 +192,51 @@ const runAutoConvert = async ({
     await recordAutoConvertAttempt(record.paymentRequest, Date.now())
 
     const usdCentsAmount = convertSatsToUsdCents(satsReceived, convert)
-    const outcome = await executeAutoConvert(sdk, {
-      satsAmount: satsReceived,
-      usdCentsAmount,
-      isStableBalanceActive,
-      recordCreatedAtMs: record.createdAtMs,
-      amountMatchToleranceBps,
-      claimedConversionIds,
+    const outcome = await afterEarlierReceivesConvert(async () => {
+      /** Read in its turn: every receive converted before it is paired by then. */
+      const { claimedConversionIds } = await buildClaimedConversionIds()
+      const converted = await executeAutoConvert(sdk, {
+        satsAmount: satsReceived,
+        usdCentsAmount,
+        isStableBalanceActive,
+        recordCreatedAtMs: record.createdAtMs,
+        amountMatchToleranceBps,
+        claimedConversionIds,
+      })
+      if (converted.status === AutoConvertStatus.Converted) {
+        /** The conversion's own payment, as the bridge names it; looked up in the history
+         *  only when it does not, as a payment whose legs are still syncing may not show. */
+        const conversionId =
+          converted.conversionPaymentId ??
+          (await findRecentConversionId(sdk, {
+            satsAmount: satsReceived,
+            toleranceBps: amountMatchToleranceBps,
+            claimedConversionIds,
+          }))
+        /** Unstored, it throws, and the receive is kept rather than removed as paired. */
+        if (conversionId) await storePairing(paymentId, conversionId)
+      }
+      /** One the history shows for it is paired too before the receive goes, so no other
+       *  receive takes it for its own once this launch is over. */
+      if (converted.status === AutoConvertStatus.AlreadyConverted) {
+        const { conversionPaymentId: foundConversionId } = converted
+        if (foundConversionId) await storePairing(paymentId, foundConversionId)
+      }
+      return converted
     })
 
     if (outcome.status === AutoConvertStatus.Converted) {
-      const conversionId = await findRecentConversionId(sdk, {
-        satsAmount: satsReceived,
-        toleranceBps: amountMatchToleranceBps,
-        claimedConversionIds,
-      })
-      if (conversionId) {
-        await markAutoConvertPairing({
-          receivePaymentId: paymentId,
-          conversionPaymentId: conversionId,
-          pairedAtMs: Date.now(),
-        })
-      }
-
       await removePendingAutoConvert(record.paymentRequest)
       onConverted?.()
+      return
+    }
+
+    /** A try that only waited behind an earlier conversion sent nothing, so it spends
+     *  none of the receive's attempts: launches that each wait anew could otherwise use
+     *  them all up and drop the receive unconverted. */
+    if (outcome.status === AutoConvertStatus.Deferred) {
+      await releaseAutoConvertAttempt(record.paymentRequest)
+      onDeferred?.(outcome.retryAfterMs)
       return
     }
 
@@ -188,7 +260,7 @@ const buildClaimedConversionIds = async (): Promise<{
   pairedReceiveIds: ReadonlySet<string>
 }> => {
   const pairings = await listAutoConvertPairings()
-  const claimedConversionIds = new Set<string>()
+  const claimedConversionIds = new Set<string>(unstoredPairings.values())
   const pairedReceiveIds = new Set<string>()
   pairings.forEach((p) => {
     claimedConversionIds.add(p.conversionPaymentId)
@@ -245,6 +317,30 @@ export const useAutoConvertListener = (): void => {
   const inFlightInvoicesRef = useRef<Set<string>>(new Set())
   const initialReplayDoneRef = useRef(false)
 
+  /** A receive that waited behind an earlier conversion has no trigger of its own left:
+   *  it alone is tried again once the wait and the cooldown are over, so it goes out
+   *  within the launch that waited, however long that one stays open. One timer per
+   *  receive, run with the listener as it is when it fires. */
+  const retryTimersRef = useRef(new Map<string, ReturnType<typeof setTimeout>>())
+  const retryReceiveRef = useRef<((receive: PaidReceive) => void) | undefined>(undefined)
+  const retryAfterWait = useCallback((receive: PaidReceive, retryAfterMs: number) => {
+    const timers = retryTimersRef.current
+    const earlier = timers.get(receive.invoice)
+    if (earlier !== undefined) clearTimeout(earlier)
+    const timer = setTimeout(() => {
+      timers.delete(receive.invoice)
+      retryReceiveRef.current?.(receive)
+    }, retryAfterMs + RETRY_COOLDOWN_MS)
+    timers.set(receive.invoice, timer)
+  }, [])
+  useEffect(() => {
+    const timers = retryTimersRef.current
+    return () => {
+      timers.forEach((timer) => clearTimeout(timer))
+      timers.clear()
+    }
+  }, [])
+
   const waitOptions = useMemo<WaitForPaymentOptions>(
     () => ({
       maxAttempts: autoConvertPollMaxAttempts,
@@ -260,7 +356,6 @@ export const useAutoConvertListener = (): void => {
       paymentId: string
       satsReceived: number
       convert: ConvertMoneyAmount
-      claimedConversionIds: ReadonlySet<string>
     }): Promise<void> => {
       const { record } = params
       if (inFlightInvoicesRef.current.has(record.paymentRequest)) return
@@ -280,10 +375,18 @@ export const useAutoConvertListener = (): void => {
           maxAttempts: autoConvertMaxAttempts,
           waitOptions,
           amountMatchToleranceBps: autoConvertAmountMatchToleranceBps,
-          claimedConversionIds: params.claimedConversionIds,
           onConverting: markConverting,
           onSettled: markSettled,
           onConverted: handleConverted,
+          onDeferred: (retryAfterMs) =>
+            retryAfterWait(
+              {
+                invoice: record.paymentRequest,
+                paymentId: params.paymentId,
+                satsReceived: params.satsReceived,
+              },
+              retryAfterMs,
+            ),
         })
       } finally {
         inFlightInvoicesRef.current.delete(record.paymentRequest)
@@ -297,8 +400,59 @@ export const useAutoConvertListener = (): void => {
       markConverting,
       markSettled,
       handleConverted,
+      retryAfterWait,
     ],
   )
+
+  /** A paid receive tried now, unless it is no longer pending, its cooldown runs, or it
+   *  was paired already. */
+  const tryPaidReceive = useCallback(
+    async (
+      activeSdk: BreezSdkInterface,
+      convert: ConvertMoneyAmount,
+      { invoice, paymentId, satsReceived }: PaidReceive,
+    ): Promise<void> => {
+      const record = await findPendingAutoConvert(invoice)
+      if (!record) return
+      if (!isRetryableNow(record, Date.now())) return
+
+      const { pairedReceiveIds } = await buildClaimedConversionIds()
+      if (pairedReceiveIds.has(paymentId)) {
+        await removePendingAutoConvert(invoice)
+        return
+      }
+
+      await processWithInFlightLock({
+        sdk: activeSdk,
+        record,
+        paymentId,
+        satsReceived,
+        convert,
+      })
+    },
+    [processWithInFlightLock],
+  )
+
+  /** A retry that comes while the listener cannot run it, with no wallet or price yet, or
+   *  in a mode that holds auto-convert, is held until it can, rather than lost: nothing
+   *  else would try that receive again in this launch. */
+  const heldRetriesRef = useRef(new Map<string, PaidReceive>())
+  useEffect(() => {
+    const runOrHold = (receive: PaidReceive) => {
+      const isHeldByMode = isAnonMode || !hasSparkToken
+      if (!sdk || !convertMoneyAmount || isHeldByMode) {
+        heldRetriesRef.current.set(receive.invoice, receive)
+        return
+      }
+      tryPaidReceive(sdk, convertMoneyAmount, receive).catch((err) =>
+        reportError("auto-convert-listener retry", err),
+      )
+    }
+    retryReceiveRef.current = runOrHold
+    const held = [...heldRetriesRef.current.values()]
+    heldRetriesRef.current.clear()
+    held.forEach(runOrHold)
+  }, [sdk, convertMoneyAmount, isAnonMode, hasSparkToken, tryPaidReceive])
 
   useEffect(() => {
     if (!sdk || !convertMoneyAmount) return
@@ -320,23 +474,10 @@ export const useAutoConvertListener = (): void => {
       const invoice = extractLightningInvoiceFromPayment(payment)
       if (!invoice) return
 
-      const record = await findPendingAutoConvert(invoice)
-      if (!record) return
-      if (!isRetryableNow(record, Date.now())) return
-
-      const { claimedConversionIds, pairedReceiveIds } = await buildClaimedConversionIds()
-      if (pairedReceiveIds.has(lastReceivedPaymentId)) {
-        await removePendingAutoConvert(invoice)
-        return
-      }
-
-      await processWithInFlightLock({
-        sdk,
-        record,
+      await tryPaidReceive(sdk, convertMoneyAmount, {
+        invoice,
         paymentId: lastReceivedPaymentId,
         satsReceived: toNumber(payment.amount),
-        convert: convertMoneyAmount,
-        claimedConversionIds,
       })
     }
 
@@ -347,7 +488,7 @@ export const useAutoConvertListener = (): void => {
     convertMoneyAmount,
     isAnonMode,
     hasSparkToken,
-    processWithInFlightLock,
+    tryPaidReceive,
   ])
 
   useEffect(() => {
@@ -384,8 +525,7 @@ export const useAutoConvertListener = (): void => {
           return
         }
 
-        const { claimedConversionIds, pairedReceiveIds } =
-          await buildClaimedConversionIds()
+        const { pairedReceiveIds } = await buildClaimedConversionIds()
         if (pairedReceiveIds.has(paid.paymentId)) {
           await removePendingAutoConvert(record.paymentRequest)
           return
@@ -397,7 +537,6 @@ export const useAutoConvertListener = (): void => {
           paymentId: paid.paymentId,
           satsReceived: paid.amount,
           convert: convertMoneyAmount,
-          claimedConversionIds,
         })
       }
 

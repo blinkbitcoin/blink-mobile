@@ -360,6 +360,13 @@ Deep reviews label structural findings by principle, and authors answer per-prin
       `blink-lnurl-server`, not Breez's, so diff the routes and signed-message format in
       the SDK's `lnurl.rs` between the two tags, and run username register, availability
       and restore against staging before merging (#4257).
+- [ ] SDK bumps: error messages the app reads. A payment missing from the wallet is told
+      apart from a wallet that could not be read only by the SDK's message
+      (`isPaymentNotFound` in `bridge/wallet.ts`: "Query returned no rows" from
+      `persist/sqlite.rs`, "Not found" from the other backends), and its specs mock that
+      text. Diff those messages between the two tags: a reworded one makes every lookup by
+      key read as unreadable, and sends to a destination with a lost keyed attempt are
+      refused until it lapses (#4427).
 - [ ] The two routes the app signs for itself (`/recover`, `/mode`) are not the SDK's. Their
       messages live in `lnurl-server-mode.ts` and are a wire contract with
       `blink-lnurl-server`'s `signed_message.rs`, pinned by the same golden vectors on both

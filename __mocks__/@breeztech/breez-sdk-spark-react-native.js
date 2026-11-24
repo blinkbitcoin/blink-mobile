@@ -32,6 +32,18 @@ const PaymentDetails = {
   Withdraw: createInstanceOf("Withdraw"),
 }
 
+const ConversionInfo = {
+  Amm: createInstanceOf("Amm"),
+  Orchestra: createInstanceOf("Orchestra"),
+  Boltz: createInstanceOf("Boltz"),
+}
+
+const ConversionPurpose = {
+  OngoingPayment: createInstanceOf("OngoingPayment"),
+  SelfTransfer: createInstanceOf("SelfTransfer"),
+  AutoConversion: createInstanceOf("AutoConversion"),
+}
+
 const SdkError_Tags = {
   SparkError: "SparkError",
   InsufficientFunds: "InsufficientFunds",
@@ -117,6 +129,7 @@ module.exports = {
     Input: jest.fn().mockImplementation((args) => ({ tag: "Input", inner: args })),
   },
   GetSparkStatusRequest: { create: (p) => p },
+  ListPaymentsRequest: { create: (p) => p },
   PrepareSendPaymentRequest: { create: (p) => p },
   RegisterLightningAddressRequest: { create: (p) => p },
   SendPaymentRequest: { create: (p) => p },
@@ -154,6 +167,9 @@ module.exports = {
   PaymentType: { Send: 0, Receive: 1 },
   PaymentDetails_Tags,
   PaymentDetails,
+  ConversionInfo,
+  ConversionPurpose,
+  ConversionStatus: { Pending: 0, Completed: 1, Failed: 2, RefundNeeded: 3, Refunded: 4 },
   SdkError,
   SdkError_Tags,
   ServiceStatus: {

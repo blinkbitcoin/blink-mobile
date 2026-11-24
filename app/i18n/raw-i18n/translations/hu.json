@@ -2362,7 +2362,8 @@
     "slideConfirming": "Megerősítés...",
     "copiedDestination": "Címzett a vágólapra másolva",
     "lightningRecommended": "Magas díj! Lightning használata ajánlott.",
-    "usdRemainderSweep": "A fennmaradó {remaining: string} ({remainingSats: string}) Bitcoinra lesz váltva. USD minimum: {minimum: string}."
+    "usdRemainderSweep": "A fennmaradó {remaining: string} ({remainingSats: string}) Bitcoinra lesz váltva. USD minimum: {minimum: string}.",
+    "sendAnyway": "Megnéztem az előzményeimet, küldés mindenképp"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "Mostantól a {bankName: string} felhasználónevek {bankName: string} címek is.",
@@ -4284,7 +4285,12 @@
     "belowMinimum": "Az összeg az ehhez a fizetéshez szükséges minimum alatt van. Próbálj nagyobb összeget.",
     "networkError": "Hálózati kapcsolódási probléma. Ellenőrizd a kapcsolatot, és próbáld újra.",
     "invalidInput": "A fizetés adatai érvénytelennek tűnnek. Kérjük, ellenőrizd, és próbáld újra.",
-    "generic": "A fizetés nem sikerült. Próbáld újra egy pillanat múlva, vagy használj kisebb összeget."
+    "generic": "A fizetés nem sikerült. Próbáld újra egy pillanat múlva, vagy használj kisebb összeget.",
+    "outcomeUnknown": "Lehet, hogy ez a fizetés már teljesült. Mielőtt újra elküldenéd, nézd meg a tranzakcióid előzményeit.",
+    "earlierConversionPending": "A korábbi átváltásod megerősítése még folyamatban van. Próbáld újra néhány perc múlva.",
+    "earlierPaymentFound": "A korábbi fizetésed erre a címre már teljesült, de más összeggel. Nézd meg, mielőtt újra küldenél.",
+    "earlierConversionFound": "A korábbi átváltásod már teljesült, de más összeggel. Nézd meg a tranzakciós előzményeidben, mielőtt újra váltanál.",
+    "convertedMeanwhile": "Épp most teljesült egy nagyjából ekkora összegű átváltás. Nézd meg az egyenlegedet, mielőtt újra megerősítenéd ezt."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Ez a fiók a(z) {network} hálózaton jött létre. Használatához váltson a(z) {network} hálózatra."
