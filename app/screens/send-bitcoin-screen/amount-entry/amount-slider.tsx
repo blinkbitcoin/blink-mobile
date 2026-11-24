@@ -330,13 +330,15 @@ const useStyles = makeStyles(({ colors }) => ({
     width: THUMB_SIZE,
     height: THUMB_SIZE,
     borderRadius: THUMB_SIZE / 2,
-    backgroundColor: colors._white,
+    // eslint-disable-next-line no-restricted-properties -- Figma's thumb is white in both modes
+    backgroundColor: colors.staticWhite,
     boxShadow: [
       {
         offsetX: 0,
         offsetY: 0,
         blurRadius: THUMB_SHADOW_BLUR,
-        color: `${colors._black}${THUMB_SHADOW_ALPHA}`,
+        // eslint-disable-next-line no-restricted-properties -- a shadow is black in both modes
+        color: `${colors.staticBlack}${THUMB_SHADOW_ALPHA}`,
       },
     ],
   },

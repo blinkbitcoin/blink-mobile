@@ -680,6 +680,9 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     amountInWallet && sendingWalletBalance.amount > 0
       ? amountInWallet / sendingWalletBalance.amount
       : 0
+  /** Green for the Dollar wallet, as slide to send. */
+  const sliderAccentColor =
+    walletCurrency === WalletCurrency.Usd ? colors.success : colors.accent
   const isLowFunds =
     !amountStatus.validAmount &&
     amountStatus.invalidReason === AmountInvalidReason.InsufficientBalance
@@ -789,9 +792,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               showHint={showAmountSliderHint}
               onHoldChange={setIsSliding}
               disabled={isQuotingFeesForNext}
-              accentColor={
-                walletCurrency === WalletCurrency.Usd ? colors._green : colors.accent
-              }
+              accentColor={sliderAccentColor}
             />
           )}
         </View>

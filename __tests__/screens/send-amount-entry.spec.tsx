@@ -1278,7 +1278,7 @@ describe("amount slider", () => {
 
       await switchWallet()
 
-      expect(amountSlider().props.accentColor).toBe(light._green)
+      expect(amountSlider().props.accentColor).toBe(light.success)
     })
 
     it("no longer sends all after a 100% slide", async () => {
