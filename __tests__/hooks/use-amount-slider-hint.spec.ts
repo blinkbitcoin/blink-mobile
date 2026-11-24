@@ -55,6 +55,15 @@ describe("useAmountSliderHint", () => {
     })
   })
 
+  it("hands back the same state once the slider is learned, so nothing is written", () => {
+    mockPersistentState = { ...baseState, hasLearnedAmountSlider: true }
+    const { result } = renderHook(() => useAmountSliderHint())
+
+    act(() => result.current.markAmountSliderLearned())
+
+    expect(applyLastUpdate(mockPersistentState)).toBe(mockPersistentState)
+  })
+
   it("leaves a state that hasn't loaded yet alone", () => {
     const { result } = renderHook(() => useAmountSliderHint())
 
