@@ -409,6 +409,12 @@
   "settings": {
     "react": {
       "version": "detect"
+    },
+    // Lets the import rules follow the @app/* alias from tsconfig.json to the file it names.
+    "import/resolver": {
+      "typescript": {
+        "project": "./tsconfig.json"
+      }
     }
   }
 }
