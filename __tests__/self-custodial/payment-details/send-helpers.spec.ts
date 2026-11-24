@@ -10,8 +10,11 @@ import {
   createGetFeeOnchain,
   createSendMutation,
   createSendMutationOnchain,
-  findLostSend,
 } from "@app/self-custodial/payment-details/send-helpers"
+import {
+  findLostSend,
+  findPaymentUnderKey,
+} from "@app/self-custodial/payment-details/lost-send"
 import {
   measureObservedPayment,
   resetMeasuredOnceKeys,
@@ -19,6 +22,7 @@ import {
   resetSettlementTracking,
   setMeasurementContext,
 } from "@app/self-custodial/measurement"
+import { scopeLostAttemptsTo } from "@app/self-custodial/payment-details/lost-attempts"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { AccountMode } from "@app/types/account"
 import { ConvertAmountAdjustment } from "@app/types/payment"
@@ -65,6 +69,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
     OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
     PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
     SyncWalletRequest: { create: (request: unknown) => request },
+    GetPaymentRequest: { create: (request: unknown) => request },
     PaymentType: { Send: 0, Receive: 1 },
     Seed: { Mnemonic: jest.fn().mockImplementation((args: unknown) => args) },
     StableBalanceActiveLabel: {
@@ -114,15 +119,31 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
 
 const mockListPayments = jest.fn()
 const mockSyncWallet = jest.fn()
+const mockGetPayment = jest.fn()
 
 const mockSdk = {
   prepareSendPayment: (...args: unknown[]) => mockPrepareSendPayment(...args),
   sendPayment: (...args: unknown[]) => mockSendPayment(...args),
   listPayments: (...args: unknown[]) => mockListPayments(...args),
   syncWallet: (...args: unknown[]) => mockSyncWallet(...args),
+  getPayment: (...args: unknown[]) => mockGetPayment(...args),
 } as never
 
 const sdkError = (tag: string, inner?: readonly [string]) => ({ tag, inner })
+
+/** Storage holding nothing from an earlier launch, and keeping nothing for the next. */
+const noStoredAttempts = {
+  load: async () => new Map(),
+  save: async () => undefined,
+  remove: async () => undefined,
+}
+
+/** Lost attempts are kept for the connected wallet for as long as the app runs, which
+ *  here is the whole file: every test connects a wallet of its own, holding none. */
+let connectedWallets = 0
+beforeEach(() => {
+  scopeLostAttemptsTo(`wallet-${(connectedWallets += 1)}`, noStoredAttempts)
+})
 
 describe("createGetFee", () => {
   beforeEach(() => {
@@ -389,7 +410,10 @@ describe("createGetFee", () => {
 
   it("forwards amount and tokenIdentifier on the prepare call", async () => {
     mockPrepareSendPayment.mockResolvedValue({
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
 
     const getFee = createGetFee({
@@ -410,7 +434,10 @@ describe("createGetFee", () => {
 
   it("forwards conversionOptions on the prepare call (USDB→BTC Lightning)", async () => {
     mockPrepareSendPayment.mockResolvedValue({
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
     const conversionOptions = {
       conversionType: { tag: "ToBitcoin", inner: { fromTokenIdentifier: "usdb" } },
@@ -478,7 +505,10 @@ describe("createGetFeeOnchain", () => {
   it("returns undefined amount when extractOnchainFees returns null (regression)", async () => {
     mockPrepareSendPayment.mockResolvedValue({
       amount: BigInt(50000),
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
 
     const getFee = createGetFeeOnchain(
@@ -494,7 +524,10 @@ describe("createGetFeeOnchain", () => {
   it("reports the Generic code when extractOnchainFees returns null", async () => {
     mockPrepareSendPayment.mockResolvedValue({
       amount: BigInt(50000),
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
 
     const getFee = createGetFeeOnchain(
@@ -570,9 +603,12 @@ describe("createSendMutation", () => {
 
   it("returns success on a successful send", async () => {
     mockPrepareSendPayment.mockResolvedValue({
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
-    mockSendPayment.mockResolvedValue(undefined)
+    mockSendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
 
     const send = createSendMutation(
       {
@@ -580,7 +616,7 @@ describe("createSendMutation", () => {
         paymentRequest: "lnbc1...",
         amount: undefined,
       },
-      telemetry,
+      { telemetry },
     )
     const result = await send()
 
@@ -596,7 +632,7 @@ describe("createSendMutation", () => {
         paymentRequest: "lnbc1...",
         amount: undefined,
       },
-      telemetry,
+      { telemetry },
     )
     const result = await send()
 
@@ -617,7 +653,7 @@ describe("createSendMutation", () => {
         paymentRequest: "lnbc1...",
         amount: undefined,
       },
-      telemetry,
+      { telemetry },
     )
     const result = await send()
 
@@ -633,7 +669,7 @@ describe("createSendMutation", () => {
         paymentRequest: "lnbc1...",
         amount: undefined,
       },
-      telemetry,
+      { telemetry },
     )
     const result = await send()
 
@@ -651,7 +687,7 @@ describe("createSendMutation", () => {
         paymentRequest: "lnbc1...",
         amount: undefined,
       },
-      telemetry,
+      { telemetry },
     )
     await send()
 
@@ -670,7 +706,7 @@ describe("createSendMutation", () => {
         paymentRequest: "lnbc1...",
         amount: undefined,
       },
-      telemetry,
+      { telemetry },
     )
     await send()
 
@@ -685,9 +721,12 @@ describe("createSendMutation", () => {
 
   it("forwards tokenIdentifier on the prepare call", async () => {
     mockPrepareSendPayment.mockResolvedValue({
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
-    mockSendPayment.mockResolvedValue(undefined)
+    mockSendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
 
     const send = createSendMutation(
       {
@@ -696,7 +735,7 @@ describe("createSendMutation", () => {
         amount: BigInt(1500),
         tokenIdentifier: "usdb-token-id",
       },
-      telemetry,
+      { telemetry },
     )
     await send()
 
@@ -707,9 +746,12 @@ describe("createSendMutation", () => {
 
   it("forwards conversionOptions on the prepare call (USDB→BTC Lightning)", async () => {
     mockPrepareSendPayment.mockResolvedValue({
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
-    mockSendPayment.mockResolvedValue(undefined)
+    mockSendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
     const conversionOptions = {
       conversionType: { tag: "ToBitcoin", inner: { fromTokenIdentifier: "usdb" } },
       maxSlippageBps: undefined,
@@ -723,7 +765,7 @@ describe("createSendMutation", () => {
         amount: undefined,
         conversionOptions,
       },
-      telemetry,
+      { telemetry },
     )
     await send()
 
@@ -742,12 +784,12 @@ describe("createSendMutationOnchain", () => {
     mockPrepareSendPayment.mockResolvedValue({
       paymentMethod: { tag: "BitcoinAddress", inner: {} },
     })
-    mockSendPayment.mockResolvedValue(undefined)
+    mockSendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
 
     const send = createSendMutationOnchain(
       { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
       "medium",
-      telemetryOnchain,
+      { telemetry: telemetryOnchain },
     )
     const result = await send()
 
@@ -765,7 +807,7 @@ describe("createSendMutationOnchain", () => {
     const send = createSendMutationOnchain(
       { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
       "fast",
-      telemetryOnchain,
+      { telemetry: telemetryOnchain },
     )
     const result = await send()
 
@@ -804,7 +846,12 @@ describe("findLostSend", () => {
    *  sync a test leaves pending must not be handed to the next one. */
   let lookupSdk = mockSdk
   const lookup = () =>
-    findLostSend({ sdk: lookupSdk, startedAtMs: STARTED_AT_MS, matches: toFriend })
+    findLostSend({
+      sdk: lookupSdk,
+      startedAtMs: STARTED_AT_MS,
+      walletClockSec: STARTED_AT_MS / 1000,
+      matches: toFriend,
+    })
 
   /** Runs the lookup to its end, releasing each wait between looks. */
   const settle = async <T>(pending: Promise<T>): Promise<T> => {
@@ -833,6 +880,62 @@ describe("findLostSend", () => {
    *  a day before the attempt's own clock, because the wallet stamps a payment with the
    *  server's clock and a phone's can be set well ahead of it. Only what was sent from
    *  this wallet is asked for. */
+  /** A phone clock days ahead puts the attempt's own time after the payment's, which
+   *  the wallet stamps by the server's clock: the wallet's newest send then, stamped the
+   *  same way, still reaches it. */
+  it("reaches back from the wallet's own clock when it is earlier than the phone's", async () => {
+    walletAnswers([sent("p1", COMPLETED)])
+    const twoDaysEarlier = STARTED_AT_MS / 1000 - 2 * 24 * 60 * 60
+
+    await settle(
+      findLostSend({
+        sdk: mockSdk,
+        startedAtMs: STARTED_AT_MS,
+        walletClockSec: twoDaysEarlier,
+        matches: toFriend,
+      }),
+    )
+
+    expect(mockListPayments).toHaveBeenCalledWith(
+      expect.objectContaining({ fromTimestamp: BigInt(twoDaysEarlier - 24 * 60 * 60) }),
+    )
+  })
+
+  /** A phone clock behind the server's: its own time is the earlier, and is used. */
+  it("reaches back from the phone's clock when it is the earlier", async () => {
+    walletAnswers([sent("p1", COMPLETED)])
+
+    await settle(
+      findLostSend({
+        sdk: mockSdk,
+        startedAtMs: STARTED_AT_MS,
+        walletClockSec: STARTED_AT_MS / 1000 + 2 * 24 * 60 * 60,
+        matches: toFriend,
+      }),
+    )
+
+    expect(mockListPayments).toHaveBeenCalledWith(
+      expect.objectContaining({ fromTimestamp: BigInt(1_747_691_078 - 24 * 60 * 60) }),
+    )
+  })
+
+  it("reads the whole history when the wallet held no send to go by", async () => {
+    walletAnswers([sent("p1", COMPLETED)])
+
+    await settle(
+      findLostSend({
+        sdk: mockSdk,
+        startedAtMs: STARTED_AT_MS,
+        walletClockSec: 0,
+        matches: toFriend,
+      }),
+    )
+
+    expect(mockListPayments).toHaveBeenCalledWith(
+      expect.objectContaining({ fromTimestamp: BigInt(0) }),
+    )
+  })
+
   it("asks for outgoing payments from a day before the attempt", async () => {
     walletAnswers([sent("p1", COMPLETED)])
 
@@ -1331,7 +1434,7 @@ describe("send telemetry", () => {
   const sendBolt11 = () =>
     createSendMutation(
       { sdk: mockSdk, paymentRequest: "lnbc1...", amount: undefined },
-      telemetry,
+      { telemetry },
     )()
 
   beforeEach(() => {
@@ -1344,7 +1447,10 @@ describe("send telemetry", () => {
       network: "mainnet",
     })
     mockPrepareSendPayment.mockResolvedValue({
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
   })
 
@@ -1424,15 +1530,27 @@ describe("send telemetry", () => {
     ])
   })
 
-  it("reports a thrown send as failed with its classified code", async () => {
-    mockSendPayment.mockRejectedValue(sdkError("NetworkError"))
+  it("reports a send the SDK refused on the way in as failed with its classified code", async () => {
+    mockSendPayment.mockRejectedValue(sdkError("InsufficientFunds"))
 
     await sendBolt11()
 
     expect(mockLogEvent).toHaveBeenLastCalledWith(
       "sc_payment_send_failed",
-      expect.objectContaining({ error_code: SelfCustodialErrorCode.NetworkError }),
+      expect.objectContaining({ error_code: SelfCustodialErrorCode.InsufficientFunds }),
     )
+  })
+
+  /** A throw after dispatch leaves the outcome unknown: the payment may have gone out, and
+   *  is looked for. Telemetry waits for the SDK's word rather than count a send that may
+   *  yet settle as failed. */
+  it("waits on a send whose outcome a throw left unknown, reporting nothing yet", async () => {
+    mockSendPayment.mockRejectedValue(sdkError("NetworkError"))
+
+    const result = await sendBolt11()
+
+    expect(result.status).toBe(PaymentSendResult.Failure)
+    expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
   })
 
   it("does not count a broadcast onchain send as settled", async () => {
@@ -1444,7 +1562,7 @@ describe("send telemetry", () => {
     await createSendMutationOnchain(
       { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
       "medium",
-      telemetryOnchain,
+      { telemetry: telemetryOnchain },
     )()
 
     expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
@@ -1472,10 +1590,12 @@ describe("send telemetry", () => {
       )
 
       const pending = sendBolt11()
-      await Promise.resolve()
-      await Promise.resolve()
+      for (let tick = 0; tick < 50 && mockSendPayment.mock.calls.length === 0; tick += 1)
+        await Promise.resolve()
       setMeasurementContext(next)
-      rejectSend(sdkError("NetworkError"))
+      /** Refused on the way in, so it would be reported as failed in the context the send
+       *  began in: the one thing that must not reach the context that followed. */
+      rejectSend(sdkError("InsufficientFunds"))
       const result = await pending
 
       expect(result.status).toBe(PaymentSendResult.Failure)
@@ -1490,5 +1610,126 @@ describe("send telemetry", () => {
 
     expect(result.status).toBe(PaymentSendResult.Success)
     expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+  })
+})
+
+describe("findPaymentUnderKey", () => {
+  const COMPLETED = 0
+  const PENDING = 1
+  const FAILED = 2
+  const KEY = "11111111-1111-4111-8111-111111111111"
+  /** What the SDK's SQLite storage answers an id it holds no payment for. */
+  const notFound = () =>
+    sdkError("StorageError", ["Underlying implementation error: Query returned no rows"])
+  const lookup = () => findPaymentUnderKey({ sdk: mockSdk, key: KEY.toUpperCase() })
+
+  /** Runs the lookup to its end, releasing each wait between looks. */
+  const settle = async <T>(pending: Promise<T>): Promise<T> => {
+    for (let i = 0; i < 3; i += 1) {
+      await Promise.resolve()
+      await jest.advanceTimersByTimeAsync(2000)
+    }
+    return pending
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    jest.useFakeTimers()
+    mockSyncWallet.mockResolvedValue(undefined)
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  /** Exact, with no window: a phone clock days ahead cannot leave the payment out. */
+  it("asks the caught-up wallet for the payment by its id, the key", async () => {
+    mockGetPayment.mockResolvedValue({ payment: { id: KEY, status: COMPLETED } })
+
+    const result = await settle(lookup())
+
+    expect(result).toEqual({
+      status: "found",
+      payment: { id: KEY, status: COMPLETED },
+      failed: [],
+    })
+    expect(mockSyncWallet).toHaveBeenCalledTimes(1)
+    expect(mockGetPayment).toHaveBeenCalledWith({ paymentId: KEY })
+    expect(mockListPayments).not.toHaveBeenCalled()
+  })
+
+  it("finds a payment still in flight", async () => {
+    mockGetPayment.mockResolvedValue({ payment: { id: KEY, status: PENDING } })
+
+    const result = await settle(lookup())
+
+    expect(result.status).toBe("found")
+  })
+
+  it("finds one that lands on a later look", async () => {
+    mockGetPayment
+      .mockRejectedValueOnce(notFound())
+      .mockResolvedValueOnce({ payment: { id: KEY, status: COMPLETED } })
+
+    const result = await settle(lookup())
+
+    expect(result.status).toBe("found")
+    expect(mockGetPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("answers not-found once every look shows no payment under the key", async () => {
+    mockGetPayment.mockRejectedValue(notFound())
+
+    const result = await settle(lookup())
+
+    expect(result).toEqual({ status: "not-found", failed: [] })
+    expect(mockGetPayment).toHaveBeenCalledTimes(3)
+  })
+
+  it("does not take a failed payment under the key for the attempt landing", async () => {
+    mockGetPayment.mockResolvedValue({ payment: { id: KEY, status: FAILED } })
+
+    const result = await settle(lookup())
+
+    expect(result).toEqual({
+      status: "not-found",
+      failed: [{ id: KEY, status: FAILED }],
+    })
+  })
+
+  /** The SDK's other storage backends answer a missing id this way. */
+  it('takes InvalidInput("Not found") for no payment under the key as well', async () => {
+    mockGetPayment.mockRejectedValue(sdkError("InvalidInput", ["Not found"]))
+
+    const result = await settle(lookup())
+
+    expect(result).toEqual({ status: "not-found", failed: [] })
+  })
+
+  it("is unreadable when the wallet cannot be read", async () => {
+    mockGetPayment.mockRejectedValue(
+      sdkError("StorageError", ["Connection error: database is locked"]),
+    )
+
+    const result = await settle(lookup())
+
+    expect(result.status).toBe("unreadable")
+  })
+
+  it("is unreadable when the wallet throws an error that is not the SDK's", async () => {
+    mockGetPayment.mockRejectedValue(new Error("bridge torn down"))
+
+    const result = await settle(lookup())
+
+    expect(result.status).toBe("unreadable")
+  })
+
+  it("is unreadable when the wallet cannot catch up with the server", async () => {
+    mockSyncWallet.mockRejectedValue(sdkError("NetworkError"))
+    mockGetPayment.mockRejectedValue(notFound())
+
+    const result = await settle(lookup())
+
+    expect(result.status).toBe("unreadable")
   })
 })

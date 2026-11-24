@@ -2362,7 +2362,8 @@
     "slideConfirming": "Đang xác nhận...",
     "copiedDestination": "Đã sao chép địa chỉ đích vào bộ nhớ tạm",
     "lightningRecommended": "Phí cao! Chúng tôi khuyên bạn nên dùng Lightning.",
-    "usdRemainderSweep": "Số dư còn lại {remaining: string} ({remainingSats: string}) sẽ được chuyển đổi thành Bitcoin. Tối thiểu USD: {minimum: string}."
+    "usdRemainderSweep": "Số dư còn lại {remaining: string} ({remainingSats: string}) sẽ được chuyển đổi thành Bitcoin. Tối thiểu USD: {minimum: string}.",
+    "sendAnyway": "Tôi đã kiểm tra lịch sử, vẫn gửi"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "Tên người dùng {bankName: string} hiện là địa chỉ {bankName: string}.",
@@ -4284,7 +4285,12 @@
     "belowMinimum": "Số tiền dưới mức tối thiểu cần thiết cho khoản thanh toán này. Hãy thử số tiền lớn hơn.",
     "networkError": "Sự cố kết nối mạng. Kiểm tra kết nối và thử lại.",
     "invalidInput": "Chi tiết thanh toán có vẻ không hợp lệ. Vui lòng xem lại và thử lại.",
-    "generic": "Không thể hoàn tất thanh toán. Hãy thử lại sau một lát, hoặc dùng số tiền nhỏ hơn."
+    "generic": "Không thể hoàn tất thanh toán. Hãy thử lại sau một lát, hoặc dùng số tiền nhỏ hơn.",
+    "outcomeUnknown": "Khoản thanh toán này có thể đã được thực hiện. Hãy kiểm tra lịch sử giao dịch trước khi gửi lại.",
+    "earlierConversionPending": "Lần chuyển đổi trước của bạn vẫn đang được xác nhận. Hãy thử lại sau vài phút.",
+    "earlierPaymentFound": "Khoản thanh toán trước đó của bạn tới địa chỉ này đã được thực hiện, với số tiền khác. Hãy kiểm tra trước khi gửi lại.",
+    "earlierConversionFound": "Lần chuyển đổi trước của bạn đã được thực hiện, với số tiền khác. Hãy kiểm tra trong lịch sử giao dịch trước khi chuyển đổi lại.",
+    "convertedMeanwhile": "Một lần chuyển đổi với số tiền gần bằng vừa được thực hiện. Hãy kiểm tra số dư trước khi xác nhận lại lần này."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Tài khoản này được tạo trên {network}. Chuyển sang {network} để sử dụng."

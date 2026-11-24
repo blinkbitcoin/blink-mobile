@@ -1,17 +1,31 @@
-import { AmountAdjustmentReason } from "@breeztech/breez-sdk-spark-react-native"
+import { it } from "@jest/globals"
+import {
+  AmountAdjustmentReason,
+  PaymentStatus,
+} from "@breeztech/breez-sdk-spark-react-native"
 
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import {
   ConvertAmountAdjustment,
   ConvertDirection,
   ConvertErrorCode,
+  type ConvertParams,
 } from "@app/types/payment"
 import { WalletCurrency } from "@app/graphql/generated"
 
+import { executeAutoConvert } from "@app/self-custodial/auto-convert/executor"
 import {
   createGetConversionQuote,
+  LOST_CONVERSION_DELIVERY_WINDOW_MS,
   mapAmountAdjustment,
 } from "@app/self-custodial/bridge/convert"
+import {
+  OWN_CONVERSIONS,
+  scopeLostAttemptsTo,
+  STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS,
+  type LostAttempts,
+  type LostAttemptsStorage,
+} from "@app/self-custodial/payment-details/lost-attempts"
 import {
   measureObservedPayment,
   resetMeasuredOnceKeys,
@@ -19,11 +33,61 @@ import {
   resetSettlementTracking,
   setMeasurementContext,
 } from "@app/self-custodial/measurement"
+import {
+  loadLostAttempts,
+  removeLostAttempts,
+  saveLostAttempts,
+} from "@app/self-custodial/storage/lost-attempts"
 import { AccountMode } from "@app/types/account"
 
 const mockFetchLimits = jest.fn()
 const mockRequireTokenId = jest.fn(() => "usdb-token-id")
 const mockRecordError = jest.fn()
+const mockFindLostConversion = jest.fn()
+/** Where the wallet's received payments stood as the conversion went out. */
+const MARK = { walletClockSec: 1_700_000_000, knownPaymentIds: ["rcv-before"] }
+const mockMarkReceivedHistory = jest.fn()
+
+jest.mock("@app/self-custodial/payment-details/lost-send", () => ({
+  ...jest.requireActual("@app/self-custodial/payment-details/lost-send"),
+  findLostConversion: (...args: unknown[]) => mockFindLostConversion(...args),
+  markReceivedHistory: (...args: unknown[]) => mockMarkReceivedHistory(...args),
+}))
+
+/** The device's storage, in memory: what the app keeps across launches. */
+const deviceStore = new Map<string, string>()
+jest.mock("@react-native-async-storage/async-storage", () => ({
+  __esModule: true,
+  default: {
+    getItem: async (key: string) => deviceStore.get(key) ?? null,
+    setItem: async (key: string, value: string) => {
+      deviceStore.set(key, value)
+    },
+    removeItem: async (key: string) => {
+      deviceStore.delete(key)
+    },
+  },
+}))
+
+/** Storage holding nothing from an earlier launch, and keeping nothing for the next. */
+const noStoredAttempts: LostAttemptsStorage = {
+  load: async () => new Map(),
+  save: async () => undefined,
+  remove: async () => undefined,
+}
+
+/** A wallet's lost conversions are kept for as long as the app runs, which here is the
+ *  whole file: every test connects a wallet of its own, holding none. */
+let connectedWallets = 0
+beforeEach(() => {
+  scopeLostAttemptsTo(`wallet-${(connectedWallets += 1)}`, noStoredAttempts)
+  mockMarkReceivedHistory.mockResolvedValue(MARK)
+})
+
+const nextTurn = () =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, 0)
+  })
 
 jest.mock("@app/self-custodial/analytics-identity", () => ({
   /** The identity owner's own spec covers when delivery is safe; here it is in place. */
@@ -56,6 +120,42 @@ jest.mock("@app/self-custodial/config", () => ({
   sparkTokenIdentifier: () => mockRequireTokenId(),
   SparkToken: { Label: "USDB", DefaultDecimals: 6 },
 }))
+
+/**
+ * The phone's clock and real time, both moved past the window in which a lost conversion
+ * may still deliver. Real time is the React Native preset's `performance.now`, itself a
+ * mock answering the clock as it was at setup: it is moved by its return value, and put
+ * back by its implementation, since restoring a spy on a mock would leave it answering
+ * nothing.
+ */
+let movedClock: jest.SpyInstance | undefined
+const realTime = performance.now as jest.Mock
+const clockAtSetup = Date.now
+const PAST_THE_WINDOW_MS = LOST_CONVERSION_DELIVERY_WINDOW_MS + 1
+/** Real time moved on by `ms` from where it stands. */
+const realTimePasses = (ms: number) => {
+  realTime.mockReturnValue(performance.now() + ms)
+}
+/** How soon after a lost transfer the user's next one of its amount is taken for a retry. */
+const RETRY_HORIZON_MS = 30 * 60 * 1000
+/** The phone's clock moved past that horizon: a transfer made on purpose, by then. */
+const afterTheRetryHorizon = () => {
+  const movedTo = Date.now() + RETRY_HORIZON_MS + 1
+  movedClock?.mockRestore()
+  movedClock = jest.spyOn(Date, "now").mockReturnValue(movedTo)
+}
+const afterTheDeliveryWindow = () => {
+  const movedTo = Date.now() + PAST_THE_WINDOW_MS
+  movedClock?.mockRestore()
+  movedClock = jest.spyOn(Date, "now").mockReturnValue(movedTo)
+  realTimePasses(PAST_THE_WINDOW_MS)
+}
+afterEach(() => {
+  movedClock?.mockRestore()
+  movedClock = undefined
+  realTime.mockReset()
+  realTime.mockImplementation(clockAtSetup)
+})
 
 const createSdk = () => ({
   prepareSendPayment: jest.fn().mockResolvedValue({
@@ -282,10 +382,11 @@ describe("createGetConversionQuote — error handling", () => {
       toAmount: toUsdMoneyAmount(137),
       direction: ConvertDirection.BtcToUsd,
     })
+    mockFindLostConversion.mockResolvedValue({ status: "not-found" })
     const result = await quote!.execute()
 
     expect(result.status).toBe("failed")
-    expect(result.errors?.[0].message).toBe("send failed")
+    expect(result.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
     expect(mockRecordError).toHaveBeenCalled()
   })
 
@@ -453,6 +554,7 @@ describe("swap telemetry", () => {
       network: "mainnet",
     })
     mockFetchLimits.mockResolvedValue({ minFromAmount: 1000, minToAmount: 0 })
+    mockFindLostConversion.mockResolvedValue({ status: "not-found" })
   })
 
   afterAll(() => {
@@ -520,15 +622,20 @@ describe("swap telemetry", () => {
   it("does not report a rejection that arrives after a switch to another account", async () => {
     const sdk = createSdk()
     let rejectSend: (err: unknown) => void = () => undefined
-    sdk.sendPayment.mockImplementation(
-      () =>
-        new Promise((_resolve, reject) => {
-          rejectSend = reject
-        }),
-    )
+    /** The conversion goes out only once the wallet's received payments are marked. */
+    const sendStarted = new Promise<void>((started) => {
+      sdk.sendPayment.mockImplementation(
+        () =>
+          new Promise((_resolve, reject) => {
+            rejectSend = reject
+            started()
+          }),
+      )
+    })
     const quote = await createGetConversionQuote(sdk as never)(params)
 
     const executing = quote!.execute()
+    await sendStarted
     setMeasurementContext({
       accountId: "sc-2",
       mode: AccountMode.Enhanced,
@@ -540,6 +647,17 @@ describe("swap telemetry", () => {
     expect(mockLogEvent).not.toHaveBeenCalled()
   })
 
+  it("reports a conversion the SDK answered as failed", async () => {
+    const sdk = createSdk()
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "cv-1", status: FAILED } })
+
+    const quote = await createGetConversionQuote(sdk as never)(params)
+    const result = await quote!.execute()
+
+    expect(result.status).toBe("failed")
+    expect(loggedEvents()).toEqual(["sc_swap_failed"])
+  })
+
   it("reports a thrown conversion as failed", async () => {
     const sdk = createSdk()
     sdk.sendPayment.mockRejectedValue(new Error("send failed"))
@@ -548,5 +666,2419 @@ describe("swap telemetry", () => {
     await quote!.execute()
 
     expect(loggedEvents()).toEqual(["sc_swap_failed"])
+  })
+
+  it("reports a thrown conversion the wallet turns out to hold as completed", async () => {
+    mockFindLostConversion.mockResolvedValue({
+      status: "found",
+      payment: {
+        id: "cv-1",
+        amount: BigInt(1_370_000),
+        details: { tag: "Token", inner: { metadata: { identifier: "usdb-token-id" } } },
+        conversionDetails: {
+          status: 1,
+          conversions: [{ from: { amount: BigInt(5000) } }],
+        },
+      },
+    })
+    const sdk = createSdk()
+    sdk.prepareSendPayment.mockResolvedValue({
+      paymentMethod: {},
+      conversionEstimate: {
+        fee: BigInt(0),
+        amountIn: BigInt(5000),
+        amountOut: BigInt(1_370_000),
+        amountAdjustment: undefined,
+      },
+    })
+    sdk.sendPayment.mockRejectedValue(new Error("connection reset"))
+
+    const quote = await createGetConversionQuote(sdk as never)(params)
+    await quote!.execute()
+
+    expect(loggedEvents()).toEqual(["sc_swap_completed"])
+  })
+})
+
+// eslint-disable-next-line max-lines-per-function -- one suite, sharing the lost conversion fixtures below
+describe("createGetConversionQuote — a conversion whose response is lost", () => {
+  /** What the quote pays in: the sats entered. */
+  const PAID_IN = 5000
+
+  const throwingSdk = () => ({
+    prepareSendPayment: jest.fn().mockResolvedValue({
+      paymentMethod: {},
+      conversionEstimate: {
+        fee: BigInt(0),
+        amountIn: BigInt(PAID_IN),
+        amountOut: BigInt(1_370_000),
+        amountAdjustment: undefined,
+      },
+    }),
+    sendPayment: jest.fn().mockRejectedValue(new Error("connection reset")),
+    receivePayment: jest.fn().mockResolvedValue({ paymentRequest: "sp1own-invoice" }),
+    getInfo: jest.fn().mockResolvedValue({ tokenBalances: {} }),
+    listPayments: jest.fn(),
+    syncWallet: jest.fn().mockResolvedValue({}),
+  })
+
+  const quoteFor = (sdk: ReturnType<typeof throwingSdk>) =>
+    createGetConversionQuote(sdk as never)({
+      fromAmount: toBtcMoneyAmount(PAID_IN),
+      toAmount: toUsdMoneyAmount(137),
+      direction: ConvertDirection.BtcToUsd,
+    })
+
+  /** What a conversion from bitcoin delivered: dollars, a token payment, and what it paid
+   *  in once the wallet has filled in its legs. */
+  const delivered = ({
+    id = "rcv-usdb",
+    tag = "Token",
+    paidIn,
+    amount = 1_370_000,
+  }: { id?: string; tag?: string; paidIn?: number; amount?: number } = {}) => ({
+    id,
+    amount: BigInt(amount),
+    details: { tag, inner: { metadata: { identifier: "usdb-token-id" } } },
+    conversionDetails: {
+      status: 1,
+      conversions: paidIn === undefined ? [] : [{ from: { amount: BigInt(paidIn) } }],
+    },
+  })
+  const foundDelivery = (payment = delivered({ paidIn: PAID_IN })) => ({
+    status: "found",
+    payment,
+    failed: [],
+  })
+  /** A quote paying in `amountIn` to deliver `amountOut`. */
+  const quotedOut = (amountIn: number, amountOut: number) => ({
+    paymentMethod: {},
+    conversionEstimate: {
+      fee: BigInt(0),
+      amountIn: BigInt(amountIn),
+      amountOut: BigInt(amountOut),
+      amountAdjustment: undefined,
+    },
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockMarkReceivedHistory.mockResolvedValue(MARK)
+    mockFetchLimits.mockResolvedValue({ minFromAmount: null, minToAmount: null })
+  })
+
+  it("marks where the wallet's received payments stand before the conversion goes out", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found" })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+
+    const [markedAt] = mockMarkReceivedHistory.mock.invocationCallOrder
+    const [sentAt] = sdk.sendPayment.mock.invocationCallOrder
+    expect(markedAt).toBeLessThan(sentAt)
+  })
+
+  it("converts nothing when the wallet's received payments cannot be read", async () => {
+    mockMarkReceivedHistory.mockRejectedValue(new Error("storage failed"))
+    const sdk = throwingSdk()
+
+    const result = await (await quoteFor(sdk))!.execute()
+
+    expect(result.errors?.[0].code).toBe(ConvertErrorCode.HistoryUnavailable)
+    expect(sdk.sendPayment).not.toHaveBeenCalled()
+    expect(mockRecordError).toHaveBeenCalled()
+  })
+
+  it("looks for what the conversion delivered after the mark", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found" })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+
+    expect(mockFindLostConversion).toHaveBeenCalledWith({
+      sdk,
+      isLabelRequired: true,
+      lost: {
+        startedAtMs: expect.any(Number),
+        lastAttemptAtMs: expect.any(Number),
+        ...MARK,
+        expectedDeliveries: [
+          {
+            tokenIdentifier: "usdb-token-id",
+            amount: 1_370_000,
+            amountIn: 5000,
+            isAutomatic: false,
+          },
+        ],
+      },
+    })
+  })
+
+  it("expects bitcoin, with no token, from a lost conversion to bitcoin", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+    sdk.getInfo.mockResolvedValue({
+      tokenBalances: {
+        "usdb-token-id": {
+          balance: 1_000_000_000n,
+          tokenMetadata: { identifier: "usdb-token-id", decimals: 6 },
+        },
+      },
+    })
+
+    await (await createGetConversionQuote(sdk as never)({
+      fromAmount: toUsdMoneyAmount(137),
+      toAmount: toBtcMoneyAmount(5000),
+      direction: ConvertDirection.UsdToBtc,
+    }))!.execute()
+
+    expect(mockFindLostConversion.mock.calls[0][0].lost.expectedDeliveries).toEqual([
+      {
+        tokenIdentifier: undefined,
+        amount: 1_370_000,
+        amountIn: 5000,
+        isAutomatic: false,
+      },
+    ])
+  })
+
+  it("reports the conversion as done when the wallet holds what it delivered", async () => {
+    mockFindLostConversion.mockResolvedValue(foundDelivery())
+
+    const result = await (await quoteFor(throwingSdk()))!.execute()
+
+    expect(result.status).toBe("success")
+  })
+
+  it("does not take what an earlier conversion delivered for this one's outcome", async () => {
+    mockFindLostConversion.mockResolvedValue(foundDelivery(delivered({ paidIn: 9000 })))
+
+    const result = await (await quoteFor(throwingSdk()))!.execute()
+
+    expect(result.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+  })
+
+  /** What it paid in says that delivery is not this conversion, so it is not hidden from
+   *  the next look either: that look settles it and tells the user of it. */
+  it("leaves that delivery for the next look, which reports it", async () => {
+    const earlierDelivery = foundDelivery(delivered({ id: "rcv-earlier", paidIn: 9000 }))
+    mockFindLostConversion
+      .mockResolvedValueOnce(earlierDelivery)
+      .mockResolvedValueOnce(earlierDelivery)
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    const next = await (await quoteFor(sdk))!.execute()
+
+    expect(mockFindLostConversion.mock.calls[1][0].lost.knownPaymentIds).toEqual(
+      MARK.knownPaymentIds,
+    )
+    expect(next.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionFound)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("does not look for a conversion the SDK refused on the way in", async () => {
+    const sdk = throwingSdk()
+    sdk.sendPayment.mockRejectedValue({ tag: "InsufficientFunds", inner: ["no funds"] })
+
+    const result = await (await quoteFor(sdk))!.execute()
+
+    expect(result.status).toBe("failed")
+    expect(result.errors?.[0].code).toBeUndefined()
+    expect(mockFindLostConversion).not.toHaveBeenCalled()
+  })
+
+  it("refuses a later conversion while the wallet's history cannot be read", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "unreadable", error: new Error("offline") })
+    const sdk = throwingSdk()
+
+    const first = await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(first.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("keeps refusing until the wallet's history can be read", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "unreadable", error: new Error("offline") })
+      .mockResolvedValueOnce({ status: "unreadable", error: new Error("offline") })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    await (await quoteFor(sdk))!.execute()
+    const third = await (await quoteFor(sdk))!.execute()
+
+    expect(third.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  /** The pool's swap can outlast the SDK's wait for it and the look after it. */
+  it("refuses a later conversion while the lost one may still deliver, though not found", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  /** A phone clock corrected forward after running offline, or set by hand, must not make
+   *  a conversion just sent look past its window while it can still deliver. */
+  it("refuses a later conversion while real time is within the window, the phone's clock moved six minutes ahead", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    movedClock = jest.spyOn(Date, "now").mockReturnValue(Date.now() + 6 * 60 * 1000)
+    realTimePasses(60 * 1000)
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("lets a later conversion through once real time is past the window", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+    sdk.sendPayment.mockRejectedValueOnce(new Error("connection reset"))
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
+
+    await (await quoteFor(sdk))!.execute()
+    realTimePasses(PAST_THE_WINDOW_MS)
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  /** A phone clock corrected back, by an hour or by years, must not keep conversions
+   *  refused for as long as it was moved. */
+  it("lets a later conversion through once real time is past the window, the phone's clock moved back an hour", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+    sdk.sendPayment.mockRejectedValueOnce(new Error("connection reset"))
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
+
+    await (await quoteFor(sdk))!.execute()
+    movedClock = jest.spyOn(Date, "now").mockReturnValue(Date.now() - 60 * 60 * 1000)
+    realTimePasses(PAST_THE_WINDOW_MS)
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  /** A swap the pool ran late in a long call, as one the phone suspended, delivers from
+   *  when its outcome was lost, not from when it went out. */
+  it("counts the window from when the outcome was lost, however long the call took", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+    sdk.sendPayment.mockImplementationOnce(async () => {
+      realTimePasses(PAST_THE_WINDOW_MS)
+      throw new Error("connection reset")
+    })
+
+    await (await quoteFor(sdk))!.execute()
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("takes the window as not run out when real time answers no number", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    realTime.mockReturnValue(Number.NaN)
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("counts that window from the lost conversion's latest attempt", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    await (await quoteFor(sdk))!.execute()
+    const third = await (await quoteFor(sdk))!.execute()
+
+    expect(third.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("still looks for its other attempt once one attempt's delivery is found", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(foundDelivery())
+      .mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    sdk.prepareSendPayment.mockResolvedValue(quotedOut(7300, 2_000_000))
+    await (await quoteFor(sdk))!.execute()
+    sdk.prepareSendPayment.mockResolvedValue(quotedOut(PAID_IN, 1_370_000))
+    const found = await (await quoteFor(sdk))!.execute()
+    await (await quoteFor(sdk))!.execute()
+
+    const lastLook = mockFindLostConversion.mock.calls.at(-1)?.[0].lost
+    expect(found.status).toBe("success")
+    expect(lastLook.expectedDeliveries).toEqual([
+      {
+        tokenIdentifier: "usdb-token-id",
+        amount: 2_000_000,
+        amountIn: 7300,
+        isAutomatic: false,
+      },
+    ])
+    expect(lastLook.knownPaymentIds).toContain("rcv-usdb")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("keeps the payments the new mark knew along with the earlier mark's", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    mockMarkReceivedHistory.mockResolvedValue({
+      walletClockSec: 1,
+      knownPaymentIds: ["rcv-between"],
+    })
+    await (await quoteFor(sdk))!.execute()
+
+    expect(mockFindLostConversion.mock.calls.at(-1)?.[0].lost).toMatchObject({
+      walletClockSec: MARK.walletClockSec,
+      knownPaymentIds: ["rcv-before", "rcv-between"],
+    })
+  })
+
+  it("lets a later conversion through once the history shows the lost one never delivered", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("settles the lost conversion once the one let through past it goes out", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
+    await (await quoteFor(sdk))!.execute()
+    await (await quoteFor(sdk))!.execute()
+
+    expect(mockFindLostConversion).toHaveBeenCalledTimes(2)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(3)
+  })
+
+  it("keeps the lost conversion when the one let through past it is refused on the way in", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    sdk.sendPayment.mockRejectedValueOnce({
+      tag: "InsufficientFunds",
+      inner: ["no funds"],
+    })
+    await (await quoteFor(sdk))!.execute()
+    await (await quoteFor(sdk))!.execute()
+
+    expect(mockFindLostConversion.mock.calls[2][0].lost).toMatchObject(MARK)
+  })
+
+  /** Either may have delivered by the time the second is looked for, so both are, from
+   *  the earlier mark, and both stay looked for. */
+  it("looks for the two together when the one let through is lost as well", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    mockMarkReceivedHistory.mockResolvedValue({ walletClockSec: 1, knownPaymentIds: [] })
+    const second = await (await quoteFor(sdk))!.execute()
+    await (await quoteFor(sdk))!.execute()
+
+    const { startedAtMs, walletClockSec, knownPaymentIds } =
+      mockFindLostConversion.mock.calls[0][0].lost
+    const fromFirstMark = { startedAtMs, walletClockSec, knownPaymentIds }
+    expect(second.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(mockFindLostConversion.mock.calls[2][0].lost).toMatchObject(fromFirstMark)
+    expect(mockFindLostConversion.mock.calls[3][0].lost).toMatchObject(fromFirstMark)
+    expect(mockFindLostConversion.mock.calls[3][0].lost.expectedDeliveries).toEqual([
+      {
+        tokenIdentifier: "usdb-token-id",
+        amount: 1_370_000,
+        amountIn: 5000,
+        isAutomatic: false,
+      },
+      {
+        tokenIdentifier: "usdb-token-id",
+        amount: 1_370_000,
+        amountIn: 5000,
+        isAutomatic: false,
+      },
+    ])
+  })
+
+  /** One delivery is all the look finds, and either attempt may have made it: it settles
+   *  one of them, and the other may still deliver. */
+  it("leaves the other attempt looked for when what the look finds could be either's", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(foundDelivery())
+      .mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    const second = await (await quoteFor(sdk))!.execute()
+    const next = await (await quoteFor(sdk))!.execute()
+
+    const nextLook = mockFindLostConversion.mock.calls[3][0].lost
+    expect(second.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(nextLook.expectedDeliveries).toEqual([
+      {
+        tokenIdentifier: "usdb-token-id",
+        amount: 1_370_000,
+        amountIn: 5000,
+        isAutomatic: false,
+      },
+    ])
+    expect(nextLook.knownPaymentIds).toContain("rcv-usdb")
+    expect(next.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("reports the one let through as done when what the look finds is no other attempt's, still looking for that one", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(foundDelivery())
+      .mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+
+    sdk.prepareSendPayment.mockResolvedValue(quotedOut(7300, 2_000_000))
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    sdk.prepareSendPayment.mockResolvedValue(quotedOut(PAID_IN, 1_370_000))
+    const second = await (await quoteFor(sdk))!.execute()
+    await (await quoteFor(sdk))!.execute()
+
+    const nextLook = mockFindLostConversion.mock.calls[3][0].lost
+    expect(second.status).toBe("success")
+    expect(nextLook.expectedDeliveries).toEqual([
+      {
+        tokenIdentifier: "usdb-token-id",
+        amount: 2_000_000,
+        amountIn: 7300,
+        isAutomatic: false,
+      },
+    ])
+    expect(nextLook.knownPaymentIds).toContain("rcv-usdb")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  /** What the look finds is the earlier attempt's delivery: it settles that attempt, and
+   *  this one is still looked for before anything more goes out. */
+  it("settles the earlier attempt whose delivery the look finds, still looking for this one", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(
+        foundDelivery(delivered({ id: "rcv-earlier", paidIn: PAID_IN })),
+      )
+      .mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    sdk.prepareSendPayment.mockResolvedValue(quotedOut(7300, 2_000_000))
+    const second = await (await quoteFor(sdk))!.execute()
+    sdk.prepareSendPayment.mockResolvedValue(quotedOut(PAID_IN, 1_370_000))
+    const firstAgain = await (await quoteFor(sdk))!.execute()
+
+    const nextLook = mockFindLostConversion.mock.calls[3][0].lost
+    expect(second.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(nextLook.expectedDeliveries).toEqual([
+      {
+        tokenIdentifier: "usdb-token-id",
+        amount: 2_000_000,
+        amountIn: 7300,
+        isAutomatic: false,
+      },
+    ])
+    expect(nextLook.knownPaymentIds).toContain("rcv-earlier")
+    expect(firstAgain.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  /** The user's own retry of a lost transfer, found by a delivery the wallet labeled, is
+   *  told it is done only soon after it was lost: later, the same amount is as likely a
+   *  transfer made on purpose, asked to check the history once and sent on the next
+   *  confirm. */
+  it("asks a retry of a lost transfer to check the history once the retry horizon has passed, then lets it go out", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(foundDelivery(labeledDelivery("rcv-usdb") as never))
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    afterTheRetryHorizon()
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
+    const late = await (await quoteFor(sdk))!.execute()
+    const next = await (await quoteFor(sdk))!.execute()
+
+    expect(late.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(next).toEqual({ status: "success", deliveredPaymentId: "c2" })
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("fails a conversion the SDK answers failed, still looking for the lost one it went out past", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(foundDelivery(labeledDelivery("rcv-usdb") as never))
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    sdk.sendPayment.mockResolvedValueOnce({
+      payment: { id: "c2", status: PaymentStatus.Failed },
+    })
+    const replacement = await (await quoteFor(sdk))!.execute()
+    const next = await (await quoteFor(sdk))!.execute()
+
+    expect(replacement.status).toBe("failed")
+    expect(replacement.errors?.[0].code).toBe(ConvertErrorCode.ConversionFailed)
+    expect(mockFindLostConversion.mock.calls[2][0].lost.expectedDeliveries).toHaveLength(
+      1,
+    )
+    expect(next.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("leaves nothing to look for once the SDK answers a conversion failed", async () => {
+    const sdk = throwingSdk()
+    sdk.sendPayment
+      .mockResolvedValueOnce({ payment: { id: "c1", status: PaymentStatus.Failed } })
+      .mockResolvedValueOnce({ payment: { id: "c2", status: PaymentStatus.Completed } })
+
+    await (await quoteFor(sdk))!.execute()
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.status).toBe("success")
+    expect(mockFindLostConversion).not.toHaveBeenCalled()
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("looks for the lost conversion again, from its own mark, before a retry goes out", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found" })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    mockMarkReceivedHistory.mockResolvedValue({ walletClockSec: 1, knownPaymentIds: [] })
+    await (await quoteFor(sdk))!.execute()
+
+    expect(mockFindLostConversion).toHaveBeenCalledTimes(3)
+    expect(mockFindLostConversion.mock.calls[1][0].lost).toMatchObject(MARK)
+  })
+
+  it("reports a retry as the lost conversion once it turns up, converting nothing more", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found" })
+      .mockResolvedValueOnce(foundDelivery())
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("takes a delivery whose legs the wallet has not filled in yet for the retry's", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found" })
+      .mockResolvedValueOnce(foundDelivery(delivered()))
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.status).toBe("success")
+  })
+
+  it("reports an earlier conversion when one without legs delivered another amount", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found" })
+      .mockResolvedValueOnce(foundDelivery(delivered({ amount: 2_000_000 })))
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionFound)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("takes a new quote paying in a little more or less for the same conversion", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found" })
+      .mockResolvedValueOnce(foundDelivery(delivered({ paidIn: PAID_IN + 50 })))
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.status).toBe("success")
+  })
+
+  it.each([
+    ["for another amount", delivered({ paidIn: PAID_IN + 51 })],
+    ["the other way", delivered({ tag: "Spark", paidIn: PAID_IN })],
+    [
+      "with nothing to tell its way",
+      { ...delivered({ paidIn: PAID_IN }), details: undefined },
+    ],
+    ["as neither dollars nor bitcoin", delivered({ tag: "Lightning", paidIn: PAID_IN })],
+  ])(
+    "reports an earlier conversion found %s as that, converting nothing",
+    async (_, payment) => {
+      mockFindLostConversion
+        .mockResolvedValueOnce({ status: "not-found" })
+        .mockResolvedValueOnce(foundDelivery(payment as ReturnType<typeof delivered>))
+      const sdk = throwingSdk()
+
+      await (await quoteFor(sdk))!.execute()
+      const retry = await (await quoteFor(sdk))!.execute()
+
+      expect(retry.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionFound)
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+    },
+  )
+
+  it("keeps the lost conversion when one of another amount is found, refusing every retry until its own delivery turns up", async () => {
+    const otherAmount = delivered({ id: "rcv-other", paidIn: 9000 })
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found" })
+      .mockResolvedValueOnce(foundDelivery(otherAmount))
+      .mockResolvedValueOnce({ status: "not-found" })
+      .mockResolvedValueOnce(foundDelivery(delivered({ paidIn: PAID_IN })))
+    const sdk = throwingSdk()
+    sdk.sendPayment.mockRejectedValueOnce(new Error("connection reset"))
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
+
+    await (await quoteFor(sdk))!.execute()
+    const reported = await (await quoteFor(sdk))!.execute()
+    const refused = await (await quoteFor(sdk))!.execute()
+    const found = await (await quoteFor(sdk))!.execute()
+
+    expect(reported.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionFound)
+    expect(refused.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
+    expect(found.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+    const lookAfterReport = mockFindLostConversion.mock.calls[2][0].lost
+    expect(lookAfterReport.knownPaymentIds).toContain("rcv-other")
+    expect(lookAfterReport.expectedDeliveries).toEqual([
+      expect.objectContaining({ amountIn: PAID_IN, amount: 1_370_000 }),
+    ])
+  })
+
+  it("keeps the lost conversion when one of another amount is found after the delivery window, still sending nothing", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found" })
+      .mockResolvedValueOnce(foundDelivery(delivered({ id: "rcv-other", paidIn: 9000 })))
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    afterTheDeliveryWindow()
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionFound)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("converts again normally once the lost conversion was found", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found" })
+      .mockResolvedValueOnce(foundDelivery())
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    await (await quoteFor(sdk))!.execute()
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
+    const next = await (await quoteFor(sdk))!.execute()
+
+    expect(next.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("does not carry a wallet's lost conversion to another wallet", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found" })
+    const sdk = throwingSdk()
+
+    await (await quoteFor(sdk))!.execute()
+    scopeLostAttemptsTo("another-wallet", noStoredAttempts)
+    await (await quoteFor(sdk))!.execute()
+
+    /** Each looked only for itself, after it threw: nothing was looked for first. */
+    expect(mockFindLostConversion).toHaveBeenCalledTimes(2)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("keeps a wallet's lost conversion for when it is connected again", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found" })
+    const sdk = throwingSdk()
+    scopeLostAttemptsTo("wallet-left", noStoredAttempts)
+
+    await (await quoteFor(sdk))!.execute()
+    scopeLostAttemptsTo("wallet-between", noStoredAttempts)
+    scopeLostAttemptsTo("wallet-left", noStoredAttempts)
+    mockFindLostConversion.mockResolvedValue({ status: "unreadable", error: "offline" })
+    const retry = await (await quoteFor(sdk))!.execute()
+
+    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  /** The screen's own guard ends with the screen: one opened again while the first
+   *  conversion is still being looked for would find nothing lost yet, and convert. */
+  it("holds a conversion from a screen opened again until the first one's lookup ends", async () => {
+    let endLookup: (lookup: unknown) => void = () => undefined
+    const lookupStarted = new Promise<void>((started) => {
+      mockFindLostConversion.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            endLookup = resolve
+            started()
+          }),
+      )
+    })
+    mockFindLostConversion.mockResolvedValueOnce(foundDelivery())
+    const sdk = throwingSdk()
+    const firstScreen = (await quoteFor(sdk))!
+    const reopenedScreen = (await quoteFor(sdk))!
+
+    const first = firstScreen.execute()
+    await lookupStarted
+    const second = reopenedScreen.execute()
+    await nextTurn()
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+
+    endLookup({ status: "not-found", failed: [] })
+    const [firstResult, secondResult] = await Promise.all([first, second])
+
+    expect(firstResult.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(secondResult.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("converts nothing until what an earlier launch kept has been read back", async () => {
+    scopeLostAttemptsTo("wallet-unread", {
+      ...noStoredAttempts,
+      load: () => Promise.reject(new Error("storage failed")),
+    })
+    const sdk = throwingSdk()
+
+    const result = await (await quoteFor(sdk))!.execute()
+
+    expect(result.errors?.[0].code).toBe(ConvertErrorCode.HistoryUnavailable)
+    expect(sdk.sendPayment).not.toHaveBeenCalled()
+  })
+
+  it("keeps a lost conversion for the next launch", async () => {
+    mockFindLostConversion.mockResolvedValue({ status: "not-found" })
+    const saves: Array<Map<string, LostAttempts>> = []
+    scopeLostAttemptsTo("wallet-kept", {
+      ...noStoredAttempts,
+      save: async (_walletId, attempts) => {
+        saves.push(new Map(attempts))
+      },
+    })
+
+    await (await quoteFor(throwingSdk()))!.execute()
+    await nextTurn()
+
+    expect(saves.at(-1)?.get(OWN_CONVERSIONS)).toEqual({
+      lostConversion: {
+        startedAtMs: expect.any(Number),
+        lastAttemptAtMs: expect.any(Number),
+        ...MARK,
+        expectedDeliveries: [
+          {
+            tokenIdentifier: "usdb-token-id",
+            amount: 1_370_000,
+            amountIn: 5000,
+            isAutomatic: false,
+          },
+        ],
+      },
+    })
+  })
+
+  it("looks for a conversion an earlier launch lost before converting", async () => {
+    const lostAMinuteAgo = Date.now() - 60_000
+    const lostConversion = {
+      startedAtMs: lostAMinuteAgo,
+      lastAttemptAtMs: lostAMinuteAgo,
+      walletClockSec: 1_600_000_000,
+      knownPaymentIds: ["rcv-old"],
+      expectedDeliveries: [
+        {
+          tokenIdentifier: "usdb-token-id",
+          amount: 1_370_000,
+          amountIn: 5000,
+          isAutomatic: false,
+        },
+      ],
+    }
+    scopeLostAttemptsTo("wallet-relaunched", {
+      ...noStoredAttempts,
+      load: async () => new Map([[OWN_CONVERSIONS, { lostConversion }]]),
+    })
+    mockFindLostConversion.mockResolvedValue(foundDelivery())
+    const sdk = throwingSdk()
+
+    const result = await (await quoteFor(sdk))!.execute()
+
+    expect(mockFindLostConversion).toHaveBeenCalledWith({
+      sdk,
+      lost: lostConversion,
+      isLabelRequired: true,
+    })
+    expect(result.status).toBe("success")
+    expect(sdk.sendPayment).not.toHaveBeenCalled()
+  })
+
+  /**
+   * The wallet as the SDK (0.27.1) records a conversion to itself: the invoice the quote
+   * was made against is never paid, and what the swap delivered comes in as a token
+   * payment, a leg of a self-transfer conversion, after everything received before.
+   */
+  it("finds a lost conversion in a wallet that records it as the SDK does", async () => {
+    const actual = jest.requireActual("@app/self-custodial/payment-details/lost-send")
+    mockMarkReceivedHistory.mockImplementation(actual.markReceivedHistory)
+    mockFindLostConversion.mockImplementation(actual.findLostConversion)
+    const receivedBefore = {
+      id: "rcv-before",
+      timestamp: BigInt(MARK.walletClockSec),
+      amount: BigInt(2100),
+      status: 0,
+      details: { tag: "Spark", inner: { invoiceDetails: undefined } },
+    }
+    const delivered = {
+      id: "rcv-usdb",
+      timestamp: BigInt(MARK.walletClockSec + 3),
+      amount: BigInt(1_370_000),
+      status: 0,
+      details: {
+        tag: "Token",
+        inner: {
+          invoiceDetails: undefined,
+          metadata: { identifier: "usdb-token-id" },
+          conversionInfo: {
+            tag: "Amm",
+            inner: { status: 1, purpose: { tag: "SelfTransfer" } },
+          },
+        },
+      },
+      conversionDetails: { status: 1, conversions: [] },
+    }
+    const sdk = throwingSdk()
+    sdk.listPayments
+      .mockResolvedValueOnce({ payments: [receivedBefore] })
+      .mockResolvedValue({ payments: [delivered, receivedBefore] })
+
+    const result = await (await quoteFor(sdk))!.execute()
+
+    expect(result.status).toBe("success")
+    expect(result.deliveredPaymentId).toBe("rcv-usdb")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  /** As the wallet records a dollar payment the conversion did not label: a plain token
+   *  payment of about what the quote delivers, as any receive of that amount is. */
+  const unlabeledDollars = (id: string) => ({
+    id,
+    /** Delivered now, by the server's clock: nothing was received before it. */
+    timestamp: BigInt(Math.floor(Date.now() / 1000)),
+    amount: BigInt(1_370_000),
+    status: 0,
+    details: {
+      tag: "Token",
+      inner: { invoiceDetails: undefined, metadata: { identifier: "usdb-token-id" } },
+    },
+  })
+
+  /** As the SDK (0.27.1) labels a delivery of its own conversion to the wallet. */
+  const labeledDelivery = (id: string) => ({
+    ...unlabeledDollars(id),
+    details: {
+      tag: "Token",
+      inner: {
+        invoiceDetails: undefined,
+        metadata: { identifier: "usdb-token-id" },
+        conversionInfo: {
+          tag: "Amm",
+          inner: { status: 1, purpose: { tag: "SelfTransfer" } },
+        },
+      },
+    },
+    conversionDetails: { status: 1, conversions: [] },
+  })
+
+  const recordedAsTheSdkDoes = () => {
+    const actual = jest.requireActual("@app/self-custodial/payment-details/lost-send")
+    mockMarkReceivedHistory.mockImplementation(actual.markReceivedHistory)
+    mockFindLostConversion.mockImplementation(actual.findLostConversion)
+  }
+
+  describe("with the wallet's history as the SDK records it", () => {
+    /** The looks wait between tries; the waits run here without being waited out. Real
+     *  time and the phone's clock stay as the tests set them. */
+    beforeEach(() => {
+      jest.useFakeTimers({
+        doNotFake: ["nextTick", "setImmediate", "queueMicrotask", "performance", "Date"],
+      })
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    const executedOverTime = async (sdk: ReturnType<typeof throwingSdk>) => {
+      const pending = (await quoteFor(sdk))!.execute()
+      for (let wait = 0; wait < 10; wait += 1) {
+        await jest.advanceTimersByTimeAsync(2000)
+      }
+      return pending
+    }
+
+    /** The SDK labels a delivery as its conversion's once its own call to the pool answers,
+     *  and one whose answer it lost once it finds the swap ran; until then a payment of
+     *  about the quoted amount may be anyone's. */
+    it("does not take a payment not labeled yet for the delivery of a conversion just lost", async () => {
+      recordedAsTheSdkDoes()
+      const sdk = throwingSdk()
+      sdk.listPayments
+        .mockResolvedValueOnce({ payments: [] })
+        .mockResolvedValue({ payments: [unlabeledDollars("rcv-usdb")] })
+
+      const result = await executedOverTime(sdk)
+
+      expect(result.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+    })
+
+    it("takes an ordinary receive of about the quoted amount for no conversion while the lost one may still deliver, settling only on its labeled delivery", async () => {
+      recordedAsTheSdkDoes()
+      const ordinaryReceive = unlabeledDollars("rcv-from-a-friend")
+      const sdk = throwingSdk()
+      sdk.listPayments
+        .mockResolvedValueOnce({ payments: [] })
+        .mockResolvedValue({ payments: [ordinaryReceive] })
+
+      await executedOverTime(sdk)
+      const retry = await executedOverTime(sdk)
+      sdk.listPayments.mockResolvedValue({
+        payments: [labeledDelivery("rcv-usdb"), ordinaryReceive],
+      })
+      const labeled = await executedOverTime(sdk)
+
+      expect(retry.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
+      const lookOfTheLabeledOne = mockFindLostConversion.mock.calls.at(-1)?.[0]
+      expect(lookOfTheLabeledOne.lost.expectedDeliveries).toEqual([
+        expect.objectContaining({ amount: 1_370_000, amountIn: PAID_IN }),
+      ])
+      expect(lookOfTheLabeledOne.lost.knownPaymentIds).not.toContain("rcv-from-a-friend")
+      expect(labeled.status).toBe("success")
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+      sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
+      const next = await executedOverTime(sdk)
+      expect(next.status).toBe("success")
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+    })
+
+    /** The SDK never labels the delivery of a conversion it was stopped in the middle of,
+     *  as an app closed while it converted, and a receive of about that amount from
+     *  anyone looks the same: the user is asked to check rather than told it is done, and
+     *  their next transfer goes out. */
+    const unlabeledPastTheWindow: Array<[string, string]> = [
+      ["a delivery the SDK never labeled", "rcv-usdb"],
+      ["an ordinary receive of about that amount", "rcv-from-a-friend"],
+    ]
+    for (const [what, id] of unlabeledPastTheWindow) {
+      it(`asks the user to check their history for ${what} once the window has run out, then lets the next transfer go out`, async () => {
+        recordedAsTheSdkDoes()
+        const sdk = throwingSdk()
+        sdk.listPayments.mockResolvedValue({ payments: [] })
+
+        await executedOverTime(sdk)
+        sdk.listPayments.mockResolvedValue({ payments: [unlabeledDollars(id)] })
+        afterTheDeliveryWindow()
+        const retry = await executedOverTime(sdk)
+        sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
+        const next = await executedOverTime(sdk)
+
+        expect(retry.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+        expect(next).toEqual({ status: "success", deliveredPaymentId: "c2" })
+        expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+      })
+    }
+
+    it("reports a delivery the wallet labeled once the window has run out as done", async () => {
+      recordedAsTheSdkDoes()
+      const sdk = throwingSdk()
+      sdk.listPayments.mockResolvedValue({ payments: [] })
+
+      await executedOverTime(sdk)
+      sdk.listPayments.mockResolvedValue({ payments: [labeledDelivery("rcv-usdb")] })
+      afterTheDeliveryWindow()
+      const retry = await executedOverTime(sdk)
+
+      expect(retry).toEqual({ status: "success", deliveredPaymentId: "rcv-usdb" })
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+    })
+
+    /** Auto-convert takes it for its receive's conversion: were it the delivery,
+     *  converting the receive again would convert it twice. */
+    it("takes a delivery still not labeled once the window has run out for auto-convert's receive", async () => {
+      recordedAsTheSdkDoes()
+      const sdk = throwingSdk()
+      sdk.listPayments.mockResolvedValue({ payments: [] })
+      const receive = {
+        satsAmount: PAID_IN,
+        usdCentsAmount: 137,
+        isStableBalanceActive: false,
+        recordCreatedAtMs: 0,
+      }
+      const autoConvertOverTime = async () => {
+        const pending = executeAutoConvert(sdk as never, receive)
+        for (let wait = 0; wait < 10; wait += 1) {
+          await jest.advanceTimersByTimeAsync(2000)
+        }
+        return pending
+      }
+
+      await autoConvertOverTime()
+      sdk.listPayments.mockResolvedValue({ payments: [unlabeledDollars("rcv-usdb")] })
+      afterTheDeliveryWindow()
+      const retry = await autoConvertOverTime()
+
+      expect(retry).toEqual({ status: "converted", conversionPaymentId: "rcv-usdb" })
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+    })
+  })
+})
+
+describe("auto-convert retrying a conversion whose response was lost", () => {
+  const receive = {
+    satsAmount: 5000,
+    usdCentsAmount: 137,
+    isStableBalanceActive: false,
+    recordCreatedAtMs: 0,
+  }
+
+  const walletLosingTheFirstConversion = () => ({
+    prepareSendPayment: jest.fn().mockResolvedValue({
+      paymentMethod: {},
+      conversionEstimate: {
+        fee: BigInt(0),
+        amountIn: BigInt(receive.satsAmount),
+        amountOut: BigInt(1_370_000),
+        amountAdjustment: undefined,
+      },
+    }),
+    sendPayment: jest.fn().mockRejectedValue(new Error("connection reset")),
+    receivePayment: jest.fn().mockResolvedValue({ paymentRequest: "sp1own-invoice" }),
+    getInfo: jest.fn().mockResolvedValue({ tokenBalances: {} }),
+    /** No completed conversion in the history: the first is still delivering, or lost. */
+    listPayments: jest.fn().mockResolvedValue({ payments: [] }),
+    syncWallet: jest.fn().mockResolvedValue({}),
+  })
+
+  const deliveredDollars = (paidIn?: number, amount = 1_370_000) => ({
+    status: "found",
+    payment: {
+      id: "rcv-usdb",
+      amount: BigInt(amount),
+      details: { tag: "Token", inner: { metadata: { identifier: "usdb-token-id" } } },
+      conversionDetails: {
+        status: 0,
+        conversions: paidIn === undefined ? [] : [{ from: { amount: BigInt(paidIn) } }],
+      },
+    },
+    failed: [],
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockMarkReceivedHistory.mockResolvedValue(MARK)
+    mockFetchLimits.mockResolvedValue({ minFromAmount: null, minToAmount: null })
+  })
+
+  it("finds the lost conversion on the next trigger instead of converting the sats again", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(deliveredDollars(receive.satsAmount))
+    const sdk = walletLosingTheFirstConversion()
+
+    const first = await executeAutoConvert(sdk as never, receive)
+    const second = await executeAutoConvert(sdk as never, receive)
+
+    expect(first).toEqual({ status: "failed" })
+    expect(second).toEqual({ status: "converted", conversionPaymentId: "rcv-usdb" })
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("converts nothing on any trigger while the history cannot be read", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValue({ status: "unreadable", error: new Error("offline") })
+    const sdk = walletLosingTheFirstConversion()
+
+    await executeAutoConvert(sdk as never, receive)
+    afterTheDeliveryWindow()
+    const second = await executeAutoConvert(sdk as never, receive)
+    const third = await executeAutoConvert(sdk as never, receive)
+
+    expect([second, third]).toEqual([{ status: "failed" }, { status: "failed" }])
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  /** What turned up paid in another amount, so it is another conversion and settles
+   *  nothing: the lost one may still deliver, so the next trigger converts nothing, and
+   *  only once its delivery window is past do these sats go out again. */
+  it("keeps the lost conversion when what turns up is another, converting again only past its delivery window", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(deliveredDollars(9000))
+      .mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = walletLosingTheFirstConversion()
+
+    await executeAutoConvert(sdk as never, receive)
+    const second = await executeAutoConvert(sdk as never, receive)
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
+    const third = await executeAutoConvert(sdk as never, receive)
+    afterTheDeliveryWindow()
+    const fourth = await executeAutoConvert(sdk as never, receive)
+
+    expect([second, third]).toEqual([
+      { status: "deferred", retryAfterMs: 0 },
+      { status: "deferred", retryAfterMs: LOST_CONVERSION_DELIVERY_WINDOW_MS },
+    ])
+    expect(fourth).toEqual({ status: "converted", conversionPaymentId: "c2" })
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+    expect(mockFindLostConversion.mock.calls[2][0].lost.knownPaymentIds).toContain(
+      "rcv-usdb",
+    )
+  })
+
+  /** A lost transfer of the user's, of 9000 sats, and auto-convert's receive of 5000 behind
+   *  it: what the user's lost transfer delivered turns up on auto-convert's look. */
+  const manualSats = 9000
+  const quotePayingIn = (
+    sdk: ReturnType<typeof walletLosingTheFirstConversion>,
+    sats: number,
+  ) =>
+    sdk.prepareSendPayment.mockResolvedValue({
+      paymentMethod: {},
+      conversionEstimate: {
+        fee: BigInt(0),
+        amountIn: BigInt(sats),
+        amountOut: BigInt(sats * 274),
+        amountAdjustment: undefined,
+      },
+    })
+  const transferManually = async (
+    sdk: ReturnType<typeof walletLosingTheFirstConversion>,
+    sats = manualSats,
+  ) => {
+    quotePayingIn(sdk, sats)
+    return (await createGetConversionQuote(sdk as never)({
+      fromAmount: toBtcMoneyAmount(sats),
+      toAmount: toUsdMoneyAmount(Math.round(sats * 0.0274)),
+      direction: ConvertDirection.BtcToUsd,
+    }))!.execute()
+  }
+  const autoConvert = (sdk: ReturnType<typeof walletLosingTheFirstConversion>) => {
+    quotePayingIn(sdk, receive.satsAmount)
+    return executeAutoConvert(sdk as never, receive)
+  }
+  const userTransferFoundByAutoConvert = async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(deliveredDollars(manualSats, manualSats * 274))
+      .mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = walletLosingTheFirstConversion()
+    await transferManually(sdk)
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c-auto", status: 0 } })
+    const automatic = await autoConvert(sdk)
+    return { sdk, automatic }
+  }
+
+  /** Left unsettled, every look of auto-convert's would find it again, and no receive
+   *  would convert until the user transferred once more. */
+  it("settles a lost manual transfer it finds, and converts the receive on its next try with no transfer of the user's", async () => {
+    const { sdk, automatic } = await userTransferFoundByAutoConvert()
+    const next = await autoConvert(sdk)
+
+    expect(automatic).toEqual({ status: "deferred", retryAfterMs: 0 })
+    expect(next).toEqual({ status: "converted", conversionPaymentId: "c-auto" })
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+    expect(mockFindLostConversion).toHaveBeenCalledTimes(2)
+  })
+
+  /** Told as the user's own look would have told them: done, since it is the transfer
+   *  they asked for again, and never converted a second time. */
+  it("tells the user's next transfer of that amount it went through, converting nothing", async () => {
+    const { sdk } = await userTransferFoundByAutoConvert()
+    const retry = await transferManually(sdk)
+
+    expect(retry).toEqual({ status: "success", deliveredPaymentId: "rcv-usdb" })
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  /** Kept in the device's storage, as the app keeps it: the user's next transfer, made
+   *  after the app restarted, is told of the transfer auto-convert found in the launch
+   *  before, and converts nothing. */
+  it("tells the user's next transfer of the transfer auto-convert found, after the app restarts", async () => {
+    scopeLostAttemptsTo("wallet-restarting")
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(deliveredDollars(manualSats, manualSats * 274))
+    const sdk = walletLosingTheFirstConversion()
+    await transferManually(sdk)
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c-auto", status: 0 } })
+    await autoConvert(sdk)
+    const isFoundTransferStored = async () =>
+      Boolean(
+        (await loadLostAttempts("wallet-restarting")).get(OWN_CONVERSIONS)
+          ?.foundUserTransfers,
+      )
+    for (let turn = 0; turn < 50 && !(await isFoundTransferStored()); turn += 1) {
+      await nextTurn()
+    }
+
+    scopeLostAttemptsTo("wallet-restarting-relaunched", {
+      load: () => loadLostAttempts("wallet-restarting"),
+      save: (_walletId, attempts) => saveLostAttempts("wallet-restarting", attempts),
+      remove: () => removeLostAttempts("wallet-restarting"),
+    })
+    const retry = await transferManually(sdk)
+
+    expect(await isFoundTransferStored()).toBe(false)
+    expect(retry).toEqual({ status: "success", deliveredPaymentId: "rcv-usdb" })
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  /** Long after it was lost, the same amount is as likely a transfer made on purpose: it is
+   *  asked to check the history once, never told it is done, and goes out on the next
+   *  confirm. */
+  it("asks the user's next transfer of that amount to check their history once the retry horizon has passed, then lets it go out", async () => {
+    const { sdk } = await userTransferFoundByAutoConvert()
+    afterTheRetryHorizon()
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c-user", status: 0 } })
+
+    const late = await transferManually(sdk)
+    const next = await transferManually(sdk)
+
+    expect(late.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(next).toEqual({ status: "success", deliveredPaymentId: "c-user" })
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("tells the user's next transfer of another amount the earlier one went through, once", async () => {
+    const { sdk } = await userTransferFoundByAutoConvert()
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c-user", status: 0 } })
+    const other = await transferManually(sdk, 20_000)
+    const again = await transferManually(sdk, 20_000)
+
+    expect(other.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionFound)
+    expect(again).toEqual({ status: "success", deliveredPaymentId: "c-user" })
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  /** Told by what it paid in once the wallet tells it: 8500 sats would deliver within the
+   *  quote's margin of what 9000 delivered, yet are another transfer. */
+  it("does not take the user's next transfer paying in another amount for the one found", async () => {
+    const { sdk } = await userTransferFoundByAutoConvert()
+    const other = await transferManually(sdk, 8500)
+
+    expect(other.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionFound)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  /** Found past the window by a payment the wallet never labeled, which may be anyone's:
+   *  the user's next transfer of that amount asks them to check, and the one after goes
+   *  out. */
+  it("asks the user's next transfer to check their history when the transfer found was never labeled", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(deliveredDollars(manualSats, manualSats * 274))
+    const sdk = walletLosingTheFirstConversion()
+    await transferManually(sdk)
+    afterTheDeliveryWindow()
+    await autoConvert(sdk)
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c-user", status: 0 } })
+
+    const retry = await transferManually(sdk)
+    const next = await transferManually(sdk)
+
+    expect(retry.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(next).toEqual({ status: "success", deliveredPaymentId: "c-user" })
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  /** Told by the way it went as well: a transfer back to bitcoin of about the amount is
+   *  not the dollars it delivered. */
+  it("does not take the user's next transfer the other way for the one found", async () => {
+    const { sdk } = await userTransferFoundByAutoConvert()
+    sdk.getInfo.mockResolvedValue({
+      tokenBalances: {
+        "usdb-token-id": {
+          balance: 1_000_000_000n,
+          tokenMetadata: { identifier: "usdb-token-id", decimals: 6 },
+        },
+      },
+    })
+    const otherWay = await (await createGetConversionQuote(sdk as never)({
+      fromAmount: toUsdMoneyAmount(247),
+      toAmount: toBtcMoneyAmount(manualSats),
+      direction: ConvertDirection.UsdToBtc,
+    }))!.execute()
+
+    expect(otherWay.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionFound)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("tells the user of each transfer it found, the oldest first", async () => {
+    const secondDelivery = {
+      ...deliveredDollars(20_000, 20_000 * 274),
+      payment: {
+        ...deliveredDollars(20_000, 20_000 * 274).payment,
+        id: "rcv-usdb-2",
+      },
+    }
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(deliveredDollars(manualSats, manualSats * 274))
+      .mockResolvedValueOnce(secondDelivery)
+    const sdk = walletLosingTheFirstConversion()
+    await transferManually(sdk)
+    afterTheDeliveryWindow()
+    await transferManually(sdk, 20_000)
+    await autoConvert(sdk)
+    await autoConvert(sdk)
+
+    const first = await transferManually(sdk)
+    const second = await transferManually(sdk, 20_000)
+
+    expect(first).toEqual({ status: "success", deliveredPaymentId: "rcv-usdb" })
+    expect(second).toEqual({ status: "success", deliveredPaymentId: "rcv-usdb-2" })
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("leaves a lost manual transfer alone when what it finds is no attempt's", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(deliveredDollars(4000, 1_100_000))
+      .mockResolvedValue({ status: "unreadable", error: new Error("offline") })
+    const sdk = walletLosingTheFirstConversion()
+    sdk.prepareSendPayment.mockResolvedValue({
+      paymentMethod: {},
+      conversionEstimate: {
+        fee: BigInt(0),
+        amountIn: BigInt(9000),
+        amountOut: BigInt(2_466_000),
+        amountAdjustment: undefined,
+      },
+    })
+    await (await createGetConversionQuote(sdk as never)({
+      fromAmount: toBtcMoneyAmount(9000),
+      toAmount: toUsdMoneyAmount(247),
+      direction: ConvertDirection.BtcToUsd,
+    }))!.execute()
+
+    const automatic = await executeAutoConvert(sdk as never, receive)
+    await executeAutoConvert(sdk as never, receive)
+
+    expect(automatic).toEqual({ status: "deferred", retryAfterMs: 0 })
+    expect(mockFindLostConversion.mock.calls[2][0].lost.expectedDeliveries).toEqual([
+      {
+        tokenIdentifier: "usdb-token-id",
+        amount: 2_466_000,
+        amountIn: 9000,
+        isAutomatic: false,
+      },
+    ])
+  })
+
+  /** Lost as well, auto-convert's look finds what the user's lost transfer delivered: it
+   *  settles nothing of it, and leaves the delivery for the user's next look. */
+  it("leaves a lost manual transfer its own lost conversion's look finds for the user", async () => {
+    const manualDelivery = deliveredDollars(9000, 2_466_000)
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(manualDelivery)
+      .mockResolvedValue(manualDelivery)
+    const sdk = walletLosingTheFirstConversion()
+    const manualQuote = {
+      paymentMethod: {},
+      conversionEstimate: {
+        fee: BigInt(0),
+        amountIn: BigInt(9000),
+        amountOut: BigInt(2_466_000),
+        amountAdjustment: undefined,
+      },
+    }
+    const convertManually = async () => {
+      sdk.prepareSendPayment.mockResolvedValue(manualQuote)
+      return (await createGetConversionQuote(sdk as never)({
+        fromAmount: toBtcMoneyAmount(9000),
+        toAmount: toUsdMoneyAmount(247),
+        direction: ConvertDirection.BtcToUsd,
+      }))!.execute()
+    }
+
+    await convertManually()
+    afterTheDeliveryWindow()
+    sdk.prepareSendPayment.mockResolvedValue({
+      ...manualQuote,
+      conversionEstimate: {
+        ...manualQuote.conversionEstimate,
+        amountIn: BigInt(receive.satsAmount),
+        amountOut: BigInt(1_370_000),
+      },
+    })
+    const automatic = await executeAutoConvert(sdk as never, receive)
+    const retry = await convertManually()
+
+    const userLook = mockFindLostConversion.mock.calls[3][0].lost
+    expect(automatic).toEqual({ status: "failed" })
+    expect(userLook.knownPaymentIds).toEqual(MARK.knownPaymentIds)
+    expect(userLook.expectedDeliveries).toHaveLength(2)
+    expect(retry.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  /** The user's lost transfer is quoted as the lost auto-conversion was: what its look
+   *  finds settles the user's own attempt, but may as well be the other's. */
+  it("does not report a lost manual transfer as done when what it finds could be the auto-conversion's", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(deliveredDollars(receive.satsAmount))
+      .mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = walletLosingTheFirstConversion()
+
+    await executeAutoConvert(sdk as never, receive)
+    afterTheDeliveryWindow()
+    const manual = await (await createGetConversionQuote(sdk as never)({
+      fromAmount: toBtcMoneyAmount(receive.satsAmount),
+      toAmount: toUsdMoneyAmount(receive.usdCentsAmount),
+      direction: ConvertDirection.BtcToUsd,
+    }))!.execute()
+    await executeAutoConvert(sdk as never, receive)
+
+    const nextLook = mockFindLostConversion.mock.calls[3][0].lost
+    expect(manual.errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(nextLook.expectedDeliveries).toEqual([
+      {
+        tokenIdentifier: "usdb-token-id",
+        amount: 1_370_000,
+        amountIn: 5000,
+        isAutomatic: true,
+        receiveRecordedAtMs: receive.recordCreatedAtMs,
+      },
+    ])
+    expect(nextLook.knownPaymentIds).toContain("rcv-usdb")
+  })
+
+  /** Auto-convert converts receives of about one amount alike: what one receive's lost
+   *  conversion delivered is not another's, whose sats are still to convert. */
+  it("does not take another receive's lost conversion for this one's, converting it once that one is settled", async () => {
+    const laterReceive = {
+      ...receive,
+      recordCreatedAtMs: receive.recordCreatedAtMs + 60_000,
+    }
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(deliveredDollars(receive.satsAmount))
+    const sdk = walletLosingTheFirstConversion()
+
+    await executeAutoConvert(sdk as never, receive)
+    const second = await executeAutoConvert(sdk as never, laterReceive)
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
+    const third = await executeAutoConvert(sdk as never, laterReceive)
+
+    expect(second).toEqual({ status: "deferred", retryAfterMs: 0 })
+    expect(third).toEqual({ status: "converted", conversionPaymentId: "c2" })
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  /** The user's transfer is never auto-convert's, whatever amount they both are. */
+  it("does not report the user's transfer as done for what a lost auto-conversion of about its amount delivered", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(deliveredDollars(receive.satsAmount))
+    const sdk = walletLosingTheFirstConversion()
+    const usersTransfer = async () =>
+      (await createGetConversionQuote(sdk as never)({
+        fromAmount: toBtcMoneyAmount(receive.satsAmount),
+        toAmount: toUsdMoneyAmount(receive.usdCentsAmount),
+        direction: ConvertDirection.BtcToUsd,
+      }))!.execute()
+
+    await executeAutoConvert(sdk as never, receive)
+    const first = await usersTransfer()
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "c2", status: 0 } })
+    const again = await usersTransfer()
+
+    expect(first.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionFound)
+    expect(again.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("holds a manual conversion back until the lost auto-conversion is looked for", async () => {
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(deliveredDollars(receive.satsAmount))
+    const sdk = walletLosingTheFirstConversion()
+
+    await executeAutoConvert(sdk as never, receive)
+    const manualSats = 7000
+    sdk.prepareSendPayment.mockResolvedValue({
+      paymentMethod: {},
+      conversionEstimate: {
+        fee: BigInt(0),
+        amountIn: BigInt(manualSats),
+        amountOut: BigInt(1_918_000),
+        amountAdjustment: undefined,
+      },
+    })
+    const manual = await createGetConversionQuote(sdk as never)({
+      fromAmount: toBtcMoneyAmount(manualSats),
+      toAmount: toUsdMoneyAmount(192),
+      direction: ConvertDirection.BtcToUsd,
+    })
+    const result = await manual!.execute()
+
+    expect(mockFindLostConversion.mock.calls[1][0].lost).toEqual(
+      mockFindLostConversion.mock.calls[0][0].lost,
+    )
+    expect(result.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionFound)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("a conversion asked once its turn comes whether it was converted meanwhile", () => {
+  const params = {
+    fromAmount: toBtcMoneyAmount(5000),
+    toAmount: toUsdMoneyAmount(137),
+    direction: ConvertDirection.BtcToUsd,
+  }
+
+  const walletSdk = () => ({
+    prepareSendPayment: jest.fn().mockResolvedValue({
+      paymentMethod: {},
+      conversionEstimate: {
+        fee: BigInt(0),
+        amountIn: BigInt(5000),
+        amountOut: BigInt(1_370_000),
+        amountAdjustment: undefined,
+      },
+    }),
+    sendPayment: jest.fn().mockResolvedValue({ payment: { id: "c1", status: 0 } }),
+    receivePayment: jest.fn().mockResolvedValue({ paymentRequest: "sp1own-invoice" }),
+    getInfo: jest.fn().mockResolvedValue({ tokenBalances: {} }),
+    listPayments: jest.fn().mockResolvedValue({ payments: [] }),
+    syncWallet: jest.fn().mockResolvedValue({}),
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockMarkReceivedHistory.mockResolvedValue(MARK)
+    mockFetchLimits.mockResolvedValue({ minFromAmount: null, minToAmount: null })
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+  })
+
+  it("converts nothing once its turn comes when what it was to convert was converted", async () => {
+    const sdk = walletSdk()
+
+    const result = await (await createGetConversionQuote(sdk as never)(params))!.execute({
+      isConvertedMeanwhile: async () => true,
+    })
+
+    expect(result.errors?.[0].code).toBe(ConvertErrorCode.AlreadyConverted)
+    expect(mockMarkReceivedHistory).not.toHaveBeenCalled()
+    expect(sdk.sendPayment).not.toHaveBeenCalled()
+  })
+
+  it("converts nothing when its turn comes and that cannot be told", async () => {
+    const sdk = walletSdk()
+
+    const result = await (await createGetConversionQuote(sdk as never)(params))!.execute({
+      isConvertedMeanwhile: () => Promise.reject(new Error("storage failed")),
+    })
+
+    expect(result.errors?.[0].code).toBe(ConvertErrorCode.HistoryUnavailable)
+    expect(sdk.sendPayment).not.toHaveBeenCalled()
+    expect(mockRecordError).toHaveBeenCalled()
+  })
+
+  it("goes out when nothing was converted while it waited", async () => {
+    const sdk = walletSdk()
+
+    const result = await (await createGetConversionQuote(sdk as never)(params))!.execute({
+      isConvertedMeanwhile: async () => false,
+    })
+
+    expect(result.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  describe("with auto-convert and the user's own conversion", () => {
+    const receive = {
+      satsAmount: 5000,
+      usdCentsAmount: 137,
+      isStableBalanceActive: false,
+      recordCreatedAtMs: 0,
+    }
+
+    /** The user's conversion of the received sats, as the history holds it once done. */
+    const completedConversion = {
+      id: "c-user",
+      timestamp: BigInt(Math.floor(Date.now() / 1000)),
+      conversionDetails: { status: 1, conversions: [{ from: { amount: BigInt(5000) } }] },
+    }
+
+    /** Holds the SDK's answer to the next conversion until it is given. */
+    const holdNextSend = (sdk: ReturnType<typeof walletSdk>) => {
+      let answer: (response: unknown) => void = () => undefined
+      sdk.sendPayment.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            answer = resolve
+          }),
+      )
+      return (response: unknown) => answer(response)
+    }
+
+    it("does not convert a receive the user converted while it waited for its turn", async () => {
+      const sdk = walletSdk()
+      const answerUser = holdNextSend(sdk)
+      const userConversion = (await createGetConversionQuote(sdk as never)(
+        params,
+      ))!.execute()
+      while (sdk.sendPayment.mock.calls.length === 0) await nextTurn()
+
+      const automatic = executeAutoConvert(sdk as never, receive)
+      for (let turn = 0; turn < 20; turn += 1) await nextTurn()
+      const sentWhileWaiting = sdk.sendPayment.mock.calls.length
+      sdk.listPayments.mockResolvedValue({ payments: [completedConversion] })
+      answerUser({ payment: { id: "c-user", status: 0 } })
+
+      expect(sentWhileWaiting).toBe(1)
+      expect(await automatic).toEqual({
+        status: "already-converted",
+        conversionPaymentId: "c-user",
+      })
+      expect((await userConversion).status).toBe("success")
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+    })
+
+    /** A receive's auto-conversion, held in flight until it is answered. */
+    const automaticInFlight = async (sdk: ReturnType<typeof walletSdk>) => {
+      const answer = holdNextSend(sdk)
+      const outcome = executeAutoConvert(sdk as never, receive)
+      while (sdk.sendPayment.mock.calls.length === 0) await nextTurn()
+      return { outcome, answer }
+    }
+
+    /** A conversion the user confirms while the one ahead of it holds the turn. */
+    const userConversionWaiting = async (
+      sdk: ReturnType<typeof walletSdk>,
+      conversion: ConvertParams = params,
+    ) => {
+      const outcome = (await createGetConversionQuote(sdk as never)(
+        conversion,
+      ))!.execute()
+      for (let turn = 0; turn < 10; turn += 1) await nextTurn()
+      return { outcome }
+    }
+
+    /** What the quotes made from here on pay in. */
+    const quotedPayingIn = (sdk: ReturnType<typeof walletSdk>, amountIn: number) =>
+      sdk.prepareSendPayment.mockResolvedValue({
+        paymentMethod: {},
+        conversionEstimate: {
+          fee: BigInt(0),
+          amountIn: BigInt(amountIn),
+          amountOut: BigInt(amountIn * 274),
+          amountAdjustment: undefined,
+        },
+      })
+
+    it("asks the user to confirm again a transfer of the amount auto-convert converted while it waited", async () => {
+      const sdk = walletSdk()
+      const automatic = await automaticInFlight(sdk)
+      const userConversion = await userConversionWaiting(sdk)
+      const sentMeanwhile = sdk.sendPayment.mock.calls.length
+      automatic.answer({ payment: { id: "c-auto", status: PaymentStatus.Completed } })
+
+      expect(await automatic.outcome).toEqual({
+        status: "converted",
+        conversionPaymentId: "c-auto",
+      })
+      expect((await userConversion.outcome).errors?.[0].code).toBe(
+        ConvertErrorCode.AlreadyConverted,
+      )
+      expect(sentMeanwhile).toBe(1)
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+      expect(mockMarkReceivedHistory).toHaveBeenCalledTimes(1)
+    })
+
+    it("asks the user to confirm again their own transfer sent twice while the first was out", async () => {
+      const sdk = walletSdk()
+      const answerFirst = holdNextSend(sdk)
+      const first = (await createGetConversionQuote(sdk as never)(params))!.execute()
+      while (sdk.sendPayment.mock.calls.length === 0) await nextTurn()
+      const second = await userConversionWaiting(sdk)
+      answerFirst({ payment: { id: "c-user", status: PaymentStatus.Completed } })
+
+      expect((await first).status).toBe("success")
+      expect((await second.outcome).errors?.[0].code).toBe(
+        ConvertErrorCode.AlreadyConverted,
+      )
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+    })
+
+    it("lets the user's transfer of another amount go out once auto-convert's is done", async () => {
+      const sdk = walletSdk()
+      const automatic = await automaticInFlight(sdk)
+      quotedPayingIn(sdk, 20_000)
+      const userConversion = await userConversionWaiting(sdk, {
+        ...params,
+        fromAmount: toBtcMoneyAmount(20_000),
+        toAmount: toUsdMoneyAmount(548),
+      })
+      automatic.answer({ payment: { id: "c-auto", status: PaymentStatus.Completed } })
+
+      expect(await automatic.outcome).toEqual({
+        status: "converted",
+        conversionPaymentId: "c-auto",
+      })
+      expect((await userConversion.outcome).status).toBe("success")
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+    })
+
+    it("lets the user's transfer the other way go out once auto-convert's is done", async () => {
+      const sdk = walletSdk()
+      sdk.getInfo.mockResolvedValue({
+        tokenBalances: {
+          "usdb-token-id": {
+            balance: 1_000_000_000n,
+            tokenMetadata: { identifier: "usdb-token-id", decimals: 6 },
+          },
+        },
+      })
+      const automatic = await automaticInFlight(sdk)
+      const userConversion = await userConversionWaiting(sdk, {
+        fromAmount: toUsdMoneyAmount(137),
+        toAmount: toBtcMoneyAmount(5000),
+        direction: ConvertDirection.UsdToBtc,
+      })
+      automatic.answer({ payment: { id: "c-auto", status: PaymentStatus.Completed } })
+
+      expect(await automatic.outcome).toEqual({
+        status: "converted",
+        conversionPaymentId: "c-auto",
+      })
+      expect((await userConversion.outcome).status).toBe("success")
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+    })
+
+    it("lets the user's transfer go out when auto-convert's ahead of it converted nothing", async () => {
+      const sdk = walletSdk()
+      const automatic = await automaticInFlight(sdk)
+      const userConversion = await userConversionWaiting(sdk)
+      automatic.answer({ payment: { id: "c-auto", status: PaymentStatus.Failed } })
+
+      expect(await automatic.outcome).toEqual({ status: "failed" })
+      expect((await userConversion.outcome).status).toBe("success")
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+    })
+
+    it("lets the user's transfer of that amount go out when they confirm it after auto-convert's is done", async () => {
+      const sdk = walletSdk()
+
+      const automatic = await executeAutoConvert(sdk as never, receive)
+      const userConversion = await (await createGetConversionQuote(sdk as never)(
+        params,
+      ))!.execute()
+
+      expect(automatic).toEqual({ status: "converted", conversionPaymentId: "c1" })
+      expect(userConversion.status).toBe("success")
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+    })
+
+    /** Two receives of one amount are two conversions: auto-convert asks the history, not
+     *  what went out while it waited. */
+    it("converts a second receive of the same amount that waited behind the first's", async () => {
+      const sdk = walletSdk()
+      const first = await automaticInFlight(sdk)
+      const second = executeAutoConvert(sdk as never, receive)
+      for (let turn = 0; turn < 10; turn += 1) await nextTurn()
+      first.answer({ payment: { id: "c-auto-1", status: PaymentStatus.Completed } })
+
+      expect(await first.outcome).toEqual({
+        status: "converted",
+        conversionPaymentId: "c-auto-1",
+      })
+      expect(await second).toEqual({ status: "converted", conversionPaymentId: "c1" })
+      expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+    })
+  })
+})
+
+/** Conversions go out one at a time: a call the SDK never answers is waited on only so
+ *  long, so it holds no later conversion until the app restarts. */
+describe("a conversion the SDK never answers", () => {
+  const params = {
+    fromAmount: toBtcMoneyAmount(5000),
+    toAmount: toUsdMoneyAmount(137),
+    direction: ConvertDirection.BtcToUsd,
+  }
+  const receive = {
+    satsAmount: 20_000,
+    usdCentsAmount: 548,
+    isStableBalanceActive: false,
+    recordCreatedAtMs: 0,
+  }
+  const neverAnswers = () => new Promise<never>(() => {})
+  const SEND_BOUND_MS = 90_000
+  const QUOTE_BOUND_MS = 60_000
+
+  const walletSdk = () => ({
+    prepareSendPayment: jest.fn().mockResolvedValue({
+      paymentMethod: {},
+      conversionEstimate: {
+        fee: BigInt(0),
+        amountIn: BigInt(5000),
+        amountOut: BigInt(1_370_000),
+        amountAdjustment: undefined,
+      },
+    }),
+    sendPayment: jest.fn(neverAnswers),
+    receivePayment: jest.fn().mockResolvedValue({ paymentRequest: "sp1own-invoice" }),
+    getInfo: jest.fn().mockResolvedValue({ tokenBalances: {} }),
+    listPayments: jest.fn().mockResolvedValue({ payments: [] }),
+    syncWallet: jest.fn().mockResolvedValue({}),
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    jest.useFakeTimers({
+      doNotFake: ["nextTick", "setImmediate", "queueMicrotask", "performance", "Date"],
+    })
+    mockMarkReceivedHistory.mockResolvedValue(MARK)
+    mockFetchLimits.mockResolvedValue({ minFromAmount: null, minToAmount: null })
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  it("takes a conversion it waited on long enough for one whose outcome was lost, and lets the next one in the wallet have its turn", async () => {
+    const sdk = walletSdk()
+    const stuck = (await createGetConversionQuote(sdk as never)(params))!.execute()
+    let isSettled = false
+    stuck.then(() => {
+      isSettled = true
+    })
+    const automatic = executeAutoConvert(sdk as never, receive)
+    await jest.advanceTimersByTimeAsync(SEND_BOUND_MS - 1)
+    const isSettledBeforeTheBound = isSettled
+    await jest.advanceTimersByTimeAsync(1)
+
+    expect(isSettledBeforeTheBound).toBe(false)
+    expect((await stuck).errors?.[0].code).toBe(ConvertErrorCode.OutcomeUnknown)
+    expect(await automatic).toEqual({
+      status: "deferred",
+      retryAfterMs: LOST_CONVERSION_DELIVERY_WINDOW_MS,
+    })
+    expect(mockFindLostConversion).toHaveBeenCalledTimes(2)
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("gives up on a quote it waited on long enough", async () => {
+    const sdk = walletSdk()
+    sdk.prepareSendPayment.mockImplementation(neverAnswers)
+
+    let isSettled = false
+    const failure = createGetConversionQuote(sdk as never)(params).then(
+      () => undefined,
+      (err: Error) => err.message,
+    )
+    failure.then(() => {
+      isSettled = true
+    })
+    await jest.advanceTimersByTimeAsync(QUOTE_BOUND_MS - 1)
+    const isSettledBeforeTheBound = isSettled
+    await jest.advanceTimersByTimeAsync(1)
+
+    expect(isSettledBeforeTheBound).toBe(false)
+    expect(await failure).toBe("Conversion quote timed out after 60000ms")
+    expect(sdk.sendPayment).not.toHaveBeenCalled()
+  })
+})
+
+describe("a conversion in flight when the app closes", () => {
+  const params = {
+    fromAmount: toBtcMoneyAmount(5000),
+    toAmount: toUsdMoneyAmount(137),
+    direction: ConvertDirection.BtcToUsd,
+  }
+
+  const walletSdk = () => ({
+    prepareSendPayment: jest.fn().mockResolvedValue({
+      paymentMethod: {},
+      conversionEstimate: {
+        fee: BigInt(0),
+        amountIn: BigInt(5000),
+        amountOut: BigInt(1_370_000),
+        amountAdjustment: undefined,
+      },
+    }),
+    sendPayment: jest.fn().mockResolvedValue({ payment: { id: "c1", status: 0 } }),
+    receivePayment: jest.fn().mockResolvedValue({ paymentRequest: "sp1own-invoice" }),
+    getInfo: jest.fn().mockResolvedValue({ tokenBalances: {} }),
+    listPayments: jest.fn().mockResolvedValue({ payments: [] }),
+    syncWallet: jest.fn().mockResolvedValue({}),
+  })
+
+  const delivery = (id: string, paidIn: number) => ({
+    status: "found",
+    payment: {
+      id,
+      amount: BigInt(1_370_000),
+      details: { tag: "Token", inner: { metadata: { identifier: "usdb-token-id" } } },
+      conversionDetails: {
+        status: 1,
+        conversions: [{ from: { amount: BigInt(paidIn) } }],
+      },
+    },
+    failed: [],
+  })
+
+  const storageAcrossLaunches = () => {
+    const stored = new Map<string, Map<string, LostAttempts>>()
+    const saves: Array<Map<string, LostAttempts>> = []
+    const storage: LostAttemptsStorage = {
+      load: async (walletId) => new Map(stored.get(walletId) ?? []),
+      save: async (walletId, attempts) => {
+        saves.push(new Map(attempts))
+        stored.set(walletId, new Map(attempts))
+      },
+      remove: async (walletId) => {
+        stored.delete(walletId)
+      },
+    }
+    return { storage, saves, storedFor: (walletId: string) => stored.get(walletId) }
+  }
+
+  /** The app converts, and is closed before the SDK answers. */
+  const closedInFlight = async (
+    walletId: string,
+    storage: LostAttemptsStorage,
+    sdk: ReturnType<typeof walletSdk>,
+  ) => {
+    scopeLostAttemptsTo(walletId, storage)
+    sdk.sendPayment.mockReturnValueOnce(
+      new Promise(() => {
+        /** never answers: the app closes first */
+      }),
+    )
+    const quote = await createGetConversionQuote(sdk as never)(params)
+    quote!.execute()
+    while (sdk.sendPayment.mock.calls.length === 0) await nextTurn()
+  }
+
+  /** The app's next launch: a memory of its own, over the same storage and wallet, that
+   *  converts as many times as asked. */
+  const nextLaunchOf = async (walletId: string, storage: LostAttemptsStorage) => {
+    let bridge: typeof import("@app/self-custodial/bridge/convert")
+    let attempts: typeof import("@app/self-custodial/payment-details/lost-attempts")
+    jest.isolateModules(() => {
+      bridge = jest.requireActual("@app/self-custodial/bridge/convert")
+      attempts = jest.requireActual("@app/self-custodial/payment-details/lost-attempts")
+    })
+    attempts!.scopeLostAttemptsTo(walletId, storage)
+    return {
+      convert: async (sdk: ReturnType<typeof walletSdk>) => {
+        const quote = await bridge!.createGetConversionQuote(sdk as never)(params)
+        return quote!.execute()
+      },
+    }
+  }
+
+  const convertOnNextLaunch = async (
+    walletId: string,
+    storage: LostAttemptsStorage,
+    sdk: ReturnType<typeof walletSdk>,
+  ) => (await nextLaunchOf(walletId, storage)).convert(sdk)
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockMarkReceivedHistory.mockResolvedValue(MARK)
+    mockFetchLimits.mockResolvedValue({ minFromAmount: null, minToAmount: null })
+  })
+
+  it("is looked for on the next launch, and not converted again once found", async () => {
+    const { storage } = storageAcrossLaunches()
+    mockFindLostConversion.mockResolvedValue(delivery("rcv-usdb", 5000))
+    const sdk = walletSdk()
+
+    await closedInFlight("wallet-closed-1", storage, sdk)
+    const result = await convertOnNextLaunch("wallet-closed-1", storage, sdk)
+
+    expect(mockFindLostConversion).toHaveBeenCalledWith({
+      sdk,
+      isLabelRequired: true,
+      lost: {
+        startedAtMs: expect.any(Number),
+        lastAttemptAtMs: expect.any(Number),
+        ...MARK,
+        expectedDeliveries: [
+          {
+            tokenIdentifier: "usdb-token-id",
+            amount: 1_370_000,
+            amountIn: 5000,
+            isAutomatic: false,
+          },
+        ],
+      },
+    })
+    expect(result.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  /** Real time cannot be read across launches, so the next launch counts the window from
+   *  when it read the lost conversion back, whatever the phone's clock says. */
+  it("converts on the next launch once the history shows it never delivered, a window after reading it back", async () => {
+    const { storage } = storageAcrossLaunches()
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = walletSdk()
+
+    await closedInFlight("wallet-closed-2", storage, sdk)
+    afterTheDeliveryWindow()
+    const nextLaunch = await nextLaunchOf("wallet-closed-2", storage)
+    const readBack = await nextLaunch.convert(sdk)
+    realTimePasses(PAST_THE_WINDOW_MS)
+    const result = await nextLaunch.convert(sdk)
+
+    expect(readBack.errors?.[0].code).toBe(ConvertErrorCode.EarlierConversionPending)
+    expect(result.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(2)
+  })
+
+  it("goes out only once its attempt is stored", async () => {
+    let storeIt: () => void = () => undefined
+    const saves: Array<Map<string, LostAttempts>> = []
+    scopeLostAttemptsTo("wallet-ahead", {
+      ...noStoredAttempts,
+      save: (_walletId, attempts) =>
+        new Promise<void>((resolve) => {
+          saves.push(new Map(attempts))
+          storeIt = resolve
+        }),
+    })
+    const sdk = walletSdk()
+    const quote = await createGetConversionQuote(sdk as never)(params)
+
+    const executing = quote!.execute()
+    while (saves.length === 0) await nextTurn()
+    await nextTurn()
+    expect(saves[0].get(OWN_CONVERSIONS)?.lostConversion).toMatchObject(MARK)
+    expect(sdk.sendPayment).not.toHaveBeenCalled()
+
+    storeIt()
+    while (sdk.sendPayment.mock.calls.length === 0) await nextTurn()
+    storeIt()
+    await executing
+  })
+
+  it.each([
+    [
+      "storage never answers",
+      () =>
+        new Promise<void>(() => {
+          /** never answers */
+        }),
+    ],
+    ["the write keeps failing", () => Promise.reject(new Error("disk full"))],
+  ])(
+    "does not go out when its attempt cannot be stored in time, as %s",
+    async (label, save) => {
+      scopeLostAttemptsTo(`wallet-unstored-${label}`, { ...noStoredAttempts, save })
+      const sdk = walletSdk()
+      const quote = await createGetConversionQuote(sdk as never)(params)
+      jest.useFakeTimers()
+      try {
+        const executing = quote!.execute()
+        await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS)
+        const result = await executing
+
+        expect(result.errors?.[0].code).toBe(ConvertErrorCode.HistoryUnavailable)
+        expect(sdk.sendPayment).not.toHaveBeenCalled()
+      } finally {
+        jest.useRealTimers()
+      }
+    },
+  )
+
+  it("converts nothing twice across a restart when its attempt was never stored", async () => {
+    const sdk = walletSdk()
+    scopeLostAttemptsTo("wallet-never-stored", {
+      load: async () => new Map(),
+      save: () =>
+        new Promise<void>(() => {
+          /** never answers: the app closes first */
+        }),
+      remove: async () => undefined,
+    })
+    const quote = await createGetConversionQuote(sdk as never)(params)
+    jest.useFakeTimers()
+    let refused: Awaited<ReturnType<NonNullable<typeof quote>["execute"]>>
+    try {
+      const executing = quote!.execute()
+      await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS)
+      refused = await executing
+    } finally {
+      jest.useRealTimers()
+    }
+    const callsBeforeRestart = sdk.sendPayment.mock.calls.length
+
+    const { storage } = storageAcrossLaunches()
+    const onNextLaunch = await convertOnNextLaunch("wallet-never-stored", storage, sdk)
+
+    expect(refused.errors?.[0].code).toBe(ConvertErrorCode.HistoryUnavailable)
+    expect(callsBeforeRestart).toBe(0)
+    expect(onNextLaunch.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("takes back the attempt it could not store, leaving nothing to look for", async () => {
+    let failSaves = true
+    const saves: Array<Map<string, LostAttempts>> = []
+    scopeLostAttemptsTo("wallet-taken-back", {
+      ...noStoredAttempts,
+      save: async (_walletId, attempts) => {
+        if (failSaves) throw new Error("disk full")
+        saves.push(new Map(attempts))
+      },
+    })
+    const sdk = walletSdk()
+    const quote = await createGetConversionQuote(sdk as never)(params)
+    jest.useFakeTimers()
+    try {
+      const executing = quote!.execute()
+      await jest.advanceTimersByTimeAsync(STORED_ATTEMPTS_WRITE_AHEAD_TIMEOUT_MS)
+      await executing
+      failSaves = false
+      await jest.advanceTimersByTimeAsync(60_000)
+    } finally {
+      jest.useRealTimers()
+    }
+
+    expect(saves.at(-1)?.get(OWN_CONVERSIONS)).toBeUndefined()
+    expect(sdk.sendPayment).not.toHaveBeenCalled()
+  })
+
+  it("takes its attempt back before anything else is stored once the SDK answers", async () => {
+    const { storage, saves, storedFor } = storageAcrossLaunches()
+    scopeLostAttemptsTo("wallet-answered", storage)
+    const sdk = walletSdk()
+
+    await (await createGetConversionQuote(sdk as never)(params))!.execute()
+    await nextTurn()
+
+    const storedAhead = saves.findIndex((save) => save.has(OWN_CONVERSIONS))
+    expect(storedAhead).toBeGreaterThanOrEqual(0)
+    expect(saves[storedAhead + 1].has(OWN_CONVERSIONS)).toBe(false)
+    expect(storedFor("wallet-answered")?.has(OWN_CONVERSIONS)).toBe(false)
+  })
+
+  it("takes its attempt back before settling the lost conversion it went out past", async () => {
+    const { storage, saves } = storageAcrossLaunches()
+    scopeLostAttemptsTo("wallet-settled", storage)
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = walletSdk()
+    sdk.sendPayment.mockRejectedValueOnce(new Error("connection reset"))
+    await (await createGetConversionQuote(sdk as never)(params))!.execute()
+    await nextTurn()
+    afterTheDeliveryWindow()
+    let answeredAt = 0
+    sdk.sendPayment.mockImplementationOnce(async () => {
+      answeredAt = saves.length
+      return { payment: { id: "c2", status: 0 } }
+    })
+
+    await (await createGetConversionQuote(sdk as never)(params))!.execute()
+    await nextTurn()
+
+    const savesOnceAnswered = saves.slice(answeredAt)
+    expect(savesOnceAnswered.length).toBeGreaterThan(0)
+    savesOnceAnswered.forEach((save) => expect(save.has(OWN_CONVERSIONS)).toBe(false))
+  })
+
+  it("stores nothing once a conversion is refused on the way in", async () => {
+    const { storage, storedFor } = storageAcrossLaunches()
+    scopeLostAttemptsTo("wallet-refused", storage)
+    const sdk = walletSdk()
+    sdk.sendPayment.mockRejectedValue({ tag: "InsufficientFunds", inner: ["no funds"] })
+
+    await (await createGetConversionQuote(sdk as never)(params))!.execute()
+    await nextTurn()
+
+    expect(storedFor("wallet-refused")?.has(OWN_CONVERSIONS)).toBe(false)
+  })
+
+  it("is stored with the lost conversion it was let through past, from the earlier mark", async () => {
+    const { storage, saves } = storageAcrossLaunches()
+    scopeLostAttemptsTo("wallet-past", storage)
+    mockFindLostConversion.mockResolvedValue({ status: "not-found", failed: [] })
+    const sdk = walletSdk()
+    sdk.sendPayment.mockRejectedValueOnce(new Error("connection reset"))
+    await (await createGetConversionQuote(sdk as never)(params))!.execute()
+    await nextTurn()
+    const earlier = saves.at(-1)?.get(OWN_CONVERSIONS)?.lostConversion
+    afterTheDeliveryWindow()
+    mockMarkReceivedHistory.mockResolvedValue({ walletClockSec: 1, knownPaymentIds: [] })
+    let storedAsItWentOut: LostAttempts | undefined
+    sdk.sendPayment.mockImplementationOnce(async () => {
+      storedAsItWentOut = saves.at(-1)?.get(OWN_CONVERSIONS)
+      return { payment: { id: "c2", status: 0 } }
+    })
+
+    await (await createGetConversionQuote(sdk as never)(params))!.execute()
+
+    expect(storedAsItWentOut?.lostConversion).toEqual({
+      ...earlier,
+      expectedDeliveries: [
+        ...(earlier?.expectedDeliveries ?? []),
+        {
+          tokenIdentifier: "usdb-token-id",
+          amount: 1_370_000,
+          amountIn: 5000,
+          isAutomatic: false,
+        },
+      ],
+      lastAttemptAtMs: expect.any(Number),
+    })
+  })
+
+  /** Every save once the conversion threw: what was stored ahead is taken back as soon
+   *  as what the look leaves is held, so none of them stores the attempt as it went out. */
+  const savesOnceThrown = (
+    sdk: ReturnType<typeof walletSdk>,
+    saves: Array<Map<string, LostAttempts>>,
+  ) => {
+    let thrownAt = 0
+    sdk.sendPayment.mockImplementation(async () => {
+      thrownAt = saves.length
+      throw new Error("connection reset")
+    })
+    return () => saves.slice(thrownAt)
+  }
+
+  /** The second conversion is lost too, and its look finds what the first delivered. */
+  it("keeps what its look leaves, not what was stored ahead, once it is lost", async () => {
+    const { storage, saves } = storageAcrossLaunches()
+    scopeLostAttemptsTo("wallet-looked", storage)
+    mockFindLostConversion
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce({ status: "not-found", failed: [] })
+      .mockResolvedValueOnce(delivery("rcv-earlier", 5000))
+    const sdk = walletSdk()
+    const thrownSaves = savesOnceThrown(sdk, saves)
+
+    await (await createGetConversionQuote(sdk as never)(params))!.execute()
+    afterTheDeliveryWindow()
+    sdk.prepareSendPayment.mockResolvedValue({
+      paymentMethod: {},
+      conversionEstimate: {
+        fee: BigInt(0),
+        amountIn: BigInt(7300),
+        amountOut: BigInt(2_000_000),
+        amountAdjustment: undefined,
+      },
+    })
+    await (await createGetConversionQuote(sdk as never)(params))!.execute()
+    await nextTurn()
+
+    expect(thrownSaves().length).toBeGreaterThan(0)
+    thrownSaves().forEach((save) =>
+      expect(save.get(OWN_CONVERSIONS)?.lostConversion).toMatchObject({
+        knownPaymentIds: [...MARK.knownPaymentIds, "rcv-earlier"],
+        expectedDeliveries: [
+          {
+            tokenIdentifier: "usdb-token-id",
+            amount: 2_000_000,
+            amountIn: 7300,
+            isAutomatic: false,
+          },
+        ],
+      }),
+    )
+  })
+
+  it("stores nothing more once the look finds the conversion", async () => {
+    const { storage, saves } = storageAcrossLaunches()
+    scopeLostAttemptsTo("wallet-found", storage)
+    mockFindLostConversion.mockResolvedValue(delivery("rcv-usdb", 5000))
+    const sdk = walletSdk()
+    const thrownSaves = savesOnceThrown(sdk, saves)
+
+    const result = await (await createGetConversionQuote(sdk as never)(params))!.execute()
+    await nextTurn()
+
+    expect(result.status).toBe("success")
+    expect(thrownSaves().length).toBeGreaterThan(0)
+    thrownSaves().forEach((save) => expect(save.has(OWN_CONVERSIONS)).toBe(false))
   })
 })

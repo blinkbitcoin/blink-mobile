@@ -2362,7 +2362,8 @@
     "slideConfirming": "جارٍ التأكيد...",
     "copiedDestination": "تم نسخ الوجهة إلى الحافظة",
     "lightningRecommended": "رسوم مرتفعة! نوصي باستخدام Lightning.",
-    "usdRemainderSweep": "الرصيد المتبقي {remaining: string} ({remainingSats: string}) سيتم تحويله إلى بيتكوين. الحد الأدنى للدولار الأمريكي: {minimum: string}."
+    "usdRemainderSweep": "الرصيد المتبقي {remaining: string} ({remainingSats: string}) سيتم تحويله إلى بيتكوين. الحد الأدنى للدولار الأمريكي: {minimum: string}.",
+    "sendAnyway": "تحققت من سجلي، أرسل على أي حال"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "أسماء المستخدمين في {bankName: string} أصبحت عناوين في {bankName: string}",
@@ -4284,7 +4285,12 @@
     "belowMinimum": "المبلغ أقل من الحد الأدنى المطلوب لهذه الدفعة. حاول بمبلغ أكبر.",
     "networkError": "مشكلة في اتصال الشبكة. تحقق من اتصالك وحاول مرة أخرى.",
     "invalidInput": "تبدو تفاصيل الدفع غير صالحة. يرجى المراجعة والمحاولة مرة أخرى.",
-    "generic": "تعذر إكمال الدفع. حاول مرة أخرى بعد لحظة، أو استخدم مبلغًا أصغر."
+    "generic": "تعذر إكمال الدفع. حاول مرة أخرى بعد لحظة، أو استخدم مبلغًا أصغر.",
+    "outcomeUnknown": "ربما تمت هذه الدفعة بالفعل. تحقق من سجل معاملاتك قبل إرسالها مرة أخرى.",
+    "earlierConversionPending": "لا يزال تحويلك السابق قيد التأكيد. حاول مرة أخرى بعد بضع دقائق.",
+    "earlierPaymentFound": "تمت دفعتك السابقة إلى هذه الوجهة بالفعل، بمبلغ مختلف. تحقق منها قبل الإرسال مرة أخرى.",
+    "earlierConversionFound": "تم التحويل السابق بالفعل، بمبلغ مختلف. تحقق منه في سجل معاملاتك قبل التحويل مرة أخرى.",
+    "convertedMeanwhile": "تم للتو تحويل بمبلغ قريب من هذا المبلغ. تحقق من رصيدك قبل تأكيد هذا التحويل مرة أخرى."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "تم إنشاء هذا الحساب على {network}. بدّل إلى {network} لاستخدامه."

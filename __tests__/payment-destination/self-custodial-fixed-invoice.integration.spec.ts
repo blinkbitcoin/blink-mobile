@@ -7,6 +7,7 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { isSendDestination } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { resolveDestination } from "@app/screens/send-bitcoin-screen/payment-destination/resolve-destination"
 import { type ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
+import { scopeLostAttemptsTo } from "@app/self-custodial/payment-details/lost-attempts"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import {
   DisplayCurrency,
@@ -136,6 +137,7 @@ const lightningQuote = {
   paymentMethod: {
     tag: "Bolt11Invoice",
     inner: {
+      invoiceDetails: { paymentHash: "a".repeat(64) },
       sparkTransferFeeSats: undefined,
       lightningFeeSats: BigInt(LIGHTNING_FEE_SATS),
     },
@@ -182,9 +184,19 @@ const FIXED_AMOUNTS = [
   },
 ]
 
+/** A send goes out only once the attempt it is about to make is stored, so a wallet is
+ *  connected first, as the app does before any send, with storage that keeps nothing. */
+let connectedWallets = 0
+const keepsNothing = {
+  load: async () => new Map(),
+  save: async () => undefined,
+  remove: async () => undefined,
+}
+
 describe("paying a fixed-amount BOLT11 invoice from a self-custodial wallet", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    scopeLostAttemptsTo(`wallet-${(connectedWallets += 1)}`, keepsNothing)
     mockPrepareSendPayment.mockResolvedValue(lightningQuote)
     mockSendPayment.mockResolvedValue(undefined)
   })

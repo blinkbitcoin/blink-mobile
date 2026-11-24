@@ -2362,7 +2362,8 @@
     "slideConfirming": "Besig om te bevestig...",
     "copiedDestination": "Bestemming na knipbord oorgedra",
     "lightningRecommended": "Hoë fooi! Ons beveel Lightning aan.",
-    "usdRemainderSweep": "Oorblywende {remaining: string} ({remainingSats: string}) sal na Bitcoin omgeskakel word. USD-minimum: {minimum: string}."
+    "usdRemainderSweep": "Oorblywende {remaining: string} ({remainingSats: string}) sal na Bitcoin omgeskakel word. USD-minimum: {minimum: string}.",
+    "sendAnyway": "Ek het my geskiedenis nagegaan, stuur in elk geval"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} gebruikersname is nou {bankName: string} adresse. ",
@@ -4284,7 +4285,12 @@
     "belowMinimum": "Bedrag is onder die minimum vereis vir hierdie betaling. Probeer 'n groter bedrag.",
     "networkError": "Netwerkverbindingsprobleem. Kyk jou verbinding en probeer weer.",
     "invalidInput": "Die betaalbesonderhede lyk ongeldig. Kyk asseblief en probeer weer.",
-    "generic": "Die betaling kon nie voltooi word nie. Probeer oor 'n oomblik weer, of gebruik 'n kleiner bedrag."
+    "generic": "Die betaling kon nie voltooi word nie. Probeer oor 'n oomblik weer, of gebruik 'n kleiner bedrag.",
+    "outcomeUnknown": "Hierdie betaling is dalk reeds deur. Gaan jou transaksiegeskiedenis na voordat jy dit weer stuur.",
+    "earlierConversionPending": "Jou vorige omskakeling word nog bevestig. Probeer oor 'n paar minute weer.",
+    "earlierPaymentFound": "Jou vorige betaling aan hierdie bestemming is reeds deur, vir 'n ander bedrag. Gaan dit na voordat jy weer stuur.",
+    "earlierConversionFound": "Jou vorige omskakeling is reeds deur, vir 'n ander bedrag. Gaan dit in jou transaksiegeskiedenis na voordat jy weer omskakel.",
+    "convertedMeanwhile": "'n Omskakeling van ongeveer hierdie bedrag het pas deurgegaan. Gaan jou saldo na voordat jy hierdie een weer bevestig."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Hierdie rekening is op {network} geskep. Skakel oor na {network} om dit te gebruik."
