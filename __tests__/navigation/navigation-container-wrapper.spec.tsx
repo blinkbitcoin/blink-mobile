@@ -34,7 +34,13 @@ let mockRootState:
 let mockOnReady: (() => void) | undefined
 let mockOnStateChange: ((state: unknown) => void) | undefined
 type LinkingSubscribe = (listener: (url: string) => void) => () => void
-let mockLinking: { subscribe?: LinkingSubscribe } | undefined
+type LinkingOptions = {
+  subscribe?: LinkingSubscribe
+  getStateFromPath?: (path: string, options?: object) => unknown
+  config?: object
+}
+let mockLinking: LinkingOptions | undefined
+let mockIsSelfCustodial = false
 
 /** The navigationRef is module-level, so the container ref is stubbed. The stub APPLIES the
  *  reset to the stack it serves, as the real container does, so a second evaluation sees the
@@ -59,7 +65,7 @@ jest.mock("@react-navigation/native", () => ({
     children?: React.ReactNode
     onReady?: () => void
     onStateChange?: (state: unknown) => void
-    linking?: { subscribe?: LinkingSubscribe }
+    linking?: LinkingOptions
   }) => {
     mockOnReady = onReady
     mockOnStateChange = onStateChange
@@ -109,7 +115,7 @@ jest.mock("@app/graphql/is-authed-context", () => ({
 }))
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
-  useActiveWallet: () => ({ isSelfCustodial: false }),
+  useActiveWallet: () => ({ isSelfCustodial: mockIsSelfCustodial }),
 }))
 
 jest.mock("@app/components/actions", () => ({
@@ -1319,5 +1325,57 @@ describe("NavigationContainerWrapper two-factor gate", () => {
     rerenderWrapper(rendered, <UnlockProbe />)
 
     await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
+  })
+})
+
+describe("NavigationContainerWrapper card links", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockBlockerVisible = false
+    mockLinking = undefined
+    mockIsSelfCustodial = false
+  })
+
+  afterAll(() => {
+    mockIsSelfCustodial = false
+  })
+
+  const resolveLink = (path: string) =>
+    mockLinking?.getStateFromPath?.(path, mockLinking.config)
+
+  /** The card exists in custodial mode only: in non-custodial mode nothing of it opens,
+   *  from a link either, as the home already shows nothing of it there. */
+  const CARD_PATHS = [
+    "card",
+    "card/details",
+    "card/onboarding",
+    "card/onboarding/approved",
+    "/card/onboarding",
+  ]
+  CARD_PATHS.forEach((path) =>
+    it(`opens nothing at ${path} in non-custodial mode`, () => {
+      mockIsSelfCustodial = true
+      renderWrapper(<Text>child</Text>)
+
+      expect(mockLinking?.getStateFromPath).toBeDefined()
+      expect(resolveLink(path)).toBeUndefined()
+    }),
+  )
+
+  it("still opens the links outside the card in non-custodial mode", () => {
+    mockIsSelfCustodial = true
+    renderWrapper(<Text>child</Text>)
+
+    expect(resolveLink("settings")).toMatchObject({
+      routes: [expect.objectContaining({ name: "settings" })],
+    })
+  })
+
+  it("opens the card links in custodial mode", () => {
+    renderWrapper(<Text>child</Text>)
+
+    expect(resolveLink("card/onboarding")).toMatchObject({
+      routes: [expect.objectContaining({ name: "cardOnboardingWelcomeScreen" })],
+    })
   })
 })

@@ -8,6 +8,7 @@ import { bootSplashGate } from "./boot-splash-gate"
 import analytics from "@react-native-firebase/analytics"
 import {
   createNavigationContainerRef,
+  getStateFromPath,
   LinkingOptions,
   NavigationContainer,
   NavigationState,
@@ -24,7 +25,7 @@ import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
 import { TwoFactorSessionPrompt } from "@app/types/two-factor-enforcement"
 
-import { DEEP_LINK_SCREENS } from "./deep-link-screens"
+import { DEEP_LINK_SCREENS, isCardDeepLinkPath } from "./deep-link-screens"
 import { isMigrationRoute } from "./migration-routes"
 import { RootStackParamList } from "./stack-param-lists"
 import { isSetupKeyAtStake } from "./two-factor-remedy-routes"
@@ -340,6 +341,14 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     ],
     config: {
       screens: DEEP_LINK_SCREENS,
+    },
+    /** The card exists in custodial mode only, so in non-custodial mode none of its links
+     *  opens anything, as the home shows nothing of it there. The navigator reads this
+     *  again after every render, so it follows the mode the user is in. */
+    getStateFromPath: (path, options) => {
+      const isCardLinkWithoutCard = isSelfCustodial && isCardDeepLinkPath(path)
+      if (isCardLinkWithoutCard) return undefined
+      return getStateFromPath(path, options)
     },
     getInitialURL: async () => {
       const url = await Linking.getInitialURL()
