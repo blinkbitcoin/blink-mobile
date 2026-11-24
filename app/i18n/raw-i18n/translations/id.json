@@ -3654,9 +3654,7 @@
       "kycHeaderTitle": "Verifikasi",
       "CardSubscription": {
         "subscribeTitle": "Berlangganan",
-        "paymentTitle": "Pembayaran",
         "acceptButton": "Terima",
-        "payButton": "Lanjutkan dan Bayar",
         "cardTitle": "Blink Orange",
         "free": "Gratis",
         "forNow": "untuk saat ini",
@@ -3666,20 +3664,11 @@
           "memberBenefits": "Manfaat anggota lainnya"
         },
         "status": {
-          "label": "Status",
           "specialOfferLabel": "Penawaran khusus",
-          "paymentPending": "Pembayaran Tertunda",
           "firstYearFree": "Tahun pertama gratis"
         },
         "renewalDate": {
           "label": "Tanggal perpanjangan"
-        },
-        "agreement": {
-          "text": "Saya menyetujui",
-          "termsOfService": "Ketentuan Layanan",
-          "privacyPolicy": "Kebijakan Privasi",
-          "cardholderAgreement": "Perjanjian Pemegang Kartu",
-          "and": "dan"
         },
         "feeSchedule": {
           "text": "Saya telah meninjau dan menyetujui",

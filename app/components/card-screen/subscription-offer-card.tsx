@@ -6,7 +6,7 @@ import { staticSurface } from "@app/rne-theme/surfaces"
 
 export type OfferTone = "default" | "positive" | "accent"
 
-export type OfferSummaryRow = {
+type OfferSummaryRow = {
   label: string
   value: string
   tone: OfferTone

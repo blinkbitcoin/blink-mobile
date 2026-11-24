@@ -3654,9 +3654,7 @@
       "kycHeaderTitle": "Ověření",
       "CardSubscription": {
         "subscribeTitle": "Předplatit",
-        "paymentTitle": "Platba",
         "acceptButton": "Přijmout",
-        "payButton": "Pokračovat a Zaplatit",
         "cardTitle": "Blink Orange",
         "free": "Zdarma",
         "forNow": "prozatím",
@@ -3666,20 +3664,11 @@
           "memberBenefits": "Další členské výhody"
         },
         "status": {
-          "label": "Stav",
           "specialOfferLabel": "Speciální nabídka",
-          "paymentPending": "Platba Čeká",
           "firstYearFree": "První rok zdarma"
         },
         "renewalDate": {
           "label": "Datum obnovení"
-        },
-        "agreement": {
-          "text": "Souhlasím s",
-          "termsOfService": "Podmínkami služby",
-          "privacyPolicy": "Zásadami ochrany osobních údajů",
-          "cardholderAgreement": "Smlouvou držitele karty",
-          "and": "a"
         },
         "feeSchedule": {
           "text": "Zkontroloval jsem a souhlasím se dokumentem",

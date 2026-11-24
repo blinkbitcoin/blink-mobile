@@ -3654,9 +3654,7 @@
       "kycHeaderTitle": "Xác minh",
       "CardSubscription": {
         "subscribeTitle": "Đăng ký",
-        "paymentTitle": "Thanh toán",
         "acceptButton": "Chấp nhận",
-        "payButton": "Tiếp tục và Thanh toán",
         "cardTitle": "Blink Orange",
         "free": "Miễn phí",
         "forNow": "hiện tại",
@@ -3666,20 +3664,11 @@
           "memberBenefits": "Các quyền lợi thành viên khác"
         },
         "status": {
-          "label": "Trạng thái",
           "specialOfferLabel": "Ưu đãi đặc biệt",
-          "paymentPending": "Đang Chờ Thanh toán",
           "firstYearFree": "Năm đầu tiên miễn phí"
         },
         "renewalDate": {
           "label": "Ngày gia hạn"
-        },
-        "agreement": {
-          "text": "Tôi đồng ý với",
-          "termsOfService": "Điều khoản Dịch vụ",
-          "privacyPolicy": "Chính sách Quyền riêng tư",
-          "cardholderAgreement": "Thỏa thuận Chủ thẻ",
-          "and": "và"
         },
         "feeSchedule": {
           "text": "Tôi đã xem xét và đồng ý với",

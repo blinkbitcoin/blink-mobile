@@ -3654,9 +3654,7 @@
       "kycHeaderTitle": "Doğrulama",
       "CardSubscription": {
         "subscribeTitle": "Abone Ol",
-        "paymentTitle": "Ödeme",
         "acceptButton": "Kabul Et",
-        "payButton": "Devam Et ve Öde",
         "cardTitle": "Blink Orange",
         "free": "Ücretsiz",
         "forNow": "şimdilik",
@@ -3666,20 +3664,11 @@
           "memberBenefits": "Diğer üyelik avantajları"
         },
         "status": {
-          "label": "Durum",
           "specialOfferLabel": "Özel teklif",
-          "paymentPending": "Ödeme Bekliyor",
           "firstYearFree": "İlk yıl ücretsiz"
         },
         "renewalDate": {
           "label": "Yenileme tarihi"
-        },
-        "agreement": {
-          "text": "Kabul ediyorum",
-          "termsOfService": "Hizmet Şartları",
-          "privacyPolicy": "Gizlilik Politikası",
-          "cardholderAgreement": "Kart Sahibi Sözleşmesi",
-          "and": "ve"
         },
         "feeSchedule": {
           "text": "İnceledim ve şunu kabul ediyorum:",

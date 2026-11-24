@@ -3875,9 +3875,7 @@ const en: BaseTranslation = {
       },
       CardSubscription: {
         subscribeTitle: "Subscribe",
-        paymentTitle: "Payment",
         acceptButton: "Accept",
-        payButton: "Continue & Pay",
         cardTitle: "Blink Orange",
         free: "Free",
         forNow: "for now",
@@ -3887,20 +3885,11 @@ const en: BaseTranslation = {
           memberBenefits: "Other member benefits",
         },
         status: {
-          label: "Status",
           specialOfferLabel: "Special offer",
-          paymentPending: "Payment Pending",
           firstYearFree: "First year free",
         },
         renewalDate: {
           label: "Renewal date",
-        },
-        agreement: {
-          text: "I agree to the",
-          termsOfService: "Terms of Service",
-          privacyPolicy: "Privacy Policy",
-          cardholderAgreement: "Cardholder Agreement",
-          and: "and",
         },
         feeSchedule: {
           text: "I have reviewed and agree to the",

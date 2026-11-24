@@ -3654,9 +3654,7 @@
       "kycHeaderTitle": "Verificació",
       "CardSubscription": {
         "subscribeTitle": "Subscriure",
-        "paymentTitle": "Pagament",
         "acceptButton": "Acceptar",
-        "payButton": "Continuar i Pagar",
         "cardTitle": "Blink Orange",
         "free": "Gratis",
         "forNow": "de moment",
@@ -3666,20 +3664,11 @@
           "memberBenefits": "Altres avantatges de membre"
         },
         "status": {
-          "label": "Estat",
           "specialOfferLabel": "Oferta especial",
-          "paymentPending": "Pagament Pendent",
           "firstYearFree": "Primer any gratuït"
         },
         "renewalDate": {
           "label": "Data de renovació"
-        },
-        "agreement": {
-          "text": "Accepto els",
-          "termsOfService": "Termes del Servei",
-          "privacyPolicy": "Política de Privacitat",
-          "cardholderAgreement": "Acord del Titular de la Targeta",
-          "and": "i"
         },
         "feeSchedule": {
           "text": "He revisat i accepto la",

@@ -3654,9 +3654,7 @@
       "kycHeaderTitle": "การยืนยันตัวตน",
       "CardSubscription": {
         "subscribeTitle": "สมัครสมาชิก",
-        "paymentTitle": "การชำระเงิน",
         "acceptButton": "ยอมรับ",
-        "payButton": "ดำเนินการและชำระเงิน",
         "cardTitle": "Blink Orange",
         "free": "ฟรี",
         "forNow": "ในตอนนี้",
@@ -3666,20 +3664,11 @@
           "memberBenefits": "สิทธิประโยชน์สมาชิกอื่นๆ"
         },
         "status": {
-          "label": "สถานะ",
           "specialOfferLabel": "ข้อเสนอพิเศษ",
-          "paymentPending": "รอการชำระเงิน",
           "firstYearFree": "ปีแรกฟรี"
         },
         "renewalDate": {
           "label": "วันที่ต่ออายุ"
-        },
-        "agreement": {
-          "text": "ฉันยอมรับ",
-          "termsOfService": "เงื่อนไขการให้บริการ",
-          "privacyPolicy": "นโยบายความเป็นส่วนตัว",
-          "cardholderAgreement": "ข้อตกลงผู้ถือบัตร",
-          "and": "และ"
         },
         "feeSchedule": {
           "text": "ฉันได้ตรวจสอบและยอมรับ",

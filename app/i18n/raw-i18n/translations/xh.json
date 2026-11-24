@@ -3654,9 +3654,7 @@
       "kycHeaderTitle": "Ukuqinisekisa",
       "CardSubscription": {
         "subscribeTitle": "Bhalisa",
-        "paymentTitle": "Intlawulo",
         "acceptButton": "Yamkela",
-        "payButton": "Qhubeka kwaye Uhlawule",
         "cardTitle": "Blink Orange",
         "free": "Simahla",
         "forNow": "okwangoku",
@@ -3666,20 +3664,11 @@
           "memberBenefits": "Ezinye izibonelelo zobulungu"
         },
         "status": {
-          "label": "Isimo",
           "specialOfferLabel": "Inikelo elikhethekileyo",
-          "paymentPending": "Intlawulo Ilindile",
           "firstYearFree": "Unyaka wokuqala simahla"
         },
         "renewalDate": {
           "label": "Umhla wokuhlaziya"
-        },
-        "agreement": {
-          "text": "Ndiyavuma",
-          "termsOfService": "Imimmiselo yoMsebenzi",
-          "privacyPolicy": "Umgaqo waBucala",
-          "cardholderAgreement": "Isivumelwano soMpathi weKhadi",
-          "and": "kunye"
         },
         "feeSchedule": {
           "text": "Ndiyiphengululile kwaye ndiyavuma",

@@ -3654,9 +3654,7 @@
       "kycHeaderTitle": "التحقق",
       "CardSubscription": {
         "subscribeTitle": "اشتراك",
-        "paymentTitle": "الدفع",
         "acceptButton": "قبول",
-        "payButton": "متابعة والدفع",
         "cardTitle": "Blink Orange",
         "free": "مجاني",
         "forNow": "حاليًا",
@@ -3666,20 +3664,11 @@
           "memberBenefits": "مزايا العضوية الأخرى"
         },
         "status": {
-          "label": "الحالة",
           "specialOfferLabel": "عرض خاص",
-          "paymentPending": "الدفع معلق",
           "firstYearFree": "السنة الأولى مجانية"
         },
         "renewalDate": {
           "label": "تاريخ التجديد"
-        },
-        "agreement": {
-          "text": "أوافق على",
-          "termsOfService": "شروط الخدمة",
-          "privacyPolicy": "سياسة الخصوصية",
-          "cardholderAgreement": "اتفاقية حامل البطاقة",
-          "and": "و"
         },
         "feeSchedule": {
           "text": "لقد راجعتُ وأوافق على",

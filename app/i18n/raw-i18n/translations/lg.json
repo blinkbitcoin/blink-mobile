@@ -3654,9 +3654,7 @@
       "kycHeaderTitle": "Okukakasa",
       "CardSubscription": {
         "subscribeTitle": "Wewandise",
-        "paymentTitle": "Okusasula",
         "acceptButton": "Kkiriza",
-        "payButton": "Weyongere era Osasula",
         "cardTitle": "Blink Orange",
         "free": "Bwereere",
         "forNow": "kati",
@@ -3666,20 +3664,11 @@
           "memberBenefits": "Ebirungi ebirala eby'obwammemba"
         },
         "status": {
-          "label": "Embeera",
           "specialOfferLabel": "Ekirabo eky'enjawulo",
-          "paymentPending": "Okusasula Kulindirira",
           "firstYearFree": "Omwaka ogusooka ogw'obwereere"
         },
         "renewalDate": {
           "label": "Ennaku ey'okuddamu okuwandiisa"
-        },
-        "agreement": {
-          "text": "Nzikiriza",
-          "termsOfService": "Amateeka g'Obuweereza",
-          "privacyPolicy": "Enkola y'Ekyama",
-          "cardholderAgreement": "Endagaano y'Omukozesa Kaadi",
-          "and": "ne"
         },
         "feeSchedule": {
           "text": "Nkakasizza era nkkiriza",

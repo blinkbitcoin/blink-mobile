@@ -1,9 +1,6 @@
 import * as React from "react"
 
-import {
-  OfferSummaryRow,
-  SubscriptionOfferCardProps,
-} from "@app/components/card-screen/subscription-offer-card"
+import { SubscriptionOfferCardProps } from "@app/components/card-screen/subscription-offer-card"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
@@ -18,12 +15,8 @@ export type SubscriptionOffer = SubscriptionOfferCardProps & {
 }
 
 /** What the membership card shows: a price of zero in Remote Config is the free offer,
- *  any other price the paid one, whose status depends on the step showing it. */
-export const useSubscriptionOffer = ({
-  isSubscribeVariant,
-}: {
-  isSubscribeVariant: boolean
-}): SubscriptionOffer => {
+ *  any other price the paid one. */
+export const useSubscriptionOffer = (): SubscriptionOffer => {
   const { LL, locale } = useI18nContext()
   const { cardSubscriptionPriceUsd } = useRemoteConfig()
   const { formatCurrency, formatMoneyAmount } = useDisplayCurrency()
@@ -55,18 +48,6 @@ export const useSubscriptionOffer = ({
       }
     }
 
-    const statusRow: OfferSummaryRow = isSubscribeVariant
-      ? {
-          label: copy.status.specialOfferLabel(),
-          value: copy.status.firstYearFree(),
-          tone: "positive",
-        }
-      : {
-          label: copy.status.label(),
-          value: copy.status.paymentPending(),
-          tone: "accent",
-        }
-
     return {
       isFree: false,
       title: copy.cardTitle(),
@@ -74,7 +55,11 @@ export const useSubscriptionOffer = ({
       priceTone: "accent",
       caption: copy.perYear(),
       rows: [
-        statusRow,
+        {
+          label: copy.status.specialOfferLabel(),
+          value: copy.status.firstYearFree(),
+          tone: "positive",
+        },
         {
           label: copy.renewalDate.label(),
           value: formatDateFromNow({ months: SUBSCRIPTION_RENEWAL_MONTHS, locale }),
@@ -82,12 +67,5 @@ export const useSubscriptionOffer = ({
         },
       ],
     }
-  }, [
-    LL,
-    cardSubscriptionPriceUsd,
-    formatCurrency,
-    formatMoneyAmount,
-    isSubscribeVariant,
-    locale,
-  ])
+  }, [LL, cardSubscriptionPriceUsd, formatCurrency, formatMoneyAmount, locale])
 }

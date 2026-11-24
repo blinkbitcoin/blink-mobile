@@ -3654,9 +3654,7 @@
       "kycHeaderTitle": "Uthibitishaji",
       "CardSubscription": {
         "subscribeTitle": "Jiandikishe",
-        "paymentTitle": "Malipo",
         "acceptButton": "Kubali",
-        "payButton": "Endelea na Kulipa",
         "cardTitle": "Blink Orange",
         "free": "Bure",
         "forNow": "kwa sasa",
@@ -3666,20 +3664,11 @@
           "memberBenefits": "Manufaa mengine ya uanachama"
         },
         "status": {
-          "label": "Hali",
           "specialOfferLabel": "Ofa maalum",
-          "paymentPending": "Malipo Yanasubiri",
           "firstYearFree": "Mwaka wa kwanza bure"
         },
         "renewalDate": {
           "label": "Tarehe ya kuhuisha"
-        },
-        "agreement": {
-          "text": "Ninakubali",
-          "termsOfService": "Masharti ya Huduma",
-          "privacyPolicy": "Sera ya Faragha",
-          "cardholderAgreement": "Mkataba wa Mmiliki wa Kadi",
-          "and": "na"
         },
         "feeSchedule": {
           "text": "Nimekagua na ninakubali",

@@ -3654,9 +3654,7 @@
             "kycHeaderTitle": "本人確認",
             "CardSubscription": {
                 "subscribeTitle": "購読",
-                "paymentTitle": "お支払い",
                 "acceptButton": "承諾",
-                "payButton": "続行して支払う",
                 "cardTitle": "Blink Orange",
                 "free": "無料",
                 "forNow": "現時点では",
@@ -3666,20 +3664,11 @@
                     "memberBenefits": "その他のメンバー特典"
                 },
                 "status": {
-                    "label": "ステータス",
                     "specialOfferLabel": "特別オファー",
-                    "paymentPending": "支払い保留中",
                     "firstYearFree": "初年度無料"
                 },
                 "renewalDate": {
                     "label": "更新日"
-                },
-                "agreement": {
-                    "text": "以下に同意します",
-                    "termsOfService": "利用規約",
-                    "privacyPolicy": "プライバシーポリシー",
-                    "cardholderAgreement": "カード会員契約",
-                    "and": "および"
                 },
                 "feeSchedule": {
                     "text": "以下を確認し、同意します：",

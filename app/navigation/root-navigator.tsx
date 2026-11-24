@@ -1008,13 +1008,6 @@ export const RootStack = () => {
           ...headerCloseControlOptions(),
         }}
       />
-      <RootNavigator.Screen
-        name="cardOnboardingPaymentScreen"
-        component={CardSubscriptionScreen}
-        options={{
-          title: LL.CardFlow.Onboarding.CardSubscription.paymentTitle(),
-        }}
-      />
       {investmentOnboardingScreens()}
       <RootNavigator.Screen
         name="cardOnboardingPersonalInfoScreen"

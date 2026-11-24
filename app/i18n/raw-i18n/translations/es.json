@@ -3691,9 +3691,7 @@
             },
             "CardSubscription": {
                 "subscribeTitle": "Suscribir",
-                "paymentTitle": "Pago",
                 "acceptButton": "Aceptar",
-                "payButton": "Continuar y Pagar",
                 "cardTitle": "Blink Orange",
                 "free": "Gratis",
                 "forNow": "por ahora",
@@ -3703,20 +3701,11 @@
                     "memberBenefits": "Otros beneficios de miembro"
                 },
                 "status": {
-                    "label": "Estado",
                     "specialOfferLabel": "Oferta especial",
-                    "paymentPending": "Pago Pendiente",
                     "firstYearFree": "Primer año gratis"
                 },
                 "renewalDate": {
                     "label": "Fecha de renovación"
-                },
-                "agreement": {
-                    "text": "Acepto los",
-                    "termsOfService": "Términos de Servicio",
-                    "privacyPolicy": "Política de Privacidad",
-                    "cardholderAgreement": "Acuerdo del Titular de la Tarjeta",
-                    "and": "y"
                 },
                 "feeSchedule": {
                     "text": "He revisado y acepto la",

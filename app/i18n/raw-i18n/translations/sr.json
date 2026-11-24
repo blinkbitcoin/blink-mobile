@@ -3654,9 +3654,7 @@
       "kycHeaderTitle": "Верификација",
       "CardSubscription": {
         "subscribeTitle": "Претплатити се",
-        "paymentTitle": "Плаћање",
         "acceptButton": "Прихвати",
-        "payButton": "Настави и Плати",
         "cardTitle": "Blink Orange",
         "free": "Бесплатно",
         "forNow": "за сада",
@@ -3666,20 +3664,11 @@
           "memberBenefits": "Остале чланске погодности"
         },
         "status": {
-          "label": "Статус",
           "specialOfferLabel": "Посебна понуда",
-          "paymentPending": "Плаћање на Чекању",
           "firstYearFree": "Прва година бесплатно"
         },
         "renewalDate": {
           "label": "Датум обнове"
-        },
-        "agreement": {
-          "text": "Прихватам",
-          "termsOfService": "Услове коришћења",
-          "privacyPolicy": "Политику приватности",
-          "cardholderAgreement": "Уговор власника картице",
-          "and": "и"
         },
         "feeSchedule": {
           "text": "Прегледао сам и слажем се са",

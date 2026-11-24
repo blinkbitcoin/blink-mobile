@@ -3654,9 +3654,7 @@
       "kycHeaderTitle": "Επαλήθευση",
       "CardSubscription": {
         "subscribeTitle": "Εγγραφή",
-        "paymentTitle": "Πληρωμή",
         "acceptButton": "Αποδοχή",
-        "payButton": "Συνέχεια και πληρωμή",
         "cardTitle": "Blink Orange",
         "free": "Δωρεάν",
         "forNow": "προς το παρόν",
@@ -3666,20 +3664,11 @@
           "memberBenefits": "Άλλα προνόμια μέλους"
         },
         "status": {
-          "label": "Κατάσταση",
           "specialOfferLabel": "Ειδική προσφορά",
-          "paymentPending": "Η πληρωμή εκκρεμεί",
           "firstYearFree": "Πρώτος χρόνος δωρεάν"
         },
         "renewalDate": {
           "label": "Ημερομηνία ανανέωσης"
-        },
-        "agreement": {
-          "text": "Συμφωνώ με τους",
-          "termsOfService": "Όρους Χρήσης",
-          "privacyPolicy": "Πολιτική Απορρήτου",
-          "cardholderAgreement": "Συμφωνία Κατόχου Κάρτας",
-          "and": "και"
         },
         "feeSchedule": {
           "text": "Έχω ελέγξει και συμφωνώ με τον",

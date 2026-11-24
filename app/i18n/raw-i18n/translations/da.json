@@ -3654,9 +3654,7 @@
       "kycHeaderTitle": "Verifikation",
       "CardSubscription": {
         "subscribeTitle": "Abonner",
-        "paymentTitle": "Betaling",
         "acceptButton": "Acceptér",
-        "payButton": "Fortsæt og Betal",
         "cardTitle": "Blink Orange",
         "free": "Gratis",
         "forNow": "indtil videre",
@@ -3666,20 +3664,11 @@
           "memberBenefits": "Andre medlemsfordele"
         },
         "status": {
-          "label": "Status",
           "specialOfferLabel": "Særtilbud",
-          "paymentPending": "Betaling Afventer",
           "firstYearFree": "Første år gratis"
         },
         "renewalDate": {
           "label": "Fornyelsesdato"
-        },
-        "agreement": {
-          "text": "Jeg accepterer",
-          "termsOfService": "Servicevilkårene",
-          "privacyPolicy": "Privatlivspolitikken",
-          "cardholderAgreement": "Kortholderaftalen",
-          "and": "og"
         },
         "feeSchedule": {
           "text": "Jeg har gennemgået og accepterer",

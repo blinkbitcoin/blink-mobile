@@ -3654,9 +3654,7 @@
       "kycHeaderTitle": "Հաստատում",
       "CardSubscription": {
         "subscribeTitle": "Բաժանորդագրվել",
-        "paymentTitle": "Վճարում",
         "acceptButton": "Ընդունել",
-        "payButton": "Շարունակել և վճարել",
         "cardTitle": "Blink Orange",
         "free": "Անվճար",
         "forNow": "առայժմ",
@@ -3666,20 +3664,11 @@
           "memberBenefits": "Անդամակցության այլ առավելություններ"
         },
         "status": {
-          "label": "Կարգավիճակ",
           "specialOfferLabel": "Հատուկ առաջարկ",
-          "paymentPending": "Վճարումը սպասման մեջ է",
           "firstYearFree": "Առաջին տարին անվճար է"
         },
         "renewalDate": {
           "label": "Երկարաձգման ամսաթիվ"
-        },
-        "agreement": {
-          "text": "Ես համաձայն եմ",
-          "termsOfService": "Ծառայության պայմաններին",
-          "privacyPolicy": "Գաղտնիության քաղաքականությանը",
-          "cardholderAgreement": "Քարտապանի համաձայնագրին",
-          "and": "և"
         },
         "feeSchedule": {
           "text": "Ես ծանոթացել եմ և համաձայն եմ",

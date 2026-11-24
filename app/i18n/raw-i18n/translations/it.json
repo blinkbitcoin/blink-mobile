@@ -3654,9 +3654,7 @@
             "kycHeaderTitle": "Verifica",
             "CardSubscription": {
                 "subscribeTitle": "Iscriversi",
-                "paymentTitle": "Pagamento",
                 "acceptButton": "Accetta",
-                "payButton": "Continua e Paga",
                 "cardTitle": "Blink Orange",
                 "free": "Gratis",
                 "forNow": "per ora",
@@ -3666,20 +3664,11 @@
                     "memberBenefits": "Altri vantaggi per i membri"
                 },
                 "status": {
-                    "label": "Stato",
                     "specialOfferLabel": "Offerta speciale",
-                    "paymentPending": "Pagamento in Sospeso",
                     "firstYearFree": "Primo anno gratuito"
                 },
                 "renewalDate": {
                     "label": "Data di rinnovo"
-                },
-                "agreement": {
-                    "text": "Accetto i",
-                    "termsOfService": "Termini di Servizio",
-                    "privacyPolicy": "Informativa sulla Privacy",
-                    "cardholderAgreement": "Contratto del Titolare della Carta",
-                    "and": "e"
                 },
                 "feeSchedule": {
                     "text": "Ho esaminato e accetto il",

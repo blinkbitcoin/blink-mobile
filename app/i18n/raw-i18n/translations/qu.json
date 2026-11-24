@@ -3654,9 +3654,7 @@
       "kycHeaderTitle": "Verificación",
       "CardSubscription": {
         "subscribeTitle": "Qillqakuy",
-        "paymentTitle": "Pagay",
         "acceptButton": "Chaskiy",
-        "payButton": "Ñawpaqman rispa Pagay",
         "cardTitle": "Blink Orange",
         "free": "Mana qullqiyuq",
         "forNow": "kunanpaq",
@@ -3666,20 +3664,11 @@
           "memberBenefits": "Huk ayllu allinkunakuna"
         },
         "status": {
-          "label": "Kayninpi",
           "specialOfferLabel": "Sapaq ofrecimiento",
-          "paymentPending": "Pagay Suyachkan",
           "firstYearFree": "Ñawpaq wata qhasilla"
         },
         "renewalDate": {
           "label": "Musuqyachiy punchaw"
-        },
-        "agreement": {
-          "text": "Ari nispa nisani",
-          "termsOfService": "Yanapay Kamachikuykuna",
-          "privacyPolicy": "Pakasqa Kamachikuy",
-          "cardholderAgreement": "Tarjeta Hap'iq Rimanakuy",
-          "and": "chaymanta"
         },
         "feeSchedule": {
           "text": "Qhawarini hinaspa arinini",

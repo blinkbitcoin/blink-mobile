@@ -3654,9 +3654,7 @@
       "kycHeaderTitle": "Ellenőrzés",
       "CardSubscription": {
         "subscribeTitle": "Feliratkozás",
-        "paymentTitle": "Fizetés",
         "acceptButton": "Elfogadás",
-        "payButton": "Folytatás és Fizetés",
         "cardTitle": "Blink Orange",
         "free": "Ingyenes",
         "forNow": "egyelőre",
@@ -3666,20 +3664,11 @@
           "memberBenefits": "Egyéb tagsági előnyök"
         },
         "status": {
-          "label": "Állapot",
           "specialOfferLabel": "Különleges ajánlat",
-          "paymentPending": "Fizetés Függőben",
           "firstYearFree": "Első év ingyenes"
         },
         "renewalDate": {
           "label": "Megújítás dátuma"
-        },
-        "agreement": {
-          "text": "Elfogadom a",
-          "termsOfService": "Szolgáltatási Feltételeket",
-          "privacyPolicy": "Adatvédelmi Irányelveket",
-          "cardholderAgreement": "Kártyabirtokosi Megállapodást",
-          "and": "és"
         },
         "feeSchedule": {
           "text": "Átnéztem és elfogadom a következőt:",

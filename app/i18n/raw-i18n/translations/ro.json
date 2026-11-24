@@ -3654,9 +3654,7 @@
       "kycHeaderTitle": "Verificare",
       "CardSubscription": {
         "subscribeTitle": "Abonare",
-        "paymentTitle": "Plată",
         "acceptButton": "Acceptă",
-        "payButton": "Continuă și Plătește",
         "cardTitle": "Blink Orange",
         "free": "Gratuit",
         "forNow": "deocamdată",
@@ -3666,20 +3664,11 @@
           "memberBenefits": "Alte beneficii pentru membri"
         },
         "status": {
-          "label": "Status",
           "specialOfferLabel": "Ofertă specială",
-          "paymentPending": "Plată în Așteptare",
           "firstYearFree": "Primul an gratuit"
         },
         "renewalDate": {
           "label": "Data de reînoire"
-        },
-        "agreement": {
-          "text": "Sunt de acord cu",
-          "termsOfService": "Termenii Serviciului",
-          "privacyPolicy": "Politica de Confidențialitate",
-          "cardholderAgreement": "Acordul Deținătorului de Card",
-          "and": "și"
         },
         "feeSchedule": {
           "text": "Am examinat și sunt de acord cu",

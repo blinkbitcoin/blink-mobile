@@ -3654,9 +3654,7 @@
       "kycHeaderTitle": "Verificatie",
       "CardSubscription": {
         "subscribeTitle": "Abonneren",
-        "paymentTitle": "Betaling",
         "acceptButton": "Accepteren",
-        "payButton": "Doorgaan en Betalen",
         "cardTitle": "Blink Orange",
         "free": "Gratis",
         "forNow": "voorlopig",
@@ -3666,20 +3664,11 @@
           "memberBenefits": "Andere ledenvoordelen"
         },
         "status": {
-          "label": "Status",
           "specialOfferLabel": "Speciale aanbieding",
-          "paymentPending": "Betaling in Afwachting",
           "firstYearFree": "Eerste jaar gratis"
         },
         "renewalDate": {
           "label": "Verlengingsdatum"
-        },
-        "agreement": {
-          "text": "Ik ga akkoord met de",
-          "termsOfService": "Servicevoorwaarden",
-          "privacyPolicy": "Privacybeleid",
-          "cardholderAgreement": "Kaarthouderovereenkomst",
-          "and": "en"
         },
         "feeSchedule": {
           "text": "Ik heb beoordeeld en ga akkoord met het",

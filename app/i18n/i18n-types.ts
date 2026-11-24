@@ -12349,17 +12349,9 @@ type RootTranslation = {
 				 */
 				subscribeTitle: string
 				/**
-				 * P​a​y​m​e​n​t
-				 */
-				paymentTitle: string
-				/**
 				 * A​c​c​e​p​t
 				 */
 				acceptButton: string
-				/**
-				 * C​o​n​t​i​n​u​e​ ​&​ ​P​a​y
-				 */
-				payButton: string
 				/**
 				 * B​l​i​n​k​ ​O​r​a​n​g​e
 				 */
@@ -12388,17 +12380,9 @@ type RootTranslation = {
 				}
 				status: {
 					/**
-					 * S​t​a​t​u​s
-					 */
-					label: string
-					/**
 					 * S​p​e​c​i​a​l​ ​o​f​f​e​r
 					 */
 					specialOfferLabel: string
-					/**
-					 * P​a​y​m​e​n​t​ ​P​e​n​d​i​n​g
-					 */
-					paymentPending: string
 					/**
 					 * F​i​r​s​t​ ​y​e​a​r​ ​f​r​e​e
 					 */
@@ -12409,28 +12393,6 @@ type RootTranslation = {
 					 * R​e​n​e​w​a​l​ ​d​a​t​e
 					 */
 					label: string
-				}
-				agreement: {
-					/**
-					 * I​ ​a​g​r​e​e​ ​t​o​ ​t​h​e
-					 */
-					text: string
-					/**
-					 * T​e​r​m​s​ ​o​f​ ​S​e​r​v​i​c​e
-					 */
-					termsOfService: string
-					/**
-					 * P​r​i​v​a​c​y​ ​P​o​l​i​c​y
-					 */
-					privacyPolicy: string
-					/**
-					 * C​a​r​d​h​o​l​d​e​r​ ​A​g​r​e​e​m​e​n​t
-					 */
-					cardholderAgreement: string
-					/**
-					 * a​n​d
-					 */
-					and: string
 				}
 				feeSchedule: {
 					/**
@@ -26695,17 +26657,9 @@ export type TranslationFunctions = {
 				 */
 				subscribeTitle: () => LocalizedString
 				/**
-				 * Payment
-				 */
-				paymentTitle: () => LocalizedString
-				/**
 				 * Accept
 				 */
 				acceptButton: () => LocalizedString
-				/**
-				 * Continue & Pay
-				 */
-				payButton: () => LocalizedString
 				/**
 				 * Blink Orange
 				 */
@@ -26734,17 +26688,9 @@ export type TranslationFunctions = {
 				}
 				status: {
 					/**
-					 * Status
-					 */
-					label: () => LocalizedString
-					/**
 					 * Special offer
 					 */
 					specialOfferLabel: () => LocalizedString
-					/**
-					 * Payment Pending
-					 */
-					paymentPending: () => LocalizedString
 					/**
 					 * First year free
 					 */
@@ -26755,28 +26701,6 @@ export type TranslationFunctions = {
 					 * Renewal date
 					 */
 					label: () => LocalizedString
-				}
-				agreement: {
-					/**
-					 * I agree to the
-					 */
-					text: () => LocalizedString
-					/**
-					 * Terms of Service
-					 */
-					termsOfService: () => LocalizedString
-					/**
-					 * Privacy Policy
-					 */
-					privacyPolicy: () => LocalizedString
-					/**
-					 * Cardholder Agreement
-					 */
-					cardholderAgreement: () => LocalizedString
-					/**
-					 * and
-					 */
-					and: () => LocalizedString
 				}
 				feeSchedule: {
 					/**
