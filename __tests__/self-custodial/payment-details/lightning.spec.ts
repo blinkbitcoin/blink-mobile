@@ -94,6 +94,26 @@ describe("createSelfCustodialLightningPaymentDetails", () => {
     mockCreateSendMutation.mockClear()
   })
 
+  it("hands the send no request for an invoice that fixes its amount", () => {
+    createSelfCustodialLightningPaymentDetails(createParams({ hasAmount: true }))
+
+    expect(mockCreateSendMutation).toHaveBeenLastCalledWith(
+      expect.anything(),
+      expect.objectContaining({ requestedAs: undefined }),
+    )
+  })
+
+  it("hands the send what the sender asked for an invoice without an amount", () => {
+    createSelfCustodialLightningPaymentDetails(createParams({ hasAmount: false }))
+
+    expect(mockCreateSendMutation).toHaveBeenLastCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        requestedAs: { entered: "BTC:1000", settlement: "BTC:1000" },
+      }),
+    )
+  })
+
   it("returns Lightning payment type", () => {
     const detail = createSelfCustodialLightningPaymentDetails(createParams())
     expect(detail.paymentType).toBe(PaymentType.Lightning)
@@ -245,7 +265,9 @@ describe("createSelfCustodialLightningPaymentDetails", () => {
 
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ amount: BigInt(3065) }),
-      { rail: "bolt11", sendingWallet: WalletCurrency.Usd },
+      expect.objectContaining({
+        telemetry: { rail: "bolt11", sendingWallet: WalletCurrency.Usd },
+      }),
     )
   })
 
@@ -262,7 +284,9 @@ describe("createSelfCustodialLightningPaymentDetails", () => {
 
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ amount: BigInt(12345) }),
-      { rail: "bolt11", sendingWallet: WalletCurrency.Btc },
+      expect.objectContaining({
+        telemetry: { rail: "bolt11", sendingWallet: WalletCurrency.Btc },
+      }),
     )
   })
 

@@ -29,16 +29,23 @@ export const AutoConvertStatus = {
   AlreadyConverted: "already-converted",
   SkippedBelowMin: "skipped-below-min",
   SkippedStableBalanceActive: "skipped-stable-balance-active",
+  /** Nothing went out: it waits behind an earlier conversion that may have been lost, so
+   *  the wait is no attempt of its own, and is tried again once the wait is over. */
+  Deferred: "deferred",
   Failed: "failed",
 } as const
 
 export type AutoConvertStatus = (typeof AutoConvertStatus)[keyof typeof AutoConvertStatus]
 
 export type AutoConvertOutcome =
-  | { status: typeof AutoConvertStatus.Converted }
-  | { status: typeof AutoConvertStatus.AlreadyConverted }
+  /** With the conversion's own payment when the bridge names it, for the pairing. */
+  | { status: typeof AutoConvertStatus.Converted; conversionPaymentId?: string }
+  /** With the conversion found in the history when there is one, for the pairing. */
+  | { status: typeof AutoConvertStatus.AlreadyConverted; conversionPaymentId?: string }
   | { status: typeof AutoConvertStatus.SkippedBelowMin }
   | { status: typeof AutoConvertStatus.SkippedStableBalanceActive }
+  /** With how long, at most, until it can go out. */
+  | { status: typeof AutoConvertStatus.Deferred; retryAfterMs: number }
   | { status: typeof AutoConvertStatus.Failed }
 
 /** Links a receive paymentId to the conversion paymentId performed for it. */

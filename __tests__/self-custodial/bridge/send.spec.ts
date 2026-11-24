@@ -7,6 +7,7 @@ import {
   extractLightningFee,
   extractLnurlFee,
   extractOnchainFees,
+  identifyPreparedSend,
   prepareLnurl,
   prepareSend,
   resolveSendTokenIdentifier,
@@ -25,6 +26,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   SendPaymentMethod_Tags: {
     BitcoinAddress: "BitcoinAddress",
     Bolt11Invoice: "Bolt11Invoice",
+    SparkInvoice: "SparkInvoice",
   },
   SendPaymentOptions: {
     BitcoinAddress: jest
@@ -121,6 +123,42 @@ describe("extractLightningFee", () => {
   })
 })
 
+describe("identifyPreparedSend", () => {
+  it("finds a Lightning send by its invoice's payment hash", () => {
+    const prepared = {
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
+    }
+
+    expect(identifyPreparedSend(prepared as never)).toEqual({ paymentHash: "hash-1" })
+  })
+
+  it("finds a Spark invoice send by the invoice itself", () => {
+    const prepared = {
+      paymentMethod: {
+        tag: "SparkInvoice",
+        inner: { sparkInvoiceDetails: { invoice: "spark1invoice" } },
+      },
+    }
+
+    expect(identifyPreparedSend(prepared as never)).toEqual({
+      sparkInvoice: "spark1invoice",
+    })
+  })
+
+  it("has nothing to find a send to a bare address by", () => {
+    const prepared = { paymentMethod: { tag: "BitcoinAddress", inner: {} } }
+
+    expect(identifyPreparedSend(prepared as never)).toBeUndefined()
+  })
+
+  it("has nothing to find a send by when the quote names no method", () => {
+    expect(identifyPreparedSend({} as never)).toBeUndefined()
+  })
+})
+
 describe("executeSend", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -183,7 +221,7 @@ describe("executeSend", () => {
       paymentMethod: { tag: "BitcoinAddress", inner: {} },
     }
 
-    await executeSend(sdk, prepared as never, 0 /* Fast */)
+    await executeSend(sdk, prepared as never, { confirmationSpeed: 0 /* Fast */ })
 
     expect(sendPayment).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -207,6 +245,39 @@ describe("executeSend", () => {
     expect(sendPayment).toHaveBeenCalledWith(
       expect.objectContaining({ options: undefined }),
     )
+  })
+})
+
+describe("executeSend idempotency key", () => {
+  const KEY = "11111111-1111-4111-8111-111111111111"
+  const send = async (prepared: Record<string, unknown>) => {
+    const sendPayment = jest.fn().mockResolvedValue(undefined)
+    await executeSend({ sendPayment } as never, prepared as never, {
+      idempotencyKey: KEY,
+    })
+    return sendPayment.mock.calls[0][0].idempotencyKey
+  }
+
+  it("forwards the key on a bitcoin send", async () => {
+    expect(await send({ paymentMethod: { tag: "SparkAddress", inner: {} } })).toBe(KEY)
+  })
+
+  it("drops it on a token transfer, which the SDK rejects a key on", async () => {
+    expect(
+      await send({
+        paymentMethod: { tag: "SparkAddress", inner: {} },
+        tokenIdentifier: "usdb-token-id",
+      }),
+    ).toBeUndefined()
+  })
+
+  it("drops it on a send that converts on the way, which is a token leg too", async () => {
+    expect(
+      await send({
+        paymentMethod: { tag: "BitcoinAddress", inner: {} },
+        conversionEstimate: { amountIn: 1n },
+      }),
+    ).toBeUndefined()
   })
 })
 
@@ -417,6 +488,24 @@ describe("executeLnurl", () => {
         prepareResponse,
         idempotencyKey: "idemp-key-1",
       }),
+    )
+  })
+
+  /** The SDK rejects a key on a pay with a conversion as invalid input, and it adds one
+   *  to a bitcoin pay on its own when stable balance is active and sats run short. */
+  it("drops the key when the quote carries a conversion", async () => {
+    const lnurlPay = jest.fn().mockResolvedValue({})
+    const sdk = { lnurlPay } as never
+    const prepareResponse = {
+      amountSats: BigInt(100),
+      feeSats: BigInt(1),
+      conversionEstimate: { amountIn: BigInt(1) },
+    } as never
+
+    await executeLnurl(sdk, prepareResponse, "idemp-key-1")
+
+    expect(lnurlPay).toHaveBeenCalledWith(
+      expect.objectContaining({ idempotencyKey: undefined }),
     )
   })
 

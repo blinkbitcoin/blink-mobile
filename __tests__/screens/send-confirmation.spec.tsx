@@ -1656,3 +1656,89 @@ describe("SendBitcoinConfirmationScreen — slide to send", () => {
     ])
   })
 })
+
+describe("SendBitcoinConfirmationScreen, a self-custodial send that did not go out", () => {
+  const outcomeUnknownText = /This payment may already have gone through/i
+  const earlierPaymentText =
+    /Your earlier payment to this destination already went through/i
+  const sendAnywayLabel = "I checked my history, send anyway"
+
+  const renderAndSlide = async () => {
+    await renderSettled(
+      <ContextForScreen>
+        <Intraledger route={route} />
+      </ContextForScreen>,
+    )
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+  }
+
+  beforeEach(() => {
+    loadLocale("en")
+  })
+
+  it("sends again once the sender chose to send anyway, after releasing the destination", async () => {
+    const sendAnyway = jest.fn()
+    sendPaymentMock
+      .mockResolvedValueOnce({
+        status: "FAILURE",
+        errorsMessage: SelfCustodialErrorCode.OutcomeUnknown,
+        extraInfo: { checkHistory: true, sendAnyway },
+      })
+      .mockResolvedValueOnce({
+        status: "FAILURE",
+        errorsMessage: SelfCustodialErrorCode.NetworkError,
+      })
+
+    await renderAndSlide()
+    expect(screen.getByText(outcomeUnknownText)).toBeTruthy()
+
+    await act(async () => {
+      fireEvent.press(screen.getByText(sendAnywayLabel))
+    })
+
+    expect(sendAnyway).toHaveBeenCalledTimes(1)
+    expect(sendPaymentMock).toHaveBeenCalledTimes(2)
+    expect(sendAnyway.mock.invocationCallOrder[0]).toBeLessThan(
+      sendPaymentMock.mock.invocationCallOrder[1],
+    )
+    expect(screen.queryByText(outcomeUnknownText)).toBeNull()
+    expect(screen.queryByText(sendAnywayLabel)).toBeNull()
+  })
+
+  it("offers to look at the earlier payment that went through for another amount", async () => {
+    sendPaymentMock.mockResolvedValueOnce({
+      status: "FAILURE",
+      errorsMessage: SelfCustodialErrorCode.EarlierPaymentFound,
+      extraInfo: { earlierPaymentId: "p-earlier" },
+    })
+
+    await renderAndSlide()
+
+    expect(screen.getByText(earlierPaymentText)).toBeTruthy()
+    expect(screen.getByText("View transaction")).toBeTruthy()
+  })
+
+  it("drops the offer once the next attempt starts", async () => {
+    sendPaymentMock
+      .mockResolvedValueOnce({
+        status: "FAILURE",
+        errorsMessage: SelfCustodialErrorCode.OutcomeUnknown,
+        extraInfo: { checkHistory: true, sendAnyway: jest.fn() },
+      })
+      .mockResolvedValueOnce({
+        status: "FAILURE",
+        errorsMessage: SelfCustodialErrorCode.NetworkError,
+      })
+
+    await renderAndSlide()
+    expect(screen.getByText(sendAnywayLabel)).toBeTruthy()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(screen.queryByText(sendAnywayLabel)).toBeNull()
+    expect(screen.getByText(/Network connection problem/i)).toBeTruthy()
+  })
+})

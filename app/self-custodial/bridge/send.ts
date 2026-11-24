@@ -9,6 +9,7 @@ import {
   SendPaymentOptions,
   SendPaymentRequest,
   type BreezSdkInterface,
+  type ConversionEstimate,
   type ConversionOptions,
   type LnurlPayRequestDetails,
   type LnurlPayResponse,
@@ -55,6 +56,28 @@ export const extractLightningFee = (
   return null
 }
 
+/** What a dispatched send can be found by in the wallet's history. */
+export type SendIdentity = { paymentHash?: string; sparkInvoice?: string }
+
+/**
+ * What a prepared send can be found by in the wallet's history once dispatched: the
+ * invoice's payment hash for Lightning, the invoice itself for a Spark invoice. A send to
+ * a bare Spark or bitcoin address carries nothing no other payment shares.
+ */
+export const identifyPreparedSend = (
+  prepared: PrepareSendPaymentResponse,
+): SendIdentity | undefined => {
+  const method = prepared.paymentMethod
+  if (!method) return undefined
+  if (method.tag === MethodTag.Bolt11Invoice) {
+    return { paymentHash: method.inner.invoiceDetails.paymentHash }
+  }
+  if (method.tag === MethodTag.SparkInvoice) {
+    return { sparkInvoice: method.inner.sparkInvoiceDetails.invoice }
+  }
+  return undefined
+}
+
 export type PrepareSendOptions = {
   paymentRequest: string
   amount: bigint | undefined
@@ -97,15 +120,40 @@ export const resolveSendTokenIdentifier = (
 ): string | undefined =>
   currency === WalletCurrency.Usd ? requireSparkTokenIdentifier() : undefined
 
+/** What a prepared send or LNURL pay says about the token legs it will move. */
+export type PreparedTokenLegs = {
+  tokenIdentifier?: string
+  conversionEstimate?: ConversionEstimate
+}
+
+/**
+ * Whether a prepared send moves a token on any leg: a USDB transfer, or a conversion in
+ * or out of USDB on the way. The SDK has no idempotency hook for token transfers and
+ * rejects a key on such a payment as invalid input before anything is sent.
+ *
+ * Read from the prepared payment, never from what was asked for: with stable balance
+ * active and too few sats, the SDK adds a conversion to a plain bitcoin send on its own.
+ */
+export const hasTokenLeg = (prepared: PreparedTokenLegs): boolean =>
+  prepared.tokenIdentifier !== undefined || prepared.conversionEstimate !== undefined
+
+export type ExecuteSendOptions = {
+  confirmationSpeed?: OnchainConfirmationSpeed
+  /** Makes a retry of the same send come back as the payment already made instead of a
+   *  second one. Dropped on a token leg, where the SDK refuses it. */
+  idempotencyKey?: string
+}
+
 export const executeSend = (
   sdk: BreezSdkInterface,
   prepareResponse: Awaited<ReturnType<typeof prepareSend>>,
-  confirmationSpeed?: OnchainConfirmationSpeed,
+  { confirmationSpeed, idempotencyKey }: ExecuteSendOptions = {},
 ) =>
   sdk.sendPayment(
     SendPaymentRequest.create({
       prepareResponse,
       options: buildSendOptions(prepareResponse, confirmationSpeed),
+      idempotencyKey: hasTokenLeg(prepareResponse) ? undefined : idempotencyKey,
     }),
   )
 
@@ -151,6 +199,7 @@ export const prepareLnurl = (sdk: BreezSdkInterface, options: PrepareLnurlOption
 export const extractLnurlFee = (prepared: PrepareLnurlPayResponse): number =>
   toNumber(prepared.feeSats)
 
+/** The key is dropped on a token leg, as `executeSend` drops it, for the same reason. */
 export const executeLnurl = (
   sdk: BreezSdkInterface,
   prepareResponse: PrepareLnurlPayResponse,
@@ -159,6 +208,6 @@ export const executeLnurl = (
   sdk.lnurlPay(
     LnurlPayRequest.create({
       prepareResponse,
-      idempotencyKey,
+      idempotencyKey: hasTokenLeg(prepareResponse) ? undefined : idempotencyKey,
     }),
   )

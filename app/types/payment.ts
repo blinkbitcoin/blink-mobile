@@ -20,6 +20,8 @@ export type PaymentResultStatus =
 export type PaymentAdapterResult = {
   status: PaymentResultStatus
   errors?: PaymentError[]
+  /** For a conversion that went through: the payment it delivered, when known. */
+  deliveredPaymentId?: string
   extraInfo?: {
     arrivalAtMempoolEstimate?: number
     preimage?: string | null
@@ -175,6 +177,9 @@ export type ConvertParams = {
   direction: ConvertDirection
   /** Telemetry only: whether the user drove the swap or the auto-convert rule did. */
   source?: ConvertSource
+  /** For auto-convert: when the receive it converts was recorded, which tells that
+   *  receive's conversion from another receive's of about the same amount. */
+  receiveRecordedAtMs?: number
 }
 
 export type ConversionLimits = {
@@ -185,6 +190,26 @@ export type ConversionLimits = {
 export const ConvertErrorCode = {
   BelowMinimum: "below_minimum",
   LimitsUnavailable: "limits_unavailable",
+  /** A conversion threw after it was dispatched and its payment could not be found, so
+   *  it may have gone through: no further conversion is sent until the user has checked. */
+  OutcomeUnknown: "outcome_unknown",
+  /** Nothing was converted: an earlier conversion that may have been lost can still
+   *  deliver, so none goes out until it turns up or the time it could take has passed. */
+  EarlierConversionPending: "earlier_conversion_pending",
+  /** Nothing was converted: what the wallet's history or its earlier conversions hold
+   *  could not be read, and a conversion that went out without it could not be told
+   *  apart from what came before. */
+  HistoryUnavailable: "history_unavailable",
+  /** Nothing was converted: an earlier conversion that may have been lost turned out to
+   *  have gone through, for another amount or the other way, and is the user's to check. */
+  EarlierConversionFound: "earlier_conversion_found",
+  /** Nothing was delivered: the SDK answered that the conversion failed, which settles
+   *  it, so it can be tried again. */
+  ConversionFailed: "conversion_failed",
+  /** Nothing was converted: what it was to convert was converted while it waited for its
+   *  turn in the wallet; for the user's own, by a conversion of about its amount, and they
+   *  confirm it again. */
+  AlreadyConverted: "already_converted",
 } as const
 
 export type ConvertErrorCode = (typeof ConvertErrorCode)[keyof typeof ConvertErrorCode]
@@ -264,10 +289,17 @@ export const resolveDustAdjustment = (
   return amountInSourceCurrency >= fromWalletBalance ? null : amountAdjustment
 }
 
+/** How a quoted conversion goes out. `isConvertedMeanwhile` is asked once its turn in the
+ *  wallet has come, right before it goes out: true when what it is to convert was
+ *  converted while it waited. A throw converts nothing either. */
+export type ConvertExecuteOptions = {
+  isConvertedMeanwhile?: () => Promise<boolean>
+}
+
 export type ConvertQuote = {
   feeAmount: UsdMoneyAmount
   amountAdjustment?: ConvertAmountAdjustment
-  execute: () => Promise<PaymentAdapterResult>
+  execute: (options?: ConvertExecuteOptions) => Promise<PaymentAdapterResult>
 }
 
 export type GetConversionQuoteAdapter = (

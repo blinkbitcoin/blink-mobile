@@ -156,7 +156,8 @@ const extractTokenTicker = (payment: Payment): string | undefined => {
   return payment.details.inner.metadata.ticker
 }
 
-const conversionInfoOf = (payment: Payment) => {
+/** The conversion a payment in the wallet's history is a leg of, if any. */
+export const conversionInfoOf = (payment: Payment) => {
   if (!payment.details) return undefined
   if (PaymentDetails.Spark.instanceOf(payment.details)) {
     return payment.details.inner.conversionInfo
