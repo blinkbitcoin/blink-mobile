@@ -8,7 +8,8 @@ import { GaloyIcon } from "../atomic/galoy-icon"
 
 const DEFAULT_GAP = 10
 const DEFAULT_LABEL_LINE_HEIGHT = 20
-/** Grows the 20 point box to the 44 point touch target the platforms ask for. */
+/** Reaches into the gap beside the box, so a tap between it and the label still lands
+ *  on it; the row's own bounds clip the rest. */
 const BOX_HIT_SLOP = 12
 
 type StyleProps = {
@@ -31,7 +32,8 @@ type CheckboxRowProps = {
    * A label with inline parts, such as links, set in the row's text style. The box is
    * then a checkbox of its own, named by `accessibilityLabel`, and the label sits beside
    * it: inside one checkbox a screen reader could not reach the links, and activating
-   * one would toggle the box instead of opening it.
+   * one would toggle the box instead of opening it. Pressing the label's prose still
+   * toggles the box, as on a plain row, while a link keeps its own press.
    */
   | { label?: never; children: React.ReactNode; accessibilityLabel: string }
 )
@@ -65,6 +67,9 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = (props) => {
   )
 
   if (hasRichLabel) {
+    /** A disabled row keeps its links open, so the documents can still be read. */
+    const handleProsePress = disabled ? undefined : onPress
+
     return (
       <View style={rowStyle}>
         <Pressable
@@ -78,7 +83,9 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = (props) => {
         >
           {box}
         </Pressable>
-        <Text style={labelStyle}>{props.children}</Text>
+        <Text style={labelStyle} onPress={handleProsePress} suppressHighlighting>
+          {props.children}
+        </Text>
       </View>
     )
   }

@@ -195,6 +195,22 @@ describe("CardSubscriptionScreen - paid offer", () => {
     expect(getByRole("checkbox", { ...feeScheduleBox, checked: false })).toBeTruthy()
   })
 
+  /** The box alone is a small target, so its prose ticks it too. */
+  it("ticks the fee schedule box from its prose as well", async () => {
+    const feeScheduleBox = {
+      name: "I have reviewed and agree to the Blink Card Fee Schedule",
+    }
+    const { getByRole, getByText } = await renderScreen()
+
+    const prose = getByText("I have reviewed and agree to the Blink Card Fee Schedule")
+    expect(prose.props.onPress).toEqual(expect.any(Function))
+    await act(async () => {
+      fireEvent.press(prose)
+    })
+
+    expect(getByRole("checkbox", { ...feeScheduleBox, checked: true })).toBeTruthy()
+  })
+
   it("button is disabled when no checkbox is checked", async () => {
     const { getByText } = await renderScreen()
 

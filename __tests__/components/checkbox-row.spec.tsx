@@ -208,10 +208,23 @@ describe("CheckboxRow", () => {
       expect(defaultProps.onPress).not.toHaveBeenCalled()
     })
 
-    it("toggles from the box alone, without opening a link", () => {
+    it("toggles from the box, without opening a link", () => {
       const { getByTestId } = renderRichRow()
 
       fireEvent.press(getByTestId("fee-schedule-box"))
+
+      expect(defaultProps.onPress).toHaveBeenCalledTimes(1)
+      expect(onLinkPress).not.toHaveBeenCalled()
+    })
+
+    /** The box alone is a small target, so the prose beside it toggles too, as the
+     *  whole row does on a plain label. */
+    it("toggles from the label's prose, without opening a link", () => {
+      const { getByText } = renderRichRow()
+
+      const prose = getByText("I agree to the Fee Schedule")
+      expect(prose.props.onPress).toEqual(expect.any(Function))
+      fireEvent.press(prose)
 
       expect(defaultProps.onPress).toHaveBeenCalledTimes(1)
       expect(onLinkPress).not.toHaveBeenCalled()
@@ -227,12 +240,6 @@ describe("CheckboxRow", () => {
       })
     })
 
-    it("grows the box's touch target to 44 points", () => {
-      const { getByRole } = renderRichRow()
-
-      expect(getByRole("checkbox").props.hitSlop).toBe(12)
-    })
-
     it("keeps the row's spacing and the label's line height", () => {
       const { toJSON, getByText } = renderRichRow()
 
@@ -242,15 +249,28 @@ describe("CheckboxRow", () => {
       ).toMatchObject({ lineHeight: 16 })
     })
 
-    it("fades the row and refuses the box's presses when disabled", () => {
-      const { getByRole, toJSON } = renderRichRow({ disabled: true })
+    /** The prose loses its press outright: a press on it would otherwise reach the row's
+     *  own handler in the test renderer, which climbs past the native responder. */
+    it("fades the row and refuses the box and the prose when disabled", () => {
+      const { getByRole, getByText, toJSON } = renderRichRow({ disabled: true })
 
       fireEvent.press(getByRole("checkbox", { disabled: true }))
 
       expect(defaultProps.onPress).not.toHaveBeenCalled()
+      expect(getByText("I agree to the Fee Schedule").props.onPress).toBeUndefined()
       expect(StyleSheet.flatten(rowOf(toJSON()).props.style)).toMatchObject({
         opacity: 0.5,
       })
+    })
+
+    /** The documents can still be read while the row waits. */
+    it("keeps the links open when disabled", () => {
+      const { getByRole } = renderRichRow({ disabled: true })
+
+      fireEvent.press(getByRole("link", { name: "Fee Schedule" }))
+
+      expect(onLinkPress).toHaveBeenCalledTimes(1)
+      expect(defaultProps.onPress).not.toHaveBeenCalled()
     })
   })
 
