@@ -13,7 +13,12 @@ export const useAmountSliderHint = (): AmountSliderHintReturn => {
   const { persistentState, updateState } = usePersistentStateContext()
 
   const markAmountSliderLearned = useCallback(() => {
-    updateState((prev) => prev && { ...prev, hasLearnedAmountSlider: true })
+    // Already learned: the same state, so nothing is written again.
+    updateState(
+      (prev) =>
+        prev &&
+        (prev.hasLearnedAmountSlider ? prev : { ...prev, hasLearnedAmountSlider: true }),
+    )
   }, [updateState])
 
   return {
