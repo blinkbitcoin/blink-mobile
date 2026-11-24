@@ -3610,7 +3610,6 @@
       },
       "Shipping": {
         "title": "Đặt thẻ vật lý của bạn",
-        "subtitle": "Nhận thẻ Blink Visa được giao đến địa chỉ của bạn.",
         "registeredAddress": "Địa chỉ đã đăng ký",
         "useRegisteredAddress": "Dùng địa chỉ đã đăng ký làm địa chỉ giao hàng",
         "delivery": "Giao hàng",

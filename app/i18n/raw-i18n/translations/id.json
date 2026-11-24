@@ -3610,7 +3610,6 @@
       },
       "Shipping": {
         "title": "Pesan kartu fisik Anda",
-        "subtitle": "Dapatkan kartu Blink Visa Anda dikirim ke alamat Anda.",
         "registeredAddress": "Alamat terdaftar",
         "useRegisteredAddress": "Gunakan alamat terdaftar sebagai alamat pengiriman",
         "delivery": "Pengiriman",

@@ -3610,7 +3610,6 @@
       },
       "Shipping": {
         "title": "Demana la teva targeta física",
-        "subtitle": "Rep la teva targeta Blink Visa al teu domicili.",
         "registeredAddress": "Adreça registrada",
         "useRegisteredAddress": "Utilitza l'adreça registrada com a adreça d'enviament",
         "delivery": "Lliurament",

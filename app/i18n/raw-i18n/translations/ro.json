@@ -3610,7 +3610,6 @@
       },
       "Shipping": {
         "title": "Comandă cardul tău fizic",
-        "subtitle": "Primește cardul tău Blink Visa la adresa ta.",
         "registeredAddress": "Adresă înregistrată",
         "useRegisteredAddress": "Folosește adresa înregistrată ca adresă de livrare",
         "delivery": "Livrare",

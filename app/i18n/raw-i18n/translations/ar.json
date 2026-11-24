@@ -3610,7 +3610,6 @@
       },
       "Shipping": {
         "title": "اطلب بطاقتك الفعلية",
-        "subtitle": "احصل على بطاقة Blink Visa الخاصة بك مُسلَّمة إلى عنوانك.",
         "registeredAddress": "العنوان المسجّل",
         "useRegisteredAddress": "استخدم العنوان المسجّل كعنوان للشحن",
         "delivery": "التسليم",

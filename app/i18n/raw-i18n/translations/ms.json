@@ -3610,7 +3610,6 @@
       },
       "Shipping": {
         "title": "Pesan kad fizikal anda",
-        "subtitle": "Dapatkan kad Blink Visa anda dihantar ke alamat anda.",
         "registeredAddress": "Alamat berdaftar",
         "useRegisteredAddress": "Gunakan alamat berdaftar sebagai alamat penghantaran",
         "delivery": "Penghantaran",

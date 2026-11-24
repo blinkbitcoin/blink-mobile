@@ -3610,7 +3610,6 @@
       },
       "Shipping": {
         "title": "Rendelje meg fizikai kártyáját",
-        "subtitle": "Kérje Blink Visa kártyájának kézbesítését a címére.",
         "registeredAddress": "Regisztrált cím",
         "useRegisteredAddress": "A regisztrált cím használata szállítási címként",
         "delivery": "Kézbesítés",

@@ -3794,7 +3794,6 @@ const en: BaseTranslation = {
       },
       Shipping: {
         title: "Order your physical card",
-        subtitle: "Get your Blink Visa card delivered to your address.",
         registeredAddress: "Registered address",
         useRegisteredAddress: "Use registered address as shipping address",
         delivery: "Delivery",

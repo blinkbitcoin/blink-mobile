@@ -3610,7 +3610,6 @@
       },
       "Shipping": {
         "title": "Naručite svoju fizičku karticu",
-        "subtitle": "Neka vam se Blink Visa kartica dostavi na adresu.",
         "registeredAddress": "Registrirana adresa",
         "useRegisteredAddress": "Koristi registriranu adresu kao adresu dostave",
         "delivery": "Dostava",

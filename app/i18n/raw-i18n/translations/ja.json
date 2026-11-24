@@ -3610,7 +3610,6 @@
             },
             "Shipping": {
                 "title": "物理カードを注文",
-                "subtitle": "Blink Visaカードを住所へお届けします。",
                 "registeredAddress": "登録済み住所",
                 "useRegisteredAddress": "登録済み住所を配送先住所として使用",
                 "delivery": "配送",

@@ -12099,10 +12099,6 @@ type RootTranslation = {
 				 */
 				title: string
 				/**
-				 * G​e​t​ ​y​o​u​r​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d​ ​d​e​l​i​v​e​r​e​d​ ​t​o​ ​y​o​u​r​ ​a​d​d​r​e​s​s​.
-				 */
-				subtitle: string
-				/**
 				 * R​e​g​i​s​t​e​r​e​d​ ​a​d​d​r​e​s​s
 				 */
 				registeredAddress: string
@@ -26410,10 +26406,6 @@ export type TranslationFunctions = {
 				 * Order your physical card
 				 */
 				title: () => LocalizedString
-				/**
-				 * Get your Blink Visa card delivered to your address.
-				 */
-				subtitle: () => LocalizedString
 				/**
 				 * Registered address
 				 */

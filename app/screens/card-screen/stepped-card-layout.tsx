@@ -14,7 +14,7 @@ type SteppedCardLayoutProps = {
   icon: IconNamesType
   iconColor?: string
   title: string
-  subtitle: string
+  subtitle?: string
   buttonLabel: string
   onButtonPress: () => void
   isButtonDisabled?: boolean
@@ -60,7 +60,7 @@ export const SteppedCardLayout: React.FC<SteppedCardLayoutProps> = ({
 
           <View style={styles.textContainer}>
             {title ? <Text style={styles.title}>{title}</Text> : null}
-            <Text style={styles.subtitle}>{subtitle}</Text>
+            {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
           </View>
         </View>
 

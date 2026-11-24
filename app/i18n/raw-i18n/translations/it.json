@@ -3610,7 +3610,6 @@
             },
             "Shipping": {
                 "title": "Ordina la tua carta fisica",
-                "subtitle": "Ricevi la tua carta Blink Visa al tuo indirizzo.",
                 "registeredAddress": "Indirizzo registrato",
                 "useRegisteredAddress": "Usa l'indirizzo registrato come indirizzo di spedizione",
                 "delivery": "Consegna",

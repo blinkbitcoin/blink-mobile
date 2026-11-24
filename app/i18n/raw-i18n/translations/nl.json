@@ -3610,7 +3610,6 @@
       },
       "Shipping": {
         "title": "Bestel je fysieke kaart",
-        "subtitle": "Ontvang je Blink Visa-kaart op je adres.",
         "registeredAddress": "Geregistreerd adres",
         "useRegisteredAddress": "Gebruik geregistreerd adres als verzendadres",
         "delivery": "Levering",

@@ -3610,7 +3610,6 @@
             },
             "Shipping": {
                 "title": "Pide tu tarjeta física",
-                "subtitle": "Recibe tu tarjeta Blink Visa en tu dirección.",
                 "registeredAddress": "Dirección registrada",
                 "useRegisteredAddress": "Usar la dirección registrada como dirección de envío",
                 "delivery": "Entrega",

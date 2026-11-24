@@ -3610,7 +3610,6 @@
       },
       "Shipping": {
         "title": "สั่งบัตรจริงของคุณ",
-        "subtitle": "รับบัตร Blink Visa ส่งถึงที่อยู่ของคุณ",
         "registeredAddress": "ที่อยู่ที่ลงทะเบียน",
         "useRegisteredAddress": "ใช้ที่อยู่ที่ลงทะเบียนเป็นที่อยู่จัดส่ง",
         "delivery": "การจัดส่ง",

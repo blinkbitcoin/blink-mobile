@@ -3610,7 +3610,6 @@
       },
       "Shipping": {
         "title": "Fiziksel kartını sipariş et",
-        "subtitle": "Blink Visa kartını adresine teslim al.",
         "registeredAddress": "Kayıtlı adres",
         "useRegisteredAddress": "Kayıtlı adresi kargo adresi olarak kullan",
         "delivery": "Teslimat",

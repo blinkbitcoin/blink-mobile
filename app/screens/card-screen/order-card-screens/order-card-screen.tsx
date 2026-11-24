@@ -20,7 +20,7 @@ type StepConfig = {
   icon: "delivery"
   iconColor: string
   title: string
-  subtitle: string
+  subtitle?: string
   buttonLabel: string
   onButtonPress: () => void
   isButtonDisabled: boolean
@@ -134,7 +134,6 @@ export const OrderCardScreen: React.FC = () => {
           icon: "delivery",
           iconColor: colors.success,
           title: LL.CardFlow.OrderPhysicalCard.Shipping.title(),
-          subtitle: LL.CardFlow.OrderPhysicalCard.Shipping.subtitle(),
           buttonLabel: LL.common.continue(),
           onButtonPress: goToNextStep,
           isButtonDisabled: !state.useRegisteredAddress && !isFormValid,

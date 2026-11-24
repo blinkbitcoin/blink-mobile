@@ -3610,7 +3610,6 @@
       },
       "Shipping": {
         "title": "Objednejte si fyzickou kartu",
-        "subtitle": "Nechte si doručit svou kartu Blink Visa na adresu.",
         "registeredAddress": "Registrovaná adresa",
         "useRegisteredAddress": "Použít registrovanou adresu jako doručovací adresu",
         "delivery": "Doručení",
