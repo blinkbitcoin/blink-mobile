@@ -1,6 +1,8 @@
 import { useEffect } from "react"
 
-import { CommonActions, useNavigation } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
+
+import { RESET_TO_HOME } from "@app/navigation/reset-to-home"
 
 import { useTransferGate } from "./use-transfer-blocked"
 
@@ -17,6 +19,12 @@ export type TransferBlockedGuard = {
   /** The verdict has not landed yet. Kept apart from the block because the two owe the
    *  user different things: a block owes them nothing, a wait owes them a loader. */
   isRegionPending: boolean
+  /** The gate's own answer, region or Anon, whatever `enabled` says: for a caller that
+   *  lets a blocked user through the way a drain is let through, dollars to bitcoin
+   *  only, and so has to know the answer, and whether it has landed, even with the
+   *  bounce switched off. */
+  isBlocked: boolean
+  isVerdictPending: boolean
 }
 
 export const useTransferBlockedGuard = ({
@@ -29,11 +37,13 @@ export const useTransferBlockedGuard = ({
 
   useEffect(() => {
     if (!shouldLeaveScreen) return
-    navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }))
+    navigation.dispatch(RESET_TO_HOME)
   }, [shouldLeaveScreen, navigation])
 
   return {
     isGated: shouldLeaveScreen,
     isRegionPending: enabled && isRegionPending,
+    isBlocked: isGated,
+    isVerdictPending: isRegionPending,
   }
 }

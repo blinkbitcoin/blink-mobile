@@ -40,14 +40,23 @@ describe("deep-linkable routes", () => {
   })
 
   /**
-   * No link reaches the investment flow yet. Its entry arrives together with the check
-   * of who may take part: a build that links to it without that check would let any
-   * signed-in user pay into the round the day the deposit wallet is configured. Its
-   * later steps take figures the signing produced and are reached from it alone; a link
-   * landing on one would open it with nothing to show, or with a sum nobody agreed to.
+   * A published path is a promise: the notification service emits this string, and a
+   * rename lands as a dead link in the phone of anyone holding an older notification.
+   * It is also a sibling of the rest of the card onboarding, and hangs under it. The
+   * entry arrives here, with the check of who may take part and the record of what was
+   * signed, and not before: a build that linked to the flow without them would let any
+   * signed-in user pay into the round the day the deposit wallet is configured.
    */
-  it("links to no step of the investment flow", () => {
-    expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingWelcomeInvestScreen")
+  it("keeps the investment entry under the card onboarding tree", () => {
+    expect(DEEP_LINK_SCREENS.cardOnboardingWelcomeInvestScreen).toBe(
+      "card/onboarding/investment",
+    )
+  })
+
+  /** The flow is entered at its first screen only. Its later steps take figures the
+   *  signing produced and are reached from it, or from the home once signed; a link
+   *  landing on one would open it with nothing to show, or with a sum nobody agreed to. */
+  it("links to no step of the investment flow past its entry", () => {
     expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingTransferInvestScreen")
     expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingDepositPendingScreen")
   })

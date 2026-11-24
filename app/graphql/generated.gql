@@ -1366,6 +1366,21 @@ query cardHolder($cardId: ID!) {
   }
 }
 
+query cardInvestmentAccount {
+  me {
+    id
+    defaultAccount {
+      id
+      wallets {
+        id
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
 query cardSecretsEncrypted($cardId: ID!, $sessionId: String!) {
   cardSecretsEncrypted(cardId: $cardId, sessionId: $sessionId) {
     encryptedPan {

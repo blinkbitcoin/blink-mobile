@@ -8,8 +8,13 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { IconHero } from "@app/components/icon-hero"
 import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
+import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progress"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { RESET_TO_HOME } from "@app/navigation/reset-to-home"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+
+import { hasNothingLeftToPay, resetToTransferStep } from "./transfer-invest-screen"
+import { useGivenUpWaiting } from "./use-given-up-waiting"
 
 export const WelcomeInvestScreen: React.FC = () => {
   const styles = useStyles()
@@ -19,10 +24,62 @@ export const WelcomeInvestScreen: React.FC = () => {
 
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { progress, isEligible, isAccountResolved, refetchAccount } =
+    useCardInvestmentProgress()
+
+  /** The investment is paid from a custodial balance; a self-custodial account that
+   *  arrives here, by a link or a notification, has no part in it and is sent home. */
+  React.useEffect(() => {
+    if (!isEligible) navigation.dispatch(RESET_TO_HOME)
+  }, [isEligible, navigation])
+
+  /**
+   * An investor who already signed is not walked through the flow again: every way in,
+   * the home's cards, a link, a notification, lands here, and the screens beyond would
+   * let them sign a second agreement. A signed investment resumes at its payment, on the
+   * same stack the signing step leaves, whatever was open underneath. One whose payment
+   * has gone out goes back to the home instead: a paid one to its welcome, and one still
+   * on its way to the ledger check there, since the payment step would offer the same
+   * invoice again.
+   */
+  React.useEffect(() => {
+    if (!progress) return
+    if (hasNothingLeftToPay(progress)) {
+      navigation.dispatch(RESET_TO_HOME)
+      return
+    }
+    navigation.dispatch(
+      resetToTransferStep({
+        selectedAmountUsd: progress.selectedAmountUsd,
+        settlementSats: progress.settlementSats,
+      }),
+    )
+  }, [progress, navigation])
 
   const handleNext = () => {
     navigation.navigate("cardOnboardingCompanyValuationScreen")
   }
+
+  /**
+   * Until the account is known the record cannot be read, and a tap in that window
+   * would push the next screen over a welcome about to send the investor elsewhere. The
+   * account is asked of the network; when the answer does not come, the wait ends the
+   * way the signing step's does, with the reason and a way to ask again at once, rather
+   * than on the interval a failed fetch is retried on.
+   */
+  const isWaitingForAccount = isEligible && !isAccountResolved
+  const { hasGivenUp: hasGivenUpWaiting, startOver: waitAgain } =
+    useGivenUpWaiting(isWaitingForAccount)
+  const askForAccountAgain = () => {
+    refetchAccount()
+    waitAgain()
+  }
+  const isWaitingOut = isWaitingForAccount && !hasGivenUpWaiting
+  const isContinueDisabled = !isEligible || isWaitingOut
+  const continueTitle = hasGivenUpWaiting
+    ? LL.common.tryAgain()
+    : LL.CardFlow.Onboarding.WelcomeInvest.buttonText()
+  const handleContinue = hasGivenUpWaiting ? askForAccountAgain : handleNext
 
   return (
     <Screen headerShown={false}>
@@ -42,19 +99,26 @@ export const WelcomeInvestScreen: React.FC = () => {
           <Text type="p2" style={styles.bodyText}>
             {LL.CardFlow.Onboarding.WelcomeInvest.welcomeMessage.paragraphs.body2()}
           </Text>
+
+          {hasGivenUpWaiting ? (
+            <Text type="p2" style={styles.errorText}>
+              {LL.CardFlow.Onboarding.SignInvest.errors.networkError()}
+            </Text>
+          ) : null}
         </View>
       </ScrollView>
       <View style={styles.buttonsContainer}>
         <GaloyPrimaryButton
-          title={LL.CardFlow.Onboarding.WelcomeInvest.buttonText()}
-          onPress={handleNext}
+          title={continueTitle}
+          disabled={isContinueDisabled}
+          onPress={handleContinue}
         />
       </View>
     </Screen>
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
   scrollView: {
     flex: 1,
   },
@@ -68,6 +132,12 @@ const useStyles = makeStyles(() => ({
     gap: 22,
   },
   bodyText: {
+    lineHeight: 22,
+    textAlign: "left",
+    width: "100%",
+  },
+  errorText: {
+    color: colors.error,
     lineHeight: 22,
     textAlign: "left",
     width: "100%",

@@ -24,6 +24,7 @@ import KeyStoreWrapper, {
   type ReinstallSessionSlot,
 } from "@app/utils/storage/secureStorage"
 
+import { withCardInvestmentsPrunedForLogout } from "./card-investment"
 import {
   defaultPersistentState,
   migratePersistentState,
@@ -791,9 +792,18 @@ export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children 
     [],
   )
 
+  /**
+   * Besides the owed wipe, a logout keeps the card investments signed for: they are
+   * filed by server account id, so nothing of them can reach another user, and a signed
+   * agreement outlives the session that signed it. Pruned on the way through, so a paid
+   * one no longer carries its invoice.
+   */
   const resetState = React.useCallback(() => {
     hasModified.current = true
-    setPersistentState(resetKeepingOwedWipe)
+    setPersistentState((prev) => ({
+      ...resetKeepingOwedWipe(prev),
+      ...(prev ? withCardInvestmentsPrunedForLogout(prev) : {}),
+    }))
   }, [])
 
   const clearToken = React.useCallback(async (): Promise<boolean> => {

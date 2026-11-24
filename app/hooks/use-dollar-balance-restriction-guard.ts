@@ -1,6 +1,8 @@
 import { useEffect } from "react"
 
-import { CommonActions, useNavigation } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
+
+import { RESET_TO_HOME } from "@app/navigation/reset-to-home"
 
 import { useDollarBalanceGate } from "./use-dollar-balance-restricted"
 
@@ -17,6 +19,12 @@ export type DollarBalanceRestrictionGuard = {
   /** The verdict has not landed yet. Kept apart from the refusal because the two owe the
    *  user different things: a refusal owes them nothing, a wait owes them a loader. */
   isRegionPending: boolean
+  /** The gate's own answer, region or Anon, whatever `enabled` says: for a caller that
+   *  lets a restricted user through but only in the one direction the restriction
+   *  allows, and so has to know the answer, and whether it has landed, even with the
+   *  bounce switched off. */
+  isRestricted: boolean
+  isVerdictPending: boolean
 }
 
 export const useDollarBalanceRestrictionGuard = ({
@@ -29,11 +37,13 @@ export const useDollarBalanceRestrictionGuard = ({
 
   useEffect(() => {
     if (!shouldLeaveScreen) return
-    navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }))
+    navigation.dispatch(RESET_TO_HOME)
   }, [shouldLeaveScreen, navigation])
 
   return {
     isGated: shouldLeaveScreen,
     isRegionPending: enabled && isRegionPending,
+    isRestricted: isGated,
+    isVerdictPending: isRegionPending,
   }
 }

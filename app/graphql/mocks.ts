@@ -8,6 +8,7 @@ import {
   RealtimePriceUnauthedDocument,
   SendBitcoinWithdrawalLimitsDocument,
   SettingsScreenDocument,
+  CardInvestmentAccountDocument,
   WalletOverviewScreenDocument,
   DisplayCurrencyDocument,
   HomeAuthedDocument,
@@ -1802,6 +1803,33 @@ const mocks = [
             },
           ],
           __typename: "Globals",
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: CardInvestmentAccountDocument,
+    },
+    result: {
+      data: {
+        me: {
+          id: "70df9822-efe0-419c-b864-c9efa99872ea",
+          defaultAccount: {
+            id: "84b26b88-89b0-5c6f-9d3d-fbead08f79d8",
+            wallets: [
+              {
+                id: "f79792e3-282b-45d4-85d5-7486d020def5",
+                __typename: "BTCWallet",
+              },
+              {
+                id: "f091c102-6277-4cc6-8d81-87ebf6aaad1b",
+                __typename: "UsdWallet",
+              },
+            ],
+            __typename: "ConsumerAccount",
+          },
+          __typename: "User",
         },
       },
     },
