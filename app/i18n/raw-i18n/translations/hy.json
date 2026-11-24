@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Տարեկան վճար",
-          "subtitle": "Ազատված է առաջին տարվա համար քարտի թողարկման ամսաթվից",
-          "value": "{amount: string} / տարի"
+          "subtitle": "Blink քարտը տարեկան վճար չունի"
         },
         "cardReplacement": {
           "title": "Քարտի փոխարինում"

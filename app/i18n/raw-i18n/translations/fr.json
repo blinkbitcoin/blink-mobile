@@ -3237,8 +3237,7 @@
             "fees": {
                 "annualFee": {
                     "title": "Frais annuels",
-                    "subtitle": "Offerts la première année à compter de la date d'émission de la carte",
-                    "value": "{amount: string} / an"
+                    "subtitle": "La Blink Card n'a pas de frais annuels"
                 },
                 "cardReplacement": {
                     "title": "Remplacement de carte"

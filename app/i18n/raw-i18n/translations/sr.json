@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Годишња накнада",
-          "subtitle": "Ослобођена прве године од датума издавања картице",
-          "value": "{amount: string} / годишње"
+          "subtitle": "Blink Card нема годишњу накнаду"
         },
         "cardReplacement": {
           "title": "Замена картице"

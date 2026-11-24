@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "الرسوم السنوية",
-          "subtitle": "معفاة للسنة الأولى من تاريخ إصدار البطاقة",
-          "value": "{amount: string} / سنة"
+          "subtitle": "لا توجد رسوم سنوية على بطاقة Blink"
         },
         "cardReplacement": {
           "title": "استبدال البطاقة"

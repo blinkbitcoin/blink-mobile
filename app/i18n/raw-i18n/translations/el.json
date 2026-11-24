@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Ετήσια χρέωση",
-          "subtitle": "Απαλλάσσεται για το πρώτο έτος από την ημερομηνία έκδοσης της κάρτας",
-          "value": "{amount: string} / έτος"
+          "subtitle": "Η Blink Card δεν έχει ετήσια χρέωση"
         },
         "cardReplacement": {
           "title": "Αντικατάσταση κάρτας"

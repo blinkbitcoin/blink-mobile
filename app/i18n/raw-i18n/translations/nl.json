@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Jaarlijkse kosten",
-          "subtitle": "Kwijtgescholden voor het eerste jaar vanaf de uitgiftedatum van de kaart",
-          "value": "{amount: string} / jaar"
+          "subtitle": "Aan de Blink Card zijn geen jaarlijkse kosten verbonden"
         },
         "cardReplacement": {
           "title": "Kaartvervanging"

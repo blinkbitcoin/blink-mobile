@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Godišnja naknada",
-          "subtitle": "Oslobođena prve godine od datuma izdavanja kartice",
-          "value": "{amount: string} / godišnje"
+          "subtitle": "Blink kartica nema godišnju naknadu"
         },
         "cardReplacement": {
           "title": "Zamjena kartice"

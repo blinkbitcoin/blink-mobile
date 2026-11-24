@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Yuran tahunan",
-          "subtitle": "Dikecualikan untuk tahun pertama dari tarikh pengeluaran Kad",
-          "value": "{amount: string} / tahun"
+          "subtitle": "Kad Blink tiada yuran tahunan"
         },
         "cardReplacement": {
           "title": "Penggantian kad"

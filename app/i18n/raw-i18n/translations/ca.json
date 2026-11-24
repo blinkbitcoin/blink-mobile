@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Tarifa anual",
-          "subtitle": "Exempta el primer any des de la data d'emissió de la targeta",
-          "value": "{amount: string} / any"
+          "subtitle": "La Blink Card no té tarifa anual"
         },
         "cardReplacement": {
           "title": "Reemplaçament de targeta"

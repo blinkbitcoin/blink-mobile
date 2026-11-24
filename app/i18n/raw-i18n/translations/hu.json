@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Éves díj",
-          "subtitle": "Az első évben elengedve a kártya kibocsátásának dátumától",
-          "value": "{amount: string} / év"
+          "subtitle": "A Blink kártyának nincs éves díja"
         },
         "cardReplacement": {
           "title": "Kártyacsere"

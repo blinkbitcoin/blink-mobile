@@ -3237,8 +3237,7 @@
             "fees": {
                 "annualFee": {
                     "title": "Tarifa anual",
-                    "subtitle": "Isenta no primeiro ano a partir da data de emissão do Cartão",
-                    "value": "{amount: string} / ano"
+                    "subtitle": "O Cartão Blink não tem tarifa anual"
                 },
                 "cardReplacement": {
                     "title": "Substituição do cartão"

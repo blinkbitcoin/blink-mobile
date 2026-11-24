@@ -3237,8 +3237,7 @@
             "fees": {
                 "annualFee": {
                     "title": "Canone annuale",
-                    "subtitle": "Esente per il primo anno dalla data di emissione della Carta",
-                    "value": "{amount: string} / anno"
+                    "subtitle": "La Blink Card non ha alcun canone annuale"
                 },
                 "cardReplacement": {
                     "title": "Sostituzione della carta"

@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Biaya tahunan",
-          "subtitle": "Dibebaskan untuk tahun pertama sejak tanggal penerbitan Kartu",
-          "value": "{amount: string} / tahun"
+          "subtitle": "Blink Card tidak memiliki biaya tahunan"
         },
         "cardReplacement": {
           "title": "Penggantian kartu"

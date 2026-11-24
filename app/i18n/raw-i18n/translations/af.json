@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Jaarlikse fooi",
-          "subtitle": "Kwytgeskeld vir die eerste jaar vanaf die datum van kaartuitreiking",
-          "value": "{amount: string} / jaar"
+          "subtitle": "Die Blink-kaart het geen jaarlikse fooi nie"
         },
         "cardReplacement": {
           "title": "Kaartvervanging"

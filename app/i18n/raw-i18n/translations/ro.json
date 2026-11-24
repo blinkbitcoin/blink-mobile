@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Taxă anuală",
-          "subtitle": "Scutită în primul an de la data emiterii cardului",
-          "value": "{amount: string} / an"
+          "subtitle": "Blink Card nu are taxă anuală"
         },
         "cardReplacement": {
           "title": "Înlocuirea cardului"

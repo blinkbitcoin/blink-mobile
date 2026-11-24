@@ -3237,8 +3237,7 @@
             "fees": {
                 "annualFee": {
                     "title": "Jahresgebühr",
-                    "subtitle": "Im ersten Jahr ab dem Ausstellungsdatum der Karte erlassen",
-                    "value": "{amount: string} / Jahr"
+                    "subtitle": "Für die Blink Card fällt keine Jahresgebühr an"
                 },
                 "cardReplacement": {
                     "title": "Kartenersatz"

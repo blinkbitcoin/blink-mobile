@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Watapaq pagana",
-          "subtitle": "Ñawpaq watapi mana pagana tarjeta qusqan p'unchawmanta",
-          "value": "{amount: string} / wata"
+          "subtitle": "Blink tarjetaqa mana watapaq paganayuqchu"
         },
         "cardReplacement": {
           "title": "Tarjeta rantipuy"

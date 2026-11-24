@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Ada ya mwaka",
-          "subtitle": "Imesamehewa mwaka wa kwanza kuanzia tarehe ya kutolewa kwa Kadi",
-          "value": "{amount: string} / mwaka"
+          "subtitle": "Blink Card haina ada ya mwaka"
         },
         "cardReplacement": {
           "title": "Kubadilisha kadi"

@@ -3405,8 +3405,7 @@ const en: BaseTranslation = {
       fees: {
         annualFee: {
           title: "Annual fee",
-          subtitle: "Waived for the first year from the date of Card issuance",
-          value: "{amount: string} / year",
+          subtitle: "The Blink Card has no annual fee",
         },
         cardReplacement: {
           title: "Card Replacement",

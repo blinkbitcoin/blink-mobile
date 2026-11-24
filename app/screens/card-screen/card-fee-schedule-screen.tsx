@@ -13,6 +13,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { toUsdMoneyAmount } from "@app/types/amounts"
 import { openExternalUrl } from "@app/utils/external"
 import { staticSurface } from "@app/rne-theme/surfaces"
 import { groupTitleGap } from "@app/rne-theme/tokens"
@@ -66,9 +67,8 @@ export const CardFeeScheduleScreen: React.FC = () => {
   const { fees, sections, btcConversion, feesUpdateNotice, additionalDetails } =
     feeSchedule
 
-  const { formatCurrency } = useDisplayCurrency()
+  const { formatCurrency, formatMoneyAmount } = useDisplayCurrency()
   const {
-    cardSubscriptionPriceUsd,
     cardReplacementFeeUsd,
     cardUsdTransactionFeePercent,
     cardForeignTransactionFeePercent,
@@ -80,7 +80,12 @@ export const CardFeeScheduleScreen: React.FC = () => {
   const formatUsd = (amountInMajorUnits: number) =>
     formatCurrency({ amountInMajorUnits, currency: WalletCurrency.Usd })
 
-  const annualFeeAmount = formatUsd(cardSubscriptionPriceUsd)
+  /** The card has no annual fee; the membership, if it ever costs anything, is billed
+   *  apart and is not part of this schedule. */
+  const annualFeeAmount = formatMoneyAmount({
+    moneyAmount: toUsdMoneyAmount(0),
+    noFractionDigits: true,
+  })
   const cardReplacementAmount = formatUsd(cardReplacementFeeUsd)
   const usdTransactionFeeAmount = `${cardUsdTransactionFeePercent}%`
   const foreignTransactionFeeAmount = `${cardForeignTransactionFeePercent}%`
@@ -93,7 +98,7 @@ export const CardFeeScheduleScreen: React.FC = () => {
     {
       title: fees.annualFee.title(),
       subtitle: fees.annualFee.subtitle(),
-      value: fees.annualFee.value({ amount: annualFeeAmount }),
+      value: annualFeeAmount,
     },
     {
       title: fees.cardReplacement.title(),

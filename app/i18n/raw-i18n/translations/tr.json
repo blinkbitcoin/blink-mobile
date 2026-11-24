@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Yıllık ücret",
-          "subtitle": "Kartın verildiği tarihten itibaren ilk yıl için muaf",
-          "value": "{amount: string} / yıl"
+          "subtitle": "Blink Kart için yıllık ücret alınmaz"
         },
         "cardReplacement": {
           "title": "Kart değişimi"

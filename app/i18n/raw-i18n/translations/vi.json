@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Phí thường niên",
-          "subtitle": "Được miễn trong năm đầu tiên kể từ ngày phát hành Thẻ",
-          "value": "{amount: string} / năm"
+          "subtitle": "Thẻ Blink không có phí thường niên"
         },
         "cardReplacement": {
           "title": "Thay thế thẻ"

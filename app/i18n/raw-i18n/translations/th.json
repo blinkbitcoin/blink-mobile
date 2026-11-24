@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "ค่าธรรมเนียมรายปี",
-          "subtitle": "ยกเว้นในปีแรกนับจากวันที่ออกบัตร",
-          "value": "{amount: string} / ปี"
+          "subtitle": "บัตร Blink ไม่มีค่าธรรมเนียมรายปี"
         },
         "cardReplacement": {
           "title": "การเปลี่ยนบัตร"

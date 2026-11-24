@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Intlawulo yonyaka",
-          "subtitle": "Ixolelwe unyaka wokuqala ukususela kumhla wokukhutshwa kweKhadi",
-          "value": "{amount: string} / ngonyaka"
+          "subtitle": "iKhadi le-Blink alinayo intlawulo yonyaka"
         },
         "cardReplacement": {
           "title": "Ukutshintshwa kwekhadi"

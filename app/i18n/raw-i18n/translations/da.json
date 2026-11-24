@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Årligt gebyr",
-          "subtitle": "Frafaldes det første år fra datoen for kortudstedelse",
-          "value": "{amount: string} / år"
+          "subtitle": "Blink-kortet har intet årligt gebyr"
         },
         "cardReplacement": {
           "title": "Kortudskiftning"

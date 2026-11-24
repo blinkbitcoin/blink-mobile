@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Ekisale ky'omwaka",
-          "subtitle": "Kisonyiyiddwa omwaka ogusooka okuva ku lunaku kaadi lwe yaweebwa",
-          "value": "{amount: string} / omwaka"
+          "subtitle": "Kaadi ya Blink terina kisale kya mwaka"
         },
         "cardReplacement": {
           "title": "Okuzza kaadi"

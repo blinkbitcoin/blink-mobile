@@ -10858,14 +10858,9 @@ type RootTranslation = {
 					 */
 					title: string
 					/**
-					 * W​a​i​v​e​d​ ​f​o​r​ ​t​h​e​ ​f​i​r​s​t​ ​y​e​a​r​ ​f​r​o​m​ ​t​h​e​ ​d​a​t​e​ ​o​f​ ​C​a​r​d​ ​i​s​s​u​a​n​c​e
+					 * T​h​e​ ​B​l​i​n​k​ ​C​a​r​d​ ​h​a​s​ ​n​o​ ​a​n​n​u​a​l​ ​f​e​e
 					 */
 					subtitle: string
-					/**
-					 * {​a​m​o​u​n​t​}​ ​/​ ​y​e​a​r
-					 * @param {string} amount
-					 */
-					value: RequiredParams<'amount'>
 				}
 				cardReplacement: {
 					/**
@@ -25241,13 +25236,9 @@ export type TranslationFunctions = {
 					 */
 					title: () => LocalizedString
 					/**
-					 * Waived for the first year from the date of Card issuance
+					 * The Blink Card has no annual fee
 					 */
 					subtitle: () => LocalizedString
-					/**
-					 * {amount} / year
-					 */
-					value: (arg: { amount: string }) => LocalizedString
 				}
 				cardReplacement: {
 					/**

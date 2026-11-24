@@ -39,6 +39,13 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   useDisplayCurrency: () => ({
     formatCurrency: ({ amountInMajorUnits }: { amountInMajorUnits: number }) =>
       `$${amountInMajorUnits}`,
+    formatMoneyAmount: ({
+      moneyAmount,
+      noFractionDigits,
+    }: {
+      moneyAmount: { amount: number }
+      noFractionDigits?: boolean
+    }) => `$${(moneyAmount.amount / 100).toFixed(noFractionDigits ? 0 : 2)}`,
   }),
 }))
 
@@ -74,8 +81,10 @@ describe("CardFeeScheduleScreen", () => {
     expect(getByText("Overdraft (funded mode)")).toBeTruthy()
   })
 
-  it("renders the annual fee with the injected amount", async () => {
-    const { getByText } = render(
+  /** The membership price in the mock is 1000: the card itself has no annual fee, and
+   *  the membership is not part of this schedule. */
+  it("says the card has no annual fee, whatever the membership costs", async () => {
+    const { getByText, queryByText } = render(
       <ContextForScreen>
         <CardFeeScheduleScreen />
       </ContextForScreen>,
@@ -84,7 +93,10 @@ describe("CardFeeScheduleScreen", () => {
     await flushEffects()
 
     expect(getByText("Annual fee")).toBeTruthy()
-    expect(getByText("$1000 / year")).toBeTruthy()
+    expect(getByText("The Blink Card has no annual fee")).toBeTruthy()
+    expect(getByText("$0")).toBeTruthy()
+    expect(queryByText(/\/ year/)).toBeNull()
+    expect(queryByText(/Waived for the first year/)).toBeNull()
   })
 
   it("renders every fee amount", async () => {

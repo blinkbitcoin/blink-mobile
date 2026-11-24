@@ -3269,8 +3269,7 @@
       "fees": {
         "annualFee": {
           "title": "Ročný poplatok",
-          "subtitle": "Odpustený na prvý rok od dátumu vydania karty",
-          "value": "{amount: string} / rok"
+          "subtitle": "Blink Card nemá žiadny ročný poplatok"
         },
         "cardReplacement": {
           "title": "Výmena karty"
