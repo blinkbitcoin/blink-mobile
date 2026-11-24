@@ -1,9 +1,18 @@
 import React from "react"
 import { Text, TouchableOpacity } from "react-native"
+import { type PanGesture, State } from "react-native-gesture-handler"
+import {
+  fireGestureHandler,
+  getByGestureTestId,
+} from "react-native-gesture-handler/jest-utils"
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 import { useNavigation } from "@react-navigation/native"
 
 import { ConversionConfirmationScreen } from "@app/screens/conversion-flow"
+import {
+  SLIDER_PAN_TEST_ID,
+  SLIDER_TRACK_TEST_ID,
+} from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 import { HomeAuthedDocument, WalletCurrency } from "@app/graphql/generated"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -680,7 +689,7 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
     })
 
     // requote() returns at once, so isLoading never turns on between the two swipes.
-    it("re-quotes again on a second swipe after a requote", async () => {
+    const renderRequoting = () => {
       const requoteMock = jest.fn()
       mockSelfCustodialConversion.mockReturnValue({
         isQuoting: false,
@@ -711,6 +720,40 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
           />
         </ContextForScreen>,
       )
+      return requoteMock
+    }
+
+    it("re-quotes again on a second drag after a requote", async () => {
+      const requoteMock = renderRequoting()
+      fireEvent(screen.getByTestId(SLIDER_TRACK_TEST_ID), "layout", {
+        nativeEvent: { layout: { width: 350, height: 60, x: 0, y: 0 } },
+      })
+      // Gesture handler applies the new width on its next setImmediate.
+      await act(
+        () =>
+          new Promise((resolve) => {
+            setImmediate(resolve)
+          }),
+      )
+
+      const drag = () =>
+        act(async () => {
+          fireGestureHandler<PanGesture>(getByGestureTestId(SLIDER_PAN_TEST_ID), [
+            { state: State.BEGAN, translationX: 0 },
+            { state: State.ACTIVE, translationX: 0 },
+            { state: State.ACTIVE, translationX: 290 },
+            { state: State.END, translationX: 290 },
+          ])
+        })
+
+      await drag()
+      await drag()
+
+      expect(requoteMock).toHaveBeenCalledTimes(2)
+    })
+
+    it("re-quotes again on a second activate after a requote", async () => {
+      const requoteMock = renderRequoting()
 
       // A screen reader's activate commits the same way a full slide does.
       const activate = () =>

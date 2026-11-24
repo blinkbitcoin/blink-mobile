@@ -2386,7 +2386,6 @@ const en: BaseTranslation = {
     priceUpdated: "The price moved, so the amounts were updated. Check them before you send.",
     paymentAlreadyAttempted:
       "Payment already attempted.\n\nIf you want to send this payment again, start from scratch.",
-    slideToConfirm: "Slide to Confirm",
     slideConfirming: "Confirming...",
     slideToSend: "Slide to send",
     calculatingFee: "Calculating fee…",

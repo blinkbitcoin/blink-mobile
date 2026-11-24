@@ -2359,7 +2359,6 @@
         "somethingWentWrong": "エラーが発生しました",
         "priceUpdated": "価格が変動したため、金額を更新しました。送金前にご確認ください。",
         "paymentAlreadyAttempted": "支払いは既に試行済みです。\n\nこの支払いを再度送信する場合は、最初からやり直してください。",
-        "slideToConfirm": "スライドして確認",
         "slideConfirming": "確認中...",
         "slideToSend": "スライドして送金",
         "calculatingFee": "手数料を計算中…",
