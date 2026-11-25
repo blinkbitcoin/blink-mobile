@@ -484,6 +484,61 @@ const readTwoFactorThresholds = (): TwoFactorThresholds => {
   return defaultTwoFactorThresholds
 }
 
+const DELIVERY_FIELDS = ["minDays", "maxDays", "priceUsd"] as const
+
+const isUsableDeliveryNumber = (value: unknown): value is number =>
+  typeof value === "number" && Number.isFinite(value) && value >= 0
+
+const isPlainRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value)
+
+/** The courier as the console sets it, field by field over the shipped one: a field
+ *  that is not a finite number of zero or more keeps its shipped value, and days out of
+ *  order keep the shipped days. The order and the replacement render these numbers, so a
+ *  partial or malformed console value must never reach them. A console value with no
+ *  courier at all is an older shape and keeps the shipped courier quietly; anything it
+ *  gets wrong is reported. */
+const readReplaceCardDeliveryConfig = (): ReplaceCardDeliveryConfig => {
+  const value = getRemoteConfigObject<Record<string, unknown>>(
+    ReplaceCardDeliveryConfigKey,
+    defaultReplaceCardDeliveryConfig,
+  )
+  const shipped = defaultReplaceCardDeliveryConfig.courier
+  if (!("courier" in value)) return defaultReplaceCardDeliveryConfig
+
+  const consoleCourier = value.courier
+  const fields = isPlainRecord(consoleCourier) ? consoleCourier : {}
+
+  const rejected: string[] = isPlainRecord(consoleCourier) ? [] : ["courier"]
+  const courier = { ...shipped }
+  DELIVERY_FIELDS.forEach((field) => {
+    if (!(field in fields)) return
+    const fieldValue = fields[field]
+    if (isUsableDeliveryNumber(fieldValue)) {
+      courier[field] = fieldValue
+    } else {
+      rejected.push(field)
+    }
+  })
+
+  const areDaysOutOfOrder = courier.minDays > courier.maxDays
+  if (areDaysOutOfOrder) {
+    courier.minDays = shipped.minDays
+    courier.maxDays = shipped.maxDays
+    rejected.push("days out of order")
+  }
+
+  if (rejected.length > 0) {
+    logError({
+      scope: "remote-config",
+      error: new Error(`Rejected parts of "${ReplaceCardDeliveryConfigKey}"`),
+      context: { key: ReplaceCardDeliveryConfigKey, rejected, value },
+      dedupKey: "remote-config-replace-card-delivery",
+    })
+  }
+  return { courier }
+}
+
 /**
  * Reads the config Firebase has activated: the values of the last fetch, persisted
  * on the device, or the shipped defaults before any fetch. Read at the first render
@@ -660,15 +715,7 @@ const readRemoteConfig = (): RemoteConfig => {
     defaultRemoteConfig.autoConvertAmountMatchToleranceBps,
   )
 
-  const parsedDeliveryConfig = getRemoteConfigObject<Partial<ReplaceCardDeliveryConfig>>(
-    ReplaceCardDeliveryConfigKey,
-    {},
-  )
-
-  const replaceCardDeliveryConfig: ReplaceCardDeliveryConfig = {
-    ...defaultReplaceCardDeliveryConfig,
-    ...parsedDeliveryConfig,
-  }
+  const replaceCardDeliveryConfig = readReplaceCardDeliveryConfig()
 
   const custodialFirstSignupBlockedCountries = getRemoteConfigStringList(
     CustodialFirstSignupBlockedCountriesKey,
