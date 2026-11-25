@@ -46,8 +46,8 @@ describe("useCardBalance", () => {
 
     const { result } = renderHook(() => useCardBalance("card-1"))
 
-    expect(result.current.balancePrimary).toBe("~ $100.00")
-    expect(result.current.balanceSecondary).toBe("0.0015 BTC")
+    expect(result.current.balancePrimary).toBe("0.0015 BTC")
+    expect(result.current.balanceSecondary).toBe("~ $100.00")
   })
 
   it("returns empty strings when display functions return null", () => {

@@ -94,8 +94,8 @@ const defaultCardData = {
 }
 
 const defaultBalance = {
-  balancePrimary: "$100.00",
-  balanceSecondary: "~ 0.0015 BTC",
+  balancePrimary: "150,000 SAT",
+  balanceSecondary: "~ $100.00",
   loading: false,
   error: undefined,
 }
@@ -252,8 +252,8 @@ describe("CardDashboardScreen", () => {
 
       await act(async () => {})
 
-      expect(getByText("$100.00")).toBeTruthy()
-      expect(getByText("~ 0.0015 BTC")).toBeTruthy()
+      expect(getByText("150,000 SAT")).toBeTruthy()
+      expect(getByText("~ $100.00")).toBeTruthy()
     })
 
     it("displays all action buttons", async () => {
@@ -609,7 +609,7 @@ describe("CardDashboardScreen", () => {
       await act(async () => {})
 
       expect(getByText("•••• •••• •••• 4242")).toBeTruthy()
-      expect(getByText("$100.00")).toBeTruthy()
+      expect(getByText("150,000 SAT")).toBeTruthy()
       expect(getByText("Details")).toBeTruthy()
       expect(getByText("Transactions")).toBeTruthy()
       expect(getByText("Coffee Shop")).toBeTruthy()

@@ -144,7 +144,7 @@ const CardDashboardScreenContent: React.FC = () => {
         />
 
         <CardBalanceSection
-          balanceUsd={balancePrimary}
+          balancePrimary={balancePrimary}
           balanceSecondary={balanceSecondary}
           isDisabled={isFrozen}
           onAddFunds={() => console.log("Add funds pressed")}
