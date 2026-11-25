@@ -3502,13 +3502,26 @@
       "CardApproved": {
         "title": "Geluk!",
         "subtitle": "Jou Blink Visa-kaart is geaktiveer.",
-        "buttonLabel": "Bestel fisiese kaart",
-        "buttonLabelDashboard": "Kontrolepaneel"
+        "buttonLabel": "Bestel fisiese kaart"
       },
       "PhysicalCardOrdered": {
         "title": "Jou fisiese kaart is op pad!",
         "subtitle": "Bestelling vir aflewering van jou Blink-kaart is ingedien.",
         "buttonLabel": "Skep PIN"
+      }
+    },
+    "Activation": {
+      "skipForNow": "Slaan vir eers oor",
+      "OrderOffer": {
+        "subtitle": "Laat jou Blink Card aflewer by enige adres van jou keuse."
+      },
+      "TopUp": {
+        "title": "Laai jou kaart op",
+        "subtitle": "Voeg nou fondse by, of later.",
+        "fromBalance": "Van jou Bitcoin- of Dollar-saldo",
+        "deposit": "Deponeer in jou kaartsaldo",
+        "topUpNow": "Laai nou op",
+        "skip": "Slaan oplaai oor"
       }
     },
     "ShippingAddress": {

@@ -3502,13 +3502,26 @@
       "CardApproved": {
         "title": "Tahniah!",
         "subtitle": "Kad Blink Visa anda telah diaktifkan.",
-        "buttonLabel": "Pesan kad fizikal",
-        "buttonLabelDashboard": "Papan Pemuka"
+        "buttonLabel": "Pesan kad fizikal"
       },
       "PhysicalCardOrdered": {
         "title": "Kad fizikal anda sedang dalam perjalanan!",
         "subtitle": "Pesanan untuk penghantaran kad Blink anda telah dihantar.",
         "buttonLabel": "Cipta PIN"
+      }
+    },
+    "Activation": {
+      "skipForNow": "Langkau buat masa ini",
+      "OrderOffer": {
+        "subtitle": "Dapatkan Blink Card anda dihantar ke mana-mana alamat pilihan anda."
+      },
+      "TopUp": {
+        "title": "Tambah nilai kad anda",
+        "subtitle": "Tambah dana sekarang, atau kemudian.",
+        "fromBalance": "Daripada baki Bitcoin atau Dolar anda",
+        "deposit": "Deposit ke baki kad anda",
+        "topUpNow": "Tambah nilai sekarang",
+        "skip": "Langkau tambah nilai"
       }
     },
     "ShippingAddress": {

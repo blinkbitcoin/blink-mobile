@@ -127,7 +127,9 @@ import {
   CardSettingsScreen,
   CardShippingAddressScreen,
   CardStatementsScreen,
+  CardOrderOfferScreen,
   CardStatusScreen,
+  CardTopUpScreen,
   CardTransactionDetailsScreen,
 } from "@app/screens/card-screen"
 import {
@@ -1079,7 +1081,20 @@ export const RootStack = () => {
         component={CardApprovedScreen}
         options={{
           title: LL.CardFlow.CardStatus.title(),
-          ...headerCloseControlOptions(),
+          ...headerCloseControlOptions({ shouldPopTo: true }),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardActivationOrderOfferScreen"
+        component={CardOrderOfferScreen}
+        options={{ title: LL.CardFlow.CardStatus.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardActivationTopUpScreen"
+        component={CardTopUpScreen}
+        options={{
+          title: "",
+          ...headerCloseControlOptions({ shouldPopTo: true }),
         }}
       />
       <RootNavigator.Screen
