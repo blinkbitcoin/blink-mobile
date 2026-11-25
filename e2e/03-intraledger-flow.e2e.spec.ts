@@ -92,16 +92,18 @@ describe("Username Payment Flow", () => {
     const btcWalletBalance = await $(selector("BTC Wallet Balance", "StaticText"))
     await btcWalletBalance.waitForDisplayed({ timeout })
     expect(btcWalletBalance).toBeDisplayed()
-    const btcWalletBalanceInUsdValue = await btcWalletBalance.getText()
-    expect(btcWalletBalanceInUsdValue).toHaveText(
-      new RegExp(
-        "^\\$\\d{1,3}(,\\d{3})*(\\.\\d{1,2})?\\s\\(\\d{1,3}(,\\d{3})*\\ssats\\)$",
-      ),
+    // The card reads the wallet's own currency first, the display currency under it.
+    expect(btcWalletBalance).toHaveText(/^\d{1,3}(,\d{3})* SAT$/)
+    const btcWalletBalanceInDisplayCurrency = await $(
+      selector("send-wallet-balance-secondary", "StaticText"),
+    )
+    expect(btcWalletBalanceInDisplayCurrency).toHaveText(
+      /^~ \$\d{1,3}(,\d{3})*(\.\d{1,2})?$/,
     )
   })
 
   it("Add amount", async () => {
-    await addSmallAmount(LL)
+    await addSmallAmount()
   })
 
   it("Click Next again", async () => {
@@ -109,7 +111,7 @@ describe("Username Payment Flow", () => {
   })
 
   it("Slides to confirm payment and get Green Checkmark success", async () => {
-    await swipeButton(LL.SendBitcoinConfirmationScreen.slideToSend())
+    await swipeButton(LL.SendBitcoinConfirmationScreen.slideToConfirm())
   })
 
   it("Clicks on not enjoying app", async () => {
@@ -146,7 +148,7 @@ describe("Conversion Flow", () => {
   })
 
   it("Add amount", async () => {
-    await addSmallAmount(LL)
+    await addSmallAmount()
   })
 
   it("Click Next", async () => {
