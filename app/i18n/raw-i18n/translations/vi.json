@@ -3390,7 +3390,7 @@
       "time": "Thời gian",
       "transactionId": "ID",
       "cardUsed": "Thẻ sử dụng",
-      "cardUsedValue": "Visa •••• {lastFour}",
+      "cardUsedValue": "Thẻ Blink •••• {lastFour}",
       "paymentMethod": "Phương thức thanh toán",
       "merchantInformation": "Thông tin đơn vị",
       "merchant": "Đơn vị",

@@ -3390,7 +3390,7 @@
       "time": "Obudde",
       "transactionId": "ID",
       "cardUsed": "Kaadi eyakozesebwa",
-      "cardUsedValue": "Visa •••• {lastFour}",
+      "cardUsedValue": "Kaadi ya Blink •••• {lastFour}",
       "paymentMethod": "Enkola y'okusasula",
       "merchantInformation": "Ebikwata ku musuubuzi",
       "merchant": "Omusuubuzi",

@@ -3390,7 +3390,7 @@
       "time": "Waktu",
       "transactionId": "ID",
       "cardUsed": "Kartu yang digunakan",
-      "cardUsedValue": "Visa •••• {lastFour}",
+      "cardUsedValue": "Blink Card •••• {lastFour}",
       "paymentMethod": "Metode pembayaran",
       "merchantInformation": "Informasi merchant",
       "merchant": "Merchant",

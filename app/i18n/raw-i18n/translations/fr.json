@@ -3390,7 +3390,7 @@
             "time": "Heure",
             "transactionId": "ID",
             "cardUsed": "Carte utilisée",
-            "cardUsedValue": "Visa •••• {lastFour}",
+            "cardUsedValue": "Blink Card •••• {lastFour}",
             "paymentMethod": "Mode de paiement",
             "merchantInformation": "Informations du commerçant",
             "merchant": "Commerçant",

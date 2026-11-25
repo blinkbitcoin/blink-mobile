@@ -3390,7 +3390,7 @@
       "time": "Ixesha",
       "transactionId": "ID",
       "cardUsed": "Ikhadi elisetyenzisiweyo",
-      "cardUsedValue": "Visa •••• {lastFour}",
+      "cardUsedValue": "Ikhadi le-Blink •••• {lastFour}",
       "paymentMethod": "Indlela yokuhlawula",
       "merchantInformation": "Ulwazi lomrhwebi",
       "merchant": "Umrhwebi",

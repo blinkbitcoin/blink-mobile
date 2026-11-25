@@ -3390,7 +3390,7 @@
       "time": "الوقت",
       "transactionId": "المعرف",
       "cardUsed": "البطاقة المستخدمة",
-      "cardUsedValue": "Visa •••• {lastFour}",
+      "cardUsedValue": "بطاقة Blink •••• {lastFour}",
       "paymentMethod": "طريقة الدفع",
       "merchantInformation": "معلومات التاجر",
       "merchant": "التاجر",

@@ -3390,7 +3390,7 @@
       "time": "Ώρα",
       "transactionId": "ID",
       "cardUsed": "Κάρτα που χρησιμοποιήθηκε",
-      "cardUsedValue": "Visa •••• {lastFour}",
+      "cardUsedValue": "Blink Card •••• {lastFour}",
       "paymentMethod": "Μέθοδος πληρωμής",
       "merchantInformation": "Πληροφορίες εμπόρου",
       "merchant": "Έμπορος",

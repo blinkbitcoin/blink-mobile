@@ -3390,7 +3390,7 @@
       "time": "Vrijeme",
       "transactionId": "ID",
       "cardUsed": "Korištena kartica",
-      "cardUsedValue": "Visa •••• {lastFour}",
+      "cardUsedValue": "Blink kartica •••• {lastFour}",
       "paymentMethod": "Način plaćanja",
       "merchantInformation": "Informacije o trgovcu",
       "merchant": "Trgovac",

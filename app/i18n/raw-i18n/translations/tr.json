@@ -3390,7 +3390,7 @@
       "time": "Zaman",
       "transactionId": "ID",
       "cardUsed": "Kullanılan kart",
-      "cardUsedValue": "Visa •••• {lastFour}",
+      "cardUsedValue": "Blink Kartı •••• {lastFour}",
       "paymentMethod": "Ödeme yöntemi",
       "merchantInformation": "Satıcı bilgileri",
       "merchant": "Satıcı",

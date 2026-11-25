@@ -3649,7 +3649,7 @@ const en: BaseTranslation = {
       time: "Time",
       transactionId: "ID",
       cardUsed: "Card used",
-      cardUsedValue: "Visa •••• {lastFour: string}",
+      cardUsedValue: "Blink Card •••• {lastFour: string}",
       paymentMethod: "Payment method",
       merchantInformation: "Merchant information",
       merchant: "Merchant",

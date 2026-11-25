@@ -3390,7 +3390,7 @@
       "time": "Ora",
       "transactionId": "ID",
       "cardUsed": "Card folosit",
-      "cardUsedValue": "Visa •••• {lastFour}",
+      "cardUsedValue": "Blink Card •••• {lastFour}",
       "paymentMethod": "Metodă de plată",
       "merchantInformation": "Informații comerciant",
       "merchant": "Comerciant",

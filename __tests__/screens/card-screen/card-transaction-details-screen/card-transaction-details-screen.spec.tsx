@@ -500,7 +500,7 @@ describe("CardTransactionDetailsScreen", () => {
     it("names the card used by its last four digits", async () => {
       const { getByText } = await renderTransaction(detailedTransaction)
 
-      expect(getByText("Visa •••• 4242")).toBeTruthy()
+      expect(getByText("Blink Card •••• 4242")).toBeTruthy()
     })
 
     it("names no card when opened from a link, which carries none", async () => {
@@ -508,8 +508,8 @@ describe("CardTransactionDetailsScreen", () => {
 
       const { queryByText } = await renderTransaction(detailedTransaction)
 
-      expect(queryByText("Visa •••• 4242")).toBeNull()
-      expect(queryByText("Visa •••• 2121")).toBeNull()
+      expect(queryByText("Blink Card •••• 4242")).toBeNull()
+      expect(queryByText("Blink Card •••• 2121")).toBeNull()
     })
 
     it("shows the enriched category, the city and country, and the MCC", async () => {

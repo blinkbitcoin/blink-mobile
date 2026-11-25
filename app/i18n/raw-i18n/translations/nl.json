@@ -3390,7 +3390,7 @@
       "time": "Tijd",
       "transactionId": "ID",
       "cardUsed": "Gebruikte kaart",
-      "cardUsedValue": "Visa •••• {lastFour}",
+      "cardUsedValue": "Blink Card •••• {lastFour}",
       "paymentMethod": "Betaalmethode",
       "merchantInformation": "Handelaarinformatie",
       "merchant": "Handelaar",

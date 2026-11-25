@@ -3390,7 +3390,7 @@
       "time": "Tid",
       "transactionId": "ID",
       "cardUsed": "Anvendt kort",
-      "cardUsedValue": "Visa •••• {lastFour}",
+      "cardUsedValue": "Blink-kort •••• {lastFour}",
       "paymentMethod": "Betalingsmetode",
       "merchantInformation": "Forhandleroplysninger",
       "merchant": "Forhandler",

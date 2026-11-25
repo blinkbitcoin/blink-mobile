@@ -3390,7 +3390,7 @@
       "time": "Idő",
       "transactionId": "ID",
       "cardUsed": "Használt kártya",
-      "cardUsedValue": "Visa •••• {lastFour}",
+      "cardUsedValue": "Blink kártya •••• {lastFour}",
       "paymentMethod": "Fizetési mód",
       "merchantInformation": "Kereskedő információ",
       "merchant": "Kereskedő",

@@ -11647,7 +11647,7 @@ type RootTranslation = {
 			 */
 			cardUsed: string
 			/**
-			 * V​i​s​a​ ​•​•​•​•​ ​{​l​a​s​t​F​o​u​r​}
+			 * B​l​i​n​k​ ​C​a​r​d​ ​•​•​•​•​ ​{​l​a​s​t​F​o​u​r​}
 			 * @param {string} lastFour
 			 */
 			cardUsedValue: RequiredParams<'lastFour'>
@@ -25921,7 +25921,7 @@ export type TranslationFunctions = {
 			 */
 			cardUsed: () => LocalizedString
 			/**
-			 * Visa •••• {lastFour}
+			 * Blink Card •••• {lastFour}
 			 */
 			cardUsedValue: (arg: { lastFour: string }) => LocalizedString
 			/**
