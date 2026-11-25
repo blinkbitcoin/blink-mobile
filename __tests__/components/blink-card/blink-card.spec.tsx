@@ -1,5 +1,5 @@
 import React from "react"
-import { Text as RNText, View } from "react-native"
+import { Dimensions, StyleSheet, Text as RNText, View } from "react-native"
 import { render } from "@testing-library/react-native"
 
 import { BlinkCard } from "@app/components/blink-card/blink-card"
@@ -8,17 +8,11 @@ jest.mock("@react-native-community/blur", () => ({
   BlurView: "BlurView",
 }))
 
-jest.mock("react-native-linear-gradient", () => ({
-  LinearGradient: ({ children }: { children: React.ReactNode }) => (
-    <View>{children}</View>
-  ),
-}))
-
 jest.mock("@app/hooks/use-card-holder", () => ({
   useCardHolder: () => ({
     firstName: "",
     lastName: "",
-    fullName: "",
+    fullName: "Satoshi Test",
     loading: false,
   }),
 }))
@@ -40,8 +34,7 @@ jest.mock("@rn-vui/themed", () => ({
   useTheme: () => ({
     theme: {
       colors: {
-        staticBrandYellow: "#F7931A",
-        staticBrandSunset: "#FF9500",
+        staticCardBackground: "#FF6418",
         staticWhite: "#FFFFFF",
         staticBlack: "#000000",
         error: "#FF0000",
@@ -52,8 +45,8 @@ jest.mock("@rn-vui/themed", () => ({
     cardWrapper: {},
     card: {},
     topRow: {},
+    visaLogo: {},
     cardNumber: {},
-    cardNumberSpacer: {},
     bottomRow: {},
     holderName: {},
     validThruContainer: {},
@@ -118,6 +111,29 @@ describe("BlinkCard", () => {
     })
   })
 
+  /** A percentage `top` resolves against the card's height minus its padding, which put
+   *  the number above the middle; the design has it start at exactly half the height. */
+  describe("card number position", () => {
+    it("starts the number at half the card's height", () => {
+      const { getByText } = renderWithProviders(<BlinkCard {...defaultProps} />)
+      const cardWidth = Math.min(Dimensions.get("window").width - 40, 400)
+
+      expect(
+        StyleSheet.flatten(getByText("•••• •••• •••• 4242").props.style),
+      ).toMatchObject({ top: cardWidth / 1.584 / 2 })
+    })
+  })
+
+  /** A larger accessibility font would otherwise wrap the number onto a second line,
+   *  out of the card. */
+  it("keeps the number on one line", () => {
+    const { getByText } = renderWithProviders(<BlinkCard {...defaultProps} />)
+    const number = getByText("•••• •••• •••• 4242")
+
+    expect(number.props.numberOfLines).toBe(1)
+    expect(number.props.adjustsFontSizeToFit).toBe(true)
+  })
+
   describe("rendering with showCardDetails", () => {
     it("displays full card number when showCardDetails is true", () => {
       const { getByText } = renderWithProviders(
@@ -139,6 +155,49 @@ describe("BlinkCard", () => {
       )
 
       expect(getByText("12/ 28")).toBeTruthy()
+    })
+  })
+
+  describe("rendering with showValidThru", () => {
+    it("shows the date while the number stays masked", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard
+          {...defaultProps}
+          validThruDate={new Date(Date.UTC(2028, 11, 1))}
+          showValidThru={true}
+        />,
+      )
+
+      expect(getByText("•••• •••• •••• 4242")).toBeTruthy()
+      expect(getByText("12/ 28")).toBeTruthy()
+    })
+
+    it("masks the date even when the card details are shown", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} showCardDetails={true} showValidThru={false} />,
+      )
+
+      expect(getByText("4242 4242 4242 4242")).toBeTruthy()
+      expect(getByText("•• / ••")).toBeTruthy()
+    })
+  })
+
+  describe("holder name and date fallbacks", () => {
+    it("shows the name the card holder lookup resolves when none is given", () => {
+      const { getByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} holderName={undefined} cardId="card-test-id" />,
+      )
+
+      expect(getByText("SATOSHI TEST")).toBeTruthy()
+    })
+
+    it("leaves the date out when it cannot be read", () => {
+      const { getByText, queryByText } = renderWithProviders(
+        <BlinkCard {...defaultProps} validThruDate="not-a-date" showCardDetails={true} />,
+      )
+
+      expect(getByText("VALID THRU")).toBeTruthy()
+      expect(queryByText(/\//)).toBeNull()
     })
   })
 
