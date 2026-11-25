@@ -84,6 +84,7 @@ type CardRow = {
   id: string
   cardType: CardType
   pinSetAt: string | null
+  walletAddedAt: string | null
 }
 
 const virtualCard: CardRow = {
@@ -91,6 +92,13 @@ const virtualCard: CardRow = {
   id: "card-virtual",
   cardType: CardType.Virtual,
   pinSetAt: null,
+  walletAddedAt: null,
+}
+
+/** A card the app told blink-card it added to Apple Pay or Google Pay. */
+const virtualCardInWallet: CardRow = {
+  ...virtualCard,
+  walletAddedAt: "2026-11-01T00:00:00Z",
 }
 
 /** A member past the PIN step has set it on the card the app shows. */
@@ -101,6 +109,7 @@ const physicalCard: CardRow = {
   id: "card-physical",
   cardType: CardType.Physical,
   pinSetAt: null,
+  walletAddedAt: null,
 }
 
 type ActivationData = {
@@ -243,6 +252,13 @@ describe("useCardActivation", () => {
       expect(orderedSince.result.current.place).toBe(CardActivationStep.Pin)
     })
 
+    it("counts a card in the wallet as the first way taken", () => {
+      answerWith(dataWith({ cards: [virtualCardInWallet] }))
+      const { result } = renderHook(() => useCardActivation())
+
+      expect(result.current.place).toBe(CardActivationStep.Pin)
+    })
+
     it("is complete once the setup has a date", () => {
       answerWith(dataWith({ setupCompletedAt: "2026-11-20T00:00:00Z" }))
       const { result } = renderHook(() => useCardActivation())
@@ -263,6 +279,20 @@ describe("useCardActivation", () => {
       act(() => result.current.resume())
 
       expect(mockNavigate).toHaveBeenCalledWith("cardActivationTopUpScreen")
+    })
+
+    it("opens the wallet offer for a member who ordered the physical card first", () => {
+      answerWith(
+        dataWith({
+          step: CardActivationStep.OfferOtherWay,
+          cards: [{ ...physicalCard, pinSetAt: "2026-11-02T00:00:00Z" }, virtualCard],
+        }),
+      )
+      const { result } = renderHook(() => useCardActivation())
+
+      act(() => result.current.resume())
+
+      expect(mockNavigate).toHaveBeenCalledWith("cardActivationWalletOfferScreen")
     })
 
     it("opens the dashboard with the activation unknown", () => {
@@ -342,6 +372,18 @@ describe("useCardActivation", () => {
         "cardOnboardingApprovedScreen",
         "cardActivationOrderOfferScreen",
       ])
+    })
+
+    it("goes on to the PIN once the wallet took the card", () => {
+      answerWith(dataWith())
+      const { result } = renderHook(() => useCardActivation())
+
+      act(() =>
+        result.current.moveOn(CardActivationStep.Activated, { isWalletAdded: true }),
+      )
+
+      const action = resetOn(["Primary", "cardOnboardingApprovedScreen"])
+      expect(routeNamesOf(action)).toEqual(["Primary", "cardCreatePinScreen"])
     })
 
     it("falls back to the dashboard with the activation unknown", () => {

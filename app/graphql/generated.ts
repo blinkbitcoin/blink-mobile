@@ -3526,7 +3526,7 @@ export type LevelQuery = { readonly __typename: 'Query', readonly me?: { readonl
 export type CardActivationQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CardActivationQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly cardActivation?: { readonly __typename: 'CardActivation', readonly step: CardActivationStep, readonly setupCompletedAt?: string | null } | null, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly cardType: CardType, readonly pinSetAt?: string | null }> } } | null };
+export type CardActivationQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly cardActivation?: { readonly __typename: 'CardActivation', readonly step: CardActivationStep, readonly setupCompletedAt?: string | null } | null, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly cardType: CardType, readonly pinSetAt?: string | null, readonly walletAddedAt?: string | null }> } } | null };
 
 export type CardActivationStepUpdateMutationVariables = Exact<{
   input: CardActivationStepUpdateInput;
@@ -5556,6 +5556,7 @@ export const CardActivationDocument = gql`
           id
           cardType
           pinSetAt
+          walletAddedAt
         }
       }
     }
