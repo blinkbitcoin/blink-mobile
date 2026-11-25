@@ -3260,7 +3260,7 @@
     },
     "CardFeeSchedule": {
       "title": "Blink-kortets gebyrplan",
-      "effectiveDate": "Gældende fra 1. juli 2026",
+      "effectiveDate": "Gældende fra {date}",
       "sections": {
         "cardFees": "Kortgebyrer",
         "transactionFees": "Transaktionsgebyrer",
@@ -3282,13 +3282,9 @@
           "title": "Udenlandsk transaktionsgebyr",
           "subtitle": "Gælder for hver transaktion i en anden valuta end amerikanske dollar"
         },
-        "maximumOverdraft": {
-          "title": "Maksimalt overtræk",
-          "subtitle": "Skal tilbagebetales inden for 7 dage"
-        },
-        "lateRepaymentFee": {
-          "title": "Gebyr for sen tilbagebetaling",
-          "subtitle": "Opkræves, hvis overtrækket ikke tilbagebetales inden for 7 dage"
+        "noOverdraft": {
+          "title": "Overtræk er ikke tilladt",
+          "value": "I/R"
         }
       },
       "btcConversion": {
@@ -3296,16 +3292,12 @@
         "body": "Når en transaktion kræver konvertering af BTC til USD, udføres konverteringen til den gældende vekselkurs, som kan omfatte et spænd, der afspejler omkostningerne ved konverteringen."
       },
       "feesUpdateNotice": {
-        "text": "Gebyrer kan opdateres fra tid til anden. Blink giver mindst 30 dages varsel, før eventuelle gebyrændringer træder i kraft, i overensstemmelse med",
+        "text": "Blink Oranges medlemsgebyr, hvis der er et, tilhører Blink og er ikke en del af denne oversigt. Kortgebyrer kan opdateres fra tid til anden med mindst 30 dages varsel, i overensstemmelse med",
         "linkText": "Kortholderaftalen"
       },
       "creditModeNotice": "Kredittilstand er ikke aktiv i øjeblikket. Hvis Kredittilstand aktiveres, vil de gældende rentesatser, gebyrer og oplysninger om faktureringsrettigheder blive givet før aktivering.",
       "additionalDetails": {
         "title": "Yderligere gebyroplysninger",
-        "overdraft": {
-          "label": "Overtræk",
-          "text": ". Under visse omstændigheder kan en transaktion blive godkendt, som får din kortsaldo til at falde under nul. Det maksimale overtræk er {maxOverdraft: string}. Du skal tilbagebetale overtrækket inden for 7 dage ved at overføre yderligere midler til din kortsaldo."
-        },
         "foreignCurrency": {
           "label": "Udenlandsk valuta",
           "text": ". Hvis du foretager en transaktion i en udenlandsk valuta, konverterer kortnetværket den til USD ved hjælp af sine egne konverteringsprocedurer. Kursen på behandlingsdatoen kan afvige fra transaktionsdatoen."

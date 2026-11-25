@@ -26,6 +26,16 @@ export const formatIssuedDate = (isoDate: string, locale: string): string =>
     year: "numeric",
   })
 
+/** A calendar date such as 2026-07-01, read and shown in UTC: read as the device's
+ *  midnight, a phone west of Greenwich would show the day before. */
+export const formatCalendarDate = (isoDate: string, locale: string): string =>
+  new Date(`${isoDate}T00:00:00Z`).toLocaleDateString(locale, {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  })
+
 export const mapTransactionStatus = (
   status: TransactionStatus,
 ): CardTransactionUiStatus => {

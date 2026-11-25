@@ -10834,9 +10834,10 @@ type RootTranslation = {
 			 */
 			title: string
 			/**
-			 * E​f​f​e​c​t​i​v​e​ ​J​u​l​y​ ​1​,​ ​2​0​2​6
+			 * E​f​f​e​c​t​i​v​e​ ​{​d​a​t​e​}
+			 * @param {string} date
 			 */
-			effectiveDate: string
+			effectiveDate: RequiredParams<'date'>
 			sections: {
 				/**
 				 * C​a​r​d​ ​f​e​e​s
@@ -10888,25 +10889,15 @@ type RootTranslation = {
 					 */
 					subtitle: string
 				}
-				maximumOverdraft: {
+				noOverdraft: {
 					/**
-					 * M​a​x​i​m​u​m​ ​o​v​e​r​d​r​a​f​t
+					 * N​o​ ​o​v​e​r​d​r​a​f​t​ ​p​e​r​m​i​t​t​e​d
 					 */
 					title: string
 					/**
-					 * M​u​s​t​ ​b​e​ ​r​e​p​a​i​d​ ​w​i​t​h​i​n​ ​7​ ​d​a​y​s
+					 * N​/​A
 					 */
-					subtitle: string
-				}
-				lateRepaymentFee: {
-					/**
-					 * L​a​t​e​ ​R​e​p​a​y​m​e​n​t​ ​F​e​e
-					 */
-					title: string
-					/**
-					 * C​h​a​r​g​e​d​ ​i​f​ ​o​v​e​r​d​r​a​f​t​ ​i​s​ ​n​o​t​ ​r​e​p​a​i​d​ ​w​i​t​h​i​n​ ​7​ ​d​a​y​s
-					 */
-					subtitle: string
+					value: string
 				}
 			}
 			btcConversion: {
@@ -10921,7 +10912,7 @@ type RootTranslation = {
 			}
 			feesUpdateNotice: {
 				/**
-				 * F​e​e​s​ ​m​a​y​ ​b​e​ ​u​p​d​a​t​e​d​ ​f​r​o​m​ ​t​i​m​e​ ​t​o​ ​t​i​m​e​.​ ​B​l​i​n​k​ ​w​i​l​l​ ​p​r​o​v​i​d​e​ ​a​t​ ​l​e​a​s​t​ ​3​0​ ​d​a​y​s​'​ ​n​o​t​i​c​e​ ​b​e​f​o​r​e​ ​a​n​y​ ​f​e​e​ ​c​h​a​n​g​e​s​ ​t​a​k​e​ ​e​f​f​e​c​t​,​ ​i​n​ ​a​c​c​o​r​d​a​n​c​e​ ​w​i​t​h​ ​t​h​e
+				 * B​l​i​n​k​ ​O​r​a​n​g​e​’​s​ ​m​e​m​b​e​r​s​h​i​p​ ​f​e​e​,​ ​i​f​ ​a​n​y​,​ ​i​s​ ​B​l​i​n​k​’​s​ ​a​n​d​ ​i​s​ ​n​o​t​ ​p​a​r​t​ ​o​f​ ​t​h​i​s​ ​s​c​h​e​d​u​l​e​.​ ​C​a​r​d​ ​f​e​e​s​ ​m​a​y​ ​b​e​ ​u​p​d​a​t​e​d​ ​f​r​o​m​ ​t​i​m​e​ ​t​o​ ​t​i​m​e​ ​w​i​t​h​ ​a​t​ ​l​e​a​s​t​ ​3​0​ ​d​a​y​s​’​ ​n​o​t​i​c​e​,​ ​i​n​ ​a​c​c​o​r​d​a​n​c​e​ ​w​i​t​h​ ​t​h​e
 				 */
 				text: string
 				/**
@@ -10938,17 +10929,6 @@ type RootTranslation = {
 				 * A​d​d​i​t​i​o​n​a​l​ ​f​e​e​ ​d​e​t​a​i​l​s
 				 */
 				title: string
-				overdraft: {
-					/**
-					 * O​v​e​r​d​r​a​f​t
-					 */
-					label: string
-					/**
-					 * .​ ​I​n​ ​c​e​r​t​a​i​n​ ​c​i​r​c​u​m​s​t​a​n​c​e​s​,​ ​a​ ​t​r​a​n​s​a​c​t​i​o​n​ ​m​a​y​ ​b​e​ ​a​p​p​r​o​v​e​d​ ​t​h​a​t​ ​c​a​u​s​e​s​ ​y​o​u​r​ ​C​a​r​d​ ​B​a​l​a​n​c​e​ ​t​o​ ​f​a​l​l​ ​b​e​l​o​w​ ​z​e​r​o​.​ ​T​h​e​ ​m​a​x​i​m​u​m​ ​o​v​e​r​d​r​a​f​t​ ​i​s​ ​{​m​a​x​O​v​e​r​d​r​a​f​t​}​.​ ​Y​o​u​ ​m​u​s​t​ ​r​e​p​a​y​ ​t​h​e​ ​o​v​e​r​d​r​a​f​t​ ​w​i​t​h​i​n​ ​7​ ​d​a​y​s​ ​b​y​ ​t​r​a​n​s​f​e​r​r​i​n​g​ ​a​d​d​i​t​i​o​n​a​l​ ​f​u​n​d​s​ ​t​o​ ​y​o​u​r​ ​C​a​r​d​ ​B​a​l​a​n​c​e​.
-					 * @param {string} maxOverdraft
-					 */
-					text: RequiredParams<'maxOverdraft'>
-				}
 				foreignCurrency: {
 					/**
 					 * F​o​r​e​i​g​n​ ​c​u​r​r​e​n​c​y
@@ -25157,9 +25137,9 @@ export type TranslationFunctions = {
 			 */
 			title: () => LocalizedString
 			/**
-			 * Effective July 1, 2026
+			 * Effective {date}
 			 */
-			effectiveDate: () => LocalizedString
+			effectiveDate: (arg: { date: string }) => LocalizedString
 			sections: {
 				/**
 				 * Card fees
@@ -25211,25 +25191,15 @@ export type TranslationFunctions = {
 					 */
 					subtitle: () => LocalizedString
 				}
-				maximumOverdraft: {
+				noOverdraft: {
 					/**
-					 * Maximum overdraft
+					 * No overdraft permitted
 					 */
 					title: () => LocalizedString
 					/**
-					 * Must be repaid within 7 days
+					 * N/A
 					 */
-					subtitle: () => LocalizedString
-				}
-				lateRepaymentFee: {
-					/**
-					 * Late Repayment Fee
-					 */
-					title: () => LocalizedString
-					/**
-					 * Charged if overdraft is not repaid within 7 days
-					 */
-					subtitle: () => LocalizedString
+					value: () => LocalizedString
 				}
 			}
 			btcConversion: {
@@ -25244,7 +25214,7 @@ export type TranslationFunctions = {
 			}
 			feesUpdateNotice: {
 				/**
-				 * Fees may be updated from time to time. Blink will provide at least 30 days' notice before any fee changes take effect, in accordance with the
+				 * Blink Orange’s membership fee, if any, is Blink’s and is not part of this schedule. Card fees may be updated from time to time with at least 30 days’ notice, in accordance with the
 				 */
 				text: () => LocalizedString
 				/**
@@ -25261,16 +25231,6 @@ export type TranslationFunctions = {
 				 * Additional fee details
 				 */
 				title: () => LocalizedString
-				overdraft: {
-					/**
-					 * Overdraft
-					 */
-					label: () => LocalizedString
-					/**
-					 * . In certain circumstances, a transaction may be approved that causes your Card Balance to fall below zero. The maximum overdraft is {maxOverdraft}. You must repay the overdraft within 7 days by transferring additional funds to your Card Balance.
-					 */
-					text: (arg: { maxOverdraft: string }) => LocalizedString
-				}
 				foreignCurrency: {
 					/**
 					 * Foreign currency

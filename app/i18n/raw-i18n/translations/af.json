@@ -3260,7 +3260,7 @@
     },
     "CardFeeSchedule": {
       "title": "Blink-kaart fooiskedule",
-      "effectiveDate": "Geldig vanaf 1 Julie 2026",
+      "effectiveDate": "Geldig vanaf {date}",
       "sections": {
         "cardFees": "Kaartfooie",
         "transactionFees": "Transaksiefooie",
@@ -3282,13 +3282,9 @@
           "title": "Buitelandse transaksiefooi",
           "subtitle": "Van toepassing op elke transaksie in 'n ander geldeenheid as Amerikaanse dollar"
         },
-        "maximumOverdraft": {
-          "title": "Maksimum oortrekking",
-          "subtitle": "Moet binne 7 dae terugbetaal word"
-        },
-        "lateRepaymentFee": {
-          "title": "Laat-terugbetalingsfooi",
-          "subtitle": "Gehef indien die oortrekking nie binne 7 dae terugbetaal word nie"
+        "noOverdraft": {
+          "title": "Geen oortrekking toegelaat",
+          "value": "N.v.t."
         }
       },
       "btcConversion": {
@@ -3296,16 +3292,12 @@
         "body": "Wanneer 'n transaksie omskakeling van BTC na USD vereis, word die omskakeling teen die heersende wisselkoers uitgevoer, wat 'n marge kan insluit wat die koste van omskakeling weerspieël."
       },
       "feesUpdateNotice": {
-        "text": "Fooie kan van tyd tot tyd bygewerk word. Blink sal ten minste 30 dae kennis gee voordat enige fooiveranderinge in werking tree, in ooreenstemming met die",
+        "text": "Blink Orange se lidmaatskapfooi, indien enige, behoort aan Blink en is nie deel van hierdie skedule nie. Kaartfooie kan van tyd tot tyd bygewerk word met ten minste 30 dae kennisgewing, in ooreenstemming met die",
         "linkText": "Kaarthouerooreenkoms"
       },
       "creditModeNotice": "Kredietmodus is tans nie aktief nie. As Kredietmodus geaktiveer word, sal die toepaslike rentekoerse, fooie en faktureringsregte-openbaarmakings voor aktivering verskaf word.",
       "additionalDetails": {
         "title": "Bykomende fooibesonderhede",
-        "overdraft": {
-          "label": "Oortrekking",
-          "text": ". In sekere omstandighede kan 'n transaksie goedgekeur word wat jou kaartsaldo onder nul laat val. Die maksimum oortrekking is {maxOverdraft: string}. Jy moet die oortrekking binne 7 dae terugbetaal deur bykomende fondse na jou kaartsaldo oor te dra."
-        },
         "foreignCurrency": {
           "label": "Buitelandse geldeenheid",
           "text": ". As jy 'n transaksie in 'n buitelandse geldeenheid doen, skakel die kaartnetwerk dit na USD om met sy eie omskakelingsprosedures. Die koers op die verwerkingsdatum kan verskil van die transaksiedatum."

@@ -1,6 +1,11 @@
+/**
+ * @jest-environment ./jest.timezone-environment
+ */
+
 import { CardStatus, CardType, TransactionStatus } from "@app/graphql/generated"
 import { CardTransactionUiStatus } from "@app/components/card-screen/types"
 import {
+  formatCalendarDate,
   formatCardType,
   formatIssuedDate,
   isCardFrozen,
@@ -137,6 +142,19 @@ describe("card-display utils", () => {
       expect(merchantIcon(null)).toBe("storefront")
       expect(merchantIcon("")).toBe("storefront")
       expect(merchantIcon("not-a-code")).toBe("storefront")
+    })
+  })
+
+  describe("formatCalendarDate", () => {
+    it("writes the calendar date out in the locale", () => {
+      expect(formatCalendarDate("2026-07-01", "en")).toBe("July 1, 2026")
+      expect(formatCalendarDate("2026-07-01", "es")).toBe("1 de julio de 2026")
+    })
+
+    /** The file runs six hours west of Greenwich, where the device's midnight of New
+     *  Year's Day is still the last day of the year before in UTC. */
+    it("keeps the day as set, whatever the device's time zone", () => {
+      expect(formatCalendarDate("2026-01-01", "en")).toBe("January 1, 2026")
     })
   })
 })

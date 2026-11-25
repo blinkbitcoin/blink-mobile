@@ -3228,7 +3228,7 @@
         "cardFrozenSubtitle": "O cartão está temporariamente desativado",
         "CardFeeSchedule": {
             "title": "Tabela de tarifas do Cartão Blink",
-            "effectiveDate": "Em vigor a partir de 1 de julho de 2026",
+            "effectiveDate": "Em vigor a partir de {date}",
             "sections": {
                 "cardFees": "Tarifas do cartão",
                 "transactionFees": "Tarifas de transação",
@@ -3250,13 +3250,9 @@
                     "title": "Tarifa de transação estrangeira",
                     "subtitle": "Aplicada a cada transação em uma moeda diferente do dólar americano"
                 },
-                "maximumOverdraft": {
-                    "title": "Cheque especial máximo",
-                    "subtitle": "Deve ser reembolsado em até 7 dias"
-                },
-                "lateRepaymentFee": {
-                    "title": "Tarifa de reembolso atrasado",
-                    "subtitle": "Cobrada se o cheque especial não for reembolsado em até 7 dias"
+                "noOverdraft": {
+                    "title": "Cheque especial não permitido",
+                    "value": "N/A"
                 }
             },
             "btcConversion": {
@@ -3264,16 +3260,12 @@
                 "body": "Quando uma transação requer a conversão de BTC para USD, a conversão é executada pela taxa de câmbio vigente, que pode incluir um spread que reflete o custo da conversão."
             },
             "feesUpdateNotice": {
-                "text": "As tarifas podem ser atualizadas periodicamente. A Blink avisará com pelo menos 30 dias de antecedência antes que qualquer alteração de tarifas entre em vigor, de acordo com o",
+                "text": "A taxa de associação do Blink Orange, se houver, é da Blink e não faz parte desta tabela. As tarifas do cartão podem ser atualizadas periodicamente com pelo menos 30 dias de aviso prévio, de acordo com o",
                 "linkText": "Contrato do Titular do Cartão"
             },
             "creditModeNotice": "O Modo Crédito não está ativo no momento. Se o Modo Crédito for ativado, as taxas de juros, tarifas e divulgações de direitos de faturamento aplicáveis serão fornecidas antes da ativação.",
             "additionalDetails": {
                 "title": "Detalhes adicionais de tarifas",
-                "overdraft": {
-                    "label": "Cheque especial",
-                    "text": ". Em certas circunstâncias, uma transação pode ser aprovada que faça o saldo do seu Cartão cair abaixo de zero. O cheque especial máximo é de {maxOverdraft: string}. Você deve reembolsar o cheque especial em até 7 dias transferindo fundos adicionais para o saldo do seu Cartão."
-                },
                 "foreignCurrency": {
                     "label": "Moeda estrangeira",
                     "text": ". Se você fizer uma transação em moeda estrangeira, a rede do cartão a converte para USD usando seus próprios procedimentos de conversão. A taxa na data de processamento pode diferir da data da transação."

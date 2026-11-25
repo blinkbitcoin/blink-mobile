@@ -3260,7 +3260,7 @@
     },
     "CardFeeSchedule": {
       "title": "Jadwal biaya Kartu Blink",
-      "effectiveDate": "Berlaku mulai 1 Juli 2026",
+      "effectiveDate": "Berlaku mulai {date}",
       "sections": {
         "cardFees": "Biaya kartu",
         "transactionFees": "Biaya transaksi",
@@ -3282,13 +3282,9 @@
           "title": "Biaya transaksi luar negeri",
           "subtitle": "Dikenakan pada setiap transaksi dalam mata uang selain dolar AS"
         },
-        "maximumOverdraft": {
-          "title": "Cerukan maksimum",
-          "subtitle": "Harus dilunasi dalam 7 hari"
-        },
-        "lateRepaymentFee": {
-          "title": "Biaya pembayaran terlambat",
-          "subtitle": "Dikenakan jika cerukan tidak dilunasi dalam 7 hari"
+        "noOverdraft": {
+          "title": "Cerukan tidak diizinkan",
+          "value": "T/A"
         }
       },
       "btcConversion": {
@@ -3296,16 +3292,12 @@
         "body": "Ketika transaksi memerlukan konversi BTC ke USD, konversi dilakukan pada nilai tukar yang berlaku, yang mungkin mencakup spread yang mencerminkan biaya konversi."
       },
       "feesUpdateNotice": {
-        "text": "Biaya dapat diperbarui dari waktu ke waktu. Blink akan memberikan pemberitahuan setidaknya 30 hari sebelum perubahan biaya berlaku, sesuai dengan",
+        "text": "Biaya keanggotaan Blink Orange, jika ada, adalah milik Blink dan bukan bagian dari jadwal ini. Biaya kartu dapat diperbarui dari waktu ke waktu dengan pemberitahuan setidaknya 30 hari sebelumnya, sesuai dengan",
         "linkText": "Perjanjian Pemegang Kartu"
       },
       "creditModeNotice": "Mode Kredit saat ini tidak aktif. Jika Mode Kredit diaktifkan, suku bunga, biaya, dan pengungkapan hak penagihan yang berlaku akan diberikan sebelum aktivasi.",
       "additionalDetails": {
         "title": "Detail biaya tambahan",
-        "overdraft": {
-          "label": "Cerukan",
-          "text": ". Dalam keadaan tertentu, transaksi dapat disetujui yang menyebabkan saldo Kartu Anda turun di bawah nol. Cerukan maksimum adalah {maxOverdraft: string}. Anda harus melunasi cerukan dalam 7 hari dengan mentransfer dana tambahan ke saldo Kartu Anda."
-        },
         "foreignCurrency": {
           "label": "Mata uang asing",
           "text": ". Jika Anda melakukan transaksi dalam mata uang asing, jaringan kartu mengonversinya ke USD menggunakan prosedur konversinya sendiri. Nilai tukar pada tanggal pemrosesan dapat berbeda dari tanggal transaksi."

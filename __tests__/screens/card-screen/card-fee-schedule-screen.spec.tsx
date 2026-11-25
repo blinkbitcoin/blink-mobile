@@ -29,8 +29,7 @@ jest.mock("@app/config/feature-flags-context", () => ({
     cardReplacementFeeUsd: 10,
     cardUsdTransactionFeePercent: 1.21,
     cardForeignTransactionFeePercent: 2.21,
-    cardMaxOverdraftUsd: 200,
-    cardLateRepaymentFeeUsd: 25,
+    cardFeeScheduleEffectiveDate: "2026-07-01",
     cardCardholderAgreementUrl: "https://example.com/cardholder",
   }),
 }))
@@ -111,8 +110,46 @@ describe("CardFeeScheduleScreen", () => {
     expect(getByText("$10")).toBeTruthy()
     expect(getByText("1.21%")).toBeTruthy()
     expect(getByText("2.21%")).toBeTruthy()
-    expect(getByText("$200")).toBeTruthy()
-    expect(getByText("$25")).toBeTruthy()
+  })
+
+  it("says no overdraft is permitted, with no overdraft amounts or terms", async () => {
+    const { getByText, queryByText } = render(
+      <ContextForScreen>
+        <CardFeeScheduleScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(getByText("No overdraft permitted")).toBeTruthy()
+    expect(getByText("N/A")).toBeTruthy()
+    expect(queryByText(/Maximum overdraft/)).toBeNull()
+    expect(queryByText(/Late Repayment Fee/)).toBeNull()
+    expect(queryByText(/maximum overdraft is/)).toBeNull()
+  })
+
+  it("shows the effective date set in Remote Config", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardFeeScheduleScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(getByText("Effective July 1, 2026")).toBeTruthy()
+  })
+
+  it("says the membership fee is Blink's and outside this schedule", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardFeeScheduleScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(getByText(/Blink Orange’s membership fee, if any, is Blink’s/)).toBeTruthy()
   })
 
   it("displays the BTC conversion and cardholder agreement notices", async () => {
