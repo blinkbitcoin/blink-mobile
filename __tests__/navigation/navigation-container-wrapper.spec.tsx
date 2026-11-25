@@ -41,6 +41,7 @@ type LinkingOptions = {
 }
 let mockLinking: LinkingOptions | undefined
 let mockIsSelfCustodial = false
+let mockAccountType: string = "custodial"
 
 /** The navigationRef is module-level, so the container ref is stubbed. The stub APPLIES the
  *  reset to the stack it serves, as the real container does, so a second evaluation sees the
@@ -115,7 +116,10 @@ jest.mock("@app/graphql/is-authed-context", () => ({
 }))
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
-  useActiveWallet: () => ({ isSelfCustodial: mockIsSelfCustodial }),
+  useActiveWallet: () => ({
+    isSelfCustodial: mockIsSelfCustodial,
+    accountType: mockAccountType,
+  }),
 }))
 
 jest.mock("@app/components/actions", () => ({
@@ -142,6 +146,7 @@ import {
   useAuthenticationContext,
 } from "@app/navigation/navigation-container-wrapper"
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
+import { AccountType } from "@app/types/wallet"
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "@app/utils/enum"
 
 describe("processLinkForAction", () => {
@@ -1334,10 +1339,12 @@ describe("NavigationContainerWrapper card links", () => {
     mockBlockerVisible = false
     mockLinking = undefined
     mockIsSelfCustodial = false
+    mockAccountType = AccountType.Custodial
   })
 
   afterAll(() => {
     mockIsSelfCustodial = false
+    mockAccountType = AccountType.Custodial
   })
 
   const resolveLink = (path: string) =>
@@ -1354,6 +1361,7 @@ describe("NavigationContainerWrapper card links", () => {
   ]
   CARD_PATHS.forEach((path) =>
     it(`opens nothing at ${path} in non-custodial mode`, () => {
+      mockAccountType = AccountType.SelfCustodial
       mockIsSelfCustodial = true
       renderWrapper(<Text>child</Text>)
 
@@ -1362,7 +1370,33 @@ describe("NavigationContainerWrapper card links", () => {
     }),
   )
 
+  /** Right after a switch to a self-custodial account, or with no mnemonic, the wallet
+   *  is Unavailable and `isSelfCustodial` reads false while the outgoing custodial
+   *  session can still be authed. The account is self-custodial all the same, so a card
+   *  link, live or replayed from the queue (both resolve here), still opens nothing. */
+  it("opens nothing at a card link while the self-custodial wallet is unavailable", () => {
+    mockAccountType = AccountType.SelfCustodial
+    mockIsSelfCustodial = false
+    renderWrapper(<Text>child</Text>)
+
+    expect(resolveLink("card/onboarding")).toBeUndefined()
+  })
+
+  it("opens the card link again once the account is custodial", () => {
+    mockAccountType = AccountType.SelfCustodial
+    const rendered = renderWrapper(<Text>child</Text>)
+    expect(resolveLink("card/onboarding")).toBeUndefined()
+
+    mockAccountType = AccountType.Custodial
+    rerenderWrapper(rendered, <Text>child</Text>)
+
+    expect(resolveLink("card/onboarding")).toMatchObject({
+      routes: [expect.objectContaining({ name: "cardOnboardingWelcomeScreen" })],
+    })
+  })
+
   it("still opens the links outside the card in non-custodial mode", () => {
+    mockAccountType = AccountType.SelfCustodial
     mockIsSelfCustodial = true
     renderWrapper(<Text>child</Text>)
 
