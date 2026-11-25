@@ -1,9 +1,10 @@
-import { TextStyle, ViewStyle } from "node_modules/@types/react-native/index"
 import * as React from "react"
 import {
   ActivityIndicator,
   StyleProp,
+  TextStyle,
   View,
+  ViewStyle,
   TextInput,
   type TextInputProps,
 } from "react-native"

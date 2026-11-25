@@ -9,9 +9,9 @@ const RAW_DESTINATION_START = 10
 const RAW_DESTINATION_END = 8
 
 /**
- * How a destination reads on amount entry and the completed screen, which shorten it the
- * same way. Review's destination field fills its width instead and only borrows the
- * username host from here.
+ * How a destination reads on amount entry. Review's destination field fills its width
+ * instead and only borrows the username host from here; the receipt prints recipients
+ * by its own rule (receipt-destination.ts).
  */
 export const formatDestination = ({
   destination,

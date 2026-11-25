@@ -1,11 +1,10 @@
 import { type TranslationFunctions } from "@app/i18n/i18n-types"
-import { formatDuration } from "@app/utils/date"
-
 import {
   type FeeTierInfo,
   type FeeTierOption,
   FeeTierOption as Tier,
-} from "./hooks/fee-tiers.types"
+} from "@app/types/fee-tiers"
+import { formatDuration } from "@app/utils/date"
 
 const MINUTES_PER_HOUR = 60
 

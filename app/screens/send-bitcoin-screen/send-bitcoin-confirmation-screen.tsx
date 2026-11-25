@@ -45,7 +45,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
 import { isAmountFixableError } from "./amount-fixable-error"
 import { feeTierLabels, formatEta } from "./fee-tier-options"
-import { FeeTierOption } from "./hooks/fee-tiers.types"
+import { FeeTierOption } from "@app/types/fee-tiers"
 import { useHomeOnBackAfterSend } from "./hooks/use-home-on-back-after-send"
 import {
   CUSTODIAL_PAYOUT_ETA_MINUTES,
@@ -66,7 +66,6 @@ import {
   useSendPayment,
 } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
-import { formatDestination } from "./format-destination"
 
 gql`
   query sendBitcoinConfirmationScreen {
@@ -290,12 +289,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               satAmount,
               currencyFeeAmount,
               satFeeAmount,
-              destination: formatDestination({
-                destination,
-                paymentType,
-                lnAddressHostname,
-              }),
-              paymentType: paymentDetail?.paymentType,
+              destination,
+              paymentType,
               createdAt: transaction?.createdAt,
             },
           },
@@ -315,7 +310,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       navigation,
       paymentType,
       destination,
-      lnAddressHostname,
       paymentDetail,
       note,
       currencyAmount,

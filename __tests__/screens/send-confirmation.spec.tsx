@@ -1,4 +1,5 @@
 import React from "react"
+import { it } from "@jest/globals"
 import { AccessibilityInfo, StyleSheet, TouchableOpacity, Text } from "react-native"
 import { Satoshis } from "lnurl-pay"
 import {
@@ -21,6 +22,8 @@ import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-detail
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import * as PaymentDetailsLightning from "@app/screens/send-bitcoin-screen/payment-details/lightning"
 import * as PriceConversion from "@app/hooks/use-price-conversion"
+import * as PaymentDetailsOnchain from "@app/screens/send-bitcoin-screen/payment-details/onchain"
+import { createSelfCustodialSparkPaymentDetails } from "@app/self-custodial/payment-details/spark"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
@@ -32,7 +35,7 @@ import { RouteProp } from "@react-navigation/native"
 import { light } from "@app/rne-theme/colors"
 import { INFO_SECTION_OUTLINE_TEST_ID } from "@app/components/card-screen/info-section"
 import { SEND_REVIEW_DESTINATION_TEST_ID } from "@app/screens/send-bitcoin-screen/review/send-review-destination"
-import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
+import { FeeTierOption } from "@app/types/fee-tiers"
 import {
   SEND_HERO_PRIMARY_TEST_ID,
   SEND_HERO_SECONDARY_TEST_ID,
@@ -674,7 +677,12 @@ describe("SendBitcoinConfirmationScreen", () => {
         const routes = action.payload?.routes ?? action.routes ?? []
         const completed = routes.find((r) => r.name === "sendBitcoinCompleted")
         if (completed)
-          return completed.params as { successAction?: unknown; note?: unknown }
+          return completed.params as {
+            successAction?: unknown
+            note?: unknown
+            destination?: unknown
+            paymentType?: unknown
+          }
       }
       throw new Error("sendBitcoinCompleted route was not dispatched")
     }
@@ -774,6 +782,77 @@ describe("SendBitcoinConfirmationScreen", () => {
 
       const params = findCompletedRouteParams()
       expect(params.note).toBe(memo)
+    })
+
+    // The receipt decides how to print a recipient (receipt-destination.ts), so every
+    // rail hands it the destination untouched.
+    it.each([
+      {
+        rail: "an on-chain",
+        build: () =>
+          PaymentDetailsOnchain.createAmountOnchainPaymentDetails<WalletCurrency>({
+            address: "bc1p5d7rjq7g6rdk2yhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg3297",
+            destinationSpecifiedAmount: toBtcMoneyAmount(10000),
+            convertMoneyAmount: convertMoneyAmountMock,
+            sendingWalletDescriptor: btcSendingWalletDescriptor,
+          }),
+      },
+      {
+        rail: "an LNURL",
+        build: () =>
+          PaymentDetailsLightning.createLnurlPaymentDetails({
+            ...defaultLightningParams,
+            lnurl:
+              "LNURL1DP68GURN8GHJ7CN5VDCXZ7FWV4UXZMTSD3JJUCM0D5H5Y4ZR9A25JNZW24FYCTMSV9UJ76F0XAYXKVJ3D5U4SCF52F6YCAELVD6HYUN9DE3HJ0242DZZVCTDDA6KUAPAX5S4RG46",
+          }),
+      },
+      {
+        rail: "a Spark",
+        build: () =>
+          createSelfCustodialSparkPaymentDetails<WalletCurrency>({
+            sdk: {} as never,
+            address: `sp1${"pgss9qzk8dxs7ehvlwrjr3qyrmsy".repeat(3)}`,
+            unitOfAccountAmount: toBtcMoneyAmount(1000),
+            convertMoneyAmount: convertMoneyAmountMock,
+            sendingWalletDescriptor: btcSendingWalletDescriptor,
+          }),
+      },
+      {
+        rail: "a Lightning invoice",
+        build: () =>
+          PaymentDetailsLightning.createAmountLightningPaymentDetails<WalletCurrency>({
+            paymentRequest: `lnbc10u1p${"5qk3z7tpp5qk3z7t".repeat(5)}`,
+            paymentRequestAmount: toBtcMoneyAmount(1000),
+            convertMoneyAmount: convertMoneyAmountMock,
+            sendingWalletDescriptor: btcSendingWalletDescriptor,
+          }),
+      },
+    ])("passes $rail recipient to the receipt untouched", async ({ build }) => {
+      const paymentDetail = build()
+      const route = {
+        key: "sendBitcoinConfirmationScreen",
+        name: "sendBitcoinConfirmation",
+        params: { paymentDetail },
+      } as const
+
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "SUCCESS",
+        extraInfo: { preimage: "p" },
+      })
+
+      render(
+        <ContextForScreen>
+          <SendBitcoinConfirmationScreen route={route} />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      const params = findCompletedRouteParams()
+      expect(params.destination).toBe(paymentDetail.destination)
+      expect(params.paymentType).toBe(paymentDetail.paymentType)
     })
   })
 })

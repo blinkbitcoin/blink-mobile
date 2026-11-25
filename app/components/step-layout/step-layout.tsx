@@ -22,6 +22,8 @@ type StepLayoutProps = {
   header?: React.ReactNode
   headerShown?: boolean
   contentStyle?: StyleProp<ViewStyle>
+  /** Drawn over the whole step, footer included, such as a celebration effect. */
+  overlay?: React.ReactNode
 }
 
 /**
@@ -44,6 +46,7 @@ export const StepLayout: React.FC<StepLayoutProps> = ({
   header,
   headerShown,
   contentStyle,
+  overlay,
 }) => {
   const styles = useStyles()
 
@@ -86,6 +89,7 @@ export const StepLayout: React.FC<StepLayoutProps> = ({
         </ScrollView>
         <View style={styles.buttonsContainer}>{footer}</View>
       </View>
+      {overlay}
     </Screen>
   )
 }

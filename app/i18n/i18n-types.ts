@@ -12360,7 +12360,7 @@ type RootTranslation = {
 				title: string
 				cardInfo: {
 					/**
-					 * T​h​e​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d
+					 * T​h​e​ ​B​l​i​n​k​ ​C​a​r​d
 					 */
 					bitcoinCard: string
 					/**
@@ -12368,9 +12368,9 @@ type RootTranslation = {
 					 */
 					'for': string
 					/**
-					 * B​i​t​c​o​i​n​ ​M​a​x​i​m​a​l​i​s​t​s
+					 * B​i​t​c​o​i​n​e​r​s
 					 */
-					maximalist: string
+					bitcoiners: string
 				}
 				/**
 				 * C​o​n​t​i​n​u​e
@@ -12379,31 +12379,45 @@ type RootTranslation = {
 			}
 			CardDetails: {
 				/**
-				 * A​d​d​i​t​i​o​n​a​l​ ​p​e​r​k​s
+				 * W​h​a​t​’​s​ ​i​n​c​l​u​d​e​d
 				 */
 				title: string
 				features: {
+					card: {
+						/**
+						 * B​l​i​n​k​ ​C​a​r​d
+						 */
+						title: string
+						/**
+						 * y​o​u​r​ ​V​i​s​a​ ​c​a​r​d​,​ ​r​e​a​d​y​ ​t​o​d​a​y
+						 */
+						subtitle: string
+					}
+					accountManager: {
+						/**
+						 * P​e​r​s​o​n​a​l​ ​a​c​c​o​u​n​t​ ​m​a​n​a​g​e​r
+						 */
+						title: string
+						/**
+						 * a​n​d​ ​p​r​i​o​r​i​t​y​ ​s​u​p​p​o​r​t
+						 */
+						subtitle: string
+					}
 					/**
-					 * D​e​d​i​c​a​t​e​d​ ​a​c​c​o​u​n​t​ ​m​a​n​a​g​e​r
+					 * O​n​/​O​f​f​ ​r​a​m​p​i​n​g
 					 */
-					accountManager: string
-					/**
-					 * P​r​i​o​r​i​t​y​ ​s​u​p​p​o​r​t
-					 */
-					support: string
-					/**
-					 * 5​0​%​ ​b​a​c​k​ ​o​n​ ​t​r​a​n​s​a​c​t​i​o​n​ ​f​e​e​s
-					 */
-					onchainDeposits: string
-					/**
-					 * $​1​0​0​ ​t​o​ ​c​i​r​c​u​l​a​r​ ​e​c​o​n​o​m​i​e​s
-					 */
-					circularEconomies: string
+					onOffRamping: string
 				}
 				/**
-				 * .​.​.​ ​a​n​d​ ​m​o​r​e​ ​c​o​m​i​n​g​ ​i​n​ ​2​0​2​6
+				 * i​n​ ​{​m​o​n​t​h​s​}​ ​m​o​n​t​h​s
+				 * @param {number} months
 				 */
-				andMore: string
+				availableIn: RequiredParams<'months'>
+				/**
+				 * S​o​m​e​ ​f​e​a​t​u​r​e​s​ ​w​i​l​l​ ​b​e​ ​a​v​a​i​l​a​b​l​e​ ​w​i​t​h​i​n​ ​{​m​o​n​t​h​s​}​ ​m​o​n​t​h​s​.​ ​T​h​e​ ​c​a​r​d​ ​i​s​ ​r​e​a​d​y​ ​t​o​d​a​y​.
+				 * @param {number} months
+				 */
+				footnote: RequiredParams<'months'>
 				/**
 				 * C​o​n​t​i​n​u​e
 				 */
@@ -12416,16 +12430,16 @@ type RootTranslation = {
 					 */
 					title: string
 					/**
-					 * T​o​ ​B​l​i​n​k​ ​P​r​i​v​a​t​e
+					 * T​o​ ​B​l​i​n​k​ ​O​r​a​n​g​e
 					 */
 					subtitle: string
 					paragraphs: {
 						/**
-						 * S​o​m​e​o​n​e​ ​t​h​o​u​g​h​t​ ​o​f​ ​y​o​u​ ​a​n​d​ ​s​u​g​g​e​s​t​e​d​ ​t​h​a​t​ ​w​e​ ​s​h​o​u​l​d​ ​i​n​v​i​t​e​ ​y​o​u​ ​t​o​ ​B​l​i​n​k​ ​P​r​i​v​a​t​e​.​ ​P​r​o​b​a​b​l​y​ ​b​e​c​a​u​s​e​ ​y​o​u​ ​a​r​e​ ​a​n​ ​a​w​e​s​o​m​e​ ​B​i​t​c​o​i​n​e​r​.
+						 * S​o​m​e​o​n​e​ ​t​h​o​u​g​h​t​ ​o​f​ ​y​o​u​ ​a​n​d​ ​s​u​g​g​e​s​t​e​d​ ​t​h​a​t​ ​w​e​ ​s​h​o​u​l​d​ ​i​n​v​i​t​e​ ​y​o​u​ ​t​o​ ​B​l​i​n​k​ ​O​r​a​n​g​e​.​ ​P​r​o​b​a​b​l​y​ ​b​e​c​a​u​s​e​ ​y​o​u​ ​a​r​e​ ​a​n​ ​a​w​e​s​o​m​e​ ​B​i​t​c​o​i​n​e​r​.
 						 */
 						body1: string
 						/**
-						 * O​u​r​ ​g​o​a​l​ ​f​o​r​ ​2​0​2​6​ ​i​s​ ​t​o​ ​s​t​u​f​f​ ​t​h​e​ ​p​r​o​g​r​a​m​ ​w​i​t​h​ ​s​o​ ​m​u​c​h​ ​g​o​o​d​i​e​s​ ​t​h​a​t​ ​i​t​ ​w​i​l​l​ ​b​e​ ​o​b​v​i​o​u​s​ ​t​o​ ​r​e​n​e​w​ ​n​e​x​t​ ​y​e​a​r​.
+						 * B​l​i​n​k​ ​O​r​a​n​g​e​ ​i​s​ ​t​h​e​ ​f​i​r​s​t​ ​t​i​e​r​ ​o​f​ ​B​l​i​n​k​’​s​ ​m​e​m​b​e​r​s​h​i​p​ ​f​o​r​ ​B​i​t​c​o​i​n​e​r​s​,​ ​b​y​ ​i​n​v​i​t​a​t​i​o​n​.​ ​T​h​e​ ​B​l​i​n​k​ ​C​a​r​d​ ​a​n​d​ ​y​o​u​r​ ​p​e​r​s​o​n​a​l​ ​a​c​c​o​u​n​t​ ​m​a​n​a​g​e​r​ ​a​r​e​ ​t​w​o​ ​o​f​ ​t​h​e​ ​f​i​r​s​t​ ​s​e​r​v​i​c​e​s​ ​w​e​ ​o​f​f​e​r​ ​—​ ​t​h​e​ ​r​e​s​t​ ​w​e​’​r​e​ ​b​u​i​l​d​i​n​g​ ​t​h​r​o​u​g​h​ ​2​0​2​7​.
 						 */
 						body2: string
 					}
@@ -12453,13 +12467,31 @@ type RootTranslation = {
 				 */
 				payButton: string
 				/**
-				 * B​l​i​n​k​ ​P​r​i​v​a​t​e
+				 * B​l​i​n​k​ ​O​r​a​n​g​e
 				 */
 				cardTitle: string
+				/**
+				 * F​r​e​e
+				 */
+				free: string
+				/**
+				 * f​o​r​ ​n​o​w
+				 */
+				forNow: string
 				/**
 				 * p​e​r​ ​y​e​a​r
 				 */
 				perYear: string
+				freeBreakdown: {
+					/**
+					 * B​l​i​n​k​ ​C​a​r​d
+					 */
+					card: string
+					/**
+					 * O​t​h​e​r​ ​m​e​m​b​e​r​ ​b​e​n​e​f​i​t​s
+					 */
+					memberBenefits: string
+				}
 				status: {
 					/**
 					 * S​t​a​t​u​s
@@ -12521,6 +12553,42 @@ type RootTranslation = {
 				 * @param {number} months
 				 */
 				renew: RequiredParams<'months'>
+				/**
+				 * I​ ​u​n​d​e​r​s​t​a​n​d​ ​B​l​i​n​k​ ​O​r​a​n​g​e​ ​i​s​ ​f​r​e​e​ ​f​o​r​ ​n​o​w​,​ ​a​n​d​ ​t​h​a​t​ ​a​ ​m​e​m​b​e​r​s​h​i​p​ ​f​e​e​ ​m​a​y​ ​b​e​ ​i​n​t​r​o​d​u​c​e​d​ ​l​a​t​e​r​,​ ​w​i​t​h​ ​n​o​t​i​c​e
+				 */
+				freeNotice: string
+			}
+			CardVerifyIdentity: {
+				/**
+				 * V​e​r​i​f​y​ ​y​o​u​r​ ​i​d​e​n​t​i​t​y
+				 */
+				title: string
+				/**
+				 * T​o​ ​a​c​t​i​v​a​t​e​ ​y​o​u​r​ ​B​l​i​n​k​ ​C​a​r​d​,​ ​t​h​e​ ​c​a​r​d​ ​i​s​s​u​e​r​ ​m​u​s​t​ ​v​e​r​i​f​y​ ​w​h​o​ ​y​o​u​ ​a​r​e​ ​(​K​Y​C​)​.​ ​Y​o​u​ ​w​i​l​l​ ​n​e​e​d​:
+				 */
+				description: string
+				requirements: {
+					/**
+					 * A​ ​g​o​v​e​r​n​m​e​n​t​-​i​s​s​u​e​d​ ​I​D
+					 */
+					governmentId: string
+					/**
+					 * A​ ​s​e​l​f​i​e​ ​/​ ​l​i​v​e​n​e​s​s​ ​c​h​e​c​k
+					 */
+					selfie: string
+					/**
+					 * P​r​o​o​f​ ​o​f​ ​a​d​d​r​e​s​s
+					 */
+					proofOfAddress: string
+					/**
+					 * A​ ​f​e​w​ ​q​u​e​s​t​i​o​n​s​ ​a​b​o​u​t​ ​y​o​u
+					 */
+					questions: string
+				}
+				/**
+				 * C​o​n​t​i​n​u​e
+				 */
+				buttonText: string
 			}
 			LoadingCard: {
 				/**
@@ -12716,7 +12784,7 @@ type RootTranslation = {
 						 */
 						label: string
 						/**
-						 * S​e​l​e​c​t​ ​y​o​u​r​ ​o​c​c​u​p​a​t​i​o​n
+						 * S​e​l​e​c​t
 						 */
 						placeholder: string
 					}
@@ -12726,7 +12794,7 @@ type RootTranslation = {
 						 */
 						label: string
 						/**
-						 * S​e​l​e​c​t​ ​y​o​u​r​ ​s​a​l​a​r​y​ ​r​a​n​g​e
+						 * S​e​l​e​c​t​ ​s​a​l​a​r​y
 						 */
 						placeholder: string
 					}
@@ -12751,10 +12819,6 @@ type RootTranslation = {
 						placeholder: string
 					}
 				}
-				/**
-				 * S​u​b​m​i​t​ ​a​p​p​l​i​c​a​t​i​o​n
-				 */
-				buttonText: string
 				/**
 				 * S​e​l​e​c​t
 				 */
@@ -12785,7 +12849,7 @@ type RootTranslation = {
 					 */
 					text: string
 					/**
-					 * I​s​s​u​e​r​'​s​ ​P​r​i​v​a​c​y​ ​P​o​l​i​c​y
+					 * I​s​s​u​e​r​’​s​ ​P​r​i​v​a​c​y​ ​P​o​l​i​c​y
 					 */
 					privacyPolicyLinkText: string
 					/**
@@ -12798,23 +12862,37 @@ type RootTranslation = {
 					cardTermsLinkText: string
 				}
 				/**
-				 * I​ ​c​e​r​t​i​f​y​ ​t​h​a​t​ ​t​h​e​ ​i​n​f​o​r​m​a​t​i​o​n​ ​I​ ​h​a​v​e​ ​p​r​o​v​i​d​e​d​ ​i​s​ ​a​c​c​u​r​a​t​e​ ​a​n​d​ ​t​h​a​t​ ​I​ ​w​i​l​l​ ​a​b​i​d​e​ ​b​y​ ​a​l​l​ ​t​h​e​ ​r​u​l​e​s​ ​a​n​d​ ​r​e​q​u​i​r​e​m​e​n​t​s​ ​r​e​l​a​t​e​d​ ​t​o​ ​m​y​ ​B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d
+				 * I​ ​c​e​r​t​i​f​y​ ​t​h​a​t​ ​t​h​e​ ​i​n​f​o​r​m​a​t​i​o​n​ ​I​ ​h​a​v​e​ ​p​r​o​v​i​d​e​d​ ​i​s​ ​a​c​c​u​r​a​t​e​ ​a​n​d​ ​t​h​a​t​ ​I​ ​w​i​l​l​ ​a​b​i​d​e​ ​b​y​ ​a​l​l​ ​t​h​e​ ​r​u​l​e​s​ ​a​n​d​ ​r​e​q​u​i​r​e​m​e​n​t​s​ ​r​e​l​a​t​e​d​ ​t​o​ ​m​y​ ​B​l​i​n​k​ ​C​a​r​d
 				 */
 				certifyAccuracy: string
 				/**
-				 * I​ ​a​c​k​n​o​w​l​e​d​g​e​ ​t​h​a​t​ ​a​p​p​l​y​i​n​g​ ​f​o​r​ ​t​h​e​ ​B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d​ ​d​o​e​s​ ​n​o​t​ ​c​o​n​s​t​i​t​u​t​e​ ​u​n​a​u​t​h​o​r​i​z​e​d​ ​s​o​l​i​c​i​t​a​t​i​o​n
+				 * I​ ​a​c​k​n​o​w​l​e​d​g​e​ ​t​h​a​t​ ​a​p​p​l​y​i​n​g​ ​f​o​r​ ​t​h​e​ ​B​l​i​n​k​ ​C​a​r​d​ ​d​o​e​s​ ​n​o​t​ ​c​o​n​s​t​i​t​u​t​e​ ​u​n​a​u​t​h​o​r​i​z​e​d​ ​s​o​l​i​c​i​t​a​t​i​o​n
 				 */
 				acknowledgeSolicitation: string
 			}
 			CardPreapproved: {
 				/**
-				 * Y​o​u​ ​h​a​v​e​ ​b​e​e​n​ ​p​r​e​-​a​p​p​r​o​v​e​d​ ​f​o​r​ ​t​h​e​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d​!
+				 * Y​o​u​r​ ​B​l​i​n​k​ ​C​a​r​d​ ​i​s​ ​r​e​a​d​y​!
 				 */
 				title: string
+				/**
+				 * Y​o​u​ ​c​a​n​ ​n​o​w​ ​a​c​t​i​v​a​t​e​ ​y​o​u​r​ ​c​a​r​d​ ​a​n​d​ ​s​t​a​r​t​ ​u​s​i​n​g​ ​i​t
+				 */
+				subtitle: string
 				/**
 				 * C​l​o​s​e
 				 */
 				buttonText: string
+			}
+			CardDeclined: {
+				/**
+				 * W​e​ ​c​o​u​l​d​n​'​t​ ​a​p​p​r​o​v​e​ ​y​o​u​r​ ​c​a​r​d​ ​a​p​p​l​i​c​a​t​i​o​n
+				 */
+				title: string
+				/**
+				 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​m​a​n​a​g​e​r​ ​w​i​l​l​ ​b​e​ ​i​n​ ​t​o​u​c​h​.
+				 */
+				subtitle: string
 			}
 			CardProcessing: {
 				/**
@@ -12822,13 +12900,9 @@ type RootTranslation = {
 				 */
 				title: string
 				/**
-				 * W​e​ ​w​i​l​l​ ​n​o​t​i​f​y​ ​y​o​u​ ​o​n​c​e​ ​w​e​ ​a​r​e​ ​r​e​a​d​y
+				 * T​h​i​s​ ​c​a​n​ ​t​a​k​e​ ​u​p​ ​t​o​ ​a​ ​m​i​n​u​t​e
 				 */
 				subtitle: string
-				/**
-				 * C​l​o​s​e
-				 */
-				buttonText: string
 			}
 		}
 	}
@@ -26756,7 +26830,7 @@ export type TranslationFunctions = {
 				title: () => LocalizedString
 				cardInfo: {
 					/**
-					 * The Blink Visa card
+					 * The Blink Card
 					 */
 					bitcoinCard: () => LocalizedString
 					/**
@@ -26764,9 +26838,9 @@ export type TranslationFunctions = {
 					 */
 					'for': () => LocalizedString
 					/**
-					 * Bitcoin Maximalists
+					 * Bitcoiners
 					 */
-					maximalist: () => LocalizedString
+					bitcoiners: () => LocalizedString
 				}
 				/**
 				 * Continue
@@ -26775,31 +26849,43 @@ export type TranslationFunctions = {
 			}
 			CardDetails: {
 				/**
-				 * Additional perks
+				 * What’s included
 				 */
 				title: () => LocalizedString
 				features: {
+					card: {
+						/**
+						 * Blink Card
+						 */
+						title: () => LocalizedString
+						/**
+						 * your Visa card, ready today
+						 */
+						subtitle: () => LocalizedString
+					}
+					accountManager: {
+						/**
+						 * Personal account manager
+						 */
+						title: () => LocalizedString
+						/**
+						 * and priority support
+						 */
+						subtitle: () => LocalizedString
+					}
 					/**
-					 * Dedicated account manager
+					 * On/Off ramping
 					 */
-					accountManager: () => LocalizedString
-					/**
-					 * Priority support
-					 */
-					support: () => LocalizedString
-					/**
-					 * 50% back on transaction fees
-					 */
-					onchainDeposits: () => LocalizedString
-					/**
-					 * $100 to circular economies
-					 */
-					circularEconomies: () => LocalizedString
+					onOffRamping: () => LocalizedString
 				}
 				/**
-				 * ... and more coming in 2026
+				 * in {months} months
 				 */
-				andMore: () => LocalizedString
+				availableIn: (arg: { months: number }) => LocalizedString
+				/**
+				 * Some features will be available within {months} months. The card is ready today.
+				 */
+				footnote: (arg: { months: number }) => LocalizedString
 				/**
 				 * Continue
 				 */
@@ -26812,16 +26898,16 @@ export type TranslationFunctions = {
 					 */
 					title: () => LocalizedString
 					/**
-					 * To Blink Private
+					 * To Blink Orange
 					 */
 					subtitle: () => LocalizedString
 					paragraphs: {
 						/**
-						 * Someone thought of you and suggested that we should invite you to Blink Private. Probably because you are an awesome Bitcoiner.
+						 * Someone thought of you and suggested that we should invite you to Blink Orange. Probably because you are an awesome Bitcoiner.
 						 */
 						body1: () => LocalizedString
 						/**
-						 * Our goal for 2026 is to stuff the program with so much goodies that it will be obvious to renew next year.
+						 * Blink Orange is the first tier of Blink’s membership for Bitcoiners, by invitation. The Blink Card and your personal account manager are two of the first services we offer — the rest we’re building through 2027.
 						 */
 						body2: () => LocalizedString
 					}
@@ -26849,13 +26935,31 @@ export type TranslationFunctions = {
 				 */
 				payButton: () => LocalizedString
 				/**
-				 * Blink Private
+				 * Blink Orange
 				 */
 				cardTitle: () => LocalizedString
+				/**
+				 * Free
+				 */
+				free: () => LocalizedString
+				/**
+				 * for now
+				 */
+				forNow: () => LocalizedString
 				/**
 				 * per year
 				 */
 				perYear: () => LocalizedString
+				freeBreakdown: {
+					/**
+					 * Blink Card
+					 */
+					card: () => LocalizedString
+					/**
+					 * Other member benefits
+					 */
+					memberBenefits: () => LocalizedString
+				}
 				status: {
 					/**
 					 * Status
@@ -26916,6 +27020,42 @@ export type TranslationFunctions = {
 				 * I understand my subscription will automatically renew in {months} months
 				 */
 				renew: (arg: { months: number }) => LocalizedString
+				/**
+				 * I understand Blink Orange is free for now, and that a membership fee may be introduced later, with notice
+				 */
+				freeNotice: () => LocalizedString
+			}
+			CardVerifyIdentity: {
+				/**
+				 * Verify your identity
+				 */
+				title: () => LocalizedString
+				/**
+				 * To activate your Blink Card, the card issuer must verify who you are (KYC). You will need:
+				 */
+				description: () => LocalizedString
+				requirements: {
+					/**
+					 * A government-issued ID
+					 */
+					governmentId: () => LocalizedString
+					/**
+					 * A selfie / liveness check
+					 */
+					selfie: () => LocalizedString
+					/**
+					 * Proof of address
+					 */
+					proofOfAddress: () => LocalizedString
+					/**
+					 * A few questions about you
+					 */
+					questions: () => LocalizedString
+				}
+				/**
+				 * Continue
+				 */
+				buttonText: () => LocalizedString
 			}
 			LoadingCard: {
 				/**
@@ -27101,7 +27241,7 @@ export type TranslationFunctions = {
 						 */
 						label: () => LocalizedString
 						/**
-						 * Select your occupation
+						 * Select
 						 */
 						placeholder: () => LocalizedString
 					}
@@ -27111,7 +27251,7 @@ export type TranslationFunctions = {
 						 */
 						label: () => LocalizedString
 						/**
-						 * Select your salary range
+						 * Select salary
 						 */
 						placeholder: () => LocalizedString
 					}
@@ -27136,10 +27276,6 @@ export type TranslationFunctions = {
 						placeholder: () => LocalizedString
 					}
 				}
-				/**
-				 * Submit application
-				 */
-				buttonText: () => LocalizedString
 				/**
 				 * Select
 				 */
@@ -27170,7 +27306,7 @@ export type TranslationFunctions = {
 					 */
 					text: () => LocalizedString
 					/**
-					 * Issuer's Privacy Policy
+					 * Issuer’s Privacy Policy
 					 */
 					privacyPolicyLinkText: () => LocalizedString
 					/**
@@ -27183,23 +27319,37 @@ export type TranslationFunctions = {
 					cardTermsLinkText: () => LocalizedString
 				}
 				/**
-				 * I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Visa Card
+				 * I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Card
 				 */
 				certifyAccuracy: () => LocalizedString
 				/**
-				 * I acknowledge that applying for the Blink Visa Card does not constitute unauthorized solicitation
+				 * I acknowledge that applying for the Blink Card does not constitute unauthorized solicitation
 				 */
 				acknowledgeSolicitation: () => LocalizedString
 			}
 			CardPreapproved: {
 				/**
-				 * You have been pre-approved for the Blink Visa card!
+				 * Your Blink Card is ready!
 				 */
 				title: () => LocalizedString
+				/**
+				 * You can now activate your card and start using it
+				 */
+				subtitle: () => LocalizedString
 				/**
 				 * Close
 				 */
 				buttonText: () => LocalizedString
+			}
+			CardDeclined: {
+				/**
+				 * We couldn't approve your card application
+				 */
+				title: () => LocalizedString
+				/**
+				 * Your account manager will be in touch.
+				 */
+				subtitle: () => LocalizedString
 			}
 			CardProcessing: {
 				/**
@@ -27207,13 +27357,9 @@ export type TranslationFunctions = {
 				 */
 				title: () => LocalizedString
 				/**
-				 * We will notify you once we are ready
+				 * This can take up to a minute
 				 */
 				subtitle: () => LocalizedString
-				/**
-				 * Close
-				 */
-				buttonText: () => LocalizedString
 			}
 		}
 	}

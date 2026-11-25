@@ -37,6 +37,7 @@ declare module "@rn-vui/themed" {
     staticLighterGrey: string
     staticDarkGrey: string
     staticCardPill: string
+    staticCardBackground: string
     staticBrandOrange: string
     staticSuccess: string
     staticBrandYellow: string
