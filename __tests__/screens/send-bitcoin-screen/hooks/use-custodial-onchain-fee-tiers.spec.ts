@@ -3,10 +3,7 @@ import { renderHook, waitFor } from "@testing-library/react-native"
 import { ApolloError } from "@apollo/client"
 import { GraphQLError } from "graphql"
 
-import {
-  FeeTierOption,
-  FeeUnit,
-} from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
+import { FeeTierOption, FeeUnit } from "@app/types/fee-tiers"
 import { OnchainFeeQuote } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { useCustodialOnchainFeeTiers } from "@app/screens/send-bitcoin-screen/hooks/use-custodial-onchain-fee-tiers"
 
@@ -42,6 +39,16 @@ const feeResponse = (fast: number, medium: number, slow: number) => ({
     slow: { amount: slow },
   },
 })
+
+/** What the backend returns when the address belongs to the sending wallet. */
+const selfPaymentRejection = () =>
+  new ApolloError({
+    graphQLErrors: [
+      new GraphQLError("User tried to pay themselves", {
+        extensions: { code: "CANT_PAY_SELF" },
+      }),
+    ],
+  })
 
 const btcParams = {
   walletId: "btc-wallet",
@@ -251,6 +258,70 @@ describe("useCustodialOnchainFeeTiers", () => {
       rejection,
       { expected: true },
     )
+  })
+
+  /** blink-mobile#4261: told apart by the backend's code, never by the message text. */
+  it("flags a payment to the sending wallet's own address as a self-payment", async () => {
+    const rejection = selfPaymentRejection()
+    mockFetchBtcFees.mockResolvedValue({ data: undefined, error: rejection })
+
+    const { result } = renderHook(() => useCustodialOnchainFeeTiers(btcParams))
+
+    await waitFor(() => {
+      expect(result.current.hasError).toBe(true)
+    })
+    expect(result.current.isSelfPayment).toBe(true)
+    expect(mockReportError).toHaveBeenCalledWith(
+      "use-custodial-onchain-fee-tiers",
+      rejection,
+      { expected: true },
+    )
+  })
+
+  it("does not flag another code as a self-payment, whatever its message says", async () => {
+    const rejection = new ApolloError({
+      graphQLErrors: [
+        new GraphQLError("User tried to pay themselves", {
+          extensions: { code: "INVALID_INPUT" },
+        }),
+      ],
+    })
+    mockFetchBtcFees.mockResolvedValue({ data: undefined, error: rejection })
+
+    const { result } = renderHook(() => useCustodialOnchainFeeTiers(btcParams))
+
+    await waitFor(() => {
+      expect(result.current.hasError).toBe(true)
+    })
+    expect(result.current.isSelfPayment).toBe(false)
+  })
+
+  it("quotes an external address after a self-payment, with the flag gone", async () => {
+    mockFetchBtcFees.mockResolvedValueOnce({
+      data: undefined,
+      error: selfPaymentRejection(),
+    })
+
+    const { result, rerender } = renderHook(
+      (props: Parameters<typeof useCustodialOnchainFeeTiers>[0]) =>
+        useCustodialOnchainFeeTiers(props),
+      { initialProps: btcParams },
+    )
+
+    await waitFor(() => {
+      expect(result.current.isSelfPayment).toBe(true)
+    })
+
+    mockFetchBtcFees.mockResolvedValue(feeResponse(900, 600, 300))
+    rerender({ ...btcParams, address: "bc1qexternal" })
+
+    // Gone on the very render the address changes, before the new quote lands.
+    expect(result.current.isSelfPayment).toBe(false)
+    await waitFor(() => {
+      expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(900)
+    })
+    expect(result.current.hasError).toBe(false)
+    expect(result.current.isSelfPayment).toBe(false)
   })
 
   /** The transport failing is what the connectivity classifier downgrades, so it must

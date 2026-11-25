@@ -2418,6 +2418,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transakcija bi trebala biti poslana u mempool",
     "amount": "Iznos",
+    "addAmount": "Dodaj iznos",
+    "lowFunds": "Nedovoljno sredstava",
     "amountExceed": "Iznos premašuje vaš saldo od {balance: string}",
     "amountExceedsLimit": "Iznos premašuje vaše preostalo dnevno ograničenje od {limit: string}",
     "upgradeAccountToIncreaseLimit": "Nadogradite svoj račun kako biste povećali svoje ograničenje",
@@ -2469,7 +2471,8 @@
     "sdkInsufficientFunds": "Nedovoljno sredstava za ovu transakciju.",
     "sdkAmountTooLow": "Iznos je prenizak za on-chain transakciju.",
     "sdkNetworkError": "Mrežna greška. Provjerite vezu i pokušajte ponovo.",
-    "sdkGenericError": "Nije moguće procijeniti naknade. Pokušajte s drugim iznosom."
+    "sdkGenericError": "Nije moguće procijeniti naknade. Pokušajte s drugim iznosom.",
+    "onchainSelfPayment": "Ovo je adresa vašeg vlastitog novčanika. Ne možete poslati on-chain uplatu sami sebi."
   },
   "SettingsScreen": {
     "createAddress": "Stvori Lightning adresu",
@@ -3131,6 +3134,12 @@
   "AmountInputButton": {
     "tapToSetAmount": "Postavite iznos"
   },
+  "Accessibility": {
+    "deleteKey": "Izbriši",
+    "swapCurrencyHint": "Mijenja valutu u kojoj upisujete iznos",
+    "switchToWallet": "Prebaci na {wallet: string}",
+    "copy": "Kopiraj"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Moram ažurirati svoju aplikaciju na najnoviju verziju. Koristim aplikaciju {os: string} s verzijom {version: string}.",
     "versionNotSupported": "Ova mobilna verzija više nije podržana",
@@ -3670,8 +3679,14 @@
         "paymentTitle": "Plaćanje",
         "acceptButton": "Prihvati",
         "payButton": "Nastavi i Plati",
-        "cardTitle": "Blink Privatni",
+        "cardTitle": "Blink Orange",
+        "free": "Besplatno",
+        "forNow": "za sada",
         "perYear": "godišnje",
+        "freeBreakdown": {
+          "card": "Blink kartica",
+          "memberBenefits": "Ostale članske pogodnosti"
+        },
         "status": {
           "label": "Status",
           "specialOfferLabel": "Posebna ponuda",
@@ -3692,35 +3707,53 @@
           "text": "Pregledao sam i slažem se s dokumentom",
           "linkText": "Cjenik naknada za Blink Card"
         },
-        "renew": "Razumijem da će se moja pretplata automatski obnoviti za {months: number} mjeseci"
+        "renew": "Razumijem da će se moja pretplata automatski obnoviti za {months: number} mjeseci",
+        "freeNotice": "Razumijem da je Blink Orange za sada besplatan te da se članarina može uvesti kasnije, uz prethodnu obavijest"
+      },
+      "CardVerifyIdentity": {
+        "title": "Potvrdite svoj identitet",
+        "description": "Da biste aktivirali svoju Blink karticu, izdavatelj kartice mora potvrditi tko ste (KYC). Trebat će vam:",
+        "requirements": {
+          "governmentId": "Službeni identifikacijski dokument",
+          "selfie": "Selfie / provjera živosti",
+          "proofOfAddress": "Dokaz o adresi",
+          "questions": "Nekoliko pitanja o vama"
+        },
+        "buttonText": "Nastavi"
       },
       "CardIntroducing": {
         "title": "Predstavljamo",
         "cardInfo": {
-          "bitcoinCard": "Blink Visa kartica",
+          "bitcoinCard": "Blink kartica",
           "for": "za",
-          "maximalist": "Bitcoin Maksimaliste"
+          "bitcoiners": "Bitcoinere"
         },
         "buttonText": "Nastavi"
       },
       "CardDetails": {
-        "title": "Dodatne pogodnosti",
+        "title": "Što je uključeno",
         "features": {
-          "accountManager": "Posvećeni upravitelj računa",
-          "support": "Prioritetna podrška",
-          "onchainDeposits": "50% povrata na naknade za transakcije",
-          "circularEconomies": "100 $ za kružne ekonomije"
+          "card": {
+            "title": "Blink kartica",
+            "subtitle": "vaša Visa kartica, spremna već danas"
+          },
+          "accountManager": {
+            "title": "Osobni upravitelj računa",
+            "subtitle": "i prioritetna podrška"
+          },
+          "onOffRamping": "Uplate i isplate novca"
         },
-        "andMore": "... i još toga dolazi 2026.",
+        "availableIn": "za {months} mjeseci",
+        "footnote": "Neke značajke bit će dostupne u roku od {months} mjeseci. Kartica je spremna već danas.",
         "buttonText": "Nastavi"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Dobrodošli na brod",
-          "subtitle": "U Blink Privatni",
+          "subtitle": "U Blink Orange",
           "paragraphs": {
-            "body1": "Netko je mislio na vas i predložio da vas pozovemo u Blink Privatni. Vjerojatno zato što ste sjajan Bitcoiner.",
-            "body2": "Naš cilj za 2026. je napuniti program s toliko pogodnosti da će biti očito da se isplati obnoviti sljedeće godine."
+            "body1": "Netko je mislio na vas i predložio da vas pozovemo u Blink Orange. Vjerojatno zato što ste sjajan Bitcoiner.",
+            "body2": "Blink Orange je prva razina Blink članstva za Bitcoinere, samo uz pozivnicu. Blink kartica i vaš osobni upravitelj računa dvije su od prvih usluga koje nudimo — ostatak gradimo do 2027."
           }
         },
         "buttonText": "Idemo"
@@ -3797,11 +3830,11 @@
         "fields": {
           "occupation": {
             "label": "Zanimanje",
-            "placeholder": "Odaberite svoje zanimanje"
+            "placeholder": "Odaberite"
           },
           "annualSalaryRange": {
             "label": "Godišnja plaća",
-            "placeholder": "Odaberite svoj raspon plaće"
+            "placeholder": "Odaberite plaću"
           },
           "accountPurpose": {
             "label": "Svrha računa",
@@ -3812,7 +3845,6 @@
             "placeholder": "Odaberite svoj raspon potrošnje"
           }
         },
-        "buttonText": "Pošalji prijavu",
         "select": "odaberi"
       },
       "Acknowledgement": {
@@ -3828,17 +3860,21 @@
           "and": ", i",
           "cardTermsLinkText": "Uvjete kartice Blink"
         },
-        "certifyAccuracy": "Potvrđujem da su podaci koje sam dao točni i da ću se pridržavati svih pravila i zahtjeva povezanih s mojom karticom Blink Visa",
-        "acknowledgeSolicitation": "Potvrđujem da podnošenje zahtjeva za karticu Blink Visa ne predstavlja neovlašteno oglašavanje"
+        "certifyAccuracy": "Potvrđujem da su podaci koje sam dao točni i da ću se pridržavati svih pravila i zahtjeva povezanih s mojom karticom Blink",
+        "acknowledgeSolicitation": "Potvrđujem da podnošenje zahtjeva za karticu Blink ne predstavlja neovlašteno oglašavanje"
       },
       "CardPreapproved": {
-        "title": "Unaprijed ste odobreni za Blink Visa karticu!",
+        "title": "Vaša Blink kartica je spremna!",
+        "subtitle": "Sada možete aktivirati svoju karticu i početi je koristiti",
         "buttonText": "Zatvori"
+      },
+      "CardDeclined": {
+        "title": "Nismo mogli odobriti vaš zahtjev za karticu",
+        "subtitle": "Vaš upravitelj računa javit će vam se."
       },
       "CardProcessing": {
         "title": "Obrađujemo vašu prijavu",
-        "subtitle": "Obavijestit ćemo te čim budemo spremni",
-        "buttonText": "Zatvori"
+        "subtitle": "Ovo može potrajati do jedne minute"
       }
     }
   },

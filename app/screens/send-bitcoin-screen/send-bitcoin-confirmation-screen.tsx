@@ -50,7 +50,6 @@ import {
   useSendPayment,
 } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
-import { ellipsizeMiddle } from "@app/utils/helper"
 import { staticSurface } from "@app/rne-theme/surfaces"
 import { groupTitleGap } from "@app/rne-theme/tokens"
 import { fonts } from "@app/rne-theme/fonts"
@@ -282,15 +281,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               satAmount,
               currencyFeeAmount,
               satFeeAmount,
-              destination:
-                paymentDetail?.paymentType === "intraledger"
-                  ? destination
-                  : ellipsizeMiddle(destination, {
-                      maxLength: 50,
-                      maxResultLeft: 13,
-                      maxResultRight: 8,
-                    }),
-              paymentType: paymentDetail?.paymentType,
+              destination,
+              paymentType,
               createdAt: transaction?.createdAt,
             },
           },
@@ -525,7 +517,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const LightningRecommendedComponent = isLightningRecommended() ? (
     <View style={styles.feeWarning}>
-      <WarningBanner numberOfLines={1}>
+      <WarningBanner numberOfLines={1} announce>
         {LL.SendBitcoinConfirmationScreen.lightningRecommended()}
       </WarningBanner>
     </View>
@@ -654,7 +646,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
         {dustWarning.status === "visible" ? (
           <View style={styles.fieldContainer}>
-            <WarningBanner>
+            <WarningBanner announce>
               {LL.SendBitcoinConfirmationScreen.usdRemainderSweep({
                 remaining: formatMoneyAmount({ moneyAmount: dustWarning.remaining }),
                 remainingSats: formatMoneyAmount({

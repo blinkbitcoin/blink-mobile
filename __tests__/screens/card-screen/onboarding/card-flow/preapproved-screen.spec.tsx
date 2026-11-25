@@ -1,26 +1,26 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import theme from "@app/rne-theme/theme"
 
 import { CardPreapprovedScreen } from "@app/screens/card-screen/onboarding/card-flow/preapproved-screen"
 import { ContextForScreen } from "../../../helper"
 
-jest.mock("@react-native-community/blur", () => ({
-  BlurView: "BlurView",
-}))
+/** The burst itself is covered by the confetti spec; here only its presence matters. */
+jest.mock("@app/components/confetti", () => {
+  const { View } = jest.requireActual("react-native")
+  return { Confetti: () => <View testID="confetti" /> }
+})
 
-jest.mock("react-native-linear-gradient", () => ({
-  LinearGradient: "LinearGradient",
-}))
-
-const mockNavigate = jest.fn()
+const mockPopTo = jest.fn()
 
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
   return {
     ...actualNav,
     useNavigation: () => ({
-      navigate: mockNavigate,
+      popTo: mockPopTo,
     }),
   }
 })
@@ -43,7 +43,7 @@ describe("CardPreapprovedScreen", () => {
     expect(toJSON()).toBeTruthy()
   })
 
-  it("displays preapproved title", async () => {
+  it("says the card is ready and that it can be activated now", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <CardPreapprovedScreen />
@@ -52,7 +52,28 @@ describe("CardPreapprovedScreen", () => {
 
     await act(async () => {})
 
-    expect(getByText("You have been pre-approved for the Blink Visa card!")).toBeTruthy()
+    expect(getByText("Your Blink Card is ready!")).toBeTruthy()
+    expect(getByText("You can now activate your card and start using it")).toBeTruthy()
+  })
+
+  it("sets the subtitle as the design's secondary paragraph", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardPreapprovedScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(
+      StyleSheet.flatten(
+        getByText("You can now activate your card and start using it").props.style,
+      ),
+    ).toMatchObject({
+      fontSize: 14,
+      lineHeight: 18,
+      color: theme.lightColors?.textSecondary,
+    })
   })
 
   it("displays continue button", async () => {
@@ -67,7 +88,19 @@ describe("CardPreapprovedScreen", () => {
     expect(getByText("Close")).toBeTruthy()
   })
 
-  it("navigates to Primary on button press", async () => {
+  it("celebrates the approval with confetti", async () => {
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <CardPreapprovedScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(getByTestId("confetti")).toBeTruthy()
+  })
+
+  it("goes back to the Home under it on Close, rather than stacking another", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <CardPreapprovedScreen />
@@ -81,6 +114,6 @@ describe("CardPreapprovedScreen", () => {
       fireEvent.press(button)
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("Primary")
+    expect(mockPopTo).toHaveBeenCalledWith("Primary")
   })
 })

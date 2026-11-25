@@ -3,6 +3,7 @@ import { AppState, View, ScrollView } from "react-native"
 import ViewShot, { type ViewShotRef } from "react-native-view-shot"
 
 import { radius } from "@app/rne-theme/radius"
+import { staticSurface } from "@app/rne-theme/surfaces"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "@app/components/screen"
 import {
@@ -23,6 +24,7 @@ import { PaymentSendCompletedStatus } from "./use-send-payment"
 import LogoLightMode from "@app/assets/logo/blink-logo-light.svg"
 import LogoDarkMode from "@app/assets/logo/app-logo-dark.svg"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { SuccessActionTag } from "@app/components/success-action/success-action"
 import { LNURLPaySuccessAction, utils } from "lnurl-pay"
 import { formatUnixTimestampYMDHM } from "@app/utils/date"
@@ -34,6 +36,9 @@ import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { PaymentType } from "@blinkbitcoin/blink-client"
+
+import { PaymentDetailType } from "./payment-details/index.types"
+import { receiptDestination } from "./receipt-destination"
 
 type StatusProcessed = "SUCCESS" | "PENDING" | "QUEUED"
 
@@ -168,7 +173,7 @@ const PaymentDetailsSection: React.FC<{
   usernameTitle: string
   destination?: string
   createdAt?: number
-  paymentType?: PaymentType | string
+  paymentType?: PaymentDetailType
   LL: TranslationFunctions
 }> = ({
   currencyAmount,
@@ -212,7 +217,11 @@ const PaymentDetailsSection: React.FC<{
         />
         <SuccessActionComponent
           title={LL.SendBitcoinScreen.recipient()}
-          text={destination}
+          text={
+            destination && paymentType
+              ? receiptDestination(paymentType, destination)
+              : destination
+          }
           key="recipient"
           visible={Boolean(destination)}
         />
@@ -395,12 +404,17 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
           </View>
 
           {!isTakingScreenshot && (
-            <GaloyPrimaryButton
-              style={styles.shareButton}
-              onPress={captureAndShare}
-              title={LL.common.share()}
-              underlayColor="transparent"
-            />
+            <View style={styles.actions}>
+              <GaloyPrimaryButton
+                onPress={captureAndShare}
+                title={LL.common.share()}
+                underlayColor="transparent"
+              />
+              <GaloySecondaryButton
+                title={LL.common.close()}
+                onPress={handleNavigateHome}
+              />
+            </View>
           )}
         </View>
       </ViewShot>
@@ -435,14 +449,15 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     marginTop: 20,
   },
-  shareButton: {
+  actions: {
+    gap: 10,
     marginTop: 10,
     marginBottom: 20,
   },
   successActionFieldContainer: {
     overflow: "hidden",
     gap: 20,
-    backgroundColor: colors.surfaceInteractive,
+    ...staticSurface(colors),
     borderRadius: radius.default,
     alignItems: "center",
     paddingHorizontal: 10,

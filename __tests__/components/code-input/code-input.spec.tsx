@@ -1,4 +1,5 @@
 import React from "react"
+import { Platform } from "react-native"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 
 import { CodeInput } from "@app/components/code-input"
@@ -70,6 +71,31 @@ describe("CodeInput", () => {
     fireEvent.changeText(field(), "1")
 
     expect(mockSetErrorMessage).toHaveBeenCalledWith("")
+  })
+
+  describe("cursor", () => {
+    const originalOS = Platform.OS
+
+    afterEach(() => {
+      Platform.OS = originalOS
+    })
+
+    /** Single-line, Android draws the cursor at the right end once the digits are deleted. */
+    it("lays the field out multiline on Android, the return key submitting", async () => {
+      Platform.OS = "android"
+      await renderInput(false)
+
+      expect(field().props.multiline).toBe(true)
+      expect(field().props.submitBehavior).toBe("blurAndSubmit")
+    })
+
+    it("keeps the field single-line on iOS", async () => {
+      Platform.OS = "ios"
+      await renderInput(false)
+
+      expect(field().props.multiline).toBe(false)
+      expect(field().props.submitBehavior).toBeUndefined()
+    })
   })
 
   it("fills the field, darker while it has focus, and starts focused", async () => {

@@ -88,6 +88,16 @@ describe("StepLayout", () => {
     )
   })
 
+  it("draws the overlay outside both the scroll view and the footer band", () => {
+    renderLayout({ overlay: <Text>overlay effect</Text> })
+
+    const overlay = screen.getByText("overlay effect")
+    const band = getPaintedAncestor(screen.getByText("footer action"))
+
+    expect(isInside(overlay, getScrollView())).toBe(false)
+    expect(band && isInside(overlay, band)).toBe(false)
+  })
+
   it("renders the header above the content", () => {
     renderLayout({ header: <Text>header row</Text> })
 

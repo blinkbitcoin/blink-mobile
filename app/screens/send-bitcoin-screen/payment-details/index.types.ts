@@ -141,14 +141,16 @@ export type SetPayoutSpeed<T extends WalletCurrency> = (
   payoutSpeed: PayoutSpeed,
 ) => PaymentDetail<T>
 
+export type PaymentDetailType =
+  | typeof PaymentType.Intraledger
+  | typeof PaymentType.Onchain
+  | typeof PaymentType.Lightning
+  | typeof PaymentType.Lnurl
+  | typeof SelfCustodialPaymentType.Spark
+
 type BasePaymentDetail<T extends WalletCurrency> = {
   memo?: string
-  paymentType:
-    | typeof PaymentType.Intraledger
-    | typeof PaymentType.Onchain
-    | typeof PaymentType.Lightning
-    | typeof PaymentType.Lnurl
-    | typeof SelfCustodialPaymentType.Spark
+  paymentType: PaymentDetailType
   destination: string
   sendingWalletDescriptor: WalletDescriptor<T>
   convertMoneyAmount: ConvertMoneyAmount

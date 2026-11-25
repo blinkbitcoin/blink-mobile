@@ -1,99 +1,108 @@
 import * as React from "react"
-import { ScrollView, View } from "react-native"
+import { View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { makeStyles, Text } from "@rn-vui/themed"
+import { Divider, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { radius } from "@app/rne-theme/radius"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { Feature, FeatureItem } from "@app/components/card-screen"
-import { Screen } from "@app/components/screen"
+import { FeatureRow, FeatureRowProps } from "@app/components/card-screen"
+import { StepLayout } from "@app/components/step-layout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { staticSurface } from "@app/rne-theme/surfaces"
 
+const UPCOMING_FEATURES_MONTHS = 12
+const DIVIDER_WIDTH = 1
+
 export const CardDetailsScreen: React.FC = () => {
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-  const FEATURES: Feature[] = React.useMemo(
-    () => [
+  const FEATURES: FeatureRowProps[] = React.useMemo(() => {
+    const upcomingBadge = LL.CardFlow.Onboarding.CardDetails.availableIn({
+      months: UPCOMING_FEATURES_MONTHS,
+    })
+
+    return [
       {
-        icon: "graph" as const,
-        title: LL.CardFlow.Onboarding.CardDetails.features.accountManager(),
+        icon: "card" as const,
+        title: LL.CardFlow.Onboarding.CardDetails.features.card.title(),
+        subtitle: LL.CardFlow.Onboarding.CardDetails.features.card.subtitle(),
       },
       {
         icon: "headset" as const,
-        title: LL.CardFlow.Onboarding.CardDetails.features.support(),
+        title: LL.CardFlow.Onboarding.CardDetails.features.accountManager.title(),
+        subtitle: LL.CardFlow.Onboarding.CardDetails.features.accountManager.subtitle(),
       },
       {
-        icon: "refresh" as const,
-        title: LL.CardFlow.Onboarding.CardDetails.features.onchainDeposits(),
+        icon: "bitcoin" as const,
+        title: LL.CardFlow.Onboarding.CardDetails.features.onOffRamping(),
+        badge: upcomingBadge,
       },
-      {
-        icon: "btc-hand" as const,
-        title: LL.CardFlow.Onboarding.CardDetails.features.circularEconomies(),
-      },
-    ],
-    [LL],
-  )
+    ]
+  }, [LL])
 
   const handleNext = () => {
     navigation.navigate("cardOnboardingSubscribeScreen")
   }
 
   return (
-    <Screen>
-      <View style={styles.container}>
-        <View style={styles.topSpacer} />
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-        >
-          <View style={styles.cardContainer}>
-            {FEATURES.map((feature, index) => (
-              <FeatureItem key={`feature-${index}`} feature={feature} />
-            ))}
-            <Text type="p2">{LL.CardFlow.Onboarding.CardDetails.andMore()}</Text>
-          </View>
-        </ScrollView>
+    <StepLayout
+      footer={
+        <GaloyPrimaryButton
+          title={LL.CardFlow.Onboarding.CardDetails.buttonText()}
+          onPress={handleNext}
+        />
+      }
+    >
+      <View style={styles.content}>
+        <View style={styles.cardContainer}>
+          {FEATURES.map((feature, index) => {
+            const hasDivider = index > 0
 
-        <View style={styles.buttonsContainer}>
-          <GaloyPrimaryButton
-            title={LL.CardFlow.Onboarding.CardDetails.buttonText()}
-            onPress={handleNext}
-          />
+            return (
+              <React.Fragment key={`feature-${index}`}>
+                {hasDivider && (
+                  <Divider
+                    color={colors.neutral}
+                    width={DIVIDER_WIDTH}
+                    style={styles.divider}
+                  />
+                )}
+                <FeatureRow {...feature} />
+              </React.Fragment>
+            )
+          })}
         </View>
+        <Text type="p3" style={styles.footnote}>
+          {LL.CardFlow.Onboarding.CardDetails.footnote({
+            months: UPCOMING_FEATURES_MONTHS,
+          })}
+        </Text>
       </View>
-    </Screen>
+    </StepLayout>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  container: {
-    flex: 1,
-  },
-  topSpacer: {
-    marginTop: 30,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
+  content: {
+    paddingTop: 10,
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    gap: 20,
   },
   cardContainer: {
     ...staticSurface(colors),
     borderRadius: radius.default,
-    padding: 15,
-    gap: 30,
   },
-  buttonsContainer: {
-    justifyContent: "flex-end",
-    marginBottom: 14,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+  divider: {
+    marginHorizontal: 14,
+  },
+  footnote: {
+    textAlign: "center",
   },
 }))

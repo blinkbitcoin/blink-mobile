@@ -41,7 +41,7 @@ export const FieldWithEvent = ({ title, value, subValue }: FieldWithEventProps) 
       <View style={styles.fieldBackground}>
         <View>
           {textData.text && (
-            <Text style={styles.inputStyle} type={"p3"}>
+            <Text style={styles.inputStyle} type={"p3"} bold>
               {textData.text}
             </Text>
           )}
@@ -51,6 +51,7 @@ export const FieldWithEvent = ({ title, value, subValue }: FieldWithEventProps) 
               style={[styles.inputStyle, styles.inputUrl]}
               onPress={() => Linking.openURL(textData.url!)}
               type={"p3"}
+              bold
             >
               {textData.url}
             </Text>
@@ -58,6 +59,7 @@ export const FieldWithEvent = ({ title, value, subValue }: FieldWithEventProps) 
           {subValue && (
             <Text
               type={"p3"}
+              bold
               style={[styles.inputStyle, styles.subValueStyle]}
             >{`(${subValue})`}</Text>
           )}

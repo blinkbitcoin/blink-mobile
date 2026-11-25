@@ -10,6 +10,8 @@ import { groupTitleGap, spacing } from "@app/rne-theme/tokens"
  * Headings (h1/h2, bold section headers) and titles beside a field are out of scope.
  * A title that is not regular 14px stays out, except the Galoy address and fee-rate titles,
  * which were already regular 16px. Send is being replaced and is not judged for size.
+ * The Send 3.0 amount entry frame has no field titles, so its details screen and priority
+ * row are not listed.
  * The artifact under test is the style source, so source-coupling here is intentional.
  */
 
@@ -29,14 +31,13 @@ const TITLE_GAPS: Record<string, number> = {
   "app/screens/card-screen/card-personal-details-screen/card-personal-details-screen.tsx": 1,
   "app/screens/card-screen/card-settings-screen/card-settings-screen.tsx": 2,
   "app/screens/card-screen/card-statements-screen/card-statements-screen.tsx": 1,
+  "app/screens/card-screen/onboarding/card-flow/personal-information-screen.tsx": 1,
   "app/screens/card-screen/order-card-screens/steps/shared-styles.ts": 1,
   "app/screens/card-screen/replace-card-screens/steps/shared-styles.ts": 1,
   "app/screens/galoy-address-screen/address-component.tsx": 1,
   "app/screens/people-screen/contacts/contact-transactions.tsx": 1,
-  "app/screens/send-bitcoin-screen/fee-tier-selector.tsx": 1,
   "app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen.tsx": 1,
   "app/screens/send-bitcoin-screen/send-bitcoin-destination-screen.tsx": 1,
-  "app/screens/send-bitcoin-screen/send-bitcoin-details-screen.tsx": 1,
   "app/screens/settings-screen/api/api-key-create-screen.tsx": 1,
   "app/screens/settings-screen/fee-rates-screen.tsx": 1,
   "app/screens/settings-screen/group.tsx": 1,
@@ -70,11 +71,14 @@ const TITLE_STYLES: [string, string][] = [
     "app/screens/card-screen/card-statements-screen/card-statements-screen.tsx",
     "sectionLabel",
   ],
+  [
+    "app/screens/card-screen/onboarding/card-flow/personal-information-screen.tsx",
+    "label",
+  ],
   ["app/screens/card-screen/order-card-screens/steps/shared-styles.ts", "sectionTitle"],
   ["app/screens/card-screen/replace-card-screens/steps/shared-styles.ts", "sectionTitle"],
   ["app/screens/galoy-address-screen/address-component.tsx", "addressTitle"],
   ["app/screens/people-screen/contacts/contact-transactions.tsx", "sectionHeaderText"],
-  ["app/screens/send-bitcoin-screen/fee-tier-selector.tsx", "title"],
   [
     "app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen.tsx",
     "fieldTitleText",
@@ -83,7 +87,6 @@ const TITLE_STYLES: [string, string][] = [
     "app/screens/send-bitcoin-screen/send-bitcoin-destination-screen.tsx",
     "fieldTitleText",
   ],
-  ["app/screens/send-bitcoin-screen/send-bitcoin-details-screen.tsx", "fieldTitleText"],
   ["app/screens/settings-screen/fee-rates-screen.tsx", "sectionTitle"],
   ["app/screens/settings-screen/group.tsx", "title"],
   ["app/screens/settings-screen/self-custodial/account-fields.tsx", "label"],
@@ -95,10 +98,8 @@ const TOKEN_USE = /^\s*(gap|rowGap|marginTop|marginBottom): groupTitleGap,$/
 
 // Send is being replaced. Its bold titles stay as this PR left them.
 const SEND_TITLES = new Set([
-  "app/screens/send-bitcoin-screen/fee-tier-selector.tsx",
   "app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen.tsx",
   "app/screens/send-bitcoin-screen/send-bitcoin-destination-screen.tsx",
-  "app/screens/send-bitcoin-screen/send-bitcoin-details-screen.tsx",
 ])
 
 // Regular 16px before this migration. Size stays; colour and gap follow the rule.
@@ -157,13 +158,6 @@ describe("group title", () => {
   })
 
   it("leaves titles outside the 14px regular contract unchanged", () => {
-    const personal = source(
-      "app/screens/card-screen/onboarding/card-flow/personal-information-screen.tsx",
-    )
-    expect(personal).not.toContain("groupTitleGap")
-    expect(personal).not.toContain("textSecondary")
-    expect(personal).toContain("gap: 6,")
-
     const deposits = styleBlock(
       "app/screens/unclaimed-deposits/unclaimed-deposits-screen.tsx",
       "fieldLabel",

@@ -1,7 +1,7 @@
 import React from "react"
-import { useNavigation } from "@react-navigation/native"
+import { StackActions, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import { useTheme } from "@rn-vui/themed"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
@@ -10,25 +10,49 @@ import { HEADER_ICON_BUTTON_TOUCH_PADDING, headerRightNoGlass } from "../header-
 
 type HeaderCloseControlParams = {
   navigateTo?: keyof RootStackParamList
+  /** Pops back to `navigateTo` instead of navigating to it. A screen that ends a flow
+   *  closes onto the Home already under it, since navigating stacks a second one. */
+  shouldPopTo?: boolean
 }
 
-const HeaderCloseButton: React.FC<HeaderCloseControlParams> = ({
-  navigateTo = "Primary",
+/** The native header already insets its right item by 16 on both platforms (Android
+ *  mirrors its start inset to the end to match iOS), and the design keeps the circle 20
+ *  from the edge. So the 48dp box leaves the circle only the remaining 4 on its right and
+ *  takes the rest on its left, instead of reaching past the inset with a negative margin. */
+const HEADER_RIGHT_NATIVE_INSET = 16
+const DESIGN_EDGE_INSET = 20
+const CLOSE_RIGHT_TOUCH_PADDING = DESIGN_EDGE_INSET - HEADER_RIGHT_NATIVE_INSET
+const CLOSE_TOUCH_PADDING = {
+  top: HEADER_ICON_BUTTON_TOUCH_PADDING,
+  bottom: HEADER_ICON_BUTTON_TOUCH_PADDING,
+  right: CLOSE_RIGHT_TOUCH_PADDING,
+  left: HEADER_ICON_BUTTON_TOUCH_PADDING * 2 - CLOSE_RIGHT_TOUCH_PADDING,
+}
+
+const HeaderCloseButton: React.FC<Required<HeaderCloseControlParams>> = ({
+  navigateTo,
+  shouldPopTo,
 }) => {
-  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
+  const close = () => {
+    if (shouldPopTo) {
+      navigation.dispatch(StackActions.popTo(navigateTo))
+      return
+    }
+    navigation.navigate(navigateTo as never)
+  }
+
   return (
     <GaloyIconButton
-      onPress={() => navigation.navigate(navigateTo as never)}
+      onPress={close}
       size="medium"
       name="close"
       backgroundColor={colors.surfaceInteractive}
-      style={styles.headerCloseButton}
-      touchPadding={HEADER_ICON_BUTTON_TOUCH_PADDING}
+      touchPadding={CLOSE_TOUCH_PADDING}
     />
   )
 }
@@ -38,13 +62,8 @@ const HeaderCloseButton: React.FC<HeaderCloseControlParams> = ({
 // export: a bare `headerRight: <close button>` would get the glass capsule back.
 export const headerCloseControlOptions = ({
   navigateTo = "Primary",
+  shouldPopTo = false,
 }: HeaderCloseControlParams = {}) =>
-  headerRightNoGlass(() => <HeaderCloseButton navigateTo={navigateTo} />)
-
-const useStyles = makeStyles(() => ({
-  // The 48dp box puts the 34dp circle 7dp in from its right edge: the margin gives
-  // those 7dp back, so the circle stays 20dp from the screen edge.
-  headerCloseButton: {
-    marginRight: 20 - HEADER_ICON_BUTTON_TOUCH_PADDING,
-  },
-}))
+  headerRightNoGlass(() => (
+    <HeaderCloseButton navigateTo={navigateTo} shouldPopTo={shouldPopTo} />
+  ))
