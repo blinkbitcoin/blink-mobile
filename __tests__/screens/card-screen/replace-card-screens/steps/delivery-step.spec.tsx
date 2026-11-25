@@ -32,13 +32,12 @@ jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
       CardFlow: {
+        Delivery: {
+          snailMail: () => "Snail mail delivery",
+          snailMailUnavailable: () => "Too unreliable to support",
+        },
         ReplaceCard: {
           Delivery: {
-            standardDelivery: () => "Standard delivery",
-            expressDelivery: () => "Express delivery",
-            businessDays: ({ day1, day2 }: { day1: string; day2: string }) =>
-              `${day1}-${day2} business days`,
-            free: () => "FREE",
             shippingAddress: () => "Shipping address",
             useRegisteredAddress: () => "Use registered address as shipping address",
           },
@@ -48,28 +47,16 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
-jest.mock("@app/config/feature-flags-context", () => ({
-  useRemoteConfig: () => ({
-    replaceCardDeliveryConfig: {
-      standard: { minDays: 7, maxDays: 10, priceUsd: 0 },
-      express: { minDays: 1, maxDays: 2, priceUsd: 15 },
-    },
-  }),
-}))
+let mockCourier = {
+  title: "Courier delivery",
+  businessDays: "3-7 business days",
+  firstCardPrice: "FREE",
+  replacementPrice: "$100.00",
+  isReplacementFree: false,
+}
 
-jest.mock("@app/hooks/use-display-currency", () => ({
-  useDisplayCurrency: () => ({
-    formatCurrency: ({
-      amountInMajorUnits,
-    }: {
-      amountInMajorUnits: number
-      currency: string
-    }) => `$${amountInMajorUnits.toFixed(2)}`,
-  }),
-}))
-
-jest.mock("@app/graphql/generated", () => ({
-  WalletCurrency: { Usd: "USD" },
+jest.mock("@app/screens/card-screen/hooks", () => ({
+  useCourierDelivery: () => mockCourier,
 }))
 
 jest.mock("@app/screens/card-screen/utils", () => ({
@@ -107,24 +94,30 @@ jest.mock("@app/components/card-screen", () => ({
     title,
     subtitle,
     value,
+    valueColor,
     isSelected,
     onPress,
+    isDisabled,
   }: {
     title: string
     subtitle: string
     value: string
+    valueColor?: string
     isSelected: boolean
     onPress: () => void
+    isDisabled?: boolean
   }) => (
     <View
       testID={`option-${title}`}
       accessibilityRole="radio"
-      accessibilityState={{ selected: isSelected }}
-      onTouchEnd={onPress}
+      accessibilityState={{ selected: isSelected, disabled: Boolean(isDisabled) }}
+      onTouchEnd={isDisabled ? undefined : onPress}
     >
       <RNText>{title}</RNText>
       <RNText>{subtitle}</RNText>
-      <RNText testID={`value-${title}`}>{value}</RNText>
+      <RNText testID={`value-${title}`} accessibilityHint={valueColor}>
+        {value}
+      </RNText>
     </View>
   ),
   MultiLineField: ({ lines }: { lines: string[] }) => (
@@ -164,7 +157,7 @@ describe("DeliveryStep", () => {
   }
 
   const defaultProps = {
-    selectedDelivery: null,
+    selectedDelivery: "courier" as const,
     onSelectDelivery: jest.fn(),
     hasRegisteredAddress: true,
     registeredAddress: mockCustomAddress,
@@ -176,6 +169,14 @@ describe("DeliveryStep", () => {
 
   beforeEach(jest.clearAllMocks)
 
+  afterEach(() => {
+    mockCourier = {
+      ...mockCourier,
+      replacementPrice: "$100.00",
+      isReplacementFree: false,
+    }
+  })
+
   describe("rendering", () => {
     it("renders without crashing", () => {
       const { toJSON } = render(<DeliveryStep {...defaultProps} />)
@@ -186,8 +187,8 @@ describe("DeliveryStep", () => {
     it("displays delivery options", () => {
       const { getByText } = render(<DeliveryStep {...defaultProps} />)
 
-      expect(getByText("Standard delivery")).toBeTruthy()
-      expect(getByText("Express delivery")).toBeTruthy()
+      expect(getByText("Snail mail delivery")).toBeTruthy()
+      expect(getByText("Courier delivery")).toBeTruthy()
     })
 
     it("displays shipping address section", () => {
@@ -203,30 +204,41 @@ describe("DeliveryStep", () => {
     })
   })
 
+  /** Cards ship by courier; snail mail is shown greyed as not offered (D124, D128). */
   describe("delivery options", () => {
-    it("displays standard delivery with business days", () => {
-      const { getByText } = render(<DeliveryStep {...defaultProps} />)
+    it("shows snail mail as not offered", () => {
+      const { getByTestId, getByText } = render(<DeliveryStep {...defaultProps} />)
 
-      expect(getByText("7-10 business days")).toBeTruthy()
+      expect(getByText("Too unreliable to support")).toBeTruthy()
+      expect(getByTestId("option-Snail mail delivery").props.accessibilityState).toEqual({
+        selected: false,
+        disabled: true,
+      })
     })
 
-    it("displays standard delivery as free", () => {
+    it("shows the courier with its business days and the replacement's price", () => {
+      const { getByText, getByTestId } = render(<DeliveryStep {...defaultProps} />)
+
+      expect(getByText("3-7 business days")).toBeTruthy()
+      expect(getByTestId("value-Courier delivery").props.children).toBe("$100.00")
+    })
+
+    it("shows a free replacement in the success color", () => {
+      mockCourier = { ...mockCourier, replacementPrice: "FREE", isReplacementFree: true }
       const { getByTestId } = render(<DeliveryStep {...defaultProps} />)
 
-      expect(getByTestId("value-Standard delivery")).toBeTruthy()
-      expect(getByTestId("value-Standard delivery").props.children).toBe("FREE")
+      expect(getByTestId("value-Courier delivery").props.children).toBe("FREE")
+      expect(getByTestId("value-Courier delivery").props.accessibilityHint).toBe(
+        "#00C853",
+      )
     })
 
-    it("displays express delivery with business days", () => {
-      const { getByText } = render(<DeliveryStep {...defaultProps} />)
-
-      expect(getByText("1-2 business days")).toBeTruthy()
-    })
-
-    it("displays express delivery price", () => {
+    it("shows a paid replacement in the text color", () => {
       const { getByTestId } = render(<DeliveryStep {...defaultProps} />)
 
-      expect(getByTestId("value-Express delivery").props.children).toBe("$15.00")
+      expect(getByTestId("value-Courier delivery").props.accessibilityHint).toBe(
+        "#000000",
+      )
     })
   })
 
@@ -278,40 +290,31 @@ describe("DeliveryStep", () => {
   })
 
   describe("interactions", () => {
-    it("calls onSelectDelivery with standard when pressed", () => {
+    it("chooses the courier when pressed", () => {
       const { getByTestId } = render(<DeliveryStep {...defaultProps} />)
 
-      fireEvent(getByTestId("option-Standard delivery"), "touchEnd")
+      fireEvent(getByTestId("option-Courier delivery"), "touchEnd")
 
-      expect(defaultProps.onSelectDelivery).toHaveBeenCalledWith("standard")
+      expect(defaultProps.onSelectDelivery).toHaveBeenCalledWith("courier")
     })
 
-    it("calls onSelectDelivery with express when pressed", () => {
+    it("cannot choose snail mail", () => {
       const { getByTestId } = render(<DeliveryStep {...defaultProps} />)
 
-      fireEvent(getByTestId("option-Express delivery"), "touchEnd")
+      fireEvent(getByTestId("option-Snail mail delivery"), "touchEnd")
 
-      expect(defaultProps.onSelectDelivery).toHaveBeenCalledWith("express")
+      expect(defaultProps.onSelectDelivery).not.toHaveBeenCalled()
     })
   })
 
   describe("selection state", () => {
-    it("highlights standard delivery when selected", () => {
-      const { getByTestId } = render(
-        <DeliveryStep {...defaultProps} selectedDelivery="standard" />,
-      )
+    it("highlights the courier when chosen", () => {
+      const { getByTestId } = render(<DeliveryStep {...defaultProps} />)
 
-      const option = getByTestId("option-Standard delivery")
-      expect(option.props.accessibilityState).toEqual({ selected: true })
-    })
-
-    it("highlights express delivery when selected", () => {
-      const { getByTestId } = render(
-        <DeliveryStep {...defaultProps} selectedDelivery="express" />,
-      )
-
-      const option = getByTestId("option-Express delivery")
-      expect(option.props.accessibilityState).toEqual({ selected: true })
+      expect(getByTestId("option-Courier delivery").props.accessibilityState).toEqual({
+        selected: true,
+        disabled: false,
+      })
     })
   })
 

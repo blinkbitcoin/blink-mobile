@@ -4,6 +4,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
+  Delivery,
   DeliveryType,
   EMPTY_ADDRESS,
   ShippingAddress,
@@ -24,7 +25,7 @@ const VIRTUAL_STEPS: StepName[] = [Step.ReportIssue, Step.Confirm]
 
 type FlowState = {
   selectedIssue: IssueType | null
-  selectedDelivery: DeliveryType | null
+  selectedDelivery: DeliveryType
   useRegisteredAddress: boolean
   customAddress: ShippingAddress
 }
@@ -61,7 +62,8 @@ export const useReplaceCardFlow = ({
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [selectedIssue, setSelectedIssue] = useState<IssueType | null>(null)
-  const [selectedDelivery, setSelectedDelivery] = useState<DeliveryType | null>(null)
+  /** The courier is the only delivery offered, so it starts chosen. */
+  const [selectedDelivery, setSelectedDelivery] = useState<DeliveryType>(Delivery.Courier)
   const [useRegisteredAddress, setUseRegisteredAddress] = useState(
     initialAddress !== null,
   )

@@ -38,11 +38,6 @@ jest.mock("@app/i18n/i18n-react", () => ({
             registeredAddress: () => "Registered address",
             useRegisteredAddress: () => "Use registered address as shipping address",
             delivery: () => "Delivery",
-            standardDelivery: () => "Standard delivery",
-            expressDelivery: () => "Express delivery",
-            businessDays: ({ day1, day2 }: { day1: string; day2: string }) =>
-              `${day1}-${day2} business days`,
-            free: () => "FREE",
             deliveryInformation: () => "Delivery information",
             bullet1: () => "Delivery bullet 1",
             bullet2: () => "Delivery bullet 2",
@@ -67,28 +62,14 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
-jest.mock("@app/config/feature-flags-context", () => ({
-  useRemoteConfig: () => ({
-    replaceCardDeliveryConfig: {
-      standard: { minDays: 7, maxDays: 10, priceUsd: 0 },
-      express: { minDays: 1, maxDays: 2, priceUsd: 15 },
-    },
+jest.mock("@app/screens/card-screen/hooks", () => ({
+  useCourierDelivery: () => ({
+    title: "Courier delivery",
+    businessDays: "3-7 business days",
+    firstCardPrice: "FREE",
+    replacementPrice: "$100.00",
+    isReplacementFree: false,
   }),
-}))
-
-jest.mock("@app/hooks/use-display-currency", () => ({
-  useDisplayCurrency: () => ({
-    formatCurrency: ({
-      amountInMajorUnits,
-    }: {
-      amountInMajorUnits: number
-      currency: string
-    }) => `$${amountInMajorUnits.toFixed(2)}`,
-  }),
-}))
-
-jest.mock("@app/graphql/generated", () => ({
-  WalletCurrency: { Usd: "USD" },
 }))
 
 jest.mock("@app/screens/card-screen/utils", () => ({
@@ -218,11 +199,12 @@ describe("ShippingStep", () => {
       expect(getByText("Use registered address as shipping address")).toBeTruthy()
     })
 
-    it("displays standard delivery OptionRow with business days and FREE", () => {
+    /** The first physical card ships by courier, free (D124, D129). */
+    it("offers the courier, with its business days and the free first card", () => {
       const { getByText, getByTestId } = render(<ShippingStep {...defaultProps} />)
 
-      expect(getByText("Standard delivery")).toBeTruthy()
-      expect(getByText("7-10 business days")).toBeTruthy()
+      expect(getByText("Courier delivery")).toBeTruthy()
+      expect(getByText("3-7 business days")).toBeTruthy()
       expect(getByTestId("option-value").props.children).toBe("FREE")
     })
 

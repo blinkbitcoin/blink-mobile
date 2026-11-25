@@ -1,17 +1,13 @@
-import React, { useMemo } from "react"
+import React from "react"
 import { View } from "react-native"
 import { Text, useTheme } from "@rn-vui/themed"
 
 import { InfoCard, InfoSection, MultiLineField } from "@app/components/card-screen"
-import { useRemoteConfig } from "@app/config/feature-flags-context"
-import { WalletCurrency } from "@app/graphql/generated"
-import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { useCourierDelivery } from "@app/screens/card-screen/hooks"
 import {
   CardDesign,
   CardDesignType,
-  Delivery,
-  DeliveryType,
   ShippingAddress,
 } from "@app/screens/card-screen/types"
 import { addressToLines } from "@app/screens/card-screen/utils"
@@ -19,13 +15,11 @@ import { addressToLines } from "@app/screens/card-screen/utils"
 import { useSharedStepStyles } from "./shared-styles"
 
 type ConfirmStepProps = {
-  deliveryType: DeliveryType
   shippingAddress: ShippingAddress
   cardDesign?: CardDesignType
 }
 
 export const ConfirmStep: React.FC<ConfirmStepProps> = ({
-  deliveryType,
   shippingAddress,
   cardDesign = CardDesign.MaxiOrange,
 }) => {
@@ -34,27 +28,9 @@ export const ConfirmStep: React.FC<ConfirmStepProps> = ({
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const { replaceCardDeliveryConfig } = useRemoteConfig()
-  const { formatCurrency } = useDisplayCurrency()
+  const courier = useCourierDelivery()
 
-  const deliveryConfig = replaceCardDeliveryConfig[deliveryType]
-  const { Shipping: shippingLL, Confirm: confirmLL } = LL.CardFlow.OrderPhysicalCard
-
-  const deliveryLabels = useMemo<Record<DeliveryType, string>>(
-    () => ({
-      [Delivery.Standard]: shippingLL.standardDelivery(),
-      [Delivery.Express]: shippingLL.expressDelivery(),
-    }),
-    [shippingLL],
-  )
-
-  const deliveryPrice =
-    deliveryConfig.priceUsd === 0
-      ? shippingLL.free()
-      : formatCurrency({
-          amountInMajorUnits: deliveryConfig.priceUsd,
-          currency: WalletCurrency.Usd,
-        })
+  const { Confirm: confirmLL } = LL.CardFlow.OrderPhysicalCard
 
   return (
     <>
@@ -67,19 +43,16 @@ export const ConfirmStep: React.FC<ConfirmStepProps> = ({
           },
           {
             label: confirmLL.delivery(),
-            value: deliveryLabels[deliveryType],
+            value: courier.title,
           },
           {
             label: confirmLL.deliveryTime(),
-            value: shippingLL.businessDays({
-              day1: deliveryConfig.minDays.toString(),
-              day2: deliveryConfig.maxDays.toString(),
-            }),
+            value: courier.businessDays,
           },
           {
             label: confirmLL.shippingCost(),
-            value: deliveryPrice,
-            valueColor: deliveryType === Delivery.Standard ? colors.success : undefined,
+            value: courier.firstCardPrice,
+            valueColor: colors.success,
           },
         ]}
       />

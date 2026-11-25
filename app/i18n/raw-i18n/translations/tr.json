@@ -3543,6 +3543,13 @@
       "signatureRequired": "Teslimatta imza gerekebilir",
       "supportedRegions": "Adres desteklenen gönderi bölgeleri içinde olmalıdır"
     },
+    "Delivery": {
+      "courier": "Kurye ile teslimat",
+      "snailMail": "Normal posta ile teslimat",
+      "snailMailUnavailable": "Desteklenemeyecek kadar güvenilmez",
+      "businessDays": "{day1}-{day2} iş günü",
+      "free": "ÜCRETSİZ"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Yeni PIN'i onayla",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "Teslimat hızınızı seçin",
         "subtitle": "Yeni kartınızı ne kadar hızlı almak istediğinizi seçin",
-        "standardDelivery": "Standart teslimat",
-        "expressDelivery": "Ekspres teslimat",
-        "businessDays": "{day1}-{day2} iş günü",
-        "free": "ÜCRETSİZ",
         "shippingAddress": "Teslimat adresi",
-        "useRegisteredAddress": "Kayıtlı adresi teslimat adresi olarak kullan",
-        "chooseDeliverySpeed": "Teslimat hızını seçin"
+        "useRegisteredAddress": "Kayıtlı adresi teslimat adresi olarak kullan"
       },
       "Confirm": {
         "title": "Talebinizi gözden geçirin",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "Kayıtlı adres",
         "useRegisteredAddress": "Kayıtlı adresi kargo adresi olarak kullan",
         "delivery": "Teslimat",
-        "standardDelivery": "Standart teslimat",
-        "expressDelivery": "Ekspres teslimat",
-        "businessDays": "{day1}-{day2} iş günü",
-        "free": "ÜCRETSİZ",
         "deliveryInformation": "Teslimat bilgileri",
         "bullet1": "Takip bilgilerini e-posta ile alacaksın",
         "bullet2": "Teslimatta imza gerekebilir",

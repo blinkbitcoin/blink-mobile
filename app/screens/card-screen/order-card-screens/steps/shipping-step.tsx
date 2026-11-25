@@ -10,11 +10,9 @@ import {
 } from "@app/components/card-screen"
 import { radius } from "@app/rne-theme/radius"
 import { CheckboxRow } from "@app/components/checkbox-row"
-import { useRemoteConfig } from "@app/config/feature-flags-context"
-import { WalletCurrency } from "@app/graphql/generated"
-import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { Delivery, ShippingAddress } from "@app/screens/card-screen/types"
+import { useCourierDelivery } from "@app/screens/card-screen/hooks"
+import { ShippingAddress } from "@app/screens/card-screen/types"
 import { addressToLines } from "@app/screens/card-screen/utils"
 
 import { useSharedStepStyles } from "./shared-styles"
@@ -44,25 +42,9 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const { replaceCardDeliveryConfig } = useRemoteConfig()
-  const { formatCurrency } = useDisplayCurrency()
+  const courier = useCourierDelivery()
 
   const { Shipping: shippingLL } = LL.CardFlow.OrderPhysicalCard
-
-  const standardConfig = replaceCardDeliveryConfig[Delivery.Standard]
-
-  const standardDays = shippingLL.businessDays({
-    day1: standardConfig.minDays.toString(),
-    day2: standardConfig.maxDays.toString(),
-  })
-
-  const standardPrice =
-    standardConfig.priceUsd === 0
-      ? shippingLL.free()
-      : formatCurrency({
-          amountInMajorUnits: standardConfig.priceUsd,
-          currency: WalletCurrency.Usd,
-        })
 
   return (
     <>
@@ -112,9 +94,9 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
           <OptionRow
             icon="delivery"
             iconColor={colors.textMuted}
-            title={shippingLL.standardDelivery()}
-            subtitle={standardDays}
-            value={standardPrice}
+            title={courier.title}
+            subtitle={courier.businessDays}
+            value={courier.firstCardPrice}
             valueColor={colors.success}
           />
         </View>

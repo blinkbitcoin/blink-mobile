@@ -3543,6 +3543,13 @@
             "signatureRequired": "Potrebbe essere richiesta la firma alla consegna",
             "supportedRegions": "L'indirizzo deve essere all'interno delle regioni di spedizione supportate"
         },
+        "Delivery": {
+            "courier": "Consegna tramite corriere",
+            "snailMail": "Consegna per posta ordinaria",
+            "snailMailUnavailable": "Troppo inaffidabile per essere offerto",
+            "businessDays": "{day1}-{day2} giorni lavorativi",
+            "free": "GRATIS"
+        },
         "PinScreens": {
             "common": {
                 "confirmNewPin": "Conferma nuovo PIN",
@@ -3605,13 +3612,8 @@
             "Delivery": {
                 "title": "Scegli la velocità di consegna",
                 "subtitle": "Seleziona quanto velocemente desideri ricevere la tua nuova carta",
-                "standardDelivery": "Consegna standard",
-                "expressDelivery": "Consegna express",
-                "businessDays": "{day1}-{day2} giorni lavorativi",
-                "free": "GRATIS",
                 "shippingAddress": "Indirizzo di spedizione",
-                "useRegisteredAddress": "Usa l'indirizzo registrato come indirizzo di spedizione",
-                "chooseDeliverySpeed": "Scegli la velocità di consegna"
+                "useRegisteredAddress": "Usa l'indirizzo registrato come indirizzo di spedizione"
             },
             "Confirm": {
                 "title": "Rivedi la tua richiesta",
@@ -3657,10 +3659,6 @@
                 "registeredAddress": "Indirizzo registrato",
                 "useRegisteredAddress": "Usa l'indirizzo registrato come indirizzo di spedizione",
                 "delivery": "Consegna",
-                "standardDelivery": "Consegna standard",
-                "expressDelivery": "Consegna espressa",
-                "businessDays": "{day1}-{day2} giorni lavorativi",
-                "free": "GRATIS",
                 "deliveryInformation": "Informazioni sulla consegna",
                 "bullet1": "Riceverai le informazioni di tracciamento via email",
                 "bullet2": "Potrebbe essere richiesta una firma alla consegna",

@@ -174,7 +174,6 @@ export const OrderCardScreen: React.FC = () => {
       case Step.Confirm:
         return (
           <ConfirmStep
-            deliveryType={state.selectedDelivery}
             shippingAddress={
               state.useRegisteredAddress ? registeredAddress : state.customAddress
             }

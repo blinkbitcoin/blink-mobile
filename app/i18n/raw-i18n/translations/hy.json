@@ -3543,6 +3543,13 @@
       "signatureRequired": "Առաքման պահին կարող է պահանջվել ստորագրություն",
       "supportedRegions": "Հասցեն պետք է լինի առաքման աջակցվող տարածաշրջաններում"
     },
+    "Delivery": {
+      "courier": "Առաքում սուրհանդակով",
+      "snailMail": "Առաքում սովորական փոստով",
+      "snailMailUnavailable": "Չափազանց անհուսալի է աջակցելու համար",
+      "businessDays": "{day1}-{day2} աշխատանքային օր",
+      "free": "ԱՆՎՃԱՐ"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Հաստատեք նոր PIN-ը",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "Ընտրեք առաքման արագությունը",
         "subtitle": "Ընտրեք՝ որքան արագ եք ցանկանում ստանալ ձեր նոր քարտը",
-        "standardDelivery": "Ստանդարտ առաքում",
-        "expressDelivery": "Արագ առաքում",
-        "businessDays": "{day1}-{day2} աշխատանքային օր",
-        "free": "ԱՆՎՃԱՐ",
         "shippingAddress": "Առաքման հասցե",
-        "useRegisteredAddress": "Օգտագործել գրանցված հասցեն որպես առաքման հասցե",
-        "chooseDeliverySpeed": "Ընտրեք առաքման արագությունը"
+        "useRegisteredAddress": "Օգտագործել գրանցված հասցեն որպես առաքման հասցե"
       },
       "Confirm": {
         "title": "Վերանայեք ձեր հարցումը",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "Գրանցված հասցե",
         "useRegisteredAddress": "Օգտագործել գրանցված հասցեն որպես առաքման հասցե",
         "delivery": "Առաքում",
-        "standardDelivery": "Ստանդարտ առաքում",
-        "expressDelivery": "Արագ առաքում",
-        "businessDays": "{day1}-{day2} աշխատանքային օր",
-        "free": "ԱՆՎՃԱՐ",
         "deliveryInformation": "Առաքման տեղեկություն",
         "bullet1": "Դուք կստանաք հետևման տեղեկությունը էլ. փոստով",
         "bullet2": "Առաքման պահին կարող է պահանջվել ստորագրություն",

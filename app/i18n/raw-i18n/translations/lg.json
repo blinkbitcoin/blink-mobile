@@ -3543,6 +3543,13 @@
       "signatureRequired": "Signature may be required upon delivery",
       "supportedRegions": "Address must be within supported shipping regions"
     },
+    "Delivery": {
+      "courier": "Okutuusibwa kuliya",
+      "snailMail": "Okutuusibwa mu posita eya bulijjo",
+      "snailMailUnavailable": "Tekyesigika kimala okukikozesa",
+      "businessDays": "{day1}-{day2} ennaku z'emirimu",
+      "free": "BWERERE"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Kakasa PIN empya",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "Londa embiro z'okutwala",
         "subtitle": "Londa bw'omanyi oyagala okufuna kaadi yo empya",
-        "standardDelivery": "Okutwala okwa bulijjo",
-        "expressDelivery": "Okutwala okw'amangu",
-        "businessDays": "Ennaku {day1}-{day2} ez'omulimu",
-        "free": "BWEREERE",
         "shippingAddress": "Endagiriro y'okutuma",
-        "useRegisteredAddress": "Kozesa endagiriro ewandiikiddwa ng'endagiriro y'okutuma",
-        "chooseDeliverySpeed": "Londa embiro y'okutumya"
+        "useRegisteredAddress": "Kozesa endagiriro ewandiikiddwa ng'endagiriro y'okutuma"
       },
       "Confirm": {
         "title": "Kebera okusaba kwo",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "Endagiriro eyateekebwa",
         "useRegisteredAddress": "Kozesa endagiriro eyateekebwa ng'ey'okutwalirako",
         "delivery": "Okutuusa",
-        "standardDelivery": "Okutuusa kwa bulijjo",
-        "expressDelivery": "Okutuusa kw'amangu",
-        "businessDays": "{day1}-{day2} ennaku z'emirimu",
-        "free": "BWERERE",
         "deliveryInformation": "Obubaka ku kutuusa",
         "bullet1": "Ojja kufuna ebikwata ku kulondoola ku email",
         "bullet2": "Obubonero buyinza okwetaagisa wakati w'okutuusa",

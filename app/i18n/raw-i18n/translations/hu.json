@@ -3543,6 +3543,13 @@
       "signatureRequired": "Aláírás szükséges lehet a kézbesítéskor",
       "supportedRegions": "A címnek a támogatott szállítási régiókban kell lennie"
     },
+    "Delivery": {
+      "courier": "Futárszolgálat",
+      "snailMail": "Hagyományos postai kézbesítés",
+      "snailMailUnavailable": "Túl megbízhatatlan ahhoz, hogy támogassuk",
+      "businessDays": "{day1}-{day2} munkanap",
+      "free": "INGYENES"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Új PIN megerősítése",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "Válassza ki a szállítási sebességet",
         "subtitle": "Válassza ki, milyen gyorsan szeretné megkapni az új kártyát",
-        "standardDelivery": "Standard szállítás",
-        "expressDelivery": "Expressz szállítás",
-        "businessDays": "{day1}-{day2} munkanap",
-        "free": "INGYENES",
         "shippingAddress": "Szállítási cím",
-        "useRegisteredAddress": "Regisztrált cím használata szállítási címként",
-        "chooseDeliverySpeed": "Válasszon szállítási sebességet"
+        "useRegisteredAddress": "Regisztrált cím használata szállítási címként"
       },
       "Confirm": {
         "title": "Ellenőrizze a kérelmét",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "Regisztrált cím",
         "useRegisteredAddress": "A regisztrált cím használata szállítási címként",
         "delivery": "Kézbesítés",
-        "standardDelivery": "Normál kézbesítés",
-        "expressDelivery": "Expressz kézbesítés",
-        "businessDays": "{day1}-{day2} munkanap",
-        "free": "INGYENES",
         "deliveryInformation": "Kézbesítési információk",
         "bullet1": "A nyomkövetési információkat e-mailben kapja meg",
         "bullet2": "A kézbesítéskor aláírásra lehet szükség",

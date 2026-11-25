@@ -24,8 +24,7 @@ jest.mock("react-native-reanimated", () => {
 jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => ({
     replaceCardDeliveryConfig: {
-      standard: { minDays: 7, maxDays: 10, priceUsd: 0 },
-      express: { minDays: 1, maxDays: 2, priceUsd: 15 },
+      courier: { minDays: 3, maxDays: 7, priceUsd: 0 },
     },
   }),
 }))
@@ -313,8 +312,8 @@ describe("ReplaceCardScreen", () => {
 
       await advanceToStep2(getByText)
 
-      expect(getByText("Standard delivery")).toBeTruthy()
-      expect(getByText("Express delivery")).toBeTruthy()
+      expect(getByText("Snail mail delivery")).toBeTruthy()
+      expect(getByText("Courier delivery")).toBeTruthy()
     })
   })
 
@@ -326,10 +325,6 @@ describe("ReplaceCardScreen", () => {
 
       await act(async () => {
         fireEvent.press(getByText("Continue"))
-      })
-
-      await act(async () => {
-        fireEvent.press(getByText("Standard delivery"))
       })
 
       await act(async () => {

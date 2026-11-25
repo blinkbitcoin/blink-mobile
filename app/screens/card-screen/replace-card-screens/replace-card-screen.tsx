@@ -13,7 +13,7 @@ import { toastShow } from "@app/utils/toast"
 import { useCardData } from "@app/hooks"
 import { useShippingAddressData } from "../card-shipping-address-screen/hooks"
 import { SteppedCardLayout } from "../stepped-card-layout"
-import { Delivery, EMPTY_ADDRESS } from "../types"
+import { EMPTY_ADDRESS } from "../types"
 import { ReportIssueStep, DeliveryStep, ConfirmStep, Issue } from "./steps"
 import {
   useLockCard,
@@ -145,11 +145,9 @@ export const ReplaceCardScreen: React.FC = () => {
           iconColor: colors.success,
           title: LL.CardFlow.ReplaceCard.Delivery.title(),
           subtitle: LL.CardFlow.ReplaceCard.Delivery.subtitle(),
-          buttonLabel: state.selectedDelivery
-            ? LL.common.continue()
-            : LL.CardFlow.ReplaceCard.Delivery.chooseDeliverySpeed(),
+          buttonLabel: LL.common.continue(),
           onButtonPress: goToNextStep,
-          isButtonDisabled: !state.selectedDelivery,
+          isButtonDisabled: false,
         }
       case Step.Confirm:
         return {
@@ -168,7 +166,6 @@ export const ReplaceCardScreen: React.FC = () => {
     LL,
     handleReportIssueContinue,
     state.selectedIssue,
-    state.selectedDelivery,
     goToNextStep,
     handleSubmit,
   ])
@@ -197,13 +194,8 @@ export const ReplaceCardScreen: React.FC = () => {
         )
       case Step.Confirm:
         if (!state.selectedIssue) return null
-        if (!isVirtualCard && !state.selectedDelivery) return null
         return (
-          <ConfirmStep
-            issueType={state.selectedIssue}
-            deliveryType={state.selectedDelivery ?? Delivery.Standard}
-            isVirtualCard={isVirtualCard}
-          />
+          <ConfirmStep issueType={state.selectedIssue} isVirtualCard={isVirtualCard} />
         )
     }
   }, [

@@ -82,10 +82,11 @@ describe("useReplaceCardFlow", () => {
       expect(result.current.state.selectedIssue).toBeNull()
     })
 
-    it("has null selectedDelivery", () => {
+    /** The courier is the only delivery offered, so it starts chosen. */
+    it("starts with the courier chosen", () => {
       const { result } = renderPhysicalFlow()
 
-      expect(result.current.state.selectedDelivery).toBeNull()
+      expect(result.current.state.selectedDelivery).toBe("courier")
     })
 
     it("has useRegisteredAddress as true when initialAddress exists", () => {
@@ -150,24 +151,14 @@ describe("useReplaceCardFlow", () => {
   })
 
   describe("setSelectedDelivery", () => {
-    it("sets standard delivery", () => {
+    it("sets the chosen delivery", () => {
       const { result } = renderPhysicalFlow()
 
       act(() => {
-        result.current.setSelectedDelivery("standard")
+        result.current.setSelectedDelivery("snailMail")
       })
 
-      expect(result.current.state.selectedDelivery).toBe("standard")
-    })
-
-    it("sets express delivery", () => {
-      const { result } = renderPhysicalFlow()
-
-      act(() => {
-        result.current.setSelectedDelivery("express")
-      })
-
-      expect(result.current.state.selectedDelivery).toBe("express")
+      expect(result.current.state.selectedDelivery).toBe("snailMail")
     })
   })
 
@@ -398,13 +389,12 @@ describe("useReplaceCardFlow", () => {
       expect(result.current.state.selectedIssue).toBe("lost")
 
       act(() => {
-        result.current.setSelectedDelivery("standard")
         result.current.goToNextStep()
       })
 
       expect(result.current.currentStep).toBe("Confirm")
       expect(result.current.stepNumber).toBe(3)
-      expect(result.current.state.selectedDelivery).toBe("standard")
+      expect(result.current.state.selectedDelivery).toBe("courier")
     })
 
     it("virtual: progresses through 2 steps (skips Delivery)", () => {

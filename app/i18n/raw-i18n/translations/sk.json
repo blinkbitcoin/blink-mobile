@@ -3543,6 +3543,13 @@
       "signatureRequired": "Pri doručení môže byť vyžadovaný podpis",
       "supportedRegions": "Adresa musí byť v podporovaných oblastiach doručenia"
     },
+    "Delivery": {
+      "courier": "Doručenie kuriérom",
+      "snailMail": "Doručenie bežnou poštou",
+      "snailMailUnavailable": "Príliš nespoľahlivé na to, aby sme ho ponúkali",
+      "businessDays": "{day1}-{day2} pracovných dní",
+      "free": "ZADARMO"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Potvrdiť nový PIN",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "Vyberte rýchlosť doručenia",
         "subtitle": "Vyberte, ako rýchlo chcete dostať novú kartu",
-        "standardDelivery": "Štandardné doručenie",
-        "expressDelivery": "Expresné doručenie",
-        "businessDays": "{day1}-{day2} pracovných dní",
-        "free": "ZADARMO",
         "shippingAddress": "Doručovacia adresa",
-        "useRegisteredAddress": "Použiť registrovanú adresu ako doručovaciu",
-        "chooseDeliverySpeed": "Vyberte rýchlosť doručenia"
+        "useRegisteredAddress": "Použiť registrovanú adresu ako doručovaciu"
       },
       "Confirm": {
         "title": "Skontrolujte svoju žiadosť",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "Registrovaná adresa",
         "useRegisteredAddress": "Použiť registrovanú adresu ako doručovaciu adresu",
         "delivery": "Doručenie",
-        "standardDelivery": "Štandardné doručenie",
-        "expressDelivery": "Expresné doručenie",
-        "businessDays": "{day1}-{day2} pracovných dní",
-        "free": "ZADARMO",
         "deliveryInformation": "Informácie o doručení",
         "bullet1": "Informácie o sledovaní dostanete e-mailom",
         "bullet2": "Pri doručení môže byť potrebný podpis",

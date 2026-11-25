@@ -3543,6 +3543,13 @@
             "signatureRequired": "Puede requerirse firma al momento de la entrega",
             "supportedRegions": "La dirección debe estar dentro de las regiones de envío soportadas"
         },
+        "Delivery": {
+            "courier": "Entrega por mensajería",
+            "snailMail": "Entrega por correo postal",
+            "snailMailUnavailable": "Demasiado poco fiable para ofrecerlo",
+            "businessDays": "{day1}-{day2} días hábiles",
+            "free": "GRATIS"
+        },
         "PinScreens": {
             "common": {
                 "confirmNewPin": "Confirmar nuevo PIN",
@@ -3605,13 +3612,8 @@
             "Delivery": {
                 "title": "Elige tu velocidad de entrega",
                 "subtitle": "Selecciona qué tan rápido deseas recibir tu nueva tarjeta",
-                "standardDelivery": "Entrega estándar",
-                "expressDelivery": "Entrega exprés",
-                "businessDays": "{day1}-{day2} días hábiles",
-                "free": "GRATIS",
                 "shippingAddress": "Dirección de envío",
-                "useRegisteredAddress": "Usar dirección registrada como dirección de envío",
-                "chooseDeliverySpeed": "Elige velocidad de envío"
+                "useRegisteredAddress": "Usar dirección registrada como dirección de envío"
             },
             "Confirm": {
                 "title": "Revisa tu solicitud",
@@ -3657,10 +3659,6 @@
                 "registeredAddress": "Dirección registrada",
                 "useRegisteredAddress": "Usar la dirección registrada como dirección de envío",
                 "delivery": "Entrega",
-                "standardDelivery": "Entrega estándar",
-                "expressDelivery": "Entrega exprés",
-                "businessDays": "{day1}-{day2} días hábiles",
-                "free": "GRATIS",
                 "deliveryInformation": "Información de entrega",
                 "bullet1": "Recibirás la información de seguimiento por correo electrónico",
                 "bullet2": "Puede requerirse firma al momento de la entrega",

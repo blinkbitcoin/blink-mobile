@@ -15,9 +15,10 @@ export const CardDesign = {
 
 export type CardDesignType = (typeof CardDesign)[keyof typeof CardDesign]
 
+/** Cards ship by courier. Snail mail is shown, greyed, as an option not offered. */
 export const Delivery = {
-  Standard: "standard",
-  Express: "express",
+  Courier: "courier",
+  SnailMail: "snailMail",
 } as const
 
 export type DeliveryType = (typeof Delivery)[keyof typeof Delivery]

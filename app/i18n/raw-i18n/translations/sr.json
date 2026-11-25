@@ -3543,6 +3543,13 @@
       "signatureRequired": "Потпис може бити потребан при достави",
       "supportedRegions": "Адреса мора бити унутар подржаних региона за испоруку"
     },
+    "Delivery": {
+      "courier": "Достава курирском службом",
+      "snailMail": "Достава обичном поштом",
+      "snailMailUnavailable": "Превише непоуздано да бисмо га нудили",
+      "businessDays": "{day1}-{day2} радних дана",
+      "free": "БЕСПЛАТНО"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Потврди нови ПИН",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "Изаберите брзину доставе",
         "subtitle": "Изаберите колико брзо желите да примите нову картицу",
-        "standardDelivery": "Стандардна достава",
-        "expressDelivery": "Експресна достава",
-        "businessDays": "{day1}-{day2} радних дана",
-        "free": "БЕСПЛАТНО",
         "shippingAddress": "Адреса за доставу",
-        "useRegisteredAddress": "Користи регистровану адресу као адресу за доставу",
-        "chooseDeliverySpeed": "Изаберите брзину испоруке"
+        "useRegisteredAddress": "Користи регистровану адресу као адресу за доставу"
       },
       "Confirm": {
         "title": "Прегледајте свој захтев",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "Регистрована адреса",
         "useRegisteredAddress": "Користи регистровану адресу као адресу за испоруку",
         "delivery": "Испорука",
-        "standardDelivery": "Стандардна испорука",
-        "expressDelivery": "Експресна испорука",
-        "businessDays": "{day1}-{day2} радних дана",
-        "free": "БЕСПЛАТНО",
         "deliveryInformation": "Информације о испоруци",
         "bullet1": "Подаци о праћењу стижу путем е‑поште",
         "bullet2": "При испоруци може бити потребан потпис",

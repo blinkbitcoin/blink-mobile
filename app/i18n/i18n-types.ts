@@ -11824,6 +11824,30 @@ type RootTranslation = {
 			 */
 			supportedRegions: string
 		}
+		Delivery: {
+			/**
+			 * C​o​u​r​i​e​r​ ​d​e​l​i​v​e​r​y
+			 */
+			courier: string
+			/**
+			 * S​n​a​i​l​ ​m​a​i​l​ ​d​e​l​i​v​e​r​y
+			 */
+			snailMail: string
+			/**
+			 * T​o​o​ ​u​n​r​e​l​i​a​b​l​e​ ​t​o​ ​s​u​p​p​o​r​t
+			 */
+			snailMailUnavailable: string
+			/**
+			 * {​d​a​y​1​}​-​{​d​a​y​2​}​ ​b​u​s​i​n​e​s​s​ ​d​a​y​s
+			 * @param {unknown} day1
+			 * @param {unknown} day2
+			 */
+			businessDays: RequiredParams<'day1' | 'day2'>
+			/**
+			 * F​R​E​E
+			 */
+			free: string
+		}
 		TransactionDetails: {
 			/**
 			 * T​r​a​n​s​a​c​t​i​o​n​ ​d​e​t​a​i​l​s
@@ -12114,24 +12138,6 @@ type RootTranslation = {
 				 */
 				subtitle: string
 				/**
-				 * S​t​a​n​d​a​r​d​ ​d​e​l​i​v​e​r​y
-				 */
-				standardDelivery: string
-				/**
-				 * {​d​a​y​1​}​-​{​d​a​y​2​}​ ​b​u​s​i​n​e​s​s​ ​d​a​y​s
-				 * @param {unknown} day1
-				 * @param {unknown} day2
-				 */
-				businessDays: RequiredParams<'day1' | 'day2'>
-				/**
-				 * F​R​E​E
-				 */
-				free: string
-				/**
-				 * E​x​p​r​e​s​s​ ​d​e​l​i​v​e​r​y
-				 */
-				expressDelivery: string
-				/**
 				 * S​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
 				 */
 				shippingAddress: string
@@ -12139,10 +12145,6 @@ type RootTranslation = {
 				 * U​s​e​ ​r​e​g​i​s​t​e​r​e​d​ ​a​d​d​r​e​s​s​ ​a​s​ ​s​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
 				 */
 				useRegisteredAddress: string
-				/**
-				 * C​h​o​o​s​e​ ​d​e​l​i​v​e​r​y​ ​s​p​e​e​d
-				 */
-				chooseDeliverySpeed: string
 			}
 			Confirm: {
 				/**
@@ -12275,24 +12277,6 @@ type RootTranslation = {
 				 * D​e​l​i​v​e​r​y
 				 */
 				delivery: string
-				/**
-				 * S​t​a​n​d​a​r​d​ ​d​e​l​i​v​e​r​y
-				 */
-				standardDelivery: string
-				/**
-				 * E​x​p​r​e​s​s​ ​d​e​l​i​v​e​r​y
-				 */
-				expressDelivery: string
-				/**
-				 * {​d​a​y​1​}​-​{​d​a​y​2​}​ ​b​u​s​i​n​e​s​s​ ​d​a​y​s
-				 * @param {unknown} day1
-				 * @param {unknown} day2
-				 */
-				businessDays: RequiredParams<'day1' | 'day2'>
-				/**
-				 * F​R​E​E
-				 */
-				free: string
 				/**
 				 * D​e​l​i​v​e​r​y​ ​i​n​f​o​r​m​a​t​i​o​n
 				 */
@@ -26391,6 +26375,28 @@ export type TranslationFunctions = {
 			 */
 			supportedRegions: () => LocalizedString
 		}
+		Delivery: {
+			/**
+			 * Courier delivery
+			 */
+			courier: () => LocalizedString
+			/**
+			 * Snail mail delivery
+			 */
+			snailMail: () => LocalizedString
+			/**
+			 * Too unreliable to support
+			 */
+			snailMailUnavailable: () => LocalizedString
+			/**
+			 * {day1}-{day2} business days
+			 */
+			businessDays: (arg: { day1: unknown, day2: unknown }) => LocalizedString
+			/**
+			 * FREE
+			 */
+			free: () => LocalizedString
+		}
 		TransactionDetails: {
 			/**
 			 * Transaction details
@@ -26680,22 +26686,6 @@ export type TranslationFunctions = {
 				 */
 				subtitle: () => LocalizedString
 				/**
-				 * Standard delivery
-				 */
-				standardDelivery: () => LocalizedString
-				/**
-				 * {day1}-{day2} business days
-				 */
-				businessDays: (arg: { day1: unknown, day2: unknown }) => LocalizedString
-				/**
-				 * FREE
-				 */
-				free: () => LocalizedString
-				/**
-				 * Express delivery
-				 */
-				expressDelivery: () => LocalizedString
-				/**
 				 * Shipping address
 				 */
 				shippingAddress: () => LocalizedString
@@ -26703,10 +26693,6 @@ export type TranslationFunctions = {
 				 * Use registered address as shipping address
 				 */
 				useRegisteredAddress: () => LocalizedString
-				/**
-				 * Choose delivery speed
-				 */
-				chooseDeliverySpeed: () => LocalizedString
 			}
 			Confirm: {
 				/**
@@ -26839,22 +26825,6 @@ export type TranslationFunctions = {
 				 * Delivery
 				 */
 				delivery: () => LocalizedString
-				/**
-				 * Standard delivery
-				 */
-				standardDelivery: () => LocalizedString
-				/**
-				 * Express delivery
-				 */
-				expressDelivery: () => LocalizedString
-				/**
-				 * {day1}-{day2} business days
-				 */
-				businessDays: (arg: { day1: unknown, day2: unknown }) => LocalizedString
-				/**
-				 * FREE
-				 */
-				free: () => LocalizedString
 				/**
 				 * Delivery information
 				 */

@@ -3543,6 +3543,13 @@
       "signatureRequired": "Semnătura poate fi necesară la livrare",
       "supportedRegions": "Adresa trebuie să fie în regiunile de livrare acceptate"
     },
+    "Delivery": {
+      "courier": "Livrare prin curier",
+      "snailMail": "Livrare prin poștă obișnuită",
+      "snailMailUnavailable": "Prea nesigur pentru a fi oferit",
+      "businessDays": "{day1}-{day2} zile lucrătoare",
+      "free": "GRATUIT"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Confirmă noul PIN",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "Alege viteza de livrare",
         "subtitle": "Selectează cât de repede dorești să primești noul card",
-        "standardDelivery": "Livrare standard",
-        "expressDelivery": "Livrare expresă",
-        "businessDays": "{day1}-{day2} zile lucrătoare",
-        "free": "GRATUIT",
         "shippingAddress": "Adresa de expediere",
-        "useRegisteredAddress": "Folosește adresa înregistrată ca adresă de expediere",
-        "chooseDeliverySpeed": "Alegeți viteza de livrare"
+        "useRegisteredAddress": "Folosește adresa înregistrată ca adresă de expediere"
       },
       "Confirm": {
         "title": "Verifică solicitarea ta",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "Adresă înregistrată",
         "useRegisteredAddress": "Folosește adresa înregistrată ca adresă de livrare",
         "delivery": "Livrare",
-        "standardDelivery": "Livrare standard",
-        "expressDelivery": "Livrare expres",
-        "businessDays": "{day1}-{day2} zile lucrătoare",
-        "free": "GRATUIT",
         "deliveryInformation": "Informații de livrare",
         "bullet1": "Vei primi informații de urmărire prin e-mail",
         "bullet2": "La livrare poate fi necesară o semnătură",

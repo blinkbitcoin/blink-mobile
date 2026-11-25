@@ -27,13 +27,6 @@ jest.mock("@app/i18n/i18n-react", () => ({
     LL: {
       CardFlow: {
         OrderPhysicalCard: {
-          Shipping: {
-            standardDelivery: () => "Standard delivery",
-            expressDelivery: () => "Express delivery",
-            businessDays: ({ day1, day2 }: { day1: string; day2: string }) =>
-              `${day1}-${day2} business days`,
-            free: () => "FREE",
-          },
           Confirm: {
             orderSummary: () => "Order summary",
             cardDesign: () => "Card design",
@@ -53,28 +46,14 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
-jest.mock("@app/config/feature-flags-context", () => ({
-  useRemoteConfig: () => ({
-    replaceCardDeliveryConfig: {
-      standard: { minDays: 7, maxDays: 10, priceUsd: 0 },
-      express: { minDays: 1, maxDays: 2, priceUsd: 15 },
-    },
+jest.mock("@app/screens/card-screen/hooks", () => ({
+  useCourierDelivery: () => ({
+    title: "Courier delivery",
+    businessDays: "3-7 business days",
+    firstCardPrice: "FREE",
+    replacementPrice: "$100.00",
+    isReplacementFree: false,
   }),
-}))
-
-jest.mock("@app/hooks/use-display-currency", () => ({
-  useDisplayCurrency: () => ({
-    formatCurrency: ({
-      amountInMajorUnits,
-    }: {
-      amountInMajorUnits: number
-      currency: string
-    }) => `$${amountInMajorUnits.toFixed(2)}`,
-  }),
-}))
-
-jest.mock("@app/graphql/generated", () => ({
-  WalletCurrency: { Usd: "USD" },
 }))
 
 jest.mock("@app/screens/card-screen/utils", () => ({
@@ -132,25 +111,19 @@ describe("ConfirmStep", () => {
 
   describe("rendering", () => {
     it("renders without crashing", () => {
-      const { toJSON } = render(
-        <ConfirmStep deliveryType="standard" shippingAddress={mockAddress} />,
-      )
+      const { toJSON } = render(<ConfirmStep shippingAddress={mockAddress} />)
 
       expect(toJSON()).toBeTruthy()
     })
 
     it("displays order summary title", () => {
-      const { getByText } = render(
-        <ConfirmStep deliveryType="standard" shippingAddress={mockAddress} />,
-      )
+      const { getByText } = render(<ConfirmStep shippingAddress={mockAddress} />)
 
       expect(getByText("Order summary")).toBeTruthy()
     })
 
     it("displays summary labels", () => {
-      const { getByText } = render(
-        <ConfirmStep deliveryType="standard" shippingAddress={mockAddress} />,
-      )
+      const { getByText } = render(<ConfirmStep shippingAddress={mockAddress} />)
 
       expect(getByText("Card design")).toBeTruthy()
       expect(getByText("Delivery")).toBeTruthy()
@@ -159,17 +132,13 @@ describe("ConfirmStep", () => {
     })
 
     it("displays shipping address section", () => {
-      const { getByText } = render(
-        <ConfirmStep deliveryType="standard" shippingAddress={mockAddress} />,
-      )
+      const { getByText } = render(<ConfirmStep shippingAddress={mockAddress} />)
 
       expect(getByText("Shipping address")).toBeTruthy()
     })
 
     it("displays important info card with bullets", () => {
-      const { getByText } = render(
-        <ConfirmStep deliveryType="standard" shippingAddress={mockAddress} />,
-      )
+      const { getByText } = render(<ConfirmStep shippingAddress={mockAddress} />)
 
       expect(getByText("Important")).toBeTruthy()
       expect(getByText("Your card will be shipped to the address provided")).toBeTruthy()
@@ -180,37 +149,24 @@ describe("ConfirmStep", () => {
     })
   })
 
-  describe("combinations", () => {
-    it("displays standard delivery with free shipping and card design", () => {
-      const { getByTestId } = render(
-        <ConfirmStep deliveryType="standard" shippingAddress={mockAddress} />,
-      )
+  describe("delivery", () => {
+    /** The first physical card ships by courier, free (D124, D129). */
+    it("shows the courier, its business days and the free first card", () => {
+      const { getByTestId } = render(<ConfirmStep shippingAddress={mockAddress} />)
 
       expect(getByTestId("info-value-Card design").props.children).toBe("Maxi orange")
-      expect(getByTestId("info-value-Delivery").props.children).toBe("Standard delivery")
+      expect(getByTestId("info-value-Delivery").props.children).toBe("Courier delivery")
       expect(getByTestId("info-value-Delivery time").props.children).toBe(
-        "7-10 business days",
+        "3-7 business days",
       )
       expect(getByTestId("info-value-Shipping cost").props.children).toBe("FREE")
-    })
-
-    it("displays express delivery with paid shipping", () => {
-      const { getByTestId } = render(
-        <ConfirmStep deliveryType="express" shippingAddress={mockAddress} />,
-      )
-
-      expect(getByTestId("info-value-Delivery").props.children).toBe("Express delivery")
-      expect(getByTestId("info-value-Delivery time").props.children).toBe(
-        "1-2 business days",
-      )
-      expect(getByTestId("info-value-Shipping cost").props.children).toBe("$15.00")
     })
   })
 
   describe("address display", () => {
     it("shows address lines via MultiLineField", () => {
       const { getByTestId, getByText } = render(
-        <ConfirmStep deliveryType="standard" shippingAddress={mockAddress} />,
+        <ConfirmStep shippingAddress={mockAddress} />,
       )
 
       expect(getByTestId("multi-line-field")).toBeTruthy()

@@ -3543,6 +3543,13 @@
       "signatureRequired": "Bij bezorging kan een handtekening vereist zijn",
       "supportedRegions": "Het adres moet binnen de ondersteunde verzendregio's liggen"
     },
+    "Delivery": {
+      "courier": "Bezorging per koerier",
+      "snailMail": "Bezorging per gewone post",
+      "snailMailUnavailable": "Te onbetrouwbaar om aan te bieden",
+      "businessDays": "{day1}-{day2} werkdagen",
+      "free": "GRATIS"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Bevestig nieuwe PIN",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "Kies je bezorgsnelheid",
         "subtitle": "Selecteer hoe snel je je nieuwe kaart wilt ontvangen",
-        "standardDelivery": "Standaardbezorging",
-        "expressDelivery": "Expresbezorging",
-        "businessDays": "{day1}-{day2} werkdagen",
-        "free": "GRATIS",
         "shippingAddress": "Verzendadres",
-        "useRegisteredAddress": "Gebruik geregistreerd adres als verzendadres",
-        "chooseDeliverySpeed": "Kies bezorgsnelheid"
+        "useRegisteredAddress": "Gebruik geregistreerd adres als verzendadres"
       },
       "Confirm": {
         "title": "Controleer je aanvraag",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "Geregistreerd adres",
         "useRegisteredAddress": "Gebruik geregistreerd adres als verzendadres",
         "delivery": "Levering",
-        "standardDelivery": "Standaardlevering",
-        "expressDelivery": "Expresslevering",
-        "businessDays": "{day1}-{day2} werkdagen",
-        "free": "GRATIS",
         "deliveryInformation": "Leveringsinformatie",
         "bullet1": "Je ontvangt trackinginformatie per e-mail",
         "bullet2": "Bij levering kan een handtekening vereist zijn",

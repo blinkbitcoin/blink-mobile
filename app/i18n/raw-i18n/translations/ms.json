@@ -3543,6 +3543,13 @@
       "signatureRequired": "Tandatangan mungkin diperlukan semasa penghantaran",
       "supportedRegions": "Alamat mesti berada dalam kawasan penghantaran yang disokong"
     },
+    "Delivery": {
+      "courier": "Penghantaran kurier",
+      "snailMail": "Penghantaran pos biasa",
+      "snailMailUnavailable": "Terlalu tidak boleh dipercayai untuk disokong",
+      "businessDays": "{day1}-{day2} hari bekerja",
+      "free": "PERCUMA"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Sahkan PIN baharu",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "Pilih kelajuan penghantaran anda",
         "subtitle": "Pilih berapa cepat anda ingin menerima kad baharu",
-        "standardDelivery": "Penghantaran standard",
-        "expressDelivery": "Penghantaran ekspres",
-        "businessDays": "{day1}-{day2} hari bekerja",
-        "free": "PERCUMA",
         "shippingAddress": "Alamat penghantaran",
-        "useRegisteredAddress": "Gunakan alamat berdaftar sebagai alamat penghantaran",
-        "chooseDeliverySpeed": "Pilih kelajuan penghantaran"
+        "useRegisteredAddress": "Gunakan alamat berdaftar sebagai alamat penghantaran"
       },
       "Confirm": {
         "title": "Semak permintaan anda",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "Alamat berdaftar",
         "useRegisteredAddress": "Gunakan alamat berdaftar sebagai alamat penghantaran",
         "delivery": "Penghantaran",
-        "standardDelivery": "Penghantaran standard",
-        "expressDelivery": "Penghantaran ekspres",
-        "businessDays": "{day1}-{day2} hari bekerja",
-        "free": "PERCUMA",
         "deliveryInformation": "Maklumat penghantaran",
         "bullet1": "Anda akan menerima maklumat penjejakan melalui e-mel",
         "bullet2": "Tandatangan mungkin diperlukan semasa penghantaran",

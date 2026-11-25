@@ -3543,6 +3543,13 @@
             "signatureRequired": "Une signature peut être requise à la livraison",
             "supportedRegions": "L'adresse doit être dans les régions de livraison prises en charge"
         },
+        "Delivery": {
+            "courier": "Livraison par coursier",
+            "snailMail": "Livraison par courrier postal",
+            "snailMailUnavailable": "Trop peu fiable pour être proposé",
+            "businessDays": "{day1}-{day2} jours ouvrés",
+            "free": "GRATUIT"
+        },
         "PinScreens": {
             "common": {
                 "confirmNewPin": "Confirmer le nouveau PIN",
@@ -3605,13 +3612,8 @@
             "Delivery": {
                 "title": "Choisissez votre vitesse de livraison",
                 "subtitle": "Sélectionnez la rapidité avec laquelle vous souhaitez recevoir votre nouvelle carte",
-                "standardDelivery": "Livraison standard",
-                "expressDelivery": "Livraison express",
-                "businessDays": "{day1}-{day2} jours ouvrables",
-                "free": "GRATUIT",
                 "shippingAddress": "Adresse de livraison",
-                "useRegisteredAddress": "Utiliser l'adresse enregistrée comme adresse de livraison",
-                "chooseDeliverySpeed": "Choisir la vitesse de livraison"
+                "useRegisteredAddress": "Utiliser l'adresse enregistrée comme adresse de livraison"
             },
             "Confirm": {
                 "title": "Vérifiez votre demande",
@@ -3657,10 +3659,6 @@
                 "registeredAddress": "Adresse enregistrée",
                 "useRegisteredAddress": "Utiliser l'adresse enregistrée comme adresse de livraison",
                 "delivery": "Livraison",
-                "standardDelivery": "Livraison standard",
-                "expressDelivery": "Livraison express",
-                "businessDays": "{day1}-{day2} jours ouvrés",
-                "free": "GRATUIT",
                 "deliveryInformation": "Informations de livraison",
                 "bullet1": "Vous recevrez les informations de suivi par e-mail",
                 "bullet2": "Une signature peut être requise à la livraison",

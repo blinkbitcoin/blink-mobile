@@ -3543,6 +3543,13 @@
       "signatureRequired": "Tanda tangan mungkin diperlukan saat pengiriman",
       "supportedRegions": "Alamat harus berada dalam wilayah pengiriman yang didukung"
     },
+    "Delivery": {
+      "courier": "Pengiriman kurir",
+      "snailMail": "Pengiriman pos biasa",
+      "snailMailUnavailable": "Terlalu tidak andal untuk didukung",
+      "businessDays": "{day1}-{day2} hari kerja",
+      "free": "GRATIS"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Konfirmasi PIN baru",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "Pilih kecepatan pengiriman",
         "subtitle": "Pilih seberapa cepat Anda ingin menerima kartu baru",
-        "standardDelivery": "Pengiriman standar",
-        "expressDelivery": "Pengiriman ekspres",
-        "businessDays": "{day1}-{day2} hari kerja",
-        "free": "GRATIS",
         "shippingAddress": "Alamat pengiriman",
-        "useRegisteredAddress": "Gunakan alamat terdaftar sebagai alamat pengiriman",
-        "chooseDeliverySpeed": "Pilih kecepatan pengiriman"
+        "useRegisteredAddress": "Gunakan alamat terdaftar sebagai alamat pengiriman"
       },
       "Confirm": {
         "title": "Tinjau permintaan Anda",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "Alamat terdaftar",
         "useRegisteredAddress": "Gunakan alamat terdaftar sebagai alamat pengiriman",
         "delivery": "Pengiriman",
-        "standardDelivery": "Pengiriman standar",
-        "expressDelivery": "Pengiriman ekspres",
-        "businessDays": "{day1}-{day2} hari kerja",
-        "free": "GRATIS",
         "deliveryInformation": "Informasi pengiriman",
         "bullet1": "Anda akan menerima informasi pelacakan melalui email",
         "bullet2": "Tanda tangan mungkin diperlukan saat pengiriman",

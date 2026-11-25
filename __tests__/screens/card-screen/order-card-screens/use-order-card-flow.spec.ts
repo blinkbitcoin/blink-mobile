@@ -58,14 +58,6 @@ describe("useOrderCardFlow", () => {
       expect(result.current.step).toBe(Step.Shipping)
     })
 
-    it("has selectedDelivery as standard", () => {
-      const { result } = renderHook(() =>
-        useOrderCardFlow({ initialAddress: mockAddress }),
-      )
-
-      expect(result.current.state.selectedDelivery).toBe("standard")
-    })
-
     it("has useRegisteredAddress as true when address exists", () => {
       const { result } = renderHook(() =>
         useOrderCardFlow({ initialAddress: mockAddress }),

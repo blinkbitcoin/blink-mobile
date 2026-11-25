@@ -3543,6 +3543,13 @@
       "signatureRequired": "Signature may be required upon delivery",
       "supportedRegions": "Address must be within supported shipping regions"
     },
+    "Delivery": {
+      "courier": "Kuriyerwan apachiy",
+      "snailMail": "Postawan apachiy",
+      "snailMailUnavailable": "Mana iñiy atinachu, manam qunchikchu",
+      "businessDays": "{day1}-{day2} llamk'ana p'unchaykuna",
+      "free": "MANA QULLQI"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Musuq PIN nisqa takyachiy",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "Akllay imaynapin apachimunki",
         "subtitle": "Akllay mayk'aqpin musuq tarjetaykita chaskiyta munanki",
-        "standardDelivery": "Sapaq apachiy",
-        "expressDelivery": "Usqhay apachiy",
-        "businessDays": "{day1}-{day2} llamk'ay p'unchawkuna",
-        "free": "QHASILLA",
         "shippingAddress": "Apachina dirección",
-        "useRegisteredAddress": "Qillqasqa direcciónta apachina dirección hina llamk'achiy",
-        "chooseDeliverySpeed": "Apachiyta ajllay"
+        "useRegisteredAddress": "Qillqasqa direcciónta apachina dirección hina llamk'achiy"
       },
       "Confirm": {
         "title": "Mañakusqaykita qhaway",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "Qillqasqa dirección",
         "useRegisteredAddress": "Qillqasqa direcciónta apachina dirección hina llamk'achiy",
         "delivery": "Apachiy",
-        "standardDelivery": "Estándar apachiy",
-        "expressDelivery": "Express apachiy",
-        "businessDays": "{day1}-{day2} llamk'ana p'unchaykuna",
-        "free": "MANA QULLQI",
         "deliveryInformation": "Apachiy willakuy",
         "bullet1": "Email-manta qhawariy willakuyta chaskinki",
         "bullet2": "Apachiykuchkanqa firmayta munachkanman",

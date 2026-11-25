@@ -3701,6 +3701,13 @@ const en: BaseTranslation = {
       signatureRequired: "Signature may be required upon delivery",
       supportedRegions: "Address must be within supported shipping regions",
     },
+    Delivery: {
+      courier: "Courier delivery",
+      snailMail: "Snail mail delivery",
+      snailMailUnavailable: "Too unreliable to support",
+      businessDays: "{day1}-{day2} business days",
+      free: "FREE",
+    },
     TransactionDetails: {
       title: "Transaction details",
       cardInformation: "Card information",
@@ -3789,13 +3796,8 @@ const en: BaseTranslation = {
       Delivery: {
         title: "Delivery options",
         subtitle: "Choose how you'd like to receive your replacement card.",
-        standardDelivery: "Standard delivery",
-        businessDays: "{day1}-{day2} business days",
-        free: "FREE",
-        expressDelivery: "Express delivery",
         shippingAddress: "Shipping address",
         useRegisteredAddress: "Use registered address as shipping address",
-        chooseDeliverySpeed: "Choose delivery speed",
       },
       Confirm: {
         title: "Confirm replacement",
@@ -3842,10 +3844,6 @@ const en: BaseTranslation = {
         registeredAddress: "Registered address",
         useRegisteredAddress: "Use registered address as shipping address",
         delivery: "Delivery",
-        standardDelivery: "Standard delivery",
-        expressDelivery: "Express delivery",
-        businessDays: "{day1}-{day2} business days",
-        free: "FREE",
         deliveryInformation: "Delivery information",
         bullet1: "You'll receive tracking information via email",
         bullet2: "Signature may be required upon delivery",

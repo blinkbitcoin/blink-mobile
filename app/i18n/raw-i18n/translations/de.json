@@ -3543,6 +3543,13 @@
             "signatureRequired": "Bei der Zustellung kann eine Unterschrift erforderlich sein",
             "supportedRegions": "Die Adresse muss innerhalb der unterstützten Versandregionen liegen"
         },
+        "Delivery": {
+            "courier": "Kurierzustellung",
+            "snailMail": "Zustellung per Briefpost",
+            "snailMailUnavailable": "Zu unzuverlässig, um es anzubieten",
+            "businessDays": "{day1}-{day2} Werktage",
+            "free": "KOSTENLOS"
+        },
         "PinScreens": {
             "common": {
                 "confirmNewPin": "Neue PIN bestätigen",
@@ -3605,13 +3612,8 @@
             "Delivery": {
                 "title": "Wählen Sie Ihre Liefergeschwindigkeit",
                 "subtitle": "Wählen Sie, wie schnell Sie Ihre neue Karte erhalten möchten",
-                "standardDelivery": "Standardlieferung",
-                "expressDelivery": "Expresslieferung",
-                "businessDays": "{day1}-{day2} Werktage",
-                "free": "KOSTENLOS",
                 "shippingAddress": "Lieferadresse",
-                "useRegisteredAddress": "Registrierte Adresse als Lieferadresse verwenden",
-                "chooseDeliverySpeed": "Liefergeschwindigkeit wählen"
+                "useRegisteredAddress": "Registrierte Adresse als Lieferadresse verwenden"
             },
             "Confirm": {
                 "title": "Überprüfen Sie Ihre Anfrage",
@@ -3657,10 +3659,6 @@
                 "registeredAddress": "Registrierte Adresse",
                 "useRegisteredAddress": "Registrierte Adresse als Lieferadresse verwenden",
                 "delivery": "Lieferung",
-                "standardDelivery": "Standardlieferung",
-                "expressDelivery": "Expresslieferung",
-                "businessDays": "{day1}-{day2} Werktage",
-                "free": "KOSTENLOS",
                 "deliveryInformation": "Lieferinformationen",
                 "bullet1": "Sie erhalten Tracking-Informationen per E-Mail",
                 "bullet2": "Bei der Lieferung kann eine Unterschrift erforderlich sein",

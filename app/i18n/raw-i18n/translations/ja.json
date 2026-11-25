@@ -3543,6 +3543,13 @@
             "signatureRequired": "配達時に署名が必要な場合があります",
             "supportedRegions": "配送対応地域内の住所である必要があります"
         },
+        "Delivery": {
+            "courier": "宅配便",
+            "snailMail": "普通郵便",
+            "snailMailUnavailable": "信頼性が低いため対応していません",
+            "businessDays": "{day1}-{day2} 営業日",
+            "free": "無料"
+        },
         "PinScreens": {
             "common": {
                 "confirmNewPin": "新しいPINを確認",
@@ -3605,13 +3612,8 @@
             "Delivery": {
                 "title": "配送速度を選択",
                 "subtitle": "新しいカードをどのくらい早く受け取りたいかを選択してください",
-                "standardDelivery": "通常配送",
-                "expressDelivery": "速達配送",
-                "businessDays": "{day1}〜{day2}営業日",
-                "free": "無料",
                 "shippingAddress": "配送先住所",
-                "useRegisteredAddress": "登録住所を配送先住所として使用",
-                "chooseDeliverySpeed": "配送速度を選択"
+                "useRegisteredAddress": "登録住所を配送先住所として使用"
             },
             "Confirm": {
                 "title": "リクエストを確認",
@@ -3657,10 +3659,6 @@
                 "registeredAddress": "登録済み住所",
                 "useRegisteredAddress": "登録済み住所を配送先住所として使用",
                 "delivery": "配送",
-                "standardDelivery": "通常配送",
-                "expressDelivery": "速達配送",
-                "businessDays": "{day1}-{day2} 営業日",
-                "free": "無料",
                 "deliveryInformation": "配送情報",
                 "bullet1": "追跡情報はメールで届きます",
                 "bullet2": "配達時に署名が必要になる場合があります",

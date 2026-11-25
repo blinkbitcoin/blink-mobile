@@ -14,7 +14,9 @@ type SelectableOptionRowProps = {
   value?: string
   valueColor?: string
   isSelected: boolean
-  onPress: () => void
+  /** Left out for an option shown but not offered. */
+  onPress?: () => void
+  isDisabled?: boolean
 }
 
 export const SelectableOptionRow: React.FC<SelectableOptionRowProps> = ({
@@ -26,14 +28,21 @@ export const SelectableOptionRow: React.FC<SelectableOptionRowProps> = ({
   valueColor,
   isSelected,
   onPress,
+  isDisabled = false,
 }) => {
   const {
     theme: { colors },
   } = useTheme()
 
+  const caretColor = isDisabled ? colors.textDisabled : colors.accent
+  /** Left unset when enabled: Pressable adds any `disabled` it gets to the
+   *  accessibility state, and an enabled option should announce only its selection. */
+  const pressableDisabled = isDisabled ? true : undefined
+
   return (
     <Pressable
       onPress={onPress}
+      disabled={pressableDisabled}
       accessibilityRole="radio"
       accessibilityState={{ selected: isSelected }}
     >
@@ -45,8 +54,9 @@ export const SelectableOptionRow: React.FC<SelectableOptionRowProps> = ({
         value={value}
         valueColor={valueColor}
         highlighted={isSelected}
+        isDisabled={isDisabled}
       >
-        <GaloyIcon name="caret-right" size={16} color={colors.accent} />
+        <GaloyIcon name="caret-right" size={16} color={caretColor} />
       </OptionRow>
     </Pressable>
   )

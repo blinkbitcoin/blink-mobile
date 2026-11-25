@@ -1,5 +1,5 @@
 import React from "react"
-import { Text as RNText, View } from "react-native"
+import { StyleSheet, Text as RNText, View } from "react-native"
 import { render } from "@testing-library/react-native"
 
 import { OptionRow } from "@app/components/card-screen/option-row"
@@ -12,6 +12,7 @@ jest.mock("@rn-vui/themed", () => ({
         textOnBackground: "#000000",
         accent: "#3B82F6",
         textMuted: "#666666",
+        textDisabled: "#AEAEB8",
         neutral: "#E0E0E0",
         transparent: "transparent",
       },
@@ -112,6 +113,31 @@ describe("OptionRow", () => {
         : valueElement.props.style
 
       expect(flatStyle.color).toBe("#00FF00")
+    })
+  })
+
+  describe("disabled", () => {
+    it("greys out its title, subtitle and icon", () => {
+      const { getByText, getByTestId } = render(
+        <OptionRow {...defaultProps} isDisabled />,
+      )
+
+      expect(StyleSheet.flatten(getByText("Standard Delivery").props.style).color).toBe(
+        "#AEAEB8",
+      )
+      expect(StyleSheet.flatten(getByText("5-7 business days").props.style).color).toBe(
+        "#AEAEB8",
+      )
+      expect(getByTestId("galoy-icon-bank").props.accessibilityHint).toBe("#AEAEB8")
+    })
+
+    it("keeps its own colors when enabled", () => {
+      const { getByText, getByTestId } = render(<OptionRow {...defaultProps} />)
+
+      expect(
+        StyleSheet.flatten(getByText("Standard Delivery").props.style).color,
+      ).toBeUndefined()
+      expect(getByTestId("galoy-icon-bank").props.accessibilityHint).toBe("#FF0000")
     })
   })
 })

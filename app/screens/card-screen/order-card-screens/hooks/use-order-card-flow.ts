@@ -5,7 +5,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import useDeviceLocation from "@app/hooks/use-device-location"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { getRegionsByCountry } from "@app/utils/address-metadata"
-import { Delivery, DeliveryType, ShippingAddress } from "@app/screens/card-screen/types"
+import { ShippingAddress } from "@app/screens/card-screen/types"
 
 const FALLBACK_COUNTRY = "US"
 
@@ -28,7 +28,6 @@ export const Step = {
 export type StepType = (typeof Step)[keyof typeof Step]
 
 type FlowState = {
-  selectedDelivery: DeliveryType
   useRegisteredAddress: boolean
   customAddress: ShippingAddress
 }
@@ -56,7 +55,6 @@ export const useOrderCardFlow = ({
   const { countryCode: detectedCountry } = useDeviceLocation()
 
   const [step, setStep] = useState<StepType>(FIRST_STEP)
-  const [selectedDelivery] = useState<DeliveryType>(Delivery.Standard)
   const [useRegisteredAddress, setUseRegisteredAddress] = useState(
     initialAddress !== null,
   )
@@ -116,7 +114,6 @@ export const useOrderCardFlow = ({
   return {
     step,
     state: {
-      selectedDelivery,
       useRegisteredAddress,
       customAddress,
     },

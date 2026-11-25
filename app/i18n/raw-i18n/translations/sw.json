@@ -3543,6 +3543,13 @@
       "signatureRequired": "Sahihi inaweza kuhitajika wakati wa utoaji",
       "supportedRegions": "Anwani lazima iwe ndani ya maeneo yanayoungwa mkono ya usafirishaji"
     },
+    "Delivery": {
+      "courier": "Usafirishaji kwa mjumbe",
+      "snailMail": "Usafirishaji kwa posta ya kawaida",
+      "snailMailUnavailable": "Si ya kuaminika vya kutosha kutolewa",
+      "businessDays": "{day1}-{day2} siku za kazi",
+      "free": "BURE"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Thibitisha PIN mpya",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "Chagua kasi ya utoaji",
         "subtitle": "Chagua haraka gani unataka kupokea kadi yako mpya",
-        "standardDelivery": "Utoaji wa kawaida",
-        "expressDelivery": "Utoaji wa haraka",
-        "businessDays": "Siku {day1}-{day2} za kazi",
-        "free": "BURE",
         "shippingAddress": "Anwani ya usafirishaji",
-        "useRegisteredAddress": "Tumia anwani iliyosajiliwa kama anwani ya usafirishaji",
-        "chooseDeliverySpeed": "Chagua kasi ya uwasilishaji"
+        "useRegisteredAddress": "Tumia anwani iliyosajiliwa kama anwani ya usafirishaji"
       },
       "Confirm": {
         "title": "Kagua ombi lako",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "Anwani iliyosajiliwa",
         "useRegisteredAddress": "Tumia anwani iliyosajiliwa kama anwani ya usafirishaji",
         "delivery": "Uwasilishaji",
-        "standardDelivery": "Uwasilishaji wa kawaida",
-        "expressDelivery": "Uwasilishaji wa haraka",
-        "businessDays": "{day1}-{day2} siku za kazi",
-        "free": "BURE",
         "deliveryInformation": "Taarifa za uwasilishaji",
         "bullet1": "Utapokea taarifa za ufuatiliaji kwa barua pepe",
         "bullet2": "Huenda saini ikahitajika wakati wa uwasilishaji",

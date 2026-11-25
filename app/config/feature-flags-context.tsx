@@ -86,7 +86,11 @@ type DeliveryOptionConfig = {
   priceUsd: number
 }
 
-type ReplaceCardDeliveryConfig = Record<string, DeliveryOptionConfig>
+/** Cards ship by courier only. Its days are the order's and the replacement's; its price
+ *  is the replacement's, since the first card ships free. */
+type ReplaceCardDeliveryConfig = {
+  courier: DeliveryOptionConfig
+}
 
 export type FeeRatesConfig = {
   lightningSendBps: number
@@ -160,9 +164,9 @@ type RemoteConfig = {
   [CloudBundleStaleAfterMsKey]: number
 }
 
-const defaultReplaceCardDeliveryConfig = {
-  standard: { minDays: 7, maxDays: 10, priceUsd: 0 },
-  express: { minDays: 1, maxDays: 2, priceUsd: 15 },
+/** Free until the replacement's payment step exists, then raised to its $100 fee. */
+const defaultReplaceCardDeliveryConfig: ReplaceCardDeliveryConfig = {
+  courier: { minDays: 3, maxDays: 7, priceUsd: 0 },
 }
 
 // Fee rates page contract: a negative rate hides its row (and the section when
@@ -656,7 +660,7 @@ const readRemoteConfig = (): RemoteConfig => {
     defaultRemoteConfig.autoConvertAmountMatchToleranceBps,
   )
 
-  const parsedDeliveryConfig = getRemoteConfigObject<ReplaceCardDeliveryConfig>(
+  const parsedDeliveryConfig = getRemoteConfigObject<Partial<ReplaceCardDeliveryConfig>>(
     ReplaceCardDeliveryConfigKey,
     {},
   )

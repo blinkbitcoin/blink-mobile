@@ -3543,6 +3543,13 @@
       "signatureRequired": "قد يكون التوقيع مطلوبًا عند التسليم",
       "supportedRegions": "يجب أن يكون العنوان ضمن مناطق الشحن المدعومة"
     },
+    "Delivery": {
+      "courier": "التوصيل عبر شركة شحن",
+      "snailMail": "التوصيل بالبريد العادي",
+      "snailMailUnavailable": "غير موثوق بما يكفي لدعمه",
+      "businessDays": "{day1}-{day2} أيام عمل",
+      "free": "مجاني"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "تأكيد رقم التعريف الشخصي الجديد",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "اختر سرعة التوصيل",
         "subtitle": "اختر مدى سرعة استلام بطاقتك الجديدة",
-        "standardDelivery": "توصيل عادي",
-        "expressDelivery": "توصيل سريع",
-        "businessDays": "{day1}-{day2} أيام عمل",
-        "free": "مجاني",
         "shippingAddress": "عنوان الشحن",
-        "useRegisteredAddress": "استخدم العنوان المسجل كعنوان شحن",
-        "chooseDeliverySpeed": "اختر سرعة التوصيل"
+        "useRegisteredAddress": "استخدم العنوان المسجل كعنوان شحن"
       },
       "Confirm": {
         "title": "راجع طلبك",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "العنوان المسجّل",
         "useRegisteredAddress": "استخدم العنوان المسجّل كعنوان للشحن",
         "delivery": "التسليم",
-        "standardDelivery": "تسليم قياسي",
-        "expressDelivery": "تسليم سريع",
-        "businessDays": "{day1}-{day2} أيام عمل",
-        "free": "مجاني",
         "deliveryInformation": "معلومات التسليم",
         "bullet1": "ستتلقى معلومات التتبع عبر البريد الإلكتروني",
         "bullet2": "قد يُطلب توقيع عند التسليم",

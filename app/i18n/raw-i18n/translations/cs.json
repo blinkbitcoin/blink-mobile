@@ -3543,6 +3543,13 @@
       "signatureRequired": "Při doručení může být vyžadován podpis",
       "supportedRegions": "Adresa musí být v podporovaných oblastech doručení"
     },
+    "Delivery": {
+      "courier": "Doručení kurýrem",
+      "snailMail": "Doručení běžnou poštou",
+      "snailMailUnavailable": "Příliš nespolehlivé, než abychom ho nabízeli",
+      "businessDays": "{day1}-{day2} pracovních dnů",
+      "free": "ZDARMA"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Potvrdit nový PIN",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "Vyberte rychlost doručení",
         "subtitle": "Vyberte, jak rychle chcete obdržet novou kartu",
-        "standardDelivery": "Standardní doručení",
-        "expressDelivery": "Expresní doručení",
-        "businessDays": "{day1}-{day2} pracovních dnů",
-        "free": "ZDARMA",
         "shippingAddress": "Doručovací adresa",
-        "useRegisteredAddress": "Použít registrovanou adresu jako doručovací",
-        "chooseDeliverySpeed": "Zvolte rychlost doručení"
+        "useRegisteredAddress": "Použít registrovanou adresu jako doručovací"
       },
       "Confirm": {
         "title": "Zkontrolujte svou žádost",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "Registrovaná adresa",
         "useRegisteredAddress": "Použít registrovanou adresu jako doručovací adresu",
         "delivery": "Doručení",
-        "standardDelivery": "Standardní doručení",
-        "expressDelivery": "Expresní doručení",
-        "businessDays": "{day1}-{day2} pracovních dnů",
-        "free": "ZDARMA",
         "deliveryInformation": "Informace o doručení",
         "bullet1": "Informace o sledování obdržíte e‑mailem",
         "bullet2": "Při doručení může být vyžadován podpis",

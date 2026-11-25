@@ -3,37 +3,24 @@ import React, { useMemo } from "react"
 import { useTheme } from "@rn-vui/themed"
 
 import { InfoCard, InfoSection } from "@app/components/card-screen"
-import { useRemoteConfig } from "@app/config/feature-flags-context"
-import { WalletCurrency } from "@app/graphql/generated"
-import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { Delivery, DeliveryType } from "@app/screens/card-screen/types"
+import { useCourierDelivery } from "@app/screens/card-screen/hooks"
 
 import { Issue, IssueType } from "./types"
 
 type ConfirmStepProps = {
   issueType: IssueType
-  deliveryType: DeliveryType
   isVirtualCard: boolean
 }
 
-export const ConfirmStep: React.FC<ConfirmStepProps> = ({
-  issueType,
-  deliveryType,
-  isVirtualCard,
-}) => {
+export const ConfirmStep: React.FC<ConfirmStepProps> = ({ issueType, isVirtualCard }) => {
   const {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const { replaceCardDeliveryConfig } = useRemoteConfig()
-  const { formatCurrency } = useDisplayCurrency()
+  const courier = useCourierDelivery()
 
-  const {
-    ReportIssue: reportIssueLL,
-    Delivery: deliveryLL,
-    Confirm: confirmLL,
-  } = LL.CardFlow.ReplaceCard
+  const { ReportIssue: reportIssueLL, Confirm: confirmLL } = LL.CardFlow.ReplaceCard
 
   const issueTypeLabels = useMemo<Record<IssueType, string>>(
     () => ({
@@ -52,52 +39,27 @@ export const ConfirmStep: React.FC<ConfirmStepProps> = ({
       },
     ]
 
+    /** The cost row is labelled with the courier itself, as the PRD asks (D126). */
     if (!isVirtualCard) {
-      const deliveryConfig = replaceCardDeliveryConfig[deliveryType]
-      const deliveryLabels: Record<DeliveryType, string> = {
-        [Delivery.Standard]: deliveryLL.standardDelivery(),
-        [Delivery.Express]: deliveryLL.expressDelivery(),
-      }
-      const deliveryPrice =
-        deliveryConfig.priceUsd === 0
-          ? deliveryLL.free()
-          : formatCurrency({
-              amountInMajorUnits: deliveryConfig.priceUsd,
-              currency: WalletCurrency.Usd,
-            })
-
       items.push(
         {
           label: confirmLL.delivery(),
-          value: deliveryLabels[deliveryType],
+          value: courier.title,
         },
         {
           label: confirmLL.deliveryTime(),
-          value: deliveryLL.businessDays({
-            day1: deliveryConfig.minDays.toString(),
-            day2: deliveryConfig.maxDays.toString(),
-          }),
+          value: courier.businessDays,
         },
         {
-          label: confirmLL.shippingCost(),
-          value: deliveryPrice,
-          valueColor: deliveryType === Delivery.Standard ? colors.success : undefined,
+          label: courier.title,
+          value: courier.replacementPrice,
+          valueColor: courier.isReplacementFree ? colors.success : undefined,
         },
       )
     }
 
     return items
-  }, [
-    confirmLL,
-    issueTypeLabels,
-    issueType,
-    isVirtualCard,
-    replaceCardDeliveryConfig,
-    deliveryType,
-    deliveryLL,
-    formatCurrency,
-    colors.success,
-  ])
+  }, [confirmLL, issueTypeLabels, issueType, isVirtualCard, courier, colors.success])
 
   return (
     <>

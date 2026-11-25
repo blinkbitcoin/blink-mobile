@@ -3543,6 +3543,13 @@
       "signatureRequired": "Có thể yêu cầu chữ ký khi nhận hàng",
       "supportedRegions": "Địa chỉ phải nằm trong vùng giao hàng được hỗ trợ"
     },
+    "Delivery": {
+      "courier": "Giao hàng qua đơn vị chuyển phát",
+      "snailMail": "Giao hàng qua bưu điện thường",
+      "snailMailUnavailable": "Quá thiếu tin cậy để hỗ trợ",
+      "businessDays": "{day1}-{day2} ngày làm việc",
+      "free": "MIỄN PHÍ"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Xác nhận PIN mới",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "Chọn tốc độ giao hàng",
         "subtitle": "Chọn tốc độ bạn muốn nhận thẻ mới",
-        "standardDelivery": "Giao hàng tiêu chuẩn",
-        "expressDelivery": "Giao hàng nhanh",
-        "businessDays": "{day1}-{day2} ngày làm việc",
-        "free": "MIỄN PHÍ",
         "shippingAddress": "Địa chỉ giao hàng",
-        "useRegisteredAddress": "Sử dụng địa chỉ đã đăng ký làm địa chỉ giao hàng",
-        "chooseDeliverySpeed": "Chọn tốc độ giao hàng"
+        "useRegisteredAddress": "Sử dụng địa chỉ đã đăng ký làm địa chỉ giao hàng"
       },
       "Confirm": {
         "title": "Xem lại yêu cầu của bạn",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "Địa chỉ đã đăng ký",
         "useRegisteredAddress": "Dùng địa chỉ đã đăng ký làm địa chỉ giao hàng",
         "delivery": "Giao hàng",
-        "standardDelivery": "Giao hàng tiêu chuẩn",
-        "expressDelivery": "Giao hàng nhanh",
-        "businessDays": "{day1}-{day2} ngày làm việc",
-        "free": "MIỄN PHÍ",
         "deliveryInformation": "Thông tin giao hàng",
         "bullet1": "Bạn sẽ nhận thông tin theo dõi qua email",
         "bullet2": "Có thể cần chữ ký khi giao hàng",

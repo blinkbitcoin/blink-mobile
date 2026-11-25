@@ -3543,6 +3543,13 @@
       "signatureRequired": "Signature may be required upon delivery",
       "supportedRegions": "Address must be within supported shipping regions"
     },
+    "Delivery": {
+      "courier": "Ukuhanjiswa ngumthunywa",
+      "snailMail": "Ukuthunyelwa ngeposi eqhelekileyo",
+      "snailMailUnavailable": "Ayithembeki ngokwaneleyo ukuba siyixhase",
+      "businessDays": "{day1}-{day2} iintsuku zomsebenzi",
+      "free": "SIMAHLA"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Qinisekisa i-PIN entsha",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "Khetha isantya sokuhanjiswa",
         "subtitle": "Khetha ukuba ufuna ukufumana ikhadi lakho elitsha ngokukhawuleza kangakanani",
-        "standardDelivery": "Ukuhanjiswa okuqhelekileyo",
-        "expressDelivery": "Ukuhanjiswa okukhawulezayo",
-        "businessDays": "Iintsuku {day1}-{day2} zomsebenzi",
-        "free": "SIMAHLA",
         "shippingAddress": "Idilesi yokuthumela",
-        "useRegisteredAddress": "Sebenzisa idilesi ebhalisiweyo njengeedilesi yokuthumela",
-        "chooseDeliverySpeed": "Khetha isantya sokuhanjiselwa"
+        "useRegisteredAddress": "Sebenzisa idilesi ebhalisiweyo njengeedilesi yokuthumela"
       },
       "Confirm": {
         "title": "Phonononga isicelo sakho",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "Idilesi ebhalisiweyo",
         "useRegisteredAddress": "Sebenzisa idilesi ebhalisiweyo njengedilesi yokuhanjiswa",
         "delivery": "Ukuhanjiswa",
-        "standardDelivery": "Ukuhanjiswa okuqhelekileyo",
-        "expressDelivery": "Ukuhanjiswa okukhawulezayo",
-        "businessDays": "{day1}-{day2} iintsuku zomsebenzi",
-        "free": "SIMAHLA",
         "deliveryInformation": "Ulwazi lokuhanjiswa",
         "bullet1": "Uya kufumana ulwazi lokulandela nge-imeyile",
         "bullet2": "Inokusetyenziswa isayini xa kuhanjiswa",

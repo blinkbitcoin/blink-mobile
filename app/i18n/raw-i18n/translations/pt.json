@@ -3543,6 +3543,13 @@
             "signatureRequired": "Pode ser necessária assinatura na entrega",
             "supportedRegions": "O endereço deve estar dentro das regiões de envio suportadas"
         },
+        "Delivery": {
+            "courier": "Entrega por transportadora",
+            "snailMail": "Entrega por correio comum",
+            "snailMailUnavailable": "Não é confiável o suficiente para oferecer",
+            "businessDays": "{day1}-{day2} dias úteis",
+            "free": "GRÁTIS"
+        },
         "PinScreens": {
             "common": {
                 "confirmNewPin": "Confirmar novo PIN",
@@ -3605,13 +3612,8 @@
             "Delivery": {
                 "title": "Escolha a velocidade de entrega",
                 "subtitle": "Selecione a rapidez com que deseja receber o seu novo cartão",
-                "standardDelivery": "Entrega padrão",
-                "expressDelivery": "Entrega expresso",
-                "businessDays": "{day1}-{day2} dias úteis",
-                "free": "GRÁTIS",
                 "shippingAddress": "Endereço de envio",
-                "useRegisteredAddress": "Usar endereço registado como endereço de envio",
-                "chooseDeliverySpeed": "Escolha a velocidade de entrega"
+                "useRegisteredAddress": "Usar endereço registado como endereço de envio"
             },
             "Confirm": {
                 "title": "Revise o seu pedido",
@@ -3657,10 +3659,6 @@
                 "registeredAddress": "Endereço registado",
                 "useRegisteredAddress": "Usar o endereço registado como endereço de envio",
                 "delivery": "Entrega",
-                "standardDelivery": "Entrega padrão",
-                "expressDelivery": "Entrega expressa",
-                "businessDays": "{day1}-{day2} dias úteis",
-                "free": "GRÁTIS",
                 "deliveryInformation": "Informações de entrega",
                 "bullet1": "Você receberá as informações de rastreamento por e-mail",
                 "bullet2": "Pode ser necessária assinatura na entrega",

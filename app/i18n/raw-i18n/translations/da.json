@@ -3543,6 +3543,13 @@
       "signatureRequired": "Underskrift kan være påkrævet ved levering",
       "supportedRegions": "Adressen skal være inden for understøttede leveringsområder"
     },
+    "Delivery": {
+      "courier": "Kurerlevering",
+      "snailMail": "Levering med almindelig post",
+      "snailMailUnavailable": "For upålidelig til at blive tilbudt",
+      "businessDays": "{day1}-{day2} hverdage",
+      "free": "GRATIS"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Bekræft ny PIN",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "Vælg din leveringshastighed",
         "subtitle": "Vælg hvor hurtigt du vil modtage dit nye kort",
-        "standardDelivery": "Standardlevering",
-        "expressDelivery": "Ekspreslevering",
-        "businessDays": "{day1}-{day2} hverdage",
-        "free": "GRATIS",
         "shippingAddress": "Leveringsadresse",
-        "useRegisteredAddress": "Brug registreret adresse som leveringsadresse",
-        "chooseDeliverySpeed": "Vælg leveringshastighed"
+        "useRegisteredAddress": "Brug registreret adresse som leveringsadresse"
       },
       "Confirm": {
         "title": "Gennemgå din anmodning",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "Registreret adresse",
         "useRegisteredAddress": "Brug registreret adresse som leveringsadresse",
         "delivery": "Levering",
-        "standardDelivery": "Standardlevering",
-        "expressDelivery": "Ekspreslevering",
-        "businessDays": "{day1}-{day2} hverdage",
-        "free": "GRATIS",
         "deliveryInformation": "Leveringsoplysninger",
         "bullet1": "Du modtager sporingsoplysninger via e-mail",
         "bullet2": "Der kan kræves underskrift ved levering",

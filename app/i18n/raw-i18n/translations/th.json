@@ -3543,6 +3543,13 @@
       "signatureRequired": "อาจต้องเซ็นชื่อเมื่อรับสินค้า",
       "supportedRegions": "ที่อยู่ต้องอยู่ในเขตจัดส่งที่รองรับ"
     },
+    "Delivery": {
+      "courier": "จัดส่งผ่านบริษัทขนส่ง",
+      "snailMail": "จัดส่งทางไปรษณีย์ธรรมดา",
+      "snailMailUnavailable": "ไม่น่าเชื่อถือพอที่จะให้บริการ",
+      "businessDays": "{day1}-{day2} วันทำการ",
+      "free": "ฟรี"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "ยืนยัน PIN ใหม่",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "เลือกความเร็วในการจัดส่ง",
         "subtitle": "เลือกว่าคุณต้องการรับบัตรใหม่เร็วแค่ไหน",
-        "standardDelivery": "จัดส่งมาตรฐาน",
-        "expressDelivery": "จัดส่งด่วน",
-        "businessDays": "{day1}-{day2} วันทำการ",
-        "free": "ฟรี",
         "shippingAddress": "ที่อยู่จัดส่ง",
-        "useRegisteredAddress": "ใช้ที่อยู่ที่ลงทะเบียนเป็นที่อยู่จัดส่ง",
-        "chooseDeliverySpeed": "เลือกความเร็วในการจัดส่ง"
+        "useRegisteredAddress": "ใช้ที่อยู่ที่ลงทะเบียนเป็นที่อยู่จัดส่ง"
       },
       "Confirm": {
         "title": "ตรวจสอบคำขอของคุณ",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "ที่อยู่ที่ลงทะเบียน",
         "useRegisteredAddress": "ใช้ที่อยู่ที่ลงทะเบียนเป็นที่อยู่จัดส่ง",
         "delivery": "การจัดส่ง",
-        "standardDelivery": "การจัดส่งมาตรฐาน",
-        "expressDelivery": "การจัดส่งแบบด่วน",
-        "businessDays": "{day1}-{day2} วันทำการ",
-        "free": "ฟรี",
         "deliveryInformation": "ข้อมูลการจัดส่ง",
         "bullet1": "คุณจะได้รับข้อมูลการติดตามทางอีเมล",
         "bullet2": "อาจต้องใช้ลายเซ็นเมื่อรับพัสดุ",

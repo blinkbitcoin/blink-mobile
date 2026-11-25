@@ -3543,6 +3543,13 @@
       "signatureRequired": "Handtekening mag by aflewering vereis word",
       "supportedRegions": "Adres moet binne ondersteunde afleweringsgebiede wees"
     },
+    "Delivery": {
+      "courier": "Koerieraflewering",
+      "snailMail": "Gewone posaflewering",
+      "snailMailUnavailable": "Te onbetroubaar om te ondersteun",
+      "businessDays": "{day1}-{day2} werksdae",
+      "free": "GRATIS"
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Bevestig nuwe PIN",
@@ -3604,13 +3611,8 @@
       "Delivery": {
         "title": "Kies jou afleweringspoed",
         "subtitle": "Kies hoe vinnig jy jou nuwe kaart wil ontvang",
-        "standardDelivery": "Standaard aflewering",
-        "expressDelivery": "Spoedaflewering",
-        "businessDays": "{day1}-{day2} besigheidsdae",
-        "free": "GRATIS",
         "shippingAddress": "Versendingsadres",
-        "useRegisteredAddress": "Gebruik geregistreerde adres as versendingsadres",
-        "chooseDeliverySpeed": "Kies afleweringspoed"
+        "useRegisteredAddress": "Gebruik geregistreerde adres as versendingsadres"
       },
       "Confirm": {
         "title": "Hersien jou versoek",
@@ -3657,10 +3659,6 @@
         "registeredAddress": "Geregistreerde adres",
         "useRegisteredAddress": "Gebruik geregistreerde adres as versendingsadres",
         "delivery": "Aflewering",
-        "standardDelivery": "Standaard aflewering",
-        "expressDelivery": "Ekspres aflewering",
-        "businessDays": "{day1}-{day2} werksdae",
-        "free": "GRATIS",
         "deliveryInformation": "Afleweringsinligting",
         "bullet1": "Jy sal opsporingsinligting per e-pos ontvang",
         "bullet2": "Handtekening kan by aflewering vereis word",

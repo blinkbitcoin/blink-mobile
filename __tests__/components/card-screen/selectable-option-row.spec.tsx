@@ -12,6 +12,7 @@ jest.mock("@rn-vui/themed", () => ({
         textOnBackground: "#000000",
         accent: "#3B82F6",
         textMuted: "#666666",
+        textDisabled: "#AEAEB8",
         neutral: "#E0E0E0",
         transparent: "transparent",
       },
@@ -137,6 +138,37 @@ describe("SelectableOptionRow", () => {
       fireEvent.press(getByRole("radio"))
 
       expect(onPress).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  /** An option shown but not offered, like snail mail for a replacement card. */
+  describe("disabled", () => {
+    it("cannot be chosen", () => {
+      const onPress = jest.fn()
+      const { getByRole } = render(
+        <SelectableOptionRow {...defaultProps} onPress={onPress} isDisabled />,
+      )
+
+      fireEvent.press(getByRole("radio"))
+
+      expect(onPress).not.toHaveBeenCalled()
+    })
+
+    it("tells screen readers it is unavailable", () => {
+      const { getByRole } = render(<SelectableOptionRow {...defaultProps} isDisabled />)
+
+      expect(getByRole("radio").props.accessibilityState).toEqual({
+        selected: false,
+        disabled: true,
+      })
+    })
+
+    it("greys out its caret", () => {
+      const { getByTestId } = render(<SelectableOptionRow {...defaultProps} isDisabled />)
+
+      expect(getByTestId("galoy-icon-caret-right").props.accessibilityHint).toBe(
+        "#AEAEB8",
+      )
     })
   })
 })
