@@ -3438,14 +3438,7 @@
       "title": "Yongera ku ssaamu ya simu",
       "addYourCard": "Yongera kaadi yo",
       "addYourCardDescription": "Yongera kaadi yo eya Blink ku ssaamu ya simu okusasula amangu era n'obukuumi",
-      "addTo": "Yongera ku",
-      "Benefits": {
-        "title": "Ebirungi by'essaamu ya simu",
-        "contactless": "Okusasula awatali kukwata mu bifo obukadde",
-        "security": "Obukuumi obulungi n'okukakasa kw'omubiri",
-        "noPhysicalCard": "Teweetaaga kutambula na kaadi yo",
-        "worksLocked": "Ekola ne singa simu yo erikuggaliddwa"
-      }
+      "addTo": "Yongera ku"
     },
     "CardStatus": {
       "title": "Kaadi ya Blink",

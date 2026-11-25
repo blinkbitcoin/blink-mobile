@@ -184,81 +184,17 @@ describe("CardAddToMobileWalletScreen", () => {
     })
   })
 
-  describe("benefits section", () => {
-    it("displays benefits title", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardAddToMobileWalletScreen />
-        </ContextForScreen>,
-      )
+  it("shows the card and the button only, with no benefits list", async () => {
+    const { queryByText } = render(
+      <ContextForScreen>
+        <CardAddToMobileWalletScreen />
+      </ContextForScreen>,
+    )
 
-      await act(async () => {})
+    await act(async () => {})
 
-      expect(getByText("Benefits of mobile wallet")).toBeTruthy()
-    })
-
-    it("displays contactless payments benefit", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardAddToMobileWalletScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Contactless payments at millions of locations")).toBeTruthy()
-    })
-
-    it("displays security benefit", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardAddToMobileWalletScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Enhanced security with biometric authentication")).toBeTruthy()
-    })
-
-    it("displays no physical card benefit", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardAddToMobileWalletScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("No need to carry your physical card")).toBeTruthy()
-    })
-
-    it("displays works when locked benefit", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardAddToMobileWalletScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Works even when your phone is locked")).toBeTruthy()
-    })
-
-    it("displays all four benefits", async () => {
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardAddToMobileWalletScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Contactless payments at millions of locations")).toBeTruthy()
-      expect(getByText("Enhanced security with biometric authentication")).toBeTruthy()
-      expect(getByText("No need to carry your physical card")).toBeTruthy()
-      expect(getByText("Works even when your phone is locked")).toBeTruthy()
-    })
+    expect(queryByText("Benefits of mobile wallet")).toBeNull()
+    expect(queryByText("Contactless payments at millions of locations")).toBeNull()
   })
 
   describe("hero section", () => {
@@ -293,7 +229,6 @@ describe("CardAddToMobileWalletScreen", () => {
         ),
       ).toBeTruthy()
       expect(getByText("Add to")).toBeTruthy()
-      expect(getByText("Benefits of mobile wallet")).toBeTruthy()
     })
   })
 })

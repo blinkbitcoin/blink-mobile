@@ -3438,14 +3438,7 @@
       "title": "Pridat do mobilnej penazenky",
       "addYourCard": "Pridajte svoju kartu",
       "addYourCardDescription": "Pridajte svoju Blink Card do mobilnej peňaženky pre rýchle a bezpečné platby",
-      "addTo": "Pridat do",
-      "Benefits": {
-        "title": "Vyhody mobilnej penazenky",
-        "contactless": "Bezkontaktne platby na milionoch miest",
-        "security": "Zvysena bezpecnost s biometrickou autentifikaciou",
-        "noPhysicalCard": "Nie je potrebne nosit fyzicku kartu",
-        "worksLocked": "Funguje aj pri zamknutom telefone"
-      }
+      "addTo": "Pridat do"
     },
     "CardStatus": {
       "title": "Blink Card",

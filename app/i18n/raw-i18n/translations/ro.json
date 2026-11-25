@@ -3438,14 +3438,7 @@
       "title": "Adauga in portofelul mobil",
       "addYourCard": "Adauga cardul tau",
       "addYourCardDescription": "Adaugă Blink Card-ul în portofelul mobil pentru plăți rapide și sigure",
-      "addTo": "Adauga in",
-      "Benefits": {
-        "title": "Beneficiile portofelului mobil",
-        "contactless": "Plati contactless in milioane de locatii",
-        "security": "Securitate imbunatatita cu autentificare biometrica",
-        "noPhysicalCard": "Nu e nevoie sa porti cardul fizic",
-        "worksLocked": "Functioneaza chiar si cand telefonul e blocat"
-      }
+      "addTo": "Adauga in"
     },
     "CardStatus": {
       "title": "Blink Card",

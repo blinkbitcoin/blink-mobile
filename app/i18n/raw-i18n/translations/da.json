@@ -3438,14 +3438,7 @@
       "title": "Tilfoej til mobil tegnebog",
       "addYourCard": "Tilfoej dit kort",
       "addYourCardDescription": "Tilføj dit Blink-kort til din mobile tegnebog for hurtige og sikre betalinger",
-      "addTo": "Tilfoej til",
-      "Benefits": {
-        "title": "Fordele ved mobil tegnebog",
-        "contactless": "Kontaktlose betalinger pa millioner af steder",
-        "security": "Forbedret sikkerhed med biometrisk godkendelse",
-        "noPhysicalCard": "Intet behov for at baere dit fysiske kort",
-        "worksLocked": "Virker selv nar din telefon er last"
-      }
+      "addTo": "Tilfoej til"
     },
     "CardStatus": {
       "title": "Blink-kort",

@@ -3421,14 +3421,7 @@
             "title": "Add to mobile wallet",
             "addYourCard": "Add your card",
             "addYourCardDescription": "Add your Blink Card to your mobile wallet for quick and secure payments",
-            "addTo": "Add to",
-            "Benefits": {
-                "title": "Benefits of mobile wallet",
-                "contactless": "Contactless payments at millions of locations",
-                "security": "Enhanced security with biometric authentication",
-                "noPhysicalCard": "No need to carry your physical card",
-                "worksLocked": "Works even when your phone is locked"
-            }
+            "addTo": "Add to"
         },
         "CardStatus": {
             "title": "Blink Card",

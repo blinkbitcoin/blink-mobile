@@ -6,7 +6,7 @@ import { RouteProp, useRoute } from "@react-navigation/native"
 import { Screen } from "@app/components/screen"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { BlinkCard } from "@app/components/blink-card/blink-card"
-import { AddToWalletButton, InfoCard } from "@app/components/card-screen"
+import { AddToWalletButton } from "@app/components/card-screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { fonts } from "@app/rne-theme/fonts"
@@ -51,18 +51,6 @@ export const CardAddToMobileWalletScreen: React.FC = () => {
         {canAddToWallet ? (
           <AddToWalletButton onPress={addToWallet} disabled={isAdding} />
         ) : null}
-
-        <InfoCard
-          title={LL.CardFlow.AddToMobileWallet.Benefits.title()}
-          bulletItems={[
-            LL.CardFlow.AddToMobileWallet.Benefits.contactless(),
-            LL.CardFlow.AddToMobileWallet.Benefits.security(),
-            LL.CardFlow.AddToMobileWallet.Benefits.noPhysicalCard(),
-            LL.CardFlow.AddToMobileWallet.Benefits.worksLocked(),
-          ]}
-          showIcon={false}
-          size="lg"
-        />
       </View>
     </Screen>
   )

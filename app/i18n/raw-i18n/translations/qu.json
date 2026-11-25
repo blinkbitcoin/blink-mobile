@@ -3438,14 +3438,7 @@
       "title": "Yapaykuy qullqi walitaman",
       "addYourCard": "Tarjetaykita yapaykuy",
       "addYourCardDescription": "Blink tarjetaykita yapaykuy qullqi walitaman utqaylla pagaypaq",
-      "addTo": "Yapaykuy",
-      "Benefits": {
-        "title": "Qullqi walitap allin kayninkunan",
-        "contactless": "Mana llamiyspa pagay waranqa waranqa cheqaspi",
-        "security": "Aswan allin waqaychay biometrico nisqawan",
-        "noPhysicalCard": "Mana tarjetaykita apanaykichu tiyan",
-        "worksLocked": "Llamkan telefonoyki wisqasqa kaptinpas"
-      }
+      "addTo": "Yapaykuy"
     },
     "CardStatus": {
       "title": "Blink tarjeta",

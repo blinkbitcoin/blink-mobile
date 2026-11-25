@@ -11466,28 +11466,6 @@ type RootTranslation = {
 			 * A​d​d​ ​t​o
 			 */
 			addTo: string
-			Benefits: {
-				/**
-				 * B​e​n​e​f​i​t​s​ ​o​f​ ​m​o​b​i​l​e​ ​w​a​l​l​e​t
-				 */
-				title: string
-				/**
-				 * C​o​n​t​a​c​t​l​e​s​s​ ​p​a​y​m​e​n​t​s​ ​a​t​ ​m​i​l​l​i​o​n​s​ ​o​f​ ​l​o​c​a​t​i​o​n​s
-				 */
-				contactless: string
-				/**
-				 * E​n​h​a​n​c​e​d​ ​s​e​c​u​r​i​t​y​ ​w​i​t​h​ ​b​i​o​m​e​t​r​i​c​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n
-				 */
-				security: string
-				/**
-				 * N​o​ ​n​e​e​d​ ​t​o​ ​c​a​r​r​y​ ​y​o​u​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d
-				 */
-				noPhysicalCard: string
-				/**
-				 * W​o​r​k​s​ ​e​v​e​n​ ​w​h​e​n​ ​y​o​u​r​ ​p​h​o​n​e​ ​i​s​ ​l​o​c​k​e​d
-				 */
-				worksLocked: string
-			}
 		}
 		CardStatus: {
 			/**
@@ -25762,28 +25740,6 @@ export type TranslationFunctions = {
 			 * Add to
 			 */
 			addTo: () => LocalizedString
-			Benefits: {
-				/**
-				 * Benefits of mobile wallet
-				 */
-				title: () => LocalizedString
-				/**
-				 * Contactless payments at millions of locations
-				 */
-				contactless: () => LocalizedString
-				/**
-				 * Enhanced security with biometric authentication
-				 */
-				security: () => LocalizedString
-				/**
-				 * No need to carry your physical card
-				 */
-				noPhysicalCard: () => LocalizedString
-				/**
-				 * Works even when your phone is locked
-				 */
-				worksLocked: () => LocalizedString
-			}
 		}
 		CardStatus: {
 			/**

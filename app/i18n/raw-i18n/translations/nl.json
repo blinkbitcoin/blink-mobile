@@ -3438,14 +3438,7 @@
       "title": "Toevoegen aan mobiele portemonnee",
       "addYourCard": "Voeg je kaart toe",
       "addYourCardDescription": "Voeg je Blink Card toe aan je mobiele portemonnee voor snelle en veilige betalingen",
-      "addTo": "Toevoegen aan",
-      "Benefits": {
-        "title": "Voordelen van mobiele portemonnee",
-        "contactless": "Contactloze betalingen op miljoenen locaties",
-        "security": "Verbeterde beveiliging met biometrische authenticatie",
-        "noPhysicalCard": "Geen fysieke kaart nodig",
-        "worksLocked": "Werkt zelfs wanneer je telefoon vergrendeld is"
-      }
+      "addTo": "Toevoegen aan"
     },
     "CardStatus": {
       "title": "Blink Card",

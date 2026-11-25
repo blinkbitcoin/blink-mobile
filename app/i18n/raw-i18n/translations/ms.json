@@ -3438,14 +3438,7 @@
       "title": "Tambah ke dompet mudah alih",
       "addYourCard": "Tambah kad anda",
       "addYourCardDescription": "Tambah Kad Blink ke dompet mudah alih untuk pembayaran pantas dan selamat",
-      "addTo": "Tambah ke",
-      "Benefits": {
-        "title": "Manfaat dompet mudah alih",
-        "contactless": "Pembayaran tanpa sentuh di jutaan lokasi",
-        "security": "Keselamatan dipertingkat dengan pengesahan biometrik",
-        "noPhysicalCard": "Tidak perlu membawa kad fizikal",
-        "worksLocked": "Berfungsi walaupun telefon dikunci"
-      }
+      "addTo": "Tambah ke"
     },
     "CardStatus": {
       "title": "Kad Blink",

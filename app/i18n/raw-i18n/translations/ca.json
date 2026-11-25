@@ -3438,14 +3438,7 @@
       "title": "Afegir a la cartera mobil",
       "addYourCard": "Afegeix la teva targeta",
       "addYourCardDescription": "Afegeix la teva Blink Card a la cartera mòbil per a pagaments ràpids i segurs",
-      "addTo": "Afegir a",
-      "Benefits": {
-        "title": "Avantatges de la cartera mobil",
-        "contactless": "Pagaments sense contacte en milions de llocs",
-        "security": "Seguretat millorada amb autenticacio biometrica",
-        "noPhysicalCard": "No cal portar la targeta fisica",
-        "worksLocked": "Funciona fins i tot amb el telefon bloquejat"
-      }
+      "addTo": "Afegir a"
     },
     "CardStatus": {
       "title": "Blink Card",

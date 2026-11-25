@@ -3438,14 +3438,7 @@
       "title": "Mobil cuzdana ekle",
       "addYourCard": "Kartinizi ekleyin",
       "addYourCardDescription": "Hızlı ve güvenli ödemeler için Blink kartınızı mobil cüzdanınıza ekleyin",
-      "addTo": "Ekle",
-      "Benefits": {
-        "title": "Mobil cuzdanin avantajlari",
-        "contactless": "Milyonlarca konumda temassiz odeme",
-        "security": "Biyometrik kimlik dogrulama ile gelistirilmis guvenlik",
-        "noPhysicalCard": "Fiziksel kartinizi tasimaniza gerek yok",
-        "worksLocked": "Telefonunuz kilitliyken bile calisir"
-      }
+      "addTo": "Ekle"
     },
     "CardStatus": {
       "title": "Blink Kartı",

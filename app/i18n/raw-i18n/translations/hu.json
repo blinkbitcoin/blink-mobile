@@ -3438,14 +3438,7 @@
       "title": "Hozzaadas a mobil tarcahoz",
       "addYourCard": "Add hozza a kartyad",
       "addYourCardDescription": "Add hozzá a Blink kártyádat a mobil tárcádhoz a gyors és biztonságos fizetésekhez",
-      "addTo": "Hozzaadas",
-      "Benefits": {
-        "title": "A mobil tarca elonyei",
-        "contactless": "Erintesmentes fizetes millio helyen",
-        "security": "Fokozott biztonsag biometrikus hitelesitessel",
-        "noPhysicalCard": "Nem kell magadnal hordanod a fizikai kartyat",
-        "worksLocked": "Mukodik meg akkor is ha a telefonod zarolva van"
-      }
+      "addTo": "Hozzaadas"
     },
     "CardStatus": {
       "title": "Blink kártya",

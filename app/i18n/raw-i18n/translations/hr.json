@@ -3438,14 +3438,7 @@
       "title": "Dodaj u mobilni novcanik",
       "addYourCard": "Dodajte svoju karticu",
       "addYourCardDescription": "Dodajte svoju Blink karticu u mobilni novčanik za brza i sigurna plaćanja",
-      "addTo": "Dodaj u",
-      "Benefits": {
-        "title": "Prednosti mobilnog novcanika",
-        "contactless": "Beskontaktna placanja na milijunima lokacija",
-        "security": "Poboljsana sigurnost s biometrijskom autentifikacijom",
-        "noPhysicalCard": "Nije potrebno nositi fizicku karticu",
-        "worksLocked": "Radi cak i kada je telefon zakljucan"
-      }
+      "addTo": "Dodaj u"
     },
     "CardStatus": {
       "title": "Blink kartica",

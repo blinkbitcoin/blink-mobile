@@ -3438,14 +3438,7 @@
             "title": "Ajouter au portefeuille mobile",
             "addYourCard": "Ajoutez votre carte",
             "addYourCardDescription": "Ajoutez votre Blink Card à votre portefeuille mobile pour des paiements rapides et sécurisés",
-            "addTo": "Ajouter à",
-            "Benefits": {
-                "title": "Avantages du portefeuille mobile",
-                "contactless": "Paiements sans contact dans des millions de lieux",
-                "security": "Sécurité renforcée avec authentification biométrique",
-                "noPhysicalCard": "Pas besoin de transporter votre carte physique",
-                "worksLocked": "Fonctionne même lorsque votre téléphone est verrouillé"
-            }
+            "addTo": "Ajouter à"
         },
         "CardStatus": {
             "title": "Blink Card",

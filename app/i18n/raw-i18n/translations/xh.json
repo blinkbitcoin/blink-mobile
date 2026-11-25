@@ -3438,14 +3438,7 @@
       "title": "Yongeza kwisipaji sefowuni",
       "addYourCard": "Yongeza ikhadi lakho",
       "addYourCardDescription": "Yongeza ikhadi lakho le-Blink kwisipaji sefowuni ukuze uhlawule ngokukhawuleza nangokukhuselekileyo",
-      "addTo": "Yongeza ku",
-      "Benefits": {
-        "title": "Iinzuzo zesipaji sefowuni",
-        "contactless": "Intlawulo engachukumisiyo kwizigidi zeendawo",
-        "security": "Ukhuseleko oluphuculweyo ngokuqinisekisa i-biometric",
-        "noPhysicalCard": "Akukho mfuneko yokuthwala ikhadi lakho lokwenyani",
-        "worksLocked": "Iyasebenza nokuba ifowuni yakho itshixiwe"
-      }
+      "addTo": "Yongeza ku"
     },
     "CardStatus": {
       "title": "Ikhadi le-Blink",

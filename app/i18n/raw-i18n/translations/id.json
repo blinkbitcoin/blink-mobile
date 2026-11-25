@@ -3438,14 +3438,7 @@
       "title": "Tambahkan ke dompet seluler",
       "addYourCard": "Tambahkan kartu Anda",
       "addYourCardDescription": "Tambahkan Blink Card ke dompet seluler untuk pembayaran cepat dan aman",
-      "addTo": "Tambahkan ke",
-      "Benefits": {
-        "title": "Manfaat dompet seluler",
-        "contactless": "Pembayaran tanpa kontak di jutaan lokasi",
-        "security": "Keamanan yang ditingkatkan dengan autentikasi biometrik",
-        "noPhysicalCard": "Tidak perlu membawa kartu fisik",
-        "worksLocked": "Berfungsi bahkan saat ponsel terkunci"
-      }
+      "addTo": "Tambahkan ke"
     },
     "CardStatus": {
       "title": "Blink Card",

@@ -3438,14 +3438,7 @@
             "title": "Adicionar à carteira móvel",
             "addYourCard": "Adicione seu cartão",
             "addYourCardDescription": "Adicione seu Cartão Blink à sua carteira móvel para pagamentos rápidos e seguros",
-            "addTo": "Adicionar a",
-            "Benefits": {
-                "title": "Benefícios da carteira móvel",
-                "contactless": "Pagamentos sem contato em milhões de locais",
-                "security": "Segurança aprimorada com autenticação biométrica",
-                "noPhysicalCard": "Não precisa carregar seu cartão físico",
-                "worksLocked": "Funciona mesmo com o telefone bloqueado"
-            }
+            "addTo": "Adicionar a"
         },
         "CardStatus": {
             "title": "Cartão Blink",

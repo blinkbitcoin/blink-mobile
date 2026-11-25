@@ -3438,14 +3438,7 @@
       "title": "Them vao vi di dong",
       "addYourCard": "Them the cua ban",
       "addYourCardDescription": "Thêm thẻ Blink vào ví di động để thanh toán nhanh chóng và an toàn",
-      "addTo": "Them vao",
-      "Benefits": {
-        "title": "Loi ich cua vi di dong",
-        "contactless": "Thanh toan khong tiep xuc tai hang trieu dia diem",
-        "security": "Bao mat nang cao voi xac thuc sinh trac hoc",
-        "noPhysicalCard": "Khong can mang theo the vat ly",
-        "worksLocked": "Hoat dong ngay ca khi dien thoai bi khoa"
-      }
+      "addTo": "Them vao"
     },
     "CardStatus": {
       "title": "Thẻ Blink",

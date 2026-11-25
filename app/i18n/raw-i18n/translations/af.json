@@ -3438,14 +3438,7 @@
       "title": "Voeg by mobiele beursie",
       "addYourCard": "Voeg jou kaart by",
       "addYourCardDescription": "Voeg jou Blink-kaart by jou mobiele beursie vir vinnige en veilige betalings",
-      "addTo": "Voeg by",
-      "Benefits": {
-        "title": "Voordele van mobiele beursie",
-        "contactless": "Kontaklose betalings by miljoene plekke",
-        "security": "Verbeterde sekuriteit met biometriese verifikasie",
-        "noPhysicalCard": "Geen fisiese kaart nodig nie",
-        "worksLocked": "Werk selfs wanneer jou foon gesluit is"
-      }
+      "addTo": "Voeg by"
     },
     "CardStatus": {
       "title": "Blink-kaart",
