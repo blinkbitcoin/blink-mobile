@@ -27,7 +27,7 @@ const TITLE_GAPS: Record<string, number> = {
   "app/screens/card-screen/card-fee-schedule-screen.tsx": 1,
   "app/screens/card-screen/card-limits-screen/card-limits-screen.tsx": 1,
   "app/screens/card-screen/card-personal-details-screen/card-personal-details-screen.tsx": 1,
-  "app/screens/card-screen/card-settings-screen/card-settings-screen.tsx": 2,
+  "app/screens/card-screen/card-settings-screen/card-settings-screen.tsx": 3,
   "app/screens/card-screen/card-statements-screen/card-statements-screen.tsx": 1,
   "app/screens/card-screen/onboarding/card-flow/personal-information-screen.tsx": 1,
   "app/screens/card-screen/order-card-screens/steps/shared-styles.ts": 1,
@@ -46,7 +46,7 @@ const TITLE_GAPS: Record<string, number> = {
   "app/screens/transaction-detail-screen/transaction-detail-screen.tsx": 1,
 }
 
-// The title's style key in each file. The card danger zone title stays `error`.
+// The title's style key in each file.
 const TITLE_STYLES: [string, string][] = [
   ["app/components/action-field/action-field.tsx", "label"],
   ["app/components/card-screen/card-transactions-section.tsx", "dateLabel"],
@@ -173,12 +173,13 @@ describe("group title", () => {
       source("app/screens/unclaimed-deposits/unclaimed-deposits-screen.tsx"),
     ).not.toContain("groupTitleGap")
 
+    // Figma 47 draws the opened Danger zone as a standard section under its toggle.
     expect(
       styleBlock(
         "app/screens/card-screen/card-settings-screen/card-settings-screen.tsx",
         "dangerZoneSection",
       ),
-    ).toMatch(/gap: 3,/)
+    ).toMatch(/gap: groupTitleGap,/)
   })
 
   it("the API key expiry label is textSecondary", () => {
