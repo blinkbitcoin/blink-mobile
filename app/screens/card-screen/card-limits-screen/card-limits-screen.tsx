@@ -98,6 +98,17 @@ export const CardLimitsScreen: React.FC = () => {
   const isSavingAtmDailyLimit = updatingAtmLimit === SpendingPeriod.Daily
   const isSavingAtmMonthlyLimit = updatingAtmLimit === SpendingPeriod.Monthly
 
+  /** Only once the ATM controls load: the group drops a row that renders nothing. */
+  const atmWithdrawalsRow = hasAtmControls ? (
+    <SwitchRow
+      title={LL.CardFlow.CardLimits.TransactionTypes.atm()}
+      description={LL.CardFlow.CardLimits.TransactionTypes.atmDescription()}
+      value={isAtmEnabled}
+      onValueChange={handleToggleAtm}
+      disabled={isTogglingAtm}
+    />
+  ) : null
+
   return (
     <Screen preset="scroll">
       <View style={styles.content}>
@@ -183,15 +194,6 @@ export const CardLimitsScreen: React.FC = () => {
           )}
           {hasAtmControls && (
             <>
-              <View style={styles.atmSwitchCard}>
-                <SwitchRow
-                  title={LL.CardFlow.CardLimits.TransactionTypes.atm()}
-                  description={LL.CardFlow.CardLimits.TransactionTypes.atmDescription()}
-                  value={isAtmEnabled}
-                  onValueChange={handleToggleAtm}
-                  disabled={isTogglingAtm}
-                />
-              </View>
               <InputField
                 testID="atm-daily-limit-input"
                 label={LL.CardFlow.CardLimits.dailyAtmLimit()}
@@ -222,33 +224,29 @@ export const CardLimitsScreen: React.FC = () => {
           )}
         </View>
 
-        <View pointerEvents="none" style={styles.disabledSection}>
-          <Text style={styles.comingSoonBadge}>{LL.common.soon()}</Text>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              {LL.CardFlow.CardLimits.transactionTypesTitle()}
-            </Text>
-            <SettingsGroup
-              containerStyle={styles.settingsGroupContainer}
-              dividerStyle={styles.dividerStyle}
-              items={[
-                () => (
-                  <SwitchRow
-                    title={LL.CardFlow.CardLimits.TransactionTypes.ecommerce()}
-                    description={LL.CardFlow.CardLimits.TransactionTypes.ecommerceDescription()}
-                  />
-                ),
-                () => (
-                  <SwitchRow
-                    title={LL.CardFlow.CardLimits.TransactionTypes.contactless()}
-                    description={LL.CardFlow.CardLimits.TransactionTypes.contactlessDescription()}
-                  />
-                ),
-              ]}
-            />
-          </View>
-        </View>
+        {/* Online and contactless wait on the card service, so they stay coming soon. */}
+        <SettingsGroup
+          name={LL.CardFlow.CardLimits.transactionTypesTitle()}
+          items={[
+            () => (
+              <SwitchRow
+                title={LL.CardFlow.CardLimits.TransactionTypes.ecommerce()}
+                description={LL.CardFlow.CardLimits.TransactionTypes.ecommerceDescription()}
+                badge={LL.common.soon()}
+                disabled
+              />
+            ),
+            () => atmWithdrawalsRow,
+            () => (
+              <SwitchRow
+                title={LL.CardFlow.CardLimits.TransactionTypes.contactless()}
+                description={LL.CardFlow.CardLimits.TransactionTypes.contactlessDescription()}
+                badge={LL.common.soon()}
+                disabled
+              />
+            ),
+          ]}
+        />
       </View>
     </Screen>
   )
@@ -302,31 +300,8 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 16,
     marginTop: 5,
   },
-  disabledSection: {
-    gap: 20,
-    opacity: 0.4,
-  },
-  comingSoonBadge: {
-    color: colors.textOnBackground,
-    fontSize: 18,
-    fontFamily: fonts.bold,
-    lineHeight: 24,
-    textAlign: "center",
-  },
-  settingsGroupContainer: {
-    marginTop: 0,
-    borderRadius: radius.default,
-  },
   atmControlsFailure: {
     gap: 10,
-  },
-  atmSwitchCard: {
-    backgroundColor: colors.surfaceInteractive,
-    borderRadius: radius.default,
-    overflow: "hidden",
-  },
-  dividerStyle: {
-    marginHorizontal: 22,
   },
   loader: {
     flex: 1,
