@@ -1,11 +1,12 @@
 import React, { useState } from "react"
-import { Alert, View } from "react-native"
+import { Alert, Pressable, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import InAppBrowser from "react-native-inappbrowser-reborn"
 
 import { radius } from "@app/rne-theme/radius"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "@app/components/screen"
 import { ContactSupportRow, SettingItemRow, SwitchRow } from "@app/components/card-screen"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
@@ -17,8 +18,11 @@ import { isIos } from "@app/utils/helper"
 import { useCardData } from "@app/hooks"
 import { CloseCardModal } from "./close-card-modal"
 import { NotificationCategory, useCloseCardAccount, useNotificationToggle } from "./hooks"
-import { groupTitleGap } from "@app/rne-theme/tokens"
+import { groupTitleGap, spacing } from "@app/rne-theme/tokens"
 import { fonts } from "@app/rne-theme/fonts"
+
+/** Lifts the 18pt Danger zone row to the 44pt minimum touch target without moving it. */
+const DANGER_ZONE_HIT_SLOP = 13
 
 export const CardSettingsScreen: React.FC = () => {
   const styles = useStyles()
@@ -40,6 +44,10 @@ export const CardSettingsScreen: React.FC = () => {
   } = useCloseCardAccount()
 
   const [closeModalVisible, setCloseModalVisible] = useState(false)
+  const [isDangerZoneOpen, setIsDangerZoneOpen] = useState(false)
+  const dangerZoneCaret = isDangerZoneOpen ? "caret-down" : "caret-right"
+
+  const toggleDangerZone = () => setIsDangerZoneOpen((isOpen) => !isOpen)
 
   const handleCloseCardPress = () => {
     if (hasPendingTransactions) {
@@ -226,18 +234,32 @@ export const CardSettingsScreen: React.FC = () => {
           ]}
         />
 
-        <View style={styles.dangerZoneSection}>
-          <Text style={styles.dangerZoneTitle}>{LL.AccountScreen.dangerZone()}</Text>
-          <SettingItemRow
-            title={LL.CardFlow.CardSettings.closeCardAccount()}
-            subtitle={LL.CardFlow.CardSettings.closeCardAccountDescription()}
-            leftIcon="trash"
-            leftIconColor={colors.error}
-            titleStyle={styles.dangerZoneRowTitle}
-            subtitleStyle={styles.dangerZoneRowSubtitle}
-            onPress={handleCloseCardPress}
-          />
-        </View>
+        <Pressable
+          style={styles.dangerZoneToggle}
+          onPress={toggleDangerZone}
+          hitSlop={DANGER_ZONE_HIT_SLOP}
+          accessibilityRole="button"
+          accessibilityLabel={LL.AccountScreen.dangerZone()}
+          accessibilityState={{ expanded: isDangerZoneOpen }}
+        >
+          <GaloyIcon name={dangerZoneCaret} size={16} color={colors.textOnBackground} />
+          <Text style={styles.dangerZoneToggleText}>{LL.AccountScreen.dangerZone()}</Text>
+        </Pressable>
+
+        {isDangerZoneOpen && (
+          <View style={styles.dangerZoneSection}>
+            <Text style={styles.sectionTitle}>{LL.AccountScreen.dangerZone()}</Text>
+            <SettingItemRow
+              title={LL.CardFlow.CardSettings.closeCardAccount()}
+              subtitle={LL.CardFlow.CardSettings.closeCardAccountDescription()}
+              leftIcon="trash"
+              leftIconColor={colors.error}
+              titleStyle={styles.dangerZoneRowTitle}
+              subtitleStyle={styles.dangerZoneRowSubtitle}
+              onPress={handleCloseCardPress}
+            />
+          </View>
+        )}
       </View>
       <CloseCardModal
         isVisible={closeModalVisible}
@@ -274,14 +296,20 @@ const useStyles = makeStyles(({ colors }) => ({
   dividerStyle: {
     marginHorizontal: 22,
   },
-  dangerZoneSection: {
-    gap: 3,
+  dangerZoneToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    gap: spacing.sm,
   },
-  dangerZoneTitle: {
-    color: colors.error,
-    fontSize: 14,
+  dangerZoneToggleText: {
+    color: colors.textOnBackground,
     fontFamily: fonts.regular,
-    lineHeight: 20,
+    fontSize: 14,
+    lineHeight: 18,
+  },
+  dangerZoneSection: {
+    gap: groupTitleGap,
   },
   dangerZoneRowTitle: {
     color: colors.error,

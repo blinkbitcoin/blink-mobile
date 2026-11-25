@@ -90,6 +90,13 @@ jest.mock("@react-navigation/native", () => {
   }
 })
 
+/** The Danger zone starts closed, so its row is reached through the toggle. */
+const pressDangerZone = async (getByRole: ReturnType<typeof render>["getByRole"]) => {
+  await act(async () => {
+    fireEvent.press(getByRole("button", { name: "Danger zone" }))
+  })
+}
+
 describe("CardSettingsScreen", () => {
   beforeEach(() => {
     loadLocale("en")
@@ -324,8 +331,8 @@ describe("CardSettingsScreen", () => {
   })
 
   describe("danger zone section", () => {
-    it("displays danger zone section title", async () => {
-      const { getByText } = render(
+    it("starts closed, with only its toggle shown", async () => {
+      const { getByRole, queryByText } = render(
         <ContextForScreen>
           <CardSettingsScreen />
         </ContextForScreen>,
@@ -333,20 +340,51 @@ describe("CardSettingsScreen", () => {
 
       await flushEffects()
 
-      expect(getByText("Danger zone")).toBeTruthy()
+      expect(
+        getByRole("button", { name: "Danger zone" }).props.accessibilityState,
+      ).toEqual({
+        expanded: false,
+      })
+      expect(queryByText("Close card account")).toBeNull()
     })
 
-    it("displays close card account row", async () => {
-      const { getByText } = render(
+    it("opens on a tap, showing Close card account under its title", async () => {
+      const { getByRole, getAllByText, getByText } = render(
         <ContextForScreen>
           <CardSettingsScreen />
         </ContextForScreen>,
       )
 
       await flushEffects()
+      await pressDangerZone(getByRole)
 
+      expect(
+        getByRole("button", { name: "Danger zone" }).props.accessibilityState,
+      ).toEqual({
+        expanded: true,
+      })
+      expect(getAllByText("Danger zone")).toHaveLength(2)
       expect(getByText("Close card account")).toBeTruthy()
       expect(getByText("Permanently close your Blink Card")).toBeTruthy()
+    })
+
+    it("closes again on a second tap", async () => {
+      const { getByRole, queryByText } = render(
+        <ContextForScreen>
+          <CardSettingsScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+      await pressDangerZone(getByRole)
+      await pressDangerZone(getByRole)
+
+      expect(
+        getByRole("button", { name: "Danger zone" }).props.accessibilityState,
+      ).toEqual({
+        expanded: false,
+      })
+      expect(queryByText("Close card account")).toBeNull()
     })
   })
 
@@ -499,13 +537,14 @@ describe("CardSettingsScreen", () => {
     it("opens close modal directly when no blockers", async () => {
       const alertSpy = jest.spyOn(Alert, "alert")
 
-      const { getByText } = render(
+      const { getByRole, getByText } = render(
         <ContextForScreen>
           <CardSettingsScreen />
         </ContextForScreen>,
       )
 
       await flushEffects()
+      await pressDangerZone(getByRole)
 
       await act(async () => {
         fireEvent.press(getByText("Close card account"))
@@ -528,13 +567,14 @@ describe("CardSettingsScreen", () => {
       }
       const alertSpy = jest.spyOn(Alert, "alert")
 
-      const { getByText } = render(
+      const { getByRole, getByText } = render(
         <ContextForScreen>
           <CardSettingsScreen />
         </ContextForScreen>,
       )
 
       await flushEffects()
+      await pressDangerZone(getByRole)
 
       await act(async () => {
         fireEvent.press(getByText("Close card account"))
@@ -556,13 +596,14 @@ describe("CardSettingsScreen", () => {
       }
       const alertSpy = jest.spyOn(Alert, "alert")
 
-      const { getByText } = render(
+      const { getByRole, getByText } = render(
         <ContextForScreen>
           <CardSettingsScreen />
         </ContextForScreen>,
       )
 
       await flushEffects()
+      await pressDangerZone(getByRole)
 
       await act(async () => {
         fireEvent.press(getByText("Close card account"))
