@@ -12220,7 +12220,7 @@ type RootTranslation = {
 				 */
 				subtitle: string
 				/**
-				 * D​a​s​h​b​o​a​r​d
+				 * B​a​c​k​ ​t​o​ ​d​a​s​h​b​o​a​r​d
 				 */
 				buttonLabel: string
 			}
@@ -26784,7 +26784,7 @@ export type TranslationFunctions = {
 				 */
 				subtitle: () => LocalizedString
 				/**
-				 * Dashboard
+				 * Back to dashboard
 				 */
 				buttonLabel: () => LocalizedString
 			}

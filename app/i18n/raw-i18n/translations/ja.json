@@ -3637,7 +3637,7 @@
             "Status": {
                 "title": "新しいカードが届きます！",
                 "subtitle": "Blinkカードの配送注文が送信されました。",
-                "buttonLabel": "ダッシュボード"
+                "buttonLabel": "ダッシュボードに戻る"
             },
             "errors": {
                 "lockFailed": "カードのロックに失敗しました。もう一度お試しください。",

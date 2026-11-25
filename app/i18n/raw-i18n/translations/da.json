@@ -3636,7 +3636,7 @@
       "Status": {
         "title": "Dit nye kort er på vej!",
         "subtitle": "Ordre til levering af dit Blink-kort er blevet indsendt.",
-        "buttonLabel": "Oversigt"
+        "buttonLabel": "Tilbage til oversigten"
       },
       "title": "Erstat kort",
       "errors": {

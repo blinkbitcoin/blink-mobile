@@ -3637,7 +3637,7 @@
             "Status": {
                 "title": "Votre nouvelle carte est en route !",
                 "subtitle": "La commande de livraison de votre carte Blink a été soumise.",
-                "buttonLabel": "Tableau de bord"
+                "buttonLabel": "Retour au tableau de bord"
             },
             "errors": {
                 "lockFailed": "Échec du verrouillage de votre carte. Veuillez réessayer.",

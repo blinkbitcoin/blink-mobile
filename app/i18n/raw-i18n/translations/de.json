@@ -3637,7 +3637,7 @@
             "Status": {
                 "title": "Ihre neue Karte ist unterwegs!",
                 "subtitle": "Bestellung zur Lieferung Ihrer Blink-Karte wurde eingereicht.",
-                "buttonLabel": "Dashboard"
+                "buttonLabel": "Zurück zum Dashboard"
             },
             "errors": {
                 "lockFailed": "Karte konnte nicht gesperrt werden. Bitte versuche es erneut.",

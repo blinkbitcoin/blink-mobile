@@ -3636,7 +3636,7 @@
       "Status": {
         "title": "Az új kártyád úton van!",
         "subtitle": "A Blink kártyád kézbesítési rendelése elküldve.",
-        "buttonLabel": "Irányítópult"
+        "buttonLabel": "Vissza az irányítópultra"
       },
       "title": "Kártya cseréje",
       "errors": {

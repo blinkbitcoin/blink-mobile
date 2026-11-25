@@ -111,6 +111,7 @@ export const ReplaceCardScreen: React.FC = () => {
       navigateTo: "cardDashboardScreen",
       iconName: "delivery",
       iconColor: colors.success,
+      isWalletPrimary: true,
       lastFour: result.lastFour,
       cardId: result.id,
     })

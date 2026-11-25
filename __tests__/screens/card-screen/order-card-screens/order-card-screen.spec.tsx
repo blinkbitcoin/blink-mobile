@@ -295,6 +295,7 @@ describe("OrderCardScreen", () => {
         navigateTo: "cardCreatePinScreen",
         iconName: "delivery",
         iconColor: expect.any(String),
+        isWalletPrimary: true,
         lastFour: "1234",
         cardId: "new-card",
       })

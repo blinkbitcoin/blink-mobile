@@ -377,10 +377,11 @@ describe("ReplaceCardScreen", () => {
       expect(mockReplace).toHaveBeenCalledWith("cardStatusScreen", {
         title: "Your new card is on the way!",
         subtitle: "Order for delivery of your Blink Card has been submitted.",
-        buttonLabel: "Dashboard",
+        buttonLabel: "Back to dashboard",
         navigateTo: "cardDashboardScreen",
         iconName: "delivery",
         iconColor: expect.any(String),
+        isWalletPrimary: true,
         lastFour: "4321",
         cardId: "replacement-card",
       })

@@ -111,6 +111,7 @@ export const OrderCardScreen: React.FC = () => {
       navigateTo: "cardCreatePinScreen",
       iconName: "delivery",
       iconColor: colors.success,
+      isWalletPrimary: true,
       lastFour: result.lastFour,
       cardId: result.id,
     })

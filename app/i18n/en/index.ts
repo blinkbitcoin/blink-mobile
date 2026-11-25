@@ -3821,7 +3821,7 @@ const en: BaseTranslation = {
       Status: {
         title: "Your new card is on the way!",
         subtitle: "Order for delivery of your Blink Card has been submitted.",
-        buttonLabel: "Dashboard",
+        buttonLabel: "Back to dashboard",
       },
       errors: {
         lockFailed: "Failed to lock your card. Please try again.",

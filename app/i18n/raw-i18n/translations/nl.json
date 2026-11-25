@@ -3636,7 +3636,7 @@
       "Status": {
         "title": "Je nieuwe kaart is onderweg!",
         "subtitle": "Bestelling voor levering van je Blink-kaart is ingediend.",
-        "buttonLabel": "Dashboard"
+        "buttonLabel": "Terug naar dashboard"
       },
       "title": "Kaart vervangen",
       "errors": {

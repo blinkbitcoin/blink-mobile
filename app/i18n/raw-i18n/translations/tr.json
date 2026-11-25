@@ -3636,7 +3636,7 @@
       "Status": {
         "title": "Yeni kartınız yolda!",
         "subtitle": "Blink kartınızın teslimat siparişi gönderildi.",
-        "buttonLabel": "Gösterge Paneli"
+        "buttonLabel": "Gösterge Paneline dön"
       },
       "title": "Kartı değiştir",
       "errors": {

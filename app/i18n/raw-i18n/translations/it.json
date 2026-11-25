@@ -3637,7 +3637,7 @@
             "Status": {
                 "title": "La tua nuova carta è in arrivo!",
                 "subtitle": "L'ordine per la consegna della tua carta Blink è stato inviato.",
-                "buttonLabel": "Dashboard"
+                "buttonLabel": "Torna alla dashboard"
             },
             "errors": {
                 "lockFailed": "Impossibile bloccare la tua carta. Per favore riprova.",

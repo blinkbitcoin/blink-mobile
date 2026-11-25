@@ -3637,7 +3637,7 @@
             "Status": {
                 "title": "O seu novo cartão está a caminho!",
                 "subtitle": "O pedido de entrega do seu cartão Blink foi enviado.",
-                "buttonLabel": "Painel"
+                "buttonLabel": "Voltar ao painel"
             },
             "errors": {
                 "lockFailed": "Falha ao bloquear seu cartão. Por favor, tente novamente.",

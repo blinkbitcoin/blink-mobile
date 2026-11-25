@@ -3636,7 +3636,7 @@
       "Status": {
         "title": "Vaša nova kartica je na putu!",
         "subtitle": "Narudžba za dostavu vaše Blink kartice je poslana.",
-        "buttonLabel": "Nadzorna ploča"
+        "buttonLabel": "Natrag na nadzornu ploču"
       },
       "title": "Zamijeni karticu",
       "errors": {

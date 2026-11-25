@@ -3636,7 +3636,7 @@
       "Status": {
         "title": "La teva nova targeta està en camí!",
         "subtitle": "S'ha enviat la comanda de lliurament de la teva targeta Blink.",
-        "buttonLabel": "Tauler"
+        "buttonLabel": "Torna al tauler"
       },
       "title": "Substituir targeta",
       "errors": {

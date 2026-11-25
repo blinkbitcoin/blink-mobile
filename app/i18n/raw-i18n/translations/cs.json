@@ -3636,7 +3636,7 @@
       "Status": {
         "title": "Vaše nová karta je na cestě!",
         "subtitle": "Objednávka doručení vaší karty Blink byla odeslána.",
-        "buttonLabel": "Přehled"
+        "buttonLabel": "Zpět na přehled"
       },
       "title": "Vyměnit kartu",
       "errors": {
