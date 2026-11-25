@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useState } from "react"
-import { ActivityIndicator, View } from "react-native"
+import { ActivityIndicator, Platform, View } from "react-native"
 
 import { radius } from "@app/rne-theme/radius"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
@@ -45,6 +45,7 @@ const useStyles = makeStyles(({ colors }) => ({
   inputStyle: {
     fontSize: 24,
     textAlign: "center",
+    textAlignVertical: "center",
   },
   errorContainer: {
     marginBottom: 20,
@@ -72,6 +73,10 @@ export const CodeInput: React.FC<Props> = ({
   const { colors } = useTheme()
 
   const [code, _setCode] = useState("")
+  /** Once typed digits are deleted, Android draws the cursor of a centered single-line
+   *  field at its right end, beside the placeholder. Multiline keeps it centered; blur on
+   *  submit keeps the return key from adding a line. */
+  const centeredCursor = Platform.OS === "android"
   // The field autofocuses on mount, so start focused: no resting fill flashes first.
   const [isFieldFocused, setIsFieldFocused] = useState(true)
 
@@ -121,6 +126,8 @@ export const CodeInput: React.FC<Props> = ({
           autoFocus={true}
           textContentType={"oneTimeCode"}
           keyboardType="numeric"
+          multiline={centeredCursor}
+          submitBehavior={centeredCursor ? "blurAndSubmit" : undefined}
         />
         {errorMessage && (
           <View style={styles.errorContainer}>
