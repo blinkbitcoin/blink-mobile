@@ -9,7 +9,12 @@ jest.mock("@app/utils/address-metadata", () => ({
   ],
 }))
 
-const mockDeviceLocation = jest.fn(() => ({ countryCode: "US", loading: false }))
+type DeviceLocation = { countryCode: string | undefined; loading: boolean }
+
+const mockDeviceLocation = jest.fn<DeviceLocation, []>(() => ({
+  countryCode: "US",
+  loading: false,
+}))
 
 jest.mock("@app/hooks/use-device-location", () => ({
   __esModule: true,
@@ -68,6 +73,21 @@ describe("useShippingAddressDraft", () => {
     expect(result.current[0].line1).toBe("")
   })
 
+  it("fills only the name fields still empty when the cardholder arrives", () => {
+    const { result, rerender } = renderHook(
+      ({ cardholder }) => useShippingAddressDraft(cardholder),
+      { initialProps: { cardholder: null as ShippingAddress | null } },
+    )
+
+    act(() => {
+      result.current[1]({ ...result.current[0], firstName: "Hal" })
+    })
+    rerender({ cardholder: cardholderAddress })
+
+    expect(result.current[0].firstName).toBe("Hal")
+    expect(result.current[0].lastName).toBe("Nakamoto")
+  })
+
   it("keeps the name the member typed when the cardholder changes later", () => {
     const { result, rerender } = renderHook(
       ({ cardholder }) => useShippingAddressDraft(cardholder),
@@ -105,5 +125,41 @@ describe("useShippingAddressDraft", () => {
     rerender()
 
     expect(result.current[0].countryCode).toBe("SV")
+  })
+
+  it("keeps the country and region the member chose when the device location arrives late", () => {
+    mockDeviceLocation.mockReturnValue({ countryCode: undefined, loading: true })
+    const { result, rerender } = renderHook(() =>
+      useShippingAddressDraft(cardholderAddress),
+    )
+
+    act(() => {
+      result.current[1]({ ...result.current[0], countryCode: "SV", region: "SS" })
+    })
+    mockDeviceLocation.mockReturnValue({ countryCode: "AR", loading: false })
+    rerender()
+
+    expect(result.current[0].countryCode).toBe("SV")
+    expect(result.current[0].region).toBe("SS")
+  })
+
+  it("keeps the country of an address the member started when the device location arrives late", () => {
+    mockDeviceLocation.mockReturnValue({ countryCode: undefined, loading: true })
+    const { result, rerender } = renderHook(() =>
+      useShippingAddressDraft(cardholderAddress),
+    )
+
+    act(() => {
+      result.current[1]({ ...result.current[0], city: "New York", postalCode: "10001" })
+    })
+    mockDeviceLocation.mockReturnValue({ countryCode: "AR", loading: false })
+    rerender()
+
+    expect(result.current[0]).toMatchObject({
+      city: "New York",
+      postalCode: "10001",
+      countryCode: "US",
+      region: "US-FIRST",
+    })
   })
 })

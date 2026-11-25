@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
+import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from "react"
 
 import useDeviceLocation from "@app/hooks/use-device-location"
 import { ShippingAddress } from "@app/screens/card-screen/types"
@@ -22,7 +22,8 @@ const emptyAddressIn = (countryCode: string, cardholder: ShippingAddress | null)
 
 /** A new shipping address. The member is invited to send the card somewhere other than
  *  home (D42), so it never starts as the address on file: it takes the cardholder's name,
- *  empty lines and the country the device is in. */
+ *  empty lines and the country the device is in. What the member types wins over what
+ *  arrives later. */
 export const useShippingAddressDraft = (
   cardholder: ShippingAddress | null,
 ): [ShippingAddress, Dispatch<SetStateAction<ShippingAddress>>] => {
@@ -31,25 +32,29 @@ export const useShippingAddressDraft = (
     emptyAddressIn(FALLBACK_COUNTRY, cardholder),
   )
   const hasNameRef = useRef(cardholder !== null)
-  const hasDeviceCountryRef = useRef(false)
+  const isCountrySettledRef = useRef(false)
 
-  /** The cardholder can arrive after the first render, with the card data. */
+  /** The cardholder can arrive after the first render, with the card data. It fills only
+   *  the name fields the member left empty. */
   useEffect(() => {
     if (hasNameRef.current || !cardholder) return
 
     hasNameRef.current = true
     setDraft((prev) => ({
       ...prev,
-      firstName: cardholder.firstName,
-      lastName: cardholder.lastName,
+      firstName: prev.firstName || cardholder.firstName,
+      lastName: prev.lastName || cardholder.lastName,
     }))
   }, [cardholder])
 
+  /** The device location can resolve after the member starts the address. Once they edit
+   *  it, the country stays theirs: a late result would pair the city or postal code they
+   *  typed with another country's region. */
   useEffect(() => {
-    if (hasDeviceCountryRef.current) return
+    if (isCountrySettledRef.current) return
     if (!detectedCountry || detectedCountry === FALLBACK_COUNTRY) return
 
-    hasDeviceCountryRef.current = true
+    isCountrySettledRef.current = true
     setDraft((prev) => ({
       ...prev,
       countryCode: detectedCountry,
@@ -57,5 +62,10 @@ export const useShippingAddressDraft = (
     }))
   }, [detectedCountry])
 
-  return [draft, setDraft]
+  const editDraft = useCallback<Dispatch<SetStateAction<ShippingAddress>>>((value) => {
+    isCountrySettledRef.current = true
+    setDraft(value)
+  }, [])
+
+  return [draft, editDraft]
 }
