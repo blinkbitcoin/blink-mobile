@@ -1,17 +1,19 @@
 import { recordAppError, toError } from "@app/utils/error-reporting"
 
-import { WalletAddResult, type WalletCard } from "../types"
-import { fetchCardProvisioningData } from "./card-provisioning-data"
+import {
+  WalletAddResult,
+  type FetchCardProvisioningData,
+  type WalletCard,
+} from "../types"
 import { deviceWalletFor } from "./device-wallets"
 import { getMeaWalletSdk } from "./meawallet-sdk"
 
 /**
  * Boundary with the device wallet (Apple Pay on iOS, Google Pay on Android), backed by
- * the MeaWallet SDK. The card is offered only when the build carries the SDK, the backend
- * can hand over what the wallet needs, and the wallet on this device can take this card.
+ * the MeaWallet SDK. The card is offered only when the build carries the SDK and the
+ * wallet on this device can take this card.
  */
 export const canAddCardToWallet = async (card: WalletCard): Promise<boolean> => {
-  if (!fetchCardProvisioningData) return false
   const sdk = await getMeaWalletSdk()
   if (!sdk) return false
   return deviceWalletFor(sdk).canAdd(card)
@@ -27,24 +29,26 @@ type PendingAdd = {
  *  away as busy. */
 let pendingAdd: PendingAdd | undefined
 
-const provisionCard = async (card: WalletCard): Promise<WalletAddResult> => {
-  const fetchData = fetchCardProvisioningData
-  if (!fetchData) {
-    throw new Error("The backend does not provide card provisioning data yet")
-  }
+const provisionCard = async (
+  card: WalletCard,
+  fetchData: FetchCardProvisioningData,
+): Promise<WalletAddResult> => {
   const sdk = await getMeaWalletSdk()
   if (!sdk) throw new Error("This build carries no device wallet SDK")
   const data = await fetchData(card.cardId)
   return deviceWalletFor(sdk).add(card, data)
 }
 
-export const addCardToWallet = (card: WalletCard): Promise<WalletAddResult> => {
+export const addCardToWallet = (
+  card: WalletCard,
+  fetchData: FetchCardProvisioningData,
+): Promise<WalletAddResult> => {
   if (pendingAdd?.cardId === card.cardId) return pendingAdd.result
   if (pendingAdd) return Promise.resolve(WalletAddResult.Busy)
 
   /** Reported here, once per add, since every screen that joined it gets the same
    *  failure. */
-  const result = provisionCard(card)
+  const result = provisionCard(card, fetchData)
     .catch((err) => {
       recordAppError(toError(err))
       throw err

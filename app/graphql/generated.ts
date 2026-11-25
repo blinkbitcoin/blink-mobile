@@ -683,6 +683,14 @@ export type CardPinUpdateInput = {
   readonly sessionId: Scalars['String']['input'];
 };
 
+export type CardProvisioningData = {
+  readonly __typename: 'CardProvisioningData';
+  readonly cardSecret: Scalars['String']['output'];
+  readonly cardholderAddress?: Maybe<CardholderAddress>;
+  readonly displayName: Scalars['String']['output'];
+  readonly processorCardId: Scalars['String']['output'];
+};
+
 export type CardReplaceInput = {
   readonly cardId: Scalars['ID']['input'];
 };
@@ -797,6 +805,18 @@ export type CardUpdateInput = {
 
 export type CardWalletAddConfirmInput = {
   readonly cardId: Scalars['ID']['input'];
+};
+
+export type CardholderAddress = {
+  readonly __typename: 'CardholderAddress';
+  readonly city: Scalars['String']['output'];
+  readonly countryCode: Scalars['String']['output'];
+  readonly line1: Scalars['String']['output'];
+  readonly line2?: Maybe<Scalars['String']['output']>;
+  readonly name: Scalars['String']['output'];
+  readonly phoneNumber?: Maybe<Scalars['String']['output']>;
+  readonly postalCode: Scalars['String']['output'];
+  readonly region: Scalars['String']['output'];
 };
 
 export type CentAmountPayload = {
@@ -2400,6 +2420,7 @@ export type Query = {
   readonly cardCollateralBalance: CardCollateralBalance;
   readonly cardEncryptionPublicKey: Scalars['String']['output'];
   readonly cardHolder: CardHolder;
+  readonly cardProvisioningData: CardProvisioningData;
   readonly cardSecretsEncrypted: CardSecretsEncrypted;
   readonly cardTransactionsPaginated: CardTransactionConnection;
   readonly countryCode: Scalars['String']['output'];
@@ -2457,6 +2478,11 @@ export type QueryCardBalanceArgs = {
 
 
 export type QueryCardHolderArgs = {
+  cardId: Scalars['ID']['input'];
+};
+
+
+export type QueryCardProvisioningDataArgs = {
   cardId: Scalars['ID']['input'];
 };
 
@@ -3721,6 +3747,13 @@ export type PersonalDetailsQuery = { readonly __typename: 'Query', readonly me?:
 
 export type CardTransactionDetailsFragment = { readonly __typename: 'CardTransaction', readonly id: string, readonly amount: number, readonly currency: string, readonly merchantName: string, readonly status: TransactionStatus, readonly createdAt: string };
 
+export type CardWalletAddConfirmMutationVariables = Exact<{
+  input: CardWalletAddConfirmInput;
+}>;
+
+
+export type CardWalletAddConfirmMutation = { readonly __typename: 'Mutation', readonly cardWalletAddConfirm: { readonly __typename: 'Card', readonly id: string, readonly walletAddedAt?: string | null } };
+
 export type CardEncryptionPublicKeyQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3778,6 +3811,13 @@ export type CardReplaceMutationVariables = Exact<{
 
 
 export type CardReplaceMutation = { readonly __typename: 'Mutation', readonly cardReplace: { readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus } };
+
+export type CardProvisioningDataQueryVariables = Exact<{
+  cardId: Scalars['ID']['input'];
+}>;
+
+
+export type CardProvisioningDataQuery = { readonly __typename: 'Query', readonly cardProvisioningData: { readonly __typename: 'CardProvisioningData', readonly processorCardId: string, readonly cardSecret: string, readonly displayName: string, readonly cardholderAddress?: { readonly __typename: 'CardholderAddress', readonly name: string, readonly line1: string, readonly line2?: string | null, readonly city: string, readonly region: string, readonly postalCode: string, readonly countryCode: string, readonly phoneNumber?: string | null } | null } };
 
 export type ConversionScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -7095,6 +7135,40 @@ export type PersonalDetailsQueryHookResult = ReturnType<typeof usePersonalDetail
 export type PersonalDetailsLazyQueryHookResult = ReturnType<typeof usePersonalDetailsLazyQuery>;
 export type PersonalDetailsSuspenseQueryHookResult = ReturnType<typeof usePersonalDetailsSuspenseQuery>;
 export type PersonalDetailsQueryResult = Apollo.QueryResult<PersonalDetailsQuery, PersonalDetailsQueryVariables>;
+export const CardWalletAddConfirmDocument = gql`
+    mutation cardWalletAddConfirm($input: CardWalletAddConfirmInput!) {
+  cardWalletAddConfirm(input: $input) {
+    id
+    walletAddedAt
+  }
+}
+    `;
+export type CardWalletAddConfirmMutationFn = Apollo.MutationFunction<CardWalletAddConfirmMutation, CardWalletAddConfirmMutationVariables>;
+
+/**
+ * __useCardWalletAddConfirmMutation__
+ *
+ * To run a mutation, you first call `useCardWalletAddConfirmMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardWalletAddConfirmMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardWalletAddConfirmMutation, { data, loading, error }] = useCardWalletAddConfirmMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardWalletAddConfirmMutation(baseOptions?: Apollo.MutationHookOptions<CardWalletAddConfirmMutation, CardWalletAddConfirmMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardWalletAddConfirmMutation, CardWalletAddConfirmMutationVariables>(CardWalletAddConfirmDocument, options);
+      }
+export type CardWalletAddConfirmMutationHookResult = ReturnType<typeof useCardWalletAddConfirmMutation>;
+export type CardWalletAddConfirmMutationResult = Apollo.MutationResult<CardWalletAddConfirmMutation>;
+export type CardWalletAddConfirmMutationOptions = Apollo.BaseMutationOptions<CardWalletAddConfirmMutation, CardWalletAddConfirmMutationVariables>;
 export const CardEncryptionPublicKeyDocument = gql`
     query cardEncryptionPublicKey {
   cardEncryptionPublicKey
@@ -7449,6 +7523,58 @@ export function useCardReplaceMutation(baseOptions?: Apollo.MutationHookOptions<
 export type CardReplaceMutationHookResult = ReturnType<typeof useCardReplaceMutation>;
 export type CardReplaceMutationResult = Apollo.MutationResult<CardReplaceMutation>;
 export type CardReplaceMutationOptions = Apollo.BaseMutationOptions<CardReplaceMutation, CardReplaceMutationVariables>;
+export const CardProvisioningDataDocument = gql`
+    query cardProvisioningData($cardId: ID!) {
+  cardProvisioningData(cardId: $cardId) {
+    processorCardId
+    cardSecret
+    displayName
+    cardholderAddress {
+      name
+      line1
+      line2
+      city
+      region
+      postalCode
+      countryCode
+      phoneNumber
+    }
+  }
+}
+    `;
+
+/**
+ * __useCardProvisioningDataQuery__
+ *
+ * To run a query within a React component, call `useCardProvisioningDataQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCardProvisioningDataQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCardProvisioningDataQuery({
+ *   variables: {
+ *      cardId: // value for 'cardId'
+ *   },
+ * });
+ */
+export function useCardProvisioningDataQuery(baseOptions: Apollo.QueryHookOptions<CardProvisioningDataQuery, CardProvisioningDataQueryVariables> & ({ variables: CardProvisioningDataQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CardProvisioningDataQuery, CardProvisioningDataQueryVariables>(CardProvisioningDataDocument, options);
+      }
+export function useCardProvisioningDataLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CardProvisioningDataQuery, CardProvisioningDataQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CardProvisioningDataQuery, CardProvisioningDataQueryVariables>(CardProvisioningDataDocument, options);
+        }
+export function useCardProvisioningDataSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CardProvisioningDataQuery, CardProvisioningDataQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CardProvisioningDataQuery, CardProvisioningDataQueryVariables>(CardProvisioningDataDocument, options);
+        }
+export type CardProvisioningDataQueryHookResult = ReturnType<typeof useCardProvisioningDataQuery>;
+export type CardProvisioningDataLazyQueryHookResult = ReturnType<typeof useCardProvisioningDataLazyQuery>;
+export type CardProvisioningDataSuspenseQueryHookResult = ReturnType<typeof useCardProvisioningDataSuspenseQuery>;
+export type CardProvisioningDataQueryResult = Apollo.QueryResult<CardProvisioningDataQuery, CardProvisioningDataQueryVariables>;
 export const ConversionScreenDocument = gql`
     query conversionScreen {
   me {
@@ -11519,6 +11645,7 @@ export type ResolversTypes = {
   CardHolder: ResolverTypeWrapper<CardHolder>;
   CardMerchant: ResolverTypeWrapper<CardMerchant>;
   CardPinUpdateInput: CardPinUpdateInput;
+  CardProvisioningData: ResolverTypeWrapper<CardProvisioningData>;
   CardReplaceInput: CardReplaceInput;
   CardSecretsEncrypted: ResolverTypeWrapper<CardSecretsEncrypted>;
   CardSpendingLimitRemoveInput: CardSpendingLimitRemoveInput;
@@ -11535,6 +11662,7 @@ export type ResolversTypes = {
   CardType: CardType;
   CardUpdateInput: CardUpdateInput;
   CardWalletAddConfirmInput: CardWalletAddConfirmInput;
+  CardholderAddress: ResolverTypeWrapper<CardholderAddress>;
   CentAmount: ResolverTypeWrapper<Scalars['CentAmount']['output']>;
   CentAmountPayload: ResolverTypeWrapper<CentAmountPayload>;
   ConsumerAccount: ResolverTypeWrapper<ConsumerAccount>;
@@ -11838,6 +11966,7 @@ export type ResolversParentTypes = {
   CardHolder: CardHolder;
   CardMerchant: CardMerchant;
   CardPinUpdateInput: CardPinUpdateInput;
+  CardProvisioningData: CardProvisioningData;
   CardReplaceInput: CardReplaceInput;
   CardSecretsEncrypted: CardSecretsEncrypted;
   CardSpendingLimitRemoveInput: CardSpendingLimitRemoveInput;
@@ -11852,6 +11981,7 @@ export type ResolversParentTypes = {
   CardTransactionPageInfo: CardTransactionPageInfo;
   CardUpdateInput: CardUpdateInput;
   CardWalletAddConfirmInput: CardWalletAddConfirmInput;
+  CardholderAddress: CardholderAddress;
   CentAmount: Scalars['CentAmount']['output'];
   CentAmountPayload: CentAmountPayload;
   ConsumerAccount: ConsumerAccount;
@@ -12359,6 +12489,14 @@ export type CardMerchantResolvers<ContextType = any, ParentType extends Resolver
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type CardProvisioningDataResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardProvisioningData'] = ResolversParentTypes['CardProvisioningData']> = {
+  cardSecret?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  cardholderAddress?: Resolver<Maybe<ResolversTypes['CardholderAddress']>, ParentType, ContextType>;
+  displayName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  processorCardId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type CardSecretsEncryptedResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardSecretsEncrypted'] = ResolversParentTypes['CardSecretsEncrypted']> = {
   encryptedCvc?: Resolver<ResolversTypes['EncryptedData'], ParentType, ContextType>;
   encryptedPan?: Resolver<ResolversTypes['EncryptedData'], ParentType, ContextType>;
@@ -12420,6 +12558,18 @@ export type CardTransactionPageInfoResolvers<ContextType = any, ParentType exten
   hasNextPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   hasPreviousPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   startCursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardholderAddressResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardholderAddress'] = ResolversParentTypes['CardholderAddress']> = {
+  city?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  countryCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  line1?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  line2?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  phoneNumber?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  postalCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  region?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -13124,6 +13274,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   cardCollateralBalance?: Resolver<ResolversTypes['CardCollateralBalance'], ParentType, ContextType>;
   cardEncryptionPublicKey?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   cardHolder?: Resolver<ResolversTypes['CardHolder'], ParentType, ContextType, RequireFields<QueryCardHolderArgs, 'cardId'>>;
+  cardProvisioningData?: Resolver<ResolversTypes['CardProvisioningData'], ParentType, ContextType, RequireFields<QueryCardProvisioningDataArgs, 'cardId'>>;
   cardSecretsEncrypted?: Resolver<ResolversTypes['CardSecretsEncrypted'], ParentType, ContextType, RequireFields<QueryCardSecretsEncryptedArgs, 'cardId' | 'sessionId'>>;
   cardTransactionsPaginated?: Resolver<ResolversTypes['CardTransactionConnection'], ParentType, ContextType, RequireFields<QueryCardTransactionsPaginatedArgs, 'cardId' | 'first'>>;
   countryCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -13615,6 +13766,7 @@ export type Resolvers<ContextType = any> = {
   CardCollateralDeposit?: CardCollateralDepositResolvers<ContextType>;
   CardHolder?: CardHolderResolvers<ContextType>;
   CardMerchant?: CardMerchantResolvers<ContextType>;
+  CardProvisioningData?: CardProvisioningDataResolvers<ContextType>;
   CardSecretsEncrypted?: CardSecretsEncryptedResolvers<ContextType>;
   CardSpendingLimitRemovePayload?: CardSpendingLimitRemovePayloadResolvers<ContextType>;
   CardSpendingLimitSetPayload?: CardSpendingLimitSetPayloadResolvers<ContextType>;
@@ -13623,6 +13775,7 @@ export type Resolvers<ContextType = any> = {
   CardTransactionConnection?: CardTransactionConnectionResolvers<ContextType>;
   CardTransactionEdge?: CardTransactionEdgeResolvers<ContextType>;
   CardTransactionPageInfo?: CardTransactionPageInfoResolvers<ContextType>;
+  CardholderAddress?: CardholderAddressResolvers<ContextType>;
   CentAmount?: GraphQLScalarType;
   CentAmountPayload?: CentAmountPayloadResolvers<ContextType>;
   ConsumerAccount?: ConsumerAccountResolvers<ContextType>;

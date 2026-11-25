@@ -3,6 +3,30 @@ import { renderHook, act } from "@testing-library/react-native"
 import { useAddToWallet } from "@app/screens/card-screen/hooks/use-add-to-wallet"
 import { WalletAddResult } from "@app/screens/card-screen/types"
 
+const mockClient = { name: "apollo-client" }
+jest.mock("@apollo/client", () => ({
+  ...jest.requireActual("@apollo/client"),
+  useApolloClient: () => mockClient,
+}))
+
+const mockConfirmWalletAdd = jest.fn()
+jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
+  useCardWalletAddConfirmMutation: () => [mockConfirmWalletAdd],
+}))
+
+const mockFetchCardProvisioningData = jest.fn()
+jest.mock("@app/screens/card-screen/utils/card-provisioning-data", () => ({
+  fetchCardProvisioningData: (...args: readonly unknown[]) =>
+    mockFetchCardProvisioningData(...args),
+}))
+
+const mockRecordAppError = jest.fn()
+jest.mock("@app/utils/error-reporting", () => ({
+  ...jest.requireActual("@app/utils/error-reporting"),
+  recordAppError: (error: Error) => mockRecordAppError(error),
+}))
+
 const mockCanAddCardToWallet = jest.fn()
 const mockAddCardToWallet = jest.fn()
 jest.mock("@app/screens/card-screen/utils/wallet-provisioning", () => ({
@@ -49,6 +73,7 @@ describe("useAddToWallet", () => {
     jest.clearAllMocks()
     mockIsFocused = true
     mockCanAddCardToWallet.mockResolvedValue(true)
+    mockConfirmWalletAdd.mockResolvedValue({})
   })
 
   describe("eligibility", () => {
@@ -140,10 +165,10 @@ describe("useAddToWallet", () => {
         await result.current.addToWallet()
       })
 
-      expect(mockAddCardToWallet).toHaveBeenCalledWith({
-        cardId: "card-1",
-        lastFour: "4242",
-      })
+      expect(mockAddCardToWallet).toHaveBeenCalledWith(
+        { cardId: "card-1", lastFour: "4242" },
+        expect.any(Function),
+      )
       expect(result.current.canAddToWallet).toBe(false)
     })
 
@@ -307,6 +332,104 @@ describe("useAddToWallet", () => {
 
       expect(mockAddCardToWallet).not.toHaveBeenCalled()
       expect(result.current.isAdding).toBe(false)
+    })
+
+    it("answers what the wallet did with the card", async () => {
+      mockAddCardToWallet.mockResolvedValue(WalletAddResult.Cancelled)
+      const { result } = await renderWithCard()
+
+      let answer: WalletAddResult | undefined
+      await act(async () => {
+        answer = await result.current.addToWallet()
+      })
+
+      expect(answer).toBe(WalletAddResult.Cancelled)
+    })
+
+    it("asks blink-card for the wallet's data through the app's client", async () => {
+      mockAddCardToWallet.mockResolvedValue(WalletAddResult.Added)
+      const { result } = await renderWithCard()
+
+      await act(async () => {
+        await result.current.addToWallet()
+      })
+      const [, fetchData] = mockAddCardToWallet.mock.calls[0]
+      fetchData("card-1")
+
+      expect(mockFetchCardProvisioningData).toHaveBeenCalledWith(mockClient, "card-1")
+    })
+  })
+
+  describe("telling blink-card", () => {
+    it("reports the card once the wallet holds it", async () => {
+      mockAddCardToWallet.mockResolvedValue(WalletAddResult.Added)
+      const { result } = await renderWithCard()
+
+      await act(async () => {
+        await result.current.addToWallet()
+      })
+
+      expect(mockConfirmWalletAdd).toHaveBeenCalledWith({
+        variables: { input: { cardId: "card-1" } },
+      })
+    })
+
+    it("reports nothing when the user cancels", async () => {
+      mockAddCardToWallet.mockResolvedValue(WalletAddResult.Cancelled)
+      const { result } = await renderWithCard()
+
+      await act(async () => {
+        await result.current.addToWallet()
+      })
+
+      expect(mockConfirmWalletAdd).not.toHaveBeenCalled()
+    })
+
+    it("keeps the card added and records it when the report fails", async () => {
+      mockAddCardToWallet.mockResolvedValue(WalletAddResult.Added)
+      mockConfirmWalletAdd.mockRejectedValue(new Error("blink-card unreachable"))
+      const { result } = await renderWithCard()
+
+      let answer: WalletAddResult | undefined
+      await act(async () => {
+        answer = await result.current.addToWallet()
+      })
+
+      expect(answer).toBe(WalletAddResult.Added)
+      expect(mockRecordAppError).toHaveBeenCalledWith(new Error("blink-card unreachable"))
+      expect(mockToastShow).not.toHaveBeenCalled()
+      expect(result.current.canAddToWallet).toBe(false)
+    })
+  })
+
+  describe("a wallet that cannot take the card", () => {
+    it("is not known to be unavailable while the wallet is still checking", async () => {
+      const pendingCheck = deferred<boolean>()
+      mockCanAddCardToWallet.mockReturnValue(pendingCheck.promise)
+
+      const { result } = await renderWithCard()
+
+      expect(result.current.isWalletUnavailable).toBe(false)
+    })
+
+    it("is unavailable once the wallet turns the card down", async () => {
+      mockCanAddCardToWallet.mockResolvedValue(false)
+
+      const { result } = await renderWithCard()
+
+      expect(result.current.isWalletUnavailable).toBe(true)
+    })
+
+    it("is not unavailable once it has taken the card", async () => {
+      mockAddCardToWallet.mockResolvedValue(WalletAddResult.Added)
+      const { result } = await renderWithCard()
+
+      await act(async () => {
+        await result.current.addToWallet()
+      })
+
+      expect(result.current.canAddToWallet).toBe(false)
+      expect(result.current.isWalletUnavailable).toBe(false)
     })
   })
 })
