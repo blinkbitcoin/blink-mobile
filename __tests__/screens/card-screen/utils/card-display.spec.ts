@@ -6,6 +6,7 @@ import { CardStatus, CardType, TransactionStatus } from "@app/graphql/generated"
 import { CardTransactionUiStatus } from "@app/components/card-screen/types"
 import {
   formatCalendarDate,
+  formatCardExpiry,
   formatCardType,
   formatIssuedDate,
   isCardFrozen,
@@ -97,6 +98,16 @@ describe("card-display utils", () => {
 
     it("returns physical label for Physical type", () => {
       expect(formatCardType(CardType.Physical, mockLL)).toBe("Physical Visa debit")
+    })
+  })
+
+  describe("formatCardExpiry", () => {
+    it("prints the expiry as the card does, month and two-digit year", () => {
+      expect(formatCardExpiry("2029-09")).toBe("09/29")
+    })
+
+    it("has nothing to print until the issuer set an expiry", () => {
+      expect(formatCardExpiry(null)).toBeNull()
     })
   })
 

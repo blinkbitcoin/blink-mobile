@@ -1425,6 +1425,8 @@ query cardSecretsEncrypted($cardId: ID!, $sessionId: String!) {
       data
       __typename
     }
+    expirationMonth
+    expirationYear
     __typename
   }
 }

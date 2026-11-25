@@ -1,11 +1,18 @@
 import { CardStatus, CardType, TransactionStatus } from "@app/graphql/generated"
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { CardTransactionUiStatus } from "@app/components/card-screen/types"
+import { parseCardValidThru } from "@app/utils/date"
 
 export const isCardFrozen = (status: CardStatus): boolean => status === CardStatus.Locked
 
 export const isCardUsable = (status: CardStatus): boolean =>
   status === CardStatus.Active || status === CardStatus.Locked
+
+/** The expiry as the card prints it, `MM/YY`; null until the issuer set one. */
+export const formatCardExpiry = (expiry: string | null): string | null => {
+  const parts = expiry ? parseCardValidThru(expiry) : null
+  return parts ? `${parts.month}/${parts.year}` : null
+}
 
 export const formatCardType = (
   cardType: CardType,

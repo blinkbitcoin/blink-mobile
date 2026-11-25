@@ -3720,7 +3720,7 @@ export type CardSecretsEncryptedQueryVariables = Exact<{
 }>;
 
 
-export type CardSecretsEncryptedQuery = { readonly __typename: 'Query', readonly cardSecretsEncrypted: { readonly __typename: 'CardSecretsEncrypted', readonly encryptedPan: { readonly __typename: 'EncryptedData', readonly iv: string, readonly data: string }, readonly encryptedCvc: { readonly __typename: 'EncryptedData', readonly iv: string, readonly data: string } } };
+export type CardSecretsEncryptedQuery = { readonly __typename: 'Query', readonly cardSecretsEncrypted: { readonly __typename: 'CardSecretsEncrypted', readonly expirationMonth?: string | null, readonly expirationYear?: string | null, readonly encryptedPan: { readonly __typename: 'EncryptedData', readonly iv: string, readonly data: string }, readonly encryptedCvc: { readonly __typename: 'EncryptedData', readonly iv: string, readonly data: string } } };
 
 export type CardApplicationStatusQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -7018,6 +7018,8 @@ export const CardSecretsEncryptedDocument = gql`
       iv
       data
     }
+    expirationMonth
+    expirationYear
   }
 }
     `;

@@ -84,20 +84,47 @@ describe("useCardSecrets", () => {
         cardSecretsEncrypted: {
           encryptedPan: { iv: "pan-iv", data: "encrypted-pan-data" },
           encryptedCvc: { iv: "cvc-iv", data: "encrypted-cvc-data" },
+          expirationMonth: "09",
+          expirationYear: "2029",
         },
       },
     })
 
     const { result } = renderHook(() => useCardSecrets())
 
-    let fetchResult: { pan: string; cvc: string } | undefined
+    let fetchResult: { pan: string; cvc: string; expiry: string | null } | undefined
     await act(async () => {
       fetchResult = await result.current.fetchSecrets("card-123")
     })
 
-    expect(fetchResult).toEqual({ pan: "4242424242424242", cvc: "123" })
-    expect(result.current.secrets).toEqual({ pan: "4242424242424242", cvc: "123" })
+    const expected = { pan: "4242424242424242", cvc: "123", expiry: "2029-09" }
+    expect(fetchResult).toEqual(expected)
+    expect(result.current.secrets).toEqual(expected)
     expect(result.current.hasFailed).toBe(false)
+  })
+
+  /** blink-card sends no expiry until the issuer has issued the card. */
+  it("has no expiry for a card the issuer has not issued yet", async () => {
+    mockFetchPublicKey.mockResolvedValue({
+      data: { cardEncryptionPublicKey: "public-key" },
+    })
+    mockFetchEncryptedSecrets.mockResolvedValue({
+      data: {
+        cardSecretsEncrypted: {
+          encryptedPan: { iv: "pan-iv", data: "encrypted-pan-data" },
+          encryptedCvc: { iv: "cvc-iv", data: "encrypted-cvc-data" },
+          expirationMonth: null,
+          expirationYear: "2029",
+        },
+      },
+    })
+
+    const { result } = renderHook(() => useCardSecrets())
+    await act(async () => {
+      await result.current.fetchSecrets("card-123")
+    })
+
+    expect(result.current.secrets?.expiry).toBeNull()
   })
 
   it("fails when the public key is not available", async () => {
@@ -199,7 +226,11 @@ describe("useCardSecrets", () => {
     })
 
     expect(result.current.hasFailed).toBe(false)
-    expect(result.current.secrets).toEqual({ pan: "4242424242424242", cvc: "123" })
+    expect(result.current.secrets).toEqual({
+      pan: "4242424242424242",
+      cvc: "123",
+      expiry: null,
+    })
   })
 
   it("asks the server for the public key every time", async () => {
@@ -287,7 +318,11 @@ describe("useCardSecrets", () => {
       await result.current.fetchSecrets("card-123")
     })
 
-    expect(result.current.secrets).toEqual({ pan: "4242424242424242", cvc: "123" })
+    expect(result.current.secrets).toEqual({
+      pan: "4242424242424242",
+      cvc: "123",
+      expiry: null,
+    })
     expect(JSON.stringify(cache.extract())).not.toContain("encrypted-pan-data")
     expect(JSON.stringify(cache.extract())).not.toContain("encrypted-cvc-data")
   })
@@ -464,7 +499,11 @@ describe("useCardSecrets attempts", () => {
       older.reject(new Error("Network error"))
     })
 
-    expect(result.current.secrets).toEqual({ pan: "4242424242424242", cvc: "123" })
+    expect(result.current.secrets).toEqual({
+      pan: "4242424242424242",
+      cvc: "123",
+      expiry: null,
+    })
     expect(result.current.hasFailed).toBe(false)
     expect(mockRecordAppError).not.toHaveBeenCalled()
   })
