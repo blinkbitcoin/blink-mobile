@@ -3662,7 +3662,7 @@ export type PersonalDetailsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type PersonalDetailsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly email?: { readonly __typename: 'Email', readonly address?: string | null } | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly firstName?: string | null, readonly lastName?: string | null, readonly onboardingStatus?: OnboardingStatus | null, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly shippingAddress?: { readonly __typename: 'ShippingAddress', readonly firstName?: string | null, readonly lastName?: string | null, readonly line1: string, readonly line2?: string | null, readonly city: string, readonly region: string, readonly postalCode: string, readonly country?: string | null, readonly countryCode: string } | null }> } } | null };
 
-export type CardTransactionDetailsFragment = { readonly __typename: 'CardTransaction', readonly id: string, readonly amount: number, readonly currency: string, readonly merchantName: string, readonly merchantCategory?: string | null, readonly enrichedMerchantCategory?: string | null, readonly merchantCategoryCode?: string | null, readonly merchantCity?: string | null, readonly merchantCountry?: string | null, readonly status: TransactionStatus, readonly createdAt: string, readonly cardId: string };
+export type CardTransactionDetailsFragment = { readonly __typename: 'CardTransaction', readonly id: string, readonly amount: number, readonly currency: string, readonly merchantName: string, readonly merchantCategory?: string | null, readonly enrichedMerchantCategory?: string | null, readonly merchantCategoryCode?: string | null, readonly merchantCity?: string | null, readonly merchantCountry?: string | null, readonly status: TransactionStatus, readonly createdAt: string };
 
 export type CardEncryptionPublicKeyQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4377,7 +4377,6 @@ export const CardTransactionDetailsFragmentDoc = gql`
   merchantCountry
   status
   createdAt
-  cardId
 }
     `;
 export const BtcMapPlaceSubmitDocument = gql`

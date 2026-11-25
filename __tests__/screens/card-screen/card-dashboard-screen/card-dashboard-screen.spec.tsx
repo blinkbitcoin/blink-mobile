@@ -630,6 +630,7 @@ describe("CardDashboardScreen", () => {
 
       expect(mockNavigate).toHaveBeenCalledWith("cardTransactionDetailsScreen", {
         transactionId: "tx-1",
+        cardId: "card-1",
       })
     })
   })

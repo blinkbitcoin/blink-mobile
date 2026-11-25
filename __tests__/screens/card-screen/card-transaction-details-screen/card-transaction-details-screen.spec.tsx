@@ -480,7 +480,6 @@ describe("CardTransactionDetailsScreen", () => {
 
     const detailedTransaction = {
       ...TRANSACTION_2,
-      cardId: "card-physical",
       enrichedMerchantCategory: "Food & Dining",
       merchantCategory: "Fast food restaurants",
       merchantCategoryCode: "5814",
@@ -489,7 +488,9 @@ describe("CardTransactionDetailsScreen", () => {
     }
 
     beforeEach(() => {
-      mockUseRoute.mockReturnValue({ params: { transactionId: "txn-002" } })
+      mockUseRoute.mockReturnValue({
+        params: { transactionId: "txn-002", cardId: "card-physical" },
+      })
       mockCards = [
         { id: "card-physical", lastFour: "4242" },
         { id: "card-virtual", lastFour: "2121" },
@@ -500,6 +501,15 @@ describe("CardTransactionDetailsScreen", () => {
       const { getByText } = await renderTransaction(detailedTransaction)
 
       expect(getByText("Visa •••• 4242")).toBeTruthy()
+    })
+
+    it("names no card when opened from a link, which carries none", async () => {
+      mockUseRoute.mockReturnValue({ params: { transactionId: "txn-002" } })
+
+      const { queryByText } = await renderTransaction(detailedTransaction)
+
+      expect(queryByText("Visa •••• 4242")).toBeNull()
+      expect(queryByText("Visa •••• 2121")).toBeNull()
     })
 
     it("shows the enriched category, the city and country, and the MCC", async () => {
@@ -536,10 +546,7 @@ describe("CardTransactionDetailsScreen", () => {
 
     it("marks what it does not know as unavailable", async () => {
       mockCards = []
-      const { getAllByText, getByTestId } = await renderTransaction({
-        ...TRANSACTION_2,
-        cardId: "card-physical",
-      })
+      const { getAllByText, getByTestId } = await renderTransaction(TRANSACTION_2)
 
       expect(getAllByText("---").length).toBeGreaterThanOrEqual(7)
       expect(getByTestId("icon-storefront")).toBeTruthy()

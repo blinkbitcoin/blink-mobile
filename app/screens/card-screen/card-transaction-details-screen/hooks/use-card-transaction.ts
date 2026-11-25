@@ -18,7 +18,6 @@ gql`
     merchantCountry
     status
     createdAt
-    cardId
   }
 `
 

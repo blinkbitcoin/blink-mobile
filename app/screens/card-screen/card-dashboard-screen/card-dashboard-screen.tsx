@@ -162,7 +162,10 @@ const CardDashboardScreenContent: React.FC = () => {
         <CardTransactionsSection
           groups={transactions}
           onTransactionPress={(transactionId) =>
-            navigation.navigate("cardTransactionDetailsScreen", { transactionId })
+            navigation.navigate("cardTransactionDetailsScreen", {
+              transactionId,
+              cardId: card.id,
+            })
           }
         />
 

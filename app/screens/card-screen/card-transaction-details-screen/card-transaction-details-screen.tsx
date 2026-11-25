@@ -40,7 +40,7 @@ export const CardTransactionDetailsScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const route = useRoute<CardTransactionDetailsScreenRouteProp>()
 
-  const { transactionId } = route.params
+  const { transactionId, cardId } = route.params
 
   const { transaction } = useCardTransaction(transactionId)
   const { cards } = useCardData()
@@ -80,7 +80,9 @@ export const CardTransactionDetailsScreen: React.FC = () => {
 
   const formattedTime = timeFormatter.format(new Date(transaction.createdAt))
 
-  const cardUsed = cards?.find(({ id }) => id === transaction.cardId)
+  /** A transaction names its card by the issuer's id, which the app's cards don't carry,
+   *  so the card used is the one whose list the transaction was opened from. */
+  const cardUsed = cards?.find(({ id }) => id === cardId)
   const cardUsedLabel = cardUsed
     ? LL.CardFlow.TransactionDetails.cardUsedValue({ lastFour: cardUsed.lastFour })
     : UNAVAILABLE
