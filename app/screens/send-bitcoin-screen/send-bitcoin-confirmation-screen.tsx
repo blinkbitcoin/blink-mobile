@@ -497,7 +497,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const LightningRecommendedComponent = isLightningRecommended() ? (
     <View style={styles.feeWarning}>
-      <WarningBanner numberOfLines={1}>
+      <WarningBanner numberOfLines={1} announce>
         {LL.SendBitcoinConfirmationScreen.lightningRecommended()}
       </WarningBanner>
     </View>
@@ -626,7 +626,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
         {dustWarning.status === "visible" ? (
           <View style={styles.fieldContainer}>
-            <WarningBanner>
+            <WarningBanner announce>
               {LL.SendBitcoinConfirmationScreen.usdRemainderSweep({
                 remaining: formatMoneyAmount({ moneyAmount: dustWarning.remaining }),
                 remainingSats: formatMoneyAmount({

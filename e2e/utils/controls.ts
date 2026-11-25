@@ -43,6 +43,25 @@ export const waitTillPressableDisplayed = async (title: string) => {
   await button.waitForDisplayed({ timeout })
 }
 
+/**
+ * By test ID on both platforms. On Android `~` matches the content description, which a
+ * control's own spoken label replaces (a keypad key reads "1", not "Key 1"), while the
+ * test ID stays the resource ID.
+ */
+export const testIdSelector = (testId: string, iosType = "Other") =>
+  findById(testId, iosType)
+
+export const clickByTestId = async (testId: string, iosType?: string) => {
+  const element = await $(testIdSelector(testId, iosType))
+  await element.waitForDisplayed({ timeout })
+  await element.click()
+}
+
+export const waitTillTestIdDisplayed = async (testId: string, iosType?: string) => {
+  const element = await $(testIdSelector(testId, iosType))
+  await element.waitForDisplayed({ timeout })
+}
+
 export async function swipeLeft() {
   try {
     const { height, width } = await browser.getWindowRect()

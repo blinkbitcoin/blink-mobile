@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react"
+import React, { Ref, useEffect, useState } from "react"
 import { makeStyles, Text } from "@rn-vui/themed"
 import { Pressable, View } from "react-native"
 
 import { radius } from "@app/rne-theme/radius"
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { fonts } from "@app/rne-theme/fonts"
 import { GaloyIcon } from "../atomic/galoy-icon"
@@ -16,6 +17,8 @@ type CurrencyKeyboardProps = {
   safeMode?: boolean
   disabledKeys?: ReadonlySet<KeyType>
   disabled?: boolean
+  /** The first key, "1": where screen reader focus lands to start typing an amount. */
+  firstKeyRef?: Ref<View>
 }
 
 export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
@@ -23,6 +26,7 @@ export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
   safeMode = false,
   disabledKeys,
   disabled = false,
+  firstKeyRef,
 }) => {
   const styles = useStyles()
 
@@ -46,6 +50,7 @@ export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
                 handleKeyPress={onPress}
                 safeMode={safeMode}
                 disabled={isKeyDisabled}
+                pressableRef={key === KeyType[1] ? firstKeyRef : undefined}
               />
             )
           })}
@@ -60,13 +65,16 @@ const Key = ({
   numberPadKey,
   safeMode,
   disabled,
+  pressableRef,
 }: {
   numberPadKey: KeyType
   handleKeyPress: (key: KeyType) => void
   safeMode?: boolean
   disabled?: boolean
+  pressableRef?: Ref<View>
 }) => {
   const styles = useStyles()
+  const { LL } = useI18nContext()
   const isBackspace = numberPadKey === KeyType.Backspace
 
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null)
@@ -97,6 +105,7 @@ const Key = ({
 
   return (
     <Pressable
+      ref={pressableRef}
       disabled={disabled}
       style={({ pressed }) => [
         styles.key,
@@ -107,6 +116,9 @@ const Key = ({
       onPress={() => handleKeyPress(numberPadKey)}
       onPressOut={handleBackSpacePressOut}
       {...testProps(`${KEY_TEST_ID_PREFIX} ${numberPadKey}`)}
+      accessibilityRole="button"
+      accessibilityLabel={isBackspace ? LL.Accessibility.deleteKey() : numberPadKey}
+      accessibilityState={{ disabled }}
     >
       {isBackspace ? (
         <GaloyIcon name="back-space" size={28} color={styles.backspaceIcon.color} />
@@ -145,9 +157,9 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.surfaceInteractive,
   },
   keyText: {
-    fontSize: 26,
     fontFamily: fonts.bold,
-    lineHeight: 30,
+    fontSize: 28,
+    lineHeight: 32,
     textAlign: "center",
   },
   backspaceIcon: {

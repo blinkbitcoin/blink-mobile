@@ -3,6 +3,8 @@ import { View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { useAccessibilityAnnouncement } from "@app/hooks/use-accessibility-announcement"
+
 import { GaloyIcon } from "../galoy-icon"
 
 import { radius } from "@app/rne-theme/radius"
@@ -10,13 +12,36 @@ import { radius } from "@app/rne-theme/radius"
 type GaloyErrorBoxProps = {
   errorMessage: string
   noIcon?: boolean
+  /** The unfilled variant is a bare centred line, for an error that sits right above the
+   *  field it is about (which carries the red outline) rather than in a box of its own. */
+  filled?: boolean
+  /** Speaks the error as it appears, for an error that shows without moving focus. Off by
+   *  default, since a screen that opens with an error is already read. */
+  announce?: boolean
 }
 
-export const GaloyErrorBox: React.FC<GaloyErrorBoxProps> = ({ errorMessage, noIcon }) => {
+export const GaloyErrorBox: React.FC<GaloyErrorBoxProps> = ({
+  errorMessage,
+  noIcon,
+  filled = true,
+  announce = false,
+}) => {
   const {
     theme: { colors, mode },
   } = useTheme()
   const styles = useStyles()
+  useAccessibilityAnnouncement(announce ? errorMessage : undefined)
+
+  if (!filled) {
+    return (
+      <View style={styles.unfilledContainer}>
+        {!noIcon && <GaloyIcon name="info" size={16} color={colors.error} />}
+        <Text style={styles.unfilledText} type="p3" color={colors.error}>
+          {errorMessage}
+        </Text>
+      </View>
+    )
+  }
 
   const color = mode === "light" ? colors.error : colors.textOnBackground
 
@@ -45,5 +70,17 @@ const useStyles = makeStyles(({ colors }) => ({
     overflow: "hidden",
     marginLeft: 4,
     flex: 1,
+  },
+  unfilledContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    columnGap: 8,
+    paddingVertical: 3,
+  },
+  unfilledText: {
+    flexShrink: 1,
+    textAlign: "center",
+    lineHeight: 20,
   },
 }))
