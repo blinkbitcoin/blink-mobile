@@ -631,6 +631,22 @@ export type CardCreateInput = {
   readonly status?: InputMaybe<CardStatus>;
 };
 
+/**
+ * Why the network declined a card payment, normalized from what Rain reports
+ * to the reasons a member can act on or understand.
+ */
+export const CardDeclineReason = {
+  CardExpired: 'CARD_EXPIRED',
+  CardLocked: 'CARD_LOCKED',
+  IncorrectPin: 'INCORRECT_PIN',
+  InsufficientFunds: 'INSUFFICIENT_FUNDS',
+  LimitExceeded: 'LIMIT_EXCEEDED',
+  /** Any other reason. */
+  Other: 'OTHER',
+  SuspectedFraud: 'SUSPECTED_FRAUD'
+} as const;
+
+export type CardDeclineReason = typeof CardDeclineReason[keyof typeof CardDeclineReason];
 export type CardHolder = {
   readonly __typename: 'CardHolder';
   /**
@@ -664,6 +680,17 @@ export type CardMerchant = {
   readonly website?: Maybe<Scalars['String']['output']>;
 };
 
+/** How a card payment was authorized, normalized from what Rain reports. */
+export const CardPaymentMethod = {
+  Chip: 'CHIP',
+  Contactless: 'CONTACTLESS',
+  Online: 'ONLINE',
+  /** A method outside this list. */
+  Other: 'OTHER',
+  Swipe: 'SWIPE'
+} as const;
+
+export type CardPaymentMethod = typeof CardPaymentMethod[keyof typeof CardPaymentMethod];
 export type CardPinUpdateInput = {
   readonly cardId: Scalars['ID']['input'];
   readonly encryptedPin: Scalars['String']['input'];
@@ -745,8 +772,8 @@ export type CardTransaction = {
   readonly cardLastFour?: Maybe<Scalars['String']['output']>;
   readonly createdAt: Scalars['DateTime']['output'];
   readonly currency: Scalars['String']['output'];
-  /** Why the network declined the payment, as Rain reports it. */
-  readonly declineReason?: Maybe<Scalars['String']['output']>;
+  /** Why the network declined the payment; null when Rain didn't say. */
+  readonly declineReason?: Maybe<CardDeclineReason>;
   readonly enrichedMerchantCategory?: Maybe<Scalars['String']['output']>;
   readonly enrichedMerchantName?: Maybe<Scalars['String']['output']>;
   readonly id: Scalars['ID']['output'];
@@ -758,11 +785,8 @@ export type CardTransaction = {
   readonly merchantCity?: Maybe<Scalars['String']['output']>;
   readonly merchantCountry?: Maybe<Scalars['String']['output']>;
   readonly merchantName: Scalars['String']['output'];
-  /**
-   * How the payment was authorized, as Rain reports it (for example
-   * contactless or online).
-   */
-  readonly paymentMethod?: Maybe<Scalars['String']['output']>;
+  /** How the payment was authorized; null when Rain didn't say. */
+  readonly paymentMethod?: Maybe<CardPaymentMethod>;
   /**
    * The sats the payment took: the settled sats once settled, the authorized
    * sats before; null when not known.
@@ -806,6 +830,7 @@ export type CardUpdateInput = {
   readonly virtualCardArt?: InputMaybe<Scalars['String']['input']>;
 };
 
+/** The cardholder's address and phone, as Rain keeps them from the application. */
 export type CardholderAddress = {
   readonly __typename: 'CardholderAddress';
   readonly city: Scalars['String']['output'];
@@ -11405,8 +11430,10 @@ export type ResolversTypes = {
   CardConsumerApplicationManualCreateInput: CardConsumerApplicationManualCreateInput;
   CardConsumerApplicationUpdateInput: CardConsumerApplicationUpdateInput;
   CardCreateInput: CardCreateInput;
+  CardDeclineReason: CardDeclineReason;
   CardHolder: ResolverTypeWrapper<CardHolder>;
   CardMerchant: ResolverTypeWrapper<CardMerchant>;
+  CardPaymentMethod: CardPaymentMethod;
   CardPinUpdateInput: CardPinUpdateInput;
   CardReplaceInput: CardReplaceInput;
   CardSecretsEncrypted: ResolverTypeWrapper<CardSecretsEncrypted>;
@@ -12273,7 +12300,7 @@ export type CardTransactionResolvers<ContextType = any, ParentType extends Resol
   cardLastFour?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   currency?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  declineReason?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  declineReason?: Resolver<Maybe<ResolversTypes['CardDeclineReason']>, ParentType, ContextType>;
   enrichedMerchantCategory?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   enrichedMerchantName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
@@ -12285,7 +12312,7 @@ export type CardTransactionResolvers<ContextType = any, ParentType extends Resol
   merchantCity?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   merchantCountry?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   merchantName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  paymentMethod?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  paymentMethod?: Resolver<Maybe<ResolversTypes['CardPaymentMethod']>, ParentType, ContextType>;
   satsAmount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['TransactionStatus'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
