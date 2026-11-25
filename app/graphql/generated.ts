@@ -633,6 +633,16 @@ export type CardCreateInput = {
 
 export type CardHolder = {
   readonly __typename: 'CardHolder';
+  /**
+   * The address Rain keeps from the application (the KYC address), with the
+   * cardholder's phone; null when Rain has none.
+   */
+  readonly address?: Maybe<CardholderAddress>;
+  /**
+   * The date of birth Rain keeps from the application (`YYYY-MM-DD`); null
+   * when Rain has none.
+   */
+  readonly dateOfBirth?: Maybe<Scalars['String']['output']>;
   readonly firstName: Scalars['String']['output'];
   readonly lastName: Scalars['String']['output'];
 };
@@ -669,6 +679,10 @@ export type CardSecretsEncrypted = {
   readonly __typename: 'CardSecretsEncrypted';
   readonly encryptedCvc: EncryptedData;
   readonly encryptedPan: EncryptedData;
+  /** The card's expiry month (`MM`); null until Rain issued the card. */
+  readonly expirationMonth?: Maybe<Scalars['String']['output']>;
+  /** The card's expiry year (`YYYY`); null until Rain issued the card. */
+  readonly expirationYear?: Maybe<Scalars['String']['output']>;
 };
 
 export type CardSpendingLimitRemoveInput = {
@@ -721,9 +735,18 @@ export type CardStatus = typeof CardStatus[keyof typeof CardStatus];
 export type CardTransaction = {
   readonly __typename: 'CardTransaction';
   readonly amount: Scalars['Int']['output'];
+  /**
+   * The bitcoin price the payment was converted at, in dollars per BTC, from
+   * its amount and sats; null without sats.
+   */
+  readonly btcRate?: Maybe<Scalars['Float']['output']>;
   readonly cardId: Scalars['String']['output'];
+  /** The last four digits of the card that paid. */
+  readonly cardLastFour?: Maybe<Scalars['String']['output']>;
   readonly createdAt: Scalars['DateTime']['output'];
   readonly currency: Scalars['String']['output'];
+  /** Why the network declined the payment, as Rain reports it. */
+  readonly declineReason?: Maybe<Scalars['String']['output']>;
   readonly enrichedMerchantCategory?: Maybe<Scalars['String']['output']>;
   readonly enrichedMerchantName?: Maybe<Scalars['String']['output']>;
   readonly id: Scalars['ID']['output'];
@@ -735,6 +758,16 @@ export type CardTransaction = {
   readonly merchantCity?: Maybe<Scalars['String']['output']>;
   readonly merchantCountry?: Maybe<Scalars['String']['output']>;
   readonly merchantName: Scalars['String']['output'];
+  /**
+   * How the payment was authorized, as Rain reports it (for example
+   * contactless or online).
+   */
+  readonly paymentMethod?: Maybe<Scalars['String']['output']>;
+  /**
+   * The sats the payment took: the settled sats once settled, the authorized
+   * sats before; null when not known.
+   */
+  readonly satsAmount?: Maybe<Scalars['Int']['output']>;
   readonly status: TransactionStatus;
 };
 
@@ -771,6 +804,20 @@ export type CardUpdateInput = {
   readonly monthlyLimitCents?: InputMaybe<Scalars['Int']['input']>;
   readonly status?: InputMaybe<CardStatus>;
   readonly virtualCardArt?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CardholderAddress = {
+  readonly __typename: 'CardholderAddress';
+  readonly city: Scalars['String']['output'];
+  readonly countryCode: Scalars['String']['output'];
+  readonly line1: Scalars['String']['output'];
+  readonly line2?: Maybe<Scalars['String']['output']>;
+  /** The cardholder's full name */
+  readonly name: Scalars['String']['output'];
+  /** `+<country code><number>` when Rain has both; null without a phone. */
+  readonly phoneNumber?: Maybe<Scalars['String']['output']>;
+  readonly postalCode: Scalars['String']['output'];
+  readonly region: Scalars['String']['output'];
 };
 
 export type CentAmountPayload = {
@@ -11359,6 +11406,7 @@ export type ResolversTypes = {
   CardTransactionPageInfo: ResolverTypeWrapper<CardTransactionPageInfo>;
   CardType: CardType;
   CardUpdateInput: CardUpdateInput;
+  CardholderAddress: ResolverTypeWrapper<CardholderAddress>;
   CentAmount: ResolverTypeWrapper<Scalars['CentAmount']['output']>;
   CentAmountPayload: ResolverTypeWrapper<CentAmountPayload>;
   ConsumerAccount: ResolverTypeWrapper<ConsumerAccount>;
@@ -11673,6 +11721,7 @@ export type ResolversParentTypes = {
   CardTransactionEdge: CardTransactionEdge;
   CardTransactionPageInfo: CardTransactionPageInfo;
   CardUpdateInput: CardUpdateInput;
+  CardholderAddress: CardholderAddress;
   CentAmount: Scalars['CentAmount']['output'];
   CentAmountPayload: CentAmountPayload;
   ConsumerAccount: ConsumerAccount;
@@ -12150,6 +12199,8 @@ export type CardCollateralDepositResolvers<ContextType = any, ParentType extends
 };
 
 export type CardHolderResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardHolder'] = ResolversParentTypes['CardHolder']> = {
+  address?: Resolver<Maybe<ResolversTypes['CardholderAddress']>, ParentType, ContextType>;
+  dateOfBirth?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   firstName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   lastName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -12175,6 +12226,8 @@ export type CardMerchantResolvers<ContextType = any, ParentType extends Resolver
 export type CardSecretsEncryptedResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardSecretsEncrypted'] = ResolversParentTypes['CardSecretsEncrypted']> = {
   encryptedCvc?: Resolver<ResolversTypes['EncryptedData'], ParentType, ContextType>;
   encryptedPan?: Resolver<ResolversTypes['EncryptedData'], ParentType, ContextType>;
+  expirationMonth?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  expirationYear?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -12198,9 +12251,12 @@ export type CardSpendingToggleSetPayloadResolvers<ContextType = any, ParentType 
 
 export type CardTransactionResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardTransaction'] = ResolversParentTypes['CardTransaction']> = {
   amount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  btcRate?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   cardId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  cardLastFour?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   currency?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  declineReason?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   enrichedMerchantCategory?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   enrichedMerchantName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
@@ -12212,6 +12268,8 @@ export type CardTransactionResolvers<ContextType = any, ParentType extends Resol
   merchantCity?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   merchantCountry?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   merchantName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  paymentMethod?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  satsAmount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['TransactionStatus'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -12233,6 +12291,18 @@ export type CardTransactionPageInfoResolvers<ContextType = any, ParentType exten
   hasNextPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   hasPreviousPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   startCursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardholderAddressResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardholderAddress'] = ResolversParentTypes['CardholderAddress']> = {
+  city?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  countryCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  line1?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  line2?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  phoneNumber?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  postalCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  region?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -13431,6 +13501,7 @@ export type Resolvers<ContextType = any> = {
   CardTransactionConnection?: CardTransactionConnectionResolvers<ContextType>;
   CardTransactionEdge?: CardTransactionEdgeResolvers<ContextType>;
   CardTransactionPageInfo?: CardTransactionPageInfoResolvers<ContextType>;
+  CardholderAddress?: CardholderAddressResolvers<ContextType>;
   CentAmount?: GraphQLScalarType;
   CentAmountPayload?: CentAmountPayloadResolvers<ContextType>;
   ConsumerAccount?: ConsumerAccountResolvers<ContextType>;
