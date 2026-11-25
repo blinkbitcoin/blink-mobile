@@ -12118,7 +12118,7 @@ type RootTranslation = {
 				 */
 				stolenCard: string
 				/**
-				 * I​ ​m​i​s​p​l​a​c​e​d​ ​m​y​ ​c​a​r​d​ ​a​n​d​ ​c​a​n​'​t​ ​f​i​n​d​ ​i​t​ ​a​n​y​w​h​e​r​e​.
+				 * M​y​ ​c​a​r​d​ ​w​a​s​ ​t​a​k​e​n​ ​w​i​t​h​o​u​t​ ​p​e​r​m​i​s​s​i​o​n​.
 				 */
 				stolenCardDescription: string
 				/**
@@ -12126,7 +12126,7 @@ type RootTranslation = {
 				 */
 				damagedCard: string
 				/**
-				 * I​ ​m​i​s​p​l​a​c​e​d​ ​m​y​ ​c​a​r​d​ ​a​n​d​ ​c​a​n​'​t​ ​f​i​n​d​ ​i​t​ ​a​n​y​w​h​e​r​e​.
+				 * M​y​ ​c​a​r​d​ ​i​s​ ​p​h​y​s​i​c​a​l​l​y​ ​d​a​m​a​g​e​d​.
 				 */
 				damagedCardDescription: string
 				/**
@@ -26604,7 +26604,7 @@ export type TranslationFunctions = {
 				 */
 				stolenCard: () => LocalizedString
 				/**
-				 * I misplaced my card and can't find it anywhere.
+				 * My card was taken without permission.
 				 */
 				stolenCardDescription: () => LocalizedString
 				/**
@@ -26612,7 +26612,7 @@ export type TranslationFunctions = {
 				 */
 				damagedCard: () => LocalizedString
 				/**
-				 * I misplaced my card and can't find it anywhere.
+				 * My card is physically damaged.
 				 */
 				damagedCardDescription: () => LocalizedString
 				/**
