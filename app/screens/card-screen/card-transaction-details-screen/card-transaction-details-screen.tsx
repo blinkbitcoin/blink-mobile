@@ -86,8 +86,10 @@ export const CardTransactionDetailsScreen: React.FC = () => {
   const cardUsedLabel = cardUsed
     ? LL.CardFlow.TransactionDetails.cardUsedValue({ lastFour: cardUsed.lastFour })
     : UNAVAILABLE
+  /** The enriched category is stored as the card network sends it, so an empty one falls
+   *  back as a missing one does. */
   const category =
-    transaction.enrichedMerchantCategory ?? transaction.merchantCategory ?? UNAVAILABLE
+    transaction.enrichedMerchantCategory || transaction.merchantCategory || UNAVAILABLE
   const merchantCountry = transaction.merchantCountry
     ? getCountryLabel(transaction.merchantCountry)
     : undefined

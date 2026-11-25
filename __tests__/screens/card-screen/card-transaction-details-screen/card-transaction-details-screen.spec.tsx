@@ -529,6 +529,15 @@ describe("CardTransactionDetailsScreen", () => {
       expect(getByText("Fast food restaurants")).toBeTruthy()
     })
 
+    it("falls back to the issuer's category when the enriched one is empty", async () => {
+      const { getByText } = await renderTransaction({
+        ...detailedTransaction,
+        enrichedMerchantCategory: "",
+      })
+
+      expect(getByText("Fast food restaurants")).toBeTruthy()
+    })
+
     it("shows whichever part of the location it has", async () => {
       const { getByText } = await renderTransaction({
         ...detailedTransaction,
