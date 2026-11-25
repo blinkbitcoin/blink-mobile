@@ -1377,11 +1377,10 @@ query cardApplicationStatus {
   }
 }
 
-query cardBalance($cardId: ID!) {
-  cardBalance(cardId: $cardId) {
-    available
-    pending
-    posted
+query cardCollateralBalance {
+  cardCollateralBalance {
+    availableSats
+    pendingSats
     __typename
   }
 }

@@ -1,36 +1,38 @@
 import { gql } from "@apollo/client"
 
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { useCardBalanceQuery } from "@app/graphql/generated"
+import { useCardCollateralBalanceQuery } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { toBtcMoneyAmount } from "@app/types/amounts"
 
 gql`
-  query cardBalance($cardId: ID!) {
-    cardBalance(cardId: $cardId) {
-      available
-      pending
-      posted
+  query cardCollateralBalance {
+    cardCollateralBalance {
+      availableSats
+      pendingSats
     }
   }
 `
 
 const BALANCE_POLL_INTERVAL_MS = 30_000
 
-export const useCardBalance = (cardId: string | undefined) => {
+/** The Card Balance is the member's collateral, one for all their cards, which blink-card
+ *  reads live. A member without a card has none to read, so the caller skips it. */
+export const useCardBalance = ({ skip = false }: { skip?: boolean } = {}) => {
   const isAuthed = useIsAuthed()
   const { moneyAmountToDisplayCurrencyString, formatMoneyAmount } = useDisplayCurrency()
 
-  const { data, loading, error, refetch } = useCardBalanceQuery({
-    variables: { cardId: cardId ?? "" },
-    skip: !isAuthed || !cardId,
+  const { data, loading, error, refetch } = useCardCollateralBalanceQuery({
+    skip: !isAuthed || skip,
     fetchPolicy: "network-only",
     pollInterval: BALANCE_POLL_INTERVAL_MS,
   })
 
   /** Undefined until the balance arrives, so a pending or failed request is never
    *  mistaken for a card that holds nothing. */
-  const availableSats = data?.cardBalance?.available
+  const availableSats = data?.cardCollateralBalance.availableSats
+  /** What payments not settled yet hold. */
+  const pendingSats = data?.cardCollateralBalance.pendingSats
   const btcAmount = toBtcMoneyAmount(availableSats ?? 0)
 
   /** The Card Balance is held in bitcoin, so it reads in bitcoin first, as the wallets on
@@ -42,5 +44,13 @@ export const useCardBalance = (cardId: string | undefined) => {
     moneyAmountToDisplayCurrencyString({ moneyAmount: btcAmount, isApproximate: true }) ??
     ""
 
-  return { balancePrimary, balanceSecondary, availableSats, loading, error, refetch }
+  return {
+    balancePrimary,
+    balanceSecondary,
+    availableSats,
+    pendingSats,
+    loading,
+    error,
+    refetch,
+  }
 }

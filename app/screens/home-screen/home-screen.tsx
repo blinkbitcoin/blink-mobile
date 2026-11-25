@@ -380,7 +380,7 @@ export const HomeScreen: React.FC = () => {
     availableSats: cardBalanceSats,
     error: cardBalanceError,
     refetch: refetchCardBalance,
-  } = useCardBalance(showCardRow ? homeCard?.id : undefined)
+  } = useCardBalance({ skip: !showCardRow })
   /** A card lookup that has not answered yet or failed before answering, or a card whose
    *  balance has not arrived or failed to, holds the total back: summing the wallets
    *  alone would show an understated total as if it were the real one. */

@@ -6,10 +6,11 @@ jest.mock("@app/graphql/is-authed-context", () => ({
   useIsAuthed: () => mockUseIsAuthed(),
 }))
 
-const mockUseCardBalanceQuery = jest.fn()
+const mockUseCardCollateralBalanceQuery = jest.fn()
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
-  useCardBalanceQuery: (opts: Record<string, unknown>) => mockUseCardBalanceQuery(opts),
+  useCardCollateralBalanceQuery: (opts: Record<string, unknown>) =>
+    mockUseCardCollateralBalanceQuery(opts),
 }))
 
 const mockMoneyAmountToDisplayCurrencyString = jest.fn()
@@ -38,13 +39,13 @@ describe("useCardBalance", () => {
   })
 
   it("returns formatted balance strings", () => {
-    mockUseCardBalanceQuery.mockReturnValue({
-      data: { cardBalance: { available: 15000, pending: 0, posted: 15000 } },
+    mockUseCardCollateralBalanceQuery.mockReturnValue({
+      data: { cardCollateralBalance: { availableSats: 15000, pendingSats: 0 } },
       loading: false,
       error: undefined,
     })
 
-    const { result } = renderHook(() => useCardBalance("card-1"))
+    const { result } = renderHook(() => useCardBalance())
 
     expect(result.current.balancePrimary).toBe("0.0015 BTC")
     expect(result.current.balanceSecondary).toBe("~ $100.00")
@@ -53,82 +54,109 @@ describe("useCardBalance", () => {
   it("returns empty strings when display functions return null", () => {
     mockMoneyAmountToDisplayCurrencyString.mockReturnValue(null)
     mockFormatMoneyAmount.mockReturnValue(null)
-    mockUseCardBalanceQuery.mockReturnValue({
-      data: { cardBalance: { available: 0, pending: 0, posted: 0 } },
+    mockUseCardCollateralBalanceQuery.mockReturnValue({
+      data: { cardCollateralBalance: { availableSats: 0, pendingSats: 0 } },
       loading: false,
       error: undefined,
     })
 
-    const { result } = renderHook(() => useCardBalance("card-1"))
+    const { result } = renderHook(() => useCardBalance())
 
     expect(result.current.balancePrimary).toBe("")
     expect(result.current.balanceSecondary).toBe("")
   })
 
   it("returns loading state", () => {
-    mockUseCardBalanceQuery.mockReturnValue({
+    mockUseCardCollateralBalanceQuery.mockReturnValue({
       data: undefined,
       loading: true,
       error: undefined,
     })
 
-    const { result } = renderHook(() => useCardBalance("card-1"))
+    const { result } = renderHook(() => useCardBalance())
 
     expect(result.current.loading).toBe(true)
   })
 
   it("returns error", () => {
     const mockError = new Error("Balance error")
-    mockUseCardBalanceQuery.mockReturnValue({
+    mockUseCardCollateralBalanceQuery.mockReturnValue({
       data: undefined,
       loading: false,
       error: mockError,
     })
 
-    const { result } = renderHook(() => useCardBalance("card-1"))
+    const { result } = renderHook(() => useCardBalance())
 
     expect(result.current.error).toBe(mockError)
   })
 
   it("skips query when not authenticated", () => {
     mockUseIsAuthed.mockReturnValue(false)
-    mockUseCardBalanceQuery.mockReturnValue({
+    mockUseCardCollateralBalanceQuery.mockReturnValue({
       data: undefined,
       loading: false,
       error: undefined,
     })
 
-    renderHook(() => useCardBalance("card-1"))
+    renderHook(() => useCardBalance())
 
-    expect(mockUseCardBalanceQuery).toHaveBeenCalledWith(
+    expect(mockUseCardCollateralBalanceQuery).toHaveBeenCalledWith(
       expect.objectContaining({ skip: true }),
     )
   })
 
-  it("skips query when cardId is undefined", () => {
-    mockUseCardBalanceQuery.mockReturnValue({
+  it("skips the query when the caller has no card to read for", () => {
+    mockUseCardCollateralBalanceQuery.mockReturnValue({
       data: undefined,
       loading: false,
       error: undefined,
     })
 
-    renderHook(() => useCardBalance(undefined))
+    renderHook(() => useCardBalance({ skip: true }))
 
-    expect(mockUseCardBalanceQuery).toHaveBeenCalledWith(
+    expect(mockUseCardCollateralBalanceQuery).toHaveBeenCalledWith(
       expect.objectContaining({ skip: true }),
     )
   })
 
-  it("uses network-only fetch policy with poll interval", () => {
-    mockUseCardBalanceQuery.mockReturnValue({
+  it("reads the member's collateral, which takes no card id", () => {
+    mockUseCardCollateralBalanceQuery.mockReturnValue({
       data: undefined,
       loading: true,
       error: undefined,
     })
 
-    renderHook(() => useCardBalance("card-1"))
+    renderHook(() => useCardBalance())
 
-    expect(mockUseCardBalanceQuery).toHaveBeenCalledWith(
+    const [options] = mockUseCardCollateralBalanceQuery.mock.calls[0]
+    expect(options).toEqual(expect.objectContaining({ skip: false }))
+    expect(options.variables).toBeUndefined()
+  })
+
+  it("hands over what unsettled payments hold", () => {
+    mockUseCardCollateralBalanceQuery.mockReturnValue({
+      data: { cardCollateralBalance: { availableSats: 15000, pendingSats: 2500 } },
+      loading: false,
+      error: undefined,
+    })
+
+    const { result } = renderHook(() => useCardBalance())
+
+    expect(result.current.availableSats).toBe(15000)
+    expect(result.current.pendingSats).toBe(2500)
+  })
+
+  it("uses network-only fetch policy with poll interval", () => {
+    mockUseCardCollateralBalanceQuery.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    })
+
+    renderHook(() => useCardBalance())
+
+    expect(mockUseCardCollateralBalanceQuery).toHaveBeenCalledWith(
       expect.objectContaining({
         fetchPolicy: "network-only",
         pollInterval: 30_000,
@@ -137,61 +165,65 @@ describe("useCardBalance", () => {
   })
 
   it("leaves availableSats undefined until the balance arrives", () => {
-    mockUseCardBalanceQuery.mockReturnValue({
+    mockUseCardCollateralBalanceQuery.mockReturnValue({
       data: undefined,
       loading: true,
       error: undefined,
     })
 
-    const { result } = renderHook(() => useCardBalance("card-1"))
+    const { result } = renderHook(() => useCardBalance())
 
     expect(result.current.availableSats).toBeUndefined()
   })
 
   it("keeps availableSats undefined when the request fails", () => {
     const error = new Error("card balance unavailable")
-    mockUseCardBalanceQuery.mockReturnValue({ data: undefined, loading: false, error })
+    mockUseCardCollateralBalanceQuery.mockReturnValue({
+      data: undefined,
+      loading: false,
+      error,
+    })
 
-    const { result } = renderHook(() => useCardBalance("card-1"))
+    const { result } = renderHook(() => useCardBalance())
 
     expect(result.current.availableSats).toBeUndefined()
     expect(result.current.error).toBe(error)
   })
 
   it("reports a confirmed zero balance as zero", () => {
-    mockUseCardBalanceQuery.mockReturnValue({
-      data: { cardBalance: { available: 0, pending: 0, posted: 0 } },
+    mockUseCardCollateralBalanceQuery.mockReturnValue({
+      data: { cardCollateralBalance: { availableSats: 0, pendingSats: 0 } },
       loading: false,
       error: undefined,
     })
 
-    const { result } = renderHook(() => useCardBalance("card-1"))
+    const { result } = renderHook(() => useCardBalance())
 
     expect(result.current.availableSats).toBe(0)
   })
 
   it("exposes the query refetch", () => {
     const refetch = jest.fn()
-    mockUseCardBalanceQuery.mockReturnValue({
+    mockUseCardCollateralBalanceQuery.mockReturnValue({
       data: undefined,
       loading: false,
       error: undefined,
       refetch,
     })
 
-    const { result } = renderHook(() => useCardBalance("card-1"))
+    const { result } = renderHook(() => useCardBalance())
 
     expect(result.current.refetch).toBe(refetch)
   })
 
-  it("defaults available to 0 when data is null", () => {
-    mockUseCardBalanceQuery.mockReturnValue({
-      data: { cardBalance: null },
+  it("formats zero while the balance is unknown", () => {
+    mockUseCardCollateralBalanceQuery.mockReturnValue({
+      data: undefined,
       loading: false,
       error: undefined,
     })
 
-    renderHook(() => useCardBalance("card-1"))
+    renderHook(() => useCardBalance())
 
     expect(mockMoneyAmountToDisplayCurrencyString).toHaveBeenCalledWith(
       expect.objectContaining({

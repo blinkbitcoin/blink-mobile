@@ -57,7 +57,7 @@ const CardDashboardScreenContent: React.FC = () => {
     balancePrimary,
     balanceSecondary,
     error: balanceError,
-  } = useCardBalance(card?.id)
+  } = useCardBalance({ skip: !card })
   const {
     transactions,
     loading: txLoading,

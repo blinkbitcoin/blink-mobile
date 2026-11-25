@@ -2,48 +2,32 @@ import { useCallback } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
-import {
-  CardStatus,
-  useCardBalanceQuery,
-  useCardUpdateMutation,
-} from "@app/graphql/generated"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { CardStatus, useCardUpdateMutation } from "@app/graphql/generated"
 import { getErrorMessages } from "@app/graphql/utils"
-import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { toBtcMoneyAmount } from "@app/types/amounts"
 import { toastShow } from "@app/utils/toast"
 
-import { useCardData } from "@app/hooks"
+import { useCardBalance, useCardData } from "@app/hooks"
 
 export const useCloseCardAccount = () => {
   const { LL } = useI18nContext()
-  const isAuthed = useIsAuthed()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { moneyAmountToDisplayCurrencyString } = useDisplayCurrency()
 
   const { card } = useCardData()
   const cardId = card?.id
 
   const [cardUpdateMutation, { loading }] = useCardUpdateMutation()
 
-  const { data: balanceData } = useCardBalanceQuery({
-    variables: { cardId: cardId ?? "" },
-    skip: !isAuthed || !cardId,
-    fetchPolicy: "cache-first",
-  })
-
-  const pendingSats = balanceData?.cardBalance?.pending ?? 0
-  const availableSats = balanceData?.cardBalance?.available ?? 0
+  /** The member's Card Balance: what is still available, and what unsettled payments hold. */
+  const {
+    availableSats = 0,
+    pendingSats = 0,
+    balanceSecondary: balanceDisplay,
+  } = useCardBalance({ skip: !cardId })
 
   const hasPendingTransactions = pendingSats > 0
   const hasPositiveBalance = availableSats > 0
-
-  const btcAmount = toBtcMoneyAmount(availableSats)
-  const balanceDisplay =
-    moneyAmountToDisplayCurrencyString({ moneyAmount: btcAmount, isApproximate: true }) ??
-    ""
 
   const closeCard = useCallback(async () => {
     if (!cardId || loading) {
