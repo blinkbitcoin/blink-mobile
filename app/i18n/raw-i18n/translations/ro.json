@@ -3625,19 +3625,10 @@
         "delivery": "Livrare",
         "submitRequest": "Trimite solicitarea",
         "importantInformation": "Informații importante",
+        "samePin": "Noul tău card va avea același PIN",
         "issueType": "Motiv",
         "deliveryTime": "Timp de livrare",
-        "shippingCost": "Cost de livrare",
-        "DamagedInfo": {
-          "bullet1": "Cardul tău actual va rămâne activ până când sosește cel nou",
-          "bullet2": "Noul tău card va avea un număr de card nou",
-          "bullet3": "Distruge cardul tău deteriorat când sosește cel nou"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Cardul tău a fost blocat pentru protecția ta",
-          "bullet2": "Noul tău card va avea un număr de card nou",
-          "bullet3": "Cardul tău vechi va fi anulat permanent"
-        }
+        "shippingCost": "Cost de livrare"
       },
       "Status": {
         "title": "Noul tău card este pe drum!",

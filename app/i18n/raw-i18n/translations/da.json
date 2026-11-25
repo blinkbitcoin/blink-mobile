@@ -3625,19 +3625,10 @@
         "delivery": "Levering",
         "submitRequest": "Indsend anmodning",
         "importantInformation": "Vigtig information",
+        "samePin": "Dit nye kort får den samme pinkode",
         "issueType": "Årsag",
         "deliveryTime": "Leveringstid",
-        "shippingCost": "Leveringsomkostninger",
-        "DamagedInfo": {
-          "bullet1": "Dit nuværende kort forbliver aktivt, indtil det nye ankommer",
-          "bullet2": "Dit nye kort vil have et nyt kortnummer",
-          "bullet3": "Destruér dit beskadigede kort, når det nye ankommer"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Dit kort er blevet låst for din beskyttelse",
-          "bullet2": "Dit nye kort vil have et nyt kortnummer",
-          "bullet3": "Dit gamle kort vil blive permanent annulleret"
-        }
+        "shippingCost": "Leveringsomkostninger"
       },
       "Status": {
         "title": "Dit nye kort er på vej!",

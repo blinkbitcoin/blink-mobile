@@ -3625,19 +3625,10 @@
         "delivery": "Pengiriman",
         "submitRequest": "Kirim permintaan",
         "importantInformation": "Informasi penting",
+        "samePin": "Kartu baru Anda akan memiliki PIN yang sama",
         "issueType": "Alasan",
         "deliveryTime": "Waktu pengiriman",
-        "shippingCost": "Biaya pengiriman",
-        "DamagedInfo": {
-          "bullet1": "Kartu Anda saat ini akan tetap aktif hingga kartu baru tiba",
-          "bullet2": "Kartu baru Anda akan memiliki nomor kartu baru",
-          "bullet3": "Hancurkan kartu rusak Anda saat kartu baru tiba"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Kartu Anda telah dikunci untuk perlindungan Anda",
-          "bullet2": "Kartu baru Anda akan memiliki nomor kartu baru",
-          "bullet3": "Kartu lama Anda akan dibatalkan secara permanen"
-        }
+        "shippingCost": "Biaya pengiriman"
       },
       "Status": {
         "title": "Kartu baru Anda sedang dalam perjalanan!",

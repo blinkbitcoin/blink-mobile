@@ -3625,19 +3625,10 @@
         "delivery": "Bezorging",
         "submitRequest": "Aanvraag indienen",
         "importantInformation": "Belangrijke informatie",
+        "samePin": "Je nieuwe kaart heeft dezelfde pincode",
         "issueType": "Reden",
         "deliveryTime": "Levertijd",
-        "shippingCost": "Bezorgkosten",
-        "DamagedInfo": {
-          "bullet1": "Je huidige kaart blijft actief totdat de nieuwe aankomt",
-          "bullet2": "Je nieuwe kaart krijgt een nieuw kaartnummer",
-          "bullet3": "Vernietig je beschadigde kaart wanneer de nieuwe aankomt"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Je kaart is vergrendeld voor je bescherming",
-          "bullet2": "Je nieuwe kaart krijgt een nieuw kaartnummer",
-          "bullet3": "Je oude kaart wordt permanent geannuleerd"
-        }
+        "shippingCost": "Bezorgkosten"
       },
       "Status": {
         "title": "Je nieuwe kaart is onderweg!",

@@ -3628,16 +3628,7 @@
                 "deliveryTime": "Lieferzeit",
                 "shippingCost": "Lieferkosten",
                 "importantInformation": "Wichtige Informationen",
-                "DamagedInfo": {
-                    "bullet1": "Deine aktuelle Karte bleibt aktiv, bis die neue eintrifft",
-                    "bullet2": "Deine neue Karte wird eine neue Kartennummer haben",
-                    "bullet3": "Vernichte deine beschädigte Karte, wenn die neue eintrifft"
-                },
-                "LostStolenInfo": {
-                    "bullet1": "Deine Karte wurde zu deinem Schutz gesperrt",
-                    "bullet2": "Deine neue Karte wird eine neue Kartennummer haben",
-                    "bullet3": "Deine alte Karte wird dauerhaft storniert"
-                },
+                "samePin": "Deine neue Karte hat dieselbe PIN",
                 "submitRequest": "Anfrage absenden"
             },
             "Status": {

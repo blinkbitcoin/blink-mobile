@@ -3625,19 +3625,10 @@
         "delivery": "Ukuhanjiswa",
         "submitRequest": "Ngenisa isicelo",
         "importantInformation": "Ulwazi olubalulekileyo",
+        "samePin": "Ikhadi lakho elitsha liya kuba nePIN efanayo",
         "issueType": "Isizathu",
         "deliveryTime": "Ixesha lokunikezela",
-        "shippingCost": "Iindleko zokuhanjiswa",
-        "DamagedInfo": {
-          "bullet1": "Ikhadi lakho langoku liya kuhlala lisebenza de kufike elitsha",
-          "bullet2": "Ikhadi lakho elitsha liya kuba nenombolo entsha yekhadi",
-          "bullet3": "Tshabalalisa ikhadi lakho elonakalisiweyo xa kufika elitsha"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Ikhadi lakho litshixiwe ukukhusela wena",
-          "bullet2": "Ikhadi lakho elitsha liya kuba nenombolo entsha yekhadi",
-          "bullet3": "Ikhadi lakho elidala liya kurhoxiswa ngokupheleleyo"
-        }
+        "shippingCost": "Iindleko zokuhanjiswa"
       },
       "Status": {
         "title": "Ikhadi lakho elitsha lisendleleni!",

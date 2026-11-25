@@ -12189,34 +12189,10 @@ type RootTranslation = {
 				 * I​m​p​o​r​t​a​n​t​ ​i​n​f​o​r​m​a​t​i​o​n
 				 */
 				importantInformation: string
-				DamagedInfo: {
-					/**
-					 * Y​o​u​r​ ​c​u​r​r​e​n​t​ ​c​a​r​d​ ​w​i​l​l​ ​r​e​m​a​i​n​ ​a​c​t​i​v​e​ ​u​n​t​i​l​ ​t​h​e​ ​n​e​w​ ​o​n​e​ ​a​r​r​i​v​e​s
-					 */
-					bullet1: string
-					/**
-					 * Y​o​u​r​ ​n​e​w​ ​c​a​r​d​ ​w​i​l​l​ ​h​a​v​e​ ​a​ ​n​e​w​ ​c​a​r​d​ ​n​u​m​b​e​r
-					 */
-					bullet2: string
-					/**
-					 * D​e​s​t​r​o​y​ ​y​o​u​r​ ​d​a​m​a​g​e​d​ ​c​a​r​d​ ​w​h​e​n​ ​t​h​e​ ​n​e​w​ ​o​n​e​ ​a​r​r​i​v​e​s
-					 */
-					bullet3: string
-				}
-				LostStolenInfo: {
-					/**
-					 * Y​o​u​r​ ​c​a​r​d​ ​h​a​s​ ​b​e​e​n​ ​l​o​c​k​e​d​ ​f​o​r​ ​y​o​u​r​ ​p​r​o​t​e​c​t​i​o​n
-					 */
-					bullet1: string
-					/**
-					 * Y​o​u​r​ ​n​e​w​ ​c​a​r​d​ ​w​i​l​l​ ​h​a​v​e​ ​a​ ​n​e​w​ ​c​a​r​d​ ​n​u​m​b​e​r
-					 */
-					bullet2: string
-					/**
-					 * Y​o​u​r​ ​o​l​d​ ​c​a​r​d​ ​w​i​l​l​ ​b​e​ ​p​e​r​m​a​n​e​n​t​l​y​ ​c​a​n​c​e​l​e​d
-					 */
-					bullet3: string
-				}
+				/**
+				 * Y​o​u​r​ ​n​e​w​ ​c​a​r​d​ ​w​i​l​l​ ​h​a​v​e​ ​t​h​e​ ​s​a​m​e​ ​P​I​N​ ​n​u​m​b​e​r
+				 */
+				samePin: string
 				/**
 				 * S​u​b​m​i​t​ ​r​e​q​u​e​s​t
 				 */
@@ -26675,34 +26651,10 @@ export type TranslationFunctions = {
 				 * Important information
 				 */
 				importantInformation: () => LocalizedString
-				DamagedInfo: {
-					/**
-					 * Your current card will remain active until the new one arrives
-					 */
-					bullet1: () => LocalizedString
-					/**
-					 * Your new card will have a new card number
-					 */
-					bullet2: () => LocalizedString
-					/**
-					 * Destroy your damaged card when the new one arrives
-					 */
-					bullet3: () => LocalizedString
-				}
-				LostStolenInfo: {
-					/**
-					 * Your card has been locked for your protection
-					 */
-					bullet1: () => LocalizedString
-					/**
-					 * Your new card will have a new card number
-					 */
-					bullet2: () => LocalizedString
-					/**
-					 * Your old card will be permanently canceled
-					 */
-					bullet3: () => LocalizedString
-				}
+				/**
+				 * Your new card will have the same PIN number
+				 */
+				samePin: () => LocalizedString
 				/**
 				 * Submit request
 				 */

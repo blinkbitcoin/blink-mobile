@@ -3628,16 +3628,7 @@
                 "deliveryTime": "配達時間",
                 "shippingCost": "配送料",
                 "importantInformation": "重要な情報",
-                "DamagedInfo": {
-                    "bullet1": "現在のカードは新しいカードが届くまでアクティブなままです",
-                    "bullet2": "新しいカードには新しいカード番号が付きます",
-                    "bullet3": "新しいカードが届いたら破損したカードを破棄してください"
-                },
-                "LostStolenInfo": {
-                    "bullet1": "お客様の保護のためカードがロックされました",
-                    "bullet2": "新しいカードには新しいカード番号が付きます",
-                    "bullet3": "古いカードは永久にキャンセルされます"
-                },
+                "samePin": "新しいカードのPINは変わりません",
                 "submitRequest": "リクエストを送信"
             },
             "Status": {

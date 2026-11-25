@@ -65,13 +65,11 @@ export const ConfirmStep: React.FC<ConfirmStepProps> = ({ issueType, isVirtualCa
     <>
       <InfoSection title={confirmLL.requestSummary()} items={summaryItems} />
 
+      {/* Only the PIN is known to stay (D122, D126); whether the numbers change and what
+          happens to the current card wait for the issuer's answer (P5). */}
       <InfoCard
         title={confirmLL.importantInformation()}
-        bulletItems={(() => {
-          const info =
-            issueType === Issue.Damaged ? confirmLL.DamagedInfo : confirmLL.LostStolenInfo
-          return [info.bullet1(), info.bullet2(), info.bullet3()]
-        })()}
+        bulletItems={[confirmLL.samePin()]}
         showIcon={false}
         size="lg"
       />

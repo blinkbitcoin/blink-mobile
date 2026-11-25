@@ -3625,19 +3625,10 @@
         "delivery": "Giao hàng",
         "submitRequest": "Gửi yêu cầu",
         "importantInformation": "Thông tin quan trọng",
+        "samePin": "Thẻ mới của bạn sẽ có cùng mã PIN",
         "issueType": "Lý do",
         "deliveryTime": "Thời gian giao hàng",
-        "shippingCost": "Phí giao hàng",
-        "DamagedInfo": {
-          "bullet1": "Thẻ hiện tại của bạn sẽ vẫn hoạt động cho đến khi thẻ mới đến",
-          "bullet2": "Thẻ mới của bạn sẽ có số thẻ mới",
-          "bullet3": "Hủy thẻ bị hỏng của bạn khi thẻ mới đến"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Thẻ của bạn đã được khóa để bảo vệ bạn",
-          "bullet2": "Thẻ mới của bạn sẽ có số thẻ mới",
-          "bullet3": "Thẻ cũ của bạn sẽ bị hủy vĩnh viễn"
-        }
+        "shippingCost": "Phí giao hàng"
       },
       "Status": {
         "title": "Thẻ mới của bạn đang trên đường đến!",

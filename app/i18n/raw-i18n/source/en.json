@@ -3637,16 +3637,7 @@
                 "deliveryTime": "Delivery time",
                 "shippingCost": "Shipping cost",
                 "importantInformation": "Important information",
-                "DamagedInfo": {
-                    "bullet1": "Your current card will remain active until the new one arrives",
-                    "bullet2": "Your new card will have a new card number",
-                    "bullet3": "Destroy your damaged card when the new one arrives"
-                },
-                "LostStolenInfo": {
-                    "bullet1": "Your card has been locked for your protection",
-                    "bullet2": "Your new card will have a new card number",
-                    "bullet3": "Your old card will be permanently canceled"
-                },
+                "samePin": "Your new card will have the same PIN number",
                 "submitRequest": "Submit request"
             },
             "Status": {

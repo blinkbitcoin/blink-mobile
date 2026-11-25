@@ -3625,19 +3625,10 @@
         "delivery": "Lliurament",
         "submitRequest": "Enviar sol·licitud",
         "importantInformation": "Informació important",
+        "samePin": "La teva nova targeta tindrà el mateix PIN",
         "issueType": "Motiu",
         "deliveryTime": "Temps de lliurament",
-        "shippingCost": "Cost de lliurament",
-        "DamagedInfo": {
-          "bullet1": "La teva targeta actual romandrà activa fins que arribi la nova",
-          "bullet2": "La teva nova targeta tindrà un nou número de targeta",
-          "bullet3": "Destrueix la teva targeta danyada quan arribi la nova"
-        },
-        "LostStolenInfo": {
-          "bullet1": "La teva targeta ha estat bloquejada per a la teva protecció",
-          "bullet2": "La teva nova targeta tindrà un nou número de targeta",
-          "bullet3": "La teva targeta antiga serà cancel·lada permanentment"
-        }
+        "shippingCost": "Cost de lliurament"
       },
       "Status": {
         "title": "La teva nova targeta està en camí!",

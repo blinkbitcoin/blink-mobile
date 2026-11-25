@@ -3625,19 +3625,10 @@
         "delivery": "Apachiy",
         "submitRequest": "Mañakuyta apachiy",
         "importantInformation": "Allin yuyaykuna",
+        "samePin": "Musuq tarjetaykiqa kikin PIN-niyuqmi kanqa",
         "issueType": "Imarayku",
         "deliveryTime": "Apachiy pacha",
-        "shippingCost": "Apachiy chanin",
-        "DamagedInfo": {
-          "bullet1": "Kunan tarjetayki kawsaqlla kanqa musuq chayamunankama",
-          "bullet2": "Musuq tarjetayki musuq yupayniyuq kanqa",
-          "bullet3": "Waqlisqa tarjetaykita chinkachiy musuq chayamuptin"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Tarjetayki wichqasqa karqan qamta waqaychasunaykirayku",
-          "bullet2": "Musuq tarjetayki musuq yupayniyuq kanqa",
-          "bullet3": "Ñawpa tarjetayki wiñaypaq huchusqa kanqa"
-        }
+        "shippingCost": "Apachiy chanin"
       },
       "Status": {
         "title": "Musuq tarjetayki ñanpim kachkan!",

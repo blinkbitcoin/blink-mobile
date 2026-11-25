@@ -3625,19 +3625,10 @@
         "delivery": "Teslimat",
         "submitRequest": "Talebi gönder",
         "importantInformation": "Önemli bilgiler",
+        "samePin": "Yeni kartınız aynı PIN'e sahip olacak",
         "issueType": "Neden",
         "deliveryTime": "Teslimat süresi",
-        "shippingCost": "Teslimat ücreti",
-        "DamagedInfo": {
-          "bullet1": "Mevcut kartınız yenisi gelene kadar aktif kalacak",
-          "bullet2": "Yeni kartınız yeni bir kart numarasına sahip olacak",
-          "bullet3": "Yenisi geldiğinde hasarlı kartınızı imha edin"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Kartınız korumanız için kilitlendi",
-          "bullet2": "Yeni kartınız yeni bir kart numarasına sahip olacak",
-          "bullet3": "Eski kartınız kalıcı olarak iptal edilecek"
-        }
+        "shippingCost": "Teslimat ücreti"
       },
       "Status": {
         "title": "Yeni kartınız yolda!",

@@ -3625,19 +3625,10 @@
         "delivery": "Szállítás",
         "submitRequest": "Kérelem beküldése",
         "importantInformation": "Fontos információk",
+        "samePin": "Az új kártyádnak ugyanaz lesz a PIN-kódja",
         "issueType": "Ok",
         "deliveryTime": "Szállítási idő",
-        "shippingCost": "Szállítási költség",
-        "DamagedInfo": {
-          "bullet1": "A jelenlegi kártyád aktív marad, amíg az új meg nem érkezik",
-          "bullet2": "Az új kártyád új kártyaszámot kap",
-          "bullet3": "Semmisítsd meg a sérült kártyádat, amikor megérkezik az új"
-        },
-        "LostStolenInfo": {
-          "bullet1": "A kártyádat a védelmed érdekében zároltuk",
-          "bullet2": "Az új kártyád új kártyaszámot kap",
-          "bullet3": "A régi kártyád véglegesen törlésre kerül"
-        }
+        "shippingCost": "Szállítási költség"
       },
       "Status": {
         "title": "Az új kártyád úton van!",

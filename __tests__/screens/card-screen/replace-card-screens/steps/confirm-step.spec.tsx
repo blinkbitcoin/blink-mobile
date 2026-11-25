@@ -31,17 +31,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
             deliveryTime: () => "Delivery time",
             shippingCost: () => "Shipping cost",
             importantInformation: () => "Important information",
-            DamagedInfo: {
-              bullet1: () =>
-                "Your current card will remain active until the new one arrives",
-              bullet2: () => "Your new card will have a new card number",
-              bullet3: () => "Destroy your damaged card when the new one arrives",
-            },
-            LostStolenInfo: {
-              bullet1: () => "Your card has been locked for your protection",
-              bullet2: () => "Your new card will have a new card number",
-              bullet3: () => "Your old card will be permanently canceled",
-            },
+            samePin: () => "Your new card will have the same PIN number",
           },
         },
       },
@@ -116,39 +106,6 @@ describe("ConfirmStep", () => {
       expect(getByTestId("info-item-Courier delivery")).toBeTruthy()
     })
 
-    it("displays lost/stolen bullet list", () => {
-      const { getByText } = render(<ConfirmStep issueType="lost" isVirtualCard={false} />)
-
-      expect(getByText("Important information")).toBeTruthy()
-      expect(getByText("Your card has been locked for your protection")).toBeTruthy()
-      expect(getByText("Your new card will have a new card number")).toBeTruthy()
-      expect(getByText("Your old card will be permanently canceled")).toBeTruthy()
-    })
-
-    it("displays stolen bullet list same as lost", () => {
-      const { getByText } = render(
-        <ConfirmStep issueType="stolen" isVirtualCard={false} />,
-      )
-
-      expect(getByText("Important information")).toBeTruthy()
-      expect(getByText("Your card has been locked for your protection")).toBeTruthy()
-      expect(getByText("Your new card will have a new card number")).toBeTruthy()
-      expect(getByText("Your old card will be permanently canceled")).toBeTruthy()
-    })
-
-    it("displays damaged bullet list", () => {
-      const { getByText } = render(
-        <ConfirmStep issueType="damaged" isVirtualCard={false} />,
-      )
-
-      expect(getByText("Important information")).toBeTruthy()
-      expect(
-        getByText("Your current card will remain active until the new one arrives"),
-      ).toBeTruthy()
-      expect(getByText("Your new card will have a new card number")).toBeTruthy()
-      expect(getByText("Destroy your damaged card when the new one arrives")).toBeTruthy()
-    })
-
     /** The cost row is labelled with the courier itself (D126); the replacement is
      *  free until its payment step exists. */
     it("shows the courier, its business days and its price", () => {
@@ -197,29 +154,29 @@ describe("ConfirmStep", () => {
       expect(queryByTestId("info-item-Delivery time")).toBeNull()
       expect(queryByTestId("info-item-Courier delivery")).toBeNull()
     })
+  })
 
-    it("displays lost/stolen bullet list", () => {
-      const { getByText } = render(
-        <ConfirmStep issueType="stolen" isVirtualCard={true} />,
-      )
+  /** The confirmation says only that the PIN stays (D122, D126). Whether the numbers
+   *  change and what happens to the current card wait for the issuer's answer (P5). */
+  describe("important information", () => {
+    const reasons = ["lost", "stolen", "damaged"] as const
 
-      expect(getByText("Important information")).toBeTruthy()
-      expect(getByText("Your card has been locked for your protection")).toBeTruthy()
-      expect(getByText("Your new card will have a new card number")).toBeTruthy()
-      expect(getByText("Your old card will be permanently canceled")).toBeTruthy()
+    reasons.forEach((issueType) => {
+      it(`says only that the new card keeps the PIN for a ${issueType} card`, () => {
+        const { getByText, getByTestId } = render(
+          <ConfirmStep issueType={issueType} isVirtualCard={false} />,
+        )
+
+        expect(getByText("Important information")).toBeTruthy()
+        expect(getByText("Your new card will have the same PIN number")).toBeTruthy()
+        expect(getByTestId("info-card").children).toHaveLength(2)
+      })
     })
 
-    it("displays damaged bullet list", () => {
-      const { getByText } = render(
-        <ConfirmStep issueType="damaged" isVirtualCard={true} />,
-      )
+    it("says the same for a virtual card", () => {
+      const { getByText } = render(<ConfirmStep issueType="lost" isVirtualCard={true} />)
 
-      expect(getByText("Important information")).toBeTruthy()
-      expect(
-        getByText("Your current card will remain active until the new one arrives"),
-      ).toBeTruthy()
-      expect(getByText("Your new card will have a new card number")).toBeTruthy()
-      expect(getByText("Destroy your damaged card when the new one arrives")).toBeTruthy()
+      expect(getByText("Your new card will have the same PIN number")).toBeTruthy()
     })
   })
 })

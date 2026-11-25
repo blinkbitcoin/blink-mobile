@@ -3625,19 +3625,10 @@
         "delivery": "Doručenie",
         "submitRequest": "Odoslať žiadosť",
         "importantInformation": "Dôležité informácie",
+        "samePin": "Vaša nová karta bude mať rovnaký PIN",
         "issueType": "Dôvod",
         "deliveryTime": "Čas doručenia",
-        "shippingCost": "Cena doručenia",
-        "DamagedInfo": {
-          "bullet1": "Vaša súčasná karta zostane aktívna, kým nedorazí nová",
-          "bullet2": "Vaša nová karta bude mať nové číslo karty",
-          "bullet3": "Zničte svoju poškodenú kartu, keď dorazí nová"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Vaša karta bola uzamknutá pre vašu ochranu",
-          "bullet2": "Vaša nová karta bude mať nové číslo karty",
-          "bullet3": "Vaša stará karta bude trvalo zrušená"
-        }
+        "shippingCost": "Cena doručenia"
       },
       "Status": {
         "title": "Vaša nová karta je na ceste!",

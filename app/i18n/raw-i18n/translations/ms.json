@@ -3625,19 +3625,10 @@
         "delivery": "Penghantaran",
         "submitRequest": "Hantar permintaan",
         "importantInformation": "Maklumat penting",
+        "samePin": "Kad baru anda akan mempunyai PIN yang sama",
         "issueType": "Sebab",
         "deliveryTime": "Masa penghantaran",
-        "shippingCost": "Kos penghantaran",
-        "DamagedInfo": {
-          "bullet1": "Kad semasa anda akan kekal aktif sehingga kad baru tiba",
-          "bullet2": "Kad baru anda akan mempunyai nombor kad baru",
-          "bullet3": "Musnahkan kad rosak anda apabila kad baru tiba"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Kad anda telah dikunci untuk perlindungan anda",
-          "bullet2": "Kad baru anda akan mempunyai nombor kad baru",
-          "bullet3": "Kad lama anda akan dibatalkan secara kekal"
-        }
+        "shippingCost": "Kos penghantaran"
       },
       "Status": {
         "title": "Kad baharu anda sedang dalam perjalanan!",

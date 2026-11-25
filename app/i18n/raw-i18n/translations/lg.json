@@ -3625,19 +3625,10 @@
         "delivery": "Okutwala",
         "submitRequest": "Weereza okusaba",
         "importantInformation": "Amawulire ag'omugaso",
+        "samePin": "Kaadi yo empya ejja kuba ne PIN y'emu",
         "issueType": "Ensonga",
         "deliveryTime": "Obudde bw'okutuusa",
-        "shippingCost": "Bbeeyi y'okutwala",
-        "DamagedInfo": {
-          "bullet1": "Kaadi yo ey'obukakafu ejja kusigala nga ekola okutuusa empya lw'ejja",
-          "bullet2": "Kaadi yo empya ejja kuba n'enamba empya",
-          "bullet3": "Zikiriza kaadi yo eyonoonese empya bw'ejja"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Kaadi yo ekkomeddwa okukulabirira",
-          "bullet2": "Kaadi yo empya ejja kuba n'enamba empya",
-          "bullet3": "Kaadi yo enkadde ejja kusazibwamu ddala"
-        }
+        "shippingCost": "Bbeeyi y'okutwala"
       },
       "Status": {
         "title": "Kaadi yo empya eri mu kkubo!",

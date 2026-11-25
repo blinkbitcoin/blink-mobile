@@ -3628,16 +3628,7 @@
                 "deliveryTime": "Délai de livraison",
                 "shippingCost": "Frais de livraison",
                 "importantInformation": "Informations importantes",
-                "DamagedInfo": {
-                    "bullet1": "Votre carte actuelle restera active jusqu'à l'arrivée de la nouvelle",
-                    "bullet2": "Votre nouvelle carte aura un nouveau numéro de carte",
-                    "bullet3": "Détruisez votre carte endommagée quand la nouvelle arrivera"
-                },
-                "LostStolenInfo": {
-                    "bullet1": "Votre carte a été verrouillée pour votre protection",
-                    "bullet2": "Votre nouvelle carte aura un nouveau numéro de carte",
-                    "bullet3": "Votre ancienne carte sera définitivement annulée"
-                },
+                "samePin": "Votre nouvelle carte aura le même code PIN",
                 "submitRequest": "Soumettre la demande"
             },
             "Status": {

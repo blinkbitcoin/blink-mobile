@@ -3628,16 +3628,7 @@
                 "deliveryTime": "Tempo de entrega",
                 "shippingCost": "Custo de entrega",
                 "importantInformation": "Informações importantes",
-                "DamagedInfo": {
-                    "bullet1": "O seu cartão atual permanecerá ativo até que o novo chegue",
-                    "bullet2": "O seu novo cartão terá um novo número de cartão",
-                    "bullet3": "Destrua o seu cartão danificado quando o novo chegar"
-                },
-                "LostStolenInfo": {
-                    "bullet1": "O seu cartão foi bloqueado para sua proteção",
-                    "bullet2": "O seu novo cartão terá um novo número de cartão",
-                    "bullet3": "O seu cartão antigo será cancelado permanentemente"
-                },
+                "samePin": "O seu novo cartão terá o mesmo PIN",
                 "submitRequest": "Enviar pedido"
             },
             "Status": {
