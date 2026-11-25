@@ -216,6 +216,10 @@ jest.mock("@app/config/feature-flags-context", () => {
 let mockIsAnonMode = false
 let mockIsTokenMissing = false
 
+jest.mock("@app/hooks/use-card-activation", () => ({
+  useCardActivation: () => ({ resume: jest.fn() }),
+}))
+
 jest.mock("@app/hooks/use-transfer-blocked", () => ({
   useTransferBlocked: () => mockTransferBlockedOverride,
   useTransferGated: () => mockIsAnonMode || mockTransferBlockedOverride,

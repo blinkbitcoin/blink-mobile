@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
-import { useIsFocused, useNavigation } from "@react-navigation/native"
+import { useFocusEffect, useIsFocused, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { BackendFeatureGate } from "@app/components/backend-feature-gate"
@@ -27,7 +27,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { toastShow } from "@app/utils/toast"
 
-import { useCardData, useCardBalance } from "@app/hooks"
+import { useCardActivation, useCardData, useCardBalance } from "@app/hooks"
 import { isCardFrozen, isCardUsable } from "../utils/card-display"
 
 import { useCardFreeze, useCardTransactions } from "./hooks"
@@ -67,6 +67,19 @@ const CardDashboardScreenContent: React.FC = () => {
   } = useCardTransactions(card?.id)
 
   const { handleFreeze, loading: freezeLoading } = useCardFreeze()
+  const {
+    isPending: isActivationPending,
+    isWaiting: isActivationWaiting,
+    redirect: redirectToActivation,
+  } = useCardActivation()
+
+  /** The dashboard opens once the activation is done. A member still in it, sent here by
+   *  a link or a notification, goes on to the step they are at. */
+  useFocusEffect(
+    useCallback(() => {
+      if (isActivationPending) redirectToActivation()
+    }, [isActivationPending, redirectToActivation]),
+  )
 
   const handleSettingsPress = useCallback(() => {
     navigation.navigate("cardSettingsScreen")
@@ -106,7 +119,8 @@ const CardDashboardScreenContent: React.FC = () => {
     if (!error) lastErrorRef.current = null
   }, [cardError, balanceError, LL])
 
-  if (cardLoading) {
+  const isLoading = cardLoading || isActivationWaiting || isActivationPending
+  if (isLoading) {
     return (
       <Screen preset="scroll" style={styles.screen}>
         <ActivityIndicator style={styles.loader} color={colors.accent} />
