@@ -13,6 +13,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useCardData } from "@app/hooks/use-card-data"
 import { CardTransactionDetailsFragment } from "@app/graphql/generated"
+import { toBtcMoneyAmount } from "@app/types/amounts"
 import { getCountryLabel } from "@app/utils/address-metadata"
 import { toMajorUnit } from "@app/utils/helper"
 import { toastShow } from "@app/utils/toast"
@@ -37,7 +38,7 @@ export const CardTransactionDetailsScreen: React.FC = () => {
   } = useTheme()
   const { LL, locale } = useI18nContext()
   const { feedbackEmailAddress } = useRemoteConfig()
-  const { formatCurrency } = useDisplayCurrency()
+  const { formatCurrency, formatMoneyAmount } = useDisplayCurrency()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const route = useRoute<CardTransactionDetailsScreenRouteProp>()
 
@@ -82,11 +83,12 @@ export const CardTransactionDetailsScreen: React.FC = () => {
 
   const formattedTime = timeFormatter.format(new Date(transaction.createdAt))
 
-  /** A transaction names its card by the issuer's id, which the app's cards don't carry,
-   *  so the card used is the one whose list the transaction was opened from. */
-  const cardUsed = cards?.find(({ id }) => id === cardId)
-  const cardUsedLabel = cardUsed
-    ? LL.CardFlow.TransactionDetails.cardUsedValue({ lastFour: cardUsed.lastFour })
+  /** The transaction names the card that paid by its last four. One that predates that
+   *  falls back to the card whose list it was opened from. */
+  const cardUsedLastFour =
+    transaction.cardLastFour ?? cards?.find(({ id }) => id === cardId)?.lastFour
+  const cardUsedLabel = cardUsedLastFour
+    ? LL.CardFlow.TransactionDetails.cardUsedValue({ lastFour: cardUsedLastFour })
     : UNAVAILABLE
   /** The enriched category is stored as the card network sends it, so an empty one falls
    *  back as a missing one does. */
@@ -98,6 +100,16 @@ export const CardTransactionDetailsScreen: React.FC = () => {
   const location =
     [transaction.merchantCity, merchantCountry].filter(Boolean).join(", ") || UNAVAILABLE
   const mccCode = transaction.merchantCategoryCode ?? UNAVAILABLE
+  /** blink-card sends the rate in dollars per bitcoin, and no rate without sats. */
+  const { btcRate, satsAmount } = transaction
+  const isRateKnown = typeof btcRate === "number"
+  const isSatsAmountKnown = typeof satsAmount === "number"
+  const bitcoinRate = isRateKnown
+    ? formatCurrency({ amountInMajorUnits: btcRate, currency: "USD" })
+    : UNAVAILABLE
+  const bitcoinSpent = isSatsAmountKnown
+    ? formatMoneyAmount({ moneyAmount: toBtcMoneyAmount(satsAmount) })
+    : UNAVAILABLE
 
   const supportTeam = LL.CardFlow.TransactionDetails.supportTeam()
   const helpText = LL.CardFlow.TransactionDetails.transactionHelpDescription({
@@ -163,11 +175,11 @@ export const CardTransactionDetailsScreen: React.FC = () => {
           items={[
             {
               label: LL.CardFlow.TransactionDetails.bitcoinRate(),
-              value: UNAVAILABLE,
+              value: bitcoinRate,
             },
             {
               label: LL.CardFlow.TransactionDetails.bitcoinSpent(),
-              value: UNAVAILABLE,
+              value: bitcoinSpent,
             },
             {
               label: LL.CardFlow.TransactionDetails.conversionFee(),

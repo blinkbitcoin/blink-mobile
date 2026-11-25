@@ -26,6 +26,9 @@ gql`
           status
           createdAt
           cardId
+          satsAmount
+          btcRate
+          cardLastFour
         }
       }
       pageInfo {

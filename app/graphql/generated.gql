@@ -26,6 +26,9 @@ fragment CardTransactionDetails on CardTransaction {
   merchantCountry
   status
   createdAt
+  satsAmount
+  btcRate
+  cardLastFour
   __typename
 }
 
@@ -1476,6 +1479,9 @@ query cardTransactionsPaginated($cardId: ID!, $first: Int!, $after: String) {
         status
         createdAt
         cardId
+        satsAmount
+        btcRate
+        cardLastFour
         __typename
       }
       __typename
