@@ -300,6 +300,9 @@ export type RootStackParamList = {
     iconColor?: string
     showCard?: boolean
     showAddToWallet?: boolean
+    /** The wallet button is the screen's main action, and the action above moves
+     *  under it as text while the wallet can take the card. */
+    isWalletPrimary?: boolean
     lastFour?: string
     cardId?: string
   }
