@@ -3398,6 +3398,7 @@
             "time": "時間",
             "transactionId": "ID",
             "cardUsed": "使用カード",
+            "cardUsedValue": "Visa •••• {lastFour}",
             "paymentMethod": "支払い方法",
             "merchantInformation": "加盟店情報",
             "merchant": "加盟店",

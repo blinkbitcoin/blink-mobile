@@ -3398,6 +3398,7 @@
       "time": "Vrijeme",
       "transactionId": "ID",
       "cardUsed": "Korištena kartica",
+      "cardUsedValue": "Visa •••• {lastFour}",
       "paymentMethod": "Način plaćanja",
       "merchantInformation": "Informacije o trgovcu",
       "merchant": "Trgovac",

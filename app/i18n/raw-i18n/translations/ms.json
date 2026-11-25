@@ -3398,6 +3398,7 @@
       "time": "Masa",
       "transactionId": "ID",
       "cardUsed": "Kad digunakan",
+      "cardUsedValue": "Visa •••• {lastFour}",
       "paymentMethod": "Kaedah pembayaran",
       "merchantInformation": "Maklumat peniaga",
       "merchant": "Peniaga",

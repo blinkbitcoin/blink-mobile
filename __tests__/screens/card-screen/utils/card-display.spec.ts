@@ -6,6 +6,7 @@ import {
   isCardFrozen,
   isCardUsable,
   mapTransactionStatus,
+  merchantIcon,
 } from "@app/screens/card-screen/utils/card-display"
 
 describe("card-display utils", () => {
@@ -107,6 +108,35 @@ describe("card-display utils", () => {
       expect(result).toContain("enero")
       expect(result).toContain("15")
       expect(result).toContain("2025")
+    })
+  })
+
+  describe("merchantIcon", () => {
+    it("shows the fork and knife for eating places, bars and fast food", () => {
+      expect(merchantIcon("5812")).toBe("fork-knife")
+      expect(merchantIcon("5813")).toBe("fork-knife")
+      expect(merchantIcon("5814")).toBe("fork-knife")
+    })
+
+    it("shows the car for commuter transport, taxis, rideshare and buses", () => {
+      expect(merchantIcon("4111")).toBe("car")
+      expect(merchantIcon("4121")).toBe("car")
+      expect(merchantIcon("4131")).toBe("car")
+    })
+
+    it("shows the store for codes next to those groups and for any other code", () => {
+      expect(merchantIcon("5811")).toBe("storefront")
+      expect(merchantIcon("5815")).toBe("storefront")
+      expect(merchantIcon("4110")).toBe("storefront")
+      expect(merchantIcon("4132")).toBe("storefront")
+      expect(merchantIcon("5411")).toBe("storefront")
+    })
+
+    it("shows the store without a code", () => {
+      expect(merchantIcon(undefined)).toBe("storefront")
+      expect(merchantIcon(null)).toBe("storefront")
+      expect(merchantIcon("")).toBe("storefront")
+      expect(merchantIcon("not-a-code")).toBe("storefront")
     })
   })
 })

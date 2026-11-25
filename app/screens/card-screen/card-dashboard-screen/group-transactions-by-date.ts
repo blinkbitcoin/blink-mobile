@@ -5,13 +5,14 @@ import { formatDateForTransaction } from "@app/components/transaction-date/trans
 import type { CardTransactionGroup } from "@app/components/card-screen/types"
 import { isToday, isYesterday } from "@app/utils/date"
 
-import { mapTransactionStatus } from "../utils/card-display"
+import { mapTransactionStatus, merchantIcon } from "../utils/card-display"
 
 type TransactionNode = {
   readonly id: string
   readonly amount: number
   readonly currency: string
   readonly merchantName: string
+  readonly merchantCategoryCode?: string | null
   readonly status: TransactionStatus
   readonly createdAt: string
 }
@@ -53,6 +54,7 @@ export const groupCardTransactionsByDate = ({
 
     groupMap[dateLabel].transactions.push({
       id: node.id,
+      icon: merchantIcon(node.merchantCategoryCode),
       merchantName: node.merchantName,
       timeAgo: formatDateForTransaction({
         createdAt: createdAtSeconds,

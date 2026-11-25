@@ -3398,6 +3398,7 @@
       "time": "Zhamanak",
       "transactionId": "ID",
       "cardUsed": "Ogtagortsats qart",
+      "cardUsedValue": "Visa •••• {lastFour}",
       "paymentMethod": "Vacharqi yeghanak",
       "merchantInformation": "Vacharogi teghekutyun",
       "merchant": "Vacharog",

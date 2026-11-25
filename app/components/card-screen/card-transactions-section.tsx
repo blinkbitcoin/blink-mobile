@@ -47,6 +47,7 @@ export const CardTransactionsSection: React.FC<CardTransactionsSectionProps> = (
             {group.transactions.map((tx) => (
               <CardTransactionItem
                 key={tx.id}
+                icon={tx.icon}
                 merchantName={tx.merchantName}
                 timeAgo={tx.timeAgo}
                 amount={tx.amount}

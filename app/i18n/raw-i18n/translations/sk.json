@@ -3398,6 +3398,7 @@
       "time": "Čas",
       "transactionId": "ID",
       "cardUsed": "Použitá karta",
+      "cardUsedValue": "Visa •••• {lastFour}",
       "paymentMethod": "Spôsob platby",
       "merchantInformation": "Informácie o obchodníkovi",
       "merchant": "Obchodník",

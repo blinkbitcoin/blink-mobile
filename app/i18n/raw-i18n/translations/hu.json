@@ -3398,6 +3398,7 @@
       "time": "Idő",
       "transactionId": "ID",
       "cardUsed": "Használt kártya",
+      "cardUsedValue": "Visa •••• {lastFour}",
       "paymentMethod": "Fizetési mód",
       "merchantInformation": "Kereskedő információ",
       "merchant": "Kereskedő",

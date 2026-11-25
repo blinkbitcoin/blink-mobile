@@ -19,8 +19,14 @@ fragment CardTransactionDetails on CardTransaction {
   amount
   currency
   merchantName
+  merchantCategory
+  enrichedMerchantCategory
+  merchantCategoryCode
+  merchantCity
+  merchantCountry
   status
   createdAt
+  cardId
   __typename
 }
 
@@ -1452,6 +1458,11 @@ query cardTransactionsPaginated($cardId: ID!, $first: Int!, $after: String) {
         amount
         currency
         merchantName
+        merchantCategory
+        enrichedMerchantCategory
+        merchantCategoryCode
+        merchantCity
+        merchantCountry
         status
         createdAt
         cardId

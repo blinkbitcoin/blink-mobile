@@ -3398,6 +3398,7 @@
       "time": "Thời gian",
       "transactionId": "ID",
       "cardUsed": "Thẻ sử dụng",
+      "cardUsedValue": "Visa •••• {lastFour}",
       "paymentMethod": "Phương thức thanh toán",
       "merchantInformation": "Thông tin đơn vị",
       "merchant": "Đơn vị",

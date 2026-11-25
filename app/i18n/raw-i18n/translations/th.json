@@ -3398,6 +3398,7 @@
       "time": "เวลา",
       "transactionId": "ID",
       "cardUsed": "บัตรที่ใช้",
+      "cardUsedValue": "Visa •••• {lastFour}",
       "paymentMethod": "วิธีการชำระเงิน",
       "merchantInformation": "ข้อมูลร้านค้า",
       "merchant": "ร้านค้า",

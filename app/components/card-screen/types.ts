@@ -1,3 +1,5 @@
+import { IconNamesType } from "@app/components/atomic/galoy-icon"
+
 export const CardTransactionUiStatus = {
   Pending: "pending",
   Completed: "completed",
@@ -10,6 +12,7 @@ export type CardTransactionUiStatus =
 
 export type CardTransactionDisplay = {
   id: string
+  icon: IconNamesType
   merchantName: string
   timeAgo: string
   amount: string

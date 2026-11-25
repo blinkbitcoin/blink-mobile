@@ -3398,6 +3398,7 @@
             "time": "Hora",
             "transactionId": "ID",
             "cardUsed": "Cartão usado",
+            "cardUsedValue": "Visa •••• {lastFour}",
             "paymentMethod": "Método de pagamento",
             "merchantInformation": "Informações do comerciante",
             "merchant": "Comerciante",

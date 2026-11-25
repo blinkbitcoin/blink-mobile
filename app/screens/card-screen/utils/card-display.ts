@@ -1,4 +1,5 @@
 import { CardStatus, CardType, TransactionStatus } from "@app/graphql/generated"
+import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { CardTransactionUiStatus } from "@app/components/card-screen/types"
 
 export const isCardFrozen = (status: CardStatus): boolean => status === CardStatus.Locked
@@ -38,4 +39,30 @@ export const mapTransactionStatus = (
     default:
       return CardTransactionUiStatus.Completed
   }
+}
+
+type MerchantCategoryRange = {
+  from: number
+  to: number
+  icon: IconNamesType
+}
+
+/**
+ * Merchant category codes (ISO 18245) grouped by what was bought: 5812 to 5814 are eating
+ * places, bars and fast food, and 4111 to 4131 are commuter transport, taxis, rideshare
+ * and bus lines. Any other code, or none, shows the store.
+ */
+const MERCHANT_CATEGORY_ICONS: readonly MerchantCategoryRange[] = [
+  { from: 5812, to: 5814, icon: "fork-knife" },
+  { from: 4111, to: 4131, icon: "car" },
+]
+
+const MERCHANT_ICON: IconNamesType = "storefront"
+
+export const merchantIcon = (
+  merchantCategoryCode: string | null | undefined,
+): IconNamesType => {
+  const code = Number(merchantCategoryCode)
+  const range = MERCHANT_CATEGORY_ICONS.find(({ from, to }) => code >= from && code <= to)
+  return range?.icon ?? MERCHANT_ICON
 }

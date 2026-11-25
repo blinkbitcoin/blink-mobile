@@ -3398,6 +3398,7 @@
       "time": "Tid",
       "transactionId": "ID",
       "cardUsed": "Anvendt kort",
+      "cardUsedValue": "Visa •••• {lastFour}",
       "paymentMethod": "Betalingsmetode",
       "merchantInformation": "Forhandleroplysninger",
       "merchant": "Forhandler",

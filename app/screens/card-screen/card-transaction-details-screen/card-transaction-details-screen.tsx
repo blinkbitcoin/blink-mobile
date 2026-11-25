@@ -11,10 +11,13 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { useCardData } from "@app/hooks/use-card-data"
 import { CardTransactionDetailsFragment } from "@app/graphql/generated"
+import { getCountryLabel } from "@app/utils/address-metadata"
 import { toastShow } from "@app/utils/toast"
 import { fonts } from "@app/rne-theme/fonts"
 
+import { merchantIcon } from "../utils/card-display"
 import { useCardTransaction } from "./hooks/use-card-transaction"
 
 // Temporary constant used as a placeholder for fields not yet available in Phase 2/3.
@@ -40,6 +43,7 @@ export const CardTransactionDetailsScreen: React.FC = () => {
   const { transactionId } = route.params
 
   const { transaction } = useCardTransaction(transactionId)
+  const { cards } = useCardData()
   const hasNavigatedBack = useRef(false)
 
   const timeFormatter = useMemo(
@@ -76,6 +80,19 @@ export const CardTransactionDetailsScreen: React.FC = () => {
 
   const formattedTime = timeFormatter.format(new Date(transaction.createdAt))
 
+  const cardUsed = cards?.find(({ id }) => id === transaction.cardId)
+  const cardUsedLabel = cardUsed
+    ? LL.CardFlow.TransactionDetails.cardUsedValue({ lastFour: cardUsed.lastFour })
+    : UNAVAILABLE
+  const category =
+    transaction.enrichedMerchantCategory ?? transaction.merchantCategory ?? UNAVAILABLE
+  const merchantCountry = transaction.merchantCountry
+    ? getCountryLabel(transaction.merchantCountry)
+    : undefined
+  const location =
+    [transaction.merchantCity, merchantCountry].filter(Boolean).join(", ") || UNAVAILABLE
+  const mccCode = transaction.merchantCategoryCode ?? UNAVAILABLE
+
   const supportTeam = LL.CardFlow.TransactionDetails.supportTeam()
   const helpText = LL.CardFlow.TransactionDetails.transactionHelpDescription({
     supportTeam,
@@ -104,7 +121,7 @@ export const CardTransactionDetailsScreen: React.FC = () => {
             },
             {
               label: LL.CardFlow.TransactionDetails.cardUsed(),
-              value: UNAVAILABLE,
+              value: cardUsedLabel,
             },
             {
               label: LL.CardFlow.TransactionDetails.paymentMethod(),
@@ -122,15 +139,15 @@ export const CardTransactionDetailsScreen: React.FC = () => {
             },
             {
               label: LL.CardFlow.TransactionDetails.category(),
-              value: UNAVAILABLE,
+              value: category,
             },
             {
               label: LL.CardFlow.TransactionDetails.location(),
-              value: UNAVAILABLE,
+              value: location,
             },
             {
               label: LL.CardFlow.TransactionDetails.mccCode(),
-              value: UNAVAILABLE,
+              value: mccCode,
             },
           ]}
         />
@@ -202,7 +219,11 @@ const TransactionHero: React.FC<TransactionHeroProps> = ({
   return (
     <View style={styles.heroContainer}>
       <View style={styles.iconContainer}>
-        <GaloyIcon name="storefront" size={34} color={colors.accent} />
+        <GaloyIcon
+          name={merchantIcon(transaction.merchantCategoryCode)}
+          size={34}
+          color={colors.accent}
+        />
       </View>
       <View style={styles.textContainer}>
         <Text style={styles.amount}>{formattedAmount}</Text>

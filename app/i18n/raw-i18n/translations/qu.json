@@ -3398,6 +3398,7 @@
       "time": "Pacha",
       "transactionId": "ID",
       "cardUsed": "Tarjeta llamkasqa",
+      "cardUsedValue": "Visa •••• {lastFour}",
       "paymentMethod": "Pagay ñan",
       "merchantInformation": "Ranqhaq willakuy",
       "merchant": "Ranqhaq",

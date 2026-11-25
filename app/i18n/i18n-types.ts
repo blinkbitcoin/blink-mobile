@@ -11689,6 +11689,11 @@ type RootTranslation = {
 			 */
 			cardUsed: string
 			/**
+			 * V​i​s​a​ ​•​•​•​•​ ​{​l​a​s​t​F​o​u​r​}
+			 * @param {string} lastFour
+			 */
+			cardUsedValue: RequiredParams<'lastFour'>
+			/**
 			 * P​a​y​m​e​n​t​ ​m​e​t​h​o​d
 			 */
 			paymentMethod: string
@@ -25999,6 +26004,10 @@ export type TranslationFunctions = {
 			 * Card used
 			 */
 			cardUsed: () => LocalizedString
+			/**
+			 * Visa •••• {lastFour}
+			 */
+			cardUsedValue: (arg: { lastFour: string }) => LocalizedString
 			/**
 			 * Payment method
 			 */

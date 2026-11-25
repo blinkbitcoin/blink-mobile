@@ -3398,6 +3398,7 @@
       "time": "Wakati",
       "transactionId": "ID",
       "cardUsed": "Kadi iliyotumika",
+      "cardUsedValue": "Visa •••• {lastFour}",
       "paymentMethod": "Njia ya malipo",
       "merchantInformation": "Taarifa za mfanyabiashara",
       "merchant": "Mfanyabiashara",

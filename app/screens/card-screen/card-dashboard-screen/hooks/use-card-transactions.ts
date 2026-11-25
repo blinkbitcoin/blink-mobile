@@ -18,6 +18,11 @@ gql`
           amount
           currency
           merchantName
+          merchantCategory
+          enrichedMerchantCategory
+          merchantCategoryCode
+          merchantCity
+          merchantCountry
           status
           createdAt
           cardId

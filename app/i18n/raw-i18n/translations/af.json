@@ -3398,6 +3398,7 @@
       "time": "Tyd",
       "transactionId": "ID",
       "cardUsed": "Kaart gebruik",
+      "cardUsedValue": "Visa •••• {lastFour}",
       "paymentMethod": "Betalingsmetode",
       "merchantInformation": "Handelaarinligting",
       "merchant": "Handelaar",
