@@ -3541,7 +3541,13 @@
       "importantDescription": "Vui lòng đảm bảo địa chỉ của bạn chính xác và đầy đủ.",
       "noPOBoxes": "Thẻ không thể giao đến hộp thư bưu điện",
       "signatureRequired": "Có thể yêu cầu chữ ký khi nhận hàng",
-      "supportedRegions": "Địa chỉ phải nằm trong vùng giao hàng được hỗ trợ"
+      "supportedRegions": "Địa chỉ phải nằm trong vùng giao hàng được hỗ trợ",
+      "useKycAddress": "Dùng địa chỉ KYC làm địa chỉ giao hàng",
+      "kycAddress": "Địa chỉ KYC",
+      "PrivacyTip": {
+        "title": "Mẹo về quyền riêng tư",
+        "description": "Thẻ sẽ được gửi đến địa chỉ này trong một phong bì kín đáo. Để tăng quyền riêng tư, bạn có thể gửi đến một địa chỉ khác nhà bạn."
+      }
     },
     "Delivery": {
       "courier": "Giao hàng qua đơn vị chuyển phát",
@@ -3610,9 +3616,7 @@
       },
       "Delivery": {
         "title": "Chọn tốc độ giao hàng",
-        "subtitle": "Chọn tốc độ bạn muốn nhận thẻ mới",
-        "shippingAddress": "Địa chỉ giao hàng",
-        "useRegisteredAddress": "Sử dụng địa chỉ đã đăng ký làm địa chỉ giao hàng"
+        "subtitle": "Chọn tốc độ bạn muốn nhận thẻ mới"
       },
       "Confirm": {
         "title": "Xem lại yêu cầu của bạn",
@@ -3656,8 +3660,6 @@
       "Shipping": {
         "title": "Đặt thẻ vật lý của bạn",
         "subtitle": "Nhận thẻ Blink Visa được giao đến địa chỉ của bạn.",
-        "registeredAddress": "Địa chỉ đã đăng ký",
-        "useRegisteredAddress": "Dùng địa chỉ đã đăng ký làm địa chỉ giao hàng",
         "delivery": "Giao hàng",
         "deliveryInformation": "Thông tin giao hàng",
         "bullet1": "Bạn sẽ nhận thông tin theo dõi qua email",

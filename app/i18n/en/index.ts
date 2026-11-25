@@ -3700,6 +3700,13 @@ const en: BaseTranslation = {
       noPOBoxes: "Cards cannot be delivered to P.O. boxes",
       signatureRequired: "Signature may be required upon delivery",
       supportedRegions: "Address must be within supported shipping regions",
+      useKycAddress: "Use KYC address as shipping address",
+      kycAddress: "KYC address",
+      PrivacyTip: {
+        title: "Privacy tip",
+        description:
+          "Card will be sent to this address in a discreet envelope. For increased privacy, you may want to send it to a different address than your home.",
+      },
     },
     Delivery: {
       courier: "Courier delivery",
@@ -3796,8 +3803,6 @@ const en: BaseTranslation = {
       Delivery: {
         title: "Delivery options",
         subtitle: "Choose how you'd like to receive your replacement card.",
-        shippingAddress: "Shipping address",
-        useRegisteredAddress: "Use registered address as shipping address",
       },
       Confirm: {
         title: "Confirm replacement",
@@ -3841,8 +3846,6 @@ const en: BaseTranslation = {
       Shipping: {
         title: "Order your physical card",
         subtitle: "Get your Blink Visa card delivered to your address.",
-        registeredAddress: "Registered address",
-        useRegisteredAddress: "Use registered address as shipping address",
         delivery: "Delivery",
         deliveryInformation: "Delivery information",
         bullet1: "You'll receive tracking information via email",

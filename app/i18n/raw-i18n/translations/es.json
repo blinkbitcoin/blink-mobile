@@ -3541,7 +3541,13 @@
             },
             "noPOBoxes": "No se puede entregar tarjetas a apartados postales",
             "signatureRequired": "Puede requerirse firma al momento de la entrega",
-            "supportedRegions": "La dirección debe estar dentro de las regiones de envío soportadas"
+            "supportedRegions": "La dirección debe estar dentro de las regiones de envío soportadas",
+            "useKycAddress": "Usar la dirección KYC como dirección de envío",
+            "kycAddress": "Dirección KYC",
+            "PrivacyTip": {
+                "title": "Consejo de privacidad",
+                "description": "La tarjeta se enviará a esta dirección en un sobre discreto. Para mayor privacidad, quizá quieras enviarla a una dirección distinta de tu casa."
+            }
         },
         "Delivery": {
             "courier": "Entrega por mensajería",
@@ -3611,9 +3617,7 @@
             },
             "Delivery": {
                 "title": "Elige tu velocidad de entrega",
-                "subtitle": "Selecciona qué tan rápido deseas recibir tu nueva tarjeta",
-                "shippingAddress": "Dirección de envío",
-                "useRegisteredAddress": "Usar dirección registrada como dirección de envío"
+                "subtitle": "Selecciona qué tan rápido deseas recibir tu nueva tarjeta"
             },
             "Confirm": {
                 "title": "Revisa tu solicitud",
@@ -3656,8 +3660,6 @@
             "Shipping": {
                 "title": "Pide tu tarjeta física",
                 "subtitle": "Recibe tu tarjeta Blink Visa en tu dirección.",
-                "registeredAddress": "Dirección registrada",
-                "useRegisteredAddress": "Usar la dirección registrada como dirección de envío",
                 "delivery": "Entrega",
                 "deliveryInformation": "Información de entrega",
                 "bullet1": "Recibirás la información de seguimiento por correo electrónico",

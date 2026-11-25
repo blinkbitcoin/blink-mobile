@@ -3541,7 +3541,13 @@
       "importantDescription": "Asigurați-vă că adresa dumneavoastră este corectă și completă.",
       "noPOBoxes": "Cardurile nu pot fi livrate la căsuțe poștale",
       "signatureRequired": "Semnătura poate fi necesară la livrare",
-      "supportedRegions": "Adresa trebuie să fie în regiunile de livrare acceptate"
+      "supportedRegions": "Adresa trebuie să fie în regiunile de livrare acceptate",
+      "useKycAddress": "Folosește adresa KYC ca adresă de livrare",
+      "kycAddress": "Adresa KYC",
+      "PrivacyTip": {
+        "title": "Sfat de confidențialitate",
+        "description": "Cardul va fi trimis la această adresă într-un plic discret. Pentru mai multă confidențialitate, poate vrei să-l trimiți la o altă adresă decât acasă."
+      }
     },
     "Delivery": {
       "courier": "Livrare prin curier",
@@ -3610,9 +3616,7 @@
       },
       "Delivery": {
         "title": "Alege viteza de livrare",
-        "subtitle": "Selectează cât de repede dorești să primești noul card",
-        "shippingAddress": "Adresa de expediere",
-        "useRegisteredAddress": "Folosește adresa înregistrată ca adresă de expediere"
+        "subtitle": "Selectează cât de repede dorești să primești noul card"
       },
       "Confirm": {
         "title": "Verifică solicitarea ta",
@@ -3656,8 +3660,6 @@
       "Shipping": {
         "title": "Comandă cardul tău fizic",
         "subtitle": "Primește cardul tău Blink Visa la adresa ta.",
-        "registeredAddress": "Adresă înregistrată",
-        "useRegisteredAddress": "Folosește adresa înregistrată ca adresă de livrare",
         "delivery": "Livrare",
         "deliveryInformation": "Informații de livrare",
         "bullet1": "Vei primi informații de urmărire prin e-mail",

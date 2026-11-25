@@ -49,6 +49,7 @@ jest.mock(
 )
 
 jest.mock("@app/screens/card-screen/utils", () => ({
+  ...jest.requireActual("@app/screens/card-screen/utils"),
   addressToLines: jest.requireActual<typeof import("../helpers/mock-address-utils")>(
     "../helpers/mock-address-utils",
   ).mockAddressToLines,
@@ -77,6 +78,7 @@ jest.mock("@app/screens/card-screen/card-shipping-address-screen/hooks", () => (
       postalCode: "10001",
       countryCode: "US",
     },
+    kycAddress: null,
     loading: false,
   }),
 }))
@@ -314,6 +316,23 @@ describe("ReplaceCardScreen", () => {
 
       expect(getByText("Snail mail delivery")).toBeTruthy()
       expect(getByText("Courier delivery")).toBeTruthy()
+    })
+
+    /** A new address, never the one on file, under the tip (D42, D123). */
+    it("shows the privacy tip and an empty address form", async () => {
+      const { getByText, queryByText } = render(
+        <ContextForScreen>
+          <ReplaceCardScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      await advanceToStep2(getByText)
+
+      expect(getByText("Privacy tip")).toBeTruthy()
+      expect(getByText("Address line 1")).toBeTruthy()
+      expect(queryByText("123 Main Street")).toBeNull()
     })
   })
 

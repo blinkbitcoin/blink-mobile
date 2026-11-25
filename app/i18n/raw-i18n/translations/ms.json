@@ -3541,7 +3541,13 @@
       "importantDescription": "Sila pastikan alamat anda tepat dan lengkap.",
       "noPOBoxes": "Kad tidak boleh dihantar ke peti surat",
       "signatureRequired": "Tandatangan mungkin diperlukan semasa penghantaran",
-      "supportedRegions": "Alamat mesti berada dalam kawasan penghantaran yang disokong"
+      "supportedRegions": "Alamat mesti berada dalam kawasan penghantaran yang disokong",
+      "useKycAddress": "Gunakan alamat KYC sebagai alamat penghantaran",
+      "kycAddress": "Alamat KYC",
+      "PrivacyTip": {
+        "title": "Petua privasi",
+        "description": "Kad akan dihantar ke alamat ini dalam sampul yang tidak menarik perhatian. Untuk privasi yang lebih baik, anda mungkin mahu menghantarnya ke alamat selain rumah anda."
+      }
     },
     "Delivery": {
       "courier": "Penghantaran kurier",
@@ -3610,9 +3616,7 @@
       },
       "Delivery": {
         "title": "Pilih kelajuan penghantaran anda",
-        "subtitle": "Pilih berapa cepat anda ingin menerima kad baharu",
-        "shippingAddress": "Alamat penghantaran",
-        "useRegisteredAddress": "Gunakan alamat berdaftar sebagai alamat penghantaran"
+        "subtitle": "Pilih berapa cepat anda ingin menerima kad baharu"
       },
       "Confirm": {
         "title": "Semak permintaan anda",
@@ -3656,8 +3660,6 @@
       "Shipping": {
         "title": "Pesan kad fizikal anda",
         "subtitle": "Dapatkan kad Blink Visa anda dihantar ke alamat anda.",
-        "registeredAddress": "Alamat berdaftar",
-        "useRegisteredAddress": "Gunakan alamat berdaftar sebagai alamat penghantaran",
         "delivery": "Penghantaran",
         "deliveryInformation": "Maklumat penghantaran",
         "bullet1": "Anda akan menerima maklumat penjejakan melalui e-mel",

@@ -13,7 +13,6 @@ import { toastShow } from "@app/utils/toast"
 import { useCardData } from "@app/hooks"
 import { useShippingAddressData } from "../card-shipping-address-screen/hooks"
 import { SteppedCardLayout } from "../stepped-card-layout"
-import { EMPTY_ADDRESS } from "../types"
 import { ReportIssueStep, DeliveryStep, ConfirmStep, Issue } from "./steps"
 import {
   useLockCard,
@@ -44,7 +43,7 @@ export const ReplaceCardScreen: React.FC = () => {
   const { cardId } = route.params
 
   const { card, loading: cardLoading } = useCardData()
-  const { initialAddress, loading: addressLoading } = useShippingAddressData()
+  const { initialAddress, kycAddress, loading: addressLoading } = useShippingAddressData()
   const { replaceCard, loading: replaceLoading } = useReplaceCard()
   const { lockCard, loading: lockLoading } = useLockCard()
 
@@ -57,7 +56,7 @@ export const ReplaceCardScreen: React.FC = () => {
     state,
     setSelectedIssue,
     setSelectedDelivery,
-    toggleUseRegisteredAddress,
+    toggleUseKycAddress,
     setCustomAddress,
     goToNextStep,
     completeFlow,
@@ -71,11 +70,6 @@ export const ReplaceCardScreen: React.FC = () => {
     }
     return stepOrder.map((step) => labelMap[step])
   }, [LL, stepOrder])
-
-  const registeredAddress = useMemo(
-    () => initialAddress ?? EMPTY_ADDRESS,
-    [initialAddress],
-  )
 
   const handleReportIssueContinue = useCallback(async () => {
     if (!state.selectedIssue) return
@@ -184,10 +178,9 @@ export const ReplaceCardScreen: React.FC = () => {
           <DeliveryStep
             selectedDelivery={state.selectedDelivery}
             onSelectDelivery={setSelectedDelivery}
-            hasRegisteredAddress={initialAddress !== null}
-            registeredAddress={registeredAddress}
-            useRegisteredAddress={state.useRegisteredAddress}
-            onToggleUseRegisteredAddress={toggleUseRegisteredAddress}
+            kycAddress={kycAddress}
+            useKycAddress={state.useKycAddress}
+            onToggleUseKycAddress={toggleUseKycAddress}
             customAddress={state.customAddress}
             onCustomAddressChange={setCustomAddress}
           />
@@ -203,9 +196,8 @@ export const ReplaceCardScreen: React.FC = () => {
     state,
     setSelectedIssue,
     setSelectedDelivery,
-    initialAddress,
-    registeredAddress,
-    toggleUseRegisteredAddress,
+    kycAddress,
+    toggleUseKycAddress,
     setCustomAddress,
     isVirtualCard,
   ])

@@ -3541,7 +3541,13 @@
             },
             "noPOBoxes": "Karten können nicht an Postfächer geliefert werden",
             "signatureRequired": "Bei der Zustellung kann eine Unterschrift erforderlich sein",
-            "supportedRegions": "Die Adresse muss innerhalb der unterstützten Versandregionen liegen"
+            "supportedRegions": "Die Adresse muss innerhalb der unterstützten Versandregionen liegen",
+            "useKycAddress": "KYC-Adresse als Lieferadresse verwenden",
+            "kycAddress": "KYC-Adresse",
+            "PrivacyTip": {
+                "title": "Datenschutz-Tipp",
+                "description": "Die Karte wird in einem neutralen Umschlag an diese Adresse geschickt. Für mehr Privatsphäre können Sie sie an eine andere Adresse als Ihre Wohnadresse senden lassen."
+            }
         },
         "Delivery": {
             "courier": "Kurierzustellung",
@@ -3611,9 +3617,7 @@
             },
             "Delivery": {
                 "title": "Wählen Sie Ihre Liefergeschwindigkeit",
-                "subtitle": "Wählen Sie, wie schnell Sie Ihre neue Karte erhalten möchten",
-                "shippingAddress": "Lieferadresse",
-                "useRegisteredAddress": "Registrierte Adresse als Lieferadresse verwenden"
+                "subtitle": "Wählen Sie, wie schnell Sie Ihre neue Karte erhalten möchten"
             },
             "Confirm": {
                 "title": "Überprüfen Sie Ihre Anfrage",
@@ -3656,8 +3660,6 @@
             "Shipping": {
                 "title": "Bestellen Sie Ihre physische Karte",
                 "subtitle": "Lassen Sie sich Ihre Blink Visa Karte an Ihre Adresse liefern.",
-                "registeredAddress": "Registrierte Adresse",
-                "useRegisteredAddress": "Registrierte Adresse als Lieferadresse verwenden",
                 "delivery": "Lieferung",
                 "deliveryInformation": "Lieferinformationen",
                 "bullet1": "Sie erhalten Tracking-Informationen per E-Mail",

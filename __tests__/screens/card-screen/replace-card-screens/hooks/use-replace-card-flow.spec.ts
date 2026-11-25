@@ -24,16 +24,14 @@ const mockAddress: ShippingAddress = {
   countryCode: "US",
 }
 
-const emptyAddress: ShippingAddress = {
-  firstName: "",
-  lastName: "",
-  line1: "",
-  line2: "",
-  city: "",
-  region: "",
-  postalCode: "",
-  countryCode: "",
-}
+jest.mock("@app/utils/address-metadata", () => ({
+  getRegionsByCountry: () => [{ value: "AL", label: "Alabama" }],
+}))
+
+jest.mock("@app/hooks/use-device-location", () => ({
+  __esModule: true,
+  default: () => ({ countryCode: "US", loading: false }),
+}))
 
 const renderPhysicalFlow = () =>
   renderHook(() =>
@@ -89,32 +87,27 @@ describe("useReplaceCardFlow", () => {
       expect(result.current.state.selectedDelivery).toBe("courier")
     })
 
-    it("has useRegisteredAddress as true when initialAddress exists", () => {
+    /** The KYC address is a choice, unticked by default (D42, D123). */
+    it("starts without the KYC address chosen", () => {
       const { result } = renderPhysicalFlow()
 
-      expect(result.current.state.useRegisteredAddress).toBe(true)
+      expect(result.current.state.useKycAddress).toBe(false)
     })
 
-    it("has useRegisteredAddress as false when initialAddress is null", () => {
-      const { result } = renderHook(() =>
-        useReplaceCardFlow({ isVirtualCard: false, initialAddress: null }),
-      )
-
-      expect(result.current.state.useRegisteredAddress).toBe(false)
-    })
-
-    it("uses initialAddress for customAddress", () => {
+    /** A new address, never the one on file: only the cardholder's name carries over. */
+    it("starts the address form with the cardholder's name and empty lines", () => {
       const { result } = renderPhysicalFlow()
 
-      expect(result.current.state.customAddress).toEqual(mockAddress)
-    })
-
-    it("uses empty address when initialAddress is null", () => {
-      const { result } = renderHook(() =>
-        useReplaceCardFlow({ isVirtualCard: false, initialAddress: null }),
-      )
-
-      expect(result.current.state.customAddress).toEqual(emptyAddress)
+      expect(result.current.state.customAddress).toEqual({
+        firstName: "Satoshi",
+        lastName: "Nakamoto",
+        line1: "",
+        line2: "",
+        city: "",
+        region: "AL",
+        postalCode: "",
+        countryCode: "US",
+      })
     })
   })
 
@@ -162,29 +155,19 @@ describe("useReplaceCardFlow", () => {
     })
   })
 
-  describe("toggleUseRegisteredAddress", () => {
-    it("toggles from true to false", () => {
+  describe("toggleUseKycAddress", () => {
+    it("chooses the KYC address, then lets it go", () => {
       const { result } = renderPhysicalFlow()
 
       act(() => {
-        result.current.toggleUseRegisteredAddress()
+        result.current.toggleUseKycAddress()
       })
-
-      expect(result.current.state.useRegisteredAddress).toBe(false)
-    })
-
-    it("toggles back to true", () => {
-      const { result } = renderPhysicalFlow()
+      expect(result.current.state.useKycAddress).toBe(true)
 
       act(() => {
-        result.current.toggleUseRegisteredAddress()
+        result.current.toggleUseKycAddress()
       })
-
-      act(() => {
-        result.current.toggleUseRegisteredAddress()
-      })
-
-      expect(result.current.state.useRegisteredAddress).toBe(true)
+      expect(result.current.state.useKycAddress).toBe(false)
     })
   })
 

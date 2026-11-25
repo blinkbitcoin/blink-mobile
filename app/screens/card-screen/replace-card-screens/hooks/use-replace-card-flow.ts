@@ -3,12 +3,8 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import {
-  Delivery,
-  DeliveryType,
-  EMPTY_ADDRESS,
-  ShippingAddress,
-} from "@app/screens/card-screen/types"
+import { useShippingAddressDraft } from "@app/screens/card-screen/hooks/use-shipping-address-draft"
+import { Delivery, DeliveryType, ShippingAddress } from "@app/screens/card-screen/types"
 
 import { IssueType } from "../steps/types"
 
@@ -26,7 +22,7 @@ const VIRTUAL_STEPS: StepName[] = [Step.ReportIssue, Step.Confirm]
 type FlowState = {
   selectedIssue: IssueType | null
   selectedDelivery: DeliveryType
-  useRegisteredAddress: boolean
+  useKycAddress: boolean
   customAddress: ShippingAddress
 }
 
@@ -43,7 +39,7 @@ type UseReplaceCardFlowReturn = {
   state: FlowState
   setSelectedIssue: (issue: IssueType) => void
   setSelectedDelivery: (delivery: DeliveryType) => void
-  toggleUseRegisteredAddress: () => void
+  toggleUseKycAddress: () => void
   setCustomAddress: (address: ShippingAddress) => void
   goToNextStep: () => void
   completeFlow: () => void
@@ -64,12 +60,9 @@ export const useReplaceCardFlow = ({
   const [selectedIssue, setSelectedIssue] = useState<IssueType | null>(null)
   /** The courier is the only delivery offered, so it starts chosen. */
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryType>(Delivery.Courier)
-  const [useRegisteredAddress, setUseRegisteredAddress] = useState(
-    initialAddress !== null,
-  )
-  const [customAddress, setCustomAddress] = useState<ShippingAddress>(
-    initialAddress ?? EMPTY_ADDRESS,
-  )
+  /** Unticked by default: the KYC address is a choice, never the default (D42, D123). */
+  const [useKycAddress, setUseKycAddress] = useState(false)
+  const [customAddress, setCustomAddress] = useShippingAddressDraft(initialAddress)
   const isCompleteRef = useRef(false)
 
   const currentStep = stepOrder[currentStepIndex]
@@ -86,8 +79,8 @@ export const useReplaceCardFlow = ({
     return true
   }, [currentStepIndex])
 
-  const toggleUseRegisteredAddress = useCallback(() => {
-    setUseRegisteredAddress((prev) => !prev)
+  const toggleUseKycAddress = useCallback(() => {
+    setUseKycAddress((prev) => !prev)
   }, [])
 
   const completeFlow = useCallback(() => {
@@ -112,12 +105,12 @@ export const useReplaceCardFlow = ({
     state: {
       selectedIssue,
       selectedDelivery,
-      useRegisteredAddress,
+      useKycAddress,
       customAddress,
     },
     setSelectedIssue,
     setSelectedDelivery,
-    toggleUseRegisteredAddress,
+    toggleUseKycAddress,
     setCustomAddress,
     goToNextStep,
     completeFlow,

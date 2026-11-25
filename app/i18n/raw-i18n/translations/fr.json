@@ -3541,7 +3541,13 @@
             },
             "noPOBoxes": "Les cartes ne peuvent pas être livrées aux boîtes postales",
             "signatureRequired": "Une signature peut être requise à la livraison",
-            "supportedRegions": "L'adresse doit être dans les régions de livraison prises en charge"
+            "supportedRegions": "L'adresse doit être dans les régions de livraison prises en charge",
+            "useKycAddress": "Utiliser l'adresse KYC comme adresse de livraison",
+            "kycAddress": "Adresse KYC",
+            "PrivacyTip": {
+                "title": "Conseil de confidentialité",
+                "description": "La carte sera envoyée à cette adresse dans une enveloppe discrète. Pour plus de confidentialité, vous pouvez l'envoyer à une autre adresse que votre domicile."
+            }
         },
         "Delivery": {
             "courier": "Livraison par coursier",
@@ -3611,9 +3617,7 @@
             },
             "Delivery": {
                 "title": "Choisissez votre vitesse de livraison",
-                "subtitle": "Sélectionnez la rapidité avec laquelle vous souhaitez recevoir votre nouvelle carte",
-                "shippingAddress": "Adresse de livraison",
-                "useRegisteredAddress": "Utiliser l'adresse enregistrée comme adresse de livraison"
+                "subtitle": "Sélectionnez la rapidité avec laquelle vous souhaitez recevoir votre nouvelle carte"
             },
             "Confirm": {
                 "title": "Vérifiez votre demande",
@@ -3656,8 +3660,6 @@
             "Shipping": {
                 "title": "Commandez votre carte physique",
                 "subtitle": "Recevez votre carte Blink Visa à votre adresse.",
-                "registeredAddress": "Adresse enregistrée",
-                "useRegisteredAddress": "Utiliser l'adresse enregistrée comme adresse de livraison",
                 "delivery": "Livraison",
                 "deliveryInformation": "Informations de livraison",
                 "bullet1": "Vous recevrez les informations de suivi par e-mail",

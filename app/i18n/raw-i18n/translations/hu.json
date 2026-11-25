@@ -3541,7 +3541,13 @@
       "importantDescription": "Kérjük, győződjön meg róla, hogy címe pontos és teljes.",
       "noPOBoxes": "A kártyák nem kézbesíthetők postafiókokba",
       "signatureRequired": "Aláírás szükséges lehet a kézbesítéskor",
-      "supportedRegions": "A címnek a támogatott szállítási régiókban kell lennie"
+      "supportedRegions": "A címnek a támogatott szállítási régiókban kell lennie",
+      "useKycAddress": "A KYC-cím használata szállítási címként",
+      "kycAddress": "KYC-cím",
+      "PrivacyTip": {
+        "title": "Adatvédelmi tipp",
+        "description": "A kártyát diszkrét borítékban küldjük erre a címre. A nagyobb adatvédelem érdekében érdemes lehet az otthonától eltérő címre kérnie."
+      }
     },
     "Delivery": {
       "courier": "Futárszolgálat",
@@ -3610,9 +3616,7 @@
       },
       "Delivery": {
         "title": "Válassza ki a szállítási sebességet",
-        "subtitle": "Válassza ki, milyen gyorsan szeretné megkapni az új kártyát",
-        "shippingAddress": "Szállítási cím",
-        "useRegisteredAddress": "Regisztrált cím használata szállítási címként"
+        "subtitle": "Válassza ki, milyen gyorsan szeretné megkapni az új kártyát"
       },
       "Confirm": {
         "title": "Ellenőrizze a kérelmét",
@@ -3656,8 +3660,6 @@
       "Shipping": {
         "title": "Rendelje meg fizikai kártyáját",
         "subtitle": "Kérje Blink Visa kártyájának kézbesítését a címére.",
-        "registeredAddress": "Regisztrált cím",
-        "useRegisteredAddress": "A regisztrált cím használata szállítási címként",
         "delivery": "Kézbesítés",
         "deliveryInformation": "Kézbesítési információk",
         "bullet1": "A nyomkövetési információkat e-mailben kapja meg",

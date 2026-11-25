@@ -4,34 +4,31 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import {
   InfoCard,
-  MultiLineField,
   OptionRow,
+  PrivacyTipCard,
   ShippingAddressForm,
 } from "@app/components/card-screen"
 import { radius } from "@app/rne-theme/radius"
-import { CheckboxRow } from "@app/components/checkbox-row"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useCourierDelivery } from "@app/screens/card-screen/hooks"
+import { KycAddressChoice } from "@app/screens/card-screen/kyc-address-choice"
 import { ShippingAddress } from "@app/screens/card-screen/types"
-import { addressToLines } from "@app/screens/card-screen/utils"
 
 import { useSharedStepStyles } from "./shared-styles"
 
 type ShippingStepProps = {
-  hasRegisteredAddress: boolean
-  registeredAddress: ShippingAddress
-  useRegisteredAddress: boolean
-  onToggleUseRegisteredAddress: () => void
+  kycAddress: ShippingAddress | null
+  useKycAddress: boolean
+  onToggleUseKycAddress: () => void
   customAddress: ShippingAddress
   onCustomAddressChange: (address: ShippingAddress) => void
   onFormValidityChange?: (isValid: boolean) => void
 }
 
 export const ShippingStep: React.FC<ShippingStepProps> = ({
-  hasRegisteredAddress,
-  registeredAddress,
-  useRegisteredAddress,
-  onToggleUseRegisteredAddress,
+  kycAddress,
+  useKycAddress,
+  onToggleUseKycAddress,
   customAddress,
   onCustomAddressChange,
   onFormValidityChange,
@@ -48,45 +45,29 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
 
   return (
     <>
-      {hasRegisteredAddress && useRegisteredAddress && (
-        <View style={sharedStyles.section}>
-          <Text style={sharedStyles.sectionTitle}>{shippingLL.registeredAddress()}</Text>
-          <MultiLineField
-            lines={addressToLines(registeredAddress, false)}
-            leftIcon="map-pin"
-          />
-        </View>
-      )}
+      <PrivacyTipCard />
 
-      <View style={localStyles.checkboxFormGroup}>
-        {hasRegisteredAddress && (
-          <CheckboxRow
-            label={shippingLL.useRegisteredAddress()}
-            isChecked={useRegisteredAddress}
-            onPress={onToggleUseRegisteredAddress}
-          />
-        )}
-
-        {!useRegisteredAddress && (
-          <>
-            <ShippingAddressForm
-              address={customAddress}
-              onAddressChange={onCustomAddressChange}
-              onValidityChange={onFormValidityChange}
-            />
-            <InfoCard
-              title={LL.CardFlow.ShippingAddress.important()}
-              description={LL.CardFlow.ShippingAddress.importantDescription()}
-              bulletItems={[
-                LL.CardFlow.ShippingAddress.noPOBoxes(),
-                LL.CardFlow.ShippingAddress.signatureRequired(),
-                LL.CardFlow.ShippingAddress.supportedRegions(),
-              ]}
-              size="lg"
-            />
-          </>
-        )}
-      </View>
+      <KycAddressChoice
+        kycAddress={kycAddress}
+        isKycAddressUsed={useKycAddress}
+        onToggle={onToggleUseKycAddress}
+      >
+        <ShippingAddressForm
+          address={customAddress}
+          onAddressChange={onCustomAddressChange}
+          onValidityChange={onFormValidityChange}
+        />
+        <InfoCard
+          title={LL.CardFlow.ShippingAddress.important()}
+          description={LL.CardFlow.ShippingAddress.importantDescription()}
+          bulletItems={[
+            LL.CardFlow.ShippingAddress.noPOBoxes(),
+            LL.CardFlow.ShippingAddress.signatureRequired(),
+            LL.CardFlow.ShippingAddress.supportedRegions(),
+          ]}
+          size="lg"
+        />
+      </KycAddressChoice>
 
       <View style={sharedStyles.section}>
         <Text style={sharedStyles.sectionTitle}>{shippingLL.delivery()}</Text>
@@ -130,9 +111,6 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
 }
 
 const useLocalStyles = makeStyles(() => ({
-  checkboxFormGroup: {
-    gap: 17,
-  },
   deliveryCard: {
     borderRadius: radius.default,
     overflow: "hidden",

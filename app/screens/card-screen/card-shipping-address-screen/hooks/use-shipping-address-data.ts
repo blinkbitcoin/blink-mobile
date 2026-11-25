@@ -3,6 +3,7 @@ import { useEffect, useMemo } from "react"
 import { usePersonalDetailsQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { ShippingAddress } from "@app/screens/card-screen/types"
 import { toastShow } from "@app/utils/toast"
 
 export const useShippingAddressData = () => {
@@ -42,5 +43,9 @@ export const useShippingAddressData = () => {
 
   const phone = data?.me?.phone ?? ""
 
-  return { initialAddress, phone, loading }
+  /** The API does not return the KYC address yet (blink-wip#2279), so the order and
+   *  the replacement have no KYC address to offer until it does. */
+  const kycAddress: ShippingAddress | null = null
+
+  return { initialAddress, kycAddress, phone, loading }
 }

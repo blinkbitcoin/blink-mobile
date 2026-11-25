@@ -3541,7 +3541,13 @@
             },
             "noPOBoxes": "Le carte non possono essere consegnate alle caselle postali",
             "signatureRequired": "Potrebbe essere richiesta la firma alla consegna",
-            "supportedRegions": "L'indirizzo deve essere all'interno delle regioni di spedizione supportate"
+            "supportedRegions": "L'indirizzo deve essere all'interno delle regioni di spedizione supportate",
+            "useKycAddress": "Usa l'indirizzo KYC come indirizzo di spedizione",
+            "kycAddress": "Indirizzo KYC",
+            "PrivacyTip": {
+                "title": "Consiglio sulla privacy",
+                "description": "La carta verrà spedita a questo indirizzo in una busta anonima. Per una maggiore privacy, puoi farla spedire a un indirizzo diverso da casa tua."
+            }
         },
         "Delivery": {
             "courier": "Consegna tramite corriere",
@@ -3611,9 +3617,7 @@
             },
             "Delivery": {
                 "title": "Scegli la velocità di consegna",
-                "subtitle": "Seleziona quanto velocemente desideri ricevere la tua nuova carta",
-                "shippingAddress": "Indirizzo di spedizione",
-                "useRegisteredAddress": "Usa l'indirizzo registrato come indirizzo di spedizione"
+                "subtitle": "Seleziona quanto velocemente desideri ricevere la tua nuova carta"
             },
             "Confirm": {
                 "title": "Rivedi la tua richiesta",
@@ -3656,8 +3660,6 @@
             "Shipping": {
                 "title": "Ordina la tua carta fisica",
                 "subtitle": "Ricevi la tua carta Blink Visa al tuo indirizzo.",
-                "registeredAddress": "Indirizzo registrato",
-                "useRegisteredAddress": "Usa l'indirizzo registrato come indirizzo di spedizione",
                 "delivery": "Consegna",
                 "deliveryInformation": "Informazioni sulla consegna",
                 "bullet1": "Riceverai le informazioni di tracciamento via email",

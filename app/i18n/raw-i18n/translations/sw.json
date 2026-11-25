@@ -3541,7 +3541,13 @@
       "importantDescription": "Tafadhali hakikisha anwani yako ni sahihi na kamili.",
       "noPOBoxes": "Kadi haziwezi kupelekwa kwa sanduku la posta",
       "signatureRequired": "Sahihi inaweza kuhitajika wakati wa utoaji",
-      "supportedRegions": "Anwani lazima iwe ndani ya maeneo yanayoungwa mkono ya usafirishaji"
+      "supportedRegions": "Anwani lazima iwe ndani ya maeneo yanayoungwa mkono ya usafirishaji",
+      "useKycAddress": "Tumia anwani ya KYC kama anwani ya usafirishaji",
+      "kycAddress": "Anwani ya KYC",
+      "PrivacyTip": {
+        "title": "Kidokezo cha faragha",
+        "description": "Kadi itatumwa kwa anwani hii ndani ya bahasha isiyovutia macho. Kwa faragha zaidi, unaweza kuituma kwa anwani tofauti na nyumbani kwako."
+      }
     },
     "Delivery": {
       "courier": "Usafirishaji kwa mjumbe",
@@ -3610,9 +3616,7 @@
       },
       "Delivery": {
         "title": "Chagua kasi ya utoaji",
-        "subtitle": "Chagua haraka gani unataka kupokea kadi yako mpya",
-        "shippingAddress": "Anwani ya usafirishaji",
-        "useRegisteredAddress": "Tumia anwani iliyosajiliwa kama anwani ya usafirishaji"
+        "subtitle": "Chagua haraka gani unataka kupokea kadi yako mpya"
       },
       "Confirm": {
         "title": "Kagua ombi lako",
@@ -3656,8 +3660,6 @@
       "Shipping": {
         "title": "Agiza kadi yako ya kimwili",
         "subtitle": "Pokea kadi yako ya Blink Visa ikipelekwa kwenye anwani yako.",
-        "registeredAddress": "Anwani iliyosajiliwa",
-        "useRegisteredAddress": "Tumia anwani iliyosajiliwa kama anwani ya usafirishaji",
         "delivery": "Uwasilishaji",
         "deliveryInformation": "Taarifa za uwasilishaji",
         "bullet1": "Utapokea taarifa za ufuatiliaji kwa barua pepe",

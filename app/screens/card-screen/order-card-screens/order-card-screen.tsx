@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
@@ -12,7 +12,7 @@ import { toastShow } from "@app/utils/toast"
 import { useCardData } from "@app/hooks"
 import { useShippingAddressData } from "../card-shipping-address-screen/hooks"
 import { SteppedCardLayout } from "../stepped-card-layout"
-import { EMPTY_ADDRESS, ShippingAddress } from "../types"
+import { ShippingAddress } from "../types"
 import { ShippingStep, ConfirmStep } from "./steps"
 import { useCreateCard, useOrderCardFlow, Step } from "./hooks"
 
@@ -48,7 +48,12 @@ export const OrderCardScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { applicationId, loading: cardLoading, error: cardError } = useCardData()
-  const { initialAddress, phone, loading: addressLoading } = useShippingAddressData()
+  const {
+    initialAddress,
+    kycAddress,
+    phone,
+    loading: addressLoading,
+  } = useShippingAddressData()
   const { createCard, loading: createLoading } = useCreateCard()
   const [isFormValid, setIsFormValid] = useState(false)
   const hasHandledErrorRef = useRef(false)
@@ -77,7 +82,7 @@ export const OrderCardScreen: React.FC = () => {
   const {
     step,
     state,
-    toggleUseRegisteredAddress,
+    toggleUseKycAddress,
     setCustomAddress,
     goToNextStep,
     completeFlow,
@@ -88,18 +93,15 @@ export const OrderCardScreen: React.FC = () => {
     LL.CardFlow.OrderPhysicalCard.steps.confirm(),
   ]
 
-  const registeredAddress = useMemo(
-    () => initialAddress ?? EMPTY_ADDRESS,
-    [initialAddress],
-  )
+  const chosenKycAddress = state.useKycAddress ? kycAddress : null
+  const shippingAddress = chosenKycAddress ?? state.customAddress
 
   const handleSubmit = useCallback(async () => {
     if (!applicationId) return
 
-    const address = state.useRegisteredAddress ? registeredAddress : state.customAddress
     const result = await createCard({
       applicationId,
-      shippingAddress: mapToShippingInput(address, phone),
+      shippingAddress: mapToShippingInput(shippingAddress, phone),
     })
     if (!result) return
 
@@ -117,9 +119,7 @@ export const OrderCardScreen: React.FC = () => {
     })
   }, [
     applicationId,
-    state.useRegisteredAddress,
-    state.customAddress,
-    registeredAddress,
+    shippingAddress,
     phone,
     createCard,
     completeFlow,
@@ -127,6 +127,9 @@ export const OrderCardScreen: React.FC = () => {
     LL,
     colors.success,
   ])
+
+  /** The form has to be complete unless the KYC address is the one chosen. */
+  const isShippingIncomplete = chosenKycAddress === null && !isFormValid
 
   const getStepConfig = (): StepConfig => {
     switch (step) {
@@ -138,7 +141,7 @@ export const OrderCardScreen: React.FC = () => {
           subtitle: LL.CardFlow.OrderPhysicalCard.Shipping.subtitle(),
           buttonLabel: LL.common.continue(),
           onButtonPress: goToNextStep,
-          isButtonDisabled: !state.useRegisteredAddress && !isFormValid,
+          isButtonDisabled: isShippingIncomplete,
         }
       case Step.Confirm:
         return {
@@ -162,23 +165,16 @@ export const OrderCardScreen: React.FC = () => {
       case Step.Shipping:
         return (
           <ShippingStep
-            hasRegisteredAddress={initialAddress !== null}
-            registeredAddress={registeredAddress}
-            useRegisteredAddress={state.useRegisteredAddress}
-            onToggleUseRegisteredAddress={toggleUseRegisteredAddress}
+            kycAddress={kycAddress}
+            useKycAddress={state.useKycAddress}
+            onToggleUseKycAddress={toggleUseKycAddress}
             customAddress={state.customAddress}
             onCustomAddressChange={setCustomAddress}
             onFormValidityChange={setIsFormValid}
           />
         )
       case Step.Confirm:
-        return (
-          <ConfirmStep
-            shippingAddress={
-              state.useRegisteredAddress ? registeredAddress : state.customAddress
-            }
-          />
-        )
+        return <ConfirmStep shippingAddress={shippingAddress} />
       default: {
         const _exhaustive: never = step
         throw new Error(`Unknown step: ${_exhaustive}`)

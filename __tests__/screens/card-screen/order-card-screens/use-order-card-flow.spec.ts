@@ -58,36 +58,24 @@ describe("useOrderCardFlow", () => {
       expect(result.current.step).toBe(Step.Shipping)
     })
 
-    it("has useRegisteredAddress as true when address exists", () => {
+    /** The KYC address is a choice, unticked by default (D42, D123). */
+    it("starts without the KYC address chosen", () => {
       const { result } = renderHook(() =>
         useOrderCardFlow({ initialAddress: mockAddress }),
       )
 
-      expect(result.current.state.useRegisteredAddress).toBe(true)
+      expect(result.current.state.useKycAddress).toBe(false)
     })
 
-    it("has customAddress from initial address", () => {
+    /** A new address, never the one on file: only the cardholder's name carries over. */
+    it("starts the address form with the cardholder's name and empty lines", () => {
       const { result } = renderHook(() =>
         useOrderCardFlow({ initialAddress: mockAddress }),
       )
-
-      expect(result.current.state.customAddress).toEqual(mockAddress)
-    })
-  })
-
-  describe("initial state with null address", () => {
-    it("has useRegisteredAddress as false when no address", () => {
-      const { result } = renderHook(() => useOrderCardFlow({ initialAddress: null }))
-
-      expect(result.current.state.useRegisteredAddress).toBe(false)
-    })
-
-    it("has default customAddress with country and region when no address", () => {
-      const { result } = renderHook(() => useOrderCardFlow({ initialAddress: null }))
 
       expect(result.current.state.customAddress).toEqual({
-        firstName: "",
-        lastName: "",
+        firstName: "Satoshi",
+        lastName: "Nakamoto",
         line1: "",
         line2: "",
         city: "",
@@ -98,86 +86,21 @@ describe("useOrderCardFlow", () => {
     })
   })
 
-  describe("device location default", () => {
-    it("uses detected country as default when no initial address", () => {
-      mockDeviceLocation.mockReturnValue({ countryCode: "AR", loading: false })
-
-      const { result } = renderHook(() => useOrderCardFlow({ initialAddress: null }))
-
-      expect(result.current.state.customAddress.countryCode).toBe("AR")
-      expect(result.current.state.customAddress.region).toBe("AL")
-    })
-
-    it("ignores detected country when initial address is provided", () => {
-      mockDeviceLocation.mockReturnValue({ countryCode: "AR", loading: false })
-
-      const { result } = renderHook(() =>
-        useOrderCardFlow({ initialAddress: mockAddress }),
-      )
-
-      expect(result.current.state.customAddress.countryCode).toBe("US")
-    })
-  })
-
-  describe("late initialAddress sync", () => {
-    it("syncs when initialAddress transitions from null to a value", () => {
-      const { result, rerender } = renderHook(
-        ({ initialAddress }) => useOrderCardFlow({ initialAddress }),
-        { initialProps: { initialAddress: null as ShippingAddress | null } },
-      )
-
-      expect(result.current.state.useRegisteredAddress).toBe(false)
-
-      rerender({ initialAddress: mockAddress })
-
-      expect(result.current.state.useRegisteredAddress).toBe(true)
-      expect(result.current.state.customAddress).toEqual(mockAddress)
-    })
-
-    it("does not re-sync if already initialized with an address", () => {
-      const newAddress: ShippingAddress = {
-        ...mockAddress,
-        firstName: "Different",
-      }
-
-      const { result, rerender } = renderHook(
-        ({ initialAddress }) => useOrderCardFlow({ initialAddress }),
-        { initialProps: { initialAddress: mockAddress as ShippingAddress | null } },
-      )
-
-      rerender({ initialAddress: newAddress })
-
-      expect(result.current.state.customAddress).toEqual(mockAddress)
-    })
-  })
-
-  describe("toggleUseRegisteredAddress", () => {
-    it("toggles from true to false", () => {
+  describe("toggleUseKycAddress", () => {
+    it("chooses the KYC address, then lets it go", () => {
       const { result } = renderHook(() =>
         useOrderCardFlow({ initialAddress: mockAddress }),
       )
 
       act(() => {
-        result.current.toggleUseRegisteredAddress()
+        result.current.toggleUseKycAddress()
       })
-
-      expect(result.current.state.useRegisteredAddress).toBe(false)
-    })
-
-    it("toggles back to true", () => {
-      const { result } = renderHook(() =>
-        useOrderCardFlow({ initialAddress: mockAddress }),
-      )
+      expect(result.current.state.useKycAddress).toBe(true)
 
       act(() => {
-        result.current.toggleUseRegisteredAddress()
+        result.current.toggleUseKycAddress()
       })
-
-      act(() => {
-        result.current.toggleUseRegisteredAddress()
-      })
-
-      expect(result.current.state.useRegisteredAddress).toBe(true)
+      expect(result.current.state.useKycAddress).toBe(false)
     })
   })
 

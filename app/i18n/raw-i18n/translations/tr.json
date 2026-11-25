@@ -3541,7 +3541,13 @@
       "importantDescription": "Lütfen adresinizin doğru ve eksiksiz olduğundan emin olun.",
       "noPOBoxes": "Kartlar posta kutularına teslim edilemez",
       "signatureRequired": "Teslimatta imza gerekebilir",
-      "supportedRegions": "Adres desteklenen gönderi bölgeleri içinde olmalıdır"
+      "supportedRegions": "Adres desteklenen gönderi bölgeleri içinde olmalıdır",
+      "useKycAddress": "KYC adresini teslimat adresi olarak kullan",
+      "kycAddress": "KYC adresi",
+      "PrivacyTip": {
+        "title": "Gizlilik ipucu",
+        "description": "Kart bu adrese dikkat çekmeyen bir zarfla gönderilecek. Daha fazla gizlilik için evinizden farklı bir adrese göndermek isteyebilirsiniz."
+      }
     },
     "Delivery": {
       "courier": "Kurye ile teslimat",
@@ -3610,9 +3616,7 @@
       },
       "Delivery": {
         "title": "Teslimat hızınızı seçin",
-        "subtitle": "Yeni kartınızı ne kadar hızlı almak istediğinizi seçin",
-        "shippingAddress": "Teslimat adresi",
-        "useRegisteredAddress": "Kayıtlı adresi teslimat adresi olarak kullan"
+        "subtitle": "Yeni kartınızı ne kadar hızlı almak istediğinizi seçin"
       },
       "Confirm": {
         "title": "Talebinizi gözden geçirin",
@@ -3656,8 +3660,6 @@
       "Shipping": {
         "title": "Fiziksel kartını sipariş et",
         "subtitle": "Blink Visa kartını adresine teslim al.",
-        "registeredAddress": "Kayıtlı adres",
-        "useRegisteredAddress": "Kayıtlı adresi kargo adresi olarak kullan",
         "delivery": "Teslimat",
         "deliveryInformation": "Teslimat bilgileri",
         "bullet1": "Takip bilgilerini e-posta ile alacaksın",

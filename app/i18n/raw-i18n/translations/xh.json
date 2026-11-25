@@ -3541,7 +3541,13 @@
       "importantDescription": "Please ensure your address is accurate and complete.",
       "noPOBoxes": "Cards cannot be delivered to P.O. boxes",
       "signatureRequired": "Signature may be required upon delivery",
-      "supportedRegions": "Address must be within supported shipping regions"
+      "supportedRegions": "Address must be within supported shipping regions",
+      "useKycAddress": "Sebenzisa idilesi ye-KYC njengedilesi yokuthumela",
+      "kycAddress": "Idilesi ye-KYC",
+      "PrivacyTip": {
+        "title": "Icebiso lobumfihlo",
+        "description": "Ikhadi liza kuthunyelwa kule dilesi kwimvulophu engabonakaliyo. Ukuze ube nobumfihlo obungakumbi, unokufuna ukulithumela kwidilesi engeyiyo eyasekhaya."
+      }
     },
     "Delivery": {
       "courier": "Ukuhanjiswa ngumthunywa",
@@ -3610,9 +3616,7 @@
       },
       "Delivery": {
         "title": "Khetha isantya sokuhanjiswa",
-        "subtitle": "Khetha ukuba ufuna ukufumana ikhadi lakho elitsha ngokukhawuleza kangakanani",
-        "shippingAddress": "Idilesi yokuthumela",
-        "useRegisteredAddress": "Sebenzisa idilesi ebhalisiweyo njengeedilesi yokuthumela"
+        "subtitle": "Khetha ukuba ufuna ukufumana ikhadi lakho elitsha ngokukhawuleza kangakanani"
       },
       "Confirm": {
         "title": "Phonononga isicelo sakho",
@@ -3656,8 +3660,6 @@
       "Shipping": {
         "title": "Odola ikhadi lakho elibonakalayo",
         "subtitle": "Fumana ikhadi lakho le-Blink Visa lilayishwa kwidilesi yakho.",
-        "registeredAddress": "Idilesi ebhalisiweyo",
-        "useRegisteredAddress": "Sebenzisa idilesi ebhalisiweyo njengedilesi yokuhanjiswa",
         "delivery": "Ukuhanjiswa",
         "deliveryInformation": "Ulwazi lokuhanjiswa",
         "bullet1": "Uya kufumana ulwazi lokulandela nge-imeyile",

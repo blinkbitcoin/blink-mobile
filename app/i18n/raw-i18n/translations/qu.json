@@ -3541,7 +3541,13 @@
       "importantDescription": "Please ensure your address is accurate and complete.",
       "noPOBoxes": "Cards cannot be delivered to P.O. boxes",
       "signatureRequired": "Signature may be required upon delivery",
-      "supportedRegions": "Address must be within supported shipping regions"
+      "supportedRegions": "Address must be within supported shipping regions",
+      "useKycAddress": "KYC tiyakuyta apachina tiyakuy hina llamk'achiy",
+      "kycAddress": "KYC tiyakuy",
+      "PrivacyTip": {
+        "title": "Pakasqa kawsaypaq yuyaychay",
+        "description": "Tarjetaqa kay tiyakuyman mana rikuchikuq sobreypi apachisqa kanqa. Aswan pakasqa kananpaq, wasiykimanta hukniray tiyakuyman apachiyta munawaq."
+      }
     },
     "Delivery": {
       "courier": "Kuriyerwan apachiy",
@@ -3610,9 +3616,7 @@
       },
       "Delivery": {
         "title": "Akllay imaynapin apachimunki",
-        "subtitle": "Akllay mayk'aqpin musuq tarjetaykita chaskiyta munanki",
-        "shippingAddress": "Apachina dirección",
-        "useRegisteredAddress": "Qillqasqa direcciónta apachina dirección hina llamk'achiy"
+        "subtitle": "Akllay mayk'aqpin musuq tarjetaykita chaskiyta munanki"
       },
       "Confirm": {
         "title": "Mañakusqaykita qhaway",
@@ -3656,8 +3660,6 @@
       "Shipping": {
         "title": "Tarjeta física mañakuy",
         "subtitle": "Blink Visa tarjetaykiqa direcciónta apachisqa kanqa.",
-        "registeredAddress": "Qillqasqa dirección",
-        "useRegisteredAddress": "Qillqasqa direcciónta apachina dirección hina llamk'achiy",
         "delivery": "Apachiy",
         "deliveryInformation": "Apachiy willakuy",
         "bullet1": "Email-manta qhawariy willakuyta chaskinki",

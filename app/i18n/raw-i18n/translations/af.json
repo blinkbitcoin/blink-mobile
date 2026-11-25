@@ -3541,7 +3541,13 @@
       "importantDescription": "Maak asseblief seker dat jou adres akkuraat en volledig is.",
       "noPOBoxes": "Kaarte kan nie by posbusse afgelewer word nie",
       "signatureRequired": "Handtekening mag by aflewering vereis word",
-      "supportedRegions": "Adres moet binne ondersteunde afleweringsgebiede wees"
+      "supportedRegions": "Adres moet binne ondersteunde afleweringsgebiede wees",
+      "useKycAddress": "Gebruik KYC-adres as afleweringsadres",
+      "kycAddress": "KYC-adres",
+      "PrivacyTip": {
+        "title": "Privaatheidswenk",
+        "description": "Die kaart sal in 'n diskrete koevert na hierdie adres gestuur word. Vir meer privaatheid wil jy dit dalk na 'n ander adres as jou huis stuur."
+      }
     },
     "Delivery": {
       "courier": "Koerieraflewering",
@@ -3610,9 +3616,7 @@
       },
       "Delivery": {
         "title": "Kies jou afleweringspoed",
-        "subtitle": "Kies hoe vinnig jy jou nuwe kaart wil ontvang",
-        "shippingAddress": "Versendingsadres",
-        "useRegisteredAddress": "Gebruik geregistreerde adres as versendingsadres"
+        "subtitle": "Kies hoe vinnig jy jou nuwe kaart wil ontvang"
       },
       "Confirm": {
         "title": "Hersien jou versoek",
@@ -3656,8 +3660,6 @@
       "Shipping": {
         "title": "Bestel jou fisiese kaart",
         "subtitle": "Kry jou Blink Visa-kaart by jou adres afgelewer.",
-        "registeredAddress": "Geregistreerde adres",
-        "useRegisteredAddress": "Gebruik geregistreerde adres as versendingsadres",
         "delivery": "Aflewering",
         "deliveryInformation": "Afleweringsinligting",
         "bullet1": "Jy sal opsporingsinligting per e-pos ontvang",

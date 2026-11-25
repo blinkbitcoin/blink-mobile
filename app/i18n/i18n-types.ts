@@ -11823,6 +11823,24 @@ type RootTranslation = {
 			 * A​d​d​r​e​s​s​ ​m​u​s​t​ ​b​e​ ​w​i​t​h​i​n​ ​s​u​p​p​o​r​t​e​d​ ​s​h​i​p​p​i​n​g​ ​r​e​g​i​o​n​s
 			 */
 			supportedRegions: string
+			/**
+			 * U​s​e​ ​K​Y​C​ ​a​d​d​r​e​s​s​ ​a​s​ ​s​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
+			 */
+			useKycAddress: string
+			/**
+			 * K​Y​C​ ​a​d​d​r​e​s​s
+			 */
+			kycAddress: string
+			PrivacyTip: {
+				/**
+				 * P​r​i​v​a​c​y​ ​t​i​p
+				 */
+				title: string
+				/**
+				 * C​a​r​d​ ​w​i​l​l​ ​b​e​ ​s​e​n​t​ ​t​o​ ​t​h​i​s​ ​a​d​d​r​e​s​s​ ​i​n​ ​a​ ​d​i​s​c​r​e​e​t​ ​e​n​v​e​l​o​p​e​.​ ​F​o​r​ ​i​n​c​r​e​a​s​e​d​ ​p​r​i​v​a​c​y​,​ ​y​o​u​ ​m​a​y​ ​w​a​n​t​ ​t​o​ ​s​e​n​d​ ​i​t​ ​t​o​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​a​d​d​r​e​s​s​ ​t​h​a​n​ ​y​o​u​r​ ​h​o​m​e​.
+				 */
+				description: string
+			}
 		}
 		Delivery: {
 			/**
@@ -12137,14 +12155,6 @@ type RootTranslation = {
 				 * C​h​o​o​s​e​ ​h​o​w​ ​y​o​u​'​d​ ​l​i​k​e​ ​t​o​ ​r​e​c​e​i​v​e​ ​y​o​u​r​ ​r​e​p​l​a​c​e​m​e​n​t​ ​c​a​r​d​.
 				 */
 				subtitle: string
-				/**
-				 * S​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
-				 */
-				shippingAddress: string
-				/**
-				 * U​s​e​ ​r​e​g​i​s​t​e​r​e​d​ ​a​d​d​r​e​s​s​ ​a​s​ ​s​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
-				 */
-				useRegisteredAddress: string
 			}
 			Confirm: {
 				/**
@@ -12265,14 +12275,6 @@ type RootTranslation = {
 				 * G​e​t​ ​y​o​u​r​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d​ ​d​e​l​i​v​e​r​e​d​ ​t​o​ ​y​o​u​r​ ​a​d​d​r​e​s​s​.
 				 */
 				subtitle: string
-				/**
-				 * R​e​g​i​s​t​e​r​e​d​ ​a​d​d​r​e​s​s
-				 */
-				registeredAddress: string
-				/**
-				 * U​s​e​ ​r​e​g​i​s​t​e​r​e​d​ ​a​d​d​r​e​s​s​ ​a​s​ ​s​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
-				 */
-				useRegisteredAddress: string
 				/**
 				 * D​e​l​i​v​e​r​y
 				 */
@@ -26374,6 +26376,24 @@ export type TranslationFunctions = {
 			 * Address must be within supported shipping regions
 			 */
 			supportedRegions: () => LocalizedString
+			/**
+			 * Use KYC address as shipping address
+			 */
+			useKycAddress: () => LocalizedString
+			/**
+			 * KYC address
+			 */
+			kycAddress: () => LocalizedString
+			PrivacyTip: {
+				/**
+				 * Privacy tip
+				 */
+				title: () => LocalizedString
+				/**
+				 * Card will be sent to this address in a discreet envelope. For increased privacy, you may want to send it to a different address than your home.
+				 */
+				description: () => LocalizedString
+			}
 		}
 		Delivery: {
 			/**
@@ -26685,14 +26705,6 @@ export type TranslationFunctions = {
 				 * Choose how you'd like to receive your replacement card.
 				 */
 				subtitle: () => LocalizedString
-				/**
-				 * Shipping address
-				 */
-				shippingAddress: () => LocalizedString
-				/**
-				 * Use registered address as shipping address
-				 */
-				useRegisteredAddress: () => LocalizedString
 			}
 			Confirm: {
 				/**
@@ -26813,14 +26825,6 @@ export type TranslationFunctions = {
 				 * Get your Blink Visa card delivered to your address.
 				 */
 				subtitle: () => LocalizedString
-				/**
-				 * Registered address
-				 */
-				registeredAddress: () => LocalizedString
-				/**
-				 * Use registered address as shipping address
-				 */
-				useRegisteredAddress: () => LocalizedString
 				/**
 				 * Delivery
 				 */

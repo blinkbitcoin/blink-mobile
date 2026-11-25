@@ -3541,7 +3541,13 @@
       "importantDescription": "Ujistěte se, že vaše adresa je přesná a úplná.",
       "noPOBoxes": "Karty nelze doručit na poštovní schránky",
       "signatureRequired": "Při doručení může být vyžadován podpis",
-      "supportedRegions": "Adresa musí být v podporovaných oblastech doručení"
+      "supportedRegions": "Adresa musí být v podporovaných oblastech doručení",
+      "useKycAddress": "Použít adresu z KYC jako doručovací adresu",
+      "kycAddress": "Adresa z KYC",
+      "PrivacyTip": {
+        "title": "Tip pro soukromí",
+        "description": "Karta bude odeslána na tuto adresu v nenápadné obálce. Pro větší soukromí ji můžete nechat poslat na jinou adresu, než je váš domov."
+      }
     },
     "Delivery": {
       "courier": "Doručení kurýrem",
@@ -3610,9 +3616,7 @@
       },
       "Delivery": {
         "title": "Vyberte rychlost doručení",
-        "subtitle": "Vyberte, jak rychle chcete obdržet novou kartu",
-        "shippingAddress": "Doručovací adresa",
-        "useRegisteredAddress": "Použít registrovanou adresu jako doručovací"
+        "subtitle": "Vyberte, jak rychle chcete obdržet novou kartu"
       },
       "Confirm": {
         "title": "Zkontrolujte svou žádost",
@@ -3656,8 +3660,6 @@
       "Shipping": {
         "title": "Objednejte si fyzickou kartu",
         "subtitle": "Nechte si doručit svou kartu Blink Visa na adresu.",
-        "registeredAddress": "Registrovaná adresa",
-        "useRegisteredAddress": "Použít registrovanou adresu jako doručovací adresu",
         "delivery": "Doručení",
         "deliveryInformation": "Informace o doručení",
         "bullet1": "Informace o sledování obdržíte e‑mailem",

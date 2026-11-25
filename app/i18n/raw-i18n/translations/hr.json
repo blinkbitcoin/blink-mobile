@@ -3541,7 +3541,13 @@
       "importantDescription": "Molimo provjerite da je vaša adresa točna i potpuna.",
       "noPOBoxes": "Kartice se ne mogu dostaviti na poštanske pretince",
       "signatureRequired": "Potpis može biti potreban prilikom dostave",
-      "supportedRegions": "Adresa mora biti unutar podržanih regija za dostavu"
+      "supportedRegions": "Adresa mora biti unutar podržanih regija za dostavu",
+      "useKycAddress": "Koristi KYC adresu kao adresu za dostavu",
+      "kycAddress": "KYC adresa",
+      "PrivacyTip": {
+        "title": "Savjet o privatnosti",
+        "description": "Kartica će biti poslana na ovu adresu u diskretnoj omotnici. Za veću privatnost možda je želite poslati na adresu koja nije vaš dom."
+      }
     },
     "Delivery": {
       "courier": "Dostava kurirom",
@@ -3610,9 +3616,7 @@
       },
       "Delivery": {
         "title": "Odaberite brzinu dostave",
-        "subtitle": "Odaberite koliko brzo želite primiti novu karticu",
-        "shippingAddress": "Adresa za dostavu",
-        "useRegisteredAddress": "Koristi registriranu adresu kao adresu za dostavu"
+        "subtitle": "Odaberite koliko brzo želite primiti novu karticu"
       },
       "Confirm": {
         "title": "Pregledajte svoj zahtjev",
@@ -3656,8 +3660,6 @@
       "Shipping": {
         "title": "Naručite svoju fizičku karticu",
         "subtitle": "Neka vam se Blink Visa kartica dostavi na adresu.",
-        "registeredAddress": "Registrirana adresa",
-        "useRegisteredAddress": "Koristi registriranu adresu kao adresu dostave",
         "delivery": "Dostava",
         "deliveryInformation": "Informacije o dostavi",
         "bullet1": "Podatke za praćenje dobit ćete e-poštom",

@@ -3541,7 +3541,13 @@
       "importantDescription": "Pastikan alamat Anda akurat dan lengkap.",
       "noPOBoxes": "Kartu tidak dapat dikirim ke kotak pos",
       "signatureRequired": "Tanda tangan mungkin diperlukan saat pengiriman",
-      "supportedRegions": "Alamat harus berada dalam wilayah pengiriman yang didukung"
+      "supportedRegions": "Alamat harus berada dalam wilayah pengiriman yang didukung",
+      "useKycAddress": "Gunakan alamat KYC sebagai alamat pengiriman",
+      "kycAddress": "Alamat KYC",
+      "PrivacyTip": {
+        "title": "Tips privasi",
+        "description": "Kartu akan dikirim ke alamat ini dalam amplop yang tidak mencolok. Untuk privasi lebih, Anda dapat mengirimkannya ke alamat selain rumah Anda."
+      }
     },
     "Delivery": {
       "courier": "Pengiriman kurir",
@@ -3610,9 +3616,7 @@
       },
       "Delivery": {
         "title": "Pilih kecepatan pengiriman",
-        "subtitle": "Pilih seberapa cepat Anda ingin menerima kartu baru",
-        "shippingAddress": "Alamat pengiriman",
-        "useRegisteredAddress": "Gunakan alamat terdaftar sebagai alamat pengiriman"
+        "subtitle": "Pilih seberapa cepat Anda ingin menerima kartu baru"
       },
       "Confirm": {
         "title": "Tinjau permintaan Anda",
@@ -3656,8 +3660,6 @@
       "Shipping": {
         "title": "Pesan kartu fisik Anda",
         "subtitle": "Dapatkan kartu Blink Visa Anda dikirim ke alamat Anda.",
-        "registeredAddress": "Alamat terdaftar",
-        "useRegisteredAddress": "Gunakan alamat terdaftar sebagai alamat pengiriman",
         "delivery": "Pengiriman",
         "deliveryInformation": "Informasi pengiriman",
         "bullet1": "Anda akan menerima informasi pelacakan melalui email",

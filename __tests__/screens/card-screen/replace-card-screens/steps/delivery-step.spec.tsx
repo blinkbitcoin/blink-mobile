@@ -1,6 +1,6 @@
 import React from "react"
 import { Text as RNText, View } from "react-native"
-import { render, fireEvent } from "@testing-library/react-native"
+import { render, fireEvent, within } from "@testing-library/react-native"
 
 import { DeliveryStep } from "@app/screens/card-screen/replace-card-screens/steps/delivery-step"
 import { ShippingAddress } from "@app/screens/card-screen/types"
@@ -36,12 +36,6 @@ jest.mock("@app/i18n/i18n-react", () => ({
           snailMail: () => "Snail mail delivery",
           snailMailUnavailable: () => "Too unreliable to support",
         },
-        ReplaceCard: {
-          Delivery: {
-            shippingAddress: () => "Shipping address",
-            useRegisteredAddress: () => "Use registered address as shipping address",
-          },
-        },
       },
     },
   }),
@@ -65,31 +59,31 @@ jest.mock("@app/screens/card-screen/utils", () => ({
   ).mockAddressToLines,
 }))
 
-jest.mock("@app/components/checkbox-row", () => {
-  const { View, Text: RNText } = jest.requireActual("react-native")
-  return {
-    CheckboxRow: ({
-      label,
-      isChecked,
-      onPress,
-    }: {
-      label: string
-      isChecked: boolean
-      onPress: () => void
-    }) => (
-      <View
-        testID="checkbox-row"
-        accessibilityRole="checkbox"
-        accessibilityState={{ checked: isChecked }}
-        onTouchEnd={onPress}
-      >
-        <RNText>{label}</RNText>
-      </View>
-    ),
-  }
-})
+jest.mock("@app/screens/card-screen/kyc-address-choice", () => ({
+  KycAddressChoice: ({
+    kycAddress,
+    isKycAddressUsed,
+    onToggle,
+    children,
+  }: {
+    kycAddress: ShippingAddress | null
+    isKycAddressUsed: boolean
+    onToggle: () => void
+    children: React.ReactNode
+  }) => (
+    <View
+      testID="kyc-address-choice"
+      accessibilityState={{ checked: isKycAddressUsed }}
+      accessibilityHint={kycAddress?.line1}
+      onTouchEnd={onToggle}
+    >
+      {children}
+    </View>
+  ),
+}))
 
 jest.mock("@app/components/card-screen", () => ({
+  PrivacyTipCard: () => <View testID="privacy-tip-card" />,
   SelectableOptionRow: ({
     title,
     subtitle,
@@ -104,7 +98,7 @@ jest.mock("@app/components/card-screen", () => ({
     value: string
     valueColor?: string
     isSelected: boolean
-    onPress: () => void
+    onPress?: () => void
     isDisabled?: boolean
   }) => (
     <View
@@ -118,13 +112,6 @@ jest.mock("@app/components/card-screen", () => ({
       <RNText testID={`value-${title}`} accessibilityHint={valueColor}>
         {value}
       </RNText>
-    </View>
-  ),
-  MultiLineField: ({ lines }: { lines: string[] }) => (
-    <View testID="multi-line-field">
-      {lines.map((line: string) => (
-        <RNText key={line}>{line}</RNText>
-      ))}
     </View>
   ),
   ShippingAddressForm: ({ address }: { address: ShippingAddress }) => (
@@ -156,13 +143,17 @@ describe("DeliveryStep", () => {
     countryCode: "US",
   }
 
+  const mockKycAddress: ShippingAddress = {
+    ...mockCustomAddress,
+    line1: "789 Verified Road",
+  }
+
   const defaultProps = {
     selectedDelivery: "courier" as const,
     onSelectDelivery: jest.fn(),
-    hasRegisteredAddress: true,
-    registeredAddress: mockCustomAddress,
-    useRegisteredAddress: true,
-    onToggleUseRegisteredAddress: jest.fn(),
+    kycAddress: mockKycAddress,
+    useKycAddress: false,
+    onToggleUseKycAddress: jest.fn(),
     customAddress: mockCustomAddress,
     onCustomAddressChange: jest.fn(),
   }
@@ -191,16 +182,16 @@ describe("DeliveryStep", () => {
       expect(getByText("Courier delivery")).toBeTruthy()
     })
 
-    it("displays shipping address section", () => {
-      const { getByText } = render(<DeliveryStep {...defaultProps} />)
+    /** Under the options: where the card goes, and an address other than home. */
+    it("shows the privacy tip between the options and the address", () => {
+      const tree = JSON.stringify(render(<DeliveryStep {...defaultProps} />).toJSON())
 
-      expect(getByText("Shipping address")).toBeTruthy()
-    })
-
-    it("displays use registered address checkbox", () => {
-      const { getByText } = render(<DeliveryStep {...defaultProps} />)
-
-      expect(getByText("Use registered address as shipping address")).toBeTruthy()
+      expect(tree.indexOf("settings-group")).toBeLessThan(
+        tree.indexOf("privacy-tip-card"),
+      )
+      expect(tree.indexOf("privacy-tip-card")).toBeLessThan(
+        tree.indexOf("kyc-address-choice"),
+      )
     })
   })
 
@@ -242,50 +233,31 @@ describe("DeliveryStep", () => {
     })
   })
 
-  describe("checkbox toggle", () => {
-    it("hides shipping address form when using registered address", () => {
-      const { queryByTestId } = render(
-        <DeliveryStep {...defaultProps} useRegisteredAddress={true} />,
-      )
-
-      expect(queryByTestId("shipping-address-form")).toBeNull()
-    })
-
-    it("shows shipping address form when not using registered address", () => {
-      const { getByTestId } = render(
-        <DeliveryStep {...defaultProps} useRegisteredAddress={false} />,
-      )
-
-      expect(getByTestId("shipping-address-form")).toBeTruthy()
-    })
-
-    it("calls onToggleUseRegisteredAddress when checkbox pressed", () => {
+  /** The KYC address is a choice, unticked by default (D42, D123). */
+  describe("the KYC address", () => {
+    it("is offered as it is, unticked", () => {
       const { getByTestId } = render(<DeliveryStep {...defaultProps} />)
 
-      fireEvent(getByTestId("checkbox-row"), "touchEnd")
-
-      expect(defaultProps.onToggleUseRegisteredAddress).toHaveBeenCalledTimes(1)
-    })
-  })
-
-  describe("address display", () => {
-    it("displays registered address when checkbox checked", () => {
-      const { getByText } = render(
-        <DeliveryStep {...defaultProps} useRegisteredAddress={true} />,
-      )
-
-      expect(getByText("123 Main Street")).toBeTruthy()
-      expect(getByText("New York, NY, 10001")).toBeTruthy()
-      expect(getByText("United States")).toBeTruthy()
+      const choice = getByTestId("kyc-address-choice")
+      expect(choice.props.accessibilityState).toEqual({ checked: false })
+      expect(choice.props.accessibilityHint).toBe("789 Verified Road")
     })
 
-    it("hides address preview and shows form when checkbox unchecked", () => {
-      const { queryByTestId, getByTestId } = render(
-        <DeliveryStep {...defaultProps} useRegisteredAddress={false} />,
-      )
+    it("toggles from the choice", () => {
+      const { getByTestId } = render(<DeliveryStep {...defaultProps} />)
 
-      expect(queryByTestId("multi-line-field")).toBeNull()
-      expect(getByTestId("shipping-address-form")).toBeTruthy()
+      fireEvent(getByTestId("kyc-address-choice"), "touchEnd")
+
+      expect(defaultProps.onToggleUseKycAddress).toHaveBeenCalledTimes(1)
+    })
+
+    it("puts the address form under the choice", () => {
+      const { getByTestId } = render(<DeliveryStep {...defaultProps} />)
+
+      const form = within(getByTestId("kyc-address-choice")).getByTestId(
+        "shipping-address-form",
+      )
+      expect(within(form).getByText("123 Main Street")).toBeTruthy()
     })
   })
 
@@ -315,40 +287,6 @@ describe("DeliveryStep", () => {
         selected: true,
         disabled: false,
       })
-    })
-  })
-
-  describe("no registered address", () => {
-    it("hides checkbox when hasRegisteredAddress is false", () => {
-      const { queryByTestId } = render(
-        <DeliveryStep
-          {...defaultProps}
-          hasRegisteredAddress={false}
-          useRegisteredAddress={false}
-        />,
-      )
-
-      expect(queryByTestId("checkbox-row")).toBeNull()
-    })
-
-    it("shows form when hasRegisteredAddress is false", () => {
-      const { getByTestId } = render(
-        <DeliveryStep
-          {...defaultProps}
-          hasRegisteredAddress={false}
-          useRegisteredAddress={false}
-        />,
-      )
-
-      expect(getByTestId("shipping-address-form")).toBeTruthy()
-    })
-
-    it("shows checkbox when hasRegisteredAddress is true", () => {
-      const { getByTestId } = render(
-        <DeliveryStep {...defaultProps} hasRegisteredAddress={true} />,
-      )
-
-      expect(getByTestId("checkbox-row")).toBeTruthy()
     })
   })
 })
