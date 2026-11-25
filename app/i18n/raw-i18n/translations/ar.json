@@ -3392,6 +3392,23 @@
       "cardUsed": "البطاقة المستخدمة",
       "cardUsedValue": "بطاقة Blink •••• {lastFour}",
       "paymentMethod": "طريقة الدفع",
+      "PaymentMethods": {
+        "contactless": "بدون تلامس",
+        "chip": "الشريحة",
+        "swipe": "تمرير البطاقة",
+        "online": "عبر الإنترنت",
+        "other": "أخرى"
+      },
+      "declineReason": "سبب الرفض",
+      "DeclineReasons": {
+        "insufficientFunds": "رصيد غير كافٍ",
+        "limitExceeded": "تم بلوغ حد البطاقة",
+        "incorrectPin": "رقم PIN غير صحيح",
+        "cardExpired": "انتهت صلاحية البطاقة",
+        "cardLocked": "البطاقة مجمّدة",
+        "suspectedFraud": "اشتباه في احتيال",
+        "other": "رفضتها شبكة البطاقات"
+      },
       "merchantInformation": "معلومات التاجر",
       "merchant": "التاجر",
       "category": "الفئة",

@@ -3392,6 +3392,23 @@
       "cardUsed": "Anvendt kort",
       "cardUsedValue": "Blink-kort •••• {lastFour}",
       "paymentMethod": "Betalingsmetode",
+      "PaymentMethods": {
+        "contactless": "Kontaktløs",
+        "chip": "Chip",
+        "swipe": "Magnetstribe",
+        "online": "Online",
+        "other": "Andet"
+      },
+      "declineReason": "Årsag til afvisning",
+      "DeclineReasons": {
+        "insufficientFunds": "Utilstrækkelige midler",
+        "limitExceeded": "Kortgrænse nået",
+        "incorrectPin": "Forkert PIN",
+        "cardExpired": "Kortet er udløbet",
+        "cardLocked": "Kortet er frosset",
+        "suspectedFraud": "Mistanke om svindel",
+        "other": "Afvist af kortnetværket"
+      },
       "merchantInformation": "Forhandleroplysninger",
       "merchant": "Forhandler",
       "category": "Kategori",

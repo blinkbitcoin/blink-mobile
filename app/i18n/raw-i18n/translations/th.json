@@ -3392,6 +3392,23 @@
       "cardUsed": "บัตรที่ใช้",
       "cardUsedValue": "บัตร Blink •••• {lastFour}",
       "paymentMethod": "วิธีการชำระเงิน",
+      "PaymentMethods": {
+        "contactless": "ไร้สัมผัส",
+        "chip": "ชิป",
+        "swipe": "รูดบัตร",
+        "online": "ออนไลน์",
+        "other": "อื่น ๆ"
+      },
+      "declineReason": "เหตุผลที่ถูกปฏิเสธ",
+      "DeclineReasons": {
+        "insufficientFunds": "ยอดเงินไม่เพียงพอ",
+        "limitExceeded": "ถึงวงเงินบัตรแล้ว",
+        "incorrectPin": "PIN ไม่ถูกต้อง",
+        "cardExpired": "บัตรหมดอายุ",
+        "cardLocked": "บัตรถูกอายัด",
+        "suspectedFraud": "สงสัยว่ามีการฉ้อโกง",
+        "other": "ถูกปฏิเสธโดยเครือข่ายบัตร"
+      },
       "merchantInformation": "ข้อมูลร้านค้า",
       "merchant": "ร้านค้า",
       "category": "หมวดหมู่",

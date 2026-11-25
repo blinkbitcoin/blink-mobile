@@ -2,13 +2,23 @@
  * @jest-environment ./jest.timezone-environment
  */
 
-import { CardStatus, CardType, TransactionStatus } from "@app/graphql/generated"
+import { it } from "@jest/globals"
+
+import {
+  CardDeclineReason,
+  CardPaymentMethod,
+  CardStatus,
+  CardType,
+  TransactionStatus,
+} from "@app/graphql/generated"
 import { CardTransactionUiStatus } from "@app/components/card-screen/types"
 import {
   formatCalendarDate,
   formatCardExpiry,
   formatCardType,
+  formatDeclineReason,
   formatIssuedDate,
+  formatPaymentMethod,
   isCardFrozen,
   isCardUsable,
   mapTransactionStatus,
@@ -108,6 +118,55 @@ describe("card-display utils", () => {
 
     it("has nothing to print until the issuer set an expiry", () => {
       expect(formatCardExpiry(null)).toBeNull()
+    })
+  })
+
+  describe("formatPaymentMethod", () => {
+    const LL = {
+      contactless: () => "Contactless",
+      chip: () => "Chip",
+      swipe: () => "Swipe",
+      online: () => "Online",
+      other: () => "Other",
+    }
+
+    it.each([
+      [CardPaymentMethod.Contactless, "Contactless"],
+      [CardPaymentMethod.Chip, "Chip"],
+      [CardPaymentMethod.Swipe, "Swipe"],
+      [CardPaymentMethod.Online, "Online"],
+      [CardPaymentMethod.Other, "Other"],
+    ])("words %s", (method, label) => {
+      expect(formatPaymentMethod(method, LL)).toBe(label)
+    })
+  })
+
+  describe("formatDeclineReason", () => {
+    const LL = {
+      insufficientFunds: () => "Insufficient funds",
+      limitExceeded: () => "Card limit reached",
+      incorrectPin: () => "Incorrect PIN",
+      cardExpired: () => "Card expired",
+      cardLocked: () => "Card frozen",
+      suspectedFraud: () => "Suspected fraud",
+      other: () => "Declined by the card network",
+    }
+
+    it.each([
+      [CardDeclineReason.InsufficientFunds, "Insufficient funds"],
+      [CardDeclineReason.LimitExceeded, "Card limit reached"],
+      [CardDeclineReason.IncorrectPin, "Incorrect PIN"],
+      [CardDeclineReason.CardExpired, "Card expired"],
+      [CardDeclineReason.CardLocked, "Card frozen"],
+      [CardDeclineReason.SuspectedFraud, "Suspected fraud"],
+      [CardDeclineReason.Other, "Declined by the card network"],
+    ])("words %s", (reason, label) => {
+      expect(formatDeclineReason(reason, LL)).toBe(label)
+    })
+
+    /** A network decline can arrive with no reason at all. */
+    it("words a decline without a reason like one outside the list", () => {
+      expect(formatDeclineReason(null, LL)).toBe("Declined by the card network")
     })
   })
 

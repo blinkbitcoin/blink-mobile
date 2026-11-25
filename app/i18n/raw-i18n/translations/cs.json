@@ -3392,6 +3392,23 @@
       "cardUsed": "Použitá karta",
       "cardUsedValue": "Blink Card •••• {lastFour}",
       "paymentMethod": "Platební metoda",
+      "PaymentMethods": {
+        "contactless": "Bezkontaktně",
+        "chip": "Čip",
+        "swipe": "Magnetický proužek",
+        "online": "Online",
+        "other": "Jiné"
+      },
+      "declineReason": "Důvod zamítnutí",
+      "DeclineReasons": {
+        "insufficientFunds": "Nedostatek prostředků",
+        "limitExceeded": "Dosažen limit karty",
+        "incorrectPin": "Nesprávný PIN",
+        "cardExpired": "Platnost karty vypršela",
+        "cardLocked": "Karta zmrazena",
+        "suspectedFraud": "Podezření na podvod",
+        "other": "Zamítnuto karetní sítí"
+      },
       "merchantInformation": "Informace o obchodníkovi",
       "merchant": "Obchodník",
       "category": "Kategorie",

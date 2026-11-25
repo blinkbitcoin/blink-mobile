@@ -3392,6 +3392,23 @@
       "cardUsed": "Használt kártya",
       "cardUsedValue": "Blink kártya •••• {lastFour}",
       "paymentMethod": "Fizetési mód",
+      "PaymentMethods": {
+        "contactless": "Érintés nélküli",
+        "chip": "Chip",
+        "swipe": "Mágnescsík",
+        "online": "Online",
+        "other": "Egyéb"
+      },
+      "declineReason": "Elutasítás oka",
+      "DeclineReasons": {
+        "insufficientFunds": "Nincs elég fedezet",
+        "limitExceeded": "Kártyalimit elérve",
+        "incorrectPin": "Hibás PIN",
+        "cardExpired": "A kártya lejárt",
+        "cardLocked": "A kártya befagyasztva",
+        "suspectedFraud": "Csalás gyanúja",
+        "other": "A kártyahálózat elutasította"
+      },
       "merchantInformation": "Kereskedő információ",
       "merchant": "Kereskedő",
       "category": "Kategória",

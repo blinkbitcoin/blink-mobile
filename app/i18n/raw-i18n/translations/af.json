@@ -3392,6 +3392,23 @@
       "cardUsed": "Kaart gebruik",
       "cardUsedValue": "Blink-kaart •••• {lastFour}",
       "paymentMethod": "Betalingsmetode",
+      "PaymentMethods": {
+        "contactless": "Kontakloos",
+        "chip": "Skyfie",
+        "swipe": "Swiep",
+        "online": "Aanlyn",
+        "other": "Ander"
+      },
+      "declineReason": "Rede vir weiering",
+      "DeclineReasons": {
+        "insufficientFunds": "Onvoldoende fondse",
+        "limitExceeded": "Kaartlimiet bereik",
+        "incorrectPin": "Verkeerde PIN",
+        "cardExpired": "Kaart het verval",
+        "cardLocked": "Kaart gevries",
+        "suspectedFraud": "Vermoedelike bedrog",
+        "other": "Deur die kaartnetwerk geweier"
+      },
       "merchantInformation": "Handelaarinligting",
       "merchant": "Handelaar",
       "category": "Kategorie",

@@ -3392,6 +3392,23 @@
       "cardUsed": "Thẻ sử dụng",
       "cardUsedValue": "Thẻ Blink •••• {lastFour}",
       "paymentMethod": "Phương thức thanh toán",
+      "PaymentMethods": {
+        "contactless": "Không tiếp xúc",
+        "chip": "Chip",
+        "swipe": "Quẹt thẻ",
+        "online": "Trực tuyến",
+        "other": "Khác"
+      },
+      "declineReason": "Lý do bị từ chối",
+      "DeclineReasons": {
+        "insufficientFunds": "Không đủ số dư",
+        "limitExceeded": "Đã đạt hạn mức thẻ",
+        "incorrectPin": "Mã PIN không đúng",
+        "cardExpired": "Thẻ đã hết hạn",
+        "cardLocked": "Thẻ đã bị đóng băng",
+        "suspectedFraud": "Nghi ngờ gian lận",
+        "other": "Bị mạng lưới thẻ từ chối"
+      },
       "merchantInformation": "Thông tin đơn vị",
       "merchant": "Đơn vị",
       "category": "Danh mục",

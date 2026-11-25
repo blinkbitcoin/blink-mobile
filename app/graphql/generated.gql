@@ -29,6 +29,8 @@ fragment CardTransactionDetails on CardTransaction {
   satsAmount
   btcRate
   cardLastFour
+  paymentMethod
+  declineReason
   __typename
 }
 
@@ -1482,6 +1484,8 @@ query cardTransactionsPaginated($cardId: ID!, $first: Int!, $after: String) {
         satsAmount
         btcRate
         cardLastFour
+        paymentMethod
+        declineReason
         __typename
       }
       __typename

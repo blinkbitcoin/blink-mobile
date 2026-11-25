@@ -3392,6 +3392,23 @@
       "cardUsed": "Kadi iliyotumika",
       "cardUsedValue": "Blink Card •••• {lastFour}",
       "paymentMethod": "Njia ya malipo",
+      "PaymentMethods": {
+        "contactless": "Bila kugusa",
+        "chip": "Chipu",
+        "swipe": "Kutelezesha kadi",
+        "online": "Mtandaoni",
+        "other": "Nyingine"
+      },
+      "declineReason": "Sababu ya kukataliwa",
+      "DeclineReasons": {
+        "insufficientFunds": "Salio halitoshi",
+        "limitExceeded": "Kikomo cha kadi kimefikiwa",
+        "incorrectPin": "PIN si sahihi",
+        "cardExpired": "Muda wa kadi umeisha",
+        "cardLocked": "Kadi imesimamishwa",
+        "suspectedFraud": "Inashukiwa kuwa ulaghai",
+        "other": "Imekataliwa na mtandao wa kadi"
+      },
       "merchantInformation": "Taarifa za mfanyabiashara",
       "merchant": "Mfanyabiashara",
       "category": "Kategoria",

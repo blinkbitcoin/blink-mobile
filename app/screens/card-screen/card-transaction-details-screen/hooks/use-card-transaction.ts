@@ -21,6 +21,8 @@ gql`
     satsAmount
     btcRate
     cardLastFour
+    paymentMethod
+    declineReason
   }
 `
 

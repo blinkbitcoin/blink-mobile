@@ -3392,6 +3392,23 @@
       "cardUsed": "Gebruikte kaart",
       "cardUsedValue": "Blink Card •••• {lastFour}",
       "paymentMethod": "Betaalmethode",
+      "PaymentMethods": {
+        "contactless": "Contactloos",
+        "chip": "Chip",
+        "swipe": "Magneetstrip",
+        "online": "Online",
+        "other": "Overig"
+      },
+      "declineReason": "Reden van weigering",
+      "DeclineReasons": {
+        "insufficientFunds": "Onvoldoende saldo",
+        "limitExceeded": "Kaartlimiet bereikt",
+        "incorrectPin": "Onjuiste pincode",
+        "cardExpired": "Kaart verlopen",
+        "cardLocked": "Kaart bevroren",
+        "suspectedFraud": "Vermoedelijke fraude",
+        "other": "Geweigerd door het kaartnetwerk"
+      },
       "merchantInformation": "Handelaarinformatie",
       "merchant": "Handelaar",
       "category": "Categorie",

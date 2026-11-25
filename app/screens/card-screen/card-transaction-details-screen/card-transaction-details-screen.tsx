@@ -12,14 +12,18 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useCardData } from "@app/hooks/use-card-data"
-import { CardTransactionDetailsFragment } from "@app/graphql/generated"
+import { CardTransactionDetailsFragment, TransactionStatus } from "@app/graphql/generated"
 import { toBtcMoneyAmount } from "@app/types/amounts"
 import { getCountryLabel } from "@app/utils/address-metadata"
 import { toMajorUnit } from "@app/utils/helper"
 import { toastShow } from "@app/utils/toast"
 import { fonts } from "@app/rne-theme/fonts"
 
-import { merchantIcon } from "../utils/card-display"
+import {
+  formatDeclineReason,
+  formatPaymentMethod,
+  merchantIcon,
+} from "../utils/card-display"
 import { useCardTransaction } from "./hooks/use-card-transaction"
 
 // Temporary constant used as a placeholder for fields not yet available in Phase 2/3.
@@ -100,6 +104,24 @@ export const CardTransactionDetailsScreen: React.FC = () => {
   const location =
     [transaction.merchantCity, merchantCountry].filter(Boolean).join(", ") || UNAVAILABLE
   const mccCode = transaction.merchantCategoryCode ?? UNAVAILABLE
+  const paymentMethod = transaction.paymentMethod
+    ? formatPaymentMethod(
+        transaction.paymentMethod,
+        LL.CardFlow.TransactionDetails.PaymentMethods,
+      )
+    : UNAVAILABLE
+  const isDeclined = transaction.status === TransactionStatus.Declined
+  const declineReasonItems = isDeclined
+    ? [
+        {
+          label: LL.CardFlow.TransactionDetails.declineReason(),
+          value: formatDeclineReason(
+            transaction.declineReason,
+            LL.CardFlow.TransactionDetails.DeclineReasons,
+          ),
+        },
+      ]
+    : []
   /** blink-card sends the rate in dollars per bitcoin, and no rate without sats. */
   const { btcRate, satsAmount } = transaction
   const isRateKnown = typeof btcRate === "number"
@@ -143,8 +165,9 @@ export const CardTransactionDetailsScreen: React.FC = () => {
             },
             {
               label: LL.CardFlow.TransactionDetails.paymentMethod(),
-              value: UNAVAILABLE,
+              value: paymentMethod,
             },
+            ...declineReasonItems,
           ]}
         />
 

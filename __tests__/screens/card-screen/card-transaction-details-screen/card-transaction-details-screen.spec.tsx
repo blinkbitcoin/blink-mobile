@@ -4,7 +4,11 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardTransactionDetailsScreen } from "@app/screens/card-screen/card-transaction-details-screen"
 import { ContextForScreen } from "../../helper"
-import { TransactionStatus } from "@app/graphql/generated"
+import {
+  CardDeclineReason,
+  CardPaymentMethod,
+  TransactionStatus,
+} from "@app/graphql/generated"
 
 const mockGoBack = jest.fn()
 const mockUseRoute = jest.fn()
@@ -554,6 +558,46 @@ describe("CardTransactionDetailsScreen", () => {
         amountInMajorUnits: 120180.06,
         currency: "USD",
       })
+    })
+
+    it("words how the payment was made", async () => {
+      const { getByText } = await renderTransaction({
+        ...detailedTransaction,
+        paymentMethod: CardPaymentMethod.Contactless,
+      })
+
+      expect(getByText("Contactless")).toBeTruthy()
+    })
+
+    it("says why the network declined a payment", async () => {
+      const { getByText } = await renderTransaction({
+        ...detailedTransaction,
+        status: TransactionStatus.Declined,
+        declineReason: CardDeclineReason.InsufficientFunds,
+      })
+
+      expect(getByText("Decline reason")).toBeTruthy()
+      expect(getByText("Insufficient funds")).toBeTruthy()
+    })
+
+    /** A network decline can arrive with no reason; it still reads as a decline. */
+    it("says the network declined a payment that came without a reason", async () => {
+      const { getByText } = await renderTransaction({
+        ...detailedTransaction,
+        status: TransactionStatus.Declined,
+        declineReason: null,
+      })
+
+      expect(getByText("Declined by the card network")).toBeTruthy()
+    })
+
+    it("has no decline reason for a payment that went through", async () => {
+      const { queryByText } = await renderTransaction({
+        ...detailedTransaction,
+        declineReason: CardDeclineReason.InsufficientFunds,
+      })
+
+      expect(queryByText("Decline reason")).toBeNull()
     })
 
     it("shows the enriched category, the city and country, and the MCC", async () => {

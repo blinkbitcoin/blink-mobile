@@ -3690,7 +3690,7 @@ export type CardTransactionsPaginatedQueryVariables = Exact<{
 }>;
 
 
-export type CardTransactionsPaginatedQuery = { readonly __typename: 'Query', readonly cardTransactionsPaginated: { readonly __typename: 'CardTransactionConnection', readonly edges: ReadonlyArray<{ readonly __typename: 'CardTransactionEdge', readonly cursor: string, readonly node: { readonly __typename: 'CardTransaction', readonly id: string, readonly amount: number, readonly currency: string, readonly merchantName: string, readonly merchantCategory?: string | null, readonly enrichedMerchantCategory?: string | null, readonly merchantCategoryCode?: string | null, readonly merchantCity?: string | null, readonly merchantCountry?: string | null, readonly status: TransactionStatus, readonly createdAt: string, readonly cardId: string, readonly satsAmount?: number | null, readonly btcRate?: number | null, readonly cardLastFour?: string | null } }>, readonly pageInfo: { readonly __typename: 'CardTransactionPageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null } } };
+export type CardTransactionsPaginatedQuery = { readonly __typename: 'Query', readonly cardTransactionsPaginated: { readonly __typename: 'CardTransactionConnection', readonly edges: ReadonlyArray<{ readonly __typename: 'CardTransactionEdge', readonly cursor: string, readonly node: { readonly __typename: 'CardTransaction', readonly id: string, readonly amount: number, readonly currency: string, readonly merchantName: string, readonly merchantCategory?: string | null, readonly enrichedMerchantCategory?: string | null, readonly merchantCategoryCode?: string | null, readonly merchantCity?: string | null, readonly merchantCountry?: string | null, readonly status: TransactionStatus, readonly createdAt: string, readonly cardId: string, readonly satsAmount?: number | null, readonly btcRate?: number | null, readonly cardLastFour?: string | null, readonly paymentMethod?: CardPaymentMethod | null, readonly declineReason?: CardDeclineReason | null } }>, readonly pageInfo: { readonly __typename: 'CardTransactionPageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null } } };
 
 export type CardSpendingControlsFragment = { readonly __typename: 'Card', readonly id: string, readonly spendingLimits: ReadonlyArray<{ readonly __typename: 'SpendingLimit', readonly category: SpendingCategory, readonly period: SpendingPeriod, readonly limitCents: number }>, readonly spendingToggles: ReadonlyArray<{ readonly __typename: 'SpendingToggle', readonly category: SpendingCategory, readonly enabled: boolean }> };
 
@@ -3732,7 +3732,7 @@ export type PersonalDetailsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type PersonalDetailsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly email?: { readonly __typename: 'Email', readonly address?: string | null } | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly firstName?: string | null, readonly lastName?: string | null, readonly onboardingStatus?: OnboardingStatus | null, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly shippingAddress?: { readonly __typename: 'ShippingAddress', readonly firstName?: string | null, readonly lastName?: string | null, readonly line1: string, readonly line2?: string | null, readonly city: string, readonly region: string, readonly postalCode: string, readonly country?: string | null, readonly countryCode: string } | null }> } } | null };
 
-export type CardTransactionDetailsFragment = { readonly __typename: 'CardTransaction', readonly id: string, readonly amount: number, readonly currency: string, readonly merchantName: string, readonly merchantCategory?: string | null, readonly enrichedMerchantCategory?: string | null, readonly merchantCategoryCode?: string | null, readonly merchantCity?: string | null, readonly merchantCountry?: string | null, readonly status: TransactionStatus, readonly createdAt: string, readonly satsAmount?: number | null, readonly btcRate?: number | null, readonly cardLastFour?: string | null };
+export type CardTransactionDetailsFragment = { readonly __typename: 'CardTransaction', readonly id: string, readonly amount: number, readonly currency: string, readonly merchantName: string, readonly merchantCategory?: string | null, readonly enrichedMerchantCategory?: string | null, readonly merchantCategoryCode?: string | null, readonly merchantCity?: string | null, readonly merchantCountry?: string | null, readonly status: TransactionStatus, readonly createdAt: string, readonly satsAmount?: number | null, readonly btcRate?: number | null, readonly cardLastFour?: string | null, readonly paymentMethod?: CardPaymentMethod | null, readonly declineReason?: CardDeclineReason | null };
 
 export type CardEncryptionPublicKeyQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4450,6 +4450,8 @@ export const CardTransactionDetailsFragmentDoc = gql`
   satsAmount
   btcRate
   cardLastFour
+  paymentMethod
+  declineReason
 }
     `;
 export const BtcMapPlaceSubmitDocument = gql`
@@ -6707,6 +6709,8 @@ export const CardTransactionsPaginatedDocument = gql`
         satsAmount
         btcRate
         cardLastFour
+        paymentMethod
+        declineReason
       }
     }
     pageInfo {

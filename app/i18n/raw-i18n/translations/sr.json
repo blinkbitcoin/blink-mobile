@@ -3392,6 +3392,23 @@
       "cardUsed": "Коришћена картица",
       "cardUsedValue": "Blink Card •••• {lastFour}",
       "paymentMethod": "Начин плаћања",
+      "PaymentMethods": {
+        "contactless": "Бесконтактно",
+        "chip": "Чип",
+        "swipe": "Магнетна трака",
+        "online": "Онлајн",
+        "other": "Остало"
+      },
+      "declineReason": "Разлог одбијања",
+      "DeclineReasons": {
+        "insufficientFunds": "Недовољно средстава",
+        "limitExceeded": "Достигнут лимит картице",
+        "incorrectPin": "Погрешан PIN",
+        "cardExpired": "Картица је истекла",
+        "cardLocked": "Картица је замрзнута",
+        "suspectedFraud": "Сумња на превару",
+        "other": "Одбијено од стране мреже картице"
+      },
       "merchantInformation": "Информације о трговцу",
       "merchant": "Трговац",
       "category": "Категорија",

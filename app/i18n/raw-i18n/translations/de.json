@@ -3392,6 +3392,23 @@
             "cardUsed": "Verwendete Karte",
             "cardUsedValue": "Blink Card •••• {lastFour}",
             "paymentMethod": "Zahlungsmethode",
+            "PaymentMethods": {
+                "contactless": "Kontaktlos",
+                "chip": "Chip",
+                "swipe": "Magnetstreifen",
+                "online": "Online",
+                "other": "Sonstige"
+            },
+            "declineReason": "Ablehnungsgrund",
+            "DeclineReasons": {
+                "insufficientFunds": "Unzureichendes Guthaben",
+                "limitExceeded": "Kartenlimit erreicht",
+                "incorrectPin": "Falsche PIN",
+                "cardExpired": "Karte abgelaufen",
+                "cardLocked": "Karte eingefroren",
+                "suspectedFraud": "Betrugsverdacht",
+                "other": "Vom Kartennetzwerk abgelehnt"
+            },
             "merchantInformation": "Händlerinformationen",
             "merchant": "Händler",
             "category": "Kategorie",
