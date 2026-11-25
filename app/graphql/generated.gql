@@ -1393,6 +1393,16 @@ query cardHolder($cardId: ID!) {
   cardHolder(cardId: $cardId) {
     firstName
     lastName
+    dateOfBirth
+    address {
+      line1
+      line2
+      city
+      region
+      postalCode
+      countryCode
+      __typename
+    }
     __typename
   }
 }

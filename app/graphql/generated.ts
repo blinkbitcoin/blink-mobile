@@ -3519,7 +3519,7 @@ export type CardHolderQueryVariables = Exact<{
 }>;
 
 
-export type CardHolderQuery = { readonly __typename: 'Query', readonly cardHolder: { readonly __typename: 'CardHolder', readonly firstName: string, readonly lastName: string } };
+export type CardHolderQuery = { readonly __typename: 'Query', readonly cardHolder: { readonly __typename: 'CardHolder', readonly firstName: string, readonly lastName: string, readonly dateOfBirth?: string | null, readonly address?: { readonly __typename: 'CardholderAddress', readonly line1: string, readonly line2?: string | null, readonly city: string, readonly region: string, readonly postalCode: string, readonly countryCode: string } | null } };
 
 export type DisplayCurrencyQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -5596,6 +5596,15 @@ export const CardHolderDocument = gql`
   cardHolder(cardId: $cardId) {
     firstName
     lastName
+    dateOfBirth
+    address {
+      line1
+      line2
+      city
+      region
+      postalCode
+      countryCode
+    }
   }
 }
     `;
