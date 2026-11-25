@@ -529,9 +529,13 @@ const readReplaceCardDeliveryConfig = (): ReplaceCardDeliveryConfig => {
   }
 
   if (rejected.length > 0) {
+    /** The message is what reaches Crashlytics, so it names the rejected parts; the
+     *  console value itself stays in the development-only context. */
     logError({
       scope: "remote-config",
-      error: new Error(`Rejected parts of "${ReplaceCardDeliveryConfigKey}"`),
+      error: new Error(
+        `Rejected ${rejected.join(", ")} in "${ReplaceCardDeliveryConfigKey}"`,
+      ),
       context: { key: ReplaceCardDeliveryConfigKey, rejected, value },
       dedupKey: "remote-config-replace-card-delivery",
     })

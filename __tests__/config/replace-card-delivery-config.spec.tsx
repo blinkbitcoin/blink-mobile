@@ -160,4 +160,28 @@ describe("replaceCardDeliveryConfig remote config", () => {
     expect(await readDelivery()).toEqual(SHIPPED)
     expect(rejectedParts()[0]).toEqual(["days out of order"])
   })
+
+  /** JSON allows a number too large for a double, which parses to Infinity. */
+  it("keeps the shipped value for a field that overflows to Infinity", async () => {
+    mockDeliveryJson.current = '{"courier":{"priceUsd":1e309}}'
+
+    expect(await readDelivery()).toEqual(SHIPPED)
+    expect(rejectedParts()[0]).toEqual(["priceUsd"])
+  })
+
+  /** Only the error's message reaches Crashlytics, so it names what was rejected. */
+  it("names the rejected parts in the reported error", async () => {
+    mockDeliveryJson.current = JSON.stringify({
+      courier: { minDays: "3", priceUsd: -1 },
+    })
+
+    await readDelivery()
+
+    const [entry] = mockLogError.mock.calls.find(
+      ([logged]) => logged?.context?.key === DELIVERY_KEY,
+    )
+    expect(entry.error.message).toBe(
+      'Rejected minDays, priceUsd in "replaceCardDeliveryConfig"',
+    )
+  })
 })
