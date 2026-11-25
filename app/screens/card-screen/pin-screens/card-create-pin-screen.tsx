@@ -2,6 +2,8 @@ import React, { useCallback } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+import { CardActivationStep } from "@app/graphql/generated"
+import { useCardActivation } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toastShow } from "@app/utils/toast"
@@ -20,6 +22,9 @@ export const CardCreatePinScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { updatePin, loading } = useCardPinUpdate()
+  const { isPending: isActivationPending, moveOn } = useCardActivation({
+    step: CardActivationStep.Pin,
+  })
   const {
     step,
     storedPin,
@@ -66,14 +71,18 @@ export const CardCreatePinScreen: React.FC = () => {
     if (!success) return
 
     completeFlow()
-    navigation.navigate("cardSettingsScreen")
-
     toastShow({
       message: LL.CardFlow.PinScreens.CreateFlow.pinCreatedToast(),
       type: "success",
       LL,
     })
-  }, [updatePin, storedPin, completeFlow, navigation, LL])
+
+    if (isActivationPending) {
+      moveOn(CardActivationStep.Pin, { isPinSet: true })
+      return
+    }
+    navigation.navigate("cardSettingsScreen")
+  }, [updatePin, storedPin, completeFlow, isActivationPending, moveOn, navigation, LL])
 
   const titles = [
     LL.CardFlow.PinScreens.CreateFlow.enterYourPin(),

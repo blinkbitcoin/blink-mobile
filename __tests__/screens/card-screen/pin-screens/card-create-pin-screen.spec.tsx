@@ -2,6 +2,7 @@ import React from "react"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
+import { CardActivationStep } from "@app/graphql/generated"
 import { CardCreatePinScreen } from "@app/screens/card-screen/pin-screens/card-create-pin-screen"
 import { ContextForScreen } from "../../helper"
 import { flushEffects } from "../../../helpers/flush-effects"
@@ -26,6 +27,12 @@ jest.mock("@app/screens/card-screen/pin-screens/hooks/use-card-pin-update", () =
   useCardPinUpdate: () => ({ updatePin: mockUpdatePin, loading: false }),
 }))
 
+const mockMoveOn = jest.fn()
+const mockUseCardActivation = jest.fn()
+jest.mock("@app/hooks/use-card-activation", () => ({
+  useCardActivation: (options: Record<string, unknown>) => mockUseCardActivation(options),
+}))
+
 import { toastShow } from "@app/utils/toast"
 
 describe("CardCreatePinScreen", () => {
@@ -35,6 +42,7 @@ describe("CardCreatePinScreen", () => {
     mockNavigate.mockClear()
     mockAddListener.mockReturnValue(jest.fn())
     mockUpdatePin.mockResolvedValue(true)
+    mockUseCardActivation.mockReturnValue({ isPending: false, moveOn: mockMoveOn })
   })
 
   afterEach(async () => {
@@ -280,6 +288,54 @@ describe("CardCreatePinScreen", () => {
   })
 
   describe("completion flow", () => {
+    it("stands for the PIN step of the card activation", async () => {
+      render(
+        <ContextForScreen>
+          <CardCreatePinScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      expect(mockUseCardActivation).toHaveBeenCalledWith({ step: CardActivationStep.Pin })
+    })
+
+    it("moves the activation on with the PIN set, instead of opening card settings", async () => {
+      mockUseCardActivation.mockReturnValue({ isPending: true, moveOn: mockMoveOn })
+      const { getByTestId, getAllByText } = render(
+        <ContextForScreen>
+          <CardCreatePinScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      fireEvent.press(getByTestId("NumericKey-5"))
+      fireEvent.press(getByTestId("NumericKey-8"))
+      fireEvent.press(getByTestId("NumericKey-2"))
+
+      await act(async () => {
+        fireEvent.press(getByTestId("NumericKey-9"))
+      })
+
+      fireEvent.press(getByTestId("NumericKey-5"))
+      fireEvent.press(getByTestId("NumericKey-8"))
+      fireEvent.press(getByTestId("NumericKey-2"))
+
+      await act(async () => {
+        fireEvent.press(getByTestId("NumericKey-9"))
+      })
+
+      const confirmButtons = getAllByText("Confirm")
+      await act(async () => {
+        fireEvent.press(confirmButtons[confirmButtons.length - 1])
+      })
+
+      expect(mockMoveOn).toHaveBeenCalledWith(CardActivationStep.Pin, { isPinSet: true })
+      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(toastShow).toHaveBeenCalledWith(expect.objectContaining({ type: "success" }))
+    })
+
     it("navigates to card settings on successful mutation", async () => {
       const { getByTestId, getAllByText } = render(
         <ContextForScreen>
