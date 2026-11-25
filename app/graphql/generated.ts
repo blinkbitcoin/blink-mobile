@@ -538,11 +538,33 @@ export type Card = {
   readonly id: Scalars['ID']['output'];
   readonly lastFour: Scalars['String']['output'];
   readonly monthlyLimitCents?: Maybe<Scalars['Int']['output']>;
+  readonly pinSetAt?: Maybe<Scalars['DateTime']['output']>;
   readonly shippingAddress?: Maybe<ShippingAddress>;
   readonly spendingLimitStatus: ReadonlyArray<SpendingLimitStatus>;
   readonly spendingLimits: ReadonlyArray<SpendingLimit>;
   readonly spendingToggles: ReadonlyArray<SpendingToggle>;
   readonly status: CardStatus;
+  readonly walletAddedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+/** The member's card activation: it runs once, starting with their first card. */
+export type CardActivation = {
+  readonly __typename: 'CardActivation';
+  readonly setupCompletedAt?: Maybe<Scalars['DateTime']['output']>;
+  readonly step: CardActivationStep;
+};
+
+export const CardActivationStep = {
+  Activated: 'ACTIVATED',
+  BalanceUnit: 'BALANCE_UNIT',
+  OfferOtherWay: 'OFFER_OTHER_WAY',
+  Pin: 'PIN',
+  TopUp: 'TOP_UP'
+} as const;
+
+export type CardActivationStep = typeof CardActivationStep[keyof typeof CardActivationStep];
+export type CardActivationStepUpdateInput = {
+  readonly step: CardActivationStep;
 };
 
 /** Balance in satoshis */
@@ -773,6 +795,10 @@ export type CardUpdateInput = {
   readonly virtualCardArt?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type CardWalletAddConfirmInput = {
+  readonly cardId: Scalars['ID']['input'];
+};
+
 export type CentAmountPayload = {
   readonly __typename: 'CentAmountPayload';
   readonly amount?: Maybe<Scalars['CentAmount']['output']>;
@@ -784,6 +810,7 @@ export type ConsumerAccount = Account & {
   readonly btcWallet?: Maybe<BtcWallet>;
   readonly callbackEndpoints: ReadonlyArray<CallbackEndpoint>;
   readonly callbackPortalUrl: Scalars['String']['output'];
+  readonly cardActivation?: Maybe<CardActivation>;
   readonly cardConsumerApplications: ReadonlyArray<ConsumerApplication>;
   readonly cards: ReadonlyArray<Card>;
   /** return CSV stream, base64 encoded, of the list of transactions in the wallet */
@@ -1559,6 +1586,8 @@ export type Mutation = {
   readonly callbackEndpointDelete: SuccessPayload;
   readonly captchaCreateChallenge: CaptchaCreateChallengePayload;
   readonly captchaRequestAuthCode: SuccessPayload;
+  readonly cardActivationComplete: CardActivation;
+  readonly cardActivationStepUpdate: CardActivation;
   readonly cardCollateralDeposit: CardCollateralDeposit;
   readonly cardConsumerApplicationCreate: ConsumerApplication;
   readonly cardConsumerApplicationManualCreate: ConsumerApplication;
@@ -1570,6 +1599,7 @@ export type Mutation = {
   readonly cardSpendingLimitSet: CardSpendingLimitSetPayload;
   readonly cardSpendingToggleSet: CardSpendingToggleSetPayload;
   readonly cardUpdate: Card;
+  readonly cardWalletAddConfirm: Card;
   readonly contactCreate: ContactPayload;
   readonly deviceNotificationTokenCreate: SuccessPayload;
   readonly feedbackSubmit: SuccessPayload;
@@ -1765,6 +1795,11 @@ export type MutationCaptchaRequestAuthCodeArgs = {
 };
 
 
+export type MutationCardActivationStepUpdateArgs = {
+  input: CardActivationStepUpdateInput;
+};
+
+
 export type MutationCardCollateralDepositArgs = {
   input: CardCollateralDepositInput;
 };
@@ -1817,6 +1852,11 @@ export type MutationCardSpendingToggleSetArgs = {
 
 export type MutationCardUpdateArgs = {
   input: CardUpdateInput;
+};
+
+
+export type MutationCardWalletAddConfirmArgs = {
+  input: CardWalletAddConfirmInput;
 };
 
 
@@ -3456,6 +3496,23 @@ export type LevelQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type LevelQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly level: AccountLevel } } | null };
+
+export type CardActivationQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CardActivationQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly cardActivation?: { readonly __typename: 'CardActivation', readonly step: CardActivationStep, readonly setupCompletedAt?: string | null } | null, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly cardType: CardType, readonly pinSetAt?: string | null }> } } | null };
+
+export type CardActivationStepUpdateMutationVariables = Exact<{
+  input: CardActivationStepUpdateInput;
+}>;
+
+
+export type CardActivationStepUpdateMutation = { readonly __typename: 'Mutation', readonly cardActivationStepUpdate: { readonly __typename: 'CardActivation', readonly step: CardActivationStep, readonly setupCompletedAt?: string | null } };
+
+export type CardActivationCompleteMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CardActivationCompleteMutation = { readonly __typename: 'Mutation', readonly cardActivationComplete: { readonly __typename: 'CardActivation', readonly step: CardActivationStep, readonly setupCompletedAt?: string | null } };
 
 export type CardBalanceQueryVariables = Exact<{
   cardId: Scalars['ID']['input'];
@@ -5444,6 +5501,126 @@ export type LevelQueryHookResult = ReturnType<typeof useLevelQuery>;
 export type LevelLazyQueryHookResult = ReturnType<typeof useLevelLazyQuery>;
 export type LevelSuspenseQueryHookResult = ReturnType<typeof useLevelSuspenseQuery>;
 export type LevelQueryResult = Apollo.QueryResult<LevelQuery, LevelQueryVariables>;
+export const CardActivationDocument = gql`
+    query cardActivation {
+  me {
+    id
+    defaultAccount {
+      id
+      ... on ConsumerAccount {
+        cardActivation {
+          step
+          setupCompletedAt
+        }
+        cards {
+          id
+          cardType
+          pinSetAt
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useCardActivationQuery__
+ *
+ * To run a query within a React component, call `useCardActivationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCardActivationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCardActivationQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCardActivationQuery(baseOptions?: Apollo.QueryHookOptions<CardActivationQuery, CardActivationQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CardActivationQuery, CardActivationQueryVariables>(CardActivationDocument, options);
+      }
+export function useCardActivationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CardActivationQuery, CardActivationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CardActivationQuery, CardActivationQueryVariables>(CardActivationDocument, options);
+        }
+export function useCardActivationSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CardActivationQuery, CardActivationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CardActivationQuery, CardActivationQueryVariables>(CardActivationDocument, options);
+        }
+export type CardActivationQueryHookResult = ReturnType<typeof useCardActivationQuery>;
+export type CardActivationLazyQueryHookResult = ReturnType<typeof useCardActivationLazyQuery>;
+export type CardActivationSuspenseQueryHookResult = ReturnType<typeof useCardActivationSuspenseQuery>;
+export type CardActivationQueryResult = Apollo.QueryResult<CardActivationQuery, CardActivationQueryVariables>;
+export const CardActivationStepUpdateDocument = gql`
+    mutation cardActivationStepUpdate($input: CardActivationStepUpdateInput!) {
+  cardActivationStepUpdate(input: $input) {
+    step
+    setupCompletedAt
+  }
+}
+    `;
+export type CardActivationStepUpdateMutationFn = Apollo.MutationFunction<CardActivationStepUpdateMutation, CardActivationStepUpdateMutationVariables>;
+
+/**
+ * __useCardActivationStepUpdateMutation__
+ *
+ * To run a mutation, you first call `useCardActivationStepUpdateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardActivationStepUpdateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardActivationStepUpdateMutation, { data, loading, error }] = useCardActivationStepUpdateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardActivationStepUpdateMutation(baseOptions?: Apollo.MutationHookOptions<CardActivationStepUpdateMutation, CardActivationStepUpdateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardActivationStepUpdateMutation, CardActivationStepUpdateMutationVariables>(CardActivationStepUpdateDocument, options);
+      }
+export type CardActivationStepUpdateMutationHookResult = ReturnType<typeof useCardActivationStepUpdateMutation>;
+export type CardActivationStepUpdateMutationResult = Apollo.MutationResult<CardActivationStepUpdateMutation>;
+export type CardActivationStepUpdateMutationOptions = Apollo.BaseMutationOptions<CardActivationStepUpdateMutation, CardActivationStepUpdateMutationVariables>;
+export const CardActivationCompleteDocument = gql`
+    mutation cardActivationComplete {
+  cardActivationComplete {
+    step
+    setupCompletedAt
+  }
+}
+    `;
+export type CardActivationCompleteMutationFn = Apollo.MutationFunction<CardActivationCompleteMutation, CardActivationCompleteMutationVariables>;
+
+/**
+ * __useCardActivationCompleteMutation__
+ *
+ * To run a mutation, you first call `useCardActivationCompleteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardActivationCompleteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardActivationCompleteMutation, { data, loading, error }] = useCardActivationCompleteMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCardActivationCompleteMutation(baseOptions?: Apollo.MutationHookOptions<CardActivationCompleteMutation, CardActivationCompleteMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardActivationCompleteMutation, CardActivationCompleteMutationVariables>(CardActivationCompleteDocument, options);
+      }
+export type CardActivationCompleteMutationHookResult = ReturnType<typeof useCardActivationCompleteMutation>;
+export type CardActivationCompleteMutationResult = Apollo.MutationResult<CardActivationCompleteMutation>;
+export type CardActivationCompleteMutationOptions = Apollo.BaseMutationOptions<CardActivationCompleteMutation, CardActivationCompleteMutationVariables>;
 export const CardBalanceDocument = gql`
     query cardBalance($cardId: ID!) {
   cardBalance(cardId: $cardId) {
@@ -11328,6 +11505,9 @@ export type ResolversTypes = {
   CaptchaCreateChallengeResult: ResolverTypeWrapper<CaptchaCreateChallengeResult>;
   CaptchaRequestAuthCodeInput: CaptchaRequestAuthCodeInput;
   Card: ResolverTypeWrapper<Card>;
+  CardActivation: ResolverTypeWrapper<CardActivation>;
+  CardActivationStep: CardActivationStep;
+  CardActivationStepUpdateInput: CardActivationStepUpdateInput;
   CardBalance: ResolverTypeWrapper<CardBalance>;
   CardCollateralBalance: ResolverTypeWrapper<CardCollateralBalance>;
   CardCollateralDeposit: ResolverTypeWrapper<CardCollateralDeposit>;
@@ -11354,6 +11534,7 @@ export type ResolversTypes = {
   CardTransactionPageInfo: ResolverTypeWrapper<CardTransactionPageInfo>;
   CardType: CardType;
   CardUpdateInput: CardUpdateInput;
+  CardWalletAddConfirmInput: CardWalletAddConfirmInput;
   CentAmount: ResolverTypeWrapper<Scalars['CentAmount']['output']>;
   CentAmountPayload: ResolverTypeWrapper<CentAmountPayload>;
   ConsumerAccount: ResolverTypeWrapper<ConsumerAccount>;
@@ -11644,6 +11825,8 @@ export type ResolversParentTypes = {
   CaptchaCreateChallengeResult: CaptchaCreateChallengeResult;
   CaptchaRequestAuthCodeInput: CaptchaRequestAuthCodeInput;
   Card: Card;
+  CardActivation: CardActivation;
+  CardActivationStepUpdateInput: CardActivationStepUpdateInput;
   CardBalance: CardBalance;
   CardCollateralBalance: CardCollateralBalance;
   CardCollateralDeposit: CardCollateralDeposit;
@@ -11668,6 +11851,7 @@ export type ResolversParentTypes = {
   CardTransactionEdge: CardTransactionEdge;
   CardTransactionPageInfo: CardTransactionPageInfo;
   CardUpdateInput: CardUpdateInput;
+  CardWalletAddConfirmInput: CardWalletAddConfirmInput;
   CentAmount: Scalars['CentAmount']['output'];
   CentAmountPayload: CentAmountPayload;
   ConsumerAccount: ConsumerAccount;
@@ -12115,11 +12299,19 @@ export type CardResolvers<ContextType = any, ParentType extends ResolversParentT
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   lastFour?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   monthlyLimitCents?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  pinSetAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   shippingAddress?: Resolver<Maybe<ResolversTypes['ShippingAddress']>, ParentType, ContextType>;
   spendingLimitStatus?: Resolver<ReadonlyArray<ResolversTypes['SpendingLimitStatus']>, ParentType, ContextType>;
   spendingLimits?: Resolver<ReadonlyArray<ResolversTypes['SpendingLimit']>, ParentType, ContextType>;
   spendingToggles?: Resolver<ReadonlyArray<ResolversTypes['SpendingToggle']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['CardStatus'], ParentType, ContextType>;
+  walletAddedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardActivationResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardActivation'] = ResolversParentTypes['CardActivation']> = {
+  setupCompletedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  step?: Resolver<ResolversTypes['CardActivationStep'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -12245,6 +12437,7 @@ export type ConsumerAccountResolvers<ContextType = any, ParentType extends Resol
   btcWallet?: Resolver<Maybe<ResolversTypes['BTCWallet']>, ParentType, ContextType>;
   callbackEndpoints?: Resolver<ReadonlyArray<ResolversTypes['CallbackEndpoint']>, ParentType, ContextType>;
   callbackPortalUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  cardActivation?: Resolver<Maybe<ResolversTypes['CardActivation']>, ParentType, ContextType>;
   cardConsumerApplications?: Resolver<ReadonlyArray<ResolversTypes['ConsumerApplication']>, ParentType, ContextType>;
   cards?: Resolver<ReadonlyArray<ResolversTypes['Card']>, ParentType, ContextType>;
   csvTransactions?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<ConsumerAccountCsvTransactionsArgs, 'walletIds'>>;
@@ -12673,6 +12866,8 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   callbackEndpointDelete?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationCallbackEndpointDeleteArgs, 'input'>>;
   captchaCreateChallenge?: Resolver<ResolversTypes['CaptchaCreateChallengePayload'], ParentType, ContextType>;
   captchaRequestAuthCode?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationCaptchaRequestAuthCodeArgs, 'input'>>;
+  cardActivationComplete?: Resolver<ResolversTypes['CardActivation'], ParentType, ContextType>;
+  cardActivationStepUpdate?: Resolver<ResolversTypes['CardActivation'], ParentType, ContextType, RequireFields<MutationCardActivationStepUpdateArgs, 'input'>>;
   cardCollateralDeposit?: Resolver<ResolversTypes['CardCollateralDeposit'], ParentType, ContextType, RequireFields<MutationCardCollateralDepositArgs, 'input'>>;
   cardConsumerApplicationCreate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationCreateArgs, 'input'>>;
   cardConsumerApplicationManualCreate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationManualCreateArgs, 'input'>>;
@@ -12684,6 +12879,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   cardSpendingLimitSet?: Resolver<ResolversTypes['CardSpendingLimitSetPayload'], ParentType, ContextType, RequireFields<MutationCardSpendingLimitSetArgs, 'input'>>;
   cardSpendingToggleSet?: Resolver<ResolversTypes['CardSpendingToggleSetPayload'], ParentType, ContextType, RequireFields<MutationCardSpendingToggleSetArgs, 'input'>>;
   cardUpdate?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationCardUpdateArgs, 'input'>>;
+  cardWalletAddConfirm?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationCardWalletAddConfirmArgs, 'input'>>;
   contactCreate?: Resolver<ResolversTypes['ContactPayload'], ParentType, ContextType, RequireFields<MutationContactCreateArgs, 'input'>>;
   deviceNotificationTokenCreate?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationDeviceNotificationTokenCreateArgs, 'input'>>;
   feedbackSubmit?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationFeedbackSubmitArgs, 'input'>>;
@@ -13413,6 +13609,7 @@ export type Resolvers<ContextType = any> = {
   CaptchaCreateChallengePayload?: CaptchaCreateChallengePayloadResolvers<ContextType>;
   CaptchaCreateChallengeResult?: CaptchaCreateChallengeResultResolvers<ContextType>;
   Card?: CardResolvers<ContextType>;
+  CardActivation?: CardActivationResolvers<ContextType>;
   CardBalance?: CardBalanceResolvers<ContextType>;
   CardCollateralBalance?: CardCollateralBalanceResolvers<ContextType>;
   CardCollateralDeposit?: CardCollateralDepositResolvers<ContextType>;
