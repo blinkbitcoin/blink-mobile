@@ -58,7 +58,7 @@ jest.mock("@app/hooks/use-card-data", () => ({
 
 const TRANSACTION_1 = {
   id: "txn-001",
-  amount: 12.5,
+  amount: 1250,
   currency: "USD",
   merchantName: "SuperSelectos",
   status: TransactionStatus.Pending,
@@ -67,7 +67,7 @@ const TRANSACTION_1 = {
 
 const TRANSACTION_2 = {
   id: "txn-002",
-  amount: 5.75,
+  amount: 575,
   currency: "USD",
   merchantName: "Starbucks",
   status: TransactionStatus.Completed,

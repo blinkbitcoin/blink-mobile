@@ -14,6 +14,7 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useCardData } from "@app/hooks/use-card-data"
 import { CardTransactionDetailsFragment } from "@app/graphql/generated"
 import { getCountryLabel } from "@app/utils/address-metadata"
+import { toMajorUnit } from "@app/utils/helper"
 import { toastShow } from "@app/utils/toast"
 import { fonts } from "@app/rne-theme/fonts"
 
@@ -73,8 +74,9 @@ export const CardTransactionDetailsScreen: React.FC = () => {
     return null
   }
 
+  /** blink-card sends the amount in cents. */
   const formattedAmount = formatCurrency({
-    amountInMajorUnits: transaction.amount,
+    amountInMajorUnits: toMajorUnit(transaction.amount),
     currency: transaction.currency,
   })
 

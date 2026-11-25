@@ -43,7 +43,7 @@ const makeNode = (
   }> = {},
 ) => ({
   id: overrides.id ?? "tx-1",
-  amount: overrides.amount ?? 10.5,
+  amount: overrides.amount ?? 1050,
   currency: overrides.currency ?? "USD",
   merchantName: overrides.merchantName ?? "Test Store",
   merchantCategoryCode: overrides.merchantCategoryCode,
@@ -107,9 +107,9 @@ describe("groupCardTransactionsByDate", () => {
     expect(result[1].date).toBe("Yesterday")
   })
 
-  it("formats amount using formatCurrency", () => {
+  it("formats the amount in dollars from the cents blink-card sends", () => {
     const result = groupCardTransactionsByDate({
-      nodes: [makeNode({ amount: 25.99, currency: "USD" })],
+      nodes: [makeNode({ amount: 2599, currency: "USD" })],
       LL: mockLL,
       locale: "en",
       formatCurrency: mockFormatCurrency,

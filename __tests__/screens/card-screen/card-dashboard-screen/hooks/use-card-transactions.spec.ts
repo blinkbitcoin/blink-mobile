@@ -46,7 +46,7 @@ const makeEdge = (id: string, merchantName = "Store") => ({
   cursor: `cursor-${id}`,
   node: {
     id,
-    amount: 10.5,
+    amount: 1050,
     currency: "USD",
     merchantName,
     status: "COMPLETED",
