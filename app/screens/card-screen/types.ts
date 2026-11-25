@@ -10,7 +10,7 @@ export type ShippingAddress = {
 }
 
 export const CardDesign = {
-  MaxiOrange: "Maxi orange",
+  BlinkOrange: "Blink Orange",
 } as const
 
 export type CardDesignType = (typeof CardDesign)[keyof typeof CardDesign]

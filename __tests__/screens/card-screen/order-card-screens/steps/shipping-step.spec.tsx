@@ -201,24 +201,12 @@ describe("ShippingStep", () => {
       expect(getByTestId("option-value").props.children).toBe("FREE")
     })
 
-    it("displays delivery information card", () => {
-      const { getByText } = render(<ShippingStep {...defaultProps} />)
+    /** The design drops the tracking, signature, packaging and card-features bullets
+     *  and the Important box: Rain's rules are checked on the address, not recited. */
+    it("shows none of the old bullets nor the Important box", () => {
+      const { queryByTestId } = render(<ShippingStep {...defaultProps} />)
 
-      expect(getByText("Delivery information")).toBeTruthy()
-      expect(getByText("Delivery bullet 1")).toBeTruthy()
-      expect(getByText("Delivery bullet 2")).toBeTruthy()
-      expect(getByText("Delivery bullet 3")).toBeTruthy()
-      expect(getByText("Delivery bullet 4")).toBeTruthy()
-    })
-
-    it("displays card features card", () => {
-      const { getByText } = render(<ShippingStep {...defaultProps} />)
-
-      expect(getByText("Card features")).toBeTruthy()
-      expect(getByText("Feature 1")).toBeTruthy()
-      expect(getByText("Feature 2")).toBeTruthy()
-      expect(getByText("Feature 3")).toBeTruthy()
-      expect(getByText("Feature 4")).toBeTruthy()
+      expect(queryByTestId("info-card")).toBeNull()
     })
   })
 
@@ -257,14 +245,6 @@ describe("ShippingStep", () => {
         "shipping-address-form",
       )
       expect(within(form).getByText("456 Office Park")).toBeTruthy()
-    })
-
-    it("keeps the Important card with it", () => {
-      const { getByTestId } = render(<ShippingStep {...defaultProps} />)
-
-      const choice = within(getByTestId("kyc-address-choice"))
-      expect(choice.getByText("Important")).toBeTruthy()
-      expect(choice.getByText("No PO Boxes")).toBeTruthy()
     })
   })
 })

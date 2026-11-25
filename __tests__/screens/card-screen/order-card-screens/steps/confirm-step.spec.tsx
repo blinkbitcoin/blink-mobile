@@ -137,15 +137,11 @@ describe("ConfirmStep", () => {
       expect(getByText("Shipping address")).toBeTruthy()
     })
 
-    it("displays important info card with bullets", () => {
-      const { getByText } = render(<ConfirmStep shippingAddress={mockAddress} />)
+    /** The Important box of the export is gone from the design (DS30, RV2). */
+    it("shows no Important box", () => {
+      const { queryByTestId } = render(<ConfirmStep shippingAddress={mockAddress} />)
 
-      expect(getByText("Important")).toBeTruthy()
-      expect(getByText("Your card will be shipped to the address provided")).toBeTruthy()
-      expect(getByText("Delivery times are estimates and may vary")).toBeTruthy()
-      expect(
-        getByText("You will receive a notification when your card ships"),
-      ).toBeTruthy()
+      expect(queryByTestId("info-card")).toBeNull()
     })
   })
 
@@ -154,7 +150,7 @@ describe("ConfirmStep", () => {
     it("shows the courier, its business days and the free first card", () => {
       const { getByTestId } = render(<ConfirmStep shippingAddress={mockAddress} />)
 
-      expect(getByTestId("info-value-Card design").props.children).toBe("Maxi orange")
+      expect(getByTestId("info-value-Card design").props.children).toBe("Blink Orange")
       expect(getByTestId("info-value-Delivery").props.children).toBe("Courier delivery")
       expect(getByTestId("info-value-Delivery time").props.children).toBe(
         "3-7 business days",

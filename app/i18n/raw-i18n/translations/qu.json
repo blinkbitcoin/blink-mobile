@@ -3660,18 +3660,7 @@
       "Shipping": {
         "title": "Tarjeta física mañakuy",
         "subtitle": "Blink Visa tarjetaykiqa direcciónta apachisqa kanqa.",
-        "delivery": "Apachiy",
-        "deliveryInformation": "Apachiy willakuy",
-        "bullet1": "Email-manta qhawariy willakuyta chaskinki",
-        "bullet2": "Apachiykuchkanqa firmayta munachkanman",
-        "bullet3": "Tarjetaqa pakasqa envoltura-pi apachisqa kanqa",
-        "bullet4": "Chayamupataq tarjetaykita llamk'achiy",
-        "cardFeatures": "Tarjetap ruwasqankuna",
-        "feature1": "Mana llalliywan pagay teknuluxiya",
-        "feature2": "EMV chip aswan allin waqaychaypaq",
-        "feature3": "Magnetic stripe llapanwan chaskiypaq",
-        "feature4": "Sutiyki tarjeta patapi reliefe-wan",
-        "important": "Allin yuyaykuna"
+        "delivery": "Apachiy"
       },
       "Confirm": {
         "title": "Mañakuyta takyachiy",
@@ -3682,12 +3671,7 @@
         "deliveryTime": "Apachiy pacha",
         "shippingCost": "Apachiy chanin",
         "shippingAddress": "Apachina dirección",
-        "placeOrder": "Mañakuyta apachiy",
-        "important": "Allin yuyaykuna",
-        "bullet1": "Virtual tarjetayki kawsaqllam kanqa físico tarjetata suyaykuchkanki",
-        "bullet2": "Físico tarjetata chayamupataq llamk'achiyta munanki",
-        "bullet3": "Iskay tarjetakuna kikin yupayniyuqmi kanqa",
-        "bullet4": "Apachiy suti mana tikrayta atinchu rantiyta ruwasqamanta qhipaman"
+        "placeOrder": "Mañakuyta apachiy"
       },
       "errors": {
         "createFailed": "Mana atinichu tarjeta físicaykita mañayta. Ama hina kaspa, musuqmanta ruway."

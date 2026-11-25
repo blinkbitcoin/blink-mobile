@@ -3660,18 +3660,7 @@
             "Shipping": {
                 "title": "Commandez votre carte physique",
                 "subtitle": "Recevez votre carte Blink Visa à votre adresse.",
-                "delivery": "Livraison",
-                "deliveryInformation": "Informations de livraison",
-                "bullet1": "Vous recevrez les informations de suivi par e-mail",
-                "bullet2": "Une signature peut être requise à la livraison",
-                "bullet3": "La carte sera expédiée dans un emballage discret",
-                "bullet4": "Activez votre carte lorsqu'elle arrive",
-                "cardFeatures": "Fonctionnalités de la carte",
-                "feature1": "Technologie de paiement sans contact",
-                "feature2": "Puce EMV pour une sécurité renforcée",
-                "feature3": "Bande magnétique pour une acceptation universelle",
-                "feature4": "Votre nom embossé sur la carte",
-                "important": "Important"
+                "delivery": "Livraison"
             },
             "Confirm": {
                 "title": "Confirmez votre commande",
@@ -3682,12 +3671,7 @@
                 "deliveryTime": "Délai de livraison",
                 "shippingCost": "Frais de livraison",
                 "shippingAddress": "Adresse de livraison",
-                "placeOrder": "Passer la commande",
-                "important": "Important",
-                "bullet1": "Votre carte virtuelle restera active pendant l'attente de la carte physique",
-                "bullet2": "Vous devrez activer votre carte physique à son arrivée",
-                "bullet3": "Les deux cartes auront le même numéro et les mêmes détails",
-                "bullet4": "L'adresse de livraison ne peut pas être modifiée après la commande"
+                "placeOrder": "Passer la commande"
             },
             "errors": {
                 "createFailed": "Échec de la commande de votre carte physique. Veuillez réessayer."

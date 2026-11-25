@@ -3660,18 +3660,7 @@
       "Shipping": {
         "title": "Bestil dit fysiske kort",
         "subtitle": "Få dit Blink Visa-kort leveret til din adresse.",
-        "delivery": "Levering",
-        "deliveryInformation": "Leveringsoplysninger",
-        "bullet1": "Du modtager sporingsoplysninger via e-mail",
-        "bullet2": "Der kan kræves underskrift ved levering",
-        "bullet3": "Kortet sendes i diskret emballage",
-        "bullet4": "Aktivér dit kort, når det ankommer",
-        "cardFeatures": "Kortfunktioner",
-        "feature1": "Kontaktløs betalingsteknologi",
-        "feature2": "EMV-chip for øget sikkerhed",
-        "feature3": "Magnetstribe til universel accept",
-        "feature4": "Dit navn præget på kortet",
-        "important": "Vigtigt"
+        "delivery": "Levering"
       },
       "Confirm": {
         "title": "Bekræft din bestilling",
@@ -3682,12 +3671,7 @@
         "deliveryTime": "Leveringstid",
         "shippingCost": "Forsendelsesomkostninger",
         "shippingAddress": "Leveringsadresse",
-        "placeOrder": "Afgiv bestilling",
-        "important": "Vigtigt",
-        "bullet1": "Dit virtuelle kort forbliver aktivt, mens du venter på det fysiske kort",
-        "bullet2": "Du skal aktivere dit fysiske kort, når det ankommer",
-        "bullet3": "Begge kort vil have samme kortnummer og oplysninger",
-        "bullet4": "Leveringsadressen kan ikke ændres, efter ordren er afgivet"
+        "placeOrder": "Afgiv bestilling"
       },
       "errors": {
         "createFailed": "Det lykkedes ikke at bestille dit fysiske kort. Prøv venligst igen."

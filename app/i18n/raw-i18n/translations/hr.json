@@ -3660,18 +3660,7 @@
       "Shipping": {
         "title": "Naručite svoju fizičku karticu",
         "subtitle": "Neka vam se Blink Visa kartica dostavi na adresu.",
-        "delivery": "Dostava",
-        "deliveryInformation": "Informacije o dostavi",
-        "bullet1": "Podatke za praćenje dobit ćete e-poštom",
-        "bullet2": "Pri dostavi može biti potreban potpis",
-        "bullet3": "Kartica će biti poslana u diskretnoj ambalaži",
-        "bullet4": "Aktivirajte karticu kada stigne",
-        "cardFeatures": "Značajke kartice",
-        "feature1": "Tehnologija beskontaktnog plaćanja",
-        "feature2": "EMV čip za veću sigurnost",
-        "feature3": "Magnetska traka za univerzalnu prihvaćenost",
-        "feature4": "Vaše ime utisnuto na kartici",
-        "important": "Važno"
+        "delivery": "Dostava"
       },
       "Confirm": {
         "title": "Potvrdite narudžbu",
@@ -3682,12 +3671,7 @@
         "deliveryTime": "Vrijeme dostave",
         "shippingCost": "Trošak dostave",
         "shippingAddress": "Adresa dostave",
-        "placeOrder": "Naruči",
-        "important": "Važno",
-        "bullet1": "Vaša virtualna kartica ostat će aktivna dok čekate fizičku karticu",
-        "bullet2": "Morat ćete aktivirati fizičku karticu kada stigne",
-        "bullet3": "Obje kartice imat će isti broj i podatke",
-        "bullet4": "Adresa za dostavu ne može se promijeniti nakon što je narudžba poslana"
+        "placeOrder": "Naruči"
       },
       "errors": {
         "createFailed": "Naručivanje vaše fizičke kartice nije uspjelo. Pokušajte ponovo."

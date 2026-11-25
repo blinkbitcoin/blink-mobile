@@ -2,7 +2,7 @@ import React from "react"
 import { View } from "react-native"
 import { Text, useTheme } from "@rn-vui/themed"
 
-import { InfoCard, InfoSection, MultiLineField } from "@app/components/card-screen"
+import { InfoSection, MultiLineField } from "@app/components/card-screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useCourierDelivery } from "@app/screens/card-screen/hooks"
 import {
@@ -21,7 +21,7 @@ type ConfirmStepProps = {
 
 export const ConfirmStep: React.FC<ConfirmStepProps> = ({
   shippingAddress,
-  cardDesign = CardDesign.MaxiOrange,
+  cardDesign = CardDesign.BlinkOrange,
 }) => {
   const sharedStyles = useSharedStepStyles()
   const {
@@ -64,17 +64,6 @@ export const ConfirmStep: React.FC<ConfirmStepProps> = ({
           leftIcon="map-pin"
         />
       </View>
-
-      <InfoCard
-        title={confirmLL.important()}
-        bulletItems={[
-          confirmLL.bullet1(),
-          confirmLL.bullet2(),
-          confirmLL.bullet3(),
-          confirmLL.bullet4(),
-        ]}
-        size="lg"
-      />
     </>
   )
 }

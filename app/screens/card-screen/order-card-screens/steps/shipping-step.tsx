@@ -3,7 +3,6 @@ import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import {
-  InfoCard,
   OptionRow,
   PrivacyTipCard,
   ShippingAddressForm,
@@ -57,16 +56,6 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
           onAddressChange={onCustomAddressChange}
           onValidityChange={onFormValidityChange}
         />
-        <InfoCard
-          title={LL.CardFlow.ShippingAddress.important()}
-          description={LL.CardFlow.ShippingAddress.importantDescription()}
-          bulletItems={[
-            LL.CardFlow.ShippingAddress.noPOBoxes(),
-            LL.CardFlow.ShippingAddress.signatureRequired(),
-            LL.CardFlow.ShippingAddress.supportedRegions(),
-          ]}
-          size="lg"
-        />
       </KycAddressChoice>
 
       <View style={sharedStyles.section}>
@@ -82,30 +71,6 @@ export const ShippingStep: React.FC<ShippingStepProps> = ({
           />
         </View>
       </View>
-
-      <InfoCard
-        title={shippingLL.deliveryInformation()}
-        bulletItems={[
-          shippingLL.bullet1(),
-          shippingLL.bullet2(),
-          shippingLL.bullet3(),
-          shippingLL.bullet4(),
-        ]}
-        showIcon={false}
-        size="lg"
-      />
-
-      <InfoCard
-        title={shippingLL.cardFeatures()}
-        bulletItems={[
-          shippingLL.feature1(),
-          shippingLL.feature2(),
-          shippingLL.feature3(),
-          shippingLL.feature4(),
-        ]}
-        showIcon={false}
-        size="lg"
-      />
     </>
   )
 }

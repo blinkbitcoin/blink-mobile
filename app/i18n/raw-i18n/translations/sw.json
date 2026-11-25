@@ -3660,18 +3660,7 @@
       "Shipping": {
         "title": "Agiza kadi yako ya kimwili",
         "subtitle": "Pokea kadi yako ya Blink Visa ikipelekwa kwenye anwani yako.",
-        "delivery": "Uwasilishaji",
-        "deliveryInformation": "Taarifa za uwasilishaji",
-        "bullet1": "Utapokea taarifa za ufuatiliaji kwa barua pepe",
-        "bullet2": "Huenda saini ikahitajika wakati wa uwasilishaji",
-        "bullet3": "Kadi itatumwa katika kifungashio kisichoonekana",
-        "bullet4": "Iwashe kadi yako inapowasili",
-        "cardFeatures": "Vipengele vya kadi",
-        "feature1": "Teknolojia ya malipo bila kugusa",
-        "feature2": "Chip ya EMV kwa usalama ulioimarishwa",
-        "feature3": "Mkanda wa sumaku kwa kukubalika kwa wote",
-        "feature4": "Jina lako limechongwa kwenye kadi",
-        "important": "Muhimu"
+        "delivery": "Uwasilishaji"
       },
       "Confirm": {
         "title": "Thibitisha agizo lako",
@@ -3682,12 +3671,7 @@
         "deliveryTime": "Muda wa uwasilishaji",
         "shippingCost": "Gharama ya usafirishaji",
         "shippingAddress": "Anwani ya usafirishaji",
-        "placeOrder": "Weka agizo",
-        "important": "Muhimu",
-        "bullet1": "Kadi yako ya mtandaoni itaendelea kuwa hai unapongoja kadi ya kimwili",
-        "bullet2": "Utahitaji kuwasha kadi yako ya kimwili inapowasili",
-        "bullet3": "Kadi zote mbili zitakuwa na namba na maelezo yale yale",
-        "bullet4": "Anwani ya usafirishaji haiwezi kubadilishwa baada ya agizo kutolewa"
+        "placeOrder": "Weka agizo"
       },
       "errors": {
         "createFailed": "Imeshindikana kuagiza kadi yako halisi. Tafadhali jaribu tena."

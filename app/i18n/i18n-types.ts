@@ -12279,50 +12279,6 @@ type RootTranslation = {
 				 * D​e​l​i​v​e​r​y
 				 */
 				delivery: string
-				/**
-				 * D​e​l​i​v​e​r​y​ ​i​n​f​o​r​m​a​t​i​o​n
-				 */
-				deliveryInformation: string
-				/**
-				 * Y​o​u​'​l​l​ ​r​e​c​e​i​v​e​ ​t​r​a​c​k​i​n​g​ ​i​n​f​o​r​m​a​t​i​o​n​ ​v​i​a​ ​e​m​a​i​l
-				 */
-				bullet1: string
-				/**
-				 * S​i​g​n​a​t​u​r​e​ ​m​a​y​ ​b​e​ ​r​e​q​u​i​r​e​d​ ​u​p​o​n​ ​d​e​l​i​v​e​r​y
-				 */
-				bullet2: string
-				/**
-				 * C​a​r​d​ ​w​i​l​l​ ​b​e​ ​s​h​i​p​p​e​d​ ​i​n​ ​d​i​s​c​r​e​e​t​ ​p​a​c​k​a​g​i​n​g
-				 */
-				bullet3: string
-				/**
-				 * A​c​t​i​v​a​t​e​ ​y​o​u​r​ ​c​a​r​d​ ​w​h​e​n​ ​i​t​ ​a​r​r​i​v​e​s
-				 */
-				bullet4: string
-				/**
-				 * C​a​r​d​ ​f​e​a​t​u​r​e​s
-				 */
-				cardFeatures: string
-				/**
-				 * C​o​n​t​a​c​t​l​e​s​s​ ​p​a​y​m​e​n​t​ ​t​e​c​h​n​o​l​o​g​y
-				 */
-				feature1: string
-				/**
-				 * E​M​V​ ​c​h​i​p​ ​f​o​r​ ​e​n​h​a​n​c​e​d​ ​s​e​c​u​r​i​t​y
-				 */
-				feature2: string
-				/**
-				 * M​a​g​n​e​t​i​c​ ​s​t​r​i​p​e​ ​f​o​r​ ​u​n​i​v​e​r​s​a​l​ ​a​c​c​e​p​t​a​n​c​e
-				 */
-				feature3: string
-				/**
-				 * Y​o​u​r​ ​n​a​m​e​ ​e​m​b​o​s​s​e​d​ ​o​n​ ​t​h​e​ ​c​a​r​d
-				 */
-				feature4: string
-				/**
-				 * I​m​p​o​r​t​a​n​t
-				 */
-				important: string
 			}
 			Confirm: {
 				/**
@@ -12361,26 +12317,6 @@ type RootTranslation = {
 				 * P​l​a​c​e​ ​o​r​d​e​r
 				 */
 				placeOrder: string
-				/**
-				 * I​m​p​o​r​t​a​n​t
-				 */
-				important: string
-				/**
-				 * Y​o​u​r​ ​v​i​r​t​u​a​l​ ​c​a​r​d​ ​w​i​l​l​ ​r​e​m​a​i​n​ ​a​c​t​i​v​e​ ​w​h​i​l​e​ ​y​o​u​ ​w​a​i​t​ ​f​o​r​ ​t​h​e​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d
-				 */
-				bullet1: string
-				/**
-				 * Y​o​u​'​l​l​ ​n​e​e​d​ ​t​o​ ​a​c​t​i​v​a​t​e​ ​y​o​u​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d​ ​w​h​e​n​ ​i​t​ ​a​r​r​i​v​e​s
-				 */
-				bullet2: string
-				/**
-				 * B​o​t​h​ ​c​a​r​d​s​ ​w​i​l​l​ ​h​a​v​e​ ​t​h​e​ ​s​a​m​e​ ​c​a​r​d​ ​n​u​m​b​e​r​ ​a​n​d​ ​d​e​t​a​i​l​s
-				 */
-				bullet3: string
-				/**
-				 * S​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s​ ​c​a​n​n​o​t​ ​b​e​ ​c​h​a​n​g​e​d​ ​a​f​t​e​r​ ​o​r​d​e​r​ ​i​s​ ​p​l​a​c​e​d
-				 */
-				bullet4: string
 			}
 			errors: {
 				/**
@@ -26829,50 +26765,6 @@ export type TranslationFunctions = {
 				 * Delivery
 				 */
 				delivery: () => LocalizedString
-				/**
-				 * Delivery information
-				 */
-				deliveryInformation: () => LocalizedString
-				/**
-				 * You'll receive tracking information via email
-				 */
-				bullet1: () => LocalizedString
-				/**
-				 * Signature may be required upon delivery
-				 */
-				bullet2: () => LocalizedString
-				/**
-				 * Card will be shipped in discreet packaging
-				 */
-				bullet3: () => LocalizedString
-				/**
-				 * Activate your card when it arrives
-				 */
-				bullet4: () => LocalizedString
-				/**
-				 * Card features
-				 */
-				cardFeatures: () => LocalizedString
-				/**
-				 * Contactless payment technology
-				 */
-				feature1: () => LocalizedString
-				/**
-				 * EMV chip for enhanced security
-				 */
-				feature2: () => LocalizedString
-				/**
-				 * Magnetic stripe for universal acceptance
-				 */
-				feature3: () => LocalizedString
-				/**
-				 * Your name embossed on the card
-				 */
-				feature4: () => LocalizedString
-				/**
-				 * Important
-				 */
-				important: () => LocalizedString
 			}
 			Confirm: {
 				/**
@@ -26911,26 +26803,6 @@ export type TranslationFunctions = {
 				 * Place order
 				 */
 				placeOrder: () => LocalizedString
-				/**
-				 * Important
-				 */
-				important: () => LocalizedString
-				/**
-				 * Your virtual card will remain active while you wait for the physical card
-				 */
-				bullet1: () => LocalizedString
-				/**
-				 * You'll need to activate your physical card when it arrives
-				 */
-				bullet2: () => LocalizedString
-				/**
-				 * Both cards will have the same card number and details
-				 */
-				bullet3: () => LocalizedString
-				/**
-				 * Shipping address cannot be changed after order is placed
-				 */
-				bullet4: () => LocalizedString
 			}
 			errors: {
 				/**

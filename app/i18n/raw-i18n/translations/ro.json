@@ -3660,18 +3660,7 @@
       "Shipping": {
         "title": "Comandă cardul tău fizic",
         "subtitle": "Primește cardul tău Blink Visa la adresa ta.",
-        "delivery": "Livrare",
-        "deliveryInformation": "Informații de livrare",
-        "bullet1": "Vei primi informații de urmărire prin e-mail",
-        "bullet2": "La livrare poate fi necesară o semnătură",
-        "bullet3": "Cardul va fi expediat în ambalaj discret",
-        "bullet4": "Activează-ți cardul când ajunge",
-        "cardFeatures": "Caracteristici ale cardului",
-        "feature1": "Tehnologie de plată contactless",
-        "feature2": "Cip EMV pentru securitate sporită",
-        "feature3": "Bandă magnetică pentru acceptare universală",
-        "feature4": "Numele tău embosat pe card",
-        "important": "Important"
+        "delivery": "Livrare"
       },
       "Confirm": {
         "title": "Confirmă comanda",
@@ -3682,12 +3671,7 @@
         "deliveryTime": "Timp de livrare",
         "shippingCost": "Cost de livrare",
         "shippingAddress": "Adresă de livrare",
-        "placeOrder": "Plasează comanda",
-        "important": "Important",
-        "bullet1": "Cardul tău virtual va rămâne activ cât timp aștepți cardul fizic",
-        "bullet2": "Va trebui să activezi cardul fizic când ajunge",
-        "bullet3": "Ambele carduri vor avea același număr și aceleași detalii",
-        "bullet4": "Adresa de livrare nu poate fi schimbată după plasarea comenzii"
+        "placeOrder": "Plasează comanda"
       },
       "errors": {
         "createFailed": "Nu s-a putut comanda cardul tău fizic. Te rugăm să încerci din nou."

@@ -3660,18 +3660,7 @@
       "Shipping": {
         "title": "Pesan kartu fisik Anda",
         "subtitle": "Dapatkan kartu Blink Visa Anda dikirim ke alamat Anda.",
-        "delivery": "Pengiriman",
-        "deliveryInformation": "Informasi pengiriman",
-        "bullet1": "Anda akan menerima informasi pelacakan melalui email",
-        "bullet2": "Tanda tangan mungkin diperlukan saat pengiriman",
-        "bullet3": "Kartu akan dikirim dalam kemasan yang tidak mencolok",
-        "bullet4": "Aktifkan kartu Anda saat tiba",
-        "cardFeatures": "Fitur kartu",
-        "feature1": "Teknologi pembayaran nirsentuh",
-        "feature2": "Chip EMV untuk keamanan yang ditingkatkan",
-        "feature3": "Pita magnetik untuk penerimaan universal",
-        "feature4": "Nama Anda terembos pada kartu",
-        "important": "Penting"
+        "delivery": "Pengiriman"
       },
       "Confirm": {
         "title": "Konfirmasi pesanan Anda",
@@ -3682,12 +3671,7 @@
         "deliveryTime": "Waktu pengiriman",
         "shippingCost": "Biaya pengiriman",
         "shippingAddress": "Alamat pengiriman",
-        "placeOrder": "Buat pesanan",
-        "important": "Penting",
-        "bullet1": "Kartu virtual Anda akan tetap aktif saat Anda menunggu kartu fisik",
-        "bullet2": "Anda perlu mengaktifkan kartu fisik saat tiba",
-        "bullet3": "Kedua kartu akan memiliki nomor dan detail yang sama",
-        "bullet4": "Alamat pengiriman tidak dapat diubah setelah pesanan dibuat"
+        "placeOrder": "Buat pesanan"
       },
       "errors": {
         "createFailed": "Gagal memesan kartu fisik Anda. Silakan coba lagi."

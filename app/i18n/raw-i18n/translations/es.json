@@ -3660,18 +3660,7 @@
             "Shipping": {
                 "title": "Pide tu tarjeta física",
                 "subtitle": "Recibe tu tarjeta Blink Visa en tu dirección.",
-                "delivery": "Entrega",
-                "deliveryInformation": "Información de entrega",
-                "bullet1": "Recibirás la información de seguimiento por correo electrónico",
-                "bullet2": "Puede requerirse firma al momento de la entrega",
-                "bullet3": "La tarjeta se enviará en un embalaje discreto",
-                "bullet4": "Activa tu tarjeta cuando llegue",
-                "cardFeatures": "Características de la tarjeta",
-                "feature1": "Tecnología de pago sin contacto",
-                "feature2": "Chip EMV para mayor seguridad",
-                "feature3": "Banda magnética para aceptación universal",
-                "feature4": "Tu nombre grabado en relieve en la tarjeta",
-                "important": "Importante"
+                "delivery": "Entrega"
             },
             "Confirm": {
                 "title": "Confirma tu pedido",
@@ -3682,12 +3671,7 @@
                 "deliveryTime": "Tiempo de entrega",
                 "shippingCost": "Costo de envío",
                 "shippingAddress": "Dirección de envío",
-                "placeOrder": "Realizar pedido",
-                "important": "Importante",
-                "bullet1": "Tu tarjeta virtual permanecerá activa mientras esperas la tarjeta física",
-                "bullet2": "Necesitarás activar tu tarjeta física cuando llegue",
-                "bullet3": "Ambas tarjetas tendrán el mismo número y detalles",
-                "bullet4": "La dirección de envío no se puede cambiar después de realizar el pedido"
+                "placeOrder": "Realizar pedido"
             },
             "errors": {
                 "createFailed": "No se pudo ordenar tu tarjeta física. Por favor, inténtalo de nuevo."

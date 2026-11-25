@@ -3660,18 +3660,7 @@
       "Shipping": {
         "title": "Fiziksel kartını sipariş et",
         "subtitle": "Blink Visa kartını adresine teslim al.",
-        "delivery": "Teslimat",
-        "deliveryInformation": "Teslimat bilgileri",
-        "bullet1": "Takip bilgilerini e-posta ile alacaksın",
-        "bullet2": "Teslimatta imza gerekebilir",
-        "bullet3": "Kart gizli bir ambalajda gönderilecektir",
-        "bullet4": "Kartın geldiğinde etkinleştir",
-        "cardFeatures": "Kart özellikleri",
-        "feature1": "Temassız ödeme teknolojisi",
-        "feature2": "Gelişmiş güvenlik için EMV çipi",
-        "feature3": "Evrensel kabul için manyetik şerit",
-        "feature4": "İsmin kartın üzerinde kabartmalı",
-        "important": "Önemli"
+        "delivery": "Teslimat"
       },
       "Confirm": {
         "title": "Siparişini onayla",
@@ -3682,12 +3671,7 @@
         "deliveryTime": "Teslimat süresi",
         "shippingCost": "Kargo ücreti",
         "shippingAddress": "Kargo adresi",
-        "placeOrder": "Sipariş ver",
-        "important": "Önemli",
-        "bullet1": "Fiziksel kartı beklerken sanal kartın aktif kalacak",
-        "bullet2": "Fiziksel kartın geldiğinde etkinleştirmen gerekecek",
-        "bullet3": "Her iki kart da aynı kart numarası ve detaylara sahip olacak",
-        "bullet4": "Kargo adresi sipariş verildikten sonra değiştirilemez"
+        "placeOrder": "Sipariş ver"
       },
       "errors": {
         "createFailed": "Fiziksel kartınız sipariş edilemedi. Lütfen tekrar deneyin."

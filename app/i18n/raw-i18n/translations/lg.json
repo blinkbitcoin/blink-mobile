@@ -3660,18 +3660,7 @@
       "Shipping": {
         "title": "Saba kaadi yo ey'omubiri",
         "subtitle": "Funa kaadi yo eya Blink Visa ekutuuke ku ndagiriro yo.",
-        "delivery": "Okutuusa",
-        "deliveryInformation": "Obubaka ku kutuusa",
-        "bullet1": "Ojja kufuna ebikwata ku kulondoola ku email",
-        "bullet2": "Obubonero buyinza okwetaagisa wakati w'okutuusa",
-        "bullet3": "Kaadi erisindikibwa mu pakka etaboneka",
-        "bullet4": "Aktiva kaadi yo ng'etuuse",
-        "cardFeatures": "Ebintu ebiri ku kaadi",
-        "feature1": "Tekinologiya y'okusasula nga togukwata",
-        "feature2": "EMV chip olw'obukuumi obulungi",
-        "feature3": "Magnetic stripe olw'okukkirizibwa buli wansi",
-        "feature4": "Erinnya lyo liryanga ku kaadi",
-        "important": "Kikulu"
+        "delivery": "Okutuusa"
       },
       "Confirm": {
         "title": "Kakasa oda yo",
@@ -3682,12 +3671,7 @@
         "deliveryTime": "Obudde bw'okutuusa",
         "shippingCost": "Ebyetaagisa okutuusa",
         "shippingAddress": "Endagiriro y'okutuusa",
-        "placeOrder": "Teeka oda",
-        "important": "Kikulu",
-        "bullet1": "Kaadi yo ya virtual ejja kusigala nga erimu emirimu ng'owuliriza kaadi ey'omubiri",
-        "bullet2": "Ojja kwetaaga okukola aktivesoni ya kaadi ey'omubiri ng'etuuse",
-        "bullet3": "Kaadi zombi zijja kuba n'omuwendo n'obubaka obw'ekimu",
-        "bullet4": "Endereesi y'okutumira tesobola kukyusibwa oluvannyuma lw'okuteeka ekiragiro"
+        "placeOrder": "Teeka oda"
       },
       "errors": {
         "createFailed": "Tekulemezeka kuteekawo kaadi yo eyiriimu. Gezaako nate."

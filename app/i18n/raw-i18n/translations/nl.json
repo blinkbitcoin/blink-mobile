@@ -3660,18 +3660,7 @@
       "Shipping": {
         "title": "Bestel je fysieke kaart",
         "subtitle": "Ontvang je Blink Visa-kaart op je adres.",
-        "delivery": "Levering",
-        "deliveryInformation": "Leveringsinformatie",
-        "bullet1": "Je ontvangt trackinginformatie per e-mail",
-        "bullet2": "Bij levering kan een handtekening vereist zijn",
-        "bullet3": "De kaart wordt in een discrete verpakking verzonden",
-        "bullet4": "Activeer je kaart zodra deze aankomt",
-        "cardFeatures": "Kaartkenmerken",
-        "feature1": "Contactloze betaaltechnologie",
-        "feature2": "EMV-chip voor verbeterde beveiliging",
-        "feature3": "Magneetstrip voor universele acceptatie",
-        "feature4": "Je naam in reliëf op de kaart",
-        "important": "Belangrijk"
+        "delivery": "Levering"
       },
       "Confirm": {
         "title": "Bevestig je bestelling",
@@ -3682,12 +3671,7 @@
         "deliveryTime": "Levertijd",
         "shippingCost": "Verzendkosten",
         "shippingAddress": "Verzendadres",
-        "placeOrder": "Bestelling plaatsen",
-        "important": "Belangrijk",
-        "bullet1": "Je virtuele kaart blijft actief terwijl je op de fysieke kaart wacht",
-        "bullet2": "Je moet je fysieke kaart activeren zodra deze aankomt",
-        "bullet3": "Beide kaarten hebben hetzelfde kaartnummer en dezelfde gegevens",
-        "bullet4": "Het verzendadres kan niet worden gewijzigd nadat de bestelling is geplaatst"
+        "placeOrder": "Bestelling plaatsen"
       },
       "errors": {
         "createFailed": "Het bestellen van je fysieke kaart is mislukt. Probeer het opnieuw."
