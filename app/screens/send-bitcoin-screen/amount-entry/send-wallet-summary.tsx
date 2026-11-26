@@ -8,6 +8,7 @@ import Animated, {
 } from "react-native-reanimated"
 import { makeStyles, Text } from "@rn-vui/themed"
 
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { WalletSwitch } from "@app/components/wallet-switch"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -36,6 +37,10 @@ type SendWalletSummaryProps = {
   /** A settled read-out rather than a control: the static grey7 surface, and no swap icon
    *  at all (rather than the reserved space an unavailable switch keeps). */
   inactive?: boolean
+  /** Draws the placeholder instead of the balances. */
+  isBalanceHidden?: boolean
+  /** Present while the balance is hidden on a read-only summary: tapping the card shows it. */
+  onReveal?: () => void
 }
 
 // TODO(#4360): becomes a thin wrapper over WalletSummary once #4360 merges.
@@ -46,6 +51,8 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
   hasError = false,
   onSwitch,
   inactive = false,
+  isBalanceHidden = false,
+  onReveal,
 }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
@@ -71,6 +78,8 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
     [progress],
   )
 
+  const onPress = onSwitch ?? onReveal
+
   const walletNameOf = (value: WalletCurrency) =>
     value === WalletCurrency.Btc ? LL.common.bitcoin() : LL.common.dollar()
 
@@ -90,10 +99,13 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
         hasError && styles.cardError,
         pressed && onSwitch && styles.cardPressed,
       ]}
-      onPress={onSwitch}
-      disabled={!onSwitch}
-      accessibilityRole={onSwitch ? "button" : undefined}
+      onPress={onPress}
+      disabled={!onPress}
+      accessibilityRole={onPress ? "button" : undefined}
       accessibilityLabel={accessibilityLabel}
+      accessibilityHint={
+        onReveal && !onSwitch ? LL.Accessibility.revealBalanceHint() : undefined
+      }
     >
       <View style={styles.balances}>
         {/* An invisible two-line copy sets the height, so the card is the same size with or
@@ -112,13 +124,17 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
           style={[styles.balancesVisible, balancesAnimatedStyle]}
           testID={SEND_WALLET_LINES_TEST_ID}
         >
-          <Text
-            style={styles.balancePrimary}
-            {...testProps(`${currency} Wallet Balance`)}
-          >
-            {balancePrimary}
-          </Text>
-          {balanceSecondary ? (
+          {isBalanceHidden ? (
+            <HiddenBalancePlaceholder size="small" />
+          ) : (
+            <Text
+              style={styles.balancePrimary}
+              {...testProps(`${currency} Wallet Balance`)}
+            >
+              {balancePrimary}
+            </Text>
+          )}
+          {balanceSecondary && !isBalanceHidden ? (
             <Text
               style={styles.balanceSecondary}
               {...testProps(SEND_WALLET_SECONDARY_TEST_ID)}

@@ -202,7 +202,8 @@ const TOKEN_CORNERS: Record<string, number> = {
   "app/components/card-screen/card-transactions-section.tsx": 1,
   "app/components/card-screen/dropdown.tsx": 2,
   "app/components/card-screen/info-card.tsx": 1,
-  "app/components/card-screen/info-section.tsx": 1,
+  // The card and the outline drawn over it.
+  "app/components/card-screen/info-section.tsx": 2,
   "app/components/card-screen/input-field.tsx": 1,
   "app/components/card-screen/multi-line-field.tsx": 1,
   "app/components/card-screen/setting-item-row.tsx": 1,
@@ -283,7 +284,6 @@ const TOKEN_CORNERS: Record<string, number> = {
   "app/screens/send-bitcoin-screen/confirm-destination-modal.tsx": 1,
   "app/screens/send-bitcoin-screen/fee-tier-selector.tsx": 2,
   "app/screens/send-bitcoin-screen/send-bitcoin-completed-screen.tsx": 1,
-  "app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen.tsx": 1,
   "app/screens/send-bitcoin-screen/send-bitcoin-destination-screen.tsx": 2,
   "app/screens/send-bitcoin-screen/send-bitcoin-details-screen.tsx": 1,
   "app/screens/settings-screen/account/settings/delete.tsx": 1,

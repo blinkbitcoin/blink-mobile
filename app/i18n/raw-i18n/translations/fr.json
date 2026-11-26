@@ -2357,6 +2357,7 @@
         "maxFeeSelected": "Il s’agit des frais maximums qui vous seront facturés pour cette transaction. Il peut s’avérer inférieur une fois le paiement effectué.",
         "invoiceAlreadyPaid": "Cette facture a déjà été payée",
         "somethingWentWrong": "Une erreur est survenue",
+        "priceUpdated": "Le prix a changé, les montants ont donc été mis à jour. Vérifiez-les avant d'envoyer.",
         "paymentAlreadyAttempted": "Paiement déjà tenté.\n\nSi vous souhaitez renvoyer ce paiement, recommencez depuis le début.",
         "slideConfirming": "Confirmation en cours…",
         "slideToSend": "Glissez pour envoyer",
@@ -2373,7 +2374,11 @@
             "stillOnItsWay": "Toujours en route"
         },
         "copiedDestination": "Destination copiée dans le presse-papiers",
-        "lightningRecommended": "Frais élevés ! Nous recommandons Lightning.",
+        "lightningRecommended": "Frais élevés. Nous recommandons Lightning.",
+        "sending": "Envoi en cours",
+        "fromBalance": "Depuis le solde",
+        "details": "Détails",
+        "changeAmount": "Modifier le montant",
         "usdRemainderSweep": "Solde restant {remaining: string} ({remainingSats: string}) sera converti en Bitcoin. Minimum en USD : {minimum: string}.",
         "sendAnyway": "J'ai vérifié mon historique, envoyer quand même"
     },
@@ -3138,7 +3143,9 @@
         "deleteKey": "Effacer",
         "swapCurrencyHint": "Change la devise dans laquelle vous saisissez le montant",
         "switchToWallet": "Passer à {wallet: string}",
-        "copy": "Copier"
+        "copy": "Copier",
+        "balanceHidden": "Solde masqué",
+        "revealBalanceHint": "Affiche votre solde sur cet écran"
     },
     "AppUpdate": {
         "needToUpdateSupportMessage": "J’ai besoin de mettre à jour la dernière version sur mon app. J’utilise l’app {os: string} avec la version {version: string}.",

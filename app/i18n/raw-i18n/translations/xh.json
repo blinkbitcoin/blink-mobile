@@ -2357,6 +2357,7 @@
     "maxFeeSelected": "Lo ngowona mrhumo uphezulu oza kubizwa ngawo kule ntengiselwano. Inokuphela incinci xa intlawulo yenziwe.",
     "invoiceAlreadyPaid": "Le invoyisi sele ihlawuliwe",
     "somethingWentWrong": "Ikhona into engahambi kakuhle",
+    "priceUpdated": "Ixabiso litshintshile, ngoko izixa zihlaziyiwe. Zijonge ngaphambi kokuba uthumele.",
     "paymentAlreadyAttempted": "Intlawulo sele izanyiwe.\n\nUkuba ufuna ukuthumela le ntlawulo kwakhona, qala ekuqaleni.",
     "slideConfirming": "Iyaqinisekisa...",
     "slideToSend": "Slaydisha ukuthumela",
@@ -2373,7 +2374,11 @@
       "stillOnItsWay": "Isesendleleni"
     },
     "copiedDestination": "Ikopishwe indawo ekuya kuyo kwibhodi eqhotyoshwayo",
-    "lightningRecommended": "Imirhumo iphezulu! Sincoma i-Lightning.",
+    "lightningRecommended": "Imirhumo iphezulu. Sincoma i-Lightning.",
+    "sending": "Iyathumela",
+    "fromBalance": "Ukusuka kwiBhalansi",
+    "details": "Iinkcukacha",
+    "changeAmount": "Tshintsha isixa",
     "usdRemainderSweep": "Iseleyo {remaining: string} ({remainingSats: string}) iya kuguqulelwa kwiBitcoin. USD ephantsi kakhulu: {minimum: string}.",
     "sendAnyway": "Ndijongile imbali yam, thumela noko"
   },
@@ -3138,7 +3143,9 @@
     "deleteKey": "Cima",
     "swapCurrencyHint": "Itshintsha imali obhala ngayo isixa",
     "switchToWallet": "Tshintshela kwi-{wallet: string}",
-    "copy": "Khuphela"
+    "copy": "Khuphela",
+    "balanceHidden": "Ibhalansi ifihliwe",
+    "revealBalanceHint": "Ibonisa ibhalansi yakho kwesi skrini"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",

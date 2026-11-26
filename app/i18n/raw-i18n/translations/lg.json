@@ -2357,6 +2357,7 @@
     "maxFeeSelected": "Eno ye ssente ezisinga obunene z’ogenda okusasula ku mpanyisa eno. Kiyinza okumaliriza nga kitono nga okusasula kukoleddwa.",
     "invoiceAlreadyPaid": "Yinivoyisi eno yasasuddwa dda",
     "somethingWentWrong": "Waliwo ekikyamu ekigenze mumaso",
+    "priceUpdated": "Bbeeyi ekyuse, n'olwekyo omuwendo gukyusiddwa. Gukebere nga tonnasindika.",
     "paymentAlreadyAttempted": "Okusasula kwagezaako dda.\n\nBw’oba ​​oyagala okuddamu okusindika ssente zino, tandika okuva ku ntobo.",
     "slideConfirming": "Okukakasa",
     "slideToSend": "Seereza Okusindika",
@@ -2373,7 +2374,11 @@
       "stillOnItsWay": "Akyali mu kkubo"
     },
     "copiedDestination": "Gy'eziraga wawanduukuluddwa ku lutimbe",
-    "lightningRecommended": "Ebisale ebingi! Tukukubiriza okukozesa Lightning.",
+    "lightningRecommended": "Ebisale ebingi. Tukukubiriza okukozesa Lightning.",
+    "sending": "Okusindika",
+    "fromBalance": "Okuva ku Balance",
+    "details": "Ebisingawo",
+    "changeAmount": "Kyusa omuwendo",
     "usdRemainderSweep": "Ekisigaddewo {remaining: string} ({remainingSats: string}) kijja kufuulibwa Bitcoin. Ekitundu ekisembayo eky'USD: {minimum: string}.",
     "sendAnyway": "Nkebedde ebyafaayo byange, weereza wadde kiri kityo"
   },
@@ -3138,7 +3143,9 @@
     "deleteKey": "Sazaamu",
     "swapCurrencyHint": "Kyusa ensimbi z'owandiikamu omuwendo",
     "switchToWallet": "Kyusa ku {wallet: string}",
-    "copy": "Koppa"
+    "copy": "Koppa",
+    "balanceHidden": "Ssente ezisigaddewo zikwekeddwa",
+    "revealBalanceHint": "Kiraga ssente zo ezisigaddewo ku lupapula luno"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Nneetaaga okukyuusa app yange okutuuka ku nkyusa eyasembyeyo. Ndi mukozesa {os: string} eya app n'e nkyusa eya {version: string}.",

@@ -7494,6 +7494,10 @@ type RootTranslation = {
 		 */
 		somethingWentWrong: string
 		/**
+		 * T​h​e​ ​p​r​i​c​e​ ​m​o​v​e​d​,​ ​s​o​ ​t​h​e​ ​a​m​o​u​n​t​s​ ​w​e​r​e​ ​u​p​d​a​t​e​d​.​ ​C​h​e​c​k​ ​t​h​e​m​ ​b​e​f​o​r​e​ ​y​o​u​ ​s​e​n​d​.
+		 */
+		priceUpdated: string
+		/**
 		 * P​a​y​m​e​n​t​ ​a​l​r​e​a​d​y​ ​a​t​t​e​m​p​t​e​d​.​
 	​
 	​I​f​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​s​e​n​d​ ​t​h​i​s​ ​p​a​y​m​e​n​t​ ​a​g​a​i​n​,​ ​s​t​a​r​t​ ​f​r​o​m​ ​s​c​r​a​t​c​h​.
@@ -7554,9 +7558,25 @@ type RootTranslation = {
 		 */
 		copiedDestination: string
 		/**
-		 * H​i​g​h​ ​f​e​e​!​ ​W​e​ ​r​e​c​o​m​m​e​n​d​ ​L​i​g​h​t​n​i​n​g​.
+		 * H​i​g​h​ ​f​e​e​.​ ​W​e​ ​r​e​c​o​m​m​e​n​d​ ​L​i​g​h​t​n​i​n​g​.
 		 */
 		lightningRecommended: string
+		/**
+		 * S​e​n​d​i​n​g
+		 */
+		sending: string
+		/**
+		 * F​r​o​m​ ​B​a​l​a​n​c​e
+		 */
+		fromBalance: string
+		/**
+		 * D​e​t​a​i​l​s
+		 */
+		details: string
+		/**
+		 * C​h​a​n​g​e​ ​a​m​o​u​n​t
+		 */
+		changeAmount: string
 		/**
 		 * R​e​m​a​i​n​i​n​g​ ​{​r​e​m​a​i​n​i​n​g​}​ ​(​{​r​e​m​a​i​n​i​n​g​S​a​t​s​}​)​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​B​i​t​c​o​i​n​.​ ​U​S​D​ ​m​i​n​i​m​u​m​:​ ​{​m​i​n​i​m​u​m​}​.
 		 * @param {string} minimum
@@ -10500,6 +10520,10 @@ type RootTranslation = {
 	}
 	Accessibility: {
 		/**
+		 * B​a​l​a​n​c​e​ ​h​i​d​d​e​n
+		 */
+		balanceHidden: string
+		/**
 		 * C​o​p​y
 		 */
 		copy: string
@@ -10507,6 +10531,10 @@ type RootTranslation = {
 		 * D​e​l​e​t​e
 		 */
 		deleteKey: string
+		/**
+		 * S​h​o​w​s​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​o​n​ ​t​h​i​s​ ​s​c​r​e​e​n
+		 */
+		revealBalanceHint: string
 		/**
 		 * S​w​i​t​c​h​e​s​ ​t​h​e​ ​c​u​r​r​e​n​c​y​ ​y​o​u​ ​t​y​p​e​ ​t​h​e​ ​a​m​o​u​n​t​ ​i​n
 		 */
@@ -22043,6 +22071,10 @@ export type TranslationFunctions = {
 		 */
 		somethingWentWrong: () => LocalizedString
 		/**
+		 * The price moved, so the amounts were updated. Check them before you send.
+		 */
+		priceUpdated: () => LocalizedString
+		/**
 		 * Payment already attempted.
 
 	If you want to send this payment again, start from scratch.
@@ -22103,9 +22135,25 @@ export type TranslationFunctions = {
 		 */
 		copiedDestination: () => LocalizedString
 		/**
-		 * High fee! We recommend Lightning.
+		 * High fee. We recommend Lightning.
 		 */
 		lightningRecommended: () => LocalizedString
+		/**
+		 * Sending
+		 */
+		sending: () => LocalizedString
+		/**
+		 * From Balance
+		 */
+		fromBalance: () => LocalizedString
+		/**
+		 * Details
+		 */
+		details: () => LocalizedString
+		/**
+		 * Change amount
+		 */
+		changeAmount: () => LocalizedString
 		/**
 		 * Remaining {remaining} ({remainingSats}) will be converted to Bitcoin. USD minimum: {minimum}.
 		 */
@@ -24965,6 +25013,10 @@ export type TranslationFunctions = {
 	}
 	Accessibility: {
 		/**
+		 * Balance hidden
+		 */
+		balanceHidden: () => LocalizedString
+		/**
 		 * Copy
 		 */
 		copy: () => LocalizedString
@@ -24972,6 +25024,10 @@ export type TranslationFunctions = {
 		 * Delete
 		 */
 		deleteKey: () => LocalizedString
+		/**
+		 * Shows your balance on this screen
+		 */
+		revealBalanceHint: () => LocalizedString
 		/**
 		 * Switches the currency you type the amount in
 		 */

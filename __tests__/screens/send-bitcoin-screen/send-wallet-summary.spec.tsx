@@ -1,9 +1,10 @@
 import React from "react"
 import { StyleSheet, Text } from "react-native"
-import { render, screen, within } from "@testing-library/react-native"
+import { fireEvent, render, screen, within } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { WalletCurrency } from "@app/graphql/generated"
+import { light } from "@app/rne-theme/colors"
 import theme from "@app/rne-theme/theme"
 import {
   SEND_WALLET_LINES_TEST_ID,
@@ -16,11 +17,18 @@ jest.mock("@app/components/wallet-switch", () => ({
   WalletSwitch: () => null,
 }))
 
+jest.mock("@app/components/hidden-balance-placeholder/hidden-balance-placeholder", () => {
+  const { View } = jest.requireActual("react-native")
+  return { HiddenBalancePlaceholder: () => <View testID="hidden-balance-placeholder" /> }
+})
+
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
       common: { bitcoin: () => "Bitcoin", dollar: () => "Dollar" },
       Accessibility: {
+        balanceHidden: () => "Balance hidden",
+        revealBalanceHint: () => "Shows your balance on this screen",
         switchToWallet: ({ wallet }: { wallet: string }) => `Switch to ${wallet}`,
       },
     },
@@ -79,6 +87,94 @@ describe("SendWalletSummary", () => {
     )
     expect(visibleStyle.position).toBe("absolute")
     expect(visibleStyle.justifyContent).toBe("center")
+  })
+
+  describe("surface", () => {
+    const cardStyle = () =>
+      StyleSheet.flatten(screen.getByTestId("choose-wallet-to-send-from").props.style)
+
+    /** Review asks for the settled surface; amount entry keeps the active one even where
+     *  the region leaves it nothing to switch to. */
+    it("uses the grey7 static surface when it is inactive", () => {
+      render(
+        <ThemeProvider theme={theme}>
+          <SendWalletSummary
+            currency={WalletCurrency.Btc}
+            balancePrimary="741 SAT"
+            inactive
+          />
+        </ThemeProvider>,
+      )
+
+      expect(cardStyle().backgroundColor).toBe(light.grey7)
+    })
+
+    it("keeps the grey5 surface when it is active but has no wallet to switch to", () => {
+      render(bitcoinCard)
+
+      expect(cardStyle().backgroundColor).toBe(light.grey5)
+    })
+
+    it("uses the grey5 surface when it can switch wallets", () => {
+      render(
+        <ThemeProvider theme={theme}>
+          <SendWalletSummary
+            currency={WalletCurrency.Btc}
+            balancePrimary="741 SAT"
+            onSwitch={jest.fn()}
+          />
+        </ThemeProvider>,
+      )
+
+      expect(cardStyle().backgroundColor).toBe(light.grey5)
+    })
+  })
+
+  describe("hidden balance", () => {
+    const hiddenCard = (onReveal?: () => void) => (
+      <ThemeProvider theme={theme}>
+        <SendWalletSummary
+          currency={WalletCurrency.Btc}
+          balancePrimary="741 SAT"
+          balanceSecondary="~ $0.57"
+          isBalanceHidden
+          onReveal={onReveal}
+        />
+      </ThemeProvider>
+    )
+
+    it("shows the placeholder instead of both balance lines", () => {
+      render(hiddenCard())
+
+      expect(screen.getByTestId("hidden-balance-placeholder")).toBeTruthy()
+      expect(screen.queryByTestId(`${WalletCurrency.Btc} Wallet Balance`)).toBeNull()
+      expect(screen.queryByTestId(SEND_WALLET_SECONDARY_TEST_ID)).toBeNull()
+    })
+
+    it("keeps the balance out of the accessibility label, saying it is hidden", () => {
+      render(hiddenCard())
+
+      expect(
+        screen.getByTestId("choose-wallet-to-send-from").props.accessibilityLabel,
+      ).toBe("Bitcoin")
+    })
+
+    it("says a tap reveals the balance where it does", () => {
+      render(hiddenCard(jest.fn()))
+
+      expect(
+        screen.getByTestId("choose-wallet-to-send-from").props.accessibilityHint,
+      ).toBe("Shows your balance on this screen")
+    })
+
+    it("calls onReveal when the card is tapped", () => {
+      const onReveal = jest.fn()
+      render(hiddenCard(onReveal))
+
+      fireEvent.press(screen.getByTestId("choose-wallet-to-send-from"))
+
+      expect(onReveal).toHaveBeenCalledTimes(1)
+    })
   })
 
   /** A screen reader hears only what a tap selects, or the wallet's name; never the balance. */

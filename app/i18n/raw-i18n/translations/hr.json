@@ -2357,6 +2357,7 @@
     "maxFeeSelected": "Ovo je najveća naknada koja će vam biti naplaćena za ovu transakciju. Nakon izvršenja plaćanja može ispasti manje.",
     "invoiceAlreadyPaid": "Ovaj račun je već plaćen",
     "somethingWentWrong": "Nešto je pošlo po zlu",
+    "priceUpdated": "Cijena se promijenila pa su iznosi ažurirani. Provjerite ih prije slanja.",
     "paymentAlreadyAttempted": "Plaćanje je već pokušano.\n\nAko želite ponovo poslati ovo plaćanje, počnite ispočetka.",
     "slideConfirming": "Potvrđivanje...",
     "slideToSend": "Povucite za slanje",
@@ -2373,7 +2374,11 @@
       "stillOnItsWay": "Još je na putu"
     },
     "copiedDestination": "Odredište kopirano u međuspremnik",
-    "lightningRecommended": "Visoka naknada! Preporučujemo Lightning.",
+    "lightningRecommended": "Visoka naknada. Preporučujemo Lightning.",
+    "sending": "Slanje",
+    "fromBalance": "Sa salda",
+    "details": "Detalji",
+    "changeAmount": "Promijeni iznos",
     "usdRemainderSweep": "Preostalo {remaining: string} ({remainingSats: string}) bit će pretvoreno u Bitcoin. Minimum u USD: {minimum: string}.",
     "sendAnyway": "Povijest je provjerena, svejedno pošalji"
   },
@@ -3138,7 +3143,9 @@
     "deleteKey": "Izbriši",
     "swapCurrencyHint": "Mijenja valutu u kojoj upisujete iznos",
     "switchToWallet": "Prebaci na {wallet: string}",
-    "copy": "Kopiraj"
+    "copy": "Kopiraj",
+    "balanceHidden": "Stanje skriveno",
+    "revealBalanceHint": "Prikazuje vaše stanje na ovom zaslonu"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Moram ažurirati svoju aplikaciju na najnoviju verziju. Koristim aplikaciju {os: string} s verzijom {version: string}.",

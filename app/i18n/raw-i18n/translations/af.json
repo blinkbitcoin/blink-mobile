@@ -2357,6 +2357,7 @@
     "maxFeeSelected": "Hierdie is die maksimum fooi wat jy sal betaal vir hierdie transaksie. Dit mag dalk minder wees as die betaling voltooi is.",
     "invoiceAlreadyPaid": "Hierdie faktuur is reeds betaal",
     "somethingWentWrong": "Iets het verkeerd geloop",
+    "priceUpdated": "Die prys het geskuif, so die bedrae is opgedateer. Gaan dit na voordat jy stuur.",
     "paymentAlreadyAttempted": "Betaling reeds geprobeer.\n\nAs jy hierdie betaling weer wil stuur, begin van voor af.",
     "slideConfirming": "Besig om te bevestig...",
     "slideToSend": "Gly om te stuur",
@@ -2373,7 +2374,11 @@
       "stillOnItsWay": "Steeds op pad"
     },
     "copiedDestination": "Bestemming na knipbord oorgedra",
-    "lightningRecommended": "Hoë fooi! Ons beveel Lightning aan.",
+    "lightningRecommended": "Hoë fooi. Ons beveel Lightning aan.",
+    "sending": "Besig om te stuur",
+    "fromBalance": "Van Balans",
+    "details": "Besonderhede",
+    "changeAmount": "Verander bedrag",
     "usdRemainderSweep": "Oorblywende {remaining: string} ({remainingSats: string}) sal na Bitcoin omgeskakel word. USD-minimum: {minimum: string}.",
     "sendAnyway": "Ek het my geskiedenis nagegaan, stuur in elk geval"
   },
@@ -3138,7 +3143,9 @@
     "deleteKey": "Vee uit",
     "swapCurrencyHint": "Wissel die geldeenheid waarin jy die bedrag tik",
     "switchToWallet": "Skakel oor na {wallet: string}",
-    "copy": "Kopieer"
+    "copy": "Kopieer",
+    "balanceHidden": "Saldo versteek",
+    "revealBalanceHint": "Wys jou saldo op hierdie skerm"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ek moet opgradeer na die nuutste weergawe. Ek gebruik tans die {os: string} toepassing met die weergawe {version: string}.",

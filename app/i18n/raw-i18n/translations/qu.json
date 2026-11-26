@@ -2357,6 +2357,7 @@
     "maxFeeSelected": "Chaynamanta kaniyta rikuyta munanpi, kaniyta rikuyta munanpi ch'usaq kayniyta rikuy munanpi kawsayniyta qillqata sutichinaqinmi. Kaniytaikuyta munanpi kawsayniyta qillqata sutichinaqinmi chaypi ch'usaq kayniyta rikuy munanpi ch'usaqta munanpi kawsayniyta qillqata sutichinaqinmi.",
     "invoiceAlreadyPaid": "Kay facturata pagasqañam",
     "somethingWentWrong": "Imapas mana allinchu kasqa",
+    "priceUpdated": "Chanin tikrakurqan, chaymi yupaykuna musuqchasqa. Manaraq kachaspa qhaway.",
     "paymentAlreadyAttempted": "Pagota ruwasqaña kanku.\n\nWatiqmanta kay pagota apachiyta munaspaykiqa, qallarimanta qallariy.",
     "slideConfirming": "Chiqapchashanku...",
     "slideToSend": "Aysay kachanapaq",
@@ -2373,7 +2374,11 @@
       "stillOnItsWay": "Ñanpiraqmi"
     },
     "copiedDestination": "Mayman rinanta clipboard nisqaman churasqa",
-    "lightningRecommended": "¡Hatun comisión! Lightning nisqata yuyaychayku.",
+    "lightningRecommended": "Hatun comisión. Lightning nisqata yuyaychayku.",
+    "sending": "Apachishaspa",
+    "fromBalance": "Saldomanta",
+    "details": "Detalles",
+    "changeAmount": "Sumata tikray",
     "usdRemainderSweep": "Puchurqan {remaining: string} ({remainingSats: string}) Bitcoin-man tikrachisqa kanqa. USD pisi: {minimum: string}.",
     "sendAnyway": "Willakuyniyta qhawarqanim, chaypas kachay"
   },
@@ -3138,7 +3143,9 @@
     "deleteKey": "Pichay",
     "swapCurrencyHint": "Chaninta qillqanaykipaq qullqita tikran",
     "switchToWallet": "{wallet: string}-man tikray",
-    "copy": "Kopiay"
+    "copy": "Kopiay",
+    "balanceHidden": "Puchuq qullqi pakasqa",
+    "revealBalanceHint": "Kay pantallapi puchuq qullqiykita rikuchin"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Kaypiyta yachayninta munanichu, hamut'a kachun {os: string} app qallarichkanmi, versiyonqa {version: string} nisqan.",

@@ -2357,6 +2357,7 @@
     "maxFeeSelected": "Đây là mức phí tối đa bạn sẽ phải trả cho giao dịch này. Nó có thể sẽ ít hơn sau khi thanh toán được thực hiện.",
     "invoiceAlreadyPaid": "Hóa đơn này đã được thanh toán",
     "somethingWentWrong": "Đã xảy ra sự cố",
+    "priceUpdated": "Giá đã thay đổi nên số tiền đã được cập nhật. Hãy kiểm tra trước khi gửi.",
     "paymentAlreadyAttempted": "Thanh toán đã được thử.\n\nNếu bạn muốn gửi lại khoản thanh toán này, hãy bắt đầu lại từ đầu.",
     "slideConfirming": "Đang xác nhận...",
     "slideToSend": "Vuốt để Gửi",
@@ -2373,7 +2374,11 @@
       "stillOnItsWay": "Vẫn đang trên đường"
     },
     "copiedDestination": "Đã sao chép địa chỉ đích vào bộ nhớ tạm",
-    "lightningRecommended": "Phí cao! Chúng tôi khuyên bạn nên dùng Lightning.",
+    "lightningRecommended": "Phí cao. Chúng tôi khuyên bạn nên dùng Lightning.",
+    "sending": "Đang gửi",
+    "fromBalance": "Từ số dư",
+    "details": "Chi tiết",
+    "changeAmount": "Đổi số tiền",
     "usdRemainderSweep": "Số dư còn lại {remaining: string} ({remainingSats: string}) sẽ được chuyển đổi thành Bitcoin. Tối thiểu USD: {minimum: string}.",
     "sendAnyway": "Tôi đã kiểm tra lịch sử, vẫn gửi"
   },
@@ -3138,7 +3143,9 @@
     "deleteKey": "Xóa",
     "swapCurrencyHint": "Chuyển đơn vị tiền tệ bạn dùng để nhập số tiền",
     "switchToWallet": "Chuyển sang {wallet: string}",
-    "copy": "Sao chép"
+    "copy": "Sao chép",
+    "balanceHidden": "Số dư đang ẩn",
+    "revealBalanceHint": "Hiển thị số dư của bạn trên màn hình này"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",

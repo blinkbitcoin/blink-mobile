@@ -2357,6 +2357,7 @@
     "maxFeeSelected": "Bu, bu işlem için sizden tahsil edilecek maksimum ücrettir. Ödeme yapıldıktan sonra daha az olabilir.",
     "invoiceAlreadyPaid": "Bu fatura zaten ödenmiştir",
     "somethingWentWrong": "Bir şeyler ters gitti",
+    "priceUpdated": "Fiyat değişti, bu yüzden tutarlar güncellendi. Göndermeden önce kontrol edin.",
     "paymentAlreadyAttempted": "Ödeme zaten denendi.\n\nBu ödemeyi tekrar göndermek istiyorsanız, sıfırdan başlayın.",
     "slideConfirming": "Onaylanıyor...",
     "slideToSend": "Göndermek için kaydırın",
@@ -2373,7 +2374,11 @@
       "stillOnItsWay": "Hâlâ yolda"
     },
     "copiedDestination": "Hedefi panoya kopyalama",
-    "lightningRecommended": "Yüksek komisyon! Lightning kullanmanızı öneriyoruz.",
+    "lightningRecommended": "Yüksek komisyon. Lightning kullanmanızı öneriyoruz.",
+    "sending": "Gönderiliyor",
+    "fromBalance": "Bakiyeden",
+    "details": "Detaylar",
+    "changeAmount": "Tutarı değiştir",
     "usdRemainderSweep": "Kalan {remaining: string} ({remainingSats: string}) Bitcoin'e dönüştürülecek. USD minimumu: {minimum: string}.",
     "sendAnyway": "Geçmişimi kontrol ettim, yine de gönder"
   },
@@ -3138,7 +3143,9 @@
     "deleteKey": "Sil",
     "swapCurrencyHint": "Tutarı girdiğiniz para birimini değiştirir",
     "switchToWallet": "{wallet: string} seçeneğine geç",
-    "copy": "Kopyala"
+    "copy": "Kopyala",
+    "balanceHidden": "Bakiye gizli",
+    "revealBalanceHint": "Bakiyenizi bu ekranda gösterir"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Uygulamamı en son sürüme güncellemem gerekiyor. {os: string} uygulamasının {version: string} sürümünü kullanıyorum.",

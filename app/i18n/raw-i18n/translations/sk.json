@@ -2357,6 +2357,7 @@
     "maxFeeSelected": "Ide o maximálny poplatok, ktorý vám bude účtovaný za túto transakciu. Po jej vykonaní môže byť poplatok nižší.",
     "invoiceAlreadyPaid": "Táto faktúra už bola uhradená",
     "somethingWentWrong": "Niečo sa pokazilo",
+    "priceUpdated": "Cena sa zmenila, preto boli sumy aktualizované. Pred odoslaním ich skontrolujte.",
     "paymentAlreadyAttempted": "Platba už bola vykonaná.\n\nAk chcete túto platbu odoslať znova, začnite od začiatku.",
     "slideConfirming": "Potvrdzovanie...",
     "slideToSend": "Posunutím odošlite",
@@ -2373,7 +2374,11 @@
       "stillOnItsWay": "Stále na ceste"
     },
     "copiedDestination": "Cieľ bol skopírovaný do schránky",
-    "lightningRecommended": "Vysoký poplatok! Odporúčame Lightning.",
+    "lightningRecommended": "Vysoký poplatok. Odporúčame Lightning.",
+    "sending": "Odosielanie",
+    "fromBalance": "Zo zostatku",
+    "details": "Podrobnosti",
+    "changeAmount": "Zmeniť sumu",
     "usdRemainderSweep": "Zostávajúcich {remaining: string} ({remainingSats: string}) bude prevedených na Bitcoin. Minimum v USD: {minimum: string}.",
     "sendAnyway": "História skontrolovaná, aj tak odoslať"
   },
@@ -3138,7 +3143,9 @@
     "deleteKey": "Vymazať",
     "swapCurrencyHint": "Prepne menu, v ktorej zadávate sumu",
     "switchToWallet": "Prepnúť na {wallet: string}",
-    "copy": "Kopírovať"
+    "copy": "Kopírovať",
+    "balanceHidden": "Zostatok skrytý",
+    "revealBalanceHint": "Zobrazí váš zostatok na tejto obrazovke"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Potrebujem aktualizovať aplikáciu na najnovšiu verziu. Používam aplikáciu {os: string} s verziou {version: string}.",

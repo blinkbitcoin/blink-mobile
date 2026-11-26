@@ -2357,6 +2357,7 @@
         "maxFeeSelected": "Dies ist die maximale Transaktionsgebühr. Die tatsächlich gezahlte Gebühr kann weniger betragen.",
         "invoiceAlreadyPaid": "Diese Invoice ist bereits bezahlt worden",
         "somethingWentWrong": "Etwas ist schief gegeangen",
+        "priceUpdated": "Der Preis hat sich geändert, deshalb wurden die Beträge aktualisiert. Prüfe sie vor dem Senden.",
         "paymentAlreadyAttempted": "Die Zahlung wurde bereits versucht.\n\nWenn Sie diese Zahlung erneut senden möchten, beginnen Sie von vorne.",
         "slideConfirming": "Bestätigend…",
         "slideToSend": "Schiebe zum Senden",
@@ -2373,7 +2374,11 @@
             "stillOnItsWay": "Noch unterwegs"
         },
         "copiedDestination": "Ziel in die Zwischenablage kopiert",
-        "lightningRecommended": "Hohe Gebühr! Wir empfehlen Lightning.",
+        "lightningRecommended": "Hohe Gebühr. Wir empfehlen Lightning.",
+        "sending": "Wird gesendet",
+        "fromBalance": "Vom Guthaben",
+        "details": "Details",
+        "changeAmount": "Betrag ändern",
         "usdRemainderSweep": "Restbetrag {remaining: string} ({remainingSats: string}) wird in Bitcoin umgewandelt. USD-Mindestbetrag: {minimum: string}.",
         "sendAnyway": "Verlauf geprüft, trotzdem senden"
     },
@@ -3138,7 +3143,9 @@
         "deleteKey": "Löschen",
         "swapCurrencyHint": "Wechselt die Währung für die Betragseingabe",
         "switchToWallet": "Zu {wallet: string} wechseln",
-        "copy": "Kopieren"
+        "copy": "Kopieren",
+        "balanceHidden": "Guthaben ausgeblendet",
+        "revealBalanceHint": "Zeigt das Guthaben auf diesem Bildschirm"
     },
     "AppUpdate": {
         "needToUpdateSupportMessage": "Ich muss meine App auf die neuste Version updaten. Ich nutze die {os: string} App mit Version {version: string}.",

@@ -2357,6 +2357,7 @@
     "maxFeeSelected": "Ini adalah biaya maksimum yang akan dikenakan untuk transaksi ini. Biaya mungkin lebih rendah setelah pembayaran dilakukan.",
     "invoiceAlreadyPaid": "Faktur ini telah dibayar",
     "somethingWentWrong": "Terjadi kesalahan",
+    "priceUpdated": "Harga berubah, jadi jumlahnya diperbarui. Periksa sebelum mengirim.",
     "paymentAlreadyAttempted": "Pembayaran telah dicoba sebelumnya.\n\nJika Anda ingin mengirim pembayaran ini lagi, mulailah dari awal.",
     "slideConfirming": "Mengkonfirmasi...",
     "slideToSend": "Geser untuk Kirim",
@@ -2373,7 +2374,11 @@
       "stillOnItsWay": "Masih dalam perjalanan"
     },
     "copiedDestination": "Tujuan disalin ke papan klip",
-    "lightningRecommended": "Biaya tinggi! Kami merekomendasikan Lightning.",
+    "lightningRecommended": "Biaya tinggi. Kami merekomendasikan Lightning.",
+    "sending": "Mengirim",
+    "fromBalance": "Dari Saldo",
+    "details": "Detail",
+    "changeAmount": "Ubah jumlah",
     "usdRemainderSweep": "Sisa {remaining: string} ({remainingSats: string}) akan dikonversi ke Bitcoin. Minimum USD: {minimum: string}.",
     "sendAnyway": "Saya sudah memeriksa riwayat, tetap kirim"
   },
@@ -3138,7 +3143,9 @@
     "deleteKey": "Hapus",
     "swapCurrencyHint": "Mengganti mata uang untuk mengetik jumlah",
     "switchToWallet": "Beralih ke {wallet: string}",
-    "copy": "Salin"
+    "copy": "Salin",
+    "balanceHidden": "Saldo disembunyikan",
+    "revealBalanceHint": "Menampilkan saldo Anda di layar ini"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Saya perlu memperbarui aplikasi saya ke versi terbaru. Saya menggunakan aplikasi {os: string} dengan versi {version: string}.",

@@ -2357,6 +2357,7 @@
         "maxFeeSelected": "Tarifa máxima que se cobrará por esta transacción. Podría ser menor una vez se realice el pago.",
         "invoiceAlreadyPaid": "Esta factura ya ha sido pagada.",
         "somethingWentWrong": "Algo salió mal",
+        "priceUpdated": "El precio cambió, así que los montos se actualizaron. Revísalos antes de enviar.",
         "paymentAlreadyAttempted": "El pago ya se intentó.\n\nSi deseas enviar este pago nuevamente, comienza desde el principio del proceso.",
         "slideConfirming": "Confirmando...",
         "slideToSend": "Desliza para enviar",
@@ -2374,6 +2375,10 @@
         },
         "copiedDestination": "Destino copiado al portapapeles",
         "lightningRecommended": "Tasa elevada. Recomendamos Lightning.",
+        "sending": "Enviando",
+        "fromBalance": "Desde el saldo",
+        "details": "Detalles",
+        "changeAmount": "Cambiar cantidad",
         "usdRemainderSweep": "Restante {remaining: string} ({remainingSats: string}) se convertirá a Bitcoin. Mínimo en USD: {minimum: string}.",
         "sendAnyway": "Revisé mi historial, enviar de todos modos"
     },
@@ -3138,7 +3143,9 @@
         "deleteKey": "Borrar",
         "swapCurrencyHint": "Cambia la moneda en la que escribes la cantidad",
         "switchToWallet": "Cambiar a {wallet: string}",
-        "copy": "Copiar"
+        "copy": "Copiar",
+        "balanceHidden": "Saldo oculto",
+        "revealBalanceHint": "Muestra tu saldo en esta pantalla"
     },
     "AppUpdate": {
         "needToUpdateSupportMessage": "Necesito actualizar la aplicación a la última versión. Utilizo la aplicación para {os: string} con la versión {version: string}.",

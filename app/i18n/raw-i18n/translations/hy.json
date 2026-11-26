@@ -2357,6 +2357,7 @@
     "maxFeeSelected": "Սա առավելագույն վճարն է, որը Ձեզանից կգանձվի այս գործառնության համար: Վճարումը կատարելուց հետո այն կարող է նվազել։ ",
     "invoiceAlreadyPaid": "Այս հաշիվ առաջնարդեն վճարված է",
     "somethingWentWrong": "Ինչ-որ բան այնպես չգնաց",
+    "priceUpdated": "Գինը փոխվել է, ուստի գումարները թարմացվել են։ Ստուգեք դրանք ուղարկելուց առաջ։",
     "paymentAlreadyAttempted": "Վճարումը արդեն փորձվել է։\n\nԵթե ցանկանում եք կրկին ուղարկել այս վճարումը՝ սկսել ի սկբանե։",
     "slideConfirming": "Հաստատվում է...",
     "slideToSend": "Սահեցրեք՝ ուղարկելու համար",
@@ -2374,6 +2375,10 @@
     },
     "copiedDestination": "Նպատակակետը պատծենվել է ջամանակավոր շտեմարանում",
     "lightningRecommended": "Բարձր միջնորդավճար։ Խորհուրդ ենք տալիս Lightning-ը։",
+    "sending": "Ուղարկվում է",
+    "fromBalance": "Հաշվեկշռից",
+    "details": "Մանրամասներ",
+    "changeAmount": "Փոխել գումարը",
     "usdRemainderSweep": "Մնացած {remaining: string} ({remainingSats: string}) կփոխարկվի Bitcoin-ի։ USD-ի նվազագույնը՝ {minimum: string}։",
     "sendAnyway": "Ստուգել եմ պատմությունը, միևնույնն է ուղարկել"
   },
@@ -3138,7 +3143,9 @@
     "deleteKey": "Ջնջել",
     "swapCurrencyHint": "Փոխում է արժույթը, որով մուտքագրում եք գումարը",
     "switchToWallet": "Անցնել {wallet: string}-ին",
-    "copy": "Պատճենել"
+    "copy": "Պատճենել",
+    "balanceHidden": "Մնացորդը թաքցված է",
+    "revealBalanceHint": "Ցույց է տալիս ձեր մնացորդը այս էկրանին"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ես պետք է թարմացնել հավելվածը։ Ես օգտագործում եմ {os: string} հավելվածը {version: string} տարբերակով։ ",

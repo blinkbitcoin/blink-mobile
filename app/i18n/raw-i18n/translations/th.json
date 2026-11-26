@@ -2357,6 +2357,7 @@
     "maxFeeSelected": "นี่คือค่าธรรมเนียมสูงสุดที่จะถูกเรียกเก็บในธุรกรรมนี้ได้ มันอาจน้อยกว่านี้เมื่อมีการทำธุรกรรมกันจริงๆ",
     "invoiceAlreadyPaid": "ใบแจ้งหนี้นี้ถูกชำระแล้ว",
     "somethingWentWrong": "มีบางอย่างผิดพลาด",
+    "priceUpdated": "ราคาเปลี่ยนไป จึงอัปเดตจำนวนเงินแล้ว โปรดตรวจสอบก่อนส่ง",
     "paymentAlreadyAttempted": "มีการพยายามชำระเงินแล้ว\n\nหากคุณต้องการส่งการชำระเงินนี้อีกครั้ง กรุณาเริ่มต้นใหม่",
     "slideConfirming": "กำลังยืนยัน...",
     "slideToSend": "เลื่อนเพื่อส่ง",
@@ -2373,7 +2374,11 @@
       "stillOnItsWay": "ยังอยู่ระหว่างทาง"
     },
     "copiedDestination": "คัดลอกปลายทางไปยังคลิปบอร์ดแล้ว",
-    "lightningRecommended": "ค่าธรรมเนียมสูง! แนะนำให้ใช้ Lightning",
+    "lightningRecommended": "ค่าธรรมเนียมสูง แนะนำให้ใช้ Lightning",
+    "sending": "กำลังส่ง",
+    "fromBalance": "จากยอดคงเหลือ",
+    "details": "รายละเอียด",
+    "changeAmount": "เปลี่ยนจำนวนเงิน",
     "usdRemainderSweep": "ยอดคงเหลือ {remaining: string} ({remainingSats: string}) จะถูกแปลงเป็น Bitcoin ขั้นต่ำของ USD: {minimum: string}",
     "sendAnyway": "ตรวจสอบประวัติแล้ว ส่งต่อไป"
   },
@@ -3138,7 +3143,9 @@
     "deleteKey": "ลบ",
     "swapCurrencyHint": "สลับสกุลเงินที่คุณใช้พิมพ์จำนวน",
     "switchToWallet": "สลับไปใช้ {wallet: string}",
-    "copy": "คัดลอก"
+    "copy": "คัดลอก",
+    "balanceHidden": "ซ่อนยอดเงินอยู่",
+    "revealBalanceHint": "แสดงยอดเงินของคุณบนหน้าจอนี้"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",
