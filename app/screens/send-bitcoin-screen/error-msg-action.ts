@@ -1,22 +1,19 @@
 import { useCallback } from "react"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 
 import { isAmountFixableError } from "./amount-fixable-error"
 import { PaymentDetail } from "./payment-details/index.types"
 import { IDEMPOTENCY_KEY_UNAVAILABLE } from "./use-send-payment"
 
-/** Failures raised before anything is sent, so a new payment can be offered. */
-const NOTHING_SENT_CODES: ReadonlySet<string> = new Set([
-  SelfCustodialErrorCode.InsufficientFunds,
-  SelfCustodialErrorCode.BelowMinimum,
-  SelfCustodialErrorCode.InvalidInput,
-  IDEMPOTENCY_KEY_UNAVAILABLE,
-])
+/** Failures certain to be raised before anything is sent, so a new payment can be
+ *  offered: the idempotency key could not be minted, so the send never started. The
+ *  self-custodial amount and input codes are not here: on a send they are the SDK's word
+ *  that nothing went out, read partly from its error text, and not certain enough. */
+const NOTHING_SENT_CODES: ReadonlySet<string> = new Set([IDEMPOTENCY_KEY_UNAVAILABLE])
 
-/** True only for a failure classified as raised before the send. Server text, an
- *  unclassified code or no reason at all may have moved money. */
+/** True only for a failure certain to be raised before the send. Server text, a
+ *  classified code or no reason at all may have moved money. */
 export const isNothingSentFailure = (raw: string | undefined): boolean =>
   raw !== undefined && NOTHING_SENT_CODES.has(raw)
 
@@ -48,8 +45,8 @@ type FailureContext = {
  * The action for a failure the user can't fix on review.
  *
  * Change amount and Try again both build a new payment, so they are offered only when
- * nothing can have been sent: a failure before the send, or one classified as raised
- * before it. Every other failure, a custodial FAILURE included, goes Home: the payment
+ * nothing can have been sent: a failure before the send, or a key that could not be
+ * minted. Every other failure, a custodial FAILURE included, goes Home: the payment
  * may still land, and a second one must never be possible (#1273 N18). Server text never
  * picks the action.
  */

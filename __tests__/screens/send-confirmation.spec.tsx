@@ -2920,7 +2920,10 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       expect(sheetButton(LL.SendBitcoinConfirmationScreen.home())).toBeTruthy()
     })
 
-    it("offers Try again when the SDK rejected the details before sending (S10 invalidInput)", async () => {
+    /** On a send, an SDK code is its word that nothing went out, read partly from its
+     *  error text: not proof enough to offer a new payment, so the way out is Home. The
+     *  copy still names the cause. */
+    it("goes Home when a self-custodial send is rejected for its details (S10 invalidInput)", async () => {
       asSelfCustodial()
       sendPaymentMock.mockResolvedValueOnce({
         status: "FAILURE",
@@ -2929,7 +2932,12 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       await renderReview(route)
       await slide()
 
-      expect(sheetButton(LL.SendBitcoinConfirmationScreen.tryAgain())).toBeTruthy()
+      expect(sheetButton(LL.SendBitcoinConfirmationScreen.home())).toBeTruthy()
+      expect(
+        within(screen.getByTestId(ERROR_SHEET_TEST_ID)).queryByText(
+          LL.SendBitcoinConfirmationScreen.tryAgain(),
+        ),
+      ).toBeNull()
     })
 
     it("offers Try again when no idempotency key could be made, since nothing was sent (S8)", async () => {
@@ -2941,7 +2949,7 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       expect(sheetButton(LL.SendBitcoinConfirmationScreen.tryAgain())).toBeTruthy()
     })
 
-    it("offers Change amount after a self-custodial send rejected for the amount (S10)", async () => {
+    it("goes Home when a self-custodial send is rejected for the amount, naming the cause (S10)", async () => {
       asSelfCustodial()
       sendPaymentMock.mockResolvedValueOnce({
         status: "FAILURE",
@@ -2950,8 +2958,16 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       await renderReview(route)
       await slide()
 
-      fireEvent.press(sheetButton(LL.SendBitcoinConfirmationScreen.changeAmount()))
-      expectChangeAmountDispatched()
+      expectInlineAndInSheet(LL.SelfCustodialError.insufficientFunds())
+      expect(
+        within(screen.getByTestId(ERROR_SHEET_TEST_ID)).queryByText(
+          LL.SendBitcoinConfirmationScreen.changeAmount(),
+        ),
+      ).toBeNull()
+      fireEvent.press(sheetButton(LL.SendBitcoinConfirmationScreen.home()))
+      expect(navigationDispatchMock).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "POP_TO_TOP" }),
+      )
     })
   })
 

@@ -636,6 +636,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     feeErrorText,
     dustWarning,
     errorMsgActionFor,
+    hasAttemptedSend,
   })
 
   // A failed quote leaves the row blank; its reason goes under the card with the other errors.

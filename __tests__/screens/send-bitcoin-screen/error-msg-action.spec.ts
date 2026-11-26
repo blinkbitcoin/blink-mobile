@@ -29,19 +29,31 @@ const cases: Case[] = [
     { raw: IDEMPOTENCY_KEY_UNAVAILABLE, outcome: "unconfirmed" },
     "tryAgain",
   ],
+  // On a send, these codes are the SDK's word that nothing went out, read partly from
+  // its error text: not proof enough to build a new payment.
   [
-    "self-custodial amount code raised before the send",
+    "self-custodial amount code on a send",
     { raw: SelfCustodialErrorCode.InsufficientFunds },
-    "changeAmount",
+    "home",
   ],
   [
-    "self-custodial amount code with a fixed amount",
+    "self-custodial amount code on a send with a fixed amount",
     { raw: SelfCustodialErrorCode.BelowMinimum, canSetAmount: false },
-    "tryAgain",
+    "home",
   ],
   [
-    "self-custodial invalid input, nothing sent",
+    "self-custodial invalid input on a send",
     { raw: SelfCustodialErrorCode.InvalidInput },
+    "home",
+  ],
+  [
+    "self-custodial amount code from a thrown send",
+    { raw: SelfCustodialErrorCode.InsufficientFunds, outcome: "unconfirmed" },
+    "home",
+  ],
+  [
+    "amount code before a send with a fixed amount (fee quote)",
+    { raw: SelfCustodialErrorCode.BelowMinimum, outcome: "notSent", canSetAmount: false },
     "tryAgain",
   ],
   [
