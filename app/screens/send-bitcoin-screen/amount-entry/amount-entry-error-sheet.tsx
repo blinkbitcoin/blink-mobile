@@ -30,8 +30,8 @@ type Props = {
  * - A3, over the daily limit: Change amount empties the amount here. It opens by itself on
  *   crossing the limit, stays closed while the amount stays over, and opens again on the
  *   next crossing
- * - the daily limit could not be read: Try again reads it again. Whether Next waits for it
- *   is limit logic, left as main has it for the senior dev
+ * - the daily limit could not be read: Try again reads it again. The screen holds Next
+ *   until a read answers
  * - an on-chain address of the sending wallet (blink-mobile#4261): Change destination
  *   starts the send over, since no amount or wallet on this screen can fix it
  */

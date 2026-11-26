@@ -546,8 +546,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       }
     })
 
-  /** Only one of the two limits queries runs for a payment, so at most one can fail. Next
-   *  is left as main has it: whether an unread limit holds the send is the senior dev's. */
+  /** Only one of the two limits queries runs for a payment, so at most one can fail. A
+   *  limit nobody read is not one the amount passed, so it holds Next until a read answers. */
   const retryLimits = withdrawalLimitsError
     ? () => refetchWithdrawalLimits()
     : intraledgerLimitsError
@@ -564,7 +564,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     !amountStatus.validAmount ||
     Boolean(lnurlBoundsErrorMessage) ||
     isSelfPayment ||
-    isQuotingFees
+    isQuotingFees ||
+    Boolean(retryLimits)
 
   /**
    * The extra-info box shows one message, and an invalid amount is the one the sender can

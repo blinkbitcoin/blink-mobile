@@ -171,25 +171,35 @@ const mockQuoteFees = jest.fn()
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
-  useSendBitcoinWithdrawalLimitsQuery: () => ({
-    error: mockWithdrawalLimitsQuery.error,
-    refetch: mockWithdrawalLimitsQuery.refetch,
-    data: {
-      me: {
-        defaultAccount: {
-          limits: {
-            withdrawal: [
-              {
-                totalLimit: 100_000_000,
-                remainingLimit: mockWithdrawalAllowance.remaining,
-                interval: 86_400,
-              },
-            ],
-          },
-        },
+  useSendBitcoinWithdrawalLimitsQuery: () => {
+    // Apollo renders the screen again once a refetch answers; the mock has to as well.
+    const [, rerender] = jest.requireActual("react").useReducer((n: number) => n + 1, 0)
+    return {
+      error: mockWithdrawalLimitsQuery.error,
+      refetch: async () => {
+        await mockWithdrawalLimitsQuery.refetch()
+        rerender()
       },
-    },
-  }),
+      // A failed query answers with no data, so no limit is there to check against.
+      data: mockWithdrawalLimitsQuery.error
+        ? undefined
+        : {
+            me: {
+              defaultAccount: {
+                limits: {
+                  withdrawal: [
+                    {
+                      totalLimit: 100_000_000,
+                      remainingLimit: mockWithdrawalAllowance.remaining,
+                      interval: 86_400,
+                    },
+                  ],
+                },
+              },
+            },
+          },
+    }
+  },
   useOnChainTxFeeBySpeedLazyQuery: () => [mockQuoteFees],
   useOnChainUsdTxFeeBySpeedLazyQuery: () => [mockQuoteFees],
   useOnChainUsdTxFeeAsBtcDenominatedBySpeedLazyQuery: () => [mockQuoteFees],
@@ -1101,6 +1111,47 @@ describe("daily limit that could not be read", () => {
       })
       .filter((node) => !isInSheet(node))
     expect(inline).toHaveLength(1)
+  })
+
+  it("holds Next while the limit can't be read, whatever the amount", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalLimitsQuery.error = new Error("limits unavailable")
+
+    await renderOnchain()
+    for (let i = 0; i < 4; i += 1) fireEvent.press(screen.getByTestId("Key 9"))
+    await flushAsync()
+    await flushAsync()
+
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      true,
+    )
+  })
+
+  it("frees Next once a read of the limit answers", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalLimitsQuery.error = new Error("limits unavailable")
+    mockWithdrawalLimitsQuery.refetch.mockImplementationOnce(async () => {
+      mockWithdrawalLimitsQuery.error = undefined
+    })
+
+    await renderOnchain()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    await flushAsync()
+    const sheet = within(await screen.findByTestId(ERROR_SHEET_TEST_ID))
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinConfirmationScreen.tryAgain()))
+    })
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled,
+      ).toBe(false)
+    })
+    expect(screen.queryByText(LL.SendBitcoinScreen.limitsUnavailable())).toBeNull()
   })
 
   // A remaining limit of 0 reads as no limit, as on main (blink-wip#1273 G1, senior dev).
