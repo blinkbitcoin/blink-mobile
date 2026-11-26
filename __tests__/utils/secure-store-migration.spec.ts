@@ -4,6 +4,7 @@ import { ACCESSIBLE } from "react-native-keychain"
 import { legacyBlank, legacyErase, legacyRead } from "@app/utils/storage/legacy-key-store"
 import {
   existsThrough,
+  purgeThrough,
   readThrough,
   removeThrough,
   writeThrough,
@@ -229,19 +230,20 @@ describe("readThrough", () => {
   })
 
   describe("a slot that records before it migrates", () => {
-    const recordBeforeMigrate = jest.fn<Promise<void>, []>()
+    const recordBeforeMigrate = jest.fn<Promise<boolean>, []>()
     const RECORDED_ARGS = { ...ARGS, recordBeforeMigrate }
 
     beforeEach(() => {
       mockedSecureRead.mockResolvedValue({ status: "absent" })
       mockedLegacyRead.mockResolvedValue({ status: "found", value: "legacy-value" })
-      recordBeforeMigrate.mockResolvedValue(undefined)
+      recordBeforeMigrate.mockResolvedValue(true)
     })
 
     it("records first, and only then writes the new copy", async () => {
       const calls: string[] = []
       recordBeforeMigrate.mockImplementation(async () => {
         calls.push("record")
+        return true
       })
       mockedSecureWrite.mockImplementation(async () => {
         calls.push("write")
@@ -256,6 +258,19 @@ describe("readThrough", () => {
 
     it("still migrates and answers with the value when the record rejects", async () => {
       recordBeforeMigrate.mockRejectedValue(new Error("list unavailable"))
+
+      const read = await readThrough(RECORDED_ARGS)
+
+      expect(read).toEqual({ status: "found", value: "legacy-value" })
+      expect(mockedSecureWrite).toHaveBeenCalledWith(
+        ARGS.slot,
+        "legacy-value",
+        ARGS.accessible,
+      )
+    })
+
+    it("still migrates and answers with the value when the record does not land", async () => {
+      recordBeforeMigrate.mockResolvedValue(false)
 
       const read = await readThrough(RECORDED_ARGS)
 
@@ -290,8 +305,8 @@ describe("readThrough", () => {
       let finishRecording: () => void = () => {}
       recordBeforeMigrate.mockImplementationOnce(
         () =>
-          new Promise((resolve) => {
-            finishRecording = resolve
+          new Promise<boolean>((resolve) => {
+            finishRecording = () => resolve(true)
           }),
       )
 
@@ -472,12 +487,23 @@ describe("removeThrough", () => {
 
   it("reports false when the operation times out", async () => {
     jest.useFakeTimers()
-    mockedLegacyErase.mockImplementation(() => new Promise<never>(() => {}))
+    let releaseHungErase: () => void = () => {}
+    mockedLegacyErase.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releaseHungErase = () => resolve(false)
+        }),
+    )
 
     const remove = removeThrough(REMOVE_ARGS)
     await jest.advanceTimersByTimeAsync(30_000)
 
     expect(await remove).toBe(false)
+
+    // The erase it sent still holds the slot, so it has to settle before the
+    // next spec gets a turn.
+    releaseHungErase()
+    await jest.advanceTimersByTimeAsync(0)
   })
 
   it("succeeds when the erase failed on a key that was never there", async () => {
@@ -682,6 +708,69 @@ describe("per-slot serialization", () => {
     expect(mockedSecureRemove).not.toHaveBeenCalled()
   })
 
+  /**
+   * The guard stops an abandoned task from starting a write; it cannot recall one already
+   * sent. Released at the timeout, the slot would let a remove run first, and the write
+   * landing after it would put the credential back.
+   */
+  it("holds the slot for a write the timeout abandoned, so a remove behind it runs after", async () => {
+    jest.useFakeTimers()
+    const calls: string[] = []
+    let releaseHungWrite: () => void = () => {}
+    mockedSecureRead.mockResolvedValue({ status: "absent" })
+    mockedLegacyRead.mockResolvedValue({ status: "found", value: "stale-token" })
+    mockedSecureWrite.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releaseHungWrite = () => {
+            calls.push("write landed")
+            resolve(true)
+          }
+        }),
+    )
+    mockedLegacyErase.mockResolvedValue(true)
+    mockedSecureRemove.mockImplementation(async () => {
+      calls.push("remove")
+      return true
+    })
+
+    const abandoned = readThrough(ARGS)
+    await jest.advanceTimersByTimeAsync(30_000)
+    expect(await abandoned).toMatchObject({ status: "failed" })
+
+    const remove = removeThrough(REMOVE_ARGS)
+    await jest.advanceTimersByTimeAsync(0)
+    expect(calls).toEqual([])
+
+    releaseHungWrite()
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(await remove).toBe(true)
+    expect(calls).toEqual(["write landed", "remove"])
+  })
+
+  /** An erase abandoned while its delete was out must not follow it with the blank: the
+   *  slot may have moved on by then, and the blank is a write. */
+  it("does not send the blank of an erase abandoned before it", async () => {
+    jest.useFakeTimers()
+    let releaseHungErase: () => void = () => {}
+    mockedLegacyErase.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releaseHungErase = () => resolve(false)
+        }),
+    )
+
+    const abandoned = removeThrough(REMOVE_ARGS)
+    await jest.advanceTimersByTimeAsync(30_000)
+    expect(await abandoned).toBe(false)
+
+    releaseHungErase()
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(mockedLegacyBlank).not.toHaveBeenCalled()
+  })
+
   /** The read-through has already fetched the legacy value when a fresh one is
    *  saved. Unqueued, its migrating write lands last and the rotated credential
    *  is replaced by the one it rotated away from. */
@@ -838,6 +927,7 @@ describe("existsThrough", () => {
     const calls: string[] = []
     const recordBeforeMigrate = async () => {
       calls.push("record")
+      return true
     }
     mockedSecureWrite.mockImplementation(async () => {
       calls.push("write")
@@ -899,5 +989,117 @@ describe("existsThrough", () => {
     mockedLegacyRead.mockResolvedValue({ status: "failed", err })
 
     expect(await existsThrough(ARGS)).toEqual({ status: "failed", err })
+  })
+})
+
+/**
+ * The reinstall wipe reaches a migrated seed only through the list that names its
+ * account, and clears the legacy store whole. So the purge keeps a seed's legacy
+ * copy, the one copy the wipe can still reach, until the record has landed.
+ */
+describe("purgeThrough erasing a seed's legacy copy", () => {
+  const SEED = "alpha beta"
+  const recordBeforeMigrate = jest.fn<Promise<boolean>, []>()
+  const SEED_ARGS = {
+    slot: "mnemonic:alice",
+    legacyKey: "mnemonic:alice",
+    accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+    deleteLegacyOnMigrate: false,
+    recordBeforeMigrate,
+  }
+  const SEED_RULE = { requireMigrated: true }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockLogEvent.mockResolvedValue(undefined)
+    mockedLegacyRead.mockResolvedValue({ status: "found", value: SEED })
+    mockedSecureRead.mockResolvedValue({ status: "found", value: SEED })
+    mockedSecureWrite.mockResolvedValue(true)
+    mockedLegacyErase.mockResolvedValue(true)
+    recordBeforeMigrate.mockResolvedValue(true)
+  })
+
+  describe("a seed already in the new store", () => {
+    it("records its account first, and only then erases the legacy copy", async () => {
+      const calls: string[] = []
+      recordBeforeMigrate.mockImplementation(async () => {
+        calls.push("record")
+        return true
+      })
+      mockedLegacyErase.mockImplementation(async () => {
+        calls.push("erase")
+        return true
+      })
+
+      expect(await purgeThrough(SEED_ARGS, SEED_RULE)).toBe("gone")
+      expect(calls).toEqual(["record", "erase"])
+    })
+
+    it("keeps the legacy copy when the record does not land", async () => {
+      recordBeforeMigrate.mockResolvedValue(false)
+
+      expect(await purgeThrough(SEED_ARGS, SEED_RULE)).toBe("transient")
+      expect(mockedLegacyErase).not.toHaveBeenCalled()
+    })
+
+    it("keeps the legacy copy when the record rejects", async () => {
+      recordBeforeMigrate.mockRejectedValue(new Error("list unavailable"))
+
+      expect(await purgeThrough(SEED_ARGS, SEED_RULE)).toBe("transient")
+      expect(mockedLegacyErase).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("a seed the purge rewrites from the legacy copy", () => {
+    beforeEach(() => {
+      mockedSecureRead
+        .mockResolvedValueOnce({ status: "absent" })
+        .mockResolvedValue({ status: "found", value: SEED })
+    })
+
+    it("erases the legacy copy once the rewrite reads back and the record lands", async () => {
+      expect(await purgeThrough(SEED_ARGS, SEED_RULE)).toBe("gone")
+      expect(mockedSecureWrite).toHaveBeenCalledWith(
+        SEED_ARGS.slot,
+        SEED,
+        SEED_ARGS.accessible,
+      )
+      expect(mockedLegacyErase).toHaveBeenCalledWith(SEED_ARGS.legacyKey)
+    })
+
+    /** The rewrite goes ahead on a record that failed, as a read does, so the new
+     *  copy is there; the legacy one is what the wipe can still reach. */
+    it("keeps the legacy copy when the record does not land", async () => {
+      recordBeforeMigrate.mockResolvedValue(false)
+
+      expect(await purgeThrough(SEED_ARGS, SEED_RULE)).toBe("transient")
+      expect(mockedSecureWrite).toHaveBeenCalledTimes(1)
+      expect(mockedLegacyErase).not.toHaveBeenCalled()
+    })
+
+    it("erases the legacy copy when a record that failed before the rewrite lands after it", async () => {
+      recordBeforeMigrate.mockResolvedValueOnce(false).mockResolvedValue(true)
+
+      expect(await purgeThrough(SEED_ARGS, SEED_RULE)).toBe("gone")
+      expect(recordBeforeMigrate).toHaveBeenCalledTimes(2)
+      expect(mockedLegacyErase).toHaveBeenCalledWith(SEED_ARGS.legacyKey)
+    })
+  })
+
+  it("needs no record for a slot that has nothing to record", async () => {
+    const { recordBeforeMigrate: _unused, ...unrecordedArgs } = SEED_ARGS
+
+    expect(await purgeThrough(unrecordedArgs, SEED_RULE)).toBe("gone")
+    expect(mockedLegacyErase).toHaveBeenCalledWith(SEED_ARGS.legacyKey)
+  })
+
+  /** Only the seed waits: a slot held to the looser rule, like the network marker,
+   *  costs a re-login or nothing when it goes, never someone's money. */
+  it("erases a slot held to the looser rule without waiting for its record", async () => {
+    recordBeforeMigrate.mockResolvedValue(false)
+
+    expect(await purgeThrough(SEED_ARGS, { requireMigrated: false })).toBe("gone")
+    expect(recordBeforeMigrate).not.toHaveBeenCalled()
+    expect(mockedLegacyErase).toHaveBeenCalledWith(SEED_ARGS.legacyKey)
   })
 })
