@@ -157,6 +157,20 @@ describe("useRestorePhrase", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
+  it("stays on step 1 after a full phrase is pasted from the clipboard", async () => {
+    mockGetString.mockResolvedValue("valid a b c d e f g h i j k")
+    mockHandlePaste.mockReturnValue(true)
+
+    const { result } = renderHook(() => useRestorePhrase({ step: PhraseStep.First }))
+
+    await act(async () => {
+      await result.current.handlePasteFromClipboard()
+    })
+
+    expect(mockHandlePaste).toHaveBeenCalledWith("valid a b c d e f g h i j k")
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
   /** The paste control lives on a header onPress, so a clipboard rejection would surface
    *  as an unhandled promise rejection; it is reported and toasted instead. */
   it("reports and toasts a clipboard read failure instead of rejecting", async () => {

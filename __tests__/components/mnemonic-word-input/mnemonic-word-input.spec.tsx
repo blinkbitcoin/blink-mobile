@@ -31,8 +31,6 @@ describe("MnemonicWordInput", () => {
     jest.clearAllMocks()
   })
 
-  /** The number slot is always mounted with a fixed width so the row cannot reflow on
-   *  the first keystroke; empty inputs hide it with opacity only. */
   /** The design starts the placeholder at the field's padding, so an empty field
    *  keeps no room for the number. */
   it("leaves the number out while the input is empty", () => {
@@ -51,6 +49,14 @@ describe("MnemonicWordInput", () => {
     const { queryByText } = renderInput({ value: "   " })
 
     expect(queryByText("1.")).toBeNull()
+  })
+
+  it("pads the field 14 on the left and 10 on the right, as the design does", () => {
+    const root = renderInput({}).toJSON() as ReactTestRendererJSON
+    const style = StyleSheet.flatten(root.props.style)
+
+    expect(style.paddingLeft).toBe(14)
+    expect(style.paddingRight).toBe(10)
   })
 
   it("forwards text changes and focus to the callbacks", () => {

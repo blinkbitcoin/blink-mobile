@@ -6,6 +6,8 @@ import { RestorePhraseScreen } from "@app/screens/self-custodial/onboarding/rest
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { HEADER_ICON_TOUCH_SIZE } from "@app/components/header-no-glass"
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import theme from "@app/rne-theme/theme"
 
 import { ContextForScreen, ContextForScreenWithTheme } from "../../../helper"
 import { flushEffects } from "../../../../helpers/flush-effects"
@@ -279,6 +281,125 @@ describe("RestorePhraseScreen", () => {
     fireEvent.press(getByText("Support"))
 
     expect(mockNavigate).toHaveBeenCalledWith("onboarding", { screen: "supportScreen" })
+  })
+
+  it("underlines Support in the error colour", async () => {
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      allValid: true,
+      isValid: false,
+    })
+
+    const { getByText } = renderScreen()
+    await flushEffects()
+
+    const link = StyleSheet.flatten(getByText("Support").props.style)
+    expect(link.textDecorationLine).toBe("underline")
+    expect(link.color).toBe(theme.lightColors?.error)
+  })
+
+  it("marks all six step 2 fields red on an invalid phrase", async () => {
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      allValid: true,
+      isValid: false,
+    })
+
+    renderScreen()
+    await flushEffects()
+
+    const wrong = mockMnemonicWordInput.mock.calls.slice(-6).map(([props]) => props.wrong)
+    expect(wrong).toEqual(Array(6).fill(true))
+  })
+
+  describe("the step button", () => {
+    const buttonDisabled = (screen: ReturnType<typeof renderScreen>) =>
+      screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled
+
+    it("keeps Next 6 words disabled until the step's words are all backup words", async () => {
+      mockRouteParams = { step: 1 }
+      mockUseRestorePhrase.mockReturnValue({
+        ...defaultHookReturn,
+        isStep1: true,
+        offset: 0,
+        stepValid: false,
+      })
+
+      const screen = renderScreen()
+      await flushEffects()
+
+      expect(buttonDisabled(screen)).toBe(true)
+    })
+
+    it("enables Next 6 words once the step's words are all backup words", async () => {
+      mockRouteParams = { step: 1 }
+      const handleContinue = jest.fn()
+      mockUseRestorePhrase.mockReturnValue({
+        ...defaultHookReturn,
+        isStep1: true,
+        offset: 0,
+        stepValid: true,
+        handleContinue,
+      })
+
+      const screen = renderScreen()
+      await flushEffects()
+      screen.UNSAFE_getByType(GaloyPrimaryButton).props.onPress()
+
+      expect(buttonDisabled(screen)).toBe(false)
+      expect(handleContinue).toHaveBeenCalledTimes(1)
+    })
+
+    /** Six real words on step 2 are not enough: the whole phrase must pass. */
+    it("keeps Restore wallet disabled while the phrase is invalid", async () => {
+      mockUseRestorePhrase.mockReturnValue({
+        ...defaultHookReturn,
+        stepValid: true,
+        allValid: true,
+        isValid: false,
+      })
+
+      const screen = renderScreen()
+      await flushEffects()
+
+      expect(buttonDisabled(screen)).toBe(true)
+    })
+
+    it("enables Restore wallet for a valid phrase", async () => {
+      const handleRestore = jest.fn()
+      mockUseRestorePhrase.mockReturnValue({
+        ...defaultHookReturn,
+        stepValid: true,
+        allValid: true,
+        isValid: true,
+        handleRestore,
+      })
+
+      const screen = renderScreen()
+      await flushEffects()
+      screen.UNSAFE_getByType(GaloyPrimaryButton).props.onPress()
+
+      expect(buttonDisabled(screen)).toBe(false)
+      expect(handleRestore).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it("shows the suggestions as chips and picks one on tap", async () => {
+    const selectSuggestion = jest.fn()
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      suggestions: ["hello", "helmet", "help"],
+      selectSuggestion,
+    })
+
+    const { getByLabelText } = renderScreen()
+    await flushEffects()
+
+    expect(getByLabelText("hello")).toBeTruthy()
+    expect(getByLabelText("help")).toBeTruthy()
+    fireEvent.press(getByLabelText("helmet"))
+
+    expect(selectSuggestion).toHaveBeenCalledWith("helmet")
   })
 
   it("does not render the inline invalid-phrase message while still typing", async () => {

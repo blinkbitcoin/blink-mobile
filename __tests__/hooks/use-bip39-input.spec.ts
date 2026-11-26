@@ -1,4 +1,5 @@
 import { Keyboard } from "react-native"
+import { it } from "@jest/globals"
 
 import { renderHook, act } from "@testing-library/react-native"
 
@@ -14,6 +15,10 @@ jest.mock("@app/utils/bip39-wordlist", () => ({
     "absent",
     "run",
     "runway",
+    "act",
+    "action",
+    "actor",
+    "actress",
   ],
   getBip39Suggestions: (
     prefix: string,
@@ -29,6 +34,10 @@ jest.mock("@app/utils/bip39-wordlist", () => ({
       "absent",
       "run",
       "runway",
+      "act",
+      "action",
+      "actor",
+      "actress",
     ].filter((w) => w.startsWith(prefix))
     return options?.maxResults ? all.slice(0, options.maxResults) : all
   },
@@ -115,6 +124,28 @@ describe("useBip39Input", () => {
     expect(result.current.suggestions).toEqual(["abandon"])
   })
 
+  it("caps the suggestions at three", () => {
+    const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+
+    act(() => {
+      result.current.updateWord(0, "act")
+      result.current.setActiveIndex(0)
+    })
+
+    expect(result.current.suggestions).toEqual(["act", "action", "actor"])
+  })
+
+  it("suggests nothing before the third letter", () => {
+    const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+
+    act(() => {
+      result.current.updateWord(0, "ab")
+      result.current.setActiveIndex(0)
+    })
+
+    expect(result.current.suggestions).toEqual([])
+  })
+
   it("keeps the chip for a full word, as the backup confirm screen does", () => {
     const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
 
@@ -180,6 +211,33 @@ describe("useBip39Input", () => {
     expect(result.current.stepValid).toBe(true)
   })
 
+  it("stepValid on step 2 is false while one of words 7-12 is not a backup word", () => {
+    const words = [...Array(10).fill("abandon"), "helz", "abandon"]
+    const { result } = renderHook(() =>
+      useBip39Input({ wordCount: 12, wordsPerStep: 6, step: 2, initialWords: words }),
+    )
+
+    expect(result.current.stepValid).toBe(false)
+  })
+
+  /** Paste stays on step 1, so "Next 6 words" has to unlock from the pasted words, and
+   *  step 2 picks up the rest of them. */
+  it("a full paste makes step 1 valid and fills words 7-12 too", () => {
+    const phrase =
+      "abandon ability able about above absent act action actor actress run runway"
+    const { result } = renderHook(() =>
+      useBip39Input({ wordCount: 12, wordsPerStep: 6, step: 1 }),
+    )
+
+    act(() => {
+      result.current.handlePaste(phrase)
+    })
+
+    expect(result.current.stepValid).toBe(true)
+    expect(result.current.allValid).toBe(true)
+    expect(result.current.words.slice(6)).toEqual(phrase.split(" ").slice(6))
+  })
+
   describe("isWordInvalid", () => {
     it("is false for an empty word and for a backup word", () => {
       const words = ["", "abandon", ...Array(10).fill("")]
@@ -200,6 +258,31 @@ describe("useBip39Input", () => {
       })
 
       expect(result.current.isWordInvalid(0)).toBe(true)
+    })
+
+    it.each(["wrongw", "helz"])("flags %s in a field the user is not in", (text) => {
+      const words = [text, ...Array(11).fill("")]
+      const { result } = renderHook(() =>
+        useBip39Input({ wordCount: 12, initialWords: words }),
+      )
+
+      expect(result.current.isWordInvalid(0)).toBe(true)
+    })
+
+    it("clears the flag once the word is corrected", () => {
+      const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+
+      act(() => {
+        result.current.setActiveIndex(0)
+        result.current.updateWord(0, "abz")
+      })
+      expect(result.current.isWordInvalid(0)).toBe(true)
+
+      act(() => {
+        result.current.updateWord(0, "abandon")
+      })
+
+      expect(result.current.isWordInvalid(0)).toBe(false)
     })
 
     it("leaves a focused prefix alone while it can still become a word", () => {
