@@ -52,7 +52,13 @@ describe("useHomeOnBackAfterSend", () => {
 
       expect(remove(type)).toHaveBeenCalled()
       expect(mockDispatch).toHaveBeenCalledWith(
-        expect.objectContaining({ type: "POP_TO_TOP" }),
+        expect.objectContaining({
+          type: "POP_TO",
+          payload: expect.objectContaining({
+            name: "Primary",
+            params: { screen: "Home" },
+          }),
+        }),
       )
       expect(mockSetOptions).toHaveBeenCalledWith({ gestureEnabled: false })
     })
