@@ -7,7 +7,8 @@ const BACKWARD_ACTIONS = ["GO_BACK", "POP"]
 /**
  * Home once a send has gone out: the Home tab, selected explicitly. `popToTop` alone would
  * keep `Primary`'s nested state, so a send started from a contact on People would land back
- * on that contact. Back after an attempt and Sent's Close both leave this way.
+ * on that contact. Back after an attempt, Sent's Close and the error sheet's Home all
+ * leave this way.
  */
 export const homeAfterSendAction = () => StackActions.popTo("Primary", { screen: "Home" })
 

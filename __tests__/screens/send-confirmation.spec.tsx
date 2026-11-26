@@ -2858,7 +2858,13 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       expectInlineAndInSheet(LL.SendBitcoinConfirmationScreen.invoiceAlreadyPaid())
       fireEvent.press(sheetButton(LL.SendBitcoinConfirmationScreen.home()))
       expect(navigationDispatchMock).toHaveBeenCalledWith(
-        expect.objectContaining({ type: "POP_TO_TOP" }),
+        expect.objectContaining({
+          type: "POP_TO",
+          payload: expect.objectContaining({
+            name: "Primary",
+            params: { screen: "Home" },
+          }),
+        }),
       )
     })
 
@@ -2874,7 +2880,13 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       expect(screen.queryByText(LL.SendBitcoinConfirmationScreen.tryAgain())).toBeNull()
       fireEvent.press(sheetButton(LL.SendBitcoinConfirmationScreen.home()))
       expect(navigationDispatchMock).toHaveBeenCalledWith(
-        expect.objectContaining({ type: "POP_TO_TOP" }),
+        expect.objectContaining({
+          type: "POP_TO",
+          payload: expect.objectContaining({
+            name: "Primary",
+            params: { screen: "Home" },
+          }),
+        }),
       )
     })
 
@@ -2976,7 +2988,13 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       ).toBeNull()
       fireEvent.press(sheetButton(LL.SendBitcoinConfirmationScreen.home()))
       expect(navigationDispatchMock).toHaveBeenCalledWith(
-        expect.objectContaining({ type: "POP_TO_TOP" }),
+        expect.objectContaining({
+          type: "POP_TO",
+          payload: expect.objectContaining({
+            name: "Primary",
+            params: { screen: "Home" },
+          }),
+        }),
       )
     })
   })
