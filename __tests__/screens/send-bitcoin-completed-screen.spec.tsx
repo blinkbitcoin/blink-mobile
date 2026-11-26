@@ -1074,6 +1074,40 @@ describe("SendBitcoinCompletedScreen", () => {
   })
 })
 
+describe("SendBitcoinCompletedScreen after Sent", () => {
+  beforeEach(() => {
+    loadLocale("en")
+  })
+
+  it("opens straight on the receipt when review already played Sent", () => {
+    const receiptAfterSentRoute = {
+      key: "sendBitcoinCompleted",
+      name: "sendBitcoinCompleted",
+      params: {
+        status: "SUCCESS",
+        hasShownSuccess: true,
+        currencyAmount: "$0.03",
+        satAmount: "25 SAT",
+        currencyFeeAmount: "$0.00",
+        satFeeAmount: "0 SAT",
+        destination: "alice",
+        paymentType: "intraledger",
+        createdAt: 1747691078,
+      },
+    } as const
+
+    render(
+      <ContextForScreen>
+        <MockedScreen route={receiptAfterSentRoute} />
+      </ContextForScreen>,
+    )
+
+    expect(screen.queryByTestId("Success Text")).toBeNull()
+    expect(screen.getByText(receiptAfterSentRoute.params.destination)).toBeTruthy()
+    expect(screen.getByText(i18nObject("en").common.share())).toBeTruthy()
+  })
+})
+
 /** A success action is read, not pressed. Its URL is a text link with no icon, which
  *  does not make the field a press target, so the field keeps the static grey7
  *  (blink-wip#1871, blink-wip#1309). */

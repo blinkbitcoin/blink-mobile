@@ -7,11 +7,14 @@ import { PaymentOfflineNotice } from "./payment-offline-notice"
 
 type Props = {
   children: React.ReactNode
+  /** A settled send sets this so a later offline refresh cannot unmount the receipt
+   *  handoff. Other screens leave it unset and keep today's block. */
+  bypass?: boolean
 }
 
-export const OfflineGate: React.FC<Props> = ({ children }) => {
+export const OfflineGate: React.FC<Props> = ({ children, bypass = false }) => {
   const { isSelfCustodial, status } = useActiveWallet()
-  if (isSelfCustodial && SELF_CUSTODIAL_BLOCKED_STATUSES.includes(status)) {
+  if (!bypass && isSelfCustodial && SELF_CUSTODIAL_BLOCKED_STATUSES.includes(status)) {
     return <PaymentOfflineNotice />
   }
   return <>{children}</>

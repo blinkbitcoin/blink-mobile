@@ -7566,6 +7566,19 @@ type RootTranslation = {
 		 */
 		sending: string
 		/**
+		 * S​e​n​t
+		 */
+		sent: string
+		/**
+		 * R​e​c​e​i​p​t
+		 */
+		receipt: string
+		/**
+		 * S​e​n​t​,​ ​{​a​m​o​u​n​t​}
+		 * @param {string} amount
+		 */
+		sentAnnouncement: RequiredParams<'amount'>
+		/**
 		 * F​r​o​m​ ​B​a​l​a​n​c​e
 		 */
 		fromBalance: string
@@ -22142,6 +22155,18 @@ export type TranslationFunctions = {
 		 * Sending
 		 */
 		sending: () => LocalizedString
+		/**
+		 * Sent
+		 */
+		sent: () => LocalizedString
+		/**
+		 * Receipt
+		 */
+		receipt: () => LocalizedString
+		/**
+		 * Sent, {amount}
+		 */
+		sentAnnouncement: (arg: { amount: string }) => LocalizedString
 		/**
 		 * From Balance
 		 */

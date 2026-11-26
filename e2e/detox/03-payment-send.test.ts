@@ -10,6 +10,7 @@ import {
 import { setLocalAndLoginWithAccessToken, waitForHomeScreen } from "./utils/common-flows"
 import { timeout, BOB_USERNAME, ALICE_TOKEN } from "./utils/config"
 import {
+  leaveSendOutcome,
   tap,
   typeSendAmount,
   verifyTextPresent,
@@ -52,7 +53,7 @@ describe("Send: Intraledger using Username - BTC Amount", () => {
     await slideSlider()
     await sleep(3000)
 
-    await tap(by.id(LL.common.back()))
+    await leaveSendOutcome(LL)
     await waitForHomeScreen(LL)
   })
 
@@ -100,7 +101,7 @@ describe("Send: Intraledger using Username - USD Amount", () => {
     await slideSlider()
     await sleep(3000)
 
-    await tap(by.id(LL.common.back()))
+    await leaveSendOutcome(LL)
     await waitForHomeScreen(LL)
   })
 
@@ -141,7 +142,7 @@ describe("Send: Intraledger using LN Invoice", () => {
     await slideSlider()
     await sleep(3000)
 
-    await tap(by.id(LL.common.back()))
+    await leaveSendOutcome(LL)
     await waitForHomeScreen(LL)
   })
 
@@ -178,7 +179,7 @@ describe("Send: to External LN Invoice", () => {
     await slideSlider()
     await sleep(3000)
 
-    await tap(by.id(LL.common.back()))
+    await leaveSendOutcome(LL)
     await waitForHomeScreen(LL)
   })
 
@@ -214,7 +215,7 @@ describe("Send: to Onchain Address", () => {
     await slideSlider()
     await sleep(3000)
 
-    await tap(by.id(LL.common.back()))
+    await leaveSendOutcome(LL)
     await waitForHomeScreen(LL)
   })
 

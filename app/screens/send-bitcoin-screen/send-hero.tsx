@@ -1,18 +1,22 @@
 import React, { useEffect } from "react"
-import { Pressable } from "react-native"
+import { Pressable, View } from "react-native"
 import Animated, {
   Easing,
+  interpolate,
+  SharedValue,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { IconHero } from "@app/components/icon-hero"
+import { SUCCESS_BADGE_DURATION_MS, SuccessBadge } from "@app/components/success-badge"
 import { useAccessibilityAnnouncement } from "@app/hooks/use-accessibility-announcement"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { fonts } from "@app/rne-theme/fonts"
-import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
+import { cappedFontScale, MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 export const SEND_HERO_CAPTION_TEST_ID = "send-hero-caption"
 export const SEND_HERO_PRIMARY_TEST_ID = "send-hero-amount-primary"
@@ -61,6 +65,50 @@ export const entryAmountFontSize = (amount: string, isEmpty: boolean): number =>
 
 const SWAP_ANIMATION_MS = 220
 
+/**
+ * Once the payment is sent the settled read-out grows into the centred Sent hero: each line
+ * runs from its review size to its sent size as `sentProgress` goes from 0 to 1.
+ */
+const CAPTION_SIZE = { review: 12, sent: 16 } as const
+const CAPTION_LINE_HEIGHT = { review: 18, sent: 22 } as const
+const SENT_AMOUNT_SIZE = { secondary: 16 } as const
+const SENT_LINE_HEIGHT = { secondary: 22 } as const
+
+/** Figma's sent badge sits in a 72 frame, 20 off the caption, where the send glyph has a
+ *  44 frame 10 off it. */
+const ICON_FRAME_SIZE = { review: 44, sent: 72 } as const
+const SENT_ICON_EXTRA_GAP = 10
+const SENT_BADGE_SIZE = 49
+/** The badge starts drawing while the hero is still on its way to the middle. */
+const SENT_BADGE_DELAY_MS = 150
+/** When the badge has finished drawing, counted from the payment landing. */
+export const SENT_BADGE_END_MS = SENT_BADGE_DELAY_MS + SUCCESS_BADGE_DURATION_MS
+
+/** The sent amount takes amount entry's scale, so it lands at the size it was typed at. */
+const sentPrimaryFontSize = (amount: string): number => entryAmountFontSize(amount, false)
+
+/** How much taller the hero stands once sent, so a caller centring it can allow for the
+ *  growth. Every line holds to one, so the growth is exact. The text lines follow the OS
+ *  text size up to the same ceiling their `maxFontSizeMultiplier` sets, line box
+ *  included, where the icon frame does not. */
+export const sentHeroGrowth = ({
+  primaryAmount,
+  hasSecondaryAmount,
+}: {
+  primaryAmount: string
+  hasSecondaryAmount: boolean
+}): number => {
+  const iconGrowth = ICON_FRAME_SIZE.sent - ICON_FRAME_SIZE.review + SENT_ICON_EXTRA_GAP
+  const textGrowth =
+    CAPTION_LINE_HEIGHT.sent -
+    CAPTION_LINE_HEIGHT.review +
+    sentPrimaryFontSize(primaryAmount) +
+    ENTRY_LINE_HEIGHT_OFFSET -
+    LINE_HEIGHT.inactive.primary +
+    (hasSecondaryAmount ? SENT_LINE_HEIGHT.secondary - LINE_HEIGHT.inactive.secondary : 0)
+  return iconGrowth + textGrowth * cappedFontScale()
+}
+
 type SendHeroProps = {
   /** The line above the amount: the destination while entering it, what the screen is
    *  doing once it is settled. */
@@ -80,6 +128,15 @@ type SendHeroProps = {
   onSwapCurrency?: () => void
   /** Long press on the caption, where the caption is a destination worth copying. */
   onCaptionLongPress?: () => void
+  /** 0 on review, 1 once sent: grows the lines and turns the icon green. Settled only. */
+  sentProgress?: SharedValue<number>
+  /** The payment has landed: the sent badge mounts and draws itself in. */
+  isSent?: boolean
+  /** Which play of the Sent timeline is on screen. A new one mounts the badge afresh;
+   *  0 holds it back while none has started. */
+  sentPlay?: number
+  /** Sent came back at its end: the badge shows fully drawn. */
+  isSentAtEnd?: boolean
 }
 
 export const SendHero: React.FC<SendHeroProps> = ({
@@ -91,6 +148,10 @@ export const SendHero: React.FC<SendHeroProps> = ({
   isEmpty = false,
   onSwapCurrency,
   onCaptionLongPress,
+  sentProgress,
+  isSent = false,
+  sentPlay = 1,
+  isSentAtEnd = false,
 }) => {
   const styles = useStyles()
   const {
@@ -156,6 +217,71 @@ export const SendHero: React.FC<SendHeroProps> = ({
 
   const size = active ? "active" : "inactive"
 
+  const noProgress = useSharedValue(0)
+  const sent = sentProgress ?? noProgress
+
+  const sentCaptionStyle = useAnimatedStyle(
+    () => ({
+      fontSize: interpolate(sent.value, [0, 1], [CAPTION_SIZE.review, CAPTION_SIZE.sent]),
+      lineHeight: interpolate(
+        sent.value,
+        [0, 1],
+        [CAPTION_LINE_HEIGHT.review, CAPTION_LINE_HEIGHT.sent],
+      ),
+    }),
+    [sent],
+  )
+
+  const sentPrimarySize = sentPrimaryFontSize(primaryAmount)
+  const sentPrimaryStyle = useAnimatedStyle(
+    () => ({
+      fontSize: interpolate(
+        sent.value,
+        [0, 1],
+        [AMOUNT_SIZE.inactive.primary, sentPrimarySize],
+      ),
+      lineHeight: interpolate(
+        sent.value,
+        [0, 1],
+        [LINE_HEIGHT.inactive.primary, sentPrimarySize + ENTRY_LINE_HEIGHT_OFFSET],
+      ),
+    }),
+    [sent, sentPrimarySize],
+  )
+
+  const sentSecondaryStyle = useAnimatedStyle(
+    () => ({
+      fontSize: interpolate(
+        sent.value,
+        [0, 1],
+        [AMOUNT_SIZE.inactive.secondary, SENT_AMOUNT_SIZE.secondary],
+      ),
+      lineHeight: interpolate(
+        sent.value,
+        [0, 1],
+        [LINE_HEIGHT.inactive.secondary, SENT_LINE_HEIGHT.secondary],
+      ),
+    }),
+    [sent],
+  )
+
+  /** The send glyph fades as the frame grows round it, and the badge draws itself in its
+   *  place. */
+  const sentIconFrameStyle = useAnimatedStyle(() => {
+    const frame = interpolate(
+      sent.value,
+      [0, 1],
+      [ICON_FRAME_SIZE.review, ICON_FRAME_SIZE.sent],
+    )
+    return {
+      width: frame,
+      height: frame,
+      marginBottom: interpolate(sent.value, [0, 1], [0, SENT_ICON_EXTRA_GAP]),
+    }
+  }, [sent])
+  const sendingIconStyle = useAnimatedStyle(() => ({ opacity: 1 - sent.value }), [sent])
+  const isMorphing = Boolean(sentProgress) && !active
+
   const captionNode = (
     <Pressable
       onLongPress={onCaptionLongPress}
@@ -169,15 +295,15 @@ export const SendHero: React.FC<SendHeroProps> = ({
       }
       onAccessibilityAction={onCaptionLongPress}
     >
-      <Text
-        type="p4"
+      <Animated.Text
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         numberOfLines={1}
         ellipsizeMode="middle"
-        style={styles.caption}
+        style={[styles.caption, isMorphing && sentCaptionStyle]}
         testID={SEND_HERO_CAPTION_TEST_ID}
       >
         {caption}
-      </Text>
+      </Animated.Text>
     </Pressable>
   )
 
@@ -194,7 +320,6 @@ export const SendHero: React.FC<SendHeroProps> = ({
       }
     >
       <Animated.Text
-        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         style={[
           styles.amount,
           {
@@ -202,8 +327,10 @@ export const SendHero: React.FC<SendHeroProps> = ({
             color: isEmpty ? colors.textMuted : colors.textOnBackground,
           },
           active && primaryStyle,
+          isMorphing && sentPrimaryStyle,
         ]}
         adjustsFontSizeToFit
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         numberOfLines={1}
         testID={SEND_HERO_PRIMARY_TEST_ID}
       >
@@ -211,7 +338,6 @@ export const SendHero: React.FC<SendHeroProps> = ({
       </Animated.Text>
       {secondaryAmount ? (
         <Animated.Text
-          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           style={[
             styles.amount,
             {
@@ -225,7 +351,9 @@ export const SendHero: React.FC<SendHeroProps> = ({
             },
             !active && styles.settledSecondary,
             active && secondaryStyle,
+            isMorphing && sentSecondaryStyle,
           ]}
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           numberOfLines={1}
           testID={SEND_HERO_SECONDARY_TEST_ID}
         >
@@ -235,13 +363,34 @@ export const SendHero: React.FC<SendHeroProps> = ({
     </Pressable>
   )
 
+  const icon = isMorphing ? (
+    <View style={styles.iconStack}>
+      <Animated.View style={sendingIconStyle}>
+        <GaloyIcon name="send" size={ICON_SIZE} color={colors.accent} />
+      </Animated.View>
+      {isSent && sentPlay ? (
+        <View style={styles.badgeOverlay}>
+          <SuccessBadge
+            key={sentPlay}
+            size={SENT_BADGE_SIZE}
+            delay={SENT_BADGE_DELAY_MS}
+            isDrawn={isSentAtEnd}
+          />
+        </View>
+      ) : null}
+    </View>
+  ) : (
+    "send"
+  )
+
   return (
     <IconHero
-      icon="send"
+      icon={icon}
       iconColor={colors.accent}
       iconSize={ICON_SIZE}
       hasIconBackground={false}
       compact
+      iconFrameStyle={isMorphing ? sentIconFrameStyle : undefined}
       caption={captionNode}
       title={amounts}
     />
@@ -250,8 +399,21 @@ export const SendHero: React.FC<SendHeroProps> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   caption: {
+    fontFamily: fonts.regular,
+    fontSize: CAPTION_SIZE.review,
+    lineHeight: CAPTION_LINE_HEIGHT.review,
     textAlign: "center",
     color: colors.textOnBackground,
+  },
+  iconStack: {
+    width: ICON_SIZE,
+    height: ICON_SIZE,
+  },
+  /** Centred on the glyph's box, which the badge outgrows. */
+  badgeOverlay: {
+    position: "absolute",
+    top: (ICON_SIZE - SENT_BADGE_SIZE) / 2,
+    left: (ICON_SIZE - SENT_BADGE_SIZE) / 2,
   },
   amount: {
     fontFamily: fonts.bold,

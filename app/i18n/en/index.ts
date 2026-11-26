@@ -2403,6 +2403,11 @@ const en: BaseTranslation = {
     copiedDestination: "Copied destination to clipboard",
     lightningRecommended: "High fee. We recommend Lightning.",
     sending: "Sending",
+    sent: "Sent",
+    receipt: "Receipt",
+    /** Spoken once Sent plays, since review turns into it in place with no new screen
+     *  for a screen reader to land on. */
+    sentAnnouncement: "Sent, {amount: string}",
     fromBalance: "From Balance",
     details: "Details",
     changeAmount: "Change amount",

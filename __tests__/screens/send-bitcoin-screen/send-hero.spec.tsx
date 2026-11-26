@@ -1,12 +1,15 @@
 import React from "react"
-import { AccessibilityInfo, StyleSheet } from "react-native"
+import { AccessibilityInfo, PixelRatio, StyleSheet } from "react-native"
+import { useSharedValue } from "react-native-reanimated"
 import { ReactTestInstance } from "react-test-renderer"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { SuccessBadge } from "@app/components/success-badge"
 import { light } from "@app/rne-theme/colors"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import theme from "@app/rne-theme/theme"
 import {
   SEND_HERO_CAPTION_TEST_ID,
@@ -14,6 +17,7 @@ import {
   SEND_HERO_SECONDARY_TEST_ID,
   SendHero,
   entryAmountFontSize,
+  sentHeroGrowth,
 } from "@app/screens/send-bitcoin-screen/send-hero"
 
 const style = (node: ReactTestInstance) => StyleSheet.flatten(node.props.style)
@@ -216,6 +220,219 @@ describe("SendHero", () => {
       act(() => jest.runAllTimers())
 
       expect(AccessibilityInfo.announceForAccessibility).not.toHaveBeenCalled()
+    })
+  })
+
+  /** Reanimated's Animated.Text is React Native's Text, which the theme's ceiling never
+   *  reaches, so each line carries it, the same one `sentHeroGrowth` centres by. */
+  it("caps every line at the text-size ceiling", () => {
+    renderHero({ secondaryAmount: "746 SAT" })
+
+    for (const testID of [
+      SEND_HERO_CAPTION_TEST_ID,
+      SEND_HERO_PRIMARY_TEST_ID,
+      SEND_HERO_SECONDARY_TEST_ID,
+    ]) {
+      expect(screen.getByTestId(testID).props.maxFontSizeMultiplier).toBe(
+        MAX_FONT_SIZE_MULTIPLIER,
+      )
+    }
+  })
+
+  describe("sentHeroGrowth", () => {
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    /** Icon frame 44 → 72 plus 10 more gap (38), caption 18 → 22 (4), and the amount's line
+     *  from 24 to amount entry's size plus 2. */
+    const cases: Array<[amount: string, hasSecondary: boolean, expected: number]> = [
+      ["$10.00", false, 38 + 4 + (36 + 2 - 24)],
+      ["$10.00", true, 38 + 4 + (36 + 2 - 24) + (22 - 20)],
+      ["1,000,000,000 SAT", false, 38 + 4 + (22 + 2 - 24)],
+    ]
+
+    cases.forEach(([primaryAmount, hasSecondaryAmount, expected]) => {
+      it(`grows ${primaryAmount} (second line: ${hasSecondaryAmount}) by ${expected}`, () => {
+        jest.spyOn(PixelRatio, "getFontScale").mockReturnValue(1)
+
+        expect(sentHeroGrowth({ primaryAmount, hasSecondaryAmount })).toBe(expected)
+      })
+    })
+
+    /** The text lines follow the OS text size, line box included; the icon frame does not. */
+    it("scales the text lines' growth with the OS text size, and not the icon's", () => {
+      jest.spyOn(PixelRatio, "getFontScale").mockReturnValue(1.2)
+
+      expect(
+        sentHeroGrowth({ primaryAmount: "$10.00", hasSecondaryAmount: true }),
+      ).toBeCloseTo(38 + 1.2 * (4 + (36 + 2 - 24) + (22 - 20)), 5)
+    })
+
+    /** The lines stop growing at the ceiling, so the centring stops with them. */
+    it("stops the text lines' growth at the text-size ceiling", () => {
+      jest.spyOn(PixelRatio, "getFontScale").mockReturnValue(3)
+
+      expect(
+        sentHeroGrowth({ primaryAmount: "$10.00", hasSecondaryAmount: true }),
+      ).toBeCloseTo(38 + MAX_FONT_SIZE_MULTIPLIER * (4 + (36 + 2 - 24) + (22 - 20)), 5)
+    })
+  })
+
+  describe("turning into Sent", () => {
+    type SentHeroProps = Partial<React.ComponentProps<typeof SendHero>> & {
+      progress: number
+    }
+
+    /** Review hands the hero its Sent progress as a shared value. */
+    const SentHero = ({ progress, ...props }: SentHeroProps) => {
+      const sentProgress = useSharedValue(progress)
+      return (
+        <SendHero
+          caption="Sent"
+          primaryAmount="$10.00"
+          sentProgress={sentProgress}
+          {...props}
+        />
+      )
+    }
+
+    const sentHero = (props: SentHeroProps) => (
+      <TypesafeI18n locale="en">
+        <ThemeProvider theme={theme}>
+          <SentHero {...props} />
+        </ThemeProvider>
+      </TypesafeI18n>
+    )
+
+    const ancestorStyles = (node: ReactTestInstance) => {
+      const styles = []
+      for (let at = node.parent; at; at = at.parent) styles.push(style(at) ?? {})
+      return styles
+    }
+
+    const badges = () => screen.UNSAFE_queryAllByType(SuccessBadge)
+
+    it("keeps the send glyph and draws no badge before the payment lands", () => {
+      render(sentHero({ progress: 0 }))
+
+      expect(screen.getByTestId("icon-send")).toBeTruthy()
+      expect(badges()).toHaveLength(0)
+    })
+
+    it("draws the badge once the payment lands", () => {
+      render(sentHero({ progress: 0, isSent: true, sentPlay: 1 }))
+
+      expect(badges()).toHaveLength(1)
+    })
+
+    /** A payment that landed while the sender was away holds the badge back until they
+     *  return. */
+    it("holds the badge back while no play has started", () => {
+      render(sentHero({ progress: 0, isSent: true, sentPlay: 0 }))
+
+      expect(badges()).toHaveLength(0)
+    })
+
+    it("mounts the badge afresh for each play", () => {
+      const { rerender } = render(sentHero({ progress: 0, isSent: true, sentPlay: 1 }))
+      const firstBadge = badges()[0]
+
+      rerender(sentHero({ progress: 0, isSent: true, sentPlay: 2 }))
+
+      expect(badges()).toHaveLength(1)
+      expect(badges()[0]).not.toBe(firstBadge)
+    })
+
+    it("draws the badge in on a play, and shows it drawn when Sent comes back at its end", () => {
+      const { rerender } = render(sentHero({ progress: 0, isSent: true, sentPlay: 1 }))
+      expect(badges()[0].props.isDrawn).toBe(false)
+
+      rerender(sentHero({ progress: 1, isSent: true, sentPlay: 2, isSentAtEnd: true }))
+      expect(badges()[0].props.isDrawn).toBe(true)
+    })
+
+    it("starts from review's sizes", () => {
+      render(sentHero({ progress: 0, secondaryAmount: "746 SAT" }))
+
+      expect(style(screen.getByTestId(SEND_HERO_CAPTION_TEST_ID))).toEqual(
+        expect.objectContaining({ fontSize: 12, lineHeight: 18 }),
+      )
+      expect(style(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID))).toEqual(
+        expect.objectContaining({ fontSize: 20, lineHeight: 24 }),
+      )
+      expect(style(screen.getByTestId(SEND_HERO_SECONDARY_TEST_ID))).toEqual(
+        expect.objectContaining({ fontSize: 14, lineHeight: 20 }),
+      )
+    })
+
+    /** Figma's Sent: caption 16/22, the amount at the size it was typed at, wallet unit
+     *  16/22. */
+    it("lands on Sent's sizes", () => {
+      render(sentHero({ progress: 1, secondaryAmount: "746 SAT" }))
+
+      expect(style(screen.getByTestId(SEND_HERO_CAPTION_TEST_ID))).toEqual(
+        expect.objectContaining({ fontSize: 16, lineHeight: 22 }),
+      )
+      expect(style(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID))).toEqual(
+        expect.objectContaining({ fontSize: 36, lineHeight: 38 }),
+      )
+      expect(style(screen.getByTestId(SEND_HERO_SECONDARY_TEST_ID))).toEqual(
+        expect.objectContaining({ fontSize: 16, lineHeight: 22 }),
+      )
+    })
+
+    it("lands a long amount at amount entry's size for it", () => {
+      render(sentHero({ progress: 1, primaryAmount: "1,000,000,000 SAT" }))
+
+      expect(style(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID))).toEqual(
+        expect.objectContaining({ fontSize: 22, lineHeight: 24 }),
+      )
+    })
+
+    it("grows the icon frame from 44 to 72, 10 further off the caption", () => {
+      render(sentHero({ progress: 0 }))
+      expect(ancestorStyles(screen.getByTestId("icon-send"))).toContainEqual(
+        expect.objectContaining({ width: 44, height: 44, marginBottom: 0 }),
+      )
+      screen.unmount()
+
+      render(sentHero({ progress: 1 }))
+      expect(ancestorStyles(screen.getByTestId("icon-send"))).toContainEqual(
+        expect.objectContaining({ width: 72, height: 72, marginBottom: 10 }),
+      )
+    })
+
+    it("fades the send glyph out as the badge takes its place", () => {
+      render(sentHero({ progress: 0 }))
+      expect(ancestorStyles(screen.getByTestId("icon-send"))).toContainEqual(
+        expect.objectContaining({ opacity: 1 }),
+      )
+      screen.unmount()
+
+      render(sentHero({ progress: 1 }))
+      expect(ancestorStyles(screen.getByTestId("icon-send"))).toContainEqual(
+        expect.objectContaining({ opacity: 0 }),
+      )
+    })
+
+    it("reads Sent and the amount to a screen reader", () => {
+      render(sentHero({ progress: 1, isSent: true, secondaryAmount: "746 SAT" }))
+
+      expect(screen.getByLabelText("Sent")).toBeTruthy()
+      expect(screen.getByLabelText("$10.00, 746 SAT")).toBeTruthy()
+    })
+
+    /** Amount entry passes no Sent progress and keeps its own sizes. */
+    it("leaves an active hero at amount entry's sizes", () => {
+      render(sentHero({ progress: 1, active: true }))
+
+      expect(style(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID))).toEqual(
+        expect.objectContaining({ fontSize: 36, lineHeight: 38 }),
+      )
+      expect(style(screen.getByTestId(SEND_HERO_CAPTION_TEST_ID))).toEqual(
+        expect.objectContaining({ fontSize: 12, lineHeight: 18 }),
+      )
     })
   })
 })

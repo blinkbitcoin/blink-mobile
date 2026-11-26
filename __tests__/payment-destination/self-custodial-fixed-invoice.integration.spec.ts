@@ -1,6 +1,9 @@
 import { renderHook } from "@testing-library/react-hooks"
 import { encode, sign } from "bolt11"
-import { Network as SparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  Network as SparkNetwork,
+  PaymentStatus,
+} from "@breeztech/breez-sdk-spark-react-native"
 
 import { Network, PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
@@ -198,7 +201,9 @@ describe("paying a fixed-amount BOLT11 invoice from a self-custodial wallet", ()
     jest.clearAllMocks()
     scopeLostAttemptsTo(`wallet-${(connectedWallets += 1)}`, keepsNothing)
     mockPrepareSendPayment.mockResolvedValue(lightningQuote)
-    mockSendPayment.mockResolvedValue(undefined)
+    /** The SDK's payment only feeds the settlement telemetry; every dispatched send
+     *  reports SUCCESS whatever its status. */
+    mockSendPayment.mockResolvedValue({ payment: { status: PaymentStatus.Completed } })
   })
 
   FIXED_AMOUNTS.forEach(({ millisatoshis, debitedSats, shown, shape }) => {
