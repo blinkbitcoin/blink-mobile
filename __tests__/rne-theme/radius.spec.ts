@@ -315,7 +315,6 @@ const POPUP_CORNERS: Record<string, number> = {
   "app/screens/galoy-address-screen/paycode-explainer-modal.tsx": 1,
   "app/screens/galoy-address-screen/pos-explainer-modal.tsx": 1,
   "app/screens/send-bitcoin-screen/confirm-destination-modal.tsx": 1,
-  "app/screens/send-bitcoin-screen/confirm-fees-modal.tsx": 1,
   "app/screens/settings-screen/account/multi-account/profile.tsx": 1,
   "app/screens/settings-screen/account/settings/delete.tsx": 1,
 }

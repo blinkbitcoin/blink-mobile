@@ -2359,6 +2359,7 @@
     "somethingWentWrong": "Ceva nu a mers bine",
     "priceUpdated": "Prețul s-a modificat, așa că sumele au fost actualizate. Verificați-le înainte de a trimite.",
     "paymentAlreadyAttempted": "Plata deja încercată.\n\nDacă doriți să trimiteți din nou această plată, începeți de la zero.",
+    "paymentMayStillLand": "Așteptați puțin, probabil plata va reuși în curând. Banii dumneavoastră vor ajunge în siguranță sau vor rămâne la dumneavoastră.",
     "slideConfirming": "Confirmare...",
     "slideToSend": "Glisați pentru a trimite",
     "calculatingFee": "Se calculează taxa…",
@@ -2382,6 +2383,9 @@
     "fromBalance": "Din sold",
     "details": "Detalii",
     "changeAmount": "Schimbă suma",
+    "tryAgain": "Încercați din nou",
+    "home": "Acasă",
+    "dustSweepSheetTitle": "Înainte de a trimite",
     "usdRemainderSweep": "Soldul rămas {remaining: string} ({remainingSats: string}) va fi convertit în Bitcoin. Minim USD: {minimum: string}.",
     "sendAnyway": "Mi-am verificat istoricul, trimite oricum"
   },
@@ -2430,6 +2434,11 @@
     "lowFunds": "Fonduri insuficiente",
     "amountExceed": "Suma depășește soldul de {balance: string}",
     "amountExceedsLimit": "Suma depășește limita zilnică rămasă de {limit: string}",
+    "limitsUnavailable": "Nu am putut verifica limita dumneavoastră zilnică. Încercați din nou peste câteva momente.",
+    "problemSheetTitle": "O mică problemă",
+    "changeDestination": "Schimbă destinația",
+    "recipientUnreachableTitle": "Destinatarul nu a putut fi contactat",
+    "recipientWrongAmountTitle": "Destinatarul a indicat o sumă greșită",
     "upgradeAccountToIncreaseLimit": "Faceți upgrade la cont pentru a vă crește limita",
     "amountIsRequired": "Suma este necesară",
     "cost": "Cost",
@@ -2448,10 +2457,11 @@
     "title": "Trimite Bitcoin",
     "failedToFetchLnurlInvoice": "Nu s-a reușit preluarea facturii lnurl",
     "lnurlInvoiceIncorrectAmount": "Serverul lnurl a răspuns cu o factură cu o sumă incorectă.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Alertă de taxă mare!",
-      "content": "Taxa este cu peste 50% mai mare decât suma trimisă. Sunteți sigur că doriți să continuați?\n\nPentru a reduce taxele, cereți destinatarului să accepte tranzacția via Lightning",
-      "confirmButton": "Sunt 100% sigur"
+      "body": "Taxa ta este de 50% sau mai mult din suma pe care o trimiți. Sigur vrei să continui?",
+      "cancelPayment": "Anulează plata",
+      "acceptFee": "Acceptă taxa"
     },
     "copiedDestination": "Destinație copiată în clipboard",
     "pendingPayment": "Plata a fost trimisă, dar nu s-a confirmată încă.\n\nEste posibil ca plata să nu se confirme, caz în care fondurile vor fi returnate în contul dvs.",
@@ -2996,6 +3006,7 @@
     "note": "Notă",
     "notification": "Notificare",
     "ok": "OK",
+    "okay": "Bine",
     "or": "sau",
     "openWallet": "Deschideți portofelul",
     "onchain": "Onchain",

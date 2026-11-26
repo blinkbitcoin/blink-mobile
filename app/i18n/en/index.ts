@@ -2386,6 +2386,8 @@ const en: BaseTranslation = {
     priceUpdated: "The price moved, so the amounts were updated. Check them before you send.",
     paymentAlreadyAttempted:
       "Payment already attempted.\n\nIf you want to send this payment again, start from scratch.",
+    paymentMayStillLand:
+      "Wait a moment, it will probably go through soon. Your money will arrive safely or stay with you.",
     slideConfirming: "Confirming...",
     slideToSend: "Slide to send",
     calculatingFee: "Calculating fee…",
@@ -2411,6 +2413,9 @@ const en: BaseTranslation = {
     fromBalance: "From Balance",
     details: "Details",
     changeAmount: "Change amount",
+    tryAgain: "Try again",
+    home: "Home",
+    dustSweepSheetTitle: "Before you send",
     usdRemainderSweep:
       "Remaining {remaining: string} ({remainingSats: string}) will be converted to Bitcoin. USD minimum: {minimum: string}.",
     sendAnyway: "I checked my history, send anyway",
@@ -2476,6 +2481,11 @@ const en: BaseTranslation = {
     lowFunds: "Low funds",
     amountExceed: "Amount exceeds your balance of {balance: string}",
     amountExceedsLimit: "Amount exceeds your remaining daily limit of {limit: string}",
+    limitsUnavailable: "We couldn't check your daily limit. Try again in a moment.",
+    problemSheetTitle: "A small problem",
+    changeDestination: "Change destination",
+    recipientUnreachableTitle: "Couldn't reach the recipient",
+    recipientWrongAmountTitle: "Recipient sent the wrong amount",
     upgradeAccountToIncreaseLimit: "Upgrade your account to increase your limit",
     amountIsRequired: "Amount is required",
     cost: "Cost",
@@ -2497,11 +2507,11 @@ const en: BaseTranslation = {
     failedToFetchLnurlInvoice: "Failed to fetch lnurl invoice",
     lnurlInvoiceIncorrectAmount:
       "The lnurl server responded with an invoice with an incorrect amount.",
-    confirmFeesModal: {
+    highFeeSheet: {
       title: "High fee alert!",
-      content:
-        "Your fee is more than 50% bigger than the amount sent. Are you sure you want to proceed?\n\nTo reduce fees, ask the receiver to accept transaction via Lightning",
-      confirmButton: "I'm 100% sure",
+      body: "Your fee is 50% or more of the amount you're sending. Are you sure you want to proceed?",
+      cancelPayment: "Cancel payment",
+      acceptFee: "Accept fee",
     },
     copiedDestination: "Copied destination to clipboard",
     pendingPayment:
@@ -3143,6 +3153,7 @@ const en: BaseTranslation = {
     note: "Note",
     notification: "Notification",
     ok: "OK",
+    okay: "Okay",
     or: "or",
     openWallet: "Open Wallet",
     onchain: "Onchain",

@@ -2359,6 +2359,7 @@
     "somethingWentWrong": "Terjadi kesalahan",
     "priceUpdated": "Harga berubah, jadi jumlahnya diperbarui. Periksa sebelum mengirim.",
     "paymentAlreadyAttempted": "Pembayaran telah dicoba sebelumnya.\n\nJika Anda ingin mengirim pembayaran ini lagi, mulailah dari awal.",
+    "paymentMayStillLand": "Tunggu sebentar, kemungkinan akan segera berhasil. Uang Anda akan tiba dengan aman atau tetap bersama Anda.",
     "slideConfirming": "Mengkonfirmasi...",
     "slideToSend": "Geser untuk Kirim",
     "calculatingFee": "Menghitung biaya…",
@@ -2382,6 +2383,9 @@
     "fromBalance": "Dari Saldo",
     "details": "Detail",
     "changeAmount": "Ubah jumlah",
+    "tryAgain": "Coba lagi",
+    "home": "Beranda",
+    "dustSweepSheetTitle": "Sebelum mengirim",
     "usdRemainderSweep": "Sisa {remaining: string} ({remainingSats: string}) akan dikonversi ke Bitcoin. Minimum USD: {minimum: string}.",
     "sendAnyway": "Saya sudah memeriksa riwayat, tetap kirim"
   },
@@ -2430,6 +2434,11 @@
     "lowFunds": "Dana tidak cukup",
     "amountExceed": "Jumlah melebihi saldo Anda sebesar {balance: string}",
     "amountExceedsLimit": "Jumlah melebihi batas harian Anda yang tersisa sebesar {limit: string}",
+    "limitsUnavailable": "Kami tidak dapat memeriksa batas harian Anda. Coba lagi sebentar lagi.",
+    "problemSheetTitle": "Ada sedikit masalah",
+    "changeDestination": "Ubah tujuan",
+    "recipientUnreachableTitle": "Tidak dapat menghubungi penerima",
+    "recipientWrongAmountTitle": "Penerima mencantumkan jumlah yang salah",
     "upgradeAccountToIncreaseLimit": "Tingkatkan akun Anda untuk meningkatkan batas",
     "amountIsRequired": "Jumlah diperlukan",
     "cost": "Biaya",
@@ -2448,10 +2457,11 @@
     "title": "Kirim Bitcoin",
     "failedToFetchLnurlInvoice": "Gagal mengambil faktur lnurl",
     "lnurlInvoiceIncorrectAmount": "Server lnurl merespons dengan faktur dengan jumlah yang salah.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Peringatan biaya tinggi!",
-      "content": "Biaya Anda lebih dari 50% lebih besar dari jumlah yang dikirim. Apakah Anda yakin ingin melanjutkan?\n\nUntuk mengurangi biaya, mintalah penerima menerima transaksi melalui Lightning.",
-      "confirmButton": "Saya 100% yakin"
+      "body": "Biaya Anda 50% atau lebih dari jumlah yang Anda kirim. Yakin ingin melanjutkan?",
+      "cancelPayment": "Batalkan pembayaran",
+      "acceptFee": "Terima biaya"
     },
     "copiedDestination": "Tujuan disalin ke papan klip",
     "pendingPayment": "Pembayaran telah dikirim, tetapi belum dikonfirmasi.\n\nAda kemungkinan pembayaran tidak akan dikonfirmasi, dalam hal ini dana akan dikembalikan ke akun Anda.",
@@ -2996,6 +3006,7 @@
     "note": "Catatan",
     "notification": "Notifikasi",
     "ok": "OK",
+    "okay": "Oke",
     "or": "atau",
     "openWallet": "Buka Dompet",
     "onchain": "Onchain",

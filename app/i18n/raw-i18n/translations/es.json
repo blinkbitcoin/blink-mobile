@@ -2359,6 +2359,7 @@
         "somethingWentWrong": "Algo salió mal",
         "priceUpdated": "El precio cambió, así que los montos se actualizaron. Revísalos antes de enviar.",
         "paymentAlreadyAttempted": "El pago ya se intentó.\n\nSi deseas enviar este pago nuevamente, comienza desde el principio del proceso.",
+        "paymentMayStillLand": "Espera un momento, probablemente se complete pronto. Tu dinero llegará de forma segura o se quedará contigo.",
         "slideConfirming": "Confirmando...",
         "slideToSend": "Desliza para enviar",
         "calculatingFee": "Calculando la comisión…",
@@ -2382,6 +2383,9 @@
         "fromBalance": "Desde el saldo",
         "details": "Detalles",
         "changeAmount": "Cambiar cantidad",
+        "tryAgain": "Intentar de nuevo",
+        "home": "Inicio",
+        "dustSweepSheetTitle": "Antes de enviar",
         "usdRemainderSweep": "Restante {remaining: string} ({remainingSats: string}) se convertirá a Bitcoin. Mínimo en USD: {minimum: string}.",
         "sendAnyway": "Revisé mi historial, enviar de todos modos"
     },
@@ -2430,6 +2434,11 @@
         "lowFunds": "Fondos insuficientes",
         "amountExceed": "La cantidad excede su saldo de {balance: string}",
         "amountExceedsLimit": "El importe supera tu límite diario restante de {limit: string}",
+        "limitsUnavailable": "No pudimos comprobar tu límite diario. Inténtalo de nuevo en un momento.",
+        "problemSheetTitle": "Un pequeño problema",
+        "changeDestination": "Cambiar destino",
+        "recipientUnreachableTitle": "No se pudo contactar con el destinatario",
+        "recipientWrongAmountTitle": "El destinatario indicó un importe incorrecto",
         "upgradeAccountToIncreaseLimit": "Actualiza tu cuenta para aumentar tu límite",
         "amountIsRequired": "Se requiere cantidad",
         "cost": "Costo",
@@ -2448,10 +2457,11 @@
         "title": "Enviar Bitcoin",
         "failedToFetchLnurlInvoice": "Error al obtener la factura de lnurl",
         "lnurlInvoiceIncorrectAmount": "El servidor lnurl ha enviado una factura con un importe incorrecto.",
-        "confirmFeesModal": {
+        "highFeeSheet": {
             "title": "Alerta de tarifa alta!",
-            "content": "Tu tarifa es un 50% más grande que la cantidad enviada. ¿Estás seguro de que quieres continuar?\n\nPara reducir la tarifa, pide al receptor que acepte la transacción a través de Lightning.",
-            "confirmButton": "Estoy 100% seguro"
+            "body": "Tu tarifa es el 50% o más del monto que envías. ¿Seguro que quieres continuar?",
+            "cancelPayment": "Cancelar pago",
+            "acceptFee": "Aceptar tarifa"
         },
         "copiedDestination": "Destino copiado al portapapeles",
         "pendingPayment": "El pago ha sido enviado, pero aún no se ha confirmado.\n\nEs posible que el pago no se confirme, en cuyo caso los fondos se devolverán a su cuenta.\nBETA",
@@ -2995,6 +3005,7 @@
         "note": "Nota ",
         "notification": "Notificación",
         "ok": "OK",
+        "okay": "De acuerdo",
         "or": "o",
         "openWallet": "Abrir billetera",
         "onchain": "Onchain",

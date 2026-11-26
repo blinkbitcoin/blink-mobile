@@ -2359,6 +2359,7 @@
     "somethingWentWrong": "Ikhona into engahambi kakuhle",
     "priceUpdated": "Ixabiso litshintshile, ngoko izixa zihlaziyiwe. Zijonge ngaphambi kokuba uthumele.",
     "paymentAlreadyAttempted": "Intlawulo sele izanyiwe.\n\nUkuba ufuna ukuthumela le ntlawulo kwakhona, qala ekuqaleni.",
+    "paymentMayStillLand": "Wait a moment, it will probably go through soon. Your money will arrive safely or stay with you.",
     "slideConfirming": "Iyaqinisekisa...",
     "slideToSend": "Slaydisha ukuthumela",
     "calculatingFee": "Ibala umrhumo…",
@@ -2382,6 +2383,9 @@
     "fromBalance": "Ukusuka kwiBhalansi",
     "details": "Iinkcukacha",
     "changeAmount": "Tshintsha isixa",
+    "tryAgain": "Try again",
+    "home": "Ekhaya",
+    "dustSweepSheetTitle": "Before you send",
     "usdRemainderSweep": "Iseleyo {remaining: string} ({remainingSats: string}) iya kuguqulelwa kwiBitcoin. USD ephantsi kakhulu: {minimum: string}.",
     "sendAnyway": "Ndijongile imbali yam, thumela noko"
   },
@@ -2430,6 +2434,11 @@
     "lowFunds": "Imali ayonelanga",
     "amountExceed": "Imali idlula ibhalansi yakho {balance: string}",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
+    "limitsUnavailable": "We couldn't check your daily limit. Try again in a moment.",
+    "problemSheetTitle": "A small problem",
+    "changeDestination": "Tshintsha indawo ekuyiwa kuyo",
+    "recipientUnreachableTitle": "Couldn't reach the recipient",
+    "recipientWrongAmountTitle": "Recipient sent the wrong amount",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
     "amountIsRequired": "Imali iyafuneka",
     "cost": "Iindleko",
@@ -2448,10 +2457,11 @@
     "title": "Thumela iBitcoin",
     "failedToFetchLnurlInvoice": "Ayiphumelelanga ukulanda i-invoyisi ye-lnurl",
     "lnurlInvoiceIncorrectAmount": "Iseva ye-lnurl iphendule nge-invoyisi ngexabiso elingachanekanga.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Isilumkiso semirhumo ephezulu!",
-      "content": "Imirhumo yakho ingaphezulu nge-50% kunesixa esithunyelweyo. Uqinisekile ukuba ufuna ukuqhubeka?\n\nUkunciphisa imirhumo, cela umamkeli ukuba amkele intlawulo nge-Lightning",
-      "confirmButton": "Ndiqinisekile 100%"
+      "body": "Umrhumo wakho ungama-50% okanye ngaphezulu kwesixa osithumelayo. Uqinisekile ukuba ufuna ukuqhubeka?",
+      "cancelPayment": "Rhoxisa intlawulo",
+      "acceptFee": "Yamkela umrhumo"
     },
     "copiedDestination": "Ikopishwe indawo ekuya kuyo kwibhodi eqhotyoshwayo",
     "pendingPayment": "Intlawulo ithunyelwe, kodwa ayikaqinisekiswa okwangoku.\n\nKunokwenzeka ukuba intlawulo ayiqinisekiswa, kwimeko enjalo imali iya kubuyiselwa kwi-akhawunti yakho.",
@@ -2996,6 +3006,7 @@
     "note": "Note",
     "notification": "Notification",
     "ok": "KULUNGILE",
+    "okay": "Kulungile",
     "or": "okanye",
     "openWallet": "Open Wallet",
     "onchain": "Onchain",

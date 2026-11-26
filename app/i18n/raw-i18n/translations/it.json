@@ -2359,6 +2359,7 @@
         "somethingWentWrong": "Qualcosa è andato storto",
         "priceUpdated": "Il prezzo è cambiato, quindi gli importi sono stati aggiornati. Controllali prima di inviare.",
         "paymentAlreadyAttempted": "Pagamento già tentato.\n\nSe vuoi inviare di nuovo questo pagamento, ricomincia da zero.",
+        "paymentMayStillLand": "Attendi un momento, probabilmente andrà a buon fine a breve. I tuoi soldi arriveranno al sicuro o resteranno a te.",
         "slideConfirming": "Confermando...",
         "slideToSend": "Scorri per inviare",
         "calculatingFee": "Calcolo della commissione…",
@@ -2382,6 +2383,9 @@
         "fromBalance": "Dal saldo",
         "details": "Dettagli",
         "changeAmount": "Modifica importo",
+        "tryAgain": "Riprova",
+        "home": "Home",
+        "dustSweepSheetTitle": "Prima di inviare",
         "usdRemainderSweep": "Saldo rimanente {remaining: string} ({remainingSats: string}) sarà convertito in Bitcoin. Minimo USD: {minimum: string}.",
         "sendAnyway": "Ho controllato la cronologia, invia comunque"
     },
@@ -2430,6 +2434,11 @@
         "lowFunds": "Fondi insufficienti",
         "amountExceed": "L'importo supera il saldo di {balance: string}",
         "amountExceedsLimit": "L'importo supera il limite giornaliero rimanente di {limit: string}",
+        "limitsUnavailable": "Non siamo riusciti a verificare il tuo limite giornaliero. Riprova tra un momento.",
+        "problemSheetTitle": "Un piccolo problema",
+        "changeDestination": "Modifica destinazione",
+        "recipientUnreachableTitle": "Impossibile raggiungere il destinatario",
+        "recipientWrongAmountTitle": "Il destinatario ha indicato un importo errato",
         "upgradeAccountToIncreaseLimit": "Aggiorna il tuo account per aumentare il tuo limite",
         "amountIsRequired": "L'importo è richiesto",
         "cost": "Costo",
@@ -2448,10 +2457,11 @@
         "title": "Invia Bitcoin",
         "failedToFetchLnurlInvoice": "Impossibile recuperare l'invoice lnurl",
         "lnurlInvoiceIncorrectAmount": "Il server lnurl ha risposto con un'invoice di importo errato.",
-        "confirmFeesModal": {
+        "highFeeSheet": {
             "title": "Attenzione: tariffe elevate!",
-            "content": "La tua commissione è superiore del 50% rispetto all'importo inviato. Vuoi procedere?\n\nPer ridurre le commissioni, chiedi al destinatario di accettare la transazione tramite Lightning",
-            "confirmButton": "Sono sicuro al 100%"
+            "body": "La commissione è pari o superiore al 50% dell'importo che invii. Vuoi davvero procedere?",
+            "cancelPayment": "Annulla pagamento",
+            "acceptFee": "Accetta commissione"
         },
         "copiedDestination": "Destinazione copiata negli apDestinazione copiata negli appuntipunti",
         "pendingPayment": "Il pagamento è stato inviato, ma non è ancora stato confermato.\n\nÈ possibile che il pagamento non venga confermato, nel qual caso i fondi verranno restituiti al tuo account.",
@@ -2996,6 +3006,7 @@
         "note": "Nota",
         "notification": "Notifica",
         "ok": "OK",
+        "okay": "Va bene",
         "or": "o",
         "openWallet": "Apri wallet",
         "onchain": "Onchain",

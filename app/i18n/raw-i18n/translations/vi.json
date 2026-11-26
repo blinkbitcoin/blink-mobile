@@ -2359,6 +2359,7 @@
     "somethingWentWrong": "Đã xảy ra sự cố",
     "priceUpdated": "Giá đã thay đổi nên số tiền đã được cập nhật. Hãy kiểm tra trước khi gửi.",
     "paymentAlreadyAttempted": "Thanh toán đã được thử.\n\nNếu bạn muốn gửi lại khoản thanh toán này, hãy bắt đầu lại từ đầu.",
+    "paymentMayStillLand": "Vui lòng đợi một chút, giao dịch có thể sẽ sớm hoàn tất. Tiền của bạn sẽ đến nơi an toàn hoặc vẫn ở lại với bạn.",
     "slideConfirming": "Đang xác nhận...",
     "slideToSend": "Vuốt để Gửi",
     "calculatingFee": "Đang tính phí…",
@@ -2382,6 +2383,9 @@
     "fromBalance": "Từ số dư",
     "details": "Chi tiết",
     "changeAmount": "Đổi số tiền",
+    "tryAgain": "Thử lại",
+    "home": "Nhà",
+    "dustSweepSheetTitle": "Trước khi gửi",
     "usdRemainderSweep": "Số dư còn lại {remaining: string} ({remainingSats: string}) sẽ được chuyển đổi thành Bitcoin. Tối thiểu USD: {minimum: string}.",
     "sendAnyway": "Tôi đã kiểm tra lịch sử, vẫn gửi"
   },
@@ -2430,6 +2434,11 @@
     "lowFunds": "Không đủ số dư",
     "amountExceed": "Số tiền vượt quá số dư {balance: string} của bạn",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
+    "limitsUnavailable": "Chúng tôi không thể kiểm tra hạn mức hằng ngày của bạn. Hãy thử lại sau giây lát.",
+    "problemSheetTitle": "Một vấn đề nhỏ",
+    "changeDestination": "Đổi điểm đến",
+    "recipientUnreachableTitle": "Không thể kết nối với người nhận",
+    "recipientWrongAmountTitle": "Người nhận đã ghi sai số tiền",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
     "amountIsRequired": "Số tiền là bắt buộc",
     "cost": "Chi phí",
@@ -2448,10 +2457,11 @@
     "title": "Gửi Bitcoin",
     "failedToFetchLnurlInvoice": "Không lấy được hóa đơn lnurl",
     "lnurlInvoiceIncorrectAmount": "Máy chủ LNURL phản hồi với một hóa đơn có số tiền không chính xác.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Cảnh báo phí cao!",
-      "content": "Phí của bạn lớn hơn 50% so với số tiền gửi. Bạn có chắc muốn tiếp tục không?\n\nĐể giảm phí, hãy yêu cầu người nhận chấp nhận giao dịch qua Lightning",
-      "confirmButton": "Tôi chắc chắn 100%"
+      "body": "Phí của bạn bằng 50% trở lên so với số tiền bạn gửi. Bạn có chắc muốn tiếp tục không?",
+      "cancelPayment": "Hủy thanh toán",
+      "acceptFee": "Chấp nhận phí"
     },
     "copiedDestination": "Đã sao chép địa chỉ đích vào bộ nhớ tạm",
     "pendingPayment": "Khoản thanh toán đã được gửi nhưng chưa được xác nhận.\n\nCó thể khoản thanh toán sẽ không được xác nhận, trong trường hợp đó tiền sẽ được trả lại tài khoản của bạn.",
@@ -2996,6 +3006,7 @@
     "note": "Ghi chú",
     "notification": "Thông báo",
     "ok": "OK",
+    "okay": "Được rồi",
     "or": "or",
     "openWallet": "Mở ví",
     "onchain": "Trên chuỗi",

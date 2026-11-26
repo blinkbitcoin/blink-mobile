@@ -2359,6 +2359,7 @@
     "somethingWentWrong": "Nešto je pošlo po zlu",
     "priceUpdated": "Cijena se promijenila pa su iznosi ažurirani. Provjerite ih prije slanja.",
     "paymentAlreadyAttempted": "Plaćanje je već pokušano.\n\nAko želite ponovo poslati ovo plaćanje, počnite ispočetka.",
+    "paymentMayStillLand": "Pričekajte trenutak, uplata će vjerojatno uskoro proći. Vaš novac će sigurno stići ili ostati kod vas.",
     "slideConfirming": "Potvrđivanje...",
     "slideToSend": "Povucite za slanje",
     "calculatingFee": "Izračun naknade…",
@@ -2382,6 +2383,9 @@
     "fromBalance": "Sa salda",
     "details": "Detalji",
     "changeAmount": "Promijeni iznos",
+    "tryAgain": "Pokušajte ponovno",
+    "home": "Doma",
+    "dustSweepSheetTitle": "Prije slanja",
     "usdRemainderSweep": "Preostalo {remaining: string} ({remainingSats: string}) bit će pretvoreno u Bitcoin. Minimum u USD: {minimum: string}.",
     "sendAnyway": "Povijest je provjerena, svejedno pošalji"
   },
@@ -2430,6 +2434,11 @@
     "lowFunds": "Nedovoljno sredstava",
     "amountExceed": "Iznos premašuje vaš saldo od {balance: string}",
     "amountExceedsLimit": "Iznos premašuje vaše preostalo dnevno ograničenje od {limit: string}",
+    "limitsUnavailable": "Nismo mogli provjeriti vaše dnevno ograničenje. Pokušajte ponovno za trenutak.",
+    "problemSheetTitle": "Mali problem",
+    "changeDestination": "Promijeni odredište",
+    "recipientUnreachableTitle": "Nije moguće doći do primatelja",
+    "recipientWrongAmountTitle": "Primatelj je naveo pogrešan iznos",
     "upgradeAccountToIncreaseLimit": "Nadogradite svoj račun kako biste povećali svoje ograničenje",
     "amountIsRequired": "Potreban je iznos",
     "cost": "Trošak",
@@ -2448,10 +2457,11 @@
     "title": "Šalji Bitcoin",
     "failedToFetchLnurlInvoice": "Nije uspjelo dohvaćanje lnurl fakture",
     "lnurlInvoiceIncorrectAmount": "lnurl poslužitelj je odgovorio fakturom s netočnim iznosom.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Upozorenje o visokoj naknadi!",
-      "content": "Vaša naknada je više od 50% veća od poslanog iznosa. Jeste li sigurni da želite nastaviti?\n\nZa smanjenje naknada, zamolite primatelja da prihvati transakciju putem Lightninga",
-      "confirmButton": "100% sam siguran/na"
+      "body": "Vaša naknada iznosi 50 % ili više iznosa koji šaljete. Jeste li sigurni da želite nastaviti?",
+      "cancelPayment": "Otkaži plaćanje",
+      "acceptFee": "Prihvati naknadu"
     },
     "copiedDestination": "Odredište kopirano u međuspremnik",
     "pendingPayment": "Plaćanje je poslano, ali još nije potvrđeno.\n\nMoguće je da plaćanje neće biti potvrđeno, u tom slučaju sredstva će biti vraćena na vaš račun.",
@@ -2996,6 +3006,7 @@
     "note": "Bilješka",
     "notification": "Obavijest",
     "ok": "OK",
+    "okay": "U redu",
     "or": "ili",
     "openWallet": "Otvori Novčanik",
     "onchain": "Onchain",

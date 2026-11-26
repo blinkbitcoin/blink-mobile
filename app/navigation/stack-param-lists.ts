@@ -135,6 +135,8 @@ export type RootStackParamList = {
   }
   sendBitcoinDetails: {
     paymentDestination: PaymentDestination
+    /** Set when review's "Change amount" returns here: the amount starts again from zero. */
+    resetAmountAt?: number
     /** Handed on from the destination step; see it there. */
     sendingWalletId?: string
   }

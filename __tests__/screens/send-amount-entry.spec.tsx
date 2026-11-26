@@ -687,6 +687,24 @@ describe("a self-custodial on-chain fee", () => {
     )
   })
 
+  /** The 200 sat Standard fee Next gets back is more than half of a 300 sat send. */
+  it("judges the fee Next quoted for the high-fee sheet", async () => {
+    mockPrepareSend.mockResolvedValue({})
+    renderScreen(onchainDestination)
+    await settle()
+    fireEvent.press(screen.getByTestId("send-hero-amount-primary"))
+    await settle()
+    typeKeys("3", "0", "0")
+    await settle()
+
+    fireEvent.press(nextButton())
+    await settle()
+
+    expect(mockPrepareSend).toHaveBeenCalledTimes(1)
+    expect(screen.getByText(LL.SendBitcoinScreen.highFeeSheet.title())).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
   /** The quote is for the payment on screen when Next was pressed, so nothing on that
    *  payment may change until it lands: review would get a tier or note the user left. */
   describe("while the quote after Next is out", () => {
@@ -798,7 +816,8 @@ describe("a custodial on-chain payment to the sender's own address", () => {
     typeKeys("1")
     await settle()
 
-    expect(screen.getByText(selfPayment)).toBeTruthy()
+    // Inline, and in the error message sheet opened over it.
+    expect(screen.getAllByText(selfPayment)).toHaveLength(2)
     expect(screen.queryByText(LL.common.feeError())).toBeNull()
     expect(isNextDisabled()).toBe(true)
   })

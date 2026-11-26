@@ -2359,6 +2359,7 @@
         "somethingWentWrong": "Algo deu errado",
         "priceUpdated": "O preço mudou, então os valores foram atualizados. Confira antes de enviar.",
         "paymentAlreadyAttempted": "Pagamento já tentado.\n\nSe você deseja enviar esse pagamento novamente, comece do zero.",
+        "paymentMayStillLand": "Aguarde um momento, provavelmente será concluído em breve. Seu dinheiro chegará com segurança ou ficará com você.",
         "slideConfirming": "Confirmando...",
         "slideToSend": "Deslize para Enviar",
         "calculatingFee": "Calculando taxa…",
@@ -2382,6 +2383,9 @@
         "fromBalance": "Do saldo",
         "details": "Detalhes",
         "changeAmount": "Alterar valor",
+        "tryAgain": "Tentar novamente",
+        "home": "Página Inicial",
+        "dustSweepSheetTitle": "Antes de enviar",
         "usdRemainderSweep": "Saldo restante {remaining: string} ({remainingSats: string}) será convertido em Bitcoin. Mínimo em USD: {minimum: string}.",
         "sendAnyway": "Verifiquei o meu histórico, enviar mesmo assim"
     },
@@ -2430,6 +2434,11 @@
         "lowFunds": "Saldo insuficiente",
         "amountExceed": "O valor excede seu saldo de {balance: string}",
         "amountExceedsLimit": "O valor excede seu limite diário restante de {limit: string}",
+        "limitsUnavailable": "Não conseguimos verificar seu limite diário. Tente novamente em instantes.",
+        "problemSheetTitle": "Um pequeno problema",
+        "changeDestination": "Alterar destino",
+        "recipientUnreachableTitle": "Não foi possível contatar o destinatário",
+        "recipientWrongAmountTitle": "O destinatário indicou um valor incorreto",
         "upgradeAccountToIncreaseLimit": "Atualize a sua conta para aumentar o seu limite",
         "amountIsRequired": "O valor é obrigatório",
         "cost": "Custo",
@@ -2448,10 +2457,11 @@
         "title": "Enviar Bitcoin",
         "failedToFetchLnurlInvoice": "Falha ao buscar a fatura lnurl",
         "lnurlInvoiceIncorrectAmount": "O server lnurl respondeu com uma invoice de valor incorreto",
-        "confirmFeesModal": {
+        "highFeeSheet": {
             "title": "Alerta de taxa alta!",
-            "content": "Sua taxa é mais de 50% maior do que o valor enviado. Tem certeza de que deseja prosseguir?\n\nPara reduzir as taxas, peça ao destinatário para aceitar a transação via Lightning.",
-            "confirmButton": "Tenho 100% de certeza"
+            "body": "Sua taxa é 50% ou mais do valor que você está enviando. Tem certeza de que deseja continuar?",
+            "cancelPayment": "Cancelar pagamento",
+            "acceptFee": "Aceitar taxa"
         },
         "copiedDestination": "Copiado destino para a área de transferência",
         "pendingPayment": "O pagamento foi enviado, mas ainda não foi confirmado.\n\nÉ possível que o pagamento não seja confirmado, caso em que os fundos serão devolvidos à sua conta.",
@@ -2996,6 +3006,7 @@
         "note": "Nota",
         "notification": "Notificação",
         "ok": "OK",
+        "okay": "Certo",
         "or": "ou",
         "openWallet": "Abrir carteira",
         "onchain": "Onchain",

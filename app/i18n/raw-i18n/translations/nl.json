@@ -2359,6 +2359,7 @@
     "somethingWentWrong": "Er is iets misgegaan",
     "priceUpdated": "De prijs is veranderd, dus de bedragen zijn bijgewerkt. Controleer ze voordat je verzendt.",
     "paymentAlreadyAttempted": "Betaling al geprobeerd.\n\nAls je deze betaling opnieuw wilt doen, begin dan opnieuw.",
+    "paymentMayStillLand": "Wacht even, de betaling gaat waarschijnlijk snel door. Uw geld komt veilig aan of blijft bij u.",
     "slideConfirming": "Bevestigen...",
     "slideToSend": "Veeg om te verzenden",
     "calculatingFee": "Kosten berekenen…",
@@ -2382,6 +2383,9 @@
     "fromBalance": "Van saldo",
     "details": "Details",
     "changeAmount": "Bedrag wijzigen",
+    "tryAgain": "Opnieuw proberen",
+    "home": "Thuisscherm",
+    "dustSweepSheetTitle": "Voordat u verstuurt",
     "usdRemainderSweep": "Resterend saldo {remaining: string} ({remainingSats: string}) wordt omgezet naar Bitcoin. USD-minimum: {minimum: string}.",
     "sendAnyway": "Ik heb mijn geschiedenis gecontroleerd, toch versturen"
   },
@@ -2430,6 +2434,11 @@
     "lowFunds": "Onvoldoende saldo",
     "amountExceed": "Bedrag overschrijdt uw saldo van {balance: string}",
     "amountExceedsLimit": "Bedrag overschrijdt uw resterende dagelijkse limiet van {limit: string}",
+    "limitsUnavailable": "We konden uw dagelijkse limiet niet controleren. Probeer het zo opnieuw.",
+    "problemSheetTitle": "Een klein probleem",
+    "changeDestination": "Bestemming wijzigen",
+    "recipientUnreachableTitle": "Kon de ontvanger niet bereiken",
+    "recipientWrongAmountTitle": "De ontvanger gaf een verkeerd bedrag op",
     "upgradeAccountToIncreaseLimit": "Upgrade uw account om uw limiet te verhogen",
     "amountIsRequired": "Bedrag is vereist",
     "cost": "Kosten",
@@ -2448,10 +2457,11 @@
     "title": "Verzend Bitcoin",
     "failedToFetchLnurlInvoice": "Kan ln-url factuur niet ophalen",
     "lnurlInvoiceIncorrectAmount": "De ln-url server reageerde met een factuur met een onjuist bedrag.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Waarschuwing: hoge kosten!",
-      "content": "Je kosten zijn meer dan 50% hoger dan het verzonden bedrag. Weet je zeker dat je wilt doorgaan?\n\nOm de kosten te verlagen, vraag de ontvanger om de transactie via Lightning te accepteren",
-      "confirmButton": "Ik weet het 100% zeker"
+      "body": "Je kosten zijn 50% of meer van het bedrag dat je verstuurt. Weet je zeker dat je wilt doorgaan?",
+      "cancelPayment": "Betaling annuleren",
+      "acceptFee": "Accepteer kosten"
     },
     "copiedDestination": "Bestemming naar het klembord gekopieerd",
     "pendingPayment": "De betaling is verzonden, maar nog niet bevestigd.\n\nHet is mogelijk dat de betaling niet wordt bevestigd, in dat geval worden de fondsen teruggestort naar je account.",
@@ -2996,6 +3006,7 @@
     "note": "Noot",
     "notification": "Melding",
     "ok": "OK",
+    "okay": "Oké",
     "or": "of",
     "openWallet": "Open Wallet",
     "onchain": "Onchain",

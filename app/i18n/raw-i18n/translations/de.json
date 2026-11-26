@@ -2359,6 +2359,7 @@
         "somethingWentWrong": "Etwas ist schief gegeangen",
         "priceUpdated": "Der Preis hat sich geändert, deshalb wurden die Beträge aktualisiert. Prüfe sie vor dem Senden.",
         "paymentAlreadyAttempted": "Die Zahlung wurde bereits versucht.\n\nWenn Sie diese Zahlung erneut senden möchten, beginnen Sie von vorne.",
+        "paymentMayStillLand": "Warte einen Moment, die Zahlung geht wahrscheinlich bald durch. Dein Geld kommt sicher an oder bleibt bei dir.",
         "slideConfirming": "Bestätigend…",
         "slideToSend": "Schiebe zum Senden",
         "calculatingFee": "Gebühr wird berechnet…",
@@ -2382,6 +2383,9 @@
         "fromBalance": "Vom Guthaben",
         "details": "Details",
         "changeAmount": "Betrag ändern",
+        "tryAgain": "Erneut versuchen",
+        "home": "Home",
+        "dustSweepSheetTitle": "Bevor du sendest",
         "usdRemainderSweep": "Restbetrag {remaining: string} ({remainingSats: string}) wird in Bitcoin umgewandelt. USD-Mindestbetrag: {minimum: string}.",
         "sendAnyway": "Verlauf geprüft, trotzdem senden"
     },
@@ -2430,6 +2434,11 @@
         "lowFunds": "Nicht genügend Guthaben",
         "amountExceed": "Der Betrag übersteigt dein Guthaben von {balance: string}",
         "amountExceedsLimit": "Der Betrag übersteigt dein verbleibendes tägliches Limit von {limit: string}",
+        "limitsUnavailable": "Wir konnten dein tägliches Limit nicht prüfen. Versuche es gleich noch einmal.",
+        "problemSheetTitle": "Ein kleines Problem",
+        "changeDestination": "Empfänger ändern",
+        "recipientUnreachableTitle": "Empfänger nicht erreichbar",
+        "recipientWrongAmountTitle": "Der Empfänger hat einen falschen Betrag angegeben",
         "upgradeAccountToIncreaseLimit": "Upgrade deinen Account, um dein Limit zu erhöhen",
         "amountIsRequired": "Betrag ist erforderlich",
         "cost": "Kosten",
@@ -2448,10 +2457,11 @@
         "title": "Sende Bitcoin",
         "failedToFetchLnurlInvoice": "LNURL Invoice konnte nicht abgerufen werden",
         "lnurlInvoiceIncorrectAmount": "Der LNURL-Server hat mit einer Zahlungsaufforderung mit einem abweichenden Betrag geantwortet.",
-        "confirmFeesModal": {
+        "highFeeSheet": {
             "title": "Hochgebührenalarm!",
-            "content": "Ihre Gebühr ist mehr als 50% höher als der zu überweisende Betrag. Sind Sie sicher, dass Sie fortfahren möchten?\n\nUm die Gebühren zu reduzieren, bitten Sie den Empfänger, die Transaktion per Lightning zu akzeptieren",
-            "confirmButton": "Ich bin mir 100% sicher"
+            "body": "Deine Gebühr beträgt 50 % oder mehr des Betrags, den du sendest. Möchtest du wirklich fortfahren?",
+            "cancelPayment": "Zahlung abbrechen",
+            "acceptFee": "Gebühr akzeptieren"
         },
         "copiedDestination": "Ziel in die Zwischenablage kopiert",
         "pendingPayment": "Die Zahlung wurde abgeschickt, aber noch nicht bestätigt.\n\nEs ist möglich, dass die Zahlung nicht bestätigt wird. In diesem Fall wird das Geld auf Ihr Konto zurückgebucht.",
@@ -2996,6 +3006,7 @@
         "note": "Notiz",
         "notification": "Benachrichtigungen",
         "ok": "OK",
+        "okay": "Okay",
         "or": "oder",
         "openWallet": "Wallet öffnen",
         "onchain": "Onchain",

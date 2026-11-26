@@ -2359,6 +2359,7 @@
     "somethingWentWrong": "Нешто је пошло наопако",
     "priceUpdated": "Цена се променила, па су износи ажурирани. Проверите их пре слања.",
     "paymentAlreadyAttempted": "Плаћање је већ покушано.\n\nАко желите да поново пошаљете ову уплату, започните испочетка.",
+    "paymentMayStillLand": "Сачекајте тренутак, уплата ће вероватно ускоро проћи. Ваш новац ће безбедно стићи или остати код вас.",
     "slideConfirming": "Потврђивање...",
     "slideToSend": "Превуците за слање",
     "calculatingFee": "Израчунавање накнаде…",
@@ -2382,6 +2383,9 @@
     "fromBalance": "Са салда",
     "details": "Детаљи",
     "changeAmount": "Промени износ",
+    "tryAgain": "Покушајте поново",
+    "home": "Почетна",
+    "dustSweepSheetTitle": "Пре слања",
     "usdRemainderSweep": "Preostalo {remaining: string} ({remainingSats: string}) biće konvertovano u Bitcoin. Minimum u USD: {minimum: string}.",
     "sendAnyway": "Историја је проверена, ипак пошаљи"
   },
@@ -2430,6 +2434,11 @@
     "lowFunds": "Nedovoljno sredstava",
     "amountExceed": "Износ прелази ваше стање од {balance: string}",
     "amountExceedsLimit": "Износ прелази ваш дневни лимит од {limit: string}",
+    "limitsUnavailable": "Нисмо могли да проверимо ваш дневни лимит. Покушајте поново за тренутак.",
+    "problemSheetTitle": "Мали проблем",
+    "changeDestination": "Промени дестинацију",
+    "recipientUnreachableTitle": "Није могуће контактирати примаоца",
+    "recipientWrongAmountTitle": "Прималац је навео погрешан износ",
     "upgradeAccountToIncreaseLimit": "Надоградите свој налог да бисте повећали лимит",
     "amountIsRequired": "Износ је обавезан",
     "cost": "Цена",
@@ -2448,10 +2457,11 @@
     "title": "Пошаљи биткоин",
     "failedToFetchLnurlInvoice": "Неуспешно повлачење „lnurl“ фактуре",
     "lnurlInvoiceIncorrectAmount": "„lnurl“ сервер је одговорио рачуном са нетачним износом.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Упозорење о високој провизији!",
-      "content": "Ваша провизија је више од 50% већа од послатог износа. Да ли сте сигурни да желите да наставите?\n\nДа бисте смањили провизије, замолите примаоца да прихвати трансакцију преко Lightning мреже",
-      "confirmButton": "100% сам сигуран/на"
+      "body": "Ваша провизија износи 50% или више од износа који шаљете. Да ли сте сигурни да желите да наставите?",
+      "cancelPayment": "Откажи плаћање",
+      "acceptFee": "Прихвати провизију"
     },
     "copiedDestination": "Одредиште је копирано у клипборд",
     "pendingPayment": "Уплата је послата, али још није потврђена.\n\nМогуће је да уплата неће бити потврђена, у том случају средства ће бити враћена на ваш налог.",
@@ -2996,6 +3006,7 @@
     "note": "Белешка",
     "notification": "Нотификација",
     "ok": "ОК",
+    "okay": "У реду",
     "or": "or",
     "openWallet": "Отвори новчаник",
     "onchain": "На блокчејну",

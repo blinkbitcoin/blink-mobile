@@ -2359,6 +2359,7 @@
     "somethingWentWrong": "Valami hiba történt",
     "priceUpdated": "Az ár megváltozott, ezért az összegek frissültek. Küldés előtt ellenőrizd őket.",
     "paymentAlreadyAttempted": "A fizetés kisérlet már megtörtént.\n\nHa újra szeretnéd küldeni ezt a fizetést, kezdd elölről.",
+    "paymentMayStillLand": "Várj egy kicsit, valószínűleg hamarosan teljesül. A pénzed biztonságban megérkezik, vagy nálad marad.",
     "slideConfirming": "Megerősítés...",
     "slideToSend": "Húzd el a küldéshez",
     "calculatingFee": "Díj kiszámítása…",
@@ -2382,6 +2383,9 @@
     "fromBalance": "Egyenlegről",
     "details": "Részletek",
     "changeAmount": "Összeg módosítása",
+    "tryAgain": "Próbáld újra",
+    "home": "Kezdőlap",
+    "dustSweepSheetTitle": "Küldés előtt",
     "usdRemainderSweep": "A fennmaradó {remaining: string} ({remainingSats: string}) Bitcoinra lesz váltva. USD minimum: {minimum: string}.",
     "sendAnyway": "Megnéztem az előzményeimet, küldés mindenképp"
   },
@@ -2430,6 +2434,11 @@
     "lowFunds": "Nincs elegendő egyenleg",
     "amountExceed": "Az összeg meghaladja az egyenlegedet: {balance: string}",
     "amountExceedsLimit": "Az összeg meghaladja a napi limitet: {limit: string}",
+    "limitsUnavailable": "Nem tudtuk ellenőrizni a napi limitedet. Próbáld újra egy pillanat múlva.",
+    "problemSheetTitle": "Egy kis probléma",
+    "changeDestination": "Cél módosítása",
+    "recipientUnreachableTitle": "Nem sikerült elérni a címzettet",
+    "recipientWrongAmountTitle": "A címzett hibás összeget adott meg",
     "upgradeAccountToIncreaseLimit": "Magasabb tranzakciós limithez magasabb szintű felhasználói fiókra váltás szükséges",
     "amountIsRequired": "Az összeg kötelező",
     "cost": "Költség",
@@ -2448,10 +2457,11 @@
     "title": "Bitcoin küldése",
     "failedToFetchLnurlInvoice": "Nem sikerült lekérni az LNURL fizetési kérelmet",
     "lnurlInvoiceIncorrectAmount": "Az LNURL szerver helytelen összegű fizetési kérelemmel válaszolt.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Magas díj figyelmeztetés!",
-      "content": "A díjad több, mint 50%kal nagyobb, mint az elküldött összeg. Biztos vagy benne, hogy folytatod?\n\nA díjak csökkentése érdekében kérd meg a címzettet, hogy fogadja a tranzakciót Lightning hálózaton.",
-      "confirmButton": "Biztos vagyok benne."
+      "body": "A díj a küldött összeg 50%-a vagy több. Biztosan folytatod?",
+      "cancelPayment": "Fizetés megszakítása",
+      "acceptFee": "Díj elfogadása"
     },
     "copiedDestination": "Címzett a vágólapra másolva.",
     "pendingPayment": "A fizetés elküldve, de még nem érkezett visszaigazolás.\n\n Visszaigazolás hiányában a pénz visszakerül a számládra.",
@@ -2996,6 +3006,7 @@
     "note": "Megjegyzés",
     "notification": "Értesítés",
     "ok": "OK",
+    "okay": "Rendben",
     "or": "vagy",
     "openWallet": "Pénztárca megnyitása",
     "onchain": "Onchain",

@@ -2359,6 +2359,7 @@
     "somethingWentWrong": "Alguna cosa ha anat malament",
     "priceUpdated": "El preu ha canviat, així que els imports s'han actualitzat. Revisa'ls abans d'enviar.",
     "paymentAlreadyAttempted": "Pagament ja intentat.\n\nSi vols enviar aquest pagament de nou, comença des de zero.",
+    "paymentMayStillLand": "Espera un moment, probablement es completarà aviat. Els teus diners arribaran amb seguretat o es quedaran amb tu.",
     "slideConfirming": "Confirmant...",
     "slideToSend": "Llisca per enviar",
     "calculatingFee": "Calculant la comissió…",
@@ -2382,6 +2383,9 @@
     "fromBalance": "Des del saldo",
     "details": "Detalls",
     "changeAmount": "Canvia l'import",
+    "tryAgain": "Torna-ho a provar",
+    "home": "Inici",
+    "dustSweepSheetTitle": "Abans d'enviar",
     "usdRemainderSweep": "Resta {remaining: string} ({remainingSats: string}) i es convertirà a Bitcoin. Mínim d'USD: {minimum: string}.",
     "sendAnyway": "He revisat el meu historial, envia igualment"
   },
@@ -2430,6 +2434,11 @@
     "lowFunds": "Fons insuficients",
     "amountExceed": "L'import excedeix el teu saldo {balance: string}",
     "amountExceedsLimit": "La quantitat supera el teu límit diari restant de {limit: string}",
+    "limitsUnavailable": "No hem pogut comprovar el teu límit diari. Torna-ho a provar d'aquí a un moment.",
+    "problemSheetTitle": "Un petit problema",
+    "changeDestination": "Canvia la destinació",
+    "recipientUnreachableTitle": "No s'ha pogut contactar amb el destinatari",
+    "recipientWrongAmountTitle": "El destinatari ha indicat un import incorrecte",
     "upgradeAccountToIncreaseLimit": "Actualitza el teu compte per incrementar els teus límits",
     "amountIsRequired": "L'import és necessari",
     "cost": "Cost",
@@ -2448,10 +2457,11 @@
     "title": "Envia Bitcoin",
     "failedToFetchLnurlInvoice": "No s'ha pogut obtenir la factura lnurl",
     "lnurlInvoiceIncorrectAmount": "El servidor de lnurl ha enviat una factura amb un import incorrecte.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Alerta d'altes comissions !",
-      "content": "La comissió és més gran que el 50% de l'import enviat. Estàs segur que vols continuar?\n\nPer reduir les comissions, demana al receptor que accepti la transacció a través de Lightning.",
-      "confirmButton": "Estic 100% segur"
+      "body": "La teva comissió és el 50% o més de l'import que envies. Segur que vols continuar?",
+      "cancelPayment": "Cancel·la el pagament",
+      "acceptFee": "Accepta la comissió"
     },
     "copiedDestination": "Destinació copiada al porta-retalls",
     "pendingPayment": "El pagament s'ha enviat, però encara no s'ha confirmat.\n\nÉs possible que el pagament no es confirmi, en aquest cas els fons es retornaran al teu compte.",
@@ -2996,6 +3006,7 @@
     "note": "Nota",
     "notification": "Notificació",
     "ok": "D'acord",
+    "okay": "D'acord",
     "or": "o",
     "openWallet": "Obrir el moneder",
     "onchain": "Onchain",
