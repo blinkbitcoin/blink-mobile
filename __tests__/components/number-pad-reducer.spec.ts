@@ -2,7 +2,7 @@
  * The @wdio/mocha-framework types in tsconfig.jest.json shadow jest's, and
  * mocha's `describe` has no `.each`; same import the screen specs use.
  */
-import { describe } from "@jest/globals"
+import { describe, it } from "@jest/globals"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { CurrencyInfo } from "@app/hooks/use-display-currency"
@@ -12,6 +12,9 @@ import {
   numberPadToString,
   formatNumberPadNumber,
   NumberPadNumber,
+  NumberPadReducerState,
+  isKeyAccepted,
+  Key,
 } from "@app/components/amount-input-screen/number-pad-reducer"
 import { groupedInLocale, withDeviceLocale } from "../helpers/device-locale"
 
@@ -343,5 +346,43 @@ describe("formatNumberPadNumber follows the device locale", () => {
     it("does not fall back to en-US grouping", () => {
       expect(formatBtc("100000")).not.toBe("100,000 SAT")
     })
+  })
+})
+
+/**
+ * A refused key must leave the state untouched: it is what keeps a refused press silent and
+ * stops a held backspace at an empty amount.
+ */
+describe("isKeyAccepted", () => {
+  const usd = (value: string): NumberPadReducerState => ({
+    numberPadNumber: parseStringToNumberPad(value),
+    numberOfDecimalsAllowed: 2,
+    currency: WalletCurrency.Usd,
+  })
+  const sats = (value: string): NumberPadReducerState => ({
+    ...usd(value),
+    numberOfDecimalsAllowed: 0,
+    currency: WalletCurrency.Btc,
+  })
+  const empty = { ...usd(""), numberPadNumber: emptyNumber }
+
+  it.each([
+    ["backspace on an empty amount", empty, Key.Backspace],
+    ["a second decimal point", usd("1."), Key.Decimal],
+    ["a decimal point after its digits", usd("1.23"), Key.Decimal],
+    ["a third decimal digit", usd("1.23"), Key[4]],
+    ["a decimal point where none is allowed", sats("12"), Key.Decimal],
+  ])("refuses %s", (_case, state, key) => {
+    expect(isKeyAccepted(state, key)).toBe(false)
+  })
+
+  it.each([
+    ["a digit on an empty amount", empty, Key[1]],
+    ["backspace on a lone decimal point", usd("."), Key.Backspace],
+    ["backspace on a digit", usd("1"), Key.Backspace],
+    ["a first decimal point", usd("1"), Key.Decimal],
+    ["a second decimal digit", usd("1.2"), Key[3]],
+  ])("accepts %s", (_case, state, key) => {
+    expect(isKeyAccepted(state, key)).toBe(true)
   })
 })
