@@ -1825,10 +1825,20 @@ describe("SendBitcoinConfirmationScreen — back after a send attempt", () => {
     return preventDefault
   }
 
+  /** Home is the Home tab: `Primary` with Home selected, not whichever tab the send
+   *  started from. */
   const wentHome = () =>
-    navigationDispatchMock.mock.calls.some(
-      ([action]) => (action as { type?: string })?.type === "POP_TO_TOP",
-    )
+    navigationDispatchMock.mock.calls.some(([action]) => {
+      const { type, payload } = action as {
+        type?: string
+        payload?: { name?: string; params?: { screen?: string } }
+      }
+      return (
+        type === "POP_TO" &&
+        payload?.name === "Primary" &&
+        payload.params?.screen === "Home"
+      )
+    })
 
   /** The real hook's contract: once the mutation fires, hasAttemptedSend stays true. */
   let hasAttemptedSend = false
@@ -2848,7 +2858,13 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       expectInlineAndInSheet(LL.SendBitcoinConfirmationScreen.invoiceAlreadyPaid())
       fireEvent.press(sheetButton(LL.SendBitcoinConfirmationScreen.home()))
       expect(navigationDispatchMock).toHaveBeenCalledWith(
-        expect.objectContaining({ type: "POP_TO_TOP" }),
+        expect.objectContaining({
+          type: "POP_TO",
+          payload: expect.objectContaining({
+            name: "Primary",
+            params: { screen: "Home" },
+          }),
+        }),
       )
     })
 
@@ -2864,7 +2880,13 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       expect(screen.queryByText(LL.SendBitcoinConfirmationScreen.tryAgain())).toBeNull()
       fireEvent.press(sheetButton(LL.SendBitcoinConfirmationScreen.home()))
       expect(navigationDispatchMock).toHaveBeenCalledWith(
-        expect.objectContaining({ type: "POP_TO_TOP" }),
+        expect.objectContaining({
+          type: "POP_TO",
+          payload: expect.objectContaining({
+            name: "Primary",
+            params: { screen: "Home" },
+          }),
+        }),
       )
     })
 
@@ -2966,7 +2988,13 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       ).toBeNull()
       fireEvent.press(sheetButton(LL.SendBitcoinConfirmationScreen.home()))
       expect(navigationDispatchMock).toHaveBeenCalledWith(
-        expect.objectContaining({ type: "POP_TO_TOP" }),
+        expect.objectContaining({
+          type: "POP_TO",
+          payload: expect.objectContaining({
+            name: "Primary",
+            params: { screen: "Home" },
+          }),
+        }),
       )
     })
   })
@@ -3236,7 +3264,13 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
           expect(preventDefault).toHaveBeenCalled()
         }
         expect(navigationDispatchMock).toHaveBeenCalledWith(
-          expect.objectContaining({ type: "POP_TO_TOP" }),
+          expect.objectContaining({
+            type: "POP_TO",
+            payload: expect.objectContaining({
+              name: "Primary",
+              params: { screen: "Home" },
+            }),
+          }),
         )
       })
     })
@@ -3666,8 +3700,18 @@ describe("SendBitcoinConfirmationScreen — Sent", () => {
 
     await pressSentAction(LL.common.close())
 
-    expect(navigationPopToTopMock).toHaveBeenCalledTimes(1)
-    expect(navigationDispatchMock).not.toHaveBeenCalled()
+    /** The Home tab by name: `popToTop` would keep the tab the send started from. */
+    expect(navigationDispatchMock).toHaveBeenCalledTimes(1)
+    expect(navigationDispatchMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "POP_TO",
+        payload: expect.objectContaining({
+          name: "Primary",
+          params: { screen: "Home" },
+        }),
+      }),
+    )
+    expect(navigationPopToTopMock).not.toHaveBeenCalled()
   })
 
   /** The hold's own timing is the hook's spec; this is that its end opens the receipt. */

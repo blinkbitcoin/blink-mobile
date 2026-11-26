@@ -23,6 +23,11 @@ const LL = i18nObject("en")
 
 const exits = () => renderHook(() => useReviewExits()).result.current
 
+const HOME_TAB = expect.objectContaining({
+  type: "POP_TO",
+  payload: expect.objectContaining({ name: "Primary", params: { screen: "Home" } }),
+})
+
 const stackOf = (...names: string[]) =>
   ({
     key: "root",
@@ -95,10 +100,11 @@ describe("useReviewExits", () => {
     expect(index).toBe(2)
   })
 
-  it("leaves the flow for Home", () => {
+  /** The Home tab by name: `popToTop` would keep the tab the send started from. */
+  it("leaves the flow for the Home tab", () => {
     exits().goHome()
 
-    expect(mockDispatch.mock.calls[0][0].type).toBe("POP_TO_TOP")
+    expect(mockDispatch.mock.calls[0][0]).toEqual(HOME_TAB)
   })
 
   it("labels each sheet action and wires it to its exit", () => {
@@ -115,6 +121,6 @@ describe("useReviewExits", () => {
     )
 
     actionButton("home").onPrimaryPress()
-    expect(mockDispatch.mock.calls[0][0].type).toBe("POP_TO_TOP")
+    expect(mockDispatch.mock.calls[0][0]).toEqual(HOME_TAB)
   })
 })

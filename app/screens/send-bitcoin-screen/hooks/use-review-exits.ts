@@ -7,6 +7,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import type { ErrorMsgAction } from "../error-msg-action"
 
+import { homeAfterSendAction } from "./use-home-on-back-after-send"
+
 /** Every screen a send can pass through before review, in any order it was reached. */
 const SEND_FLOW_ROUTES: ReadonlySet<string> = new Set([
   "sendBitcoinDestination",
@@ -53,8 +55,9 @@ export const useReviewExits = () => {
     })
   }, [navigation])
 
+  /** The Home tab, not just the top of the stack, which kept the tab the send began on. */
   const goHome = useCallback(
-    () => navigation.dispatch(StackActions.popToTop()),
+    () => navigation.dispatch(homeAfterSendAction()),
     [navigation],
   )
 
