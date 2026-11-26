@@ -1,4 +1,5 @@
 import React from "react"
+import { it } from "@jest/globals"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 import {
   AccessibilityInfo,
@@ -31,6 +32,8 @@ import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-detail
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import * as PaymentDetailsLightning from "@app/screens/send-bitcoin-screen/payment-details/lightning"
 import * as PriceConversion from "@app/hooks/use-price-conversion"
+import * as PaymentDetailsOnchain from "@app/screens/send-bitcoin-screen/payment-details/onchain"
+import { createSelfCustodialSparkPaymentDetails } from "@app/self-custodial/payment-details/spark"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
@@ -43,7 +46,7 @@ import { RouteProp } from "@react-navigation/native"
 import { light } from "@app/rne-theme/colors"
 import { INFO_SECTION_OUTLINE_TEST_ID } from "@app/components/card-screen/info-section"
 import { SEND_REVIEW_DESTINATION_TEST_ID } from "@app/screens/send-bitcoin-screen/review/send-review-destination"
-import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
+import { FeeTierOption } from "@app/types/fee-tiers"
 import {
   SEND_HERO_CAPTION_TEST_ID,
   SEND_HERO_PRIMARY_TEST_ID,
@@ -859,7 +862,12 @@ describe("SendBitcoinConfirmationScreen", () => {
         const routes = action.payload?.routes ?? action.routes ?? []
         const completed = routes.find((r) => r.name === "sendBitcoinCompleted")
         if (completed)
-          return completed.params as { successAction?: unknown; note?: unknown }
+          return completed.params as {
+            successAction?: unknown
+            note?: unknown
+            destination?: unknown
+            paymentType?: unknown
+          }
       }
       throw new Error("sendBitcoinCompleted route was not dispatched")
     }
@@ -953,6 +961,75 @@ describe("SendBitcoinConfirmationScreen", () => {
 
       const params = findCompletedRouteParams()
       expect(params.note).toBe(memo)
+    })
+
+    // The receipt decides how to print a recipient (receipt-destination.ts), so every
+    // rail hands it the destination untouched.
+    it.each([
+      {
+        rail: "an on-chain",
+        build: () =>
+          PaymentDetailsOnchain.createAmountOnchainPaymentDetails<WalletCurrency>({
+            address: "bc1p5d7rjq7g6rdk2yhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg3297",
+            destinationSpecifiedAmount: toBtcMoneyAmount(10000),
+            convertMoneyAmount: convertMoneyAmountMock,
+            sendingWalletDescriptor: btcSendingWalletDescriptor,
+          }),
+      },
+      {
+        rail: "an LNURL",
+        build: () =>
+          PaymentDetailsLightning.createLnurlPaymentDetails({
+            ...defaultLightningParams,
+            lnurl:
+              "LNURL1DP68GURN8GHJ7CN5VDCXZ7FWV4UXZMTSD3JJUCM0D5H5Y4ZR9A25JNZW24FYCTMSV9UJ76F0XAYXKVJ3D5U4SCF52F6YCAELVD6HYUN9DE3HJ0242DZZVCTDDA6KUAPAX5S4RG46",
+          }),
+      },
+      {
+        rail: "a Spark",
+        build: () =>
+          createSelfCustodialSparkPaymentDetails<WalletCurrency>({
+            sdk: {} as never,
+            address: `sp1${"pgss9qzk8dxs7ehvlwrjr3qyrmsy".repeat(3)}`,
+            unitOfAccountAmount: toBtcMoneyAmount(1000),
+            convertMoneyAmount: convertMoneyAmountMock,
+            sendingWalletDescriptor: btcSendingWalletDescriptor,
+          }),
+      },
+      {
+        rail: "a Lightning invoice",
+        build: () =>
+          PaymentDetailsLightning.createAmountLightningPaymentDetails<WalletCurrency>({
+            paymentRequest: `lnbc10u1p${"5qk3z7tpp5qk3z7t".repeat(5)}`,
+            paymentRequestAmount: toBtcMoneyAmount(1000),
+            convertMoneyAmount: convertMoneyAmountMock,
+            sendingWalletDescriptor: btcSendingWalletDescriptor,
+          }),
+      },
+    ])("passes $rail recipient to the receipt untouched", async ({ build }) => {
+      const paymentDetail = build()
+      const route = {
+        key: "sendBitcoinConfirmationScreen",
+        name: "sendBitcoinConfirmation",
+        params: { paymentDetail },
+      } as const
+
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "SUCCESS",
+        extraInfo: { preimage: "p" },
+      })
+
+      render(
+        <ContextForScreen>
+          <SendBitcoinConfirmationScreen route={route} />
+        </ContextForScreen>,
+      )
+
+      await slideAndOpenReceipt()
+
+      const params = findCompletedRouteParams()
+      expect(params.destination).toBe(paymentDetail.destination)
+      expect(params.paymentType).toBe(paymentDetail.paymentType)
     })
   })
 })
@@ -2197,13 +2274,15 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       expect(completed?.params.satAmount).toBe(secondary)
     })
 
-    it("copies the destination when the Destination field is pressed", async () => {
+    it("copies the destination as the Destination field shows it", async () => {
       await renderReview(buildBtcSettlementRoute(1000))
+      const shown = screen.getByTestId(SEND_REVIEW_DESTINATION_TEST_ID).props.children
 
       fireEvent.press(screen.getByTestId("send-review-copy-destination"))
 
+      expect(shown).toMatch(/^test@/)
       expect(copyToClipboardMock).toHaveBeenCalledWith(
-        expect.objectContaining({ content: "test" }),
+        expect.objectContaining({ content: shown }),
       )
     })
 
@@ -2378,6 +2457,31 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       expectChangeAmountDispatched()
     })
 
+    it("does not offer Change amount for a below-minimum fee quote once a send was attempted", async () => {
+      mockUseSendPayment.mockReturnValue({
+        loading: false,
+        hasAttemptedSend: true,
+        sendPayment: sendPaymentMock,
+      })
+      mockUseFee.mockReturnValue({
+        status: "error",
+        errors: [
+          {
+            __typename: "GraphQLApplicationError",
+            message: SelfCustodialErrorCode.BelowMinimum,
+          },
+        ],
+      })
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(
+        screen.getAllByText(LL.SelfCustodialError.belowMinimum()).length,
+      ).toBeGreaterThan(0)
+      expect(
+        screen.queryByText(LL.SendBitcoinConfirmationScreen.changeAmount()),
+      ).toBeNull()
+    })
+
     it("does not offer Change amount when the fee quote fails on the network", async () => {
       mockUseFee.mockReturnValue({
         status: "error",
@@ -2413,42 +2517,46 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
         screen.queryByText(LL.SendBitcoinConfirmationScreen.changeAmount()),
       ).toBeNull()
     })
-  })
 
-  describe("a fee taken out of the amount", () => {
-    const feeIncludedRoute = (sats: number) => {
-      const base = buildOnchainRoute(sats)
-      return {
-        ...base,
-        params: {
-          paymentDetail: { ...base.params.paymentDetail, isFeeIncluded: true },
-        },
-      } as unknown as ReturnType<typeof buildBtcSettlementRoute>
-    }
+    /** Once a send was attempted, back goes Home (useHomeOnBackAfterSend), so Change
+     *  amount could only lead there. And an amount code on a send is the SDK's word that
+     *  nothing went out, read partly from its error text: not certain enough to offer a
+     *  way to build a new payment. */
+    it.each([
+      [
+        "answers FAILURE",
+        () =>
+          sendPaymentMock.mockResolvedValueOnce({
+            status: "FAILURE",
+            errorsMessage: SelfCustodialErrorCode.InsufficientFunds,
+          }),
+        () => LL.SelfCustodialError.insufficientFunds(),
+      ],
+      [
+        "throws",
+        () =>
+          sendPaymentMock.mockRejectedValueOnce(
+            new Error(SelfCustodialErrorCode.InsufficientFunds),
+          ),
+        () => LL.SelfCustodialError.insufficientFunds(),
+      ],
+    ])(
+      "does not offer Change amount when a send %s with an amount code",
+      async (_, failSend, shownError) => {
+        failSend()
+        await renderReview(buildBtcSettlementRoute(1000))
 
-    afterEach(() => {
-      mockPreferredAmountCurrency.current = undefined
-    })
+        await act(async () => {
+          fireEvent.press(screen.getByTestId("slider"))
+        })
 
-    it("leads with what the recipient gets: the amount less the fee", async () => {
-      mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
-      btcFee(100)
-      await renderReview(feeIncludedRoute(1000))
-
-      expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("900 SAT")
-    })
-
-    it("keeps the slider off until the fee it takes out is quoted", async () => {
-      // A max-fee estimate leaves the slider on for a fee paid on top; one taken out of
-      // the amount has to be the real quote.
-      mockUseFee.mockReturnValue({
-        status: "error",
-        amount: { amount: 100, currency: WalletCurrency.Btc, currencyCode: "BTC" },
-      })
-      await renderReview(feeIncludedRoute(1000))
-
-      expect(lastSliderProps().disabled).toBe(true)
-    })
+        // Inline and in the error sheet.
+        expect(screen.getAllByText(shownError()).length).toBeGreaterThan(0)
+        expect(
+          screen.queryByText(LL.SendBitcoinConfirmationScreen.changeAmount()),
+        ).toBeNull()
+      },
+    )
   })
 
   describe("amount currency", () => {
@@ -2812,7 +2920,10 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       expect(sheetButton(LL.SendBitcoinConfirmationScreen.home())).toBeTruthy()
     })
 
-    it("offers Try again when the SDK rejected the details before sending (S10 invalidInput)", async () => {
+    /** On a send, an SDK code is its word that nothing went out, read partly from its
+     *  error text: not proof enough to offer a new payment, so the way out is Home. The
+     *  copy still names the cause. */
+    it("goes Home when a self-custodial send is rejected for its details (S10 invalidInput)", async () => {
       asSelfCustodial()
       sendPaymentMock.mockResolvedValueOnce({
         status: "FAILURE",
@@ -2821,7 +2932,12 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       await renderReview(route)
       await slide()
 
-      expect(sheetButton(LL.SendBitcoinConfirmationScreen.tryAgain())).toBeTruthy()
+      expect(sheetButton(LL.SendBitcoinConfirmationScreen.home())).toBeTruthy()
+      expect(
+        within(screen.getByTestId(ERROR_SHEET_TEST_ID)).queryByText(
+          LL.SendBitcoinConfirmationScreen.tryAgain(),
+        ),
+      ).toBeNull()
     })
 
     it("offers Try again when no idempotency key could be made, since nothing was sent (S8)", async () => {
@@ -2833,7 +2949,7 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       expect(sheetButton(LL.SendBitcoinConfirmationScreen.tryAgain())).toBeTruthy()
     })
 
-    it("offers Change amount after a self-custodial send rejected for the amount (S10)", async () => {
+    it("goes Home when a self-custodial send is rejected for the amount, naming the cause (S10)", async () => {
       asSelfCustodial()
       sendPaymentMock.mockResolvedValueOnce({
         status: "FAILURE",
@@ -2842,8 +2958,16 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       await renderReview(route)
       await slide()
 
-      fireEvent.press(sheetButton(LL.SendBitcoinConfirmationScreen.changeAmount()))
-      expectChangeAmountDispatched()
+      expectInlineAndInSheet(LL.SelfCustodialError.insufficientFunds())
+      expect(
+        within(screen.getByTestId(ERROR_SHEET_TEST_ID)).queryByText(
+          LL.SendBitcoinConfirmationScreen.changeAmount(),
+        ),
+      ).toBeNull()
+      fireEvent.press(sheetButton(LL.SendBitcoinConfirmationScreen.home()))
+      expect(navigationDispatchMock).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "POP_TO_TOP" }),
+      )
     })
   })
 

@@ -30,7 +30,7 @@ import {
 } from "@app/types/amounts"
 import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction"
 import { WalletDescriptor } from "@app/types/wallets"
-import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
+import { FeeTierOption } from "@app/types/fee-tiers"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
 export type ConvertMoneyAmount = <W extends WalletOrDisplayCurrency>(
@@ -142,14 +142,16 @@ export type SetPayoutSpeed<T extends WalletCurrency> = (
   payoutSpeed: PayoutSpeed,
 ) => PaymentDetail<T>
 
+export type PaymentDetailType =
+  | typeof PaymentType.Intraledger
+  | typeof PaymentType.Onchain
+  | typeof PaymentType.Lightning
+  | typeof PaymentType.Lnurl
+  | typeof SelfCustodialPaymentType.Spark
+
 type BasePaymentDetail<T extends WalletCurrency> = {
   memo?: string
-  paymentType:
-    | typeof PaymentType.Intraledger
-    | typeof PaymentType.Onchain
-    | typeof PaymentType.Lightning
-    | typeof PaymentType.Lnurl
-    | typeof SelfCustodialPaymentType.Spark
+  paymentType: PaymentDetailType
   destination: string
   sendingWalletDescriptor: WalletDescriptor<T>
   convertMoneyAmount: ConvertMoneyAmount
@@ -157,9 +159,6 @@ type BasePaymentDetail<T extends WalletCurrency> = {
   setSendingWalletDescriptor: SetSendingWalletDescriptor<T>
   canSendMax?: boolean
   isSendingMax?: boolean
-  /** The fee comes out of the amount sent, so the recipient gets the amount less the fee:
-   *  a send-all, or a dollar send to a Lightning address. */
-  isFeeIncluded?: boolean
   setMemo?: SetMemo<T>
   canSetMemo: boolean
   setAmount?: SetAmount<T>

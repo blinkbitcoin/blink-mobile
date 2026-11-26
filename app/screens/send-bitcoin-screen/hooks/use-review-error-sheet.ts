@@ -28,6 +28,8 @@ type Args = {
   /** The USD dust sweep (R5): information to acknowledge before sending. */
   dustWarning: SendDustWarning
   errorMsgActionFor: (raw: string | undefined, outcome?: FailureOutcome) => ErrorMsgAction
+  /** A fee quote that fails after a send attempt can't vouch that nothing was sent. */
+  hasAttemptedSend: boolean
 }
 
 /**
@@ -54,6 +56,7 @@ export const useReviewErrorSheet = ({
   feeErrorText,
   dustWarning,
   errorMsgActionFor,
+  hasAttemptedSend,
 }: Args) => {
   const { LL } = useI18nContext()
   const { formatMoneyAmount } = useDisplayCurrency()
@@ -81,10 +84,13 @@ export const useReviewErrorSheet = ({
       isFeeFailed && isSelfCustodialErrorCode(feeErrorCode)
         ? {
             message: feeErrorText,
-            action: errorMsgActionFor(feeErrorCode, "notSent"),
+            action: errorMsgActionFor(
+              feeErrorCode,
+              hasAttemptedSend ? "failed" : "notSent",
+            ),
           }
         : undefined,
-    [isFeeFailed, feeErrorCode, feeErrorText, errorMsgActionFor],
+    [isFeeFailed, feeErrorCode, feeErrorText, errorMsgActionFor, hasAttemptedSend],
   )
 
   // Keyed on whether the notice shows, not on its text: the amounts in it follow the

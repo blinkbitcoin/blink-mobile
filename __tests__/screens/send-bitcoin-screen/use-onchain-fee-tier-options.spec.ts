@@ -2,10 +2,7 @@ import { renderHook, act } from "@testing-library/react-native"
 
 import { wrapDestination } from "@app/self-custodial/payment-details/wrap-destination"
 
-import {
-  FeeTierOption,
-  FeeUnit,
-} from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
+import { FeeTierOption, FeeUnit } from "@app/types/fee-tiers"
 import { SdkFeeError } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
 import { useOnchainFeeTierOptions } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tier-options"
 import { PayoutSpeed, WalletCurrency } from "@app/graphql/generated"

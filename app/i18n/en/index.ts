@@ -3883,30 +3883,36 @@ const en: BaseTranslation = {
       CardIntroducing: {
         title: "Introducing",
         cardInfo: {
-          bitcoinCard: "The Blink Visa card",
+          bitcoinCard: "The Blink Card",
           for: "for",
-          maximalist: "Bitcoin Maximalists",
+          bitcoiners: "Bitcoiners",
         },
         buttonText: "Continue",
       },
       CardDetails: {
-        title: "Additional perks",
+        title: "What’s included",
         features: {
-          accountManager: "Dedicated account manager",
-          support: "Priority support",
-          onchainDeposits: "50% back on transaction fees",
-          circularEconomies: "$100 to circular economies",
+          card: {
+            title: "Blink Card",
+            subtitle: "your Visa card, ready today",
+          },
+          accountManager: {
+            title: "Personal account manager",
+            subtitle: "and priority support",
+          },
+          onOffRamping: "On/Off ramping",
         },
-        andMore: "... and more coming in 2026",
+        availableIn: "in {months:number} months",
+        footnote: "Some features will be available within {months:number} months. The card is ready today.",
         buttonText: "Continue",
       },
       WelcomeOnboard: {
         welcomeMessage: {
           title: "Welcome onboard",
-          subtitle: "To Blink Private",
+          subtitle: "To Blink Orange",
           paragraphs: {
-            body1: "Someone thought of you and suggested that we should invite you to Blink Private. Probably because you are an awesome Bitcoiner.",
-            body2: "Our goal for 2026 is to stuff the program with so much goodies that it will be obvious to renew next year.",
+            body1: "Someone thought of you and suggested that we should invite you to Blink Orange. Probably because you are an awesome Bitcoiner.",
+            body2: "Blink Orange is the first tier of Blink’s membership for Bitcoiners, by invitation. The Blink Card and your personal account manager are two of the first services we offer — the rest we’re building through 2027.",
           },
         },
         buttonText: "Let's go",
@@ -3916,8 +3922,14 @@ const en: BaseTranslation = {
         paymentTitle: "Payment",
         acceptButton: "Accept",
         payButton: "Continue & Pay",
-        cardTitle: "Blink Private",
+        cardTitle: "Blink Orange",
+        free: "Free",
+        forNow: "for now",
         perYear: "per year",
+        freeBreakdown: {
+          card: "Blink Card",
+          memberBenefits: "Other member benefits",
+        },
         status: {
           label: "Status",
           specialOfferLabel: "Special offer",
@@ -3939,6 +3951,18 @@ const en: BaseTranslation = {
           linkText: "Blink Card Fee Schedule",
         },
         renew: "I understand my subscription will automatically renew in {months: number} months",
+        freeNotice: "I understand Blink Orange is free for now, and that a membership fee may be introduced later, with notice",
+      },
+      CardVerifyIdentity: {
+        title: "Verify your identity",
+        description: "To activate your Blink Card, the card issuer must verify who you are (KYC). You will need:",
+        requirements: {
+          governmentId: "A government-issued ID",
+          selfie: "A selfie / liveness check",
+          proofOfAddress: "Proof of address",
+          questions: "A few questions about you",
+        },
+        buttonText: "Continue",
       },
       LoadingCard: {
         title: "We're working on your card",
@@ -4012,11 +4036,11 @@ const en: BaseTranslation = {
         fields: {
           occupation: {
             label: "Occupation",
-            placeholder: "Select your occupation",
+            placeholder: "Select",
           },
           annualSalaryRange: {
             label: "Annual salary",
-            placeholder: "Select your salary range",
+            placeholder: "Select salary",
           },
           accountPurpose: {
             label: "Account purpose",
@@ -4027,7 +4051,6 @@ const en: BaseTranslation = {
             placeholder: "Select your spending range",
           },
         },
-        buttonText: "Submit application",
         select: "Select",
       },
       Acknowledgement: {
@@ -4039,23 +4062,27 @@ const en: BaseTranslation = {
         },
         privacyAndTerms: {
           text: "I accept the",
-          privacyPolicyLinkText: "Issuer's Privacy Policy",
+          privacyPolicyLinkText: "Issuer’s Privacy Policy",
           and: ", and",
           cardTermsLinkText: "Blink Card Terms",
         },
         certifyAccuracy:
-          "I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Visa Card",
+          "I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Card",
         acknowledgeSolicitation:
-          "I acknowledge that applying for the Blink Visa Card does not constitute unauthorized solicitation",
+          "I acknowledge that applying for the Blink Card does not constitute unauthorized solicitation",
       },
       CardPreapproved: {
-        title: "You have been pre-approved for the Blink Visa card!",
+        title: "Your Blink Card is ready!",
+        subtitle: "You can now activate your card and start using it",
         buttonText: "Close",
+      },
+      CardDeclined: {
+        title: "We couldn't approve your card application",
+        subtitle: "Your account manager will be in touch.",
       },
       CardProcessing: {
         title: "Processing your application",
-        subtitle: "We will notify you once we are ready",
-        buttonText: "Close",
+        subtitle: "This can take up to a minute",
       },
     },
   },

@@ -269,6 +269,7 @@ beforeEach(() => {
   mockHapticReject.mockClear()
   mockHapticTap.mockClear()
   mockSavePreferredAmountCurrency.mockClear()
+  mockHapticTap.mockClear()
   mockDisplayCurrency.current = "NGN"
   mockPreferredAmountCurrency.current = undefined
 })

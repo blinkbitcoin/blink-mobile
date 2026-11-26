@@ -8,7 +8,17 @@ import {
 } from "@app/self-custodial/sdk-error"
 import { logBreadcrumb } from "@app/utils/error-reporting"
 
-import { isNothingSentFailure } from "../error-msg-action"
+import { IDEMPOTENCY_KEY_UNAVAILABLE } from "../use-send-payment"
+
+/** Failures that name their own cause: classified as raised before the send. Only the
+ *  copy reads them; the action stays Home for every one after a send attempt, since the
+ *  SDK's classification is not proof that nothing went out (error-msg-action.ts). */
+const CAUSE_CODES: ReadonlySet<string> = new Set([
+  SelfCustodialErrorCode.InsufficientFunds,
+  SelfCustodialErrorCode.BelowMinimum,
+  SelfCustodialErrorCode.InvalidInput,
+  IDEMPOTENCY_KEY_UNAVAILABLE,
+])
 
 /** Codes whose own copy already says what became of the payment, and goes with the
  *  actions offered under it. */
@@ -34,7 +44,7 @@ export const useSendFailureCopy = () => {
           translateSdkError(raw) || LL.SendBitcoinConfirmationScreen.somethingWentWrong()
         )
       }
-      if (isNothingSentFailure(raw)) {
+      if (raw && CAUSE_CODES.has(raw)) {
         return (
           (isSelfCustodialErrorCode(raw) && translateSdkError(raw)) ||
           LL.SendBitcoinConfirmationScreen.somethingWentWrong()

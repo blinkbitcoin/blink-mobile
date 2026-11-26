@@ -2,13 +2,11 @@ import { useCallback, useState } from "react"
 
 import { WalletCurrency } from "@app/graphql/generated"
 
-import { isAmountFixableError } from "../amount-fixable-error"
 import { ErrorMsgAction, useErrorMsgAction } from "../error-msg-action"
 import { PaymentDetail, PaymentSendExtraInfo } from "../payment-details/index.types"
 
 type PaymentFailure = {
   message: string
-  canChangeAmount: boolean
   action: ErrorMsgAction
 }
 
@@ -25,7 +23,6 @@ export const usePaymentFailure = (paymentDetail: PaymentDetail<WalletCurrency>) 
     (message: string, raw?: string, action?: ErrorMsgAction) =>
       setPaymentFailure({
         message,
-        canChangeAmount: isAmountFixableError(raw),
         action: action ?? errorMsgActionFor(raw),
       }),
     [errorMsgActionFor],
