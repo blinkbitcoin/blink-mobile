@@ -25,11 +25,10 @@ const TopUpWay = {
 type TopUpWay = (typeof TopUpWay)[keyof typeof TopUpWay]
 
 /** Where each way goes once the activation is complete, in the order the ways are shown
- *  and preselected. The deposit is shown but not offered until Receive can fill the Card
- *  Balance. */
+ *  and preselected. A way without a route is shown but not offered. */
 const TOP_UP_ROUTES: Record<TopUpWay, ActivationThen | null> = {
   [TopUpWay.Balance]: { name: "conversionDetails", params: { destination: CARD } },
-  [TopUpWay.Deposit]: null,
+  [TopUpWay.Deposit]: { name: "receiveBitcoin", params: { destination: CARD } },
 }
 
 const WAY_ICONS: Record<TopUpWay, IconNamesType> = {
@@ -43,7 +42,7 @@ const WAY_ROW_HEIGHT = 62
 const SELECTED_BORDER_WIDTH = 1
 
 /** The activation's last step. The member tops the card up from the Bitcoin or Dollar
- *  Balance, or skips; either completes the activation. */
+ *  Balance, deposits into the Card Balance, or skips; each completes the activation. */
 export const CardTopUpScreen: React.FC = () => {
   const styles = useStyles()
   const {

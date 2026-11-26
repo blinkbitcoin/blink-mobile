@@ -94,19 +94,20 @@ describe("CardTopUpScreen", () => {
     expect(balance).not.toBeSelected()
   })
 
-  it("shows the deposit as not offered yet", async () => {
+  it("offers the deposit, left unchosen while the balances hold funds", async () => {
     const { getByRole } = await renderScreen()
 
     const deposit = getByRole("radio", { name: depositWay })
-    expect(deposit).toBeDisabled()
+    expect(deposit).toBeEnabled()
     expect(deposit).not.toBeSelected()
   })
 
-  it("keeps Top-up now off while no way can be chosen", async () => {
+  it("preselects the deposit when neither balance holds funds", async () => {
     mockUseActiveWallet.mockReturnValue(walletsWith({ btc: 0, usd: 0 }))
-    const { getByText } = await renderScreen()
+    const { getByRole, getByText } = await renderScreen()
 
-    expect(getByText("Top-up now")).toBeDisabled()
+    expect(getByRole("radio", { name: depositWay })).toBeSelected()
+    expect(getByText("Top-up now")).toBeEnabled()
   })
 
   it("completes the activation and opens the Transfer into the Card Balance", async () => {
@@ -138,13 +139,29 @@ describe("CardTopUpScreen", () => {
   })
 
   it("leaves a way not offered unchosen when tapped", async () => {
+    mockUseActiveWallet.mockReturnValue(walletsWith({ btc: 0, usd: 0 }))
     const { getByRole } = await renderScreen()
+
+    await act(async () => {
+      fireEvent.press(getByRole("radio", { name: balanceWay }))
+    })
+
+    expect(getByRole("radio", { name: depositWay })).toBeSelected()
+  })
+
+  it("completes the activation and opens Receive into the Card Balance", async () => {
+    const { getByRole, getByText } = await renderScreen()
 
     await act(async () => {
       fireEvent.press(getByRole("radio", { name: depositWay }))
     })
+    await act(async () => {
+      fireEvent.press(getByText("Top-up now"))
+    })
 
-    expect(getByRole("radio", { name: balanceWay })).toBeSelected()
+    expect(mockComplete).toHaveBeenCalledWith({
+      then: { name: "receiveBitcoin", params: { destination: CARD } },
+    })
   })
 
   it("completes the activation when the member skips the top-up", async () => {

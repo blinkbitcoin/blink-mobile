@@ -200,7 +200,13 @@ export type RootStackParamList = {
   lnurl: { username: string }
   sectionCompleted: { amount: number; sectionTitle: string; isAvailable: boolean }
   priceHistory: undefined
-  receiveBitcoin: undefined
+  receiveBitcoin:
+    | {
+        /** The Card Balance as the destination, fixed: blink-card mints the invoice and
+         *  the address, so the payment lands in the card, never in a wallet. */
+        destination?: CardCurrency
+      }
+    | undefined
   redeemBitcoinDetail: {
     receiveDestination: ReceiveDestination
   }
