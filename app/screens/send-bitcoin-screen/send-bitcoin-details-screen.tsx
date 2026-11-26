@@ -212,28 +212,28 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     if (rebuilt) setPaymentDetail(rebuilt)
   }
 
+  /** Blink's daily limits govern the custodial account only. A self-custodial send settles
+   *  in the device's own wallet, so a signed-in user on that rail is not asked for them. */
+  const skipLimits = !useIsAuthed() || isSelfCustodial || !paymentDetail?.paymentType
+
   const {
     data: withdrawalLimitsData,
+    loading: withdrawalLimitsLoading,
     error: withdrawalLimitsError,
     refetch: refetchWithdrawalLimits,
   } = useSendBitcoinWithdrawalLimitsQuery({
     fetchPolicy: "no-cache",
-    skip:
-      !useIsAuthed() ||
-      !paymentDetail?.paymentType ||
-      paymentDetail.paymentType === "intraledger",
+    skip: skipLimits || paymentDetail?.paymentType === "intraledger",
   })
 
   const {
     data: intraledgerLimitsData,
+    loading: intraledgerLimitsLoading,
     error: intraledgerLimitsError,
     refetch: refetchIntraledgerLimits,
   } = useSendBitcoinInternalLimitsQuery({
     fetchPolicy: "no-cache",
-    skip:
-      !useIsAuthed() ||
-      !paymentDetail?.paymentType ||
-      paymentDetail.paymentType !== "intraledger",
+    skip: skipLimits || paymentDetail?.paymentType !== "intraledger",
   })
 
   const [lnurlError, setLnurlError] = useState<LnurlInvoiceError>()
@@ -549,13 +549,19 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       }
     })
 
-  /** Only one of the two limits queries runs for a payment, so at most one can fail. A
-   *  limit nobody read is not one the amount passed, so it holds Next until a read answers. */
+  /** Only one of the two limits queries runs for a payment, so at most one can fail. */
   const retryLimits = withdrawalLimitsError
     ? () => refetchWithdrawalLimits()
     : intraledgerLimitsError
       ? () => refetchIntraledgerLimits()
       : undefined
+  /** A limit nobody has read yet, still on its way or failed, is not one the amount passed,
+   *  so it holds Next until a read answers. A skipped query is never loading. */
+  const isLimitsUnread = Boolean(
+    retryLimits ||
+      (withdrawalLimitsLoading && !withdrawalLimitsData) ||
+      (intraledgerLimitsLoading && !intraledgerLimitsData),
+  )
 
   /**
    * Held while the custodial quote is out, because the high-fee warning is judged by the fee the
@@ -568,7 +574,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     Boolean(lnurlBoundsErrorMessage) ||
     isSelfPayment ||
     isQuotingFees ||
-    Boolean(retryLimits)
+    isLimitsUnread
 
   /**
    * The extra-info box shows one message, and an invalid amount is the one the sender can

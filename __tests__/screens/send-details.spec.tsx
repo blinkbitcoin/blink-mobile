@@ -145,10 +145,13 @@ jest.mock("@app/screens/send-bitcoin-screen/hooks/use-send-wallets", () => {
       usdWallet,
       network: "mainnet",
       loading: false,
-      isSelfCustodial: false,
+      isSelfCustodial: mockAccountMode.isSelfCustodial,
     }),
   }
 })
+
+/** Which rail the send is on. Signed in all the same, as a user holding both accounts is. */
+const mockAccountMode = { isSelfCustodial: false }
 
 /**
  * The withdrawal allowance, in cents. It starts where the shared account mock leaves it, so
@@ -156,11 +159,14 @@ jest.mock("@app/screens/send-bitcoin-screen/hooks/use-send-wallets", () => {
  */
 const mockWithdrawalAllowance = { remaining: 100_000_000 }
 
-/** The limits query's own failure, and its refetch, for the fail-closed tests. */
-const mockWithdrawalLimitsQuery: { error?: Error; refetch: jest.Mock } = {
-  error: undefined,
-  refetch: jest.fn(),
-}
+/** The limits query's first read still out, its own failure, and its refetch, for the
+ *  fail-closed tests. */
+const mockWithdrawalLimitsQuery: { loading: boolean; error?: Error; refetch: jest.Mock } =
+  {
+    loading: false,
+    error: undefined,
+    refetch: jest.fn(),
+  }
 
 /**
  * The tier quote, answered per test rather than left to fall off the end of the mocked
@@ -171,33 +177,38 @@ const mockQuoteFees = jest.fn()
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
-  useSendBitcoinWithdrawalLimitsQuery: () => {
+  useSendBitcoinWithdrawalLimitsQuery: ({ skip }: { skip?: boolean } = {}) => {
     // Apollo renders the screen again once a refetch answers; the mock has to as well.
     const [, rerender] = jest.requireActual("react").useReducer((n: number) => n + 1, 0)
+    const refetch = async () => {
+      await mockWithdrawalLimitsQuery.refetch()
+      rerender()
+    }
+    // A skipped query asks nothing: no data, no error, never loading.
+    if (skip) return { data: undefined, loading: false, error: undefined, refetch }
     return {
+      loading: mockWithdrawalLimitsQuery.loading,
       error: mockWithdrawalLimitsQuery.error,
-      refetch: async () => {
-        await mockWithdrawalLimitsQuery.refetch()
-        rerender()
-      },
-      // A failed query answers with no data, so no limit is there to check against.
-      data: mockWithdrawalLimitsQuery.error
-        ? undefined
-        : {
-            me: {
-              defaultAccount: {
-                limits: {
-                  withdrawal: [
-                    {
-                      totalLimit: 100_000_000,
-                      remainingLimit: mockWithdrawalAllowance.remaining,
-                      interval: 86_400,
-                    },
-                  ],
+      refetch,
+      // A read still out, or a failed one, has no data, so no limit to check against.
+      data:
+        mockWithdrawalLimitsQuery.loading || mockWithdrawalLimitsQuery.error
+          ? undefined
+          : {
+              me: {
+                defaultAccount: {
+                  limits: {
+                    withdrawal: [
+                      {
+                        totalLimit: 100_000_000,
+                        remainingLimit: mockWithdrawalAllowance.remaining,
+                        interval: 86_400,
+                      },
+                    ],
+                  },
                 },
               },
             },
-          },
     }
   },
   useOnChainTxFeeBySpeedLazyQuery: () => [mockQuoteFees],
@@ -215,6 +226,8 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  mockAccountMode.isSelfCustodial = false
+  mockWithdrawalLimitsQuery.loading = false
   mockWithdrawalAllowance.remaining = 100_000_000
   mockWithdrawalLimitsQuery.error = undefined
   mockWithdrawalLimitsQuery.refetch.mockClear()
@@ -1157,6 +1170,64 @@ describe("daily limit that could not be read", () => {
 
     expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
       true,
+    )
+  })
+
+  it("holds Next while the first read of the limit is out, then frees it", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalLimitsQuery.loading = true
+
+    const view = render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    await flushAsync()
+
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      true,
+    )
+    // Still on its way is not a failure: no sheet, and nothing said inline.
+    expect(errorSheet()).toBeNull()
+    expect(screen.queryByText(LL.SendBitcoinScreen.limitsUnavailable())).toBeNull()
+
+    mockWithdrawalLimitsQuery.loading = false
+    view.rerender(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled,
+      ).toBe(false)
+    })
+  })
+
+  /** Blink's limits are the custodial account's. A signed-in user sending on the
+   *  self-custodial rail is not held by a custodial query that failed. */
+  it("asks a self-custodial send for no custodial limit, so a failed read holds nothing", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockAccountMode.isSelfCustodial = true
+    mockWithdrawalLimitsQuery.error = new Error("limits unavailable")
+
+    await renderOnchain()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    await flushAsync()
+
+    expect(errorSheet()).toBeNull()
+    expect(screen.queryByText(LL.SendBitcoinScreen.limitsUnavailable())).toBeNull()
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      false,
     )
   })
 
