@@ -34,7 +34,11 @@ let mockRootState:
 let mockOnReady: (() => void) | undefined
 let mockOnStateChange: ((state: unknown) => void) | undefined
 type LinkingSubscribe = (listener: (url: string) => void) => () => void
-let mockLinking: { subscribe?: LinkingSubscribe } | undefined
+type MockLinking = {
+  subscribe?: LinkingSubscribe
+  getInitialURL?: () => Promise<string | null | undefined>
+}
+let mockLinking: MockLinking | undefined
 
 /** The navigationRef is module-level, so the container ref is stubbed. The stub APPLIES the
  *  reset to the stack it serves, as the real container does, so a second evaluation sees the
@@ -59,7 +63,7 @@ jest.mock("@react-navigation/native", () => ({
     children?: React.ReactNode
     onReady?: () => void
     onStateChange?: (state: unknown) => void
-    linking?: { subscribe?: LinkingSubscribe }
+    linking?: MockLinking
   }) => {
     mockOnReady = onReady
     mockOnStateChange = onStateChange
@@ -112,9 +116,10 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => ({ isSelfCustodial: false }),
 }))
 
+const mockSetActiveAction = jest.fn()
 jest.mock("@app/components/actions", () => ({
   ...jest.requireActual("@app/components/actions"),
-  useActionsContext: () => ({ setActiveAction: jest.fn() }),
+  useActionsContext: () => ({ setActiveAction: mockSetActiveAction }),
 }))
 
 jest.mock("@rn-vui/themed", () => ({
@@ -135,6 +140,7 @@ import {
   processLinkForAction,
   useAuthenticationContext,
 } from "@app/navigation/navigation-container-wrapper"
+import { TELEGRAM_CALLBACK_PATH } from "@app/config"
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "@app/utils/enum"
 
@@ -1030,6 +1036,10 @@ describe("NavigationContainerWrapper two-factor gate", () => {
     mockRootState = STACK_AT_BLOCKER
   })
 
+  /** A queued link opens inside the app: handing it back to the OS made Android ask which
+   *  app to open it with a second time, and lost it if that prompt was dismissed. */
+  afterEach(() => expect(Linking.openURL).not.toHaveBeenCalled())
+
   /** The gate stands in only for a start it is owed, which is pending meanwhile. */
   const armGateOverPendingStart = (rendered: ReturnType<typeof render>) => {
     mockTwoFactorStartPending = true
@@ -1064,7 +1074,6 @@ describe("NavigationContainerWrapper two-factor gate", () => {
 
     receive(PAYMENT_DEEPLINK)
     expect(listener).not.toHaveBeenCalled()
-    expect(Linking.openURL).not.toHaveBeenCalled()
 
     receive(MIGRATION_DEEPLINK)
     expect(listener).toHaveBeenCalledWith(MIGRATION_DEEPLINK)
@@ -1073,7 +1082,7 @@ describe("NavigationContainerWrapper two-factor gate", () => {
     mockTwoFactorGateActive = false
     rerenderWrapper(rendered, <UnlockProbe />)
 
-    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
+    await waitFor(() => expect(listener).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
   })
 
   /** The countdown modal, and the flow it opened, hold the start without the gate. */
@@ -1086,7 +1095,6 @@ describe("NavigationContainerWrapper two-factor gate", () => {
     receive(PAYMENT_DEEPLINK)
 
     expect(listener).not.toHaveBeenCalled()
-    expect(Linking.openURL).not.toHaveBeenCalled()
   })
 
   /** The home takes a start that owes nothing only once it is focused and clear of
@@ -1119,19 +1127,18 @@ describe("NavigationContainerWrapper two-factor gate", () => {
 
     await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
     expect(listener).not.toHaveBeenCalled()
-    expect(Linking.openURL).not.toHaveBeenCalled()
   })
 
   it("replays a queued migration link through the prompts, as it lets a live one through", async () => {
     const rendered = renderWrapper(<UnlockProbe />)
-    const { receive } = subscribeToLinks()
+    const { listener, receive } = subscribeToLinks()
     receive(MIGRATION_DEEPLINK)
-    expect(Linking.openURL).not.toHaveBeenCalled()
+    expect(listener).not.toHaveBeenCalled()
 
     armGateOverPendingStart(rendered)
     unlock()
 
-    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(MIGRATION_DEEPLINK))
+    await waitFor(() => expect(listener).toHaveBeenCalledWith(MIGRATION_DEEPLINK))
   })
 
   /** The accepted code ends the prompt while the key's backup is still up; a link let
@@ -1140,7 +1147,7 @@ describe("NavigationContainerWrapper two-factor gate", () => {
     mockTwoFactorStartPending = true
     const rendered = await renderUnlocked()
     rerenderWrapper(rendered, <UnlockProbe />)
-    const { receive } = subscribeToLinks()
+    const { listener, receive } = subscribeToLinks()
     receive(PAYMENT_DEEPLINK)
     navigateTo({
       index: 1,
@@ -1159,11 +1166,11 @@ describe("NavigationContainerWrapper two-factor gate", () => {
     mockTwoFactorStartPending = false
     rerenderWrapper(rendered, <UnlockProbe />)
     await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
-    expect(Linking.openURL).not.toHaveBeenCalled()
+    expect(listener).not.toHaveBeenCalled()
 
     navigateTo(STACK_AT_BLOCKER)
 
-    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
+    await waitFor(() => expect(listener).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
   })
 
   /** A link to a screen below the backup, the home among them, would close it before
@@ -1178,11 +1185,10 @@ describe("NavigationContainerWrapper two-factor gate", () => {
 
     receive(PAYMENT_DEEPLINK)
     expect(listener).not.toHaveBeenCalled()
-    expect(Linking.openURL).not.toHaveBeenCalled()
 
     navigateTo(STACK_AT_BLOCKER)
 
-    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
+    await waitFor(() => expect(listener).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
   })
 
   /** The code's answer brings up the backup only while the code screen is there: a
@@ -1200,7 +1206,6 @@ describe("NavigationContainerWrapper two-factor gate", () => {
 
     receive(PAYMENT_DEEPLINK)
     expect(listener).not.toHaveBeenCalled()
-    expect(Linking.openURL).not.toHaveBeenCalled()
 
     navigateTo({
       index: 1,
@@ -1210,7 +1215,7 @@ describe("NavigationContainerWrapper two-factor gate", () => {
       ],
     })
 
-    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
+    await waitFor(() => expect(listener).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
   })
 
   /** Before a code is sent no authenticator is on, and a link costs only the progress. */
@@ -1240,12 +1245,11 @@ describe("NavigationContainerWrapper two-factor gate", () => {
     receive(MIGRATION_DEEPLINK)
     await act(async () => {})
     expect(listener).not.toHaveBeenCalled()
-    expect(Linking.openURL).not.toHaveBeenCalled()
 
     navigateTo(STACK_AT_BLOCKER)
 
-    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(MIGRATION_DEEPLINK))
-    expect(Linking.openURL).toHaveBeenCalledTimes(1)
+    await waitFor(() => expect(listener).toHaveBeenCalledWith(MIGRATION_DEEPLINK))
+    expect(listener).toHaveBeenCalledTimes(1)
   })
 
   /** The done screen takes the backup's place once the key is kept. */
@@ -1264,7 +1268,7 @@ describe("NavigationContainerWrapper two-factor gate", () => {
 
   it("keeps a link that waited only for the unlock until the key's backup is left", async () => {
     const rendered = renderWrapper(<UnlockProbe />)
-    const { receive } = subscribeToLinks()
+    const { listener, receive } = subscribeToLinks()
     receive(PAYMENT_DEEPLINK)
     navigateTo({
       index: 1,
@@ -1276,29 +1280,29 @@ describe("NavigationContainerWrapper two-factor gate", () => {
     await waitFor(() =>
       expect(screen.getByTestId("lock-state").props.children).toBe("unlocked"),
     )
-    expect(Linking.openURL).not.toHaveBeenCalled()
+    expect(listener).not.toHaveBeenCalled()
 
     navigateTo(STACK_AT_BLOCKER)
 
-    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
+    await waitFor(() => expect(listener).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
   })
 
   /** A registration opened from the settings owes no prompt: a link that waited only
    *  for the unlock opens with it, as on any other screen. */
   it("opens a link that waited only for the unlock over an open registration", async () => {
     const rendered = renderWrapper(<UnlockProbe />)
-    const { receive } = subscribeToLinks()
+    const { listener, receive } = subscribeToLinks()
     receive(PAYMENT_DEEPLINK)
     navigateTo({
       index: 1,
       routes: [{ name: "Primary" }, { name: "totpRegistrationInitiate" }],
     })
-    expect(Linking.openURL).not.toHaveBeenCalled()
+    expect(listener).not.toHaveBeenCalled()
 
     unlock()
     rerenderWrapper(rendered, <UnlockProbe />)
 
-    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
+    await waitFor(() => expect(listener).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
   })
 
   it("holds a link while the session start is still being decided, and opens it once it is", async () => {
@@ -1313,11 +1317,148 @@ describe("NavigationContainerWrapper two-factor gate", () => {
 
     receive(PAYMENT_DEEPLINK)
     expect(listener).not.toHaveBeenCalled()
-    expect(Linking.openURL).not.toHaveBeenCalled()
 
     mockTwoFactorStartPreparing = false
     rerenderWrapper(rendered, <UnlockProbe />)
 
-    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
+    await waitFor(() => expect(listener).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
+  })
+})
+
+/** A link that launched the app from cold is read once the container mounts and waits
+ *  behind the unlock, then opens inside the app the way a live one does (blink-wip#178). */
+describe("NavigationContainerWrapper cold-start link", () => {
+  let consoleLogSpy: jest.SpyInstance
+  beforeAll(() => {
+    consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {})
+  })
+  afterAll(() => consoleLogSpy.mockRestore())
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockBlockerVisible = false
+    mockTwoFactorGateActive = false
+    mockTwoFactorStartPreparing = false
+    mockTwoFactorStartPending = false
+    mockTwoFactorPromptOwed = true
+    mockIsReady = true
+    mockOnReady = undefined
+    mockOnStateChange = undefined
+    mockLinking = undefined
+    mockRootState = STACK_AT_BLOCKER
+  })
+
+  /** Handing the link back to the OS is what made Android ask a second time. */
+  afterEach(() => expect(Linking.openURL).not.toHaveBeenCalled())
+
+  /** Mounts locked, as a cold start does, and has the container read the launch link. */
+  const coldStartWith = async (launchUrl: string) => {
+    jest.mocked(Linking.getInitialURL).mockResolvedValueOnce(launchUrl)
+    const rendered = renderWrapper(<UnlockProbe />)
+    await act(async () => {
+      expect(await mockLinking?.getInitialURL?.()).toBeNull()
+    })
+    return rendered
+  }
+
+  const unlockAndSettle = async () => {
+    unlock()
+    await waitFor(() =>
+      expect(screen.getByTestId("lock-state").props.children).toBe("unlocked"),
+    )
+  }
+
+  it("opens the launch payment link in the app once the app is unlocked", async () => {
+    await coldStartWith(PAYMENT_DEEPLINK)
+    const { listener } = subscribeToLinks()
+    expect(listener).not.toHaveBeenCalled()
+
+    await unlockAndSettle()
+
+    expect(listener).toHaveBeenCalledWith(PAYMENT_DEEPLINK)
+    expect(listener).toHaveBeenCalledTimes(1)
+  })
+
+  it("sets the action a launch link asks for before opening it", async () => {
+    const actionLink = "blink://home?action=set-ln-address"
+    await coldStartWith(actionLink)
+    const { listener } = subscribeToLinks()
+
+    await unlockAndSettle()
+
+    expect(mockSetActiveAction).toHaveBeenCalledWith(Action.SetLnAddress)
+    expect(listener).toHaveBeenCalledWith(actionLink)
+  })
+
+  it("drops a launch payment link while the blocker is up", async () => {
+    mockBlockerVisible = true
+    await coldStartWith(PAYMENT_DEEPLINK)
+    const { listener } = subscribeToLinks()
+
+    await unlockAndSettle()
+
+    expect(listener).not.toHaveBeenCalled()
+  })
+
+  it("opens the launch migration entry while the blocker is up", async () => {
+    mockBlockerVisible = true
+    await coldStartWith(MIGRATION_DEEPLINK)
+    const { listener } = subscribeToLinks()
+
+    await unlockAndSettle()
+
+    expect(listener).toHaveBeenCalledWith(MIGRATION_DEEPLINK)
+  })
+
+  it("ignores a Telegram login callback that launched the app", async () => {
+    await coldStartWith(`blink://${TELEGRAM_CALLBACK_PATH}?token=t`)
+    const { listener } = subscribeToLinks()
+
+    await unlockAndSettle()
+
+    expect(listener).not.toHaveBeenCalled()
+  })
+
+  /** Only reachable if the unlock beat the container's subscription: the link must wait
+   *  for a handler rather than be thrown away. */
+  it("keeps the launch link queued until there is a handler to open it with", async () => {
+    const rendered = await coldStartWith(PAYMENT_DEEPLINK)
+    await unlockAndSettle()
+
+    const { listener } = subscribeToLinks()
+    expect(listener).not.toHaveBeenCalled()
+    /** Any change to whether a queued link may open runs the drain again. */
+    mockTwoFactorStartPreparing = true
+    rerenderWrapper(rendered, <UnlockProbe />)
+    mockTwoFactorStartPreparing = false
+    rerenderWrapper(rendered, <UnlockProbe />)
+
+    await waitFor(() => expect(listener).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
+  })
+
+  it("forgets the handler of a subscription that ended", async () => {
+    const rendered = await coldStartWith(PAYMENT_DEEPLINK)
+    const listener = jest.fn()
+    const unsubscribe = mockLinking?.subscribe?.(listener)
+    unsubscribe?.()
+
+    await unlockAndSettle()
+    rerenderWrapper(rendered, <UnlockProbe />)
+
+    expect(listener).not.toHaveBeenCalled()
+  })
+
+  it("keeps the handler of a newer subscription when an older one ends", async () => {
+    await coldStartWith(PAYMENT_DEEPLINK)
+    const older = jest.fn()
+    const unsubscribeOlder = mockLinking?.subscribe?.(older)
+    const newer = jest.fn()
+    mockLinking?.subscribe?.(newer)
+    unsubscribeOlder?.()
+
+    await unlockAndSettle()
+
+    expect(older).not.toHaveBeenCalled()
+    expect(newer).toHaveBeenCalledWith(PAYMENT_DEEPLINK)
   })
 })
