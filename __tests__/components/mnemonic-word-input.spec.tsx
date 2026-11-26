@@ -59,11 +59,10 @@ describe("MnemonicWordInput", () => {
     expect(StyleSheet.flatten(wordNumber.props.style).opacity).toBeUndefined()
   })
 
-  it("keeps word number mounted but hidden when value is empty", () => {
-    const { getByText } = render(<MnemonicWordInput {...defaultProps} index={0} />)
+  it("leaves the word number out when value is empty", () => {
+    const { queryByText } = render(<MnemonicWordInput {...defaultProps} index={0} />)
 
-    const wordNumber = getByText("1.")
-    expect(StyleSheet.flatten(wordNumber.props.style).opacity).toBe(0)
+    expect(queryByText("1.")).toBeNull()
   })
 
   it("calls onChangeText when text changes", () => {

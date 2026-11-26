@@ -41,27 +41,25 @@ export const MnemonicWordInput = forwardRef<
 
   return (
     <View style={[styles.container, correct && styles.correct, wrong && styles.error]}>
-      {/* Always mounted, fixed width: the row's layout must not depend on the input's
-       *  content, or the first keystroke reflows the field under the user's finger. */}
-      <Text
-        style={[styles.wordNumber, value.trim().length === 0 && styles.wordNumberHidden]}
-      >
-        {index + 1}.
-      </Text>
-      <TextInput
-        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
-        ref={inputRef}
-        style={styles.input}
-        placeholder={placeholder}
-        placeholderTextColor={colors.textMuted}
-        value={value}
-        onChangeText={onChangeText}
-        onFocus={onFocus}
-        autoCapitalize="none"
-        autoCorrect={false}
-        keyboardType="visible-password"
-        {...testProps(testID ?? `word-input-${index}`)}
-      />
+      <View style={styles.word}>
+        {/* Only once there's a word: an empty field shows its placeholder from the left
+         *  edge, as the design does, and the word moves over on the first keystroke. */}
+        {value.trim().length > 0 && <Text style={styles.wordNumber}>{index + 1}.</Text>}
+        <TextInput
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+          ref={inputRef}
+          style={styles.input}
+          placeholder={placeholder}
+          placeholderTextColor={colors.textMuted}
+          value={value}
+          onChangeText={onChangeText}
+          onFocus={onFocus}
+          autoCapitalize="none"
+          autoCorrect={false}
+          keyboardType="visible-password"
+          {...testProps(testID ?? `word-input-${index}`)}
+        />
+      </View>
       <GaloyIcon name="pencil" size={16} color={colors.accent} />
     </View>
   )
@@ -78,19 +76,23 @@ const useStyles = makeStyles(({ colors }) => ({
     borderWidth: 1,
     borderColor: colors.transparent,
     minHeight: 50,
-    paddingHorizontal: 14,
+    paddingLeft: 14,
+    paddingRight: 10,
     gap: 12,
+  },
+  /** The space in the design's "7. festival", drawn as a gap. */
+  word: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
   },
   /** The number and the input share one typeface and no lineHeight override, so both
    *  center on the same baseline; lineHeight on an iOS TextInput anchors glyphs
    *  differently than on a Text and the two drift apart. */
   wordNumber: {
-    width: 24,
     fontSize: 14,
     color: colors.textMuted,
-  },
-  wordNumberHidden: {
-    opacity: 0,
   },
   correct: {
     borderColor: colors.success,

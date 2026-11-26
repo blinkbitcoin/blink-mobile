@@ -1,14 +1,16 @@
 import React, { useCallback, useEffect, useRef } from "react"
-import { TextInput, View } from "react-native"
-import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
+import { View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
-import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import {
+  MnemonicWordInput,
+  type MnemonicWordInputHandle,
+} from "@app/components/mnemonic-word-input"
 import { Screen } from "@app/components/screen"
 import { ScreenSecurityGate } from "@app/components/screen-security-gate"
 import { SuggestionBar } from "@app/components/suggestion-bar"
@@ -19,7 +21,6 @@ import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
 import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
-import { fonts } from "@app/rne-theme/fonts"
 
 import { useBackupConfirm, useCompleteBackup } from "../hooks"
 import { type Challenge, isValidChallenges } from "../utils"
@@ -67,7 +68,7 @@ const BackupPhraseConfirmContent: React.FC<BackupPhraseConfirmContentProps> = ({
   const anyWrong = challenges.some((_, i) => isWordWrong(i))
   const isConfirmDisabled = !allCorrect || checkpointLoading
 
-  const inputRefs = useRef<Array<TextInput | null>>([])
+  const inputRefs = useRef<Array<MnemonicWordInputHandle | null>>([])
 
   useEffect(() => {
     if (focusRequest === null) return
@@ -84,53 +85,25 @@ const BackupPhraseConfirmContent: React.FC<BackupPhraseConfirmContentProps> = ({
           </Text>
 
           <View style={styles.inputList}>
-            {challenges.map((challenge, i) => {
-              const correct = inputs[i].trim().length > 0 && isWordCorrect(i)
-              const wrong = isWordWrong(i)
-              return (
-                <View key={challenge.index}>
-                  <View
-                    style={[
-                      styles.inputContainer,
-                      correct && styles.inputCorrect,
-                      wrong && styles.inputError,
-                    ]}
-                  >
-                    {/* Always mounted, fixed width: the row's layout must not depend on
-                     *  the input's content, or the first keystroke reflows the field
-                     *  under the user's finger. */}
-                    <Text
-                      style={[
-                        styles.wordNumber,
-                        inputs[i].trim().length === 0 && styles.wordNumberHidden,
-                      ]}
-                    >
-                      {challenge.index + 1}.
-                    </Text>
-                    <TextInput
-                      maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
-                      ref={(ref) => {
-                        inputRefs.current[i] = ref
-                      }}
-                      style={styles.input}
-                      placeholder={`${LL.BackupScreen.ManualBackup.Confirm.enterWord()} ${challenge.index + 1}`}
-                      placeholderTextColor={colors.textMuted}
-                      value={inputs[i]}
-                      onChangeText={(text) => {
-                        updateInput(i, text)
-                        setActiveIndex(i)
-                      }}
-                      onFocus={() => setActiveIndex(i)}
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      keyboardType="visible-password"
-                      {...testProps(`confirm-word-${challenge.index}`)}
-                    />
-                    <GaloyIcon name="pencil" size={16} color={colors.accent} />
-                  </View>
-                </View>
-              )
-            })}
+            {challenges.map((challenge, i) => (
+              <MnemonicWordInput
+                key={challenge.index}
+                ref={(handle) => {
+                  inputRefs.current[i] = handle
+                }}
+                index={challenge.index}
+                value={inputs[i]}
+                placeholder={`${LL.BackupScreen.ManualBackup.Confirm.enterWord()} ${challenge.index + 1}`}
+                onChangeText={(text) => {
+                  updateInput(i, text)
+                  setActiveIndex(i)
+                }}
+                onFocus={() => setActiveIndex(i)}
+                correct={inputs[i].trim().length > 0 && isWordCorrect(i)}
+                wrong={isWordWrong(i)}
+                testID={`confirm-word-${challenge.index}`}
+              />
+            ))}
           </View>
 
           <View style={styles.errorContainer}>
@@ -259,39 +232,6 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   inputList: {
     gap: 10,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.surfaceInteractive,
-    borderRadius: radius.default,
-    borderWidth: 1,
-    borderColor: colors.transparent,
-    minHeight: 50,
-    paddingHorizontal: 14,
-    gap: 12,
-  },
-  /** Same typeface and no lineHeight override on number and input, so both center on
-   *  one baseline (see MnemonicWordInput). */
-  wordNumber: {
-    width: 24,
-    fontSize: 14,
-    color: colors.textMuted,
-  },
-  wordNumberHidden: {
-    opacity: 0,
-  },
-  inputCorrect: {
-    borderColor: colors.success,
-  },
-  inputError: {
-    borderColor: colors.error,
-  },
-  input: {
-    flex: 1,
-    fontSize: 14,
-    color: colors.textOnBackground,
-    fontFamily: fonts.regular,
   },
   errorContainer: {
     flexDirection: "row",

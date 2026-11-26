@@ -33,24 +33,24 @@ describe("MnemonicWordInput", () => {
 
   /** The number slot is always mounted with a fixed width so the row cannot reflow on
    *  the first keystroke; empty inputs hide it with opacity only. */
-  it("keeps the number invisible but mounted while the input is empty", () => {
-    const { getByText } = renderInput({ value: "" })
+  /** The design starts the placeholder at the field's padding, so an empty field
+   *  keeps no room for the number. */
+  it("leaves the number out while the input is empty", () => {
+    const { queryByText } = renderInput({ value: "" })
 
-    const number = getByText("1.")
-    expect(StyleSheet.flatten(number.props.style).opacity).toBe(0)
+    expect(queryByText("1.")).toBeNull()
   })
 
   it("shows the number once the input has content", () => {
     const { getByText } = renderInput({ value: "abandon", index: 4 })
 
-    const number = getByText("5.")
-    expect(StyleSheet.flatten(number.props.style).opacity).toBeUndefined()
+    expect(getByText("5.")).toBeTruthy()
   })
 
   it("treats whitespace-only content as empty for the number", () => {
-    const { getByText } = renderInput({ value: "   " })
+    const { queryByText } = renderInput({ value: "   " })
 
-    expect(StyleSheet.flatten(getByText("1.").props.style).opacity).toBe(0)
+    expect(queryByText("1.")).toBeNull()
   })
 
   it("forwards text changes and focus to the callbacks", () => {
