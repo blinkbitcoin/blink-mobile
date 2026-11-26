@@ -1,9 +1,18 @@
 import React from "react"
 import { Text, TouchableOpacity } from "react-native"
-import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
+import { type PanGesture, State } from "react-native-gesture-handler"
+import {
+  fireGestureHandler,
+  getByGestureTestId,
+} from "react-native-gesture-handler/jest-utils"
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 import { useNavigation } from "@react-navigation/native"
 
 import { ConversionConfirmationScreen } from "@app/screens/conversion-flow"
+import {
+  SLIDER_PAN_TEST_ID,
+  SLIDER_TRACK_TEST_ID,
+} from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 import { HomeAuthedDocument, WalletCurrency } from "@app/graphql/generated"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -152,17 +161,35 @@ jest.mock("@app/screens/conversion-flow/hooks/self-custodial/use-conversion", ()
     mockSelfCustodialConversion(...args),
 }))
 
+/** Set by the one case that needs the real slider: the requote swipe, whose onSwipe
+ *  settles at once. */
+let mockUseRealSlider = false
+
 jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () => {
   type Props = { onSwipe: () => void; initialText: string; disabled?: boolean }
-
-  const MockGaloySliderButton = ({ onSwipe, initialText, disabled }: Props) => (
-    <TouchableOpacity onPress={onSwipe} disabled={disabled}>
-      <Text>{initialText}</Text>
-    </TouchableOpacity>
+  const actual = jest.requireActual(
+    "@app/components/atomic/galoy-slider-button/galoy-slider-button",
   )
+  const RealGaloySliderButton = actual.default as React.ComponentType<Props>
 
-  return { __esModule: true, default: MockGaloySliderButton }
+  const MockGaloySliderButton = (props: Props) =>
+    mockUseRealSlider ? (
+      <RealGaloySliderButton {...props} />
+    ) : (
+      <TouchableOpacity onPress={props.onSwipe} disabled={props.disabled}>
+        <Text>{props.initialText}</Text>
+      </TouchableOpacity>
+    )
+
+  return { ...actual, __esModule: true, default: MockGaloySliderButton }
 })
+
+// The real slider's busy border runs a frame loop; the arc is not under test here.
+jest.mock("react-native-reanimated", () => ({
+  __esModule: true,
+  ...jest.requireActual("react-native-reanimated"),
+  useFrameCallback: jest.fn(),
+}))
 
 describe("conversion-confirmation-screen", () => {
   let LL: ReturnType<typeof i18nObject>
@@ -650,6 +677,97 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
       expect(requoteMock).toHaveBeenCalledTimes(1)
     })
     expect(executeMock).not.toHaveBeenCalled()
+  })
+
+  describe("with the real slider", () => {
+    beforeEach(() => {
+      mockUseRealSlider = true
+    })
+
+    afterEach(() => {
+      mockUseRealSlider = false
+    })
+
+    // requote() returns at once, so isLoading never turns on between the two swipes.
+    const renderRequoting = () => {
+      const requoteMock = jest.fn()
+      mockSelfCustodialConversion.mockReturnValue({
+        isQuoting: false,
+        hasQuoteError: true,
+        feeText: "",
+        adjustmentText: null,
+        canExecute: false,
+        loading: false,
+        execute: jest.fn(),
+        requote: requoteMock,
+      })
+
+      render(
+        <ContextForScreen>
+          <ConversionConfirmationScreen
+            route={{
+              key: "conversionConfirmation",
+              name: "conversionConfirmation",
+              params: {
+                fromWalletCurrency: WalletCurrency.Btc,
+                moneyAmount: {
+                  amount: 10000,
+                  currency: WalletCurrency.Btc,
+                  currencyCode: WalletCurrency.Btc,
+                },
+              },
+            }}
+          />
+        </ContextForScreen>,
+      )
+      return requoteMock
+    }
+
+    it("re-quotes again on a second drag after a requote", async () => {
+      const requoteMock = renderRequoting()
+      fireEvent(screen.getByTestId(SLIDER_TRACK_TEST_ID), "layout", {
+        nativeEvent: { layout: { width: 350, height: 60, x: 0, y: 0 } },
+      })
+      // Gesture handler applies the new width on its next setImmediate.
+      await act(
+        () =>
+          new Promise((resolve) => {
+            setImmediate(resolve)
+          }),
+      )
+
+      const drag = () =>
+        act(async () => {
+          fireGestureHandler<PanGesture>(getByGestureTestId(SLIDER_PAN_TEST_ID), [
+            { state: State.BEGAN, translationX: 0 },
+            { state: State.ACTIVE, translationX: 0 },
+            { state: State.ACTIVE, translationX: 290 },
+            { state: State.END, translationX: 290 },
+          ])
+        })
+
+      await drag()
+      await drag()
+
+      expect(requoteMock).toHaveBeenCalledTimes(2)
+    })
+
+    it("re-quotes again on a second activate after a requote", async () => {
+      const requoteMock = renderRequoting()
+
+      // A screen reader's activate commits the same way a full slide does.
+      const activate = () =>
+        act(async () => {
+          fireEvent(screen.getByTestId("slider"), "accessibilityAction", {
+            nativeEvent: { actionName: "activate" },
+          })
+        })
+
+      await activate()
+      await activate()
+
+      expect(requoteMock).toHaveBeenCalledTimes(2)
+    })
   })
 
   it("keeps the slider disabled while the quote is still pending", () => {

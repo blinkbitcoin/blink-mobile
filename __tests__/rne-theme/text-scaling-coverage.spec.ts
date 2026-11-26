@@ -270,21 +270,15 @@ describe("the walk's own reading", () => {
   })
 
   /**
-   * The production tag, not a toy: stripping the multiplier from the slider label is the
-   * edit that used to leave this suite green.
+   * The production file, not a toy: the slider draws its labels with the themed `Text`,
+   * which carries the ceiling, so it must hold no React Native text that drops it.
    */
-  it("fails when the slider label drops the ceiling", () => {
+  it("finds no uncapped text in the slider", () => {
     const source = fs.readFileSync(
       path.join(APP_DIR, "components/atomic/galoy-slider-button/galoy-slider-button.tsx"),
       "utf8",
     )
-    const stripped = source.replace(
-      "maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}\n",
-      "",
-    )
 
-    expect(stripped).not.toBe(source)
     expect(uncappedAnimatedTags(source)).toEqual([])
-    expect(uncappedAnimatedTags(stripped)).toHaveLength(1)
   })
 })
