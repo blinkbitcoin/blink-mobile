@@ -53,7 +53,10 @@ import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
 import { isAmountFixableError } from "./amount-fixable-error"
 import { feeTierLabels, formatEta } from "./fee-tier-options"
 import { FeeTierOption } from "@app/types/fee-tiers"
-import { useHomeOnBackAfterSend } from "./hooks/use-home-on-back-after-send"
+import {
+  homeAfterSendAction,
+  useHomeOnBackAfterSend,
+} from "./hooks/use-home-on-back-after-send"
 import {
   CUSTODIAL_PAYOUT_ETA_MINUTES,
   feeTierFromPayoutSpeed,
@@ -326,7 +329,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       : undefined,
   )
 
-  const handleClose = React.useCallback(() => navigation.popToTop(), [navigation])
+  /** Close leaves Sent for the Home tab, wherever the send started from. */
+  const handleClose = React.useCallback(
+    () => navigation.dispatch(homeAfterSendAction()),
+    [navigation],
+  )
 
   const navigateToCompleted = React.useCallback(
     async ({

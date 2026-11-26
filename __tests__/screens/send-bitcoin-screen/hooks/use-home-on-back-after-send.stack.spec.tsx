@@ -10,7 +10,10 @@ import {
 } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 
-import { useHomeOnBackAfterSend } from "@app/screens/send-bitcoin-screen/hooks/use-home-on-back-after-send"
+import {
+  homeAfterSendAction,
+  useHomeOnBackAfterSend,
+} from "@app/screens/send-bitcoin-screen/hooks/use-home-on-back-after-send"
 
 /**
  * A second spec for the hook, on the app's own nesting: the root stack, `Primary`'s tabs,
@@ -59,18 +62,29 @@ const ReviewStub = ({ route }: { route: { params: { hasAttemptedSend: boolean } 
   const navigation = useNavigation()
   useHomeOnBackAfterSend(route.params.hasAttemptedSend)
   return (
-    <Pressable testID="go-back" onPress={() => navigation.goBack()}>
-      <Text>review</Text>
-    </Pressable>
+    <>
+      <Pressable testID="go-back" onPress={() => navigation.goBack()}>
+        <Text>review</Text>
+      </Pressable>
+      {/* Sent's Close, as review dispatches it. */}
+      <Pressable
+        testID="sent-close"
+        onPress={() => navigation.dispatch(homeAfterSendAction())}
+      >
+        <Text>close</Text>
+      </Pressable>
+    </>
   )
 }
 
 const renderSend = async ({
   fromContact,
   hasAttemptedSend,
+  leaveBy = "go-back",
 }: {
   fromContact: boolean
   hasAttemptedSend: boolean
+  leaveBy?: "go-back" | "sent-close"
 }) => {
   render(
     <NavigationContainer ref={navigationRef}>
@@ -100,7 +114,7 @@ const renderSend = async ({
     navigationRef.navigate("sendBitcoinConfirmation", { hasAttemptedSend })
   })
   await act(async () => {
-    fireEvent.press(screen.getByTestId("go-back"))
+    fireEvent.press(screen.getByTestId(leaveBy))
   })
 }
 
@@ -142,5 +156,29 @@ describe("useHomeOnBackAfterSend on the app's navigators", () => {
     await renderSend({ fromContact: true, hasAttemptedSend: false })
 
     expect(where().root).toEqual(["Primary", "sendBitcoinDetails"])
+  })
+})
+
+/** Close on Sent leaves by the same action. Once Sent has settled, review hands back to
+ *  Sent's own hold and the hook is off, so the action has to reach Home on its own. */
+describe("Sent's Close on the app's navigators", () => {
+  it("lands on Home for a send started from Home", async () => {
+    await renderSend({
+      fromContact: false,
+      hasAttemptedSend: false,
+      leaveBy: "sent-close",
+    })
+
+    expect(where()).toEqual({ root: ["Primary"], tab: "Home", tabTop: undefined })
+  })
+
+  it("lands on Home, not the contact, for a send started from People", async () => {
+    await renderSend({
+      fromContact: true,
+      hasAttemptedSend: false,
+      leaveBy: "sent-close",
+    })
+
+    expect(where()).toEqual({ root: ["Primary"], tab: "Home", tabTop: undefined })
   })
 })

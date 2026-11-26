@@ -2856,8 +2856,18 @@ describe("SendBitcoinConfirmationScreen — Sent", () => {
 
     await pressSentAction(LL.common.close())
 
-    expect(navigationPopToTopMock).toHaveBeenCalledTimes(1)
-    expect(navigationDispatchMock).not.toHaveBeenCalled()
+    /** The Home tab by name: `popToTop` would keep the tab the send started from. */
+    expect(navigationDispatchMock).toHaveBeenCalledTimes(1)
+    expect(navigationDispatchMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "POP_TO",
+        payload: expect.objectContaining({
+          name: "Primary",
+          params: { screen: "Home" },
+        }),
+      }),
+    )
+    expect(navigationPopToTopMock).not.toHaveBeenCalled()
   })
 
   /** The hold's own timing is the hook's spec; this is that its end opens the receipt. */
