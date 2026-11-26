@@ -32,7 +32,6 @@ import {
   useConvertMoneyDetails,
 } from "@app/screens/conversion-flow/use-convert-money-details"
 import {
-  CARD,
   CardCurrency,
   DisplayCurrency,
   lessThan,
@@ -47,9 +46,6 @@ import { Screen } from "@app/components/screen"
 import { cappedFontScale } from "@app/rne-theme/text-scaling"
 import { testProps } from "@app/utils/testProps"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { useDollarBalanceRestrictionGuard } from "@app/hooks/use-dollar-balance-restriction-guard"
-import { useDollarBalanceGate } from "@app/hooks/use-dollar-balance-restricted"
-import { useTransferBlockedGuard } from "@app/hooks/use-transfer-blocked-guard"
 import {
   DrainConversionReturn,
   useConsumeDrainConversionArmed,
@@ -78,7 +74,7 @@ import {
   useConversionOverlayFocus,
   useSelfCustodialConversionGuard,
   useSyncedInputValues,
-  useTransferCard,
+  useTransferAccess,
   useTransferWallets,
   TransferWallet,
 } from "./hooks"
@@ -140,41 +136,19 @@ const FULL_BALANCE_PERCENTAGE = 100
 export const ConversionDetailsScreen = () => {
   const route = useRoute<RouteProp<RootStackParamList, "conversionDetails">>()
   const drainConversion = useConsumeDrainConversionArmed()
-  const isDrainConversion = drainConversion !== null
-  const { card, isPending: isCardPending } = useTransferCard()
-  const isCardHolder = card !== undefined
-
-  /** A drain conversion waives the region restriction that would otherwise bounce a
-   *  restricted user home: emptying the dollar balance is the one way to migrate or to
-   *  switch to Anon Mode, and the flow arming the flag (not a deep-linkable param) is
-   *  what confirms it. A card holder keeps the Transfer wherever they are, since it is
-   *  how they fund the card (D82); a restricted Dollar Balance is left out of its
-   *  choices instead. */
-  const isGuardEnabled = !isDrainConversion && !isCardHolder && !isCardPending
-  const dollarBalanceGuard = useDollarBalanceRestrictionGuard({ enabled: isGuardEnabled })
-  const transferGuard = useTransferBlockedGuard({ enabled: isGuardEnabled })
-  const dollarBalanceGate = useDollarBalanceGate()
-
-  const isRefused = dollarBalanceGuard.isGated || transferGuard.isGated
-  const isCardHolderDollarPending = isCardHolder && dollarBalanceGate.isRegionPending
-  const isRegionPending =
-    dollarBalanceGuard.isRegionPending ||
-    transferGuard.isRegionPending ||
-    isCardHolderDollarPending
-  const isDollarBalanceOffered = !dollarBalanceGate.isGated || isDrainConversion
-  /** Only the member's own card is ever the fixed destination, so a link that asks for
-   *  it without a card opens the usual Transfer. */
-  const isCardDestination = isCardHolder && route.params?.destination === CARD
-  const destination = isCardDestination ? CARD : undefined
+  const { card, destination, isDollarBalanceOffered, isRefused, isPending } =
+    useTransferAccess({
+      requestedDestination: route.params?.destination,
+      isDrainConversion: drainConversion !== null,
+    })
 
   /** A refusal is already navigating the user away, so there is nothing to render. */
   if (isRefused) return null
 
   /** The wait is not a refusal, and this screen is reachable by routes other than the home
    *  transfer button, which hides itself while pending. Rendering nothing here would leave
-   *  a deep-linked user on an empty area under the header until the verdict lands. The
-   *  card lookup is waited on the same way, since it decides which guard applies. */
-  if (isRegionPending || isCardPending) return <ConversionDetailsRegionPending />
+   *  a deep-linked user on an empty area under the header until the verdict lands. */
+  if (isPending) return <ConversionDetailsRegionPending />
 
   return (
     <ConversionDetailsScreenContent
