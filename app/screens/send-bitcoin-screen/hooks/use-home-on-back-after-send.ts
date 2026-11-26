@@ -14,6 +14,9 @@ const BACKWARD_ACTIONS = ["GO_BACK", "POP"]
  * Only backward actions are redirected: the reset to the completed screen goes through as
  * it is. A `goBack` from the screen itself lands Home too, so review offers no Change
  * amount once a send was attempted.
+ *
+ * Home is the Home tab, selected explicitly. `popToTop` alone would keep `Primary`'s nested
+ * state, so a send started from a contact on People would land back on that contact.
  */
 export const useHomeOnBackAfterSend = (hasAttemptedSend: boolean) => {
   const navigation = useNavigation()
@@ -25,7 +28,7 @@ export const useHomeOnBackAfterSend = (hasAttemptedSend: boolean) => {
     return navigation.addListener("beforeRemove", (event) => {
       if (!BACKWARD_ACTIONS.includes(event.data.action.type)) return
       event.preventDefault()
-      navigation.dispatch(StackActions.popToTop())
+      navigation.dispatch(StackActions.popTo("Primary", { screen: "Home" }))
     })
   }, [navigation, hasAttemptedSend])
 }

@@ -1,9 +1,11 @@
 import React from "react"
 import { Pressable, Text } from "react-native"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import {
   createNavigationContainerRef,
   NavigationContainer,
+  NavigationState,
   useNavigation,
 } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
@@ -11,23 +13,47 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { useHomeOnBackAfterSend } from "@app/screens/send-bitcoin-screen/hooks/use-home-on-back-after-send"
 
 /**
- * A second spec for the hook, on a real stack: the sibling spec hands it a stand-in
- * navigation, so it can say the hook dispatched popToTop but not where a `goBack` from
- * the screen ends up, and that is what decides whether review may offer one.
+ * A second spec for the hook, on the app's own nesting: the root stack, `Primary`'s tabs,
+ * and People's own stack (root-navigator.tsx). The sibling spec hands the hook a stand-in
+ * navigation, so it can say what the hook dispatched but not where a `goBack` from review
+ * ends up. On a flat stack `popToTop` looked right, yet it kept `Primary`'s selected tab
+ * and its stack, so a send started from a contact went back to that contact.
  */
 
-type StackParamList = {
-  home: undefined
-  amountEntry: undefined
-  review: { hasAttemptedSend: boolean }
+type PeopleParamList = {
+  peopleHome: undefined
+  contactDetail: undefined
 }
 
-const Stack = createNativeStackNavigator<StackParamList>()
-const navigationRef = createNavigationContainerRef<StackParamList>()
+type RootParamList = {
+  Primary: undefined
+  sendBitcoinDetails: undefined
+  sendBitcoinConfirmation: { hasAttemptedSend: boolean }
+}
 
-const Stub = ({ label }: { label: string }) => <Text>{label}</Text>
-const HomeStub = () => <Stub label="home" />
-const AmountEntryStub = () => <Stub label="amount entry" />
+const Root = createNativeStackNavigator<RootParamList>()
+const Tabs = createBottomTabNavigator()
+const People = createNativeStackNavigator<PeopleParamList>()
+const navigationRef = createNavigationContainerRef<RootParamList>()
+
+const HomeStub = () => <Text>home</Text>
+const PeopleHomeStub = () => <Text>people</Text>
+const ContactDetailStub = () => <Text>contact detail</Text>
+const AmountEntryStub = () => <Text>amount entry</Text>
+
+const PeopleStack = () => (
+  <People.Navigator initialRouteName="peopleHome">
+    <People.Screen name="peopleHome" component={PeopleHomeStub} />
+    <People.Screen name="contactDetail" component={ContactDetailStub} />
+  </People.Navigator>
+)
+
+const PrimaryTabs = () => (
+  <Tabs.Navigator initialRouteName="Home">
+    <Tabs.Screen name="Home" component={HomeStub} />
+    <Tabs.Screen name="People" component={PeopleStack} />
+  </Tabs.Navigator>
+)
 
 const ReviewStub = ({ route }: { route: { params: { hasAttemptedSend: boolean } } }) => {
   const navigation = useNavigation()
@@ -39,46 +65,82 @@ const ReviewStub = ({ route }: { route: { params: { hasAttemptedSend: boolean } 
   )
 }
 
-const renderStack = async (hasAttemptedSend: boolean) => {
+const renderSend = async ({
+  fromContact,
+  hasAttemptedSend,
+}: {
+  fromContact: boolean
+  hasAttemptedSend: boolean
+}) => {
   render(
     <NavigationContainer ref={navigationRef}>
-      <Stack.Navigator initialRouteName="home">
-        <Stack.Screen name="home" component={HomeStub} />
-        <Stack.Screen name="amountEntry" component={AmountEntryStub} />
-        <Stack.Screen name="review" component={ReviewStub} />
-      </Stack.Navigator>
+      <Root.Navigator initialRouteName="Primary">
+        <Root.Screen name="Primary" component={PrimaryTabs} />
+        <Root.Screen name="sendBitcoinDetails" component={AmountEntryStub} />
+        <Root.Screen name="sendBitcoinConfirmation" component={ReviewStub} />
+      </Root.Navigator>
     </NavigationContainer>,
   )
+  if (fromContact) {
+    // The contact's Send button: People's stack, then up to the root's send screens.
+    await act(async () => {
+      navigationRef.dispatch({
+        type: "NAVIGATE",
+        payload: {
+          name: "Primary",
+          params: { screen: "People", params: { screen: "contactDetail" } },
+        },
+      })
+    })
+  }
   await act(async () => {
-    navigationRef.navigate("amountEntry")
+    navigationRef.navigate("sendBitcoinDetails")
   })
   await act(async () => {
-    navigationRef.navigate("review", { hasAttemptedSend })
+    navigationRef.navigate("sendBitcoinConfirmation", { hasAttemptedSend })
+  })
+  await act(async () => {
+    fireEvent.press(screen.getByTestId("go-back"))
   })
 }
 
-const routeNames = () => navigationRef.getRootState().routes.map((route) => route.name)
+/** The root routes, the selected tab, and the screen on top of that tab's own stack. */
+const where = () => {
+  const root = navigationRef.getRootState()
+  const primary = root.routes[0].state as NavigationState | undefined
+  const tab = primary?.routes[primary.index]
+  const tabStack = tab?.state as NavigationState | undefined
+  return {
+    root: root.routes.map((route) => route.name),
+    tab: tab?.name,
+    tabTop: tabStack?.routes[tabStack.index].name,
+  }
+}
 
-describe("useHomeOnBackAfterSend on a real stack", () => {
+describe("useHomeOnBackAfterSend on the app's navigators", () => {
   it("lets goBack return to amount entry before any send", async () => {
-    await renderStack(false)
+    await renderSend({ fromContact: false, hasAttemptedSend: false })
 
-    await act(async () => {
-      fireEvent.press(screen.getByTestId("go-back"))
-    })
-
-    expect(routeNames()).toEqual(["home", "amountEntry"])
+    expect(where().root).toEqual(["Primary", "sendBitcoinDetails"])
   })
 
   /** Any goBack from review, a header arrow or a "Change amount" alike, lands Home once a
    *  send was attempted: review must not offer a way back to amount entry after one. */
   it("turns goBack into Home after a send attempt", async () => {
-    await renderStack(true)
+    await renderSend({ fromContact: false, hasAttemptedSend: true })
 
-    await act(async () => {
-      fireEvent.press(screen.getByTestId("go-back"))
-    })
+    expect(where()).toEqual({ root: ["Primary"], tab: "Home", tabTop: undefined })
+  })
 
-    expect(routeNames()).toEqual(["home"])
+  it("lands on Home, not the contact, for a send started from People", async () => {
+    await renderSend({ fromContact: true, hasAttemptedSend: true })
+
+    expect(where()).toEqual({ root: ["Primary"], tab: "Home", tabTop: undefined })
+  })
+
+  it("still returns to amount entry before any send started from People", async () => {
+    await renderSend({ fromContact: true, hasAttemptedSend: false })
+
+    expect(where().root).toEqual(["Primary", "sendBitcoinDetails"])
   })
 })

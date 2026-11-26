@@ -1625,10 +1625,20 @@ describe("SendBitcoinConfirmationScreen — back after a send attempt", () => {
     return preventDefault
   }
 
+  /** Home is the Home tab: `Primary` with Home selected, not whichever tab the send
+   *  started from. */
   const wentHome = () =>
-    navigationDispatchMock.mock.calls.some(
-      ([action]) => (action as { type?: string })?.type === "POP_TO_TOP",
-    )
+    navigationDispatchMock.mock.calls.some(([action]) => {
+      const { type, payload } = action as {
+        type?: string
+        payload?: { name?: string; params?: { screen?: string } }
+      }
+      return (
+        type === "POP_TO" &&
+        payload?.name === "Primary" &&
+        payload.params?.screen === "Home"
+      )
+    })
 
   /** The real hook's contract: once the mutation fires, hasAttemptedSend stays true. */
   let hasAttemptedSend = false
