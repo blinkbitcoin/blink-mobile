@@ -18,7 +18,7 @@ import {
 } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { isIdempotencyConflict } from "@app/graphql/is-idempotency-conflict"
-import { useAppConfig, useClipboard, useDisplayCurrency } from "@app/hooks"
+import { useClipboard, useDisplayCurrency } from "@app/hooks"
 import { useInitialAccessibilityFocus } from "@app/hooks/use-initial-accessibility-focus"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -156,11 +156,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const translateSdkError = useTranslateSdkError()
   const { copyToClipboard } = useClipboard()
   const tierLabels = feeTierLabels(LL)
-  const {
-    appConfig: {
-      galoyInstance: { lnAddressHostname },
-    },
-  } = useAppConfig()
 
   const { fee, recipientAmount, isAwaitingIncludedFee } = useReviewQuote(paymentDetail)
 
