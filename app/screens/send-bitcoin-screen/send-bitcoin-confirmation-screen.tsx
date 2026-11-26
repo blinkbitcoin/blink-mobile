@@ -140,22 +140,14 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const btcPrimaryText = formatMoneyAmount({ moneyAmount: btcBalanceMoneyAmount })
   const usdPrimaryText = formatMoneyAmount({ moneyAmount: usdBalanceMoneyAmount })
-  const [paymentFailure, setPaymentFailure] = useState<
-    { message: string; canChangeAmount: boolean } | undefined
-  >(undefined)
-  const paymentError = paymentFailure?.message
-  const setPaymentError = React.useCallback(
-    (message: string, raw?: string) =>
-      setPaymentFailure({ message, canChangeAmount: isAmountFixableError(raw) }),
-    [],
-  )
+  const [paymentError, setPaymentError] = useState<string | undefined>(undefined)
   /** What the last send that did not go out said about itself, for the actions it
    *  offers under its error. */
   const [failedSend, setFailedSend] = useState<PaymentSendExtraInfo | undefined>(
     undefined,
   )
   const clearPaymentError = React.useCallback(() => {
-    setPaymentFailure(undefined)
+    setPaymentError(undefined)
     setFailedSend(undefined)
   }, [])
   const [isVerifying, setIsVerifying] = useState(false)
@@ -355,7 +347,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       setPaymentError(
         translateSdkError(errorsMessage) ||
           LL.SendBitcoinConfirmationScreen.somethingWentWrong(),
-        errorsMessage,
       )
       ReactNativeHapticFeedback.trigger("notificationError", {
         ignoreAndroidSystemSettings: true,
@@ -410,7 +401,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           err.message === IDEMPOTENCY_KEY_UNAVAILABLE
             ? LL.SendBitcoinConfirmationScreen.somethingWentWrong()
             : err.message || err.toString(),
-          err.message,
         )
       }
     }
@@ -566,11 +556,14 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const blockingError =
     paymentError || invalidAmountErrorMessage || (isFeeFailed ? feeErrorText : "")
   // Offered only when the error on show is about the amount; a network or invoice failure
-  // is not fixed by going back to change it.
-  const canChangeAmount = paymentFailure
-    ? paymentFailure.canChangeAmount
-    : Boolean(invalidAmountErrorMessage) ||
-      (isFeeFailed && isAmountFixableError(feeErrorCode))
+  // is not fixed by going back to change it. Never after a send attempt: back goes Home
+  // from then on (useHomeOnBackAfterSend), and an amount code on a send is the SDK's word
+  // that nothing went out, not a certainty.
+  const canChangeAmount =
+    !hasAttemptedSend &&
+    !paymentError &&
+    (Boolean(invalidAmountErrorMessage) ||
+      (isFeeFailed && isAmountFixableError(feeErrorCode)))
   const detailsOutline =
     invalidAmountErrorMessage || isFeeFailed
       ? colors.error

@@ -2234,6 +2234,29 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       expect(navigationGoBackMock).toHaveBeenCalledTimes(1)
     })
 
+    it("does not offer Change amount for a below-minimum fee quote once a send was attempted", async () => {
+      mockUseSendPayment.mockReturnValue({
+        loading: false,
+        hasAttemptedSend: true,
+        sendPayment: sendPaymentMock,
+      })
+      mockUseFee.mockReturnValue({
+        status: "error",
+        errors: [
+          {
+            __typename: "GraphQLApplicationError",
+            message: SelfCustodialErrorCode.BelowMinimum,
+          },
+        ],
+      })
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(screen.getByText(LL.SelfCustodialError.belowMinimum())).toBeTruthy()
+      expect(
+        screen.queryByText(LL.SendBitcoinConfirmationScreen.changeAmount()),
+      ).toBeNull()
+    })
+
     it("does not offer Change amount when the fee quote fails on the network", async () => {
       mockUseFee.mockReturnValue({
         status: "error",
@@ -2268,6 +2291,45 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
         screen.queryByText(LL.SendBitcoinConfirmationScreen.changeAmount()),
       ).toBeNull()
     })
+
+    /** Once a send was attempted, back goes Home (useHomeOnBackAfterSend), so Change
+     *  amount could only lead there. And an amount code on a send is the SDK's word that
+     *  nothing went out, read partly from its error text: not certain enough to offer a
+     *  way to build a new payment. */
+    it.each([
+      [
+        "answers FAILURE",
+        () =>
+          sendPaymentMock.mockResolvedValueOnce({
+            status: "FAILURE",
+            errorsMessage: SelfCustodialErrorCode.InsufficientFunds,
+          }),
+        () => LL.SelfCustodialError.insufficientFunds(),
+      ],
+      [
+        "throws",
+        () =>
+          sendPaymentMock.mockRejectedValueOnce(
+            new Error(SelfCustodialErrorCode.InsufficientFunds),
+          ),
+        () => SelfCustodialErrorCode.InsufficientFunds,
+      ],
+    ])(
+      "does not offer Change amount when a send %s with an amount code",
+      async (_, failSend, shownError) => {
+        failSend()
+        await renderReview(buildBtcSettlementRoute(1000))
+
+        await act(async () => {
+          fireEvent.press(screen.getByTestId("slider"))
+        })
+
+        expect(screen.getByText(shownError())).toBeTruthy()
+        expect(
+          screen.queryByText(LL.SendBitcoinConfirmationScreen.changeAmount()),
+        ).toBeNull()
+      },
+    )
   })
 
   describe("a fee taken out of the amount", () => {
