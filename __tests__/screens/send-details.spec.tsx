@@ -708,6 +708,38 @@ describe("SendBitcoinDetailsScreen — LNURL invoice errors", () => {
     ).toBeTruthy()
     expect(mockNavigate).not.toHaveBeenCalled()
   })
+
+  /** Over the limit Next is off, so only a new amount can clear the old request's error. */
+  it("clears the invoice error on a new amount, so crossing the limit opens its sheet (L3 then A3)", async () => {
+    const LL = i18nObject("en")
+    mockRequestInvoiceWithServiceParams.mockResolvedValue({
+      invoice: "lnbc-wrong-amount",
+      successAction: undefined,
+    })
+    mockNextDecodedInvoice.current = { millisatoshis: "1000" }
+    await renderLnurl()
+    await pressNext(LL)
+    await act(async () => {
+      fireEvent.press(
+        within(screen.getByTestId(ERROR_SHEET_TEST_ID)).getByText(LL.common.close()),
+      )
+    })
+    expect(errorSheet()).toBeNull()
+
+    // $5 left today, under the 5,000 the invoice was for.
+    mockWithdrawalAllowance.remaining = 500
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("Key 1"))
+    })
+    await flushAsync()
+
+    expect(
+      screen.queryByText(LL.SendBitcoinScreen.lnurlInvoiceIncorrectAmount()),
+    ).toBeNull()
+    const sheet = within(screen.getByTestId(ERROR_SHEET_TEST_ID))
+    expect(sheet.getByText(LL.SendBitcoinScreen.problemSheetTitle())).toBeTruthy()
+    expect(sheet.getByText(LL.SendBitcoinConfirmationScreen.changeAmount())).toBeTruthy()
+  })
 })
 
 describe("SendBitcoinDetailsScreen — Change amount from review", () => {

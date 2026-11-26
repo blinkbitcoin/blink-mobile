@@ -238,7 +238,10 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   const [lnurlError, setLnurlError] = useState<LnurlInvoiceError>()
 
+  /** A typed amount, or none. An invoice request's error was about the amount it asked
+   *  for, so a new amount clears it and frees the error slot and sheet for this one. */
   const setAmount = useCallback((moneyAmount: MoneyAmount<WalletOrDisplayCurrency>) => {
+    setLnurlError(undefined)
     setPaymentDetail((paymentDetail) =>
       paymentDetail?.setAmount ? paymentDetail.setAmount(moneyAmount) : paymentDetail,
     )
