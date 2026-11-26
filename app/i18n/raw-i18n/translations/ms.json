@@ -3575,6 +3575,14 @@
       "businessDays": "{day1}-{day2} hari bekerja",
       "free": "PERCUMA"
     },
+    "Deposit": {
+      "note": "Tambah nilai baki kad",
+      "setAmount": "Tetapkan jumlah untuk menambah nilai baki kad anda.",
+      "crediting": "Sedang ditambah ke baki kad anda…",
+      "credited": "{amount: string} ditambah ke baki kad anda",
+      "failed": "Kami tidak dapat menambah tambah nilai ini ke baki kad anda. Sila hubungi sokongan.",
+      "addressFailed": "Alamat tidak dapat dimuatkan. Cuba lagi kemudian."
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Sahkan PIN baharu",

@@ -3575,6 +3575,14 @@
       "businessDays": "{day1}-{day2} hverdage",
       "free": "GRATIS"
     },
+    "Deposit": {
+      "note": "Opfyldning af kortsaldo",
+      "setAmount": "Angiv et beløb for at fylde din kortsaldo op.",
+      "crediting": "Tilføjes til din kortsaldo…",
+      "credited": "{amount: string} tilføjet til din kortsaldo",
+      "failed": "Vi kunne ikke tilføje denne opfyldning til din kortsaldo. Kontakt venligst support.",
+      "addressFailed": "Adressen kunne ikke indlæses. Prøv igen senere."
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Bekræft ny PIN",

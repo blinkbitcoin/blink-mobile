@@ -3575,6 +3575,14 @@
       "businessDays": "{day1}-{day2} zile lucrătoare",
       "free": "GRATUIT"
     },
+    "Deposit": {
+      "note": "Reîncărcarea soldului cardului",
+      "setAmount": "Introduceți o sumă pentru a reîncărca soldul cardului.",
+      "crediting": "Se adaugă în soldul cardului…",
+      "credited": "{amount: string} adăugați în soldul cardului",
+      "failed": "Nu am putut adăuga această reîncărcare în soldul cardului. Vă rugăm să contactați asistența.",
+      "addressFailed": "Adresa nu a putut fi încărcată. Încercați mai târziu."
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Confirmă noul PIN",

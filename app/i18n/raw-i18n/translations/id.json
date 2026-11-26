@@ -3575,6 +3575,14 @@
       "businessDays": "{day1}-{day2} hari kerja",
       "free": "GRATIS"
     },
+    "Deposit": {
+      "note": "Isi ulang saldo kartu",
+      "setAmount": "Masukkan jumlah untuk mengisi ulang saldo kartu Anda.",
+      "crediting": "Sedang ditambahkan ke saldo kartu Anda…",
+      "credited": "{amount: string} ditambahkan ke saldo kartu Anda",
+      "failed": "Kami tidak dapat menambahkan isi ulang ini ke saldo kartu Anda. Silakan hubungi dukungan.",
+      "addressFailed": "Alamat tidak dapat dimuat. Coba lagi nanti."
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Konfirmasi PIN baru",

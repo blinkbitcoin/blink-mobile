@@ -3575,6 +3575,14 @@
       "businessDays": "{day1}-{day2} werkdagen",
       "free": "GRATIS"
     },
+    "Deposit": {
+      "note": "Opwaardering kaarttegoed",
+      "setAmount": "Stel een bedrag in om je kaarttegoed op te waarderen.",
+      "crediting": "Wordt aan je kaarttegoed toegevoegd…",
+      "credited": "{amount: string} toegevoegd aan je kaarttegoed",
+      "failed": "We konden deze opwaardering niet aan je kaarttegoed toevoegen. Neem contact op met support.",
+      "addressFailed": "Het adres kon niet worden geladen. Probeer het later opnieuw."
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Bevestig nieuwe PIN",

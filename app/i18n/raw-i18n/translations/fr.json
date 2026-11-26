@@ -3575,6 +3575,14 @@
             "businessDays": "{day1}-{day2} jours ouvrés",
             "free": "GRATUIT"
         },
+        "Deposit": {
+            "note": "Recharge du solde de la carte",
+            "setAmount": "Indiquez un montant pour recharger le solde de votre carte.",
+            "crediting": "Ajout au solde de votre carte…",
+            "credited": "{amount: string} ajoutés au solde de votre carte",
+            "failed": "Nous n'avons pas pu ajouter cette recharge au solde de votre carte. Veuillez contacter le support.",
+            "addressFailed": "Impossible de charger l'adresse. Réessayez plus tard."
+        },
         "PinScreens": {
             "common": {
                 "confirmNewPin": "Confirmer le nouveau PIN",

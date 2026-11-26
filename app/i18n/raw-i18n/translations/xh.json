@@ -3575,6 +3575,14 @@
       "businessDays": "{day1}-{day2} iintsuku zomsebenzi",
       "free": "SIMAHLA"
     },
+    "Deposit": {
+      "note": "Ukufaka imali kwibhalansi yekhadi",
+      "setAmount": "Faka isixa ukuze ufake imali kwibhalansi yekhadi lakho.",
+      "crediting": "Iyongezwa kwibhalansi yekhadi lakho…",
+      "credited": "{amount: string} yongeziwe kwibhalansi yekhadi lakho",
+      "failed": "Asikwazanga ukongeza le mali kwibhalansi yekhadi lakho. Nceda uqhagamshelane nenkxaso.",
+      "addressFailed": "Asikwazanga ukulayisha idilesi. Zama kwakhona kamva."
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Qinisekisa i-PIN entsha",

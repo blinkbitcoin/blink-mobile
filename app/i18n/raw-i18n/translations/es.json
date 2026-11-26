@@ -3575,6 +3575,14 @@
             "businessDays": "{day1}-{day2} días hábiles",
             "free": "GRATIS"
         },
+        "Deposit": {
+            "note": "Recarga del saldo de la tarjeta",
+            "setAmount": "Indica un monto para recargar el saldo de tu tarjeta.",
+            "crediting": "Agregándolo al saldo de tu tarjeta…",
+            "credited": "{amount: string} agregados al saldo de tu tarjeta",
+            "failed": "No pudimos agregar esta recarga al saldo de tu tarjeta. Contacta a soporte.",
+            "addressFailed": "No se pudo cargar la dirección. Inténtalo más tarde."
+        },
         "PinScreens": {
             "common": {
                 "confirmNewPin": "Confirmar nuevo PIN",

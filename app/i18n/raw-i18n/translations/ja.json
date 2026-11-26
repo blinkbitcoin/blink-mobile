@@ -3575,6 +3575,14 @@
             "businessDays": "{day1}-{day2} 営業日",
             "free": "無料"
         },
+        "Deposit": {
+            "note": "カード残高へのチャージ",
+            "setAmount": "カード残高にチャージする金額を入力してください。",
+            "crediting": "カード残高に追加しています…",
+            "credited": "{amount: string}をカード残高に追加しました",
+            "failed": "このチャージをカード残高に追加できませんでした。サポートにお問い合わせください。",
+            "addressFailed": "アドレスを読み込めませんでした。後でもう一度お試しください。"
+        },
         "PinScreens": {
             "common": {
                 "confirmNewPin": "新しいPINを確認",

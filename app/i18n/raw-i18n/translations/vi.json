@@ -3575,6 +3575,14 @@
       "businessDays": "{day1}-{day2} ngày làm việc",
       "free": "MIỄN PHÍ"
     },
+    "Deposit": {
+      "note": "Nạp tiền vào số dư thẻ",
+      "setAmount": "Nhập số tiền để nạp vào số dư thẻ của bạn.",
+      "crediting": "Đang thêm vào số dư thẻ của bạn…",
+      "credited": "Đã thêm {amount: string} vào số dư thẻ của bạn",
+      "failed": "Chúng tôi không thể thêm lần nạp này vào số dư thẻ của bạn. Vui lòng liên hệ hỗ trợ.",
+      "addressFailed": "Không thể tải địa chỉ. Vui lòng thử lại sau."
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Xác nhận PIN mới",

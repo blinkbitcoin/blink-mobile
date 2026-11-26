@@ -3575,6 +3575,14 @@
       "businessDays": "{day1}-{day2} pracovních dnů",
       "free": "ZDARMA"
     },
+    "Deposit": {
+      "note": "Dobití zůstatku karty",
+      "setAmount": "Zadejte částku pro dobití zůstatku karty.",
+      "crediting": "Připisujeme na zůstatek karty…",
+      "credited": "{amount: string} připsáno na zůstatek karty",
+      "failed": "Toto dobití se nepodařilo připsat na zůstatek karty. Kontaktujte prosím podporu.",
+      "addressFailed": "Adresu se nepodařilo načíst. Zkuste to později."
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Potvrdit nový PIN",

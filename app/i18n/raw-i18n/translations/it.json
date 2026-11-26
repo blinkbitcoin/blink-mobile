@@ -3575,6 +3575,14 @@
             "businessDays": "{day1}-{day2} giorni lavorativi",
             "free": "GRATIS"
         },
+        "Deposit": {
+            "note": "Ricarica del saldo della carta",
+            "setAmount": "Imposta un importo per ricaricare il saldo della carta.",
+            "crediting": "Aggiunta al saldo della carta in corso…",
+            "credited": "{amount: string} aggiunti al saldo della carta",
+            "failed": "Non è stato possibile aggiungere questa ricarica al saldo della carta. Contatta l'assistenza.",
+            "addressFailed": "Impossibile caricare l'indirizzo. Riprova più tardi."
+        },
         "PinScreens": {
             "common": {
                 "confirmNewPin": "Conferma nuovo PIN",

@@ -11919,6 +11919,33 @@ type RootTranslation = {
 			 */
 			free: string
 		}
+		Deposit: {
+			/**
+			 * C​a​r​d​ ​B​a​l​a​n​c​e​ ​T​o​p​-​u​p
+			 */
+			note: string
+			/**
+			 * S​e​t​ ​a​n​ ​a​m​o​u​n​t​ ​t​o​ ​t​o​p​ ​u​p​ ​y​o​u​r​ ​C​a​r​d​ ​B​a​l​a​n​c​e​.
+			 */
+			setAmount: string
+			/**
+			 * A​d​d​i​n​g​ ​i​t​ ​t​o​ ​y​o​u​r​ ​C​a​r​d​ ​B​a​l​a​n​c​e​…
+			 */
+			crediting: string
+			/**
+			 * {​a​m​o​u​n​t​}​ ​a​d​d​e​d​ ​t​o​ ​y​o​u​r​ ​C​a​r​d​ ​B​a​l​a​n​c​e
+			 * @param {string} amount
+			 */
+			credited: RequiredParams<'amount'>
+			/**
+			 * W​e​ ​c​o​u​l​d​ ​n​o​t​ ​a​d​d​ ​t​h​i​s​ ​t​o​p​-​u​p​ ​t​o​ ​y​o​u​r​ ​C​a​r​d​ ​B​a​l​a​n​c​e​.​ ​P​l​e​a​s​e​ ​c​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​.
+			 */
+			failed: string
+			/**
+			 * C​o​u​l​d​n​'​t​ ​l​o​a​d​ ​t​h​e​ ​a​d​d​r​e​s​s​.​ ​T​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​.
+			 */
+			addressFailed: string
+		}
 		TransactionDetails: {
 			/**
 			 * T​r​a​n​s​a​c​t​i​o​n​ ​d​e​t​a​i​l​s
@@ -26433,6 +26460,32 @@ export type TranslationFunctions = {
 			 * FREE
 			 */
 			free: () => LocalizedString
+		}
+		Deposit: {
+			/**
+			 * Card Balance Top-up
+			 */
+			note: () => LocalizedString
+			/**
+			 * Set an amount to top up your Card Balance.
+			 */
+			setAmount: () => LocalizedString
+			/**
+			 * Adding it to your Card Balance…
+			 */
+			crediting: () => LocalizedString
+			/**
+			 * {amount} added to your Card Balance
+			 */
+			credited: (arg: { amount: string }) => LocalizedString
+			/**
+			 * We could not add this top-up to your Card Balance. Please contact support.
+			 */
+			failed: () => LocalizedString
+			/**
+			 * Couldn't load the address. Try again later.
+			 */
+			addressFailed: () => LocalizedString
 		}
 		TransactionDetails: {
 			/**
