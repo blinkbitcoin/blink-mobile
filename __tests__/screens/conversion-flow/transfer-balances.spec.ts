@@ -6,6 +6,7 @@ import {
   nextChoice,
   settlementCurrencyOf,
   sourceChoices,
+  transferPillHandlers,
   withDestination,
   withSource,
 } from "@app/screens/conversion-flow/transfer-balances"
@@ -177,5 +178,112 @@ describe("initialTransferPair", () => {
         destination: CARD,
       }),
     ).toEqual({ from: BTC, to: CARD })
+  })
+})
+
+describe("transferPillHandlers", () => {
+  const sides = { [BTC]: "btc-side", [USD]: "usd-side", [CARD]: "card-side" }
+  const onChange = jest.fn()
+
+  beforeEach(() => {
+    onChange.mockClear()
+  })
+
+  const handlersFor = ({
+    balances = ALL,
+    pair = { from: BTC, to: USD },
+    destination,
+    isLocked = false,
+    knownSides = sides,
+  }: {
+    balances?: (typeof BTC | typeof USD | typeof CARD)[]
+    pair?: {
+      from: typeof BTC | typeof USD | typeof CARD
+      to: typeof BTC | typeof USD | typeof CARD
+    }
+    destination?: typeof CARD
+    isLocked?: boolean
+    knownSides?: Partial<typeof sides>
+  } = {}) =>
+    transferPillHandlers({
+      balances,
+      destination,
+      pair,
+      sides: { [BTC]: undefined, [USD]: undefined, [CARD]: undefined, ...knownSides },
+      isLocked,
+      onChange,
+    })
+
+  it("leaves the two wallets to the flip, with no pill switches", () => {
+    const handlers = handlersFor({ balances: [BTC, USD] })
+
+    expect(handlers.onSourcePillPress).toBeUndefined()
+    expect(handlers.onDestinationPillPress).toBeUndefined()
+    expect(handlers.isFlipOffered).toBe(true)
+  })
+
+  it("switches the source to the next balance with the card", () => {
+    handlersFor().onSourcePillPress?.()
+
+    expect(onChange).toHaveBeenCalledWith({
+      fromWallet: "usd-side",
+      toWallet: "btc-side",
+    })
+  })
+
+  it("switches the destination to the next balance with the card", () => {
+    handlersFor().onDestinationPillPress?.()
+
+    expect(onChange).toHaveBeenCalledWith({
+      fromWallet: "btc-side",
+      toWallet: "card-side",
+    })
+  })
+
+  it("has no destination switch from the Card Balance, which only goes to Bitcoin", () => {
+    const handlers = handlersFor({ pair: { from: CARD, to: BTC } })
+
+    expect(handlers.onDestinationPillPress).toBeUndefined()
+    expect(handlers.isFlipOffered).toBe(true)
+  })
+
+  it("does not flip a top-up into the Dollar Balance's way back", () => {
+    expect(handlersFor({ pair: { from: USD, to: CARD } }).isFlipOffered).toBe(false)
+  })
+
+  it("switches only the source while the Card Balance is the fixed destination", () => {
+    const handlers = handlersFor({ pair: { from: BTC, to: CARD }, destination: CARD })
+
+    expect(handlers.onDestinationPillPress).toBeUndefined()
+    expect(handlers.isFlipOffered).toBe(false)
+    handlers.onSourcePillPress?.()
+    expect(onChange).toHaveBeenCalledWith({
+      fromWallet: "usd-side",
+      toWallet: "card-side",
+    })
+  })
+
+  it("has no source switch on a top-up with only the Bitcoin Balance", () => {
+    const handlers = handlersFor({
+      balances: [BTC, CARD],
+      pair: { from: BTC, to: CARD },
+      destination: CARD,
+    })
+
+    expect(handlers.onSourcePillPress).toBeUndefined()
+  })
+
+  it("switches nothing while the amount is being worked out", () => {
+    handlersFor({ isLocked: true }).onSourcePillPress?.()
+
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it("switches nothing to a side that is not known", () => {
+    handlersFor({
+      knownSides: { [BTC]: "btc-side", [CARD]: "card-side" },
+    }).onSourcePillPress?.()
+
+    expect(onChange).not.toHaveBeenCalled()
   })
 })
