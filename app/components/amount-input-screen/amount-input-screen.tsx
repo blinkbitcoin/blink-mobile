@@ -23,6 +23,7 @@ import { AmountInputScreenUI } from "./amount-input-screen-ui"
 import {
   formatNumberPadNumber,
   getDisabledKeys,
+  isKeyAccepted,
   Key,
   numberPadReducer,
   NumberPadReducerActionType,
@@ -100,12 +101,14 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
   })
 
   const onKeyPress = (key: Key) => {
+    if (!isKeyAccepted(numberPadState, key)) return false
     dispatchNumberPadAction({
       action: NumberPadReducerActionType.HandleKeyPress,
       payload: {
         key,
       },
     })
+    return true
   }
 
   const onPaste = (keys: number) => {

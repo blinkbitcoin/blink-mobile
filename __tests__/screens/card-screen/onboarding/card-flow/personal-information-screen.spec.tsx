@@ -1,6 +1,8 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { light } from "@app/rne-theme/colors"
 
 import { CardPersonalInformationScreen } from "@app/screens/card-screen/onboarding/card-flow/personal-information-screen"
 import { ContextForScreen } from "../../../helper"
@@ -14,6 +16,7 @@ jest.mock("react-native-linear-gradient", () => ({
 }))
 
 const mockNavigate = jest.fn()
+const mockDropdown = jest.fn()
 
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
@@ -28,20 +31,23 @@ jest.mock("@react-navigation/native", () => {
 jest.mock("@app/components/card-screen", () => {
   const { TouchableOpacity, Text } = jest.requireActual("react-native")
   return {
-    DropdownComponent: ({
-      testID,
-      onValueChange,
-    }: {
+    DropdownComponent: (props: {
       testID: string
       onValueChange: (value: string) => void
       options: { value: string; label: string }[]
       selectedValue: string | undefined
       placeholder: string
-    }) => (
-      <TouchableOpacity testID={testID} onPress={() => onValueChange("selected-value")}>
-        <Text>{testID}</Text>
-      </TouchableOpacity>
-    ),
+    }) => {
+      mockDropdown(props)
+      return (
+        <TouchableOpacity
+          testID={props.testID}
+          onPress={() => props.onValueChange(`${props.testID}-value`)}
+        >
+          <Text>{props.testID}</Text>
+        </TouchableOpacity>
+      )
+    },
     DropdownOption: {},
   }
 })
@@ -50,10 +56,6 @@ describe("CardPersonalInformationScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
-  })
-
-  afterEach(() => {
-    jest.useRealTimers()
   })
 
   it("renders without crashing", async () => {
@@ -116,6 +118,50 @@ describe("CardPersonalInformationScreen", () => {
     expect(getByText("Expected monthly spending")).toBeTruthy()
   })
 
+  it("draws every field title in the secondary text color, as the design does", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardPersonalInformationScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    const titles = [
+      "Occupation",
+      "Annual salary",
+      "Account purpose",
+      "Expected monthly spending",
+    ]
+    titles.forEach((title) => {
+      expect(StyleSheet.flatten(getByText(title).props.style).color).toBe(
+        light.textSecondary,
+      )
+    })
+  })
+
+  it("prompts each field with the design's placeholder", async () => {
+    render(
+      <ContextForScreen>
+        <CardPersonalInformationScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    const placeholders = mockDropdown.mock.calls.map(
+      ([props]: [{ placeholder: string }]) => props.placeholder,
+    )
+    expect(new Set(placeholders)).toEqual(
+      new Set([
+        "Select",
+        "Select salary",
+        "Select purpose",
+        "Select your spending range",
+      ]),
+    )
+  })
+
   it("button is disabled initially with no selections", async () => {
     const { getByText } = render(
       <ContextForScreen>
@@ -145,9 +191,7 @@ describe("CardPersonalInformationScreen", () => {
     expect(getByText("Select")).toBeTruthy()
   })
 
-  it("navigates to the acknowledgement screen once all fields are selected", async () => {
-    jest.useFakeTimers()
-
+  it("carries the answers to the terms step once every field is selected", async () => {
     const { getByText, getByTestId } = render(
       <ContextForScreen>
         <CardPersonalInformationScreen />
@@ -157,20 +201,21 @@ describe("CardPersonalInformationScreen", () => {
     await act(async () => {})
 
     await act(async () => {
-      fireEvent.press(getByTestId("Select your occupation"))
-      fireEvent.press(getByTestId("Select your salary range"))
-      fireEvent.press(getByTestId("Select purpose"))
-      fireEvent.press(getByTestId("Select your spending range"))
+      fireEvent.press(getByTestId("occupation-dropdown"))
+      fireEvent.press(getByTestId("annual-salary-dropdown"))
+      fireEvent.press(getByTestId("account-purpose-dropdown"))
+      fireEvent.press(getByTestId("expected-monthly-spending-dropdown"))
     })
 
     await act(async () => {
-      fireEvent.press(getByText("Submit application"))
+      fireEvent.press(getByText("Continue"))
     })
 
-    await act(async () => {
-      jest.advanceTimersByTime(500)
+    expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingAcknowledgementScreen", {
+      occupation: "occupation-dropdown-value",
+      annualSalary: "annual-salary-dropdown-value",
+      accountPurpose: "account-purpose-dropdown-value",
+      expectedMonthlyVolume: "expected-monthly-spending-dropdown-value",
     })
-
-    expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingAcknowledgementScreen")
   })
 })

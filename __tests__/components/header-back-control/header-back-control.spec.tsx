@@ -7,7 +7,6 @@ import { fonts } from "@app/rne-theme/fonts"
 import theme from "@app/rne-theme/theme"
 import {
   headerBackControl,
-  HeaderBackButtonWithTheme,
   InvisibleBackButton,
 } from "@app/components/header-back-control/header-back-control"
 
@@ -148,11 +147,10 @@ describe("headerBackControl", () => {
     expect(getByLabelText("Settings, back")).toBeTruthy()
   })
 
-  /* A headerless screen (send review) renders the button bare, with no headerTintColor
-   * from a native header. HeaderBackButton then passes an undefined tint to its icon,
+  /* With no tint from the header, HeaderBackButton passes an undefined tint to its icon,
    * which drops the icon's own default and draws the raw black glyph. */
-  it("tints the arrow with the theme foreground when rendered outside a header", () => {
-    const rendered = renderHeaderLeft(<HeaderBackButtonWithTheme />)
+  it("tints the arrow with the theme foreground when the header gives no tint", () => {
+    const rendered = renderHeaderLeft(headerBackControl()(headerProps))
 
     expect(rendered.UNSAFE_getByType(Image).props.tintColor).toBe(
       theme.lightColors?.textOnBackground,

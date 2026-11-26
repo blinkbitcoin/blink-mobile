@@ -135,6 +135,7 @@ import {
   CardDetailsScreen as OnboardingCardDetailsScreen,
   WelcomeOnboardScreen,
   CardSubscriptionScreen,
+  CardVerifyIdentityScreen,
   LoadingCardScreen,
   WelcomeInvestScreen,
   SelectInvestScreen,
@@ -146,6 +147,7 @@ import {
   CardPersonalInformationScreen,
   CardAcknowledgementScreen,
   CardPreapprovedScreen,
+  CardDeclinedScreen,
   CardProcessingScreen,
   CardApprovedScreen,
 } from "@app/screens/card-screen/onboarding"
@@ -272,6 +274,15 @@ const renderTabBarLabel = ({ color, children }: { color: string; children: strin
     {children}
   </RNText>
 )
+
+/** `headerBackVisible: false` hides only the native button, while the navigators here
+ *  also draw their own back through `headerLeft`, so a screen that offers only the close
+ *  button clears both. A null element leaves no left item for iOS 26 to wrap in a glass
+ *  capsule. The swipe and the hardware back are left as they are. */
+const noHeaderBack = {
+  headerBackVisible: false,
+  headerLeft: () => null,
+}
 
 /**
  * The swipe stays blocked for every entry: leaving by gesture is undirected, so the arrow is
@@ -982,13 +993,25 @@ export const RootStack = () => {
         component={WelcomeOnboardScreen}
         options={{
           title: "",
+          ...noHeaderBack,
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
         name="cardOnboardingSubscribeScreen"
         component={CardSubscriptionScreen}
         options={{
-          title: LL.CardFlow.Onboarding.CardSubscription.subscribeTitle(),
+          /** The screen sets its own title: the free offer has none. */
+          title: "",
+          ...headerCloseControlOptions(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingVerifyIdentityScreen"
+        component={CardVerifyIdentityScreen}
+        options={{
+          /** The design leaves this step untitled. */
+          title: "",
           ...headerCloseControlOptions(),
         }}
       />
@@ -1013,9 +1036,7 @@ export const RootStack = () => {
         component={CardPersonalInformationScreen}
         options={{
           title: LL.CardFlow.Onboarding.PersonalInformation.title(),
-          // Suppresses the back button natively — an empty custom headerLeft item
-          // would still get the iOS 26 Liquid Glass capsule drawn around it.
-          headerBackVisible: false,
+          ...noHeaderBack,
           ...headerCloseControlOptions(),
         }}
       />
@@ -1031,9 +1052,8 @@ export const RootStack = () => {
         name="cardOnboardingProcessingScreen"
         component={CardProcessingScreen}
         options={{
-          title: "",
-          headerBackVisible: false,
-          ...headerCloseControlOptions(),
+          headerShown: false,
+          gestureEnabled: false,
         }}
       />
       <RootNavigator.Screen
@@ -1041,8 +1061,17 @@ export const RootStack = () => {
         component={CardPreapprovedScreen}
         options={{
           title: "",
-          headerBackVisible: false,
-          ...headerCloseControlOptions(),
+          ...noHeaderBack,
+          ...headerCloseControlOptions({ shouldPopTo: true }),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingDeclinedScreen"
+        component={CardDeclinedScreen}
+        options={{
+          title: "",
+          ...noHeaderBack,
+          ...headerCloseControlOptions({ shouldPopTo: true }),
         }}
       />
       <RootNavigator.Screen

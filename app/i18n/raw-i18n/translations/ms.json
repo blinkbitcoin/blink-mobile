@@ -3691,8 +3691,14 @@
         "paymentTitle": "Pembayaran",
         "acceptButton": "Terima",
         "payButton": "Teruskan dan Bayar",
-        "cardTitle": "Blink Peribadi",
+        "cardTitle": "Blink Orange",
+        "free": "Percuma",
+        "forNow": "buat masa ini",
         "perYear": "setahun",
+        "freeBreakdown": {
+          "card": "Kad Blink",
+          "memberBenefits": "Faedah ahli lain"
+        },
         "status": {
           "label": "Status",
           "specialOfferLabel": "Tawaran istimewa",
@@ -3713,35 +3719,53 @@
           "text": "Saya telah menyemak dan bersetuju dengan",
           "linkText": "Jadual Fi Blink Card"
         },
-        "renew": "Saya faham bahawa langganan saya akan diperbaharui secara automatik dalam {months: number} bulan"
+        "renew": "Saya faham bahawa langganan saya akan diperbaharui secara automatik dalam {months: number} bulan",
+        "freeNotice": "Saya faham bahawa Blink Orange percuma buat masa ini, dan yuran keahlian mungkin diperkenalkan kemudian, dengan notis"
+      },
+      "CardVerifyIdentity": {
+        "title": "Sahkan identiti anda",
+        "description": "Untuk mengaktifkan Kad Blink anda, pengeluar kad perlu mengesahkan siapa anda (KYC). Anda akan memerlukan:",
+        "requirements": {
+          "governmentId": "ID yang dikeluarkan kerajaan",
+          "selfie": "Swafoto / semakan keaktifan",
+          "proofOfAddress": "Bukti alamat",
+          "questions": "Beberapa soalan tentang anda"
+        },
+        "buttonText": "Teruskan"
       },
       "CardIntroducing": {
         "title": "Memperkenalkan",
         "cardInfo": {
-          "bitcoinCard": "Kad Visa Blink",
+          "bitcoinCard": "Kad Blink",
           "for": "untuk",
-          "maximalist": "Maximalis Bitcoin"
+          "bitcoiners": "Bitcoiner"
         },
         "buttonText": "Teruskan"
       },
       "CardDetails": {
-        "title": "Faedah tambahan",
+        "title": "Apa yang disertakan",
         "features": {
-          "accountManager": "Pengurus akaun khusus",
-          "support": "Sokongan keutamaan",
-          "onchainDeposits": "50% pulangan yuran transaksi",
-          "circularEconomies": "$100 untuk ekonomi pekeliling"
+          "card": {
+            "title": "Kad Blink",
+            "subtitle": "kad Visa anda, sedia hari ini"
+          },
+          "accountManager": {
+            "title": "Pengurus akaun peribadi",
+            "subtitle": "dan sokongan keutamaan"
+          },
+          "onOffRamping": "Wang masuk dan keluar"
         },
-        "andMore": "... dan lagi akan datang pada 2026",
+        "availableIn": "dalam {months} bulan",
+        "footnote": "Sesetengah ciri akan tersedia dalam tempoh {months} bulan. Kad sedia hari ini.",
         "buttonText": "Teruskan"
       },
       "WelcomeOnboard": {
         "welcomeMessage": {
           "title": "Selamat datang",
-          "subtitle": "Di Blink Peribadi",
+          "subtitle": "Di Blink Orange",
           "paragraphs": {
-            "body1": "Seseorang memikirkan anda dan mencadangkan agar kami menjemput anda ke Blink Peribadi. Mungkin kerana anda seorang Bitcoiner yang hebat.",
-            "body2": "Matlamat kami untuk 2026 adalah mengisi program dengan begitu banyak kebaikan sehingga jelas untuk memperbaharui tahun depan."
+            "body1": "Seseorang memikirkan anda dan mencadangkan agar kami menjemput anda ke Blink Orange. Mungkin kerana anda seorang Bitcoiner yang hebat.",
+            "body2": "Blink Orange ialah peringkat pertama keahlian Blink untuk Bitcoiner, melalui jemputan sahaja. Kad Blink dan pengurus akaun peribadi anda ialah dua daripada perkhidmatan pertama yang kami tawarkan — selebihnya sedang kami bina sehingga 2027."
           }
         },
         "buttonText": "Jom mulakan"
@@ -3818,11 +3842,11 @@
         "fields": {
           "occupation": {
             "label": "Pekerjaan",
-            "placeholder": "Pilih pekerjaan anda"
+            "placeholder": "Pilih"
           },
           "annualSalaryRange": {
             "label": "Gaji tahunan",
-            "placeholder": "Pilih julat gaji anda"
+            "placeholder": "Pilih gaji"
           },
           "accountPurpose": {
             "label": "Tujuan akaun",
@@ -3833,7 +3857,6 @@
             "placeholder": "Pilih julat perbelanjaan anda"
           }
         },
-        "buttonText": "Hantar permohonan",
         "select": "pilih"
       },
       "Acknowledgement": {
@@ -3849,17 +3872,21 @@
           "and": ", dan",
           "cardTermsLinkText": "Terma Kad Blink"
         },
-        "certifyAccuracy": "Saya mengesahkan bahawa maklumat yang saya berikan adalah tepat dan bahawa saya akan mematuhi semua peraturan dan keperluan berkaitan Kad Blink Visa saya",
-        "acknowledgeSolicitation": "Saya mengakui bahawa memohon Kad Blink Visa bukan merupakan permohonan yang tidak dibenarkan"
+        "certifyAccuracy": "Saya mengesahkan bahawa maklumat yang saya berikan adalah tepat dan bahawa saya akan mematuhi semua peraturan dan keperluan berkaitan Kad Blink saya",
+        "acknowledgeSolicitation": "Saya mengakui bahawa memohon Kad Blink bukan merupakan permohonan yang tidak dibenarkan"
       },
       "CardPreapproved": {
-        "title": "Anda telah dipra-luluskan untuk kad Blink Visa!",
+        "title": "Kad Blink anda sudah sedia!",
+        "subtitle": "Anda kini boleh mengaktifkan kad anda dan mula menggunakannya",
         "buttonText": "Tutup"
+      },
+      "CardDeclined": {
+        "title": "Kami tidak dapat meluluskan permohonan kad anda",
+        "subtitle": "Pengurus akaun anda akan menghubungi anda."
       },
       "CardProcessing": {
         "title": "Memproses permohonan anda",
-        "subtitle": "Kami akan memberitahu anda sebaik sahaja kami bersedia",
-        "buttonText": "Tutup"
+        "subtitle": "Ini boleh mengambil masa sehingga satu minit"
       }
     }
   },

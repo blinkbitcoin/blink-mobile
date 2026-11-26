@@ -7,11 +7,7 @@ import {
   buildFeeTierOptions,
   feeTierLabels,
 } from "@app/screens/send-bitcoin-screen/fee-tier-options"
-import {
-  FeeTierOption,
-  FeeUnit,
-  buildZeroTiers,
-} from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
+import { FeeTierOption, FeeUnit, buildZeroTiers } from "@app/types/fee-tiers"
 import { CUSTODIAL_PAYOUT_ETA_MINUTES } from "@app/screens/send-bitcoin-screen/hooks/use-custodial-onchain-fee-tiers"
 import { FEE_TIER_ETA_MINUTES } from "@app/types/payment"
 

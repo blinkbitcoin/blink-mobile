@@ -1,19 +1,19 @@
 import * as React from "react"
-import { View } from "react-native"
+import { Platform, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { BlinkCard } from "@app/components/blink-card/blink-card"
-import { Screen } from "@app/components/screen"
+import { StepLayout } from "@app/components/step-layout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { formatDateFromNow } from "@app/utils/date"
 import { fonts } from "@app/rne-theme/fonts"
+import { formatDateFromNow } from "@app/utils/date"
 
 const CARD_DISPLAY_PLACEHOLDER = {
-  cardNumber: "2121212121212121",
+  cardNumber: "2121",
   holderName: "SATOSHI NAKAMOTO",
 }
 
@@ -27,78 +27,60 @@ export const CardIntroducingScreen: React.FC = () => {
   )
 
   return (
-    <Screen>
-      <View style={styles.cardStyle}>
-        <BlinkCard
-          cardNumber={CARD_DISPLAY_PLACEHOLDER.cardNumber}
-          holderName={CARD_DISPLAY_PLACEHOLDER.holderName}
-          validThruDate={validThruDate}
-          showCardDetails
-          isFrozen={false}
-        />
-        <View style={styles.textContainer}>
-          <Text type="h2" style={styles.boldText}>
-            {LL.CardFlow.Onboarding.CardIntroducing.cardInfo.bitcoinCard()}
-          </Text>
-          <View style={styles.forContainer}>
-            <View style={styles.lineStyle} />
-            <Text type="p1">{LL.CardFlow.Onboarding.CardIntroducing.cardInfo.for()}</Text>
-            <View style={styles.lineStyle} />
-          </View>
-          <Text type="h2" style={styles.boldText}>
-            {LL.CardFlow.Onboarding.CardIntroducing.cardInfo.maximalist()}
-          </Text>
-        </View>
-      </View>
-      <View style={styles.buttonsContainer}>
+    <StepLayout
+      footer={
         <GaloyPrimaryButton
           title={LL.CardFlow.Onboarding.CardIntroducing.buttonText()}
           onPress={() => navigation.navigate("cardOnboardingDetailsScreen")}
         />
+      }
+    >
+      <View style={styles.body}>
+        <BlinkCard
+          cardNumber={CARD_DISPLAY_PLACEHOLDER.cardNumber}
+          holderName={CARD_DISPLAY_PLACEHOLDER.holderName}
+          validThruDate={validThruDate}
+          showValidThru
+          isFrozen={false}
+        />
+        <View style={styles.textContainer}>
+          <Text type="h2" bold>
+            {LL.CardFlow.Onboarding.CardIntroducing.cardInfo.bitcoinCard()}
+          </Text>
+          <Text type="p1">
+            —{" "}
+            <Text style={styles.forText}>
+              {LL.CardFlow.Onboarding.CardIntroducing.cardInfo.for()}
+            </Text>{" "}
+            —
+          </Text>
+          <Text type="h2" bold>
+            {LL.CardFlow.Onboarding.CardIntroducing.cardInfo.bitcoiners()}
+          </Text>
+        </View>
       </View>
-    </Screen>
+    </StepLayout>
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
-  cardStyle: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 1,
-    padding: 20,
-    gap: 50,
-    marginTop: -70,
-  },
-  buttonsContainer: {
-    flex: 1,
-    justifyContent: "flex-end",
-    marginBottom: 14,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    zIndex: 2,
-  },
-  textContainer: {
-    gap: 5,
-    alignItems: "center",
-  },
-  boldText: {
-    fontFamily: fonts.bold,
-  },
-  forContainer: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 5,
-    justifyContent: "center",
-  },
-  lineStyle: {
-    height: 1,
-    width: 16,
-    backgroundColor: colors.textOnBackground,
-  },
-}))
+/** The platform check sits inside the factory rather than in a module constant so the
+ *  spec can vary `Platform.OS` per case without re-importing the module. */
+const useStyles = makeStyles(() => {
+  const italicFontStyle = Platform.OS === "ios" ? { fontStyle: "italic" as const } : {}
+
+  return {
+    body: {
+      paddingHorizontal: 20,
+      paddingTop: 16,
+      gap: 60,
+    },
+    textContainer: {
+      gap: 10,
+      alignItems: "center",
+    },
+    forText: {
+      fontFamily: fonts.italic,
+      ...italicFontStyle,
+    },
+  }
+})
