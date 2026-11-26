@@ -3524,6 +3524,12 @@
                 "skip": "Omitir recarga"
             }
         },
+        "CardBalanceTransfer": {
+            "waitAndRetry": "Espera {seconds} segundos e inténtalo de nuevo.",
+            "tooManyPending": "Tienes demasiadas recargas pendientes. Inténtalo más tarde.",
+            "insufficient": "El saldo de tu tarjeta no cubre este monto.",
+            "inReview": "Estamos revisando esta transferencia. Contacta a soporte si no llega pronto."
+        },
         "ShippingAddress": {
             "title": "Dirección de envío",
             "firstName": "Nombre",

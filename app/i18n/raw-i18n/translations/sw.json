@@ -3524,6 +3524,12 @@
         "skip": "Ruka kuongeza salio"
       }
     },
+    "CardBalanceTransfer": {
+      "waitAndRetry": "Tafadhali subiri sekunde {seconds} kisha ujaribu tena.",
+      "tooManyPending": "Una malipo mengi sana ya kuongeza salio yanayosubiri. Jaribu tena baadaye.",
+      "insufficient": "Salio la kadi yako halitoshi kwa kiasi hiki.",
+      "inReview": "Tunakagua uhamisho huu. Wasiliana na usaidizi ikiwa haufiki hivi karibuni."
+    },
     "ShippingAddress": {
       "title": "Anwani ya usafirishaji",
       "firstName": "Jina la kwanza",

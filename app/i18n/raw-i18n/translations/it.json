@@ -3524,6 +3524,12 @@
                 "skip": "Salta la ricarica"
             }
         },
+        "CardBalanceTransfer": {
+            "waitAndRetry": "Attendi {seconds} secondi e riprova.",
+            "tooManyPending": "Hai troppe ricariche in attesa. Riprova più tardi.",
+            "insufficient": "Il saldo della carta non copre questo importo.",
+            "inReview": "Stiamo controllando questo trasferimento. Contatta l’assistenza se non arriva presto."
+        },
         "ShippingAddress": {
             "title": "Indirizzo di spedizione",
             "firstName": "Nome",

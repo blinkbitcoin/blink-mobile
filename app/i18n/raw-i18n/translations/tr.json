@@ -3524,6 +3524,12 @@
         "skip": "Yüklemeyi atla"
       }
     },
+    "CardBalanceTransfer": {
+      "waitAndRetry": "Lütfen {seconds} saniye bekleyip tekrar deneyin.",
+      "tooManyPending": "Bekleyen çok fazla yüklemen var. Daha sonra tekrar dene.",
+      "insufficient": "Kart bakiyen bu tutarı karşılamıyor.",
+      "inReview": "Bu transferi kontrol ediyoruz. Yakında ulaşmazsa destekle iletişime geç."
+    },
     "ShippingAddress": {
       "title": "Teslimat adresi",
       "firstName": "Ad",

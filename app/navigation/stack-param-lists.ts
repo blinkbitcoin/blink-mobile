@@ -16,6 +16,7 @@ import {
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { PaymentSendCompletedStatus } from "@app/screens/send-bitcoin-screen/use-send-payment"
 import { DrainConversionReturn } from "@app/screens/conversion-flow/drain-conversion"
+import { TransferBalance } from "@app/screens/conversion-flow/transfer-balances"
 import { AccountMode, AccountTypeMode, CreationBlockReason } from "@app/types/account"
 import { CardApplicationAnswers } from "@app/types/card-application"
 import {
@@ -159,7 +160,8 @@ export type RootStackParamList = {
       }
     | undefined
   conversionConfirmation: {
-    fromWalletCurrency: WalletCurrency
+    fromBalance: TransferBalance
+    toBalance: TransferBalance
     moneyAmount: MoneyAmount<WalletOrDisplayCurrency>
     /** Where a completed drain convert lands (back in its flow, not Home). Navigation-only,
      *  never a privilege: the region waiver comes from the armed flag, not this forgeable param. */

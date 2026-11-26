@@ -26,6 +26,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { toastShow } from "@app/utils/toast"
+import { CARD } from "@app/types/amounts"
 
 import { useCardActivation, useCardData, useCardBalance } from "@app/hooks"
 import { isCardFrozen, isCardUsable } from "../utils/card-display"
@@ -83,6 +84,11 @@ const CardDashboardScreenContent: React.FC = () => {
 
   const handleSettingsPress = useCallback(() => {
     navigation.navigate("cardSettingsScreen")
+  }, [navigation])
+
+  /** Add funds is the Transfer into the Card Balance (D82). */
+  const openAddFunds = useCallback(() => {
+    navigation.navigate("conversionDetails", { destination: CARD })
   }, [navigation])
 
   useEffect(() => {
@@ -161,7 +167,7 @@ const CardDashboardScreenContent: React.FC = () => {
           balanceUsd={balancePrimary}
           balanceSecondary={balanceSecondary}
           isDisabled={isFrozen}
-          onAddFunds={() => console.log("Add funds pressed")}
+          onAddFunds={openAddFunds}
         />
 
         <CardActionButtons

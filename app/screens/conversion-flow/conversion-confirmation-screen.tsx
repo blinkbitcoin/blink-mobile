@@ -18,11 +18,12 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useIntraLedgerConversion } from "@app/hooks/use-intra-ledger-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { toBtcMoneyAmount } from "@app/types/amounts"
+import { CARD, toBtcMoneyAmount } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
 
 import { ConversionFeeRow } from "./conversion-fee-row"
-import { useSelfCustodialConversion } from "./hooks"
+import { useCardTopUp, useCardWithdrawal, useSelfCustodialConversion } from "./hooks"
+import { settlementCurrencyOf, TransferBalance } from "./transfer-balances"
 
 import { Screen } from "@app/components/screen"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -47,7 +48,14 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     useDisplayCurrency()
   const { convertMoneyAmount } = usePriceConversion()
 
-  const { fromWalletCurrency, moneyAmount, drainConversion } = route.params
+  const { fromBalance, toBalance, moneyAmount, drainConversion } = route.params
+  const fromCurrency = settlementCurrencyOf(fromBalance)
+  const toCurrency = settlementCurrencyOf(toBalance)
+  const isCardTopUp = toBalance === CARD
+  const isCardWithdrawal = fromBalance === CARD
+  /** Sats into or out of a bitcoin Card Balance move as they are, so the amount on the
+   *  other side is exact rather than an estimate (design 160). */
+  const isSameCurrency = fromCurrency === toCurrency
   const isAuthed = useIsAuthed()
   const { isSelfCustodial, wallets: activeWallets } = useActiveWallet()
 
@@ -108,17 +116,22 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     })
 
   const nonCustodialConversion = useSelfCustodialConversion({
-    fromCurrency: fromWalletCurrency,
+    fromCurrency,
     moneyAmount,
     enabled: isSelfCustodial,
     onSuccess: navigateToSuccess,
   })
 
   const intraLedgerConversion = useIntraLedgerConversion({ onSuccess: navigateToSuccess })
+  const cardTopUp = useCardTopUp({ onSuccess: navigateToSuccess })
+  const cardWithdrawal = useCardWithdrawal({ onSuccess: navigateToSuccess })
 
-  const activeConversion = isSelfCustodial
-    ? nonCustodialConversion
-    : intraLedgerConversion
+  const activeConversion = (() => {
+    if (isSelfCustodial) return nonCustodialConversion
+    if (isCardTopUp) return cardTopUp
+    if (isCardWithdrawal) return cardWithdrawal
+    return intraLedgerConversion
+  })()
   const isLoading = activeConversion.loading
 
   if (
@@ -131,44 +144,47 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     return null
   }
 
-  const fromWallet: WalletDescriptor<WalletCurrency> =
-    fromWalletCurrency === WalletCurrency.Btc
+  const walletOf = (currency: WalletCurrency): WalletDescriptor<WalletCurrency> =>
+    currency === WalletCurrency.Btc
       ? { id: btcWallet.id, currency: WalletCurrency.Btc }
       : { id: usdWallet.id, currency: WalletCurrency.Usd }
+  const fromWallet = walletOf(fromCurrency)
+  const toWallet = walletOf(toCurrency)
 
-  const toWallet: WalletDescriptor<WalletCurrency> =
-    fromWalletCurrency === WalletCurrency.Btc
-      ? { id: usdWallet.id, currency: WalletCurrency.Usd }
-      : { id: btcWallet.id, currency: WalletCurrency.Btc }
+  const fromAmount = convertMoneyAmount(moneyAmount, fromCurrency)
+  const toAmount = convertMoneyAmount(moneyAmount, toCurrency)
 
-  const fromAmount = convertMoneyAmount(moneyAmount, fromWallet.currency)
-  const toAmount = convertMoneyAmount(moneyAmount, toWallet.currency)
-
-  const fromWalletLabel =
-    fromWallet.currency === WalletCurrency.Btc ? LL.common.bitcoin() : LL.common.dollar()
-  const toWalletLabel =
-    toWallet.currency === WalletCurrency.Btc ? LL.common.bitcoin() : LL.common.dollar()
+  const balanceLabels: Record<TransferBalance, string> = {
+    [WalletCurrency.Btc]: LL.common.bitcoin(),
+    [WalletCurrency.Usd]: LL.common.dollar(),
+    [CARD]: LL.common.card(),
+  }
+  const fromWalletLabel = balanceLabels[fromBalance]
+  const toWalletLabel = balanceLabels[toBalance]
 
   const fromWalletBalanceFormatted = formatMoneyAmount({ moneyAmount: fromAmount })
   const fromSatsFormatted =
-    fromWallet.currency === WalletCurrency.Usd && displayCurrency === WalletCurrency.Usd
+    fromCurrency === WalletCurrency.Usd && displayCurrency === WalletCurrency.Usd
       ? null
       : moneyAmountToDisplayCurrencyString({
           moneyAmount: fromAmount,
           isApproximate: true,
         })
 
+  const isToAmountApproximate = !isSameCurrency
   const toWalletBalanceFormatted = formatMoneyAmount({
     moneyAmount: toAmount,
-    isApproximate: true,
+    isApproximate: isToAmountApproximate,
   })
-  const toSatsFormatted =
-    toWallet.currency === WalletCurrency.Usd && displayCurrency === WalletCurrency.Usd
-      ? null
-      : moneyAmountToDisplayCurrencyString({
-          moneyAmount: toAmount,
-          isApproximate: true,
-        })
+  const isToAlreadyInDisplayCurrency =
+    toCurrency === WalletCurrency.Usd && displayCurrency === WalletCurrency.Usd
+  const isToDisplayAmountShown = isToAmountApproximate && !isToAlreadyInDisplayCurrency
+  const toSatsFormatted = isToDisplayAmountShown
+    ? moneyAmountToDisplayCurrencyString({
+        moneyAmount: toAmount,
+        isApproximate: true,
+      })
+    : null
 
   const payWallet = async () => {
     if (isSelfCustodial) {
@@ -179,6 +195,14 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
         return
       }
       await nonCustodialConversion.execute()
+      return
+    }
+    if (isCardTopUp) {
+      await cardTopUp.execute({ walletId: fromWallet.id, amountSats: toAmount.amount })
+      return
+    }
+    if (isCardWithdrawal) {
+      await cardWithdrawal.execute({ amountSats: fromAmount.amount })
       return
     }
     await intraLedgerConversion.execute({
@@ -208,10 +232,10 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
         <View style={styles.conversionInfoCard}>
           <View style={styles.fromFieldContainer}>
             <CurrencyPill
-              currency={fromWallet.currency}
+              currency={fromBalance}
               containerSize="medium"
               containerStyle={pillWidthStyle}
-              onLayout={onPillLayout(fromWallet.currency)}
+              onLayout={onPillLayout(fromBalance)}
             />
 
             <View style={styles.walletSelectorBalanceContainer}>
@@ -231,18 +255,20 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
           </View>
           <View style={styles.toFieldContainer}>
             <CurrencyPill
-              currency={toWallet.currency}
+              currency={toBalance}
               containerSize="medium"
               containerStyle={pillWidthStyle}
-              onLayout={onPillLayout(toWallet.currency)}
+              onLayout={onPillLayout(toBalance)}
             />
             <View style={styles.walletSelectorBalanceContainer}>
               <Text style={styles.conversionInfoFieldValue}>
                 {toWalletBalanceFormatted}
               </Text>
-              <Text style={styles.conversionInfoFieldConvertValue}>
-                {toSatsFormatted}
-              </Text>
+              {toSatsFormatted && (
+                <Text style={styles.conversionInfoFieldConvertValue}>
+                  {toSatsFormatted}
+                </Text>
+              )}
             </View>
           </View>
         </View>
@@ -253,13 +279,15 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
             hasError={nonCustodialConversion.hasQuoteError}
           />
         )}
-        <View style={styles.infoContainer}>
-          <Text style={styles.conversionInfoFieldTitle}>
-            {toWallet.currency === WalletCurrency.Btc
-              ? LL.ConversionConfirmationScreen.infoBitcoin()
-              : LL.ConversionConfirmationScreen.infoDollar()}
-          </Text>
-        </View>
+        {isToAmountApproximate && (
+          <View style={styles.infoContainer}>
+            <Text style={styles.conversionInfoFieldTitle}>
+              {toCurrency === WalletCurrency.Btc
+                ? LL.ConversionConfirmationScreen.infoBitcoin()
+                : LL.ConversionConfirmationScreen.infoDollar()}
+            </Text>
+          </View>
+        )}
         {visibleErrorMessage && (
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>{visibleErrorMessage}</Text>

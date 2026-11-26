@@ -3921,6 +3921,13 @@ export type ConversionScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type ConversionScreenQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> } } | null };
 
+export type CardCollateralWithdrawMutationVariables = Exact<{
+  input: CardCollateralWithdrawInput;
+}>;
+
+
+export type CardCollateralWithdrawMutation = { readonly __typename: 'Mutation', readonly cardCollateralWithdraw: { readonly __typename: 'CardCollateralWithdrawal', readonly id: string, readonly amountSats: number, readonly status: CardCollateralWithdrawalStatus, readonly requestedAt: string } };
+
 export type DebugScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -7798,6 +7805,42 @@ export type ConversionScreenQueryHookResult = ReturnType<typeof useConversionScr
 export type ConversionScreenLazyQueryHookResult = ReturnType<typeof useConversionScreenLazyQuery>;
 export type ConversionScreenSuspenseQueryHookResult = ReturnType<typeof useConversionScreenSuspenseQuery>;
 export type ConversionScreenQueryResult = Apollo.QueryResult<ConversionScreenQuery, ConversionScreenQueryVariables>;
+export const CardCollateralWithdrawDocument = gql`
+    mutation cardCollateralWithdraw($input: CardCollateralWithdrawInput!) {
+  cardCollateralWithdraw(input: $input) {
+    id
+    amountSats
+    status
+    requestedAt
+  }
+}
+    `;
+export type CardCollateralWithdrawMutationFn = Apollo.MutationFunction<CardCollateralWithdrawMutation, CardCollateralWithdrawMutationVariables>;
+
+/**
+ * __useCardCollateralWithdrawMutation__
+ *
+ * To run a mutation, you first call `useCardCollateralWithdrawMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardCollateralWithdrawMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardCollateralWithdrawMutation, { data, loading, error }] = useCardCollateralWithdrawMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardCollateralWithdrawMutation(baseOptions?: Apollo.MutationHookOptions<CardCollateralWithdrawMutation, CardCollateralWithdrawMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardCollateralWithdrawMutation, CardCollateralWithdrawMutationVariables>(CardCollateralWithdrawDocument, options);
+      }
+export type CardCollateralWithdrawMutationHookResult = ReturnType<typeof useCardCollateralWithdrawMutation>;
+export type CardCollateralWithdrawMutationResult = Apollo.MutationResult<CardCollateralWithdrawMutation>;
+export type CardCollateralWithdrawMutationOptions = Apollo.BaseMutationOptions<CardCollateralWithdrawMutation, CardCollateralWithdrawMutationVariables>;
 export const DebugScreenDocument = gql`
     query debugScreen {
   me {

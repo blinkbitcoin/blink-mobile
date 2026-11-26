@@ -1,5 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { NavigationProp, useNavigation } from "@react-navigation/native"
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native"
 import {
   View,
   ActivityIndicator,
@@ -27,12 +32,12 @@ import {
   useConvertMoneyDetails,
 } from "@app/screens/conversion-flow/use-convert-money-details"
 import {
+  CARD,
+  CardCurrency,
   DisplayCurrency,
   lessThan,
   MoneyAmount,
-  toBtcMoneyAmount,
   toDisplayAmount,
-  toUsdMoneyAmount,
   toWalletAmount,
   toWalletMoneyAmount,
   WalletOrDisplayCurrency,
@@ -43,12 +48,12 @@ import { cappedFontScale } from "@app/rne-theme/text-scaling"
 import { testProps } from "@app/utils/testProps"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useDollarBalanceRestrictionGuard } from "@app/hooks/use-dollar-balance-restriction-guard"
+import { useDollarBalanceGate } from "@app/hooks/use-dollar-balance-restricted"
 import { useTransferBlockedGuard } from "@app/hooks/use-transfer-blocked-guard"
 import {
   DrainConversionReturn,
   useConsumeDrainConversionArmed,
 } from "@app/screens/conversion-flow/drain-conversion"
-import { resolveInitialConvertWallets } from "@app/screens/conversion-flow/migration-convert-wallets"
 import { CurrencyInput } from "@app/components/currency-input"
 import {
   PercentageSelector,
@@ -68,12 +73,17 @@ import { convertDirectionFromCurrency } from "@app/types/payment"
 import { AccountType } from "@app/types/wallet"
 
 import {
+  TransferCard,
   useConversionFormatting,
   useConversionOverlayFocus,
   useSelfCustodialConversionGuard,
   useSyncedInputValues,
+  useTransferCard,
+  useTransferWallets,
+  TransferWallet,
 } from "./hooks"
 import { BTC_SUFFIX, findBtcSuffixIndex } from "./btc-format"
+import { transferSideSwitch } from "./transfer-side-switch"
 
 gql`
   query conversionScreen {
@@ -91,6 +101,32 @@ gql`
   }
 `
 
+const placeholderOf = (wallet: TransferWallet) =>
+  wallet.walletCurrency === WalletCurrency.Usd ? "$0" : `0 ${BTC_SUFFIX}`
+
+type BalanceFormatters = Pick<
+  ReturnType<typeof useDisplayCurrency>,
+  "displayCurrency" | "formatMoneyAmount" | "moneyAmountToDisplayCurrencyString"
+>
+
+/** A balance as its row shows it, with its display-currency equivalent unless a dollar
+ *  amount would only repeat itself. */
+const balanceTextsOf = (
+  balance: MoneyAmount<WalletCurrency>,
+  {
+    displayCurrency,
+    formatMoneyAmount,
+    moneyAmountToDisplayCurrencyString,
+  }: BalanceFormatters,
+) => {
+  const isDollarShownInDollars =
+    balance.currency === WalletCurrency.Usd && displayCurrency === WalletCurrency.Usd
+  const secondary = isDollarShownInDollars
+    ? null
+    : moneyAmountToDisplayCurrencyString({ moneyAmount: balance })
+  return { primary: formatMoneyAmount({ moneyAmount: balance }), secondary }
+}
+
 const ANIMATION_CONFIG = {
   duration: 120,
   easing: Easing.inOut(Easing.quad),
@@ -102,30 +138,52 @@ const ANIMATION_CONFIG = {
 const FULL_BALANCE_PERCENTAGE = 100
 
 export const ConversionDetailsScreen = () => {
+  const route = useRoute<RouteProp<RootStackParamList, "conversionDetails">>()
   const drainConversion = useConsumeDrainConversionArmed()
   const isDrainConversion = drainConversion !== null
+  const { card, isPending: isCardPending } = useTransferCard()
+  const isCardHolder = card !== undefined
 
   /** A drain conversion waives the region restriction that would otherwise bounce a
    *  restricted user home: emptying the dollar balance is the one way to migrate or to
    *  switch to Anon Mode, and the flow arming the flag (not a deep-linkable param) is
-   *  what confirms it. */
-  const isGuardEnabled = !isDrainConversion
+   *  what confirms it. A card holder keeps the Transfer wherever they are, since it is
+   *  how they fund the card (D82); a restricted Dollar Balance is left out of its
+   *  choices instead. */
+  const isGuardEnabled = !isDrainConversion && !isCardHolder && !isCardPending
   const dollarBalanceGuard = useDollarBalanceRestrictionGuard({ enabled: isGuardEnabled })
   const transferGuard = useTransferBlockedGuard({ enabled: isGuardEnabled })
+  const dollarBalanceGate = useDollarBalanceGate()
 
   const isRefused = dollarBalanceGuard.isGated || transferGuard.isGated
+  const isCardHolderDollarPending = isCardHolder && dollarBalanceGate.isRegionPending
   const isRegionPending =
-    dollarBalanceGuard.isRegionPending || transferGuard.isRegionPending
+    dollarBalanceGuard.isRegionPending ||
+    transferGuard.isRegionPending ||
+    isCardHolderDollarPending
+  const isDollarBalanceOffered = !dollarBalanceGate.isGated || isDrainConversion
+  /** Only the member's own card is ever the fixed destination, so a link that asks for
+   *  it without a card opens the usual Transfer. */
+  const isCardDestination = isCardHolder && route.params?.destination === CARD
+  const destination = isCardDestination ? CARD : undefined
 
   /** A refusal is already navigating the user away, so there is nothing to render. */
   if (isRefused) return null
 
   /** The wait is not a refusal, and this screen is reachable by routes other than the home
    *  transfer button, which hides itself while pending. Rendering nothing here would leave
-   *  a deep-linked user on an empty area under the header until the verdict lands. */
-  if (isRegionPending) return <ConversionDetailsRegionPending />
+   *  a deep-linked user on an empty area under the header until the verdict lands. The
+   *  card lookup is waited on the same way, since it decides which guard applies. */
+  if (isRegionPending || isCardPending) return <ConversionDetailsRegionPending />
 
-  return <ConversionDetailsScreenContent drainConversion={drainConversion} />
+  return (
+    <ConversionDetailsScreenContent
+      drainConversion={drainConversion}
+      card={card}
+      destination={destination}
+      isDollarBalanceOffered={isDollarBalanceOffered}
+    />
+  )
 }
 
 const ConversionDetailsRegionPending = () => {
@@ -149,10 +207,16 @@ const ConversionDetailsRegionPending = () => {
 
 type ConversionDetailsScreenContentProps = {
   drainConversion: DrainConversionReturn | null
+  card: TransferCard | undefined
+  destination: CardCurrency | undefined
+  isDollarBalanceOffered: boolean
 }
 
 const ConversionDetailsScreenContent = ({
   drainConversion,
+  card,
+  destination,
+  isDollarBalanceOffered,
 }: ConversionDetailsScreenContentProps) => {
   const isDrainConversion = drainConversion !== null
   const {
@@ -215,10 +279,15 @@ const ConversionDetailsScreenContent = ({
   const usdWallet =
     selfCustodialWalletsForConvert?.usd ?? getUsdWallet(data?.me?.defaultAccount?.wallets)
 
-  const initialWallets = useMemo(
-    () => resolveInitialConvertWallets(btcWallet, usdWallet, isDrainConversion),
-    [btcWallet, usdWallet, isDrainConversion],
-  )
+  const { transferWallets, balances, balanceAmounts, initialWallets, isDirectionFixed } =
+    useTransferWallets({
+      btcWallet,
+      usdWallet,
+      card,
+      destination,
+      isDollarBalanceOffered,
+      isDrainConversion,
+    })
 
   const {
     fromWallet,
@@ -231,7 +300,7 @@ const ConversionDetailsScreenContent = ({
     moneyAmount,
     canToggleWallet,
     toggleWallet,
-  } = useConvertMoneyDetails(initialWallets)
+  } = useConvertMoneyDetails<TransferWallet>(initialWallets)
 
   const convertDirection =
     isSelfCustodial && fromWallet
@@ -286,7 +355,7 @@ const ConversionDetailsScreenContent = ({
   const [loadingPercent, setLoadingPercent] = useState<number | null>(null)
   const [selectedPercent, setSelectedPercent] = useState<number | null>(null)
   const pillLabels = useMemo(
-    () => ({ BTC: LL.common.bitcoin(), USD: LL.common.dollar() }),
+    () => ({ BTC: LL.common.bitcoin(), USD: LL.common.dollar(), CARD: LL.common.card() }),
     [LL.common],
   )
   const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth({
@@ -583,30 +652,34 @@ const ConversionDetailsScreenContent = ({
     }
   }
 
-  const btcWalletBalance = toBtcMoneyAmount(btcWallet?.balance ?? NaN)
-  const usdWalletBalance = toUsdMoneyAmount(usdWallet?.balance ?? NaN)
-
-  const fromWalletBalance =
-    fromWallet.walletCurrency === WalletCurrency.Btc ? btcWalletBalance : usdWalletBalance
-  const toWalletBalance =
-    toWallet.walletCurrency === WalletCurrency.Btc ? btcWalletBalance : usdWalletBalance
-
-  const fromWalletBalanceFormatted = formatMoneyAmount({ moneyAmount: fromWalletBalance })
-  const fromSatsFormatted =
-    fromWallet.walletCurrency === WalletCurrency.Usd &&
-    displayCurrency === WalletCurrency.Usd
-      ? null
-      : moneyAmountToDisplayCurrencyString({ moneyAmount: fromWalletBalance })
-
-  const toWalletBalanceFormatted = formatMoneyAmount({ moneyAmount: toWalletBalance })
-  const toSatsFormatted =
-    toWallet.walletCurrency === WalletCurrency.Usd &&
-    displayCurrency === WalletCurrency.Usd
-      ? null
-      : moneyAmountToDisplayCurrencyString({ moneyAmount: toWalletBalance })
+  const formatters = {
+    displayCurrency,
+    formatMoneyAmount,
+    moneyAmountToDisplayCurrencyString,
+  }
+  const fromBalanceTexts = balanceTextsOf(balanceAmounts[fromWallet.kind], formatters)
+  const toBalanceTexts = balanceTextsOf(balanceAmounts[toWallet.kind], formatters)
+  const { onSourcePillPress, onDestinationPillPress, isFlipOffered } = transferSideSwitch(
+    {
+      fromWallet,
+      toWallet,
+      sides: transferWallets,
+      balances,
+      destination,
+      uiLocked,
+      focusedInputValues,
+      inputValues,
+      setWallets,
+      setFocusedInputValues,
+      setLockFormattingInputId,
+      setIsTyping,
+      setSelectedPercent,
+      setInitialAmount,
+    },
+  )
 
   const exceedsBalance = lessThan({
-    value: fromWalletBalance,
+    value: balanceAmounts[fromWallet.kind],
     lessThan: settlementSendAmount,
   })
 
@@ -618,7 +691,7 @@ const ConversionDetailsScreenContent = ({
 
   const amountFieldError: string | undefined = (() => {
     if (exceedsBalance) {
-      return LL.SendBitcoinScreen.amountExceed({ balance: fromWalletBalanceFormatted })
+      return LL.SendBitcoinScreen.amountExceed({ balance: fromBalanceTexts.primary })
     }
     if (selfCustodialLimitsUnavailable) {
       return LL.StableBalance.conversionUnavailable()
@@ -655,7 +728,8 @@ const ConversionDetailsScreenContent = ({
     conversionGuard.hasQuoteError ||
     isSelfCustodialBooting
 
-  const isWalletToggleDisabled = !canToggleWallet || uiLocked || isDrainConversion
+  const isWalletToggleDisabled =
+    !canToggleWallet || uiLocked || isDrainConversion || !isFlipOffered
   const drainLockedPercentages = isDrainConversion
     ? PERCENTAGE_OPTIONS.filter((percentage) => percentage !== FULL_BALANCE_PERCENTAGE)
     : undefined
@@ -667,7 +741,8 @@ const ConversionDetailsScreenContent = ({
 
   const moveToNextScreen = () => {
     navigation.navigate("conversionConfirmation", {
-      fromWalletCurrency: fromWallet.walletCurrency,
+      fromBalance: fromWallet.kind,
+      toBalance: toWallet.kind,
       moneyAmount,
       drainConversion,
     })
@@ -693,11 +768,7 @@ const ConversionDetailsScreenContent = ({
             <WalletAmountRow
               inputRef={fromInputRef}
               value={renderValue(ConvertInputType.FROM)}
-              placeholder={
-                fromWallet.walletCurrency === WalletCurrency.Usd
-                  ? "$0"
-                  : `0 ${BTC_SUFFIX}`
-              }
+              placeholder={placeholderOf(fromWallet)}
               selection={caretSelectionFor(ConvertInputType.FROM)}
               isLocked={uiLocked}
               onOverlayPress={() =>
@@ -715,11 +786,12 @@ const ConversionDetailsScreenContent = ({
                   },
                 })
               }}
-              currency={fromWallet.walletCurrency}
-              balancePrimary={fromWalletBalanceFormatted}
-              balanceSecondary={fromSatsFormatted}
+              currency={fromWallet.kind}
+              onPillPress={onSourcePillPress}
+              balancePrimary={fromBalanceTexts.primary}
+              balanceSecondary={fromBalanceTexts.secondary}
               pillContainerStyle={pillContainerStyle}
-              pillOnLayout={onPillLayout(fromWallet.walletCurrency)}
+              pillOnLayout={onPillLayout(fromWallet.kind)}
               pillWrapperStyle={styles.topRowPillAlign}
               inputContainerStyle={styles.topRowInputAlign}
             />
@@ -738,6 +810,7 @@ const ConversionDetailsScreenContent = ({
             <WalletToggleButton
               loading={isRecalculating}
               disabled={isWalletToggleDisabled}
+              isDirectionFixed={isDirectionFixed}
               onPress={toggleInputs}
               containerStyle={styles.switchButton}
               testID="wallet-toggle-button"
@@ -755,11 +828,7 @@ const ConversionDetailsScreenContent = ({
             <WalletAmountRow
               inputRef={toInputRef}
               value={renderValue(ConvertInputType.TO)}
-              placeholder={
-                fromWallet.walletCurrency === WalletCurrency.Usd
-                  ? `0 ${BTC_SUFFIX}`
-                  : "$0"
-              }
+              placeholder={placeholderOf(toWallet)}
               selection={caretSelectionFor(ConvertInputType.TO)}
               isLocked={uiLocked}
               onOverlayPress={() =>
@@ -777,11 +846,12 @@ const ConversionDetailsScreenContent = ({
                   },
                 })
               }}
-              currency={toWallet.walletCurrency}
-              balancePrimary={toWalletBalanceFormatted}
-              balanceSecondary={toSatsFormatted}
+              currency={toWallet.kind}
+              onPillPress={onDestinationPillPress}
+              balancePrimary={toBalanceTexts.primary}
+              balanceSecondary={toBalanceTexts.secondary}
               pillContainerStyle={pillContainerStyle}
-              pillOnLayout={onPillLayout(toWallet.walletCurrency)}
+              pillOnLayout={onPillLayout(toWallet.kind)}
             />
           </Animated.View>
         </View>

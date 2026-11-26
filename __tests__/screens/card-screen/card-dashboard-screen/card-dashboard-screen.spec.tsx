@@ -4,6 +4,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-screen"
 import { CardStatus } from "@app/graphql/generated"
+import { CARD } from "@app/types/amounts"
 import { ContextForScreen } from "../../helper"
 
 jest.mock("@react-native-community/blur", () => ({
@@ -521,9 +522,7 @@ describe("CardDashboardScreen", () => {
       expect(mockHandleFreeze).toHaveBeenCalledWith("card-1", CardStatus.Locked)
     })
 
-    it("calls console.log on add funds press", async () => {
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation()
-
+    it("opens the Transfer into the Card Balance on Add funds", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardDashboardScreen />
@@ -536,8 +535,9 @@ describe("CardDashboardScreen", () => {
         fireEvent.press(getByText("Add funds"))
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith("Add funds pressed")
-      consoleSpy.mockRestore()
+      expect(mockNavigate).toHaveBeenCalledWith("conversionDetails", {
+        destination: CARD,
+      })
     })
   })
 

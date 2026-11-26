@@ -82,6 +82,10 @@ const noRetryOperations = [
   // one of its few pending deposits, so a resend is refused for a while. The caller
   // reads blink-card's answer and waits before asking again.
   "cardCollateralDepositIntentCreate",
+
+  // Moves sats off the Card Balance. The caller retries with the same key, which returns
+  // the same withdrawal; a silent resend is left to it.
+  "cardCollateralWithdraw",
 ]
 
 const IDEMPOTENCY_KEY_HEADER = "x-idempotency-key"

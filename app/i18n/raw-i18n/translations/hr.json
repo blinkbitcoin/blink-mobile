@@ -3524,6 +3524,12 @@
         "skip": "Preskoči nadoplatu"
       }
     },
+    "CardBalanceTransfer": {
+      "waitAndRetry": "Pričekajte {seconds} sekundi i pokušajte ponovno.",
+      "tooManyPending": "Imate previše nadoplata na čekanju. Pokušajte ponovno kasnije.",
+      "insufficient": "Saldo kartice ne pokriva ovaj iznos.",
+      "inReview": "Provjeravamo ovaj prijenos. Obratite se podršci ako uskoro ne stigne."
+    },
     "ShippingAddress": {
       "title": "Adresa za dostavu",
       "firstName": "Ime",

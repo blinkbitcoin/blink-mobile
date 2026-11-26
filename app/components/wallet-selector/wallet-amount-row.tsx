@@ -10,8 +10,10 @@ import {
 } from "react-native"
 
 import { CurrencyPill } from "@app/components/atomic/currency-pill"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { WalletCurrency } from "@app/graphql/generated"
 import { APPROXIMATE_PREFIX } from "@app/config"
+import { CardCurrency } from "@app/types/amounts"
 import type { InputRef } from "@app/types/themed-input"
 import { fonts } from "@app/rne-theme/fonts"
 
@@ -24,7 +26,10 @@ export type WalletAmountRowProps = {
   isLocked: boolean
   onOverlayPress: () => void
   onFocus: () => void
-  currency: WalletCurrency
+  currency: WalletCurrency | CardCurrency
+  /** Set when the row can switch to another balance: the pill shows the switch icon and
+   *  a tap on it switches. */
+  onPillPress?: () => void
   balancePrimary: string
   balanceSecondary?: string | null
   pillContainerStyle?: StyleProp<ViewStyle>
@@ -44,6 +49,7 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
   onOverlayPress,
   onFocus,
   currency,
+  onPillPress,
   balancePrimary,
   balanceSecondary,
   pillContainerStyle,
@@ -80,12 +86,27 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
       />
       <View style={styles.rightColumn}>
         <View style={[styles.currencyBubbleText, pillWrapperStyle]}>
-          <CurrencyPill
-            currency={currency}
-            containerSize="medium"
-            containerStyle={pillContainerStyle}
-            onLayout={pillOnLayout}
-          />
+          <TouchableOpacity
+            style={styles.pillSwitch}
+            onPress={onPillPress}
+            disabled={!onPillPress}
+            accessibilityRole="button"
+            testID={`wallet-switch-${currency}`}
+          >
+            {onPillPress && (
+              <GaloyIcon
+                name="refresh"
+                size={PILL_SWITCH_ICON_SIZE}
+                color={colors.textMuted}
+              />
+            )}
+            <CurrencyPill
+              currency={currency}
+              containerSize="medium"
+              containerStyle={pillContainerStyle}
+              onLayout={pillOnLayout}
+            />
+          </TouchableOpacity>
         </View>
         <View style={styles.walletSelectorBalanceContainer}>
           <Text style={styles.primaryBalanceText}>{balancePrimary}</Text>
@@ -105,7 +126,15 @@ export const WalletAmountRow: React.FC<WalletAmountRowProps> = ({
   )
 }
 
+const PILL_SWITCH_ICON_SIZE = 12
+
 const useStyles = makeStyles(({ colors }) => ({
+  pillSwitch: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    zIndex: 11,
+  },
   row: {
     flexDirection: "row",
     alignItems: "flex-start",

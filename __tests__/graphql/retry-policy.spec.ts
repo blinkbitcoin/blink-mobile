@@ -32,7 +32,8 @@ const MIGRATION_OPERATIONS = [
  *  the login method additions it guards. A card limit removal that landed leaves nothing
  *  for a resend to remove, and a card application that landed refuses a second one.
  *  Each Card Balance deposit created spends the account's cooldown and one of its
- *  pending deposits, so a resend is refused for a while. */
+ *  pending deposits, so a resend is refused for a while. A withdrawal off the Card
+ *  Balance moves sats, and its caller retries under the same key. */
 const IRREVERSIBLE_OPERATIONS = [
   ...MIGRATION_OPERATIONS,
   "accountDelete",
@@ -43,6 +44,7 @@ const IRREVERSIBLE_OPERATIONS = [
   "cardSpendingLimitRemove",
   "cardConsumerApplicationCreate",
   "cardCollateralDepositIntentCreate",
+  "cardCollateralWithdraw",
 ]
 
 /**
