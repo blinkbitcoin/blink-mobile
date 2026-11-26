@@ -214,7 +214,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   } = useSendPayment(sendPaymentMutation, paymentDetail.idempotencyKeyRef)
   useHomeOnBackAfterSend(hasAttemptedSend)
 
-  const displayAmount = paymentDetail.convertMoneyAmount(settlementAmount, DisplayCurrency)
+  const displayAmount = paymentDetail.convertMoneyAmount(
+    settlementAmount,
+    DisplayCurrency,
+  )
 
   const currencyAmount = formatMoneyAmount({
     moneyAmount: displayAmount,
@@ -480,10 +483,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   /** What stops a send from this screen: the slider's gates, which "send anyway" honours
    *  too, since it sends in the slider's place. */
   const isSliderDisabled =
-    !validAmount ||
-    !sendPayment ||
-    feeUnavailable ||
-    dustNotEvaluable
+    !validAmount || !sendPayment || feeUnavailable || dustNotEvaluable
 
   const isLightningRecommended = (() => {
     const ratioFeeToAmount = 50 // 2%
