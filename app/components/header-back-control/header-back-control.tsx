@@ -56,8 +56,7 @@ type HeaderBackButtonWithThemeProps = React.ComponentProps<typeof HeaderBackButt
   onBack?: () => void
 }
 
-/** Also rendered inside a headerless screen that draws its own header row (send review). */
-export const HeaderBackButtonWithTheme = ({
+const HeaderBackButtonWithTheme = ({
   onBack,
   ...props
 }: HeaderBackButtonWithThemeProps): React.ReactNode => {
