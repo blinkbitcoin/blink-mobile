@@ -111,6 +111,24 @@ describe("SendReviewDestination", () => {
     expect(onCopy).toHaveBeenCalledTimes(1)
   })
 
+  /** What the sender reads is what they paste: a username copies with its host. */
+  it.each([
+    ["intraledger", "andrejstack", "andrejstack@blink.sv"],
+    [
+      "onchain",
+      "bc1q6pwejxkd0gfr2m7fvs4yh3nh5ul7zc8smg9fq4aw",
+      "bc1q6pwejxkd0gfr2m7fvs4yh3nh5ul7zc8smg9fq4aw",
+    ],
+  ] as const)("copies the %s destination as the field shows it", (type, raw, shown) => {
+    const onCopy = jest.fn()
+    renderDestination(type, raw, onCopy)
+
+    expect(screen.getByTestId(SEND_REVIEW_DESTINATION_TEST_ID).props.children).toBe(shown)
+    fireEvent.press(screen.getByTestId(SEND_REVIEW_COPY_TEST_ID))
+
+    expect(onCopy).toHaveBeenCalledWith(shown)
+  })
+
   it("tells a screen reader that the field copies the destination", () => {
     renderDestination("lightning", "alice@blink.sv")
 

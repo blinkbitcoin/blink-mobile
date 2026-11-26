@@ -14,7 +14,8 @@ export const SEND_REVIEW_COPY_TEST_ID = "send-review-copy-destination"
 type SendReviewDestinationProps = {
   destination: string
   paymentType: PaymentDetail<WalletCurrency>["paymentType"]
-  onCopy: () => void
+  /** Called with the destination as the field shows it, so the copy matches what was read. */
+  onCopy: (shown: string) => void
 }
 
 /** The destination, as the card flow's `ActionField`: a labelled value with one action.
@@ -40,19 +41,19 @@ export const SendReviewDestination: React.FC<SendReviewDestinationProps> = ({
     lnurl: LL.common.lightning(),
     spark: LL.common.spark(),
   }[paymentType]
+  const shown =
+    paymentType === "intraledger"
+      ? formatDestination({ destination, paymentType, lnAddressHostname })
+      : destination
 
   return (
     <ActionField
       label={`${LL.SendBitcoinScreen.destination()} - ${typeLabel}`}
-      value={
-        paymentType === "intraledger"
-          ? formatDestination({ destination, paymentType, lnAddressHostname })
-          : destination
-      }
+      value={shown}
       icon="copy-paste"
       iconSize={16}
       numberOfLines={1}
-      onAction={onCopy}
+      onAction={() => onCopy(shown)}
       actionHint={LL.Accessibility.copy()}
       testID={SEND_REVIEW_COPY_TEST_ID}
       valueTestID={SEND_REVIEW_DESTINATION_TEST_ID}

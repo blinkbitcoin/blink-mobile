@@ -477,9 +477,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     }
   }
 
-  const handleCopyToClipboard = () => {
+  const handleCopyToClipboard = (shown: string) => {
     copyToClipboard({
-      content: destination,
+      content: shown,
       message: LL.SendBitcoinConfirmationScreen.copiedDestination(),
     })
   }

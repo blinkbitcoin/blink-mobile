@@ -2058,13 +2058,15 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       expect(completed?.params.satAmount).toBe(secondary)
     })
 
-    it("copies the destination when the Destination field is pressed", async () => {
+    it("copies the destination as the Destination field shows it", async () => {
       await renderReview(buildBtcSettlementRoute(1000))
+      const shown = screen.getByTestId(SEND_REVIEW_DESTINATION_TEST_ID).props.children
 
       fireEvent.press(screen.getByTestId("send-review-copy-destination"))
 
+      expect(shown).toMatch(/^test@/)
       expect(copyToClipboardMock).toHaveBeenCalledWith(
-        expect.objectContaining({ content: "test" }),
+        expect.objectContaining({ content: shown }),
       )
     })
 
