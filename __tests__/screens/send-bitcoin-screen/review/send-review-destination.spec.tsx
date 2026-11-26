@@ -1,4 +1,5 @@
 import React from "react"
+import { it } from "@jest/globals"
 import { StyleSheet } from "react-native"
 import { fireEvent, render, screen, within } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
