@@ -10,6 +10,7 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
 import {
+  CardCurrency,
   DisplayCurrency,
   isNonZeroMoneyAmount,
   MoneyAmount,
@@ -57,6 +58,9 @@ const formatAmounts = ({
 type ReceiveAmountRowProps = {
   unitOfAccountAmount?: MoneyAmount<WalletOrDisplayCurrency>
   walletCurrency: WalletCurrency
+  /** A balance other than the wallet the amount is counted in, such as the Card
+   *  Balance, named by the pill in place of the wallet. */
+  destination?: CardCurrency
   convertMoneyAmount: ConvertMoneyAmount
   setAmount: (amount: MoneyAmount<WalletOrDisplayCurrency>) => void
   canSetAmount: boolean
@@ -68,6 +72,7 @@ type ReceiveAmountRowProps = {
 export const ReceiveAmountRow: React.FC<ReceiveAmountRowProps> = ({
   unitOfAccountAmount,
   walletCurrency,
+  destination,
   convertMoneyAmount,
   setAmount,
   canSetAmount,
@@ -81,6 +86,9 @@ export const ReceiveAmountRow: React.FC<ReceiveAmountRowProps> = ({
     useDisplayCurrency()
   const [isPressed, setIsPressed] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  /** A fixed destination, such as the Card Balance, takes the wallet's place in the pill. */
+  const pillCurrency = destination ?? walletCurrency
 
   const { formattedPrimary, formattedSecondary } = formatAmounts({
     unitOfAccountAmount,
@@ -128,7 +136,7 @@ export const ReceiveAmountRow: React.FC<ReceiveAmountRowProps> = ({
           accessibilityRole="button"
           accessibilityLabel="Toggle wallet"
         >
-          <WalletSwitch currency={walletCurrency} canToggle={canToggleWallet} />
+          <WalletSwitch currency={pillCurrency} canToggle={canToggleWallet} />
         </Pressable>
       </View>
       <AmountInputModal
