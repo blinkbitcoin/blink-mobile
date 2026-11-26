@@ -1,6 +1,7 @@
 import { useMemo, useRef } from "react"
 
 import { useDisplayCurrency } from "@app/hooks"
+import { useErrorHaptic } from "@app/hooks/use-error-haptic"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import type { SendDustWarning } from "@app/self-custodial/hooks/use-send-dust-warning"
 import { isSelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
@@ -42,6 +43,9 @@ type Args = {
  * - the USD dust sweep notice (R5), with OK only closing the sheet
  *
  * It also formats the dust sweep text for the banner under Details.
+ *
+ * Custodial fee failures carry raw text and stay inline, yet block the send just the same,
+ * so they get the error haptic the sheet gives the rest, unless a sheet error buzzed first.
  */
 export const useReviewErrorSheet = ({
   paymentFailure,
@@ -102,6 +106,14 @@ export const useReviewErrorSheet = ({
   const sheet = useDismissibleErrorMsg<SheetContent>(
     paymentFailure ?? overBalance ?? feeError ?? noticeSlot,
   )
+  // A sheet error, even a dismissed one, already buzzed: an over-balance amount usually
+  // fails the custodial fee probe too, and the two must not buzz together.
+  const hasSheetError = Boolean(paymentFailure ?? overBalance)
+  useErrorHaptic(
+    isFeeFailed && !isSelfCustodialErrorCode(feeErrorCode) && !hasSheetError
+      ? feeErrorText
+      : undefined,
+  )
 
   // The sheet stays mounted and only toggles `isVisible`, as `BottomSheet` expects. With
   // nothing to show it is hidden, so the fallbacks are never on screen.
@@ -113,6 +125,7 @@ export const useReviewErrorSheet = ({
       title: LL.SendBitcoinConfirmationScreen.dustSweepSheetTitle(),
       message: lastNoticeText.current ?? "",
       button: { primaryLabel: LL.common.okay(), onPrimaryPress: sheet.dismiss },
+      hasHaptic: false,
       changeAmount: exits.changeAmount,
       dustSweepText,
     }
@@ -124,6 +137,7 @@ export const useReviewErrorSheet = ({
     title: LL.SendBitcoinScreen.problemSheetTitle(),
     message: shown?.message ?? "",
     button: exits.actionButton(shown?.action ?? "tryAgain"),
+    hasHaptic: true,
     changeAmount: exits.changeAmount,
     dustSweepText,
   }

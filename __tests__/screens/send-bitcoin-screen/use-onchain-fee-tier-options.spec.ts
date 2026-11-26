@@ -332,6 +332,29 @@ describe("useOnchainFeeTierOptions", () => {
     }
   })
 
+  /** The one fee error amount entry buzzes a refusal for: the sender fixes it in place. */
+  it("calls only the SDK's invalid input an amount that is too low", () => {
+    const cases: Array<[SdkFeeError, boolean]> = [
+      [SdkFeeError.InsufficientFunds, false],
+      [SdkFeeError.InvalidInput, true],
+      [SdkFeeError.NetworkError, false],
+      [SdkFeeError.Generic, false],
+    ]
+
+    for (const [err, expected] of cases) {
+      mockFeeError = err
+      const { result } = renderHook(() =>
+        useOnchainFeeTierOptions({
+          paymentDetail: null,
+          isSelfCustodial: true,
+          paymentDestination: undefined,
+          convertMoneyAmount: undefined,
+        }),
+      )
+      expect(result.current.isFeeTierAmountTooLow).toBe(expected)
+    }
+  })
+
   it("hands the self-custodial rail nothing to quote on a custodial payment", () => {
     renderHook(() =>
       useOnchainFeeTierOptions({
@@ -1009,5 +1032,6 @@ describe("useOnchainFeeTierOptions on Next", () => {
 
     expect(result.current.feeTierErrorMessage).toBe("Unable to calculate fee")
     expect(result.current.isSelfPayment).toBe(false)
+    expect(result.current.isFeeTierAmountTooLow).toBe(false)
   })
 })

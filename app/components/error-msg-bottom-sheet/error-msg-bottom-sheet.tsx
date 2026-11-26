@@ -6,6 +6,7 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { BottomSheet } from "@app/components/bottom-sheet"
 import { IconHero } from "@app/components/icon-hero"
+import { useErrorHaptic } from "@app/hooks/use-error-haptic"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 type ErrorMsgBottomSheetProps = {
@@ -18,6 +19,9 @@ type ErrorMsgBottomSheetProps = {
   /** A second way on, under the action, for a warning the user may accept. */
   secondaryLabel?: string
   onSecondaryPress?: () => void
+  /** False for a notice the user only acknowledges: nothing failed, so nothing buzzes.
+   *  Errors and warnings keep the error haptic. */
+  hasHaptic?: boolean
   testID?: string
 }
 
@@ -32,6 +36,9 @@ type ErrorMsgBottomSheetProps = {
  *
  * It rests on its content and doesn't expand: messages are short. Swiping it
  * down, pressing the scrim or Android back closes it without taking the action.
+ *
+ * Opening buzzes the error haptic, which makes the sheet the one buzz even when an inline
+ * error appears with it. A notice opts out with `hasHaptic={false}`.
  * Its buttons stop answering once it is closing, so a second tap as it slides out
  * can't take an action twice.
  */
@@ -44,6 +51,7 @@ export const ErrorMsgBottomSheet: React.FC<ErrorMsgBottomSheetProps> = ({
   onPrimaryPress,
   secondaryLabel,
   onSecondaryPress,
+  hasHaptic = true,
   testID,
 }) => {
   const { bottom } = useSafeAreaInsets()
@@ -51,6 +59,7 @@ export const ErrorMsgBottomSheet: React.FC<ErrorMsgBottomSheetProps> = ({
   const {
     theme: { colors },
   } = useTheme()
+  useErrorHaptic((hasHaptic && isVisible) || undefined)
 
   const whileOpen = (action: () => void) => () => {
     if (isVisible) action()
