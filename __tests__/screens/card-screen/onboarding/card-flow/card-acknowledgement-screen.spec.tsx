@@ -1,5 +1,5 @@
 import React from "react"
-import { render, fireEvent, act } from "@testing-library/react-native"
+import { render, fireEvent, act, within } from "@testing-library/react-native"
 import InAppBrowser from "react-native-inappbrowser-reborn"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
@@ -14,21 +14,52 @@ jest.mock("react-native-linear-gradient", () => ({
   LinearGradient: "LinearGradient",
 }))
 
-jest.mock("@rn-vui/themed", () =>
-  jest.requireActual("../../../../helpers/card-flow-mocks").mockThemedWithCheckbox(),
-)
+const mockDispatch = jest.fn()
+const mockSubmitApplication = jest.fn()
+const mockToastShow = jest.fn()
+const mockSubmitState = { isSubmitting: false }
 
-const mockNavigate = jest.fn()
+const ANSWERS = {
+  occupation: "15-1132",
+  annualSalary: "50,000 - 74,999",
+  accountPurpose: "Personal spending",
+  expectedMonthlyVolume: "1,000 - 1,999",
+}
+
+/** Leaving the step runs the focus effect's cleanup, as a blur or an unmount would. */
+let mockLeaveStep: () => void = () => {}
 
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
+  const { useEffect } = jest.requireActual("react")
   return {
     ...actualNav,
     useNavigation: () => ({
-      navigate: mockNavigate,
+      dispatch: mockDispatch,
     }),
+    useRoute: () => ({ params: ANSWERS }),
+    useFocusEffect: (effect: () => (() => void) | undefined) =>
+      useEffect(() => {
+        const cleanup = effect()
+        mockLeaveStep = () => cleanup?.()
+        return cleanup
+      }, [effect]),
   }
 })
+
+jest.mock(
+  "@app/screens/card-screen/onboarding/card-flow/use-card-application-submit",
+  () => ({
+    useCardApplicationSubmit: () => ({
+      submitApplication: mockSubmitApplication,
+      ...mockSubmitState,
+    }),
+  }),
+)
+
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (params: unknown) => mockToastShow(params),
+}))
 
 jest.mock("react-native-inappbrowser-reborn", () => ({
   open: jest.fn(),
@@ -43,14 +74,16 @@ jest.mock("@app/config/feature-flags-context", () => ({
 }))
 
 const CERTIFY_TEXT =
-  "I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Visa Card"
+  "I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Card"
 const ACKNOWLEDGE_TEXT =
-  "I acknowledge that applying for the Blink Visa Card does not constitute unauthorized solicitation"
+  "I acknowledge that applying for the Blink Card does not constitute unauthorized solicitation"
 
 describe("CardAcknowledgementScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
+    mockSubmitState.isSubmitting = false
+    mockSubmitApplication.mockResolvedValue("application-1")
   })
 
   it("renders without crashing", async () => {
@@ -87,7 +120,7 @@ describe("CardAcknowledgementScreen", () => {
     await act(async () => {})
 
     expect(getByText("E-Sign Consent")).toBeTruthy()
-    expect(getByText("Issuer's Privacy Policy")).toBeTruthy()
+    expect(getByText("Issuer’s Privacy Policy")).toBeTruthy()
     expect(getByText("Blink Card Terms")).toBeTruthy()
     expect(getByText(CERTIFY_TEXT)).toBeTruthy()
     expect(getByText(ACKNOWLEDGE_TEXT)).toBeTruthy()
@@ -107,12 +140,12 @@ describe("CardAcknowledgementScreen", () => {
       fireEvent.press(button)
     })
 
-    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockSubmitApplication).not.toHaveBeenCalled()
   })
 
   for (const skipIndex of [0, 1, 2, 3]) {
     it(`keeps the button disabled when only checkbox ${skipIndex} is left unchecked`, async () => {
-      const { getByText, getAllByTestId } = render(
+      const { getByText, getAllByRole } = render(
         <ContextForScreen>
           <CardAcknowledgementScreen />
         </ContextForScreen>,
@@ -120,7 +153,7 @@ describe("CardAcknowledgementScreen", () => {
 
       await act(async () => {})
 
-      const unchecked = getAllByTestId("checkbox-unchecked")
+      const unchecked = getAllByRole("checkbox", { checked: false })
       await act(async () => {
         unchecked.forEach((checkbox, index) => {
           if (index !== skipIndex) fireEvent.press(checkbox)
@@ -131,34 +164,161 @@ describe("CardAcknowledgementScreen", () => {
         fireEvent.press(getByText("Accept"))
       })
 
-      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(mockSubmitApplication).not.toHaveBeenCalled()
     })
   }
 
-  it("navigates to the processing screen when all checkboxes are checked", async () => {
-    const { getByText, getAllByTestId } = render(
+  const acceptAll = async () => {
+    const screen = render(
       <ContextForScreen>
         <CardAcknowledgementScreen />
       </ContextForScreen>,
     )
-
     await act(async () => {})
 
-    const unchecked = getAllByTestId("checkbox-unchecked")
+    const unchecked = screen.getAllByRole("checkbox", { checked: false })
+    await act(async () => {
+      unchecked.forEach((checkbox) => fireEvent.press(checkbox))
+    })
+    await act(async () => {
+      fireEvent.press(screen.getByText("Accept"))
+    })
+    return screen
+  }
+
+  it("sends the additional data with the application once every box is checked", async () => {
+    await acceptAll()
+
+    expect(mockSubmitApplication).toHaveBeenCalledWith(ANSWERS)
+  })
+
+  it("waits for the approval with only Home behind it once the application is sent", async () => {
+    await acceptAll()
+
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "RESET",
+        payload: expect.objectContaining({
+          index: 1,
+          routes: [
+            { name: "Primary" },
+            {
+              name: "cardOnboardingProcessingScreen",
+              params: { applicationId: "application-1" },
+            },
+          ],
+        }),
+      }),
+    )
+  })
+
+  it("stays on the terms and says so when the application could not be sent", async () => {
+    mockSubmitApplication.mockResolvedValue(null)
+
+    await acceptAll()
+
+    expect(mockDispatch).not.toHaveBeenCalled()
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Unexpected error occurred" }),
+    )
+  })
+
+  it("sends the application once when Accept is tapped twice in the same frame", async () => {
+    let finishSending: (applicationId: string) => void = () => {}
+    mockSubmitApplication.mockReturnValue(
+      new Promise<string>((resolve) => {
+        finishSending = resolve
+      }),
+    )
+    const { getByText, getAllByRole } = render(
+      <ContextForScreen>
+        <CardAcknowledgementScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+    const unchecked = getAllByRole("checkbox", { checked: false })
     await act(async () => {
       unchecked.forEach((checkbox) => fireEvent.press(checkbox))
     })
 
-    const button = getByText("Accept")
     await act(async () => {
-      fireEvent.press(button)
+      fireEvent.press(getByText("Accept"))
+      fireEvent.press(getByText("Accept"))
+    })
+    await act(async () => {
+      finishSending("application-1")
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingProcessingScreen")
+    expect(mockSubmitApplication).toHaveBeenCalledTimes(1)
+    expect(mockDispatch).toHaveBeenCalledTimes(1)
   })
 
-  it("opens the e-sign consent link when pressed", async () => {
-    const { getByText } = render(
+  describe("when the user leaves before the application answers", () => {
+    const acceptAndLeave = async () => {
+      let finishSending: (applicationId: string | null) => void = () => {}
+      mockSubmitApplication.mockReturnValue(
+        new Promise<string | null>((resolve) => {
+          finishSending = resolve
+        }),
+      )
+      await acceptAll()
+      act(() => {
+        mockLeaveStep()
+      })
+      return finishSending
+    }
+
+    it("leaves the stack alone when the application lands", async () => {
+      const finishSending = await acceptAndLeave()
+
+      await act(async () => {
+        finishSending("application-1")
+      })
+
+      expect(mockDispatch).not.toHaveBeenCalled()
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
+    it("shows no toast over another screen when the application fails", async () => {
+      const finishSending = await acceptAndLeave()
+
+      await act(async () => {
+        finishSending(null)
+      })
+
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+  })
+
+  it("lets the user try again after a failed send", async () => {
+    mockSubmitApplication.mockResolvedValueOnce(null)
+    const { getByText } = await acceptAll()
+
+    await act(async () => {
+      fireEvent.press(getByText("Accept"))
+    })
+
+    expect(mockSubmitApplication).toHaveBeenCalledTimes(2)
+    expect(mockDispatch).toHaveBeenCalledTimes(1)
+  })
+
+  it("holds Accept on its spinner while the application is being sent", async () => {
+    mockSubmitState.isSubmitting = true
+    const { queryByText } = render(
+      <ContextForScreen>
+        <CardAcknowledgementScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    expect(queryByText("Accept")).toBeNull()
+  })
+
+  /** A screen reader reaches what a box sits inside of as one element, so each document
+   *  link has to stand beside its box to be read and opened on its own. */
+  it("opens the e-sign consent from a link of its own, without ticking its box", async () => {
+    const eSignBox = { name: "I accept the E-Sign Consent" }
+    const { getByRole } = render(
       <ContextForScreen>
         <CardAcknowledgementScreen />
       </ContextForScreen>,
@@ -166,15 +326,21 @@ describe("CardAcknowledgementScreen", () => {
 
     await act(async () => {})
 
+    expect(within(getByRole("checkbox", eSignBox)).queryByRole("link")).toBeNull()
+
     await act(async () => {
-      fireEvent.press(getByText("E-Sign Consent"))
+      fireEvent.press(getByRole("link", { name: "E-Sign Consent" }))
     })
 
     expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/e-sign")
+    expect(getByRole("checkbox", { ...eSignBox, checked: false })).toBeTruthy()
   })
 
-  it("opens the privacy policy and card terms links when pressed", async () => {
-    const { getByText } = render(
+  it("opens the privacy policy and card terms from links of their own, without ticking their box", async () => {
+    const privacyAndTermsBox = {
+      name: "I accept the Issuer’s Privacy Policy, and Blink Card Terms",
+    }
+    const { getByRole } = render(
       <ContextForScreen>
         <CardAcknowledgementScreen />
       </ContextForScreen>,
@@ -182,12 +348,17 @@ describe("CardAcknowledgementScreen", () => {
 
     await act(async () => {})
 
+    expect(
+      within(getByRole("checkbox", privacyAndTermsBox)).queryByRole("link"),
+    ).toBeNull()
+
     await act(async () => {
-      fireEvent.press(getByText("Issuer's Privacy Policy"))
-      fireEvent.press(getByText("Blink Card Terms"))
+      fireEvent.press(getByRole("link", { name: "Issuer’s Privacy Policy" }))
+      fireEvent.press(getByRole("link", { name: "Blink Card Terms" }))
     })
 
     expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/privacy")
     expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/terms")
+    expect(getByRole("checkbox", { ...privacyAndTermsBox, checked: false })).toBeTruthy()
   })
 })

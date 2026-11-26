@@ -14,6 +14,7 @@ import {
 import {
   formatNumberPadNumber,
   getDisabledKeys,
+  isKeyAccepted,
   Key,
   numberPadReducer,
   NumberPadReducerActionType,
@@ -125,13 +126,15 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
 
   const handleKeyPress = useCallback(
     (key: Key) => {
+      if (!isKeyAccepted(numberPadState, key)) return false
       startTyping()
       dispatchNumberPadAction({
         action: NumberPadReducerActionType.HandleKeyPress,
         payload: { key },
       })
+      return true
     },
-    [startTyping],
+    [startTyping, numberPadState],
   )
 
   const setNumberPadAmount = useCallback(

@@ -25,7 +25,7 @@ import {
 } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { isIdempotencyConflict } from "@app/graphql/is-idempotency-conflict"
-import { useAppConfig, useClipboard, useDisplayCurrency } from "@app/hooks"
+import { useClipboard, useDisplayCurrency } from "@app/hooks"
 import { useAccessibilityAnnouncement } from "@app/hooks/use-accessibility-announcement"
 import { useInitialAccessibilityFocus } from "@app/hooks/use-initial-accessibility-focus"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -53,7 +53,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
 import { isAmountFixableError } from "./amount-fixable-error"
 import { feeTierLabels, formatEta } from "./fee-tier-options"
-import { FeeTierOption } from "./hooks/fee-tiers.types"
+import { FeeTierOption } from "@app/types/fee-tiers"
 import { useHomeOnBackAfterSend } from "./hooks/use-home-on-back-after-send"
 import {
   CUSTODIAL_PAYOUT_ETA_MINUTES,
@@ -72,11 +72,10 @@ import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
 import { PaymentSendExtraInfo } from "./payment-details/index.types"
 import { useReviewFeeText } from "./review/use-review-fee-text"
 import { usePaymentFailure } from "./review/use-payment-failure"
-import { useReviewQuote } from "./review/use-review-quote"
+import useFee from "./use-fee"
 import { PaymentErrorActions } from "./payment-error-actions"
 import { PaymentSendCompletedStatus, useSendPayment } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
-import { formatDestination } from "./format-destination"
 
 gql`
   query sendBitcoinConfirmationScreen {
@@ -163,13 +162,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const failureCopy = useSendFailureCopy()
   const { copyToClipboard } = useClipboard()
   const tierLabels = feeTierLabels(LL)
-  const {
-    appConfig: {
-      galoyInstance: { lnAddressHostname },
-    },
-  } = useAppConfig()
 
-  const { fee, recipientAmount, isAwaitingIncludedFee } = useReviewQuote(paymentDetail)
+  const fee = useFee(paymentDetail.getFee)
 
   /** The receipt a landed payment opens from Sent, kept until the sender asks for it. */
   const sentReceiptRef =
@@ -265,8 +259,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   // Once Sent takes over, its own hold owns back.
   useHomeOnBackAfterSend(hasAttemptedSend && !sentTransition.isSettled)
 
-  // What the recipient gets: the amount less the fee, when the fee comes out of it.
-  const displayAmount = paymentDetail.convertMoneyAmount(recipientAmount, DisplayCurrency)
+  const displayAmount = paymentDetail.convertMoneyAmount(
+    settlementAmount,
+    DisplayCurrency,
+  )
 
   const currencyAmount = formatMoneyAmount({
     moneyAmount: displayAmount,
@@ -274,8 +270,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const secondaryAmount = getSecondaryAmountIfCurrencyIsDifferent({
     primaryAmount: displayAmount,
-    walletAmount: paymentDetail.convertMoneyAmount(recipientAmount, WalletCurrency.Btc),
-    displayAmount: paymentDetail.convertMoneyAmount(recipientAmount, DisplayCurrency),
+    walletAmount: paymentDetail.convertMoneyAmount(settlementAmount, WalletCurrency.Btc),
+    displayAmount: paymentDetail.convertMoneyAmount(settlementAmount, DisplayCurrency),
   })
 
   const satAmount = formatMoneyAmount({
@@ -285,7 +281,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   /** The hero pairs the display currency with the sending wallet's, the pair the keypad
    *  swaps between, led by whichever the sender typed in. */
   const heroWalletAmount = paymentDetail.convertMoneyAmount(
-    recipientAmount,
+    settlementAmount,
     sendingWalletDescriptor.currency,
   )
   const heroPrimaryAmount = leadsWithWalletCurrency ? heroWalletAmount : displayAmount
@@ -362,11 +358,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         satAmount,
         currencyFeeAmount,
         satFeeAmount,
-        destination: formatDestination({
-          destination,
-          paymentType,
-          lnAddressHostname,
-        }),
+        destination,
         paymentType: paymentDetail?.paymentType,
         createdAt: transaction?.createdAt,
         hasShownSuccess: isSuccess,
@@ -412,7 +404,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       saveLnAddressContact,
       paymentType,
       destination,
-      lnAddressHostname,
       paymentDetail,
       note,
       currencyAmount,
@@ -550,10 +541,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     ? paymentDetail.convertMoneyAmount(fee.amount, settlementAmount.currency)
     : zeroSettlementAmount
 
-  // A fee taken out of the amount is already inside it.
   const totalAmount = addMoneyAmounts({
     a: settlementAmount,
-    b: paymentDetail.isFeeIncluded ? zeroSettlementAmount : feeInSettlementCurrency,
+    b: feeInSettlementCurrency,
   })
 
   const skipBalanceCheck = isSendingMax || hasAttemptedSend
@@ -590,19 +580,15 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     }
   }
 
-  const handleCopyToClipboard = () => {
+  const handleCopyToClipboard = (shown: string) => {
     copyToClipboard({
-      content: destination,
+      content: shown,
       message: LL.SendBitcoinConfirmationScreen.copiedDestination(),
     })
   }
 
   const isSliderDisabled =
-    !validAmount ||
-    !sendPayment ||
-    isAwaitingIncludedFee ||
-    feeUnavailable ||
-    dustNotEvaluable
+    !validAmount || !sendPayment || feeUnavailable || dustNotEvaluable
 
   const isLightningRecommended = (() => {
     const ratioFeeToAmount = 50 // 2%
@@ -680,11 +666,14 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     invalidAmountErrorMessage ||
     (isFeeFailed ? feeErrorText : "")
   // Offered only when the error on show is about the amount; a network or invoice failure
-  // is not fixed by going back to change it.
-  const canChangeAmount = paymentFailure
-    ? paymentFailure.canChangeAmount
-    : Boolean(invalidAmountErrorMessage) ||
-      (isFeeFailed && isAmountFixableError(feeErrorCode))
+  // is not fixed by going back to change it. Never after a send attempt: back goes Home
+  // from then on (useHomeOnBackAfterSend), and an amount code on a send is the SDK's word
+  // that nothing went out, not a certainty.
+  const canChangeAmount =
+    !hasAttemptedSend &&
+    !paymentFailure &&
+    (Boolean(invalidAmountErrorMessage) ||
+      (isFeeFailed && isAmountFixableError(feeErrorCode)))
   const detailsOutline =
     invalidAmountErrorMessage || isFeeFailed
       ? colors.error

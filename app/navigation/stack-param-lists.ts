@@ -10,10 +10,14 @@ import {
   MerchantChoice,
   ReceiveDestination,
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
-import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
+import {
+  PaymentDetail,
+  PaymentDetailType,
+} from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { PaymentSendCompletedStatus } from "@app/screens/send-bitcoin-screen/use-send-payment"
 import { DrainConversionReturn } from "@app/screens/conversion-flow/drain-conversion"
 import { AccountMode, AccountTypeMode, CreationBlockReason } from "@app/types/account"
+import { CardApplicationAnswers } from "@app/types/card-application"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
 import {
@@ -168,7 +172,7 @@ export type RootStackParamList = {
     currencyFeeAmount?: string
     satFeeAmount?: string
     destination?: string
-    paymentType?: string
+    paymentType?: PaymentDetailType
     createdAt?: number
     /** Review already played Sent, so the receipt opens straight away. */
     hasShownSuccess?: boolean
@@ -314,6 +318,7 @@ export type RootStackParamList = {
   cardOnboardingDetailsScreen: undefined
   cardOnboardingWelcomeScreen: undefined
   cardOnboardingSubscribeScreen: undefined
+  cardOnboardingVerifyIdentityScreen: undefined
   cardOnboardingPaymentScreen: undefined
   cardOnboardingLoadingScreen: undefined
   cardOnboardingWelcomeInvestScreen: undefined
@@ -329,9 +334,10 @@ export type RootStackParamList = {
   cardOnboardingDepositPendingScreen: undefined
   cardOnboardingCompanyValuationScreen: undefined
   cardOnboardingPersonalInfoScreen: undefined
-  cardOnboardingAcknowledgementScreen: undefined
+  cardOnboardingAcknowledgementScreen: CardApplicationAnswers
   cardOnboardingPreapprovedScreen: undefined
-  cardOnboardingProcessingScreen: undefined
+  cardOnboardingDeclinedScreen: undefined
+  cardOnboardingProcessingScreen: { applicationId: string }
   cardOnboardingApprovedScreen: undefined
   selfCustodialBackupMethod: undefined
   selfCustodialCloudBackup: undefined
