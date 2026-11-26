@@ -12,6 +12,7 @@ import {
   TransactionStatus,
   type NormalizedTransaction,
 } from "@app/types/transaction"
+import { toWalletId, type WalletState } from "@app/types/wallet"
 
 const ACCOUNT_A = "account-a"
 const ACCOUNT_B = "account-b"
@@ -36,7 +37,7 @@ let mockConnection: { sdk: typeof sdkA | null; connectedAccountId: string | null
 }
 let mockTransactions: NormalizedTransaction[] = []
 const mockLifecycle = {
-  wallets: [],
+  wallets: [] as WalletState[],
   status: "ready",
   sdkStableBalanceActive: false,
   lastPaymentEventKey: null,
@@ -247,6 +248,73 @@ describe("SelfCustodialWalletProvider — the transactions across an account swi
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
     await waitFor(() => expect(result.current.allTransactions).toEqual([]))
+  })
+})
+
+const btcWalletOf = (id: string, sats: number): WalletState => ({
+  id: toWalletId(id),
+  walletCurrency: WalletCurrency.Btc,
+  balance: { amount: sats, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+  transactions: [],
+})
+
+describe("SelfCustodialWalletProvider — the wallets across an account switch", () => {
+  const walletOfA = btcWalletOf("btc-of-a", 5000)
+  const walletOfB = btcWalletOf("btc-of-b", 700)
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockActiveAccountId = ACCOUNT_A
+    mockActiveAccountType = "self-custodial"
+    mockConnection = { sdk: sdkA, connectedAccountId: ACCOUNT_A }
+    mockTransactions = []
+    mockLifecycle.wallets = [walletOfA]
+    mockLifecycle.status = "ready"
+  })
+
+  afterAll(() => {
+    mockLifecycle.wallets = []
+  })
+
+  it("publishes the connection's wallets while it is the active account's", async () => {
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => expect(result.current.wallets).toEqual([walletOfA]))
+  })
+
+  it("publishes none of the previous account's wallets, and reads loading, once the account has switched", async () => {
+    const { result, rerender } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+    await waitFor(() => expect(result.current.wallets).toEqual([walletOfA]))
+
+    mockActiveAccountId = ACCOUNT_B
+    rerender(undefined)
+
+    expect(result.current.status).toBe("loading")
+    expect(result.current.wallets).toEqual([])
+  })
+
+  it("publishes the new account's wallets once its connection catches up", async () => {
+    mockActiveAccountId = ACCOUNT_B
+
+    const { result, rerender } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+    expect(result.current.wallets).toEqual([])
+
+    mockConnection = { sdk: sdkB, connectedAccountId: ACCOUNT_B }
+    mockLifecycle.wallets = [walletOfB]
+    rerender(undefined)
+
+    await waitFor(() => expect(result.current.wallets).toEqual([walletOfB]))
+    expect(result.current.status).toBe("ready")
+  })
+
+  it("keeps the same empty list across renders while the connection is another account's", () => {
+    mockActiveAccountId = ACCOUNT_B
+
+    const { result, rerender } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+    const first = result.current.wallets
+    rerender(undefined)
+
+    expect(result.current.wallets).toBe(first)
   })
 })
 
