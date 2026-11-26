@@ -58,7 +58,7 @@ import { useSendBalances } from "./hooks/use-send-wallets"
 import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
 import { PaymentSendExtraInfo } from "./payment-details/index.types"
 import { useReviewFeeText } from "./review/use-review-fee-text"
-import { useReviewQuote } from "./review/use-review-quote"
+import useFee from "./use-fee"
 import { PaymentErrorActions } from "./payment-error-actions"
 import {
   IDEMPOTENCY_KEY_UNAVAILABLE,
@@ -157,7 +157,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const { copyToClipboard } = useClipboard()
   const tierLabels = feeTierLabels(LL)
 
-  const { fee, recipientAmount, isAwaitingIncludedFee } = useReviewQuote(paymentDetail)
+  const fee = useFee(paymentDetail.getFee)
 
   const settledFee = fee.status === "set" ? fee : undefined
 
@@ -214,8 +214,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   } = useSendPayment(sendPaymentMutation, paymentDetail.idempotencyKeyRef)
   useHomeOnBackAfterSend(hasAttemptedSend)
 
-  // What the recipient gets: the amount less the fee, when the fee comes out of it.
-  const displayAmount = paymentDetail.convertMoneyAmount(recipientAmount, DisplayCurrency)
+  const displayAmount = paymentDetail.convertMoneyAmount(settlementAmount, DisplayCurrency)
 
   const currencyAmount = formatMoneyAmount({
     moneyAmount: displayAmount,
@@ -223,8 +222,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const secondaryAmount = getSecondaryAmountIfCurrencyIsDifferent({
     primaryAmount: displayAmount,
-    walletAmount: paymentDetail.convertMoneyAmount(recipientAmount, WalletCurrency.Btc),
-    displayAmount: paymentDetail.convertMoneyAmount(recipientAmount, DisplayCurrency),
+    walletAmount: paymentDetail.convertMoneyAmount(settlementAmount, WalletCurrency.Btc),
+    displayAmount: paymentDetail.convertMoneyAmount(settlementAmount, DisplayCurrency),
   })
 
   const satAmount = formatMoneyAmount({
@@ -234,7 +233,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   /** The hero pairs the display currency with the sending wallet's, the pair the keypad
    *  swaps between, led by whichever the sender typed in. */
   const heroWalletAmount = paymentDetail.convertMoneyAmount(
-    recipientAmount,
+    settlementAmount,
     sendingWalletDescriptor.currency,
   )
   const heroPrimaryAmount = leadsWithWalletCurrency ? heroWalletAmount : displayAmount
@@ -432,10 +431,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     ? paymentDetail.convertMoneyAmount(fee.amount, settlementAmount.currency)
     : zeroSettlementAmount
 
-  // A fee taken out of the amount is already inside it.
   const totalAmount = addMoneyAmounts({
     a: settlementAmount,
-    b: paymentDetail.isFeeIncluded ? zeroSettlementAmount : feeInSettlementCurrency,
+    b: feeInSettlementCurrency,
   })
 
   const skipBalanceCheck = isSendingMax || hasAttemptedSend
@@ -484,7 +482,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const isSliderDisabled =
     !validAmount ||
     !sendPayment ||
-    isAwaitingIncludedFee ||
     feeUnavailable ||
     dustNotEvaluable
 
