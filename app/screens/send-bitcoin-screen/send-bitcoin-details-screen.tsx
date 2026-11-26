@@ -383,8 +383,11 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   /**
    * The LNURL service's bounds, which the amount modal this screen replaced enforced before
    * it let an amount through. With the keypad in-screen they hold Next instead.
+   *
+   * Over the maximum, every further digit only goes further over. Under the minimum is
+   * where every amount starts as it is typed, on its way to a valid one.
    */
-  const lnurlBoundsErrorMessage = (() => {
+  const lnurlBoundsError = ((): { message: string; isOverMax: boolean } | undefined => {
     if (!lnurlParams || !paymentDetail.canSetAmount) return undefined
     const amount = paymentDetail.unitOfAccountAmount
     if (!amount.amount) return undefined
@@ -392,21 +395,28 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     if (lnurlParams.max) {
       const max = toBtcMoneyAmount(lnurlParams.max)
       if (greaterThan({ value: btcAmount, greaterThan: max })) {
-        return LL.AmountInputScreen.maxAmountExceeded({
-          maxAmount: formatMoneyAmount({ moneyAmount: max }),
-        })
+        return {
+          message: LL.AmountInputScreen.maxAmountExceeded({
+            maxAmount: formatMoneyAmount({ moneyAmount: max }),
+          }),
+          isOverMax: true,
+        }
       }
     }
     if (lnurlParams.min) {
       const min = toBtcMoneyAmount(lnurlParams.min)
       if (lessThan({ value: btcAmount, lessThan: min })) {
-        return LL.AmountInputScreen.minAmountNotMet({
-          minAmount: formatMoneyAmount({ moneyAmount: min }),
-        })
+        return {
+          message: LL.AmountInputScreen.minAmountNotMet({
+            minAmount: formatMoneyAmount({ moneyAmount: min }),
+          }),
+          isOverMax: false,
+        }
       }
     }
     return undefined
   })()
+  const lnurlBoundsErrorMessage = lnurlBoundsError?.message
 
   const handleCopyToClipboard = () => {
     copyToClipboard({
@@ -683,12 +693,13 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         onChangeAmount={clearAmount}
       />
       {/* An amount the sender fixes right here gets the light refusal, the too-low
-          on-chain amount once Next shows it. Over the daily limit and the sender's own
-          address open the error sheet, which buzzes for itself. Every other fee error is
-          the service's, so it stays silent. */}
+          on-chain amount once Next shows it. Under an LNURL minimum stays silent: the
+          amount is still being typed towards it, and the inline text already says so.
+          Over the daily limit and the sender's own address open the error sheet, which
+          buzzes for itself. Every other fee error is the service's, so it stays silent. */}
       <ErrorHaptic
         error={
-          lnurlBoundsErrorMessage ||
+          (lnurlBoundsError?.isOverMax ? lnurlBoundsError.message : undefined) ||
           (isLowFunds ? "lowFunds" : undefined) ||
           (amountStatus.validAmount && isFeeTierAmountTooLow
             ? feeTierErrorMessage

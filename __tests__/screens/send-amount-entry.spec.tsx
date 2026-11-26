@@ -20,8 +20,10 @@ import {
 import {
   createAmountLightningPaymentDetails,
   createIntraledgerPaymentDetails,
+  createLnurlPaymentDetails,
   PaymentDetail,
 } from "@app/screens/send-bitcoin-screen/payment-details"
+import { Satoshis, type LnUrlPayServiceResponse } from "lnurl-pay"
 import { createSelfCustodialOnchainPaymentDetails } from "@app/self-custodial/payment-details/onchain"
 import {
   MoneyAmount,
@@ -599,6 +601,99 @@ describe("free amount", () => {
  * hook to the screen. The SDK reserves the wallet's funds to quote, so it is asked once,
  * on Next, and never while the amount is typed.
  */
+describe("LNURL bounds", () => {
+  const lnurlDestination = (bounds: { min: number; max: number }) => {
+    const lnurlParams: LnUrlPayServiceResponse = {
+      callback: "https://example.com/cb",
+      fixed: false,
+      min: bounds.min as Satoshis,
+      max: bounds.max as Satoshis,
+      domain: "example.com",
+      metadata: [["text/plain", "Pay alice"]],
+      metadataHash: "",
+      identifier: "alice@example.com",
+      description: "Pay alice",
+      image: "",
+      commentAllowed: 0,
+      rawData: { metadata: '[["text/plain","Pay alice"]]' },
+    }
+    return {
+      valid: true,
+      validDestination: {
+        valid: true,
+        paymentType: PaymentType.Lnurl,
+        lnurl: "lnurl1alice",
+        lnurlParams,
+      },
+      destinationDirection: DestinationDirection.Send,
+      createPaymentDetail: <T extends WalletCurrency>({
+        convertMoneyAmount,
+        sendingWalletDescriptor,
+      }: CreatePaymentDetailParams<T>) =>
+        recordAmounts(
+          createLnurlPaymentDetails({
+            lnurl: "lnurl1alice",
+            lnurlParams,
+            unitOfAccountAmount: ZeroBtcMoneyAmount,
+            convertMoneyAmount,
+            sendingWalletDescriptor,
+            isMerchant: false,
+          }),
+        ),
+    } as unknown as PaymentDestination
+  }
+
+  const minNotMetText = /Amount must be at least/
+  const maxExceededText = /Amount must not exceed/
+
+  /** Every amount starts under a minimum as it is typed: ₦1 is about 4,200 sats, under the
+   *  10,000 minimum, on the way to ₦15, which is inside it and the balance. The inline text
+   *  says so while it lasts, but nothing was refused. */
+  it("stays silent while the amount is typed up past the minimum", async () => {
+    renderScreen(lnurlDestination({ min: 10000, max: 1000000 }))
+    await settle()
+
+    typeKeys("1")
+    await settle()
+    expect(screen.getByText(minNotMetText)).toBeTruthy()
+    expect(isNextDisabled()).toBe(true)
+
+    typeKeys("5")
+    await settle()
+    expect(screen.queryByText(minNotMetText)).toBeNull()
+    expect(isNextDisabled()).toBe(false)
+
+    expect(mockHapticTap).toHaveBeenCalledTimes(2)
+    expect(mockHapticReject).not.toHaveBeenCalled()
+  })
+
+  /** Over a maximum, each further digit only goes further over: ₦5 is about 20,800 sats,
+   *  past the 10,000 maximum. Once as it goes over, not again while it stays over, and
+   *  again after it comes back and goes over once more. */
+  it("buzzes a refusal each time the amount goes over the maximum", async () => {
+    renderScreen(lnurlDestination({ min: 1, max: 10000 }))
+    await settle()
+
+    typeKeys("5")
+    await settle()
+    expect(screen.getByText(maxExceededText)).toBeTruthy()
+    expect(mockHapticReject).toHaveBeenCalledTimes(1)
+
+    typeKeys("1")
+    await settle()
+    expect(mockHapticReject).toHaveBeenCalledTimes(1)
+
+    fireEvent.press(screen.getByTestId("Key ⌫"))
+    fireEvent.press(screen.getByTestId("Key ⌫"))
+    await settle()
+    expect(screen.queryByText(maxExceededText)).toBeNull()
+
+    typeKeys("5")
+    await settle()
+    expect(mockHapticReject).toHaveBeenCalledTimes(2)
+  })
+})
+
 describe("a self-custodial on-chain fee", () => {
   const ONCHAIN_ADDRESS = "bc1qamountentryspec"
   /** ₦1 is about 4,164 sats against the mocked price, ₦10 about 41,640. */
