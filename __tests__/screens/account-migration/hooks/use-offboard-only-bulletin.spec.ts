@@ -2,11 +2,27 @@ import { renderHook } from "@testing-library/react-native"
 
 import { useOffboardOnlyBulletin } from "@app/screens/account-migration/hooks/use-offboard-only-bulletin"
 import { AccountType } from "@app/types/wallet"
+import { WindDown, WindDownReason, WindDownStatus } from "@app/types/wind-down"
 
 let mockAccountType: AccountType = AccountType.Custodial
 
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: { type: mockAccountType } }),
+}))
+
+const offboardWindDown: WindDown = {
+  status: WindDownStatus.PreCutoff,
+  reason: WindDownReason.Region,
+  receiveDisabledAt: 1_790_000_000,
+  finalDeadline: 1_790_100_000,
+  gateArmsAt: 1_790_200_000,
+  timezone: "Asia/Dubai",
+}
+
+let mockWindDown: WindDown | null = offboardWindDown
+
+jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
+  useWindDownStatus: () => ({ windDown: mockWindDown, isPending: false }),
 }))
 
 let mockPhoneCountry: string | undefined = "AE"
@@ -41,6 +57,7 @@ describe("useOffboardOnlyBulletin", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockAccountType = AccountType.Custodial
+    mockWindDown = offboardWindDown
     mockPhoneCountry = "AE"
     mockOffboardOnlyCountries = ["AE", "NP", "DZ"]
     mockBalances.btcBalanceSats = 21_000
@@ -53,6 +70,36 @@ describe("useOffboardOnlyBulletin", () => {
     const { result } = renderHook(() => useOffboardOnlyBulletin())
 
     expect(result.current.isVisible).toBe(true)
+  })
+
+  it("carries the server's dates, phase and timezone for the card", () => {
+    mockWindDown = { ...offboardWindDown, status: WindDownStatus.ReceiveDisabled }
+
+    const { result } = renderHook(() => useOffboardOnlyBulletin())
+
+    expect(result.current.status).toBe(WindDownStatus.ReceiveDisabled)
+    expect(result.current.deadlineTimestamp).toBe(offboardWindDown.finalDeadline)
+    expect(result.current.receiveDisabledTimestamp).toBe(
+      offboardWindDown.receiveDisabledAt,
+    )
+    expect(result.current.timezone).toBe(offboardWindDown.timezone)
+  })
+
+  /** The card is dated by the server: with no wind-down there is no date to show. */
+  it("hides when the server reports no wind-down for the account", () => {
+    mockWindDown = null
+
+    const { result } = renderHook(() => useOffboardOnlyBulletin())
+
+    expect(result.current.isVisible).toBe(false)
+  })
+
+  it("skips the balance query when the server reports no wind-down", () => {
+    mockWindDown = null
+
+    renderHook(() => useOffboardOnlyBulletin())
+
+    expect(mockUseCustodialWalletBalances).toHaveBeenCalledWith({ skip: true })
   })
 
   it("never shows for a self-custodial account", () => {

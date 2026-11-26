@@ -3978,17 +3978,22 @@
     "migrateNowModal": {
       "title": "Fudukela ngoku kwiakhawunti engagcinwanga",
       "body": "Awusakwazi ukufumana imali kwiakhawunti yakho egcinwayo. UBlink uyekile inkonzo yokugcina kummandla wakho kwaye le akhawunti iza kuvalwa ekupheleni kuka-{date}.\n\nFudukela ngoku kwiakhawunti engagcinwanga.",
+      "bodyLevelZero": "Awusakwazi ukufumana imali kule akhawunti yovavanyo. UBlink uvala ii-akhawunti zovavanyo kwaye le akhawunti iza kuvalwa ekupheleni kuka-{date}.\n\nFudukela ngoku kwiakhawunti engagcinwanga.",
       "migrateCta": "Fuduka ngoku"
     },
     "reminderBulletin": {
       "title": "Kubalulekile",
       "body": "Yiya kwiakhawunti engagcinwanga ngofuduko olukhokelwayo, okanye ukhuphe imali yakho, phambi kwe-{date}. Ukufumana kuyakuma nge-{receiveStopsDate}.",
+      "bodySingleDate": "Yiya kwiakhawunti engagcinwanga ngofuduko olukhokelwayo, okanye ukhuphe imali yakho, phambi kwe-{date} — yonke into ifuduka ngokucofa kambalwa.",
+      "bodyLevelZero": "Yiya kwiakhawunti engagcinwanga ngofuduko olukhokelwayo, okanye ukhuphe imali yakho, phambi kwe-{date}.",
       "bodyReceiveDisabled": "Ukufumana kumile. Yiya kwiakhawunti engagcinwanga ngofuduko olukhokelwayo, okanye ukhuphe imali yakho, phambi kwe-{date}.",
       "migrateCta": "Fuduka"
     },
     "offboardBulletin": {
       "title": "Kubalulekile",
-      "body": "I-akhawunti yakho ibhaliswe kwingingqi apho singenako ukunikezela ngee-akhawunti. Rhoxisa imali yakho phambi komhla wama-31 ku-Agasti. Ukwamkela kuyayeka ngomhla we-10 ku-Agasti."
+      "bodyTwoDates": "UBlink akakwazi ukubonelela ngee-akhawunti ezigcinwayo kummandla wakho. Rhoxisa imali yakho phambi kwe-{date} — ngaphandle kwentlawulo kaBlink. Ukufumana kuyakuma nge-{receiveStopsDate}. Ukuba ukholelwa ukuba i-akhawunti yakho ichaphazeleke ngempazamo, ungaqinisekisa indawo ohlala kuyo ngoku kwi-app.",
+      "bodySingleDate": "UBlink akakwazi ukubonelela ngee-akhawunti ezigcinwayo kummandla wakho. Rhoxisa imali yakho phambi kwe-{date} — ngaphandle kwentlawulo kaBlink. Ukuba ukholelwa ukuba i-akhawunti yakho ichaphazeleke ngempazamo, ungaqinisekisa indawo ohlala kuyo ngoku kwi-app.",
+      "bodyReceiveOff": "UBlink akakwazi ukubonelela ngee-akhawunti ezigcinwayo kummandla wakho. Rhoxisa imali yakho phambi kwe-{date} — ngaphandle kwentlawulo kaBlink. Ukufumana kuvaliwe. Ukuba ukholelwa ukuba i-akhawunti yakho ichaphazeleke ngempazamo, ungaqinisekisa indawo ohlala kuyo ngoku kwi-app."
     },
     "dollarBalanceModal": {
       "title": "Asikwazi ukufudusa ibhalansi yakho yedola",
@@ -4044,8 +4049,10 @@
     "resumeFailed": "Kukho into engahambanga kakuhle ekuqhubekeni nofuduko lwakho. Nceda uqale kwakhona.",
     "migrationRequiredBody": "Lixesha lokufudusela iakhawunti yakho egcinwayo kwiakhawunti engagcinwanga.",
     "migrationRequiredForcedBody": "Lixesha lokufudusela iakhawunti yakho egcinwayo kwiakhawunti engagcinwanga. Iyafuneka ngenxa yezizathu zolawulo.\n\nSukukhathazeka, i-non-custodial iya kuba ngcono kuwe kwixesha elide.",
+    "migrationRequiredForcedBodyLevelZero": "UBlink uvala ii-akhawunti zovavanyo. Fudusela ibhalansi yakho kwiakhawunti engagcinwanga. Kuthatha ukucofa kambalwa nje.",
     "migrationGateTitle": "Iakhawunti ayifikeleleki",
     "migrationGateBody": "Ngenxa yezizathu zolawulo asikwazi ukubonelela ngeeakhawunti ze-custodial kwingingqi yakho. Dlulisela imali yakho kwiakhawunti ye-non-custodial ne-Blink ngokulandela amanyathelo alandelayo okanye uqhagamshelane nathi ku-<link>{email}</link>",
+    "migrationGateBodyLevelZero": "Ii-akhawunti zovavanyo ngoku zivaliwe. Ibhalansi yakho ikhuselekile. Yifudusele kwiakhawunti engagcinwanga ngokulandela amanyathelo alandelayo, simahla kwaye ngaphandle komda wexesha, okanye uqhagamshelane nathi ku-<link>{email}</link>",
     "bitcoinBalance": "Ibhalansi yeBitcoin",
     "dollarBalance": "Ibhalansi yedola",
     "moveToNonCustodial": "Fudukela kwi-non-custodial",

@@ -3978,17 +3978,22 @@
         "migrateNowModal": {
             "title": "Migrez maintenant vers un compte non-custodial",
             "body": "Vous ne pouvez plus recevoir de fonds sur votre compte custodial. Blink a mis fin au service custodial dans votre région et ce compte sera inactivé à la fin du {date}.\n\nMigrez maintenant vers un compte non-custodial.",
+            "bodyLevelZero": "Vous ne pouvez plus recevoir de fonds sur ce compte d'essai. Blink ferme les comptes d'essai et ce compte sera inactivé à la fin du {date}.\n\nMigrez maintenant vers un compte non-custodial.",
             "migrateCta": "Migrer maintenant"
         },
         "reminderBulletin": {
             "title": "Important",
             "body": "Passez à un compte non-custodial via la migration guidée, ou retirez vos fonds, avant le {date}. La réception s'arrête le {receiveStopsDate}.",
+            "bodySingleDate": "Passez à un compte non-custodial via la migration guidée, ou retirez vos fonds, avant le {date} — tout se fait en quelques gestes.",
+            "bodyLevelZero": "Passez à un compte non-custodial via la migration guidée, ou retirez vos fonds, avant le {date}.",
             "bodyReceiveDisabled": "La réception s'est arrêtée. Passez à un compte non-custodial via la migration guidée, ou retirez vos fonds, avant le {date}.",
             "migrateCta": "Migrer"
         },
         "offboardBulletin": {
             "title": "Important",
-            "body": "Votre compte est enregistré dans une région où nous ne pouvons pas proposer de comptes. Retirez vos fonds avant le 31 août. La réception s'arrête le 10 août."
+            "bodyTwoDates": "Blink ne peut pas proposer de comptes custodial dans votre région. Retirez vos fonds avant le {date} — sans aucuns frais de la part de Blink. La réception s'arrête le {receiveStopsDate}. Si vous pensez que votre compte a été concerné par erreur, vous pouvez vérifier votre lieu de résidence actuel dans l'app.",
+            "bodySingleDate": "Blink ne peut pas proposer de comptes custodial dans votre région. Retirez vos fonds avant le {date} — sans aucuns frais de la part de Blink. Si vous pensez que votre compte a été concerné par erreur, vous pouvez vérifier votre lieu de résidence actuel dans l'app.",
+            "bodyReceiveOff": "Blink ne peut pas proposer de comptes custodial dans votre région. Retirez vos fonds avant le {date} — sans aucuns frais de la part de Blink. La réception est désactivée. Si vous pensez que votre compte a été concerné par erreur, vous pouvez vérifier votre lieu de résidence actuel dans l'app."
         },
         "dollarBalanceModal": {
             "title": "Nous ne pouvons pas migrer votre solde en dollars",
@@ -4044,8 +4049,10 @@
         "resumeFailed": "Une erreur s'est produite lors de la reprise de votre migration. Veuillez la recommencer.",
         "migrationRequiredBody": "Il est temps de migrer votre compte custodial vers un compte non-custodial.",
         "migrationRequiredForcedBody": "Il est temps de migrer votre compte custodial vers un compte non-custodial. C'est requis pour des raisons réglementaires.\n\nPas d'inquiétude, le non-custodial sera meilleur pour vous à long terme.",
+        "migrationRequiredForcedBodyLevelZero": "Blink ferme les comptes d'essai. Transférez votre solde vers un compte non-custodial. Cela ne prend que quelques gestes.",
         "migrationGateTitle": "Compte non accessible",
         "migrationGateBody": "Pour des raisons réglementaires, nous ne pouvons pas fournir de comptes custodial dans votre région. Transférez vos fonds vers un compte non-custodial avec Blink en suivant les étapes suivantes ou contactez-nous à <link>{email}</link>",
+        "migrationGateBodyLevelZero": "Les comptes d'essai sont désormais fermés. Votre solde est en sécurité. Transférez-le vers un compte non-custodial en suivant les étapes suivantes, gratuitement et sans limite de temps, ou contactez-nous à <link>{email}</link>",
         "bitcoinBalance": "Solde Bitcoin",
         "dollarBalance": "Solde en dollars",
         "moveToNonCustodial": "Passer au non-custodial",

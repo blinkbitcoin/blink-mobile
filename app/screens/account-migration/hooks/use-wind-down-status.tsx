@@ -17,6 +17,7 @@ gql`
   query windDown {
     windDown {
       status
+      reason
       receiveDisabledAt
       finalDeadline
       gateArmsAt
@@ -31,6 +32,7 @@ const toWindDown = (node: WindDownQuery["windDown"]): WindDown | null => {
 
   return {
     status: node.status,
+    reason: node.reason,
     receiveDisabledAt: node.receiveDisabledAt,
     finalDeadline: node.finalDeadline,
     gateArmsAt: node.gateArmsAt,

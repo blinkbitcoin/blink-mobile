@@ -4,7 +4,7 @@ import {
   useMigrateNowPrompt,
   useMigrateNowRemedy,
 } from "@app/screens/account-migration/hooks/use-migrate-now-prompt"
-import { WindDown, WindDownStatus } from "@app/types/wind-down"
+import { WindDown, WindDownReason, WindDownStatus } from "@app/types/wind-down"
 import { AccountType } from "@app/types/wallet"
 
 let mockFeatureFlags = {
@@ -32,6 +32,7 @@ jest.mock("@app/screens/account-migration/hooks/use-custodial-owner-id", () => (
 /** A synthetic affected wind-down; each test swaps `status` on top of it. */
 const affectedWindDown: WindDown = {
   status: WindDownStatus.ReceiveDisabled,
+  reason: WindDownReason.Region,
   receiveDisabledAt: 1_790_000_000,
   finalDeadline: 1_790_100_000,
   gateArmsAt: 1_790_200_000,
@@ -115,6 +116,7 @@ describe("useMigrateNowPrompt", () => {
     expect(result.current.canReopen).toBe(true)
     expect(result.current.deadlineTimestamp).toBe(affectedWindDown.finalDeadline)
     expect(result.current.timezone).toBe(affectedWindDown.timezone)
+    expect(result.current.reason).toBe(affectedWindDown.reason)
   })
 
   it("stays quiet before the receive cutoff", () => {

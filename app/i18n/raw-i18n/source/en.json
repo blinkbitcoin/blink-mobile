@@ -3995,8 +3995,10 @@
         "migrationRequiredTitle": "Time to upgrade",
         "migrationRequiredBody": "It's time to migrate your custodial account to a non-custodial account.",
         "migrationRequiredForcedBody": "It's time to migrate your custodial account to a non-custodial account. It's required for regulatory reasons.\n\nNo need to worry, non-custodial will be better for you in the long term.",
+        "migrationRequiredForcedBodyLevelZero": "Blink is closing trial accounts. Move your balance to a non-custodial account. It only takes a few taps.",
         "migrationGateTitle": "Account not accessible",
         "migrationGateBody": "For regulatory reasons we cannot provide custodial accounts in your region. Transfer your funds to a non-custodial account with Blink by following the next steps or contact us at <link>{email}</link>",
+        "migrationGateBodyLevelZero": "Trial accounts are now closed. Your balance is safe. Move it to a non-custodial account by following the next steps, free and with no time limit, or contact us at <link>{email}</link>",
         "bitcoinBalance": "Bitcoin balance",
         "dollarBalance": "Dollar balance",
         "keepReceivingTitle": "Keep receiving as usual",
@@ -4053,17 +4055,22 @@
         "migrateNowModal": {
             "title": "Migrate now to a non-custodial account",
             "body": "You can no longer receive funds to your custodial account. Blink has discontinued custodial service in your region and this account will be inactivated by the end of {date: string}.\n\nMigrate now to a non-custodial account.",
+            "bodyLevelZero": "You can no longer receive funds to this trial account. Blink is closing trial accounts and this account will be inactivated by the end of {date: string}.\n\nMigrate now to a non-custodial account.",
             "migrateCta": "Migrate now"
         },
         "reminderBulletin": {
             "title": "Important",
             "body": "Move to a non-custodial account via guided migration, or withdraw, before {date: string}. Receiving stops {receiveStopsDate: string}.",
+            "bodySingleDate": "Move to a non-custodial account via guided migration, or withdraw, before {date: string} — everything moves in a few taps.",
+            "bodyLevelZero": "Move to a non-custodial account via guided migration, or withdraw, before {date: string}.",
             "bodyReceiveDisabled": "Receiving has stopped. Move to a non-custodial account via guided migration, or withdraw, before {date: string}.",
             "migrateCta": "Migrate"
         },
         "offboardBulletin": {
             "title": "Important",
-            "body": "Your account is registered in a region where we cannot offer accounts. Withdraw your funds before August 31. Receiving stops August 10."
+            "bodyTwoDates": "Blink cannot offer custodial accounts in your region. Withdraw your funds before {date: string} — free of any Blink charge. Receiving stops {receiveStopsDate: string}. If you believe your account has been affected in error, you can verify your current residence in the app.",
+            "bodySingleDate": "Blink cannot offer custodial accounts in your region. Withdraw your funds before {date: string} — free of any Blink charge. If you believe your account has been affected in error, you can verify your current residence in the app.",
+            "bodyReceiveOff": "Blink cannot offer custodial accounts in your region. Withdraw your funds before {date: string} — free of any Blink charge. Receiving is off. If you believe your account has been affected in error, you can verify your current residence in the app."
         },
         "contactSupport": {
             "title": "Contact support",

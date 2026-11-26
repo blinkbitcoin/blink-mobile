@@ -3978,17 +3978,22 @@
     "migrateNowModal": {
       "title": "Migreer nou na 'n nie-bewaarrekening",
       "body": "Jy kan nie meer fondse in jou bewaarrekening ontvang nie. Blink het die bewaardiens in jou streek gestaak en hierdie rekening sal teen die einde van {date} gedeaktiveer word.\n\nMigreer nou na 'n nie-bewaarrekening.",
+      "bodyLevelZero": "Jy kan nie meer fondse in hierdie proefrekening ontvang nie. Blink sluit proefrekeninge en hierdie rekening sal teen die einde van {date} gedeaktiveer word.\n\nMigreer nou na 'n nie-bewaarrekening.",
       "migrateCta": "Migreer nou"
     },
     "reminderBulletin": {
       "title": "Belangrik",
       "body": "Skuif na 'n nie-bewaarrekening via begeleide migrasie, of onttrek jou fondse, voor {date}. Ontvangs stop op {receiveStopsDate}.",
+      "bodySingleDate": "Skuif na 'n nie-bewaarrekening via begeleide migrasie, of onttrek jou fondse, voor {date} — alles skuif oor in 'n paar tikke.",
+      "bodyLevelZero": "Skuif na 'n nie-bewaarrekening via begeleide migrasie, of onttrek jou fondse, voor {date}.",
       "bodyReceiveDisabled": "Ontvangs het gestop. Skuif na 'n nie-bewaarrekening via begeleide migrasie, of onttrek jou fondse, voor {date}.",
       "migrateCta": "Migreer"
     },
     "offboardBulletin": {
       "title": "Belangrik",
-      "body": "Jou rekening is geregistreer in 'n streek waar ons nie rekeninge kan aanbied nie. Onttrek jou fondse voor 31 Augustus. Ontvangs stop 10 Augustus."
+      "bodyTwoDates": "Blink kan nie bewaarrekeninge in jou streek aanbied nie. Onttrek jou fondse voor {date} — sonder enige Blink-koste. Ontvangs stop op {receiveStopsDate}. As jy glo jou rekening is verkeerdelik geraak, kan jy jou huidige verblyf in die app verifieer.",
+      "bodySingleDate": "Blink kan nie bewaarrekeninge in jou streek aanbied nie. Onttrek jou fondse voor {date} — sonder enige Blink-koste. As jy glo jou rekening is verkeerdelik geraak, kan jy jou huidige verblyf in die app verifieer.",
+      "bodyReceiveOff": "Blink kan nie bewaarrekeninge in jou streek aanbied nie. Onttrek jou fondse voor {date} — sonder enige Blink-koste. Ontvangs is af. As jy glo jou rekening is verkeerdelik geraak, kan jy jou huidige verblyf in die app verifieer."
     },
     "dollarBalanceModal": {
       "title": "Ons kan nie jou dollarsaldo migreer nie",
@@ -4044,8 +4049,10 @@
     "resumeFailed": "Iets het verkeerd geloop met die hervatting van jou migrasie. Begin dit asseblief weer.",
     "migrationRequiredBody": "Dit is tyd om jou bewaarrekening na 'n nie-bewaarrekening te migreer.",
     "migrationRequiredForcedBody": "Dit is tyd om jou bewaarrekening na 'n nie-bewaarrekening te migreer. Dit word om regulatoriese redes vereis.\n\nGeen rede tot kommer nie, nie-bewaring sal op die lange duur beter vir jou wees.",
+    "migrationRequiredForcedBodyLevelZero": "Blink sluit proefrekeninge. Skuif jou saldo na 'n nie-bewaarrekening. Dit neem net 'n paar tikke.",
     "migrationGateTitle": "Rekening nie toeganklik nie",
     "migrationGateBody": "Om regulatoriese redes kan ons nie bewaarde rekeninge in jou streek verskaf nie. Dra jou fondse oor na 'n nie-bewaarde rekening by Blink deur die volgende stappe te volg of kontak ons by <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Proefrekeninge is nou gesluit. Jou saldo is veilig. Skuif dit na 'n nie-bewaarrekening deur die volgende stappe te volg, gratis en sonder tydsbeperking, of kontak ons by <link>{email}</link>",
     "bitcoinBalance": "Bitcoin-saldo",
     "dollarBalance": "Dollar-saldo",
     "moveToNonCustodial": "Skuif na nie-bewaarde",

@@ -4,7 +4,7 @@ import {
   useCustodialWindDown,
   useCustodialWindDownRead,
 } from "@app/screens/account-migration/hooks/use-custodial-wind-down"
-import { WindDown, WindDownStatus } from "@app/types/wind-down"
+import { WindDown, WindDownReason, WindDownStatus } from "@app/types/wind-down"
 import { AccountType } from "@app/types/wallet"
 
 let mockActiveAccount: { type: AccountType } | undefined
@@ -21,6 +21,7 @@ jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
 
 const affectedWindDown: WindDown = {
   status: WindDownStatus.ReceiveDisabled,
+  reason: WindDownReason.Region,
   receiveDisabledAt: 1_000,
   finalDeadline: 2_000,
   gateArmsAt: 3_000,

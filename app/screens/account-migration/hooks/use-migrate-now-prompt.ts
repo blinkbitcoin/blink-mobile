@@ -1,4 +1,4 @@
-import { WindDown, WindDownStatus } from "@app/types/wind-down"
+import { WindDown, WindDownReason, WindDownStatus } from "@app/types/wind-down"
 
 import { useAccountSessionDismissal } from "./use-account-session-dismissal"
 import { useCustodialWindDownRead } from "./use-custodial-wind-down"
@@ -35,6 +35,8 @@ type MigrateNowPrompt = {
   canReopen: boolean
   deadlineTimestamp: number
   timezone: string | undefined
+  /** Why the account is wound down; picks the Level 0 or the region copy. */
+  reason: WindDownReason | undefined
   dismissForSession: () => void
   reopen: () => void
 }
@@ -54,6 +56,7 @@ export const useMigrateNowPrompt = (): MigrateNowPrompt => {
     canReopen,
     deadlineTimestamp: windDown?.finalDeadline ?? 0,
     timezone: windDown?.timezone,
+    reason: windDown?.reason,
     dismissForSession,
     reopen,
   }

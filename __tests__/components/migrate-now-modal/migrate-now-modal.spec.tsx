@@ -10,6 +10,7 @@ jest.mock("react-native-modal", () =>
 )
 
 import { MigrateNowModal } from "@app/components/migrate-now-modal"
+import { WindDownReason } from "@app/types/wind-down"
 
 loadLocale("en")
 
@@ -43,6 +44,23 @@ describe("MigrateNowModal", () => {
     expect(getByText(TITLE)).toBeTruthy()
     expect(getByText(/by the end of August 31\./)).toBeTruthy()
     expect(getByText(/You can no longer receive funds/)).toBeTruthy()
+  })
+
+  it("keeps the region copy for a region wind-down", () => {
+    const { getByText } = renderModal({ reason: WindDownReason.Region })
+
+    expect(getByText(/discontinued custodial service in your region/)).toBeTruthy()
+  })
+
+  it("gives a Level 0 account the trial copy, with no region wording", () => {
+    const { getByText, queryByText } = renderModal({ reason: WindDownReason.LevelZero })
+
+    expect(
+      getByText(
+        "You can no longer receive funds to this trial account. Blink is closing trial accounts and this account will be inactivated by the end of August 31.\n\nMigrate now to a non-custodial account.",
+      ),
+    ).toBeTruthy()
+    expect(queryByText(/region|regulatory/i)).toBeNull()
   })
 
   it("starts the migration from the primary action without closing by itself", () => {

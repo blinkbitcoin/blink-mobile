@@ -3978,17 +3978,22 @@
     "migrateNowModal": {
       "title": "Migrează acum către un cont non-custodial",
       "body": "Nu mai poți primi fonduri în contul tău custodial. Blink a întrerupt serviciul custodial în regiunea ta, iar acest cont va fi inactivat până la sfârșitul zilei de {date}.\n\nMigrează acum către un cont non-custodial.",
+      "bodyLevelZero": "Nu mai poți primi fonduri în acest cont de probă. Blink închide conturile de probă, iar acest cont va fi inactivat până la sfârșitul zilei de {date}.\n\nMigrează acum către un cont non-custodial.",
       "migrateCta": "Migrează acum"
     },
     "reminderBulletin": {
       "title": "Important",
       "body": "Treci la un cont non-custodial prin migrarea ghidată sau retrage-ți fondurile înainte de {date}. Primirea se oprește pe {receiveStopsDate}.",
+      "bodySingleDate": "Treci la un cont non-custodial prin migrarea ghidată sau retrage-ți fondurile înainte de {date} — totul se mută în câteva atingeri.",
+      "bodyLevelZero": "Treci la un cont non-custodial prin migrarea ghidată sau retrage-ți fondurile înainte de {date}.",
       "bodyReceiveDisabled": "Primirea s-a oprit. Treci la un cont non-custodial prin migrarea ghidată sau retrage-ți fondurile înainte de {date}.",
       "migrateCta": "Migrează"
     },
     "offboardBulletin": {
       "title": "Important",
-      "body": "Contul tău este înregistrat într-o regiune în care nu putem oferi conturi. Retrage-ți fondurile înainte de 31 august. Primirea se oprește pe 10 august."
+      "bodyTwoDates": "Blink nu poate oferi conturi custodial în regiunea ta. Retrage-ți fondurile înainte de {date} — fără niciun cost din partea Blink. Primirea se oprește pe {receiveStopsDate}. Dacă crezi că acest lucru îți afectează contul din greșeală, îți poți verifica reședința actuală în aplicație.",
+      "bodySingleDate": "Blink nu poate oferi conturi custodial în regiunea ta. Retrage-ți fondurile înainte de {date} — fără niciun cost din partea Blink. Dacă crezi că acest lucru îți afectează contul din greșeală, îți poți verifica reședința actuală în aplicație.",
+      "bodyReceiveOff": "Blink nu poate oferi conturi custodial în regiunea ta. Retrage-ți fondurile înainte de {date} — fără niciun cost din partea Blink. Primirea este oprită. Dacă crezi că acest lucru îți afectează contul din greșeală, îți poți verifica reședința actuală în aplicație."
     },
     "dollarBalanceModal": {
       "title": "Nu îți putem migra soldul în dolari",
@@ -4044,8 +4049,10 @@
     "resumeFailed": "Ceva nu a mers bine la reluarea migrării. Te rugăm să o începi din nou.",
     "migrationRequiredBody": "Este timpul să îți migrezi contul custodial către un cont non-custodial.",
     "migrationRequiredForcedBody": "Este timpul să îți migrezi contul custodial către un cont non-custodial. Este necesar din motive de reglementare.\n\nNu-ți face griji, non-custodial va fi mai bun pentru tine pe termen lung.",
+    "migrationRequiredForcedBodyLevelZero": "Blink închide conturile de probă. Mută-ți soldul într-un cont non-custodial. Durează doar câteva atingeri.",
     "migrationGateTitle": "Cont inaccesibil",
     "migrationGateBody": "Din motive de reglementare nu putem oferi conturi custodial în regiunea ta. Transferă-ți fondurile într-un cont non-custodial cu Blink urmând pașii următori sau contactează-ne la <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Conturile de probă sunt acum închise. Soldul tău este în siguranță. Mută-l într-un cont non-custodial urmând pașii următori, gratuit și fără limită de timp, sau contactează-ne la <link>{email}</link>",
     "bitcoinBalance": "Sold Bitcoin",
     "dollarBalance": "Sold în dolari",
     "moveToNonCustodial": "Treci la non-custodial",
