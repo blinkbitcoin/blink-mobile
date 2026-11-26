@@ -13,13 +13,13 @@ import {
   IdempotencyKeyRef,
   SendPaymentMutation,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
-import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import {
   toBtcMoneyAmount,
   type MoneyAmount,
   type WalletAmount,
   type WalletOrDisplayCurrency,
 } from "@app/types/amounts"
+import { FeeTierOption } from "@app/types/fee-tiers"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 import { reportError } from "@app/utils/error-logging"
 

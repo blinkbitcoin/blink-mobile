@@ -11,8 +11,9 @@ const BACKWARD_ACTIONS = ["GO_BACK", "POP"]
  * Android hardware back and the iOS swipe. It reads `hasAttemptedSend` as the send hook
  * returns it, and stays on for the life of the mount.
  *
- * Only backward actions are redirected. The reset to the completed screen and the error
- * sheet's own exits (Change amount, Try again, Home) go through as they are.
+ * Only backward actions are redirected: the reset to the completed screen goes through as
+ * it is. A `goBack` from the screen itself lands Home too, so review offers no Change
+ * amount once a send was attempted.
  */
 export const useHomeOnBackAfterSend = (hasAttemptedSend: boolean) => {
   const navigation = useNavigation()

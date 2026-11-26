@@ -3689,8 +3689,14 @@
                 "paymentTitle": "Pagamento",
                 "acceptButton": "Accetta",
                 "payButton": "Continua e Paga",
-                "cardTitle": "Blink Privato",
+                "cardTitle": "Blink Orange",
+                "free": "Gratis",
+                "forNow": "per ora",
                 "perYear": "all'anno",
+                "freeBreakdown": {
+                    "card": "Blink Card",
+                    "memberBenefits": "Altri vantaggi per i membri"
+                },
                 "status": {
                     "label": "Stato",
                     "specialOfferLabel": "Offerta speciale",
@@ -3711,35 +3717,53 @@
                     "text": "Ho esaminato e accetto il",
                     "linkText": "Tariffario di Blink Card"
                 },
-                "renew": "Capisco che il mio abbonamento si rinnoverà automaticamente tra {months: number} mesi"
+                "renew": "Capisco che il mio abbonamento si rinnoverà automaticamente tra {months: number} mesi",
+                "freeNotice": "Capisco che Blink Orange è gratuito per ora e che in futuro potrebbe essere introdotta una quota di adesione, con preavviso"
+            },
+            "CardVerifyIdentity": {
+                "title": "Verifica la tua identità",
+                "description": "Per attivare la tua Blink Card, l'emittente della carta deve verificare chi sei (KYC). Ti serviranno:",
+                "requirements": {
+                    "governmentId": "Un documento d'identità ufficiale",
+                    "selfie": "Un selfie / verifica di vitalità",
+                    "proofOfAddress": "Una prova di residenza",
+                    "questions": "Alcune domande su di te"
+                },
+                "buttonText": "Continua"
             },
             "CardIntroducing": {
                 "title": "Presentazione",
                 "cardInfo": {
-                    "bitcoinCard": "La carta Visa Blink",
+                    "bitcoinCard": "La Blink Card",
                     "for": "per",
-                    "maximalist": "Massimalisti Bitcoin"
+                    "bitcoiners": "Bitcoiner"
                 },
                 "buttonText": "Continua"
             },
             "CardDetails": {
-                "title": "Vantaggi aggiuntivi",
+                "title": "Cosa è incluso",
                 "features": {
-                    "accountManager": "Account manager dedicato",
-                    "support": "Supporto prioritario",
-                    "onchainDeposits": "50% di rimborso sulle commissioni di transazione",
-                    "circularEconomies": "100 $ per le economie circolari"
+                    "card": {
+                        "title": "Blink Card",
+                        "subtitle": "la tua carta Visa, pronta oggi"
+                    },
+                    "accountManager": {
+                        "title": "Account manager personale",
+                        "subtitle": "e supporto prioritario"
+                    },
+                    "onOffRamping": "Entrate e uscite di denaro"
                 },
-                "andMore": "... e altro in arrivo nel 2026",
+                "availableIn": "tra {months} mesi",
+                "footnote": "Alcune funzionalità saranno disponibili entro {months} mesi. La carta è pronta oggi.",
                 "buttonText": "Continua"
             },
             "WelcomeOnboard": {
                 "welcomeMessage": {
                     "title": "Benvenuto a bordo",
-                    "subtitle": "In Blink Privato",
+                    "subtitle": "In Blink Orange",
                     "paragraphs": {
-                        "body1": "Qualcuno ha pensato a te e ha suggerito che dovremmo invitarti a Blink Privato. Probabilmente perché sei un fantastico Bitcoiner.",
-                        "body2": "Il nostro obiettivo per il 2026 è riempire il programma con tanti vantaggi che sarà ovvio rinnovare l'anno prossimo."
+                        "body1": "Qualcuno ha pensato a te e ha suggerito che dovremmo invitarti a Blink Orange. Probabilmente perché sei un fantastico Bitcoiner.",
+                        "body2": "Blink Orange è il primo livello della membership di Blink per i Bitcoiner, solo su invito. La Blink Card e il tuo account manager personale sono due dei primi servizi che offriamo — il resto lo stiamo costruendo fino al 2027."
                     }
                 },
                 "buttonText": "Andiamo"
@@ -3755,11 +3779,11 @@
                 "fields": {
                     "occupation": {
                         "label": "Occupazione",
-                        "placeholder": "Seleziona la tua occupazione"
+                        "placeholder": "Seleziona"
                     },
                     "annualSalaryRange": {
                         "label": "Stipendio annuale",
-                        "placeholder": "Seleziona la tua fascia di stipendio"
+                        "placeholder": "Seleziona lo stipendio"
                     },
                     "accountPurpose": {
                         "label": "Scopo dell'account",
@@ -3770,7 +3794,6 @@
                         "placeholder": "Seleziona la tua fascia di spesa"
                     }
                 },
-                "buttonText": "Invia richiesta",
                 "select": "seleziona"
             },
             "Acknowledgement": {
@@ -3786,17 +3809,21 @@
                     "and": ", e i",
                     "cardTermsLinkText": "Termini della carta Blink"
                 },
-                "certifyAccuracy": "Certifico che le informazioni che ho fornito sono accurate e che rispetterò tutte le regole e i requisiti relativi alla mia carta Blink Visa",
-                "acknowledgeSolicitation": "Riconosco che richiedere la carta Blink Visa non costituisce una sollecitazione non autorizzata"
+                "certifyAccuracy": "Certifico che le informazioni che ho fornito sono accurate e che rispetterò tutte le regole e i requisiti relativi alla mia carta Blink",
+                "acknowledgeSolicitation": "Riconosco che richiedere la carta Blink non costituisce una sollecitazione non autorizzata"
             },
             "CardPreapproved": {
-                "title": "Sei stato pre-approvato per la carta Blink Visa!",
+                "title": "La tua Blink Card è pronta!",
+                "subtitle": "Ora puoi attivare la tua carta e iniziare a usarla",
                 "buttonText": "Chiudi"
+            },
+            "CardDeclined": {
+                "title": "Non siamo riusciti ad approvare la tua richiesta di carta",
+                "subtitle": "Il tuo account manager ti contatterà."
             },
             "CardProcessing": {
                 "title": "Elaborazione della tua richiesta",
-                "subtitle": "Ti avviseremo non appena saremo pronti",
-                "buttonText": "Chiudi"
+                "subtitle": "Potrebbe volerci fino a un minuto"
             },
             "WelcomeInvest": {
                 "welcomeMessage": {

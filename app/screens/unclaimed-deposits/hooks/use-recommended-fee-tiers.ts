@@ -15,7 +15,7 @@ import {
   type FeeTierInfo,
   FeeTierOption,
   FeeTierOption as Tier,
-} from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
+} from "@app/types/fee-tiers"
 import { useQuoteStatus } from "@app/screens/send-bitcoin-screen/hooks/use-quote-status"
 
 const DEFAULT_TIERS = buildZeroTiers(ETA_MINUTES, FeeUnit.SatPerVbyte)

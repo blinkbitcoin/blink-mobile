@@ -7,7 +7,7 @@ import * as React from "react"
  * it needs the same stubs. Keeping them here means a change to the screen's
  * hooks is a one-line change instead of the same edit in three files.
  *
- * Pull each one in from inside the factory, the way card-flow-mocks is used:
+ * Pull each one in from inside the factory:
  *
  *   jest.mock("@rn-vui/themed", () =>
  *     jest.requireActual("../helpers/transaction-detail-mocks").mockThemedText(),
