@@ -18,7 +18,12 @@ import { PaymentSendCompletedStatus } from "@app/screens/send-bitcoin-screen/use
 import { DrainConversionReturn } from "@app/screens/conversion-flow/drain-conversion"
 import { AccountMode, AccountTypeMode, CreationBlockReason } from "@app/types/account"
 import { CardApplicationAnswers } from "@app/types/card-application"
-import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
+import {
+  CardCurrency,
+  DisplayCurrency,
+  MoneyAmount,
+  WalletOrDisplayCurrency,
+} from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
 import {
   LoginMethodAdditionParams,
@@ -146,7 +151,13 @@ export type RootStackParamList = {
   sendBitcoinConfirmation: {
     paymentDetail: PaymentDetail<WalletCurrency>
   }
-  conversionDetails: undefined
+  conversionDetails:
+    | {
+        /** The Card Balance as the destination, fixed: Add funds and the activation's
+         *  top-up move money into the card, never off it. */
+        destination?: CardCurrency
+      }
+    | undefined
   conversionConfirmation: {
     fromWalletCurrency: WalletCurrency
     moneyAmount: MoneyAmount<WalletOrDisplayCurrency>

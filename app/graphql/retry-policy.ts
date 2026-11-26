@@ -77,6 +77,11 @@ const noRetryOperations = [
   // One application per account: a resend after a lost answer is refused even when the
   // first attempt went through.
   "cardConsumerApplicationCreate",
+
+  // Each deposit into the Card Balance spends the account's cooldown between creates and
+  // one of its few pending deposits, so a resend is refused for a while. The caller
+  // reads blink-card's answer and waits before asking again.
+  "cardCollateralDepositIntentCreate",
 ]
 
 const IDEMPOTENCY_KEY_HEADER = "x-idempotency-key"

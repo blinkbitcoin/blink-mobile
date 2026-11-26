@@ -30,7 +30,9 @@ const MIGRATION_OPERATIONS = [
  *  registration: a resend after a lost answer is refused though the first turned it on.
  *  Removing the authenticator spends one of the hour's code checks on every try, as do
  *  the login method additions it guards. A card limit removal that landed leaves nothing
- *  for a resend to remove, and a card application that landed refuses a second one. */
+ *  for a resend to remove, and a card application that landed refuses a second one.
+ *  Each Card Balance deposit created spends the account's cooldown and one of its
+ *  pending deposits, so a resend is refused for a while. */
 const IRREVERSIBLE_OPERATIONS = [
   ...MIGRATION_OPERATIONS,
   "accountDelete",
@@ -40,6 +42,7 @@ const IRREVERSIBLE_OPERATIONS = [
   "userPhoneRegistrationValidate",
   "cardSpendingLimitRemove",
   "cardConsumerApplicationCreate",
+  "cardCollateralDepositIntentCreate",
 ]
 
 /**
