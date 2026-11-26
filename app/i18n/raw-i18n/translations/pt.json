@@ -4131,6 +4131,8 @@
         "pasteFailed": "Não foi possível ler da área de transferência. Digite sua frase de backup manualmente.",
         "enterWord": "Palavra",
         "invalidMnemonic": "Frase de backup inválida. Verifique se a ordem das palavras está correta.",
+        "invalidPhrase": "Frase de backup inválida. Verifique se a ordem das palavras está correta. Entre em contato com o <link>Suporte</link> se o problema persistir.",
+        "invalidWord": "Palavra inválida, verifique a ortografia",
         "restoring": "Restaurando sua carteira...",
         "restoreSuccess": "Carteira restaurada com sucesso",
         "restoreFailed": "Falha ao restaurar carteira. Tente novamente.",

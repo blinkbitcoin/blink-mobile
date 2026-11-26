@@ -4131,6 +4131,8 @@
         "pasteFailed": "No se pudo leer del portapapeles. Por favor ingresa tu frase de respaldo manualmente.",
         "enterWord": "Palabra",
         "invalidMnemonic": "Frase de respaldo no válida. Por favor verifica si el orden de las palabras es correcto.",
+        "invalidPhrase": "Frase de respaldo no válida. Por favor verifica si el orden de las palabras es correcto. Contacta a <link>Soporte</link> si el problema persiste.",
+        "invalidWord": "Palabra no válida, revisa la ortografía",
         "restoring": "Restaurando tu billetera...",
         "restoreSuccess": "Billetera restaurada exitosamente",
         "restoreFailed": "Error al restaurar la billetera. Por favor intenta de nuevo.",

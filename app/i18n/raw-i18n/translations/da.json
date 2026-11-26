@@ -4131,6 +4131,8 @@
     "pasteFailed": "Kunne ikke læse fra udklipsholderen. Indtast venligst din sikkerhedsfrase manuelt.",
     "enterWord": "Ord",
     "invalidMnemonic": "Ugyldig backup-frase. Kontroller venligst om ordrækkefølgen er korrekt.",
+    "invalidPhrase": "Ugyldig backup-frase. Kontroller venligst om ordrækkefølgen er korrekt. Kontakt <link>Support</link>, hvis problemet fortsætter.",
+    "invalidWord": "Ugyldigt ord, kontroller venligst stavningen",
     "restoring": "Gendanner din tegnebog...",
     "restoreSuccess": "Tegnebog genoprettet",
     "restoreFailed": "Kunne ikke gendanne tegnebogen. Prøv venligst igen.",

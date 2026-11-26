@@ -4131,6 +4131,8 @@
     "pasteFailed": "Čitanje iz međuspremnika nije uspjelo. Unesite svoju sigurnosnu frazu ručno.",
     "enterWord": "Riječ",
     "invalidMnemonic": "Neispravna pričuvna fraza. Provjerite je li redoslijed riječi točan.",
+    "invalidPhrase": "Neispravna pričuvna fraza. Provjerite je li redoslijed riječi točan. Ako se problem nastavi, kontaktirajte <link>podršku</link>.",
+    "invalidWord": "Neispravna riječ, provjerite pravopis",
     "restoring": "Obnavljanje vašeg novčanika...",
     "restoreSuccess": "Novčanik uspješno obnovljen",
     "restoreFailed": "Obnova novčanika nije uspjela. Pokušajte ponovo.",

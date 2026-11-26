@@ -4131,6 +4131,8 @@
     "pasteFailed": "Nem sikerült olvasni a vágólapról. Kérjük, add meg a biztonsági kifejezésed kézzel.",
     "enterWord": "Szó",
     "invalidMnemonic": "Érvénytelen biztonsági mentési kifejezés. Kérlek ellenőrizd, hogy a szavak sorrendje helyes-e.",
+    "invalidPhrase": "Érvénytelen biztonsági mentési kifejezés. Kérlek ellenőrizd, hogy a szavak sorrendje helyes-e. Ha a probléma továbbra is fennáll, fordulj az <link>ügyfélszolgálatunkhoz</link>.",
+    "invalidWord": "Érvénytelen szó, kérlek ellenőrizd a helyesírást",
     "restoring": "Tárca visszaállítása...",
     "restoreSuccess": "Tárca sikeresen visszaállítva",
     "restoreFailed": "Nem sikerült visszaállítani a tárcát. Kérjük, próbáld újra.",

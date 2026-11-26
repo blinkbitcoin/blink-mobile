@@ -4356,6 +4356,10 @@ const en: BaseTranslation = {
     pasteFailed: "Couldn't read from clipboard. Please enter your backup phrase manually.",
     enterWord: "Word",
     invalidMnemonic: "Invalid backup phrase. Please check if the word order is correct.",
+    // Inline under the phrase fields; <link> opens Support.
+    invalidPhrase:
+      "Invalid backup phrase. Please check if the word order is correct. Contact <link>Support</link> if problem persists.",
+    invalidWord: "Invalid word, please check the spelling",
     restoring: "Restoring your wallet...",
     restoreSuccess: "Wallet restored successfully",
     restoreFailed: "Failed to restore wallet. Please try again.",

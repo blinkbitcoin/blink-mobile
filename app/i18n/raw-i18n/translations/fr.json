@@ -4131,6 +4131,8 @@
         "pasteFailed": "Impossible de lire le presse-papier. Veuillez saisir votre phrase de sauvegarde manuellement.",
         "enterWord": "Mot",
         "invalidMnemonic": "Phrase de sauvegarde invalide. Veuillez vérifier si l'ordre des mots est correct.",
+        "invalidPhrase": "Phrase de sauvegarde invalide. Veuillez vérifier si l'ordre des mots est correct. Contactez l'<link>Assistance</link> si le problème persiste.",
+        "invalidWord": "Mot invalide, veuillez vérifier l'orthographe",
         "restoring": "Restauration de votre portefeuille...",
         "restoreSuccess": "Portefeuille restauré avec succès",
         "restoreFailed": "Échec de la restauration. Veuillez réessayer.",
