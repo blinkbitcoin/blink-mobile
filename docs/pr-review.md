@@ -421,7 +421,8 @@ Deep reviews label structural findings by principle, and authors answer per-prin
 ### Native / dependencies
 
 - [ ] patch-package changes: exact version pin, `--error-on-fail`, upstream issue filed
-      and linked in the patch (#3825).
+      and linked in the patch (#3825). `__tests__/patches/patch-policy.spec.ts` fails a
+      patch that misses the pin or the link; never add a new patch to its exceptions.
 - [ ] Audit fixes via `resolutions` (#3833); run `yarn deps:check` for RN ecosystem
       alignment.
 - [ ] New env vars: consider R8 embedding/extractability before adding secrets (#3877).
