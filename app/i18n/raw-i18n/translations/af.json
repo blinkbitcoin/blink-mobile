@@ -2354,6 +2354,7 @@
     "title": "Bevestig Betaling ",
     "totalLabel": "Totaal:",
     "totalExceed": "Die totaal is meer as jou saldo van {balance: string}",
+    "feeExceedsAmount": "Die netwerkfooi is meer as die bedrag wat jy stuur",
     "maxFeeSelected": "Hierdie is die maksimum fooi wat jy sal betaal vir hierdie transaksie. Dit mag dalk minder wees as die betaling voltooi is.",
     "invoiceAlreadyPaid": "Hierdie faktuur is reeds betaal",
     "somethingWentWrong": "Iets het verkeerd geloop",

@@ -2354,6 +2354,7 @@
     "title": "Bevestig Betaling",
     "totalLabel": "Totaal:",
     "totalExceed": "Totaal overschrijdt uw saldo van {balance: string}",
+    "feeExceedsAmount": "De netwerkkosten zijn hoger dan het bedrag dat u verstuurt",
     "maxFeeSelected": "Dit zijn de maximale kosten die voor deze transactie in rekening worden gebracht. Het kan uiteindelijk minder zijn zodra de betaling is gedaan.",
     "invoiceAlreadyPaid": "Deze factuur is al betaald",
     "somethingWentWrong": "Er is iets misgegaan",

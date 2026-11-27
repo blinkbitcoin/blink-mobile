@@ -7482,6 +7482,10 @@ type RootTranslation = {
 		 */
 		totalExceed: RequiredParams<'balance'>
 		/**
+		 * T​h​e​ ​n​e​t​w​o​r​k​ ​f​e​e​ ​i​s​ ​m​o​r​e​ ​t​h​a​n​ ​t​h​e​ ​a​m​o​u​n​t​ ​y​o​u​'​r​e​ ​s​e​n​d​i​n​g
+		 */
+		feeExceedsAmount: string
+		/**
 		 * T​h​i​s​ ​i​s​ ​t​h​e​ ​m​a​x​i​m​u​m​ ​f​e​e​ ​y​o​u​ ​w​i​l​l​ ​b​e​ ​c​h​a​r​g​e​d​ ​f​o​r​ ​t​h​i​s​ ​t​r​a​n​s​a​c​t​i​o​n​.​ ​ ​I​t​ ​m​a​y​ ​e​n​d​ ​u​p​ ​b​e​i​n​g​ ​l​e​s​s​ ​o​n​c​e​ ​t​h​e​ ​p​a​y​m​e​n​t​ ​h​a​s​ ​b​e​e​n​ ​m​a​d​e​.
 		 */
 		maxFeeSelected: string
@@ -22155,6 +22159,10 @@ export type TranslationFunctions = {
 		 * Total exceeds your balance of {balance}
 		 */
 		totalExceed: (arg: { balance: string }) => LocalizedString
+		/**
+		 * The network fee is more than the amount you're sending
+		 */
+		feeExceedsAmount: () => LocalizedString
 		/**
 		 * This is the maximum fee you will be charged for this transaction.  It may end up being less once the payment has been made.
 		 */

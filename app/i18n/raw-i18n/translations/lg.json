@@ -2354,6 +2354,7 @@
     "title": "Kakasa Okusasula",
     "totalLabel": "Omugatte:",
     "totalExceed": "Omugatte gusuka bbaansi wo eya {balance: string}",
+    "feeExceedsAmount": "Ebisale by'omukutu bisinga omuwendo gw'osindika",
     "maxFeeSelected": "Eno ye ssente ezisinga obunene z’ogenda okusasula ku mpanyisa eno. Kiyinza okumaliriza nga kitono nga okusasula kukoleddwa.",
     "invoiceAlreadyPaid": "Yinivoyisi eno yasasuddwa dda",
     "somethingWentWrong": "Waliwo ekikyamu ekigenze mumaso",

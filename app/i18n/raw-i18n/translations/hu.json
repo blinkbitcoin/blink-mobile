@@ -2354,6 +2354,7 @@
     "title": "Fizetés Megerősítése",
     "totalLabel": "Összesen:",
     "totalExceed": "Az összeg meghaladja az egyenleged, amely {balance: string}",
+    "feeExceedsAmount": "A hálózati díj több, mint az összeg, amit küldesz",
     "maxFeeSelected": "Ez a maximális díj, amit ezen tranzakcióért felszámíthatunk. Lehet, hogy kevesebb lesz, miután a fizetés megtörtént.",
     "invoiceAlreadyPaid": "Ez a fizetési kérelem már kifizetésre került",
     "somethingWentWrong": "Valami hiba történt",

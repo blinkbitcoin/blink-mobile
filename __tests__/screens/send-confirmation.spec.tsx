@@ -2697,15 +2697,43 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       await renderReview(feeIncludedRoute(1000))
 
       expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("900 SAT")
+      expect(
+        screen.queryByText(LL.SendBitcoinConfirmationScreen.feeExceedsAmount()),
+      ).toBeNull()
     })
 
-    it("keeps the slider off when the fee taken out would leave the recipient nothing", async () => {
+    it("holds the send, says why and offers Change amount when the fee taken out would leave the recipient nothing", async () => {
       mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
       btcFee(1200)
       await renderReview(feeIncludedRoute(1000))
 
       expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("0 SAT")
       expect(lastSliderProps().disabled).toBe(true)
+      expect(outlineColor()).toBe(colors.light.error)
+      expectInlineAndInSheet(LL.SendBitcoinConfirmationScreen.feeExceedsAmount())
+
+      const [chip] = screen.getAllByText(LL.SendBitcoinConfirmationScreen.changeAmount())
+      fireEvent.press(chip)
+      expectChangeAmountDispatched()
+    })
+
+    it("holds the send when the fee taken out is exactly the amount", async () => {
+      mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
+      btcFee(1000)
+      await renderReview(feeIncludedRoute(1000))
+
+      expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("0 SAT")
+      expectInlineAndInSheet(LL.SendBitcoinConfirmationScreen.feeExceedsAmount())
+    })
+
+    it("never blames the fee for a fee paid on top of the amount", async () => {
+      btcFee(1200)
+      await renderReview(buildOnchainRoute(1000))
+
+      expect(screen.getByTestId("Successful Fee")).toBeTruthy()
+      expect(
+        screen.queryByText(LL.SendBitcoinConfirmationScreen.feeExceedsAmount()),
+      ).toBeNull()
     })
 
     it("keeps the slider off until the fee it takes out is quoted", async () => {

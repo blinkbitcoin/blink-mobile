@@ -2354,6 +2354,7 @@
     "title": "Potvrdi plaćanje",
     "totalLabel": "Ukupno:",
     "totalExceed": "Ukupno premašuje vaš saldo od {balance: string}",
+    "feeExceedsAmount": "Mrežna naknada veća je od iznosa koji šaljete",
     "maxFeeSelected": "Ovo je najveća naknada koja će vam biti naplaćena za ovu transakciju. Nakon izvršenja plaćanja može ispasti manje.",
     "invoiceAlreadyPaid": "Ovaj račun je već plaćen",
     "somethingWentWrong": "Nešto je pošlo po zlu",

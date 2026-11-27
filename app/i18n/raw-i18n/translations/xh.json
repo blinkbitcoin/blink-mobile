@@ -2354,6 +2354,7 @@
     "title": "Qinisekisa intlawulo",
     "totalLabel": "Iyonke",
     "totalExceed": "Iyonke igqithile kwibhalansi yakho {balance: string}",
+    "feeExceedsAmount": "Intlawulo yenethiwekhi ingaphezulu kwesixa osithumelayo",
     "maxFeeSelected": "Lo ngowona mrhumo uphezulu oza kubizwa ngawo kule ntengiselwano. Inokuphela incinci xa intlawulo yenziwe.",
     "invoiceAlreadyPaid": "Le invoyisi sele ihlawuliwe",
     "somethingWentWrong": "Ikhona into engahambi kakuhle",

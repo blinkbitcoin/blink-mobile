@@ -2354,6 +2354,7 @@
         "title": "送金する",
         "totalLabel": "総額：",
         "totalExceed": "合計金額が{balance: string}を超えています",
+        "feeExceedsAmount": "ネットワーク手数料が送金額を上回っています",
         "maxFeeSelected": "これは今回のトランザクションで請求される手数料の上限です。 お取引完了後に、手数料は少なくなる場合があります。",
         "invoiceAlreadyPaid": "このインボイスは既に支払い済みです",
         "somethingWentWrong": "エラーが発生しました",

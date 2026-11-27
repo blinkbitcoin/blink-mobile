@@ -576,6 +576,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       })
     }
   }
+  // A fee that takes the whole amount leaves nothing: an amount error, so Change amount.
+  if (isFeeOverAmount && !invalidAmountErrorMessage)
+    invalidAmountErrorMessage = LL.SendBitcoinConfirmationScreen.feeExceedsAmount()
 
   const handleCopyToClipboard = (shown: string) => {
     copyToClipboard({
