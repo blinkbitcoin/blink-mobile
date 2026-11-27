@@ -24,7 +24,7 @@ import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
 import { TwoFactorSessionPrompt } from "@app/types/two-factor-enforcement"
 
-import { DEEP_LINK_SCREENS } from "./deep-link-screens"
+import { DEEP_LINK_SCREENS, getDeepLinkState } from "./deep-link-screens"
 import { isMigrationRoute } from "./migration-routes"
 import { RootStackParamList } from "./stack-param-lists"
 import { isSetupKeyAtStake } from "./two-factor-remedy-routes"
@@ -341,6 +341,7 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     config: {
       screens: DEEP_LINK_SCREENS,
     },
+    getStateFromPath: getDeepLinkState,
     getInitialURL: async () => {
       const url = await Linking.getInitialURL()
       setUrlAfterUnlockAndAuth(url)

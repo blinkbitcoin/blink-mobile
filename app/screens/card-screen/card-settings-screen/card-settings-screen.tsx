@@ -163,9 +163,9 @@ export const CardSettingsScreen: React.FC = () => {
                 <SwitchRow
                   title={LL.CardFlow.CardSettings.transactionAlerts()}
                   description={LL.CardFlow.CardSettings.transactionAlertsDescription()}
-                  value={isCategoryEnabled(NotificationCategory.Payments)}
+                  value={isCategoryEnabled(NotificationCategory.CardAlerts)}
                   onValueChange={(value) =>
-                    toggleCategory(NotificationCategory.Payments, value)
+                    toggleCategory(NotificationCategory.CardAlerts, value)
                   }
                 />
               ),

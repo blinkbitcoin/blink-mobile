@@ -8,6 +8,8 @@ import {
 const mockEnableMutate = jest.fn()
 const mockDisableMutate = jest.fn()
 const mockToastShow = jest.fn()
+/** The categories the server holds off; set per test before render. */
+const mockDisabledCategories: { current: string[] } = { current: ["Marketing"] }
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
@@ -19,7 +21,7 @@ jest.mock("@app/graphql/generated", () => ({
           notificationSettings: {
             push: {
               enabled: true,
-              disabledCategories: ["Marketing"],
+              disabledCategories: mockDisabledCategories.current,
             },
           },
         },
@@ -53,6 +55,7 @@ jest.mock("@app/utils/toast", () => ({
 describe("useNotificationToggle", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDisabledCategories.current = ["Marketing"]
   })
 
   it("returns isCategoryEnabled and toggleCategory", () => {
@@ -62,10 +65,10 @@ describe("useNotificationToggle", () => {
     expect(typeof result.current.toggleCategory).toBe("function")
   })
 
-  it("isCategoryEnabled returns true for Payments (not in disabledCategories)", () => {
+  it("isCategoryEnabled returns true for CardAlerts (not in disabledCategories)", () => {
     const { result } = renderHook(() => useNotificationToggle())
 
-    expect(result.current.isCategoryEnabled(NotificationCategory.Payments)).toBe(true)
+    expect(result.current.isCategoryEnabled(NotificationCategory.CardAlerts)).toBe(true)
   })
 
   it("isCategoryEnabled returns false for Marketing (in disabledCategories)", () => {
@@ -93,12 +96,12 @@ describe("useNotificationToggle", () => {
     const { result } = renderHook(() => useNotificationToggle())
 
     await act(async () => {
-      await result.current.toggleCategory(NotificationCategory.Payments, false)
+      await result.current.toggleCategory(NotificationCategory.CardAlerts, false)
     })
 
     expect(mockDisableMutate).toHaveBeenCalledWith({
       variables: {
-        input: { category: "Payments", channel: NotificationChannel.Push },
+        input: { category: "CardAlerts", channel: NotificationChannel.Push },
       },
     })
     expect(mockEnableMutate).not.toHaveBeenCalled()
@@ -119,5 +122,85 @@ describe("useNotificationToggle", () => {
         type: "warning",
       }),
     )
+  })
+  /** Until the server knows a category (CardAlerts, blink #221), it answers the toggle
+   *  with errors in the payload and leaves the settings as they were. */
+  const refusals = [
+    {
+      turned: "on",
+      enabled: true,
+      mutate: mockEnableMutate,
+      field: "accountEnableNotificationCategory",
+    },
+    {
+      turned: "off",
+      enabled: false,
+      mutate: mockDisableMutate,
+      field: "accountDisableNotificationCategory",
+    },
+  ]
+  for (const { turned, enabled, mutate, field } of refusals) {
+    it(`shows the warning toast when the server refuses turning a category ${turned}`, async () => {
+      mutate.mockResolvedValue({
+        data: { [field]: { errors: [{ message: "Invalid category" }] } },
+      })
+
+      const { result } = renderHook(() => useNotificationToggle())
+
+      await act(async () => {
+        await result.current.toggleCategory(NotificationCategory.CardAlerts, enabled)
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: "Failed to update notification settings",
+          type: "warning",
+        }),
+      )
+    })
+  }
+
+  it("shows no toast when the server takes the change", async () => {
+    mockDisableMutate.mockResolvedValue({
+      data: { accountDisableNotificationCategory: { errors: [] } },
+    })
+
+    const { result } = renderHook(() => useNotificationToggle())
+
+    await act(async () => {
+      await result.current.toggleCategory(NotificationCategory.CardAlerts, false)
+    })
+
+    expect(mockToastShow).not.toHaveBeenCalled()
+  })
+  /** Cards are on staging only, so no member has the old card switch's Payments opt-out.
+   *  An account that has one keeps it: the card switch reads its own category and leaves
+   *  the account-wide Payments mute alone. */
+  describe("with a legacy Payments opt-out from the old card switch", () => {
+    beforeEach(() => {
+      mockDisabledCategories.current = ["Payments"]
+    })
+
+    it("reads the card alerts as on", () => {
+      const { result } = renderHook(() => useNotificationToggle())
+
+      expect(result.current.isCategoryEnabled(NotificationCategory.CardAlerts)).toBe(true)
+    })
+
+    it("turns only the card alerts off, and keeps the Payments mute", async () => {
+      const { result } = renderHook(() => useNotificationToggle())
+
+      await act(async () => {
+        await result.current.toggleCategory(NotificationCategory.CardAlerts, false)
+      })
+
+      expect(mockDisableMutate).toHaveBeenCalledTimes(1)
+      expect(mockDisableMutate).toHaveBeenCalledWith({
+        variables: {
+          input: { category: "CardAlerts", channel: NotificationChannel.Push },
+        },
+      })
+      expect(mockEnableMutate).not.toHaveBeenCalled()
+    })
   })
 })

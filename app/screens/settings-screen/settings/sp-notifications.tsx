@@ -9,7 +9,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { NotificationCategories } from "../notifications-screen"
 import { SettingsRow } from "../row"
 
-const TOTAL_CATEGORIES = Object.keys(NotificationCategories).length
+const VISIBLE_CATEGORIES: readonly string[] = Object.values(NotificationCategories)
+const TOTAL_CATEGORIES = VISIBLE_CATEGORIES.length
 
 export const NotificationSetting: React.FC = () => {
   const { LL } = useI18nContext()
@@ -21,7 +22,12 @@ export const NotificationSetting: React.FC = () => {
   })
 
   const pushSettings = data?.me?.defaultAccount?.notificationSettings?.push
-  const disabledCount = pushSettings?.disabledCategories.length ?? 0
+  /** Only the categories this screen lists count: a category it doesn't show, such as
+   *  the card's alerts, is turned on and off in card settings. */
+  const disabledCount =
+    pushSettings?.disabledCategories.filter((category) =>
+      VISIBLE_CATEGORIES.includes(category),
+    ).length ?? 0
 
   const getStatusLabel = () => {
     if (disabledCount === 0) return LL.NotificationSettingsScreen.statusAll()
