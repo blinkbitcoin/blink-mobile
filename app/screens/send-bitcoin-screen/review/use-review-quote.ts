@@ -8,9 +8,10 @@ import useFee from "../use-fee"
  * The quote review stands on.
  *
  * When the fee comes out of the amount, the recipient gets the amount less the fee, so
- * that is the amount review leads with, and nothing is sent until the fee is quoted. No
- * payment sets `isFeeIncluded` yet: what is taken out of an amount is left to the senior
- * dev (blink-wip#1134, logic rule).
+ * that is the amount review leads with, and nothing is sent until the fee is quoted. The
+ * custodial on-chain send-all sets `isFeeIncluded`, since its mutation pays the fee out of
+ * the balance. Whether any other payment takes its fee out of the amount is left to the
+ * senior dev (blink-wip#1134, logic rule).
  */
 export const useReviewQuote = (paymentDetail: PaymentDetail<WalletCurrency>) => {
   const fee = useFee(paymentDetail.getFee)

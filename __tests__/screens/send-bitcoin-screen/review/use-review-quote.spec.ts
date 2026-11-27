@@ -4,7 +4,13 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { useReviewQuote } from "@app/screens/send-bitcoin-screen/review/use-review-quote"
 import { FeeType } from "@app/screens/send-bitcoin-screen/use-fee"
 import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
+import { createNoAmountOnchainPaymentDetails } from "@app/screens/send-bitcoin-screen/payment-details/onchain"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+
+import {
+  btcSendingWalletDescriptor,
+  convertMoneyAmountMock,
+} from "../../../payment-details/helpers"
 
 const mockUseFee = jest.fn<FeeType, [unknown]>()
 jest.mock("@app/screens/send-bitcoin-screen/use-fee", () => ({
@@ -100,5 +106,49 @@ describe("useReviewQuote", () => {
 
     mockUseFee.mockReturnValue({ status: "set", amount: toBtcMoneyAmount(5000) })
     expect(run().isFeeOverAmount).toBe(false)
+  })
+
+  /** The real send-all detail, not one with `isFeeIncluded` handed in, so a factory that
+   *  stops declaring it shows up here as the gross balance on review. */
+  describe("a custodial on-chain send-all", () => {
+    const balance = toBtcMoneyAmount(10_000)
+
+    const sendAll = () => {
+      const noAmount = createNoAmountOnchainPaymentDetails<WalletCurrency>({
+        address: "bc1qsendall",
+        convertMoneyAmount: convertMoneyAmountMock,
+        sendingWalletDescriptor: btcSendingWalletDescriptor,
+        unitOfAccountAmount: toBtcMoneyAmount(0),
+      })
+      if (!noAmount.canSetAmount) throw new Error("Amount is unable to be set")
+      return noAmount.setAmount(balance, true)
+    }
+
+    const runSendAll = () => renderHook(() => useReviewQuote(sendAll())).result.current
+
+    it("leads with the balance less the fee once quoted", () => {
+      mockUseFee.mockReturnValue({ status: "set", amount: toBtcMoneyAmount(300) })
+
+      expect(runSendAll()).toMatchObject({
+        recipientAmount: { amount: 9_700, currency: WalletCurrency.Btc },
+        isAwaitingIncludedFee: false,
+        isFeeOverAmount: false,
+      })
+    })
+
+    it("waits for the quote before anything is sent", () => {
+      mockUseFee.mockReturnValue({ status: "loading" })
+
+      expect(runSendAll().isAwaitingIncludedFee).toBe(true)
+    })
+
+    it("holds the send when the fee would take the whole balance", () => {
+      mockUseFee.mockReturnValue({ status: "set", amount: balance })
+
+      expect(runSendAll()).toMatchObject({
+        recipientAmount: { amount: 0, currency: WalletCurrency.Btc },
+        isFeeOverAmount: true,
+      })
+    })
   })
 })
