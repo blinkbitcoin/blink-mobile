@@ -305,4 +305,38 @@ describe("AmountSlider", () => {
       expect(screen.queryByTestId(AMOUNT_SLIDER_BADGE_TEST_ID)).toBeNull()
     })
   })
+
+  describe("before the track is laid out", () => {
+    it("reads any touch as 0%, with no travel to place it on", async () => {
+      const onSlide = jest.fn()
+      render(
+        <ContextForScreen>
+          <AmountSlider share={0} onSlide={onSlide} />
+        </ContextForScreen>,
+      )
+      await act(async () => {
+        await new Promise((resolve) => {
+          realSetImmediate(resolve)
+        })
+      })
+
+      await pan([
+        { state: State.BEGAN, x: xAt(60) },
+        { state: State.END, x: xAt(60) },
+      ])
+
+      expect(onSlide).toHaveBeenCalledWith(0)
+    })
+  })
+
+  describe("while disabled", () => {
+    it("takes no screen reader step", async () => {
+      const onSlide = await renderSlider({ share: 0.5, disabled: true })
+
+      swipe("increment")
+      swipe("decrement")
+
+      expect(onSlide).not.toHaveBeenCalled()
+    })
+  })
 })

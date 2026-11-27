@@ -936,6 +936,29 @@ describe("a self-custodial on-chain fee", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
+  it("tells review the slider was used when the high-fee sheet is accepted", async () => {
+    mockPrepareSend.mockResolvedValue({})
+    renderScreen(onchainDestination)
+    await settle()
+    slideTo(1)
+    await settle()
+    fireEvent.press(screen.getByTestId("send-hero-amount-primary"))
+    await settle()
+    for (let i = 0; i < 8; i += 1) fireEvent.press(screen.getByTestId("Key ⌫"))
+    typeKeys("3", "0", "0")
+    await settle()
+    fireEvent.press(nextButton())
+    await settle()
+
+    fireEvent.press(screen.getByText(LL.SendBitcoinScreen.highFeeSheet.acceptFee()))
+    await settle()
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "sendBitcoinConfirmation",
+      expect.objectContaining({ usedAmountSlider: true }),
+    )
+  })
+
   /** The quote is for the payment on screen when Next was pressed, so nothing on that
    *  payment may change until it lands: review would get a tier or note the user left. */
   describe("while the quote after Next is out", () => {
