@@ -3541,7 +3541,20 @@
       "importantDescription": "Vui lòng đảm bảo địa chỉ của bạn chính xác và đầy đủ.",
       "noPOBoxes": "Thẻ không thể giao đến hộp thư bưu điện",
       "signatureRequired": "Có thể yêu cầu chữ ký khi nhận hàng",
-      "supportedRegions": "Địa chỉ phải nằm trong vùng giao hàng được hỗ trợ"
+      "supportedRegions": "Địa chỉ phải nằm trong vùng giao hàng được hỗ trợ",
+      "useKycAddress": "Dùng địa chỉ KYC làm địa chỉ giao hàng",
+      "kycAddress": "Địa chỉ KYC",
+      "PrivacyTip": {
+        "title": "Mẹo về quyền riêng tư",
+        "description": "Thẻ sẽ được gửi đến địa chỉ này trong một phong bì kín đáo. Để tăng quyền riêng tư, bạn có thể gửi đến một địa chỉ khác nhà bạn."
+      }
+    },
+    "Delivery": {
+      "courier": "Giao hàng qua đơn vị chuyển phát",
+      "snailMail": "Giao hàng qua bưu điện thường",
+      "snailMailUnavailable": "Quá thiếu tin cậy để hỗ trợ",
+      "businessDays": "{day1}-{day2} ngày làm việc",
+      "free": "MIỄN PHÍ"
     },
     "PinScreens": {
       "common": {
@@ -3603,14 +3616,7 @@
       },
       "Delivery": {
         "title": "Chọn tốc độ giao hàng",
-        "subtitle": "Chọn tốc độ bạn muốn nhận thẻ mới",
-        "standardDelivery": "Giao hàng tiêu chuẩn",
-        "expressDelivery": "Giao hàng nhanh",
-        "businessDays": "{day1}-{day2} ngày làm việc",
-        "free": "MIỄN PHÍ",
-        "shippingAddress": "Địa chỉ giao hàng",
-        "useRegisteredAddress": "Sử dụng địa chỉ đã đăng ký làm địa chỉ giao hàng",
-        "chooseDeliverySpeed": "Chọn tốc độ giao hàng"
+        "subtitle": "Chọn tốc độ bạn muốn nhận thẻ mới"
       },
       "Confirm": {
         "title": "Xem lại yêu cầu của bạn",
@@ -3619,24 +3625,15 @@
         "delivery": "Giao hàng",
         "submitRequest": "Gửi yêu cầu",
         "importantInformation": "Thông tin quan trọng",
+        "samePin": "Thẻ mới của bạn sẽ có cùng mã PIN",
         "issueType": "Lý do",
         "deliveryTime": "Thời gian giao hàng",
-        "shippingCost": "Phí giao hàng",
-        "DamagedInfo": {
-          "bullet1": "Thẻ hiện tại của bạn sẽ vẫn hoạt động cho đến khi thẻ mới đến",
-          "bullet2": "Thẻ mới của bạn sẽ có số thẻ mới",
-          "bullet3": "Hủy thẻ bị hỏng của bạn khi thẻ mới đến"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Thẻ của bạn đã được khóa để bảo vệ bạn",
-          "bullet2": "Thẻ mới của bạn sẽ có số thẻ mới",
-          "bullet3": "Thẻ cũ của bạn sẽ bị hủy vĩnh viễn"
-        }
+        "shippingCost": "Phí giao hàng"
       },
       "Status": {
         "title": "Thẻ mới của bạn đang trên đường đến!",
         "subtitle": "Đơn đặt hàng giao thẻ Blink của bạn đã được gửi.",
-        "buttonLabel": "Bảng điều khiển"
+        "buttonLabel": "Quay lại bảng điều khiển"
       },
       "title": "Thay thẻ",
       "errors": {
@@ -3654,24 +3651,7 @@
       "Shipping": {
         "title": "Đặt thẻ vật lý của bạn",
         "subtitle": "Nhận thẻ Blink Visa được giao đến địa chỉ của bạn.",
-        "registeredAddress": "Địa chỉ đã đăng ký",
-        "useRegisteredAddress": "Dùng địa chỉ đã đăng ký làm địa chỉ giao hàng",
-        "delivery": "Giao hàng",
-        "standardDelivery": "Giao hàng tiêu chuẩn",
-        "expressDelivery": "Giao hàng nhanh",
-        "businessDays": "{day1}-{day2} ngày làm việc",
-        "free": "MIỄN PHÍ",
-        "deliveryInformation": "Thông tin giao hàng",
-        "bullet1": "Bạn sẽ nhận thông tin theo dõi qua email",
-        "bullet2": "Có thể cần chữ ký khi giao hàng",
-        "bullet3": "Thẻ sẽ được gửi trong bao bì kín đáo",
-        "bullet4": "Kích hoạt thẻ khi nhận được",
-        "cardFeatures": "Tính năng của thẻ",
-        "feature1": "Công nghệ thanh toán không tiếp xúc",
-        "feature2": "Chip EMV tăng cường bảo mật",
-        "feature3": "Dải từ để chấp nhận rộng rãi",
-        "feature4": "Tên của bạn được dập nổi trên thẻ",
-        "important": "Quan trọng"
+        "delivery": "Giao hàng"
       },
       "Confirm": {
         "title": "Xác nhận đơn hàng",
@@ -3682,12 +3662,7 @@
         "deliveryTime": "Thời gian giao hàng",
         "shippingCost": "Phí giao hàng",
         "shippingAddress": "Địa chỉ giao hàng",
-        "placeOrder": "Đặt hàng",
-        "important": "Quan trọng",
-        "bullet1": "Thẻ ảo của bạn sẽ vẫn hoạt động trong khi chờ thẻ vật lý",
-        "bullet2": "Bạn cần kích hoạt thẻ vật lý khi nhận được",
-        "bullet3": "Cả hai thẻ sẽ có cùng số thẻ và thông tin",
-        "bullet4": "Không thể thay đổi địa chỉ giao hàng sau khi đặt hàng"
+        "placeOrder": "Đặt hàng"
       },
       "errors": {
         "createFailed": "Không thể đặt thẻ vật lý của bạn. Vui lòng thử lại."

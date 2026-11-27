@@ -1,32 +1,27 @@
 import React from "react"
-import { View } from "react-native"
 
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { useTheme } from "@rn-vui/themed"
 
 import {
-  MultiLineField,
+  PrivacyTipCard,
   SelectableOptionRow,
   ShippingAddressForm,
 } from "@app/components/card-screen"
-import { CheckboxRow } from "@app/components/checkbox-row"
-import { useRemoteConfig } from "@app/config/feature-flags-context"
-import { WalletCurrency } from "@app/graphql/generated"
-import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { useCourierDelivery } from "@app/screens/card-screen/hooks"
+import { KycAddressChoice } from "@app/screens/card-screen/kyc-address-choice"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 
 import { Delivery, DeliveryType, ShippingAddress } from "@app/screens/card-screen/types"
-import { addressToLines } from "@app/screens/card-screen/utils"
 
 import { useSharedStepStyles } from "./shared-styles"
 
 type DeliveryStepProps = {
-  selectedDelivery: DeliveryType | null
+  selectedDelivery: DeliveryType
   onSelectDelivery: (delivery: DeliveryType) => void
-  hasRegisteredAddress: boolean
-  registeredAddress: ShippingAddress
-  useRegisteredAddress: boolean
-  onToggleUseRegisteredAddress: () => void
+  kycAddress: ShippingAddress | null
+  useKycAddress: boolean
+  onToggleUseKycAddress: () => void
   customAddress: ShippingAddress
   onCustomAddressChange: (address: ShippingAddress) => void
 }
@@ -34,41 +29,27 @@ type DeliveryStepProps = {
 export const DeliveryStep: React.FC<DeliveryStepProps> = ({
   selectedDelivery,
   onSelectDelivery,
-  hasRegisteredAddress,
-  registeredAddress,
-  useRegisteredAddress,
-  onToggleUseRegisteredAddress,
+  kycAddress,
+  useKycAddress,
+  onToggleUseKycAddress,
   customAddress,
   onCustomAddressChange,
 }) => {
   const sharedStyles = useSharedStepStyles()
-  const localStyles = useLocalStyles()
   const {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const { replaceCardDeliveryConfig } = useRemoteConfig()
-  const { formatCurrency } = useDisplayCurrency()
+  const courier = useCourierDelivery()
 
-  const { Delivery: deliveryLL } = LL.CardFlow.ReplaceCard
-
-  const getDays = (type: DeliveryType) => {
-    const config = replaceCardDeliveryConfig[type]
-    return deliveryLL.businessDays({
-      day1: config.minDays.toString(),
-      day2: config.maxDays.toString(),
-    })
-  }
-
-  const getPrice = (type: DeliveryType) => {
-    const { priceUsd } = replaceCardDeliveryConfig[type]
-    return priceUsd === 0
-      ? deliveryLL.free()
-      : formatCurrency({ amountInMajorUnits: priceUsd, currency: WalletCurrency.Usd })
-  }
+  const deliveryLL = LL.CardFlow.Delivery
+  const courierPriceColor = courier.isReplacementFree
+    ? colors.success
+    : colors.textOnBackground
 
   return (
     <>
+      {/* Snail mail is shown greyed and not offered: cards ship by courier. */}
       <SettingsGroup
         containerStyle={sharedStyles.settingsGroupContainer}
         dividerStyle={sharedStyles.dividerStyle}
@@ -77,62 +58,40 @@ export const DeliveryStep: React.FC<DeliveryStepProps> = ({
             <SelectableOptionRow
               icon="delivery"
               iconColor={colors.textMuted}
-              title={deliveryLL.standardDelivery()}
-              subtitle={getDays(Delivery.Standard)}
-              value={getPrice(Delivery.Standard)}
-              valueColor={colors.success}
-              isSelected={selectedDelivery === Delivery.Standard}
-              onPress={() => onSelectDelivery(Delivery.Standard)}
+              title={deliveryLL.snailMail()}
+              subtitle={deliveryLL.snailMailUnavailable()}
+              isSelected={false}
+              isDisabled
             />
           ),
           () => (
             <SelectableOptionRow
               icon="lightning"
               iconColor={colors.textMuted}
-              title={deliveryLL.expressDelivery()}
-              subtitle={getDays(Delivery.Express)}
-              value={getPrice(Delivery.Express)}
-              valueColor={colors.textOnBackground}
-              isSelected={selectedDelivery === Delivery.Express}
-              onPress={() => onSelectDelivery(Delivery.Express)}
+              title={courier.title}
+              subtitle={courier.businessDays}
+              value={courier.replacementPrice}
+              valueColor={courierPriceColor}
+              isSelected={selectedDelivery === Delivery.Courier}
+              onPress={() => onSelectDelivery(Delivery.Courier)}
             />
           ),
         ]}
       />
 
-      {hasRegisteredAddress && useRegisteredAddress && (
-        <View style={sharedStyles.section}>
-          <Text style={sharedStyles.sectionTitle}>{deliveryLL.shippingAddress()}</Text>
-          <MultiLineField
-            lines={addressToLines(registeredAddress, false)}
-            leftIcon="map-pin"
-          />
-        </View>
-      )}
+      <PrivacyTipCard />
 
-      <View style={localStyles.checkboxFormGroup}>
-        {hasRegisteredAddress && (
-          <CheckboxRow
-            label={deliveryLL.useRegisteredAddress()}
-            isChecked={useRegisteredAddress}
-            onPress={onToggleUseRegisteredAddress}
-          />
-        )}
-
-        {!useRegisteredAddress && (
-          <ShippingAddressForm
-            address={customAddress}
-            onAddressChange={onCustomAddressChange}
-            showFullName={false}
-          />
-        )}
-      </View>
+      <KycAddressChoice
+        kycAddress={kycAddress}
+        isKycAddressUsed={useKycAddress}
+        onToggle={onToggleUseKycAddress}
+      >
+        <ShippingAddressForm
+          address={customAddress}
+          onAddressChange={onCustomAddressChange}
+          showFullName={false}
+        />
+      </KycAddressChoice>
     </>
   )
 }
-
-const useLocalStyles = makeStyles(() => ({
-  checkboxFormGroup: {
-    gap: 17,
-  },
-}))

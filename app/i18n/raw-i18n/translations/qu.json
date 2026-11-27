@@ -3541,7 +3541,20 @@
       "importantDescription": "Please ensure your address is accurate and complete.",
       "noPOBoxes": "Cards cannot be delivered to P.O. boxes",
       "signatureRequired": "Signature may be required upon delivery",
-      "supportedRegions": "Address must be within supported shipping regions"
+      "supportedRegions": "Address must be within supported shipping regions",
+      "useKycAddress": "KYC tiyakuyta apachina tiyakuy hina llamk'achiy",
+      "kycAddress": "KYC tiyakuy",
+      "PrivacyTip": {
+        "title": "Pakasqa kawsaypaq yuyaychay",
+        "description": "Tarjetaqa kay tiyakuyman mana rikuchikuq sobreypi apachisqa kanqa. Aswan pakasqa kananpaq, wasiykimanta hukniray tiyakuyman apachiyta munawaq."
+      }
+    },
+    "Delivery": {
+      "courier": "Kuriyerwan apachiy",
+      "snailMail": "Postawan apachiy",
+      "snailMailUnavailable": "Mana iñiy atinachu, manam qunchikchu",
+      "businessDays": "{day1}-{day2} llamk'ana p'unchaykuna",
+      "free": "MANA QULLQI"
     },
     "PinScreens": {
       "common": {
@@ -3603,14 +3616,7 @@
       },
       "Delivery": {
         "title": "Akllay imaynapin apachimunki",
-        "subtitle": "Akllay mayk'aqpin musuq tarjetaykita chaskiyta munanki",
-        "standardDelivery": "Sapaq apachiy",
-        "expressDelivery": "Usqhay apachiy",
-        "businessDays": "{day1}-{day2} llamk'ay p'unchawkuna",
-        "free": "QHASILLA",
-        "shippingAddress": "Apachina dirección",
-        "useRegisteredAddress": "Qillqasqa direcciónta apachina dirección hina llamk'achiy",
-        "chooseDeliverySpeed": "Apachiyta ajllay"
+        "subtitle": "Akllay mayk'aqpin musuq tarjetaykita chaskiyta munanki"
       },
       "Confirm": {
         "title": "Mañakusqaykita qhaway",
@@ -3619,24 +3625,15 @@
         "delivery": "Apachiy",
         "submitRequest": "Mañakuyta apachiy",
         "importantInformation": "Allin yuyaykuna",
+        "samePin": "Musuq tarjetaykiqa kikin PIN-niyuqmi kanqa",
         "issueType": "Imarayku",
         "deliveryTime": "Apachiy pacha",
-        "shippingCost": "Apachiy chanin",
-        "DamagedInfo": {
-          "bullet1": "Kunan tarjetayki kawsaqlla kanqa musuq chayamunankama",
-          "bullet2": "Musuq tarjetayki musuq yupayniyuq kanqa",
-          "bullet3": "Waqlisqa tarjetaykita chinkachiy musuq chayamuptin"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Tarjetayki wichqasqa karqan qamta waqaychasunaykirayku",
-          "bullet2": "Musuq tarjetayki musuq yupayniyuq kanqa",
-          "bullet3": "Ñawpa tarjetayki wiñaypaq huchusqa kanqa"
-        }
+        "shippingCost": "Apachiy chanin"
       },
       "Status": {
         "title": "Musuq tarjetayki ñanpim kachkan!",
         "subtitle": "Blink tarjetaykipa apachiy kamachikuyqa kachisqañam.",
-        "buttonLabel": "Ñawpaq panqa"
+        "buttonLabel": "Ñawpaq panqaman kutiy"
       },
       "title": "Tarjetata tikray",
       "errors": {
@@ -3654,24 +3651,7 @@
       "Shipping": {
         "title": "Tarjeta física mañakuy",
         "subtitle": "Blink Visa tarjetaykiqa direcciónta apachisqa kanqa.",
-        "registeredAddress": "Qillqasqa dirección",
-        "useRegisteredAddress": "Qillqasqa direcciónta apachina dirección hina llamk'achiy",
-        "delivery": "Apachiy",
-        "standardDelivery": "Estándar apachiy",
-        "expressDelivery": "Express apachiy",
-        "businessDays": "{day1}-{day2} llamk'ana p'unchaykuna",
-        "free": "MANA QULLQI",
-        "deliveryInformation": "Apachiy willakuy",
-        "bullet1": "Email-manta qhawariy willakuyta chaskinki",
-        "bullet2": "Apachiykuchkanqa firmayta munachkanman",
-        "bullet3": "Tarjetaqa pakasqa envoltura-pi apachisqa kanqa",
-        "bullet4": "Chayamupataq tarjetaykita llamk'achiy",
-        "cardFeatures": "Tarjetap ruwasqankuna",
-        "feature1": "Mana llalliywan pagay teknuluxiya",
-        "feature2": "EMV chip aswan allin waqaychaypaq",
-        "feature3": "Magnetic stripe llapanwan chaskiypaq",
-        "feature4": "Sutiyki tarjeta patapi reliefe-wan",
-        "important": "Allin yuyaykuna"
+        "delivery": "Apachiy"
       },
       "Confirm": {
         "title": "Mañakuyta takyachiy",
@@ -3682,12 +3662,7 @@
         "deliveryTime": "Apachiy pacha",
         "shippingCost": "Apachiy chanin",
         "shippingAddress": "Apachina dirección",
-        "placeOrder": "Mañakuyta apachiy",
-        "important": "Allin yuyaykuna",
-        "bullet1": "Virtual tarjetayki kawsaqllam kanqa físico tarjetata suyaykuchkanki",
-        "bullet2": "Físico tarjetata chayamupataq llamk'achiyta munanki",
-        "bullet3": "Iskay tarjetakuna kikin yupayniyuqmi kanqa",
-        "bullet4": "Apachiy suti mana tikrayta atinchu rantiyta ruwasqamanta qhipaman"
+        "placeOrder": "Mañakuyta apachiy"
       },
       "errors": {
         "createFailed": "Mana atinichu tarjeta físicaykita mañayta. Ama hina kaspa, musuqmanta ruway."

@@ -24,8 +24,7 @@ jest.mock("react-native-reanimated", () => {
 jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => ({
     replaceCardDeliveryConfig: {
-      standard: { minDays: 7, maxDays: 10, priceUsd: 0 },
-      express: { minDays: 1, maxDays: 2, priceUsd: 15 },
+      courier: { minDays: 3, maxDays: 7, priceUsd: 0 },
     },
   }),
 }))
@@ -50,6 +49,7 @@ jest.mock(
 )
 
 jest.mock("@app/screens/card-screen/utils", () => ({
+  ...jest.requireActual("@app/screens/card-screen/utils"),
   addressToLines: jest.requireActual<typeof import("../helpers/mock-address-utils")>(
     "../helpers/mock-address-utils",
   ).mockAddressToLines,
@@ -78,6 +78,7 @@ jest.mock("@app/screens/card-screen/card-shipping-address-screen/hooks", () => (
       postalCode: "10001",
       countryCode: "US",
     },
+    kycAddress: null,
     loading: false,
   }),
 }))
@@ -313,8 +314,25 @@ describe("ReplaceCardScreen", () => {
 
       await advanceToStep2(getByText)
 
-      expect(getByText("Standard delivery")).toBeTruthy()
-      expect(getByText("Express delivery")).toBeTruthy()
+      expect(getByText("Snail mail delivery")).toBeTruthy()
+      expect(getByText("Courier delivery")).toBeTruthy()
+    })
+
+    /** A new address, never the one on file, under the tip (D42, D123). */
+    it("shows the privacy tip and an empty address form", async () => {
+      const { getByText, queryByText } = render(
+        <ContextForScreen>
+          <ReplaceCardScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      await advanceToStep2(getByText)
+
+      expect(getByText("Privacy tip")).toBeTruthy()
+      expect(getByText("Address line 1")).toBeTruthy()
+      expect(queryByText("123 Main Street")).toBeNull()
     })
   })
 
@@ -326,10 +344,6 @@ describe("ReplaceCardScreen", () => {
 
       await act(async () => {
         fireEvent.press(getByText("Continue"))
-      })
-
-      await act(async () => {
-        fireEvent.press(getByText("Standard delivery"))
       })
 
       await act(async () => {
@@ -377,10 +391,11 @@ describe("ReplaceCardScreen", () => {
       expect(mockReplace).toHaveBeenCalledWith("cardStatusScreen", {
         title: "Your new card is on the way!",
         subtitle: "Order for delivery of your Blink Card has been submitted.",
-        buttonLabel: "Dashboard",
+        buttonLabel: "Back to dashboard",
         navigateTo: "cardDashboardScreen",
         iconName: "delivery",
         iconColor: expect.any(String),
+        isWalletPrimary: true,
         lastFour: "4321",
         cardId: "replacement-card",
       })

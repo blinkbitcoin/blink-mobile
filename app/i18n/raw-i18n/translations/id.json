@@ -3541,7 +3541,20 @@
       "importantDescription": "Pastikan alamat Anda akurat dan lengkap.",
       "noPOBoxes": "Kartu tidak dapat dikirim ke kotak pos",
       "signatureRequired": "Tanda tangan mungkin diperlukan saat pengiriman",
-      "supportedRegions": "Alamat harus berada dalam wilayah pengiriman yang didukung"
+      "supportedRegions": "Alamat harus berada dalam wilayah pengiriman yang didukung",
+      "useKycAddress": "Gunakan alamat KYC sebagai alamat pengiriman",
+      "kycAddress": "Alamat KYC",
+      "PrivacyTip": {
+        "title": "Tips privasi",
+        "description": "Kartu akan dikirim ke alamat ini dalam amplop yang tidak mencolok. Untuk privasi lebih, Anda dapat mengirimkannya ke alamat selain rumah Anda."
+      }
+    },
+    "Delivery": {
+      "courier": "Pengiriman kurir",
+      "snailMail": "Pengiriman pos biasa",
+      "snailMailUnavailable": "Terlalu tidak andal untuk didukung",
+      "businessDays": "{day1}-{day2} hari kerja",
+      "free": "GRATIS"
     },
     "PinScreens": {
       "common": {
@@ -3603,14 +3616,7 @@
       },
       "Delivery": {
         "title": "Pilih kecepatan pengiriman",
-        "subtitle": "Pilih seberapa cepat Anda ingin menerima kartu baru",
-        "standardDelivery": "Pengiriman standar",
-        "expressDelivery": "Pengiriman ekspres",
-        "businessDays": "{day1}-{day2} hari kerja",
-        "free": "GRATIS",
-        "shippingAddress": "Alamat pengiriman",
-        "useRegisteredAddress": "Gunakan alamat terdaftar sebagai alamat pengiriman",
-        "chooseDeliverySpeed": "Pilih kecepatan pengiriman"
+        "subtitle": "Pilih seberapa cepat Anda ingin menerima kartu baru"
       },
       "Confirm": {
         "title": "Tinjau permintaan Anda",
@@ -3619,24 +3625,15 @@
         "delivery": "Pengiriman",
         "submitRequest": "Kirim permintaan",
         "importantInformation": "Informasi penting",
+        "samePin": "Kartu baru Anda akan memiliki PIN yang sama",
         "issueType": "Alasan",
         "deliveryTime": "Waktu pengiriman",
-        "shippingCost": "Biaya pengiriman",
-        "DamagedInfo": {
-          "bullet1": "Kartu Anda saat ini akan tetap aktif hingga kartu baru tiba",
-          "bullet2": "Kartu baru Anda akan memiliki nomor kartu baru",
-          "bullet3": "Hancurkan kartu rusak Anda saat kartu baru tiba"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Kartu Anda telah dikunci untuk perlindungan Anda",
-          "bullet2": "Kartu baru Anda akan memiliki nomor kartu baru",
-          "bullet3": "Kartu lama Anda akan dibatalkan secara permanen"
-        }
+        "shippingCost": "Biaya pengiriman"
       },
       "Status": {
         "title": "Kartu baru Anda sedang dalam perjalanan!",
         "subtitle": "Pesanan pengiriman kartu Blink Anda telah dikirim.",
-        "buttonLabel": "Dasbor"
+        "buttonLabel": "Kembali ke dasbor"
       },
       "title": "Ganti kartu",
       "errors": {
@@ -3654,24 +3651,7 @@
       "Shipping": {
         "title": "Pesan kartu fisik Anda",
         "subtitle": "Dapatkan kartu Blink Visa Anda dikirim ke alamat Anda.",
-        "registeredAddress": "Alamat terdaftar",
-        "useRegisteredAddress": "Gunakan alamat terdaftar sebagai alamat pengiriman",
-        "delivery": "Pengiriman",
-        "standardDelivery": "Pengiriman standar",
-        "expressDelivery": "Pengiriman ekspres",
-        "businessDays": "{day1}-{day2} hari kerja",
-        "free": "GRATIS",
-        "deliveryInformation": "Informasi pengiriman",
-        "bullet1": "Anda akan menerima informasi pelacakan melalui email",
-        "bullet2": "Tanda tangan mungkin diperlukan saat pengiriman",
-        "bullet3": "Kartu akan dikirim dalam kemasan yang tidak mencolok",
-        "bullet4": "Aktifkan kartu Anda saat tiba",
-        "cardFeatures": "Fitur kartu",
-        "feature1": "Teknologi pembayaran nirsentuh",
-        "feature2": "Chip EMV untuk keamanan yang ditingkatkan",
-        "feature3": "Pita magnetik untuk penerimaan universal",
-        "feature4": "Nama Anda terembos pada kartu",
-        "important": "Penting"
+        "delivery": "Pengiriman"
       },
       "Confirm": {
         "title": "Konfirmasi pesanan Anda",
@@ -3682,12 +3662,7 @@
         "deliveryTime": "Waktu pengiriman",
         "shippingCost": "Biaya pengiriman",
         "shippingAddress": "Alamat pengiriman",
-        "placeOrder": "Buat pesanan",
-        "important": "Penting",
-        "bullet1": "Kartu virtual Anda akan tetap aktif saat Anda menunggu kartu fisik",
-        "bullet2": "Anda perlu mengaktifkan kartu fisik saat tiba",
-        "bullet3": "Kedua kartu akan memiliki nomor dan detail yang sama",
-        "bullet4": "Alamat pengiriman tidak dapat diubah setelah pesanan dibuat"
+        "placeOrder": "Buat pesanan"
       },
       "errors": {
         "createFailed": "Gagal memesan kartu fisik Anda. Silakan coba lagi."

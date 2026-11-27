@@ -2,6 +2,8 @@ import React from "react"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { CardStatusScreen } from "@app/screens/card-screen/card-status-screen"
 import { ContextForScreen } from "../helper"
 
@@ -567,5 +569,63 @@ describe("CardStatusScreen - BlinkCard component", () => {
     await act(async () => {})
 
     expect(toJSON()).toBeTruthy()
+  })
+})
+
+/** After an order or a replacement the wallet button is the screen's main action and the
+ *  route's action sits under it as text. Without a wallet that can take the card, the
+ *  action is the main button again, so the screen never ends on a lone text link. */
+describe("CardStatusScreen - the wallet as the main action", () => {
+  const walletFirstParams = { ...physicalCardOrderedParams, isWalletPrimary: true }
+
+  beforeEach(() => {
+    loadLocale("en")
+    jest.clearAllMocks()
+    mockUseRoute.mockReturnValue({ params: walletFirstParams })
+  })
+
+  it("puts the route's action under the wallet button as text", async () => {
+    const rendered = render(
+      <ContextForScreen>
+        <CardStatusScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(rendered.UNSAFE_getByType(GaloySecondaryButton).props.title).toBe("Create PIN")
+    expect(rendered.UNSAFE_queryByType(GaloyPrimaryButton)).toBeNull()
+  })
+
+  it("still navigates from the text action", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardStatusScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+    await act(async () => {
+      fireEvent.press(getByText("Create PIN"))
+    })
+
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: "NAVIGATE",
+      payload: { name: "cardDashboardScreen" },
+    })
+  })
+
+  it("keeps the action as the main button when the wallet cannot take the card", async () => {
+    mockUseAddToWallet.mockReturnValue(walletState({ canAddToWallet: false }))
+    const rendered = render(
+      <ContextForScreen>
+        <CardStatusScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(rendered.UNSAFE_getByType(GaloyPrimaryButton).props.title).toBe("Create PIN")
+    expect(rendered.UNSAFE_queryByType(GaloySecondaryButton)).toBeNull()
   })
 })

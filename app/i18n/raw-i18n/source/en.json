@@ -3525,7 +3525,20 @@
             "importantDescription": "Please ensure your address is accurate and complete.",
             "noPOBoxes": "Cards cannot be delivered to P.O. boxes",
             "signatureRequired": "Signature may be required upon delivery",
-            "supportedRegions": "Address must be within supported shipping regions"
+            "supportedRegions": "Address must be within supported shipping regions",
+            "useKycAddress": "Use KYC address as shipping address",
+            "kycAddress": "KYC address",
+            "PrivacyTip": {
+                "title": "Privacy tip",
+                "description": "Card will be sent to this address in a discreet envelope. For increased privacy, you may want to send it to a different address than your home."
+            }
+        },
+        "Delivery": {
+            "courier": "Courier delivery",
+            "snailMail": "Snail mail delivery",
+            "snailMailUnavailable": "Too unreliable to support",
+            "businessDays": "{day1}-{day2} business days",
+            "free": "FREE"
         },
         "TransactionDetails": {
             "title": "Transaction details",
@@ -3603,9 +3616,9 @@
                 "lostCard": "Lost card",
                 "lostCardDescription": "I misplaced my card and can't find it anywhere.",
                 "stolenCard": "Stolen card",
-                "stolenCardDescription": "I misplaced my card and can't find it anywhere.",
+                "stolenCardDescription": "My card was taken without permission.",
                 "damagedCard": "Damaged card",
-                "damagedCardDescription": "I misplaced my card and can't find it anywhere.",
+                "damagedCardDescription": "My card is physically damaged.",
                 "whatHappensNext": "What happens next?",
                 "bullet1": "Your current card will be frozen for security",
                 "bullet2": "A new card with different numbers will be issued",
@@ -3613,14 +3626,7 @@
             },
             "Delivery": {
                 "title": "Delivery options",
-                "subtitle": "Choose how you'd like to receive your replacement card.",
-                "standardDelivery": "Standard delivery",
-                "businessDays": "{day1}-{day2} business days",
-                "free": "FREE",
-                "expressDelivery": "Express delivery",
-                "shippingAddress": "Shipping address",
-                "useRegisteredAddress": "Use registered address as shipping address",
-                "chooseDeliverySpeed": "Choose delivery speed"
+                "subtitle": "Choose how you'd like to receive your replacement card."
             },
             "Confirm": {
                 "title": "Confirm replacement",
@@ -3631,22 +3637,13 @@
                 "deliveryTime": "Delivery time",
                 "shippingCost": "Shipping cost",
                 "importantInformation": "Important information",
-                "DamagedInfo": {
-                    "bullet1": "Your current card will remain active until the new one arrives",
-                    "bullet2": "Your new card will have a new card number",
-                    "bullet3": "Destroy your damaged card when the new one arrives"
-                },
-                "LostStolenInfo": {
-                    "bullet1": "Your card has been locked for your protection",
-                    "bullet2": "Your new card will have a new card number",
-                    "bullet3": "Your old card will be permanently canceled"
-                },
+                "samePin": "Your new card will have the same PIN number",
                 "submitRequest": "Submit request"
             },
             "Status": {
                 "title": "Your new card is on the way!",
                 "subtitle": "Order for delivery of your Blink Card has been submitted.",
-                "buttonLabel": "Dashboard"
+                "buttonLabel": "Back to dashboard"
             },
             "errors": {
                 "lockFailed": "Failed to lock your card. Please try again.",
@@ -3663,24 +3660,7 @@
             "Shipping": {
                 "title": "Order your physical card",
                 "subtitle": "Get your Blink Visa card delivered to your address.",
-                "registeredAddress": "Registered address",
-                "useRegisteredAddress": "Use registered address as shipping address",
-                "delivery": "Delivery",
-                "standardDelivery": "Standard delivery",
-                "expressDelivery": "Express delivery",
-                "businessDays": "{day1}-{day2} business days",
-                "free": "FREE",
-                "deliveryInformation": "Delivery information",
-                "bullet1": "You'll receive tracking information via email",
-                "bullet2": "Signature may be required upon delivery",
-                "bullet3": "Card will be shipped in discreet packaging",
-                "bullet4": "Activate your card when it arrives",
-                "cardFeatures": "Card features",
-                "feature1": "Contactless payment technology",
-                "feature2": "EMV chip for enhanced security",
-                "feature3": "Magnetic stripe for universal acceptance",
-                "feature4": "Your name embossed on the card",
-                "important": "Important"
+                "delivery": "Delivery"
             },
             "Confirm": {
                 "title": "Confirm your order",
@@ -3691,12 +3671,7 @@
                 "deliveryTime": "Delivery time",
                 "shippingCost": "Shipping cost",
                 "shippingAddress": "Shipping address",
-                "placeOrder": "Place order",
-                "important": "Important",
-                "bullet1": "Your virtual card will remain active while you wait for the physical card",
-                "bullet2": "You'll need to activate your physical card when it arrives",
-                "bullet3": "Both cards will have the same card number and details",
-                "bullet4": "Shipping address cannot be changed after order is placed"
+                "placeOrder": "Place order"
             },
             "errors": {
                 "createFailed": "Failed to order your physical card. Please try again."

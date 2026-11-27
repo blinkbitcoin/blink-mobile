@@ -3541,7 +3541,20 @@
             },
             "noPOBoxes": "Karten können nicht an Postfächer geliefert werden",
             "signatureRequired": "Bei der Zustellung kann eine Unterschrift erforderlich sein",
-            "supportedRegions": "Die Adresse muss innerhalb der unterstützten Versandregionen liegen"
+            "supportedRegions": "Die Adresse muss innerhalb der unterstützten Versandregionen liegen",
+            "useKycAddress": "KYC-Adresse als Lieferadresse verwenden",
+            "kycAddress": "KYC-Adresse",
+            "PrivacyTip": {
+                "title": "Datenschutz-Tipp",
+                "description": "Die Karte wird in einem neutralen Umschlag an diese Adresse geschickt. Für mehr Privatsphäre können Sie sie an eine andere Adresse als Ihre Wohnadresse senden lassen."
+            }
+        },
+        "Delivery": {
+            "courier": "Kurierzustellung",
+            "snailMail": "Zustellung per Briefpost",
+            "snailMailUnavailable": "Zu unzuverlässig, um es anzubieten",
+            "businessDays": "{day1}-{day2} Werktage",
+            "free": "KOSTENLOS"
         },
         "PinScreens": {
             "common": {
@@ -3604,14 +3617,7 @@
             },
             "Delivery": {
                 "title": "Wählen Sie Ihre Liefergeschwindigkeit",
-                "subtitle": "Wählen Sie, wie schnell Sie Ihre neue Karte erhalten möchten",
-                "standardDelivery": "Standardlieferung",
-                "expressDelivery": "Expresslieferung",
-                "businessDays": "{day1}-{day2} Werktage",
-                "free": "KOSTENLOS",
-                "shippingAddress": "Lieferadresse",
-                "useRegisteredAddress": "Registrierte Adresse als Lieferadresse verwenden",
-                "chooseDeliverySpeed": "Liefergeschwindigkeit wählen"
+                "subtitle": "Wählen Sie, wie schnell Sie Ihre neue Karte erhalten möchten"
             },
             "Confirm": {
                 "title": "Überprüfen Sie Ihre Anfrage",
@@ -3622,22 +3628,13 @@
                 "deliveryTime": "Lieferzeit",
                 "shippingCost": "Lieferkosten",
                 "importantInformation": "Wichtige Informationen",
-                "DamagedInfo": {
-                    "bullet1": "Deine aktuelle Karte bleibt aktiv, bis die neue eintrifft",
-                    "bullet2": "Deine neue Karte wird eine neue Kartennummer haben",
-                    "bullet3": "Vernichte deine beschädigte Karte, wenn die neue eintrifft"
-                },
-                "LostStolenInfo": {
-                    "bullet1": "Deine Karte wurde zu deinem Schutz gesperrt",
-                    "bullet2": "Deine neue Karte wird eine neue Kartennummer haben",
-                    "bullet3": "Deine alte Karte wird dauerhaft storniert"
-                },
+                "samePin": "Deine neue Karte hat dieselbe PIN",
                 "submitRequest": "Anfrage absenden"
             },
             "Status": {
                 "title": "Ihre neue Karte ist unterwegs!",
                 "subtitle": "Bestellung zur Lieferung Ihrer Blink-Karte wurde eingereicht.",
-                "buttonLabel": "Dashboard"
+                "buttonLabel": "Zurück zum Dashboard"
             },
             "errors": {
                 "lockFailed": "Karte konnte nicht gesperrt werden. Bitte versuche es erneut.",
@@ -3654,24 +3651,7 @@
             "Shipping": {
                 "title": "Bestellen Sie Ihre physische Karte",
                 "subtitle": "Lassen Sie sich Ihre Blink Visa Karte an Ihre Adresse liefern.",
-                "registeredAddress": "Registrierte Adresse",
-                "useRegisteredAddress": "Registrierte Adresse als Lieferadresse verwenden",
-                "delivery": "Lieferung",
-                "standardDelivery": "Standardlieferung",
-                "expressDelivery": "Expresslieferung",
-                "businessDays": "{day1}-{day2} Werktage",
-                "free": "KOSTENLOS",
-                "deliveryInformation": "Lieferinformationen",
-                "bullet1": "Sie erhalten Tracking-Informationen per E-Mail",
-                "bullet2": "Bei der Lieferung kann eine Unterschrift erforderlich sein",
-                "bullet3": "Die Karte wird in diskreter Verpackung versandt",
-                "bullet4": "Aktivieren Sie Ihre Karte, sobald sie ankommt",
-                "cardFeatures": "Kartenfunktionen",
-                "feature1": "Kontaktlose Zahlungstechnologie",
-                "feature2": "EMV-Chip für erhöhte Sicherheit",
-                "feature3": "Magnetstreifen für universelle Akzeptanz",
-                "feature4": "Ihr Name ist auf der Karte geprägt",
-                "important": "Wichtig"
+                "delivery": "Lieferung"
             },
             "Confirm": {
                 "title": "Bestellung bestätigen",
@@ -3682,12 +3662,7 @@
                 "deliveryTime": "Lieferzeit",
                 "shippingCost": "Versandkosten",
                 "shippingAddress": "Lieferadresse",
-                "placeOrder": "Bestellung aufgeben",
-                "important": "Wichtig",
-                "bullet1": "Ihre virtuelle Karte bleibt aktiv, während Sie auf die physische Karte warten",
-                "bullet2": "Sie müssen Ihre physische Karte aktivieren, wenn sie ankommt",
-                "bullet3": "Beide Karten haben dieselbe Kartennummer und dieselben Daten",
-                "bullet4": "Die Lieferadresse kann nach Aufgabe der Bestellung nicht mehr geändert werden"
+                "placeOrder": "Bestellung aufgeben"
             },
             "errors": {
                 "createFailed": "Die Bestellung Ihrer physischen Karte ist fehlgeschlagen. Bitte versuchen Sie es erneut."

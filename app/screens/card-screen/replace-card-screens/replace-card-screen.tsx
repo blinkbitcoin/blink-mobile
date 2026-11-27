@@ -13,7 +13,6 @@ import { toastShow } from "@app/utils/toast"
 import { useCardData } from "@app/hooks"
 import { useShippingAddressData } from "../card-shipping-address-screen/hooks"
 import { SteppedCardLayout } from "../stepped-card-layout"
-import { Delivery, EMPTY_ADDRESS } from "../types"
 import { ReportIssueStep, DeliveryStep, ConfirmStep, Issue } from "./steps"
 import {
   useLockCard,
@@ -44,7 +43,7 @@ export const ReplaceCardScreen: React.FC = () => {
   const { cardId } = route.params
 
   const { card, loading: cardLoading } = useCardData()
-  const { initialAddress, loading: addressLoading } = useShippingAddressData()
+  const { initialAddress, kycAddress, loading: addressLoading } = useShippingAddressData()
   const { replaceCard, loading: replaceLoading } = useReplaceCard()
   const { lockCard, loading: lockLoading } = useLockCard()
 
@@ -57,7 +56,7 @@ export const ReplaceCardScreen: React.FC = () => {
     state,
     setSelectedIssue,
     setSelectedDelivery,
-    toggleUseRegisteredAddress,
+    toggleUseKycAddress,
     setCustomAddress,
     goToNextStep,
     completeFlow,
@@ -71,11 +70,6 @@ export const ReplaceCardScreen: React.FC = () => {
     }
     return stepOrder.map((step) => labelMap[step])
   }, [LL, stepOrder])
-
-  const registeredAddress = useMemo(
-    () => initialAddress ?? EMPTY_ADDRESS,
-    [initialAddress],
-  )
 
   const handleReportIssueContinue = useCallback(async () => {
     if (!state.selectedIssue) return
@@ -111,6 +105,7 @@ export const ReplaceCardScreen: React.FC = () => {
       navigateTo: "cardDashboardScreen",
       iconName: "delivery",
       iconColor: colors.success,
+      isWalletPrimary: true,
       lastFour: result.lastFour,
       cardId: result.id,
     })
@@ -144,11 +139,9 @@ export const ReplaceCardScreen: React.FC = () => {
           iconColor: colors.success,
           title: LL.CardFlow.ReplaceCard.Delivery.title(),
           subtitle: LL.CardFlow.ReplaceCard.Delivery.subtitle(),
-          buttonLabel: state.selectedDelivery
-            ? LL.common.continue()
-            : LL.CardFlow.ReplaceCard.Delivery.chooseDeliverySpeed(),
+          buttonLabel: LL.common.continue(),
           onButtonPress: goToNextStep,
-          isButtonDisabled: !state.selectedDelivery,
+          isButtonDisabled: false,
         }
       case Step.Confirm:
         return {
@@ -167,7 +160,6 @@ export const ReplaceCardScreen: React.FC = () => {
     LL,
     handleReportIssueContinue,
     state.selectedIssue,
-    state.selectedDelivery,
     goToNextStep,
     handleSubmit,
   ])
@@ -186,23 +178,17 @@ export const ReplaceCardScreen: React.FC = () => {
           <DeliveryStep
             selectedDelivery={state.selectedDelivery}
             onSelectDelivery={setSelectedDelivery}
-            hasRegisteredAddress={initialAddress !== null}
-            registeredAddress={registeredAddress}
-            useRegisteredAddress={state.useRegisteredAddress}
-            onToggleUseRegisteredAddress={toggleUseRegisteredAddress}
+            kycAddress={kycAddress}
+            useKycAddress={state.useKycAddress}
+            onToggleUseKycAddress={toggleUseKycAddress}
             customAddress={state.customAddress}
             onCustomAddressChange={setCustomAddress}
           />
         )
       case Step.Confirm:
         if (!state.selectedIssue) return null
-        if (!isVirtualCard && !state.selectedDelivery) return null
         return (
-          <ConfirmStep
-            issueType={state.selectedIssue}
-            deliveryType={state.selectedDelivery ?? Delivery.Standard}
-            isVirtualCard={isVirtualCard}
-          />
+          <ConfirmStep issueType={state.selectedIssue} isVirtualCard={isVirtualCard} />
         )
     }
   }, [
@@ -210,9 +196,8 @@ export const ReplaceCardScreen: React.FC = () => {
     state,
     setSelectedIssue,
     setSelectedDelivery,
-    initialAddress,
-    registeredAddress,
-    toggleUseRegisteredAddress,
+    kycAddress,
+    toggleUseKycAddress,
     setCustomAddress,
     isVirtualCard,
   ])

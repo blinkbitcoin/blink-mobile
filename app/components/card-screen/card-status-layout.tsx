@@ -4,6 +4,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { BlinkCard } from "@app/components/blink-card/blink-card"
 import { Screen } from "@app/components/screen"
 import { fonts } from "@app/rne-theme/fonts"
@@ -13,8 +14,10 @@ import { AddToWalletButton } from "./add-to-wallet-button"
 type CardStatusLayoutProps = {
   title: string
   subtitle: string
-  buttonLabel: string
-  onPrimaryButtonPress: () => void
+  buttonLabel?: string
+  onPrimaryButtonPress?: () => void
+  secondaryButtonLabel?: string
+  onSecondaryButtonPress?: () => void
   iconName: IconNamesType
   iconColor?: string
   showCard?: boolean
@@ -32,6 +35,8 @@ export const CardStatusLayout: React.FC<CardStatusLayoutProps> = ({
   subtitle,
   buttonLabel,
   onPrimaryButtonPress,
+  secondaryButtonLabel,
+  onSecondaryButtonPress,
   iconName,
   iconColor,
   showCard = true,
@@ -72,15 +77,23 @@ export const CardStatusLayout: React.FC<CardStatusLayoutProps> = ({
               isFrozen={isFrozen}
             />
           )}
-
-          {showAddToWallet ? (
-            <AddToWalletButton onPress={onAddToWallet} disabled={isAddingToWallet} />
-          ) : null}
         </View>
       </View>
 
-      <View style={styles.bottomSection}>
-        <GaloyPrimaryButton title={buttonLabel} onPress={onPrimaryButtonPress} />
+      {/* The wallet button sits right above the screen's action, as the designs do. */}
+      <View style={styles.bottomSection} testID="card-status-actions">
+        {showAddToWallet ? (
+          <AddToWalletButton onPress={onAddToWallet} disabled={isAddingToWallet} />
+        ) : null}
+        {buttonLabel ? (
+          <GaloyPrimaryButton title={buttonLabel} onPress={onPrimaryButtonPress} />
+        ) : null}
+        {secondaryButtonLabel ? (
+          <GaloySecondaryButton
+            title={secondaryButtonLabel}
+            onPress={onSecondaryButtonPress}
+          />
+        ) : null}
       </View>
     </Screen>
   )
@@ -138,5 +151,6 @@ const useStyles = makeStyles(({ colors }) => ({
   bottomSection: {
     paddingHorizontal: 24,
     paddingBottom: 20,
+    gap: 10,
   },
 }))

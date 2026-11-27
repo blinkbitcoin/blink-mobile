@@ -112,3 +112,13 @@ describe("defaultRemoteConfig: compliance country lists", () => {
     expect(defaultRemoteConfig.migrationReceiveDelayedNoticeMs).toBe(60_000)
   })
 })
+
+describe("defaultRemoteConfig: card delivery", () => {
+  /** Every card ships by courier (3–7 business days). The replacement's price stays
+   *  free until the payment step exists; the console raises it to the $100 fee then. */
+  it("replaceCardDeliveryConfig defaults to the courier, 3-7 business days, free", () => {
+    expect(defaultRemoteConfig.replaceCardDeliveryConfig).toEqual({
+      courier: { minDays: 3, maxDays: 7, priceUsd: 0 },
+    })
+  })
+})

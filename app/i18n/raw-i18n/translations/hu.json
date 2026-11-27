@@ -3541,7 +3541,20 @@
       "importantDescription": "Kérjük, győződjön meg róla, hogy címe pontos és teljes.",
       "noPOBoxes": "A kártyák nem kézbesíthetők postafiókokba",
       "signatureRequired": "Aláírás szükséges lehet a kézbesítéskor",
-      "supportedRegions": "A címnek a támogatott szállítási régiókban kell lennie"
+      "supportedRegions": "A címnek a támogatott szállítási régiókban kell lennie",
+      "useKycAddress": "A KYC-cím használata szállítási címként",
+      "kycAddress": "KYC-cím",
+      "PrivacyTip": {
+        "title": "Adatvédelmi tipp",
+        "description": "A kártyát diszkrét borítékban küldjük erre a címre. A nagyobb adatvédelem érdekében érdemes lehet az otthonától eltérő címre kérnie."
+      }
+    },
+    "Delivery": {
+      "courier": "Futárszolgálat",
+      "snailMail": "Hagyományos postai kézbesítés",
+      "snailMailUnavailable": "Túl megbízhatatlan ahhoz, hogy támogassuk",
+      "businessDays": "{day1}-{day2} munkanap",
+      "free": "INGYENES"
     },
     "PinScreens": {
       "common": {
@@ -3603,14 +3616,7 @@
       },
       "Delivery": {
         "title": "Válassza ki a szállítási sebességet",
-        "subtitle": "Válassza ki, milyen gyorsan szeretné megkapni az új kártyát",
-        "standardDelivery": "Standard szállítás",
-        "expressDelivery": "Expressz szállítás",
-        "businessDays": "{day1}-{day2} munkanap",
-        "free": "INGYENES",
-        "shippingAddress": "Szállítási cím",
-        "useRegisteredAddress": "Regisztrált cím használata szállítási címként",
-        "chooseDeliverySpeed": "Válasszon szállítási sebességet"
+        "subtitle": "Válassza ki, milyen gyorsan szeretné megkapni az új kártyát"
       },
       "Confirm": {
         "title": "Ellenőrizze a kérelmét",
@@ -3619,24 +3625,15 @@
         "delivery": "Szállítás",
         "submitRequest": "Kérelem beküldése",
         "importantInformation": "Fontos információk",
+        "samePin": "Az új kártyádnak ugyanaz lesz a PIN-kódja",
         "issueType": "Ok",
         "deliveryTime": "Szállítási idő",
-        "shippingCost": "Szállítási költség",
-        "DamagedInfo": {
-          "bullet1": "A jelenlegi kártyád aktív marad, amíg az új meg nem érkezik",
-          "bullet2": "Az új kártyád új kártyaszámot kap",
-          "bullet3": "Semmisítsd meg a sérült kártyádat, amikor megérkezik az új"
-        },
-        "LostStolenInfo": {
-          "bullet1": "A kártyádat a védelmed érdekében zároltuk",
-          "bullet2": "Az új kártyád új kártyaszámot kap",
-          "bullet3": "A régi kártyád véglegesen törlésre kerül"
-        }
+        "shippingCost": "Szállítási költség"
       },
       "Status": {
         "title": "Az új kártyád úton van!",
         "subtitle": "A Blink kártyád kézbesítési rendelése elküldve.",
-        "buttonLabel": "Irányítópult"
+        "buttonLabel": "Vissza az irányítópultra"
       },
       "title": "Kártya cseréje",
       "errors": {
@@ -3654,24 +3651,7 @@
       "Shipping": {
         "title": "Rendelje meg fizikai kártyáját",
         "subtitle": "Kérje Blink Visa kártyájának kézbesítését a címére.",
-        "registeredAddress": "Regisztrált cím",
-        "useRegisteredAddress": "A regisztrált cím használata szállítási címként",
-        "delivery": "Kézbesítés",
-        "standardDelivery": "Normál kézbesítés",
-        "expressDelivery": "Expressz kézbesítés",
-        "businessDays": "{day1}-{day2} munkanap",
-        "free": "INGYENES",
-        "deliveryInformation": "Kézbesítési információk",
-        "bullet1": "A nyomkövetési információkat e-mailben kapja meg",
-        "bullet2": "A kézbesítéskor aláírásra lehet szükség",
-        "bullet3": "A kártyát diszkrét csomagolásban küldjük",
-        "bullet4": "Érkezéskor aktiválja a kártyáját",
-        "cardFeatures": "Kártya funkciók",
-        "feature1": "Érintés nélküli fizetési technológia",
-        "feature2": "EMV chip a fokozott biztonságért",
-        "feature3": "Mágnescsík az univerzális elfogadásért",
-        "feature4": "A neve dombornyomva a kártyán",
-        "important": "Fontos"
+        "delivery": "Kézbesítés"
       },
       "Confirm": {
         "title": "Rendelés megerősítése",
@@ -3682,12 +3662,7 @@
         "deliveryTime": "Szállítási idő",
         "shippingCost": "Szállítási költség",
         "shippingAddress": "Szállítási cím",
-        "placeOrder": "Rendelés leadása",
-        "important": "Fontos",
-        "bullet1": "A virtuális kártyája aktív marad, amíg a fizikai kártyára vár",
-        "bullet2": "A fizikai kártyát érkezéskor aktiválnia kell",
-        "bullet3": "Mindkét kártya azonos kártyaszámmal és adatokkal rendelkezik",
-        "bullet4": "A szállítási cím a rendelés leadása után nem módosítható"
+        "placeOrder": "Rendelés leadása"
       },
       "errors": {
         "createFailed": "Nem sikerült megrendelni a fizikai kártyádat. Kérjük, próbáld újra."

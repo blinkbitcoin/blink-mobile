@@ -3541,7 +3541,20 @@
       "importantDescription": "Asigurați-vă că adresa dumneavoastră este corectă și completă.",
       "noPOBoxes": "Cardurile nu pot fi livrate la căsuțe poștale",
       "signatureRequired": "Semnătura poate fi necesară la livrare",
-      "supportedRegions": "Adresa trebuie să fie în regiunile de livrare acceptate"
+      "supportedRegions": "Adresa trebuie să fie în regiunile de livrare acceptate",
+      "useKycAddress": "Folosește adresa KYC ca adresă de livrare",
+      "kycAddress": "Adresa KYC",
+      "PrivacyTip": {
+        "title": "Sfat de confidențialitate",
+        "description": "Cardul va fi trimis la această adresă într-un plic discret. Pentru mai multă confidențialitate, poate vrei să-l trimiți la o altă adresă decât acasă."
+      }
+    },
+    "Delivery": {
+      "courier": "Livrare prin curier",
+      "snailMail": "Livrare prin poștă obișnuită",
+      "snailMailUnavailable": "Prea nesigur pentru a fi oferit",
+      "businessDays": "{day1}-{day2} zile lucrătoare",
+      "free": "GRATUIT"
     },
     "PinScreens": {
       "common": {
@@ -3603,14 +3616,7 @@
       },
       "Delivery": {
         "title": "Alege viteza de livrare",
-        "subtitle": "Selectează cât de repede dorești să primești noul card",
-        "standardDelivery": "Livrare standard",
-        "expressDelivery": "Livrare expresă",
-        "businessDays": "{day1}-{day2} zile lucrătoare",
-        "free": "GRATUIT",
-        "shippingAddress": "Adresa de expediere",
-        "useRegisteredAddress": "Folosește adresa înregistrată ca adresă de expediere",
-        "chooseDeliverySpeed": "Alegeți viteza de livrare"
+        "subtitle": "Selectează cât de repede dorești să primești noul card"
       },
       "Confirm": {
         "title": "Verifică solicitarea ta",
@@ -3619,24 +3625,15 @@
         "delivery": "Livrare",
         "submitRequest": "Trimite solicitarea",
         "importantInformation": "Informații importante",
+        "samePin": "Noul tău card va avea același PIN",
         "issueType": "Motiv",
         "deliveryTime": "Timp de livrare",
-        "shippingCost": "Cost de livrare",
-        "DamagedInfo": {
-          "bullet1": "Cardul tău actual va rămâne activ până când sosește cel nou",
-          "bullet2": "Noul tău card va avea un număr de card nou",
-          "bullet3": "Distruge cardul tău deteriorat când sosește cel nou"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Cardul tău a fost blocat pentru protecția ta",
-          "bullet2": "Noul tău card va avea un număr de card nou",
-          "bullet3": "Cardul tău vechi va fi anulat permanent"
-        }
+        "shippingCost": "Cost de livrare"
       },
       "Status": {
         "title": "Noul tău card este pe drum!",
         "subtitle": "Comanda pentru livrarea cardului tău Blink a fost trimisă.",
-        "buttonLabel": "Panou"
+        "buttonLabel": "Înapoi la panou"
       },
       "title": "Înlocuire card",
       "errors": {
@@ -3654,24 +3651,7 @@
       "Shipping": {
         "title": "Comandă cardul tău fizic",
         "subtitle": "Primește cardul tău Blink Visa la adresa ta.",
-        "registeredAddress": "Adresă înregistrată",
-        "useRegisteredAddress": "Folosește adresa înregistrată ca adresă de livrare",
-        "delivery": "Livrare",
-        "standardDelivery": "Livrare standard",
-        "expressDelivery": "Livrare expres",
-        "businessDays": "{day1}-{day2} zile lucrătoare",
-        "free": "GRATUIT",
-        "deliveryInformation": "Informații de livrare",
-        "bullet1": "Vei primi informații de urmărire prin e-mail",
-        "bullet2": "La livrare poate fi necesară o semnătură",
-        "bullet3": "Cardul va fi expediat în ambalaj discret",
-        "bullet4": "Activează-ți cardul când ajunge",
-        "cardFeatures": "Caracteristici ale cardului",
-        "feature1": "Tehnologie de plată contactless",
-        "feature2": "Cip EMV pentru securitate sporită",
-        "feature3": "Bandă magnetică pentru acceptare universală",
-        "feature4": "Numele tău embosat pe card",
-        "important": "Important"
+        "delivery": "Livrare"
       },
       "Confirm": {
         "title": "Confirmă comanda",
@@ -3682,12 +3662,7 @@
         "deliveryTime": "Timp de livrare",
         "shippingCost": "Cost de livrare",
         "shippingAddress": "Adresă de livrare",
-        "placeOrder": "Plasează comanda",
-        "important": "Important",
-        "bullet1": "Cardul tău virtual va rămâne activ cât timp aștepți cardul fizic",
-        "bullet2": "Va trebui să activezi cardul fizic când ajunge",
-        "bullet3": "Ambele carduri vor avea același număr și aceleași detalii",
-        "bullet4": "Adresa de livrare nu poate fi schimbată după plasarea comenzii"
+        "placeOrder": "Plasează comanda"
       },
       "errors": {
         "createFailed": "Nu s-a putut comanda cardul tău fizic. Te rugăm să încerci din nou."

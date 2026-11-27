@@ -3541,7 +3541,20 @@
       "importantDescription": "Maak asseblief seker dat jou adres akkuraat en volledig is.",
       "noPOBoxes": "Kaarte kan nie by posbusse afgelewer word nie",
       "signatureRequired": "Handtekening mag by aflewering vereis word",
-      "supportedRegions": "Adres moet binne ondersteunde afleweringsgebiede wees"
+      "supportedRegions": "Adres moet binne ondersteunde afleweringsgebiede wees",
+      "useKycAddress": "Gebruik KYC-adres as afleweringsadres",
+      "kycAddress": "KYC-adres",
+      "PrivacyTip": {
+        "title": "Privaatheidswenk",
+        "description": "Die kaart sal in 'n diskrete koevert na hierdie adres gestuur word. Vir meer privaatheid wil jy dit dalk na 'n ander adres as jou huis stuur."
+      }
+    },
+    "Delivery": {
+      "courier": "Koerieraflewering",
+      "snailMail": "Gewone posaflewering",
+      "snailMailUnavailable": "Te onbetroubaar om te ondersteun",
+      "businessDays": "{day1}-{day2} werksdae",
+      "free": "GRATIS"
     },
     "PinScreens": {
       "common": {
@@ -3603,14 +3616,7 @@
       },
       "Delivery": {
         "title": "Kies jou afleweringspoed",
-        "subtitle": "Kies hoe vinnig jy jou nuwe kaart wil ontvang",
-        "standardDelivery": "Standaard aflewering",
-        "expressDelivery": "Spoedaflewering",
-        "businessDays": "{day1}-{day2} besigheidsdae",
-        "free": "GRATIS",
-        "shippingAddress": "Versendingsadres",
-        "useRegisteredAddress": "Gebruik geregistreerde adres as versendingsadres",
-        "chooseDeliverySpeed": "Kies afleweringspoed"
+        "subtitle": "Kies hoe vinnig jy jou nuwe kaart wil ontvang"
       },
       "Confirm": {
         "title": "Hersien jou versoek",
@@ -3619,24 +3625,15 @@
         "delivery": "Aflewering",
         "submitRequest": "Dien versoek in",
         "importantInformation": "Belangrike inligting",
+        "samePin": "Jou nuwe kaart sal dieselfde PIN hê",
         "issueType": "Rede",
         "deliveryTime": "Afleweringstyd",
-        "shippingCost": "Afleweringskoste",
-        "DamagedInfo": {
-          "bullet1": "Jou huidige kaart sal aktief bly totdat die nuwe een aankom",
-          "bullet2": "Jou nuwe kaart sal 'n nuwe kaartnommer hê",
-          "bullet3": "Vernietig jou beskadigde kaart wanneer die nuwe een aankom"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Jou kaart is gesluit vir jou beskerming",
-          "bullet2": "Jou nuwe kaart sal 'n nuwe kaartnommer hê",
-          "bullet3": "Jou ou kaart sal permanent gekanselleer word"
-        }
+        "shippingCost": "Afleweringskoste"
       },
       "Status": {
         "title": "Jou nuwe kaart is op pad!",
         "subtitle": "Bestelling vir aflewering van jou Blink-kaart is ingedien.",
-        "buttonLabel": "Dashboard"
+        "buttonLabel": "Terug na dashboard"
       },
       "title": "Vervang kaart",
       "errors": {
@@ -3654,24 +3651,7 @@
       "Shipping": {
         "title": "Bestel jou fisiese kaart",
         "subtitle": "Kry jou Blink Visa-kaart by jou adres afgelewer.",
-        "registeredAddress": "Geregistreerde adres",
-        "useRegisteredAddress": "Gebruik geregistreerde adres as versendingsadres",
-        "delivery": "Aflewering",
-        "standardDelivery": "Standaard aflewering",
-        "expressDelivery": "Ekspres aflewering",
-        "businessDays": "{day1}-{day2} werksdae",
-        "free": "GRATIS",
-        "deliveryInformation": "Afleweringsinligting",
-        "bullet1": "Jy sal opsporingsinligting per e-pos ontvang",
-        "bullet2": "Handtekening kan by aflewering vereis word",
-        "bullet3": "Kaart sal in diskrete verpakking gestuur word",
-        "bullet4": "Aktiveer jou kaart wanneer dit aankom",
-        "cardFeatures": "Kaartkenmerke",
-        "feature1": "Kontaklose betalingstegnologie",
-        "feature2": "EMV-skyfie vir verbeterde sekuriteit",
-        "feature3": "Magneetstrook vir universele aanvaarding",
-        "feature4": "Jou naam op die kaart ge-embosseer",
-        "important": "Belangrik"
+        "delivery": "Aflewering"
       },
       "Confirm": {
         "title": "Bevestig jou bestelling",
@@ -3682,12 +3662,7 @@
         "deliveryTime": "Afleweringstyd",
         "shippingCost": "Versendingskoste",
         "shippingAddress": "Versendingsadres",
-        "placeOrder": "Plaas bestelling",
-        "important": "Belangrik",
-        "bullet1": "Jou virtuele kaart bly aktief terwyl jy vir die fisiese kaart wag",
-        "bullet2": "Jy sal jou fisiese kaart moet aktiveer wanneer dit aankom",
-        "bullet3": "Albei kaarte sal dieselfde kaartnommer en besonderhede hê",
-        "bullet4": "Versendadres kan nie verander word nadat die bestelling geplaas is nie"
+        "placeOrder": "Plaas bestelling"
       },
       "errors": {
         "createFailed": "Kon nie jou fisiese kaart bestel nie. Probeer asseblief weer."

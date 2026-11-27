@@ -37,11 +37,9 @@ jest.mock("@app/i18n/i18n-react", () => ({
             lostCard: () => "Lost card",
             lostCardDescription: () => "I misplaced my card and can't find it anywhere.",
             stolenCard: () => "Stolen card",
-            stolenCardDescription: () =>
-              "I misplaced my card and can't find it anywhere.",
+            stolenCardDescription: () => "My card was taken without permission.",
             damagedCard: () => "Damaged card",
-            damagedCardDescription: () =>
-              "I misplaced my card and can't find it anywhere.",
+            damagedCardDescription: () => "My card is physically damaged.",
             whatHappensNext: () => "What happens next?",
             bullet1: () => "Your current card will be frozen for security",
             bullet2: () => "A new card with different numbers will be issued",
@@ -120,6 +118,14 @@ describe("ReportIssueStep", () => {
       expect(getByText("Lost card")).toBeTruthy()
       expect(getByText("Stolen card")).toBeTruthy()
       expect(getByText("Damaged card")).toBeTruthy()
+    })
+
+    it("describes each reason on its own", () => {
+      const { getByText } = render(<ReportIssueStep {...defaultProps} />)
+
+      expect(getByText("I misplaced my card and can't find it anywhere.")).toBeTruthy()
+      expect(getByText("My card was taken without permission.")).toBeTruthy()
+      expect(getByText("My card is physically damaged.")).toBeTruthy()
     })
 
     it("displays what happens next bullet list", () => {

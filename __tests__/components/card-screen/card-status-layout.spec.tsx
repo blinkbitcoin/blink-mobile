@@ -1,6 +1,6 @@
 import React from "react"
 import { Text as RNText, View } from "react-native"
-import { render, fireEvent } from "@testing-library/react-native"
+import { render, fireEvent, within } from "@testing-library/react-native"
 
 import { CardStatusLayout } from "@app/components/card-screen/card-status-layout"
 
@@ -40,6 +40,14 @@ jest.mock("@app/components/atomic/galoy-icon", () => ({
 jest.mock("@app/components/atomic/galoy-primary-button", () => ({
   GaloyPrimaryButton: ({ title, onPress }: { title: string; onPress: () => void }) => (
     <View testID="galoy-primary-button" onTouchEnd={onPress}>
+      <RNText>{title}</RNText>
+    </View>
+  ),
+}))
+
+jest.mock("@app/components/atomic/galoy-secondary-button", () => ({
+  GaloySecondaryButton: ({ title, onPress }: { title: string; onPress: () => void }) => (
+    <View testID="galoy-secondary-button" onTouchEnd={onPress}>
       <RNText>{title}</RNText>
     </View>
   ),
@@ -178,6 +186,60 @@ describe("CardStatusLayout", () => {
       expect(getByTestId("add-to-wallet-button").props.accessibilityState).toEqual({
         disabled: true,
       })
+    })
+  })
+
+  /** The designs stack the wallet button right above the screen's action, both at the
+   *  bottom, with an optional secondary action as text under them. */
+  describe("actions", () => {
+    it("puts the wallet button at the bottom, with the action", () => {
+      const { getByTestId } = render(
+        <CardStatusLayout {...defaultProps} showAddToWallet={true} />,
+      )
+
+      const actions = within(getByTestId("card-status-actions"))
+
+      expect(actions.getByTestId("add-to-wallet-button")).toBeTruthy()
+      expect(actions.getByTestId("galoy-primary-button")).toBeTruthy()
+    })
+
+    it("shows a secondary action under the others when given", () => {
+      const mockOnSecondaryButtonPress = jest.fn()
+      const { getByTestId } = render(
+        <CardStatusLayout
+          {...defaultProps}
+          secondaryButtonLabel="Back to dashboard"
+          onSecondaryButtonPress={mockOnSecondaryButtonPress}
+        />,
+      )
+
+      const secondary = within(getByTestId("card-status-actions")).getByTestId(
+        "galoy-secondary-button",
+      )
+      fireEvent(secondary, "touchEnd")
+
+      expect(within(secondary).getByText("Back to dashboard")).toBeTruthy()
+      expect(mockOnSecondaryButtonPress).toHaveBeenCalledTimes(1)
+    })
+
+    it("shows no secondary action by default", () => {
+      const { queryByTestId } = render(<CardStatusLayout {...defaultProps} />)
+
+      expect(queryByTestId("galoy-secondary-button")).toBeNull()
+    })
+
+    it("shows no primary button when the screen has no primary action", () => {
+      const { queryByTestId } = render(
+        <CardStatusLayout
+          {...defaultProps}
+          buttonLabel={undefined}
+          onPrimaryButtonPress={undefined}
+          secondaryButtonLabel="Back to dashboard"
+          onSecondaryButtonPress={jest.fn()}
+        />,
+      )
+
+      expect(queryByTestId("galoy-primary-button")).toBeNull()
     })
   })
 })

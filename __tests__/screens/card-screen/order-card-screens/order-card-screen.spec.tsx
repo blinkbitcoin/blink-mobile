@@ -24,8 +24,7 @@ jest.mock("react-native-reanimated", () => {
 jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => ({
     replaceCardDeliveryConfig: {
-      standard: { minDays: 7, maxDays: 10, priceUsd: 0 },
-      express: { minDays: 1, maxDays: 2, priceUsd: 15 },
+      courier: { minDays: 3, maxDays: 7, priceUsd: 0 },
     },
   }),
 }))
@@ -50,10 +49,51 @@ jest.mock(
 )
 
 jest.mock("@app/screens/card-screen/utils", () => ({
+  ...jest.requireActual("@app/screens/card-screen/utils"),
   addressToLines: jest.requireActual<typeof import("../helpers/mock-address-utils")>(
     "../helpers/mock-address-utils",
   ).mockAddressToLines,
 }))
+
+const mockTypedAddress = {
+  firstName: "Satoshi",
+  lastName: "Nakamoto",
+  line1: "456 Office Park",
+  line2: "Suite 9",
+  city: "Austin",
+  region: "TX",
+  postalCode: "73301",
+  countryCode: "US",
+}
+
+let mockIsFormValid = true
+
+/** The form itself is covered by its own spec: here it reports its validity and lets a
+ *  test type the whole address in one press. */
+jest.mock("@app/components/card-screen/shipping-address-form", () => {
+  const { Text: RNText, View: RNView } = jest.requireActual("react-native")
+  return {
+    ShippingAddressForm: ({
+      address,
+      onAddressChange,
+      onValidityChange,
+    }: {
+      address: { line1: string }
+      onAddressChange: (address: typeof mockTypedAddress) => void
+      onValidityChange?: (isValid: boolean) => void
+    }) => {
+      React.useEffect(() => {
+        onValidityChange?.(mockIsFormValid)
+      }, [onValidityChange])
+      return (
+        <RNView testID="shipping-address-form">
+          <RNText>{address.line1 || "empty address"}</RNText>
+          <RNText onPress={() => onAddressChange(mockTypedAddress)}>type address</RNText>
+        </RNView>
+      )
+    },
+  }
+})
 
 jest.mock("@app/utils/helper", () => ({
   isIos: false,
@@ -131,9 +171,11 @@ describe("OrderCardScreen", () => {
     })
     mockUseShippingAddressData.mockReturnValue({
       initialAddress: mockAddress,
+      kycAddress: null,
       phone: "+1234567890",
       loading: false,
     })
+    mockIsFormValid = true
   })
 
   afterEach(async () => {
@@ -179,8 +221,9 @@ describe("OrderCardScreen", () => {
   })
 
   describe("step 1 - shipping", () => {
-    it("displays registered address", async () => {
-      const { getByText } = render(
+    /** A new address, never the one on file, with the tip first (D42, D123). */
+    it("opens with the privacy tip and an empty address form", async () => {
+      const { getByText, queryByText } = render(
         <ContextForScreen>
           <OrderCardScreen />
         </ContextForScreen>,
@@ -188,11 +231,43 @@ describe("OrderCardScreen", () => {
 
       await flushEffects()
 
-      expect(getByText("Registered address")).toBeTruthy()
-      expect(getByText("123 Main Street")).toBeTruthy()
+      expect(getByText("Privacy tip")).toBeTruthy()
+      expect(getByText("empty address")).toBeTruthy()
+      expect(queryByText("123 Main Street")).toBeNull()
     })
 
-    it("displays standard delivery", async () => {
+    /** Until the API returns it (blink-wip#2279) there is no KYC address to offer. */
+    it("offers no KYC address while there is none", async () => {
+      const { queryByRole } = render(
+        <ContextForScreen>
+          <OrderCardScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      expect(
+        queryByRole("checkbox", { name: "Use KYC address as shipping address" }),
+      ).toBeNull()
+    })
+
+    it("keeps Continue disabled until the form is complete", async () => {
+      mockIsFormValid = false
+      const { getByText, queryByText } = render(
+        <ContextForScreen>
+          <OrderCardScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+      await act(async () => {
+        fireEvent.press(getByText("Continue"))
+      })
+
+      expect(queryByText("Confirm your order")).toBeNull()
+    })
+
+    it("offers the courier", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <OrderCardScreen />
@@ -201,8 +276,8 @@ describe("OrderCardScreen", () => {
 
       await flushEffects()
 
-      expect(getByText("Standard delivery")).toBeTruthy()
-      expect(getByText("7-10 business days")).toBeTruthy()
+      expect(getByText("Courier delivery")).toBeTruthy()
+      expect(getByText("3-7 business days")).toBeTruthy()
     })
 
     it("advances to step 2 on continue press", async () => {
@@ -266,6 +341,9 @@ describe("OrderCardScreen", () => {
       )
 
       await flushEffects()
+      await act(async () => {
+        fireEvent.press(getByText("type address"))
+      })
 
       await advanceToStep2(getByText)
 
@@ -275,17 +353,7 @@ describe("OrderCardScreen", () => {
 
       expect(mockCreateCard).toHaveBeenCalledWith({
         applicationId: "app-123",
-        shippingAddress: {
-          firstName: "Satoshi",
-          lastName: "Nakamoto",
-          line1: "123 Main Street",
-          line2: "Apt 4B",
-          city: "New York",
-          region: "NY",
-          postalCode: "10001",
-          countryCode: "US",
-          phoneNumber: "+1234567890",
-        },
+        shippingAddress: { ...mockTypedAddress, phoneNumber: "+1234567890" },
       })
 
       expect(mockReplace).toHaveBeenCalledWith("cardStatusScreen", {
@@ -295,6 +363,7 @@ describe("OrderCardScreen", () => {
         navigateTo: "cardCreatePinScreen",
         iconName: "delivery",
         iconColor: expect.any(String),
+        isWalletPrimary: true,
         lastFour: "1234",
         cardId: "new-card",
       })
@@ -432,6 +501,60 @@ describe("OrderCardScreen", () => {
       await flushEffects()
 
       expect(mockGoBack).toHaveBeenCalled()
+    })
+  })
+
+  /** The KYC address, once the API returns it, is a choice the member can make. */
+  describe("the KYC address", () => {
+    beforeEach(() => {
+      mockUseShippingAddressData.mockReturnValue({
+        initialAddress: mockAddress,
+        kycAddress: mockAddress,
+        phone: "+1234567890",
+        loading: false,
+      })
+      mockIsFormValid = false
+    })
+
+    it("is offered unticked", async () => {
+      const { getByRole } = render(
+        <ContextForScreen>
+          <OrderCardScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      expect(
+        getByRole("checkbox", { name: "Use KYC address as shipping address" }).props
+          .accessibilityState,
+      ).toMatchObject({ checked: false })
+    })
+
+    it("is sent once chosen, with no form to fill in", async () => {
+      const { getByRole, getByText } = render(
+        <ContextForScreen>
+          <OrderCardScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+      await act(async () => {
+        fireEvent.press(
+          getByRole("checkbox", { name: "Use KYC address as shipping address" }),
+        )
+      })
+      await act(async () => {
+        fireEvent.press(getByText("Continue"))
+      })
+      await act(async () => {
+        fireEvent.press(getByText("Place order"))
+      })
+
+      expect(mockCreateCard).toHaveBeenCalledWith({
+        applicationId: "app-123",
+        shippingAddress: { ...mockAddress, phoneNumber: "+1234567890" },
+      })
     })
   })
 })

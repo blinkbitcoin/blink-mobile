@@ -3541,7 +3541,20 @@
       "importantDescription": "Uistite sa, že vaša adresa je presná a úplná.",
       "noPOBoxes": "Karty nemožno doručiť na poštové schránky",
       "signatureRequired": "Pri doručení môže byť vyžadovaný podpis",
-      "supportedRegions": "Adresa musí byť v podporovaných oblastiach doručenia"
+      "supportedRegions": "Adresa musí byť v podporovaných oblastiach doručenia",
+      "useKycAddress": "Použiť adresu z KYC ako doručovaciu adresu",
+      "kycAddress": "Adresa z KYC",
+      "PrivacyTip": {
+        "title": "Tip pre súkromie",
+        "description": "Karta bude odoslaná na túto adresu v nenápadnej obálke. Pre väčšie súkromie ju môžete poslať na inú adresu, než je váš domov."
+      }
+    },
+    "Delivery": {
+      "courier": "Doručenie kuriérom",
+      "snailMail": "Doručenie bežnou poštou",
+      "snailMailUnavailable": "Príliš nespoľahlivé na to, aby sme ho ponúkali",
+      "businessDays": "{day1}-{day2} pracovných dní",
+      "free": "ZADARMO"
     },
     "PinScreens": {
       "common": {
@@ -3603,14 +3616,7 @@
       },
       "Delivery": {
         "title": "Vyberte rýchlosť doručenia",
-        "subtitle": "Vyberte, ako rýchlo chcete dostať novú kartu",
-        "standardDelivery": "Štandardné doručenie",
-        "expressDelivery": "Expresné doručenie",
-        "businessDays": "{day1}-{day2} pracovných dní",
-        "free": "ZADARMO",
-        "shippingAddress": "Doručovacia adresa",
-        "useRegisteredAddress": "Použiť registrovanú adresu ako doručovaciu",
-        "chooseDeliverySpeed": "Vyberte rýchlosť doručenia"
+        "subtitle": "Vyberte, ako rýchlo chcete dostať novú kartu"
       },
       "Confirm": {
         "title": "Skontrolujte svoju žiadosť",
@@ -3619,24 +3625,15 @@
         "delivery": "Doručenie",
         "submitRequest": "Odoslať žiadosť",
         "importantInformation": "Dôležité informácie",
+        "samePin": "Vaša nová karta bude mať rovnaký PIN",
         "issueType": "Dôvod",
         "deliveryTime": "Čas doručenia",
-        "shippingCost": "Cena doručenia",
-        "DamagedInfo": {
-          "bullet1": "Vaša súčasná karta zostane aktívna, kým nedorazí nová",
-          "bullet2": "Vaša nová karta bude mať nové číslo karty",
-          "bullet3": "Zničte svoju poškodenú kartu, keď dorazí nová"
-        },
-        "LostStolenInfo": {
-          "bullet1": "Vaša karta bola uzamknutá pre vašu ochranu",
-          "bullet2": "Vaša nová karta bude mať nové číslo karty",
-          "bullet3": "Vaša stará karta bude trvalo zrušená"
-        }
+        "shippingCost": "Cena doručenia"
       },
       "Status": {
         "title": "Vaša nová karta je na ceste!",
         "subtitle": "Objednávka na doručenie vašej karty Blink bola odoslaná.",
-        "buttonLabel": "Prehľad"
+        "buttonLabel": "Späť na prehľad"
       },
       "title": "Vymeniť kartu",
       "errors": {
@@ -3654,24 +3651,7 @@
       "Shipping": {
         "title": "Objednajte si fyzickú kartu",
         "subtitle": "Nechajte si doručiť svoju kartu Blink Visa na adresu.",
-        "registeredAddress": "Registrovaná adresa",
-        "useRegisteredAddress": "Použiť registrovanú adresu ako doručovaciu adresu",
-        "delivery": "Doručenie",
-        "standardDelivery": "Štandardné doručenie",
-        "expressDelivery": "Expresné doručenie",
-        "businessDays": "{day1}-{day2} pracovných dní",
-        "free": "ZADARMO",
-        "deliveryInformation": "Informácie o doručení",
-        "bullet1": "Informácie o sledovaní dostanete e-mailom",
-        "bullet2": "Pri doručení môže byť potrebný podpis",
-        "bullet3": "Karta bude odoslaná v diskrétnom balení",
-        "bullet4": "Aktivujte kartu, keď dorazí",
-        "cardFeatures": "Vlastnosti karty",
-        "feature1": "Technológia bezkontaktných platieb",
-        "feature2": "EMV čip pre zvýšenú bezpečnosť",
-        "feature3": "Magnetický prúžok pre univerzálnu akceptáciu",
-        "feature4": "Vaše meno vyrazené na karte",
-        "important": "Dôležité"
+        "delivery": "Doručenie"
       },
       "Confirm": {
         "title": "Potvrďte objednávku",
@@ -3682,12 +3662,7 @@
         "deliveryTime": "Čas doručenia",
         "shippingCost": "Cena dopravy",
         "shippingAddress": "Doručovacia adresa",
-        "placeOrder": "Odoslať objednávku",
-        "important": "Dôležité",
-        "bullet1": "Vaša virtuálna karta zostane aktívna, kým čakáte na fyzickú kartu",
-        "bullet2": "Po doručení budete musieť fyzickú kartu aktivovať",
-        "bullet3": "Obe karty budú mať rovnaké číslo a údaje",
-        "bullet4": "Doručovaciu adresu nie je možné po zadaní objednávky zmeniť"
+        "placeOrder": "Odoslať objednávku"
       },
       "errors": {
         "createFailed": "Nepodarilo sa objednať vašu fyzickú kartu. Skúste to prosím znova."
