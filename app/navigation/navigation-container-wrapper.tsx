@@ -48,6 +48,13 @@ export const isMigrationDeeplink = (url: string): boolean => {
   }
 }
 
+/** Links that are never opened, whether live or queued: the Telegram login callback, which
+ *  its own screen reads, and, with the account-closed gate armed, anything but the
+ *  migration entry. Any other would open a working screen on top of the blocker, and that
+ *  gate never lets the home back. */
+const isDroppedLink = (url: string, isBlockerVisible: boolean): boolean =>
+  url.includes(TELEGRAM_CALLBACK_PATH) || (isBlockerVisible && !isMigrationDeeplink(url))
+
 /** Where the blocker lives, and the two-factor gate with it: the home gate stands either
  *  in for the tabs. */
 const BLOCKER_ROUTE = "Primary" satisfies keyof RootStackParamList
@@ -281,12 +288,24 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     !isMigrationDeeplink(urlAfterUnlockAndAuth)
   const isQueuedLinkHeld = isQueuedLinkHeldByPrompts || isKeyAtStake
   const canOpenQueuedUrl = canHandlePayments && !isAppLocked && !isQueuedLinkHeld
+
+  /** React Navigation's own link handler, kept from the subscription below. A queued link
+   *  is opened through it inside the app, never handed back to the OS: Linking.openURL
+   *  made Android resolve the link again, asking which app to open it with a second time
+   *  and losing it if that prompt was dismissed (blink-wip#178). */
+  const linkListenerRef = useRef<((url: string) => void) | null>(null)
   useEffect(() => {
-    if (canOpenQueuedUrl && urlAfterUnlockAndAuth) {
-      Linking.openURL(urlAfterUnlockAndAuth)
-      setUrlAfterUnlockAndAuth(null)
-    }
-  }, [canOpenQueuedUrl, urlAfterUnlockAndAuth])
+    const openLink = linkListenerRef.current
+    if (!canOpenQueuedUrl || !urlAfterUnlockAndAuth || !openLink) return
+    setUrlAfterUnlockAndAuth(null)
+
+    /** The same drops the live listener makes, which the trip through the OS used to
+     *  apply on the way back in. */
+    if (isDroppedLink(urlAfterUnlockAndAuth, isBlockerVisible)) return
+    const maybeAction = processLinkForAction(urlAfterUnlockAndAuth)
+    if (maybeAction) setActiveAction(maybeAction)
+    openLink(urlAfterUnlockAndAuth)
+  }, [canOpenQueuedUrl, urlAfterUnlockAndAuth, isBlockerVisible, setActiveAction])
 
   const readIsAppLocked = React.useCallback(() => isAppLockedRef.current, [])
 
@@ -347,16 +366,14 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
       return null
     },
     subscribe: (listener) => {
+      linkListenerRef.current = listener
       const onReceiveURL = ({ url }: { url: string }) => {
-        if (url.includes(TELEGRAM_CALLBACK_PATH)) return
+        if (isDroppedLink(url, isBlockerVisibleRef.current)) return
 
-        /** With the account-closed gate armed, only the migration deeplink is honoured; any
-         *  other would open a working screen on top of the blocker, so it is dropped: that
-         *  gate never lets the home back. The two-factor prompts do, by a dismissal or a
-         *  factor added, so a link that arrives while they hold the session start waits
-         *  for that instead. The migration is a way out they offer, so its link passes. */
+        /** The two-factor prompts let the home back, by a dismissal or a factor added, so
+         *  a link that arrives while they hold the session start waits for that instead.
+         *  The migration is a way out they offer, so its link passes. */
         const isGateRemedyLink = isMigrationDeeplink(url)
-        if (isBlockerVisibleRef.current && !isGateRemedyLink) return
         const isHeldByTwoFactor = isTwoFactorHoldingLinksRef.current && !isGateRemedyLink
         const isHeld = isHeldByTwoFactor || isKeyAtStakeRef.current
 
@@ -377,6 +394,7 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
       return () => {
         // Clean up the event listeners
         subscription.remove()
+        if (linkListenerRef.current === listener) linkListenerRef.current = null
       }
     },
   }
