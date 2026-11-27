@@ -52,6 +52,7 @@ import {
   SEND_HERO_CAPTION_TEST_ID,
   SEND_HERO_PRIMARY_TEST_ID,
   SEND_HERO_SECONDARY_TEST_ID,
+  SendHero,
 } from "@app/screens/send-bitcoin-screen/send-hero"
 import {
   SENT_HOLD_MS,
@@ -2786,6 +2787,48 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       await renderReview(feeIncludedRoute(1000))
 
       expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("900 SAT")
+    })
+
+    describe("bounce on a send-all", () => {
+      const sendAllRoute = (sats: number) => {
+        const base = feeIncludedRoute(sats)
+        return {
+          ...base,
+          params: {
+            paymentDetail: { ...base.params.paymentDetail, isSendingMax: true },
+          },
+        } as unknown as ReturnType<typeof buildBtcSettlementRoute>
+      }
+      const isAmountBounced = () =>
+        screen.UNSAFE_getByType(SendHero).props.isAmountBounced
+
+      it("bounces the amount, since review's is the balance picked less the fee", async () => {
+        btcFee(100)
+        await renderReview(sendAllRoute(1000))
+
+        expect(isAmountBounced()).toBe(true)
+      })
+
+      it("holds still while the fee is out, when review still shows the balance", async () => {
+        mockUseFee.mockReturnValue({ status: "loading" })
+        await renderReview(sendAllRoute(1000))
+
+        expect(isAmountBounced()).toBe(false)
+      })
+
+      it("holds still when the fee takes nothing out", async () => {
+        btcFee(0)
+        await renderReview(sendAllRoute(1000))
+
+        expect(isAmountBounced()).toBe(false)
+      })
+
+      it("holds still on a fee-included amount the sender typed", async () => {
+        btcFee(100)
+        await renderReview(feeIncludedRoute(1000))
+
+        expect(isAmountBounced()).toBe(false)
+      })
     })
 
     it("keeps the slider off when the fee taken out would leave the recipient nothing", async () => {

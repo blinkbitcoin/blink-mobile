@@ -7,16 +7,32 @@ import {
   type SharedValue,
 } from "react-native-reanimated"
 
+const BOUNCE_LOW = 0.88
+const BOUNCE_PEAK = 1.22
+
 export const bounceInAnimation = ({
   scale,
   duration,
+  isSingleBounce = false,
 }: {
   scale: SharedValue<number>
   duration: number
+  /** Grows, shrinks and comes back to size once, each step `duration` long, where the
+   *  default springs back from the peak and can wobble more than once. */
+  isSingleBounce?: boolean
 }) => {
-  scale.value = 0.88
+  if (isSingleBounce) {
+    const step = { duration, easing: Easing.inOut(Easing.quad) }
+    scale.value = withSequence(
+      withTiming(BOUNCE_PEAK, step),
+      withTiming(BOUNCE_LOW, step),
+      withTiming(1, step),
+    )
+    return
+  }
+  scale.value = BOUNCE_LOW
   scale.value = withSequence(
-    withTiming(1.22, { duration, easing: Easing.out(Easing.quad) }),
+    withTiming(BOUNCE_PEAK, { duration, easing: Easing.out(Easing.quad) }),
     withSpring(1, { damping: 12, stiffness: 200 }),
   )
 }
@@ -27,12 +43,14 @@ export const useBounceInAnimation = ({
   scale,
   delay,
   duration,
+  isSingleBounce,
 }: {
   isFocused: boolean
   visible: boolean
   scale: SharedValue<number>
   delay: number
   duration: number
+  isSingleBounce?: boolean
 }) => {
   const [rendered, setRendered] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -59,7 +77,7 @@ export const useBounceInAnimation = ({
       setRendered(false)
       timerRef.current = setTimeout(() => {
         setRendered(true)
-        bounceInAnimation({ scale, duration })
+        bounceInAnimation({ scale, duration, isSingleBounce })
       }, delay)
     }
 
@@ -69,7 +87,7 @@ export const useBounceInAnimation = ({
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }
-  }, [delay, duration, isFocused, scale, visible])
+  }, [delay, duration, isFocused, isSingleBounce, scale, visible])
 
   return rendered
 }

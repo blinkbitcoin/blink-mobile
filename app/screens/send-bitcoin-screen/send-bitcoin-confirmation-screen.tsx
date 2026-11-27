@@ -739,6 +739,12 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 isSent={isSent}
                 sentPlay={sentPlay}
                 isSentAtEnd={isAtEnd}
+                /* A send-all at 100% picked the whole balance; review leads with it
+                   less the fee, so the amount bounces to show it changed. */
+                isAmountBounced={
+                  Boolean(isSendingMax) &&
+                  recipientAmount.amount !== settlementAmount.amount
+                }
               />
             </Animated.View>
           </View>
