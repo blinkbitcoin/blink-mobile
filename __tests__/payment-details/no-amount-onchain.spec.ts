@@ -264,6 +264,18 @@ describe("no amount lightning payment details", () => {
     expect(newPaymentDetails.sendingWalletDescriptor).toEqual(sendingWalletDescriptor)
   })
 
+  it("drops a send-all on a wallet switch, as typing an amount does", () => {
+    const sendAll = PaymentDetails.createNoAmountOnchainPaymentDetails({
+      ...defaultParams,
+      isSendingMax: true,
+    })
+
+    const switched = sendAll.setSendingWalletDescriptor(usdSendingWalletDescriptor)
+
+    expect(sendAll.isSendingMax).toBe(true)
+    expect(switched.isSendingMax).toBe(false)
+  })
+
   it("can set convertMoneyAmount", () => {
     const paymentDetails = createNoAmountOnchainPaymentDetails(defaultParams)
     const newConvertMoneyAmount: ConvertMoneyAmount = (amount, currency) => ({
