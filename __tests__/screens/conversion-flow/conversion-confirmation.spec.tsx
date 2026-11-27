@@ -737,7 +737,8 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
               key: "conversionConfirmation",
               name: "conversionConfirmation",
               params: {
-                fromWalletCurrency: WalletCurrency.Btc,
+                fromBalance: WalletCurrency.Btc,
+                toBalance: WalletCurrency.Usd,
                 moneyAmount: {
                   amount: 10000,
                   currency: WalletCurrency.Btc,
