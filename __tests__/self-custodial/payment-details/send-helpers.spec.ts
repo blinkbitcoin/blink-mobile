@@ -67,6 +67,8 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
     SendPaymentMethod_Tags: {
       BitcoinAddress: "BitcoinAddress",
       Bolt11Invoice: "Bolt11Invoice",
+      SparkAddress: "SparkAddress",
+      SparkInvoice: "SparkInvoice",
     },
     OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
     PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
@@ -1940,6 +1942,28 @@ describe("a send-all whose quote moved since review", () => {
 
     expect(result.status).toBe(PaymentSendResult.Success)
     expect(mockSendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  /** SDK 0.27.1 quotes a Spark transfer at 0; one that charges is held to review's fee
+   *  as Lightning is. */
+  it("holds a Spark send-all to the Spark fee review quoted", async () => {
+    const sparkQuote = (feeSats: number) => ({
+      paymentMethod: {
+        tag: "SparkAddress",
+        inner: { address: "sp1...", fee: BigInt(feeSats), tokenIdentifier: undefined },
+      },
+      feePolicy: FEES_INCLUDED,
+    })
+    const params = { ...sendAll(), paymentRequest: "sp1..." }
+    mockPrepareSendPayment.mockResolvedValueOnce(sparkQuote(50))
+    const review = await createGetFee(params as never)()
+    mockPrepareSendPayment.mockResolvedValueOnce(sparkQuote(150))
+
+    const result = await createSendMutation(params as never, { telemetry })()
+
+    expect(review.amount?.amount).toBe(50)
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.QuoteMoved)
+    expect(mockSendPayment).not.toHaveBeenCalled()
   })
 
   it("checks only the priority it sends at on-chain", async () => {

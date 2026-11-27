@@ -29,6 +29,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   SendPaymentMethod_Tags: {
     BitcoinAddress: "BitcoinAddress",
     Bolt11Invoice: "Bolt11Invoice",
+    SparkAddress: "SparkAddress",
     SparkInvoice: "SparkInvoice",
   },
   SendPaymentOptions: {
@@ -151,7 +152,23 @@ describe("extractLightningFee", () => {
     expect(extractLightningFee(prepared as never)).toBeNull()
   })
 
-  it("returns null for non-Bolt11Invoice payment", () => {
+  for (const tag of ["SparkAddress", "SparkInvoice"]) {
+    it(`returns the fee a ${tag} quotes`, () => {
+      const prepared = { paymentMethod: { tag, inner: { fee: BigInt(50) } } }
+
+      expect(extractLightningFee(prepared as never)).toBe(50)
+    })
+
+    it(`leaves out a ${tag} token transfer's fee, which is not in sats`, () => {
+      const prepared = {
+        paymentMethod: { tag, inner: { fee: BigInt(50), tokenIdentifier: "usdb" } },
+      }
+
+      expect(extractLightningFee(prepared as never)).toBeNull()
+    })
+  }
+
+  it("returns null for an on-chain payment", () => {
     const prepared = {
       paymentMethod: { tag: "BitcoinAddress", inner: {} },
     }

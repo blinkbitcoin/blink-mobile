@@ -61,11 +61,20 @@ export const onchainQuoteExpiresAt = (
   return toNumber(feeQuote.expiresAt)
 }
 
+/**
+ * The fee in sats a prepared Lightning or Spark send quotes. SDK 0.27.1 quotes a Spark
+ * transfer at 0, but it is read anyway so a send-all keeps to a later SDK that charges
+ * one. A token transfer's fee is in the token's units, not sats, so it is left out.
+ */
 export const extractLightningFee = (
   prepared: PrepareSendPaymentResponse,
 ): number | null => {
-  if (prepared.paymentMethod?.tag !== MethodTag.Bolt11Invoice) return null
-  const { sparkTransferFeeSats, lightningFeeSats } = prepared.paymentMethod.inner
+  const method = prepared.paymentMethod
+  if (method?.tag === MethodTag.SparkAddress || method?.tag === MethodTag.SparkInvoice) {
+    return method.inner.tokenIdentifier ? null : toNumber(method.inner.fee)
+  }
+  if (method?.tag !== MethodTag.Bolt11Invoice) return null
+  const { sparkTransferFeeSats, lightningFeeSats } = method.inner
   if (sparkTransferFeeSats !== undefined) return toNumber(sparkTransferFeeSats)
   if (lightningFeeSats !== undefined) return toNumber(lightningFeeSats)
   return null
