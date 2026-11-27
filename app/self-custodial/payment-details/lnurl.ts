@@ -295,7 +295,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
       extraInfo: {
         preimage,
         successAction: sdkSuccessActionToLib(successAction),
-        ...settledOf(sendAllPolicy, payment),
+        ...settledOf(sendAllPolicy, prepareOptions.amount, payment),
       },
     }
   }

@@ -1783,6 +1783,24 @@ describe("a send-all", () => {
     expect(result.extraInfo).toEqual({ settled: { amountSats: 99_120, feeSats: 880 } })
   })
 
+  /** A Lightning send comes back before the provider names its fee, at 0 until then. */
+  it("reports the fee as what of the amount did not go out, while the SDK's is still 0", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
+      feePolicy: FEES_INCLUDED,
+    })
+    mockSendPayment.mockResolvedValue({
+      payment: { id: "p1", status: 1, amount: BigInt(99_120), fees: BigInt(0) },
+    })
+
+    const result = await createSendMutation(sendAll as never, { telemetry })()
+
+    expect(result.extraInfo).toEqual({ settled: { amountSats: 99_120, feeSats: 880 } })
+  })
+
   it("reports nothing extra for a plain amount, whose figures review already had", async () => {
     mockPrepareSendPayment.mockResolvedValue({
       paymentMethod: {

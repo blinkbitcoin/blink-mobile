@@ -2216,6 +2216,39 @@ describe("createSelfCustodialLnurlPaymentDetails send-all", () => {
     expect(result.extraInfo?.settled).toEqual({ amountSats: 99_000, feeSats: 1_000 })
   })
 
+  it("leaves the receipt to review's quote when the SDK answered without a payment", async () => {
+    mockPrepareLnurl.mockResolvedValue({ ...quote(), feePolicy: FEES_INCLUDED })
+    mockExecuteLnurl.mockResolvedValue({})
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+    if (!sendAll.canSendPayment) throw new Error("expected canSendPayment")
+
+    const result = await sendAll.sendPaymentMutation({} as never)
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.extraInfo?.settled).toBeUndefined()
+  })
+
+  /** The pay request's invoice goes out through the provider, whose fee is 0 on the
+   *  payment until it names it, and what was taken for the fee never reaches the payee. */
+  it("hands back the fee taken from the balance, while the SDK's is still 0", async () => {
+    mockPrepareLnurl.mockResolvedValue({ ...quote(), feePolicy: FEES_INCLUDED })
+    mockExecuteLnurl.mockResolvedValue({
+      payment: { id: "p1", status: 1, amount: BigInt(99_000), fees: BigInt(0) },
+    })
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+    if (!sendAll.canSendPayment) throw new Error("expected canSendPayment")
+
+    const result = await sendAll.sendPaymentMutation({} as never)
+
+    expect(result.extraInfo?.settled).toEqual({ amountSats: 99_000, feeSats: 1_000 })
+  })
+
   /** blink-wip#2048 SR3: the fee on top of the whole balance would spend more than it holds. */
   it("sends nothing, and quotes nothing, when the SDK did not take the fee out", async () => {
     mockPrepareLnurl.mockResolvedValue({ ...quote(), feePolicy: 0 /* FeesExcluded */ })

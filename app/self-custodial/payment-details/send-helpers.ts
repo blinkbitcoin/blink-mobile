@@ -132,14 +132,22 @@ export const sendAllFeePolicy = (
   sendMax && currency === WalletCurrency.Btc ? FeePolicy.FeesIncluded : undefined
 
 /** What went out, for a send whose fee came out of the amount: review only had a quote,
- *  and the SDK prepares the send again (blink-wip#2048 SR2). */
+ *  and the SDK prepares the send again (blink-wip#2048 SR2).
+ *
+ *  The fee is what of the amount sent did not reach the recipient. The SDK's own fee
+ *  can't be read for it: a Lightning send comes back before the provider names its fee,
+ *  and until then the payment's fee is 0. */
 export const settledOf = (
   requested: FeePolicy | undefined,
+  amountSentSats: bigint | undefined,
   payment: Payment | undefined,
-): PaymentSendExtraInfo | undefined =>
-  requested === FeePolicy.FeesIncluded && payment
-    ? { settled: { amountSats: Number(payment.amount), feeSats: Number(payment.fees) } }
-    : undefined
+): PaymentSendExtraInfo | undefined => {
+  if (requested !== FeePolicy.FeesIncluded) return undefined
+  if (!payment) return undefined
+  const amountSats = Number(payment.amount)
+  const totalSats = Number(amountSentSats ?? payment.amount + payment.fees)
+  return { settled: { amountSats, feeSats: totalSats - amountSats } }
+}
 
 /** What a send reports about itself: the rail category and the wallet spent from, never
  *  the destination, amount, or counterparty. */
@@ -326,11 +334,11 @@ const runSendMutation = (
       executeSend(params.sdk, prepared, { confirmationSpeed, idempotencyKey }),
     sentOutcome: ({ payment }) => ({
       status: PaymentSendResult.Success,
-      extraInfo: settledOf(params.feePolicy, payment),
+      extraInfo: settledOf(params.feePolicy, params.amount, payment),
     }),
     foundOutcome: (payment) => ({
       status: PaymentSendResult.Success,
-      extraInfo: settledOf(params.feePolicy, payment),
+      extraInfo: settledOf(params.feePolicy, params.amount, payment),
     }),
     failure: (err) => ({
       status: PaymentSendResult.Failure,
