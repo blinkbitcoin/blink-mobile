@@ -4011,17 +4011,22 @@
     "migrateNowModal": {
       "title": "Přejděte nyní na non-custodial účet",
       "body": "Na svůj custodial účet již nemůžete přijímat prostředky. Blink ukončil custodial službu ve vašem regionu a tento účet bude deaktivován do konce dne {date}.\n\nPřejděte nyní na non-custodial účet.",
+      "bodyLevelZero": "Na tento zkušební účet již nemůžete přijímat prostředky. Blink ruší zkušební účty a tento účet bude deaktivován do konce dne {date}.\n\nPřejděte nyní na non-custodial účet.",
       "migrateCta": "Migrovat nyní"
     },
     "reminderBulletin": {
       "title": "Důležité",
       "body": "Přejděte na non-custodial účet pomocí řízené migrace, nebo si vyberte prostředky, před {date}. Přijímání končí {receiveStopsDate}.",
+      "bodySingleDate": "Přejděte na non-custodial účet pomocí řízené migrace, nebo si vyberte prostředky, před {date} — vše přesunete několika klepnutími.",
+      "bodyLevelZero": "Přejděte na non-custodial účet pomocí řízené migrace, nebo si vyberte prostředky, před {date}.",
       "bodyReceiveDisabled": "Přijímání skončilo. Přejděte na non-custodial účet pomocí řízené migrace, nebo si vyberte prostředky, před {date}.",
       "migrateCta": "Migrovat"
     },
     "offboardBulletin": {
       "title": "Důležité",
-      "body": "Váš účet je registrován v regionu, kde nemůžeme nabízet účty. Vyberte své prostředky před 31. srpnem. Přijímání se zastaví 10. srpna."
+      "bodyTwoDates": "Blink nemůže ve vašem regionu nabízet custodial účty. Vyberte své prostředky před {date} — bez jakýchkoli poplatků Blink. Přijímání končí {receiveStopsDate}. Pokud se domníváte, že se to vašeho účtu týká omylem, můžete v aplikaci ověřit své současné bydliště.",
+      "bodySingleDate": "Blink nemůže ve vašem regionu nabízet custodial účty. Vyberte své prostředky před {date} — bez jakýchkoli poplatků Blink. Pokud se domníváte, že se to vašeho účtu týká omylem, můžete v aplikaci ověřit své současné bydliště.",
+      "bodyReceiveOff": "Blink nemůže ve vašem regionu nabízet custodial účty. Vyberte své prostředky před {date} — bez jakýchkoli poplatků Blink. Přijímání je vypnuté. Pokud se domníváte, že se to vašeho účtu týká omylem, můžete v aplikaci ověřit své současné bydliště."
     },
     "dollarBalanceModal": {
       "title": "Váš dolarový zůstatek nemůžeme migrovat",
@@ -4077,8 +4082,10 @@
     "resumeFailed": "Při pokračování migrace se něco pokazilo. Začněte ji prosím znovu.",
     "migrationRequiredBody": "Je čas migrovat váš custodial účet na non-custodial účet.",
     "migrationRequiredForcedBody": "Je čas migrovat váš custodial účet na non-custodial účet. Je to vyžadováno z regulatorních důvodů.\n\nNení třeba se obávat, non-custodial pro tebe bude z dlouhodobého hlediska lepší.",
+    "migrationRequiredForcedBodyLevelZero": "Blink ruší zkušební účty. Převeďte svůj zůstatek na non-custodial účet. Zabere to jen pár klepnutí.",
     "migrationGateTitle": "Účet není přístupný",
     "migrationGateBody": "Z regulatorních důvodů nemůžeme ve tvém regionu poskytovat custodial účty. Převeď své prostředky na non-custodial účet u Blink podle následujících kroků nebo nás kontaktuj na <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Zkušební účty jsou nyní zrušeny. Váš zůstatek je v bezpečí. Převeďte ho na non-custodial účet podle následujících kroků, zdarma a bez časového omezení, nebo nás kontaktujte na <link>{email}</link>",
     "bitcoinBalance": "Zůstatek Bitcoinu",
     "dollarBalance": "Zůstatek v dolarech",
     "moveToNonCustodial": "Přejít na non-custodial",

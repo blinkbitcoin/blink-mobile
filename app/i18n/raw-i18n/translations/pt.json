@@ -4011,17 +4011,22 @@
         "migrateNowModal": {
             "title": "Migre agora para uma conta não custodial",
             "body": "Você não pode mais receber fundos na sua conta custodial. A Blink descontinuou o serviço custodial na sua região e esta conta será inativada até o final de {date}.\n\nMigre agora para uma conta não custodial.",
+            "bodyLevelZero": "Você não pode mais receber fundos nesta conta de teste. A Blink está encerrando as contas de teste e esta conta será inativada até o final de {date}.\n\nMigre agora para uma conta não custodial.",
             "migrateCta": "Migrar agora"
         },
         "reminderBulletin": {
             "title": "Importante",
             "body": "Mude para uma conta não custodial através da migração guiada, ou retire os seus fundos, antes de {date}. O recebimento termina em {receiveStopsDate}.",
+            "bodySingleDate": "Mude para uma conta não custodial através da migração guiada, ou retire os seus fundos, antes de {date} — tudo se move em poucos toques.",
+            "bodyLevelZero": "Mude para uma conta não custodial através da migração guiada, ou retire os seus fundos, antes de {date}.",
             "bodyReceiveDisabled": "O recebimento terminou. Mude para uma conta não custodial através da migração guiada, ou retire os seus fundos, antes de {date}.",
             "migrateCta": "Migrar"
         },
         "offboardBulletin": {
             "title": "Importante",
-            "body": "A tua conta está registada numa região onde não podemos oferecer contas. Levanta os teus fundos antes de 31 de agosto. A receção para a 10 de agosto."
+            "bodyTwoDates": "A Blink não pode oferecer contas custodiais na sua região. Retire seus fundos antes de {date} — sem nenhuma cobrança da Blink. O recebimento termina em {receiveStopsDate}. Se você acredita que sua conta foi afetada por engano, pode verificar sua residência atual no app.",
+            "bodySingleDate": "A Blink não pode oferecer contas custodiais na sua região. Retire seus fundos antes de {date} — sem nenhuma cobrança da Blink. Se você acredita que sua conta foi afetada por engano, pode verificar sua residência atual no app.",
+            "bodyReceiveOff": "A Blink não pode oferecer contas custodiais na sua região. Retire seus fundos antes de {date} — sem nenhuma cobrança da Blink. O recebimento está desativado. Se você acredita que sua conta foi afetada por engano, pode verificar sua residência atual no app."
         },
         "dollarBalanceModal": {
             "title": "Não podemos migrar o seu saldo em dólares",
@@ -4077,8 +4082,10 @@
         "resumeFailed": "Algo deu errado ao retomar a sua migração. Por favor, comece novamente.",
         "migrationRequiredBody": "É hora de migrar a sua conta custodial para uma conta não custodial.",
         "migrationRequiredForcedBody": "É hora de migrar a sua conta custodial para uma conta não custodial. É obrigatório por motivos regulatórios.\n\nNão se preocupe, a modalidade não custodial será melhor para você a longo prazo.",
+        "migrationRequiredForcedBodyLevelZero": "A Blink está encerrando as contas de teste. Mova seu saldo para uma conta não custodial. Leva apenas alguns toques.",
         "migrationGateTitle": "Conta não acessível",
         "migrationGateBody": "Por motivos regulatórios não podemos oferecer contas custodiais na sua região. Transfira seus fundos para uma conta não custodial com a Blink seguindo os próximos passos ou entre em contato conosco em <link>{email}</link>",
+        "migrationGateBodyLevelZero": "As contas de teste foram encerradas. Seu saldo está seguro. Mova-o para uma conta não custodial seguindo os próximos passos, de graça e sem limite de tempo, ou entre em contato conosco em <link>{email}</link>",
         "bitcoinBalance": "Saldo de Bitcoin",
         "dollarBalance": "Saldo em dólares",
         "moveToNonCustodial": "Migrar para não custodial",

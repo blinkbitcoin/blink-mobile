@@ -4011,17 +4011,22 @@
     "migrateNowModal": {
       "title": "Şimdi saklamasız bir hesaba taşının",
       "body": "Saklamalı hesabınıza artık para alamazsınız. Blink bölgenizde saklama hizmetini sonlandırdı ve bu hesap {date} sonuna kadar devre dışı bırakılacak.\n\nŞimdi saklamasız bir hesaba taşının.",
+      "bodyLevelZero": "Bu deneme hesabına artık para alamazsınız. Blink deneme hesaplarını kapatıyor ve bu hesap {date} sonuna kadar devre dışı bırakılacak.\n\nŞimdi saklamasız bir hesaba taşının.",
       "migrateCta": "Şimdi taşı"
     },
     "reminderBulletin": {
       "title": "Önemli",
       "body": "{date} tarihinden önce rehberli taşıma ile saklamasız bir hesaba geçin veya paranızı çekin. Alma, {receiveStopsDate} tarihinde durur.",
+      "bodySingleDate": "{date} tarihinden önce rehberli taşıma ile saklamasız bir hesaba geçin veya paranızı çekin — her şey birkaç dokunuşla taşınır.",
+      "bodyLevelZero": "{date} tarihinden önce rehberli taşıma ile saklamasız bir hesaba geçin veya paranızı çekin.",
       "bodyReceiveDisabled": "Alma durdu. {date} tarihinden önce rehberli taşıma ile saklamasız bir hesaba geçin veya paranızı çekin.",
       "migrateCta": "Taşı"
     },
     "offboardBulletin": {
       "title": "Önemli",
-      "body": "Hesabınız, hesap sunamadığımız bir bölgede kayıtlı. Paranızı 31 Ağustos'tan önce çekin. Para alımı 10 Ağustos'ta duruyor."
+      "bodyTwoDates": "Blink bölgenizde saklamalı hesap sunamıyor. Paranızı {date} tarihinden önce çekin — Blink hiçbir ücret almaz. Para alımı {receiveStopsDate} tarihinde durur. Hesabınızın yanlışlıkla etkilendiğini düşünüyorsanız, uygulamada mevcut ikametinizi doğrulayabilirsiniz.",
+      "bodySingleDate": "Blink bölgenizde saklamalı hesap sunamıyor. Paranızı {date} tarihinden önce çekin — Blink hiçbir ücret almaz. Hesabınızın yanlışlıkla etkilendiğini düşünüyorsanız, uygulamada mevcut ikametinizi doğrulayabilirsiniz.",
+      "bodyReceiveOff": "Blink bölgenizde saklamalı hesap sunamıyor. Paranızı {date} tarihinden önce çekin — Blink hiçbir ücret almaz. Para alımı kapalı. Hesabınızın yanlışlıkla etkilendiğini düşünüyorsanız, uygulamada mevcut ikametinizi doğrulayabilirsiniz."
     },
     "dollarBalanceModal": {
       "title": "Dolar bakiyenizi taşıyamıyoruz",
@@ -4077,8 +4082,10 @@
     "resumeFailed": "Taşıma işleminiz devam ettirilirken bir sorun oluştu. Lütfen yeniden başlatın.",
     "migrationRequiredBody": "Saklamalı hesabınızı saklamasız bir hesaba taşımanın zamanı geldi.",
     "migrationRequiredForcedBody": "Saklamalı hesabınızı saklamasız bir hesaba taşımanın zamanı geldi. Bu, düzenleyici nedenlerle zorunludur.\n\nEndişelenme, non-custodial uzun vadede senin için daha iyi olacak.",
+    "migrationRequiredForcedBodyLevelZero": "Blink deneme hesaplarını kapatıyor. Bakiyenizi saklamasız bir hesaba taşıyın. Yalnızca birkaç dokunuş sürer.",
     "migrationGateTitle": "Hesap erişilebilir değil",
     "migrationGateBody": "Düzenleyici nedenlerle bölgende custodial hesaplar sağlayamıyoruz. Sonraki adımları izleyerek fonlarını Blink'te bir non-custodial hesaba aktar ya da <link>{email}</link> adresinden bize ulaş",
+    "migrationGateBodyLevelZero": "Deneme hesapları artık kapatıldı. Bakiyeniz güvende. Sonraki adımları izleyerek bakiyenizi ücretsiz ve süre sınırı olmadan saklamasız bir hesaba taşıyın ya da <link>{email}</link> adresinden bize ulaşın",
     "bitcoinBalance": "Bitcoin bakiyesi",
     "dollarBalance": "Dolar bakiyesi",
     "moveToNonCustodial": "Non-custodial'a geç",

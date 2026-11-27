@@ -13373,6 +13373,10 @@ type RootTranslation = {
 		 */
 		migrationRequiredForcedBody: string
 		/**
+		 * B​l​i​n​k​ ​i​s​ ​c​l​o​s​i​n​g​ ​t​r​i​a​l​ ​a​c​c​o​u​n​t​s​.​ ​M​o​v​e​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.​ ​I​t​ ​o​n​l​y​ ​t​a​k​e​s​ ​a​ ​f​e​w​ ​t​a​p​s​.
+		 */
+		migrationRequiredForcedBodyLevelZero: string
+		/**
 		 * A​c​c​o​u​n​t​ ​n​o​t​ ​a​c​c​e​s​s​i​b​l​e
 		 */
 		migrationGateTitle: string
@@ -13381,6 +13385,11 @@ type RootTranslation = {
 		 * @param {unknown} email
 		 */
 		migrationGateBody: RequiredParams<'email'>
+		/**
+		 * T​r​i​a​l​ ​a​c​c​o​u​n​t​s​ ​a​r​e​ ​n​o​w​ ​c​l​o​s​e​d​.​ ​Y​o​u​r​ ​b​a​l​a​n​c​e​ ​i​s​ ​s​a​f​e​.​ ​M​o​v​e​ ​i​t​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​b​y​ ​f​o​l​l​o​w​i​n​g​ ​t​h​e​ ​n​e​x​t​ ​s​t​e​p​s​,​ ​f​r​e​e​ ​a​n​d​ ​w​i​t​h​ ​n​o​ ​t​i​m​e​ ​l​i​m​i​t​,​ ​o​r​ ​c​o​n​t​a​c​t​ ​u​s​ ​a​t​ ​<​l​i​n​k​>​{​e​m​a​i​l​}​<​/​l​i​n​k​>
+		 * @param {unknown} email
+		 */
+		migrationGateBodyLevelZero: RequiredParams<'email'>
 		/**
 		 * B​i​t​c​o​i​n​ ​b​a​l​a​n​c​e
 		 */
@@ -13588,6 +13597,13 @@ type RootTranslation = {
 			 */
 			body: RequiredParams<'date'>
 			/**
+			 * Y​o​u​ ​c​a​n​ ​n​o​ ​l​o​n​g​e​r​ ​r​e​c​e​i​v​e​ ​f​u​n​d​s​ ​t​o​ ​t​h​i​s​ ​t​r​i​a​l​ ​a​c​c​o​u​n​t​.​ ​B​l​i​n​k​ ​i​s​ ​c​l​o​s​i​n​g​ ​t​r​i​a​l​ ​a​c​c​o​u​n​t​s​ ​a​n​d​ ​t​h​i​s​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​i​n​a​c​t​i​v​a​t​e​d​ ​b​y​ ​t​h​e​ ​e​n​d​ ​o​f​ ​{​d​a​t​e​}​.​
+		​
+		​M​i​g​r​a​t​e​ ​n​o​w​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
+			 * @param {string} date
+			 */
+			bodyLevelZero: RequiredParams<'date'>
+			/**
 			 * M​i​g​r​a​t​e​ ​n​o​w
 			 */
 			migrateCta: string
@@ -13604,6 +13620,16 @@ type RootTranslation = {
 			 */
 			body: RequiredParams<'date' | 'receiveStopsDate'>
 			/**
+			 * M​o​v​e​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​v​i​a​ ​g​u​i​d​e​d​ ​m​i​g​r​a​t​i​o​n​,​ ​o​r​ ​w​i​t​h​d​r​a​w​,​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​ ​—​ ​e​v​e​r​y​t​h​i​n​g​ ​m​o​v​e​s​ ​i​n​ ​a​ ​f​e​w​ ​t​a​p​s​.
+			 * @param {string} date
+			 */
+			bodySingleDate: RequiredParams<'date'>
+			/**
+			 * M​o​v​e​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​v​i​a​ ​g​u​i​d​e​d​ ​m​i​g​r​a​t​i​o​n​,​ ​o​r​ ​w​i​t​h​d​r​a​w​,​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​.
+			 * @param {string} date
+			 */
+			bodyLevelZero: RequiredParams<'date'>
+			/**
 			 * R​e​c​e​i​v​i​n​g​ ​h​a​s​ ​s​t​o​p​p​e​d​.​ ​M​o​v​e​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​v​i​a​ ​g​u​i​d​e​d​ ​m​i​g​r​a​t​i​o​n​,​ ​o​r​ ​w​i​t​h​d​r​a​w​,​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​.
 			 * @param {string} date
 			 */
@@ -13619,9 +13645,21 @@ type RootTranslation = {
 			 */
 			title: string
 			/**
-			 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​r​e​g​i​s​t​e​r​e​d​ ​i​n​ ​a​ ​r​e​g​i​o​n​ ​w​h​e​r​e​ ​w​e​ ​c​a​n​n​o​t​ ​o​f​f​e​r​ ​a​c​c​o​u​n​t​s​.​ ​W​i​t​h​d​r​a​w​ ​y​o​u​r​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​A​u​g​u​s​t​ ​3​1​.​ ​R​e​c​e​i​v​i​n​g​ ​s​t​o​p​s​ ​A​u​g​u​s​t​ ​1​0​.
+			 * B​l​i​n​k​ ​c​a​n​n​o​t​ ​o​f​f​e​r​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​s​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n​.​ ​W​i​t​h​d​r​a​w​ ​y​o​u​r​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​ ​—​ ​f​r​e​e​ ​o​f​ ​a​n​y​ ​B​l​i​n​k​ ​c​h​a​r​g​e​.​ ​R​e​c​e​i​v​i​n​g​ ​s​t​o​p​s​ ​{​r​e​c​e​i​v​e​S​t​o​p​s​D​a​t​e​}​.​ ​I​f​ ​y​o​u​ ​b​e​l​i​e​v​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​h​a​s​ ​b​e​e​n​ ​a​f​f​e​c​t​e​d​ ​i​n​ ​e​r​r​o​r​,​ ​y​o​u​ ​c​a​n​ ​v​e​r​i​f​y​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​r​e​s​i​d​e​n​c​e​ ​i​n​ ​t​h​e​ ​a​p​p​.
+			 * @param {string} date
+			 * @param {string} receiveStopsDate
 			 */
-			body: string
+			bodyTwoDates: RequiredParams<'date' | 'receiveStopsDate'>
+			/**
+			 * B​l​i​n​k​ ​c​a​n​n​o​t​ ​o​f​f​e​r​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​s​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n​.​ ​W​i​t​h​d​r​a​w​ ​y​o​u​r​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​ ​—​ ​f​r​e​e​ ​o​f​ ​a​n​y​ ​B​l​i​n​k​ ​c​h​a​r​g​e​.​ ​I​f​ ​y​o​u​ ​b​e​l​i​e​v​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​h​a​s​ ​b​e​e​n​ ​a​f​f​e​c​t​e​d​ ​i​n​ ​e​r​r​o​r​,​ ​y​o​u​ ​c​a​n​ ​v​e​r​i​f​y​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​r​e​s​i​d​e​n​c​e​ ​i​n​ ​t​h​e​ ​a​p​p​.
+			 * @param {string} date
+			 */
+			bodySingleDate: RequiredParams<'date'>
+			/**
+			 * B​l​i​n​k​ ​c​a​n​n​o​t​ ​o​f​f​e​r​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​s​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n​.​ ​W​i​t​h​d​r​a​w​ ​y​o​u​r​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​ ​—​ ​f​r​e​e​ ​o​f​ ​a​n​y​ ​B​l​i​n​k​ ​c​h​a​r​g​e​.​ ​R​e​c​e​i​v​i​n​g​ ​i​s​ ​o​f​f​.​ ​I​f​ ​y​o​u​ ​b​e​l​i​e​v​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​h​a​s​ ​b​e​e​n​ ​a​f​f​e​c​t​e​d​ ​i​n​ ​e​r​r​o​r​,​ ​y​o​u​ ​c​a​n​ ​v​e​r​i​f​y​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​r​e​s​i​d​e​n​c​e​ ​i​n​ ​t​h​e​ ​a​p​p​.
+			 * @param {string} date
+			 */
+			bodyReceiveOff: RequiredParams<'date'>
 		}
 		contactSupport: {
 			/**
@@ -27873,6 +27911,10 @@ export type TranslationFunctions = {
 		 */
 		migrationRequiredForcedBody: () => LocalizedString
 		/**
+		 * Blink is closing trial accounts. Move your balance to a non-custodial account. It only takes a few taps.
+		 */
+		migrationRequiredForcedBodyLevelZero: () => LocalizedString
+		/**
 		 * Account not accessible
 		 */
 		migrationGateTitle: () => LocalizedString
@@ -27880,6 +27922,10 @@ export type TranslationFunctions = {
 		 * For regulatory reasons we cannot provide custodial accounts in your region. Transfer your funds to a non-custodial account with Blink by following the next steps or contact us at <link>{email}</link>
 		 */
 		migrationGateBody: (arg: { email: unknown }) => LocalizedString
+		/**
+		 * Trial accounts are now closed. Your balance is safe. Move it to a non-custodial account by following the next steps, free and with no time limit, or contact us at <link>{email}</link>
+		 */
+		migrationGateBodyLevelZero: (arg: { email: unknown }) => LocalizedString
 		/**
 		 * Bitcoin balance
 		 */
@@ -28084,6 +28130,12 @@ export type TranslationFunctions = {
 			 */
 			body: (arg: { date: string }) => LocalizedString
 			/**
+			 * You can no longer receive funds to this trial account. Blink is closing trial accounts and this account will be inactivated by the end of {date}.
+	
+		Migrate now to a non-custodial account.
+			 */
+			bodyLevelZero: (arg: { date: string }) => LocalizedString
+			/**
 			 * Migrate now
 			 */
 			migrateCta: () => LocalizedString
@@ -28097,6 +28149,14 @@ export type TranslationFunctions = {
 			 * Move to a non-custodial account via guided migration, or withdraw, before {date}. Receiving stops {receiveStopsDate}.
 			 */
 			body: (arg: { date: string, receiveStopsDate: string }) => LocalizedString
+			/**
+			 * Move to a non-custodial account via guided migration, or withdraw, before {date} — everything moves in a few taps.
+			 */
+			bodySingleDate: (arg: { date: string }) => LocalizedString
+			/**
+			 * Move to a non-custodial account via guided migration, or withdraw, before {date}.
+			 */
+			bodyLevelZero: (arg: { date: string }) => LocalizedString
 			/**
 			 * Receiving has stopped. Move to a non-custodial account via guided migration, or withdraw, before {date}.
 			 */
@@ -28112,9 +28172,17 @@ export type TranslationFunctions = {
 			 */
 			title: () => LocalizedString
 			/**
-			 * Your account is registered in a region where we cannot offer accounts. Withdraw your funds before August 31. Receiving stops August 10.
+			 * Blink cannot offer custodial accounts in your region. Withdraw your funds before {date} — free of any Blink charge. Receiving stops {receiveStopsDate}. If you believe your account has been affected in error, you can verify your current residence in the app.
 			 */
-			body: () => LocalizedString
+			bodyTwoDates: (arg: { date: string, receiveStopsDate: string }) => LocalizedString
+			/**
+			 * Blink cannot offer custodial accounts in your region. Withdraw your funds before {date} — free of any Blink charge. If you believe your account has been affected in error, you can verify your current residence in the app.
+			 */
+			bodySingleDate: (arg: { date: string }) => LocalizedString
+			/**
+			 * Blink cannot offer custodial accounts in your region. Withdraw your funds before {date} — free of any Blink charge. Receiving is off. If you believe your account has been affected in error, you can verify your current residence in the app.
+			 */
+			bodyReceiveOff: (arg: { date: string }) => LocalizedString
 		}
 		contactSupport: {
 			/**

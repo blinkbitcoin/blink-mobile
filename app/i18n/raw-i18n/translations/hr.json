@@ -4011,17 +4011,22 @@
     "migrateNowModal": {
       "title": "Migrirajte sada na račun bez skrbništva",
       "body": "Više ne možete primati sredstva na svoj skrbnički račun. Blink je ukinuo skrbničku uslugu u vašoj regiji i ovaj će račun biti deaktiviran do kraja dana {date}.\n\nMigrirajte sada na račun bez skrbništva.",
+      "bodyLevelZero": "Više ne možete primati sredstva na ovaj probni račun. Blink zatvara probne račune i ovaj će račun biti deaktiviran do kraja dana {date}.\n\nMigrirajte sada na račun bez skrbništva.",
       "migrateCta": "Migriraj sada"
     },
     "reminderBulletin": {
       "title": "Važno",
       "body": "Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date}. Primanje prestaje {receiveStopsDate}.",
+      "bodySingleDate": "Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date} — sve se prenosi u nekoliko dodira.",
+      "bodyLevelZero": "Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date}.",
       "bodyReceiveDisabled": "Primanje je prestalo. Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date}.",
       "migrateCta": "Migriraj"
     },
     "offboardBulletin": {
       "title": "Važno",
-      "body": "Vaš račun registriran je u regiji u kojoj ne možemo nuditi račune. Podignite svoja sredstva prije 31. kolovoza. Primanje prestaje 10. kolovoza."
+      "bodyTwoDates": "Blink ne može nuditi skrbničke račune u vašoj regiji. Podignite svoja sredstva prije {date} — bez ikakvih naknada Blinka. Primanje prestaje {receiveStopsDate}. Ako smatrate da je vaš račun pogođen greškom, svoje trenutačno prebivalište možete potvrditi u aplikaciji.",
+      "bodySingleDate": "Blink ne može nuditi skrbničke račune u vašoj regiji. Podignite svoja sredstva prije {date} — bez ikakvih naknada Blinka. Ako smatrate da je vaš račun pogođen greškom, svoje trenutačno prebivalište možete potvrditi u aplikaciji.",
+      "bodyReceiveOff": "Blink ne može nuditi skrbničke račune u vašoj regiji. Podignite svoja sredstva prije {date} — bez ikakvih naknada Blinka. Primanje je isključeno. Ako smatrate da je vaš račun pogođen greškom, svoje trenutačno prebivalište možete potvrditi u aplikaciji."
     },
     "dollarBalanceModal": {
       "title": "Ne možemo migrirati vaš dolarski saldo",
@@ -4077,8 +4082,10 @@
     "resumeFailed": "Nešto je pošlo po zlu pri nastavku migracije. Molimo započnite je ponovno.",
     "migrationRequiredBody": "Vrijeme je da migrirate svoj skrbnički račun na račun bez skrbništva.",
     "migrationRequiredForcedBody": "Vrijeme je da migrirate svoj skrbnički račun na račun bez skrbništva. To je obavezno iz regulatornih razloga.\n\nBez brige, non-custodial će ti dugoročno biti bolji.",
+    "migrationRequiredForcedBodyLevelZero": "Blink zatvara probne račune. Prenesite svoj saldo na račun bez skrbništva. Potrebno je samo nekoliko dodira.",
     "migrationGateTitle": "Račun nije dostupan",
     "migrationGateBody": "Iz regulatornih razloga ne možemo pružati custodial račune u tvojoj regiji. Prenesi svoja sredstva na non-custodial račun uz Blink slijedeći sljedeće korake ili nas kontaktiraj na <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Probni računi sada su zatvoreni. Vaš saldo je siguran. Prenesite ga na račun bez skrbništva slijedeći sljedeće korake, besplatno i bez vremenskog ograničenja, ili nas kontaktirajte na <link>{email}</link>",
     "bitcoinBalance": "Stanje Bitcoina",
     "dollarBalance": "Stanje u dolarima",
     "moveToNonCustodial": "Prebaci na ne-skrbnički",

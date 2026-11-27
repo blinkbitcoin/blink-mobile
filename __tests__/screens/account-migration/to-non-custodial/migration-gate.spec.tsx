@@ -7,7 +7,7 @@ import {
   MigrationSupportReason,
   PendingDepositCheckStatus,
 } from "@app/types/migration"
-import { WindDown, WindDownStatus } from "@app/types/wind-down"
+import { WindDown, WindDownReason, WindDownStatus } from "@app/types/wind-down"
 import { StorageFailure } from "@app/utils/storage/storage-failure"
 
 import { walletOverviewQueryResult } from "../helpers"
@@ -147,6 +147,7 @@ const pendingDepositsState = (overrides: Record<string, unknown> = {}) => ({
 /** Only the status drives the intro mode, so the display fields stay fixed across cases. */
 const windDownWith = (status: WindDownStatus): WindDown => ({
   status,
+  reason: WindDownReason.Region,
   receiveDisabledAt: 0,
   finalDeadline: 0,
   gateArmsAt: 0,

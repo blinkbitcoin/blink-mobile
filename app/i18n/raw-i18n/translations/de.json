@@ -4011,17 +4011,22 @@
         "migrateNowModal": {
             "title": "Migriere jetzt auf ein nicht-verwahrtes Konto",
             "body": "Du kannst keine Gelder mehr auf deinem verwahrten Konto empfangen. Blink hat den Verwahrdienst in deiner Region eingestellt und dieses Konto wird zum Ende des {date} deaktiviert.\n\nMigriere jetzt auf ein nicht-verwahrtes Konto.",
+            "bodyLevelZero": "Du kannst keine Gelder mehr auf diesem Probekonto empfangen. Blink schließt Probekonten und dieses Konto wird zum Ende des {date} deaktiviert.\n\nMigriere jetzt auf ein nicht-verwahrtes Konto.",
             "migrateCta": "Jetzt migrieren"
         },
         "reminderBulletin": {
             "title": "Wichtig",
             "body": "Wechsle bis zum {date} über die geführte Migration zu einem nicht-verwahrten Konto oder zahle dein Guthaben aus. Der Empfang endet am {receiveStopsDate}.",
+            "bodySingleDate": "Wechsle bis zum {date} über die geführte Migration zu einem nicht-verwahrten Konto oder zahle dein Guthaben aus — alles ist mit wenigen Fingertipps erledigt.",
+            "bodyLevelZero": "Wechsle bis zum {date} über die geführte Migration zu einem nicht-verwahrten Konto oder zahle dein Guthaben aus.",
             "bodyReceiveDisabled": "Der Empfang ist beendet. Wechsle bis zum {date} über die geführte Migration zu einem nicht-verwahrten Konto oder zahle dein Guthaben aus.",
             "migrateCta": "Migrieren"
         },
         "offboardBulletin": {
             "title": "Wichtig",
-            "body": "Dein Konto ist in einer Region registriert, in der wir keine Konten anbieten können. Hebe dein Guthaben vor dem 31. August ab. Der Empfang endet am 10. August."
+            "bodyTwoDates": "Blink kann in deiner Region keine verwahrten Konten anbieten. Hebe dein Guthaben vor dem {date} ab — ohne Gebühren von Blink. Der Empfang endet am {receiveStopsDate}. Wenn du glaubst, dass dein Konto irrtümlich betroffen ist, kannst du deinen aktuellen Wohnsitz in der App bestätigen.",
+            "bodySingleDate": "Blink kann in deiner Region keine verwahrten Konten anbieten. Hebe dein Guthaben vor dem {date} ab — ohne Gebühren von Blink. Wenn du glaubst, dass dein Konto irrtümlich betroffen ist, kannst du deinen aktuellen Wohnsitz in der App bestätigen.",
+            "bodyReceiveOff": "Blink kann in deiner Region keine verwahrten Konten anbieten. Hebe dein Guthaben vor dem {date} ab — ohne Gebühren von Blink. Der Empfang ist deaktiviert. Wenn du glaubst, dass dein Konto irrtümlich betroffen ist, kannst du deinen aktuellen Wohnsitz in der App bestätigen."
         },
         "dollarBalanceModal": {
             "title": "Wir können dein Dollar-Guthaben nicht migrieren",
@@ -4077,8 +4082,10 @@
         "resumeFailed": "Beim Fortsetzen deiner Migration ist etwas schiefgelaufen. Bitte starte sie erneut.",
         "migrationRequiredBody": "Es ist Zeit, dein verwahrtes Konto auf ein nicht-verwahrtes Konto zu migrieren.",
         "migrationRequiredForcedBody": "Es ist Zeit, dein verwahrtes Konto auf ein nicht-verwahrtes Konto zu migrieren. Dies ist aus regulatorischen Gründen erforderlich.\n\nKeine Sorge, Non-Custodial wird auf lange Sicht besser für dich sein.",
+        "migrationRequiredForcedBodyLevelZero": "Blink schließt Probekonten. Übertrage dein Guthaben auf ein nicht-verwahrtes Konto. Das dauert nur wenige Fingertipps.",
         "migrationGateTitle": "Konto nicht zugänglich",
         "migrationGateBody": "Aus regulatorischen Gründen können wir in deiner Region keine Custodial-Konten anbieten. Übertrage deine Gelder mit den folgenden Schritten auf ein Non-Custodial-Konto bei Blink oder kontaktiere uns unter <link>{email}</link>",
+        "migrationGateBodyLevelZero": "Probekonten sind jetzt geschlossen. Dein Guthaben ist sicher. Übertrage es mit den folgenden Schritten auf ein nicht-verwahrtes Konto, kostenlos und ohne Frist, oder kontaktiere uns unter <link>{email}</link>",
         "bitcoinBalance": "Bitcoin-Guthaben",
         "dollarBalance": "Dollar-Guthaben",
         "moveToNonCustodial": "Zu Non-Custodial wechseln",

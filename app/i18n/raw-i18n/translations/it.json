@@ -4011,17 +4011,22 @@
         "migrateNowModal": {
             "title": "Migra ora verso un account non custodiale",
             "body": "Non puoi più ricevere fondi sul tuo account custodiale. Blink ha interrotto il servizio di custodia nella tua regione e questo account sarà disattivato entro la fine del {date}.\n\nMigra ora verso un account non custodiale.",
+            "bodyLevelZero": "Non puoi più ricevere fondi su questo account di prova. Blink sta chiudendo gli account di prova e questo account sarà disattivato entro la fine del {date}.\n\nMigra ora verso un account non custodiale.",
             "migrateCta": "Migra ora"
         },
         "reminderBulletin": {
             "title": "Importante",
             "body": "Passa a un account non custodiale tramite la migrazione guidata, oppure preleva i tuoi fondi, entro il {date}. La ricezione si interrompe il {receiveStopsDate}.",
+            "bodySingleDate": "Passa a un account non custodiale tramite la migrazione guidata, oppure preleva i tuoi fondi, entro il {date} — tutto si sposta in pochi tocchi.",
+            "bodyLevelZero": "Passa a un account non custodiale tramite la migrazione guidata, oppure preleva i tuoi fondi, entro il {date}.",
             "bodyReceiveDisabled": "La ricezione si è interrotta. Passa a un account non custodiale tramite la migrazione guidata, oppure preleva i tuoi fondi, entro il {date}.",
             "migrateCta": "Migra"
         },
         "offboardBulletin": {
             "title": "Importante",
-            "body": "Il tuo account è registrato in una regione in cui non possiamo offrire account. Preleva i tuoi fondi entro il 31 agosto. La ricezione si interrompe il 10 agosto."
+            "bodyTwoDates": "Blink non può offrire account custodiali nella tua regione. Preleva i tuoi fondi entro il {date} — senza alcun costo da parte di Blink. La ricezione si interrompe il {receiveStopsDate}. Se ritieni che il tuo account sia stato coinvolto per errore, puoi verificare la tua residenza attuale nell'app.",
+            "bodySingleDate": "Blink non può offrire account custodiali nella tua regione. Preleva i tuoi fondi entro il {date} — senza alcun costo da parte di Blink. Se ritieni che il tuo account sia stato coinvolto per errore, puoi verificare la tua residenza attuale nell'app.",
+            "bodyReceiveOff": "Blink non può offrire account custodiali nella tua regione. Preleva i tuoi fondi entro il {date} — senza alcun costo da parte di Blink. La ricezione è disattivata. Se ritieni che il tuo account sia stato coinvolto per errore, puoi verificare la tua residenza attuale nell'app."
         },
         "dollarBalanceModal": {
             "title": "Non possiamo migrare il tuo saldo in dollari",
@@ -4077,8 +4082,10 @@
         "resumeFailed": "Qualcosa è andato storto durante la ripresa della migrazione. Ricominciala da capo.",
         "migrationRequiredBody": "È ora di migrare il tuo account custodiale verso un account non custodiale.",
         "migrationRequiredForcedBody": "È ora di migrare il tuo account custodiale verso un account non custodiale. È obbligatorio per motivi normativi.\n\nNon preoccuparti, il non-custodial sarà migliore per te nel lungo periodo.",
+        "migrationRequiredForcedBodyLevelZero": "Blink sta chiudendo gli account di prova. Sposta il tuo saldo su un account non custodiale. Bastano pochi tocchi.",
         "migrationGateTitle": "Account non accessibile",
         "migrationGateBody": "Per motivi normativi non possiamo fornire account custodial nella tua regione. Trasferisci i tuoi fondi su un account non-custodial con Blink seguendo i passaggi successivi o contattaci su <link>{email}</link>",
+        "migrationGateBodyLevelZero": "Gli account di prova sono ora chiusi. Il tuo saldo è al sicuro. Spostalo su un account non custodiale seguendo i passaggi successivi, gratuitamente e senza limiti di tempo, oppure contattaci su <link>{email}</link>",
         "bitcoinBalance": "Saldo Bitcoin",
         "dollarBalance": "Saldo in dollari",
         "moveToNonCustodial": "Passa a non-custodial",

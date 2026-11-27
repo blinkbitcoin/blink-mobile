@@ -4011,17 +4011,22 @@
     "migrateNowModal": {
       "title": "Migra ara a un compte no custodi",
       "body": "Ja no pots rebre fons al teu compte custodial. Blink ha discontinuat el servei de custòdia a la teva regió i aquest compte quedarà inactivat al final del {date}.\n\nMigra ara a un compte no custodi.",
+      "bodyLevelZero": "Ja no pots rebre fons en aquest compte de prova. Blink tanca els comptes de prova i aquest compte quedarà inactivat al final del {date}.\n\nMigra ara a un compte no custodi.",
       "migrateCta": "Migra ara"
     },
     "reminderBulletin": {
       "title": "Important",
       "body": "Passa a un compte no custodi mitjançant la migració guiada, o retira els teus fons, abans del {date}. La recepció s'atura el {receiveStopsDate}.",
+      "bodySingleDate": "Passa a un compte no custodi mitjançant la migració guiada, o retira els teus fons, abans del {date} — tot es mou en uns pocs tocs.",
+      "bodyLevelZero": "Passa a un compte no custodi mitjançant la migració guiada, o retira els teus fons, abans del {date}.",
       "bodyReceiveDisabled": "La recepció s'ha aturat. Passa a un compte no custodi mitjançant la migració guiada, o retira els teus fons, abans del {date}.",
       "migrateCta": "Migra"
     },
     "offboardBulletin": {
       "title": "Important",
-      "body": "El teu compte està registrat en una regió on no podem oferir comptes. Retira els teus fons abans del 31 d'agost. La recepció s'atura el 10 d'agost."
+      "bodyTwoDates": "Blink no pot oferir comptes custodials a la teva regió. Retira els teus fons abans del {date} — sense cap càrrec de Blink. La recepció s'atura el {receiveStopsDate}. Si creus que el teu compte s'ha vist afectat per error, pots verificar la teva residència actual a l'app.",
+      "bodySingleDate": "Blink no pot oferir comptes custodials a la teva regió. Retira els teus fons abans del {date} — sense cap càrrec de Blink. Si creus que el teu compte s'ha vist afectat per error, pots verificar la teva residència actual a l'app.",
+      "bodyReceiveOff": "Blink no pot oferir comptes custodials a la teva regió. Retira els teus fons abans del {date} — sense cap càrrec de Blink. La recepció està desactivada. Si creus que el teu compte s'ha vist afectat per error, pots verificar la teva residència actual a l'app."
     },
     "dollarBalanceModal": {
       "title": "No podem migrar el teu saldo en dòlars",
@@ -4077,8 +4082,10 @@
     "resumeFailed": "Alguna cosa ha fallat en reprendre la migració. Si us plau, torna-la a començar.",
     "migrationRequiredBody": "És hora de migrar el teu compte custodial a un compte no custodi.",
     "migrationRequiredForcedBody": "És hora de migrar el teu compte custodial a un compte no custodi. És obligatori per motius reguladors.\n\nNo et preocupis, la modalitat no custodial serà millor per a tu a llarg termini.",
+    "migrationRequiredForcedBodyLevelZero": "Blink tanca els comptes de prova. Passa el teu saldo a un compte no custodi. Només calen uns pocs tocs.",
     "migrationGateTitle": "Compte no accessible",
     "migrationGateBody": "Per motius reguladors no podem oferir comptes custodials a la teva regió. Transfereix els teus fons a un compte no custodial amb Blink seguint els passos següents o contacta amb nosaltres a <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Els comptes de prova ja estan tancats. El teu saldo està segur. Passa'l a un compte no custodi seguint els passos següents, de franc i sense límit de temps, o contacta amb nosaltres a <link>{email}</link>",
     "bitcoinBalance": "Saldo de Bitcoin",
     "dollarBalance": "Saldo en dòlars",
     "moveToNonCustodial": "Passa a no custodial",

@@ -15,6 +15,8 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { GateBalances } from "@app/screens/account-migration/gate-balances"
 import { useMigrationNextStep } from "@app/screens/account-migration/hooks"
+import { useCustodialWindDown } from "@app/screens/account-migration/hooks/use-custodial-wind-down"
+import { WindDownReason } from "@app/types/wind-down"
 import { StepLayout } from "@app/components/step-layout"
 import { testProps } from "@app/utils/testProps"
 
@@ -58,6 +60,9 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { goToNextStep, loading: nextStepLoading } = useMigrationNextStep()
   const { supportEmailAddress, openSupport } = useContactSupport()
+  /** A trial account closes wherever it is registered, so it never reads the region
+   *  wording; any other reason, or none yet, keeps it. */
+  const isLevelZero = useCustodialWindDown()?.reason === WindDownReason.LevelZero
 
   const isAuthed = useIsAuthed()
   const {
@@ -98,7 +103,11 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
 
   const gateBody = (
     <RichText
-      text={LL.AccountMigration.migrationGateBody({ email: supportEmailAddress })}
+      text={
+        isLevelZero
+          ? LL.AccountMigration.migrationGateBodyLevelZero({ email: supportEmailAddress })
+          : LL.AccountMigration.migrationGateBody({ email: supportEmailAddress })
+      }
       style={styles.gateBody}
       tags={{ link: { style: styles.gateLink, onPress: openSupport } }}
     />
@@ -118,7 +127,9 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
       heroIcon: "upgrade",
       heroIconColor: colors.success,
       title: LL.AccountMigration.migrationRequiredTitle(),
-      subtitle: LL.AccountMigration.migrationRequiredForcedBody(),
+      subtitle: isLevelZero
+        ? LL.AccountMigration.migrationRequiredForcedBodyLevelZero()
+        : LL.AccountMigration.migrationRequiredForcedBody(),
       shouldShowClose: true,
       shouldShowBalances: false,
     },

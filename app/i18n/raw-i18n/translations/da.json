@@ -4011,17 +4011,22 @@
     "migrateNowModal": {
       "title": "Migrér nu til en ikke-depotkonto",
       "body": "Du kan ikke længere modtage midler på din depotkonto. Blink har indstillet depottjenesten i din region, og denne konto vil blive deaktiveret ved udgangen af {date}.\n\nMigrér nu til en ikke-depotkonto.",
+      "bodyLevelZero": "Du kan ikke længere modtage midler på denne prøvekonto. Blink lukker prøvekonti, og denne konto vil blive deaktiveret ved udgangen af {date}.\n\nMigrér nu til en ikke-depotkonto.",
       "migrateCta": "Migrér nu"
     },
     "reminderBulletin": {
       "title": "Vigtigt",
       "body": "Skift til en ikke-depotkonto via guidet migrering, eller hæv dine midler, inden {date}. Modtagelse stopper den {receiveStopsDate}.",
+      "bodySingleDate": "Skift til en ikke-depotkonto via guidet migrering, eller hæv dine midler, inden {date} — alt flyttes med få tryk.",
+      "bodyLevelZero": "Skift til en ikke-depotkonto via guidet migrering, eller hæv dine midler, inden {date}.",
       "bodyReceiveDisabled": "Modtagelse er stoppet. Skift til en ikke-depotkonto via guidet migrering, eller hæv dine midler, inden {date}.",
       "migrateCta": "Migrér"
     },
     "offboardBulletin": {
       "title": "Vigtigt",
-      "body": "Din konto er registreret i en region, hvor vi ikke kan tilbyde konti. Hæv dine midler inden den 31. august. Modtagelse stopper den 10. august."
+      "bodyTwoDates": "Blink kan ikke tilbyde depotkonti i din region. Hæv dine midler inden {date} — uden gebyrer fra Blink. Modtagelse stopper den {receiveStopsDate}. Hvis du mener, at din konto er berørt ved en fejl, kan du bekræfte din nuværende bopæl i appen.",
+      "bodySingleDate": "Blink kan ikke tilbyde depotkonti i din region. Hæv dine midler inden {date} — uden gebyrer fra Blink. Hvis du mener, at din konto er berørt ved en fejl, kan du bekræfte din nuværende bopæl i appen.",
+      "bodyReceiveOff": "Blink kan ikke tilbyde depotkonti i din region. Hæv dine midler inden {date} — uden gebyrer fra Blink. Modtagelse er slået fra. Hvis du mener, at din konto er berørt ved en fejl, kan du bekræfte din nuværende bopæl i appen."
     },
     "dollarBalanceModal": {
       "title": "Vi kan ikke migrere din dollarsaldo",
@@ -4077,8 +4082,10 @@
     "resumeFailed": "Noget gik galt under genoptagelsen af din migrering. Start den venligst igen.",
     "migrationRequiredBody": "Det er tid til at migrere din depotkonto til en ikke-depotkonto.",
     "migrationRequiredForcedBody": "Det er tid til at migrere din depotkonto til en ikke-depotkonto. Det er påkrævet af regulatoriske årsager.\n\nIngen grund til bekymring, non-custodial vil være bedre for dig i det lange løb.",
+    "migrationRequiredForcedBodyLevelZero": "Blink lukker prøvekonti. Flyt din saldo til en ikke-depotkonto. Det tager kun få tryk.",
     "migrationGateTitle": "Konto ikke tilgængelig",
     "migrationGateBody": "Af regulatoriske årsager kan vi ikke tilbyde custodial konti i din region. Overfør dine midler til en non-custodial konto hos Blink ved at følge de næste trin, eller kontakt os på <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Prøvekonti er nu lukket. Din saldo er sikker. Flyt den til en ikke-depotkonto ved at følge de næste trin, gratis og uden tidsfrist, eller kontakt os på <link>{email}</link>",
     "bitcoinBalance": "Bitcoin-saldo",
     "dollarBalance": "Dollar-saldo",
     "moveToNonCustodial": "Flyt til non-custodial",

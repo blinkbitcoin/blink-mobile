@@ -4011,17 +4011,22 @@
     "migrateNowModal": {
       "title": "Költözzön át most egy nem letétkezelt fiókba",
       "body": "Már nem fogadhat pénzt a letétkezelt fiókjába. A Blink megszüntette a letétkezelési szolgáltatást az Ön régiójában, és ez a fiók {date} végéig inaktiválásra kerül.\n\nKöltözzön át most egy nem letétkezelt fiókba.",
+      "bodyLevelZero": "Erre a próbafiókra már nem fogadhat pénzt. A Blink megszünteti a próbafiókokat, és ez a fiók {date} végéig inaktiválásra kerül.\n\nKöltözzön át most egy nem letétkezelt fiókba.",
       "migrateCta": "Átköltözés most"
     },
     "reminderBulletin": {
       "title": "Fontos",
       "body": "Váltson át egy nem letétkezelt fiókra az irányított átköltöztetéssel, vagy vegye fel az egyenlegét {date} előtt. A fogadás megszűnik: {receiveStopsDate}.",
+      "bodySingleDate": "Váltson át egy nem letétkezelt fiókra az irányított átköltöztetéssel, vagy vegye fel az egyenlegét {date} előtt — minden néhány koppintással átkerül.",
+      "bodyLevelZero": "Váltson át egy nem letétkezelt fiókra az irányított átköltöztetéssel, vagy vegye fel az egyenlegét {date} előtt.",
       "bodyReceiveDisabled": "A fogadás megszűnt. Váltson át egy nem letétkezelt fiókra az irányított átköltöztetéssel, vagy vegye fel az egyenlegét {date} előtt.",
       "migrateCta": "Átköltözés"
     },
     "offboardBulletin": {
       "title": "Fontos",
-      "body": "A fiókod olyan régióban van regisztrálva, ahol nem tudunk fiókokat kínálni. Vedd fel a pénzed augusztus 31. előtt. A fogadás augusztus 10-én leáll."
+      "bodyTwoDates": "A Blink nem tud letétkezelt fiókokat kínálni a régiódban. Vedd fel a pénzed {date} előtt — a Blink semmilyen díjat nem számít fel. A fogadás megszűnik: {receiveStopsDate}. Ha úgy gondolod, hogy ez tévesen érinti a fiókodat, az alkalmazásban igazolhatod a jelenlegi lakóhelyedet.",
+      "bodySingleDate": "A Blink nem tud letétkezelt fiókokat kínálni a régiódban. Vedd fel a pénzed {date} előtt — a Blink semmilyen díjat nem számít fel. Ha úgy gondolod, hogy ez tévesen érinti a fiókodat, az alkalmazásban igazolhatod a jelenlegi lakóhelyedet.",
+      "bodyReceiveOff": "A Blink nem tud letétkezelt fiókokat kínálni a régiódban. Vedd fel a pénzed {date} előtt — a Blink semmilyen díjat nem számít fel. A fogadás ki van kapcsolva. Ha úgy gondolod, hogy ez tévesen érinti a fiókodat, az alkalmazásban igazolhatod a jelenlegi lakóhelyedet."
     },
     "dollarBalanceModal": {
       "title": "Nem tudjuk átköltöztetni a dollár egyenlegedet",
@@ -4077,8 +4082,10 @@
     "resumeFailed": "Hiba történt az átköltözés folytatása közben. Kérjük, kezdje újra.",
     "migrationRequiredBody": "Itt az ideje átköltöztetni letétkezelt fiókját egy nem letétkezelt fiókba.",
     "migrationRequiredForcedBody": "Itt az ideje átköltöztetni letétkezelt fiókját egy nem letétkezelt fiókba. Ez szabályozási okokból kötelező.\n\nNe aggódj, a nem letéti mód hosszú távon jobb lesz neked.",
+    "migrationRequiredForcedBodyLevelZero": "A Blink megszünteti a próbafiókokat. Vigye át egyenlegét egy nem letétkezelt fiókba. Csak néhány koppintás.",
     "migrationGateTitle": "A fiók nem elérhető",
     "migrationGateBody": "Szabályozási okokból nem tudunk letéti fiókokat biztosítani a régiódban. Utald át a pénzed egy nem letéti fiókba a Blinknél a következő lépéseket követve, vagy lépj kapcsolatba velünk itt: <link>{email}</link>",
+    "migrationGateBodyLevelZero": "A próbafiókok mostantól megszűntek. Az egyenlege biztonságban van. Vigye át egy nem letétkezelt fiókba a következő lépéseket követve, ingyenesen és időkorlát nélkül, vagy lépjen kapcsolatba velünk itt: <link>{email}</link>",
     "bitcoinBalance": "Bitcoin-egyenleg",
     "dollarBalance": "Dollár-egyenleg",
     "moveToNonCustodial": "Áttérés önrendelkezőre",

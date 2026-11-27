@@ -2,6 +2,7 @@ import * as React from "react"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { WindDownReason } from "@app/types/wind-down"
 import { formatDayAndMonth } from "@app/utils/date"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -16,6 +17,9 @@ type MigrateNowModalProps = {
   deadlineTimestamp: number
   /** IANA timezone the backend defines for rendering region dates. */
   timezone?: string
+  /** Why the account is wound down: LEVEL_ZERO gets the trial copy, anything else the
+   *  region copy. */
+  reason?: WindDownReason
 }
 
 export const MigrateNowModal: React.FC<MigrateNowModalProps> = ({
@@ -24,6 +28,7 @@ export const MigrateNowModal: React.FC<MigrateNowModalProps> = ({
   onMigrate,
   deadlineTimestamp,
   timezone,
+  reason,
 }) => {
   const { LL, locale } = useI18nContext()
   const styles = useStyles()
@@ -45,7 +50,9 @@ export const MigrateNowModal: React.FC<MigrateNowModalProps> = ({
       title={LL.AccountMigration.migrateNowModal.title()}
       body={
         <Text style={styles.body}>
-          {LL.AccountMigration.migrateNowModal.body({ date: deadlineDate })}
+          {reason === WindDownReason.LevelZero
+            ? LL.AccountMigration.migrateNowModal.bodyLevelZero({ date: deadlineDate })
+            : LL.AccountMigration.migrateNowModal.body({ date: deadlineDate })}
         </Text>
       }
       primaryButtonTitle={LL.AccountMigration.migrateNowModal.migrateCta()}

@@ -4011,17 +4011,22 @@
     "migrateNowModal": {
       "title": "Kunan astakuy mana waqaychasqa kuentaman",
       "body": "Manañam qullqita chaskiyta atinkichu waqaychasqa kuentaykipi. Blink-qa waqaychay ruwayta tukurqun llaqtaykipi, kay kuentaqa {date} tukukuyninpi wichq'asqa kanqa.\n\nKunan astakuy mana waqaychasqa kuentaman.",
+      "bodyLevelZero": "Manañam qullqita chaskiyta atinkichu kay prueba kuentapi. Blink-qa prueba kuentakunata wichq'achkan, kay kuentaqa {date} tukukuyninpi wichq'asqa kanqa.\n\nKunan astakuy mana waqaychasqa kuentaman.",
       "migrateCta": "Kunan astakuy"
     },
     "reminderBulletin": {
       "title": "Ancha allin",
       "body": "Astakuy mana waqaychasqa kuentaman pusaykachasqa astakuywan, otaq qullqiykita hurquy, {date} manaraq chayamuchkaptin. Chaskiyqa {receiveStopsDate}-pi tukukunqa.",
+      "bodySingleDate": "Astakuy mana waqaychasqa kuentaman pusaykachasqa astakuywan, otaq qullqiykita hurquy, {date} manaraq chayamuchkaptin — llapanmi pisi llamiykunallawan astakun.",
+      "bodyLevelZero": "Astakuy mana waqaychasqa kuentaman pusaykachasqa astakuywan, otaq qullqiykita hurquy, {date} manaraq chayamuchkaptin.",
       "bodyReceiveDisabled": "Chaskiyqa tukukunñam. Astakuy mana waqaychasqa kuentaman pusaykachasqa astakuywan, otaq qullqiykita hurquy, {date} manaraq chayamuchkaptin.",
       "migrateCta": "Astakuy"
     },
     "offboardBulletin": {
       "title": "Ancha allin",
-      "body": "Cuentaykiqa mana cuentakunata qoyta atinayku suyupim qelqasqa kashan. Qolqeykita horqokuy 31 Agosto manaraq chayamuchkaptin. Chaskiyqa 10 Agostopi sayan."
+      "bodyTwoDates": "Blink-qa manam waqaychasqa kuentakunata suyuykipi qoyta atinchu. Qullqiykita hurquy {date} manaraq chayamuchkaptin — mana ima Blink cobroyuq. Chaskiyqa {receiveStopsDate}-pi tukukunqa. Pantaywan kuentayki chayasqa kanman nispa yuyaspaqa, app-pi kunan tiyasqaykita chiqapchayta atinki.",
+      "bodySingleDate": "Blink-qa manam waqaychasqa kuentakunata suyuykipi qoyta atinchu. Qullqiykita hurquy {date} manaraq chayamuchkaptin — mana ima Blink cobroyuq. Pantaywan kuentayki chayasqa kanman nispa yuyaspaqa, app-pi kunan tiyasqaykita chiqapchayta atinki.",
+      "bodyReceiveOff": "Blink-qa manam waqaychasqa kuentakunata suyuykipi qoyta atinchu. Qullqiykita hurquy {date} manaraq chayamuchkaptin — mana ima Blink cobroyuq. Chaskiyqa harkasqam. Pantaywan kuentayki chayasqa kanman nispa yuyaspaqa, app-pi kunan tiyasqaykita chiqapchayta atinki."
     },
     "dollarBalanceModal": {
       "title": "Manam dólar qullqiykita astayta atinikuchu",
@@ -4077,8 +4082,10 @@
     "resumeFailed": "Astakuyniykita qatichiypi imapas mana allinchu rikhurirqan. Ama hina kaspa, musuqmanta qallariy.",
     "migrationRequiredBody": "Waqaychasqa kuentaykita mana waqaychasqa kuentaman astanaykipaq pachan.",
     "migrationRequiredForcedBody": "Waqaychasqa kuentaykita mana waqaychasqa kuentaman astanaykipaq pachan. Kamachiykuna raykumi necesitakun.\n\nAma llakikuychu, non-custodial nisqaqa unay pachapaqmi aswan allin kanqa qanpaq.",
+    "migrationRequiredForcedBodyLevelZero": "Blink-qa prueba kuentakunata wichq'achkan. Qullqiykita mana waqaychasqa kuentaman astay. Pisi llamiykunallam.",
     "migrationGateTitle": "Cuentaqa mana haykunallachu",
     "migrationGateBody": "Kamachiykuna raykumi mana atinikuchu custodial cuentakunata qan kasqaykipi qoyta. Qullqiykikunata Blink non-custodial cuentaman apachiy kay qatiq ruwaykunata qatispa utaq ñuqaykuwan rimay <link>{email}</link> nisqapi",
+    "migrationGateBodyLevelZero": "Prueba kuentakunaqa kunanqa wichq'asqañam. Qullqiykiqa allinmi kachkan. Mana waqaychasqa kuentaman astay kay qatiq ruwaykunata qatispa, mana qullqiyuq, mana pacha tupuyuq, utaq ñuqaykuwan rimay <link>{email}</link> nisqapi",
     "bitcoinBalance": "Bitcoin saldo",
     "dollarBalance": "Dólar saldo",
     "moveToNonCustodial": "Non-custodial nisqaman kutiy",

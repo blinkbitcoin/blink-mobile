@@ -979,6 +979,7 @@ export const HomeScreen: React.FC = () => {
         onMigrate={goToMigration}
         deadlineTimestamp={migrateNowPrompt.deadlineTimestamp}
         timezone={migrateNowPrompt.timezone}
+        reason={migrateNowPrompt.reason}
       />
       <View {...testProps("home-header")} style={styles.balanceContainer}>
         <View {...testProps("home-header-row")} style={styles.header}>
@@ -1093,11 +1094,19 @@ export const HomeScreen: React.FC = () => {
         {twoFactorReminderReason && (
           <TwoFactorReminderBulletin reason={twoFactorReminderReason} />
         )}
-        {offboardBulletin.isVisible && <OffboardOnlyBulletin />}
+        {offboardBulletin.isVisible && (
+          <OffboardOnlyBulletin
+            status={offboardBulletin.status}
+            deadlineTimestamp={offboardBulletin.deadlineTimestamp}
+            receiveDisabledTimestamp={offboardBulletin.receiveDisabledTimestamp}
+            timezone={offboardBulletin.timezone}
+          />
+        )}
         {reminderBulletin.isVisible && (
           <MigrationReminderBulletin
             onMigrate={goToMigration}
             phase={reminderBulletin.phase}
+            reason={reminderBulletin.reason}
             deadlineTimestamp={reminderBulletin.deadlineTimestamp}
             receiveDisabledTimestamp={reminderBulletin.receiveDisabledTimestamp}
             timezone={reminderBulletin.timezone}

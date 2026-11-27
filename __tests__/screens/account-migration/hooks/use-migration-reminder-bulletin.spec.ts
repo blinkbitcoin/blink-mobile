@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react-native"
 
 import { useMigrationReminderBulletin } from "@app/screens/account-migration/hooks/use-migration-reminder-bulletin"
-import { WindDown, WindDownStatus } from "@app/types/wind-down"
+import { WindDown, WindDownReason, WindDownStatus } from "@app/types/wind-down"
 import { AccountType } from "@app/types/wallet"
 
 let mockAccountType: AccountType = AccountType.Custodial
@@ -13,6 +13,7 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 /** A synthetic affected wind-down; each test swaps `status` on top of it. */
 const affectedWindDown: WindDown = {
   status: WindDownStatus.PreCutoff,
+  reason: WindDownReason.Region,
   receiveDisabledAt: 1_790_000_000,
   finalDeadline: 1_790_100_000,
   gateArmsAt: 1_790_200_000,
@@ -20,10 +21,14 @@ const affectedWindDown: WindDown = {
 }
 
 let mockStatus: WindDownStatus | null = WindDownStatus.PreCutoff
+let mockReason: WindDownReason = WindDownReason.Region
 
 jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
   useWindDownStatus: () => ({
-    windDown: mockStatus === null ? null : { ...affectedWindDown, status: mockStatus },
+    windDown:
+      mockStatus === null
+        ? null
+        : { ...affectedWindDown, status: mockStatus, reason: mockReason },
     isPending: false,
   }),
 }))
@@ -32,6 +37,7 @@ describe("useMigrationReminderBulletin", () => {
   beforeEach(() => {
     mockAccountType = AccountType.Custodial
     mockStatus = WindDownStatus.PreCutoff
+    mockReason = WindDownReason.Region
   })
 
   it("shows for a custodial account in the pre-cutoff phase with the deadline data", () => {
@@ -44,6 +50,15 @@ describe("useMigrationReminderBulletin", () => {
       affectedWindDown.receiveDisabledAt,
     )
     expect(result.current.timezone).toBe(affectedWindDown.timezone)
+    expect(result.current.reason).toBe(WindDownReason.Region)
+  })
+
+  it("passes a Level 0 reason through for the trial-account copy", () => {
+    mockReason = WindDownReason.LevelZero
+
+    const { result } = renderHook(() => useMigrationReminderBulletin())
+
+    expect(result.current.reason).toBe(WindDownReason.LevelZero)
   })
 
   /** The migrate-now modal also fires in this phase, but it is dismissible for the session

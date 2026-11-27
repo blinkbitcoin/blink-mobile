@@ -3604,7 +3604,7 @@ export type MigrationCommitMutation = { readonly __typename: 'Mutation', readonl
 export type WindDownQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type WindDownQuery = { readonly __typename: 'Query', readonly windDown?: { readonly __typename: 'AccountWindDown', readonly status: WindDownStatus, readonly receiveDisabledAt: number, readonly finalDeadline: number, readonly gateArmsAt: number, readonly timezone: string } | null };
+export type WindDownQuery = { readonly __typename: 'Query', readonly windDown?: { readonly __typename: 'AccountWindDown', readonly status: WindDownStatus, readonly reason: WindDownReason, readonly receiveDisabledAt: number, readonly finalDeadline: number, readonly gateArmsAt: number, readonly timezone: string } | null };
 
 export type CardUpdateMutationVariables = Exact<{
   input: CardUpdateInput;
@@ -6528,6 +6528,7 @@ export const WindDownDocument = gql`
     query windDown {
   windDown {
     status
+    reason
     receiveDisabledAt
     finalDeadline
     gateArmsAt

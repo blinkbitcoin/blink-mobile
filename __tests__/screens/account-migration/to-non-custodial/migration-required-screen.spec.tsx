@@ -9,6 +9,7 @@ import {
   MigrationMode,
   MigrationRequiredScreen,
 } from "@app/screens/account-migration/to-non-custodial/migration-required-screen"
+import { WindDown, WindDownReason, WindDownStatus } from "@app/types/wind-down"
 import { ContextForScreen } from "../../helper"
 import { walletOverviewQueryResult } from "../helpers"
 import { flushEffects } from "../../../helpers/flush-effects"
@@ -44,6 +45,24 @@ jest.mock("@app/graphql/is-authed-context", () => ({
   ...jest.requireActual("@app/graphql/is-authed-context"),
   useIsAuthed: () => true,
 }))
+
+let mockWindDown: WindDown | null = null
+
+jest.mock("@app/screens/account-migration/hooks/use-custodial-wind-down", () => ({
+  ...jest.requireActual("@app/screens/account-migration/hooks/use-custodial-wind-down"),
+  useCustodialWindDown: () => mockWindDown,
+}))
+
+const windDownFor = (reason: WindDownReason): WindDown => ({
+  status: WindDownStatus.PreCutoff,
+  reason,
+  receiveDisabledAt: 0,
+  finalDeadline: 0,
+  gateArmsAt: 0,
+  timezone: "Europe/Paris",
+})
+
+const REGION_OR_REGULATORY = /region|regulatory/i
 
 const mockGoToNextStep = jest.fn()
 let mockNextStepLoading = false
@@ -94,6 +113,7 @@ describe("MigrationRequiredScreen", () => {
     loadLocale("en")
     mockConvertReady = true
     mockNextStepLoading = false
+    mockWindDown = null
     mockUseWalletOverviewScreenQuery.mockReturnValue(
       walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 2500 }),
     )
@@ -132,9 +152,56 @@ describe("MigrationRequiredScreen", () => {
       ).toBeTruthy()
       expect(screen.getByTestId("migration-close")).toBeTruthy()
     })
+
+    it("gives a Level 0 account the trial intro, with no region or regulatory wording", async () => {
+      mockWindDown = windDownFor(WindDownReason.LevelZero)
+      renderScreen("forcedPreDeadline")
+      await flushEffects()
+
+      expect(
+        screen.getByText(
+          "Blink is closing trial accounts. Move your balance to a non-custodial account. It only takes a few taps.",
+        ),
+      ).toBeTruthy()
+      expect(screen.queryByText(REGION_OR_REGULATORY)).toBeNull()
+    })
+
+    it("keeps the regulatory copy when the server reports REGION", async () => {
+      mockWindDown = windDownFor(WindDownReason.Region)
+      renderScreen("forcedPreDeadline")
+      await flushEffects()
+
+      expect(
+        screen.getByText(LL.AccountMigration.migrationRequiredForcedBody()),
+      ).toBeTruthy()
+    })
   })
 
   describe("gate mode", () => {
+    it("keeps the region gate copy for a region wind-down", async () => {
+      mockWindDown = windDownFor(WindDownReason.Region)
+      renderScreen("gate")
+      await flushEffects()
+
+      expect(
+        screen.getByText(/we cannot provide custodial accounts in your region/),
+      ).toBeTruthy()
+    })
+
+    it("gives a Level 0 account the trial gate copy, with no region or regulatory wording", async () => {
+      mockWindDown = windDownFor(WindDownReason.LevelZero)
+      renderScreen("gate")
+      await flushEffects()
+
+      expect(
+        screen.getByText(
+          /^Trial accounts are now closed\. Your balance is safe\. Move it to a non-custodial account by following the next steps, free and with no time limit, or contact us at/,
+        ),
+      ).toBeTruthy()
+      expect(screen.getByText(CONTACT_EMAIL)).toBeTruthy()
+      expect(screen.queryByText(REGION_OR_REGULATORY)).toBeNull()
+    })
+
     it("renders the warning hero, gate title, balances and no close button", async () => {
       renderScreen("gate")
       await flushEffects()

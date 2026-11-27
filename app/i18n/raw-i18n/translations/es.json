@@ -4011,17 +4011,22 @@
         "migrateNowModal": {
             "title": "Migra ahora a una cuenta no custodial",
             "body": "Ya no puedes recibir fondos en tu cuenta custodial. Blink descontinuó el servicio custodial en tu región y esta cuenta quedará inactivada al finalizar el {date}.\n\nMigra ahora a una cuenta no custodial.",
+            "bodyLevelZero": "Ya no puedes recibir fondos en esta cuenta de prueba. Blink está cerrando las cuentas de prueba y esta cuenta quedará inactivada al finalizar el {date}.\n\nMigra ahora a una cuenta no custodial.",
             "migrateCta": "Migrar ahora"
         },
         "reminderBulletin": {
             "title": "Importante",
             "body": "Pasa a una cuenta no custodial mediante la migración guiada, o retira tus fondos, antes del {date}. La recepción se detiene el {receiveStopsDate}.",
+            "bodySingleDate": "Pasa a una cuenta no custodial mediante la migración guiada, o retira tus fondos, antes del {date} — todo se mueve en unos pocos toques.",
+            "bodyLevelZero": "Pasa a una cuenta no custodial mediante la migración guiada, o retira tus fondos, antes del {date}.",
             "bodyReceiveDisabled": "La recepción se ha detenido. Pasa a una cuenta no custodial mediante la migración guiada, o retira tus fondos, antes del {date}.",
             "migrateCta": "Migrar"
         },
         "offboardBulletin": {
             "title": "Importante",
-            "body": "Tu cuenta está registrada en una región donde no podemos ofrecer cuentas. Retira tus fondos antes del 31 de agosto. La recepción se detiene el 10 de agosto."
+            "bodyTwoDates": "Blink no puede ofrecer cuentas custodiales en tu región. Retira tus fondos antes del {date} — sin ningún cargo de Blink. La recepción se detiene el {receiveStopsDate}. Si crees que tu cuenta se ha visto afectada por error, puedes verificar tu residencia actual en la app.",
+            "bodySingleDate": "Blink no puede ofrecer cuentas custodiales en tu región. Retira tus fondos antes del {date} — sin ningún cargo de Blink. Si crees que tu cuenta se ha visto afectada por error, puedes verificar tu residencia actual en la app.",
+            "bodyReceiveOff": "Blink no puede ofrecer cuentas custodiales en tu región. Retira tus fondos antes del {date} — sin ningún cargo de Blink. La recepción está desactivada. Si crees que tu cuenta se ha visto afectada por error, puedes verificar tu residencia actual en la app."
         },
         "dollarBalanceModal": {
             "title": "No podemos migrar tu Saldo Dólar",
@@ -4077,8 +4082,10 @@
         "resumeFailed": "Algo salió mal al reanudar tu migración. Por favor, comiénzala de nuevo.",
         "migrationRequiredBody": "Es hora de migrar tu cuenta custodial a una cuenta no custodial.",
         "migrationRequiredForcedBody": "Es hora de migrar tu cuenta custodial a una cuenta no custodial. Es obligatorio por motivos regulatorios.\n\nNo te preocupes, la modalidad no custodial será mejor para ti a largo plazo.",
+        "migrationRequiredForcedBodyLevelZero": "Blink está cerrando las cuentas de prueba. Pasa tu saldo a una cuenta no custodial. Solo toma unos pocos toques.",
         "migrationGateTitle": "Cuenta no accesible",
         "migrationGateBody": "Por motivos regulatorios no podemos ofrecer cuentas custodiales en tu región. Transfiere tus fondos a una cuenta no custodial con Blink siguiendo los próximos pasos o contáctanos en <link>{email}</link>",
+        "migrationGateBodyLevelZero": "Las cuentas de prueba ya están cerradas. Tu saldo está seguro. Pásalo a una cuenta no custodial siguiendo los próximos pasos, gratis y sin límite de tiempo, o contáctanos en <link>{email}</link>",
         "bitcoinBalance": "Saldo de Bitcoin",
         "dollarBalance": "Saldo en dólares",
         "moveToNonCustodial": "Migrar a no custodia",
