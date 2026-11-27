@@ -2354,6 +2354,7 @@
     "title": "Bekræft betaling",
     "totalLabel": "Total:",
     "totalExceed": "Totalen overstiger din saldo på {balance: string}",
+    "feeExceedsAmount": "Netværksgebyret er højere end det beløb, du sender",
     "maxFeeSelected": "Dette er det maksimale gebyr, du vil blive opkrævet for denne transaktion. Det kan ende med at være mindre, når betalingen er foretaget.",
     "invoiceAlreadyPaid": "Denne faktura er allerede blevet betalt",
     "somethingWentWrong": "Noget gik galt",

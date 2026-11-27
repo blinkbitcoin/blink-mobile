@@ -2354,6 +2354,7 @@
     "title": "Potvrdiť platbu",
     "totalLabel": "Celkom:",
     "totalExceed": "Celková suma prekračuje váš zostatok {balance: string}",
+    "feeExceedsAmount": "Sieťový poplatok je vyšší ako suma, ktorú posielate",
     "maxFeeSelected": "Ide o maximálny poplatok, ktorý vám bude účtovaný za túto transakciu. Po jej vykonaní môže byť poplatok nižší.",
     "invoiceAlreadyPaid": "Táto faktúra už bola uhradená",
     "somethingWentWrong": "Niečo sa pokazilo",

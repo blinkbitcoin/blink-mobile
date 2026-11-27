@@ -2354,6 +2354,7 @@
     "title": "Confirma el pagament",
     "totalLabel": "Total:",
     "totalExceed": "El total supera el teu saldo de {balance: string}",
+    "feeExceedsAmount": "La comissió de la xarxa supera l'import que envies",
     "maxFeeSelected": "Aquesta és la comissió màxima que se't cobrarà per aquesta transacció. Pot acabar sent inferior un cop s'hagi realitzat el pagament.",
     "invoiceAlreadyPaid": "Aquesta factura ja ha estat pagada",
     "somethingWentWrong": "Alguna cosa ha anat malament",

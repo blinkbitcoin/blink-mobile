@@ -2354,6 +2354,7 @@
     "title": "Pastikan bayaran anda",
     "totalLabel": "Jumlah:",
     "totalExceed": "Jumlah yang melebihi baki anda {balance: string}",
+    "feeExceedsAmount": "Cas rangkaian melebihi amaun yang anda hantar",
     "maxFeeSelected": "Ini adalah cas bayaran maksimum yang akan dikenakan untuk transaksi ini. Tapi cas ni mungkin akan lagi rendah bila bayaran telah dibuat.",
     "invoiceAlreadyPaid": "Invois ini telah pun dibayar",
     "somethingWentWrong": "Sesuatu tidak kena",

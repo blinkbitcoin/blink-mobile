@@ -2354,6 +2354,7 @@
     "title": "Confirmați plata",
     "totalLabel": "Total:",
     "totalExceed": "Total depășește soldul {sold: string}",
+    "feeExceedsAmount": "Taxa de rețea depășește suma pe care o trimiteți",
     "maxFeeSelected": "Aceasta este taxa maximă care vi se va percepe pentru această tranzacție. Poate ajunge să fie mai mică odată ce plata a fost efectuată.",
     "invoiceAlreadyPaid": "Această factură a fost deja plătită",
     "somethingWentWrong": "Ceva nu a mers bine",

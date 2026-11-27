@@ -2379,6 +2379,7 @@ const en: BaseTranslation = {
     title: "Confirm Payment",
     totalLabel: "Total:",
     totalExceed: "Total exceeds your balance of {balance: string}",
+    feeExceedsAmount: "The network fee is more than the amount you're sending",
     maxFeeSelected:
       "This is the maximum fee you will be charged for this transaction.  It may end up being less once the payment has been made.",
     invoiceAlreadyPaid: "This invoice has already been paid",

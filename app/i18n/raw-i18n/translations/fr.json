@@ -2354,6 +2354,7 @@
         "title": "Confirmer le paiement",
         "totalLabel": "Solde :",
         "totalExceed": "Le total excède votre solde de {balance: string}",
+        "feeExceedsAmount": "Les frais de réseau dépassent le montant que vous envoyez",
         "maxFeeSelected": "Il s’agit des frais maximums qui vous seront facturés pour cette transaction. Il peut s’avérer inférieur une fois le paiement effectué.",
         "invoiceAlreadyPaid": "Cette facture a déjà été payée",
         "somethingWentWrong": "Une erreur est survenue",

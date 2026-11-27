@@ -2354,6 +2354,7 @@
         "title": "Confirmar pago",
         "totalLabel": "Total:",
         "totalExceed": "El total excede su saldo de {balance: string}",
+        "feeExceedsAmount": "La tarifa de red supera la cantidad que envías",
         "maxFeeSelected": "Tarifa máxima que se cobrará por esta transacción. Podría ser menor una vez se realice el pago.",
         "invoiceAlreadyPaid": "Esta factura ya ha sido pagada.",
         "somethingWentWrong": "Algo salió mal",

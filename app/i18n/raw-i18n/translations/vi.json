@@ -2354,6 +2354,7 @@
     "title": "Xác nhận thanh toán",
     "totalLabel": "Tổng cộng:",
     "totalExceed": "Tổng vượt quá số dư của bạn là {balance: string}",
+    "feeExceedsAmount": "Phí mạng lưới cao hơn số tiền bạn đang gửi",
     "maxFeeSelected": "Đây là mức phí tối đa bạn sẽ phải trả cho giao dịch này. Nó có thể sẽ ít hơn sau khi thanh toán được thực hiện.",
     "invoiceAlreadyPaid": "Hóa đơn này đã được thanh toán",
     "somethingWentWrong": "Đã xảy ra sự cố",

@@ -2354,6 +2354,7 @@
     "title": "Konfirmasi Pembayaran",
     "totalLabel": "Total:",
     "totalExceed": "Total melebihi saldo Anda sebesar {balance: string}",
+    "feeExceedsAmount": "Biaya jaringan lebih besar dari jumlah yang Anda kirim",
     "maxFeeSelected": "Ini adalah biaya maksimum yang akan dikenakan untuk transaksi ini. Biaya mungkin lebih rendah setelah pembayaran dilakukan.",
     "invoiceAlreadyPaid": "Faktur ini telah dibayar",
     "somethingWentWrong": "Terjadi kesalahan",

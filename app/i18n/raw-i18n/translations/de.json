@@ -2354,6 +2354,7 @@
         "title": "Zahlung bestätigen",
         "totalLabel": "Gesamt:",
         "totalExceed": "Der Gesamtbetrag übersteigt dein Guthaben von {balance: string}",
+        "feeExceedsAmount": "Die Netzwerkgebühr ist höher als der Betrag, den du sendest",
         "maxFeeSelected": "Dies ist die maximale Transaktionsgebühr. Die tatsächlich gezahlte Gebühr kann weniger betragen.",
         "invoiceAlreadyPaid": "Diese Invoice ist bereits bezahlt worden",
         "somethingWentWrong": "Etwas ist schief gegeangen",

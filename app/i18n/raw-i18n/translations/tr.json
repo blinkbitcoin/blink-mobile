@@ -2354,6 +2354,7 @@
     "title": "Ödemeyi Onayla",
     "totalLabel": "Toplam:",
     "totalExceed": "Toplam tutar {balance: string} bakiyenizi aşıyor",
+    "feeExceedsAmount": "Ağ ücreti gönderdiğiniz tutardan fazla",
     "maxFeeSelected": "Bu, bu işlem için sizden tahsil edilecek maksimum ücrettir. Ödeme yapıldıktan sonra daha az olabilir.",
     "invoiceAlreadyPaid": "Bu fatura zaten ödenmiştir",
     "somethingWentWrong": "Bir şeyler ters gitti",

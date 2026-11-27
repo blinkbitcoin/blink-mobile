@@ -2354,6 +2354,7 @@
     "title": "Thibitisha malipo.",
     "totalLabel": "Jumla:",
     "totalExceed": "Jumla imezidi baki lako la {balance: string}",
+    "feeExceedsAmount": "Ada ya mtandao ni kubwa kuliko kiasi unachotuma",
     "maxFeeSelected": "Hii ndio ada ya juu zaidi ambayo unawezalipishwa kwa malipo haya. Inaweza kuishia kuwa kidogo malipo yatakapofanyika.",
     "invoiceAlreadyPaid": "Laini ya malipo imekwisha kulipiwa",
     "somethingWentWrong": "Kitu kimeenda vibaya",
