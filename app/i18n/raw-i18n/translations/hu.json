@@ -3575,6 +3575,14 @@
       "businessDays": "{day1}-{day2} munkanap",
       "free": "INGYENES"
     },
+    "Deposit": {
+      "note": "Kártyaegyenleg-feltöltés",
+      "setAmount": "Adjon meg egy összeget a kártyaegyenleg feltöltéséhez.",
+      "crediting": "Jóváírás a kártyaegyenlegen…",
+      "credited": "{amount: string} jóváírva a kártyaegyenlegen",
+      "failed": "Ezt a feltöltést nem tudtuk jóváírni a kártyaegyenlegen. Kérjük, forduljon az ügyfélszolgálathoz.",
+      "addressFailed": "A címet nem sikerült betölteni. Próbálja újra később."
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Új PIN megerősítése",

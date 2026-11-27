@@ -50,6 +50,10 @@ type Props = {
   loading: boolean
   completed: boolean
   converting?: boolean
+  /** Replaces the conversion wait's words, for a payment that is not converting. */
+  convertingMessage?: string
+  /** Shown in place of the QR while the request still needs something, such as an amount. */
+  prompt?: string
   err: string
   style?: StyleProp<ViewStyle>
   expired: boolean
@@ -66,6 +70,8 @@ const QRViewBase: React.FC<Props> = ({
   loading,
   completed,
   converting = false,
+  convertingMessage,
+  prompt,
   err,
   style,
   expired,
@@ -142,9 +148,19 @@ const QRViewBase: React.FC<Props> = ({
           <View style={styles.convertingContent}>
             <ActivityIndicator size="large" color={colors.accent} />
             <Text type="p2" style={styles.convertingText}>
-              {LL.ReceiveScreen.pleaseWaitForConversion()}
+              {convertingMessage ?? LL.ReceiveScreen.pleaseWaitForConversion()}
             </Text>
           </View>
+        </View>
+      )
+    }
+
+    if (prompt) {
+      return (
+        <View {...testProps("QR-Prompt")} style={[styles.container, style]}>
+          <Text type="p2" style={styles.promptText}>
+            {prompt}
+          </Text>
         </View>
       )
     }
@@ -266,6 +282,10 @@ const useStyles = makeStyles(({ colors }) => ({
     rowGap: 12,
   },
   convertingText: {
+    color: colors.staticBlack,
+    textAlign: "center",
+  },
+  promptText: {
     color: colors.staticBlack,
     textAlign: "center",
   },

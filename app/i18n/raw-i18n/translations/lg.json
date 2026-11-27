@@ -3575,6 +3575,14 @@
       "businessDays": "{day1}-{day2} ennaku z'emirimu",
       "free": "BWERERE"
     },
+    "Deposit": {
+      "note": "Okwongera ku bbalansi ya kaadi",
+      "setAmount": "Teeka omuwendo okwongera ku bbalansi ya kaadi yo.",
+      "crediting": "Kyongerwa ku bbalansi ya kaadi yo…",
+      "credited": "{amount: string} byongeddwa ku bbalansi ya kaadi yo",
+      "failed": "Tetusobodde kwongera kino ku bbalansi ya kaadi yo. Tuukirira abayambi.",
+      "addressFailed": "Endagiriro teyasobose kulabika. Gezaako oluvannyuma."
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Kakasa PIN empya",

@@ -3575,6 +3575,14 @@
       "businessDays": "{day1}-{day2} llamk'ana p'unchaykuna",
       "free": "MANA QULLQI"
     },
+    "Deposit": {
+      "note": "Tarjeta saldo recargay",
+      "setAmount": "Huk qullqi kaqta churay tarjetaykiq saldonta recarganaykipaq.",
+      "crediting": "Tarjetaykiq saldonman yapakuchkan…",
+      "credited": "{amount: string} tarjetaykiq saldonman yapakurqan",
+      "failed": "Manam kay recargata tarjetaykiq saldonman yapayta atirqanchikchu. Yanapaqkunawan rimay.",
+      "addressFailed": "Manam direccionta cargayta atikurqanchu. Qhipaman yapamanta kallpachakuy."
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Musuq PIN nisqa takyachiy",

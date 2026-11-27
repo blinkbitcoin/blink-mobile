@@ -3575,6 +3575,14 @@
       "businessDays": "{day1}-{day2} werksdae",
       "free": "GRATIS"
     },
+    "Deposit": {
+      "note": "Kaartsaldo-oplaai",
+      "setAmount": "Stel 'n bedrag om jou kaartsaldo op te laai.",
+      "crediting": "Word by jou kaartsaldo gevoeg…",
+      "credited": "{amount: string} by jou kaartsaldo gevoeg",
+      "failed": "Ons kon nie hierdie oplaai by jou kaartsaldo voeg nie. Kontak asseblief ondersteuning.",
+      "addressFailed": "Kon nie die adres laai nie. Probeer later weer."
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Bevestig nuwe PIN",

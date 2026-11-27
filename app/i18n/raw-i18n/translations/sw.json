@@ -3575,6 +3575,14 @@
       "businessDays": "{day1}-{day2} siku za kazi",
       "free": "BURE"
     },
+    "Deposit": {
+      "note": "Kuongeza salio la kadi",
+      "setAmount": "Weka kiasi ili kuongeza salio la kadi yako.",
+      "crediting": "Inaongezwa kwenye salio la kadi yako…",
+      "credited": "{amount: string} imeongezwa kwenye salio la kadi yako",
+      "failed": "Hatukuweza kuongeza malipo haya kwenye salio la kadi yako. Tafadhali wasiliana na msaada.",
+      "addressFailed": "Imeshindwa kupakia anwani. Jaribu tena baadaye."
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Thibitisha PIN mpya",

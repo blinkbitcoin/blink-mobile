@@ -3575,6 +3575,14 @@
             "businessDays": "{day1}-{day2} Werktage",
             "free": "KOSTENLOS"
         },
+        "Deposit": {
+            "note": "Aufladung des Kartenguthabens",
+            "setAmount": "Legen Sie einen Betrag fest, um Ihr Kartenguthaben aufzuladen.",
+            "crediting": "Wird Ihrem Kartenguthaben gutgeschrieben…",
+            "credited": "{amount: string} Ihrem Kartenguthaben gutgeschrieben",
+            "failed": "Diese Aufladung konnte Ihrem Kartenguthaben nicht gutgeschrieben werden. Bitte kontaktieren Sie den Support.",
+            "addressFailed": "Die Adresse konnte nicht geladen werden. Versuchen Sie es später erneut."
+        },
         "PinScreens": {
             "common": {
                 "confirmNewPin": "Neue PIN bestätigen",

@@ -3575,6 +3575,14 @@
       "businessDays": "{day1}-{day2} radnih dana",
       "free": "BESPLATNO"
     },
+    "Deposit": {
+      "note": "Nadoplata salda kartice",
+      "setAmount": "Unesite iznos za nadoplatu salda kartice.",
+      "crediting": "Dodaje se na saldo kartice…",
+      "credited": "{amount: string} dodano na saldo kartice",
+      "failed": "Ovu nadoplatu nismo mogli dodati na saldo kartice. Obratite se podršci.",
+      "addressFailed": "Adresa se nije mogla učitati. Pokušajte kasnije."
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Potvrdi novi PIN",

@@ -5,7 +5,7 @@ import { render, fireEvent } from "@testing-library/react-native"
 import { WalletCurrency } from "@app/graphql/generated"
 import { ReceiveAmountRow } from "@app/components/receive-amount-row"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
-import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
+import { CARD, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 
 const mockFormatMoneyAmount = jest.fn(
   ({ moneyAmount }: { moneyAmount: MoneyAmount<WalletOrDisplayCurrency> }) =>
@@ -69,12 +69,15 @@ jest.mock("@app/components/animations", () => ({
   }),
 }))
 
+const mockPillProps = jest.fn()
+const mockEqualWidthStyle = { width: 72 }
 jest.mock("@app/components/atomic/currency-pill", () => ({
-  CurrencyPill: ({ currency }: { currency: string }) => (
-    <View testID={`currency-pill-${currency}`} />
-  ),
+  CurrencyPill: (props: { currency: string }) => {
+    mockPillProps(props)
+    return <View testID={`currency-pill-${props.currency}`} />
+  },
   useEqualPillWidth: () => ({
-    widthStyle: {},
+    widthStyle: mockEqualWidthStyle,
     onPillLayout: () => jest.fn(),
   }),
 }))
@@ -253,6 +256,36 @@ describe("ReceiveAmountRow", () => {
       fireEvent.press(getByLabelText("Toggle wallet"))
 
       expect(mockOnToggleWallet).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe("fixed destination", () => {
+    it("names the Card Balance in the pill when the payment lands there", () => {
+      const { getByTestId, queryByTestId } = render(
+        <ReceiveAmountRow {...defaultProps} destination={CARD} canToggleWallet={false} />,
+      )
+
+      expect(getByTestId("currency-pill-CARD")).toBeTruthy()
+      expect(queryByTestId("currency-pill-BTC")).toBeNull()
+    })
+
+    it("keeps the Card pill its own width, since it never flips with a wallet", () => {
+      render(<ReceiveAmountRow {...defaultProps} destination={CARD} />)
+
+      expect(mockPillProps).toHaveBeenLastCalledWith(
+        expect.objectContaining({ containerStyle: undefined, onLayout: undefined }),
+      )
+    })
+
+    it("gives the wallet pills one width, so the row does not jump on a flip", () => {
+      render(<ReceiveAmountRow {...defaultProps} />)
+
+      expect(mockPillProps).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          containerStyle: mockEqualWidthStyle,
+          onLayout: expect.any(Function),
+        }),
+      )
     })
   })
 })

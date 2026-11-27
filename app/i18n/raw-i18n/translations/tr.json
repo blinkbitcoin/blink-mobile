@@ -3575,6 +3575,14 @@
       "businessDays": "{day1}-{day2} iş günü",
       "free": "ÜCRETSİZ"
     },
+    "Deposit": {
+      "note": "Kart bakiyesi yükleme",
+      "setAmount": "Kart bakiyeni yüklemek için bir tutar gir.",
+      "crediting": "Kart bakiyene ekleniyor…",
+      "credited": "{amount: string} kart bakiyene eklendi",
+      "failed": "Bu yüklemeyi kart bakiyene ekleyemedik. Lütfen destekle iletişime geç.",
+      "addressFailed": "Adres yüklenemedi. Daha sonra tekrar dene."
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Yeni PIN'i onayla",

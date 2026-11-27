@@ -8,12 +8,14 @@ import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { CARD, CardCurrency } from "@app/types/amounts"
 
 /** "ALL" is only for lists that span both wallets, such as the transaction history. */
 export type WalletSwitchValue = WalletCurrency | "ALL"
 
 type WalletSwitchProps = {
-  currency: WalletSwitchValue
+  /** A card balance is a fixed destination, such as Receive into the Card Balance. */
+  currency: WalletSwitchValue | CardCurrency
   /** Hides the swap icon (keeping its space) where there is no other wallet to switch to. */
   canToggle: boolean
   /** Drops the icon and its space entirely, for a read-out that is not a switch at all. */
@@ -39,6 +41,14 @@ export const WalletSwitch: React.FC<WalletSwitchProps> = ({
   })
   const { triggerSpin, spinStyle } = useAlternatingSpin()
 
+  /** The wallet pills share the widest label's width, so the switch keeps its size. "All" is
+   *  shorter than both wallet names, so it takes their width without being measured itself. A
+   *  card balance never flips with a wallet, so its pill keeps its own width. */
+  const isCardBalance = currency === CARD
+  const isWalletPill = currency !== "ALL" && !isCardBalance
+  const pillWidthStyle = isCardBalance ? undefined : widthStyle
+  const onWalletPillLayout = isWalletPill ? onPillLayout(currency) : undefined
+
   const previousCurrency = useRef(currency)
   useEffect(() => {
     if (previousCurrency.current === currency) return
@@ -56,10 +66,8 @@ export const WalletSwitch: React.FC<WalletSwitchProps> = ({
       <CurrencyPill
         currency={currency}
         containerSize="medium"
-        containerStyle={widthStyle}
-        // "All" is shorter than both wallet names, so it takes their width without being
-        // measured itself.
-        onLayout={currency === "ALL" ? undefined : onPillLayout(currency)}
+        containerStyle={pillWidthStyle}
+        onLayout={onWalletPillLayout}
       />
     </View>
   )

@@ -73,6 +73,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
         regenerateInvoiceButtonTitle: () => "Regenerate",
         setUsernameToAcceptViaPaycode: () => "Set username to accept via paycode",
         setUsernameButtonTitle: () => "Set username",
+        pleaseWaitForConversion: () => "Please wait for conversion",
       },
     },
   }),
@@ -255,5 +256,41 @@ describe("QRView", () => {
     )
 
     expect(getByTestId("QR-Code")).toBeTruthy()
+  })
+
+  describe("a request that still needs something", () => {
+    it("asks for it where the QR goes", () => {
+      const { getByText, queryByTestId } = render(
+        <QRView {...defaultProps} prompt="Set an amount" />,
+      )
+
+      expect(getByText("Set an amount")).toBeTruthy()
+      expect(queryByTestId("QR-Code")).toBeNull()
+    })
+
+    it("shows a payment as done over the prompt", () => {
+      const { getByTestId, queryByText } = render(
+        <QRView {...defaultProps} prompt="Set an amount" completed />,
+      )
+
+      expect(getByTestId("Success Icon")).toBeTruthy()
+      expect(queryByText("Set an amount")).toBeNull()
+    })
+  })
+
+  describe("a payment on its way", () => {
+    it("names the wait in the request's own words", () => {
+      const { getByText } = render(
+        <QRView {...defaultProps} converting convertingMessage="Adding to your card" />,
+      )
+
+      expect(getByText("Adding to your card")).toBeTruthy()
+    })
+
+    it("speaks of a conversion when the request names nothing else", () => {
+      const { getByText } = render(<QRView {...defaultProps} converting />)
+
+      expect(getByText("Please wait for conversion")).toBeTruthy()
+    })
   })
 })

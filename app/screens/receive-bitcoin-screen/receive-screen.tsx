@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { ActivityIndicator, Pressable, View } from "react-native"
 
-import { useFocusEffect, useNavigation } from "@react-navigation/native"
+import {
+  RouteProp,
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -29,6 +34,7 @@ import {
   type NewOnchainAddressResultType,
   type ReceivePaymentRequestState,
 } from "./payment/request-state.types"
+import { CARD } from "@app/types/amounts"
 import { ActiveWalletStatus } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
@@ -40,6 +46,7 @@ import { QRView } from "./qr-view"
 import { withMyLnUpdateSub } from "./my-ln-updates-sub"
 import { Invoice, InvoiceType, PaymentRequestState } from "./payment/index.types"
 import {
+  useCardDepositRequest,
   useDisplayPaymentRequest,
   useNfcReceive,
   useOnchainResolver,
@@ -70,6 +77,29 @@ const LoadingView: React.FC = () => {
 }
 
 const ReceiveScreen = () => {
+  const { params } = useRoute<RouteProp<RootStackParamList, "receiveBitcoin">>()
+  const isCardDeposit = params?.destination === CARD
+
+  if (isCardDeposit) return <CardDepositReceive />
+  return <WalletReceive />
+}
+
+/** Receive into the Card Balance, which only a custodial account holds. */
+const CardDepositReceive = () => {
+  const requestState = useCardDepositRequest()
+
+  if (!requestState) return <LoadingView />
+
+  return (
+    <ReceiveScreenContent
+      requestState={requestState}
+      isSelfCustodial={false}
+      selfCustodialRequest={undefined}
+    />
+  )
+}
+
+const WalletReceive = () => {
   const { isSelfCustodial, status } = useActiveWallet()
   const { convertMoneyAmount } = usePriceConversion()
   const custodialRequest = usePaymentRequest()
@@ -136,11 +166,18 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
 
   const carousel = useReceiveCarousel(requestState, openTrialModal)
 
+  const { destination, requestOnchainAddress } = requestState
+  const isCardDeposit = destination !== undefined
+  const isOnchainFromRequest = isSelfCustodial || isCardDeposit
   const onchain = useOnchainResolver(
-    isSelfCustodial,
+    isOnchainFromRequest,
     requestState,
     carousel.onchainWalletCurrency,
   )
+
+  useEffect(() => {
+    if (carousel.isOnChainPage) requestOnchainAddress?.()
+  }, [carousel.isOnChainPage, requestOnchainAddress])
 
   const [isGeneratingAddress, setIsGeneratingAddress] = useState(false)
   // A second tap can land before the disabled state renders; each one would burn an address.
@@ -195,7 +232,9 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     carousel.isOnChainPage,
     onchain.address,
   )
-  const hasNothingToShare = carousel.isOnChainPage && !onchain.address
+  /** A card deposit has no invoice until an amount is set, so nothing to copy yet. */
+  const isLightningEmpty = isCardDeposit && !requestState.info?.data
+  const hasNothingToShare = carousel.isOnChainPage ? !onchain.address : isLightningEmpty
 
   const {
     displayReceiveNfc,
@@ -255,10 +294,23 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
   // Switching wallets mid-create would put the old wallet's new address on the new wallet's
   // page. Off that page the create finishes quietly and its result is dropped.
   const canToggleWallet =
+    !isCardDeposit &&
     !(isGeneratingAddress && carousel.isOnChainPage) &&
     (isSelfCustodial
       ? !carousel.isOnChainPage && !selfCustodialRequest?.isAssetToggleDisabled
       : !isDollarBalanceGated)
+
+  /** blink-card keeps one on-chain address for the card while it waits for a
+   *  payment, so there is no other address to ask for. */
+  const canRequestNewAddress = carousel.isOnChainPage && !isCardDeposit
+  const isLightningFailed = requestState.state === PaymentRequestState.Error
+  const lightningError = isLightningFailed
+    ? requestState.errorMessage ?? LL.ReceiveScreen.error()
+    : ""
+  const isOnchainFailed = onchain.failed && !isGeneratingAddress
+  const onchainError = isOnchainFailed
+    ? requestState.onchainErrorMessage ?? LL.ReceiveScreen.onchainAddressLoadFailed()
+    : ""
 
   return (
     <Screen
@@ -277,11 +329,9 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
             loading={requestState.state === PaymentRequestState.Loading}
             completed={requestState.state === PaymentRequestState.Paid}
             converting={isConverting}
-            err={
-              requestState.state === PaymentRequestState.Error
-                ? LL.ReceiveScreen.error()
-                : ""
-            }
+            convertingMessage={requestState.convertingMessage}
+            prompt={requestState.amountPrompt}
+            err={lightningError}
             expired={requestState.state === PaymentRequestState.Expired}
             regenerateInvoiceFn={requestState.regenerateInvoice}
             copyToClipboard={handleCopy}
@@ -298,11 +348,9 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
             loading={onchain.loading || (isGeneratingAddress && !onchain.address)}
             completed={requestState.state === PaymentRequestState.Paid}
             converting={isConverting}
-            err={
-              onchain.failed && !isGeneratingAddress
-                ? LL.ReceiveScreen.onchainAddressLoadFailed()
-                : ""
-            }
+            convertingMessage={requestState.convertingMessage}
+            prompt={requestState.amountPrompt}
+            err={onchainError}
             expired={false}
             regenerateInvoiceFn={requestState.regenerateInvoice}
             copyToClipboard={handleCopy}
@@ -348,6 +396,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
         <ReceiveAmountRow
           unitOfAccountAmount={requestState.unitOfAccountAmount}
           walletCurrency={amountRowCurrency}
+          destination={destination}
           convertMoneyAmount={requestState.convertMoneyAmount}
           setAmount={handleSetAmount}
           canSetAmount={requestState.canSetAmount}
@@ -394,7 +443,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
                   : LL.common.shareLightning()
               }
             />
-            {carousel.isOnChainPage && (
+            {canRequestNewAddress && (
               <ActionButton
                 label={LL.ReceiveScreen.newAddress()}
                 icon="refresh"

@@ -3575,6 +3575,14 @@
       "businessDays": "{day1}-{day2} dies laborables",
       "free": "GRATUÏT"
     },
+    "Deposit": {
+      "note": "Recàrrega del saldo de la targeta",
+      "setAmount": "Indica un import per recarregar el saldo de la teva targeta.",
+      "crediting": "S'està afegint al saldo de la teva targeta…",
+      "credited": "{amount: string} afegits al saldo de la teva targeta",
+      "failed": "No hem pogut afegir aquesta recàrrega al saldo de la teva targeta. Contacta amb el suport.",
+      "addressFailed": "No s'ha pogut carregar l'adreça. Torna-ho a provar més tard."
+    },
     "PinScreens": {
       "common": {
         "confirmNewPin": "Confirmar nou PIN",

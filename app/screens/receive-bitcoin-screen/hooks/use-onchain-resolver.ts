@@ -8,8 +8,10 @@ import { useOnChainAddress } from "./use-onchain-address"
 
 type RequestState = ReceivePaymentRequestState
 
+/** `isOnchainFromRequest`: the request brings its own address (a self-custodial
+ *  wallet, or the Card Balance's) instead of the custodial wallet's. */
 export const useOnchainResolver = (
-  isSelfCustodial: boolean,
+  isOnchainFromRequest: boolean,
   requestState: RequestState,
   onchainWalletCurrency: WalletCurrency,
 ) => {
@@ -18,7 +20,7 @@ export const useOnchainResolver = (
     [WalletCurrency.Usd]: requestState.usdWalletId,
   }
 
-  const custodialWalletId = isSelfCustodial
+  const custodialWalletId = isOnchainFromRequest
     ? undefined
     : onchainWalletIds[onchainWalletCurrency]
   const custodialOnchain = useOnChainAddress(custodialWalletId, {
@@ -28,7 +30,7 @@ export const useOnchainResolver = (
 
   // `failed` is a request that settled without an address: nothing more is coming,
   // so the screen offers New as the way to retry instead of waiting on a spinner.
-  if (isSelfCustodial) {
+  if (isOnchainFromRequest) {
     const failed =
       !requestState.onchainAddress && Boolean(requestState.onchainAddressFailed)
     return {

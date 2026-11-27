@@ -3734,6 +3734,14 @@ const en: BaseTranslation = {
       businessDays: "{day1}-{day2} business days",
       free: "FREE",
     },
+    Deposit: {
+      note: "Card Balance Top-up",
+      setAmount: "Set an amount to top up your Card Balance.",
+      crediting: "Adding it to your Card Balance…",
+      credited: "{amount: string} added to your Card Balance",
+      failed: "We could not add this top-up to your Card Balance. Please contact support.",
+      addressFailed: "Couldn't load the address. Try again later.",
+    },
     TransactionDetails: {
       title: "Transaction details",
       cardInformation: "Card information",
