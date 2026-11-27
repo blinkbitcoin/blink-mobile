@@ -23,7 +23,7 @@ import {
 const style = (node: ReactTestInstance) => StyleSheet.flatten(node.props.style)
 
 /** Stands in for the bounce's peak, so the scale it drives can be read off the lines. */
-const BOUNCE_PEAK = 1.22
+const BOUNCE_PEAK = 1.3
 const mockUseBounceInAnimation = jest.fn(
   ({ visible, scale }: { visible: boolean; scale: { value: number } }) => {
     scale.value = visible ? BOUNCE_PEAK : 1
@@ -298,15 +298,16 @@ describe("SendHero", () => {
         (step: object) => "scale" in step,
       )
 
-    it("bounces both lines once when the amount is flagged, at twice the list's pace", () => {
+    it("bounces both lines once when the amount is flagged, to 1.3 in 80 ms steps", () => {
       renderHero({ secondaryAmount: "746 SAT", isAmountBounced: true })
 
       expect(mockUseBounceInAnimation).toHaveBeenLastCalledWith(
         expect.objectContaining({
           visible: true,
           delay: 300,
-          duration: 60,
+          duration: 80,
           isSingleBounce: true,
+          peak: 1.3,
         }),
       )
       expect(scaleOf(SEND_HERO_PRIMARY_TEST_ID)).toEqual({ scale: BOUNCE_PEAK })

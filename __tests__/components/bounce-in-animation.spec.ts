@@ -25,13 +25,18 @@ describe("bounceInAnimation", () => {
   it("grows, shrinks and comes back to size once for a single bounce", () => {
     const scale = { value: 1 }
 
-    bounceInAnimation({ scale: scale as never, duration: 60, isSingleBounce: true })
+    bounceInAnimation({
+      scale: scale as never,
+      duration: 80,
+      isSingleBounce: true,
+      peak: 1.3,
+    })
 
     expect(scale.value).toEqual({
       sequence: [
-        { timing: 1.22, duration: 60 },
-        { timing: 0.88, duration: 60 },
-        { timing: 1, duration: 60 },
+        { timing: 1.3, duration: 80 },
+        { timing: 0.88, duration: 80 },
+        { timing: 1, duration: 80 },
       ],
     })
   })

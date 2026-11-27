@@ -14,9 +14,12 @@ export const bounceInAnimation = ({
   scale,
   duration,
   isSingleBounce = false,
+  peak = BOUNCE_PEAK,
 }: {
   scale: SharedValue<number>
   duration: number
+  /** How far the bounce grows. */
+  peak?: number
   /** Grows, shrinks and comes back to size once, each step `duration` long, where the
    *  default springs back from the peak and can wobble more than once. */
   isSingleBounce?: boolean
@@ -24,7 +27,7 @@ export const bounceInAnimation = ({
   if (isSingleBounce) {
     const step = { duration, easing: Easing.inOut(Easing.quad) }
     scale.value = withSequence(
-      withTiming(BOUNCE_PEAK, step),
+      withTiming(peak, step),
       withTiming(BOUNCE_LOW, step),
       withTiming(1, step),
     )
@@ -32,7 +35,7 @@ export const bounceInAnimation = ({
   }
   scale.value = BOUNCE_LOW
   scale.value = withSequence(
-    withTiming(BOUNCE_PEAK, { duration, easing: Easing.out(Easing.quad) }),
+    withTiming(peak, { duration, easing: Easing.out(Easing.quad) }),
     withSpring(1, { damping: 12, stiffness: 200 }),
   )
 }
@@ -44,6 +47,7 @@ export const useBounceInAnimation = ({
   delay,
   duration,
   isSingleBounce,
+  peak,
 }: {
   isFocused: boolean
   visible: boolean
@@ -51,6 +55,7 @@ export const useBounceInAnimation = ({
   delay: number
   duration: number
   isSingleBounce?: boolean
+  peak?: number
 }) => {
   const [rendered, setRendered] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -77,7 +82,7 @@ export const useBounceInAnimation = ({
       setRendered(false)
       timerRef.current = setTimeout(() => {
         setRendered(true)
-        bounceInAnimation({ scale, duration, isSingleBounce })
+        bounceInAnimation({ scale, duration, isSingleBounce, peak })
       }, delay)
     }
 
@@ -87,7 +92,7 @@ export const useBounceInAnimation = ({
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }
-  }, [delay, duration, isFocused, isSingleBounce, scale, visible])
+  }, [delay, duration, isFocused, isSingleBounce, peak, scale, visible])
 
   return rendered
 }

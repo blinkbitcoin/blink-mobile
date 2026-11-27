@@ -69,7 +69,8 @@ const SWAP_ANIMATION_MS = 220
 /** The transaction list's bounce, which a highlighted row plays on arrival, played once
  *  at twice its pace. The delay also lets review's push settle before the amount moves. */
 const BOUNCE_DELAY_MS = 300
-const BOUNCE_DURATION_MS = 60
+const BOUNCE_DURATION_MS = 80
+const BOUNCE_PEAK = 1.3
 
 /**
  * Once the payment is sent the settled read-out grows into the centred Sent hero: each line
@@ -234,6 +235,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
     delay: BOUNCE_DELAY_MS,
     duration: BOUNCE_DURATION_MS,
     isSingleBounce: true,
+    peak: BOUNCE_PEAK,
   })
 
   const bounceStyle = useAnimatedStyle(
