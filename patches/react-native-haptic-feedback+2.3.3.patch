@@ -1,0 +1,23 @@
+diff --git a/node_modules/react-native-haptic-feedback/android/src/main/java/com/mkuczera/RNReactNativeHapticFeedbackModuleImpl.java b/node_modules/react-native-haptic-feedback/android/src/main/java/com/mkuczera/RNReactNativeHapticFeedbackModuleImpl.java
+index 6485865..bab095f 100644
+--- a/node_modules/react-native-haptic-feedback/android/src/main/java/com/mkuczera/RNReactNativeHapticFeedbackModuleImpl.java
++++ b/node_modules/react-native-haptic-feedback/android/src/main/java/com/mkuczera/RNReactNativeHapticFeedbackModuleImpl.java
+@@ -34,7 +34,18 @@ public class RNReactNativeHapticFeedbackModuleImpl {
+       return hasVibrator && (isVolumeOn || isVibrateMode);
+    }
+ 
++    // The phone's own haptics switch (Settings > Sound & vibration > Touch feedback). It is
++    // what View.performHapticFeedback() obeys, and what iOS's System Haptics is to
++    // UIFeedbackGenerator, so no option overrides it.
++    // Delete this patch with the library: https://github.com/blinkbitcoin/blink-wip/issues/2332
++    public static boolean isHapticFeedbackEnabled(Context context) {
++      return Settings.System.getInt(
++        context.getContentResolver(), Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) != 0;
++    }
++
+     public static void trigger(ReactApplicationContext reactContext, String type, ReadableMap options) {
++      if (!isHapticFeedbackEnabled(reactContext)) return;
++
+       // Check system settings, if disabled and we're not explicitly ignoring then return immediatly
+       boolean ignoreAndroidSystemSettings = options.getBoolean("ignoreAndroidSystemSettings");
+       boolean isVibrationEnabled = isVibrationEnabled(reactContext);

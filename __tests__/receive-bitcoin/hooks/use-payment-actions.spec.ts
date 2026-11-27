@@ -3,6 +3,9 @@ import { Share, Alert } from "react-native"
 
 import { usePaymentActions } from "@app/screens/receive-bitcoin-screen/hooks/use-payment-actions"
 import { Invoice } from "@app/screens/receive-bitcoin-screen/payment/index.types"
+import { haptics } from "@app/utils/haptics"
+
+jest.mock("@app/utils/haptics", () => ({ haptics: { select: jest.fn() } }))
 
 const mockLL = {
   ReceiveScreen: {
@@ -49,6 +52,26 @@ describe("usePaymentActions", () => {
 
       expect(mockSetString).not.toHaveBeenCalled()
       expect(mockToastShow).not.toHaveBeenCalled()
+      expect(haptics.select).not.toHaveBeenCalled()
+    })
+
+    it("fires the select haptic once per copy, with the toast", () => {
+      const order: string[] = []
+      jest.mocked(haptics.select).mockImplementationOnce(() => order.push("haptic"))
+      mockToastShow.mockImplementationOnce(() => order.push("toast"))
+      const { result } = renderHook(() =>
+        usePaymentActions({
+          copyableContent: "lnbc1invoice",
+          invoiceType: Invoice.Lightning,
+        }),
+      )
+
+      act(() => {
+        result.current.copyToClipboard()
+      })
+
+      expect(haptics.select).toHaveBeenCalledTimes(1)
+      expect(order).toEqual(["haptic", "toast"])
     })
 
     it("copies content and shows lightning toast", () => {

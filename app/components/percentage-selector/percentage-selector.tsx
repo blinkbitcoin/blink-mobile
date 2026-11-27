@@ -2,6 +2,7 @@ import React, { useMemo } from "react"
 import { StyleProp, View, ViewStyle } from "react-native"
 import { makeStyles } from "@rn-vui/themed"
 
+import { haptics } from "@app/utils/haptics"
 import { Chip } from "@app/components/atomic/chip"
 
 export const PERCENTAGE_OPTIONS = [25, 50, 75, 100] as const
@@ -56,7 +57,10 @@ export const PercentageSelector = <T extends number = number>({
           loading={loadingPercent === p}
           selected={selectedPercent === p}
           disabled={isLocked || (disabledOptions?.includes(p) ?? false)}
-          onPress={() => onSelect(p)}
+          onPress={() => {
+            haptics.select()
+            onSelect(p)
+          }}
         />
       ))}
     </View>

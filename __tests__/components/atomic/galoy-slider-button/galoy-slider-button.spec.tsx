@@ -33,7 +33,11 @@ jest.mock("react-native-reanimated", () => ({
 // for them), so text queries here must reach hidden elements.
 configure({ defaultIncludeHiddenElements: true })
 
-jest.mock("@app/utils/haptics", () => ({ haptics: { grab: jest.fn() } }))
+// The commit haptic runs the real helper, so the native call it makes can be read too.
+jest.mock("@app/utils/haptics", () => {
+  const { haptics } = jest.requireActual("@app/utils/haptics")
+  return { haptics: { grab: jest.fn(), commit: jest.fn(haptics.commit) } }
+})
 
 const TRACK_WIDTH = 350
 const HANDLE_SIZE = 60
@@ -230,6 +234,13 @@ describe("GaloySliderButton", () => {
       expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledWith("impactMedium", {
         ignoreAndroidSystemSettings: true,
       })
+    })
+
+    it("fires the commit haptic once per send", async () => {
+      jest.mocked(haptics.commit).mockClear()
+      await renderSlider({ onSwipe: jest.fn(() => new Promise(() => {})) })
+      await drag(TRAVEL)
+      expect(haptics.commit).toHaveBeenCalledTimes(1)
     })
 
     // The handle fades out over the last tenth of the travel.

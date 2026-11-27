@@ -5,6 +5,7 @@ import { cancelPendingClipboardClear } from "@app/hooks/use-clipboard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { reportError } from "@app/utils/error-logging"
+import { haptics } from "@app/utils/haptics"
 import { toastShow } from "@app/utils/toast"
 import Clipboard from "@react-native-clipboard/clipboard"
 
@@ -32,6 +33,7 @@ export const usePaymentActions = ({
 
     cancelPendingClipboardClear()
     Clipboard.setString(copyableContent)
+    haptics.select()
     toastShow({
       message: toastMessageByType[invoiceType],
       LL,

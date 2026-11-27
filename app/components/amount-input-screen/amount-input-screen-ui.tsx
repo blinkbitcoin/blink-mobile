@@ -4,6 +4,7 @@ import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { haptics } from "@app/utils/haptics"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { fonts } from "@app/rne-theme/fonts"
 
@@ -51,6 +52,13 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
 
   const hasSecondary = Boolean(secondaryCurrencyFormattedAmount)
   const hasError = Boolean(errorMessage)
+  /** With nothing to swap to, the button keeps no handler, so it neither ticks nor acts. */
+  const handleToggleCurrency =
+    onToggleCurrency &&
+    (() => {
+      haptics.select()
+      onToggleCurrency()
+    })
 
   return (
     <View style={styles.sheet}>
@@ -102,7 +110,7 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
             </View>
             <View style={styles.toggleOverlay} pointerEvents="box-none">
               <Pressable
-                onPress={onToggleCurrency}
+                onPress={handleToggleCurrency}
                 hitSlop={8}
                 accessibilityLabel="Switch currencies"
                 accessibilityRole="button"

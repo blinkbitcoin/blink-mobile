@@ -4,7 +4,11 @@
     "react-native/react-native": true,
     "jest/globals": true
   },
-  "ignorePatterns": ["./patches", "vendor/meawallet/", "**/GT3Captcha.bundle/resource.js"],
+  "ignorePatterns": [
+    "./patches",
+    "vendor/meawallet/",
+    "**/GT3Captcha.bundle/resource.js"
+  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {
@@ -12,7 +16,15 @@
     },
     "ecmaVersion": 12
   },
-  "plugins": ["react", "react-hooks", "react-native", "@typescript-eslint", "import", "prettier", "jest"],
+  "plugins": [
+    "react",
+    "react-hooks",
+    "react-native",
+    "@typescript-eslint",
+    "import",
+    "prettier",
+    "jest"
+  ],
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
@@ -164,6 +176,10 @@
           {
             "name": "@react-native-firebase/crashlytics",
             "message": "Write to Crashlytics only through app/utils/error-reporting.ts (logBreadcrumb, recordAppError), which drops everything while an Incognito or unset-mode wallet is active."
+          },
+          {
+            "name": "react-native-haptic-feedback",
+            "message": "Fire haptics only through app/utils/haptics.ts (haptics.select, haptics.success, …), so each intent keeps one feel and one silent-mode rule. See blinkbitcoin/blink-wip#2041."
           }
         ]
       }
@@ -238,29 +254,87 @@
     //     sync with the static* keys in colors.ts (enforced by colors.spec.ts).
     "no-restricted-properties": [
       "error",
-      { "property": "staticWhite", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticBlack", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticLightGrey", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticLighterGrey", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticDarkGrey", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticCardPill", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticCardBackground", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticBrandOrange", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticSuccess", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticBrandYellow", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticBrandSunset", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticWarningBackground", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticBlue", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticBrightBlue", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." },
-      { "property": "staticPaleBlue", "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)." }
+      {
+        "property": "staticWhite",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticBlack",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticLightGrey",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticLighterGrey",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticDarkGrey",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticCardPill",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticCardBackground",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticBrandOrange",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticSuccess",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticBrandYellow",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticBrandSunset",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticWarningBackground",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticBlue",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticBrightBlue",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      },
+      {
+        "property": "staticPaleBlue",
+        "message": "static* colors never invert with the theme: use them only on a surface that never inverts (see the allowlist in .eslintrc.json overrides)."
+      }
     ]
-
   },
   "overrides": [
     {
       "files": ["app/utils/storage/legacy-key-store.ts"],
       "rules": {
-        "no-restricted-imports": "off"
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@react-native-firebase/crashlytics",
+                "message": "Write to Crashlytics only through app/utils/error-reporting.ts (logBreadcrumb, recordAppError), which drops everything while an Incognito or unset-mode wallet is active."
+              },
+              {
+                "name": "react-native-haptic-feedback",
+                "message": "Fire haptics only through app/utils/haptics.ts (haptics.select, haptics.success, …), so each intent keeps one feel and one silent-mode rule. See blinkbitcoin/blink-wip#2041."
+              }
+            ]
+          }
+        ]
       }
     },
     {
@@ -369,6 +443,30 @@
               {
                 "name": "react-native-secure-key-store",
                 "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              },
+              {
+                "name": "react-native-haptic-feedback",
+                "message": "Fire haptics only through app/utils/haptics.ts (haptics.select, haptics.success, …), so each intent keeps one feel and one silent-mode rule. See blinkbitcoin/blink-wip#2041."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/utils/haptics.ts", "__tests__/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react-native-secure-key-store",
+                "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              },
+              {
+                "name": "@react-native-firebase/crashlytics",
+                "message": "Write to Crashlytics only through app/utils/error-reporting.ts (logBreadcrumb, recordAppError), which drops everything while an Incognito or unset-mode wallet is active."
               }
             ]
           }
