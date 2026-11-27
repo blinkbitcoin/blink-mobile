@@ -1,9 +1,10 @@
 import React from "react"
 import { act, fireEvent, render } from "@testing-library/react-native"
 
-import { CardActivationStep } from "@app/graphql/generated"
+import { CardActivationStep, WalletCurrency } from "@app/graphql/generated"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { CardTopUpScreen } from "@app/screens/card-screen/activation/top-up-screen"
+import { CARD } from "@app/types/amounts"
 
 import { ContextForScreen } from "../../helper"
 
@@ -12,6 +13,28 @@ const mockUseCardActivation = jest.fn()
 jest.mock("@app/hooks/use-card-activation", () => ({
   useCardActivation: (options: Record<string, unknown>) => mockUseCardActivation(options),
 }))
+
+type Balances = { btc: number; usd: number }
+
+const mockUseActiveWallet = jest.fn()
+jest.mock("@app/hooks/use-active-wallet", () => ({
+  useActiveWallet: () => mockUseActiveWallet(),
+}))
+
+const walletsWith = ({ btc, usd }: Balances) => ({
+  wallets: [
+    {
+      id: "btc-wallet",
+      walletCurrency: WalletCurrency.Btc,
+      balance: { amount: btc, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+    },
+    {
+      id: "usd-wallet",
+      walletCurrency: WalletCurrency.Usd,
+      balance: { amount: usd, currency: WalletCurrency.Usd, currencyCode: "USD" },
+    },
+  ],
+})
 
 const renderScreen = async () => {
   const screen = render(
@@ -23,11 +46,15 @@ const renderScreen = async () => {
   return screen
 }
 
+const balanceWay = "From your Bitcoin or Dollar Balance"
+const depositWay = "Deposit to your Card Balance"
+
 describe("CardTopUpScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
     mockUseCardActivation.mockReturnValue({ complete: mockComplete, isCompleting: false })
+    mockUseActiveWallet.mockReturnValue(walletsWith({ btc: 21420, usd: 0 }))
   })
 
   it("stands for the top-up step of the activation", async () => {
@@ -45,17 +72,79 @@ describe("CardTopUpScreen", () => {
     expect(getByText("Add funds now, or later.")).toBeTruthy()
   })
 
-  it("shows both ways to add funds as unavailable", async () => {
-    const { getByText } = await renderScreen()
+  it("preselects the balances when the Bitcoin Balance holds funds", async () => {
+    const { getByRole } = await renderScreen()
 
-    expect(getByText("From your Bitcoin or Dollar Balance")).toBeDisabled()
-    expect(getByText("Deposit to your Card Balance")).toBeDisabled()
+    expect(getByRole("radio", { name: balanceWay })).toBeSelected()
   })
 
-  it("keeps Top-up now off, since no way can be chosen", async () => {
+  it("preselects the balances when only the Dollar Balance holds funds", async () => {
+    mockUseActiveWallet.mockReturnValue(walletsWith({ btc: 0, usd: 500 }))
+    const { getByRole } = await renderScreen()
+
+    expect(getByRole("radio", { name: balanceWay })).toBeSelected()
+  })
+
+  it("greys the balances out when neither holds funds", async () => {
+    mockUseActiveWallet.mockReturnValue(walletsWith({ btc: 0, usd: 0 }))
+    const { getByRole } = await renderScreen()
+
+    const balance = getByRole("radio", { name: balanceWay })
+    expect(balance).toBeDisabled()
+    expect(balance).not.toBeSelected()
+  })
+
+  it("shows the deposit as not offered yet", async () => {
+    const { getByRole } = await renderScreen()
+
+    const deposit = getByRole("radio", { name: depositWay })
+    expect(deposit).toBeDisabled()
+    expect(deposit).not.toBeSelected()
+  })
+
+  it("keeps Top-up now off while no way can be chosen", async () => {
+    mockUseActiveWallet.mockReturnValue(walletsWith({ btc: 0, usd: 0 }))
     const { getByText } = await renderScreen()
 
     expect(getByText("Top-up now")).toBeDisabled()
+  })
+
+  it("completes the activation and opens the Transfer into the Card Balance", async () => {
+    const { getByText } = await renderScreen()
+
+    await act(async () => {
+      fireEvent.press(getByText("Top-up now"))
+    })
+
+    expect(mockComplete).toHaveBeenCalledWith({
+      then: { name: "conversionDetails", params: { destination: CARD } },
+    })
+  })
+
+  it("keeps the way the member taps", async () => {
+    const { getByRole, getByText } = await renderScreen()
+
+    await act(async () => {
+      fireEvent.press(getByRole("radio", { name: balanceWay }))
+    })
+    await act(async () => {
+      fireEvent.press(getByText("Top-up now"))
+    })
+
+    expect(getByRole("radio", { name: balanceWay })).toBeSelected()
+    expect(mockComplete).toHaveBeenCalledWith({
+      then: { name: "conversionDetails", params: { destination: CARD } },
+    })
+  })
+
+  it("leaves a way not offered unchosen when tapped", async () => {
+    const { getByRole } = await renderScreen()
+
+    await act(async () => {
+      fireEvent.press(getByRole("radio", { name: depositWay }))
+    })
+
+    expect(getByRole("radio", { name: balanceWay })).toBeSelected()
   })
 
   it("completes the activation when the member skips the top-up", async () => {
@@ -65,13 +154,31 @@ describe("CardTopUpScreen", () => {
       fireEvent.press(getByText("Skip top-up"))
     })
 
-    expect(mockComplete).toHaveBeenCalledTimes(1)
+    expect(mockComplete).toHaveBeenCalledWith()
   })
 
-  it("shows the completion running instead of the skip", async () => {
+  it("shows a skip running on the skip, with Top-up now off", async () => {
     mockUseCardActivation.mockReturnValue({ complete: mockComplete, isCompleting: true })
-    const { queryByText } = await renderScreen()
+    const { getByText, queryByText } = await renderScreen()
 
     expect(queryByText("Skip top-up")).toBeNull()
+    expect(getByText("Top-up now")).toBeDisabled()
+  })
+
+  it("shows a top-up running on Top-up now, with the skip off", async () => {
+    const { getByText, queryByText, rerender } = await renderScreen()
+
+    await act(async () => {
+      fireEvent.press(getByText("Top-up now"))
+    })
+    mockUseCardActivation.mockReturnValue({ complete: mockComplete, isCompleting: true })
+    rerender(
+      <ContextForScreen>
+        <CardTopUpScreen />
+      </ContextForScreen>,
+    )
+
+    expect(queryByText("Top-up now")).toBeNull()
+    expect(getByText("Skip top-up")).toBeDisabled()
   })
 })

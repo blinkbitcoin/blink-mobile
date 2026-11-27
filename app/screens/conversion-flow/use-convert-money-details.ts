@@ -9,9 +9,12 @@ import { usePriceConversion } from "../../hooks/use-price-conversion"
 
 type WalletFragment = Pick<Wallet, "id" | "balance" | "walletCurrency">
 
-type UseConvertMoneyDetailsParams = {
-  initialFromWallet: WalletFragment
-  initialToWallet: WalletFragment
+type UseConvertMoneyDetailsParams<W extends WalletFragment> = {
+  initialFromWallet: W
+  initialToWallet: W
+  /** Keeps the direction it opens with, even from an empty balance: a top-up of the card
+   *  never turns into a move off it. */
+  isDirectionFixed?: boolean
 }
 export type TInputCurrency = (typeof ConvertInputType)[keyof typeof ConvertInputType]
 export interface InputField {
@@ -29,20 +32,22 @@ export interface InputValues {
   formattedAmount: string
 }
 
-export const useConvertMoneyDetails = (params?: UseConvertMoneyDetailsParams) => {
+export const useConvertMoneyDetails = <W extends WalletFragment = WalletFragment>(
+  params?: UseConvertMoneyDetailsParams<W>,
+) => {
   const { convertMoneyAmount, convertMoneyAmountWithRounding } = usePriceConversion()
   const { zeroDisplayAmount } = useDisplayCurrency()
 
   const [wallets, _setWallets] = React.useState<
     | {
-        fromWallet: WalletFragment
-        toWallet: WalletFragment
+        fromWallet: W
+        toWallet: W
       }
     | undefined
   >(() => {
     if (params) {
       // if the from wallet is empty, swap the wallets
-      if (params.initialFromWallet.balance === 0) {
+      if (params.initialFromWallet.balance === 0 && !params.isDirectionFixed) {
         return {
           fromWallet: params.initialToWallet,
           toWallet: params.initialFromWallet,
@@ -58,12 +63,9 @@ export const useConvertMoneyDetails = (params?: UseConvertMoneyDetailsParams) =>
   const [moneyAmount, setMoneyAmount] =
     React.useState<MoneyAmount<WalletOrDisplayCurrency>>(zeroDisplayAmount)
 
-  const setWallets = useCallback(
-    (wallets: { fromWallet: WalletFragment; toWallet: WalletFragment }) => {
-      _setWallets(wallets)
-    },
-    [],
-  )
+  const setWallets = useCallback((wallets: { fromWallet: W; toWallet: W }) => {
+    _setWallets(wallets)
+  }, [])
 
   if (!wallets || !convertMoneyAmount || !convertMoneyAmountWithRounding) {
     return {

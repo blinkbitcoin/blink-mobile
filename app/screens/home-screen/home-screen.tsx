@@ -75,6 +75,7 @@ import { OffboardOnlyBulletin } from "@app/components/offboard-only-bulletin"
 /** Deep import on purpose: keeps the migration hooks barrel out of the home graph. */
 import { useWindDownHomeNudges } from "@app/screens/account-migration/hooks/use-wind-down-home-nudges"
 import { useTransferGate } from "@app/hooks/use-transfer-blocked"
+import { useIsCardBackendAvailable } from "@app/hooks/use-is-card-backend-available"
 import { useSelfCustodialNetworkMismatchToast } from "@app/self-custodial/hooks/use-network-mismatch-toast"
 import {
   useNonCustodialConversionLimits,
@@ -357,13 +358,7 @@ export const HomeScreen: React.FC = () => {
       }))
     : dataAuthed?.me?.defaultAccount?.wallets
 
-  /**
-   * TODO(card): `cards` on ConsumerAccount only exists on the staging backend
-   * today, so gate the home card row to staging until the card service ships to
-   * every instance; then drop `isCardBackendAvailable` from the gate below.
-   * Ref PR #3899.
-   */
-  const isCardBackendAvailable = galoyInstanceId === "Staging"
+  const isCardBackendAvailable = useIsCardBackendAvailable()
   /** The card belongs to the custodial account, so a self-custodial session leaves it
    *  out like the other custodial queries above, rather than adding another account's
    *  card to its own total. */
@@ -868,10 +863,15 @@ export const HomeScreen: React.FC = () => {
     levelAccount === AccountLevel.Three ||
     (isIos && satsBalance > 0)
 
+  /** A card holder keeps the Transfer wherever they are, since it is how they fund the
+   *  card (D82): a gated Dollar Balance only leaves the Dollar out of its choices. */
+  const isCardHolder = showCardRow
+  const isDollarTransferGated = isDollarBalanceGated && !isCardHolder
   /** Disabled while the region resolves so a fast tap cannot reach the gated flow before
    *  the verdict lands; the explanation waits, since it would be wrong for a user who
    *  turns out to be ungated. A sanctioned region disables it outright. */
-  const isTransferDisabled = isDollarBalanceGated || isRestrictedRegion || isRegionPending
+  const isTransferDisabled =
+    isDollarTransferGated || isRestrictedRegion || isRegionPending
   const onTransferDisabledPress = isRegionPending ? undefined : onGatedDollarTap
 
   /** A gated transfer must not hide the button while something else already disables it:
@@ -885,8 +885,9 @@ export const HomeScreen: React.FC = () => {
    *  otherwise ungated. Anon resolves no region, so nothing pends there. The hold costs a
    *  frame: the settings query behind the country is cache-first and the phone parse is
    *  synchronous. */
+  const isTransferOffered = !isTransferGated || isCardHolder
   const shouldShowTransferButton =
-    passesIosGate && !isTransferRegionPending && (!isTransferGated || isTransferDisabled)
+    passesIosGate && !isTransferRegionPending && (isTransferOffered || isTransferDisabled)
 
   if (shouldShowTransferButton) {
     buttons.unshift({

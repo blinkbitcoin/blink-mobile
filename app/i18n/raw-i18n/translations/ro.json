@@ -3524,6 +3524,12 @@
         "skip": "Omite reîncărcarea"
       }
     },
+    "CardBalanceTransfer": {
+      "waitAndRetry": "Așteptați {seconds} secunde și încercați din nou.",
+      "tooManyPending": "Aveți prea multe reîncărcări în așteptare. Încercați din nou mai târziu.",
+      "insufficient": "Soldul cardului nu acoperă această sumă.",
+      "inReview": "Verificăm acest transfer. Contactați asistența dacă nu ajunge în curând."
+    },
     "ShippingAddress": {
       "title": "Adresa de livrare",
       "firstName": "Prenume",

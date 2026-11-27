@@ -3524,6 +3524,12 @@
                 "skip": "Aufladen überspringen"
             }
         },
+        "CardBalanceTransfer": {
+            "waitAndRetry": "Bitte warten Sie {seconds} Sekunden und versuchen Sie es erneut.",
+            "tooManyPending": "Sie haben zu viele ausstehende Aufladungen. Versuchen Sie es später erneut.",
+            "insufficient": "Ihr Kartenguthaben deckt diesen Betrag nicht.",
+            "inReview": "Wir prüfen diese Überweisung. Wenden Sie sich an den Support, wenn sie nicht bald ankommt."
+        },
         "ShippingAddress": {
             "title": "Lieferadresse",
             "firstName": "Vorname",

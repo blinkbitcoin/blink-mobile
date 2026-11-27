@@ -6,6 +6,9 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 export type WalletToggleButtonProps = {
   loading: boolean
   disabled: boolean
+  /** Shows the one direction the money moves in, as during a top-up of the card,
+   *  instead of the flip. */
+  isDirectionFixed?: boolean
   onPress: () => void
   containerStyle?: StyleProp<ViewStyle>
   testID?: string
@@ -14,6 +17,7 @@ export type WalletToggleButtonProps = {
 export const WalletToggleButton: React.FC<WalletToggleButtonProps> = ({
   loading,
   disabled,
+  isDirectionFixed = false,
   onPress,
   containerStyle,
   testID,
@@ -22,10 +26,12 @@ export const WalletToggleButton: React.FC<WalletToggleButtonProps> = ({
     theme: { colors },
   } = useTheme()
   const styles = useStyles()
+  /** A fixed direction is not a flip turned off, so it keeps the button's own grey. */
+  const isDimmed = disabled && !isDirectionFixed
 
   return (
     <TouchableHighlight
-      style={[styles.button, containerStyle, disabled && styles.buttonDisabled]}
+      style={[styles.button, containerStyle, isDimmed && styles.buttonDisabled]}
       disabled={disabled}
       onPress={onPress}
       underlayColor={colors.surfacePressed}
@@ -34,7 +40,11 @@ export const WalletToggleButton: React.FC<WalletToggleButtonProps> = ({
       {loading ? (
         <ActivityIndicator color={colors.accent} />
       ) : (
-        <GaloyIcon name="transfer" color={colors.accent} size={25} />
+        <GaloyIcon
+          name={isDirectionFixed ? "arrow-down" : "transfer"}
+          color={isDirectionFixed ? colors.textDisabled : colors.accent}
+          size={25}
+        />
       )}
     </TouchableHighlight>
   )

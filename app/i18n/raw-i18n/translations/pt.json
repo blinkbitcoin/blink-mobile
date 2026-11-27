@@ -3524,6 +3524,12 @@
                 "skip": "Pular recarga"
             }
         },
+        "CardBalanceTransfer": {
+            "waitAndRetry": "Aguarde {seconds} segundos e tente novamente.",
+            "tooManyPending": "Você tem recargas pendentes demais. Tente novamente mais tarde.",
+            "insufficient": "O saldo do seu cartão não cobre este valor.",
+            "inReview": "Estamos verificando esta transferência. Fale com o suporte se ela não chegar em breve."
+        },
         "ShippingAddress": {
             "title": "Endereço de envio",
             "firstName": "Nome",

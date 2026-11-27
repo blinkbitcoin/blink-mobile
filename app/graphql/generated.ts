@@ -594,6 +594,65 @@ export type CardCollateralDepositInput = {
   readonly blinkTxId: Scalars['String']['input'];
 };
 
+export type CardCollateralDepositIntent = {
+  readonly __typename: 'CardCollateralDepositIntent';
+  readonly creditedSats?: Maybe<Scalars['Int']['output']>;
+  readonly declaredAmountSats: Scalars['Int']['output'];
+  readonly expiresAt: Scalars['DateTime']['output'];
+  readonly id: Scalars['ID']['output'];
+  readonly method: CardCollateralDepositMethod;
+  readonly status: CardCollateralDepositIntentStatus;
+};
+
+export type CardCollateralDepositIntentCreateInput = {
+  readonly amountSats: Scalars['Int']['input'];
+  readonly method: CardCollateralDepositMethod;
+};
+
+export type CardCollateralDepositIntentCreatePayload = {
+  readonly __typename: 'CardCollateralDepositIntentCreatePayload';
+  readonly destination: Scalars['String']['output'];
+  readonly expiresAt: Scalars['DateTime']['output'];
+  readonly intentId: Scalars['ID']['output'];
+  readonly method: CardCollateralDepositMethod;
+};
+
+export const CardCollateralDepositIntentStatus = {
+  Consumed: 'CONSUMED',
+  Expired: 'EXPIRED',
+  Failed: 'FAILED',
+  Pending: 'PENDING',
+  Processing: 'PROCESSING'
+} as const;
+
+export type CardCollateralDepositIntentStatus = typeof CardCollateralDepositIntentStatus[keyof typeof CardCollateralDepositIntentStatus];
+export const CardCollateralDepositMethod = {
+  Lightning: 'LIGHTNING',
+  Onchain: 'ONCHAIN'
+} as const;
+
+export type CardCollateralDepositMethod = typeof CardCollateralDepositMethod[keyof typeof CardCollateralDepositMethod];
+export type CardCollateralWithdrawInput = {
+  readonly amountSats: Scalars['Int']['input'];
+  readonly idempotencyKey: Scalars['String']['input'];
+};
+
+export type CardCollateralWithdrawal = {
+  readonly __typename: 'CardCollateralWithdrawal';
+  readonly amountSats: Scalars['Int']['output'];
+  readonly id: Scalars['ID']['output'];
+  readonly requestedAt: Scalars['DateTime']['output'];
+  readonly status: CardCollateralWithdrawalStatus;
+};
+
+export const CardCollateralWithdrawalStatus = {
+  Completed: 'COMPLETED',
+  InReview: 'IN_REVIEW',
+  Processing: 'PROCESSING',
+  Refused: 'REFUSED'
+} as const;
+
+export type CardCollateralWithdrawalStatus = typeof CardCollateralWithdrawalStatus[keyof typeof CardCollateralWithdrawalStatus];
 export type CardConsumerApplicationCreateInput = {
   readonly accountPurpose: Scalars['String']['input'];
   readonly annualSalary: Scalars['String']['input'];
@@ -1609,6 +1668,8 @@ export type Mutation = {
   readonly cardActivationComplete: CardActivation;
   readonly cardActivationStepUpdate: CardActivation;
   readonly cardCollateralDeposit: CardCollateralDeposit;
+  readonly cardCollateralDepositIntentCreate: CardCollateralDepositIntentCreatePayload;
+  readonly cardCollateralWithdraw: CardCollateralWithdrawal;
   readonly cardConsumerApplicationCreate: ConsumerApplication;
   readonly cardConsumerApplicationManualCreate: ConsumerApplication;
   readonly cardConsumerApplicationUpdate: ConsumerApplication;
@@ -1822,6 +1883,16 @@ export type MutationCardActivationStepUpdateArgs = {
 
 export type MutationCardCollateralDepositArgs = {
   input: CardCollateralDepositInput;
+};
+
+
+export type MutationCardCollateralDepositIntentCreateArgs = {
+  input: CardCollateralDepositIntentCreateInput;
+};
+
+
+export type MutationCardCollateralWithdrawArgs = {
+  input: CardCollateralWithdrawInput;
 };
 
 
@@ -2418,6 +2489,8 @@ export type Query = {
   readonly businessMapMarkers: ReadonlyArray<MapMarker>;
   readonly cardBalance: CardBalance;
   readonly cardCollateralBalance: CardCollateralBalance;
+  readonly cardCollateralDepositIntent?: Maybe<CardCollateralDepositIntent>;
+  readonly cardCollateralWithdrawal?: Maybe<CardCollateralWithdrawal>;
   readonly cardEncryptionPublicKey: Scalars['String']['output'];
   readonly cardHolder: CardHolder;
   readonly cardProvisioningData: CardProvisioningData;
@@ -2474,6 +2547,16 @@ export type QueryBtcPriceListArgs = {
 
 export type QueryCardBalanceArgs = {
   cardId: Scalars['ID']['input'];
+};
+
+
+export type QueryCardCollateralDepositIntentArgs = {
+  intentId: Scalars['ID']['input'];
+};
+
+
+export type QueryCardCollateralWithdrawalArgs = {
+  withdrawalId: Scalars['ID']['input'];
 };
 
 
@@ -3552,6 +3635,20 @@ export type CardQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type CardQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus, readonly createdAt: string, readonly dailyLimitCents?: number | null, readonly monthlyLimitCents?: number | null }>, readonly cardConsumerApplications: ReadonlyArray<{ readonly __typename: 'ConsumerApplication', readonly id: string, readonly applicationStatus: ApplicationStatus }> } } | null };
 
+export type CardCollateralDepositIntentCreateMutationVariables = Exact<{
+  input: CardCollateralDepositIntentCreateInput;
+}>;
+
+
+export type CardCollateralDepositIntentCreateMutation = { readonly __typename: 'Mutation', readonly cardCollateralDepositIntentCreate: { readonly __typename: 'CardCollateralDepositIntentCreatePayload', readonly intentId: string, readonly method: CardCollateralDepositMethod, readonly destination: string, readonly expiresAt: string } };
+
+export type CardCollateralDepositIntentQueryVariables = Exact<{
+  intentId: Scalars['ID']['input'];
+}>;
+
+
+export type CardCollateralDepositIntentQuery = { readonly __typename: 'Query', readonly cardCollateralDepositIntent?: { readonly __typename: 'CardCollateralDepositIntent', readonly id: string, readonly status: CardCollateralDepositIntentStatus, readonly creditedSats?: number | null } | null };
+
 export type CardHolderQueryVariables = Exact<{
   cardId: Scalars['ID']['input'];
 }>;
@@ -3823,6 +3920,13 @@ export type ConversionScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ConversionScreenQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> } } | null };
+
+export type CardCollateralWithdrawMutationVariables = Exact<{
+  input: CardCollateralWithdrawInput;
+}>;
+
+
+export type CardCollateralWithdrawMutation = { readonly __typename: 'Mutation', readonly cardCollateralWithdraw: { readonly __typename: 'CardCollateralWithdrawal', readonly id: string, readonly amountSats: number, readonly status: CardCollateralWithdrawalStatus, readonly requestedAt: string } };
 
 export type DebugScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -5761,6 +5865,84 @@ export type CardQueryHookResult = ReturnType<typeof useCardQuery>;
 export type CardLazyQueryHookResult = ReturnType<typeof useCardLazyQuery>;
 export type CardSuspenseQueryHookResult = ReturnType<typeof useCardSuspenseQuery>;
 export type CardQueryResult = Apollo.QueryResult<CardQuery, CardQueryVariables>;
+export const CardCollateralDepositIntentCreateDocument = gql`
+    mutation cardCollateralDepositIntentCreate($input: CardCollateralDepositIntentCreateInput!) {
+  cardCollateralDepositIntentCreate(input: $input) {
+    intentId
+    method
+    destination
+    expiresAt
+  }
+}
+    `;
+export type CardCollateralDepositIntentCreateMutationFn = Apollo.MutationFunction<CardCollateralDepositIntentCreateMutation, CardCollateralDepositIntentCreateMutationVariables>;
+
+/**
+ * __useCardCollateralDepositIntentCreateMutation__
+ *
+ * To run a mutation, you first call `useCardCollateralDepositIntentCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardCollateralDepositIntentCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardCollateralDepositIntentCreateMutation, { data, loading, error }] = useCardCollateralDepositIntentCreateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardCollateralDepositIntentCreateMutation(baseOptions?: Apollo.MutationHookOptions<CardCollateralDepositIntentCreateMutation, CardCollateralDepositIntentCreateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardCollateralDepositIntentCreateMutation, CardCollateralDepositIntentCreateMutationVariables>(CardCollateralDepositIntentCreateDocument, options);
+      }
+export type CardCollateralDepositIntentCreateMutationHookResult = ReturnType<typeof useCardCollateralDepositIntentCreateMutation>;
+export type CardCollateralDepositIntentCreateMutationResult = Apollo.MutationResult<CardCollateralDepositIntentCreateMutation>;
+export type CardCollateralDepositIntentCreateMutationOptions = Apollo.BaseMutationOptions<CardCollateralDepositIntentCreateMutation, CardCollateralDepositIntentCreateMutationVariables>;
+export const CardCollateralDepositIntentDocument = gql`
+    query cardCollateralDepositIntent($intentId: ID!) {
+  cardCollateralDepositIntent(intentId: $intentId) {
+    id
+    status
+    creditedSats
+  }
+}
+    `;
+
+/**
+ * __useCardCollateralDepositIntentQuery__
+ *
+ * To run a query within a React component, call `useCardCollateralDepositIntentQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCardCollateralDepositIntentQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCardCollateralDepositIntentQuery({
+ *   variables: {
+ *      intentId: // value for 'intentId'
+ *   },
+ * });
+ */
+export function useCardCollateralDepositIntentQuery(baseOptions: Apollo.QueryHookOptions<CardCollateralDepositIntentQuery, CardCollateralDepositIntentQueryVariables> & ({ variables: CardCollateralDepositIntentQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CardCollateralDepositIntentQuery, CardCollateralDepositIntentQueryVariables>(CardCollateralDepositIntentDocument, options);
+      }
+export function useCardCollateralDepositIntentLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CardCollateralDepositIntentQuery, CardCollateralDepositIntentQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CardCollateralDepositIntentQuery, CardCollateralDepositIntentQueryVariables>(CardCollateralDepositIntentDocument, options);
+        }
+export function useCardCollateralDepositIntentSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CardCollateralDepositIntentQuery, CardCollateralDepositIntentQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CardCollateralDepositIntentQuery, CardCollateralDepositIntentQueryVariables>(CardCollateralDepositIntentDocument, options);
+        }
+export type CardCollateralDepositIntentQueryHookResult = ReturnType<typeof useCardCollateralDepositIntentQuery>;
+export type CardCollateralDepositIntentLazyQueryHookResult = ReturnType<typeof useCardCollateralDepositIntentLazyQuery>;
+export type CardCollateralDepositIntentSuspenseQueryHookResult = ReturnType<typeof useCardCollateralDepositIntentSuspenseQuery>;
+export type CardCollateralDepositIntentQueryResult = Apollo.QueryResult<CardCollateralDepositIntentQuery, CardCollateralDepositIntentQueryVariables>;
 export const CardHolderDocument = gql`
     query cardHolder($cardId: ID!) {
   cardHolder(cardId: $cardId) {
@@ -7623,6 +7805,42 @@ export type ConversionScreenQueryHookResult = ReturnType<typeof useConversionScr
 export type ConversionScreenLazyQueryHookResult = ReturnType<typeof useConversionScreenLazyQuery>;
 export type ConversionScreenSuspenseQueryHookResult = ReturnType<typeof useConversionScreenSuspenseQuery>;
 export type ConversionScreenQueryResult = Apollo.QueryResult<ConversionScreenQuery, ConversionScreenQueryVariables>;
+export const CardCollateralWithdrawDocument = gql`
+    mutation cardCollateralWithdraw($input: CardCollateralWithdrawInput!) {
+  cardCollateralWithdraw(input: $input) {
+    id
+    amountSats
+    status
+    requestedAt
+  }
+}
+    `;
+export type CardCollateralWithdrawMutationFn = Apollo.MutationFunction<CardCollateralWithdrawMutation, CardCollateralWithdrawMutationVariables>;
+
+/**
+ * __useCardCollateralWithdrawMutation__
+ *
+ * To run a mutation, you first call `useCardCollateralWithdrawMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardCollateralWithdrawMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardCollateralWithdrawMutation, { data, loading, error }] = useCardCollateralWithdrawMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardCollateralWithdrawMutation(baseOptions?: Apollo.MutationHookOptions<CardCollateralWithdrawMutation, CardCollateralWithdrawMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardCollateralWithdrawMutation, CardCollateralWithdrawMutationVariables>(CardCollateralWithdrawDocument, options);
+      }
+export type CardCollateralWithdrawMutationHookResult = ReturnType<typeof useCardCollateralWithdrawMutation>;
+export type CardCollateralWithdrawMutationResult = Apollo.MutationResult<CardCollateralWithdrawMutation>;
+export type CardCollateralWithdrawMutationOptions = Apollo.BaseMutationOptions<CardCollateralWithdrawMutation, CardCollateralWithdrawMutationVariables>;
 export const DebugScreenDocument = gql`
     query debugScreen {
   me {
@@ -11639,6 +11857,14 @@ export type ResolversTypes = {
   CardCollateralBalance: ResolverTypeWrapper<CardCollateralBalance>;
   CardCollateralDeposit: ResolverTypeWrapper<CardCollateralDeposit>;
   CardCollateralDepositInput: CardCollateralDepositInput;
+  CardCollateralDepositIntent: ResolverTypeWrapper<CardCollateralDepositIntent>;
+  CardCollateralDepositIntentCreateInput: CardCollateralDepositIntentCreateInput;
+  CardCollateralDepositIntentCreatePayload: ResolverTypeWrapper<CardCollateralDepositIntentCreatePayload>;
+  CardCollateralDepositIntentStatus: CardCollateralDepositIntentStatus;
+  CardCollateralDepositMethod: CardCollateralDepositMethod;
+  CardCollateralWithdrawInput: CardCollateralWithdrawInput;
+  CardCollateralWithdrawal: ResolverTypeWrapper<CardCollateralWithdrawal>;
+  CardCollateralWithdrawalStatus: CardCollateralWithdrawalStatus;
   CardConsumerApplicationCreateInput: CardConsumerApplicationCreateInput;
   CardConsumerApplicationManualCreateInput: CardConsumerApplicationManualCreateInput;
   CardConsumerApplicationUpdateInput: CardConsumerApplicationUpdateInput;
@@ -11960,6 +12186,11 @@ export type ResolversParentTypes = {
   CardCollateralBalance: CardCollateralBalance;
   CardCollateralDeposit: CardCollateralDeposit;
   CardCollateralDepositInput: CardCollateralDepositInput;
+  CardCollateralDepositIntent: CardCollateralDepositIntent;
+  CardCollateralDepositIntentCreateInput: CardCollateralDepositIntentCreateInput;
+  CardCollateralDepositIntentCreatePayload: CardCollateralDepositIntentCreatePayload;
+  CardCollateralWithdrawInput: CardCollateralWithdrawInput;
+  CardCollateralWithdrawal: CardCollateralWithdrawal;
   CardConsumerApplicationCreateInput: CardConsumerApplicationCreateInput;
   CardConsumerApplicationManualCreateInput: CardConsumerApplicationManualCreateInput;
   CardConsumerApplicationUpdateInput: CardConsumerApplicationUpdateInput;
@@ -12464,6 +12695,32 @@ export type CardCollateralDepositResolvers<ContextType = any, ParentType extends
   newAvailableBalance?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   satAmount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   transferId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardCollateralDepositIntentResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardCollateralDepositIntent'] = ResolversParentTypes['CardCollateralDepositIntent']> = {
+  creditedSats?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  declaredAmountSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  expiresAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  method?: Resolver<ResolversTypes['CardCollateralDepositMethod'], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['CardCollateralDepositIntentStatus'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardCollateralDepositIntentCreatePayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardCollateralDepositIntentCreatePayload'] = ResolversParentTypes['CardCollateralDepositIntentCreatePayload']> = {
+  destination?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  expiresAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  intentId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  method?: Resolver<ResolversTypes['CardCollateralDepositMethod'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardCollateralWithdrawalResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardCollateralWithdrawal'] = ResolversParentTypes['CardCollateralWithdrawal']> = {
+  amountSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  requestedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['CardCollateralWithdrawalStatus'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -13020,6 +13277,8 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   cardActivationComplete?: Resolver<ResolversTypes['CardActivation'], ParentType, ContextType>;
   cardActivationStepUpdate?: Resolver<ResolversTypes['CardActivation'], ParentType, ContextType, RequireFields<MutationCardActivationStepUpdateArgs, 'input'>>;
   cardCollateralDeposit?: Resolver<ResolversTypes['CardCollateralDeposit'], ParentType, ContextType, RequireFields<MutationCardCollateralDepositArgs, 'input'>>;
+  cardCollateralDepositIntentCreate?: Resolver<ResolversTypes['CardCollateralDepositIntentCreatePayload'], ParentType, ContextType, RequireFields<MutationCardCollateralDepositIntentCreateArgs, 'input'>>;
+  cardCollateralWithdraw?: Resolver<ResolversTypes['CardCollateralWithdrawal'], ParentType, ContextType, RequireFields<MutationCardCollateralWithdrawArgs, 'input'>>;
   cardConsumerApplicationCreate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationCreateArgs, 'input'>>;
   cardConsumerApplicationManualCreate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationManualCreateArgs, 'input'>>;
   cardConsumerApplicationUpdate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationUpdateArgs, 'input'>>;
@@ -13273,6 +13532,8 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   businessMapMarkers?: Resolver<ReadonlyArray<ResolversTypes['MapMarker']>, ParentType, ContextType>;
   cardBalance?: Resolver<ResolversTypes['CardBalance'], ParentType, ContextType, RequireFields<QueryCardBalanceArgs, 'cardId'>>;
   cardCollateralBalance?: Resolver<ResolversTypes['CardCollateralBalance'], ParentType, ContextType>;
+  cardCollateralDepositIntent?: Resolver<Maybe<ResolversTypes['CardCollateralDepositIntent']>, ParentType, ContextType, RequireFields<QueryCardCollateralDepositIntentArgs, 'intentId'>>;
+  cardCollateralWithdrawal?: Resolver<Maybe<ResolversTypes['CardCollateralWithdrawal']>, ParentType, ContextType, RequireFields<QueryCardCollateralWithdrawalArgs, 'withdrawalId'>>;
   cardEncryptionPublicKey?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   cardHolder?: Resolver<ResolversTypes['CardHolder'], ParentType, ContextType, RequireFields<QueryCardHolderArgs, 'cardId'>>;
   cardProvisioningData?: Resolver<ResolversTypes['CardProvisioningData'], ParentType, ContextType, RequireFields<QueryCardProvisioningDataArgs, 'cardId'>>;
@@ -13765,6 +14026,9 @@ export type Resolvers<ContextType = any> = {
   CardBalance?: CardBalanceResolvers<ContextType>;
   CardCollateralBalance?: CardCollateralBalanceResolvers<ContextType>;
   CardCollateralDeposit?: CardCollateralDepositResolvers<ContextType>;
+  CardCollateralDepositIntent?: CardCollateralDepositIntentResolvers<ContextType>;
+  CardCollateralDepositIntentCreatePayload?: CardCollateralDepositIntentCreatePayloadResolvers<ContextType>;
+  CardCollateralWithdrawal?: CardCollateralWithdrawalResolvers<ContextType>;
   CardHolder?: CardHolderResolvers<ContextType>;
   CardMerchant?: CardMerchantResolvers<ContextType>;
   CardProvisioningData?: CardProvisioningDataResolvers<ContextType>;

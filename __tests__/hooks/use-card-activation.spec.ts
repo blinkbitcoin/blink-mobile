@@ -3,6 +3,7 @@ import { NavigationState } from "@react-navigation/native"
 
 import { CardActivationStep, CardType } from "@app/graphql/generated"
 import { useCardActivation } from "@app/hooks/use-card-activation"
+import { CARD } from "@app/types/amounts"
 
 const mockUseIsAuthed = jest.fn()
 jest.mock("@app/graphql/is-authed-context", () => ({
@@ -450,6 +451,62 @@ describe("useCardActivation", () => {
         "cardActivationTopUpScreen",
       ])
       expect(routeNamesOf(action)).toEqual(["Primary", "cardDashboardScreen"])
+    })
+
+    it("opens the way the member chose over the dashboard", async () => {
+      answerWith(
+        dataWith({ step: CardActivationStep.TopUp, cards: [virtualCardWithPin] }),
+      )
+      const { result } = renderHook(() => useCardActivation())
+
+      await act(async () => {
+        await result.current.complete({
+          then: { name: "conversionDetails", params: { destination: CARD } },
+        })
+      })
+
+      const action = resetOn(["Primary", "cardActivationTopUpScreen"])
+      expect(routeNamesOf(action)).toEqual([
+        "Primary",
+        "cardDashboardScreen",
+        "conversionDetails",
+      ])
+      expect(action.payload.routes[2].params).toEqual({ destination: CARD })
+      expect(action.payload.index).toBe(2)
+    })
+
+    it("opens the chosen way over the dashboard with the activation unknown", async () => {
+      answerWith(undefined)
+      const { result } = renderHook(() => useCardActivation())
+
+      await act(async () => {
+        await result.current.complete({
+          then: { name: "conversionDetails", params: { destination: CARD } },
+        })
+      })
+
+      expect(mockReplace).toHaveBeenCalledWith("cardDashboardScreen")
+      expect(mockNavigate).toHaveBeenCalledWith({
+        name: "conversionDetails",
+        params: { destination: CARD },
+      })
+    })
+
+    it("opens nothing more when the completion fails", async () => {
+      answerWith(
+        dataWith({ step: CardActivationStep.TopUp, cards: [virtualCardWithPin] }),
+      )
+      mockComplete.mockRejectedValue(new Error("Card service unavailable"))
+      const { result } = renderHook(() => useCardActivation())
+
+      await act(async () => {
+        await result.current.complete({
+          then: { name: "conversionDetails", params: { destination: CARD } },
+        })
+      })
+
+      expect(mockDispatch).not.toHaveBeenCalled()
+      expect(mockNavigate).not.toHaveBeenCalled()
     })
 
     it("stays on the step and says why when the completion fails", async () => {

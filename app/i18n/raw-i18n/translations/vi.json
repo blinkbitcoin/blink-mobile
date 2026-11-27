@@ -3524,6 +3524,12 @@
         "skip": "Bỏ qua nạp tiền"
       }
     },
+    "CardBalanceTransfer": {
+      "waitAndRetry": "Vui lòng đợi {seconds} giây rồi thử lại.",
+      "tooManyPending": "Bạn có quá nhiều lần nạp đang chờ. Vui lòng thử lại sau.",
+      "insufficient": "Số dư thẻ của bạn không đủ cho số tiền này.",
+      "inReview": "Chúng tôi đang kiểm tra giao dịch chuyển này. Hãy liên hệ hỗ trợ nếu tiền không đến sớm."
+    },
     "ShippingAddress": {
       "title": "Địa chỉ giao hàng",
       "firstName": "Tên",

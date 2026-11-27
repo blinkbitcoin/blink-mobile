@@ -156,6 +156,18 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
 
 const mockSelfCustodialConversion = jest.fn()
 
+const mockCardTopUpExecute = jest.fn()
+const mockCardTopUp = jest.fn()
+jest.mock("@app/screens/conversion-flow/hooks/use-card-top-up", () => ({
+  useCardTopUp: (...args: unknown[]) => mockCardTopUp(...args),
+}))
+
+const mockCardWithdrawalExecute = jest.fn()
+const mockCardWithdrawal = jest.fn()
+jest.mock("@app/screens/conversion-flow/hooks/use-card-withdrawal", () => ({
+  useCardWithdrawal: (...args: unknown[]) => mockCardWithdrawal(...args),
+}))
+
 jest.mock("@app/screens/conversion-flow/hooks/self-custodial/use-conversion", () => ({
   useSelfCustodialConversion: (...args: unknown[]) =>
     mockSelfCustodialConversion(...args),
@@ -204,6 +216,11 @@ describe("conversion-confirmation-screen", () => {
     jest.clearAllMocks()
     ;(useNavigation as jest.Mock).mockReturnValue({ dispatch: dispatchMock })
     mockUseActiveWallet.mockReturnValue({ isSelfCustodial: false, wallets: [] })
+    mockCardTopUp.mockReturnValue({ execute: mockCardTopUpExecute, loading: false })
+    mockCardWithdrawal.mockReturnValue({
+      execute: mockCardWithdrawalExecute,
+      loading: false,
+    })
     mockSelfCustodialConversion.mockReturnValue({
       isQuoting: false,
       hasQuoteError: false,
@@ -220,7 +237,8 @@ describe("conversion-confirmation-screen", () => {
       key: "conversionConfirmation",
       name: "conversionConfirmation",
       params: {
-        fromWalletCurrency: WalletCurrency.Btc,
+        fromBalance: WalletCurrency.Btc,
+        toBalance: WalletCurrency.Usd,
         moneyAmount: {
           amount: 10000,
           currency: WalletCurrency.Btc,
@@ -254,7 +272,8 @@ describe("conversion-confirmation-screen", () => {
       key: "conversionConfirmation",
       name: "conversionConfirmation",
       params: {
-        fromWalletCurrency: WalletCurrency.Usd,
+        fromBalance: WalletCurrency.Usd,
+        toBalance: WalletCurrency.Btc,
         moneyAmount: {
           amount: 5000,
           currency: WalletCurrency.Usd,
@@ -284,7 +303,8 @@ describe("conversion-confirmation-screen", () => {
       key: "conversionConfirmation",
       name: "conversionConfirmation",
       params: {
-        fromWalletCurrency: WalletCurrency.Btc,
+        fromBalance: WalletCurrency.Btc,
+        toBalance: WalletCurrency.Usd,
         moneyAmount: {
           amount: 10000,
           currency: WalletCurrency.Btc,
@@ -307,7 +327,8 @@ describe("conversion-confirmation-screen", () => {
       key: "conversionConfirmation",
       name: "conversionConfirmation",
       params: {
-        fromWalletCurrency: WalletCurrency.Btc,
+        fromBalance: WalletCurrency.Btc,
+        toBalance: WalletCurrency.Usd,
         moneyAmount: {
           amount: 10000,
           currency: WalletCurrency.Btc,
@@ -330,7 +351,8 @@ describe("conversion-confirmation-screen", () => {
       key: "conversionConfirmation",
       name: "conversionConfirmation",
       params: {
-        fromWalletCurrency: WalletCurrency.Btc,
+        fromBalance: WalletCurrency.Btc,
+        toBalance: WalletCurrency.Usd,
         moneyAmount: {
           amount: 10000,
           currency: WalletCurrency.Btc,
@@ -380,7 +402,8 @@ describe("conversion-confirmation-screen", () => {
       key: "conversionConfirmation",
       name: "conversionConfirmation",
       params: {
-        fromWalletCurrency: WalletCurrency.Usd,
+        fromBalance: WalletCurrency.Usd,
+        toBalance: WalletCurrency.Btc,
         moneyAmount: {
           amount: 5000,
           currency: WalletCurrency.Usd,
@@ -425,7 +448,8 @@ describe("conversion-confirmation-screen", () => {
       key: "conversionConfirmation",
       name: "conversionConfirmation",
       params: {
-        fromWalletCurrency: WalletCurrency.Usd,
+        fromBalance: WalletCurrency.Usd,
+        toBalance: WalletCurrency.Btc,
         moneyAmount: {
           amount: 5000,
           currency: WalletCurrency.Usd,
@@ -508,7 +532,8 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
       key: "conversionConfirmation",
       name: "conversionConfirmation",
       params: {
-        fromWalletCurrency: WalletCurrency.Btc,
+        fromBalance: WalletCurrency.Btc,
+        toBalance: WalletCurrency.Usd,
         moneyAmount: {
           amount: 10000,
           currency: WalletCurrency.Btc,
@@ -550,7 +575,8 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
       key: "conversionConfirmation",
       name: "conversionConfirmation",
       params: {
-        fromWalletCurrency: WalletCurrency.Btc,
+        fromBalance: WalletCurrency.Btc,
+        toBalance: WalletCurrency.Usd,
         moneyAmount: {
           amount: 10000,
           currency: WalletCurrency.Btc,
@@ -601,7 +627,8 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
       key: "conversionConfirmation",
       name: "conversionConfirmation",
       params: {
-        fromWalletCurrency: WalletCurrency.Usd,
+        fromBalance: WalletCurrency.Usd,
+        toBalance: WalletCurrency.Btc,
         moneyAmount: {
           amount: 5000,
           currency: WalletCurrency.Usd,
@@ -649,7 +676,8 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
       key: "conversionConfirmation",
       name: "conversionConfirmation",
       params: {
-        fromWalletCurrency: WalletCurrency.Btc,
+        fromBalance: WalletCurrency.Btc,
+        toBalance: WalletCurrency.Usd,
         moneyAmount: {
           amount: 10000,
           currency: WalletCurrency.Btc,
@@ -709,7 +737,8 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
               key: "conversionConfirmation",
               name: "conversionConfirmation",
               params: {
-                fromWalletCurrency: WalletCurrency.Btc,
+                fromBalance: WalletCurrency.Btc,
+                toBalance: WalletCurrency.Usd,
                 moneyAmount: {
                   amount: 10000,
                   currency: WalletCurrency.Btc,
@@ -788,7 +817,8 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
       key: "conversionConfirmation",
       name: "conversionConfirmation",
       params: {
-        fromWalletCurrency: WalletCurrency.Btc,
+        fromBalance: WalletCurrency.Btc,
+        toBalance: WalletCurrency.Usd,
         moneyAmount: {
           amount: 10000,
           currency: WalletCurrency.Btc,
@@ -823,7 +853,8 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
       key: "conversionConfirmation",
       name: "conversionConfirmation",
       params: {
-        fromWalletCurrency: WalletCurrency.Btc,
+        fromBalance: WalletCurrency.Btc,
+        toBalance: WalletCurrency.Usd,
         moneyAmount: {
           amount: 10000,
           currency: WalletCurrency.Btc,
@@ -846,5 +877,192 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
         }),
       ),
     ).toBeNull()
+  })
+})
+
+describe("conversion-confirmation-screen with the Card Balance", () => {
+  let LL: ReturnType<typeof i18nObject>
+  const dispatchMock = jest.fn()
+  const plainDisplayCurrency = displayCurrencyMock.getMockImplementation()
+
+  afterEach(() => {
+    if (plainDisplayCurrency) displayCurrencyMock.mockImplementation(plainDisplayCurrency)
+  })
+
+  beforeAll(() => {
+    loadLocale("en")
+  })
+
+  beforeEach(() => {
+    LL = i18nObject("en")
+    jest.clearAllMocks()
+    ;(useNavigation as jest.Mock).mockReturnValue({ dispatch: dispatchMock })
+    mockUseActiveWallet.mockReturnValue({ isSelfCustodial: false, wallets: [] })
+    mockCardTopUp.mockReturnValue({ execute: mockCardTopUpExecute, loading: false })
+    mockCardWithdrawal.mockReturnValue({
+      execute: mockCardWithdrawalExecute,
+      loading: false,
+    })
+    mockSelfCustodialConversion.mockReturnValue({
+      isQuoting: false,
+      hasQuoteError: false,
+      feeText: "",
+      adjustmentText: null,
+      canExecute: false,
+      loading: false,
+      execute: jest.fn(),
+    })
+  })
+
+  const routeFor = (
+    fromBalance: "BTC" | "USD" | "CARD",
+    toBalance: "BTC" | "USD" | "CARD",
+    amount = 21420,
+  ) =>
+    ({
+      key: "conversionConfirmation",
+      name: "conversionConfirmation",
+      params: {
+        fromBalance,
+        toBalance,
+        moneyAmount: {
+          amount,
+          currency: WalletCurrency.Btc,
+          currencyCode: WalletCurrency.Btc,
+        },
+      },
+    }) as const
+
+  const renderWith = (route: ReturnType<typeof routeFor>) =>
+    render(
+      <ContextForScreen>
+        <ConversionConfirmationScreen route={route} />
+      </ContextForScreen>,
+    )
+
+  it("moves sats into the Card Balance as they are, with no estimate", () => {
+    const marksEstimates = ({
+      moneyAmount,
+      isApproximate,
+    }: {
+      moneyAmount: { amount: number }
+      isApproximate?: boolean
+    }) => `${isApproximate ? "~ " : ""}$${moneyAmount.amount}`
+    displayCurrencyMock.mockImplementation(() => ({
+      displayCurrency: "USD",
+      formatMoneyAmount: marksEstimates,
+      moneyAmountToDisplayCurrencyString: marksEstimates,
+    }))
+    renderWith(routeFor("BTC", "CARD"))
+
+    expect(screen.getByText(LL.common.card())).toBeTruthy()
+    expect(screen.getAllByText("$21420")).toHaveLength(2)
+    expect(screen.getAllByText("~ $21420")).toHaveLength(1)
+    expect(screen.queryByText(LL.ConversionConfirmationScreen.infoBitcoin())).toBeNull()
+    expect(screen.queryByText(LL.ConversionConfirmationScreen.infoDollar())).toBeNull()
+    expect(
+      screen.getByText(
+        LL.ConversionConfirmationScreen.transferButtonText({
+          fromWallet: LL.common.bitcoin(),
+          toWallet: LL.common.card(),
+        }),
+      ),
+    ).toBeTruthy()
+  })
+
+  it("tops the card up from the Bitcoin wallet on swipe", async () => {
+    renderWith(routeFor("BTC", "CARD"))
+
+    fireEvent.press(
+      screen.getByText(
+        LL.ConversionConfirmationScreen.transferButtonText({
+          fromWallet: LL.common.bitcoin(),
+          toWallet: LL.common.card(),
+        }),
+      ),
+    )
+
+    await waitFor(() => {
+      expect(mockCardTopUpExecute).toHaveBeenCalledWith({
+        walletId: "btc-wallet-id",
+        amountSats: 21420,
+      })
+    })
+    expect(intraLedgerMutationMock).not.toHaveBeenCalled()
+  })
+
+  it("tops the card up from the Dollar wallet with the sats the amount buys", async () => {
+    renderWith(routeFor("USD", "CARD"))
+
+    expect(screen.getByText(LL.ConversionConfirmationScreen.infoBitcoin())).toBeTruthy()
+    fireEvent.press(
+      screen.getByText(
+        LL.ConversionConfirmationScreen.transferButtonText({
+          fromWallet: LL.common.dollar(),
+          toWallet: LL.common.card(),
+        }),
+      ),
+    )
+
+    await waitFor(() => {
+      expect(mockCardTopUpExecute).toHaveBeenCalledWith({
+        walletId: "usd-wallet-id",
+        amountSats: 21420,
+      })
+    })
+  })
+
+  it("moves sats off the Card Balance on swipe", async () => {
+    renderWith(routeFor("CARD", "BTC"))
+
+    fireEvent.press(
+      screen.getByText(
+        LL.ConversionConfirmationScreen.transferButtonText({
+          fromWallet: LL.common.card(),
+          toWallet: LL.common.bitcoin(),
+        }),
+      ),
+    )
+
+    await waitFor(() => {
+      expect(mockCardWithdrawalExecute).toHaveBeenCalledWith({ amountSats: 21420 })
+    })
+    expect(mockCardTopUpExecute).not.toHaveBeenCalled()
+    expect(intraLedgerMutationMock).not.toHaveBeenCalled()
+  })
+
+  it("shows why a top-up failed", () => {
+    mockCardTopUp.mockReturnValue({
+      execute: mockCardTopUpExecute,
+      loading: false,
+      errorMessage: "Please wait 22 seconds and try again.",
+    })
+    renderWith(routeFor("BTC", "CARD"))
+
+    expect(screen.getByText("Please wait 22 seconds and try again.")).toBeTruthy()
+  })
+
+  it("shows why a move off the card failed", () => {
+    mockCardWithdrawal.mockReturnValue({
+      execute: mockCardWithdrawalExecute,
+      loading: false,
+      errorMessage: "Your Card Balance doesn't cover this amount.",
+    })
+    renderWith(routeFor("CARD", "BTC"))
+
+    expect(screen.getByText("Your Card Balance doesn't cover this amount.")).toBeTruthy()
+  })
+
+  it("goes to the success screen once the move is done", () => {
+    renderWith(routeFor("BTC", "CARD"))
+
+    const { onSuccess } = mockCardTopUp.mock.calls[0][0] as { onSuccess: () => void }
+    onSuccess()
+
+    const resetAction = dispatchMock.mock.calls[0][0]({ routes: [], index: 0 })
+    expect(resetAction.payload.routes.map((r: { name: string }) => r.name)).toEqual([
+      "Primary",
+      "conversionSuccess",
+    ])
   })
 })

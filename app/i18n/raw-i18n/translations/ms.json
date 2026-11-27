@@ -3524,6 +3524,12 @@
         "skip": "Langkau tambah nilai"
       }
     },
+    "CardBalanceTransfer": {
+      "waitAndRetry": "Sila tunggu {seconds} saat dan cuba lagi.",
+      "tooManyPending": "Anda mempunyai terlalu banyak tambah nilai yang menunggu. Cuba lagi kemudian.",
+      "insufficient": "Baki kad anda tidak mencukupi untuk jumlah ini.",
+      "inReview": "Kami sedang menyemak pemindahan ini. Hubungi sokongan jika ia tidak tiba tidak lama lagi."
+    },
     "ShippingAddress": {
       "title": "Alamat penghantaran",
       "firstName": "Nama pertama",

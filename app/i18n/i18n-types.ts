@@ -11742,6 +11742,25 @@ type RootTranslation = {
 				skip: string
 			}
 		}
+		CardBalanceTransfer: {
+			/**
+			 * P​l​e​a​s​e​ ​w​a​i​t​ ​{​s​e​c​o​n​d​s​}​ ​s​e​c​o​n​d​s​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+			 * @param {number} seconds
+			 */
+			waitAndRetry: RequiredParams<'seconds'>
+			/**
+			 * Y​o​u​ ​h​a​v​e​ ​t​o​o​ ​m​a​n​y​ ​t​o​p​-​u​p​s​ ​w​a​i​t​i​n​g​.​ ​T​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​.
+			 */
+			tooManyPending: string
+			/**
+			 * Y​o​u​r​ ​C​a​r​d​ ​B​a​l​a​n​c​e​ ​d​o​e​s​n​'​t​ ​c​o​v​e​r​ ​t​h​i​s​ ​a​m​o​u​n​t​.
+			 */
+			insufficient: string
+			/**
+			 * W​e​'​r​e​ ​c​h​e​c​k​i​n​g​ ​t​h​i​s​ ​t​r​a​n​s​f​e​r​.​ ​C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​ ​i​f​ ​i​t​ ​d​o​e​s​n​'​t​ ​a​r​r​i​v​e​ ​s​o​o​n​.
+			 */
+			inReview: string
+		}
 		ShippingAddress: {
 			/**
 			 * S​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
@@ -26240,6 +26259,24 @@ export type TranslationFunctions = {
 				 */
 				skip: () => LocalizedString
 			}
+		}
+		CardBalanceTransfer: {
+			/**
+			 * Please wait {seconds} seconds and try again.
+			 */
+			waitAndRetry: (arg: { seconds: number }) => LocalizedString
+			/**
+			 * You have too many top-ups waiting. Try again later.
+			 */
+			tooManyPending: () => LocalizedString
+			/**
+			 * Your Card Balance doesn't cover this amount.
+			 */
+			insufficient: () => LocalizedString
+			/**
+			 * We're checking this transfer. Contact support if it doesn't arrive soon.
+			 */
+			inReview: () => LocalizedString
 		}
 		ShippingAddress: {
 			/**

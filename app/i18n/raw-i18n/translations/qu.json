@@ -3524,6 +3524,12 @@
         "skip": "Recargata saltay"
       }
     },
+    "CardBalanceTransfer": {
+      "waitAndRetry": "{seconds} segundokunata suyay, hinaspa wakmanta ruray.",
+      "tooManyPending": "Nisyu recargakunam suyachkan. Qhipaman wakmanta ruray.",
+      "insufficient": "Tarjetaykiq saldonqa manam kay qullqipaq aypanchu.",
+      "inReview": "Kay apachiytam qhawachkayku. Mana pisillapi chayamuptinqa, yanapaqkunawan rimay."
+    },
     "ShippingAddress": {
       "title": "Apachina tiyay",
       "firstName": "Ñawpaq suti",
