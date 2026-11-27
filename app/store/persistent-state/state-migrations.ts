@@ -357,8 +357,9 @@ type PersistentState_24 = Omit<PersistentState_23, "schemaVersion"> & {
    */
   pendingReinstallLegacyStoreClear?: boolean
   // The sender has used the amount slider on a send that went out (sent or pending), so
-  // its "Slide to select amount" hint is no longer shown. Device-wide: it is about the
-  // person, not the wallet. Optional and unset reads as "not yet", so it needs no schema bump.
+  // its "Slide to select amount" hint is no longer shown. Shared by every wallet on the
+  // device, since it is about the person; a logout resets it with the rest of the state.
+  // Optional and unset reads as "not yet", so it needs no schema bump.
   hasLearnedAmountSlider?: boolean
 }
 
