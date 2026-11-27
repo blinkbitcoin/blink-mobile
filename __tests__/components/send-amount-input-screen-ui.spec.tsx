@@ -185,6 +185,20 @@ describe("AmountInputScreenUI", () => {
     expect(haptics.select).toHaveBeenCalledTimes(1)
   })
 
+  it("stays silent with no currency to swap to", () => {
+    const { getByLabelText } = render(
+      <AmountInputScreenUI
+        {...defaultProps}
+        secondaryCurrencyFormattedAmount="1,500"
+        secondaryCurrencyCode="SAT"
+      />,
+    )
+
+    fireEvent.press(getByLabelText("Switch currencies"))
+
+    expect(haptics.select).not.toHaveBeenCalled()
+  })
+
   it("does not render error text when no error message", () => {
     const { getByTestId } = render(<AmountInputScreenUI {...defaultProps} />)
 

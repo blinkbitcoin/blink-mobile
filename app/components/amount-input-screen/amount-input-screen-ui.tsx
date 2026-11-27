@@ -52,6 +52,13 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
 
   const hasSecondary = Boolean(secondaryCurrencyFormattedAmount)
   const hasError = Boolean(errorMessage)
+  /** With nothing to swap to, the button keeps no handler, so it neither ticks nor acts. */
+  const handleToggleCurrency =
+    onToggleCurrency &&
+    (() => {
+      haptics.select()
+      onToggleCurrency()
+    })
 
   return (
     <View style={styles.sheet}>
@@ -103,11 +110,7 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
             </View>
             <View style={styles.toggleOverlay} pointerEvents="box-none">
               <Pressable
-                onPress={() => {
-                  if (!onToggleCurrency) return
-                  haptics.select()
-                  onToggleCurrency()
-                }}
+                onPress={handleToggleCurrency}
                 hitSlop={8}
                 accessibilityLabel="Switch currencies"
                 accessibilityRole="button"
