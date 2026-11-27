@@ -23,6 +23,8 @@ const mockFormatCurrency = jest.fn(
 )
 let mockDisplayCurrency = "USD"
 let mockLoadedCurrencyCode = "USD"
+/** The codes the currency list knows; `null` stands for a list that knows them all. */
+let mockListedCurrencies: string[] | null = null
 const mockUseAccountRegistry = jest.fn()
 
 jest.mock("@app/hooks", () => ({
@@ -34,6 +36,8 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   useDisplayCurrency: () => ({
     formatMoneyAmount: mockFormatMoneyAmount,
     formatCurrency: mockFormatCurrency,
+    hasCurrencyInfo: (currency: string) =>
+      mockListedCurrencies === null || mockListedCurrencies.includes(currency),
     displayCurrency: mockDisplayCurrency,
     currencyInfo: { DisplayCurrency: { currencyCode: mockLoadedCurrencyCode } },
   }),
@@ -85,6 +89,7 @@ describe("usePendingReceiveAmount", () => {
     jest.clearAllMocks()
     mockDisplayCurrency = "USD"
     mockLoadedCurrencyCode = "USD"
+    mockListedCurrencies = null
     mockConvertMoneyAmount.mockReturnValue(mockConverter)
     mockUseAccountRegistry.mockReturnValue({
       activeAccount: { type: AccountType.Custodial },
@@ -246,6 +251,27 @@ describe("usePendingReceiveAmount", () => {
       )
 
       expect(result.current.pendingReceiveAmountText).toBe("EUR 12.34")
+    })
+
+    it("prices the receive itself while the currency list does not know the code", () => {
+      mockListedCurrencies = []
+
+      const { result } = renderHook(() =>
+        usePendingReceiveAmount({
+          pendingIncomingTransactions: [
+            pendingReceiveTx({
+              settlementAmount: 6,
+              settlementCurrency: WalletCurrency.Usd,
+              settlementDisplayAmount: "0.06",
+              settlementDisplayCurrency: "USD",
+            }),
+          ],
+        }),
+      )
+
+      // 6 cents through the converter's USD factor, spelled by formatMoneyAmount.
+      expect(mockFormatCurrency).not.toHaveBeenCalled()
+      expect(result.current.pendingReceiveAmountText).toBe("$0.60")
     })
 
     it("falls back to live-rate conversion when a display amount is missing", () => {
