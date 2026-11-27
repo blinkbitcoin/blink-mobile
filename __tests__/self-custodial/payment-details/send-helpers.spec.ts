@@ -1975,3 +1975,113 @@ describe("a send-all whose quote moved since review", () => {
     expect(result.status).toBe(PaymentSendResult.Success)
   })
 })
+
+/** blink-wip#2048 step-down: the SDK replaces an on-chain quote near expiry at send, and
+ *  can then send at a slower speed than the sender chose. */
+describe("an on-chain send whose quote the SDK would replace at send", () => {
+  const NOW_SEC = 1_800_000_000
+  let nowSpy: jest.SpyInstance
+
+  const quoteLasting = (secondsLeft: number, extra: object = {}) => ({
+    paymentMethod: {
+      tag: "BitcoinAddress",
+      inner: {
+        feeQuote: {
+          expiresAt: BigInt(NOW_SEC + secondsLeft),
+          isEstimate: false,
+          speedFast: { userFeeSat: BigInt(800), l1BroadcastFeeSat: BigInt(0) },
+          speedMedium: { userFeeSat: BigInt(400), l1BroadcastFeeSat: BigInt(0) },
+          speedSlow: { userFeeSat: BigInt(100), l1BroadcastFeeSat: BigInt(0) },
+        },
+      },
+    },
+    ...extra,
+  })
+  const estimate = {
+    paymentMethod: {
+      tag: "BitcoinAddress",
+      inner: {
+        feeQuote: { ...quoteLasting(0).paymentMethod.inner.feeQuote, isEstimate: true },
+      },
+    },
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    nowSpy = jest.spyOn(Date, "now").mockReturnValue(NOW_SEC * 1000)
+    mockSendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
+  })
+
+  afterEach(() => {
+    nowSpy.mockRestore()
+  })
+
+  const onchainSend = () => ({
+    sdk: mockSdk,
+    paymentRequest: "bc1q...",
+    amount: BigInt(50_000),
+    quoteClockRef: {},
+  })
+  const quoteReview = (params: object, quote: object) => {
+    mockPrepareSendPayment.mockResolvedValueOnce(quote)
+    return createGetFeeOnchain(params as never, "medium" as never)()
+  }
+  const slide = (params: object, quote: object) => {
+    mockPrepareSendPayment.mockResolvedValueOnce(quote)
+    return createSendMutationOnchain(params as never, "medium" as never, {
+      telemetry: telemetryOnchain,
+    })()
+  }
+
+  it("sends nothing, and asks for a new quote, on one with 20 seconds or less left", async () => {
+    const params = onchainSend()
+    await quoteReview(params, quoteLasting(60))
+
+    const result = await slide(params, quoteLasting(20))
+
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.QuoteMoved)
+    expect(mockSendPayment).not.toHaveBeenCalled()
+  })
+
+  it("sends on a quote with more than 20 seconds left", async () => {
+    const params = onchainSend()
+    await quoteReview(params, quoteLasting(60))
+
+    const result = await slide(params, quoteLasting(21))
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+  })
+
+  /** A clock running ahead of the provider's makes every fresh quote look this close, so
+   *  refusing would refuse every slide. */
+  it("sends as before when review's own fresh quote looked as close", async () => {
+    const params = onchainSend()
+    await quoteReview(params, quoteLasting(5))
+
+    const result = await slide(params, quoteLasting(5))
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+  })
+
+  it("holds the send again once review's new quote reads right on the clock", async () => {
+    const params = onchainSend()
+    await quoteReview(params, quoteLasting(5))
+    await quoteReview(params, quoteLasting(60))
+
+    const result = await slide(params, quoteLasting(10))
+
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.QuoteMoved)
+  })
+
+  it.each([
+    ["an estimate, which the SDK always replaces", estimate],
+    ["a quote a conversion funds", quoteLasting(5, { conversionEstimate: {} })],
+  ])("leaves %s to the SDK", async (_, quote) => {
+    const params = onchainSend()
+    await quoteReview(params, quote)
+
+    const result = await slide(params, quote)
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+  })
+})

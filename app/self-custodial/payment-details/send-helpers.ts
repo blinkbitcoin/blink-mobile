@@ -38,6 +38,7 @@ import {
   executeSend,
   extractLightningFee,
   extractOnchainFees,
+  onchainQuoteExpiresAt,
   hasTokenLeg,
   identifyPreparedSend,
   mapAmountAdjustment,
@@ -90,6 +91,8 @@ type PrepareParams = {
   feePolicy?: FeePolicy
   /** A send-all's quote on review, which its send checks before it goes out. */
   quoteRef?: SendAllQuoteRef
+  /** How review's on-chain quote read against this device's clock. */
+  quoteClockRef?: QuoteClockRef
 }
 
 /** The fee review quoted a send-all on, in sats. */
@@ -118,6 +121,51 @@ export const assertSendAllQuoteHolds = (
   if (quoted === undefined) return
   if (freshFeeSats === undefined) return
   if (Math.abs(freshFeeSats - quoted) >= SEND_ALL_MOVED_SATS) throw new QuoteMovedError()
+}
+
+/** The SDK takes a new on-chain quote at send when its own has this little left, and may
+ *  then lower the speed to keep to the fee review showed (spark-sdk 0.27.1). */
+const SDK_QUOTE_REFRESH_SECS = 10
+
+/** Ruled 2026-11-27 (blink-wip#2048 step-down): on top of the SDK's margin, room for the
+ *  time between this check and the SDK's own. */
+const QUOTE_EXPIRY_MARGIN_SECS = 10
+
+/** Whether review's on-chain quote already looked about to expire when it came in. */
+export type QuoteClockRef = { isClockAhead?: boolean }
+
+const isQuoteExpiring = (expiresAtSec: number): boolean =>
+  expiresAtSec <= Date.now() / 1000 + SDK_QUOTE_REFRESH_SECS + QUOTE_EXPIRY_MARGIN_SECS
+
+/** Review's quote was fetched just now, so only a device clock running ahead of the
+ *  provider's makes it look about to expire. */
+export const recordQuoteClock = (
+  clockRef: QuoteClockRef | undefined,
+  prepared: PrepareSendPaymentResponse,
+) => {
+  if (!clockRef) return
+  const expiresAt = onchainQuoteExpiresAt(prepared)
+  if (expiresAt === undefined) return
+  clockRef.isClockAhead = isQuoteExpiring(expiresAt)
+}
+
+/**
+ * Ruled 2026-11-27 (blink-wip#2048 step-down): a sats-funded on-chain send goes out only
+ * on a quote the SDK keeps. One it would replace at send can go out at a slower speed
+ * than the sender chose, so nothing is sent and review quotes again.
+ *
+ * A device clock running ahead makes every fresh quote look this close to expiring. When
+ * review's did too, the send goes out as it always has, instead of being refused on
+ * every slide.
+ */
+export const assertQuoteOutlastsSend = (
+  clockRef: QuoteClockRef,
+  prepared: PrepareSendPaymentResponse,
+) => {
+  if (clockRef.isClockAhead) return
+  const expiresAt = onchainQuoteExpiresAt(prepared)
+  if (expiresAt === undefined) return
+  if (isQuoteExpiring(expiresAt)) throw new QuoteMovedError()
 }
 
 /**
@@ -258,6 +306,7 @@ export const createGetFeeOnchain = <T extends WalletCurrency>(
       }
 
       recordSendAllQuote(params.quoteRef, fees[feeTier])
+      recordQuoteClock(params.quoteClockRef, prepared)
       return { amount: asGetFeeAmount<T>(fees[feeTier]) }
     } catch (err) {
       return feeFailure<T>("Self-custodial onchain fee", err)
@@ -327,6 +376,7 @@ const runSendMutation = (
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
       assertFeePolicyApplied(params.feePolicy, prepared)
       if (params.quoteRef) assertSendAllQuoteHolds(params.quoteRef, feeOf(prepared))
+      if (params.quoteClockRef) assertQuoteOutlastsSend(params.quoteClockRef, prepared)
       return prepared
     },
     identify: identifyPreparedSend,

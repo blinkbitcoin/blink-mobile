@@ -63,6 +63,16 @@ describe("createSelfCustodialOnchainPaymentDetails", () => {
     )
   })
 
+  /** blink-wip#2048 step-down: the send reads how review's quote stood on the clock. */
+  it("hands review's quote and the send the same clock record", () => {
+    createSelfCustodialOnchainPaymentDetails(createParams())
+
+    const reviewParams = jest.mocked(createGetFeeOnchain).mock.lastCall?.[0]
+    const sendParams = jest.mocked(createSendMutationOnchain).mock.lastCall?.[0]
+    expect(reviewParams?.quoteClockRef).toEqual({})
+    expect(sendParams?.quoteClockRef).toBe(reviewParams?.quoteClockRef)
+  })
+
   it("returns Onchain payment type", () => {
     const detail = createSelfCustodialOnchainPaymentDetails(createParams())
     expect(detail.paymentType).toBe(PaymentType.Onchain)

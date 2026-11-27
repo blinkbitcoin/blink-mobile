@@ -38,6 +38,7 @@ export {
   hasTokenLeg,
   identifyPreparedSend,
   extractOnchainFees,
+  onchainQuoteExpiresAt,
   extractLightningFee,
   toSdkSendAmount,
   resolveSendTokenIdentifier,

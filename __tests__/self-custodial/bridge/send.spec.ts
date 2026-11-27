@@ -10,6 +10,7 @@ import {
   extractLnurlFee,
   extractOnchainFees,
   identifyPreparedSend,
+  onchainQuoteExpiresAt,
   prepareLnurl,
   prepareSend,
   resolveSendTokenIdentifier,
@@ -73,6 +74,40 @@ describe("extractOnchainFees", () => {
     }
 
     expect(extractOnchainFees(prepared as never)).toBeNull()
+  })
+})
+
+describe("onchainQuoteExpiresAt", () => {
+  const onchain = (feeQuote: object, extra: object = {}) => ({
+    paymentMethod: { tag: "BitcoinAddress", inner: { feeQuote } },
+    ...extra,
+  })
+
+  it("reads when the provider's quote expires, in seconds", () => {
+    const prepared = onchain({ expiresAt: BigInt(1_800_000_060), isEstimate: false })
+
+    expect(onchainQuoteExpiresAt(prepared as never)).toBe(1_800_000_060)
+  })
+
+  it("reads nothing for an estimate, which the SDK always replaces", () => {
+    const prepared = onchain({ expiresAt: BigInt(0), isEstimate: true })
+
+    expect(onchainQuoteExpiresAt(prepared as never)).toBeUndefined()
+  })
+
+  it("reads nothing for a send a conversion funds, priced after it converts", () => {
+    const prepared = onchain(
+      { expiresAt: BigInt(1_800_000_060), isEstimate: false },
+      { conversionEstimate: {} },
+    )
+
+    expect(onchainQuoteExpiresAt(prepared as never)).toBeUndefined()
+  })
+
+  it("reads nothing for a send that is not on-chain", () => {
+    const prepared = { paymentMethod: { tag: "Bolt11Invoice", inner: {} } }
+
+    expect(onchainQuoteExpiresAt(prepared as never)).toBeUndefined()
   })
 })
 

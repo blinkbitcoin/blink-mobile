@@ -46,6 +46,21 @@ export const extractOnchainFees = (
   }
 }
 
+/**
+ * When the provider's quote a sats-funded on-chain send was prepared on expires, in Unix
+ * seconds. None for an estimate, which the SDK always replaces at send, nor for a send a
+ * conversion funds, which it prices after converting.
+ */
+export const onchainQuoteExpiresAt = (
+  prepared: PrepareSendPaymentResponse,
+): number | undefined => {
+  if (prepared.paymentMethod?.tag !== MethodTag.BitcoinAddress) return undefined
+  if (prepared.conversionEstimate) return undefined
+  const { feeQuote } = prepared.paymentMethod.inner
+  if (feeQuote.isEstimate) return undefined
+  return toNumber(feeQuote.expiresAt)
+}
+
 export const extractLightningFee = (
   prepared: PrepareSendPaymentResponse,
 ): number | null => {

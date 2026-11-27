@@ -76,6 +76,7 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
     amount: BigInt(settlementAmount.amount),
     feePolicy,
     quoteRef: isSendingMax ? {} : undefined,
+    quoteClockRef: {},
   }
 
   const sendPaymentAndGetFee: PaymentDetailSendPaymentGetFee<T> = settlementAmount.amount
