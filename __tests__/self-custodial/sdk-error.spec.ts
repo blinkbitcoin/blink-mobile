@@ -2,6 +2,7 @@
 import {
   classifySdkError,
   getSdkErrorReason,
+  QuoteMovedError,
   SelfCustodialErrorCode,
 } from "@app/self-custodial/sdk-error"
 
@@ -42,6 +43,12 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
 const sdkError = (tag: string, inner?: readonly [string]) => ({ tag, inner })
 
 describe("classifySdkError", () => {
+  it("classifies a send-all stopped for a moved quote as QuoteMoved", () => {
+    expect(classifySdkError(new QuoteMovedError())).toBe(
+      SelfCustodialErrorCode.QuoteMoved,
+    )
+  })
+
   it("classifies non-SdkError exceptions as Generic", () => {
     expect(classifySdkError(new Error("plain js error"))).toBe(
       SelfCustodialErrorCode.Generic,

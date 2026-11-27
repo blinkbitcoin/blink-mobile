@@ -1,3 +1,4 @@
+import { it } from "@jest/globals"
 import { renderHook, act } from "@testing-library/react-native"
 
 import { wrapDestination } from "@app/self-custodial/payment-details/wrap-destination"
@@ -104,7 +105,7 @@ const mockSetMemo = jest.fn().mockImplementation((memo) => ({
   paymentType: "onchain",
   memo,
   canSetAmount: true,
-  setAmount: (amt: unknown) => mockSetAmount(amt),
+  setAmount: (amt: unknown, sendMax?: boolean) => mockSetAmount(amt, sendMax),
 }))
 
 jest.mock("@app/self-custodial/payment-details/wrap-destination", () => ({
@@ -115,7 +116,7 @@ jest.mock("@app/self-custodial/payment-details/wrap-destination", () => ({
       return {
         paymentType: "onchain",
         canSetAmount: true,
-        setAmount: (amt: unknown) => mockSetAmount(amt),
+        setAmount: (amt: unknown, sendMax?: boolean) => mockSetAmount(amt, sendMax),
         canSetMemo: true,
         setMemo: (memo: unknown) => mockSetMemo(memo),
       }
@@ -367,9 +368,7 @@ describe("useOnchainFeeTierOptions", () => {
 
     // Address and amount gated off, so the SDK never quotes a payment the backend owns.
     expect(mockUseOnchainFeeTiers).toHaveBeenLastCalledWith(
-      expect.anything(),
-      undefined,
-      undefined,
+      expect.objectContaining({ address: undefined, amountSats: undefined }),
     )
   })
 
@@ -384,9 +383,7 @@ describe("useOnchainFeeTierOptions", () => {
     )
 
     expect(mockUseOnchainFeeTiers).toHaveBeenLastCalledWith(
-      expect.anything(),
-      "bc1qaddr",
-      5000,
+      expect.objectContaining({ address: "bc1qaddr", amountSats: 5000 }),
     )
   })
 
@@ -508,6 +505,52 @@ describe("useOnchainFeeTierOptions", () => {
 
     expect(mockSetMemo).toHaveBeenCalledWith("rent")
     expect(mockSetAmount).toHaveBeenCalled()
+  })
+
+  /** A rebuild that dropped send-all would put the fee back on top of the whole balance
+   *  (#2048 SA1). */
+  it.each([
+    ["without a note", undefined],
+    ["with a note", "rent"],
+  ])("keeps a send-all a send-all when the priority changes, %s", (_, memo) => {
+    const sendAll = { ...buildOnchainDetailRaw(), memo, isSendingMax: true } as never
+
+    const { result } = renderHook(() =>
+      useOnchainFeeTierOptions({
+        paymentDetail: sendAll,
+        isSelfCustodial: true,
+        paymentDestination: { isValid: true } as never,
+        convertMoneyAmount: jest.fn() as never,
+      }),
+    )
+
+    act(() => {
+      result.current.setFeeTier(FeeTierOption.Fast, sendAll)
+    })
+
+    expect(mockSetAmount).toHaveBeenCalledTimes(1)
+    expect(mockSetAmount).toHaveBeenCalledWith(
+      expect.objectContaining({ amount: 5000 }),
+      true,
+    )
+  })
+
+  it("keeps a typed amount a plain amount when the priority changes", () => {
+    const { result } = renderHook(() =>
+      useOnchainFeeTierOptions({
+        paymentDetail: buildOnchainDetail(),
+        isSelfCustodial: true,
+        paymentDestination: { isValid: true } as never,
+        convertMoneyAmount: jest.fn() as never,
+      }),
+    )
+
+    act(() => {
+      result.current.setFeeTier(FeeTierOption.Fast, buildOnchainDetail())
+    })
+
+    expect(mockSetAmount).toHaveBeenCalledTimes(1)
+    expect(mockSetAmount.mock.calls[0][1]).toBeFalsy()
   })
 
   it("leaves the rebuilt detail alone when the sender wrote no note", () => {

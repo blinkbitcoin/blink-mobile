@@ -1,4 +1,6 @@
 /* eslint-disable camelcase */
+import { FeePolicy } from "@breeztech/breez-sdk-spark-react-native"
+
 import { WalletCurrency } from "@app/graphql/generated"
 
 import {
@@ -8,6 +10,7 @@ import {
   extractLnurlFee,
   extractOnchainFees,
   identifyPreparedSend,
+  onchainQuoteExpiresAt,
   prepareLnurl,
   prepareSend,
   resolveSendTokenIdentifier,
@@ -26,6 +29,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   SendPaymentMethod_Tags: {
     BitcoinAddress: "BitcoinAddress",
     Bolt11Invoice: "Bolt11Invoice",
+    SparkAddress: "SparkAddress",
     SparkInvoice: "SparkInvoice",
   },
   SendPaymentOptions: {
@@ -74,6 +78,40 @@ describe("extractOnchainFees", () => {
   })
 })
 
+describe("onchainQuoteExpiresAt", () => {
+  const onchain = (feeQuote: object, extra: object = {}) => ({
+    paymentMethod: { tag: "BitcoinAddress", inner: { feeQuote } },
+    ...extra,
+  })
+
+  it("reads when the provider's quote expires, in seconds", () => {
+    const prepared = onchain({ expiresAt: BigInt(1_800_000_060), isEstimate: false })
+
+    expect(onchainQuoteExpiresAt(prepared as never)).toBe(1_800_000_060)
+  })
+
+  it("reads nothing for an estimate, which the SDK always replaces", () => {
+    const prepared = onchain({ expiresAt: BigInt(0), isEstimate: true })
+
+    expect(onchainQuoteExpiresAt(prepared as never)).toBeUndefined()
+  })
+
+  it("reads nothing for a send a conversion funds, priced after it converts", () => {
+    const prepared = onchain(
+      { expiresAt: BigInt(1_800_000_060), isEstimate: false },
+      { conversionEstimate: {} },
+    )
+
+    expect(onchainQuoteExpiresAt(prepared as never)).toBeUndefined()
+  })
+
+  it("reads nothing for a send that is not on-chain", () => {
+    const prepared = { paymentMethod: { tag: "Bolt11Invoice", inner: {} } }
+
+    expect(onchainQuoteExpiresAt(prepared as never)).toBeUndefined()
+  })
+})
+
 describe("extractLightningFee", () => {
   it("returns the Spark transfer fee when both routes are present (Spark is cheaper)", () => {
     const prepared = {
@@ -114,7 +152,23 @@ describe("extractLightningFee", () => {
     expect(extractLightningFee(prepared as never)).toBeNull()
   })
 
-  it("returns null for non-Bolt11Invoice payment", () => {
+  for (const tag of ["SparkAddress", "SparkInvoice"]) {
+    it(`returns the fee a ${tag} quotes`, () => {
+      const prepared = { paymentMethod: { tag, inner: { fee: BigInt(50) } } }
+
+      expect(extractLightningFee(prepared as never)).toBe(50)
+    })
+
+    it(`leaves out a ${tag} token transfer's fee, which is not in sats`, () => {
+      const prepared = {
+        paymentMethod: { tag, inner: { fee: BigInt(50), tokenIdentifier: "usdb" } },
+      }
+
+      expect(extractLightningFee(prepared as never)).toBeNull()
+    })
+  }
+
+  it("returns null for an on-chain payment", () => {
     const prepared = {
       paymentMethod: { tag: "BitcoinAddress", inner: {} },
     }
@@ -325,7 +379,21 @@ describe("prepareSend", () => {
       amount: undefined,
       tokenIdentifier: undefined,
       conversionOptions: undefined,
+      feePolicy: undefined,
     })
+  })
+
+  it("forwards the fee policy, so a send-all takes the fee out of the balance", async () => {
+    const prepareSendPayment = jest.fn().mockResolvedValue({})
+    const sdk = { prepareSendPayment } as never
+
+    await prepareSend(sdk, {
+      paymentRequest: "bc1qtest",
+      amount: BigInt(100_000),
+      feePolicy: FeePolicy.FeesIncluded,
+    })
+
+    expect(prepareSendPayment.mock.calls[0][0].feePolicy).toBe(FeePolicy.FeesIncluded)
   })
 
   it("forwards conversionOptions when provided (USDB→BTC Lightning send)", async () => {

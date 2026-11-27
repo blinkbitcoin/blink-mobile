@@ -14,6 +14,8 @@ const mockReportError = jest.fn()
 jest.mock("@app/self-custodial/bridge", () => ({
   prepareSend: (...args: unknown[]) => mockPrepareSend(...args),
   extractOnchainFees: (...args: unknown[]) => mockExtractOnchainFees(...args),
+  assertFeePolicyApplied: jest.requireActual("@app/self-custodial/bridge/send")
+    .assertFeePolicyApplied,
 }))
 
 jest.mock("@app/utils/error-logging", () => ({
@@ -27,9 +29,13 @@ const FEES = { fast: 300, medium: 200, slow: 100 }
 type HookProps = { amount: number | undefined }
 
 const renderTiers = (amount: number | undefined = 5000) =>
-  renderHook(({ amount }: HookProps) => useOnchainFeeTiers(mockSdk, "bc1qtest", amount), {
-    initialProps: { amount },
-  })
+  renderHook(
+    ({ amount }: HookProps) =>
+      useOnchainFeeTiers({ sdk: mockSdk, address: "bc1qtest", amountSats: amount }),
+    {
+      initialProps: { amount },
+    },
+  )
 
 const deferred = <T>() => {
   let resolve: (value: T) => void = () => {}
@@ -93,7 +99,9 @@ describe("useOnchainFeeTiers", () => {
   })
 
   it("resolves null without calling the SDK when there is nothing to quote", async () => {
-    const { result } = renderHook(() => useOnchainFeeTiers(null, "bc1qtest", 1000))
+    const { result } = renderHook(() =>
+      useOnchainFeeTiers({ sdk: null, address: "bc1qtest", amountSats: 1000 }),
+    )
 
     let tiers: unknown = "unset"
     await act(async () => {
@@ -394,5 +402,86 @@ describe("useOnchainFeeTiers", () => {
     expect(tiers).toBeNull()
     expect(result.current.error).toBe(SdkFeeError.Generic)
     expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(0)
+  })
+})
+
+describe("useOnchainFeeTiers send-all", () => {
+  const FEES_INCLUDED = 1
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockExtractOnchainFees.mockReturnValue(FEES)
+    mockPrepareSend.mockResolvedValue({})
+  })
+
+  const quoteWith = async (isFeeIncluded: boolean) => {
+    const { result } = renderHook(() =>
+      useOnchainFeeTiers({
+        sdk: mockSdk,
+        address: "bc1qtest",
+        amountSats: 5000,
+        isFeeIncluded,
+      }),
+    )
+    await act(async () => {
+      await result.current.quote()
+    })
+    return mockPrepareSend.mock.calls[0][1].feePolicy
+  }
+
+  it("quotes a send-all with the fee taken out, so the whole balance can pay", async () => {
+    expect(await quoteWith(true)).toBe(FEES_INCLUDED)
+  })
+
+  /** blink-wip#2048 SR3: a send-all quoted with the fee on top would spend more than the
+   *  balance, so the quote fails rather than show it. */
+  it.each([
+    ["holds", FEES_INCLUDED, true],
+    ["fails", 0 /* FeesExcluded */, false],
+  ])(
+    "%s a send-all's quote by the fee policy the SDK applied",
+    async (_, applied, quoted) => {
+      mockPrepareSend.mockResolvedValue({ feePolicy: applied })
+      const { result } = renderHook(() =>
+        useOnchainFeeTiers({
+          sdk: mockSdk,
+          address: "bc1qtest",
+          amountSats: 5000,
+          isFeeIncluded: true,
+        }),
+      )
+
+      await act(async () => {
+        await result.current.quote()
+      })
+
+      expect(result.current.hasQuote).toBe(quoted)
+      expect(result.current.error === null).toBe(quoted)
+    },
+  )
+
+  it("quotes a plain amount with the fee on top", async () => {
+    expect(await quoteWith(false)).toBeUndefined()
+  })
+
+  it("drops the quote when send-all is switched on or off", async () => {
+    const { result, rerender } = renderHook(
+      ({ isFeeIncluded }: { isFeeIncluded: boolean }) =>
+        useOnchainFeeTiers({
+          sdk: mockSdk,
+          address: "bc1qtest",
+          amountSats: 5000,
+          isFeeIncluded,
+        }),
+      { initialProps: { isFeeIncluded: false } },
+    )
+    await act(async () => {
+      await result.current.quote()
+    })
+    expect(result.current.hasQuote).toBe(true)
+
+    rerender({ isFeeIncluded: true })
+
+    expect(result.current.hasQuote).toBe(false)
   })
 })

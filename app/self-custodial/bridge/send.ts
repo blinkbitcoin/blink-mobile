@@ -46,11 +46,35 @@ export const extractOnchainFees = (
   }
 }
 
+/**
+ * When the provider's quote a sats-funded on-chain send was prepared on expires, in Unix
+ * seconds. None for an estimate, which the SDK always replaces at send, nor for a send a
+ * conversion funds, which it prices after converting.
+ */
+export const onchainQuoteExpiresAt = (
+  prepared: PrepareSendPaymentResponse,
+): number | undefined => {
+  if (prepared.paymentMethod?.tag !== MethodTag.BitcoinAddress) return undefined
+  if (prepared.conversionEstimate) return undefined
+  const { feeQuote } = prepared.paymentMethod.inner
+  if (feeQuote.isEstimate) return undefined
+  return toNumber(feeQuote.expiresAt)
+}
+
+/**
+ * The fee in sats a prepared Lightning or Spark send quotes. SDK 0.27.1 quotes a Spark
+ * transfer at 0, but it is read anyway so a send-all keeps to a later SDK that charges
+ * one. A token transfer's fee is in the token's units, not sats, so it is left out.
+ */
 export const extractLightningFee = (
   prepared: PrepareSendPaymentResponse,
 ): number | null => {
-  if (prepared.paymentMethod?.tag !== MethodTag.Bolt11Invoice) return null
-  const { sparkTransferFeeSats, lightningFeeSats } = prepared.paymentMethod.inner
+  const method = prepared.paymentMethod
+  if (method?.tag === MethodTag.SparkAddress || method?.tag === MethodTag.SparkInvoice) {
+    return method.inner.tokenIdentifier ? null : toNumber(method.inner.fee)
+  }
+  if (method?.tag !== MethodTag.Bolt11Invoice) return null
+  const { sparkTransferFeeSats, lightningFeeSats } = method.inner
   if (sparkTransferFeeSats !== undefined) return toNumber(sparkTransferFeeSats)
   if (lightningFeeSats !== undefined) return toNumber(lightningFeeSats)
   return null
@@ -83,6 +107,8 @@ export type PrepareSendOptions = {
   amount: bigint | undefined
   tokenIdentifier?: string
   conversionOptions?: ConversionOptions
+  /** `FeesIncluded` takes the fee out of `amount`: a send-all passes the balance. */
+  feePolicy?: FeePolicy
 }
 
 export const prepareSend = (sdk: BreezSdkInterface, options: PrepareSendOptions) =>
@@ -94,6 +120,7 @@ export const prepareSend = (sdk: BreezSdkInterface, options: PrepareSendOptions)
       amount: options.amount,
       tokenIdentifier: options.tokenIdentifier,
       conversionOptions: options.conversionOptions,
+      feePolicy: options.feePolicy,
     }),
   )
 
@@ -198,6 +225,24 @@ export const prepareLnurl = (sdk: BreezSdkInterface, options: PrepareLnurlOption
 
 export const extractLnurlFee = (prepared: PrepareLnurlPayResponse): number =>
   toNumber(prepared.feeSats)
+
+/**
+ * The SDK reports the fee policy it applied, which may differ from the one asked for
+ * (blink-wip#2048 SR3). A send-all that came back with the fee on top would show the
+ * balance less the fee while spending the balance plus it, so its quote and its send
+ * stop here, before anything goes out.
+ */
+export const assertFeePolicyApplied = (
+  requested: FeePolicy | undefined,
+  prepared: { feePolicy: FeePolicy },
+) => {
+  if (
+    requested === FeePolicy.FeesIncluded &&
+    prepared.feePolicy !== FeePolicy.FeesIncluded
+  ) {
+    throw new Error("The SDK did not take the fee out of the amount")
+  }
+}
 
 /** The key is dropped on a token leg, as `executeSend` drops it, for the same reason. */
 export const executeLnurl = (

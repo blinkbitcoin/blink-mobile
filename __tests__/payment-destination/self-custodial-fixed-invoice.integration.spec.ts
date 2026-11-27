@@ -152,6 +152,8 @@ const preparedWithoutAmount = (invoice: string) => ({
   amount: undefined,
   tokenIdentifier: undefined,
   conversionOptions: undefined,
+  // A fixed invoice is never a send-all, so its fee stays on top.
+  feePolicy: undefined,
 })
 
 const sdkRefusal = (reason: string) =>

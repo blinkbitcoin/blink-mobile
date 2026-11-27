@@ -21,6 +21,7 @@ import {
   createGetFeeOnchain,
   createSendMutationOnchain,
   requestedAsOf,
+  sendAllFeePolicy,
 } from "./send-helpers"
 
 type CreateOnchainParams<T extends WalletCurrency> = {
@@ -29,6 +30,8 @@ type CreateOnchainParams<T extends WalletCurrency> = {
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
   feeTier?: FeeTierOption
   idempotencyKeyRef?: IdempotencyKeyRef
+  /** Slid to 100%: the whole balance, with the fee taken out of it. */
+  sendMax?: boolean
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrency>(
@@ -43,6 +46,7 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
     sendingWalletDescriptor,
     destinationSpecifiedMemo,
     senderSpecifiedMemo,
+    sendMax,
   } = params
 
   /**
@@ -63,10 +67,16 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
     sendingWalletDescriptor.currency,
   )
 
+  const feePolicy = sendAllFeePolicy(sendMax, sendingWalletDescriptor.currency)
+  const isSendingMax = feePolicy !== undefined
+
   const prepareParams = {
     sdk,
     paymentRequest: address,
     amount: BigInt(settlementAmount.amount),
+    feePolicy,
+    quoteRef: isSendingMax ? {} : undefined,
+    quoteClockRef: {},
   }
 
   const sendPaymentAndGetFee: PaymentDetailSendPaymentGetFee<T> = settlementAmount.amount
@@ -85,11 +95,12 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
       }
     : { canSendPayment: false, canGetFee: false }
 
-  const setAmount: SetAmount<T> = (newAmount) =>
+  const setAmount: SetAmount<T> = (newAmount, newSendMax) =>
     createSelfCustodialOnchainPaymentDetails({
       ...paramsWithKey,
       idempotencyKeyRef: undefined,
       unitOfAccountAmount: newAmount,
+      sendMax: newSendMax,
     })
 
   const setMemo: PaymentDetailSetMemo<T> = destinationSpecifiedMemo
@@ -108,6 +119,7 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
       ...paramsWithKey,
       idempotencyKeyRef: undefined,
       sendingWalletDescriptor: desc,
+      sendMax: false,
     })
 
   const setConvertMoneyAmount = (fn: ConvertMoneyAmount) =>
@@ -128,6 +140,9 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
     idempotencyKeyRef,
     canSetAmount: true,
     setAmount,
+    canSendMax: sendingWalletDescriptor.currency === WalletCurrency.Btc,
+    isSendingMax,
+    isFeeIncluded: isSendingMax,
     ...setMemo,
     ...sendPaymentAndGetFee,
   } as PaymentDetail<T>

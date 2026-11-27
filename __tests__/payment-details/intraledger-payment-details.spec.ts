@@ -174,3 +174,24 @@ describe("intraledger payment details", () => {
     expect(newPaymentDetails.sendingWalletDescriptor).toEqual(sendingWalletDescriptor)
   })
 })
+
+describe("intraledger send-all", () => {
+  it("offers a send-all, since a Blink-to-Blink send has no fee", () => {
+    const detail = PaymentDetails.createIntraledgerPaymentDetails(defaultParams)
+
+    expect(detail.canSendMax).toBe(true)
+  })
+
+  /** Nothing comes out of the amount, so the whole balance goes as a plain amount, and
+   *  review keeps checking it against the balance. */
+  it("sends the whole balance as a plain amount at 100%", () => {
+    const balance = { ...testAmount, amount: 50_000 }
+    const detail = PaymentDetails.createIntraledgerPaymentDetails(defaultParams)
+
+    const all = detail.setAmount?.(balance, true)
+
+    expect(all?.settlementAmount).toEqual(balance)
+    expect(all?.isSendingMax).toBeFalsy()
+    expect(all?.isFeeIncluded).toBeFalsy()
+  })
+})

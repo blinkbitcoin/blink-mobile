@@ -347,12 +347,15 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     })
   }
 
+  // A send-all is the whole balance of the wallet it was slid on, so another wallet's
+  // amount starts as a plain one (blink-wip#2048 E3).
   const setSendingWalletDescriptor: SetSendingWalletDescriptor<T> = (
     newSendingWalletDescriptor,
   ) => {
     return createNoAmountOnchainPaymentDetails({
       ...params,
       idempotencyKeyRef: undefined,
+      isSendingMax: false,
       sendingWalletDescriptor: newSendingWalletDescriptor,
     })
   }

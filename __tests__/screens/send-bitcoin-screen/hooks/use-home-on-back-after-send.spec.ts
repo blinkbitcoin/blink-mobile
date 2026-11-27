@@ -1,4 +1,7 @@
-import { renderHook } from "@testing-library/react-native"
+import { useEffect } from "react"
+
+import { act, renderHook } from "@testing-library/react-native"
+import { useNavigation } from "@react-navigation/native"
 
 import { useHomeOnBackAfterSend } from "@app/screens/send-bitcoin-screen/hooks/use-home-on-back-after-send"
 
@@ -84,5 +87,45 @@ describe("useHomeOnBackAfterSend", () => {
     rerender({ hasAttemptedSend: true })
 
     expect(remove("GO_BACK")).toHaveBeenCalled()
+  })
+
+  it("gives back and the swipe back when an attempt that went nowhere is forgotten", () => {
+    const { rerender } = renderHook(
+      ({ hasAttemptedSend }: { hasAttemptedSend: boolean }) =>
+        useHomeOnBackAfterSend(hasAttemptedSend),
+      { initialProps: { hasAttemptedSend: true } },
+    )
+    expect(mockSetOptions).toHaveBeenLastCalledWith({ gestureEnabled: false })
+
+    rerender({ hasAttemptedSend: false })
+
+    expect(remove("GO_BACK")).not.toHaveBeenCalled()
+    expect(mockDispatch).not.toHaveBeenCalled()
+    expect(mockSetOptions).toHaveBeenLastCalledWith({ gestureEnabled: true })
+  })
+
+  it("leaves the swipe off when Sent's hold takes over in the same commit", async () => {
+    /** Sent's hold as the screen wires it: declared first, taking the swipe once settled. */
+    const useReviewHolds = (isSettled: boolean) => {
+      const navigation = useNavigation()
+      useEffect(() => {
+        if (isSettled) navigation.setOptions({ gestureEnabled: false })
+      }, [isSettled, navigation])
+      useHomeOnBackAfterSend(!isSettled)
+    }
+    const { rerender } = renderHook(
+      ({ isSettled }: { isSettled: boolean }) => useReviewHolds(isSettled),
+      { initialProps: { isSettled: false } },
+    )
+
+    rerender({ isSettled: true })
+    await act(async () => {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 20)
+      })
+    })
+
+    expect(mockSetOptions).toHaveBeenCalledWith({ gestureEnabled: true })
+    expect(mockSetOptions).toHaveBeenLastCalledWith({ gestureEnabled: false })
   })
 })

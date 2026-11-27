@@ -52,6 +52,7 @@ import {
   SEND_HERO_CAPTION_TEST_ID,
   SEND_HERO_PRIMARY_TEST_ID,
   SEND_HERO_SECONDARY_TEST_ID,
+  SendHero,
 } from "@app/screens/send-bitcoin-screen/send-hero"
 import {
   SENT_HOLD_MS,
@@ -249,6 +250,11 @@ const mockUseSendPayment = jest.fn()
 jest.mock("@app/screens/send-bitcoin-screen/use-send-payment", () => ({
   ...jest.requireActual("@app/screens/send-bitcoin-screen/use-send-payment"),
   useSendPayment: () => mockUseSendPayment(),
+}))
+
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
 
 const mockUseFee = jest.fn()
@@ -1067,7 +1073,7 @@ const usdBtcConvert: ConvertMoneyAmount = (amount, currency) => {
 
 const buildUsdSettlementRoute = (
   unitOfAccountUsdCents: number,
-  overrides?: { isSendingMax?: boolean },
+  overrides?: { isSendingMax?: boolean; isFeeIncluded?: boolean },
 ) => {
   const usdDescriptor = { currency: WalletCurrency.Usd, id: "usd-wallet-id" } as const
   const params: PaymentDetails.CreateIntraledgerPaymentDetailsParams<WalletCurrency> = {
@@ -1407,6 +1413,22 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
 
     expect(screen.queryByText(/exceeds your balance/i)).toBeNull()
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
+  })
+
+  it("(isSendingMax=true, fee taken out) over balance — still checked, since the balance may have dropped", async () => {
+    await renderSettled(
+      <ContextForScreen>
+        <Intraledger
+          route={buildUsdSettlementRoute(1100, {
+            isSendingMax: true,
+            isFeeIncluded: true,
+          })}
+        />
+      </ContextForScreen>,
+    )
+
+    expectInlineAndInSheet(/exceeds your balance/i)
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
   })
 
   it("(isSendingMax=false, hasAttemptedSend=true) over balance — no error, and a retry is still offered", async () => {
@@ -1910,6 +1932,163 @@ describe("SendBitcoinConfirmationScreen — haptics", () => {
 
     expect(haptics.error).toHaveBeenCalledTimes(1)
     expect(haptics.success).not.toHaveBeenCalled()
+  })
+})
+
+/** blink-wip#2048 E4: a send-all quoted again at the slide that moved since review sends
+ *  nothing; review quotes it again and a toast asks the sender to look. */
+describe("SendBitcoinConfirmationScreen — a send-all whose quote moved", () => {
+  const lnurlRoute = () =>
+    ({
+      key: "sendBitcoinConfirmationScreen",
+      name: "sendBitcoinConfirmation",
+      params: {
+        paymentDetail:
+          PaymentDetailsLightning.createLnurlPaymentDetails(defaultLightningParams),
+      },
+    }) as const
+
+  /** The real hook's contract: the attempt is sticky until the screen forgets it. */
+  let hasAttemptedSend = false
+  const forgetAttemptMock = jest.fn(() => {
+    hasAttemptedSend = false
+  })
+  const quoteMoved = () => {
+    hasAttemptedSend = true
+    return Promise.resolve({ status: "FAILURE", errorsMessage: "sc_quote_moved" })
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockBeforeRemoveListeners.length = 0
+    loadLocale("en")
+    hasAttemptedSend = false
+    mockUseSendPayment.mockImplementation(() => ({
+      loading: false,
+      hasAttemptedSend,
+      forgetAttempt: forgetAttemptMock,
+      sendPayment: sendPaymentMock,
+    }))
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+    })
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 500000,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 10000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+  })
+
+  afterEach(() => {
+    mockUseSendPayment.mockReset()
+    sendPaymentMock.mockReset()
+  })
+
+  const renderAndSlide = async () => {
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={lnurlRoute()} />
+      </ContextForScreen>,
+    )
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+  }
+
+  const pressBack = (type: string) => {
+    const preventDefault = jest.fn()
+    mockBeforeRemoveListeners.forEach((listener) =>
+      listener({ data: { action: { type } }, preventDefault }),
+    )
+    return preventDefault
+  }
+
+  it("leaves back to amount entry, since nothing went out", async () => {
+    sendPaymentMock.mockImplementationOnce(quoteMoved)
+    await renderAndSlide()
+
+    expect(forgetAttemptMock).toHaveBeenCalledTimes(1)
+    for (const type of ["GO_BACK", "POP"]) {
+      expect(pressBack(type)).not.toHaveBeenCalled()
+    }
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
+  })
+
+  it("still sends back Home after a failure that may have gone out", async () => {
+    sendPaymentMock.mockImplementationOnce(() => {
+      hasAttemptedSend = true
+      return Promise.resolve({ status: "FAILURE", errorsMessage: "route not found" })
+    })
+    await renderAndSlide()
+
+    expect(forgetAttemptMock).not.toHaveBeenCalled()
+    expect(pressBack("GO_BACK")).toHaveBeenCalled()
+  })
+
+  it("warns of a high fee on the new quote", async () => {
+    // $100.00 to the Lightning address: half of it in fees is a high fee. The balance
+    // covers it, since the balance check is back on and low funds would win.
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 500000,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 1000000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+    mockUseFee.mockImplementation((_getFee: unknown, round: number) => ({
+      status: "set",
+      amount: {
+        amount: round > 0 ? 5000 : 1,
+        currency: WalletCurrency.Usd,
+        currencyCode: "USD",
+      },
+    }))
+    sendPaymentMock.mockImplementationOnce(quoteMoved)
+    await renderAndSlide()
+    await flushEffects()
+
+    expect(screen.queryByTestId("high-fee-sheet")).toBeTruthy()
+  })
+
+  it("quotes it again with a toast, and opens no error sheet", async () => {
+    sendPaymentMock.mockResolvedValueOnce({
+      status: "FAILURE",
+      errorsMessage: "sc_quote_moved",
+    })
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={lnurlRoute()} />
+      </ContextForScreen>,
+    )
+    const roundsBefore = mockUseFee.mock.calls.map(([, round]) => round)
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(roundsBefore.every((round) => round === 0)).toBe(true)
+    expect(mockUseFee.mock.calls[mockUseFee.mock.calls.length - 1][1]).toBe(1)
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "warning" }),
+    )
+    const { message } = mockToastShow.mock.calls[0][0]
+    expect(message(i18nObject("en"))).toBe(
+      i18nObject("en").SendBitcoinConfirmationScreen.priceUpdated(),
+    )
+    expect(errorSheet()).toBeNull()
   })
 })
 
@@ -2702,6 +2881,48 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       ).toBeNull()
     })
 
+    describe("bounce on a send-all", () => {
+      const sendAllRoute = (sats: number) => {
+        const base = feeIncludedRoute(sats)
+        return {
+          ...base,
+          params: {
+            paymentDetail: { ...base.params.paymentDetail, isSendingMax: true },
+          },
+        } as unknown as ReturnType<typeof buildBtcSettlementRoute>
+      }
+      const isAmountBounced = () =>
+        screen.UNSAFE_getByType(SendHero).props.isAmountBounced
+
+      it("bounces the amount, since review's is the balance picked less the fee", async () => {
+        btcFee(100)
+        await renderReview(sendAllRoute(1000))
+
+        expect(isAmountBounced()).toBe(true)
+      })
+
+      it("holds still while the fee is out, when review still shows the balance", async () => {
+        mockUseFee.mockReturnValue({ status: "loading" })
+        await renderReview(sendAllRoute(1000))
+
+        expect(isAmountBounced()).toBe(false)
+      })
+
+      it("holds still when the fee takes nothing out", async () => {
+        btcFee(0)
+        await renderReview(sendAllRoute(1000))
+
+        expect(isAmountBounced()).toBe(false)
+      })
+
+      it("holds still on a fee-included amount the sender typed", async () => {
+        btcFee(100)
+        await renderReview(feeIncludedRoute(1000))
+
+        expect(isAmountBounced()).toBe(false)
+      })
+    })
+
     it("holds the send, says why and offers Change amount when the fee taken out would leave the recipient nothing", async () => {
       mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
       btcFee(1200)
@@ -2734,6 +2955,38 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       expect(
         screen.queryByText(LL.SendBitcoinConfirmationScreen.feeExceedsAmount()),
       ).toBeNull()
+    })
+
+    /** blink-wip#2048 SR2: the send is prepared again at the slide, so the fee, and with
+     *  it what arrives, can move off review's quote. The receipt keeps what went out. */
+    it("shows Sent and hands the receipt what the SDK says went out", async () => {
+      mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
+      btcFee(100)
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "SUCCESS",
+        extraInfo: { settled: { amountSats: 880, feeSats: 120 } },
+      })
+      await renderReview(feeIncludedRoute(1000))
+      expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("900 SAT")
+
+      await slideAndOpenReceipt()
+
+      expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("880 SAT")
+      const reducer = navigationDispatchMock.mock.calls
+        .map(([action]) => action)
+        .find((action) => typeof action === "function")
+      const reset = reducer({ index: 0, routes: [] }) as {
+        payload: { routes: { name: string; params: Record<string, unknown> }[] }
+      }
+      const completed = reset.payload.routes.find(
+        (entry) => entry.name === "sendBitcoinCompleted",
+      )
+      expect(
+        `${completed?.params.currencyAmount} ${completed?.params.satAmount}`,
+      ).toContain("880")
+      expect(
+        `${completed?.params.currencyFeeAmount} ${completed?.params.satFeeAmount}`,
+      ).toContain("120")
     })
 
     it("keeps the slider off until the fee it takes out is quoted", async () => {

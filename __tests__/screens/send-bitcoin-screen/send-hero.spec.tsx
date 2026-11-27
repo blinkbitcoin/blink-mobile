@@ -22,6 +22,19 @@ import {
 
 const style = (node: ReactTestInstance) => StyleSheet.flatten(node.props.style)
 
+/** Stands in for the bounce's peak, so the scale it drives can be read off the lines. */
+const BOUNCE_PEAK = 1.3
+const mockUseBounceInAnimation = jest.fn(
+  ({ visible, scale }: { visible: boolean; scale: { value: number } }) => {
+    scale.value = visible ? BOUNCE_PEAK : 1
+    return visible
+  },
+)
+jest.mock("@app/components/animations", () => ({
+  ...jest.requireActual("@app/components/animations"),
+  useBounceInAnimation: (args: never) => mockUseBounceInAnimation(args),
+}))
+
 loadLocale("en")
 
 const hero = (props: Partial<React.ComponentProps<typeof SendHero>> = {}) => (
@@ -276,6 +289,45 @@ describe("SendHero", () => {
       expect(
         sentHeroGrowth({ primaryAmount: "$10.00", hasSecondaryAmount: true }),
       ).toBeCloseTo(38 + MAX_FONT_SIZE_MULTIPLIER * (4 + (36 + 2 - 24) + (22 - 20)), 5)
+    })
+  })
+
+  describe("bounce", () => {
+    const scaleOf = (testID: string) =>
+      (style(screen.getByTestId(testID)).transform ?? []).find(
+        (step: object) => "scale" in step,
+      )
+
+    it("bounces both lines once when the amount is flagged, to 1.3 in 80 ms steps", () => {
+      renderHero({ secondaryAmount: "746 SAT", isAmountBounced: true })
+
+      expect(mockUseBounceInAnimation).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          visible: true,
+          delay: 300,
+          duration: 80,
+          isSingleBounce: true,
+          peak: 1.3,
+        }),
+      )
+      expect(scaleOf(SEND_HERO_PRIMARY_TEST_ID)).toEqual({ scale: BOUNCE_PEAK })
+      expect(scaleOf(SEND_HERO_SECONDARY_TEST_ID)).toEqual({ scale: BOUNCE_PEAK })
+    })
+
+    it("holds the amount still by default", () => {
+      renderHero({ secondaryAmount: "746 SAT" })
+
+      expect(mockUseBounceInAnimation).toHaveBeenLastCalledWith(
+        expect.objectContaining({ visible: false }),
+      )
+      expect(scaleOf(SEND_HERO_PRIMARY_TEST_ID)).toEqual({ scale: 1 })
+    })
+
+    /** The swap's own scale is what the typed amount needs, so the bounce never takes it. */
+    it("leaves an active hero's swap transform in charge", () => {
+      renderHero({ active: true, isAmountBounced: true, primaryCurrency: "USD" })
+
+      expect(scaleOf(SEND_HERO_PRIMARY_TEST_ID)).not.toEqual({ scale: BOUNCE_PEAK })
     })
   })
 

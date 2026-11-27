@@ -240,6 +240,25 @@ describe("useSendPayment attempt gating", () => {
     expect(result.current.hasAttemptedSend).toBe(true)
   })
 
+  it("forgets an attempt that went nowhere, keeping its key for the next one", async () => {
+    const idempotencyKeyRef: IdempotencyKeyRef = {}
+    const { result } = renderHook(() =>
+      useSendPayment(sendAllMutations(PaymentSendResult.Failure), idempotencyKeyRef),
+    )
+    await invoke(result.current.sendPayment)
+    expect(result.current.hasAttemptedSend).toBe(true)
+
+    act(() => result.current.forgetAttempt())
+
+    expect(result.current.hasAttemptedSend).toBe(false)
+    expect(result.current.sendPayment).toBeDefined()
+    await invoke(result.current.sendPayment)
+    expect(randomUUIDMock).toHaveBeenCalledTimes(1)
+    expect(keysStampedOn("intraLedgerPaymentSend")).toEqual([KEY_A, KEY_A])
+    // A later attempt is sticky again until it, too, is forgotten.
+    expect(result.current.hasAttemptedSend).toBe(true)
+  })
+
   it("reopens the send after a thrown mutation, rethrows, and retries under the same key", async () => {
     // The ambiguous case: the request may have landed. A retry must be possible AND must
     // carry the original key, so a true duplicate comes back as a 409 the screen resolves.

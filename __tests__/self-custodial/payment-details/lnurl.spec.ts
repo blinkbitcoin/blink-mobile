@@ -13,6 +13,7 @@ import {
   setMeasurementContext,
 } from "@app/self-custodial/measurement"
 import { AccountMode } from "@app/types/account"
+import { type PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { createSelfCustodialLnurlPaymentDetails } from "@app/self-custodial/payment-details/lnurl"
 import { scopeLostAttemptsTo } from "@app/self-custodial/payment-details/lost-attempts"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
@@ -49,6 +50,8 @@ jest.mock("@app/self-custodial/bridge", () => ({
       : quoted
   },
   hasTokenLeg: jest.requireActual("@app/self-custodial/bridge/send").hasTokenLeg,
+  assertFeePolicyApplied: jest.requireActual("@app/self-custodial/bridge/send")
+    .assertFeePolicyApplied,
   executeLnurl: (...args: unknown[]) => mockExecuteLnurl(...args),
   extractLnurlFee: (...args: unknown[]) => mockExtractLnurlFee(...args),
   buildConversionType: jest.fn().mockReturnValue({ tag: "ToBitcoin" }),
@@ -2135,5 +2138,198 @@ describe("createSelfCustodialLnurlPaymentDetails reporting a bitcoin send", () =
     expect(result.status).toBe(PaymentSendResult.Success)
     expect(result.extraInfo?.preimage).toBe("pre")
     expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("createSelfCustodialLnurlPaymentDetails send-all", () => {
+  const FEES_INCLUDED = 1
+  const balance = {
+    amount: 100_000,
+    currency: WalletCurrency.Btc,
+    currencyCode: WalletCurrency.Btc,
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    convertMoneyAmount.mockImplementation((amount, target) => ({
+      amount: amount.amount,
+      currency: target,
+      currencyCode: target,
+    }))
+    mockExtractLnurlFee.mockReturnValue(5)
+    mockPrepareLnurl.mockResolvedValue(quote())
+  })
+
+  const feePolicyOf = async <T extends WalletCurrency>(detail: PaymentDetail<T>) => {
+    if (!detail.canGetFee) throw new Error("expected canGetFee")
+    await detail.getFee({} as never)
+    return mockPrepareLnurl.mock.calls[mockPrepareLnurl.mock.calls.length - 1][1]
+      .feePolicy
+  }
+
+  it("sends all from the Bitcoin wallet with the fee taken out", async () => {
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+
+    expect(sendAll.canSendMax).toBe(true)
+    expect(sendAll.isSendingMax).toBe(true)
+    expect(sendAll.isFeeIncluded).toBe(true)
+    expect(await feePolicyOf(sendAll)).toBe(FEES_INCLUDED)
+  })
+
+  it("sends a send-all with the fee taken out, not only quotes it", async () => {
+    mockExecuteLnurl.mockResolvedValue({
+      payment: { id: "p1", status: 0 /* PaymentStatus.Completed */ },
+    })
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+    if (!sendAll.canSendPayment) throw new Error("expected canSendPayment")
+
+    await sendAll.sendPaymentMutation({} as never)
+
+    expect(mockPrepareLnurl).toHaveBeenLastCalledWith(
+      expect.any(Object),
+      expect.objectContaining({ feePolicy: FEES_INCLUDED }),
+    )
+  })
+
+  /** blink-wip#2048 SR2: the SDK prepares the send again, so what went out can differ from
+   *  review's quote. Sent and the receipt read it from here. */
+  it("hands back what a send-all sent, for Sent and the receipt", async () => {
+    mockPrepareLnurl.mockResolvedValue({ ...quote(), feePolicy: FEES_INCLUDED })
+    mockExecuteLnurl.mockResolvedValue({
+      payment: { id: "p1", status: 0, amount: BigInt(99_000), fees: BigInt(1_000) },
+    })
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+    if (!sendAll.canSendPayment) throw new Error("expected canSendPayment")
+
+    const result = await sendAll.sendPaymentMutation({} as never)
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.extraInfo?.settled).toEqual({ amountSats: 99_000, feeSats: 1_000 })
+  })
+
+  it("leaves the receipt to review's quote when the SDK answered without a payment", async () => {
+    mockPrepareLnurl.mockResolvedValue({ ...quote(), feePolicy: FEES_INCLUDED })
+    mockExecuteLnurl.mockResolvedValue({})
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+    if (!sendAll.canSendPayment) throw new Error("expected canSendPayment")
+
+    const result = await sendAll.sendPaymentMutation({} as never)
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.extraInfo?.settled).toBeUndefined()
+  })
+
+  /** The pay request's invoice goes out through the provider, whose fee is 0 on the
+   *  payment until it names it, and what was taken for the fee never reaches the payee. */
+  it("hands back the fee taken from the balance, while the SDK's is still 0", async () => {
+    mockPrepareLnurl.mockResolvedValue({ ...quote(), feePolicy: FEES_INCLUDED })
+    mockExecuteLnurl.mockResolvedValue({
+      payment: { id: "p1", status: 1, amount: BigInt(99_000), fees: BigInt(0) },
+    })
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+    if (!sendAll.canSendPayment) throw new Error("expected canSendPayment")
+
+    const result = await sendAll.sendPaymentMutation({} as never)
+
+    expect(result.extraInfo?.settled).toEqual({ amountSats: 99_000, feeSats: 1_000 })
+  })
+
+  /** blink-wip#2048 SR3: the fee on top of the whole balance would spend more than it holds. */
+  it("sends nothing, and quotes nothing, when the SDK did not take the fee out", async () => {
+    mockPrepareLnurl.mockResolvedValue({ ...quote(), feePolicy: 0 /* FeesExcluded */ })
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+    if (!sendAll.canSendPayment || !sendAll.canGetFee) throw new Error("expected a send")
+
+    const fee = await sendAll.getFee({} as never)
+    const result = await sendAll.sendPaymentMutation({} as never)
+
+    expect(fee.amount).toBeUndefined()
+    expect(result.status).toBe(PaymentSendResult.Failure)
+    expect(mockExecuteLnurl).not.toHaveBeenCalled()
+  })
+
+  /** blink-wip#2048 E4: what arrives may move under 100 sats between review and send. */
+  it.each([
+    ["sends", 99, PaymentSendResult.Success],
+    ["sends nothing", 100, PaymentSendResult.Failure],
+  ])("%s when the fee moved by %i sats since review", async (_, moved, status) => {
+    mockPrepareLnurl.mockResolvedValue({ ...quote(), feePolicy: FEES_INCLUDED })
+    mockExecuteLnurl.mockResolvedValue({ payment: { id: "p1", status: 0 } })
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+    if (!sendAll.canSendPayment || !sendAll.canGetFee) throw new Error("expected a send")
+
+    mockExtractLnurlFee.mockReturnValue(5)
+    await sendAll.getFee({} as never)
+    mockExtractLnurlFee.mockReturnValue(5 + moved)
+    const result = await sendAll.sendPaymentMutation({} as never)
+
+    expect(result.status).toBe(status)
+    expect(mockExecuteLnurl).toHaveBeenCalledTimes(
+      status === PaymentSendResult.Success ? 1 : 0,
+    )
+  })
+
+  it("puts the fee back on top once an amount is typed", async () => {
+    const typed = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    ).setAmount!(balance)
+
+    expect(typed.isSendingMax).toBe(false)
+    expect(typed.isFeeIncluded).toBe(false)
+    expect(await feePolicyOf(typed)).toBeUndefined()
+  })
+
+  it("leaves a plain Bitcoin amount's fee on top", async () => {
+    const plain =
+      createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(balance)
+
+    expect(plain.isFeeIncluded).toBe(false)
+    expect(await feePolicyOf(plain)).toBeUndefined()
+  })
+
+  it("drops the send-all on a wallet switch", async () => {
+    const switched = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    ).setSendingWalletDescriptor({ id: "w-other", currency: WalletCurrency.Btc })
+
+    expect(switched.isSendingMax).toBe(false)
+    expect(await feePolicyOf(switched)).toBeUndefined()
+  })
+
+  /** A dollar send takes its fee out on main's path, which review doesn't treat as a
+   *  send-all: the policy is FeesIncluded, the send-all flag stays off. */
+  it("keeps the Dollar wallet on FeesIncluded, with no send-all offered", async () => {
+    const detail = createSelfCustodialLnurlPaymentDetails(
+      createParams({
+        sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
+      }),
+    )
+
+    expect(detail.canSendMax).toBe(false)
+    expect(detail.isFeeIncluded).toBe(false)
+    expect(await feePolicyOf(detail)).toBe(FEES_INCLUDED)
   })
 })

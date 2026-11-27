@@ -262,6 +262,8 @@ const mockSelfCustodialWallet = { sdk: { id: "sdk" } }
 jest.mock("@app/self-custodial/bridge", () => ({
   prepareSend: (...args: unknown[]) => mockPrepareSend(...args),
   extractOnchainFees: () => ({ fast: 300, medium: 200, slow: 100 }),
+  assertFeePolicyApplied: jest.requireActual("@app/self-custodial/bridge/send")
+    .assertFeePolicyApplied,
 }))
 jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockSelfCustodialWallet,
@@ -543,8 +545,9 @@ describe("free amount", () => {
     expect(isNextDisabled()).toBe(false)
   })
 
+  /** A Blink-to-Blink send has no fee, so it is a send-all rail of its own (#2048 SA7). */
   it("sends the whole balance as a send-all where the rail supports one", async () => {
-    renderScreen(intraledgerDestination({ canSendMax: true }))
+    renderScreen(intraledgerDestination())
     await settle()
 
     slideTo(100)
@@ -556,8 +559,36 @@ describe("free amount", () => {
     )
   })
 
-  it("sends 100% as a plain amount where the rail has no send-all", async () => {
+  /** #2048: typing an amount, or sliding back under 100%, puts the fee back on top. */
+  it("turns the send-all off once an amount is typed after 100%", async () => {
     renderScreen(intraledgerDestination())
+    await settle()
+
+    slideTo(100)
+    await settle()
+    fireEvent.press(screen.getByTestId("Key ⌫"))
+    await settle()
+
+    expect(mockSetAmount.mock.calls.at(-1)?.[1]).toBeFalsy()
+  })
+
+  it("turns the send-all off when the slider goes back under 100%", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    slideTo(100)
+    await settle()
+    slideTo(90)
+    await settle()
+
+    expect(mockSetAmount).toHaveBeenLastCalledWith(
+      expect.objectContaining({ amount: Math.floor((btcWallet.balance * 90) / 100) }),
+      false,
+    )
+  })
+
+  it("sends 100% as a plain amount where the rail has no send-all", async () => {
+    renderScreen(intraledgerDestination({ canSendMax: false }))
     await settle()
 
     slideTo(100)

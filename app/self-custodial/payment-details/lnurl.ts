@@ -34,6 +34,7 @@ import {
 import { ConvertDirection } from "@app/types/payment"
 
 import {
+  assertFeePolicyApplied,
   buildConversionType,
   executeLnurl,
   extractLnurlFee,
@@ -47,10 +48,15 @@ import { classifySdkError } from "../sdk-error"
 
 import { htlcDetailsOf } from "./lost-send"
 import {
+  assertSendAllQuoteHolds,
   feeFailure,
+  recordSendAllQuote,
   requestedAsOf,
   runSelfCustodialSend,
+  sendAllFeePolicy,
   sendSettlement,
+  type SendAllQuoteRef,
+  settledOf,
 } from "./send-helpers"
 
 const SAT_TO_MILLISAT = BigInt(1000)
@@ -155,6 +161,8 @@ type CreateSCLnurlParams<T extends WalletCurrency> = {
   successAction?: LNURLPaySuccessAction
   isMerchant: boolean
   idempotencyKeyRef?: IdempotencyKeyRef
+  /** Slid to 100%: the whole balance, with the fee taken out of it. */
+  sendMax?: boolean
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>(
@@ -205,6 +213,14 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     sendingWalletDescriptor.currency,
   )
   const isUsdSend = sendingWalletDescriptor.currency === WalletCurrency.Usd
+  // A pay request with its own amount can't be a send-all.
+  const isSendingMax =
+    !destinationSpecifiedAmount &&
+    sendAllFeePolicy(params.sendMax, sendingWalletDescriptor.currency) !== undefined
+  /** What a send-all asks of the SDK. A dollar send always takes its fee out too, but it
+   *  keeps main's handling: its quote and receipt are not checked against the SDK's. */
+  const sendAllPolicy = isSendingMax ? FeePolicy.FeesIncluded : undefined
+  const sendAllQuoteRef: SendAllQuoteRef | undefined = isSendingMax ? {} : undefined
   const payRequest = lnurlParamsToPayRequest(lnurlParams, lnurl)
 
   // Only the note the user typed travels as the comment. The destination's description
@@ -230,7 +246,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
           completionTimeoutSecs: undefined,
         }
       : undefined,
-    feePolicy: isUsdSend ? FeePolicy.FeesIncluded : undefined,
+    feePolicy: isUsdSend || isSendingMax ? FeePolicy.FeesIncluded : undefined,
   }
 
   /** LNURL sends report their own fine rail, split from plain BOLT11. */
@@ -279,6 +295,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
       extraInfo: {
         preimage,
         successAction: sdkSuccessActionToLib(successAction),
+        ...settledOf(sendAllPolicy, prepareOptions.amount, payment),
       },
     }
   }
@@ -296,7 +313,9 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
         getFee: async () => {
           try {
             const prepared = await prepareLnurl(sdk, prepareOptions)
+            assertFeePolicyApplied(sendAllPolicy, prepared)
             const feeSats = extractLnurlFee(prepared)
+            recordSendAllQuote(sendAllQuoteRef, feeSats)
             return { amount: asBtcSettlementAmount<T>(feeSats) }
           } catch (err) {
             return feeFailure<T>("Self-custodial LNURL fee", err)
@@ -316,7 +335,12 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
             idempotencyKeyRef,
             destination: lostAttemptsKey,
             telemetry: { params: sendTelemetry, settlement: sendSettlementTelemetry },
-            prepare: () => prepareLnurl(sdk, prepareOptions),
+            prepare: async () => {
+              const prepared = await prepareLnurl(sdk, prepareOptions)
+              assertFeePolicyApplied(sendAllPolicy, prepared)
+              assertSendAllQuoteHolds(sendAllQuoteRef, extractLnurlFee(prepared))
+              return prepared
+            },
             identify: (prepared) => ({
               paymentHash: prepared.invoiceDetails.paymentHash,
             }),
@@ -359,11 +383,12 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
    * payment that may have gone out does not stop being one because the amount changed,
    * and a send made without looking for it first could be the second one.
    */
-  const setAmount: SetAmount<T> = (newAmount) =>
+  const setAmount: SetAmount<T> = (newAmount, newSendMax) =>
     createSelfCustodialLnurlPaymentDetails({
       ...paramsWithKey,
       idempotencyKeyRef: undefined,
       unitOfAccountAmount: newAmount,
+      sendMax: newSendMax,
     })
 
   const setSendingWalletDescriptor: SetSendingWalletDescriptor<T> = (desc) =>
@@ -371,6 +396,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
       ...paramsWithKey,
       idempotencyKeyRef: undefined,
       sendingWalletDescriptor: desc,
+      sendMax: false,
     })
 
   const setConvertMoneyAmount = (fn: ConvertMoneyAmount) =>
@@ -403,9 +429,16 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     successAction,
     setSuccessAction,
     isMerchant,
+    // A send-all takes the fee out of the amount (FeesIncluded).
+    isFeeIncluded: isSendingMax,
     ...(destinationSpecifiedAmount
       ? { canSetAmount: false as const, destinationSpecifiedAmount }
-      : { canSetAmount: true as const, setAmount }),
+      : {
+          canSetAmount: true as const,
+          setAmount,
+          canSendMax: !isUsdSend,
+          isSendingMax,
+        }),
     ...setMemo,
     ...sendPaymentAndGetFee,
   } as PaymentDetail<T>

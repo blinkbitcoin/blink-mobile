@@ -51,6 +51,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
       IncreasedToAvoidDust: "IncreasedToAvoidDust",
     },
     BitcoinNetwork: { Bitcoin: 0, Regtest: 4 },
+    FeePolicy: { FeesExcluded: 0, FeesIncluded: 1 },
     InputType_Tags: { SparkAddress: "SparkAddress" },
     Network: { Mainnet: 0, Regtest: 1 },
     PaymentType: { Send: 0, Receive: 1 },
@@ -2418,5 +2419,34 @@ describe("what is done with the SDK's answer, once the send went out", () => {
 
     expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.OutcomeUnknown)
     expect(lostAttemptsTo("sp1abc").unresolvedSend).toBeDefined()
+  })
+})
+
+/** blink-wip#2048 SR2: a send found in the wallet after it threw reports as the send itself
+ *  would have, so a fee taken out of the amount still hands back what went out. */
+describe("a fee-included send found after it threw", () => {
+  it("hands back the amount and fee the wallet holds, for Sent and the receipt", async () => {
+    // A token leg sends without a key, so the lost attempt is looked for by its invoice.
+    mockPrepareSendPayment.mockResolvedValue(
+      bolt11("hash-1", { conversionEstimate: { amountIn: 1n }, feePolicy: 1 }),
+    )
+    mockSendPayment.mockRejectedValue(lostResponse())
+    mockFindLostSend.mockResolvedValue({
+      status: "found",
+      payment: { id: "p1", amount: BigInt(99_000), fees: BigInt(1_000) },
+      failed: [],
+    })
+    const ref = {}
+
+    const result = (await attempt(
+      createSendMutation({ ...usdLightning, feePolicy: 1 } as never, {
+        telemetry: TELEMETRY,
+        idempotencyKeyRef: ref,
+      }),
+      ref,
+    )) as { status: string; extraInfo?: { settled?: unknown } }
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.extraInfo?.settled).toEqual({ amountSats: 99_000, feeSats: 1_000 })
   })
 })

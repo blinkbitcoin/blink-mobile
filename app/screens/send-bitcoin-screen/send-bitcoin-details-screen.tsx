@@ -618,18 +618,18 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       (intraledgerLimitsLoading && !intraledgerLimitsData),
   )
 
-  /**
-   * Held while the custodial quote is out, because the high-fee warning is judged by the fee the
-   * selector quoted: leaving before it lands is leaving without the warning. The fee this
-   * screen probed on mount used to stand in for it, which the picked tier's own fee replaced.
-   */
   const isNextDisabled =
     !goToNextScreen ||
     !amountStatus.validAmount ||
     Boolean(lnurlBoundsErrorMessage) ||
     isSelfPayment ||
-    isQuotingFees ||
     isLimitsUnread
+
+  /** Held on its spinner while the custodial quote is out: the high-fee warning is judged by
+   *  the fee the selector quoted, so leaving before it lands leaves without the warning. A
+   *  dimmed Next said nothing about a quote that can take seconds. */
+  const isNextLoading =
+    isLoadingLnurl || isQuotingFeesForNext || (isQuotingFees && !isNextDisabled)
 
   /**
    * The extra-info box shows one message, and an invalid amount is the one the sender can
@@ -867,7 +867,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         )}
         <GaloyPrimaryButton
           onPress={goToNextScreen || undefined}
-          loading={isLoadingLnurl || isQuotingFeesForNext}
+          loading={isNextLoading}
           disabled={isNextDisabled}
           title={nextButtonTitle}
           containerStyle={styles.next}

@@ -264,6 +264,18 @@ describe("no amount lightning payment details", () => {
     expect(newPaymentDetails.sendingWalletDescriptor).toEqual(sendingWalletDescriptor)
   })
 
+  it("drops a send-all on a wallet switch, as typing an amount does", () => {
+    const sendAll = PaymentDetails.createNoAmountOnchainPaymentDetails({
+      ...defaultParams,
+      isSendingMax: true,
+    })
+
+    const switched = sendAll.setSendingWalletDescriptor(usdSendingWalletDescriptor)
+
+    expect(sendAll.isSendingMax).toBe(true)
+    expect(switched.isSendingMax).toBe(false)
+  })
+
   it("can set convertMoneyAmount", () => {
     const paymentDetails = createNoAmountOnchainPaymentDetails(defaultParams)
     const newConvertMoneyAmount: ConvertMoneyAmount = (amount, currency) => ({
@@ -553,10 +565,13 @@ describe("no amount lightning payment details", () => {
         paymentDetails.setConvertMoneyAmount(convertMoneyAmountMock).isFeeIncluded,
       ).toBe(true)
       expect(paymentDetails.setMemo("memo").isFeeIncluded).toBe(true)
+    })
+
+    /** blink-wip#2048 E3: another wallet's amount starts as a plain one, fee on top. */
+    it("is dropped on a wallet switch, with the send-all", () => {
       expect(
-        paymentDetails.setSendingWalletDescriptor(usdSendingWalletDescriptor)
-          .isFeeIncluded,
-      ).toBe(true)
+        sendAll().setSendingWalletDescriptor(usdSendingWalletDescriptor).isFeeIncluded,
+      ).toBe(false)
     })
 
     it("is dropped when an amount is chosen after a send-all", () => {

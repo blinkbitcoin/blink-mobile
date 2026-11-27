@@ -10,6 +10,7 @@ import Animated, {
 } from "react-native-reanimated"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
+import { useBounceInAnimation } from "@app/components/animations"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { IconHero } from "@app/components/icon-hero"
 import { SUCCESS_BADGE_DURATION_MS, SuccessBadge } from "@app/components/success-badge"
@@ -64,6 +65,12 @@ export const entryAmountFontSize = (amount: string, isEmpty: boolean): number =>
 }
 
 const SWAP_ANIMATION_MS = 220
+
+/** The transaction list's bounce, which a highlighted row plays on arrival, played once
+ *  at twice its pace. The delay also lets review's push settle before the amount moves. */
+const BOUNCE_DELAY_MS = 300
+const BOUNCE_DURATION_MS = 80
+const BOUNCE_PEAK = 1.3
 
 /**
  * Once the payment is sent the settled read-out grows into the centred Sent hero: each line
@@ -137,6 +144,9 @@ type SendHeroProps = {
   sentPlay?: number
   /** Sent came back at its end: the badge shows fully drawn. */
   isSentAtEnd?: boolean
+  /** Turning on bounces the amount once, so an amount that is not the one the sender
+   *  picked is seen to have changed. */
+  isAmountBounced?: boolean
 }
 
 export const SendHero: React.FC<SendHeroProps> = ({
@@ -152,6 +162,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
   isSent = false,
   sentPlay = 1,
   isSentAtEnd = false,
+  isAmountBounced = false,
 }) => {
   const styles = useStyles()
   const {
@@ -213,6 +224,23 @@ export const SendHero: React.FC<SendHeroProps> = ({
       ],
     }),
     [swap, swapDistance, sizeRatio],
+  )
+
+  const bounce = useSharedValue(1)
+  // Review is popped rather than left behind, so it is in focus for as long as it shows.
+  useBounceInAnimation({
+    isFocused: true,
+    visible: isAmountBounced,
+    scale: bounce,
+    delay: BOUNCE_DELAY_MS,
+    duration: BOUNCE_DURATION_MS,
+    isSingleBounce: true,
+    peak: BOUNCE_PEAK,
+  })
+
+  const bounceStyle = useAnimatedStyle(
+    () => ({ transform: [{ scale: bounce.value }] }),
+    [bounce],
   )
 
   const size = active ? "active" : "inactive"
@@ -326,6 +354,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
             ...primarySize,
             color: isEmpty ? colors.textMuted : colors.textOnBackground,
           },
+          bounceStyle,
           active && primaryStyle,
           isMorphing && sentPrimaryStyle,
         ]}
@@ -350,6 +379,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
                   : colors.textOnBackground,
             },
             !active && styles.settledSecondary,
+            bounceStyle,
             active && secondaryStyle,
             isMorphing && sentSecondaryStyle,
           ]}

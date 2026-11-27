@@ -38,12 +38,14 @@ export {
   hasTokenLeg,
   identifyPreparedSend,
   extractOnchainFees,
+  onchainQuoteExpiresAt,
   extractLightningFee,
   toSdkSendAmount,
   resolveSendTokenIdentifier,
   prepareLnurl,
   executeLnurl,
   extractLnurlFee,
+  assertFeePolicyApplied,
 } from "./send"
 export type {
   ExecuteSendOptions,

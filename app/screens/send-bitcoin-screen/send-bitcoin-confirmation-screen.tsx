@@ -52,7 +52,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
-import { isAmountFixableError } from "./amount-fixable-error"
+import { isAmountFixableError, isQuoteMovedError } from "./amount-fixable-error"
 import { feeTierLabels, formatEta } from "./fee-tier-options"
 import { FeeTierOption } from "@app/types/fee-tiers"
 import {
@@ -77,6 +77,7 @@ import { PaymentSendExtraInfo } from "./payment-details/index.types"
 import { useReviewFeeText } from "./review/use-review-fee-text"
 import { usePaymentFailure } from "./review/use-payment-failure"
 import { useReviewQuote } from "./review/use-review-quote"
+import { useSettledAmountText } from "./review/use-settled-amount-text"
 import { PaymentErrorActions } from "./payment-error-actions"
 import { PaymentSendCompletedStatus, useSendPayment } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
@@ -99,6 +100,7 @@ gql`
 
 type Props = { route: RouteProp<RootStackParamList, "sendBitcoinConfirmation"> }
 
+// eslint-disable-next-line max-lines-per-function -- review, the send and Sent share one component; splitting it solely to meet the line cap is a refactor of its own
 const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const {
     theme: { colors },
@@ -168,7 +170,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const { copyToClipboard } = useClipboard()
   const tierLabels = feeTierLabels(LL)
 
-  const { fee, recipientAmount, isAwaitingIncludedFee, isFeeOverAmount } =
+  const { fee, recipientAmount, isAwaitingIncludedFee, isFeeOverAmount, requote } =
     useReviewQuote(paymentDetail)
 
   /** The receipt a landed payment opens from Sent, kept until the sender asks for it. */
@@ -261,6 +263,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     loading: sendPaymentLoading,
     sendPayment,
     hasAttemptedSend,
+    forgetAttempt,
   } = useSendPayment(sendPaymentMutation, paymentDetail.idempotencyKeyRef)
   // Once Sent takes over, its own hold owns back.
   useHomeOnBackAfterSend(hasAttemptedSend && !sentTransition.isSettled)
@@ -298,6 +301,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const heroSecondaryText =
     heroSecondaryAmount && formatMoneyAmount({ moneyAmount: heroSecondaryAmount })
 
+  const { hero, settle } = useSettledAmountText(paymentDetail, leadsWithWalletCurrency, {
+    heroPrimaryText,
+    heroSecondaryText,
+  })
+
   const {
     stageRef,
     heroRef,
@@ -324,7 +332,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
    *  is spoken as Sent appears, also when it first appears on the sender's return. */
   useAccessibilityAnnouncement(
     sentPlay
-      ? LL.SendBitcoinConfirmationScreen.sentAnnouncement({ amount: heroPrimaryText })
+      ? LL.SendBitcoinConfirmationScreen.sentAnnouncement({
+          amount: hero.heroPrimaryText,
+        })
       : undefined,
   )
 
@@ -351,6 +361,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         }).catch((err) => reportError("send-bitcoin-confirmation:save-contact", err))
       }
 
+      const sent = settle(extraInfo?.settled)
       const isSuccess = status === "SUCCESS"
       const params: RootStackParamList["sendBitcoinCompleted"] = {
         arrivalAtMempoolEstimate: extraInfo?.arrivalAtMempoolEstimate,
@@ -362,6 +373,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         satAmount,
         currencyFeeAmount,
         satFeeAmount,
+        ...sent.receipt,
         destination,
         paymentType: paymentDetail?.paymentType,
         createdAt: transaction?.createdAt,
@@ -387,8 +399,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         holdSettledSend()
         sentReceiptRef.current = params
         await playSent({
-          primaryAmount: heroPrimaryText,
-          hasSecondaryAmount: Boolean(heroSecondaryText),
+          primaryAmount: sent.heroPrimaryText,
+          hasSecondaryAmount: Boolean(sent.heroSecondaryText),
         })
         return
       }
@@ -404,8 +416,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       isRouteLive,
       usedAmountSlider,
       markAmountSliderLearned,
-      heroPrimaryText,
-      heroSecondaryText,
+      settle,
       saveLnAddressContact,
       paymentType,
       destination,
@@ -448,6 +459,14 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           undefined,
           "home",
         )
+        return
+      }
+
+      /** Refused before anything went out (blink-wip#2048 E4), so review is as it was
+       *  before the slide: back, the balance check and the high-fee sheet included. */
+      if (isQuoteMovedError(errorsMessage)) {
+        forgetAttempt()
+        requote()
         return
       }
 
@@ -521,6 +540,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     verifyPaymentSettled,
     failureCopy,
     errorMsgActionFor,
+    forgetAttempt,
+    requote,
   ])
 
   let validAmount = true
@@ -543,7 +564,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     : feeInSettlementCurrency
   const totalAmount = addMoneyAmounts({ a: settlementAmount, b: feeAddedToTotal })
 
-  const skipBalanceCheck = isSendingMax || hasAttemptedSend
+  /** The backend's own send-all (custodial on-chain) settles whatever the balance holds, so
+   *  review leaves it to it. One whose fee comes out of the amount sends the balance the
+   *  slider read, which may have dropped since, so that one is still checked. */
+  const isBackendSendAll = isSendingMax && !paymentDetail.isFeeIncluded
+  const skipBalanceCheck = isBackendSendAll || hasAttemptedSend
 
   if (
     moneyAmountIsCurrencyType(settlementAmount, WalletCurrency.Btc) &&
@@ -716,12 +741,18 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                     ? LL.SendBitcoinConfirmationScreen.sent()
                     : LL.SendBitcoinConfirmationScreen.sending()
                 }
-                primaryAmount={heroPrimaryText}
-                secondaryAmount={heroSecondaryText}
+                primaryAmount={hero.heroPrimaryText}
+                secondaryAmount={hero.heroSecondaryText}
                 sentProgress={heroProgress}
                 isSent={isSent}
                 sentPlay={sentPlay}
                 isSentAtEnd={isAtEnd}
+                /* A send-all at 100% picked the whole balance; review leads with it
+                   less the fee, so the amount bounces to show it changed. */
+                isAmountBounced={
+                  Boolean(isSendingMax) &&
+                  recipientAmount.amount !== settlementAmount.amount
+                }
               />
             </Animated.View>
           </View>

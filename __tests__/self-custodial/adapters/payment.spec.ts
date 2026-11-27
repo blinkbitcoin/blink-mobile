@@ -31,6 +31,8 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   SendPaymentMethod_Tags: {
     BitcoinAddress: "BitcoinAddress",
     Bolt11Invoice: "Bolt11Invoice",
+    SparkAddress: "SparkAddress",
+    SparkInvoice: "SparkInvoice",
   },
   SendPaymentOptions: {
     BitcoinAddress: jest.fn((args: unknown) => args),
