@@ -168,7 +168,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const { copyToClipboard } = useClipboard()
   const tierLabels = feeTierLabels(LL)
 
-  const { fee, recipientAmount, isAwaitingIncludedFee } = useReviewQuote(paymentDetail)
+  const { fee, recipientAmount, isAwaitingIncludedFee, isFeeOverAmount } =
+    useReviewQuote(paymentDetail)
 
   /** The receipt a landed payment opens from Sent, kept until the sender asks for it. */
   const sentReceiptRef =
@@ -537,10 +538,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     : zeroSettlementAmount
 
   // A fee taken out of the amount is already inside it.
-  const totalAmount = addMoneyAmounts({
-    a: settlementAmount,
-    b: paymentDetail.isFeeIncluded ? zeroSettlementAmount : feeInSettlementCurrency,
-  })
+  const feeAddedToTotal = paymentDetail.isFeeIncluded
+    ? zeroSettlementAmount
+    : feeInSettlementCurrency
+  const totalAmount = addMoneyAmounts({ a: settlementAmount, b: feeAddedToTotal })
 
   const skipBalanceCheck = isSendingMax || hasAttemptedSend
 
@@ -587,6 +588,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     !validAmount ||
     !sendPayment ||
     isAwaitingIncludedFee ||
+    isFeeOverAmount ||
     feeUnavailable ||
     dustNotEvaluable
 

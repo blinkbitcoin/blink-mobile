@@ -84,4 +84,21 @@ describe("useReviewQuote", () => {
     expect(recipientAmount).toMatchObject({ amount: 900, currency: WalletCurrency.Btc })
     expect(isAwaitingIncludedFee).toBe(false)
   })
+
+  it("holds the send, and shows nothing below zero, when the fee would take the whole amount", () => {
+    mockUseFee.mockReturnValue({ status: "set", amount: toBtcMoneyAmount(1200) })
+
+    const { recipientAmount, isFeeOverAmount } = run(true)
+
+    expect(recipientAmount).toMatchObject({ amount: 0, currency: WalletCurrency.Btc })
+    expect(isFeeOverAmount).toBe(true)
+  })
+
+  it("never holds the send for a fee that leaves something, or one paid on top", () => {
+    mockUseFee.mockReturnValue({ status: "set", amount: toBtcMoneyAmount(999) })
+    expect(run(true).isFeeOverAmount).toBe(false)
+
+    mockUseFee.mockReturnValue({ status: "set", amount: toBtcMoneyAmount(5000) })
+    expect(run().isFeeOverAmount).toBe(false)
+  })
 })

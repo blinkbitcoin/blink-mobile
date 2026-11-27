@@ -16,17 +16,24 @@ export const useReviewQuote = (paymentDetail: PaymentDetail<WalletCurrency>) => 
   const fee = useFee(paymentDetail.getFee)
 
   const { settlementAmount, isFeeIncluded, convertMoneyAmount } = paymentDetail
-  const recipientAmount =
+  const lessFee =
     isFeeIncluded && fee.status === "set"
       ? subtractMoneyAmounts({
           a: settlementAmount,
           b: convertMoneyAmount(fee.amount, settlementAmount.currency),
         })
-      : settlementAmount
+      : undefined
+  /** A fee that would take the whole amount leaves the recipient nothing: no send, and
+   *  never a negative amount on review. */
+  const isFeeOverAmount = lessFee !== undefined && lessFee.amount <= 0
+  const recipientAmount = lessFee
+    ? { ...lessFee, amount: Math.max(lessFee.amount, 0) }
+    : settlementAmount
 
   return {
     fee,
     recipientAmount,
     isAwaitingIncludedFee: Boolean(isFeeIncluded) && fee.status !== "set",
+    isFeeOverAmount,
   }
 }

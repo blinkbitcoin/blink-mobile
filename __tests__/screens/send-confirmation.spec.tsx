@@ -2699,6 +2699,15 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("900 SAT")
     })
 
+    it("keeps the slider off when the fee taken out would leave the recipient nothing", async () => {
+      mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
+      btcFee(1200)
+      await renderReview(feeIncludedRoute(1000))
+
+      expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("0 SAT")
+      expect(lastSliderProps().disabled).toBe(true)
+    })
+
     it("keeps the slider off until the fee it takes out is quoted", async () => {
       // A max-fee estimate leaves the slider on for a fee paid on top; one taken out of
       // the amount has to be the real quote.
