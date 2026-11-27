@@ -2676,6 +2676,42 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
     )
   })
 
+  describe("a fee taken out of the amount", () => {
+    const feeIncludedRoute = (sats: number) => {
+      const base = buildOnchainRoute(sats)
+      return {
+        ...base,
+        params: {
+          paymentDetail: { ...base.params.paymentDetail, isFeeIncluded: true },
+        },
+      } as unknown as ReturnType<typeof buildBtcSettlementRoute>
+    }
+
+    afterEach(() => {
+      mockPreferredAmountCurrency.current = undefined
+    })
+
+    it("leads with what the recipient gets: the amount less the fee", async () => {
+      mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
+      btcFee(100)
+      await renderReview(feeIncludedRoute(1000))
+
+      expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("900 SAT")
+    })
+
+    it("keeps the slider off until the fee it takes out is quoted", async () => {
+      // A max-fee estimate leaves the slider on for a fee paid on top; one taken out of
+      // the amount has to be the real quote.
+      mockUseFee.mockReturnValue({
+        status: "error",
+        amount: { amount: 100, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+      })
+      await renderReview(feeIncludedRoute(1000))
+
+      expect(lastSliderProps().disabled).toBe(true)
+    })
+  })
+
   describe("amount currency", () => {
     const heroLines = () => [
       screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children,
