@@ -34,7 +34,7 @@ let mockRootState:
 let mockOnReady: (() => void) | undefined
 let mockOnStateChange: ((state: unknown) => void) | undefined
 type LinkingSubscribe = (listener: (url: string) => void) => () => void
-let mockLinking: { subscribe?: LinkingSubscribe } | undefined
+let mockLinking: { subscribe?: LinkingSubscribe; getStateFromPath?: unknown } | undefined
 
 /** The navigationRef is module-level, so the container ref is stubbed. The stub APPLIES the
  *  reset to the stack it serves, as the real container does, so a second evaluation sees the
@@ -59,7 +59,7 @@ jest.mock("@react-navigation/native", () => ({
     children?: React.ReactNode
     onReady?: () => void
     onStateChange?: (state: unknown) => void
-    linking?: { subscribe?: LinkingSubscribe }
+    linking?: { subscribe?: LinkingSubscribe; getStateFromPath?: unknown }
   }) => {
     mockOnReady = onReady
     mockOnStateChange = onStateChange
@@ -135,6 +135,7 @@ import {
   processLinkForAction,
   useAuthenticationContext,
 } from "@app/navigation/navigation-container-wrapper"
+import { getDeepLinkState } from "@app/navigation/deep-link-screens"
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "@app/utils/enum"
 
@@ -448,6 +449,25 @@ describe("NavigationContainerWrapper boot splash", () => {
     })
 
     expect(RNBootSplash.hide).toHaveBeenCalledWith({ fade: true })
+  })
+})
+
+/** blink-wip#2271: a bulletin's or push's card/add-funds link opens the Transfer into the
+ *  Card Balance, which the screens config alone cannot give its params. */
+describe("NavigationContainerWrapper deep links", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockBlockerVisible = false
+    mockIsReady = true
+    mockLinking = undefined
+    mockRootState = STACK_AT_BLOCKER
+  })
+
+  it("reads each link's path through the deep-link state", async () => {
+    renderWrapper(<Text testID="child">child</Text>)
+
+    await waitFor(() => expect(mockLinking).toBeDefined())
+    expect(mockLinking?.getStateFromPath).toBe(getDeepLinkState)
   })
 })
 

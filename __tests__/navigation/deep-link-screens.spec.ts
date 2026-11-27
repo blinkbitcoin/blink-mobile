@@ -1,6 +1,6 @@
 import { getStateFromPath } from "@react-navigation/native"
 
-import { DEEP_LINK_SCREENS } from "@app/navigation/deep-link-screens"
+import { DEEP_LINK_SCREENS, getDeepLinkState } from "@app/navigation/deep-link-screens"
 
 /**
  * The webView route's `allowArbitraryUrl` param bypasses the WebView entry-origin
@@ -132,5 +132,40 @@ describe("deep-linkable routes", () => {
     const routeNames = collectRouteNames(DEEP_LINK_SCREENS as ScreenConfig)
     expect(routeNames).not.toContain("totpRegistrationValidate")
     expect(routeNames).not.toContain("totpRegistrationBackup")
+  })
+})
+
+/** blink-wip#2271: a low-funds or decline bulletin's "Add funds", and its push, link to
+ *  card/add-funds, which opens the Transfer with the Card Balance fixed as its destination. */
+describe("getDeepLinkState", () => {
+  const options = { screens: DEEP_LINK_SCREENS }
+
+  for (const path of [
+    "/card/add-funds",
+    "card/add-funds",
+    "/card/add-funds/",
+    "/card/add-funds?ref=bulletin",
+  ]) {
+    it(`opens the Transfer into the Card Balance from ${path}`, () => {
+      expect(getDeepLinkState(path, options)).toEqual({
+        routes: [{ name: "conversionDetails", params: { destination: "CARD" } }],
+      })
+    })
+  }
+
+  it("leaves every other path to the screens", () => {
+    expect(getDeepLinkState("/card/settings", options)).toEqual(
+      getStateFromPath("/card/settings", options),
+    )
+    expect(getDeepLinkState("/convert", options)?.routes[0]).toMatchObject({
+      name: "conversionDetails",
+    })
+    expect(getDeepLinkState("/convert", options)?.routes[0].params).toBeUndefined()
+  })
+
+  it("never reads an object's own keys as a path", () => {
+    expect(getDeepLinkState("/constructor", options)).toEqual(
+      getStateFromPath("/constructor", options),
+    )
   })
 })

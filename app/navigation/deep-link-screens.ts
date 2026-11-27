@@ -1,4 +1,6 @@
-import { LinkingOptions } from "@react-navigation/native"
+import { getStateFromPath, LinkingOptions } from "@react-navigation/native"
+
+import { CARD } from "@app/types/amounts"
 
 import { RootStackParamList } from "./stack-param-lists"
 
@@ -65,4 +67,33 @@ export const DEEP_LINK_SCREENS: NonNullable<
     path: "transaction/:txid",
   },
   sendBitcoinDestination: ":payment",
+}
+
+/** A route with the params its own entry in RootStackParamList takes. */
+type FixedParamsRoute = {
+  [Name in keyof RootStackParamList]: { name: Name; params: RootStackParamList[Name] }
+}[keyof RootStackParamList]
+
+/**
+ * Paths that open a route with params the path itself does not carry, which the screens
+ * above cannot express. A low-funds or decline bulletin's "Add funds", and the push behind
+ * it, open the Transfer with the Card Balance fixed as its destination, as the card
+ * dashboard's Add funds does (blink-wip#2271). A Map, so a path such as "constructor"
+ * never reads an object's own keys.
+ */
+const FIXED_PARAMS_ROUTES = new Map<string, FixedParamsRoute>([
+  ["card/add-funds", { name: "conversionDetails", params: { destination: CARD } }],
+])
+
+/** The path with no leading or trailing slash, query or fragment. */
+const barePath = (path: string): string => path.split(/[?#]/)[0].replace(/^\/+|\/+$/g, "")
+
+/** The navigation state a deep link's path opens: a fixed-params path first, then the
+ *  screens above. */
+export const getDeepLinkState: NonNullable<
+  LinkingOptions<RootStackParamList>["getStateFromPath"]
+> = (path, options) => {
+  const route = FIXED_PARAMS_ROUTES.get(barePath(path))
+  if (route) return { routes: [route] }
+  return getStateFromPath(path, options)
 }
