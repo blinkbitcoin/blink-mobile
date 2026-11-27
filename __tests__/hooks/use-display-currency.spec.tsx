@@ -42,6 +42,7 @@ const setCurrencyList = (
     currencyList,
     loading: false,
     isUnavailable: false,
+    hasPendingSource: false,
   })
 }
 
@@ -446,12 +447,13 @@ describe("useDisplayCurrency", () => {
         currencyList: [],
         loading: true,
         isUnavailable: false,
+        hasPendingSource: true,
       })
 
       const { result } = renderHook(() => useDisplayCurrency())
 
       expect(result.current.hasCurrencyInfo("USD")).toBe(false)
-      expect(result.current.currencyListLoading).toBe(true)
+      expect(result.current.currencyListPending).toBe(true)
     })
   })
 

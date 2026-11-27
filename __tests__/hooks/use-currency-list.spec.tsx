@@ -321,4 +321,60 @@ describe("useCurrencyList", () => {
 
     expect(result.current.isUnavailable).toBe(false)
   })
+
+  describe("hasPendingSource", () => {
+    it("stays pending while the backend is in flight, even with a stored SDK list", () => {
+      // The backend carries codes the SDK lacks (GHS, TZS, XAF), so a code missing from
+      // the SDK list may still arrive. `loading` is already false here: the picker has
+      // rows to show.
+      selfCustodial()
+      fiatRates(sdkList)
+      mockUseCurrencyListQuery.mockReturnValue({ data: undefined, loading: true })
+
+      const { result } = renderHook(() => useCurrencyList())
+
+      expect(result.current.loading).toBe(false)
+      expect(result.current.hasPendingSource).toBe(true)
+    })
+
+    it("stays pending while the SDK has not settled, even with the backend list in", () => {
+      selfCustodial()
+      fiatRates([], false)
+      mockUseCurrencyListQuery.mockReturnValue({
+        data: { currencyList: backendList },
+        loading: false,
+      })
+
+      const { result } = renderHook(() => useCurrencyList())
+
+      expect(result.current.hasPendingSource).toBe(true)
+    })
+
+    it("ends once every source has answered", () => {
+      selfCustodial()
+      fiatRates(sdkList)
+      mockUseCurrencyListQuery.mockReturnValue({ data: undefined, loading: false })
+
+      const { result } = renderHook(() => useCurrencyList())
+
+      expect(result.current.hasPendingSource).toBe(false)
+    })
+
+    it("follows the backend alone for a custodial account", () => {
+      custodial()
+      fiatRates([], false)
+      mockUseCurrencyListQuery.mockReturnValue({ data: undefined, loading: true })
+
+      const { result, rerender } = renderHook(() => useCurrencyList())
+      expect(result.current.hasPendingSource).toBe(true)
+
+      mockUseCurrencyListQuery.mockReturnValue({
+        data: { currencyList: backendList },
+        loading: false,
+      })
+      rerender({})
+
+      expect(result.current.hasPendingSource).toBe(false)
+    })
+  })
 })

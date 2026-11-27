@@ -1,7 +1,10 @@
 import { renderHook } from "@testing-library/react-hooks"
 
 import { TxDirection, type TransactionFragment } from "@app/graphql/generated"
-import { useUnseenTxAmountBadge } from "@app/components/unseen-tx-amount-badge"
+import {
+  useIncomingBadgeAutoSeen,
+  useUnseenTxAmountBadge,
+} from "@app/components/unseen-tx-amount-badge"
 
 const mockNavigate = jest.fn()
 const mockPriceConverter = jest.fn()
@@ -10,7 +13,7 @@ const mockConvertMoneyAmount = jest.fn<typeof mockPriceConverter | undefined, []
 )
 /** The codes the currency list knows; `null` stands for a list that knows them all. */
 let mockListedCurrencies: string[] | null = null
-let mockCurrencyListLoading = false
+let mockCurrencyListPending = false
 
 jest.mock("@react-navigation/native", () => {
   return {
@@ -39,7 +42,7 @@ jest.mock("@app/hooks", () => {
       ...formatters,
       hasCurrencyInfo: (currency: string) =>
         mockListedCurrencies === null || mockListedCurrencies.includes(currency),
-      currencyListLoading: mockCurrencyListLoading,
+      currencyListPending: mockCurrencyListPending,
     }),
     usePriceConversion: () => ({ convertMoneyAmount: mockConvertMoneyAmount() }),
   }
@@ -108,7 +111,7 @@ describe("useUnseenTxAmountBadge", () => {
     jest.clearAllMocks()
     mockConvertMoneyAmount.mockReturnValue(mockPriceConverter)
     mockListedCurrencies = null
-    mockCurrencyListLoading = false
+    mockCurrencyListPending = false
   })
 
   it("falls back to the cached custodial transactions when none are provided", () => {
@@ -405,7 +408,7 @@ describe("useUnseenTxAmountBadge", () => {
 
     it("holds a custodial amount back while the list is loading", () => {
       mockListedCurrencies = []
-      mockCurrencyListLoading = true
+      mockCurrencyListPending = true
 
       const { result, rerender } = renderHook(() =>
         useUnseenTxAmountBadge({
@@ -418,7 +421,7 @@ describe("useUnseenTxAmountBadge", () => {
       expect(result.current.unseenAmountText).toBeNull()
 
       mockListedCurrencies = ["USD"]
-      mockCurrencyListLoading = false
+      mockCurrencyListPending = false
       rerender()
 
       expect(result.current.unseenAmountText).toBe("+USD 0.06")
@@ -436,6 +439,96 @@ describe("useUnseenTxAmountBadge", () => {
       )
 
       expect(result.current.unseenAmountText).toBe("+USD 6")
+    })
+
+    it("falls back to sats for a bitcoin receive once the list settles without the code", () => {
+      mockListedCurrencies = []
+
+      const { result } = renderHook(() =>
+        useUnseenTxAmountBadge({
+          transactions: [
+            tx({
+              id: "receive",
+              createdAt: 1,
+              settlementAmount: 1912,
+              settlementCurrency: "BTC",
+              settlementDisplayAmount: "1.18",
+              settlementDisplayCurrency: "USD",
+            }),
+          ],
+          hasUnseenBtcTx: true,
+          hasUnseenUsdTx: false,
+        }),
+      )
+
+      expect(result.current.unseenAmountText).toBe("+BTC 1912")
+    })
+
+    it("holds a self-custodial amount back for a backend-only code after the price is in", () => {
+      // A stored SDK list without GHS, the backend list still in flight, and the price
+      // already loaded: the wallet amount would be latched for the whole announcement.
+      mockListedCurrencies = ["USD", "NGN"]
+      mockCurrencyListPending = true
+
+      const { result, rerender } = renderHook(() =>
+        useUnseenTxAmountBadge({
+          transactions: [
+            tx({
+              id: "receive",
+              createdAt: 1,
+              settlementAmount: 1912,
+              settlementCurrency: "BTC",
+              settlementDisplayAmount: "14.50",
+              settlementDisplayCurrency: "GHS",
+            }),
+          ],
+          isSelfCustodial: true,
+          hasUnseenBtcTx: true,
+          hasUnseenUsdTx: false,
+        }),
+      )
+
+      expect(result.current.unseenAmountText).toBeNull()
+
+      mockListedCurrencies = ["USD", "NGN", "GHS"]
+      mockCurrencyListPending = false
+      rerender()
+
+      expect(result.current.unseenAmountText).toBe("+GHS 14.50")
+    })
+
+    it("announces the symbol text, not a placeholder, once the list arrives", () => {
+      // Drives the real latch: whatever amountText the announcement is made with is
+      // what the badge shows for its whole run.
+      mockListedCurrencies = []
+      mockCurrencyListPending = true
+      const markTxSeen = jest.fn()
+
+      const { result, rerender } = renderHook(() => {
+        const badge = useUnseenTxAmountBadge({
+          transactions: [usdReceive],
+          hasUnseenBtcTx: false,
+          hasUnseenUsdTx: true,
+        })
+        const autoSeen = useIncomingBadgeAutoSeen({
+          isFocused: true,
+          isOutgoing: badge.isOutgoing,
+          tx: badge.latestUnseenTx,
+          amountText: badge.unseenAmountText,
+          markTxSeen,
+        })
+        return autoSeen
+      })
+
+      expect(result.current.announcement).toBeNull()
+      expect(markTxSeen).not.toHaveBeenCalled()
+
+      mockListedCurrencies = ["USD"]
+      mockCurrencyListPending = false
+      rerender()
+
+      expect(result.current.announcement?.amountText).toBe("+USD 0.06")
+      expect(markTxSeen).toHaveBeenCalledTimes(1)
     })
   })
 

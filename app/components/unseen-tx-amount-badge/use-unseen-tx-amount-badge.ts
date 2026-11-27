@@ -26,7 +26,7 @@ export const useUnseenTxAmountBadge = ({
   hasUnseenBtcTx,
 }: UnseenTxAmountBadgeParams) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { formatCurrency, formatMoneyAmount, hasCurrencyInfo, currencyListLoading } =
+  const { formatCurrency, formatMoneyAmount, hasCurrencyInfo, currencyListPending } =
     useDisplayCurrency()
   const { convertMoneyAmount } = usePriceConversion()
   const { feeReimbursementMemo } = useRemoteConfig()
@@ -84,12 +84,13 @@ export const useUnseenTxAmountBadge = ({
     /**
      * The server's display amount is spelled with the currency list's symbol, and
      * without the list `formatCurrency` puts the bare code in its place ("+USD0.06").
-     * The announcement keeps the text it was made with, so it waits for the list rather
-     * than show that for its whole run. A list that settles without the code falls
-     * through to the wallet amount below.
+     * The announcement keeps the text it was made with, so it waits while any source
+     * could still add the code rather than show that for its whole run. A stored SDK
+     * list is not enough: the backend carries codes the SDK lacks. Once every source has
+     * answered without the code, it falls through to the wallet amount below.
      */
     const isDisplayCurrencyListed = hasDisplayAmount && hasCurrencyInfo(displayCurrency)
-    if (hasDisplayAmount && !isDisplayCurrencyListed && currencyListLoading) return null
+    if (hasDisplayAmount && !isDisplayCurrencyListed && currencyListPending) return null
 
     const formattedFromDisplay = isDisplayCurrencyListed
       ? formatCurrency({ amountInMajorUnits: displayAmount, currency: displayCurrency })
@@ -115,7 +116,7 @@ export const useUnseenTxAmountBadge = ({
     formatCurrency,
     formatMoneyAmount,
     hasCurrencyInfo,
-    currencyListLoading,
+    currencyListPending,
   ])
 
   /** Takes the transaction to open rather than reading the newest unseen one: once a badge

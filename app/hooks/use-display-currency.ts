@@ -149,7 +149,7 @@ const displayCurrencyHasSignificantMinorUnits = ({
 
 export const useDisplayCurrency = () => {
   const { LL } = useI18nContext()
-  const { currencyList, loading: currencyListLoading } = useCurrencyList()
+  const { currencyList, hasPendingSource: currencyListPending } = useCurrencyList()
   const { convertMoneyAmount, displayCurrency, toDisplayMoneyAmount } =
     usePriceConversion()
 
@@ -447,6 +447,6 @@ export const useDisplayCurrency = () => {
     getCurrencySymbol,
     getFractionDigits,
     hasCurrencyInfo,
-    currencyListLoading,
+    currencyListPending,
   }
 }
