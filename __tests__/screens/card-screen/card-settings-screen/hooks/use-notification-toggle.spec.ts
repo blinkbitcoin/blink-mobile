@@ -120,4 +120,54 @@ describe("useNotificationToggle", () => {
       }),
     )
   })
+  /** Until the server knows a category (CardAlerts, blink #221), it answers the toggle
+   *  with errors in the payload and leaves the settings as they were. */
+  const refusals = [
+    {
+      turned: "on",
+      enabled: true,
+      mutate: mockEnableMutate,
+      field: "accountEnableNotificationCategory",
+    },
+    {
+      turned: "off",
+      enabled: false,
+      mutate: mockDisableMutate,
+      field: "accountDisableNotificationCategory",
+    },
+  ]
+  for (const { turned, enabled, mutate, field } of refusals) {
+    it(`shows the warning toast when the server refuses turning a category ${turned}`, async () => {
+      mutate.mockResolvedValue({
+        data: { [field]: { errors: [{ message: "Invalid category" }] } },
+      })
+
+      const { result } = renderHook(() => useNotificationToggle())
+
+      await act(async () => {
+        await result.current.toggleCategory(NotificationCategory.CardAlerts, enabled)
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: "Failed to update notification settings",
+          type: "warning",
+        }),
+      )
+    })
+  }
+
+  it("shows no toast when the server takes the change", async () => {
+    mockDisableMutate.mockResolvedValue({
+      data: { accountDisableNotificationCategory: { errors: [] } },
+    })
+
+    const { result } = renderHook(() => useNotificationToggle())
+
+    await act(async () => {
+      await result.current.toggleCategory(NotificationCategory.CardAlerts, false)
+    })
+
+    expect(mockToastShow).not.toHaveBeenCalled()
+  })
 })

@@ -100,18 +100,31 @@ export const useNotificationToggle = () => {
       ? !notificationSettings.push.disabledCategories.includes(category)
       : false
 
+  /** The errors the server answered with. A category it refuses comes back in the
+   *  payload, with the settings as they were, rather than as a failed request. */
+  const sendToggle = async (category: NotificationCategoryType, enabled: boolean) => {
+    const variables = { input: { category, channel: NotificationChannel.Push } }
+    if (enabled) {
+      const result = await enableNotificationCategory({ variables })
+      return result?.data?.accountEnableNotificationCategory.errors ?? []
+    }
+    const result = await disableNotificationCategory({ variables })
+    return result?.data?.accountDisableNotificationCategory.errors ?? []
+  }
+
+  const showToggleError = () =>
+    toastShow({
+      message: LL.CardFlow.CardSettings.notificationToggleError(),
+      type: "warning",
+      LL,
+    })
+
   const toggleCategory = async (category: NotificationCategoryType, enabled: boolean) => {
     try {
-      const mutation = enabled ? enableNotificationCategory : disableNotificationCategory
-      await mutation({
-        variables: { input: { category, channel: NotificationChannel.Push } },
-      })
+      const errors = await sendToggle(category, enabled)
+      if (errors.length > 0) showToggleError()
     } catch {
-      toastShow({
-        message: LL.CardFlow.CardSettings.notificationToggleError(),
-        type: "warning",
-        LL,
-      })
+      showToggleError()
     }
   }
 
