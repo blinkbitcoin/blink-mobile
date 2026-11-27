@@ -1,6 +1,10 @@
 import { getStateFromPath } from "@react-navigation/native"
 
-import { DEEP_LINK_SCREENS, getDeepLinkState } from "@app/navigation/deep-link-screens"
+import {
+  DEEP_LINK_SCREENS,
+  FIXED_PARAMS_ROUTES,
+  getDeepLinkState,
+} from "@app/navigation/deep-link-screens"
 
 /**
  * The webView route's `allowArbitraryUrl` param bypasses the WebView entry-origin
@@ -137,6 +141,27 @@ describe("deep-linkable routes", () => {
 
 /** blink-wip#2271: a low-funds or decline bulletin's "Add funds", and its push, link to
  *  card/add-funds, which opens the Transfer with the Card Balance fixed as its destination. */
+/**
+ * A path with fixed params opens a route outside the screens config, so every guard above
+ * holds only while those routes are among the screens too. Their params are fixed in the
+ * app, never read from the link.
+ */
+describe("fixed-params deep links", () => {
+  const fixedRouteNames = [...FIXED_PARAMS_ROUTES.values()].map((route) => route.name)
+
+  it("opens only routes the screens already link to, and never the webView", () => {
+    const routeNames = collectRouteNames(DEEP_LINK_SCREENS as ScreenConfig)
+    for (const name of fixedRouteNames) expect(routeNames).toContain(name)
+    expect(fixedRouteNames).not.toContain("webView")
+  })
+
+  it("fixes each path's params in the app", () => {
+    expect(Object.fromEntries(FIXED_PARAMS_ROUTES)).toEqual({
+      "card/add-funds": { name: "conversionDetails", params: { destination: "CARD" } },
+    })
+  })
+})
+
 describe("getDeepLinkState", () => {
   const options = { screens: DEEP_LINK_SCREENS }
 

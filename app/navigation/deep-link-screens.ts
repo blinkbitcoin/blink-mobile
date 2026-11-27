@@ -71,7 +71,7 @@ export const DEEP_LINK_SCREENS: NonNullable<
 
 /** A route with the params its own entry in RootStackParamList takes. */
 type FixedParamsRoute = {
-  [Name in keyof RootStackParamList]: { name: Name; params: RootStackParamList[Name] }
+  [Name in keyof RootStackParamList]-?: { name: Name; params: RootStackParamList[Name] }
 }[keyof RootStackParamList]
 
 /**
@@ -80,10 +80,13 @@ type FixedParamsRoute = {
  * it, open the Transfer with the Card Balance fixed as its destination, as the card
  * dashboard's Add funds does (blink-wip#2271). A Map, so a path such as "constructor"
  * never reads an object's own keys.
+ *
+ * Every route here is also reachable through DEEP_LINK_SCREENS, so those screens stay
+ * the one inventory of deep-linkable routes the security tests walk (asserted there).
  */
-const FIXED_PARAMS_ROUTES = new Map<string, FixedParamsRoute>([
+export const FIXED_PARAMS_ROUTES: ReadonlyMap<string, FixedParamsRoute> = new Map([
   ["card/add-funds", { name: "conversionDetails", params: { destination: CARD } }],
-])
+] satisfies [string, FixedParamsRoute][])
 
 /** The path with no leading or trailing slash, query or fragment. */
 const barePath = (path: string): string => path.split(/[?#]/)[0].replace(/^\/+|\/+$/g, "")
