@@ -103,6 +103,62 @@ describe("NotificationSetting", () => {
     ).toBeTruthy()
   })
 
+  /** blink-wip#2271: the card's alerts are turned on and off in card settings, so this
+   *  summary of the screen's four categories leaves them out. */
+  it("stays at 'All' when only the card alerts are off", () => {
+    mockedQueryResult = buildQueryResult(["CardAlerts"])
+
+    render(
+      <ContextForScreen>
+        <NotificationSetting />
+      </ContextForScreen>,
+    )
+
+    expect(
+      screen.getByText(
+        `${LL.common.notifications()}: ${LL.NotificationSettingsScreen.statusAll()}`,
+      ),
+    ).toBeTruthy()
+  })
+
+  it("shows 'None' once its four categories are off, whatever else is", () => {
+    mockedQueryResult = buildQueryResult([
+      "Payments",
+      "Circles",
+      "Price",
+      "Marketing",
+      "CardAlerts",
+    ])
+
+    render(
+      <ContextForScreen>
+        <NotificationSetting />
+      </ContextForScreen>,
+    )
+
+    expect(
+      screen.getByText(
+        `${LL.common.notifications()}: ${LL.NotificationSettingsScreen.statusNone()}`,
+      ),
+    ).toBeTruthy()
+  })
+
+  it("shows 'Some' with the card alerts and one of its categories off", () => {
+    mockedQueryResult = buildQueryResult(["CardAlerts", "Marketing", "Price", "Circles"])
+
+    render(
+      <ContextForScreen>
+        <NotificationSetting />
+      </ContextForScreen>,
+    )
+
+    expect(
+      screen.getByText(
+        `${LL.common.notifications()}: ${LL.NotificationSettingsScreen.statusSome()}`,
+      ),
+    ).toBeTruthy()
+  })
+
   it("shows 'All' when query data is unavailable", () => {
     mockedQueryResult = { data: undefined }
 
