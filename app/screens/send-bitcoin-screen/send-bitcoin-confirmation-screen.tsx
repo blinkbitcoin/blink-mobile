@@ -553,7 +553,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     : feeInSettlementCurrency
   const totalAmount = addMoneyAmounts({ a: settlementAmount, b: feeAddedToTotal })
 
-  const skipBalanceCheck = isSendingMax || hasAttemptedSend
+  /** The backend's own send-all (custodial on-chain) settles whatever the balance holds, so
+   *  review leaves it to it. One whose fee comes out of the amount sends the balance the
+   *  slider read, which may have dropped since, so that one is still checked. */
+  const isBackendSendAll = isSendingMax && !paymentDetail.isFeeIncluded
+  const skipBalanceCheck = isBackendSendAll || hasAttemptedSend
 
   if (
     moneyAmountIsCurrencyType(settlementAmount, WalletCurrency.Btc) &&

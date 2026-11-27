@@ -1067,7 +1067,7 @@ const usdBtcConvert: ConvertMoneyAmount = (amount, currency) => {
 
 const buildUsdSettlementRoute = (
   unitOfAccountUsdCents: number,
-  overrides?: { isSendingMax?: boolean },
+  overrides?: { isSendingMax?: boolean; isFeeIncluded?: boolean },
 ) => {
   const usdDescriptor = { currency: WalletCurrency.Usd, id: "usd-wallet-id" } as const
   const params: PaymentDetails.CreateIntraledgerPaymentDetailsParams<WalletCurrency> = {
@@ -1407,6 +1407,22 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
 
     expect(screen.queryByText(/exceeds your balance/i)).toBeNull()
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
+  })
+
+  it("(isSendingMax=true, fee taken out) over balance — still checked, since the balance may have dropped", async () => {
+    await renderSettled(
+      <ContextForScreen>
+        <Intraledger
+          route={buildUsdSettlementRoute(1100, {
+            isSendingMax: true,
+            isFeeIncluded: true,
+          })}
+        />
+      </ContextForScreen>,
+    )
+
+    expectInlineAndInSheet(/exceeds your balance/i)
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
   })
 
   it("(isSendingMax=false, hasAttemptedSend=true) over balance — no error, and a retry is still offered", async () => {
