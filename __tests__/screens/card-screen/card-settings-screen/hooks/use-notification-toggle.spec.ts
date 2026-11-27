@@ -8,6 +8,8 @@ import {
 const mockEnableMutate = jest.fn()
 const mockDisableMutate = jest.fn()
 const mockToastShow = jest.fn()
+/** The categories the server holds off; set per test before render. */
+const mockDisabledCategories: { current: string[] } = { current: ["Marketing"] }
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
@@ -19,7 +21,7 @@ jest.mock("@app/graphql/generated", () => ({
           notificationSettings: {
             push: {
               enabled: true,
-              disabledCategories: ["Marketing"],
+              disabledCategories: mockDisabledCategories.current,
             },
           },
         },
@@ -53,6 +55,7 @@ jest.mock("@app/utils/toast", () => ({
 describe("useNotificationToggle", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDisabledCategories.current = ["Marketing"]
   })
 
   it("returns isCategoryEnabled and toggleCategory", () => {
@@ -169,5 +172,35 @@ describe("useNotificationToggle", () => {
     })
 
     expect(mockToastShow).not.toHaveBeenCalled()
+  })
+  /** Cards are on staging only, so no member has the old card switch's Payments opt-out.
+   *  An account that has one keeps it: the card switch reads its own category and leaves
+   *  the account-wide Payments mute alone. */
+  describe("with a legacy Payments opt-out from the old card switch", () => {
+    beforeEach(() => {
+      mockDisabledCategories.current = ["Payments"]
+    })
+
+    it("reads the card alerts as on", () => {
+      const { result } = renderHook(() => useNotificationToggle())
+
+      expect(result.current.isCategoryEnabled(NotificationCategory.CardAlerts)).toBe(true)
+    })
+
+    it("turns only the card alerts off, and keeps the Payments mute", async () => {
+      const { result } = renderHook(() => useNotificationToggle())
+
+      await act(async () => {
+        await result.current.toggleCategory(NotificationCategory.CardAlerts, false)
+      })
+
+      expect(mockDisableMutate).toHaveBeenCalledTimes(1)
+      expect(mockDisableMutate).toHaveBeenCalledWith({
+        variables: {
+          input: { category: "CardAlerts", channel: NotificationChannel.Push },
+        },
+      })
+      expect(mockEnableMutate).not.toHaveBeenCalled()
+    })
   })
 })
