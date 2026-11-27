@@ -1340,4 +1340,30 @@ describe("NavigationContainerWrapper two-factor gate", () => {
 
     await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
   })
+
+  /** blink-wip#2271: a bulletin's link and a push's both come in like any other link. */
+  it("passes a bulletin's card/add-funds link straight to navigation once unlocked", async () => {
+    const rendered = await renderUnlocked()
+    rerenderWrapper(rendered, <UnlockProbe />)
+    const { listener, receive } = subscribeToLinks()
+
+    receive("blink://card/add-funds")
+
+    expect(listener).toHaveBeenCalledWith("blink://card/add-funds")
+  })
+
+  it("keeps a push's card/add-funds link that arrives while locked, and opens it after the unlock", async () => {
+    renderWrapper(<UnlockProbe />)
+    const { listener, receive } = subscribeToLinks()
+
+    receive("blink:/card/add-funds")
+    expect(listener).not.toHaveBeenCalled()
+    expect(Linking.openURL).not.toHaveBeenCalled()
+
+    unlock()
+
+    await waitFor(() =>
+      expect(Linking.openURL).toHaveBeenCalledWith("blink:/card/add-funds"),
+    )
+  })
 })
