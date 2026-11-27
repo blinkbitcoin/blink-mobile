@@ -204,19 +204,25 @@ export const clickOnText = async (text: string) => {
 }
 
 export const swipeButton = async (title: string) => {
-  const sliderButton = await $(selector(title, "Other"))
-  await sliderButton.waitForDisplayed({ timeout })
+  // On iOS the handle is a Button whose name is its testID, with the title as its label.
+  const handle = await $(
+    process.env.E2E_DEVICE === "ios"
+      ? `//XCUIElementTypeButton[@name="slider" and @label="${title}"]`
+      : selector(title),
+  )
+  await handle.waitForDisplayed({ timeout })
 
-  const location = await sliderButton.getLocation()
-  const size = await sliderButton.getSize()
+  const location = await handle.getLocation()
+  const size = await handle.getSize()
+  // The track's own testID gives its rect directly: native sessions can't walk the tree.
+  const track = await $(findById("slider-track", "Other"))
+  const trackLocation = await track.getLocation()
+  const trackSize = await track.getSize()
 
-  const thumbWidthPercentage = 0.1
-
-  const thumbWidth = size.width * thumbWidthPercentage
-  const startX = location.x + thumbWidth
+  const startX = location.x + size.width / 2
   const startY = location.y + size.height / 2
+  const endX = trackLocation.x + trackSize.width - 1
 
-  const endX = location.x + size.width
   await driver.touchAction([
     { action: "press", x: startX, y: startY },
     { action: "wait", ms: 1500 },

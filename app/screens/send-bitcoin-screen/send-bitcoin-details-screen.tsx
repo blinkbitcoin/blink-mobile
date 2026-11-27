@@ -29,6 +29,7 @@ import { NavigationProp, RouteProp, useNavigation } from "@react-navigation/nati
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useAppConfig, useClipboard, usePriceConversion } from "@app/hooks"
+import { useAmountSliderHint } from "@app/hooks/use-amount-slider-hint"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { ErrorHaptic } from "@app/hooks/use-error-haptic"
 import { useInitialAccessibilityFocus } from "@app/hooks/use-initial-accessibility-focus"
@@ -59,6 +60,7 @@ import {
   AmountEntryErrorSheet,
   LnurlInvoiceError,
 } from "./amount-entry/amount-entry-error-sheet"
+import { AmountSlider } from "./amount-entry/amount-slider"
 import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
 import { formatDestination } from "./format-destination"
 import { HighFeeSheet } from "./high-fee-sheet"
@@ -165,6 +167,17 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   } = useAppConfig()
   const [isLoadingLnurl, setIsLoadingLnurl] = useState(false)
   const [isHighFeeSheetVisible, setIsHighFeeSheetVisible] = useState(false)
+  /** The thumb is held: the screen holds its scroll so the drag stays a drag, and the
+   *  on-chain fee is quoted once it is let go. */
+  const [isSliding, setIsSliding] = useState(false)
+  /** The held thumb has moved the amount sent. Only then does the fee quote wait for the
+   *  release: a touch that leaves the amount where it was keeps the quote it has. */
+  const [hasSlidAmount, setHasSlidAmount] = useState(false)
+  /** The sender slid on this send; review learns it, and a send that goes through retires
+   *  the slider's hint, even when the amount was typed over after. They have seen it work. */
+  const [hasUsedSlider, setHasUsedSlider] = useState(false)
+  const isAmountSliding = isSliding && hasSlidAmount
+  const { showAmountSliderHint } = useAmountSliderHint()
 
   const { convertMoneyAmount: _convertMoneyAmount, displayCurrency } =
     usePriceConversion()
@@ -197,6 +210,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     isSelfCustodial,
     paymentDestination,
     convertMoneyAmount: _convertMoneyAmount,
+    isAmountSliding,
   })
 
   /**
@@ -240,14 +254,19 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   const [lnurlError, setLnurlError] = useState<LnurlInvoiceError>()
 
-  /** A typed amount, or none. An invoice request's error was about the amount it asked
-   *  for, so a new amount clears it and frees the error slot and sheet for this one. */
-  const setAmount = useCallback((moneyAmount: MoneyAmount<WalletOrDisplayCurrency>) => {
-    setLnurlError(undefined)
-    setPaymentDetail((paymentDetail) =>
-      paymentDetail?.setAmount ? paymentDetail.setAmount(moneyAmount) : paymentDetail,
-    )
-  }, [])
+  /** A typed or slid amount, or none. An invoice request's error was about the amount it
+   *  asked for, so a new amount clears it and frees the error slot and sheet for this one. */
+  const setAmount = useCallback(
+    (moneyAmount: MoneyAmount<WalletOrDisplayCurrency>, isSendAll?: boolean) => {
+      setLnurlError(undefined)
+      setPaymentDetail((paymentDetail) =>
+        paymentDetail?.setAmount
+          ? paymentDetail.setAmount(moneyAmount, isSendAll)
+          : paymentDetail,
+      )
+    },
+    [],
+  )
 
   const amountPad = useNumberPad({
     walletCurrency:
@@ -453,6 +472,29 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       setPaymentDetail(updatedPaymentDetail)
     })
 
+  /** Each hold starts with the amount where it was, whatever a step before it did. */
+  const handleSliderHold = (isHeld: boolean) => {
+    setIsSliding(isHeld)
+    setHasSlidAmount(false)
+  }
+
+  const selectPercent = (percent: number) => {
+    setHasUsedSlider(true)
+    const amount = {
+      ...sendingWalletBalance,
+      amount: Math.floor((sendingWalletBalance.amount * percent) / 100),
+    }
+    /** Where the rail can send the whole balance net of fees, 100% is that send-all rather
+     *  than the balance as a plain amount, which the fee would push over. */
+    const isSendAll = percent === 100 && Boolean(paymentDetail.canSendMax)
+
+    const slidSettlement = paymentDetail.setAmount?.(amount, isSendAll).settlementAmount
+    const isNewAmount = slidSettlement?.amount !== paymentDetail.settlementAmount.amount
+    if (isNewAmount) setHasSlidAmount(true)
+    setAmount(amount, isSendAll)
+    amountPad.showAmount(amount)
+  }
+
   const goToNextScreen =
     (paymentDetail.sendPaymentMutation ||
       (paymentDetail.paymentType === "lnurl" && paymentDetail.unitOfAccountAmount)) &&
@@ -556,6 +598,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         } else {
           navigation.navigate("sendBitcoinConfirmation", {
             paymentDetail: paymentDetailForConfirmation,
+            usedAmountSlider: hasUsedSlider,
           })
         }
       }
@@ -642,6 +685,18 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     )
 
   const hasAmount = paymentDetail.unitOfAccountAmount.amount > 0
+
+  /** Where the slider's thumb sits: the amount's share of the balance it is sent from. */
+  const amountInWallet = hasAmount
+    ? convertMoneyAmount(paymentDetail.unitOfAccountAmount, walletCurrency)?.amount
+    : undefined
+  const balanceShare =
+    amountInWallet && sendingWalletBalance.amount > 0
+      ? amountInWallet / sendingWalletBalance.amount
+      : 0
+  /** Green for the Dollar wallet, as slide to send. */
+  const sliderAccentColor =
+    walletCurrency === WalletCurrency.Usd ? colors.success : colors.accent
   const isLowFunds =
     !amountStatus.validAmount &&
     amountStatus.invalidReason === AmountInvalidReason.InsufficientBalance
@@ -711,34 +766,50 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         isVisible={isHighFeeSheetVisible}
         onAccept={() => {
           setIsHighFeeSheetVisible(false)
-          navigation.navigate("sendBitcoinConfirmation", { paymentDetail })
+          navigation.navigate("sendBitcoinConfirmation", {
+            paymentDetail,
+            usedAmountSlider: hasUsedSlider,
+          })
         }}
         onClose={() => setIsHighFeeSheetVisible(false)}
       />
       <ScrollView
         ref={scrollRef}
+        scrollEnabled={!isSliding}
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         onLayout={scrollNoteIntoView}
         onContentSizeChange={scrollNoteIntoView}
       >
-        <SendHero
-          active
-          caption={formatDestination({
-            destination: paymentDetail.destination,
-            paymentType: paymentDetail.paymentType,
-            lnAddressHostname,
-          })}
-          primaryAmount={primaryAmountText}
-          secondaryAmount={
-            secondaryAmount && formatMoneyAmount({ moneyAmount: secondaryAmount })
-          }
-          primaryCurrency={primaryCurrency}
-          isEmpty={paymentDetail.canSetAmount && !hasAmount}
-          onSwapCurrency={paymentDetail.canSetAmount ? swapTypedCurrency : undefined}
-          onCaptionLongPress={handleCopyToClipboard}
-        />
+        <View style={styles.amount}>
+          <SendHero
+            active
+            caption={formatDestination({
+              destination: paymentDetail.destination,
+              paymentType: paymentDetail.paymentType,
+              lnAddressHostname,
+            })}
+            primaryAmount={primaryAmountText}
+            secondaryAmount={
+              secondaryAmount && formatMoneyAmount({ moneyAmount: secondaryAmount })
+            }
+            primaryCurrency={primaryCurrency}
+            isEmpty={paymentDetail.canSetAmount && !hasAmount}
+            onSwapCurrency={paymentDetail.canSetAmount ? swapTypedCurrency : undefined}
+            onCaptionLongPress={handleCopyToClipboard}
+          />
+          {paymentDetail.canSetAmount && (
+            <AmountSlider
+              share={balanceShare}
+              onSlide={selectPercent}
+              showHint={showAmountSliderHint}
+              onHoldChange={handleSliderHold}
+              disabled={isQuotingFeesForNext}
+              accentColor={sliderAccentColor}
+            />
+          )}
+        </View>
         <View style={styles.fields}>
           {/* The one error slot sits right above the wallet card it is usually about. */}
           <View style={styles.walletWithError}>
@@ -827,6 +898,10 @@ const useStyles = makeStyles(() => ({
     justifyContent: "space-between",
     rowGap: 14,
     paddingHorizontal: 20,
+  },
+  /** The hero and the slider under it, 14 apart as drawn. */
+  amount: {
+    rowGap: 14,
   },
   fields: {
     rowGap: 14,

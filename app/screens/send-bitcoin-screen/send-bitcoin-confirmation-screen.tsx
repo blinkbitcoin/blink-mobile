@@ -26,6 +26,7 @@ import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { isIdempotencyConflict } from "@app/graphql/is-idempotency-conflict"
 import { useClipboard, useDisplayCurrency } from "@app/hooks"
 import { useAccessibilityAnnouncement } from "@app/hooks/use-accessibility-announcement"
+import { useAmountSliderHint } from "@app/hooks/use-amount-slider-hint"
 import { useInitialAccessibilityFocus } from "@app/hooks/use-initial-accessibility-focus"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -75,7 +76,7 @@ import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
 import { PaymentSendExtraInfo } from "./payment-details/index.types"
 import { useReviewFeeText } from "./review/use-review-fee-text"
 import { usePaymentFailure } from "./review/use-payment-failure"
-import useFee from "./use-fee"
+import { useReviewQuote } from "./review/use-review-quote"
 import { PaymentErrorActions } from "./payment-error-actions"
 import { PaymentSendCompletedStatus, useSendPayment } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
@@ -109,7 +110,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       NativeStackNavigationProp<RootStackParamList, "sendBitcoinConfirmation">
     >()
 
-  const { paymentDetail } = route.params
+  const { paymentDetail, usedAmountSlider } = route.params
+  const { markAmountSliderLearned } = useAmountSliderHint()
 
   const { hideAmount } = useHideAmount()
   /** A tap on the wallet card shows the balance on this screen only: the global setting
@@ -166,7 +168,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const { copyToClipboard } = useClipboard()
   const tierLabels = feeTierLabels(LL)
 
-  const fee = useFee(paymentDetail.getFee)
+  const { fee, recipientAmount, isAwaitingIncludedFee, isFeeOverAmount } =
+    useReviewQuote(paymentDetail)
 
   /** The receipt a landed payment opens from Sent, kept until the sender asks for it. */
   const sentReceiptRef =
@@ -262,10 +265,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   // Once Sent takes over, its own hold owns back.
   useHomeOnBackAfterSend(hasAttemptedSend && !sentTransition.isSettled)
 
-  const displayAmount = paymentDetail.convertMoneyAmount(
-    settlementAmount,
-    DisplayCurrency,
-  )
+  // What the recipient gets: the amount less the fee, when the fee comes out of it.
+  const displayAmount = paymentDetail.convertMoneyAmount(recipientAmount, DisplayCurrency)
 
   const currencyAmount = formatMoneyAmount({
     moneyAmount: displayAmount,
@@ -273,8 +274,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const secondaryAmount = getSecondaryAmountIfCurrencyIsDifferent({
     primaryAmount: displayAmount,
-    walletAmount: paymentDetail.convertMoneyAmount(settlementAmount, WalletCurrency.Btc),
-    displayAmount: paymentDetail.convertMoneyAmount(settlementAmount, DisplayCurrency),
+    walletAmount: paymentDetail.convertMoneyAmount(recipientAmount, WalletCurrency.Btc),
+    displayAmount: paymentDetail.convertMoneyAmount(recipientAmount, DisplayCurrency),
   })
 
   const satAmount = formatMoneyAmount({
@@ -284,7 +285,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   /** The hero pairs the display currency with the sending wallet's, the pair the keypad
    *  swaps between, led by whichever the sender typed in. */
   const heroWalletAmount = paymentDetail.convertMoneyAmount(
-    settlementAmount,
+    recipientAmount,
     sendingWalletDescriptor.currency,
   )
   const heroPrimaryAmount = leadsWithWalletCurrency ? heroWalletAmount : displayAmount
@@ -367,6 +368,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         hasShownSuccess: isSuccess,
       }
 
+      if (usedAmountSlider) markAmountSliderLearned()
       /** A payment that landed plays Sent in place and holds there until the sender opens
        *  the receipt or closes; the receipt then skips its own success icon. Pending keeps
        *  today's screen until its design lands. */
@@ -400,6 +402,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       resetToCompleted,
       holdSettledSend,
       isRouteLive,
+      usedAmountSlider,
+      markAmountSliderLearned,
       heroPrimaryText,
       heroSecondaryText,
       saveLnAddressContact,
@@ -533,10 +537,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     ? paymentDetail.convertMoneyAmount(fee.amount, settlementAmount.currency)
     : zeroSettlementAmount
 
-  const totalAmount = addMoneyAmounts({
-    a: settlementAmount,
-    b: feeInSettlementCurrency,
-  })
+  // A fee taken out of the amount is already inside it.
+  const feeAddedToTotal = paymentDetail.isFeeIncluded
+    ? zeroSettlementAmount
+    : feeInSettlementCurrency
+  const totalAmount = addMoneyAmounts({ a: settlementAmount, b: feeAddedToTotal })
 
   const skipBalanceCheck = isSendingMax || hasAttemptedSend
 
@@ -571,6 +576,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       })
     }
   }
+  // A fee that takes the whole amount leaves nothing: an amount error, so Change amount.
+  if (isFeeOverAmount && !invalidAmountErrorMessage)
+    invalidAmountErrorMessage = LL.SendBitcoinConfirmationScreen.feeExceedsAmount()
 
   const handleCopyToClipboard = (shown: string) => {
     copyToClipboard({
@@ -580,7 +588,12 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   }
 
   const isSliderDisabled =
-    !validAmount || !sendPayment || feeUnavailable || dustNotEvaluable
+    !validAmount ||
+    !sendPayment ||
+    isAwaitingIncludedFee ||
+    isFeeOverAmount ||
+    feeUnavailable ||
+    dustNotEvaluable
 
   const isLightningRecommended = (() => {
     const ratioFeeToAmount = 50 // 2%

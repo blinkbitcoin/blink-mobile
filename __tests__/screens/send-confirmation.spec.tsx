@@ -75,6 +75,8 @@ const LightningLnURL = ({
   route: RouteProp<RootStackParamList, "sendBitcoinConfirmation">
 }) => <SendBitcoinConfirmationScreen route={route} />
 
+const mockUpdatePersistentState = jest.fn()
+
 jest.mock("@app/store/persistent-state", () => ({
   ...jest.requireActual("@app/store/persistent-state"),
   usePersistentStateContext: () => ({
@@ -83,7 +85,7 @@ jest.mock("@app/store/persistent-state", () => ({
       galoyInstance: { id: "Main" },
       galoyAuthToken: "",
     },
-    updateState: jest.fn(),
+    updateState: mockUpdatePersistentState,
     resetState: jest.fn(),
   }),
 }))
@@ -2674,6 +2676,79 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
     )
   })
 
+  describe("a fee taken out of the amount", () => {
+    const feeIncludedRoute = (sats: number) => {
+      const base = buildOnchainRoute(sats)
+      return {
+        ...base,
+        params: {
+          paymentDetail: { ...base.params.paymentDetail, isFeeIncluded: true },
+        },
+      } as unknown as ReturnType<typeof buildBtcSettlementRoute>
+    }
+
+    afterEach(() => {
+      mockPreferredAmountCurrency.current = undefined
+    })
+
+    it("leads with what the recipient gets: the amount less the fee", async () => {
+      mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
+      btcFee(100)
+      await renderReview(feeIncludedRoute(1000))
+
+      expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("900 SAT")
+      expect(
+        screen.queryByText(LL.SendBitcoinConfirmationScreen.feeExceedsAmount()),
+      ).toBeNull()
+    })
+
+    it("holds the send, says why and offers Change amount when the fee taken out would leave the recipient nothing", async () => {
+      mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
+      btcFee(1200)
+      await renderReview(feeIncludedRoute(1000))
+
+      expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("0 SAT")
+      expect(lastSliderProps().disabled).toBe(true)
+      expect(outlineColor()).toBe(colors.light.error)
+      expectInlineAndInSheet(LL.SendBitcoinConfirmationScreen.feeExceedsAmount())
+
+      const [chip] = screen.getAllByText(LL.SendBitcoinConfirmationScreen.changeAmount())
+      fireEvent.press(chip)
+      expectChangeAmountDispatched()
+    })
+
+    it("holds the send when the fee taken out is exactly the amount", async () => {
+      mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
+      btcFee(1000)
+      await renderReview(feeIncludedRoute(1000))
+
+      expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("0 SAT")
+      expectInlineAndInSheet(LL.SendBitcoinConfirmationScreen.feeExceedsAmount())
+    })
+
+    it("never blames the fee for a fee paid on top of the amount", async () => {
+      btcFee(1200)
+      await renderReview(buildOnchainRoute(1000))
+
+      expect(screen.getByTestId("Successful Fee")).toBeTruthy()
+      expect(
+        screen.queryByText(LL.SendBitcoinConfirmationScreen.feeExceedsAmount()),
+      ).toBeNull()
+    })
+
+    it("keeps the slider off until the fee it takes out is quoted", async () => {
+      // A max-fee estimate leaves the slider on for a fee paid on top; one taken out of
+      // the amount has to be the real quote.
+      mockUseFee.mockReturnValue({
+        status: "error",
+        amount: { amount: 100, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+      })
+      await renderReview(feeIncludedRoute(1000))
+
+      expect(lastSliderProps().disabled).toBe(true)
+    })
+  })
+
   describe("amount currency", () => {
     const heroLines = () => [
       screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children,
@@ -4211,5 +4286,70 @@ describe("SendBitcoinConfirmationScreen, a self-custodial send that did not go o
         i18nObject("en").SendBitcoinConfirmationScreen.paymentMayStillLand(),
       ),
     ).toBeTruthy()
+  })
+})
+
+describe("SendBitcoinConfirmationScreen — amount slider hint", () => {
+  const sendWith = async (
+    outcome: Record<string, unknown>,
+    { usedAmountSlider }: { usedAmountSlider?: boolean } = {},
+  ) => {
+    const { createLnurlPaymentDetails } = PaymentDetailsLightning
+    sendPaymentMock.mockResolvedValueOnce(outcome)
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL
+          route={{
+            key: "sendBitcoinConfirmationScreen",
+            name: "sendBitcoinConfirmation",
+            params: {
+              paymentDetail: createLnurlPaymentDetails(defaultLightningParams),
+              usedAmountSlider,
+            },
+          }}
+        />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+  }
+
+  /** Whether any write to persistent state set the slider as learned. */
+  const markedLearned = () =>
+    mockUpdatePersistentState.mock.calls.some(
+      ([update]) =>
+        typeof update === "function" &&
+        update({ schemaVersion: 23, galoyInstance: { id: "Main" }, galoyAuthToken: "" })
+          ?.hasLearnedAmountSlider === true,
+    )
+
+  it("retires the hint when a slid send succeeds", async () => {
+    await sendWith({ status: "SUCCESS", extraInfo: {} }, { usedAmountSlider: true })
+
+    expect(markedLearned()).toBe(true)
+  })
+
+  it("retires the hint when a slid send is pending, as most on-chain sends answer", async () => {
+    await sendWith({ status: "PENDING", extraInfo: {} }, { usedAmountSlider: true })
+
+    expect(markedLearned()).toBe(true)
+  })
+
+  it("keeps the hint when the amount was typed", async () => {
+    await sendWith({ status: "SUCCESS", extraInfo: {} })
+
+    expect(markedLearned()).toBe(false)
+  })
+
+  it("keeps the hint when a slid send fails", async () => {
+    await sendWith(
+      { status: "FAILURE", errorsMessage: "boom" },
+      { usedAmountSlider: true },
+    )
+
+    expect(markedLearned()).toBe(false)
   })
 })
