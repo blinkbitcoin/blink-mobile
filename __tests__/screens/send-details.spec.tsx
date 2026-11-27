@@ -17,6 +17,7 @@ import { i18nObject } from "@app/i18n/i18n-util"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
+import { AmountSlider } from "@app/screens/send-bitcoin-screen/amount-entry/amount-slider"
 import {
   ConvertMoneyAmount,
   PaymentDetail,
@@ -720,6 +721,34 @@ describe("SendBitcoinDetailsScreen — LNURL invoice errors", () => {
       screen.getByText(LL.SendBitcoinScreen.lnurlInvoiceIncorrectAmount()),
     ).toBeTruthy()
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("clears the invoice error on a slid amount, as on a typed one", async () => {
+    const LL = i18nObject("en")
+    mockRequestInvoiceWithServiceParams.mockResolvedValue({
+      invoice: "lnbc-wrong-amount",
+      successAction: undefined,
+    })
+    mockNextDecodedInvoice.current = { millisatoshis: "1000" }
+    await renderLnurl()
+    await pressNext(LL)
+    await act(async () => {
+      fireEvent.press(
+        within(screen.getByTestId(ERROR_SHEET_TEST_ID)).getByText(LL.common.close()),
+      )
+    })
+    expect(
+      screen.getByText(LL.SendBitcoinScreen.lnurlInvoiceIncorrectAmount()),
+    ).toBeTruthy()
+
+    await act(async () => {
+      screen.UNSAFE_getByType(AmountSlider).props.onSlide(50)
+    })
+    await flushAsync()
+
+    expect(
+      screen.queryByText(LL.SendBitcoinScreen.lnurlInvoiceIncorrectAmount()),
+    ).toBeNull()
   })
 
   /** Over the limit Next is off, so only a new amount can clear the old request's error. */

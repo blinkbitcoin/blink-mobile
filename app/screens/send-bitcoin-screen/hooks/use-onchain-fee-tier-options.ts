@@ -78,9 +78,10 @@ export const useOnchainFeeTierOptions = ({
     paymentDetail,
     isActive: isSelfCustodial && isOnchain,
   })
+  const isCustodialRailActive = !isSelfCustodial && isOnchain && !isAmountSliding
   const custodialRail = useCustodialFeeRail({
     paymentDetail,
-    isActive: !isSelfCustodial && isOnchain && !isAmountSliding,
+    isActive: isCustodialRailActive,
   })
 
   /** The one place the rail is chosen; everything below reads the winner plainly. */

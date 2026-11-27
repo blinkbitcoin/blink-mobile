@@ -176,6 +176,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   /** The sender slid on this send; review learns it, and a send that goes through retires
    *  the slider's hint, even when the amount was typed over after. They have seen it work. */
   const [hasUsedSlider, setHasUsedSlider] = useState(false)
+  const isAmountSliding = isSliding && hasSlidAmount
   const { showAmountSliderHint } = useAmountSliderHint()
 
   const { convertMoneyAmount: _convertMoneyAmount, displayCurrency } =
@@ -209,7 +210,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     isSelfCustodial,
     paymentDestination,
     convertMoneyAmount: _convertMoneyAmount,
-    isAmountSliding: isSliding && hasSlidAmount,
+    isAmountSliding,
   })
 
   /**
@@ -253,14 +254,19 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   const [lnurlError, setLnurlError] = useState<LnurlInvoiceError>()
 
-  /** A typed amount, or none. An invoice request's error was about the amount it asked
-   *  for, so a new amount clears it and frees the error slot and sheet for this one. */
-  const setAmount = useCallback((moneyAmount: MoneyAmount<WalletOrDisplayCurrency>) => {
-    setLnurlError(undefined)
-    setPaymentDetail((paymentDetail) =>
-      paymentDetail?.setAmount ? paymentDetail.setAmount(moneyAmount) : paymentDetail,
-    )
-  }, [])
+  /** A typed or slid amount, or none. An invoice request's error was about the amount it
+   *  asked for, so a new amount clears it and frees the error slot and sheet for this one. */
+  const setAmount = useCallback(
+    (moneyAmount: MoneyAmount<WalletOrDisplayCurrency>, isSendAll?: boolean) => {
+      setLnurlError(undefined)
+      setPaymentDetail((paymentDetail) =>
+        paymentDetail?.setAmount
+          ? paymentDetail.setAmount(moneyAmount, isSendAll)
+          : paymentDetail,
+      )
+    },
+    [],
+  )
 
   const amountPad = useNumberPad({
     walletCurrency:
@@ -483,14 +489,9 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     const isSendAll = percent === 100 && Boolean(paymentDetail.canSendMax)
 
     const slidSettlement = paymentDetail.setAmount?.(amount, isSendAll).settlementAmount
-    if (slidSettlement?.amount !== paymentDetail.settlementAmount.amount) {
-      setHasSlidAmount(true)
-    }
-    setPaymentDetail((paymentDetail) =>
-      paymentDetail?.setAmount
-        ? paymentDetail.setAmount(amount, isSendAll)
-        : paymentDetail,
-    )
+    const isNewAmount = slidSettlement?.amount !== paymentDetail.settlementAmount.amount
+    if (isNewAmount) setHasSlidAmount(true)
+    setAmount(amount, isSendAll)
     amountPad.showAmount(amount)
   }
 
