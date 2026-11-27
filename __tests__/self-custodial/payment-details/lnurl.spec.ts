@@ -2197,6 +2197,42 @@ describe("createSelfCustodialLnurlPaymentDetails send-all", () => {
     )
   })
 
+  /** blink-wip#2048 SR2: the SDK prepares the send again, so what went out can differ from
+   *  review's quote. Sent and the receipt read it from here. */
+  it("hands back what a send-all sent, for Sent and the receipt", async () => {
+    mockPrepareLnurl.mockResolvedValue({ ...quote(), feePolicy: FEES_INCLUDED })
+    mockExecuteLnurl.mockResolvedValue({
+      payment: { id: "p1", status: 0, amount: BigInt(99_000), fees: BigInt(1_000) },
+    })
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+    if (!sendAll.canSendPayment) throw new Error("expected canSendPayment")
+
+    const result = await sendAll.sendPaymentMutation({} as never)
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.extraInfo?.settled).toEqual({ amountSats: 99_000, feeSats: 1_000 })
+  })
+
+  /** blink-wip#2048 SR3: the fee on top of the whole balance would spend more than it holds. */
+  it("sends nothing, and quotes nothing, when the SDK did not take the fee out", async () => {
+    mockPrepareLnurl.mockResolvedValue({ ...quote(), feePolicy: 0 /* FeesExcluded */ })
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+    if (!sendAll.canSendPayment || !sendAll.canGetFee) throw new Error("expected a send")
+
+    const fee = await sendAll.getFee({} as never)
+    const result = await sendAll.sendPaymentMutation({} as never)
+
+    expect(fee.amount).toBeUndefined()
+    expect(result.status).toBe(PaymentSendResult.Failure)
+    expect(mockExecuteLnurl).not.toHaveBeenCalled()
+  })
+
   /** blink-wip#2048 E4: what arrives may move under 100 sats between review and send. */
   it.each([
     ["sends", 99, PaymentSendResult.Success],

@@ -433,6 +433,33 @@ describe("useOnchainFeeTiers send-all", () => {
     expect(await quoteWith(true)).toBe(FEES_INCLUDED)
   })
 
+  /** blink-wip#2048 SR3: a send-all quoted with the fee on top would spend more than the
+   *  balance, so the quote fails rather than show it. */
+  it.each([
+    ["holds", FEES_INCLUDED, true],
+    ["fails", 0 /* FeesExcluded */, false],
+  ])(
+    "%s a send-all's quote by the fee policy the SDK applied",
+    async (_, applied, quoted) => {
+      mockPrepareSend.mockResolvedValue({ feePolicy: applied })
+      const { result } = renderHook(() =>
+        useOnchainFeeTiers({
+          sdk: mockSdk,
+          address: "bc1qtest",
+          amountSats: 5000,
+          isFeeIncluded: true,
+        }),
+      )
+
+      await act(async () => {
+        await result.current.quote()
+      })
+
+      expect(result.current.hasQuote).toBe(quoted)
+      expect(result.current.error === null).toBe(quoted)
+    },
+  )
+
   it("quotes a plain amount with the fee on top", async () => {
     expect(await quoteWith(false)).toBeUndefined()
   })
