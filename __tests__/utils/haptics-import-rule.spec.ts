@@ -5,12 +5,13 @@ import { join } from "path"
 
 /** The slice of ESLint's Node API used here; the repo has no @types/eslint. */
 type LintMessage = { ruleId: string | null; message: string }
-type ESLintApi = new (options: { cwd: string }) => {
+type ESLintInstance = {
   lintText: (
     code: string,
     options: { filePath: string },
   ) => Promise<Array<{ messages: LintMessage[] }>>
 }
+type ESLintApi = new (options: { cwd: string }) => ESLintInstance
 const { ESLint } = jest.requireActual<{ ESLint: ESLintApi }>("eslint")
 
 /**
@@ -24,8 +25,14 @@ const DIRECT_IMPORT = `import ReactNativeHapticFeedback from "react-native-hapti
 export const buzz = () => ReactNativeHapticFeedback.trigger("impactLight")
 `
 
+/** One instance for the whole spec: each one loads the full config, plugins and resolver. */
+let eslint: ESLintInstance
+
+beforeAll(() => {
+  eslint = new ESLint({ cwd: ROOT })
+})
+
 const restrictedImportErrors = async (filePath: string) => {
-  const eslint = new ESLint({ cwd: ROOT })
   const [result] = await eslint.lintText(DIRECT_IMPORT, {
     filePath: join(ROOT, filePath),
   })
@@ -62,7 +69,6 @@ describe("react-native-haptic-feedback import rule", () => {
   })
 
   it("still refuses Crashlytics in the files exempt from the haptics path", async () => {
-    const eslint = new ESLint({ cwd: ROOT })
     const [result] = await eslint.lintText(
       'import crashlytics from "@react-native-firebase/crashlytics"\nexport const c = crashlytics\n',
       { filePath: join(ROOT, "app/utils/haptics.ts") },
