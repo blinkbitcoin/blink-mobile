@@ -10,7 +10,9 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { toastShow } from "@app/utils/toast"
 
 export const NotificationCategory = {
-  Payments: "Payments",
+  /** The card's transaction alerts. The low-funds push follows it; a decline for
+   *  insufficient funds is sent with it off (blink-wip#2278). */
+  CardAlerts: "CardAlerts",
   Marketing: "Marketing",
 }
 

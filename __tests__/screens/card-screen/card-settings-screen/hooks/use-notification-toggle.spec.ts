@@ -62,10 +62,10 @@ describe("useNotificationToggle", () => {
     expect(typeof result.current.toggleCategory).toBe("function")
   })
 
-  it("isCategoryEnabled returns true for Payments (not in disabledCategories)", () => {
+  it("isCategoryEnabled returns true for CardAlerts (not in disabledCategories)", () => {
     const { result } = renderHook(() => useNotificationToggle())
 
-    expect(result.current.isCategoryEnabled(NotificationCategory.Payments)).toBe(true)
+    expect(result.current.isCategoryEnabled(NotificationCategory.CardAlerts)).toBe(true)
   })
 
   it("isCategoryEnabled returns false for Marketing (in disabledCategories)", () => {
@@ -93,12 +93,12 @@ describe("useNotificationToggle", () => {
     const { result } = renderHook(() => useNotificationToggle())
 
     await act(async () => {
-      await result.current.toggleCategory(NotificationCategory.Payments, false)
+      await result.current.toggleCategory(NotificationCategory.CardAlerts, false)
     })
 
     expect(mockDisableMutate).toHaveBeenCalledWith({
       variables: {
-        input: { category: "Payments", channel: NotificationChannel.Push },
+        input: { category: "CardAlerts", channel: NotificationChannel.Push },
       },
     })
     expect(mockEnableMutate).not.toHaveBeenCalled()

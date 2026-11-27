@@ -50,7 +50,7 @@ jest.mock("react-native-inappbrowser-reborn", () => ({
 }))
 
 const mockToggleCategory = jest.fn()
-const mockIsCategoryEnabled = jest.fn((category: string) => category === "Payments")
+const mockIsCategoryEnabled = jest.fn((category: string) => category === "CardAlerts")
 const mockCloseCard = jest.fn()
 let mockCloseCardAccountReturn = {
   closeCard: mockCloseCard,
@@ -69,7 +69,7 @@ jest.mock("@app/hooks/use-card-data", () => ({
 
 jest.mock("@app/screens/card-screen/card-settings-screen/hooks", () => ({
   NotificationCategory: {
-    Payments: "Payments",
+    CardAlerts: "CardAlerts",
     Marketing: "Marketing",
   },
   useNotificationToggle: () => ({
@@ -579,7 +579,7 @@ describe("CardSettingsScreen", () => {
   })
 
   describe("switch interactions", () => {
-    it("calls toggleCategory with Payments when transaction alerts switch is pressed", async () => {
+    it("turns the card alerts category off from the transaction alerts switch, not payments", async () => {
       const { getAllByRole } = render(
         <ContextForScreen>
           <CardSettingsScreen />
@@ -595,7 +595,7 @@ describe("CardSettingsScreen", () => {
         fireEvent(switches[0], "pressIn")
       })
 
-      expect(mockToggleCategory).toHaveBeenCalledWith("Payments", false)
+      expect(mockToggleCategory).toHaveBeenCalledWith("CardAlerts", false)
     })
 
     it("calls toggleCategory with Marketing when marketing updates switch is pressed", async () => {
