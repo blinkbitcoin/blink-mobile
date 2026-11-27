@@ -201,6 +201,7 @@ export const AmountSlider: React.FC<AmountSliderProps> = ({
       runOnJS(release)()
     })
 
+  const accentFillStyle = accentColor && { backgroundColor: accentColor }
   const fillStyle = useAnimatedStyle(
     () => ({ width: position.value + THUMB_INSET }),
     [position],
@@ -239,13 +240,7 @@ export const AmountSlider: React.FC<AmountSliderProps> = ({
             onLayout={onTrackLayout}
             testID={AMOUNT_SLIDER_TRACK_TEST_ID}
           >
-            <Animated.View
-              style={[
-                styles.fill,
-                accentColor && { backgroundColor: accentColor },
-                fillStyle,
-              ]}
-            />
+            <Animated.View style={[styles.fill, accentFillStyle, fillStyle]} />
             <Animated.View style={[styles.thumbSlot, thumbStyle]} pointerEvents="none">
               <Animated.View style={[styles.halo, haloStyle]} />
               <View style={styles.thumb} />
