@@ -3502,13 +3502,26 @@
       "CardApproved": {
         "title": "Sivuyisana nawe!",
         "subtitle": "Ikhadi lakho le-Blink Visa livuselelwe.",
-        "buttonLabel": "Odola ikhadi lokwenyani",
-        "buttonLabelDashboard": "Ideshibhodi"
+        "buttonLabel": "Odola ikhadi lokwenyani"
       },
       "PhysicalCardOrdered": {
         "title": "Ikhadi lakho lokwenyani lisendleleni!",
         "subtitle": "I-odolo yokuhanjiswa kwekhadi lakho le-Blink ithunyelwe.",
         "buttonLabel": "Yenza i-PIN"
+      }
+    },
+    "Activation": {
+      "skipForNow": "Tsiba okwangoku",
+      "OrderOffer": {
+        "subtitle": "Fumana iBlink Card yakho ithunyelwe kuyo nayiphi na idilesi oyikhethileyo."
+      },
+      "TopUp": {
+        "title": "Faka imali kwikhadi lakho",
+        "subtitle": "Yongeza imali ngoku, okanye kamva.",
+        "fromBalance": "Kwibhalansi yakho yeBitcoin okanye yeDola",
+        "deposit": "Faka kwibhalansi yekhadi lakho",
+        "topUpNow": "Faka imali ngoku",
+        "skip": "Tsiba ukufaka imali"
       }
     },
     "ShippingAddress": {

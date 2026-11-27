@@ -16,6 +16,7 @@ import {
   getUsdWallet,
   getWallets,
 } from "@app/graphql/wallets-utils"
+import { useCardActivation } from "@app/hooks/use-card-activation"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useDollarBalanceGate } from "@app/hooks/use-dollar-balance-restricted"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -150,6 +151,8 @@ const WalletOverview: React.FC<Props> = ({
   const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed || hasWallets })
   const wallets = hasWallets ? suppliedWallets : data?.me?.defaultAccount?.wallets
   const cardAccount = getCardAccount(accounts)
+  /** Until the card is set up, the Card line opens the activation where it was left. */
+  const { resume: openCard } = useCardActivation({ skip: !cardAccount })
   const cardBalance = cardAccount?.balance
   const isCardBalanceKnown = cardBalance !== undefined
 
@@ -343,7 +346,7 @@ const WalletOverview: React.FC<Props> = ({
           <Pressable
             onPressIn={() => setPressedCard(true)}
             onPressOut={() => setPressedCard(false)}
-            onPress={() => navigation.navigate("cardDashboardScreen")}
+            onPress={openCard}
           >
             <View style={styles.displayTextView}>
               <View style={styles.currency}>

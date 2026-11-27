@@ -26,6 +26,15 @@ jest.mock("@react-navigation/native", () => {
   }
 })
 
+const mockResumeCard = jest.fn()
+const mockUseCardActivation = jest.fn()
+jest.mock("@app/hooks/use-card-activation", () => ({
+  useCardActivation: (options: Record<string, unknown>) => {
+    mockUseCardActivation(options)
+    return { resume: mockResumeCard }
+  },
+}))
+
 const mockIsRestricted = jest.fn()
 let mockIsRegionPending = false
 let mockIsRegionDetermined = true
@@ -243,13 +252,21 @@ describe("WalletOverview", () => {
       )
     })
 
-    it("navigates to the card dashboard when the Card row is pressed", async () => {
+    it("opens the card where its activation was left when the Card row is pressed", async () => {
       const { getByText } = renderOverview({ accounts: withCardFixture })
       await flushEffects()
 
       fireEvent.press(getByText("Card"))
 
-      expect(mockNavigate).toHaveBeenCalledWith("cardDashboardScreen")
+      expect(mockResumeCard).toHaveBeenCalledTimes(1)
+      expect(mockUseCardActivation).toHaveBeenLastCalledWith({ skip: false })
+    })
+
+    it("reads no activation for accounts without a card", async () => {
+      renderOverview({ accounts: walletsFixture })
+      await flushEffects()
+
+      expect(mockUseCardActivation).toHaveBeenLastCalledWith({ skip: true })
     })
 
     it("holds the card balance back while the balances load", async () => {

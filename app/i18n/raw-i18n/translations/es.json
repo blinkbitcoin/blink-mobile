@@ -3502,13 +3502,26 @@
             "CardApproved": {
                 "title": "¡Felicidades!",
                 "subtitle": "Tu tarjeta Blink Visa ha sido activada.",
-                "buttonLabel": "Solicitar tarjeta física",
-                "buttonLabelDashboard": "Panel"
+                "buttonLabel": "Solicitar tarjeta física"
             },
             "PhysicalCardOrdered": {
                 "title": "¡Tu tarjeta física está en camino!",
                 "subtitle": "La solicitud de envío de tu tarjeta Blink ha sido enviada.",
                 "buttonLabel": "Crear PIN"
+            }
+        },
+        "Activation": {
+            "skipForNow": "Omitir por ahora",
+            "OrderOffer": {
+                "subtitle": "Recibe tu Blink Card en la dirección que elijas."
+            },
+            "TopUp": {
+                "title": "Recarga tu tarjeta",
+                "subtitle": "Agrega fondos ahora o más tarde.",
+                "fromBalance": "Desde tu saldo en Bitcoin o en dólares",
+                "deposit": "Depositar en el saldo de tu tarjeta",
+                "topUpNow": "Recargar ahora",
+                "skip": "Omitir recarga"
             }
         },
         "ShippingAddress": {

@@ -3502,13 +3502,26 @@
       "CardApproved": {
         "title": "¡Kusikuyki!",
         "subtitle": "Blink Visa tarjetayki qallarisqa.",
-        "buttonLabel": "Tarjeta físicata mañakuy",
-        "buttonLabelDashboard": "Ñawpaq panqa"
+        "buttonLabel": "Tarjeta físicata mañakuy"
       },
       "PhysicalCardOrdered": {
         "title": "¡Tarjeta físicayki ñanpi kachkan!",
         "subtitle": "Blink tarjetayki apachiypa mañakuyninqa kachasqa.",
         "buttonLabel": "PIN ruray"
+      }
+    },
+    "Activation": {
+      "skipForNow": "Kunanpaq saltay",
+      "OrderOffer": {
+        "subtitle": "Blink Cardniykita munasqayki direcciónman chayachiy."
+      },
+      "TopUp": {
+        "title": "Tarjetaykita recargay",
+        "subtitle": "Kunan otaq qhipaman qullqita yapay.",
+        "fromBalance": "Bitcoin otaq dólares saldoykimanta",
+        "deposit": "Tarjetaykiq saldonman depositay",
+        "topUpNow": "Kunan recargay",
+        "skip": "Recargata saltay"
       }
     },
     "ShippingAddress": {

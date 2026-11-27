@@ -168,6 +168,13 @@ describe("CardStatusLayout", () => {
       expect(queryByTestId("add-to-wallet-button")).toBeNull()
     })
 
+    it("offers no wallet on a screen that does not handle it", () => {
+      const { onAddToWallet: _onAddToWallet, ...propsWithoutWallet } = defaultProps
+      const { queryByTestId } = render(<CardStatusLayout {...propsWithoutWallet} />)
+
+      expect(queryByTestId("add-to-wallet-button")).toBeNull()
+    })
+
     it("calls onAddToWallet when AddToWalletButton is pressed", () => {
       const { getByTestId } = render(
         <CardStatusLayout {...defaultProps} showAddToWallet={true} />,

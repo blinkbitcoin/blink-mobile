@@ -3502,13 +3502,26 @@
       "CardApproved": {
         "title": "Hongera!",
         "subtitle": "Kadi yako ya Blink Visa imeamilishwa.",
-        "buttonLabel": "Agiza kadi halisi",
-        "buttonLabelDashboard": "Dashibodi"
+        "buttonLabel": "Agiza kadi halisi"
       },
       "PhysicalCardOrdered": {
         "title": "Kadi yako halisi iko njiani!",
         "subtitle": "Agizo la uwasilishaji wa kadi yako ya Blink limetumwa.",
         "buttonLabel": "Unda PIN"
+      }
+    },
+    "Activation": {
+      "skipForNow": "Ruka kwa sasa",
+      "OrderOffer": {
+        "subtitle": "Pata Blink Card yako ikifikishwa kwenye anwani yoyote utakayochagua."
+      },
+      "TopUp": {
+        "title": "Ongeza salio kwenye kadi yako",
+        "subtitle": "Ongeza fedha sasa, au baadaye.",
+        "fromBalance": "Kutoka kwenye salio lako la Bitcoin au Dola",
+        "deposit": "Weka kwenye salio la kadi yako",
+        "topUpNow": "Ongeza salio sasa",
+        "skip": "Ruka kuongeza salio"
       }
     },
     "ShippingAddress": {

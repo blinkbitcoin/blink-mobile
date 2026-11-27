@@ -11688,10 +11688,6 @@ type RootTranslation = {
 				 * O​r​d​e​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d
 				 */
 				buttonLabel: string
-				/**
-				 * D​a​s​h​b​o​a​r​d
-				 */
-				buttonLabelDashboard: string
 			}
 			PhysicalCardOrdered: {
 				/**
@@ -11706,6 +11702,44 @@ type RootTranslation = {
 				 * C​r​e​a​t​e​ ​P​I​N
 				 */
 				buttonLabel: string
+			}
+		}
+		Activation: {
+			/**
+			 * S​k​i​p​ ​f​o​r​ ​n​o​w
+			 */
+			skipForNow: string
+			OrderOffer: {
+				/**
+				 * G​e​t​ ​y​o​u​r​ ​B​l​i​n​k​ ​C​a​r​d​ ​d​e​l​i​v​e​r​e​d​ ​t​o​ ​a​n​y​ ​a​d​d​r​e​s​s​ ​o​f​ ​y​o​u​r​ ​c​h​o​o​s​i​n​g​.
+				 */
+				subtitle: string
+			}
+			TopUp: {
+				/**
+				 * T​o​p​-​u​p​ ​y​o​u​r​ ​c​a​r​d
+				 */
+				title: string
+				/**
+				 * A​d​d​ ​f​u​n​d​s​ ​n​o​w​,​ ​o​r​ ​l​a​t​e​r​.
+				 */
+				subtitle: string
+				/**
+				 * F​r​o​m​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​o​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e
+				 */
+				fromBalance: string
+				/**
+				 * D​e​p​o​s​i​t​ ​t​o​ ​y​o​u​r​ ​C​a​r​d​ ​B​a​l​a​n​c​e
+				 */
+				deposit: string
+				/**
+				 * T​o​p​-​u​p​ ​n​o​w
+				 */
+				topUpNow: string
+				/**
+				 * S​k​i​p​ ​t​o​p​-​u​p
+				 */
+				skip: string
 			}
 		}
 		ShippingAddress: {
@@ -26153,10 +26187,6 @@ export type TranslationFunctions = {
 				 * Order physical card
 				 */
 				buttonLabel: () => LocalizedString
-				/**
-				 * Dashboard
-				 */
-				buttonLabelDashboard: () => LocalizedString
 			}
 			PhysicalCardOrdered: {
 				/**
@@ -26171,6 +26201,44 @@ export type TranslationFunctions = {
 				 * Create PIN
 				 */
 				buttonLabel: () => LocalizedString
+			}
+		}
+		Activation: {
+			/**
+			 * Skip for now
+			 */
+			skipForNow: () => LocalizedString
+			OrderOffer: {
+				/**
+				 * Get your Blink Card delivered to any address of your choosing.
+				 */
+				subtitle: () => LocalizedString
+			}
+			TopUp: {
+				/**
+				 * Top-up your card
+				 */
+				title: () => LocalizedString
+				/**
+				 * Add funds now, or later.
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * From your Bitcoin or Dollar Balance
+				 */
+				fromBalance: () => LocalizedString
+				/**
+				 * Deposit to your Card Balance
+				 */
+				deposit: () => LocalizedString
+				/**
+				 * Top-up now
+				 */
+				topUpNow: () => LocalizedString
+				/**
+				 * Skip top-up
+				 */
+				skip: () => LocalizedString
 			}
 		}
 		ShippingAddress: {

@@ -3661,12 +3661,25 @@ const en: BaseTranslation = {
         title: "Congratulations!",
         subtitle: "Your Blink Visa Card has been activated.",
         buttonLabel: "Order physical card",
-        buttonLabelDashboard: "Dashboard",
       },
       PhysicalCardOrdered: {
         title: "Your physical card is on the way!",
         subtitle: "Order for delivery of your Blink Card has been submitted.",
         buttonLabel: "Create PIN",
+      },
+    },
+    Activation: {
+      skipForNow: "Skip for now",
+      OrderOffer: {
+        subtitle: "Get your Blink Card delivered to any address of your choosing.",
+      },
+      TopUp: {
+        title: "Top-up your card",
+        subtitle: "Add funds now, or later.",
+        fromBalance: "From your Bitcoin or Dollar Balance",
+        deposit: "Deposit to your Card Balance",
+        topUpNow: "Top-up now",
+        skip: "Skip top-up",
       },
     },
     ShippingAddress: {
