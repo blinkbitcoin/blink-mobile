@@ -21,6 +21,8 @@ export type AmountInputScreenUIProps = {
   secondaryCurrencyFormattedAmount?: string
   secondaryCurrencyCode?: string
   errorMessage?: string
+  /** Shown in the error slot without the error border; never disables the CTA. */
+  warningMessage?: string
   setAmountDisabled?: boolean
   onKeyPress: (key: Key) => boolean
   onPaste: (keys: number) => void
@@ -38,6 +40,7 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
   secondaryCurrencyFormattedAmount,
   secondaryCurrencyCode,
   errorMessage,
+  warningMessage,
   onKeyPress,
   onPaste,
   onToggleCurrency,
@@ -51,6 +54,8 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
 
   const hasSecondary = Boolean(secondaryCurrencyFormattedAmount)
   const hasError = Boolean(errorMessage)
+  const message = errorMessage || warningMessage
+  const hasMessage = Boolean(message)
 
   return (
     <View style={styles.sheet}>
@@ -123,10 +128,14 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
           <GaloyIcon
             name="warning"
             size={14}
-            color={hasError ? theme.colors.error : "transparent"}
+            color={hasMessage ? theme.colors.error : "transparent"}
           />
-          <Text type="p3" color={hasError ? theme.colors.error : "transparent"}>
-            {errorMessage || " "}
+          <Text
+            type="p3"
+            color={hasMessage ? theme.colors.error : "transparent"}
+            testID={warningMessage && !hasError ? "amount-input-warning" : undefined}
+          >
+            {message || " "}
           </Text>
         </View>
         <View style={styles.keyboardContainer}>

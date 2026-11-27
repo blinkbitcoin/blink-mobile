@@ -1,4 +1,9 @@
-import { formatDepositFeeTiers } from "@app/utils/deposit-fees"
+import {
+  DepositFeeWarning,
+  depositFeeForAmount,
+  formatDepositFeeTiers,
+  getDepositFeeWarning,
+} from "@app/utils/deposit-fees"
 
 describe("formatDepositFeeTiers", () => {
   const deposit = {
@@ -103,5 +108,126 @@ describe("formatDepositFeeTiers", () => {
         })[0].maxAmount,
       ).toBe("1M")
     })
+  })
+})
+
+describe("getDepositFeeWarning", () => {
+  const deposit = {
+    minBankFee: "2500",
+    minBankFeeThreshold: "1000000",
+    tiers: [
+      { maxAmount: "1000000", amount: "2500" },
+      { maxAmount: null, amount: "5000" },
+    ],
+  }
+  const F = 2500
+  const N = 10
+  const MIN = 5000
+  const classify = (amountSats: number, overrides = {}) =>
+    getDepositFeeWarning({
+      amountSats,
+      deposit,
+      minimumSats: MIN,
+      multiplier: N,
+      ...overrides,
+    })
+  const result = (type: string, extra = {}) => ({ type, fee: F, minimum: MIN, ...extra })
+
+  it("says nothing for an empty amount", () => {
+    expect(classify(0)).toBeNull()
+  })
+
+  describe("with the backend default floor above the fee", () => {
+    it("flags an amount under the floor as below the minimum, even when it covers the fee", () => {
+      expect(classify(F)).toEqual(result(DepositFeeWarning.BelowMinimum))
+      expect(classify(MIN - 1)).toEqual(result(DepositFeeWarning.BelowMinimum))
+    })
+
+    it("warns about the fee from exactly the floor", () => {
+      expect(classify(MIN)).toEqual(result(DepositFeeWarning.ConsumedByFee))
+    })
+
+    it("warns up to one sat under the multiplier band", () => {
+      expect(classify(F * N - 1)).toEqual(result(DepositFeeWarning.ConsumedByFee))
+    })
+
+    it("stops warning at the multiplier band", () => {
+      expect(classify(F * N)).toBeNull()
+    })
+  })
+
+  describe("with the floor under the fee", () => {
+    const low = { minimumSats: 1000 }
+
+    it("flags an amount under the floor as below the minimum", () => {
+      expect(classify(999, low)).toEqual(
+        result(DepositFeeWarning.BelowMinimum, { minimum: 1000 }),
+      )
+    })
+
+    it("flags an amount the fee would take entirely", () => {
+      expect(classify(1000, low)).toEqual(
+        result(DepositFeeWarning.AllConsumedByFee, { minimum: 1000 }),
+      )
+      expect(classify(F - 1, low)?.type).toBe(DepositFeeWarning.AllConsumedByFee)
+    })
+
+    it("flags an amount equal to the fee, which the backend credits as nothing", () => {
+      expect(classify(F, low)?.type).toBe(DepositFeeWarning.AllConsumedByFee)
+    })
+
+    it("warns about the fee from one sat over the fee", () => {
+      expect(classify(F + 1, low)?.type).toBe(DepositFeeWarning.ConsumedByFee)
+    })
+  })
+
+  it("falls back to 2,500 when feesInformation has not resolved", () => {
+    expect(classify(F * N - 1, { deposit: undefined })).toEqual(
+      result(DepositFeeWarning.ConsumedByFee),
+    )
+    expect(classify(F * N, { deposit: undefined })).toBeNull()
+  })
+
+  it("uses the fee of the tier the amount lands in", () => {
+    const steep = {
+      ...deposit,
+      tiers: [
+        { maxAmount: "6000", amount: "100" },
+        { maxAmount: null, amount: "8000" },
+      ],
+    }
+    expect(classify(5999, { deposit: steep })).toBeNull()
+    expect(classify(6001, { deposit: steep })).toEqual(
+      result(DepositFeeWarning.AllConsumedByFee, { fee: 8000 }),
+    )
+    expect(classify(8001, { deposit: steep })?.type).toBe(DepositFeeWarning.ConsumedByFee)
+  })
+
+  it("narrows the band with a smaller multiplier", () => {
+    expect(classify(F * 3, { multiplier: 3 })).toBeNull()
+    expect(classify(F * 3 - 1, { multiplier: 3 })?.type).toBe(
+      DepositFeeWarning.ConsumedByFee,
+    )
+  })
+
+  it("only checks the floor when the tier charges no fee", () => {
+    const free = { deposit: { ...deposit, tiers: [{ maxAmount: null, amount: "0" }] } }
+    expect(classify(MIN - 1, free)?.type).toBe(DepositFeeWarning.BelowMinimum)
+    expect(classify(MIN, free)).toBeNull()
+  })
+})
+
+describe("depositFeeForAmount", () => {
+  it("treats a tier's maxAmount as inclusive, like the backend", () => {
+    const deposit = {
+      minBankFee: "2500",
+      minBankFeeThreshold: "1000000",
+      tiers: [
+        { maxAmount: "1000000", amount: "2500" },
+        { maxAmount: null, amount: "5000" },
+      ],
+    }
+    expect(depositFeeForAmount(1_000_000, deposit)).toBe(2500)
+    expect(depositFeeForAmount(1_000_001, deposit)).toBe(5000)
   })
 })

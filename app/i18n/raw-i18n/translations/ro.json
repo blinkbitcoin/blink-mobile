@@ -2280,6 +2280,9 @@
     "depositFeeTiers": "Deposit fees: {tiers: string}",
     "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
     "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
+    "depositBelowMinimum": "Suma este sub depunerea minimă. Nimic sub {min} SAT nu va ajunge",
+    "depositBelowFee": "Suma va fi consumată de taxa de depunere",
+    "depositConsumedByFee": "{fee} SAT vor fi consumați de taxa de depunere",
     "autoConvertMinAmount": "Sumele sub {minSats: number} sats / {minFiat: string} nu pot fi convertite automat în Dolari. Veți primi Bitcoin în schimb.",
     "autoConvertFailed": "Plata primită, dar conversia a eșuat.",
     "pleaseWaitForConversion": "Vă rugăm să așteptați până când conversia este finalizată"

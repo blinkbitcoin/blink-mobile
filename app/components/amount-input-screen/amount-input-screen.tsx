@@ -41,6 +41,8 @@ export type AmountInputScreenProps = {
   maxAmount?: MoneyAmount<WalletOrDisplayCurrency>
   maxAmountIsBalance?: boolean
   minAmount?: MoneyAmount<WalletOrDisplayCurrency>
+  /** A non-blocking message for the typed amount, re-read on every keystroke. */
+  getAmountWarning?: (amount: MoneyAmount<WalletOrDisplayCurrency>) => string | undefined
 }
 
 export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
@@ -51,6 +53,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
   maxAmount,
   maxAmountIsBalance,
   minAmount,
+  getAmountWarning,
 }) => {
   const {
     currencyInfo,
@@ -192,6 +195,8 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
     })
   }
 
+  const warningMessage = errorMessage ? "" : getAmountWarning?.(newPrimaryAmount)
+
   const disabledKeys = useMemo(() => getDisabledKeys(numberPadState), [numberPadState])
 
   const primaryCurrencyInfo = currencyInfo[newPrimaryAmount.currency]
@@ -221,6 +226,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
       }
       secondaryCurrencySymbol={secondaryCurrencyInfo?.symbol}
       errorMessage={errorMessage}
+      warningMessage={warningMessage}
       onKeyPress={onKeyPress}
       onPaste={onPaste}
       onClearAmount={onClear}
