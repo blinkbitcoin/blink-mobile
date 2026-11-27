@@ -263,6 +263,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     loading: sendPaymentLoading,
     sendPayment,
     hasAttemptedSend,
+    forgetAttempt,
   } = useSendPayment(sendPaymentMutation, paymentDetail.idempotencyKeyRef)
   // Once Sent takes over, its own hold owns back.
   useHomeOnBackAfterSend(hasAttemptedSend && !sentTransition.isSettled)
@@ -461,7 +462,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         return
       }
 
+      /** Refused before anything went out (blink-wip#2048 E4), so review is as it was
+       *  before the slide: back, the balance check and the high-fee sheet included. */
       if (isQuoteMovedError(errorsMessage)) {
+        forgetAttempt()
         requote()
         return
       }
@@ -536,6 +540,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     verifyPaymentSettled,
     failureCopy,
     errorMsgActionFor,
+    forgetAttempt,
     requote,
   ])
 

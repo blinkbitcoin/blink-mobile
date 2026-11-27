@@ -1948,14 +1948,27 @@ describe("SendBitcoinConfirmationScreen — a send-all whose quote moved", () =>
       },
     }) as const
 
+  /** The real hook's contract: the attempt is sticky until the screen forgets it. */
+  let hasAttemptedSend = false
+  const forgetAttemptMock = jest.fn(() => {
+    hasAttemptedSend = false
+  })
+  const quoteMoved = () => {
+    hasAttemptedSend = true
+    return Promise.resolve({ status: "FAILURE", errorsMessage: "sc_quote_moved" })
+  }
+
   beforeEach(() => {
     jest.clearAllMocks()
+    mockBeforeRemoveListeners.length = 0
     loadLocale("en")
-    mockUseSendPayment.mockReturnValue({
+    hasAttemptedSend = false
+    mockUseSendPayment.mockImplementation(() => ({
       loading: false,
-      hasAttemptedSend: false,
+      hasAttemptedSend,
+      forgetAttempt: forgetAttemptMock,
       sendPayment: sendPaymentMock,
-    })
+    }))
     mockUseFee.mockReturnValue({
       status: "set",
       amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
@@ -1972,6 +1985,82 @@ describe("SendBitcoinConfirmationScreen — a send-all whose quote moved", () =>
         walletCurrency: WalletCurrency.Usd,
       },
     })
+  })
+
+  afterEach(() => {
+    mockUseSendPayment.mockReset()
+    sendPaymentMock.mockReset()
+  })
+
+  const renderAndSlide = async () => {
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={lnurlRoute()} />
+      </ContextForScreen>,
+    )
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+  }
+
+  const pressBack = (type: string) => {
+    const preventDefault = jest.fn()
+    mockBeforeRemoveListeners.forEach((listener) =>
+      listener({ data: { action: { type } }, preventDefault }),
+    )
+    return preventDefault
+  }
+
+  it("leaves back to amount entry, since nothing went out", async () => {
+    sendPaymentMock.mockImplementationOnce(quoteMoved)
+    await renderAndSlide()
+
+    expect(forgetAttemptMock).toHaveBeenCalledTimes(1)
+    for (const type of ["GO_BACK", "POP"]) {
+      expect(pressBack(type)).not.toHaveBeenCalled()
+    }
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
+  })
+
+  it("still sends back Home after a failure that may have gone out", async () => {
+    sendPaymentMock.mockImplementationOnce(() => {
+      hasAttemptedSend = true
+      return Promise.resolve({ status: "FAILURE", errorsMessage: "route not found" })
+    })
+    await renderAndSlide()
+
+    expect(forgetAttemptMock).not.toHaveBeenCalled()
+    expect(pressBack("GO_BACK")).toHaveBeenCalled()
+  })
+
+  it("warns of a high fee on the new quote", async () => {
+    // $100.00 to the Lightning address: half of it in fees is a high fee. The balance
+    // covers it, since the balance check is back on and low funds would win.
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 500000,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 1000000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+    mockUseFee.mockImplementation((_getFee: unknown, round: number) => ({
+      status: "set",
+      amount: {
+        amount: round > 0 ? 5000 : 1,
+        currency: WalletCurrency.Usd,
+        currencyCode: "USD",
+      },
+    }))
+    sendPaymentMock.mockImplementationOnce(quoteMoved)
+    await renderAndSlide()
+    await flushEffects()
+
+    expect(screen.queryByTestId("high-fee-sheet")).toBeTruthy()
   })
 
   it("quotes it again with a toast, and opens no error sheet", async () => {
