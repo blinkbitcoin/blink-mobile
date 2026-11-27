@@ -50,6 +50,8 @@ jest.mock("@app/self-custodial/bridge", () => ({
       : quoted
   },
   hasTokenLeg: jest.requireActual("@app/self-custodial/bridge/send").hasTokenLeg,
+  assertFeePolicyApplied: jest.requireActual("@app/self-custodial/bridge/send")
+    .assertFeePolicyApplied,
   executeLnurl: (...args: unknown[]) => mockExecuteLnurl(...args),
   extractLnurlFee: (...args: unknown[]) => mockExtractLnurlFee(...args),
   buildConversionType: jest.fn().mockReturnValue({ tag: "ToBitcoin" }),

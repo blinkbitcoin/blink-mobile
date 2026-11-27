@@ -14,6 +14,8 @@ const mockReportError = jest.fn()
 jest.mock("@app/self-custodial/bridge", () => ({
   prepareSend: (...args: unknown[]) => mockPrepareSend(...args),
   extractOnchainFees: (...args: unknown[]) => mockExtractOnchainFees(...args),
+  assertFeePolicyApplied: jest.requireActual("@app/self-custodial/bridge/send")
+    .assertFeePolicyApplied,
 }))
 
 jest.mock("@app/utils/error-logging", () => ({

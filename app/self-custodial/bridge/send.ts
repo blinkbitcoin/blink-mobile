@@ -202,6 +202,24 @@ export const prepareLnurl = (sdk: BreezSdkInterface, options: PrepareLnurlOption
 export const extractLnurlFee = (prepared: PrepareLnurlPayResponse): number =>
   toNumber(prepared.feeSats)
 
+/**
+ * The SDK reports the fee policy it applied, which may differ from the one asked for
+ * (blink-wip#2048 SR3). A send-all that came back with the fee on top would show the
+ * balance less the fee while spending the balance plus it, so its quote and its send
+ * stop here, before anything goes out.
+ */
+export const assertFeePolicyApplied = (
+  requested: FeePolicy | undefined,
+  prepared: { feePolicy: FeePolicy },
+) => {
+  if (
+    requested === FeePolicy.FeesIncluded &&
+    prepared.feePolicy !== FeePolicy.FeesIncluded
+  ) {
+    throw new Error("The SDK did not take the fee out of the amount")
+  }
+}
+
 /** The key is dropped on a token leg, as `executeSend` drops it, for the same reason. */
 export const executeLnurl = (
   sdk: BreezSdkInterface,

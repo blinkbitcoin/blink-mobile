@@ -7,8 +7,11 @@ import {
   type BreezSdkInterface,
 } from "@breeztech/breez-sdk-spark-react-native"
 
-import { extractOnchainFees, prepareSend } from "@app/self-custodial/bridge"
-import { assertFeePolicyApplied } from "@app/self-custodial/payment-details/send-helpers"
+import {
+  assertFeePolicyApplied,
+  extractOnchainFees,
+  prepareSend,
+} from "@app/self-custodial/bridge"
 import {
   buildZeroTiers,
   FeeTierOption,

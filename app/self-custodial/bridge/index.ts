@@ -44,6 +44,7 @@ export {
   prepareLnurl,
   executeLnurl,
   extractLnurlFee,
+  assertFeePolicyApplied,
 } from "./send"
 export type {
   ExecuteSendOptions,

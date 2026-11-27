@@ -33,6 +33,7 @@ export type SelfCustodialFeeResult<T extends WalletCurrency> = Awaited<
 }
 
 import {
+  assertFeePolicyApplied,
   executeSend,
   extractLightningFee,
   extractOnchainFees,
@@ -98,24 +99,6 @@ export const sendAllFeePolicy = (
   currency: WalletCurrency,
 ): FeePolicy | undefined =>
   sendMax && currency === WalletCurrency.Btc ? FeePolicy.FeesIncluded : undefined
-
-/**
- * The SDK reports the fee policy it applied, which may differ from the one asked for
- * (blink-wip#2048 SR3). A send-all that came back with the fee on top would show the
- * balance less the fee while spending the balance plus it, so its quote and its send
- * stop here, before anything goes out.
- */
-export const assertFeePolicyApplied = (
-  requested: FeePolicy | undefined,
-  prepared: { feePolicy: FeePolicy },
-) => {
-  if (
-    requested === FeePolicy.FeesIncluded &&
-    prepared.feePolicy !== FeePolicy.FeesIncluded
-  ) {
-    throw new Error("The SDK did not take the fee out of the amount")
-  }
-}
 
 /** What went out, for a send whose fee came out of the amount: review only had a quote,
  *  and the SDK prepares the send again (blink-wip#2048 SR2). */

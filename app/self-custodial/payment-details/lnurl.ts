@@ -34,6 +34,7 @@ import {
 import { ConvertDirection } from "@app/types/payment"
 
 import {
+  assertFeePolicyApplied,
   buildConversionType,
   executeLnurl,
   extractLnurlFee,
@@ -47,7 +48,6 @@ import { classifySdkError } from "../sdk-error"
 
 import { htlcDetailsOf } from "./lost-send"
 import {
-  assertFeePolicyApplied,
   feeFailure,
   requestedAsOf,
   runSelfCustodialSend,

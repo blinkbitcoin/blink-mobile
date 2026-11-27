@@ -262,6 +262,8 @@ const mockSelfCustodialWallet = { sdk: { id: "sdk" } }
 jest.mock("@app/self-custodial/bridge", () => ({
   prepareSend: (...args: unknown[]) => mockPrepareSend(...args),
   extractOnchainFees: () => ({ fast: 300, medium: 200, slow: 100 }),
+  assertFeePolicyApplied: jest.requireActual("@app/self-custodial/bridge/send")
+    .assertFeePolicyApplied,
 }))
 jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockSelfCustodialWallet,
