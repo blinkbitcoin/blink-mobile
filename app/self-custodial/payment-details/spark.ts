@@ -69,6 +69,7 @@ export const createSelfCustodialSparkPaymentDetails = <T extends WalletCurrency>
     sdk,
     paymentRequest: address,
     feePolicy,
+    quoteRef: isSendingMax ? {} : undefined,
     amount: settlementAmount.amount
       ? toSdkSendAmount(settlementAmount.amount, sendingWalletDescriptor.currency)
       : undefined,

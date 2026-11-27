@@ -48,11 +48,14 @@ import { classifySdkError } from "../sdk-error"
 
 import { htlcDetailsOf } from "./lost-send"
 import {
+  assertSendAllQuoteHolds,
   feeFailure,
+  recordSendAllQuote,
   requestedAsOf,
   runSelfCustodialSend,
   sendAllFeePolicy,
   sendSettlement,
+  type SendAllQuoteRef,
   settledOf,
 } from "./send-helpers"
 
@@ -217,6 +220,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
   /** What a send-all asks of the SDK. A dollar send always takes its fee out too, but it
    *  keeps main's handling: its quote and receipt are not checked against the SDK's. */
   const sendAllPolicy = isSendingMax ? FeePolicy.FeesIncluded : undefined
+  const sendAllQuoteRef: SendAllQuoteRef | undefined = isSendingMax ? {} : undefined
   const payRequest = lnurlParamsToPayRequest(lnurlParams, lnurl)
 
   // Only the note the user typed travels as the comment. The destination's description
@@ -311,6 +315,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
             const prepared = await prepareLnurl(sdk, prepareOptions)
             assertFeePolicyApplied(sendAllPolicy, prepared)
             const feeSats = extractLnurlFee(prepared)
+            recordSendAllQuote(sendAllQuoteRef, feeSats)
             return { amount: asBtcSettlementAmount<T>(feeSats) }
           } catch (err) {
             return feeFailure<T>("Self-custodial LNURL fee", err)
@@ -333,6 +338,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
             prepare: async () => {
               const prepared = await prepareLnurl(sdk, prepareOptions)
               assertFeePolicyApplied(sendAllPolicy, prepared)
+              assertSendAllQuoteHolds(sendAllQuoteRef, extractLnurlFee(prepared))
               return prepared
             },
             identify: (prepared) => ({

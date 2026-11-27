@@ -2197,6 +2197,30 @@ describe("createSelfCustodialLnurlPaymentDetails send-all", () => {
     )
   })
 
+  /** blink-wip#2048 E4: what arrives may move under 100 sats between review and send. */
+  it.each([
+    ["sends", 99, PaymentSendResult.Success],
+    ["sends nothing", 100, PaymentSendResult.Failure],
+  ])("%s when the fee moved by %i sats since review", async (_, moved, status) => {
+    mockPrepareLnurl.mockResolvedValue({ ...quote(), feePolicy: FEES_INCLUDED })
+    mockExecuteLnurl.mockResolvedValue({ payment: { id: "p1", status: 0 } })
+    const sendAll = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
+      balance,
+      true,
+    )
+    if (!sendAll.canSendPayment || !sendAll.canGetFee) throw new Error("expected a send")
+
+    mockExtractLnurlFee.mockReturnValue(5)
+    await sendAll.getFee({} as never)
+    mockExtractLnurlFee.mockReturnValue(5 + moved)
+    const result = await sendAll.sendPaymentMutation({} as never)
+
+    expect(result.status).toBe(status)
+    expect(mockExecuteLnurl).toHaveBeenCalledTimes(
+      status === PaymentSendResult.Success ? 1 : 0,
+    )
+  })
+
   it("puts the fee back on top once an amount is typed", async () => {
     const typed = createSelfCustodialLnurlPaymentDetails(createParams()).setAmount!(
       balance,

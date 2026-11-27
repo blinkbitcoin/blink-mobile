@@ -6,6 +6,7 @@ import { it } from "@jest/globals"
 import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
 
 import {
+  assertSendAllQuoteHolds,
   createGetFee,
   createGetFeeOnchain,
   createSendMutation,
@@ -1847,5 +1848,112 @@ describe("a send-all", () => {
 
     expect(result.amount).toBeUndefined()
     expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.Generic)
+  })
+})
+
+/** blink-wip#2048 E4, ruled 2026-11-07: a send-all is prepared again at the slide, and
+ *  when what arrives moved by 100 sats or more since review, nothing is sent. */
+describe("a send-all whose quote moved since review", () => {
+  const FEES_INCLUDED = 1
+
+  const lightningQuote = (feeSats: number) => ({
+    paymentMethod: {
+      tag: "Bolt11Invoice",
+      inner: {
+        invoiceDetails: { paymentHash: "hash-1" },
+        lightningFeeSats: BigInt(feeSats),
+      },
+    },
+    feePolicy: FEES_INCLUDED,
+  })
+
+  const onchainQuote = (mediumFeeSats: number, fastFeeSats = 800) => ({
+    paymentMethod: {
+      tag: "BitcoinAddress",
+      inner: {
+        feeQuote: {
+          speedFast: { userFeeSat: BigInt(fastFeeSats), l1BroadcastFeeSat: BigInt(0) },
+          speedMedium: {
+            userFeeSat: BigInt(mediumFeeSats),
+            l1BroadcastFeeSat: BigInt(0),
+          },
+          speedSlow: { userFeeSat: BigInt(100), l1BroadcastFeeSat: BigInt(0) },
+        },
+      },
+    },
+    feePolicy: FEES_INCLUDED,
+  })
+
+  const sendAll = () => ({
+    sdk: mockSdk,
+    paymentRequest: "lnbc1...",
+    amount: BigInt(100_000),
+    feePolicy: FEES_INCLUDED,
+    quoteRef: {},
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockSendPayment.mockResolvedValue({ payment: { id: "p1", status: 0 } })
+  })
+
+  /** Quotes review's fee, then sends against a fresh one. */
+  const sendAfterReview = async (reviewFee: number, sendFee: number) => {
+    const params = sendAll()
+    mockPrepareSendPayment.mockResolvedValueOnce(lightningQuote(reviewFee))
+    await createGetFee(params as never)()
+    mockPrepareSendPayment.mockResolvedValueOnce(lightningQuote(sendFee))
+    return createSendMutation(params as never, { telemetry })()
+  }
+
+  it.each([
+    ["up", 300],
+    ["down", 100],
+  ])("sends nothing when the fee moved %s by 100 sats", async (_, sendFee) => {
+    const result = await sendAfterReview(200, sendFee)
+
+    expect(result.status).toBe(PaymentSendResult.Failure)
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.QuoteMoved)
+    expect(mockSendPayment).not.toHaveBeenCalled()
+  })
+
+  it("sends when the fee moved by less than 100 sats", async () => {
+    const result = await sendAfterReview(200, 299)
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(mockSendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("checks only the priority it sends at on-chain", async () => {
+    const params = { ...sendAll(), paymentRequest: "bc1q..." }
+    mockPrepareSendPayment.mockResolvedValueOnce(onchainQuote(400))
+    await createGetFeeOnchain(params as never, "medium" as never)()
+
+    mockPrepareSendPayment.mockResolvedValueOnce(onchainQuote(450, 2_000))
+    const held = await createSendMutationOnchain(params as never, "medium" as never, {
+      telemetry: telemetryOnchain,
+    })()
+    mockPrepareSendPayment.mockResolvedValueOnce(onchainQuote(500))
+    const moved = await createSendMutationOnchain(params as never, "medium" as never, {
+      telemetry: telemetryOnchain,
+    })()
+
+    expect(held.status).toBe(PaymentSendResult.Success)
+    expect(moved.errors?.[0]?.message).toBe(SelfCustodialErrorCode.QuoteMoved)
+  })
+
+  it("has nothing to hold a fresh quote to when it names no fee", () => {
+    expect(() => assertSendAllQuoteHolds({ feeSats: 200 }, undefined)).not.toThrow()
+  })
+
+  it("never holds a plain send, whose fee is paid on top", async () => {
+    const plain = { ...sendAll(), feePolicy: undefined, quoteRef: undefined }
+    mockPrepareSendPayment.mockResolvedValueOnce({ ...lightningQuote(200), feePolicy: 0 })
+    await createGetFee(plain as never)()
+    mockPrepareSendPayment.mockResolvedValueOnce({ ...lightningQuote(900), feePolicy: 0 })
+
+    const result = await createSendMutation(plain as never, { telemetry })()
+
+    expect(result.status).toBe(PaymentSendResult.Success)
   })
 })

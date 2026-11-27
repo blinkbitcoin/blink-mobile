@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react-native"
+import { act, renderHook } from "@testing-library/react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { useReviewQuote } from "@app/screens/send-bitcoin-screen/review/use-review-quote"
@@ -6,10 +6,15 @@ import { FeeType } from "@app/screens/send-bitcoin-screen/use-fee"
 import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 
-const mockUseFee = jest.fn<FeeType, [unknown]>()
+const mockUseFee = jest.fn<FeeType, [unknown, number | undefined]>()
 jest.mock("@app/screens/send-bitcoin-screen/use-fee", () => ({
   __esModule: true,
-  default: (getFee: unknown) => mockUseFee(getFee),
+  default: (getFee: unknown, quoteRound?: number) => mockUseFee(getFee, quoteRound),
+}))
+
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
 
 const getFee = jest.fn()
@@ -44,7 +49,7 @@ describe("useReviewQuote", () => {
 
     const { fee } = run()
 
-    expect(mockUseFee).toHaveBeenCalledWith(getFee)
+    expect(mockUseFee).toHaveBeenCalledWith(getFee, 0)
     expect(fee).toEqual({ status: "loading" })
   })
 
@@ -100,5 +105,18 @@ describe("useReviewQuote", () => {
 
     mockUseFee.mockReturnValue({ status: "set", amount: toBtcMoneyAmount(5000) })
     expect(run().isFeeOverAmount).toBe(false)
+  })
+
+  /** blink-wip#2048 E4: a send-all whose quote moved since review sent nothing. */
+  it("quotes again on requote, with a toast asking the sender to look", () => {
+    mockUseFee.mockReturnValue({ status: "loading" })
+    const { result } = renderHook(() => useReviewQuote(detail(true)))
+
+    act(() => result.current.requote())
+
+    expect(mockUseFee).toHaveBeenLastCalledWith(getFee, 1)
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "warning" }),
+    )
   })
 })

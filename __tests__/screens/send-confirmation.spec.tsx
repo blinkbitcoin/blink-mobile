@@ -251,6 +251,11 @@ jest.mock("@app/screens/send-bitcoin-screen/use-send-payment", () => ({
   useSendPayment: () => mockUseSendPayment(),
 }))
 
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
+}))
+
 const mockUseFee = jest.fn()
 jest.mock("@app/screens/send-bitcoin-screen/use-fee", () => ({
   __esModule: true,
@@ -1926,6 +1931,74 @@ describe("SendBitcoinConfirmationScreen — haptics", () => {
 
     expect(haptics.error).toHaveBeenCalledTimes(1)
     expect(haptics.success).not.toHaveBeenCalled()
+  })
+})
+
+/** blink-wip#2048 E4: a send-all quoted again at the slide that moved since review sends
+ *  nothing; review quotes it again and a toast asks the sender to look. */
+describe("SendBitcoinConfirmationScreen — a send-all whose quote moved", () => {
+  const lnurlRoute = () =>
+    ({
+      key: "sendBitcoinConfirmationScreen",
+      name: "sendBitcoinConfirmation",
+      params: {
+        paymentDetail:
+          PaymentDetailsLightning.createLnurlPaymentDetails(defaultLightningParams),
+      },
+    }) as const
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    loadLocale("en")
+    mockUseSendPayment.mockReturnValue({
+      loading: false,
+      hasAttemptedSend: false,
+      sendPayment: sendPaymentMock,
+    })
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+    })
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 500000,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 10000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+  })
+
+  it("quotes it again with a toast, and opens no error sheet", async () => {
+    sendPaymentMock.mockResolvedValueOnce({
+      status: "FAILURE",
+      errorsMessage: "sc_quote_moved",
+    })
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={lnurlRoute()} />
+      </ContextForScreen>,
+    )
+    const roundsBefore = mockUseFee.mock.calls.map(([, round]) => round)
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(roundsBefore.every((round) => round === 0)).toBe(true)
+    expect(mockUseFee.mock.calls[mockUseFee.mock.calls.length - 1][1]).toBe(1)
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "warning" }),
+    )
+    const { message } = mockToastShow.mock.calls[0][0]
+    expect(message(i18nObject("en"))).toBe(
+      i18nObject("en").SendBitcoinConfirmationScreen.priceUpdated(),
+    )
+    expect(errorSheet()).toBeNull()
   })
 })
 

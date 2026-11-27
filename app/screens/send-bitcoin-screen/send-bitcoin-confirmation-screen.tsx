@@ -52,7 +52,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
-import { isAmountFixableError } from "./amount-fixable-error"
+import { isAmountFixableError, isQuoteMovedError } from "./amount-fixable-error"
 import { feeTierLabels, formatEta } from "./fee-tier-options"
 import { FeeTierOption } from "@app/types/fee-tiers"
 import {
@@ -170,7 +170,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const { copyToClipboard } = useClipboard()
   const tierLabels = feeTierLabels(LL)
 
-  const { fee, recipientAmount, isAwaitingIncludedFee, isFeeOverAmount } =
+  const { fee, recipientAmount, isAwaitingIncludedFee, isFeeOverAmount, requote } =
     useReviewQuote(paymentDetail)
 
   /** The receipt a landed payment opens from Sent, kept until the sender asks for it. */
@@ -461,6 +461,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         return
       }
 
+      if (isQuoteMovedError(errorsMessage)) {
+        requote()
+        return
+      }
+
       setFailedSend(extraInfo)
       setPaymentError(failureCopy(errorsMessage), errorsMessage)
     } catch (err) {
@@ -531,6 +536,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     verifyPaymentSettled,
     failureCopy,
     errorMsgActionFor,
+    requote,
   ])
 
   let validAmount = true

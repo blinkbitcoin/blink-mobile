@@ -86,6 +86,7 @@ export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurre
         }
       : undefined,
     feePolicy,
+    quoteRef: isSendingMax ? {} : undefined,
   }
 
   /** An invoice with an amount fixes it: there is no other amount to tell a send by. */

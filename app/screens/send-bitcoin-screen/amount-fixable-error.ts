@@ -11,3 +11,8 @@ const AMOUNT_ERROR_CODES: ReadonlySet<string> = new Set([
  *  that builds a new payment. */
 export const isAmountFixableError = (raw: string | undefined): boolean =>
   raw !== undefined && AMOUNT_ERROR_CODES.has(raw)
+
+/** True when a send-all stopped because its quote moved since review: nothing was sent,
+ *  and review quotes it again rather than show a failure (blink-wip#2048 E4). */
+export const isQuoteMovedError = (raw: string | undefined): boolean =>
+  raw === SelfCustodialErrorCode.QuoteMoved

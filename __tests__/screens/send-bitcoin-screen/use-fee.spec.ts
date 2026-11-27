@@ -85,6 +85,26 @@ describe("useFee", () => {
     expect(result.current.amount?.amount).toBe(42)
   })
 
+  it("asks for a fresh quote each time the quote round changes", async () => {
+    const getFee = jest.fn().mockResolvedValue({ amount: toBtcMoneyAmount(42) })
+
+    const { result, rerender } = renderHook(
+      ({ round }: { round: number }) => useFee(getFee, round),
+      { initialProps: { round: 0 } },
+    )
+    await waitFor(() => {
+      expect(result.current.status).toBe("set")
+    })
+
+    getFee.mockResolvedValue({ amount: toBtcMoneyAmount(60) })
+    rerender({ round: 1 })
+
+    await waitFor(() => {
+      expect(result.current.amount?.amount).toBe(60)
+    })
+    expect(getFee).toHaveBeenCalledTimes(2)
+  })
+
   // The classified code is the whole point of the plumbing: the confirmation screen reads
   // it off this state to name the cause instead of showing its generic dead-end string.
   it("threads the errors from a failed quote into the error state", async () => {

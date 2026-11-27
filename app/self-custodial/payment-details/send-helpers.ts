@@ -6,6 +6,7 @@ import {
   type BreezSdkInterface,
   type ConversionOptions,
   type Payment,
+  type PrepareSendPaymentResponse,
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
@@ -54,7 +55,7 @@ import {
   type ScRail,
   type SettlementTelemetry,
 } from "../measurement"
-import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
+import { classifySdkError, QuoteMovedError, SelfCustodialErrorCode } from "../sdk-error"
 
 import {
   grantSendAnyway,
@@ -87,6 +88,36 @@ type PrepareParams = {
   tokenIdentifier?: string
   conversionOptions?: ConversionOptions
   feePolicy?: FeePolicy
+  /** A send-all's quote on review, which its send checks before it goes out. */
+  quoteRef?: SendAllQuoteRef
+}
+
+/** The fee review quoted a send-all on, in sats. */
+export type SendAllQuoteRef = { feeSats?: number }
+
+/** Ruled 2026-11-07 (blink-wip#2048 E4): a send-all is prepared again at the slide, and
+ *  when what arrives moved this much since review, nothing is sent and review quotes it
+ *  again. With the fee taken out of a fixed amount, what arrives moves by the fee. */
+const SEND_ALL_MOVED_SATS = 100
+
+/** Records the fee a send-all was quoted on, for its send to check against. */
+export const recordSendAllQuote = (
+  quoteRef: SendAllQuoteRef | undefined,
+  feeSats: number | undefined,
+) => {
+  if (quoteRef) quoteRef.feeSats = feeSats
+}
+
+/** Stops a send-all whose fresh fee moved what arrives by the ruled margin since review.
+ *  One sent with no quote on record has nothing to compare: review quotes first. */
+export const assertSendAllQuoteHolds = (
+  quoteRef: SendAllQuoteRef | undefined,
+  freshFeeSats: number | undefined,
+) => {
+  const quoted = quoteRef?.feeSats
+  if (quoted === undefined) return
+  if (freshFeeSats === undefined) return
+  if (Math.abs(freshFeeSats - quoted) >= SEND_ALL_MOVED_SATS) throw new QuoteMovedError()
 }
 
 /**
@@ -191,6 +222,7 @@ export const createGetFee = <T extends WalletCurrency>(
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
       assertFeePolicyApplied(params.feePolicy, prepared)
       const feeSats = extractLightningFee(prepared) ?? 0
+      recordSendAllQuote(params.quoteRef, feeSats)
       const amountAdjustment = mapAmountAdjustment(
         prepared.conversionEstimate?.amountAdjustment,
       )
@@ -217,6 +249,7 @@ export const createGetFeeOnchain = <T extends WalletCurrency>(
         )
       }
 
+      recordSendAllQuote(params.quoteRef, fees[feeTier])
       return { amount: asGetFeeAmount<T>(fees[feeTier]) }
     } catch (err) {
       return feeFailure<T>("Self-custodial onchain fee", err)
@@ -228,11 +261,17 @@ const reportSendFailure = (
   scope: string,
   err: unknown,
 ): { __typename: "GraphQLApplicationError"; message: string } => {
-  reportError(scope, err)
+  // A moved quote is the rule working, not a failure to report.
+  if (!(err instanceof QuoteMovedError)) reportError(scope, err)
   return { __typename: "GraphQLApplicationError", message: classifySdkError(err) }
 }
 
-type SendRail = { scope: string; confirmationSpeed?: OnchainConfirmationSpeed }
+type SendRail = {
+  scope: string
+  confirmationSpeed?: OnchainConfirmationSpeed
+  /** The fee a fresh quote carries on this rail, for a send-all to check against review. */
+  feeOf: (prepared: PrepareSendPaymentResponse) => number | undefined
+}
 
 /**
  * How a send mutation reports itself, and the payment detail's key ref: the send hook
@@ -265,7 +304,7 @@ export const requestedAsOf = (
 const runSendMutation = (
   params: PrepareParams,
   { telemetry, idempotencyKeyRef = {}, requestedAs }: SendMutationOptions,
-  { scope, confirmationSpeed }: SendRail,
+  { scope, confirmationSpeed, feeOf }: SendRail,
 ): ReturnType<SendPaymentMutation> =>
   runSelfCustodialSend({
     sdk: params.sdk,
@@ -279,6 +318,7 @@ const runSendMutation = (
     prepare: async () => {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
       assertFeePolicyApplied(params.feePolicy, prepared)
+      if (params.quoteRef) assertSendAllQuoteHolds(params.quoteRef, feeOf(prepared))
       return prepared
     },
     identify: identifyPreparedSend,
@@ -303,7 +343,10 @@ export const createSendMutation = (
   options: SendMutationOptions,
 ): SendPaymentMutation => {
   return () =>
-    runSendMutation(params, options, { scope: "Self-custodial Lightning send" })
+    runSendMutation(params, options, {
+      scope: "Self-custodial Lightning send",
+      feeOf: (prepared) => extractLightningFee(prepared) ?? 0,
+    })
 }
 
 export const createSendMutationOnchain = (
@@ -315,6 +358,7 @@ export const createSendMutationOnchain = (
     runSendMutation(params, options, {
       scope: "Self-custodial onchain send",
       confirmationSpeed: TIER_TO_SPEED[feeTier],
+      feeOf: (prepared) => extractOnchainFees(prepared)?.[feeTier],
     })
 }
 
