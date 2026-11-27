@@ -46,26 +46,30 @@ a Convert percent chip, and nothing should buzz; set it back to `1` and it ticks
 that most phones can't render. Only the duration-based types carry, so the touch intents
 use those.
 
-`tap`, `grab`, `reject` and `commit` have no caller on `main` yet. They are reserved for
-the keypad, slide-to-send and inline-refusal work that builds on this helper.
+`error` and `reject` for an error on screen go through `useErrorHaptic`
+(`app/hooks/use-error-haptic.ts`), which fires once per error as it appears.
 
 ---
 
 ## 2. Where each intent fires today
 
-| Intent    | Call site                                                                                                        | When                                                                                  |
-| --------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `select`  | `app/components/percentage-selector/percentage-selector.tsx`                                                     | A Convert percent chip is pressed (never a locked or disabled one)                    |
-| `select`  | `app/components/receive-amount-row/receive-amount-row.tsx`                                                       | The Receive wallet toggle switches wallet                                             |
-| `select`  | `app/screens/conversion-flow/conversion-details-screen.tsx` (`toggleInputs`)                                     | Convert's from/to swap, unless the screen is locked                                   |
-| `select`  | `app/components/amount-input-screen/amount-input-screen-ui.tsx`                                                  | The amount modal's currency toggle, when there is one                                 |
-| `select`  | `app/hooks/use-clipboard.ts` (`copyToClipboard`)                                                                 | Every copy that shows the "copied" toast, tapped or long-pressed                      |
-| `select`  | `app/screens/receive-bitcoin-screen/hooks/use-payment-actions.ts`                                                | Receive's copy action                                                                 |
-| `success` | `app/screens/receive-bitcoin-screen/hooks/use-invoice-lifecycle.ts`                                              | The shown invoice is paid                                                             |
-| `success` | `app/hooks/use-intra-ledger-conversion.ts`, `app/screens/conversion-flow/hooks/self-custodial/use-conversion.ts` | A conversion succeeds                                                                 |
-| `error`   | the same two conversion hooks                                                                                    | A conversion fails, throws or has no quote                                            |
-| `success` | `app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen.tsx`                                           | A send completes (`SUCCESS` or `PENDING`)                                             |
-| `error`   | the same screen                                                                                                  | Already paid, a failed status, or a repeat attempt that can't be confirmed as settled |
+| Intent             | Call site                                                                                                        | When                                                                     |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `select`           | `app/components/percentage-selector/percentage-selector.tsx`                                                     | A Convert percent chip is pressed (never a locked or disabled one)       |
+| `select`           | `app/components/receive-amount-row/receive-amount-row.tsx`                                                       | The Receive wallet toggle switches wallet                                |
+| `select`           | `app/screens/conversion-flow/conversion-details-screen.tsx` (`toggleInputs`)                                     | Convert's from/to swap, unless the screen is locked                      |
+| `select`           | `app/components/amount-input-screen/amount-input-screen-ui.tsx`                                                  | The amount modal's currency toggle, when there is one                    |
+| `select`           | `app/hooks/use-clipboard.ts` (`copyToClipboard`)                                                                 | Every copy that shows the "copied" toast, tapped or long-pressed         |
+| `select`           | `app/screens/receive-bitcoin-screen/hooks/use-payment-actions.ts`                                                | Receive's copy action                                                    |
+| `success`          | `app/screens/receive-bitcoin-screen/hooks/use-invoice-lifecycle.ts`                                              | The shown invoice is paid                                                |
+| `success`          | `app/hooks/use-intra-ledger-conversion.ts`, `app/screens/conversion-flow/hooks/self-custodial/use-conversion.ts` | A conversion succeeds                                                    |
+| `error`            | the same two conversion hooks                                                                                    | A conversion fails, throws or has no quote                               |
+| `success`          | `app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen.tsx`                                           | A send lands (`SUCCESS`; `PENDING` stays silent)                         |
+| `error`            | `app/components/error-msg-bottom-sheet/error-msg-bottom-sheet.tsx` (`useErrorHaptic`)                            | A send error sheet opens                                                 |
+| `error` / `reject` | `useErrorHaptic` in the send destination, amount and review hooks                                                | An inline send error appears; `reject` when the sender fixes it in place |
+| `tap`              | `app/components/currency-keyboard/currency-keyboard.tsx`                                                         | Every accepted keypad press                                              |
+| `grab`             | `app/components/atomic/galoy-slider-button/galoy-slider-button.tsx`                                              | A finger lands on the slide-to-send handle                               |
+| `commit`           | the same slider                                                                                                  | The slide commits the send                                               |
 
 A copy fires once: between the clipboard write and the toast, and not again when the
 clipboard auto-clears. Every press of an enabled control ticks, re-selecting the current

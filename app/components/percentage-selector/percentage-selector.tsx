@@ -2,8 +2,8 @@ import React, { useMemo } from "react"
 import { StyleProp, View, ViewStyle } from "react-native"
 import { makeStyles } from "@rn-vui/themed"
 
-import { Chip } from "@app/components/atomic/chip"
 import { haptics } from "@app/utils/haptics"
+import { Chip } from "@app/components/atomic/chip"
 
 export const PERCENTAGE_OPTIONS = [25, 50, 75, 100] as const
 const DEFAULT_TEST_ID_PREFIX = "convert"
