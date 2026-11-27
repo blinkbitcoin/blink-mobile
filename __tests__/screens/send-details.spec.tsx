@@ -1024,9 +1024,10 @@ describe("onchain fee tier gating", () => {
 
   /**
    * The high-fee warning is judged by the fee the selector quoted, so leaving before the
-   * quote lands would leave without the warning.
+   * quote lands would leave without the warning. The hold shows as Next's spinner, since a
+   * quote can take seconds and a dimmed Next said nothing about why.
    */
-  it("holds Next while the custodial quote is still out", async () => {
+  it("holds Next on its spinner while the custodial quote is still out", async () => {
     loadLocale("en")
     const LL = i18nObject("en")
     mockQuoteFees.mockResolvedValue(failedQuote)
@@ -1041,15 +1042,17 @@ describe("onchain fee tier gating", () => {
     fireEvent.press(screen.getByTestId("Key 1"))
 
     // Asserted before flushing: the quote goes out on this render and nothing is back yet.
-    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
-      true,
-    )
+    const next = screen.getByTestId(LL.common.next())
+    expect(next.props.accessibilityState?.busy).toBe(true)
+    mockNavigate.mockClear()
+    fireEvent.press(next)
+    expect(mockNavigate).not.toHaveBeenCalled()
 
     await waitFor(() => {
       expect(screen.getByText(LL.common.feeError())).toBeTruthy()
     })
-    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
-      false,
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState).toEqual(
+      expect.objectContaining({ busy: false, disabled: false }),
     )
   })
 
