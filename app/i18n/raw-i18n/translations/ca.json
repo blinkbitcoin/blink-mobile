@@ -3130,6 +3130,7 @@
     "downloadLogs": "Baixa els logs",
     "exportLogsTitle": "Comparteix els logs de la cartera",
     "exportLogsBody": "Aquest fitxer ajuda l'assistència a investigar problemes amb les teves carteres. Inclou l'historial de pagaments (imports, factures i adreces) i els identificadors de cada cartera no custodiada d'aquest dispositiu, no només d'aquesta, però mai les frases de còpia de seguretat ni les claus. Comparteix-lo només amb la nostra assistència.",
+    "exportLogsAnalyticsIdNote": "Aquest fitxer inclou l'ID d'analítica d'aquesta instal·lació, perquè l'equip de suport pugui veure'n els esdeveniments de l'app.",
     "exportLogsConfirm": "Comparteix els logs",
     "noLogsYet": "Encara no hi ha logs per compartir. Obre la cartera i torna-ho a provar.",
     "exportLogsError": "No s'han pogut exportar els logs. Torna-ho a provar."

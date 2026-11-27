@@ -1,5 +1,8 @@
+import AsyncStorage from "@react-native-async-storage/async-storage"
+
 import {
   getTelemetryInstanceId,
+  peekTelemetryInstanceId,
   resetTelemetryInstanceIdCache,
 } from "@app/self-custodial/telemetry-instance-id"
 
@@ -59,5 +62,32 @@ describe("getTelemetryInstanceId", () => {
 
     await expect(getTelemetryInstanceId()).rejects.toThrow("busy")
     await expect(getTelemetryInstanceId()).resolves.toMatch(/^[0-9a-f-]{36}$/)
+  })
+})
+
+describe("peekTelemetryInstanceId", () => {
+  beforeEach(() => {
+    store.clear()
+    resetTelemetryInstanceIdCache()
+    jest.clearAllMocks()
+  })
+
+  it("returns the id this install already reports under", async () => {
+    const minted = await getTelemetryInstanceId()
+
+    await expect(peekTelemetryInstanceId()).resolves.toBe(minted)
+  })
+
+  it("never mints one: an install without an id stays without one", async () => {
+    await expect(peekTelemetryInstanceId()).resolves.toBeNull()
+
+    expect(AsyncStorage.setItem).not.toHaveBeenCalled()
+    expect(store.size).toBe(0)
+  })
+
+  it("is null when storage cannot be read", async () => {
+    jest.mocked(AsyncStorage.getItem).mockRejectedValueOnce(new Error("unreadable"))
+
+    await expect(peekTelemetryInstanceId()).resolves.toBeNull()
   })
 })

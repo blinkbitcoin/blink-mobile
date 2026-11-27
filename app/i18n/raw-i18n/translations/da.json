@@ -3130,6 +3130,7 @@
     "downloadLogs": "Download logfiler",
     "exportLogsTitle": "Del logfilerne fra din tegnebog",
     "exportLogsBody": "Denne fil hjælper vores supportteam med at undersøge problemer med dine tegnebøger. Den indeholder betalingshistorikken (beløb, fakturaer og adresser) og tegnebogs-id'er for alle ikke-depottegnebøger på denne enhed, ikke kun denne, men aldrig dine gendannelsesfraser eller nøgler. Del den kun med vores supportteam.",
+    "exportLogsAnalyticsIdNote": "Denne fil indeholder denne installations analyse-ID, så support kan se dens app-hændelser.",
     "exportLogsConfirm": "Del logfiler",
     "noLogsYet": "Der er endnu ingen logfiler at dele. Åbn din tegnebog, og prøv igen.",
     "exportLogsError": "Kunne ikke eksportere dine logfiler. Prøv igen."

@@ -1,5 +1,7 @@
 import { renderHook, act } from "@testing-library/react-native"
+import { it } from "@jest/globals"
 import { Network } from "@breeztech/breez-sdk-spark-react-native"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 import {
   ExportLogsOutcome,
@@ -38,8 +40,13 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
   useSparkNetwork: () => Network.Mainnet,
 }))
 
+/** The active wallet is "a"; each wallet's stored mode is looked up by its id. */
+const mockModes: Record<string, AccountMode | null> = {}
 jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
-  useSelfCustodialAccountMode: () => ({ accountMode: AccountMode.Anon }),
+  useSelfCustodialAccountMode: () => ({
+    accountMode: mockModes.a ?? null,
+    getModeFor: (id: string) => mockModes[id] ?? null,
+  }),
 }))
 
 jest.mock("@app/hooks/use-account-registry", () => ({
@@ -52,6 +59,18 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   }),
 }))
 
+/** The real per-install id module over an in-memory store, so a mint would show. */
+const mockStore = new Map<string, string>()
+jest.mock("@react-native-async-storage/async-storage", () => ({
+  getItem: jest.fn((key: string) => Promise.resolve(mockStore.get(key) ?? null)),
+  setItem: jest.fn((key: string, value: string) => {
+    mockStore.set(key, value)
+    return Promise.resolve()
+  }),
+}))
+
+const INSTALL_ID = "3f1c2a9e-7b4d-4e58-9a61-0c2d8e5b7f10"
+
 const PATH = "/caches/breez-sdk-log-exports/blink-wallet-logs-20261028-0905.txt"
 
 describe("useExportSdkLogs", () => {
@@ -59,6 +78,70 @@ describe("useExportSdkLogs", () => {
     jest.clearAllMocks()
     mockExportSdkLogs.mockResolvedValue(PATH)
     mockShareTextFile.mockResolvedValue(true)
+    mockStore.clear()
+    mockModes.a = AccountMode.Anon
+    mockModes.b = AccountMode.Anon
+  })
+
+  const exportedHeader = async (): Promise<string> => {
+    const { result } = renderHook(() => useExportSdkLogs())
+    await act(async () => {
+      await result.current.exportLogs()
+    })
+    return mockExportSdkLogs.mock.calls[0][0]
+  }
+
+  describe("the analytics id (KB-26)", () => {
+    it("is in the header when every wallet on the device is Enhanced", async () => {
+      mockStore.set("telemetryInstanceId", INSTALL_ID)
+      mockModes.a = AccountMode.Enhanced
+      mockModes.b = AccountMode.Enhanced
+
+      const header = await exportedHeader()
+
+      expect(header).toContain("Account mode: enhanced")
+      expect(header).toContain(`Analytics ID: ${INSTALL_ID}`)
+    })
+
+    it("is said on the disclosure exactly when it is in the file", () => {
+      mockModes.a = AccountMode.Enhanced
+      mockModes.b = AccountMode.Enhanced
+      const { result, rerender } = renderHook(() => useExportSdkLogs())
+      expect(result.current.includesAnalyticsId).toBe(true)
+
+      mockModes.b = AccountMode.Anon
+      rerender({})
+
+      expect(result.current.includesAnalyticsId).toBe(false)
+    })
+
+    it.each([
+      ["Incognito", AccountMode.Anon, AccountMode.Anon],
+      ["no mode chosen yet", null, null],
+      ["Enhanced beside an Incognito wallet", AccountMode.Enhanced, AccountMode.Anon],
+      ["Enhanced beside a wallet with no mode", AccountMode.Enhanced, null],
+    ])("is absent for %s", async (_label, activeMode, otherMode) => {
+      mockStore.set("telemetryInstanceId", INSTALL_ID)
+      mockModes.a = activeMode
+      mockModes.b = otherMode
+
+      const header = await exportedHeader()
+
+      expect(header).toContain("Network: mainnet")
+      expect(header).not.toContain("Analytics ID")
+      expect(header).not.toContain(INSTALL_ID)
+    })
+
+    it("is never minted by an export", async () => {
+      mockModes.a = AccountMode.Enhanced
+      mockModes.b = AccountMode.Enhanced
+
+      const header = await exportedHeader()
+
+      expect(header).toContain("Account mode: enhanced")
+      expect(header).not.toContain("Analytics ID")
+      expect(AsyncStorage.setItem).not.toHaveBeenCalled()
+    })
   })
 
   it("builds the export with an identifier-free header and shares it", async () => {

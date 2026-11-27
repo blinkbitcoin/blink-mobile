@@ -10,6 +10,12 @@ import analytics from "@react-native-firebase/analytics"
 import { AccountMode } from "@app/types/account"
 
 import {
+  amountBucketForPayment,
+  type BandablePayment,
+  type BandingPrice,
+  type ScAmountBucket,
+} from "./amount-bucket"
+import {
   isEnhancedIdentityApplied,
   onEnhancedIdentityApplied,
 } from "./analytics-identity"
@@ -73,12 +79,16 @@ export const ScEvent = {
   SwapCompleted: "sc_swap_completed",
   SwapFailed: "sc_swap_failed",
   BlinkPaymentSent: "sc_blink_payment_sent",
+  /** Once per Enhanced session, when the region verdict has settled; never a country
+   *  (`region-check-outcome.ts`). */
+  RegionChecked: "sc_region_checked",
 } as const
 
 export type ScEvent = (typeof ScEvent)[keyof typeof ScEvent]
 
 /** Closed enums and booleans only: never amounts, balances, pubkeys, invoices,
- *  destinations, or free text. */
+ *  destinations, or free text. A payment's size travels only as `amount_bucket`, one of
+ *  the four values in `amount-bucket.ts`, on a settled send and a received payment. */
 export type ScEventParams = Record<string, string | number | boolean>
 
 type MeasurementContext = {
@@ -336,11 +346,31 @@ export type SettlementTelemetry = {
 
 type TerminalStatus = PaymentStatus.Completed | PaymentStatus.Failed
 
+/** What prices a dollar payment's band. Refreshed by TelemetryContextMount from the fiat
+ *  feed, so the band can be read from non-React code at the moment a payment settles. */
+const NO_BANDING_PRICE: BandingPrice = { usdPerBtc: undefined, usdTokenIdentifier: null }
+let bandingPrice: BandingPrice = NO_BANDING_PRICE
+
+export const setBandingPrice = (next: BandingPrice): void => {
+  bandingPrice = next
+}
+
+export const resetBandingPrice = (): void => {
+  bandingPrice = NO_BANDING_PRICE
+}
+
+const amountBucketOf = (payment: BandablePayment): ScAmountBucket | null =>
+  amountBucketForPayment(payment, bandingPrice)
+
+/** How a payment ended, and its band, taken while the payment is in hand: the outcome
+ *  may be reported later, from a call that only knows the payment's id. */
+type ObservedOutcome = { status: TerminalStatus; bucket: ScAmountBucket | null }
+
 /** Bounded like the dedupe set; a payment that never resolves (an app killed mid-send,
  *  an SDK that suppresses its event) is dropped, never counted. */
 const SETTLEMENT_TRACK_CAP = 200
 const awaitingOutcome = new Map<string, SettlementTelemetry>()
-const observedOutcomes = new Map<string, TerminalStatus>()
+const observedOutcomes = new Map<string, ObservedOutcome>()
 
 const remember = <V>(map: Map<string, V>, key: string, value: V) => {
   if (map.size >= SETTLEMENT_TRACK_CAP) {
@@ -350,14 +380,28 @@ const remember = <V>(map: Map<string, V>, key: string, value: V) => {
   map.set(key, value)
 }
 
+/** Only a send's settle carries the band (KB-25): not its failure, not a swap, and not
+ *  the referral event that rides on the same settle. */
+const withAmountBucket = (
+  { event, params }: MeasuredEvent,
+  bucket: ScAmountBucket | null,
+): ScEventParams | undefined =>
+  event === ScEvent.PaymentSendSettled && bucket !== null
+    ? { ...params, amount_bucket: bucket }
+    : params
+
 const emitOutcome = (
   paymentId: string,
-  status: TerminalStatus,
+  { status, bucket }: ObservedOutcome,
   telemetry: SettlementTelemetry,
 ) => {
   if (status === PaymentStatus.Completed) {
-    telemetry.settled.forEach(({ event, params }) =>
-      measureOnce(`${paymentId}:${event}`, event, params),
+    telemetry.settled.forEach((settled) =>
+      measureOnce(
+        `${paymentId}:${settled.event}`,
+        settled.event,
+        withAmountBucket(settled, bucket),
+      ),
     )
     return
   }
@@ -376,7 +420,7 @@ const emitOutcome = (
  * That event can also beat the call's return, so an outcome seen first is kept too.
  */
 export const measureSettlement = (
-  payment: Pick<Payment, "id" | "status"> | undefined,
+  payment: (Pick<Payment, "id" | "status"> & BandablePayment) | undefined,
   telemetry: SettlementTelemetry,
   startedIn: number,
 ): void => {
@@ -388,13 +432,22 @@ export const measureSettlement = (
    *  can never be reported later under the context that followed. */
   if (startedIn !== generation || context.mode !== AccountMode.Enhanced) return
   if (payment.status !== PaymentStatus.Pending) {
-    emitOutcome(payment.id, payment.status, telemetry)
+    emitOutcome(
+      payment.id,
+      { status: payment.status, bucket: amountBucketOf(payment) },
+      telemetry,
+    )
     return
   }
   const observed = observedOutcomes.get(payment.id)
   if (observed !== undefined) {
     observedOutcomes.delete(payment.id)
-    emitOutcome(payment.id, observed, telemetry)
+    /** Either copy of the payment may be the one that carries its amount. */
+    emitOutcome(
+      payment.id,
+      { status: observed.status, bucket: observed.bucket ?? amountBucketOf(payment) },
+      telemetry,
+    )
     return
   }
   remember(awaitingOutcome, payment.id, telemetry)
@@ -413,17 +466,24 @@ export const measureObservedPayment = (payment: Payment): void => {
   if (paymentType === PaymentType.Receive) {
     if (status !== PaymentStatus.Completed) return
     const rail = scRailForPaymentMethod(payment.method)
-    if (rail) measureOnce(id, ScEvent.PaymentReceived, { rail })
+    if (!rail) return
+    const bucket = amountBucketOf(payment)
+    measureOnce(
+      id,
+      ScEvent.PaymentReceived,
+      bucket === null ? { rail } : { rail, amount_bucket: bucket },
+    )
     return
   }
 
+  const outcome: ObservedOutcome = { status, bucket: amountBucketOf(payment) }
   const awaiting = awaitingOutcome.get(id)
   if (awaiting) {
     awaitingOutcome.delete(id)
-    emitOutcome(id, status, awaiting)
+    emitOutcome(id, outcome, awaiting)
     return
   }
-  remember(observedOutcomes, id, status)
+  remember(observedOutcomes, id, outcome)
 }
 
 export const resetSettlementTracking = (): void => {

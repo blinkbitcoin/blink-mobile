@@ -3130,6 +3130,7 @@
     "downloadLogs": "Günlükleri indir",
     "exportLogsTitle": "Cüzdan günlüklerinizi paylaşın",
     "exportLogsBody": "Bu dosya, destek ekibimizin cüzdanlarınızdaki sorunları incelemesine yardımcı olur. Bu cihazdaki her saklamasız cüzdanın (yalnızca bu değil) ödeme geçmişini (tutarlar, faturalar ve adresler) ve cüzdan tanımlayıcılarını içerir; yedekleme ifadelerinizi veya anahtarlarınızı asla içermez. Yalnızca destek ekibimizle paylaşın.",
+    "exportLogsAnalyticsIdNote": "Bu dosya, destek ekibinin uygulama olaylarını görebilmesi için bu kurulumun analiz kimliğini içerir.",
     "exportLogsConfirm": "Günlükleri paylaş",
     "noLogsYet": "Henüz paylaşılacak günlük yok. Cüzdanınızı açıp yeniden deneyin.",
     "exportLogsError": "Günlükler dışa aktarılamadı. Lütfen yeniden deneyin."

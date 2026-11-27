@@ -3130,6 +3130,7 @@
     "downloadLogs": "Tải nhật ký xuống",
     "exportLogsTitle": "Chia sẻ nhật ký ví của bạn",
     "exportLogsBody": "Tệp này giúp bộ phận hỗ trợ xem xét sự cố với ví của bạn. Tệp gồm lịch sử thanh toán (số tiền, hóa đơn và địa chỉ) và mã định danh của mọi ví không lưu ký trên thiết bị này, không chỉ ví này, nhưng không bao giờ gồm cụm từ sao lưu hay khóa. Chỉ chia sẻ với bộ phận hỗ trợ của chúng tôi.",
+    "exportLogsAnalyticsIdNote": "Tệp này bao gồm ID phân tích của bản cài đặt này, để bộ phận hỗ trợ có thể xem các sự kiện ứng dụng của nó.",
     "exportLogsConfirm": "Chia sẻ nhật ký",
     "noLogsYet": "Chưa có nhật ký để chia sẻ. Mở ví và thử lại.",
     "exportLogsError": "Không xuất được nhật ký. Vui lòng thử lại."

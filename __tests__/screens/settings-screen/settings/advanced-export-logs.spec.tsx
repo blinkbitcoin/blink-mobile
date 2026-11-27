@@ -33,9 +33,14 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
 
 const mockExportLogs = jest.fn()
 let mockLoading = false
+let mockIncludesAnalyticsId = false
 jest.mock("@app/self-custodial/hooks/use-export-sdk-logs", () => ({
   ...jest.requireActual("@app/self-custodial/hooks/use-export-sdk-logs"),
-  useExportSdkLogs: () => ({ exportLogs: mockExportLogs, loading: mockLoading }),
+  useExportSdkLogs: () => ({
+    exportLogs: mockExportLogs,
+    loading: mockLoading,
+    includesAnalyticsId: mockIncludesAnalyticsId,
+  }),
 }))
 
 const mockToastShow = jest.fn()
@@ -54,6 +59,7 @@ const LL = {
     downloadLogs: () => "Download logs",
     exportLogsTitle: () => "Share your wallet logs",
     exportLogsBody: () => "This file helps our support team",
+    exportLogsAnalyticsIdNote: () => "This file includes this install's analytics ID",
     exportLogsConfirm: () => "Share logs",
     noLogsYet: () => "There are no logs to share yet.",
     exportLogsError: () => "Couldn't export your logs.",
@@ -84,6 +90,7 @@ describe("ExportLogsSetting", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockLoading = false
+    mockIncludesAnalyticsId = false
     mockUseAccountRegistry.mockReturnValue({ activeAccount: selfCustodial })
     mockExportLogs.mockResolvedValue(ExportLogsOutcome.Shared)
   })
@@ -109,6 +116,34 @@ describe("ExportLogsSetting", () => {
     await call(mockSettingsRow, "action")
 
     expect(lastProps(mockCustomModal).isVisible).toBe(true)
+  })
+
+  describe("the analytics id line", () => {
+    const disclosureBody = () =>
+      render(lastProps(mockCustomModal).body as React.ReactElement)
+
+    it("is on the disclosure when the file will carry the id", () => {
+      mockIncludesAnalyticsId = true
+      render(<ExportLogsSetting />)
+
+      const body = disclosureBody()
+
+      expect(body.getByText("This file helps our support team")).toBeTruthy()
+      expect(
+        body.getByText("This file includes this install's analytics ID"),
+      ).toBeTruthy()
+    })
+
+    it("is not on the disclosure when the file will not carry it", () => {
+      render(<ExportLogsSetting />)
+
+      const body = disclosureBody()
+
+      expect(body.getByText("This file helps our support team")).toBeTruthy()
+      expect(
+        body.queryByText("This file includes this install's analytics ID"),
+      ).toBeNull()
+    })
   })
 
   it("spins while the export file is being built", () => {

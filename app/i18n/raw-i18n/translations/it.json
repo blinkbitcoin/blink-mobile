@@ -3130,6 +3130,7 @@
         "downloadLogs": "Scarica i log",
         "exportLogsTitle": "Condividi i log del portafoglio",
         "exportLogsBody": "Questo file aiuta la nostra assistenza a esaminare i problemi dei tuoi portafogli. Include la cronologia dei pagamenti (importi, fatture e indirizzi) e gli identificatori di ogni portafoglio non custodiale su questo dispositivo, non solo di questo, ma mai le frasi di recupero o le chiavi. Condividilo solo con la nostra assistenza.",
+        "exportLogsAnalyticsIdNote": "Questo file include l'ID di analisi di questa installazione, così l'assistenza può vederne gli eventi dell'app.",
         "exportLogsConfirm": "Condividi i log",
         "noLogsYet": "Non ci sono ancora log da condividere. Apri il portafoglio e riprova.",
         "exportLogsError": "Impossibile esportare i log. Riprova."

@@ -3130,6 +3130,7 @@
     "downloadLogs": "Muat turun log",
     "exportLogsTitle": "Kongsi log dompet anda",
     "exportLogsBody": "Fail ini membantu pasukan sokongan kami menyiasat masalah dompet anda. Ia mengandungi sejarah pembayaran (jumlah, invois dan alamat) serta pengecam setiap dompet bukan kustodial pada peranti ini, bukan hanya yang ini, tetapi tidak pernah frasa sandaran atau kunci anda. Kongsikan hanya dengan pasukan sokongan kami.",
+    "exportLogsAnalyticsIdNote": "Fail ini mengandungi ID analitik pemasangan ini, supaya sokongan dapat melihat peristiwa aplikasinya.",
     "exportLogsConfirm": "Kongsi log",
     "noLogsYet": "Belum ada log untuk dikongsi. Buka dompet anda dan cuba lagi.",
     "exportLogsError": "Tidak dapat mengeksport log. Sila cuba lagi."

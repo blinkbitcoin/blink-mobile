@@ -3130,6 +3130,7 @@
     "downloadLogs": "Stáhnout logy",
     "exportLogsTitle": "Sdílet logy peněženky",
     "exportLogsBody": "Tento soubor pomáhá našemu týmu podpory prozkoumat problémy s vašimi peněženkami. Obsahuje historii plateb (částky, faktury a adresy) a identifikátory každé non-custodial peněženky v tomto zařízení, nejen této, ale nikdy vaše záložní fráze ani klíče. Sdílejte ho jen s naším týmem podpory.",
+    "exportLogsAnalyticsIdNote": "Tento soubor obsahuje analytické ID této instalace, aby podpora viděla její události v aplikaci.",
     "exportLogsConfirm": "Sdílet logy",
     "noLogsYet": "Zatím nejsou žádné logy ke sdílení. Otevřete peněženku a zkuste to znovu.",
     "exportLogsError": "Logy se nepodařilo exportovat. Zkuste to prosím znovu."

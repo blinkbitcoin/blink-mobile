@@ -27,6 +27,11 @@ const findUsableRate = (rates: readonly FiatRate[], coin: string): number | unde
   return match.value
 }
 
+/** The price of one whole BTC in whole US dollars, or undefined when the feed has no
+ *  usable USD entry. */
+export const usdPerBtcFrom = (rates: readonly FiatRate[]): number | undefined =>
+  findUsableRate(rates, USD)
+
 /**
  * Undefined when the feed cannot price this display currency, which the caller must
  * treat as "no price" rather than as zero: every amount derived from a missing rate

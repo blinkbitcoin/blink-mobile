@@ -3130,6 +3130,7 @@
         "downloadLogs": "Baixar logs",
         "exportLogsTitle": "Compartilhar os logs da sua carteira",
         "exportLogsBody": "Este arquivo ajuda nossa equipe de suporte a investigar problemas nas suas carteiras. Ele inclui o histórico de pagamentos (valores, faturas e endereços) e os identificadores de cada carteira não custodial neste dispositivo, não só desta, mas nunca suas frases de recuperação ou chaves. Compartilhe apenas com nossa equipe de suporte.",
+        "exportLogsAnalyticsIdNote": "Este arquivo inclui o ID de análise desta instalação, para que o suporte possa ver os eventos do app.",
         "exportLogsConfirm": "Compartilhar logs",
         "noLogsYet": "Ainda não há logs para compartilhar. Abra sua carteira e tente de novo.",
         "exportLogsError": "Não foi possível exportar seus logs. Tente de novo."

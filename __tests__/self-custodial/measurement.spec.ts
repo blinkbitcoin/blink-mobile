@@ -16,7 +16,9 @@ import {
   measureSettlement,
   resetMeasuredOnceKeys,
   resetMeasurementContext,
+  resetBandingPrice,
   resetSettlementTracking,
+  setBandingPrice,
   SETTLEMENT_FAILED_CODE,
   scRailForPaymentMethod,
   setMeasurementContext,
@@ -568,6 +570,244 @@ describe("delivery ownership", () => {
       announce()
 
       expect(mockLogEvent).toHaveBeenCalledTimes(2)
+    })
+  })
+})
+
+describe("amount bucket", () => {
+  const USDB = "btkn1usdb"
+  const send = { rail: ScRail.Bolt11, sending_wallet: "BTC" }
+  const sendTelemetry = {
+    settled: [
+      { event: ScEvent.PaymentSendSettled, params: send },
+      { event: ScEvent.BlinkPaymentSent, params: send },
+    ],
+    failed: { event: ScEvent.PaymentSendFailed, params: send },
+  }
+  const swapTelemetry = {
+    settled: [{ event: ScEvent.SwapCompleted, params: { direction: "BTCtoUSD" } }],
+    failed: { event: ScEvent.SwapFailed, params: { direction: "BTCtoUSD" } },
+  }
+  const sentPayment = (status: PaymentStatus, amount?: bigint) => ({
+    id: "pay-1",
+    status,
+    paymentType: PaymentType.Send,
+    method: PaymentMethod.Lightning,
+    ...(amount === undefined ? {} : { amount }),
+  })
+  const receivedUsdb = (usd: number) =>
+    ({
+      id: "rx-usdb",
+      status: PaymentStatus.Completed,
+      paymentType: PaymentType.Receive,
+      method: PaymentMethod.Token,
+      amount: BigInt(usd * 1_000_000),
+      details: { tag: "Token", inner: { metadata: { identifier: USDB, decimals: 6 } } },
+    }) as never
+  const paramsOf = (event: ScEvent) =>
+    mockLogEvent.mock.calls.find(([name]) => name === event)?.[1]
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    resetMeasuredOnceKeys()
+    resetSettlementTracking()
+    resetBandingPrice()
+    setMeasurementContext({
+      accountId: "sc-1",
+      mode: AccountMode.Enhanced,
+      network: "mainnet",
+    })
+  })
+
+  it("rides on a completed send's settle, and only there", () => {
+    measureSettlement(
+      sentPayment(PaymentStatus.Completed, 25_000n),
+      sendTelemetry,
+      measurementGeneration(),
+    )
+
+    expect(paramsOf(ScEvent.PaymentSendSettled)).toEqual({
+      network: "mainnet",
+      ...send,
+      amount_bucket: "10k_100k",
+    })
+    expect(paramsOf(ScEvent.BlinkPaymentSent)).toEqual({ network: "mainnet", ...send })
+  })
+
+  it("is not added to a failed send", () => {
+    measureSettlement(
+      sentPayment(PaymentStatus.Failed, 25_000n),
+      sendTelemetry,
+      measurementGeneration(),
+    )
+
+    expect(paramsOf(ScEvent.PaymentSendFailed)).toEqual({
+      network: "mainnet",
+      ...send,
+      error_code: SETTLEMENT_FAILED_CODE,
+    })
+  })
+
+  it("is not added to a swap", () => {
+    measureSettlement(
+      sentPayment(PaymentStatus.Completed, 25_000n),
+      swapTelemetry,
+      measurementGeneration(),
+    )
+
+    expect(paramsOf(ScEvent.SwapCompleted)).toEqual({
+      network: "mainnet",
+      direction: "BTCtoUSD",
+    })
+  })
+
+  it("is taken from the SDK's announcement when a pending send settles later", () => {
+    measureSettlement(
+      sentPayment(PaymentStatus.Pending),
+      sendTelemetry,
+      measurementGeneration(),
+    )
+    measureObservedPayment(sentPayment(PaymentStatus.Completed, 500n) as never)
+
+    expect(paramsOf(ScEvent.PaymentSendSettled)).toMatchObject({
+      amount_bucket: "under_1k",
+    })
+  })
+
+  it("survives an announcement that arrives before the send is handed back", () => {
+    measureObservedPayment(sentPayment(PaymentStatus.Completed, 150_000n) as never)
+    measureSettlement(
+      sentPayment(PaymentStatus.Pending),
+      sendTelemetry,
+      measurementGeneration(),
+    )
+
+    expect(paramsOf(ScEvent.PaymentSendSettled)).toMatchObject({
+      amount_bucket: "over_100k",
+    })
+  })
+
+  it("falls back to the handed-back payment when the announcement had no amount", () => {
+    measureObservedPayment(sentPayment(PaymentStatus.Completed) as never)
+    measureSettlement(
+      sentPayment(PaymentStatus.Pending, 2_000n),
+      sendTelemetry,
+      measurementGeneration(),
+    )
+
+    expect(paramsOf(ScEvent.PaymentSendSettled)).toMatchObject({
+      amount_bucket: "1k_10k",
+    })
+  })
+
+  it("is left out when the payment's size cannot be told", () => {
+    measureSettlement(
+      sentPayment(PaymentStatus.Completed),
+      sendTelemetry,
+      measurementGeneration(),
+    )
+
+    expect(paramsOf(ScEvent.PaymentSendSettled)).toEqual({ network: "mainnet", ...send })
+  })
+
+  it("rides on a completed receive", () => {
+    measureObservedPayment({
+      id: "rx-1",
+      status: PaymentStatus.Completed,
+      paymentType: PaymentType.Receive,
+      method: PaymentMethod.Lightning,
+      amount: 1_000n,
+    } as never)
+
+    expect(paramsOf(ScEvent.PaymentReceived)).toEqual({
+      network: "mainnet",
+      rail: ScRail.Lightning,
+      amount_bucket: "1k_10k",
+    })
+  })
+
+  it("bands a dollar receive at the held price", () => {
+    setBandingPrice({ usdPerBtc: 100_000, usdTokenIdentifier: USDB })
+
+    measureObservedPayment(receivedUsdb(20))
+
+    expect(paramsOf(ScEvent.PaymentReceived)).toEqual({
+      network: "mainnet",
+      rail: ScRail.Spark,
+      amount_bucket: "10k_100k",
+    })
+  })
+
+  it("sends a dollar receive without a band when no price is held", () => {
+    measureObservedPayment(receivedUsdb(20))
+
+    expect(paramsOf(ScEvent.PaymentReceived)).toEqual({
+      network: "mainnet",
+      rail: ScRail.Spark,
+    })
+  })
+
+  it("sends nothing at all in Incognito", () => {
+    setMeasurementContext({
+      accountId: "sc-1",
+      mode: AccountMode.Anon,
+      network: "mainnet",
+    })
+
+    measureSettlement(
+      sentPayment(PaymentStatus.Completed, 25_000n),
+      sendTelemetry,
+      measurementGeneration(),
+    )
+    measureObservedPayment(receivedUsdb(20))
+
+    expect(mockLogEvent).not.toHaveBeenCalled()
+  })
+
+  /** The privacy contract, as a property of every payload: only allowlisted keys, and the
+   *  amount itself nowhere, in any form. */
+  it("never puts the amount in any event", () => {
+    const amounts = [123_456n, 25_000n, 999n]
+    setBandingPrice({ usdPerBtc: 100_000, usdTokenIdentifier: USDB })
+
+    measureSettlement(
+      { ...sentPayment(PaymentStatus.Completed, amounts[0]), id: "a" },
+      sendTelemetry,
+      measurementGeneration(),
+    )
+    measureSettlement(
+      { ...sentPayment(PaymentStatus.Pending), id: "b" },
+      sendTelemetry,
+      measurementGeneration(),
+    )
+    measureObservedPayment({
+      ...sentPayment(PaymentStatus.Completed, amounts[1]),
+      id: "b",
+    } as never)
+    measureObservedPayment({
+      id: "c",
+      status: PaymentStatus.Completed,
+      paymentType: PaymentType.Receive,
+      method: PaymentMethod.Spark,
+      amount: amounts[2],
+    } as never)
+    measureObservedPayment(receivedUsdb(20))
+
+    const allowed = new Set([
+      "network",
+      "rail",
+      "sending_wallet",
+      "amount_bucket",
+      "error_code",
+    ])
+    const forbidden = [...amounts.map(String), "20", "20000000"]
+    /** Two sends (each with its referral event) and two receives. */
+    expect(mockLogEvent).toHaveBeenCalledTimes(6)
+    mockLogEvent.mock.calls.forEach(([, payload]) => {
+      Object.entries(payload as Record<string, unknown>).forEach(([key, value]) => {
+        expect(allowed).toContain(key)
+        forbidden.forEach((amount) => expect(String(value)).not.toContain(amount))
+      })
     })
   })
 })

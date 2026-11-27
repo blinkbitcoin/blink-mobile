@@ -3130,6 +3130,7 @@
     "downloadLogs": "Descarcă jurnalele",
     "exportLogsTitle": "Partajează jurnalele portofelului",
     "exportLogsBody": "Acest fișier ajută echipa noastră de asistență să investigheze problemele portofelelor tale. Include istoricul plăților (sume, facturi și adrese) și identificatorii fiecărui portofel non-custodial de pe acest dispozitiv, nu doar al acestuia, dar niciodată frazele de recuperare sau cheile. Partajează-l doar cu echipa noastră de asistență.",
+    "exportLogsAnalyticsIdNote": "Acest fișier include ID-ul de analiză al acestei instalări, ca echipa de asistență să poată vedea evenimentele aplicației.",
     "exportLogsConfirm": "Partajează jurnalele",
     "noLogsYet": "Nu există încă jurnale de partajat. Deschide portofelul și încearcă din nou.",
     "exportLogsError": "Nu s-au putut exporta jurnalele. Încearcă din nou."

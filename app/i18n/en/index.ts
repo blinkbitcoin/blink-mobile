@@ -3288,6 +3288,8 @@ const en: BaseTranslation = {
     exportLogsTitle: "Share your wallet logs",
     exportLogsBody:
       "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+    exportLogsAnalyticsIdNote:
+      "This file includes this install's analytics ID, so support can see its app events.",
     exportLogsConfirm: "Share logs",
     noLogsYet: "There are no logs to share yet. Open your wallet and try again.",
     exportLogsError: "Couldn't export your logs. Please try again.",

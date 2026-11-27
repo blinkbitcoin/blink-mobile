@@ -33,6 +33,20 @@ export const getTelemetryInstanceId = (): Promise<string> => {
   return inflight
 }
 
+/**
+ * The id if this install already has one, and null otherwise; never creates one. For the
+ * log export, which shows the id to support (R27): an id created only to be shared would
+ * have no events behind it, so only an id Enhanced telemetry already reports under is
+ * worth sharing. A failed read is null too: the export goes out without the line.
+ */
+export const peekTelemetryInstanceId = async (): Promise<string | null> => {
+  try {
+    return (await AsyncStorage.getItem(STORAGE_KEY)) || null
+  } catch {
+    return null
+  }
+}
+
 export const resetTelemetryInstanceIdCache = (): void => {
   inflight = null
 }
