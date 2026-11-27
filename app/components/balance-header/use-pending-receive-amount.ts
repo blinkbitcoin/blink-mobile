@@ -60,8 +60,13 @@ export const usePendingReceiveAmount = ({
   pendingIncomingTransactions,
   deposits = NO_DEPOSITS,
 }: Params): { pendingReceiveAmountText: string | null } => {
-  const { formatMoneyAmount, formatCurrency, currencyInfo, displayCurrency } =
-    useDisplayCurrency()
+  const {
+    formatMoneyAmount,
+    formatCurrency,
+    hasCurrencyInfo,
+    currencyInfo,
+    displayCurrency,
+  } = useDisplayCurrency()
   const { convertMoneyAmount } = usePriceConversion()
   const { activeAccount } = useAccountRegistry()
   // Branch on the account type alone (same predicate as use-price-conversion):
@@ -106,8 +111,14 @@ export const usePendingReceiveAmount = ({
       (tx) => tx.direction === TxDirection.Receive && tx.settlementAmount > 0,
     )
 
+    // Only while the currency list knows the code: without it formatCurrency puts the
+    // bare code where the symbol belongs ("USD0.06"), so the conversion below answers.
     const displayTotal = sumSettlementDisplayAmounts(pendingReceives)
-    if (displayTotal && displayTotal.amount > 0) {
+    if (
+      displayTotal &&
+      displayTotal.amount > 0 &&
+      hasCurrencyInfo(displayTotal.currency)
+    ) {
       return formatCurrency({
         amountInMajorUnits: displayTotal.amount,
         currency: displayTotal.currency,
@@ -140,6 +151,7 @@ export const usePendingReceiveAmount = ({
     displayCurrencyReady,
     formatCurrency,
     formatMoneyAmount,
+    hasCurrencyInfo,
   ])
 
   return { pendingReceiveAmountText }

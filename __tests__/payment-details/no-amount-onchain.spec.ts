@@ -529,4 +529,56 @@ describe("no amount lightning payment details", () => {
       )
     })
   })
+
+  describe("fee taken out of the amount", () => {
+    const sendAll = () => {
+      const paymentDetails = createNoAmountOnchainPaymentDetails(defaultParams)
+      if (!paymentDetails.canSetAmount) throw new Error("Amount is unable to be set")
+      return paymentDetails.setAmount(testAmount, true)
+    }
+
+    it("is declared by a send-all, whose mutation pays the fee out of the balance", () => {
+      expect(sendAll().isFeeIncluded).toBe(true)
+    })
+
+    it("is declared by a send-all from a usd wallet", () => {
+      const paymentDetails = createNoAmountOnchainPaymentDetails({
+        ...defaultParams,
+        sendingWalletDescriptor: usdSendingWalletDescriptor,
+        isSendingMax: true,
+      })
+      expect(paymentDetails.isFeeIncluded).toBe(true)
+    })
+
+    it("is not declared by a send of a chosen amount, whose fee is paid on top", () => {
+      expect(createNoAmountOnchainPaymentDetails(defaultParams).isFeeIncluded).toBe(false)
+    })
+
+    it("survives the rebuilds that keep the send-all", () => {
+      const paymentDetails = sendAll()
+      if (!paymentDetails.setPayoutSpeed || !paymentDetails.canSetMemo) {
+        throw new Error("Payout speed or memo cannot be set")
+      }
+
+      expect(paymentDetails.setPayoutSpeed(PayoutSpeed.Slow).isFeeIncluded).toBe(true)
+      expect(
+        paymentDetails.setConvertMoneyAmount(convertMoneyAmountMock).isFeeIncluded,
+      ).toBe(true)
+      expect(paymentDetails.setMemo("memo").isFeeIncluded).toBe(true)
+    })
+
+    /** blink-wip#2048 E3: another wallet's amount starts as a plain one, fee on top. */
+    it("is dropped on a wallet switch, with the send-all", () => {
+      expect(
+        sendAll().setSendingWalletDescriptor(usdSendingWalletDescriptor).isFeeIncluded,
+      ).toBe(false)
+    })
+
+    it("is dropped when an amount is chosen after a send-all", () => {
+      const paymentDetails = sendAll()
+      if (!paymentDetails.canSetAmount) throw new Error("Amount is unable to be set")
+
+      expect(paymentDetails.setAmount(testAmount).isFeeIncluded).toBe(false)
+    })
+  })
 })

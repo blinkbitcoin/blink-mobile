@@ -391,6 +391,10 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     ...sendPaymentAndGetFee,
     canSendMax: true,
     isSendingMax,
+    // onChainPaymentSendAll pays the network fee out of the balance it sends, so the
+    // recipient gets the balance less the fee. Derived from isSendingMax, which every
+    // rebuild but setAmount carries, so it cannot fall out of step with the mutation.
+    isFeeIncluded: Boolean(isSendingMax),
   } as const
 }
 

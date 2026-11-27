@@ -42,6 +42,7 @@ const setCurrencyList = (
     currencyList,
     loading: false,
     isUnavailable: false,
+    hasPendingSource: false,
   })
 }
 
@@ -430,6 +431,29 @@ describe("useDisplayCurrency", () => {
       const symbol = result.current.getCurrencySymbol({ currency: "JPY" })
 
       expect(symbol).toBe("JPY")
+    })
+  })
+
+  describe("hasCurrencyInfo", () => {
+    it("knows a code the list carries and not one it lacks", () => {
+      const { result } = renderHook(() => useDisplayCurrency())
+
+      expect(result.current.hasCurrencyInfo("EUR")).toBe(true)
+      expect(result.current.hasCurrencyInfo("JPY")).toBe(false)
+    })
+
+    it("knows no code while the list is still loading", () => {
+      mockUseCurrencyListQuery.mockReturnValue({
+        currencyList: [],
+        loading: true,
+        isUnavailable: false,
+        hasPendingSource: true,
+      })
+
+      const { result } = renderHook(() => useDisplayCurrency())
+
+      expect(result.current.hasCurrencyInfo("USD")).toBe(false)
+      expect(result.current.currencyListPending).toBe(true)
     })
   })
 

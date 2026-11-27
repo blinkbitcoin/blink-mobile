@@ -13,7 +13,8 @@ import useFee from "../use-fee"
  *
  * When the fee comes out of the amount, the recipient gets the amount less the fee, so
  * that is the amount review leads with, and nothing is sent until the fee is quoted. The
- * self-custodial Bitcoin wallet's send-alls set `isFeeIncluded`: on-chain, Spark, a
+ * custodial on-chain send-all sets `isFeeIncluded`, since its mutation pays the fee out of
+ * the balance, and so do the self-custodial Bitcoin wallet's send-alls: on-chain, Spark, a
  * Lightning invoice with no amount, and LNURL or a Lightning address.
  *
  * Such a send is quoted again at the slide, and one whose quote moved since review is

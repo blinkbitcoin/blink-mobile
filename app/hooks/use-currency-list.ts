@@ -34,6 +34,10 @@ export type CurrencyListResult = {
   loading: boolean
   /** Nothing to show and nothing coming — the picker should say so rather than spin. */
   isUnavailable: boolean
+  /** True while any source that could still add a code has not answered. Unlike
+   *  `loading`, a stored SDK list does not end it: the backend carries codes the SDK
+   *  lacks, so a code missing from the list may yet arrive. */
+  hasPendingSource: boolean
 }
 
 export const useCurrencyList = (): CurrencyListResult => {
@@ -70,8 +74,10 @@ export const useCurrencyList = (): CurrencyListResult => {
       selfCustodialSource.currencies,
     )
 
+    const hasPendingSource = !selfCustodialSource.hasSettled || !backendSource.hasSettled
+
     if (currencyList.length > 0) {
-      return { currencyList, loading: false, isUnavailable: false }
+      return { currencyList, loading: false, isUnavailable: false, hasPendingSource }
     }
     /** Only self-custodial can conclude that nothing is coming: it is the only session
      *  where every source can be known to have finished empty. */
@@ -81,6 +87,7 @@ export const useCurrencyList = (): CurrencyListResult => {
       currencyList,
       loading: !backendSource.hasSettled && !isUnavailable,
       isUnavailable,
+      hasPendingSource,
     }
   }, [isSelfCustodial, sdkCurrencies, sdkHasSettled, backendCurrencies, loading])
 }
