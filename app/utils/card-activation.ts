@@ -10,6 +10,8 @@ export type CardActivationFacts = {
    *  the flow comes without one. */
   isPinSet: boolean
   hasPhysicalCard: boolean
+  /** A card of the member's is in Apple Pay or Google Pay, as the app told blink-card. */
+  isWalletAdded: boolean
 }
 
 export const ACTIVATION_DONE = "DONE"
@@ -24,18 +26,22 @@ const STEP_ORDER: readonly CardActivationStep[] = [
   CardActivationStep.TopUp,
 ]
 
-/** A step is passed over once what it asks for has happened. Until Apple Pay and Google
- *  Pay can take the card, the physical card is the one way it can be used, so it settles
- *  both the first way and the other way. The balance unit is passed over until the Card
- *  Balance can be held in dollars. */
+/** A step is passed over once what it asks for has happened. The two ways to use the card
+ *  are the physical card and the wallet: either settles the first way, and the other way
+ *  is settled once both are taken. The balance unit is passed over until the Card Balance
+ *  can be held in dollars. */
 export const isStepDone = (
   step: CardActivationStep,
   facts: CardActivationFacts,
 ): boolean => {
+  const hasTakenEitherWay = facts.hasPhysicalCard || facts.isWalletAdded
+  const hasTakenBothWays = facts.hasPhysicalCard && facts.isWalletAdded
+
   switch (step) {
     case CardActivationStep.Activated:
+      return hasTakenEitherWay
     case CardActivationStep.OfferOtherWay:
-      return facts.hasPhysicalCard
+      return hasTakenBothWays
     case CardActivationStep.Pin:
       return facts.isPinSet
     case CardActivationStep.BalanceUnit:
@@ -77,6 +83,7 @@ type ActivationScreen = keyof Pick<
   | "cardOnboardingApprovedScreen"
   | "cardCreatePinScreen"
   | "cardActivationOrderOfferScreen"
+  | "cardActivationWalletOfferScreen"
   | "cardActivationTopUpScreen"
   | "cardDashboardScreen"
 >
@@ -96,6 +103,7 @@ const SCREEN_STEP: Partial<Record<string, CardActivationStep>> = {
   cardOnboardingApprovedScreen: CardActivationStep.Activated,
   cardCreatePinScreen: CardActivationStep.Pin,
   cardActivationOrderOfferScreen: CardActivationStep.OfferOtherWay,
+  cardActivationWalletOfferScreen: CardActivationStep.OfferOtherWay,
   cardActivationTopUpScreen: CardActivationStep.TopUp,
 }
 
@@ -110,8 +118,17 @@ const PASSED_SCREENS: ReadonlySet<string> = new Set([
 const isFlowScreen = (name: string): boolean =>
   SCREEN_STEP[name] !== undefined || PASSED_SCREENS.has(name)
 
-export const activationScreen = (place: ActivationPlace): ActivationScreen =>
-  PLACE_SCREEN[place]
+/** The other way is offered as the one not taken: the wallet once the physical card is
+ *  ordered, and the physical card otherwise. */
+export const activationScreen = (
+  place: ActivationPlace,
+  facts: CardActivationFacts,
+): ActivationScreen => {
+  const isWalletTheOtherWay =
+    place === CardActivationStep.OfferOtherWay && facts.hasPhysicalCard
+  if (isWalletTheOtherWay) return "cardActivationWalletOfferScreen"
+  return PLACE_SCREEN[place]
+}
 
 type StackRoute = { name: string; key?: string }
 

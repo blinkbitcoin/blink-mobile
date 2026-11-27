@@ -43,6 +43,7 @@ gql`
             id
             cardType
             pinSetAt
+            walletAddedAt
           }
         }
       }
@@ -67,7 +68,9 @@ gql`
 type ActivationAccount = NonNullable<CardActivationQuery["me"]>["defaultAccount"]
 type Activation = NonNullable<ActivationAccount["cardActivation"]>
 type FlowRoute = { name: keyof RootStackParamList; params?: object; key?: string }
-type LearnedFacts = Partial<Pick<CardActivationFacts, "isPinSet" | "hasPhysicalCard">>
+type LearnedFacts = Partial<
+  Pick<CardActivationFacts, "isPinSet" | "hasPhysicalCard" | "isWalletAdded">
+>
 type OrderPlacedParams = RootStackParamList["cardStatusScreen"]
 
 /** The facts of a member whose activation has started. Cards come newest first, the
@@ -83,7 +86,14 @@ const activationFacts = (
     isSetupComplete: Boolean(activation.setupCompletedAt),
     isPinSet: Boolean(account.cards[0]?.pinSetAt),
     hasPhysicalCard: account.cards.some(({ cardType }) => cardType === CardType.Physical),
+    isWalletAdded: account.cards.some(({ walletAddedAt }) => Boolean(walletAddedAt)),
   }
+}
+
+/** The screen of where the member belongs, or none while the activation is unknown. */
+const screenOfPlace = (facts: CardActivationFacts | undefined) => {
+  if (!facts) return undefined
+  return activationScreen(activationPlace(facts), facts)
 }
 
 type UseCardActivationOptions = {
@@ -112,6 +122,7 @@ export const useCardActivation = ({
   const account = data?.me?.defaultAccount
   const facts = useMemo(() => activationFacts(account), [account])
   const place = facts ? activationPlace(facts) : undefined
+  const placeScreen = screenOfPlace(facts)
   const isComplete = facts?.isSetupComplete ?? false
   /** A read that failed leaves the activation unknown, which keeps every card screen as
    *  it was before the flow existed. */
@@ -158,7 +169,7 @@ export const useCardActivation = ({
 
   const showPlace = useCallback(
     (routePlace: ActivationPlace, routeFacts: CardActivationFacts) => {
-      show({ name: activationScreen(routePlace) }, routePlace, routeFacts)
+      show({ name: activationScreen(routePlace, routeFacts) }, routePlace, routeFacts)
     },
     [show],
   )
@@ -175,14 +186,14 @@ export const useCardActivation = ({
   const redirect = useCallback(() => {
     if (hasRedirectedRef.current) return
     hasRedirectedRef.current = true
-    navigation.replace(place ? activationScreen(place) : "cardDashboardScreen")
-  }, [place, navigation])
+    navigation.replace(placeScreen ?? "cardDashboardScreen")
+  }, [placeScreen, navigation])
 
   /** Home's Card line lives in a tab navigator, which cannot reset the root stack, so the
    *  step's screen is pushed over the Home. */
   const resume = useCallback(() => {
-    navigation.navigate(place ? activationScreen(place) : "cardDashboardScreen")
-  }, [place, navigation])
+    navigation.navigate(placeScreen ?? "cardDashboardScreen")
+  }, [placeScreen, navigation])
 
   /** Moves on from `from`, whether the member took the step or skipped it. What they
    *  just did counts at once, before the cards are read again. */

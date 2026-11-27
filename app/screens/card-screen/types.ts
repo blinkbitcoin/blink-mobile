@@ -48,7 +48,7 @@ export type WalletCard = {
 }
 
 /** The cardholder's address and phone on file, which Google Pay asks for so the user
- *  does not have to type them. */
+ *  does not have to type them. An empty second line means there is none. */
 export type CardholderAddress = {
   name: string
   line1: string
@@ -57,16 +57,21 @@ export type CardholderAddress = {
   region: string
   postalCode: string
   countryCode: string
-  phoneNumber: string
+  phoneNumber?: string
 }
 
-/** What a device wallet needs to take a card besides its id: Rain's one-time secret for
- *  it, the name the wallet shows, and, for Google Pay, the cardholder's address. */
+/** What a device wallet needs to take a card: the card as Rain's processor knows it, its
+ *  short-lived secret, the name the wallet shows, and, for Google Pay, the cardholder's
+ *  address when Rain has one. */
 export type CardProvisioningData = {
+  /** The id the wallet SDK takes, which is not the app's card id. */
+  processorCardId: string
   cardSecret: string
   displayName: string
-  address: CardholderAddress
+  address?: CardholderAddress
 }
+
+export type FetchCardProvisioningData = (cardId: string) => Promise<CardProvisioningData>
 
 /** A wallet on the device that can take the card: Apple Pay on iOS, Google Pay on
  *  Android. */

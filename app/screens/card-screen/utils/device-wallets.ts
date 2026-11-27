@@ -66,9 +66,9 @@ const appleWallet = (sdk: MeaWalletSdk): DeviceWallet => ({
     if (!canAddPasses) return false
     return sdk.applePay.canAddPaymentPassWithPrimaryAccountNumberSuffix(card.lastFour)
   },
-  add: async (card, data) => {
+  add: async (_card, data) => {
     const tokenization = await sdk.applePay.initializeOemTokenization(
-      sdk.cardWithSecret(card.cardId, data.cardSecret),
+      sdk.cardWithSecret(data.processorCardId, data.cardSecret),
     )
     try {
       /** Whatever activation state the pass comes back in, Apple Pay now holds it. */
@@ -91,12 +91,14 @@ const googleWallet = (sdk: MeaWalletSdk): DeviceWallet => ({
     )
     return !isCardHeld
   },
-  add: async (card, data) => {
+  add: async (_card, data) => {
+    /** Rain may have no address for the cardholder, and then the wallet gets none. */
+    const address = data.address ? toGooglePayAddress(data.address) : undefined
     try {
       await sdk.googlePay.push(
-        sdk.cardWithSecret(card.cardId, data.cardSecret),
+        sdk.cardWithSecret(data.processorCardId, data.cardSecret),
         data.displayName,
-        toGooglePayAddress(data.address),
+        address,
       )
       return WalletAddResult.Added
     } catch (err) {

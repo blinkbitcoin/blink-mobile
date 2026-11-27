@@ -3,6 +3,7 @@ import { Platform } from "react-native"
 
 import {
   WalletAddResult,
+  type CardholderAddress,
   type CardProvisioningData,
 } from "@app/screens/card-screen/types"
 import { deviceWalletFor } from "@app/screens/card-screen/utils/device-wallets"
@@ -12,19 +13,22 @@ const card = { cardId: "card-1", lastFour: "4242" }
 const cardData = { type: "SECRET" }
 const tokenization = { tokenizationReceipt: "receipt-1" }
 
+const cardholderAddress: CardholderAddress = {
+  name: "Satoshi Nakamoto",
+  line1: "1 Main St",
+  line2: "Apt 2",
+  city: "San Salvador",
+  region: "SS",
+  postalCode: "1101",
+  countryCode: "SV",
+  phoneNumber: "+50370000000",
+}
+
 const provisioning: CardProvisioningData = {
+  processorCardId: "processor-1",
   cardSecret: "secret-1",
   displayName: "Blink Visa •• 4242",
-  address: {
-    name: "Satoshi Nakamoto",
-    line1: "1 Main St",
-    line2: "Apt 2",
-    city: "San Salvador",
-    region: "SS",
-    postalCode: "1101",
-    countryCode: "SV",
-    phoneNumber: "+50370000000",
-  },
+  address: cardholderAddress,
 }
 
 const fakeSdk = () => {
@@ -110,13 +114,13 @@ describe("deviceWalletFor on iOS", () => {
     await expect(deviceWalletFor(sdk).canAdd(card)).resolves.toBe(false)
   })
 
-  it("adds the card through Apple's sheet with the card secret", async () => {
+  it("adds the card through Apple's sheet as Rain's processor knows it", async () => {
     const sdk = fakeSdk()
 
     await expect(deviceWalletFor(sdk).add(card, provisioning)).resolves.toBe(
       WalletAddResult.Added,
     )
-    expect(sdk.cardWithSecret).toHaveBeenCalledWith("card-1", "secret-1")
+    expect(sdk.cardWithSecret).toHaveBeenCalledWith("processor-1", "secret-1")
     expect(sdk.applePay.initializeOemTokenization).toHaveBeenCalledWith(cardData)
     expect(sdk.applePay.showAddPaymentPassView).toHaveBeenCalledWith(tokenization)
   })
@@ -290,7 +294,7 @@ describe("deviceWalletFor on Android", () => {
     await expect(deviceWalletFor(sdk).add(card, provisioning)).resolves.toBe(
       WalletAddResult.Added,
     )
-    expect(sdk.cardWithSecret).toHaveBeenCalledWith("card-1", "secret-1")
+    expect(sdk.cardWithSecret).toHaveBeenCalledWith("processor-1", "secret-1")
     expect(sdk.googlePay.push).toHaveBeenCalledWith(cardData, "Blink Visa •• 4242", {
       name: "Satoshi Nakamoto",
       address1: "1 Main St",
@@ -310,14 +314,39 @@ describe("deviceWalletFor on Android", () => {
 
       await deviceWalletFor(sdk).add(card, {
         ...provisioning,
-        address: { ...provisioning.address, line2 },
+        address: { ...cardholderAddress, line2 },
       })
 
       const [, , address] = sdk.googlePay.push.mock.calls[0]
-      expect(address.address2).toBeUndefined()
-      expect(address.address1).toBe("1 Main St")
+      expect(address?.address2).toBeUndefined()
+      expect(address?.address1).toBe("1 Main St")
     },
   )
+
+  it("pushes the card with no address when Rain has none for the cardholder", async () => {
+    const sdk = fakeSdk()
+
+    await deviceWalletFor(sdk).add(card, { ...provisioning, address: undefined })
+
+    expect(sdk.googlePay.push).toHaveBeenCalledWith(
+      cardData,
+      "Blink Visa •• 4242",
+      undefined,
+    )
+  })
+
+  it("leaves the phone out when Rain has none for the cardholder", async () => {
+    const sdk = fakeSdk()
+
+    await deviceWalletFor(sdk).add(card, {
+      ...provisioning,
+      address: { ...cardholderAddress, phoneNumber: undefined },
+    })
+
+    const [, , address] = sdk.googlePay.push.mock.calls[0]
+    expect(address?.phoneNumber).toBeUndefined()
+    expect(address?.name).toBe("Satoshi Nakamoto")
+  })
 
   it("answers cancelled when the user backs out of Google's sheet", async () => {
     const sdk = fakeSdk()

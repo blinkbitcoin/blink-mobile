@@ -8,6 +8,7 @@ import { useCardActivation, useCardData } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
+import { WalletAddResult } from "../types"
 import { useAddToWallet } from "../hooks/use-add-to-wallet"
 import { isCardFrozen } from "../utils/card-display"
 
@@ -39,10 +40,11 @@ export const CardApprovedScreen: React.FC = () => {
     navigation.navigate("orderCardScreen")
   }
 
-  /** Temporary, while Apple Pay and Google Pay cannot take the card: without it the
-   *  physical card would be the only way past this step. */
-  const handleSkipPress = () => {
-    moveOn(CardActivationStep.Activated)
+  /** The wallet is the other first way: once it takes the card, the PIN comes next. */
+  const handleAddToWallet = async () => {
+    const result = await addToWallet()
+    const isCardAdded = result === WalletAddResult.Added
+    if (isCardAdded) moveOn(CardActivationStep.Activated, { isWalletAdded: true })
   }
 
   return (
@@ -51,14 +53,12 @@ export const CardApprovedScreen: React.FC = () => {
       subtitle={LL.CardFlow.CardStatus.CardApproved.subtitle()}
       buttonLabel={LL.CardFlow.CardStatus.CardApproved.buttonLabel()}
       onPrimaryButtonPress={handleOrderPress}
-      secondaryButtonLabel={LL.CardFlow.Activation.skipForNow()}
-      onSecondaryButtonPress={handleSkipPress}
       iconName="check-badge"
       cardId={card?.id}
       cardNumber={card?.lastFour}
       isFrozen={card ? isCardFrozen(card.status) : false}
       showAddToWallet={canAddToWallet}
-      onAddToWallet={addToWallet}
+      onAddToWallet={handleAddToWallet}
       isAddingToWallet={isAdding}
     />
   )
