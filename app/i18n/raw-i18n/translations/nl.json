@@ -2359,6 +2359,7 @@
     "somethingWentWrong": "Er is iets misgegaan",
     "priceUpdated": "De prijs is veranderd, dus de bedragen zijn bijgewerkt. Controleer ze voordat je verzendt.",
     "paymentAlreadyAttempted": "Betaling al geprobeerd.\n\nAls je deze betaling opnieuw wilt doen, begin dan opnieuw.",
+    "paymentMayStillLand": "Wacht even, de betaling gaat waarschijnlijk snel door. Uw geld komt veilig aan of blijft bij u.",
     "slideConfirming": "Bevestigen...",
     "slideToSend": "Veeg om te verzenden",
     "calculatingFee": "Kosten berekenen…",
@@ -2382,6 +2383,9 @@
     "fromBalance": "Van saldo",
     "details": "Details",
     "changeAmount": "Bedrag wijzigen",
+    "tryAgain": "Opnieuw proberen",
+    "home": "Thuisscherm",
+    "dustSweepSheetTitle": "Voordat u verstuurt",
     "usdRemainderSweep": "Resterend saldo {remaining: string} ({remainingSats: string}) wordt omgezet naar Bitcoin. USD-minimum: {minimum: string}.",
     "sendAnyway": "Ik heb mijn geschiedenis gecontroleerd, toch versturen"
   },
@@ -2430,6 +2434,11 @@
     "lowFunds": "Onvoldoende saldo",
     "amountExceed": "Bedrag overschrijdt uw saldo van {balance: string}",
     "amountExceedsLimit": "Bedrag overschrijdt uw resterende dagelijkse limiet van {limit: string}",
+    "limitsUnavailable": "We konden uw dagelijkse limiet niet controleren. Probeer het zo opnieuw.",
+    "problemSheetTitle": "Een klein probleem",
+    "changeDestination": "Bestemming wijzigen",
+    "recipientUnreachableTitle": "Kon de ontvanger niet bereiken",
+    "recipientWrongAmountTitle": "De ontvanger gaf een verkeerd bedrag op",
     "upgradeAccountToIncreaseLimit": "Upgrade uw account om uw limiet te verhogen",
     "amountIsRequired": "Bedrag is vereist",
     "cost": "Kosten",
@@ -2448,10 +2457,11 @@
     "title": "Verzend Bitcoin",
     "failedToFetchLnurlInvoice": "Kan ln-url factuur niet ophalen",
     "lnurlInvoiceIncorrectAmount": "De ln-url server reageerde met een factuur met een onjuist bedrag.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Waarschuwing: hoge kosten!",
-      "content": "Je kosten zijn meer dan 50% hoger dan het verzonden bedrag. Weet je zeker dat je wilt doorgaan?\n\nOm de kosten te verlagen, vraag de ontvanger om de transactie via Lightning te accepteren",
-      "confirmButton": "Ik weet het 100% zeker"
+      "body": "Je kosten zijn 50% of meer van het bedrag dat je verstuurt. Weet je zeker dat je wilt doorgaan?",
+      "cancelPayment": "Betaling annuleren",
+      "acceptFee": "Accepteer kosten"
     },
     "copiedDestination": "Bestemming naar het klembord gekopieerd",
     "pendingPayment": "De betaling is verzonden, maar nog niet bevestigd.\n\nHet is mogelijk dat de betaling niet wordt bevestigd, in dat geval worden de fondsen teruggestort naar je account.",
@@ -2998,6 +3008,7 @@
     "note": "Noot",
     "notification": "Melding",
     "ok": "OK",
+    "okay": "Oké",
     "or": "of",
     "openWallet": "Open Wallet",
     "onchain": "Onchain",
@@ -4002,17 +4013,22 @@
     "migrateNowModal": {
       "title": "Migreer nu naar een niet-bewaarde rekening",
       "body": "Je kunt geen geld meer ontvangen op je bewaarde rekening. Blink heeft de bewaardienst in jouw regio stopgezet en deze rekening wordt tegen het einde van {date} gedeactiveerd.\n\nMigreer nu naar een niet-bewaarde rekening.",
+      "bodyLevelZero": "Je kunt geen geld meer ontvangen op dit proefaccount. Blink sluit proefaccounts en dit account wordt tegen het einde van {date} gedeactiveerd.\n\nMigreer nu naar een niet-bewaarde rekening.",
       "migrateCta": "Migreer nu"
     },
     "reminderBulletin": {
       "title": "Belangrijk",
       "body": "Stap vóór {date} over naar een niet-bewaarde rekening via begeleide migratie, of neem je tegoed op. Ontvangen stopt op {receiveStopsDate}.",
+      "bodySingleDate": "Stap vóór {date} over naar een niet-bewaarde rekening via begeleide migratie, of neem je tegoed op — alles verhuist in een paar tikken.",
+      "bodyLevelZero": "Stap vóór {date} over naar een niet-bewaarde rekening via begeleide migratie, of neem je tegoed op.",
       "bodyReceiveDisabled": "Ontvangen is gestopt. Stap vóór {date} over naar een niet-bewaarde rekening via begeleide migratie, of neem je tegoed op.",
       "migrateCta": "Migreer"
     },
     "offboardBulletin": {
       "title": "Belangrijk",
-      "body": "Je account is geregistreerd in een regio waar we geen accounts kunnen aanbieden. Neem je geld op vóór 31 augustus. Ontvangen stopt op 10 augustus."
+      "bodyTwoDates": "Blink kan in jouw regio geen bewaarde rekeningen aanbieden. Neem je geld op vóór {date} — zonder kosten van Blink. Ontvangen stopt op {receiveStopsDate}. Denk je dat je account hier onterecht onder valt, dan kun je je huidige woonplaats in de app verifiëren.",
+      "bodySingleDate": "Blink kan in jouw regio geen bewaarde rekeningen aanbieden. Neem je geld op vóór {date} — zonder kosten van Blink. Denk je dat je account hier onterecht onder valt, dan kun je je huidige woonplaats in de app verifiëren.",
+      "bodyReceiveOff": "Blink kan in jouw regio geen bewaarde rekeningen aanbieden. Neem je geld op vóór {date} — zonder kosten van Blink. Ontvangen staat uit. Denk je dat je account hier onterecht onder valt, dan kun je je huidige woonplaats in de app verifiëren."
     },
     "dollarBalanceModal": {
       "title": "We kunnen je dollarsaldo niet migreren",
@@ -4068,8 +4084,10 @@
     "resumeFailed": "Er is iets misgegaan bij het hervatten van je migratie. Begin deze opnieuw.",
     "migrationRequiredBody": "Het is tijd om je bewaarde rekening te migreren naar een niet-bewaarde rekening.",
     "migrationRequiredForcedBody": "Het is tijd om je bewaarde rekening te migreren naar een niet-bewaarde rekening. Dit is vereist om regelgevende redenen.\n\nGeen zorgen, non-custodial is op de lange termijn beter voor je.",
+    "migrationRequiredForcedBodyLevelZero": "Blink sluit proefaccounts. Zet je saldo over naar een niet-bewaarde rekening. Het kost maar een paar tikken.",
     "migrationGateTitle": "Account niet toegankelijk",
     "migrationGateBody": "Om regelgevende redenen kunnen we geen custodial accounts aanbieden in jouw regio. Zet je geld over naar een non-custodial account bij Blink door de volgende stappen te volgen of neem contact met ons op via <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Proefaccounts zijn nu gesloten. Je saldo is veilig. Zet het over naar een niet-bewaarde rekening door de volgende stappen te volgen, gratis en zonder tijdslimiet, of neem contact met ons op via <link>{email}</link>",
     "bitcoinBalance": "Bitcoin-saldo",
     "dollarBalance": "Dollarsaldo",
     "moveToNonCustodial": "Overstappen naar non-custodial",

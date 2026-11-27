@@ -1,4 +1,4 @@
-import { WindDownStatus } from "@app/types/wind-down"
+import { WindDownReason, WindDownStatus } from "@app/types/wind-down"
 
 import { useCustodialWindDown } from "./use-custodial-wind-down"
 
@@ -6,6 +6,8 @@ type MigrationReminderBulletin = {
   isVisible: boolean
   /** The phase the bulletin's copy speaks to; only read while visible. */
   phase: WindDownStatus
+  /** Why the account is wound down; picks the Level 0 or the region copy. */
+  reason: WindDownReason | undefined
   deadlineTimestamp: number
   receiveDisabledTimestamp: number
   timezone: string | undefined
@@ -38,6 +40,7 @@ export const useMigrationReminderBulletin = (): MigrationReminderBulletin => {
   return {
     isVisible: isReminderPhase,
     phase,
+    reason: windDown?.reason,
     deadlineTimestamp: windDown?.finalDeadline ?? 0,
     receiveDisabledTimestamp: windDown?.receiveDisabledAt ?? 0,
     timezone: windDown?.timezone,

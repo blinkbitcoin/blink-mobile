@@ -138,6 +138,41 @@ export const formatDayAndMonth = ({
   }
 }
 
+/** The calendar day of a Unix-seconds timestamp in `timezone` as a sortable number
+ *  (YYYYMMDD), each field read on its own so no locale pattern decides the order. */
+const dayKey = (timestampSeconds: number, timezone?: string): number => {
+  const date = new Date(timestampSeconds * 1000)
+  const field = (options: Intl.DateTimeFormatOptions) =>
+    Number(date.toLocaleDateString("en-US", { ...options, timeZone: timezone }))
+  const year = field({ year: "numeric" })
+  const month = field({ month: "numeric" })
+  const day = field({ day: "numeric" })
+  return year * 10000 + month * 100 + day
+}
+
+/**
+ * Whether timestamp `a` (Unix seconds) falls on the same calendar day as `b`, or a later
+ * one, in `timezone`: the days are compared as numeric YYYYMMDD keys, so the hour within
+ * the day never matters. A malformed zone falls back to the device zone, as
+ * `formatDayAndMonth` does, so the comparison matches the dates it renders.
+ */
+export const isOnOrAfterDay = ({
+  a,
+  b,
+  timezone,
+}: {
+  a: number
+  b: number
+  timezone?: string
+}): boolean => {
+  try {
+    return dayKey(a, timezone) >= dayKey(b, timezone)
+  } catch (err) {
+    reportError("isOnOrAfterDay timezone", err)
+    return dayKey(a) >= dayKey(b)
+  }
+}
+
 export const parseCardValidThru = (
   value: string | Date,
 ): { month: string; year: string } | null => {

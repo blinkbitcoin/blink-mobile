@@ -1,6 +1,7 @@
 import { renderHook } from "@testing-library/react-native"
 
 import { useWindDownHomeNudges } from "@app/screens/account-migration/hooks/use-wind-down-home-nudges"
+import { WindDownReason, WindDownStatus } from "@app/types/wind-down"
 
 const mockReopen = jest.fn()
 const mockMigrateNowPrompt = {
@@ -8,8 +9,22 @@ const mockMigrateNowPrompt = {
   canReopen: true,
   reopen: mockReopen,
 }
-const mockReminderBulletin = { isVisible: false, deadlineTimestamp: 123, timezone: "UTC" }
-let mockOffboardBulletin = { isVisible: false }
+const mockReminderBulletin = {
+  isVisible: false,
+  phase: WindDownStatus.PreCutoff,
+  reason: WindDownReason.Region,
+  deadlineTimestamp: 123,
+  receiveDisabledTimestamp: 100,
+  timezone: "UTC",
+}
+const offboardBulletinWith = (isVisible: boolean) => ({
+  isVisible,
+  status: WindDownStatus.PreCutoff,
+  deadlineTimestamp: 123,
+  receiveDisabledTimestamp: 100,
+  timezone: "UTC",
+})
+let mockOffboardBulletin = offboardBulletinWith(false)
 let mockReceiveBlocked = false
 const mockToastShow = jest.fn()
 
@@ -44,7 +59,7 @@ describe("useWindDownHomeNudges", () => {
     jest.clearAllMocks()
     mockMigrateNowPrompt.canReopen = true
     mockReminderBulletin.isVisible = false
-    mockOffboardBulletin = { isVisible: false }
+    mockOffboardBulletin = offboardBulletinWith(false)
     mockReceiveBlocked = false
   })
 
@@ -58,7 +73,7 @@ describe("useWindDownHomeNudges", () => {
 
   it("replaces the reminder bulletin with the offboard bulletin when both would show", () => {
     mockReminderBulletin.isVisible = true
-    mockOffboardBulletin = { isVisible: true }
+    mockOffboardBulletin = offboardBulletinWith(true)
 
     const { result } = renderHook(() => useWindDownHomeNudges())
 

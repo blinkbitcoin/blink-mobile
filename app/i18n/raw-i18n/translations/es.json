@@ -2359,6 +2359,7 @@
         "somethingWentWrong": "Algo salió mal",
         "priceUpdated": "El precio cambió, así que los montos se actualizaron. Revísalos antes de enviar.",
         "paymentAlreadyAttempted": "El pago ya se intentó.\n\nSi deseas enviar este pago nuevamente, comienza desde el principio del proceso.",
+        "paymentMayStillLand": "Espera un momento, probablemente se complete pronto. Tu dinero llegará de forma segura o se quedará contigo.",
         "slideConfirming": "Confirmando...",
         "slideToSend": "Desliza para enviar",
         "calculatingFee": "Calculando la comisión…",
@@ -2382,6 +2383,9 @@
         "fromBalance": "Desde el saldo",
         "details": "Detalles",
         "changeAmount": "Cambiar cantidad",
+        "tryAgain": "Intentar de nuevo",
+        "home": "Inicio",
+        "dustSweepSheetTitle": "Antes de enviar",
         "usdRemainderSweep": "Restante {remaining: string} ({remainingSats: string}) se convertirá a Bitcoin. Mínimo en USD: {minimum: string}.",
         "sendAnyway": "Revisé mi historial, enviar de todos modos"
     },
@@ -2430,6 +2434,11 @@
         "lowFunds": "Fondos insuficientes",
         "amountExceed": "La cantidad excede su saldo de {balance: string}",
         "amountExceedsLimit": "El importe supera tu límite diario restante de {limit: string}",
+        "limitsUnavailable": "No pudimos comprobar tu límite diario. Inténtalo de nuevo en un momento.",
+        "problemSheetTitle": "Un pequeño problema",
+        "changeDestination": "Cambiar destino",
+        "recipientUnreachableTitle": "No se pudo contactar con el destinatario",
+        "recipientWrongAmountTitle": "El destinatario indicó un importe incorrecto",
         "upgradeAccountToIncreaseLimit": "Actualiza tu cuenta para aumentar tu límite",
         "amountIsRequired": "Se requiere cantidad",
         "cost": "Costo",
@@ -2448,10 +2457,11 @@
         "title": "Enviar Bitcoin",
         "failedToFetchLnurlInvoice": "Error al obtener la factura de lnurl",
         "lnurlInvoiceIncorrectAmount": "El servidor lnurl ha enviado una factura con un importe incorrecto.",
-        "confirmFeesModal": {
+        "highFeeSheet": {
             "title": "Alerta de tarifa alta!",
-            "content": "Tu tarifa es un 50% más grande que la cantidad enviada. ¿Estás seguro de que quieres continuar?\n\nPara reducir la tarifa, pide al receptor que acepte la transacción a través de Lightning.",
-            "confirmButton": "Estoy 100% seguro"
+            "body": "Tu tarifa es el 50% o más del monto que envías. ¿Seguro que quieres continuar?",
+            "cancelPayment": "Cancelar pago",
+            "acceptFee": "Aceptar tarifa"
         },
         "copiedDestination": "Destino copiado al portapapeles",
         "pendingPayment": "El pago ha sido enviado, pero aún no se ha confirmado.\n\nEs posible que el pago no se confirme, en cuyo caso los fondos se devolverán a su cuenta.\nBETA",
@@ -2997,6 +3007,7 @@
         "note": "Nota ",
         "notification": "Notificación",
         "ok": "OK",
+        "okay": "De acuerdo",
         "or": "o",
         "openWallet": "Abrir billetera",
         "onchain": "Onchain",
@@ -4002,17 +4013,22 @@
         "migrateNowModal": {
             "title": "Migra ahora a una cuenta no custodial",
             "body": "Ya no puedes recibir fondos en tu cuenta custodial. Blink descontinuó el servicio custodial en tu región y esta cuenta quedará inactivada al finalizar el {date}.\n\nMigra ahora a una cuenta no custodial.",
+            "bodyLevelZero": "Ya no puedes recibir fondos en esta cuenta de prueba. Blink está cerrando las cuentas de prueba y esta cuenta quedará inactivada al finalizar el {date}.\n\nMigra ahora a una cuenta no custodial.",
             "migrateCta": "Migrar ahora"
         },
         "reminderBulletin": {
             "title": "Importante",
             "body": "Pasa a una cuenta no custodial mediante la migración guiada, o retira tus fondos, antes del {date}. La recepción se detiene el {receiveStopsDate}.",
+            "bodySingleDate": "Pasa a una cuenta no custodial mediante la migración guiada, o retira tus fondos, antes del {date} — todo se mueve en unos pocos toques.",
+            "bodyLevelZero": "Pasa a una cuenta no custodial mediante la migración guiada, o retira tus fondos, antes del {date}.",
             "bodyReceiveDisabled": "La recepción se ha detenido. Pasa a una cuenta no custodial mediante la migración guiada, o retira tus fondos, antes del {date}.",
             "migrateCta": "Migrar"
         },
         "offboardBulletin": {
             "title": "Importante",
-            "body": "Tu cuenta está registrada en una región donde no podemos ofrecer cuentas. Retira tus fondos antes del 31 de agosto. La recepción se detiene el 10 de agosto."
+            "bodyTwoDates": "Blink no puede ofrecer cuentas custodiales en tu región. Retira tus fondos antes del {date} — sin ningún cargo de Blink. La recepción se detiene el {receiveStopsDate}. Si crees que tu cuenta se ha visto afectada por error, puedes verificar tu residencia actual en la app.",
+            "bodySingleDate": "Blink no puede ofrecer cuentas custodiales en tu región. Retira tus fondos antes del {date} — sin ningún cargo de Blink. Si crees que tu cuenta se ha visto afectada por error, puedes verificar tu residencia actual en la app.",
+            "bodyReceiveOff": "Blink no puede ofrecer cuentas custodiales en tu región. Retira tus fondos antes del {date} — sin ningún cargo de Blink. La recepción está desactivada. Si crees que tu cuenta se ha visto afectada por error, puedes verificar tu residencia actual en la app."
         },
         "dollarBalanceModal": {
             "title": "No podemos migrar tu Saldo Dólar",
@@ -4068,8 +4084,10 @@
         "resumeFailed": "Algo salió mal al reanudar tu migración. Por favor, comiénzala de nuevo.",
         "migrationRequiredBody": "Es hora de migrar tu cuenta custodial a una cuenta no custodial.",
         "migrationRequiredForcedBody": "Es hora de migrar tu cuenta custodial a una cuenta no custodial. Es obligatorio por motivos regulatorios.\n\nNo te preocupes, la modalidad no custodial será mejor para ti a largo plazo.",
+        "migrationRequiredForcedBodyLevelZero": "Blink está cerrando las cuentas de prueba. Pasa tu saldo a una cuenta no custodial. Solo toma unos pocos toques.",
         "migrationGateTitle": "Cuenta no accesible",
         "migrationGateBody": "Por motivos regulatorios no podemos ofrecer cuentas custodiales en tu región. Transfiere tus fondos a una cuenta no custodial con Blink siguiendo los próximos pasos o contáctanos en <link>{email}</link>",
+        "migrationGateBodyLevelZero": "Las cuentas de prueba ya están cerradas. Tu saldo está seguro. Pásalo a una cuenta no custodial siguiendo los próximos pasos, gratis y sin límite de tiempo, o contáctanos en <link>{email}</link>",
         "bitcoinBalance": "Saldo de Bitcoin",
         "dollarBalance": "Saldo en dólares",
         "moveToNonCustodial": "Migrar a no custodia",

@@ -2359,6 +2359,7 @@
     "somethingWentWrong": "Niečo sa pokazilo",
     "priceUpdated": "Cena sa zmenila, preto boli sumy aktualizované. Pred odoslaním ich skontrolujte.",
     "paymentAlreadyAttempted": "Platba už bola vykonaná.\n\nAk chcete túto platbu odoslať znova, začnite od začiatku.",
+    "paymentMayStillLand": "Chvíľu počkajte, platba pravdepodobne čoskoro prejde. Vaše peniaze buď bezpečne dorazia, alebo zostanú u vás.",
     "slideConfirming": "Potvrdzovanie...",
     "slideToSend": "Posunutím odošlite",
     "calculatingFee": "Výpočet poplatku…",
@@ -2382,6 +2383,9 @@
     "fromBalance": "Zo zostatku",
     "details": "Podrobnosti",
     "changeAmount": "Zmeniť sumu",
+    "tryAgain": "Skúsiť znova",
+    "home": "Domov",
+    "dustSweepSheetTitle": "Pred odoslaním",
     "usdRemainderSweep": "Zostávajúcich {remaining: string} ({remainingSats: string}) bude prevedených na Bitcoin. Minimum v USD: {minimum: string}.",
     "sendAnyway": "História skontrolovaná, aj tak odoslať"
   },
@@ -2430,6 +2434,11 @@
     "lowFunds": "Nedostatok prostriedkov",
     "amountExceed": "Suma prekračuje váš zostatok vo výške {balance: string}",
     "amountExceedsLimit": "Suma prekračuje váš zostávajúci denný limit {limit: string}",
+    "limitsUnavailable": "Nepodarilo sa overiť váš denný limit. Skúste to o chvíľu znova.",
+    "problemSheetTitle": "Malý problém",
+    "changeDestination": "Zmeniť príjemcu",
+    "recipientUnreachableTitle": "Nepodarilo sa spojiť s príjemcom",
+    "recipientWrongAmountTitle": "Príjemca uviedol nesprávnu sumu",
     "upgradeAccountToIncreaseLimit": "Upgradujte si účet a zvýšte svoj limit",
     "amountIsRequired": "Suma je povinná",
     "cost": "Náklady",
@@ -2448,10 +2457,11 @@
     "title": "Odoslať Bitcoin",
     "failedToFetchLnurlInvoice": "Nepodarilo sa načítať lnurl faktúru",
     "lnurlInvoiceIncorrectAmount": "Server lnurl odpovedal faktúrou s nesprávnou sumou.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Upozornenie na vysoké poplatky!",
-      "content": "Váš poplatok je o viac ako 50 % vyšší ako odoslaná suma. Naozaj chcete pokračovať?\n\nAk chcete znížiť poplatky, požiadajte príjemcu, aby prijal transakciu cez Lightning",
-      "confirmButton": "Som si 100% istý."
+      "body": "Váš poplatok je 50 % alebo viac z odosielanej sumy. Naozaj chcete pokračovať?",
+      "cancelPayment": "Zrušiť platbu",
+      "acceptFee": "Prijať poplatok"
     },
     "copiedDestination": "Cieľ bol skopírovaný do schránky",
     "pendingPayment": "Platba bola odoslaná, ale ešte nie je potvrdená.\n\nJe možné, že platba nebude potvrdená, v takom prípade budú prostriedky vrátené na váš účet.",
@@ -2998,6 +3008,7 @@
     "note": "Poznámka",
     "notification": "Upozornenie",
     "ok": "OK",
+    "okay": "Dobre",
     "or": "alebo",
     "openWallet": "Otvoriť peňaženku",
     "onchain": "Onchain",
@@ -4002,17 +4013,22 @@
     "migrateNowModal": {
       "title": "Prejdite teraz na non-custodial účet",
       "body": "Na svoj custodial účet už nemôžete prijímať prostriedky. Blink ukončil custodial službu vo vašom regióne a tento účet bude deaktivovaný do konca dňa {date}.\n\nPrejdite teraz na non-custodial účet.",
+      "bodyLevelZero": "Na tento skúšobný účet už nemôžete prijímať prostriedky. Blink ruší skúšobné účty a tento účet bude deaktivovaný do konca dňa {date}.\n\nPrejdite teraz na non-custodial účet.",
       "migrateCta": "Migrovať teraz"
     },
     "reminderBulletin": {
       "title": "Dôležité",
       "body": "Prejdite na non-custodial účet pomocou riadenej migrácie alebo si vyberte prostriedky pred {date}. Prijímanie sa skončí {receiveStopsDate}.",
+      "bodySingleDate": "Prejdite na non-custodial účet pomocou riadenej migrácie alebo si vyberte prostriedky pred {date} — všetko presuniete niekoľkými ťuknutiami.",
+      "bodyLevelZero": "Prejdite na non-custodial účet pomocou riadenej migrácie alebo si vyberte prostriedky pred {date}.",
       "bodyReceiveDisabled": "Prijímanie sa skončilo. Prejdite na non-custodial účet pomocou riadenej migrácie alebo si vyberte prostriedky pred {date}.",
       "migrateCta": "Migrovať"
     },
     "offboardBulletin": {
       "title": "Dôležité",
-      "body": "Váš účet je registrovaný v regióne, kde nemôžeme ponúkať účty. Vyberte si svoje prostriedky pred 31. augustom. Prijímanie sa zastaví 10. augusta."
+      "bodyTwoDates": "Blink nemôže vo vašom regióne ponúkať custodial účty. Vyberte si svoje prostriedky pred {date} — bez akýchkoľvek poplatkov Blink. Prijímanie sa skončí {receiveStopsDate}. Ak sa domnievate, že sa to vášho účtu týka omylom, môžete v aplikácii overiť svoje súčasné bydlisko.",
+      "bodySingleDate": "Blink nemôže vo vašom regióne ponúkať custodial účty. Vyberte si svoje prostriedky pred {date} — bez akýchkoľvek poplatkov Blink. Ak sa domnievate, že sa to vášho účtu týka omylom, môžete v aplikácii overiť svoje súčasné bydlisko.",
+      "bodyReceiveOff": "Blink nemôže vo vašom regióne ponúkať custodial účty. Vyberte si svoje prostriedky pred {date} — bez akýchkoľvek poplatkov Blink. Prijímanie je vypnuté. Ak sa domnievate, že sa to vášho účtu týka omylom, môžete v aplikácii overiť svoje súčasné bydlisko."
     },
     "dollarBalanceModal": {
       "title": "Váš dolárový zostatok nemôžeme migrovať",
@@ -4068,8 +4084,10 @@
     "resumeFailed": "Pri pokračovaní migrácie sa niečo pokazilo. Začnite ju, prosím, znova.",
     "migrationRequiredBody": "Je čas migrovať váš custodial účet na non-custodial účet.",
     "migrationRequiredForcedBody": "Je čas migrovať váš custodial účet na non-custodial účet. Je to vyžadované z regulačných dôvodov.\n\nNeboj sa, non-custodial pre teba bude z dlhodobého hľadiska lepší.",
+    "migrationRequiredForcedBodyLevelZero": "Blink ruší skúšobné účty. Presuňte svoj zostatok na non-custodial účet. Stačí len pár ťuknutí.",
     "migrationGateTitle": "Účet nie je prístupný",
     "migrationGateBody": "Z regulačných dôvodov nemôžeme vo tvojom regióne poskytovať custodial účty. Preveď svoje prostriedky na non-custodial účet v Blink podľa nasledujúcich krokov alebo nás kontaktuj na <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Skúšobné účty sú teraz zrušené. Váš zostatok je v bezpečí. Presuňte ho na non-custodial účet podľa nasledujúcich krokov, zadarmo a bez časového obmedzenia, alebo nás kontaktujte na <link>{email}</link>",
     "bitcoinBalance": "Zostatok Bitcoinu",
     "dollarBalance": "Zostatok v dolároch",
     "moveToNonCustodial": "Prejsť na non-custodial",

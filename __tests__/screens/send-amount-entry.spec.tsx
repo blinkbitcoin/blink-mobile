@@ -20,8 +20,10 @@ import {
 import {
   createAmountLightningPaymentDetails,
   createIntraledgerPaymentDetails,
+  createLnurlPaymentDetails,
   PaymentDetail,
 } from "@app/screens/send-bitcoin-screen/payment-details"
+import { Satoshis, type LnUrlPayServiceResponse } from "lnurl-pay"
 import { createSelfCustodialOnchainPaymentDetails } from "@app/self-custodial/payment-details/onchain"
 import {
   MoneyAmount,
@@ -46,11 +48,19 @@ jest.mock("@react-navigation/native", () => ({
   },
 }))
 
+const mockHapticReject = jest.fn()
 const mockHapticTap = jest.fn()
 
 jest.mock("@app/utils/haptics", () => {
   const actual = jest.requireActual("@app/utils/haptics")
-  return { ...actual, haptics: { ...actual.haptics, tap: () => mockHapticTap() } }
+  return {
+    ...actual,
+    haptics: {
+      ...actual.haptics,
+      reject: () => mockHapticReject(),
+      tap: () => mockHapticTap(),
+    },
+  }
 })
 
 /** Laid over the real fee options, so a spec can stand in a fee error the quote returned. */
@@ -258,6 +268,8 @@ beforeEach(() => {
   mockSetAmount.mockClear()
   mockNavigate.mockClear()
   mockFeeTierOverride.current = {}
+  mockHapticReject.mockClear()
+  mockHapticTap.mockClear()
   mockSavePreferredAmountCurrency.mockClear()
   mockHapticTap.mockClear()
   mockDisplayCurrency.current = "NGN"
@@ -493,6 +505,28 @@ describe("free amount", () => {
     expect(colorOf("send-hero-amount-primary")).not.toBe(emptyPrimary)
   })
 
+  /** The light refusal for an amount fixed in place: once as it goes over, not again while
+   *  it stays over, and again after it comes back under and goes over once more. */
+  it("buzzes a refusal each time the amount goes over the balance", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    typeKeys("2", "2")
+    await settle()
+    expect(mockHapticReject).toHaveBeenCalledTimes(1)
+
+    typeKeys("2")
+    await settle()
+    expect(mockHapticReject).toHaveBeenCalledTimes(1)
+
+    fireEvent.press(screen.getByTestId("Key ⌫"))
+    fireEvent.press(screen.getByTestId("Key ⌫"))
+    await settle()
+    typeKeys("2")
+    await settle()
+    expect(mockHapticReject).toHaveBeenCalledTimes(2)
+  })
+
   /** ₦22 is past the bitcoin balance against the mocked price (see the switch spec below). */
   it("reads Low funds and outlines the wallet when the amount exceeds its balance", async () => {
     renderScreen(intraledgerDestination())
@@ -567,6 +601,99 @@ describe("free amount", () => {
  * hook to the screen. The SDK reserves the wallet's funds to quote, so it is asked once,
  * on Next, and never while the amount is typed.
  */
+describe("LNURL bounds", () => {
+  const lnurlDestination = (bounds: { min: number; max: number }) => {
+    const lnurlParams: LnUrlPayServiceResponse = {
+      callback: "https://example.com/cb",
+      fixed: false,
+      min: bounds.min as Satoshis,
+      max: bounds.max as Satoshis,
+      domain: "example.com",
+      metadata: [["text/plain", "Pay alice"]],
+      metadataHash: "",
+      identifier: "alice@example.com",
+      description: "Pay alice",
+      image: "",
+      commentAllowed: 0,
+      rawData: { metadata: '[["text/plain","Pay alice"]]' },
+    }
+    return {
+      valid: true,
+      validDestination: {
+        valid: true,
+        paymentType: PaymentType.Lnurl,
+        lnurl: "lnurl1alice",
+        lnurlParams,
+      },
+      destinationDirection: DestinationDirection.Send,
+      createPaymentDetail: <T extends WalletCurrency>({
+        convertMoneyAmount,
+        sendingWalletDescriptor,
+      }: CreatePaymentDetailParams<T>) =>
+        recordAmounts(
+          createLnurlPaymentDetails({
+            lnurl: "lnurl1alice",
+            lnurlParams,
+            unitOfAccountAmount: ZeroBtcMoneyAmount,
+            convertMoneyAmount,
+            sendingWalletDescriptor,
+            isMerchant: false,
+          }),
+        ),
+    } as unknown as PaymentDestination
+  }
+
+  const minNotMetText = /Amount must be at least/
+  const maxExceededText = /Amount must not exceed/
+
+  /** Every amount starts under a minimum as it is typed: ₦1 is about 4,200 sats, under the
+   *  10,000 minimum, on the way to ₦15, which is inside it and the balance. The inline text
+   *  says so while it lasts, but nothing was refused. */
+  it("stays silent while the amount is typed up past the minimum", async () => {
+    renderScreen(lnurlDestination({ min: 10000, max: 1000000 }))
+    await settle()
+
+    typeKeys("1")
+    await settle()
+    expect(screen.getByText(minNotMetText)).toBeTruthy()
+    expect(isNextDisabled()).toBe(true)
+
+    typeKeys("5")
+    await settle()
+    expect(screen.queryByText(minNotMetText)).toBeNull()
+    expect(isNextDisabled()).toBe(false)
+
+    expect(mockHapticTap).toHaveBeenCalledTimes(2)
+    expect(mockHapticReject).not.toHaveBeenCalled()
+  })
+
+  /** Over a maximum, each further digit only goes further over: ₦5 is about 20,800 sats,
+   *  past the 10,000 maximum. Once as it goes over, not again while it stays over, and
+   *  again after it comes back and goes over once more. */
+  it("buzzes a refusal each time the amount goes over the maximum", async () => {
+    renderScreen(lnurlDestination({ min: 1, max: 10000 }))
+    await settle()
+
+    typeKeys("5")
+    await settle()
+    expect(screen.getByText(maxExceededText)).toBeTruthy()
+    expect(mockHapticReject).toHaveBeenCalledTimes(1)
+
+    typeKeys("1")
+    await settle()
+    expect(mockHapticReject).toHaveBeenCalledTimes(1)
+
+    fireEvent.press(screen.getByTestId("Key ⌫"))
+    fireEvent.press(screen.getByTestId("Key ⌫"))
+    await settle()
+    expect(screen.queryByText(maxExceededText)).toBeNull()
+
+    typeKeys("5")
+    await settle()
+    expect(mockHapticReject).toHaveBeenCalledTimes(2)
+  })
+})
+
 describe("a self-custodial on-chain fee", () => {
   const ONCHAIN_ADDRESS = "bc1qamountentryspec"
   /** ₦1 is about 4,164 sats against the mocked price, ₦10 about 41,640. */
@@ -652,12 +779,52 @@ describe("a self-custodial on-chain fee", () => {
 
     expect(screen.queryByText(tooLow)).toBeNull()
     expect(isNextDisabled()).toBe(false)
+    expect(mockHapticReject).not.toHaveBeenCalled()
 
     fireEvent.press(nextButton())
     await settle()
 
     expect(screen.getByText(tooLow)).toBeTruthy()
     expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockHapticReject).toHaveBeenCalledTimes(1)
+  })
+
+  /** The light refusal of an amount fixed in place, like Low funds: once per showing. An
+   *  amount change hides the error, so the next Next that shows it buzzes again. */
+  it("buzzes a refusal each time Next shows the amount is too low", async () => {
+    renderScreen(onchainDestination)
+    await settle()
+    typeKeys("1")
+    await settle()
+
+    fireEvent.press(nextButton())
+    await settle()
+    expect(mockHapticReject).toHaveBeenCalledTimes(1)
+
+    fireEvent.press(screen.getByTestId("Key ⌫"))
+    typeKeys("2")
+    await settle()
+    expect(screen.queryByText(tooLow)).toBeNull()
+    expect(mockHapticReject).toHaveBeenCalledTimes(1)
+
+    fireEvent.press(nextButton())
+    await settle()
+    expect(screen.getByText(tooLow)).toBeTruthy()
+    expect(mockHapticReject).toHaveBeenCalledTimes(2)
+  })
+
+  it("stays silent for a fee error no amount fixes", async () => {
+    mockPrepareSend.mockRejectedValueOnce(new Error("Failed to select leaves"))
+    renderScreen(onchainDestination)
+    await settle()
+    typeKeys("1", "0")
+    await settle()
+
+    fireEvent.press(nextButton())
+    await settle()
+
+    expect(screen.getByText(LL.SendBitcoinScreen.sdkGenericError())).toBeTruthy()
+    expect(mockHapticReject).not.toHaveBeenCalled()
   })
 
   /** The reported bug: a quote that failed for a cause no amount fixes left the sender
@@ -685,6 +852,24 @@ describe("a self-custodial on-chain fee", () => {
       "sendBitcoinConfirmation",
       expect.anything(),
     )
+  })
+
+  /** The 200 sat Standard fee Next gets back is more than half of a 300 sat send. */
+  it("judges the fee Next quoted for the high-fee sheet", async () => {
+    mockPrepareSend.mockResolvedValue({})
+    renderScreen(onchainDestination)
+    await settle()
+    fireEvent.press(screen.getByTestId("send-hero-amount-primary"))
+    await settle()
+    typeKeys("3", "0", "0")
+    await settle()
+
+    fireEvent.press(nextButton())
+    await settle()
+
+    expect(mockPrepareSend).toHaveBeenCalledTimes(1)
+    expect(screen.getByText(LL.SendBitcoinScreen.highFeeSheet.title())).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   /** The quote is for the payment on screen when Next was pressed, so nothing on that
@@ -798,9 +983,12 @@ describe("a custodial on-chain payment to the sender's own address", () => {
     typeKeys("1")
     await settle()
 
-    expect(screen.getByText(selfPayment)).toBeTruthy()
+    // Inline, and in the error message sheet opened over it.
+    expect(screen.getAllByText(selfPayment)).toHaveLength(2)
     expect(screen.queryByText(LL.common.feeError())).toBeNull()
     expect(isNextDisabled()).toBe(true)
+    // The sheet's error haptic is the one buzz; the inline error adds no refusal.
+    expect(mockHapticReject).not.toHaveBeenCalled()
   })
 
   it("leaves Next on for any other fee error, as before", async () => {
@@ -815,6 +1003,7 @@ describe("a custodial on-chain payment to the sender's own address", () => {
 
     expect(screen.getByText(LL.common.feeError())).toBeTruthy()
     expect(isNextDisabled()).toBe(false)
+    expect(mockHapticReject).not.toHaveBeenCalled()
   })
 })
 

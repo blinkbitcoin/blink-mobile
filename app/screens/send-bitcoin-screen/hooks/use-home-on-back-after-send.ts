@@ -1,8 +1,22 @@
-import { useEffect } from "react"
+import { useCallback, useEffect } from "react"
 
 import { StackActions, useNavigation } from "@react-navigation/native"
 
 const BACKWARD_ACTIONS = ["GO_BACK", "POP"]
+
+/**
+ * Home once a send has gone out: the Home tab, selected explicitly. `popToTop` alone would
+ * keep `Primary`'s nested state, so a send started from a contact on People would land back
+ * on that contact. Back after an attempt, Sent's Close and the error sheet's Home all
+ * leave this way.
+ */
+export const homeAfterSendAction = () => StackActions.popTo("Primary", { screen: "Home" })
+
+/** Sent's Close: the Home tab, wherever the send started from. */
+export const useGoHomeAfterSend = () => {
+  const navigation = useNavigation()
+  return useCallback(() => navigation.dispatch(homeAfterSendAction()), [navigation])
+}
 
 /**
  * Once a send has reached the network it may land, and every screen behind review can
@@ -25,7 +39,7 @@ export const useHomeOnBackAfterSend = (hasAttemptedSend: boolean) => {
     return navigation.addListener("beforeRemove", (event) => {
       if (!BACKWARD_ACTIONS.includes(event.data.action.type)) return
       event.preventDefault()
-      navigation.dispatch(StackActions.popToTop())
+      navigation.dispatch(homeAfterSendAction())
     })
   }, [navigation, hasAttemptedSend])
 }

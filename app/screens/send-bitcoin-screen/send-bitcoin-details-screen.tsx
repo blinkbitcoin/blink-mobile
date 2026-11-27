@@ -30,6 +30,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useAppConfig, useClipboard, usePriceConversion } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { ErrorHaptic } from "@app/hooks/use-error-haptic"
 import { useInitialAccessibilityFocus } from "@app/hooks/use-initial-accessibility-focus"
 import { useKeyboardVisible } from "@app/hooks/use-keyboard-visible"
 import { radius } from "@app/rne-theme/radius"
@@ -49,14 +50,18 @@ import { isIos } from "@app/utils/helper"
 
 import { feeTierLabels } from "./fee-tier-options"
 import { FeeTierSelector } from "./fee-tier-selector"
-import { shouldWarnAboutHighFee } from "./hooks/onchain-fee-alert"
+import { shouldWarnAboutHighFee } from "./hooks/high-fee-alert"
 import { useOnchainFeeTierOptions } from "./hooks/use-onchain-fee-tier-options"
 import { useSendWallets } from "./hooks/use-send-wallets"
 
 import { testProps } from "../../utils/testProps"
+import {
+  AmountEntryErrorSheet,
+  LnurlInvoiceError,
+} from "./amount-entry/amount-entry-error-sheet"
 import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
-import { ConfirmFeesModal } from "./confirm-fees-modal"
 import { formatDestination } from "./format-destination"
+import { HighFeeSheet } from "./high-fee-sheet"
 import { SendHero } from "./send-hero"
 import {
   AmountInvalidReason,
@@ -159,12 +164,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     },
   } = useAppConfig()
   const [isLoadingLnurl, setIsLoadingLnurl] = useState(false)
-  const [modalHighFeesVisible, setModalHighFeesVisible] = useState(false)
+  const [isHighFeeSheetVisible, setIsHighFeeSheetVisible] = useState(false)
 
   const { convertMoneyAmount: _convertMoneyAmount, displayCurrency } =
     usePriceConversion()
   const { zeroDisplayAmount } = useDisplayCurrency()
-  const { paymentDestination, sendingWalletId } = route.params
+  const { paymentDestination, resetAmountAt, sendingWalletId } = route.params
 
   /** The wallet the caller judged able to pay, when it named one the flow offers; the
    *  flow's own default otherwise. */
@@ -182,6 +187,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     feeTierOptions,
     feeTierErrorMessage,
     isSelfPayment,
+    isFeeTierAmountTooLow,
     isQuotingFees,
     isQuotingFeesForNext,
     isOnchain,
@@ -208,25 +214,36 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     if (rebuilt) setPaymentDetail(rebuilt)
   }
 
-  const { data: withdrawalLimitsData } = useSendBitcoinWithdrawalLimitsQuery({
+  /** Blink's daily limits govern the custodial account only. A self-custodial send settles
+   *  in the device's own wallet, so a signed-in user on that rail is not asked for them. */
+  const skipLimits = !useIsAuthed() || isSelfCustodial || !paymentDetail?.paymentType
+
+  const {
+    data: withdrawalLimitsData,
+    loading: withdrawalLimitsLoading,
+    error: withdrawalLimitsError,
+    refetch: refetchWithdrawalLimits,
+  } = useSendBitcoinWithdrawalLimitsQuery({
     fetchPolicy: "no-cache",
-    skip:
-      !useIsAuthed() ||
-      !paymentDetail?.paymentType ||
-      paymentDetail.paymentType === "intraledger",
+    skip: skipLimits || paymentDetail?.paymentType === "intraledger",
   })
 
-  const { data: intraledgerLimitsData } = useSendBitcoinInternalLimitsQuery({
+  const {
+    data: intraledgerLimitsData,
+    loading: intraledgerLimitsLoading,
+    error: intraledgerLimitsError,
+    refetch: refetchIntraledgerLimits,
+  } = useSendBitcoinInternalLimitsQuery({
     fetchPolicy: "no-cache",
-    skip:
-      !useIsAuthed() ||
-      !paymentDetail?.paymentType ||
-      paymentDetail.paymentType !== "intraledger",
+    skip: skipLimits || paymentDetail?.paymentType !== "intraledger",
   })
 
-  const [asyncErrorMessage, setAsyncErrorMessage] = useState("")
+  const [lnurlError, setLnurlError] = useState<LnurlInvoiceError>()
 
+  /** A typed amount, or none. An invoice request's error was about the amount it asked
+   *  for, so a new amount clears it and frees the error slot and sheet for this one. */
   const setAmount = useCallback((moneyAmount: MoneyAmount<WalletOrDisplayCurrency>) => {
+    setLnurlError(undefined)
     setPaymentDetail((paymentDetail) =>
       paymentDetail?.setAmount ? paymentDetail.setAmount(moneyAmount) : paymentDetail,
     )
@@ -241,6 +258,22 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     amountOfRecord: paymentDetail?.unitOfAccountAmount,
     onAmountChange: setAmount,
   })
+
+  /** "Change amount", from review or from this screen's error sheet: back to zero, with the
+   *  destination, wallet and note kept. */
+  const clearAmount = () => {
+    setAmount(zeroDisplayAmount)
+    amountPad.showAmount(zeroDisplayAmount)
+  }
+
+  // Review's "Change amount" comes back with a fresh `resetAmountAt`. The back arrow
+  // sends none, so it returns with the amount as it was.
+  const handledResetAt = useRef(resetAmountAt)
+  useEffect(() => {
+    if (!resetAmountAt || handledResetAt.current === resetAmountAt) return
+    handledResetAt.current = resetAmountAt
+    clearAmount()
+  }, [resetAmountAt, clearAmount])
 
   /** Keeps the payment detail on the current rate. A change of display currency, which is
    *  what sats-only mode starting or ending is, also moves the amount already typed. */
@@ -350,8 +383,11 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   /**
    * The LNURL service's bounds, which the amount modal this screen replaced enforced before
    * it let an amount through. With the keypad in-screen they hold Next instead.
+   *
+   * Over the maximum, every further digit only goes further over. Under the minimum is
+   * where every amount starts as it is typed, on its way to a valid one.
    */
-  const lnurlBoundsErrorMessage = (() => {
+  const lnurlBoundsError = ((): { message: string; isOverMax: boolean } | undefined => {
     if (!lnurlParams || !paymentDetail.canSetAmount) return undefined
     const amount = paymentDetail.unitOfAccountAmount
     if (!amount.amount) return undefined
@@ -359,21 +395,28 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     if (lnurlParams.max) {
       const max = toBtcMoneyAmount(lnurlParams.max)
       if (greaterThan({ value: btcAmount, greaterThan: max })) {
-        return LL.AmountInputScreen.maxAmountExceeded({
-          maxAmount: formatMoneyAmount({ moneyAmount: max }),
-        })
+        return {
+          message: LL.AmountInputScreen.maxAmountExceeded({
+            maxAmount: formatMoneyAmount({ moneyAmount: max }),
+          }),
+          isOverMax: true,
+        }
       }
     }
     if (lnurlParams.min) {
       const min = toBtcMoneyAmount(lnurlParams.min)
       if (lessThan({ value: btcAmount, lessThan: min })) {
-        return LL.AmountInputScreen.minAmountNotMet({
-          minAmount: formatMoneyAmount({ moneyAmount: min }),
-        })
+        return {
+          message: LL.AmountInputScreen.minAmountNotMet({
+            minAmount: formatMoneyAmount({ moneyAmount: min }),
+          }),
+          isOverMax: false,
+        }
       }
     }
     return undefined
   })()
+  const lnurlBoundsErrorMessage = lnurlBoundsError?.message
 
   const handleCopyToClipboard = () => {
     copyToClipboard({
@@ -429,6 +472,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       let paymentDetailForConfirmation: PaymentDetail<WalletCurrency> = paymentDetail
 
       if (paymentDetail.paymentType === "lnurl" && !paymentDetail.sendPaymentMutation) {
+        // A new request clears the last one's error, so a retry that fails opens the sheet again.
+        setLnurlError(undefined)
         try {
           setIsLoadingLnurl(true)
 
@@ -444,7 +489,11 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           // not be the callback it pays.
           if (!lnurlParams) {
             setIsLoadingLnurl(false)
-            setAsyncErrorMessage(LL.SendBitcoinScreen.failedToFetchLnurlInvoice())
+            setLnurlError({
+              title: LL.SendBitcoinScreen.recipientUnreachableTitle(),
+              message: LL.SendBitcoinScreen.failedToFetchLnurlInvoice(),
+              canRetry: true,
+            })
             return
           }
 
@@ -472,7 +521,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           if (
             Math.round(Number(decodedInvoice.millisatoshis) / 1000) !== btcAmount.amount
           ) {
-            setAsyncErrorMessage(LL.SendBitcoinScreen.lnurlInvoiceIncorrectAmount())
+            // Paying it would send the wrong amount, so there is no retry (L3).
+            setLnurlError({
+              title: LL.SendBitcoinScreen.recipientWrongAmountTitle(),
+              message: LL.SendBitcoinScreen.lnurlInvoiceIncorrectAmount(),
+              canRetry: false,
+            })
             return
           }
 
@@ -486,19 +540,19 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         } catch (error) {
           setIsLoadingLnurl(false)
           reportError("send-bitcoin-details", error)
-          setAsyncErrorMessage(LL.SendBitcoinScreen.failedToFetchLnurlInvoice())
+          setLnurlError({
+            title: LL.SendBitcoinScreen.recipientUnreachableTitle(),
+            message: LL.SendBitcoinScreen.failedToFetchLnurlInvoice(),
+            canRetry: true,
+          })
           return
         }
       }
 
       if (paymentDetailForConfirmation.sendPaymentMutation) {
-        const alertHighFees = shouldWarnAboutHighFee({
-          paymentDetail,
-          isSelfCustodial,
-          ...feeQuote,
-        })
+        const alertHighFees = shouldWarnAboutHighFee({ paymentDetail, ...feeQuote })
         if (alertHighFees) {
-          setModalHighFeesVisible(true)
+          setIsHighFeeSheetVisible(true)
         } else {
           navigation.navigate("sendBitcoinConfirmation", {
             paymentDetail: paymentDetailForConfirmation,
@@ -506,6 +560,20 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         }
       }
     })
+
+  /** Only one of the two limits queries runs for a payment, so at most one can fail. */
+  const retryLimits = withdrawalLimitsError
+    ? () => refetchWithdrawalLimits()
+    : intraledgerLimitsError
+      ? () => refetchIntraledgerLimits()
+      : undefined
+  /** A limit nobody has read yet, still on its way or failed, is not one the amount passed,
+   *  so it holds Next until a read answers. A skipped query is never loading. */
+  const isLimitsUnread = Boolean(
+    retryLimits ||
+      (withdrawalLimitsLoading && !withdrawalLimitsData) ||
+      (intraledgerLimitsLoading && !intraledgerLimitsData),
+  )
 
   /**
    * Held while the custodial quote is out, because the high-fee warning is judged by the fee the
@@ -517,16 +585,24 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     !amountStatus.validAmount ||
     Boolean(lnurlBoundsErrorMessage) ||
     isSelfPayment ||
-    isQuotingFees
+    isQuotingFees ||
+    isLimitsUnread
 
   /**
    * The extra-info box shows one message, and an invalid amount is the one the sender can
-   * act on, so a fee error only takes the box once the amount is valid.
+   * act on, so a fee error only takes the box once the amount is valid. An unread limit
+   * stays in the box after its sheet is closed, unless an amount problem holds it.
    */
+  const isAmountBlocked =
+    !amountStatus.validAmount &&
+    amountStatus.invalidReason !== AmountInvalidReason.NoAmount
   const extraInfoErrorMessage =
-    asyncErrorMessage ||
+    lnurlError?.message ||
     lnurlBoundsErrorMessage ||
-    (amountStatus.validAmount ? feeTierErrorMessage : undefined)
+    (amountStatus.validAmount ? feeTierErrorMessage : undefined) ||
+    (retryLimits && !isAmountBlocked
+      ? LL.SendBitcoinScreen.limitsUnavailable()
+      : undefined)
 
   const walletCurrency = sendingWalletDescriptor.currency
 
@@ -601,13 +677,43 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       avoidKeyboardEnabled={isIos || isKeyboardVisible}
       edges={isKeyboardVisible ? ["left", "right"] : ["left", "right", "bottom"]}
     >
-      <ConfirmFeesModal
-        action={() => {
-          setModalHighFeesVisible(false)
+      <AmountEntryErrorSheet
+        lnurlError={lnurlError}
+        limitMessage={
+          !amountStatus.validAmount &&
+          amountStatus.invalidReason === AmountInvalidReason.InsufficientLimit
+            ? LL.SendBitcoinScreen.amountExceedsLimit({
+                limit: formatMoneyAmount({ moneyAmount: amountStatus.remainingLimit }),
+              })
+            : undefined
+        }
+        selfPaymentMessage={isSelfPayment ? feeTierErrorMessage : undefined}
+        onRetryLimits={retryLimits}
+        onRetry={goToNextScreen || undefined}
+        onChangeAmount={clearAmount}
+      />
+      {/* An amount the sender fixes right here gets the light refusal, the too-low
+          on-chain amount once Next shows it. Under an LNURL minimum stays silent: the
+          amount is still being typed towards it, and the inline text already says so.
+          Over the daily limit and the sender's own address open the error sheet, which
+          buzzes for itself. Every other fee error is the service's, so it stays silent. */}
+      <ErrorHaptic
+        error={
+          (lnurlBoundsError?.isOverMax ? lnurlBoundsError.message : undefined) ||
+          (isLowFunds ? "lowFunds" : undefined) ||
+          (amountStatus.validAmount && isFeeTierAmountTooLow
+            ? feeTierErrorMessage
+            : undefined)
+        }
+        kind="reject"
+      />
+      <HighFeeSheet
+        isVisible={isHighFeeSheetVisible}
+        onAccept={() => {
+          setIsHighFeeSheetVisible(false)
           navigation.navigate("sendBitcoinConfirmation", { paymentDetail })
         }}
-        isVisible={modalHighFeesVisible}
-        cancel={() => setModalHighFeesVisible(false)}
+        onClose={() => setIsHighFeeSheetVisible(false)}
       />
       <ScrollView
         ref={scrollRef}

@@ -2359,6 +2359,7 @@
     "somethingWentWrong": "Nešto je pošlo po zlu",
     "priceUpdated": "Cijena se promijenila pa su iznosi ažurirani. Provjerite ih prije slanja.",
     "paymentAlreadyAttempted": "Plaćanje je već pokušano.\n\nAko želite ponovo poslati ovo plaćanje, počnite ispočetka.",
+    "paymentMayStillLand": "Pričekajte trenutak, uplata će vjerojatno uskoro proći. Vaš novac će sigurno stići ili ostati kod vas.",
     "slideConfirming": "Potvrđivanje...",
     "slideToSend": "Povucite za slanje",
     "calculatingFee": "Izračun naknade…",
@@ -2382,6 +2383,9 @@
     "fromBalance": "Sa salda",
     "details": "Detalji",
     "changeAmount": "Promijeni iznos",
+    "tryAgain": "Pokušajte ponovno",
+    "home": "Doma",
+    "dustSweepSheetTitle": "Prije slanja",
     "usdRemainderSweep": "Preostalo {remaining: string} ({remainingSats: string}) bit će pretvoreno u Bitcoin. Minimum u USD: {minimum: string}.",
     "sendAnyway": "Povijest je provjerena, svejedno pošalji"
   },
@@ -2430,6 +2434,11 @@
     "lowFunds": "Nedovoljno sredstava",
     "amountExceed": "Iznos premašuje vaš saldo od {balance: string}",
     "amountExceedsLimit": "Iznos premašuje vaše preostalo dnevno ograničenje od {limit: string}",
+    "limitsUnavailable": "Nismo mogli provjeriti vaše dnevno ograničenje. Pokušajte ponovno za trenutak.",
+    "problemSheetTitle": "Mali problem",
+    "changeDestination": "Promijeni odredište",
+    "recipientUnreachableTitle": "Nije moguće doći do primatelja",
+    "recipientWrongAmountTitle": "Primatelj je naveo pogrešan iznos",
     "upgradeAccountToIncreaseLimit": "Nadogradite svoj račun kako biste povećali svoje ograničenje",
     "amountIsRequired": "Potreban je iznos",
     "cost": "Trošak",
@@ -2448,10 +2457,11 @@
     "title": "Šalji Bitcoin",
     "failedToFetchLnurlInvoice": "Nije uspjelo dohvaćanje lnurl fakture",
     "lnurlInvoiceIncorrectAmount": "lnurl poslužitelj je odgovorio fakturom s netočnim iznosom.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Upozorenje o visokoj naknadi!",
-      "content": "Vaša naknada je više od 50% veća od poslanog iznosa. Jeste li sigurni da želite nastaviti?\n\nZa smanjenje naknada, zamolite primatelja da prihvati transakciju putem Lightninga",
-      "confirmButton": "100% sam siguran/na"
+      "body": "Vaša naknada iznosi 50 % ili više iznosa koji šaljete. Jeste li sigurni da želite nastaviti?",
+      "cancelPayment": "Otkaži plaćanje",
+      "acceptFee": "Prihvati naknadu"
     },
     "copiedDestination": "Odredište kopirano u međuspremnik",
     "pendingPayment": "Plaćanje je poslano, ali još nije potvrđeno.\n\nMoguće je da plaćanje neće biti potvrđeno, u tom slučaju sredstva će biti vraćena na vaš račun.",
@@ -2998,6 +3008,7 @@
     "note": "Bilješka",
     "notification": "Obavijest",
     "ok": "OK",
+    "okay": "U redu",
     "or": "ili",
     "openWallet": "Otvori Novčanik",
     "onchain": "Onchain",
@@ -4002,17 +4013,22 @@
     "migrateNowModal": {
       "title": "Migrirajte sada na račun bez skrbništva",
       "body": "Više ne možete primati sredstva na svoj skrbnički račun. Blink je ukinuo skrbničku uslugu u vašoj regiji i ovaj će račun biti deaktiviran do kraja dana {date}.\n\nMigrirajte sada na račun bez skrbništva.",
+      "bodyLevelZero": "Više ne možete primati sredstva na ovaj probni račun. Blink zatvara probne račune i ovaj će račun biti deaktiviran do kraja dana {date}.\n\nMigrirajte sada na račun bez skrbništva.",
       "migrateCta": "Migriraj sada"
     },
     "reminderBulletin": {
       "title": "Važno",
       "body": "Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date}. Primanje prestaje {receiveStopsDate}.",
+      "bodySingleDate": "Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date} — sve se prenosi u nekoliko dodira.",
+      "bodyLevelZero": "Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date}.",
       "bodyReceiveDisabled": "Primanje je prestalo. Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date}.",
       "migrateCta": "Migriraj"
     },
     "offboardBulletin": {
       "title": "Važno",
-      "body": "Vaš račun registriran je u regiji u kojoj ne možemo nuditi račune. Podignite svoja sredstva prije 31. kolovoza. Primanje prestaje 10. kolovoza."
+      "bodyTwoDates": "Blink ne može nuditi skrbničke račune u vašoj regiji. Podignite svoja sredstva prije {date} — bez ikakvih naknada Blinka. Primanje prestaje {receiveStopsDate}. Ako smatrate da je vaš račun pogođen greškom, svoje trenutačno prebivalište možete potvrditi u aplikaciji.",
+      "bodySingleDate": "Blink ne može nuditi skrbničke račune u vašoj regiji. Podignite svoja sredstva prije {date} — bez ikakvih naknada Blinka. Ako smatrate da je vaš račun pogođen greškom, svoje trenutačno prebivalište možete potvrditi u aplikaciji.",
+      "bodyReceiveOff": "Blink ne može nuditi skrbničke račune u vašoj regiji. Podignite svoja sredstva prije {date} — bez ikakvih naknada Blinka. Primanje je isključeno. Ako smatrate da je vaš račun pogođen greškom, svoje trenutačno prebivalište možete potvrditi u aplikaciji."
     },
     "dollarBalanceModal": {
       "title": "Ne možemo migrirati vaš dolarski saldo",
@@ -4068,8 +4084,10 @@
     "resumeFailed": "Nešto je pošlo po zlu pri nastavku migracije. Molimo započnite je ponovno.",
     "migrationRequiredBody": "Vrijeme je da migrirate svoj skrbnički račun na račun bez skrbništva.",
     "migrationRequiredForcedBody": "Vrijeme je da migrirate svoj skrbnički račun na račun bez skrbništva. To je obavezno iz regulatornih razloga.\n\nBez brige, non-custodial će ti dugoročno biti bolji.",
+    "migrationRequiredForcedBodyLevelZero": "Blink zatvara probne račune. Prenesite svoj saldo na račun bez skrbništva. Potrebno je samo nekoliko dodira.",
     "migrationGateTitle": "Račun nije dostupan",
     "migrationGateBody": "Iz regulatornih razloga ne možemo pružati custodial račune u tvojoj regiji. Prenesi svoja sredstva na non-custodial račun uz Blink slijedeći sljedeće korake ili nas kontaktiraj na <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Probni računi sada su zatvoreni. Vaš saldo je siguran. Prenesite ga na račun bez skrbništva slijedeći sljedeće korake, besplatno i bez vremenskog ograničenja, ili nas kontaktirajte na <link>{email}</link>",
     "bitcoinBalance": "Stanje Bitcoina",
     "dollarBalance": "Stanje u dolarima",
     "moveToNonCustodial": "Prebaci na ne-skrbnički",

@@ -21,6 +21,19 @@ export const WindDownStatus = {
 export type WindDownStatus = (typeof WindDownStatus)[keyof typeof WindDownStatus]
 
 /**
+ * Why the account is being wound down, as the backend reports it: REGION for an account
+ * registered where Blink can no longer offer custodial accounts, LEVEL_ZERO for a trial
+ * account closing wherever it is registered. Only the copy branches on it: LEVEL_ZERO
+ * gets the trial-account wording, and every other value keeps the region wording.
+ */
+export const WindDownReason = {
+  LevelZero: "LEVEL_ZERO",
+  Region: "REGION",
+} as const
+
+export type WindDownReason = (typeof WindDownReason)[keyof typeof WindDownReason]
+
+/**
  * Shape of the backend wind-down state (the authed top-level Query.windDown in the
  * integration contract). Dates are Unix SECONDS and exist only for display copy ("by
  * the end of 31st of August"); the timezone is the IANA zone the backend defines per
@@ -29,6 +42,8 @@ export type WindDownStatus = (typeof WindDownStatus)[keyof typeof WindDownStatus
  */
 export type WindDown = {
   status: WindDownStatus
+  /** Why the account is wound down; picks the Level 0 or the region copy. */
+  reason: WindDownReason
   /** When receiving gets disabled (phase 2 starts). Display only. */
   receiveDisabledAt: number
   /** Last day to initiate an exit; the date shown in the "Migrate now" modal. */

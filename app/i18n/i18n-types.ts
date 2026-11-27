@@ -7504,6 +7504,10 @@ type RootTranslation = {
 		 */
 		paymentAlreadyAttempted: string
 		/**
+		 * W​a​i​t​ ​a​ ​m​o​m​e​n​t​,​ ​i​t​ ​w​i​l​l​ ​p​r​o​b​a​b​l​y​ ​g​o​ ​t​h​r​o​u​g​h​ ​s​o​o​n​.​ ​Y​o​u​r​ ​m​o​n​e​y​ ​w​i​l​l​ ​a​r​r​i​v​e​ ​s​a​f​e​l​y​ ​o​r​ ​s​t​a​y​ ​w​i​t​h​ ​y​o​u​.
+		 */
+		paymentMayStillLand: string
+		/**
 		 * C​o​n​f​i​r​m​i​n​g​.​.​.
 		 */
 		slideConfirming: string
@@ -7590,6 +7594,18 @@ type RootTranslation = {
 		 * C​h​a​n​g​e​ ​a​m​o​u​n​t
 		 */
 		changeAmount: string
+		/**
+		 * T​r​y​ ​a​g​a​i​n
+		 */
+		tryAgain: string
+		/**
+		 * H​o​m​e
+		 */
+		home: string
+		/**
+		 * B​e​f​o​r​e​ ​y​o​u​ ​s​e​n​d
+		 */
+		dustSweepSheetTitle: string
 		/**
 		 * R​e​m​a​i​n​i​n​g​ ​{​r​e​m​a​i​n​i​n​g​}​ ​(​{​r​e​m​a​i​n​i​n​g​S​a​t​s​}​)​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​B​i​t​c​o​i​n​.​ ​U​S​D​ ​m​i​n​i​m​u​m​:​ ​{​m​i​n​i​m​u​m​}​.
 		 * @param {string} minimum
@@ -7785,6 +7801,26 @@ type RootTranslation = {
 		 */
 		amountExceedsLimit: RequiredParams<'limit'>
 		/**
+		 * W​e​ ​c​o​u​l​d​n​'​t​ ​c​h​e​c​k​ ​y​o​u​r​ ​d​a​i​l​y​ ​l​i​m​i​t​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​.
+		 */
+		limitsUnavailable: string
+		/**
+		 * A​ ​s​m​a​l​l​ ​p​r​o​b​l​e​m
+		 */
+		problemSheetTitle: string
+		/**
+		 * C​h​a​n​g​e​ ​d​e​s​t​i​n​a​t​i​o​n
+		 */
+		changeDestination: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​r​e​a​c​h​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t
+		 */
+		recipientUnreachableTitle: string
+		/**
+		 * R​e​c​i​p​i​e​n​t​ ​s​e​n​t​ ​t​h​e​ ​w​r​o​n​g​ ​a​m​o​u​n​t
+		 */
+		recipientWrongAmountTitle: string
+		/**
 		 * U​p​g​r​a​d​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​t​o​ ​i​n​c​r​e​a​s​e​ ​y​o​u​r​ ​l​i​m​i​t
 		 */
 		upgradeAccountToIncreaseLimit: string
@@ -7860,21 +7896,23 @@ type RootTranslation = {
 		 * T​h​e​ ​l​n​u​r​l​ ​s​e​r​v​e​r​ ​r​e​s​p​o​n​d​e​d​ ​w​i​t​h​ ​a​n​ ​i​n​v​o​i​c​e​ ​w​i​t​h​ ​a​n​ ​i​n​c​o​r​r​e​c​t​ ​a​m​o​u​n​t​.
 		 */
 		lnurlInvoiceIncorrectAmount: string
-		confirmFeesModal: {
+		highFeeSheet: {
 			/**
 			 * H​i​g​h​ ​f​e​e​ ​a​l​e​r​t​!
 			 */
 			title: string
 			/**
-			 * Y​o​u​r​ ​f​e​e​ ​i​s​ ​m​o​r​e​ ​t​h​a​n​ ​5​0​%​ ​b​i​g​g​e​r​ ​t​h​a​n​ ​t​h​e​ ​a​m​o​u​n​t​ ​s​e​n​t​.​ ​A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​p​r​o​c​e​e​d​?​
-		​
-		​T​o​ ​r​e​d​u​c​e​ ​f​e​e​s​,​ ​a​s​k​ ​t​h​e​ ​r​e​c​e​i​v​e​r​ ​t​o​ ​a​c​c​e​p​t​ ​t​r​a​n​s​a​c​t​i​o​n​ ​v​i​a​ ​L​i​g​h​t​n​i​n​g
+			 * Y​o​u​r​ ​f​e​e​ ​i​s​ ​5​0​%​ ​o​r​ ​m​o​r​e​ ​o​f​ ​t​h​e​ ​a​m​o​u​n​t​ ​y​o​u​'​r​e​ ​s​e​n​d​i​n​g​.​ ​A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​p​r​o​c​e​e​d​?
 			 */
-			content: string
+			body: string
 			/**
-			 * I​'​m​ ​1​0​0​%​ ​s​u​r​e
+			 * C​a​n​c​e​l​ ​p​a​y​m​e​n​t
 			 */
-			confirmButton: string
+			cancelPayment: string
+			/**
+			 * A​c​c​e​p​t​ ​f​e​e
+			 */
+			acceptFee: string
 		}
 		/**
 		 * C​o​p​i​e​d​ ​d​e​s​t​i​n​a​t​i​o​n​ ​t​o​ ​c​l​i​p​b​o​a​r​d
@@ -10000,6 +10038,10 @@ type RootTranslation = {
 		 * O​K
 		 */
 		ok: string
+		/**
+		 * O​k​a​y
+		 */
+		okay: string
 		/**
 		 * o​r
 		 */
@@ -13339,6 +13381,10 @@ type RootTranslation = {
 		 */
 		migrationRequiredForcedBody: string
 		/**
+		 * B​l​i​n​k​ ​i​s​ ​c​l​o​s​i​n​g​ ​t​r​i​a​l​ ​a​c​c​o​u​n​t​s​.​ ​M​o​v​e​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.​ ​I​t​ ​o​n​l​y​ ​t​a​k​e​s​ ​a​ ​f​e​w​ ​t​a​p​s​.
+		 */
+		migrationRequiredForcedBodyLevelZero: string
+		/**
 		 * A​c​c​o​u​n​t​ ​n​o​t​ ​a​c​c​e​s​s​i​b​l​e
 		 */
 		migrationGateTitle: string
@@ -13347,6 +13393,11 @@ type RootTranslation = {
 		 * @param {unknown} email
 		 */
 		migrationGateBody: RequiredParams<'email'>
+		/**
+		 * T​r​i​a​l​ ​a​c​c​o​u​n​t​s​ ​a​r​e​ ​n​o​w​ ​c​l​o​s​e​d​.​ ​Y​o​u​r​ ​b​a​l​a​n​c​e​ ​i​s​ ​s​a​f​e​.​ ​M​o​v​e​ ​i​t​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​b​y​ ​f​o​l​l​o​w​i​n​g​ ​t​h​e​ ​n​e​x​t​ ​s​t​e​p​s​,​ ​f​r​e​e​ ​a​n​d​ ​w​i​t​h​ ​n​o​ ​t​i​m​e​ ​l​i​m​i​t​,​ ​o​r​ ​c​o​n​t​a​c​t​ ​u​s​ ​a​t​ ​<​l​i​n​k​>​{​e​m​a​i​l​}​<​/​l​i​n​k​>
+		 * @param {unknown} email
+		 */
+		migrationGateBodyLevelZero: RequiredParams<'email'>
 		/**
 		 * B​i​t​c​o​i​n​ ​b​a​l​a​n​c​e
 		 */
@@ -13554,6 +13605,13 @@ type RootTranslation = {
 			 */
 			body: RequiredParams<'date'>
 			/**
+			 * Y​o​u​ ​c​a​n​ ​n​o​ ​l​o​n​g​e​r​ ​r​e​c​e​i​v​e​ ​f​u​n​d​s​ ​t​o​ ​t​h​i​s​ ​t​r​i​a​l​ ​a​c​c​o​u​n​t​.​ ​B​l​i​n​k​ ​i​s​ ​c​l​o​s​i​n​g​ ​t​r​i​a​l​ ​a​c​c​o​u​n​t​s​ ​a​n​d​ ​t​h​i​s​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​i​n​a​c​t​i​v​a​t​e​d​ ​b​y​ ​t​h​e​ ​e​n​d​ ​o​f​ ​{​d​a​t​e​}​.​
+		​
+		​M​i​g​r​a​t​e​ ​n​o​w​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
+			 * @param {string} date
+			 */
+			bodyLevelZero: RequiredParams<'date'>
+			/**
 			 * M​i​g​r​a​t​e​ ​n​o​w
 			 */
 			migrateCta: string
@@ -13570,6 +13628,16 @@ type RootTranslation = {
 			 */
 			body: RequiredParams<'date' | 'receiveStopsDate'>
 			/**
+			 * M​o​v​e​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​v​i​a​ ​g​u​i​d​e​d​ ​m​i​g​r​a​t​i​o​n​,​ ​o​r​ ​w​i​t​h​d​r​a​w​,​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​ ​—​ ​e​v​e​r​y​t​h​i​n​g​ ​m​o​v​e​s​ ​i​n​ ​a​ ​f​e​w​ ​t​a​p​s​.
+			 * @param {string} date
+			 */
+			bodySingleDate: RequiredParams<'date'>
+			/**
+			 * M​o​v​e​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​v​i​a​ ​g​u​i​d​e​d​ ​m​i​g​r​a​t​i​o​n​,​ ​o​r​ ​w​i​t​h​d​r​a​w​,​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​.
+			 * @param {string} date
+			 */
+			bodyLevelZero: RequiredParams<'date'>
+			/**
 			 * R​e​c​e​i​v​i​n​g​ ​h​a​s​ ​s​t​o​p​p​e​d​.​ ​M​o​v​e​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​v​i​a​ ​g​u​i​d​e​d​ ​m​i​g​r​a​t​i​o​n​,​ ​o​r​ ​w​i​t​h​d​r​a​w​,​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​.
 			 * @param {string} date
 			 */
@@ -13585,9 +13653,21 @@ type RootTranslation = {
 			 */
 			title: string
 			/**
-			 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​r​e​g​i​s​t​e​r​e​d​ ​i​n​ ​a​ ​r​e​g​i​o​n​ ​w​h​e​r​e​ ​w​e​ ​c​a​n​n​o​t​ ​o​f​f​e​r​ ​a​c​c​o​u​n​t​s​.​ ​W​i​t​h​d​r​a​w​ ​y​o​u​r​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​A​u​g​u​s​t​ ​3​1​.​ ​R​e​c​e​i​v​i​n​g​ ​s​t​o​p​s​ ​A​u​g​u​s​t​ ​1​0​.
+			 * B​l​i​n​k​ ​c​a​n​n​o​t​ ​o​f​f​e​r​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​s​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n​.​ ​W​i​t​h​d​r​a​w​ ​y​o​u​r​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​ ​—​ ​f​r​e​e​ ​o​f​ ​a​n​y​ ​B​l​i​n​k​ ​c​h​a​r​g​e​.​ ​R​e​c​e​i​v​i​n​g​ ​s​t​o​p​s​ ​{​r​e​c​e​i​v​e​S​t​o​p​s​D​a​t​e​}​.​ ​I​f​ ​y​o​u​ ​b​e​l​i​e​v​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​h​a​s​ ​b​e​e​n​ ​a​f​f​e​c​t​e​d​ ​i​n​ ​e​r​r​o​r​,​ ​y​o​u​ ​c​a​n​ ​v​e​r​i​f​y​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​r​e​s​i​d​e​n​c​e​ ​i​n​ ​t​h​e​ ​a​p​p​.
+			 * @param {string} date
+			 * @param {string} receiveStopsDate
 			 */
-			body: string
+			bodyTwoDates: RequiredParams<'date' | 'receiveStopsDate'>
+			/**
+			 * B​l​i​n​k​ ​c​a​n​n​o​t​ ​o​f​f​e​r​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​s​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n​.​ ​W​i​t​h​d​r​a​w​ ​y​o​u​r​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​ ​—​ ​f​r​e​e​ ​o​f​ ​a​n​y​ ​B​l​i​n​k​ ​c​h​a​r​g​e​.​ ​I​f​ ​y​o​u​ ​b​e​l​i​e​v​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​h​a​s​ ​b​e​e​n​ ​a​f​f​e​c​t​e​d​ ​i​n​ ​e​r​r​o​r​,​ ​y​o​u​ ​c​a​n​ ​v​e​r​i​f​y​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​r​e​s​i​d​e​n​c​e​ ​i​n​ ​t​h​e​ ​a​p​p​.
+			 * @param {string} date
+			 */
+			bodySingleDate: RequiredParams<'date'>
+			/**
+			 * B​l​i​n​k​ ​c​a​n​n​o​t​ ​o​f​f​e​r​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​s​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n​.​ ​W​i​t​h​d​r​a​w​ ​y​o​u​r​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​ ​—​ ​f​r​e​e​ ​o​f​ ​a​n​y​ ​B​l​i​n​k​ ​c​h​a​r​g​e​.​ ​R​e​c​e​i​v​i​n​g​ ​i​s​ ​o​f​f​.​ ​I​f​ ​y​o​u​ ​b​e​l​i​e​v​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​h​a​s​ ​b​e​e​n​ ​a​f​f​e​c​t​e​d​ ​i​n​ ​e​r​r​o​r​,​ ​y​o​u​ ​c​a​n​ ​v​e​r​i​f​y​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​r​e​s​i​d​e​n​c​e​ ​i​n​ ​t​h​e​ ​a​p​p​.
+			 * @param {string} date
+			 */
+			bodyReceiveOff: RequiredParams<'date'>
 		}
 		contactSupport: {
 			/**
@@ -22102,6 +22182,10 @@ export type TranslationFunctions = {
 		 */
 		paymentAlreadyAttempted: () => LocalizedString
 		/**
+		 * Wait a moment, it will probably go through soon. Your money will arrive safely or stay with you.
+		 */
+		paymentMayStillLand: () => LocalizedString
+		/**
 		 * Confirming...
 		 */
 		slideConfirming: () => LocalizedString
@@ -22187,6 +22271,18 @@ export type TranslationFunctions = {
 		 * Change amount
 		 */
 		changeAmount: () => LocalizedString
+		/**
+		 * Try again
+		 */
+		tryAgain: () => LocalizedString
+		/**
+		 * Home
+		 */
+		home: () => LocalizedString
+		/**
+		 * Before you send
+		 */
+		dustSweepSheetTitle: () => LocalizedString
 		/**
 		 * Remaining {remaining} ({remainingSats}) will be converted to Bitcoin. USD minimum: {minimum}.
 		 */
@@ -22360,6 +22456,26 @@ export type TranslationFunctions = {
 		 */
 		amountExceedsLimit: (arg: { limit: string }) => LocalizedString
 		/**
+		 * We couldn't check your daily limit. Try again in a moment.
+		 */
+		limitsUnavailable: () => LocalizedString
+		/**
+		 * A small problem
+		 */
+		problemSheetTitle: () => LocalizedString
+		/**
+		 * Change destination
+		 */
+		changeDestination: () => LocalizedString
+		/**
+		 * Couldn't reach the recipient
+		 */
+		recipientUnreachableTitle: () => LocalizedString
+		/**
+		 * Recipient sent the wrong amount
+		 */
+		recipientWrongAmountTitle: () => LocalizedString
+		/**
 		 * Upgrade your account to increase your limit
 		 */
 		upgradeAccountToIncreaseLimit: () => LocalizedString
@@ -22435,21 +22551,23 @@ export type TranslationFunctions = {
 		 * The lnurl server responded with an invoice with an incorrect amount.
 		 */
 		lnurlInvoiceIncorrectAmount: () => LocalizedString
-		confirmFeesModal: {
+		highFeeSheet: {
 			/**
 			 * High fee alert!
 			 */
 			title: () => LocalizedString
 			/**
-			 * Your fee is more than 50% bigger than the amount sent. Are you sure you want to proceed?
-	
-		To reduce fees, ask the receiver to accept transaction via Lightning
+			 * Your fee is 50% or more of the amount you're sending. Are you sure you want to proceed?
 			 */
-			content: () => LocalizedString
+			body: () => LocalizedString
 			/**
-			 * I'm 100% sure
+			 * Cancel payment
 			 */
-			confirmButton: () => LocalizedString
+			cancelPayment: () => LocalizedString
+			/**
+			 * Accept fee
+			 */
+			acceptFee: () => LocalizedString
 		}
 		/**
 		 * Copied destination to clipboard
@@ -24529,6 +24647,10 @@ export type TranslationFunctions = {
 		 * OK
 		 */
 		ok: () => LocalizedString
+		/**
+		 * Okay
+		 */
+		okay: () => LocalizedString
 		/**
 		 * or
 		 */
@@ -27805,6 +27927,10 @@ export type TranslationFunctions = {
 		 */
 		migrationRequiredForcedBody: () => LocalizedString
 		/**
+		 * Blink is closing trial accounts. Move your balance to a non-custodial account. It only takes a few taps.
+		 */
+		migrationRequiredForcedBodyLevelZero: () => LocalizedString
+		/**
 		 * Account not accessible
 		 */
 		migrationGateTitle: () => LocalizedString
@@ -27812,6 +27938,10 @@ export type TranslationFunctions = {
 		 * For regulatory reasons we cannot provide custodial accounts in your region. Transfer your funds to a non-custodial account with Blink by following the next steps or contact us at <link>{email}</link>
 		 */
 		migrationGateBody: (arg: { email: unknown }) => LocalizedString
+		/**
+		 * Trial accounts are now closed. Your balance is safe. Move it to a non-custodial account by following the next steps, free and with no time limit, or contact us at <link>{email}</link>
+		 */
+		migrationGateBodyLevelZero: (arg: { email: unknown }) => LocalizedString
 		/**
 		 * Bitcoin balance
 		 */
@@ -28016,6 +28146,12 @@ export type TranslationFunctions = {
 			 */
 			body: (arg: { date: string }) => LocalizedString
 			/**
+			 * You can no longer receive funds to this trial account. Blink is closing trial accounts and this account will be inactivated by the end of {date}.
+	
+		Migrate now to a non-custodial account.
+			 */
+			bodyLevelZero: (arg: { date: string }) => LocalizedString
+			/**
 			 * Migrate now
 			 */
 			migrateCta: () => LocalizedString
@@ -28029,6 +28165,14 @@ export type TranslationFunctions = {
 			 * Move to a non-custodial account via guided migration, or withdraw, before {date}. Receiving stops {receiveStopsDate}.
 			 */
 			body: (arg: { date: string, receiveStopsDate: string }) => LocalizedString
+			/**
+			 * Move to a non-custodial account via guided migration, or withdraw, before {date} — everything moves in a few taps.
+			 */
+			bodySingleDate: (arg: { date: string }) => LocalizedString
+			/**
+			 * Move to a non-custodial account via guided migration, or withdraw, before {date}.
+			 */
+			bodyLevelZero: (arg: { date: string }) => LocalizedString
 			/**
 			 * Receiving has stopped. Move to a non-custodial account via guided migration, or withdraw, before {date}.
 			 */
@@ -28044,9 +28188,17 @@ export type TranslationFunctions = {
 			 */
 			title: () => LocalizedString
 			/**
-			 * Your account is registered in a region where we cannot offer accounts. Withdraw your funds before August 31. Receiving stops August 10.
+			 * Blink cannot offer custodial accounts in your region. Withdraw your funds before {date} — free of any Blink charge. Receiving stops {receiveStopsDate}. If you believe your account has been affected in error, you can verify your current residence in the app.
 			 */
-			body: () => LocalizedString
+			bodyTwoDates: (arg: { date: string, receiveStopsDate: string }) => LocalizedString
+			/**
+			 * Blink cannot offer custodial accounts in your region. Withdraw your funds before {date} — free of any Blink charge. If you believe your account has been affected in error, you can verify your current residence in the app.
+			 */
+			bodySingleDate: (arg: { date: string }) => LocalizedString
+			/**
+			 * Blink cannot offer custodial accounts in your region. Withdraw your funds before {date} — free of any Blink charge. Receiving is off. If you believe your account has been affected in error, you can verify your current residence in the app.
+			 */
+			bodyReceiveOff: (arg: { date: string }) => LocalizedString
 		}
 		contactSupport: {
 			/**

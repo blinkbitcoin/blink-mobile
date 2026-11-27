@@ -2451,6 +2451,7 @@ query warningSecureAccount {
 query windDown {
   windDown {
     status
+    reason
     receiveDisabledAt
     finalDeadline
     gateArmsAt

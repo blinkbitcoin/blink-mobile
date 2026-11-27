@@ -2359,6 +2359,7 @@
     "somethingWentWrong": "Sesuatu tidak kena",
     "priceUpdated": "Harga berubah, jadi jumlah telah dikemas kini. Semak sebelum anda hantar.",
     "paymentAlreadyAttempted": "Bayaran telah pun dicuba.\n\nJika anda mahu menghantar bayaran ini semula, mulakan dari awal.",
+    "paymentMayStillLand": "Tunggu sebentar, ia mungkin akan berjaya tidak lama lagi. Wang anda akan sampai dengan selamat atau kekal bersama anda.",
     "slideConfirming": "Mengesahkan...",
     "slideToSend": "Leret untuk Hantar",
     "calculatingFee": "Mengira cas…",
@@ -2382,6 +2383,9 @@
     "fromBalance": "Daripada Baki",
     "details": "Butiran",
     "changeAmount": "Tukar amaun",
+    "tryAgain": "Cuba lagi",
+    "home": "Rumah",
+    "dustSweepSheetTitle": "Sebelum anda menghantar",
     "usdRemainderSweep": "Baki {remaining: string} ({remainingSats: string}) akan ditukar kepada Bitcoin. Minimum USD: {minimum: string}.",
     "sendAnyway": "Saya telah menyemak sejarah, hantar juga"
   },
@@ -2430,6 +2434,11 @@
     "lowFunds": "Dana tidak mencukupi",
     "amountExceed": "Amaun ini telah melebihi baki {balance: string}",
     "amountExceedsLimit": "Amaun ini telah melebihi baki transaksi harian {limit: string}",
+    "limitsUnavailable": "Kami tidak dapat menyemak had harian anda. Cuba lagi sebentar lagi.",
+    "problemSheetTitle": "Masalah kecil",
+    "changeDestination": "Tukar destinasi",
+    "recipientUnreachableTitle": "Tidak dapat menghubungi penerima",
+    "recipientWrongAmountTitle": "Penerima menyatakan jumlah yang salah",
     "upgradeAccountToIncreaseLimit": "Naik taraf akaun anda untuk tambahkan had",
     "amountIsRequired": "Jumlah diperlukan",
     "cost": "Kos",
@@ -2448,10 +2457,11 @@
     "title": "Hantar bitcoin",
     "failedToFetchLnurlInvoice": "Gagal untuk dapatkan invois lnurl ",
     "lnurlInvoiceIncorrectAmount": "Server lnurl telah beri respon invois tersebut salah amaunnya",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Amaran yuran tinggi!",
-      "content": "Yuran anda melebihi 50% daripada jumlah yang dihantar. Adakah anda pasti mahu meneruskan?\n\nUntuk mengurangkan yuran, minta penerima menerima transaksi melalui Lightning",
-      "confirmButton": "Saya 100% pasti"
+      "body": "Cas anda ialah 50% atau lebih daripada jumlah yang anda hantar. Adakah anda pasti mahu meneruskan?",
+      "cancelPayment": "Batalkan pembayaran",
+      "acceptFee": "Terima cas"
     },
     "copiedDestination": "Destinasi telah disalin ke clipboard",
     "pendingPayment": "Bayaran telah dihantar, tetapi belum disahkan lagi.\n\nKemungkinan bayaran tidak akan disahkan, dan dalam kes itu dana akan dikembalikan ke akaun anda.",
@@ -2998,6 +3008,7 @@
     "note": "Nota",
     "notification": "Pemberitahuan",
     "ok": "Baiklah",
+    "okay": "Baiklah",
     "or": "atau",
     "openWallet": "Buka Dompet",
     "onchain": "Onchain",
@@ -4002,17 +4013,22 @@
     "migrateNowModal": {
       "title": "Berpindah sekarang ke akaun bukan kustodial",
       "body": "Anda tidak lagi boleh menerima dana ke akaun kustodial anda. Blink telah menghentikan perkhidmatan kustodial di wilayah anda dan akaun ini akan dinyahaktifkan menjelang akhir {date}.\n\nBerpindah sekarang ke akaun bukan kustodial.",
+      "bodyLevelZero": "Anda tidak lagi boleh menerima dana ke akaun percubaan ini. Blink sedang menutup akaun percubaan dan akaun ini akan dinyahaktifkan menjelang akhir {date}.\n\nBerpindah sekarang ke akaun bukan kustodial.",
       "migrateCta": "Pindah sekarang"
     },
     "reminderBulletin": {
       "title": "Penting",
       "body": "Beralih kepada akaun bukan kustodial melalui migrasi berpandu, atau keluarkan dana anda, sebelum {date}. Penerimaan berhenti pada {receiveStopsDate}.",
+      "bodySingleDate": "Beralih kepada akaun bukan kustodial melalui migrasi berpandu, atau keluarkan dana anda, sebelum {date} — semuanya berpindah dengan beberapa ketikan sahaja.",
+      "bodyLevelZero": "Beralih kepada akaun bukan kustodial melalui migrasi berpandu, atau keluarkan dana anda, sebelum {date}.",
       "bodyReceiveDisabled": "Penerimaan telah berhenti. Beralih kepada akaun bukan kustodial melalui migrasi berpandu, atau keluarkan dana anda, sebelum {date}.",
       "migrateCta": "Pindah"
     },
     "offboardBulletin": {
       "title": "Penting",
-      "body": "Akaun anda didaftarkan di wilayah yang kami tidak dapat menawarkan akaun. Keluarkan dana anda sebelum 31 Ogos. Penerimaan berhenti pada 10 Ogos."
+      "bodyTwoDates": "Blink tidak dapat menawarkan akaun kustodial di wilayah anda. Keluarkan dana anda sebelum {date} — tanpa sebarang caj daripada Blink. Penerimaan berhenti pada {receiveStopsDate}. Jika anda percaya akaun anda terjejas secara silap, anda boleh mengesahkan tempat tinggal semasa anda dalam aplikasi.",
+      "bodySingleDate": "Blink tidak dapat menawarkan akaun kustodial di wilayah anda. Keluarkan dana anda sebelum {date} — tanpa sebarang caj daripada Blink. Jika anda percaya akaun anda terjejas secara silap, anda boleh mengesahkan tempat tinggal semasa anda dalam aplikasi.",
+      "bodyReceiveOff": "Blink tidak dapat menawarkan akaun kustodial di wilayah anda. Keluarkan dana anda sebelum {date} — tanpa sebarang caj daripada Blink. Penerimaan dimatikan. Jika anda percaya akaun anda terjejas secara silap, anda boleh mengesahkan tempat tinggal semasa anda dalam aplikasi."
     },
     "dollarBalanceModal": {
       "title": "Kami tidak dapat memindahkan Baki Dolar anda",
@@ -4068,8 +4084,10 @@
     "resumeFailed": "Sesuatu telah berlaku semasa menyambung semula pemindahan anda. Sila mulakannya semula.",
     "migrationRequiredBody": "Sudah tiba masanya untuk memindahkan akaun kustodial anda ke akaun bukan kustodial.",
     "migrationRequiredForcedBody": "Sudah tiba masanya untuk memindahkan akaun kustodial anda ke akaun bukan kustodial. Ini diperlukan atas sebab kawal selia.\n\nJangan risau, non-custodial akan lebih baik untuk anda dalam jangka panjang.",
+    "migrationRequiredForcedBodyLevelZero": "Blink sedang menutup akaun percubaan. Pindahkan baki anda ke akaun bukan kustodial. Hanya perlu beberapa ketikan.",
     "migrationGateTitle": "Akaun tidak boleh diakses",
     "migrationGateBody": "Atas sebab kawal selia, kami tidak dapat menyediakan akaun custodial di wilayah anda. Pindahkan dana anda ke akaun non-custodial dengan Blink dengan mengikuti langkah seterusnya atau hubungi kami di <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Akaun percubaan kini telah ditutup. Baki anda selamat. Pindahkannya ke akaun bukan kustodial dengan mengikuti langkah seterusnya, percuma dan tanpa had masa, atau hubungi kami di <link>{email}</link>",
     "bitcoinBalance": "Baki Bitcoin",
     "dollarBalance": "Baki dolar",
     "moveToNonCustodial": "Beralih ke non-custodial",

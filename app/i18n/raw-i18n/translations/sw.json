@@ -2359,6 +2359,7 @@
     "somethingWentWrong": "Kitu kimeenda vibaya",
     "priceUpdated": "Bei imebadilika, kwa hivyo kiasi kimesasishwa. Kikague kabla ya kutuma.",
     "paymentAlreadyAttempted": "Malipo tayari yamejaribiwa.\n\nIkiwa unataka kutuma malipo haya tena, anza upya.",
+    "paymentMayStillLand": "Subiri kidogo, huenda itafanikiwa hivi karibuni. Pesa zako zitafika salama au zitabaki kwako.",
     "slideConfirming": "Inathibitisha...",
     "slideToSend": "Telezesha ili Kutuma",
     "calculatingFee": "Inakokotoa ada…",
@@ -2382,6 +2383,9 @@
     "fromBalance": "Kutoka Salio",
     "details": "Maelezo",
     "changeAmount": "Badilisha kiasi",
+    "tryAgain": "Jaribu tena",
+    "home": "Nyumbani",
+    "dustSweepSheetTitle": "Kabla ya kutuma",
     "usdRemainderSweep": "Iliyosalia {remaining: string} ({remainingSats: string}) itabadilishwa kuwa Bitcoin. Kima cha chini cha USD: {minimum: string}.",
     "sendAnyway": "Nimeangalia historia yangu, tuma hata hivyo"
   },
@@ -2430,6 +2434,11 @@
     "lowFunds": "Fedha hazitoshi",
     "amountExceed": "Kiasi kimepitisha baki yako ya {balance: string}",
     "amountExceedsLimit": "Kiasi kinazidi kikomo chako cha kila siku kilichobaki cha {limit: string}",
+    "limitsUnavailable": "Hatukuweza kuangalia kikomo chako cha kila siku. Jaribu tena baada ya muda mfupi.",
+    "problemSheetTitle": "Tatizo dogo",
+    "changeDestination": "Badilisha mpokeaji",
+    "recipientUnreachableTitle": "Imeshindwa kumfikia mpokeaji",
+    "recipientWrongAmountTitle": "Mpokeaji ameweka kiasi kisicho sahihi",
     "upgradeAccountToIncreaseLimit": "Boresha akaunti yako ili kuongeza kikomo chako",
     "amountIsRequired": "Kiasi kinahitajika",
     "cost": "Gharama",
@@ -2448,10 +2457,11 @@
     "title": "Tuma Bitcoin",
     "failedToFetchLnurlInvoice": "Imeshindwa kupata ankara ya malipo ya lnurl",
     "lnurlInvoiceIncorrectAmount": "Seva ya lnurl ilijibu na ankara ya malipo yenye kiasi batili",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Onyo la ada kubwa!",
-      "content": "Ada yako ni zaidi ya 50% zaidi ya kiasi kilichotumwa. Una uhakika unataka kuendelea?\n\nIli kupunguza ada, omba mpokeaji akubali muamala kupitia Lightning",
-      "confirmButton": "Nina uhakika 100%"
+      "body": "Ada yako ni 50% au zaidi ya kiasi unachotuma. Una uhakika unataka kuendelea?",
+      "cancelPayment": "Ghairi malipo",
+      "acceptFee": "Kubali ada"
     },
     "copiedDestination": "Imeakiliwa marudio kwenye ubao wa kunakili",
     "pendingPayment": "Ada kubwa! Tunapendekeza Umeme.\n\nInawezekana malipo hayatathibitisha, katika hali ambayo pesa zitarejeshwa kwenye akaunti yako.",
@@ -2998,6 +3008,7 @@
     "note": "Dokezo",
     "notification": "Taarifa",
     "ok": "Sawa",
+    "okay": "Sawa",
     "or": "au",
     "openWallet": "Fungua pochi",
     "onchain": "Onchain",
@@ -4002,17 +4013,22 @@
     "migrateNowModal": {
       "title": "Hamia sasa kwenye akaunti isiyo ya udhamini",
       "body": "Huwezi tena kupokea fedha kwenye akaunti yako ya udhamini. Blink imesitisha huduma ya udhamini katika eneo lako na akaunti hii itazimwa ifikapo mwisho wa {date}.\n\nHamia sasa kwenye akaunti isiyo ya udhamini.",
+      "bodyLevelZero": "Huwezi tena kupokea fedha kwenye akaunti hii ya majaribio. Blink inafunga akaunti za majaribio na akaunti hii itazimwa ifikapo mwisho wa {date}.\n\nHamia sasa kwenye akaunti isiyo ya udhamini.",
       "migrateCta": "Hamia sasa"
     },
     "reminderBulletin": {
       "title": "Muhimu",
       "body": "Hamia kwenye akaunti isiyo ya udhamini kupitia uhamishaji unaoongozwa, au toa fedha zako, kabla ya {date}. Kupokea kutasimama {receiveStopsDate}.",
+      "bodySingleDate": "Hamia kwenye akaunti isiyo ya udhamini kupitia uhamishaji unaoongozwa, au toa fedha zako, kabla ya {date} — kila kitu kinahamia kwa miguso michache tu.",
+      "bodyLevelZero": "Hamia kwenye akaunti isiyo ya udhamini kupitia uhamishaji unaoongozwa, au toa fedha zako, kabla ya {date}.",
       "bodyReceiveDisabled": "Kupokea kumesimama. Hamia kwenye akaunti isiyo ya udhamini kupitia uhamishaji unaoongozwa, au toa fedha zako, kabla ya {date}.",
       "migrateCta": "Hamia"
     },
     "offboardBulletin": {
       "title": "Muhimu",
-      "body": "Akaunti yako imesajiliwa katika eneo ambalo hatuwezi kutoa akaunti. Toa fedha zako kabla ya tarehe 31 Agosti. Kupokea kunasimama tarehe 10 Agosti."
+      "bodyTwoDates": "Blink haiwezi kutoa akaunti za udhamini katika eneo lako. Toa fedha zako kabla ya {date} — bila malipo yoyote ya Blink. Kupokea kutasimama {receiveStopsDate}. Ikiwa unaamini akaunti yako imeathiriwa kimakosa, unaweza kuthibitisha makazi yako ya sasa ndani ya programu.",
+      "bodySingleDate": "Blink haiwezi kutoa akaunti za udhamini katika eneo lako. Toa fedha zako kabla ya {date} — bila malipo yoyote ya Blink. Ikiwa unaamini akaunti yako imeathiriwa kimakosa, unaweza kuthibitisha makazi yako ya sasa ndani ya programu.",
+      "bodyReceiveOff": "Blink haiwezi kutoa akaunti za udhamini katika eneo lako. Toa fedha zako kabla ya {date} — bila malipo yoyote ya Blink. Kupokea kumezimwa. Ikiwa unaamini akaunti yako imeathiriwa kimakosa, unaweza kuthibitisha makazi yako ya sasa ndani ya programu."
     },
     "dollarBalanceModal": {
       "title": "Hatuwezi kuhamisha Salio lako la Dola",
@@ -4068,8 +4084,10 @@
     "resumeFailed": "Hitilafu imetokea wakati wa kuendelea na uhamishaji wako. Tafadhali anza tena.",
     "migrationRequiredBody": "Ni wakati wa kuhamisha akaunti yako ya udhamini kwenda akaunti isiyo ya udhamini.",
     "migrationRequiredForcedBody": "Ni wakati wa kuhamisha akaunti yako ya udhamini kwenda akaunti isiyo ya udhamini. Inahitajika kwa sababu za udhibiti.\n\nUsiwe na wasiwasi, non-custodial itakuwa bora kwako kwa muda mrefu.",
+    "migrationRequiredForcedBodyLevelZero": "Blink inafunga akaunti za majaribio. Hamisha salio lako kwenye akaunti isiyo ya udhamini. Inachukua miguso michache tu.",
     "migrationGateTitle": "Akaunti haipatikani",
     "migrationGateBody": "Kwa sababu za udhibiti hatuwezi kutoa akaunti za custodial katika eneo lako. Hamisha fedha zako kwenye akaunti ya non-custodial na Blink kwa kufuata hatua zifuatazo au wasiliana nasi kupitia <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Akaunti za majaribio sasa zimefungwa. Salio lako liko salama. Lihamishe kwenye akaunti isiyo ya udhamini kwa kufuata hatua zifuatazo, bila malipo na bila kikomo cha muda, au wasiliana nasi kupitia <link>{email}</link>",
     "bitcoinBalance": "Salio la Bitcoin",
     "dollarBalance": "Salio la dola",
     "moveToNonCustodial": "Hamia kwa non-custodial",

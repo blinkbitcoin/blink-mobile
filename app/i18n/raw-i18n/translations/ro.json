@@ -2359,6 +2359,7 @@
     "somethingWentWrong": "Ceva nu a mers bine",
     "priceUpdated": "Prețul s-a modificat, așa că sumele au fost actualizate. Verificați-le înainte de a trimite.",
     "paymentAlreadyAttempted": "Plata deja încercată.\n\nDacă doriți să trimiteți din nou această plată, începeți de la zero.",
+    "paymentMayStillLand": "Așteptați puțin, probabil plata va reuși în curând. Banii dumneavoastră vor ajunge în siguranță sau vor rămâne la dumneavoastră.",
     "slideConfirming": "Confirmare...",
     "slideToSend": "Glisați pentru a trimite",
     "calculatingFee": "Se calculează taxa…",
@@ -2382,6 +2383,9 @@
     "fromBalance": "Din sold",
     "details": "Detalii",
     "changeAmount": "Schimbă suma",
+    "tryAgain": "Încercați din nou",
+    "home": "Acasă",
+    "dustSweepSheetTitle": "Înainte de a trimite",
     "usdRemainderSweep": "Soldul rămas {remaining: string} ({remainingSats: string}) va fi convertit în Bitcoin. Minim USD: {minimum: string}.",
     "sendAnyway": "Mi-am verificat istoricul, trimite oricum"
   },
@@ -2430,6 +2434,11 @@
     "lowFunds": "Fonduri insuficiente",
     "amountExceed": "Suma depășește soldul de {balance: string}",
     "amountExceedsLimit": "Suma depășește limita zilnică rămasă de {limit: string}",
+    "limitsUnavailable": "Nu am putut verifica limita dumneavoastră zilnică. Încercați din nou peste câteva momente.",
+    "problemSheetTitle": "O mică problemă",
+    "changeDestination": "Schimbă destinația",
+    "recipientUnreachableTitle": "Destinatarul nu a putut fi contactat",
+    "recipientWrongAmountTitle": "Destinatarul a indicat o sumă greșită",
     "upgradeAccountToIncreaseLimit": "Faceți upgrade la cont pentru a vă crește limita",
     "amountIsRequired": "Suma este necesară",
     "cost": "Cost",
@@ -2448,10 +2457,11 @@
     "title": "Trimite Bitcoin",
     "failedToFetchLnurlInvoice": "Nu s-a reușit preluarea facturii lnurl",
     "lnurlInvoiceIncorrectAmount": "Serverul lnurl a răspuns cu o factură cu o sumă incorectă.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Alertă de taxă mare!",
-      "content": "Taxa este cu peste 50% mai mare decât suma trimisă. Sunteți sigur că doriți să continuați?\n\nPentru a reduce taxele, cereți destinatarului să accepte tranzacția via Lightning",
-      "confirmButton": "Sunt 100% sigur"
+      "body": "Taxa ta este de 50% sau mai mult din suma pe care o trimiți. Sigur vrei să continui?",
+      "cancelPayment": "Anulează plata",
+      "acceptFee": "Acceptă taxa"
     },
     "copiedDestination": "Destinație copiată în clipboard",
     "pendingPayment": "Plata a fost trimisă, dar nu s-a confirmată încă.\n\nEste posibil ca plata să nu se confirme, caz în care fondurile vor fi returnate în contul dvs.",
@@ -2998,6 +3008,7 @@
     "note": "Notă",
     "notification": "Notificare",
     "ok": "OK",
+    "okay": "Bine",
     "or": "sau",
     "openWallet": "Deschideți portofelul",
     "onchain": "Onchain",
@@ -4002,17 +4013,22 @@
     "migrateNowModal": {
       "title": "Migrează acum către un cont non-custodial",
       "body": "Nu mai poți primi fonduri în contul tău custodial. Blink a întrerupt serviciul custodial în regiunea ta, iar acest cont va fi inactivat până la sfârșitul zilei de {date}.\n\nMigrează acum către un cont non-custodial.",
+      "bodyLevelZero": "Nu mai poți primi fonduri în acest cont de probă. Blink închide conturile de probă, iar acest cont va fi inactivat până la sfârșitul zilei de {date}.\n\nMigrează acum către un cont non-custodial.",
       "migrateCta": "Migrează acum"
     },
     "reminderBulletin": {
       "title": "Important",
       "body": "Treci la un cont non-custodial prin migrarea ghidată sau retrage-ți fondurile înainte de {date}. Primirea se oprește pe {receiveStopsDate}.",
+      "bodySingleDate": "Treci la un cont non-custodial prin migrarea ghidată sau retrage-ți fondurile înainte de {date} — totul se mută în câteva atingeri.",
+      "bodyLevelZero": "Treci la un cont non-custodial prin migrarea ghidată sau retrage-ți fondurile înainte de {date}.",
       "bodyReceiveDisabled": "Primirea s-a oprit. Treci la un cont non-custodial prin migrarea ghidată sau retrage-ți fondurile înainte de {date}.",
       "migrateCta": "Migrează"
     },
     "offboardBulletin": {
       "title": "Important",
-      "body": "Contul tău este înregistrat într-o regiune în care nu putem oferi conturi. Retrage-ți fondurile înainte de 31 august. Primirea se oprește pe 10 august."
+      "bodyTwoDates": "Blink nu poate oferi conturi custodial în regiunea ta. Retrage-ți fondurile înainte de {date} — fără niciun cost din partea Blink. Primirea se oprește pe {receiveStopsDate}. Dacă crezi că acest lucru îți afectează contul din greșeală, îți poți verifica reședința actuală în aplicație.",
+      "bodySingleDate": "Blink nu poate oferi conturi custodial în regiunea ta. Retrage-ți fondurile înainte de {date} — fără niciun cost din partea Blink. Dacă crezi că acest lucru îți afectează contul din greșeală, îți poți verifica reședința actuală în aplicație.",
+      "bodyReceiveOff": "Blink nu poate oferi conturi custodial în regiunea ta. Retrage-ți fondurile înainte de {date} — fără niciun cost din partea Blink. Primirea este oprită. Dacă crezi că acest lucru îți afectează contul din greșeală, îți poți verifica reședința actuală în aplicație."
     },
     "dollarBalanceModal": {
       "title": "Nu îți putem migra soldul în dolari",
@@ -4068,8 +4084,10 @@
     "resumeFailed": "Ceva nu a mers bine la reluarea migrării. Te rugăm să o începi din nou.",
     "migrationRequiredBody": "Este timpul să îți migrezi contul custodial către un cont non-custodial.",
     "migrationRequiredForcedBody": "Este timpul să îți migrezi contul custodial către un cont non-custodial. Este necesar din motive de reglementare.\n\nNu-ți face griji, non-custodial va fi mai bun pentru tine pe termen lung.",
+    "migrationRequiredForcedBodyLevelZero": "Blink închide conturile de probă. Mută-ți soldul într-un cont non-custodial. Durează doar câteva atingeri.",
     "migrationGateTitle": "Cont inaccesibil",
     "migrationGateBody": "Din motive de reglementare nu putem oferi conturi custodial în regiunea ta. Transferă-ți fondurile într-un cont non-custodial cu Blink urmând pașii următori sau contactează-ne la <link>{email}</link>",
+    "migrationGateBodyLevelZero": "Conturile de probă sunt acum închise. Soldul tău este în siguranță. Mută-l într-un cont non-custodial urmând pașii următori, gratuit și fără limită de timp, sau contactează-ne la <link>{email}</link>",
     "bitcoinBalance": "Sold Bitcoin",
     "dollarBalance": "Sold în dolari",
     "moveToNonCustodial": "Treci la non-custodial",

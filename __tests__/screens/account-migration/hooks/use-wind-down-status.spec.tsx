@@ -5,7 +5,7 @@ import {
   useWindDownStatus,
   WindDownStatusProvider,
 } from "@app/screens/account-migration/hooks/use-wind-down-status"
-import { WindDownStatus } from "@app/types/wind-down"
+import { WindDownReason, WindDownStatus } from "@app/types/wind-down"
 
 /** How long the provider promises to wait for the wind-down's answer, pinned here. */
 const ANSWER_WAIT_MS = 5_000
@@ -27,6 +27,7 @@ jest.mock("@app/graphql/is-authed-context", () => ({
 const serverWindDown = {
   __typename: "AccountWindDown" as const,
   status: WindDownStatus.PreCutoff,
+  reason: WindDownReason.LevelZero,
   receiveDisabledAt: 1_790_000_000,
   finalDeadline: 1_790_100_000,
   gateArmsAt: 1_790_200_000,

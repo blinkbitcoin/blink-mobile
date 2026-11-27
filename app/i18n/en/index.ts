@@ -2386,6 +2386,8 @@ const en: BaseTranslation = {
     priceUpdated: "The price moved, so the amounts were updated. Check them before you send.",
     paymentAlreadyAttempted:
       "Payment already attempted.\n\nIf you want to send this payment again, start from scratch.",
+    paymentMayStillLand:
+      "Wait a moment, it will probably go through soon. Your money will arrive safely or stay with you.",
     slideConfirming: "Confirming...",
     slideToSend: "Slide to send",
     calculatingFee: "Calculating fee…",
@@ -2411,6 +2413,9 @@ const en: BaseTranslation = {
     fromBalance: "From Balance",
     details: "Details",
     changeAmount: "Change amount",
+    tryAgain: "Try again",
+    home: "Home",
+    dustSweepSheetTitle: "Before you send",
     usdRemainderSweep:
       "Remaining {remaining: string} ({remainingSats: string}) will be converted to Bitcoin. USD minimum: {minimum: string}.",
     sendAnyway: "I checked my history, send anyway",
@@ -2476,6 +2481,11 @@ const en: BaseTranslation = {
     lowFunds: "Low funds",
     amountExceed: "Amount exceeds your balance of {balance: string}",
     amountExceedsLimit: "Amount exceeds your remaining daily limit of {limit: string}",
+    limitsUnavailable: "We couldn't check your daily limit. Try again in a moment.",
+    problemSheetTitle: "A small problem",
+    changeDestination: "Change destination",
+    recipientUnreachableTitle: "Couldn't reach the recipient",
+    recipientWrongAmountTitle: "Recipient sent the wrong amount",
     upgradeAccountToIncreaseLimit: "Upgrade your account to increase your limit",
     amountIsRequired: "Amount is required",
     cost: "Cost",
@@ -2497,11 +2507,11 @@ const en: BaseTranslation = {
     failedToFetchLnurlInvoice: "Failed to fetch lnurl invoice",
     lnurlInvoiceIncorrectAmount:
       "The lnurl server responded with an invoice with an incorrect amount.",
-    confirmFeesModal: {
+    highFeeSheet: {
       title: "High fee alert!",
-      content:
-        "Your fee is more than 50% bigger than the amount sent. Are you sure you want to proceed?\n\nTo reduce fees, ask the receiver to accept transaction via Lightning",
-      confirmButton: "I'm 100% sure",
+      body: "Your fee is 50% or more of the amount you're sending. Are you sure you want to proceed?",
+      cancelPayment: "Cancel payment",
+      acceptFee: "Accept fee",
     },
     copiedDestination: "Copied destination to clipboard",
     pendingPayment:
@@ -3145,6 +3155,7 @@ const en: BaseTranslation = {
     note: "Note",
     notification: "Notification",
     ok: "OK",
+    okay: "Okay",
     or: "or",
     openWallet: "Open Wallet",
     onchain: "Onchain",
@@ -4218,9 +4229,13 @@ const en: BaseTranslation = {
       "It's time to migrate your custodial account to a non-custodial account.",
     migrationRequiredForcedBody:
       "It's time to migrate your custodial account to a non-custodial account. It's required for regulatory reasons.\n\nNo need to worry, non-custodial will be better for you in the long term.",
+    migrationRequiredForcedBodyLevelZero:
+      "Blink is closing trial accounts. Move your balance to a non-custodial account. It only takes a few taps.",
     migrationGateTitle: "Account not accessible",
     migrationGateBody:
       "For regulatory reasons we cannot provide custodial accounts in your region. Transfer your funds to a non-custodial account with Blink by following the next steps or contact us at <link>{email}</link>",
+    migrationGateBodyLevelZero:
+      "Trial accounts are now closed. Your balance is safe. Move it to a non-custodial account by following the next steps, free and with no time limit, or contact us at <link>{email}</link>",
     bitcoinBalance: "Bitcoin balance",
     dollarBalance: "Dollar balance",
     keepReceivingTitle: "Keep receiving as usual",
@@ -4281,18 +4296,29 @@ const en: BaseTranslation = {
     migrateNowModal: {
       title: "Migrate now to a non-custodial account",
       body: "You can no longer receive funds to your custodial account. Blink has discontinued custodial service in your region and this account will be inactivated by the end of {date: string}.\n\nMigrate now to a non-custodial account.",
+      bodyLevelZero:
+        "You can no longer receive funds to this trial account. Blink is closing trial accounts and this account will be inactivated by the end of {date: string}.\n\nMigrate now to a non-custodial account.",
       migrateCta: "Migrate now",
     },
     reminderBulletin: {
       title: "Important",
       body: "Move to a non-custodial account via guided migration, or withdraw, before {date: string}. Receiving stops {receiveStopsDate: string}.",
+      bodySingleDate:
+        "Move to a non-custodial account via guided migration, or withdraw, before {date: string} — everything moves in a few taps.",
+      bodyLevelZero:
+        "Move to a non-custodial account via guided migration, or withdraw, before {date: string}.",
       bodyReceiveDisabled:
         "Receiving has stopped. Move to a non-custodial account via guided migration, or withdraw, before {date: string}.",
       migrateCta: "Migrate",
     },
     offboardBulletin: {
       title: "Important",
-      body: "Your account is registered in a region where we cannot offer accounts. Withdraw your funds before August 31. Receiving stops August 10.",
+      bodyTwoDates:
+        "Blink cannot offer custodial accounts in your region. Withdraw your funds before {date: string} — free of any Blink charge. Receiving stops {receiveStopsDate: string}. If you believe your account has been affected in error, you can verify your current residence in the app.",
+      bodySingleDate:
+        "Blink cannot offer custodial accounts in your region. Withdraw your funds before {date: string} — free of any Blink charge. If you believe your account has been affected in error, you can verify your current residence in the app.",
+      bodyReceiveOff:
+        "Blink cannot offer custodial accounts in your region. Withdraw your funds before {date: string} — free of any Blink charge. Receiving is off. If you believe your account has been affected in error, you can verify your current residence in the app.",
     },
     contactSupport: {
       title: "Contact support",

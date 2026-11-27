@@ -2359,6 +2359,7 @@
     "somethingWentWrong": "Bir şeyler ters gitti",
     "priceUpdated": "Fiyat değişti, bu yüzden tutarlar güncellendi. Göndermeden önce kontrol edin.",
     "paymentAlreadyAttempted": "Ödeme zaten denendi.\n\nBu ödemeyi tekrar göndermek istiyorsanız, sıfırdan başlayın.",
+    "paymentMayStillLand": "Biraz bekleyin, büyük ihtimalle yakında gerçekleşecek. Paranız ya güvenle ulaşacak ya da sizde kalacak.",
     "slideConfirming": "Onaylanıyor...",
     "slideToSend": "Göndermek için kaydırın",
     "calculatingFee": "Ücret hesaplanıyor…",
@@ -2382,6 +2383,9 @@
     "fromBalance": "Bakiyeden",
     "details": "Detaylar",
     "changeAmount": "Tutarı değiştir",
+    "tryAgain": "Tekrar deneyin",
+    "home": "Ev",
+    "dustSweepSheetTitle": "Göndermeden önce",
     "usdRemainderSweep": "Kalan {remaining: string} ({remainingSats: string}) Bitcoin'e dönüştürülecek. USD minimumu: {minimum: string}.",
     "sendAnyway": "Geçmişimi kontrol ettim, yine de gönder"
   },
@@ -2430,6 +2434,11 @@
     "lowFunds": "Yetersiz bakiye",
     "amountExceed": "Göndermek istediğin miktar, bakiyenin {balance: string} üstünde.",
     "amountExceedsLimit": "Tutar, kalan günlük {limit: string} limitinizi aşıyor",
+    "limitsUnavailable": "Günlük limitinizi kontrol edemedik. Birazdan tekrar deneyin.",
+    "problemSheetTitle": "Küçük bir sorun",
+    "changeDestination": "Alıcıyı değiştir",
+    "recipientUnreachableTitle": "Alıcıya ulaşılamadı",
+    "recipientWrongAmountTitle": "Alıcı yanlış tutar belirtti",
     "upgradeAccountToIncreaseLimit": "Limitinizi artırmak için hesabınızı yükseltin",
     "amountIsRequired": "Miktar girilmesi gerekli",
     "cost": "Maliyet",
@@ -2448,10 +2457,11 @@
     "title": "Bitcoin Gönder",
     "failedToFetchLnurlInvoice": "LnUrl adresini alırken hata oluştu. ",
     "lnurlInvoiceIncorrectAmount": "lnurl sunucusu yanlış tutarlı bir fatura ile yanıt verdi.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Yüksek ücret uyarısı!",
-      "content": "Ücretiniz gönderilen miktardan %50 daha fazla. Devam etmek istediğinizden emin misiniz?\n\nÜcretleri azaltmak için alıcıdan işlemi Lightning aracılığıyla kabul etmesini isteyin",
-      "confirmButton": "%100 eminim"
+      "body": "Ücretiniz gönderdiğiniz tutarın %50'si veya daha fazlası. Devam etmek istediğinizden emin misiniz?",
+      "cancelPayment": "Ödemeyi iptal et",
+      "acceptFee": "Ücreti kabul et"
     },
     "copiedDestination": "Hedefi panoya kopyalama",
     "pendingPayment": "Ödeme gönderildi, ancak henüz onaylanmadı.\n\nÖdemenin onaylanmaması mümkündür, bu durumda para hesabınıza iade edilecektir.",
@@ -2998,6 +3008,7 @@
     "note": "Not",
     "notification": "Bildirim",
     "ok": "Tamam",
+    "okay": "Tamam",
     "or": "ya da",
     "openWallet": "Cüzdanı aç",
     "onchain": "Onchain",
@@ -4002,17 +4013,22 @@
     "migrateNowModal": {
       "title": "Şimdi saklamasız bir hesaba taşının",
       "body": "Saklamalı hesabınıza artık para alamazsınız. Blink bölgenizde saklama hizmetini sonlandırdı ve bu hesap {date} sonuna kadar devre dışı bırakılacak.\n\nŞimdi saklamasız bir hesaba taşının.",
+      "bodyLevelZero": "Bu deneme hesabına artık para alamazsınız. Blink deneme hesaplarını kapatıyor ve bu hesap {date} sonuna kadar devre dışı bırakılacak.\n\nŞimdi saklamasız bir hesaba taşının.",
       "migrateCta": "Şimdi taşı"
     },
     "reminderBulletin": {
       "title": "Önemli",
       "body": "{date} tarihinden önce rehberli taşıma ile saklamasız bir hesaba geçin veya paranızı çekin. Alma, {receiveStopsDate} tarihinde durur.",
+      "bodySingleDate": "{date} tarihinden önce rehberli taşıma ile saklamasız bir hesaba geçin veya paranızı çekin — her şey birkaç dokunuşla taşınır.",
+      "bodyLevelZero": "{date} tarihinden önce rehberli taşıma ile saklamasız bir hesaba geçin veya paranızı çekin.",
       "bodyReceiveDisabled": "Alma durdu. {date} tarihinden önce rehberli taşıma ile saklamasız bir hesaba geçin veya paranızı çekin.",
       "migrateCta": "Taşı"
     },
     "offboardBulletin": {
       "title": "Önemli",
-      "body": "Hesabınız, hesap sunamadığımız bir bölgede kayıtlı. Paranızı 31 Ağustos'tan önce çekin. Para alımı 10 Ağustos'ta duruyor."
+      "bodyTwoDates": "Blink bölgenizde saklamalı hesap sunamıyor. Paranızı {date} tarihinden önce çekin — Blink hiçbir ücret almaz. Para alımı {receiveStopsDate} tarihinde durur. Hesabınızın yanlışlıkla etkilendiğini düşünüyorsanız, uygulamada mevcut ikametinizi doğrulayabilirsiniz.",
+      "bodySingleDate": "Blink bölgenizde saklamalı hesap sunamıyor. Paranızı {date} tarihinden önce çekin — Blink hiçbir ücret almaz. Hesabınızın yanlışlıkla etkilendiğini düşünüyorsanız, uygulamada mevcut ikametinizi doğrulayabilirsiniz.",
+      "bodyReceiveOff": "Blink bölgenizde saklamalı hesap sunamıyor. Paranızı {date} tarihinden önce çekin — Blink hiçbir ücret almaz. Para alımı kapalı. Hesabınızın yanlışlıkla etkilendiğini düşünüyorsanız, uygulamada mevcut ikametinizi doğrulayabilirsiniz."
     },
     "dollarBalanceModal": {
       "title": "Dolar bakiyenizi taşıyamıyoruz",
@@ -4068,8 +4084,10 @@
     "resumeFailed": "Taşıma işleminiz devam ettirilirken bir sorun oluştu. Lütfen yeniden başlatın.",
     "migrationRequiredBody": "Saklamalı hesabınızı saklamasız bir hesaba taşımanın zamanı geldi.",
     "migrationRequiredForcedBody": "Saklamalı hesabınızı saklamasız bir hesaba taşımanın zamanı geldi. Bu, düzenleyici nedenlerle zorunludur.\n\nEndişelenme, non-custodial uzun vadede senin için daha iyi olacak.",
+    "migrationRequiredForcedBodyLevelZero": "Blink deneme hesaplarını kapatıyor. Bakiyenizi saklamasız bir hesaba taşıyın. Yalnızca birkaç dokunuş sürer.",
     "migrationGateTitle": "Hesap erişilebilir değil",
     "migrationGateBody": "Düzenleyici nedenlerle bölgende custodial hesaplar sağlayamıyoruz. Sonraki adımları izleyerek fonlarını Blink'te bir non-custodial hesaba aktar ya da <link>{email}</link> adresinden bize ulaş",
+    "migrationGateBodyLevelZero": "Deneme hesapları artık kapatıldı. Bakiyeniz güvende. Sonraki adımları izleyerek bakiyenizi ücretsiz ve süre sınırı olmadan saklamasız bir hesaba taşıyın ya da <link>{email}</link> adresinden bize ulaşın",
     "bitcoinBalance": "Bitcoin bakiyesi",
     "dollarBalance": "Dolar bakiyesi",
     "moveToNonCustodial": "Non-custodial'a geç",
