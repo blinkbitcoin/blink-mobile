@@ -26,7 +26,8 @@ export const useUnseenTxAmountBadge = ({
   hasUnseenBtcTx,
 }: UnseenTxAmountBadgeParams) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { formatCurrency, formatMoneyAmount } = useDisplayCurrency()
+  const { formatCurrency, formatMoneyAmount, hasCurrencyInfo, currencyListLoading } =
+    useDisplayCurrency()
   const { convertMoneyAmount } = usePriceConversion()
   const { feeReimbursementMemo } = useRemoteConfig()
 
@@ -80,7 +81,17 @@ export const useUnseenTxAmountBadge = ({
     const hasRawAmount =
       rawAmount !== null && rawAmount !== undefined && Boolean(rawCurrency)
 
-    const formattedFromDisplay = hasDisplayAmount
+    /**
+     * The server's display amount is spelled with the currency list's symbol, and
+     * without the list `formatCurrency` puts the bare code in its place ("+USD0.06").
+     * The announcement keeps the text it was made with, so it waits for the list rather
+     * than show that for its whole run. A list that settles without the code falls
+     * through to the wallet amount below.
+     */
+    const isDisplayCurrencyListed = hasDisplayAmount && hasCurrencyInfo(displayCurrency)
+    if (hasDisplayAmount && !isDisplayCurrencyListed && currencyListLoading) return null
+
+    const formattedFromDisplay = isDisplayCurrencyListed
       ? formatCurrency({ amountInMajorUnits: displayAmount, currency: displayCurrency })
       : null
 
@@ -98,7 +109,14 @@ export const useUnseenTxAmountBadge = ({
     if (!formatted) return null
 
     return direction === TxDirection.Receive ? `+${formatted}` : formatted
-  }, [latestUnseenTx, isAwaitingPrice, formatCurrency, formatMoneyAmount])
+  }, [
+    latestUnseenTx,
+    isAwaitingPrice,
+    formatCurrency,
+    formatMoneyAmount,
+    hasCurrencyInfo,
+    currencyListLoading,
+  ])
 
   /** Takes the transaction to open rather than reading the newest unseen one: once a badge
    *  is announced its transaction is already marked seen, so by the time it can be pressed

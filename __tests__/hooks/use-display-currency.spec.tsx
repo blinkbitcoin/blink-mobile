@@ -433,6 +433,28 @@ describe("useDisplayCurrency", () => {
     })
   })
 
+  describe("hasCurrencyInfo", () => {
+    it("knows a code the list carries and not one it lacks", () => {
+      const { result } = renderHook(() => useDisplayCurrency())
+
+      expect(result.current.hasCurrencyInfo("EUR")).toBe(true)
+      expect(result.current.hasCurrencyInfo("JPY")).toBe(false)
+    })
+
+    it("knows no code while the list is still loading", () => {
+      mockUseCurrencyListQuery.mockReturnValue({
+        currencyList: [],
+        loading: true,
+        isUnavailable: false,
+      })
+
+      const { result } = renderHook(() => useDisplayCurrency())
+
+      expect(result.current.hasCurrencyInfo("USD")).toBe(false)
+      expect(result.current.currencyListLoading).toBe(true)
+    })
+  })
+
   describe("getSecondaryAmountIfCurrencyIsDifferent", () => {
     it("should return undefined when wallet currency matches display currency", () => {
       const { result } = renderHook(() => useDisplayCurrency())

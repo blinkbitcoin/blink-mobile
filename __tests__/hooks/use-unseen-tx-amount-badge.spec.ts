@@ -8,6 +8,9 @@ const mockPriceConverter = jest.fn()
 const mockConvertMoneyAmount = jest.fn<typeof mockPriceConverter | undefined, []>(
   () => mockPriceConverter,
 )
+/** The codes the currency list knows; `null` stands for a list that knows them all. */
+let mockListedCurrencies: string[] | null = null
+let mockCurrencyListLoading = false
 
 jest.mock("@react-navigation/native", () => {
   return {
@@ -32,7 +35,12 @@ jest.mock("@app/hooks", () => {
       `${moneyAmount.currency} ${moneyAmount.amount}`,
   }
   return {
-    useDisplayCurrency: () => formatters,
+    useDisplayCurrency: () => ({
+      ...formatters,
+      hasCurrencyInfo: (currency: string) =>
+        mockListedCurrencies === null || mockListedCurrencies.includes(currency),
+      currencyListLoading: mockCurrencyListLoading,
+    }),
     usePriceConversion: () => ({ convertMoneyAmount: mockConvertMoneyAmount() }),
   }
 })
@@ -99,6 +107,8 @@ describe("useUnseenTxAmountBadge", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockConvertMoneyAmount.mockReturnValue(mockPriceConverter)
+    mockListedCurrencies = null
+    mockCurrencyListLoading = false
   })
 
   it("falls back to the cached custodial transactions when none are provided", () => {
@@ -381,6 +391,52 @@ describe("useUnseenTxAmountBadge", () => {
     )
 
     expect(result.current.unseenAmountText).toBe("+USD 0.06")
+  })
+
+  describe("before the currency list knows the display currency", () => {
+    const usdReceive = tx({
+      id: "receive",
+      createdAt: 1,
+      settlementAmount: 6,
+      settlementCurrency: "USD",
+      settlementDisplayAmount: "0.06",
+      settlementDisplayCurrency: "USD",
+    })
+
+    it("holds a custodial amount back while the list is loading", () => {
+      mockListedCurrencies = []
+      mockCurrencyListLoading = true
+
+      const { result, rerender } = renderHook(() =>
+        useUnseenTxAmountBadge({
+          transactions: [usdReceive],
+          hasUnseenBtcTx: false,
+          hasUnseenUsdTx: true,
+        }),
+      )
+
+      expect(result.current.unseenAmountText).toBeNull()
+
+      mockListedCurrencies = ["USD"]
+      mockCurrencyListLoading = false
+      rerender()
+
+      expect(result.current.unseenAmountText).toBe("+USD 0.06")
+    })
+
+    it("falls back to the wallet amount once the list settles without the code", () => {
+      mockListedCurrencies = []
+
+      const { result } = renderHook(() =>
+        useUnseenTxAmountBadge({
+          transactions: [usdReceive],
+          hasUnseenBtcTx: false,
+          hasUnseenUsdTx: true,
+        }),
+      )
+
+      expect(result.current.unseenAmountText).toBe("+USD 6")
+    })
   })
 
   it("navigates to transactionDetail for the transaction it is given", () => {
