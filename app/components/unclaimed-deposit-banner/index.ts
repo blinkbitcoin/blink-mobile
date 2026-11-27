@@ -1,1 +1,1 @@
-export { UnclaimedDepositBanner } from "./unclaimed-deposit-banner"
+export { UnclaimedDepositBanner, actionableDeposits } from "./unclaimed-deposit-banner"
