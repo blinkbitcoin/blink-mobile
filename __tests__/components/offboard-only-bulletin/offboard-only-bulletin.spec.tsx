@@ -88,6 +88,19 @@ describe("OffboardOnlyBulletin", () => {
     expect(queryByText(/Receiving stops/)).toBeNull()
   })
 
+  it("says receiving is off for a closed account, never a past cutoff", () => {
+    const { getByText, queryByText } = renderBulletin({
+      status: WindDownStatus.GatedClosed,
+    })
+
+    expect(
+      getByText(
+        `${REGION_SENTENCE} Withdraw your funds before September 30 — free of any Blink charge. Receiving is off. ${ERROR_SENTENCE}`,
+      ),
+    ).toBeTruthy()
+    expect(queryByText(/Receiving stops/)).toBeNull()
+  })
+
   it("renders the dates in the backend timezone", () => {
     /** 23:30 UTC on Sep 29 is already Sep 30 in Dubai (UTC+4). */
     const { getByText } = renderBulletin({

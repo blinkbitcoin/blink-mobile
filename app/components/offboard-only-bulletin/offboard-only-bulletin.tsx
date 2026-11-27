@@ -39,9 +39,13 @@ export const OffboardOnlyBulletin: React.FC<OffboardOnlyBulletinProps> = ({
   })
 
   /** Past the cutoff the receive date would read as a future event; a cutoff on or after
-   *  the deadline day says nothing the deadline does not, so one date is shown. */
+   *  the deadline day says nothing the deadline does not, so one date is shown. A closed
+   *  account is past its cutoff too: the home only shows it while the gate is held back. */
   const body = (() => {
-    if (status === WindDownStatus.ReceiveDisabled) {
+    if (
+      status === WindDownStatus.ReceiveDisabled ||
+      status === WindDownStatus.GatedClosed
+    ) {
       return LL.AccountMigration.offboardBulletin.bodyReceiveOff({ date })
     }
     if (isOnOrAfterDay({ a: receiveDisabledTimestamp, b: deadlineTimestamp, timezone })) {
