@@ -1876,6 +1876,16 @@ describe("SendBitcoinConfirmationScreen — haptics", () => {
     expect(haptics.error).not.toHaveBeenCalled()
   })
 
+  /** Pending is not a landed payment: it opens the receipt without Sent or its success. */
+  it("stays silent when the send comes back PENDING", async () => {
+    sendPaymentMock.mockResolvedValueOnce({ status: "PENDING" })
+
+    await slide()
+
+    expect(haptics.success).not.toHaveBeenCalled()
+    expect(haptics.error).not.toHaveBeenCalled()
+  })
+
   it.each(["ALREADY_PAID", "FAILURE"])(
     "plays error once when the send comes back %s",
     async (status) => {

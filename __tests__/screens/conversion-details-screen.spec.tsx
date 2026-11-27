@@ -44,13 +44,13 @@ import { withDeviceLocale } from "../helpers/device-locale"
  */
 withDeviceLocale("en-US")
 
-/** The dollar-balance guard now holds the screen until remote config lands, and the
- *  context default outside a provider is never-ready, which would hide it for good. */
 jest.mock("@app/utils/haptics", () => {
   const actual = jest.requireActual("@app/utils/haptics")
   return { haptics: { ...actual.haptics, select: jest.fn() } }
 })
 
+/** The dollar-balance guard now holds the screen until remote config lands, and the
+ *  context default outside a provider is never-ready, which would hide it for good. */
 jest.mock("@app/config/feature-flags-context", () => ({
   ...jest.requireActual("@app/config/feature-flags-context"),
   useFeatureFlags: () => ({ remoteConfigReady: true }),
@@ -2641,5 +2641,38 @@ describe("Wallet toggle select haptic", () => {
     })
 
     expect(haptics.select).toHaveBeenCalledTimes(2)
+  })
+
+  it("stays silent on a press while the swap is still re-quoting the amount", async () => {
+    const Wrapper = createTestWrapper(
+      createGraphQLMocks({ btcBalance: 100000, usdBalance: 50000 }),
+    )
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+    await waitFor(() => {
+      expect(getByTestId("convert-50%")).toBeTruthy()
+    })
+    await act(async () => {
+      fireEvent.press(getByTestId("convert-50%"))
+    })
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+    await waitFor(() => {
+      expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(false)
+    })
+    jest.mocked(haptics.select).mockClear()
+
+    await act(async () => {
+      fireEvent.press(getByTestId("wallet-toggle-button"))
+    })
+    await act(async () => {
+      fireEvent.press(getByTestId("wallet-toggle-button"))
+    })
+
+    expect(haptics.select).toHaveBeenCalledTimes(1)
   })
 })
