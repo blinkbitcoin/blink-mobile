@@ -86,7 +86,7 @@ maestro upgrade voided the baked driver.
 ## After Editing the Scripts
 
 ```bash
-"$BLINK/tests/run.sh"     # exits non-zero on failure; fake maestro/xcrun, no simulator, no network
+"$BLINK/tests/run.sh"     # 23 assertions, ~5s, exits non-zero on failure; fake maestro/xcrun, no simulator, no network
 ```
 
 Same house rule as the other skills: a new guarantee lands with the
