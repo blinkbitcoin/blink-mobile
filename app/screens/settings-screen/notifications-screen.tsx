@@ -19,6 +19,7 @@ import { Screen } from "@app/components/screen"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { Switch } from "@app/components/atomic/switch"
 import { radius } from "@app/rne-theme/radius"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import {
   toastSplashSetting,
   useSplashSettings,
@@ -346,6 +347,7 @@ export const SplashMinimumRow: React.FC = () => {
         keyboardType="number-pad"
         returnKeyType="done"
         selectTextOnFocus
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         /* The title beside it is a sibling: without a name of its own the field reads
            as a bare number. */
         accessibilityLabel={LL.NotificationSettingsScreen.splashMinimum()}
