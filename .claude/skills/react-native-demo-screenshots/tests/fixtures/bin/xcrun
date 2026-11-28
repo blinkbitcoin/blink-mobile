@@ -1,0 +1,59 @@
+#!/bin/bash
+# Fake `xcrun simctl io <udid> screenshot` for the tests.
+#
+# Writes a real PNG, so the caller's image validation runs against something
+# ImageMagick can actually read. $FAKE_FRAMES lets a test script a sequence of
+# distinct frames (an animating screen) followed by a repeat (a settled one),
+# which is what the stability polling keys on.
+
+set -uo pipefail
+
+[ "${1:-}" = "simctl" ] || { echo "fake xcrun: only simctl is supported" >&2; exit 64; }
+shift
+
+ARGS_LOG="${FAKE_ARGS_LOG:-/dev/null}"
+
+case "${1:-}" in
+  io)
+    UDID="${2:?fake xcrun: io needs a udid}"
+    OP="${3:?}"
+    OUT="${4:?fake xcrun: screenshot needs an output path}"
+    [ "$OP" = "screenshot" ] || { echo "fake xcrun: unsupported io op '$OP'" >&2; exit 64; }
+
+    echo "screenshot udid=$UDID out=$OUT" >> "$ARGS_LOG"
+
+    if [ -n "${FAKE_DEVICES:-}" ] && [ -f "${FAKE_DEVICES}" ]; then
+      grep -q "^${UDID}|" "$FAKE_DEVICES" || { echo "fake xcrun: no device $UDID" >&2; exit 1; }
+    fi
+
+    if [ -n "${FAKE_SHOT_BROKEN:-}" ]; then
+      printf 'simctl: an error, not an image' > "$OUT"
+      exit 0
+    fi
+
+    # Frame sequence: each call consumes the next colour; once the list is
+    # exhausted the last colour repeats, which reads as "the screen settled".
+    COUNTER_FILE="${FAKE_FRAME_COUNTER:-$TMPDIR/fake-frame-counter}"
+    n=$(cat "$COUNTER_FILE" 2>/dev/null || echo 0)
+    echo $((n + 1)) > "$COUNTER_FILE"
+
+    # A screen that never settles: every frame differs, so the caller's
+    # stability poll can never see two matching frames in a row.
+    if [ -n "${FAKE_NEVER_SETTLE:-}" ]; then
+      magick -size "${FAKE_SHOT_SIZE:-120x260}" "xc:gray$(( (n * 7) % 100 ))" "$OUT" 2>/dev/null \
+        || { echo "fake xcrun: magick unavailable" >&2; exit 1; }
+      exit 0
+    fi
+
+    FRAMES="${FAKE_FRAMES:-red}"
+    set -- $FRAMES
+    idx=$((n + 1))
+    [ "$idx" -gt "$#" ] && idx=$#
+    eval "colour=\${$idx}"
+
+    magick -size "${FAKE_SHOT_SIZE:-120x260}" "xc:$colour" "$OUT" 2>/dev/null \
+      || { echo "fake xcrun: magick unavailable" >&2; exit 1; }
+    ;;
+
+  *) echo "fake xcrun: unsupported verb '${1:-}'" >&2; exit 64 ;;
+esac
