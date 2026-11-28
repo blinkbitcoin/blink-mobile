@@ -1,5 +1,4 @@
 import React from "react"
-import { Alert } from "react-native"
 import { act, fireEvent, render } from "@testing-library/react-native"
 
 import { ThemeProvider } from "@rn-vui/themed"
@@ -21,7 +20,10 @@ let mockStackRoutes = [{ key: "totpRegistrationValidate" }]
 /** The screen's `beforeRemove` listener, as the navigator would hold it. */
 let mockBeforeRemove: ((event: BeforeRemoveEvent) => void) | undefined
 /** One navigation object for every render, as the navigator hands a screen. */
+/** False once the app lock is pushed over the screen. */
+let mockIsFocused = true
 const mockNavigation = {
+  isFocused: () => mockIsFocused,
   setOptions: (...args: unknown[]) => mockSetOptions(...args),
   setParams: (...args: unknown[]) => mockSetParams(...args),
   getState: () => ({ routes: mockStackRoutes }),
@@ -108,6 +110,12 @@ jest.mock("@app/components/code-input", () => {
 
 import { TotpRegistrationValidateScreen } from "@app/screens/totp-screen/totp-registration-validate"
 
+const mockNotifyModal = jest.fn()
+jest.mock("@app/components/notifications", () => ({
+  ...jest.requireActual("@app/components/notifications"),
+  useNotifications: () => ({ notifyModal: mockNotifyModal }),
+}))
+
 loadLocale("en")
 
 const wrap = (ui: React.ReactElement) => (
@@ -164,7 +172,6 @@ const submitCode = async () => {
 describe("TotpRegistrationValidateScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    jest.spyOn(Alert, "alert").mockImplementation(() => {})
     registrationCount += 1
     mockRegistrationId = `reg-${registrationCount}`
     mockTotpValidate.mockResolvedValue(enabledResponse)
@@ -174,13 +181,14 @@ describe("TotpRegistrationValidateScreen", () => {
     mockIsEnforced = true
     mockRegistrationPrompt = undefined
     mockBeforeRemove = undefined
+    mockIsFocused = true
   })
 
   it("moves on to the backup of the setup key once the authenticator is on", async () => {
     await submitCode()
 
     expect(mockShowBackup).toHaveBeenCalledWith({ secret: "SECRET", userId: "1" })
-    expect(Alert.alert).not.toHaveBeenCalled()
+    expect(mockNotifyModal).not.toHaveBeenCalled()
   })
 
   it("sends the code with the registration id and the session token", async () => {
@@ -245,7 +253,46 @@ describe("TotpRegistrationValidateScreen", () => {
 
     expect(mockLogTwoFactorSetupCompleted).not.toHaveBeenCalled()
     expect(mockShowBackup).not.toHaveBeenCalled()
-    expect(Alert.alert).toHaveBeenCalledTimes(1)
+    expect(mockNotifyModal).toHaveBeenCalledTimes(1)
+    expect(mockNotifyModal.mock.lastCall?.[0]).toMatchObject({
+      icon: "warning-circle",
+      title: "Couldn't turn on two-factor authentication",
+      text: "Check your connection and try again.",
+      primaryButtonTitle: "Try again",
+    })
+    consoleError.mockRestore()
+  })
+
+  it("sends the same code again from Try again", async () => {
+    const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
+    mockTotpValidate.mockRejectedValueOnce(lostAnswer())
+
+    await submitCode()
+    await act(async () => {
+      mockNotifyModal.mock.lastCall?.[0].primaryButtonAction()
+    })
+
+    expect(mockTotpValidate).toHaveBeenCalledTimes(2)
+    expect(mockTotpValidate.mock.calls[1][0].variables.input.totpCode).toBe(
+      mockTotpValidate.mock.calls[0][0].variables.input.totpCode,
+    )
+    expect(mockShowBackup).toHaveBeenCalledTimes(1)
+    consoleError.mockRestore()
+  })
+
+  /** An accepted code moves on to the setup key, which must not open from under a lock. */
+  it("sends nothing from Try again once the app lock is over the screen", async () => {
+    const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
+    mockTotpValidate.mockRejectedValueOnce(lostAnswer())
+
+    await submitCode()
+    mockIsFocused = false
+    await act(async () => {
+      mockNotifyModal.mock.lastCall?.[0].primaryButtonAction()
+    })
+
+    expect(mockTotpValidate).toHaveBeenCalledTimes(1)
+    expect(mockShowBackup).not.toHaveBeenCalled()
     consoleError.mockRestore()
   })
 
@@ -289,7 +336,7 @@ describe("TotpRegistrationValidateScreen", () => {
         isEnforced: true,
         prompt: "tier2_bulletin",
       })
-      expect(Alert.alert).not.toHaveBeenCalled()
+      expect(mockNotifyModal).not.toHaveBeenCalled()
     })
 
     /** A second try after a lost answer is refused, its registration spent. */
@@ -345,7 +392,7 @@ describe("TotpRegistrationValidateScreen", () => {
 
       expect(mockReadRegistrationState).not.toHaveBeenCalled()
       expect(mockShowBackup).not.toHaveBeenCalled()
-      expect(Alert.alert).toHaveBeenCalledTimes(1)
+      expect(mockNotifyModal).toHaveBeenCalledTimes(1)
       consoleError.mockRestore()
     })
 
@@ -398,7 +445,7 @@ describe("TotpRegistrationValidateScreen", () => {
       await submitCode()
 
       expect(mockShowBackup).not.toHaveBeenCalled()
-      expect(Alert.alert).toHaveBeenCalledTimes(1)
+      expect(mockNotifyModal).toHaveBeenCalledTimes(1)
       consoleError.mockRestore()
     })
   })

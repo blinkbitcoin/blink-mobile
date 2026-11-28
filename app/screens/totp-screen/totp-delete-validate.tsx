@@ -3,6 +3,7 @@ import { Alert } from "react-native"
 
 import { gql } from "@apollo/client"
 import { CodeInput } from "@app/components/code-input"
+import { MessageIcon, useNotifications } from "@app/components/notifications"
 import { TwoFactorManualResetSheet } from "@app/custodial/components/two-factor-manual-reset-sheet"
 import { useTwoFactorTurnOff } from "@app/custodial/hooks/use-two-factor-turn-off"
 import {
@@ -54,6 +55,7 @@ export const TotpDeleteValidateScreen: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "totpDeleteValidate">>()
   const { LL } = useI18nContext()
+  const { notifyModal } = useNotifications()
   const { key: routeKey } = useRoute()
   const isMounted = useIsMounted()
   const { isTurnOffBlocked, isTurnOffDecided, reportBlocked } = useTwoFactorTurnOff()
@@ -78,8 +80,13 @@ export const TotpDeleteValidateScreen: React.FC = () => {
   const finish = useCallback(() => {
     if (!isMounted()) return
     leaveScreen()
-    Alert.alert(LL.AccountScreen.totpDeactivated())
-  }, [LL, isMounted, leaveScreen])
+    notifyModal({
+      icon: MessageIcon.Success,
+      title: LL.Messages.twoFactorOffTitle(),
+      text: LL.Messages.twoFactorOffBody(),
+      primaryButtonTitle: LL.Messages.okay(),
+    })
+  }, [LL, isMounted, leaveScreen, notifyModal])
 
   const showError = useCallback(
     (message?: string) => {

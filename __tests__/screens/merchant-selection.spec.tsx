@@ -109,6 +109,12 @@ const renderScreen = (mode: "light" | "dark" = "light", routeParams = route.para
     </ContextForScreenWithTheme>,
   )
 
+const mockNotifyModal = jest.fn()
+jest.mock("@app/components/notifications", () => ({
+  ...jest.requireActual("@app/components/notifications"),
+  useNotifications: () => ({ notifyModal: mockNotifyModal }),
+}))
+
 describe("MerchantSelectionScreen", () => {
   const resolveMerchantChoiceDestinationMock =
     resolveMerchantChoiceDestination as jest.MockedFunction<
@@ -305,7 +311,14 @@ describe("MerchantSelectionScreen", () => {
     )
 
     await waitFor(() => expect(mockRecordError).toHaveBeenCalledWith(error))
-    expect(Alert.alert).toHaveBeenCalledWith(error.toString(), "", [{ text: "OK" }])
+    expect(mockNotifyModal).toHaveBeenCalledWith(
+      expect.objectContaining({
+        icon: "warning-circle",
+        title: "Couldn't load this merchant",
+        text: "Check your connection and try again, or pick another merchant.",
+        primaryButtonTitle: "Try again",
+      }),
+    )
     expect(screen.queryByTestId(`merchant-${merchants[1].id}-selected`)).toBeNull()
 
     resolveMerchantChoiceDestinationMock.mockResolvedValue({
@@ -322,6 +335,39 @@ describe("MerchantSelectionScreen", () => {
     await waitFor(() =>
       expect(resolveMerchantChoiceDestinationMock).toHaveBeenCalledTimes(2),
     )
+  })
+
+  it("tries the same merchant again from the pop-up", async () => {
+    resolveMerchantChoiceDestinationMock.mockRejectedValue(new Error("LNURL failed"))
+    renderScreen()
+    fireEvent.press(
+      screen.getByLabelText(`${merchants[1].title}. ${merchants[1].description}`),
+    )
+    await waitFor(() => expect(mockNotifyModal).toHaveBeenCalledTimes(1))
+
+    mockNotifyModal.mock.calls[0][0].primaryButtonAction()
+
+    await waitFor(() =>
+      expect(resolveMerchantChoiceDestinationMock).toHaveBeenCalledTimes(2),
+    )
+    expect(resolveMerchantChoiceDestinationMock.mock.calls[1]).toEqual(
+      resolveMerchantChoiceDestinationMock.mock.calls[0],
+    )
+  })
+
+  /** A retry is the screen's to make: once the user has left it, nothing is resolved. */
+  it("does not try again from the pop-up once the screen has lost focus", async () => {
+    resolveMerchantChoiceDestinationMock.mockRejectedValue(new Error("LNURL failed"))
+    renderScreen()
+    fireEvent.press(
+      screen.getByLabelText(`${merchants[1].title}. ${merchants[1].description}`),
+    )
+    await waitFor(() => expect(mockNotifyModal).toHaveBeenCalledTimes(1))
+
+    mockFocusCleanups.forEach((cleanup) => cleanup())
+    mockNotifyModal.mock.calls[0][0].primaryButtonAction()
+
+    expect(resolveMerchantChoiceDestinationMock).toHaveBeenCalledTimes(1)
   })
 
   it("does not navigate or alert when resolution completes after blur", async () => {

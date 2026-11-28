@@ -1,10 +1,11 @@
 import * as React from "react"
-import { Alert, View } from "react-native"
+import { View } from "react-native"
 import { Text, makeStyles } from "@rn-vui/themed"
 import InAppBrowser from "react-native-inappbrowser-reborn"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 
+import { MessageIcon, useNotifications } from "@app/components/notifications"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
@@ -38,6 +39,7 @@ import { useCreateDeviceAccount } from "../get-started-screen/use-create-device-
 export const AcceptTermsAndConditionsScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
+  const { notifyModal } = useNotifications()
   const navigation =
     useNavigation<
       NativeStackNavigationProp<RootStackParamList, "acceptTermsAndConditions">
@@ -164,7 +166,13 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
       return
     }
 
-    Alert.alert("unknown flow")
+    reportError("accept-t-and-c", new Error(`unknown flow: ${flow}`))
+    notifyModal({
+      icon: MessageIcon.Alert,
+      title: LL.Messages.somethingWentWrongTitle(),
+      text: LL.Messages.somethingWentWrongBody(),
+      primaryButtonTitle: LL.Messages.okay(),
+    })
   }
 
   return (

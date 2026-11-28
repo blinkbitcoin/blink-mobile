@@ -10399,6 +10399,124 @@ type RootTranslation = {
 			title: string
 		}
 	}
+	Messages: {
+		/**
+		 * O​k​a​y
+		 */
+		okay: string
+		/**
+		 * T​r​y​ ​a​g​a​i​n
+		 */
+		tryAgain: string
+		/**
+		 * C​o​p​y
+		 */
+		copy: string
+		/**
+		 * C​o​p​y​ ​l​i​n​k
+		 */
+		copyLink: string
+		/**
+		 * C​o​p​y​ ​k​e​y
+		 */
+		copyKey: string
+		/**
+		 * T​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​i​s​ ​o​f​f
+		 */
+		twoFactorOffTitle: string
+		/**
+		 * Y​o​u​ ​c​a​n​ ​t​u​r​n​ ​i​t​ ​b​a​c​k​ ​o​n​ ​a​t​ ​a​n​y​ ​t​i​m​e​ ​i​n​ ​S​e​t​t​i​n​g​s​.
+		 */
+		twoFactorOffBody: string
+		/**
+		 * P​h​o​n​e​ ​n​u​m​b​e​r​ ​c​o​n​f​i​r​m​e​d
+		 */
+		phoneConfirmedTitle: string
+		/**
+		 * P​h​o​n​e​ ​n​u​m​b​e​r​ ​a​d​d​e​d
+		 */
+		phoneAddedTitle: string
+		/**
+		 * Y​o​u​ ​c​a​n​ ​n​o​w​ ​l​o​g​ ​i​n​ ​w​i​t​h​ ​t​h​i​s​ ​n​u​m​b​e​r​.
+		 */
+		phoneLoginBody: string
+		/**
+		 * Y​o​u​'​r​e​ ​l​o​g​g​e​d​ ​o​u​t
+		 */
+		loggedOutTitle: string
+		/**
+		 * Y​o​u​ ​c​a​n​ ​l​o​g​ ​b​a​c​k​ ​i​n​ ​a​t​ ​a​n​y​ ​t​i​m​e​.
+		 */
+		loggedOutBody: string
+		/**
+		 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​c​l​o​s​e​d
+		 */
+		accountClosedTitle: string
+		/**
+		 * W​e​ ​m​a​y​ ​k​e​e​p​ ​s​o​m​e​ ​r​e​c​o​r​d​s​ ​w​h​e​r​e​ ​t​h​e​ ​l​a​w​ ​r​e​q​u​i​r​e​s​ ​i​t​.
+		 */
+		accountClosedBody: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​t​u​r​n​ ​o​n​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n
+		 */
+		twoFactorOnFailedTitle: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​a​d​d​ ​t​h​i​s​ ​l​o​g​i​n​ ​m​e​t​h​o​d
+		 */
+		loginMethodFailedTitle: string
+		/**
+		 * C​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		checkConnectionBody: string
+		/**
+		 * T​h​i​s​ ​p​a​g​e​ ​d​i​d​n​'​t​ ​l​o​a​d​ ​p​r​o​p​e​r​l​y
+		 */
+		pageNotReadyTitle: string
+		/**
+		 * C​l​o​s​e​ ​i​t​ ​a​n​d​ ​o​p​e​n​ ​i​t​ ​a​g​a​i​n​.
+		 */
+		pageNotReadyBody: string
+		/**
+		 * S​o​m​e​t​h​i​n​g​ ​w​e​n​t​ ​w​r​o​n​g
+		 */
+		somethingWentWrongTitle: string
+		/**
+		 * P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​.
+		 */
+		somethingWentWrongBody: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​o​p​e​n​ ​s​h​a​r​i​n​g
+		 */
+		shareFailedTitle: string
+		/**
+		 * C​o​p​y​ ​t​h​e​ ​i​n​v​i​t​e​ ​l​i​n​k​ ​a​n​d​ ​s​e​n​d​ ​i​t​ ​y​o​u​r​s​e​l​f​.
+		 */
+		shareInviteFailedBody: string
+		/**
+		 * C​o​p​y​ ​i​t​ ​a​n​d​ ​p​a​s​t​e​ ​i​t​ ​w​h​e​r​e​ ​y​o​u​ ​n​e​e​d​ ​i​t​.
+		 */
+		shareCopyFailedBody: string
+		/**
+		 * C​o​p​y​ ​t​h​e​ ​k​e​y​ ​n​o​w​.​ ​I​t​'​s​ ​s​h​o​w​n​ ​o​n​l​y​ ​o​n​c​e​,​ ​s​o​ ​s​a​v​e​ ​i​t​ ​b​e​f​o​r​e​ ​y​o​u​ ​l​e​a​v​e​ ​t​h​i​s​ ​s​c​r​e​e​n​.
+		 */
+		shareKeyFailedBody: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​o​p​e​n​ ​t​h​i​s​ ​l​i​n​k
+		 */
+		linkFailedTitle: string
+		/**
+		 * Y​o​u​r​ ​p​h​o​n​e​ ​c​o​u​l​d​n​'​t​ ​o​p​e​n​ ​i​t​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​.
+		 */
+		linkFailedBody: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​l​o​a​d​ ​t​h​i​s​ ​m​e​r​c​h​a​n​t
+		 */
+		merchantFailedTitle: string
+		/**
+		 * C​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​,​ ​o​r​ ​p​i​c​k​ ​a​n​o​t​h​e​r​ ​m​e​r​c​h​a​n​t​.
+		 */
+		merchantFailedBody: string
+	}
 	support: {
 		/**
 		 * N​e​e​d​ ​h​e​l​p​?​ ​C​o​n​t​a​c​t​ ​u​s​.
@@ -25002,6 +25120,124 @@ export type TranslationFunctions = {
 			 */
 			title: () => LocalizedString
 		}
+	}
+	Messages: {
+		/**
+		 * Okay
+		 */
+		okay: () => LocalizedString
+		/**
+		 * Try again
+		 */
+		tryAgain: () => LocalizedString
+		/**
+		 * Copy
+		 */
+		copy: () => LocalizedString
+		/**
+		 * Copy link
+		 */
+		copyLink: () => LocalizedString
+		/**
+		 * Copy key
+		 */
+		copyKey: () => LocalizedString
+		/**
+		 * Two-factor authentication is off
+		 */
+		twoFactorOffTitle: () => LocalizedString
+		/**
+		 * You can turn it back on at any time in Settings.
+		 */
+		twoFactorOffBody: () => LocalizedString
+		/**
+		 * Phone number confirmed
+		 */
+		phoneConfirmedTitle: () => LocalizedString
+		/**
+		 * Phone number added
+		 */
+		phoneAddedTitle: () => LocalizedString
+		/**
+		 * You can now log in with this number.
+		 */
+		phoneLoginBody: () => LocalizedString
+		/**
+		 * You're logged out
+		 */
+		loggedOutTitle: () => LocalizedString
+		/**
+		 * You can log back in at any time.
+		 */
+		loggedOutBody: () => LocalizedString
+		/**
+		 * Your account is closed
+		 */
+		accountClosedTitle: () => LocalizedString
+		/**
+		 * We may keep some records where the law requires it.
+		 */
+		accountClosedBody: () => LocalizedString
+		/**
+		 * Couldn't turn on two-factor authentication
+		 */
+		twoFactorOnFailedTitle: () => LocalizedString
+		/**
+		 * Couldn't add this login method
+		 */
+		loginMethodFailedTitle: () => LocalizedString
+		/**
+		 * Check your connection and try again.
+		 */
+		checkConnectionBody: () => LocalizedString
+		/**
+		 * This page didn't load properly
+		 */
+		pageNotReadyTitle: () => LocalizedString
+		/**
+		 * Close it and open it again.
+		 */
+		pageNotReadyBody: () => LocalizedString
+		/**
+		 * Something went wrong
+		 */
+		somethingWentWrongTitle: () => LocalizedString
+		/**
+		 * Please try again later.
+		 */
+		somethingWentWrongBody: () => LocalizedString
+		/**
+		 * Couldn't open sharing
+		 */
+		shareFailedTitle: () => LocalizedString
+		/**
+		 * Copy the invite link and send it yourself.
+		 */
+		shareInviteFailedBody: () => LocalizedString
+		/**
+		 * Copy it and paste it where you need it.
+		 */
+		shareCopyFailedBody: () => LocalizedString
+		/**
+		 * Copy the key now. It's shown only once, so save it before you leave this screen.
+		 */
+		shareKeyFailedBody: () => LocalizedString
+		/**
+		 * Couldn't open this link
+		 */
+		linkFailedTitle: () => LocalizedString
+		/**
+		 * Your phone couldn't open it. Try again in a moment.
+		 */
+		linkFailedBody: () => LocalizedString
+		/**
+		 * Couldn't load this merchant
+		 */
+		merchantFailedTitle: () => LocalizedString
+		/**
+		 * Check your connection and try again, or pick another merchant.
+		 */
+		merchantFailedBody: () => LocalizedString
 	}
 	support: {
 		/**

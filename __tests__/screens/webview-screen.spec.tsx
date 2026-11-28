@@ -116,6 +116,12 @@ const simulateLoad = (webViewInstance: ReactTestInstance, url: string) => {
   webViewInstance.props.onLoadProgress({ nativeEvent: { progress: 0.8, url } })
 }
 
+const mockNotifyModal = jest.fn()
+jest.mock("@app/components/notifications", () => ({
+  ...jest.requireActual("@app/components/notifications"),
+  useNotifications: () => ({ notifyModal: mockNotifyModal }),
+}))
+
 describe("WebViewScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -201,19 +207,23 @@ describe("WebViewScreen", () => {
   })
 
   describe("webview not ready", () => {
-    it("shows the translated error and injects nothing", async () => {
+    it("says the page did not load, once, and injects nothing", async () => {
       loadLocale("en")
       const LL = i18nObject("en")
       mockExposeWebViewHandle = false
-      const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {})
 
       const webViewInstance = await getWebView(mockRoute)
       simulateLoad(webViewInstance, FIAT_URL)
+      simulateLoad(webViewInstance, FIAT_URL)
 
-      expect(alertSpy).toHaveBeenCalledWith(
-        LL.common.error(),
-        LL.GaloyAddressScreen.somethingWentWrong(),
-      )
+      expect(mockNotifyModal).toHaveBeenCalledTimes(1)
+      expect(mockNotifyModal.mock.calls[0][0]).toMatchObject({
+        icon: "warning-circle",
+        title: LL.Messages.pageNotReadyTitle(),
+        text: LL.Messages.pageNotReadyBody(),
+        primaryButtonTitle: LL.Messages.okay(),
+        isRequired: true,
+      })
       expect(mockInjectJavaScript).not.toHaveBeenCalled()
     })
   })

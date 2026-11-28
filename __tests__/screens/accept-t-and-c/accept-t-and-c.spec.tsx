@@ -1,5 +1,4 @@
 import React from "react"
-import { Alert } from "react-native"
 import { act, render, screen, fireEvent, waitFor } from "@testing-library/react-native"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -22,6 +21,12 @@ import { StorageFailure } from "@app/utils/storage/storage-failure"
 
 import { ContextForScreen } from "../helper"
 import { flushEffects } from "../../helpers/flush-effects"
+
+const mockNotifyModal = jest.fn()
+jest.mock("@app/components/notifications", () => ({
+  ...jest.requireActual("@app/components/notifications"),
+  useNotifications: () => ({ notifyModal: mockNotifyModal }),
+}))
 
 loadLocale("en")
 const LL = i18nObject("en")
@@ -647,14 +652,17 @@ describe("AcceptTermsAndConditionsScreen", () => {
     })
 
     it("flags a flow it does not know", async () => {
-      const alert = jest.spyOn(Alert, "alert").mockImplementation(() => undefined)
       mockFlow = "unexpected"
       mockAppCheckToken = "app-check-token"
 
       await renderAndAccept()
 
-      expect(alert).toHaveBeenCalledWith("unknown flow")
-      alert.mockRestore()
+      expect(mockNotifyModal).toHaveBeenCalledWith({
+        icon: "warning-circle",
+        title: "Something went wrong",
+        text: "Please try again later.",
+        primaryButtonTitle: "Okay",
+      })
     })
   })
 

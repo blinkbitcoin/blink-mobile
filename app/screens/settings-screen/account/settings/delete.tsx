@@ -8,6 +8,7 @@ import { radius } from "@app/rne-theme/radius"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
+import { MessageIcon, useNotifications } from "@app/components/notifications"
 import { CONTACT_EMAIL_ADDRESS } from "@app/config"
 import { useAccountDeleteMutation, useSettingsScreenQuery } from "@app/graphql/generated"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
@@ -52,6 +53,7 @@ export const Delete = () => {
   const { switchToNextProfile } = useSwitchToNextProfile()
 
   const { LL } = useI18nContext()
+  const { notifyModal } = useNotifications()
 
   const [text, setText] = useState("")
   const [modalVisible, setModalVisible] = useState(false)
@@ -131,7 +133,7 @@ export const Delete = () => {
       if (res.data?.accountDelete?.success) {
         /** The lock stays up from here on: the account is gone, and the screen under the
          *  cover is about to render for whichever session comes next. It is left only
-         *  through the lock, by the switch or by the farewell's OK, and never given back. */
+         *  through the lock, by the switch or by closing the farewell, and never given back. */
         const outcome = await switchToNextProfile(
           accountToDeleteToken,
           leaveWhileDeleting,
@@ -158,16 +160,20 @@ export const Delete = () => {
           isAppLockKeptByLogout = isAppLockKept
         }
 
-        Alert.alert(LL.support.bye(), LL.support.deleteAccountConfirmation(), [
-          {
-            text: LL.common.ok(),
-            onPress: () => {
-              if (!hasSwitched) {
-                leaveWhileDeleting(() => routeAfterLogout(isAppLockKeptByLogout))
-              }
-            },
-          },
-        ])
+        const leave = () => {
+          if (!hasSwitched) {
+            leaveWhileDeleting(() => routeAfterLogout(isAppLockKeptByLogout))
+          }
+        }
+        notifyModal({
+          icon: MessageIcon.Success,
+          title: LL.Messages.accountClosedTitle(),
+          text: LL.Messages.accountClosedBody(),
+          primaryButtonTitle: LL.Messages.okay(),
+          primaryButtonAction: leave,
+          dismissAction: leave,
+          isRequired: true,
+        })
       } else {
         /** The server can answer with neither a success nor a rejection, which reading the
          *  first error unguarded turns into a TypeError: the generic alert then replaces the

@@ -1,12 +1,13 @@
 import * as React from "react"
 import { useCallback, useEffect, useState } from "react"
-import { ActivityIndicator, Alert, View } from "react-native"
+import { ActivityIndicator, View } from "react-native"
 
 import { gql } from "@apollo/client"
 import { radius } from "@app/rne-theme/radius"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyInfo } from "@app/components/atomic/galoy-info"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
+import { MessageIcon, useNotifications } from "@app/components/notifications"
 import {
   PhoneCodeChannelType,
   useUserPhoneRegistrationValidateMutation,
@@ -89,6 +90,7 @@ export const PhoneRegistrationValidateScreen: React.FC<
   >()
 
   const { LL } = useI18nContext()
+  const { notifyModal } = useNotifications()
   const { updateCurrentProfile } = useSaveSessionProfile()
 
   const [phoneValidate] = useUserPhoneRegistrationValidateMutation()
@@ -161,12 +163,20 @@ export const PhoneRegistrationValidateScreen: React.FC<
         } else {
           await updateCurrentProfile()
           setStatus(ValidatePhoneCodeStatus.Success)
-          Alert.alert(LL.PhoneRegistrationValidateScreen.successTitle(), undefined, [
-            {
-              text: LL.common.ok(),
-              onPress: () => navigation.pop(2),
-            },
-          ])
+          /** Not from under the app lock, which a relock pushes over this screen while
+           *  the pop-up is open: popping two would take the lock with it. */
+          const backToStart = () => {
+            if (navigation.isFocused()) navigation.pop(2)
+          }
+          notifyModal({
+            icon: MessageIcon.Success,
+            title: LL.Messages.phoneConfirmedTitle(),
+            text: LL.Messages.phoneLoginBody(),
+            primaryButtonTitle: LL.Messages.okay(),
+            primaryButtonAction: backToStart,
+            dismissAction: backToStart,
+            isRequired: true,
+          })
         }
       } catch (err) {
         if (err instanceof Error) {
@@ -188,6 +198,7 @@ export const PhoneRegistrationValidateScreen: React.FC<
       navigation,
       LL,
       updateCurrentProfile,
+      notifyModal,
     ],
   )
 

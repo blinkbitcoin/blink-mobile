@@ -1,6 +1,5 @@
 import * as React from "react"
 import {
-  Alert,
   Platform,
   Share,
   TouchableOpacity,
@@ -26,6 +25,7 @@ import { makeStyles, useTheme, Text } from "@rn-vui/themed"
 
 import { GaloyIconButton } from "../atomic/galoy-icon-button"
 import { GaloyToast } from "../galoy-toast"
+import { MessageIcon, MessagePopup } from "../notifications"
 import { PressableCard } from "../pressable-card"
 
 type Props = {
@@ -54,6 +54,10 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
   const styles = useStyles()
 
   const navigation = useNavigation<NativeStackNavigationProp<PeopleStackParamList>>()
+
+  /** Shown inside this modal rather than through the app's queue: iOS presents a modal
+   *  only from the one on top, and the app's would wait behind this one unseen. */
+  const [isShareFailedVisible, setIsShareFailedVisible] = React.useState(false)
 
   const acknowledgeModal = () => {
     setIsVisible(false)
@@ -94,7 +98,7 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
     } catch (err) {
       if (err instanceof Error) {
         reportError("invite-modal", err)
-        Alert.alert(err.message)
+        setIsShareFailedVisible(true)
       }
     }
   }
@@ -173,6 +177,18 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
           </View>
         </View>
       </View>
+      <MessagePopup
+        isVisible={isShareFailedVisible}
+        icon={MessageIcon.Alert}
+        title={LL.Messages.shareFailedTitle()}
+        text={LL.Messages.shareInviteFailedBody()}
+        buttonTitle={LL.Messages.copyLink()}
+        onButtonPress={() => {
+          setIsShareFailedVisible(false)
+          handleCopyToClipboard()
+        }}
+        onClose={() => setIsShareFailedVisible(false)}
+      />
       <GaloyToast inModal />
     </Modal>
   )

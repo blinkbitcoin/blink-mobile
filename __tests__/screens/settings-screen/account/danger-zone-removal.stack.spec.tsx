@@ -244,6 +244,12 @@ const deferred = <T,>() => {
   return { promise, resolve }
 }
 
+const mockNotifyModal = jest.fn()
+jest.mock("@app/components/notifications", () => ({
+  ...jest.requireActual("@app/components/notifications"),
+  useNotifications: () => ({ notifyModal: mockNotifyModal }),
+}))
+
 describe("Danger zone removal under the real lock", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -405,7 +411,7 @@ describe("Danger zone removal under the real lock", () => {
       })
 
       expect(routeNames()).toEqual(["Primary"])
-      expect(alertCalls.at(-1)?.title).toBe("Bye!")
+      expect(mockNotifyModal.mock.lastCall?.[0].title).toBe("Your account is closed")
     })
 
     /** `navigate("Primary")` pushed a second Home over the deleted account's screen, and
@@ -437,11 +443,13 @@ describe("Danger zone removal under the real lock", () => {
         mutation.resolve({ data: { accountDelete: { success: true, errors: [] } } })
       })
 
-      expect(alertCalls.at(-1)?.title).toBe("Bye!")
+      expect(mockNotifyModal.mock.lastCall?.[0].title).toBe("Your account is closed")
       expect(screen.getByTestId("account-deletion-lock")).toBeTruthy()
       expect(routeNames()).toEqual(["Primary", "settings", "accountScreen"])
 
-      await pressLastAlertButton("OK")
+      await act(async () => {
+        mockNotifyModal.mock.lastCall?.[0].primaryButtonAction()
+      })
 
       expect(mockRouteAfterLogout).toHaveBeenCalledWith(false)
       expect(routeNames()).toEqual(["Primary"])

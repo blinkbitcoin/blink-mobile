@@ -1,10 +1,11 @@
-import React, { useCallback, useRef, useState } from "react"
-import { Alert, FlatList, Pressable, View } from "react-native"
+import React, { useCallback, useEffect, useRef, useState } from "react"
+import { FlatList, Pressable, View } from "react-native"
 import { RouteProp, useFocusEffect, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { MessageIcon, useNotifications } from "@app/components/notifications"
 import { useDisplayCurrency } from "@app/hooks"
 import { useAccountDefaultWalletLazyQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -33,6 +34,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
+  const { notifyModal } = useNotifications()
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "merchantSelection">>()
   const [selectedMerchantId, setSelectedMerchantId] = useState<string | null>(null)
@@ -55,6 +57,9 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
       }
     }, []),
   )
+
+  /** The press below, which Try again hands the same merchant to again. */
+  const handleMerchantPressRef = useRef<(merchant: MerchantChoice) => void>(() => {})
 
   const handleMerchantPress = useCallback(
     async (merchant: MerchantChoice) => {
@@ -105,7 +110,15 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
           if (!(err instanceof Error)) return
 
           recordAppError(err)
-          Alert.alert(err.toString(), "", [{ text: LL.common.ok() }])
+          notifyModal({
+            icon: MessageIcon.Alert,
+            title: LL.Messages.merchantFailedTitle(),
+            text: LL.Messages.merchantFailedBody(),
+            primaryButtonTitle: LL.Messages.tryAgain(),
+            primaryButtonAction: () => {
+              if (isActiveRef.current) handleMerchantPressRef.current(merchant)
+            },
+          })
         } finally {
           if (isCurrentRequest()) {
             setResolvingMerchantId(null)
@@ -114,7 +127,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
       })
     },
     [
-      LL.common,
+      LL,
       navigation,
       myWalletIds,
       bitcoinNetwork,
@@ -123,8 +136,12 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
       displayCurrency,
       sdk,
       runMerchantSelection,
+      notifyModal,
     ],
   )
+  useEffect(() => {
+    handleMerchantPressRef.current = handleMerchantPress
+  }, [handleMerchantPress])
 
   const renderMerchant = useCallback(
     ({ item, index }: { item: MerchantChoice; index: number }) => {

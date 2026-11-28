@@ -5,6 +5,7 @@ import { WebView, WebViewMessageEvent, WebViewNavigation } from "react-native-we
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { headerIconTouchArea, headerLeftNoGlass } from "@app/components/header-no-glass"
+import { MessageIcon, useNotifications } from "@app/components/notifications"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { openExternalUrl } from "@app/utils/external"
@@ -34,6 +35,7 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
     useNavigation<NativeStackNavigationProp<RootStackParamList, "Primary">>()
   const { url, initialTitle, headerTitle, allowArbitraryUrl } = route.params
   const { LL } = useI18nContext()
+  const { notifyModal } = useNotifications()
 
   const {
     appConfig: {
@@ -45,6 +47,8 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
   // Not state: this guards a native side effect, is read and written inside the
   // same event callback, and must be atomic across events within one render.
   const jsInjected = React.useRef(false)
+  /** Progress keeps coming while the page loads: the user is told once, not per tick. */
+  const isNotReadyShown = React.useRef(false)
 
   const navigation = useNavigation()
   const [canGoBack, setCanGoBack] = React.useState<boolean>(false)
@@ -221,7 +225,22 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
         onLoadProgress={(e: WebViewProgressEvent) => {
           if (jsInjected.current || e.nativeEvent.progress <= 0.75) return
           if (!webview.current) {
-            Alert.alert(LL.common.error(), LL.GaloyAddressScreen.somethingWentWrong())
+            if (isNotReadyShown.current) return
+            isNotReadyShown.current = true
+            /** Payments from a page the wallet is not connected to would not work, so
+             *  every way out of the message closes it. */
+            const closePage = () => {
+              if (navigation.isFocused()) navigation.goBack()
+            }
+            notifyModal({
+              icon: MessageIcon.Alert,
+              title: LL.Messages.pageNotReadyTitle(),
+              text: LL.Messages.pageNotReadyBody(),
+              primaryButtonTitle: LL.Messages.okay(),
+              primaryButtonAction: closePage,
+              dismissAction: closePage,
+              isRequired: true,
+            })
             return
           }
           // Latch before injecting, and in a ref rather than state: two progress
