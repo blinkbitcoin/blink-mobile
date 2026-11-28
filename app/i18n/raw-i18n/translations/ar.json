@@ -2794,6 +2794,7 @@
     "title": "Set {bankName: string} address",
     "mainTitle": "اختر عنوان Lightning",
     "setLightningAddress": "تعيين عنوان Lightning",
+    "addressSet": "تم تعيين عنوان Lightning",
     "Errors": {
       "tooShort": "Address must be at least 3 characters long",
       "tooLong": "Address must be at most 50 characters long",
@@ -2917,6 +2918,7 @@
   },
   "EmailRegistrationValidateScreen": {
     "header": "To confirm your email address, enter the code we just sent you on {email: string}",
+    "emailVerified": "تم التحقق من البريد الإلكتروني",
     "success": "Email {email: string} confirmed successfully"
   },
   "EmailLoginInitiateScreen": {

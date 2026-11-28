@@ -9275,6 +9275,10 @@ type RootTranslation = {
 		 * S​e​t​ ​L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s
 		 */
 		setLightningAddress: string
+		/**
+		 * L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​ ​s​e​t
+		 */
+		addressSet: string
 		Errors: {
 			/**
 			 * A​d​d​r​e​s​s​ ​m​u​s​t​ ​b​e​ ​a​t​ ​l​e​a​s​t​ ​3​ ​c​h​a​r​a​c​t​e​r​s​ ​l​o​n​g
@@ -9685,6 +9689,10 @@ type RootTranslation = {
 		 * @param {string} email
 		 */
 		header: RequiredParams<'email'>
+		/**
+		 * E​m​a​i​l​ ​v​e​r​i​f​i​e​d
+		 */
+		emailVerified: string
 		/**
 		 * E​m​a​i​l​ ​{​e​m​a​i​l​}​ ​c​o​n​f​i​r​m​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
 		 * @param {string} email
@@ -23905,6 +23913,10 @@ export type TranslationFunctions = {
 		 * Set Lightning address
 		 */
 		setLightningAddress: () => LocalizedString
+		/**
+		 * Lightning address set
+		 */
+		addressSet: () => LocalizedString
 		Errors: {
 			/**
 			 * Address must be at least 3 characters long
@@ -24307,6 +24319,10 @@ export type TranslationFunctions = {
 		 * To confirm your email address, enter the code we just sent you on {email}
 		 */
 		header: (arg: { email: string }) => LocalizedString
+		/**
+		 * Email verified
+		 */
+		emailVerified: () => LocalizedString
 		/**
 		 * Email {email} confirmed successfully
 		 */

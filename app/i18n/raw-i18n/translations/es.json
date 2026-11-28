@@ -2794,6 +2794,7 @@
         "title": "Establece tu dirección de {bankName: string}",
         "mainTitle": "Elegir dirección Lightning",
         "setLightningAddress": "Establecer dirección de Lightning",
+        "addressSet": "Dirección de Lightning establecida",
         "Errors": {
             "tooShort": "La dirección debe tener al menos 3 caracteres",
             "tooLong": "La dirección debe tener como máximo 50 carácteres",
@@ -2917,6 +2918,7 @@
     },
     "EmailRegistrationValidateScreen": {
         "header": "Para confirmar su dirección de correo electrónico, ingrese el código que acabamos de enviarle a {email: string}",
+        "emailVerified": "Correo electrónico verificado",
         "success": "El correo electrónico {email: string} ha sido confirmado con éxito"
     },
     "EmailLoginInitiateScreen": {

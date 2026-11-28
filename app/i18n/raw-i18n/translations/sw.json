@@ -2794,6 +2794,7 @@
     "title": "Weka anwani ya {bankName: string}",
     "mainTitle": "Chagua Anwani ya Lightning",
     "setLightningAddress": "Weka anwani ya umeme",
+    "addressSet": "Anwani ya umeme imewekwa",
     "Errors": {
       "tooShort": "Anwani lazima iwe na herufi angalau 3",
       "tooLong": "Anwani lazima iwe na herufi si zaidi ya 50",
@@ -2917,6 +2918,7 @@
   },
   "EmailRegistrationValidateScreen": {
     "header": "Ili kuthibitisha anwani yako ya barua pepe, ingiza nambari tuliyokutumia kwenye {email: string}",
+    "emailVerified": "Barua pepe imethibitishwa",
     "success": "Barua pepe {email: string} imethibitishwa kwa mafanikio"
   },
   "EmailLoginInitiateScreen": {

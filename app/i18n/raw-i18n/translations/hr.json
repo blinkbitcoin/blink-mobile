@@ -2794,6 +2794,7 @@
     "title": "Postavite {bankName: string} adresu",
     "mainTitle": "Odaberite Lightning adresu",
     "setLightningAddress": "Postavi Lightning adresu",
+    "addressSet": "Lightning adresa postavljena",
     "Errors": {
       "tooShort": "Adresa mora imati najmanje 3 znaka",
       "tooLong": "Adresa mora imati najviše 50 znakova",
@@ -2917,6 +2918,7 @@
   },
   "EmailRegistrationValidateScreen": {
     "header": "Kako biste potvrdili svoju adresu e-pošte, unesite kod koji smo vam upravo poslali na {email: string}",
+    "emailVerified": "E-pošta potvrđena",
     "success": "E-pošta {email: string} uspješno je potvrđena"
   },
   "EmailLoginInitiateScreen": {

@@ -2794,6 +2794,7 @@
     "title": "Tetapkan alamat {bankName: string}",
     "mainTitle": "Pilih Alamat Lightning",
     "setLightningAddress": "Tetapkan alamat Lightning",
+    "addressSet": "Alamat Lightning ditetapkan",
     "Errors": {
       "tooShort": "Alamat mesti melebihi 3 huruf",
       "tooLong": "Panjang alamat maksimum adalah 50 aksara",
@@ -2917,6 +2918,7 @@
   },
   "EmailRegistrationValidateScreen": {
     "header": "Untuk sahkan emel anda, sila masukkan kod yang baru sahaja kami hantar ke {email: string}",
+    "emailVerified": "Emel disahkan",
     "success": "Emel {email: string} telah berjaya disahkan"
   },
   "EmailLoginInitiateScreen": {

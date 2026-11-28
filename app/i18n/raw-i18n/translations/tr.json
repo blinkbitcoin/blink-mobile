@@ -2794,6 +2794,7 @@
     "title": "{bankName: string} adresini belirle",
     "mainTitle": "Lightning Adresi Seç",
     "setLightningAddress": " Lightning adresini ayarla",
+    "addressSet": "Lightning adresi ayarlandı",
     "Errors": {
       "tooShort": "Adres en azından 3 karakter uzunluğunda olabilir",
       "tooLong": "Adres en fazla 50 karakter uzunluğunda olabilir",
@@ -2917,6 +2918,7 @@
   },
   "EmailRegistrationValidateScreen": {
     "header": "E-posta adresinizi onaylamak için, size az önce gönderdiğimiz kodu {email: string} adresine girin",
+    "emailVerified": "E-posta doğrulandı",
     "success": "E-posta {email: string} başarıyla onaylandı"
   },
   "EmailLoginInitiateScreen": {

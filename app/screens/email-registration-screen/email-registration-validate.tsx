@@ -1,7 +1,6 @@
 import * as React from "react"
-import { useCallback, useState, useEffect } from "react"
-import { View, Keyboard, Modal } from "react-native"
-import { Text, makeStyles } from "@rn-vui/themed"
+import { useCallback, useState } from "react"
+import { Keyboard, Modal } from "react-native"
 
 import { gql } from "@apollo/client"
 import { CodeInput } from "@app/components/code-input"
@@ -10,8 +9,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { SuccessIconAnimation } from "@app/components/success-animation"
+import { SuccessScreen } from "@app/components/success-screen"
 import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 
 gql`
@@ -35,11 +33,8 @@ type Props = {
   route: RouteProp<RootStackParamList, "emailRegistrationValidate">
 }
 
-const SUCCESS_DELAY = 2000
-
 export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const styles = useStyles()
 
   const [errorMessage, setErrorMessage] = React.useState<string>("")
 
@@ -98,27 +93,13 @@ export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
     [emailVerify, emailRegistrationId, LL.common, updateCurrentProfile],
   )
 
-  useEffect(() => {
-    if (!showSuccess) return
-
-    const t = setTimeout(() => {
-      if (onboarding) {
-        onboardingNavigate()
-        return
-      }
-      navigation.popTo("settings")
-    }, SUCCESS_DELAY)
-
-    return () => clearTimeout(t)
-  }, [
-    showSuccess,
-    onboarding,
-    onboardingNavigate,
-    LL.common,
-    LL.EmailRegistrationValidateScreen,
-    email,
-    navigation,
-  ])
+  const leaveAfterSuccess = useCallback(() => {
+    if (onboarding) {
+      onboardingNavigate()
+      return
+    }
+    navigation.popTo("settings")
+  }, [onboarding, onboardingNavigate, navigation])
 
   const header = LL.EmailRegistrationValidateScreen.header({ email })
 
@@ -126,18 +107,16 @@ export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
     <>
       <Modal
         visible={showSuccess}
-        transparent
         animationType="fade"
+        statusBarTranslucent
+        navigationBarTranslucent
         onRequestClose={() => setShowSuccess(false)}
       >
-        <View style={styles.successAnimationContainer}>
-          <SuccessIconAnimation>
-            <GaloyIcon name="email-add" size={110} />
-            <Text type="h2" style={styles.successText}>
-              {LL.common.success()}
-            </Text>
-          </SuccessIconAnimation>
-        </View>
+        <SuccessScreen
+          title={LL.EmailRegistrationValidateScreen.emailVerified()}
+          subtitle={email}
+          onHoldEnd={leaveAfterSuccess}
+        />
       </Modal>
 
       <CodeInput
@@ -150,17 +129,3 @@ export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
     </>
   )
 }
-
-const useStyles = makeStyles(({ colors }) => ({
-  successText: {
-    marginTop: 20,
-    textAlign: "center",
-    alignSelf: "center",
-  },
-  successAnimationContainer: {
-    flex: 1,
-    backgroundColor: colors.backgroundDefault,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-}))

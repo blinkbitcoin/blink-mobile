@@ -2794,6 +2794,7 @@
     "title": "Set {bankName: string} address",
     "mainTitle": "Lightning tinkunata akllay",
     "setLightningAddress": "Lightning tinkunata churay",
+    "addressSet": "Lightning tinkunata churasqa",
     "Errors": {
       "tooShort": "Address must be at least 3 characters long",
       "tooLong": "Address must be at most 50 characters long",
@@ -2917,6 +2918,7 @@
   },
   "EmailRegistrationValidateScreen": {
     "header": "To confirm your email address, enter the code we just sent you on {email: string}",
+    "emailVerified": "Email chiqaqchasqa",
     "success": "Email {email: string} confirmed successfully"
   },
   "EmailLoginInitiateScreen": {

@@ -2794,6 +2794,7 @@
     "title": "Set {bankName: string} address",
     "mainTitle": "Chọn Địa chỉ Lightning",
     "setLightningAddress": "Đặt địa chỉ Lightning",
+    "addressSet": "Đã đặt địa chỉ Lightning",
     "Errors": {
       "tooShort": "Address must be at least 3 characters long",
       "tooLong": "Address must be at most 50 characters long",
@@ -2917,6 +2918,7 @@
   },
   "EmailRegistrationValidateScreen": {
     "header": "To confirm your email address, enter the code we just sent you on {email: string}",
+    "emailVerified": "Đã xác minh email",
     "success": "Email {email: string} confirmed successfully"
   },
   "EmailLoginInitiateScreen": {

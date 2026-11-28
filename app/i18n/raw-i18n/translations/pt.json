@@ -2794,6 +2794,7 @@
         "title": "Definir endereço {bankName: string}",
         "mainTitle": "Escolha o Endereço Lightning",
         "setLightningAddress": "Defina seu endereço Lightning",
+        "addressSet": "Endereço Lightning definido",
         "Errors": {
             "tooShort": "O endereço deve ter pelo menos 3 caracteres de comprimento.",
             "tooLong": "O endereço deve ter no máximo 50 caracteres de comprimento.",
@@ -2917,6 +2918,7 @@
     },
     "EmailRegistrationValidateScreen": {
         "header": "Para confirmar o seu endereço de e-mail, insira o código que acabamos de enviar para você em {email: string}",
+        "emailVerified": "Email verificado",
         "success": "Email {email: string} confirmado com sucesso"
     },
     "EmailLoginInitiateScreen": {

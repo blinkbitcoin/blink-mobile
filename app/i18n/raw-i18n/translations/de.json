@@ -2794,6 +2794,7 @@
         "title": "Erstelle {bankName: string} Adresse",
         "mainTitle": "Lightning-Adresse wählen",
         "setLightningAddress": "Setze Lightning Adresse",
+        "addressSet": "Lightning-Adresse festgelegt",
         "Errors": {
             "tooShort": "Die Adresse muss mindestens drei Zeichen haben",
             "tooLong": "Die Adresse darf nicht länger als 50 Zeichen sein",
@@ -2917,6 +2918,7 @@
     },
     "EmailRegistrationValidateScreen": {
         "header": "Gib den Code, den wir dir eben an {email: string} gesendet haben ein, um deine Email-Adresse zu bestätigen",
+        "emailVerified": "Email-Adresse bestätigt",
         "success": "Email-Adresse {email: string} erfolgreich bestätigt"
     },
     "EmailLoginInitiateScreen": {
