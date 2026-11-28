@@ -1,6 +1,7 @@
 ---
 name: github-pr-image-attachments
 description: Use when embedding screenshots, GIFs, or any image into a GitHub pull request comment or review from the command line — including "attach the screenshots to the PR", "add before/after images", or when a gh attachment upload or gist has been blocked. Works against whatever GitHub repo the current checkout's origin remote points at.
+allowed-tools: Bash(/*/.claude/skills/*/scripts/*.sh) Bash(/*/.claude/skills/*/scripts/*.sh *) Bash(/*/.claude/skills/*/tests/run.sh)
 ---
 
 # Attaching Images to a GitHub PR
